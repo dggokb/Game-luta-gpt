@@ -85,7 +85,7 @@ python3 tools/sprites/inicio_da_base.py p16 base.webp --altura 0.70 --sombra-sat
 
 ## Prompt
 
-Prompts prontos para p01–p12, refeitos dos que deram certo na p15: [flick-h3-elenco.md](flick-h3-elenco.md).
+Prompts prontos para o elenco todo (p01–p16), refeitos dos que deram certo na p15: [flick-h3-elenco.md](flick-h3-elenco.md).
 
 A fórmula do [omni-flash.md](omni-flash.md#fórmula-do-prompt), com a última faixa indo até 5 s
 e a lista de limpeza com faíscas: no jab de teste saiu um clarão de impacto na ponta do punho e

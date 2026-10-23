@@ -1,7 +1,7 @@
 # Prompts do Flick (MiniMax H3 Fast) para o elenco
 
 Os prompts que deram certo na p15 no Flick ([p15.md](p15.md), [flick-h3.md](flick-h3.md)),
-refeitos para p01–p12. Cada um troca só o que muda de personagem: quem é, pronome, a lista do
+refeitos para p01–p14 e p16 (a p15 já tem os dela). Cada um troca só o que muda de personagem: quem é, pronome, a lista do
 que não pode mudar e o golpe H e o 2M da ficha.
 
 | Clipe | Na p15 | Aqui |
@@ -651,4 +651,168 @@ Static locked-off side view, one continuous shot with no scene cuts. 2D anime fi
 [1.3-1.8s] It pulls the leg back under it into the crouch.
 [1.8-5s] It is back in the deep crouching guard facing RIGHT, as in the end frame, breathing calmly.
 ONE sweep only, no spin. The sweeping leg stays low along the floor the whole time, never above knee height. It stays low and never stands up. It never holds any object. Keep its face, stitched scars, black hair, bandages, clawed fingers, trousers, red sash, bare feet, colors, line art and size exactly as in the frames; its size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+## p13 a p16
+
+- **p15:** já tem os seis clipes no Flick (idle, andar para frente e para trás, agachar, H,
+  2M), aprovados e no jogo. Os prompts dela estão em [p15.md](p15.md).
+- **p16:** já tem as imagens iniciais no tamanho do H3. São as `inicio_*.png` sem sufixo,
+  porque ela não tem vídeo antigo. O corpo ocupa 70% da altura, para ela ficar um pouco mais
+  baixa que a p15.
+  - O vídeo de agachar dá a `inicio_agachado.png` dela, para o 2M.
+  - O `tamanho.json` usa escala 0,4103 e altura 221 e entra junto com o pacote.
+- **p13 e p14:** os golpes são os **propostos** nas fichas, ainda sem aprovação.
+  - Os concepts já estão em `art/concepts/`, mas falta a Base no ChatGPT.
+  - Depois da Base, montar as imagens com `inicio_da_base.py` sem `--sufixo`, como na p16.
+  - `--altura`: p13 é enorme (perto de 0,77, o máximo que cabe o chute) e p14 é mais baixo.
+  - Medir pelo rosto contra a p15.
+
+## p13 — colosso de punhos pesados
+
+| Ordem | Clipe | Início → fim | Prompt |
+|---|---|---|---|
+| 1 | idle | `inicio_centro_h3` → `inicio_centro_h3` | abaixo |
+| 2 | andar para frente | `inicio_esquerda_h3` → `inicio_centro_h3` | "Andando para frente como personagem de jogo de luta mantendo sua guarda" |
+| 3 | andar para trás | `inicio_centro_h3` → `inicio_esquerda_h3` | "Andando para trás como personagem de jogo de luta mantendo sua guarda, sempre virado para a direita" |
+| 4 | agachar (e levantar) | `inicio_centro_h3` → `inicio_centro_h3` | abaixo; o quadro mais baixo vira `inicio_agachado_h3` |
+| 5 | H — martelo frontal (soco descendente) | `inicio_centro_h3` → `inicio_centro_h3` | abaixo |
+| 6 | 2M — rasteira baixa, sem giro | `inicio_agachado_h3` → `inicio_agachado_h3` | abaixo |
+
+**Idle**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the giant brawler from the start frame, on a flat solid green background. He faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-5s] He holds his fighting guard exactly as in the start frame, breathing calmly in a seamless loop: two slow breaths, chest and shoulders rising and falling slightly; his hair and clothes move softly with the breathing.
+His feet stay planted and never slide; he never leaves the guard and never turns toward the camera. He never holds any object. Keep his bald head, face, torn black vest, tank top, red arm wraps, reinforced gloves, cargo pants, heavy boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**Agachar**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the giant brawler from the start frame, on a flat solid green background. He faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-0.5s] He holds his fighting guard exactly as in the start frame.
+[0.5-1s] He sinks into a deep fighting-game crouch: a low squat with his hips dropping all the way down to the level of his knees, thighs horizontal, knees sharply bent and pointing forward, heels flat on the ground; torso upright and leaning slightly forward, his arms kept in his guard as in the start frame, eyes forward on the opponent. This is a deep squat, not a wide horse stance.
+[1-3s] He holds the deep squat, breathing calmly: only his shoulders rise and fall slightly, his hips stay low and his feet stay planted.
+[3-3.5s] He rises smoothly back to his standing guard.
+[3.5-5s] He holds the same guard as the end frame and stays still.
+His feet never move or slide: the same leg stays in front and both feet stay in the same place for the whole video. He does not punch, kick or sit down. He never holds any object. Keep his bald head, face, torn black vest, tank top, red arm wraps, reinforced gloves, cargo pants, heavy boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**H**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the giant brawler from the start frame, on a flat solid green background. He faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-1s] He holds his fighting guard exactly as in the start frame.
+[1-1.5s] He raises his rear fist (the fist held farther back, toward the LEFT side of the frame) high above his head, elbow bent, torso rising tall, and holds that raised pose for a split second.
+[1.5-2s] He brings it DOWN in ONE crushing hammer-fist strike in a vertical arc in front of him, his whole body leaning forward into it, ending with the fist at waist height in front of his body.
+[2-2.5s] He pulls back and returns to the guard.
+[2.5-5s] He holds the same guard as the end frame, breathing calmly, feet planted.
+One strike only. The fist moves DOWN, never straight forward. He does not step: the same leg stays in front and both feet stay planted and never slide. His whole body stays inside the frame. He never holds any object. Keep his bald head, face, torn black vest, tank top, red arm wraps, reinforced gloves, cargo pants, heavy boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**2M**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the giant brawler from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+[0-0.5s] He holds his deep crouching guard facing RIGHT, exactly as in the start frame.
+[0.5-0.9s] Staying low, he shifts his weight onto his rear leg.
+[0.9-1.3s] He extends his front leg straight out along the floor toward the RIGHT in ONE low, heavy, sweeping kick at ankle height, the heavy boot sliding just above the floor.
+[1.3-1.8s] He pulls the leg back under him into the crouch.
+[1.8-5s] He is back in the deep crouching guard facing RIGHT, as in the end frame, breathing calmly.
+ONE sweep only, no spin. The sweeping leg stays low along the floor the whole time, never above knee height. He stays low and never stands up. He never holds any object. Keep his bald head, face, torn black vest, tank top, red arm wraps, reinforced gloves, cargo pants, heavy boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+## p14 — malandro das fintas
+
+| Ordem | Clipe | Início → fim | Prompt |
+|---|---|---|---|
+| 1 | idle | `inicio_centro_h3` → `inicio_centro_h3` | abaixo |
+| 2 | andar para frente | `inicio_esquerda_h3` → `inicio_centro_h3` | "Andando para frente como personagem de jogo de luta mantendo sua guarda" |
+| 3 | andar para trás | `inicio_centro_h3` → `inicio_esquerda_h3` | "Andando para trás como personagem de jogo de luta mantendo sua guarda, sempre virado para a direita" |
+| 4 | agachar (e levantar) | `inicio_centro_h3` → `inicio_centro_h3` | abaixo; o quadro mais baixo vira `inicio_agachado_h3` |
+| 5 | H — chute de malandro (circular longo, perna de trás) | `inicio_centro_h3` → `inicio_centro_h3` | abaixo |
+| 6 | 2M — rasteira baixa, sem giro | `inicio_agachado_h3` → `inicio_agachado_h3` | abaixo |
+
+**Idle**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the trickster fighter from the start frame, on a flat solid green background. He faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-5s] He holds his fighting guard exactly as in the start frame, breathing calmly in a seamless loop: two slow breaths, chest and shoulders rising and falling slightly; his hair and clothes move softly with the breathing.
+His feet stay planted and never slide; he never leaves the guard and never turns toward the camera. He never holds any object. Keep his face, messy tied black hair, black long coat, black shirt, red sashes, cargo pants, boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**Agachar**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the trickster fighter from the start frame, on a flat solid green background. He faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-0.5s] He holds his fighting guard exactly as in the start frame.
+[0.5-1s] He sinks into a deep fighting-game crouch: a low squat with his hips dropping all the way down to the level of his knees, thighs horizontal, knees sharply bent and pointing forward, heels flat on the ground; torso upright and leaning slightly forward, his arms kept in his guard as in the start frame, eyes forward on the opponent. This is a deep squat, not a wide horse stance.
+[1-3s] He holds the deep squat, breathing calmly: only his shoulders rise and fall slightly, his hips stay low and his feet stay planted.
+[3-3.5s] He rises smoothly back to his standing guard.
+[3.5-5s] He holds the same guard as the end frame and stays still.
+His feet never move or slide: the same leg stays in front and both feet stay in the same place for the whole video. He does not punch, kick or sit down. He never holds any object. Keep his face, messy tied black hair, black long coat, black shirt, red sashes, cargo pants, boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**H**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the trickster fighter from the start frame, on a flat solid green background. He faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-1s] He holds his fighting guard exactly as in the start frame.
+[1-2s] He pivots on his front foot and throws ONE long roundhouse kick with his rear leg (the leg farther back, on the LEFT side of the frame): the knee rises, then the leg whips around horizontally at chest height, fully extended toward the RIGHT; his long coat swings with it. He retracts the knee and sets the foot back down exactly where it started. His hands stay up in his guard.
+[2-5s] He holds the same guard as the end frame, breathing calmly, feet planted.
+One kick only. After the kick the same leg is in front again, as in the start frame. His whole body stays inside the frame. He never holds any object. Keep his face, messy tied black hair, black long coat, black shirt, red sashes, cargo pants, boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**2M**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the trickster fighter from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+[0-0.5s] He holds his deep crouching guard facing RIGHT, exactly as in the start frame.
+[0.5-0.9s] Staying low, he shifts his weight onto his rear leg.
+[0.9-1.3s] He extends his front leg straight out along the floor toward the RIGHT in ONE low, sweeping kick at ankle height, the foot sliding just above the floor.
+[1.3-1.8s] He pulls the leg back under him into the crouch.
+[1.8-5s] He is back in the deep crouching guard facing RIGHT, as in the end frame, breathing calmly.
+ONE sweep only, no spin. The sweeping leg stays low along the floor the whole time, never above knee height. He stays low and never stands up. He never holds any object. Keep his face, messy tied black hair, black long coat, black shirt, red sashes, cargo pants, boots, colors, line art and size exactly as in the frames; his size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+## p16 — Bonnie Scarlet
+
+| Ordem | Clipe | Início → fim | Prompt |
+|---|---|---|---|
+| 1 | idle | `inicio_centro` → `inicio_centro` | abaixo |
+| 2 | andar para frente | `inicio_esquerda` → `inicio_centro` | "Andando para frente como personagem de jogo de luta mantendo sua guarda" |
+| 3 | andar para trás | `inicio_centro` → `inicio_esquerda` | "Andando para trás como personagem de jogo de luta mantendo sua guarda, sempre virada para a direita" |
+| 4 | agachar (e levantar) | `inicio_centro` → `inicio_centro` | abaixo; o quadro mais baixo vira `inicio_agachado` |
+| 5 | H — chute de estrela (chute alto com giro) | `inicio_centro` → `inicio_centro` | abaixo |
+| 6 | 2M — rasteira girando | `inicio_agachado` → `inicio_agachado` | abaixo |
+
+**Idle**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the clown martial artist from the start frame, on a flat solid green background. She faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-5s] She holds her fighting guard exactly as in the start frame, breathing calmly in a seamless loop: two slow breaths, chest and shoulders rising and falling slightly; her hair and clothes move softly with the breathing.
+Her feet stay planted and never slide; she never leaves the guard and never turns toward the camera. She never holds any object. Keep her face, red clown nose, red ponytail and bow, red/black/cream diamond outfit, pompom, waist bows, gloves, mismatched socks, big sneakers, colors, line art and size exactly as in the frames; her size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**Agachar**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the clown martial artist from the start frame, on a flat solid green background. She faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-0.5s] She holds her fighting guard exactly as in the start frame.
+[0.5-1s] She sinks into a deep fighting-game crouch: a low squat with her hips dropping all the way down to the level of her knees, thighs horizontal, knees sharply bent and pointing forward, heels flat on the ground; torso upright and leaning slightly forward, her arms kept in her guard as in the start frame, eyes forward on the opponent. This is a deep squat, not a wide horse stance.
+[1-3s] She holds the deep squat, breathing calmly: only her shoulders rise and fall slightly, her hips stay low and her feet stay planted.
+[3-3.5s] She rises smoothly back to her standing guard.
+[3.5-5s] She holds the same guard as the end frame and stays still.
+Her feet never move or slide: the same leg stays in front and both feet stay in the same place for the whole video. She does not punch, kick or sit down. She never holds any object. Keep her face, red clown nose, red ponytail and bow, red/black/cream diamond outfit, pompom, waist bows, gloves, mismatched socks, big sneakers, colors, line art and size exactly as in the frames; her size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**H**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the clown martial artist from the start frame, on a flat solid green background. She faces RIGHT the whole time and stays in place; the camera stays fixed and never zooms.
+[0-1s] She holds her fighting guard exactly as in the start frame.
+[1-2s] She spins her whole body around on her front foot: for an instant her BACK is toward the camera, and her rear leg swings around straight at head height, the heel leading, striking toward the RIGHT. She completes the full turn and sets the foot back down exactly where it started, facing RIGHT again in the same guard.
+[2-5s] She holds the same guard as the end frame, breathing calmly, feet planted.
+ONE full 360-degree spin and ONE kick only. After the kick the same leg is in front again, as in the start frame. Her whole body stays inside the frame. She never holds any object. Keep her face, red clown nose, red ponytail and bow, red/black/cream diamond outfit, pompom, waist bows, gloves, mismatched socks, big sneakers, colors, line art and size exactly as in the frames; her size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+```
+
+**2M**
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the clown martial artist from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+[0-0.5s] She holds her deep crouching guard facing RIGHT, exactly as in the start frame.
+[0.5-0.8s] She drops even lower and plants one hand flat on the ground.
+[0.8-1.1s] Pivoting on that hand, she spins her whole body around fast: for an instant her BACK is toward the camera, and one leg swings out straight along the floor behind her.
+[1.1-1.4s] Still spinning, the extended leg sweeps around low along the floor to the front, toward the RIGHT, at ankle height, like the classic spinning crouching sweep of 1990s anime fighting games.
+[1.4-1.8s] She finishes the full turn, pulls the leg back under her and lifts her hand from the ground.
+[1.8-5s] She is back in the deep crouching guard facing RIGHT, as in the end frame, breathing calmly.
+ONE full 360-degree spin and ONE sweep. The sweeping leg stays straight and low along the floor the whole time, never above knee height. She stays low and never stands up. She never holds any object. Keep her face, red clown nose, red ponytail and bow, red/black/cream diamond outfit, pompom, waist bows, gloves, mismatched socks, big sneakers, colors, line art and size exactly as in the frames; her size never changes. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
 ```
