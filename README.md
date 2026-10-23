@@ -262,8 +262,8 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem batia é jogado
   para trás (arrastando o pé, com fumacinha) e fica atordoado, e você sai correndo sozinho até
   ele para emendar o seu combo. Sem barra não quebra. **Aviso**: quando o golpe que dá para
-  quebrar começa (e você tem barra), um balão espetado de mangá com **"!"** estala sobre a sua
-  cabeça; na janela do M + H o "!" fica vermelho e o balão treme (`CombatEngine.breakerCue`,
+  quebrar começa (e você tem barra), um **"!"** de tinta, estilo mangá, estala sobre a sua
+  cabeça; na janela do M + H o "!" fica vermelho e treme (`CombatEngine.breakerCue`,
   `GameView.drawBreakerCue`).
 - **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
 - **Grito da troca**: em toda luta em dupla, quando a vida de quem luta entra no vermelho, o
