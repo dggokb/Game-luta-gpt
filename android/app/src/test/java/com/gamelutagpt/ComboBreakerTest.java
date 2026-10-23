@@ -307,8 +307,7 @@ public class ComboBreakerTest {
         for (int i = 0; i < cues.size(); i++) if (cues.get(i) >= 0 && first < 0) first = i;
         assertTrue("o \"!\" aparece antes do H entrar", first >= 0 && first < contact);
         for (int i = 0; i < first; i++) assertEquals("no L e no M não tem aviso", -1, (int)cues.get(i));
-        // Aparece antes da janela (dá tempo de reagir) e a janela está aberta no quadro da batida.
-        assertTrue("aviso antes da janela: " + cues, cues.get(first) > new CombatConfig().comboBreakerFrames);
+        // A janela está aberta antes da batida (o aviso nasce no começo do golpe, quase todo nela).
         assertTrue("janela aberta antes da batida: " + cues, cues.get(contact - 1) <= new CombatConfig().comboBreakerFrames);
         for (int i = first + 1; i < contact; i++) assertTrue("conta para baixo", cues.get(i) <= cues.get(i - 1));
         for (int i = contact; i < cues.size(); i++) assertEquals("some quando o H entra", -1, (int)cues.get(i));

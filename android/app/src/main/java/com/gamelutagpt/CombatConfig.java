@@ -379,7 +379,8 @@ final class CombatConfig {
     // está entrando, M + H em cima da hora quebra o combo: o golpe não entra, quem batia é jogado
     // para longe e fica atordoado, e quem apanhava sai correndo sozinho até ele para emendar o
     // próprio combo. Custa barra (sem barra, nada acontece) e vale uma vez por combo.
-    int comboBreakerFrames = 5;
+    /** Quadros antes da batida em que o M + H ainda vale (~0,17 s: o "!" do aviso já nasce quase todo nela). */
+    int comboBreakerFrames = 10;
     /** Um M + H logo depois do outro não abre a janela (bater sem parar não quebra). */
     int comboBreakerLockoutFrames = 20;
     /** Quadros entre o M e o H (dois dedos) que ainda valem como apertados juntos. */

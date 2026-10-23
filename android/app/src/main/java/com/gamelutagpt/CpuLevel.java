@@ -89,7 +89,9 @@ final class CpuLevel {
      * nada até o 3, depois sobe com o nível. A aposta é no tempo: só quebra se acertar a janela.
      */
     double comboBreaker() {
-        return number <= 3 ? 0.0 : 0.12 * (number - 3);
+        // Metade do que era com a janela de 5 quadros: com a de 10 o palpite dela cai na janela
+        // quase sempre, e a quebra da CPU fica na mesma frequência de antes.
+        return number <= 3 ? 0.0 : 0.06 * (number - 3);
     }
 
     static CpuLevel of(int number) {
