@@ -1,0 +1,51 @@
+{
+  "id": "p16_rise",
+  "javaName": "P16_RISE",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_rise_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_rise.webp",
+  "report": "tools/sprites/reports/p16_rise.report.json",
+  "preview": "android/app/build/sprite-review/p16_rise-import.png",
+  "expectedFrames": 13,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "quadros": "80,81,82,83,84,85,86,87,88,89,90,91,92",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "100,270",
+    "colunas": 7,
+    "fixar": "video",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_rise_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        100,
+        270
+      ],
+      "colunas": 7
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 200,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_rise_video_normalized.png"
+  ]
+}

@@ -2740,6 +2740,72 @@ final class GeneratedSpriteLayouts {
     static final int P15_WALK_FORWARD_ROOT_Y = 532;
     static final int P15_WALK_FORWARD_FRAME_COUNT = 20;
 
+    static final int P16_BACKDASH_FRAME_WIDTH = 428;
+    static final int P16_BACKDASH_FRAME_HEIGHT = 596;
+    static final int P16_BACKDASH_ROOT_X = 220;
+    static final int P16_BACKDASH_ROOT_Y = 587;
+    static final int P16_BACKDASH_FRAME_COUNT = 12;
+
+    static final int P16_CROUCH_FRAME_WIDTH = 330;
+    static final int P16_CROUCH_FRAME_HEIGHT = 433;
+    static final int P16_CROUCH_ROOT_X = 167;
+    static final int P16_CROUCH_ROOT_Y = 424;
+    static final int P16_CROUCH_FRAME_COUNT = 11;
+
+    static final int P16_CROUCH_IDLE_FRAME_WIDTH = 318;
+    static final int P16_CROUCH_IDLE_FRAME_HEIGHT = 342;
+    static final int P16_CROUCH_IDLE_ROOT_X = 155;
+    static final int P16_CROUCH_IDLE_ROOT_Y = 332;
+    static final int P16_CROUCH_IDLE_FRAME_COUNT = 26;
+
+    static final int P16_DASH_FRAME_WIDTH = 561;
+    static final int P16_DASH_FRAME_HEIGHT = 408;
+    static final int P16_DASH_ROOT_X = 353;
+    static final int P16_DASH_ROOT_Y = 398;
+    static final int P16_DASH_FRAME_COUNT = 17;
+
+    static final int P16_FALL_FRAME_WIDTH = 360;
+    static final int P16_FALL_FRAME_HEIGHT = 569;
+    static final int P16_FALL_ROOT_X = 145;
+    static final int P16_FALL_ROOT_Y = 557;
+    static final int P16_FALL_FRAME_COUNT = 6;
+
+    static final int P16_IDLE_FRAME_WIDTH = 318;
+    static final int P16_IDLE_FRAME_HEIGHT = 474;
+    static final int P16_IDLE_ROOT_X = 150;
+    static final int P16_IDLE_ROOT_Y = 465;
+    static final int P16_IDLE_FRAME_COUNT = 40;
+
+    static final int P16_JUMP_FRAME_WIDTH = 339;
+    static final int P16_JUMP_FRAME_HEIGHT = 594;
+    static final int P16_JUMP_ROOT_X = 166;
+    static final int P16_JUMP_ROOT_Y = 583;
+    static final int P16_JUMP_FRAME_COUNT = 6;
+
+    static final int P16_LAND_FRAME_WIDTH = 304;
+    static final int P16_LAND_FRAME_HEIGHT = 440;
+    static final int P16_LAND_ROOT_X = 157;
+    static final int P16_LAND_ROOT_Y = 430;
+    static final int P16_LAND_FRAME_COUNT = 4;
+
+    static final int P16_RISE_FRAME_WIDTH = 321;
+    static final int P16_RISE_FRAME_HEIGHT = 466;
+    static final int P16_RISE_ROOT_X = 154;
+    static final int P16_RISE_ROOT_Y = 456;
+    static final int P16_RISE_FRAME_COUNT = 13;
+
+    static final int P16_WALK_BACK_FRAME_WIDTH = 350;
+    static final int P16_WALK_BACK_FRAME_HEIGHT = 485;
+    static final int P16_WALK_BACK_ROOT_X = 164;
+    static final int P16_WALK_BACK_ROOT_Y = 475;
+    static final int P16_WALK_BACK_FRAME_COUNT = 19;
+
+    static final int P16_WALK_FORWARD_FRAME_WIDTH = 377;
+    static final int P16_WALK_FORWARD_FRAME_HEIGHT = 495;
+    static final int P16_WALK_FORWARD_ROOT_X = 187;
+    static final int P16_WALK_FORWARD_ROOT_Y = 485;
+    static final int P16_WALK_FORWARD_FRAME_COUNT = 19;
+
     static final int BACKDASH_SET_FRAME_WIDTH = 497;
     static final int BACKDASH_SET_FRAME_HEIGHT = 487;
     static final int BACKDASH_SET_ROOT_X = 205;

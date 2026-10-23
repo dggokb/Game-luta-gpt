@@ -1,0 +1,9 @@
+{
+  "IDLE": "idle",
+  "WALK_FORWARD": "frente",
+  "WALK_BACK": "tras",
+  "DASH": "dash",
+  "BACKDASH": "backdash",
+  "CROUCH": "agachar",
+  "JUMP": "jump"
+}

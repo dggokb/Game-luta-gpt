@@ -1,0 +1,49 @@
+{
+  "id": "p16_fall",
+  "javaName": "P16_FALL",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_fall_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_fall.webp",
+  "report": "tools/sprites/reports/p16_fall.report.json",
+  "preview": "android/app/build/sprite-review/p16_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jump.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "quadros": "22,33,44,55,66,79",
+    "celula": 352,
+    "largura": 224,
+    "raiz": "100,334",
+    "colunas": 6,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_fall_video_normalized.png",
+      "celula": [
+        224,
+        352
+      ],
+      "raiz": [
+        100,
+        334
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 704,
+  "rootX": 200,
+  "rootY": 668,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_fall_video_normalized.png"
+  ]
+}

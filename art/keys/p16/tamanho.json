@@ -1,0 +1,10 @@
+{
+  "pacote": "p16",
+  "altura": 221,
+  "chaves": {
+    "inicio_centro": 0.4103,
+    "inicio_esquerda": 0.4103,
+    "inicio_direita": 0.4103,
+    "inicio_agachado": 0.4103
+  }
+}

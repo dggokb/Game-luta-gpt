@@ -1,0 +1,50 @@
+{
+  "id": "p16_land",
+  "javaName": "P16_LAND",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_land_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_land.webp",
+  "report": "tools/sprites/reports/p16_land.report.json",
+  "preview": "android/app/build/sprite-review/p16_land-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jump.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "quadros": "89,91,93,95",
+    "celula": 320,
+    "largura": 224,
+    "raiz": "110,292",
+    "colunas": 4,
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_land_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        110,
+        292
+      ],
+      "colunas": 4
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 220,
+  "rootY": 584,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_land_video_normalized.png"
+  ]
+}

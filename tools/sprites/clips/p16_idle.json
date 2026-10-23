@@ -1,0 +1,49 @@
+{
+  "id": "p16_idle",
+  "javaName": "P16_IDLE",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_idle_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_idle.webp",
+  "report": "tools/sprites/reports/p16_idle.report.json",
+  "preview": "android/app/build/sprite-review/p16_idle-import.png",
+  "expectedFrames": 40,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "idle.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "108,270",
+    "colunas": 9,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_idle_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        108,
+        270
+      ],
+      "colunas": 9
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 216,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_idle_video_normalized.png"
+  ]
+}

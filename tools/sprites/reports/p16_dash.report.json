@@ -1,0 +1,377 @@
+{
+  "id": "p16_dash",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_dash_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 736,
+    "frameHeight": 512,
+    "rootX": 400,
+    "rootY": 476,
+    "columns": 5,
+    "frameCount": 17
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        267,
+        98,
+        595,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 45660
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        158,
+        101,
+        565,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 50270
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        82,
+        88,
+        569,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 53391
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        55,
+        104,
+        584,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 55897
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        68,
+        86,
+        582,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 55566
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        177,
+        87,
+        586,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 53269
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        247,
+        94,
+        595,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 48050
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        215,
+        104,
+        568,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 46538
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        123,
+        93,
+        578,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 52676
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        72,
+        116,
+        586,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 51228
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        69,
+        88,
+        599,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 50708
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        198,
+        89,
+        600,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 49020
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        248,
+        91,
+        575,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 44196
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        117,
+        96,
+        549,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 51028
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        68,
+        97,
+        561,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 52001
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        63,
+        89,
+        575,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 54931
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        118,
+        87,
+        567,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 54808
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 561,
+    "frameHeight": 408,
+    "rootX": 353,
+    "rootY": 398,
+    "columns": 5,
+    "frameCount": 17,
+    "cropOffset": [
+      47,
+      78
+    ],
+    "sheetWidth": 2704,
+    "sheetHeight": 1192,
+    "frames": [
+      [
+        0,
+        804,
+        336,
+        388,
+        216,
+        16
+      ],
+      [
+        848,
+        804,
+        416,
+        384,
+        107,
+        19
+      ],
+      [
+        0,
+        0,
+        496,
+        400,
+        31,
+        6
+      ],
+      [
+        1268,
+        804,
+        540,
+        384,
+        4,
+        22
+      ],
+      [
+        500,
+        0,
+        524,
+        400,
+        17,
+        4
+      ],
+      [
+        1028,
+        0,
+        420,
+        400,
+        126,
+        5
+      ],
+      [
+        1280,
+        404,
+        356,
+        392,
+        196,
+        12
+      ],
+      [
+        1812,
+        804,
+        364,
+        384,
+        164,
+        22
+      ],
+      [
+        1640,
+        404,
+        464,
+        392,
+        72,
+        11
+      ],
+      [
+        2180,
+        804,
+        524,
+        372,
+        21,
+        34
+      ],
+      [
+        1452,
+        0,
+        540,
+        400,
+        18,
+        6
+      ],
+      [
+        0,
+        404,
+        412,
+        396,
+        147,
+        7
+      ],
+      [
+        416,
+        404,
+        336,
+        396,
+        197,
+        9
+      ],
+      [
+        2108,
+        404,
+        440,
+        392,
+        66,
+        14
+      ],
+      [
+        340,
+        804,
+        504,
+        388,
+        17,
+        15
+      ],
+      [
+        756,
+        404,
+        520,
+        396,
+        12,
+        7
+      ],
+      [
+        1996,
+        0,
+        460,
+        400,
+        67,
+        5
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 30146560,
+      "grid": 18311040,
+      "packed": 12892672
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "697c482843d35b0438f9b355119c04c24480dcf58342fa591f99dd980ce45103",
+      "config": "87f415b429380e5f425d7a56105ceaf3c6b2f20d8045f59e633389eb39d85230",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_dash_video_normalized.png": "9eda2289ead6282220709aafcd6714f0895f4115f920a1c14a2db1a732294e70"
+    }
+  }
+}

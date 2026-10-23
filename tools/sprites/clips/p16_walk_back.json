@@ -1,0 +1,48 @@
+{
+  "id": "p16_walk_back",
+  "javaName": "P16_WALK_BACK",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_walk_back_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_walk_back.webp",
+  "report": "tools/sprites/reports/p16_walk_back.report.json",
+  "preview": "android/app/build/sprite-review/p16_walk_back-import.png",
+  "expectedFrames": 19,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "tras.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67,69,71,73",
+    "celula": 320,
+    "largura": 256,
+    "raiz": "120,302",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_walk_back_video_normalized.png",
+      "celula": [
+        256,
+        320
+      ],
+      "raiz": [
+        120,
+        302
+      ],
+      "colunas": 8
+    },
+    "recorte_suave": true
+  },
+  "frameHeight": 640,
+  "rootX": 240,
+  "rootY": 604,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_walk_back_video_normalized.png"
+  ]
+}

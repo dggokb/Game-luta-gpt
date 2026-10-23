@@ -1,0 +1,130 @@
+{
+  "id": "p16_land",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_land_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 640,
+    "rootX": 220,
+    "rootY": 584,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        71,
+        162,
+        350,
+        585
+      ],
+      "minimumMargin": 55,
+      "opaquePixels": 45186
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        71,
+        199,
+        355,
+        586
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 42693
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        72,
+        196,
+        357,
+        585
+      ],
+      "minimumMargin": 55,
+      "opaquePixels": 44742
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        74,
+        180,
+        359,
+        586
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 44563
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 304,
+    "frameHeight": 440,
+    "rootX": 157,
+    "rootY": 430,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      63,
+      154
+    ],
+    "sheetWidth": 296,
+    "sheetHeight": 1656,
+    "frames": [
+      [
+        0,
+        0,
+        288,
+        432,
+        4,
+        4
+      ],
+      [
+        0,
+        1260,
+        292,
+        396,
+        4,
+        41
+      ],
+      [
+        0,
+        856,
+        296,
+        400,
+        5,
+        38
+      ],
+      [
+        0,
+        436,
+        296,
+        416,
+        7,
+        22
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4587520,
+      "grid": 2140160,
+      "packed": 1960704
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c6e786cb40566c1dc99ccbe7ddb3eedf648e98cff3afa96b146d7a33fb624713",
+      "config": "2575aa475531b83a7967f54b991ef0734ca04c3f28fb25f70b6b94b595db55c9",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_land_video_normalized.png": "8a69c5f3d853a717329f515e9448d8296369532d086d568c88a81cd8ff7ef643"
+    }
+  }
+}

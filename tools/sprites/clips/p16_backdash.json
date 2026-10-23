@@ -1,0 +1,50 @@
+{
+  "id": "p16_backdash",
+  "javaName": "P16_BACKDASH",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_backdash_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_backdash.webp",
+  "report": "tools/sprites/reports/p16_backdash.report.json",
+  "preview": "android/app/build/sprite-review/p16_backdash-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "backdash.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "quadros": "4,10,16,22,28,34,40,46,52,58,63,68",
+    "celula": 352,
+    "largura": 256,
+    "raiz": "120,334",
+    "colunas": 6,
+    "fixar": "registro",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_backdash_video_normalized.png",
+      "celula": [
+        256,
+        352
+      ],
+      "raiz": [
+        120,
+        334
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
+  },
+  "frameHeight": 704,
+  "rootX": 240,
+  "rootY": 668,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_backdash_video_normalized.png"
+  ]
+}

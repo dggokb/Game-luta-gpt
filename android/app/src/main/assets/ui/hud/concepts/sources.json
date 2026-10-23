@@ -121,6 +121,16 @@
       "sha256": "5dc93bfd199bca185d1aedcf6bb7381fe51f1eba0c002b73f82572a44d623981",
       "bytes": 1384700,
       "git_sha": "bb41d980b124fec1d958dcf7d66df8c6943e3f30"
+    },
+    {
+      "name": "p16.png",
+      "drive_file_id": "16IuQMBDUsl0v6mLneykr1H1BTmKTgDAa",
+      "drive_url": "https://drive.google.com/file/d/16IuQMBDUsl0v6mLneykr1H1BTmKTgDAa/view?usp=drivesdk",
+      "source": "art/concepts/p16.png",
+      "asset": "ui/hud/concepts/p16.webp",
+      "sha256": "fec979f47f5a8731b5b50a1e5f804be18b4a1cbdd5c48c19a563f7d67194f6cc",
+      "bytes": 1582208,
+      "git_sha": "742d0ba88d90338c1a0ae4e1f32f080130b6d9c4"
     }
   ]
 }

@@ -1,0 +1,51 @@
+{
+  "id": "p16_crouch_idle",
+  "javaName": "P16_CROUCH_IDLE",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_crouch_idle_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_crouch_idle.webp",
+  "report": "tools/sprites/reports/p16_crouch_idle.report.json",
+  "preview": "android/app/build/sprite-review/p16_crouch_idle-import.png",
+  "expectedFrames": 26,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "quadros": "44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "100,270",
+    "colunas": 9,
+    "fixar": "video",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_crouch_idle_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        100,
+        270
+      ],
+      "colunas": 9
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 200,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_crouch_idle_video_normalized.png"
+  ]
+}
