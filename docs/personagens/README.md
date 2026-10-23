@@ -48,8 +48,8 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 | **p08** | p07 | Dama de vestido vermelho/preto, cabelo rosa, chicote | **Chicote — longo alcance** (Dhalsim). Única com arma na mão. Gananciosa | Chicote nos normais fortes e lançado |
 | **p09** | p10 | Bombeiro ruivo, colete vermelho com faixas refletivas | **Grappler bombeiro.** Agarrões de "resgate", tanque | Machado lançado (giratório), fogo |
 | **p10** | p09 | Bombeira loira, mesmo uniforme | **Bombeira ágil.** Chutes, acrobacias, rushdown | Machado lançado, vapor/água |
-| **p11** | p12 | Médico grisalho, jaleco com sangue, luvas | **Cirurgião sádico.** Trapper, veneno ao longo do tempo | Bisturis e seringas lançados |
-| **p12** | p11 | Morto-vivo costurado, bandagens | **Criatura feral.** Contorcido, imprevisível, mordidas, golpes que custam vida, super armor | Força que cresce com a vida perdida |
+| **p11** | p12 (Necro) | Médico grisalho, jaleco com sangue, luvas | **Cirurgião sádico.** Trapper, veneno ao longo do tempo | Bisturis e seringas lançados |
+| **p12** (Necro) | p11 | Morto-vivo costurado, bandagens | **Criatura feral.** Contorcido, imprevisível, mordidas, golpes que custam vida, super armor | Força que cresce com a vida perdida |
 | **p13** | p14 *(proposta)* | Homem enorme, careca, colete preto rasgado, luvas reforçadas e faixas vermelhas | **Brawler pesado**, punhos esmagadores, ombradas e pressão de curta distância *(proposta)* | Ondas de choque cinéticas curtas *(proposta)* |
 | **p14** | p13 *(proposta)* | Homem magro, cabelo preto preso, casaco preto de mangas compridas, faixa vermelha e sorriso malandro | **Trickster de fintas**, esquivas, rasteiras e mudanças de ritmo *(proposta)* | Cortes curtos de ar *(proposta)* |
 | **p15** | p16 *(proposta)* | Karateca forte de cabelo preto preso em rabo de cavalo, quimono branco, faixa preta | **Shotokan técnico**, base firme, golpes retos e chutes precisos (no jogo) | Ki curto no S1 (no jogo) |
@@ -70,7 +70,7 @@ Fichas completas (golpes, lista de animações e prompts):
 - [p09](p09.md)
 - [p10](p10.md)
 - [p11](p11.md)
-- [p12](p12.md)
+- [p12 — Necro](p12.md)
 - [p13](p13.md) — proposta (somente PNG no Drive)
 - [p14](p14.md) — proposta (somente PNG no Drive)
 - [p15](p15.md) — no jogo com os vídeos que já existem (sem golpes no pulo, reações, intro e vitória)
