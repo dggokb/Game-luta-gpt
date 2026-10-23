@@ -55,8 +55,8 @@ não em unidades do mundo.
    Super e do ultra.
 2. `drawBackground`:
    1. cor de fundo;
-   2. camadas atrás do fim do piso (céu, montanhas, cidade, água, neblina, portal...), da
-      mais longe para a mais perto;
+   2. camadas atrás do fim do piso (o `longe`, ou o `ate` quando o chão continua: céu,
+      montanhas, cidade, água, neblina, portal...), da mais longe para a mais perto;
    3. piso;
    4. reflexo das luzes e fogos no piso;
    5. camadas entre o fim do piso e os lutadores (grade, pilares, braseiros);
@@ -153,7 +153,10 @@ uma camada parada (só muda a posição).
 
 **Chão até o fundo** (`"ate"` no `chao`): atrás da borda de cima da imagem do piso, a imagem
 lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
-chão de uma arena ir do ringue até a arquibancada lá no fundo.
+chão de uma arena ir do ringue até a arquibancada lá no fundo. Na ordem de desenho, o fim do
+piso passa a ser o `ate`: o que está apoiado nesse chão (holofotes, pórticos, pilastras) vem
+depois dele. Com o corte no `longe`, o chão do fundo pintava por cima da base dessas peças e,
+com a câmera alta no super pulo, elas afundavam.
 
 **Mar deitado** (`agua` com `"imagem"`): a textura do mar vista de cima é desenhada em
 perspectiva entre `perto` e `longe`, em faixas, igual ao piso: ondas grandes perto e pequenas
