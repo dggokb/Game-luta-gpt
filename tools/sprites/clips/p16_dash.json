@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p16_dash.webp",
   "report": "tools/sprites/reports/p16_dash.report.json",
   "preview": "android/app/build/sprite-review/p16_dash-import.png",
-  "expectedFrames": 17,
+  "expectedFrames": 29,
   "segmentation": "prepared-grid",
   "columns": 5,
   "rootMode": "authored",
@@ -16,7 +16,7 @@
     "personagem": "p16",
     "escala": 0.411,
     "medida": "último quadro = inicio_centro (nota 0.95)",
-    "quadros": "27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43",
+    "quadros": "17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45",
     "largura": 368,
     "raiz": "200,238",
     "colunas": 5,
@@ -35,16 +35,16 @@
         200,
         238
       ],
-      "colunas": 5
+      "colunas": 10
     },
     "recorte_suave": true
   },
   "frameWidth": 736,
   "rootX": 400,
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p16_dash_video_normalized.png"
-  ]
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

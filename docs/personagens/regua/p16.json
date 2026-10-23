@@ -337,9 +337,9 @@
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 0.8648382742707071,
-   "nota": 0.19646967947483063,
-   "quadro": 0,
+   "fator": 0.7056,
+   "nota": 0.19124887883663177,
+   "quadro": 18,
    "ref": "inicio_centro"
   },
   "cabeca": null,
@@ -349,10 +349,10 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.8928571428571426,
-    "pe": 50,
-    "iou": 0.32986334036503717,
-    "altura": 0.852850013133701,
+    "fator": 1.01010101010101,
+    "pe": -24,
+    "iou": 0.2584873031764813,
+    "altura": 0.8531652219595482,
     "mesma_pose": 0.0
    }
   ],

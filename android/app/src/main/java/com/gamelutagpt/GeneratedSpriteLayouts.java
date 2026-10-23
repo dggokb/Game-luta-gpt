@@ -2758,11 +2758,11 @@ final class GeneratedSpriteLayouts {
     static final int P16_CROUCH_IDLE_ROOT_Y = 332;
     static final int P16_CROUCH_IDLE_FRAME_COUNT = 26;
 
-    static final int P16_DASH_FRAME_WIDTH = 561;
-    static final int P16_DASH_FRAME_HEIGHT = 408;
-    static final int P16_DASH_ROOT_X = 353;
-    static final int P16_DASH_ROOT_Y = 398;
-    static final int P16_DASH_FRAME_COUNT = 17;
+    static final int P16_DASH_FRAME_WIDTH = 562;
+    static final int P16_DASH_FRAME_HEIGHT = 412;
+    static final int P16_DASH_ROOT_X = 354;
+    static final int P16_DASH_ROOT_Y = 400;
+    static final int P16_DASH_FRAME_COUNT = 29;
 
     static final int P16_FALL_FRAME_WIDTH = 360;
     static final int P16_FALL_FRAME_HEIGHT = 569;
