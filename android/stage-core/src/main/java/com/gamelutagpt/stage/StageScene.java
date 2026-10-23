@@ -510,7 +510,10 @@ public final class StageScene {
         boolean pending = between != null;
         c.fillRect(-10f, -10f, VW + 10f, VH + 10f, pack.definition.backgroundColor);
         StageDefinition.Floor floor = pack.definition.floor;
-        float floorFar = floor != null ? floor.far : 0f;
+        // O chão vai até o "ate" (extent), não só até a borda da imagem do piso: o que está
+        // apoiado nele (holofotes, pórticos, pilastras) vem depois, senão o chão do fundo pinta
+        // por cima da base deles e, com a câmera alta no super pulo, eles afundam.
+        float floorFar = floor != null ? floor.extent : 0f;
 
         StageDefinition.Lightning lightning = pack.definition.lightning;
         boolean bolt = lightning != null;

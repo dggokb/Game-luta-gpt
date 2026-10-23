@@ -199,6 +199,40 @@ public class StageSceneTest {
         }
     }
 
+    /**
+     * Um holofote em pé no chão que continua atrás do piso ("ate") vem depois do chão: antes
+     * o chão do fundo era pintado por cima da base dele e, no super pulo, ele afundava.
+     */
+    @Test
+    public void layerStandingOnTheFloorExtentIsDrawnAfterTheFloor() throws IOException {
+        final FakeImage chao = new FakeImage(512, 512), liso = new FakeImage(512, 512), holofote = new FakeImage(200, 800);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"holofote.png\", \"profundidade\": 1300, \"noChao\": true, \"altura\": 0.5}],"
+            + "\"chao\": {\"imagem\": \"chao.jpg\", \"imagemLajotas\": \"liso.jpg\", \"longe\": 600, \"ate\": 2500}}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("holofote.png") ? holofote : path.endsWith("liso.jpg") ? liso : chao;
+            }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        for (float top : new float[] {72f, -400f}) {
+            scene.setCamera(1.12f, 400f, top);
+            final java.util.List<Object> desenhos = new java.util.ArrayList<>();
+            scene.drawBackground(new CountingCanvas() {
+                @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                    desenhos.add(image);
+                }
+                @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                      float l, float t, float r, float b, int alpha) {
+                    if (image == liso) desenhos.add(image);
+                }
+            });
+            assertTrue("o chão do fundo foi desenhado", desenhos.contains(liso));
+            assertTrue("o holofote vem depois do chão", desenhos.lastIndexOf(liso) < desenhos.indexOf(holofote));
+        }
+    }
+
     /** {topo do mar, base da ilha, base do mar} na tela, com a câmera no topo {@code top}. */
     private static float[] baseSobreOMar(StageScene scene, final RenderImage mar, final RenderImage ilha, float top) {
         scene.setCamera(1.12f, 140f, top);
