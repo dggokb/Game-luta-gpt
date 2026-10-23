@@ -278,4 +278,43 @@ public class ComboBreakerTest {
             assertTrue("nível " + level + ": depois do breaker a CPU emenda o combo", counter);
         }
     }
+
+    /** O "!" de cada quadro do L > M > H sem aperto (quadros que faltam até a batida, ou -1). */
+    private static java.util.List<Integer> cuesOfTheCombo(int meter) {
+        Match m = new Match();
+        m.cpu.superMeter = meter;
+        java.util.List<Integer> cues = new java.util.ArrayList<>();
+        String[] seq = {"L", "M", "H"};
+        int k = 0;
+        m.in[0].light = true;
+        for (int i = 0; i < 90; i++) {
+            m.step();
+            cues.add(m.engine.breakerCue(m.f(1)));
+            for (CombatEngine.HitEvent h : m.engine.events()) {
+                if (h.attacker == 0 && !h.blocked && k < 2) {
+                    k++;
+                    if ("M".equals(seq[k])) m.in[0].medium = true; else m.in[0].heavy = true;
+                }
+            }
+        }
+        return cues;
+    }
+
+    @Test public void theCueWarnsAheadOfTheHeavyEnderAndOpensTheWindowBeforeItLands() {
+        int contact = Match.contactOf("H");
+        java.util.List<Integer> cues = cuesOfTheCombo(CombatConfig.METER_PER_BAR);
+        int first = -1;
+        for (int i = 0; i < cues.size(); i++) if (cues.get(i) >= 0 && first < 0) first = i;
+        assertTrue("o \"!\" aparece antes do H entrar", first >= 0 && first < contact);
+        for (int i = 0; i < first; i++) assertEquals("no L e no M não tem aviso", -1, (int)cues.get(i));
+        // Aparece antes da janela (dá tempo de reagir) e a janela está aberta no quadro da batida.
+        assertTrue("aviso antes da janela: " + cues, cues.get(first) > new CombatConfig().comboBreakerFrames);
+        assertTrue("janela aberta antes da batida: " + cues, cues.get(contact - 1) <= new CombatConfig().comboBreakerFrames);
+        for (int i = first + 1; i < contact; i++) assertTrue("conta para baixo", cues.get(i) <= cues.get(i - 1));
+        for (int i = contact; i < cues.size(); i++) assertEquals("some quando o H entra", -1, (int)cues.get(i));
+    }
+
+    @Test public void noCueWithoutMeter() {
+        for (int cue : cuesOfTheCombo(CombatConfig.METER_PER_BAR - 1)) assertEquals(-1, cue);
+    }
 }

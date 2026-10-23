@@ -1661,6 +1661,38 @@ final class CombatEngine {
     }
 
     /**
+     * O aviso do combo breaker ("!" sobre quem apanha): o golpe que fecha a sequência (forte ou
+     * especial corpo a corpo) já começou contra {@code d}, num combo que pode ser quebrado e com
+     * barra para pagar. Devolve quantos quadros faltam até a batida que dá para quebrar (0 = ela
+     * entra agora), ou -1 sem aviso.
+     */
+    int breakerCue(CombatFighter d) {
+        if (!d.inHitstun()) return -1;
+        ComboSession session = sessions[d.index];
+        if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return -1;
+        if (d.state.superMeter < config.comboBreakerCost) return -1;
+        CombatFighter a = fighters[1 - d.index];
+        AttackDefinition attack = a.attack;
+        if (!a.attacking() || attack == null || attack.kind != AttackDefinition.Kind.NORMAL) return -1;
+        if (attack.strength != AttackDefinition.Strength.HEAVY && attack.strength != AttackDefinition.Strength.SPECIAL) {
+            return -1;
+        }
+        int boxes = attack.hitboxCount();
+        if (boxes == 0) return -1;
+        // Vários acertos: quem fecha é a última batida. Um acerto só: qualquer caixa fecha.
+        int from = attack.maxHits > 1 ? boxes - 1 : 0;
+        long closing = attack.maxHits > 1 ? 1L << from : -1L;
+        if ((a.hitboxMask & closing) != 0) return -1;
+        int first = Integer.MAX_VALUE, end = -1;
+        for (int i = from; i < boxes; i++) {
+            first = Math.min(first, attack.hitbox(i).firstFrame);
+            end = Math.max(end, attack.hitbox(i).lastFrame);
+        }
+        if (a.attackFrame > end) return -1;
+        return Math.max(0, first - a.attackFrame - 1);
+    }
+
+    /**
      * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre) e
      * quem batia é jogado para longe, arrastando o pé, e fica atordoado, sem o golpe. Quem quebrou
      * sai correndo sozinho até ele (sem o → →) para dar o troco.

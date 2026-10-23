@@ -2387,6 +2387,83 @@ public class GameView extends SurfaceView
         feel.slow(BREAKER_SLOW_FRAMES, BREAKER_SLOW_SCALE);
     }
 
+    /** Quadro do motor em que o "!" do combo breaker apareceu (o estalo de entrada), ou -1. */
+    private int breakerCueStart = -1;
+    private final Path breakerCuePath = new Path();
+    private static final int BREAKER_CUE_POP_FRAMES = 6;
+    private static final float BREAKER_CUE_RADIUS = 40f;
+    private static final int BREAKER_CUE_INK = 0xFF111114;
+    private static final int BREAKER_CUE_HOT = 0xFFE0262B;
+
+    /**
+     * O aviso do combo breaker, em estilo mangá: um balão espetado com "!" sobre a cabeça do
+     * jogador quando o golpe que fecha o combo dele está vindo e dá para quebrar (M + H, com
+     * barra). Entra com um estalo; na janela do breaker o "!" fica vermelho e o balão treme.
+     */
+    private void drawBreakerCue(Canvas c) {
+        CombatFighter f = player();
+        int until = engine.breakerCue(f);
+        if (until < 0) {
+            breakerCueStart = -1;
+            return;
+        }
+        int now = engine.frame();
+        if (breakerCueStart < 0) breakerCueStart = now;
+        int age = now - breakerCueStart;
+        boolean window = until <= engine.config.comboBreakerFrames;
+        float t = Math.min(1f, age / (float)BREAKER_CUE_POP_FRAMES);
+        float scale = 1.45f - 0.45f * (1f - (1f - t) * (1f - t));
+        float shake = window ? ((now & 1) == 0 ? 2.5f : -2.5f) : 0f;
+        float cx = f.x + tagOffset() - f.facing * 18f + shake;
+        float cy = visualTop(f) - 52f;
+
+        c.save();
+        c.translate(cx, cy);
+        c.scale(scale, scale);
+        // Balão espetado: pontas irregulares (fixas, para não piscar), miolo branco e traço de tinta.
+        breakerCuePath.reset();
+        int spikes = 14;
+        for (int i = 0; i < spikes * 2; i++) {
+            double a = Math.PI * i / spikes - Math.PI / 2;
+            float r = i % 2 == 0 ? BREAKER_CUE_RADIUS * (i % 4 == 0 ? 1.1f : 0.94f) : BREAKER_CUE_RADIUS * 0.7f;
+            float x = (float)Math.cos(a) * r, y = (float)Math.sin(a) * r * 0.92f;
+            if (i == 0) breakerCuePath.moveTo(x, y);
+            else breakerCuePath.lineTo(x, y);
+        }
+        breakerCuePath.close();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        c.drawPath(breakerCuePath, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.MITER);
+        paint.setStrokeWidth(4f);
+        paint.setColor(BREAKER_CUE_INK);
+        c.drawPath(breakerCuePath, paint);
+        // Três riscos de ênfase por fora, do lado de cima (o "!" de surpresa das páginas).
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(5f);
+        for (int k = -1; k <= 1; k++) {
+            double a = -Math.PI / 2 - 0.62 + k * 0.42;
+            float r0 = BREAKER_CUE_RADIUS * 1.22f, r1 = BREAKER_CUE_RADIUS * (k == 0 ? 1.62f : 1.5f);
+            c.drawLine((float)Math.cos(a) * r0, (float)Math.sin(a) * r0,
+                (float)Math.cos(a) * r1, (float)Math.sin(a) * r1, paint);
+        }
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        // O "!": cunha grossa inclinada e o ponto.
+        c.skew(-0.18f, 0f);
+        breakerCuePath.reset();
+        breakerCuePath.moveTo(-8f, -25f);
+        breakerCuePath.lineTo(8f, -25f);
+        breakerCuePath.lineTo(3f, 7f);
+        breakerCuePath.lineTo(-3f, 7f);
+        breakerCuePath.close();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(window ? BREAKER_CUE_HOT : BREAKER_CUE_INK);
+        c.drawPath(breakerCuePath, paint);
+        c.drawCircle(0f, 17f, 5.5f, paint);
+        c.restore();
+    }
+
     /** Quem teve o combo quebrado e está deslizando para trás (fumacinha do pé), ou -1. */
     private int breakerSkid = -1;
 
@@ -3032,6 +3109,7 @@ public class GameView extends SurfaceView
             drawPlayer(canvas);
             canvas.restore();
             impacts.draw(canvas);
+            drawBreakerCue(canvas);
             efeitos.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
