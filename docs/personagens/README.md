@@ -52,8 +52,8 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 | **p12** (Necro) | p11 | Morto-vivo costurado, bandagens | **Criatura feral.** Contorcido, imprevisível, mordidas, golpes que custam vida, super armor | Força que cresce com a vida perdida |
 | **p13** | p14 *(proposta)* | Homem enorme, careca, colete preto rasgado, luvas reforçadas e faixas vermelhas | **Brawler pesado**, punhos esmagadores, ombradas e pressão de curta distância *(proposta)* | Ondas de choque cinéticas curtas *(proposta)* |
 | **p14** | p13 *(proposta)* | Homem magro, cabelo preto preso, casaco preto de mangas compridas, faixa vermelha e sorriso malandro | **Trickster de fintas**, esquivas, rasteiras e mudanças de ritmo *(proposta)* | Cortes curtos de ar *(proposta)* |
-| **p15** | p16 *(proposta)* | Karateca forte de cabelo preto preso em rabo de cavalo, quimono branco, faixa preta | **Shotokan técnico**, base firme, golpes retos e chutes precisos (no jogo) | Ki curto no S1 (no jogo) |
-| **p16** | p15 *(proposta)* | Palhacinha marcial ruiva, roupa vermelha/preta de losangos e meias diferentes | **Rushdown caótico/acrobático**, fingimentos e ataques imprevisíveis *(proposta)* | Estrelas e faíscas de impacto *(proposta)* |
+| **p15** (Natisuko) | p16 (Bonnie Scarlet) *(proposta)* | Karateca forte de cabelo preto preso em rabo de cavalo, quimono branco, faixa preta | **Shotokan técnico**, base firme, golpes retos e chutes precisos (no jogo) | Ki curto no S1 (no jogo) |
+| **p16** (Bonnie Scarlet) | p15 (Natisuko) *(proposta)* | Palhacinha marcial ruiva, roupa vermelha/preta de losangos e meias diferentes | **Rushdown caótico/acrobático**, fingimentos e ataques imprevisíveis *(proposta)* | Estrelas e faíscas de impacto *(proposta)* |
 
 Mecânicas de jogo por personagem (vida, movimento, dano, mecânica única): [mecanicas.md](mecanicas.md) — rascunho.
 
@@ -73,8 +73,8 @@ Fichas completas (golpes, lista de animações e prompts):
 - [p12 — Necro](p12.md)
 - [p13](p13.md) — proposta (somente PNG no Drive)
 - [p14](p14.md) — proposta (somente PNG no Drive)
-- [p15](p15.md) — no jogo com os vídeos que já existem (sem golpes no pulo, reações, intro e vitória)
-- [p16](p16.md) — proposta (somente PNG no Drive)
+- [p15 — Natisuko](p15.md) — no jogo com os vídeos que já existem (sem golpes no pulo, reações, intro e vitória)
+- [p16 — Bonnie Scarlet](p16.md) — proposta (somente PNG no Drive)
 
 ## Personagens novos no Drive
 

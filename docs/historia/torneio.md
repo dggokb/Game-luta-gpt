@@ -28,7 +28,7 @@ Ficam em `android/app/src/main/assets/historia/torneio/torneio.json`:
 | p09 | p09 + p10 | sorteada |
 | p11 | p11 + p12 (Necro) | sorteada |
 | p13 | p13 + p14 | sorteada, `"pronta": false` |
-| p15 | p15 + p16 | sorteada, `"pronta": false` |
+| p15 | p15 (Natisuko) + p16 (Bonnie Scarlet) | sorteada, `"pronta": false` |
 
 `"pronta": false` = dupla que ainda não tem golpes (p13–p16). O sorteio põe essas duplas no
 **lado do rival**, então elas só aparecem nas lutas CPU × CPU da chave e nunca cruzam com o
@@ -87,11 +87,13 @@ semifinal) e o porto aumenta o número de duplas diferentes que ele enfrenta.
 | p09 + p10 | `pag5_ryuga_p09` (os irmãos bombeiros no cais: ele grita por alguém forte para se aquecer, o Ryūga topa, e as duas parceiras: "Meninos....") | provisória |
 | p11 + p12 (Necro) | `pag5_ryuga_p11` (o cais foge do "zumbi", a Yin-lu grita, o cirurgião: "não é somente um simples zumbi..." e solta o Necro: "Necro... PEGA!") | provisória |
 | p13 + p14 | `pag5_ryuga_p13` (o grandalhão careca no cais, o p14 abraça o Ryūga: "Mas é claro que somos", e o p13 barra a Yin-lu: "Onde vai, mocinha..."). Só aparece quando a dupla tiver golpes (`"pronta": false` no `torneio.json`) | provisória |
-| p15 + p16 (quando tiverem golpes) | provisória (`pag3_q*`) | provisória |
+| p15 (Natisuko) + p16 (Bonnie Scarlet) | `pag5_ryuga_p15` (a Natisuko, velha conhecida do Ryūga, acena no cais, a Yin-lu fica com ciúme e a Bonnie parte para a briga: "Bonnie se comporta sempre... mas agora ela luta!"). Só aparece quando a dupla tiver golpes | provisória |
+
+No Ryūga toda dupla tem a página dela; o desafio provisório (`pag3_q*`) ficou só para o Kōga.
 
 Quando chegar a página de um adversário: grave como `pagN_<irmao>_<dupla>.jpg`, ponha o passo
-com `"irmao"` e `"adversario"` antes da luta e tire o id da lista `"adversario"` da página
-provisória do mesmo irmão. O `TorneioTest.ep03TemAsPaginasDoAdversarioDoPorto` confere a ordem.
+com `"irmao"` e `"adversario"` antes da luta (no Kōga, tire também o desafio provisório dele quando
+todas as duplas tiverem página). O `TorneioTest.ep03TemAsPaginasDoAdversarioDoPorto` confere a ordem.
 
 ### A regra escondida
 

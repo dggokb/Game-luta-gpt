@@ -10,7 +10,9 @@
     "mensageiro":{ "nome": "???",       "cor": "#4A4A55" },
     "p02":       { "nome": "Yin-lu",    "cor": "#1F8A8A", "lutador": "p02" },
     "p04":       { "nome": "Brucy",     "cor": "#D9B12E", "lutador": "p04" },
-    "p12":       { "nome": "Necro",     "cor": "#8E1B1B", "lutador": "p12" }
+    "p12":       { "nome": "Necro",     "cor": "#8E1B1B", "lutador": "p12" },
+    "p15":       { "nome": "Natisuko",  "cor": "#E8E4DA", "lutador": "p15" },
+    "p16":       { "nome": "Bonnie Scarlet", "cor": "#D8262E", "lutador": "p16" }
   },
   "episodios": ["ep00", "ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07", "ep08"]
 }

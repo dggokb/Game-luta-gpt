@@ -7,7 +7,7 @@ sobre linhas de concentração em tinta e retícula na cor do lutador. A câmera
 ativou, então o quadro fica ao fundo, ao lado dele. A luta fica parada nesse tempo; quando o
 quadro sai pela borda, o Super sai, com o mesmo congelamento, flash e tempo de reação de antes.
 
-Primeiro teste: **p15** (vídeo `Entrada_Esquerda_Direita.mp4`, ela entrando pela esquerda).
+Primeiro teste: **p15** (Natisuko; vídeo `Entrada_Esquerda_Direita.mp4`, ela entrando pela esquerda).
 
 ## Como funciona
 

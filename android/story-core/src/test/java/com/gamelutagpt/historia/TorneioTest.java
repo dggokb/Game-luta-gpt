@@ -399,7 +399,7 @@ public class TorneioTest {
     }
 
     @Test
-    public void cadaDuplaTemUmaPaginaNoPortoDoRyugaEOP13EntraQuandoFicarPronto() throws IOException {
+    public void cadaDuplaTemUmaPaginaNoPortoDoRyugaEAsSemGolpesEntramQuandoFicaremProntas() throws IOException {
         GameAssets assets = new GameAssets();
         Temporada temporada = Temporada.load(assets);
         Episodio ep03 = temporada.loadEpisodio(assets, "ep03");
@@ -411,18 +411,20 @@ public class TorneioTest {
         for (Torneio.Dupla d : duplas()) if (d.irmao == null) duplas.add(d.id);
         java.util.Collections.sort(cobertas);
         assertEquals(duplas, cobertas);
-        // Com o p13 + p14 prontos, o porto pode sortear a dupla e a página dela aparece.
-        List<Torneio.Dupla> comP13 = new ArrayList<>();
-        for (Torneio.Dupla d : duplas()) comP13.add("p13".equals(d.id) ? new Torneio.Dupla(d.id, d.lutadores, d.irmao, true) : d);
-        Campanha campanha = null;
-        for (long semente = 0; semente < 500 && campanha == null; semente++) {
-            Campanha c = new Campanha(comP13, semente);
-            c.escolher(Torneio.RYUGA);
-            if ("p13".equals(c.adversarioPorto().id)) campanha = c;
+        // Com a dupla pronta, o porto pode sorteá-la e a página dela aparece.
+        for (String id : new String[] {"p13", "p15"}) {
+            List<Torneio.Dupla> pronta = new ArrayList<>();
+            for (Torneio.Dupla d : duplas()) pronta.add(id.equals(d.id) ? new Torneio.Dupla(d.id, d.lutadores, d.irmao, true) : d);
+            Campanha campanha = null;
+            for (long semente = 0; semente < 500 && campanha == null; semente++) {
+                Campanha c = new Campanha(pronta, semente);
+                c.escolher(Torneio.RYUGA);
+                if (id.equals(c.adversarioPorto().id)) campanha = c;
+            }
+            assertNotNull(id, campanha);
+            List<String> paginas = paginas("ep03", campanha);
+            assertEquals(java.util.Arrays.asList("pag5_ryuga_" + id + ".jpg", "LUTA"), paginas.subList(4, 6));
         }
-        assertNotNull(campanha);
-        List<String> paginas = paginas("ep03", campanha);
-        assertEquals(java.util.Arrays.asList("pag5_ryuga_p13.jpg", "LUTA"), paginas.subList(4, 6));
     }
 
     /**
