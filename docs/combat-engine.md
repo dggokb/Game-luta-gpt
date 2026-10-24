@@ -977,9 +977,9 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   um clarão branco e câmera lenta (~0,7 s de luta a 35%).
 - **Punish counter**: congela +8 quadros (`punishHitstopBonus`).
 - **Riscos de mangá** (`RiscosDeImpacto`, como no Hajime no Ippo): nos golpes fortes (H, especiais,
-  Super e Ultra), traços pretos sem contorno saem do tronco de quem apanhou, longos e cheios nas
-  costas (por onde a força sai), e traços paralelos ao golpe ficam atrás do contato, na faixa do
-  braço ou da perna. Duram 16 quadros, tremem (trocam a cada 2) e somem nos últimos 5. Os fracos
+  Super e Ultra), traços pretos finos e longos, sem contorno, saem das costas de quem apanhou na
+  altura do golpe (golpe em cima, riscos em cima: a força atravessando), abrindo pouco em leque, e
+  traços paralelos ao golpe ficam atrás do contato, na faixa do braço ou da perna. Duram 16 quadros, tremem (trocam a cada 2) e somem nos últimos 5. Os fracos
   (L e M) ainda não têm: em teste.
 - **Impact frames** (a técnica dos animes): por 2 quadros a cena vira silhueta, com linhas
   de velocidade saindo do impacto, e 1 quadro de cores invertidas antes de voltar.

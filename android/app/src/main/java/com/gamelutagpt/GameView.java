@@ -2377,7 +2377,8 @@ public class GameView extends SurfaceView
         }
         // Golpe forte (H, especiais, Super, Ultra): os riscos de mangá no corpo e no rastro do golpe.
         if (!event.blocked && size >= ImpactEffects.HEAVY) {
-            riscos.spawn(engine.frame(), event.defender, x, y, direction, size == ImpactEffects.HEAVY ? 1f : 1.25f);
+            riscos.spawn(engine.frame(), event.defender, x, y, direction, size == ImpactEffects.HEAVY ? 1f : 1.25f,
+                defender.y);
         }
         // O tremor do golpe tem direção: a tela vai no sentido do golpe e volta (o aleatório fica menor).
         // Só nos normais (o especial de vários acertos balançaria a tela a cada um) e no KO.
