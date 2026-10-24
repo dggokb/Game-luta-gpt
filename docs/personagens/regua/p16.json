@@ -505,7 +505,7 @@
   "estado": "MEDIUM_KICK",
   "atlas": "p16_medium_kick",
   "fator": 1.0066127782451924,
-  "fonte": "imagem inicial no q24 (nota 0.89)",
+  "fonte": "imagem inicial no q23 (nota 0.92)",
   "receita": "forte",
   "medida": "1º quadro = inicio_centro (nota 0.95)",
   "fator_optico": 1.0,
@@ -513,24 +513,24 @@
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
    "fator": 1.0066127782451924,
-   "nota": 0.8927878141403198,
-   "quadro": 24,
+   "nota": 0.9162113070487976,
+   "quadro": 23,
    "ref": "inicio_centro"
   },
   "cabeca": {
    "fator": 1.0,
    "min": 1.0,
-   "max": 1.0,
+   "max": 1.0198770916279105,
    "zoom": false,
    "por_quadro": {
     "0": 1.0,
-    "3": 1.0,
+    "3": 1.02,
     "6": 1.0,
     "12": 1.0,
     "15": 1.0,
-    "21": 1.0,
-    "24": 1.0,
-    "26": 1.0
+    "18": 1.0,
+    "21": 1.02,
+    "23": 1.0
    }
   },
   "emendas": [
@@ -539,21 +539,21 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9975062344139647,
-    "pe": 0,
-    "iou": 0.8945778800517762,
-    "altura": 0.9958497504596795,
+    "fator": 0.9999999999999998,
+    "pe": -1,
+    "iou": 0.896609187074337,
+    "altura": 0.9942211715261361,
     "mesma_pose": 1.0
    },
    {
     "estado": "MEDIUM_KICK",
     "ponta": "fim",
-    "quadro": 26,
+    "quadro": 23,
     "ref": "guarda",
-    "fator": 0.9975062344139647,
-    "pe": 0,
-    "iou": 0.8945778800517762,
-    "altura": 0.9958497504596795,
+    "fator": 0.9999999999999998,
+    "pe": -1,
+    "iou": 0.8846683581007612,
+    "altura": 0.9984239558707644,
     "mesma_pose": 1.0
    }
   ],

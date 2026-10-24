@@ -2818,11 +2818,11 @@ final class GeneratedSpriteLayouts {
     static final int P16_LIGHT_JAB_ROOT_Y = 461;
     static final int P16_LIGHT_JAB_FRAME_COUNT = 18;
 
-    static final int P16_MEDIUM_KICK_FRAME_WIDTH = 541;
-    static final int P16_MEDIUM_KICK_FRAME_HEIGHT = 473;
+    static final int P16_MEDIUM_KICK_FRAME_WIDTH = 483;
+    static final int P16_MEDIUM_KICK_FRAME_HEIGHT = 479;
     static final int P16_MEDIUM_KICK_ROOT_X = 174;
-    static final int P16_MEDIUM_KICK_ROOT_Y = 452;
-    static final int P16_MEDIUM_KICK_FRAME_COUNT = 14;
+    static final int P16_MEDIUM_KICK_ROOT_Y = 455;
+    static final int P16_MEDIUM_KICK_FRAME_COUNT = 24;
 
     static final int P16_RISE_FRAME_WIDTH = 321;
     static final int P16_RISE_FRAME_HEIGHT = 466;
