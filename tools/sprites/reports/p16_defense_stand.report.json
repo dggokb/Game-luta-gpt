@@ -1,0 +1,206 @@
+{
+  "id": "p16_defense_stand",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_defense_stand_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 544,
+    "rootX": 168,
+    "rootY": 486,
+    "columns": 8,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        47,
+        46,
+        351,
+        488
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 47758
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        37,
+        39,
+        340,
+        489
+      ],
+      "minimumMargin": 37,
+      "opaquePixels": 46796
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        18,
+        27,
+        316,
+        489
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 46391
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        27,
+        43,
+        328,
+        490
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 45363
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        17,
+        47,
+        317,
+        490
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 44025
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        33,
+        46,
+        334,
+        490
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43877
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        30,
+        37,
+        331,
+        490
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 43894
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        44,
+        40,
+        335,
+        488
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 47069
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 350,
+    "frameHeight": 479,
+    "rootX": 159,
+    "rootY": 467,
+    "columns": 8,
+    "frameCount": 8,
+    "cropOffset": [
+      9,
+      19
+    ],
+    "sheetWidth": 628,
+    "sheetHeight": 1852,
+    "frames": [
+      [
+        304,
+        940,
+        312,
+        452,
+        34,
+        23
+      ],
+      [
+        0,
+        476,
+        312,
+        460,
+        24,
+        16
+      ],
+      [
+        0,
+        0,
+        308,
+        472,
+        5,
+        4
+      ],
+      [
+        316,
+        476,
+        312,
+        456,
+        14,
+        20
+      ],
+      [
+        0,
+        1400,
+        308,
+        452,
+        4,
+        24
+      ],
+      [
+        312,
+        1400,
+        312,
+        452,
+        20,
+        23
+      ],
+      [
+        312,
+        0,
+        312,
+        464,
+        17,
+        14
+      ],
+      [
+        0,
+        940,
+        300,
+        456,
+        31,
+        17
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 6684672,
+      "grid": 5364800,
+      "packed": 4652224
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "b74af9386b18f51bd81a4c4d10cf1fc37f11626f1ee74b3d9514adde56310e48",
+      "config": "9aa837c0158f44d1d6486afeb2da62a3f206825a3ca1afb325a0ecc82ee27520",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_defense_stand_video_normalized.png": "c82eb75a4c955e690126c6b77b5b986b87b86f28b8312b0186c124708b9ae5e8"
+    }
+  }
+}

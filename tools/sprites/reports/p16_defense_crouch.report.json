@@ -1,0 +1,187 @@
+{
+  "id": "p16_defense_crouch",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_defense_crouch_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 384,
+    "rootX": 256,
+    "rootY": 356,
+    "columns": 8,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        78,
+        33,
+        378,
+        359
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 39853
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        78,
+        28,
+        378,
+        359
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 39383
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        81,
+        26,
+        386,
+        360
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 43220
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        50,
+        352,
+        360
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 40724
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        112,
+        43,
+        418,
+        360
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 37759
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        114,
+        51,
+        420,
+        360
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 36455
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        79,
+        31,
+        378,
+        359
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 39581
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 385,
+    "frameHeight": 350,
+    "rootX": 213,
+    "rootY": 338,
+    "columns": 8,
+    "frameCount": 7,
+    "cropOffset": [
+      43,
+      18
+    ],
+    "sheetWidth": 316,
+    "sheetHeight": 2348,
+    "frames": [
+      [
+        0,
+        692,
+        308,
+        336,
+        31,
+        11
+      ],
+      [
+        0,
+        348,
+        308,
+        340,
+        31,
+        6
+      ],
+      [
+        0,
+        0,
+        316,
+        344,
+        34,
+        4
+      ],
+      [
+        0,
+        1704,
+        312,
+        320,
+        4,
+        28
+      ],
+      [
+        0,
+        1372,
+        316,
+        328,
+        65,
+        21
+      ],
+      [
+        0,
+        2028,
+        316,
+        320,
+        67,
+        29
+      ],
+      [
+        0,
+        1032,
+        308,
+        336,
+        32,
+        9
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 6291456,
+      "grid": 4312000,
+      "packed": 2967872
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c09495c730a11dfc4e614aedf6aa4228797124a59f1da64e6077760c1df0d9b2",
+      "config": "43682a43672a89fb12b46c306bd50d55c103c2bf590196f829ea57629de084d4",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_defense_crouch_video_normalized.png": "85e90fca9d91e85a7ffb311b2ab3fc90eacdd927b18d9f0ae51b5f077be957be"
+    }
+  }
+}

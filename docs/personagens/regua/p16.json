@@ -1206,5 +1206,349 @@
    ]
   ],
   "nivel": "aviso"
+ },
+ {
+  "estado": "DEFENSE_STAND",
+  "atlas": "p16_defense_stand",
+  "fator": 0.9965954846375733,
+  "fonte": "imagem inicial no q0 (nota 0.89)",
+  "receita": "forte",
+  "medida": "último quadro = inicio_centro (nota 0.95)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9965954846375733,
+   "nota": 0.8918378949165344,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 1.0,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.0,
+    "2": 1.0,
+    "7": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "DEFENSE_STAND",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9975062344139647,
+    "pe": 12,
+    "iou": 0.9084085167809455,
+    "altura": 0.9919096401365904,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "DEFENSE_STAND",
+    "ponta": "fim",
+    "quadro": 7,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 10,
+    "iou": 0.848134302038513,
+    "altura": 1.0045179931704753,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "troca (ini): corpo +12 px fora do lugar da guarda"
+   ]
+  ],
+  "nivel": "aviso"
+ },
+ {
+  "estado": "DEFENSE_CROUCH",
+  "atlas": "p16_defense_crouch",
+  "fator": 1.0083089237184482,
+  "fonte": "imagem inicial no q0 (nota 0.89)",
+  "receita": "forte",
+  "medida": "último quadro = inicio_agachado (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 1.0083089237184482,
+   "nota": 0.8887676000595093,
+   "quadro": 0,
+   "ref": "inicio_agachado"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 1.0,
+   "max": 1.0,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.0,
+    "6": 1.0
+   }
+  },
+  "emendas": [
+   {
+    "estado": "DEFENSE_CROUCH",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "agachado",
+    "fator": 1.0416666666666665,
+    "pe": -17,
+    "iou": 0.818228542059277,
+    "altura": 1.0468655816757082,
+    "mesma_pose": 0.0
+   },
+   {
+    "estado": "DEFENSE_CROUCH",
+    "ponta": "fim",
+    "quadro": 6,
+    "ref": "agachado",
+    "fator": 1.0416666666666665,
+    "pe": -17,
+    "iou": 0.7951848084096304,
+    "altura": 1.052893309222423,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "troca (fim): pose diferente da agachado, altura 105% (salto de pose, não de tamanho)"
+   ]
+  ],
+  "nivel": "aviso"
+ },
+ {
+  "estado": "HIT_STAND",
+  "atlas": "p16_hit_stand",
+  "fator": 0.9899562035834135,
+  "fonte": "imagem inicial no q0 (nota 0.90)",
+  "receita": "forte",
+  "medida": "último quadro = inicio_centro (nota 0.95)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9899562035834135,
+   "nota": 0.8972097039222717,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0198770916279105,
+   "min": 1.0,
+   "max": 1.0401492820274054,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.02,
+    "7": 1.0,
+    "8": 1.04
+   }
+  },
+  "emendas": [
+   {
+    "estado": "HIT_STAND",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9803921568627448,
+    "pe": -2,
+    "iou": 0.8830299978418819,
+    "altura": 0.9789860782768585,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "HIT_CROUCH",
+  "atlas": "p16_hit_crouch",
+  "fator": 1.0066127782451924,
+  "fonte": "imagem inicial no q0 (nota 0.90)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_agachado (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 1.0066127782451924,
+   "nota": 0.8975450396537781,
+   "quadro": 0,
+   "ref": "inicio_agachado"
+  },
+  "cabeca": {
+   "fator": 1.0409552644510636,
+   "min": 1.0,
+   "max": 1.081910528902127,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.082,
+    "8": 1.0
+   }
+  },
+  "emendas": [
+   {
+    "estado": "HIT_CROUCH",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "agachado",
+    "fator": 1.0282776349614393,
+    "pe": -7,
+    "iou": 0.8009688465714524,
+    "altura": 1.0505575647980712,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "troca (ini): pose diferente da agachado, altura 105% (salto de pose, não de tamanho)"
+   ]
+  ],
+  "nivel": "aviso"
+ },
+ {
+  "estado": "HIT_AIR",
+  "atlas": "p16_hit_air",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "último quadro = inicio_pulo (nota 0.98)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 1.0355798523653112,
+   "nota": 0.22718578577041626,
+   "quadro": 3,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "JUMP_LIGHT",
+  "atlas": "p16_jump_light",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_pulo (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9850181195830947,
+   "nota": 0.1920045167207718,
+   "quadro": 4,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "JUMP_MEDIUM",
+  "atlas": "p16_jump_medium",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_pulo (nota 0.98)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9752157249325022,
+   "nota": 0.20711569488048553,
+   "quadro": 4,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "JUMP_HEAVY",
+  "atlas": "p16_jump_heavy",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "último quadro = inicio_pulo (nota 0.98)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 1.1033341990817864,
+   "nota": 0.22983737289905548,
+   "quadro": 10,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 0.9152837752672389,
+   "min": 0.9062767027369673,
+   "max": 0.9242908477975106,
+   "zoom": false,
+   "por_quadro": {
+    "8": 0.924,
+    "9": 0.906
+   }
+  },
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "DEFENSE_AIR",
+  "atlas": "p16_defense_air",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_pulo (nota 0.98)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 1.1033341990817864,
+   "nota": 0.20012831687927246,
+   "quadro": 2,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "JUMP_HEAVY_DOWN",
+  "atlas": "p16_jump_heavy_down",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "último quadro = inicio_pulo (nota 0.98)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.8462850751315597,
+   "nota": 0.19088780879974365,
+   "quadro": 15,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
  }
 ]

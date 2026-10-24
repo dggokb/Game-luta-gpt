@@ -1,0 +1,50 @@
+{
+  "id": "p16_jump_medium",
+  "javaName": "P16_JUMP_MEDIUM",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_jump_medium_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_jump_medium.webp",
+  "report": "tools/sprites/reports/p16_jump_medium.report.json",
+  "preview": "android/app/build/sprite-review/p16_jump_medium-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jM.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_pulo (nota 0.98)",
+    "quadros": "8,10,12,14,16,18,24,40,54,58,62,66",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "84,272",
+    "colunas": 5,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_jump_medium_video_normalized.png",
+      "celula": [
+        288,
+        288
+      ],
+      "raiz": [
+        84,
+        272
+      ],
+      "colunas": 5
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 576,
+  "rootX": 168,
+  "frameHeight": 576,
+  "rootY": 544,
+  "sourceReferences": [
+    "art/sprites/source/p16_jump_medium_video_normalized.png"
+  ],
+  "pixelScale": 2.0
+}

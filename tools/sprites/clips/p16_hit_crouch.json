@@ -1,0 +1,51 @@
+{
+  "id": "p16_hit_crouch",
+  "javaName": "P16_HIT_CROUCH",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_hit_crouch_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_hit_crouch.webp",
+  "report": "tools/sprites/reports/p16_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p16_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoBaixo.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_agachado (nota 0.97)",
+    "quadros": "8,10,12,16,30,60,84,88,94",
+    "celula": 208,
+    "largura": 240,
+    "raiz": "112,180",
+    "colunas": 7,
+    "fixar": "registro",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_hit_crouch_video_normalized.png",
+      "celula": [
+        240,
+        208
+      ],
+      "raiz": [
+        112,
+        180
+      ],
+      "colunas": 7
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 480,
+  "frameHeight": 416,
+  "rootX": 224,
+  "rootY": 360,
+  "sourceReferences": [
+    "art/sprites/source/p16_hit_crouch_video_normalized.png"
+  ],
+  "pixelScale": 2.0
+}

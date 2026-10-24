@@ -1,0 +1,50 @@
+{
+  "id": "p16_jump_heavy_down",
+  "javaName": "P16_JUMP_HEAVY_DOWN",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_jump_heavy_down_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_jump_heavy_down.webp",
+  "report": "tools/sprites/reports/p16_jump_heavy_down.report.json",
+  "preview": "android/app/build/sprite-review/p16_jump_heavy_down-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jH_baixo.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_pulo (nota 0.98)",
+    "quadros": "4,6,8,12,18,24,30,36,40,42,46,52,60,72,84,92",
+    "celula": 336,
+    "largura": 208,
+    "raiz": "87,274",
+    "colunas": 6,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_jump_heavy_down_video_normalized.png",
+      "celula": [
+        208,
+        336
+      ],
+      "raiz": [
+        87,
+        274
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 416,
+  "frameHeight": 672,
+  "rootX": 174,
+  "rootY": 548,
+  "sourceReferences": [
+    "art/sprites/source/p16_jump_heavy_down_video_normalized.png"
+  ],
+  "pixelScale": 2.0
+}

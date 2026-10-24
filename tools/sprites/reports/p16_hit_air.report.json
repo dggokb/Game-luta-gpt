@@ -1,0 +1,130 @@
+{
+  "id": "p16_hit_air",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_hit_air_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 416,
+    "frameHeight": 640,
+    "rootX": 234,
+    "rootY": 544,
+    "columns": 7,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        32,
+        26,
+        344,
+        586
+      ],
+      "minimumMargin": 26,
+      "opaquePixels": 47852
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        31,
+        29,
+        373,
+        592
+      ],
+      "minimumMargin": 29,
+      "opaquePixels": 48681
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        32,
+        36,
+        347,
+        593
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 46692
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        86,
+        28,
+        373,
+        582
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 46613
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 358,
+    "frameHeight": 583,
+    "rootX": 211,
+    "rootY": 526,
+    "columns": 7,
+    "frameCount": 4,
+    "cropOffset": [
+      23,
+      18
+    ],
+    "sheetWidth": 1304,
+    "sheetHeight": 572,
+    "frames": [
+      [
+        356,
+        0,
+        320,
+        568,
+        5,
+        4
+      ],
+      [
+        0,
+        0,
+        352,
+        572,
+        4,
+        7
+      ],
+      [
+        680,
+        0,
+        324,
+        568,
+        5,
+        14
+      ],
+      [
+        1008,
+        0,
+        296,
+        564,
+        59,
+        6
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 7454720,
+      "grid": 5843992,
+      "packed": 2983552
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "33cdc7c78fbc83cdb5e2cf7fbe10ef3619d24ac75cb902f65792a7f468375dc5",
+      "config": "6906d0092e68307528ad5987920dcd2a9b6569b1338d001643b57b046e367c42",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_hit_air_video_normalized.png": "9600f30c181a17e95712c17ff8ce165f064e32acaf59dbf05337fabc5e9239c5"
+    }
+  }
+}

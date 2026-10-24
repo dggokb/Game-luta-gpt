@@ -1,0 +1,49 @@
+{
+  "id": "p16_defense_stand",
+  "javaName": "P16_DEFENSE_STAND",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_defense_stand_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_defense_stand.webp",
+  "report": "tools/sprites/reports/p16_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p16_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaFrente.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "quadros": "6,10,13,16,20,40,56,62",
+    "celula": 272,
+    "largura": 192,
+    "raiz": "84,243",
+    "fixar": "registro",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_defense_stand_video_normalized.png",
+      "celula": [
+        192,
+        272
+      ],
+      "raiz": [
+        84,
+        243
+      ],
+      "colunas": 8
+    },
+    "recorte_suave": true
+  },
+  "rootX": 168,
+  "frameHeight": 544,
+  "rootY": 486,
+  "sourceReferences": [
+    "art/sprites/source/p16_defense_stand_video_normalized.png"
+  ],
+  "frameWidth": 384,
+  "pixelScale": 2.0
+}

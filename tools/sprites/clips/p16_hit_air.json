@@ -1,0 +1,51 @@
+{
+  "id": "p16_hit_air",
+  "javaName": "P16_HIT_AIR",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_hit_air_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_hit_air.webp",
+  "report": "tools/sprites/reports/p16_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p16_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoPulo.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_pulo (nota 0.98)",
+    "quadros": "66,70,80,92",
+    "celula": 320,
+    "largura": 208,
+    "raiz": "117,272",
+    "colunas": 7,
+    "fixar": "video",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_hit_air_video_normalized.png",
+      "celula": [
+        208,
+        320
+      ],
+      "raiz": [
+        117,
+        272
+      ],
+      "colunas": 7
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 416,
+  "frameHeight": 640,
+  "rootX": 234,
+  "rootY": 544,
+  "sourceReferences": [
+    "art/sprites/source/p16_hit_air_video_normalized.png"
+  ],
+  "pixelScale": 2.0
+}

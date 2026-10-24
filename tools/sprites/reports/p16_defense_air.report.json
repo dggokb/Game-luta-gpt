@@ -1,0 +1,187 @@
+{
+  "id": "p16_defense_air",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_defense_air_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 640,
+    "rootX": 164,
+    "rootY": 540,
+    "columns": 8,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        80,
+        25,
+        352,
+        545
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 42326
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        27,
+        29,
+        353,
+        550
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 43278
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        42,
+        38,
+        274,
+        592
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 40066
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        52,
+        36,
+        266,
+        589
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 40120
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        87,
+        38,
+        267,
+        591
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 39723
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        36,
+        33,
+        350,
+        556
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44939
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        50,
+        26,
+        349,
+        547
+      ],
+      "minimumMargin": 26,
+      "opaquePixels": 42854
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 342,
+    "frameHeight": 583,
+    "rootX": 145,
+    "rootY": 523,
+    "columns": 8,
+    "frameCount": 7,
+    "cropOffset": [
+      19,
+      17
+    ],
+    "sheetWidth": 664,
+    "sheetHeight": 1636,
+    "frames": [
+      [
+        312,
+        1104,
+        280,
+        528,
+        57,
+        4
+      ],
+      [
+        0,
+        568,
+        336,
+        532,
+        4,
+        8
+      ],
+      [
+        0,
+        0,
+        240,
+        564,
+        19,
+        17
+      ],
+      [
+        244,
+        0,
+        224,
+        564,
+        29,
+        15
+      ],
+      [
+        472,
+        0,
+        188,
+        564,
+        64,
+        17
+      ],
+      [
+        340,
+        568,
+        324,
+        532,
+        13,
+        12
+      ],
+      [
+        0,
+        1104,
+        308,
+        532,
+        27,
+        5
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 7864320,
+      "grid": 6380352,
+      "packed": 4345216
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c63816e031e0d18544cdf441fab98df50a26487365e2b008d78518d8a7ad6d31",
+      "config": "3414813a215a9e09b06ab6b9b710c8a420cf5e34b299d1467a8b49a6863e8bfb",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_defense_air_video_normalized.png": "126364e0fd63b6665dca6885292e40ea35911029df5c1c29e6e0269a8f06da35"
+    }
+  }
+}
