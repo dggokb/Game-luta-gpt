@@ -921,37 +921,33 @@
  },
  {
   "estado": "SPECIAL_S3",
-  "atlas": "p16_idle",
-  "fator": 1.0066127782451924,
-  "fonte": "imagem inicial no q0 (nota 0.96)",
+  "atlas": "p16_special_s3",
+  "fator": 1.0,
+  "fonte": "receita forte",
   "receita": "forte",
-  "medida": "1º quadro = inicio_centro (nota 0.95)",
+  "medida": "1º quadro = inicio_centro (nota 0.94)",
   "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 1.0066127782451924,
-   "nota": 0.9557026624679565,
-   "quadro": 0,
+   "fator": 1.0338378325959068,
+   "nota": 0.7552727460861206,
+   "quadro": 10,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.0401492820274054,
-   "min": 1.0401492820274054,
-   "max": 1.0401492820274054,
+   "fator": 1.0,
+   "min": 0.9426630616700208,
+   "max": 1.0,
    "zoom": false,
    "por_quadro": {
-    "0": 1.04,
-    "2": 1.04,
-    "4": 1.04,
-    "6": 1.04,
-    "8": 1.04,
-    "10": 1.04,
-    "12": 1.04,
-    "14": 1.04,
-    "16": 1.04,
-    "18": 1.04,
-    "20": 1.04
+    "0": 1.0,
+    "5": 0.943,
+    "10": 1.0,
+    "15": 1.0,
+    "20": 1.0,
+    "35": 0.981,
+    "39": 1.0
    }
   },
   "emendas": [
@@ -960,26 +956,31 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9999999999999998,
+    "fator": 0.9685230024213071,
     "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
+    "iou": 0.7177122960861435,
+    "altura": 0.9610191752035723,
+    "mesma_pose": 0.0
    },
    {
     "estado": "SPECIAL_S3",
     "ponta": "fim",
-    "quadro": 20,
+    "quadro": 39,
     "ref": "guarda",
-    "fator": 0.9999999999999998,
-    "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
+    "fator": 1.0309278350515463,
+    "pe": 2,
+    "iou": 0.6689860206211652,
+    "altura": 1.061885999474652,
+    "mesma_pose": 0.0
    }
   ],
-  "problemas": [],
-  "nivel": "ok"
+  "problemas": [
+   [
+    "aviso",
+    "troca (fim): pose diferente da guarda, altura 106% (salto de pose, não de tamanho)"
+   ]
+  ],
+  "nivel": "aviso"
  },
  {
   "estado": "SPECIAL_S4",

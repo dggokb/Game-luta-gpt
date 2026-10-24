@@ -888,11 +888,22 @@
       "dano": 1.0,
       "ritmo": 1.0,
       "framesGolpe": {
+        "S3": [
+          24,
+          10,
+          30
+        ],
         "S4": [
           20,
           30,
           24
         ]
+      },
+      "especiais": {
+        "S3": {
+          "baixo": true,
+          "altura": 70
+        }
       },
       "projetil": {
         "velocidade": 760,

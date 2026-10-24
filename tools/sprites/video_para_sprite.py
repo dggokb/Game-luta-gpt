@@ -71,16 +71,19 @@ JOIN_GAP = 7       # px: peça grande a essa distância do corpo é do corpo (fa
 JOIN_AREA = 800
 
 
-def keep_largest(alpha):
+def keep_largest(alpha, objects=0):
     """Zera tudo fora da maior peça conectada (poeira, efeitos e restos soltos). Peça grande
     colada no corpo fica: roupa com faixa verde igual ao fundo (calça do p10) corta a perna,
-    e a bota viraria uma peça solta."""
+    e a bota viraria uma peça solta. Com objects > 0, peça solta com pelo menos essa área
+    (px do vídeo) também fica: objeto do golpe longe do corpo (a casca de banana da p16)."""
     n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
     if n > 1:
         main = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
         near = cv2.dilate((labels == main).astype(np.uint8), np.ones((2 * JOIN_GAP + 1,) * 2, np.uint8))
         keep = {main} | {i for i in np.unique(labels[(near > 0) & (labels > 0)])
                          if stats[i, cv2.CC_STAT_AREA] >= JOIN_AREA}
+        if objects > 0:
+            keep |= {i for i in range(1, n) if stats[i, cv2.CC_STAT_AREA] >= objects}
         alpha[~np.isin(labels, list(keep))] = 0
     return alpha
 
@@ -99,7 +102,7 @@ def floor_dust(alpha, h, s, v):
     return band & (tinted | beige)
 
 
-def key(frame, dust=False, effects=False, floor=False, soft=False):
+def key(frame, dust=False, effects=False, floor=False, soft=False, objects=0):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45) & (v >= SCREEN_MIN_V)
@@ -125,11 +128,11 @@ def key(frame, dust=False, effects=False, floor=False, soft=False):
         colored = ((alpha > 0) & ~pale).astype(np.uint8)
         body = cv2.dilate(colored, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (91, 91)))
         alpha[thin | ((alpha > 0) & pale & (body == 0))] = 0
-        keep_largest(alpha)
+        keep_largest(alpha, objects)
     if floor:
         alpha[floor_dust(alpha, h, s, v)] = 0
         alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
-    alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
+    alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)), objects)
     # Furinhos dentro do corpo (reflexo verde na roupa branca) voltam a ser opacos;
     # vãos grandes, como entre as pernas, continuam transparentes.
     _, labels, stats, _ = cv2.connectedComponentsWithStats((alpha == 0).astype(np.uint8))
@@ -236,7 +239,7 @@ RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
-              balanco=1.0)
+              balanco=1.0, objetos=0)
 
 
 def parser():
@@ -277,6 +280,9 @@ def parser():
                         "--no-pe-no-chao desliga o que a receita gravada tiver")
     p.add_argument("--reescala", type=lambda v: [float(x) for x in v.split(",")],
                    help="fator de tamanho por quadro (tools/sprites/reescalar.py): divide a escala")
+    p.add_argument("--objetos", type=int, default=0,
+                   help="mantém peça solta com pelo menos essa área em px do vídeo (objeto do golpe: "
+                        "casca de banana, balão), em vez de só o corpo")
     p.add_argument("--limpar-quadros", type=lambda v: [int(x) for x in v.split(",")],
                    help="células a limpar de efeito depois de converter (tools/sprites/limpar.py)")
     p.add_argument("--limpar-area", type=json.loads,
@@ -424,9 +430,9 @@ def main(argv=None):
     cache = {}
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
-        soft = args.recorte_suave
+        soft, objects = args.recorte_suave, args.objetos
         if (i, dust, effects, floor, soft) not in cache:
-            cache[i, dust, effects, floor, soft] = key(frames[i], dust, effects, floor, soft)
+            cache[i, dust, effects, floor, soft] = key(frames[i], dust, effects, floor, soft, objects)
         return cache[i, dust, effects, floor, soft]
 
     measured = None
