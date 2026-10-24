@@ -127,6 +127,11 @@ public class GameView extends SurfaceView
     private final EffectsRenderer effects = new EffectsRenderer();
     /** Hit and guard sparks at the real contact point (presentation only). */
     private final ImpactEffects impacts = new ImpactEffects();
+    /** Riscos de mangá dos golpes fortes (no corpo de quem apanhou e no rastro do golpe). */
+    private final RiscosDeImpacto riscos = new RiscosDeImpacto();
+    private final CombatFighter[] riscosLutadores = new CombatFighter[2];
+    private final float[] riscosDeslocamento = new float[2];
+    private final boolean[] riscosVisiveis = new boolean[2];
     /**
      * Efeitos vindos de vídeo (assets/efeitos, feitos pelo tools/sprites/efeito_video.py). Cada
      * evento tenta o dele e, se ainda não existe, usa o efeito clássico do ImpactEffects.
@@ -1776,6 +1781,7 @@ public class GameView extends SurfaceView
     void startIntro() {
         hud.resetEffects();
         impacts.clear();
+        riscos.clear();
         efeitos.limpar();
         feel.clear();
         finalizacao.limpar();
@@ -2368,6 +2374,10 @@ public class GameView extends SurfaceView
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         if (!efeitoDeGolpe(event.blocked, x, y, direction, size)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        }
+        // Golpe forte (H, especiais, Super, Ultra): os riscos de mangá no corpo e no rastro do golpe.
+        if (!event.blocked && size >= ImpactEffects.HEAVY) {
+            riscos.spawn(engine.frame(), event.defender, x, y, direction, size == ImpactEffects.HEAVY ? 1f : 1.25f);
         }
         // O tremor do golpe tem direção: a tela vai no sentido do golpe e volta (o aleatório fica menor).
         // Só nos normais (o especial de vários acertos balançaria a tela a cada um) e no KO.
@@ -3159,6 +3169,13 @@ public class GameView extends SurfaceView
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
+            for (int i = 0; i < 2; i++) {
+                riscosLutadores[i] = engine.fighter(i);
+                riscosVisiveis[i] = !hiddenByUltra(riscosLutadores[i]);
+            }
+            riscosDeslocamento[PLAYER] = tagOffset();
+            riscosDeslocamento[OPPONENT] = engine.teams.tagOffset(OPPONENT);
+            riscos.draw(canvas, engine.frame(), riscosLutadores, riscosDeslocamento, riscosVisiveis);
             impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
