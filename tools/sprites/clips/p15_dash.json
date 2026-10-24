@@ -2,36 +2,50 @@
   "id": "p15_dash",
   "javaName": "P15_DASH",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_dash_sr_hd.png",
+  "source": "art/sprites/source/p15_dash_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_dash.webp",
   "report": "tools/sprites/reports/p15_dash.report.json",
   "preview": "android/app/build/sprite-review/p15_dash-import.png",
-  "expectedFrames": 18,
+  "expectedFrames": 17,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "dash.mp4",
     "personagem": "p15",
-    "escala": 0.5689,
-    "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55",
-    "celula": 288,
-    "largura": 256,
-    "raiz": "160,269",
-    "colunas": 11,
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro_h3 (nota 0.98)",
+    "quadros": "34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50",
+    "celula": 320,
+    "largura": 352,
+    "raiz": "170,270",
+    "colunas": 5,
     "fixar": "volta",
-    "deslocar": "0,4",
+    "deslocar": "26,12",
     "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_dash_video_normalized.png",
+      "celula": [
+        352,
+        320
+      ],
+      "raiz": [
+        170,
+        270
+      ],
+      "colunas": 6
+    },
     "recorte_suave": true
   },
-  "rootX": 320,
-  "frameHeight": 576,
-  "rootY": 538,
+  "rootX": 340,
+  "frameHeight": 640,
+  "rootY": 540,
   "sourceReferences": [
     "art/sprites/source/p15_dash_video_normalized.png"
   ],
-  "frameWidth": 512,
+  "frameWidth": 704,
   "pixelScale": 2.0
 }

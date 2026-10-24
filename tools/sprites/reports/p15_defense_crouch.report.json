@@ -1,0 +1,377 @@
+{
+  "id": "p15_defense_crouch",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_defense_crouch_video_hd.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 448,
+    "rootX": 220,
+    "rootY": 412,
+    "columns": 9,
+    "frameCount": 17
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        60,
+        64,
+        369,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 48960
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        60,
+        64,
+        369,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 48980
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        60,
+        64,
+        369,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 48937
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        75,
+        69,
+        383,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 47458
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        85,
+        78,
+        391,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 46387
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        83,
+        84,
+        390,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 46097
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        76,
+        90,
+        382,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 44786
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        70,
+        90,
+        376,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 43563
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        69,
+        90,
+        376,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 43563
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        65,
+        96,
+        371,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 44500
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        60,
+        95,
+        366,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 42859
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        59,
+        95,
+        365,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 42726
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        59,
+        95,
+        365,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 42735
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        60,
+        95,
+        366,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 42754
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        67,
+        84,
+        374,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 43435
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        71,
+        75,
+        379,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 44672
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        63,
+        67,
+        372,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 46926
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 348,
+    "frameHeight": 365,
+    "rootX": 169,
+    "rootY": 356,
+    "columns": 9,
+    "frameCount": 17,
+    "cropOffset": [
+      51,
+      56
+    ],
+    "sheetWidth": 644,
+    "sheetHeight": 3104,
+    "frames": [
+      [
+        0,
+        0,
+        320,
+        360,
+        5,
+        4
+      ],
+      [
+        324,
+        0,
+        320,
+        360,
+        5,
+        4
+      ],
+      [
+        0,
+        364,
+        320,
+        360,
+        5,
+        4
+      ],
+      [
+        0,
+        728,
+        316,
+        352,
+        20,
+        9
+      ],
+      [
+        0,
+        1084,
+        316,
+        344,
+        30,
+        18
+      ],
+      [
+        320,
+        1084,
+        316,
+        340,
+        28,
+        24
+      ],
+      [
+        320,
+        1432,
+        316,
+        332,
+        21,
+        30
+      ],
+      [
+        0,
+        1776,
+        316,
+        332,
+        15,
+        30
+      ],
+      [
+        320,
+        1776,
+        316,
+        332,
+        14,
+        30
+      ],
+      [
+        0,
+        2112,
+        316,
+        328,
+        10,
+        36
+      ],
+      [
+        320,
+        2112,
+        316,
+        328,
+        5,
+        35
+      ],
+      [
+        0,
+        2444,
+        316,
+        328,
+        4,
+        35
+      ],
+      [
+        320,
+        2444,
+        316,
+        328,
+        4,
+        35
+      ],
+      [
+        0,
+        2776,
+        316,
+        328,
+        5,
+        35
+      ],
+      [
+        0,
+        1432,
+        316,
+        340,
+        12,
+        24
+      ],
+      [
+        320,
+        728,
+        316,
+        348,
+        16,
+        15
+      ],
+      [
+        324,
+        364,
+        320,
+        356,
+        8,
+        7
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 14450688,
+      "grid": 9145440,
+      "packed": 7995904
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c7f3fc9f8c5164ca8752b9568ea73542f08fb54d35957f8871a0256f069b1bbf",
+      "config": "514a4bf0938faf027e95c762ca9513b95137bf8040ea577a2f5c191bae6f5f7f",
+      "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
+    },
+    "referenceSources": {
+      "art/sprites/source/p15_defense_crouch_video_normalized.png": "9d0502748d328862ec471225cf97e693a7d3d6c581e42f9c167fdc5dcc9d3915"
+    }
+  }
+}

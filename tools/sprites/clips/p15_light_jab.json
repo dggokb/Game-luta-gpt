@@ -2,11 +2,11 @@
   "id": "p15_light_jab",
   "javaName": "P15_LIGHT_JAB",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_light_jab_sr_hd.png",
+  "source": "art/sprites/source/p15_light_jab_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_light_jab.webp",
   "report": "tools/sprites/reports/p15_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p15_light_jab-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 14,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -14,21 +14,36 @@
   "video": {
     "arquivo": "L.mp4",
     "personagem": "p15",
-    "escala": 0.5689,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "16,23,24,25,26,30",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro_h3 (nota 0.98)",
+    "quadros": "36,40,42,44,46,48,52,56,60,64,66,68,70,72",
     "celula": 288,
     "largura": 224,
-    "raiz": "85,269",
+    "raiz": "87,270",
     "colunas": 6,
     "fixar": "video",
+    "sem_efeitos": true,
     "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_light_jab_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        87,
+        270
+      ],
+      "colunas": 6
+    },
     "recorte_suave": true
   },
   "frameWidth": 448,
   "frameHeight": 576,
-  "rootX": 170,
-  "rootY": 538,
+  "rootX": 174,
+  "rootY": 540,
   "sourceReferences": [
     "art/sprites/source/p15_light_jab_video_normalized.png"
   ],

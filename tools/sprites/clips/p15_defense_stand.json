@@ -1,0 +1,50 @@
+{
+  "id": "p15_defense_stand",
+  "javaName": "P15_DEFENSE_STAND",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_defense_stand_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_defense_stand.webp",
+  "report": "tools/sprites/reports/p15_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p15_defense_stand-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesa.mp4",
+    "personagem": "p15",
+    "escala": 0.411,
+    "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)",
+    "quadros": "10,12,14,16,18,20,24,32,40,48,54,56,58,60,62,64",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "104,270",
+    "colunas": 9,
+    "fixar": "registro",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_defense_stand_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        104,
+        270
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 208,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_defense_stand_video_normalized.png"
+  ]
+}

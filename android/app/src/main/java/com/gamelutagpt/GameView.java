@@ -3946,9 +3946,71 @@ public class GameView extends SurfaceView
         float visualY = fighterVisualY(f);
         ColorFilter look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
+        if (look == null && renderer.override() == null && ghostArmsActive(f)) drawGhostArms(c, renderer, f, visualY);
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         if (look != null) renderer.setOverride(null);
         c.restore();
+    }
+
+    /** Cópias azuladas e translúcidas dos braços fantasmas, da mais forte à mais fraca; o alfa baixo vai a zero. */
+    private final ColorFilter[] ghostTints = {ghostTint(0.95f), ghostTint(0.75f), ghostTint(0.55f)};
+
+    private static ColorFilter ghostTint(float strength) {
+        // As cores do próprio desenho, clareadas e puxadas para o azul; o borrão que o vídeo já
+        // tem nos braços da rajada vira rastro de movimento (tingido chapado, virava um bloco).
+        return new ColorMatrixColorFilter(new float[] {
+            0.7f, 0f, 0f, 0f, 40f,
+            0f, 0.75f, 0f, 0f, 55f,
+            0f, 0f, 0.8f, 0f, 80f,
+            0f, 0f, 0f, 1.3f * strength, -90f * strength,
+        });
+    }
+
+    /**
+     * Braços fantasmas (efeito "FANTASMAS", a rajada da p15): durante os socos, antes do chute
+     * que fecha o golpe.
+     */
+    private boolean ghostArmsActive(CombatFighter f) {
+        if (!f.attacking() || f.attack == null) return false;
+        CharacterDefinition.Special special = f.character().specials.get(f.attack.id);
+        if (special == null || !"FANTASMAS".equals(special.effect)) return false;
+        int strikes = f.attack.hitboxCount();
+        int end = strikes > 1 ? f.attack.hitbox(strikes - 1).firstFrame - 8 : f.attack.startupFrames + f.attack.activeFrames;
+        return f.attackFrame >= f.attack.startupFrames - 2 && f.attackFrame < end;
+    }
+
+    /**
+     * Cópias claras e translúcidas do desenho, atrás dela e recortadas na faixa dos braços (do
+     * ombro à cintura), deslocadas para a frente e para cima e para baixo, trocando a cada 2
+     * quadros: muitos braços socando ao mesmo tempo.
+     */
+    private void drawGhostArms(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float visualY) {
+        // Atrás dela (o corpo esconde o tronco das cópias), só na faixa dos ombros à cintura: os
+        // braços extras aparecem acima e abaixo do braço de verdade, sem cabeça nem pernas.
+        float h = f.body().height(false);
+        float back = f.x - f.facing * (f.body().halfWidth + 40f), reach = f.attack.reach + 80f;
+        float front = f.x + f.facing * reach;
+        float left = Math.min(back, front), right = Math.max(back, front);
+        float top = visualY - h * 0.86f, bottom = visualY - h * 0.5f;
+        int seed = engine.frame() / 2;
+        for (int k = 0; k < ghostTints.length; k++) {
+            // Um acima, um no meio e um abaixo do braço de verdade, com um pouco de tremor.
+            float dx = f.facing * (4f + 10f * ghostNoise(seed, k));
+            float dy = (k - 1) * 24f + (ghostNoise(seed, k + 5) - 0.5f) * 12f;
+            c.save();
+            c.clipRect(left, top, right, bottom);
+            c.translate(dx, dy);
+            renderer.setOverride(ghostTints[k]);
+            renderer.draw(c, f.x, visualY, f.facing, false, false);
+            c.restore();
+        }
+        renderer.setOverride(null);
+    }
+
+    private static float ghostNoise(int seed, int k) {
+        int x = seed * 374761393 + k * 668265263;
+        x = (x ^ (x >>> 13)) * 1274126177;
+        return ((x ^ (x >>> 16)) & 0xFFFF) / 65535f;
     }
 
     /** Graus por frame do giro do punish counter (~3 voltas no voo). */

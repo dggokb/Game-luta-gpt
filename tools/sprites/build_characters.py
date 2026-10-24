@@ -84,7 +84,7 @@ def safe(root, value):
 # Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
 ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO','BALAO','CAIXA')
 # Efeitos desenhados durante um especial (ProjetilVisual).
-SPECIAL_EFFECTS = ('VAPOR',)
+SPECIAL_EFFECTS = ('VAPOR', 'FANTASMAS')
 
 def validate_projectile(data, name, body):
     positive_int(data['damage'], name+'.damage')

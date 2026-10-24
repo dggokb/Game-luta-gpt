@@ -180,7 +180,7 @@ final class CharacterDefinition {
         }
         /** Projétil que o especial lança no fim da preparação (null: golpe corpo a corpo). */
         Projectile projectile;
-        /** Efeito desenhado durante o golpe ("VAPOR"); null: nenhum. */
+        /** Efeito desenhado durante o golpe ("VAPOR", "FANTASMAS": braços fantasmas da rajada); null: nenhum. */
         String effect;
         /**
          * O especial lança um projétil: desenho (ProjetilVisual.Tipo), alcance e velocidade na

@@ -2,32 +2,46 @@
   "id": "p15_fall",
   "javaName": "P15_FALL",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_fall_sr_hd.png",
+  "source": "art/sprites/source/p15_fall_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_fall.webp",
   "report": "tools/sprites/reports/p15_fall.report.json",
   "preview": "android/app/build/sprite-review/p15_fall-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 9,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "pular.mp4",
+    "arquivo": "pulo.mp4",
     "personagem": "p15",
-    "escala": 0.5689,
-    "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "34,36,38,40,42,44",
-    "celula": 352,
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro_h3 (nota 0.98)",
+    "quadros": "58,60,62,64,66,68,70,72,74",
+    "celula": 288,
     "largura": 192,
-    "raiz": "101,334",
+    "raiz": "101,270",
     "colunas": 6,
     "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_fall_video_normalized.png",
+      "celula": [
+        192,
+        288
+      ],
+      "raiz": [
+        101,
+        270
+      ],
+      "colunas": 6
+    },
     "recorte_suave": true
   },
   "frameWidth": 384,
-  "frameHeight": 704,
+  "frameHeight": 576,
   "rootX": 202,
-  "rootY": 668,
+  "rootY": 540,
   "sourceReferences": [
     "art/sprites/source/p15_fall_video_normalized.png"
   ],

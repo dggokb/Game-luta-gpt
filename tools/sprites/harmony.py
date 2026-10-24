@@ -49,10 +49,14 @@ ACCEPTED = {
     # the hand fill the torso band and pull its middle forward. The body lines up with
     # frames 23 and 25 (silhouettes overlaid); only the effect is new in this frame.
     'p11/ULTRA_SEQ[24]',
-    # Corrida de verdade no dash da p15: na passada os dois pés saem do chão (quadros 45-46 e
-    # 54-55 do vídeo, e o 38 na ponta do pé). Com os pés colados no chão ela afundava 14 px
-    # nesses quadros (solavanco); os quadros de apoio continuam no chão.
-    'p15/DASH[0]', 'p15/DASH[7]', 'p15/DASH[8]', 'p15/DASH[16]', 'p15/DASH[17]',
+    # Corrida de verdade no dash da p15 (vídeo H3 de 24/10, passada 34-50): nos quadros 40, 41,
+    # 48 e 49 do vídeo os dois pés saem do chão; nos 44, 46 e 47 o pé de apoio desce 5 px (1 além
+    # da tolerância) enquanto o outro fica plantado. Com os pés colados no chão ela afundava
+    # nos quadros de voo (solavanco); os outros quadros de apoio continuam no chão.
+    'p15/DASH[6]', 'p15/DASH[7]', 'p15/DASH[14]', 'p15/DASH[15]', 'p15/DASH[10]', 'p15/DASH[12]',
+    'p15/DASH[13]',
+    # Aterrissagem da p15 (vídeo H3): o primeiro quadro é o pé ainda descendo, 9 px acima.
+    'p15/LAND[0]',
 }
 
 

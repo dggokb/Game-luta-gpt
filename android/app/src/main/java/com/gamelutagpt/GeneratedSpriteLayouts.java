@@ -2602,11 +2602,11 @@ final class GeneratedSpriteLayouts {
     static final int P12_WALK_FORWARD_ROOT_Y = 201;
     static final int P12_WALK_FORWARD_FRAME_COUNT = 22;
 
-    static final int P15_BACKDASH_FRAME_WIDTH = 397;
-    static final int P15_BACKDASH_FRAME_HEIGHT = 577;
-    static final int P15_BACKDASH_ROOT_X = 185;
+    static final int P15_BACKDASH_FRAME_WIDTH = 355;
+    static final int P15_BACKDASH_FRAME_HEIGHT = 576;
+    static final int P15_BACKDASH_ROOT_X = 153;
     static final int P15_BACKDASH_ROOT_Y = 563;
-    static final int P15_BACKDASH_FRAME_COUNT = 10;
+    static final int P15_BACKDASH_FRAME_COUNT = 16;
 
     static final int P15_CROUCH_FRAME_WIDTH = 327;
     static final int P15_CROUCH_FRAME_HEIGHT = 500;
@@ -2614,11 +2614,11 @@ final class GeneratedSpriteLayouts {
     static final int P15_CROUCH_ROOT_Y = 490;
     static final int P15_CROUCH_FRAME_COUNT = 14;
 
-    static final int P15_CROUCH_HEAVY_FRAME_WIDTH = 340;
-    static final int P15_CROUCH_HEAVY_FRAME_HEIGHT = 536;
-    static final int P15_CROUCH_HEAVY_ROOT_X = 163;
-    static final int P15_CROUCH_HEAVY_ROOT_Y = 521;
-    static final int P15_CROUCH_HEAVY_FRAME_COUNT = 8;
+    static final int P15_CROUCH_HEAVY_FRAME_WIDTH = 427;
+    static final int P15_CROUCH_HEAVY_FRAME_HEIGHT = 586;
+    static final int P15_CROUCH_HEAVY_ROOT_X = 167;
+    static final int P15_CROUCH_HEAVY_ROOT_Y = 564;
+    static final int P15_CROUCH_HEAVY_FRAME_COUNT = 16;
 
     static final int P15_CROUCH_IDLE_FRAME_WIDTH = 327;
     static final int P15_CROUCH_IDLE_FRAME_HEIGHT = 373;
@@ -2626,11 +2626,11 @@ final class GeneratedSpriteLayouts {
     static final int P15_CROUCH_IDLE_ROOT_Y = 365;
     static final int P15_CROUCH_IDLE_FRAME_COUNT = 27;
 
-    static final int P15_CROUCH_LIGHT_FRAME_WIDTH = 390;
-    static final int P15_CROUCH_LIGHT_FRAME_HEIGHT = 435;
-    static final int P15_CROUCH_LIGHT_ROOT_X = 163;
-    static final int P15_CROUCH_LIGHT_ROOT_Y = 420;
-    static final int P15_CROUCH_LIGHT_FRAME_COUNT = 6;
+    static final int P15_CROUCH_LIGHT_FRAME_WIDTH = 441;
+    static final int P15_CROUCH_LIGHT_FRAME_HEIGHT = 374;
+    static final int P15_CROUCH_LIGHT_ROOT_X = 160;
+    static final int P15_CROUCH_LIGHT_ROOT_Y = 364;
+    static final int P15_CROUCH_LIGHT_FRAME_COUNT = 10;
 
     static final int P15_CROUCH_MEDIUM_FRAME_WIDTH = 851;
     static final int P15_CROUCH_MEDIUM_FRAME_HEIGHT = 448;
@@ -2638,29 +2638,65 @@ final class GeneratedSpriteLayouts {
     static final int P15_CROUCH_MEDIUM_ROOT_Y = 397;
     static final int P15_CROUCH_MEDIUM_FRAME_COUNT = 83;
 
-    static final int P15_DASH_FRAME_WIDTH = 463;
-    static final int P15_DASH_FRAME_HEIGHT = 517;
-    static final int P15_DASH_ROOT_X = 297;
-    static final int P15_DASH_ROOT_Y = 495;
-    static final int P15_DASH_FRAME_COUNT = 18;
+    static final int P15_DASH_FRAME_WIDTH = 501;
+    static final int P15_DASH_FRAME_HEIGHT = 470;
+    static final int P15_DASH_ROOT_X = 283;
+    static final int P15_DASH_ROOT_Y = 450;
+    static final int P15_DASH_FRAME_COUNT = 17;
 
-    static final int P15_FALL_FRAME_WIDTH = 315;
-    static final int P15_FALL_FRAME_HEIGHT = 623;
-    static final int P15_FALL_ROOT_X = 168;
-    static final int P15_FALL_ROOT_Y = 605;
-    static final int P15_FALL_FRAME_COUNT = 6;
+    static final int P15_DEFENSE_AIR_FRAME_WIDTH = 337;
+    static final int P15_DEFENSE_AIR_FRAME_HEIGHT = 540;
+    static final int P15_DEFENSE_AIR_ROOT_X = 181;
+    static final int P15_DEFENSE_AIR_ROOT_Y = 495;
+    static final int P15_DEFENSE_AIR_FRAME_COUNT = 23;
 
-    static final int P15_GOLPE_ALTO_FRAME_WIDTH = 338;
-    static final int P15_GOLPE_ALTO_FRAME_HEIGHT = 597;
-    static final int P15_GOLPE_ALTO_ROOT_X = 149;
-    static final int P15_GOLPE_ALTO_ROOT_Y = 578;
-    static final int P15_GOLPE_ALTO_FRAME_COUNT = 13;
+    static final int P15_DEFENSE_CROUCH_FRAME_WIDTH = 348;
+    static final int P15_DEFENSE_CROUCH_FRAME_HEIGHT = 365;
+    static final int P15_DEFENSE_CROUCH_ROOT_X = 169;
+    static final int P15_DEFENSE_CROUCH_ROOT_Y = 356;
+    static final int P15_DEFENSE_CROUCH_FRAME_COUNT = 17;
+
+    static final int P15_DEFENSE_STAND_FRAME_WIDTH = 345;
+    static final int P15_DEFENSE_STAND_FRAME_HEIGHT = 503;
+    static final int P15_DEFENSE_STAND_ROOT_X = 156;
+    static final int P15_DEFENSE_STAND_ROOT_Y = 494;
+    static final int P15_DEFENSE_STAND_FRAME_COUNT = 16;
+
+    static final int P15_FALL_FRAME_WIDTH = 331;
+    static final int P15_FALL_FRAME_HEIGHT = 518;
+    static final int P15_FALL_ROOT_X = 175;
+    static final int P15_FALL_ROOT_Y = 506;
+    static final int P15_FALL_FRAME_COUNT = 9;
+
+    static final int P15_GOLPE_ALTO_FRAME_WIDTH = 585;
+    static final int P15_GOLPE_ALTO_FRAME_HEIGHT = 512;
+    static final int P15_GOLPE_ALTO_ROOT_X = 143;
+    static final int P15_GOLPE_ALTO_ROOT_Y = 501;
+    static final int P15_GOLPE_ALTO_FRAME_COUNT = 20;
 
     static final int P15_HEAVY_STRAIGHT_FRAME_WIDTH = 578;
     static final int P15_HEAVY_STRAIGHT_FRAME_HEIGHT = 550;
     static final int P15_HEAVY_STRAIGHT_ROOT_X = 145;
     static final int P15_HEAVY_STRAIGHT_ROOT_Y = 540;
     static final int P15_HEAVY_STRAIGHT_FRAME_COUNT = 79;
+
+    static final int P15_HIT_AIR_FRAME_WIDTH = 359;
+    static final int P15_HIT_AIR_FRAME_HEIGHT = 557;
+    static final int P15_HIT_AIR_ROOT_X = 203;
+    static final int P15_HIT_AIR_ROOT_Y = 504;
+    static final int P15_HIT_AIR_FRAME_COUNT = 20;
+
+    static final int P15_HIT_CROUCH_FRAME_WIDTH = 422;
+    static final int P15_HIT_CROUCH_FRAME_HEIGHT = 372;
+    static final int P15_HIT_CROUCH_ROOT_X = 171;
+    static final int P15_HIT_CROUCH_ROOT_Y = 363;
+    static final int P15_HIT_CROUCH_FRAME_COUNT = 15;
+
+    static final int P15_HIT_STAND_FRAME_WIDTH = 383;
+    static final int P15_HIT_STAND_FRAME_HEIGHT = 502;
+    static final int P15_HIT_STAND_ROOT_X = 157;
+    static final int P15_HIT_STAND_ROOT_Y = 493;
+    static final int P15_HIT_STAND_FRAME_COUNT = 15;
 
     static final int P15_IDLE_FRAME_WIDTH = 323;
     static final int P15_IDLE_FRAME_HEIGHT = 503;
@@ -2674,28 +2710,52 @@ final class GeneratedSpriteLayouts {
     static final int P15_IDLE_2_ROOT_Y = 531;
     static final int P15_IDLE_2_FRAME_COUNT = 32;
 
-    static final int P15_JUMP_FRAME_WIDTH = 335;
-    static final int P15_JUMP_FRAME_HEIGHT = 547;
-    static final int P15_JUMP_ROOT_X = 147;
-    static final int P15_JUMP_ROOT_Y = 530;
-    static final int P15_JUMP_FRAME_COUNT = 6;
+    static final int P15_JUMP_FRAME_WIDTH = 332;
+    static final int P15_JUMP_FRAME_HEIGHT = 537;
+    static final int P15_JUMP_ROOT_X = 145;
+    static final int P15_JUMP_ROOT_Y = 526;
+    static final int P15_JUMP_FRAME_COUNT = 10;
 
-    static final int P15_LAND_FRAME_WIDTH = 296;
-    static final int P15_LAND_FRAME_HEIGHT = 628;
-    static final int P15_LAND_ROOT_X = 153;
-    static final int P15_LAND_ROOT_Y = 613;
-    static final int P15_LAND_FRAME_COUNT = 4;
+    static final int P15_JUMP_HEAVY_FRAME_WIDTH = 392;
+    static final int P15_JUMP_HEAVY_FRAME_HEIGHT = 571;
+    static final int P15_JUMP_HEAVY_ROOT_X = 156;
+    static final int P15_JUMP_HEAVY_ROOT_Y = 484;
+    static final int P15_JUMP_HEAVY_FRAME_COUNT = 19;
 
-    static final int P15_LIGHT_JAB_FRAME_WIDTH = 404;
-    static final int P15_LIGHT_JAB_FRAME_HEIGHT = 527;
-    static final int P15_LIGHT_JAB_ROOT_X = 149;
-    static final int P15_LIGHT_JAB_ROOT_Y = 505;
-    static final int P15_LIGHT_JAB_FRAME_COUNT = 6;
+    static final int P15_JUMP_HEAVY_DOWN_FRAME_WIDTH = 349;
+    static final int P15_JUMP_HEAVY_DOWN_FRAME_HEIGHT = 603;
+    static final int P15_JUMP_HEAVY_DOWN_ROOT_X = 167;
+    static final int P15_JUMP_HEAVY_DOWN_ROOT_Y = 501;
+    static final int P15_JUMP_HEAVY_DOWN_FRAME_COUNT = 19;
 
-    static final int P15_MEDIUM_KICK_FRAME_WIDTH = 408;
-    static final int P15_MEDIUM_KICK_FRAME_HEIGHT = 520;
-    static final int P15_MEDIUM_KICK_ROOT_X = 157;
-    static final int P15_MEDIUM_KICK_ROOT_Y = 503;
+    static final int P15_JUMP_LIGHT_FRAME_WIDTH = 406;
+    static final int P15_JUMP_LIGHT_FRAME_HEIGHT = 513;
+    static final int P15_JUMP_LIGHT_ROOT_X = 164;
+    static final int P15_JUMP_LIGHT_ROOT_Y = 504;
+    static final int P15_JUMP_LIGHT_FRAME_COUNT = 23;
+
+    static final int P15_JUMP_MEDIUM_FRAME_WIDTH = 491;
+    static final int P15_JUMP_MEDIUM_FRAME_HEIGHT = 561;
+    static final int P15_JUMP_MEDIUM_ROOT_X = 169;
+    static final int P15_JUMP_MEDIUM_ROOT_Y = 504;
+    static final int P15_JUMP_MEDIUM_FRAME_COUNT = 21;
+
+    static final int P15_LAND_FRAME_WIDTH = 335;
+    static final int P15_LAND_FRAME_HEIGHT = 620;
+    static final int P15_LAND_ROOT_X = 168;
+    static final int P15_LAND_ROOT_Y = 609;
+    static final int P15_LAND_FRAME_COUNT = 7;
+
+    static final int P15_LIGHT_JAB_FRAME_WIDTH = 389;
+    static final int P15_LIGHT_JAB_FRAME_HEIGHT = 507;
+    static final int P15_LIGHT_JAB_ROOT_X = 144;
+    static final int P15_LIGHT_JAB_ROOT_Y = 496;
+    static final int P15_LIGHT_JAB_FRAME_COUNT = 14;
+
+    static final int P15_MEDIUM_KICK_FRAME_WIDTH = 387;
+    static final int P15_MEDIUM_KICK_FRAME_HEIGHT = 512;
+    static final int P15_MEDIUM_KICK_ROOT_X = 147;
+    static final int P15_MEDIUM_KICK_ROOT_Y = 501;
     static final int P15_MEDIUM_KICK_FRAME_COUNT = 14;
 
     static final int P15_RISE_FRAME_WIDTH = 327;
@@ -2716,17 +2776,23 @@ final class GeneratedSpriteLayouts {
     static final int P15_SPECIAL_S2_ROOT_Y = 535;
     static final int P15_SPECIAL_S2_FRAME_COUNT = 12;
 
-    static final int P15_SPECIAL_S3_FRAME_WIDTH = 433;
+    static final int P15_SPECIAL_S3_FRAME_WIDTH = 650;
     static final int P15_SPECIAL_S3_FRAME_HEIGHT = 530;
-    static final int P15_SPECIAL_S3_ROOT_X = 170;
-    static final int P15_SPECIAL_S3_ROOT_Y = 513;
-    static final int P15_SPECIAL_S3_FRAME_COUNT = 29;
+    static final int P15_SPECIAL_S3_ROOT_X = 278;
+    static final int P15_SPECIAL_S3_ROOT_Y = 519;
+    static final int P15_SPECIAL_S3_FRAME_COUNT = 39;
 
     static final int P15_SPECIAL_S4_FRAME_WIDTH = 613;
     static final int P15_SPECIAL_S4_FRAME_HEIGHT = 724;
     static final int P15_SPECIAL_S4_ROOT_X = 276;
     static final int P15_SPECIAL_S4_ROOT_Y = 706;
     static final int P15_SPECIAL_S4_FRAME_COUNT = 37;
+
+    static final int P15_SUPER_WAVE_FRAME_WIDTH = 623;
+    static final int P15_SUPER_WAVE_FRAME_HEIGHT = 552;
+    static final int P15_SUPER_WAVE_ROOT_X = 165;
+    static final int P15_SUPER_WAVE_ROOT_Y = 543;
+    static final int P15_SUPER_WAVE_FRAME_COUNT = 45;
 
     static final int P15_WALK_BACK_FRAME_WIDTH = 383;
     static final int P15_WALK_BACK_FRAME_HEIGHT = 521;

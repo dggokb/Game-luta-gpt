@@ -2,32 +2,46 @@
   "id": "p15_backdash",
   "javaName": "P15_BACKDASH",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_backdash_sr_hd.png",
+  "source": "art/sprites/source/p15_backdash_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_backdash.webp",
   "report": "tools/sprites/reports/p15_backdash.report.json",
   "preview": "android/app/build/sprite-review/p15_backdash-import.png",
-  "expectedFrames": 10,
+  "expectedFrames": 16,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "backDash.mp4",
     "personagem": "p15",
-    "escala": 0.567,
-    "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "11,20,30,39,48,58,67,76,86,95",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro_h3 (nota 0.98)",
+    "quadros": "2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32",
     "celula": 320,
     "largura": 224,
-    "raiz": "105,302",
-    "colunas": 10,
+    "raiz": "100,302",
+    "colunas": 6,
     "fixar": "registro",
     "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_backdash_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        100,
+        302
+      ],
+      "colunas": 6
+    },
     "recorte_suave": true
   },
   "frameWidth": 448,
   "frameHeight": 640,
-  "rootX": 210,
+  "rootX": 200,
   "rootY": 604,
   "sourceReferences": [
     "art/sprites/source/p15_backdash_video_normalized.png"

@@ -2,11 +2,11 @@
   "id": "p15_crouch_light",
   "javaName": "P15_CROUCH_LIGHT",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_crouch_light_sr_hd.png",
+  "source": "art/sprites/source/p15_crouch_light_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_crouch_light.webp",
   "report": "tools/sprites/reports/p15_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/p15_crouch_light-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 10,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -14,22 +14,38 @@
   "video": {
     "arquivo": "2L.mp4",
     "personagem": "p15",
-    "escala": 0.5708,
-    "medida": "1º quadro = inicio_agachado (nota 0.99)",
-    "quadros": "16,24,25,26,27,29",
-    "largura": 224,
-    "raiz": "96,238",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_agachado_h3 (nota 0.98)",
+    "quadros": "0,4,6,8,9,10,11,12,14,16",
+    "celula": 224,
+    "largura": 256,
+    "raiz": "98,206",
     "colunas": 6,
     "fixar": "video",
+    "sem_efeitos": true,
     "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_crouch_light_video_normalized.png",
+      "celula": [
+        256,
+        224
+      ],
+      "raiz": [
+        98,
+        206
+      ],
+      "colunas": 6
+    },
     "recorte_suave": true
   },
-  "frameWidth": 448,
-  "rootX": 192,
+  "rootX": 196,
   "sourceReferences": [
     "art/sprites/source/p15_crouch_light_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
+  "frameHeight": 448,
+  "rootY": 412,
+  "frameWidth": 512,
   "pixelScale": 2.0
 }

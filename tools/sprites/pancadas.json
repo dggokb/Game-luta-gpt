@@ -41,7 +41,7 @@
       "SUPER": {"pancadas": [6, 10, 13, 16], "avanco": 220}
     },
     "p15": {
-      "S3": {"pancadas": [4, 7, 10, 13, 15, 19, 23], "avanco": 120},
+      "S3": {"pancadas": [4, 8, 12, 16, 21, 25, 29, 33, 44], "avanco": 80}, "SUPER": {"pancadas": [6, 34], "pausa": 16, "preparo": 24, "duracao": 110},
       "S4": {"pancadas": [7, 24], "avanco": {"distancia": 147, "de": 2, "ate": 20}}
     },
     "p16": {

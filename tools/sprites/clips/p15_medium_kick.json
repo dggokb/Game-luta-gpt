@@ -2,27 +2,42 @@
   "id": "p15_medium_kick",
   "javaName": "P15_MEDIUM_KICK",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_medium_kick_sr_hd.png",
+  "source": "art/sprites/source/p15_medium_kick_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_medium_kick.webp",
   "report": "tools/sprites/reports/p15_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p15_medium_kick-import.png",
   "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "M.mp4",
     "personagem": "p15",
-    "escala": 0.5689,
-    "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "12,17,23,28,30,33,35,38,40,42,45,47,50,52",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro_h3 (nota 0.97)",
+    "quadros": "4,6,8,10,12,14,16,18,20,22,24,26,28,30",
     "celula": 288,
     "largura": 224,
     "raiz": "88,270",
-    "colunas": 11,
+    "colunas": 6,
     "fixar": "video",
+    "sem_efeitos": true,
     "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_medium_kick_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        88,
+        270
+      ],
+      "colunas": 6
+    },
     "recorte_suave": true
   },
   "frameWidth": 448,

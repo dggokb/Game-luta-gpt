@@ -1,0 +1,50 @@
+{
+  "id": "p15_hit_crouch",
+  "javaName": "P15_HIT_CROUCH",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_hit_crouch_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_hit_crouch.webp",
+  "report": "tools/sprites/reports/p15_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p15_hit_crouch-import.png",
+  "expectedFrames": 15,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoBaixo.mp4",
+    "personagem": "p15",
+    "escala": 0.411,
+    "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)",
+    "quadros": "10,14,16,18,20,24,30,40,50,58,62,64,66,68,72",
+    "celula": 224,
+    "largura": 256,
+    "raiz": "108,206",
+    "fixar": "registro",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_hit_crouch_video_normalized.png",
+      "celula": [
+        256,
+        224
+      ],
+      "raiz": [
+        108,
+        206
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameHeight": 448,
+  "rootX": 216,
+  "rootY": 412,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_hit_crouch_video_normalized.png"
+  ]
+}

@@ -838,9 +838,9 @@
           26
         ],
         "S3": [
-          12,
+          10,
           4,
-          56
+          86
         ],
         "S4": [
           16,
@@ -848,12 +848,18 @@
           46
         ]
       },
+      "especiais": {
+        "S3": {
+          "lancar": "wallBounce",
+          "efeito": "FANTASMAS"
+        }
+      },
       "projetil": {
         "velocidade": 900,
         "alcance": 320
       },
       "unica": {
-        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; a rajada (S3) acerta 7 vezes avançando; a voadora (S4) cruza a distância no voo e o machado derruba."
+        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; a rajada (S3) soca duas vezes com braços fantasmas e o chute joga na parede (9 acertos); a voadora (S4) cruza a distância no voo e o machado derruba."
       },
       "comandos": {
         "S1": {

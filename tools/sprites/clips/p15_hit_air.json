@@ -1,0 +1,51 @@
+{
+  "id": "p15_hit_air",
+  "javaName": "P15_HIT_AIR",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_hit_air_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_hit_air.webp",
+  "report": "tools/sprites/reports/p15_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p15_hit_air-import.png",
+  "expectedFrames": 20,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoPulo.mp4",
+    "personagem": "p15",
+    "escala": 0.411,
+    "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)",
+    "quadros": "6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44",
+    "celula": 320,
+    "largura": 224,
+    "raiz": "124,283",
+    "colunas": 9,
+    "fixar": "video",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_hit_air_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        124,
+        283
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 248,
+  "rootY": 566,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_hit_air_video_normalized.png"
+  ]
+}

@@ -89,13 +89,27 @@ def fit_impact(anim, m):
     start = m['startupFrames'] / total
     whole, before = sum(d), sum(d[:i])
     if start - 0.75 / total <= before / whole <= start < (before + d[i]) / whole:
-        return
+        return settle(anim, i, start)
     # começa meio frame antes do acerto e dura pelo menos um frame de jogo
     lead, hold = start - 0.5 / total, max(d[i] / whole, 1 / total)
     after = sum(d[i + 1:])
     head = [x * lead * whole / before for x in d[:i]]
     tail = [x * (1 - lead - hold) * whole / after for x in d[i + 1:]] if after else []
     anim['durationsMs'] = [max(1, round(x)) for x in head + [hold * whole] + tail]
+    settle(anim, i, start)
+
+
+def settle(anim, i, start):
+    """Muitos quadros curtos: arredondada, a preparação passava do contato por menos de 1 ms e o
+    impacto entrava um quadro tarde; tira esse excesso dos maiores quadros da preparação."""
+    out = anim['durationsMs']
+    for _ in range(4 * i):
+        if sum(out[:i]) <= start * sum(out):
+            break
+        k = max(range(i), key=lambda n: out[n])
+        if out[k] <= 1:
+            break
+        out[k] -= 1
 
 
 def window(name, m):
@@ -262,7 +276,7 @@ def s1(pack, spec):
         energy['visual'] = s['visual']
 
 
-EFEITOS = ('VAPOR',)   # efeito desenhado durante o especial (ProjetilVisual)
+EFEITOS = ('VAPOR', 'FANTASMAS')   # efeito desenhado durante o especial (vapor; braços fantasmas da rajada)
 SPECIAL_MELEE = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback')
 
 
@@ -291,6 +305,12 @@ def especiais(pack, spec):
         if 'altura' in e:   # altura do golpe (o chute baixo pega a canela)
             base['hitHeight'] = m.get('hitHeight')
             m['hitHeight'] = e['altura']
+        if 'lancar' in e:   # o que o último golpe faz com o rival (wallBounce: o chute da p15 na parede)
+            base['launchType'] = m.get('launchType')
+            m['launchType'] = e['lancar']
+        if 'empurrao' in e:
+            base['knockback'] = m.get('knockback')
+            m['knockback'] = e['empurrao']
         p = e.get('projetil')
         if p:
             if p['visual'] not in VISUALS:

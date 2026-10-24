@@ -1,0 +1,51 @@
+{
+  "id": "p15_jump_medium",
+  "javaName": "P15_JUMP_MEDIUM",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_jump_medium_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_jump_medium.webp",
+  "report": "tools/sprites/reports/p15_jump_medium.report.json",
+  "preview": "android/app/build/sprite-review/p15_jump_medium-import.png",
+  "expectedFrames": 21,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jM.mp4",
+    "personagem": "p15",
+    "escala": 0.411,
+    "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)",
+    "quadros": "0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40",
+    "celula": 320,
+    "largura": 288,
+    "raiz": "106,281",
+    "colunas": 7,
+    "fixar": "video",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_jump_medium_video_normalized.png",
+      "celula": [
+        288,
+        320
+      ],
+      "raiz": [
+        106,
+        281
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 576,
+  "frameHeight": 640,
+  "rootX": 212,
+  "rootY": 562,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_jump_medium_video_normalized.png"
+  ]
+}
