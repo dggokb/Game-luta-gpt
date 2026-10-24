@@ -142,6 +142,11 @@ final class AttackDefinition {
     final float pushbackOnHit, pushbackOnBlock;
     final int juggleCost, maxHits, maxUsesPerCombo;
     /**
+     * Pausa (hitstop) de cada pancada de um golpe de várias, em quadros; 0 = a de sempre (as do
+     * meio mais curtas, para o golpe manter o ritmo). O Super da p16 segura a torta e a marreta.
+     */
+    final int strikeStop;
+    /**
      * Usos do golpe numa mesma corrente de cancelamentos (desde o último golpe que saiu do
      * neutro), acertando ou na defesa; 0 = livre. Diferente de maxUsesPerCombo, zera depois de
      * uma ligação: L > M > H, parede, dash, L > M vale.
@@ -186,6 +191,7 @@ final class AttackDefinition {
         pushbackOnBlock = b.pushbackOnBlock;
         juggleCost = b.juggleCost;
         maxHits = b.strikes.length > 0 ? b.strikes.length : b.maxHits;
+        strikeStop = b.strikeStop;
         maxUsesPerCombo = b.maxUses;
         maxUsesPerChain = b.maxChainUses;
         low = b.low;
@@ -295,6 +301,7 @@ final class AttackDefinition {
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
         private int[] strikes = new int[0];
+        private int strikeStop;
         private final List<Box> hurtboxes = new ArrayList<>();
         private Mechanics mechanics = NO_MECHANICS;
 
@@ -322,6 +329,7 @@ final class AttackDefinition {
         Builder maxHits(int value) { maxHits = value; return this; }
         /** Frames where each strike of the animation lands; the first is the end of the startup. */
         Builder strikes(int... frames) { strikes = frames.clone(); return this; }
+        Builder strikeStop(int frames) { strikeStop = frames; return this; }
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
         Builder maxUsesPerChain(int value) { maxChainUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
@@ -370,6 +378,9 @@ final class AttackDefinition {
                     if (strikes[i] <= strikes[i - 1]) throw new IllegalArgumentException(name + "strikes must grow");
                 }
                 if (kind == Kind.PROJECTILE) throw new IllegalArgumentException(name + "a projectile move cannot strike");
+            }
+            if (strikeStop < 0 || strikeStop > 0 && strikes.length == 0) {
+                throw new IllegalArgumentException(name + "strikeStop is the pause of each strike of a several-strike move");
             }
             for (Box box : hitboxes) {
                 if (box.firstFrame < startup || box.lastFrame > lastActive || box.firstFrame > box.lastFrame) {

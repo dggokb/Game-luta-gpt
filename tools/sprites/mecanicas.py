@@ -386,6 +386,7 @@ def restore(m):
     """Desfaz as pancadas gravadas antes (refazer dá sempre o mesmo resultado)."""
     m.update(m.pop('golpesBase', {}))
     m.pop('golpes', None)
+    m.pop('pausaGolpes', None)
 
 
 def strike(m, anim, pancadas):
@@ -431,6 +432,8 @@ def striking_super(pack, spec):
     a['startupFrames'] = int(sum(d[:first]) / sum(d) * total)
     a['activeFrames'], a['recoveryFrames'] = 1, total - a['startupFrames'] - 1
     strike(a, anim, spec['pancadas'])
+    if spec.get('pausa'):
+        a['pausaGolpes'] = spec['pausa']   # cada pancada segura a cena esse tanto (torta, marreta)
     anim['impactFrame'] = first
     heavy = pack['moves']['H']
     a['reach'] = spec.get('alcance', heavy['reach'] + 30)

@@ -92,6 +92,7 @@
           23,
           43
         ],
+        "pausaGolpes": 20,
         "reach": 260,
         "hitHeight": 210,
         "launchType": "knockdown",

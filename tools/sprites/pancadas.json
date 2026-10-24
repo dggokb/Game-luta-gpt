@@ -1,5 +1,5 @@
 {
-  "_doc": "Golpes que batem mais de uma vez, seguindo a animação (tools/sprites/mecanicas.py). pancadas: quadros da animação (índice na lista de frames) em que cada pancada acerta; a primeira vira o impacto do golpe. avanco: velocidade do corpo para a frente até o último quadro ativo (a animação anda), ou {\"distancia\": px, \"de\": quadro, \"ate\": quadro} para andar só nesse trecho da animação (a voadora do p15); distância negativa recua (a estrela da p16). SUPER com pancadas deixa de soltar a onda e bate corpo a corpo: alcance e altura da caixa, lancar no último golpe. Quem não está aqui fica como está (um acerto; Super de onda).",
+  "_doc": "Golpes que batem mais de uma vez, seguindo a animação (tools/sprites/mecanicas.py). pancadas: quadros da animação (índice na lista de frames) em que cada pancada acerta; a primeira vira o impacto do golpe. avanco: velocidade do corpo para a frente até o último quadro ativo (a animação anda), ou {\"distancia\": px, \"de\": quadro, \"ate\": quadro} para andar só nesse trecho da animação (a voadora do p15); distância negativa recua (a estrela da p16). pausa (SUPER): quadros que cada pancada segura a cena, com impact frame em todas (a torta e a marreta da p16). SUPER com pancadas deixa de soltar a onda e bate corpo a corpo: alcance e altura da caixa, lancar no último golpe. Quem não está aqui fica como está (um acerto; Super de onda).",
   "personagens": {
     "player_base": {
       "S4": {"pancadas": [4, 8, 12], "avanco": 260}
@@ -46,7 +46,7 @@
     },
     "p16": {
       "S4": {"pancadas": [20, 26, 32, 39], "avanco": {"distancia": 188, "de": 5, "ate": 56}},
-      "SUPER": {"pancadas": [13, 24], "alcance": 260, "altura": 210}
+      "SUPER": {"pancadas": [13, 24], "alcance": 260, "altura": 210, "pausa": 20}
     }
   }
 }

@@ -2723,7 +2723,8 @@ final class CombatEngine {
             : !multi || !stillStriking || c.hitbox >= attack.hitboxCount() - 1;
         int holdUntil = lastStrike ? 0 : multiProjectile
             ? c.projectile.hitInterval + attack.hitstopFrames + config.strikeHoldFrames
-            : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame + attack.hitstopFrames + config.strikeHoldFrames;
+            : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame + Math.max(attack.hitstopFrames, attack.strikeStop) +
+                config.strikeHoldFrames;
 
         if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && (!multi || !a.strikeLanded) &&
             (long)session.juggleCount + attack.juggleCost > config.juggleLimit) {
@@ -2950,7 +2951,8 @@ final class CombatEngine {
             a.strikeJuggled = true;
         }
         if (!d.grounded) session.airCombo = true;
-        int stop = lastStrike ? attack.hitstopFrames : holdingHitstop(attack);
+        int stop = multi && attack.strikeStop > 0 ? attack.strikeStop
+            : lastStrike ? attack.hitstopFrames : holdingHitstop(attack);
         if (lastStrike && !projectile) stop += hitHold(attack);
         if (punish) stop += config.punishHitstopBonus;
         if (d.ko()) stop += config.koHitstopBonus;

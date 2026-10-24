@@ -2349,7 +2349,11 @@ public class GameView extends SurfaceView
         if (!event.blocked && stageScene != null) {
             stageScene.cheer(knockout ? 1f : size >= ImpactEffects.HEAVY ? 0.65f : size == ImpactEffects.MEDIUM ? 0.35f : 0.15f);
         }
-        if (!event.blocked && pausa.impacto()) feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y);
+        if (!event.blocked && pausa.impacto()) {
+            // O golpe que segura cada pancada (o Super da p16) ganha um impact frame em todas.
+            boolean everyStrike = !event.projectile && attacker.attacking() && attacker.attack.strikeStop > 0;
+            feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y, everyStrike);
+        }
         if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
             (knockout || bigBlow(attacker, defender))) {
             // O H que joga na parede ganha um close mais aberto que o lançador e o KO.

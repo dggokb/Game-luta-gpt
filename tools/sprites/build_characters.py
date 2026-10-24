@@ -295,6 +295,9 @@ def validate_attack(name, m, projectile):
             raise ValueError(f'{name}.golpes: increasing frames from the first active frame to the last')
         if projectile and not ('reach' in m and 'hitHeight' in m):
             raise ValueError(f'{name}.golpes: a striking Super needs reach and hitHeight')
+    if 'pausaGolpes' in m:
+        non_negative_int(m['pausaGolpes'], f'{name}.pausaGolpes')
+        if 'golpes' not in m: raise ValueError(f'{name}.pausaGolpes: the pause of each strike needs golpes')
     if projectile and 'golpes' not in m and name.endswith('.energy.attack') and 'reach' in m:
         # S corpo a corpo (tapa, investida): bate com a caixa padrão em vez de lançar.
         if 'hitHeight' not in m or m.get('hitboxes'):
@@ -561,6 +564,7 @@ def compile_packs(root, results):
         if 'juggleCost' in m: code += '.juggleCost('+str(m['juggleCost'])+')'
         if 'maxHits' in m: code += '.maxHits('+str(m['maxHits'])+')'
         if 'golpes' in m: code += '.strikes('+','.join(map(str,m['golpes']))+')'
+        if m.get('pausaGolpes'): code += '.strikeStop('+str(m['pausaGolpes'])+')'
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
         if 'maxUsesPerChain' in m: code += '.maxUsesPerChain('+str(m['maxUsesPerChain'])+')'
         if m.get('low'): code += '.low(true)'

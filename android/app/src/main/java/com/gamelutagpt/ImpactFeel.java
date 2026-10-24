@@ -122,8 +122,13 @@ final class ImpactFeel {
      * forte (VOID sobre RED) toma o lugar.
      */
     void impactFrame(int style, float x, float y) {
+        impactFrame(style, x, y, false);
+    }
+
+    /** {@code every}: ignora o intervalo (cada pancada do Super ganha o seu, a torta e a marreta). */
+    void impactFrame(int style, float x, float y, boolean every) {
         if (style == NONE) return;
-        if (impactCooldown > 0 && style <= impactStyle) return;
+        if (!every && impactCooldown > 0 && style <= impactStyle) return;
         impactStyle = style;
         // +1: o passo da luta que pediu ainda conta um quadro antes de desenhar.
         impactLeft = STYLE_FRAMES + NEGATIVE_FRAMES + 1;

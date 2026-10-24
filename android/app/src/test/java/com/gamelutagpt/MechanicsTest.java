@@ -182,6 +182,29 @@ public class MechanicsTest {
         assertTrue("L opens first, H last", l < m && m < h);
     }
 
+    /** Hitstop of each strike of a several-strike H, by contact; {@code stop}: strikeStop (0 = default). */
+    private static int[] strikeHitstops(int stop) {
+        AttackDefinition.Builder b = move("H", 6, 16, 12).stun(20, 10, 12).strikes(6, 16);
+        if (stop > 0) b.strikeStop(stop);
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(b.build()), BASE, 500f, 600f);
+        s.in[0].heavy = true;
+        int[] stops = new int[2];
+        int life = s.f(1).state.life, n = 0;
+        for (int i = 0; i < 80 && n < 2; i++) {
+            s.step();
+            if (s.f(1).state.life < life) stops[n++] = s.f(0).hitstop;
+            life = s.f(1).state.life;
+        }
+        return stops;
+    }
+
+    @Test public void strikeStopHoldsEveryStrike() {
+        int[] plain = strikeHitstops(0), held = strikeHitstops(24);
+        assertTrue("by default the first strike pauses less: " + plain[0] + " " + plain[1], plain[0] < plain[1]);
+        assertEquals("pie", 24, held[0]);
+        assertTrue("mallet, plus the hold of the last strike: " + held[1], held[1] >= 24);
+    }
+
     @Test public void thrownBoxSpinsTwiceUntilItLands() {
         Projectile box = new Projectile(300f, Arena.GROUND_Y - 215f, 600f, 115f, 40f, 100, 0, 0, -1, null, "CAIXA");
         assertEquals(0f, EffectsRenderer.boxSpin(box), 0.01f);
