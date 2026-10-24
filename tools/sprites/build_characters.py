@@ -310,6 +310,11 @@ def validate_attack(name, m, projectile):
             raise ValueError(f'{name}.golpes: increasing frames from the first active frame to the last')
         if projectile and not ('reach' in m and 'hitHeight' in m):
             raise ValueError(f'{name}.golpes: a striking Super needs reach and hitHeight')
+    if 'segurarRival' in m:
+        g = m['segurarRival']
+        if 'golpes' not in m or not (isinstance(g, list) and len(g) == len(m['golpes'])
+                                     and all(type(v) in (int, float) and v > 0 for v in g)):
+            raise ValueError(f'{name}.segurarRival: one place ahead (px) per strike of golpes')
     if 'pausaGolpes' in m:
         non_negative_int(m['pausaGolpes'], f'{name}.pausaGolpes')
         if 'golpes' not in m: raise ValueError(f'{name}.pausaGolpes: the pause of each strike needs golpes')
@@ -580,6 +585,7 @@ def compile_packs(root, results):
         if 'maxHits' in m: code += '.maxHits('+str(m['maxHits'])+')'
         if 'golpes' in m: code += '.strikes('+','.join(map(str,m['golpes']))+')'
         if m.get('pausaGolpes'): code += '.strikeStop('+str(m['pausaGolpes'])+')'
+        if m.get('segurarRival'): code += '.strikeHold('+','.join(f(v) for v in m['segurarRival'])+')'
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
         if 'maxUsesPerChain' in m: code += '.maxUsesPerChain('+str(m['maxUsesPerChain'])+')'
         if m.get('low'): code += '.low(true)'

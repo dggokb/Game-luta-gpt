@@ -147,6 +147,11 @@ final class AttackDefinition {
      */
     final int strikeStop;
     /**
+     * Onde cada pancada deixa o rival (px à frente de quem bate), ou null: a torta põe o rosto
+     * no creme e a marreta deixa o rival deitado debaixo dela até o golpe acabar (o Super da p16).
+     */
+    final float[] strikeHold;
+    /**
      * Usos do golpe numa mesma corrente de cancelamentos (desde o último golpe que saiu do
      * neutro), acertando ou na defesa; 0 = livre. Diferente de maxUsesPerCombo, zera depois de
      * uma ligação: L > M > H, parede, dash, L > M vale.
@@ -192,6 +197,7 @@ final class AttackDefinition {
         juggleCost = b.juggleCost;
         maxHits = b.strikes.length > 0 ? b.strikes.length : b.maxHits;
         strikeStop = b.strikeStop;
+        strikeHold = b.strikeHold;
         maxUsesPerCombo = b.maxUses;
         maxUsesPerChain = b.maxChainUses;
         low = b.low;
@@ -302,6 +308,7 @@ final class AttackDefinition {
         private final List<Box> hitboxes = new ArrayList<>();
         private int[] strikes = new int[0];
         private int strikeStop;
+        private float[] strikeHold;
         private final List<Box> hurtboxes = new ArrayList<>();
         private Mechanics mechanics = NO_MECHANICS;
 
@@ -330,6 +337,7 @@ final class AttackDefinition {
         /** Frames where each strike of the animation lands; the first is the end of the startup. */
         Builder strikes(int... frames) { strikes = frames.clone(); return this; }
         Builder strikeStop(int frames) { strikeStop = frames; return this; }
+        Builder strikeHold(float... gaps) { strikeHold = gaps.clone(); return this; }
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
         Builder maxUsesPerChain(int value) { maxChainUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
@@ -378,6 +386,9 @@ final class AttackDefinition {
                     if (strikes[i] <= strikes[i - 1]) throw new IllegalArgumentException(name + "strikes must grow");
                 }
                 if (kind == Kind.PROJECTILE) throw new IllegalArgumentException(name + "a projectile move cannot strike");
+            }
+            if (strikeHold != null && strikeHold.length != strikes.length) {
+                throw new IllegalArgumentException(name + "strikeHold needs one place per strike");
             }
             if (strikeStop < 0 || strikeStop > 0 && strikes.length == 0) {
                 throw new IllegalArgumentException(name + "strikeStop is the pause of each strike of a several-strike move");

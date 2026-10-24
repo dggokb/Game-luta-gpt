@@ -387,6 +387,7 @@ def restore(m):
     m.update(m.pop('golpesBase', {}))
     m.pop('golpes', None)
     m.pop('pausaGolpes', None)
+    m.pop('segurarRival', None)
 
 
 def strike(m, anim, pancadas):
@@ -444,6 +445,8 @@ def striking_super(pack, spec, clips=None):
     strike(a, anim, spec['pancadas'])
     if spec.get('pausa'):
         a['pausaGolpes'] = spec['pausa']   # cada pancada segura a cena esse tanto (torta, marreta)
+    if spec.get('rival'):
+        a['segurarRival'] = spec['rival']  # onde cada pancada deixa o rival (px à frente)
     anim['impactFrame'] = first
     heavy = pack['moves']['H']
     a['reach'] = spec.get('alcance', heavy['reach'] + 30)

@@ -205,6 +205,23 @@ public class MechanicsTest {
         assertTrue("mallet, plus the hold of the last strike: " + held[1], held[1] >= 24);
     }
 
+    @Test public void strikeHoldPlacesTheDefenderAndPinsItDownUntilTheMoveEnds() {
+        AttackDefinition pieAndMallet = move("H", 6, 16, 60).stun(20, 10, 12).strikes(6, 16)
+            .strikeHold(285f, 230f).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(0f).reach(300f, 78f).build();
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(pieAndMallet), BASE, 500f, 640f);
+        s.in[0].heavy = true;
+        s.until(() -> s.f(0).strikeLanded, 20);
+        assertEquals("the pie puts the face on the cream", 285f, s.f(1).x - s.f(0).x, 0.5f);
+        s.until(() -> s.f(1).status == CombatFighter.Status.KNOCKDOWN, 40);
+        assertEquals("down under the mallet", 230f, s.f(1).x - s.f(0).x, 0.5f);
+        while (s.f(0).attacking()) {
+            assertEquals("stays down until the move ends", CombatFighter.Status.KNOCKDOWN, s.f(1).status);
+            assertEquals(230f, s.f(1).x - s.f(0).x, 0.5f);
+            s.step();
+        }
+        s.until(() -> s.f(1).status != CombatFighter.Status.KNOCKDOWN, 120);
+    }
+
     @Test public void thrownBoxSpinsTwiceUntilItLands() {
         Projectile box = new Projectile(300f, Arena.GROUND_Y - 215f, 600f, 115f, 40f, 100, 0, 0, -1, null, "CAIXA");
         assertEquals(0f, EffectsRenderer.boxSpin(box), 0.01f);

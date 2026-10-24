@@ -93,10 +93,14 @@
           67
         ],
         "pausaGolpes": 20,
+        "segurarRival": [
+          285,
+          230
+        ],
         "reach": 260,
         "hitHeight": 210,
         "launchType": "knockdown",
-        "knockback": 120
+        "knockback": 0
       },
       "hits": 5,
       "hitInterval": 8

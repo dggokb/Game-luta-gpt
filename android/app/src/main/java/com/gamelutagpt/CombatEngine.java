@@ -729,7 +729,7 @@ final class CombatEngine {
                 break;
             case KNOCKDOWN: {
                 // Defeated: stays down (the KO is the defeat pose).
-                if (f.ko()) break;
+                if (f.ko() || pinnedDown(f)) break;
                 if (f.knockdownFrame >= config.knockdownFallFrames && f.wakeup == CombatFighter.WAKE_NORMAL &&
                     !f.hardKnockdown) {
                     chooseWakeup(f);
@@ -2500,6 +2500,23 @@ final class CombatEngine {
         }
     }
 
+    /** Põe o rival {@code gap} à frente de quem bate; contra a parede quem recua é quem bate. */
+    private static void holdAhead(CombatFighter a, CombatFighter d, float gap) {
+        float wanted = a.x + a.facing * gap;
+        d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        if (d.x != wanted) a.x = Arena.clamp(d.x - a.facing * gap, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        d.vx = 0f;
+    }
+
+    /**
+     * Derrubado por um golpe que segura o rival (a marreta da p16): fica deitado até o golpe
+     * acabar, sem levantar nem rolar.
+     */
+    private boolean pinnedDown(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        return other.attacking() && other.attack.strikeHold != null && other.strikeLanded;
+    }
+
     /** Segura o rival na pose do Ultra; contra a parede quem recua é o atacante. */
     private void holdUltraVictim(CombatFighter a, CombatFighter d, CharacterDefinition.UltraSequence seq) {
         float[] pose = seq.holdAt(a.ultraFrame);
@@ -2941,6 +2958,11 @@ final class CombatEngine {
             float gap = Math.abs(d.x - a.x) - a.body().halfWidth - d.body().halfWidth - config.teleportGap;
             push(d, a, -direction * Math.min(attack.mechanics.pull, Math.max(0f, gap)));
             cues.add("PULL");
+        }
+        if (attack.strikeHold != null && !projectile) {
+            // A pose segura o rival: cada pancada o deixa no lugar dela, sem empurrão.
+            holdAhead(a, d, attack.strikeHold[Math.min(c.hitbox, attack.strikeHold.length - 1)]);
+            push(d, a, 0f);
         }
         // Every hit that leaves the defender juggled costs juggle points (a several-strike move once).
         // The H that sends a grounded defender to the wall is free: it hit on the ground, and the

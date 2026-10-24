@@ -976,6 +976,10 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
 - **KO**: o golpe que nocauteia congela mais (`koHitstopBonus`, +16), a tela treme forte,
   um clarão branco e câmera lenta (~0,7 s de luta a 35%).
 - **Punish counter**: congela +8 quadros (`punishHitstopBonus`).
+- **Pancadas que seguram o rival** (`AttackDefinition.strikeHold`, `rival` no `pancadas.json`): cada
+  pancada põe o rival num ponto à frente de quem bate, sem empurrão (contra a parede recua quem
+  bate); derrubado por um golpe desses, fica deitado até o golpe acabar (`pinnedDown`). O Super da
+  p16: o rosto no creme da torta e deitado debaixo da marreta.
 - **Riscos de mangá** (`RiscosDeImpacto`, como no Hajime no Ippo): nos golpes fortes (H, especiais,
   Super e Ultra), traços pretos finos e longos, sem contorno, saem das costas de quem apanhou na
   altura do golpe (golpe em cima, riscos em cima: a força atravessando), abrindo pouco em leque, e
