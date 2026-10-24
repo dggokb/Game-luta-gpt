@@ -45,7 +45,7 @@
       "S4": {"pancadas": [7, 24], "avanco": {"distancia": 147, "de": 2, "ate": 20}}
     },
     "p16": {
-      "S3": {"avanco": {"distancia": 120, "de": 17, "ate": 29}},
+      "S3": {"avanco": {"distancia": 120, "de": 34, "ate": 58}},
       "S4": {"pancadas": [20, 26, 32, 39], "avanco": {"distancia": 188, "de": 5, "ate": 56}},
       "SUPER": {"pancadas": [12, 34], "alcance": 260, "altura": 210, "pausa": 20, "preparo": 30, "duracao": 115, "rival": [285, 230], "empurrao": 0}
     }
