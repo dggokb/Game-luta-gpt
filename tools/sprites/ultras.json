@@ -14,6 +14,8 @@
                       [58, 54, 261], [60, 95, 150], [62, 130, 0]]},
     "p10": {"nome": "Resgate Aéreo", "inicio": 6, "preparo": 18, "golpes": [23, 35, 45, 48, 60], "fim": 92},
     "p11": {"nome": "Autópsia", "inicio": 0, "preparo": 22, "golpes": [28, 32, 40, 44, 54], "fim": 96},
-    "p12": {"nome": "Último Suspiro", "inicio": 10, "preparo": 40, "golpes": [44, 50, 56, 72], "fim": 92}
+    "p12": {"nome": "Último Suspiro", "inicio": 10, "preparo": 40, "golpes": [44, 50, 56, 72], "fim": 92},
+    "p16": {"nome": "Grande Final", "inicio": 0, "preparo": 12, "golpes": [50, 112], "fim": 233,
+            "rival": [[50, 234, 0], [61, 234, 0], [62, 355, 252], [112, 355, 252]]}
   }
 }

@@ -46,6 +46,9 @@ SHEET = {
     # p11: o jaleco abre para trás e a estocada estica com o clarão para a frente.
     'p11': dict(celula=384, largura=640, raiz='250,362', densidade=1, peNoChao=True),
     'p12': dict(celula=352, largura=576, raiz='210,330', densidade=1, peNoChao=True),
+    # p16: cartola e canhão de circo grudados nela (o tronco medido erra): posição do vídeo, e a
+    # cartola caindo solta fica.
+    'p16': dict(celula=352, largura=608, raiz='175,330', densidade=1, fixar='video', objetos=1500),
 }
 
 
@@ -140,6 +143,10 @@ def convert(cid, video, picked):
            '--colunas', '8', '--densidade', str(sheet['densidade']), '--limpar-chao']
     if sheet.get('semEfeitos'):
         cmd.append('--sem-efeitos')
+    if sheet.get('fixar'):
+        cmd += ['--fixar', sheet['fixar']]
+    if sheet.get('objetos'):
+        cmd += ['--objetos', str(sheet['objetos'])]
     # O que passa da célula (rastro do sumiço, chicote) sai cortado limpo, longe da margem.
     cmd += ['--aparar-borda', '10']
     if sheet.get('peNoChao'):
