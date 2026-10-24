@@ -14,7 +14,7 @@ import android.graphics.Path;
  */
 final class RiscosDeImpacto {
     static final int FRAMES = 16;
-    private static final int SLOTS = 4, BACK = 16, STREAKS = 9, FADE = 5;
+    private static final int SLOTS = 4, BACK = 16, STREAKS = 7, FADE = 5;
 
     private final boolean[] used = new boolean[SLOTS];
     private final int[] start = new int[SLOTS], defender = new int[SLOTS], direction = new int[SLOTS];
@@ -103,10 +103,10 @@ final class RiscosDeImpacto {
         int dir = direction[i];
         for (int k = 0; k < STREAKS; k++) {
             // Na faixa do braço (ou da perna) que bateu, do contato para trás.
-            float y = impactY[i] + (noise(seed, k, 5) - 0.5f) * 56f * s;
-            float x0 = impactX[i] - dir * (10f + 26f * noise(seed, k, 6));
-            float len = (60f + 110f * noise(seed, k, 7)) * s;
-            float width = (1.2f + 1.6f * noise(seed, k, 8)) * s;
+            float y = impactY[i] + (noise(seed, k, 5) - 0.5f) * 40f * s;
+            float x0 = impactX[i] - dir * (10f + 20f * noise(seed, k, 6));
+            float len = (35f + 60f * noise(seed, k, 7)) * s;
+            float width = (0.8f + 1.0f * noise(seed, k, 8)) * s;
             // Grosso perto do contato, afinando para trás.
             wedgeTo(c, x0, y, x0 - dir * len, y, width);
         }

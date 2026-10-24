@@ -87,17 +87,28 @@ final class EffectsRenderer {
         }
     }
 
-    /** O balão flutua (sobe, desce e balança); a caixa gira no ar. */
+    /**
+     * Centro da caixa na imagem dela (px da imagem HD): a imagem tem a janela inteira da luva
+     * saindo, e a caixa fica no canto de baixo. O giro é em volta dele (no próprio eixo).
+     */
+    private static final float BOX_CENTER_X = 112.5f, BOX_CENTER_Y = 466f, BOX_HALF_HEIGHT = 29.5f;
+
+    /** O balão flutua (sobe, desce e balança); a caixa gira no próprio eixo. */
     private void drawImage(Canvas c, Projectile p, Bitmap b) {
         float travelled = Math.abs(p.x - p.startX);
         boolean box = "CAIXA".equals(p.visual);
         float bob = box ? 0f : 6f * (float)Math.sin(travelled / 40f);
         float w = b.getWidth() / 2f, h = b.getHeight() / 2f;
         c.save();
-        c.translate(p.x, p.y + bob);
+        // A caixa: o centro dela no projétil, meia caixa acima (pousa com o fundo no chão).
+        c.translate(p.x, p.y + bob - (box ? BOX_HALF_HEIGHT : 0f));
         c.rotate(box ? boxSpin(p) : 4f * (float)Math.sin(travelled / 55f));
         if (p.direction < 0) c.scale(-1f, 1f);
-        imageBox.set(-w / 2f, -h / 2f, w / 2f, h / 2f);
+        if (box) {
+            imageBox.set(-BOX_CENTER_X / 2f, -BOX_CENTER_Y / 2f, w - BOX_CENTER_X / 2f, h - BOX_CENTER_Y / 2f);
+        } else {
+            imageBox.set(-w / 2f, -h / 2f, w / 2f, h / 2f);
+        }
         c.drawBitmap(b, null, imageBox, imagePaint);
         c.restore();
     }

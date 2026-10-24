@@ -422,13 +422,23 @@ def travel(m, anim, spec):
                                               'frames': [a, b]}
 
 
-def striking_super(pack, spec):
-    """Super que bate corpo a corpo seguindo a animação (em vez de soltar a onda)."""
+def striking_super(pack, spec, clips=None):
+    """Super que bate corpo a corpo seguindo a animação (em vez de soltar a onda). Com
+    "duracao" (quadros do jogo) o Super tem tempo próprio: a animação anda na proporção do
+    vídeo, com a primeira pancada em "preparo" (o resto, depois dela, mais solto)."""
     a = pack['fighter']['super']['attack']
     anim = pack['animations'][pack['specialAnimations']['SUPER']]
     a['golpesBase'] = {k: a[k] for k in BASE_KEYS}
     total = a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']
-    d, first = anim['durationsMs'], spec['pancadas'][0]
+    first = spec['pancadas'][0]
+    if spec.get('duracao'):
+        total, prep = spec['duracao'], spec.get('preparo', a['startupFrames'])
+        d = video_cadence(anim, (clips or {}).get(anim['atlas'], {}), total * 1000 / 60)
+        if d:
+            anim['durationsMs'] = d
+        anim['impactFrame'] = first
+        fit_impact(anim, {'startupFrames': prep, 'activeFrames': 1, 'recoveryFrames': total - prep - 1})
+    d = anim['durationsMs']
     a['startupFrames'] = int(sum(d[:first]) / sum(d) * total)
     a['activeFrames'], a['recoveryFrames'] = 1, total - a['startupFrames'] - 1
     strike(a, anim, spec['pancadas'])
@@ -535,7 +545,7 @@ def apply(cid, spec, base, combos_data):
         report.append(f"  {key:4} {dmg:5}  {m['startupFrames']:2}/{m['activeFrames']:2}/{m['recoveryFrames']:2}"
                       f"  {total / 60:.2f}s  cadência {cadence}")
     if 'SUPER' in hits:
-        striking_super(pack, hits['SUPER'])
+        striking_super(pack, hits['SUPER'], clips)
         a = fighter['super']['attack']
         report.append(f"  SUPER corpo a corpo: {len(a['golpes'])} pancadas {a['golpes']}, "
                       f"{a['startupFrames']}/{a['activeFrames']}/{a['recoveryFrames']}, alcance {a['reach']}")

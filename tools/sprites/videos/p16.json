@@ -8,6 +8,7 @@
   "JUMP": "jump",
   "LIGHT_JAB": "L",
   "MEDIUM_KICK": "M",
+  "GOLPE_ALTO": "M_medio",
   "HEAVY_STRAIGHT": "H",
   "CROUCH_LIGHT": "2L",
   "CROUCH_MEDIUM": "2M",

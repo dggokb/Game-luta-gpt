@@ -2800,10 +2800,10 @@ final class GeneratedSpriteLayouts {
     static final int P16_DEFENSE_STAND_ROOT_Y = 467;
     static final int P16_DEFENSE_STAND_FRAME_COUNT = 8;
 
-    static final int P16_FALL_FRAME_WIDTH = 360;
-    static final int P16_FALL_FRAME_HEIGHT = 569;
-    static final int P16_FALL_ROOT_X = 145;
-    static final int P16_FALL_ROOT_Y = 557;
+    static final int P16_FALL_FRAME_WIDTH = 343;
+    static final int P16_FALL_FRAME_HEIGHT = 544;
+    static final int P16_FALL_ROOT_X = 138;
+    static final int P16_FALL_ROOT_Y = 531;
     static final int P16_FALL_FRAME_COUNT = 6;
 
     static final int P16_FALL_DOWN_FRAME_WIDTH = 689;
@@ -2817,6 +2817,12 @@ final class GeneratedSpriteLayouts {
     static final int P16_GETUP_ROOT_X = 197;
     static final int P16_GETUP_ROOT_Y = 467;
     static final int P16_GETUP_FRAME_COUNT = 12;
+
+    static final int P16_GOLPE_ALTO_FRAME_WIDTH = 557;
+    static final int P16_GOLPE_ALTO_FRAME_HEIGHT = 518;
+    static final int P16_GOLPE_ALTO_ROOT_X = 158;
+    static final int P16_GOLPE_ALTO_ROOT_Y = 506;
+    static final int P16_GOLPE_ALTO_FRAME_COUNT = 20;
 
     static final int P16_HEAVY_STRAIGHT_FRAME_WIDTH = 584;
     static final int P16_HEAVY_STRAIGHT_FRAME_HEIGHT = 476;
@@ -2848,10 +2854,10 @@ final class GeneratedSpriteLayouts {
     static final int P16_IDLE_ROOT_Y = 465;
     static final int P16_IDLE_FRAME_COUNT = 40;
 
-    static final int P16_JUMP_FRAME_WIDTH = 339;
-    static final int P16_JUMP_FRAME_HEIGHT = 594;
-    static final int P16_JUMP_ROOT_X = 166;
-    static final int P16_JUMP_ROOT_Y = 583;
+    static final int P16_JUMP_FRAME_WIDTH = 322;
+    static final int P16_JUMP_FRAME_HEIGHT = 564;
+    static final int P16_JUMP_ROOT_X = 158;
+    static final int P16_JUMP_ROOT_Y = 554;
     static final int P16_JUMP_FRAME_COUNT = 6;
 
     static final int P16_JUMP_HEAVY_FRAME_WIDTH = 415;
@@ -2878,10 +2884,10 @@ final class GeneratedSpriteLayouts {
     static final int P16_JUMP_MEDIUM_ROOT_Y = 530;
     static final int P16_JUMP_MEDIUM_FRAME_COUNT = 12;
 
-    static final int P16_LAND_FRAME_WIDTH = 304;
-    static final int P16_LAND_FRAME_HEIGHT = 440;
-    static final int P16_LAND_ROOT_X = 157;
-    static final int P16_LAND_ROOT_Y = 430;
+    static final int P16_LAND_FRAME_WIDTH = 289;
+    static final int P16_LAND_FRAME_HEIGHT = 420;
+    static final int P16_LAND_ROOT_X = 150;
+    static final int P16_LAND_ROOT_Y = 410;
     static final int P16_LAND_FRAME_COUNT = 4;
 
     static final int P16_LIGHT_JAB_FRAME_WIDTH = 410;
@@ -2926,11 +2932,11 @@ final class GeneratedSpriteLayouts {
     static final int P16_SPECIAL_S4_ROOT_Y = 606;
     static final int P16_SPECIAL_S4_FRAME_COUNT = 60;
 
-    static final int P16_SUPER_WAVE_FRAME_WIDTH = 914;
-    static final int P16_SUPER_WAVE_FRAME_HEIGHT = 619;
+    static final int P16_SUPER_WAVE_FRAME_WIDTH = 939;
+    static final int P16_SUPER_WAVE_FRAME_HEIGHT = 624;
     static final int P16_SUPER_WAVE_ROOT_X = 312;
     static final int P16_SUPER_WAVE_ROOT_Y = 586;
-    static final int P16_SUPER_WAVE_FRAME_COUNT = 34;
+    static final int P16_SUPER_WAVE_FRAME_COUNT = 49;
 
     static final int P16_THROW_FRAME_WIDTH = 496;
     static final int P16_THROW_FRAME_HEIGHT = 516;

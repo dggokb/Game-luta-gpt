@@ -18,138 +18,138 @@
     {
       "index": 0,
       "outputBbox": [
-        59,
-        225,
-        359,
-        669
+        66,
+        246,
+        351,
+        668
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 48548
+      "minimumMargin": 36,
+      "opaquePixels": 43887
     },
     {
       "index": 1,
       "outputBbox": [
-        42,
-        289,
-        342,
-        669
+        50,
+        307,
+        335,
+        668
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 44041
+      "minimumMargin": 36,
+      "opaquePixels": 39799
     },
     {
       "index": 2,
       "outputBbox": [
-        46,
-        224,
-        365,
-        669
+        52,
+        247,
+        356,
+        670
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 49294
+      "minimumMargin": 34,
+      "opaquePixels": 44610
     },
     {
       "index": 3,
       "outputBbox": [
-        65,
-        95,
-        337,
-        671
+        71,
+        123,
+        330,
+        670
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 48390
+      "minimumMargin": 34,
+      "opaquePixels": 43736
     },
     {
       "index": 4,
       "outputBbox": [
-        107,
-        93,
-        340,
-        669
+        112,
+        122,
+        334,
+        670
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 48018
+      "minimumMargin": 34,
+      "opaquePixels": 43356
     },
     {
       "index": 5,
       "outputBbox": [
-        80,
-        105,
-        285,
-        669
+        85,
+        134,
+        279,
+        670
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 40117
+      "minimumMargin": 34,
+      "opaquePixels": 36293
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 339,
-    "frameHeight": 594,
-    "rootX": 166,
-    "rootY": 583,
+    "frameWidth": 322,
+    "frameHeight": 564,
+    "rootX": 158,
+    "rootY": 554,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      34,
-      85
+      42,
+      114
     ],
-    "sheetWidth": 952,
-    "sheetHeight": 1044,
+    "sheetWidth": 912,
+    "sheetHeight": 992,
     "frames": [
       [
-        332,
-        588,
-        308,
-        452,
-        21,
-        136
+        0,
+        560,
+        296,
+        432,
+        20,
+        128
       ],
       [
-        644,
-        588,
-        308,
-        388,
+        616,
+        560,
+        296,
+        372,
         4,
-        200
+        189
+      ],
+      [
+        300,
+        560,
+        312,
+        432,
+        6,
+        129
       ],
       [
         0,
-        588,
-        328,
-        456,
-        8,
-        135
+        0,
+        268,
+        556,
+        25,
+        5
       ],
       [
+        272,
         0,
-        0,
-        280,
-        584,
-        27,
-        6
-      ],
-      [
-        284,
-        0,
-        244,
-        584,
-        69,
+        232,
+        556,
+        66,
         4
       ],
       [
-        532,
+        508,
         0,
-        216,
-        572,
-        42,
+        204,
+        544,
+        39,
         16
       ]
     ],
     "decodedBytes": {
       "canonical": 7569408,
-      "grid": 4832784,
-      "packed": 3975552
+      "grid": 4358592,
+      "packed": 3618816
     },
     "pixelScale": 2.0
   },
@@ -157,12 +157,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "554a2fa94eb25cc68f1bf3223d6a71df87a97fda559be94f52a7f9377d4725d7",
-      "config": "50fc3a645aa22cc6b6972a7ffd0640b55a859dfaf817396184497be16951e51b",
+      "source": "69de904cfa0eab5e02d8e468102cc15f75513d576e7698f2b67014058f61b91b",
+      "config": "9e2cbbe259eee27ecee7656ee789b473cf8d8e15bbc0ec65f30b98f43963df34",
       "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
     },
     "referenceSources": {
-      "art/sprites/source/p16_jump_video_normalized.png": "ae02d504f63ad098d5472354db675dc32017aef03b484c4ccaf8604e96cf1977"
+      "art/sprites/source/p16_jump_video_normalized.png": "4948bcbfbcebfc5a4e7b9b9506c9d0fdbe751cf4bc73715df2cdd09d12d90a26"
     }
   }
 }

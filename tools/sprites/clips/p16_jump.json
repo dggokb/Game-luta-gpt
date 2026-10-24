@@ -14,8 +14,8 @@
   "video": {
     "arquivo": "jump.mp4",
     "personagem": "p16",
-    "escala": 0.411,
-    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "escala": 0.3905,
+    "motivo": "pulo 95% (pedido: parecia maior que a guarda)",
     "quadros": "0,12,13,14,16,18",
     "celula": 352,
     "largura": 224,
@@ -42,8 +42,8 @@
   "frameHeight": 704,
   "rootX": 200,
   "rootY": 668,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p16_jump_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2.0
 }

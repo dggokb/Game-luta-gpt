@@ -13,6 +13,8 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     explosao  [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo
     camera    planos fixos [quadro, frente, altura, zoom] da sequência (corte seco de um para o outro)
 
+"segurar" ([quadro, quadros do jogo]) segura um quadro da folha mais tempo (a tela preta da p16).
+
 "pular" (quadros do vídeo, [de, até]) tira trechos da folha: a explosão do canhão da p16, que
 passa da borda do vídeo e o jogo desenha por fora.
 
@@ -99,15 +101,19 @@ def timeline(spec, picked, speed):
     """Duração de cada quadro (ms) e o "ultra" do lutador em quadros do jogo."""
     ms = 1000.0 / 60.0
     nxt = picked[1:] + [picked[-1] + 2]
-    durations = [round((b - a) * speed * ms) for a, b in zip(picked, nxt)]
+    # "segurar": [quadro do vídeo, quadros do jogo a mais] (a tela preta da p16 dura mais).
+    holds = {v: extra for v, extra in spec.get('segurar', [])}
+    if set(holds) - set(picked):
+        raise SystemExit(f"segurar {sorted(set(holds) - set(picked))}: quadros fora da folha")
+    durations = [round(((b - a) * speed + holds.get(a, 0)) * ms) for a, b in zip(picked, nxt)]
     start = picked[0]
+    at = lambda v: (v - spec['preparo']) * speed + sum(e for h, e in holds.items() if h < v)
     prep = (spec['preparo'] - start) * speed
     ultra = {
         'preparo': prep,
-        'golpes': [(g - spec['preparo']) * speed for g in spec['golpes']],
-        'duracao': (nxt[-1] - spec['preparo']) * speed,
+        'golpes': [at(g) for g in spec['golpes']],
+        'duracao': at(nxt[-1]),
     }
-    at = lambda v: (v - spec['preparo']) * speed
     if spec.get('rival'):
         ultra['rival'] = [[at(v), dx, dy] for v, dx, dy in spec['rival']]
     if spec.get('some'):

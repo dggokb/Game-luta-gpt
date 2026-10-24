@@ -14,8 +14,8 @@
   "video": {
     "arquivo": "jump.mp4",
     "personagem": "p16",
-    "escala": 0.411,
-    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "escala": 0.3905,
+    "motivo": "pulo 95% (pedido: parecia maior que a guarda)",
     "quadros": "89,91,93,95",
     "celula": 320,
     "largura": 224,
@@ -43,8 +43,8 @@
   "frameHeight": 640,
   "rootX": 220,
   "rootY": 584,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p16_land_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2.0
 }
