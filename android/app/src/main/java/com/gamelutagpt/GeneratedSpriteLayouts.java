@@ -2926,6 +2926,12 @@ final class GeneratedSpriteLayouts {
     static final int P16_SPECIAL_S4_ROOT_Y = 606;
     static final int P16_SPECIAL_S4_FRAME_COUNT = 60;
 
+    static final int P16_SUPER_WAVE_FRAME_WIDTH = 914;
+    static final int P16_SUPER_WAVE_FRAME_HEIGHT = 619;
+    static final int P16_SUPER_WAVE_ROOT_X = 312;
+    static final int P16_SUPER_WAVE_ROOT_Y = 586;
+    static final int P16_SUPER_WAVE_FRAME_COUNT = 34;
+
     static final int P16_THROW_FRAME_WIDTH = 496;
     static final int P16_THROW_FRAME_HEIGHT = 516;
     static final int P16_THROW_ROOT_X = 176;
