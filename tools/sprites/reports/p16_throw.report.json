@@ -1,0 +1,225 @@
+{
+  "id": "p16_throw",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_throw_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 544,
+    "frameHeight": 576,
+    "rootX": 192,
+    "rootY": 524,
+    "columns": 6,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        51,
+        109,
+        337,
+        525
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 45744
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        51,
+        125,
+        344,
+        525
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 42771
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        51,
+        57,
+        350,
+        525
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 42331
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        49,
+        26,
+        395,
+        526
+      ],
+      "minimumMargin": 26,
+      "opaquePixels": 50775
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        30,
+        120,
+        504,
+        526
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 51562
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        30,
+        160,
+        441,
+        526
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 51579
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        30,
+        190,
+        441,
+        526
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 49369
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        24,
+        179,
+        433,
+        526
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 48465
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        51,
+        68,
+        365,
+        525
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 47182
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 496,
+    "frameHeight": 516,
+    "rootX": 176,
+    "rootY": 506,
+    "columns": 6,
+    "frameCount": 9,
+    "cropOffset": [
+      16,
+      18
+    ],
+    "sheetWidth": 1784,
+    "sheetHeight": 920,
+    "frames": [
+      [
+        1000,
+        0,
+        296,
+        424,
+        31,
+        87
+      ],
+      [
+        0,
+        512,
+        304,
+        408,
+        31,
+        103
+      ],
+      [
+        360,
+        0,
+        308,
+        476,
+        31,
+        35
+      ],
+      [
+        0,
+        0,
+        356,
+        508,
+        29,
+        4
+      ],
+      [
+        1300,
+        0,
+        484,
+        416,
+        10,
+        98
+      ],
+      [
+        308,
+        512,
+        420,
+        376,
+        10,
+        138
+      ],
+      [
+        1156,
+        512,
+        420,
+        344,
+        10,
+        168
+      ],
+      [
+        732,
+        512,
+        420,
+        356,
+        4,
+        157
+      ],
+      [
+        672,
+        0,
+        324,
+        468,
+        31,
+        46
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 15040512,
+      "grid": 12284928,
+      "packed": 6565120
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "4e637da34b4cf7648914ef1d2774d23efb9988da88e9750a0cf1fe1cdbb6212c",
+      "config": "14d95610a7a291ec0ff1298ddd61849f7e92982d28a1db2a0ed651501751f860",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_throw_video_normalized.png": "03bd52417deb160291c8e93be9ea7cf09d972f63cde37154ec5bde83c98f5ae3"
+    }
+  }
+}

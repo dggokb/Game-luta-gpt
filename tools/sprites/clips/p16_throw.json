@@ -1,0 +1,50 @@
+{
+  "id": "p16_throw",
+  "javaName": "P16_THROW",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_throw_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_throw.webp",
+  "report": "tools/sprites/reports/p16_throw.report.json",
+  "preview": "android/app/build/sprite-review/p16_throw-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agarrao.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "36,42,48,54,57,60,64,72,84",
+    "celula": 288,
+    "largura": 272,
+    "raiz": "96,262",
+    "colunas": 6,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_throw_video_normalized.png",
+      "celula": [
+        272,
+        288
+      ],
+      "raiz": [
+        96,
+        262
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 544,
+  "frameHeight": 576,
+  "rootX": 192,
+  "rootY": 524,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_throw_video_normalized.png"
+  ]
+}

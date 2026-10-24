@@ -2806,6 +2806,18 @@ final class GeneratedSpriteLayouts {
     static final int P16_FALL_ROOT_Y = 557;
     static final int P16_FALL_FRAME_COUNT = 6;
 
+    static final int P16_FALL_DOWN_FRAME_WIDTH = 689;
+    static final int P16_FALL_DOWN_FRAME_HEIGHT = 533;
+    static final int P16_FALL_DOWN_ROOT_X = 337;
+    static final int P16_FALL_DOWN_ROOT_Y = 521;
+    static final int P16_FALL_DOWN_FRAME_COUNT = 11;
+
+    static final int P16_GETUP_FRAME_WIDTH = 501;
+    static final int P16_GETUP_FRAME_HEIGHT = 478;
+    static final int P16_GETUP_ROOT_X = 197;
+    static final int P16_GETUP_ROOT_Y = 467;
+    static final int P16_GETUP_FRAME_COUNT = 12;
+
     static final int P16_HEAVY_STRAIGHT_FRAME_WIDTH = 584;
     static final int P16_HEAVY_STRAIGHT_FRAME_HEIGHT = 476;
     static final int P16_HEAVY_STRAIGHT_ROOT_X = 205;
@@ -2878,11 +2890,11 @@ final class GeneratedSpriteLayouts {
     static final int P16_LIGHT_JAB_ROOT_Y = 461;
     static final int P16_LIGHT_JAB_FRAME_COUNT = 18;
 
-    static final int P16_MEDIUM_KICK_FRAME_WIDTH = 483;
-    static final int P16_MEDIUM_KICK_FRAME_HEIGHT = 479;
-    static final int P16_MEDIUM_KICK_ROOT_X = 174;
-    static final int P16_MEDIUM_KICK_ROOT_Y = 455;
-    static final int P16_MEDIUM_KICK_FRAME_COUNT = 24;
+    static final int P16_MEDIUM_KICK_FRAME_WIDTH = 557;
+    static final int P16_MEDIUM_KICK_FRAME_HEIGHT = 518;
+    static final int P16_MEDIUM_KICK_ROOT_X = 158;
+    static final int P16_MEDIUM_KICK_ROOT_Y = 506;
+    static final int P16_MEDIUM_KICK_FRAME_COUNT = 20;
 
     static final int P16_RISE_FRAME_WIDTH = 321;
     static final int P16_RISE_FRAME_HEIGHT = 466;
@@ -2913,6 +2925,12 @@ final class GeneratedSpriteLayouts {
     static final int P16_SPECIAL_S4_ROOT_X = 389;
     static final int P16_SPECIAL_S4_ROOT_Y = 606;
     static final int P16_SPECIAL_S4_FRAME_COUNT = 60;
+
+    static final int P16_THROW_FRAME_WIDTH = 496;
+    static final int P16_THROW_FRAME_HEIGHT = 516;
+    static final int P16_THROW_ROOT_X = 176;
+    static final int P16_THROW_ROOT_Y = 506;
+    static final int P16_THROW_FRAME_COUNT = 9;
 
     static final int P16_WALK_BACK_FRAME_WIDTH = 350;
     static final int P16_WALK_BACK_FRAME_HEIGHT = 485;

@@ -1,0 +1,263 @@
+{
+  "id": "p16_fall_down",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_fall_down_video_hd.png",
+  "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 800,
+    "frameHeight": 576,
+    "rootX": 400,
+    "rootY": 540,
+    "columns": 5,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        259,
+        87,
+        558,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 49007
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        237,
+        27,
+        606,
+        542
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 61432
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        296,
+        63,
+        668,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 50115
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        264,
+        100,
+        673,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 51862
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        249,
+        140,
+        681,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 54080
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        244,
+        164,
+        691,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 52717
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        286,
+        215,
+        744,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 48458
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        71,
+        318,
+        591,
+        544
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 41562
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        72,
+        361,
+        591,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 39098
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        94,
+        359,
+        633,
+        540
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 38339
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        104,
+        362,
+        640,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38745
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 689,
+    "frameHeight": 533,
+    "rootX": 337,
+    "rootY": 521,
+    "columns": 5,
+    "frameCount": 11,
+    "cropOffset": [
+      63,
+      19
+    ],
+    "sheetWidth": 1096,
+    "sheetHeight": 1808,
+    "frames": [
+      [
+        768,
+        0,
+        308,
+        464,
+        192,
+        64
+      ],
+      [
+        0,
+        0,
+        380,
+        524,
+        170,
+        4
+      ],
+      [
+        384,
+        0,
+        380,
+        488,
+        229,
+        40
+      ],
+      [
+        0,
+        528,
+        420,
+        452,
+        197,
+        77
+      ],
+      [
+        424,
+        528,
+        440,
+        412,
+        182,
+        117
+      ],
+      [
+        0,
+        984,
+        456,
+        388,
+        177,
+        141
+      ],
+      [
+        460,
+        984,
+        468,
+        336,
+        219,
+        192
+      ],
+      [
+        0,
+        1376,
+        528,
+        236,
+        4,
+        295
+      ],
+      [
+        532,
+        1376,
+        528,
+        192,
+        5,
+        338
+      ],
+      [
+        0,
+        1616,
+        548,
+        192,
+        27,
+        336
+      ],
+      [
+        552,
+        1616,
+        544,
+        188,
+        37,
+        339
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 27648000,
+      "grid": 22034220,
+      "packed": 7926272
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "1bd773b40b84b20ef4cd411d0eccdcfd318b5fd4afb00a40ec000ea73f676451",
+      "config": "7c9c544fe9372bee024fe8ac8d0bedb9ed03f6af8739761a34f04c6e714b6a07",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_fall_down_video_normalized.png": "9b02e8b8160224583684f0e026d45457ef51c90041646c55f0d4713f8ed4c8bb"
+    }
+  }
+}

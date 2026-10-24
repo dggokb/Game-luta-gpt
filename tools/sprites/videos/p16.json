@@ -7,7 +7,7 @@
   "CROUCH": "agachar",
   "JUMP": "jump",
   "LIGHT_JAB": "L",
-  "MEDIUM_KICK": "M",
+  "MEDIUM_KICK": "M_medio",
   "HEAVY_STRAIGHT": "H",
   "CROUCH_LIGHT": "2L",
   "CROUCH_MEDIUM": "2M",
@@ -25,5 +25,7 @@
   "SPECIAL_ENERGY": "s1",
   "SPECIAL_S3": "s3",
   "SPECIAL_S4": "S4",
-  "SUPER_WAVE": "SUPER"
+  "SUPER_WAVE": "SUPER",
+  "THROW": "agarrao",
+  "KNOCKDOWN": "derruba_levanta"
 }

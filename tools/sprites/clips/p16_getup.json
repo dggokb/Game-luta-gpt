@@ -1,0 +1,51 @@
+{
+  "id": "p16_getup",
+  "javaName": "P16_GETUP",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_getup_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_getup.webp",
+  "report": "tools/sprites/reports/p16_getup.report.json",
+  "preview": "android/app/build/sprite-review/p16_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruba_levanta.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "84,86,88,90,92,95,98,101,104,107,110,114",
+    "celula": 288,
+    "largura": 400,
+    "raiz": "200,270",
+    "colunas": 5,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_getup_video_normalized.png",
+      "celula": [
+        400,
+        288
+      ],
+      "raiz": [
+        200,
+        270
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 800,
+  "frameHeight": 576,
+  "rootX": 400,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_getup_video_normalized.png"
+  ]
+}
