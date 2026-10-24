@@ -888,10 +888,10 @@
       "dano": 1.0,
       "ritmo": 1.0,
       "framesGolpe": {
-        "H": [
-          18,
-          6,
-          40
+        "S4": [
+          20,
+          30,
+          24
         ]
       },
       "projetil": {
@@ -899,7 +899,7 @@
         "alcance": 720
       },
       "unica": {
-        "descricao": "Estrela (H): o chute sai de uma estrela (acrobacia) para trás; as pernas passam por cima na direção do rival e ela recua ~190 px. Especiais ainda com os dados do p01 e a guarda parada (sem vídeo)."
+        "descricao": "Estrelinha (S4): a estrela para a frente, um acerto a cada toque das pernas no rival. Especiais ainda com os dados do p01 e a guarda parada (sem vídeo)."
       },
       "comandos": {
         "S1": {

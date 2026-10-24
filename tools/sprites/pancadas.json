@@ -45,7 +45,7 @@
       "S4": {"pancadas": [7, 24], "avanco": {"distancia": 147, "de": 2, "ate": 20}}
     },
     "p16": {
-      "H": {"avanco": {"distancia": -188, "de": 24, "ate": 54}}
+      "S4": {"pancadas": [20, 26, 32, 39], "avanco": {"distancia": 188, "de": 5, "ate": 56}}
     }
   }
 }
