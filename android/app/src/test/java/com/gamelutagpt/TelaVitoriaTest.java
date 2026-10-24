@@ -47,14 +47,14 @@ public class TelaVitoriaTest {
         assertTrue(t.ativa());
         int passos = tocarAteOFim(t, -1);
         assertFalse(t.ativa());
-        // 124 quadros a 36 fps (~3,4 s) com a entrada, o quadro parado e a saída: ~4,5 s.
-        assertTrue("passos " + passos, passos > 250 && passos < 300);
+        // 124 quadros a 48 fps (~2,6 s) com a entrada, a pose final parada 2 s e a saída: ~5 s.
+        assertTrue("passos " + passos, passos > 270 && passos < 320);
     }
 
     @Test public void umToqueNoComecoNaoPulaDepoisPula() {
         TelaVitoria cedo = tela();
         cedo.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
-        assertTrue(tocarAteOFim(cedo, 10) > 250);
+        assertTrue(tocarAteOFim(cedo, 10) > 270);
         TelaVitoria depois = tela();
         depois.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
         int passos = tocarAteOFim(depois, 60);

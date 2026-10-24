@@ -7,7 +7,7 @@ vitória:
 2. o lutador (vídeo no verde, do quadril para cima) entra deslizando pela esquerda, já tocando o vídeo;
 3. **"VITÓRIA"** bate à direita, numa faixa de tinta com o traço na cor dele (clarão e tremida ao assentar);
 4. um **quadro de mangá** entra com uma frase dele e a etiqueta com o nome;
-5. o vídeo acaba, o último quadro fica parado 0,7 s e a tela escurece até o preto (~4,5 s no total).
+5. o vídeo acaba, a pose final fica parada 2 s e a tela escurece até o preto (~5 s no total).
 
 Depois disso a história segue com o resultado ou, fora dela, a revanche começa. Um toque ou um botão
 leva direto para a saída (só depois de 0,6 s, para o toque que acabou a luta não pular a cena).
@@ -40,15 +40,15 @@ Vídeo no verde, o lutador do quadril para cima, olhando para a direita (o texto
 ```bash
 pip install -r tools/sprites/requirements-animar.txt
 python3 tools/sprites/vitoria_video.py Max_Ajusta_Gola_5_Segundos.mp4 --personagem player_base \
-    --marca 8,8,150,50 --fps 36 --segurar 700 \
+    --marca 8,8,150,50 --fps 48 --segurar 2000 \
     --frase "Eu li cada movimento seu. Treine mais e volte." \
     --frase "Calma vence pressa. Sempre." \
     --frase "Ainda não acabou. Eu preciso ficar mais forte."
 ```
 
-- `--inicio/--fim/--passo/--fps`: o trecho e a velocidade (sem `--fps`, a do vídeo; o Ryūga usa 36,
-  1,5x o vídeo). No jogo, entre um quadro e o próximo os dois se misturam (o jogo roda a 60 Hz).
-- `--segurar MS`: o último quadro parado antes de sair (o Ryūga usa 700).
+- `--inicio/--fim/--passo/--fps`: o trecho e a velocidade (sem `--fps`, a do vídeo; o Ryūga usa 48,
+  2x o vídeo: a gola em ~2,6 s). No jogo, entre um quadro e o próximo os dois se misturam (o jogo roda a 60 Hz).
+- `--segurar MS`: o último quadro parado antes de sair (o Ryūga usa 2000).
 - `--marca x0,y0,x1,y1`: apaga a marca d'água clara.
 - `--frase`: repita para várias. Sem `--frase`, as frases que já estão no `vitoria.json` ficam.
 - `--resolucao`: pixels guardados por pixel da tela (0,6).

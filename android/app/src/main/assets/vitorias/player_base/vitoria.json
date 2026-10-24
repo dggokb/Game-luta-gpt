@@ -7,8 +7,8 @@
  "passo": 1,
  "alturaTela": 1.0,
  "larguraVideo": 1260.0,
- "quadroMs": 27.8,
- "segurarMs": 700,
+ "quadroMs": 20.8,
+ "segurarMs": 2000,
  "frases": [
   "Eu li cada movimento seu. Treine mais e volte.",
   "Calma vence pressa. Sempre.",
