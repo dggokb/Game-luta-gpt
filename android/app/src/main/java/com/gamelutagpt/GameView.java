@@ -200,6 +200,12 @@ public class GameView extends SurfaceView
     private final UltraDirector.Shot ultraShot = new UltraDirector.Shot();
     /** Direção do Ultra em andamento (do "estilo" do ultra.json), escolhida na ativação. */
     private UltraDirector.Script ultraScript = UltraDirector.PADRAO;
+    /** Quadros que o plano fixo do Ultra (a p16) segura depois do golpe final. */
+    private static final int ULTRA_FIXED_CAMERA_HOLD = 54;
+    /** Explosão do canhão da p16 (desenhada pelo jogo, fora da folha): onde, para onde e desde quando. */
+    private boolean ultraBlastArmed;
+    private int ultraBlastStart = -1, ultraBlastDirection = 1;
+    private float ultraBlastX, ultraBlastY, ultraBlastAngle;
     private int ultraFinalImpact = ImpactFeel.VOID;
     private float ultraSlowScale = ImpactFeel.ULTRA_SLOW_SCALE;
     private boolean ultraShotActive;
@@ -1955,6 +1961,33 @@ public class GameView extends SurfaceView
                 UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing,
                     ultraScript);
                 ultraShotActive = ultraShot.kind != UltraDirector.FINAL;
+                // O plano fixo segura até a explosão do golpe final passar, e só então a câmera da luta volta.
+                if (seq.camera != null && p.ultraFrame < seq.hits[seq.hits.length - 1] + ULTRA_FIXED_CAMERA_HOLD) {
+                    ultraShotActive = true;
+                    // Planos fixos do Ultra (a p16): enquadrados dentro do vídeo, a borda da folha (a
+                    // cartola subindo) fica fora da tela; o do canhão abre para o tiro. O zoom é o da
+                    // tela, não sobre o da luta.
+                    float[] shot = seq.shotAt(p.ultraFrame);
+                    ultraShot.focusX = p.x + p.facing * shot[1];
+                    ultraShot.focusY = GROUND_Y - shot[2];
+                    ultraShot.anchorX = 0.5f;
+                    ultraShot.anchorY = 0.5f;
+                    ultraShot.tilt = 0f;
+                    ultraShot.zoom = shot[3] / Math.max(0.01f, camera.zoom);
+                }
+                if (seq.blast != null) {
+                    // A explosão do canhão sai uma vez, quando a sequência passa do quadro dela.
+                    if (p.ultraFrame < seq.blast[0]) {
+                        ultraBlastArmed = true;
+                    } else if (ultraBlastArmed) {
+                        ultraBlastArmed = false;
+                        ultraBlastStart = engine.frame();
+                        ultraBlastX = p.x + p.facing * seq.blast[1];
+                        ultraBlastY = GROUND_Y - seq.blast[2];
+                        ultraBlastAngle = seq.blast[3];
+                        ultraBlastDirection = p.facing;
+                    }
+                }
             } else {
                 ultraShotActive = false;
             }
@@ -3127,6 +3160,14 @@ public class GameView extends SurfaceView
             drawPlayer(canvas);
             canvas.restore();
             impacts.draw(canvas);
+            if (ultraBlastStart >= 0) {
+                int age = engine.frame() - ultraBlastStart;
+                if (age >= 0 && age < EffectsRenderer.CANNON_BLAST_FRAMES) {
+                    effects.drawCannonBlast(canvas, ultraBlastX, ultraBlastY, ultraBlastAngle, ultraBlastDirection, age);
+                } else {
+                    ultraBlastStart = -1;   // acabou (ou a luta recomeçou o relógio)
+                }
+            }
             drawBreakerCue(canvas);
             efeitos.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
@@ -3146,6 +3187,13 @@ public class GameView extends SurfaceView
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
+            int blackout = ultraBlackout();
+            if (blackout > 0) {
+                // Tela preta do Ultra (a p16: da cartola para o canhão).
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(blackout << 24);
+                canvas.drawRect(-40f, -40f, VW + 40f, VH + 40f, paint);
+            }
             if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
                 drawGroundMarkers(canvas, renderZoom, cameraLeft, renderCameraTop);
                 drawGuardGauges(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -3843,8 +3891,30 @@ public class GameView extends SurfaceView
         return move.animation.id;
     }
 
+    /** Rival que o Ultra em sequência esconde agora (debaixo da cartola, dentro do canhão da p16). */
+    private boolean hiddenByUltra(CombatFighter f) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraSequence() || engine.fighter(1 - i) != f) continue;
+            CharacterDefinition.UltraSequence seq = u.state.profile.ultraSequence;
+            if (seq != null && seq.hidesVictim(u.ultraFrame)) return true;
+        }
+        return false;
+    }
+
+    /** Opacidade da tela preta do Ultra em sequência (a p16 entre a cartola e o canhão). */
+    private int ultraBlackout() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            CharacterDefinition.UltraSequence seq = u.state.profile.ultraSequence;
+            if (u.inUltraSequence() && seq != null) return seq.blackoutAlpha(u.ultraFrame);
+        }
+        return 0;
+    }
+
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
+        if (hiddenByUltra(f)) return;
         float angle = knockdownAngle(renderer, f);
         // Rastro do motor de animação: atrás do lutador, onde ele estava.
         renderer.drawRastro(c);
@@ -4145,6 +4215,7 @@ public class GameView extends SurfaceView
      * junto com o achatar da aterrissagem.
      */
     private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
+        if (hiddenByUltra(f)) return;
         float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
         float half = 43f * k * renderer.animacao.pose().escalaX;

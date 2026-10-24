@@ -217,7 +217,7 @@ def validate_command_extras(name, m, special):
 
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
-    known = {'preparo','golpes','duracao','dano','rival','quadrosVideo'}
+    known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -230,6 +230,21 @@ def validate_ultra(name, u, animations):
     for k in u.get('rival', []):
         if not isinstance(k, list) or len(k) != 3:
             raise ValueError(f'{name}.ultra.rival: [quadro, frente, altura]')
+    # Cena (a Grande Final da p16): rival escondido, tela preta, explosão e câmera fixa.
+    window = lambda w: isinstance(w, list) and len(w) == 2 and all(type(v) is int for v in w) and 0 <= w[0] < w[1]
+    if not all(window(w) for w in u.get('some', [])):
+        raise ValueError(f'{name}.ultra.some: [de, até] frames')
+    if 'preto' in u and not window(u['preto']):
+        raise ValueError(f'{name}.ultra.preto: [de, até] frames')
+    number = lambda v: type(v) in (int, float)
+    if 'explosao' in u and not (isinstance(u['explosao'], list) and len(u['explosao']) == 4
+                                and all(number(v) for v in u['explosao']) and 0 <= u['explosao'][0] < u['duracao']):
+        raise ValueError(f'{name}.ultra.explosao: [quadro, frente, altura, ângulo]')
+    shots = u.get('camera', [])
+    if not (isinstance(shots, list) and all(isinstance(k, list) and len(k) == 4 and all(number(v) for v in k)
+                                            and k[3] >= 1 for k in shots)
+            and [k[0] for k in shots] == sorted({k[0] for k in shots})):
+        raise ValueError(f'{name}.ultra.camera: [[quadro, frente, altura, zoom >= 1], ...] by growing frame')
     if 'ULTRA_SEQ' not in animations:
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
@@ -599,9 +614,17 @@ def compile_packs(root, results):
                 +(f".withHenchmen({mech['capangas']})" if mech.get('capangas') else ''))
     def ultra_sequence(u):
         hold = ','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('rival', []))
+        scene = ''
+        if any(k in u for k in ('some','preto','explosao','camera')):
+            floats = lambda k: 'new float[]{'+','.join(f(v) for v in u[k])+'}' if k in u else 'null'
+            scene = ('.withScene(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('some', []))+'},'
+                     +('new int[]{'+','.join(map(str,u['preto']))+'}' if 'preto' in u else 'null')+','
+                     +floats('explosao')+','
+                     +('new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u['camera'])+'}'
+                       if u.get('camera') else 'null')+')')
         return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
                 +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
-                +',new float[][]{'+hold+'}))')
+                +',new float[][]{'+hold+'})'+scene+')')
     def super_extras(data):
         if data is None: return ''
         code = '.withVisual('+q(data['visual'])+')' if 'visual' in data else ''

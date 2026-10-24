@@ -9,6 +9,12 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     golpes    quadros, contados do preparo, em que cada pancada acerta (o último lança)
     duracao   quadros do preparo até o fim da animação
     rival     [quadro, frente, altura] da posição do rival presa à pose (agarrão)
+    some      [de, até] em que o rival não aparece; preto: [de, até] com a tela preta
+    explosao  [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo
+    camera    planos fixos [quadro, frente, altura, zoom] da sequência (corte seco de um para o outro)
+
+"pular" (quadros do vídeo, [de, até]) tira trechos da folha: a explosão do canhão da p16, que
+passa da borda do vídeo e o jogo desenha por fora.
 
     python3 tools/sprites/ultras.py                         # só mostra os quadros
     python3 tools/sprites/ultras.py p02 --videos DIR --converter   # DIR/p02/ultra.mp4
@@ -56,9 +62,14 @@ def pack_path(cid):
     return ROOT / 'characters' / cid / 'character.json'
 
 
+def skipped(spec, v):
+    return any(a <= v <= b for a, b in spec.get('pular', []))
+
+
 def candidates(spec):
-    pre = list(range(spec['inicio'], spec['preparo'], 3))
-    seq = set(range(spec['preparo'], spec['fim'] + 1, 2)) | set(spec['golpes']) | {spec['preparo'], spec['fim']}
+    pre = [v for v in range(spec['inicio'], spec['preparo'], 3) if not skipped(spec, v)]
+    seq = {v for v in range(spec['preparo'], spec['fim'] + 1, 2) if not skipped(spec, v)}
+    seq |= set(spec['golpes']) | {spec['preparo'], spec['fim']}
     return pre, sorted(seq)
 
 
@@ -96,8 +107,18 @@ def timeline(spec, picked, speed):
         'golpes': [(g - spec['preparo']) * speed for g in spec['golpes']],
         'duracao': (nxt[-1] - spec['preparo']) * speed,
     }
+    at = lambda v: (v - spec['preparo']) * speed
     if spec.get('rival'):
-        ultra['rival'] = [[(v - spec['preparo']) * speed, dx, dy] for v, dx, dy in spec['rival']]
+        ultra['rival'] = [[at(v), dx, dy] for v, dx, dy in spec['rival']]
+    if spec.get('some'):
+        ultra['some'] = [[at(a), at(b)] for a, b in spec['some']]
+    if spec.get('preto'):
+        ultra['preto'] = [at(v) for v in spec['preto']]
+    if spec.get('explosao'):
+        v, dx, dy, angle = spec['explosao']
+        ultra['explosao'] = [at(v), dx, dy, angle]
+    if spec.get('camera'):
+        ultra['camera'] = [[max(0, at(v)), dx, dy, zoom] for v, dx, dy, zoom in spec['camera']]
     return durations, ultra
 
 

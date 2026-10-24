@@ -1,5 +1,5 @@
 {
-  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio. p09: o vídeo desenhou um saco no lugar do rival; ele sai pela cor antes de converter (tools/sprites/apagar_saco.py).",
+  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio. p09: o vídeo desenhou um saco no lugar do rival; ele sai pela cor antes de converter (tools/sprites/apagar_saco.py). Cena (a Grande Final da p16): pular = trechos [de, até] do vídeo que ficam fora da folha (a explosão do canhão, que o jogo desenha); some = trechos em que o rival não aparece (debaixo da cartola, dentro do canhão); preto = [de, até] com a tela toda preta; explosao = [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo (boca do canhão); camera = planos fixos [quadro, frente, altura, zoom] (do quadro em diante; centro da tela a frente/altura px do jogo da raiz dela, zoom da tela), enquadrados para a borda do vídeo (a cartola subindo) não aparecer; o primeiro vale desde o começo e a troca é corte seco (na tela preta).",
   "velocidade": 2,
   "dano": 4200,
   "personagens": {
@@ -15,7 +15,9 @@
     "p10": {"nome": "Resgate Aéreo", "inicio": 6, "preparo": 18, "golpes": [23, 35, 45, 48, 60], "fim": 92},
     "p11": {"nome": "Autópsia", "inicio": 0, "preparo": 22, "golpes": [28, 32, 40, 44, 54], "fim": 96},
     "p12": {"nome": "Último Suspiro", "inicio": 10, "preparo": 40, "golpes": [44, 50, 56, 72], "fim": 92},
-    "p16": {"nome": "Grande Final", "inicio": 0, "preparo": 12, "golpes": [50, 112], "fim": 233,
-            "rival": [[50, 234, 0], [61, 234, 0], [62, 355, 252], [112, 355, 252]]}
+    "p16": {"nome": "Grande Final", "inicio": 0, "preparo": 12, "golpes": [50, 110], "fim": 233,
+            "rival": [[46, 232, 0], [62, 232, 0], [63, 370, 110], [110, 370, 110]],
+            "pular": [[111, 121]], "some": [[46, 110]], "preto": [54, 64],
+            "explosao": [110, 370, 240, 25], "camera": [[46, 215, 126, 1.7], [60, 324, 178, 1.35]]}
   }
 }

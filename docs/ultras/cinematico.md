@@ -75,7 +75,7 @@ mantêm o formato.
 | p10 | leque | faixa | ágil | vazio |
 | p11 | quebrada | dividida | sombria | vazio |
 | p12 | quebrada | racha | sombria | vermelho |
-| p16 | (padrão: sem `ultra.json` ainda) | | | |
+| p16 | (padrão: sem `ultra.json` ainda) | | própria: planos fixos (`camera` no `tools/sprites/ultras.json`) | |
 
 ## Trocar nome, grito, cores e onomatopeias
 

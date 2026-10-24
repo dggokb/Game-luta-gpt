@@ -112,6 +112,118 @@ final class EffectsRenderer {
         return 720f * done * p.direction;
     }
 
+    /** Quadros (60 Hz) da explosão do canhão do Ultra da p16. */
+    static final int CANNON_BLAST_FRAMES = 78;
+    private static final int[] CONFETTI = {0xFFE53935, 0xFFFFD54F, 0xFF42A5F5, 0xFF66BB6A, 0xFFAB47BC,
+        0xFFFFFFFF, 0xFFFF7043, 0xFF26C6DA};
+    private static final int CONFETTI_PIECES = 56, SMOKE_PUFFS = 10;
+    private final RectF blastBox = new RectF();
+
+    /** Número fixo entre 0 e 1 para o pedaço {@code i} (a explosão é igual toda vez). */
+    private static float blastNoise(int i, int salt) {
+        int h = i * 374761393 + salt * 668265263;
+        h = (h ^ (h >>> 13)) * 1274126177;
+        return ((h ^ (h >>> 16)) & 0xFFFF) / 65535f;
+    }
+
+    /**
+     * Explosão do canhão de circo do Ultra da p16, desenhada aqui e não na folha (no vídeo ela
+     * passava da borda e saía cortada): clarão na boca, labareda ao longo do cano, onda de
+     * choque, fumaça e uma chuva de confete. (x, y): boca do canhão; {@code angle}: graus acima
+     * da horizontal, para o lado de {@code direction}; {@code age}: quadros desde o tiro.
+     */
+    void drawCannonBlast(Canvas c, float x, float y, float angle, int direction, int age) {
+        float rad = (float)Math.toRadians(angle);
+        float ax = (float)Math.cos(rad) * direction, ay = -(float)Math.sin(rad);
+        fx.setShader(null);
+        fx.setStyle(Paint.Style.FILL);
+        // Fumaça: nuvens cinza (bordas suaves) que saem pela boca, crescem e sobem devagar.
+        for (int i = 0; i < SMOKE_PUFFS; i++) {
+            float start = 3f + 10f * blastNoise(i, 1);
+            float life = age - start;
+            if (life < 0f || life > 60f) continue;
+            float k = life / 60f;
+            float reach = (60f + 170f * blastNoise(i, 2)) * (1f - (1f - k) * (1f - k));
+            float side = (blastNoise(i, 3) - 0.5f) * 120f * k;
+            float px = x + ax * reach - ay * side * direction, py = y + ay * reach + ax * side * direction - 40f * k;
+            float r = 50f + 80f * k + 26f * blastNoise(i, 4);
+            int grey = 120 + Math.round(70f * blastNoise(i, 5));
+            softBlob(c, px, py, r, r, Color.rgb(grey, grey, grey), Math.round(230f * (1f - k)));
+        }
+        // Labareda: chamas em camadas ao longo do cano (vermelha por fora, branca no meio).
+        if (age < 18) {
+            float k = age / 18f;
+            float grow = Math.min(1f, (age + 1f) / 4f);
+            c.save();
+            c.translate(x, y);
+            c.rotate(direction > 0 ? -angle : 180f + angle);
+            int[] layers = {0xFFE65100, 0xFFFFA000, 0xFFFFEB3B, 0xFFFFFFFF};
+            for (int l = 0; l < layers.length; l++) {
+                float len = (330f - 60f * l) * grow * (1f - 0.3f * k);
+                float half = (95f - 18f * l) * (1f - 0.5f * k);
+                softBlob(c, len * 0.42f, 0f, len * 0.6f, half, layers[l], Math.round(255f * (1f - k)));
+            }
+            c.restore();
+        }
+        // Clarão na boca.
+        if (age < 12) {
+            float k = age / 12f;
+            float r = 90f + 120f * k;
+            c.save();
+            c.translate(x, y);
+            c.scale(r, r);
+            fx.setShader(whiteCore);
+            fx.setAlpha(Math.round(255f * (1f - k)));
+            c.drawCircle(0f, 0f, 1f, fx);
+            fx.setShader(null);
+            c.restore();
+        }
+        // Onda de choque.
+        if (age < 22) {
+            float k = age / 22f;
+            fx.setStyle(Paint.Style.STROKE);
+            fx.setStrokeWidth(14f * (1f - k) + 2f);
+            fx.setColor(Color.argb(Math.round(220f * (1f - k)), 255, 244, 214));
+            c.drawCircle(x + ax * 40f, y + ay * 40f, 50f + 260f * k, fx);
+            fx.setStyle(Paint.Style.FILL);
+        }
+        // Confete: sai em leque pelo cano, freia no ar, cai girando e some no fim.
+        float fade = Math.min(1f, (CANNON_BLAST_FRAMES - age) / 20f);
+        float t = Math.max(0f, age - 2f);
+        float drift = (1f - (float)Math.pow(0.95, t)) / 0.05f;
+        for (int i = 0; i < CONFETTI_PIECES; i++) {
+            float spread = (float)Math.toRadians(angle + (blastNoise(i, 6) - 0.5f) * 70f);
+            float speed = 9f + 11f * blastNoise(i, 7);
+            float vx = (float)Math.cos(spread) * speed * direction, vy = -(float)Math.sin(spread) * speed;
+            float px = x + vx * drift, py = y + vy * drift + 0.12f * t * t;
+            float spin = age * (8f + 14f * blastNoise(i, 8)) + 360f * blastNoise(i, 9);
+            float w = 7f + 6f * blastNoise(i, 10), h = 4f + 3f * blastNoise(i, 11);
+            c.save();
+            c.translate(px, py);
+            c.rotate(spin);
+            c.scale(1f, (float)Math.cos(Math.toRadians(spin * 1.7f)));   // vira de lado enquanto cai
+            fx.setColor(CONFETTI[i % CONFETTI.length]);
+            fx.setAlpha(Math.round(255f * Math.max(0f, fade)));
+            blastBox.set(-w, -h, w, h);
+            c.drawRect(blastBox, fx);
+            c.restore();
+        }
+        fx.setAlpha(255);
+    }
+
+    /** Mancha de borda suave (o brilho radial da cor), com raios rx e ry, centro em (x, y). */
+    private void softBlob(Canvas c, float x, float y, float rx, float ry, int color, int alpha) {
+        if (alpha <= 0) return;
+        c.save();
+        c.translate(x, y);
+        c.scale(rx, ry);
+        fx.setShader(glow(color | 0xFF000000));
+        fx.setAlpha(Math.min(255, alpha));
+        c.drawCircle(0f, 0f, 1f, fx);
+        fx.setShader(null);
+        c.restore();
+    }
+
     private Shader glow(int color) {
         Shader shader = glows.get(color);
         if (shader == null) {

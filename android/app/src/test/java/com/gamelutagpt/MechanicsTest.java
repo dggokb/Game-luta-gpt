@@ -507,6 +507,25 @@ public class MechanicsTest {
         return life - s.f(1).state.life;
     }
 
+    @Test public void ultraSceneHidesTheVictimAndBlacksOutTheScreen() {
+        CharacterDefinition.UltraSequence seq = new CharacterDefinition.UltraSequence(10, new int[]{50, 120}, 200, 4000, null)
+            .withScene(new int[][]{{40, 120}}, new int[]{60, 80}, new float[]{120f, 350f, 220f, 30f},
+                new float[][]{{30f, 215f, 126f, 1.7f}, {70f, 320f, 178f, 1.35f}});
+        assertFalse("seen before the hat", seq.hidesVictim(39));
+        assertTrue("under the hat and in the cannon", seq.hidesVictim(40) && seq.hidesVictim(119));
+        assertFalse("out of the cannon on the blast", seq.hidesVictim(120));
+        assertEquals(0, seq.blackoutAlpha(59));
+        assertTrue("fades in fast", seq.blackoutAlpha(60) > 0 && seq.blackoutAlpha(60) < 255);
+        assertEquals(255, seq.blackoutAlpha(70));
+        assertEquals("cuts back on the cannon", 0, seq.blackoutAlpha(80));
+        assertEquals("the first shot holds from the start", 1.7f, seq.shotAt(0)[3], 0f);
+        assertEquals("a hard cut to the cannon shot", 1.35f, seq.shotAt(70)[3], 0f);
+        CharacterDefinition.UltraSequence p16 = GeneratedCharacters.get("p16").fighter.ultraSequence;
+        assertNotNull("the Grande Final has its scene", p16.camera);
+        assertTrue("the blast is the last blow", p16.blast[0] == p16.hits[p16.hits.length - 1]);
+        assertFalse("the victim shows up for the blast", p16.hidesVictim(p16.blast[0]));
+    }
+
     @Test public void theCinematicUltraWaitsForTheMangaPageAndTheGradeBoostsTheLastBlow() {
         int plain = ultraDamage(false, 0f);
         assertEquals("a page without a grade changes nothing", plain, ultraDamage(true, 0f));

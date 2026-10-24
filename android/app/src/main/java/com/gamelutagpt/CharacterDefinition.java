@@ -277,6 +277,45 @@ final class CharacterDefinition {
             this.startupFrame=startupFrame;this.hits=hits.clone();this.length=length;this.damage=damage;
             this.hold=hold==null?new float[0][]:hold;
         }
+        /** Trechos {de, até} da sequência em que o rival não aparece (debaixo da cartola, dentro do canhão). */
+        int[][] hidden=new int[0][];
+        /** {de, até} com a tela toda preta, ou null. */
+        int[] blackout;
+        /** Explosão desenhada pelo jogo: {quadro, frente, altura, ângulo em graus}, ou null. */
+        float[] blast;
+        /**
+         * Planos fixos da sequência, {quadro, frente, altura do centro da tela, zoom da tela}, do
+         * quadro em diante (o primeiro vale desde o começo; a troca é corte seco), ou null.
+         */
+        float[][] camera;
+        /** A cena da Grande Final da p16 (tools/sprites/ultras.json): só apresentação. */
+        UltraSequence withScene(int[][] hidden,int[] blackout,float[] blast,float[][] camera) {
+            for(int[] w:hidden)if(w.length!=2||w[0]>=w[1])throw new IllegalArgumentException("ultra sequence: hidden {from, to}");
+            if(blackout!=null&&(blackout.length!=2||blackout[0]>=blackout[1]))throw new IllegalArgumentException("ultra sequence: blackout {from, to}");
+            if(blast!=null&&blast.length!=4)throw new IllegalArgumentException("ultra sequence: blast {frame, ahead, height, angle}");
+            if(camera!=null)for(int i=0;i<camera.length;i++)
+                if(camera[i].length!=4||camera[i][3]<1f||(i>0&&camera[i][0]<=camera[i-1][0]))
+                    throw new IllegalArgumentException("ultra sequence: camera {frame, ahead, height, zoom}, growing frames");
+            this.hidden=hidden.clone();this.blackout=blackout;this.blast=blast;this.camera=camera;
+            return this;
+        }
+        /** O plano fixo que vale neste quadro ({quadro, frente, altura, zoom}), ou null sem câmera própria. */
+        float[] shotAt(float frame) {
+            if(camera==null||camera.length==0)return null;
+            float[] shot=camera[0];
+            for(float[] k:camera)if(frame>=k[0])shot=k;
+            return shot;
+        }
+        /** O rival some neste quadro da sequência. */
+        boolean hidesVictim(float frame) {
+            for(int[] w:hidden)if(frame>=w[0]&&frame<w[1])return true;
+            return false;
+        }
+        /** Opacidade (0-255) da tela preta: entra em 4 quadros e sai seco. */
+        int blackoutAlpha(float frame) {
+            if(blackout==null||frame<blackout[0]||frame>=blackout[1])return 0;
+            return Math.round(255f*Math.min(1f,(frame-blackout[0]+1f)/4f));
+        }
         /** Dano do golpe i: partes iguais, o resto no último. */
         int hitDamage(int i) {
             int each=damage/hits.length;
