@@ -14,6 +14,7 @@ final class Projectile {
     CharacterDefinition.Projectile trap;
     int fuse;
     final float startX;
+    final float startY;
     final float range;
     final float speed;
     final float radius;
@@ -67,6 +68,7 @@ final class Projectile {
         this.previousX = x;
         this.y = y;
         this.startX = x;
+        this.startY = y;
         this.range = range;
         this.speed = speed;
         this.radius = radius;

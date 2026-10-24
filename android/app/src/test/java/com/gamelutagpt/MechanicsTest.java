@@ -182,6 +182,15 @@ public class MechanicsTest {
         assertTrue("L opens first, H last", l < m && m < h);
     }
 
+    @Test public void thrownBoxSpinsTwiceUntilItLands() {
+        Projectile box = new Projectile(300f, Arena.GROUND_Y - 215f, 600f, 115f, 40f, 100, 0, 0, -1, null, "CAIXA");
+        assertEquals(0f, EffectsRenderer.boxSpin(box), 0.01f);
+        box.y = Arena.GROUND_Y - 107.5f;
+        assertEquals(-360f, EffectsRenderer.boxSpin(box), 0.01f);
+        box.y = Arena.GROUND_Y;
+        assertEquals("two full turns, upright on the ground", -720f, EffectsRenderer.boxSpin(box), 0.01f);
+    }
+
     @Test public void teleportReappearsBehindFacingTheOpponent() {
         AttackDefinition vanish = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().teleport(6).evade(AttackDefinition.Reads.ANY, 0, 8)).build();

@@ -510,7 +510,7 @@
   "estado": "MEDIUM_KICK",
   "atlas": "p16_medium_kick",
   "fator": 1.0066127782451924,
-  "fonte": "imagem inicial no q19 (nota 0.87)",
+  "fonte": "imagem inicial no q23 (nota 0.92)",
   "receita": "forte",
   "medida": "1º quadro = inicio_centro (nota 0.95)",
   "fator_optico": 1.0,
@@ -518,26 +518,24 @@
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
    "fator": 1.0066127782451924,
-   "nota": 0.8662388920783997,
-   "quadro": 19,
+   "nota": 0.9162113070487976,
+   "quadro": 23,
    "ref": "inicio_centro"
   },
   "cabeca": {
    "fator": 1.0,
-   "min": 0.9805103067898279,
-   "max": 1.0,
+   "min": 1.0,
+   "max": 1.0198770916279105,
    "zoom": false,
    "por_quadro": {
     "0": 1.0,
-    "2": 1.0,
-    "4": 1.0,
-    "8": 1.0,
-    "10": 1.0,
+    "3": 1.02,
+    "6": 1.0,
     "12": 1.0,
-    "14": 0.981,
-    "16": 1.0,
+    "15": 1.0,
     "18": 1.0,
-    "19": 1.0
+    "21": 1.02,
+    "23": 1.0
    }
   },
   "emendas": [
@@ -546,22 +544,22 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 1.01010101010101,
-    "pe": 4,
-    "iou": 0.6408291457286432,
-    "altura": 1.021171526136065,
-    "mesma_pose": 0.0
+    "fator": 0.9999999999999998,
+    "pe": -1,
+    "iou": 0.896609187074337,
+    "altura": 0.9942211715261361,
+    "mesma_pose": 1.0
    },
    {
     "estado": "MEDIUM_KICK",
     "ponta": "fim",
-    "quadro": 19,
+    "quadro": 23,
     "ref": "guarda",
     "fator": 0.9999999999999998,
     "pe": -1,
-    "iou": 0.8286360104541922,
-    "altura": 0.995954820068295,
-    "mesma_pose": 0.0
+    "iou": 0.8846683581007612,
+    "altura": 0.9984239558707644,
+    "mesma_pose": 1.0
    }
   ],
   "problemas": [],
@@ -1072,66 +1070,6 @@
     "iou": 0.6057089084065245,
     "altura": 1.03377987916995,
     "mesma_pose": 0.0
-   }
-  ],
-  "problemas": [],
-  "nivel": "ok"
- },
- {
-  "estado": "ULTRA_BEAM",
-  "atlas": "p16_idle",
-  "fator": 1.0066127782451924,
-  "fonte": "imagem inicial no q0 (nota 0.96)",
-  "receita": "forte",
-  "medida": "1º quadro = inicio_centro (nota 0.95)",
-  "fator_optico": 1.0,
-  "cadeia": null,
-  "cadeia_nota": "sem folha do vídeo",
-  "inicio": {
-   "fator": 1.0066127782451924,
-   "nota": 0.9557026624679565,
-   "quadro": 0,
-   "ref": "inicio_centro"
-  },
-  "cabeca": {
-   "fator": 1.0401492820274054,
-   "min": 1.0401492820274054,
-   "max": 1.0401492820274054,
-   "zoom": false,
-   "por_quadro": {
-    "0": 1.04,
-    "1": 1.04,
-    "2": 1.04,
-    "3": 1.04,
-    "4": 1.04,
-    "5": 1.04,
-    "6": 1.04,
-    "7": 1.04,
-    "8": 1.04
-   }
-  },
-  "emendas": [
-   {
-    "estado": "ULTRA_BEAM",
-    "ponta": "ini",
-    "quadro": 0,
-    "ref": "guarda",
-    "fator": 0.9999999999999998,
-    "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
-   },
-   {
-    "estado": "ULTRA_BEAM",
-    "ponta": "fim",
-    "quadro": 8,
-    "ref": "guarda",
-    "fator": 0.9999999999999998,
-    "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
    }
   ],
   "problemas": [],
@@ -1712,5 +1650,64 @@
   ],
   "problemas": [],
   "nivel": "ok"
+ },
+ {
+  "estado": "ULTRA_SEQ",
+  "atlas": "p16_ultra_seq",
+  "fator": 1.0066127782451924,
+  "fonte": "imagem inicial no q0 (nota 0.94)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.93)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 1.0066127782451924,
+   "nota": 0.942177951335907,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 1.0,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "27": 1.02,
+    "36": 1.0
+   }
+  },
+  "emendas": [
+   {
+    "estado": "ULTRA_SEQ",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 1.0050251256281404,
+    "pe": 0,
+    "iou": 0.9262271062271062,
+    "altura": 0.9925925925925927,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "ULTRA_SEQ",
+    "ponta": "fim",
+    "quadro": 78,
+    "ref": "guarda",
+    "fator": 1.0928961748633879,
+    "pe": -57,
+    "iou": 0.09996466051042514,
+    "altura": 1.2027318098240085,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "troca (fim): pose diferente da guarda, altura 120% (salto de pose, não de tamanho)"
+   ]
+  ],
+  "nivel": "aviso"
  }
 ]

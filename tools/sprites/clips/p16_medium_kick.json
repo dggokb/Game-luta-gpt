@@ -6,20 +6,20 @@
   "output": "android/app/src/main/res/drawable-nodpi/p16_medium_kick.webp",
   "report": "tools/sprites/reports/p16_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p16_medium_kick-import.png",
-  "expectedFrames": 20,
+  "expectedFrames": 24,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "M_medio.mp4",
+    "arquivo": "M.mp4",
     "personagem": "p16",
     "escala": 0.411,
     "medida": "1º quadro = inicio_centro (nota 0.95)",
-    "quadros": "22,24,26,28,30,32,33,34,36,40,46,52,56,58,60,62,64,66,68,72",
+    "quadros": "18,19,20,21,22,23,24,25,26,28,30,32,36,63,66,69,70,71,72,73,74,75,76,78",
     "celula": 288,
-    "largura": 320,
-    "raiz": "87,264",
+    "largura": 336,
+    "raiz": "150,270",
     "colunas": 6,
     "fixar": "video",
     "sem_efeitos": true,
@@ -29,21 +29,21 @@
     "referencia": {
       "folha": "art/sprites/source/p16_medium_kick_video_normalized.png",
       "celula": [
-        320,
+        336,
         288
       ],
       "raiz": [
-        87,
-        264
+        150,
+        270
       ],
-      "colunas": 8
+      "colunas": 6
     },
     "recorte_suave": true
   },
-  "frameWidth": 640,
+  "frameWidth": 672,
   "frameHeight": 576,
-  "rootX": 174,
-  "rootY": 528,
+  "rootX": 300,
+  "rootY": 540,
   "sourceReferences": [
     "art/sprites/source/p16_medium_kick_video_normalized.png"
   ],

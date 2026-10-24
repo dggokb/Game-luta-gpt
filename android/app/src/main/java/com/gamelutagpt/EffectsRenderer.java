@@ -95,11 +95,21 @@ final class EffectsRenderer {
         float w = b.getWidth() / 2f, h = b.getHeight() / 2f;
         c.save();
         c.translate(p.x, p.y + bob);
-        c.rotate(box ? travelled * 1.4f * p.direction : 4f * (float)Math.sin(travelled / 55f));
+        c.rotate(box ? boxSpin(p) : 4f * (float)Math.sin(travelled / 55f));
         if (p.direction < 0) c.scale(-1f, 1f);
         imageBox.set(-w / 2f, -h / 2f, w / 2f, h / 2f);
         c.drawBitmap(b, null, imageBox, imagePaint);
         c.restore();
+    }
+
+    /**
+     * A caixa anda pouco para a frente e cai rápido: o giro segue a queda, duas voltas inteiras
+     * até o chão, onde ela pousa em pé como a armadilha.
+     */
+    static float boxSpin(Projectile p) {
+        float fall = Arena.GROUND_Y - p.startY;
+        float done = fall > 0f ? Math.max(0f, Math.min(1f, (p.y - p.startY) / fall)) : 0f;
+        return 720f * done * p.direction;
     }
 
     private Shader glow(int color) {
