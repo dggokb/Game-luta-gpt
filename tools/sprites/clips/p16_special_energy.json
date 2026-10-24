@@ -1,0 +1,50 @@
+{
+  "id": "p16_special_energy",
+  "javaName": "P16_SPECIAL_ENERGY",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_special_energy_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_special_energy.webp",
+  "report": "tools/sprites/reports/p16_special_energy.report.json",
+  "preview": "android/app/build/sprite-review/p16_special_energy-import.png",
+  "expectedFrames": 35,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p16 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "s1.mp4",
+    "personagem": "p16",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,74,75,76,78,81,84,88,92,96,100,104",
+    "celula": 288,
+    "largura": 352,
+    "raiz": "90,270",
+    "colunas": 5,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p16_special_energy_video_normalized.png",
+      "celula": [
+        352,
+        288
+      ],
+      "raiz": [
+        90,
+        270
+      ],
+      "colunas": 9
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 704,
+  "frameHeight": 576,
+  "rootX": 180,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_special_energy_video_normalized.png"
+  ]
+}

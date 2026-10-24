@@ -214,7 +214,7 @@ def commands(pack, spec):
 
 
 VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
-           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO')
+           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO', 'BALAO')
 RENTE = 14        # altura da saída do projétil rente ao chão (px acima do pé)
 MELEE_ACTIVE = 4  # quadros ativos do S1 corpo a corpo (o projétil tem 1)
 MELEE_KEYS = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback', 'low')

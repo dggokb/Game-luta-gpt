@@ -1,9 +1,13 @@
 package com.gamelutagpt;
 
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import com.gamelutagpt.efeitos.ProjetilVisual;
@@ -18,6 +22,42 @@ final class EffectsRenderer {
     private final java.util.Map<Integer, Shader> glows = new java.util.HashMap<>();
     private final Shader whiteCore = new RadialGradient(0f, 0f, 1f,
         new int[]{0xFFFFFFFF, 0xF0FFFFFF, 0x00FFFFFF}, new float[]{0f, .45f, 1f}, Shader.TileMode.CLAMP);
+
+    /**
+     * Projéteis desenhados com uma imagem tirada do vídeo do personagem (o balão da p16), em
+     * vez do desenho por código do ProjetilVisual: nome do desenho -> arquivo em assets, em HD
+     * (2 px de imagem por px do jogo).
+     */
+    static final java.util.Map<String, String> IMAGE_VISUALS = new java.util.HashMap<>();
+    static { IMAGE_VISUALS.put("BALAO", "efeitos/balao_p16.webp"); }
+    private final java.util.Map<String, Bitmap> images = new java.util.HashMap<>();
+    private final RectF imageBox = new RectF();
+    private final Paint imagePaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+
+    void loadImages(AssetManager assets) {
+        for (java.util.Map.Entry<String, String> e : IMAGE_VISUALS.entrySet()) {
+            try (java.io.InputStream in = assets.open(e.getValue())) {
+                Bitmap b = BitmapFactory.decodeStream(in);
+                if (b != null) images.put(e.getKey(), b);
+            } catch (java.io.IOException ignored) {
+                // Sem a imagem o projétil não aparece, mas o golpe continua valendo.
+            }
+        }
+    }
+
+    /** O balão flutua: sobe e desce devagar e balança um pouco enquanto voa. */
+    private void drawImage(Canvas c, Projectile p, Bitmap b) {
+        float travelled = Math.abs(p.x - p.startX);
+        float bob = 6f * (float)Math.sin(travelled / 40f);
+        float w = b.getWidth() / 2f, h = b.getHeight() / 2f;
+        c.save();
+        c.translate(p.x, p.y + bob);
+        c.rotate(4f * (float)Math.sin(travelled / 55f));
+        if (p.direction < 0) c.scale(-1f, 1f);
+        imageBox.set(-w / 2f, -h / 2f, w / 2f, h / 2f);
+        c.drawBitmap(b, null, imageBox, imagePaint);
+        c.restore();
+    }
 
     private Shader glow(int color) {
         Shader shader = glows.get(color);
@@ -40,7 +80,10 @@ final class EffectsRenderer {
         for (Projectile p : projectiles) {
             // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
             float scale = p.radius / 24f;
-            if (p.visual == null || "ONDA".equals(p.visual)) {
+            if (p.visual != null && IMAGE_VISUALS.containsKey(p.visual)) {
+                Bitmap b = images.get(p.visual);
+                if (b != null) drawImage(c, p, b);
+            } else if (p.visual == null || "ONDA".equals(p.visual)) {
                 drawOrb(c, p, 20f * scale, false);
             } else if ("ONDA_CURTA".equals(p.visual)) {
                 drawOrb(c, p, 13f * scale, false);

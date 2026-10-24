@@ -511,6 +511,7 @@ public class GameView extends SurfaceView
     public GameView(Context context, boolean emSegundoPlano) {
         super(context);
         efeitos = new EfeitosVideo(context.getAssets());
+        effects.loadImages(context.getAssets());
         entradaSuper = new EntradaSuper(context.getAssets());
         telaVitoria = new TelaVitoria(context.getAssets());
         AjusteTamanho.load(context);

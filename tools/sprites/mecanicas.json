@@ -888,6 +888,11 @@
       "dano": 1.0,
       "ritmo": 1.0,
       "framesGolpe": {
+        "S": [
+          26,
+          1,
+          22
+        ],
         "S3": [
           24,
           10,
@@ -906,32 +911,32 @@
         }
       },
       "projetil": {
-        "velocidade": 760,
-        "alcance": 720
+        "velocidade": 500,
+        "alcance": 900
       },
       "unica": {
         "descricao": "Estrelinha (S4): a estrela para a frente, um acerto a cada toque das pernas no rival. Especiais ainda com os dados do p01 e a guarda parada (sem vídeo)."
       },
       "comandos": {
         "S1": {
-          "nome": "Onda",
+          "nome": "Balão",
           "comando": "↓↘→"
         },
         "S2": {
-          "nome": "Punho ascendente",
+          "nome": "Caixa surpresa",
           "comando": "→↓↘"
         },
         "S3": {
-          "nome": "Aparar",
+          "nome": "Casca de banana",
           "comando": "↓↓"
         },
         "S4": {
-          "nome": "Chute giratório",
+          "nome": "Estrelinha",
           "comando": "↓↙←"
         }
       },
       "s1": {
-        "visual": "ONDA"
+        "visual": "BALAO"
       },
       "super": {
         "acertos": 5,

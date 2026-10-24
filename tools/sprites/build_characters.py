@@ -82,7 +82,7 @@ def safe(root, value):
     return p
 
 # Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
-ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO')
+ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO','BALAO')
 # Efeitos desenhados durante um especial (ProjetilVisual).
 SPECIAL_EFFECTS = ('VAPOR',)
 

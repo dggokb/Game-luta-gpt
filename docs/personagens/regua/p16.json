@@ -797,37 +797,29 @@
  },
  {
   "estado": "SPECIAL_ENERGY",
-  "atlas": "p16_idle",
-  "fator": 1.0066127782451924,
-  "fonte": "imagem inicial no q0 (nota 0.96)",
+  "atlas": "p16_special_energy",
+  "fator": 0.9916242826796838,
+  "fonte": "imagem inicial no q34 (nota 0.88)",
   "receita": "forte",
   "medida": "1º quadro = inicio_centro (nota 0.95)",
   "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 1.0066127782451924,
-   "nota": 0.9557026624679565,
-   "quadro": 0,
+   "fator": 0.9916242826796838,
+   "nota": 0.8846229314804077,
+   "quadro": 34,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.0401492820274054,
-   "min": 1.0401492820274054,
-   "max": 1.0401492820274054,
+   "fator": 1.0,
+   "min": 0.9805103067898279,
+   "max": 1.0,
    "zoom": false,
    "por_quadro": {
-    "0": 1.04,
-    "1": 1.04,
-    "2": 1.04,
-    "3": 1.04,
-    "4": 1.04,
-    "5": 1.04,
-    "6": 1.04,
-    "7": 1.04,
-    "8": 1.04,
-    "9": 1.04,
-    "10": 1.04
+    "0": 0.981,
+    "32": 1.0,
+    "34": 1.0
    }
   },
   "emendas": [
@@ -836,22 +828,22 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9999999999999998,
-    "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
+    "fator": 0.9803921568627446,
+    "pe": 1,
+    "iou": 0.7092699358683682,
+    "altura": 0.9853427895981087,
+    "mesma_pose": 0.0
    },
    {
     "estado": "SPECIAL_ENERGY",
     "ponta": "fim",
-    "quadro": 10,
+    "quadro": 34,
     "ref": "guarda",
-    "fator": 0.9999999999999998,
+    "fator": 0.9950248756218902,
     "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
+    "iou": 0.8319165111617942,
+    "altura": 0.989545573942737,
+    "mesma_pose": 0.0
    }
   ],
   "problemas": [],
