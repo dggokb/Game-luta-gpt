@@ -329,17 +329,17 @@
  {
   "estado": "DASH",
   "atlas": "p16_dash",
-  "fator": 1.0,
-  "fonte": "receita forte",
-  "receita": "forte",
-  "medida": "último quadro = inicio_centro (nota 0.95)",
+  "fator": null,
+  "fonte": "sem medida",
+  "receita": "manual",
+  "medida": "corrida 95% (pedido: parecia maior que a guarda)",
   "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 0.7056,
-   "nota": 0.19124887883663177,
-   "quadro": 18,
+   "fator": 0.8117296582798491,
+   "nota": 0.18520154058933258,
+   "quadro": 12,
    "ref": "inicio_centro"
   },
   "cabeca": null,
@@ -349,15 +349,20 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 1.01010101010101,
-    "pe": -24,
-    "iou": 0.2584873031764813,
-    "altura": 0.8531652219595482,
+    "fator": 0.9661835748792267,
+    "pe": 17,
+    "iou": 0.25559675868699355,
+    "altura": 0.8125032834252692,
     "mesma_pose": 0.0
    }
   ],
-  "problemas": [],
-  "nivel": "ok"
+  "problemas": [
+   [
+    "aviso",
+    "tamanho não medido (pose nunca bate e a receita é fraca)"
+   ]
+  ],
+  "nivel": "aviso"
  },
  {
   "estado": "BACKDASH",

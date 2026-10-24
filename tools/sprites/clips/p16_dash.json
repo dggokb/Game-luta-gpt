@@ -14,8 +14,8 @@
   "video": {
     "arquivo": "dash.mp4",
     "personagem": "p16",
-    "escala": 0.411,
-    "medida": "último quadro = inicio_centro (nota 0.95)",
+    "escala": 0.3905,
+    "motivo": "corrida 95% (pedido: parecia maior que a guarda)",
     "quadros": "17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45",
     "largura": 368,
     "raiz": "200,238",
@@ -35,7 +35,7 @@
         200,
         238
       ],
-      "colunas": 10
+      "colunas": 5
     },
     "recorte_suave": true
   },
