@@ -174,7 +174,7 @@ Definidas no bloco `unica` de `tools/sprites/mecanicas.json` e aplicadas pelo me
 fazer: **armadura** (aguenta N golpes sem atordoar), **contra-golpe** (lê golpe alto, baixo ou
 qualquer um na preparação e responde na hora), **esquiva** (passa por baixo de golpe alto e de
 projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival; com velocidade negativa recua, como a estrela da p16),
-**teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata),
+**teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata), **armadilha** (o projétil cai e espera um pavio por botão, L/M/H; depois um golpe sai dele, como a luva da caixa da p16),
 **custo de vida**, **fúria** (dano cresce com a vida perdida), **air dashes extras** e
 **agarrão próprio** (dano e alcance). Testes: `MechanicsTest`.
 

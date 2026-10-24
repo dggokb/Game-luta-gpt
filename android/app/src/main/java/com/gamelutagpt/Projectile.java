@@ -10,6 +10,9 @@ final class Projectile {
     float vy;
     /** Poça que fica onde ele cai (seringa da p11); null: some no chão. */
     CharacterDefinition.Projectile puddle;
+    /** Armadilha que fica onde ele cai (caixa da p16) e o pavio dela; a caixa em voo não acerta. */
+    CharacterDefinition.Projectile trap;
+    int fuse;
     final float startX;
     final float range;
     final float speed;
@@ -87,7 +90,7 @@ final class Projectile {
      * Pode bater num projétil do rival: o chicote é o braço da p08, não energia, e o projétil
      * que volta ou que está parado no rival entre dois acertos já não está no caminho.
      */
-    boolean clashes() { return !cancelled && !retracts() && !returning && !holding; }
+    boolean clashes() { return !cancelled && !retracts() && !returning && !holding && trap == null; }
 
     /** Força no choque: os acertos que ainda faltam (a Onda Máxima de 5 aguenta 5). */
     int durability() { return Math.max(0, totalHits - hitsDone); }

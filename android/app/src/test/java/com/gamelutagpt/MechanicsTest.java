@@ -158,6 +158,30 @@ public class MechanicsTest {
         assertTrue("backed away from the opponent", start - s.f(0).x > 60f);
     }
 
+    /** Caixa surpresa da p16 (→↓↘): cai e vira armadilha; o botão escolhe o pavio da luva. */
+    private static int boxGloveHitFrame(boolean light, boolean heavy) {
+        CharacterDefinition c = GeneratedCharacters.get("p16");
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(c, BASE, 500f, 750f);
+        for (int d : new int[]{1, 1, 3, 3, 2}) { s.in[0].direction = d; s.step(); }
+        s.in[0].direction = 2;
+        if (light) s.in[0].light = true; else if (heavy) s.in[0].heavy = true; else s.in[0].medium = true;
+        s.step();
+        s.in[0].direction = 0;
+        assertEquals("S2", s.attackId(0));
+        int life = s.f(1).state.life;
+        for (int i = 0; i < 200; i++) {
+            s.step();
+            if (s.f(1).state.life < life) return i;
+        }
+        return -1;
+    }
+
+    @Test public void boxTrapOpensByButtonAndTheGloveHits() {
+        int l = boxGloveHitFrame(true, false), m = boxGloveHitFrame(false, false), h = boxGloveHitFrame(false, true);
+        assertTrue("the glove hits whoever stands on the box: " + l + " " + m + " " + h, l > 0 && m > 0 && h > 0);
+        assertTrue("L opens first, H last", l < m && m < h);
+    }
+
     @Test public void teleportReappearsBehindFacingTheOpponent() {
         AttackDefinition vanish = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().teleport(6).evade(AttackDefinition.Reads.ANY, 0, 8)).build();

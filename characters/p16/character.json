@@ -887,53 +887,55 @@
       "impactFrame": 26
     },
     "SPECIAL_S2": {
-      "atlas": "p16_idle",
+      "atlas": "p16_special_s2",
       "frames": [
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
       ],
       "loop": false,
       "durationsMs": [
-        18,
-        18,
-        18,
-        18,
-        18,
-        30,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        17,
+        13,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        25
       ],
-      "impactFrame": 5
+      "impactFrame": 9
     },
     "SPECIAL_S3": {
       "atlas": "p16_special_s3",
@@ -1604,18 +1606,16 @@
       ],
       "animation": "SPECIAL_S2",
       "damage": 1100,
-      "reach": 81,
-      "hitHeight": 138,
-      "startupFrames": 6,
-      "activeFrames": 8,
+      "startupFrames": 18,
+      "activeFrames": 1,
       "recoveryFrames": 22,
-      "hitstunFrames": 39,
-      "blockstunFrames": 17,
+      "hitstunFrames": 32,
+      "blockstunFrames": 10,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
-          6,
-          19
+          18,
+          24
         ],
         "block": null,
         "whiff": null
@@ -1623,8 +1623,6 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
-      "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
       "buttons": [
@@ -1632,7 +1630,37 @@
         "M",
         "H"
       ],
-      "nome": "Caixa surpresa"
+      "nome": "Caixa surpresa",
+      "projectile": {
+        "visual": "CAIXA",
+        "range": 600,
+        "speed": 115,
+        "spawnX": 166,
+        "spawnY": 215,
+        "vertical": 321,
+        "trap": {
+          "fuse": [
+            10,
+            40,
+            75
+          ],
+          "duration": 48,
+          "activeFrom": 13,
+          "active": 25,
+          "height": 197,
+          "reach": 91,
+          "radius": 70
+        }
+      },
+      "especialBase": {
+        "activeFrames": 1,
+        "recoveryFrames": 22,
+        "reach": 81,
+        "hitHeight": 138,
+        "hitFloor": null,
+        "launchType": "knockdown",
+        "knockback": 60
+      }
     },
     "S3": {
       "command": [

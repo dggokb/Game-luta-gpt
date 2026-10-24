@@ -3087,6 +3087,7 @@ public class GameView extends SurfaceView
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
+            effects.drawTraps(canvas, engine.traps);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
             effects.drawSuperProjectiles(canvas, renderCanvas, engine.superProjectiles);

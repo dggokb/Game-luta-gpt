@@ -851,37 +851,36 @@
  },
  {
   "estado": "SPECIAL_S2",
-  "atlas": "p16_idle",
-  "fator": 1.0066127782451924,
-  "fonte": "imagem inicial no q0 (nota 0.96)",
+  "atlas": "p16_special_s2",
+  "fator": 0.9965954846375733,
+  "fonte": "imagem inicial no q0 (nota 0.94)",
   "receita": "forte",
   "medida": "1º quadro = inicio_centro (nota 0.95)",
   "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 1.0066127782451924,
-   "nota": 0.9557026624679565,
+   "fator": 0.9965954846375733,
+   "nota": 0.937989354133606,
    "quadro": 0,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.0401492820274054,
-   "min": 1.0401492820274054,
+   "fator": 1.0,
+   "min": 0.9614004617210825,
    "max": 1.0401492820274054,
    "zoom": false,
    "por_quadro": {
     "0": 1.04,
     "2": 1.04,
-    "4": 1.04,
-    "6": 1.04,
-    "8": 1.04,
-    "10": 1.04,
-    "12": 1.04,
-    "14": 1.04,
-    "16": 1.04,
-    "18": 1.04,
-    "19": 1.04
+    "4": 1.0,
+    "6": 1.0,
+    "10": 0.981,
+    "12": 0.961,
+    "14": 0.981,
+    "16": 0.981,
+    "18": 1.0,
+    "20": 1.0
    }
   },
   "emendas": [
@@ -890,26 +889,31 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9999999999999998,
-    "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
+    "fator": 0.9925558312655084,
+    "pe": 1,
+    "iou": 0.9105406178489702,
+    "altura": 0.992434988179669,
     "mesma_pose": 1.0
    },
    {
     "estado": "SPECIAL_S2",
     "ponta": "fim",
-    "quadro": 19,
+    "quadro": 20,
     "ref": "guarda",
-    "fator": 0.9999999999999998,
-    "pe": 0,
-    "iou": 1.0,
-    "altura": 1.0,
-    "mesma_pose": 1.0
+    "fator": 1.06951871657754,
+    "pe": 7,
+    "iou": 0.571802379914024,
+    "altura": 1.0890990281061204,
+    "mesma_pose": 0.0
    }
   ],
-  "problemas": [],
-  "nivel": "ok"
+  "problemas": [
+   [
+    "aviso",
+    "troca (fim): pose diferente da guarda, altura 109% (salto de pose, não de tamanho)"
+   ]
+  ],
+  "nivel": "aviso"
  },
  {
   "estado": "SPECIAL_S3",

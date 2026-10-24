@@ -90,6 +90,8 @@ final class CombatFighter {
     /** Último quadro do golpe normal que acertou (ou da rasteira defendida): a recuperação acaba aí (-1: vai inteira). */
     int hitCutFrame = -1;
     String specialStrength;
+    /** Botão (L, M, H) do último especial de comando (S2..S4): o pavio da caixa da p16. */
+    String commandButton;
     /** Step of the autoCombo route this attack came from, or -1. */
     int autoStep = -1;
     int hitsOnTarget;

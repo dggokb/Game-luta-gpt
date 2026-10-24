@@ -893,6 +893,11 @@
           1,
           22
         ],
+        "S2": [
+          18,
+          1,
+          22
+        ],
         "S3": [
           24,
           10,
@@ -905,6 +910,29 @@
         ]
       },
       "especiais": {
+        "S2": {
+          "projetil": {
+            "visual": "CAIXA",
+            "alcance": 600,
+            "velocidade": 115,
+            "saidaX": 166,
+            "saidaY": 215,
+            "vertical": 321,
+            "armadilha": {
+              "pavio": [
+                10,
+                40,
+                75
+              ],
+              "aberta": 48,
+              "acertaDe": 13,
+              "acerta": 25,
+              "altura": 197,
+              "avanco": 91,
+              "raio": 70
+            }
+          }
+        },
         "S3": {
           "baixo": true,
           "altura": 70

@@ -82,7 +82,7 @@ def safe(root, value):
     return p
 
 # Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
-ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO','BALAO')
+ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO','BALAO','CAIXA')
 # Efeitos desenhados durante um especial (ProjetilVisual).
 SPECIAL_EFFECTS = ('VAPOR',)
 
@@ -347,6 +347,17 @@ def validate_special_projectile(name, p, body):
         raise ValueError(f'{name}.projectile.spawnY: projectile must spawn inside the body height ({body["standHeight"]})')
     if isinstance(p.get('vertical'),bool) or not isinstance(p.get('vertical'),(int,float)):
         raise ValueError(f'{name}.projectile.vertical: expected a number (negative goes up)')
+    if 'trap' in p:
+        t = p['trap']
+        if p['vertical'] <= 0:
+            raise ValueError(f'{name}.projectile.trap: only a falling projectile lands')
+        if not (isinstance(t.get('fuse'),list) and len(t['fuse']) == 3):
+            raise ValueError(f'{name}.projectile.trap.fuse: expected the L, M and H fuses')
+        for v in t['fuse']: positive_int(v, f'{name}.projectile.trap.fuse')
+        for key in ('duration','active'): positive_int(t.get(key), f'{name}.projectile.trap.{key}')
+        if not (type(t.get('activeFrom')) is int and 0 <= t['activeFrom'] and t['activeFrom'] + t['active'] <= t['duration']):
+            raise ValueError(f'{name}.projectile.trap: the active window must fit in the open frames')
+        for key in ('height','reach','radius'): positive(t.get(key), f'{name}.projectile.trap.{key}')
     if 'puddle' in p:
         q = p['puddle']
         if p['vertical'] <= 0:
@@ -642,6 +653,10 @@ def compile_packs(root, results):
             extra = ''
             if proj:
                 extra += ('.withProjectile('+q(proj['visual'])+','+','.join(f(proj[k]) for k in ('range','speed','spawnX','spawnY','vertical'))+')')
+                if 'trap' in proj:
+                    t = proj['trap']
+                    extra += ('.withTrap(new int[]{'+','.join(map(str,t['fuse']))+'},'+str(t['duration'])+','+str(t['activeFrom'])+','
+                              +str(t['active'])+','+','.join(f(t[k]) for k in ('height','reach','radius'))+')')
                 if 'puddle' in proj:
                     pd = proj['puddle']
                     extra += '.withPuddle('+str(pd['frames'])+','+f(pd['halfWidth'])+','+str(pd['damage'])+','+str(pd['poisonFrames'])+')'

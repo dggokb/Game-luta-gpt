@@ -29,30 +29,73 @@ final class EffectsRenderer {
      * (2 px de imagem por px do jogo).
      */
     static final java.util.Map<String, String> IMAGE_VISUALS = new java.util.HashMap<>();
-    static { IMAGE_VISUALS.put("BALAO", "efeitos/balao_p16.webp"); }
+    static {
+        IMAGE_VISUALS.put("BALAO", "efeitos/balao_p16.webp");
+        IMAGE_VISUALS.put("CAIXA", "efeitos/caixa_p16_00.webp");
+    }
+    /**
+     * A caixa surpresa abrindo (vídeo s2_2 da p16): uma imagem por pose, todas recortadas na
+     * mesma janela, com o centro da caixa no chão em TRAP_ANCHOR (px da imagem HD). TRAP_AT é
+     * em que ponto da abertura (0 a 1) cada uma entra, na proporção do vídeo.
+     */
+    private static final int TRAP_IMAGES = 16;
+    private static final float[] TRAP_AT = {0f, 0f, .0625f, .125f, .1875f, .21875f, .28125f, .40625f,
+        .59375f, .78125f, .8125f, .84375f, .875f, .90625f, .9375f, .97f};
+    private static final float TRAP_ANCHOR_X = 113f, TRAP_ANCHOR_Y = 524f;
+    private final Bitmap[] trapImages = new Bitmap[TRAP_IMAGES];
     private final java.util.Map<String, Bitmap> images = new java.util.HashMap<>();
     private final RectF imageBox = new RectF();
     private final Paint imagePaint = new Paint(Paint.FILTER_BITMAP_FLAG);
 
     void loadImages(AssetManager assets) {
         for (java.util.Map.Entry<String, String> e : IMAGE_VISUALS.entrySet()) {
-            try (java.io.InputStream in = assets.open(e.getValue())) {
-                Bitmap b = BitmapFactory.decodeStream(in);
-                if (b != null) images.put(e.getKey(), b);
-            } catch (java.io.IOException ignored) {
-                // Sem a imagem o projétil não aparece, mas o golpe continua valendo.
-            }
+            Bitmap b = image(assets, e.getValue());
+            if (b != null) images.put(e.getKey(), b);
+        }
+        for (int i = 0; i < TRAP_IMAGES; i++) {
+            trapImages[i] = image(assets, String.format(java.util.Locale.ROOT, "efeitos/caixa_p16_%02d.webp", i));
         }
     }
 
-    /** O balão flutua: sobe e desce devagar e balança um pouco enquanto voa. */
+    /** Sem a imagem o desenho não aparece, mas o golpe continua valendo. */
+    private static Bitmap image(AssetManager assets, String path) {
+        try (java.io.InputStream in = assets.open(path)) {
+            return BitmapFactory.decodeStream(in);
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    /** Caixas surpresa no chão: fechada no pavio, depois a abertura e a luva saltando. */
+    void drawTraps(Canvas c, List<Armadilha> traps) {
+        for (Armadilha t : traps) {
+            float progress = t.progress();
+            int index = 0;
+            if (t.open()) {
+                index = 1;
+                while (index + 1 < TRAP_IMAGES && TRAP_AT[index + 1] <= progress) index++;
+            }
+            Bitmap b = trapImages[index];
+            if (b == null) continue;
+            c.save();
+            c.translate(t.x, Arena.GROUND_Y);
+            if (t.direction < 0) c.scale(-1f, 1f);
+            imageBox.set(-TRAP_ANCHOR_X / 2f, -TRAP_ANCHOR_Y / 2f,
+                (b.getWidth() - TRAP_ANCHOR_X) / 2f, (b.getHeight() - TRAP_ANCHOR_Y) / 2f);
+            c.drawBitmap(b, null, imageBox, imagePaint);
+            c.restore();
+        }
+    }
+
+    /** O balão flutua (sobe, desce e balança); a caixa gira no ar. */
     private void drawImage(Canvas c, Projectile p, Bitmap b) {
         float travelled = Math.abs(p.x - p.startX);
-        float bob = 6f * (float)Math.sin(travelled / 40f);
+        boolean box = "CAIXA".equals(p.visual);
+        float bob = box ? 0f : 6f * (float)Math.sin(travelled / 40f);
         float w = b.getWidth() / 2f, h = b.getHeight() / 2f;
         c.save();
         c.translate(p.x, p.y + bob);
-        c.rotate(4f * (float)Math.sin(travelled / 55f));
+        c.rotate(box ? travelled * 1.4f * p.direction : 4f * (float)Math.sin(travelled / 55f));
         if (p.direction < 0) c.scale(-1f, 1f);
         imageBox.set(-w / 2f, -h / 2f, w / 2f, h / 2f);
         c.drawBitmap(b, null, imageBox, imagePaint);
@@ -80,6 +123,7 @@ final class EffectsRenderer {
         for (Projectile p : projectiles) {
             // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
             float scale = p.radius / 24f;
+            if ("LUVA".equals(p.visual)) continue;   // a luva da caixa: quem desenha é a armadilha
             if (p.visual != null && IMAGE_VISUALS.containsKey(p.visual)) {
                 Bitmap b = images.get(p.visual);
                 if (b != null) drawImage(c, p, b);

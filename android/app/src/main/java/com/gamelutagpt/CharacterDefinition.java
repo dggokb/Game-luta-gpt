@@ -197,6 +197,18 @@ final class CharacterDefinition {
             projectile.puddleDamage=damage;projectile.puddlePoisonFrames=poisonFrames;
             return this;
         }
+        /**
+         * Ao cair, o projétil vira armadilha (caixa surpresa da p16): pavio por botão (L, M, H),
+         * quadros abertos, quadros em que a luva acerta (a partir do pico de abertura), altura
+         * e avanço da luva sobre a caixa, e o raio do acerto.
+         */
+        Special withTrap(int[] fuse,int duration,int activeFrom,int active,float height,float reach,float radius) {
+            if(fuse.length!=3||duration<1||active<1||activeFrom<0||activeFrom+active>duration)
+                throw new IllegalArgumentException("trap needs three fuses and an active window inside it");
+            projectile.trapFuse=fuse.clone();projectile.trapDuration=duration;projectile.trapActiveFrom=activeFrom;
+            projectile.trapActive=active;projectile.trapHeight=height;projectile.trapReach=reach;projectile.trapRadius=radius;
+            return this;
+        }
         Special withEffect(String name) { effect=name; return this; }
         int commandLength() { return command.length; }
         /** The motion, in relative directions (tutorial text and examples). */
@@ -232,6 +244,10 @@ final class CharacterDefinition {
         Projectile withClones(int count) { clones=count; return this; }
         /** Poça que fica onde o projétil cai (0 quadros: some no chão). */
         int puddleFrames,puddleDamage,puddlePoisonFrames;
+        /** Armadilha onde cai (caixa da p16); trapFuse null: não é armadilha. */
+        int[] trapFuse;
+        int trapDuration,trapActiveFrom,trapActive;
+        float trapHeight,trapReach,trapRadius;
         float puddleHalfWidth;
         float spawnHeight(boolean crouching,boolean airborne) {
             return crouching ? crouchSpawnY : airborne ? airSpawnY : spawnY;

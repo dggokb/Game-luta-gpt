@@ -85,6 +85,8 @@ final class CombatEngine {
     final List<Projectile> superProjectiles = new ArrayList<>();
     /** Poças de veneno no chão (seringa da p11). */
     final List<Puddle> puddles = new ArrayList<>();
+    /** Caixas surpresa da p16 no chão, esperando o pavio para soltar a luva. */
+    final List<Armadilha> traps = new ArrayList<>();
     /** Shadow copies of moves (p06's echo) waiting or playing. */
     final List<Echo> echoes = new ArrayList<>();
     /** Henchmen called by a Super (p07): they run in, strike once and run off. */
@@ -266,6 +268,7 @@ final class CombatEngine {
         energyProjectiles.clear();
         superProjectiles.clear();
         puddles.clear();
+        traps.clear();
         echoes.clear();
         henchmen.clear();
         events.clear();
@@ -458,6 +461,7 @@ final class CombatEngine {
                 f.jumpGrace = 0;
             }
             if (command != null && !"S".equals(command)) {
+                f.commandButton = button;
                 f.buffer.push(InputBuffer.Button.SPECIAL, command, false);
             } else if (command != null) {
                 // The command only arms the special; the strongest button pressed picks its strength.
@@ -1920,6 +1924,11 @@ final class CombatEngine {
         p.totalHits = data.hits;
         p.hitInterval = data.hitInterval;
         if (data.puddleFrames > 0) p.puddle = data;
+        if (data.trapFuse != null) {
+            // Caixa surpresa: o botão escolhe o pavio (L abre logo, H demora).
+            p.trap = data;
+            p.fuse = data.trapFuse["L".equals(f.commandButton) ? 0 : "H".equals(f.commandButton) ? 2 : 1];
+        }
         (superKind ? superProjectiles : energyProjectiles).add(p);
     }
 
@@ -1932,6 +1941,30 @@ final class CombatEngine {
         moveProjectiles(superProjectiles, 180f);
         clashProjectiles();
         advancePuddles();
+        advanceTraps();
+    }
+
+    /**
+     * A armadilha conta o pavio e abre; no pico da abertura a luva salta: um projétil parado na
+     * frente da caixa, que acerta pelo caminho dos projéteis enquanto a luva fica esticada.
+     */
+    private void advanceTraps() {
+        Iterator<Armadilha> it = traps.iterator();
+        while (it.hasNext()) {
+            Armadilha t = it.next();
+            if (!t.open()) {
+                t.fuse--;
+                continue;
+            }
+            CharacterDefinition.Projectile d = t.data;
+            if (t.opened == d.trapActiveFrom) {
+                float speed = 60f;   // 1 px por quadro: dura os quadros ativos e some
+                energyProjectiles.add(new Projectile(t.x + t.direction * d.trapReach, Arena.GROUND_Y - d.trapHeight,
+                    speed * d.trapActive / 60f, speed, d.trapRadius, t.damage, t.color, t.ownerIndex,
+                    t.direction, t.attack, "LUVA"));
+            }
+            if (++t.opened >= d.trapDuration) it.remove();
+        }
     }
 
     /**
@@ -1996,6 +2029,13 @@ final class CombatEngine {
 
     /** O projétil que cai (seringa) chega ao chão: vira poça (uma por dono) ou some. */
     private void land(Projectile p) {
+        if (p.trap != null) {
+            for (Iterator<Armadilha> it = traps.iterator(); it.hasNext();) {
+                if (it.next().ownerIndex == p.ownerIndex) it.remove();
+            }
+            traps.add(new Armadilha(p.x, p.ownerIndex, p.direction, p.color, p.damage, p.attack, p.trap, p.fuse));
+            return;
+        }
         if (p.puddle == null) return;
         for (Iterator<Puddle> it = puddles.iterator(); it.hasNext();) {
             if (it.next().ownerIndex == p.ownerIndex) it.remove();
@@ -2138,7 +2178,7 @@ final class CombatEngine {
         Iterator<Projectile> it = projectiles.iterator();
         while (it.hasNext()) {
             Projectile p = it.next();
-            if (p.returning) continue;
+            if (p.returning || p.trap != null) continue;   // a caixa em voo não acerta: quem bate é a luva
             if (p.hitCooldown > 0) {
                 p.hitCooldown--;
                 continue;

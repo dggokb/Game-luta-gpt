@@ -214,7 +214,7 @@ def commands(pack, spec):
 
 
 VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
-           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO', 'BALAO')
+           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO', 'BALAO', 'CAIXA')
 RENTE = 14        # altura da saída do projétil rente ao chão (px acima do pé)
 MELEE_ACTIVE = 4  # quadros ativos do S1 corpo a corpo (o projétil tem 1)
 MELEE_KEYS = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback', 'low')
@@ -304,6 +304,13 @@ def especiais(pack, spec):
                 m.pop(k, None)
             proj = {'visual': p['visual'], 'range': p['alcance'], 'speed': p['velocidade'],
                     'spawnX': p['saidaX'], 'spawnY': p['saidaY'], 'vertical': p.get('vertical', 0)}
+            if 'armadilha' in p:
+                # Caixa surpresa (p16): cai e vira armadilha; o pavio de cada botão (L, M, H),
+                # os quadros abertos e a janela em que a luva acerta, altura e avanço da luva.
+                a = p['armadilha']
+                proj['trap'] = {'fuse': a['pavio'], 'duration': a['aberta'], 'activeFrom': a['acertaDe'],
+                                'active': a['acerta'], 'height': a['altura'], 'reach': a['avanco'],
+                                'radius': a['raio']}
             if 'poca' in p:
                 q = p['poca']
                 proj['puddle'] = {'frames': q['frames'], 'halfWidth': q['largura'] / 2,
