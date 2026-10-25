@@ -44,6 +44,8 @@ final class ImpactFeel {
      */
     static final int NONE = 0, RED = 1, VOID = 2;
     static final int STYLE_FRAMES = 2, NEGATIVE_FRAMES = 1;
+    /** Quadros do impact frame forte (a pancada que fecha o golpe): o dobro e mais um. */
+    static final int STRONG_STYLE_FRAMES = 5;
     /** Quadros sem outro impact frame do mesmo peso (a tela não fica piscando num combo). */
     static final int IMPACT_COOLDOWN = 30;
 
@@ -127,11 +129,16 @@ final class ImpactFeel {
 
     /** {@code every}: ignora o intervalo (cada pancada do Super ganha o seu, a torta e a marreta). */
     void impactFrame(int style, float x, float y, boolean every) {
+        impactFrame(style, x, y, every, false);
+    }
+
+    /** {@code strong}: o impact frame dura {@link #STRONG_STYLE_FRAMES} (a pancada que fecha o golpe). */
+    void impactFrame(int style, float x, float y, boolean every, boolean strong) {
         if (style == NONE) return;
-        if (!every && impactCooldown > 0 && style <= impactStyle) return;
+        if (!every && !strong && impactCooldown > 0 && style <= impactStyle) return;
         impactStyle = style;
         // +1: o passo da luta que pediu ainda conta um quadro antes de desenhar.
-        impactLeft = STYLE_FRAMES + NEGATIVE_FRAMES + 1;
+        impactLeft = (strong ? STRONG_STYLE_FRAMES : STYLE_FRAMES) + NEGATIVE_FRAMES + 1;
         impactCooldown = IMPACT_COOLDOWN;
         impactX = x;
         impactY = y;

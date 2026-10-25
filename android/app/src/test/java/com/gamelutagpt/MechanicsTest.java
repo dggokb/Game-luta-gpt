@@ -184,8 +184,12 @@ public class MechanicsTest {
 
     /** Hitstop of each strike of a several-strike H, by contact; {@code stop}: strikeStop (0 = default). */
     private static int[] strikeHitstops(int stop) {
+        return strikeHitstops(stop, 0);
+    }
+
+    private static int[] strikeHitstops(int stop, int last) {
         AttackDefinition.Builder b = move("H", 6, 16, 12).stun(20, 10, 12).strikes(6, 16);
-        if (stop > 0) b.strikeStop(stop);
+        if (stop > 0) b.strikeStop(stop, last);
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(b.build()), BASE, 500f, 600f);
         s.in[0].heavy = true;
         int[] stops = new int[2];
@@ -203,6 +207,12 @@ public class MechanicsTest {
         assertTrue("by default the first strike pauses less: " + plain[0] + " " + plain[1], plain[0] < plain[1]);
         assertEquals("pie", 24, held[0]);
         assertTrue("mallet, plus the hold of the last strike: " + held[1], held[1] >= 24);
+    }
+
+    @Test public void finalStopHoldsTheLastStrikeLonger() {
+        int[] held = strikeHitstops(16, 34);
+        assertEquals("punch", 16, held[0]);
+        assertTrue("the closing kick: " + held[1], held[1] >= 34);
     }
 
     @Test public void strikeHoldPlacesTheDefenderAndPinsItDownUntilTheMoveEnds() {

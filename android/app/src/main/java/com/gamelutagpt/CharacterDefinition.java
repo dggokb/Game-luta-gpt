@@ -299,6 +299,35 @@ final class CharacterDefinition {
             this.hidden=hidden.clone();this.blackout=blackout;this.blast=blast;this.camera=camera;
             return this;
         }
+        /** Trechos {de, até} em que quem bate some (o zanzoken do Mugen Rendan da p15). */
+        int[][] vanish=new int[0][];
+        /** {quadro, distância}: nesse quadro ela reaparece essa distância para trás (longe do rival), ou null. */
+        float[] retreat;
+        /** O sumiço do Mugen Rendan da p15: só o recuo mexe na luta (o resto é apresentação). */
+        UltraSequence withVanish(int[][] vanish,float[] retreat) {
+            for(int[] w:vanish)if(w.length!=2||w[0]>=w[1]||w[1]>length)throw new IllegalArgumentException("ultra sequence: vanish {from, to}");
+            if(retreat!=null&&(retreat.length!=2||retreat[0]<0||retreat[0]>=length||retreat[1]<=0f))
+                throw new IllegalArgumentException("ultra sequence: retreat {frame, distance}");
+            this.vanish=vanish.clone();this.retreat=retreat;
+            return this;
+        }
+        /** Quem bate está sumido neste quadro (zanzoken). */
+        boolean hidesAttacker(float frame) {
+            for(int[] w:vanish)if(frame>=w[0]&&frame<w[1])return true;
+            return false;
+        }
+        /** Quadros desde o último sumiço que começou (o rastro que fica), ou -1. */
+        float sinceVanish(float frame) {
+            float since=-1f;
+            for(int[] w:vanish)if(frame>=w[0])since=frame-w[0];
+            return since;
+        }
+        /** Quadros desde o último reaparecimento, ou -1. */
+        float sinceReappear(float frame) {
+            float since=-1f;
+            for(int[] w:vanish)if(frame>=w[1])since=frame-w[1];
+            return since;
+        }
         /** O plano fixo que vale neste quadro ({quadro, frente, altura, zoom}), ou null sem câmera própria. */
         float[] shotAt(float frame) {
             if(camera==null||camera.length==0)return null;

@@ -30,6 +30,8 @@ final class CombatEngine {
         float impactX = Float.NaN, impactY = Float.NaN;
         /** Button class of the contact, or null when unknown. Presentation only. */
         AttackDefinition.Strength strength;
+        /** Última pancada de um golpe com pausa final própria (o chute que fecha o Super da p15). */
+        boolean finalStrike;
         HitEvent(int attacker, int defender, int damage, boolean blocked, boolean projectile, String moveId) {
             this.attacker = attacker;
             this.defender = defender;
@@ -2432,6 +2434,7 @@ final class CombatEngine {
             a.ultraHitsDone = 0;
             a.ultraPaused = false;
             a.ultraPageDone = false;
+            a.ultraRetreated = false;
             a.ultraFinalBonus = 0f;
             a.ultraVictim = d;
             a.ultraVictimState = d.state;
@@ -2460,6 +2463,13 @@ final class CombatEngine {
         // Zerado no meio do Ultra, ele continua preso e levando os golpes (sem dano) até o golpe
         // final, que é o que joga longe: voando antes, o golpe final e a finalização de mangá
         // aconteciam no vento.
+        if (seq.retreat != null && !a.ultraRetreated && a.ultraFrame >= seq.retreat[0]) {
+            // Zanzoken: ela reaparece longe; o rival continua onde estava, preso até o golpe final.
+            a.ultraRetreated = true;
+            float from = a.x;
+            a.x = Arena.clamp(a.x - a.facing * seq.retreat[1], Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            a.ultraHoldGap += Math.abs(from - a.x);
+        }
         if (a.ultraHitsDone < seq.hits.length) holdUltraVictim(a, d, seq);
         int finalHit = seq.hits.length - 1;
         if (config.ultraSequencePage && !a.ultraPageDone && a.ultraHitsDone == finalHit &&
@@ -2973,7 +2983,8 @@ final class CombatEngine {
             a.strikeJuggled = true;
         }
         if (!d.grounded) session.airCombo = true;
-        int stop = multi && attack.strikeStop > 0 ? attack.strikeStop
+        boolean finalStrike = multi && lastStrike && attack.finalStop > 0;
+        int stop = finalStrike ? attack.finalStop : multi && attack.strikeStop > 0 ? attack.strikeStop
             : lastStrike ? attack.hitstopFrames : holdingHitstop(attack);
         if (lastStrike && !projectile) stop += hitHold(attack);
         if (punish) stop += config.punishHitstopBonus;
@@ -2986,7 +2997,9 @@ final class CombatEngine {
             (d.status == CombatFighter.Status.HITSTUN || punish || spinHit || wallBounce)) {
             cutRecovery(a, attack, attack.hitWindow);
         }
-        events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
+        HitEvent hit = new HitEvent(a.index, d.index, damage, false, projectile, attack.id);
+        hit.finalStrike = finalStrike;
+        events.add(hit);
     }
 
     /**

@@ -212,6 +212,8 @@ final class CombatFighter {
      * (já pediu uma vez nesta sequência), e o bônus da nota do toque para o último golpe.
      */
     boolean ultraPaused, ultraPageDone;
+    /** O recuo do Ultra em sequência já aconteceu (a p15 reaparece longe uma vez só). */
+    boolean ultraRetreated;
     float ultraFinalBonus;
     /** Who the sequence caught (a partner coming in after a KO is not held or hit). */
     CombatFighter ultraVictim;

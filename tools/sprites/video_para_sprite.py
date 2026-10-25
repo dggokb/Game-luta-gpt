@@ -67,6 +67,21 @@ def best_loop(frames, lo, hi, min_len):
 # Fundo é o verde da tela, que é claro (v ~240): preto com reflexo verde (ponta da faixa, luva,
 # cabelo) tem matiz e saturação de verde, mas é escuro, e é do personagem.
 SCREEN_MIN_V = 100
+# Vídeo que escurece o fundo (o Ultra da p15 apaga a luz do verde): o mínimo cai com o verde da
+# borda do quadro, até este piso; o personagem não escurece junto.
+SCREEN_MIN_V_FLOOR = 36
+
+
+def screen_min_v(hsv):
+    """Brilho mínimo do verde da tela neste quadro: SCREEN_MIN_V no fundo de sempre, menos no
+    fundo escurecido (55% do verde medido na borda do quadro)."""
+    b = 8
+    border = np.concatenate([hsv[:b].reshape(-1, 3), hsv[-b:].reshape(-1, 3),
+                             hsv[:, :b].reshape(-1, 3), hsv[:, -b:].reshape(-1, 3)])
+    green = border[(border[:, 0] > 35) & (border[:, 0] < 95) & (border[:, 1] > 45)]
+    if len(green) < 100:
+        return SCREEN_MIN_V
+    return int(min(SCREEN_MIN_V, max(SCREEN_MIN_V_FLOOR, 0.55 * float(np.median(green[:, 2])))))
 JOIN_GAP = 7       # px: peça grande a essa distância do corpo é do corpo (faixa verde da roupa)
 JOIN_AREA = 800
 
@@ -102,10 +117,10 @@ def floor_dust(alpha, h, s, v):
     return band & (tinted | beige)
 
 
-def key(frame, dust=False, effects=False, floor=False, soft=False, objects=0):
+def key(frame, dust=False, effects=False, floor=False, soft=False, objects=0, glow=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
-    bg = (h > 35) & (h < 95) & (s > 45) & (v >= SCREEN_MIN_V)
+    bg = (h > 35) & (h < 95) & (s > 45) & (v >= screen_min_v(hsv))
     if dust:  # poeira bege dos pés (o jogo desenha os efeitos)
         bg |= (h >= 8) & (h <= 34) & (s >= 18) & (s <= 70) & (v >= 120)
     if effects:
@@ -145,7 +160,57 @@ def key(frame, dust=False, effects=False, floor=False, soft=False, objects=0):
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(int)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda
     out = np.dstack([rgb.astype(np.uint8), alpha])
-    return soft_edges(frame, out) if soft else out
+    out = soft_edges(frame, out) if soft else out
+    return keep_glow(frame, out) if glow else out
+
+
+GLOW_MIN = 0.1        # alfa mínimo do halo (abaixo é ruído da compressão no verde)
+GLOW_CORE = 0.85      # alfa do miolo que faz uma mancha clara ser efeito, e não ruído
+GLOW_CORE_AREA = 12   # px do vídeo de miolo para a mancha contar
+GLOW_LIGHT = 150      # brilho mínimo da cor tirada do verde (sombra no chão sai escura)
+GLOW_REACH = 31       # px do vídeo além da mancha onde o halo ainda se espalha
+GLOW_BLUR = 31        # px do vídeo da suavização do halo (some com os blocos da compressão)
+
+
+def keep_glow(frame, rgba):
+    """Efeito de luz desenhado pelo vídeo (bola de energia, brilho na mão, raio), mantido com o
+    halo meio transparente: o key() corta o halo, que é amarelo misturado com o verde (matiz de
+    fundo), e o keep_largest apaga o raio, solto do corpo. Aqui cada pixel ganha o alfa pelo quanto
+    o verde do fundo sumiu dele (alfa = 1 - verde / verde do fundo) e a cor sem o fundo; ficam as
+    manchas claras com miolo forte (o ruído do verde tem alfa baixo e nenhum miolo). O corpo
+    recortado continua por cima."""
+    f = frame.astype(np.float32)
+    green = f[..., 1] - np.maximum(f[..., 0], f[..., 2])
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    screen = (hsv[..., 0] > 35) & (hsv[..., 0] < 95) & (hsv[..., 1] > 45) & (hsv[..., 2] >= screen_min_v(hsv))
+    if screen.sum() < 100:
+        return rgba
+    full = float(np.median(green[screen]))
+    color = np.median(f[screen], axis=0)
+    a = np.clip(1 - green / max(1.0, full), 0, 1)
+    unmixed = np.clip((f - (1 - a[..., None]) * color) / np.maximum(a, 1e-3)[..., None], 0, 255)
+    light = (a >= GLOW_MIN) & (unmixed.max(axis=2) >= GLOW_LIGHT)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(light.astype(np.uint8))
+    core = np.bincount(labels[light & (a >= GLOW_CORE)], minlength=n)
+    keep = np.isin(labels, [i for i in range(1, n) if core[i] >= GLOW_CORE_AREA])
+    # O halo fraco vem em blocos da compressão: a borda da mancha e o alfa são suavizados, e a
+    # cor de cada pixel é a média ponderada pelo alfa em volta (no halo fraco a cor tirada do
+    # verde é só ruído).
+    near = cv2.dilate(keep.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (GLOW_REACH,) * 2)) > 0
+    glow = cv2.GaussianBlur(np.where(near, a, 0).astype(np.float32), (GLOW_BLUR, GLOW_BLUR), 0)
+    glow = np.where(keep & (a >= 0.5), a, glow)
+    weight = cv2.GaussianBlur(np.where(keep, a, 0).astype(np.float32), (GLOW_BLUR, GLOW_BLUR), 0)
+    tint = cv2.GaussianBlur(unmixed * np.where(keep, a, 0)[..., None], (GLOW_BLUR, GLOW_BLUR), 0)
+    # Longe do miolo o peso some: a cor tende à do miolo (sem ela, o halo de fora sai escuro).
+    base = np.median(unmixed[keep & (a >= GLOW_CORE)], axis=0) if (keep & (a >= GLOW_CORE)).any() else color
+    tint = (tint + 0.05 * base) / (weight + 0.05)[..., None]
+    rgb = np.where(keep[..., None], unmixed, tint)[..., ::-1]
+    out = rgba.copy()
+    alpha = (np.clip(glow, 0, 1) * 255).astype(np.uint8)
+    more = (alpha >= 10) & (alpha > out[..., 3])
+    out[..., 3][more] = alpha[more]
+    out[..., :3][more] = np.clip(rgb[more], 0, 255).astype(np.uint8)
+    return out
 
 
 SOFT_FROM = 14      # "verde" (G - max(R, B)) até onde o pixel é todo do personagem
@@ -163,7 +228,7 @@ def soft_edges(frame, rgba):
     (alfa = 1 - verde / verde do fundo), com a cor do fundo tirada da mistura."""
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
-    screen = (h > 35) & (h < 95) & (s > 45) & (v >= SCREEN_MIN_V)
+    screen = (h > 35) & (h < 95) & (s > 45) & (v >= screen_min_v(hsv))
     alpha = rgba[..., 3].copy()
     n, labels, stats, _ = cv2.connectedComponentsWithStats(screen.astype(np.uint8))
     for i in range(1, n):
@@ -237,7 +302,7 @@ def torso_x(rgba):
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
-              sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
+              sem_poeira=False, sem_efeitos=False, manter_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
               balanco=1.0, objetos=0)
 
@@ -260,6 +325,9 @@ def parser():
     p.add_argument("--largura", type=int, help="largura da célula (padrão: igual à altura)")
     p.add_argument("--sem-poeira", action="store_true", help="remove poeira bege do chão")
     p.add_argument("--sem-efeitos", action="store_true", help="remove clarão de impacto e rastro de golpe")
+    p.add_argument("--manter-efeitos", action="store_true",
+                   help="mantém o efeito de luz do vídeo com o halo meio transparente (keep_glow): "
+                        "bola de energia, brilho na mão, raio solto do corpo")
     p.add_argument("--recorte-suave", action="store_true",
                    help="mechas de cabelo meio transparentes e vãos de fundo entre elas abertos (soft_edges)")
     p.add_argument("--limpar-chao", action="store_true",
@@ -430,9 +498,9 @@ def main(argv=None):
     cache = {}
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
-        soft, objects = args.recorte_suave, args.objetos
+        soft, objects, glow = args.recorte_suave, args.objetos, args.manter_efeitos
         if (i, dust, effects, floor, soft) not in cache:
-            cache[i, dust, effects, floor, soft] = key(frames[i], dust, effects, floor, soft, objects)
+            cache[i, dust, effects, floor, soft] = key(frames[i], dust, effects, floor, soft, objects, glow)
         return cache[i, dust, effects, floor, soft]
 
     measured = None
@@ -497,8 +565,16 @@ def main(argv=None):
     for n, (k, off) in enumerate(zip(keyed, offsets)):
         s = (scale / args.reescala[n] if args.reescala else scale) * d
         img = Image.fromarray(k, "RGBA")
-        img = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
-        if args.nitidez:
+        size = (round(img.width * s), round(img.height * s))
+        img = img.resize(size, Image.LANCZOS)
+        if args.nitidez and args.manter_efeitos:
+            # A nitidez sangra a cor do corpo na borda meio transparente e tira o verde dela: o
+            # halo do efeito ficaria marrom e laranja. Só o corpo (recortado sem o efeito) é
+            # afiado, por cima do efeito.
+            body = key(frames[picked[n]], args.sem_poeira, True, args.limpar_chao,
+                       args.recorte_suave, args.objetos)
+            img.alpha_composite(sharpen(Image.fromarray(body, "RGBA").resize(size, Image.LANCZOS), d))
+        elif args.nitidez:
             img = sharpen(img, d)
         x = rx - round((ref_x - off) * s)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y

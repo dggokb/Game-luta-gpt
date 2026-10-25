@@ -279,6 +279,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     args.append(f"--balanco={opts.get('balanco', 1.0)}")
     if opts.get('sem_efeitos'):
         args.append('--sem-efeitos')  # rastro e brilho desenhados pelo vídeo (machado do p15)
+    if opts.get('manter_efeitos'):
+        args.append('--manter-efeitos')  # bola de energia e raio desenhados pelo vídeo (S1 do p15)
     if opts.get('recorte_suave'):
         args.append('--recorte-suave')  # mechas finas de cabelo (p15)
     # Sempre explícito: sem ele o video_para_sprite reaproveita o da receita gravada antes.

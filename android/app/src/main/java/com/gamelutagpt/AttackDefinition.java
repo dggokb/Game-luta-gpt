@@ -147,6 +147,11 @@ final class AttackDefinition {
      */
     final int strikeStop;
     /**
+     * Pausa da última pancada de um golpe com {@link #strikeStop}, em quadros; 0 = a mesma das
+     * outras. O chute que fecha o Super da p15 segura mais e ganha o impact frame forte.
+     */
+    final int finalStop;
+    /**
      * Onde cada pancada deixa o rival (px à frente de quem bate), ou null: a torta põe o rosto
      * no creme e a marreta deixa o rival deitado debaixo dela até o golpe acabar (o Super da p16).
      */
@@ -197,6 +202,7 @@ final class AttackDefinition {
         juggleCost = b.juggleCost;
         maxHits = b.strikes.length > 0 ? b.strikes.length : b.maxHits;
         strikeStop = b.strikeStop;
+        finalStop = b.finalStop;
         strikeHold = b.strikeHold;
         maxUsesPerCombo = b.maxUses;
         maxUsesPerChain = b.maxChainUses;
@@ -307,7 +313,7 @@ final class AttackDefinition {
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
         private int[] strikes = new int[0];
-        private int strikeStop;
+        private int strikeStop, finalStop;
         private float[] strikeHold;
         private final List<Box> hurtboxes = new ArrayList<>();
         private Mechanics mechanics = NO_MECHANICS;
@@ -337,6 +343,7 @@ final class AttackDefinition {
         /** Frames where each strike of the animation lands; the first is the end of the startup. */
         Builder strikes(int... frames) { strikes = frames.clone(); return this; }
         Builder strikeStop(int frames) { strikeStop = frames; return this; }
+        Builder strikeStop(int frames, int last) { strikeStop = frames; finalStop = last; return this; }
         Builder strikeHold(float... gaps) { strikeHold = gaps.clone(); return this; }
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
         Builder maxUsesPerChain(int value) { maxChainUses = value; return this; }
@@ -392,6 +399,9 @@ final class AttackDefinition {
             }
             if (strikeStop < 0 || strikeStop > 0 && strikes.length == 0) {
                 throw new IllegalArgumentException(name + "strikeStop is the pause of each strike of a several-strike move");
+            }
+            if (finalStop < 0 || finalStop > 0 && strikeStop == 0) {
+                throw new IllegalArgumentException(name + "finalStop is the pause of the last strike of a strikeStop move");
             }
             for (Box box : hitboxes) {
                 if (box.firstFrame < startup || box.lastFrame > lastActive || box.firstFrame > box.lastFrame) {

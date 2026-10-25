@@ -2764,11 +2764,11 @@ final class GeneratedSpriteLayouts {
     static final int P15_RISE_ROOT_Y = 493;
     static final int P15_RISE_FRAME_COUNT = 9;
 
-    static final int P15_SPECIAL_ENERGY_FRAME_WIDTH = 430;
-    static final int P15_SPECIAL_ENERGY_FRAME_HEIGHT = 510;
-    static final int P15_SPECIAL_ENERGY_ROOT_X = 157;
-    static final int P15_SPECIAL_ENERGY_ROOT_Y = 493;
-    static final int P15_SPECIAL_ENERGY_FRAME_COUNT = 11;
+    static final int P15_SPECIAL_ENERGY_FRAME_WIDTH = 917;
+    static final int P15_SPECIAL_ENERGY_FRAME_HEIGHT = 615;
+    static final int P15_SPECIAL_ENERGY_ROOT_X = 339;
+    static final int P15_SPECIAL_ENERGY_ROOT_Y = 596;
+    static final int P15_SPECIAL_ENERGY_FRAME_COUNT = 23;
 
     static final int P15_SPECIAL_S2_FRAME_WIDTH = 344;
     static final int P15_SPECIAL_S2_FRAME_HEIGHT = 554;
@@ -2782,11 +2782,11 @@ final class GeneratedSpriteLayouts {
     static final int P15_SPECIAL_S3_ROOT_Y = 519;
     static final int P15_SPECIAL_S3_FRAME_COUNT = 39;
 
-    static final int P15_SPECIAL_S4_FRAME_WIDTH = 613;
-    static final int P15_SPECIAL_S4_FRAME_HEIGHT = 724;
-    static final int P15_SPECIAL_S4_ROOT_X = 276;
-    static final int P15_SPECIAL_S4_ROOT_Y = 706;
-    static final int P15_SPECIAL_S4_FRAME_COUNT = 37;
+    static final int P15_SPECIAL_S4_FRAME_WIDTH = 782;
+    static final int P15_SPECIAL_S4_FRAME_HEIGHT = 574;
+    static final int P15_SPECIAL_S4_ROOT_X = 251;
+    static final int P15_SPECIAL_S4_ROOT_Y = 563;
+    static final int P15_SPECIAL_S4_FRAME_COUNT = 29;
 
     static final int P15_SUPER_WAVE_FRAME_WIDTH = 623;
     static final int P15_SUPER_WAVE_FRAME_HEIGHT = 552;

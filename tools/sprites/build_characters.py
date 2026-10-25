@@ -217,7 +217,8 @@ def validate_command_extras(name, m, special):
 
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
-    known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera'}
+    known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
+             'zanzoken','recuo'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -245,6 +246,12 @@ def validate_ultra(name, u, animations):
                                             and k[3] >= 1 for k in shots)
             and [k[0] for k in shots] == sorted({k[0] for k in shots})):
         raise ValueError(f'{name}.ultra.camera: [[quadro, frente, altura, zoom >= 1], ...] by growing frame')
+    # Zanzoken (o Mugen Rendan da p15): ela some deixando a imagem e reaparece; recuo: reaparece longe.
+    if not all(window(w) and w[1] <= u['duracao'] for w in u.get('zanzoken', [])):
+        raise ValueError(f'{name}.ultra.zanzoken: [de, até] frames inside the sequence')
+    if 'recuo' in u and not (isinstance(u['recuo'], list) and len(u['recuo']) == 2 and type(u['recuo'][0]) is int
+                             and 0 <= u['recuo'][0] < u['duracao'] and number(u['recuo'][1]) and u['recuo'][1] > 0):
+        raise ValueError(f'{name}.ultra.recuo: [quadro, distância > 0]')
     if 'ULTRA_SEQ' not in animations:
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
@@ -318,6 +325,9 @@ def validate_attack(name, m, projectile):
     if 'pausaGolpes' in m:
         non_negative_int(m['pausaGolpes'], f'{name}.pausaGolpes')
         if 'golpes' not in m: raise ValueError(f'{name}.pausaGolpes: the pause of each strike needs golpes')
+    if 'pausaFinal' in m:
+        non_negative_int(m['pausaFinal'], f'{name}.pausaFinal')
+        if not m.get('pausaGolpes'): raise ValueError(f'{name}.pausaFinal: the last strike pause needs pausaGolpes')
     if projectile and 'golpes' not in m and name.endswith('.energy.attack') and 'reach' in m:
         # S corpo a corpo (tapa, investida): bate com a caixa padrão em vez de lançar.
         if 'hitHeight' not in m or m.get('hitboxes'):
@@ -584,7 +594,7 @@ def compile_packs(root, results):
         if 'juggleCost' in m: code += '.juggleCost('+str(m['juggleCost'])+')'
         if 'maxHits' in m: code += '.maxHits('+str(m['maxHits'])+')'
         if 'golpes' in m: code += '.strikes('+','.join(map(str,m['golpes']))+')'
-        if m.get('pausaGolpes'): code += '.strikeStop('+str(m['pausaGolpes'])+')'
+        if m.get('pausaGolpes'): code += '.strikeStop('+str(m['pausaGolpes'])+(','+str(m['pausaFinal']) if m.get('pausaFinal') else '')+')'
         if m.get('segurarRival'): code += '.strikeHold('+','.join(f(v) for v in m['segurarRival'])+')'
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
         if 'maxUsesPerChain' in m: code += '.maxUsesPerChain('+str(m['maxUsesPerChain'])+')'
@@ -628,6 +638,9 @@ def compile_packs(root, results):
                      +floats('explosao')+','
                      +('new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u['camera'])+'}'
                        if u.get('camera') else 'null')+')')
+        if 'zanzoken' in u or 'recuo' in u:
+            scene += ('.withVanish(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('zanzoken', []))+'},'
+                      +('new float[]{'+','.join(f(v) for v in u['recuo'])+'}' if 'recuo' in u else 'null')+')')
         return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
                 +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
                 +',new float[][]{'+hold+'})'+scene+')')

@@ -12,6 +12,8 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     some      [de, até] em que o rival não aparece; preto: [de, até] com a tela preta
     explosao  [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo
     camera    planos fixos [quadro, frente, altura, zoom] da sequência (corte seco de um para o outro)
+    zanzoken  [de, até] em que ela some (deixa a imagem para trás) e reaparece
+    recuo     [quadro, distância] em que ela reaparece longe do rival (px do jogo para trás)
 
 "segurar" ([quadro, quadros do jogo]) segura um quadro da folha mais tempo (a tela preta da p16).
 
@@ -125,6 +127,11 @@ def timeline(spec, picked, speed):
         ultra['explosao'] = [at(v), dx, dy, angle]
     if spec.get('camera'):
         ultra['camera'] = [[max(0, at(v)), dx, dy, zoom] for v, dx, dy, zoom in spec['camera']]
+    if spec.get('zanzoken'):
+        ultra['zanzoken'] = [[at(a), at(b)] for a, b in spec['zanzoken']]
+    if spec.get('recuo'):
+        v, distance = spec['recuo']
+        ultra['recuo'] = [at(v), distance]
     return durations, ultra
 
 

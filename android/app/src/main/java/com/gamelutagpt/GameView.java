@@ -2396,8 +2396,11 @@ public class GameView extends SurfaceView
         if (!event.blocked && pausa.impacto()) {
             // O golpe que segura cada pancada (o Super da p16) ganha um impact frame em todas.
             boolean everyStrike = !event.projectile && attacker.attacking() && attacker.attack.strikeStop > 0;
-            feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y, everyStrike);
+            feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y, everyStrike,
+                event.finalStrike);
         }
+        // A pancada que fecha o golpe (o chute do Super da p15) treme a tela como um KO.
+        if (!event.blocked && event.finalStrike) beamShake = Math.max(beamShake, 14f);
         if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
             (knockout || bigBlow(attacker, defender))) {
             // O H que joga na parede ganha um close mais aberto que o lançador e o KO.
