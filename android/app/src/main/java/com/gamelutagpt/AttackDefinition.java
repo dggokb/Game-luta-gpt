@@ -65,6 +65,11 @@ final class AttackDefinition {
         /** Counter stance: a melee strike it reads in the window is answered by this move. */
         Reads counter = Reads.NONE;
         int counterStart, counterEnd;
+        /**
+         * Repel (o S2 da p15): a postura só bate quando repele (sem nada chegando, a janela passa
+         * e é só a recuperação, aberta), e o projétil que chega na janela se desfaz.
+         */
+        boolean repel;
         /** Evasion: HIGH slips standing/air strikes and projectiles, ANY everything. */
         Reads evade = Reads.NONE;
         int evadeStart, evadeEnd;
@@ -97,6 +102,7 @@ final class AttackDefinition {
 
         Mechanics armor(int hits, int start, int end) { armorHits = hits; armorStart = start; armorEnd = end; return this; }
         Mechanics counter(Reads reads, int start, int end) { counter = reads; counterStart = start; counterEnd = end; return this; }
+        Mechanics repel() { repel = true; return this; }
         Mechanics evade(Reads reads, int start, int end) { evade = reads; evadeStart = start; evadeEnd = end; return this; }
         Mechanics advance(float speed, int start, int end, boolean through) {
             advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;
@@ -448,6 +454,7 @@ final class AttackDefinition {
             if (m.advanceSpeed != 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
             if (m.poisonDamage > 0 && m.poisonFrames < 1) throw new IllegalArgumentException(name + "poison needs frames");
+            if (m.repel && m.counter == Reads.NONE) throw new IllegalArgumentException(name + "a repel is a counter stance");
             if (m.counter != Reads.NONE && (kind != Kind.NORMAL || m.counterEnd >= startup)) {
                 throw new IllegalArgumentException(name + "a counter stance is a melee move that reads before its strike");
             }

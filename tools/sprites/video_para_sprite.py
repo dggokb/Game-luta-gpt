@@ -161,7 +161,7 @@ def key(frame, dust=False, effects=False, floor=False, soft=False, objects=0, gl
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda
     out = np.dstack([rgb.astype(np.uint8), alpha])
     out = soft_edges(frame, out) if soft else out
-    return keep_glow(frame, out) if glow else out
+    return keep_glow(frame, out, glow if isinstance(glow, (tuple, list)) else None) if glow else out
 
 
 GLOW_MIN = 0.1        # alfa mínimo do halo (abaixo é ruído da compressão no verde)
@@ -169,16 +169,30 @@ GLOW_CORE = 0.85      # alfa do miolo que faz uma mancha clara ser efeito, e nã
 GLOW_CORE_AREA = 12   # px do vídeo de miolo para a mancha contar
 GLOW_LIGHT = 150      # brilho mínimo da cor tirada do verde (sombra no chão sai escura)
 GLOW_REACH = 31       # px do vídeo além da mancha onde o halo ainda se espalha
+GLOW_EDGE = 60        # px do vídeo junto da borda em que o efeito apaga
+GLOW_NO_BLUE = 25     # azul abaixo do qual o pixel do corpo é mistura do efeito com o verde
+GLOW_TINTED = 0.6     # verde do miolo (fração do verde do fundo) abaixo do qual o efeito é colorido
 GLOW_BLUR = 31        # px do vídeo da suavização do halo (some com os blocos da compressão)
 
 
-def keep_glow(frame, rgba):
+def effect_in_body(frame, rgba):
+    """Pixels que o key() deu como corpo e são o efeito misturado ao verde: sem azul (vermelho,
+    laranja, amarelo); roupa, pele e cabelo têm."""
+    f = frame.astype(np.float32)
+    return (rgba[..., 3] >= 128) & (f[..., 0] < GLOW_NO_BLUE) & (np.maximum(f[..., 1], f[..., 2]) > 120)
+
+
+def keep_glow(frame, rgba, tint=None):
     """Efeito de luz desenhado pelo vídeo (bola de energia, brilho na mão, raio), mantido com o
     halo meio transparente: o key() corta o halo, que é amarelo misturado com o verde (matiz de
     fundo), e o keep_largest apaga o raio, solto do corpo. Aqui cada pixel ganha o alfa pelo quanto
     o verde do fundo sumiu dele (alfa = 1 - verde / verde do fundo) e a cor sem o fundo; ficam as
     manchas claras com miolo forte (o ruído do verde tem alfa baixo e nenhum miolo). O corpo
-    recortado continua por cima."""
+    recortado continua por cima.
+
+    tint (R, G, B): a cor do efeito, quando ela é conhecida (a aura vermelha do S2 da p15): o alfa
+    de cada pixel sai do quanto o verde do fundo caiu em direção ao verde dessa cor, em todos os
+    pixels claros ou misturados, e a aura que o key() juntou ao corpo sai do corpo."""
     f = frame.astype(np.float32)
     green = f[..., 1] - np.maximum(f[..., 0], f[..., 2])
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -189,10 +203,43 @@ def keep_glow(frame, rgba):
     color = np.median(f[screen], axis=0)
     a = np.clip(1 - green / max(1.0, full), 0, 1)
     unmixed = np.clip((f - (1 - a[..., None]) * color) / np.maximum(a, 1e-3)[..., None], 0, 255)
-    light = (a >= GLOW_MIN) & (unmixed.max(axis=2) >= GLOW_LIGHT)
+    # Efeito colado no corpo, que o key() juntou ao corpo: a mistura dele com o verde não tem azul
+    # (vermelho, laranja, amarelo); roupa, pele e cabelo têm. Fora disso o corpo fica de fora.
+    mixed = effect_in_body(frame, rgba)
+    light = (a >= GLOW_MIN) & (unmixed.max(axis=2) >= GLOW_LIGHT) & ((rgba[..., 3] < 128) | mixed)
     n, labels, stats, _ = cv2.connectedComponentsWithStats(light.astype(np.uint8))
     core = np.bincount(labels[light & (a >= GLOW_CORE)], minlength=n)
-    keep = np.isin(labels, [i for i in range(1, n) if core[i] >= GLOW_CORE_AREA])
+    kept = [i for i in range(1, n) if core[i] >= GLOW_CORE_AREA]
+    keep = np.isin(labels, kept)
+    # Efeito de cor com pouco verde (aura vermelha): a medida pelo verde que sobra exagera o alfa
+    # (vermelho misturado ao verde perde o "verde a mais" antes da metade) e o halo sai
+    # verde-amarelado. Com a cor do miolo conhecida, o alfa sai do quanto o verde do fundo caiu.
+    bg_g = float(color[1])
+    override = np.zeros(a.shape, bool)
+    if tint is not None:
+        # Cor conhecida: a mesma conta em todos os pixels que podem ser do efeito.
+        c_g = float(tint[1])
+        region = (rgba[..., 3] < 128) | mixed
+        ai = np.clip((bg_g - f[..., 1]) / max(1.0, bg_g - c_g), 0, 1)
+        a = np.where(region, ai, a)
+        unmixed = np.where(region[..., None], np.clip((f - (1 - a[..., None]) * color) / np.maximum(a, 1e-3)[..., None], 0, 255), unmixed)
+        light = region & (a >= GLOW_MIN) & (unmixed.max(axis=2) >= GLOW_LIGHT)
+        n, labels, stats, _ = cv2.connectedComponentsWithStats(light.astype(np.uint8))
+        core = np.bincount(labels[light & (a >= GLOW_CORE)], minlength=n)
+        kept = [i for i in range(1, n) if core[i] >= GLOW_CORE_AREA]
+        keep = np.isin(labels, kept)
+        override = mixed.copy()
+        kept = []
+    for i in kept:
+        blob = labels == i
+        # O verde da cor do efeito: o do miolo mais puro (a mistura com o fundo só soma verde).
+        c_g = float(np.percentile(f[..., 1][blob & (a >= GLOW_CORE)], 10))
+        if c_g >= GLOW_TINTED * bg_g:
+            continue   # amarelo e branco: o verde do efeito confunde com o do fundo; fica a medida de cima
+        ai = np.clip((bg_g - f[..., 1][blob]) / max(1.0, bg_g - c_g), 0, 1)
+        a[blob] = ai
+        unmixed[blob] = np.clip((f[blob] - (1 - ai[:, None]) * color) / np.maximum(ai, 1e-3)[:, None], 0, 255)
+        override |= blob & mixed   # a aura que o key() deu como corpo sai com o alfa dela
     # O halo fraco vem em blocos da compressão: a borda da mancha e o alfa são suavizados, e a
     # cor de cada pixel é a média ponderada pelo alfa em volta (no halo fraco a cor tirada do
     # verde é só ruído).
@@ -206,8 +253,12 @@ def keep_glow(frame, rgba):
     tint = (tint + 0.05 * base) / (weight + 0.05)[..., None]
     rgb = np.where(keep[..., None], unmixed, tint)[..., ::-1]
     out = rgba.copy()
+    # O efeito que passa da borda do vídeo (a aura alta) apaga aos poucos, em vez de cortar reto.
+    h_, w_ = glow.shape
+    ramp = np.minimum(1.0, np.minimum.outer(np.arange(h_), np.minimum(np.arange(w_), w_ - 1 - np.arange(w_))) / GLOW_EDGE)
+    glow = glow * np.where(keep | (glow > 0), ramp, 1.0)
     alpha = (np.clip(glow, 0, 1) * 255).astype(np.uint8)
-    more = (alpha >= 10) & (alpha > out[..., 3])
+    more = ((alpha >= 10) & (alpha > out[..., 3])) | override
     out[..., 3][more] = alpha[more]
     out[..., :3][more] = np.clip(rgb[more], 0, 255).astype(np.uint8)
     return out
@@ -302,7 +353,7 @@ def torso_x(rgba):
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
-              sem_poeira=False, sem_efeitos=False, manter_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
+              sem_poeira=False, sem_efeitos=False, manter_efeitos=False, cor_efeito=None, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
               balanco=1.0, objetos=0)
 
@@ -328,6 +379,8 @@ def parser():
     p.add_argument("--manter-efeitos", action="store_true",
                    help="mantém o efeito de luz do vídeo com o halo meio transparente (keep_glow): "
                         "bola de energia, brilho na mão, raio solto do corpo")
+    p.add_argument("--cor-efeito", help="R,G,B: a cor do efeito mantido (com --manter-efeitos), quando ela é "
+                   "conhecida: a aura vermelha sai sem o verde misturado e solta do corpo")
     p.add_argument("--recorte-suave", action="store_true",
                    help="mechas de cabelo meio transparentes e vãos de fundo entre elas abertos (soft_edges)")
     p.add_argument("--limpar-chao", action="store_true",
@@ -498,7 +551,8 @@ def main(argv=None):
     cache = {}
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
-        soft, objects, glow = args.recorte_suave, args.objetos, args.manter_efeitos
+        soft, objects = args.recorte_suave, args.objetos
+        glow = (tuple(int(v) for v in args.cor_efeito.split(",")) if args.cor_efeito else True) if args.manter_efeitos else False
         if (i, dust, effects, floor, soft) not in cache:
             cache[i, dust, effects, floor, soft] = key(frames[i], dust, effects, floor, soft, objects, glow)
         return cache[i, dust, effects, floor, soft]
@@ -573,6 +627,8 @@ def main(argv=None):
             # afiado, por cima do efeito.
             body = key(frames[picked[n]], args.sem_poeira, True, args.limpar_chao,
                        args.recorte_suave, args.objetos)
+            if args.cor_efeito:   # a aura que o key() juntou ao corpo fica só na camada do efeito
+                body[..., 3][effect_in_body(frames[picked[n]], body)] = 0
             img.alpha_composite(sharpen(Image.fromarray(body, "RGBA").resize(size, Image.LANCZOS), d))
         elif args.nitidez:
             img = sharpen(img, d)

@@ -833,9 +833,9 @@
           20
         ],
         "S2": [
-          9,
-          8,
-          26
+          30,
+          4,
+          30
         ],
         "S3": [
           10,
@@ -859,7 +859,16 @@
         "alcance": 320
       },
       "unica": {
-        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; a rajada (S3) soca duas vezes com braços fantasmas e o chute joga na parede (9 acertos); a voadora (S4) cruza a distância no voo e o machado derruba."
+        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; o S2 é o repel (a aura vermelha repele socos, chutes e golpes aéreos, altos e baixos, e desfaz projéteis; sem nada para repelir, fica aberta na recuperação); a rajada (S3) soca duas vezes com braços fantasmas e o chute joga na parede (9 acertos); a voadora (S4) cruza a distância no voo e o chute girando derruba.",
+        "golpes": {
+          "S2": {
+            "contra": {
+              "le": "tudo",
+              "janela": "startup",
+              "repele": true
+            }
+          }
+        }
       },
       "comandos": {
         "S1": {
@@ -867,7 +876,7 @@
           "comando": "↓↘→"
         },
         "S2": {
-          "nome": "Shōryū de caratê",
+          "nome": "Repel da aura vermelha",
           "comando": "→↓↘"
         },
         "S3": {
@@ -875,7 +884,7 @@
           "comando": "↓↓"
         },
         "S4": {
-          "nome": "Voadora e machado",
+          "nome": "Voadora e chute girando",
           "comando": "↓↙←"
         }
       },

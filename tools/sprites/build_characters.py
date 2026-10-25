@@ -181,6 +181,11 @@ def validate_mechanics(name, mech, m, projectile):
                 raise ValueError(f'{name}.mecanica.{key}.{field}: one of {allowed}')
     if 'contra' in mech and (projectile or mech['contra']['frames'][1] >= m['startupFrames']):
         raise ValueError(f'{name}.mecanica.contra: a melee move that reads before its strike')
+    # repele: o repel do S2 da p15 (só bate no que repeliu; projétil na janela se desfaz).
+    if 'contra' in mech and set(mech['contra']) - {'le', 'frames', 'repele'}:
+        raise ValueError(f'{name}.mecanica.contra: expected le, frames and repele')
+    if mech.get('contra', {}).get('repele') not in (None, True):
+        raise ValueError(f'{name}.mecanica.contra.repele: true (or leave it out)')
     if 'avanco' in mech:
         frames('avanco', mech['avanco'])
         v = mech['avanco'].get('velocidade')  # negativa: recua (estrela da p16)
@@ -612,6 +617,7 @@ def compile_packs(root, results):
         code = 'new AttackDefinition.Mechanics()'
         if 'armadura' in mech: code += '.armor('+str(mech['armadura']['golpes'])+','+','.join(map(str,mech['armadura']['frames']))+')'
         if 'contra' in mech: code += '.counter(AttackDefinition.Reads.'+READS[mech['contra']['le']]+','+','.join(map(str,mech['contra']['frames']))+')'
+        if mech.get('contra', {}).get('repele'): code += '.repel()'
         if 'esquiva' in mech: code += '.evade(AttackDefinition.Reads.'+READS[mech['esquiva']['de']]+','+','.join(map(str,mech['esquiva']['frames']))+')'
         if 'avanco' in mech:
             v = mech['avanco']

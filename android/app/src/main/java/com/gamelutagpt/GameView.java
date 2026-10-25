@@ -1695,6 +1695,11 @@ public class GameView extends SurfaceView
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
             }
         }
+        for (float[] p : engine.repelled) {
+            // O projétil desfeito no repel (o S2 da p15) estoura vermelho onde a aura o pegou.
+            impacts.spawn(ImpactEffects.GUARD, p[0], p[1], p[2] >= 0f ? -1 : 1, ImpactEffects.SPECIAL, 0xFFE0281E);
+            beamShake = Math.max(beamShake, 6f);
+        }
         for (String cue : engine.cues()) {
             String banner = bannerFor(cue);
             if (banner != null) showBanner(banner);
@@ -2671,6 +2676,7 @@ public class GameView extends SurfaceView
             case "DHC": return "TEAM SUPER!";
             case "OVERDRIVE": return "OVERDRIVE!";
             case "COUNTER": return "CONTRA-GOLPE!";
+            case "REPEL": return "REPEL!";
             case "PUNISH": return "PUNISH COUNTER!";
             case "ARMOR": return "ARMADURA!";
             case "POISON": return "VENENO!";

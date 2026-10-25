@@ -72,10 +72,10 @@
     "animacoes": {"SPECIAL_ENERGY": {"impacto": 9}}
   },
   "special_s2": {
-    "trechos": [["s_base", 0, 40], ["s2", 0, 48]],
-    "quadros": "22,34,54,56,58,59,60,61,62,63,64,67",
-    "opcoes": {"fixar": "video"},
-    "animacoes": {"SPECIAL_S2": {"frames": "0-11,10-0", "impacto": 8}}
+    "trechos": [["S2", 0, 124]],
+    "quadros": "9,13,17,21,25,29,33,36,39,43,47,51,55,59,63,67,71,75,79,83,87,91,95,99,103,107,111",
+    "opcoes": {"fixar": "video", "manter_efeitos": true, "cor_efeito": "255,40,0", "escala": 0.411, "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)"},
+    "animacoes": {"SPECIAL_S2": {"impacto": 17}}
   },
   "special_s3": {
     "trechos": [["S3", 0, 124]],

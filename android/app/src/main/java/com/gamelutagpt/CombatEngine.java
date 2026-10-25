@@ -85,6 +85,8 @@ final class CombatEngine {
     final TeamSystem teams;
     final List<Projectile> energyProjectiles = new ArrayList<>();
     final List<Projectile> superProjectiles = new ArrayList<>();
+    /** Projéteis desfeitos pelo repel neste passo: {x, y, direção} (a tela desenha o estouro). */
+    final List<float[]> repelled = new ArrayList<>();
     /** Poças de veneno no chão (seringa da p11). */
     final List<Puddle> puddles = new ArrayList<>();
     /** Caixas surpresa da p16 no chão, esperando o pavio para soltar a luva. */
@@ -276,6 +278,7 @@ final class CombatEngine {
         events.clear();
         cues.clear();
         clashes.clear();
+        repelled.clear();
         superFreeze = 0;
         ultraConnected = -1;
         teams.calm();
@@ -344,6 +347,7 @@ final class CombatEngine {
         events.clear();
         cues.clear();
         clashes.clear();
+        repelled.clear();
         ultraConnected = -1;
         for (int i = 0; i < 2; i++) startX[i] = fighters[i].x;
 
@@ -2102,6 +2106,8 @@ final class CombatEngine {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         int frame = hitFrame(a);
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
+        // O repel só bate no que ele repeliu: sem golpe na janela, a explosão não sai.
+        if (a.attack.mechanics.repel && !a.countered) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
         CharacterDefinition.Body body = d.body();
         boolean crouch = d.crouchingBody() && !hitsCrouching(a.attack, a);
@@ -2192,6 +2198,14 @@ final class CombatEngine {
                     d.crouchingBody() && !hitsCrouching(p.attack, fighters[p.ownerIndex]));
             if (!hits) {
                 p.holding = false;   // o rival saiu de baixo: a onda segue voando com os acertos que sobraram
+                continue;
+            }
+            AttackDefinition.Mechanics stance = d.mechanics();
+            if (stance.repel && stance.counterAt(d.attackFrame)) {
+                // Repel: o projétil se desfaz na aura, sem dano nem atordoamento.
+                repelled.add(new float[]{p.x, p.y, p.direction});
+                cues.add("REPEL");
+                it.remove();
                 continue;
             }
             addContact(fighters[p.ownerIndex], d, p.attack, -1, p);
@@ -3007,7 +3021,8 @@ final class CombatEngine {
      * the strike, which lands at once on the attacker (poison included when the move has it).
      */
     private void counter(CombatFighter d, CombatFighter a) {
-        cues.add("COUNTER");
+        cues.add(d.attack.mechanics.repel ? "REPEL" : "COUNTER");
+        d.countered = true;
         d.attackFrame = d.attack.startupFrames;
         Contact answer = new Contact();
         answer.attacker = d;

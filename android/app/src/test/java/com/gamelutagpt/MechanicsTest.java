@@ -57,6 +57,54 @@ public class MechanicsTest {
         assertTrue("the jab was answered", s.f(0).state.life < s.f(0).state.profile.maxLife);
     }
 
+    private static AttackDefinition repel() {
+        return move("H", 12, 3, 20).mechanics(new AttackDefinition.Mechanics()
+            .counter(AttackDefinition.Reads.ANY, 1, 11).repel()).build();
+    }
+
+    @Test public void repelAnswersAStrikeWithoutTakingDamage() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 500f, 600f);
+        int max1 = s.f(1).state.life;
+        assertTrue("REPEL cue", jabInto(s, 1, "REPEL"));
+        assertEquals("the repel takes nothing", max1, s.f(1).state.life);
+        assertTrue("the jab was repelled", s.f(0).state.life < s.f(0).state.profile.maxLife);
+    }
+
+    @Test public void repelReadsLowStrikesToo() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 500f, 600f);
+        s.in[1].heavy = true;
+        s.step();
+        s.in[0].direction = 1;
+        s.in[0].light = true;
+        boolean seen = false;
+        for (int i = 0; i < 20; i++) { s.step(); seen |= cue(s, "REPEL"); }
+        assertTrue("the crouching jab is repelled", seen);
+        assertEquals(s.f(1).state.profile.maxLife, s.f(1).state.life);
+    }
+
+    @Test public void repelWithNothingToRepelDoesNotStrikeAndLeavesHerOpen() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 500f, 600f);
+        s.in[1].heavy = true;
+        for (int i = 0; i < 20; i++) s.step();
+        assertEquals("no burst without a repel", s.f(0).state.profile.maxLife, s.f(0).state.life);
+        assertTrue("still recovering", s.f(1).attacking());
+        s.in[0].light = true;
+        s.until(() -> s.f(1).state.life < s.f(1).state.profile.maxLife, 20);
+    }
+
+    @Test public void repelDissipatesAProjectile() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 300f, 600f);
+        s.in[1].heavy = true;
+        s.step();
+        AttackDefinition energy = BASE.fighter.energy.attack;
+        s.engine.energyProjectiles.add(new Projectile(560f, Arena.GROUND_Y - 120f, 600f, 900f, 30f, 500, 0, 0, 1, energy));
+        boolean seen = false;
+        for (int i = 0; i < 6; i++) { s.step(); seen |= cue(s, "REPEL"); }
+        assertTrue("REPEL cue", seen);
+        assertTrue("the projectile is gone", s.engine.energyProjectiles.isEmpty());
+        assertEquals("no damage", s.f(1).state.profile.maxLife, s.f(1).state.life);
+    }
+
     @Test public void lowCounterDoesNotReadAStandingStrike() {
         AttackDefinition stance = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().counter(AttackDefinition.Reads.LOW, 1, 11)).build();
