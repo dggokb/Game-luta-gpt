@@ -11,6 +11,7 @@
     "p02":       { "nome": "Yin-lu",    "cor": "#1F8A8A", "lutador": "p02" },
     "p04":       { "nome": "Brucy",     "cor": "#D9B12E", "lutador": "p04" },
     "p12":       { "nome": "Necro",     "cor": "#8E1B1B", "lutador": "p12" },
+    "p13":       { "nome": "Krüger Stahl", "cor": "#A3242A", "lutador": "p13" },
     "p15":       { "nome": "Natisuko",  "cor": "#E8E4DA", "lutador": "p15" },
     "p16":       { "nome": "Bonnie Scarlet", "cor": "#D8262E", "lutador": "p16" }
   },
