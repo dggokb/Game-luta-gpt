@@ -162,6 +162,73 @@ public class MechanicsTest {
         assertTrue("about the same distance: " + d13 + " vs " + d01, d13 < d01 && d13 > d01 * 0.7f);
     }
 
+    /** O S3 do p13: agarra e dá três cabeçadas, a última com a pausa forte. */
+    private static AttackDefinition headbutts() {
+        return move("H", 10, 38, 24).damage(900).stun(28, 10, 8).strikes(10, 24, 45).strikeStop(7, 28)
+            .strikeHold(88f, 88f, 88f).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(90f)
+            .mechanics(new AttackDefinition.Mechanics().grab(40f)).build();
+    }
+
+    /** {acertos, acertos com a pausa final, derrubou (0/1), agarrou (0/1)} */
+    private static int[] grabRival(float rivalX) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(headbutts()), BASE, 500f, rivalX);
+        s.in[0].heavy = true;
+        int[] out = new int[4];
+        for (int i = 0; i < 180; i++) {
+            s.step();
+            if (cue(s, "AGARRA")) out[3] = 1;
+            if (s.f(1).status == CombatFighter.Status.KNOCKDOWN) out[2] = 1;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker != 0 || e.blocked) continue;
+                out[0]++;
+                if (e.finalStrike) out[1]++;
+            }
+        }
+        return out;
+    }
+
+    @Test public void commandGrabHoldsTheRivalForThreeHeadbutts() {
+        int[] near = grabRival(570f);
+        assertEquals("grabbed", 1, near[3]);
+        assertEquals("three headbutts", 3, near[0]);
+        assertEquals("the last one is the heavy", 1, near[1]);
+        assertEquals("and it knocks down", 1, near[2]);
+    }
+
+    @Test public void commandGrabWhiffsOutOfReach() {
+        int[] far = grabRival(760f);
+        assertEquals("nobody grabbed", 0, far[3]);
+        assertEquals("no headbutt lands", 0, far[0]);
+    }
+
+    @Test public void theColossusRockFliesInAnArcAndTheButtonSetsTheDistance() {
+        CharacterDefinition.Projectile rock = GeneratedCharacters.get("p13").specials.get("S2").projectile;
+        assertTrue("arc", rock.gravity > 0f && rock.vertical < 0f);
+        assertTrue("L near, H far", rock.strengthSpeed[0] < rock.strengthSpeed[1] && rock.strengthSpeed[1] < rock.strengthSpeed[2]);
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, BASE, 300f, 1200f);
+        Projectile p = new Projectile(400f, Arena.GROUND_Y - rock.spawnY, rock.range, rock.speed, 24f, 100, 0, 0, 1, null, "PEDRA");
+        p.vy = rock.vertical;
+        p.gravity = rock.gravity;
+        s.engine.energyProjectiles.add(p);
+        float peak = p.y;
+        int frames = 0;
+        while (s.engine.energyProjectiles.contains(p) && frames++ < 200) {
+            s.step();
+            peak = Math.min(peak, p.y);
+        }
+        assertTrue("it rises first", peak < Arena.GROUND_Y - rock.spawnY - 40f);
+        assertTrue("and comes down on the ground: " + p.y, p.y >= Arena.GROUND_Y - 1f);
+        assertTrue("lands a medium distance away: " + (p.x - 400f), p.x - 400f > 300f && p.x - 400f < 700f);
+    }
+
+    @Test public void theColossusJumpLiftsTheDrawingInAnArc() {
+        AttackDefinition.Mechanics m = GeneratedCharacters.get("p13").specials.get("S4").move.attack.mechanics;
+        int mid = (m.hopStart + m.hopEnd) / 2;
+        assertEquals(0f, m.hopLift(m.hopStart), 0.01f);
+        assertTrue("up in the middle: " + m.hopLift(mid), m.hopLift(mid) > 100f);
+        assertEquals("down on the punch", 0f, m.hopLift(m.hopEnd), 0.01f);
+    }
+
     @Test public void lowCounterDoesNotReadAStandingStrike() {
         AttackDefinition stance = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().counter(AttackDefinition.Reads.LOW, 1, 11)).build();

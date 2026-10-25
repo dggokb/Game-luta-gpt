@@ -268,6 +268,21 @@ todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTes
   especial, Super, Ultra, projétil, ou outro golpe fraco dentro da janela acertam normal; atordoado,
   derrubado ou agarrado não tem couraça. Cue `COURACA`; o golpe conta como acerto para quem bateu
   (o cancelamento sai). Testes em `MechanicsTest` (`theColossus...`).
+- **Agarrão de especial** (o S3 do p13, três cabeçadas): `Mechanics.grab(alcance)`,
+  `mecanicas.json` → `unica.golpes.S3.agarra {alcance}`. No primeiro quadro ativo pega quem está
+  até o alcance à frente e é agarrável (as regras do agarrão: no chão, livre, sem a proteção
+  depois de apanhar ou defender); pegou (cue `AGARRA`), as pancadas seguintes acertam no quadro
+  delas sem caixa e sem defesa, com o rival preso na frente (`strikeHold`); errou, o golpe sai no
+  vazio. Pausa de cada pancada e a pausa final com impact frame forte vêm do `pancadas.json`
+  (`pausa`, `pausaFinal`, `rival`), como no Super.
+- **Projétil em arco** (a pedra do S2 do p13): `Special.withArc(gravidade, L, M, H)`,
+  `especiais.S2.projetil {vertical, gravidade, distancias}`. A gravidade puxa a velocidade
+  vertical (sobe e cai); o botão multiplica a velocidade para a frente, e com ela a distância (o
+  tempo de voo é o mesmo). Ao cair some com poeira (`CombatEngine.landed`); o desenho é a pedra
+  recortada do vídeo (`efeitos/pedra_p13.webp`), rolando no ar.
+- **Salto desenhado** (o S4 do p13): `Mechanics.hop(altura, de, ate)`, `pancadas.json` →
+  `salto {altura, de, ate}` (quadros da animação). O vídeo é de câmera que acompanha; o desenho
+  sobe em arco nesse trecho e o corpo segue no chão, levado pelo avanço.
 - **Corrida própria** (o p13, lerdo): `Fighter.withRun(dash‰, quadrosDoBackdash, velocidade)`,
   `mecanicas.json` → `lutador.corrida {dash, backdashQuadros, backdashVelocidade}`. A corrida (e o
   embalo do dash jump) sai a `dash` da do motor; o backdash dura os quadros dele, na velocidade dele,

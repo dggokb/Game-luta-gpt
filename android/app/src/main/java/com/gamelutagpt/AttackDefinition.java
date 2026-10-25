@@ -70,6 +70,20 @@ final class AttackDefinition {
          * e é só a recuperação, aberta), e o projétil que chega na janela se desfaz.
          */
         boolean repel;
+        /**
+         * Agarrão de especial (o S3 do p13): o primeiro quadro ativo pega quem está até
+         * {@link #grabRange} à frente e agarrável (as regras do agarrão); pegou, as pancadas
+         * seguintes acertam sem caixa nem defesa; errou, o golpe sai no vazio.
+         */
+        boolean grab;
+        float grabRange;
+        /**
+         * Salto do golpe (o S4 do p13, que cai com o soco): o desenho sobe em arco até
+         * {@link #hopHeight} entre os quadros {@link #hopStart} e {@link #hopEnd} (o vídeo é de
+         * câmera que acompanha); o corpo segue no chão e o avanço leva ele para a frente.
+         */
+        float hopHeight;
+        int hopStart, hopEnd;
         /** Evasion: HIGH slips standing/air strikes and projectiles, ANY everything. */
         Reads evade = Reads.NONE;
         int evadeStart, evadeEnd;
@@ -103,6 +117,14 @@ final class AttackDefinition {
         Mechanics armor(int hits, int start, int end) { armorHits = hits; armorStart = start; armorEnd = end; return this; }
         Mechanics counter(Reads reads, int start, int end) { counter = reads; counterStart = start; counterEnd = end; return this; }
         Mechanics repel() { repel = true; return this; }
+        Mechanics grab(float range) { grab = true; grabRange = range; return this; }
+        Mechanics hop(float height, int start, int end) { hopHeight = height; hopStart = start; hopEnd = end; return this; }
+        /** Altura do desenho no quadro {@code frame} do golpe (arco: sobe e desce no trecho). */
+        float hopLift(int frame) {
+            if (hopHeight <= 0f || frame <= hopStart || frame >= hopEnd) return 0f;
+            float u = (frame - hopStart) / (float)(hopEnd - hopStart);
+            return 4f * hopHeight * u * (1f - u);
+        }
         Mechanics evade(Reads reads, int start, int end) { evade = reads; evadeStart = start; evadeEnd = end; return this; }
         Mechanics advance(float speed, int start, int end, boolean through) {
             advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;

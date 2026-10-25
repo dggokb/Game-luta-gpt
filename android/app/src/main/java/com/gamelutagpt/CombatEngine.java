@@ -87,6 +87,8 @@ final class CombatEngine {
     final List<Projectile> superProjectiles = new ArrayList<>();
     /** Projéteis desfeitos pelo repel neste passo: {x, y, direção} (a tela desenha o estouro). */
     final List<float[]> repelled = new ArrayList<>();
+    /** Projéteis em arco que caíram no chão neste passo (a pedra do p13): {x, direção}. */
+    final List<float[]> landed = new ArrayList<>();
     /** Poças de veneno no chão (seringa da p11). */
     final List<Puddle> puddles = new ArrayList<>();
     /** Caixas surpresa da p16 no chão, esperando o pavio para soltar a luva. */
@@ -279,6 +281,7 @@ final class CombatEngine {
         cues.clear();
         clashes.clear();
         repelled.clear();
+        landed.clear();
         superFreeze = 0;
         ultraConnected = -1;
         teams.calm();
@@ -348,6 +351,7 @@ final class CombatEngine {
         cues.clear();
         clashes.clear();
         repelled.clear();
+        landed.clear();
         ultraConnected = -1;
         for (int i = 0; i < 2; i++) startX[i] = fighters[i].x;
 
@@ -1928,6 +1932,10 @@ final class CombatEngine {
                 damage = Math.round(damage * 1.45f);
             }
         }
+        if (data.strengthSpeed != null) {
+            // A pedra do p13: o botão escolhe a distância (fraco perto, forte longe).
+            speed *= data.strengthSpeed["L".equals(f.commandButton) ? 0 : "H".equals(f.commandButton) ? 2 : 1];
+        }
         float radius = superKind ? 58f : 24f;
         float range = data.range;
         if (energy && f.charge > 0) {
@@ -1948,6 +1956,7 @@ final class CombatEngine {
             radius, damage, profile.color, f.index, f.facing, f.attack,
             energy ? profile.energyVisual : data.visual);
         p.vy = data.vertical;
+        p.gravity = data.gravity;
         p.totalHits = data.hits;
         p.hitInterval = data.hitInterval;
         if (data.puddleFrames > 0) p.puddle = data;
@@ -2056,6 +2065,7 @@ final class CombatEngine {
 
     /** O projétil que cai (seringa) chega ao chão: vira poça (uma por dono) ou some. */
     private void land(Projectile p) {
+        if (p.gravity > 0f) landed.add(new float[]{p.x, p.direction});
         if (p.trap != null) {
             for (Iterator<Armadilha> it = traps.iterator(); it.hasNext();) {
                 if (it.next().ownerIndex == p.ownerIndex) it.remove();
@@ -2088,6 +2098,7 @@ final class CombatEngine {
                 continue;
             }
             p.x += p.speed * p.direction * CombatConfig.DT;
+            p.vy += p.gravity * CombatConfig.DT;
             if (p.vy != 0f) {
                 p.y += p.vy * CombatConfig.DT;
                 if (p.y >= Arena.GROUND_Y) {
@@ -2130,6 +2141,10 @@ final class CombatEngine {
         // O repel só bate no que ele repeliu: sem golpe na janela, a explosão não sai.
         if (a.attack.mechanics.repel && !a.countered) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
+        if (a.attack.mechanics.grab) {
+            grabStrike(a, d, frame);
+            return;
+        }
         CharacterDefinition.Body body = d.body();
         boolean crouch = d.crouchingBody() && !hitsCrouching(a.attack, a);
         for (int i = 0; i < a.attack.hitboxCount(); i++) {
@@ -2353,6 +2368,29 @@ final class CombatEngine {
                 techThrow(a, d);
             } else if (a.throwFrame >= config.throwTechWindow) {
                 landThrow(a, d);
+            }
+        }
+    }
+
+    /**
+     * Agarrão de especial: no primeiro quadro ativo pega quem está ao alcance e agarrável; daí
+     * cada pancada acerta no quadro dela, sem caixa (o rival está preso na frente).
+     */
+    private void grabStrike(CombatFighter a, CombatFighter d, int frame) {
+        if (a.grabMissed) return;
+        if (!a.strikeLanded) {
+            float gap = Math.abs(d.x - a.x) - a.body().halfWidth - d.body().halfWidth;
+            boolean ahead = (d.x - a.x) * a.facing >= 0f;
+            if (!a.grounded || !throwable(d) || !ahead || gap > a.attack.mechanics.grabRange) {
+                a.grabMissed = true;
+                return;
+            }
+            cues.add("AGARRA");
+        }
+        for (int i = 0; i < a.attack.hitboxCount(); i++) {
+            if (a.attack.hitbox(i).activeAt(frame) && (a.hitboxMask & (1L << i)) == 0) {
+                addContact(a, d, a.attack, i, null);
+                return;
             }
         }
     }
@@ -2824,7 +2862,8 @@ final class CombatEngine {
             base = lastStrike ? base - each * (count - 1) : each;
         }
 
-        int guard = effectiveGuard(d);
+        // O agarrão de especial não se defende (como o agarrão).
+        int guard = !projectile && attack.mechanics.grab ? CombatFighter.GUARD_NONE : effectiveGuard(d);
         if (energyChain(c, d)) {
             // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
             // a próxima bola dele chega como se ele já tivesse se recuperado e defendido (sem

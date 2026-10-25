@@ -32,6 +32,7 @@ final class EffectsRenderer {
     static {
         IMAGE_VISUALS.put("BALAO", "efeitos/balao_p16.webp");
         IMAGE_VISUALS.put("CAIXA", "efeitos/caixa_p16_00.webp");
+        IMAGE_VISUALS.put("PEDRA", "efeitos/pedra_p13.webp");
     }
     /**
      * A caixa surpresa abrindo (vídeo s2_2 da p16): uma imagem por pose, todas recortadas na
@@ -97,12 +98,14 @@ final class EffectsRenderer {
     private void drawImage(Canvas c, Projectile p, Bitmap b) {
         float travelled = Math.abs(p.x - p.startX);
         boolean box = "CAIXA".equals(p.visual);
-        float bob = box ? 0f : 6f * (float)Math.sin(travelled / 40f);
+        boolean rock = "PEDRA".equals(p.visual);
+        float bob = box || rock ? 0f : 6f * (float)Math.sin(travelled / 40f);
         float w = b.getWidth() / 2f, h = b.getHeight() / 2f;
         c.save();
         // A caixa: o centro dela no projétil, meia caixa acima (pousa com o fundo no chão).
         c.translate(p.x, p.y + bob - (box ? BOX_HALF_HEIGHT : 0f));
-        c.rotate(box ? boxSpin(p) : 4f * (float)Math.sin(travelled / 55f));
+        // A pedra rola no ar: uma volta a cada ~300 px para a frente.
+        c.rotate(box ? boxSpin(p) : rock ? 1.2f * travelled * p.direction : 4f * (float)Math.sin(travelled / 55f));
         if (p.direction < 0) c.scale(-1f, 1f);
         if (box) {
             imageBox.set(-BOX_CENTER_X / 2f, -BOX_CENTER_Y / 2f, w - BOX_CENTER_X / 2f, h - BOX_CENTER_Y / 2f);

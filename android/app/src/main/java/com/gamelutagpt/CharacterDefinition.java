@@ -209,6 +209,11 @@ final class CharacterDefinition {
             projectile.trapActive=active;projectile.trapHeight=height;projectile.trapReach=reach;projectile.trapRadius=radius;
             return this;
         }
+        Special withArc(float gravity,float light,float medium,float heavy) {
+            if(gravity<=0f||light<=0f||medium<=0f||heavy<=0f)throw new IllegalArgumentException("arc: gravity and the L, M, H speeds > 0");
+            projectile.gravity=gravity;projectile.strengthSpeed=new float[]{light,medium,heavy};
+            return this;
+        }
         Special withEffect(String name) { effect=name; return this; }
         int commandLength() { return command.length; }
         /** The motion, in relative directions (tutorial text and examples). */
@@ -242,6 +247,13 @@ final class CharacterDefinition {
             hits=count;hitInterval=interval;return this;
         }
         Projectile withClones(int count) { clones=count; return this; }
+        /**
+         * Voo em arco (a pedra do p13): gravidade em px/s² sobre a velocidade vertical; a força do
+         * botão (L, M, H) multiplica a velocidade para a frente, e com ela a distância (o tempo
+         * de voo é o mesmo). null: reto, a mesma velocidade.
+         */
+        float gravity;
+        float[] strengthSpeed;
         /** Poça que fica onde o projétil cai (0 quadros: some no chão). */
         int puddleFrames,puddleDamage,puddlePoisonFrames;
         /** Armadilha onde cai (caixa da p16); trapFuse null: não é armadilha. */

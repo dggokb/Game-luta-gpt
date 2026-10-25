@@ -143,5 +143,29 @@
     "quadros": "24,25,34,35,36,38,40,44,50,56,62,66,69,72,75",
     "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)"},
     "animacoes": {"HIT_AIR": {}}
+  },
+  "special_energy": {
+    "trechos": [["S1", 0, 124, "fixo"]],
+    "quadros": "8,14,20,26,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,82,86,90,96,102,108",
+    "opcoes": {"fixar": "video", "manter_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "animacoes": {"SPECIAL_ENERGY": {"impacto": 6}}
+  },
+  "special_s2": {
+    "trechos": [["S2", 0, 124]],
+    "quadros": "14,18,22,26,30,40,50,58,62,64,66,68,72,76,80,84,86,88,96,100,104,108,112",
+    "opcoes": {"fixar": "video", "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "animacoes": {"SPECIAL_S2": {"impacto": 17}}
+  },
+  "special_s3": {
+    "trechos": [["s3", 0, 40], ["s3", 48, 124]],
+    "quadros": "20,24,26,28,29,30,32,36,42,44,45,46,48,52,60,68,72,73,74,75,76,78,82,88,92,96,100",
+    "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "animacoes": {"SPECIAL_S3": {"impacto": 5}}
+  },
+  "special_s4": {
+    "trechos": [["pulo", 0, 32], ["s4", 0, 124]],
+    "quadros": "4,10,14,18,22,24,26,28,30,34,42,52,62,72,82,86,88,90,91,92,93,94,96,98,102,108,116,124,132,136,138,140,142",
+    "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a decolagem é a do pulo)"},
+    "animacoes": {"SPECIAL_S4": {"impacto": 21}}
   }
 }

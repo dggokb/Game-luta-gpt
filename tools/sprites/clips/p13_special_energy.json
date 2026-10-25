@@ -1,0 +1,51 @@
+{
+  "id": "p13_special_energy",
+  "javaName": "P13_SPECIAL_ENERGY",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_special_energy_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_special_energy.webp",
+  "report": "tools/sprites/reports/p13_special_energy.report.json",
+  "preview": "android/app/build/sprite-review/p13_special_energy-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "p13_special_energy.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "8,14,20,26,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,82,86,90,96,102,108",
+    "celula": 352,
+    "largura": 384,
+    "raiz": "199,334",
+    "colunas": 5,
+    "fixar": "video",
+    "manter_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_special_energy_video_normalized.png",
+      "celula": [
+        384,
+        352
+      ],
+      "raiz": [
+        199,
+        334
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 768,
+  "frameHeight": 704,
+  "rootX": 398,
+  "rootY": 668,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_special_energy_video_normalized.png"
+  ]
+}

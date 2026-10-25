@@ -1,0 +1,50 @@
+{
+  "id": "p13_special_s4",
+  "javaName": "P13_SPECIAL_S4",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_special_s4_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_special_s4.webp",
+  "report": "tools/sprites/reports/p13_special_s4.report.json",
+  "preview": "android/app/build/sprite-review/p13_special_s4-import.png",
+  "expectedFrames": 33,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "p13_special_s4.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13 (a decolagem é a do pulo)",
+    "quadros": "4,10,14,18,22,24,26,28,30,34,42,52,62,72,82,86,88,90,91,92,93,94,96,98,102,108,116,124,132,136,138,140,142",
+    "celula": 384,
+    "largura": 256,
+    "raiz": "128,355",
+    "fixar": "video",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_special_s4_video_normalized.png",
+      "celula": [
+        256,
+        384
+      ],
+      "raiz": [
+        128,
+        355
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameHeight": 768,
+  "rootY": 710,
+  "frameWidth": 512,
+  "rootX": 256,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_special_s4_video_normalized.png"
+  ]
+}

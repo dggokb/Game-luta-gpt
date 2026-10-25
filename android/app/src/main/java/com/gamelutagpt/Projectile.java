@@ -8,6 +8,8 @@ final class Projectile {
     float y;
     /** Velocidade vertical (projétil de especial em diagonal): negativa sobe, positiva desce. */
     float vy;
+    /** Gravidade do voo em arco (a pedra do p13), px/s²; 0: reto. */
+    float gravity;
     /** Poça que fica onde ele cai (seringa da p11); null: some no chão. */
     CharacterDefinition.Projectile puddle;
     /** Armadilha que fica onde ele cai (caixa da p16) e o pavio dela; a caixa em voo não acerta. */

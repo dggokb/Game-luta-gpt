@@ -60,6 +60,9 @@ ACCEPTED = {
     # Mugen Rendan da p15: o quadro 68 é ela reaparecendo de frente depois do zanzoken (o jogo a
     # leva para trás no recuo); o tronco muda de lugar porque ela surgiu em outro ponto.
     'p15/ULTRA_SEQ[68]',
+    # Investida do p13 (S1, efeitos do vídeo mantidos): nos quadros 63 e 66 do vídeo a nuvem de
+    # poeira passa na frente do tronco e a faixa do tronco pega a nuvem; o corpo segue a corrida.
+    'p13/SPECIAL_ENERGY[17]', 'p13/SPECIAL_ENERGY[18]',
 }
 
 

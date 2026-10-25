@@ -82,7 +82,7 @@ def safe(root, value):
     return p
 
 # Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
-ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO','BALAO','CAIXA')
+ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO','BALAO','CAIXA','PEDRA')
 # Efeitos desenhados durante um especial (ProjetilVisual).
 SPECIAL_EFFECTS = ('VAPOR', 'FANTASMAS')
 
@@ -165,7 +165,7 @@ def validate_mechanics(name, mech, m, projectile):
     if not isinstance(mech, dict):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
-    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho'}
+    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -194,6 +194,12 @@ def validate_mechanics(name, mech, m, projectile):
     if 'teleporte' in mech and not (type(mech['teleporte']) is int and 0 <= mech['teleporte'] < total):
         raise ValueError(f'{name}.mecanica.teleporte: a frame inside the move')
     if 'puxar' in mech: positive(mech['puxar'], f'{name}.mecanica.puxar')
+    if 'salto' in mech:   # o desenho sobe em arco no trecho (o S4 do p13)
+        frames('salto', mech['salto']); positive(mech['salto'].get('altura'), f'{name}.mecanica.salto.altura')
+    if 'agarra' in mech:   # agarrão de especial (o S3 do p13): alcance à frente do corpo
+        if projectile or not isinstance(mech['agarra'], dict) or set(mech['agarra']) != {'alcance'}:
+            raise ValueError(f'{name}.mecanica.agarra: a melee move with {{alcance}}')
+        positive(mech['agarra']['alcance'], f'{name}.mecanica.agarra.alcance')
     if 'veneno' in mech:
         positive_int(mech['veneno'].get('dano'), f'{name}.mecanica.veneno.dano'); positive_int(mech['veneno'].get('frames'), f'{name}.mecanica.veneno.frames')
     if 'custoVida' in mech: positive_int(mech['custoVida'], f'{name}.mecanica.custoVida')
@@ -413,6 +419,11 @@ def validate_special_projectile(name, p, body):
         if not (type(t.get('activeFrom')) is int and 0 <= t['activeFrom'] and t['activeFrom'] + t['active'] <= t['duration']):
             raise ValueError(f'{name}.projectile.trap: the active window must fit in the open frames')
         for key in ('height','reach','radius'): positive(t.get(key), f'{name}.projectile.trap.{key}')
+    if 'gravity' in p:   # voo em arco: gravidade e o multiplicador da velocidade de L, M e H
+        positive(p['gravity'], f'{name}.projectile.gravity')
+        if not (isinstance(p.get('strengthSpeed'), list) and len(p['strengthSpeed']) == 3):
+            raise ValueError(f'{name}.projectile.strengthSpeed: expected the L, M and H multipliers')
+        for v in p['strengthSpeed']: positive(v, f'{name}.projectile.strengthSpeed')
     if 'puddle' in p:
         q = p['puddle']
         if p['vertical'] <= 0:
@@ -639,6 +650,8 @@ def compile_packs(root, results):
             code += '.advance('+f(v['velocidade'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('atravessa'))).lower()+')'
         if 'teleporte' in mech: code += '.teleport('+str(mech['teleporte'])+')'
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
+        if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'
+        if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
         if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
         if 'carga' in mech: code += '.charge('+str(mech['carga']['frames'])+','+str(mech['carga']['bonus'])+')'
@@ -732,6 +745,8 @@ def compile_packs(root, results):
                     t = proj['trap']
                     extra += ('.withTrap(new int[]{'+','.join(map(str,t['fuse']))+'},'+str(t['duration'])+','+str(t['activeFrom'])+','
                               +str(t['active'])+','+','.join(f(t[k]) for k in ('height','reach','radius'))+')')
+                if 'gravity' in proj:
+                    extra += '.withArc('+f(proj['gravity'])+','+','.join(f(v) for v in proj['strengthSpeed'])+')'
                 if 'puddle' in proj:
                     pd = proj['puddle']
                     extra += '.withPuddle('+str(pd['frames'])+','+f(pd['halfWidth'])+','+str(pd['damage'])+','+str(pd['poisonFrames'])+')'

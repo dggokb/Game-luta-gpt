@@ -1700,6 +1700,11 @@ public class GameView extends SurfaceView
             impacts.spawn(ImpactEffects.GUARD, p[0], p[1], p[2] >= 0f ? -1 : 1, ImpactEffects.SPECIAL, 0xFFE0281E);
             beamShake = Math.max(beamShake, 6f);
         }
+        for (float[] p : engine.landed) {
+            // A pedra do p13 quebra no chão: poeira cinza e um tranco.
+            impacts.spawn(ImpactEffects.GUARD, p[0], Arena.GROUND_Y - 20f, p[1] >= 0f ? 1 : -1, ImpactEffects.SPECIAL, 0xFF8A8F98);
+            beamShake = Math.max(beamShake, 5f);
+        }
         for (String cue : engine.cues()) {
             String banner = bannerFor(cue);
             if (banner != null) showBanner(banner);
@@ -3872,6 +3877,7 @@ public class GameView extends SurfaceView
         if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
             visualY -= engine.config.backdashVisualLift(f.backdashFrames, engine.backdashFrames(f));
         }
+        if (f.attacking() && f.grounded) visualY -= f.attack.mechanics.hopLift(f.attackFrame);
         return visualY;
     }
 

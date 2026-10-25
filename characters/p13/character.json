@@ -32,20 +32,20 @@
       "spawnY": 191,
       "crouchSpawnY": 102,
       "attack": {
-        "startupFrames": 12,
-        "activeFrames": 1,
-        "recoveryFrames": 22,
+        "startupFrames": 14,
+        "activeFrames": 22,
+        "recoveryFrames": 24,
         "hitstunFrames": 20,
         "blockstunFrames": 14,
         "hitstopFrames": 6,
         "cancelWindows": {
           "hit": [
-            12,
-            33
+            14,
+            58
           ],
           "block": [
-            12,
-            33
+            14,
+            58
           ],
           "whiff": null
         },
@@ -54,9 +54,29 @@
         ],
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
-        "pushbackOnBlock": 50
+        "pushbackOnBlock": 50,
+        "corpoBase": {
+          "startupFrames": 14,
+          "activeFrames": 22,
+          "recoveryFrames": 24,
+          "hitstunFrames": 20,
+          "blockstunFrames": 14
+        },
+        "reach": 120,
+        "hitHeight": 210,
+        "launchType": "knockdown",
+        "knockback": 110,
+        "mecanica": {
+          "avanco": {
+            "velocidade": 707,
+            "frames": [
+              12,
+              39
+            ]
+          }
+        }
       },
-      "nome": "Pancada sísmica"
+      "nome": "Investida do colosso"
     },
     "super": {
       "damage": 3840,
@@ -770,184 +790,260 @@
       "impactFrame": 3
     },
     "SPECIAL_ENERGY": {
-      "atlas": "p13_idle",
+      "atlas": "p13_special_energy",
       "frames": [
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
       ],
       "loop": false,
       "durationsMs": [
         48,
         48,
         48,
-        48,
-        53,
-        56,
-        56,
-        56,
-        56,
-        56,
-        56
+        32,
+        24,
+        24,
+        29,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        42,
+        42,
+        42,
+        62,
+        62,
+        62,
+        31
       ],
-      "impactFrame": 4
+      "impactFrame": 6
     },
     "SPECIAL_S2": {
-      "atlas": "p13_idle",
+      "atlas": "p13_special_s2",
       "frames": [
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
       ],
       "loop": false,
       "durationsMs": [
+        28,
+        28,
+        28,
+        28,
+        57,
+        57,
+        57,
+        28,
+        14,
+        14,
+        14,
+        28,
+        28,
+        28,
+        28,
+        14,
+        14,
+        78,
+        76,
+        76,
+        76,
+        76,
+        76
+      ],
+      "impactFrame": 17
+    },
+    "SPECIAL_S3": {
+      "atlas": "p13_special_s3",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
         25,
-        25,
-        25,
-        25,
-        25,
-        38,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43,
-        43
+        26
+      ],
+      "loop": false,
+      "durationsMs": [
+        64,
+        32,
+        32,
+        16,
+        16,
+        34,
+        70,
+        70,
+        34,
+        17,
+        17,
+        34,
+        70,
+        70,
+        70,
+        70,
+        17,
+        17,
+        17,
+        17,
+        34,
+        70,
+        70,
+        70,
+        70,
+        70,
+        34
       ],
       "impactFrame": 5
     },
-    "SPECIAL_S3": {
-      "atlas": "p13_idle",
-      "frames": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "loop": false,
-      "durationsMs": [
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        39,
-        47,
-        47,
-        47,
-        47,
-        47,
-        47,
-        47,
-        47,
-        47
-      ],
-      "impactFrame": 11
-    },
     "SPECIAL_S4": {
-      "atlas": "p13_idle",
+      "atlas": "p13_special_s4",
       "frames": [
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
       ],
       "loop": false,
       "durationsMs": [
-        48,
-        48,
-        48,
-        48,
-        40,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38,
-        38
+        41,
+        27,
+        27,
+        27,
+        14,
+        14,
+        14,
+        14,
+        27,
+        55,
+        55,
+        55,
+        55,
+        55,
+        27,
+        14,
+        14,
+        6,
+        6,
+        6,
+        6,
+        17,
+        22,
+        45,
+        67,
+        90,
+        90,
+        90,
+        45,
+        22,
+        22,
+        22,
+        45
       ],
-      "impactFrame": 4
+      "impactFrame": 21
     },
     "SUPER_WAVE": {
       "atlas": "p13_idle",
@@ -1898,18 +1994,16 @@
       ],
       "animation": "SPECIAL_S2",
       "damage": 1320,
-      "reach": 93,
-      "hitHeight": 159,
-      "startupFrames": 8,
-      "activeFrames": 10,
-      "recoveryFrames": 28,
-      "hitstunFrames": 47,
-      "blockstunFrames": 25,
+      "startupFrames": 30,
+      "activeFrames": 1,
+      "recoveryFrames": 26,
+      "hitstunFrames": 36,
+      "blockstunFrames": 14,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
-          8,
-          24
+          30,
+          37
         ],
         "block": null,
         "whiff": null
@@ -1917,8 +2011,6 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
-      "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
       "buttons": [
@@ -1926,7 +2018,30 @@
         "M",
         "H"
       ],
-      "nome": "Torre ascendente"
+      "nome": "Pedra arremessada",
+      "projectile": {
+        "visual": "PEDRA",
+        "range": 2000,
+        "speed": 520,
+        "spawnX": 100,
+        "spawnY": 210,
+        "vertical": -560,
+        "gravity": 1650,
+        "strengthSpeed": [
+          0.55,
+          1,
+          1.45
+        ]
+      },
+      "especialBase": {
+        "activeFrames": 1,
+        "recoveryFrames": 26,
+        "reach": 93,
+        "hitHeight": 159,
+        "hitFloor": null,
+        "launchType": "knockdown",
+        "knockback": 60
+      }
     },
     "S3": {
       "command": [
@@ -1934,19 +2049,19 @@
         3
       ],
       "animation": "SPECIAL_S3",
-      "damage": 1080,
+      "damage": 1560,
       "reach": 168,
       "hitHeight": 213,
-      "startupFrames": 22,
-      "activeFrames": 5,
-      "recoveryFrames": 22,
+      "startupFrames": 10,
+      "activeFrames": 38,
+      "recoveryFrames": 24,
       "hitstunFrames": 30,
       "blockstunFrames": 22,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          22,
-          33
+          10,
+          28
         ],
         "block": null,
         "whiff": null
@@ -1956,12 +2071,42 @@
       ],
       "pushbackOnHit": 40,
       "pushbackOnBlock": 50,
+      "mecanica": {
+        "agarra": {
+          "alcance": 40
+        }
+      },
       "buttons": [
         "L",
         "M",
         "H"
       ],
-      "nome": "Muralha de braços"
+      "nome": "Três cabeçadas",
+      "launchType": "knockdown",
+      "knockback": 90,
+      "especialBase": {
+        "launchType": null,
+        "knockback": null
+      },
+      "golpesBase": {
+        "startupFrames": 10,
+        "activeFrames": 2,
+        "recoveryFrames": 60,
+        "hitstunFrames": 65,
+        "blockstunFrames": 57
+      },
+      "golpes": [
+        10,
+        24,
+        45
+      ],
+      "pausaGolpes": 7,
+      "pausaFinal": 28,
+      "segurarRival": [
+        88,
+        88,
+        88
+      ]
     },
     "S4": {
       "command": [
@@ -1973,16 +2118,16 @@
       "damage": 1200,
       "reach": 187,
       "hitHeight": 225,
-      "startupFrames": 12,
-      "activeFrames": 18,
-      "recoveryFrames": 18,
-      "hitstunFrames": 45,
-      "blockstunFrames": 29,
+      "startupFrames": 34,
+      "activeFrames": 4,
+      "recoveryFrames": 30,
+      "hitstunFrames": 43,
+      "blockstunFrames": 27,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
-          12,
-          36
+          34,
+          48
         ],
         "block": null,
         "whiff": null
@@ -1999,7 +2144,27 @@
         "M",
         "H"
       ],
-      "nome": "Investida brutal"
+      "nome": "Salto do colosso",
+      "especialBase": {
+        "launchType": "knockdown",
+        "knockback": 70
+      },
+      "mecanica": {
+        "salto": {
+          "altura": 150,
+          "frames": [
+            9,
+            33
+          ]
+        },
+        "avanco": {
+          "velocidade": 624,
+          "frames": [
+            9,
+            33
+          ]
+        }
+      }
     }
   }
 }

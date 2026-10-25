@@ -992,12 +992,44 @@
       "vida": 11500,
       "dano": 1.2,
       "ritmo": 1.25,
+      "framesGolpe": {
+        "S": [
+          14,
+          22,
+          24
+        ],
+        "S2": [
+          30,
+          1,
+          26
+        ],
+        "S3": [
+          10,
+          2,
+          60
+        ],
+        "S4": [
+          34,
+          4,
+          30
+        ]
+      },
+      "danoGolpe": {
+        "S3": 1300
+      },
       "projetil": {
         "velocidade": 600,
         "alcance": 900
       },
       "unica": {
-        "descricao": "Colosso de couraça: golpe fraco (L ou M) em ação normal ou golpe não tira a ação dele, só segura um instante e tira metade do dano; golpe forte, especial, Super ou outro golpe em até 0,75 s acertam normal. Especiais ainda com os dados do p01 (sem vídeo).",
+        "descricao": "Colosso de couraça: golpe fraco (L ou M) em ação normal ou golpe não tira a ação dele, só segura um instante e tira metade do dano; golpe forte, especial, Super ou outro golpe em até 0,75 s acertam normal. S1 investida de ombro correndo; S2 pedra arremessada em arco (L perto, H longe); S3 agarrão de três cabeçadas, a última pesada.",
+        "golpes": {
+          "S3": {
+            "agarra": {
+              "alcance": 40
+            }
+          }
+        },
         "lutador": {
           "couraca": {
             "janela": 45,
@@ -1012,20 +1044,54 @@
       },
       "comandos": {
         "S1": {
-          "nome": "Pancada sísmica",
+          "nome": "Investida do colosso",
           "comando": "↓↘→"
         },
         "S2": {
-          "nome": "Torre ascendente",
+          "nome": "Pedra arremessada",
           "comando": "→↓↘"
         },
         "S3": {
-          "nome": "Muralha de braços",
+          "nome": "Três cabeçadas",
           "comando": "↓↓"
         },
         "S4": {
-          "nome": "Investida brutal",
+          "nome": "Salto do colosso",
           "comando": "↓↙←"
+        }
+      },
+      "s1": {
+        "corpoACorpo": {
+          "alcance": 120,
+          "altura": 210,
+          "derruba": true,
+          "empurrao": 110
+        }
+      },
+      "especiais": {
+        "S2": {
+          "projetil": {
+            "visual": "PEDRA",
+            "alcance": 2000,
+            "velocidade": 520,
+            "saidaX": 100,
+            "saidaY": 210,
+            "vertical": -560,
+            "gravidade": 1650,
+            "distancias": [
+              0.55,
+              1,
+              1.45
+            ]
+          }
+        },
+        "S3": {
+          "lancar": "knockdown",
+          "empurrao": 90
+        },
+        "S4": {
+          "lancar": "knockdown",
+          "empurrao": 70
         }
       }
     }

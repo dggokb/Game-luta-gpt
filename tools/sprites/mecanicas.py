@@ -228,7 +228,7 @@ def commands(pack, spec):
 
 
 VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
-           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO', 'BALAO', 'CAIXA')
+           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO', 'BALAO', 'CAIXA', 'PEDRA')
 RENTE = 14        # altura da saída do projétil rente ao chão (px acima do pé)
 MELEE_ACTIVE = 4  # quadros ativos do S1 corpo a corpo (o projétil tem 1)
 MELEE_KEYS = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback', 'low')
@@ -331,6 +331,11 @@ def especiais(pack, spec):
                 proj['trap'] = {'fuse': a['pavio'], 'duration': a['aberta'], 'activeFrom': a['acertaDe'],
                                 'active': a['acerta'], 'height': a['altura'], 'reach': a['avanco'],
                                 'radius': a['raio']}
+            if 'gravidade' in p:
+                # Voo em arco (a pedra do p13): gravidade e quanto cada botão (L, M, H) multiplica
+                # a velocidade para a frente (a distância muda, o tempo de voo não).
+                proj['gravity'] = p['gravidade']
+                proj['strengthSpeed'] = p.get('distancias', [1, 1, 1])
             if 'poca' in p:
                 q = p['poca']
                 proj['puddle'] = {'frames': q['frames'], 'halfWidth': q['largura'] / 2,
@@ -510,7 +515,9 @@ def apply(cid, spec, base, combos_data):
         return spec.get('ritmoGolpe', {}).get(key, spec['ritmo'])
 
     def damage(key):
-        return int(round(base['dano'][key] * spec['dano'] / 10) * 10)
+        # danoGolpe: dano base próprio do golpe (o agarrão de cabeçadas do p13), antes do "dano".
+        own = spec.get('danoGolpe', {}).get(key, base['dano'][key])
+        return int(round(own * spec['dano'] / 10) * 10)
 
     def frames(key):
         # framesGolpe: tempo próprio do golpe (especial de vídeo longo, como a rajada do p15).
@@ -561,8 +568,23 @@ def apply(cid, spec, base, combos_data):
         if 'pancadas' in h:
             strike(m, anim, h['pancadas'])
             cadence += f", {len(h['pancadas'])} pancadas {m['golpes']}"
+            # Pausa de cada pancada, a da última (impact frame forte) e onde ela deixa o rival
+            # (o agarrão de cabeçadas do p13), como no Super.
+            if h.get('pausa'):
+                m['pausaGolpes'] = h['pausa']
+            if h.get('pausaFinal'):
+                m['pausaFinal'] = h['pausaFinal']
+            if h.get('rival'):
+                m['segurarRival'] = h['rival']
             if 'avanco' in m.get('mecanica', {}):
                 m['mecanica']['avanco']['frames'] = window('ate_ativo', m)   # a janela ativa cresceu
+        if 'salto' in h:
+            # O desenho sobe em arco no trecho da animação (o S4 do p13: câmera que acompanha).
+            dd = anim['durationsMs']
+            total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+            at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
+            m.setdefault('mecanica', {})['salto'] = {'altura': h['salto']['altura'],
+                                                     'frames': [at(h['salto']['de']), min(at(h['salto']['ate']), total - 1)]}
         if isinstance(h.get('avanco'), dict):
             travel(m, anim, h['avanco'])
         elif 'avanco' in h:

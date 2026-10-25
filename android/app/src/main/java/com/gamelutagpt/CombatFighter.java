@@ -216,6 +216,8 @@ final class CombatFighter {
     int armorHitFrame = Integer.MIN_VALUE / 2;
     /** A postura de contra-ataque deste golpe já pegou um golpe (o repel só bate assim). */
     boolean countered;
+    /** O agarrão de especial não pegou ninguém no primeiro quadro ativo: o resto sai no vazio. */
+    boolean grabMissed;
     /** O recuo do Ultra em sequência já aconteceu (a p15 reaparece longe uma vez só). */
     boolean ultraRetreated;
     float ultraFinalBonus;
@@ -390,6 +392,7 @@ final class CombatFighter {
         hitboxMask = 0L;
         strikeLanded = strikeBlocked = strikeJuggled = false;
         countered = false;
+        grabMissed = false;
         armorUsed = 0;
         charge = 0;
         charging = false;
