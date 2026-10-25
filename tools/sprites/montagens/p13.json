@@ -17,5 +17,11 @@
     "quadros": "5,8,12,16,18,20,22,24,28,32,36,38,40,44,49,54,59,63,68",
     "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)"},
     "animacoes": {"CROUCH_MEDIUM": {"impacto": 5}}
+  },
+  "crouch_heavy": {
+    "trechos": [["2H", 0, 124]],
+    "quadros": "0,16,28,33,34,35,36,37,38,40,44,50,60",
+    "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)"},
+    "animacoes": {"CROUCH_HEAVY": {"frames": "0-12,8,6,5,4,3", "impacto": 7}}
   }
 }

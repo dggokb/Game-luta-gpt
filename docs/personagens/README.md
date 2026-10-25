@@ -71,7 +71,7 @@ Fichas completas (golpes, lista de animações e prompts):
 - [p10](p10.md)
 - [p11](p11.md)
 - [p12 — Necro](p12.md)
-- [p13 — Krüger Stahl](p13.md) — no jogo para teste (idle, andar, pulo, L/M/H, 6M, 2L, 2M; couraça)
+- [p13 — Krüger Stahl](p13.md) — no jogo para teste (idle, andar, pulo, L/M/H, 6M, 2L, 2M, 2H; couraça)
 - [p14](p14.md) — proposta (somente PNG no Drive)
 - [p15 — Natisuko](p15.md) — no jogo com os vídeos que já existem (sem golpes no pulo, reações, intro e vitória)
 - [p16 — Bonnie Scarlet](p16.md) — proposta (somente PNG no Drive)

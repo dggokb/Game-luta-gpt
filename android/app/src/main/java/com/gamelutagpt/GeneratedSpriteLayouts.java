@@ -2614,6 +2614,12 @@ final class GeneratedSpriteLayouts {
     static final int P13_CROUCH_ROOT_Y = 514;
     static final int P13_CROUCH_FRAME_COUNT = 8;
 
+    static final int P13_CROUCH_HEAVY_FRAME_WIDTH = 386;
+    static final int P13_CROUCH_HEAVY_FRAME_HEIGHT = 653;
+    static final int P13_CROUCH_HEAVY_ROOT_X = 199;
+    static final int P13_CROUCH_HEAVY_ROOT_Y = 642;
+    static final int P13_CROUCH_HEAVY_FRAME_COUNT = 13;
+
     static final int P13_CROUCH_LIGHT_FRAME_WIDTH = 633;
     static final int P13_CROUCH_LIGHT_FRAME_HEIGHT = 431;
     static final int P13_CROUCH_LIGHT_ROOT_X = 191;

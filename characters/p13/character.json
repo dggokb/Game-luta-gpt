@@ -919,6 +919,51 @@
         100,
         100
       ]
+    },
+    "CROUCH_HEAVY": {
+      "atlas": "p13_crouch_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        8,
+        6,
+        5,
+        4,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        44,
+        44,
+        44,
+        15,
+        15,
+        15,
+        15,
+        21,
+        49,
+        74,
+        74,
+        74,
+        74,
+        49,
+        25,
+        25,
+        25,
+        25
+      ],
+      "impactFrame": 7
     }
   },
   "moves": {
@@ -1147,7 +1192,7 @@
       "juggleCost": 2,
       "hitHeight": 302,
       "hitFloor": 25,
-      "pose": "CROUCH",
+      "animation": "CROUCH_HEAVY",
       "maxUsesPerChain": 1
     },
     "jL": {
