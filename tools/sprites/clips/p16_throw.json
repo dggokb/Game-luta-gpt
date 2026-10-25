@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p16_throw.webp",
   "report": "tools/sprites/reports/p16_throw.report.json",
   "preview": "android/app/build/sprite-review/p16_throw-import.png",
-  "expectedFrames": 9,
+  "expectedFrames": 17,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -16,7 +16,7 @@
     "personagem": "p16",
     "escala": 0.411,
     "medida": "1º quadro = inicio_centro (nota 0.95)",
-    "quadros": "36,42,48,54,57,60,64,72,84",
+    "quadros": "36,39,42,45,48,51,54,55,57,58,60,62,64,68,72,78,84",
     "celula": 288,
     "largura": 272,
     "raiz": "96,262",
@@ -43,8 +43,8 @@
   "frameHeight": 576,
   "rootX": 192,
   "rootY": 524,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p16_throw_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2.0
 }

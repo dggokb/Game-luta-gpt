@@ -208,11 +208,11 @@ final class GeneratedSpriteLayouts {
     static final int P02_TAUNT_ROOT_Y = 373;
     static final int P02_TAUNT_FRAME_COUNT = 33;
 
-    static final int P02_THROW_FRAME_WIDTH = 468;
-    static final int P02_THROW_FRAME_HEIGHT = 495;
-    static final int P02_THROW_ROOT_X = 193;
-    static final int P02_THROW_ROOT_Y = 476;
-    static final int P02_THROW_FRAME_COUNT = 9;
+    static final int P02_THROW_FRAME_WIDTH = 524;
+    static final int P02_THROW_FRAME_HEIGHT = 484;
+    static final int P02_THROW_ROOT_X = 196;
+    static final int P02_THROW_ROOT_Y = 470;
+    static final int P02_THROW_FRAME_COUNT = 17;
 
     static final int P02_ULTRA_BEAM_FRAME_WIDTH = 577;
     static final int P02_ULTRA_BEAM_FRAME_HEIGHT = 480;
@@ -670,11 +670,11 @@ final class GeneratedSpriteLayouts {
     static final int P04_TAUNT_ROOT_Y = 496;
     static final int P04_TAUNT_FRAME_COUNT = 33;
 
-    static final int P04_THROW_FRAME_WIDTH = 684;
-    static final int P04_THROW_FRAME_HEIGHT = 499;
-    static final int P04_THROW_ROOT_X = 218;
-    static final int P04_THROW_ROOT_Y = 474;
-    static final int P04_THROW_FRAME_COUNT = 9;
+    static final int P04_THROW_FRAME_WIDTH = 671;
+    static final int P04_THROW_FRAME_HEIGHT = 487;
+    static final int P04_THROW_ROOT_X = 208;
+    static final int P04_THROW_ROOT_Y = 469;
+    static final int P04_THROW_FRAME_COUNT = 17;
 
     static final int P04_ULTRA_BEAM_FRAME_WIDTH = 558;
     static final int P04_ULTRA_BEAM_FRAME_HEIGHT = 586;
@@ -904,11 +904,11 @@ final class GeneratedSpriteLayouts {
     static final int P05_TAUNT_ROOT_Y = 390;
     static final int P05_TAUNT_FRAME_COUNT = 33;
 
-    static final int P05_THROW_FRAME_WIDTH = 782;
-    static final int P05_THROW_FRAME_HEIGHT = 637;
-    static final int P05_THROW_ROOT_X = 155;
-    static final int P05_THROW_ROOT_Y = 623;
-    static final int P05_THROW_FRAME_COUNT = 9;
+    static final int P05_THROW_FRAME_WIDTH = 797;
+    static final int P05_THROW_FRAME_HEIGHT = 634;
+    static final int P05_THROW_ROOT_X = 152;
+    static final int P05_THROW_ROOT_Y = 620;
+    static final int P05_THROW_FRAME_COUNT = 17;
 
     static final int P05_ULTRA_BEAM_FRAME_WIDTH = 513;
     static final int P05_ULTRA_BEAM_FRAME_HEIGHT = 442;
@@ -1150,11 +1150,11 @@ final class GeneratedSpriteLayouts {
     static final int P06_TAUNT_ROOT_Y = 228;
     static final int P06_TAUNT_FRAME_COUNT = 33;
 
-    static final int P06_THROW_FRAME_WIDTH = 458;
-    static final int P06_THROW_FRAME_HEIGHT = 262;
-    static final int P06_THROW_ROOT_X = 229;
-    static final int P06_THROW_ROOT_Y = 250;
-    static final int P06_THROW_FRAME_COUNT = 9;
+    static final int P06_THROW_FRAME_WIDTH = 464;
+    static final int P06_THROW_FRAME_HEIGHT = 279;
+    static final int P06_THROW_ROOT_X = 240;
+    static final int P06_THROW_ROOT_Y = 266;
+    static final int P06_THROW_FRAME_COUNT = 17;
 
     static final int P06_ULTRA_BEAM_FRAME_WIDTH = 288;
     static final int P06_ULTRA_BEAM_FRAME_HEIGHT = 236;
@@ -1396,11 +1396,11 @@ final class GeneratedSpriteLayouts {
     static final int P07_TAUNT_ROOT_Y = 224;
     static final int P07_TAUNT_FRAME_COUNT = 33;
 
-    static final int P07_THROW_FRAME_WIDTH = 362;
-    static final int P07_THROW_FRAME_HEIGHT = 273;
-    static final int P07_THROW_ROOT_X = 134;
-    static final int P07_THROW_ROOT_Y = 260;
-    static final int P07_THROW_FRAME_COUNT = 9;
+    static final int P07_THROW_FRAME_WIDTH = 336;
+    static final int P07_THROW_FRAME_HEIGHT = 258;
+    static final int P07_THROW_ROOT_X = 130;
+    static final int P07_THROW_ROOT_Y = 246;
+    static final int P07_THROW_FRAME_COUNT = 17;
 
     static final int P07_ULTRA_BEAM_FRAME_WIDTH = 440;
     static final int P07_ULTRA_BEAM_FRAME_HEIGHT = 298;
@@ -1630,11 +1630,11 @@ final class GeneratedSpriteLayouts {
     static final int P08_TAUNT_ROOT_Y = 242;
     static final int P08_TAUNT_FRAME_COUNT = 33;
 
-    static final int P08_THROW_FRAME_WIDTH = 383;
-    static final int P08_THROW_FRAME_HEIGHT = 256;
-    static final int P08_THROW_ROOT_X = 171;
+    static final int P08_THROW_FRAME_WIDTH = 384;
+    static final int P08_THROW_FRAME_HEIGHT = 254;
+    static final int P08_THROW_ROOT_X = 172;
     static final int P08_THROW_ROOT_Y = 244;
-    static final int P08_THROW_FRAME_COUNT = 9;
+    static final int P08_THROW_FRAME_COUNT = 17;
 
     static final int P08_ULTRA_BEAM_FRAME_WIDTH = 631;
     static final int P08_ULTRA_BEAM_FRAME_HEIGHT = 275;
@@ -1864,11 +1864,11 @@ final class GeneratedSpriteLayouts {
     static final int P09_TAUNT_ROOT_Y = 266;
     static final int P09_TAUNT_FRAME_COUNT = 33;
 
-    static final int P09_THROW_FRAME_WIDTH = 427;
-    static final int P09_THROW_FRAME_HEIGHT = 284;
-    static final int P09_THROW_ROOT_X = 189;
-    static final int P09_THROW_ROOT_Y = 272;
-    static final int P09_THROW_FRAME_COUNT = 9;
+    static final int P09_THROW_FRAME_WIDTH = 431;
+    static final int P09_THROW_FRAME_HEIGHT = 286;
+    static final int P09_THROW_ROOT_X = 185;
+    static final int P09_THROW_ROOT_Y = 278;
+    static final int P09_THROW_FRAME_COUNT = 17;
 
     static final int P09_ULTRA_BEAM_FRAME_WIDTH = 600;
     static final int P09_ULTRA_BEAM_FRAME_HEIGHT = 362;
@@ -2098,11 +2098,11 @@ final class GeneratedSpriteLayouts {
     static final int P10_TAUNT_ROOT_Y = 237;
     static final int P10_TAUNT_FRAME_COUNT = 33;
 
-    static final int P10_THROW_FRAME_WIDTH = 599;
-    static final int P10_THROW_FRAME_HEIGHT = 362;
-    static final int P10_THROW_ROOT_X = 225;
-    static final int P10_THROW_ROOT_Y = 347;
-    static final int P10_THROW_FRAME_COUNT = 9;
+    static final int P10_THROW_FRAME_WIDTH = 608;
+    static final int P10_THROW_FRAME_HEIGHT = 363;
+    static final int P10_THROW_ROOT_X = 237;
+    static final int P10_THROW_ROOT_Y = 348;
+    static final int P10_THROW_FRAME_COUNT = 17;
 
     static final int P10_ULTRA_BEAM_FRAME_WIDTH = 274;
     static final int P10_ULTRA_BEAM_FRAME_HEIGHT = 338;
@@ -2332,11 +2332,11 @@ final class GeneratedSpriteLayouts {
     static final int P11_TAUNT_ROOT_Y = 271;
     static final int P11_TAUNT_FRAME_COUNT = 33;
 
-    static final int P11_THROW_FRAME_WIDTH = 392;
-    static final int P11_THROW_FRAME_HEIGHT = 289;
-    static final int P11_THROW_ROOT_X = 144;
-    static final int P11_THROW_ROOT_Y = 272;
-    static final int P11_THROW_FRAME_COUNT = 9;
+    static final int P11_THROW_FRAME_WIDTH = 389;
+    static final int P11_THROW_FRAME_HEIGHT = 288;
+    static final int P11_THROW_ROOT_X = 141;
+    static final int P11_THROW_ROOT_Y = 270;
+    static final int P11_THROW_FRAME_COUNT = 17;
 
     static final int P11_ULTRA_BEAM_FRAME_WIDTH = 441;
     static final int P11_ULTRA_BEAM_FRAME_HEIGHT = 297;
@@ -2566,11 +2566,11 @@ final class GeneratedSpriteLayouts {
     static final int P12_TAUNT_ROOT_Y = 226;
     static final int P12_TAUNT_FRAME_COUNT = 33;
 
-    static final int P12_THROW_FRAME_WIDTH = 409;
-    static final int P12_THROW_FRAME_HEIGHT = 230;
-    static final int P12_THROW_ROOT_X = 79;
-    static final int P12_THROW_ROOT_Y = 212;
-    static final int P12_THROW_FRAME_COUNT = 9;
+    static final int P12_THROW_FRAME_WIDTH = 411;
+    static final int P12_THROW_FRAME_HEIGHT = 229;
+    static final int P12_THROW_ROOT_X = 82;
+    static final int P12_THROW_ROOT_Y = 213;
+    static final int P12_THROW_FRAME_COUNT = 17;
 
     static final int P12_ULTRA_BEAM_FRAME_WIDTH = 264;
     static final int P12_ULTRA_BEAM_FRAME_HEIGHT = 236;
@@ -3011,10 +3011,10 @@ final class GeneratedSpriteLayouts {
     static final int P16_SUPER_WAVE_FRAME_COUNT = 49;
 
     static final int P16_THROW_FRAME_WIDTH = 496;
-    static final int P16_THROW_FRAME_HEIGHT = 516;
-    static final int P16_THROW_ROOT_X = 176;
-    static final int P16_THROW_ROOT_Y = 506;
-    static final int P16_THROW_FRAME_COUNT = 9;
+    static final int P16_THROW_FRAME_HEIGHT = 529;
+    static final int P16_THROW_ROOT_X = 178;
+    static final int P16_THROW_ROOT_Y = 517;
+    static final int P16_THROW_FRAME_COUNT = 17;
 
     static final int P16_ULTRA_SEQ_FRAME_WIDTH = 552;
     static final int P16_ULTRA_SEQ_FRAME_HEIGHT = 331;

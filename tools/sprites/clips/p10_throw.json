@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p10_throw.webp",
   "report": "tools/sprites/reports/p10_throw.report.json",
   "preview": "android/app/build/sprite-review/p10_throw-import.png",
-  "expectedFrames": 9,
+  "expectedFrames": 17,
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
@@ -16,15 +16,15 @@
     "personagem": "p10",
     "escala": 0.5232,
     "medida": "1º quadro = inicio_centro (nota 0.93)",
-    "quadros": "4,14,24,35,45,51,66,76,86",
+    "quadros": "4,9,14,19,24,25,35,35,45,45,51,65,66,71,76,81,86",
     "celula": 384,
     "largura": 608,
     "raiz": "229,365",
     "colunas": 9,
     "limpar_chao": true
   },
-  "frameWidth": 608,
+  "frameWidth": 616,
   "frameHeight": 384,
-  "rootX": 229,
+  "rootX": 237,
   "rootY": 365
 }

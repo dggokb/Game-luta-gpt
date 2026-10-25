@@ -57,6 +57,9 @@ ACCEPTED = {
     'p15/DASH[13]',
     # Aterrissagem da p15 (vídeo H3): o primeiro quadro é o pé ainda descendo, 9 px acima.
     'p15/LAND[0]',
+    # Mugen Rendan da p15: o quadro 68 é ela reaparecendo de frente depois do zanzoken (o jogo a
+    # leva para trás no recuo); o tronco muda de lugar porque ela surgiu em outro ponto.
+    'p15/ULTRA_SEQ[68]',
 }
 
 
