@@ -550,6 +550,35 @@ public class StageSceneTest {
         assertTrue("o chão dele fica acima do chão dos lutadores", scene.groundScreenY(200f) < scene.groundScreenY(0f));
     }
 
+    @Test
+    public void aPillarBeforeTheEndOfTheFloorStandsOnTheFloor() throws IOException {
+        // Arena Central: lajotas até 600, chão liso até a arquibancada (3500) e as pilastras
+        // no meio do caminho (1300). O chão vem antes delas; senão cobre a base e, no super
+        // pulo, elas parecem coladas na arquibancada.
+        final FakeImage pilastra = new FakeImage(490, 1527), chao = new FakeImage(512, 512), liso = new FakeImage(512, 512);
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"arquibancada.png\", \"profundidade\": 3500, \"noChao\": true, \"altura\": 0.5},"
+            + "{\"imagem\": \"pilastra.png\", \"profundidade\": 1300, \"noChao\": true, \"altura\": 0.54}],"
+            + "\"chao\": {\"imagem\": \"chao.jpg\", \"imagemLajotas\": \"liso.jpg\", \"perto\": -600, \"longe\": 600, \"ate\": 3500}}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("pilastra.png") ? pilastra : path.endsWith("chao.jpg") ? chao
+                    : path.endsWith("liso.jpg") ? liso : new FakeImage(2048, 425);
+            }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        for (float top : new float[] {72f, -520f}) {
+            scene.setCamera(1.24f, 200f, top);
+            CountingCanvas canvas = new CountingCanvas();
+            scene.drawBackground(canvas);
+            int ultimoChao = Math.max(canvas.ordem.lastIndexOf(chao), canvas.ordem.lastIndexOf(liso));
+            int pilar = canvas.ordem.indexOf(pilastra);
+            assertTrue("o chão aparece", ultimoChao >= 0);
+            assertTrue("a pilastra vem depois do chão (topo " + top + ")", pilar > ultimoChao);
+        }
+    }
+
     private static final class FakeImage implements RenderImage {
         final int w, h;
 
@@ -609,6 +638,7 @@ public class StageSceneTest {
         @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
                                               float l, float t, float r, float b, int alpha) {
             regions++;
+            ordem.add(image);
             if (image == watch) watched.add(new float[] {st, sb, l, r});
             assertTrue("recorte dentro da imagem", sl >= -0.01f && sr <= image.width() + 0.01f && sr > sl);
             assertTrue(st >= -0.01f && sb <= image.height() + 0.01f && sb > st);

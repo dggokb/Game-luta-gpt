@@ -59,7 +59,10 @@ não em unidades do mundo.
       mais longe para a mais perto;
    3. piso;
    4. reflexo das luzes e fogos no piso;
-   5. camadas entre o fim do piso e os lutadores (grade, pilares, braseiros);
+   5. camadas entre o fim do piso e os lutadores (grade, pilares, braseiros). O fim do piso
+      é o `ate` do chão (o chão liso até a arquibancada), não o `longe` das lajotas: as
+      pilastras da Central a 1300 ficam em cima do chão, que vai até 3500. Antes elas vinham
+      antes do chão, ele cobria a base e no super pulo pareciam coladas na arquibancada;
    6. respingos, chuva e pétalas atrás dos lutadores.
 
    `drawBackground(canvas, z, desenho)` encaixa mais um desenho na profundidade `z`: depois

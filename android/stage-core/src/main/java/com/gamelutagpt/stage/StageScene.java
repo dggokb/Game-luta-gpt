@@ -510,7 +510,10 @@ public final class StageScene {
         boolean pending = between != null;
         c.fillRect(-10f, -10f, VW + 10f, VH + 10f, pack.definition.backgroundColor);
         StageDefinition.Floor floor = pack.definition.floor;
-        float floorFar = floor != null ? floor.far : 0f;
+        // O chão vai até "ate" (extent), não só até o fim das lajotas: o que está antes disso
+        // (pilastras, pórticos, lanternas) fica em cima do chão e vem depois dele, senão o chão
+        // cobre a base e a pilastra parece colada na arquibancada lá no fundo.
+        float floorFar = floor != null ? floor.extent : 0f;
 
         StageDefinition.Lightning lightning = pack.definition.lightning;
         boolean bolt = lightning != null;
