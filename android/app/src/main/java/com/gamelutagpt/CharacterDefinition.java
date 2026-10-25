@@ -311,6 +311,12 @@ final class CharacterDefinition {
             this.vanish=vanish.clone();this.retreat=retreat;
             return this;
         }
+        /** Sem os closes do Ultra: a câmera da luta segue os dois (o Mugen Rendan da p15). */
+        boolean fightCamera;
+        UltraSequence withFightCamera() {
+            fightCamera=true;
+            return this;
+        }
         /** Quem bate está sumido neste quadro (zanzoken). */
         boolean hidesAttacker(float frame) {
             for(int[] w:vanish)if(frame>=w[0]&&frame<w[1])return true;

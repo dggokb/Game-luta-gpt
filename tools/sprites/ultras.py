@@ -14,6 +14,7 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     camera    planos fixos [quadro, frente, altura, zoom] da sequência (corte seco de um para o outro)
     zanzoken  [de, até] em que ela some (deixa a imagem para trás) e reaparece
     recuo     [quadro, distância] em que ela reaparece longe do rival (px do jogo para trás)
+    cameraDaLuta  sem os closes do Ultra: a câmera da luta segue os dois
 
 "segurar" ([quadro, quadros do jogo]) segura um quadro da folha mais tempo (a tela preta da p16).
 
@@ -94,7 +95,7 @@ def pick(spec, video=None):
         if not ok:
             break
         frames.append(cv2.resize(cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), (320, 180)).astype(np.float32))
-    must = set(spec['golpes']) | {spec['preparo'], spec['fim']}
+    must = set(spec['golpes']) | {spec['preparo'], spec['fim']} | {v for v, _ in spec.get('segurar', [])}
     kept = [seq[0]]
     for v in seq[1:]:
         still = float(np.abs(frames[v] - frames[kept[-1]]).mean()) < HOLD_DIFF
@@ -136,6 +137,8 @@ def timeline(spec, picked, speed):
     if spec.get('recuo'):
         v, distance = spec['recuo']
         ultra['recuo'] = [at(v), distance]
+    if spec.get('cameraDaLuta'):
+        ultra['cameraDaLuta'] = True
     return durations, ultra
 
 

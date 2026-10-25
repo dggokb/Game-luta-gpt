@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_crouch_light-import.png",
   "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 2,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -16,12 +16,13 @@
     "personagem": "p15",
     "escala": 0.411,
     "medida": "1º quadro = inicio_agachado_h3 (nota 0.98)",
-    "quadros": "0,4,6,8,9,10,11,12,14,16",
-    "celula": 224,
-    "largura": 256,
-    "raiz": "98,206",
-    "colunas": 6,
+    "quadros": "0,4,6,8,9,10,11,13,14,16",
+    "celula": 512,
+    "largura": 768,
+    "raiz": "398,494",
+    "colunas": 2,
     "fixar": "video",
+    "deslocar": "9,0",
     "sem_efeitos": true,
     "limpar_chao": true,
     "densidade": 2,
@@ -29,23 +30,23 @@
     "referencia": {
       "folha": "art/sprites/source/p15_crouch_light_video_normalized.png",
       "celula": [
-        256,
-        224
+        768,
+        512
       ],
       "raiz": [
-        98,
-        206
+        398,
+        494
       ],
-      "colunas": 6
+      "colunas": 2
     },
     "recorte_suave": true
   },
-  "rootX": 196,
+  "rootX": 796,
   "sourceReferences": [
     "art/sprites/source/p15_crouch_light_video_normalized.png"
   ],
-  "frameHeight": 448,
-  "rootY": 412,
-  "frameWidth": 512,
+  "frameHeight": 1024,
+  "rootY": 988,
+  "frameWidth": 1536,
   "pixelScale": 2.0
 }

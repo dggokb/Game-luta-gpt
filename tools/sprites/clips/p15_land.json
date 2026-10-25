@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_land-import.png",
   "expectedFrames": 7,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 3,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -16,32 +16,32 @@
     "personagem": "p15",
     "escala": 0.411,
     "medida": "1º quadro = inicio_centro_h3 (nota 0.98)",
-    "quadros": "76,78,80,82,84,86,88",
-    "celula": 352,
-    "largura": 192,
-    "raiz": "97,334",
-    "colunas": 6,
+    "quadros": "77,79,81,83,85,87,89",
+    "celula": 512,
+    "largura": 608,
+    "raiz": "399,494",
+    "colunas": 3,
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p15_land_video_normalized.png",
       "celula": [
-        192,
-        352
+        608,
+        512
       ],
       "raiz": [
-        97,
-        334
+        399,
+        494
       ],
-      "colunas": 6
+      "colunas": 3
     },
     "recorte_suave": true
   },
-  "frameWidth": 384,
-  "frameHeight": 704,
-  "rootX": 194,
-  "rootY": 668,
+  "frameWidth": 1216,
+  "frameHeight": 1024,
+  "rootX": 798,
+  "rootY": 988,
   "sourceReferences": [
     "art/sprites/source/p15_land_video_normalized.png"
   ],

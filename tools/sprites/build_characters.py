@@ -218,7 +218,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo'}
+             'zanzoken','recuo','cameraDaLuta'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -252,6 +252,8 @@ def validate_ultra(name, u, animations):
     if 'recuo' in u and not (isinstance(u['recuo'], list) and len(u['recuo']) == 2 and type(u['recuo'][0]) is int
                              and 0 <= u['recuo'][0] < u['duracao'] and number(u['recuo'][1]) and u['recuo'][1] > 0):
         raise ValueError(f'{name}.ultra.recuo: [quadro, distância > 0]')
+    if 'cameraDaLuta' in u and u['cameraDaLuta'] is not True:
+        raise ValueError(f'{name}.ultra.cameraDaLuta: true (or leave it out)')
     if 'ULTRA_SEQ' not in animations:
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
@@ -638,6 +640,8 @@ def compile_packs(root, results):
                      +floats('explosao')+','
                      +('new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u['camera'])+'}'
                        if u.get('camera') else 'null')+')')
+        if u.get('cameraDaLuta'):
+            scene += '.withFightCamera()'
         if 'zanzoken' in u or 'recuo' in u:
             scene += ('.withVanish(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('zanzoken', []))+'},'
                       +('new float[]{'+','.join(f(v) for v in u['recuo'])+'}' if 'recuo' in u else 'null')+')')

@@ -1950,15 +1950,18 @@ public class GameView extends SurfaceView
             if (phase == CombatFighter.ULTRA_RUSH) ultraSounds.play(ultraFolder(p.state), "investida");
             ultraPhaseSeen = phase;
         }
+        // O Ultra com a câmera da luta (o Mugen Rendan da p15) não fecha nela na ativação.
+        CharacterDefinition.UltraSequence own = p.state.profile.ultraSequence;
+        float startupZoom = own != null && own.fightCamera ? 0f : ULTRA_STARTUP_ZOOM;
         if (phase == CombatFighter.ULTRA_STARTUP) {
             float t = clamp(p.ultraFrame / (float)engine.config.ultraStartupFrames, 0f, 1f);
             ultraDarkAlpha = Math.round(205f * Math.min(1f, t * 3f));
-            ultraCameraZoom = 1f + ULTRA_STARTUP_ZOOM * (1f - (1f - t) * (1f - t));
+            ultraCameraZoom = 1f + startupZoom * (1f - (1f - t) * (1f - t));
             ultraAuraTime = p.ultraFrame * FIXED_STEP;
         } else if (phase == CombatFighter.ULTRA_RUSH) {
             float t = clamp(p.ultraFrame / (float)engine.config.ultraRushFrames, 0f, 1f);
             ultraDarkAlpha = Math.round(205f * (1f - t));
-            ultraCameraZoom = 1f + ULTRA_STARTUP_ZOOM * (1f - t);
+            ultraCameraZoom = 1f + startupZoom * (1f - t);
         } else if (phase == CombatFighter.ULTRA_SEQUENCE) {
             // Sequência do vídeo: um plano de câmera por golpe (UltraDirector), corte seco a cada
             // acerto, fundo escuro; depois do golpe final a câmera da luta volta.
@@ -1967,7 +1970,7 @@ public class GameView extends SurfaceView
                 CombatFighter v = engine.fighter(1 - p.index);
                 UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing,
                     ultraScript);
-                ultraShotActive = ultraShot.kind != UltraDirector.FINAL;
+                ultraShotActive = ultraShot.kind != UltraDirector.FINAL && !seq.fightCamera;
                 // O plano fixo segura até a explosão do golpe final passar, e só então a câmera da luta volta.
                 if (seq.camera != null && p.ultraFrame < seq.hits[seq.hits.length - 1] + ULTRA_FIXED_CAMERA_HOLD) {
                     ultraShotActive = true;

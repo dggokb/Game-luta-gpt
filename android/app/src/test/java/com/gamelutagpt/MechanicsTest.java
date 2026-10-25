@@ -561,17 +561,22 @@ public class MechanicsTest {
         int inTheDark = 0;
         for (int h : seq.hits) if (h >= seq.blackout[0] && h < seq.blackout[1]) inTheDark++;
         assertTrue("hits in the dark: " + inTheDark, inTheDark >= 4);
-        assertTrue("reappears far on the second zanzoken", seq.retreat[0] == seq.vanish[1][1]);
+        assertTrue("reappears back on the second zanzoken", seq.retreat[0] == seq.vanish[1][1]);
+        int last = seq.hits[seq.hits.length - 1];
+        assertTrue("the final blow lands while she is gone", seq.hidesAttacker(last));
+        assertTrue("the manga page comes in as she vanishes", last - seq.vanish[1][0] <= new CombatConfig().ultraPageLeadFrames);
+        assertTrue("she stays gone a while after it", seq.retreat[0] - last >= 50);
+        assertTrue("the fight camera, no close-ups", seq.fightCamera);
         CombatConfig config = s.engine.config;
         s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
-        s.until(() -> s.f(0).ultraFrame >= seq.retreat[0] - 1, 900);
-        float rival = s.f(1).x, gap = (s.f(1).x - s.f(0).x) * s.f(0).facing;
+        s.until(() -> s.f(0).ultraHitsDone == seq.hits.length, 900);
+        assertTrue("the final blow throws the rival", s.f(1).ultraFall);
+        s.until(() -> s.f(0).ultraFrame >= seq.retreat[0] - 1, 200);
+        float x = s.f(0).x;
         s.until(() -> s.f(0).ultraRetreated, 30);
-        assertEquals("the rival stays where he was", rival, s.f(1).x, 0.5f);
-        assertTrue("she is far now: " + gap + " -> " + (s.f(1).x - s.f(0).x) * s.f(0).facing,
-            (s.f(1).x - s.f(0).x) * s.f(0).facing > gap + 150f);
+        assertEquals("she reappears back", seq.retreat[1], Math.abs(s.f(0).x - x), 0.5f);
+        assertFalse("while the rival is still flying", s.f(1).grounded);
         s.until(() -> !s.f(0).inUltraSequence(), 600);
-        assertTrue("the belt is the last blow", s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
     }
 
     @Test public void theCinematicUltraWaitsForTheMangaPageAndTheGradeBoostsTheLastBlow() {
