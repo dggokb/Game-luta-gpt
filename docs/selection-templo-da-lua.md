@@ -25,7 +25,12 @@ TAG e confirmação ao elenco real. Não recriar uma tela genérica.
   y=137..537. Somente os oito personagens em GeneratedCharacters.SELECTABLE
   são selecionáveis; demais espaços mostram cadeados
 - TEAM: boxes verticais x=22..223 e x=1058..1259, slots 1/2
-- Cenário: Templo da Lua, preview trapezoidal x≈293..987, y=547..684
+- Cenário: preview trapezoidal x≈293..987, y=547..684. No modo teste as setas trocam o
+  cenário da luta (toque nas setas/lados do painel, L2/R2 no controle, Z/C no teclado): todas
+  as pastas de `assets/stages` com `stage.json`, pelo `nome`, com a miniatura de
+  `assets/selection/stages/<id>.webp` (o fundo e a frente desenhados pelo jogo, sem lutadores
+  nem HUD, recortados na faixa do meio). A luta de teste abre no escolhido e a seleção volta
+  nele. No Arcade (dupla livre) o painel mostra "CENÁRIO SORTEADO": cada luta sorteia o seu.
 - Comandos: faixa inferior y=685..720. Inclui confirmar, voltar,
   configurações (ajuda), trocar TAG e aleatório
 
@@ -34,8 +39,6 @@ TAG e confirmação ao elenco real. Não recriar uma tela genérica.
 - P1 titular/P1 TAG e P2 titular são enviados ao CombatEngine
 - A tela permite selecionar o parceiro P2, mas a CPU ainda não aciona
   a mecânica TAG de P2 nessa versão. Não apresentar como concluído.
-- O catálogo de cenários implementado tem **somente Templo da Lua**.
-  As setas do conceito permanecem visuais, não inventam outros estágios.
 - Os retratos vêm das artes de conceito existentes; a arte original inteira
   enviada na conversa não foi importada porque o arquivo não tinha bytes
   acessíveis neste runtime. Por isso, as linhas e símbolos espirituais foram

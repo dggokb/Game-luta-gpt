@@ -117,7 +117,7 @@ final class CharacterSelectRenderer {
         grid(c,s);
         team(c,s,0);
         if(s.solo())drawDrawNotice(c,s);else team(c,s,1);
-        stage(c);
+        stage(c,s);
         if(s.ready()) readyStamps(c,s);
         footer(c,s);
         if(s.settingsOpen()) settings(c);
@@ -369,20 +369,41 @@ final class CharacterSelectRenderer {
         text(c,"⇄",(l+r)/2,s.slotTop(1)-13,29,WHITE,true);
     }
 
-    private void stage(Canvas c) {
+    /**
+     * Painel do cenário: a miniatura do cenário escolhido (assets/selection/stages, o fundo
+     * desenhado pelo jogo, sem lutadores) e o nome; as setas trocam (toque, L2/R2, Z/C).
+     */
+    private void stage(Canvas c,CharacterSelect s) {
         path.reset();path.moveTo(336,547);path.lineTo(944,547);
         path.lineTo(986,682);path.lineTo(294,682);path.close();
         c.save();c.clipPath(path);
         p.setColor(0xFF081F3F);c.drawRect(294,547,986,682,p);
-        if(stageArt!=null) {
-            // Only the stage-art region of the supplied reference is rendered.
-            // Portraits, selection state and all controls above are real dynamic UI.
-            box.set(0,0,1280,720);imagePaint.setAlpha(255);c.drawBitmap(stageArt,null,box,imagePaint);
+        // Arcade: o cenário de cada luta é sorteado (o painel não troca).
+        Bitmap thumb=s.solo()?null:stageThumb(s.stage());
+        imagePaint.setAlpha(255);
+        if(thumb!=null) {
+            box.set(294,547,986,682);c.drawBitmap(thumb,null,box,imagePaint);
+        } else if(stageArt!=null) {
+            // Sem miniatura: a região do cenário da arte de referência.
+            box.set(0,0,1280,720);c.drawBitmap(stageArt,null,box,imagePaint);
         }
         p.setColor(0xD8051025);c.drawRect(315,651,965,678,p);
-        text(c,CharacterSelect.STAGE,640,673,22,WHITE,false);
-        text(c,"❮",434,670,25,WHITE,true);text(c,"❯",846,670,25,WHITE,true);
+        text(c,s.solo()?"CENÁRIO SORTEADO":s.stageName().toUpperCase(java.util.Locale.ROOT),640,673,22,WHITE,false);
+        if(s.stagePickable()) {
+            text(c,"❮",434,670,25,WHITE,true);text(c,"❯",846,670,25,WHITE,true);
+            text(c,(s.stageIndex()+1)+"/"+s.stageCount(),940,673,14,0xFFB8CCF0,false);
+        }
         c.restore();glow(c,BLUE,.8f);stroke(c,0x66FFFFFF,6);stroke(c,BLUE,1.8f);
+    }
+
+    private final java.util.Map<String,Bitmap> stageThumbs=new java.util.HashMap<>();
+    private Bitmap stageThumb(String id) {
+        if(!stageThumbs.containsKey(id)) {
+            Bitmap b=read("selection/stages/"+id+".webp",1);
+            stageThumbs.put(id,b!=null?b:SEM_ARTE);
+        }
+        Bitmap b=stageThumbs.get(id);
+        return b==SEM_ARTE?null:b;
     }
 
     private void footer(Canvas c,CharacterSelect s) {

@@ -19,6 +19,9 @@ final class CharacterSelect {
     static final float SWAP_LEFT = 804f, SWAP_RIGHT = 1037f;
     static final float RANDOM_LEFT = 1037f, RANDOM_TOP = 685f, RANDOM_RIGHT = 1279f, RANDOM_BOTTOM = 720f;
     static final String STAGE = "TEMPLO DA LUA";
+    /** Painel do cenário embaixo da grade: as setas trocam o cenário da luta de teste. */
+    static final float STAGE_LEFT = 294f, STAGE_TOP = 547f, STAGE_RIGHT = 986f, STAGE_BOTTOM = 682f;
+    static final float STAGE_PREV_RIGHT = 540f, STAGE_NEXT_LEFT = 740f;
     /**
      * Grid order: the story pairs side by side (p01+p02, p03+p04 … p15+p16, p13+p14), so each
      * pair sits on the same row. Playable ones come first; the rest are locked concept slots.
@@ -33,6 +36,9 @@ final class CharacterSelect {
     private int focusSide, focusSlot, cursorIndex, confirmedSteps;
     /** Picks to confirm: 4 (both teams) or 2 (only the player's, {@link #openSolo}). */
     private int steps = 4;
+    /** Cenários (pastas em assets/stages) e os nomes deles; o escolhido vale para a luta de teste. */
+    private String[] stageIds = {"templo_lua"}, stageNames = {STAGE};
+    private int stageIndex;
 
     CharacterSelect(String[] ids) {
         if (ids == null || ids.length < 2) throw new IllegalArgumentException("need at least two fighters");
@@ -108,7 +114,28 @@ final class CharacterSelect {
     int focusSide() { return focusSide; }
     int focusSlot() { return focusSlot; }
     int cursorIndex() { return cursorIndex; }
-    int stageCount() { return 1; }  // no imaginary, unimplemented stages
+    int stageCount() { return stageIds.length; }
+    void setStages(String[] ids, String[] names) {
+        if (ids == null || names == null || ids.length == 0 || ids.length != names.length) return;
+        String current = stage();
+        stageIds = ids.clone();
+        stageNames = names.clone();
+        selectStage(current);
+    }
+    /** Põe o cursor do cenário no {@code id} (o da luta de agora); desconhecido: fica onde está. */
+    void selectStage(String id) {
+        for (int i = 0; i < stageIds.length; i++) if (stageIds[i].equals(id)) stageIndex = i;
+    }
+    String stage() { return stageIds[stageIndex]; }
+    int stageIndex() { return stageIndex; }
+    String stageName() { return stageNames[stageIndex]; }
+    /** O Arcade sorteia o cenário de cada luta: lá o painel só mostra, não troca. */
+    boolean stagePickable() { return !solo() && stageIds.length > 1; }
+    boolean moveStage(int direction) {
+        if (!stagePickable()) return false;
+        stageIndex = Math.floorMod(stageIndex + direction, stageIds.length);
+        return true;
+    }
     int order(int side, String id) {
         if (chosen(side,0)&&id.equals(picks[side][0])) return 1;
         if (chosen(side,1)&&id.equals(picks[side][1])) return 2;
@@ -196,6 +223,9 @@ final class CharacterSelect {
             if (x>=RANDOM_LEFT && x<=RANDOM_RIGHT) {return randomFocused()?Result.CHANGED:Result.NONE;}
         }
         if (showHelp) {showHelp=false;return Result.CHANGED;}
+        if (inside(x,y,STAGE_LEFT,STAGE_TOP,STAGE_RIGHT,STAGE_BOTTOM)) {
+            return moveStage(x<=STAGE_PREV_RIGHT?-1:1)?Result.CHANGED:Result.NONE;
+        }
         int card=cardAt(x,y);
         if(card>=0)return choose(ids[card])?Result.CHANGED:Result.NONE;
         return Result.NONE;

@@ -133,7 +133,7 @@ final class HardwareInput {
 
     /**
      * Tecla dos menus no formato do controle. Só as letras mudam (WASD = D-pad, J/Espaço = A,
-     * K/Backspace = B, R/U = X, Tab/I = Y, Q/E/O = L1); as outras teclas passam como estão,
+     * K/Backspace = B, R/U = X, Tab/I = Y, Q/E/O = L1, Z/C = L2/R2); as outras teclas passam como estão,
      * para Enter, Esc, Back e os botões do controle manterem o que cada tela faz com eles.
      */
     static int menuKey(int keyCode) {
@@ -147,6 +147,9 @@ final class HardwareInput {
             case KeyEvent.KEYCODE_R: case KeyEvent.KEYCODE_U: return KeyEvent.KEYCODE_BUTTON_X;
             case KeyEvent.KEYCODE_TAB: case KeyEvent.KEYCODE_I: return KeyEvent.KEYCODE_BUTTON_Y;
             case KeyEvent.KEYCODE_Q: case KeyEvent.KEYCODE_E: case KeyEvent.KEYCODE_O: return KeyEvent.KEYCODE_BUTTON_L1;
+            // Cenário da seleção (o painel embaixo da grade): Z volta, C avança.
+            case KeyEvent.KEYCODE_Z: return KeyEvent.KEYCODE_BUTTON_L2;
+            case KeyEvent.KEYCODE_C: return KeyEvent.KEYCODE_BUTTON_R2;
             default: return keyCode;
         }
     }

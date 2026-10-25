@@ -307,6 +307,9 @@ public class GameView extends SurfaceView
     private static final String SELECT_LABEL = "◀ SELEÇÃO";
     /** A última escolha da seleção no modo teste (titular, parceiro, CPU, parceiro do CPU). */
     private String[] testPicks = {"player_base", "p02", "p03", "p04"};
+    /** Cenário da luta de teste, escolhido no painel embaixo da grade da seleção. */
+    private String testStage = DEFAULT_STAGE;
+    private boolean stageChoicesLoaded;
     /**
      * Entrou no MODO TESTE pelo menu e a luta de trás ainda é a de antes (da história, ou a do
      * construtor): se a seleção for cancelada, a luta de teste começa com {@link #testPicks}.
@@ -960,10 +963,12 @@ public class GameView extends SurfaceView
         sceneAfter = null;
         tutorial.stop();
         descarregarConversa();
-        useStage(null);
+        useStage(testStage);
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
+        loadStageChoices();
+        characterSelect.selectStage(testStage);
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
@@ -1098,6 +1103,8 @@ public class GameView extends SurfaceView
             case KeyEvent.KEYCODE_BUTTON_Y: characterSelect.toggleSettings(); break;
             case KeyEvent.KEYCODE_BUTTON_L1:
             case KeyEvent.KEYCODE_BUTTON_R1: characterSelect.swapFocusedTeam(); break;
+            case KeyEvent.KEYCODE_BUTTON_L2: characterSelect.moveStage(-1); break;
+            case KeyEvent.KEYCODE_BUTTON_R2: characterSelect.moveStage(1); break;
             case KeyEvent.KEYCODE_BUTTON_START:
                 if(characterSelect.ready()) confirmCharacterSelection();
                 else characterSelect.selectCursor();
@@ -1132,7 +1139,45 @@ public class GameView extends SurfaceView
         testFightPending = false;
         testPicks = new String[] {characterSelect.point(), characterSelect.partner(),
             characterSelect.opponentPoint(), characterSelect.opponentPartner()};
-        selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
+        // O cenário escolhido no painel entra junto, na tela de carregamento.
+        final String[] picks = testPicks;
+        final String cenario = testStage = characterSelect.stage();
+        carregando(() -> {
+            useStage(cenario);
+            selectTeamsNow(picks[0], picks[1], picks[2], picks[3], false);
+        });
+    }
+
+    /** Os cenários do painel da seleção: as pastas de assets/stages com stage.json, pelo nome. */
+    private void loadStageChoices() {
+        if (stageChoicesLoaded) return;
+        stageChoicesLoaded = true;
+        java.util.List<String> ids = new java.util.ArrayList<>(), names = new java.util.ArrayList<>();
+        try {
+            String[] pastas = getContext().getAssets().list("stages");
+            if (pastas != null) {
+                java.util.Arrays.sort(pastas);
+                for (String id : pastas) {
+                    try (java.io.InputStream in = getContext().getAssets().open("stages/" + id + "/stage.json")) {
+                        String json = new String(readAll(in), java.nio.charset.StandardCharsets.UTF_8);
+                        ids.add(id);
+                        names.add(new org.json.JSONObject(json).optString("nome", id));
+                    } catch (java.io.IOException | org.json.JSONException semCenario) {
+                        // pasta sem stage.json: não é cenário
+                    }
+                }
+            }
+        } catch (java.io.IOException ex) {
+            Log.w(LOG_TAG, "sem a lista de cenários da seleção", ex);
+        }
+        if (!ids.isEmpty()) characterSelect.setStages(ids.toArray(new String[0]), names.toArray(new String[0]));
+    }
+
+    private static byte[] readAll(java.io.InputStream in) throws java.io.IOException {
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+        byte[] buffer = new byte[8192];
+        for (int n; (n = in.read(buffer)) > 0;) out.write(buffer, 0, n);
+        return out.toByteArray();
     }
 
     /** Seleção cancelada: volta para a luta (a de teste do zero, se veio do menu inicial). */
@@ -4896,6 +4941,7 @@ public class GameView extends SurfaceView
         setOpponentAiEnabled(false);
         openCharacterSelect();
         characterSelect.open(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
+        characterSelect.selectStage(testStage);
         testFightPending = true;
     }
 

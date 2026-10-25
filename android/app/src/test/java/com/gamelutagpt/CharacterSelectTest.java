@@ -97,6 +97,28 @@ public class CharacterSelectTest {
         s.cardCorners(12,q);assertTrue(q[0]<CharacterSelect.GRID_X);assertEquals(12,s.cardAt(q[6]+4,q[5]-4));
         s.cardCorners(0,q);assertEquals(-1,s.cardAt(q[2]+4,q[3]+1));assertEquals(1,s.stageCount());
     }
+    @Test public void stagePanelArrowsPickTheTestFightStage() {
+        CharacterSelect s=make();
+        s.setStages(new String[]{"arena","beco","templo"},new String[]{"Arena","Beco","Templo"});
+        s.selectStage("templo");
+        assertEquals("templo",s.stage());
+        float y=(CharacterSelect.STAGE_TOP+CharacterSelect.STAGE_BOTTOM)/2;
+        assertEquals(CharacterSelect.Result.CHANGED,s.tap(CharacterSelect.STAGE_RIGHT-20,y));
+        assertEquals("wraps to the first","arena",s.stage());
+        assertEquals(CharacterSelect.Result.CHANGED,s.tap(CharacterSelect.STAGE_LEFT+20,y));
+        assertEquals("Templo",s.stageName());
+        assertEquals("the stage does not count as a pick",0,s.step());
+        s.selectStage("nenhum");
+        assertEquals("unknown keeps the choice","templo",s.stage());
+    }
+    @Test public void theArcadeDrawsTheStageSoThePanelDoesNotChangeIt() {
+        CharacterSelect s=new CharacterSelect(new String[]{"p01","p02","p03","p04"});
+        s.setStages(new String[]{"arena","beco"},new String[]{"Arena","Beco"});
+        s.openSolo("p01","p02");
+        assertFalse(s.stagePickable());
+        assertFalse(s.moveStage(1));
+        assertEquals("arena",s.stage());
+    }
     @Test public void soloPicksOnlyThePlayersTeamForTheArcade() {
         CharacterSelect s=make();
         s.openSolo("p01","p08");
