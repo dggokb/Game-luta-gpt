@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p13_light_jab.webp",
   "report": "tools/sprites/reports/p13_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p13_light_jab-import.png",
-  "expectedFrames": 9,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -16,7 +16,7 @@
     "personagem": "p13",
     "escala": 0.4322,
     "motivo": "mesma câmera dos outros vídeos do p13",
-    "quadros": "22,24,25,26,27,30,31,33,36",
+    "quadros": "22,23,24,25,26,27,30,31,32,33,34,36",
     "celula": 288,
     "largura": 320,
     "raiz": "134,270",
@@ -44,8 +44,8 @@
   "frameHeight": 576,
   "rootX": 268,
   "rootY": 540,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p13_light_jab_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2.0
 }

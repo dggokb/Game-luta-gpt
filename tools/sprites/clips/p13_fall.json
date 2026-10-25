@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p13_fall.webp",
   "report": "tools/sprites/reports/p13_fall.report.json",
   "preview": "android/app/build/sprite-review/p13_fall-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 9,
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
@@ -16,12 +16,13 @@
     "personagem": "p13",
     "escala": 0.4322,
     "motivo": "mesma câmera dos outros vídeos do p13",
-    "quadros": "48,50,52,54,56,58,60,62,64,66,68",
+    "quadros": "48,50,52,54,56,58,60,62,68",
     "celula": 288,
     "largura": 256,
-    "raiz": "136,270",
-    "fixar": "registro",
+    "raiz": "157,270",
+    "fixar": "video",
     "pe_no_chao": true,
+    "deslocar": "-26,0",
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
@@ -32,7 +33,7 @@
         288
       ],
       "raiz": [
-        136,
+        157,
         270
       ],
       "colunas": 8
@@ -40,7 +41,7 @@
     "recorte_suave": true
   },
   "frameHeight": 576,
-  "rootX": 272,
+  "rootX": 314,
   "rootY": 540,
   "sourceReferences": [
     "art/sprites/source/p13_fall_video_normalized.png"

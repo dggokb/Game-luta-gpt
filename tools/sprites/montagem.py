@@ -15,9 +15,11 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
 
 - trechos: [vídeo sem .mp4, primeiro quadro, fim exclusivo]. Cada vídeo de complemento
   começa no último quadro do anterior (o quadro final de um é o inicial do outro no Flow),
-  então os trechos colados formam um vídeo contínuo, na mesma câmera. "fixo" anula o
+  então os trechos colados formam um vídeo contínuo, na mesma câmera. "fixo_corpo" é o "fixo"
+  medindo o corpo escuro, sem a fumaça branca do vídeo (a investida do p13). "fixo" anula o
   deslocamento lateral do trecho (a voadora atravessa a tela; quem anda no jogo é o motor,
-  com o avanço do golpe) e os trechos seguintes ficam no mesmo lugar; "alinha" leva o trecho,
+  com o avanço do golpe) e os trechos seguintes ficam no mesmo lugar; "emenda" (trecho que pula quadros do vídeo) começa com
+  o corpo onde o anterior terminou; "alinha" leva o trecho,
   aos poucos, a terminar com o tronco onde o vídeo colado começou (a guarda do fim volta para
   a raiz, sem pulo ao trocar para o IDLE).
 - quadros: os quadros do vídeo colado que viram o clipe ("A-B/N" = de A a B de N em N).
@@ -91,6 +93,16 @@ def shift(frame, dx):
     return out
 
 
+def body_x(frame):
+    """Meio do corpo escuro no quadro (px do vídeo): sem a fumaça e os rastros brancos que o
+    vídeo desenha por cima (a investida do p13), que puxam a medida do tronco."""
+    f = frame.astype(int)
+    b, g, r = f[..., 0], f[..., 1], f[..., 2]
+    dark = ~((g > r + 40) & (g > b + 40)) & (f.max(2) < 150)
+    xs = np.nonzero(dark)[1]
+    return float(np.median(xs)) if len(xs) else 0.0
+
+
 def glue(folder, trechos):
     """Quadros dos trechos colados (BGR), com o deslocamento dos trechos fixos."""
     frames, offset, start = [], 0, None
@@ -100,8 +112,12 @@ def glue(folder, trechos):
         part = src[a:b]
         if start is None:
             start = torso_x(key(part[0]))
-        if 'fixo' in item[3:]:
-            xs = np.array([torso_x(key(f)) for f in part])
+        if 'emenda' in item[3:] and frames:
+            # Trecho que não continua o anterior (pulou quadros do vídeo): começa com o corpo
+            # onde o anterior terminou.
+            offset = int(round(body_x(frames[-1]) - body_x(part[0])))
+        if 'fixo' in item[3:] or 'fixo_corpo' in item[3:]:
+            xs = np.array([body_x(f) if 'fixo_corpo' in item[3:] else torso_x(key(f)) for f in part])
             t = np.arange(len(xs))
             trend = np.polyval(np.polyfit(t, xs, 1), t)
             moves = [int(round(offset - (v - trend[0]))) for v in trend]

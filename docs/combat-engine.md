@@ -272,8 +272,9 @@ todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTes
   `mecanicas.json` → `unica.golpes.S3.agarra {alcance}`. No primeiro quadro ativo pega quem está
   até o alcance à frente e é agarrável (as regras do agarrão: no chão, livre, sem a proteção
   depois de apanhar ou defender); pegou (cue `AGARRA`), as pancadas seguintes acertam no quadro
-  delas sem caixa e sem defesa, com o rival preso na frente (`strikeHold`); errou, o golpe sai no
-  vazio. Pausa de cada pancada e a pausa final com impact frame forte vêm do `pancadas.json`
+  delas sem caixa e sem defesa, com o rival preso na frente (`strikeHold`); errou, nenhuma
+  pancada sai e o desenho troca para a pegada no vazio (`<animação>_ERRO`, `SPECIAL_S3_ERRO`) pelo
+  resto do golpe: a recuperação longa é a punição. Pausa de cada pancada e a pausa final com impact frame forte vêm do `pancadas.json`
   (`pausa`, `pausaFinal`, `rival`), como no Super.
 - **Projétil em arco** (a pedra do S2 do p13): `Special.withArc(gravidade, L, M, H)`,
   `especiais.S2.projetil {vertical, gravidade, distancias}`. A gravidade puxa a velocidade

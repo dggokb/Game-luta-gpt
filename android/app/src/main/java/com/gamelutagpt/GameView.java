@@ -3634,7 +3634,14 @@ public class GameView extends SurfaceView
         if (animation == null && f.attacking()) {
             float elapsed = (f.attackFrame + 0.5f) * FIXED_STEP;
             float total = f.attack.totalFrames * FIXED_STEP;
-            if (f.move != null) {
+            // Agarrão de especial que não pegou (o S3 do p13): a pegada no vazio, sem as cabeçadas,
+            // no tempo do golpe (a recuperação longa é a punição).
+            CharacterDefinition.Animation miss = f.grabMissed && f.move != null && f.move.animation != null
+                ? character.animations.get(f.move.animation.id + "_ERRO") : null;
+            if (miss != null) {
+                animation = miss.id;
+                animationElapsed = miss.timeFor(elapsed, total);
+            } else if (f.move != null) {
                 if (f.move.animation != null) {
                     animation = f.move.animation.id;
                     // Recuperação cortada no contato: volta seco à guarda até o corte. Sem corte

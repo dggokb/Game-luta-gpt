@@ -50,7 +50,7 @@
       "SUPER": {"pancadas": [12, 34], "alcance": 260, "altura": 210, "pausa": 20, "preparo": 30, "duracao": 115, "rival": [285, 230], "empurrao": 0}
     },
     "p13": {
-      "S": {"avanco": {"distancia": 330, "de": 5, "ate": 20}},
+      "S": {"pancadas": [16, 27, 39, 51, 62], "pausa": 4, "pausaFinal": 14, "rival": [110, 110, 110, 110, 110], "avanco": {"distancia": 600, "de": 6, "ate": 62}},
       "S4": {"avanco": {"distancia": 260, "de": 6, "ate": 21}, "salto": {"altura": 150, "de": 6, "ate": 21}},
       "S3": {"pancadas": [5, 11, 18], "pausa": 7, "pausaFinal": 28, "rival": [88, 88, 88]}
     }

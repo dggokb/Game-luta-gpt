@@ -199,6 +199,9 @@ public class MechanicsTest {
         int[] far = grabRival(760f);
         assertEquals("nobody grabbed", 0, far[3]);
         assertEquals("no headbutt lands", 0, far[0]);
+        CharacterDefinition p13 = GeneratedCharacters.get("p13");
+        assertTrue("the colossus grabs the air instead of headbutting it",
+            p13.animations.containsKey(p13.specials.get("S3").move.animation.id + "_ERRO"));
     }
 
     @Test public void theColossusRockFliesInAnArcAndTheButtonSetsTheDistance() {

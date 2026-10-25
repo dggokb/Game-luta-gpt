@@ -26,9 +26,9 @@
   },
   "light_jab": {
     "trechos": [["L", 0, 124]],
-    "quadros": "22,24,25,26,27,30,31,33,36",
+    "quadros": "22,23,24,25,26,27,30,31,32,33,34,36",
     "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
-    "animacoes": {"LIGHT_JAB": {"frames": "0-8,4,3,2,1,0", "impacto": 5}}
+    "animacoes": {"LIGHT_JAB": {"frames": "0-11,5,4,3,2,1,0", "impacto": 6}}
   },
   "medium_kick": {
     "trechos": [["M", 0, 124]],
@@ -68,14 +68,14 @@
   },
   "jump": {
     "trechos": [["pulo", 0, 124]],
-    "quadros": "24-46/2",
-    "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "quadros": "26-46/2",
+    "opcoes": {"fixar": "video", "deslocar": "-23,0", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
     "animacoes": {"JUMP": {}}
   },
   "fall": {
     "trechos": [["pulo", 0, 124]],
-    "quadros": "48-68/2",
-    "opcoes": {"fixar": "registro", "pe_no_chao": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "quadros": "48,50,52,54,56,58,60,62,68",
+    "opcoes": {"fixar": "video", "deslocar": "-26,0", "pe_no_chao": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
     "animacoes": {"FALL": {}}
   },
   "land": {
@@ -145,10 +145,11 @@
     "animacoes": {"HIT_AIR": {}}
   },
   "special_energy": {
-    "trechos": [["S1", 0, 124, "fixo"]],
-    "quadros": "8,14,20,26,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,82,86,90,96,102,108",
+    "_doc": "Investida: sem a preparação parada (14-21 do vídeo); a arrancada (22-44), a passada da corrida (45-56, cada uma fixa no lugar pelo corpo, sem a fumaça) e a freada (69 em diante) voltando para a raiz. A passada toca três vezes, atropelando o rival.",
+    "trechos": [["S1", 0, 14], ["S1", 22, 45, "fixo_corpo"], ["S1", 45, 57, "fixo_corpo"], ["S1", 69, 124, "emenda", "alinha"]],
+    "quadros": "6,8,10,12,14,18,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,62,64,66,70,76,82,88",
     "opcoes": {"fixar": "video", "manter_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
-    "animacoes": {"SPECIAL_ENERGY": {"impacto": 6}}
+    "animacoes": {"SPECIAL_ENERGY": {"frames": "0-32,21-32,21-32,33-51", "impacto": 16}}
   },
   "special_s2": {
     "trechos": [["S2", 0, 124]],

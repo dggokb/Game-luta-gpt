@@ -420,7 +420,8 @@ final class AttackDefinition {
                 for (int i = 1; i < strikes.length; i++) {
                     if (strikes[i] <= strikes[i - 1]) throw new IllegalArgumentException(name + "strikes must grow");
                 }
-                if (kind == Kind.PROJECTILE) throw new IllegalArgumentException(name + "a projectile move cannot strike");
+                // O S corpo a corpo (alcance próprio, sem lançar) pode bater várias vezes: a investida do p13.
+                if (kind == Kind.PROJECTILE && reach <= 0f) throw new IllegalArgumentException(name + "a projectile move cannot strike");
             }
             if (strikeHold != null && strikeHold.length != strikes.length) {
                 throw new IllegalArgumentException(name + "strikeHold needs one place per strike");

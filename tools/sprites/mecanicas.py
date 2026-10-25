@@ -550,7 +550,8 @@ def apply(cid, spec, base, combos_data):
     specials = pack.get('specialMoves', {})
     for key, h in hits.items():
         if key != 'SUPER' and 'pancadas' in h:
-            pack['animations'][specials[key]['animation']]['impactFrame'] = h['pancadas'][0]
+            anim_id = pack['specialAnimations']['S'] if key == 'S' else specials[key]['animation']
+            pack['animations'][anim_id]['impactFrame'] = h['pancadas'][0]
 
     for key, anim_id, m in attacks:
         anim_id = m.get('animation', anim_id)   # a mecânica pode trocar a animação do golpe
