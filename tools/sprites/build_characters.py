@@ -263,9 +263,16 @@ def validate_ultra(name, u, animations):
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
 def validate_fighter_mechanics(name, mech):
-    known = {'furia','airDashes','agarrao','wallJump','capangas'}
+    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca'}
     if not isinstance(mech, dict) or set(mech) - known:
         raise ValueError(f'{name}.mecanica: expected some of {sorted(known)}')
+    if 'couraca' in mech:   # o p13: golpe fraco só atrasa; forte ou o segundo logo depois acerta
+        c = mech['couraca']
+        if not (isinstance(c, dict) and set(c) == {'janela', 'dano'}):
+            raise ValueError(name+'.mecanica.couraca: {janela, dano}')
+        positive_int(c['janela'], name+'.mecanica.couraca.janela')
+        if not (type(c['dano']) in (int, float) and 0 <= c['dano'] <= 1):
+            raise ValueError(name+'.mecanica.couraca.dano: fraction of the damage, 0..1')
     if 'furia' in mech: positive_int(mech['furia'], name+'.mecanica.furia')
     if 'wallJump' in mech and type(mech['wallJump']) is not bool: raise ValueError(name+'.mecanica.wallJump: true or false')
     if 'capangas' in mech: positive_int(mech['capangas'], name+'.mecanica.capangas')
@@ -635,7 +642,9 @@ def compile_packs(root, results):
         return ('.withMechanics('+str(mech.get('furia',0))+','+str(mech.get('airDashes',1))+','
                 +str(grab.get('dano',0))+','+f(grab.get('alcance',0))+')'
                 +('.withWallJump(true)' if mech.get('wallJump') else '')
-                +(f".withHenchmen({mech['capangas']})" if mech.get('capangas') else ''))
+                +(f".withHenchmen({mech['capangas']})" if mech.get('capangas') else '')
+                +(f".withNaturalArmor({mech['couraca']['janela']},{round(mech['couraca']['dano'] * 1000)})"
+                  if mech.get('couraca') else ''))
     def ultra_sequence(u):
         hold = ','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('rival', []))
         scene = ''

@@ -446,6 +446,16 @@ final class CharacterDefinition {
         Fighter withMechanics(int fury,int dashes,int grabDamage,float grabRange) {
             furyPermille=fury;airDashes=dashes;throwDamage=grabDamage;throwRangeBonus=grabRange;return this;
         }
+        /**
+         * Couraça (o p13, o colosso): golpe fraco (L ou M) que pega ele numa ação normal ou num
+         * golpe não tira a ação, só segura um instante e tira {@link #armorDamagePermille} do
+         * dano; o golpe forte, ou outro golpe em até {@link #armorWindow} quadros, acerta normal.
+         */
+        int armorWindow, armorDamagePermille;
+        Fighter withNaturalArmor(int window,int damagePermille) {
+            if(window<=0||damagePermille<0||damagePermille>1000)throw new IllegalArgumentException("natural armor: window > 0 and damage 0..1000");
+            armorWindow=window;armorDamagePermille=damagePermille;return this;
+        }
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }

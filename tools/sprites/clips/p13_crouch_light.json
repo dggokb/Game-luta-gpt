@@ -1,0 +1,49 @@
+{
+  "id": "p13_crouch_light",
+  "javaName": "P13_CROUCH_LIGHT",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_crouch_light_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_crouch_light.webp",
+  "report": "tools/sprites/reports/p13_crouch_light.report.json",
+  "preview": "android/app/build/sprite-review/p13_crouch_light-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2L.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)",
+    "quadros": "4,6,7,8,9,10,12,14,16,18,20,22,24,26,28,30",
+    "largura": 352,
+    "raiz": "116,238",
+    "colunas": 5,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_crouch_light_video_normalized.png",
+      "celula": [
+        352,
+        256
+      ],
+      "raiz": [
+        116,
+        238
+      ],
+      "colunas": 5
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 704,
+  "rootX": 232,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_crouch_light_video_normalized.png"
+  ]
+}

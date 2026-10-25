@@ -260,6 +260,18 @@ fim (até 15 acertos com a p05, encurralando o boneco).
 Medido soltando bola o mais rápido possível colado no boneco, de 60 a 300 de distância, em
 todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTest`.
 
+## Couraça e repel
+
+- **Couraça** (o p13): golpe fraco (L ou M, normais e no ar) que pega o lutador numa ação
+  normal ou num golpe não tira a ação: só o hitstop do golpe e uma fração do dano
+  (`Fighter.withNaturalArmor(janela, dano‰)`, `mecanicas.json` → `lutador.couraca`). Golpe forte,
+  especial, Super, Ultra, projétil, ou outro golpe fraco dentro da janela acertam normal; atordoado,
+  derrubado ou agarrado não tem couraça. Cue `COURACA`; o golpe conta como acerto para quem bateu
+  (o cancelamento sai). Testes em `MechanicsTest` (`theColossus...`).
+- **Repel** (o S2 da p15): postura de contra-ataque (`Mechanics.counter` com `repel()`) que só bate
+  no golpe que repeliu; sem golpe na janela a explosão não sai e sobra a recuperação. Projétil que
+  chega na janela se desfaz (`CombatEngine.repelled`, estouro na tela). Cue e aviso `REPEL`.
+
 ## Anulação de projéteis
 
 Projéteis de lados opostos que se tocam se anulam antes de chegar em alguém

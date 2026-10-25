@@ -105,6 +105,52 @@ public class MechanicsTest {
         assertEquals("no damage", s.f(1).state.profile.maxLife, s.f(1).state.life);
     }
 
+    /** O jab do jogador 0 no p13 (jogador 1); devolve se ele ficou atordoado e quanto tirou. */
+    private static int[] jabTheColossus(CombatEngineTest.Sim s, boolean heavy) {
+        int life = s.f(1).state.life;
+        if (heavy) s.in[0].heavy = true; else s.in[0].light = true;
+        boolean stunned = false, cue = false;
+        for (int i = 0; i < 30; i++) {
+            s.step();
+            stunned |= s.f(1).status == CombatFighter.Status.HITSTUN;
+            cue |= cue(s, "COURACA");
+            if (s.f(1).state.life < life && i > 0) break;
+        }
+        for (int i = 0; i < 4; i++) { s.step(); stunned |= s.f(1).status == CombatFighter.Status.HITSTUN; }
+        return new int[]{stunned ? 1 : 0, life - s.f(1).state.life, cue ? 1 : 0};
+    }
+
+    @Test public void theColossusShrugsOffALightHitButNotTheSecondOne() {
+        CharacterDefinition p13 = GeneratedCharacters.get("p13");
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, p13, 500f, 600f);
+        int[] first = jabTheColossus(s, false);
+        assertEquals("the first jab does not stun him", 0, first[0]);
+        assertEquals("COURACA cue", 1, first[2]);
+        assertTrue("it still hurts a little: " + first[1], first[1] > 0);
+        for (int i = 0; i < 8; i++) s.step();
+        int[] second = jabTheColossus(s, false);
+        assertEquals("the second jab right after lands", 1, second[0]);
+        assertTrue("full damage on the second: " + first[1] + " vs " + second[1], second[1] > first[1]);
+    }
+
+    @Test public void theColossusTakesAHeavyHit() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, GeneratedCharacters.get("p13"), 500f, 600f);
+        int[] heavy = jabTheColossus(s, true);
+        assertEquals("the heavy lands at once", 1, heavy[0]);
+        assertEquals("no armor on it", 0, heavy[2]);
+    }
+
+    @Test public void theColossusKeepsAttackingThroughALightHit() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, GeneratedCharacters.get("p13"), 500f, 600f);
+        s.in[1].heavy = true;
+        s.step();
+        s.in[0].light = true;
+        boolean cue = false;
+        for (int i = 0; i < 6; i++) { s.step(); cue |= cue(s, "COURACA"); }
+        assertTrue("the jab hit the armor", cue);
+        assertEquals("his H carries on", "H", s.attackId(1));
+    }
+
     @Test public void lowCounterDoesNotReadAStandingStrike() {
         AttackDefinition stance = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().counter(AttackDefinition.Reads.LOW, 1, 11)).build();

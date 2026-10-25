@@ -1,0 +1,32 @@
+{
+  "id": "p13_backdash",
+  "javaName": "P13_BACKDASH",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_backdash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_backdash.webp",
+  "report": "tools/sprites/reports/p13_backdash.report.json",
+  "preview": "android/app/build/sprite-review/p13_backdash-import.png",
+  "expectedFrames": 10,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "backDash.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "medida": "1º quadro = inicio_centro (nota 0.99)",
+    "quadros": "2,15,29,42,56,69,83,96,110,123",
+    "celula": 320,
+    "largura": 256,
+    "raiz": "130,302",
+    "fixar": "registro",
+    "limpar_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 512,
+  "frameHeight": 640,
+  "rootX": 260,
+  "rootY": 604,
+  "pixelScale": 2.0
+}

@@ -1,0 +1,127 @@
+{
+  "id": "p13_land",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_land_video_normalized.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 262,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        47,
+        42,
+        465,
+        472
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 99252
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        50,
+        64,
+        466,
+        474
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 97566
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        53,
+        68,
+        467,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 98470
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        57,
+        64,
+        469,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 99069
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 442,
+    "frameHeight": 458,
+    "rootX": 225,
+    "rootY": 445,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      37,
+      31
+    ],
+    "sheetWidth": 432,
+    "sheetHeight": 1732,
+    "frames": [
+      [
+        0,
+        0,
+        432,
+        444,
+        4,
+        4
+      ],
+      [
+        0,
+        880,
+        428,
+        424,
+        7,
+        27
+      ],
+      [
+        0,
+        1308,
+        424,
+        424,
+        12,
+        30
+      ],
+      [
+        0,
+        448,
+        428,
+        428,
+        13,
+        27
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4194304,
+      "grid": 3238976,
+      "packed": 2992896
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "0f909cb53d10fef7a2e75f0129ff31a84bd6a8a3cb6f5cda2bc74f692549676e",
+      "config": "675ecf06c33b0ff3ea899a0867407e92951d117ee214d0ebc55526702fee6594",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    }
+  }
+}

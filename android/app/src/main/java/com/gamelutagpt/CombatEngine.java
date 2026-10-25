@@ -2846,6 +2846,20 @@ final class CombatEngine {
             events.add(new HitEvent(a.index, d.index, raw, false, projectile, attack.id));
             return;
         }
+        if (naturalArmor(d, attack, projectile)) {
+            // Couraça (o p13): o golpe fraco só segura ele um instante e tira pouco; a ação
+            // continua. O próximo golpe logo depois (ou um forte) já acerta normal.
+            CharacterDefinition.Fighter body = d.state.profile;
+            d.armorHitFrame = frame;
+            int soft = raw * body.armorDamagePermille / 1000;
+            d.state.takeDamage(soft, config.recoverableLifePermille);
+            gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
+            freeze(a, d, attack.hitstopFrames, projectile);
+            if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.HIT;
+            cues.add("COURACA");
+            events.add(new HitEvent(a.index, d.index, soft, false, projectile, attack.id));
+            return;
+        }
 
         boolean newSession = sessions[d.index] == null;
         session = sessionFor(a, d);
@@ -3030,6 +3044,19 @@ final class CombatEngine {
         answer.attack = d.attack;
         answer.hitbox = 0;
         applyContact(answer);
+    }
+
+    /**
+     * A couraça segura este golpe: o defensor tem couraça, está numa ação normal ou num golpe
+     * (não atordoado, derrubado ou agarrado), o golpe é um normal fraco (L ou M) e a couraça não
+     * segurou outro há pouco.
+     */
+    private boolean naturalArmor(CombatFighter d, AttackDefinition attack, boolean projectile) {
+        CharacterDefinition.Fighter body = d.state.profile;
+        if (body.armorWindow <= 0 || projectile || attack.kind != AttackDefinition.Kind.NORMAL || d.ko()) return false;
+        if (attack.strength != AttackDefinition.Strength.LIGHT && attack.strength != AttackDefinition.Strength.MEDIUM) return false;
+        if (d.status != CombatFighter.Status.NEUTRAL && d.status != CombatFighter.Status.ATTACK) return false;
+        return frame - d.armorHitFrame > body.armorWindow;
     }
 
     /** The defender's own melee strike reaches the attacker in this same step (a trade). */

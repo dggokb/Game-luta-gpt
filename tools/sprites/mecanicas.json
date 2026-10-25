@@ -985,6 +985,44 @@
         "acertos": 5,
         "intervalo": 8
       }
+    },
+    "p13": {
+      "molde": "Colosso de couraça",
+      "estiloCombo": "tanque",
+      "vida": 11500,
+      "dano": 1.2,
+      "ritmo": 1.25,
+      "projetil": {
+        "velocidade": 600,
+        "alcance": 900
+      },
+      "unica": {
+        "descricao": "Colosso de couraça: golpe fraco (L ou M) em ação normal ou golpe não tira a ação dele, só segura um instante e tira metade do dano; golpe forte, especial, Super ou outro golpe em até 0,75 s acertam normal. Especiais ainda com os dados do p01 (sem vídeo).",
+        "lutador": {
+          "couraca": {
+            "janela": 45,
+            "dano": 0.5
+          }
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Pancada sísmica",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Torre ascendente",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Muralha de braços",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Investida brutal",
+          "comando": "↓↙←"
+        }
+      }
     }
   }
 }

@@ -1,0 +1,51 @@
+{
+  "id": "p13_golpe_alto",
+  "javaName": "P13_GOLPE_ALTO",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_golpe_alto_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_golpe_alto.webp",
+  "report": "tools/sprites/reports/p13_golpe_alto.report.json",
+  "preview": "android/app/build/sprite-review/p13_golpe_alto-import.png",
+  "expectedFrames": 21,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M_BAIXO.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "medida": "1º quadro = inicio_centro (nota 0.99)",
+    "quadros": "24,28,30,32,34,36,40,44,48,52,56,60,64,66,68,70,72,76,80,84,88",
+    "celula": 320,
+    "largura": 352,
+    "raiz": "151,302",
+    "colunas": 5,
+    "fixar": "video",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_golpe_alto_video_normalized.png",
+      "celula": [
+        352,
+        320
+      ],
+      "raiz": [
+        151,
+        302
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 704,
+  "frameHeight": 640,
+  "rootX": 302,
+  "rootY": 604,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_golpe_alto_video_normalized.png"
+  ]
+}

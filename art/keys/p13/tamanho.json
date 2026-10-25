@@ -1,0 +1,9 @@
+{
+  "pacote": "p13",
+  "altura": 255,
+  "chaves": {
+    "inicio_centro": 0.4315,
+    "inicio_direita": 0.4315,
+    "inicio_esquerda": 0.4315
+  }
+}

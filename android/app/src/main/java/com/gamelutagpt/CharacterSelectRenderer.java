@@ -178,6 +178,7 @@ final class CharacterSelectRenderer {
             case "p10":return "BOMBEIRA ÁGIL";
             case "p11":return "CIRURGIÃO SÁDICO";
             case "p12":return "CRIATURA FERAL";
+            case "p13":return "COLOSSO DE COURAÇA";
             case "p15":return "KARATÊ SHOTOKAN";
             case "p16":return "PALHAÇA DO CAOS";
             default:return "";

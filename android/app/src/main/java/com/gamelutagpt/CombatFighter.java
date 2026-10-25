@@ -212,6 +212,8 @@ final class CombatFighter {
      * (já pediu uma vez nesta sequência), e o bônus da nota do toque para o último golpe.
      */
     boolean ultraPaused, ultraPageDone;
+    /** Quadro da luta em que a couraça (o p13) segurou o último golpe fraco. */
+    int armorHitFrame = Integer.MIN_VALUE / 2;
     /** A postura de contra-ataque deste golpe já pegou um golpe (o repel só bate assim). */
     boolean countered;
     /** O recuo do Ultra em sequência já aconteceu (a p15 reaparece longe uma vez só). */

@@ -1,0 +1,260 @@
+{
+  "id": "p13_light_jab",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_light_jab_video_normalized.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 456,
+    "frameHeight": 576,
+    "rootX": 226,
+    "rootY": 540,
+    "columns": 9,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        54,
+        29,
+        397,
+        542
+      ],
+      "minimumMargin": 29,
+      "opaquePixels": 100912
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        53,
+        43,
+        397,
+        540
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 90355
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        16,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 99828
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 100901
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        47,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101294
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        46,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101243
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        45,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101311
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        43,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101357
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        43,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101356
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        42,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101373
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        40,
+        28,
+        448,
+        538
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 101449
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 450,
+    "frameHeight": 533,
+    "rootX": 220,
+    "rootY": 521,
+    "columns": 9,
+    "frameCount": 11,
+    "cropOffset": [
+      6,
+      19
+    ],
+    "sheetWidth": 2460,
+    "sheetHeight": 1052,
+    "frames": [
+      [
+        0,
+        0,
+        356,
+        528,
+        42,
+        4
+      ],
+      [
+        2104,
+        532,
+        356,
+        512,
+        41,
+        18
+      ],
+      [
+        360,
+        0,
+        444,
+        520,
+        4,
+        4
+      ],
+      [
+        808,
+        0,
+        408,
+        520,
+        39,
+        4
+      ],
+      [
+        1220,
+        0,
+        412,
+        520,
+        35,
+        4
+      ],
+      [
+        1636,
+        0,
+        412,
+        520,
+        34,
+        4
+      ],
+      [
+        0,
+        532,
+        416,
+        520,
+        33,
+        4
+      ],
+      [
+        420,
+        532,
+        416,
+        520,
+        31,
+        4
+      ],
+      [
+        840,
+        532,
+        416,
+        520,
+        31,
+        4
+      ],
+      [
+        1260,
+        532,
+        416,
+        520,
+        30,
+        4
+      ],
+      [
+        1680,
+        532,
+        420,
+        520,
+        28,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 18911232,
+      "grid": 17269200,
+      "packed": 10351680
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d536dce85149a38393f3a850164597543c82af7b797462ac53887e4bb6bc1631",
+      "config": "b62a63f427da35e96f34e2b168073908d7c86284b809362321af3ab32bedce64",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    }
+  }
+}

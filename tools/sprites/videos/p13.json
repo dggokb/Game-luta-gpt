@@ -1,0 +1,14 @@
+{
+  "IDLE": "idle",
+  "WALK_FORWARD": "frente",
+  "WALK_BACK": "tras",
+  "DASH": "Dash",
+  "BACKDASH": "backDash",
+  "CROUCH": "agachar",
+  "JUMP": "pulo",
+  "LIGHT_JAB": "L",
+  "MEDIUM_KICK": "M",
+  "HEAVY_STRAIGHT": "H",
+  "CROUCH_LIGHT": "2L",
+  "CROUCH_MEDIUM": "2M"
+}

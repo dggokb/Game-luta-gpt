@@ -1,0 +1,31 @@
+{
+  "id": "p13_crouch",
+  "javaName": "P13_CROUCH",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_crouch.webp",
+  "report": "tools/sprites/reports/p13_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p13_crouch-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "medida": "1º quadro = inicio_centro (nota 0.99)",
+    "quadros": "26,27,28,29,31,32,33,34",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "112,270",
+    "limpar_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 224,
+  "rootY": 540,
+  "pixelScale": 2.0
+}

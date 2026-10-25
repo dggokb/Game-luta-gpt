@@ -1,0 +1,21 @@
+{
+  "_doc": "Clipes do p13 com quadros escolhidos à mão (tools/sprites/montagem.py). Os vídeos ficam no Drive em game-luta-gpt/animations/p13 (H3 Fast, 124 quadros). M_BAIXO é o chute para a frente: vira o golpe alto (→ + M, 6M), como na p15.",
+  "golpe_alto": {
+    "trechos": [["M_BAIXO", 0, 124]],
+    "quadros": "24,28,30,32,34,36,40,44,48,52,56,60,64,66,68,70,72,76,80,84,88",
+    "opcoes": {"fixar": "video", "sem_efeitos": true},
+    "animacoes": {"GOLPE_ALTO": {"impacto": 3}}
+  },
+  "crouch_light": {
+    "trechos": [["2L", 0, 124]],
+    "quadros": "4,6,7,8,9,10,12,14,16,18,20,22,24,26,28,30",
+    "opcoes": {"fixar": "video", "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)"},
+    "animacoes": {"CROUCH_LIGHT": {"impacto": 3}}
+  },
+  "crouch_medium": {
+    "trechos": [["2M", 0, 124]],
+    "quadros": "5,8,12,16,18,20,22,24,28,32,36,38,40,44,49,54,59,63,68",
+    "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)"},
+    "animacoes": {"CROUCH_MEDIUM": {"impacto": 5}}
+  }
+}

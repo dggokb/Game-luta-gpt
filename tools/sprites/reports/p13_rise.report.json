@@ -1,0 +1,165 @@
+{
+  "id": "p13_rise",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_rise_video_normalized.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 520,
+    "rootX": 226,
+    "rootY": 484,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        45,
+        95,
+        401,
+        486
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 88416
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        47,
+        81,
+        403,
+        486
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 89965
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        49,
+        56,
+        404,
+        486
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 92555
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        8,
+        399,
+        486
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 96828
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        53,
+        8,
+        400,
+        486
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 97568
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        55,
+        8,
+        398,
+        486
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 97991
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 378,
+    "frameHeight": 496,
+    "rootX": 190,
+    "rootY": 484,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      36,
+      0
+    ],
+    "sheetWidth": 368,
+    "sheetHeight": 2752,
+    "frames": [
+      [
+        0,
+        2348,
+        368,
+        404,
+        4,
+        89
+      ],
+      [
+        0,
+        1924,
+        368,
+        420,
+        6,
+        75
+      ],
+      [
+        0,
+        1476,
+        368,
+        444,
+        8,
+        50
+      ],
+      [
+        0,
+        0,
+        364,
+        488,
+        9,
+        4
+      ],
+      [
+        0,
+        492,
+        360,
+        488,
+        11,
+        4
+      ],
+      [
+        0,
+        984,
+        356,
+        488,
+        13,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5591040,
+      "grid": 4499712,
+      "packed": 4050944
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "0f26d3a2cb9934059642d631e4b43c5001ffc21b7c95ffeb33ff634ecd70163f",
+      "config": "e5ee3880572ab0e03c8b1eae90db85fbbd73b062da8e593f8cd653e8083ca266",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    }
+  }
+}

@@ -1,0 +1,241 @@
+{
+  "id": "p13_backdash",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_backdash_video_normalized.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 640,
+    "rootX": 260,
+    "rootY": 604,
+    "columns": 8,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        116,
+        102,
+        458,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 99494
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        54,
+        62,
+        439,
+        590
+      ],
+      "minimumMargin": 50,
+      "opaquePixels": 101951
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        84,
+        43,
+        451,
+        519
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 94726
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        61,
+        166,
+        418,
+        607
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 93170
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        104,
+        116,
+        448,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 97781
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        110,
+        109,
+        454,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 98834
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        112,
+        92,
+        455,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 100795
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        114,
+        104,
+        458,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 99798
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        114,
+        95,
+        457,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 100450
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        114,
+        93,
+        457,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 100493
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 423,
+    "frameHeight": 584,
+    "rootX": 215,
+    "rootY": 571,
+    "columns": 8,
+    "frameCount": 10,
+    "cropOffset": [
+      45,
+      33
+    ],
+    "sheetWidth": 1836,
+    "sheetHeight": 1060,
+    "frames": [
+      [
+        1480,
+        0,
+        356,
+        516,
+        64,
+        63
+      ],
+      [
+        0,
+        0,
+        396,
+        540,
+        4,
+        23
+      ],
+      [
+        1080,
+        544,
+        380,
+        488,
+        33,
+        4
+      ],
+      [
+        1464,
+        544,
+        372,
+        456,
+        10,
+        127
+      ],
+      [
+        720,
+        544,
+        356,
+        504,
+        54,
+        77
+      ],
+      [
+        360,
+        544,
+        356,
+        512,
+        60,
+        70
+      ],
+      [
+        400,
+        0,
+        356,
+        528,
+        61,
+        54
+      ],
+      [
+        0,
+        544,
+        356,
+        516,
+        64,
+        66
+      ],
+      [
+        1120,
+        0,
+        356,
+        524,
+        63,
+        56
+      ],
+      [
+        760,
+        0,
+        356,
+        528,
+        63,
+        54
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 20971520,
+      "grid": 15810048,
+      "packed": 7784640
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "411d230541c6632bb041df2a2ded4303464e132d8c6eda7ed26965f65891eb7a",
+      "config": "d32f56d4538e487ae7f3e774deb878bb7be6c86a7596608f28929781e27d14f9",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    }
+  }
+}
