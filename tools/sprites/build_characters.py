@@ -263,7 +263,7 @@ def validate_ultra(name, u, animations):
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
 def validate_fighter_mechanics(name, mech):
-    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca'}
+    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca','corrida'}
     if not isinstance(mech, dict) or set(mech) - known:
         raise ValueError(f'{name}.mecanica: expected some of {sorted(known)}')
     if 'couraca' in mech:   # o p13: golpe fraco só atrasa; forte ou o segundo logo depois acerta
@@ -273,6 +273,14 @@ def validate_fighter_mechanics(name, mech):
         positive_int(c['janela'], name+'.mecanica.couraca.janela')
         if not (type(c['dano']) in (int, float) and 0 <= c['dano'] <= 1):
             raise ValueError(name+'.mecanica.couraca.dano: fraction of the damage, 0..1')
+    if 'corrida' in mech:   # o p13: corrida mais lerda, backdash mais longo
+        c = mech['corrida']
+        if not (isinstance(c, dict) and set(c) <= {'dash', 'backdashQuadros', 'backdashVelocidade'} and c):
+            raise ValueError(name+'.mecanica.corrida: {dash, backdashQuadros, backdashVelocidade}')
+        if 'dash' in c and not (type(c['dash']) in (int, float) and 0 < c['dash'] <= 2):
+            raise ValueError(name+'.mecanica.corrida.dash: fraction of the engine run, 0..2')
+        if 'backdashQuadros' in c: positive_int(c['backdashQuadros'], name+'.mecanica.corrida.backdashQuadros')
+        if 'backdashVelocidade' in c: positive(c['backdashVelocidade'], name+'.mecanica.corrida.backdashVelocidade')
     if 'furia' in mech: positive_int(mech['furia'], name+'.mecanica.furia')
     if 'wallJump' in mech and type(mech['wallJump']) is not bool: raise ValueError(name+'.mecanica.wallJump: true or false')
     if 'capangas' in mech: positive_int(mech['capangas'], name+'.mecanica.capangas')
@@ -644,7 +652,9 @@ def compile_packs(root, results):
                 +('.withWallJump(true)' if mech.get('wallJump') else '')
                 +(f".withHenchmen({mech['capangas']})" if mech.get('capangas') else '')
                 +(f".withNaturalArmor({mech['couraca']['janela']},{round(mech['couraca']['dano'] * 1000)})"
-                  if mech.get('couraca') else ''))
+                  if mech.get('couraca') else '')
+                +(f".withRun({round(mech['corrida'].get('dash', 1) * 1000)},{mech['corrida'].get('backdashQuadros', 0)},"
+                  f"{f(mech['corrida'].get('backdashVelocidade', 0))})" if mech.get('corrida') else ''))
     def ultra_sequence(u):
         hold = ','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('rival', []))
         scene = ''

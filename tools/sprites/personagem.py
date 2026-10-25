@@ -269,7 +269,10 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     Medidas em px lógicos; com densidade 2 (HD) a folha tem o dobro de px."""
     clip = clip_path(char, name)
     cols = min(len(quadros), 11)
-    args = [video, '--clipe', str(clip), '--personagem', char, '--quadros', ','.join(map(str, quadros)),
+    # Saída explícita: a receita de um clipe já em HD aponta o source para a folha HD, e a medida
+    # abaixo lê a folha normalizada.
+    args = [video, str(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png'),
+            '--clipe', str(clip), '--personagem', char, '--quadros', ','.join(map(str, quadros)),
             '--colunas', str(cols), '--fixar', opts.get('fixar', 'tronco')]
     if opts.get('pe_no_chao'):
         args.append('--pe-no-chao')
@@ -296,8 +299,11 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     run(args + ['--celula', '512', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
     d = int(json.loads(clip.read_text(encoding='utf-8')).get('pixelScale', 1))
     sheet = Image.open(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
-    boxes = [sheet.crop((i % cols * 768 * d, i // cols * 512 * d, (i % cols + 1) * 768 * d, (i // cols + 1) * 512 * d))
-             .getchannel('A').point(lambda v: 255 if v > 10 else 0).getbbox() for i in range(len(quadros))]
+    # A folha da medida pode sair com menos colunas que as pedidas (largura máxima da folha):
+    # lê as colunas que ela tem, senão só os primeiros quadros entram na medida.
+    per_row = max(1, sheet.width // (768 * d))
+    boxes = [body_box(sheet.crop((i % per_row * 768 * d, i // per_row * 512 * d, (i % per_row + 1) * 768 * d, (i // per_row + 1) * 512 * d)))
+             for i in range(len(quadros))]
     boxes = [[v // d for v in b] for b in boxes if b]
     x0, y0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
     x1, y1 = max(b[2] for b in boxes), max(b[3] for b in boxes)
@@ -313,6 +319,23 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         up = min(up, h - down)
     out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
     return out.strip().splitlines()[0]
+
+
+def body_box(cell):
+    """Caixa do corpo na célula: sem a sujeira solta do vídeo (pontinhos na borda do quadro), que
+    faria a medida achar o corpo encostado na borda e pegar a célula máxima com a borda aparada."""
+    import cv2
+    a = (np.array(cell.getchannel('A')) > 10).astype(np.uint8)
+    n, _, stats, _ = cv2.connectedComponentsWithStats(a, connectivity=8)
+    if n <= 1:
+        return None
+    areas = stats[1:, cv2.CC_STAT_AREA]
+    keep = [i + 1 for i, v in enumerate(areas) if v >= max(40, areas.max() * 0.004)]
+    x0 = min(stats[i, cv2.CC_STAT_LEFT] for i in keep)
+    y0 = min(stats[i, cv2.CC_STAT_TOP] for i in keep)
+    x1 = max(stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH] for i in keep)
+    y1 = max(stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] for i in keep)
+    return (int(x0), int(y0), int(x1), int(y1))
 
 
 # ---------------------------------------------------------------- pacote

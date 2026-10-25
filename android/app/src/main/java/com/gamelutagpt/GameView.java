@@ -3870,7 +3870,7 @@ public class GameView extends SurfaceView
     private float fighterVisualY(CombatFighter f) {
         float visualY = f.y;
         if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
-            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
+            visualY -= engine.config.backdashVisualLift(f.backdashFrames, engine.backdashFrames(f));
         }
         return visualY;
     }

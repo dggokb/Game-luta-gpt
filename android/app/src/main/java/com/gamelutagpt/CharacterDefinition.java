@@ -456,6 +456,17 @@ final class CharacterDefinition {
             if(window<=0||damagePermille<0||damagePermille>1000)throw new IllegalArgumentException("natural armor: window > 0 and damage 0..1000");
             armorWindow=window;armorDamagePermille=damagePermille;return this;
         }
+        /**
+         * Corrida e backdash do lutador (o colosso é mais lerdo): a corrida a {@link #dashPermille}
+         * da do motor; o backdash dura {@link #backdashFrames} quadros a {@link #backdashSpeed}
+         * px/s (0 = o do motor).
+         */
+        int dashPermille=1000, backdashFrames;
+        float backdashSpeed;
+        Fighter withRun(int dashPermille,int backdashFrames,float backdashSpeed) {
+            if(dashPermille<=0||backdashFrames<0||backdashSpeed<0)throw new IllegalArgumentException("run: dash > 0, backdash >= 0");
+            this.dashPermille=dashPermille;this.backdashFrames=backdashFrames;this.backdashSpeed=backdashSpeed;return this;
+        }
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }

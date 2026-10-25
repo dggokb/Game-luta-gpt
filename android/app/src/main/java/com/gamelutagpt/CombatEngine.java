@@ -619,8 +619,8 @@ final class CombatEngine {
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround()) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
-                f.backdashFrames = config.backdashFrames;
-                f.backdashCooldown = config.backdashFrames + config.backdashRecoveryFrames;
+                f.backdashFrames = backdashFrames(f);
+                f.backdashCooldown = f.backdashFrames + config.backdashRecoveryFrames;
                 f.backdashArmed = false;
                 f.forwardDashing = false;
             } else if ((f.dashRequest || wallChaseRun(f)) && f.backdashFrames == 0) {
@@ -964,6 +964,27 @@ final class CombatEngine {
         CharacterDefinition c = f.character();
         float own = c == null ? 0f : forward ? c.fighter.walkSpeed : c.fighter.walkBackSpeed;
         return own > 0f ? own : forward ? config.walkSpeed : config.walkBackSpeed;
+    }
+
+    /** Corrida do lutador: a do motor vezes a dele (o colosso corre mais lerdo). */
+    float dashSpeed(CombatFighter f) {
+        return config.dashSpeed * dashScale(f);
+    }
+
+    private static float dashScale(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        return c == null ? 1f : c.fighter.dashPermille / 1000f;
+    }
+
+    /** Duração do backdash do lutador (0 no pacote = a do motor). */
+    int backdashFrames(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        return c != null && c.fighter.backdashFrames > 0 ? c.fighter.backdashFrames : config.backdashFrames;
+    }
+
+    float backdashSpeed(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        return c != null && c.fighter.backdashSpeed > 0f ? c.fighter.backdashSpeed : config.backdashSpeed;
     }
 
     /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
@@ -1383,15 +1404,15 @@ final class CombatEngine {
             if (!f.grounded) {
                 airDrift(f, horizontal, walk, boost);
             } else if (f.backdashFrames > 0) {
-                f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
+                f.x -= f.facing * backdashSpeed(f) * boost * CombatConfig.DT;
                 f.backdashFrames--;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE && f.landingLag == 0 &&
                 (f.jumpSquat == 0 || f.forwardDashing)) {
                 if (f.jumpSquat > 0) {
                     // Na preparação do pulo só a corrida segue (o embalo do dash jump).
-                    f.x += f.facing * config.dashSpeed * boost * CombatConfig.DT;
+                    f.x += f.facing * dashSpeed(f) * boost * CombatConfig.DT;
                 } else {
-                    float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost
+                    float speed = f.forwardDashing && holdingForward ? dashSpeed(f) * boost
                         : walkSpeed(f, holdingForward) * boost;
                     f.x += horizontal * speed * CombatConfig.DT;
                 }
@@ -1432,7 +1453,7 @@ final class CombatEngine {
     private void airDrift(CombatFighter f, int horizontal, float walk, float boost) {
         switch (f.jumpMode) {
             case CombatFighter.PULO_CORRIDA:
-                f.x += f.jumpDirection * config.dashJumpSpeed * boost * CombatConfig.DT;
+                f.x += f.jumpDirection * config.dashJumpSpeed * dashScale(f) * boost * CombatConfig.DT;
                 break;
             case CombatFighter.PULO_COMPROMETIDO:
                 // Logo depois de sair do chão ainda dá para escolher a direção; depois, fixa.

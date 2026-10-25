@@ -1,0 +1,339 @@
+{
+  "id": "p13_jump_light",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_jump_light_video_hd.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 704,
+    "rootX": 232,
+    "rootY": 668,
+    "columns": 8,
+    "frameCount": 15
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        41,
+        91,
+        370,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 96653
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        62,
+        75,
+        442,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 96553
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        65,
+        73,
+        459,
+        672
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 98290
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        65,
+        77,
+        462,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 98044
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        66,
+        77,
+        465,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 97399
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        67,
+        79,
+        467,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 97163
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        68,
+        65,
+        468,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 97533
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        69,
+        56,
+        469,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 97258
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        70,
+        51,
+        470,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 96714
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        70,
+        50,
+        470,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 96385
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        71,
+        53,
+        471,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 95841
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        71,
+        62,
+        369,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 90717
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        72,
+        82,
+        358,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 90850
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        62,
+        113,
+        368,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 95206
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        49,
+        105,
+        378,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 98955
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 446,
+    "frameHeight": 638,
+    "rootX": 199,
+    "rootY": 626,
+    "columns": 8,
+    "frameCount": 15,
+    "cropOffset": [
+      33,
+      42
+    ],
+    "sheetWidth": 2932,
+    "sheetHeight": 1236,
+    "frames": [
+      [
+        1928,
+        632,
+        340,
+        588,
+        4,
+        45
+      ],
+      [
+        0,
+        632,
+        388,
+        604,
+        25,
+        29
+      ],
+      [
+        2372,
+        0,
+        404,
+        608,
+        28,
+        27
+      ],
+      [
+        392,
+        632,
+        408,
+        604,
+        28,
+        31
+      ],
+      [
+        804,
+        632,
+        408,
+        604,
+        29,
+        31
+      ],
+      [
+        1216,
+        632,
+        408,
+        600,
+        30,
+        33
+      ],
+      [
+        1648,
+        0,
+        408,
+        616,
+        31,
+        19
+      ],
+      [
+        1236,
+        0,
+        408,
+        624,
+        32,
+        10
+      ],
+      [
+        0,
+        0,
+        408,
+        628,
+        33,
+        5
+      ],
+      [
+        412,
+        0,
+        408,
+        628,
+        33,
+        4
+      ],
+      [
+        824,
+        0,
+        408,
+        628,
+        34,
+        7
+      ],
+      [
+        2060,
+        0,
+        308,
+        616,
+        34,
+        16
+      ],
+      [
+        1628,
+        632,
+        296,
+        596,
+        35,
+        36
+      ],
+      [
+        2616,
+        632,
+        316,
+        564,
+        25,
+        67
+      ],
+      [
+        2272,
+        632,
+        340,
+        572,
+        12,
+        59
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 23068672,
+      "grid": 18211072,
+      "packed": 14495808
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "39af5f55e5c9e52471aea78a26699b2005028f415037a7b2ea3455c4699c7f0f",
+      "config": "60d6990b5d4f83e85e590a2714861ebfa82f46f80fe03110c38204e03e576777",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    },
+    "referenceSources": {
+      "art/sprites/source/p13_jump_light_video_normalized.png": "68b8d2680f42a40083718cf986fb0329d19878fcc46b4f729c6cc95e155550aa"
+    }
+  }
+}

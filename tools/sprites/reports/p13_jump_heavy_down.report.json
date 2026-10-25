@@ -1,0 +1,377 @@
+{
+  "id": "p13_jump_heavy_down",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_jump_heavy_down_video_hd.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 768,
+    "rootX": 246,
+    "rootY": 732,
+    "columns": 9,
+    "frameCount": 17
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        86,
+        145,
+        372,
+        735
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 91328
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        88,
+        174,
+        373,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 90402
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        72,
+        163,
+        389,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 95013
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        82,
+        104,
+        375,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 94692
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        82,
+        97,
+        376,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 93778
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        76,
+        88,
+        375,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 95871
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        83,
+        83,
+        376,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 95614
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        80,
+        83,
+        377,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 95283
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        78,
+        76,
+        390,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 94217
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        74,
+        90,
+        409,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 93960
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        30,
+        107,
+        403,
+        735
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 99880
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        59,
+        145,
+        416,
+        734
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 90331
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        60,
+        130,
+        396,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 88558
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        61,
+        126,
+        397,
+        734
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 88606
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        60,
+        166,
+        396,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 87020
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        59,
+        185,
+        396,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 86902
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        59,
+        168,
+        397,
+        733
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 86897
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 402,
+    "frameHeight": 675,
+    "rootX": 224,
+    "rootY": 664,
+    "columns": 9,
+    "frameCount": 17,
+    "cropOffset": [
+      22,
+      68
+    ],
+    "sheetWidth": 2952,
+    "sheetHeight": 1284,
+    "frames": [
+      [
+        348,
+        672,
+        296,
+        600,
+        60,
+        73
+      ],
+      [
+        2052,
+        672,
+        296,
+        568,
+        62,
+        102
+      ],
+      [
+        1020,
+        672,
+        328,
+        580,
+        46,
+        91
+      ],
+      [
+        1912,
+        0,
+        304,
+        640,
+        56,
+        32
+      ],
+      [
+        1604,
+        0,
+        304,
+        648,
+        56,
+        25
+      ],
+      [
+        944,
+        0,
+        308,
+        656,
+        50,
+        16
+      ],
+      [
+        324,
+        0,
+        304,
+        660,
+        57,
+        11
+      ],
+      [
+        632,
+        0,
+        308,
+        660,
+        54,
+        11
+      ],
+      [
+        0,
+        0,
+        320,
+        668,
+        52,
+        4
+      ],
+      [
+        1256,
+        0,
+        344,
+        652,
+        48,
+        18
+      ],
+      [
+        2220,
+        0,
+        384,
+        636,
+        4,
+        35
+      ],
+      [
+        648,
+        672,
+        368,
+        600,
+        33,
+        73
+      ],
+      [
+        0,
+        672,
+        344,
+        612,
+        34,
+        58
+      ],
+      [
+        2608,
+        0,
+        344,
+        616,
+        35,
+        54
+      ],
+      [
+        1352,
+        672,
+        344,
+        576,
+        34,
+        94
+      ],
+      [
+        2352,
+        672,
+        348,
+        556,
+        33,
+        113
+      ],
+      [
+        1700,
+        672,
+        348,
+        576,
+        33,
+        96
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 24772608,
+      "grid": 19537200,
+      "packed": 15161472
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "b673a799624383a36ecda28a6b1eb98d0e639267f50f0f44365d0aa71c91011d",
+      "config": "2a595bf3d10783e536769c010e9bb3e252821d0aae33c2e73f0440e203c6da76",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    },
+    "referenceSources": {
+      "art/sprites/source/p13_jump_heavy_down_video_normalized.png": "984a6f305dc95d205ddca42c78d8f7d0efad246ed1ed721890e97e52af8f0dae"
+    }
+  }
+}

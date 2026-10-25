@@ -1002,6 +1002,11 @@
           "couraca": {
             "janela": 45,
             "dano": 0.5
+          },
+          "corrida": {
+            "dash": 0.72,
+            "backdashQuadros": 24,
+            "backdashVelocidade": 520
           }
         }
       },

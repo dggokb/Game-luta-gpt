@@ -114,8 +114,12 @@ final class CombatConfig {
     /** Visual retreat hop is shared by all fighters; ground collision remains unchanged. */
     float backdashHopHeight = 40f;
     float backdashVisualLift(int framesLeft) {
-        if (framesLeft <= 0 || framesLeft > backdashFrames) return 0f;
-        float fraction = (backdashFrames - framesLeft) / (float)backdashFrames;
+        return backdashVisualLift(framesLeft, backdashFrames);
+    }
+    /** O pulinho de um backdash de {@code total} quadros (o do lutador). */
+    float backdashVisualLift(int framesLeft, int total) {
+        if (framesLeft <= 0 || framesLeft > total) return 0f;
+        float fraction = (total - framesLeft) / (float)total;
         return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
     }
     // 60 FPS normal jump: ~42 airborne frames, apex ~1.16x P01's standing hurtbox.

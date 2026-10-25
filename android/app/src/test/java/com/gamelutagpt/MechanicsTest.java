@@ -151,6 +151,17 @@ public class MechanicsTest {
         assertEquals("his H carries on", "H", s.attackId(1));
     }
 
+    @Test public void theColossusRunsSlowerAndBackdashesLonger() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, GeneratedCharacters.get("p13"), 500f, 600f);
+        CombatEngine e = s.engine;
+        assertTrue("slower run", e.dashSpeed(s.f(1)) < e.dashSpeed(s.f(0)));
+        assertTrue("longer backdash", e.backdashFrames(s.f(1)) > e.backdashFrames(s.f(0)));
+        assertEquals("the others keep the engine's", e.config.backdashSpeed, e.backdashSpeed(s.f(0)), .001f);
+        float d13 = e.backdashSpeed(s.f(1)) * e.backdashFrames(s.f(1));
+        float d01 = e.backdashSpeed(s.f(0)) * e.backdashFrames(s.f(0));
+        assertTrue("about the same distance: " + d13 + " vs " + d01, d13 < d01 && d13 > d01 * 0.7f);
+    }
+
     @Test public void lowCounterDoesNotReadAStandingStrike() {
         AttackDefinition stance = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().counter(AttackDefinition.Reads.LOW, 1, 11)).build();

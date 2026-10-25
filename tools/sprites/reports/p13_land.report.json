@@ -1,117 +1,269 @@
 {
   "id": "p13_land",
   "characterProfile": "p13",
-  "source": "art/sprites/source/p13_land_video_normalized.png",
+  "source": "art/sprites/source/p13_land_video_hd.png",
   "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 262,
-    "rootY": 476,
-    "columns": 4,
-    "frameCount": 4
+    "frameHeight": 576,
+    "rootX": 266,
+    "rootY": 540,
+    "columns": 8,
+    "frameCount": 12
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        47,
-        42,
-        465,
-        472
+        53,
+        87,
+        472,
+        541
       ],
-      "minimumMargin": 40,
-      "opaquePixels": 99252
+      "minimumMargin": 35,
+      "opaquePixels": 99477
     },
     {
       "index": 1,
       "outputBbox": [
-        50,
-        64,
-        466,
-        474
+        44,
+        102,
+        462,
+        541
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 97566
+      "minimumMargin": 35,
+      "opaquePixels": 98972
     },
     {
       "index": 2,
       "outputBbox": [
-        53,
-        68,
-        467,
-        479
+        45,
+        127,
+        461,
+        542
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 98470
+      "minimumMargin": 34,
+      "opaquePixels": 97614
     },
     {
       "index": 3,
       "outputBbox": [
-        57,
-        64,
-        469,
-        478
+        45,
+        131,
+        461,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 97559
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        47,
+        128,
+        461,
+        542
       ],
       "minimumMargin": 34,
-      "opaquePixels": 99069
+      "opaquePixels": 98145
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        48,
+        126,
+        460,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 98404
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        50,
+        123,
+        460,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 98481
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        56,
+        120,
+        460,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 99268
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        72,
+        103,
+        457,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 100465
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        86,
+        80,
+        450,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 100399
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        78,
+        54,
+        442,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 100475
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        79,
+        33,
+        433,
+        541
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 100211
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 442,
-    "frameHeight": 458,
-    "rootX": 225,
-    "rootY": 445,
-    "columns": 4,
-    "frameCount": 4,
+    "frameWidth": 444,
+    "frameHeight": 525,
+    "rootX": 230,
+    "rootY": 515,
+    "columns": 8,
+    "frameCount": 12,
     "cropOffset": [
-      37,
-      31
+      36,
+      25
     ],
-    "sheetWidth": 432,
-    "sheetHeight": 1732,
+    "sheetWidth": 852,
+    "sheetHeight": 2736,
     "frames": [
       [
-        0,
-        0,
-        432,
-        444,
-        4,
-        4
+        376,
+        520,
+        428,
+        464,
+        13,
+        58
       ],
       [
         0,
-        880,
+        996,
         428,
+        448,
+        4,
+        73
+      ],
+      [
+        0,
+        1884,
+        424,
+        424,
+        5,
+        98
+      ],
+      [
+        424,
+        2312,
+        424,
+        420,
+        5,
+        102
+      ],
+      [
+        428,
+        1884,
+        424,
         424,
         7,
-        27
+        99
       ],
       [
         0,
-        1308,
+        2312,
+        420,
         424,
-        424,
-        12,
-        30
+        8,
+        97
+      ],
+      [
+        416,
+        1448,
+        420,
+        428,
+        10,
+        94
       ],
       [
         0,
+        1448,
+        412,
+        432,
+        16,
+        91
+      ],
+      [
+        432,
+        996,
+        396,
         448,
-        428,
-        428,
-        13,
-        27
+        32,
+        74
+      ],
+      [
+        0,
+        520,
+        372,
+        472,
+        46,
+        51
+      ],
+      [
+        368,
+        0,
+        372,
+        496,
+        38,
+        25
+      ],
+      [
+        0,
+        0,
+        364,
+        516,
+        39,
+        4
       ]
     ],
     "decodedBytes": {
-      "canonical": 4194304,
-      "grid": 3238976,
-      "packed": 2992896
+      "canonical": 18874368,
+      "grid": 14918400,
+      "packed": 9324288
     },
     "pixelScale": 2.0
   },
@@ -119,9 +271,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0f909cb53d10fef7a2e75f0129ff31a84bd6a8a3cb6f5cda2bc74f692549676e",
-      "config": "675ecf06c33b0ff3ea899a0867407e92951d117ee214d0ebc55526702fee6594",
+      "source": "1b67812443a42a0a143b0ef6b5fcfc7b0c808e1f9d37d10c9dd5064fd6519a49",
+      "config": "59aeb087089c682154bbaa27870e36c1ac8dd997cd6a40e5495a0417405ef3c7",
       "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    },
+    "referenceSources": {
+      "art/sprites/source/p13_land_video_normalized.png": "2baf436e73172e0d6b09fc01e82faf185949340cf187f8e739aa7f2aa0bd6969"
     }
   }
 }

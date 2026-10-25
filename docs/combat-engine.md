@@ -268,6 +268,10 @@ todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTes
   especial, Super, Ultra, projétil, ou outro golpe fraco dentro da janela acertam normal; atordoado,
   derrubado ou agarrado não tem couraça. Cue `COURACA`; o golpe conta como acerto para quem bateu
   (o cancelamento sai). Testes em `MechanicsTest` (`theColossus...`).
+- **Corrida própria** (o p13, lerdo): `Fighter.withRun(dash‰, quadrosDoBackdash, velocidade)`,
+  `mecanicas.json` → `lutador.corrida {dash, backdashQuadros, backdashVelocidade}`. A corrida (e o
+  embalo do dash jump) sai a `dash` da do motor; o backdash dura os quadros dele, na velocidade dele,
+  e o pulinho do desenho acompanha (`CombatConfig.backdashVisualLift(restam, total)`).
 - **Repel** (o S2 da p15): postura de contra-ataque (`Mechanics.counter` com `repel()`) que só bate
   no golpe que repeliu; sem golpe na janela a explosão não sai e sobra a recuperação. Projétil que
   chega na janela se desfaz (`CombatEngine.repelled`, estouro na tela). Cue e aviso `REPEL`.

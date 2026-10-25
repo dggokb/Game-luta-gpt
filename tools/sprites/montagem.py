@@ -31,7 +31,8 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
   mede pelo pé de apoio (vídeo em que a câmera acompanha, como a corrida do dash); "devagar": 1.6
   deixa o ciclo 1,6x mais lento que o pé plantado (o pé escorrega um pouco); "velocidade": "video"
   faz o lutador andar no chão na velocidade do vídeo (fighter.walkSpeed / walkBackSpeed, no lugar
-  da do motor): o ciclo toca no tempo do vídeo com o pé plantado; "tempo": "video" deixa o andar
+  da do motor): o ciclo toca no tempo do vídeo com o pé plantado; "velocidade": 170 anda a 170 px/s com o ciclo
+  "acelerar" vezes mais rápido que o vídeo (vídeo que quase marca passo: o p13); "tempo": "video" deixa o andar
   do motor e acerta a distância por quadro para o ciclo tocar no tempo do vídeo (o pé escorrega
   se o passo do vídeo for curto; "acelerar": 2 toca o ciclo 2x mais rápido). A mesma folha
   pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1).
@@ -196,7 +197,12 @@ def update_pack(char, name, spec, distance=None):
                 anim['distancePerFrame'] = round(anim['distancePerFrame'] * a['devagar'], 2)
             step = float(np.median(np.abs(np.diff(quadros)))) if len(quadros) > 1 else 1.0
             key = 'walkBackSpeed' if state == 'WALK_BACK' else 'walkSpeed'
-            if a.get('velocidade') == 'video':
+            if type(a.get('velocidade')) in (int, float):
+                # Velocidade própria (px/s, o colosso lerdo): o ciclo do vídeo toca "acelerar" vezes
+                # mais rápido e o lutador anda nessa velocidade (o pé escorrega só a diferença).
+                pack['fighter'][key] = a['velocidade']
+                anim['distancePerFrame'] = round(a['velocidade'] * step / FPS / a.get('acelerar', 1), 2)
+            elif a.get('velocidade') == 'video':
                 # Anda no chão na velocidade do vídeo: o ciclo toca no tempo do vídeo, pé plantado.
                 pack['fighter'][key] = round(anim['distancePerFrame'] * FPS / step, 1)
             elif a.get('tempo') == 'video':

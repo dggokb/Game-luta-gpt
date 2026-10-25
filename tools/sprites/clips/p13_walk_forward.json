@@ -2,31 +2,48 @@
   "id": "p13_walk_forward",
   "javaName": "P13_WALK_FORWARD",
   "profile": "p13.json",
-  "source": "art/sprites/source/p13_walk_forward_video_normalized.png",
+  "source": "art/sprites/source/p13_walk_forward_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p13_walk_forward.webp",
   "report": "tools/sprites/reports/p13_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p13_walk_forward-import.png",
   "expectedFrames": 21,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "frente.mp4",
     "personagem": "p13",
     "escala": 0.4322,
-    "medida": "1º quadro = inicio_centro (nota 0.99)",
+    "motivo": "mesma câmera dos outros vídeos do p13",
     "quadros": "45,47,49,51,53,55,57,59,61,63,65,67,69,71,73,75,77,79,81,83,85",
     "celula": 320,
-    "largura": 192,
-    "raiz": "95,302",
-    "colunas": 10,
+    "largura": 224,
+    "raiz": "99,302",
+    "colunas": 9,
     "pe_no_chao": true,
-    "densidade": 2
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_walk_forward_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        99,
+        302
+      ],
+      "colunas": 9
+    },
+    "recorte_suave": true
   },
-  "frameWidth": 392,
+  "frameWidth": 448,
   "frameHeight": 640,
-  "rootX": 190,
+  "rootX": 198,
   "rootY": 604,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_walk_forward_video_normalized.png"
+  ]
 }

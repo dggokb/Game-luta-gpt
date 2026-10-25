@@ -2,30 +2,49 @@
   "id": "p13_land",
   "javaName": "P13_LAND",
   "profile": "p13.json",
-  "source": "art/sprites/source/p13_land_video_normalized.png",
+  "source": "art/sprites/source/p13_land_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p13_land.webp",
   "report": "tools/sprites/reports/p13_land.report.json",
   "preview": "android/app/build/sprite-review/p13_land-import.png",
-  "expectedFrames": 4,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 4,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "pulo.mp4",
     "personagem": "p13",
     "escala": 0.4322,
-    "medida": "1º quadro = inicio_centro (nota 0.99)",
-    "quadros": "73,75,77,79",
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "70,72,74,76,78,80,82,84,86,88,90,92",
+    "celula": 288,
     "largura": 256,
-    "raiz": "131,238",
-    "colunas": 4,
+    "raiz": "133,270",
+    "pe_no_chao": true,
+    "sem_efeitos": true,
     "limpar_chao": true,
-    "densidade": 2
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_land_video_normalized.png",
+      "celula": [
+        256,
+        288
+      ],
+      "raiz": [
+        133,
+        270
+      ],
+      "colunas": 8
+    },
+    "recorte_suave": true
   },
+  "frameHeight": 576,
+  "rootX": 266,
+  "rootY": 540,
   "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 262,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_land_video_normalized.png"
+  ]
 }

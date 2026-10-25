@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p13_crouch_medium-import.png",
   "expectedFrames": 19,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -17,9 +17,10 @@
     "escala": 0.4322,
     "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)",
     "quadros": "5,8,12,16,18,20,22,24,28,32,36,38,40,44,49,54,59,63,68",
-    "largura": 320,
-    "raiz": "117,230",
-    "colunas": 6,
+    "celula": 288,
+    "largura": 384,
+    "raiz": "118,262",
+    "colunas": 5,
     "fixar": "video",
     "sem_efeitos": true,
     "limpar_chao": true,
@@ -28,23 +29,23 @@
     "referencia": {
       "folha": "art/sprites/source/p13_crouch_medium_video_normalized.png",
       "celula": [
-        320,
-        256
+        384,
+        288
       ],
       "raiz": [
-        117,
-        230
+        118,
+        262
       ],
-      "colunas": 6
+      "colunas": 5
     },
     "recorte_suave": true
   },
-  "frameWidth": 648,
-  "rootX": 234,
-  "rootY": 460,
-  "frameHeight": 512,
-  "pixelScale": 2.0,
+  "frameWidth": 768,
+  "rootX": 236,
+  "rootY": 524,
+  "frameHeight": 576,
   "sourceReferences": [
     "art/sprites/source/p13_crouch_medium_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2.0
 }

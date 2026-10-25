@@ -1,0 +1,377 @@
+{
+  "id": "p13_defense_crouch",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_defense_crouch_video_hd.png",
+  "sourceNote": "p13 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 512,
+    "rootX": 238,
+    "rootY": 476,
+    "columns": 9,
+    "frameCount": 17
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        57,
+        76,
+        414,
+        477
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 89477
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        55,
+        63,
+        411,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 90001
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        43,
+        68,
+        408,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 89652
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        77,
+        398,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 84897
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        62,
+        89,
+        414,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 81938
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        67,
+        91,
+        420,
+        478
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 80694
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        34,
+        95,
+        388,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 79290
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        37,
+        89,
+        389,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 79490
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        43,
+        91,
+        396,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 80068
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        40,
+        94,
+        394,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 79384
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        39,
+        87,
+        391,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 79884
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        40,
+        94,
+        392,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 79134
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        38,
+        96,
+        388,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 78930
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        26,
+        94,
+        375,
+        477
+      ],
+      "minimumMargin": 26,
+      "opaquePixels": 80700
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        35,
+        90,
+        392,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 85170
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        48,
+        85,
+        406,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 87295
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        51,
+        84,
+        409,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 88593
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 410,
+    "frameHeight": 431,
+    "rootX": 220,
+    "rootY": 421,
+    "columns": 9,
+    "frameCount": 17,
+    "cropOffset": [
+      18,
+      55
+    ],
+    "sheetWidth": 744,
+    "sheetHeight": 3644,
+    "frames": [
+      [
+        0,
+        428,
+        368,
+        412,
+        35,
+        17
+      ],
+      [
+        0,
+        0,
+        364,
+        424,
+        33,
+        4
+      ],
+      [
+        368,
+        0,
+        376,
+        420,
+        21,
+        9
+      ],
+      [
+        372,
+        428,
+        356,
+        412,
+        29,
+        18
+      ],
+      [
+        0,
+        1252,
+        360,
+        400,
+        40,
+        30
+      ],
+      [
+        364,
+        1656,
+        364,
+        396,
+        45,
+        32
+      ],
+      [
+        0,
+        2460,
+        364,
+        392,
+        12,
+        36
+      ],
+      [
+        364,
+        1252,
+        360,
+        400,
+        15,
+        30
+      ],
+      [
+        0,
+        2060,
+        364,
+        396,
+        21,
+        32
+      ],
+      [
+        368,
+        2460,
+        364,
+        392,
+        18,
+        35
+      ],
+      [
+        0,
+        1656,
+        360,
+        400,
+        17,
+        28
+      ],
+      [
+        0,
+        2856,
+        360,
+        392,
+        18,
+        35
+      ],
+      [
+        364,
+        2856,
+        360,
+        392,
+        16,
+        37
+      ],
+      [
+        0,
+        3252,
+        360,
+        392,
+        4,
+        35
+      ],
+      [
+        368,
+        2060,
+        368,
+        396,
+        13,
+        31
+      ],
+      [
+        0,
+        844,
+        368,
+        404,
+        26,
+        26
+      ],
+      [
+        372,
+        844,
+        368,
+        404,
+        29,
+        25
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 16515072,
+      "grid": 12723120,
+      "packed": 10844544
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "ef3403fd23ecf2612077730078161dddc1944c2c868324391b064b7dfbf5e73b",
+      "config": "8b707305f01fec075412c35a0ec7f46524a283628a07eaf5be8f24fae6281841",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    },
+    "referenceSources": {
+      "art/sprites/source/p13_defense_crouch_video_normalized.png": "4d686393b558131e0b621fa758770fe618db6aabdf5f56eaad08a832ee735133"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "p13_defense_crouch",
+  "javaName": "P13_DEFENSE_CROUCH",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_defense_crouch_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_defense_crouch.webp",
+  "report": "tools/sprites/reports/p13_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p13_defense_crouch-import.png",
+  "expectedFrames": 17,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaAgachado.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)",
+    "quadros": "12,15,17,19,21,24,30,40,50,60,70,78,80,82,84,86,90",
+    "largura": 224,
+    "raiz": "119,238",
+    "colunas": 9,
+    "fixar": "registro",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_defense_crouch_video_normalized.png",
+      "celula": [
+        224,
+        256
+      ],
+      "raiz": [
+        119,
+        238
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameWidth": 448,
+  "rootX": 238,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_defense_crouch_video_normalized.png"
+  ]
+}

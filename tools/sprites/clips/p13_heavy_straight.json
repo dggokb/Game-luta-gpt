@@ -2,30 +2,49 @@
   "id": "p13_heavy_straight",
   "javaName": "P13_HEAVY_STRAIGHT",
   "profile": "p13.json",
-  "source": "art/sprites/source/p13_heavy_straight_video_normalized.png",
+  "source": "art/sprites/source/p13_heavy_straight_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p13_heavy_straight.webp",
   "report": "tools/sprites/reports/p13_heavy_straight.report.json",
   "preview": "android/app/build/sprite-review/p13_heavy_straight-import.png",
-  "expectedFrames": 23,
+  "expectedFrames": 29,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "H.mp4",
     "personagem": "p13",
     "escala": 0.4322,
-    "medida": "1º quadro = inicio_centro (nota 0.99)",
-    "quadros": "15,20,26,31,37,42,47,53,58,64,69,71,72,74,75,77,78,80,82,83,85,86,88",
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "16,20,22,24,26,28,30,32,34,36,38,40,42,44,46,50,54,58,62,66,70,72,74,76,78,80,82,84,88",
     "celula": 320,
-    "largura": 256,
-    "raiz": "106,302",
+    "largura": 352,
+    "raiz": "123,302",
+    "colunas": 5,
+    "fixar": "video",
     "limpar_chao": true,
-    "densidade": 2
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_heavy_straight_video_normalized.png",
+      "celula": [
+        352,
+        320
+      ],
+      "raiz": [
+        123,
+        302
+      ],
+      "colunas": 5
+    },
+    "recorte_suave": true
   },
-  "frameWidth": 520,
+  "frameWidth": 704,
   "frameHeight": 640,
-  "rootX": 212,
+  "rootX": 246,
   "rootY": 604,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_heavy_straight_video_normalized.png"
+  ]
 }

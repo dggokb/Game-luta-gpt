@@ -6,45 +6,46 @@
   "output": "android/app/src/main/res/drawable-nodpi/p13_jump.webp",
   "report": "tools/sprites/reports/p13_jump.report.json",
   "preview": "android/app/build/sprite-review/p13_jump-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "pulo.mp4",
     "personagem": "p13",
     "escala": 0.4322,
-    "medida": "1º quadro = inicio_centro (nota 0.99)",
-    "quadros": "0,23,24,33,43,52",
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "24,26,28,30,32,34,36,38,40,42,44,46",
     "celula": 320,
-    "largura": 224,
-    "raiz": "108,302",
-    "colunas": 6,
+    "largura": 256,
+    "raiz": "143,302",
     "fixar": "registro",
     "pe_no_chao": true,
+    "sem_efeitos": true,
+    "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p13_jump_video_normalized.png",
       "celula": [
-        224,
+        256,
         320
       ],
       "raiz": [
-        108,
+        143,
         302
       ],
-      "colunas": 6
+      "colunas": 8
     },
     "recorte_suave": true
   },
-  "frameWidth": 456,
   "frameHeight": 640,
-  "rootX": 224,
+  "rootX": 286,
   "rootY": 604,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p13_jump_video_normalized.png"
-  ]
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

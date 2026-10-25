@@ -2,31 +2,50 @@
   "id": "p13_light_jab",
   "javaName": "P13_LIGHT_JAB",
   "profile": "p13.json",
-  "source": "art/sprites/source/p13_light_jab_video_normalized.png",
+  "source": "art/sprites/source/p13_light_jab_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p13_light_jab.webp",
   "report": "tools/sprites/reports/p13_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p13_light_jab-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "L.mp4",
     "personagem": "p13",
     "escala": 0.4322,
-    "medida": "1º quadro = inicio_centro (nota 0.99)",
-    "quadros": "23,26,30,41,52,64,76,88,100,111,123",
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "22,24,25,26,27,30,31,33,36",
     "celula": 288,
-    "largura": 224,
-    "raiz": "113,270",
-    "colunas": 9,
+    "largura": 320,
+    "raiz": "134,270",
+    "colunas": 6,
+    "fixar": "video",
+    "sem_efeitos": true,
     "limpar_chao": true,
-    "densidade": 2
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_light_jab_video_normalized.png",
+      "celula": [
+        320,
+        288
+      ],
+      "raiz": [
+        134,
+        270
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
   },
-  "frameWidth": 456,
+  "frameWidth": 640,
   "frameHeight": 576,
-  "rootX": 226,
+  "rootX": 268,
   "rootY": 540,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_light_jab_video_normalized.png"
+  ]
 }

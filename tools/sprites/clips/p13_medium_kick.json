@@ -2,11 +2,11 @@
   "id": "p13_medium_kick",
   "javaName": "P13_MEDIUM_KICK",
   "profile": "p13.json",
-  "source": "art/sprites/source/p13_medium_kick_video_normalized.png",
+  "source": "art/sprites/source/p13_medium_kick_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p13_medium_kick.webp",
   "report": "tools/sprites/reports/p13_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p13_medium_kick-import.png",
-  "expectedFrames": 14,
+  "expectedFrames": 19,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -15,18 +15,37 @@
     "arquivo": "M.mp4",
     "personagem": "p13",
     "escala": 0.4322,
-    "medida": "1º quadro = inicio_centro (nota 0.99)",
-    "quadros": "15,17,19,22,23,25,27,29,31,33,35,37,39,41",
-    "celula": 320,
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "15,17,18,19,20,23,25,27,29,31,33,35,36,37,38,39,40,42,44",
+    "celula": 288,
     "largura": 320,
-    "raiz": "122,299",
+    "raiz": "119,270",
     "colunas": 6,
+    "fixar": "video",
+    "sem_efeitos": true,
     "limpar_chao": true,
-    "densidade": 2
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_medium_kick_video_normalized.png",
+      "celula": [
+        320,
+        288
+      ],
+      "raiz": [
+        119,
+        270
+      ],
+      "colunas": 6
+    },
+    "recorte_suave": true
   },
   "frameWidth": 640,
-  "frameHeight": 640,
-  "rootX": 244,
-  "rootY": 598,
-  "pixelScale": 2.0
+  "frameHeight": 576,
+  "rootX": 238,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_medium_kick_video_normalized.png"
+  ]
 }
