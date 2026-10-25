@@ -125,5 +125,23 @@
     "quadros": "0,6,10,14,18,24,30,34,36,37,38,39,40,42,46,52,60",
     "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)"},
     "animacoes": {"JUMP_HEAVY_DOWN": {"impacto": 11}}
+  },
+  "hit_stand": {
+    "trechos": [["dano", 0, 124]],
+    "quadros": "15,17,22,23,24,26,28,30,34,38,44,50,56,62,66,70,74,78,82",
+    "opcoes": {"fixar": "registro", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)"},
+    "animacoes": {"HIT_STAND": {}}
+  },
+  "hit_crouch": {
+    "trechos": [["danoAgachado", 0, 124]],
+    "quadros": "22,25,27,28,29,30,32,36,42,48,54,60,66,72,76,78,80,82,86",
+    "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)"},
+    "animacoes": {"HIT_CROUCH": {}}
+  },
+  "hit_air": {
+    "trechos": [["danoPulo", 0, 124]],
+    "quadros": "24,25,34,35,36,38,40,44,50,56,62,66,69,72,75",
+    "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)"},
+    "animacoes": {"HIT_AIR": {}}
   }
 }

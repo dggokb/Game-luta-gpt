@@ -1,0 +1,50 @@
+{
+  "id": "p13_hit_crouch",
+  "javaName": "P13_HIT_CROUCH",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_hit_crouch_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_hit_crouch.webp",
+  "report": "tools/sprites/reports/p13_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p13_hit_crouch-import.png",
+  "expectedFrames": 19,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoAgachado.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)",
+    "quadros": "22,25,27,28,29,30,32,36,42,48,54,60,66,72,76,78,80,82,86",
+    "largura": 256,
+    "raiz": "112,238",
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_hit_crouch_video_normalized.png",
+      "celula": [
+        256,
+        256
+      ],
+      "raiz": [
+        112,
+        238
+      ],
+      "colunas": 8
+    },
+    "recorte_suave": true
+  },
+  "rootX": 224,
+  "sourceReferences": [
+    "art/sprites/source/p13_hit_crouch_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
+}

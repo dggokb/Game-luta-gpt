@@ -1,0 +1,50 @@
+{
+  "id": "p13_hit_stand",
+  "javaName": "P13_HIT_STAND",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_hit_stand_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_hit_stand.webp",
+  "report": "tools/sprites/reports/p13_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/p13_hit_stand-import.png",
+  "expectedFrames": 19,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dano.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)",
+    "quadros": "15,17,22,23,24,26,28,30,34,38,44,50,56,62,66,70,74,78,82",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "115,270",
+    "fixar": "registro",
+    "sem_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p13_hit_stand_video_normalized.png",
+      "celula": [
+        256,
+        288
+      ],
+      "raiz": [
+        115,
+        270
+      ],
+      "colunas": 11
+    },
+    "recorte_suave": true
+  },
+  "frameHeight": 576,
+  "rootX": 230,
+  "rootY": 540,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_hit_stand_video_normalized.png"
+  ]
+}
