@@ -76,6 +76,7 @@ mantêm o formato.
 | p11 | quebrada | dividida | sombria | vazio |
 | p12 | quebrada | racha | sombria | vermelho |
 | p16 | (padrão: sem `ultra.json` ainda) | | própria: planos fixos (`camera` no `tools/sprites/ultras.json`) | |
+| p15 | (padrão: sem `ultra.json` ainda) | | padrão; **zanzoken** (ela some deixando a imagem piscando e reaparece piscando), o **secreto** na tela preta (cada golpe no escuro pisca a tela, mostra o rival em silhueta branca, cortes brancos de borda vermelha e a estrela do impacto) e o **recuo** (reaparece 260 px para trás e aperta a faixa, o golpe final) | |
 
 ## Trocar nome, grito, cores e onomatopeias
 

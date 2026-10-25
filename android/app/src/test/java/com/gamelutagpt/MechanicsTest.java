@@ -553,6 +553,27 @@ public class MechanicsTest {
         assertFalse("the victim shows up for the blast", p16.hidesVictim(p16.blast[0]));
     }
 
+    @Test public void mugenRendanVanishesInTheDarkAndReappearsFarForTheBelt() {
+        CombatEngineTest.Sim s = ultraSequence("p15", 110f);
+        CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
+        assertTrue("two zanzoken", seq.vanish.length == 2 && seq.retreat != null);
+        assertTrue("she vanishes into the blackout", seq.hidesAttacker(seq.blackout[0]) && seq.blackoutAlpha(seq.blackout[0] + 4) == 255);
+        int inTheDark = 0;
+        for (int h : seq.hits) if (h >= seq.blackout[0] && h < seq.blackout[1]) inTheDark++;
+        assertTrue("hits in the dark: " + inTheDark, inTheDark >= 4);
+        assertTrue("reappears far on the second zanzoken", seq.retreat[0] == seq.vanish[1][1]);
+        CombatConfig config = s.engine.config;
+        s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
+        s.until(() -> s.f(0).ultraFrame >= seq.retreat[0] - 1, 900);
+        float rival = s.f(1).x, gap = (s.f(1).x - s.f(0).x) * s.f(0).facing;
+        s.until(() -> s.f(0).ultraRetreated, 30);
+        assertEquals("the rival stays where he was", rival, s.f(1).x, 0.5f);
+        assertTrue("she is far now: " + gap + " -> " + (s.f(1).x - s.f(0).x) * s.f(0).facing,
+            (s.f(1).x - s.f(0).x) * s.f(0).facing > gap + 150f);
+        s.until(() -> !s.f(0).inUltraSequence(), 600);
+        assertTrue("the belt is the last blow", s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
+    }
+
     @Test public void theCinematicUltraWaitsForTheMangaPageAndTheGradeBoostsTheLastBlow() {
         int plain = ultraDamage(false, 0f);
         assertEquals("a page without a grade changes nothing", plain, ultraDamage(true, 0f));

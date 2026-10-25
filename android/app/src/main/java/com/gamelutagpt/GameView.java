@@ -1782,6 +1782,7 @@ public class GameView extends SurfaceView
         hud.resetEffects();
         impacts.clear();
         riscos.clear();
+        secretoStart = -1;
         efeitos.limpar();
         feel.clear();
         finalizacao.limpar();
@@ -2374,6 +2375,14 @@ public class GameView extends SurfaceView
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         if (!efeitoDeGolpe(event.blocked, x, y, direction, size)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        }
+        // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
+        if (!event.blocked && ultraBlackout() > 0) {
+            secretoStart = engine.frame();
+            secretoX = x;
+            secretoY = y;
+            secretoVictim = event.defender;
+            secretoSeed++;
         }
         // Golpe forte (H, especiais, Super, Ultra): os riscos de mangá no corpo e no rastro do golpe.
         if (!event.blocked && size >= ImpactEffects.HEAVY) {
@@ -3214,6 +3223,7 @@ public class GameView extends SurfaceView
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(blackout << 24);
                 canvas.drawRect(-40f, -40f, VW + 40f, VH + 40f, paint);
+                drawSecreto(canvas, renderZoom, cameraLeft, renderCameraTop);
             }
             if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
                 drawGroundMarkers(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -3923,6 +3933,46 @@ public class GameView extends SurfaceView
         return false;
     }
 
+    /** Quadros do zanzoken: a imagem que fica some nesse tanto; o reaparecer pisca nesse tanto. */
+    private static final int ZANZOKEN_FADE = 16, ZANZOKEN_ARRIVE = 8;
+
+    /**
+     * Opacidade de quem está no Ultra com zanzoken (o Mugen Rendan da p15): 1 visível, 0 sumida.
+     * Ao sumir a imagem fica onde ela estava, piscando e apagando; ao reaparecer ela pisca.
+     */
+    private float zanzokenAlpha(CombatFighter f) {
+        if (!f.inUltraSequence()) return 1f;
+        CharacterDefinition.UltraSequence seq = f.state.profile.ultraSequence;
+        if (seq == null || seq.vanish.length == 0) return 1f;
+        float frame = f.ultraFrame;
+        boolean blink = (engine.frame() / 2) % 2 == 0;
+        if (seq.hidesAttacker(frame)) {
+            float since = seq.sinceVanish(frame);
+            if (since >= ZANZOKEN_FADE) return 0f;
+            return (blink ? 0.8f : 0.35f) * (1f - since / ZANZOKEN_FADE);
+        }
+        float since = seq.sinceReappear(frame);
+        if (since >= 0f && since < ZANZOKEN_ARRIVE) return blink ? 0.9f : 0.4f;
+        return 1f;
+    }
+
+    /** O desenho dela clareado e translúcido (alfa de 0 a 1 em passos de 0,1), para o zanzoken. */
+    private final ColorFilter[] zanzokenTints = zanzokenTints();
+
+    private static ColorFilter[] zanzokenTints() {
+        ColorFilter[] out = new ColorFilter[11];
+        for (int i = 0; i < out.length; i++) {
+            float a = i / 10f;
+            out[i] = new ColorMatrixColorFilter(new float[] {
+                0.85f, 0f, 0f, 0f, 30f,
+                0f, 0.85f, 0f, 0f, 34f,
+                0f, 0f, 0.85f, 0f, 46f,
+                0f, 0f, 0f, a, 0f,
+            });
+        }
+        return out;
+    }
+
     /** Opacidade da tela preta do Ultra em sequência (a p16 entre a cartola e o canhão). */
     private int ultraBlackout() {
         for (int i = 0; i < 2; i++) {
@@ -3936,6 +3986,15 @@ public class GameView extends SurfaceView
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
         if (hiddenByUltra(f)) return;
+        float zanzoken = zanzokenAlpha(f);
+        if (zanzoken <= 0f) return;
+        if (zanzoken < 1f && renderer.override() == null) {
+            // Zanzoken: a imagem que fica piscando onde ela estava (ou chegando, no reaparecer).
+            renderer.setOverride(zanzokenTints[Math.min(zanzokenTints.length - 1, Math.round(zanzoken * 10f))]);
+            renderer.draw(c, f.x, fighterVisualY(f), f.facing, false, false);
+            renderer.setOverride(null);
+            return;
+        }
         float angle = knockdownAngle(renderer, f);
         // Rastro do motor de animação: atrás do lutador, onde ele estava.
         renderer.drawRastro(c);
@@ -4058,6 +4117,71 @@ public class GameView extends SurfaceView
      * velocidade saindo do impacto, os dois lutadores em silhueta (preta com contorno branco no
      * RED, branca no VOID) e a estrela do impacto. Mesma câmera da luta (com o soco de zoom).
      */
+    /** Clarão de cada golpe no escuro do Ultra (o sumiço da p15): quadros que ele dura. */
+    private static final int SECRETO_FRAMES = 9;
+    private int secretoStart = -1, secretoVictim, secretoSeed;
+    private float secretoX, secretoY;
+
+    /**
+     * O secreto do Akuma no escuro: a cada golpe a tela pisca branca, o rival aparece em
+     * silhueta branca, cortes brancos com borda vermelha atravessam o corpo e a estrela do
+     * impacto estoura e encolhe. Por cima da tela preta.
+     */
+    private void drawSecreto(Canvas canvas, float zoom, float left, float top) {
+        if (secretoStart < 0) return;
+        int age = engine.frame() - secretoStart;
+        if (age < 0 || age >= SECRETO_FRAMES) return;
+        if (age < 2) canvas.drawColor(age == 0 ? 0xB4FFFFFF : 0x50FFFFFF);
+        canvas.save();
+        canvas.scale(zoom, zoom);
+        canvas.translate(-left, -top);
+        if (age < 5) {
+            boolean mine = secretoVictim == PLAYER;
+            SpriteFighterRenderer renderer = mine ? spriteFighterRenderer : opponentSpriteRenderer;
+            canvas.save();
+            canvas.translate(mine ? tagOffset() : engine.teams.tagOffset(OPPONENT), 0f);
+            renderer.setOverride(whiteSilhouette);
+            CombatFighter victim = mine ? player() : opponent();
+            renderer.draw(canvas, victim.x, fighterVisualY(victim), victim.facing, false, false);
+            renderer.setOverride(null);
+            canvas.restore();
+        }
+        Random r = new Random(secretoSeed * 7919L);
+        float t = age / (float)SECRETO_FRAMES;
+        paint.setStyle(Paint.Style.FILL);
+        for (int k = 0; k < 3; k++) {
+            // Corte longo e fino cruzando o corpo, de borda vermelha.
+            double a = Math.PI * (r.nextFloat() - 0.5f) * 0.9f;
+            float len = 170f + 120f * r.nextFloat(), w = 9f * (1f - t);
+            float cx = secretoX + (r.nextFloat() - 0.5f) * 50f, cy = secretoY + (r.nextFloat() - 0.5f) * 90f;
+            float dx = (float)Math.cos(a) * len, dy = (float)Math.sin(a) * len;
+            paint.setColor(0xFFE0141E);
+            drawSlash(canvas, cx, cy, dx, dy, w + 5f);
+            paint.setColor(Color.WHITE);
+            drawSlash(canvas, cx, cy, dx, dy, w);
+        }
+        float size = 95f * (1f - t * 0.7f);
+        paint.setColor(0xFFE0141E);
+        drawStar(canvas, secretoX, secretoY, size);
+        paint.setColor(Color.WHITE);
+        drawStar(canvas, secretoX, secretoY, size * 0.6f);
+        canvas.restore();
+    }
+
+    /** Losango fino de (cx - dx, cy - dy) a (cx + dx, cy + dy), largura w no meio. */
+    private void drawSlash(Canvas canvas, float cx, float cy, float dx, float dy, float w) {
+        float l = (float)Math.sqrt(dx * dx + dy * dy);
+        if (l < 1f || w <= 0f) return;
+        float px = -dy / l * w * 0.5f, py = dx / l * w * 0.5f;
+        impactPath.reset();
+        impactPath.moveTo(cx - dx, cy - dy);
+        impactPath.lineTo(cx + px, cy + py);
+        impactPath.lineTo(cx + dx, cy + dy);
+        impactPath.lineTo(cx - px, cy - py);
+        impactPath.close();
+        canvas.drawPath(impactPath, paint);
+    }
+
     private void drawImpactFrame(Canvas canvas, float zoom, float left, float top) {
         boolean red = feel.impactStyle() == ImpactFeel.RED;
         float x = feel.impactX(), y = feel.impactY();
@@ -4298,7 +4422,7 @@ public class GameView extends SurfaceView
      * junto com o achatar da aterrissagem.
      */
     private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
-        if (hiddenByUltra(f)) return;
+        if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f) return;
         float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
         float half = 43f * k * renderer.animacao.pose().escalaX;

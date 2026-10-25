@@ -2794,6 +2794,12 @@ final class GeneratedSpriteLayouts {
     static final int P15_SUPER_WAVE_ROOT_Y = 543;
     static final int P15_SUPER_WAVE_FRAME_COUNT = 45;
 
+    static final int P15_ULTRA_SEQ_FRAME_WIDTH = 460;
+    static final int P15_ULTRA_SEQ_FRAME_HEIGHT = 331;
+    static final int P15_ULTRA_SEQ_ROOT_X = 168;
+    static final int P15_ULTRA_SEQ_ROOT_Y = 309;
+    static final int P15_ULTRA_SEQ_FRAME_COUNT = 76;
+
     static final int P15_WALK_BACK_FRAME_WIDTH = 383;
     static final int P15_WALK_BACK_FRAME_HEIGHT = 521;
     static final int P15_WALK_BACK_ROOT_X = 200;

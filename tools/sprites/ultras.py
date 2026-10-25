@@ -59,6 +59,10 @@ SHEET = {
     # p16: cartola e canhão de circo grudados nela (o tronco medido erra): posição do vídeo, e a
     # cartola caindo solta fica.
     'p16': dict(celula=352, largura=608, raiz='175,330', densidade=1, fixar='video', objetos=1500),
+    # p15: os dois vídeos do Mugen Rendan colados, na câmera dos vídeos H3 (escala manual); os rastros
+    # vermelhos dos socos e o clarão dos chutes ficam (o fundo escurece no meio do vídeo).
+    'p15': dict(celula=352, largura=480, raiz='170,330', densidade=1, fixar='video', manterEfeitos=True,
+                escala=(0.411, 'mesma câmera dos vídeos H3 de 24/10')),
 }
 
 
@@ -181,6 +185,10 @@ def convert(cid, video, picked):
         cmd += ['--fixar', sheet['fixar']]
     if sheet.get('objetos'):
         cmd += ['--objetos', str(sheet['objetos'])]
+    if sheet.get('manterEfeitos'):
+        cmd.append('--manter-efeitos')
+    if sheet.get('escala'):
+        cmd += ['--escala', str(sheet['escala'][0]), '--motivo', sheet['escala'][1]]
     # O que passa da célula (rastro do sumiço, chicote) sai cortado limpo, longe da margem.
     cmd += ['--aparar-borda', '10']
     if sheet.get('peNoChao'):

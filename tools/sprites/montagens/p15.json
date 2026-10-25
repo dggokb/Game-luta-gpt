@@ -69,7 +69,7 @@
     "trechos": [["S1", 0, 124]],
     "quadros": "32,36,40,44,48,52,56,60,62,64,66,68,70,72,76,80,84,88,90,92,94,96,98",
     "opcoes": {"fixar": "video", "manter_efeitos": true, "escala": 0.411, "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)"},
-    "animacoes": {"SPECIAL_ENERGY": {"impacto": 9}, "ULTRA_BEAM": {"frames": "0-9,14,14,14"}}
+    "animacoes": {"SPECIAL_ENERGY": {"impacto": 9}}
   },
   "special_s2": {
     "trechos": [["s_base", 0, 40], ["s2", 0, 48]],
