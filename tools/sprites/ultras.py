@@ -15,6 +15,13 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     zanzoken  [de, até] em que ela some (deixa a imagem para trás) e reaparece
     recuo     [quadro, distância] em que ela reaparece longe do rival (px do jogo para trás)
     cameraDaLuta  sem os closes do Ultra: a câmera da luta segue os dois
+    voo       [quadro, frente, altura] do desenho de quem bate (o p13 sobe e desce de meteoro)
+    deCabeca  [de, até] com o rival deitado de cabeça para baixo (o abraço do p13)
+    bracos    [de, até] com os braços dele (folha ULTRA_SEQ_FRENTE) por cima do rival
+    quedaFinal  [subida, empurrão] do golpe final no lugar do lançamento alto
+
+A câmera aceita um 5º número por plano: os quadros que ela leva, suave, do plano anterior até
+ele (sem ele, corte seco). "velocidade" no personagem troca a do arquivo (o p13, mais lento).
 
 "segurar" ([quadro, quadros do jogo]) segura um quadro da folha mais tempo (a tela preta da p16).
 
@@ -64,6 +71,10 @@ SHEET = {
     # vermelhos dos socos e o clarão dos chutes ficam (o fundo escurece no meio do vídeo).
     'p15': dict(celula=352, largura=480, raiz='170,330', densidade=1, fixar='video', manterEfeitos=True,
                 escala=(0.411, 'mesma câmera dos vídeos H3 de 24/10')),
+    # p13: ult2 + ult3 + ult4 + o pulo colados (o ult1, o estalo do pescoço, fica de fora); a célula pega
+    # o vídeo inteiro (a explosão vai de borda a borda) e o fogo do meteoro fica.
+    'p13': dict(celula=368, largura=600, raiz='300,330', densidade=1, fixar='video', manterEfeitos=True,
+                escala=(0.4322, 'mesma câmera dos outros vídeos do p13'), esfumar=True),
 }
 
 
@@ -108,14 +119,16 @@ def timeline(spec, picked, speed):
     """Duração de cada quadro (ms) e o "ultra" do lutador em quadros do jogo."""
     ms = 1000.0 / 60.0
     nxt = picked[1:] + [picked[-1] + 2]
+    # Velocidade fracionária (o p13): os quadros do jogo arredondam.
+    whole = (lambda v: int(round(v))) if speed != int(speed) else (lambda v: v)
     # "segurar": [quadro do vídeo, quadros do jogo a mais] (a tela preta da p16 dura mais).
     holds = {v: extra for v, extra in spec.get('segurar', [])}
     if set(holds) - set(picked):
         raise SystemExit(f"segurar {sorted(set(holds) - set(picked))}: quadros fora da folha")
     durations = [round(((b - a) * speed + holds.get(a, 0)) * ms) for a, b in zip(picked, nxt)]
     start = picked[0]
-    at = lambda v: (v - spec['preparo']) * speed + sum(e for h, e in holds.items() if h < v)
-    prep = (spec['preparo'] - start) * speed
+    at = lambda v: whole((v - spec['preparo']) * speed + sum(e for h, e in holds.items() if h < v))
+    prep = whole((spec['preparo'] - start) * speed)
     ultra = {
         'preparo': prep,
         'golpes': [at(g) for g in spec['golpes']],
@@ -131,7 +144,9 @@ def timeline(spec, picked, speed):
         v, dx, dy, angle = spec['explosao']
         ultra['explosao'] = [at(v), dx, dy, angle]
     if spec.get('camera'):
-        ultra['camera'] = [[max(0, at(v)), dx, dy, zoom] for v, dx, dy, zoom in spec['camera']]
+        # 5º número: quadros do vídeo que a câmera leva do plano anterior até este (o p13).
+        ultra['camera'] = [[max(0, at(k[0]))] + k[1:4] + ([whole(k[4] * speed)] if len(k) > 4 else [])
+                           for k in spec['camera']]
     if spec.get('zanzoken'):
         ultra['zanzoken'] = [[at(a), at(b)] for a, b in spec['zanzoken']]
     if spec.get('recuo'):
@@ -139,6 +154,15 @@ def timeline(spec, picked, speed):
         ultra['recuo'] = [at(v), distance]
     if spec.get('cameraDaLuta'):
         ultra['cameraDaLuta'] = True
+    # O Ultra do p13: voo de quem bate (só o desenho), rival de cabeça para baixo, braços na frente
+    # dele e a queda curta do golpe final.
+    if spec.get('voo'):
+        ultra['voo'] = [[at(v), dx, dy] for v, dx, dy in spec['voo']]
+    for key in ('deCabeca', 'bracos'):
+        if spec.get(key):
+            ultra[key] = [at(v) for v in spec[key]]
+    if spec.get('quedaFinal'):
+        ultra['quedaFinal'] = spec['quedaFinal']
     return durations, ultra
 
 
@@ -199,6 +223,119 @@ def convert(cid, video, picked):
     if sheet['densidade'] > 1:
         cmd.append('--nitidez')
     subprocess.run(cmd, check=True, cwd=ROOT)
+    if sheet.get('esfumar'):
+        esfumar(cid, picked, spec_of(cid))
+    if spec_of(cid).get('bracos'):
+        frente(cid, picked, spec_of(cid))
+
+
+def spec_of(cid):
+    return json.loads(DATA.read_text(encoding='utf-8'))['personagens'][cid]
+
+
+def cells(cid):
+    """A folha do Ultra (RGBA) e a geometria das células: (imagem, largura, altura, colunas, raiz x, raiz y)."""
+    from PIL import Image
+    clip = json.loads((HERE / 'clips' / f'{cid}_ultra_seq.json').read_text(encoding='utf-8'))
+    img = Image.open(ROOT / clip['source']).convert('RGBA')
+    return img, clip['frameWidth'], clip['frameHeight'], clip['columns'], clip['rootX'], clip['rootY']
+
+
+def esfumar(cid, picked, spec, faixa=36):
+    """Apaga aos poucos o que encosta nas bordas do vídeo (a explosão de borda a borda, o fogo
+    que sobe além do quadro): sem a linha reta do corte. As bordas são as do vídeo dentro da
+    célula, achadas pelo quadro mais largo; a de cima só nos quadros de "esfumarTopo"."""
+    import numpy as np
+    from PIL import Image
+    img, cw, ch, cols, rx, ry = cells(cid)
+    a = np.array(img)
+    n = len(picked)
+    boxes = []
+    for i in range(n):
+        cell = a[(i // cols) * ch:(i // cols + 1) * ch, (i % cols) * cw:(i % cols + 1) * cw, 3]
+        xs = np.nonzero(cell.max(0) > 8)[0]
+        boxes.append((xs.min(), xs.max()) if len(xs) else None)
+    left = min(b[0] for b in boxes if b)
+    right = max(b[1] for b in boxes if b)
+    top_frames = spec.get('esfumarTopo', [])
+    for i, v in enumerate(picked):
+        y0, x0 = (i // cols) * ch, (i % cols) * cw
+        cell = a[y0:y0 + ch, x0:x0 + cw].astype(np.float32)
+        ramp = np.ones(cw, np.float32)
+        k = np.arange(cw, dtype=np.float32)
+        ramp = np.minimum(ramp, np.clip((k - left) / faixa, 0, 1))
+        ramp = np.minimum(ramp, np.clip((right - k) / faixa, 0, 1))
+        alpha = cell[..., 3] * ramp[None, :]
+        if any(f <= v <= t for f, t in top_frames):
+            ys = np.nonzero(a[y0:y0 + ch, x0:x0 + cw, 3].max(1) > 8)[0]
+            if len(ys):
+                r = np.arange(ch, dtype=np.float32)
+                alpha *= np.clip((r - ys.min()) / (faixa * 2), 0, 1)[:, None]
+        a[y0:y0 + ch, x0:x0 + cw, 3] = alpha.astype(np.uint8)
+    Image.fromarray(a, 'RGBA').save(ROOT / json.loads((HERE / 'clips' / f'{cid}_ultra_seq.json')
+                                                     .read_text(encoding='utf-8'))['source'])
+    print(f'{cid}: bordas do vídeo esfumadas (x {left}–{right})')
+
+
+def frente(cid, picked, spec):
+    """Folha ULTRA_SEQ_FRENTE: só os braços dos quadros de "bracos" (vídeo), um quadro por quadro
+    do abraço. O jogo desenha o rival entre o corpo e esta folha (o abraço do p13)."""
+    import numpy as np
+    from PIL import Image
+    img, cw, ch, cols, rx, ry = cells(cid)
+    a = np.array(img)
+    hug = hug_cells(picked, spec)
+    out = np.zeros((ch, cw * len(hug), 4), np.uint8)
+    for k, i in enumerate(hug):
+        y0, x0 = (i // cols) * ch, (i % cols) * cw
+        out[:, k * cw:(k + 1) * cw] = bracos(a[y0:y0 + ch, x0:x0 + cw])
+    src = f'art/sprites/source/{cid}_ultra_seq_frente_video_normalized.png'
+    Image.fromarray(out, 'RGBA').save(ROOT / src)
+    clip = json.loads((HERE / 'clips' / f'{cid}_ultra_seq.json').read_text(encoding='utf-8'))
+    clip.pop('video', None)
+    clip.update({
+        'id': f'{cid}_ultra_seq_frente', 'javaName': f'{cid.upper()}_ULTRA_SEQ_FRENTE', 'source': src,
+        'output': f'android/app/src/main/res/drawable-nodpi/{cid}_ultra_seq_frente.webp',
+        'report': f'tools/sprites/reports/{cid}_ultra_seq_frente.report.json',
+        'preview': f'android/app/build/sprite-review/{cid}_ultra_seq_frente-import.png',
+        'expectedFrames': len(hug), 'columns': len(hug), 'minOpaquePixels': 500,
+        'sourceNote': f'{cid}: os braços do abraço do Ultra, recortados da folha ULTRA_SEQ por tools/sprites/ultras.py.',
+    })
+    (HERE / 'clips' / f'{cid}_ultra_seq_frente.json').write_text(json.dumps(clip, indent=2, ensure_ascii=False) + '\n',
+                                                                encoding='utf-8')
+    print(f'{cid}: braços na frente em {len(hug)} quadros')
+
+
+def hug_cells(picked, spec):
+    """Posições da folha (ULTRA_SEQ) dos quadros do abraço."""
+    lo, hi = spec['bracos']
+    return [i for i, v in enumerate(picked) if lo <= v < hi]
+
+
+def bracos(cell):
+    """Os braços de uma célula do abraço: a pele (braços, ombros e cabeça) e as luvas abaixo
+    dos antebraços; o tronco e a calça ficam atrás do rival."""
+    import numpy as np
+    import cv2
+    rgb = cell[..., :3].astype(np.int16)
+    alpha = cell[..., 3] > 40
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    skin = alpha & (r > 120) & (r > g + 25) & (g > b + 5)
+    ys, xs = np.nonzero(alpha)
+    top, bottom = ys.min(), ys.max()
+    # A cabeça e os ombros também ficam na frente: as pernas do rival, de cabeça para baixo,
+    # sobem por trás da cabeça dele. As luvas só a partir dos ombros.
+    shoulder = top + int((bottom - top) * 0.30)
+    # As luvas: o escuro logo abaixo da pele dos antebraços (só para baixo: a calça do lado fica).
+    down = np.zeros((61, 9), np.uint8)
+    down[:31] = 1   # o elemento estende a pele para baixo (a âncora fica no meio)
+    near = cv2.dilate(skin.astype(np.uint8), down) > 0
+    near |= cv2.dilate(skin.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+    mask = skin | (near & alpha & (np.arange(cell.shape[0])[:, None] >= shoulder))
+    mask = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)) > 0
+    out = np.zeros_like(cell)
+    out[mask] = cell[mask]
+    return out
 
 
 def apply(cid, spec, picked, speed, damage):
@@ -207,6 +344,11 @@ def apply(cid, spec, picked, speed, damage):
     durations, ultra = timeline(spec, picked, speed)
     pack['animations'][STATE] = {'atlas': f'{cid}_ultra_seq', 'frames': list(range(len(picked))),
                                  'loop': False, 'durationsMs': durations}
+    if spec.get('bracos'):
+        # Mesmo tempo da ULTRA_SEQ; fora do abraço aponta para o 1º quadro (o jogo nem desenha).
+        hug = hug_cells(picked, spec)
+        pack['animations']['ULTRA_SEQ_FRENTE'] = dict(pack['animations'][STATE], atlas=f'{cid}_ultra_seq_frente',
+                                                      frames=[hug.index(i) if i in hug else 0 for i in range(len(picked))])
     # O Ultra deixa de ser o raio: a folha do raio sai e o "ULTRA" aponta para a sequência.
     pack['animations'].pop('ULTRA_BEAM', None)
     pack.setdefault('specialAnimations', {})['ULTRA'] = STATE
@@ -242,11 +384,12 @@ def main(argv=None):
                 raise SystemExit(f'{cid}: vídeo {video} não encontrado')
             convert(cid, video, picked)
         damage = round(data['dano'] * mech.get(cid, {}).get('dano', 1.0))
-        durations, ultra = timeline(spec, picked, speed)
+        own = spec.get('velocidade', speed)   # o p13 anda mais devagar que os outros
+        durations, ultra = timeline(spec, picked, own)
         print(f"{cid} {spec['nome']}: {len(picked)} quadros, preparo {ultra['preparo']}, "
               f"golpes {ultra['golpes']}, duração {ultra['duracao']}, dano {damage}")
         if args.write:
-            apply(cid, spec, picked, speed, damage)
+            apply(cid, spec, picked, own, damage)
 
 
 if __name__ == '__main__':

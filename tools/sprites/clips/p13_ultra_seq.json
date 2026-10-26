@@ -1,0 +1,32 @@
+{
+  "id": "p13_ultra_seq",
+  "javaName": "P13_ULTRA_SEQ",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_ultra_seq_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_ultra_seq.webp",
+  "report": "tools/sprites/reports/p13_ultra_seq.report.json",
+  "preview": "android/app/build/sprite-review/p13_ultra_seq-import.png",
+  "expectedFrames": 86,
+  "segmentation": "prepared-grid",
+  "rootMode": "authored",
+  "sourceNote": "p13: Ultra em sequência, vídeo Seedance ultra.mp4 (pasta animations/p13 do Drive), quadros e golpes em tools/sprites/ultras.json.",
+  "columns": 8,
+  "frameWidth": 600,
+  "frameHeight": 368,
+  "rootX": 300,
+  "rootY": 330,
+  "video": {
+    "arquivo": "ultra.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "0,3,6,9,12,15,18,21,23,25,27,29,33,39,45,51,57,59,61,63,65,71,77,83,87,89,91,93,95,99,103,105,107,109,111,113,115,117,119,121,123,125,127,129,131,133,135,137,139,141,143,145,147,149,151,153,155,157,159,161,163,165,169,175,181,185,189,195,201,203,207,211,213,215,219,223,225,231,235,237,239,241,243,245,249,251",
+    "celula": 368,
+    "largura": 600,
+    "raiz": "300,330",
+    "fixar": "video",
+    "manter_efeitos": true,
+    "limpar_chao": true,
+    "aparar_borda": 10
+  }
+}

@@ -192,6 +192,8 @@ final class CombatConfig {
     /** Several-strike move: frames of hitstun past the next strike, and the push of the strikes before the last. */
     int strikeHoldFrames = 8;
     float strikeHoldPushback = 0.2f;
+    /** Pancadas no chão (o Super do p13) cuja primeira errou: quadros até ele levantar e o golpe acabar. */
+    int poundMissFrames = 36;
     /** Upward speed given to an airborne defender by a strike before the last (stays in reach). */
     float strikeHoldLift = 260f;
     /** An advancing move stops this close to the opponent's body (px past the pushboxes). */

@@ -298,6 +298,14 @@ todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTes
 - **Salto desenhado** (o S4 do p13): `Mechanics.hop(altura, de, ate)`, `pancadas.json` →
   `salto {altura, de, ate}` (quadros da animação). O vídeo é de câmera que acompanha; o desenho
   sobe em arco nesse trecho e o corpo segue no chão, levado pelo avanço.
+- **Pancadas no chão** (o Super do p13): `Mechanics.pound()`, `pancadas.json` → `SUPER.chao`. A
+  primeira caixa (a queda do pulo em cima do rival) derruba mesmo não sendo a última; as outras
+  acertam o rival deitado no quadro delas, sem caixa e sem defesa, e ele fica no chão até o golpe
+  acabar (a última recomeça o tempo deitado). A queda errou ou foi defendida: os socos não saem, o
+  desenho troca para `SUPER_WAVE_ERRO` (ele levanta) e o golpe acaba em
+  `CombatConfig.poundMissFrames`. Os socos aceleram como metralhadora (`metralhadora {de, ate,
+  fim}`: os quadros dessa faixa vão do tempo do vídeo até `fim` vezes ele) e a fumaça no chão
+  cresce a cada pancada (`fumaca_pouso` e a poeira do `ImpactEffects`).
 - **Corrida própria** (o p13, lerdo): `Fighter.withRun(dash‰, quadrosDoBackdash, velocidade)`,
   `mecanicas.json` → `lutador.corrida {dash, backdashQuadros, backdashVelocidade}`. A corrida (e o
   embalo do dash jump) sai a `dash` da do motor; o backdash dura os quadros dele, na velocidade dele,

@@ -2782,6 +2782,24 @@ final class GeneratedSpriteLayouts {
     static final int P13_SPECIAL_S4_ROOT_Y = 642;
     static final int P13_SPECIAL_S4_FRAME_COUNT = 33;
 
+    static final int P13_SUPER_WAVE_FRAME_WIDTH = 297;
+    static final int P13_SUPER_WAVE_FRAME_HEIGHT = 301;
+    static final int P13_SUPER_WAVE_ROOT_X = 131;
+    static final int P13_SUPER_WAVE_ROOT_Y = 289;
+    static final int P13_SUPER_WAVE_FRAME_COUNT = 35;
+
+    static final int P13_ULTRA_SEQ_FRAME_WIDTH = 587;
+    static final int P13_ULTRA_SEQ_FRAME_HEIGHT = 348;
+    static final int P13_ULTRA_SEQ_ROOT_X = 294;
+    static final int P13_ULTRA_SEQ_ROOT_Y = 325;
+    static final int P13_ULTRA_SEQ_FRAME_COUNT = 86;
+
+    static final int P13_ULTRA_SEQ_FRENTE_FRAME_WIDTH = 156;
+    static final int P13_ULTRA_SEQ_FRENTE_FRAME_HEIGHT = 267;
+    static final int P13_ULTRA_SEQ_FRENTE_ROOT_X = 77;
+    static final int P13_ULTRA_SEQ_FRENTE_ROOT_Y = 266;
+    static final int P13_ULTRA_SEQ_FRENTE_FRAME_COUNT = 5;
+
     static final int P13_WALK_BACK_FRAME_WIDTH = 392;
     static final int P13_WALK_BACK_FRAME_HEIGHT = 560;
     static final int P13_WALK_BACK_ROOT_X = 209;

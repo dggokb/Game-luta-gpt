@@ -1794,6 +1794,13 @@ public class GameView extends SurfaceView
             if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
                 event.attacker, event.defender);
             spawnImpact(event, ultraHit, punishNow, knockout);
+            CombatFighter hitter = engine.fighter(event.attacker);
+            if (!event.blocked && hitter.attacking() && hitter.attack.mechanics.pound) {
+                // Socos no chão (o Super do p13): a fumaça cresce a cada pancada.
+                float k = Long.bitCount(hitter.hitboxMask) / (float)hitter.attack.hitboxCount();
+                impacts.spawnDust(hitFighter.x, GROUND_Y, 0.3f + 0.7f * k);
+                efeitos.tocar("fumaca_pouso", hitFighter.x, GROUND_Y, 0.6f + 1.6f * k, (engine.frame() & 1) == 0);
+            }
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
@@ -2520,7 +2527,10 @@ public class GameView extends SurfaceView
         if (!event.blocked && stageScene != null) {
             stageScene.cheer(knockout ? 1f : size >= ImpactEffects.HEAVY ? 0.65f : size == ImpactEffects.MEDIUM ? 0.35f : 0.15f);
         }
-        if (!event.blocked && pausa.impacto()) {
+        // Os socos no chão do meio (o Super do p13, como metralhadora) não piscam: só a queda e o último.
+        boolean poundRun = !event.projectile && attacker.attacking() && attacker.attack.mechanics.pound &&
+            Long.bitCount(attacker.hitboxMask) > 1 && !event.finalStrike;
+        if (!event.blocked && pausa.impacto() && !poundRun) {
             // O golpe que segura cada pancada (o Super da p16) ganha um impact frame em todas.
             boolean everyStrike = !event.projectile && attacker.attacking() && attacker.attack.strikeStop > 0;
             feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y, everyStrike,
@@ -3303,6 +3313,7 @@ public class GameView extends SurfaceView
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
+            drawUltraArms(canvas);
             for (int i = 0; i < 2; i++) {
                 riscosLutadores[i] = engine.fighter(i);
                 riscosVisiveis[i] = !hiddenByUltra(riscosLutadores[i]);
@@ -3638,6 +3649,15 @@ public class GameView extends SurfaceView
     private String reactionState(SpriteFighterRenderer renderer, CombatFighter f) {
         String state = null;
         CombatConfig config = engine.config;
+        if (upsideDownBy(f) != null) {
+            // Preso de cabeça para baixo (o Ultra do p13): a pose deitada, girada no desenho.
+            for (String lying : new String[] {SpriteStates.GROUNDED, SpriteStates.KNOCKDOWN, SpriteStates.HIT_AIR}) {
+                CharacterDefinition.Animation clip = f.character().animations.get(lying);
+                if (clip == null || !renderer.hasAnimation(lying)) continue;
+                reactionElapsed = SpriteStates.GROUNDED.equals(lying) ? 0f : clip.duration - 0.0001f;
+                return lying;
+            }
+        }
         switch (f.status) {
             case KNOCKDOWN:
                 if (f.knockdownFrame < config.knockdownFallFrames) {
@@ -3745,7 +3765,16 @@ public class GameView extends SurfaceView
             // no tempo do golpe (a recuperação longa é a punição).
             CharacterDefinition.Animation miss = f.grabMissed && f.move != null && f.move.animation != null
                 ? character.animations.get(f.move.animation.id + "_ERRO") : null;
-            if (miss != null) {
+            CharacterDefinition.Animation superArt = f.move == null ? character.specialAnimations.get("SUPER") : null;
+            CharacterDefinition.Animation poundMiss = f.grabMissed && f.attack.mechanics.pound && superArt != null
+                ? character.animations.get(superArt.id + "_ERRO") : null;
+            if (poundMiss != null) {
+                // O Super do p13 que errou a queda: ele levanta, sem os socos, até o corte.
+                int from = f.attack.hitbox(0).lastFrame + 1;
+                int to = f.hitCutFrame >= 0 ? f.hitCutFrame : f.attack.totalFrames - 1;
+                animation = poundMiss.id;
+                animationElapsed = poundMiss.timeFor((f.attackFrame - from + 0.5f) * FIXED_STEP, Math.max(1, to - from) * FIXED_STEP);
+            } else if (miss != null) {
                 animation = miss.id;
                 animationElapsed = miss.timeFor(elapsed, total);
             } else if (f.move != null) {
@@ -4051,6 +4080,70 @@ public class GameView extends SurfaceView
         return move.animation.id;
     }
 
+    /** Altura do corpo deitado em que o rival preso de cabeça para baixo gira. */
+    private static final float UPSIDE_DOWN_PIVOT = 40f;
+    /** O voo calculado por {@link #ultraFlight}: deslocamento do desenho (x, y). */
+    private final float[] flightOffset = new float[2];
+
+    /**
+     * Quem está no Ultra com voo (o p13): preenche {@link #flightOffset} e diz se há voo. O
+     * voo conta da posição em que a sequência começou; depois do recuo (o pulo para trás do
+     * fim) o lutador já está atrás, e o desenho compensa.
+     */
+    private boolean ultraFlight(CombatFighter f) {
+        if (!f.inUltraSequence()) return false;
+        CharacterDefinition.UltraSequence seq = f.state.profile.ultraSequence;
+        if (seq == null || seq.flight.length == 0) return false;
+        float[] at = seq.flightAt(f.ultraFrame);
+        float ahead = at[0] + (f.ultraRetreated && seq.retreat != null ? seq.retreat[1] : 0f);
+        flightOffset[0] = f.facing * ahead;
+        flightOffset[1] = -at[1];
+        return true;
+    }
+
+    /** Quem segura {@code f} de cabeça para baixo agora (o abraço do Ultra do p13), ou null. */
+    private CombatFighter upsideDownBy(CombatFighter f) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraSequence() || engine.fighter(1 - i) != f) continue;
+            CharacterDefinition.UltraSequence seq = u.state.profile.ultraSequence;
+            if (seq != null && CharacterDefinition.UltraSequence.inside(seq.upsideDown, u.ultraFrame)) return u;
+        }
+        return null;
+    }
+
+    /**
+     * Abraço do Ultra do p13: o rival por cima do corpo dele e os braços (a folha
+     * ULTRA_SEQ_FRENTE, no mesmo quadro) por cima do rival.
+     */
+    private void drawUltraArms(Canvas c) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraSequence()) continue;
+            CharacterDefinition.UltraSequence seq = u.state.profile.ultraSequence;
+            if (seq == null || !CharacterDefinition.UltraSequence.inside(seq.armsInFront, u.ultraFrame)) continue;
+            CombatFighter v = engine.fighter(1 - i);
+            boolean uPlayer = i == PLAYER;
+            SpriteFighterRenderer ur = uPlayer ? spriteFighterRenderer : opponentSpriteRenderer;
+            SpriteFighterRenderer vr = uPlayer ? opponentSpriteRenderer : spriteFighterRenderer;
+            float uo = uPlayer ? tagOffset() : engine.teams.tagOffset(OPPONENT);
+            float vo = uPlayer ? engine.teams.tagOffset(OPPONENT) : tagOffset();
+            c.save();
+            c.translate(vo, 0f);
+            drawFighter(c, vr, v, false, false);
+            c.restore();
+            c.save();
+            c.translate(uo, 0f);
+            if (ultraFlight(u)) c.translate(flightOffset[0], flightOffset[1]);
+            CharacterDefinition.Animation arms = u.character().animations.get(SpriteStates.ULTRA_SEQ_FRENTE);
+            if (arms != null) {
+                ur.drawQuadro(c, u.character(), SpriteStates.ULTRA_SEQ_FRENTE, arms.frame(ur.motion.time, 0f), u.x,
+                    fighterVisualY(u), u.facing);
+            }
+            c.restore();
+        }
+    }
+
     /** Rival que o Ultra em sequência esconde agora (debaixo da cartola, dentro do canhão da p16). */
     private boolean hiddenByUltra(CombatFighter f) {
         for (int i = 0; i < 2; i++) {
@@ -4135,6 +4228,10 @@ public class GameView extends SurfaceView
         if (f.spinning && !f.grounded) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
         float visualY = fighterVisualY(f);
+        // Voo do Ultra (o p13 sobe atrás do rival e desce de meteoro): só o desenho sai do lugar.
+        if (ultraFlight(f)) c.translate(flightOffset[0], flightOffset[1]);
+        // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
+        if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
         ColorFilter look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
         if (look == null && renderer.override() == null && ghostArmsActive(f)) drawGhostArms(c, renderer, f, visualY);

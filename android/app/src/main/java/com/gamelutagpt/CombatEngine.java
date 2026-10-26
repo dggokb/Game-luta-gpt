@@ -2151,6 +2151,7 @@ final class CombatEngine {
     private void detectMelee(CombatFighter a, CombatFighter d) {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         int frame = hitFrame(a);
+        if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel só bate no que ele repeliu: sem golpe na janela, a explosão não sai.
         if (a.attack.mechanics.repel && !a.countered) return;
@@ -2387,6 +2388,37 @@ final class CombatEngine {
     }
 
     /**
+     * Pancadas no chão (o Super do p13). Antes de a primeira acertar, a caixa dela procura o
+     * rival como qualquer golpe (devolve false); passou a janela dela sem acertar, o resto não
+     * sai. Depois, cada pancada acerta o rival deitado no quadro dela, sem caixa.
+     */
+    private boolean poundStrike(CombatFighter a, CombatFighter d, int frame) {
+        if (a.grabMissed) return true;
+        if (!a.strikeLanded) {
+            if (frame > a.attack.hitbox(0).lastFrame) {
+                // Errou (ou defenderam) a queda: sem os socos, ele levanta e o golpe acaba logo.
+                a.grabMissed = true;
+                a.hitCutFrame = Math.min(a.attack.totalFrames - 2, a.attackFrame + config.poundMissFrames);
+            }
+            return a.grabMissed;
+        }
+        if (d.status != CombatFighter.Status.KNOCKDOWN) return true;
+        for (int i = 1; i < a.attack.hitboxCount(); i++) {
+            if (a.attack.hitbox(i).activeAt(frame) && (a.hitboxMask & (1L << i)) == 0) {
+                addContact(a, d, a.attack, i, null);
+                return true;
+            }
+        }
+        return true;
+    }
+
+    /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */
+    private static boolean poundTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
+        return !projectile && attack.mechanics.pound && a.strikeLanded && a.attacking() && a.attack == attack &&
+            d.status == CombatFighter.Status.KNOCKDOWN;
+    }
+
+    /**
      * Agarrão de especial: no primeiro quadro ativo pega quem está ao alcance e agarrável; daí
      * cada pancada acerta no quadro dela, sem caixa (o rival está preso na frente).
      */
@@ -2611,7 +2643,7 @@ final class CombatEngine {
      */
     private boolean pinnedDown(CombatFighter f) {
         CombatFighter other = fighters[1 - f.index];
-        return other.attacking() && other.attack.strikeHold != null && other.strikeLanded;
+        return other.attacking() && (other.attack.strikeHold != null || other.attack.mechanics.pound) && other.strikeLanded;
     }
 
     /** Segura o rival na pose do Ultra; contra a parede quem recua é o atacante. */
@@ -2767,14 +2799,17 @@ final class CombatEngine {
         d.stunProjectile = null;
         d.grounded = false;
         d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
-        d.vy = -config.ultraLaunchSpeed;
+        // O meteoro do p13 crava o rival no chão: sobe pouco e cai ali perto, deitado.
+        CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
+        float[] low = seq != null && a.inUltraSequence() ? seq.finalLaunch : null;
+        d.vy = low != null ? -low[0] : -config.ultraLaunchSpeed;
         d.launched = true;
         d.slammed = false;
         d.superJumping = false;
         d.ultraFall = true;
         d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
         d.stunElapsed = 0;
-        push(d, a, a.facing * config.ultraKnockback);
+        push(d, a, a.facing * (low != null ? low[1] : config.ultraKnockback));
         ComboSession session = sessions[d.index];
         if (session != null) session.airCombo = true;
     }
@@ -2817,7 +2852,8 @@ final class CombatEngine {
             a.hitboxMask |= 1L << c.hitbox;
             a.hitsOnTarget++;
         }
-        if (!d.hittable()) return;
+        boolean pounding = poundTarget(a, d, attack, projectile);
+        if (!d.hittable() && !pounding) return;
         int direction = projectile ? c.projectile.direction : a.facing;
         // The owner's S/SUPER learns about its projectile while it still runs.
         boolean ownerMove = !c.echo && (!projectile || (a.attacking() && a.attack == attack));
@@ -2876,8 +2912,8 @@ final class CombatEngine {
             base = lastStrike ? base - each * (count - 1) : each;
         }
 
-        // O agarrão de especial não se defende (como o agarrão).
-        int guard = !projectile && attack.mechanics.grab ? CombatFighter.GUARD_NONE : effectiveGuard(d);
+        // O agarrão de especial não se defende (como o agarrão), nem quem está deitado.
+        int guard = !projectile && attack.mechanics.grab || pounding ? CombatFighter.GUARD_NONE : effectiveGuard(d);
         if (energyChain(c, d)) {
             // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
             // a próxima bola dele chega como se ele já tivesse se recuperado e defendido (sem
@@ -2944,6 +2980,8 @@ final class CombatEngine {
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
+        // Pancadas no chão (o Super do p13): a primeira, a queda do pulo, já derruba.
+        if (!projectile && attack.mechanics.pound && c.hitbox == 0) launch = AttackDefinition.Launch.KNOCKDOWN;
         float hitPush = lastStrike ? attack.pushbackOnHit : attack.pushbackOnHit * config.strikeHoldPushback;
         if (projectile && lastStrike && attack.kind != AttackDefinition.Kind.SUPER) {
             hitPush = Math.max(hitPush, config.projectileHitPushback);
@@ -2983,7 +3021,14 @@ final class CombatEngine {
             session.groundBounces < config.maxGroundBounces;
 
         boolean spinHit = attack.spin && lastStrike && !projectile;
-        if (punish || spinHit) {
+        if (pounding) {
+            // Socado deitado: continua no chão, no lugar; a última pancada recomeça o tempo
+            // deitado (levanta depois do Super, não no meio dele).
+            d.vx = 0f;
+            d.pushRemaining = 0f;
+            d.pushFramesLeft = 0;
+            if (lastStrike) d.knockdownFrame = Math.min(d.knockdownFrame, config.knockdownFallFrames);
+        } else if (punish || spinHit) {
             // Spinning knockdown: flies away in a medium arc, still open to a juggle, and
             // lands lying down (no air tech). Also the tag's flying kick (VoadoraTroca).
             d.status = CombatFighter.Status.AIR_HITSTUN;

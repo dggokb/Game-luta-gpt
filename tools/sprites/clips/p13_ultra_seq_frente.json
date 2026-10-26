@@ -1,0 +1,19 @@
+{
+  "id": "p13_ultra_seq_frente",
+  "javaName": "P13_ULTRA_SEQ_FRENTE",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_ultra_seq_frente_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_ultra_seq_frente.webp",
+  "report": "tools/sprites/reports/p13_ultra_seq_frente.report.json",
+  "preview": "android/app/build/sprite-review/p13_ultra_seq_frente-import.png",
+  "expectedFrames": 5,
+  "segmentation": "prepared-grid",
+  "rootMode": "authored",
+  "sourceNote": "p13: os braços do abraço do Ultra, recortados da folha ULTRA_SEQ por tools/sprites/ultras.py.",
+  "columns": 5,
+  "frameWidth": 600,
+  "frameHeight": 368,
+  "rootX": 300,
+  "rootY": 330,
+  "minOpaquePixels": 500
+}

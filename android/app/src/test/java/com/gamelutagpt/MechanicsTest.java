@@ -407,6 +407,73 @@ public class MechanicsTest {
         s.until(() -> s.f(1).status != CombatFighter.Status.KNOCKDOWN, 120);
     }
 
+    /** Pancadas no chão (o Super do p13): a queda e três socos no rival deitado. */
+    private static AttackDefinition groundPound() {
+        return move("H", 6, 40, 30).stun(20, 10, 12).strikes(6, 16, 26, 36).strikeHold(150f, 150f, 150f, 150f)
+            .launch(AttackDefinition.Launch.KNOCKDOWN).knockback(0f).reach(300f, 78f)
+            .mechanics(new AttackDefinition.Mechanics().pound()).build();
+    }
+
+    @Test public void groundPoundKnocksDownWithTheFirstStrikeAndKeepsHittingTheLyingRival() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(groundPound()), BASE, 500f, 640f);
+        s.in[0].heavy = true;
+        s.until(() -> s.f(0).strikeLanded, 20);
+        s.until(() -> s.f(1).status == CombatFighter.Status.KNOCKDOWN, 6);
+        int hits = 1, life = s.f(1).state.life;
+        while (s.f(0).attacking()) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
+            if (s.f(0).attacking()) assertEquals("stays down", CombatFighter.Status.KNOCKDOWN, s.f(1).status);
+        }
+        assertEquals("the fall and the three punches on the ground", 4, hits);
+        assertTrue("the punches took life", s.f(1).state.life < life);
+        s.until(() -> s.f(1).status != CombatFighter.Status.KNOCKDOWN, 150);
+    }
+
+    @Test public void groundPoundThatMissesTheFallSkipsThePunchesAndEndsEarly() {
+        AttackDefinition pound = groundPound();
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(pound), BASE, 500f, 1300f);
+        s.in[0].heavy = true;
+        s.until(() -> s.f(0).attacking(), 4);
+        s.in[0].heavy = false;
+        int frames = 0, hits = 0;
+        while (s.f(0).attacking() && frames < 200) {
+            s.step();
+            frames++;
+            if (frames == 12) s.f(1).x = s.f(0).x + 150f;   // o rival chega depois da queda: os socos não saem
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0) hits++;
+        }
+        assertEquals("no punches without the fall", 0, hits);
+        assertTrue("gets up early: " + frames, frames < pound.totalFrames - 10);
+    }
+
+    @Test public void ultraCameraPansSmoothlyAndTheFlightFollowsItsKeys() {
+        CharacterDefinition.UltraSequence seq = new CharacterDefinition.UltraSequence(10, new int[]{20, 40}, 60, 1000, null)
+            .withScene(new int[0][], null, null, new float[][]{{0f, 0f, 100f, 1.5f}, {20f, 0f, 500f, 1.2f, 10f}})
+            .withFlight(new float[][]{{0f, 0f, 0f}, {10f, -40f, 200f}}, new int[]{5, 15}, new int[]{8, 12}, new float[]{300f, 50f});
+        assertEquals("before the pan", 100f, seq.shotAt(19)[2], 0.01f);
+        assertEquals("halfway up", 300f, seq.shotAt(25)[2], 0.01f);
+        assertEquals("arrived", 500f, seq.shotAt(35)[2], 0.01f);
+        assertEquals(100f, seq.flightAt(5)[1], 0.01f);
+        assertEquals(-20f, seq.flightAt(5)[0], 0.01f);
+        assertEquals(200f, seq.flightAt(50)[1], 0.01f);
+        assertTrue(CharacterDefinition.UltraSequence.inside(seq.upsideDown, 5));
+        assertFalse(CharacterDefinition.UltraSequence.inside(seq.upsideDown, 15));
+    }
+
+    @Test public void p13UltraLeavesTheRivalOnTheGroundNearby() {
+        CombatEngineTest.Sim s = ultraSequence("p13", 120f);
+        CombatConfig config = s.engine.config;
+        s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
+        float start = s.f(0).x;
+        CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
+        assertTrue("held upside down in the hug", seq.upsideDown != null && seq.armsInFront != null);
+        s.until(() -> s.f(1).status == CombatFighter.Status.KNOCKDOWN, 2000);
+        assertTrue("lands close, not across the stage: " + (s.f(1).x - s.f(0).x), Math.abs(s.f(1).x - s.f(0).x) < 400f);
+        s.until(() -> !s.f(0).inUltraSequence(), 600);
+        assertEquals("the jump back moved him", start - 240f, s.f(0).x, 1f);
+    }
+
     @Test public void thrownBoxSpinsTwiceUntilItLands() {
         Projectile box = new Projectile(300f, Arena.GROUND_Y - 215f, 600f, 115f, 40f, 100, 0, 0, -1, null, "CAIXA");
         assertEquals(0f, EffectsRenderer.boxSpin(box), 0.01f);

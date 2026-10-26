@@ -306,8 +306,9 @@ final class CharacterDefinition {
             if(blackout!=null&&(blackout.length!=2||blackout[0]>=blackout[1]))throw new IllegalArgumentException("ultra sequence: blackout {from, to}");
             if(blast!=null&&blast.length!=4)throw new IllegalArgumentException("ultra sequence: blast {frame, ahead, height, angle}");
             if(camera!=null)for(int i=0;i<camera.length;i++)
-                if(camera[i].length!=4||camera[i][3]<1f||(i>0&&camera[i][0]<=camera[i-1][0]))
-                    throw new IllegalArgumentException("ultra sequence: camera {frame, ahead, height, zoom}, growing frames");
+                if((camera[i].length!=4&&camera[i].length!=5)||camera[i][3]<1f||(i>0&&camera[i][0]<=camera[i-1][0])||
+                   (camera[i].length==5&&(camera[i][4]<0f||i==0)))
+                    throw new IllegalArgumentException("ultra sequence: camera {frame, ahead, height, zoom[, pan frames]}, growing frames");
             this.hidden=hidden.clone();this.blackout=blackout;this.blast=blast;this.camera=camera;
             return this;
         }
@@ -346,13 +347,54 @@ final class CharacterDefinition {
             for(int[] w:vanish)if(frame>=w[1])since=frame-w[1];
             return since;
         }
-        /** O plano fixo que vale neste quadro ({quadro, frente, altura, zoom}), ou null sem câmera própria. */
+        /**
+         * O plano que vale neste quadro ({quadro, frente, altura, zoom}), ou null sem câmera
+         * própria. Plano com 5º número (o Ultra do p13): a câmera vai do plano anterior até ele
+         * nesse tanto de quadros, suave; sem ele a troca é corte seco.
+         */
         float[] shotAt(float frame) {
             if(camera==null||camera.length==0)return null;
-            float[] shot=camera[0];
-            for(float[] k:camera)if(frame>=k[0])shot=k;
-            return shot;
+            int at=0;
+            for(int i=0;i<camera.length;i++)if(frame>=camera[i][0])at=i;
+            float[] shot=camera[at];
+            if(shot.length<5||at==0||frame>=shot[0]+shot[4])return shot;
+            float[] from=camera[at-1];
+            float t=(frame-shot[0])/Math.max(1f,shot[4]);
+            t=t*t*(3f-2f*t);
+            return new float[]{shot[0],from[1]+(shot[1]-from[1])*t,from[2]+(shot[2]-from[2])*t,from[3]+(shot[3]-from[3])*t};
         }
+        /** Voo de quem bate, só no desenho: {quadro, frente, altura}, interpolado (o p13 sobe e desce de meteoro). */
+        float[][] flight=new float[0][];
+        /** {de, até} em que o rival preso aparece deitado de cabeça para baixo (no abraço do p13), ou null. */
+        int[] upsideDown;
+        /** {de, até} em que os braços de quem bate (a folha ULTRA_SEQ_FRENTE) passam na frente do rival, ou null. */
+        int[] armsInFront;
+        /** {subida, empurrão} do golpe final no lugar do lançamento alto (o rival fica no chão), ou null. */
+        float[] finalLaunch;
+        /** O Ultra do p13: voo, abraço com o rival de cabeça para baixo e a queda curta no fim. */
+        UltraSequence withFlight(float[][] flight,int[] upsideDown,int[] armsInFront,float[] finalLaunch) {
+            for(int i=0;i<flight.length;i++)
+                if(flight[i].length!=3||(i>0&&flight[i][0]<=flight[i-1][0]))throw new IllegalArgumentException("ultra sequence: flight {frame, ahead, height}, growing frames");
+            for(int[] w:new int[][]{upsideDown,armsInFront})
+                if(w!=null&&(w.length!=2||w[0]>=w[1]))throw new IllegalArgumentException("ultra sequence: {from, to}");
+            if(finalLaunch!=null&&(finalLaunch.length!=2||finalLaunch[0]<0f))throw new IllegalArgumentException("ultra sequence: final launch {rise, push}");
+            this.flight=flight.clone();this.upsideDown=upsideDown;this.armsInFront=armsInFront;this.finalLaunch=finalLaunch;
+            return this;
+        }
+        /** Frente e altura do voo de quem bate neste quadro ({0, 0} sem voo). */
+        float[] flightAt(float frame) {
+            if(flight.length==0)return new float[]{0f,0f};
+            if(frame<=flight[0][0])return new float[]{flight[0][1],flight[0][2]};
+            for(int i=1;i<flight.length;i++){
+                if(frame<=flight[i][0]){
+                    float t=(frame-flight[i-1][0])/Math.max(1f,flight[i][0]-flight[i-1][0]);
+                    return new float[]{flight[i-1][1]+(flight[i][1]-flight[i-1][1])*t,flight[i-1][2]+(flight[i][2]-flight[i-1][2])*t};
+                }
+            }
+            float[] last=flight[flight.length-1];
+            return new float[]{last[1],last[2]};
+        }
+        static boolean inside(int[] w,float frame){return w!=null&&frame>=w[0]&&frame<w[1];}
         /** O rival some neste quadro da sequência. */
         boolean hidesVictim(float frame) {
             for(int[] w:hidden)if(frame>=w[0]&&frame<w[1])return true;

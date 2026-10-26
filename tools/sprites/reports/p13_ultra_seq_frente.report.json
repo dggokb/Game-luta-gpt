@@ -1,0 +1,144 @@
+{
+  "id": "p13_ultra_seq_frente",
+  "characterProfile": "p13",
+  "source": "art/sprites/source/p13_ultra_seq_frente_video_normalized.png",
+  "sourceNote": "p13: os bra\u00e7os do abra\u00e7o do Ultra, recortados da folha ULTRA_SEQ por tools/sprites/ultras.py.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 600,
+    "frameHeight": 368,
+    "rootX": 300,
+    "rootY": 330,
+    "columns": 5,
+    "frameCount": 5
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        237,
+        72,
+        371,
+        237
+      ],
+      "minimumMargin": 72,
+      "opaquePixels": 12060
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        231,
+        79,
+        370,
+        243
+      ],
+      "minimumMargin": 79,
+      "opaquePixels": 12432
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        244,
+        87,
+        370,
+        251
+      ],
+      "minimumMargin": 87,
+      "opaquePixels": 12108
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        239,
+        93,
+        370,
+        257
+      ],
+      "minimumMargin": 93,
+      "opaquePixels": 12285
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        234,
+        92,
+        353,
+        257
+      ],
+      "minimumMargin": 92,
+      "opaquePixels": 11811
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 156,
+    "frameHeight": 267,
+    "rootX": 77,
+    "rootY": 266,
+    "columns": 5,
+    "frameCount": 5,
+    "cropOffset": [
+      223,
+      64
+    ],
+    "sheetWidth": 148,
+    "sheetHeight": 884,
+    "frames": [
+      [
+        0,
+        0,
+        144,
+        176,
+        10,
+        4
+      ],
+      [
+        0,
+        360,
+        148,
+        172,
+        4,
+        11
+      ],
+      [
+        0,
+        536,
+        136,
+        172,
+        17,
+        19
+      ],
+      [
+        0,
+        712,
+        140,
+        172,
+        12,
+        25
+      ],
+      [
+        0,
+        180,
+        128,
+        176,
+        7,
+        24
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4416000,
+      "grid": 833040,
+      "packed": 523328
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "6e322323eee4e7f4010cab9c0c34440a3f9fdb0552f7359b3d993cba59a21555",
+      "config": "9194c890cce38d584665c4e95a992cff7e52ab308c73b726be9d3f1f036acca8",
+      "profile": "6d144947fb1741e8d34efe1c3bb6e1753925d9f97c129a27e124f2a5d42a05d2"
+    }
+  }
+}

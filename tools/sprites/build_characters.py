@@ -33,8 +33,12 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER',
             # Ultra em sequência (tools/sprites/ultras.py): a folha do vídeo com os golpes.
             'ULTRA_SEQ',
+            # Os braços do Ultra do p13, por cima do rival no abraço (mesmos quadros da ULTRA_SEQ).
+            'ULTRA_SEQ_FRENTE',
             # Agarrão de especial que não pegou (o S3 do p13): a pegada no vazio no lugar das cabeçadas.
-            'SPECIAL_S3_ERRO')
+            'SPECIAL_S3_ERRO',
+            # Super de pancadas no chão que errou a queda (o p13): ele levanta, sem os socos.
+            'SUPER_WAVE_ERRO')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
@@ -167,7 +171,8 @@ def validate_mechanics(name, mech, m, projectile):
     if not isinstance(mech, dict):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
-    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto'}
+    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
+             'chao'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -198,6 +203,9 @@ def validate_mechanics(name, mech, m, projectile):
     if 'puxar' in mech: positive(mech['puxar'], f'{name}.mecanica.puxar')
     if 'salto' in mech:   # o desenho sobe em arco no trecho (o S4 do p13)
         frames('salto', mech['salto']); positive(mech['salto'].get('altura'), f'{name}.mecanica.salto.altura')
+    # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
+    if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
+        raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
     if 'agarra' in mech:   # agarrão de especial (o S3 do p13): alcance à frente do corpo
         if projectile or not isinstance(mech['agarra'], dict) or set(mech['agarra']) != {'alcance'}:
             raise ValueError(f'{name}.mecanica.agarra: a melee move with {{alcance}}')
@@ -231,7 +239,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo','cameraDaLuta'}
+             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -255,10 +263,25 @@ def validate_ultra(name, u, animations):
                                 and all(number(v) for v in u['explosao']) and 0 <= u['explosao'][0] < u['duracao']):
         raise ValueError(f'{name}.ultra.explosao: [quadro, frente, altura, ângulo]')
     shots = u.get('camera', [])
-    if not (isinstance(shots, list) and all(isinstance(k, list) and len(k) == 4 and all(number(v) for v in k)
-                                            and k[3] >= 1 for k in shots)
+    # 5º número (o p13): a câmera vai do plano anterior até este nesse tanto de quadros.
+    if not (isinstance(shots, list) and all(isinstance(k, list) and len(k) in (4, 5) and all(number(v) for v in k)
+                                            and k[3] >= 1 and (len(k) == 4 or (k[4] >= 0 and i > 0))
+                                            for i, k in enumerate(shots))
             and [k[0] for k in shots] == sorted({k[0] for k in shots})):
-        raise ValueError(f'{name}.ultra.camera: [[quadro, frente, altura, zoom >= 1], ...] by growing frame')
+        raise ValueError(f'{name}.ultra.camera: [[quadro, frente, altura, zoom >= 1(, quadros da passagem)], ...] by growing frame')
+    # O Ultra do p13: voo (só o desenho), rival de cabeça para baixo, braços na frente e queda curta.
+    flight = u.get('voo', [])
+    if not (isinstance(flight, list) and all(isinstance(k, list) and len(k) == 3 and all(number(v) for v in k) for k in flight)
+            and [k[0] for k in flight] == sorted({k[0] for k in flight})):
+        raise ValueError(f'{name}.ultra.voo: [[quadro, frente, altura], ...] by growing frame')
+    for key in ('deCabeca', 'bracos'):
+        if key in u and not window(u[key]):
+            raise ValueError(f'{name}.ultra.{key}: [de, até] frames')
+    if 'bracos' in u and 'ULTRA_SEQ_FRENTE' not in animations:
+        raise ValueError(f'{name}.ultra.bracos: needs the ULTRA_SEQ_FRENTE animation')
+    if 'quedaFinal' in u and not (isinstance(u['quedaFinal'], list) and len(u['quedaFinal']) == 2
+                                  and all(number(v) and v >= 0 for v in u['quedaFinal'])):
+        raise ValueError(f'{name}.ultra.quedaFinal: [subida, empurrão]')
     # Zanzoken (o Mugen Rendan da p15): ela some deixando a imagem e reaparece; recuo: reaparece longe.
     if not all(window(w) and w[1] <= u['duracao'] for w in u.get('zanzoken', [])):
         raise ValueError(f'{name}.ultra.zanzoken: [de, até] frames inside the sequence')
@@ -653,6 +676,7 @@ def compile_packs(root, results):
         if 'teleporte' in mech: code += '.teleport('+str(mech['teleporte'])+')'
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
         if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'
+        if mech.get('chao'): code += '.pound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
         if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
@@ -685,6 +709,11 @@ def compile_packs(root, results):
         if 'zanzoken' in u or 'recuo' in u:
             scene += ('.withVanish(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('zanzoken', []))+'},'
                       +('new float[]{'+','.join(f(v) for v in u['recuo'])+'}' if 'recuo' in u else 'null')+')')
+        if any(k in u for k in ('voo','deCabeca','bracos','quedaFinal')):
+            ints = lambda k: 'new int[]{'+','.join(map(str, u[k]))+'}' if k in u else 'null'
+            scene += ('.withFlight(new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('voo', []))+'},'
+                      +ints('deCabeca')+','+ints('bracos')+','
+                      +('new float[]{'+','.join(f(v) for v in u['quedaFinal'])+'}' if 'quedaFinal' in u else 'null')+')')
         return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
                 +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
                 +',new float[][]{'+hold+'})'+scene+')')

@@ -463,6 +463,8 @@ def striking_super(pack, spec, clips=None):
         d = video_cadence(anim, (clips or {}).get(anim['atlas'], {}), total * 1000 / 60)
         if d:
             anim['durationsMs'] = d
+        if spec.get('metralhadora'):
+            total = machine_gun(anim, spec['metralhadora'])
         anim['impactFrame'] = first
         fit_impact(anim, {'startupFrames': prep, 'activeFrames': 1, 'recoveryFrames': total - prep - 1})
     d = anim['durationsMs']
@@ -482,8 +484,29 @@ def striking_super(pack, spec, clips=None):
     a['launchType'], a['knockback'] = 'knockdown', spec.get('empurrao', 120)
     # Defendido, o Super corpo a corpo fica -10 (a onda era segura por ser de longe).
     a['blockstunFrames'] = max(4, total - a['golpes'][-1] - 10)
-    if spec.get('avanco'):
+    if isinstance(spec.get('avanco'), dict):
+        travel(a, anim, spec['avanco'])   # só num trecho (o pulo do Super do p13)
+    elif spec.get('avanco'):
         advance(a, spec['avanco'])
+    if 'salto' in spec:
+        dd = anim['durationsMs']
+        at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
+        a.setdefault('mecanica', {})['salto'] = {'altura': spec['salto']['altura'],
+                                                 'frames': [at(spec['salto']['de']), min(at(spec['salto']['ate']), total - 1)]}
+    if spec.get('chao'):
+        a.setdefault('mecanica', {})['chao'] = True   # a primeira derruba, as outras no rival deitado
+
+
+def machine_gun(anim, mg):
+    """Socos que aceleram como metralhadora (o Super do p13): os quadros de "de" até "ate"
+    (posições na lista de frames) vão do tempo do vídeo até "fim" vezes ele, aos poucos. Devolve
+    o novo total em quadros do jogo."""
+    d = anim['durationsMs']
+    de, ate, fim = mg['de'], mg['ate'], mg['fim']
+    for i in range(de, ate):
+        k = 1 + (fim - 1) * (i - de) / max(1, ate - de - 1)
+        d[i] = max(17, round(d[i] * k))
+    return round(sum(d) * 60 / 1000)
 
 
 def scaled(base, f, air=False):
