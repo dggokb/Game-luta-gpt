@@ -270,6 +270,24 @@ final class SpriteFighterRenderer {
 
     private static float clamp01(float v){return Math.max(0f,Math.min(1f,v));}
     void setTint(ColorFilter tint){this.tint=tint;}
+
+    /**
+     * Um quadro de um clipe de {@code ch}, sem pose nem rastro (o telão e o replay dele). Pula
+     * se a folha não está pronta: nunca decodifica na hora de desenhar.
+     */
+    void drawQuadro(Canvas canvas,CharacterDefinition ch,String clip,int frame,float x,float baseY,int facing) {
+        CharacterDefinition.Animation anim=ch.animations.get(clip);
+        if(anim==null||anim.atlas==null||!atlases.pronta(anim.atlas.resource))return;
+        CharacterDefinition antes=character;
+        character=ch;
+        spritePaint.setColorFilter(null);
+        canvas.save();
+        if(facing*ch.artFacing<0) canvas.scale(-1f,1f,x,0f);
+        drawClip(canvas,clip,frame,x,baseY,255);
+        spritePaint.setAlpha(255);
+        canvas.restore();
+        character=antes;
+    }
     /** Sombra roxa e translúcida do próprio lutador (o eco de sombra da p06). */
     static ColorFilter shadowEcho() {
         return new ColorMatrixColorFilter(new ColorMatrix(new float[]{

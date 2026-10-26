@@ -579,6 +579,53 @@ public class StageSceneTest {
         }
     }
 
+    @Test
+    public void oTelaoDesenhaALutaNaTelaDaImagem() throws IOException {
+        final FakeImage telao = new FakeImage(1000, 820);
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"telao.png\", \"profundidade\": 3420, \"noChao\": true, \"altura\": 0.37, \"x\": 0.5,"
+            + " \"telao\": {\"x\": 0.07, \"y\": 0.1171, \"largura\": 0.86, \"altura\": 0.5878}}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) { return telao; }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        assertTrue(scene.temTelao());
+        scene.setCamera(1.24f, 200f, 72f);
+        final java.util.List<float[]> telas = new java.util.ArrayList<>();
+        final CountingCanvas canvas = new CountingCanvas() {
+            @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                super.drawImage(image, l, t, r, b, alpha);
+                telas.add(new float[] {l, t, r, b});
+            }
+        };
+        scene.drawBackground(canvas);
+        assertTrue("sem quem desenhe, só a imagem", telas.size() == 1);
+        final java.util.List<float[]> chamadas = new java.util.ArrayList<>();
+        scene.setTelao((c, l, t, r, b) -> chamadas.add(new float[] {l, t, r, b}));
+        telas.clear();
+        scene.drawBackground(canvas);
+        assertEquals(1, chamadas.size());
+        float[] img = telas.get(0), tela = chamadas.get(0);
+        float w = img[2] - img[0], h = img[3] - img[1];
+        assertEquals(img[0] + 0.07f * w, tela[0], 0.5f);
+        assertEquals(img[1] + 0.1171f * h, tela[1], 0.5f);
+        assertEquals(0.86f * w, tela[2] - tela[0], 0.5f);
+        assertEquals(0.5878f * h, tela[3] - tela[1], 0.5f);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void telaoSemTamanhoEhErro() {
+        StageDefinition.fromJson("{\"nome\": \"X\", \"camadas\": [{\"imagem\": \"t.png\", \"profundidade\": 300,"
+            + " \"noChao\": true, \"altura\": 1, \"telao\": {\"x\": 0.1}}]}");
+    }
+
+    @Test
+    public void imagemDeOutroCenarioPeloCaminhoComPontos() {
+        assertEquals("stages/arena_central/ceu.jpg", StagePack.caminho("stages/terraco_lua/", "../arena_central/ceu.jpg"));
+        assertEquals("stages/terraco_lua/lua.png", StagePack.caminho("stages/terraco_lua/", "lua.png"));
+    }
+
     private static final class FakeImage implements RenderImage {
         final int w, h;
 

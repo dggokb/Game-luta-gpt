@@ -434,6 +434,21 @@ python tools/stage/montar_central.py --comum pasta/torneio --entrada pasta/torne
   câmera afasta e no super pulo), penhascos, mar e o céu com a lua.
 - O ep08 usa este cenário na FINAL, e ele entra no sorteio do Arcade.
 
+### Telão da Imperial e da Central
+
+As duas arenas da semifinal e da final têm um telão no meio, na frente da arquibancada (Central
+a 3420, entre as pilastras e a mureta) ou do palácio (Imperial a 2420, logo atrás dos
+pórticos). O jogo mostra a luta na tela dele e o replay dos golpes fortes (veja "Telão" em
+`docs/stage-engine.md`). Hoje é o provisório desenhado pelo `tools/stage/telao_provisorio.py`
+(`arena_central/telao.png`, usado pelas duas).
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `telao.png` | horizontal, um pouco mais larga que alta | **transparente** | Telão de estádio moderno visto **exatamente de frente**: uma tela grande 16:9 **apagada, preta e lisa** (o jogo desenha a imagem nela), numa moldura grossa de aço escuro com friso dourado, uma faixa vermelha em cima com o emblema do torneio em dourado no meio e uma fileira de refletores de palco apagados por cima da moldura. Embaixo, duas pernas de treliça de metal preto descendo até o chão, com placas na base. O topo aparece inteiro, com margem transparente. A base das pernas toca a borda de baixo. Sem texto, sem imagem na tela. |
+
+Dica: a tela precisa ficar **preta e chapada** e com as bordas retas: meça o retângulo dela
+na imagem (em frações da largura e da altura) e ponha no `"telao"` da camada no `stage.json`.
+
 ## 5b. Terraço da Lua (`terraco_lua`): Sob a Mesma Lua
 
 A noite antes da final. Um terraço de pedra silencioso no alto da ilha, perto da Arena

@@ -379,6 +379,18 @@ public class GameView extends SurfaceView
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
     /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag). */
     private SpriteFighterRenderer opponentPartnerRenderer;
+    /** O telão da arena (semifinal e final): a luta de perto e o replay dos golpes fortes. */
+    private final TelaoLuta telao = new TelaoLuta();
+    /** Desenha os quadros do telão (de qualquer lutador; não mexe nos renderers da luta). */
+    private SpriteFighterRenderer telaoRenderer;
+    /** O Canvas do quadro, para o telão desenhar quando o cenário chega na tela dele. */
+    private Canvas telaoCanvas;
+    private final com.gamelutagpt.stage.StageScene.Telao desenhaTelao = (rc, l, t, r, b) -> desenharTelao(l, t, r, b);
+
+    private void desenharTelao(float l, float t, float r, float b) {
+        if (telaoCanvas == null || telaoRenderer == null) return;
+        telao.desenhar(telaoCanvas, telaoRenderer, l, t, r, b, GROUND_Y, qualidade.efeitosLeves(), engine.frame() / 60f);
+    }
     private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
     /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
 
@@ -729,6 +741,7 @@ public class GameView extends SurfaceView
         echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
         henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character, folhas);
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character, folhas);
+        telaoRenderer = new SpriteFighterRenderer(atlases, team[0].character, false);
         medicao.parte("folhas");
         StageScene cenario = stageId.equals(cenarioAntecipadoId) ? resultado(cenarioAntecipado) : null;
         stageScene = cenario != null ? cenario : loadStage(ultraAssets, stageId);
@@ -1726,6 +1739,7 @@ public class GameView extends SurfaceView
         updateGritoDaTroca();
         updateConversa();
         updateNarracao();
+        gravarTelao();
         updateCinematica(intro);
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
@@ -1845,6 +1859,7 @@ public class GameView extends SurfaceView
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
+        telao.reset();
         hud.resetEffects();
         impacts.clear();
         riscos.clear();
@@ -3177,6 +3192,8 @@ public class GameView extends SurfaceView
                 perfil.marca(PerfilQuadros.TELA);
                 stageScene.setDetalhe(!qualidade.efeitosLeves());
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
+                stageScene.setTelao(desenhaTelao);
+                telaoCanvas = canvas;
                 if (narradorNoPalco) {
                     stageScene.drawBackground(renderCanvas, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
                         desenhaNarradorPalco);
@@ -4477,6 +4494,29 @@ public class GameView extends SurfaceView
         if (f.airDashDirection < 0) c.scale(-1f, 1f, f.x, 0f);
         effects.drawAirDash(c, paint, f.x, f.y, f.state.profile.color);
         c.restore();
+    }
+
+    /**
+     * O passo para o telão (só nos cenários com telão): onde cada um em campo estava e qual
+     * quadro mostrava, para a transmissão e o replay.
+     */
+    private void gravarTelao() {
+        if (stageScene == null || !stageScene.temTelao()) return;
+        CombatFighter p = player(), o = opponent();
+        gravarTelao(0, spriteFighterRenderer, p, p.x + tagOffset());
+        gravarTelao(1, opponentSpriteRenderer, o, o.x + engine.teams.tagOffset(OPPONENT));
+        CombatFighter a = engine.team(PLAYER).assist, b = engine.team(OPPONENT).assist;
+        gravarTelao(2, a != null ? partnerSpriteRenderer : null, a, a != null ? a.x : 0f);
+        gravarTelao(3, b != null ? opponentPartnerRenderer : null, b, b != null ? b.x : 0f);
+        telao.passo(engine);
+    }
+
+    private void gravarTelao(int lugar, SpriteFighterRenderer r, CombatFighter f, float x) {
+        if (r == null || f == null || hiddenByUltra(f) || zanzokenAlpha(f) <= 0f) {
+            telao.gravar(lugar, null, null, 0, 0f, 0f, 1);
+            return;
+        }
+        telao.gravar(lugar, r.character(), r.motion.clip, r.motion.frame(), x, fighterVisualY(f), f.facing);
     }
 
     /** The partner behind the point: the assist doing its move, or the former point leaving. */

@@ -238,6 +238,12 @@ public final class StageDefinition {
         public final List<Light> lights;
         public final List<Fire> fires;
         public final List<Banner> banners;
+        /**
+         * {@code "telao": {"x", "y", "largura", "altura"}}: a tela de um telão na imagem da
+         * camada (frações dela, do canto de cima à esquerda), onde o jogo mostra a luta; null
+         * sem telão.
+         */
+        public final float[] screen;
         /** Ator: pasta dele, relativa ao cenário (com o ator.json e as folhas). */
         public final String actor;
         /** Ator: espelhado (olhando para o outro lado). */
@@ -277,6 +283,7 @@ public final class StageDefinition {
             lights = Collections.unmodifiableList(new ArrayList<>(b.lights));
             fires = Collections.unmodifiableList(new ArrayList<>(b.fires));
             banners = Collections.unmodifiableList(new ArrayList<>(b.banners));
+            screen = b.screen;
             actor = b.actor;
             flip = b.flip;
         }
@@ -314,6 +321,7 @@ public final class StageDefinition {
         final List<Light> lights = new ArrayList<>();
         final List<Fire> fires = new ArrayList<>();
         final List<Banner> banners = new ArrayList<>();
+        float[] screen;
         String actor;
         boolean flip;
     }
@@ -702,6 +710,15 @@ public final class StageDefinition {
                 Map<String, Object> f = (Map<String, Object>)item;
                 b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f)));
             }
+        }
+        Object telao = map.get("telao");
+        if (telao instanceof Map) {
+            Map<String, Object> f = (Map<String, Object>)telao;
+            float width = number(f, "largura", 0f), height = number(f, "altura", 0f);
+            if (width <= 0f || height <= 0f) {
+                throw new IllegalArgumentException(where + ": telao precisa de \"largura\" e \"altura\"");
+            }
+            b.screen = new float[] {number(f, "x", 0f), number(f, "y", 0f), width, height};
         }
         Object banners = map.get("bandeiras");
         if (banners instanceof List) {

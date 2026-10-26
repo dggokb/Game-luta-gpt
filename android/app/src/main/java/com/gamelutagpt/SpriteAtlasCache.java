@@ -255,6 +255,14 @@ final class SpriteAtlasCache {
         return e.folha;
     }
 
+    /** A folha já está pronta para desenhar (sem decodificar na hora). */
+    boolean pronta(String resource) {
+        synchronized(trava) {
+            Entrada e=folhas.get(resource);
+            return e!=null&&e.folha!=null;
+        }
+    }
+
     /** Folhas prontas. */
     int size() {
         synchronized(trava) {

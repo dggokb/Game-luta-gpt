@@ -209,6 +209,31 @@ dela (`x`, `y` do canto de cima à esquerda, `largura`, `altura`):
 - Hoje: os pilares do Templo da Lua e do Dojo Yinlu, o poste do porto, o andaime do
   Caminho e os estandartes da Ilha do Torneio.
 
+### Telão
+
+Uma camada de imagem pode ter a tela de um telão (`"telao"`), um retângulo da imagem em
+frações dela, como as bandeiras:
+
+```json
+"telao": { "x": 0.07, "y": 0.1171, "largura": 0.86, "altura": 0.5878 }
+```
+
+- O cenário desenha a imagem (a estrutura, com a tela escura) e chama quem o jogo pôs em
+  `StageScene.setTelao` com o retângulo da tela já na perspectiva da camada. O jogo
+  (`TelaoLuta`) mostra a luta ali como uma transmissão: os mesmos sprites dos lutadores,
+  pequenos, num fundo liso com linhas de TV e o selo AO VIVO.
+- **Replay**: depois de um Super, de um combo de 5 acertos ou mais ou de um K.O., o telão
+  passa de novo, em câmera lenta (metade da velocidade), de pouco antes do golpe até um
+  pouco depois, com o selo REPLAY. Um replay de cada vez.
+- **Leve**: o telão não desenha a cena de novo. A cada passo ele guarda só qual clipe e qual
+  quadro cada um em campo mostrava e onde estava (4 s guardados, alguns números por
+  lutador), e redesenha esses quadros pequenos. Só desenha folhas já carregadas (nunca
+  decodifica na hora) e esquece tudo a cada luta nova. No modo de efeitos leves, sem os
+  parceiros e sem as linhas de TV.
+- Hoje: o telão provisório (`tools/stage/telao_provisorio.py`) na Arena Imperial
+  (semifinal) e na Arena Central (final). Prompt da arte definitiva em
+  `tools/stage/ilha-do-torneio.md`.
+
 ## Efeitos do jogo
 
 - **Reflexo dos lutadores**: `chao.reflexoLutadores` (0 a 1). O `GameView` desenha cada

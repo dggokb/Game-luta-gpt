@@ -240,6 +240,25 @@ public final class StageScene {
         return pack.definition.floor != null && floorImage != null ? pack.definition.floor.fighterReflection : 0f;
     }
 
+    /** Quem desenha o que passa na tela de um telão ({@code "telao"} numa camada). */
+    public interface Telao {
+        /** A tela do telão ocupa este retângulo da tela agora (já na perspectiva da camada). */
+        void desenhar(RenderCanvas c, float l, float t, float r, float b);
+    }
+
+    private Telao telao;
+
+    /** O que passa nos telões do cenário (null: a tela fica como na imagem). */
+    public void setTelao(Telao telao) {
+        this.telao = telao;
+    }
+
+    /** O cenário tem um telão. */
+    public boolean temTelao() {
+        for (Placed p : placed) if (p.layer.screen != null) return true;
+        return false;
+    }
+
     /** Copia a câmera da luta: zoom final, esquerda e topo visíveis no mundo. */
     public void setCamera(float zoom, float cameraLeft, float top) {
         camera.set(zoom, cameraLeft, top);
@@ -619,6 +638,13 @@ public final class StageScene {
             drawWaterfalls(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawBanners(c, p, l, top, r, bottom, mirrored, alpha, k);
+            if (layer.screen != null && telao != null) {
+                // A tela do telão (o recorte fica do lado certo na cópia espelhada).
+                float[] s = layer.screen;
+                float w = r - l, h = bottom - top;
+                float sl = mirrored ? r - (s[0] + s[2]) * w : l + s[0] * w;
+                telao.desenhar(c, sl, top + s[1] * h, sl + s[2] * w, top + (s[1] + s[3]) * h);
+            }
             if (layer.reflection > 0f && detalhe) {
                 c.save();
                 c.scale(1f, -1f, 0f, bottom);

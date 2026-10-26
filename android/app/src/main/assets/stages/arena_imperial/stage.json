@@ -147,6 +147,16 @@
       "luzes": [
         { "x": 0.47, "y": 0.33, "raio": 0.18, "cor": "#FFC878", "pulsar": 0.06 }
       ]
+    },
+    {
+      "id": "telao",
+      "imagem": "../arena_central/telao.png",
+      "profundidade": 2420,
+      "noChao": true,
+      "altura": 0.37,
+      "x": 0.3,
+      "repetir": "nao",
+      "telao": {"x": 0.07, "y": 0.1171, "largura": 0.86, "altura": 0.5878}
     }
   ],
   "chao": {
