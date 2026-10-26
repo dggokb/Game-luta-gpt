@@ -2,6 +2,7 @@ package com.gamelutagpt.historia;
 
 import com.gamelutagpt.render.RenderAssets;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -77,6 +78,7 @@ public final class Campanha {
         vencedor = null;
         derrotasSeguidas = 0;
         alivio = 0;
+        onda = 0;
         if (irmao != null) escolher(irmao);
         if (disputadas < 0 || !temTorneio()) return;
         Torneio t = torneio();
@@ -236,8 +238,42 @@ public final class Campanha {
 
     private String[] resolver(String ref, String[] fixo) {
         if (ref == null) return fixo;
+        if (Episodio.IRMAOS.equals(ref)) {
+            // A TAG impossível: o irmão escolhido de titular e o outro de parceiro.
+            Torneio.Dupla minha = duplaDo(irmao()), outra = duplaDo(rival());
+            return minha != null && outra != null ? new String[] {minha.lutadores[0], outra.lutadores[0]} : null;
+        }
+        if (Episodio.AGENTES.equals(ref)) return agentes(onda);
         Torneio.Dupla d = duplaDo("jogador".equals(ref) ? irmao() : rival());
         return d != null ? d.lutadores : null;
+    }
+
+    /** Onda atual de uma luta com {@code "ondas"} (0 = a primeira): escolhe os agentes dela. */
+    private int onda;
+
+    public void onda(int onda) {
+        this.onda = Math.max(0, onda);
+    }
+
+    public int onda() {
+        return onda;
+    }
+
+    /** Mistura da semente para os agentes (outra sequência que a do sorteio e a do porto). */
+    private static final long AGENTES = 0x6A3E7151L;
+
+    /**
+     * Os agentes do torneio na onda {@code onda}. Ainda não existem: por enquanto são dois
+     * lutadores com golpes das duplas que não são dos irmãos, sorteados pela semente, sem
+     * repetir entre as ondas enquanto houver gente. Null sem duplas (Arcade).
+     */
+    public String[] agentes(int onda) {
+        List<String> gente = new ArrayList<>();
+        for (Torneio.Dupla d : duplas) if (d.pronta && d.irmao == null) Collections.addAll(gente, d.lutadores);
+        if (gente.size() < 2) return null;
+        Collections.shuffle(gente, new Random(semente ^ AGENTES));
+        int k = (Math.max(0, onda) % (gente.size() / 2)) * 2;
+        return new String[] {gente.get(k), gente.get(k + 1)};
     }
 
     /** Rótulo da luta: o do passo ou, numa luta do torneio, o nome da rodada. */

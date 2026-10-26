@@ -121,13 +121,15 @@ cenário: [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torne
 | QUARTAS DE FINAL (ep04) | Arena Costeira (`arena_costeira`), **pronto** |
 | EMBOSCADA (ep05) | Caminho dos Penhascos (`caminho_penhascos`), **pronto** |
 | SEMIFINAL (ep06) | Arena Imperial (`arena_imperial`), **pronto** |
-| FINAL (2x2, ep07) | Arena Central (`arena_central`), **pronto** |
+| BONUS STAGE — BROTHERS UNITED (ep07, Sob a Mesma Lua) | Terraço da Lua (`terraco_lua`), **provisório** (peças da Central) |
+| FINAL (2x2, ep08) | Arena Central (`arena_central`), **pronto** |
 | DUELO FINAL (1x1, a "Final da Tag") | Arena VIP (`arena_vip`) |
 | O Campeão, Takatoshi | Arena do Templo (`arena_templo`) |
 
 O Porto Secreto, a Arena Costeira, o Caminho dos Penhascos, a Arena Imperial e a Arena
 Central já estão no jogo (no ep03, nas quartas do ep04, na emboscada do ep05, na semifinal
-do ep06 e na final do ep07, e no sorteio de cenários do Arcade). A Arena VIP e a Arena do
+do ep06 e na final do ep08, e no sorteio de cenários do Arcade). O Terraço da Lua do ep07 é
+provisório. A Arena VIP e a Arena do
 Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
 
 ## Passos novos no `episodio.json`
@@ -144,6 +146,9 @@ Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
 | `"irmao": "ryuga"` ou `"koga"` | em qualquer passo: só toca na campanha desse irmão (páginas diferentes para cada lado) |
 | `{ "tipo": "luta", "porto": true }` | o desafio no porto: contra uma dupla do lado do rival na chave que ainda vai ser sorteada |
 | `"adversario": "p05"` (ou lista) | em qualquer passo: só toca quando o adversário do porto é essa dupla (id do `torneio.json`) |
+| `"dupla": "irmaos"` | a TAG impossível: o irmão escolhido de titular e o outro de parceiro (só no bônus Sob a Mesma Lua) |
+| `"cpu": "agentes"` | os agentes do torneio. Ainda não existem: por enquanto, dois lutadores com golpes das duplas que não são dos irmãos, sorteados pela semente (`Campanha.agentes`), diferentes a cada onda |
+| `"ondas": 3` | a luta são lutas seguidas contra duplas novas, sem tela de vitória entre elas; a vida e o Super da dupla do jogador passam de uma para a outra (quem caiu volta com 20% da vida) e o rótulo das seguintes é ONDA 2 / 3, ONDA 3 / 3. Conta como uma luta só para o nível da CPU; perder recomeça da primeira onda, de vida cheia |
 
 Se o sorteio for pulado (PULAR), a chave é sorteada na primeira luta do torneio. Sem a
 campanha (cenas tocadas sem a história), escolha, sorteio, chave, lutas do torneio e passos
@@ -159,19 +164,22 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 | ep04 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
 | ep05 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep06 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
-| ep07 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
-| ep08 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
+| ep07 — Sob a Mesma Lua | o episódio bônus do documento da história (7.1): a noite antes da final, Ryūga e Kōga conversam no terraço sob a lua cheia, os magnatas (só silhuetas, "???") mandam agentes desgastar os dois, e a única TAG Ryūga + Kōga: **BONUS STAGE — BROTHERS UNITED**, 3 ondas de agentes no `terraco_lua`. Fora da chave: não muda nada no torneio. Páginas provisórias (cenas `terraco` e `magnatas` na arte provisória) |
+| ep08 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
+| ep09 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
 
 **Nível da CPU** (`NivelCpu`): começa no NÍVEL CPU da pausa (padrão 5) na primeira luta e
-chega ao 8 na última, repartido pelas lutas da campanha do irmão escolhido. Hoje são 8 (treino
-do ep01, convite, desafio, quartas, emboscada, semifinal, final e duelo): 5, 5, 5, 6, 6, 7, 7, 8. O
+chega ao 8 na última, repartido pelas lutas da campanha do irmão escolhido. Hoje são 9 (treino
+do ep01, convite, desafio, quartas, emboscada, semifinal, o bônus com as 3 ondas contando como
+uma, final e duelo): 5, 5, 5, 6, 6, 6, 7, 7, 8. Nas ondas a CPU fica um nível abaixo por onda que
+falta (a primeira é a mais fácil). O
 treino-tutorial do Prólogo não conta (não tem IA). O Arcade usa a mesma regra
 ([arcade.md](arcade.md)). A cada 2 derrotas seguidas a CPU desce 1 nível (nunca abaixo de 1); a
 vitória zera a contagem e a CPU volta ao nível da luta (`Campanha.registrarResultado`).
 
-As páginas do ep03 ao ep08 são provisórias (painéis montados pelo jogo, com a arte
+As páginas do ep03 ao ep09 são provisórias (painéis montados pelo jogo, com a arte
 provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md) (o ep02 já está todo em páginas prontas). Depois do
-ep08 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
+ep09 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
 existe).
 
 ## Retratos

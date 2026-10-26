@@ -27,9 +27,9 @@
 
     { "tipo": "chave" },
 
-    { "tipo": "proximo", "titulo": "A Final", "linhas": [
-      "Duas duplas chegaram ao fim da chave.",
-      "Ryūga e Kōga, frente a frente."
+    { "tipo": "proximo", "titulo": "Sob a Mesma Lua", "linhas": [
+      "Amanhã, a final.",
+      "Hoje à noite, a lua cheia."
     ] }
   ]
 }

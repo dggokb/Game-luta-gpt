@@ -27,6 +27,8 @@ final class ArteHistoria {
             case "chuva": top = 0xFF4B5563; bottom = 0xFF1F2933; break;
             case "carta": top = 0xFF8A5A32; bottom = 0xFF3E2513; break;
             case "porto": top = 0xFF2A2350; bottom = 0xFFE07A3A; break;
+            case "terraco": top = 0xFF0B1230; bottom = 0xFF26305A; break;
+            case "magnatas": top = 0xFF1A1410; bottom = 0xFF050404; break;
             default: top = 0xFFD9D4C7; bottom = 0xFFA9A49A; break;
         }
         c.fillVerticalGradient(l, t, r, b, top, bottom);
@@ -54,6 +56,26 @@ final class ArteHistoria {
             c.fillPolygon(ilha, 0xFF1A1630);
             c.fillRect(l, mar, r, b, 0xFF14213D);
             c.fillRect(l, t + h * 0.82f, r, b, 0xFF2B2B38);
+        } else if ("terraco".equals(cena)) {
+            // Lua cheia, o estádio da Central aceso lá longe e a mureta do terraço embaixo.
+            float lx = l + w * 0.72f, ly = t + h * 0.24f;
+            c.fillRadialGlow(lx, ly, h * 0.34f, 0x77DDE6FF);
+            c.fillCircle(lx, ly, h * 0.11f, 0xFFF6F3E6);
+            rand.reset(23);
+            for (int i = 0; i < 30; i++) c.fillCircle(l + rand.next() * w, t + rand.next() * h * 0.5f, 1.5f, 0xAAFFFFFF);
+            float estadio = t + h * 0.66f;
+            c.fillRect(l + w * 0.08f, estadio - h * 0.10f, l + w * 0.46f, estadio, 0xFF161A33);
+            for (float x = l + w * 0.10f; x < l + w * 0.45f; x += w * 0.04f) c.fillCircle(x, estadio - h * 0.11f, 2.5f, 0xFFFFD58A);
+            c.fillRect(l, estadio, r, b, 0xFF1B2140);
+            c.fillRect(l, t + h * 0.74f, r, t + h * 0.80f, 0xFF3A3F5C);
+        } else if ("magnatas".equals(cena)) {
+            // Sala escura: as telas das câmeras acesas e as silhuetas em poltronas.
+            for (int i = 0; i < 3; i++) {
+                float x0 = l + w * (0.12f + i * 0.28f), x1 = x0 + w * 0.22f;
+                c.fillRect(x0, t + h * 0.12f, x1, t + h * 0.38f, 0xFF2F5B7A);
+                c.fillRadialGlow((x0 + x1) * 0.5f, t + h * 0.25f, w * 0.16f, 0x332F8FCF);
+            }
+            c.fillRect(l, t + h * 0.78f, r, b, 0xFF0D0A08);
         } else if ("chuva".equals(cena)) {
             rand.reset(11);
             for (int i = 0; i < 60; i++) {

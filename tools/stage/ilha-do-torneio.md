@@ -13,8 +13,9 @@ estandartes vermelhos. Os concepts estão em `art/concepts/cenarios/` (vieram do
 | 2 | Arena Costeira (`arena_costeira`), **pronto** | `arena_costeira.jpg` | QUARTAS DE FINAL (ep04) |
 | 3 | Arena Imperial (`arena_imperial`), **pronto** | `arena_imperial.jpg` | SEMIFINAL (ep06) |
 | 4 | Caminho dos Penhascos (`caminho_penhascos`), **pronto** | `caminho_penhascos.jpg` | EMBOSCADA (ep05) |
-| 5 | Arena Central (`arena_central`), **pronto** | `arena_central.jpg` | FINAL 2x2 (ep07) |
-| 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep08) |
+| 5 | Arena Central (`arena_central`), **pronto** | `arena_central.jpg` | FINAL 2x2 (ep08) |
+| — | Terraço da Lua (`terraco_lua`), **provisório** | (sem concept ainda) | BONUS STAGE — BROTHERS UNITED (ep07, Sob a Mesma Lua): Ryūga + Kōga contra 3 ondas de agentes |
+| 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep09) |
 | 7 | Arena do Templo (`arena_templo`) | `arena_templo.jpg` | o Campeão, Takatoshi (chefe final) |
 
 O caminho sobe a ilha: o porto fica no pé, as arenas vão subindo pelos penhascos e o
@@ -431,7 +432,45 @@ python tools/stage/montar_central.py --comum pasta/torneio --entrada pasta/torne
   profundidade (presa nas pilastras; a 420 ela flutuava no super pulo), mureta 600, arquibancada 640 (logo atrás da
   mureta, alta, 0,42 da tela; mais longe ela voava no super pulo), templo do Takatoshi ao longe 6000 (aparece por cima da arquibancada quando a
   câmera afasta e no super pulo), penhascos, mar e o céu com a lua.
-- O ep07 usa este cenário na FINAL, e ele entra no sorteio do Arcade.
+- O ep08 usa este cenário na FINAL, e ele entra no sorteio do Arcade.
+
+## 5b. Terraço da Lua (`terraco_lua`): Sob a Mesma Lua
+
+A noite antes da final. Um terraço de pedra silencioso no alto da ilha, perto da Arena
+Central, fora das arenas oficiais: ninguém assistindo, só vento e mar. A lua cheia grande
+no céu, o caminho de luz dela no mar lá embaixo, o estádio da Central aceso ao longe, sobre
+os penhascos, e o templo do Takatoshi no pico, pequeno. É onde Ryūga e Kōga conversam e
+onde os agentes mascarados dos magnatas cercam os dois (o episódio bônus do documento da
+história, seção 7.1).
+
+**Provisório no jogo** (até a arte chegar): o `stage.json` usa peças da Central e da
+Imperial pelo caminho `"../arena_central/..."` (céu, templo ao longe, estádio, mureta, mar
+liso) e só tem uma imagem própria, a `lua.png`, recortada do `ceu_lua.jpg`. O céu ainda é
+o crepúsculo da Central escurecido por uma névoa, e o piso é o da Imperial.
+
+Composição: piso do terraço até 1600 (pedra escura, `reflexoLutadores` ~0,2), mureta 1600
+(fim do piso), postes de luz 1500 (`luzes`), mar em perspectiva de 1620 a 8500 (`agua`, com
+o `sol` virando o caminho de luz da lua), estádio da Central ao longe 5000 (no chão do mar,
+aceso), ilha com o templo 8600, lua 80000 (`luzes` para o brilho), céu 100000.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `ceu_noite.jpg` | horizontal | opaco | Céu de noite de lua cheia sobre o mar, visto de frente: azul-marinho profundo em cima clareando para um azul-acinzentado perto do horizonte, poucas nuvens finas iluminadas de prata pela lua, estrelas pequenas. **Sem a lua** (o jogo põe a lua por cima) e **sem pôr do sol**: nada de laranja. Sem terra, sem mar, sem montanhas. Continua igual nas duas bordas. |
+| `lua.png` | quadrado | **transparente** | Lua cheia grande e nítida, vista de frente, branca-azulada com crateras suaves em cel-shading, contorno limpo. **Só o disco da lua**, sem halo e sem brilho em volta (o jogo faz o brilho), sem nuvens na frente. Fundo transparente. |
+| `ilha_noite.png` | horizontal | **transparente** | Bem ao longe, à noite sob a lua, um penhasco de pedra escura pontiagudo saindo do mar, coberto de mata, com cachoeiras prateadas, e no pico um templo asiático de vários telhados com as luzes douradas acesas e uma escadaria iluminada descendo. Pequeno, com névoa azulada na base. A base é uma faixa reta de névoa (encontra o mar). O resto é transparente. Sem céu, sem lua, sem mar. |
+| `estadio_longe.png` | horizontal | **transparente** | Ao longe, à noite, o estádio principal da ilha (um coliseu moderno de pedra e concreto com vários andares de camarotes envidraçados acesos em dourado, estandartes vermelhos com o emblema do torneio e um anel de holofotes no alto) sobre uma base de pedra de penhasco que sai do mar, com algumas luzes de caminho subindo. Visto **exatamente de frente**, pequeno. A base é uma linha reta (encontra o mar). O topo aparece inteiro, com margem transparente. Sem céu, sem mar. |
+| `mureta.png` | horizontal | **transparente** | Balaustrada de pedra de um terraço de luxo, vista **exatamente de frente**, em linha reta: pedra escura com friso dourado no alto, colunetas a intervalos iguais e, a cada tantas colunetas, um pilarzinho com uma pequena luminária dourada apagada (o jogo acende). Continua igual nas duas bordas, para se repetir lado a lado. A base toca a borda de baixo. Fundo transparente. |
+| `poste.png` | **vertical** | **transparente** | Poste de luz de jardim de um terraço de luxo, visto de frente: haste fina de metal preto com detalhes dourados e, no alto, uma lanterna de vidro em estilo asiático **apagada** (o jogo acende). O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de um terraço de pedra visto **exatamente de cima** (vista ortográfica, sem perspectiva): placas grandes de pedra cinza-escura com veios sutis e juntas finas, e no centro um mosaico redondo discreto de pedra clara com o desenho de uma lua cheia dentro de um anel dourado. Iluminação uniforme, sem sombras e sem reflexos (a luz da lua é do jogo). As bordas esquerda e direita continuam o padrão das placas. |
+| `chao_liso.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o mosaico da lua do centro, com as placas continuando no lugar dele". |
+
+Dicas do terraço:
+- É de noite: tudo em azul e prata, com o dourado só nas luzes (estádio, templo, postes).
+  O vermelho só nos estandartes do estádio, pequeno, ao longe.
+- O mar não vai na arte: é a camada `agua` do jogo, que faz as ondas e o caminho de luz da
+  lua. As bases do estádio e da ilha só precisam ser retas.
+- A lua fica separada do céu para aparecer na câmera parada (no céu ela ficaria no alto da
+  imagem, fora da tela) e para o jogo fazer o brilho dela.
 
 ## 6. Arena VIP (`arena_vip`): a "Final da Tag", o duelo 1x1
 
@@ -503,7 +542,8 @@ escadaria do `templo.png` podem vir na arte (são pequenas e distantes, quase n�
 1. ~~As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.~~ Prontas, no Drive.
 2. ~~Arena Costeira e Caminho dos Penhascos~~ Prontos (quartas do ep04 e emboscada do ep05).
 3. ~~Porto Secreto, junto com o episódio da chegada.~~ Pronto (ep03).
-4. ~~Imperial e Central~~ Prontas (semifinal do ep06 e final do ep07). Falta a VIP.
+4. ~~Imperial e Central~~ Prontas (semifinal do ep06 e final do ep08). Falta a VIP.
+4b. Terraço da Lua (ep07, Sob a Mesma Lua): provisório com peças da Central; prompts na seção 5b.
 5. Arena do Templo, quando o Takatoshi virar lutador.
 
 Quando um cenário estiver pronto, é só pôr `"cenario": "<id>"` no passo da luta no

@@ -421,7 +421,7 @@ Personagens: p09 (bombeiro ruivo enorme, colete vermelho com faixas refletivas),
 manchado, mãos vazias), p12 (morto-vivo costurado com bandagens, curvado).
 
 ### Também falta
-- História: páginas do ep03 ao ep08 ainda são provisórias (desenhadas pelo jogo).
+- História: páginas do ep03 ao ep09 ainda são provisórias (desenhadas pelo jogo).
 
 ---
 

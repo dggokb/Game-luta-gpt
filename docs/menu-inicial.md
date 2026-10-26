@@ -6,7 +6,7 @@ subindo, e três opções em faixas de mangá:
 
 | Opção | O que faz |
 |---|---|
-| **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep08 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
+| **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep09 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
 | **ARCADE** | Torneio de 16 duplas com dupla oficial ou livre, o duelo 1x1 da dupla campeã e o Takatoshi (em breve): [historia/arcade.md](historia/arcade.md). |
 | **MODO TESTE** | O que o app abria antes: a seleção de dupla e a luta de teste no cenário escolhido no painel da seleção (começa no Templo da Lua, `DEFAULT_STAGE`), com os botões de teste, o DEBUG (AJUSTAR TAMANHOS / AJUSTAR CAIXAS), o modo batalha (IA ON) etc. A seleção abre com a última dupla escolhida no teste. |
 
@@ -33,7 +33,8 @@ fim de cada episódio:
   do rival.
 - O save tem versão (`ProgressoHistoria.VERSAO`). Quando um episódio novo entra no meio da
   temporada, os saves antigos precisam ser convertidos na leitura: a versão 1 é de antes do
-  ep02 "O Parceiro" e a 2, de antes do ep03 "A Chegada"; nas duas, os episódios dali em
+  ep02 "O Parceiro", a 2, de antes do ep03 "A Chegada", e a 3, de antes do ep07 "Sob a
+  Mesma Lua"; em todas, os episódios dali em
   diante estão uma posição antes (`inserirEpisodio`). Quem parou no começo do episódio que
   agora vem depois do novo joga o novo. Sem isso, o CONTINUAR caía no episódio errado com
   a campanha de outro (a emboscada sumia e as rodadas chegavam adiantadas).

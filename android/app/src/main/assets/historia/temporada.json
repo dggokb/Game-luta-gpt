@@ -6,6 +6,8 @@
     "ryuga":     { "nome": "Ryūga",     "cor": "#2F6FD6", "lutador": "player_base" },
     "koga":      { "nome": "Kōga",      "cor": "#C62F2F", "lutador": "p03" },
     "takatoshi": { "nome": "Takatoshi", "cor": "#2B3F8F" },
+    "magnata":   { "nome": "???",       "cor": "#8C6A2A" },
+    "magnata2":  { "nome": "???",       "cor": "#5A4A6A" },
     "dafu":      { "nome": "Dafu",      "cor": "#D9A42E" },
     "mensageiro":{ "nome": "???",       "cor": "#4A4A55" },
     "p02":       { "nome": "Yin-lu",    "cor": "#1F8A8A", "lutador": "p02" },
@@ -15,5 +17,5 @@
     "p15":       { "nome": "Natisuko",  "cor": "#E8E4DA", "lutador": "p15" },
     "p16":       { "nome": "Bonnie Scarlet", "cor": "#D8262E", "lutador": "p16" }
   },
-  "episodios": ["ep00", "ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07", "ep08"]
+  "episodios": ["ep00", "ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07", "ep08", "ep09"]
 }

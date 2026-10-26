@@ -33,6 +33,15 @@ public final class NivelCpu {
         return Math.max(MenuPausa.NIVEL_MIN, nivel(base, feitas, total) - Math.max(0, alivio));
     }
 
+    /**
+     * Nível da onda {@code onda} (0 = a primeira) de uma luta com {@code ondas}: um abaixo do
+     * nível da luta por onda que ainda falta, e a última no nível da luta. Nunca abaixo de 1.
+     */
+    public static int onda(int nivel, int onda, int ondas) {
+        int faltam = Math.max(0, ondas - 1 - Math.max(0, onda));
+        return Math.max(MenuPausa.NIVEL_MIN, nivel - faltam);
+    }
+
     /** O passo é uma luta contra a CPU que conta para quem escolheu {@code irmao} (null = todas). */
     public static boolean conta(Episodio.Passo p, String irmao) {
         return p.tipo == Episodio.TipoPasso.LUTA && !p.tutorial() &&

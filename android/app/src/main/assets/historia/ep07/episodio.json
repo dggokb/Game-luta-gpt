@@ -1,30 +1,118 @@
 {
   "id": "ep07",
   "numero": 7,
-  "titulo": "A Final",
+  "titulo": "Sob a Mesma Lua",
   "passos": [
     { "tipo": "titulo" },
 
-    { "tipo": "chave" },
-
-    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
-      { "imagem": "pag1_q1.jpg", "cena": "templo", "personagens": ["ryuga"], "enquadramento": "close",
+    { "tipo": "pagina", "layout": "faixa-e-dois", "paineis": [
+      { "imagem": "pag1_q1.jpg", "cena": "terraco", "personagens": ["ryuga"], "foco": 0.4,
         "baloes": [
-          { "tipo": "fala", "quem": "ryuga", "texto": "Kōga. Não precisava ser assim.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "narracao", "texto": "A noite antes da final. Um terraço silencioso da ilha, sob a lua cheia.", "pos": [0.32, 0.16] }
         ] },
-      { "imagem": "pag1_q2.jpg", "cena": "templo", "personagens": ["koga"], "enquadramento": "close", "efeito": "impacto",
+      { "imagem": "pag1_q2.jpg", "cena": "terraco", "personagens": ["koga"], "enquadramento": "close",
         "baloes": [
-          { "tipo": "grito", "quem": "koga", "texto": "Precisava sim! Só um de nós chega ao fim!", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "fala", "quem": "koga", "texto": "Heh... então você também gosta de ficar olhando para a lua? Eu também. Dá um relaxamento bom.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag1_q3.jpg", "cena": "terraco", "personagens": ["ryuga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "ryuga", "texto": "Não sabia que você gostava disso, Kōga...", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
         ] }
     ] },
 
-    { "tipo": "luta", "torneio": true, "cenario": "arena_central" },
+    { "tipo": "pagina", "layout": "tres-faixas", "paineis": [
+      { "imagem": "pag2_q1.jpg", "cena": "terraco", "personagens": ["ryuga", "koga"],
+        "baloes": [
+          { "tipo": "narracao", "texto": "Em silêncio, os dois lembram dos tempos em que treinavam juntos no dojo de Takatoshi.", "pos": [0.35, 0.2] }
+        ] },
+      { "imagem": "pag2_q2.jpg", "cena": "terraco", "personagens": ["ryuga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "ryuga", "texto": "Kōga... você acha que nós dois estamos fazendo a coisa certa?", "pos": [0.5, 0.25], "rabo": [0.5, 0.55] }
+        ] },
+      { "imagem": "pag2_q3.jpg", "cena": "terraco", "personagens": ["koga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "koga", "texto": "Quem é que sabe o que é certo ou errado, Ryūga? Temos nossas convicções. E eu nunca vou tentar tirar isso de você.", "pos": [0.5, 0.25], "rabo": [0.5, 0.55] }
+        ] }
+    ] },
 
-    { "tipo": "chave" },
+    { "tipo": "pagina", "layout": "dois-e-faixa", "paineis": [
+      { "imagem": "pag3_q1.jpg", "cena": "terraco", "personagens": ["ryuga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "ryuga", "texto": "Eu também não, irmão...", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag3_q2.jpg", "cena": "terraco", "personagens": ["koga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "koga", "texto": "Mas amanhã não vou pegar leve.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag3_q3.jpg", "cena": "terraco", "personagens": ["ryuga", "koga"],
+        "baloes": [
+          { "tipo": "fala", "quem": "ryuga", "texto": "Hehe... nem eu.", "pos": [0.3, 0.2], "rabo": [0.3, 0.5] }
+        ] }
+    ] },
 
-    { "tipo": "proximo", "titulo": "A Regra Escondida", "linhas": [
-      "A final da chave terminou...",
-      "...mas o torneio ainda guarda um segredo."
+    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
+      { "imagem": "pag4_q1.jpg", "cena": "magnatas", "personagens": ["magnata"],
+        "baloes": [
+          { "tipo": "fala", "quem": "magnata", "texto": "Que cena bonita... Dois irmãos, tão tranquilos na véspera de se enfrentarem.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag4_q2.jpg", "cena": "magnatas", "personagens": ["magnata2"],
+        "baloes": [
+          { "tipo": "fala", "quem": "magnata2", "texto": "Seria uma pena chegarem descansados à final. Vamos apimentar um pouco nosso espetáculo.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "pagina", "layout": "faixa-e-dois", "paineis": [
+      { "imagem": "pag5_q1.jpg", "cena": "terraco", "efeito": "impacto", "sfx": "TAP TAP TAP", "posicaoSfx": [0.78, 0.8],
+        "baloes": [
+          { "tipo": "narracao", "texto": "Agentes mascarados surgem dos acessos e cercam os irmãos.", "pos": [0.3, 0.16] }
+        ] },
+      { "imagem": "pag5_q2.jpg", "cena": "terraco", "personagens": ["ryuga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "ryuga", "texto": "Kōga... parece que temos companhia.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag5_q3.jpg", "cena": "terraco", "personagens": ["koga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "koga", "texto": "Heh... faz tempo que não lutamos juntos, irmãozinho!", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "pagina", "layout": "splash", "paineis": [
+      { "imagem": "pag6.jpg", "cena": "terraco", "personagens": ["ryuga", "koga"], "efeito": "brilho",
+        "baloes": [
+          { "tipo": "grito", "quem": "ryuga", "texto": "Vamos ver se você ainda consegue me acompanhar!", "pos": [0.3, 0.18], "rabo": [0.3, 0.45] },
+          { "tipo": "grito", "quem": "koga", "texto": "Hahaha! Olha quem fala!", "pos": [0.72, 0.3], "rabo": [0.7, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "luta", "dupla": "irmaos", "cpu": "agentes", "ondas": 3, "cenario": "terraco_lua",
+      "rotulo": "BONUS STAGE — BROTHERS UNITED" },
+
+    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
+      { "imagem": "pag7_q1.jpg", "cena": "terraco", "personagens": ["ryuga", "koga"],
+        "baloes": [
+          { "tipo": "narracao", "texto": "Os últimos agentes caem. Os dois continuam de pé, ofegantes.", "pos": [0.5, 0.16] },
+          { "tipo": "fala", "quem": "ryuga", "texto": "Foi bom lutar ao seu lado novamente.", "pos": [0.5, 0.42], "rabo": [0.3, 0.6] }
+        ] },
+      { "imagem": "pag7_q2.jpg", "cena": "terraco", "personagens": ["koga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "koga", "texto": "Heh... foi mesmo, irmãozinho.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
+      { "imagem": "pag8_q1.jpg", "cena": "terraco", "personagens": ["koga"],
+        "baloes": [
+          { "tipo": "fala", "quem": "koga", "texto": "Mas amanhã... estaremos de lados opostos.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag8_q2.jpg", "cena": "terraco", "personagens": ["ryuga"], "foco": 0.4,
+        "baloes": [
+          { "tipo": "narracao", "texto": "Ryūga observa o irmão partir e volta a olhar para a lua.", "pos": [0.5, 0.16] }
+        ] }
+    ] },
+
+    { "tipo": "proximo", "titulo": "A Final", "linhas": [
+      "Duas duplas chegaram ao fim da chave.",
+      "Ryūga e Kōga, frente a frente."
     ] }
   ]
 }

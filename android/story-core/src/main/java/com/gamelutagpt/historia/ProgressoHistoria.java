@@ -38,13 +38,16 @@ public final class ProgressoHistoria {
 
     /**
      * Versão do save. A 1 é de antes do ep02 "O Parceiro" (o torneio começava no ep02); a 2,
-     * de antes do ep03 "A Chegada" (o torneio começava no ep03).
+     * de antes do ep03 "A Chegada" (o torneio começava no ep03); a 3, de antes do ep07 "Sob a
+     * Mesma Lua" (A Final era o ep07).
      */
-    static final int VERSAO = 3;
+    static final int VERSAO = 4;
     /** Onde o ep02 "O Parceiro" entrou: nos saves da versão 1, daqui em diante os índices andam um. */
     static final int EPISODIO_NOVO_V2 = 2;
     /** Onde o ep03 "A Chegada" entrou: nos saves até a versão 2, daqui em diante os índices andam um. */
     static final int EPISODIO_NOVO_V3 = 3;
+    /** Onde o ep07 "Sob a Mesma Lua" entrou (entre a Semifinal e A Final). */
+    static final int EPISODIO_NOVO_V4 = 7;
 
     private long semente;
     private int atual;
@@ -188,6 +191,7 @@ public final class ProgressoHistoria {
             int versao = Episodio.number(map, "versao", 1).intValue();
             if (versao < 2) p.inserirEpisodio(EPISODIO_NOVO_V2);
             if (versao < 3) p.inserirEpisodio(EPISODIO_NOVO_V3);
+            if (versao < 4) p.inserirEpisodio(EPISODIO_NOVO_V4);
             return p;
         } catch (RuntimeException ex) {
             return new ProgressoHistoria(sementeNova);
@@ -204,6 +208,7 @@ public final class ProgressoHistoria {
      * <ul>
      *   <li>Versão 1: o ep02 "O Parceiro" ainda não existia ({@link #EPISODIO_NOVO_V2}).</li>
      *   <li>Versão 2: o ep03 "A Chegada" ainda não existia ({@link #EPISODIO_NOVO_V3}).</li>
+     *   <li>Versão 3: o ep07 "Sob a Mesma Lua" ainda não existia ({@link #EPISODIO_NOVO_V4}).</li>
      * </ul>
      */
     private void inserirEpisodio(int novo) {

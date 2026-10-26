@@ -35,7 +35,7 @@ public class NivelCpuTest {
     }
 
     @Test
-    public void historiaDeCadaIrmaoTemOitoLutasDo5Ao8() throws IOException {
+    public void historiaDeCadaIrmaoTemNoveLutasDo5Ao8() throws IOException {
         GameAssets assets = new GameAssets();
         Temporada t = Temporada.load(assets);
         List<Episodio> eps = new ArrayList<>();
@@ -52,14 +52,24 @@ public class NivelCpuTest {
             }
             int[] got = new int[niveis.size()];
             for (int i = 0; i < got.length; i++) got[i] = niveis.get(i);
-            // Treino do ep01, convite, desafio no porto, quartas, emboscada, semifinal, final e o duelo.
-            assertArrayEquals(irmao, new int[] {5, 5, 5, 6, 6, 7, 7, 8}, got);
+            // Treino do ep01, convite, desafio no porto, quartas, emboscada, semifinal, o bônus Sob a
+            // Mesma Lua (as 3 ondas contam como uma luta), final e o duelo.
+            assertArrayEquals(irmao, new int[] {5, 5, 5, 6, 6, 6, 7, 7, 8}, got);
         }
         // O treino-tutorial do Prólogo não conta (não tem IA).
         Episodio prologo = eps.get(0);
         for (int i = 0; i < prologo.passos.size(); i++) {
             assertNull(NivelCpu.posicao(eps, prologo.id, i, Torneio.RYUGA));
         }
+    }
+
+    @Test
+    public void asOndasComecamMaisFaceisETerminamNoNivelDaLuta() {
+        assertEquals(5, NivelCpu.onda(7, 0, 3));
+        assertEquals(6, NivelCpu.onda(7, 1, 3));
+        assertEquals(7, NivelCpu.onda(7, 2, 3));
+        assertEquals("sem ondas, o da luta", 7, NivelCpu.onda(7, 0, 1));
+        assertEquals("nunca abaixo de 1", 1, NivelCpu.onda(1, 0, 3));
     }
 
     @Test

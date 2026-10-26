@@ -380,10 +380,10 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
   11 páginas prontas lidas quadro a quadro (com o treino/tutorial depois da página 4), o
   Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
-- **Torneio** (ep01–ep08, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
+- **Torneio** (ep01–ep09, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
   **Kōga (p03)**; no ep02 cada um convence o parceiro numa luta 1x1 (P01 × P02, p03 × p04); no ep03 chegam à Ilha do Torneio e são desafiados no Porto Secreto (p07 + p08); o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
   opostas: quartas → **emboscada fora da arena** (a dupla que perdeu a outra quarta do seu
-  lado quer a sua vaga) → semifinal → final 2x2 contra o outro irmão → **duelo 1x1** contra o
+  lado quer a sua vaga) → semifinal → **Sob a Mesma Lua** (bônus: Ryūga + Kōga juntos contra 3 ondas de agentes, na noite antes da final) → final 2x2 contra o outro irmão → **duelo 1x1** contra o
   próprio parceiro (a regra escondida; o jogador fica com quem estava em campo ao vencer a final). O rival sempre avança; CPU × CPU é sorteado.
   `docs/historia/torneio.md`.
 - Motor em `android/story-core` (Java puro); episódios em JSON em

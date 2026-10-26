@@ -113,6 +113,12 @@ public final class Episodio {
          * é uma dessas duplas (ids de {@code torneio.json}); null = contra qualquer uma.
          */
         public final List<String> adversario;
+        /**
+         * {@code "ondas": 3}: a luta é uma sequência de lutas seguidas contra duplas novas (os
+         * agentes do "Sob a Mesma Lua"), com a vida da dupla do jogador passando de uma para a
+         * outra. Conta como uma luta só (nível da CPU, campanha); perder recomeça da primeira.
+         */
+        public final int ondas;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -124,8 +130,9 @@ public final class Episodio {
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
               String cinematica, String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
               String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada, boolean solo,
-              boolean porto, List<String> adversario) {
+              boolean porto, List<String> adversario, int ondas) {
             this.tipo = tipo;
+            this.ondas = ondas;
             this.porto = porto;
             this.adversario = adversario;
             this.solo = solo;
@@ -328,6 +335,8 @@ public final class Episodio {
         }
         String duplaRef = ref(map, "dupla");
         String cpuRef = ref(map, "cpu");
+        int ondas = number(map, "ondas", 1).intValue();
+        if (ondas < 1) throw new IllegalArgumentException("ondas precisa ser 1 ou mais");
         String[] dupla = duplaRef != null ? null : pair(map, "dupla");
         String[] cpu = cpuRef != null ? null : pair(map, "cpu");
         if (dupla != null && cpu != null && dupla.length != cpu.length) {
@@ -343,7 +352,7 @@ public final class Episodio {
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
             Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
             Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")),
-            Boolean.TRUE.equals(map.get("solo")), Boolean.TRUE.equals(map.get("porto")), adversario(map));
+            Boolean.TRUE.equals(map.get("solo")), Boolean.TRUE.equals(map.get("porto")), adversario(map), ondas);
     }
 
     /** {@code "adversario"}: um id ou uma lista de ids de dupla; null sem o campo. */
@@ -358,11 +367,19 @@ public final class Episodio {
     }
 
     /** {@code "dupla": "jogador"} ou {@code "rival"} (dupla fixa de um irmão); null se for uma lista. */
+    /** {@code "dupla": "irmaos"}: o irmão escolhido de titular e o outro de parceiro. */
+    public static final String IRMAOS = "irmaos";
+    /** {@code "cpu": "agentes"}: uma dupla de agentes do torneio (por enquanto, lutadores sorteados). */
+    public static final String AGENTES = "agentes";
+
     private static String ref(Map<String, Object> map, String key) {
         Object value = map.get(key);
         if (!(value instanceof String)) return null;
-        if (!value.equals("jogador") && !value.equals("rival")) {
-            throw new IllegalArgumentException(key + " precisa ser [titular, parceiro], [lutador], \"jogador\" ou \"rival\"");
+        // "irmaos": Ryūga + Kōga juntos (só do lado do jogador); "agentes": os agentes do
+        // torneio (só do lado da CPU).
+        String extra = "dupla".equals(key) ? IRMAOS : AGENTES;
+        if (!value.equals("jogador") && !value.equals("rival") && !value.equals(extra)) {
+            throw new IllegalArgumentException(key + " precisa ser [titular, parceiro], [lutador], \"jogador\", \"rival\" ou \"" + extra + "\"");
         }
         return (String)value;
     }

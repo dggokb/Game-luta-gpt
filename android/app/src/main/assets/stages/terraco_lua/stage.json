@@ -1,0 +1,155 @@
+{
+  "nome": "Terraço da Lua",
+  "_provisorio": "Montado com peças da Arena Central e da Arena Imperial até a arte do terraço chegar (prompt em tools/stage/terraco-da-lua.md).",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#070B1E",
+  "camadas": [
+    {
+      "id": "ceu",
+      "imagem": "../arena_central/ceu_lua.jpg",
+      "profundidade": 100000,
+      "topo": -0.75,
+      "base": 0.42,
+      "x": 0.42,
+      "repetir": "espelhar",
+      "corAcima": "#0B1030"
+    },
+    {
+      "id": "noite",
+      "tipo": "neblina",
+      "profundidade": 90000,
+      "topo": 0.05,
+      "base": 0.46,
+      "cor": "#0A1030",
+      "alfa": 0.75
+    },
+    {
+      "id": "lua",
+      "imagem": "lua.png",
+      "profundidade": 80000,
+      "topo": 0.03,
+      "base": 0.19,
+      "x": 0.74,
+      "repetir": "nao",
+      "luzes": [
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "raio": 1.1,
+          "cor": "#C8D4FF",
+          "pulsar": 0.03,
+          "reflexo": false
+        }
+      ]
+    },
+    {
+      "id": "mar-plano",
+      "tipo": "agua",
+      "imagem": "../arena_central/mar_plano.jpg",
+      "perto": 1620,
+      "longe": 8500,
+      "tamanho": 1300,
+      "corrente": 14,
+      "corLonge": "#0E1530",
+      "alfa": 1,
+      "brilhos": 70,
+      "sol": {
+        "x": 0.74,
+        "cor": "#DDE6FF",
+        "alfa": 0.55
+      }
+    },
+    {
+      "id": "templo-longe",
+      "imagem": "../arena_central/templo_longe.png",
+      "profundidade": 8600,
+      "topo": 0.0,
+      "base": 0.45,
+      "x": 0.2,
+      "repetir": "nao"
+    },
+    {
+      "id": "neblina-longe",
+      "tipo": "neblina",
+      "profundidade": 6000,
+      "topo": 0.32,
+      "base": 0.47,
+      "cor": "#1E2250",
+      "alfa": 0.45
+    },
+    {
+      "id": "estadio",
+      "imagem": "../arena_central/arquibancada.png",
+      "profundidade": 5000,
+      "x": 0.72,
+      "repetir": "nao",
+      "luzes": [
+        {
+          "x": 0.5,
+          "y": 0.79,
+          "raio": 0.05,
+          "cor": "#FFC070",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.38,
+          "y": 0.82,
+          "raio": 0.05,
+          "cor": "#FFC070",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.62,
+          "y": 0.82,
+          "raio": 0.05,
+          "cor": "#FFC070",
+          "pulsar": 0.05,
+          "reflexo": false
+        }
+      ],
+      "noChao": true,
+      "altura": 0.17
+    },
+    {
+      "id": "mureta",
+      "imagem": "../arena_central/barreira.png",
+      "profundidade": 1600,
+      "noChao": true,
+      "altura": 0.045,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "lanternas",
+      "imagem": "../arena_imperial/lanterna.png",
+      "profundidade": 1500,
+      "noChao": true,
+      "altura": 0.075,
+      "x": 0.14,
+      "repetir": "espelhar",
+      "periodo": 0.5,
+      "luzes": [
+        {
+          "x": 0.47,
+          "y": 0.33,
+          "raio": 0.18,
+          "cor": "#FFC878",
+          "pulsar": 0.06
+        }
+      ]
+    }
+  ],
+  "chao": {
+    "imagem": "../arena_imperial/chao_placas.jpg",
+    "perto": -600,
+    "longe": 600,
+    "ate": 1600,
+    "centroX": 700,
+    "reflexoLutadores": 0.15,
+    "reflexoLuzes": 0.5
+  }
+}

@@ -294,6 +294,8 @@ public class GameView extends SurfaceView
     private SharedPreferences storyPrefs;
     private static final String STORY_PREFS = "historia_v1";
     private static final String STORY_SAVE_KEY = "progresso";
+    /** Rótulo das ondas seguintes de uma luta com ondas (traduzido pela temporada). */
+    private static final String ONDA = "ONDA";
     /** Pausa (botão MENU ou tecla voltar): continuar ou voltar ao menu inicial. */
     private final MenuPausa pausa = new MenuPausa();
     /**
@@ -323,6 +325,15 @@ public class GameView extends SurfaceView
     private java.util.List<Episodio> episodiosTemporada;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
     private int storyKoFrames;
+    /**
+     * Luta da história com {@code "ondas"} (o "Sob a Mesma Lua"): a onda atual (0 = a primeira)
+     * e a vida e o Super da dupla do jogador no fim da onda anterior (null na primeira).
+     */
+    private Episodio.Passo lutaComOndas;
+    private int ondaDaLuta;
+    private int[] vidaEntreOndas, superEntreOndas;
+    /** Quem caiu numa onda volta na seguinte com esta parte da vida (fôlego). */
+    private static final float FOLEGO_ENTRE_ONDAS = 0.2f;
     private static final int STORY_KO_FRAMES = 150;
     private int ultraAttacker = -1;
     private int ultraDamageDealt;
@@ -5196,6 +5207,7 @@ public class GameView extends SurfaceView
             conversa.momento(won ? "vitoria" : "derrota");
         }
         if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0 || conversa.falando()) return;
+        if (won && proximaOnda()) return;
         if (won && tocarVitoria()) return;
         storyKoFrames = 0;
         descarregarConversa();
@@ -5247,8 +5259,51 @@ public class GameView extends SurfaceView
 
     @Override
     public void onHistoriaLuta(Episodio.Passo luta) {
+        // Uma luta nova (ou repetida depois da derrota) começa na primeira onda, de vida cheia.
+        lutaComOndas = luta.ondas > 1 ? luta : null;
+        ondaDaLuta = 0;
+        vidaEntreOndas = superEntreOndas = null;
+        if (historia.campanha() != null) historia.campanha().onda(0);
         // Cenário e duplas da luta carregam com a tela de carregamento; o resto vem depois deles.
         carregando(() -> startStoryFight(luta));
+    }
+
+    /**
+     * A onda acabou com a vitória e ainda há outra: a mesma dupla do jogador, com a vida e o
+     * Super de agora, contra os próximos agentes. Sem a tela de vitória entre as ondas.
+     */
+    private boolean proximaOnda() {
+        Episodio.Passo luta = lutaComOndas;
+        if (luta == null || ondaDaLuta + 1 >= luta.ondas) return false;
+        vidaEntreOndas = new int[team.length];
+        superEntreOndas = new int[team.length];
+        for (int i = 0; i < team.length; i++) {
+            vidaEntreOndas[i] = team[i].life;
+            superEntreOndas[i] = team[i].superMeter;
+        }
+        ondaDaLuta++;
+        if (historia.campanha() != null) historia.campanha().onda(ondaDaLuta);
+        storyKoFrames = 0;
+        descarregarConversa();
+        pad.reset();
+        releaseAllPointers();
+        carregando(() -> startStoryFight(luta));
+        return true;
+    }
+
+    /** A dupla do jogador começa a onda com a vida e o Super do fim da anterior. */
+    private void aplicarVidaEntreOndas() {
+        if (vidaEntreOndas == null) return;
+        for (int i = 0; i < team.length && i < vidaEntreOndas.length; i++) {
+            FighterState f = team[i];
+            int folego = Math.round(f.profile.maxLife * FOLEGO_ENTRE_ONDAS);
+            f.life = Math.min(f.profile.maxLife, Math.max(vidaEntreOndas[i], folego));
+            f.recoverableLife = 0;
+            f.superMeter = superEntreOndas[i];
+            f.refreshHudLabels();
+        }
+        hud.resetEffects();
+        engine.refreshOverdrive(PLAYER);
     }
 
     private void startStoryFight(Episodio.Passo luta) {
@@ -5271,8 +5326,13 @@ public class GameView extends SurfaceView
             if (lados != null) Log.w(LOG_TAG, "dupla da história sem golpes ainda; usando as duplas atuais");
             selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
         }
+        aplicarVidaEntreOndas();
         String rotulo = historia.rotulo(luta);
         if (rotulo != null && temporada != null) rotulo = temporada.t(rotulo);
+        if (lutaComOndas == luta && ondaDaLuta > 0) {
+            // Da segunda onda em diante: "ONDA 2 / 3".
+            rotulo = (temporada != null ? temporada.t(ONDA) : ONDA) + " " + (ondaDaLuta + 1) + " / " + luta.ondas;
+        }
         // A conversa da luta (nos quadros laterais, sem parar a luta) começa com o "inicio".
         descarregarConversa();
         conversaLicao = -1;
@@ -5419,7 +5479,9 @@ public class GameView extends SurfaceView
         }
         int[] pos = campanha == null || indice < 0 ? null : NivelCpu.posicao(campanha, ep.id, indice, irmao);
         int alivio = historia.campanha() != null ? historia.campanha().alivio() : 0;
-        return pos == null ? Math.max(MenuPausa.NIVEL_MIN, base - alivio) : NivelCpu.nivel(base, pos[0], pos[1], alivio);
+        int nivel = pos == null ? Math.max(MenuPausa.NIVEL_MIN, base - alivio) : NivelCpu.nivel(base, pos[0], pos[1], alivio);
+        // Nas ondas (Sob a Mesma Lua), as primeiras são mais fáceis; a última é a da luta.
+        return luta == lutaComOndas ? NivelCpu.onda(nivel, ondaDaLuta, luta.ondas) : nivel;
     }
 
     private java.util.List<Episodio> episodiosTemporada() {

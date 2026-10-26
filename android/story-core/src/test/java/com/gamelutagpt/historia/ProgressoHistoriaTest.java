@@ -1,5 +1,6 @@
 package com.gamelutagpt.historia;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -31,6 +32,61 @@ public class ProgressoHistoriaTest {
         assertFalse(p.liberado(1));
         assertEquals(42L, p.semente());
         assertFalse("save estragado vira save novo", ProgressoHistoria.fromJson("{lixo", 7L).temSave());
+    }
+
+    @Test
+    public void saveDeAntesDoSobAMesmaLuaParadoNaFinalJogaOBonus() throws IOException {
+        // Versão 3: terminou a Semifinal (ep06) e ia para A Final, que era o ep07.
+        ProgressoHistoria p = ProgressoHistoria.fromJson("{\"versao\":3,\"semente\":\"3\",\"atual\":7,\"concluidos\":7,"
+            + "\"fotos\":{\"7\":{\"irmao\":\"koga\",\"disputadas\":2}}}", 9L);
+        assertEquals("joga o bônus", 7, p.atual());
+        assertEquals(2, p.campanhaNoInicio(7, duplas()).disputadas());
+        assertEquals("A Final começa igual", 2, p.campanhaNoInicio(8, duplas()).disputadas());
+        // Quem já tinha terminado a temporada continua com ela terminada.
+        ProgressoHistoria fim = ProgressoHistoria.fromJson("{\"versao\":3,\"semente\":\"3\",\"atual\":9,\"concluidos\":9,"
+            + "\"fotos\":{}}", 9L);
+        assertEquals(10, fim.atual());
+        assertEquals(10, fim.concluidos());
+        assertEquals("gravado de novo não anda mais", 7, ProgressoHistoria.fromJson(p.toJson(), 9L).atual());
+    }
+
+    @Test
+    public void osIrmaosJuntosContraAgentesDiferentesEmCadaOnda() throws IOException {
+        Campanha c = new Campanha(duplas(), 21L);
+        c.escolher(Torneio.KOGA);
+        Episodio ep = Episodio.fromJson("{\"id\":\"t\",\"titulo\":\"T\",\"passos\":["
+            + "{\"tipo\":\"luta\",\"dupla\":\"irmaos\",\"cpu\":\"agentes\",\"ondas\":3}]}");
+        Episodio.Passo luta = ep.passos.get(0);
+        assertEquals(3, luta.ondas);
+        java.util.Set<String> vistos = new java.util.HashSet<>();
+        for (int onda = 0; onda < 3; onda++) {
+            c.onda(onda);
+            String[][] lados = c.lados(luta);
+            assertArrayEquals("o escolhido de titular", new String[] {"p03", "player_base"}, lados[0]);
+            for (String agente : lados[1]) {
+                assertTrue("sem repetir: " + agente, vistos.add(agente));
+                for (Torneio.Dupla d : duplas()) {
+                    if (java.util.Arrays.asList(d.lutadores).contains(agente)) {
+                        assertNull("nem os irmãos nem os parceiros", d.irmao);
+                        assertTrue("só quem tem golpes", d.pronta);
+                    }
+                }
+            }
+        }
+        c.restaurar(Torneio.RYUGA, -1);
+        assertEquals("restaurar volta à primeira onda", 0, c.onda());
+        assertArrayEquals(new String[] {"player_base", "p03"}, c.lados(luta)[0]);
+        assertEquals("sem ondas é uma luta", 1, Episodio.fromJson("{\"id\":\"t\",\"titulo\":\"T\",\"passos\":["
+            + "{\"tipo\":\"luta\",\"dupla\":\"jogador\",\"cpu\":\"rival\"}]}").passos.get(0).ondas);
+        for (String ruim : new String[] {"\"dupla\":\"agentes\",\"cpu\":\"rival\"", "\"dupla\":\"jogador\",\"cpu\":\"irmaos\"",
+                "\"dupla\":\"irmaos\",\"cpu\":\"agentes\",\"ondas\":0"}) {
+            try {
+                Episodio.fromJson("{\"id\":\"t\",\"titulo\":\"T\",\"passos\":[{\"tipo\":\"luta\"," + ruim + "}]}");
+                org.junit.Assert.fail("devia recusar " + ruim);
+            } catch (IllegalArgumentException esperado) {
+                // ok
+            }
+        }
     }
 
     private static String chave(Torneio t) {

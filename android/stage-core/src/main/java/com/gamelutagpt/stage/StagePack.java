@@ -47,6 +47,21 @@ public final class StagePack {
         return folder + "/" + sheet;
     }
 
+    /**
+     * Onde está a imagem {@code name} do cenário da pasta {@code base}. Começando com
+     * {@code "../"}, ela vem da pasta de outro cenário ({@code "../arena_central/ceu_lua.jpg"}):
+     * um cenário provisório usa as peças de outro sem copiar os arquivos.
+     */
+    static String caminho(String base, String name) {
+        String dir = base.endsWith("/") ? base.substring(0, base.length() - 1) : base;
+        while (name.startsWith("../")) {
+            int corte = dir.lastIndexOf('/');
+            dir = corte >= 0 ? dir.substring(0, corte) : "";
+            name = name.substring(3);
+        }
+        return dir.isEmpty() ? name : dir + "/" + name;
+    }
+
     public static StagePack load(RenderAssets assets, String folder) throws IOException {
         String base = folder.endsWith("/") ? folder : folder + "/";
         StageDefinition definition = StageDefinition.fromJson(assets.readText(base + DEFINITION_FILE));
@@ -91,7 +106,7 @@ public final class StagePack {
         }
         for (String name : names) {
             try {
-                images.put(name, assets.loadImage(base + name));
+                images.put(name, assets.loadImage(caminho(base, name)));
             } catch (IOException | RuntimeException ex) {
                 warnings.add("não carregou " + name + " (" + ex.getMessage() + ")");
             }
