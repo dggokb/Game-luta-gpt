@@ -326,14 +326,20 @@ public class GameView extends SurfaceView
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
     private int storyKoFrames;
     /**
-     * Luta da história com {@code "ondas"} (o "Sob a Mesma Lua"): a onda atual (0 = a primeira)
-     * e a vida e o Super da dupla do jogador no fim da onda anterior (null na primeira).
+     * Luta da história com {@code "ondas"} (o "Sob a Mesma Lua"): a onda atual (0 = a primeira).
+     * As ondas são uma luta só: a dupla de agentes que cai dá lugar à próxima, sem READY/GO,
+     * sem carregar e sem relógio.
      */
     private Episodio.Passo lutaComOndas;
     private int ondaDaLuta;
-    private int[] vidaEntreOndas, superEntreOndas;
-    /** Quem caiu numa onda volta na seguinte com esta parte da vida (fôlego). */
-    private static final float FOLEGO_ENTRE_ONDAS = 0.2f;
+    /** Quadros desde que a dupla de agentes inteira caiu (a próxima entra depois da queda). */
+    private int quedaDaOnda;
+    /** Quadros que a dupla caída fica no chão antes da próxima entrar. */
+    private static final int ONDA_PAUSA = 70;
+    /** Distância fora da tela (mundo) de onde a próxima dupla entra andando. */
+    private static final float ONDA_ENTRADA = 90f;
+    /** Lutadores que a luta ainda vai usar (os agentes das próximas ondas): carregam com ela. */
+    private CharacterDefinition[] lutadoresExtras = new CharacterDefinition[0];
     private static final int STORY_KO_FRAMES = 150;
     private int ultraAttacker = -1;
     private int ultraDamageDealt;
@@ -906,6 +912,19 @@ public class GameView extends SurfaceView
         carregando(() -> selectTeamsNow(point, partner, cpuPoint, cpuPartner, solo));
     }
 
+    /** Os lutadores da luta mais os que ela ainda vai usar (os agentes das próximas ondas). */
+    /** Os lutadores que a luta ainda vai usar (os agentes das próximas ondas), ou nenhum. */
+    private CharacterDefinition[] extrasDaLuta() {
+        return lutaComOndas != null && storyMode ? lutadoresExtras : new CharacterDefinition[0];
+    }
+
+    private CharacterDefinition[] comExtras(CharacterDefinition... daLuta) {
+        if (lutaComOndas == null || !storyMode) return daLuta;
+        CharacterDefinition[] todos = java.util.Arrays.copyOf(daLuta, daLuta.length + lutadoresExtras.length);
+        System.arraycopy(lutadoresExtras, 0, todos, daLuta.length, lutadoresExtras.length);
+        return todos;
+    }
+
     private void selectTeamsNow(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
         MedicaoCarregamento medicao = new MedicaoCarregamento("dupla " + point + "+" + partner + " x " + cpuPoint + "+" + cpuPartner);
         ultraEsperando = null;
@@ -918,17 +937,20 @@ public class GameView extends SurfaceView
         if (flow.battle() && !duel) {
             // Batalha 2x2: o parceiro do CPU entra de assist, na troca e quando o titular cai,
             // então a arte dele fica carregada (sem decodificar no meio da luta).
-            atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
-            atlases.preload(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
+            CharacterDefinition[] luta = comExtras(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
+            atlases.retainOnly(luta);
+            atlases.preload(luta);
         } else {
-            atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
+            CharacterDefinition[] luta = comExtras(team[0].character, team[1].character, opponentFighter.character);
+            atlases.retainOnly(luta);
             // As folhas dos três de uma vez, em paralelo; as antecipadas só são esperadas.
-            atlases.preload(team[0].character, team[1].character, opponentFighter.character);
+            atlases.preload(luta);
         }
         lutadoresAntecipados = "";
         // Os rostos do HUD saem de folhas de conceito grandes: decodificados aqui, e não no
         // primeiro quadro da luta (que engasgava).
         prepararRostosDoHud(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
+        prepararRostosDoHud(extrasDaLuta());
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
@@ -960,6 +982,12 @@ public class GameView extends SurfaceView
             if (carregarFolhasNaHora) pedirUltra(member, true);
             ultraSounds.loadUltra(ultraFolder(member));
         }
+        // Os sons do Ultra dos agentes das próximas ondas (carregar na troca engasgava).
+        for (CharacterDefinition c : extrasDaLuta()) {
+            FighterState agente = new FighterState(c, "CPU");
+            if (carregarFolhasNaHora) pedirUltra(agente, true);
+            ultraSounds.loadUltra(ultraFolder(agente));
+        }
     }
 
     /** A entrada do Super (retrato ao fundo) de quem está na luta, dos dois lados. */
@@ -967,6 +995,8 @@ public class GameView extends SurfaceView
         java.util.List<String> ids = new java.util.ArrayList<>();
         for (FighterState member : engine.team(PLAYER).members) ids.add(member.character.id);
         for (FighterState member : engine.team(OPPONENT).members) ids.add(member.character.id);
+        // Os agentes das próximas ondas: carregados já, para a troca não engasgar.
+        for (CharacterDefinition c : extrasDaLuta()) ids.add(c.id);
         entradaSuper.manter(engine, ids.toArray(new String[0]));
         // A tela de vitória só é do jogador.
         java.util.List<String> nossos = new java.util.ArrayList<>();
@@ -1718,10 +1748,14 @@ public class GameView extends SurfaceView
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
         boolean fightFree = ultraAttacker < 0 && !engine.ultraSequenceRunning();
         // Cena da história esperando a vida baixar (ou o K.O.), ou rodando: o relógio espera.
-        flow.setClockHeld(cinematica.protegeVida() || cinematica.seguraFimDaLuta() || demo.active());
+        // As ondas (Sob a Mesma Lua) não têm relógio.
+        flow.setClockHeld(cinematica.protegeVida() || cinematica.seguraFimDaLuta() || demo.active() ||
+            lutaComOndas != null && storyMode);
+        flow.setProximaDupla(temProximaOnda() && storyMode);
         // O relógio para no congelamento do Super/Ultra e enquanto a cena tem o controle.
         boolean clockRuns = fightFree && !engine.superFreezeActive() && !cinematica.controleTravado();
         flow.update(engine, fightFree, clockRuns);
+        atualizarOndas();
         updateOpponentVisuals();
         // Fora da história, a tela de vitória entra quando o K.O. sai; a revanche espera ela.
         if (flow.showingResult() && flow.winner() == PLAYER && !historia.waitingFight() && !tutorial.active()) {
@@ -5247,7 +5281,6 @@ public class GameView extends SurfaceView
             conversa.momento(won ? "vitoria" : "derrota");
         }
         if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0 || conversa.falando()) return;
-        if (won && proximaOnda()) return;
         if (won && tocarVitoria()) return;
         storyKoFrames = 0;
         descarregarConversa();
@@ -5302,48 +5335,73 @@ public class GameView extends SurfaceView
         // Uma luta nova (ou repetida depois da derrota) começa na primeira onda, de vida cheia.
         lutaComOndas = luta.ondas > 1 ? luta : null;
         ondaDaLuta = 0;
-        vidaEntreOndas = superEntreOndas = null;
+        quedaDaOnda = 0;
         if (historia.campanha() != null) historia.campanha().onda(0);
         // Cenário e duplas da luta carregam com a tela de carregamento; o resto vem depois deles.
         carregando(() -> startStoryFight(luta));
     }
 
-    /**
-     * A onda acabou com a vitória e ainda há outra: a mesma dupla do jogador, com a vida e o
-     * Super de agora, contra os próximos agentes. Sem a tela de vitória entre as ondas.
-     */
-    private boolean proximaOnda() {
-        Episodio.Passo luta = lutaComOndas;
-        if (luta == null || ondaDaLuta + 1 >= luta.ondas) return false;
-        vidaEntreOndas = new int[team.length];
-        superEntreOndas = new int[team.length];
-        for (int i = 0; i < team.length; i++) {
-            vidaEntreOndas[i] = team[i].life;
-            superEntreOndas[i] = team[i].superMeter;
-        }
-        ondaDaLuta++;
-        if (historia.campanha() != null) historia.campanha().onda(ondaDaLuta);
-        storyKoFrames = 0;
-        descarregarConversa();
-        pad.reset();
-        releaseAllPointers();
-        carregando(() -> startStoryFight(luta));
-        return true;
+    /** Ainda vem outra dupla de agentes depois desta. */
+    private boolean temProximaOnda() {
+        return lutaComOndas != null && ondaDaLuta + 1 < lutaComOndas.ondas;
     }
 
-    /** A dupla do jogador começa a onda com a vida e o Super do fim da anterior. */
-    private void aplicarVidaEntreOndas() {
-        if (vidaEntreOndas == null) return;
-        for (int i = 0; i < team.length && i < vidaEntreOndas.length; i++) {
-            FighterState f = team[i];
-            int folego = Math.round(f.profile.maxLife * FOLEGO_ENTRE_ONDAS);
-            f.life = Math.min(f.profile.maxLife, Math.max(vidaEntreOndas[i], folego));
-            f.recoverableLife = 0;
-            f.superMeter = superEntreOndas[i];
-            f.refreshHudLabels();
+    /**
+     * Ondas: a dupla de agentes inteira caiu e ainda há outra. Depois da queda, a próxima entra
+     * andando de fora da tela, do lado com mais espaço, e a luta segue (sem READY/GO).
+     */
+    private void atualizarOndas() {
+        if (!temProximaOnda() || !flow.battle() || flow.over()) return;
+        if (!engine.teams.defeated(OPPONENT)) {
+            quedaDaOnda = 0;
+            return;
         }
+        if (!opponent().grounded || ++quedaDaOnda < ONDA_PAUSA) return;
+        quedaDaOnda = 0;
+        Campanha campanha = historia.campanha();
+        if (campanha != null) campanha.onda(ondaDaLuta + 1);
+        String[][] lados = historia.lados(lutaComOndas);
+        if (lados == null || lados[1].length < 2 || !fightersExist(lados[1][0], lados[1][1])) {
+            // Sem a próxima dupla: a luta acaba aqui, como numa luta comum.
+            ondaDaLuta = lutaComOndas.ondas - 1;
+            return;
+        }
+        ondaDaLuta++;
+        FighterState a = new FighterState(GeneratedCharacters.get(lados[1][0]), "CPU");
+        FighterState b = new FighterState(GeneratedCharacters.get(lados[1][1]), "CPU");
+        opponentFighter = a;
+        opponentTagId = lados[1][1];
+        opponentSpriteRenderer.setCharacter(a.character.id);
+        opponentPartnerRenderer.setCharacter(b.character.id);
+        // De fora da tela, do lado em que o jogador tem mais espaço na frente.
+        float metade = VW / (2f * camera.zoom);
+        float px = player().x;
+        float x = px < camera.x
+            ? Math.min(Arena.RIGHT_BOUND, camera.x + metade + ONDA_ENTRADA)
+            : Math.max(Arena.LEFT_BOUND, camera.x - metade - ONDA_ENTRADA);
+        engine.novaDupla(OPPONENT, x, a, b);
+        engine.refreshOverdrive(OPPONENT);
+        prepararRostosDoHud(team[0].character, team[1].character, a.character, b.character);
+        loadCpuUltras();
+        loadSuperIntros();
+        setOpponentAiEnabled(true);
+        ai.setLevel(nivelDaLuta(lutaComOndas));
         hud.resetEffects();
-        engine.refreshOverdrive(PLAYER);
+        String rotulo = (temporada != null ? temporada.t(ONDA) : ONDA) + " " + (ondaDaLuta + 1) + " / " + lutaComOndas.ondas;
+        showBanner(rotulo);
+    }
+
+    /** Os agentes das ondas depois da primeira, para carregarem junto com a luta. */
+    private CharacterDefinition[] agentesDasProximasOndas(Episodio.Passo luta) {
+        Campanha campanha = historia.campanha();
+        if (luta.ondas <= 1 || campanha == null) return new CharacterDefinition[0];
+        java.util.List<CharacterDefinition> lista = new java.util.ArrayList<>();
+        for (int k = 1; k < luta.ondas; k++) {
+            String[] dupla = campanha.agentes(k);
+            if (dupla == null) continue;
+            for (String id : dupla) if (fightersExist(id)) lista.add(GeneratedCharacters.get(id));
+        }
+        return lista.toArray(new CharacterDefinition[0]);
     }
 
     private void startStoryFight(Episodio.Passo luta) {
@@ -5354,6 +5412,7 @@ public class GameView extends SurfaceView
         // e as lições dizem o que ele faz.
         setOpponentAiEnabled(!luta.tutorial());
         if (storyMode) ai.setLevel(nivelDaLuta(luta));
+        lutadoresExtras = agentesDasProximasOndas(luta);
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
         // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
         String[][] lados = historia.lados(luta);
@@ -5366,13 +5425,8 @@ public class GameView extends SurfaceView
             if (lados != null) Log.w(LOG_TAG, "dupla da história sem golpes ainda; usando as duplas atuais");
             selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
         }
-        aplicarVidaEntreOndas();
         String rotulo = historia.rotulo(luta);
         if (rotulo != null && temporada != null) rotulo = temporada.t(rotulo);
-        if (lutaComOndas == luta && ondaDaLuta > 0) {
-            // Da segunda onda em diante: "ONDA 2 / 3".
-            rotulo = (temporada != null ? temporada.t(ONDA) : ONDA) + " " + (ondaDaLuta + 1) + " / " + luta.ondas;
-        }
         // A conversa da luta (nos quadros laterais, sem parar a luta) começa com o "inicio".
         descarregarConversa();
         conversaLicao = -1;

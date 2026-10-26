@@ -99,18 +99,23 @@ final class TeamSystem {
 
     /** Demos: no tag, assist or cooldown in progress on either side (members stay). */
     void calm() {
-        for (Side s : sides) {
-            s.tagPhase = TAG_NONE;
-            s.tagFrame = s.tagCooldown = 0;
-            s.assistPhase = ASSIST_NONE;
-            s.assistFrame = s.assistCooldown = 0;
-            s.assist = null;
-            s.convert = false;
-            s.leaving = null;
-            s.leavingFrame = -1;
-            s.assistRequestAge = s.tagRequestAge = -1;
-            s.overdriveFrames = 0;
-        }
+        calm(0);
+        calm(1);
+    }
+
+    /** Um lado só, sem tag, assist ou espera em andamento (a dupla nova das ondas). */
+    void calm(int side) {
+        Side s = sides[side];
+        s.tagPhase = TAG_NONE;
+        s.tagFrame = s.tagCooldown = 0;
+        s.assistPhase = ASSIST_NONE;
+        s.assistFrame = s.assistCooldown = 0;
+        s.assist = null;
+        s.convert = false;
+        s.leaving = null;
+        s.leavingFrame = -1;
+        s.assistRequestAge = s.tagRequestAge = -1;
+        s.overdriveFrames = 0;
     }
 
     boolean overdriveActive(int side) { return sides[side].overdriveFrames > 0; }

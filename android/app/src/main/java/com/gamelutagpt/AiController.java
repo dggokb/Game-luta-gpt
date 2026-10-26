@@ -62,14 +62,31 @@ final class AiController {
      * Na beira do jab do rival: chance (vezes a de defender) de parar em vez de entrar andando,
      * e a folga da beira.
      */
-    static final double EDGE_STOP = 0.45;
+    static final double EDGE_STOP = 0.3;
     static final float EDGE_MARGIN = 20f;
     /** Perto, no respiro entre os golpes dela: chance de segurar a defesa (vezes a de defender). */
-    static final double COOLDOWN_GUARD = 0.45;
+    static final double COOLDOWN_GUARD = 0.25;
     /** Quadros desde o último golpe do rival em que ela ainda se sente pressionada. */
     static final int PRESSURE_FRAMES = 30;
     /** Quadros que ela segura a defesa por hábito (de MIN a MIN + SPREAD - 1). */
-    static final int HABIT_GUARD_MIN = 10, HABIT_GUARD_SPREAD = 12;
+    static final int HABIT_GUARD_MIN = 8, HABIT_GUARD_SPREAD = 8;
+    /**
+     * Pressionada: o quanto a defesa por hábito sobe (vezes a de defender reagindo); dobra no
+     * nível 8, que respeita mais a pressão.
+     */
+    static final double PRESSURE_GUARD = 0.05;
+    /**
+     * Defesa por hábito agachada (segura tudo no chão): sempre contra quem está agachado; contra
+     * quem está em pé, esta parte das vezes no nível 1, subindo até quase sempre no 8 (o certo
+     * a fazer, mas agachada o tempo todo ela parecia grudada no chão).
+     */
+    static final double HABIT_LOW = 0.3;
+    /**
+     * Quadros que ela segura a defesa quando vê um golpe vindo: o bastante para o golpe chegar,
+     * mais {@link #REACT_GUARD_EXTRA} no nível 8 (que segura também o próximo jab da pressão).
+     * Antes eram 24 em todo nível, e contra quem ataca sem parar ela não largava a defesa.
+     */
+    static final int REACT_GUARD_FRAMES = 14, REACT_GUARD_EXTRA = 10;
     /** As duas alturas seguram, e ela defende em pé (o projétil do meio). */
     private static final int GUARD_HIGH_ONLY = 4;
 
@@ -116,8 +133,11 @@ final class AiController {
     /** A defesa atual é hábito (não viu ameaça): punir e tirar do ar passam na frente dela. */
     private boolean guardHabit;
 
+    /** O quadro que ela acabou de soltar foi defesa por hábito (não reação a nada que viu). */
+    private boolean habitGuardFrame;
+
     /** Está esperando defendendo por hábito (não reagindo a nada que viu). */
-    boolean guardingByHabit() { return guardHabit && guardFrames > 0; }
+    boolean guardingByHabit() { return habitGuardFrame || guardHabit && guardFrames > 0; }
     private int anticipationTimer;
     private int lastGuardSerial = -1, lastJumpSerial = -1, lastProjectileSerial = -1;
     private int lastOpponentAttackSerial = -1, lastOpponentAttackFrame = Integer.MIN_VALUE / 2;
@@ -315,6 +335,7 @@ final class AiController {
     /** Fills the CPU input for the next engine step. */
     void fill(CombatEngine engine, int self, FighterInput out) {
         out.clear();
+        habitGuardFrame = false;
         if (!enabled) return;
         perception.record(engine, self);
         CombatFighter me = engine.fighter(self);
@@ -544,7 +565,9 @@ final class AiController {
                 // O golpe alto de chão só se defende em pé.
                 int required = !seen.grounded || seen.attack.overhead ? GUARD_HIGH
                     : seen.attack.low ? GUARD_LOW : GUARD_ANY;
-                if (decideGuard(required, 24)) {
+                // Com pressa (fim do tempo) ela larga a defesa mais cedo para voltar a atacar.
+                int segura = (int)Math.round((REACT_GUARD_FRAMES + REACT_GUARD_EXTRA * smart()) * (1.0 - 0.4 * urgency));
+                if (decideGuard(required, segura)) {
                     // Quadros até o golpe ficar ativo, contando o que passou desde o que ela viu.
                     int elapsed = engine.frame() - seen.frame;
                     planJustDefense(me, seen.attack.startupFrames - seen.attackFrame - elapsed);
@@ -669,14 +692,15 @@ final class AiController {
         // Sem pressão (o rival não atacou há pouco) ela quase não fica agachada esperando: era o
         // que mais a deixava parecendo grudada no chão. Pressionada, defende (o jab não dá para
         // defender reagindo), mas em janelas curtas: a pressão acabou, ela volta a atacar.
-        p = pressured ? p + 0.10 * level.reactGuard : p * CALM_HABIT_SCALE;
+        p = pressured ? p + PRESSURE_GUARD * (1.0 + smart()) * level.reactGuard : p * CALM_HABIT_SCALE;
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
         // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.
         p *= 1.0 - 0.6 * urgency;
         if (roll(Math.min(0.95, p))) {
             guardFrames = HABIT_GUARD_MIN + reactRandom.nextInt(HABIT_GUARD_SPREAD);
-            guardLow = seen.grounded;   // rival no ar: o pulo só se defende em pé
+            // Rival no ar: o pulo só se defende em pé.
+            guardLow = seen.grounded && (seen.crouching || roll(habitLow()));
             guardHabit = true;
             return holdGuard(me, out);
         }
@@ -687,6 +711,7 @@ final class AiController {
     private boolean holdGuard(CombatFighter me, FighterInput out) {
         if (guardFrames <= 0) return false;
         guardFrames--;
+        habitGuardFrame = guardHabit;
         movingForward = movingBack = dashing = false;
         if (justDefenseWait > 0) {
             // Defesa perfeita: solta (parada) e aperta a defesa em cima da hora.
@@ -783,9 +808,16 @@ final class AiController {
         if (required == GUARD_HIGH) guardLow = !right;
         else if (required == GUARD_LOW) guardLow = right;
         else if (required == GUARD_HIGH_ONLY) guardLow = false;
-        else guardLow = true;   // golpe do meio: agachada segura ele e os baixos (o certo a fazer)
+        // Golpe do meio: segura em pé ou agachada (agachada segura também os baixos, mas
+        // agachada sempre ela parecia grudada no chão).
+        else guardLow = roll(habitLow());
         guardFrames = Math.max(guardFrames, frames);
         return true;
+    }
+
+    /** Chance de defender agachada (por hábito, ou o golpe do meio): sobe com o nível. */
+    private double habitLow() {
+        return HABIT_LOW + (0.95 - HABIT_LOW) * smart();
     }
 
     /** Plano da última decisão do neutro: entrar andando no alcance do jab do rival. */

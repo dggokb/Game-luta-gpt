@@ -64,6 +64,11 @@ final class BattleFlow {
     private boolean timeOver;
     /** Uma cena da história segura a luta: o relógio não anda nem acaba (HUD mostra ∞). */
     private boolean clockHeld;
+    /**
+     * Vem outra dupla da CPU (as ondas do "Sob a Mesma Lua"): a dupla dela caída não acaba a
+     * luta; quem chama troca a dupla e a luta segue.
+     */
+    private boolean proximaDupla;
 
     /** IA ON: as regras de verdade (2x2, derrota quando a dupla cai). */
     void setBattle(boolean value) { battle = value; }
@@ -104,6 +109,9 @@ final class BattleFlow {
      * rodando): o relógio fica parado e não encerra a luta, e a HUD mostra ∞.
      */
     void setClockHeld(boolean value) { clockHeld = value; }
+
+    /** Vem outra dupla da CPU depois desta: o K.O. dela não acaba a luta. */
+    void setProximaDupla(boolean value) { proximaDupla = value; }
 
     /** A luta tem relógio agora (batalha e nenhuma cena segurando). */
     boolean timed() { return battle && !clockHeld; }
@@ -149,6 +157,7 @@ final class BattleFlow {
         // o golpe final.
         if (engine.ultraHoldsKo(0) || engine.ultraHoldsKo(1)) return;
         boolean firstDown = engine.teams.defeated(0), secondDown = engine.teams.defeated(1);
+        if (proximaDupla && !firstDown) secondDown = false;
         if (firstDown || secondDown) {
             winner = firstDown && secondDown ? DRAW : firstDown ? 1 : 0;
             phase = Phase.OVER;

@@ -148,7 +148,7 @@ Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
 | `"adversario": "p05"` (ou lista) | em qualquer passo: só toca quando o adversário do porto é essa dupla (id do `torneio.json`) |
 | `"dupla": "irmaos"` | a TAG impossível: o irmão escolhido de titular e o outro de parceiro (só no bônus Sob a Mesma Lua) |
 | `"cpu": "agentes"` | os agentes do torneio. Ainda não existem: por enquanto, dois lutadores com golpes das duplas que não são dos irmãos, sorteados pela semente (`Campanha.agentes`), diferentes a cada onda |
-| `"ondas": 3` | a luta são lutas seguidas contra duplas novas, sem tela de vitória entre elas; a vida e o Super da dupla do jogador passam de uma para a outra (quem caiu volta com 20% da vida) e o rótulo das seguintes é ONDA 2 / 3, ONDA 3 / 3. Conta como uma luta só para o nível da CPU; perder recomeça da primeira onda, de vida cheia |
+| `"ondas": 3` | uma luta só, sem relógio, contra duplas que vêm uma depois da outra: quando a dupla da CPU inteira cai, a próxima entra andando de fora da tela (sem READY/GO, sem carregar: os agentes de todas as ondas carregam com a luta) e a faixa mostra ONDA 2 / 3, ONDA 3 / 3. A dupla do jogador segue como está (vida, Super, quem caiu continua caído). Conta como uma luta só para o nível da CPU; perder recomeça da primeira onda |
 
 Se o sorteio for pulado (PULAR), a chave é sorteada na primeira luta do torneio. Sem a
 campanha (cenas tocadas sem a história), escolha, sorteio, chave, lutas do torneio e passos

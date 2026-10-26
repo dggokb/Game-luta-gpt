@@ -116,7 +116,7 @@ final class OpponentAi {
         float min = Math.max(DECISION_MIN, level.decisionMin);
         float max = Math.max(min, level.decisionMax);
         // Com pressa ela decide mais rápido (até 35% menos tempo entre as decisões).
-        decisionTimer = (min + random.nextFloat() * (max - min)) * (1f - 0.35f * u);
+        decisionTimer = (min + random.nextFloat() * (max - min)) * (1f - 0.35f * u) * DECISION_PACE;
         // E luta como o estilo agressivo: no fim do tempo todo mundo vai para cima.
         double aggression = style.aggression + (1.0 - style.aggression) * u;
         actions.stop();
@@ -197,11 +197,25 @@ final class OpponentAi {
             // Approach until at least one ground move can reach the target (inside the preferred
             // distance only as often as the style is aggressive).
             actions.moveForward(false);
-        } else if (random.nextDouble() < 0.12 * style.jumping) {
+        } else if (random.nextDouble() < 0.12 * style.jumping * DECISION_PACE) {
+            // Decidindo mais vezes, a chance por decisão cai junto: os pulos por segundo ficam.
             actions.jump(random.nextDouble() < 0.32);
+        } else if (s.targetAlive && !s.selfAirborne) {
+            // Não fez nada (ainda no respiro entre os golpes, ou o sorteio não deu): pensa de novo
+            // logo, em vez de ficar parada o tempo inteiro de uma decisão.
+            decisionTimer = Math.min(decisionTimer, level.decisionMin * IDLE_RETHINK);
         }
         return true;
     }
+
+    /**
+     * Ritmo das decisões no neutro (vezes o tempo de decisão do nível): mais rápido, ela parte
+     * para cima mais vezes em vez de ficar olhando.
+     */
+    static final float DECISION_PACE = 0.7f;
+
+    /** Sem fazer nada, ela pensa de novo nesta parte do tempo mínimo de decisão do nível. */
+    static final float IDLE_RETHINK = 0.35f;
 
     /** Folga de alcance do L de abertura (a distância vista pode ter mudado desde então). */
     static final float STARTER_REACH_MARGIN = 30f;

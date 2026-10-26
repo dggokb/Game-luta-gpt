@@ -253,6 +253,20 @@ final class CombatEngine {
 
     TeamSystem.Side team(int side) { return teams.sides[side]; }
 
+    /**
+     * Ondas ("Sob a Mesma Lua"): uma dupla nova entra no lugar da que caiu, de pé em {@code x}
+     * e olhando para o rival, sem parar a luta (o outro lado fica como está).
+     */
+    void novaDupla(int side, float x, FighterState... members) {
+        teams.setMembers(side, members);
+        teams.calm(side);
+        int facing = fighters[1 - side].x >= x ? 1 : -1;
+        fighters[side] = new CombatFighter(side, members[0], x, facing);
+        sessions[side] = null;
+        lastSessions[side] = null;
+        sessionEndFrame[side] = -1;
+    }
+
     /** New round for a side (training refills): its Overdrive can be used again. */
     void refreshOverdrive(int side) {
         teams.refreshOverdrive(side);

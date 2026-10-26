@@ -139,6 +139,20 @@ humano**.
   Medido em batalha 2x2 contra o jogador simulado (nível 8): Super de 1,0/min com 38% de
   acerto para 0,4/min com 57%, barra média de 1,3 para 2,5 barras, todo Ultra acertando.
   O combo breaker continua uma aposta de tempo (com a chance do nível).
+- **Brigar mais, defender e agachar menos** (medido contra um jogador simulado que chega perto
+  e ataca a cada 10 a 35 quadros, nível 5, 30 lutas de 1 min): p03 atacando 20% → 26% do tempo,
+  defendendo 30% → 25%, agachada 48% → 39%; p07 27% → 32%, 31% → 24%, 34% → 24%. O que mudou:
+  - a defesa por reação segura 14 quadros depois de ver o golpe (antes 24 em todo nível, e
+    contra quem ataca sem parar ela não largava a defesa); o nível 8 segura até 24
+    (`REACT_GUARD_FRAMES` + `REACT_GUARD_EXTRA`) e continua defendendo ~31% dos jabs colados;
+  - defender agachada (por hábito, ou o golpe do meio) é 30% das vezes no nível 1 e sobe até
+    95% no 8 (`HABIT_LOW`; contra quem está agachado, sempre); pressionada, a defesa por hábito
+    sobe menos (`PRESSURE_GUARD`), em janelas menores (8 a 15 quadros) e no respiro entre os
+    golpes ela segura menos (`COOLDOWN_GUARD` 0,25); na beira do jab para menos (`EDGE_STOP`
+    0,3);
+  - decide 30% mais rápido no neutro (`OpponentAi.DECISION_PACE`; a chance de pular por
+    decisão cai junto, os pulos por segundo ficam) e, quando não decide nada, pensa de novo
+    logo (`IDLE_RETHINK`).
 - **Agachar menos**: sem pressão (o rival não atacou há pouco) o hábito de esperar agachada caiu
   para 0,1 da chance (antes 0,35; `CALM_HABIT_SCALE`); pressionada, defende como antes. Os golpes
   agachados (2L/2M/2H) pesam menos na escolha do neutro, e o projétil do meio ela defende em pé.
