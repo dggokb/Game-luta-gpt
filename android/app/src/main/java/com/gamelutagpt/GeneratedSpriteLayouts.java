@@ -2710,6 +2710,12 @@ final class GeneratedSpriteLayouts {
     static final int P13_JUMP_ROOT_Y = 533;
     static final int P13_JUMP_FRAME_COUNT = 11;
 
+    static final int P13_JUMP_HEAVY_FRAME_WIDTH = 770;
+    static final int P13_JUMP_HEAVY_FRAME_HEIGHT = 627;
+    static final int P13_JUMP_HEAVY_ROOT_X = 335;
+    static final int P13_JUMP_HEAVY_ROOT_Y = 616;
+    static final int P13_JUMP_HEAVY_FRAME_COUNT = 21;
+
     static final int P13_JUMP_HEAVY_DOWN_FRAME_WIDTH = 402;
     static final int P13_JUMP_HEAVY_DOWN_FRAME_HEIGHT = 675;
     static final int P13_JUMP_HEAVY_DOWN_ROOT_X = 224;

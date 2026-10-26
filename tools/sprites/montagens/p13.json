@@ -120,6 +120,12 @@
     "opcoes": {"fixar": "registro", "pe_no_chao": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)"},
     "animacoes": {"DEFENSE_AIR": {}}
   },
+  "jump_heavy": {
+    "trechos": [["jH", 0, 124]],
+    "quadros": "0,4,8,11,12,13,14,15,16,18,22,28,34,40,41,42,43,44,46,49,52",
+    "opcoes": {"fixar": "registro", "pe_no_chao": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (a medida no ar não acha a guarda)", "sem_efeitos": true},
+    "animacoes": {"JUMP_HEAVY": {"impacto": 8}}
+  },
   "jump_heavy_down": {
     "trechos": [["jH_baixo", 0, 124]],
     "quadros": "0,6,10,14,18,24,30,34,36,37,38,39,40,42,46,52,60",

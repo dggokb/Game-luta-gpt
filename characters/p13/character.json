@@ -1750,6 +1750,57 @@
         80,
         80
       ]
+    },
+    "JUMP_HEAVY": {
+      "atlas": "p13_jump_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "loop": false,
+      "durationsMs": [
+        43,
+        43,
+        33,
+        11,
+        11,
+        11,
+        11,
+        11,
+        20,
+        38,
+        38,
+        38,
+        38,
+        10,
+        10,
+        10,
+        10,
+        19,
+        29,
+        29,
+        19
+      ],
+      "impactFrame": 8
     }
   },
   "moves": {
@@ -2052,6 +2103,7 @@
       "maxUsesPerChain": 1
     },
     "jH": {
+      "animation": "JUMP_HEAVY",
       "damage": 960,
       "reach": 192,
       "startupFrames": 11,
@@ -2072,7 +2124,6 @@
       "pushbackOnBlock": 34,
       "juggleCost": 2,
       "hitHeight": 198,
-      "pose": "AIR",
       "maxUsesPerChain": 1
     },
     "j2H": {
