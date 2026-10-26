@@ -75,9 +75,11 @@ cenários não precisa gerar essas duas imagens.
   atrás do ringue, mesmo aumentada, a arquibancada parecia maquete. Agora o chão da arena
   continua do ringue até ela (`"ate"` no `chao`) e ela fica lá no fundo (Central a 3500,
   Costeira e Imperial a 2500, com o palácio e as árvores), onde gente pequena faz sentido.
-  Os objetos do campo ficam no meio do caminho, a 1300 (pilastras e treliça da Central,
-  holofotes da Costeira, pórticos da Imperial; lanternas da Imperial a 800), com o tamanho
-  real deles: colados na câmera (a 150-320) pareciam enormes e perto demais.
+  As pilastras e a treliça da Central (3350), os holofotes da Costeira e os pórticos da
+  Imperial (2400) ficam em pé no chão logo na frente da arquibancada, com o mesmo tamanho na
+  tela de antes. Colados na câmera (a 150-320) pareciam enormes e perto demais; a 1300, com a
+  base aparecendo no chão, ficavam no meio do campo. As lanternas da Imperial (800) são do
+  campo mesmo, pequenas na praça.
   Com uma arquibancada desenhada de perto (poucas fileiras, gente grande), daria para ela
   voltar a ficar logo atrás do ringue.
 - **Nada parado.** Arquibancadas têm `"plateia"` (Central: os dois andares; Costeira e
