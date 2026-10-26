@@ -4853,11 +4853,16 @@ public class GameView extends SurfaceView
     /** Tela dos capítulos: CONTINUAR e os episódios (os não liberados ficam trancados). */
     private void openChapters() {
         java.util.List<MenuCapitulos.Capitulo> lista = new java.util.ArrayList<>();
+        episodioSorteio = episodioPorto = -1;
         for (int i = 0; i < temporada.episodios.size(); i++) {
             String id = temporada.episodios.get(i);
             try {
                 Episodio ep = temporada.loadEpisodio(ultraAssets, id);
                 lista.add(new MenuCapitulos.Capitulo(ep.numero, ep.titulo));
+                for (Episodio.Passo passo : ep.passos) {
+                    if (passo.tipo == Episodio.TipoPasso.SORTEIO && episodioSorteio < 0) episodioSorteio = i;
+                    if (passo.porto && episodioPorto < 0) episodioPorto = i;
+                }
             } catch (IOException | RuntimeException ex) {
                 Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
                 lista.add(new MenuCapitulos.Capitulo(i, id));
@@ -4898,7 +4903,26 @@ public class GameView extends SurfaceView
         } else if (escolha == MenuCapitulos.CONTINUAR) {
             startStoryAt(progresso.atual());
         } else {
+            novoSorteio(escolha);
             startStoryAt(escolha);
+        }
+    }
+
+    /** Episódios com o passo "sorteio" e com o desafio no porto (-1: não há), achados em {@link #openChapters}. */
+    private int episodioSorteio = -1, episodioPorto = -1;
+
+    /**
+     * Jogar de novo um capítulo até o do sorteio sorteia outro torneio (o CONTINUAR mantém a
+     * chave). Se o porto já passou, a chave nova mantém o adversário de lá.
+     */
+    private void novoSorteio(int episodio) {
+        try {
+            if (progresso.novoSorteio(episodio, episodioSorteio, episodioPorto,
+                    Torneio.duplasFromJson(ultraAssets.readText(Torneio.ARQUIVO)), new Random())) {
+                saveProgresso();
+            }
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "novo sorteio indisponível", ex);
         }
     }
 

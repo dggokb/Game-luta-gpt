@@ -33,6 +33,47 @@ public class ProgressoHistoriaTest {
         assertFalse("save estragado vira save novo", ProgressoHistoria.fromJson("{lixo", 7L).temSave());
     }
 
+    private static String chave(Torneio t) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < t.vagas(); i++) sb.append(t.participante(0, i).id).append(' ');
+        return sb.toString();
+    }
+
+    @Test
+    public void jogarDeNovoAteOSorteioSorteiaOutroTorneio() throws IOException {
+        // Como na temporada: desafio no porto no ep03 e o sorteio no ep04.
+        final int porto = 3, sorteio = 4;
+        List<Torneio.Dupla> duplas = duplas();
+        java.util.Random sorte = new java.util.Random(11L);
+        java.util.Set<String> chaves = new java.util.HashSet<>();
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            ProgressoHistoria p = new ProgressoHistoria(77L);
+            Campanha c = new Campanha(duplas, 77L);
+            c.escolher(irmao);
+            for (int ep = 1; ep <= sorteio; ep++) p.comecou(ep, c);
+            String portoAntes = p.campanhaNoInicio(sorteio, duplas).adversarioPorto().id;
+
+            assertFalse("depois do sorteio a chave fica", p.novoSorteio(sorteio + 1, sorteio, porto, duplas, sorte));
+            assertEquals(77L, p.semente());
+            for (int i = 0; i < 20; i++) {
+                // O próprio sorteio: outra chave, mas o adversário do porto (já enfrentado) é o mesmo.
+                assertTrue(p.novoSorteio(sorteio, sorteio, porto, duplas, sorte));
+                Campanha nova = p.campanhaNoInicio(sorteio, duplas);
+                assertEquals(irmao, nova.irmao());
+                assertEquals(portoAntes, nova.adversarioPorto().id);
+                chaves.add(chave(nova.torneio()));
+            }
+            long antes = p.semente();
+            assertTrue("antes do porto vale qualquer chave", p.novoSorteio(porto, sorteio, porto, duplas, sorte));
+            assertTrue(antes != p.semente());
+            assertTrue(p.novoSorteio(0, sorteio, porto, duplas, sorte));
+            assertEquals("a semente nova fica no save", p.semente(), ProgressoHistoria.fromJson(p.toJson(), 1L).semente());
+        }
+        assertTrue("sai chave diferente: " + chaves.size(), chaves.size() > 4);
+        ProgressoHistoria semSorteio = new ProgressoHistoria(3L);
+        assertFalse("temporada sem sorteio", semSorteio.novoSorteio(0, -1, -1, duplas, sorte));
+    }
+
     @Test
     public void terminarLiberaOProximoEContinuarApontaParaEle() throws IOException {
         ProgressoHistoria p = new ProgressoHistoria(5L);

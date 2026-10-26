@@ -3,6 +3,7 @@ package com.gamelutagpt.historia;
 import com.gamelutagpt.render.MiniJson;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 /**
@@ -17,6 +18,8 @@ import java.util.TreeMap;
  *       Os capítulos liberados são esses e o seguinte; os outros ficam trancados.</li>
  *   <li>A campanha guarda a semente da chave e, por episódio, o irmão escolhido e as rodadas
  *       já disputadas: com isso a chave é refeita igual ({@link Campanha#restaurar}).</li>
+ *   <li>Escolher de novo um capítulo até o do sorteio troca a semente: outro torneio
+ *       ({@link #novoSorteio}). O CONTINUAR mantém a chave.</li>
  * </ul>
  *
  * Java puro: o jogo guarda o texto de {@link #toJson()} (no Android, em SharedPreferences).
@@ -43,7 +46,7 @@ public final class ProgressoHistoria {
     /** Onde o ep03 "A Chegada" entrou: nos saves até a versão 2, daqui em diante os índices andam um. */
     static final int EPISODIO_NOVO_V3 = 3;
 
-    private final long semente;
+    private long semente;
     private int atual;
     private int concluidos;
     private final Map<Integer, Foto> fotos = new TreeMap<>();
@@ -103,10 +106,49 @@ public final class ProgressoHistoria {
      * desse episódio (o Prólogo, ou um save antigo), a campanha começa do zero.
      */
     public Campanha campanhaNoInicio(int episodio, List<Torneio.Dupla> duplas) {
+        return campanhaCom(semente, episodio, duplas);
+    }
+
+    private Campanha campanhaCom(long semente, int episodio, List<Torneio.Dupla> duplas) {
         Campanha c = new Campanha(duplas, semente);
         Foto f = fotos.get(episodio);
         if (f != null) c.restaurar(f.irmao, f.disputadas);
         return c;
+    }
+
+    /** Quantas sementes {@link #novoSorteio} tenta para achar uma com o mesmo adversário no porto. */
+    static final int TENTATIVAS_SORTEIO = 400;
+
+    /**
+     * O jogador escolheu jogar de novo a partir do capítulo {@code episodio}: se ele vem antes do
+     * sorteio da chave, ou é o próprio sorteio, a semente troca e sai outro torneio.
+     *
+     * <p>O adversário do desafio no porto também sai da semente (é do lado do rival na chave que
+     * vai ser sorteada). Se o porto já ficou para trás ({@code episodio > porto}), a semente nova
+     * precisa dar o mesmo adversário de lá; senão ele poderia reaparecer no caminho do jogador.
+     * Sem nenhuma em {@link #TENTATIVAS_SORTEIO}, fica a chave de antes.
+     *
+     * @param sorteio índice do episódio com o passo "sorteio" (-1: não há)
+     * @param porto índice do episódio com o desafio no porto (-1: não há)
+     * @return se a semente mudou
+     */
+    public boolean novoSorteio(int episodio, int sorteio, int porto, List<Torneio.Dupla> duplas, Random sorte) {
+        if (sorteio < 0 || episodio > sorteio) return false;
+        if (porto < 0 || episodio <= porto) {
+            semente = sorte.nextLong();
+            return true;
+        }
+        Torneio.Dupla antes = campanhaNoInicio(episodio, duplas).adversarioPorto();
+        for (int i = 0; i < TENTATIVAS_SORTEIO; i++) {
+            long nova = sorte.nextLong();
+            Campanha c = campanhaCom(nova, episodio, duplas);
+            Torneio.Dupla depois = c.adversarioPorto();
+            if (antes == null ? depois == null : depois != null && antes.id.equals(depois.id)) {
+                semente = nova;
+                return true;
+            }
+        }
+        return false;
     }
 
     // ------------------------------------------------------------ gravação

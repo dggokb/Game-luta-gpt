@@ -26,6 +26,11 @@ fim de cada episódio:
 - Sair no meio de um episódio (MENU INICIAL na pausa, ou fechar o app) volta ao começo dele.
 - O save guarda a semente da chave e, para cada episódio, o irmão e as rodadas já
   disputadas; a chave é refeita igual ao carregar (`ProgressoHistoria`, `Campanha.restaurar`).
+- **Novo sorteio**: escolher na tela de capítulos um capítulo até o "O Sorteio" (ep04),
+  inclusive, troca a semente e sai outro torneio (`ProgressoHistoria.novoSorteio`). O
+  CONTINUAR mantém a chave. Do próprio "O Sorteio", o desafio do porto (ep03) já foi
+  jogado: a semente nova é uma que dá o mesmo adversário de lá, para ele continuar do lado
+  do rival.
 - O save tem versão (`ProgressoHistoria.VERSAO`). Quando um episódio novo entra no meio da
   temporada, os saves antigos precisam ser convertidos na leitura: a versão 1 é de antes do
   ep02 "O Parceiro" e a 2, de antes do ep03 "A Chegada"; nas duas, os episódios dali em

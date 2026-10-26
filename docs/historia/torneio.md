@@ -75,6 +75,8 @@ semifinal) e o porto aumenta o número de duplas diferentes que ele enfrenta.
   mesma) e escolhe, pela semente, uma das duplas com golpes (`pronta`) da metade do rival
   (`Torneio.prontasDoLadoDoRival`). Hoje, com p13 e p15 sem golpes no lado do rival, sobra uma:
   p05, p07, p09 ou p11, cada uma em ~1/4 das partidas. O save não muda: a semente refaz tudo.
+- Jogar de novo o "O Sorteio" pela tela de capítulos sorteia outra chave, mas com o mesmo
+  adversário do porto (`ProgressoHistoria.novoSorteio`); de um capítulo antes, tudo muda.
 - A luta tem `"porto": true` (o `"cpu"` do passo só vale sem campanha).
 - As páginas do desafio dependem do adversário: `"adversario": "p05"` (ou uma lista) faz o
   passo tocar só contra essa dupla. As do Ryūga são fixas (chegada) e as do adversário vêm
