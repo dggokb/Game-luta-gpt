@@ -127,6 +127,20 @@
     "opcoes": {"fixar": "video", "pe_no_chao": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13", "sem_efeitos": true},
     "animacoes": {"SUPER_WAVE": {"frames": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,22,23,24,26,21,23,24,26,21,23,24,26,21,23,24,26,21,23,24,26,21,23,24,26,21,22,23,24,25,19,27,28,29,30,31,32,33,34", "impacto": 9}, "SUPER_WAVE_ERRO": {"frames": "11,12,13,29,30,31,32,33,34"}}
   },
+  "fall_down": {
+    "_doc": "Queda (8-26, sem o clarão do golpe) e deitado (28-44, a poeira assentando) do vídeo derruba_levanta.",
+    "trechos": [["derruba_levanta", 0, 124]],
+    "quadros": "8,11,14,17,20,23,26,28,32,36,44",
+    "opcoes": {"fixar": "quadro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "animacoes": {"KNOCKDOWN": {"frames": "0-6"}, "GROUNDED": {"frames": "7-10"}}
+  },
+  "getup": {
+    "_doc": "Levantar (82-118) do vídeo derruba_levanta.",
+    "trechos": [["derruba_levanta", 0, 124]],
+    "quadros": "82,86,89,92,95,98,101,104,107,110,114,118",
+    "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "animacoes": {"GETUP": {}}
+  },
   "jump_heavy": {
     "trechos": [["jH", 0, 124]],
     "quadros": "0,4,8,11,12,13,14,15,16,18,22,28,34,40,41,42,43,44,46,49,52",

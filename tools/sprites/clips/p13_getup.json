@@ -1,0 +1,39 @@
+{
+  "id": "p13_getup",
+  "javaName": "P13_GETUP",
+  "profile": "p13.json",
+  "source": "art/sprites/source/p13_getup_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p13_getup.webp",
+  "report": "tools/sprites/reports/p13_getup.report.json",
+  "preview": "android/app/build/sprite-review/p13_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruba_levanta.mp4",
+    "personagem": "p13",
+    "escala": 0.4322,
+    "motivo": "mesma câmera dos outros vídeos do p13",
+    "quadros": "82,86,89,92,95,98,101,104,107,110,114,118",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "151,270",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "sem_efeitos": true,
+    "densidade": 2,
+    "nitidez": true,
+    "recorte_suave": true
+  },
+  "frameWidth": 640,
+  "frameHeight": 576,
+  "rootX": 302,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p13_getup_video_normalized.png"
+  ]
+}

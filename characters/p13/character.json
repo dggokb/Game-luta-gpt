@@ -515,7 +515,8 @@
         "backdashQuadros": 24,
         "backdashVelocidade": 520
       }
-    }
+    },
+    "wakeupFrames": 30
   },
   "animations": {
     "IDLE": {
@@ -2699,6 +2700,76 @@
         250,
         292,
         83
+      ]
+    },
+    "KNOCKDOWN": {
+      "atlas": "p13_fall_down",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31
+      ]
+    },
+    "GROUNDED": {
+      "atlas": "p13_fall_down",
+      "frames": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        60,
+        60,
+        60,
+        1020
+      ]
+    },
+    "GETUP": {
+      "atlas": "p13_getup",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": false,
+      "durationsMs": [
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        38
       ]
     }
   },
