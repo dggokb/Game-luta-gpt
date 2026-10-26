@@ -72,7 +72,8 @@ logo antes dos prompts antigos do Seedance:
   - O vídeo de agachar dá a `inicio_agachado.png` dela, para o 2M.
   - O `tamanho.json` usa escala 0,4103 e altura 221 e entra junto com o pacote.
 - **p13 e p14:** os golpes são os **propostos** nas fichas, ainda sem aprovação.
-  - Os concepts já estão em `art/concepts/`, mas falta a Base no ChatGPT.
+  - Os concepts já estão em `art/concepts/`. O p14 já tem a Base e as imagens iniciais (26/10,
+    `art/keys/p14/`, altura 0,72); falta a Base do p13.
   - Depois da Base, montar as imagens com `inicio_da_base.py` sem `--sufixo`, como na p16.
   - `--altura`: p13 é enorme (perto de 0,77, o máximo que cabe o chute) e p14 é mais baixo.
   - Medir pelo rosto contra a p15.
