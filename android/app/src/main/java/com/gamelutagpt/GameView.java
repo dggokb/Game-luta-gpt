@@ -4082,8 +4082,10 @@ public class GameView extends SurfaceView
 
     /** Altura do corpo deitado em que o rival preso de cabeça para baixo gira. */
     private static final float UPSIDE_DOWN_PIVOT = 40f;
-    /** O voo calculado por {@link #ultraFlight}: deslocamento do desenho (x, y). */
-    private final float[] flightOffset = new float[2];
+    /** O voo calculado por {@link #ultraFlight}: deslocamento do desenho (x, y) e o giro (graus). */
+    private final float[] flightOffset = new float[3];
+    /** Altura do corpo (acima dos pés desenhados) em que o giro do voo gira. */
+    private static final float FLIGHT_SPIN_PIVOT = 140f;
 
     /**
      * Quem está no Ultra com voo (o p13): preenche {@link #flightOffset} e diz se há voo. O
@@ -4098,7 +4100,14 @@ public class GameView extends SurfaceView
         float ahead = at[0] + (f.ultraRetreated && seq.retreat != null ? seq.retreat[1] : 0f);
         flightOffset[0] = f.facing * ahead;
         flightOffset[1] = -at[1];
+        flightOffset[2] = f.facing * at[2];   // para a frente: o mortal na direção do rival
         return true;
+    }
+
+    /** Desloca e gira o canvas pelo voo de {@code f} (o desenho dele no Ultra do p13). */
+    private void applyFlight(Canvas c, CombatFighter f, float visualY) {
+        c.translate(flightOffset[0], flightOffset[1]);
+        if (flightOffset[2] != 0f) c.rotate(flightOffset[2], f.x, visualY - FLIGHT_SPIN_PIVOT);
     }
 
     /** Quem segura {@code f} de cabeça para baixo agora (o abraço do Ultra do p13), ou null. */
@@ -4134,7 +4143,7 @@ public class GameView extends SurfaceView
             c.restore();
             c.save();
             c.translate(uo, 0f);
-            if (ultraFlight(u)) c.translate(flightOffset[0], flightOffset[1]);
+            if (ultraFlight(u)) applyFlight(c, u, fighterVisualY(u));
             CharacterDefinition.Animation arms = u.character().animations.get(SpriteStates.ULTRA_SEQ_FRENTE);
             if (arms != null) {
                 ur.drawQuadro(c, u.character(), SpriteStates.ULTRA_SEQ_FRENTE, arms.frame(ur.motion.time, 0f), u.x,
@@ -4229,7 +4238,7 @@ public class GameView extends SurfaceView
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
         float visualY = fighterVisualY(f);
         // Voo do Ultra (o p13 sobe atrás do rival e desce de meteoro): só o desenho sai do lugar.
-        if (ultraFlight(f)) c.translate(flightOffset[0], flightOffset[1]);
+        if (ultraFlight(f)) applyFlight(c, f, visualY);
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
         ColorFilter look = renderer.override() == null ? superLook(f) : null;

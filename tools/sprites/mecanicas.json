@@ -1042,7 +1042,7 @@
             "dano": 0.5
           },
           "corrida": {
-            "dash": 0.72,
+            "dash": 0.65,
             "backdashQuadros": 24,
             "backdashVelocidade": 520
           }

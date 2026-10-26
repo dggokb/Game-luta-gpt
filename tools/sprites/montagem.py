@@ -143,7 +143,7 @@ def write_video(frames, path):
 def source(char, folder, name, spec):
     """O vídeo de onde o clipe sai: o próprio arquivo ou o colado."""
     trechos = spec['trechos']
-    if len(trechos) == 1 and 'fixo' not in trechos[0][3:]:
+    if len(trechos) == 1 and not {'fixo', 'fixo_corpo'} & set(trechos[0][3:]):
         video, a, _ = trechos[0][:3]
         return str(Path(folder) / f'{video}.mp4'), a
     path = OUT / f'{char}_{name}.mp4'

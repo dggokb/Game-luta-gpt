@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p13_walk_forward.webp",
   "report": "tools/sprites/reports/p13_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p13_walk_forward-import.png",
-  "expectedFrames": 21,
+  "expectedFrames": 41,
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
@@ -16,31 +16,19 @@
     "personagem": "p13",
     "escala": 0.4322,
     "motivo": "mesma câmera dos outros vídeos do p13",
-    "quadros": "45,47,49,51,53,55,57,59,61,63,65,67,69,71,73,75,77,79,81,83,85",
+    "quadros": "45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85",
     "celula": 320,
     "largura": 224,
-    "raiz": "99,302",
+    "raiz": "100,302",
     "colunas": 9,
     "pe_no_chao": true,
     "densidade": 2,
     "nitidez": true,
-    "referencia": {
-      "folha": "art/sprites/source/p13_walk_forward_video_normalized.png",
-      "celula": [
-        224,
-        320
-      ],
-      "raiz": [
-        99,
-        302
-      ],
-      "colunas": 9
-    },
     "recorte_suave": true
   },
   "frameWidth": 448,
   "frameHeight": 640,
-  "rootX": 198,
+  "rootX": 200,
   "rootY": 604,
   "pixelScale": 2.0,
   "sourceReferences": [

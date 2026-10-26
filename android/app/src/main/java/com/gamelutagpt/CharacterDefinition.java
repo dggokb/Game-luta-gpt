@@ -363,7 +363,10 @@ final class CharacterDefinition {
             t=t*t*(3f-2f*t);
             return new float[]{shot[0],from[1]+(shot[1]-from[1])*t,from[2]+(shot[2]-from[2])*t,from[3]+(shot[3]-from[3])*t};
         }
-        /** Voo de quem bate, só no desenho: {quadro, frente, altura}, interpolado (o p13 sobe e desce de meteoro). */
+        /**
+         * Voo de quem bate, só no desenho: {quadro, frente, altura[, giro em graus]}, interpolado (o
+         * p13 sobe, gira no alto e desce de meteoro).
+         */
         float[][] flight=new float[0][];
         /** {de, até} em que o rival preso aparece deitado de cabeça para baixo (no abraço do p13), ou null. */
         int[] upsideDown;
@@ -374,26 +377,29 @@ final class CharacterDefinition {
         /** O Ultra do p13: voo, abraço com o rival de cabeça para baixo e a queda curta no fim. */
         UltraSequence withFlight(float[][] flight,int[] upsideDown,int[] armsInFront,float[] finalLaunch) {
             for(int i=0;i<flight.length;i++)
-                if(flight[i].length!=3||(i>0&&flight[i][0]<=flight[i-1][0]))throw new IllegalArgumentException("ultra sequence: flight {frame, ahead, height}, growing frames");
+                if((flight[i].length!=3&&flight[i].length!=4)||(i>0&&flight[i][0]<=flight[i-1][0]))
+                    throw new IllegalArgumentException("ultra sequence: flight {frame, ahead, height[, turn]}, growing frames");
             for(int[] w:new int[][]{upsideDown,armsInFront})
                 if(w!=null&&(w.length!=2||w[0]>=w[1]))throw new IllegalArgumentException("ultra sequence: {from, to}");
             if(finalLaunch!=null&&(finalLaunch.length!=2||finalLaunch[0]<0f))throw new IllegalArgumentException("ultra sequence: final launch {rise, push}");
             this.flight=flight.clone();this.upsideDown=upsideDown;this.armsInFront=armsInFront;this.finalLaunch=finalLaunch;
             return this;
         }
-        /** Frente e altura do voo de quem bate neste quadro ({0, 0} sem voo). */
+        /** Frente, altura e giro (graus) do voo de quem bate neste quadro ({0, 0, 0} sem voo). */
         float[] flightAt(float frame) {
-            if(flight.length==0)return new float[]{0f,0f};
-            if(frame<=flight[0][0])return new float[]{flight[0][1],flight[0][2]};
+            if(flight.length==0)return new float[]{0f,0f,0f};
+            if(frame<=flight[0][0])return new float[]{flight[0][1],flight[0][2],turn(flight[0])};
             for(int i=1;i<flight.length;i++){
                 if(frame<=flight[i][0]){
-                    float t=(frame-flight[i-1][0])/Math.max(1f,flight[i][0]-flight[i-1][0]);
-                    return new float[]{flight[i-1][1]+(flight[i][1]-flight[i-1][1])*t,flight[i-1][2]+(flight[i][2]-flight[i-1][2])*t};
+                    float[] a=flight[i-1],b=flight[i];
+                    float t=(frame-a[0])/Math.max(1f,b[0]-a[0]);
+                    return new float[]{a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,turn(a)+(turn(b)-turn(a))*t};
                 }
             }
             float[] last=flight[flight.length-1];
-            return new float[]{last[1],last[2]};
+            return new float[]{last[1],last[2],turn(last)};
         }
+        private static float turn(float[] key){return key.length>3?key[3]:0f;}
         static boolean inside(int[] w,float frame){return w!=null&&frame>=w[0]&&frame<w[1];}
         /** O rival some neste quadro da sequência. */
         boolean hidesVictim(float frame) {

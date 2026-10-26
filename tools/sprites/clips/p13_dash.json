@@ -8,42 +8,30 @@
   "preview": "android/app/build/sprite-review/p13_dash-import.png",
   "expectedFrames": 15,
   "segmentation": "prepared-grid",
-  "columns": 5,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p13 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "Dash.mp4",
+    "arquivo": "p13_dash.mp4",
     "personagem": "p13",
     "escala": 0.4322,
     "motivo": "mesma câmera dos outros vídeos do p13",
-    "quadros": "45,46,47,48,49,50,51,52,53,54,55,56,57,58,59",
+    "quadros": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14",
     "celula": 320,
-    "largura": 352,
-    "raiz": "197,302",
-    "colunas": 5,
-    "fixar": "registro",
+    "largura": 320,
+    "raiz": "189,302",
+    "colunas": 6,
+    "fixar": "video",
     "pe_no_chao": true,
     "sem_efeitos": true,
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
-    "referencia": {
-      "folha": "art/sprites/source/p13_dash_video_normalized.png",
-      "celula": [
-        352,
-        320
-      ],
-      "raiz": [
-        197,
-        302
-      ],
-      "colunas": 5
-    },
     "recorte_suave": true
   },
-  "frameWidth": 704,
+  "frameWidth": 640,
   "frameHeight": 640,
-  "rootX": 394,
+  "rootX": 378,
   "rootY": 604,
   "sourceReferences": [
     "art/sprites/source/p13_dash_video_normalized.png"

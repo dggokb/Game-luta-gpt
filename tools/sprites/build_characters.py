@@ -271,9 +271,9 @@ def validate_ultra(name, u, animations):
         raise ValueError(f'{name}.ultra.camera: [[quadro, frente, altura, zoom >= 1(, quadros da passagem)], ...] by growing frame')
     # O Ultra do p13: voo (só o desenho), rival de cabeça para baixo, braços na frente e queda curta.
     flight = u.get('voo', [])
-    if not (isinstance(flight, list) and all(isinstance(k, list) and len(k) == 3 and all(number(v) for v in k) for k in flight)
+    if not (isinstance(flight, list) and all(isinstance(k, list) and len(k) in (3, 4) and all(number(v) for v in k) for k in flight)
             and [k[0] for k in flight] == sorted({k[0] for k in flight})):
-        raise ValueError(f'{name}.ultra.voo: [[quadro, frente, altura], ...] by growing frame')
+        raise ValueError(f'{name}.ultra.voo: [[quadro, frente, altura(, giro)], ...] by growing frame')
     for key in ('deCabeca', 'bracos'):
         if key in u and not window(u[key]):
             raise ValueError(f'{name}.ultra.{key}: [de, até] frames')

@@ -15,7 +15,8 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     zanzoken  [de, até] em que ela some (deixa a imagem para trás) e reaparece
     recuo     [quadro, distância] em que ela reaparece longe do rival (px do jogo para trás)
     cameraDaLuta  sem os closes do Ultra: a câmera da luta segue os dois
-    voo       [quadro, frente, altura] do desenho de quem bate (o p13 sobe e desce de meteoro)
+    voo       [quadro, frente, altura(, giro em graus)] do desenho de quem bate (o p13 sobe, gira e
+              desce de meteoro)
     deCabeca  [de, até] com o rival deitado de cabeça para baixo (o abraço do p13)
     bracos    [de, até] com os braços dele (folha ULTRA_SEQ_FRENTE) por cima do rival
     quedaFinal  [subida, empurrão] do golpe final no lugar do lançamento alto
@@ -157,7 +158,7 @@ def timeline(spec, picked, speed):
     # O Ultra do p13: voo de quem bate (só o desenho), rival de cabeça para baixo, braços na frente
     # dele e a queda curta do golpe final.
     if spec.get('voo'):
-        ultra['voo'] = [[at(v), dx, dy] for v, dx, dy in spec['voo']]
+        ultra['voo'] = [[at(k[0])] + k[1:] for k in spec['voo']]   # 4º número: giro (graus)
     for key in ('deCabeca', 'bracos'):
         if spec.get(key):
             ultra[key] = [at(v) for v in spec[key]]

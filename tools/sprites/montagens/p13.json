@@ -22,7 +22,7 @@
     "trechos": [["2H", 0, 124]],
     "quadros": "0,16,28,33,34,35,36,37,38,40,44,50,60",
     "opcoes": {"fixar": "video", "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13 (começa agachado, sem imagem inicial)"},
-    "animacoes": {"CROUCH_HEAVY": {"frames": "0-12,8,6,5,4,3", "impacto": 7}}
+    "animacoes": {"CROUCH_HEAVY": {"frames": "0-12,10,8,6,5,4,3,1,0", "impacto": 7}}
   },
   "light_jab": {
     "trechos": [["L", 0, 124]],
@@ -55,10 +55,11 @@
     "animacoes": {"CROUCH_IDLE": {"loop": true}}
   },
   "dash": {
-    "trechos": [["Dash", 0, 124]],
-    "quadros": "45-59",
-    "opcoes": {"fixar": "registro", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
-    "animacoes": {"DASH": {"distancia": 19}}
+    "_doc": "Um passo inteiro da corrida (37-51: o 52 repete o 37), cada quadro fixo pelo corpo (no vídeo ele atravessa a tela); o ciclo toca devagar (28 px de corrida por quadro, ~1 s por passada): corre pesado, de mamute.",
+    "trechos": [["Dash", 37, 52, "fixo_corpo"]],
+    "quadros": "0-14",
+    "opcoes": {"fixar": "video", "pe_no_chao": true, "sem_efeitos": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
+    "animacoes": {"DASH": {"distancia": 28}}
   },
   "backdash": {
     "trechos": [["backDash", 0, 124]],
@@ -86,9 +87,9 @@
   },
   "walk_forward": {
     "trechos": [["frente", 0, 124]],
-    "quadros": "45-85/2",
+    "quadros": "45-85",
     "opcoes": {"pe_no_chao": true, "escala": 0.4322, "motivo": "mesma câmera dos outros vídeos do p13"},
-    "animacoes": {"WALK_FORWARD": {"distancia": "video", "velocidade": 170, "acelerar": 2.6}}
+    "animacoes": {"WALK_FORWARD": {"distancia": "video", "velocidade": 170, "acelerar": 1.4}}
   },
   "jump_light": {
     "trechos": [["jL", 0, 124]],
