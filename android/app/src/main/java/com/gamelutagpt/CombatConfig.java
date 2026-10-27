@@ -441,7 +441,7 @@ final class CombatConfig {
     /** SPEED, o sumiço (→ → com o rival até esta distância): some, aparece atrás dele. */
     float shinkaiVanishRange = 560f;
     int shinkaiVanishFrames = 10;
-    float shinkaiVanishBehind = 70f;
+    float shinkaiVanishBehind = 120f;
     /** Cada sumiço gasta este tanto do tempo do SHINKAI. */
     int shinkaiVanishCost = 45;
     /** ENERGY: barra de Super por quadro (uma barra em 4 s) e o projétil mais forte. */
