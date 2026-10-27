@@ -262,6 +262,52 @@ final class SpriteFighterRenderer {
         canvas.drawBitmap(folha.bitmap,source,destination,spritePaint);
     }
 
+    /** A cor da roupa de cada personagem (as farpas do desgaste), já medida. */
+    private static final java.util.Map<String,Integer> coresDaRoupa=new java.util.HashMap<>();
+
+    /**
+     * A cor que mais aparece no tronco do quadro parado (a roupa), sem pele nem o contorno preto.
+     * Medida uma vez por personagem quando a folha já está pronta; antes disso, um pano escuro.
+     */
+    int corDaRoupa() {
+        Integer pronta=coresDaRoupa.get(character.id);
+        if(pronta!=null)return pronta;
+        CharacterDefinition.Animation idle=character.animations.get(SpriteStates.IDLE);
+        int[] caixa=new int[6];
+        if(idle==null||!atlases.pronta(idle.atlas.resource)||!idle.atlas.frame(idle.frame(0f,0f),caixa))return 0xFF3A3440;
+        SpriteAtlasCache.Folha folha=atlases.get(character,idle.atlas);
+        int x0=Math.round(caixa[0]*folha.escalaX),w=Math.max(1,Math.round(caixa[2]*folha.escalaX));
+        int y0=Math.round((caixa[1]+caixa[3]*0.30f)*folha.escalaY),h=Math.max(1,Math.round(caixa[3]*0.35f*folha.escalaY));
+        w=Math.min(w,folha.bitmap.getWidth()-x0);h=Math.min(h,folha.bitmap.getHeight()-y0);
+        int cor=0xFF3A3440;
+        if(w>0&&h>0) {
+            int[] px=new int[w*h];
+            folha.bitmap.getPixels(px,0,w,x0,y0,w,h);
+            // Contagem por cor reduzida (4 bits por canal); fica a média da mais comum.
+            int[] conta=new int[4096];long[] soma=new long[4096*3];
+            float[] hsv=new float[3];
+            for(int i=0;i<px.length;i+=2) {
+                int p=px[i];
+                if((p>>>24)<200)continue;
+                android.graphics.Color.colorToHSV(p,hsv);
+                if(hsv[2]<0.16f)continue;
+                // Pele: alaranjado pouco saturado e claro.
+                if((hsv[0]<=45f||hsv[0]>=345f)&&hsv[1]>0.15f&&hsv[1]<0.62f&&hsv[2]>0.42f)continue;
+                int r=(p>>16)&255,g=(p>>8)&255,b=p&255;
+                int k=(r>>4)<<8|(g>>4)<<4|(b>>4);
+                conta[k]++;soma[k*3]+=r;soma[k*3+1]+=g;soma[k*3+2]+=b;
+            }
+            int melhor=-1;
+            for(int k=0;k<4096;k++)if(conta[k]>0&&(melhor<0||conta[k]>conta[melhor]))melhor=k;
+            if(melhor>=0) {
+                int n=conta[melhor];
+                cor=0xFF000000|(int)(soma[melhor*3]/n)<<16|(int)(soma[melhor*3+1]/n)<<8|(int)(soma[melhor*3+2]/n);
+            }
+        }
+        coresDaRoupa.put(character.id,cor);
+        return cor;
+    }
+
     /** Um quadro de uma folha com a raiz em (x, baseY), sem calibração nem flash (ferramentas de conferência). */
     void drawAtlasFrame(Canvas canvas,CharacterDefinition.Atlas atlas,int frame,float x,float baseY) {
         spritePaint.setColorFilter(null);

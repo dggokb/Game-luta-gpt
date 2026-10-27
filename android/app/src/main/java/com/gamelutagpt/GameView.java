@@ -1807,6 +1807,7 @@ public class GameView extends SurfaceView
             if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
                 event.attacker, event.defender);
             spawnImpact(event, ultraHit, punishNow, knockout);
+            desgaste.golpe(event, hitFighter, corRoupa[event.defender]);
             CombatFighter hitter = engine.fighter(event.attacker);
             if (!event.blocked && hitter.attacking() && hitter.attack.mechanics.pound) {
                 // Socos no chão (o Super do p13): a fumaça cresce a cada pancada.
@@ -2306,6 +2307,9 @@ public class GameView extends SurfaceView
         if (shinkaiFlash > 0) shinkaiFlash--;
         corteShinkai.passo();
         shinkaiDetalhes.passo(engine, engine.frame());
+        corRoupa[PLAYER] = spriteFighterRenderer.corDaRoupa();
+        corRoupa[OPPONENT] = opponentSpriteRenderer.corDaRoupa();
+        desgaste.passo(engine, engine.frame(), corRoupa);
         recordSpeedTrail();
         if (ultraAttacker < 0 || paginaFinal.isActive()) return;
         CombatFighter a = engine.fighter(ultraAttacker);
@@ -3371,6 +3375,7 @@ public class GameView extends SurfaceView
             }
 
             shinkaiDetalhes.desenharChao(canvas);
+            desgaste.desenharChao(canvas);
             drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawMechanicAura(canvas, player(), tagOffset());
             drawEchoes(canvas);
@@ -3391,6 +3396,7 @@ public class GameView extends SurfaceView
             riscosDeslocamento[OPPONENT] = engine.teams.tagOffset(OPPONENT);
             riscos.draw(canvas, engine.frame(), riscosLutadores, riscosDeslocamento, riscosVisiveis);
             shinkaiDetalhes.desenhar(canvas);
+            desgaste.desenhar(canvas);
             impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
@@ -3512,7 +3518,9 @@ public class GameView extends SurfaceView
         // lutador por quadro pesa na GPU de celular fraco). Só muda onde dois quadros se cruzam
         // (a troca suave do P01), e num reflexo apagado isso não aparece.
         renderer.setAlphaGlobal(alpha);
+        drawingReflection = true;
         drawFighter(c, renderer, f, false, false);
+        drawingReflection = false;
         renderer.setAlphaGlobal(255);
         c.restore();
     }
@@ -4332,9 +4340,41 @@ public class GameView extends SurfaceView
         ColorFilter look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
         if (look == null && renderer.override() == null && ghostArmsActive(f)) drawGhostArms(c, renderer, f, visualY);
+        // Desgaste: no vermelho ele respira ofegante (o corpo infla e esvazia a partir dos pés).
+        float folego = DesgasteDaLuta.folego(f.state, engine.frame());
+        if (folego != 1f && f.grounded && !f.attacking() && !f.inHitstun()) {
+            c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
+        }
+        renderer.setTint(desgaste.tinta(f.state));
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
+        renderer.setTint(null);
+        if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
+            drawDirt(c, renderer, f, visualY);
+        }
         if (look != null) renderer.setOverride(null);
         c.restore();
+    }
+
+    /**
+     * Desgaste: a poeira subindo dos pés, o próprio quadro de novo por cima, tingido de terra e
+     * recortado em duas faixas (mais forte embaixo). Segue a animação e a rotação do corpo.
+     */
+    private void drawDirt(Canvas c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+        ColorFilter dirt = desgaste.sujeira(f.state);
+        if (dirt == null) return;
+        float h = f.character().visualStandHeight;
+        r.setOverride(dirt);
+        c.save();
+        c.clipRect(f.x - h, visualY - h * 0.16f, f.x + h, visualY + 40f);
+        r.draw(c, f.x, visualY, f.facing, false, false);
+        c.restore();
+        c.save();
+        c.clipRect(f.x - h, visualY - h * 0.36f, f.x + h, visualY - h * 0.16f);
+        r.setAlphaGlobal(130);
+        r.draw(c, f.x, visualY, f.facing, false, false);
+        r.setAlphaGlobal(255);
+        c.restore();
+        r.setOverride(null);
     }
 
     /** Cópias azuladas e translúcidas dos braços fantasmas, da mais forte à mais fraca; o alfa baixo vai a zero. */
@@ -4648,6 +4688,13 @@ public class GameView extends SurfaceView
             canvas.restore();
         }
     }
+
+    /** Desgaste da luta: sangue, farpas da roupa, suor, bafo e a sujeira de cada estágio. */
+    private final DesgasteDaLuta desgaste = new DesgasteDaLuta();
+    /** Desenhando o reflexo no chão: sem a poeira nas pernas (duas cópias a menos, e não aparece). */
+    private boolean drawingReflection;
+        /** A cor da roupa de quem está em campo, por lado (as farpas). */
+    private final int[] corRoupa = new int[2];
 
     /** Os detalhes de cada tipo do SHINKAI (pedrinhas, raios, brilhos, trincas). */
     private final ShinkaiDetalhes shinkaiDetalhes = new ShinkaiDetalhes();
