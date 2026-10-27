@@ -427,9 +427,13 @@ final class CombatConfig {
     int shinkaiOnBreaker = 150;
     /** Vida vermelha que volta por quadro para quem está no SHINKAI (todos os tipos). */
     int shinkaiRegenPerFrame = 12;
-    /** POWER: o golpe que a couraça segura tira esta parte do dano; os golpes dele batem mais. */
+    /** Todos: os golpes batem mais forte, e defendido todo golpe arranha (vira vida vermelha). */
+    int shinkaiDamagePermille = 1250;
+    int shinkaiChipPermille = 150;
+    /** Todos: o primeiro Super no SHINKAI sai sem barra e ainda mais forte. */
+    int shinkaiSuperDamagePermille = 1200;
+    /** POWER: o golpe que a couraça segura tira esta parte do dano. O H joga na parede e ele quica. */
     int shinkaiPowerArmorPermille = 700;
-    int shinkaiPowerDamagePermille = 1200;
     /** SPEED: andar, dash e air dash mais rápidos, um air dash a mais. */
     float shinkaiSpeed = 1.3f;
     /** SPEED, o sumiço (→ → com o rival até esta distância): some, aparece atrás dele. */
@@ -438,11 +442,20 @@ final class CombatConfig {
     float shinkaiVanishBehind = 120f;
     /** Cada sumiço gasta este tanto do tempo do SHINKAI. */
     int shinkaiVanishCost = 45;
-    /** ENERGY: barra de Super por quadro (uma barra em 4 s) e o projétil mais forte. */
+    /** SPEED: cada golpe é repetido pela imagem residual, estes quadros depois, com este dano. */
+    int shinkaiSpeedEchoDelay = 7;
+    int shinkaiSpeedEchoDamagePermille = 500;
+    /** ENERGY: barra de Super por quadro (uma barra em 4 s), o projétil maior e mais rápido. */
     int shinkaiEnergyMeterPerFrame = 4;
     float shinkaiEnergyProjectileSpeed = 1.3f;
-    int shinkaiEnergyProjectileDamagePermille = 1250;
-    /** TECHNIQUE: o parry vale se o → foi apertado até estes quadros antes do golpe chegar. */
+    /** ENERGY: projéteis de energia ao mesmo tempo (o S sai sem esperar o anterior). */
+    int shinkaiEnergyProjectiles = 5;
+    /** ENERGY: o H solta junto um mini projétil com esta parte do dano da energia. */
+    int shinkaiEnergyShotDamagePermille = 450;
+    /**
+     * TECHNIQUE: o primeiro golpe que chega com ele livre é aparado sozinho; depois, o parry vale
+     * se o → foi apertado até estes quadros antes do golpe chegar.
+     */
     int shinkaiParryWindow = 10;
     /** Os dois congelam no parry; quem aparou sai livre e o golpe do outro continua. */
     int shinkaiParryFreeze = 16;

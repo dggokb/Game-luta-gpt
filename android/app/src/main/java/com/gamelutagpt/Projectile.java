@@ -37,6 +37,8 @@ final class Projectile {
     int hitInterval;
     int hitCooldown;
     boolean holding;
+    /** O mini projétil do H no SHINKAI ENERGY (desenhado menor). */
+    boolean mini;
 
     Projectile(
         float x,

@@ -434,12 +434,17 @@ Testes: `BattleFlowTest`, `AiFullKitTest`.
 Barra própria de cada lutador (entre a vida do titular e a do parceiro), que enche apanhando,
 batendo e defendendo. Cheia, ela ativa uma vez por personagem no round, por 8 s, com o botão
 SHINKAI (onde era o OD), SUPER + TAG ou a tecla P. Na ativação os dois congelam e o combo
-continua. Todos recuperam a vida vermelha; o resto vem do tipo:
+continua. Todos batem 25% mais forte (o dano aparece grande na cor do tipo), arranham com
+qualquer golpe defendido, têm o primeiro Super sem barra (e mais forte) e recuperam a vida
+vermelha. O resto vem do tipo, sempre com os mesmos botões e o resultado na tela:
 
-- **POWER**: corpo de aço e mais dano;
-- **SPEED**: mais rápido, air dash extra e o sumiço com → →;
-- **ENERGY**: barra de Super enchendo sozinha e projéteis mais fortes, dois por vez;
-- **TECHNIQUE**: cancels livres e parry com → tocado.
+- **POWER**: corpo de aço; o H joga na parede (wall bounce mesmo no neutro);
+- **SPEED**: imagem residual que repete cada normal (um `Echo` com `shinkai`), mais rápido, air
+  dash extra e o sumiço no dash;
+- **ENERGY**: o H solta um mini projétil, o S sai sem esperar o anterior (até 5) e a barra de
+  Super enche sozinha;
+- **TECHNIQUE**: o primeiro golpe que chega com ele livre é aparado sozinho; depois, parry com →
+  tocado; cancels livres.
 
 Regras, números, a divisão do elenco e o que falta: [shinkai.md](shinkai.md).
 O assist (antes a barra de 5 partes) agora aparece como um anel em volta do círculo do TAG.

@@ -67,6 +67,8 @@ final class CombatEngine {
         final int damagePermille;
         /** Só desenho (os clones do Super do p06): não acerta ninguém. */
         boolean ghost;
+        /** A imagem residual do SHINKAI SPEED (desenhada na cor do tipo). */
+        boolean shinkai;
         /** Frame of the copied move; negative while it waits for its delay. */
         int frame;
         int hitsOnTarget;
@@ -658,6 +660,8 @@ final class CombatEngine {
         s.shinkaiUsed = true;
         s.shinkai = 0;
         s.shinkaiFrames = config.shinkaiFrames;
+        s.shinkaiFreeSuper = true;
+        s.shinkaiAutoParry = s.shinkaiType == Shinkai.Type.TECHNIQUE;
         f.shinkaiRequestAge = -1;
         if (f.attacking()) {
             f.status = CombatFighter.Status.NEUTRAL;
@@ -732,12 +736,15 @@ final class CombatEngine {
      * quadros antes. Agarrão não se apara.
      */
     private boolean parries(CombatFighter d, AttackDefinition attack, boolean projectile) {
-        if (!d.state.inShinkai(Shinkai.Type.TECHNIQUE) || d.parryAge < 0) return false;
+        if (!d.state.inShinkai(Shinkai.Type.TECHNIQUE)) return false;
         if (!projectile && attack.mechanics.grab) return false;
+        // A primeira aparada é sozinha: o golpe que chega com ele livre (parado, andando).
+        if (d.parryAge < 0) return d.state.shinkaiAutoParry && d.status == CombatFighter.Status.NEUTRAL;
         return d.status == CombatFighter.Status.NEUTRAL || d.status == CombatFighter.Status.BLOCKSTUN;
     }
 
     private void parry(CombatFighter a, CombatFighter d, boolean projectile, String moveId) {
+        if (d.parryAge < 0) d.state.shinkaiAutoParry = false;
         d.parryAge = -1;
         d.status = CombatFighter.Status.NEUTRAL;
         d.clearAttack();
@@ -863,8 +870,9 @@ final class CombatEngine {
 
     private void startFromBuffer(final CombatFighter f, final boolean cancel) {
         if (f.buffer.size() == 0) return;
-        // Um projétil por vez; no SHINKAI ENERGY, dois.
-        final boolean projectileAlive = countProjectiles(energyProjectiles, f.index) >= (f.state.inShinkai(Shinkai.Type.ENERGY) ? 2 : 1);
+        // Um projétil por vez; no SHINKAI ENERGY, vários.
+        final boolean projectileAlive = countProjectiles(energyProjectiles, f.index) >=
+            (f.state.inShinkai(Shinkai.Type.ENERGY) ? config.shinkaiEnergyProjectiles : 1);
         final ComboSession session = sessions[1 - f.index];
         InputBuffer.Entry entry = f.buffer.select(e -> {
             AttackDefinition next = CancelSystem.resolve(f, e, projectileAlive, null);
@@ -889,6 +897,7 @@ final class CombatEngine {
         f.status = CombatFighter.Status.ATTACK;
         f.clearAttack();
         f.attack = attack;
+        f.shinkaiSuper = false;
         // O golpe alto avisa na preparação (o brilho na tela), para dar para ler e defender em pé.
         if (attack.overhead) cues.add("OVERHEAD");
         // Normais e especiais (também os que lançam, como a shuriken) tocam a própria animação.
@@ -906,6 +915,12 @@ final class CombatEngine {
             cues.add("ECHO");
         } else if (f.echoLeft > 0 && attack.kind == AttackDefinition.Kind.NORMAL && f.move != null) {
             echoes.add(new Echo(f.index, attack, f.move, f.x, f.y, f.facing, f.echoDelay, f.echoDamagePermille));
+        } else if (f.state.inShinkai(Shinkai.Type.SPEED) && attack.kind == AttackDefinition.Kind.NORMAL && f.move != null) {
+            // SHINKAI SPEED: a imagem residual repete o golpe logo depois (todo golpe bate duas vezes).
+            Echo e = new Echo(f.index, attack, f.move, f.x, f.y, f.facing, config.shinkaiSpeedEchoDelay,
+                config.shinkaiSpeedEchoDamagePermille);
+            e.shinkai = true;
+            echoes.add(e);
         }
         if (attack.mechanics.lifeCost > 0) {
             // Fury: the special is paid with the fighter's own life.
@@ -917,7 +932,14 @@ final class CombatEngine {
         }
         if (attack.mechanics.dives()) f.vy = 0f;
         if (attack.kind == AttackDefinition.Kind.SUPER) {
-            f.state.spendSuperMeter(CombatConfig.SUPER_COST);
+            if (f.state.inShinkai() && f.state.shinkaiFreeSuper) {
+                // O Super do SHINKAI: sem barra e mais forte.
+                f.state.shinkaiFreeSuper = false;
+                f.shinkaiSuper = true;
+                cues.add("SHINKAI_SUPER");
+            } else {
+                f.state.spendSuperMeter(CombatConfig.SUPER_COST);
+            }
             callClones(f, attack);
             f.vy = 0f;
             // Super freeze: the opponent and the projectiles wait for the release. A Super that
@@ -1214,6 +1236,8 @@ final class CombatEngine {
                 f.attackFrame++;
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
+                } else if (f.attackFrame == f.attack.startupFrames && energyShot(f)) {
+                    spawnEnergyShot(f);
                 }
                 if (f.attackFrame == f.attack.mechanics.teleportFrame) teleportBehind(f);
                 break;
@@ -1861,10 +1885,11 @@ final class CombatEngine {
         return Math.abs(other.x - f.x) > close;
     }
 
-    /** Arranhão de uma batida defendida: só especial e Super/Ultra. */
-    private int chipFor(AttackDefinition attack, int strikeDamage) {
+    /** Arranhão de uma batida defendida: especial e Super/Ultra; no SHINKAI, todo golpe. */
+    private int chipFor(CombatFighter a, AttackDefinition attack, int strikeDamage) {
         int permille = attack.strength == AttackDefinition.Strength.SUPER ? config.chipSuperPermille
             : attack.strength == AttackDefinition.Strength.SPECIAL ? config.chipSpecialPermille : 0;
+        if (a.state.inShinkai()) permille = Math.max(permille, config.shinkaiChipPermille);
         return strikeDamage * permille / 1000;
     }
 
@@ -2008,9 +2033,8 @@ final class CombatEngine {
             if (f.charged()) cues.add("CHARGED");
         }
         if (!superKind && f.state.inShinkai(Shinkai.Type.ENERGY)) {
-            // SHINKAI ENERGY: o projétil sai maior, mais rápido e mais forte.
+            // SHINKAI ENERGY: o projétil sai maior e mais rápido.
             speed *= config.shinkaiEnergyProjectileSpeed;
-            damage = damage * config.shinkaiEnergyProjectileDamagePermille / 1000;
             radius *= 1.3f;
         }
         float height = superKind ? data.spawnHeight(false, !f.grounded) : data.spawnHeight(f.crouching, !f.grounded);
@@ -2031,6 +2055,27 @@ final class CombatEngine {
             p.fuse = data.trapFuse["L".equals(f.commandButton) ? 0 : "H".equals(f.commandButton) ? 2 : 1];
         }
         (superKind ? superProjectiles : energyProjectiles).add(p);
+    }
+
+    /** SHINKAI ENERGY: o H (normal) solta junto um mini projétil de energia. */
+    private boolean energyShot(CombatFighter f) {
+        return f.state.inShinkai(Shinkai.Type.ENERGY) && f.attack.kind == AttackDefinition.Kind.NORMAL &&
+            f.attack.strength == AttackDefinition.Strength.HEAVY && f.state.profile.energy != null &&
+            f.character().attack("S") != null;
+    }
+
+    private void spawnEnergyShot(CombatFighter f) {
+        CharacterDefinition.Fighter profile = f.state.profile;
+        CharacterDefinition.Projectile data = profile.energy;
+        float height = data.spawnHeight(f.crouching, !f.grounded);
+        Projectile p = new Projectile(
+            f.x + f.facing * (data.spawnX + 20f), f.y - height, Math.max(420f, data.range * 0.7f),
+            data.speed * config.shinkaiEnergyProjectileSpeed * 1.15f, 15f,
+            data.damage * config.shinkaiEnergyShotDamagePermille / 1000, f.state.shinkaiType.color,
+            f.index, f.facing, f.character().attack("S"), profile.energyVisual);
+        p.mini = true;
+        energyProjectiles.add(p);
+        cues.add("SHINKAI_SHOT");
     }
 
     private void advanceProjectiles() {
@@ -2998,7 +3043,7 @@ final class CombatEngine {
         }
         if (guardStops(guard, attack, !a.grounded, projectile)) {
             block(a, d, attack, guard, direction, projectile, !lastStrike,
-                multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(attack, base));
+                multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(a, attack, base));
             if (multi) a.strikeBlocked = true;
             d.state.chargeShinkai(config.shinkaiOnBlock);
             if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
@@ -3011,8 +3056,9 @@ final class CombatEngine {
 
         // Fury: the attacker hits harder the less life it has left.
         int raw = base * a.state.profile.furyScale(a.state.life) / 1000;
-        // SHINKAI POWER: os golpes dele batem mais forte.
-        if (a.state.inShinkai(Shinkai.Type.POWER)) raw = raw * config.shinkaiPowerDamagePermille / 1000;
+        // SHINKAI: todos os golpes batem mais forte; o Super grátis dele, mais ainda.
+        if (a.state.inShinkai()) raw = raw * config.shinkaiDamagePermille / 1000;
+        if (a.shinkaiSuper && attack.kind == AttackDefinition.Kind.SUPER) raw = raw * config.shinkaiSuperDamagePermille / 1000;
         if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
             // Super armor: the damage goes through, the stun does not; the move carries on.
             d.armorUsed++;
@@ -3058,6 +3104,10 @@ final class CombatEngine {
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
+        // SHINKAI POWER: o H joga na parede, mesmo sozinho no neutro, e ele volta quicando.
+        boolean powerBounce = lastStrike && !projectile && !c.echo && a.state.inShinkai(Shinkai.Type.POWER) &&
+            attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY;
+        if (powerBounce) launch = AttackDefinition.Launch.WALL_BOUNCE;
         // Pancadas no chão (o Super do p13): a primeira, a queda do pulo, já derruba.
         if (!projectile && attack.mechanics.pound && c.hitbox == 0) launch = AttackDefinition.Launch.KNOCKDOWN;
         float hitPush = lastStrike ? attack.pushbackOnHit : attack.pushbackOnHit * config.strikeHoldPushback;
@@ -3094,7 +3144,7 @@ final class CombatEngine {
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.spinning = false;
         // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
-        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && session.hitCount >= 2 &&
+        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce) &&
             session.wallBounces < config.maxWallBounces;
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
@@ -3299,7 +3349,7 @@ final class CombatEngine {
     /** Guarded contact: blockstun, pushback, guard meter and hitstop. */
     private void block(CombatFighter a, CombatFighter d, AttackDefinition attack, int guard, int direction,
                        boolean projectile) {
-        block(a, d, attack, guard, direction, projectile, false, true, chipFor(attack, attack.damage));
+        block(a, d, attack, guard, direction, projectile, false, true, chipFor(a, attack, attack.damage));
     }
 
     /**

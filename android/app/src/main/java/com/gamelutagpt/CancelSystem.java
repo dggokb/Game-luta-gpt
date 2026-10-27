@@ -72,7 +72,7 @@ final class CancelSystem {
                 if (projectileAlive || f.state.profile.energy == null) return null;
                 return c.attack("S");
             case SUPER:
-                if (f.state.profile.superAttack == null || f.state.superMeter < CombatConfig.SUPER_COST) return null;
+                if (f.state.profile.superAttack == null || !f.state.canPaySuper()) return null;
                 // A Super that strikes is a ground move (its strikes reach a standing opponent).
                 AttackDefinition sup = c.attack("SUPER");
                 return sup != null && sup.melee() && !f.grounded ? null : sup;

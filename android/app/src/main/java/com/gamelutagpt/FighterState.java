@@ -146,6 +146,16 @@ final class FighterState {
 
     boolean inShinkai(Shinkai.Type type) { return shinkaiFrames > 0 && shinkaiType == type; }
 
+    /** O primeiro Super do SHINKAI (sai sem barra) ainda não saiu. */
+    boolean shinkaiFreeSuper;
+    /** TECHNIQUE: a aparada automática do SHINKAI ainda não foi usada. */
+    boolean shinkaiAutoParry;
+
+    /** Dá para pagar o Super agora: uma barra, ou o Super grátis do SHINKAI. */
+    boolean canPaySuper() {
+        return superMeter >= CombatConfig.SUPER_COST || (inShinkai() && shinkaiFreeSuper);
+    }
+
     /** Enche a barra do SHINKAI (nada depois de usado no round, nem durante ele). */
     void chargeShinkai(int amount) {
         if (amount <= 0 || shinkaiUsed || shinkaiFrames > 0 || life <= 0) return;
@@ -156,6 +166,8 @@ final class FighterState {
     void refreshShinkai() {
         shinkaiUsed = false;
         shinkaiFrames = 0;
+        shinkaiFreeSuper = false;
+        shinkaiAutoParry = false;
     }
 
     float superBars() {

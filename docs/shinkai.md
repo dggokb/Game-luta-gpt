@@ -53,8 +53,15 @@ botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` 
 - **Troca.** O SHINKAI é de quem está em campo. Sair na troca acaba com ele e conta como usado.
 - **Round novo.** `CombatEngine.refreshShinkai(side)` libera o uso de novo, mas a barra continua
   como estava. No treino, os botões **VIDA P1** e **VIDA CPU** também enchem a barra, para testar.
-- **Todos os tipos** recuperam a vida vermelha em campo durante o SHINKAI
-  (`shinkaiRegenPerFrame` = 12 por quadro).
+- **Todos os tipos**, durante o SHINKAI (o que se sente no primeiro golpe):
+  - todo golpe bate **25% mais forte** (`shinkaiDamagePermille`), e o dano aparece **grande na
+    cor do tipo** onde o golpe entrou (os golpes seguidos somam no mesmo número —
+    `ShinkaiDetalhes.numero`);
+  - **defendido, todo golpe arranha** (até o L): 15% do dano vira vida vermelha
+    (`shinkaiChipPermille`);
+  - o **primeiro Super sai sem barra** e ainda **20% mais forte** (`shinkaiSuperDamagePermille`);
+    o botão SUPER acende mesmo sem barra (`FighterState.canPaySuper`). Os seguintes pagam barra;
+  - recuperam a vida vermelha em campo (`shinkaiRegenPerFrame` = 12 por quadro).
 
 ## Os quatro tipos
 
@@ -62,10 +69,12 @@ A divisão abaixo é o ponto de partida. Para mudar, basta editar `Shinkai.typeO
 
 | Tipo | Quem | Cor | O que ganha |
 |---|---|---|---|
-| **POWER** | p04, p09, p12, p13 | laranja | **Corpo de aço**: aguenta qualquer golpe sem perder a ação e leva só 70% do dano (`shinkaiPowerArmorPermille`). Agarrão e Super entram normal. Os golpes dele batem **20% mais forte** (`shinkaiPowerDamagePermille`). |
-| **SPEED** | p03, p05, p10, p16 | ciano | **30% mais rápido** ao andar, no dash e no air dash (`shinkaiSpeed`), e **um air dash a mais** por pulo. **Sumiço**: → → no chão, com o rival a até 560 px, faz ele sumir por 10 quadros (nada acerta) e aparecer **atrás do rival** (120 px atrás), já virado para ele. Cada sumiço gasta 45 quadros do SHINKAI. O golpe apertado enquanto ele está sumido sai assim que ele aparece. |
-| **ENERGY** | p01, p06, p08, p11 | roxo | A **barra de Super enche sozinha** (uma barra a cada 4 s, `shinkaiEnergyMeterPerFrame`). Os projéteis saem **maiores, 30% mais rápidos e 25% mais fortes**, e podem ter **dois na tela** ao mesmo tempo. |
-| **TECHNIQUE** | p02, p07, p14, p15 (e quem não está na lista) | dourado | **Cancels livres**: o golpe que acertou ou foi defendido cancela em qualquer outro (era o Overdrive). **Parry**: tocar → (apertar, não segurar) até 10 quadros antes do golpe chegar faz o golpe não entrar. Os dois congelam por 16 quadros e quem aparou sai livre, enquanto o golpe do outro continua. Funciona livre ou defendendo, contra golpes e projéteis, mas agarrão não se apara. |
+| **POWER** | p04, p09, p12, p13 | laranja | **Corpo de aço**: aguenta qualquer golpe sem perder a ação e leva só 70% do dano (`shinkaiPowerArmorPermille`). Agarrão e Super entram normal. **O H joga o rival na parede**, mesmo sozinho no neutro, e ele volta quicando — dá para continuar o combo. O chão trinca a cada golpe. |
+| **SPEED** | p03, p05, p10, p16 | ciano | **Imagem residual**: todo golpe normal é repetido por uma imagem ciano no mesmo lugar `shinkaiSpeedEchoDelay` (7) quadros depois, com metade do dano — **todo golpe bate duas vezes**. 30% mais rápido ao andar, no dash e no air dash (`shinkaiSpeed`) e um air dash a mais. **Sumiço**: o dash (→ →), com o rival a até 560 px, vira sumir por 10 quadros (nada acerta) e aparecer **atrás do rival**, já virado para ele. Cada sumiço gasta 45 quadros do SHINKAI. |
+| **ENERGY** | p01, p06, p08, p11 | roxo | **O H solta junto um mini projétil** roxo (45% do dano da energia, `shinkaiEnergyShotDamagePermille`). O **S sai sem esperar o anterior** (até `shinkaiEnergyProjectiles` = 5 na tela), maior e 30% mais rápido. A **barra de Super enche sozinha** (uma barra a cada 4 s). |
+| **TECHNIQUE** | p02, p07, p14, p15 (e quem não está na lista) | dourado | **Aparada automática**: o primeiro golpe que chega com ele livre (parado ou andando) é aparado sozinho — "PARRY!", nada entra e ele sai livre. Depois, o parry é o toque → até 10 quadros antes do golpe (também defendendo, também contra projétil; agarrão não se apara). **Cancels livres**: o golpe que acertou ou foi defendido cancela em qualquer outro. |
+
+Nada disso precisa de comando novo: são os mesmos botões, com o resultado na tela.
 
 ## CPU
 

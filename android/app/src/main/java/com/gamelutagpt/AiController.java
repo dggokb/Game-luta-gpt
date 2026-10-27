@@ -448,7 +448,7 @@ final class AiController {
         situation.targetGrounded = seen.grounded;
         situation.targetCrouching = seen.crouching;
         situation.targetAlive = !seen.ko;
-        situation.superReady = me.state.superMeter >= CombatConfig.SUPER_COST;
+        situation.superReady = me.state.canPaySuper();
         situation.projectileActive = engine.energyProjectileAlive(self);
         // Caído no chão não leva golpe: bater nele é golpe perdido (e de onde ela o viu cair, que
         // já não é onde ele está). Ela chega perto e espera ele levantar.
@@ -1290,7 +1290,7 @@ final class AiController {
                 reaches = me.state.profile.energy != null && !engine.energyProjectileAlive(me.index) &&
                     (!a.melee() || alcanca(c, option, gap, target));
             } else if ("SUPER".equals(option)) {
-                reaches = me.state.superMeter >= CombatConfig.SUPER_COST && c.fighter.hasSuperAttack();
+                reaches = me.state.canPaySuper() && c.fighter.hasSuperAttack();
             } else {
                 reaches = alcanca(c, option, gap, target);
             }
@@ -1481,7 +1481,9 @@ final class AiController {
      */
     private boolean spendSuper(CombatFighter me, CombatFighter target) {
         int meter = me.state.superMeter;
-        if (meter < CombatConfig.SUPER_COST || !me.character().fighter.hasSuperAttack()) return false;
+        if (!me.state.canPaySuper() || !me.character().fighter.hasSuperAttack()) return false;
+        // O Super grátis do SHINKAI: não gasta a reserva, sai sempre.
+        if (meter < CombatConfig.SUPER_COST) return true;
         if (smart() < 0.5 || !fullKit) return true;
         AttackDefinition sup = me.character().attack("SUPER");
         boolean kills = sup != null && sup.damage * KILL_SCALE >= target.state.life;

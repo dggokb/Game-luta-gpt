@@ -195,7 +195,7 @@ public class ShinkaiTest {
         power.hitWith(0, () -> power.in[0].light = true, "L");
         int normal = plain.cpuState.profile.maxLife - plain.cpuState.life;
         int strong = power.cpuState.profile.maxLife - power.cpuState.life;
-        assertEquals(normal * power.config().shinkaiPowerDamagePermille / 1000, strong, 2);
+        assertEquals(normal * power.config().shinkaiDamagePermille / 1000, strong, 2);
     }
 
     // ------------------------------------------------------------------ SPEED
@@ -231,7 +231,7 @@ public class ShinkaiTest {
 
     // ------------------------------------------------------------------ ENERGY
 
-    @Test public void energyFillsTheSuperMeterAndFiresTwoAtOnce() {
+    @Test public void energyFillsTheSuperMeterAndFiresManyAtOnce() {
         Match m = new Match("player_base", "p15", 300f, 1500f);
         m.shinkai();
         int meter = m.first.superMeter;
@@ -243,7 +243,7 @@ public class ShinkaiTest {
             m.step();
             most = Math.max(most, m.engine.countEnergyProjectiles(0));
         }
-        assertEquals(2, most);
+        assertTrue("several at once: " + most, most >= 3);
 
         Match plain = new Match("player_base", "p15", 300f, 1500f);
         int count = 0;
@@ -282,6 +282,7 @@ public class ShinkaiTest {
     @Test public void techniqueParriesWithATapForward() {
         Match m = new Match("p15", "player_base", 600f, 690f);
         m.shinkai();
+        m.first.shinkaiAutoParry = false;   // a aparada automática já foi
         int life = m.first.life;
         boolean parried = false;
         for (int i = 0; i < 80 && !parried; i++) {
@@ -295,10 +296,124 @@ public class ShinkaiTest {
         assertEquals("nothing went in", life, m.first.life);
         assertFalse(m.f(0).inHitstun());
 
-        // Without the tap the same H hits.
+        // Without the tap (and the automatic one used) the same H hits.
         Match hit = new Match("p15", "player_base", 600f, 690f);
         hit.shinkai();
+        hit.first.shinkaiAutoParry = false;
         hit.hitWith(1, () -> hit.in[1].heavy = true, "H");
         assertTrue(hit.first.life < life);
+    }
+
+    /** A primeira aparada é sozinha (livre, sem tocar nada); a segunda já precisa do toque. */
+    @Test public void techniqueParriesTheFirstHitByItself() {
+        Match m = new Match("p15", "player_base", 600f, 690f);
+        m.shinkai();
+        int life = m.first.life;
+        m.hitWith(1, () -> m.in[1].heavy = true, "H");
+        assertTrue(m.engine.cues().contains("PARRY"));
+        assertEquals("nothing went in", life, m.first.life);
+        assertFalse(m.first.shinkaiAutoParry);
+        while (m.f(1).attacking()) m.step();
+        m.steps(20);
+        m.hitWith(1, () -> m.in[1].heavy = true, "H");
+        assertTrue("the second one hits", m.first.life < life);
+    }
+
+    // ------------------------------------------------------------------ todos
+
+    /** No SHINKAI todo golpe defendido arranha (o L também), virando vida vermelha. */
+    @Test public void blockedNormalsChipInShinkai() {
+        for (boolean on : new boolean[] {false, true}) {
+            Match m = new Match("p15", "player_base", 600f, 690f);
+            if (on) m.shinkai();
+            int life = m.cpuState.life;
+            for (int i = 0; i < 40; i++) {
+                m.in[1].direction = MotionParser.relative(5, m.f(1).facing);   // trás
+                if (!m.f(0).attacking()) m.in[0].light = true;
+                m.step();
+            }
+            assertTrue("defended", m.f(1).status == CombatFighter.Status.BLOCKSTUN || m.cpuState.life < life || !on);
+            if (on) assertTrue("chip in SHINKAI", m.cpuState.life < life);
+            else assertEquals("no chip on a light", life, m.cpuState.life);
+        }
+    }
+
+    /** O primeiro Super do SHINKAI sai sem barra e bate mais forte; o segundo precisa de barra. */
+    @Test public void theFirstSuperIsFreeAndStronger() {
+        Match free = new Match("p15", "player_base", 600f, 700f);
+        free.shinkai();
+        free.first.superMeter = 0;
+        assertTrue(free.first.canPaySuper());
+        free.hitWith(0, () -> free.in[0].superAttack = true, "SUPER");
+        assertTrue(free.f(0).shinkaiSuper);
+        assertEquals("no bar spent", 0, free.first.superMeter);
+        assertFalse("only the first", free.first.canPaySuper());
+        while (free.f(0).attacking() || free.f(1).inHitstun() || free.f(1).status == CombatFighter.Status.KNOCKDOWN) free.step();
+        int freeDamage = free.cpuState.profile.maxLife - free.cpuState.life;
+
+        Match paid = new Match("p15", "player_base", 600f, 700f);
+        paid.first.superMeter = CombatConfig.SUPER_COST;
+        paid.hitWith(0, () -> paid.in[0].superAttack = true, "SUPER");
+        assertEquals(0, paid.first.superMeter);
+        while (paid.f(0).attacking() || paid.f(1).inHitstun() || paid.f(1).status == CombatFighter.Status.KNOCKDOWN) paid.step();
+        int paidDamage = paid.cpuState.profile.maxLife - paid.cpuState.life;
+        CombatConfig c = free.config();
+        float expected = c.shinkaiDamagePermille / 1000f * c.shinkaiSuperDamagePermille / 1000f;
+        assertEquals(expected, freeDamage / (float)paidDamage, 0.08f);
+    }
+
+    /** POWER: o H joga o rival na parede mesmo sozinho, no neutro. */
+    @Test public void powerHeavyThrowsToTheWall() {
+        Match m = new Match("p13", "p15", 600f, 700f);
+        m.shinkai();
+        boolean bounced = false;
+        m.hitWith(0, () -> m.in[0].heavy = true, "H");
+        assertEquals(CombatFighter.BOUNCE_WALL, m.f(1).bounce);
+        for (int i = 0; i < 90 && !bounced; i++) {
+            m.step();
+            bounced = m.engine.cues().contains("WALL_BOUNCE");
+        }
+        assertTrue("bounced back from the wall", bounced);
+
+        Match plain = new Match("p13", "p15", 600f, 700f);
+        plain.hitWith(0, () -> plain.in[0].heavy = true, "H");
+        assertNotEquals(CombatFighter.BOUNCE_WALL, plain.f(1).bounce);
+    }
+
+    /** SPEED: a imagem residual repete o golpe logo depois, e ele bate de novo. */
+    @Test public void speedAfterimageRepeatsEachHit() {
+        Match m = new Match("p16", "player_base", 600f, 690f);
+        m.shinkai();
+        m.hitWith(0, () -> m.in[0].light = true, "L");
+        assertEquals(1, m.engine.echoes.size());
+        assertTrue(m.engine.echoes.get(0).shinkai);
+        int hits = 0, combo = 0;
+        for (int i = 0; i < 30; i++) {
+            m.step();
+            for (CombatEngine.HitEvent e : m.engine.events()) if (e.attacker == 0 && "L".equals(e.moveId)) hits++;
+            if (m.engine.session(1) != null) combo = Math.max(combo, m.engine.session(1).hitCount);
+        }
+        assertEquals("the afterimage hit too", 1, hits);
+        assertEquals("one combo of two hits", 2, combo);
+    }
+
+    /** ENERGY: o H solta junto um mini projétil. */
+    @Test public void energyHeavyFiresAMiniShot() {
+        Match m = new Match("player_base", "p15", 400f, 900f);
+        m.shinkai();
+        for (int i = 0; i < 30 && m.engine.countEnergyProjectiles(0) == 0; i++) {
+            if (!m.f(0).attacking()) m.in[0].heavy = true;
+            m.step();
+        }
+        assertEquals(1, m.engine.countEnergyProjectiles(0));
+        assertTrue(m.engine.energyProjectiles.get(0).mini);
+        assertTrue(m.engine.cues().contains("SHINKAI_SHOT"));
+
+        Match plain = new Match("player_base", "p15", 400f, 900f);
+        for (int i = 0; i < 30; i++) {
+            if (!plain.f(0).attacking()) plain.in[0].heavy = true;
+            plain.step();
+        }
+        assertEquals(0, plain.engine.countEnergyProjectiles(0));
     }
 }

@@ -341,11 +341,13 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   apanhando (mais), batendo e defendendo. Cheia, brilha e aparece escrito **SHINKAI**.
 - Botão **SHINKAI** (à esquerda de SUPER e TAG), **SUPER + TAG juntos** ou a tecla **P**:
   **1 vez por personagem no round**, por **8 segundos**. Dá para ligar no meio do combo.
-- Cada tipo ganha uma coisa diferente:
-  - **POWER** (p04, p09, p12, p13): corpo de aço e mais dano;
-  - **SPEED** (p03, p05, p10, p16): mais rápido e sumiço com → →, aparecendo atrás do rival;
-  - **ENERGY** (p01, p06, p08, p11): barra de Super enchendo sozinha e projéteis fortes, dois por vez;
-  - **TECHNIQUE** (p02, p07, p14, p15): cancels livres e parry tocando →.
+- Todos: golpes 25% mais fortes com o dano grande na tela, todo golpe defendido arranha e o
+  **primeiro Super sai sem barra** (e mais forte).
+- Cada tipo ganha uma coisa que se vê, com os mesmos botões:
+  - **POWER** (p04, p09, p12, p13): corpo de aço e o **H joga na parede** (ele volta quicando);
+  - **SPEED** (p03, p05, p10, p16): **imagem residual repete cada golpe**, mais rápido e sumiço no dash;
+  - **ENERGY** (p01, p06, p08, p11): **o H solta um mini projétil**, o S sai sem esperar e a barra enche sozinha;
+  - **TECHNIQUE** (p02, p07, p14, p15): **o primeiro golpe é aparado sozinho**, depois parry tocando →, e cancels livres.
 - No treino, **VIDA P1 / VIDA CPU** enchem a barra. **DEMO 87** mostra o SHINKAI.
 - Detalhes: `docs/shinkai.md`.
 

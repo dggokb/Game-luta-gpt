@@ -260,6 +260,11 @@ final class EffectsRenderer {
             // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
             float scale = p.radius / 24f;
             if ("LUVA".equals(p.visual)) continue;   // a luva da caixa: quem desenha é a armadilha
+            if (p.mini) {
+                // O mini projétil do H no SHINKAI ENERGY: uma bolinha na cor do tipo.
+                drawOrb(c, p, 11f, false);
+                continue;
+            }
             if (p.visual != null && IMAGE_VISUALS.containsKey(p.visual)) {
                 Bitmap b = images.get(p.visual);
                 if (b != null) drawImage(c, p, b);

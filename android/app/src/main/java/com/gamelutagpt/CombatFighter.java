@@ -150,6 +150,8 @@ final class CombatFighter {
     boolean justDefended;
     /** Quem quebrou o último combo quebrado (para a tela; o outro lado zera quando quebra). */
     boolean comboBroke;
+    /** O Super em andamento é o grátis do SHINKAI (mais forte). */
+    boolean shinkaiSuper;
     /** Quadros em que quem quebrou o combo ainda corre sozinho até quem foi jogado para longe. */
     int breakerChase;
     /** A bola de energia (não Super) cujo acerto o segura no atordoamento agora, ou null. */

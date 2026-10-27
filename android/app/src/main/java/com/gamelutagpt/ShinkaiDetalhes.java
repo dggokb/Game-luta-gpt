@@ -13,8 +13,8 @@ import java.util.Random;
  * GameView. Só apresentação: nada aqui muda a luta.
  */
 final class ShinkaiDetalhes {
-    private static final int PEDRAS = 40, RAIOS = 12, TRINCAS = 6, BRILHOS = 6;
-    private static final int VIDA_PEDRA = 56, VIDA_RAIO = 7, VIDA_TRINCA = 70, VIDA_BRILHO = 14;
+    private static final int PEDRAS = 40, RAIOS = 12, TRINCAS = 6, BRILHOS = 6, NUMEROS = 8;
+    private static final int VIDA_PEDRA = 56, VIDA_RAIO = 7, VIDA_TRINCA = 70, VIDA_BRILHO = 14, VIDA_NUMERO = 42;
 
     private final Random sorte = new Random(31L);
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -33,6 +33,11 @@ final class ShinkaiDetalhes {
     // Brilhos de ponta de golpe.
     private final float[] bx = new float[BRILHOS], by = new float[BRILHOS];
     private final int[] bIdade = fill(new int[BRILHOS]), bCor = new int[BRILHOS];
+
+    // Números do dano: onde, quanto, cor, se é o Super do SHINKAI (maior).
+    private final float[] nx = new float[NUMEROS], ny = new float[NUMEROS];
+    private final int[] nIdade = fill(new int[NUMEROS]), nValor = new int[NUMEROS], nCor = new int[NUMEROS];
+    private final boolean[] nGrande = new boolean[NUMEROS];
 
     private static int[] fill(int[] a) {
         java.util.Arrays.fill(a, -1);
@@ -67,6 +72,7 @@ final class ShinkaiDetalhes {
         envelhecer(rIdade, VIDA_RAIO);
         envelhecer(tIdade, VIDA_TRINCA);
         envelhecer(bIdade, VIDA_BRILHO);
+        envelhecer(nIdade, VIDA_NUMERO);
         for (int i = 0; i < PEDRAS; i++) {
             if (pIdade[i] < 0) continue;
             py[i] -= pv[i] / 60f;
@@ -82,6 +88,30 @@ final class ShinkaiDetalhes {
         tSemente[i] = sorte.nextInt();
         tCor[i] = cor;
         for (int k = 0; k < 6; k++) pedra(x + (sorte.nextFloat() * 2f - 1f) * 50f, Arena.GROUND_Y, cor);
+    }
+
+    /**
+     * O dano de um golpe no SHINKAI, grande e na cor do tipo. Golpes seguidos no mesmo lugar
+     * (o combo) somam no número que ainda está na tela.
+     */
+    void numero(float x, float y, int dano, int cor, boolean grande) {
+        for (int i = 0; i < NUMEROS; i++) {
+            if (nIdade[i] >= 0 && nIdade[i] < 24 && nCor[i] == cor && Math.abs(nx[i] - x) < 160f) {
+                nValor[i] += dano;
+                nIdade[i] = 0;
+                nGrande[i] |= grande;
+                nx[i] = x;
+                ny[i] = y;
+                return;
+            }
+        }
+        int i = livre(nIdade);
+        nx[i] = x;
+        ny[i] = y;
+        nValor[i] = dano;
+        nCor[i] = cor;
+        nGrande[i] = grande;
+        nIdade[i] = 0;
     }
 
     private void pedra(float x, float y, int cor) {
@@ -222,5 +252,36 @@ final class ShinkaiDetalhes {
         }
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeJoin(Paint.Join.MITER);
+        desenharNumeros(c);
+    }
+
+    /** Os números do dano: batem grandes, assentam, sobem e somem. */
+    private void desenharNumeros(Canvas c) {
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setFakeBoldText(true);
+        paint.setTextSkewX(-0.2f);
+        for (int i = 0; i < NUMEROS; i++) {
+            if (nIdade[i] < 0) continue;
+            int t = nIdade[i];
+            float bate = Math.max(0f, 1f - t / 6f);
+            float tamanho = (nGrande[i] ? 78f : 54f) * (1f + 0.6f * bate * bate);
+            float k = t < VIDA_NUMERO - 12 ? 1f : (VIDA_NUMERO - t) / 12f;
+            float y = ny[i] - t * 0.9f;
+            String s = Integer.toString(nValor[i]);
+            paint.setTextSize(tamanho);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStrokeWidth(tamanho * 0.16f);
+            paint.setColor(Color.argb(Math.round(255 * k), 7, 8, 14));
+            c.drawText(s, nx[i], y, paint);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor((Math.round(255 * k) << 24) | (nCor[i] & 0xFFFFFF));
+            c.drawText(s, nx[i] + 3f, y + 3f, paint);
+            paint.setColor(Color.argb(Math.round(255 * k), 255, 255, 255));
+            c.drawText(s, nx[i], y, paint);
+        }
+        paint.setTextSkewX(0f);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 }

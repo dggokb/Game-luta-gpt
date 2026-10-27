@@ -1795,6 +1795,13 @@ public class GameView extends SurfaceView
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
             CombatFighter hitFighter = engine.fighter(event.defender);
             FighterState batedor = engine.fighter(event.attacker).state;
+            if (!event.blocked && event.damage > 0 && batedor.inShinkai()) {
+                // SHINKAI: o dano aparece grande, na cor do tipo, onde o golpe entrou.
+                float nx = Float.isNaN(event.impactX) ? hitFighter.x : event.impactX;
+                float ny = Float.isNaN(event.impactY) ? hitFighter.y - hitFighter.body().height(false) * 0.8f : event.impactY;
+                shinkaiDetalhes.numero(nx, ny - 30f, event.damage, batedor.shinkaiType.color,
+                    "SUPER".equals(event.moveId) && engine.fighter(event.attacker).shinkaiSuper);
+            }
             if (!event.blocked && event.damage > 0 && batedor.inShinkai(Shinkai.Type.POWER)) {
                 // SHINKAI POWER: o golpe trinca o chão e a tela sente.
                 shinkaiDetalhes.trinca(hitFighter.x, batedor.shinkaiType.color);
@@ -2036,7 +2043,7 @@ public class GameView extends SurfaceView
     private boolean superAvailable() {
         CombatFighter p = player();
         return activeFighter().profile.hasSuperAttack() &&
-            activeFighter().superMeter >= CombatConfig.SUPER_COST &&
+            activeFighter().canPaySuper() &&
             !isTagAnimationActive() &&
             (p.canAct() || CancelSystem.canCancel(p, "SUPER", engine.session(OPPONENT)));
     }
@@ -4785,7 +4792,10 @@ public class GameView extends SurfaceView
             CharacterDefinition owner = engine.fighter(e.owner).character();
             if (!echoRenderer.character().id.equals(owner.id)) echoRenderer.setCharacter(owner.id);
             echoRenderer.pose(e.move.animation.id, e.move.animationTime((e.frame + 0.5f) * FIXED_STEP), 0f);
+            // A imagem residual do SHINKAI SPEED: a silhueta translúcida na cor do tipo.
+            if (e.shinkai) echoRenderer.setOverride(shinkaiTint(0xA0000000 | (Shinkai.Type.SPEED.color & 0xFFFFFF)));
             echoRenderer.draw(c, e.x, e.y, e.facing, false, false);
+            if (e.shinkai) echoRenderer.setOverride(null);
         }
     }
 
