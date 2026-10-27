@@ -22,6 +22,14 @@ final class FighterState {
      * o gatilho de vida baixa e enquanto roda, para nenhum golpe pular a cena indo direto ao KO.
      */
     int lifeFloor;
+    /** Barra do SHINKAI (0..CombatConfig.SHINKAI_MAX); esvazia ao ativar. */
+    int shinkai;
+    /** Quadros de SHINKAI que faltam (0 fora dele). */
+    int shinkaiFrames;
+    /** Já usou o SHINKAI neste round (uma vez por personagem). */
+    boolean shinkaiUsed;
+    /** O tipo do SHINKAI dele (POWER, SPEED, ENERGY ou TECHNIQUE). */
+    final Shinkai.Type shinkaiType;
     String lifeHudLabel;
     String superHudLabel;
     String superLevelHudLabel;
@@ -33,6 +41,7 @@ final class FighterState {
         this.reserveHudLabel = "RESERVA: " + character.displayName;
         this.life = profile.maxLife;
         this.superMeter = 0;
+        this.shinkaiType = Shinkai.typeOf(character);
         refreshHudLabels();
     }
 
@@ -126,6 +135,27 @@ final class FighterState {
         life += gain;
         recoverableLife -= gain;
         refreshLifeLabel();
+    }
+
+    /** A barra do SHINKAI cheia e ainda não usada neste round. */
+    boolean shinkaiReady() {
+        return !shinkaiUsed && shinkaiFrames == 0 && shinkai >= CombatConfig.SHINKAI_MAX;
+    }
+
+    boolean inShinkai() { return shinkaiFrames > 0; }
+
+    boolean inShinkai(Shinkai.Type type) { return shinkaiFrames > 0 && shinkaiType == type; }
+
+    /** Enche a barra do SHINKAI (nada depois de usado no round, nem durante ele). */
+    void chargeShinkai(int amount) {
+        if (amount <= 0 || shinkaiUsed || shinkaiFrames > 0 || life <= 0) return;
+        shinkai = Math.min(CombatConfig.SHINKAI_MAX, shinkai + amount);
+    }
+
+    /** Round novo: o SHINKAI volta a poder ser usado (a barra fica como estava). */
+    void refreshShinkai() {
+        shinkaiUsed = false;
+        shinkaiFrames = 0;
     }
 
     float superBars() {

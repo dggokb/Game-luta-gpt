@@ -70,11 +70,8 @@ final class HudRenderer {
         /** Botão do motor de animação (nível ou OFF), ou null para não mostrar. */
         default String animacaoLabel() { return null; }
         default boolean animacaoLigada() { return false; }
-        /** Overdrive left (1 just turned on, 0 when off). */
-        float overdriveRatio();
-        float overdriveSeconds();
-        /** The Overdrive of this round has not been used yet. */
-        boolean overdriveReady();
+        /** Quadros que o SHINKAI dura (a barra ativa esvazia nesse tempo). */
+        default int shinkaiDuration() { return 480; }
         /** Demo playing (index into DemoDirector.VERSIONS), or -1. */
         int demoPlaying();
         String demoTitle();
@@ -135,6 +132,7 @@ final class HudRenderer {
     /** Same production renderer with a deterministic clock for native Canvas review. */
     void drawHudAt(Canvas c, State s, CharacterSelectRenderer portraits, double seconds) {
         effects.update(s, seconds);
+        shinkaiDuration = s.shinkaiDuration();
         reset();
         FighterState active = s.active();
         // Sem parceiro (duelo 1x1), reserve() devolve o próprio titular: o HUD mostra a vaga vazia.
@@ -149,12 +147,9 @@ final class HudRenderer {
             drawArtTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
             drawArtTeam(c, s.opponent(), s.opponentReserve(), s.opponentReserveCharacter(), true, s.opponentTagReadyRatio(), portraits);
             artwork(c, 0, 0, 1672, 280, 0f, 0f, 1280f, 170f);
-            drawSegments(c, Arena.clamp(s.tagReadyRatio(), 0f, 1f) * 5f, 174f, 96f, 330f, 11f, BLUE);
-            c.save(); c.translate(Arena.VW, 0f); c.scale(-1f, 1f);
-            // The CPU's assist meter (empty in training, where it has no reserve).
-            float cpuReady = Arena.clamp(s.opponentTagReadyRatio(), 0f, 1f);
-            drawSegments(c, cpuReady * 5f, 174f, 96f, 330f, 11f, cpuReady > 0f ? RED : 0xFF596072);
-            c.restore();
+            // Entre as vidas: a barra do SHINKAI de quem está em campo (o assist foi para o círculo).
+            drawShinkaiBar(c, active, false, 174f, 96f, 330f, 11f, shinkaiDuration);
+            drawShinkaiBar(c, s.opponent(), true, 174f, 96f, 330f, 11f, shinkaiDuration);
             drawArtPower(c, active, false);
             drawArtPower(c, s.opponent(), true);
             text(c, "PLAYER 1", 220f, 65f, 15f, Color.WHITE);
@@ -252,6 +247,7 @@ final class HudRenderer {
         c.drawCircle(554f, 115f, 8f, paint);
         paint.setColor(reserve != null && ready >= 1f ? Color.WHITE : 0xFF111723);
         c.drawCircle(554f, 115f, 4f, paint);
+        if (reserve != null) assistRing(c, 554f, 115f, 13f, ready, right ? RED : BLUE);
         c.restore();
     }
 
@@ -375,7 +371,6 @@ final class HudRenderer {
         panel(c, 82f, 30f, 503f, 65f, 28f, 0xEF060B19, accent, 5f);
         panel(c, 165f, 31f, 393f, 27f, 15f, 0xE908101E, 0xFFDDE8FF, 1.5f);
         energyLife(c, point, 109f, 63f, 474f, 26f);
-        drawSegments(c, Arena.clamp(ready, 0f, 1f) * 5f, 181f, 98f, 319f, 12f, accent);
         portrait(c, portraits, point.character, 8f, 1f, 98f, 103f, accent);
         panel(c, 83f, 114f, 394f, 31f, 16f, 0xEB070D1B, accent, 3f);
         CharacterDefinition partner = reserve == null ? absentPartner : reserve.character;
@@ -394,7 +389,9 @@ final class HudRenderer {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(reserve != null && ready >= 1f ? Color.WHITE : 0xFF454B5A);
         c.drawCircle(551f, 109f, 4f, paint);
+        if (reserve != null) assistRing(c, 551f, 109f, 14f, ready, accent);
         c.restore();
+        drawShinkaiBar(c, point, right, 181f, 98f, 319f, 12f, shinkaiDuration);
         // Text stays readable when the frame is mirrored.
         float labelX = right ? Arena.VW - 353f : 353f;
         text(c, point.hudTitle, labelX, 51f, 16f, Color.WHITE);
@@ -491,6 +488,67 @@ final class HudRenderer {
         return Color.argb(255, r, g, b);
     }
 
+    /**
+     * O assist no anel do círculo do TAG: enche até ficar pronto (aí o anel fica inteiro e o
+     * miolo branco). Era a barra de 5 partes entre as vidas, que agora é do SHINKAI.
+     */
+    private void assistRing(Canvas c, float x, float y, float radius, float ready, int accent) {
+        float k = Arena.clamp(ready, 0f, 1f);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        paint.setColor(0xFF1A2236);
+        c.drawCircle(x, y, radius, paint);
+        if (k > 0f) {
+            paint.setColor(k >= 1f ? Color.WHITE : accent);
+            c.drawArc(x - radius, y - radius, x + radius, y + radius, -90f, 360f * k, false, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    /**
+     * A barra do SHINKAI (entre a vida do titular e a do parceiro): enche na cor do tipo dele;
+     * cheia, brilha e escreve SHINKAI; ativa, esvazia com o tempo e diz o tipo; usada no round,
+     * fica apagada. Desenhada no lado dele (espelhada à direita), o texto sempre legível.
+     */
+    private void drawShinkaiBar(Canvas c, FighterState f, boolean right, float x, float y, float w, float h, int duration) {
+        int color = f.shinkaiType.color;
+        boolean active = f.inShinkai();
+        boolean ready = f.shinkaiReady();
+        float fill = active ? f.shinkaiFrames / (float)Math.max(1, duration)
+            : f.shinkaiUsed ? 0f : f.shinkai / (float)CombatConfig.SHINKAI_MAX;
+        double now = effects.now;
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        panel(c, x, y, w, h, Math.min(7f, h * 0.4f), 0xFF0A1020, f.shinkaiUsed && !active ? 0xFF4A5164 : 0xFFCED9F0, 1.3f);
+        c.save();
+        c.clipPath(shape);
+        if (fill > 0f) {
+            // Enchendo, a cor do tipo mais apagada; cheia ou ativa, viva e pulsando.
+            float glow = ready || active ? 0.75f + 0.25f * (float)Math.sin(now * (ready ? 7.0 : 11.0)) : 0.55f;
+            paint.setColor(blend(0xFF0A1020, color, glow));
+            c.drawRect(x, y, x + w * fill, y + h, paint);
+            paint.setColor(0x99FFFFFF);
+            c.drawRect(x, y + 1f, x + w * fill, y + Math.max(2f, h * 0.25f), paint);
+            if (ready || active) {
+                // Energia correndo pela barra.
+                float flow = (float)((now * (active ? 1.6 : 0.9)) % 1.0);
+                float fx0 = x + (w + 60f) * flow - 60f;
+                fxPaint.setColor(Color.WHITE);
+                fxPaint.setAlpha(120);
+                c.drawRect(Math.max(x, fx0), y, Math.min(x + w * fill, fx0 + 40f), y + h, fxPaint);
+                fxPaint.setAlpha(255);
+            }
+        }
+        c.restore();
+        if (ready || active) energyEdge(c, x - 1f, y - 2f, w + 2f, h + 4f, color, ready ? 1f : 0.6f);
+        c.restore();
+        if (!ready && !active) return;
+        float cx = right ? Arena.VW - (x + w / 2f) : x + w / 2f;
+        float pop = ready ? 1f + 0.08f * (float)Math.sin(now * 7.0) : 1f;
+        text(c, active ? "SHINKAI " + f.shinkaiType.label : "SHINKAI", cx, y + h + 3f, 15f * pop,
+            active ? Color.WHITE : blend(color, Color.WHITE, 0.55f));
+    }
+
     private void drawSegments(Canvas c, float bars, float x, float y, float w, float h, int accent) {
         float segment = (w - 20f) / 5f;
         for (int i = 0; i < 5; i++) {
@@ -532,6 +590,8 @@ final class HudRenderer {
     }
 
     private final Paint fxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    /** Quadros do SHINKAI ativo (do State, lido a cada desenho do HUD). */
+    private int shinkaiDuration = 480;
     private final Path flame = new Path();
     /** Cores do fogo do número do super, na cor da barra de cada lado: borda, meio e miolo. */
     private static final int[] FIRE_BLUE = {BLUE, 0xFF8FE6FF, 0xFFE8FCFF};
@@ -1263,44 +1323,51 @@ final class HudRenderer {
         drawComboButton(c, s.pressed(Control.COMBO));
         drawTagButton(c, s);
         drawSuperButton(c, s);
-        drawOverdriveButton(c, s);
+        drawShinkaiButton(c, s);
     }
 
-    /** OD: lit while unused this round, a draining ring while on, dim once spent. */
-    private void drawOverdriveButton(Canvas c, State s) {
-        float x = OVERDRIVE_X, y = OVERDRIVE_Y, r = OVERDRIVE_RADIUS;
-        float left = s.overdriveRatio();
-        boolean ready = s.overdriveReady();
-        boolean pressed = s.pressed(Control.OVERDRIVE);
-        int ring = 0xFFFF7A2E;
-        button(c, x, y, r, ring, pressed || left > 0f, ready || left > 0f);
-        if (left > 0f) {
-            // Draining ring while Overdrive burns.
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(5f);
-            paint.setColor(0xFFFFE08A);
-            c.drawArc(x - r - 5f, y - r - 5f, x + r + 5f, y + r + 5f, -90f, 360f * left, false, paint);
-            paint.setStyle(Paint.Style.FILL);
-        } else if (ready && !pressed) {
-            readyHalo(c, x, y, r, ring);
-        }
+    /**
+     * Botão SHINKAI: o anel mostra a barra enchendo; cheia, acende na cor do tipo; ativo, o anel
+     * esvazia com os segundos; usado no round, apagado.
+     */
+    private void drawShinkaiButton(Canvas c, State s) {
+        float x = SHINKAI_X, y = SHINKAI_Y, r = SHINKAI_RADIUS;
+        FighterState f = s.active();
+        int duration = s.shinkaiDuration();
+        float left = f.inShinkai() ? f.shinkaiFrames / (float)Math.max(1, duration) : 0f;
+        boolean ready = f.shinkaiReady();
+        boolean pressed = s.pressed(Control.SHINKAI);
+        int ring = f.shinkaiType.color;
         boolean lit = ready || left > 0f;
-        label(c, "OD", x, y + (left > 0f || !ready ? -7f : 0f), 20f, lit ? Color.WHITE : 0xFFB4BCCB);
-        if (left > 0f) label(c, overdriveLabel(s.overdriveSeconds()), x, y + 11f, 10f, Color.WHITE);
-        else if (!ready) label(c, "USADO", x, y + 11f, 9f, 0xFFB4BCCB);
+        button(c, x, y, r, ring, pressed || left > 0f, lit);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5f);
+        if (left > 0f) {
+            paint.setColor(0xFFFFFFFF);
+            c.drawArc(x - r - 5f, y - r - 5f, x + r + 5f, y + r + 5f, -90f, 360f * left, false, paint);
+        } else if (!ready && !f.shinkaiUsed && f.shinkai > 0) {
+            paint.setColor(ring);
+            c.drawArc(x - r - 5f, y - r - 5f, x + r + 5f, y + r + 5f, -90f,
+                360f * f.shinkai / CombatConfig.SHINKAI_MAX, false, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+        if (ready && !pressed) readyHalo(c, x, y, r, ring);
+        label(c, "SHINKAI", x, y + (left > 0f || f.shinkaiUsed ? -7f : 0f), 13f, lit ? Color.WHITE : 0xFFB4BCCB);
+        if (left > 0f) label(c, shinkaiLabel(f.shinkaiFrames / 60f), x, y + 11f, 10f, Color.WHITE);
+        else if (f.shinkaiUsed) label(c, "USADO", x, y + 11f, 9f, 0xFFB4BCCB);
     }
 
-    private int overdriveTenthsShown = -1;
-    private String overdriveText = "";
+    private int shinkaiTenthsShown = -1;
+    private String shinkaiText = "";
 
     /** "3.4s": rebuilt only when the tenth changes, not every frame. */
-    private String overdriveLabel(float seconds) {
+    private String shinkaiLabel(float seconds) {
         int tenths = Math.max(0, Math.round(seconds * 10f));
-        if (tenths != overdriveTenthsShown) {
-            overdriveTenthsShown = tenths;
-            overdriveText = tenths / 10 + "." + tenths % 10 + "s";
+        if (tenths != shinkaiTenthsShown) {
+            shinkaiTenthsShown = tenths;
+            shinkaiText = tenths / 10 + "." + tenths % 10 + "s";
         }
-        return overdriveText;
+        return shinkaiText;
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {

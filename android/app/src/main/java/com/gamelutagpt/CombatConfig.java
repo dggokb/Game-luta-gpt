@@ -419,16 +419,39 @@ final class CombatConfig {
     int recoverableLifePermille = 270;
     int recoverableLifePerFrame = 6;
 
-    // Overdrive (botão OD ou SUPER + TAG): once per round, about 8 seconds for the team.
-    int overdriveFrames = 480;
+    // SHINKAI (botão SHINKAI ou SUPER + TAG; docs/shinkai.md): a barra de cada lutador enche
+    // até SHINKAI_MAX; cheia, ele ativa uma vez por round e fica nele por estes quadros.
+    static final int SHINKAI_MAX = 1000;
+    int shinkaiFrames = 480;
     /** Both fighters freeze on activation; the opponent's stun waits too (combo extension). */
-    int overdriveFlashFrames = 20;
-    /** Walk, dash and air dash speed multiplier. */
-    float overdriveSpeed = 1.25f;
-    /** Meter gained in Overdrive, permille of the normal gain. */
-    int overdriveMeterPermille = 1500;
-    /** Recoverable life per frame in Overdrive, for every member (the point too). */
-    int overdriveRegenPerFrame = 12;
+    int shinkaiFlashFrames = 30;
+    /** Barra por dano: apanhando enche rápido (cheia com uns 3.300 de dano), batendo devagar. */
+    int shinkaiPerDamageTakenPermille = 300;
+    int shinkaiPerDamageDealtPermille = 100;
+    /** Por golpe defendido e pelo combo breaker. */
+    int shinkaiOnBlock = 12;
+    int shinkaiOnBreaker = 150;
+    /** Vida vermelha que volta por quadro para quem está no SHINKAI (todos os tipos). */
+    int shinkaiRegenPerFrame = 12;
+    /** POWER: o golpe que a couraça segura tira esta parte do dano; os golpes dele batem mais. */
+    int shinkaiPowerArmorPermille = 700;
+    int shinkaiPowerDamagePermille = 1200;
+    /** SPEED: andar, dash e air dash mais rápidos, um air dash a mais. */
+    float shinkaiSpeed = 1.3f;
+    /** SPEED, o sumiço (→ → com o rival até esta distância): some, aparece atrás dele. */
+    float shinkaiVanishRange = 560f;
+    int shinkaiVanishFrames = 10;
+    float shinkaiVanishBehind = 70f;
+    /** Cada sumiço gasta este tanto do tempo do SHINKAI. */
+    int shinkaiVanishCost = 45;
+    /** ENERGY: barra de Super por quadro (uma barra em 4 s) e o projétil mais forte. */
+    int shinkaiEnergyMeterPerFrame = 4;
+    float shinkaiEnergyProjectileSpeed = 1.3f;
+    int shinkaiEnergyProjectileDamagePermille = 1250;
+    /** TECHNIQUE: o parry vale se o → foi apertado até estes quadros antes do golpe chegar. */
+    int shinkaiParryWindow = 10;
+    /** Os dois congelam no parry; quem aparou sai livre e o golpe do outro continua. */
+    int shinkaiParryFreeze = 16;
 
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;

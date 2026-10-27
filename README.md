@@ -336,18 +336,19 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
     **84** air tech, levantar rápido, rolamentos · **85** DHC, vida vermelha.
 - Detalhes: `docs/combat-engine.md` (seção Demos).
 
-## Overdrive — v0.87
+## SHINKAI (substitui o Overdrive)
 
-- Botão **OD** (à esquerda de SUPER e TAG) ou **SUPER + TAG juntos**: **1 vez por round**,
-  dura **8 segundos** para o time todo.
-- Ao ligar, os dois congelam por um instante (o hitstun do CPU espera): dá para ligar **no
-  meio do combo**, cancelando o próprio golpe, e continuar.
-- Durante o Overdrive: **25% mais rápido** (andar, dash, air dash), **50% mais barra**,
-  **cancels livres** (todo golpe que acertou ou foi defendido cancela em qualquer outro,
-  ex.: H > M > H) e a **vida vermelha volta até para quem está lutando**, mais rápido.
-- O botão mostra o tempo restante; depois fica "USADO". Os botões **VIDA P1 / VIDA CPU**
-  também recarregam o Overdrive (novo round no treino).
-- **DEMO 87** mostra tudo isso. A CPU ainda não usa o Overdrive.
+- Cada lutador tem a **barra do SHINKAI** entre a vida dele e a do parceiro. Ela enche
+  apanhando (mais), batendo e defendendo. Cheia, brilha e aparece escrito **SHINKAI**.
+- Botão **SHINKAI** (à esquerda de SUPER e TAG), **SUPER + TAG juntos** ou a tecla **P**:
+  **1 vez por personagem no round**, por **8 segundos**. Dá para ligar no meio do combo.
+- Cada tipo ganha uma coisa diferente:
+  - **POWER** (p04, p09, p12, p13): corpo de aço e mais dano;
+  - **SPEED** (p03, p05, p10, p16): mais rápido e sumiço com → →, aparecendo atrás do rival;
+  - **ENERGY** (p01, p06, p08, p11): barra de Super enchendo sozinha e projéteis fortes, dois por vez;
+  - **TECHNIQUE** (p02, p07, p14, p15): cancels livres e parry tocando →.
+- No treino, **VIDA P1 / VIDA CPU** enchem a barra. **DEMO 87** mostra o SHINKAI.
+- Detalhes: `docs/shinkai.md`.
 
 ## Modo batalha (IA ON) e READY → GO
 
@@ -360,7 +361,7 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   para baixo, ao máximo nos últimos 10) o CPU fica com pressa: vai para cima para terminar a
   luta em vez de deixar o tempo acabar. O treino segue com tempo infinito (∞). Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
   também usam essa regra. Na batalha o CPU usa tudo: assist, troca, Assist → Tag, Super,
-  DHC, Guard Cancel, pushblock, Overdrive e Ultra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
+  DHC, Guard Cancel, pushblock, SHINKAI e Ultra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
 
 ## Menu inicial
 

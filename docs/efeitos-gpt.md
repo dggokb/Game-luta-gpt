@@ -162,7 +162,7 @@ Fundo de "impact frame" de mangá de luta, formato 16:9: fundo preto com linhas 
 ## Lote 2 — Super, movimento e auras
 
 Hoje: `ImpactEffects.spawnSuperJump`, `spawnSuperGlint`, `EffectsRenderer.drawSuperCharge`,
-`drawOverdrive`, `drawMechanicAura`, `drawAirDash`, `drawUltraRush`.
+`drawShinkai`, `drawMechanicAura`, `drawAirDash`, `drawUltraRush`.
 
 ### `aura_super.png` — referência do lote
 LUZ + FOLHA + TINTA. Aura de carga do Super e do Ultra.
@@ -188,8 +188,9 @@ LUZ, imagem única, TINTA. Rastro do air dash e da investida do Ultra.
 Rastro de velocidade de anime: feixe de linhas horizontais retas e finas de comprimentos diferentes, mais grossas e brilhantes à direita (onde está quem corre) e afinando para a esquerda, com algumas linhas curvas de vento. Imagem larga e baixa.
 ```
 
-### `overdrive.png`
-LUZ + FOLHA. Aura do Overdrive (hoje: oval vermelho com faíscas laranja).
+### `shinkai.png`
+LUZ + FOLHA. Aura do SHINKAI, uma por tipo. Hoje é desenhada pelo código: oval e chamas na cor do
+tipo (POWER laranja, SPEED ciano, ENERGY roxo, TECHNIQUE dourado) e um anel no chão.
 ```
 Aura de fúria de anime em volta de uma pessoa em pé (o meio é preto, sem corpo): chamas vermelhas e laranja intensas e recortadas subindo, faíscas e brasas voando para cima, contorno vermelho-escuro, muito agressiva. Os quadros: as chamas tremulando, em loop.
 ```
@@ -356,7 +357,8 @@ Confira se a palavra veio escrita certinha; se vier errada, peça de novo.
 | DEFESA PERFEITA! | defesa no tempo certo |
 | COMBO BREAKER! | escapou do combo |
 | CONTRA-GOLPE! / PUNISH COUNTER! | contra-ataque |
-| OVERDRIVE! | Overdrive |
+| SHINKAI POWER! (SPEED, ENERGY, TECHNIQUE) | SHINKAI |
+| PARRY! | Parry do SHINKAI TECHNIQUE |
 | TEAM SUPER! | Super em dupla |
 | TECH! / AIR TECH! / PUSHBLOCK! / GUARD CANCEL! / AGARRÃO! | sistema |
 | ARMADURA! / VENENO! / ONDA CARREGADA! / ECO DE SOMBRA! / COBRANÇA! / LEGIÃO DE SOMBRAS! | mecânicas de personagem |
@@ -431,7 +433,7 @@ manchado, mãos vazias), p12 (morto-vivo costurado com bandagens, curvado).
   células do super (mudam a cada quadro). A moldura do HUD já é imagem
   (`ui/hud/energy-frame.png`).
 - **Textos que mudam**: relógio, números de dano e escala do combo, ASSIST/TROCA, segundos
-  do OD, nome e grito do Ultra, menus, balões e legendas (traduzidos).
+  do SHINKAI, nome e grito do Ultra, menus, balões e legendas (traduzidos).
 - **Partículas pequenas**: os risquinhos de faísca, as pedrinhas, a chuva e as pétalas
   (centenas por segundo; imagem não melhora).
 - **Câmera e tela**: tremida, zoom, escurecer, clarão branco, câmera lenta, brilho do

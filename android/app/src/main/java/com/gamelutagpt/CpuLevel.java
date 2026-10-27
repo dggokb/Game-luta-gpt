@@ -46,7 +46,7 @@ final class CpuLevel {
     final double airTech;
     /** Intervalo entre decisões no neutro, em segundos. */
     final float decisionMin, decisionMax;
-    /** Escala das chances do kit da batalha (assist, DHC, Overdrive, troca). */
+    /** Escala das chances do kit da batalha (assist, DHC, SHINKAI, troca). */
     final double kitScale;
 
     private CpuLevel(int number, int reactionFrames, int reactionJitter, double guardAnticipation,

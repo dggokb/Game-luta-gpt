@@ -49,10 +49,6 @@ final class TeamSystem {
         int assistRequestAge = -1;
         int tagRequestAge = -1;
 
-        // Overdrive: frames left (0 when off) and whether this round's one use is gone.
-        int overdriveFrames;
-        boolean overdriveUsed;
-
         Side(int index, FighterState state) {
             this.index = index;
             members = new FighterState[]{state};
@@ -115,23 +111,26 @@ final class TeamSystem {
         s.leaving = null;
         s.leavingFrame = -1;
         s.assistRequestAge = s.tagRequestAge = -1;
-        s.overdriveFrames = 0;
+        for (FighterState m : s.members) m.shinkaiFrames = 0;
     }
 
-    boolean overdriveActive(int side) { return sides[side].overdriveFrames > 0; }
+    /** O titular do lado está no SHINKAI. */
+    boolean shinkaiActive(int side) { return sides[side].pointState().inShinkai(); }
 
-    /** The side can turn its Overdrive on now: unused this round, free or cancelling its own attack. */
-    boolean canOverdrive(CombatFighter f) {
+    /**
+     * O lutador pode ativar o SHINKAI agora: barra cheia e ainda não usado neste round, livre
+     * ou cancelando o próprio golpe (não o Super), fora da troca.
+     */
+    boolean canShinkai(CombatFighter f) {
         Side s = sides[f.index];
-        if (s.overdriveUsed || s.overdriveFrames > 0 || s.tagging() || f.locked || f.ko() || f.frozen()) return false;
+        if (!f.state.shinkaiReady() || s.tagging() || f.locked || f.ko() || f.frozen()) return false;
         return f.status == CombatFighter.Status.NEUTRAL ||
             (f.attacking() && f.attack.kind != AttackDefinition.Kind.SUPER);
     }
 
-    /** New round for the side: its Overdrive can be used again. */
-    void refreshOverdrive(int side) {
-        sides[side].overdriveUsed = false;
-        sides[side].overdriveFrames = 0;
+    /** Round novo para o lado: cada um da dupla pode usar o SHINKAI de novo. */
+    void refreshShinkai(int side) {
+        for (FighterState m : sides[side].members) m.refreshShinkai();
     }
 
     /** Horizontal offset of the point's sprite during a raw tag (it runs off and back in). */
@@ -318,20 +317,26 @@ final class TeamSystem {
         }
         advanceTag(engine, s, point);
         advanceAssist(engine, s, point);
-        // The clock waits through freezes (its own flash, Supers).
-        if (s.overdriveFrames > 0 && !engine.superFreezeActive()) s.overdriveFrames--;
+        // O SHINKAI é de quem está em campo: saiu (troca), acabou. O tempo espera os
+        // congelamentos (o próprio brilho, os Supers).
+        for (FighterState m : s.members) {
+            if (m.shinkaiFrames <= 0) continue;
+            if (m != s.pointState()) m.shinkaiFrames = 0;
+            else if (!engine.superFreezeActive()) {
+                m.shinkaiFrames--;
+                // ENERGY: a barra de Super enche sozinha.
+                if (m.shinkaiType == Shinkai.Type.ENERGY) m.addSuperMeter(config.shinkaiEnergyMeterPerFrame);
+            }
+        }
         regenerate(s);
     }
 
     /**
      * Members waiting off screen get their recoverable life back, little by little. In
-     * Overdrive every member does, the point too, and faster.
+     * SHINKAI the point gets it back too, and faster.
      */
     private void regenerate(Side s) {
-        if (s.overdriveFrames > 0) {
-            for (FighterState m : s.members) m.regenerate(config.overdriveRegenPerFrame);
-            return;
-        }
+        if (s.pointState().inShinkai()) s.pointState().regenerate(config.shinkaiRegenPerFrame);
         if (s.members.length < 2) return;
         for (FighterState m : s.members) {
             boolean onScreen = m == s.pointState() || (s.assist != null && s.assist.state == m) ||

@@ -142,7 +142,7 @@ final class CombatEngine {
     private final List<HitEvent> events = new ArrayList<>();
     /**
      * System notices of the last step, for the shell's call-outs and screen shake: "TECH",
-     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE", "OVERDRIVE", "OD_CANCEL",
+     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE", "SHINKAI", "SHINKAI_CANCEL",
      * "PROJECTILE_CLASH", "GUARD_BREAK".
      * Not hits (no damage).
      */
@@ -267,9 +267,9 @@ final class CombatEngine {
         sessionEndFrame[side] = -1;
     }
 
-    /** New round for a side (training refills): its Overdrive can be used again. */
-    void refreshOverdrive(int side) {
-        teams.refreshOverdrive(side);
+    /** New round for a side (training refills): each member can use its SHINKAI again. */
+    void refreshShinkai(int side) {
+        teams.refreshShinkai(side);
     }
 
     /**
@@ -443,7 +443,7 @@ final class CombatEngine {
             f.ultraRequestAge = -1;
             f.throwRequestAge = -1;
             f.pushblockRequestAge = -1;
-            f.overdriveRequestAge = -1;
+            f.shinkaiRequestAge = -1;
             return;
         }
         // Require a fully completed backdash AND a release to neutral before
@@ -499,7 +499,8 @@ final class CombatEngine {
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
         if (in.grab) f.throwRequestAge = 0;
-        if (in.overdrive) f.overdriveRequestAge = 0;
+        if (in.shinkai) f.shinkaiRequestAge = 0;
+        trackParryPress(f, in);
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
         boolean breakerPress = trackBreakerPress(f, in);
         if (in.pushblock) {
@@ -574,14 +575,19 @@ final class CombatEngine {
 
     private void resolve(CombatFighter f) {
         if (f.frozen()) return;
+        if (f.vanishFrames > 0) {
+            // Sumido (SHINKAI SPEED): nada sai até aparecer; o golpe apertado espera no buffer.
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
         endFinishedStates(f);
         if (f.locked || f.ko()) {
             f.dashRequest = f.backdashRequest = false;
             return;
         }
 
-        if (f.overdriveRequestAge >= 0 && teams.canOverdrive(f)) {
-            overdrive(f);
+        if (f.shinkaiRequestAge >= 0 && teams.canShinkai(f)) {
+            shinkai(f);
             f.dashRequest = f.backdashRequest = false;
             return;
         }
@@ -634,6 +640,11 @@ final class CombatEngine {
             f.clearAttack();
         }
 
+        if (f.dashRequest && canVanish(f)) {
+            vanish(f);
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround()) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
@@ -656,45 +667,121 @@ final class CombatEngine {
             // Correndo até o outro, o golpe apertado espera chegar perto (não sai de longe). Na
             // preparação do pulo e na aterrissagem do pulo vazio ele espera no buffer.
             if (!breakerChasing(f) && !f.busyOnGround()) startFromBuffer(f, false);
-        } else if (f.attacking() && (CancelSystem.windowOpen(f) || overdriveCancelOpen(f))) {
+        } else if (f.attacking() && (CancelSystem.windowOpen(f) || shinkaiCancelOpen(f))) {
             startFromBuffer(f, true);
         }
     }
 
     /**
-     * Overdrive: the team's clock starts and both fighters freeze for the flash (the
-     * opponent's stun waits, so a combo can go on). It cancels the fighter's own attack.
+     * SHINKAI: a barra cheia vira {@link CombatConfig#shinkaiFrames} quadros do estado do tipo dele
+     * e os dois congelam no brilho (o stun do outro espera, então o combo segue). Cancela o
+     * próprio golpe. Uma vez por personagem no round.
      */
-    private void overdrive(CombatFighter f) {
-        TeamSystem.Side side = teams.sides[f.index];
-        side.overdriveUsed = true;
-        side.overdriveFrames = config.overdriveFrames;
-        f.overdriveRequestAge = -1;
+    private void shinkai(CombatFighter f) {
+        FighterState s = f.state;
+        s.shinkaiUsed = true;
+        s.shinkai = 0;
+        s.shinkaiFrames = config.shinkaiFrames;
+        f.shinkaiRequestAge = -1;
         if (f.attacking()) {
             f.status = CombatFighter.Status.NEUTRAL;
             f.clearAttack();
         }
         f.buffer.clear();
         CombatFighter other = fighters[1 - f.index];
-        f.hitstop = Math.max(f.hitstop, config.overdriveFlashFrames);
-        other.hitstop = Math.max(other.hitstop, config.overdriveFlashFrames);
-        superFreeze = Math.max(superFreeze, config.overdriveFlashFrames);
-        cues.add("OVERDRIVE");
+        f.hitstop = Math.max(f.hitstop, config.shinkaiFlashFrames);
+        other.hitstop = Math.max(other.hitstop, config.shinkaiFlashFrames);
+        superFreeze = Math.max(superFreeze, config.shinkaiFlashFrames);
+        cues.add("SHINKAI");
     }
 
-    /** In Overdrive an attack that already hit or was blocked cancels into any other move. */
-    private boolean overdriveCancelOpen(CombatFighter f) {
-        return f.attacking() && teams.overdriveActive(f.index) && f.outcome != CombatFighter.Outcome.NONE &&
+    /** TECHNIQUE no SHINKAI: o golpe que acertou ou foi defendido cancela em qualquer outro. */
+    private boolean shinkaiCancelOpen(CombatFighter f) {
+        return f.attacking() && f.state.inShinkai(Shinkai.Type.TECHNIQUE) && f.outcome != CombatFighter.Outcome.NONE &&
             f.attack.kind != AttackDefinition.Kind.SUPER;
     }
 
-    private boolean overdriveCancel(CombatFighter f, AttackDefinition next, ComboSession session) {
-        return overdriveCancelOpen(f) && !next.id.equals(f.attack.id) && (session == null || session.allows(next));
+    private boolean shinkaiCancel(CombatFighter f, AttackDefinition next, ComboSession session) {
+        return shinkaiCancelOpen(f) && !next.id.equals(f.attack.id) && (session == null || session.allows(next));
     }
 
-    /** Meter for a hit or a block; more of it in Overdrive. */
+    /**
+     * SPEED no SHINKAI, o sumiço: → → no chão, livre, com o rival perto. Some por alguns quadros
+     * (nada acerta) e aparece atrás dele; cada um gasta um pouco do tempo do SHINKAI.
+     */
+    private boolean canVanish(CombatFighter f) {
+        if (!f.state.inShinkai(Shinkai.Type.SPEED) || f.state.shinkaiFrames <= config.shinkaiVanishCost) return false;
+        if (f.status != CombatFighter.Status.NEUTRAL || !f.grounded || f.busyOnGround() || f.vanishFrames > 0) return false;
+        CombatFighter other = fighters[1 - f.index];
+        return Math.abs(other.x - f.x) <= config.shinkaiVanishRange;
+    }
+
+    private void vanish(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        f.state.shinkaiFrames -= config.shinkaiVanishCost;
+        f.vanishFrames = config.shinkaiVanishFrames;
+        f.vanishFromX = f.x;
+        // Atrás do rival; encurralado, do lado que cabe.
+        float behind = other.x + f.facing * config.shinkaiVanishBehind;
+        if (behind < Arena.LEFT_BOUND || behind > Arena.RIGHT_BOUND) behind = other.x - f.facing * config.shinkaiVanishBehind;
+        f.vanishToX = Arena.clamp(behind, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        f.invulnFrames = Math.max(f.invulnFrames, config.shinkaiVanishFrames + 2);
+        f.forwardDashing = false;
+        f.backdashFrames = 0;
+        cues.add("VANISH");
+    }
+
+    /** O sumiço anda: no último quadro ele aparece do outro lado, já virado para o rival. */
+    private void advanceVanish(CombatFighter f) {
+        if (f.sinceVanish < 999) f.sinceVanish++;
+        if (f.vanishFrames <= 0) return;
+        if (--f.vanishFrames > 0) return;
+        f.x = f.vanishToX;
+        f.vx = 0f;
+        f.sinceVanish = 0;
+        CombatFighter other = fighters[1 - f.index];
+        f.facing = other.x >= f.x ? 1 : -1;
+    }
+
+    /** TECHNIQUE: conta os quadros desde o último → apertado (o parry pede o toque, não o segurar). */
+    private void trackParryPress(CombatFighter f, FighterInput in) {
+        int dir = horizontal(in.direction);
+        if (f.parryAge >= 0 && ++f.parryAge > config.shinkaiParryWindow) f.parryAge = -1;
+        if (dir == f.facing && f.lastHorizontal != f.facing && f.state.inShinkai(Shinkai.Type.TECHNIQUE)) f.parryAge = 0;
+        f.lastHorizontal = dir;
+    }
+
+    /**
+     * O parry da TECHNIQUE: livre (ou defendendo) com o → apertado até {@link CombatConfig#shinkaiParryWindow}
+     * quadros antes. Agarrão não se apara.
+     */
+    private boolean parries(CombatFighter d, AttackDefinition attack, boolean projectile) {
+        if (!d.state.inShinkai(Shinkai.Type.TECHNIQUE) || d.parryAge < 0) return false;
+        if (!projectile && attack.mechanics.grab) return false;
+        return d.status == CombatFighter.Status.NEUTRAL || d.status == CombatFighter.Status.BLOCKSTUN;
+    }
+
+    private void parry(CombatFighter a, CombatFighter d, boolean projectile, String moveId) {
+        d.parryAge = -1;
+        d.status = CombatFighter.Status.NEUTRAL;
+        d.clearAttack();
+        d.stunLeft = d.stunTotal = 0;
+        d.forwardDashing = false;
+        d.backdashFrames = 0;
+        d.hitstop = Math.max(d.hitstop, config.shinkaiParryFreeze);
+        if (!projectile) a.hitstop = Math.max(a.hitstop, config.shinkaiParryFreeze);
+        cues.add("PARRY");
+        events.add(new HitEvent(a.index, d.index, 0, true, projectile, moveId));
+    }
+
+    /** Barra do SHINKAI pelo dano: quem apanhou enche mais, quem bateu menos. */
+    private void chargeShinkai(CombatFighter a, CombatFighter d, int damage) {
+        d.state.chargeShinkai(damage * config.shinkaiPerDamageTakenPermille / 1000);
+        a.state.chargeShinkai(damage * config.shinkaiPerDamageDealtPermille / 1000);
+    }
+
+    /** Meter for a hit or a block. */
     private void gainMeter(CombatFighter f, int amount) {
-        if (teams.overdriveActive(f.index)) amount = amount * config.overdriveMeterPermille / 1000;
         f.state.addSuperMeter(amount);
     }
 
@@ -800,19 +887,20 @@ final class CombatEngine {
 
     private void startFromBuffer(final CombatFighter f, final boolean cancel) {
         if (f.buffer.size() == 0) return;
-        final boolean projectileAlive = hasProjectile(energyProjectiles, f.index);
+        // Um projétil por vez; no SHINKAI ENERGY, dois.
+        final boolean projectileAlive = countProjectiles(energyProjectiles, f.index) >= (f.state.inShinkai(Shinkai.Type.ENERGY) ? 2 : 1);
         final ComboSession session = sessions[1 - f.index];
         InputBuffer.Entry entry = f.buffer.select(e -> {
             AttackDefinition next = CancelSystem.resolve(f, e, projectileAlive, null);
             if (next == null) return null;
-            if (cancel && !CancelSystem.canCancel(f, next.id, session) && !overdriveCancel(f, next, session)) {
+            if (cancel && !CancelSystem.canCancel(f, next.id, session) && !shinkaiCancel(f, next, session)) {
                 return null;
             }
             return next;
         }, f.state.profile.inputPriority, resolved);
         if (entry == null) return;
         AttackDefinition next = resolved[0];
-        if (cancel && !CancelSystem.canCancel(f, next.id, session)) cues.add("OD_CANCEL");
+        if (cancel && !CancelSystem.canCancel(f, next.id, session)) cues.add("SHINKAI_CANCEL");
         CancelSystem.resolve(f, entry, projectileAlive, autoStep);
         f.buffer.consume(entry);
         startAttack(f, next, entry.strength, autoStep[0]);
@@ -934,7 +1022,8 @@ final class CombatEngine {
 
     /** Air dash: a fixed burst forward (or back) that holds the height; one per jump (an acrobat has more). */
     private void startAirDash(CombatFighter f, boolean back) {
-        f.airDashUsed = ++f.airDashCount >= Math.max(1, f.state.profile.airDashes);
+        int airDashes = Math.max(1, f.state.profile.airDashes) + (f.state.inShinkai(Shinkai.Type.SPEED) ? 1 : 0);
+        f.airDashUsed = ++f.airDashCount >= airDashes;
         f.airDashBack = back;
         f.airDashDirection = back ? -f.facing : f.facing;
         f.airDashFrames = back ? config.backAirDashFrames : config.airDashFrames;
@@ -1112,8 +1201,9 @@ final class CombatEngine {
         if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.throwBufferFrames) f.throwRequestAge = -1;
         if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
         if (f.techRequestAge >= 0 && ++f.techRequestAge > config.bufferFrames) f.techRequestAge = -1;
-        if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
+        if (f.shinkaiRequestAge >= 0 && ++f.shinkaiRequestAge > config.bufferFrames) f.shinkaiRequestAge = -1;
         if (f.invulnFrames > 0) f.invulnFrames--;
+        advanceVanish(f);
         if (f.throwProtect > 0) f.throwProtect--;
         if (f.backdashCooldown > 0) f.backdashCooldown--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
@@ -1355,6 +1445,7 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        if (f.vanishFrames > 0) return;
         // The winner has already won: no stale held direction, dash or air
         // momentum may translate the victory animation around the arena.
         // Keep the defeated fighter's knockdown and physics untouched.
@@ -1373,8 +1464,8 @@ final class CombatEngine {
         if (!f.grounded && f.status != CombatFighter.Status.NEUTRAL && !f.attacking()) {
             f.jumpMode = CombatFighter.PULO_LIVRE;
         }
-        // Overdrive: the team moves faster.
-        float boost = teams.overdriveActive(f.index) ? config.overdriveSpeed : 1f;
+        // SHINKAI SPEED: anda, corre e dá air dash mais rápido.
+        float boost = f.state.inShinkai(Shinkai.Type.SPEED) ? config.shinkaiSpeed : 1f;
         if (f.vx != 0f && f.status == CombatFighter.Status.AIR_HITSTUN) {
             f.x += f.vx * CombatConfig.DT;
             boolean reached = f.bounce == CombatFighter.BOUNCE_WALL &&
@@ -1749,6 +1840,7 @@ final class CombatEngine {
      */
     private void comboBreaker(CombatFighter a, CombatFighter d) {
         d.state.spendSuperMeter(config.comboBreakerCost);
+        d.state.chargeShinkai(config.shinkaiOnBreaker);
         d.breakerPressCounts = false;
         d.guardPressCounts = false;
         endSession(d.index);
@@ -1962,6 +2054,12 @@ final class CombatEngine {
             range *= 1f + 0.5f * full;
             if (f.charged()) cues.add("CHARGED");
         }
+        if (!superKind && f.state.inShinkai(Shinkai.Type.ENERGY)) {
+            // SHINKAI ENERGY: o projétil sai maior, mais rápido e mais forte.
+            speed *= config.shinkaiEnergyProjectileSpeed;
+            damage = damage * config.shinkaiEnergyProjectileDamagePermille / 1000;
+            radius *= 1.3f;
+        }
         float height = superKind ? data.spawnHeight(false, !f.grounded) : data.spawnHeight(f.crouching, !f.grounded);
         // Projétil baixo (sombra): corre colado no chão, mesmo lançado do alto.
         float base = !superKind && f.attack.low ? Arena.GROUND_Y : f.y;
@@ -2139,6 +2237,17 @@ final class CombatEngine {
     /** Whether {@code owner} still has an energy projectile on screen (one at a time). */
     boolean energyProjectileAlive(int owner) {
         return hasProjectile(energyProjectiles, owner);
+    }
+
+    /** Energy projectiles of {@code owner} on screen. */
+    int countEnergyProjectiles(int owner) {
+        return countProjectiles(energyProjectiles, owner);
+    }
+
+    private static int countProjectiles(List<Projectile> projectiles, int owner) {
+        int count = 0;
+        for (Projectile p : projectiles) if (p.ownerIndex == owner) count++;
+        return count;
     }
 
     private static boolean hasProjectile(List<Projectile> projectiles, int owner) {
@@ -2897,6 +3006,13 @@ final class CombatEngine {
             comboBreaker(a, d);
             return;
         }
+        if (parries(d, attack, projectile)) {
+            // SHINKAI TECHNIQUE: aparou. Nada entra; o golpe dele segue e quem aparou está livre.
+            if (multi) a.hitsOnTarget = attack.maxHits;
+            parry(a, d, projectile, attack.id);
+            if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
+            return;
+        }
 
         AttackDefinition.Mechanics stance = d.mechanics();
         if (!projectile && stance.counterAt(d.attackFrame) && reads(stance.counter, attack, !a.grounded)) {
@@ -2935,6 +3051,7 @@ final class CombatEngine {
             block(a, d, attack, guard, direction, projectile, !lastStrike,
                 multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(attack, base));
             if (multi) a.strikeBlocked = true;
+            d.state.chargeShinkai(config.shinkaiOnBlock);
             if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
             // A rasteira defendida não termina a animação: corta como no acerto (vantagem igual).
@@ -2945,6 +3062,8 @@ final class CombatEngine {
 
         // Fury: the attacker hits harder the less life it has left.
         int raw = base * a.state.profile.furyScale(a.state.life) / 1000;
+        // SHINKAI POWER: os golpes dele batem mais forte.
+        if (a.state.inShinkai(Shinkai.Type.POWER)) raw = raw * config.shinkaiPowerDamagePermille / 1000;
         if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
             // Super armor: the damage goes through, the stun does not; the move carries on.
             d.armorUsed++;
@@ -2954,6 +3073,16 @@ final class CombatEngine {
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
             cues.add("ARMOR");
             events.add(new HitEvent(a.index, d.index, raw, false, projectile, attack.id));
+            return;
+        }
+        if (shinkaiArmor(d, attack, projectile, pounding)) {
+            // SHINKAI POWER, corpo de aço: aguenta o golpe sem perder a ação, com menos dano.
+            int soft = raw * config.shinkaiPowerArmorPermille / 1000;
+            d.state.takeDamage(soft, config.recoverableLifePermille);
+            freeze(a, d, attack.hitstopFrames, projectile);
+            if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.HIT;
+            cues.add("SHINKAI_ARMOR");
+            events.add(new HitEvent(a.index, d.index, soft, false, projectile, attack.id));
             return;
         }
         if (naturalArmor(d, attack, projectile)) {
@@ -2990,6 +3119,7 @@ final class CombatEngine {
         // Later strikes of the same move keep the scale of its first strike.
         int damage = firstStrike ? session.registerHit(attack, raw, config) : session.registerFollowUp(raw);
         d.state.takeDamage(damage, config.recoverableLifePermille);
+        chargeShinkai(a, d, damage);
         if (firstStrike) gainMeter(a, CombatRules.superGainOnHit(attack.strength));
         if (attack.mechanics.poisonDamage > 0) {
             d.state.poison(attack.mechanics.poisonDamage, attack.mechanics.poisonFrames);
@@ -3163,6 +3293,16 @@ final class CombatEngine {
         answer.attack = d.attack;
         answer.hitbox = 0;
         applyContact(answer);
+    }
+
+    /**
+     * SHINKAI POWER segura o golpe: numa ação normal ou num golpe (não atordoado, derrubado,
+     * agarrado), contra tudo menos agarrão e Super.
+     */
+    private boolean shinkaiArmor(CombatFighter d, AttackDefinition attack, boolean projectile, boolean pounding) {
+        if (!d.state.inShinkai(Shinkai.Type.POWER) || pounding) return false;
+        if (attack.kind == AttackDefinition.Kind.SUPER || (!projectile && attack.mechanics.grab)) return false;
+        return d.status == CombatFighter.Status.NEUTRAL || d.attacking();
     }
 
     /**

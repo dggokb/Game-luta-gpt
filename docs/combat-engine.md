@@ -133,7 +133,7 @@ humano**.
     errado ou defendido inseguro, guarda quebrada: `ultraPunish`) e emendado no combo quando
     o golpe dela deixa o rival atordoado até ela poder apertar (`ultraLinks`, o frame data do
     golpe; o Ultra só começa do neutro, para todo mundo);
-  - **Overdrive** para esticar o combo que acertou (mais nos altos) em vez do sorteio de vida
+  - **SHINKAI** (barra cheia) para esticar o combo que acertou (mais nos altos) em vez do sorteio de vida
     baixa; **pushblock** (gasta barra) só com a guarda perto de quebrar;
   - **agarram** mais quem ficou na defesa há pouco (`rivalBlocked`, 1,5 s de memória).
   Medido em batalha 2x2 contra o jogador simulado (nível 8): Super de 1,0/min com 38% de
@@ -172,8 +172,8 @@ Ordem de cada quadro (`AiController.fill`):
 1. agarrada: tech **por palpite** (a janela do tech, 12 quadros, é menor que a reação): só se
    ela já esperava o agarrão (o rival estava colado no que ela viu antes dele agarrar);
 2. no ar apanhando / caída: air tech e opções de levantar, com a chance do nível;
-3. kit da batalha (assist, DHC, Overdrive, troca, Ultra, pushblock, Guard Cancel); o assist e o
-   Overdrive no meio do combo só depois de *ver* que acertou;
+3. kit da batalha (assist, DHC, SHINKAI, troca, Ultra, pushblock, Guard Cancel); o assist e o
+   SHINKAI no meio do combo só depois de *ver* que acertou;
 4. o próprio golpe: o **caderno de combos** segue a rota;
 5. **defesa por reação**: golpe vindo (agachada contra golpe baixo; em pé contra pulo), pulo
    vindo (em pé) ou projétil (defende quando ela chega ou pula por cima na hora certa; ver
@@ -421,7 +421,7 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
   - **Super** cancelando um golpe que acertou (além do Super à distância de antes) e **DHC**
     quando o próprio Super já saiu;
   - **Guard Cancel Tag** e **pushblock** quando está defendendo;
-  - **Overdrive** no meio do combo ou com a vida baixa; **Ultra** com 3 barras e perto.
+  - **SHINKAI** (barra cheia) no meio do combo ou com a vida baixa; **Ultra** com 3 barras e perto.
   - Chances e distâncias: constantes no topo do `AiController`.
 - O parceiro do CPU em campo (assist, ou saindo depois do Assist → Tag) é desenhado com as
   cores normais, como o titular; a arte dele já vem carregada na batalha. O Ultra do CPU usa o pack do
@@ -429,27 +429,20 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
 
 Testes: `BattleFlowTest`, `AiFullKitTest`.
 
-## Overdrive — v0.87
+## SHINKAI (substitui o Overdrive da v0.87)
 
-- Entrada: `FighterInput.overdrive` (botão OD em `ControlsLayout.OVERDRIVE_*`, ou SUPER + TAG
-  no mesmo quadro no `PadInput`, que então não manda nem o Super nem o assist). Fica no
-  buffer como os outros pedidos (`overdriveRequestAge`).
-- Estado por lado em `TeamSystem.Side` (`overdriveFrames`, `overdriveUsed`): **1 vez por
-  round**, `CombatConfig.overdriveFrames` = 480 (8 s). `refreshOverdrive(side)` começa um
-  round novo (os botões VIDA do treino chamam).
-- Liga em `NEUTRAL` ou **cancelando o próprio golpe** (não Super, não em stun, não no tag).
-  Os dois congelam `overdriveFlashFrames` (20) e o super freeze segura projéteis: o stun do
-  oponente espera, então o combo continua. Cue `OVERDRIVE`. O relógio não anda em freeze.
-- Efeitos enquanto dura (para o time):
-  - velocidade × `overdriveSpeed` (1.25): andar, dash, backdash, air dash;
-  - barra × `overdriveMeterPermille` (1500) no acerto e na defesa;
-  - **cancels livres**: golpe que acertou ou foi defendido cancela em qualquer outro golpe
-    diferente dele (normais, especiais, Super), respeitando os limites do combo
-    (`ComboSession.allows`, juggle). Cue `OD_CANCEL` quando só o Overdrive permitia;
-  - vida recuperável volta para **todos** os membros, inclusive o point, a
-    `overdriveRegenPerFrame` (12/quadro).
-- Tela: botão OD com anel do tempo restante, banner "OVERDRIVE!", aura vermelha
-  (`EffectsRenderer.drawOverdrive`). Testes: `OverdriveTest` e `DemoDirectorTest` (demo 87).
+Barra própria de cada lutador (entre a vida do titular e a do parceiro), que enche apanhando,
+batendo e defendendo. Cheia, ela ativa uma vez por personagem no round, por 8 s, com o botão
+SHINKAI (onde era o OD), SUPER + TAG ou a tecla P. Na ativação os dois congelam e o combo
+continua. Todos recuperam a vida vermelha; o resto vem do tipo:
+
+- **POWER**: corpo de aço e mais dano;
+- **SPEED**: mais rápido, air dash extra e o sumiço com → →;
+- **ENERGY**: barra de Super enchendo sozinha e projéteis mais fortes, dois por vez;
+- **TECHNIQUE**: cancels livres e parry com → tocado.
+
+Regras, números, a divisão do elenco e o que falta: [shinkai.md](shinkai.md).
+O assist (antes a barra de 5 partes) agora aparece como um anel em volta do círculo do TAG.
 
 ## Demos das versões e CPU de treino — v0.86
 

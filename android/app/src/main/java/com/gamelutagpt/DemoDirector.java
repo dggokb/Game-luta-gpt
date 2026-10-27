@@ -250,32 +250,28 @@ final class DemoDirector {
                     c -> c.mark >= 0 && c.engine.team(0).pointState() != c.team[0] && c.team[0].life > c.value),
             };
             case 6: return new Step[] {
-                new Step("OVERDRIVE", "botão OD (ou SUPER+TAG), 1 vez por round: 8 s mais rápido e com mais barra", 150,
+                new Step("SHINKAI", "barra cheia: botão SHINKAI (ou SUPER+TAG), 1 vez por personagem no round, 8 s", 150,
                     c -> c.engine.restage(X - 200f, X + 420f),
+                    (c, p1, cpu) -> { if (c.t == 0) p1.shinkai = true; },
+                    c -> c.cue("SHINKAI")),
+                new Step("ENERGY: DOIS PROJÉTEIS", "no SHINKAI ENERGY (o P01) sai uma bola atrás da outra", 150,
+                    c -> c.engine.restage(X - 300f, X + 500f),
                     (c, p1, cpu) -> {
-                        if (c.t == 0) p1.overdrive = true;
-                        if (c.t == 30) p1.dash = true;
-                        if (c.t >= 30 && c.t < 70) p1.direction = 1;
-                        if (c.t == 70) p1.light = true;
+                        if (c.t == 0) p1.shinkai = true;
+                        if (c.t >= 40 && c.p1().canAct()) p1.special = "L";
+                        c.value = Math.max(c.value, c.engine.countEnergyProjectiles(0));
                     },
-                    c -> c.cue("OVERDRIVE")),
-                new Step("CANCELS LIVRES", "no Overdrive todo golpe que acerta cancela em outro: H > M > H", 150,
-                    c -> c.placeApart(X, 12f),
-                    (c, p1, cpu) -> {
-                        if (c.t == 0) p1.overdrive = true;
-                        if (c.t >= 24) c.sequence(c.p1(), p1, "H", "M", "H");
-                    },
-                    c -> c.value >= 3 && c.engine.session(1) != null && c.engine.session(1).hitCount >= 3),
-                new Step("OVERDRIVE NO MEIO DO COMBO", "L > M acertou: OD congela o CPU e o combo segue com 2L > 2M", 150,
+                    c -> c.value >= 2),
+                new Step("SHINKAI NO MEIO DO COMBO", "L > M acertou: o SHINKAI congela o CPU e o combo segue com 2L > 2M", 150,
                     c -> c.placeApart(X, 12f),
                     (c, p1, cpu) -> {
                         c.sequence(c.p1(), p1, "L", "M");
                         if (c.value == 2 && c.p1().outcome == CombatFighter.Outcome.HIT && c.mark < 0) {
                             c.mark = c.t;
-                            p1.overdrive = true;
+                            p1.shinkai = true;
                         }
                         // After the flash: a fresh route the M could not cancel into.
-                        if (c.mark >= 0 && c.t > c.mark + 2 && c.t < c.mark + 60) {
+                        if (c.mark >= 0 && c.t > c.mark + 2 && c.t < c.mark + 70) {
                             String id = c.attackId(c.p1());
                             // ↓ segurado de 2L a 2M: soltar e apertar de novo seria o ↓↓ de um especial.
                             p1.direction = 3;
@@ -284,13 +280,13 @@ final class DemoDirector {
                         }
                     },
                     c -> c.mark >= 0 && c.hit(0, "2M")),
-                new Step("VIDA VERMELHA EM CAMPO", "no Overdrive a vida vermelha volta até para quem está lutando", 150,
+                new Step("VIDA VERMELHA EM CAMPO", "no SHINKAI a vida vermelha volta para quem está lutando", 150,
                     c -> {
                         c.placeApart(X, 200f);
                         c.team[0].takeDamage(3000, c.config().recoverableLifePermille);
                         c.value = c.team[0].life;
                     },
-                    (c, p1, cpu) -> { if (c.t == 0) p1.overdrive = true; },
+                    (c, p1, cpu) -> { if (c.t == 0) p1.shinkai = true; },
                     c -> c.engine.team(0).pointState() == c.team[0] && c.team[0].life > c.value),
             };
             default: throw new IllegalArgumentException("demo " + demo);
@@ -320,7 +316,8 @@ final class DemoDirector {
     private FighterState[] saved = new FighterState[0];
     private int[] savedLife = new int[0], savedRecoverable = new int[0], savedMeter = new int[0];
     private int savedPoint;
-    private final boolean[] savedOverdriveUsed = new boolean[2];
+    private int[] savedShinkai;
+    private boolean[] savedShinkaiUsed;
 
     boolean active() { return demo >= 0; }
     /** Demo playing (index into {@link #VERSIONS}), or -1. */
@@ -360,7 +357,12 @@ final class DemoDirector {
             savedMeter[i] = saved[i].superMeter;
         }
         savedPoint = engine.team(0).point;
-        for (int side = 0; side < 2; side++) savedOverdriveUsed[side] = engine.team(side).overdriveUsed;
+        savedShinkai = new int[saved.length];
+        savedShinkaiUsed = new boolean[saved.length];
+        for (int i = 0; i < saved.length; i++) {
+            savedShinkai[i] = saved[i].shinkai;
+            savedShinkaiUsed[i] = saved[i].shinkaiUsed;
+        }
         demo = index;
         steps = steps(index);
         results = new boolean[steps.length];
@@ -375,11 +377,13 @@ final class DemoDirector {
         ctx.mark = -1;
         ctx.value = 0;
         ctx.engine.setTeam(0, ctx.team);
-        ctx.engine.refreshOverdrive(0);
-        ctx.engine.refreshOverdrive(1);
+        ctx.engine.refreshShinkai(0);
+        ctx.engine.refreshShinkai(1);
         for (FighterState f : saved) {
             f.restoreLife();
             f.superMeter = 0;
+            // A barra do SHINKAI começa cheia em toda demo (a do v0.87 mostra ele).
+            f.shinkai = CombatConfig.SHINKAI_MAX;
         }
         ctx.engine.restage(homeFirstX, homeSecondX);
         steps[index].setup.apply(ctx);
@@ -420,7 +424,11 @@ final class DemoDirector {
         }
         engine.setTeam(0, ctx.team);
         engine.restage(homeFirstX, homeSecondX);
-        for (int side = 0; side < 2; side++) engine.team(side).overdriveUsed = savedOverdriveUsed[side];
+        for (int i = 0; i < saved.length; i++) {
+            saved[i].shinkai = savedShinkai[i];
+            saved[i].shinkaiUsed = savedShinkaiUsed[i];
+            saved[i].shinkaiFrames = 0;
+        }
         if (savedPoint != 0) {
             engine.team(0).point = savedPoint;
             engine.setFighterState(0, ctx.team[savedPoint]);

@@ -19,7 +19,7 @@ import android.view.KeyEvent;
  * TAG         O                  RB
  * agarrão     H (ou J + K)       RT
  * pushblock   ; (ou K + L)       R3
- * OVERDRIVE   P (ou I + O)       LT
+ * SHINKAI     P (ou I + O)       LT
  * pausa       Esc                START
  * seleção     F2                 SELECT (no modo história: a pausa)
  * DEBUG       F1                 (só no modo teste, como os botões de teste)
@@ -94,7 +94,7 @@ final class HardwareInput {
             case KeyEvent.KEYCODE_O: case KeyEvent.KEYCODE_BUTTON_R1: return PadInput.Button.TAG;
             case KeyEvent.KEYCODE_H: case KeyEvent.KEYCODE_BUTTON_R2: return PadInput.Button.THROW;
             case KeyEvent.KEYCODE_SEMICOLON: case KeyEvent.KEYCODE_BUTTON_THUMBR: return PadInput.Button.PUSHBLOCK;
-            case KeyEvent.KEYCODE_P: case KeyEvent.KEYCODE_BUTTON_L2: return PadInput.Button.OVERDRIVE;
+            case KeyEvent.KEYCODE_P: case KeyEvent.KEYCODE_BUTTON_L2: return PadInput.Button.SHINKAI;
             default: return null;
         }
     }

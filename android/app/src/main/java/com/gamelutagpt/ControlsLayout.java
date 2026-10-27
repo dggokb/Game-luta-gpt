@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
 
     static final float DPAD_X = 185f;
     static final float DPAD_Y = 545f;
@@ -55,10 +55,10 @@ final class ControlsLayout {
     static final float SUPER_Y = 628f;
     static final float SUPER_RADIUS = 54f;
 
-    // Overdrive (v0.87): its own button left of SUPER and TAG (SUPER + TAG together also works).
-    static final float OVERDRIVE_X = 790f;
-    static final float OVERDRIVE_Y = 555f;
-    static final float OVERDRIVE_RADIUS = 40f;
+    // SHINKAI (era o OD da v0.87): its own button left of SUPER and TAG (SUPER + TAG together also works).
+    static final float SHINKAI_X = 790f;
+    static final float SHINKAI_Y = 555f;
+    static final float SHINKAI_RADIUS = 40f;
 
     static final float AI_BUTTON_LEFT = 1082f;
     static final float AI_BUTTON_TOP = 176f;
@@ -150,7 +150,7 @@ final class ControlsLayout {
         }
         if (dpadCaptures(x, y)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
-        if (insideCircle(x, y, OVERDRIVE_X, OVERDRIVE_Y, OVERDRIVE_RADIUS)) return Control.OVERDRIVE;
+        if (insideCircle(x, y, SHINKAI_X, SHINKAI_Y, SHINKAI_RADIUS)) return Control.SHINKAI;
         if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;
         if (insideCircle(x, y, PUSHBLOCK_X, PUSHBLOCK_Y, THROW_RADIUS)) return Control.PUSHBLOCK;
         if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) return Control.LIGHT;

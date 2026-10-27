@@ -412,7 +412,7 @@ public class GameView extends SurfaceView
     private int tagPointer = -1;
     private int throwPointer = -1;
     private int pushblockPointer = -1;
-    private int overdrivePointer = -1;
+    private int shinkaiPointer = -1;
     /** "AGARRÃO!" / "TECH!" over the fight, and how many frames it still shows. */
     private String throwBanner;
     private int throwBannerFrames;
@@ -463,7 +463,7 @@ public class GameView extends SurfaceView
     }
 
     private void releaseAllPointers() {
-        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = overdrivePointer = superPointer = -1;
+        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = shinkaiPointer = superPointer = -1;
         healPlayerPointer = healOpponentPointer = -1;
     }
 
@@ -499,7 +499,7 @@ public class GameView extends SurfaceView
     private boolean ownedByButton(int pointerId) {
         return pointerId == lightPointer || pointerId == mediumPointer || pointerId == heavyPointer ||
             pointerId == comboPointer || pointerId == tagPointer || pointerId == throwPointer ||
-            pointerId == pushblockPointer || pointerId == overdrivePointer || pointerId == superPointer ||
+            pointerId == pushblockPointer || pointerId == shinkaiPointer || pointerId == superPointer ||
             pointerId == healPlayerPointer || pointerId == healOpponentPointer;
     }
 
@@ -521,7 +521,7 @@ public class GameView extends SurfaceView
         if (tagPointer != -1 && touchSlot(tagPointer) < 0) tagPointer = -1;
         if (throwPointer != -1 && touchSlot(throwPointer) < 0) throwPointer = -1;
         if (pushblockPointer != -1 && touchSlot(pushblockPointer) < 0) pushblockPointer = -1;
-        if (overdrivePointer != -1 && touchSlot(overdrivePointer) < 0) overdrivePointer = -1;
+        if (shinkaiPointer != -1 && touchSlot(shinkaiPointer) < 0) shinkaiPointer = -1;
         if (superPointer != -1 && touchSlot(superPointer) < 0) superPointer = -1;
         if (healPlayerPointer != -1 && touchSlot(healPlayerPointer) < 0) healPlayerPointer = -1;
         if (healOpponentPointer != -1 && touchSlot(healOpponentPointer) < 0) healOpponentPointer = -1;
@@ -960,8 +960,8 @@ public class GameView extends SurfaceView
         } else {
             engine.setTeam(OPPONENT, opponentFighter);
         }
-        engine.refreshOverdrive(PLAYER);
-        engine.refreshOverdrive(OPPONENT);
+        engine.refreshShinkai(PLAYER);
+        engine.refreshShinkai(OPPONENT);
         medicao.parte("folhas");
         engine.restage(PLAYER_START_X, OPPONENT_START_X);
         loadTeamUltras();
@@ -1120,15 +1120,22 @@ public class GameView extends SurfaceView
     /** VIDA P1: os dois do time, para o reserva também estar pronto depois do tag. */
     private void healPlayerTeam() {
         hud.resetEffects();
-        for (FighterState member : team) member.restoreLife();
-        engine.refreshOverdrive(PLAYER);
+        for (FighterState member : team) {
+            member.restoreLife();
+            // Treino: a barra do SHINKAI cheia, para testar sem esperar ela encher.
+            member.shinkai = CombatConfig.SHINKAI_MAX;
+        }
+        engine.refreshShinkai(PLAYER);
     }
 
     /** VIDA CPU: a dupla inteira do CPU no 2x2 (só o titular no treino). */
     private void healOpponentTeam() {
         hud.resetEffects();
-        for (FighterState member : engine.team(OPPONENT).members) member.restoreLife();
-        engine.refreshOverdrive(OPPONENT);
+        for (FighterState member : engine.team(OPPONENT).members) {
+            member.restoreLife();
+            member.shinkai = CombatConfig.SHINKAI_MAX;
+        }
+        engine.refreshShinkai(OPPONENT);
     }
 
     private static boolean isPauseKey(int keyCode) {
@@ -1818,7 +1825,11 @@ public class GameView extends SurfaceView
         }
         for (String cue : engine.cues()) {
             String banner = bannerFor(cue);
+            if ("SHINKAI".equals(cue)) banner = spawnShinkai();
             if (banner != null) showBanner(banner);
+            if ("PARRY".equals(cue)) spawnParry();
+            if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
+            if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             // Bounces shake the screen like the beam's hits.
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue) ||
                 "SPIN".equals(cue)) {
@@ -1978,11 +1989,7 @@ public class GameView extends SurfaceView
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
         @Override public int dpadDirection() { return pad.direction(); }
-        @Override public float overdriveRatio() {
-            return engine.team(PLAYER).overdriveFrames / (float)engine.config.overdriveFrames;
-        }
-        @Override public float overdriveSeconds() { return engine.team(PLAYER).overdriveFrames * FIXED_STEP; }
-        @Override public boolean overdriveReady() { return !engine.team(PLAYER).overdriveUsed; }
+        @Override public int shinkaiDuration() { return engine.config.shinkaiFrames; }
         @Override public int demoPlaying() { return demo.demo(); }
         @Override public String demoTitle() { return demo.title(); }
         @Override public String demoCaption() { return demo.caption(); }
@@ -2004,7 +2011,7 @@ public class GameView extends SurfaceView
                 case HEAL_OPPONENT: return healOpponentPointer != -1;
                 case THROW: return throwPointer != -1;
                 case PUSHBLOCK: return pushblockPointer != -1;
-                case OVERDRIVE: return overdrivePointer != -1;
+                case SHINKAI: return shinkaiPointer != -1;
                 default: return false;
             }
         }
@@ -2290,6 +2297,7 @@ public class GameView extends SurfaceView
     /** Follows the engine's beam: hit pulses, the blast, the shake and the end of the ultra. */
     private void updateUltraBeam() {
         beamShake = Math.max(0f, beamShake - FIXED_STEP * 60f);
+        if (shinkaiFlash > 0) shinkaiFlash--;
         if (ultraAttacker < 0 || paginaFinal.isActive()) return;
         CombatFighter a = engine.fighter(ultraAttacker);
         if (!a.firingBeam()) {
@@ -2572,6 +2580,54 @@ public class GameView extends SurfaceView
     }
 
     /** Defesa perfeita: um brilho branco no peito de quem defendeu e o som da defesa mais agudo. */
+    /**
+     * O SHINKAI acendeu: anel e brilho na cor do tipo dele, a tela treme e o aviso diz o tipo.
+     * Devolve o texto do aviso.
+     */
+    private String spawnShinkai() {
+        String banner = "SHINKAI!";
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (f.state.shinkaiFrames != engine.config.shinkaiFrames) continue;
+            int color = f.state.shinkaiType.color;
+            float x = f.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+            impacts.spawnSuperJump(x, GROUND_Y, color);
+            impacts.spawnSuperGlint(x, chestY(f), color);
+            shinkaiFlash = SHINKAI_FLASH_FRAMES;
+            shinkaiFlashColor = color;
+            banner = "SHINKAI " + f.state.shinkaiType.label + "!";
+        }
+        beamShake = Math.max(beamShake, 16f);
+        ultraSounds.playFight("acerto_s", 1f, 0.7f);
+        return banner;
+    }
+
+    /** Clarão da tela na ativação do SHINKAI (quadros que faltam e a cor do tipo). */
+    static final int SHINKAI_FLASH_FRAMES = 18;
+    private int shinkaiFlash;
+    private int shinkaiFlashColor;
+
+    /** Parry (SHINKAI TECHNIQUE): estalo branco no peito de quem aparou. */
+    private void spawnParry() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (f.hitstop != engine.config.shinkaiParryFreeze || !f.state.inShinkai(Shinkai.Type.TECHNIQUE)) continue;
+            impacts.spawnSuperGlint(f.x, chestY(f), 0xFFFFFFFF);
+            impacts.spawn(ImpactEffects.GUARD, f.x + f.facing * 30f, chestY(f), f.facing, ImpactEffects.SPECIAL, Shinkai.Type.TECHNIQUE.color);
+        }
+        ultraSounds.playFight("defesa", 1f, 1.7f);
+    }
+
+    /** Corpo de aço (SHINKAI POWER): o golpe bate e faísca laranja, ele nem se mexe. */
+    private void spawnShinkaiArmor() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (!f.state.inShinkai(Shinkai.Type.POWER) || f.hitstop <= 0) continue;
+            impacts.spawn(ImpactEffects.GUARD, f.x, chestY(f), -f.facing, ImpactEffects.SPECIAL, Shinkai.Type.POWER.color);
+        }
+        beamShake = Math.max(beamShake, 6f);
+    }
+
     private void spawnJustDefense() {
         for (int side = 0; side < 2; side++) {
             CombatFighter f = engine.fighter(side);
@@ -2794,7 +2850,8 @@ public class GameView extends SurfaceView
             case "JUST_DEFENSE": return "DEFESA PERFEITA!";
             case "COMBO_BREAKER": return "COMBO BREAKER!";
             case "DHC": return "TEAM SUPER!";
-            case "OVERDRIVE": return "OVERDRIVE!";
+            case "SHINKAI": return "SHINKAI!";
+            case "PARRY": return "PARRY!";
             case "COUNTER": return "CONTRA-GOLPE!";
             case "REPEL": return "REPEL!";
             case "PUNISH": return "PUNISH COUNTER!";
@@ -2881,7 +2938,7 @@ public class GameView extends SurfaceView
     /** A IA ligada é o modo batalha (2x2, derrota quando a dupla cai); desligada, o treino. */
     private void setOpponentAiEnabled(boolean enabled) {
         ai.setEnabled(enabled);
-        // Na batalha o CPU usa o kit inteiro: assist, troca, DHC, Guard Cancel, Overdrive, Ultra.
+        // Na batalha o CPU usa o kit inteiro: assist, troca, DHC, Guard Cancel, SHINKAI, Ultra.
         ai.setFullKit(enabled);
         flow.setBattle(enabled);
     }
@@ -3300,8 +3357,8 @@ public class GameView extends SurfaceView
                 canvas.restore();
             }
 
-            drawOverdriveAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
-            drawOverdriveAura(canvas, player(), tagOffset());
+            drawShinkaiAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
+            drawShinkaiAura(canvas, player(), tagOffset());
             drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawMechanicAura(canvas, player(), tagOffset());
             drawEchoes(canvas);
@@ -3349,6 +3406,13 @@ public class GameView extends SurfaceView
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
+            if (shinkaiFlash > 0) {
+                // Clarão do SHINKAI: a tela inteira na cor do tipo, apagando.
+                paint.setStyle(Paint.Style.FILL);
+                int alpha = Math.round(150f * shinkaiFlash / SHINKAI_FLASH_FRAMES);
+                paint.setColor((alpha << 24) | (shinkaiFlashColor & 0xFFFFFF));
+                canvas.drawRect(-40f, -40f, VW + 40f, VH + 40f, paint);
+            }
             int blackout = ultraBlackout();
             if (blackout > 0) {
                 // Tela preta do Ultra (a p16: da cartola para o canhão).
@@ -4173,6 +4237,13 @@ public class GameView extends SurfaceView
      * Ao sumir a imagem fica onde ela estava, piscando e apagando; ao reaparecer ela pisca.
      */
     private float zanzokenAlpha(CombatFighter f) {
+        if (f.vanishFrames > 0) {
+            // O sumiço do SHINKAI SPEED: a imagem fica onde ele estava, piscando e apagando.
+            boolean blink = (engine.frame() / 2) % 2 == 0;
+            float since = engine.config.shinkaiVanishFrames - f.vanishFrames;
+            return Math.max(0f, (blink ? 0.8f : 0.35f) * (1f - since / engine.config.shinkaiVanishFrames));
+        }
+        if (f.sinceVanish < ZANZOKEN_ARRIVE) return (engine.frame() / 2) % 2 == 0 ? 0.9f : 0.4f;
         if (!f.inUltraSequence()) return 1f;
         CharacterDefinition.UltraSequence seq = f.state.profile.ultraSequence;
         if (seq == null || seq.vanish.length == 0) return 1f;
@@ -4562,10 +4633,11 @@ public class GameView extends SurfaceView
         }
     }
 
-    /** Glow and sparks around a fighter whose team is in Overdrive. */
-    private void drawOverdriveAura(Canvas c, CombatFighter f, float offset) {
-        if (!engine.teams.overdriveActive(f.index)) return;
-        effects.drawOverdrive(c, paint, f.x + offset, f.y, engine.frame() * FIXED_STEP);
+    /** A aura do SHINKAI na cor do tipo (some junto com ele no sumiço). */
+    private void drawShinkaiAura(Canvas c, CombatFighter f, float offset) {
+        if (!f.state.inShinkai() || zanzokenAlpha(f) < 1f) return;
+        float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        effects.drawShinkai(c, paint, f.x + offset, f.y, engine.frame() * FIXED_STEP, f.state.shinkaiType.color, left);
     }
 
     /** Algum botão de ataque continua sob um dedo (carrega a Onda do p01). */
@@ -4707,7 +4779,7 @@ public class GameView extends SurfaceView
     private static boolean isPadControl(ControlsLayout.Control control) {
         switch (control) {
             case DPAD: case SUPER: case LIGHT: case MEDIUM: case HEAVY: case COMBO:
-            case TAG: case THROW: case PUSHBLOCK: case OVERDRIVE:
+            case TAG: case THROW: case PUSHBLOCK: case SHINKAI:
                 return true;
             default:
                 return false;
@@ -4914,9 +4986,9 @@ public class GameView extends SurfaceView
                     pushblockPointer = pointerId;
                     pad.press(PadInput.Button.PUSHBLOCK);
                     break;
-                case OVERDRIVE:
-                    overdrivePointer = pointerId;
-                    pad.press(PadInput.Button.OVERDRIVE);
+                case SHINKAI:
+                    shinkaiPointer = pointerId;
+                    pad.press(PadInput.Button.SHINKAI);
                     break;
                 case TAG:
                     // TAG calls the assist (again: Assist -> Tag); with down it is the raw tag.
@@ -4947,7 +5019,7 @@ public class GameView extends SurfaceView
             if (pointerId == tagPointer) tagPointer = -1;
             if (pointerId == throwPointer) throwPointer = -1;
             if (pointerId == pushblockPointer) pushblockPointer = -1;
-            if (pointerId == overdrivePointer) overdrivePointer = -1;
+            if (pointerId == shinkaiPointer) shinkaiPointer = -1;
             if (pointerId == superPointer) superPointer = -1;
             if (pointerId == healPlayerPointer) healPlayerPointer = -1;
             if (pointerId == healOpponentPointer) healOpponentPointer = -1;
@@ -5487,7 +5559,7 @@ public class GameView extends SurfaceView
             ? Math.min(Arena.RIGHT_BOUND, camera.x + metade + ONDA_ENTRADA)
             : Math.max(Arena.LEFT_BOUND, camera.x - metade - ONDA_ENTRADA);
         engine.novaDupla(OPPONENT, x, a, b);
-        engine.refreshOverdrive(OPPONENT);
+        engine.refreshShinkai(OPPONENT);
         prepararRostosDoHud(team[0].character, team[1].character, a.character, b.character);
         loadCpuUltras();
         loadSuperIntros();

@@ -52,7 +52,7 @@ public class DemoDirectorTest {
     @Test public void v83WallAndGroundBounce() { assertEveryStepShown(3); }
     @Test public void v84AirTechAndWakeUps() { assertEveryStepShown(4); }
     @Test public void v85DhcAndRecoverableLife() { assertEveryStepShown(5); }
-    @Test public void v87Overdrive() { assertEveryStepShown(6); }
+    @Test public void v87Shinkai() { assertEveryStepShown(6); }
 
     @Test public void theMatchComesBackAsItWas() {
         Match m = new Match();

@@ -425,22 +425,34 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
-    /** Overdrive: a red glow around the body and sparks rising from the feet. */
-    void drawOverdrive(Canvas c, Paint paint, float x, float baseY, float time) {
+    /**
+     * SHINKAI: brilho na cor do tipo em volta do corpo, chamas subindo dos pés e um anel no
+     * chão. No fim ({@code left} < 0,2) a aura falha, avisando que vai acabar.
+     */
+    void drawShinkai(Canvas c, Paint paint, float x, float baseY, float time, int color, float left) {
+        if (left < 0.2f && ((int)(time * 20f)) % 3 == 0) return;
+        int r = Color.red(color), g = Color.green(color), b = Color.blue(color);
         float centerY = baseY - 100f;
         float pulse = 1f + 0.07f * (float)Math.sin(time * 14f);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(55, 255, 60, 20));
-        c.drawOval(x - 82f * pulse, centerY - 118f * pulse, x + 82f * pulse, baseY + 8f, paint);
+        paint.setColor(Color.argb(50, r, g, b));
+        c.drawOval(x - 86f * pulse, centerY - 124f * pulse, x + 86f * pulse, baseY + 8f, paint);
+        paint.setColor(Color.argb(40, (r + 255) / 2, (g + 255) / 2, (b + 255) / 2));
+        c.drawOval(x - 52f * pulse, centerY - 90f * pulse, x + 52f * pulse, baseY - 4f, paint);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        paint.setColor(Color.argb(150, r, g, b));
+        c.drawOval(x - 70f * pulse, baseY - 9f, x + 70f * pulse, baseY + 9f, paint);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        for (int i = 0; i < 7; i++) {
-            float phase = (time * 1.4f + i / 7f) % 1f;
-            float px = x + (float)Math.sin(i * 2.3f + time * 2.5f) * 62f;
-            float y = baseY - 6f - phase * 200f;
-            paint.setStrokeWidth(5f - phase * 3f);
-            paint.setColor(Color.argb(Math.round(210f * (1f - phase)), 255, 120 + i * 15, 40));
-            c.drawLine(px, y, px, y - 30f, paint);
+        for (int i = 0; i < 9; i++) {
+            float phase = (time * 1.5f + i / 9f) % 1f;
+            float px = x + (float)Math.sin(i * 2.3f + time * 2.5f) * 64f;
+            float y = baseY - 6f - phase * 215f;
+            paint.setStrokeWidth(6f - phase * 4f);
+            float light = (i % 3) / 3f;
+            paint.setColor(Color.argb(Math.round(220f * (1f - phase)),
+                Math.round(r + (255 - r) * light), Math.round(g + (255 - g) * light), Math.round(b + (255 - b) * light)));
+            c.drawLine(px, y, px, y - 34f, paint);
         }
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStyle(Paint.Style.FILL);

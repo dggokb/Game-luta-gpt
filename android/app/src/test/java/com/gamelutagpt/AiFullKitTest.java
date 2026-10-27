@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Random;
 import org.junit.Test;
 
-/** Batalha (IA ON): o CPU usa assist, troca, Assist → Tag, Guard Cancel, pushblock, Overdrive e Ultra. */
+/** Batalha (IA ON): o CPU usa assist, troca, Assist → Tag, Guard Cancel, pushblock, Shinkai e Ultra. */
 public class AiFullKitTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
     private static final CharacterDefinition TWO = GeneratedCharacters.get("player_two");
@@ -57,10 +57,12 @@ public class AiFullKitTest {
         assertTrue(m.pressesWithin(900, in -> in.tag));
     }
 
-    @Test public void cpuTurnsOverdriveOnWhenHurt() {
+    @Test public void cpuTurnsShinkaiOnWhenHurtAndTheBarIsFull() {
         Match m = new Match(600f, true, 4);
         m.cpu[0].takeDamage(m.cpu[0].life * 2 / 3, 0);
-        assertTrue(m.pressesWithin(3000, in -> in.overdrive));
+        assertFalse("not with the bar empty", m.pressesWithin(600, in -> in.shinkai));
+        m.cpu[0].shinkai = CombatConfig.SHINKAI_MAX;
+        assertTrue(m.pressesWithin(3000, in -> in.shinkai));
     }
 
     @Test public void blockingCpuGuardCancelsOrPushblocks() {
@@ -98,6 +100,6 @@ public class AiFullKitTest {
         Match m = new Match(300f, false, 6);
         m.cpu[0].superMeter = CombatConfig.ULTRA_COST;
         m.cpu[0].takeDamage(m.cpu[0].life * 3 / 4, 0);
-        assertFalse(m.pressesWithin(1500, in -> in.assist || in.tag || in.ultra || in.overdrive || in.pushblock));
+        assertFalse(m.pressesWithin(1500, in -> in.assist || in.tag || in.ultra || in.shinkai || in.pushblock));
     }
 }

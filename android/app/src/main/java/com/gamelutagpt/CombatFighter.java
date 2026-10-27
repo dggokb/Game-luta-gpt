@@ -255,8 +255,20 @@ final class CombatFighter {
     int throwRequestAge = -1;
     /** Frames since M + H was pressed while blocking, or -1: pushblock. */
     int pushblockRequestAge = -1;
-    /** Frames since the Overdrive was asked for, or -1. */
-    int overdriveRequestAge = -1;
+    /** Frames since the SHINKAI was asked for, or -1. */
+    int shinkaiRequestAge = -1;
+    /**
+     * SHINKAI SPEED, o sumiço: quadros que ainda falta ele ficar sumido (0 fora dele). No fim
+     * ele aparece em {@link #vanishToX}; {@link #vanishFromX} é de onde sumiu (o rastro).
+     */
+    int vanishFrames;
+    float vanishFromX, vanishToX;
+    /** Quadros desde que ele apareceu do último sumiço (o reaparecer pisca). */
+    int sinceVanish = 999;
+    /** SHINKAI TECHNIQUE, o parry: quadros desde o último → apertado (de novo), ou -1. */
+    int parryAge = -1;
+    /** Direção horizontal do quadro anterior (o parry pede o → apertado, não segurado). */
+    int lastHorizontal;
     /** Frames during which nothing hits this fighter (Guard Cancel entry). */
     int invulnFrames;
 

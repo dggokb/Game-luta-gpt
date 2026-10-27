@@ -68,7 +68,7 @@ public class HardwareInputTest {
         assertEquals(PadInput.Button.TAG, HardwareInput.button(KeyEvent.KEYCODE_BUTTON_R1));
         assertEquals(PadInput.Button.THROW, HardwareInput.button(KeyEvent.KEYCODE_H));
         assertEquals(PadInput.Button.PUSHBLOCK, HardwareInput.button(KeyEvent.KEYCODE_SEMICOLON));
-        assertEquals(PadInput.Button.OVERDRIVE, HardwareInput.button(KeyEvent.KEYCODE_BUTTON_L2));
+        assertEquals(PadInput.Button.SHINKAI, HardwareInput.button(KeyEvent.KEYCODE_BUTTON_L2));
         assertNull(HardwareInput.button(KeyEvent.KEYCODE_W));
         assertNull(HardwareInput.button(KeyEvent.KEYCODE_ENTER));
     }

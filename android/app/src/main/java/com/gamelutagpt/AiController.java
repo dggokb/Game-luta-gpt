@@ -22,7 +22,7 @@ final class AiController {
 
     // Batalha (IA ON): o kit inteiro, como um jogador usa. Chances por oportunidade (no nível 6;
     // os outros níveis escalam por CpuLevel.kitScale).
-    /** Frames entre as decisões do kit no neutro (assist, troca, Ultra, Overdrive). */
+    /** Frames entre as decisões do kit no neutro (assist, troca, Ultra, SHINKAI). */
     static final int KIT_DECISION_FRAMES = 15;
     static final double ASSIST_NEUTRAL_CHANCE = 0.18;
     /** Golpe que acertou: chama o assist para estender o combo. */
@@ -45,9 +45,9 @@ final class AiController {
     static final double KILL_SCALE = 0.6;
     /** Quadros que ela lembra que o rival ficou na defesa (para agarrar quem só defende). */
     static final int RIVAL_BLOCK_MEMORY = 90;
-    /** Overdrive no meio do combo, ou no neutro com a vida baixa. */
-    static final double OVERDRIVE_COMBO_CHANCE = 0.15;
-    static final double OVERDRIVE_LOW_LIFE_CHANCE = 0.08;
+    /** SHINKAI (barra cheia) no meio do combo, ou no neutro com a vida mais baixa. */
+    static final double SHINKAI_COMBO_CHANCE = 0.15;
+    static final double SHINKAI_LOW_LIFE_CHANCE = 0.08;
     /** Defendendo: Guard Cancel Tag ou pushblock na sequência de bloqueio. */
     static final double GUARD_CANCEL_CHANCE = 0.25;
     static final double PUSHBLOCK_CHANCE = 0.35;
@@ -103,7 +103,7 @@ final class AiController {
     /** Golpe para o qual os planos de combo já foram sorteados, e em que frame dele. */
     private AttackDefinition plannedAttack;
     private int plannedAttackFrame;
-    private boolean assistPlan, dhcPlan, overdrivePlan;
+    private boolean assistPlan, dhcPlan, shinkaiPlan;
     private boolean wasBlocking, guardCancelPlan, pushblockPlan;
     private boolean wasAssistOut, convertPlan;
     private boolean enabled;
@@ -259,7 +259,7 @@ final class AiController {
 
     /**
      * Batalha: além de andar, bater, soltar energia e Super, o CPU usa o kit inteiro — assist,
-     * troca, Assist → Tag, DHC, Guard Cancel, pushblock, Overdrive e Ultra.
+     * troca, Assist → Tag, DHC, Guard Cancel, pushblock, SHINKAI e Ultra.
      */
     void setFullKit(boolean value) {
         fullKit = value;
@@ -290,7 +290,7 @@ final class AiController {
     private void resetKit() {
         kitTimer = 0;
         plannedAttack = null;
-        assistPlan = dhcPlan = overdrivePlan = false;
+        assistPlan = dhcPlan = shinkaiPlan = false;
         wasBlocking = guardCancelPlan = pushblockPlan = false;
         wasAssistOut = convertPlan = false;
     }
@@ -1361,7 +1361,7 @@ final class AiController {
 
     /**
      * O kit da batalha neste frame. Verdadeiro quando apertou algo que pede o frame só para
-     * si (a troca, o Ultra e o Overdrive no neutro): a decisão normal fica para depois.
+     * si (a troca, o Ultra e o SHINKAI no neutro): a decisão normal fica para depois.
      */
     private boolean fillKit(CombatEngine engine, CombatFighter me, CombatFighter target,
                             CpuPerception.Snapshot seen, FighterInput out) {
@@ -1405,16 +1405,16 @@ final class AiController {
                 plannedAttack = me.attack;
                 assistPlan = chance(ASSIST_COMBO_CHANCE);
                 dhcPlan = chance(DHC_CHANCE);
-                // Os níveis altos usam o Overdrive para esticar o combo que acertou.
-                overdrivePlan = chance(OVERDRIVE_COMBO_CHANCE * (0.5 + 1.5 * smart()));
+                // Os níveis altos usam o SHINKAI para esticar o combo que acertou.
+                shinkaiPlan = chance(SHINKAI_COMBO_CHANCE * (0.5 + 1.5 * smart()));
             }
             plannedAttackFrame = me.attackFrame;
             if (teams.dhcReady(self, me)) {
                 if (dhcPlan) out.assist = true;
             } else if (hitSeen(engine) && me.attack.kind != AttackDefinition.Kind.SUPER) {
-                if (overdrivePlan && teams.canOverdrive(me)) {
-                    out.overdrive = true;
-                    overdrivePlan = false;
+                if (shinkaiPlan && teams.canShinkai(me)) {
+                    out.shinkai = true;
+                    shinkaiPlan = false;
                 } else if (assistPlan && teams.canAssist(self, me)) {
                     out.assist = true;
                     assistPlan = false;
@@ -1441,9 +1441,9 @@ final class AiController {
             out.tag = true;
             return true;
         }
-        if (!team.overdriveUsed && life < 0.5f && teams.canOverdrive(me) &&
-            chance(OVERDRIVE_LOW_LIFE_CHANCE * (1.0 - 0.7 * smart()))) {
-            out.overdrive = true;
+        if (life < 0.6f && teams.canShinkai(me) &&
+            chance(SHINKAI_LOW_LIFE_CHANCE * (1.0 - 0.7 * smart()))) {
+            out.shinkai = true;
             return true;
         }
         if (distance >= 150f && distance <= 700f && teams.canAssist(self, me) && chance(ASSIST_NEUTRAL_CHANCE)) {
