@@ -739,7 +739,7 @@ final class AiController {
 
     /**
      * Combo breaker: quando o combo que ela leva fica quebrável (o "!"), decide uma vez se quebra
-     * e, se sim, aperta SUPER depois de um tempo de reação.
+     * e, se sim, aperta um golpe (L) depois de um tempo de reação.
      */
     private void betOnComboBreaker(CombatEngine engine, CombatFighter me, CpuPerception.Snapshot seen,
                                    FighterInput out) {
@@ -754,7 +754,7 @@ final class AiController {
             breakerDecided = true;
             if (roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
         }
-        if (breakerWait > 0 && --breakerWait == 0) out.superAttack = true;
+        if (breakerWait > 0 && --breakerWait == 0) out.light = true;
     }
 
     /**

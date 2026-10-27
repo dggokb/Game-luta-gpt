@@ -381,7 +381,7 @@ final class CombatConfig {
     /** Vida que volta (por mil da vida máxima): primeiro a vermelha. */
     int justDefenseHealPermille = 12;
 
-    // Combo breaker: apanhando num combo que já entrou, o SUPER quebra na hora (o "!" sobre a
+    // Combo breaker: apanhando num combo que já entrou, L, M ou H quebra na hora (o "!" sobre a
     // cabeça avisa enquanto dá): o golpe não entra, quem batia é jogado para longe e fica
     // atordoado, e quem apanhava sai correndo sozinho até ele para emendar o próprio combo. Custa
     // barra (sem barra, o "!" não aparece) e não quebra Super, Ultra nem agarrão.

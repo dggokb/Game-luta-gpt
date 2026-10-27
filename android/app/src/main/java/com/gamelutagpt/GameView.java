@@ -2696,7 +2696,7 @@ public class GameView extends SurfaceView
 
     /**
      * O aviso do combo breaker, em estilo mangá: um "!" vermelho sobre a cabeça do jogador durante
-     * todo o combo que ele pode quebrar (SUPER, com barra). Entra com um estalo e tremendo, depois
+     * todo o combo que ele pode quebrar (L, M ou H, com barra). Entra com um estalo e tremendo, depois
      * fica parado. O contorno branco fino o separa do cenário.
      */
     private void drawBreakerCue(Canvas c) {

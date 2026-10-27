@@ -258,7 +258,7 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **Defesa perfeita**: aperte trás bem em cima do golpe (até 5 quadros antes). Não gasta a
   guarda, não leva chip, recupera um pouco de vida e sai antes do bloqueio. Ficar batendo
   trás não vale.
-- **Combo breaker**: apanhando num combo que já tem 2 acertos, **SUPER** quebra o combo na hora,
+- **Combo breaker**: apanhando num combo que já tem 2 acertos, **L, M ou H** quebra o combo na hora,
   em qualquer golpe e sem tempo certo, por **1 barra**: o golpe não entra, quem batia é jogado
   para trás (arrastando o pé, com fumacinha) e fica atordoado, e você sai correndo sozinho até
   ele para emendar o seu combo. Sem barra não quebra; Super, Ultra e agarrão não se quebram.

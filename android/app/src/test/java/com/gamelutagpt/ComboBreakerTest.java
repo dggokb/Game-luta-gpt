@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * Combo breaker: apanhando num combo que já tem 2 acertos, o SUPER quebra na hora, em qualquer
+ * Combo breaker: apanhando num combo que já tem 2 acertos, L, M ou H quebra na hora, em qualquer
  * golpe — por 1 barra. O "!" fica sobre quem apanha enquanto dá. Quem batia é jogado para longe
  * e quem quebrou corre sozinho até ele.
  */
@@ -29,10 +29,10 @@ public class ComboBreakerTest {
 
         int back(int i) { return MotionParser.relative(5, f(i).facing); }
 
-        /** O aperto do CPU: SUPER, só trás, ou o M + H (o breaker antigo). */
-        static final int SUPER = 0, BACK = 1, MH = 2;
+        /** O aperto do CPU: L, M, H, só trás, ou SUPER (que não quebra). */
+        static final int L = 0, BACK = 1, SUPER = 2, M = 3, H = 4;
 
-        void combo(String target, int lead) { combo(target, lead, SUPER); }
+        void combo(String target, int lead) { combo(target, lead, L); }
 
         /**
          * P1 faz L > M > H; o CPU aperta {@code lead} quadros antes do contato do golpe
@@ -45,9 +45,11 @@ public class ComboBreakerTest {
             in[0].light = true;
             for (int i = 0; i < 90; i++) {
                 if (contact >= 0 && i == contact - lead) {
-                    if (how == SUPER) in[1].superAttack = true;
+                    if (how == L) in[1].light = true;
+                    else if (how == M) in[1].medium = true;
+                    else if (how == H) in[1].heavy = true;
                     else if (how == BACK) in[1].direction = back(1);
-                    else in[1].pushblock = true;
+                    else in[1].superAttack = true;
                 }
                 step();
                 for (CombatEngine.HitEvent h : engine.events()) {
@@ -84,7 +86,7 @@ public class ComboBreakerTest {
         float touching() { return f(0).body().halfWidth + f(1).body().halfWidth; }
     }
 
-    @Test public void superRightBeforeTheHeavyEnderBreaksTheCombo() {
+    @Test public void aButtonRightBeforeTheHeavyEnderBreaksTheCombo() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
         m.combo("H", 3);
@@ -188,13 +190,55 @@ public class ComboBreakerTest {
         assertEquals(0, m.cpu.superMeter);
     }
 
-    /** O gesto antigo (M + H) não quebra mais: agora é o SUPER. */
-    @Test public void mhNoLongerBreaks() {
+    /** No ar, com o atordoamento acabado, o botão é o tech (cai de pé) e a barra fica. */
+    @Test public void afterTheAirHitstunTheButtonTechsInsteadOfBreaking() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
-        m.combo("H", 3, Match.MH);
+        String[] seq = {"L", "M", "H"};
+        int k = 0;
+        m.in[0].light = true;
+        boolean ready = false;
+        for (int i = 0; i < 200 && !ready; i++) {
+            m.step();
+            for (CombatEngine.HitEvent h : m.engine.events()) {
+                if (h.attacker == 0 && !h.blocked && k < 2) {
+                    k++;
+                    if ("M".equals(seq[k])) m.in[0].medium = true; else m.in[0].heavy = true;
+                }
+            }
+            ready = m.f(1).status == CombatFighter.Status.AIR_HITSTUN && m.f(1).stunLeft == 0 && !m.f(1).frozen();
+        }
+        assertTrue("o H lançou e o atordoamento no ar acabou", ready);
+        assertEquals(-1, m.engine.breakerCue(m.f(1)));
+        boolean hardFall = m.f(1).hardFall;
+        m.in[1].light = true;
+        boolean tech = false;
+        for (int i = 0; i < 4; i++) {
+            m.step();
+            tech |= m.engine.cues().contains("AIR_TECH");
+            assertFalse(m.engine.cues().contains("COMBO_BREAKER"));
+        }
+        // A queda forte (o H derruba) não deixa cair de pé; a barra fica de qualquer jeito.
+        assertTrue("caiu de pé (ou a queda é forte)", tech || hardFall);
+        assertEquals("a barra fica", CombatConfig.METER_PER_BAR, m.cpu.superMeter);
+    }
+
+    /** Qualquer botão de golpe quebra: M e H também. */
+    @Test public void mediumAndHeavyBreakToo() {
+        for (int how : new int[] {Match.M, Match.H}) {
+            Match m = new Match();
+            m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+            m.combo("H", 3, how);
+            assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
+        }
+    }
+
+    /** O SUPER não quebra (vai para o buffer, como sempre). */
+    @Test public void superDoesNotBreak() {
+        Match m = new Match();
+        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+        m.combo("H", 3, Match.SUPER);
         assertFalse(m.engine.cues().contains("COMBO_BREAKER"));
-        assertEquals(3, m.engine.session(1).hitCount);
     }
 
     @Test public void backAloneDoesNotBreak() {
@@ -213,7 +257,7 @@ public class ComboBreakerTest {
         assertEquals(3, m.engine.session(1).hitCount);
     }
 
-    /** No primeiro golpe do combo ainda não dá: o SUPER antes do M entrar não quebra. */
+    /** No primeiro golpe do combo ainda não dá: o L antes do M entrar não quebra. */
     @Test public void theFirstHitCannotBeBroken() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
@@ -222,7 +266,7 @@ public class ComboBreakerTest {
         assertEquals(CombatConfig.METER_PER_BAR, m.cpu.superMeter);
     }
 
-    /** Super não se quebra: apanhando dele (vários acertos), o SUPER não faz nada e não tem "!". */
+    /** Super não se quebra: apanhando dele (vários acertos), os botões não fazem nada e não tem "!". */
     @Test public void aSuperCannotBeBroken() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
@@ -231,7 +275,7 @@ public class ComboBreakerTest {
         int superHits = 0;
         boolean broke = false;
         for (int i = 0; i < 200 && !broke; i++) {
-            if (m.f(1).inHitstun()) m.in[1].superAttack = true;
+            if (m.f(1).inHitstun()) m.in[1].light = true;
             m.step();
             for (CombatEngine.HitEvent h : m.engine.events()) if (h.attacker == 0 && !h.blocked) superHits++;
             if (superHits > 0) assertEquals("sem \"!\" no Super", -1, m.engine.breakerCue(m.f(1)));
@@ -257,8 +301,8 @@ public class ComboBreakerTest {
             for (int i = 0; i < 90 && !broke; i++) {
                 ai.fill(m.engine, 1, m.in[1]);
                 // O aperto em cima da hora (o que a CPU às vezes acerta no palpite), garantido aqui.
-                m.in[1].superAttack = i == contact - 3;
-                m.in[1].light = m.in[1].medium = m.in[1].heavy = m.in[1].pushblock = false;
+                m.in[1].light = i == contact - 3;
+                m.in[1].medium = m.in[1].heavy = m.in[1].pushblock = m.in[1].superAttack = false;
                 m.step();
                 for (CombatEngine.HitEvent h : m.engine.events()) {
                     if (h.attacker == 0 && !h.blocked && k < 2) {

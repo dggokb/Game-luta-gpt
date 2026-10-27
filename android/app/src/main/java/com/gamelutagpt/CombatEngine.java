@@ -509,8 +509,9 @@ final class CombatEngine {
             if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
             else f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
         }
-        if ((in.superAttack || in.ultra) && canBreakCombo(f)) {
-            // Apanhando, o SUPER é o combo breaker: quebra na hora, sem tempo certo.
+        if ((in.light || in.medium || in.heavy || in.pushblock) && canBreakCombo(f)) {
+            // Apanhando, qualquer botão de golpe (L, M ou H) é o combo breaker: quebra na hora.
+            f.techRequestAge = -1;
             comboBreaker(fighters[1 - f.index], f);
         } else if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
             f.ultraRequestAge = 0;
@@ -1786,11 +1787,13 @@ final class CombatEngine {
 
     /**
      * Combo breaker: apanhando num combo que já tem {@code comboBreakerMinHits} acertos, com barra
-     * para pagar, o SUPER quebra na hora (em qualquer golpe do combo). Não quebra Super nem Ultra,
+     * para pagar, L, M ou H quebra na hora (em qualquer golpe do combo). Não quebra Super nem Ultra,
      * nem no congelamento deles, nem agarrão.
      */
     boolean canBreakCombo(CombatFighter d) {
         if (!d.inHitstun() || d.ko() || superFreeze > 0) return false;
+        // No ar com o atordoamento acabado, o botão é o tech (cair de pé), não o breaker.
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && d.stunLeft == 0) return false;
         ComboSession session = sessions[d.index];
         if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return false;
         if (session.usesOf("SUPER") > 0 || session.usesOf("ULTRA") > 0) return false;
@@ -1803,7 +1806,7 @@ final class CombatEngine {
     }
 
     /**
-     * O aviso do combo breaker ("!" sobre quem apanha): 0 enquanto o SUPER quebra o combo, ou -1.
+     * O aviso do combo breaker ("!" sobre quem apanha): 0 enquanto L, M ou H quebra o combo, ou -1.
      */
     int breakerCue(CombatFighter d) {
         return canBreakCombo(d) ? 0 : -1;
