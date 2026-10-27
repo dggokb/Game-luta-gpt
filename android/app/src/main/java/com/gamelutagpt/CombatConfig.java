@@ -459,6 +459,13 @@ final class CombatConfig {
     int shinkaiParryWindow = 10;
     /** Os dois congelam no parry; quem aparou sai livre e o golpe do outro continua. */
     int shinkaiParryFreeze = 16;
+    /**
+     * SHINKAI Clash (ShinkaiClash): ligar o SHINKAI com o rival no dele vira um cabo de guerra.
+     * Quem vence acerta este dano e fica com o SHINKAI cheio; quem perde voa e perde o dele.
+     */
+    int shinkaiClashDamage = 2000;
+    /** A distância entre os dois no confronto. */
+    float shinkaiClashGap = 300f;
 
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;

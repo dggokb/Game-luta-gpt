@@ -76,6 +76,44 @@ A divisão abaixo é o ponto de partida. Para mudar, basta editar `Shinkai.typeO
 
 Nada disso precisa de comando novo: são os mesmos botões, com o resultado na tela.
 
+## SHINKAI Clash
+
+Ligar o SHINKAI **com o rival já no dele** (a qualquer momento dos 8 s dele) vira o **SHINKAI
+Clash**: um cabo de guerra jogável no meio da tela, sem QTE (`ShinkaiClash` no motor,
+`ConfrontoShinkai` no desenho; testes em `ShinkaiClashTest`).
+
+- **Começo.** O corte de quem respondeu passa (0,8 s); o que estava no ar some (projéteis, ecos,
+  capangas), os combos acabam e os dois ficam frente a frente no chão, a `shinkaiClashGap` (300 px)
+  um do outro. A luta para: nada anda, e os relógios do SHINKAI esperam.
+- **A disputa** (até 5 s, `ShinkaiClash.DURACAO`): cada um empurra a marca com os próprios
+  botões, do jeito do tipo dele:
+
+  | Tipo | Como empurra |
+  |---|---|
+  | POWER | força: o **H** empurra muito (58), mas tem fôlego de 12 quadros; o M menos, o L pouco |
+  | SPEED | velocidade: o **L** empurra bem (36) quase sem espera — bater rápido |
+  | ENERGY | alimentar o raio: **segurar** um botão carrega (até 70 quadros) e **soltar** empurra; a carga cheia vale muito mais que várias curtas (carga²/16), e enquanto segura não empurra |
+  | TECHNIQUE | ritmo: um pulso a cada 24 quadros (o anel que fecha no corpo); apertar **no pulso** empurra muito (105), fora dele quase nada |
+
+  Bem jogados, os quatro empurram parecido (uns 4–5 por quadro); o que muda é o jeito.
+- **Desistir.** Segurar **trás** por meio segundo sai do confronto **sem dano**, mas **perde o
+  SHINKAI**; o outro segue no dele.
+- **Fim.** Quem leva a marca até o fim (`META` = 600), ou está na frente quando o tempo acaba,
+  **vence**: o golpe dele entra (`shinkaiClashDamage` = 2000), quem perdeu voa girando e **perde o
+  SHINKAI**, e o SHINKAI de quem venceu **volta cheio** (8 s de novo). Empate exato: os dois se
+  afastam e seguem no SHINKAI.
+- **Na tela.** A tela escurece com linhas de velocidade saindo do encontro, cada metade puxando
+  para a cor de quem está daquele lado. Cada um empurra com o visual do tipo até o encontro (o
+  raio do ENERGY, que engrossa ao soltar e tem a bola crescendo na mão enquanto carrega; as ondas
+  de choque do POWER, com o chão rachando; a rajada de riscos do SPEED; o anel do ritmo e os cortes
+  da TECHNIQUE). O encontro é uma bola nas duas cores, com raios, que anda conforme a disputa; cada
+  empurrão solta faíscas e treme a tela. No alto, a barra do cabo de guerra com "SHINKAI CLASH" e
+  o tempo acabando. As poses: POWER e TECHNIQUE no H, SPEED trocando L, M e H a cada empurrão,
+  ENERGY no disparo da energia. O fim estoura no encontro na cor de quem venceu, com câmera lenta.
+- **CPU.** Com a barra cheia e o jogador no SHINKAI, às vezes responde e começa o confronto
+  (`SHINKAI_ANSWER_CHANCE`). No confronto ela empurra do jeito do tipo dela, mais rápida e certeira
+  nos níveis altos.
+
 ## CPU
 
 A CPU usa o SHINKAI quando a barra está cheia, de duas formas:
@@ -86,9 +124,8 @@ O sumiço dos lutadores SPEED sai sozinho quando ela pede o dash. O parry ela ai
 
 ## Próximos passos (do documento do Drive)
 
-- **SHINKAI Clash.** Os dois ativando quase juntos viram um confronto jogável conforme os tipos:
-  POWER × POWER é disputa de força, ENERGY × ENERGY é choque de raios, SPEED × SPEED é batalha de
-  sumiço, e as combinações cruzadas também.
+- **SHINKAI Clash v2.** Cenas próprias por par de tipos (POWER × POWER de mãos travadas, SPEED ×
+  SPEED trocando sumiços pela arena) e ligação com o cenário que quebra.
 - **Arte.** O corte usa o rosto do HUD. Uma ilustração parada por personagem (os olhos em close,
   sem vídeo) deixaria o corte ainda melhor. Falta também um som próprio de ativação, ou uma voz.
 - **Prólogo.** O pai ensina o SHINKAI e as crianças falham.

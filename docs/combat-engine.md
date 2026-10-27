@@ -446,6 +446,10 @@ vermelha. O resto vem do tipo, sempre com os mesmos botões e o resultado na tel
 - **TECHNIQUE**: o primeiro golpe que chega com ele livre é aparado sozinho; depois, parry com →
   tocado; cancels livres.
 
+**SHINKAI Clash** (`ShinkaiClash`, `ConfrontoShinkai`): ligar o SHINKAI com o rival no dele
+para a luta (o `step` só roda o confronto) e vira um cabo de guerra em que cada tipo empurra de um
+jeito; quem vence acerta 2000 e fica com o SHINKAI cheio, quem perde voa e perde o dele.
+
 Regras, números, a divisão do elenco e o que falta: [shinkai.md](shinkai.md).
 O assist (antes a barra de 5 partes) agora aparece como um anel em volta do círculo do TAG.
 

@@ -48,6 +48,8 @@ final class AiController {
     /** SHINKAI (barra cheia) no meio do combo, ou no neutro com a vida mais baixa. */
     static final double SHINKAI_COMBO_CHANCE = 0.15;
     static final double SHINKAI_LOW_LIFE_CHANCE = 0.08;
+    /** A cada decisão do neutro com o rival no SHINKAI e a barra dela cheia: responder (o Clash). */
+    static final double SHINKAI_ANSWER_CHANCE = 0.25;
     /** Defendendo: Guard Cancel Tag ou pushblock na sequência de bloqueio. */
     static final double GUARD_CANCEL_CHANCE = 0.25;
     static final double PUSHBLOCK_CHANCE = 0.35;
@@ -341,6 +343,12 @@ final class AiController {
         CombatFighter me = engine.fighter(self);
         CombatFighter target = engine.fighter(1 - self);
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
+        ShinkaiClash clash = engine.shinkaiClash();
+        if (clash != null) {
+            pushInClash(clash, self, out);
+            return;
+        }
+        clashHold = 0;
         lowGuard = guardLow(engine, me);
         feelContact(engine, self, me, target);
         if (me.status == CombatFighter.Status.THROWN) {
@@ -789,6 +797,43 @@ final class AiController {
     }
 
     private boolean breakerCombo;
+
+    /**
+     * SHINKAI Clash: empurra do jeito do tipo dela, mais rápido e mais certeiro nos níveis altos
+     * (no nível 8, mais ou menos o ritmo de quem bate rápido com o dedo).
+     */
+    private void pushInClash(ShinkaiClash c, int self, FighterInput out) {
+        if (!c.disputando()) return;
+        int n = level.number;
+        switch (c.tipo[self]) {
+            case POWER:
+                if (c.espera[self] == 0 && reactRandom.nextDouble() < 0.05 + 0.015 * n) out.heavy = true;
+                break;
+            case SPEED:
+                if (reactRandom.nextDouble() < 0.03 + 0.012 * n) out.light = true;
+                break;
+            case ENERGY:
+                // Segura até a carga que o nível aguenta e solta.
+                if (clashHold == 0) clashHold = Math.min(ShinkaiClash.CARGA_MAX, 30 + 5 * n);
+                if (c.carga[self] < clashHold) {
+                    out.holding = true;
+                } else {
+                    clashHold = 0;
+                }
+                break;
+            case TECHNIQUE:
+            default: {
+                int fase = c.fase();
+                boolean pulso = fase == 0 || fase == ShinkaiClash.BATIDA - 1;
+                if (pulso && !c.batidaUsada[self] && reactRandom.nextDouble() < 0.25 + 0.08 * n) out.medium = true;
+                else if (reactRandom.nextDouble() < 0.01) out.medium = true;
+                break;
+            }
+        }
+    }
+
+    /** SHINKAI Clash (ENERGY): até onde ela segura a carga desta vez. */
+    private int clashHold;
 
     /** Quanto ela espera (no máximo) para apertar depois do "!". */
     static final int BREAKER_GUESS_FRAMES = 18;
@@ -1440,6 +1485,11 @@ final class AiController {
             life < TAG_LIFE_RATIO && partner.life / (float)partner.profile.maxLife > life + 0.15f &&
             chance(TAG_CHANCE)) {
             out.tag = true;
+            return true;
+        }
+        if (target.state.inShinkai() && teams.canShinkai(me) && chance(SHINKAI_ANSWER_CHANCE * (0.5 + smart()))) {
+            // O rival ligou o SHINKAI: responder com o dela vira o confronto (SHINKAI Clash).
+            out.shinkai = true;
             return true;
         }
         if (life < 0.6f && teams.canShinkai(me) &&

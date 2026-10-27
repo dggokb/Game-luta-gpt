@@ -348,6 +348,10 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   - **SPEED** (p03, p05, p10, p16): **imagem residual repete cada golpe**, mais rápido e sumiço no dash;
   - **ENERGY** (p01, p06, p08, p11): **o H solta um mini projétil**, o S sai sem esperar e a barra enche sozinha;
   - **TECHNIQUE** (p02, p07, p14, p15): **o primeiro golpe é aparado sozinho**, depois parry tocando →, e cancels livres.
+- **SHINKAI Clash**: ligar o seu com o rival no dele vira um cabo de guerra no meio da tela.
+  POWER empurra com o H, SPEED batendo o L rápido, ENERGY segurando e soltando, TECHNIQUE no
+  ritmo. Quem vence acerta forte e fica com o SHINKAI cheio; quem perde voa e perde o dele.
+  Segurar trás desiste sem dano, mas perde o SHINKAI.
 - No treino, **VIDA P1 / VIDA CPU** enchem a barra. **DEMO 87** mostra o SHINKAI.
 - Detalhes: `docs/shinkai.md`.
 

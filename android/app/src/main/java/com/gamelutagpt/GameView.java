@@ -1844,6 +1844,7 @@ public class GameView extends SurfaceView
             if ("PARRY".equals(cue)) spawnParry();
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
+            if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
             // Bounces shake the screen like the beam's hits.
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue) ||
                 "SPIN".equals(cue)) {
@@ -1887,6 +1888,10 @@ public class GameView extends SurfaceView
         updateTeamVisuals();
         updateFighterSprite(spriteFighterRenderer, player());
         updateFighterSprite(opponentSpriteRenderer, opponent());
+        if (engine.shinkaiClash() != null) {
+            poseClash(spriteFighterRenderer, player(), PLAYER);
+            poseClash(opponentSpriteRenderer, opponent(), OPPONENT);
+        }
         poeiraDoMotor(spriteFighterRenderer, player(), tagOffset());
         poeiraDoMotor(opponentSpriteRenderer, opponent(), engine.teams.tagOffset(OPPONENT));
         if (intro && ++introFrame >= introTotalFrames) {
@@ -2314,6 +2319,14 @@ public class GameView extends SurfaceView
         if (shinkaiFlash > 0) shinkaiFlash--;
         corteShinkai.passo();
         shinkaiDetalhes.passo(engine, engine.frame());
+        confronto.passo(engine);
+        ShinkaiClash clash = engine.shinkaiClash();
+        if (clash != null && clash.disputando()) {
+            // Cada empurrão treme a tela, mais no forte.
+            for (int i = 0; i < 2; i++) {
+                if (clash.idadeEmpurrao[i] == 0) beamShake = Math.max(beamShake, 3f + clash.ultimoEmpurrao[i] / 18f);
+            }
+        }
         corRoupa[PLAYER] = spriteFighterRenderer.corDaRoupa();
         corRoupa[OPPONENT] = opponentSpriteRenderer.corDaRoupa();
         desgaste.passo(engine, engine.frame(), corRoupa);
@@ -2622,6 +2635,76 @@ public class GameView extends SurfaceView
         beamShake = Math.max(beamShake, 16f);
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
         return banner;
+    }
+
+    /** O desenho do SHINKAI Clash (o fundo, os empurrões, o encontro e a barra). */
+    private final ConfrontoShinkai confronto = new ConfrontoShinkai();
+
+    /**
+     * SHINKAI Clash: o começo treme a tela; o fim estoura no encontro — na cor de quem venceu,
+     * com câmera lenta; branco no empate; quem desistiu só sai.
+     */
+    private void spawnShinkaiClash(String cue) {
+        float x = confronto.encontroX(), y = confronto.encontroY();
+        switch (cue) {
+            case "SHINKAI_CLASH":
+                beamShake = Math.max(beamShake, 18f);
+                ultraSounds.playFight("acerto_s", 1f, 0.55f);
+                break;
+            case "SHINKAI_CLASH_WIN": {
+                int winner = -1;
+                for (CombatEngine.HitEvent e : engine.events()) if ("SHINKAI_CLASH".equals(e.moveId)) winner = e.attacker;
+                int color = winner >= 0 ? confronto.cor(winner) : 0xFFFFFFFF;
+                impacts.spawn(ImpactEffects.HIT, x, y, winner == PLAYER ? 1 : -1, ImpactEffects.SPECIAL, color);
+                impacts.spawnSuperGlint(x, y, color);
+                shinkaiFlash = SHINKAI_FLASH_FRAMES;
+                shinkaiFlashColor = color;
+                beamShake = Math.max(beamShake, 28f);
+                feel.slow(BREAKER_SLOW_FRAMES, BREAKER_SLOW_SCALE);
+                ultraSounds.playFight("acerto_s", 1f, 0.45f);
+                break;
+            }
+            case "SHINKAI_CLASH_TIE":
+                impacts.spawnSuperGlint(x, y, 0xFFFFFFFF);
+                shinkaiFlash = SHINKAI_FLASH_FRAMES;
+                shinkaiFlashColor = 0xFFFFFFFF;
+                beamShake = Math.max(beamShake, 16f);
+                break;
+            default:
+                beamShake = Math.max(beamShake, 6f);
+                break;
+        }
+    }
+
+    /**
+     * No SHINKAI Clash cada um fica na pose de empurrar do tipo dele: o quadro do golpe batendo
+     * no empurrão e um pouco antes entre um e outro (POWER e TECHNIQUE com o H, SPEED trocando L,
+     * M e H a cada empurrão, ENERGY com o disparo da energia e a preparação enquanto carrega).
+     */
+    private final int[] clashStrikes = new int[2];
+
+    private void poseClash(SpriteFighterRenderer renderer, CombatFighter f, int side) {
+        ShinkaiClash c = engine.shinkaiClash();
+        if (c == null || !c.disputando()) return;
+        CharacterDefinition ch = f.character();
+        boolean pushing = c.idadeEmpurrao[side] < 6;
+        if (c.idadeEmpurrao[side] == 0) clashStrikes[side]++;
+        if (c.tipo[side] == Shinkai.Type.ENERGY) {
+            CharacterDefinition.Animation shot = ch.specialAnimations.get("S");
+            AttackDefinition s = ch.attack("S");
+            if (shot != null && s != null) {
+                int at = pushing || c.carga[side] == 0 ? s.startupFrames : Math.max(0, s.startupFrames - 4);
+                renderer.pose(shot.id, shot.timeFor(at * FIXED_STEP, s.totalFrames * FIXED_STEP), 0f);
+                return;
+            }
+        }
+        String id = c.tipo[side] == Shinkai.Type.SPEED ? new String[] {"L", "M", "H"}[clashStrikes[side] % 3] : "H";
+        CharacterDefinition.Move move = ch.moveFor(id);
+        AttackDefinition attack = ch.attack(id);
+        if (move == null || move.animation == null || attack == null || attack.hitboxCount() == 0) return;
+        int active = attack.hitbox(0).firstFrame;
+        int at = pushing ? active : Math.max(0, active - 4);
+        renderer.pose(move.animation.id, move.animationTime((at + 0.5f) * FIXED_STEP), 0f);
     }
 
     /** Clarão da tela na ativação do SHINKAI (quadros que faltam e a cor do tipo). */
@@ -3351,6 +3434,8 @@ public class GameView extends SurfaceView
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
             if (isSuperCinematicActive()) drawSuperDarkness(canvas, renderZoom, cameraLeft, renderCameraTop);
+            // SHINKAI Clash: a tela escurece atrás dos dois (antes de qualquer corpo).
+            confronto.desenharFundo(canvas);
             // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
             canvas.save();
             canvas.translate(tagOffset(), 0f);
@@ -3404,6 +3489,7 @@ public class GameView extends SurfaceView
             riscos.draw(canvas, engine.frame(), riscosLutadores, riscosDeslocamento, riscosVisiveis);
             shinkaiDetalhes.desenhar(canvas);
             desgaste.desenhar(canvas);
+            confronto.desenharFrente(canvas);
             impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
@@ -3461,6 +3547,7 @@ public class GameView extends SurfaceView
             }
 
             corteShinkai.desenhar(canvas);
+            confronto.desenharBarra(canvas);
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
                 // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.

@@ -287,6 +287,7 @@ final class CombatEngine {
             lastSessions[i] = null;
             sessionEndFrame[i] = -1;
         }
+        shinkaiClash = null;
         energyProjectiles.clear();
         superProjectiles.clear();
         puddles.clear();
@@ -370,6 +371,12 @@ final class CombatEngine {
         landed.clear();
         ultraConnected = -1;
         for (int i = 0; i < 2; i++) startX[i] = fighters[i].x;
+        if (shinkaiClash != null) {
+            // O confronto para a luta: só ele anda até acabar.
+            stepShinkaiClash(first, second);
+            for (int i = 0; i < 2; i++) fighters[i].travel = 0f;
+            return;
+        }
 
         // 1. Inputs, buffer and motion parser.
         readInput(fighters[0], first);
@@ -674,6 +681,124 @@ final class CombatEngine {
         other.hitstop = Math.max(other.hitstop, config.shinkaiFlashFrames);
         superFreeze = Math.max(superFreeze, config.shinkaiFlashFrames);
         cues.add("SHINKAI");
+        if (canClash(other)) startShinkaiClash(f, other);
+    }
+
+    // ---------------------------------------------------------------- SHINKAI Clash
+
+    private ShinkaiClash shinkaiClash;
+
+    /** O confronto em andamento, ou null. */
+    ShinkaiClash shinkaiClash() { return shinkaiClash; }
+
+    /** O rival já está no SHINKAI e livre para o confronto (não no Ultra, no agarrão ou na troca). */
+    private boolean canClash(CombatFighter other) {
+        if (!other.state.inShinkai() || other.ko() || other.inUltraSequence() || teams.sides[other.index].tagging()) {
+            return false;
+        }
+        return other.status != CombatFighter.Status.ULTRA && other.status != CombatFighter.Status.THROW &&
+            other.status != CombatFighter.Status.THROWN;
+    }
+
+    /**
+     * Começa o confronto: o que estava no ar some (projéteis, ecos, capangas), os combos acabam e
+     * os dois ficam frente a frente no meio, no chão. A entrada é o corte do SHINKAI de quem
+     * respondeu; o congelamento da ativação fica por conta do confronto.
+     */
+    private void startShinkaiClash(CombatFighter responder, CombatFighter other) {
+        energyProjectiles.clear();
+        superProjectiles.clear();
+        echoes.clear();
+        henchmen.clear();
+        superFreeze = 0;
+        float mid = (fighters[0].x + fighters[1].x) / 2f;
+        float half = config.shinkaiClashGap / 2f;
+        mid = Math.max(Arena.LEFT_BOUND + half + 60f, Math.min(Arena.RIGHT_BOUND - half - 60f, mid));
+        CombatFighter left = fighters[0].x <= fighters[1].x ? fighters[0] : fighters[1];
+        CombatFighter right = left == fighters[0] ? fighters[1] : fighters[0];
+        left.x = mid - half;
+        right.x = mid + half;
+        for (CombatFighter f : fighters) {
+            endSession(f.index);
+            f.status = CombatFighter.Status.NEUTRAL;
+            f.clearAttack();
+            f.buffer.clear();
+            f.stunLeft = f.stunTotal = f.stunElapsed = 0;
+            f.hitstop = 0;
+            f.grounded = true;
+            f.y = Arena.GROUND_Y;
+            f.vx = f.vy = 0f;
+            f.pushRemaining = 0f;
+            f.pushFramesLeft = 0;
+            f.launched = f.slammed = f.hardFall = f.spinning = f.ultraFall = false;
+            f.bounce = CombatFighter.BOUNCE_NONE;
+            f.forwardDashing = false;
+            f.backdashFrames = 0;
+            f.vanishFrames = 0;
+            f.breakerChase = 0;
+            f.facing = f == left ? 1 : -1;
+        }
+        shinkaiClash = new ShinkaiClash(fighters[0].state.shinkaiType, fighters[1].state.shinkaiType,
+            config.shinkaiFlashFrames, fighters[0].facing, fighters[1].facing);
+        cues.add("SHINKAI_CLASH");
+    }
+
+    private void stepShinkaiClash(FighterInput first, FighterInput second) {
+        ShinkaiClash c = shinkaiClash;
+        c.passo(first, second);
+        if (!c.acabou()) return;
+        shinkaiClash = null;
+        CombatFighter a = fighters[0], b = fighters[1];
+        float mid = (a.x + b.x) / 2f;
+        switch (c.fim) {
+            case VITORIA: {
+                CombatFighter w = fighters[c.lado], l = fighters[1 - c.lado];
+                // O golpe de quem venceu entra: dano forte, o perdedor voa girando e perde o SHINKAI.
+                l.state.takeDamage(config.shinkaiClashDamage, config.recoverableLifePermille);
+                l.state.shinkaiFrames = 0;
+                w.state.shinkaiFrames = config.shinkaiFrames;
+                int away = l.x >= w.x ? 1 : -1;
+                l.status = CombatFighter.Status.AIR_HITSTUN;
+                l.grounded = false;
+                l.y -= 2f;
+                l.vx = away * config.spinSpeed * 1.4f;
+                l.vy = -config.spinLift * 1.1f;
+                l.spinning = true;
+                l.launched = true;
+                l.hardFall = true;
+                l.stunLeft = l.stunTotal = config.spinHitstunFrames + 10;
+                l.stunElapsed = 0;
+                l.framesSinceHit = 0;
+                freeze(w, l, 20, false);
+                HitEvent e = new HitEvent(w.index, l.index, config.shinkaiClashDamage, false, false, "SHINKAI_CLASH");
+                e.impactX = l.x - away * l.body().halfWidth;
+                e.impactY = l.y - l.body().height(false) * 0.6f;
+                e.strength = AttackDefinition.Strength.SUPER;
+                events.add(e);
+                cues.add("SHINKAI_CLASH_WIN");
+                break;
+            }
+            case DESISTENCIA: {
+                // Desistiu: sai sem dano, mas perde o SHINKAI; o outro segue no dele.
+                CombatFighter q = fighters[c.lado];
+                q.state.shinkaiFrames = 0;
+                pushApart(q, mid, 1.0f);
+                cues.add("SHINKAI_CLASH_RETREAT");
+                break;
+            }
+            default:
+                pushApart(a, mid, 0.8f);
+                pushApart(b, mid, 0.8f);
+                cues.add("SHINKAI_CLASH_TIE");
+                break;
+        }
+    }
+
+    /** Empurra para longe do meio do confronto, deslizando no chão. */
+    private void pushApart(CombatFighter f, float mid, float scale) {
+        int away = f.x >= mid ? 1 : -1;
+        f.pushRemaining = away * config.comboBreakerPushGap * scale;
+        f.pushFramesLeft = config.comboBreakerPushFrames;
     }
 
     /** TECHNIQUE no SHINKAI: o golpe que acertou ou foi defendido cancela em qualquer outro. */
