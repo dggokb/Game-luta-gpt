@@ -4100,7 +4100,8 @@ public class GameView extends SurfaceView
         float ahead = at[0] + (f.ultraRetreated && seq.retreat != null ? seq.retreat[1] : 0f);
         flightOffset[0] = f.facing * ahead;
         flightOffset[1] = -at[1];
-        flightOffset[2] = f.facing * at[2];   // para a frente: o mortal na direção do rival
+        // Para a frente (o mortal na direção do rival); volta inteira é o mesmo que nada.
+        flightOffset[2] = f.facing * (at[2] % 360f);
         return true;
     }
 
