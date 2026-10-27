@@ -425,41 +425,6 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
-    /**
-     * SHINKAI: brilho na cor do tipo em volta do corpo, chamas subindo dos pés e um anel no
-     * chão. No fim ({@code left} < 0,2) a aura falha, avisando que vai acabar.
-     */
-    void drawShinkai(Canvas c, Paint paint, float x, float baseY, float time, int color, float left) {
-        if (left < 0.2f && ((int)(time * 20f)) % 3 == 0) return;
-        int r = Color.red(color), g = Color.green(color), b = Color.blue(color);
-        int lr = (r + 255) / 2, lg = (g + 255) / 2, lb = (b + 255) / 2;
-        float centerY = baseY - 105f;
-        float pulse = 1f + 0.08f * (float)Math.sin(time * 14f);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(70, r, g, b));
-        c.drawOval(x - 95f * pulse, centerY - 135f * pulse, x + 95f * pulse, baseY + 10f, paint);
-        paint.setColor(Color.argb(60, lr, lg, lb));
-        c.drawOval(x - 62f * pulse, centerY - 100f * pulse, x + 62f * pulse, baseY - 2f, paint);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4f);
-        paint.setColor(Color.argb(210, lr, lg, lb));
-        c.drawOval(x - 78f * pulse, baseY - 11f, x + 78f * pulse, baseY + 11f, paint);
-        paint.setStrokeCap(Paint.Cap.ROUND);
-        // Chamas subindo dos pés, na cor do tipo e clareando.
-        for (int i = 0; i < 14; i++) {
-            float phase = (time * 1.6f + i / 14f) % 1f;
-            float px = x + (float)Math.sin(i * 2.3f + time * 2.5f) * 70f * (1f - phase * 0.4f);
-            float y = baseY - 4f - phase * 240f;
-            paint.setStrokeWidth(8f - phase * 5f);
-            float light = (i % 3) / 2.5f;
-            paint.setColor(Color.argb(Math.round(235f * (1f - phase)),
-                Math.round(r + (255 - r) * light), Math.round(g + (255 - g) * light), Math.round(b + (255 - b) * light)));
-            c.drawLine(px, y, px, y - 46f * (1f - phase * 0.5f), paint);
-        }
-        paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStyle(Paint.Style.FILL);
-    }
-
     static final int AURA_POISON = 0, AURA_ARMOR = 1, AURA_COUNTER = 2, AURA_EVADE = 3, AURA_FURY = 4;
 
     /**

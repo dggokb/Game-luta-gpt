@@ -6,7 +6,7 @@ Roadmap do Combate", no Drive (seções Barra SHINKAI e Anime Clash).
 
 Código: `Shinkai.java` (os tipos e a divisão do elenco), `FighterState` (a barra e o estado),
 `CombatEngine` (ativação e bônus), `TeamSystem` (o relógio), `HudRenderer` (a barra e o
-botão), `GameView` e `EffectsRenderer` (clarão, aura, parry, sumiço). Testes: `ShinkaiTest` e
+botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` (contorno, detalhes de cada tipo, clarão, parry, sumiço). Testes: `ShinkaiTest` e
 `DemoDirectorTest` (demo 87).
 
 ## Regras de todos
@@ -29,14 +29,26 @@ botão), `GameView` e `EffectsRenderer` (clarão, aura, parry, sumiço). Testes:
   juntos** ou a tecla **P** (gatilho LT no controle). Só sai com a barra cheia. Pode ser livre
   ou cancelando o próprio golpe (não o Super), então dá para ligar **no meio do combo**.
 - **Na ativação:**
-  - os dois congelam por `shinkaiFlashFrames` (30); o stun do rival espera, então o combo
+  - os dois congelam por `shinkaiFlashFrames` (48, 0,8 s); o stun do rival espera, então o combo
     continua;
-  - a tela pisca na cor do tipo;
-  - um anel e um brilho saem do lutador;
-  - aparece o aviso **"SHINKAI POWER!"** (ou o tipo dele).
+  - a tela pisca na cor do tipo e um anel e um brilho saem do lutador;
+  - entra o **corte de ativação** (`CorteShinkai`), como nos animes: uma faixa de mangá
+    inclinada atravessa a tela vinda do lado de quem ativou. Nela aparecem os olhos dele (o rosto
+    do HUD, sem arte nova), linhas de velocidade na cor do tipo e **SHINKAI** grande com o tipo
+    embaixo. A tela escurece atrás.
 - **Duração.** Dura `shinkaiFrames` = 480 quadros (**8 s**, como era o OD). A barra esvazia
-  mostrando o tempo e o botão mostra os segundos. No último quinto a aura falha, avisando que
+  mostrando o tempo e o botão mostra os segundos. No último quinto o contorno falha, avisando que
   vai acabar.
+- **Em volta do corpo** (sem aura e sem animação nova): um **contorno de energia** na cor do tipo.
+  É a silhueta do próprio quadro, desenhada atrás dele em várias direções, tremendo: uma borda
+  larga e fraca e outra fina e clara (`GameView.drawShinkaiOutline`). Ele acompanha cada quadro
+  da animação.
+- **O detalhe de cada tipo** (`ShinkaiDetalhes`, e o rastro no `GameView`):
+  - **POWER**: pedrinhas sobem do chão em volta dos pés, e cada golpe que acerta trinca o chão
+    debaixo do rival e treme a tela;
+  - **SPEED**: imagens residuais na cor do tipo atrás dele ao andar e correr;
+  - **ENERGY**: raios curtos estalando em volta do corpo;
+  - **TECHNIQUE**: uma estrela de brilho na ponta do golpe, no quadro em que ele acerta.
 - **Uma vez por personagem no round** (`shinkaiUsed`). Cada um da dupla tem o seu.
 - **Troca.** O SHINKAI é de quem está em campo. Sair na troca acaba com ele e conta como usado.
 - **Round novo.** `CombatEngine.refreshShinkai(side)` libera o uso de novo, mas a barra continua
@@ -68,6 +80,6 @@ O sumiço dos lutadores SPEED sai sozinho quando ela pede o dash. O parry ela ai
 - **SHINKAI Clash.** Os dois ativando quase juntos viram um confronto jogável conforme os tipos:
   POWER × POWER é disputa de força, ENERGY × ENERGY é choque de raios, SPEED × SPEED é batalha de
   sumiço, e as combinações cruzadas também.
-- **Arte.** Hoje a aura, o clarão e o rastro do sumiço são desenhados pelo código. Falta a arte
-  própria de cada tipo: a aura e um grito ou pose na ativação.
+- **Arte.** O corte usa o rosto do HUD. Uma ilustração parada por personagem (os olhos em close,
+  sem vídeo) deixaria o corte ainda melhor. Falta também um som próprio de ativação, ou uma voz.
 - **Prólogo.** O pai ensina o SHINKAI e as crianças falham.

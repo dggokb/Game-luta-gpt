@@ -162,7 +162,7 @@ Fundo de "impact frame" de mangá de luta, formato 16:9: fundo preto com linhas 
 ## Lote 2 — Super, movimento e auras
 
 Hoje: `ImpactEffects.spawnSuperJump`, `spawnSuperGlint`, `EffectsRenderer.drawSuperCharge`,
-`drawShinkai`, `drawMechanicAura`, `drawAirDash`, `drawUltraRush`.
+`drawMechanicAura`, `drawAirDash`, `drawUltraRush`.
 
 ### `aura_super.png` — referência do lote
 LUZ + FOLHA + TINTA. Aura de carga do Super e do Ultra.
@@ -189,8 +189,9 @@ Rastro de velocidade de anime: feixe de linhas horizontais retas e finas de comp
 ```
 
 ### `shinkai.png`
-LUZ + FOLHA. Aura do SHINKAI, uma por tipo. Hoje é desenhada pelo código: oval e chamas na cor do
-tipo (POWER laranja, SPEED ciano, ENERGY roxo, TECHNIQUE dourado) e um anel no chão.
+LUZ + FOLHA. Opcional. O SHINKAI não tem aura: ele mostra um contorno de energia na silhueta e um
+detalhe por tipo, todos desenhados pelo código (docs/shinkai.md). Uma arte aqui seria só para os
+detalhes: pedrinhas (POWER), raio (ENERGY) e brilho de ponta de golpe (TECHNIQUE).
 ```
 Aura de fúria de anime em volta de uma pessoa em pé (o meio é preto, sem corpo): chamas vermelhas e laranja intensas e recortadas subindo, faíscas e brasas voando para cima, contorno vermelho-escuro, muito agressiva. Os quadros: as chamas tremulando, em loop.
 ```

@@ -1794,6 +1794,12 @@ public class GameView extends SurfaceView
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
             CombatFighter hitFighter = engine.fighter(event.defender);
+            FighterState batedor = engine.fighter(event.attacker).state;
+            if (!event.blocked && event.damage > 0 && batedor.inShinkai(Shinkai.Type.POWER)) {
+                // SHINKAI POWER: o golpe trinca o chão e a tela sente.
+                shinkaiDetalhes.trinca(hitFighter.x, batedor.shinkaiType.color);
+                beamShake = Math.max(beamShake, 9f);
+            }
             // Zerado no meio do Ultra: o K.O. (câmera lenta, close, finalização) fica para o golpe final.
             boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter &&
                 !engine.ultraHoldsKo(event.defender);
@@ -2298,6 +2304,9 @@ public class GameView extends SurfaceView
     private void updateUltraBeam() {
         beamShake = Math.max(0f, beamShake - FIXED_STEP * 60f);
         if (shinkaiFlash > 0) shinkaiFlash--;
+        corteShinkai.passo();
+        shinkaiDetalhes.passo(engine, engine.frame());
+        recordSpeedTrail();
         if (ultraAttacker < 0 || paginaFinal.isActive()) return;
         CombatFighter a = engine.fighter(ultraAttacker);
         if (!a.firingBeam()) {
@@ -2581,8 +2590,8 @@ public class GameView extends SurfaceView
 
     /** Defesa perfeita: um brilho branco no peito de quem defendeu e o som da defesa mais agudo. */
     /**
-     * O SHINKAI acendeu: anel e brilho na cor do tipo dele, a tela treme e o aviso diz o tipo.
-     * Devolve o texto do aviso.
+     * O SHINKAI acendeu: anel e brilho na cor do tipo dele, a tela treme e entra o corte de
+     * ativação (que diz o nome e o tipo). Devolve o aviso de texto (nenhum quando o corte entra).
      */
     private String spawnShinkai() {
         String banner = "SHINKAI!";
@@ -2595,7 +2604,9 @@ public class GameView extends SurfaceView
             impacts.spawnSuperGlint(x, chestY(f), color);
             shinkaiFlash = SHINKAI_FLASH_FRAMES;
             shinkaiFlashColor = color;
-            banner = "SHINKAI " + f.state.shinkaiType.label + "!";
+            corteShinkai.comecar(side == OPPONENT, characterSelectRenderer.hudPortrait(f.state.character), f.state.shinkaiType);
+            // O nome vem no corte de ativação: sem o aviso por cima dele.
+            banner = null;
         }
         beamShake = Math.max(beamShake, 16f);
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
@@ -2603,7 +2614,9 @@ public class GameView extends SurfaceView
     }
 
     /** Clarão da tela na ativação do SHINKAI (quadros que faltam e a cor do tipo). */
-    static final int SHINKAI_FLASH_FRAMES = 18;
+    static final int SHINKAI_FLASH_FRAMES = 10;
+    /** O corte de ativação (faixa de mangá com os olhos e o nome), por cima da luta. */
+    private final CorteShinkai corteShinkai = new CorteShinkai();
     private int shinkaiFlash;
     private int shinkaiFlashColor;
 
@@ -3357,8 +3370,7 @@ public class GameView extends SurfaceView
                 canvas.restore();
             }
 
-            drawShinkaiAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
-            drawShinkaiAura(canvas, player(), tagOffset());
+            shinkaiDetalhes.desenharChao(canvas);
             drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawMechanicAura(canvas, player(), tagOffset());
             drawEchoes(canvas);
@@ -3378,6 +3390,7 @@ public class GameView extends SurfaceView
             riscosDeslocamento[PLAYER] = tagOffset();
             riscosDeslocamento[OPPONENT] = engine.teams.tagOffset(OPPONENT);
             riscos.draw(canvas, engine.frame(), riscosLutadores, riscosDeslocamento, riscosVisiveis);
+            shinkaiDetalhes.desenhar(canvas);
             impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
@@ -3434,6 +3447,7 @@ public class GameView extends SurfaceView
                 canvas.drawRect(-40f, VH - bar, VW + 40f, VH + 40f, paint);
             }
 
+            corteShinkai.desenhar(canvas);
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
                 // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.
@@ -4301,6 +4315,7 @@ public class GameView extends SurfaceView
         float angle = knockdownAngle(renderer, f);
         // Rastro do motor de animação: atrás do lutador, onde ele estava.
         renderer.drawRastro(c);
+        if (renderer.override() == null) drawSpeedTrail(c, renderer, f);
         c.save();
         // Quem apanhou treme durante o congelamento do acerto.
         float shake = ImpactFeel.hitShake(f, engine.frame());
@@ -4313,6 +4328,7 @@ public class GameView extends SurfaceView
         if (ultraFlight(f)) applyFlight(c, f, visualY);
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
+        if (f.state.inShinkai() && renderer.override() == null) drawShinkaiOutline(c, renderer, f, visualY);
         ColorFilter look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
         if (look == null && renderer.override() == null && ghostArmsActive(f)) drawGhostArms(c, renderer, f, visualY);
@@ -4633,11 +4649,81 @@ public class GameView extends SurfaceView
         }
     }
 
-    /** A aura do SHINKAI na cor do tipo (some junto com ele no sumiço). */
-    private void drawShinkaiAura(Canvas c, CombatFighter f, float offset) {
-        if (!f.state.inShinkai() || zanzokenAlpha(f) < 1f) return;
+    /** Os detalhes de cada tipo do SHINKAI (pedrinhas, raios, brilhos, trincas). */
+    private final ShinkaiDetalhes shinkaiDetalhes = new ShinkaiDetalhes();
+    /** Filtros da silhueta do SHINKAI (cor sólida com o alfa do desenho), por cor. */
+    private final java.util.Map<Integer, ColorFilter> shinkaiTints = new java.util.HashMap<>();
+
+    private ColorFilter shinkaiTint(int argb) {
+        ColorFilter f = shinkaiTints.get(argb);
+        if (f == null) {
+            f = new PorterDuffColorFilter(argb, PorterDuff.Mode.SRC_IN);
+            shinkaiTints.put(argb, f);
+        }
+        return f;
+    }
+
+    /**
+     * O contorno do SHINKAI: a silhueta do próprio quadro, na cor do tipo, tremendo em volta do
+     * corpo (uma borda larga e fraca, outra fina e clara). Segue cada quadro da animação. No fim
+     * do SHINKAI ele falha, avisando que vai acabar.
+     */
+    private void drawShinkaiOutline(Canvas c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
-        effects.drawShinkai(c, paint, f.x + offset, f.y, engine.frame() * FIXED_STEP, f.state.shinkaiType.color, left);
+        int frame = engine.frame();
+        if (left < 0.2f && (frame / 3) % 3 == 0) return;
+        int color = f.state.shinkaiType.color & 0xFFFFFF;
+        int light = ((Color.red(color) + 255) / 2 << 16) | ((Color.green(color) + 255) / 2 << 8) | (Color.blue(color) + 255) / 2;
+        r.setOverride(shinkaiTint(0x66000000 | color));
+        for (int i = 0; i < 4; i++) {
+            double a = Math.PI * 2.0 * i / 4.0 + Math.PI / 4.0 + frame * 0.05;
+            float rad = 8f + 3f * (float)Math.sin(frame * 0.7 + i * 1.9);
+            r.draw(c, f.x + (float)Math.cos(a) * rad, visualY + (float)Math.sin(a) * rad, f.facing, false, false);
+        }
+        r.setOverride(shinkaiTint(0xFF000000 | light));
+        for (int i = 0; i < 6; i++) {
+            double a = Math.PI * 2.0 * i / 6.0;
+            float rad = 3.2f + 1.3f * (float)Math.sin(frame * 1.3 + i * 2.3);
+            r.draw(c, f.x + (float)Math.cos(a) * rad, visualY + (float)Math.sin(a) * rad, f.facing, false, false);
+        }
+        r.setOverride(null);
+    }
+
+    /** SPEED no SHINKAI: imagens residuais na cor do tipo onde ele esteve (só andando ou correndo). */
+    private final float[][] speedTrail = new float[2][12];
+    private final int[] speedTrailCount = new int[2];
+
+    private void recordSpeedTrail() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            float[] t = speedTrail[i];
+            if (!f.state.inShinkai(Shinkai.Type.SPEED) || f.vanishFrames > 0) {
+                speedTrailCount[i] = 0;
+                continue;
+            }
+            if (engine.frame() % 3 != 0) continue;
+            // Guarda as últimas 4 posições (x, y, lado), a mais nova na frente.
+            System.arraycopy(t, 0, t, 3, 9);
+            t[0] = f.x;
+            t[1] = fighterVisualY(f);
+            t[2] = f.facing;
+            speedTrailCount[i] = Math.min(4, speedTrailCount[i] + 1);
+        }
+    }
+
+    private void drawSpeedTrail(Canvas c, SpriteFighterRenderer r, CombatFighter f) {
+        int side = f == engine.fighter(PLAYER) ? PLAYER : f == engine.fighter(OPPONENT) ? OPPONENT : -1;
+        if (side < 0 || !f.state.inShinkai(Shinkai.Type.SPEED)) return;
+        float[] t = speedTrail[side];
+        int color = f.state.shinkaiType.color & 0xFFFFFF;
+        for (int k = speedTrailCount[side] - 1; k >= 1; k--) {
+            float x = t[k * 3], y = t[k * 3 + 1];
+            if (Math.abs(x - f.x) < 14f && Math.abs(y - fighterVisualY(f)) < 14f) continue;
+            int alpha = 150 - k * 35;
+            r.setOverride(shinkaiTint((alpha << 24) | color));
+            r.draw(c, x, y, (int)t[k * 3 + 2], false, false);
+        }
+        r.setOverride(null);
     }
 
     /** Algum botão de ataque continua sob um dedo (carrega a Onda do p01). */

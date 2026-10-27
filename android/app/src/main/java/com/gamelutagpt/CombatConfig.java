@@ -424,7 +424,7 @@ final class CombatConfig {
     static final int SHINKAI_MAX = 1000;
     int shinkaiFrames = 480;
     /** Both fighters freeze on activation; the opponent's stun waits too (combo extension). */
-    int shinkaiFlashFrames = 30;
+    int shinkaiFlashFrames = 48;
     /** Barra por dano: apanhando enche rápido (cheia com uns 3.300 de dano), batendo devagar. */
     int shinkaiPerDamageTakenPermille = 300;
     int shinkaiPerDamageDealtPermille = 100;
