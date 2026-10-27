@@ -2683,25 +2683,25 @@ public class GameView extends SurfaceView
     private static final int BREAKER_CUE_POP_FRAMES = 6;
     /** Tamanho do "!" (o desenho base tem ~50 px de altura). */
     private static final float BREAKER_CUE_SCALE = 1.5f;
-    private static final int BREAKER_CUE_INK = 0xFF111114;
+    /** Quadros em que o "!" treme ao aparecer. */
+    private static final int BREAKER_CUE_SHAKE_FRAMES = 14;
     private static final int BREAKER_CUE_HOT = 0xFFE0262B;
 
     /**
-     * O aviso do combo breaker, em estilo mangá: um "!" de tinta sobre a cabeça do jogador quando
-     * o golpe que fecha o combo dele está vindo e dá para quebrar (M + H, com barra). Entra com um
-     * estalo; na janela do breaker fica vermelho e treme. O contorno branco fino o separa do cenário.
+     * O aviso do combo breaker, em estilo mangá: um "!" vermelho sobre a cabeça do jogador durante
+     * todo o combo que ele pode quebrar (SUPER, com barra). Entra com um estalo e tremendo, depois
+     * fica parado. O contorno branco fino o separa do cenário.
      */
     private void drawBreakerCue(Canvas c) {
         CombatFighter f = player();
-        int until = engine.breakerCue(f);
-        if (until < 0) {
+        if (engine.breakerCue(f) < 0) {
             breakerCueStart = -1;
             return;
         }
         int now = engine.frame();
         if (breakerCueStart < 0) breakerCueStart = now;
         int age = now - breakerCueStart;
-        boolean window = until <= engine.config.comboBreakerFrames;
+        boolean window = age < BREAKER_CUE_SHAKE_FRAMES;
         float t = Math.min(1f, age / (float)BREAKER_CUE_POP_FRAMES);
         float scale = BREAKER_CUE_SCALE * (1.45f - 0.45f * (1f - (1f - t) * (1f - t)));
         float shake = window ? ((now & 1) == 0 ? 2.5f : -2.5f) : 0f;
@@ -2726,7 +2726,7 @@ public class GameView extends SurfaceView
         paint.setColor(Color.WHITE);
         c.drawPath(breakerCuePath, paint);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(window ? BREAKER_CUE_HOT : BREAKER_CUE_INK);
+        paint.setColor(BREAKER_CUE_HOT);
         c.drawPath(breakerCuePath, paint);
         paint.setStrokeJoin(Paint.Join.MITER);
         c.restore();

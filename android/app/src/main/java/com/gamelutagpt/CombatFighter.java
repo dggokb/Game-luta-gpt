@@ -150,14 +150,6 @@ final class CombatFighter {
     boolean justDefended;
     /** Quem quebrou o último combo quebrado (para a tela; o outro lado zera quando quebra). */
     boolean comboBroke;
-    /**
-     * Combo breaker (M + H apanhando): quadros desde o último aperto, se ele vale (não veio logo
-     * depois do anterior: quem fica batendo M + H não ganha a janela) e há quantos quadros saiu
-     * cada metade sozinha (os dois dedos não precisam cair no mesmo quadro), ou -1.
-     */
-    int breakerPressAge = 999;
-    boolean breakerPressCounts;
-    int breakerMediumAge = -1, breakerHeavyAge = -1;
     /** Quadros em que quem quebrou o combo ainda corre sozinho até quem foi jogado para longe. */
     int breakerChase;
     /** A bola de energia (não Super) cujo acerto o segura no atordoamento agora, ou null. */

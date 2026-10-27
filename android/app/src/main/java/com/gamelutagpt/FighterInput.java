@@ -19,7 +19,7 @@ final class FighterInput {
     boolean ultra;
     /** L + M (or the spot between them): throw, or tech the opponent's throw. */
     boolean grab;
-    /** M + H (or the spot between them): pushblock while blocking, combo breaker while being hit, otherwise a heavy. */
+    /** M + H (or the spot between them): pushblock while blocking, otherwise a heavy. */
     boolean pushblock;
     /** TAG: calls the partner as an assist, or turns the assist on screen into a tag. */
     boolean assist;

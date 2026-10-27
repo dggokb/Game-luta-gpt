@@ -312,7 +312,7 @@ final class AiController {
         guardFrames = 0;
         justDefenseWait = 0;
         breakerWait = 0;
-        lastBreakerSerial = -1;
+        breakerDecided = false;
         breakerCombo = false;
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
@@ -738,24 +738,23 @@ final class AiController {
     }
 
     /**
-     * Combo breaker: apanhando num combo (e com barra), a cada golpe novo que ela vê o rival
-     * soltar, às vezes aposta: espera um pouco e aperta M + H. Quebra só se o aperto cair na
-     * janela de um golpe forte/especial (como um humano que tenta no ritmo do combo).
+     * Combo breaker: quando o combo que ela leva fica quebrável (o "!"), decide uma vez se quebra
+     * e, se sim, aperta SUPER depois de um tempo de reação.
      */
     private void betOnComboBreaker(CombatEngine engine, CombatFighter me, CpuPerception.Snapshot seen,
                                    FighterInput out) {
         ComboSession session = engine.session(me.index);
-        CombatConfig config = engine.config;
-        if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits ||
-            me.state.superMeter < config.comboBreakerCost) {
+        if (session == null || !session.active) {
             breakerWait = 0;
+            breakerDecided = false;
             return;
         }
-        if (seen != null && seen.attacking() && seen.attackSerial != lastBreakerSerial) {
-            lastBreakerSerial = seen.attackSerial;
-            if (breakerWait == 0 && roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
+        if (!engine.canBreakCombo(me)) return;
+        if (!breakerDecided) {
+            breakerDecided = true;
+            if (roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
         }
-        if (breakerWait > 0 && --breakerWait == 0) out.pushblock = true;
+        if (breakerWait > 0 && --breakerWait == 0) out.superAttack = true;
     }
 
     /**
@@ -791,9 +790,11 @@ final class AiController {
 
     private boolean breakerCombo;
 
-    /** Quanto ela espera (no máximo) para apertar depois de ver o golpe. */
-    static final int BREAKER_GUESS_FRAMES = 10;
-    private int breakerWait, lastBreakerSerial = -1;
+    /** Quanto ela espera (no máximo) para apertar depois do "!". */
+    static final int BREAKER_GUESS_FRAMES = 18;
+    private int breakerWait;
+    /** Já decidiu (quebrar ou não) o combo que está levando. */
+    private boolean breakerDecided;
 
 
     /** Quantos quadros antes do contato ela aperta a defesa perfeita (dentro da janela). */

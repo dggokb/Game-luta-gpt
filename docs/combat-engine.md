@@ -719,15 +719,18 @@ Testes em `DefesaEGolpeAltoTest`.
 
 ### Combo breaker
 
-Contra combo sem fim: quem está apanhando pode quebrar o combo **no golpe que fecha a
-sequência** — o forte ou o especial, corpo a corpo, na última batida dele — com **M + H**
-(os dois juntos, o ponto entre eles, ou um dedo até `comboBreakerPairFrames` = 2 quadros depois
-do outro) apertado até `comboBreakerFrames` = 10 quadros (~0,17 s) antes do contato (era 5). Bater M + H sem parar
-não vale (`comboBreakerLockoutFrames` = 20 entre um aperto e outro). L e M no meio da sequência
-não quebram. Apanhando, M + H não sai como H no buffer.
+Contra combo sem fim: quem está apanhando quebra o combo com **SUPER**, **em qualquer golpe**
+e sem tempo certo (antes era M + H nos 10 quadros antes do golpe forte que fechava a sequência:
+no celular era quase impossível). `CombatEngine.canBreakCombo` diz quando dá:
 
-- Só num combo que já tem `comboBreakerMinHits` (2) acertos antes desse golpe e com **1 barra**
-  de Super (`comboBreakerCost`); sem barra, o golpe entra normal. Uma vez por combo (o combo acaba).
+- em atordoamento (no chão ou no ar), num combo que já tem `comboBreakerMinHits` (2) acertos e
+  com **1 barra** de Super (`comboBreakerCost`); sem barra, nada acontece;
+- **não** contra Super nem Ultra (nem no congelamento deles, nem num combo que já teve um) e nem
+  no agarrão. Uma vez por combo (o combo acaba).
+
+Apanhando sem poder quebrar, o SUPER vai para o buffer como sempre (o Super sai se der). O M + H
+apanhando é só o H.
+
 - **Efeito** (cue `COMBO_BREAKER`): o golpe não entra; quem apanhava fica livre na hora (no ar,
   cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (44) depois de um
   congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (170) do corpo de quem
@@ -742,17 +745,19 @@ não quebram. Apanhando, M + H não sai como H no buffer.
   envelhece enquanto corre — e sai no alcance; chegando, ainda sobram ~29 quadros de atordoamento.
 - **Não vira luta infinita**: cada quebra custa uma barra, e a barra só volta batendo e
   apanhando; o troco também pode ser quebrado, mas só por quem ainda tiver barra.
-- **CPU**: a partir do nível 4, apanhando num combo e com barra, a cada golpe novo que ela vê às
-  vezes aposta no tempo (`CpuLevel.comboBreaker`: 6% por nível acima do 3; era 12% com a janela de 5, e com a de 10 o palpite cai na janela quase sempre): espera um pouco e
-  aperta M + H. Só quebra se a aposta cair na janela de um golpe forte/especial. Quando quebra,
+- **CPU**: a partir do nível 4, quando o combo que ela leva fica quebrável, decide uma vez se
+  quebra (`CpuLevel.comboBreaker`: 9% por nível acima do 3, 45% no 8) e, se sim, aperta SUPER
+  depois de até `AiController.BREAKER_GUESS_FRAMES` (18) quadros de reação. Quando quebra,
   **sempre emenda o combo** dela (`AiController.breakerFollowUp`: deixa a corrida levar até ele e
   abre a rota com o primeiro golpe que alcança).
+- **Invencível no estalo**: quem quebrou fica intocável no congelamento e no deslize (o que
+  estava no ar, como um projétil, não o pega de novo).
 - **Câmera lenta**: no estalo, 36 quadros a 50% (`GameView.BREAKER_SLOW_*`), para dar para ver
   o golpe que não entrou e o troco começando.
-- **Aviso**: quando o golpe que dá para quebrar começa contra o jogador (com barra), um "!" de
-  tinta estala sobre a cabeça dele (`CombatEngine.breakerCue`, `GameView.drawBreakerCue`); na
-  janela fica vermelho e treme.
-- Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) M + H".
+- **Aviso**: enquanto o jogador pode quebrar, um "!" vermelho de tinta fica sobre a cabeça dele
+  — aparece no 2º acerto e some quando o combo acaba (`CombatEngine.breakerCue`,
+  `GameView.drawBreakerCue`). Entra com um estalo e tremendo, depois fica parado.
+- Na lista de COMANDOS: "Combo breaker SUPER".
 
 Testes em `ComboBreakerTest`.
 

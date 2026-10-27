@@ -502,43 +502,19 @@ final class CombatEngine {
         if (in.shinkai) f.shinkaiRequestAge = 0;
         trackParryPress(f, in);
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
-        boolean breakerPress = trackBreakerPress(f, in);
         if (in.pushblock) {
-            // Blocking, M + H is the pushblock; being hit, the combo breaker; otherwise the heavy.
+            // Blocking, M + H is the pushblock; otherwise the heavy.
             if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
-            else if (!breakerPress) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+            else f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
         }
-        if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
+        if ((in.superAttack || in.ultra) && canBreakCombo(f)) {
+            // Apanhando, o SUPER é o combo breaker: quebra na hora, sem tempo certo.
+            comboBreaker(fighters[1 - f.index], f);
+        } else if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
             f.buffer.push(InputBuffer.Button.SUPER, null, false);
         }
-    }
-
-    /**
-     * Combo breaker: conta os quadros desde o último M + H apertado apanhando (os dois juntos, o
-     * ponto entre eles, ou um dedo até {@code comboBreakerPairFrames} depois do outro). O aperto
-     * só abre a janela se veio depois do bloqueio contra bater sem parar.
-     */
-    private boolean trackBreakerPress(CombatFighter f, FighterInput in) {
-        boolean press = false;
-        if (f.inHitstun()) {
-            press = in.pushblock || (in.medium && in.heavy) ||
-                (in.medium && f.breakerHeavyAge >= 0) || (in.heavy && f.breakerMediumAge >= 0);
-        }
-        if (press) {
-            f.breakerPressCounts = f.breakerPressAge >= config.comboBreakerLockoutFrames;
-            f.breakerPressAge = 0;
-            f.breakerMediumAge = f.breakerHeavyAge = -1;
-            return true;
-        }
-        if (f.breakerPressAge < 999) f.breakerPressAge++;
-        boolean stunned = f.inHitstun();
-        f.breakerMediumAge = stunned && in.medium ? 0
-            : f.breakerMediumAge >= 0 && f.breakerMediumAge < config.comboBreakerPairFrames ? f.breakerMediumAge + 1 : -1;
-        f.breakerHeavyAge = stunned && in.heavy ? 0
-            : f.breakerHeavyAge >= 0 && f.breakerHeavyAge < config.comboBreakerPairFrames ? f.breakerHeavyAge + 1 : -1;
-        return false;
     }
 
     /** O personagem tem um especial de segurar baixo ([↓] ↑)? */
@@ -1785,52 +1761,28 @@ final class CombatEngine {
     }
 
     /**
-     * Combo breaker: o golpe que fecha a sequência (forte ou especial, corpo a corpo, a última
-     * batida dele) num combo que já tem {@code comboBreakerMinHits} acertos, com M + H apertado
-     * em cima da hora e barra para pagar.
+     * Combo breaker: apanhando num combo que já tem {@code comboBreakerMinHits} acertos, com barra
+     * para pagar, o SUPER quebra na hora (em qualquer golpe do combo). Não quebra Super nem Ultra,
+     * nem no congelamento deles, nem agarrão.
      */
-    private boolean comboBreaks(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile,
-                                boolean echo, boolean lastStrike) {
-        if (projectile || echo || !lastStrike || !d.inHitstun()) return false;
-        if (attack.strength != AttackDefinition.Strength.HEAVY && attack.strength != AttackDefinition.Strength.SPECIAL) {
-            return false;
-        }
+    boolean canBreakCombo(CombatFighter d) {
+        if (!d.inHitstun() || d.ko() || superFreeze > 0) return false;
         ComboSession session = sessions[d.index];
         if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return false;
+        if (session.usesOf("SUPER") > 0 || session.usesOf("ULTRA") > 0) return false;
         if (d.state.superMeter < config.comboBreakerCost) return false;
-        return d.breakerPressCounts && d.breakerPressAge <= config.comboBreakerFrames;
+        CombatFighter a = fighters[1 - d.index];
+        if (a.inUltraSequence() || a.status == CombatFighter.Status.ULTRA || a.status == CombatFighter.Status.THROW) {
+            return false;
+        }
+        return !(a.attacking() && a.attack != null && a.attack.kind == AttackDefinition.Kind.SUPER);
     }
 
     /**
-     * O aviso do combo breaker ("!" sobre quem apanha): o golpe que fecha a sequência (forte ou
-     * especial corpo a corpo) já começou contra {@code d}, num combo que pode ser quebrado e com
-     * barra para pagar. Devolve quantos quadros faltam até a batida que dá para quebrar (0 = ela
-     * entra agora), ou -1 sem aviso.
+     * O aviso do combo breaker ("!" sobre quem apanha): 0 enquanto o SUPER quebra o combo, ou -1.
      */
     int breakerCue(CombatFighter d) {
-        if (!d.inHitstun()) return -1;
-        ComboSession session = sessions[d.index];
-        if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return -1;
-        if (d.state.superMeter < config.comboBreakerCost) return -1;
-        CombatFighter a = fighters[1 - d.index];
-        AttackDefinition attack = a.attack;
-        if (!a.attacking() || attack == null || attack.kind != AttackDefinition.Kind.NORMAL) return -1;
-        if (attack.strength != AttackDefinition.Strength.HEAVY && attack.strength != AttackDefinition.Strength.SPECIAL) {
-            return -1;
-        }
-        int boxes = attack.hitboxCount();
-        if (boxes == 0) return -1;
-        // Vários acertos: quem fecha é a última batida. Um acerto só: qualquer caixa fecha.
-        int from = attack.maxHits > 1 ? boxes - 1 : 0;
-        long closing = attack.maxHits > 1 ? 1L << from : -1L;
-        if ((a.hitboxMask & closing) != 0) return -1;
-        int first = Integer.MAX_VALUE, end = -1;
-        for (int i = from; i < boxes; i++) {
-            first = Math.min(first, attack.hitbox(i).firstFrame);
-            end = Math.max(end, attack.hitbox(i).lastFrame);
-        }
-        if (a.attackFrame > end) return -1;
-        return Math.max(0, first - a.attackFrame - 1);
+        return canBreakCombo(d) ? 0 : -1;
     }
 
     /**
@@ -1841,7 +1793,6 @@ final class CombatEngine {
     private void comboBreaker(CombatFighter a, CombatFighter d) {
         d.state.spendSuperMeter(config.comboBreakerCost);
         d.state.chargeShinkai(config.shinkaiOnBreaker);
-        d.breakerPressCounts = false;
         d.guardPressCounts = false;
         endSession(d.index);
         d.status = CombatFighter.Status.NEUTRAL;
@@ -1857,6 +1808,8 @@ final class CombatEngine {
         d.pushRemaining = 0f;
         d.pushFramesLeft = 0;
         d.comboBroke = true;
+        // O que estiver no ar (um projétil, o resto do golpe) não pega quem acabou de quebrar.
+        d.invulnFrames = Math.max(d.invulnFrames, config.comboBreakerHitstopFrames + config.comboBreakerPushFrames);
         // O que sobrou do M e do H no buffer não sai de longe: o troco é apertado na corrida.
         d.buffer.clear();
         d.breakerChase = config.comboBreakerChaseFrames;
@@ -3002,10 +2955,6 @@ final class CombatEngine {
             return;
         }
 
-        if (comboBreaks(a, d, attack, projectile, c.echo, lastStrike)) {
-            comboBreaker(a, d);
-            return;
-        }
         if (parries(d, attack, projectile)) {
             // SHINKAI TECHNIQUE: aparou. Nada entra; o golpe dele segue e quem aparou está livre.
             if (multi) a.hitsOnTarget = attack.maxHits;

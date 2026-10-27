@@ -381,17 +381,11 @@ final class CombatConfig {
     /** Vida que volta (por mil da vida máxima): primeiro a vermelha. */
     int justDefenseHealPermille = 12;
 
-    // Combo breaker: no golpe que fecha a sequência (o forte ou o especial) de um combo que já
-    // está entrando, M + H em cima da hora quebra o combo: o golpe não entra, quem batia é jogado
-    // para longe e fica atordoado, e quem apanhava sai correndo sozinho até ele para emendar o
-    // próprio combo. Custa barra (sem barra, nada acontece) e vale uma vez por combo.
-    /** Quadros antes da batida em que o M + H ainda vale (~0,17 s: o "!" do aviso já nasce quase todo nela). */
-    int comboBreakerFrames = 10;
-    /** Um M + H logo depois do outro não abre a janela (bater sem parar não quebra). */
-    int comboBreakerLockoutFrames = 20;
-    /** Quadros entre o M e o H (dois dedos) que ainda valem como apertados juntos. */
-    int comboBreakerPairFrames = 2;
-    /** Acertos que o combo já tem antes do golpe que fecha (o breaker não vale no 1º golpe). */
+    // Combo breaker: apanhando num combo que já entrou, o SUPER quebra na hora (o "!" sobre a
+    // cabeça avisa enquanto dá): o golpe não entra, quem batia é jogado para longe e fica
+    // atordoado, e quem apanhava sai correndo sozinho até ele para emendar o próprio combo. Custa
+    // barra (sem barra, o "!" não aparece) e não quebra Super, Ultra nem agarrão.
+    /** Acertos que o combo precisa ter para dar para quebrar (o 1º golpe não quebra). */
     int comboBreakerMinHits = 2;
     int comboBreakerCost = METER_PER_BAR;
     /** Atordoamento de quem teve o combo quebrado: a corrida até ele e o tempo de entrar um combo. */

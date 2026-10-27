@@ -85,13 +85,11 @@ final class CpuLevel {
     }
 
     /**
-     * Chance de apostar no combo breaker a cada golpe novo do combo que está levando (com barra):
-     * nada até o 3, depois sobe com o nível. A aposta é no tempo: só quebra se acertar a janela.
+     * Chance de quebrar o combo que está levando (uma decisão por combo, com barra): nada até o
+     * 3, depois sobe com o nível. Sem tempo certo, quem decide quebrar quebra.
      */
     double comboBreaker() {
-        // Metade do que era com a janela de 5 quadros: com a de 10 o palpite dela cai na janela
-        // quase sempre, e a quebra da CPU fica na mesma frequência de antes.
-        return number <= 3 ? 0.0 : 0.06 * (number - 3);
+        return number <= 3 ? 0.0 : 0.09 * (number - 3);
     }
 
     static CpuLevel of(int number) {

@@ -258,13 +258,12 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **Defesa perfeita**: aperte trás bem em cima do golpe (até 5 quadros antes). Não gasta a
   guarda, não leva chip, recupera um pouco de vida e sai antes do bloqueio. Ficar batendo
   trás não vale.
-- **Combo breaker**: apanhando num combo, **M + H** em cima da hora **no golpe forte ou especial
-  que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem batia é jogado
+- **Combo breaker**: apanhando num combo que já tem 2 acertos, **SUPER** quebra o combo na hora,
+  em qualquer golpe e sem tempo certo, por **1 barra**: o golpe não entra, quem batia é jogado
   para trás (arrastando o pé, com fumacinha) e fica atordoado, e você sai correndo sozinho até
-  ele para emendar o seu combo. Sem barra não quebra. **Aviso**: quando o golpe que dá para
-  quebrar começa (e você tem barra), um **"!"** de tinta, estilo mangá, estala sobre a sua
-  cabeça; na janela do M + H o "!" fica vermelho e treme (`CombatEngine.breakerCue`,
-  `GameView.drawBreakerCue`).
+  ele para emendar o seu combo. Sem barra não quebra; Super, Ultra e agarrão não se quebram.
+  **Aviso**: enquanto dá para quebrar, um **"!"** vermelho de tinta, estilo mangá, fica sobre a
+  sua cabeça (entra com um estalo e tremendo) — `CombatEngine.breakerCue`, `GameView.drawBreakerCue`.
 - **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
 - **Tela de vitória** (teste no Ryūga): depois do K.O., o cenário borrado cobre a luta, ele entra
   fazendo a cena (vídeo no verde), "VITÓRIA" bate à direita e um quadro de mangá traz uma frase

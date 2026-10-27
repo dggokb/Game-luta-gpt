@@ -38,7 +38,7 @@ final class ListaComandos {
             linhas.add(new TelaComandos.Linha(TelaComandos.GOLPE_ALTO, Comandos.texto("→ + {M}", esquema), false));
         }
         linhas.add(new TelaComandos.Linha(TelaComandos.DEFESA_PERFEITA, "←", false));
-        linhas.add(new TelaComandos.Linha(TelaComandos.COMBO_BREAKER, Comandos.texto("{M} + {H}", esquema), false));
+        linhas.add(new TelaComandos.Linha(TelaComandos.COMBO_BREAKER, Comandos.texto("{SUPER}", esquema), false));
         return new TelaComandos.Ficha(c.displayName, linhas);
     }
 
