@@ -37,6 +37,11 @@ final class SpriteAtlasCache {
     static final class Folha {
         final Bitmap bitmap;
         final float escalaX,escalaY;
+        /**
+         * Folha na placa de vídeo não se lê: a do IDLE leva junto esta cópia pequena em memória
+         * comum (1/{@link #AMOSTRA} do lado) para medir a cor da roupa. Null nas outras.
+         */
+        Bitmap amostra;
         Folha(Bitmap bitmap,float escalaX,float escalaY) {this.bitmap=bitmap;this.escalaX=escalaX;this.escalaY=escalaY;}
         boolean inteira() {return escalaX==1f&&escalaY==1f;}
     }
@@ -49,6 +54,19 @@ final class SpriteAtlasCache {
      * e visivelmente mais mole nos closes); em 1080p ou mais, a folha inteira.
      */
     static final float AMPLIACAO_MAXIMA = 1f;
+    /**
+     * As folhas vão direto para a placa de vídeo (Bitmap HARDWARE, Android 9+): sobem uma vez, na
+     * decodificação, e ficam só lá. Sem isso a folha fica na memória comum e o sistema a copia
+     * para a placa de vídeo ao desenhar, de novo sempre que ela sai do cache de texturas (as
+     * folhas de vídeo são grandes e muitas): o FPS caía na troca de animação, nos golpes. O
+     * {@link GameView} liga quando a tela é desenhada pela GPU (um canvas de software não
+     * desenha Bitmap HARDWARE) e desliga, soltando as folhas, se ela voltar ao software.
+     */
+    static volatile boolean naPlacaDeVideo;
+
+    /** Redução da {@link Folha#amostra}. */
+    static final int AMOSTRA=4;
+
     /** Escalas de decodificação, da menor para a maior. */
     private static final float[] ESCALAS = {0.5f, 0.75f, 1f};
 
@@ -418,6 +436,11 @@ final class SpriteAtlasCache {
             bitmap.recycle();
             throw new IllegalStateException("Invalid atlas dimensions: "+a.resource);
         }
+        CharacterDefinition.Animation idle=character.animations.get(SpriteStates.IDLE);
+        if(naPlacaDeVideo(bitmap)&&idle!=null&&idle.atlas==a) {
+            BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;o.inSampleSize=AMOSTRA;
+            folha.amostra=BitmapFactory.decodeResource(context.getResources(),id,o);
+        }
         return folha;
     }
 
@@ -427,18 +450,39 @@ final class SpriteAtlasCache {
      * dele só a metade (inSampleSize 2) é possível, e 3/4 vira a folha inteira.
      */
     private Bitmap decodificar(int id,float escala,int largura,int altura) {
-        if(escala<1f&&Build.VERSION.SDK_INT>=Build.VERSION_CODES.P) {
-            final int alvoL=Math.round(largura*escala),alvoA=Math.round(altura*escala);
-            try {
-                return ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.getResources(),id),
-                    (decoder,info,source)->{
-                        decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);
-                        decoder.setTargetSize(alvoL,alvoA);
-                    });
-            } catch(IOException|RuntimeException e) {
-                android.util.Log.w(MedicaoCarregamento.TAG,"ImageDecoder falhou; decodificando com BitmapFactory",e);
+        boolean placa=naPlacaDeVideo;
+        if((escala<1f||placa)&&Build.VERSION.SDK_INT>=Build.VERSION_CODES.P) {
+            // Na placa de vídeo; se ela recusar (folha maior que a textura máxima do aparelho, sem
+            // memória de vídeo), essa folha fica na memória comum.
+            for(int tentativa=placa?0:1;tentativa<2;tentativa++) {
+                Bitmap b=decodificarComImageDecoder(id,escala,largura,altura,tentativa==0);
+                if(b!=null)return b;
             }
         }
+        return decodificarComBitmapFactory(id,escala);
+    }
+
+    /** A folha está na placa de vídeo (Bitmap HARDWARE só existe do Android 8 em diante). */
+    static boolean naPlacaDeVideo(Bitmap b) {
+        return Build.VERSION.SDK_INT>=Build.VERSION_CODES.O&&b.getConfig()==Bitmap.Config.HARDWARE;
+    }
+
+    private Bitmap decodificarComImageDecoder(int id,float escala,int largura,int altura,boolean placa) {
+        final int alvoL=Math.round(largura*escala),alvoA=Math.round(altura*escala);
+        try {
+            return ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.getResources(),id),
+                (decoder,info,source)->{
+                    decoder.setAllocator(placa?ImageDecoder.ALLOCATOR_HARDWARE:ImageDecoder.ALLOCATOR_SOFTWARE);
+                    if(escala<1f)decoder.setTargetSize(alvoL,alvoA);
+                });
+        } catch(IOException|RuntimeException|OutOfMemoryError e) {
+            android.util.Log.w(MedicaoCarregamento.TAG,placa?"folha não coube na placa de vídeo; memória comum"
+                :"ImageDecoder falhou; decodificando com BitmapFactory",e);
+            return null;
+        }
+    }
+
+    private Bitmap decodificarComBitmapFactory(int id,float escala) {
         BitmapFactory.Options options=new BitmapFactory.Options();options.inScaled=false;
         options.inSampleSize=escala<=0.5f?2:1;
         return BitmapFactory.decodeResource(context.getResources(),id,options);

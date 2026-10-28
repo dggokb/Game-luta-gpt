@@ -3625,11 +3625,19 @@ public class GameView extends SurfaceView
     private Canvas lockFrameCanvas() {
         if (hardwareCanvas && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
-                return holder.lockHardwareCanvas();
+                Canvas c = holder.lockHardwareCanvas();
+                // Tela pela GPU: as folhas dos lutadores podem ir direto para a placa de vídeo.
+                SpriteAtlasCache.naPlacaDeVideo = true;
+                return c;
             } catch (RuntimeException ex) {
                 Log.w(LOG_TAG, "Canvas pela GPU indisponível, usando software", ex);
                 hardwareCanvas = false;
             }
+        }
+        if (SpriteAtlasCache.naPlacaDeVideo) {
+            // O software não desenha folha da placa de vídeo: solta todas (voltam na memória comum).
+            SpriteAtlasCache.naPlacaDeVideo = false;
+            atlases.retainOnly();
         }
         return holder.lockCanvas();
     }

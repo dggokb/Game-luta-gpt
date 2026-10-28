@@ -276,13 +276,16 @@ final class SpriteFighterRenderer {
         int[] caixa=new int[6];
         if(idle==null||!atlases.pronta(idle.atlas.resource)||!idle.atlas.frame(idle.frame(0f,0f),caixa))return 0xFF3A3440;
         SpriteAtlasCache.Folha folha=atlases.get(character,idle.atlas);
-        int x0=Math.round(caixa[0]*folha.escalaX),w=Math.max(1,Math.round(caixa[2]*folha.escalaX));
-        int y0=Math.round((caixa[1]+caixa[3]*0.30f)*folha.escalaY),h=Math.max(1,Math.round(caixa[3]*0.35f*folha.escalaY));
-        w=Math.min(w,folha.bitmap.getWidth()-x0);h=Math.min(h,folha.bitmap.getHeight()-y0);
+        // Folha na placa de vídeo: mede na cópia pequena.
+        android.graphics.Bitmap fonte=folha.amostra!=null?folha.amostra:folha.bitmap;
+        float kx=fonte.getWidth()/(float)idle.atlas.sheetWidth,ky=fonte.getHeight()/(float)idle.atlas.sheetHeight;
+        int x0=Math.round(caixa[0]*kx),w=Math.max(1,Math.round(caixa[2]*kx));
+        int y0=Math.round((caixa[1]+caixa[3]*0.30f)*ky),h=Math.max(1,Math.round(caixa[3]*0.35f*ky));
+        w=Math.min(w,fonte.getWidth()-x0);h=Math.min(h,fonte.getHeight()-y0);
         int cor=0xFF3A3440;
-        if(w>0&&h>0) {
+        if(w>0&&h>0&&!SpriteAtlasCache.naPlacaDeVideo(fonte)) {
             int[] px=new int[w*h];
-            folha.bitmap.getPixels(px,0,w,x0,y0,w,h);
+            fonte.getPixels(px,0,w,x0,y0,w,h);
             // Contagem por cor reduzida (4 bits por canal); fica a média da mais comum.
             int[] conta=new int[4096];long[] soma=new long[4096*3];
             float[] hsv=new float[3];
