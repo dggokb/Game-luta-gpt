@@ -4122,6 +4122,11 @@ public class GameView extends SurfaceView
         }
         CombatFighter rival = engine.fighter(1 - f.index);
         int side = f.index;
+        // Treino: o jogador errou e o boneco provoca (a TAUNT dele, parado no lugar).
+        if (animation == null && tutorial.taunting() && f == engine.fighter(1) && renderer.hasAnimation(SpriteStates.TAUNT)) {
+            animation = SpriteStates.TAUNT;
+            animationElapsed = Math.min(character.animations.get(SpriteStates.TAUNT).duration - 0.0001f, tutorial.tauntTime());
+        }
         // Só o titular comemora; o parceiro em campo (assist, saindo) não mexe no relógio dele.
         boolean onPoint = f == engine.fighter(side);
         // No 2x2 só se comemora quando a dupla inteira do outro lado caiu.
@@ -6126,6 +6131,8 @@ public class GameView extends SurfaceView
      */
     private int nivelDaLuta(Episodio.Passo luta) {
         int base = pausa.nivelCpu();
+        // Luta com nível próprio (a briga dos irmãos crianças): fora da curva da campanha.
+        if (luta != null && luta.nivelCpu > 0) return luta.nivelCpu;
         Episodio ep = historia.episodio();
         if (luta == null || ep == null) return base;
         int indice = ep.passos.indexOf(luta);

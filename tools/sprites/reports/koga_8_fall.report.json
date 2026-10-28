@@ -1,0 +1,168 @@
+{
+  "id": "koga_8_fall",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_fall_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 448,
+    "rootX": 168,
+    "rootY": 412,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        65,
+        44,
+        259,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35055
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        65,
+        44,
+        259,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35055
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        65,
+        44,
+        259,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35055
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        55,
+        51,
+        265,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35266
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        56,
+        51,
+        266,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35266
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        56,
+        51,
+        266,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35266
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 227,
+    "frameHeight": 385,
+    "rootX": 121,
+    "rootY": 376,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      47,
+      36
+    ],
+    "sheetWidth": 668,
+    "sheetHeight": 756,
+    "frames": [
+      [
+        0,
+        0,
+        204,
+        380,
+        14,
+        4
+      ],
+      [
+        208,
+        0,
+        204,
+        380,
+        14,
+        4
+      ],
+      [
+        416,
+        0,
+        204,
+        380,
+        14,
+        4
+      ],
+      [
+        0,
+        384,
+        220,
+        372,
+        4,
+        11
+      ],
+      [
+        224,
+        384,
+        220,
+        372,
+        5,
+        11
+      ],
+      [
+        448,
+        384,
+        220,
+        372,
+        5,
+        11
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 3440640,
+      "grid": 2097480,
+      "packed": 2020032
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "5b475ef628932419ee6cb802682f00de5f90468d2e4a90a84713f2fa9c8da6a7",
+      "config": "fa94c98bf034b1531b8356972851fb368cc683a3fe8181a56459302a77653947",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_fall_video_normalized.png": "06299baf49c0ebc4d5d6da2216e3d610148a2f5f34bad5f2eeccb022613a418a"
+    }
+  }
+}

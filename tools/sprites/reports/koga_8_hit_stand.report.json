@@ -1,0 +1,225 @@
+{
+  "id": "koga_8_hit_stand",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_hit_stand_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 448,
+    "rootX": 174,
+    "rootY": 412,
+    "columns": 9,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        43,
+        87,
+        301,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32820
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        84,
+        93,
+        343,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31986
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        85,
+        92,
+        343,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32098
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        92,
+        87,
+        343,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31827
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        85,
+        73,
+        336,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32580
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        85,
+        74,
+        336,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32368
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        82,
+        68,
+        333,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32884
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        81,
+        65,
+        332,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32977
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        50,
+        80,
+        308,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33367
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 316,
+    "frameHeight": 364,
+    "rootX": 139,
+    "rootY": 355,
+    "columns": 9,
+    "frameCount": 9,
+    "cropOffset": [
+      35,
+      57
+    ],
+    "sheetWidth": 804,
+    "sheetHeight": 1048,
+    "frames": [
+      [
+        536,
+        360,
+        268,
+        336,
+        4,
+        26
+      ],
+      [
+        536,
+        712,
+        268,
+        328,
+        45,
+        32
+      ],
+      [
+        264,
+        712,
+        268,
+        332,
+        46,
+        31
+      ],
+      [
+        0,
+        712,
+        260,
+        336,
+        53,
+        26
+      ],
+      [
+        528,
+        0,
+        260,
+        348,
+        46,
+        12
+      ],
+      [
+        0,
+        360,
+        260,
+        348,
+        46,
+        13
+      ],
+      [
+        0,
+        0,
+        260,
+        356,
+        43,
+        7
+      ],
+      [
+        264,
+        0,
+        260,
+        356,
+        42,
+        4
+      ],
+      [
+        264,
+        360,
+        268,
+        344,
+        11,
+        19
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 6193152,
+      "grid": 4140864,
+      "packed": 3370368
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "dbcd132eb044817234f144c1b48b6a2a8b85874e5e8c32c61899a47a12f3fced",
+      "config": "9b3a605c927aca4cdd9aee66e613dec0665c039bb4284ec1d515c4693136d5e1",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_hit_stand_video_normalized.png": "5640ded25878b783576d296b2dfbbc35b168ba5aed59f9f3105c7f7631df268c"
+    }
+  }
+}

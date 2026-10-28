@@ -1,0 +1,187 @@
+{
+  "id": "koga_8_defense_crouch",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_defense_crouch_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 320,
+    "rootX": 162,
+    "rootY": 284,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        50,
+        47,
+        300,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 26877
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        79,
+        113,
+        330,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22394
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        79,
+        113,
+        330,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22411
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        79,
+        113,
+        330,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22374
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        79,
+        111,
+        330,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22411
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        77,
+        99,
+        328,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22932
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        54,
+        54,
+        304,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26377
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 296,
+    "frameHeight": 255,
+    "rootX": 120,
+    "rootY": 245,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      42,
+      39
+    ],
+    "sheetWidth": 260,
+    "sheetHeight": 1432,
+    "frames": [
+      [
+        0,
+        0,
+        260,
+        248,
+        4,
+        4
+      ],
+      [
+        0,
+        884,
+        260,
+        180,
+        33,
+        70
+      ],
+      [
+        0,
+        1068,
+        260,
+        180,
+        33,
+        70
+      ],
+      [
+        0,
+        1252,
+        260,
+        180,
+        33,
+        70
+      ],
+      [
+        0,
+        696,
+        260,
+        184,
+        33,
+        68
+      ],
+      [
+        0,
+        496,
+        260,
+        196,
+        31,
+        56
+      ],
+      [
+        0,
+        252,
+        260,
+        240,
+        8,
+        11
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 3440640,
+      "grid": 2113440,
+      "packed": 1489280
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "2dc181c6a8a9c8d87b0ba014ec2d25d3f7a4062a7d40a5b2dc6af776cb52a9c4",
+      "config": "d610db6c92255e2e54404d20e2bae18ced589dd0514bbac3bb9f32b7731a573f",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_defense_crouch_video_normalized.png": "17acd5497e2e5062926ea2d782e12788a375eda86c892a9c4f742df022ff1a50"
+    }
+  }
+}

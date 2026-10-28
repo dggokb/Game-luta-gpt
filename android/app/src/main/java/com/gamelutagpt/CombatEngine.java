@@ -520,11 +520,16 @@ final class CombatEngine {
             // Apanhando, qualquer botão de golpe (L, M ou H) é o combo breaker: quebra na hora.
             f.techRequestAge = -1;
             comboBreaker(fighters[1 - f.index], f);
-        } else if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
+        } else if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST && temUltra(f.character())) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
             f.buffer.push(InputBuffer.Button.SUPER, null, false);
         }
+    }
+
+    /** Tem Ultra (sequência ou raio): as crianças da história ainda não têm. */
+    static boolean temUltra(CharacterDefinition c) {
+        return c.fighter.ultraSequence != null || c.specialAnimations.containsKey("ULTRA");
     }
 
     /** O personagem tem um especial de segurar baixo ([↓] ↑)? */
@@ -579,7 +584,7 @@ final class CombatEngine {
         }
 
         if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround() &&
-            f.state.superMeter >= CombatConfig.ULTRA_COST) {
+            f.state.superMeter >= CombatConfig.ULTRA_COST && temUltra(f.character())) {
             startUltra(f);
             f.dashRequest = f.backdashRequest = false;
             return;
@@ -1950,6 +1955,11 @@ final class CombatEngine {
         if (a.inUltraSequence() || a.status == CombatFighter.Status.ULTRA || a.status == CombatFighter.Status.THROW) {
             return false;
         }
+        // Sendo arremessado (agarrado, voando do arremesso até cair, ou no agarrão de um
+        // especial): não quebra.
+        if (d.status == CombatFighter.Status.THROWN) return false;
+        if (throwAttack.id.equals(session.lastMove()) && !d.grounded) return false;
+        if (a.attacking() && a.attack != null && a.attack.mechanics.grab) return false;
         return !(a.attacking() && a.attack != null && a.attack.kind == AttackDefinition.Kind.SUPER);
     }
 
@@ -3262,10 +3272,46 @@ final class CombatEngine {
     private static float impactX(Contact c) {
         CombatFighter a = c.attacker, d = c.defender;
         float half = d.body().halfWidth;
-        if (c.projectile != null) return d.x - c.projectile.direction * half * .6f;
+        if (c.projectile != null) {
+            float surface = superficie(d, c.projectile.direction, impactY(c));
+            return Float.isNaN(surface) ? d.x - c.projectile.direction * half * .6f : surface;
+        }
         AttackDefinition.Box box = c.attack.hitbox(c.hitbox);
-        float front = a.facing > 0 ? a.x + box.x1 : a.x - box.x1;
+        // A ponta do membro no quadro desenhado (sem medida, a caixa do golpe).
+        float[] g = c.hitbox == 0 ? golpeNoDesenho(a, a.attackFrame) : null;
+        float reach = g != null ? g[1] : box.x1;
+        float front = a.x + a.facing * reach;
+        // O choque é onde o punho encontra o corpo desenhado do rival, do lado de quem bate (o
+        // punho que entra no desenho não leva a faísca para o meio ou para as costas dele).
+        float surface = superficie(d, a.facing, impactY(c));
+        if (!Float.isNaN(surface)) {
+            float into = 10f;
+            return a.facing > 0 ? Math.min(front, surface + into) : Math.max(front, surface - into);
+        }
         return Math.max(d.x - half, Math.min(d.x + half, front));
+    }
+
+    /**
+     * Onde fica, no mundo, a borda do corpo desenhado de {@code d} que encara um golpe vindo na
+     * direção {@code direction} (+1 da esquerda para a direita), na altura {@code y} da tela.
+     * NaN sem caixas do desenho.
+     */
+    static float superficie(CombatFighter d, int direction, float y) {
+        float[] corpo = corpoAtual(d);
+        if (corpo == null || corpo.length < 4) return Float.NaN;
+        float h = d.y - y;
+        // O lado do rival que encara o golpe, nas coordenadas dele (+ = a frente dele).
+        int lado = -direction * d.facing;
+        float melhor = Float.NaN, dist = Float.MAX_VALUE;
+        for (int k = 0; k + 3 < corpo.length; k += 4) {
+            float y0 = corpo[k + 2], y1 = corpo[k + 3];
+            float fora = h < y0 ? y0 - h : h > y1 ? h - y1 : 0f;
+            if (fora < dist) {
+                dist = fora;
+                melhor = lado > 0 ? corpo[k + 1] : -corpo[k];
+            }
+        }
+        return d.x - direction * melhor;
     }
 
     private static float impactY(Contact c) {

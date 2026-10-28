@@ -1,0 +1,47 @@
+{
+  "id": "koga_8_jump",
+  "javaName": "KOGA_8_JUMP",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_jump_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_jump.webp",
+  "report": "tools/sprites/reports/koga_8_jump.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pular.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.98)",
+    "quadros": "0,33,34,51,67,84",
+    "largura": 160,
+    "raiz": "82,238",
+    "colunas": 6,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_jump_video_normalized.png",
+      "celula": [
+        160,
+        256
+      ],
+      "raiz": [
+        82,
+        238
+      ],
+      "colunas": 6
+    }
+  },
+  "frameWidth": 320,
+  "rootX": 164,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_jump_video_normalized.png"
+  ]
+}

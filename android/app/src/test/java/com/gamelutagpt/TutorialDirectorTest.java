@@ -12,12 +12,15 @@ public class TutorialDirectorTest {
 
     private static final class Treino {
         final FighterState[] team;
-        final FighterState dummy = new FighterState(GeneratedCharacters.get("p03"), "CPU");
+        final FighterState dummy;
         final CombatEngine engine;
         final FighterInput p1 = new FighterInput(), npc = new FighterInput();
         final TutorialDirector tutorial = new TutorialDirector();
 
-        Treino(String character) {
+        Treino(String character) { this(character, "p03"); }
+
+        Treino(String character, String boneco) {
+            dummy = new FighterState(GeneratedCharacters.get(boneco), "CPU");
             team = new FighterState[] {
                 new FighterState(GeneratedCharacters.get(character), "PLAYER 1"),
                 new FighterState(GeneratedCharacters.get("p02"), "PLAYER 2")
@@ -36,7 +39,11 @@ public class TutorialDirectorTest {
     }
 
     private static void everyLessonCanBeDone(String character) {
-        Treino t = new Treino(character);
+        everyLessonCanBeDone(character, "p03");
+    }
+
+    private static void everyLessonCanBeDone(String character, String boneco) {
+        Treino t = new Treino(character, boneco);
         t.tutorial.start(t.engine, t.team, HOME);
         List<TutorialDirector.Lesson> lessons = TutorialDirector.lessons(t.engine.fighter(0).character());
         assertEquals(lessons.size(), t.tutorial.lessonCount());
@@ -56,6 +63,41 @@ public class TutorialDirectorTest {
     }
 
     @Test public void lutadorBase() { everyLessonCanBeDone("player_base"); }
+
+    /** O treino da história: o Kōga com 8 anos dos dois lados, só com S1 e S2. */
+    @Test public void kogaCrianca() {
+        everyLessonCanBeDone("koga_8", "koga_8");
+        java.util.Set<String> titulos = new java.util.HashSet<>();
+        for (TutorialDirector.Lesson l : TutorialDirector.lessons(GeneratedCharacters.get("koga_8"))) titulos.add(l.title);
+        assertTrue(titulos.contains("ESPECIAL DE ENERGIA"));
+        assertTrue(titulos.contains("ESPECIAL S2"));
+        for (String fora : new String[] {"SUPER", "ULTRA", "AGARRÃO", "ESPECIAL S3", "ESPECIAL S4"}) {
+            assertFalse("sem " + fora, titulos.contains(fora));
+        }
+    }
+
+    /** Errou (golpe no vazio): o boneco provoca, parado, e para de provocar sozinho. */
+    @Test public void errarFazOBonecoProvocar() {
+        Treino t = new Treino("koga_8", "koga_8");
+        t.tutorial.start(t.engine, t.team, HOME);
+        while (!t.tutorial.lesson().title.equals("GOLPE FRACO")) t.tutorial.skip();
+        t.engine.restage(HOME, HOME + 400f);
+        assertFalse(t.tutorial.taunting());
+        boolean provocou = false;
+        for (int i = 0; i < 120 && !provocou; i++) {
+            t.p1.clear();
+            t.p1.light = i == 2;
+            t.tutorial.fillDummy(t.npc);
+            t.engine.step(t.p1, t.npc);
+            t.tutorial.afterStep();
+            provocou = t.tutorial.taunting();
+        }
+        assertTrue("o golpe no vazio faz o boneco provocar", provocou);
+        t.tutorial.fillDummy(t.npc);
+        assertFalse("provocando, o boneco não ataca", t.npc.light || t.npc.medium || t.npc.heavy);
+        for (int i = 0; i < TutorialDirector.TAUNT_MAX + 5; i++) t.step(false);
+        assertFalse(t.tutorial.taunting());
+    }
     @Test public void p02() { everyLessonCanBeDone("p02"); }
     @Test public void p03() { everyLessonCanBeDone("p03"); }
     /**

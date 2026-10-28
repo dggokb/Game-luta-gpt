@@ -1,0 +1,168 @@
+{
+  "id": "koga_8_dash",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_dash_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 448,
+    "rootX": 304,
+    "rootY": 412,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        171,
+        119,
+        428,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 30059
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        127,
+        101,
+        456,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 36100
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        56,
+        115,
+        418,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 37644
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        57,
+        110,
+        420,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 37616
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        96,
+        148,
+        403,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32992
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        175,
+        83,
+        433,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33230
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 416,
+    "frameHeight": 347,
+    "rootX": 256,
+    "rootY": 337,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      48,
+      75
+    ],
+    "sheetWidth": 988,
+    "sheetHeight": 652,
+    "frames": [
+      [
+        376,
+        344,
+        268,
+        304,
+        119,
+        40
+      ],
+      [
+        272,
+        0,
+        340,
+        320,
+        75,
+        22
+      ],
+      [
+        0,
+        344,
+        372,
+        308,
+        4,
+        36
+      ],
+      [
+        616,
+        0,
+        372,
+        312,
+        5,
+        31
+      ],
+      [
+        648,
+        344,
+        316,
+        276,
+        44,
+        69
+      ],
+      [
+        0,
+        0,
+        268,
+        340,
+        123,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5505024,
+      "grid": 3464448,
+      "packed": 2576704
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "9611c0ef5ca5f648074a04e681b687c59cd34fab02c1e9015b308b9a1a07e725",
+      "config": "9c9593e2c9f13a24742ed375243cee366a0ce474fe3d75e6b5140955c44f9120",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_dash_video_normalized.png": "5c3712293bd45c6bf20e12e6c772bcd7bb9e5b394bc9e465941d3c8c45366ff8"
+    }
+  }
+}

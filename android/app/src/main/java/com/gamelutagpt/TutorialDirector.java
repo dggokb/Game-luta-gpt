@@ -246,23 +246,14 @@ final class TutorialDirector {
                 (c, p1) -> special(c, p1, command, hold, air, button)));
         }
 
-        // Agarrão, Super e Ultra.
-        out.add(new Lesson("AGARRÃO", "Colado no boneco, aperte {AGARRAO}", 1, true,
-            c -> c.placeApart(8f), null,
-            c -> c.event("THROW"),
-            (c, p1) -> p1.grab = c.t == 2));
-        out.add(new Lesson("SUPER", "Com 1 barra cheia, aperte {SUPER}", 1, false,
-            c -> { c.placeApart(140f); c.team[0].superMeter = Math.max(c.team[0].superMeter, BAR); }, null,
-            c -> c.doing("SUPER"),
-            (c, p1) -> p1.superAttack = c.t == 2));
-        out.add(new Lesson("ULTRA", "Com 3 barras, segure ↓ e aperte {SUPER}", 1, true,
-            c -> { c.placeApart(60f); c.team[0].superMeter = Math.max(c.team[0].superMeter, CombatConfig.ULTRA_COST); },
-            null,
-            c -> c.p1().status == CombatFighter.Status.ULTRA,
-            (c, p1) -> {
-                if (c.t < 4) p1.direction = 3;
-                p1.ultra = c.t == 2;
-            }));
+        // Agarrão, só de quem tem o desenho dele. O treino é o começo (as crianças): sem Super e
+        // sem Ultra, que vêm depois, na luta.
+        if (character.animations.containsKey(SpriteStates.THROW_GRAB)) {
+            out.add(new Lesson("AGARRÃO", "Colado no boneco, aperte {AGARRAO}", 1, true,
+                c -> c.placeApart(8f), null,
+                c -> c.event("THROW"),
+                (c, p1) -> p1.grab = c.t == 2));
+        }
         return out;
     }
 
@@ -415,6 +406,17 @@ final class TutorialDirector {
     /** Acontecimentos deste passo para quem assiste: "licao", "impacto", "levou", "fim". */
     private final List<String> reactions = new ArrayList<>();
     private int lastImpact = -999, lastHurt = -999, frame;
+    /** Quadros que ainda faltam da provocação do boneco (0: sem provocar). */
+    private int taunt, tauntTotal, lastTaunt = -999;
+    /** O golpe do jogador que está saindo e a contagem da lição quando ele começou. */
+    private boolean wasAttacking;
+    private int countAtAttack, missWait;
+    /** Quadros depois do golpe antes de contar como erro (o projétil ainda pode acertar). */
+    static final int MISS_WAIT = 45;
+    /** Intervalo mínimo entre duas provocações (quadros). */
+    static final int TAUNT_GAP = 150;
+    /** Provocação mais longa que isso é cortada (quadros). */
+    static final int TAUNT_MAX = 150;
 
     boolean active() { return index >= 0 && !finished; }
     /** Liga os quadros entre as lições (o jogo responde com {@link #panelDone}). */
@@ -473,6 +475,9 @@ final class TutorialDirector {
         ctx.t = 0;
         ctx.forward = ctx.back = 0f;
         ctx.landed = "";
+        taunt = 0;
+        missWait = 0;
+        wasAttacking = false;
         ctx.engine.setTeam(0, ctx.team);
         for (FighterState f : ctx.team) {
             f.restoreLife();
@@ -531,12 +536,36 @@ final class TutorialDirector {
             lastHurt = frame;
             reactions.add("levou");
         }
+        if (hurt) mistake();
     }
+
+    /**
+     * O jogador errou: um golpe que acabou sem contar para a lição, ou levou o golpe do boneco
+     * (a defesa que não saiu). O boneco, livre, provoca (a animação TAUNT dele), com folga
+     * entre uma provocação e outra.
+     */
+    private void mistake() {
+        reactions.add("erro");
+        CombatFighter d = ctx.dummy();
+        if (taunt > 0 || frame - lastTaunt < TAUNT_GAP) return;
+        CharacterDefinition.Animation a = d.character().animations.get(SpriteStates.TAUNT);
+        if (a == null || !d.grounded || d.status != CombatFighter.Status.NEUTRAL || d.attacking()) return;
+        tauntTotal = taunt = Math.max(1, Math.min(TAUNT_MAX, Math.round(a.duration * 60f)));
+        lastTaunt = frame;
+    }
+
+    /** O boneco está provocando (o jogo desenha a TAUNT dele). */
+    boolean taunting() { return active() && taunt > 0; }
+
+    /** Segundos desde o começo da provocação (o quadro da TAUNT). */
+    float tauntTime() { return (tauntTotal - taunt) / 60f; }
 
     /** Entrada do boneco para o próximo passo do motor (o jogador usa o próprio pad). */
     void fillDummy(FighterInput dummy) {
         dummy.clear();
         Lesson l = lesson();
+        // Provocando, o boneco fica parado (a animação é dele, não do motor).
+        if (taunt > 0) return;
         if (l == null || l.dummy == null || praise >= 0 || complete >= 0 || panelWanted != null) return;
         l.dummy.drive(ctx, dummy);
     }
@@ -569,12 +598,25 @@ final class TutorialDirector {
             return;
         }
         Lesson l = lessons.get(index);
+        // A provocação acaba no tempo dela, ou na hora em que o boneco apanha ou sai do chão.
+        if (taunt > 0) {
+            CombatFighter d = ctx.dummy();
+            taunt = d.status == CombatFighter.Status.NEUTRAL && d.grounded ? taunt - 1 : 0;
+        }
         watch();
         ctx.observe();
         boolean met = l.check.met(ctx);
         if (met && !wasMet) count++;
         wasMet = met;
         ctx.t++;
+        // Golpe que acabou (sem emendar em outro) sem a lição andar: errou.
+        boolean attacking = ctx.p1().attacking();
+        if (attacking && !wasAttacking) countAtAttack = count;
+        // Espera um pouco (o especial que lança acerta depois de o golpe acabar).
+        if (!attacking && wasAttacking && count == countAtAttack && count < l.times) missWait = MISS_WAIT;
+        if (count != countAtAttack) missWait = 0;
+        if (missWait > 0 && --missWait == 0) mistake();
+        wasAttacking = attacking;
         if (count >= l.times) {
             done[index] = true;
             praise = 0;

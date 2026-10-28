@@ -1,0 +1,263 @@
+{
+  "id": "koga_8_special_energy",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_special_energy_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 448,
+    "rootX": 202,
+    "rootY": 412,
+    "columns": 9,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        74,
+        89,
+        332,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32910
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        73,
+        98,
+        322,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31377
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        69,
+        98,
+        320,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31410
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        67,
+        100,
+        318,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31285
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        63,
+        90,
+        362,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33838
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        60,
+        92,
+        399,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 43704
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        58,
+        91,
+        371,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 36783
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        55,
+        93,
+        354,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33946
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        52,
+        71,
+        310,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34853
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        50,
+        71,
+        308,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34848
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        47,
+        80,
+        305,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33088
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 368,
+    "frameHeight": 358,
+    "rootX": 163,
+    "rootY": 349,
+    "columns": 9,
+    "frameCount": 11,
+    "cropOffset": [
+      39,
+      63
+    ],
+    "sheetWidth": 1100,
+    "sheetHeight": 1020,
+    "frames": [
+      [
+        816,
+        0,
+        268,
+        332,
+        31,
+        22
+      ],
+      [
+        312,
+        692,
+        260,
+        324,
+        30,
+        31
+      ],
+      [
+        576,
+        692,
+        260,
+        324,
+        26,
+        31
+      ],
+      [
+        840,
+        692,
+        260,
+        324,
+        24,
+        33
+      ],
+      [
+        0,
+        356,
+        308,
+        332,
+        20,
+        23
+      ],
+      [
+        312,
+        356,
+        348,
+        332,
+        17,
+        25
+      ],
+      [
+        664,
+        356,
+        324,
+        332,
+        15,
+        24
+      ],
+      [
+        0,
+        692,
+        308,
+        328,
+        12,
+        26
+      ],
+      [
+        0,
+        0,
+        268,
+        352,
+        9,
+        4
+      ],
+      [
+        272,
+        0,
+        268,
+        352,
+        7,
+        4
+      ],
+      [
+        544,
+        0,
+        268,
+        344,
+        4,
+        13
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 14450688,
+      "grid": 9485568,
+      "packed": 4488000
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d09005d5f06616ca87933c09e759348eef09a23010aa542ff952aab0828efed0",
+      "config": "ccff8e80c6e4eb86f258b92ccf8be0d70e73a1b9460057d2502f1b219b96eab4",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_special_energy_video_normalized.png": "fe028b3106f24ce0543e907d6596b8028a742fb0b6b49ac091d2bad5d4742c95"
+    }
+  }
+}

@@ -1,0 +1,396 @@
+{
+  "id": "koga_8_walk_forward",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_walk_forward_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 448,
+    "rootX": 236,
+    "rootY": 412,
+    "columns": 10,
+    "frameCount": 18
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        152,
+        54,
+        312,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33815
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        141,
+        59,
+        295,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33452
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        130,
+        57,
+        281,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33404
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        120,
+        50,
+        271,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34015
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        113,
+        48,
+        270,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34039
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        107,
+        48,
+        297,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34239
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        102,
+        54,
+        329,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34086
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        95,
+        65,
+        340,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33779
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        85,
+        76,
+        336,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33190
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        77,
+        80,
+        328,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32916
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        68,
+        81,
+        319,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33253
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        59,
+        80,
+        311,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 33502
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        50,
+        75,
+        302,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34239
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        43,
+        67,
+        293,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34926
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        53,
+        56,
+        293,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 35244
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        84,
+        53,
+        296,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34688
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        107,
+        54,
+        293,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34457
+    },
+    {
+      "index": 17,
+      "outputBbox": [
+        118,
+        53,
+        284,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34054
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 313,
+    "frameHeight": 382,
+    "rootX": 201,
+    "rootY": 372,
+    "columns": 10,
+    "frameCount": 18,
+    "cropOffset": [
+      35,
+      40
+    ],
+    "sheetWidth": 2004,
+    "sheetHeight": 744,
+    "frames": [
+      [
+        540,
+        0,
+        168,
+        368,
+        113,
+        10
+      ],
+      [
+        1808,
+        0,
+        164,
+        364,
+        102,
+        15
+      ],
+      [
+        0,
+        380,
+        160,
+        364,
+        91,
+        13
+      ],
+      [
+        376,
+        0,
+        160,
+        372,
+        81,
+        6
+      ],
+      [
+        0,
+        0,
+        168,
+        376,
+        74,
+        4
+      ],
+      [
+        172,
+        0,
+        200,
+        376,
+        68,
+        4
+      ],
+      [
+        712,
+        0,
+        236,
+        368,
+        63,
+        10
+      ],
+      [
+        164,
+        380,
+        256,
+        356,
+        56,
+        21
+      ],
+      [
+        688,
+        380,
+        260,
+        348,
+        46,
+        32
+      ],
+      [
+        1216,
+        380,
+        260,
+        344,
+        38,
+        36
+      ],
+      [
+        1744,
+        380,
+        260,
+        340,
+        29,
+        37
+      ],
+      [
+        1480,
+        380,
+        260,
+        344,
+        20,
+        36
+      ],
+      [
+        952,
+        380,
+        260,
+        348,
+        11,
+        31
+      ],
+      [
+        424,
+        380,
+        260,
+        356,
+        4,
+        23
+      ],
+      [
+        952,
+        0,
+        248,
+        368,
+        14,
+        12
+      ],
+      [
+        1204,
+        0,
+        220,
+        368,
+        45,
+        9
+      ],
+      [
+        1428,
+        0,
+        196,
+        368,
+        68,
+        10
+      ],
+      [
+        1628,
+        0,
+        176,
+        368,
+        79,
+        9
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 13762560,
+      "grid": 9565280,
+      "packed": 5963904
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "5b792584983efb3983fa75a4648d48fc6a9aed3b23e84bfbdbe7d3424a156315",
+      "config": "01eaecd459c3afda40ad2b0b2d3cdc13680e3f2cfa98e66046636b80d98153f3",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_walk_forward_video_normalized.png": "e7e35d3a881aae971339d1f73f047df3b7d0f8a82b446cb3bc2699ff13deaa71"
+    }
+  }
+}

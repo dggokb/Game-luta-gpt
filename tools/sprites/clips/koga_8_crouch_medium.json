@@ -1,0 +1,47 @@
+{
+  "id": "koga_8_crouch_medium",
+  "javaName": "KOGA_8_CROUCH_MEDIUM",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_crouch_medium_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_crouch_medium.webp",
+  "report": "tools/sprites/reports/koga_8_crouch_medium.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_crouch_medium-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2M.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): o vídeo começa agachado ou no ar, sem a imagem inicial em pé",
+    "quadros": "7,12,17,22,27,32,37,43,50,56,61,69,75,81,88,94",
+    "celula": 224,
+    "largura": 256,
+    "raiz": "93,206",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_crouch_medium_video_normalized.png",
+      "celula": [
+        256,
+        224
+      ],
+      "raiz": [
+        93,
+        206
+      ],
+      "colunas": 11
+    }
+  },
+  "frameHeight": 448,
+  "rootX": 186,
+  "rootY": 412,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_crouch_medium_video_normalized.png"
+  ]
+}

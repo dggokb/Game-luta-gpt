@@ -89,7 +89,9 @@
         }
       ]
     },
-    {"tipo": "luta", "marca": "treino", "modo": "tutorial", "cenario": "dojo_shinshinkan", "conversa": "ep00/conversa_treino.json", "rotulo": "TREINO", "dupla": ["player_base", "p02"], "cpu": ["p03", "p04"]},
+    {"tipo": "escolha"},
+    {"tipo": "luta", "marca": "treino", "modo": "tutorial", "cenario": "dojo_shinshinkan", "conversa": "ep00/conversa_treino.json", "rotulo": "TREINO", "dupla": ["koga_8"], "cpu": ["koga_8"]},
+    {"tipo": "luta", "marca": "briga-irmaos", "rotulo": "IRMÃOS", "cenario": "dojo_shinshinkan", "dupla": ["koga_8"], "cpu": ["koga_8"], "repetirSeDerrota": false, "nivelCpu": 2},
     {
       "marca": "pai-parte",
       "tipo": "pagina",

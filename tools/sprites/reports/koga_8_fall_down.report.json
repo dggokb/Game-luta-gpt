@@ -1,0 +1,263 @@
+{
+  "id": "koga_8_fall_down",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_fall_down_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 384,
+    "rootX": 198,
+    "rootY": 348,
+    "columns": 8,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        123,
+        77,
+        451,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28295
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        130,
+        138,
+        463,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25261
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        124,
+        178,
+        454,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 26058
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        78,
+        192,
+        408,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 26375
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        63,
+        199,
+        394,
+        350
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26420
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        51,
+        195,
+        386,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 26153
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        55,
+        199,
+        389,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25958
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        55,
+        199,
+        389,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25958
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        67,
+        203,
+        402,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25978
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        67,
+        203,
+        402,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25978
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        89,
+        202,
+        429,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25909
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 428,
+    "frameHeight": 289,
+    "rootX": 155,
+    "rootY": 279,
+    "columns": 8,
+    "frameCount": 11,
+    "cropOffset": [
+      43,
+      69
+    ],
+    "sheetWidth": 348,
+    "sheetHeight": 2000,
+    "frames": [
+      [
+        0,
+        0,
+        336,
+        280,
+        76,
+        4
+      ],
+      [
+        0,
+        284,
+        344,
+        220,
+        83,
+        65
+      ],
+      [
+        0,
+        508,
+        340,
+        180,
+        77,
+        105
+      ],
+      [
+        0,
+        692,
+        340,
+        168,
+        31,
+        119
+      ],
+      [
+        0,
+        1032,
+        340,
+        160,
+        16,
+        126
+      ],
+      [
+        0,
+        864,
+        344,
+        164,
+        4,
+        122
+      ],
+      [
+        0,
+        1196,
+        344,
+        160,
+        8,
+        126
+      ],
+      [
+        0,
+        1360,
+        344,
+        160,
+        8,
+        126
+      ],
+      [
+        0,
+        1524,
+        344,
+        156,
+        20,
+        130
+      ],
+      [
+        0,
+        1684,
+        344,
+        156,
+        20,
+        130
+      ],
+      [
+        0,
+        1844,
+        348,
+        156,
+        42,
+        129
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "grid": 7916288,
+      "packed": 2784000
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "b909733a9adae245f5d88f803a27040d78483e81804ab0918a2582469ff740d0",
+      "config": "a6002c053e027d2b893043c2a1218c617b83373ee33f6ee302edc9b8f4f2b86d",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_fall_down_video_normalized.png": "a6b28944bc921fd4b229333b1ecdad09de592a5300cfc3fbbbe0db0a9944056f"
+    }
+  }
+}

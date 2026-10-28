@@ -9,7 +9,7 @@ import java.util.List;
  * seguidas a CPU desce 1 nível até o jogador vencer ({@link Campanha#alivio}).
  *
  * <p>Contam as lutas contra a CPU que valem para o irmão escolhido: o treino-tutorial do Prólogo
- * (sem IA) fica de fora, e nos episódios com uma luta para cada irmão só a dele conta.
+ * (sem IA) e a luta com nível próprio ({@code nivelCpu}) ficam de fora, e nos episódios com uma luta para cada irmão só a dele conta.
  */
 public final class NivelCpu {
     /** O nível da última luta da campanha. */
@@ -44,7 +44,7 @@ public final class NivelCpu {
 
     /** O passo é uma luta contra a CPU que conta para quem escolheu {@code irmao} (null = todas). */
     public static boolean conta(Episodio.Passo p, String irmao) {
-        return p.tipo == Episodio.TipoPasso.LUTA && !p.tutorial() &&
+        return p.tipo == Episodio.TipoPasso.LUTA && !p.tutorial() && p.nivelCpu <= 0 &&
             (p.irmao == null || irmao == null || p.irmao.equals(irmao));
     }
 

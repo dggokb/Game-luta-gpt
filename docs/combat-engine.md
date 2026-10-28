@@ -737,6 +737,9 @@ Testes em `DefesaEGolpeAltoTest`.
 
 ### Combo breaker
 
+Não quebra quem está sendo arremessado: agarrado (THROWN), voando do arremesso até cair, ou
+no agarrão de um especial (golpe com `grab`).
+
 Contra combo sem fim: quem está apanhando quebra o combo com **qualquer botão de golpe (L, M ou
 H)**, **em qualquer golpe** e sem tempo certo (antes era M + H nos 10 quadros antes do golpe
 forte que fechava a sequência: no celular era quase impossível; depois foi o SUPER). `CombatEngine.canBreakCombo` diz quando dá:
@@ -957,6 +960,10 @@ folhas já convertidas e grava no `character.json`; rode de novo depois de recon
   posição feita à mão: `rival`, `voo`, `alem`).
 
 DEBUG mostra as faixas do corpo (verde) e o membro (vermelho) do quadro que vale.
+
+A faísca do acerto sai onde o punho encontra o corpo desenhado do rival (a borda da faixa na
+altura do golpe, do lado de quem bate): antes ela usava a ponta do golpe presa na largura do
+tronco, e o punho que entrava no desenho levava a faísca para o meio ou para as costas dele.
 
 ## Ajustar caixas no celular (DEBUG > AJUSTAR CAIXAS)
 

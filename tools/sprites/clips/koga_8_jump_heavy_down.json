@@ -1,0 +1,47 @@
+{
+  "id": "koga_8_jump_heavy_down",
+  "javaName": "KOGA_8_JUMP_HEAVY_DOWN",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_jump_heavy_down_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_jump_heavy_down.webp",
+  "report": "tools/sprites/reports/koga_8_jump_heavy_down.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_jump_heavy_down-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jH_BAIXO.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): o vídeo começa agachado ou no ar, sem a imagem inicial em pé",
+    "quadros": "3,22,42,56,72,88,103",
+    "largura": 160,
+    "raiz": "92,238",
+    "colunas": 7,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_jump_heavy_down_video_normalized.png",
+      "celula": [
+        160,
+        256
+      ],
+      "raiz": [
+        92,
+        238
+      ],
+      "colunas": 7
+    }
+  },
+  "frameWidth": 320,
+  "rootX": 184,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_jump_heavy_down_video_normalized.png"
+  ]
+}

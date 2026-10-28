@@ -1,0 +1,168 @@
+{
+  "id": "koga_8_rise",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_rise_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 448,
+    "rootX": 190,
+    "rootY": 412,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        71,
+        187,
+        323,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26231
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        68,
+        174,
+        320,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26815
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        66,
+        176,
+        318,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26872
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        64,
+        98,
+        318,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 31950
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        61,
+        98,
+        315,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 31903
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        59,
+        56,
+        313,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 35010
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 280,
+    "frameHeight": 374,
+    "rootX": 139,
+    "rootY": 364,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      51,
+      48
+    ],
+    "sheetWidth": 264,
+    "sheetHeight": 1768,
+    "frames": [
+      [
+        0,
+        1532,
+        260,
+        236,
+        16,
+        135
+      ],
+      [
+        0,
+        1028,
+        260,
+        248,
+        13,
+        122
+      ],
+      [
+        0,
+        1280,
+        260,
+        248,
+        11,
+        124
+      ],
+      [
+        0,
+        372,
+        264,
+        324,
+        9,
+        46
+      ],
+      [
+        0,
+        700,
+        264,
+        324,
+        6,
+        46
+      ],
+      [
+        0,
+        0,
+        264,
+        368,
+        4,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4128768,
+      "grid": 2513280,
+      "packed": 1867008
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "5f2c7fc05fff146d4870c60824f5d64da3bfedc125983c7f81541ee20469fe81",
+      "config": "d1f79300470a70f2778c5ea102447bc5bddea5b9d665c421da9bb1476cdf338e",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_rise_video_normalized.png": "39d71118d66d102007b86e7c78f68199b9bc4d6c67bdc594683f61e8a5b32725"
+    }
+  }
+}

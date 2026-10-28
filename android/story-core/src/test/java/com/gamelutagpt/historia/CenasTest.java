@@ -98,7 +98,9 @@ public class CenasTest {
         Episodio.Passo treino = tutorial.passos.get(tutorial.passos.size() - 1);
         assertTrue(treino.tutorial());
         assertEquals("dojo_shinshinkan", treino.cenario);
-        assertEquals(intro.passos.size() + 1, tutorial.passos.size());
+        // A escolha do irmão e o treino, logo depois da intro.
+        assertEquals(intro.passos.size() + 2, tutorial.passos.size());
+        assertEquals(Episodio.TipoPasso.ESCOLHA, tutorial.passos.get(intro.passos.size()).tipo);
     }
 
     private static String read(String path) throws IOException {

@@ -33,6 +33,11 @@ final class ComboSession {
         this.defender = defender;
     }
 
+    /** O último golpe que entrou no combo, ou null. */
+    String lastMove() {
+        return usedMoves.isEmpty() ? null : usedMoves.get(usedMoves.size() - 1);
+    }
+
     int usesOf(String moveId) {
         int uses = 0;
         for (String used : usedMoves) if (used.equals(moveId)) uses++;

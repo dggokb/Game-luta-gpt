@@ -1,0 +1,263 @@
+{
+  "id": "koga_8_light_jab",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_light_jab_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 448,
+    "rootX": 194,
+    "rootY": 412,
+    "columns": 9,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        62,
+        81,
+        320,
+        408
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 32973
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        61,
+        56,
+        319,
+        398
+      ],
+      "minimumMargin": 50,
+      "opaquePixels": 33627
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        60,
+        66,
+        394,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 34687
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        59,
+        62,
+        354,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35286
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        57,
+        62,
+        353,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35291
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        57,
+        62,
+        353,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35302
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        57,
+        62,
+        352,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35220
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        55,
+        62,
+        351,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35295
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        55,
+        61,
+        351,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35342
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        54,
+        62,
+        350,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35226
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        54,
+        62,
+        349,
+        397
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 35238
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 356,
+    "frameHeight": 368,
+    "rootX": 148,
+    "rootY": 364,
+    "columns": 9,
+    "frameCount": 11,
+    "cropOffset": [
+      46,
+      48
+    ],
+    "sheetWidth": 1808,
+    "sheetHeight": 700,
+    "frames": [
+      [
+        1272,
+        356,
+        268,
+        336,
+        12,
+        29
+      ],
+      [
+        0,
+        0,
+        268,
+        352,
+        11,
+        4
+      ],
+      [
+        924,
+        356,
+        344,
+        340,
+        10,
+        14
+      ],
+      [
+        272,
+        0,
+        304,
+        344,
+        9,
+        10
+      ],
+      [
+        580,
+        0,
+        304,
+        344,
+        7,
+        10
+      ],
+      [
+        888,
+        0,
+        304,
+        344,
+        7,
+        10
+      ],
+      [
+        1196,
+        0,
+        304,
+        344,
+        7,
+        10
+      ],
+      [
+        1504,
+        0,
+        304,
+        344,
+        5,
+        10
+      ],
+      [
+        0,
+        356,
+        304,
+        344,
+        5,
+        9
+      ],
+      [
+        308,
+        356,
+        304,
+        344,
+        4,
+        10
+      ],
+      [
+        616,
+        356,
+        304,
+        344,
+        4,
+        10
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 14450688,
+      "grid": 9432576,
+      "packed": 5062400
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "008a89f1797d005fe8c1d5919f3a559b08a92f36ea056a0eaa41b45b7abdc480",
+      "config": "68b31098fca2659759e248ec11520bf65d2643e3f278bd62a18e3cdc1f3a4653",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_light_jab_video_normalized.png": "6f386dc1df76861f9481884bd6535e75658cb78fcc61baf55785a17f1b1777ce"
+    }
+  }
+}

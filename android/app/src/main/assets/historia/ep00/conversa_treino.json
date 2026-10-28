@@ -274,6 +274,28 @@
         "expressao": "bravo",
         "texto": "Preste atenção nele!"
       }
+    ],
+    "erro": [
+      {
+        "quem": "dafu",
+        "expressao": "rindo",
+        "texto": "Hohoho! Olha ele te provocando!"
+      },
+      {
+        "quem": "takatoshi",
+        "expressao": "bravo",
+        "texto": "Não caia na provocação. De novo, com calma."
+      },
+      {
+        "quem": "dafu",
+        "expressao": "rindo",
+        "texto": "Errou! Mostra pra ele que foi sorte!"
+      },
+      {
+        "quem": "takatoshi",
+        "expressao": "normal",
+        "texto": "Respira. Olhe a distância e tente outra vez."
+      }
     ]
   }
 }

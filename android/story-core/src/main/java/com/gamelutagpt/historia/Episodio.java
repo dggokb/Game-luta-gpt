@@ -119,6 +119,11 @@ public final class Episodio {
          * outra. Conta como uma luta só (nível da CPU, campanha); perder recomeça da primeira.
          */
         public final int ondas;
+        /**
+         * {@code "nivelCpu": 2}: a luta tem a CPU neste nível, fora da subida da campanha
+         * ({@link NivelCpu}): a briga dos irmãos crianças, logo depois do treino. 0 = a curva.
+         */
+        public int nivelCpu;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -345,7 +350,7 @@ public final class Episodio {
         if ((dupla != null && dupla.length == 1 && cpu == null) || (cpu != null && cpu.length == 1 && dupla == null)) {
             throw new IllegalArgumentException("luta 1x1 precisa de um lutador em dupla e em cpu");
         }
-        return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
+        Passo passo = new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
             Collections.unmodifiableList(paineis), dupla, cpu, string(map, "rotulo", null),
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
             string(map, "conversa", null), string(map, "cinematica", null), string(map, "titulo", null),
@@ -353,6 +358,12 @@ public final class Episodio {
             Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
             Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")),
             Boolean.TRUE.equals(map.get("solo")), Boolean.TRUE.equals(map.get("porto")), adversario(map), ondas);
+        int nivelCpu = number(map, "nivelCpu", 0).intValue();
+        if (nivelCpu < 0 || nivelCpu > MenuPausa.NIVEL_MAX) {
+            throw new IllegalArgumentException("nivelCpu vai de 1 a " + MenuPausa.NIVEL_MAX);
+        }
+        passo.nivelCpu = nivelCpu;
+        return passo;
     }
 
     /** {@code "adversario"}: um id ou uma lista de ids de dupla; null sem o campo. */

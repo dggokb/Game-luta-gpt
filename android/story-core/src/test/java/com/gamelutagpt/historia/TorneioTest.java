@@ -253,11 +253,12 @@ public class TorneioTest {
         }
         assertTrue(viuSorteio);
         assertEquals(irmao, campanha.irmao());
-        // O treino do Prólogo é antes da escolha (o jogador é o Ryūga criança).
-        assertEquals(1, lutasAntesDaEscolha);
-        rotulos.remove(0);
+        // A escolha abre o Prólogo, antes do treino e da briga dos irmãos crianças.
+        assertEquals(0, lutasAntesDaEscolha);
+        assertEquals("TREINO", rotulos.remove(0));
+        assertEquals("IRMÃOS", rotulos.remove(0));
         assertSame(campanha.torneio().jogador(), campanha.torneio().campeao());
-        return lutas.subList(lutasAntesDaEscolha, lutas.size());
+        return lutas.subList(2, lutas.size());
     }
 
     @Test
@@ -473,6 +474,7 @@ public class TorneioTest {
             progresso.terminou(ep, p.campanha());
         }
         rotulos.remove(0); // o treino do Prólogo
+        rotulos.remove(0); // a briga dos irmãos crianças
         assertEquals(java.util.Arrays.asList("TREINO", "CONVITE", "DESAFIO", Torneio.QUARTAS, Campanha.EMBOSCADA,
             Torneio.SEMIFINAL, BONUS, Torneio.FINAL, Campanha.DUELO), rotulos);
     }

@@ -1,0 +1,244 @@
+{
+  "id": "koga_8_backdash",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_backdash_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 512,
+    "rootX": 160,
+    "rootY": 476,
+    "columns": 10,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        30,
+        147,
+        289,
+        477
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 33247
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        51,
+        60,
+        239,
+        442
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 34147
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        52,
+        57,
+        240,
+        417
+      ],
+      "minimumMargin": 52,
+      "opaquePixels": 32805
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        54,
+        55,
+        243,
+        399
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 32179
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        54,
+        54,
+        245,
+        386
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 31605
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        55,
+        55,
+        246,
+        379
+      ],
+      "minimumMargin": 55,
+      "opaquePixels": 31339
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        30,
+        194,
+        287,
+        477
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 30752
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        30,
+        188,
+        288,
+        477
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 30992
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        31,
+        147,
+        290,
+        477
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 33344
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        30,
+        147,
+        289,
+        477
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 33317
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 276,
+    "frameHeight": 439,
+    "rootX": 138,
+    "rootY": 430,
+    "columns": 10,
+    "frameCount": 10,
+    "cropOffset": [
+      22,
+      46
+    ],
+    "sheetWidth": 872,
+    "sheetHeight": 1072,
+    "frames": [
+      [
+        604,
+        0,
+        268,
+        340,
+        4,
+        97
+      ],
+      [
+        0,
+        0,
+        196,
+        392,
+        25,
+        10
+      ],
+      [
+        200,
+        0,
+        196,
+        368,
+        26,
+        7
+      ],
+      [
+        400,
+        0,
+        200,
+        352,
+        28,
+        5
+      ],
+      [
+        0,
+        396,
+        200,
+        340,
+        28,
+        4
+      ],
+      [
+        0,
+        740,
+        200,
+        332,
+        29,
+        5
+      ],
+      [
+        476,
+        740,
+        268,
+        292,
+        4,
+        144
+      ],
+      [
+        204,
+        740,
+        268,
+        300,
+        4,
+        138
+      ],
+      [
+        204,
+        396,
+        268,
+        340,
+        5,
+        97
+      ],
+      [
+        476,
+        396,
+        268,
+        340,
+        4,
+        97
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 6553600,
+      "grid": 4846560,
+      "packed": 3739136
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "b58f9cade44765944eb1640b3dfc80b13df77d6455a1d5b827969451234766ff",
+      "config": "4dfe2d3fcde588910a66a8cae3cc15b1b33896ac9e1b25d5ea28e181dd241e37",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_backdash_video_normalized.png": "1cf5f5d08df8a396738deae0e174a677f25ad546adb0f34ce951fdd45f9d6176"
+    }
+  }
+}

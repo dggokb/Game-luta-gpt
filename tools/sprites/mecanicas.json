@@ -1405,6 +1405,33 @@
         "H": 1.35,
         "2H": 1.35
       }
+    },
+    "koga_8": {
+      "molde": "Criança do tutorial (Kōga com 8 anos)",
+      "estiloCombo": "equilibrado",
+      "vida": 8000,
+      "dano": 0.6,
+      "ritmo": 1.0,
+      "projetil": {
+        "velocidade": 420,
+        "alcance": 240
+      },
+      "unica": {
+        "descricao": "Kōga com 8 anos, do treino e da briga dos irmãos no Prólogo: só S1 (a energia que ainda não sai: um estouro de fumaça curto na frente) e S2 (socos girando). Sem Super e sem Ultra."
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Fumacinha",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Socos girando",
+          "comando": "→↓↘"
+        }
+      },
+      "s1": {
+        "visual": "ESTOURO"
+      }
     }
   }
 }

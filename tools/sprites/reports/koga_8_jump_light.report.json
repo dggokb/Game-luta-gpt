@@ -1,0 +1,187 @@
+{
+  "id": "koga_8_jump_light",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_jump_light_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 512,
+    "rootX": 202,
+    "rootY": 476,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        95,
+        79,
+        283,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35250
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        57,
+        88,
+        388,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 38261
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        54,
+        91,
+        394,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38271
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        54,
+        91,
+        393,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38276
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        53,
+        91,
+        393,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38289
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        57,
+        89,
+        379,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 37654
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        90,
+        78,
+        287,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35815
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 357,
+    "frameHeight": 416,
+    "rootX": 157,
+    "rootY": 406,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      45,
+      70
+    ],
+    "sheetWidth": 1104,
+    "sheetHeight": 808,
+    "frames": [
+      [
+        0,
+        0,
+        196,
+        408,
+        46,
+        5
+      ],
+      [
+        412,
+        0,
+        340,
+        400,
+        8,
+        14
+      ],
+      [
+        756,
+        0,
+        348,
+        396,
+        5,
+        17
+      ],
+      [
+        0,
+        412,
+        348,
+        396,
+        5,
+        17
+      ],
+      [
+        352,
+        412,
+        348,
+        396,
+        4,
+        17
+      ],
+      [
+        704,
+        412,
+        332,
+        396,
+        8,
+        15
+      ],
+      [
+        200,
+        0,
+        208,
+        408,
+        41,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 6422528,
+      "grid": 4158336,
+      "packed": 3568128
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "8c5e74db2f9d5177948bc079b61d2d00e2dbd65fb36d8a6554d32acb2a3db167",
+      "config": "741d0817a4747ecb20cde9f9cb7e81f2dcb8513320b5669a8c6e2a9bcfc63310",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_jump_light_video_normalized.png": "770ad5de8fbf0f132eca5a4ac40cd7e4554f090d27d644223f3e8da13f968595"
+    }
+  }
+}

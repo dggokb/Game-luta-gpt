@@ -1,0 +1,130 @@
+{
+  "id": "koga_8_hit_air",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_hit_air_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 512,
+    "rootX": 228,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        121,
+        78,
+        309,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35450
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        36,
+        109,
+        346,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35189
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        50,
+        98,
+        341,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35403
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        125,
+        71,
+        311,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35746
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 326,
+    "frameHeight": 422,
+    "rootX": 200,
+    "rootY": 413,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      28,
+      63
+    ],
+    "sheetWidth": 1024,
+    "sheetHeight": 416,
+    "frames": [
+      [
+        200,
+        0,
+        196,
+        408,
+        89,
+        11
+      ],
+      [
+        704,
+        0,
+        320,
+        376,
+        4,
+        42
+      ],
+      [
+        400,
+        0,
+        300,
+        388,
+        18,
+        31
+      ],
+      [
+        0,
+        0,
+        196,
+        416,
+        93,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 3145728,
+      "grid": 2201152,
+      "packed": 1703936
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "25b0dc44c6614f1debca5af3e71456a847ea1401c03d86db722c08823c576589",
+      "config": "4a2213c8dcfc2bb858740c4dc32c9d534ac6f002853f2ec3e7cb5e40e43848f6",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_hit_air_video_normalized.png": "a5c3ba5ad8de35e15231039f48532f1f13e9ea9ec2f40b9dc8b405ff5ea51087"
+    }
+  }
+}

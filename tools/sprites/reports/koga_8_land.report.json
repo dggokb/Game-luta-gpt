@@ -1,0 +1,130 @@
+{
+  "id": "koga_8_land",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_land_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 448,
+    "rootX": 196,
+    "rootY": 412,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        68,
+        61,
+        314,
+        412
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 34838
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        59,
+        125,
+        324,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32519
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        62,
+        138,
+        326,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31290
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        64,
+        141,
+        324,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 30957
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 283,
+    "frameHeight": 368,
+    "rootX": 145,
+    "rootY": 359,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      51,
+      53
+    ],
+    "sheetWidth": 276,
+    "sheetHeight": 1232,
+    "frames": [
+      [
+        0,
+        0,
+        256,
+        360,
+        13,
+        4
+      ],
+      [
+        0,
+        364,
+        276,
+        296,
+        4,
+        68
+      ],
+      [
+        0,
+        664,
+        272,
+        284,
+        7,
+        81
+      ],
+      [
+        0,
+        952,
+        268,
+        280,
+        9,
+        84
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 2752512,
+      "grid": 1666304,
+      "packed": 1360128
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "1ee480e88e3d66f93266184ee028e0d09a189b872071732d3f3cb9e573ffe494",
+      "config": "8c8ca97812dd8b16c9ae688ad95329d35933f297b591856ffae3186578a98b22",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_land_video_normalized.png": "6957ce3c301c55c35fe26c621f2d70bd7574f12fcf35e85d2fe25ddff99dcea7"
+    }
+  }
+}

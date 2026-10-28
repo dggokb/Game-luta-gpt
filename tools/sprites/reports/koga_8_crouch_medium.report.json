@@ -1,0 +1,358 @@
+{
+  "id": "koga_8_crouch_medium",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_crouch_medium_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 448,
+    "rootX": 186,
+    "rootY": 412,
+    "columns": 8,
+    "frameCount": 16
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        64,
+        172,
+        316,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 27357
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        34,
+        111,
+        350,
+        390
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 34556
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        70,
+        100,
+        391,
+        390
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 32825
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        92,
+        101,
+        398,
+        390
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 31890
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        91,
+        102,
+        401,
+        390
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 31856
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        127,
+        122,
+        384,
+        416
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 35614
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        154,
+        124,
+        476,
+        401
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 33154
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        155,
+        132,
+        478,
+        408
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 33390
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        157,
+        132,
+        480,
+        408
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 33382
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        159,
+        129,
+        479,
+        410
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 33009
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        158,
+        113,
+        428,
+        406
+      ],
+      "minimumMargin": 42,
+      "opaquePixels": 31724
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        178,
+        89,
+        366,
+        399
+      ],
+      "minimumMargin": 49,
+      "opaquePixels": 31230
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        115,
+        76,
+        347,
+        405
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 33722
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        91,
+        74,
+        342,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 34191
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        93,
+        128,
+        342,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 29995
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        95,
+        172,
+        344,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 27163
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 462,
+    "frameHeight": 358,
+    "rootX": 160,
+    "rootY": 346,
+    "columns": 8,
+    "frameCount": 16,
+    "cropOffset": [
+      26,
+      66
+    ],
+    "sheetWidth": 1596,
+    "sheetHeight": 944,
+    "frames": [
+      [
+        1008,
+        656,
+        260,
+        252,
+        34,
+        102
+      ],
+      [
+        1240,
+        352,
+        324,
+        288,
+        4,
+        41
+      ],
+      [
+        1264,
+        0,
+        332,
+        300,
+        40,
+        30
+      ],
+      [
+        0,
+        352,
+        316,
+        300,
+        62,
+        31
+      ],
+      [
+        320,
+        352,
+        320,
+        296,
+        61,
+        32
+      ],
+      [
+        708,
+        0,
+        268,
+        304,
+        97,
+        52
+      ],
+      [
+        0,
+        656,
+        332,
+        288,
+        124,
+        54
+      ],
+      [
+        336,
+        656,
+        332,
+        284,
+        125,
+        62
+      ],
+      [
+        672,
+        656,
+        332,
+        284,
+        127,
+        62
+      ],
+      [
+        908,
+        352,
+        328,
+        292,
+        129,
+        59
+      ],
+      [
+        980,
+        0,
+        280,
+        304,
+        128,
+        43
+      ],
+      [
+        508,
+        0,
+        196,
+        320,
+        148,
+        19
+      ],
+      [
+        264,
+        0,
+        240,
+        340,
+        85,
+        6
+      ],
+      [
+        0,
+        0,
+        260,
+        348,
+        61,
+        4
+      ],
+      [
+        644,
+        352,
+        260,
+        296,
+        63,
+        58
+      ],
+      [
+        1272,
+        656,
+        260,
+        252,
+        65,
+        102
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 14680064,
+      "grid": 10585344,
+      "packed": 6026496
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "78d6d72bf73aacc75087dcfbe4cd2a5970ff4e0ca88bfaa39d4c6bb67e8f2c52",
+      "config": "89033782a2767f9582c21c3ef4b27115cf2295a363471f5ba90a2bef6d8132e4",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_crouch_medium_video_normalized.png": "10a3a5c354107ddda3473fb2709bc1a650c326db1d8769edcc12d8c9aa0293dc"
+    }
+  }
+}

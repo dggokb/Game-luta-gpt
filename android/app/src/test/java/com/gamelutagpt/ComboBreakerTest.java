@@ -234,6 +234,31 @@ public class ComboBreakerTest {
     }
 
     /** O SUPER não quebra (vai para o buffer, como sempre). */
+    /** Sendo arremessado (agarrado ou no agarrão de um especial) não se quebra o combo. */
+    @Test public void beingThrownCannotBreak() {
+        Match m = new Match();
+        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+        // L > M entram: o combo já pode ser quebrado.
+        int contact = Match.contactOf("H");
+        m.in[0].light = true;
+        String[] seq = {"L", "M", "H"};
+        int k = 0;
+        for (int i = 0; i < contact - 2; i++) {
+            m.step();
+            for (CombatEngine.HitEvent h : m.engine.events()) {
+                if (h.attacker == 0 && !h.blocked && k < 2) {
+                    k++;
+                    if ("M".equals(seq[k])) m.in[0].medium = true; else m.in[0].heavy = true;
+                }
+            }
+        }
+        assertTrue("apanhando no combo, quebra", m.engine.canBreakCombo(m.f(1)));
+        CombatFighter.Status antes = m.f(1).status;
+        m.f(1).status = CombatFighter.Status.THROWN;
+        assertFalse("sendo arremessado, não quebra", m.engine.canBreakCombo(m.f(1)));
+        m.f(1).status = antes;
+    }
+
     @Test public void superDoesNotBreak() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;

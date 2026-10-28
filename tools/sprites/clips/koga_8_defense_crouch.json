@@ -1,0 +1,50 @@
+{
+  "id": "koga_8_defense_crouch",
+  "javaName": "KOGA_8_DEFENSE_CROUCH",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_defense_crouch_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_defense_crouch.webp",
+  "report": "tools/sprites/reports/koga_8_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_defense_crouch-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaBaixo.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): o vídeo começa agachado ou no ar, sem a imagem inicial em pé",
+    "quadros": "11,22,34,46,57,68,80",
+    "celula": 160,
+    "largura": 192,
+    "raiz": "81,142",
+    "colunas": 7,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_defense_crouch_video_normalized.png",
+      "celula": [
+        192,
+        160
+      ],
+      "raiz": [
+        81,
+        142
+      ],
+      "colunas": 7
+    }
+  },
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "rootX": 162,
+  "rootY": 284,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_defense_crouch_video_normalized.png"
+  ]
+}

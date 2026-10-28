@@ -1,0 +1,47 @@
+{
+  "id": "koga_8_hit_air",
+  "javaName": "KOGA_8_HIT_AIR",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_hit_air_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_hit_air.webp",
+  "report": "tools/sprites/reports/koga_8_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoPulo.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): o vídeo começa agachado ou no ar, sem a imagem inicial em pé",
+    "quadros": "1,33,65,97",
+    "largura": 192,
+    "raiz": "114,238",
+    "colunas": 4,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_hit_air_video_normalized.png",
+      "celula": [
+        192,
+        256
+      ],
+      "raiz": [
+        114,
+        238
+      ],
+      "colunas": 4
+    }
+  },
+  "frameWidth": 384,
+  "rootX": 228,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_hit_air_video_normalized.png"
+  ]
+}

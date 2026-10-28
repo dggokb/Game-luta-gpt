@@ -1,0 +1,206 @@
+{
+  "id": "koga_8_defense_stand",
+  "characterProfile": "koga_8",
+  "source": "art/sprites/source/koga_8_defense_stand_video_hd.png",
+  "sourceNote": "koga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 448,
+    "rootX": 214,
+    "rootY": 412,
+    "columns": 8,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        88,
+        87,
+        345,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32962
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        39,
+        95,
+        320,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31376
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        42,
+        98,
+        321,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31628
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        42,
+        99,
+        320,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31557
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        43,
+        99,
+        321,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31560
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        43,
+        99,
+        321,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31560
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        53,
+        101,
+        325,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31924
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        81,
+        86,
+        340,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 32957
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 322,
+    "frameHeight": 343,
+    "rootX": 183,
+    "rootY": 334,
+    "columns": 8,
+    "frameCount": 8,
+    "cropOffset": [
+      31,
+      78
+    ],
+    "sheetWidth": 1156,
+    "sheetHeight": 664,
+    "frames": [
+      [
+        0,
+        0,
+        268,
+        336,
+        53,
+        5
+      ],
+      [
+        544,
+        0,
+        292,
+        328,
+        4,
+        13
+      ],
+      [
+        840,
+        0,
+        288,
+        324,
+        7,
+        16
+      ],
+      [
+        0,
+        340,
+        288,
+        324,
+        7,
+        17
+      ],
+      [
+        292,
+        340,
+        288,
+        324,
+        8,
+        17
+      ],
+      [
+        584,
+        340,
+        288,
+        324,
+        8,
+        17
+      ],
+      [
+        876,
+        340,
+        280,
+        320,
+        18,
+        19
+      ],
+      [
+        272,
+        0,
+        268,
+        336,
+        46,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5505024,
+      "grid": 3534272,
+      "packed": 3070336
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "9ba0ecb78bcc742db2b4ceaf0597fa63afa97d2e19aa1b3958b1550d2fd4da46",
+      "config": "8f934235812b104a8f494a6a4e78a254c306e9c0efe2a26de9fad9b53109d15e",
+      "profile": "70ba693fd7ce86c0378d60e9d6ed90d093ed2f3906f3eec2ddc10a821bf2e8e5"
+    },
+    "referenceSources": {
+      "art/sprites/source/koga_8_defense_stand_video_normalized.png": "67cbf8a1805d487611484d89be465c79f3db3b13aac2ff62bfa35a560993a53b"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "koga_8_fall_down",
+  "javaName": "KOGA_8_FALL_DOWN",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_fall_down_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_fall_down.webp",
+  "report": "tools/sprites/reports/koga_8_fall_down.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_fall_down-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruba_levanta.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.98)",
+    "quadros": "35,36,37,38,39,40,41,41,42,42,43",
+    "celula": 192,
+    "largura": 256,
+    "raiz": "99,174",
+    "fixar": "quadro",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_fall_down_video_normalized.png",
+      "celula": [
+        256,
+        192
+      ],
+      "raiz": [
+        99,
+        174
+      ],
+      "colunas": 11
+    }
+  },
+  "frameHeight": 384,
+  "rootX": 198,
+  "rootY": 348,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_fall_down_video_normalized.png"
+  ]
+}

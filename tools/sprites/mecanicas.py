@@ -525,12 +525,15 @@ def apply(cid, spec, base, combos_data):
         restore(m)
     for m in pack.get('specialMoves', {}).values():
         restore_special(m)
-    sup = fighter['super']['attack']
-    restore(sup)
+    # Sem Super (as crianças da história): só o resto.
+    sup = fighter['super']['attack'] if 'super' in fighter else None
+    if sup is not None:
+        restore(sup)
     restore_s1(fighter['energy']['attack'])
-    restore_super(fighter['super'])
-    for k in ('reach', 'hitHeight', 'launchType', 'knockback', 'mecanica'):
-        sup.pop(k, None)
+    if sup is not None:
+        restore_super(fighter['super'])
+        for k in ('reach', 'hitHeight', 'launchType', 'knockback', 'mecanica'):
+            sup.pop(k, None)
     fighter['maxLife'] = spec['vida']
     keep = spec.get('manterTempo', False)   # arte própria calibrada golpe a golpe (p01)
 
@@ -567,7 +570,8 @@ def apply(cid, spec, base, combos_data):
     energy['speed'] = spec['projetil']['velocidade']
     energy['range'] = spec['projetil']['alcance']
     attacks.append(('S', pack.get('specialAnimations', {}).get('S'), energy['attack']))
-    fighter['super']['damage'] = damage('SUPER')
+    if 'super' in fighter:
+        fighter['super']['damage'] = damage('SUPER')
     unique(pack, spec)
     combos(pack, spec, combos_data)
     commands(pack, spec)
@@ -621,7 +625,7 @@ def apply(cid, spec, base, combos_data):
         dmg = energy['damage'] if key == 'S' else m['damage']
         report.append(f"  {key:4} {dmg:5}  {m['startupFrames']:2}/{m['activeFrames']:2}/{m['recoveryFrames']:2}"
                       f"  {total / 60:.2f}s  cadência {cadence}")
-    if 'SUPER' in hits:
+    if 'SUPER' in hits and 'super' in fighter:
         striking_super(pack, hits['SUPER'], clips)
         a = fighter['super']['attack']
         report.append(f"  SUPER corpo a corpo: {len(a['golpes'])} pancadas {a['golpes']}, "
@@ -639,7 +643,7 @@ def main():
         spec = data['personagens'][cid]
         pack, path, report = apply(cid, spec, data['base'], data['combos'])
         print(f"{cid} ({spec['molde']}): vida {spec['vida']}, dano {spec['dano']}x, ritmo {spec['ritmo']}x, "
-              f"Super {pack['fighter']['super']['damage']}, combo {spec['estiloCombo']}")
+              f"Super {pack['fighter']['super']['damage'] if 'super' in pack['fighter'] else '-'}, combo {spec['estiloCombo']}")
         print('\n'.join(report))
         if args.write:
             path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')

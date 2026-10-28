@@ -364,6 +364,9 @@ public final class PaginaHistoria {
                 p.tipo != Episodio.TipoPasso.SORTEIO && p.tipo != Episodio.TipoPasso.CHAVE && !p.torneio;
         }
         if (!campanha.vale(p)) return false;
+        // A escolha agora é no Prólogo, antes do treino; a do começo do ep01 só aparece para o
+        // save que passou do Prólogo antes disso (sem irmão escolhido).
+        if (p.tipo == Episodio.TipoPasso.ESCOLHA && campanha.escolheu()) return false;
         if (p.duelo) return true;
         boolean precisaChave = p.tipo == Episodio.TipoPasso.SORTEIO || p.tipo == Episodio.TipoPasso.CHAVE || p.torneio;
         if (precisaChave && campanha.torneio() == null) return false;

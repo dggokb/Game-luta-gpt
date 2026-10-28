@@ -1,0 +1,10 @@
+{
+  "pacote": "koga_8",
+  "altura": 165,
+  "chaves": {
+    "inicio_centro": 0.2995,
+    "inicio_direita": 0.2995,
+    "inicio_esquerda": 0.2995
+  },
+  "motivo": "criança de 8 anos: 165 px de guarda (~73% do Kōga adulto, 224); as imagens iniciais foram geradas maiores que as do p01"
+}

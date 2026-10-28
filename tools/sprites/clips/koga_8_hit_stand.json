@@ -1,0 +1,50 @@
+{
+  "id": "koga_8_hit_stand",
+  "javaName": "KOGA_8_HIT_STAND",
+  "profile": "koga_8.json",
+  "source": "art/sprites/source/koga_8_hit_stand_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/koga_8_hit_stand.webp",
+  "report": "tools/sprites/reports/koga_8_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/koga_8_hit_stand-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dano.mp4",
+    "personagem": "koga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.98)",
+    "quadros": "2,14,27,39,52,64,76,89,101",
+    "celula": 224,
+    "largura": 192,
+    "raiz": "87,206",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/koga_8_hit_stand_video_normalized.png",
+      "celula": [
+        192,
+        224
+      ],
+      "raiz": [
+        87,
+        206
+      ],
+      "colunas": 9
+    }
+  },
+  "frameWidth": 384,
+  "frameHeight": 448,
+  "rootX": 174,
+  "rootY": 412,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/koga_8_hit_stand_video_normalized.png"
+  ]
+}
