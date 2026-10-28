@@ -1,0 +1,49 @@
+{
+  "id": "p14_backdash",
+  "javaName": "P14_BACKDASH",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_backdash_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_backdash.webp",
+  "report": "tools/sprites/reports/p14_backdash.report.json",
+  "preview": "android/app/build/sprite-review/p14_backdash-import.png",
+  "expectedFrames": 10,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "backDash.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "último quadro = inicio_centro (nota 0.98)",
+    "quadros": "1,15,28,42,55,69,82,96,109,123",
+    "celula": 352,
+    "largura": 224,
+    "raiz": "111,331",
+    "colunas": 9,
+    "fixar": "registro",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_backdash_video_normalized.png",
+      "celula": [
+        224,
+        352
+      ],
+      "raiz": [
+        111,
+        331
+      ],
+      "colunas": 10
+    }
+  },
+  "frameWidth": 448,
+  "frameHeight": 704,
+  "rootX": 222,
+  "rootY": 662,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_backdash_video_normalized.png"
+  ]
+}

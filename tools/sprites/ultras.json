@@ -1,33 +1,598 @@
 {
-  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio. p15 (Mugen Rendan): os dois vídeos colados (ultra.mp4 = Natisuko_Mugen_Rendan 0–79, 18 cópias do quadro 79 no sumiço, Natisuko_Mugen_Rendan_1 16–69 e 81–123); zanzoken = [de, até] em que ela some deixando a imagem e reaparece (o jogo desenha), e na tela preta do primeiro sumiço os golpes são o secreto (clarões no escuro); o golpe final é no segundo sumiço (a página de mangá entra quando ela some), o rival voa e ela, ainda sumida, segura o quadro 151 (segurar) até reaparecer com ele no ar; recuo = [quadro, distância] em que ela reaparece para trás e aperta a faixa; cameraDaLuta: sem os closes do Ultra (a câmera da luta). p09: o vídeo desenhou um saco no lugar do rival; ele sai pela cor antes de converter (tools/sprites/apagar_saco.py). Cena (a Grande Final da p16): pular = trechos [de, até] do vídeo que ficam fora da folha (a explosão do canhão, que o jogo desenha); some = trechos em que o rival não aparece (debaixo da cartola, dentro do canhão); preto = [de, até] com a tela toda preta; segurar = [[quadro, quadros do jogo]] que um quadro da folha fica a mais (a tela preta mais longa); explosao = [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo (boca do canhão); camera = planos fixos [quadro, frente, altura, zoom] (do quadro em diante; centro da tela a frente/altura px do jogo da raiz dela, zoom da tela), enquadrados para a borda do vídeo (a cartola subindo) não aparecer; o primeiro vale desde o começo e a troca é corte seco (na tela preta). p13 (Meteoro do Colosso): ultra.mp4 = ult2 0–74, ult3 0–96, ult4 82–100 e 17 quadros do pulo (16–32 e 58–82) colados (o ult1, o estalo do pescoço, fica de fora); velocidade própria (quadros do jogo por quadro do vídeo); voo = [quadro, frente, altura(, giro em graus)] do desenho dele (sobe rápido atrás do rival, gira no alto, desce reto acelerando e pula para trás no fim); camera com 5º número = quadros do vídeo que a câmera leva do plano anterior até este (sobe e desce suave); deCabeca = [de, até] com o rival deitado de cabeça para baixo (provisório até a arte do agarrado); bracos = [de, até] com os braços dele (folha ULTRA_SEQ_FRENTE) por cima do rival; quedaFinal = [subida, empurrão] do golpe final (o rival fica no chão); esfumarTopo = quadros em que o fogo que passa do alto do vídeo some aos poucos.",
+  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio. p15 (Mugen Rendan): os dois vídeos colados (ultra.mp4 = Natisuko_Mugen_Rendan 0–79, 18 cópias do quadro 79 no sumiço, Natisuko_Mugen_Rendan_1 16–69 e 81–123); zanzoken = [de, até] em que ela some deixando a imagem e reaparece (o jogo desenha), e na tela preta do primeiro sumiço os golpes são o secreto (clarões no escuro); o golpe final é no segundo sumiço (a página de mangá entra quando ela some), o rival voa e ela, ainda sumida, segura o quadro 151 (segurar) até reaparecer com ele no ar; recuo = [quadro, distância] em que ela reaparece para trás e aperta a faixa; cameraDaLuta: sem os closes do Ultra (a câmera da luta). p09: o vídeo desenhou um saco no lugar do rival; ele sai pela cor antes de converter (tools/sprites/apagar_saco.py). Cena (a Grande Final da p16): pular = trechos [de, até] do vídeo que ficam fora da folha (a explosão do canhão, que o jogo desenha); some = trechos em que o rival não aparece (debaixo da cartola, dentro do canhão); preto = [de, até] com a tela toda preta; segurar = [[quadro, quadros do jogo]] que um quadro da folha fica a mais (a tela preta mais longa); explosao = [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo (boca do canhão); camera = planos fixos [quadro, frente, altura, zoom] (do quadro em diante; centro da tela a frente/altura px do jogo da raiz dela, zoom da tela), enquadrados para a borda do vídeo (a cartola subindo) não aparecer; o primeiro vale desde o começo e a troca é corte seco (na tela preta). p13 (Meteoro do Colosso): ultra.mp4 = ult2 0–74, ult3 0–96, ult4 82–100 e 17 quadros do pulo (16–32 e 58–82) colados (o ult1, o estalo do pescoço, fica de fora); velocidade própria (quadros do jogo por quadro do vídeo); voo = [quadro, frente, altura(, giro em graus)] do desenho dele (sobe rápido atrás do rival, gira no alto, desce reto acelerando e pula para trás no fim); camera com 5º número = quadros do vídeo que a câmera leva do plano anterior até este (sobe e desce suave); deCabeca = [de, até] com o rival deitado de cabeça para baixo (provisório até a arte do agarrado); bracos = [de, até] com os braços dele (folha ULTRA_SEQ_FRENTE) por cima do rival; quedaFinal = [subida, empurrão] do golpe final (o rival fica no chão); esfumarTopo = quadros em que o fogo que passa do alto do vídeo some aos poucos. p14 (Tufão do Malandro): o vídeo tem fundo de cena escuro (não verde); ultra.mp4 aqui é o recortado por tools/sprites/ultra_fundo.py (quadros 40–345 do vídeo do Drive, sem o fundo, a câmera que sobe no pulo desfeita) sobre verde puro: rajada de chutes da esquerda, pulo por cima do rival, rajada do outro lado, giro de vento e o tornado que joga o rival longe.",
   "velocidade": 2,
   "dano": 4200,
   "personagens": {
-    "p02": {"nome": "Dança da Garça", "inicio": 0, "preparo": 6, "golpes": [8, 18, 26, 36, 43, 63], "fim": 92},
-    "p03": {"nome": "Fúria da Casa", "inicio": 0, "preparo": 6, "golpes": [8, 12, 16, 20, 24, 28, 37, 44, 52], "fim": 92},
-    "p04": {"nome": "Soco de Rua", "inicio": 4, "preparo": 16, "golpes": [18, 22, 26, 30, 37, 51], "fim": 88},
-    "p05": {"nome": "Eclipse", "inicio": 0, "preparo": 8, "golpes": [14, 18, 22, 26, 35, 44, 66], "fim": 92},
-    "p07": {"nome": "Herança", "inicio": 8, "preparo": 26, "golpes": [29, 38, 47, 63], "fim": 90},
-    "p08": {"nome": "Sinfonia Escarlate", "inicio": 8, "preparo": 22, "golpes": [25, 29, 46, 62, 67], "fim": 92},
-    "p09": {"nome": "Resgate Final", "inicio": 0, "preparo": 22, "golpes": [30, 40, 62], "fim": 96,
-            "rival": [[30, 115, 0], [34, 115, 0], [38, 75, 30], [40, 70, 60], [44, 9, 252], [54, 14, 230],
-                      [58, 54, 261], [60, 95, 150], [62, 130, 0]]},
-    "p10": {"nome": "Resgate Aéreo", "inicio": 6, "preparo": 18, "golpes": [23, 35, 45, 48, 60], "fim": 92},
-    "p11": {"nome": "Autópsia", "inicio": 0, "preparo": 22, "golpes": [28, 32, 40, 44, 54], "fim": 96},
-    "p12": {"nome": "Último Suspiro", "inicio": 10, "preparo": 40, "golpes": [44, 50, 56, 72], "fim": 92},
-    "p16": {"nome": "Grande Final", "inicio": 0, "preparo": 12, "golpes": [50, 110], "fim": 233,
-            "rival": [[46, 232, 0], [62, 232, 0], [63, 370, 110], [110, 370, 110]],
-            "pular": [[111, 121]], "some": [[46, 110]], "preto": [54, 64], "segurar": [[60, 30]],
-            "explosao": [110, 370, 240, 25], "camera": [[46, 215, 126, 1.7], [60, 324, 178, 1.35]]},
-    "p15": {"nome": "Mugen Rendan", "inicio": 0, "preparo": 23,
-            "golpes": [25, 37, 42, 46, 49, 54, 59, 67, 87, 89, 91, 93, 95, 102, 108, 115, 122, 136, 148], "fim": 194,
-            "zanzoken": [[80, 98], [146, 152]], "preto": [85, 97], "segurar": [[151, 56]], "recuo": [152, 140],
-            "cameraDaLuta": true},
-    "p13": {"nome": "Meteoro do Colosso", "velocidade": 2.2, "inicio": 0, "preparo": 21, "golpes": [27, 83, 141], "fim": 207,
-            "rival": [[21, 120, 0], [27, 120, 0], [33, 125, 250], [45, 130, 650], [60, 130, 1000], [70, 40, 1000], [81, 6, 750], [96, 6, 750], [100, 110, 700], [138, 110, 40], [141, 110, 0]],
-            "some": [[96, 141]], "deCabeca": [70, 96], "bracos": [81, 95],
-            "voo": [[58, 0, 0], [60, 0, 60], [63, 0, 280], [66, 0, 440], [70, 0, 570], [75, 0, 630], [81, 0, 650], [96, 0, 660, 0], [104, 0, 660, 360], [113, 0, 621, 360], [122, 0, 504, 360], [130, 0, 334, 360], [135, 0, 196, 360], [138, 0, 103, 360], [141, 0, 0, 360], [195, 0, 0, 360], [197, -70, 50, 360], [199, -140, 70, 360], [202, -210, 40, 360], [204, -240, 0, 360]],
-            "recuo": [204, 240], "camera": [[21, 60, 125, 1.6], [63, 0, 760, 1.4, 10], [127, 0, 125, 1.6]],
-            "quedaFinal": [350, 60], "esfumarTopo": [[99, 150]]}
+    "p02": {
+      "nome": "Dança da Garça",
+      "inicio": 0,
+      "preparo": 6,
+      "golpes": [
+        8,
+        18,
+        26,
+        36,
+        43,
+        63
+      ],
+      "fim": 92
+    },
+    "p03": {
+      "nome": "Fúria da Casa",
+      "inicio": 0,
+      "preparo": 6,
+      "golpes": [
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        37,
+        44,
+        52
+      ],
+      "fim": 92
+    },
+    "p04": {
+      "nome": "Soco de Rua",
+      "inicio": 4,
+      "preparo": 16,
+      "golpes": [
+        18,
+        22,
+        26,
+        30,
+        37,
+        51
+      ],
+      "fim": 88
+    },
+    "p05": {
+      "nome": "Eclipse",
+      "inicio": 0,
+      "preparo": 8,
+      "golpes": [
+        14,
+        18,
+        22,
+        26,
+        35,
+        44,
+        66
+      ],
+      "fim": 92
+    },
+    "p07": {
+      "nome": "Herança",
+      "inicio": 8,
+      "preparo": 26,
+      "golpes": [
+        29,
+        38,
+        47,
+        63
+      ],
+      "fim": 90
+    },
+    "p08": {
+      "nome": "Sinfonia Escarlate",
+      "inicio": 8,
+      "preparo": 22,
+      "golpes": [
+        25,
+        29,
+        46,
+        62,
+        67
+      ],
+      "fim": 92
+    },
+    "p09": {
+      "nome": "Resgate Final",
+      "inicio": 0,
+      "preparo": 22,
+      "golpes": [
+        30,
+        40,
+        62
+      ],
+      "fim": 96,
+      "rival": [
+        [
+          30,
+          115,
+          0
+        ],
+        [
+          34,
+          115,
+          0
+        ],
+        [
+          38,
+          75,
+          30
+        ],
+        [
+          40,
+          70,
+          60
+        ],
+        [
+          44,
+          9,
+          252
+        ],
+        [
+          54,
+          14,
+          230
+        ],
+        [
+          58,
+          54,
+          261
+        ],
+        [
+          60,
+          95,
+          150
+        ],
+        [
+          62,
+          130,
+          0
+        ]
+      ]
+    },
+    "p10": {
+      "nome": "Resgate Aéreo",
+      "inicio": 6,
+      "preparo": 18,
+      "golpes": [
+        23,
+        35,
+        45,
+        48,
+        60
+      ],
+      "fim": 92
+    },
+    "p11": {
+      "nome": "Autópsia",
+      "inicio": 0,
+      "preparo": 22,
+      "golpes": [
+        28,
+        32,
+        40,
+        44,
+        54
+      ],
+      "fim": 96
+    },
+    "p12": {
+      "nome": "Último Suspiro",
+      "inicio": 10,
+      "preparo": 40,
+      "golpes": [
+        44,
+        50,
+        56,
+        72
+      ],
+      "fim": 92
+    },
+    "p16": {
+      "nome": "Grande Final",
+      "inicio": 0,
+      "preparo": 12,
+      "golpes": [
+        50,
+        110
+      ],
+      "fim": 233,
+      "rival": [
+        [
+          46,
+          232,
+          0
+        ],
+        [
+          62,
+          232,
+          0
+        ],
+        [
+          63,
+          370,
+          110
+        ],
+        [
+          110,
+          370,
+          110
+        ]
+      ],
+      "pular": [
+        [
+          111,
+          121
+        ]
+      ],
+      "some": [
+        [
+          46,
+          110
+        ]
+      ],
+      "preto": [
+        54,
+        64
+      ],
+      "segurar": [
+        [
+          60,
+          30
+        ]
+      ],
+      "explosao": [
+        110,
+        370,
+        240,
+        25
+      ],
+      "camera": [
+        [
+          46,
+          215,
+          126,
+          1.7
+        ],
+        [
+          60,
+          324,
+          178,
+          1.35
+        ]
+      ]
+    },
+    "p15": {
+      "nome": "Mugen Rendan",
+      "inicio": 0,
+      "preparo": 23,
+      "golpes": [
+        25,
+        37,
+        42,
+        46,
+        49,
+        54,
+        59,
+        67,
+        87,
+        89,
+        91,
+        93,
+        95,
+        102,
+        108,
+        115,
+        122,
+        136,
+        148
+      ],
+      "fim": 194,
+      "zanzoken": [
+        [
+          80,
+          98
+        ],
+        [
+          146,
+          152
+        ]
+      ],
+      "preto": [
+        85,
+        97
+      ],
+      "segurar": [
+        [
+          151,
+          56
+        ]
+      ],
+      "recuo": [
+        152,
+        140
+      ],
+      "cameraDaLuta": true
+    },
+    "p13": {
+      "nome": "Meteoro do Colosso",
+      "velocidade": 2.2,
+      "inicio": 0,
+      "preparo": 21,
+      "golpes": [
+        27,
+        83,
+        141
+      ],
+      "fim": 207,
+      "rival": [
+        [
+          21,
+          120,
+          0
+        ],
+        [
+          27,
+          120,
+          0
+        ],
+        [
+          33,
+          125,
+          250
+        ],
+        [
+          45,
+          130,
+          650
+        ],
+        [
+          60,
+          130,
+          1000
+        ],
+        [
+          70,
+          40,
+          1000
+        ],
+        [
+          81,
+          6,
+          750
+        ],
+        [
+          96,
+          6,
+          750
+        ],
+        [
+          100,
+          110,
+          700
+        ],
+        [
+          138,
+          110,
+          40
+        ],
+        [
+          141,
+          110,
+          0
+        ]
+      ],
+      "some": [
+        [
+          96,
+          141
+        ]
+      ],
+      "deCabeca": [
+        70,
+        96
+      ],
+      "bracos": [
+        81,
+        95
+      ],
+      "voo": [
+        [
+          58,
+          0,
+          0
+        ],
+        [
+          60,
+          0,
+          60
+        ],
+        [
+          63,
+          0,
+          280
+        ],
+        [
+          66,
+          0,
+          440
+        ],
+        [
+          70,
+          0,
+          570
+        ],
+        [
+          75,
+          0,
+          630
+        ],
+        [
+          81,
+          0,
+          650
+        ],
+        [
+          96,
+          0,
+          660,
+          0
+        ],
+        [
+          104,
+          0,
+          660,
+          360
+        ],
+        [
+          113,
+          0,
+          621,
+          360
+        ],
+        [
+          122,
+          0,
+          504,
+          360
+        ],
+        [
+          130,
+          0,
+          334,
+          360
+        ],
+        [
+          135,
+          0,
+          196,
+          360
+        ],
+        [
+          138,
+          0,
+          103,
+          360
+        ],
+        [
+          141,
+          0,
+          0,
+          360
+        ],
+        [
+          195,
+          0,
+          0,
+          360
+        ],
+        [
+          197,
+          -70,
+          50,
+          360
+        ],
+        [
+          199,
+          -140,
+          70,
+          360
+        ],
+        [
+          202,
+          -210,
+          40,
+          360
+        ],
+        [
+          204,
+          -240,
+          0,
+          360
+        ]
+      ],
+      "recuo": [
+        204,
+        240
+      ],
+      "camera": [
+        [
+          21,
+          60,
+          125,
+          1.6
+        ],
+        [
+          63,
+          0,
+          760,
+          1.4,
+          10
+        ],
+        [
+          127,
+          0,
+          125,
+          1.6
+        ]
+      ],
+      "quedaFinal": [
+        350,
+        60
+      ],
+      "esfumarTopo": [
+        [
+          99,
+          150
+        ]
+      ]
+    },
+    "p14": {
+      "nome": "Tufão do Malandro",
+      "velocidade": 1.6,
+      "inicio": 3,
+      "preparo": 5,
+      "golpes": [
+        6,
+        16,
+        26,
+        38,
+        48,
+        98,
+        112,
+        124,
+        134,
+        146,
+        170,
+        185,
+        200,
+        218,
+        225,
+        240,
+        255,
+        265
+      ],
+      "fim": 305,
+      "rival": [
+        [
+          5,
+          130,
+          0
+        ],
+        [
+          305,
+          130,
+          0
+        ]
+      ],
+      "pular": [
+        [
+          212,
+          217
+        ]
+      ],
+      "esfumarTopo": [
+        [
+          56,
+          84
+        ]
+      ]
+    }
   }
 }

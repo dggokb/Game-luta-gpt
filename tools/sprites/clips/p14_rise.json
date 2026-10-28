@@ -1,0 +1,47 @@
+{
+  "id": "p14_rise",
+  "javaName": "P14_RISE",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_rise_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_rise.webp",
+  "report": "tools/sprites/reports/p14_rise.report.json",
+  "preview": "android/app/build/sprite-review/p14_rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.98)",
+    "quadros": "68,71,74,77,80,83",
+    "largura": 224,
+    "raiz": "115,238",
+    "colunas": 6,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_rise_video_normalized.png",
+      "celula": [
+        224,
+        256
+      ],
+      "raiz": [
+        115,
+        238
+      ],
+      "colunas": 6
+    }
+  },
+  "frameWidth": 448,
+  "rootX": 230,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_rise_video_normalized.png"
+  ]
+}

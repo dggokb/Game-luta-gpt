@@ -84,6 +84,12 @@ final class AttackDefinition {
          */
         boolean pound;
         /**
+         * Rebote (o S1 do p14, chute que mergulha do pulo): o primeiro chute é um golpe comum;
+         * acertou, ele quica e as pancadas seguintes saem; errou ou defenderam, ele cai e o
+         * golpe acaba logo (a animação _ERRO).
+         */
+        boolean rebound;
+        /**
          * Salto do golpe (o S4 do p13, que cai com o soco): o desenho sobe em arco até
          * {@link #hopHeight} entre os quadros {@link #hopStart} e {@link #hopEnd} (o vídeo é de
          * câmera que acompanha); o corpo segue no chão e o avanço leva ele para a frente.
@@ -125,6 +131,7 @@ final class AttackDefinition {
         Mechanics repel() { repel = true; return this; }
         Mechanics grab(float range) { grab = true; grabRange = range; return this; }
         Mechanics pound() { pound = true; return this; }
+        Mechanics rebound() { rebound = true; return this; }
         Mechanics hop(float height, int start, int end) { hopHeight = height; hopStart = start; hopEnd = end; return this; }
         /** Altura do desenho no quadro {@code frame} do golpe (arco: sobe e desce no trecho). */
         float hopLift(int frame) {

@@ -1,0 +1,244 @@
+{
+  "id": "p14_backdash",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_backdash_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 704,
+    "rootX": 222,
+    "rootY": 662,
+    "columns": 9,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        61,
+        218,
+        410,
+        663
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 63846
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        65,
+        264,
+        329,
+        661
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 54307
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        48,
+        283,
+        350,
+        661
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 54423
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        93,
+        355,
+        584
+      ],
+      "minimumMargin": 51,
+      "opaquePixels": 62431
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        40,
+        90,
+        329,
+        566
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 60292
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        48,
+        77,
+        335,
+        574
+      ],
+      "minimumMargin": 48,
+      "opaquePixels": 60872
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        37,
+        261,
+        383,
+        672
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 58352
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        65,
+        211,
+        412,
+        663
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 63912
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        53,
+        213,
+        400,
+        663
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 62449
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        53,
+        211,
+        400,
+        663
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 62423
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 391,
+    "frameHeight": 611,
+    "rootX": 193,
+    "rootY": 593,
+    "columns": 9,
+    "frameCount": 10,
+    "cropOffset": [
+      29,
+      69
+    ],
+    "sheetWidth": 1672,
+    "sheetHeight": 972,
+    "frames": [
+      [
+        360,
+        512,
+        360,
+        456,
+        28,
+        145
+      ],
+      [
+        1084,
+        512,
+        272,
+        408,
+        32,
+        191
+      ],
+      [
+        1360,
+        512,
+        312,
+        388,
+        15,
+        210
+      ],
+      [
+        300,
+        0,
+        312,
+        500,
+        18,
+        20
+      ],
+      [
+        616,
+        0,
+        300,
+        484,
+        7,
+        17
+      ],
+      [
+        0,
+        0,
+        296,
+        508,
+        15,
+        4
+      ],
+      [
+        724,
+        512,
+        356,
+        420,
+        4,
+        188
+      ],
+      [
+        920,
+        0,
+        356,
+        460,
+        32,
+        138
+      ],
+      [
+        1280,
+        0,
+        356,
+        460,
+        20,
+        140
+      ],
+      [
+        0,
+        512,
+        356,
+        460,
+        20,
+        138
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 22708224,
+      "grid": 17200872,
+      "packed": 6500736
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "fd58dac32eadb3fbae948b135db884560e78da6ec8ead94aa7788b6123f66f82",
+      "config": "37d0903ec553d7f0abe87a5492867955593676270da87a6a52f667ff75e5bd59",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_backdash_video_normalized.png": "91bfe2ad19701dd7ad034c2fe07a9d6d82d8dd703ec28f75875b0b659c473574"
+    }
+  }
+}

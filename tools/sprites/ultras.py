@@ -74,6 +74,10 @@ SHEET = {
                 escala=(0.411, 'mesma câmera dos vídeos H3 de 24/10')),
     # p13: ult2 + ult3 + ult4 + o pulo colados (o ult1, o estalo do pescoço, fica de fora); a célula pega
     # o vídeo inteiro (a explosão vai de borda a borda) e o fogo do meteoro fica.
+    # p14: vídeo de fundo escuro recortado por ultra_fundo.py; a célula pega o vídeo inteiro (ele
+    # pula por cima do rival e chuta do outro lado) e os efeitos (rajadas, giro, tornado) ficam.
+    'p14': dict(celula=384, largura=576, raiz='180,336', densidade=1, fixar='video', manterEfeitos=True,
+                escala=(0.411, 'mesma câmera dos vídeos H3 do p14'), esfumar=True),
     'p13': dict(celula=368, largura=600, raiz='300,330', densidade=1, fixar='video', manterEfeitos=True,
                 escala=(0.4322, 'mesma câmera dos outros vídeos do p13'), esfumar=True),
 }

@@ -2,35 +2,130 @@
   "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho).",
   "base": {
     "frames": {
-      "L": [3, 3, 7],
-      "2L": [3, 3, 7],
-      "M": [6, 4, 11],
-      "2M": [7, 4, 13],
-      "H": [10, 5, 18],
-      "2H": [10, 6, 18],
-      "jL": [4, 3, 6],
-      "jM": [6, 4, 8],
-      "jH": [9, 6, 10],
-      "j2H": [9, 6, 9],
-      "S2": [6, 8, 22],
-      "S3": [18, 4, 18],
-      "S4": [10, 14, 14],
-      "S": [10, 1, 18]
+      "L": [
+        3,
+        3,
+        7
+      ],
+      "2L": [
+        3,
+        3,
+        7
+      ],
+      "M": [
+        6,
+        4,
+        11
+      ],
+      "2M": [
+        7,
+        4,
+        13
+      ],
+      "H": [
+        10,
+        5,
+        18
+      ],
+      "2H": [
+        10,
+        6,
+        18
+      ],
+      "jL": [
+        4,
+        3,
+        6
+      ],
+      "jM": [
+        6,
+        4,
+        8
+      ],
+      "jH": [
+        9,
+        6,
+        10
+      ],
+      "j2H": [
+        9,
+        6,
+        9
+      ],
+      "S2": [
+        6,
+        8,
+        22
+      ],
+      "S3": [
+        18,
+        4,
+        18
+      ],
+      "S4": [
+        10,
+        14,
+        14
+      ],
+      "S": [
+        10,
+        1,
+        18
+      ]
     },
     "vantagem": {
-      "L": [5, 2],
-      "2L": [5, 2],
-      "M": [4, 1],
-      "2M": [20, 1],
-      "H": [5, -2],
-      "2H": [25, -4],
-      "jL": [8, 4],
-      "jM": [7, 3],
-      "jH": [6, 2],
-      "j2H": [5, 1],
-      "S2": [10, -12],
-      "S3": [4, -4],
-      "S4": [10, -6]
+      "L": [
+        5,
+        2
+      ],
+      "2L": [
+        5,
+        2
+      ],
+      "M": [
+        4,
+        1
+      ],
+      "2M": [
+        20,
+        1
+      ],
+      "H": [
+        5,
+        -2
+      ],
+      "2H": [
+        25,
+        -4
+      ],
+      "jL": [
+        8,
+        4
+      ],
+      "jM": [
+        7,
+        3
+      ],
+      "jH": [
+        6,
+        2
+      ],
+      "j2H": [
+        5,
+        1
+      ],
+      "S2": [
+        10,
+        -12
+      ],
+      "S3": [
+        4,
+        -4
+      ],
+      "S4": [
+        10,
+        -6
+      ]
     },
     "dano": {
       "L": 300,
@@ -54,15 +149,56 @@
     "_doc": "Correntes de combo (docs/combat-engine.md, seção Correntes de combo). base vale para todos; estiloCombo de cada personagem soma rotas à base. Só somam, nunca tiram: as rotas do character.json continuam. maxUsesPerChain = usos do golpe numa mesma corrente (zera depois de uma ligação), acertando ou na defesa; o estilo vence a base. Alvo que o personagem não tem (j2H, S) fica de fora. JUMP no ar = cancelamento de pulo (uma vez por voo).",
     "base": {
       "rotas": {
-        "L": ["L", "2L", "M", "2M", "H", "2H"],
-        "2L": ["L", "2L", "M", "2M", "H", "2H"],
-        "M": ["2M", "H", "2H"],
-        "2M": ["H"],
-        "2H": ["JUMP"],
-        "jL": ["jM", "jH", "j2H"],
-        "jM": ["jH", "j2H", "JUMP"]
+        "L": [
+          "L",
+          "2L",
+          "M",
+          "2M",
+          "H",
+          "2H"
+        ],
+        "2L": [
+          "L",
+          "2L",
+          "M",
+          "2M",
+          "H",
+          "2H"
+        ],
+        "M": [
+          "2M",
+          "H",
+          "2H"
+        ],
+        "2M": [
+          "H"
+        ],
+        "2H": [
+          "JUMP"
+        ],
+        "jL": [
+          "jM",
+          "jH",
+          "j2H"
+        ],
+        "jM": [
+          "jH",
+          "j2H",
+          "JUMP"
+        ]
       },
-      "maxUsosCorrente": {"L": 3, "2L": 2, "M": 1, "2M": 1, "H": 1, "2H": 1, "jL": 1, "jM": 1, "jH": 1, "j2H": 1}
+      "maxUsosCorrente": {
+        "L": 3,
+        "2L": 2,
+        "M": 1,
+        "2M": 1,
+        "H": 1,
+        "2H": 1,
+        "jL": 1,
+        "jM": 1,
+        "jH": 1,
+        "j2H": 1
+      }
     },
     "soCombos": {
       "_doc": "Pacotes fora de personagens (lutador de teste e boneco de treino) que só recebem as correntes.",
@@ -77,33 +213,91 @@
       },
       "pressao": {
         "descricao": "Rushdown: o M repete (M > M) e cancela em pulo mesmo na defesa, para continuar a pressão no ar.",
-        "rotas": {"M": ["M", "JUMP"]},
-        "maxUsosCorrente": {"M": 2}
+        "rotas": {
+          "M": [
+            "M",
+            "JUMP"
+          ]
+        },
+        "maxUsosCorrente": {
+          "M": 2
+        }
       },
       "chutes": {
         "descricao": "Kung fu: três chutes seguidos no chão (M > M > H) e dois jM no ar.",
-        "rotas": {"M": ["M"], "jM": ["jM"]},
-        "maxUsosCorrente": {"M": 2, "jM": 2}
+        "rotas": {
+          "M": [
+            "M"
+          ],
+          "jM": [
+            "jM"
+          ]
+        },
+        "maxUsosCorrente": {
+          "M": 2,
+          "jM": 2
+        }
       },
       "aereo": {
         "descricao": "Ninja: corrente aérea longa (jL > jL > jM), cancela o pulo do jL também e o M sobe para o ar sem lançador.",
-        "rotas": {"M": ["JUMP"], "jL": ["jL", "JUMP"]},
-        "maxUsosCorrente": {"jL": 2}
+        "rotas": {
+          "M": [
+            "JUMP"
+          ],
+          "jL": [
+            "jL",
+            "JUMP"
+          ]
+        },
+        "maxUsosCorrente": {
+          "jL": 2
+        }
       },
       "alcance": {
         "descricao": "Zoner: golpe fraco ou baixo termina no projétil (L, 2L, 2M > S1); combo curto e seguro.",
-        "rotas": {"L": ["S"], "2L": ["S"], "2M": ["S"]},
+        "rotas": {
+          "L": [
+            "S"
+          ],
+          "2L": [
+            "S"
+          ],
+          "2M": [
+            "S"
+          ]
+        },
         "maxUsosCorrente": {}
       },
       "tanque": {
         "descricao": "Agarrador: o H repete (H > H), poucos acertos e muito dano em cada um.",
-        "rotas": {"H": ["H"]},
-        "maxUsosCorrente": {"H": 2}
+        "rotas": {
+          "H": [
+            "H"
+          ]
+        },
+        "maxUsosCorrente": {
+          "H": 2
+        }
       },
       "imprevisivel": {
         "descricao": "Berserker: volta para golpes mais fracos (M > L, H > L, H > M); cada golpe até 2 vezes na corrente.",
-        "rotas": {"M": ["L", "2L"], "H": ["L", "2L", "M"]},
-        "maxUsosCorrente": {"L": 2, "2L": 2, "M": 2, "H": 2}
+        "rotas": {
+          "M": [
+            "L",
+            "2L"
+          ],
+          "H": [
+            "L",
+            "2L",
+            "M"
+          ]
+        },
+        "maxUsosCorrente": {
+          "L": 2,
+          "2L": 2,
+          "M": 2,
+          "H": 2
+        }
       }
     }
   },
@@ -289,7 +483,11 @@
         },
         "rotas": {
           "S3": {
-            "cancelaEm": ["L", "M", "H"],
+            "cancelaEm": [
+              "L",
+              "M",
+              "H"
+            ],
             "noVazio": true
           }
         }
@@ -1098,6 +1296,100 @@
         "S4": {
           "lancar": "knockdown",
           "empurrao": 70
+        }
+      }
+    },
+    "p14": {
+      "molde": "Trickster de chutes",
+      "estiloCombo": "chutes",
+      "vida": 9500,
+      "dano": 0.95,
+      "ritmo": 0.9,
+      "framesGolpe": {
+        "S": [
+          20,
+          2,
+          48
+        ],
+        "S2": [
+          14,
+          2,
+          44
+        ],
+        "S3": [
+          10,
+          4,
+          30
+        ],
+        "S4": [
+          17,
+          12,
+          24
+        ]
+      },
+      "danoGolpe": {
+        "S": 1200,
+        "S2": 1100,
+        "S3": 950,
+        "S4": 1000
+      },
+      "projetil": {
+        "velocidade": 600,
+        "alcance": 900
+      },
+      "unica": {
+        "descricao": "Trickster de chutes: S1 salta e mergulha no chute; acertou, quica e chuta mais três vezes (errou ou defenderam, cai e fica aberto). S2 chute que solta um tornado à frente, S3 meia-lua de chute (anti-aéreo), S4 pisão que solta a onda rente ao chão, Super em parafuso atravessando a tela. Os efeitos dos especiais e do Super são os dos vídeos.",
+        "golpes": {
+          "S": {
+            "rebote": true
+          }
+        },
+        "alcance": {
+          "S2": 300,
+          "S3": 150,
+          "S4": 330
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Chute rebote",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Chute tornado",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Meia-lua cortante",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Pisão de onda",
+          "comando": "↓↙←"
+        }
+      },
+      "s1": {
+        "corpoACorpo": {
+          "alcance": 130,
+          "altura": 230,
+          "derruba": true,
+          "empurrao": 110
+        }
+      },
+      "especiais": {
+        "S2": {
+          "altura": 190,
+          "lancar": "launch"
+        },
+        "S3": {
+          "altura": 210,
+          "lancar": "launch"
+        },
+        "S4": {
+          "baixo": true,
+          "altura": 70,
+          "lancar": "knockdown",
+          "empurrao": 80
         }
       }
     }

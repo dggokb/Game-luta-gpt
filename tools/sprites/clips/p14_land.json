@@ -1,0 +1,48 @@
+{
+  "id": "p14_land",
+  "javaName": "P14_LAND",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_land_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_land.webp",
+  "report": "tools/sprites/reports/p14_land.report.json",
+  "preview": "android/app/build/sprite-review/p14_land-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.98)",
+    "quadros": "68,70,72,74",
+    "celula": 320,
+    "largura": 224,
+    "raiz": "115,298",
+    "colunas": 4,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_land_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        115,
+        298
+      ],
+      "colunas": 4
+    }
+  },
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 230,
+  "rootY": 596,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_land_video_normalized.png"
+  ]
+}

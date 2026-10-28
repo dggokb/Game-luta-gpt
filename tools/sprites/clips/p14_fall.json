@@ -1,0 +1,48 @@
+{
+  "id": "p14_fall",
+  "javaName": "P14_FALL",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_fall_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_fall.webp",
+  "report": "tools/sprites/reports/p14_fall.report.json",
+  "preview": "android/app/build/sprite-review/p14_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.98)",
+    "quadros": "57,59,61,63,65,67",
+    "celula": 320,
+    "largura": 192,
+    "raiz": "110,302",
+    "colunas": 6,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_fall_video_normalized.png",
+      "celula": [
+        192,
+        320
+      ],
+      "raiz": [
+        110,
+        302
+      ],
+      "colunas": 6
+    }
+  },
+  "frameWidth": 384,
+  "frameHeight": 640,
+  "rootX": 220,
+  "rootY": 604,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_fall_video_normalized.png"
+  ]
+}

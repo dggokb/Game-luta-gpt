@@ -1,0 +1,225 @@
+{
+  "id": "p14_hit_stand",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_hit_stand_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 576,
+    "rootX": 222,
+    "rootY": 540,
+    "columns": 8,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        50,
+        92,
+        398,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61828
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        72,
+        88,
+        419,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61675
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        72,
+        107,
+        462,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63698
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        88,
+        104,
+        457,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62180
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        89,
+        105,
+        456,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61554
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        90,
+        105,
+        457,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61727
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        89,
+        102,
+        455,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62197
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        96,
+        83,
+        444,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 64335
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        62,
+        84,
+        410,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 64263
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 428,
+    "frameHeight": 474,
+    "rootX": 180,
+    "rootY": 465,
+    "columns": 8,
+    "frameCount": 9,
+    "cropOffset": [
+      42,
+      75
+    ],
+    "sheetWidth": 1160,
+    "sheetHeight": 1380,
+    "frames": [
+      [
+        0,
+        472,
+        356,
+        460,
+        4,
+        13
+      ],
+      [
+        720,
+        0,
+        356,
+        464,
+        26,
+        9
+      ],
+      [
+        0,
+        936,
+        400,
+        444,
+        26,
+        28
+      ],
+      [
+        360,
+        472,
+        380,
+        448,
+        42,
+        25
+      ],
+      [
+        404,
+        936,
+        376,
+        444,
+        43,
+        26
+      ],
+      [
+        784,
+        936,
+        376,
+        444,
+        44,
+        26
+      ],
+      [
+        744,
+        472,
+        376,
+        448,
+        43,
+        23
+      ],
+      [
+        0,
+        0,
+        356,
+        468,
+        50,
+        4
+      ],
+      [
+        360,
+        0,
+        356,
+        468,
+        16,
+        5
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 18874368,
+      "grid": 12983808,
+      "packed": 6403200
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "bb540de0a36ccf397dc2d56dae898e14acc6532668fca5714b29432f50d607a3",
+      "config": "b89ee04e8f7d10e71a4f97cf2e59da3c79fc3dc405e15f41d4ff83bab995e4e2",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_hit_stand_video_normalized.png": "6b9c141c8ea4f0ca9f6704ba46b83635ba7a14d1a532cda651458310664ea1eb"
+    }
+  }
+}

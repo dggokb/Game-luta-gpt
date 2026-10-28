@@ -447,6 +447,8 @@ def travel(m, anim, spec):
     a, b = at(spec.get('de', 0)), min(at(spec['ate']), total - 1)
     m.setdefault('mecanica', {})['avanco'] = {'velocidade': round(spec['distancia'] * 60 / max(1, b - a + 1)),
                                               'frames': [a, b]}
+    if spec.get('atravessa'):
+        m['mecanica']['avanco']['atravessa'] = True   # passa pelo rival (o parafuso do Super do p14)
 
 
 def striking_super(pack, spec, clips=None):

@@ -1,0 +1,52 @@
+{
+  "id": "p14_special_s2",
+  "javaName": "P14_SPECIAL_S2",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_special_s2_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_special_s2.webp",
+  "report": "tools/sprites/reports/p14_special_s2.report.json",
+  "preview": "android/app/build/sprite-review/p14_special_s2-import.png",
+  "expectedFrames": 30,
+  "segmentation": "prepared-grid",
+  "columns": 2,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "s2.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "8,12,16,20,24,26,28,30,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100,104,108,112,116",
+    "celula": 352,
+    "largura": 768,
+    "raiz": "248,323",
+    "colunas": 2,
+    "fixar": "video",
+    "manter_efeitos": true,
+    "limpar_chao": true,
+    "aparar_borda": 10,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_special_s2_video_normalized.png",
+      "celula": [
+        768,
+        352
+      ],
+      "raiz": [
+        248,
+        323
+      ],
+      "colunas": 11
+    },
+    "objetos": 2000
+  },
+  "frameWidth": 1536,
+  "frameHeight": 704,
+  "rootX": 496,
+  "rootY": 646,
+  "sourceReferences": [
+    "art/sprites/source/p14_special_s2_video_normalized.png"
+  ],
+  "pixelScale": 2.0
+}

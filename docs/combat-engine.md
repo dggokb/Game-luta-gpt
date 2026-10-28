@@ -306,6 +306,15 @@ todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTes
   `CombatConfig.poundMissFrames`. Os socos aceleram como metralhadora (`metralhadora {de, ate,
   fim}`: os quadros dessa faixa vão do tempo do vídeo até `fim` vezes ele) e a fumaça no chão
   cresce a cada pancada (`fumaca_pouso` e a poeira do `ImpactEffects`).
+- **Rebote** (o S1 do p14): `Mechanics.rebound()`, `mecanicas.json` → `unica.golpes.S.rebote`. O
+  primeiro chute (o mergulho do pulo) é um golpe comum; acertou, ele quica e as outras pancadas
+  saem (o rival preso à frente por `segurarRival`); errou ou defenderam, as outras não saem, o
+  desenho troca para `SPECIAL_ENERGY_ERRO` (ele cai) e o golpe acaba em
+  `CombatConfig.reboundMissFrames` (fica aberto). O desenho do erro usa o mesmo corte do Super do
+  p13 (`<animação>_ERRO`, do fim do primeiro golpe até o corte).
+- **Parafuso que atravessa** (o Super do p14): `pancadas.json` → `SUPER.avanco {distancia, de, ate,
+  atravessa}`; com `rival` em todas as pancadas ele leva o rival junto pela tela e, depois da
+  última, passa por ele (`Mechanics.passThrough`).
 - **Corrida própria** (o p13, lerdo): `Fighter.withRun(dash‰, quadrosDoBackdash, velocidade)`,
   `mecanicas.json` → `lutador.corrida {dash, backdashQuadros, backdashVelocidade}`. A corrida (e o
   embalo do dash jump) sai a `dash` da do motor; o backdash dura os quadros dele, na velocidade dele,

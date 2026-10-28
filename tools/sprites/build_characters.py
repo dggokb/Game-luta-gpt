@@ -36,7 +36,7 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # Os braços do Ultra do p13, por cima do rival no abraço (mesmos quadros da ULTRA_SEQ).
             'ULTRA_SEQ_FRENTE',
             # Agarrão de especial que não pegou (o S3 do p13): a pegada no vazio no lugar das cabeçadas.
-            'SPECIAL_S3_ERRO',
+            'SPECIAL_S3_ERRO', 'SPECIAL_ENERGY_ERRO',
             # Super de pancadas no chão que errou a queda (o p13): ele levanta, sem os socos.
             'SUPER_WAVE_ERRO')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
@@ -172,7 +172,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao'}
+             'chao','rebote'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -206,6 +206,9 @@ def validate_mechanics(name, mech, m, projectile):
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
     if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
         raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
+    # Rebote (o S1 do p14): acertou o primeiro chute, quica e as outras pancadas saem.
+    if 'rebote' in mech and (mech['rebote'] is not True or len(m.get('golpes', [])) < 2 or 'reach' not in m):
+        raise ValueError(f'{name}.mecanica.rebote: true, on a striking move with golpes')
     if 'agarra' in mech:   # agarrão de especial (o S3 do p13): alcance à frente do corpo
         if projectile or not isinstance(mech['agarra'], dict) or set(mech['agarra']) != {'alcance'}:
             raise ValueError(f'{name}.mecanica.agarra: a melee move with {{alcance}}')
@@ -677,6 +680,7 @@ def compile_packs(root, results):
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
         if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'
         if mech.get('chao'): code += '.pound()'
+        if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
         if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'

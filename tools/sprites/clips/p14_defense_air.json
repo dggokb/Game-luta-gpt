@@ -1,0 +1,47 @@
+{
+  "id": "p14_defense_air",
+  "javaName": "P14_DEFENSE_AIR",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_defense_air_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_defense_air.webp",
+  "report": "tools/sprites/reports/p14_defense_air.report.json",
+  "preview": "android/app/build/sprite-review/p14_defense_air-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaPulo.mp4",
+    "personagem": "p14",
+    "escala": 0.4096,
+    "medida": "último quadro = inicio_pulo (nota 0.99)",
+    "quadros": "24,34,45,55,65,76,86",
+    "largura": 224,
+    "raiz": "123,238",
+    "colunas": 7,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_defense_air_video_normalized.png",
+      "celula": [
+        224,
+        256
+      ],
+      "raiz": [
+        123,
+        238
+      ],
+      "colunas": 7
+    }
+  },
+  "frameWidth": 448,
+  "rootX": 246,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_defense_air_video_normalized.png"
+  ]
+}

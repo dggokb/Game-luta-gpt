@@ -139,6 +139,16 @@
       "asset": "ui/hud/concepts/p13.webp",
       "sha256": "f34f11cad064682549ee700480d9c3f2be997703c167547b0b2eefd7ff805132",
       "bytes": 1351556
+    },
+    {
+      "name": "p14.png",
+      "drive_file_id": "11NzBxwbsG2SztRrduX1mQA3yncNVl0LU",
+      "drive_url": "https://drive.google.com/file/d/11NzBxwbsG2SztRrduX1mQA3yncNVl0LU/view?usp=drivesdk",
+      "source": "art/concepts/p14.png",
+      "asset": "ui/hud/concepts/p14.webp",
+      "sha256": "73c3cbae906e237e2e972ff3f4ce1f82cad34c14f5869b08df3b238d3241e273",
+      "bytes": 1345872,
+      "git_sha": "3b3dc27225e5bf77822ea2b36a705ce3858bd9c0"
     }
   ]
 }

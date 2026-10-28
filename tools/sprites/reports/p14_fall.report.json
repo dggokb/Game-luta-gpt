@@ -1,0 +1,168 @@
+{
+  "id": "p14_fall",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_fall_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 640,
+    "rootX": 220,
+    "rootY": 604,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        76,
+        70,
+        344,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63680
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        39,
+        70,
+        344,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 64850
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        76,
+        71,
+        343,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63621
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        75,
+        71,
+        343,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63619
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        74,
+        69,
+        343,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63567
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        75,
+        67,
+        342,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 64154
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 321,
+    "frameHeight": 554,
+    "rootX": 189,
+    "rootY": 545,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      31,
+      59
+    ],
+    "sheetWidth": 1720,
+    "sheetHeight": 548,
+    "frames": [
+      [
+        280,
+        0,
+        276,
+        544,
+        41,
+        7
+      ],
+      [
+        560,
+        0,
+        316,
+        544,
+        4,
+        7
+      ],
+      [
+        880,
+        0,
+        276,
+        544,
+        41,
+        8
+      ],
+      [
+        1160,
+        0,
+        276,
+        544,
+        40,
+        8
+      ],
+      [
+        1440,
+        0,
+        280,
+        544,
+        39,
+        6
+      ],
+      [
+        0,
+        0,
+        276,
+        548,
+        40,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5898240,
+      "grid": 4268016,
+      "packed": 3770240
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f89926556acf7513292b3b123e8fc3f94d0199407de49cd232db2b34fd51ea9d",
+      "config": "582b89f47ba0461413386081f3f7c14ab3fea1ae0cbba1e7eaa6d2c51ca50b25",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_fall_video_normalized.png": "c467ec866f8701f3b64c7467587ededb2d9a569f4f7115bfed5b4583a06a0e7c"
+    }
+  }
+}

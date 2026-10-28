@@ -1,0 +1,49 @@
+{
+  "id": "p14_dash",
+  "javaName": "P14_DASH",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_dash_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_dash.webp",
+  "report": "tools/sprites/reports/p14_dash.report.json",
+  "preview": "android/app/build/sprite-review/p14_dash-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "p14_dash.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+    "largura": 288,
+    "raiz": "171,238",
+    "colunas": 7,
+    "fixar": "video",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_dash_video_normalized.png",
+      "celula": [
+        288,
+        256
+      ],
+      "raiz": [
+        171,
+        238
+      ],
+      "colunas": 11
+    }
+  },
+  "frameWidth": 576,
+  "rootX": 342,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_dash_video_normalized.png"
+  ]
+}

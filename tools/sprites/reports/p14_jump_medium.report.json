@@ -1,0 +1,187 @@
+{
+  "id": "p14_jump_medium",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_jump_medium_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 704,
+    "frameHeight": 512,
+    "rootX": 294,
+    "rootY": 476,
+    "columns": 5,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        140,
+        45,
+        417,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 55045
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        154,
+        114,
+        424,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 46547
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        44,
+        75,
+        640,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71466
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        47,
+        74,
+        644,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71274
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        54,
+        74,
+        651,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 71885
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        59,
+        74,
+        657,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71487
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        132,
+        68,
+        585,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63267
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 629,
+    "frameHeight": 449,
+    "rootX": 258,
+    "rootY": 439,
+    "columns": 5,
+    "frameCount": 7,
+    "cropOffset": [
+      36,
+      37
+    ],
+    "sheetWidth": 1976,
+    "sheetHeight": 856,
+    "frames": [
+      [
+        0,
+        0,
+        288,
+        440,
+        100,
+        4
+      ],
+      [
+        1224,
+        444,
+        280,
+        372,
+        114,
+        73
+      ],
+      [
+        760,
+        0,
+        604,
+        412,
+        4,
+        34
+      ],
+      [
+        1368,
+        0,
+        608,
+        412,
+        7,
+        33
+      ],
+      [
+        0,
+        444,
+        608,
+        412,
+        14,
+        33
+      ],
+      [
+        612,
+        444,
+        608,
+        412,
+        19,
+        33
+      ],
+      [
+        292,
+        0,
+        464,
+        420,
+        92,
+        27
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 14417920,
+      "grid": 11296840,
+      "packed": 6765824
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "0b4669e44ff0f5f062285418633ff91d0bc9c93db1c3a4a8774b4bf4c4a3b1a7",
+      "config": "1d0b5eaf13332cb02903b524b237894b4a6cb849b6a03e1236d6fb8b3083f5bc",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_jump_medium_video_normalized.png": "86980f65a3f5dcb3051dd0094b6ee4550c3438afb36a0e01597279064c407651"
+    }
+  }
+}

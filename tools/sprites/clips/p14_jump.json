@@ -1,0 +1,48 @@
+{
+  "id": "p14_jump",
+  "javaName": "P14_JUMP",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_jump_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_jump.webp",
+  "report": "tools/sprites/reports/p14_jump.report.json",
+  "preview": "android/app/build/sprite-review/p14_jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.98)",
+    "quadros": "0,35,36,43,49,56",
+    "celula": 320,
+    "largura": 224,
+    "raiz": "109,302",
+    "colunas": 6,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_jump_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        109,
+        302
+      ],
+      "colunas": 6
+    }
+  },
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 218,
+  "rootY": 604,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_jump_video_normalized.png"
+  ]
+}

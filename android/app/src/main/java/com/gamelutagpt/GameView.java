@@ -3943,13 +3943,16 @@ public class GameView extends SurfaceView
             float total = f.attack.totalFrames * FIXED_STEP;
             // Agarrão de especial que não pegou (o S3 do p13): a pegada no vazio, sem as cabeçadas,
             // no tempo do golpe (a recuperação longa é a punição).
-            CharacterDefinition.Animation miss = f.grabMissed && f.move != null && f.move.animation != null
+            CharacterDefinition.Animation art = f.move != null ? f.move.animation : character.specialAnimations.get(
+                f.attack.kind == AttackDefinition.Kind.SUPER ? "SUPER" : "S");
+            boolean cutMiss = f.attack.mechanics.pound || f.attack.mechanics.rebound;
+            CharacterDefinition.Animation poundMiss = f.grabMissed && cutMiss && art != null
+                ? character.animations.get(art.id + "_ERRO") : null;
+            CharacterDefinition.Animation miss = f.grabMissed && !cutMiss && f.move != null && f.move.animation != null
                 ? character.animations.get(f.move.animation.id + "_ERRO") : null;
-            CharacterDefinition.Animation superArt = f.move == null ? character.specialAnimations.get("SUPER") : null;
-            CharacterDefinition.Animation poundMiss = f.grabMissed && f.attack.mechanics.pound && superArt != null
-                ? character.animations.get(superArt.id + "_ERRO") : null;
             if (poundMiss != null) {
-                // O Super do p13 que errou a queda: ele levanta, sem os socos, até o corte.
+                // O Super do p13 que errou a queda (ele levanta, sem os socos) e o rebote do p14
+                // que errou o chute (ele cai, sem quicar): do fim do primeiro golpe até o corte.
                 int from = f.attack.hitbox(0).lastFrame + 1;
                 int to = f.hitCutFrame >= 0 ? f.hitCutFrame : f.attack.totalFrames - 1;
                 animation = poundMiss.id;

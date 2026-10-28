@@ -1,0 +1,224 @@
+{
+  "_doc": "Clipes do p14 com quadros escolhidos à mão (tools/sprites/montagem.py); o resto sai do personagem.py (tools/sprites/videos/p14.json). Vídeos do Flick (H3) na pasta game-luta-gpt/animations/p14 do Drive (27/10).",
+  "_opcoes": {
+    "escala": 0.411,
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)"
+  },
+  "dash": {
+    "_doc": "Uma passada inteira da corrida (40-55: o período do vídeo é 16 quadros), cada quadro fixo pelo corpo.",
+    "trechos": [
+      [
+        "dash",
+        40,
+        56,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "0-15",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "DASH": {
+        "distancia": 26,
+        "loop": true
+      }
+    }
+  },
+  "crouch_medium": {
+    "_doc": "2M: mão no chão (48-62), giro com a perna esticada (64-76) e de volta agachado; o vídeo levanta (84-92) e agacha de novo, então pula do 82 para o 98.",
+    "trechos": [
+      [
+        "2M",
+        0,
+        124
+      ]
+    ],
+    "quadros": "40,44,48,50,52,56,60,62,64,66,68,70,72,74,76,78,80,82,98,102",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH_MEDIUM": {
+        "impacto": 10
+      }
+    }
+  },
+  "jump_heavy_down": {
+    "_doc": "j2H: encolhe no ar (60-80) e desce com o chute para baixo (86-98); o 82-84 é o borrão do vídeo.",
+    "trechos": [
+      [
+        "jH_BAIXO",
+        0,
+        124
+      ]
+    ],
+    "quadros": "60,66,72,78,80,86,88,90,92,94,96,98,100,104",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false
+    },
+    "animacoes": {
+      "JUMP_HEAVY_DOWN": {
+        "impacto": 5
+      }
+    }
+  },
+  "golpe_alto": {
+    "_doc": "→M: chute baixo em pé (o vídeo M_BAIXO), canela na altura do joelho do rival.",
+    "trechos": [
+      [
+        "M_BAIXO",
+        0,
+        124
+      ]
+    ],
+    "quadros": "16,20,24,26,28,30,32,34,36,38,40,44,48,52,54,56,58,60,64,68",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "GOLPE_ALTO": {
+        "impacto": 6
+      }
+    }
+  },
+  "crouch_idle": {
+    "_doc": "Agachado parado, respirando (agachar 30-62).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "30-62/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH_IDLE": {
+        "loop": true
+      }
+    }
+  },
+  "special_energy": {
+    "_doc": "S1 (Chute rebote): agacha e salta (pulo 24-35), mergulha no chute com o rastro e a estrela do vídeo (s1), e se acertar quica e chuta de novo três vezes (os ciclos do s1); cai pela aterrissagem do pulo (68-85). SPECIAL_ENERGY_ERRO (o que toca depois do primeiro chute que errou): o começo do quique e a aterrissagem.",
+    "trechos": [
+      [
+        "pulo",
+        24,
+        36
+      ],
+      [
+        "s1",
+        10,
+        64,
+        "emenda"
+      ],
+      [
+        "pulo",
+        68,
+        86,
+        "emenda"
+      ]
+    ],
+    "quadros": "0,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,40,41,42,43,44,45,46,47,48,49,50,51,66,68,70,72,74,78,82",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true,
+      "pe_no_chao": false
+    },
+    "animacoes": {
+      "SPECIAL_ENERGY": {
+        "impacto": 12
+      },
+      "SPECIAL_ENERGY_ERRO": {
+        "frames": "16-19,44-50"
+      }
+    }
+  },
+  "special_s2": {
+    "_doc": "S2 (Chute tornado): chute alto que solta o tornado do vídeo à frente; o tornado cresce, gira e some. O efeito é do vídeo.",
+    "trechos": [
+      [
+        "s2",
+        0,
+        124
+      ]
+    ],
+    "quadros": "8,12,16,20,24,26,28,30,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100,104,108,112,116",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S2": {
+        "impacto": 8
+      }
+    }
+  },
+  "special_s3": {
+    "_doc": "S3 (Meia-lua cortante): passo e chute alto em arco, com a lâmina de vento do vídeo (anti-aéreo).",
+    "trechos": [
+      [
+        "s3",
+        0,
+        124
+      ]
+    ],
+    "quadros": "16,20,24,26,28,30,32,34,36,38,40,44,48,52,56,60,64,68,72,76,80,84,88,92",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S3": {
+        "impacto": 8
+      }
+    }
+  },
+  "special_s4": {
+    "_doc": "S4 (Pisão de onda): ergue o joelho e pisa; o estouro e a onda de vento e poeira do vídeo correm rente ao chão para a frente.",
+    "trechos": [
+      [
+        "s4",
+        0,
+        124
+      ]
+    ],
+    "quadros": "10,14,18,22,24,26,28,30,31,32,33,34,36,38,40,42,44,46,48,52,56,60,64,68",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S4": {
+        "impacto": 9
+      }
+    }
+  },
+  "super_wave": {
+    "_doc": "Super (Parafuso): o corpo deitado girando em parafuso com a espiral do vídeo; um giro são 12 quadros (20-31), repetido. O jogo leva ele atravessando a tela.",
+    "trechos": [
+      [
+        "super",
+        0,
+        124
+      ]
+    ],
+    "quadros": "20-31",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true,
+      "pe_no_chao": false
+    },
+    "animacoes": {
+      "SUPER_WAVE": {
+        "frames": "0-11,0-11,0-11,0-11,0-11,0-11",
+        "impacto": 2
+      }
+    }
+  }
+}

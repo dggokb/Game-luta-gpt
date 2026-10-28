@@ -1,0 +1,282 @@
+{
+  "id": "p14_super_wave",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_super_wave_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 1088,
+    "frameHeight": 448,
+    "rootX": 442,
+    "rootY": 386,
+    "columns": 3,
+    "frameCount": 12
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        62,
+        83,
+        1044,
+        419
+      ],
+      "minimumMargin": 29,
+      "opaquePixels": 169394
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        62,
+        83,
+        1044,
+        419
+      ],
+      "minimumMargin": 29,
+      "opaquePixels": 169275
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        56,
+        80,
+        1042,
+        395
+      ],
+      "minimumMargin": 46,
+      "opaquePixels": 171765
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        55,
+        80,
+        1042,
+        395
+      ],
+      "minimumMargin": 46,
+      "opaquePixels": 171875
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        36,
+        84,
+        1048,
+        396
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 192206
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        36,
+        84,
+        1048,
+        396
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 191654
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        34,
+        97,
+        1053,
+        396
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 189009
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        33,
+        97,
+        1053,
+        397
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 188835
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        36,
+        87,
+        1050,
+        405
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 179106
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        36,
+        87,
+        1050,
+        405
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 178550
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        68,
+        84,
+        1048,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 170811
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        73,
+        83,
+        1048,
+        414
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 170370
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 1037,
+    "frameHeight": 357,
+    "rootX": 418,
+    "rootY": 315,
+    "columns": 3,
+    "frameCount": 12,
+    "cropOffset": [
+      24,
+      71
+    ],
+    "sheetWidth": 2064,
+    "sheetHeight": 2000,
+    "frames": [
+      [
+        0,
+        0,
+        992,
+        348,
+        33,
+        8
+      ],
+      [
+        996,
+        0,
+        992,
+        348,
+        33,
+        8
+      ],
+      [
+        0,
+        696,
+        996,
+        328,
+        27,
+        4
+      ],
+      [
+        1000,
+        696,
+        1000,
+        328,
+        26,
+        4
+      ],
+      [
+        0,
+        1360,
+        1024,
+        324,
+        7,
+        8
+      ],
+      [
+        1028,
+        1360,
+        1024,
+        324,
+        7,
+        8
+      ],
+      [
+        0,
+        1688,
+        1028,
+        312,
+        5,
+        21
+      ],
+      [
+        1032,
+        1688,
+        1032,
+        312,
+        4,
+        21
+      ],
+      [
+        0,
+        1028,
+        1024,
+        328,
+        7,
+        12
+      ],
+      [
+        1028,
+        1028,
+        1024,
+        328,
+        8,
+        12
+      ],
+      [
+        0,
+        352,
+        992,
+        340,
+        39,
+        8
+      ],
+      [
+        996,
+        352,
+        984,
+        340,
+        45,
+        8
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 23396352,
+      "grid": 17770032,
+      "packed": 16512000
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "2edd78a2bf380c84bbe7ea27ec12f8bf1b01419fcc9dfd32705740b0beb4c8c0",
+      "config": "39fedbc83f3622af344a32dd1accf348921e01106629beac5858980fc2883740",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_super_wave_video_normalized.png": "2cff3fd5b2bcc73a8d62024cf9d3fd9e57256967c86f3531f0c6819de14d3f73"
+    }
+  }
+}

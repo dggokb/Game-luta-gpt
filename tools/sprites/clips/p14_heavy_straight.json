@@ -1,0 +1,48 @@
+{
+  "id": "p14_heavy_straight",
+  "javaName": "P14_HEAVY_STRAIGHT",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_heavy_straight_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_heavy_straight.webp",
+  "report": "tools/sprites/reports/p14_heavy_straight.report.json",
+  "preview": "android/app/build/sprite-review/p14_heavy_straight-import.png",
+  "expectedFrames": 23,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "H.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.98)",
+    "quadros": "20,22,24,26,28,30,31,33,35,37,39,43,46,50,54,57,61,65,68,72,76,79,83",
+    "celula": 288,
+    "largura": 352,
+    "raiz": "110,270",
+    "colunas": 5,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_heavy_straight_video_normalized.png",
+      "celula": [
+        352,
+        288
+      ],
+      "raiz": [
+        110,
+        270
+      ],
+      "colunas": 11
+    }
+  },
+  "frameWidth": 704,
+  "frameHeight": 576,
+  "rootX": 220,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_heavy_straight_video_normalized.png"
+  ]
+}

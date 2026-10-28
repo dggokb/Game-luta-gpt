@@ -1,0 +1,47 @@
+{
+  "id": "p14_crouch_heavy",
+  "javaName": "P14_CROUCH_HEAVY",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_crouch_heavy_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_crouch_heavy.webp",
+  "report": "tools/sprites/reports/p14_crouch_heavy.report.json",
+  "preview": "android/app/build/sprite-review/p14_crouch_heavy-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2H.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_agachado (nota 0.99)",
+    "quadros": "2,10,17,24,32,45,58,71,84,97,110,123",
+    "celula": 320,
+    "largura": 256,
+    "raiz": "140,302",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_crouch_heavy_video_normalized.png",
+      "celula": [
+        256,
+        320
+      ],
+      "raiz": [
+        140,
+        302
+      ],
+      "colunas": 11
+    }
+  },
+  "frameHeight": 640,
+  "rootX": 280,
+  "rootY": 604,
+  "frameWidth": 512,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_crouch_heavy_video_normalized.png"
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "id": "p14_defense_stand",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_defense_stand_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 576,
+    "rootX": 240,
+    "rootY": 540,
+    "columns": 8,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        66,
+        86,
+        410,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61793
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        104,
+        87,
+        368,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 52203
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        55,
+        88,
+        369,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 53780
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        62,
+        88,
+        366,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 53305
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        40,
+        92,
+        356,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 56352
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        48,
+        91,
+        356,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 56010
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        73,
+        93,
+        381,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 58240
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        61,
+        86,
+        410,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62582
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 386,
+    "frameHeight": 471,
+    "rootX": 208,
+    "rootY": 462,
+    "columns": 8,
+    "frameCount": 8,
+    "cropOffset": [
+      32,
+      78
+    ],
+    "sheetWidth": 1328,
+    "sheetHeight": 932,
+    "frames": [
+      [
+        0,
+        0,
+        352,
+        464,
+        30,
+        4
+      ],
+      [
+        356,
+        0,
+        272,
+        464,
+        68,
+        5
+      ],
+      [
+        632,
+        0,
+        324,
+        464,
+        19,
+        6
+      ],
+      [
+        960,
+        0,
+        312,
+        464,
+        26,
+        6
+      ],
+      [
+        364,
+        468,
+        324,
+        460,
+        4,
+        10
+      ],
+      [
+        692,
+        468,
+        316,
+        460,
+        12,
+        9
+      ],
+      [
+        1012,
+        468,
+        316,
+        456,
+        37,
+        11
+      ],
+      [
+        0,
+        468,
+        360,
+        464,
+        25,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 8257536,
+      "grid": 5817792,
+      "packed": 4950784
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "3763878fe42cd9127c099642202fa8f1dddb7a2e2e9155576e828f8b4afe97dd",
+      "config": "f9f09394c70f540a798ba3648f4002abe4a2653175e1e0353fe607ade41c294f",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_defense_stand_video_normalized.png": "1b23112966c7f287049694b85606769a2f8410e8ee4fbd22e986573c9bc49029"
+    }
+  }
+}

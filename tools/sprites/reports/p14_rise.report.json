@@ -1,0 +1,168 @@
+{
+  "id": "p14_rise",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_rise_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 512,
+    "rootX": 230,
+    "rootY": 476,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        38,
+        136,
+        386,
+        472
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 54291
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        42,
+        125,
+        390,
+        472
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 55921
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        47,
+        99,
+        395,
+        473
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 57311
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        52,
+        69,
+        400,
+        475
+      ],
+      "minimumMargin": 37,
+      "opaquePixels": 59122
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        57,
+        42,
+        405,
+        476
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 61434
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        61,
+        29,
+        409,
+        477
+      ],
+      "minimumMargin": 29,
+      "opaquePixels": 63019
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 387,
+    "frameHeight": 464,
+    "rootX": 200,
+    "rootY": 455,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      30,
+      21
+    ],
+    "sheetWidth": 356,
+    "sheetHeight": 2420,
+    "frames": [
+      [
+        0,
+        2076,
+        356,
+        344,
+        4,
+        111
+      ],
+      [
+        0,
+        1716,
+        356,
+        356,
+        8,
+        100
+      ],
+      [
+        0,
+        1328,
+        356,
+        384,
+        13,
+        74
+      ],
+      [
+        0,
+        908,
+        356,
+        416,
+        18,
+        44
+      ],
+      [
+        0,
+        460,
+        356,
+        444,
+        23,
+        17
+      ],
+      [
+        0,
+        0,
+        356,
+        456,
+        27,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5505024,
+      "grid": 4309632,
+      "packed": 3446080
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "40390093ef2f1b13dfcd5aaf996955e29fd22c4a769b9244cf4e8d041cdf81f4",
+      "config": "95274323d1efdae5371aa54380aaaddaa96bc7423fadf58b83dfe8ff7ed85b02",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_rise_video_normalized.png": "e07cfaf73a099d3d7f5f7275079ea60f139ec3e79d617abefbe21cede415ed54"
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "id": "p14_land",
+  "characterProfile": "p14",
+  "source": "art/sprites/source/p14_land_video_hd.png",
+  "sourceNote": "p14 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 640,
+    "rootX": 230,
+    "rootY": 596,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        91,
+        60,
+        354,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 66288
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        48,
+        183,
+        397,
+        609
+      ],
+      "minimumMargin": 31,
+      "opaquePixels": 59126
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        49,
+        198,
+        398,
+        593
+      ],
+      "minimumMargin": 47,
+      "opaquePixels": 58361
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        206,
+        400,
+        597
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 58789
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 368,
+    "frameHeight": 566,
+    "rootX": 190,
+    "rootY": 544,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      40,
+      52
+    ],
+    "sheetWidth": 360,
+    "sheetHeight": 1812,
+    "frames": [
+      [
+        0,
+        0,
+        272,
+        560,
+        47,
+        4
+      ],
+      [
+        0,
+        564,
+        360,
+        436,
+        4,
+        127
+      ],
+      [
+        0,
+        1004,
+        360,
+        404,
+        5,
+        142
+      ],
+      [
+        0,
+        1412,
+        360,
+        400,
+        7,
+        150
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4587520,
+      "grid": 3332608,
+      "packed": 2609280
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "9cd745451c28d1ced4f1970b01a26dc20f0cf573e768d038068de6cac12fa74d",
+      "config": "1eae4a074d20e7a27c2eedcdf79b03811183460b8005ae1f0980f46174872b3d",
+      "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
+    },
+    "referenceSources": {
+      "art/sprites/source/p14_land_video_normalized.png": "cb39b7c701f918427066c8e3550f4ff8deefe019e0a64cbbf971fcacb3df1fda"
+    }
+  }
+}

@@ -2387,6 +2387,7 @@ final class CombatEngine {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
+        if (a.attack.mechanics.rebound && reboundMissed(a, frame)) return;
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel só bate no que ele repeliu: sem golpe na janela, a explosão não sai.
         if (a.attack.mechanics.repel && !a.countered) return;
@@ -2645,6 +2646,19 @@ final class CombatEngine {
             }
         }
         return true;
+    }
+
+    /**
+     * Rebote (o S1 do p14): o primeiro chute procura o rival como qualquer golpe; passou a
+     * janela dele sem acertar (errou ou defenderam), as outras pancadas não saem e ele cai.
+     */
+    private boolean reboundMissed(CombatFighter a, int frame) {
+        if (a.grabMissed) return true;
+        if (!a.strikeLanded && frame > a.attack.hitbox(0).lastFrame) {
+            a.grabMissed = true;
+            a.hitCutFrame = Math.min(a.attack.totalFrames - 2, a.attackFrame + config.reboundMissFrames);
+        }
+        return a.grabMissed;
     }
 
     /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */

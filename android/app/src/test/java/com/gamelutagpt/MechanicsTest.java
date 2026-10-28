@@ -204,6 +204,58 @@ public class MechanicsTest {
             p13.animations.containsKey(p13.specials.get("S3").move.animation.id + "_ERRO"));
     }
 
+    /** O S1 do p14: o chute que mergulha; acertou, quica e chuta de novo. */
+    private static AttackDefinition reboundKicks() {
+        return move("H", 12, 40, 20).damage(1200).stun(20, 10, 4).strikes(12, 22, 32, 42).strikeStop(4, 14)
+            .strikeHold(95f, 95f, 95f, 95f).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(110f)
+            .mechanics(new AttackDefinition.Mechanics().rebound()).build();
+    }
+
+    /** {acertos, defendidos, quadros até ele voltar ao neutro} */
+    private static int[] kickRival(float rivalX, boolean guard) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(reboundKicks()), BASE, 500f, rivalX);
+        s.in[0].heavy = true;
+        int[] out = new int[3];
+        for (int i = 0; i < 160; i++) {
+            if (guard) s.in[1].direction = 1;   // trás (o rival olha para a esquerda)
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker != 0) continue;
+                if (e.blocked) out[1]++; else out[0]++;
+            }
+            if (out[2] == 0 && i > 2 && !s.f(0).attacking()) out[2] = i;
+        }
+        return out;
+    }
+
+    @Test public void theReboundKickBouncesAndKicksAgainOnHit() {
+        int[] hit = kickRival(600f, false);
+        assertEquals("four kicks", 4, hit[0]);
+    }
+
+    @Test public void theReboundKickStopsWhenItWhiffs() {
+        int[] miss = kickRival(900f, false);
+        int[] hit = kickRival(600f, false);
+        assertEquals("nothing lands", 0, miss[0]);
+        assertTrue("he lands and the move ends early: " + miss[2] + " vs " + hit[2], miss[2] < hit[2]);
+    }
+
+    @Test public void theReboundKickStopsWhenBlocked() {
+        int[] blocked = kickRival(600f, true);
+        assertEquals("no kick lands", 0, blocked[0]);
+        assertEquals("only the first is blocked", 1, blocked[1]);
+    }
+
+    @Test public void theTricksterKicksAndCorkscrews() {
+        CharacterDefinition p14 = GeneratedCharacters.get("p14");
+        assertTrue("S1 rebounds", p14.fighter.energy.attack.mechanics.rebound);
+        assertTrue("and has the landing for the miss", p14.animations.containsKey(
+            p14.specialAnimations.get("S").id + "_ERRO"));
+        AttackDefinition sup = p14.fighter.superAttack.attack;
+        assertTrue("the Super corkscrews through", sup.mechanics.passThrough && sup.mechanics.advanceSpeed > 0f);
+        assertTrue("several strikes", sup.maxHits > 3);
+    }
+
     @Test public void theColossusRockFliesInAnArcAndTheButtonSetsTheDistance() {
         CharacterDefinition.Projectile rock = GeneratedCharacters.get("p13").specials.get("S2").projectile;
         assertTrue("arc", rock.gravity > 0f && rock.vertical < 0f);

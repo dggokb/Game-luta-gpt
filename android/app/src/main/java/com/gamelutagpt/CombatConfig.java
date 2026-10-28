@@ -194,6 +194,8 @@ final class CombatConfig {
     float strikeHoldPushback = 0.2f;
     /** Pancadas no chão (o Super do p13) cuja primeira errou: quadros até ele levantar e o golpe acabar. */
     int poundMissFrames = 36;
+    /** O rebote (S1 do p14) que errou o primeiro chute: quadros até cair em guarda. */
+    int reboundMissFrames = 20;
     /** Upward speed given to an airborne defender by a strike before the last (stays in reach). */
     float strikeHoldLift = 260f;
     /** An advancing move stops this close to the opponent's body (px past the pushboxes). */

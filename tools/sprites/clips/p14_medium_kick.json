@@ -1,0 +1,48 @@
+{
+  "id": "p14_medium_kick",
+  "javaName": "P14_MEDIUM_KICK",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_medium_kick_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_medium_kick.webp",
+  "report": "tools/sprites/reports/p14_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/p14_medium_kick-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro (nota 0.98)",
+    "quadros": "9,24,39,54,57,60,63,66,69,72,75,78,81,84",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "131,270",
+    "colunas": 6,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_medium_kick_video_normalized.png",
+      "celula": [
+        320,
+        288
+      ],
+      "raiz": [
+        131,
+        270
+      ],
+      "colunas": 11
+    }
+  },
+  "frameWidth": 640,
+  "frameHeight": 576,
+  "rootX": 262,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_medium_kick_video_normalized.png"
+  ]
+}
