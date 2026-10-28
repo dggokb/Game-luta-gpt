@@ -248,41 +248,47 @@ public class MechanicsTest {
 
     /** O S1 do p14 de verdade: do pulo, mergulha no chute; acertou, fica no ar e chuta mais. */
     private static AttackDefinition airReboundKicks() {
-        return move("jH", 6, 40, 14).damage(1200).stun(20, 10, 4).strikes(6, 16, 26, 36).strikeStop(4, 14)
-            .strikeHold(95f, 95f, 95f, 95f).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(110f)
+        return move("jH", 6, 4, 50).damage(1200).stun(20, 10, 4).strikes(6).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(110f)
             .reach(150f, 120f)
             .mechanics(new AttackDefinition.Mechanics().rebound().dive(420f, 900f)).build();
     }
 
-    /** {acertos, menor altura dele (y) depois do primeiro acerto até o último, quadros no ar} */
-    private static int[] diveOnto(float rivalX) {
+    /** {acertos, subiu depois do acerto (1/0), último quadro no ar, x do chute, x onde caiu}. */
+    private static float[] diveOnto(float rivalX) {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(airReboundKicks()), BASE, 500f, rivalX);
         CombatFighter f = s.f(0);
         f.grounded = false;
         f.y = Arena.GROUND_Y - 160f;
         f.vy = 0f;
         s.in[0].heavy = true;
-        int[] out = {0, 0, 0};
-        float hoverY = -1f;
+        float[] out = {0, 0, 0, 0, 0};
+        float hitY = -1f;
         for (int i = 0; i < 200; i++) {
             s.step();
             s.in[0].heavy = false;
             for (CombatEngine.HitEvent e : s.engine.events()) {
                 if (e.attacker == 0 && !e.blocked) out[0]++;
             }
-            if (out[0] == 1 && hoverY < 0f) hoverY = f.y;
-            if (out[0] >= 1 && out[0] < 4 && Math.abs(f.y - hoverY) > 1f) out[1] = 1;
-            if (!f.grounded) out[2] = i;
+            if (out[0] == 1 && hitY < 0f) {
+                hitY = f.y;
+                out[3] = f.x;
+            }
+            if (hitY >= 0f && f.y < hitY - 20f) out[1] = 1;
+            if (!f.grounded) {
+                out[2] = i;
+                out[4] = f.x;
+            }
         }
         return out;
     }
 
-    @Test public void theAirReboundKickHoversAndKicksOnlyAfterTheDiveLands() {
-        int[] hit = diveOnto(600f);
-        assertEquals("four kicks", 4, hit[0]);
-        assertEquals("he stays in the air while kicking", 0, hit[1]);
-        int[] miss = diveOnto(1100f);
-        assertEquals("nothing lands", 0, miss[0]);
+    @Test public void theAirReboundKickHitsOnceAndHopsBack() {
+        float[] hit = diveOnto(650f);
+        assertEquals("one kick", 1f, hit[0], 0f);
+        assertEquals("he hops up after it", 1f, hit[1], 0f);
+        assertTrue("and lands back, away from the rival: " + hit[3] + " -> " + hit[4], hit[4] < hit[3] - 60f);
+        float[] miss = diveOnto(1100f);
+        assertEquals("nothing lands", 0f, miss[0], 0f);
         assertTrue("the miss lands sooner: " + miss[2] + " vs " + hit[2], miss[2] < hit[2]);
     }
 
@@ -563,7 +569,9 @@ public class MechanicsTest {
         s.until(() -> s.f(1).status == CombatFighter.Status.KNOCKDOWN, 2000);
         assertTrue("lands close, not across the stage: " + (s.f(1).x - s.f(0).x), Math.abs(s.f(1).x - s.f(0).x) < 400f);
         s.until(() -> !s.f(0).inUltraSequence(), 600);
-        assertEquals("the jump back moved him", start - 240f, s.f(0).x, 1f);
+        // O pulo para trás (240) e, no fim, o empurrão dos corpos encostados (o rival cai perto).
+        float back = start - s.f(0).x;
+        assertTrue("the jump back moved him: " + back, back >= 239f && back < 300f);
     }
 
     @Test public void thrownBoxSpinsTwiceUntilItLands() {

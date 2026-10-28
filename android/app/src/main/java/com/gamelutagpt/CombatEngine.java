@@ -964,6 +964,7 @@ final class CombatEngine {
                         // No tech: it recovers on its own a little later, without the escape.
                         f.status = CombatFighter.Status.NEUTRAL;
                         f.launched = false;
+                        f.airRecovering = true;
                         f.freeFallFrames = 0;
                     }
                 }
@@ -1042,6 +1043,7 @@ final class CombatEngine {
         if (!f.attacking()) f.chain.clear();
         f.chain.add(attack.id);
         f.status = CombatFighter.Status.ATTACK;
+        f.airRecovering = false;
         f.clearAttack();
         f.attack = attack;
         f.shinkaiSuper = false;
@@ -1172,6 +1174,7 @@ final class CombatEngine {
         f.airDashBack = back;
         f.airDashDirection = back ? -f.facing : f.facing;
         f.airDashFrames = back ? config.backAirDashFrames : config.airDashFrames;
+        f.airRecovering = false;
         f.vy = 0f;
     }
 
@@ -1181,6 +1184,7 @@ final class CombatEngine {
         int relative = MotionParser.relative(f.input.direction, f.facing);
         f.status = CombatFighter.Status.NEUTRAL;
         f.launched = false;
+        f.airRecovering = true;
         f.jumpMode = CombatFighter.PULO_LIVRE;
         f.techRequestAge = -1;
         f.freeFallFrames = 0;
@@ -1321,6 +1325,7 @@ final class CombatEngine {
         f.status = CombatFighter.Status.NEUTRAL;
         f.clearAttack();
         f.airJumpUsed = true;
+        f.airRecovering = false;
         f.vy = -config.airJumpSpeed;
         if (f.jumpMode != CombatFighter.PULO_SUPER) {
             // O pulo no ar escolhe a direção de novo (comprometido).
@@ -1380,6 +1385,8 @@ final class CombatEngine {
                     break;
                 }
                 f.charging = false;
+                // Mergulho ainda no ar (o pulo para trás do rebote): o fim espera o chão.
+                if (moveMechanics.dives() && !f.grounded && f.attackFrame >= f.attack.totalFrames - config.diveLandingFrames - 1) break;
                 f.attackFrame++;
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
@@ -1677,8 +1684,10 @@ final class CombatEngine {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
         } else if (f.attacking() && !f.grounded && f.attack.mechanics.dives()) {
             // Mergulho: parado durante a preparação, depois desce na diagonal (moveVertically).
-            // O rebote acertou: fica no lugar quicando e cai reto.
-            if (f.attackFrame >= f.attack.startupFrames && !(f.attack.mechanics.rebound && f.strikeLanded)) {
+            // O rebote acertou: pula para trás, para longe do rival.
+            if (f.attack.mechanics.rebound && f.strikeLanded) {
+                f.x -= f.facing * config.reboundBackSpeed * CombatConfig.DT;
+            } else if (f.attackFrame >= f.attack.startupFrames) {
                 f.x += f.facing * f.attack.mechanics.diveForward * CombatConfig.DT;
             }
         } else if (f.attacking() && f.attack.mechanics.advanceAt(f.attackFrame)) {
@@ -1767,11 +1776,12 @@ final class CombatEngine {
         }
         if (f.attacking() && f.attack.mechanics.dives()) {
             if (f.attack.mechanics.rebound && f.strikeLanded) {
-                // Rebote: parado no ar enquanto chuta; depois do último, cai.
-                if (reboundHover(f)) {
-                    scale = 0f;
-                    f.vy = 0f;
+                // Rebote: o chute pegou, ele quica para cima e para trás e cai.
+                if (!f.reboundHopped) {
+                    f.reboundHopped = true;
+                    f.vy = -config.reboundHopSpeed;
                 }
+                scale = config.reboundGravityScale;
             } else {
                 scale = 0f;
                 f.vy = f.attackFrame >= f.attack.startupFrames ? f.attack.mechanics.diveDescent : 0f;
@@ -1814,6 +1824,7 @@ final class CombatEngine {
         }
         f.vx = 0f;
         f.freeFallFrames = 0;
+        f.airRecovering = false;
         if (f.status == CombatFighter.Status.AIR_HITSTUN) {
             // A fighter KO'd in the air lands lying down, not on its feet.
             if (f.slammed || f.ultraFall || f.hardFall || f.ko()) {
@@ -1880,8 +1891,11 @@ final class CombatEngine {
         if (a.rolling() || b.rolling() || passingThrough(a) || passingThrough(b)) return;
         if (CombatRules.resolvePush(a.x, a.y, a.body(), b.x, b.y, b.body(),
             Arena.LEFT_BOUND, Arena.RIGHT_BOUND, a.facing, pushResult)) {
-            a.x = pushResult[0];
-            b.x = pushResult[1];
+            // Aos poucos (pushStepMax por quadro): quem cai por cima do rival escorrega para o
+            // lado, sem pular de uma vez a largura das duas caixas.
+            float step = config.pushStepMax;
+            a.x += Math.max(-step, Math.min(step, pushResult[0] - a.x));
+            b.x += Math.max(-step, Math.min(step, pushResult[1] - b.x));
         }
     }
 
@@ -2558,7 +2572,10 @@ final class CombatEngine {
                               CharacterDefinition.Body body, boolean crouch) {
         if ((d.x - a.x) * a.facing < CombatRules.MIN_MELEE_DISTANCE) return false;
         float[] g = golpeNoDesenho(a, frame);
-        float x0 = g != null ? g[0] - FOLGA_DESENHO : box.x0, x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
+        // O membro medido é a ponta que mexeu; o braço ou a perna vem inteiro desde a frente do
+        // corpo. De perto (o pulo que cai em cima) a ponta já passou das costas do rival.
+        float x0 = g != null ? Math.min(g[0], a.body().halfWidth) - FOLGA_DESENHO : box.x0;
+        float x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
         float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
         // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
@@ -2881,34 +2898,16 @@ final class CombatEngine {
     }
 
     /**
-     * Rebote no mergulho (o S1 do p14, do pulo): até acertar, o primeiro chute bate a descida
-     * inteira; caiu no chão sem acertar, as outras não saem. Acertou: ele fica no ar quicando e
-     * cada chute seguinte acerta o rival preso na frente, no quadro dele, sem caixa.
+     * Rebote no mergulho (o S1 do p14, do pulo): o chute bate a descida inteira até acertar; caiu
+     * no chão sem acertar, fica aberto. Acertou: um golpe só, e ele pula para trás (moveVertically).
      */
     private boolean reboundDive(CombatFighter a, CombatFighter d) {
-        if (a.grabMissed) return true;
-        if (!a.strikeLanded) {
-            if (a.grounded) {
-                a.grabMissed = true;
-                return true;
-            }
-            return false;
+        if (a.grabMissed || a.strikeLanded) return true;
+        if (a.grounded) {
+            a.grabMissed = true;
+            return true;
         }
-        if (!d.hittable()) return true;
-        for (int i = 1; i < a.attack.hitboxCount(); i++) {
-            if (a.attack.hitbox(i).activeAt(a.attackFrame) && (a.hitboxMask & (1L << i)) == 0) {
-                addContact(a, d, a.attack, i, null);
-                return true;
-            }
-        }
-        return true;
-    }
-
-    /** Quicando no ar depois do primeiro chute do rebote no mergulho (até o último chute). */
-    private static boolean reboundHover(CombatFighter f) {
-        AttackDefinition.Mechanics m = f.attack.mechanics;
-        return m.rebound && m.dives() && f.strikeLanded && !f.grabMissed &&
-            f.attackFrame <= f.attack.hitbox(f.attack.hitboxCount() - 1).lastFrame;
+        return false;
     }
 
     /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */
@@ -3550,7 +3549,7 @@ final class CombatEngine {
         // The move's first strike that hits pays meter and sets the combo scale; the later
         // strikes keep that scale (a new combo starts over as a first strike).
         boolean firstStrike = multiProjectile ? c.strike == 0 || newSession : !multi || !a.strikeLanded || newSession;
-        if (multi) a.strikeLanded = true;
+        if (multi || (!projectile && attack.mechanics.rebound)) a.strikeLanded = true;   // o rebote de um chute só também pula para trás
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;

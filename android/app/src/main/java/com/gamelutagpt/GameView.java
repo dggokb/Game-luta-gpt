@@ -3962,6 +3962,14 @@ public class GameView extends SurfaceView
                 // guard as control returns, whether the stun is short or long.
                 reactionElapsed = hitReactionTime(f.character().animations.get(state), f.stunElapsed, f.stunTotal);
                 break;
+            case NEUTRAL:
+                // Saiu do dano ainda no ar (depois do lançador): cai na pose de recuperação do
+                // dano no ar, não no quadro do pulo.
+                if (!f.grounded && f.airRecovering) {
+                    state = SpriteStates.HIT_AIR;
+                    reactionElapsed = launchPoseTime(Math.max(0f, f.vy), false);
+                }
+                break;
             case THROWN:
                 // Held by the collar: the first frame of the hit reaction.
                 state = SpriteStates.HIT_STAND;
@@ -3971,6 +3979,37 @@ public class GameView extends SurfaceView
                 break;
         }
         return state != null && renderer.hasAnimation(state) ? state : null;
+    }
+
+    /**
+     * Tempo na animação do rebote (S1 do p14): quadros 0-3 encolhendo (a preparação), 4-5 o
+     * mergulho com o rastro (repete até encostar), 6-9 a estrela do acerto e 10-13 o pulo para
+     * trás (subindo 10-11, descendo 12-13). Errou: 10-13 na aterrissagem.
+     */
+    private float reboundTime(CombatFighter f, CharacterDefinition.Animation art) {
+        CombatConfig config = engine.config;
+        int startup = f.attack.startupFrames;
+        if (f.strikeLanded) {
+            if (!f.reboundHopped) return art.startOf(6);   // a pausa do impacto
+            float gravity = config.gravity * config.reboundGravityScale;
+            float since = (f.vy + config.reboundHopSpeed) / gravity;   // s desde o pulo
+            float star = art.startOf(10) - art.startOf(6);
+            if (since < star) return art.startOf(6) + since;
+            if (f.vy < 0f) {
+                float rise = config.reboundHopSpeed / gravity - star;
+                float k = rise <= 0f ? 1f : Math.min(1f, (since - star) / rise);
+                return art.startOf(10) + k * (art.startOf(12) - art.startOf(10)) * 0.999f;
+            }
+            return Math.min(art.startOf(14) - 0.0001f, art.startOf(12) + f.vy / gravity);
+        }
+        if (f.attackFrame < startup) return art.startOf(4) * (f.attackFrame + 0.5f) / startup;
+        if (f.grounded || f.grabMissed) {
+            int land = f.attack.totalFrames - config.diveLandingFrames;
+            float k = Math.max(0f, Math.min(0.999f, (f.attackFrame - land + 0.5f) / config.diveLandingFrames));
+            return art.startOf(10) + k * (art.startOf(14) - art.startOf(10));
+        }
+        float dive = art.startOf(6) - art.startOf(4);
+        return art.startOf(4) + ((f.attackFrame - startup) * FIXED_STEP) % dive;
     }
 
     /** Clip time of a ground hit reaction: the whole clip spread over the hitstun. */
@@ -4045,7 +4084,11 @@ public class GameView extends SurfaceView
                 ? character.animations.get(art.id + "_ERRO") : null;
             CharacterDefinition.Animation miss = f.grabMissed && !cutMiss && f.move != null && f.move.animation != null
                 ? character.animations.get(f.move.animation.id + "_ERRO") : null;
-            if (poundMiss != null) {
+            if (f.attack.mechanics.rebound && f.attack.mechanics.dives() && art != null && art.startOf(14) < art.duration + 0.0001f) {
+                // O rebote (S1 do p14): encolhe, mergulha no chute e, acertando, pula para trás.
+                animation = art.id;
+                animationElapsed = reboundTime(f, art);
+            } else if (poundMiss != null) {
                 // O Super do p13 que errou a queda (ele levanta, sem os socos) e o rebote do p14
                 // que errou o chute (ele cai, sem quicar): do fim do primeiro golpe até o corte.
                 int from = f.attack.hitbox(0).lastFrame + 1;

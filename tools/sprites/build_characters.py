@@ -128,9 +128,10 @@ def validate_fighter(pack):
     for key in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'): positive(body[key], f'{name}.body.{key}')
     if body['crouchHeight'] > body['standHeight']:
         raise ValueError(f'{name}: crouchHeight cannot exceed standHeight')
-    # The pushbox keeps bodies apart; it sits inside the hurtbox so it never blocks a hit.
-    if body['pushHalfWidth'] > body['halfWidth'] or body['pushHeight'] > body['crouchHeight'] + 60:
-        raise ValueError(f'{name}: pushbox must stay inside the hurtbox (width) and near crouch height')
+    # The pushbox keeps the drawn bodies apart (about the torso with the guard, wider than the
+    # chest-to-hip halfWidth); hits land on the drawn silhouette, outside it.
+    if body['pushHalfWidth'] > 2.5 * body['halfWidth'] or body['pushHeight'] > body['crouchHeight'] + 60:
+        raise ValueError(f'{name}: pushbox must stay near the drawn torso (width) and near crouch height')
     if 'energy' in f:
         validate_projectile(f['energy'], name+'.energy', body)
         command = f['energy']['command']
@@ -206,8 +207,8 @@ def validate_mechanics(name, mech, m, projectile):
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
     if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
         raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
-    # Rebote (o S1 do p14): acertou o primeiro chute, quica e as outras pancadas saem.
-    if 'rebote' in mech and (mech['rebote'] is not True or len(m.get('golpes', [])) < 2 or 'reach' not in m):
+    # Rebote (o S1 do p14): o chute do mergulho; acertou, ele pula para trás.
+    if 'rebote' in mech and (mech['rebote'] is not True or not m.get('golpes') or 'reach' not in m):
         raise ValueError(f'{name}.mecanica.rebote: true, on a striking move with golpes')
     if 'agarra' in mech:   # agarrão de especial (o S3 do p13): alcance à frente do corpo
         if projectile or not isinstance(mech['agarra'], dict) or set(mech['agarra']) != {'alcance'}:

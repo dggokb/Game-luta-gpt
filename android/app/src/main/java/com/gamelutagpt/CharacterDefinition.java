@@ -78,6 +78,10 @@ final class CharacterDefinition {
          * Null sem caixas medidas.
          */
         float[][] silhuetaCorpo,silhuetaGolpe;
+        /** Onde começa o quadro {@code index} da animação (s); o fim dela além do último. */
+        float startOf(int index) {
+            float t=0f;for(int i=0;i<Math.min(index,durations.length);i++)t+=durations[i];return t;
+        }
         Animation withSilhueta(String corpo,String golpe) {
             silhuetaCorpo=quadros(corpo);silhuetaGolpe=quadros(golpe);
             for(float[] g:silhuetaGolpe)if(g!=null&&g.length!=4)throw new IllegalArgumentException(id+": golpe {x0,x1,y0,y1}");

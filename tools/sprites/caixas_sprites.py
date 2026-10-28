@@ -5,8 +5,10 @@ Hurt (o corpo, fighter.body):
     standHeight   altura do IDLE (do chão ao topo da cabeça, mediana dos quadros)
     crouchHeight  altura do agachado parado (CROUCH_IDLE, ou o fim do CROUCH)
     halfWidth     meia largura do tronco (do peito ao quadril, sem os pés abertos nem a cabeça)
-    pushHalfWidth e pushHeight mantêm a proporção que tinham com halfWidth e standHeight (o
-                  empurrão no máximo 60 acima do agachado, como o build pede).
+    pushHalfWidth 0,9 da meia largura do tronco desenhado parado (a faixa do meio da silhueta
+                  do IDLE, com a guarda): dois lutadores encostam sem um entrar no outro
+    pushHeight    mantém a proporção que tinha com standHeight (no máximo 60 acima do
+                  agachado, como o build pede).
 
 Hit (cada golpe normal: L, M, H, 2L, 2M, 2H, jL, jM, jH, j2H, 6M), no quadro mais esticado
 entre o do impacto (um antes) e três depois:
@@ -219,7 +221,7 @@ def golpe(pack, binding, meia, alto):
         # O lançador pega no caminho da perna (ou do punho) que sobe, não só lá no alto: tem que
         # acertar quem está em pé, mesmo os baixos (o golpe dos combos).
         lo = max(20.0, min(float(h[dx > meia].min(initial=lo)), alto * 0.5))
-        reach = max(reach, meia + 30.0)
+        reach = max(reach, lancador_alcance(pack, meia))
     if hi - lo <= 2 * FOLGA:
         return reach, (lo + hi) / 2, None
     return reach, hi - FOLGA, lo
@@ -234,7 +236,7 @@ def medir(pack):
         'halfWidth': round(meia),
         'standHeight': round(alto),
         'crouchHeight': round(agachado),
-        'pushHalfWidth': round(meia * b['pushHalfWidth'] / b['halfWidth']),
+        'pushHalfWidth': empurrao(pack) or round(meia * b['pushHalfWidth'] / b['halfWidth']),
         # A caixa de empurrão fica perto da altura agachada (o build pede no máximo 60 acima).
         'pushHeight': min(round(alto * b['pushHeight'] / b['standHeight']), round(agachado) + 60),
     }
@@ -344,7 +346,7 @@ def silhuetas(pack):
             if g and nome == lancador:
                 # O lançador (2H) sobe colado ao corpo: alcança um pouco além dele e desce até a
                 # cintura, como a caixa do golpe (tem que pegar quem está em pé na frente).
-                g = [g[0], max(g[1], round(meia + 30)), min(g[2], round(alto * 0.5)), g[3]]
+                g = [g[0], max(g[1], round(lancador_alcance(pack, meia))), min(g[2], round(alto * 0.5)), g[3]]
             if g:
                 golpe[str(i)] = g
         a['silhueta'] = {'corpo': corpo, 'golpe': golpe}
@@ -376,6 +378,26 @@ def alcance_do_ultra(pack, spec):
         if corpo:
             pontas.append(float(max(c[1] for c in corpo)))
     return round(float(np.median(pontas))) + 15 if pontas else None
+
+
+EMPURRAO_DO_TRONCO = 0.9
+
+
+def lancador_alcance(pack, meia):
+    """O mínimo que o lançador (2H) alcança à frente da raiz: passa da caixa de empurrão (os
+    corpos ficam a duas delas) o bastante para pegar depois do empurrão do L > M."""
+    push = empurrao(pack) or pack['fighter']['body']['pushHalfWidth']
+    return max(meia + 30.0, push + 50.0)
+
+
+def empurrao(pack):
+    """Meia largura do empurrão: EMPURRAO_DO_TRONCO da meia largura do tronco desenhado parado
+    (a faixa do meio da silhueta do IDLE, mediana dos quadros). None sem silhueta."""
+    corpo = pack['animations'].get('IDLE', {}).get('silhueta', {}).get('corpo')
+    meios = [c[1] for c in (corpo or {}).values() if len(c) == 3]
+    if not meios:
+        return None
+    return round(EMPURRAO_DO_TRONCO * float(np.median([(m[1] - m[0]) / 2 for m in meios])))
 
 
 def aplicar(pack, novo, golpes):
@@ -411,6 +433,9 @@ def main():
         if a.write:
             aplicar(pack, novo, golpes)
             silhuetas(pack)
+            meia = empurrao(pack)
+            if meia:
+                pack['fighter']['body']['pushHalfWidth'] = meia
             path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     # Ultras: o rival preso onde a ponta das pancadas encosta.
     ultras_path = HERE / 'ultras.json'

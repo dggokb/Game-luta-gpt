@@ -89,6 +89,8 @@ final class CombatFighter {
     Outcome outcome = Outcome.NONE;
     /** Último quadro do golpe normal que acertou (ou da rasteira defendida): a recuperação acaba aí (-1: vai inteira). */
     int hitCutFrame = -1;
+    /** O rebote acertou e já saiu o pulo para trás. */
+    boolean reboundHopped;
     String specialStrength;
     /** Botão (L, M, H) do último especial de comando (S2..S4): o pavio da caixa da p16. */
     String commandButton;
@@ -118,6 +120,11 @@ final class CombatFighter {
     int stunElapsed;
     boolean hitCrouching;
     boolean launched;
+    /**
+     * Saiu do dano no ar ainda no ar (sozinho ou com o tech): cai na pose de recuperação do
+     * HIT_AIR, não no pulo, até o chão ou a próxima ação (golpe, pulo ou dash no ar).
+     */
+    boolean airRecovering;
     boolean slammed;
     int knockdownFrame;
     int guard;
@@ -399,6 +406,7 @@ final class CombatFighter {
         hitsOnTarget = 0;
         hitboxMask = 0L;
         strikeLanded = strikeBlocked = strikeJuggled = false;
+        reboundHopped = false;
         countered = false;
         grabMissed = false;
         armorUsed = 0;

@@ -209,6 +209,12 @@ final class CombatConfig {
     int poundMissFrames = 36;
     /** O rebote (S1 do p14) que errou o primeiro chute: quadros até cair em guarda. */
     int reboundMissFrames = 20;
+    /** O rebote (S1 do p14) que acertou: o pulo para trás (para cima, para trás e o peso). */
+    float reboundHopSpeed = 950f;
+    float reboundBackSpeed = 300f;
+    float reboundGravityScale = 2.4f;
+    /** O empurrão dos corpos encostados anda no máximo isto por quadro (cada um). */
+    float pushStepMax = 12f;
     /** Upward speed given to an airborne defender by a strike before the last (stays in reach). */
     float strikeHoldLift = 260f;
     /** An advancing move stops this close to the opponent's body (px past the pushboxes). */

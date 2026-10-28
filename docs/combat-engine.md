@@ -516,6 +516,9 @@ A recuperação deixou de ser automática: quem apanha escolhe. Valores em
 | L/M/H sem direção | Air tech neutro: um pulinho para cima |
 | nada | **Cai solto** por até 12 frames (`airTechWindow`), ainda aberto a golpes (conta no combo), e recupera sozinho, sem invulnerabilidade |
 
+Recuperado ainda no ar (sozinho ou pelo tech), o lutador cai na pose de recuperação do `HIT_AIR`
+(`airRecovering`), não no quadro do pulo, até o chão ou a próxima ação (golpe, pulo ou dash no ar).
+
 O botão do tech não sai como golpe aéreo. Quedas forçadas (slam), bounces e o ultra não
 têm air tech (caem derrubados).
 
@@ -953,6 +956,11 @@ folhas já convertidas e grava no `character.json`; rode de novo depois de recon
 
 - **Postura** (`fighter.body`): altura do IDLE e do agachado parado (sem fio de cabelo), meia
   largura do tronco, da barriga ao peito. Vale parado, andando, agachado, no ar e apanhando.
+- **Empurrão** (`pushHalfWidth`): 0,9 da meia largura do tronco desenhado parado (a faixa do meio da
+  silhueta do IDLE, com a guarda). Os dois encostam sem um entrar no outro (antes era a largura do
+  peito, e os corpos desenhados ficavam um dentro do outro). Corpos encostados se separam no máximo
+  `pushStepMax` (12) px por quadro cada um: quem cai por cima do rival escorrega para o lado, sem
+  pular de uma vez a largura das duas caixas.
 - **Golpe** (`reach`/`hitHeight`/`hitFloor` dos normais): o membro que bate no quadro mais esticado
   (o que mudou desde o primeiro quadro do golpe). É a caixa de reserva e a que a CPU usa para medir
   distância.
@@ -960,7 +968,9 @@ folhas já convertidas e grava no `character.json`; rode de novo depois de recon
   especiais, S e Super): o corpo em 3 faixas (cabeça, tronco, pernas) e o membro que bate. O motor
   acha o quadro que a tela mostra (`move.animationTime` / `Animation.timeFor` do clipe esticado sobre
   o golpe, a mesma conta do desenho) e:
-  - a pancada usa o membro daquele quadro (sem membro medido, a caixa do golpe);
+  - a pancada usa o membro daquele quadro (sem membro medido, a caixa do golpe), **desde a frente do
+    corpo de quem bate até a ponta**: o membro medido é só a ponta que mexeu, e de perto (o pulo que
+    cai em cima, o jH) a ponta já passou das costas do rival;
   - quem está golpeando apanha nas 3 faixas do quadro, então **o braço ou a perna esticados apanham**
     (golpes e projéteis).
 - **Posturas** (IDLE, andar, dash, backdash, pulo, queda, agachado, apanhando e defendendo): as 3
@@ -972,7 +982,8 @@ folhas já convertidas e grava no `character.json`; rode de novo depois de recon
 - **Coreografados** ficam com a caixa do golpe: o que prende o rival num lugar (`segurarRival`), anda
   com o corpo (avanço), pisa o caído, agarra, pula ou puxa (o desenho do vídeo já mostra o caminho
   que o motor também faz). O Ultra prende o rival pela sequência (`ultras.json`).
-- O lançador (2H) que sobe colado ao corpo alcança um pouco além dele e desce até a cintura; no
+- O lançador (2H) que sobe colado ao corpo alcança pelo menos `pushHalfWidth + 50` (pega depois do
+  empurrão do L > M, com os corpos a duas caixas de empurrão) e desce até a cintura; no
   quadro a quadro vale o que mexeu da cintura para cima (o punho que sobe, não o pé que desliza).
 - **Ultra**: `ultras.json` `alcance` é a distância em que os golpes desenhados encostam no rival; o
   rival vai do contato até ela até o primeiro acerto e fica ali (o p09, p13, p14, p15 e p16 têm a
@@ -1019,7 +1030,7 @@ em pé. Valor ausente = altura − 19,5.
 Conferências do build depois de aplicar (o `caixas.py` grava o que veio do app; o
 `build_characters.py` recusa o que quebra a luta):
 
-- empurrão dentro do corpo: `pushHalfWidth ≤ halfWidth` e `pushHeight ≤ crouchHeight + 60`
+- empurrão perto do tronco desenhado: `pushHalfWidth ≤ 2,5 × halfWidth` e `pushHeight ≤ crouchHeight + 60`
   (o empurrão baixo deixa um pulo passar por cima do outro);
 - magia sai de dentro do corpo: `spawnY`/`airSpawnY ≤ standHeight`, `crouchSpawnY ≤ crouchHeight`;
 - `hitFloor ≤ hitHeight`.

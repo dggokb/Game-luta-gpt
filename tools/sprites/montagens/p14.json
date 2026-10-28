@@ -105,7 +105,7 @@
     }
   },
   "special_energy": {
-    "_doc": "S1 (Chute rebote), só no pulo: encolhe no ar (10-13), mergulha no chute com o rastro e a estrela do vídeo (14-19); acertou, quica e chuta mais três vezes (20-48); no fim encolhe e cai (49-58). Cada quadro pelo tronco: quem anda no ar é o motor (o mergulho).",
+    "_doc": "S1 (Chute rebote), só no pulo: encolhe no ar (0-3), mergulha no chute com o rastro (4-5, repete até encostar) e a estrela do vídeo (6-9); acertou, pula para trás (10-13). Cada quadro pelo tronco: quem anda no ar é o motor (o mergulho e o pulo para trás).",
     "trechos": [
       [
         "s1",
@@ -121,7 +121,8 @@
     },
     "animacoes": {
       "SPECIAL_ENERGY": {
-        "impacto": 6
+        "impacto": 6,
+        "frames": "0-13"
       }
     }
   },
@@ -253,7 +254,7 @@
     }
   },
   "idle": {
-    "_doc": "Guarda respirando (4-53, dois fôlegos) com o pé no lugar do vídeo (sem recentrar quadro a quadro, que deslizava).",
+    "_doc": "Idle: três respiradas e a risada (o vídeo inteiro em loop, começando na guarda depois da risada: 56-123 e 0-55, de 2 em 2).",
     "trechos": [
       [
         "idle",
@@ -261,7 +262,7 @@
         124
       ]
     ],
-    "quadros": "4-53",
+    "quadros": "56-122/2,0-54/2",
     "opcoes": {
       "fixar": "video"
     },

@@ -73,8 +73,9 @@ public class CrossUpTest {
         // P2 começa olhando para a esquerda (P1 à esquerda): o "trás" antigo é a direita (1).
         Pulo antigo = pulo("M", press, 1);
         assertTrue("segurando o lado antigo, apanha", antigo.acertou && !antigo.defendeu);
+        // Segurando para o lado novo: defende, ou anda para longe antes de o golpe encostar.
         Pulo novo = pulo("M", press, 5);
-        assertTrue("segurando para o outro lado, defende", novo.defendeu);
+        assertFalse("segurando para o outro lado, não apanha", novo.acertou);
     }
 
     @Test public void soOJmCruza() {

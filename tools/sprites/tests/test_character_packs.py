@@ -243,8 +243,8 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(throw)
         with self.assertRaisesRegex(ValueError,'projectile.visual'):pipeline.build(self.root)
 
-    def test_pushbox_must_fit_inside_hurtbox(self):
-        self.edit(lambda d:d['fighter']['body'].update(pushHalfWidth=80))
+    def test_pushbox_must_stay_near_the_torso(self):
+        self.edit(lambda d:d['fighter']['body'].update(pushHalfWidth=200))
         with self.assertRaisesRegex(ValueError,'pushbox'):pipeline.build(self.root)
 
     def test_regroup_returns_limbs_that_cross_into_a_neighbour_cell(self):

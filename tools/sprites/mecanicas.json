@@ -1338,7 +1338,7 @@
         "alcance": 900
       },
       "unica": {
-        "descricao": "Trickster de chutes: S1, só no pulo, mergulha no chute; acertou, quica e chuta mais três vezes (errou ou defenderam, cai e fica aberto). S2 chute que solta um tornado à frente, S3 meia-lua de chute (anti-aéreo), S4 pisão que solta a onda rente ao chão, Super em parafuso atravessando a tela. Os efeitos dos especiais e do Super são os dos vídeos.",
+        "descricao": "Trickster de chutes: S1, só no pulo, mergulha num chute só; acertou, pula para trás e cai longe do rival (errou ou defenderam, cai e fica aberto). S2 chute que solta um tornado à frente, S3 meia-lua de chute (anti-aéreo), S4 pisão que solta a onda rente ao chão, Super em parafuso atravessando a tela. Os efeitos dos especiais e do Super são os dos vídeos.",
         "golpes": {
           "S": {
             "rebote": true,

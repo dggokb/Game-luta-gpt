@@ -138,10 +138,11 @@ public class CombatRulesTest {
         assertFalse(CombatRules.resolvePush(500,565-n.pushHeight-1,p,520,565,n,90,2510,1,out));
         assertEquals(500,out[0],0);assertEquals(520,out[1],0);
     }
-    @Test public void pushboxIsSmallerThanHurtboxSoItNeverBlocksAHit() {
+    @Test public void pushboxKeepsTheDrawnTorsosApartButNeverBlocksAHit() {
         for(String id:new String[]{"player_base","player_two","monster_npc"}) {
             CharacterDefinition.Body b=GeneratedCharacters.get(id).fighter.body;
-            assertTrue(b.pushHalfWidth<=b.halfWidth);
+            // Do tamanho do tronco desenhado (com a guarda), mais largo que o peito-quadril.
+            assertTrue(b.pushHalfWidth<=2.5f*b.halfWidth);
             // Melee reach of every move is measured past the hurtbox edge, beyond the push gap.
             for(CharacterDefinition.Move m:GeneratedCharacters.get(id).moves.values())
                 assertTrue(id+"/"+m.binding,

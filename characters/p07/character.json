@@ -16,7 +16,7 @@
       "halfWidth": 48,
       "standHeight": 274,
       "crouchHeight": 153,
-      "pushHalfWidth": 26,
+      "pushHalfWidth": 68,
       "pushHeight": 213
     },
     "energy": {
@@ -6601,13 +6601,13 @@
         "golpe": {
           "1": [
             1,
-            78,
+            118,
             137,
             263
           ],
           "2": [
             1,
-            90,
+            118,
             137,
             282
           ],
@@ -6625,31 +6625,31 @@
           ],
           "5": [
             1,
-            78,
+            118,
             137,
             349
           ],
           "6": [
             1,
-            78,
+            118,
             137,
             349
           ],
           "7": [
             1,
-            78,
+            118,
             137,
             349
           ],
           "8": [
             1,
-            78,
+            118,
             137,
             349
           ],
           "9": [
             1,
-            78,
+            118,
             137,
             285
           ]
@@ -11028,7 +11028,7 @@
     "2H": {
       "animation": "CROUCH_HEAVY",
       "damage": 960,
-      "reach": 78,
+      "reach": 118,
       "startupFrames": 12,
       "activeFrames": 8,
       "recoveryFrames": 22,
