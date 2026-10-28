@@ -180,6 +180,11 @@ Exemplo de animação de quatro frames e vínculo L:
 }
 ```
 
+`reach` é a ponta do membro medida no desenho (`tools/sprites/caixas_sprites.py` regrava). Um
+ajuste de balanço que encurta o golpe vai em `alcanceMaximo`: o motor corta o desenho nesse
+limite (`AttackDefinition.reachCap`) e a medida das caixas não passa dele (hoje só o 2M do p09,
+220; docs/balanco/ajustes.md, etapa 4).
+
 O pack declara **todos** os nove inputs: `L`, `M`, `H`, `2L`, `2M`, `2H`, `jL`, `jM`,
 `jH`. Cada golpe tem `animation` **ou** `pose` (nunca os dois). Sem arte própria, o
 golpe declara a postura mantida: `"pose": "CROUCH"` para 2X e `"pose": "AIR"` para jX.

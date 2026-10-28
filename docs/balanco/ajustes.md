@@ -194,3 +194,96 @@ o contra-ataque automático garantido; corrigir a decisão tardia da CPU.
   acaba, como decidido; o "TROCA PEDIDA…" mostra que o aperto foi aceito.
 - **Não testado no aparelho:** as mudanças de HUD (texto, "…", aviso e arco) passaram nos testes do
   motor, mas não foram vistas no celular.
+
+## Etapa 4a — p09: o 2M (P1, primeira iteração)
+
+**Decisão:**
+- 2M: alcance de 250 para 220 e dano de 620 para 560.
+- Velocidade, vida e dano dos agarrões ficam como estão.
+- Se continuar dominante, avaliar a velocidade de 300 para 270 numa segunda iteração.
+
+**Arquivos:**
+- `characters/p09/character.json`, 2M:
+  - `damage` 620 → 560;
+  - `reach` 250 → 220;
+  - novo `alcanceMaximo` 220.
+- `GeneratedCharacters.java`: a linha do 2M do p09.
+- `AttackDefinition.java`: `reachCap`.
+- `CombatEngine.golpeToca`: o desenho não acerta além do `reachCap`.
+- `tools/sprites/build_characters.py`:
+  - passa `alcanceMaximo` para o motor (`.reachCap(...)`);
+  - recusa `reach` maior que ele.
+- `tools/sprites/caixas_sprites.py`: a medida das caixas não passa do `alcanceMaximo`, para a ferramenta
+  não desfazer o ajuste.
+- `docs/sprite-standard.md`: o campo novo.
+
+**O alcance (precisa de decisão):**
+- **O que eu achei:** o `reach` de 250 do json estava acima do próprio desenho. A ponta desenhada do 2M
+  vai até ~221 px, e é o desenho que decide o acerto. Por isso o 2M acerta até ~305 de distância entre
+  os centros (a ponta mais o corpo de quem apanha), contra ~220 do 2M da Yin-lu.
+- **O efeito do ajuste:** baixar o `reach` para 220 alinhou o número ao desenho. Isso muda quando a
+  CPU usa o 2M, mas a distância de acerto só cai ~1 px.
+- **Para encurtar o acerto de verdade em 30 px:** basta `alcanceMaximo` 190 (o motor já corta no
+  limite). Não apliquei sem aprovação.
+
+**Cada metade medida sozinha (mesmas sementes; o "antes" é o código depois da etapa 3):**
+
+| métrica | antes | só o dano 560 | só o alcance 220 | os dois |
+|---|---|---|---|---|
+| 1x1.p09 | 82% | 81% | 75% | 74% |
+| 1x1.p09_vs_p02 | 98% | 98% | 85% | 85% |
+| 2x2.p09 | 77% | 76% | 81% | 82% |
+| p09.vs_p02_400 | 92% | 92% | 90% | 90% |
+| p09.dano_por_acerto | 774 | 746 | 752 | 733 |
+| p09.parte_2M | 34% | 32% | 27% | 25% |
+| p09.parte_agarroes | 1% | 1% | 1% | 1% |
+| 1x1.p02 | 44% | 44% | 44% | 44% |
+
+**Resultado:**
+- **O dano sozinho** quase não muda as vitórias (−1 a −2 pontos); o dano por acerto cai 4%.
+- **O `reach` 220** é o que mais mexe: a CPU do p09 usa menos o 2M (34% → 27% do dano dele). Contra o
+  elenco no 1x1 ele cai de 82% para 75%.
+- **Os dois juntos:** o p09 fica com 74% contra o elenco (era 82%).
+- **Ele continua o mais forte do 1x1.** Contra a Yin-lu, o detalhe de 400 lutas ainda dá 90%.
+- **Efeito da etapa 2:** o p09 contra a Yin-lu tinha subido de 78% para 92%. Antes a CPU da Yin-lu
+  (TECHNIQUE) ganhava todos os Clash contra o p09 (POWER), e isso era 16% do dano dela.
+- **Lutas 2x2:** o p09 foi de 77% para 82%, dentro do ruído de ±8 pontos.
+- **Testes:** os 541 do app passam, e o `build_characters.py --check` confere o arquivo gerado.
+
+Todos os 16 personagens (1x1 contra o elenco e 2x2), antes e depois da etapa 4a:
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| 1x1.Ryūga (p01) | 68% | 69% | +2 pts |
+| 1x1.Yin-lu (p02) | 44% | 44% | +1 pts |
+| 1x1.Kōga (p03) | 60% | 60% | +0 pts |
+| 1x1.p04 | 54% | 54% | +0 pts |
+| 1x1.p05 | 41% | 42% | +1 pts |
+| 1x1.p06 | 68% | 69% | +0 pts |
+| 1x1.p07 | 13% | 13% | +0 pts |
+| 1x1.p08 | 78% | 79% | +0 pts |
+| 1x1.p09 | 82% | 74% | -8 pts |
+| 1x1.p10 | 57% | 57% | +1 pts |
+| 1x1.p11 | 54% | 56% | +1 pts |
+| 1x1.p12 | 44% | 44% | +1 pts |
+| 1x1.p13 | 55% | 56% | +1 pts |
+| 1x1.p14 | 40% | 40% | +0 pts |
+| 1x1.p15 | 16% | 16% | +0 pts |
+| 1x1.p16 | 27% | 27% | +0 pts |
+| 1x1.p09_vs_p02 | 98% | 85% | -12 pts |
+| 2x2.Ryūga (p01) | 64% | 65% | +1 pts |
+| 2x2.Yin-lu (p02) | 42% | 42% | +0 pts |
+| 2x2.Kōga (p03) | 50% | 49% | -2 pts |
+| 2x2.p04 | 56% | 53% | -3 pts |
+| 2x2.p05 | 41% | 41% | -1 pts |
+| 2x2.p06 | 59% | 59% | +0 pts |
+| 2x2.p07 | 34% | 32% | -3 pts |
+| 2x2.p08 | 74% | 73% | -1 pts |
+| 2x2.p09 | 77% | 82% | +5 pts |
+| 2x2.p10 | 55% | 53% | -2 pts |
+| 2x2.p11 | 53% | 53% | +0 pts |
+| 2x2.p12 | 45% | 45% | +0 pts |
+| 2x2.p13 | 55% | 55% | -0 pts |
+| 2x2.p14 | 36% | 36% | +0 pts |
+| 2x2.p15 | 22% | 22% | +0 pts |
+| 2x2.p16 | 40% | 44% | +4 pts |

@@ -211,6 +211,11 @@ final class AttackDefinition {
     /** No acerto, o rival sai girando no ar e cai deitado (o giro do punish counter). */
     final boolean spin;
     final float reach, hitHeight;
+    /**
+     * Limite de balanço do alcance (px à frente da raiz): o membro desenhado não acerta além disto.
+     * 0 = sem limite (o desenho manda). character.json "alcanceMaximo".
+     */
+    final float reachCap;
     /** Base of the default strike box: hitHeight minus the slack, or lower for a sweeping hit (uppercut). */
     final float hitFloor;
     private final Box[] hitboxes;
@@ -252,6 +257,7 @@ final class AttackDefinition {
         overhead = b.overhead;
         spin = b.spin;
         reach = b.reach;
+        reachCap = b.reachCap;
         hitHeight = b.hitHeight;
         hitFloor = Math.min(b.hitFloor > 0f ? b.hitFloor : Float.MAX_VALUE, hitHeight - CombatRules.VERTICAL_SLACK);
         if (b.hitboxes.isEmpty() && b.strikes.length > 0) {
@@ -352,7 +358,7 @@ final class AttackDefinition {
         private float pushbackOnHit, pushbackOnBlock;
         private int juggleCost = 1, maxHits = 1, maxUses = 0, maxChainUses = 0;
         private boolean low, overhead, spin;
-        private float reach, hitHeight, hitFloor;
+        private float reach, hitHeight, hitFloor, reachCap;
         private final List<Box> hitboxes = new ArrayList<>();
         private int[] strikes = new int[0];
         private int strikeStop, finalStop;
@@ -395,6 +401,7 @@ final class AttackDefinition {
         Builder reach(float reachValue, float hitHeightValue) { reach = reachValue; hitHeight = hitHeightValue; return this; }
         /** Reach with the box stretched down to {@code floor} (fist path of an uppercut). */
         Builder reach(float reachValue, float hitHeightValue, float floor) { reach(reachValue, hitHeightValue); hitFloor = floor; return this; }
+        Builder reachCap(float value) { reachCap = value; return this; }
         Builder hitbox(int first, int last, float x0, float x1, float y0, float y1) {
             hitboxes.add(new Box(first, last, x0, x1, y0, y1)); return this;
         }

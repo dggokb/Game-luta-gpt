@@ -489,6 +489,9 @@ def validate_move(pack, binding, m, projectile=False):
             raise ValueError(f'{binding}: damage must be a positive integer')
         return
     positive(m['reach'], binding)
+    if 'alcanceMaximo' in m:
+        positive(m['alcanceMaximo'], binding+'.alcanceMaximo')
+        if m['reach'] > m['alcanceMaximo']: raise ValueError(f'{binding}: reach passes alcanceMaximo')
     if 'hitHeight' in m: positive(m['hitHeight'], binding)
     # Base of the strike box, below hitHeight - 19.5 for a sweeping hit (uppercut): fist path, low to high.
     if 'hitFloor' in m:
@@ -684,6 +687,7 @@ def compile_packs(root, results):
         if m.get('low'): code += '.low(true)'
         if binding == OVERHEAD: code += '.overhead(true)'
         if reach is not None: code += '.reach('+f(reach)+','+f(height)+(','+f(m['hitFloor']) if 'hitFloor' in m else '')+')'
+        if 'alcanceMaximo' in m: code += '.reachCap('+f(m['alcanceMaximo'])+')'
         for key in ('hitboxes','hurtboxes'):
             for box in m.get(key, []):
                 code += '.'+key[:-2]+'('+','.join([str(box['frames'][0]),str(box['frames'][1])]+[f(v) for v in box['x']+box['y']])+')'

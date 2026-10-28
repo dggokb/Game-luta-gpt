@@ -404,7 +404,8 @@ def aplicar(pack, novo, golpes):
     pack['fighter']['body'].update(novo)
     for binding, (reach, altura, base) in golpes.items():
         m = pack['moves'][binding]
-        m['reach'] = round(reach)
+        # Limite de balanço (docs/balanco/ajustes.md): a medida do desenho não passa dele.
+        m['reach'] = round(min(reach, m.get('alcanceMaximo', reach)))
         m['hitHeight'] = round(altura)
         if base is None or round(base) >= m['hitHeight'] - FOLGA:
             m.pop('hitFloor', None)

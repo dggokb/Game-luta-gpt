@@ -10400,8 +10400,9 @@
     },
     "2M": {
       "animation": "CROUCH_MEDIUM",
-      "damage": 620,
-      "reach": 250,
+      "damage": 560,
+      "reach": 220,
+      "alcanceMaximo": 220,
       "low": true,
       "startupFrames": 9,
       "activeFrames": 5,

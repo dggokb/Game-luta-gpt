@@ -2577,6 +2577,8 @@ final class CombatEngine {
         // corpo. De perto (o pulo que cai em cima) a ponta já passou das costas do rival.
         float x0 = g != null ? Math.min(g[0], a.body().halfWidth) - FOLGA_DESENHO : box.x0;
         float x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
+        // Limite de balanço do golpe (alcanceMaximo): o desenho não acerta além dele.
+        if (a.attack != null && a.attack.reachCap > 0f) x1 = Math.min(x1, a.attack.reachCap + FOLGA_DESENHO);
         float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
         // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
