@@ -385,6 +385,17 @@ final class CharacterDefinition {
             this.flight=flight.clone();this.upsideDown=upsideDown;this.armsInFront=armsInFront;this.finalLaunch=finalLaunch;
             return this;
         }
+        /**
+         * O Ultra do p14: pula por cima do rival e termina do outro lado. No golpe final ele passa
+         * para lá (px do jogo à frente de onde estava); o desenho segue o voo e o tornado joga o
+         * rival para o lado de onde ele veio. 0: fica onde está.
+         */
+        float crossAhead;
+        UltraSequence withCross(float ahead) {
+            if(ahead<=0f)throw new IllegalArgumentException("ultra sequence: cross ahead > 0");
+            crossAhead=ahead;
+            return this;
+        }
         /** Frente, altura e giro (graus) do voo de quem bate neste quadro ({0, 0, 0} sem voo). */
         float[] flightAt(float frame) {
             if(flight.length==0)return new float[]{0f,0f,0f};
@@ -493,6 +504,9 @@ final class CharacterDefinition {
         String energyName;
         boolean energyHold;
         Fighter withEnergyCommand(String name,boolean hold) { energyName=name; energyHold=hold; return this; }
+        /** S1 só no ar (o chute que mergulha do pulo do p14): no chão o comando não solta nada. */
+        boolean energyAir;
+        Fighter withEnergyAir() { energyAir=true; return this; }
         /** Desenho do projétil do S1 (ProjetilVisual.Tipo); null = a bola de energia padrão. */
         String energyVisual;
         Fighter withEnergyVisual(String visual) { energyVisual=visual; return this; }
@@ -624,7 +638,7 @@ final class CharacterDefinition {
                 best=e.getKey();bestLength=length;bestEnd=end;
             }
         }
-        if(fighter.energy!=null&&fighter.energyCommand.length>0) {
+        if(fighter.energy!=null&&fighter.energyCommand.length>0&&!(fighter.energyAir&&grounded)) {
             int[] steps=MotionParser.requiredSteps(fighter.energyCommand);
             int end=commandEnd(motion,fighter.energyCommand,steps,fighter.energyHold,clock,config);
             int length=weight(steps,fighter.energyHold);

@@ -232,8 +232,8 @@ def validate_command_extras(name, m, special):
     for key in ('segurar', 'noAr'):
         if key in m and m[key] is not True:
             raise ValueError(f'{name}.{key}: true or absent')
-    if m.get('noAr') and not special:
-        raise ValueError(f'{name}.noAr: only S2..S9 are air-only')
+    if m.get('noAr') and not special and not name.endswith('.energy'):
+        raise ValueError(f'{name}.noAr: only S1 (the energy) and S2..S9 are air-only')
     if m.get('segurar'):
         c = m['command']
         if len(c) != 2 or c not in ([5, 1], [3, 7]):
@@ -242,7 +242,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal'}
+             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -291,6 +291,9 @@ def validate_ultra(name, u, animations):
     if 'recuo' in u and not (isinstance(u['recuo'], list) and len(u['recuo']) == 2 and type(u['recuo'][0]) is int
                              and 0 <= u['recuo'][0] < u['duracao'] and number(u['recuo'][1]) and u['recuo'][1] > 0):
         raise ValueError(f'{name}.ultra.recuo: [quadro, distância > 0]')
+    # O p14: pula por cima do rival e termina do outro lado (px à frente no golpe final).
+    if 'alem' in u and not (number(u['alem']) and u['alem'] > 0):
+        raise ValueError(f'{name}.ultra.alem: distância > 0')
     if 'cameraDaLuta' in u and u['cameraDaLuta'] is not True:
         raise ValueError(f'{name}.ultra.cameraDaLuta: true (or leave it out)')
     if 'ULTRA_SEQ' not in animations:
@@ -718,6 +721,8 @@ def compile_packs(root, results):
             scene += ('.withFlight(new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('voo', []))+'},'
                       +ints('deCabeca')+','+ints('bracos')+','
                       +('new float[]{'+','.join(f(v) for v in u['quedaFinal'])+'}' if 'quedaFinal' in u else 'null')+')')
+        if 'alem' in u:
+            scene += '.withCross('+f(u['alem'])+')'
         return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
                 +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
                 +',new float[][]{'+hold+'})'+scene+')')
@@ -804,6 +809,7 @@ def compile_packs(root, results):
                    +('.withAnimationWeight('+f(fi['pesoAnimacao'])+')' if 'pesoAnimacao' in fi else '')
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
+                   +('.withEnergyAir()' if energy.get('noAr') else '')
                      if energy and ('nome' in energy or energy.get('segurar')) else '')
                    +('.withEnergyVisual('+q(energy['visual'])+')' if energy and 'visual' in energy else '')
                    +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else '')

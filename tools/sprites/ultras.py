@@ -20,6 +20,8 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     deCabeca  [de, até] com o rival deitado de cabeça para baixo (o abraço do p13)
     bracos    [de, até] com os braços dele (folha ULTRA_SEQ_FRENTE) por cima do rival
     quedaFinal  [subida, empurrão] do golpe final no lugar do lançamento alto
+    alem      px do jogo: no golpe final ele passa para o outro lado do rival (o p14 pula por cima
+              e termina lá; o tornado joga o rival de volta)
 
 A câmera aceita um 5º número por plano: os quadros que ela leva, suave, do plano anterior até
 ele (sem ele, corte seco). "velocidade" no personagem troca a do arquivo (o p13, mais lento).
@@ -168,6 +170,8 @@ def timeline(spec, picked, speed):
             ultra[key] = [at(v) for v in spec[key]]
     if spec.get('quedaFinal'):
         ultra['quedaFinal'] = spec['quedaFinal']
+    if spec.get('alem'):
+        ultra['alem'] = spec['alem']
     return durations, ultra
 
 

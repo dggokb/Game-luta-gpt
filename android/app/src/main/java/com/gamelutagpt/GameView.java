@@ -2583,8 +2583,9 @@ public class GameView extends SurfaceView
         boolean poundRun = !event.projectile && attacker.attacking() && attacker.attack.mechanics.pound &&
             Long.bitCount(attacker.hitboxMask) > 1 && !event.finalStrike;
         if (!event.blocked && pausa.impacto() && !poundRun) {
-            // O golpe que segura cada pancada (o Super da p16) ganha um impact frame em todas.
-            boolean everyStrike = !event.projectile && attacker.attacking() && attacker.attack.strikeStop > 0;
+            // O golpe que segura cada pancada (o Super da p16) ganha um impact frame em todas; o
+            // tranco de um quadro (o parafuso do p14, que não para de andar) não pisca.
+            boolean everyStrike = !event.projectile && attacker.attacking() && attacker.attack.strikeStop > 1;
             feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y, everyStrike,
                 event.finalStrike);
         }
@@ -4322,7 +4323,7 @@ public class GameView extends SurfaceView
         CharacterDefinition.UltraSequence seq = f.state.profile.ultraSequence;
         if (seq == null || seq.flight.length == 0) return false;
         float[] at = seq.flightAt(f.ultraFrame);
-        float ahead = at[0] + (f.ultraRetreated && seq.retreat != null ? seq.retreat[1] : 0f);
+        float ahead = at[0] + (f.ultraRetreated && seq.retreat != null ? seq.retreat[1] : 0f) - f.ultraCrossed;
         flightOffset[0] = f.facing * ahead;
         flightOffset[1] = -at[1];
         // Para a frente (o mortal na direção do rival); volta inteira é o mesmo que nada.

@@ -18,10 +18,9 @@
     "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
     "quadros": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
     "largura": 288,
-    "raiz": "171,238",
+    "raiz": "171,227",
     "colunas": 7,
     "fixar": "video",
-    "pe_no_chao": true,
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
@@ -33,15 +32,15 @@
       ],
       "raiz": [
         171,
-        238
+        227
       ],
       "colunas": 11
     }
   },
   "frameWidth": 576,
   "rootX": 342,
+  "rootY": 454,
   "frameHeight": 512,
-  "rootY": 476,
   "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p14_dash_video_normalized.png"

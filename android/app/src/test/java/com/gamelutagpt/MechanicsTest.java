@@ -246,11 +246,51 @@ public class MechanicsTest {
         assertEquals("only the first is blocked", 1, blocked[1]);
     }
 
+    /** O S1 do p14 de verdade: do pulo, mergulha no chute; acertou, fica no ar e chuta mais. */
+    private static AttackDefinition airReboundKicks() {
+        return move("jH", 6, 40, 14).damage(1200).stun(20, 10, 4).strikes(6, 16, 26, 36).strikeStop(4, 14)
+            .strikeHold(95f, 95f, 95f, 95f).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(110f)
+            .reach(150f, 120f)
+            .mechanics(new AttackDefinition.Mechanics().rebound().dive(420f, 900f)).build();
+    }
+
+    /** {acertos, menor altura dele (y) depois do primeiro acerto até o último, quadros no ar} */
+    private static int[] diveOnto(float rivalX) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(airReboundKicks()), BASE, 500f, rivalX);
+        CombatFighter f = s.f(0);
+        f.grounded = false;
+        f.y = Arena.GROUND_Y - 160f;
+        f.vy = 0f;
+        s.in[0].heavy = true;
+        int[] out = {0, 0, 0};
+        float hoverY = -1f;
+        for (int i = 0; i < 200; i++) {
+            s.step();
+            s.in[0].heavy = false;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker == 0 && !e.blocked) out[0]++;
+            }
+            if (out[0] == 1 && hoverY < 0f) hoverY = f.y;
+            if (out[0] >= 1 && out[0] < 4 && Math.abs(f.y - hoverY) > 1f) out[1] = 1;
+            if (!f.grounded) out[2] = i;
+        }
+        return out;
+    }
+
+    @Test public void theAirReboundKickHoversAndKicksOnlyAfterTheDiveLands() {
+        int[] hit = diveOnto(600f);
+        assertEquals("four kicks", 4, hit[0]);
+        assertEquals("he stays in the air while kicking", 0, hit[1]);
+        int[] miss = diveOnto(1100f);
+        assertEquals("nothing lands", 0, miss[0]);
+        assertTrue("the miss lands sooner: " + miss[2] + " vs " + hit[2], miss[2] < hit[2]);
+    }
+
     @Test public void theTricksterKicksAndCorkscrews() {
         CharacterDefinition p14 = GeneratedCharacters.get("p14");
         assertTrue("S1 rebounds", p14.fighter.energy.attack.mechanics.rebound);
-        assertTrue("and has the landing for the miss", p14.animations.containsKey(
-            p14.specialAnimations.get("S").id + "_ERRO"));
+        assertTrue("S1 dives from the jump", p14.fighter.energy.attack.mechanics.dives() && p14.fighter.energyAir);
+        assertTrue("the Ultra ends past the rival", p14.fighter.ultraSequence.crossAhead > 0f);
         AttackDefinition sup = p14.fighter.superAttack.attack;
         assertTrue("the Super corkscrews through", sup.mechanics.passThrough && sup.mechanics.advanceSpeed > 0f);
         assertTrue("several strikes", sup.maxHits > 3);

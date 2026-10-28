@@ -1304,12 +1304,12 @@
       "estiloCombo": "chutes",
       "vida": 9500,
       "dano": 0.95,
-      "ritmo": 0.9,
+      "ritmo": 1.15,
       "framesGolpe": {
         "S": [
-          20,
+          12,
           2,
-          48
+          56
         ],
         "S2": [
           14,
@@ -1338,10 +1338,14 @@
         "alcance": 900
       },
       "unica": {
-        "descricao": "Trickster de chutes: S1 salta e mergulha no chute; acertou, quica e chuta mais três vezes (errou ou defenderam, cai e fica aberto). S2 chute que solta um tornado à frente, S3 meia-lua de chute (anti-aéreo), S4 pisão que solta a onda rente ao chão, Super em parafuso atravessando a tela. Os efeitos dos especiais e do Super são os dos vídeos.",
+        "descricao": "Trickster de chutes: S1, só no pulo, mergulha no chute; acertou, quica e chuta mais três vezes (errou ou defenderam, cai e fica aberto). S2 chute que solta um tornado à frente, S3 meia-lua de chute (anti-aéreo), S4 pisão que solta a onda rente ao chão, Super em parafuso atravessando a tela. Os efeitos dos especiais e do Super são os dos vídeos.",
         "golpes": {
           "S": {
-            "rebote": true
+            "rebote": true,
+            "mergulho": {
+              "frente": 420,
+              "descida": 900
+            }
           }
         },
         "alcance": {
@@ -1353,7 +1357,8 @@
       "comandos": {
         "S1": {
           "nome": "Chute rebote",
-          "comando": "↓↘→"
+          "comando": "↓↘→",
+          "noAr": true
         },
         "S2": {
           "nome": "Chute tornado",
@@ -1391,6 +1396,14 @@
           "lancar": "knockdown",
           "empurrao": 80
         }
+      },
+      "ritmoGolpe": {
+        "L": 1.6,
+        "2L": 1.6,
+        "M": 1.45,
+        "2M": 1.45,
+        "H": 1.35,
+        "2H": 1.35
       }
     }
   }

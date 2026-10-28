@@ -6,20 +6,20 @@
   "output": "android/app/src/main/res/drawable-nodpi/p14_walk_back.webp",
   "report": "tools/sprites/reports/p14_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p14_walk_back-import.png",
-  "expectedFrames": 19,
+  "expectedFrames": 37,
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "tras.mp4",
+    "arquivo": "p14_walk_back.mp4",
     "personagem": "p14",
     "escala": 0.411,
-    "medida": "1º quadro = inicio_centro (nota 0.98)",
-    "quadros": "68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104",
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104",
     "celula": 288,
     "largura": 224,
-    "raiz": "118,270",
+    "raiz": "117,270",
     "colunas": 9,
     "pe_no_chao": true,
     "densidade": 2,
@@ -31,7 +31,7 @@
         288
       ],
       "raiz": [
-        118,
+        117,
         270
       ],
       "colunas": 11
@@ -39,7 +39,7 @@
   },
   "frameWidth": 448,
   "frameHeight": 576,
-  "rootX": 236,
+  "rootX": 234,
   "rootY": 540,
   "pixelScale": 2.0,
   "sourceReferences": [

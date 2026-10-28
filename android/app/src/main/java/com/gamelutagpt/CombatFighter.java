@@ -214,6 +214,8 @@ final class CombatFighter {
     boolean grabMissed;
     /** O recuo do Ultra em sequência já aconteceu (a p15 reaparece longe uma vez só). */
     boolean ultraRetreated;
+    /** Quanto ele já passou para o outro lado do rival no Ultra do p14 (px; o desenho compensa). */
+    float ultraCrossed;
     float ultraFinalBonus;
     /** Who the sequence caught (a partner coming in after a KO is not held or hit). */
     CombatFighter ultraVictim;

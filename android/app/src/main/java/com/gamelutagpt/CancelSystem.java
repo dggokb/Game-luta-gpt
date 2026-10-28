@@ -70,6 +70,7 @@ final class CancelSystem {
                     return special.air != f.grounded ? c.attack(entry.strength) : null;
                 }
                 if (projectileAlive || f.state.profile.energy == null) return null;
+                if (c.fighter.energyAir && f.grounded) return null;   // S1 só no ar (o p14)
                 return c.attack("S");
             case SUPER:
                 if (f.state.profile.superAttack == null || !f.state.canPaySuper()) return null;

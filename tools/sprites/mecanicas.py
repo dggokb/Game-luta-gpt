@@ -222,9 +222,7 @@ def commands(pack, spec):
         if hold:
             target['segurar'] = True
         if c.get('noAr'):
-            if key == 'S1':
-                raise SystemExit('S1 sai no chão e no ar; noAr é para S2 a S4')
-            target['noAr'] = True
+            target['noAr'] = True   # S1 só no ar: o chute que mergulha do pulo do p14
 
 
 VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
@@ -552,6 +550,11 @@ def apply(cid, spec, base, combos_data):
     attacks = []
     for key, m in list(pack['moves'].items()) + list(pack.get('specialMoves', {}).items()):
         if key not in base['frames']:
+            anim = pack['animations'].get(m.get('animation')) if key == '6M' and not keep else None
+            if anim and 'durationsMs' in anim:
+                # O golpe alto (→M) mantém o tempo e a cadência próprios; só o impacto vai para o
+                # começo da janela ativa quando o clipe novo o deixou fora dela (o p14).
+                fit_impact(anim, m)
             continue
         if not keep:
             retime(m, frames(key), base['vantagem'][key])

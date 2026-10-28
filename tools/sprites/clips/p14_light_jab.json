@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p14_light_jab.webp",
   "report": "tools/sprites/reports/p14_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p14_light_jab-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 25,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -15,12 +15,13 @@
     "arquivo": "L.mp4",
     "personagem": "p14",
     "escala": 0.411,
-    "medida": "1º quadro = inicio_centro (nota 0.98)",
-    "quadros": "19,27,35,39,43,47,50,54,58,62,66",
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67",
     "celula": 288,
     "largura": 320,
-    "raiz": "131,270",
+    "raiz": "135,270",
     "colunas": 6,
+    "fixar": "video",
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
@@ -31,7 +32,7 @@
         288
       ],
       "raiz": [
-        131,
+        135,
         270
       ],
       "colunas": 11
@@ -39,7 +40,7 @@
   },
   "frameWidth": 640,
   "frameHeight": 576,
-  "rootX": 262,
+  "rootX": 270,
   "rootY": 540,
   "pixelScale": 2.0,
   "sourceReferences": [

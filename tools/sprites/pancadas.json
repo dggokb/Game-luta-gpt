@@ -356,10 +356,10 @@
     "p14": {
       "S": {
         "pancadas": [
-          12,
-          21,
-          29,
-          38
+          6,
+          15,
+          25,
+          34
         ],
         "pausa": 4,
         "pausaFinal": 14,
@@ -368,12 +368,7 @@
           95,
           95,
           95
-        ],
-        "avanco": {
-          "distancia": 200,
-          "de": 2,
-          "ate": 12
-        }
+        ]
       },
       "S2": {
         "pancadas": [
@@ -396,8 +391,8 @@
           48,
           54
         ],
-        "preparo": 8,
-        "duracao": 84,
+        "preparo": 6,
+        "duracao": 60,
         "rival": [
           110,
           110,
@@ -413,11 +408,13 @@
         "alcance": 200,
         "altura": 190,
         "avanco": {
-          "distancia": 760,
+          "distancia": 780,
           "de": 0,
-          "ate": 62,
+          "ate": 56,
           "atravessa": true
-        }
+        },
+        "pausa": 1,
+        "pausaFinal": 12
       }
     }
   }

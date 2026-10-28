@@ -1670,7 +1670,8 @@ final class CombatEngine {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
         } else if (f.attacking() && !f.grounded && f.attack.mechanics.dives()) {
             // Mergulho: parado durante a preparação, depois desce na diagonal (moveVertically).
-            if (f.attackFrame >= f.attack.startupFrames) {
+            // O rebote acertou: fica no lugar quicando e cai reto.
+            if (f.attackFrame >= f.attack.startupFrames && !(f.attack.mechanics.rebound && f.strikeLanded)) {
                 f.x += f.facing * f.attack.mechanics.diveForward * CombatConfig.DT;
             }
         } else if (f.attacking() && f.attack.mechanics.advanceAt(f.attackFrame)) {
@@ -1752,8 +1753,16 @@ final class CombatEngine {
             f.vy = 0f;
         }
         if (f.attacking() && f.attack.mechanics.dives()) {
-            scale = 0f;
-            f.vy = f.attackFrame >= f.attack.startupFrames ? f.attack.mechanics.diveDescent : 0f;
+            if (f.attack.mechanics.rebound && f.strikeLanded) {
+                // Rebote: parado no ar enquanto chuta; depois do último, cai.
+                if (reboundHover(f)) {
+                    scale = 0f;
+                    f.vy = 0f;
+                }
+            } else {
+                scale = 0f;
+                f.vy = f.attackFrame >= f.attack.startupFrames ? f.attack.mechanics.diveDescent : 0f;
+            }
         }
         f.vy += config.gravity * scale * CombatConfig.DT;
         f.y += f.vy * CombatConfig.DT;
@@ -2401,7 +2410,7 @@ final class CombatEngine {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
-        if (a.attack.mechanics.rebound && reboundMissed(a, frame)) return;
+        if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d) : reboundMissed(a, frame))) return;
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel só bate no que ele repeliu: sem golpe na janela, a explosão não sai.
         if (a.attack.mechanics.repel && !a.countered) return;
@@ -2440,6 +2449,10 @@ final class CombatEngine {
 
     /** Quadro que vale para o acerto: no mergulho, o golpe bate a descida inteira até o chão. */
     private static int hitFrame(CombatFighter a) {
+        if (a.attack.mechanics.rebound && a.attack.mechanics.dives() && !a.strikeLanded && !a.grounded &&
+            a.attackFrame >= a.attack.startupFrames) {
+            return a.attack.hitbox(0).firstFrame;   // o primeiro chute bate a descida inteira
+        }
         if (a.attack.mechanics.dives() && !a.grounded && a.attackFrame >= a.attack.startupFrames) {
             return Math.min(a.attackFrame, a.attack.lastActiveFrame());
         }
@@ -2675,6 +2688,37 @@ final class CombatEngine {
         return a.grabMissed;
     }
 
+    /**
+     * Rebote no mergulho (o S1 do p14, do pulo): até acertar, o primeiro chute bate a descida
+     * inteira; caiu no chão sem acertar, as outras não saem. Acertou: ele fica no ar quicando e
+     * cada chute seguinte acerta o rival preso na frente, no quadro dele, sem caixa.
+     */
+    private boolean reboundDive(CombatFighter a, CombatFighter d) {
+        if (a.grabMissed) return true;
+        if (!a.strikeLanded) {
+            if (a.grounded) {
+                a.grabMissed = true;
+                return true;
+            }
+            return false;
+        }
+        if (!d.hittable()) return true;
+        for (int i = 1; i < a.attack.hitboxCount(); i++) {
+            if (a.attack.hitbox(i).activeAt(a.attackFrame) && (a.hitboxMask & (1L << i)) == 0) {
+                addContact(a, d, a.attack, i, null);
+                return true;
+            }
+        }
+        return true;
+    }
+
+    /** Quicando no ar depois do primeiro chute do rebote no mergulho (até o último chute). */
+    private static boolean reboundHover(CombatFighter f) {
+        AttackDefinition.Mechanics m = f.attack.mechanics;
+        return m.rebound && m.dives() && f.strikeLanded && !f.grabMissed &&
+            f.attackFrame <= f.attack.hitbox(f.attack.hitboxCount() - 1).lastFrame;
+    }
+
     /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */
     private static boolean poundTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
         return !projectile && attack.mechanics.pound && a.strikeLanded && a.attacking() && a.attack == attack &&
@@ -2817,6 +2861,7 @@ final class CombatEngine {
             a.ultraPaused = false;
             a.ultraPageDone = false;
             a.ultraRetreated = false;
+            a.ultraCrossed = 0f;
             a.ultraFinalBonus = 0f;
             a.ultraVictim = d;
             a.ultraVictimState = d.state;
@@ -2882,6 +2927,12 @@ final class CombatEngine {
             a.hitstop = Math.max(a.hitstop, stop);
             d.hitstop = Math.max(d.hitstop, stop);
             if (last) {
+                if (seq.crossAhead > 0f) {
+                    // O p14 termina do outro lado: passa para onde o desenho está.
+                    float from = a.x;
+                    a.x = Arena.clamp(a.x + a.facing * seq.crossAhead, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+                    a.ultraCrossed = Math.abs(a.x - from);
+                }
                 launchUltraVictim(a, d);
                 cues.add("ULTRA_FINISH");
             }
@@ -3072,7 +3123,9 @@ final class CombatEngine {
         d.ultraFall = true;
         d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
         d.stunElapsed = 0;
-        push(d, a, a.facing * (low != null ? low[1] : config.ultraKnockback));
+        // Quem passou para o outro lado (o p14) joga o rival de volta para onde veio.
+        int away = seq != null && a.inUltraSequence() && seq.crossAhead > 0f ? -a.facing : a.facing;
+        push(d, a, away * (low != null ? low[1] : config.ultraKnockback));
         ComboSession session = sessions[d.index];
         if (session != null) session.airCombo = true;
     }

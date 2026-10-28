@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p14_backdash.webp",
   "report": "tools/sprites/reports/p14_backdash.report.json",
   "preview": "android/app/build/sprite-review/p14_backdash-import.png",
-  "expectedFrames": 10,
+  "expectedFrames": 30,
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
@@ -15,11 +15,11 @@
     "arquivo": "backDash.mp4",
     "personagem": "p14",
     "escala": 0.411,
-    "medida": "último quadro = inicio_centro (nota 0.98)",
-    "quadros": "1,15,28,42,55,69,82,96,109,123",
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "4,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91",
     "celula": 352,
     "largura": 224,
-    "raiz": "111,331",
+    "raiz": "114,331",
     "colunas": 9,
     "fixar": "registro",
     "limpar_chao": true,
@@ -32,15 +32,15 @@
         352
       ],
       "raiz": [
-        111,
+        114,
         331
       ],
-      "colunas": 10
+      "colunas": 11
     }
   },
   "frameWidth": 448,
   "frameHeight": 704,
-  "rootX": 222,
+  "rootX": 228,
   "rootY": 662,
   "pixelScale": 2.0,
   "sourceReferences": [

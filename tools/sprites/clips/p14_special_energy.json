@@ -6,22 +6,21 @@
   "output": "android/app/src/main/res/drawable-nodpi/p14_special_energy.webp",
   "report": "tools/sprites/reports/p14_special_energy.report.json",
   "preview": "android/app/build/sprite-review/p14_special_energy-import.png",
-  "expectedFrames": 51,
+  "expectedFrames": 42,
   "segmentation": "prepared-grid",
-  "columns": 3,
+  "columns": 4,
   "rootMode": "authored",
   "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "p14_special_energy.mp4",
+    "arquivo": "s1.mp4",
     "personagem": "p14",
     "escala": 0.411,
     "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
-    "quadros": "0,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,40,41,42,43,44,45,46,47,48,49,50,51,66,68,70,72,74,78,82",
+    "quadros": "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,40,41,42,43,44,45,46,47,48,49,50,51,56,58",
     "celula": 352,
-    "largura": 544,
-    "raiz": "240,323",
-    "colunas": 3,
-    "fixar": "video",
+    "largura": 512,
+    "raiz": "212,321",
+    "colunas": 4,
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2,
@@ -29,20 +28,20 @@
     "referencia": {
       "folha": "art/sprites/source/p14_special_energy_video_normalized.png",
       "celula": [
-        544,
+        512,
         352
       ],
       "raiz": [
-        240,
-        323
+        212,
+        321
       ],
       "colunas": 11
     }
   },
-  "frameWidth": 1088,
+  "frameWidth": 1024,
   "frameHeight": 704,
-  "rootX": 480,
-  "rootY": 646,
+  "rootX": 424,
+  "rootY": 642,
   "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p14_special_energy_video_normalized.png"
