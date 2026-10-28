@@ -1,0 +1,51 @@
+{
+  "id": "p15_fall_down",
+  "javaName": "P15_FALL_DOWN",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_fall_down_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_fall_down.webp",
+  "report": "tools/sprites/reports/p15_fall_down.report.json",
+  "preview": "android/app/build/sprite-review/p15_fall_down-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "queda.mp4",
+    "personagem": "p15",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro_h3 (nota 0.98)",
+    "quadros": "6,12,18,24,30,36,40,46,48,52,56,60",
+    "celula": 288,
+    "largura": 384,
+    "raiz": "161,270",
+    "colunas": 5,
+    "fixar": "quadro",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "recorte_suave": true,
+    "rampa": "36,8",
+    "referencia": {
+      "folha": "art/sprites/source/p15_fall_down_video_normalized.png",
+      "celula": [
+        384,
+        288
+      ],
+      "raiz": [
+        161,
+        270
+      ],
+      "colunas": 11
+    }
+  },
+  "frameWidth": 768,
+  "frameHeight": 576,
+  "rootX": 322,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_fall_down_video_normalized.png"
+  ]
+}

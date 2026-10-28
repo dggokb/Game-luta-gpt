@@ -355,7 +355,7 @@ RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, manter_efeitos=False, cor_efeito=None, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
-              balanco=1.0, objetos=0)
+              balanco=1.0, objetos=0, rampa=None)
 
 
 def parser():
@@ -426,6 +426,10 @@ def parser():
                    help="unsharp mask leve e borda sem verde (franja do recorte) depois de escalar")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
+    p.add_argument("--rampa", default=None,
+                   help="DX,ATE: desloca os quadros aos poucos, de 0 no primeiro a DX px da célula no "
+                        "quadro ATE (e DX dali em diante); emenda clipes de vídeos diferentes (a queda "
+                        "deitada no lugar em que o vídeo do levantar começa)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
     return p
 
@@ -633,6 +637,9 @@ def main(argv=None):
         elif args.nitidez:
             img = sharpen(img, d)
         x = rx - round((ref_x - off) * s)
+        if args.rampa:
+            rdx, ate = (float(v) for v in str(args.rampa).split(","))
+            x += round(rdx * min(1.0, n / max(1.0, ate)) * d)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
         y = ry - round(bottom * s)
         # Cada quadro fica na própria célula: o que passa da borda é cortado, não invade a vizinha.
