@@ -22,6 +22,12 @@ roupas.
 | Takatoshi (45 anos) | `takatoshi_45.png` | Prólogo | cabelo castanho bagunçado, cavanhaque, colete longo sem mangas branco com azul-marinho e vermelho e um dragão azul bordado nas costas e na barra, gola vermelha, quimono preto por baixo, faixas vermelha e azul com borlas, luvas sem dedos, tênis cano alto |
 | Ryūga (18 anos) | `p01.png` | Episódio 1 | colete azul e branco sem mangas com gola vermelha, regata preta, calça branca com faixa azul, faixa preta com pontas vermelhas |
 | Kōga (18 anos) | `p03.png` | Episódio 1 | colete preto sem mangas com capuz e forro vermelho, regata branca, calça cargo preta com tiras vermelhas |
+
+**Animação das crianças (28/10):** a guarda de luta de cada um (a Base, em `art/keys/ryuga_8/idle_base.png` e
+`art/keys/koga_8/idle_base.png`) virou as imagens iniciais do Flick sobre verde puro, 1344×768, corpo com 72% da
+altura (como o p14; o tamanho de criança no jogo sai do `tamanho.json` depois):
+`inicio_da_base.py ryuga_8 <base> --altura 0.72` e o mesmo para `koga_8` (`inicio_centro`, `inicio_esquerda`,
+`inicio_direita`). Prompts e regras dos vídeos: [flick-h3.md](../personagens/flick-h3.md).
 | Dafu | `dafu.png` | os dois | corpulento e forte, coque no alto da cabeça, bigode fino e comprido caído, olhos sempre fechados de tanto sorrir, colete mostarda com nuvens douradas, camisa branca, faixa vermelha, cabaça pendurada na cintura, calça escura larga, faixas nos tornozelos |
 | Takatoshi (55 anos) | `takatoshi_55.png` | **não aparece agora**: é o Campeão do fim da temporada (cabelo longo e barba, quimono preto rasgado, geta). Não usar no Prólogo |
 
