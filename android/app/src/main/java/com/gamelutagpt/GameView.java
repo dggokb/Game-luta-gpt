@@ -24,7 +24,6 @@ import com.gamelutagpt.historia.Campanha;
 import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
-import com.gamelutagpt.historia.MenuArcade;
 import com.gamelutagpt.historia.MenuCapitulos;
 import com.gamelutagpt.historia.MenuInicial;
 import com.gamelutagpt.historia.MenuPausa;
@@ -281,11 +280,9 @@ public class GameView extends SurfaceView
     private final MenuInicial menuInicial;
     /** MODO HISTÓRIA com save: CONTINUAR e os capítulos já liberados. */
     private final MenuCapitulos capitulos = new MenuCapitulos();
-    /** ARCADE: a escolha da dupla (oficial ou livre). */
-    private final MenuArcade menuArcade;
-    /** As duplas oficiais que lutam (os cards do {@link #menuArcade} e o resto da chave). */
+    /** As duplas oficiais que lutam no Arcade (o resto da chave). */
     private final java.util.List<Torneio.Dupla> arcadeOficiais = new java.util.ArrayList<>();
-    /** A dupla livre do Arcade está sendo montada na seleção (só a dupla do jogador). */
+    /** A dupla do Arcade está sendo montada na seleção (só a dupla do jogador). */
     private boolean arcadeSelectPending;
     /** Um Arcade em andamento: a CPU sobe de nível a cada rodada. */
     private boolean arcadeMode;
@@ -600,7 +597,6 @@ public class GameView extends SurfaceView
         historia = new PaginaHistoria(this, ultraAssets);
         menuInicial = new MenuInicial(ultraAssets);
         menuInicial.setVersao(VERSION_HUD_LABEL);
-        menuArcade = new MenuArcade(ultraAssets);
         conversa = new ConversaLuta(ultraAssets);
         narracao = new com.gamelutagpt.historia.Narracao(ultraAssets);
         cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
@@ -1036,8 +1032,8 @@ public class GameView extends SurfaceView
             offerMenuKey(keyCode, event);
             return true;
         }
-        if (capitulos.isOpen() || menuArcade.isOpen()) {
-            // Nos capítulos e na escolha da dupla do Arcade, voltar leva ao menu inicial.
+        if (capitulos.isOpen()) {
+            // Nos capítulos, voltar leva ao menu inicial.
             offerMenuKey(keyCode, event);
             return true;
         }
@@ -1192,7 +1188,7 @@ public class GameView extends SurfaceView
         characterSelectRenderer.beginFightTransition();
         characterSelect.close();
         if (arcadeSelectPending) {
-            // Dupla livre do Arcade: os adversários vêm do sorteio da chave.
+            // Dupla do Arcade: os adversários vêm do sorteio da chave.
             arcadeSelectPending = false;
             startArcade(Arcade.livre(characterSelect.point(), characterSelect.partner()));
             return;
@@ -1246,7 +1242,7 @@ public class GameView extends SurfaceView
         characterSelect.close();
         if (arcadeSelectPending) {
             arcadeSelectPending = false;
-            openArcadeMenu();
+            openMainMenu();
             return;
         }
         if (testFightPending) {
@@ -1595,7 +1591,7 @@ public class GameView extends SurfaceView
 
     /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
     private boolean fightClockRunning() {
-        return !menuInicial.isOpen() && !menuArcade.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
+        return !menuInicial.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
             !ajusteCaixas.isOpen() && !characterSelect.isOpen() && !historia.coversScreen() &&
             !paginaFinal.isActive();
     }
@@ -1616,13 +1612,6 @@ public class GameView extends SurfaceView
             if (escolha == MenuInicial.Opcao.HISTORIA) comArteDaLuta(this::startStoryMode);
             else if (escolha == MenuInicial.Opcao.ARCADE) comArteDaLuta(this::openArcadeMenu);
             else if (escolha == MenuInicial.Opcao.TESTE) comArteDaLuta(this::startTestMode);
-            return;
-        }
-        if (menuArcade.isOpen()) {
-            pad.drainInto(ignoredInput);
-            Integer key;
-            while (menuArcade.isOpen() && (key = selectionKeys.poll()) != null) handleArcadeMenuKey(key);
-            menuArcade.update(FIXED_STEP);
             return;
         }
         if (capitulos.isOpen()) {
@@ -3379,12 +3368,6 @@ public class GameView extends SurfaceView
             if (capitulos.isOpen()) {
                 renderCanvas.begin(canvas);
                 capitulos.render(renderCanvas);
-                canvas.restore();
-                return;
-            }
-            if (menuArcade.isOpen()) {
-                renderCanvas.begin(canvas);
-                menuArcade.render(renderCanvas);
                 canvas.restore();
                 return;
             }
@@ -5235,12 +5218,6 @@ public class GameView extends SurfaceView
             }
             return;
         }
-        if (menuArcade.isOpen()) {
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                applyArcadeChoice(menuArcade.tap(event.getX(index) / sx, event.getY(index) / sy));
-            }
-            return;
-        }
         if (pausa.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 applyPause(pausa.tap(event.getX(index) / sx, event.getY(index) / sy));
@@ -5437,7 +5414,6 @@ public class GameView extends SurfaceView
         // Fora do Arcade a CPU volta ao nível da pausa.
         arcadeMode = false;
         arcadeSelectPending = false;
-        menuArcade.fechar();
         ai.setLevel(pausa.nivelCpu());
         selectButtonLabel = SELECT_LABEL;
         tutorial.stop();
@@ -6031,7 +6007,7 @@ public class GameView extends SurfaceView
 
     // ------------------------------------------------------------ arcade
 
-    /** ARCADE: a escolha da dupla (oficial ou livre); depois, a chave de 16 e as lutas. */
+    /** ARCADE: direto na seleção da dupla do jogador; depois, a chave de 16 e as lutas. */
     private void openArcadeMenu() {
         if (!loadTemporada()) {
             openMainMenu();
@@ -6039,55 +6015,20 @@ public class GameView extends SurfaceView
         }
         storyMode = false;
         arcadeMode = false;
-        arcadeSelectPending = false;
         arcadeOficiais.clear();
         try {
             for (Torneio.Dupla d : Arcade.oficiais(Torneio.duplasFromJson(ultraAssets.readText(Torneio.ARQUIVO)))) {
                 if (fightersExist(d.lutadores)) arcadeOficiais.add(d);
             }
         } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "torneio indisponível; o Arcade fica só com a dupla livre", ex);
+            Log.w(LOG_TAG, "torneio indisponível; a chave do Arcade fica só com duplas livres", ex);
         }
-        menuArcade.abrir(temporada, arcadeOficiais);
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
-    }
-
-    private void handleArcadeMenuKey(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_LEFT: menuArcade.mover(-1, 0); break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT: menuArcade.mover(1, 0); break;
-            case KeyEvent.KEYCODE_DPAD_UP: menuArcade.mover(0, -1); break;
-            case KeyEvent.KEYCODE_DPAD_DOWN: menuArcade.mover(0, 1); break;
-            case KeyEvent.KEYCODE_BUTTON_A:
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_BUTTON_START:
-                applyArcadeChoice(menuArcade.confirmar());
-                break;
-            case KeyEvent.KEYCODE_BUTTON_B:
-            case KeyEvent.KEYCODE_BACK:
-            case KeyEvent.KEYCODE_ESCAPE:
-                applyArcadeChoice(menuArcade.voltar());
-                break;
-            default:
-                break;
-        }
-    }
-
-    /** Dupla oficial: o Arcade começa; DUPLA LIVRE: a seleção só da dupla do jogador. */
-    private void applyArcadeChoice(Integer escolha) {
-        if (escolha == null) return;
-        if (escolha == MenuArcade.VOLTAR) {
-            openMainMenu();
-        } else if (escolha == MenuArcade.LIVRE) {
-            openCharacterSelect();
-            characterSelect.openSolo(testPicks[0], testPicks[1]);
-            arcadeSelectPending = true;
-        } else {
-            startArcade(arcadeOficiais.get(escolha));
-        }
+        openCharacterSelect();
+        characterSelect.openSolo(testPicks[0], testPicks[1]);
+        arcadeSelectPending = true;
     }
 
     /**

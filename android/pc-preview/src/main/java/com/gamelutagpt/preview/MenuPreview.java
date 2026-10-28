@@ -104,15 +104,10 @@ public final class MenuPreview {
         System.out.println("Menu gravado em " + outDir.getAbsolutePath());
     }
 
-    /** As telas do Arcade: a escolha da dupla, o sorteio, a chave depois de 2 rodadas e o fim. */
+    /** As telas do Arcade: o sorteio, a chave depois de 2 rodadas e o fim. */
     private static void arcade(FileRenderAssets assets, Temporada temporada, String idioma, File outDir) throws IOException {
         java.util.List<com.gamelutagpt.historia.Torneio.Dupla> oficiais = com.gamelutagpt.historia.Arcade.oficiais(
             com.gamelutagpt.historia.Torneio.duplasFromJson(assets.readText(com.gamelutagpt.historia.Torneio.ARQUIVO)));
-        com.gamelutagpt.historia.MenuArcade escolha = new com.gamelutagpt.historia.MenuArcade(assets);
-        escolha.abrir(temporada, oficiais);
-        for (float t = 0f; t < 1f; t += DT) escolha.update(DT);
-        save(escolha::render, new File(outDir, "arcade_" + idioma + "_dupla.png"));
-
         java.util.List<String> lutadores = java.util.Arrays.asList("player_base", "p02", "p03", "p04", "p05", "p06",
             "p07", "p08", "p09", "p10", "p11", "p12");
         com.gamelutagpt.historia.Campanha campanha = com.gamelutagpt.historia.Campanha.arcade(com.gamelutagpt.historia.Arcade.chave(

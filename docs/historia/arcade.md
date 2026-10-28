@@ -4,22 +4,17 @@
 mesmo final do modo história, mas sem as páginas da história.
 
 ```
-escolha da dupla → sorteio → OITAVAS → QUARTAS → SEMIFINAL → FINAL (2x2)
+seleção da dupla → sorteio → OITAVAS → QUARTAS → SEMIFINAL → FINAL (2x2)
                  → a regra escondida: DUELO FINAL (1x1) → TAKATOSHI (em breve) → menu inicial
 ```
 
 ## A dupla
 
-A primeira tela (`MenuArcade`) mostra as **duplas oficiais** que já lutam (as de
-`historia/torneio/torneio.json` sem `"pronta": false`: hoje Ryūga · Yin-lu, Kōga · Brucy,
-p05 · p06, p07 · p08, p09 · p10 e p11 · p12) e o card **DUPLA LIVRE**.
-
-- **Dupla oficial**: o Arcade começa na hora.
-- **Dupla livre**: abre a seleção de personagens só com o lado do jogador (`CharacterSelect.openSolo`:
-  "1/2 ESCOLHA SEU LUTADOR", "2/2 ESCOLHA SEU PARCEIRO"); o lado do CPU mostra "SORTEIO DA CHAVE".
-  Voltar da seleção volta para a escolha da dupla.
-
-Toque escolhe; controle: direcional move, A escolhe, B volta ao menu inicial.
+**ARCADE** abre direto a seleção de personagens só com o lado do jogador
+(`CharacterSelect.openSolo`: "1/2 ESCOLHA SEU LUTADOR", "2/2 ESCOLHA SEU PARCEIRO"); o lado do
+CPU mostra "SORTEIO DA CHAVE". Confirmar a dupla começa o Arcade; voltar da seleção volta ao menu
+inicial. Não há mais duplas sugeridas para escolher: as **duplas oficiais** que já lutam (as de
+`historia/torneio/torneio.json` sem `"pronta": false`) entram só como adversárias na chave.
 
 ## A chave
 
@@ -75,7 +70,6 @@ O Arcade não tem save. Os textos passam pela tradução da história (`historia
 |---|---|
 | `historia/Arcade` | duplas oficiais, dupla livre e a chave de 16 |
 | `historia/NivelCpu` | o nível da CPU de cada luta (história e Arcade) |
-| `historia/MenuArcade` | a tela da escolha da dupla |
 | `historia/Torneio` | a chave com 8 (história) ou 16 vagas (`Torneio.arcade`) |
 | `historia/ChaveTorneio` | o desenho da chave, com o layout de 8 ou de 16 |
 | `historia/Campanha.arcade` | a campanha só com a chave (o duelo usa a dupla do jogador da chave) |

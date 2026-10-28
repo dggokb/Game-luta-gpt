@@ -27,7 +27,7 @@ public final class MenuInicial {
     public static final String HISTORIA = "MODO HISTÓRIA";
     public static final String HISTORIA_SUB = "A jornada dos irmãos Komyo, desde o Prólogo";
     public static final String ARCADE = "ARCADE";
-    public static final String ARCADE_SUB = "Torneio de 16 duplas: oficiais ou do seu jeito";
+    public static final String ARCADE_SUB = "Torneio de 16 duplas: monte a sua";
     public static final String TESTE = "MODO TESTE";
     public static final String TESTE_SUB = "Luta livre para testar golpes, sprites e ajustes";
     public static final String DICA = "Toque numa opção  •  Controle: ▲▼ e A";

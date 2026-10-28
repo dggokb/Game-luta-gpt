@@ -266,31 +266,4 @@ public class ArcadeTest {
         // A sorte do Arcade cabe em poucos segundos mesmo com 15 duplas.
         assertTrue(ChaveTorneio.duracaoSorteio(t) < 4.5f);
     }
-
-    @Test
-    public void menuArcadeEscolheOficialLivreOuVolta() throws IOException {
-        List<Torneio.Dupla> oficiais = oficiais();
-        MenuArcade m = new MenuArcade(new GameAssets());
-        m.abrir(null, oficiais);
-        assertEquals(0, m.cursor());
-        assertNull("cedo demais", m.confirmar());
-        m.update(MenuArcade.TAP_DELAY + 0.05f);
-        m.render(new PaginaHistoriaTest.NullCanvas());
-        // A dupla livre é o último card: ▶ até o fim da primeira linha, ▼ e ▶ até ela.
-        for (int i = 0; i < 6; i++) m.mover(1, 0);
-        m.mover(0, 1);
-        for (int i = 0; i < 6; i++) m.mover(1, 0);
-        assertEquals(MenuArcade.LIVRE, m.cursor());
-        assertEquals(Integer.valueOf(MenuArcade.LIVRE), m.confirmar());
-        assertFalse(m.isOpen());
-
-        m.abrir(null, oficiais);
-        m.update(MenuArcade.TAP_DELAY + 0.05f);
-        float[] b = m.caixa(2);
-        assertEquals(Integer.valueOf(2), m.tap((b[0] + b[2]) * 0.5f, (b[1] + b[3]) * 0.5f));
-        assertSame(oficiais.get(2), m.oficial(2));
-
-        m.abrir(null, oficiais);
-        assertEquals(Integer.valueOf(MenuArcade.VOLTAR), m.voltar());
-    }
 }

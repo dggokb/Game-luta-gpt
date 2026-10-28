@@ -43,7 +43,7 @@ public class GameViewCelularPcTest {
         CombatFighter p = v.engine.fighter(GameView.PLAYER);
         sb.append("x ").append(antes).append(" -> ").append(p.x).append(", status ").append(p.status)
             .append(", locked ").append(p.locked);
-        for (String nome : new String[] {"menuInicial", "characterSelect", "pausa", "menuArcade", "capitulos"}) {
+        for (String nome : new String[] {"menuInicial", "characterSelect", "pausa", "capitulos"}) {
             try {
                 Object o = campo(v, nome);
                 java.lang.reflect.Method aberto = o.getClass().getDeclaredMethod("isOpen");
