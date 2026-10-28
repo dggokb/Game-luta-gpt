@@ -940,11 +940,21 @@ folhas já convertidas e grava no `character.json`; rode de novo depois de recon
   o golpe, a mesma conta do desenho) e:
   - a pancada usa o membro daquele quadro (sem membro medido, a caixa do golpe);
   - quem está golpeando apanha nas 3 faixas do quadro, então **o braço ou a perna esticados apanham**
-    (golpes e projéteis); fora dos golpes, a caixa da postura.
+    (golpes e projéteis).
+- **Posturas** (IDLE, andar, dash, backdash, pulo, queda, agachado, apanhando e defendendo): as 3
+  faixas da mediana dos quadros da animação. Parado com a base aberta, **o pé da frente apanha** (a
+  rasteira que encosta no pé acerta). O motor não sabe o quadro da tela fora dos golpes, então a
+  postura é uma só por animação. A CPU mede a distância dos projéteis até esse corpo.
+- Vale para os 16 (p01 a p16). O p01 mantém a altura agachada calibrada à mão (157) e a caixa do
+  agachado sem faixas.
 - **Coreografados** ficam com a caixa do golpe: o que prende o rival num lugar (`segurarRival`), anda
   com o corpo (avanço), pisa o caído, agarra, pula ou puxa (o desenho do vídeo já mostra o caminho
   que o motor também faz). O Ultra prende o rival pela sequência (`ultras.json`).
-- O lançador (2H) que sobe colado ao corpo alcança um pouco além dele e desce até a cintura.
+- O lançador (2H) que sobe colado ao corpo alcança um pouco além dele e desce até a cintura; no
+  quadro a quadro vale o que mexeu da cintura para cima (o punho que sobe, não o pé que desliza).
+- **Ultra**: `ultras.json` `alcance` é a distância em que os golpes desenhados encostam no rival; o
+  rival vai do contato até ela até o primeiro acerto e fica ali (o p09, p13, p14, p15 e p16 têm a
+  posição feita à mão: `rival`, `voo`, `alem`).
 
 DEBUG mostra as faixas do corpo (verde) e o membro (vermelho) do quadro que vale.
 

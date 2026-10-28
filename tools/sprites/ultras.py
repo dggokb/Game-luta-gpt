@@ -22,6 +22,9 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     quedaFinal  [subida, empurrão] do golpe final no lugar do lançamento alto
     alem      px do jogo: no golpe final ele passa para o outro lado do rival (o p14 pula por cima
               e termina lá; o tornado joga o rival de volta)
+    alcance   px do jogo: até onde a ponta das pancadas desenhadas encosta no rival (medido por
+              tools/sprites/caixas_sprites.py); o rival sai de onde o avanço encostou e vai até
+              ela na primeira pancada (sem "rival")
 
 A câmera aceita um 5º número por plano: os quadros que ela leva, suave, do plano anterior até
 ele (sem ele, corte seco). "velocidade" no personagem troca a do arquivo (o p13, mais lento).
@@ -172,6 +175,8 @@ def timeline(spec, picked, speed):
         ultra['quedaFinal'] = spec['quedaFinal']
     if spec.get('alem'):
         ultra['alem'] = spec['alem']
+    if spec.get('alcance'):
+        ultra['alcance'] = spec['alcance']
     return durations, ultra
 
 

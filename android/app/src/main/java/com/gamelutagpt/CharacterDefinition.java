@@ -82,7 +82,28 @@ final class CharacterDefinition {
             silhuetaCorpo=quadros(corpo);silhuetaGolpe=quadros(golpe);
             for(float[] g:silhuetaGolpe)if(g!=null&&g.length!=4)throw new IllegalArgumentException(id+": golpe {x0,x1,y0,y1}");
             for(float[] c:silhuetaCorpo)if(c!=null&&c.length%4!=0)throw new IllegalArgumentException(id+": corpo em caixas de 4");
+            postura=mediana(silhuetaCorpo);
             return this;
+        }
+        /**
+         * O corpo desta animação como postura (parado, andando, no ar, apanhando, defendendo): a
+         * mediana de cada faixa entre os quadros medidos. O motor não sabe o quadro que a tela
+         * mostra fora dos golpes, então a postura é uma só. Null sem caixas medidas.
+         */
+        float[] postura;
+        private static float[] mediana(float[][] quadros) {
+            int n=0;
+            for(float[] q:quadros)if(q!=null)n=Math.max(n,q.length);
+            if(n==0)return null;
+            float[] out=new float[n];
+            float[] valores=new float[quadros.length];
+            for(int k=0;k<n;k++) {
+                int c=0;
+                for(float[] q:quadros)if(q!=null&&q.length==n)valores[c++]=q[k];
+                java.util.Arrays.sort(valores,0,c);
+                out[k]=valores[c/2];
+            }
+            return out;
         }
         /** "quadro:n,n,n,...|quadro:..." → por quadro da folha (null onde não há). */
         private float[][] quadros(String texto) {
@@ -421,6 +442,17 @@ final class CharacterDefinition {
          * rival para o lado de onde ele veio. 0: fica onde está.
          */
         float crossAhead;
+        /**
+         * Distância (px à frente) em que a ponta das pancadas desenhadas encosta no rival: ele sai
+         * de onde o avanço encostou e vai até ela, chegando na primeira pancada. 0: fica onde
+         * encostou.
+         */
+        float holdReach;
+        UltraSequence withHoldReach(float reach) {
+            if(reach<=0f)throw new IllegalArgumentException("ultra sequence: hold reach > 0");
+            holdReach=reach;
+            return this;
+        }
         UltraSequence withCross(float ahead) {
             if(ahead<=0f)throw new IllegalArgumentException("ultra sequence: cross ahead > 0");
             crossAhead=ahead;

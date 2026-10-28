@@ -242,7 +242,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem'}
+             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -294,6 +294,9 @@ def validate_ultra(name, u, animations):
     # O p14: pula por cima do rival e termina do outro lado (px à frente no golpe final).
     if 'alem' in u and not (number(u['alem']) and u['alem'] > 0):
         raise ValueError(f'{name}.ultra.alem: distância > 0')
+    # Até onde as pancadas desenhadas encostam no rival (tools/sprites/caixas_sprites.py).
+    if 'alcance' in u and not (number(u['alcance']) and u['alcance'] > 0 and not u.get('rival')):
+        raise ValueError(f'{name}.ultra.alcance: distância > 0, sem rival (o rival já diz onde fica)')
     if 'cameraDaLuta' in u and u['cameraDaLuta'] is not True:
         raise ValueError(f'{name}.ultra.cameraDaLuta: true (or leave it out)')
     if 'ULTRA_SEQ' not in animations:
@@ -738,6 +741,8 @@ def compile_packs(root, results):
                       +('new float[]{'+','.join(f(v) for v in u['quedaFinal'])+'}' if 'quedaFinal' in u else 'null')+')')
         if 'alem' in u:
             scene += '.withCross('+f(u['alem'])+')'
+        if 'alcance' in u:
+            scene += '.withHoldReach('+f(u['alcance'])+')'
         return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
                 +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
                 +',new float[][]{'+hold+'})'+scene+')')

@@ -2479,8 +2479,42 @@ final class CombatEngine {
     }
 
     /**
+     * O corpo que apanha agora, em faixas do desenho: o quadro do golpe de quem está golpeando, ou
+     * a postura (parado com as pernas abertas, encolhido no pulo, a guarda...). Null: a caixa da
+     * postura do {@link CharacterDefinition.Body} (sem caixas medidas, agarrado, caído).
+     */
+    static float[] corpoAtual(CombatFighter d) {
+        if (d.attacking()) return corpoNoDesenho(d);
+        String nome = posturaDe(d);
+        CharacterDefinition.Animation a = nome == null ? null : d.character().animations.get(nome);
+        if (a == null && SpriteStates.CROUCH_IDLE.equals(nome)) a = d.character().animations.get(SpriteStates.CROUCH);
+        return a == null ? null : a.postura;
+    }
+
+    /** A animação da postura de {@code d} fora dos golpes, ou null. */
+    private static String posturaDe(CombatFighter d) {
+        switch (d.status) {
+            case HITSTUN: return d.hitCrouching ? SpriteStates.HIT_CROUCH : SpriteStates.HIT_STAND;
+            case AIR_HITSTUN: return SpriteStates.HIT_AIR;
+            case BLOCKSTUN:
+                if (!d.grounded) return SpriteStates.DEFENSE_AIR;
+                return d.lastGuard == CombatFighter.GUARD_LOW ? SpriteStates.DEFENSE_CROUCH : SpriteStates.DEFENSE_STAND;
+            case NEUTRAL:
+                if (!d.grounded) return d.vy > 0f ? SpriteStates.FALL : SpriteStates.JUMP;
+                if (d.crouchingBody()) return SpriteStates.CROUCH_IDLE;
+                if (d.forwardDashing) return SpriteStates.DASH;
+                if (d.backdashFrames > 0) return SpriteStates.BACKDASH;
+                if (d.vx * d.facing > 1f) return SpriteStates.WALK_FORWARD;
+                if (d.vx * d.facing < -1f) return SpriteStates.WALK_BACK;
+                return SpriteStates.IDLE;
+            default:
+                return null;
+        }
+    }
+
+    /**
      * A pancada {@code box} de {@code a} encosta em {@code d}: o membro do desenho (ou a caixa do
-     * golpe) contra o corpo do desenho de quem está golpeando (ou o corpo da postura).
+     * golpe) contra o corpo do desenho de {@code d} (o quadro do golpe ou a postura).
      */
     private boolean golpeToca(CombatFighter a, AttackDefinition.Box box, int frame, CombatFighter d,
                               CharacterDefinition.Body body, boolean crouch) {
@@ -2489,7 +2523,7 @@ final class CombatEngine {
         float x0 = g != null ? g[0] - FOLGA_DESENHO : box.x0, x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
         float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
         // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
-        float[] corpo = crouch == d.crouchingBody() ? corpoNoDesenho(d) : null;
+        float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
         if (corpo == null) {
             return CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
                 d.x - body.halfWidth, d.y - body.height(crouch), d.x + body.halfWidth, d.y);
@@ -2505,9 +2539,9 @@ final class CombatEngine {
         return false;
     }
 
-    /** O projétil encosta em {@code d}: no corpo do desenho de quem está golpeando, ou no da postura. */
+    /** O projétil encosta em {@code d}: no corpo do desenho (o quadro do golpe ou a postura). */
     private static boolean projetilToca(Projectile p, CombatFighter d, boolean crouch) {
-        float[] corpo = crouch == d.crouchingBody() ? corpoNoDesenho(d) : null;
+        float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
         if (corpo == null) {
             return CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), crouch);
         }
@@ -3052,6 +3086,12 @@ final class CombatEngine {
     private void holdUltraVictim(CombatFighter a, CombatFighter d, CharacterDefinition.UltraSequence seq) {
         float[] pose = seq.holdAt(a.ultraFrame);
         float gap = pose != null ? pose[0] : a.ultraHoldGap;
+        if (pose == null && seq.holdReach > 0f) {
+            // Até onde as pancadas desenhadas encostam: sai de onde encostou e chega na primeira.
+            float alvo = Math.max(seq.holdReach, a.body().halfWidth + d.body().halfWidth);
+            float k = Math.min(1f, a.ultraFrame / (float) Math.max(1, seq.hits[0]));
+            gap = a.ultraHoldGap + (alvo - a.ultraHoldGap) * k;
+        }
         float wanted = a.x + a.facing * gap;
         d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
         if (d.x != wanted) a.x = Arena.clamp(d.x - a.facing * gap, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);

@@ -21,8 +21,8 @@ final class DebugOverlay {
             CombatFighter f = engine.fighter(i);
             CharacterDefinition.Body body = f.body();
             float hurtTop = f.hurtTop();
-            // Golpeando com caixas medidas no desenho: o corpo em faixas (o que apanha de verdade).
-            float[] corpo = CombatEngine.corpoNoDesenho(f);
+            // O corpo em faixas do desenho (o que apanha de verdade), ou a caixa da postura.
+            float[] corpo = CombatEngine.corpoAtual(f);
             if (corpo == null) {
                 stroke(c, Color.argb(220, 80, 230, 120), f.x - body.halfWidth, hurtTop, f.x + body.halfWidth, f.y);
             } else {

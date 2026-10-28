@@ -329,10 +329,23 @@ public class CpuTest {
     // ------------------------------------------------------------ punir e combos
 
     /** Golpe do jogador que nunca alcança e demora para recuperar: um convite para punir. */
-    private static final CharacterDefinition WHIFFER = CombatEngineTest.withMoves(BASE,
+    private static final CharacterDefinition WHIFFER = semDesenho(CombatEngineTest.withMoves(BASE,
         new AttackDefinition.Builder("H", AttackDefinition.Kind.NORMAL).damage(100)
             .frames(10, 3, 28).stun(12, 8, 0).windows(null, null, null)
-            .pushback(0f, 0f).reach(10f, 78f).build());
+            .pushback(0f, 0f).reach(10f, 78f).build()), "H");
+
+    /**
+     * O golpe de teste sem o desenho do golpe de verdade: o braço desenhado do H alcança muito
+     * mais que o alcance curto do teste, e o golpe "errado" acertaria pelo desenho. Com o desenho
+     * parado (sem membro medido) a caixa do teste decide.
+     */
+    private static CharacterDefinition semDesenho(CharacterDefinition c, String id) {
+        java.util.Map<String, CharacterDefinition.Move> moves = new java.util.LinkedHashMap<>(c.moves);
+        CharacterDefinition.Move m = moves.get(id);
+        moves.put(id, new CharacterDefinition.Move(id, c.animations.get("IDLE"), m.pose, m.attack));
+        return new CharacterDefinition(c.id, c.displayName, c.profile, c.artFacing, c.visualStandHeight,
+            c.visualCrouchHeight, c.fighter, c.animations, moves, c.specialAnimations, c.specials);
+    }
 
     /**
      * O jogador erra um golpe lento colado na CPU. Só valem as tentativas em que a CPU não

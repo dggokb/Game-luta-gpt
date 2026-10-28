@@ -17,6 +17,9 @@ entre o do impacto (um antes) e três depois:
                   base desce pelo membro inteiro à frente do corpo: o chute alto na diagonal). A caixa
                   do motor vai de hitFloor a hitHeight + 19,5 (CombatRules.VERTICAL_SLACK).
 
+Ultra (ultras.json "alcance", nos que não têm o lugar do rival feito à mão): a mediana da ponta
+das pancadas desenhadas + 15 px; o rival sai de onde o avanço encostou e vai até ela.
+
 Px do mundo: px da folha × worldScale do perfil ÷ pixelScale da folha, contados da raiz da
 célula, como o SpriteFighterRenderer desenha. Só os pixels bem opacos contam (rastro e brilho
 meio transparentes do vídeo não alongam o golpe). Especiais, Super e Ultra ficam como estão
@@ -37,8 +40,11 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 NORMAIS = ('L', 'M', 'H', '2L', '2M', '2H', 'jL', 'jM', 'jH', 'j2H', '6M')
-# Personagens com calibração própria do desenho (P01SpriteCalibration) ou sem folhas de vídeo.
-FORA = {'player_base', 'player_two', 'monster_npc'}
+# Fora: o boneco do treino e o monstro (não estão na seleção). O p01 (player_base) entra; a
+# calibração de desenho dele (P01SpriteCalibration, ~2% de escala e poucos px) fica de fora da conta.
+FORA = {'player_two', 'monster_npc'}
+# Agachar desenhado já calibrado (o jogo redimensiona ao mostrar): a folha crua não serve de medida.
+AGACHAR_CALIBRADO = {'player_base'}
 OPACO = 160          # alfa mínimo de um pixel que conta (0-255)
 PONTA = 45           # px do mundo: o pedaço da ponta do golpe que dá a altura da caixa
 FOLGA = 19.5         # CombatRules.VERTICAL_SLACK
@@ -222,6 +228,8 @@ def golpe(pack, binding, meia, alto):
 def medir(pack):
     alto, agachado, meia = corpo(pack)
     b = pack['fighter']['body']
+    if pack['id'] in AGACHAR_CALIBRADO:
+        agachado = b['crouchHeight']
     novo = {
         'halfWidth': round(meia),
         'standHeight': round(alto),
@@ -275,9 +283,27 @@ def faixas(pack, atlas, i):
     return caixas
 
 
-def ponta(pack, atlas, i, antes, meia):
+def ponta(pack, atlas, i, antes, meia, alto=None):
     """A caixa do membro que bate no quadro i: o que mudou desde o primeiro quadro do golpe
-    (ligado à ponta mais à frente), do corpo para a frente. [x0, x1, y0, y1] ou None."""
+    (ligado à ponta mais à frente), do corpo para a frente. [x0, x1, y0, y1] ou None. Com
+    {@code alto} (o lançador): o que mexeu à frente da cintura para cima (o punho ou a perna que
+    sobe, não o pé que desliza no chão)."""
+    if alto is not None:
+        dx, h = quadro(pack, atlas, i)
+        _, rep, k = ler(pack['id'], atlas)
+        lay = rep['layout']
+        folga = max(2, int(round(6 / k)))
+        perto = cv2.dilate(celula(atlas, antes).astype(np.uint8), np.ones((2 * folga + 1,) * 2, np.uint8)) > 0
+        ys, xs = np.nonzero(celula(atlas, i) & ~perto)
+        dx = (xs - lay['rootX']) * k
+        if pack.get('artFacing') == 'left':
+            dx = -dx
+        h = (lay['rootY'] - ys) * k
+        sobe = (dx > 0) & (h >= alto * 0.5)
+        if sobe.sum() < 30:
+            return None
+        return [round(float(dx[sobe].min())), round(float(dx[sobe].max())),
+                round(float(h[sobe].min())), round(float(h[sobe].max()))]
     dx, h = membro(pack, atlas, i, antes, meia)
     if len(dx) < 20 or dx.max() < meia:
         return None
@@ -297,8 +323,15 @@ def animacoes_de_golpe(pack):
     return [n for n in dict.fromkeys(nomes) if n and n in pack['animations']]
 
 
+# Posturas fora dos golpes: o corpo que apanha parado, andando, agachado, no ar, apanhando e
+# defendendo (o motor usa a mediana dos quadros de cada uma). Do agachar só o fim.
+POSTURAS = ('IDLE', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH_IDLE', 'CROUCH', 'JUMP', 'FALL', 'DASH', 'BACKDASH',
+            'HIT_STAND', 'HIT_CROUCH', 'HIT_AIR', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'DEFENSE_AIR')
+
+
 def silhuetas(pack):
-    """Caixas de cada quadro do desenho dos golpes: o corpo (faixas) e o membro que bate."""
+    """Caixas de cada quadro do desenho: nos golpes o corpo (faixas) e o membro que bate; nas
+    posturas só o corpo."""
     meia = pack['fighter']['body']['halfWidth']
     alto = pack['fighter']['body']['standHeight']
     lancador = pack['moves'].get('2H', {}).get('animation')
@@ -307,7 +340,7 @@ def silhuetas(pack):
         corpo, golpe = {}, {}
         for i in sorted(set(a['frames'])):
             corpo[str(i)] = faixas(pack, a['atlas'], i)
-            g = ponta(pack, a['atlas'], i, a['frames'][0], meia)
+            g = ponta(pack, a['atlas'], i, a['frames'][0], meia, alto if nome == lancador else None)
             if g and nome == lancador:
                 # O lançador (2H) sobe colado ao corpo: alcança um pouco além dele e desce até a
                 # cintura, como a caixa do golpe (tem que pegar quem está em pé na frente).
@@ -315,6 +348,34 @@ def silhuetas(pack):
             if g:
                 golpe[str(i)] = g
         a['silhueta'] = {'corpo': corpo, 'golpe': golpe}
+    for nome in POSTURAS:
+        a = pack['animations'].get(nome)
+        if not a or (nome.startswith('CROUCH') and pack['id'] in AGACHAR_CALIBRADO):
+            continue
+        quadros = a['frames'][-1:] if nome == 'CROUCH' else sorted(set(a['frames']))
+        a['silhueta'] = {'corpo': {str(i): faixas(pack, a['atlas'], i) for i in quadros}, 'golpe': {}}
+
+
+# Ultras com o lugar do rival feito à mão (agarrão, voo, câmera própria, recuo do zanzoken).
+ULTRA_A_MAO = {'p09', 'p13', 'p14', 'p15', 'p16'}
+
+
+def alcance_do_ultra(pack, spec):
+    """Até onde a ponta das pancadas desenhadas do Ultra chega (px à frente da raiz), mediana
+    das pancadas, + 15 para a ponta entrar um pouco no rival. None sem folha do Ultra."""
+    a = pack['animations'].get('ULTRA_SEQ')
+    ult = pack['fighter'].get('ultra')
+    if not a or not ult or not ult.get('quadrosVideo'):
+        return None
+    qv = ult['quadrosVideo']
+    pontas = []
+    for g in spec['golpes']:
+        i = max([j for j, v in enumerate(qv) if v <= g] or [0])
+        # Só o personagem (o maior pedaço ligado): a estrela de impacto solta do vídeo não conta.
+        corpo = faixas(pack, a['atlas'], a['frames'][min(i, len(a['frames']) - 1)])
+        if corpo:
+            pontas.append(float(max(c[1] for c in corpo)))
+    return round(float(np.median(pontas))) + 15 if pontas else None
 
 
 def aplicar(pack, novo, golpes):
@@ -351,8 +412,20 @@ def main():
             aplicar(pack, novo, golpes)
             silhuetas(pack)
             path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    # Ultras: o rival preso onde a ponta das pancadas encosta.
+    ultras_path = HERE / 'ultras.json'
+    ultras = json.loads(ultras_path.read_text(encoding='utf-8'))
+    for cid, spec in ultras['personagens'].items():
+        if cid in ULTRA_A_MAO or spec.get('rival') or (a.personagens and cid not in a.personagens):
+            continue
+        pack = json.loads((ROOT / f'characters/{cid}/character.json').read_text(encoding='utf-8'))
+        d = alcance_do_ultra(pack, spec)
+        if d:
+            print(f"{cid}  Ultra: rival preso a {spec.get('alcance', '-')}→{d} px (onde as pancadas encostam)")
+            spec['alcance'] = d
     if a.write:
-        print('agora: python3 tools/sprites/build_characters.py --write')
+        ultras_path.write_text(json.dumps(ultras, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+        print('agora: python3 tools/sprites/ultras.py --write e python3 tools/sprites/build_characters.py --write')
 
 
 if __name__ == '__main__':

@@ -109,16 +109,34 @@ final class CpuPerception {
         nearestProjectile(engine, me, t.index, s);
     }
 
+    /**
+     * Quanto o corpo do desenho de {@code me} passa da meia largura do corpo do lado {@code lado}
+     * (+1 direita, -1 esquerda do mundo); 0 sem caixas medidas.
+     */
+    static float alemDaCaixa(CombatFighter me, int lado) {
+        float[] corpo = CombatEngine.corpoAtual(me);
+        if (corpo == null) return 0f;
+        boolean frente = lado == me.facing;
+        float longe = 0f;
+        for (int k = 0; k + 3 < corpo.length; k += 4) longe = Math.max(longe, frente ? corpo[k + 1] : -corpo[k]);
+        return Math.max(0f, longe - me.body().halfWidth);
+    }
+
     private void nearestProjectile(CombatEngine engine, CombatFighter me, int owner, Snapshot s) {
         s.projectileGap = Float.MAX_VALUE;
         Projectile best = null;
+        float bestAlem = 0f;
         for (List<Projectile> list : java.util.Arrays.asList(engine.energyProjectiles, engine.superProjectiles)) {
             for (Projectile p : list) {
                 if (p.ownerIndex != owner || p.returning) continue;
-                float gap = (me.x - p.x) * p.direction - p.radius;
+                // Até o corpo do desenho (a base aberta, a guarda): o que passa da caixa antiga
+                // encosta antes, e os prazos de pular e defender contam até ele.
+                float alem = alemDaCaixa(me, -p.direction);
+                float gap = (me.x - p.x) * p.direction - p.radius - alem;
                 if (gap < -40f || gap >= s.projectileGap) continue;
                 s.projectileGap = gap;
                 best = p;
+                bestAlem = alem;
             }
         }
         if (best != null) {
@@ -126,7 +144,8 @@ final class CpuPerception {
             s.projectileSpeed = best.speed;
             s.projectileX = best.x;
             s.projectileDirection = best.direction;
-            s.projectileRadius = best.radius;
+            // O raio leva junto o corpo além da caixa: a previsão (projectileGapNow) conta até ele.
+            s.projectileRadius = best.radius + bestAlem;
             s.projectileLow = best.attack.low;
             s.projectileSuper = best.superKind();
         }

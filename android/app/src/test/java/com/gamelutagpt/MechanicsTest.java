@@ -942,8 +942,11 @@ public class MechanicsTest {
                 // The screen puts the impact frame on whoever stands across from the Ultra.
                 assertEquals("still in the Ultra on its last hit", CombatFighter.Status.ULTRA, s.f(0).status);
             }
-            if (s.f(0).ultraHitsDone < seq.hits.length) {
-                assertEquals("the defender stays held in front", gap, (s.f(1).x - s.f(0).x) * s.f(0).facing, 0.5f);
+            if (s.f(0).ultraHitsDone < seq.hits.length && s.f(0).ultraFrame >= seq.hits[0]) {
+                // Da primeira pancada em diante, preso onde a ponta das pancadas desenhadas encosta.
+                float preso = seq.holdReach > 0f
+                    ? Math.max(seq.holdReach, s.f(0).body().halfWidth + s.f(1).body().halfWidth) : gap;
+                assertEquals("the defender stays held in front", preso, (s.f(1).x - s.f(0).x) * s.f(0).facing, 0.5f);
                 assertFalse("nothing interrupts the sequence", s.f(0).hittable());
             }
         }
@@ -1168,11 +1171,29 @@ public class MechanicsTest {
         assertTrue("and it reaches the foot, past the body: " + maisLonge, maisLonge > f.body().halfWidth + 100f);
     }
 
+    /** Até onde vai à frente o desenho do corpo parado (a guarda, a base aberta). */
+    private static float frenteParado(CharacterDefinition c) {
+        float[] corpo = c.animations.get(SpriteStates.IDLE).postura;
+        float frente = c.fighter.body.halfWidth;
+        for (int k = 1; corpo != null && k < corpo.length; k += 4) frente = Math.max(frente, corpo[k]);
+        return frente;
+    }
+
+    @Test public void standingTheBodyIsTheDrawingNotANarrowBox() {
+        CharacterDefinition p15 = GeneratedCharacters.get("p15");
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(p15, BASE, 400f, 900f);
+        float[] corpo = CombatEngine.corpoAtual(s.f(0));
+        assertNotNull("standing: the stance of the drawing", corpo);
+        float largura = 0f;
+        for (int k = 0; k + 3 < corpo.length; k += 4) largura = Math.max(largura, corpo[k + 1] - corpo[k]);
+        assertTrue("the open stance is wider than the old box: " + largura, largura > p15.fighter.body.halfWidth * 2 + 20f);
+    }
+
     @Test public void theStretchedLegCanBeHit() throws Exception {
         CharacterDefinition p14 = GeneratedCharacters.get("p14");
         float reach = BASE.attack("L").reach;
         // Longe demais para o soco encostar no corpo dele, perto o bastante para a perna esticada.
-        float gap = p14.fighter.body.halfWidth + reach + 40f;
+        float gap = frenteParado(p14) + reach + 30f;
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(p14, BASE, 400f, 400f + gap);
         CombatFighter kicker = s.f(0);
         startMove(s.engine, 0, "H");
@@ -1196,7 +1217,7 @@ public class MechanicsTest {
 
     @Test public void theJabMissesTheBodyFromThere() throws Exception {
         CharacterDefinition p14 = GeneratedCharacters.get("p14");
-        float gap = p14.fighter.body.halfWidth + BASE.attack("L").reach + 40f;
+        float gap = frenteParado(p14) + BASE.attack("L").reach + 30f;
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(p14, BASE, 400f, 400f + gap);
         int hits = 0;
         startMove(s.engine, 1, "L");
