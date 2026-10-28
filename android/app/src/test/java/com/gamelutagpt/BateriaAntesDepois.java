@@ -367,6 +367,32 @@ public final class BateriaAntesDepois {
         List<String> rota = java.util.Arrays.asList("M H A S SUPER D J j2H jM S SUPER W14 W14 S 2L S".split(" "));
         BateriaBalanco.Execucao x = BateriaBalanco.executar("player_base", rota, 0, true);
         put("combo.rota_ryuga_0barras", x.valida ? x.dano : 0);
+        put("combo.rota_ryuga_barra_ganha", x.barraGanha);
+        put("combo.rota_ryuga_supers", x.supers);
+        // A maior rota sem barra de cada um: quanta barra o próprio combo gerou e quantos Supers pagou.
+        double ganho = 0, supers = 0;
+        for (String id : ids) {
+            BateriaBalanco.Candidata c = BateriaBalanco.buscar(id, 0, false, 60, 16);
+            if (c == null) continue;
+            ganho += c.x.barraGanha;
+            supers += c.x.supers;
+        }
+        put("combo.barra_ganha_media_0barras", ganho / ids.size());
+        put("combo.supers_media_0barras", supers / ids.size());
+        // Com o SHINKAI ligado (8 s) desde o começo: os combos que passavam da vida inteira (frente B).
+        for (String tipo : new String[] {"ENERGY", "TECHNIQUE", "POWER", "SPEED"}) {
+            for (String id : new String[] {"player_base", "p09"}) {
+                Shinkai.Type t = Shinkai.Type.valueOf(tipo);
+                BateriaBalanco.PREPARO = e -> {
+                    FighterState st = e.fighter(0).state;
+                    BateriaBalanco.forcarTipo(st, t);
+                    st.shinkaiFrames = e.config.shinkaiFrames;
+                };
+                BateriaBalanco.Candidata c = BateriaBalanco.buscar(id, 0, false, 60, 16);
+                BateriaBalanco.PREPARO = null;
+                put("combo.shinkai_" + tipo + "." + id, c == null ? 0 : c.x.dano);
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException {

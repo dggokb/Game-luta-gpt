@@ -1010,9 +1010,12 @@ public final class BateriaBalanco {
 
     static final String[] ACOES = {"L", "M", "H", "2L", "2M", "2H", "S", "SUPER", "A", "J", "SJ", "D", "jL", "jM", "jH", "j2H", "W6", "W14"};
 
+    /** Preparo antes da rota (forçar o SHINKAI, por exemplo); null = nada. */
+    static java.util.function.Consumer<CombatEngine> PREPARO;
+
     static final class Execucao {
         boolean valida;
-        int dano, acertos, parede, chao, duracao;
+        int dano, acertos, parede, chao, duracao, barraGanha, supers;
         boolean assist, superUsado;
     }
 
@@ -1025,6 +1028,8 @@ public final class BateriaBalanco {
         e.setTeam(0, a, p);
         d.life = 10_000_000;
         a.superMeter = barras * CombatConfig.METER_PER_BAR;
+        if (PREPARO != null) PREPARO.accept(e);
+        final int[] barra = {a.superMeter, 0};
         FighterInput in0 = new FighterInput(), in1 = new FighterInput();
         Execucao x = new Execucao();
         ComboSession sess = null;
@@ -1064,6 +1069,8 @@ public final class BateriaBalanco {
                 boolean noChao = me.grounded;
                 boolean assistAntes = e.team(0).assistOut();
                 e.step(in0, in1);
+                if (me.state.superMeter > barra[0]) barra[1] += me.state.superMeter - barra[0];
+                barra[0] = me.state.superMeter;
                 ComboSession s = e.session(1);
                 if (sess == null && s != null && s.active) sess = s;
                 if (sess != null && s != sess && k > 0) return x;   // o combo caiu antes do passo
@@ -1113,6 +1120,8 @@ public final class BateriaBalanco {
         x.chao = sess.groundBounces;
         x.duracao = sess.comboDuration;
         x.superUsado = sess.usesOf("SUPER") > 0;
+        x.supers = sess.usesOf("SUPER");
+        x.barraGanha = barra[1];
         return x;
     }
 

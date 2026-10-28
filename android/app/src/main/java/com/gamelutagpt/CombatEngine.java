@@ -3571,7 +3571,7 @@ final class CombatEngine {
         int damage = firstStrike ? session.registerHit(attack, raw, config) : session.registerFollowUp(raw);
         d.state.takeDamage(damage, config.recoverableLifePermille);
         chargeShinkai(a, d, damage);
-        if (firstStrike) gainMeter(a, CombatRules.superGainOnHit(attack.strength));
+        if (firstStrike) gainMeter(a, session.meterGain(CombatRules.superGainOnHit(attack.strength), config));
         if (attack.mechanics.poisonDamage > 0) {
             d.state.poison(attack.mechanics.poisonDamage, attack.mechanics.poisonFrames);
             cues.add("POISON");

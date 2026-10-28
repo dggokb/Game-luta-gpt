@@ -329,3 +329,96 @@ Todos os 16 personagens (1x1 contra o elenco e 2x2), antes e depois da etapa 4a:
 - **Atenção:** a queda vem da CPU, e um p09 humano que só cutuca com o 2M não muda. O teste com
   jogadores é o que diz se o p09 humano ainda domina.
 - **Testes:** os 541 do app passam, e o `build_characters.py --check` confere o arquivo gerado.
+
+## Etapa 5 — barra em combos longos e depois do Super (P1)
+
+**Decisão:**
+- Redução progressiva da barra gerada em combos longos, e uma redução a mais depois do Super.
+- Reavaliar as rotas do Ryūga antes de mexer no dano base.
+
+**Arquivos:**
+- `ComboSession.java`, `meterGain`:
+  - barra cheia até o 3º acerto do combo;
+  - depois, 10% a menos por acerto, até um piso de 30%;
+  - com um Super já no combo, metade disso.
+- `CombatConfig.java`: `comboMeterFullHits` 3, `comboMeterStepPermille` 100, `comboMeterFloorPermille`
+  300 e `comboMeterAfterSuperPermille` 500.
+- `CombatEngine.java`: o acerto usa `session.meterGain`.
+- `docs/combat-engine.md`: barra do time.
+- Bateria (`BateriaBalanco.executar`): mede a barra ganha na rota e os Supers usados, e aceita um
+  preparo; a métrica nova é o combo com o SHINKAI ligado desde o começo.
+
+**Antes/depois (mesmas sementes; o "antes" é o código depois da etapa 4b):**
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| combo.rota_ryuga_0barras | 7997 | 0 | -7997 |
+| combo.rota_ryuga_barra_ganha | 2600 | 0 | -2600 |
+| combo.rota_ryuga_supers | 2 | 0 | -2 |
+| combo.barra_ganha_media_0barras | 1847 | 1422 | -424 |
+| combo.supers_media_0barras | 1 | 1 | -0 |
+| combo.shinkai_ENERGY.Ryūga (p01) | 13159 | 10308 | -2851 |
+| combo.shinkai_ENERGY.p09 | 10362 | 10362 | +0 |
+| combo.shinkai_TECHNIQUE.Ryūga (p01) | 10775 | 9598 | -1177 |
+| combo.shinkai_TECHNIQUE.p09 | 9153 | 9153 | +0 |
+| combo.shinkai_POWER.Ryūga (p01) | 9880 | 7550 | -2330 |
+| combo.shinkai_POWER.p09 | 8040 | 8040 | +0 |
+| combo.shinkai_SPEED.Ryūga (p01) | 11661 | 9334 | -2327 |
+| combo.shinkai_SPEED.p09 | 8654 | 8654 | +0 |
+
+- `rota_ryuga_*`: a rota de 58% que o Ryūga fazia começando sem barra (M H assist S SUPER dash pulo
+  j2H jM S SUPER …), refeita igual. 0 = ela não fecha mais.
+- `barra_ganha_media_0barras`: quanta barra a maior rota sem barra de cada personagem gera dentro dela
+  mesma (média dos 16).
+- `shinkai_X`: o maior combo achado com o SHINKAI daquele tipo ligado, começando sem barra.
+
+**Resultado:**
+- **A rota de dois Supers do Ryūga** começando sem barra não fecha mais: o combo não gera barra para o
+  segundo.
+- **O maior combo dele sem barra** caiu de 8202 para 7390 (de 59% para 53% da vida média). Com 1 barra,
+  de 9259 para 8465.
+- **Com SHINKAI,** o maior combo do Ryūga caiu de 13159 para 10308 (ENERGY) e de 11661 para 9334
+  (SPEED).
+- **O p09 não mudou:** as rotas dele não vivem da barra gerada no combo.
+- **Na média dos 16,** a maior rota sem barra gera 23% menos barra (1847 → 1422).
+- **O dano base do Ryūga ficou como está,** como pedido. Ele continua com o maior combo do elenco, e o
+  próximo passo é olhar a rota dele com jogadores antes de mexer no dano.
+- **Lutas:** sem mudança fora do ruído.
+- **Testes:** os 541 do app passam.
+
+Os 16 personagens, maior combo sem barra e com 1 barra:
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| combo.max_0barras.Ryūga (p01) | 8202 | 7390 | -812 |
+| combo.max_1barra.Ryūga (p01) | 9259 | 8465 | -794 |
+| combo.max_0barras.Yin-lu (p02) | 4798 | 4798 | +0 |
+| combo.max_1barra.Yin-lu (p02) | 4288 | 4288 | +0 |
+| combo.max_0barras.Kōga (p03) | 5718 | 5718 | +0 |
+| combo.max_1barra.Kōga (p03) | 4669 | 4669 | +0 |
+| combo.max_0barras.p04 | 5552 | 5552 | +0 |
+| combo.max_1barra.p04 | 5408 | 5408 | +0 |
+| combo.max_0barras.p05 | 6041 | 6041 | +0 |
+| combo.max_1barra.p05 | 4629 | 4629 | +0 |
+| combo.max_0barras.p06 | 6005 | 6005 | +0 |
+| combo.max_1barra.p06 | 3922 | 3922 | +0 |
+| combo.max_0barras.p07 | 7385 | 7385 | +0 |
+| combo.max_1barra.p07 | 6481 | 6481 | +0 |
+| combo.max_0barras.p08 | 6846 | 6846 | +0 |
+| combo.max_1barra.p08 | 4339 | 4339 | +0 |
+| combo.max_0barras.p09 | 6924 | 6924 | +0 |
+| combo.max_1barra.p09 | 8676 | 7906 | -770 |
+| combo.max_0barras.p10 | 6407 | 6407 | +0 |
+| combo.max_1barra.p10 | 4730 | 4730 | +0 |
+| combo.max_0barras.p11 | 4407 | 4407 | +0 |
+| combo.max_1barra.p11 | 5996 | 6219 | +223 |
+| combo.max_0barras.p12 | 5926 | 5926 | +0 |
+| combo.max_1barra.p12 | 5751 | 5751 | +0 |
+| combo.max_0barras.p13 | 7115 | 7115 | +0 |
+| combo.max_1barra.p13 | 7115 | 7115 | +0 |
+| combo.max_0barras.p14 | 5737 | 5737 | +0 |
+| combo.max_1barra.p14 | 6636 | 5649 | -987 |
+| combo.max_0barras.p15 | 5700 | 5700 | +0 |
+| combo.max_1barra.p15 | 3840 | 3840 | +0 |
+| combo.max_0barras.p16 | 6707 | 6707 | +0 |
+| combo.max_1barra.p16 | 6707 | 6707 | +0 |

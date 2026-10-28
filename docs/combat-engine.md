@@ -874,6 +874,11 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
 - **Barra do time**: há uma barra só. O que o parceiro fora de campo ganha (os acertos do
   assist) vai para o ponto a cada frame, e na troca a barra vai com quem entra. O HUD e
   todos os custos leem a barra do ponto.
+- **Barra dentro do combo** (`ComboSession.meterGain`; docs/balanco/ajustes.md, etapa 5): cada
+  acerto dá a barra do golpe (`CombatRules.superGainOnHit`: 100/150/200/450) cheia até o 3º acerto
+  do combo, depois 10% a menos por acerto até 30%; com um Super já no combo, metade disso
+  (`CombatConfig.comboMeter*`). Antes o combo longo começado sem barra pagava um ou dois Supers
+  no meio dele mesmo.
 - Um lado com um membro só (o boneco de treino) nunca troca nem chama assist.
 
 **A voadora da troca** (`VoadoraTroca`, fase `TeamSystem.TAG_KICK`):

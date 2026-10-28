@@ -88,6 +88,19 @@ final class ComboSession {
         return damageScale;
     }
 
+    /**
+     * Barra que quem bate ganha com o acerto que acabou de entrar (já contado em {@link #hitCount}):
+     * cheia nos primeiros {@code comboMeterFullHits}, depois cai um pouco a cada acerto até o piso;
+     * com um Super já no combo, só uma parte disso (docs/balanco/ajustes.md, etapa 5: o combo
+     * longo enchia a barra e pagava um ou dois Supers no meio dele mesmo).
+     */
+    int meterGain(int base, CombatConfig config) {
+        int extra = Math.max(0, hitCount - config.comboMeterFullHits);
+        int permille = Math.max(config.comboMeterFloorPermille, 1000 - config.comboMeterStepPermille * extra);
+        if (usesOf("SUPER") > 0) permille = permille * config.comboMeterAfterSuperPermille / 1000;
+        return base * permille / 1000;
+    }
+
     /** One part of an already scaled hit (ultra cinematic). */
     void addHit(int damage) {
         hitCount++;

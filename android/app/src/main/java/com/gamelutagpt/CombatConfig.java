@@ -179,6 +179,15 @@ final class CombatConfig {
 
     // Super meter, in thousandths of a bar.
     static final int METER_PER_BAR = 1000;
+    /**
+     * Barra ganha batendo dentro de um combo (ComboSession.meterGain): cheia até o 3º acerto,
+     * depois 10% a menos a cada acerto até 30%; com um Super já no combo, metade disso. O combo
+     * longo começado sem barra pagava um ou dois Supers no meio dele mesmo (o especial dá 450).
+     */
+    int comboMeterFullHits = 3;
+    int comboMeterStepPermille = 100;
+    int comboMeterFloorPermille = 300;
+    int comboMeterAfterSuperPermille = 500;
     static final int MAX_METER = 5 * METER_PER_BAR;
     static final int SUPER_COST = METER_PER_BAR;
     /** Ultra (↓ + SUPER): three bars. */
