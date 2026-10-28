@@ -61,13 +61,43 @@ em GIF, com a origem marcada em vermelho, em `android/app/build/sprite-review/ef
 **A chave do verde é por diferença de cor:** o branco a 50% sobre o verde volta a ser branco a
 50% (a fumaça e o brilho ficam meio transparentes, sem borda verde). Manchinhas de ruído saem.
 
+## Efeitos do manequim (dano e defesa)
+
+Outro jeito de fazer o efeito: um manequim verde sobre o fundo verde levando o golpe. O manequim
+dá a escala e o ponto do corpo (o efeito encaixa no corpo de quem apanha), e o recorte tira o
+manequim junto com o fundo (`tools/sprites/efeitos_manequim.py`): a placa é a mediana dos
+quadros sem efeito, e o verde que sobra em cada pixel diz o quanto ela aparece por baixo.
+
+```bash
+python3 tools/sprites/efeitos_manequim.py cabeca.mp4 --nome dano_cabeca --quadros 80-104 --placa 30-75 --ponto cabeca --espelhar --resolucao 1
+python3 tools/sprites/efeitos_manequim.py tronco.mp4 --nome dano_tronco --quadros 0-44 --placa 70-120 --ponto tronco --espelhar --resolucao 0.5
+python3 tools/sprites/efeitos_manequim.py defesa.mp4 --nome defesa --quadros 26-46 --placa 50-70 --ponto 850,217 --espelhar --resolucao 1
+```
+
+- `--ponto cabeca|tronco|baixo` (medidos no manequim) ou `x,y` do vídeo (o centro da estrela da defesa).
+- `--espelhar`: o vídeo é de golpe para a esquerda (o spray sai para trás de quem olha para a direita).
+- `--resolucao`: px da folha por px do mundo (o spray do tronco é enorme; 0,5 deixa a folha leve).
+- `--escuro 0` para fumaça escura (sem ele, o que sai escuro é tratado como o contorno do manequim).
+
+Para o vídeo: fundo verde liso, manequim verde sem contorno preto, câmera parada, um golpe por
+vídeo começando sem efeito, o efeito dentro do quadro (o que passa da borda é esfumado) e nada
+verde no efeito (some junto com o manequim).
+
+| Efeito | Vídeo | O que é |
+|---|---|---|
+| `dano_cabeca` | Mannequin_Air_Damage_Effect (2º golpe) | estouro e anel de choque saindo de trás da cabeça |
+| `dano_tronco` | Spray_no_Tronco | spray de faíscas saindo pelas costas |
+| `dano_baixo` | (falta) | — no lugar, o do tronco mais embaixo |
+| `defesa` | Defesa_com_Impacto | a estrela de impacto nos antebraços cruzados e as faíscas |
+
 ## No jogo
 
 `EfeitosVideo` lê as folhas junto com a arte da luta e o `GameView` toca:
 
 | Evento | Efeito | Sem o efeito |
 |---|---|---|
-| Golpe acerta | `impacto_<tamanho>` (sem o do tamanho, o de baixo um pouco maior) | faísca clássica |
+| Golpe acerta | pelo ponto do corpo: `dano_cabeca` (golpe acima de 72% da altura de quem apanha), `dano_baixo` (agachado ou abaixo de 35%: a rasteira) ou `dano_tronco`, na mesma parte do corpo dele, do tamanho dele e menor que o vídeo (50% a 80% pela força) | `impacto_<tamanho>` |
+| Golpe acerta (sem os do manequim) | `impacto_<tamanho>` (sem o do tamanho, o de baixo um pouco maior) | faísca clássica |
 | Golpe defendido | `defesa` | faísca de defesa |
 | Aterrissagem (motor de animação) | `fumaca_pouso` | sopros/poeira |
 | Pulo saindo do chão | `fumaca_pulo` | nada |

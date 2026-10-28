@@ -2550,7 +2550,8 @@ public class GameView extends SurfaceView
         int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
-        if (!efeitoDeGolpe(event.blocked, x, y, direction, size)) {
+        if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
+            !efeitoDeGolpe(event.blocked, x, y, direction, size)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -4205,6 +4206,35 @@ public class GameView extends SurfaceView
             impacts.spawnSkid(x + d * 16f, GROUND_Y, d);
             impacts.spawnSkid(x - d * 18f, GROUND_Y, d);
         }
+    }
+
+    /** Altura do manequim dos vídeos de dano (tools/sprites/efeitos_manequim.py), px do mundo. */
+    private static final float MANEQUIM_ALTURA = 225f;
+    /** Golpe acima disso (fração da altura de quem apanha, dos pés) é na cabeça; abaixo do outro, embaixo. */
+    private static final float DANO_CABECA_ACIMA = 0.72f, DANO_BAIXO_ABAIXO = 0.35f;
+
+    /**
+     * Dano com o efeito do vídeo do manequim, no ponto do corpo que apanhou: na cabeça
+     * (dano_cabeca), no tronco (dano_tronco) e embaixo, em quem está agachado ou no golpe nas
+     * pernas (a rasteira): dano_baixo, ou o do tronco mais embaixo. A origem do efeito vai no
+     * mesmo ponto do corpo de quem apanha, e o tamanho segue a altura dele e a força do golpe
+     * (menor que o vídeo). False: não há o efeito.
+     */
+    private boolean efeitoDeDano(CombatFighter defender, float impactY, int direction, int size) {
+        CharacterDefinition c = defender.character();
+        float alto = c.visualStandHeight;
+        float tamanho = alto / MANEQUIM_ALTURA * (0.5f + 0.1f * size);
+        boolean esquerda = direction < 0;
+        float x = defender.x;
+        boolean agachado = defender.crouchingBody();
+        if (agachado || defender.y - impactY < alto * DANO_BAIXO_ABAIXO) {
+            float y = defender.y - (agachado ? c.visualCrouchHeight * 0.5f : alto * 0.3f);
+            return efeitos.tocar("dano_baixo", x, y, tamanho, esquerda) ||
+                efeitos.tocar("dano_tronco", x, y, tamanho, esquerda);
+        }
+        boolean cabeca = defender.y - impactY >= alto * DANO_CABECA_ACIMA;
+        return cabeca ? efeitos.tocar("dano_cabeca", x, defender.y - alto * 0.91f, tamanho, esquerda)
+            : efeitos.tocar("dano_tronco", x, defender.y - alto * 0.62f, tamanho, esquerda);
     }
 
     /**
