@@ -1666,3 +1666,676 @@ Cada titular com o parceiro oficial e com três alternativos, contra as outras s
 
 ---
 
+
+---
+
+## Anexo: Auditoria SŌKON, frente D: comparações diretas (seção 6), sinergia (C01) e matriz 16 × 16 (seção 7.3)
+
+Medido no `CombatEngine` real, CPU nível 8, sementes fixas, sobre o HEAD 3703d87a (com as etapas 1–5 dos ajustes
+aprovados: Breaker, Clash, TAG, p09 e barra nos combos). Código: `android/app/src/test/java/com/gamelutagpt/BateriaComparacoes.java`
+(`java ... com.gamelutagpt.BateriaComparacoes [secao6|sinergia|matriz|tudo]`, ~1 min no total; reaproveita
+`BateriaBalanco`, `BateriaIdentidade` e `BateriaEquipe`). Nada de produção foi alterado.
+
+Cada grupo da seção 6 foi medido nos mesmos cenários:
+- **especiais:** mecânica declarada no pacote, alcance efetivo no boneco em pé, vantagem na defesa e o
+  que fazem no boneco a 250 px (dano, quanto andam, quanto puxam, se passam para trás, veneno, vida
+  paga, quadros até agir);
+- **corpo e mobilidade:** vida, início do L, alcance real de M/H/2M, andar, dash, pulo, air dashes,
+  pulo na parede;
+- **como a CPU joga** (depende da CPU): 1x1 contra os outros 15, 4 lutas por rival, com distância
+  média, pulos, agarrões, uso de S1 e S2–S4 e de onde vem o dano;
+- **janelas de reação** dos especiais defensivos (contra-golpe, repel, esquiva, armadura) contra o M, o
+  2M e o S1 do outro do grupo: o especial apertado de 30 quadros antes a 40 depois do aperto do rival,
+  contando em quantos quadros ele anula o golpe e em quantos ainda acerta. Antes, um controle confere
+  se o golpe do rival acerta quem está parado;
+- **os do grupo entre si:** 1x1, 20 lutas por par.
+
+Ressalva que vale para todos os grupos: a CPU **não usa S2–S4** (0 a 0,4 por minuto; `AiController`
+só tem o S1). Por isso a identidade de cada um, nas lutas da CPU, vem do S1, da distância e da vida.
+As diferenças de projeto aparecem nos cenários com roteiro, não nas lutas.
+
+---
+
+```text
+ID: Seção 6 / G1 Shotos técnicos — Ryūga (p01) × p15
+STATUS: REPRODUZIDO · DECIDIR
+CENÁRIO: especiais e janelas com roteiro; CPU 1x1 × elenco (60 lutas cada); 20 lutas entre os dois.
+RESULTADO:
+- Energia e punição à distância (Ryūga): existe. Onda 760 px/s, carregável, +9 na defesa; o S1 é 39% do dano dele e o Super 24%;
+  maior combo sem barra 6934 (dano explosivo 5).
+- Defesa técnica e repel (p15): o repel existe e funciona contra a Onda. Anula o projétil em 25 de 41 tempos (a 450 px), mas não
+  devolve dano; contra o M anula só em 4 de 41 e contra o 2M em 12 de 41 (e aí pune). Só que a CPU nunca usa o repel (S2–S4: 0/min).
+- Combos de karatê (p15): não aparecem. O maior combo sem barra é 3650, o menor do elenco (o Ryūga tira 6934). A rajada (S3,
+  9 acertos) tira só 800 e deixa a p15 152 quadros sem agir.
+- Onde se parecem: os dois jogam de projétil. A p15 tira 52% do dano do S1 (mais que o Ryūga, 39%), na mesma distância (257 × 274 px),
+  com a mesma mobilidade. O Ryūga vence 95% dos confrontos; contra o elenco, 60% × 12%.
+- O "Aparar" (S3) do Ryūga não tem mecânica de aparar no pacote nem no motor (`characters/player_base/character.json`, S3
+  "nome": "Aparar", sem `mecanica`): é um golpe comum de 0 dano a 250 px e −7 na defesa. O nome promete um parry que não existe.
+IMPACTO: a p15 não se diferencia do Ryūga pelo que o documento promete; é um Ryūga mais fraco.
+ALTERNATIVAS: (a) dar à p15 dano de combo (rajada que emenda, normais que cancelam em S3) e à CPU o uso do repel;
+  (b) dar ao "Aparar" a mecânica de contra-golpe (como o S3 da Yin-lu) ou trocar o nome; (c) manter.
+RECOMENDAÇÃO: DECIDIR (a) e (b). O "Aparar" sem mecânica parece descuido de dados; ver no aparelho antes.
+```
+
+```text
+ID: Seção 6 / G2 Lutadores de chutes — Yin-lu (p02) × p14
+STATUS: REPRODUZIDO · DECIDIR
+RESULTADO:
+- Chutes longos (p14): existem. H 324 px, 2M 332 px, S2 tornado 480 px, S3 472 px, S4 424 px; os especiais de mais alcance do grupo.
+  Anda devagar (200 px/s contra 300).
+- Contra-ataque (Yin-lu): existe. O contra-golpe (S3, lê golpe alto) anula o M do p14 em 13 de 41 tempos e pune em 9; contra o 2M
+  (baixo) quase nunca (2 de 41), como a leitura alta pede.
+- Pressão próxima (Yin-lu): não aparece. Vantagem média dos normais −3,5 (p14 −3,7); tempo colada 39% contra 40% do p14.
+- Onde se parecem: a CPU joga os dois na mesma distância (248 × 245 px), sem usar os especiais. O p14 tira 70% do dano dos normais
+  e não usa o S1 (o mergulho). Yin-lu vence 45% dos confrontos.
+IMPACTO: o "controle de trajetória" do p14 e a pressão da Yin-lu só existem no papel nas lutas da CPU.
+ALTERNATIVAS: (a) CPU do p14 com distância preferida longa (o estilo "chutes" pede 180 px; o alcance dele pede ~300) e uso de S2–S4;
+  (b) dar à Yin-lu normais positivos na defesa ou um avanço que emende; (c) manter.
+RECOMENDAÇÃO: (a) é de baixo risco (só a CPU); (b) é DECIDIR.
+```
+
+```text
+ID: Seção 6 / G3 Pressão — Kōga (p03) × p04 × p10
+STATUS: REPRODUZIDO · DECIDIR
+RESULTADO:
+- Rekka e avanço (Kōga): existem. S2 3 acertos que andam 125 px, S3 "avanço em três" que anda 165 px e alcança 452 px.
+- Esquiva e brawler (p04): a esquiva (S3, contra golpe alto) passa pelo M do rival em 7 de 42 tempos e nunca pelo 2M; contra projétil,
+  8 de 42. A ombrada (S4) anda 171 px.
+- Mobilidade aérea (p10): só os 2 air dashes (os outros têm 1) e a voadora que atravessa (217 px). Anda, corre e pula igual aos outros.
+- Onde se parecem: a esquiva do p10 (S3) é a mesma da p04 (golpe alto, janelas de 6–9 de 42). Nas lutas da CPU os três são iguais:
+  57% de vitórias cada, distância 237–243 px, colados 41–42%, 49% / 49% / 45% do dano nos normais. O p10 pula menos que o Kōga
+  (5,9 × 7,9 por minuto).
+- Entre si: p04 vence 70% do p10, Kōga 35% da p04 e 55% do p10.
+IMPACTO: as três pressões se distinguem só pelos especiais, que a CPU não usa; p04 e p10 dividem a mesma esquiva.
+ALTERNATIVAS: (a) CPU usar rekka, esquiva e air dash; (b) trocar a esquiva do p10 por algo aéreo (esquiva no ar, cancel do air dash);
+  (c) manter.
+RECOMENDAÇÃO: (a) primeiro; (b) DECIDIR depois de ver (a) no aparelho.
+```
+
+```text
+ID: Seção 6 / G4 Controle de espaço — p06 × p08 × p11
+STATUS: REPRODUZIDO · DECIDIR
+RESULTADO:
+- Sombra e puxão (p06): existem. O S3 puxa o rival 151 px a 250 px (alcance 444); a sombra rasteira (S1, 480 px/s) é +15 na defesa.
+- Chicote (p08): existe e domina. S1 a 1100 px/s, H com 432 px (o maior normal do elenco). A CPU fica a 385 px (30% do tempo longe)
+  e o S1 é 60% do dano; vence 87% contra o elenco.
+- Veneno e armadilhas (p11): o veneno existe (a seringa, S2, envenena 900; o contra-golpe S3 envenena 600), mas a CPU não usa (S2–S4:
+  0,2/min). Armadilha o p11 não tem: o "poça" do documento não aparece como especial.
+- Onde se parecem: os três, nas mãos da CPU, são o mesmo zoner de S1 (25 a 32 por minuto; 51% / 60% / 63% do dano). A distância os
+  separa (310 / 385 / 350 px).
+- Entre si: p06 vence 65% do p08 e 65% do p11; p08 vence 65% do p11.
+IMPACTO: o p08 é o mais forte do jogo (77% na matriz) só com o chicote; o p11 perde o que tem de próprio (veneno).
+ALTERNATIVAS: (a) CPU usar puxão e veneno; (b) chicote mais lento ou com mais recuperação (o S1 do p08 sai a 1100 px/s e é +8);
+  (c) dar ao p11 a armadilha do documento.
+RECOMENDAÇÃO: (a) primeiro; (b) DECIDIR com jogadores, porque o p08 lidera também a matriz.
+```
+
+```text
+ID: Seção 6 / G5 Resistência — p07 × p09 × p13
+STATUS: REPRODUZIDO · DECIDIR
+RESULTADO:
+- Reação e capangas (p07): o contra-golpe (S3, lê tudo) anula o M e o 2M dos outros dois em 11–14 de 41 tempos e pune em 8–9; contra a
+  investida do p13 (S1), 39 de 41. Os capangas só estão no Super (16% do dano).
+- Agarrão (p09): depois da etapa 4b a CPU agarra 0,8 vez por minuto (8% do dano). O escudo (S3, armadura 1) segura um golpe mas leva o
+  dano (0 de 42 tempos "sem dano": a armadura absorve, não anula); a ombrada (S4, armadura 1) atravessa o M dos dois.
+- Couraça e impacto (p13): o mais lento do jogo (anda 170, dash 134), o 2M mais longo (336 px), vida 16100; a CPU fica colada 51% do tempo.
+- Onde se parecem: p09 e p13 dividem vida (16100), dano de combo (6924 × 6809) e a armadura de um golpe. O p07 é o caso grave: o S1
+  dele (tapa de luva) é corpo a corpo, a CPU quase não usa (1,3/min), 66% do dano vem dos normais e ele vence 13% contra o elenco,
+  0% contra o p09 e 15% contra o p13.
+IMPACTO: a identidade do p07 (reação) só aparece com roteiro; nas lutas ele é o pior do jogo (16% na matriz).
+ALTERNATIVAS: (a) CPU do p07 esperar e usar o contra-golpe; (b) subir o p07 (vida, dano ou um S1 que alcance); (c) manter.
+RECOMENDAÇÃO: (a) e medir de novo; se continuar abaixo de 30%, (b) é DECIDIR.
+```
+
+```text
+ID: Seção 6 / G6 Mobilidade — p05 × p10
+STATUS: REPRODUZIDO · DECIDIR
+RESULTADO:
+- Teleporte e parede (p05): existem. O S3 "selo e mudança" esquiva tudo e teleporta 353 px, passando para trás do rival; contra o
+  projétil do p10 anula e pune em 26 de 42 tempos. Pulo na parede: só a p05 tem.
+- Air dash e acrobacia (p10): 2 air dashes; a voadora (S4) atravessa e anda 217 px.
+- Onde se parecem: nas lutas da CPU, nem o teleporte nem a parede nem o segundo air dash aparecem (S2–S4 0/min; pulos 5,4 × 5,9 por
+  minuto, iguais ao resto do elenco). A p05 vence 32% contra o elenco e 20% contra o p10.
+IMPACTO: os dois aéreos do elenco não jogam no ar com a CPU.
+ALTERNATIVAS: (a) CPU com o estilo "aéreo" usando parede, teleporte e air dash; (b) manter.
+RECOMENDAÇÃO: (a).
+```
+
+```text
+ID: Seção 6 / G7 Imprevisibilidade — p12 × p16
+STATUS: REPRODUZIDO · DECIDIR
+RESULTADO:
+- Troca de vida por poder (p12): existe. Todo especial custa vida (S1 150, S2–S4 250), e os de 250 tiram 996–1218 (os especiais dos outros
+  ficam entre 720 e 1050 a 250 px). A CPU usa o S1 8,5 vezes por minuto, ≈1.300 de vida por minuto pagos só nele. Ela fica colada 54% do
+  tempo e pula 10,5 vezes por minuto, o mais agressivo do elenco.
+- Armadilhas e enganos (p16): a caixa surpresa (S2) é armadilha (+91 na defesa, porque fica no chão), e a banana (S3) é um carrinho
+  que anda 120 px. A CPU não usa nenhum dos dois; a p16 vive do balão (S1).
+- A Fúria da p12 (S3, armadura 1) não anula nada: segura um golpe e leva o dano.
+- Entre si: p12 vence 85% da p16; contra o elenco, 50% × 25%.
+IMPACTO: a p12 é a única do grupo cuja identidade aparece nas lutas da CPU; a p16 é só o balão.
+ALTERNATIVAS: (a) CPU da p16 armar a caixa e a banana; (b) manter.
+RECOMENDAÇÃO: (a).
+```
+
+---
+
+```text
+ID: C01 sinergia (fichas completas)
+STATUS: REPRODUZIDO
+CENÁRIO:
+- como assist (chamado pelo Ryūga; o do Ryūga, pela Yin-lu): distâncias de 100 a 1000 px em que acerta o boneco parado, quadros até
+  acertar, quantas de 12 chamadas pegam o boneco pulando a 250 px e a cobertura (vantagem do titular num H defendido com o assist
+  junto, menos sem);
+- como parceiro: o que o assist soma ao maior combo (sem barra, sem Super; busca em feixe 40 × 14) de Ryūga, Kōga, p09 e p11;
+- como titular: o que o parceiro oficial soma ao maior combo dele.
+A nota (1–5) é o quintil do elenco numa soma desses quatro números.
+RESULTADO:
+- Os assistentes que mais valem: p08 (83% antiaéreo, +1509 no combo dos outros), p09 (alcance de tela inteira, 75% antiaéreo) e p06
+  (+27 de cobertura, o maior).
+- Os que não valem nada: p12, p13 e p15 só acertam a 100 px, e o p14 não acerta; somam −198 ao combo dos outros, ou seja, chamar
+  atrapalha. O balão da p16 cobre bem (83% antiaéreo, +18), mas sai em 35 quadros e não cabe em combo (−296).
+- Duplas oficiais (o parceiro somado ao combo do titular): p09+p10 +3009 e p08+p07 +1919 são as melhores. Ryūga+Yin-lu −135,
+  p11+p12 −274 e p15+p16 −989 (o balão lento quebra o combo da p15) atrapalham.
+- Notas de sinergia: 5 para p06, p08 e p09; 1 para p12, p13, p14 e p15. As outras seis dimensões vêm da frente A, refeitas no código
+  atual.
+IMPACTO: metade das duplas oficiais não tem sinergia jogável; os quatro do fim do elenco (p12–p15) são os piores assistentes.
+ALTERNATIVAS: consertar os assistentes de corpo a corpo (já no backlog, item 2); dar ao balão da p16 uma versão rápida de assist.
+RECOMENDAÇÃO: o conserto dos assistentes de corpo a corpo resolve a nota 1 de p12–p15 de uma vez.
+```
+
+```text
+ID: 7.3 Matriz 1x1 16 × 16 com espelhos
+STATUS: REPRODUZIDO (depende da CPU)
+CENÁRIO: 256 combinações ordenadas (linha = lado esquerdo, coluna = lado direito), CPU nível 8 dos dois lados, 10 sementes por célula,
+  2560 lutas.
+RESULTADO:
+- Viés de lado: nenhum. O lado esquerdo vence 50% das 2560 lutas; nos espelhos, 47% (75 de 160), e cada espelho fica entre 2 e 7 de 10.
+- Só 3 dos 120 pares mudam de resultado em 6 ou mais de 10 com o lado (Ryūga × Kōga, Yin-lu × p16, p06 × p11). Com 10 lutas por lado,
+  isso cabe no acaso (o esperado é ~2,4 pares).
+- Força contra o elenco (os dois lados): p08 77%, p06 68%, Ryūga 67%, p04 63%, p13 62%, p11 61%, Kōga 60%, p10 60%, p09 58% … p12 43%,
+  p14 41%, p05 41%, Yin-lu 37%, p16 30%, p15 17%, p07 16%.
+- O p09 saiu do topo depois das etapas 4a/4b (era 72%, 4º lugar; agora 58%, 9º).
+IMPACTO: o elenco tem um meio largo (58–68%) e uma cauda fraca (p15 e p07 abaixo de 20%, p16 e Yin-lu abaixo de 40%).
+ALTERNATIVAS: tratar a cauda (p07, p15) pela identidade (G1, G5) antes de mexer em números; checar o p08 com jogadores.
+RECOMENDAÇÃO: usar esta matriz como linha de base das próximas etapas (mesmas sementes: 900000 + 1000·linha + 20·coluna + semente).
+```
+
+---
+
+### Tabelas completas
+
+### Seção 6: comparações diretas
+
+
+#### Shotos técnicos: Ryūga (p01) × p15
+
+Promessa do documento: Energia e punição à distância × defesa técnica, repel e combos de karatê.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| Ryūga (p01) | S1 Onda | projétil 760 px/s, carregável | projétil | +9 | dano 850, anda +10, puxa 0, livre em 19 q |
+| Ryūga (p01) | S2 Punho ascendente | golpe simples | 184 px | +1 | dano 0, anda +10, puxa 0, livre em 42 q |
+| Ryūga (p01) | S3 Aparar | golpe simples | 236 px | -7 | dano 0, anda +0, puxa 0, livre em 43 q |
+| Ryūga (p01) | S4 Chute giratório | avanço, 3 acertos | 336 px | -15 | dano 1000, anda +110, puxa 0, livre em 63 q |
+| p15 | S1 Seiken Hadō | projétil 900 px/s | projétil | +0 | dano 850, anda +10, puxa 0, livre em 36 q |
+| p15 | S2 Repel da aura vermelha | contra-golpe (ANY), repel | – | – | dano 0, anda +10, puxa 0, livre em 65 q |
+| p15 | S3 Rajada de punhos | avanço, 9 acertos | 332 px | – | dano 800, anda +109, puxa 0, livre em 152 q |
+| p15 | S4 Voadora e chute girando | avanço, 2 acertos | 348 px | -6 | dano 1000, anda +108, puxa 0, livre em 86 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| Ryūga (p01) | 14000 | 2 q | 208 / 256 / 240 | 300 | 207 | 280 | 1 | não | 627 |
+| p15 | 14000 | 3 q | 196 / 300 / 332 | 300 | 207 | 280 | 1 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ryūga (p01) | 60% | 274 px | 33% / 14% | 5.0 | 0.1 | 19.2 | 0.0 | 25% | 39% | 0% | 24% | 5% | 1% | 6% | 0% |
+| p15 | 12% | 257 px | 37% / 10% | 4.4 | 0.0 | 10.9 | 0.0 | 29% | 52% | 0% | 5% | 2% | 1% | 11% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| p15 S2 Repel da aura vermelha | Ryūga (p01) M a 150 px | 4 de 41 | 4 |
+| p15 S2 Repel da aura vermelha | Ryūga (p01) 2M a 150 px | 12 de 41 | 12 |
+| p15 S2 Repel da aura vermelha | Ryūga (p01) S1 a 450 px | 25 de 41 | 0 |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- Ryūga (p01) vence 95% de p15
+
+
+#### Lutadores de chutes: Yin-lu (p02) × p14
+
+Promessa do documento: Contra-ataque e pressão próxima × chutes longos e controle de trajetória.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| Yin-lu (p02) | S1 Palma | projétil 700 px/s | projétil | +15 | dano 760, anda +10, puxa 0, livre em 27 q |
+| Yin-lu (p02) | S2 Chute da garça | golpe simples | 152 px | – | dano 0, anda +0, puxa 0, livre em 33 q |
+| Yin-lu (p02) | S3 Contra-golpe | contra-golpe (HIGH) | 200 px | -4 | dano 0, anda +0, puxa 0, livre em 37 q |
+| Yin-lu (p02) | S4 Chute rodopiante | avanço, 2 acertos | 268 px | -6 | dano 450, anda +0, puxa 0, livre em 44 q |
+| p14 | S1 Chute rebote | mergulho, rebote | – | -5 | dano 0, anda +7, puxa 0, livre em 38 q |
+| p14 | S2 Chute tornado | 5 acertos | 480 px | -12 | dano 1040, anda +7, puxa 0, livre em 95 q |
+| p14 | S3 Meia-lua cortante | golpe simples | 472 px | -4 | dano 900, anda +0, puxa 0, livre em 54 q |
+| p14 | S4 Pisão de onda | golpe simples | 424 px | +1 | dano 950, anda +0, puxa 0, livre em 62 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| Yin-lu (p02) | 13440 | 3 q | 264 / 276 / 220 | 300 | 207 | 280 | 1 | não | 627 |
+| p14 | 13300 | 5 q | 256 / 324 / 332 | 200 | 207 | 280 | 1 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Yin-lu (p02) | 52% | 248 px | 39% / 9% | 4.7 | 0.0 | 10.6 | 0.0 | 36% | 31% | 0% | 21% | 3% | 1% | 8% | 0% |
+| p14 | 43% | 245 px | 40% / 7% | 8.2 | 0.0 | 0.0 | 0.0 | 70% | 0% | 0% | 20% | 1% | 0% | 10% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| Yin-lu (p02) S3 Contra-golpe | p14 M a 150 px | 13 de 41 | 9 |
+| Yin-lu (p02) S3 Contra-golpe | p14 2M a 150 px | 2 de 41 | 0 |
+| Yin-lu (p02) S3 Contra-golpe | p14 S1 a 450 px | não alcança quem está parado | – |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- Yin-lu (p02) vence 45% de p14
+
+
+#### Pressão: Kōga (p03) × p04 × p10
+
+Promessa do documento: Rekka e avanço × esquiva/brawler × mobilidade aérea.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| Kōga (p03) | S1 Onda curta | projétil 950 px/s | projétil | +3 | dano 850, anda +10, puxa 0, livre em 29 q |
+| Kōga (p03) | S2 Punho em sequência | avanço, 3 acertos | 296 px | -10 | dano 734, anda +125, puxa 0, livre em 52 q |
+| Kōga (p03) | S3 Avanço em três | avanço, 3 acertos | 452 px | -4 | dano 900, anda +165, puxa 0, livre em 60 q |
+| Kōga (p03) | S4 Mergulho | mergulho | – | +3 | só no ar |
+| p04 | S1 Soco de impacto | projétil 800 px/s | projétil | +12 | dano 890, anda +10, puxa 0, livre em 30 q |
+| p04 | S2 Cabeçada | avanço | 180 px | – | dano 0, anda +0, puxa 0, livre em 37 q |
+| p04 | S3 Esquiva | esquiva (HIGH) | 188 px | -4 | dano 0, anda +0, puxa 0, livre em 41 q |
+| p04 | S4 Ombrada | avanço | 372 px | +1 | dano 1050, anda +171, puxa 0, livre em 47 q |
+| p10 | S1 Machadinho | projétil 900 px/s | projétil | +12 | dano 720, anda +0, puxa 0, livre em 25 q |
+| p10 | S2 Jato de vapor | golpe simples | 208 px | +1 | dano 0, anda +10, puxa 0, livre em 32 q |
+| p10 | S3 Esquiva acrobática | esquiva (HIGH) | 288 px | -4 | dano 760, anda +0, puxa 0, livre em 33 q |
+| p10 | S4 Voadora em parafuso | avanço atravessa | 428 px | +1 | dano 850, anda +217, puxa 0, livre em 41 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| Kōga (p03) | 13720 | 3 q | 204 / 208 / 312 | 300 | 207 | 280 | 1 | não | 627 |
+| p04 | 14420 | 3 q | 260 / 260 / 288 | 300 | 207 | 280 | 1 | não | 627 |
+| p10 | 13020 | 3 q | 284 / 196 / 252 | 300 | 207 | 280 | 2 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Kōga (p03) | 57% | 243 px | 41% / 8% | 7.9 | 0.1 | 8.1 | 0.0 | 49% | 33% | 0% | 6% | 3% | 0% | 8% | 0% |
+| p04 | 57% | 237 px | 42% / 8% | 6.9 | 0.1 | 8.6 | 0.4 | 49% | 27% | 1% | 11% | 4% | 0% | 8% | 0% |
+| p10 | 57% | 243 px | 41% / 9% | 5.9 | 0.1 | 12.5 | 0.0 | 45% | 30% | 0% | 3% | 15% | 0% | 7% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| p04 S3 Esquiva | Kōga (p03) M a 150 px | 7 de 42 | 7 |
+| p04 S3 Esquiva | Kōga (p03) 2M a 150 px | 0 de 42 | 0 |
+| p04 S3 Esquiva | Kōga (p03) S1 a 450 px | 8 de 42 | 0 |
+| p04 S3 Esquiva | p10 M a 150 px | 6 de 42 | 6 |
+| p04 S3 Esquiva | p10 2M a 150 px | 0 de 42 | 0 |
+| p04 S3 Esquiva | p10 S1 a 450 px | 9 de 42 | 0 |
+| p10 S3 Esquiva acrobática | Kōga (p03) M a 150 px | 7 de 42 | 7 |
+| p10 S3 Esquiva acrobática | Kōga (p03) 2M a 150 px | 0 de 42 | 0 |
+| p10 S3 Esquiva acrobática | Kōga (p03) S1 a 450 px | 6 de 42 | 0 |
+| p10 S3 Esquiva acrobática | p04 M a 150 px | 6 de 42 | 6 |
+| p10 S3 Esquiva acrobática | p04 2M a 150 px | 0 de 42 | 0 |
+| p10 S3 Esquiva acrobática | p04 S1 a 450 px | não alcança quem está parado | – |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- Kōga (p03) vence 35% de p04
+- Kōga (p03) vence 55% de p10
+- p04 vence 70% de p10
+
+
+#### Controle de espaço: p06 × p08 × p11
+
+Promessa do documento: Sombra e puxão × chicote × veneno e armadilhas.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| p06 | S1 Sombra rastejante | projétil 480 px/s | projétil | +15 | dano 720, anda +0, puxa 0, livre em 30 q |
+| p06 | S2 Eco de sombra | eco | 172 px | +1 | dano 0, anda +0, puxa 0, livre em 59 q |
+| p06 | S3 Puxar | puxão 320 | 444 px | -4 | dano 760, anda +10, puxa 151, livre em 38 q |
+| p06 | S4 Passo-sombra | avanço | 432 px | +1 | dano 850, anda +170, puxa 0, livre em 47 q |
+| p08 | S1 Chicote | projétil 1100 px/s | projétil | +8 | dano 810, anda +3, puxa 0, livre em 30 q |
+| p08 | S2 Giro ascendente | 2 acertos | 444 px | -12 | dano 1040, anda +0, puxa 0, livre em 53 q |
+| p08 | S3 Contra-golpe | contra-golpe (LOW) | 208 px | -4 | dano 0, anda +0, puxa 0, livre em 41 q |
+| p08 | S4 Salto-agulha | avanço | 408 px | +1 | dano 950, anda +190, puxa 0, livre em 47 q |
+| p11 | S1 Bisturi | projétil 950 px/s | projétil | +2 | dano 680, anda +10, puxa 0, livre em 30 q |
+| p11 | S2 Seringa | projétil 650 px/s, veneno 900 | 420 px | -2 | dano 880, anda +0, puxa 0, envenena, livre em 37 q |
+| p11 | S3 Bloqueio de nervos | contra-golpe (ANY), veneno 600 | 184 px | -4 | dano 0, anda +10, puxa 0, livre em 41 q |
+| p11 | S4 Passo cirúrgico | avanço | 340 px | +3 | dano 800, anda +75, puxa 0, livre em 47 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| p06 | 13300 | 3 q | 244 / 216 / 272 | 300 | 207 | 280 | 1 | não | 627 |
+| p08 | 13020 | 3 q | 284 / 432 / 200 | 300 | 207 | 280 | 1 | não | 627 |
+| p11 | 12600 | 3 q | 220 / 236 / 264 | 300 | 207 | 280 | 1 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| p06 | 70% | 310 px | 27% / 19% | 5.0 | 0.0 | 25.0 | 0.0 | 23% | 51% | 0% | 5% | 13% | 0% | 7% | 0% |
+| p08 | 87% | 385 px | 16% / 30% | 4.7 | 0.0 | 32.1 | 0.0 | 15% | 60% | 0% | 16% | 4% | 0% | 4% | 0% |
+| p11 | 47% | 350 px | 25% / 29% | 4.8 | 0.0 | 29.6 | 0.2 | 13% | 63% | 0% | 16% | 3% | 1% | 5% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| p08 S3 Contra-golpe | p06 M a 150 px | 4 de 41 | 0 |
+| p08 S3 Contra-golpe | p06 2M a 150 px | 9 de 41 | 7 |
+| p08 S3 Contra-golpe | p06 S1 a 450 px | 0 de 41 | 0 |
+| p08 S3 Contra-golpe | p11 M a 150 px | 6 de 41 | 1 |
+| p08 S3 Contra-golpe | p11 2M a 150 px | 9 de 41 | 7 |
+| p08 S3 Contra-golpe | p11 S1 a 450 px | 4 de 41 | 0 |
+| p11 S3 Bloqueio de nervos | p06 M a 150 px | 6 de 37 | 2 |
+| p11 S3 Bloqueio de nervos | p06 2M a 150 px | 5 de 37 | 3 |
+| p11 S3 Bloqueio de nervos | p06 S1 a 450 px | 0 de 37 | 0 |
+| p11 S3 Bloqueio de nervos | p08 M a 150 px | 6 de 37 | 2 |
+| p11 S3 Bloqueio de nervos | p08 2M a 150 px | 5 de 37 | 3 |
+| p11 S3 Bloqueio de nervos | p08 S1 a 450 px | 4 de 41 | 0 |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- p06 vence 65% de p08
+- p06 vence 65% de p11
+- p08 vence 65% de p11
+
+
+#### Resistência: p07 × p09 × p13
+
+Promessa do documento: Reação e capangas × agarrão × couraça e impacto.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| p07 | S1 Tapa de luva | golpe simples | – | +3 | dano 1020, anda +10, puxa 0, livre em 42 q |
+| p07 | S2 Chute ascendente | 3 acertos | 320 px | -12 | dano 1320, anda +10, puxa 0, livre em 69 q |
+| p07 | S3 Contra-golpe | contra-golpe (ANY) | 336 px | -4 | dano 1080, anda +0, puxa 0, livre em 44 q |
+| p07 | S4 Chute giratório baixo | golpe simples | 408 px | +1 | dano 1200, anda +0, puxa 0, livre em 57 q |
+| p09 | S1 Machado | projétil 600 px/s | projétil | +8 | dano 1060, anda +10, puxa 0, livre em 38 q |
+| p09 | S2 Cotovelada | golpe simples | 148 px | +1 | dano 0, anda +10, puxa 0, livre em 48 q |
+| p09 | S3 Escudo | armadura 1 | 176 px | – | dano 0, anda +0, puxa 0, livre em 52 q |
+| p09 | S4 Ombrada | armadura 1, avanço | 404 px | +1 | dano 1250, anda +131, puxa 0, livre em 58 q |
+| p13 | S1 Investida do colosso | avanço, 5 acertos | – | -24 | dano 1320, anda +81, puxa 61, livre em 141 q |
+| p13 | S2 Pedra arremessada | projétil 520 px/s | 260 px | +8 | dano 1320, anda +6, puxa 0, livre em 58 q |
+| p13 | S3 Três cabeçadas | agarrão, 3 acertos | 116 px | – | dano 0, anda +0, puxa 0, livre em 73 q |
+| p13 | S4 Salto do colosso | avanço | 504 px | +1 | dano 1200, anda +138, puxa 0, livre em 77 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| p07 | 15120 | 4 q | 264 / 228 / 192 | 300 | 207 | 280 | 1 | não | 627 |
+| p09 | 16100 | 4 q | 276 / 196 / 300 | 300 | 207 | 280 | 1 | não | 627 |
+| p13 | 16100 | 4 q | 260 / 284 / 336 | 170 | 134 | 280 | 1 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| p07 | 13% | 250 px | 42% / 9% | 4.3 | 0.1 | 1.3 | 0.0 | 66% | 4% | 0% | 16% | 1% | 1% | 12% | 0% |
+| p09 | 58% | 248 px | 42% / 9% | 3.9 | 0.8 | 5.5 | 0.4 | 50% | 20% | 1% | 11% | 2% | 8% | 9% | 0% |
+| p13 | 60% | 236 px | 51% / 7% | 5.2 | 0.1 | 7.4 | 0.0 | 56% | 20% | 0% | 15% | 2% | 0% | 7% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| p07 S3 Contra-golpe | p09 M a 150 px | 12 de 41 | 8 |
+| p07 S3 Contra-golpe | p09 2M a 150 px | 11 de 41 | 9 |
+| p07 S3 Contra-golpe | p09 S1 a 450 px | 6 de 45 | 0 |
+| p07 S3 Contra-golpe | p13 M a 150 px | 14 de 41 | 8 |
+| p07 S3 Contra-golpe | p13 2M a 150 px | 11 de 41 | 9 |
+| p07 S3 Contra-golpe | p13 S1 a 450 px | 39 de 41 | 39 |
+| p09 S3 Escudo | p07 M a 150 px | 0 de 42 | 0 |
+| p09 S3 Escudo | p07 2M a 150 px | 0 de 42 | 0 |
+| p09 S3 Escudo | p07 S1 a 450 px | não alcança quem está parado | – |
+| p09 S3 Escudo | p13 M a 150 px | 0 de 42 | 0 |
+| p09 S3 Escudo | p13 2M a 150 px | 0 de 42 | 0 |
+| p09 S3 Escudo | p13 S1 a 450 px | 21 de 42 | 21 |
+| p09 S4 Ombrada | p07 M a 150 px | 15 de 15 | 10 |
+| p09 S4 Ombrada | p07 2M a 150 px | 8 de 15 | 8 |
+| p09 S4 Ombrada | p07 S1 a 450 px | não alcança quem está parado | – |
+| p09 S4 Ombrada | p13 M a 150 px | 15 de 15 | 10 |
+| p09 S4 Ombrada | p13 2M a 150 px | 0 de 15 | 0 |
+| p09 S4 Ombrada | p13 S1 a 450 px | 11 de 15 | 11 |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- p07 vence 0% de p09
+- p07 vence 15% de p13
+- p09 vence 35% de p13
+
+
+#### Mobilidade: p05 × p10
+
+Promessa do documento: Teleporte e parede × air dash e acrobacia.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| p05 | S1 Kunai | projétil 1000 px/s | projétil | +14 | dano 760, anda +10, puxa 0, livre em 25 q |
+| p05 | S2 Shuriken | projétil 950 px/s | 476 px | -2 | dano 990, anda +0, puxa 0, livre em 32 q |
+| p05 | S3 Selo e mudança | esquiva (ANY), teleporte | 520 px | -4 | dano 810, anda +353, puxa 47, passa para trás, livre em 33 q |
+| p05 | S4 Corte de mão | avanço, 2 acertos | 488 px | -2 | dano 900, anda +150, puxa 0, livre em 46 q |
+| p10 | S1 Machadinho | projétil 900 px/s | projétil | +12 | dano 720, anda +0, puxa 0, livre em 25 q |
+| p10 | S2 Jato de vapor | golpe simples | 208 px | +1 | dano 0, anda +10, puxa 0, livre em 32 q |
+| p10 | S3 Esquiva acrobática | esquiva (HIGH) | 288 px | -4 | dano 760, anda +0, puxa 0, livre em 33 q |
+| p10 | S4 Voadora em parafuso | avanço atravessa | 428 px | +1 | dano 850, anda +217, puxa 0, livre em 41 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| p05 | 12880 | 3 q | 276 / 204 / 220 | 300 | 207 | 280 | 1 | sim | 627 |
+| p10 | 13020 | 3 q | 284 / 196 / 252 | 300 | 207 | 280 | 2 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| p05 | 32% | 275 px | 37% / 13% | 5.4 | 0.0 | 14.5 | 0.0 | 29% | 45% | 0% | 9% | 7% | 0% | 9% | 0% |
+| p10 | 57% | 243 px | 41% / 9% | 5.9 | 0.1 | 12.5 | 0.0 | 45% | 30% | 0% | 3% | 15% | 0% | 7% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| p05 S3 Selo e mudança | p10 M a 150 px | 6 de 42 | 6 |
+| p05 S3 Selo e mudança | p10 2M a 150 px | 7 de 42 | 7 |
+| p05 S3 Selo e mudança | p10 S1 a 450 px | 26 de 42 | 26 |
+| p10 S3 Esquiva acrobática | p05 M a 150 px | 6 de 42 | 6 |
+| p10 S3 Esquiva acrobática | p05 2M a 150 px | não alcança quem está parado | – |
+| p10 S3 Esquiva acrobática | p05 S1 a 450 px | 7 de 42 | 0 |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- p05 vence 20% de p10
+
+
+#### Imprevisibilidade: p12 × p16
+
+Promessa do documento: Troca de vida por poder × armadilhas e enganos.
+
+**Especiais** (mecânica declarada; alcance efetivo no boneco em pé; vantagem na defesa; o que fazem no boneco a 250 px):
+
+| lutador | especial | mecânica | alcance | vantagem na defesa | efeito a 250 px |
+|---|---|---|---|---|---|
+| p12 | S1 Investida | avanço, custa 150 de vida | – | – | dano 0, anda +4, puxa 0, paga 150 de vida, livre em 30 q |
+| p12 | S2 Salto de garras | custa 250 de vida | 268 px | +1 | dano 1218, anda +0, puxa 0, paga 250 de vida, livre em 47 q |
+| p12 | S3 Fúria | armadura 1, custa 250 de vida | 252 px | -4 | dano 996, anda +0, puxa 0, paga 250 de vida, livre em 38 q |
+| p12 | S4 Contorção | avanço, custa 250 de vida, 2 acertos | 348 px | -6 | dano 1106, anda +144, puxa 0, paga 250 de vida, livre em 52 q |
+| p16 | S1 Balão | projétil 500 px/s | projétil | -2 | dano 850, anda +10, puxa 0, livre em 50 q |
+| p16 | S2 Caixa surpresa | armadilha | projétil | +91 | dano 0, anda +10, puxa 0, livre em 42 q |
+| p16 | S3 Casca de banana | avanço | 424 px | +1 | dano 900, anda +120, puxa 0, livre em 106 q |
+| p16 | S4 Estrelinha | avanço, 4 acertos | 344 px | -6 | dano 1000, anda +181, puxa 0, livre em 87 q |
+
+**Corpo, alcance e mobilidade:**
+
+| lutador | vida | L (início) | alcance M / H / 2M | anda | dash 20 q | pulo à frente | air dashes | pulo na parede | super pulo |
+|---|---|---|---|---|---|---|---|---|---|
+| p12 | 13300 | 3 q | 264 / 160 / 296 | 300 | 207 | 280 | 1 | não | 627 |
+| p16 | 14000 | 3 q | 224 / 268 / 292 | 300 | 207 | 280 | 1 | não | 627 |
+
+**Como a CPU joga** (1x1 nível 8 contra os outros 15, 4 lutas por rival; depende da CPU):
+
+| lutador | vence | distância média | colado / longe | pulos/min | agarrões/min | S1/min | S2–S4/min | dano: normais | dano: S1 | dano: S2–S4 | dano: Super | dano: Ultra | dano: agarrão | dano: Clash | dano: outros |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| p12 | 50% | 214 px | 54% / 5% | 10.5 | 0.0 | 8.5 | 0.0 | 51% | 34% | 0% | 4% | 2% | 0% | 9% | 0% |
+| p16 | 25% | 268 px | 37% / 11% | 6.2 | 0.2 | 9.4 | 0.0 | 45% | 33% | 0% | 6% | 5% | 1% | 10% | 0% |
+
+**Janelas de reação** (o especial defensivo apertado de 30 quadros antes a 40 depois do aperto do rival; em quantos quadros ele anula o golpe, e em quantos ainda acerta):
+
+| quem reage | contra | anula em | anula e acerta em |
+|---|---|---|---|
+| p12 S3 Fúria | p16 M a 150 px | 0 de 42 | 0 |
+| p12 S3 Fúria | p16 2M a 150 px | 0 de 42 | 0 |
+| p12 S3 Fúria | p16 S1 a 450 px | 0 de 42 | 0 |
+
+**Entre si** (1x1, 20 lutas por par, metade de cada lado):
+
+- p12 vence 85% de p16
+
+
+### C01 sinergia: o assist de cada um e o que o assist rende para cada um
+
+Como assist: alcance (distância do titular ao boneco em que acerta), início, antiaéreo (acerta o boneco
+pulando a 250 px em quantos de 12 tempos), cobertura (vantagem do titular num H defendido com o assist
+chamado junto, menos sem). Como parceiro: quanto o assist soma ao maior combo (sem barra, sem Super) de
+Ryūga, Kōga, p09 e p11. Como titular: quanto o parceiro oficial soma ao maior combo dele.
+
+| lutador | assist | alcance | início | antiaéreo | cobertura | soma ao combo de outros (média) | o oficial soma ao dele | nota sinergia (1–5) |
+|---|---|---|---|---|---|---|---|---|
+| Ryūga (p01) | S | 100–800 px | 15 q | 75% | +0 | +1025 | -135 (Yin-lu (p02)) | 3 |
+| Yin-lu (p02) | S | 100–350 px | 18 q | 50% | +15 | +763 | +133 (Ryūga (p01)) | 3 |
+| Kōga (p03) | S | 100–500 px | 19 q | 42% | +1 | +1249 | +282 (p04) | 2 |
+| p04 | S | 100–350 px | 19 q | 25% | +10 | +1042 | +262 (Kōga (p03)) | 2 |
+| p05 | S | 100–1000 px | 17 q | 33% | +8 | +854 | +773 (p06) | 4 |
+| p06 | S | 100–850 px | 19 q | 50% | +27 | +484 | +744 (p05) | 5 |
+| p07 | S | 100–150 px | 21 q | 0% | +13 | +1299 | +40 (p08) | 2 |
+| p08 | S | 100–750 px | 19 q | 83% | +8 | +1509 | +1919 (p07) | 5 |
+| p09 | S | 100–1000 px | 22 q | 75% | +14 | +493 | +3009 (p10) | 5 |
+| p10 | S | 100–800 px | 17 q | 58% | +6 | +811 | +748 (p09) | 4 |
+| p11 | S | 100–1000 px | 19 q | 92% | +1 | +423 | -274 (p12) | 3 |
+| p12 | S | 100–100 px | 19 q | 0% | +0 | -198 | -78 (p11) | 1 |
+| p13 | S | 100–100 px | 27 q | 0% | +0 | -198 | -100 (p14) | 1 |
+| p14 | S | não acerta | – | 0% | +0 | -198 | -105 (p13) | 1 |
+| p15 | M | 100–100 px | 17 q | 0% | +0 | +617 | -989 (p16) | 1 |
+| p16 | S | 100–1000 px | 35 q | 83% | +18 | -296 | +288 (p15) | 4 |
+
+### C01 fichas completas (sete dimensões, notas 1–5 por quintil do elenco)
+
+| lutador | alcance | mobilidade | pressão | defesa | dano explosivo | controle de espaço | sinergia | números brutos |
+|---|---|---|---|---|---|---|---|---|
+| Ryūga (p01) | 1 | 1 | 1 | 1 | 5 | 1 | 3 | alcance M/H/2M 208/256/240 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -5.0, colado 33%; vida 14000, janela antiaérea total 131, L em 2 q; maior combo sem barra 6934; projétil 760 px/s, longe 14% |
+| Yin-lu (p02) | 3 | 1 | 2 | 5 | 1 | 1 | 3 | alcance M/H/2M 264/276/220 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -3.5, colado 39%; vida 13440, janela antiaérea total 194, L em 3 q; maior combo sem barra 4798; projétil 700 px/s, longe 9% |
+| Kōga (p03) | 2 | 1 | 5 | 2 | 2 | 4 | 2 | alcance M/H/2M 204/208/312 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 41%; vida 13720, janela antiaérea total 146, L em 3 q; maior combo sem barra 5501; projétil 950 px/s, longe 8% |
+| p04 | 4 | 1 | 3 | 3 | 2 | 3 | 2 | alcance M/H/2M 260/260/288 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -3.5, colado 42%; vida 14420, janela antiaérea total 147, L em 3 q; maior combo sem barra 5466; projétil 800 px/s, longe 8% |
+| p05 | 1 | 5 | 2 | 1 | 4 | 1 | 4 | alcance M/H/2M 276/204/220 px; anda 300, dash 207, pulo 280 px, 1 air dash, pulo na parede; vantagem média dos normais -3.3, colado 37%; vida 12880, janela antiaérea total 125, L em 3 q; maior combo sem barra 6041; projétil 1000 px/s, longe 13% |
+| p06 | 2 | 1 | 2 | 1 | 3 | 3 | 5 | alcance M/H/2M 244/216/272 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 27%; vida 13300, janela antiaérea total 130, L em 3 q; maior combo sem barra 6005; projétil 480 px/s, longe 19% |
+| p07 | 1 | 1 | 3 | 4 | 4 | 1 | 2 | alcance M/H/2M 264/228/192 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -3.0, colado 42%; vida 15120, janela antiaérea total 170, L em 4 q; maior combo sem barra 6411; projétil 700 px/s, longe 9% |
+| p08 | 5 | 1 | 1 | 5 | 1 | 5 | 5 | alcance M/H/2M 284/432/200 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 16%; vida 13020, janela antiaérea total 195, L em 3 q; maior combo sem barra 4137; projétil 1100 px/s, longe 30% |
+| p09 | 3 | 1 | 4 | 4 | 5 | 3 | 5 | alcance M/H/2M 276/196/300 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -3.0, colado 42%; vida 16100, janela antiaérea total 144, L em 4 q; maior combo sem barra 6924; projétil 600 px/s, longe 9% |
+| p10 | 2 | 5 | 3 | 2 | 2 | 2 | 4 | alcance M/H/2M 284/196/252 px; anda 300, dash 207, pulo 280 px, 2 air dash; vantagem média dos normais -3.3, colado 41%; vida 13020, janela antiaérea total 146, L em 3 q; maior combo sem barra 5027; projétil 900 px/s, longe 9% |
+| p11 | 1 | 1 | 1 | 1 | 1 | 5 | 3 | alcance M/H/2M 220/236/264 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 25%; vida 12600, janela antiaérea total 146, L em 3 q; maior combo sem barra 4407; projétil 950 px/s, longe 29% |
+| p12 | 1 | 1 | 5 | 5 | 3 | 2 | 1 | alcance M/H/2M 264/160/296 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 54%; vida 13300, janela antiaérea total 198, L em 3 q; maior combo sem barra 5751; projétil 700 px/s, longe 5% |
+| p13 | 5 | 1 | 5 | 4 | 5 | 4 | 1 | alcance M/H/2M 260/284/336 px; anda 170, dash 134, pulo 280 px, 1 air dash; vantagem média dos normais -3.3, colado 51%; vida 16100, janela antiaérea total 160, L em 4 q; maior combo sem barra 6809; projétil 600 px/s, longe 7% |
+| p14 | 5 | 1 | 1 | 2 | 3 | 4 | 1 | alcance M/H/2M 256/324/332 px; anda 200, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -3.7, colado 40%; vida 13300, janela antiaérea total 148, L em 5 q; maior combo sem barra 5547; projétil 600 px/s, longe 7% |
+| p15 | 4 | 1 | 4 | 3 | 1 | 5 | 1 | alcance M/H/2M 196/300/332 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 37%; vida 14000, janela antiaérea total 159, L em 3 q; maior combo sem barra 3650; projétil 900 px/s, longe 10% |
+| p16 | 4 | 1 | 4 | 3 | 4 | 2 | 4 | alcance M/H/2M 224/268/292 px; anda 300, dash 207, pulo 280 px, 1 air dash; vantagem média dos normais -2.3, colado 37%; vida 14000, janela antiaérea total 147, L em 3 q; maior combo sem barra 6565; projétil 500 px/s, longe 11% |
+
+### Matriz 1x1 16 × 16 (seção 7.3)
+
+CPU nível 8 dos dois lados, 10 sementes por célula. Linha = lado esquerdo (P1), coluna = lado direito (P2);
+célula = vitórias do lado esquerdo (de 10). Empates e tempo esgotado sem vencedor contam como não vitória.
+
+| P1 \ P2 | p01 | p02 | p03 | p04 | p05 | p06 | p07 | p08 | p09 | p10 | p11 | p12 | p13 | p14 | p15 | p16 | total P1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| p01 | **4** | 7 | 9 | 1 | 8 | 8 | 10 | 7 | 4 | 3 | 10 | 5 | 8 | 8 | 9 | 8 | 68% |
+| p02 | 3 | **5** | 6 | 2 | 4 | 0 | 7 | 1 | 0 | 3 | 5 | 4 | 1 | 3 | 8 | 2 | 34% |
+| p03 | 9 | 6 | **4** | 3 | 5 | 6 | 9 | 5 | 6 | 7 | 7 | 6 | 2 | 5 | 10 | 8 | 61% |
+| p04 | 6 | 9 | 7 | **2** | 8 | 4 | 10 | 3 | 5 | 6 | 6 | 7 | 0 | 7 | 10 | 7 | 61% |
+| p05 | 2 | 8 | 3 | 4 | **7** | 2 | 7 | 2 | 2 | 4 | 4 | 6 | 1 | 7 | 9 | 5 | 46% |
+| p06 | 3 | 7 | 7 | 7 | 7 | **6** | 10 | 5 | 7 | 1 | 4 | 6 | 10 | 9 | 9 | 7 | 66% |
+| p07 | 0 | 2 | 0 | 3 | 1 | 1 | **4** | 0 | 0 | 2 | 1 | 5 | 0 | 3 | 2 | 3 | 17% |
+| p08 | 4 | 9 | 5 | 10 | 8 | 6 | 10 | **3** | 3 | 8 | 4 | 10 | 10 | 10 | 10 | 10 | 75% |
+| p09 | 7 | 7 | 5 | 3 | 7 | 3 | 7 | 4 | **4** | 3 | 4 | 7 | 3 | 7 | 6 | 9 | 54% |
+| p10 | 3 | 8 | 5 | 5 | 9 | 8 | 10 | 2 | 7 | **7** | 5 | 5 | 2 | 5 | 9 | 9 | 62% |
+| p11 | 2 | 5 | 2 | 4 | 7 | 0 | 10 | 7 | 5 | 4 | **7** | 6 | 10 | 8 | 8 | 10 | 59% |
+| p12 | 5 | 5 | 3 | 4 | 6 | 3 | 6 | 0 | 3 | 4 | 0 | **5** | 4 | 5 | 10 | 4 | 42% |
+| p13 | 5 | 7 | 7 | 5 | 10 | 0 | 8 | 0 | 8 | 7 | 1 | 8 | **5** | 9 | 8 | 9 | 61% |
+| p14 | 3 | 3 | 3 | 4 | 7 | 1 | 9 | 1 | 5 | 6 | 3 | 5 | 1 | **3** | 10 | 6 | 44% |
+| p15 | 0 | 3 | 1 | 1 | 1 | 0 | 5 | 0 | 0 | 1 | 0 | 1 | 3 | 2 | **4** | 4 | 16% |
+| p16 | 1 | 2 | 2 | 1 | 5 | 2 | 7 | 0 | 3 | 4 | 0 | 3 | 2 | 5 | 4 | **5** | 29% |
+
+Viés de lado: o lado esquerdo vence 50% das 2560 lutas (47% nos espelhos: 75 de 160).
+
+Espelhos (lado esquerdo vence, de 10):
+
+Ryūga (p01) 4; Yin-lu (p02) 5; Kōga (p03) 4; p04 2; p05 7; p06 6; p07 4; p08 3; p09 4; p10 7; p11 7; p12 5; p13 5; p14 3; p15 4; p16 5.
+
+Força contra o elenco (os dois lados somados, sem os espelhos) e a maior diferença de lado nos pares:
+
+| # | lutador | vence | como P1 | como P2 |
+|---|---|---|---|---|
+| 1 | p08 | 77% | 78% | 75% |
+| 2 | p06 | 68% | 66% | 71% |
+| 3 | Ryūga (p01) | 67% | 70% | 65% |
+| 4 | p04 | 63% | 63% | 62% |
+| 5 | p13 | 62% | 61% | 62% |
+| 6 | p11 | 61% | 59% | 64% |
+| 7 | Kōga (p03) | 60% | 63% | 57% |
+| 8 | p10 | 60% | 61% | 58% |
+| 9 | p09 | 58% | 55% | 61% |
+| 10 | p12 | 43% | 41% | 44% |
+| 11 | p14 | 41% | 45% | 38% |
+| 12 | p05 | 41% | 44% | 38% |
+| 13 | Yin-lu (p02) | 37% | 33% | 41% |
+| 14 | p16 | 30% | 27% | 33% |
+| 15 | p15 | 17% | 15% | 19% |
+| 16 | p07 | 16% | 15% | 17% |
+
+Pares em que o lado muda o resultado em 6 ou mais de 10 (3 de 120):
+
+- Ryūga (p01) × Kōga (p03): Ryūga (p01) vence 9 de 10 pela esquerda e 1 de 10 pela direita
+- Yin-lu (p02) × p16: Yin-lu (p02) vence 2 de 10 pela esquerda e 8 de 10 pela direita
+- p06 × p11: p06 vence 4 de 10 pela esquerda e 10 de 10 pela direita
+
