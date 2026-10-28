@@ -6,8 +6,9 @@ import org.junit.Test;
 
 /**
  * Combo breaker: apanhando num combo que já tem 2 acertos, L, M ou H quebra na hora, em qualquer
- * golpe — por 1 barra. O "!" fica sobre quem apanha enquanto dá. Quem batia é jogado para longe
- * e quem quebrou corre sozinho até ele.
+ * golpe — por 1 barra. O "!" fica sobre quem apanha enquanto dá. Quem batia é jogado para longe,
+ * fica atordoado um instante e a luta volta ao neutro (sem troco garantido; docs/balanco/ajustes.md).
+ * A corrida sozinha de quem quebrou continua no motor como opção ({@code comboBreakerChaseFrames}).
  */
 public class ComboBreakerTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
@@ -16,8 +17,12 @@ public class ComboBreakerTest {
     private static final class Match {
         final FighterState first = new FighterState(BASE, "P1");
         final FighterState cpu = new FighterState(NPC, "CPU");
-        final CombatEngine engine = new CombatEngine(first, cpu, 500f, 600f, new CombatConfig());
+        final CombatEngine engine;
         final FighterInput[] in = {new FighterInput(), new FighterInput()};
+
+        Match() { this(new CombatConfig()); }
+
+        Match(CombatConfig config) { engine = new CombatEngine(first, cpu, 500f, 600f, config); }
 
         CombatFighter f(int i) { return engine.fighter(i); }
 
@@ -100,15 +105,14 @@ public class ComboBreakerTest {
         assertNull("o combo acabou", m.engine.session(1) != null && m.engine.session(1).active ? m.engine.session(1) : null);
     }
 
-    /** O estalo joga quem batia para longe (arrastando o pé) e quem quebrou corre sozinho até ele. */
-    @Test public void theBreakerThrowsTheAttackerAwayAndTheDefenderRunsAlone() {
+    /** O estalo joga quem batia para longe (arrastando o pé); quem quebrou não sai correndo sozinho. */
+    @Test public void theBreakerThrowsTheAttackerAwayAndTheFightGoesBackToNeutral() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
         m.combo("H", 3);
         assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
         CombatConfig config = m.engine.config;
         float attackerStart = m.f(0).x, breakerStart = m.f(1).x;
-        // Congelamento do estalo + o deslize.
         boolean ran = false;
         for (int i = 0; i < config.comboBreakerHitstopFrames + config.comboBreakerPushFrames; i++) {
             m.step();
@@ -116,59 +120,45 @@ public class ComboBreakerTest {
         }
         assertTrue("jogado para trás: " + Math.abs(m.f(0).x - attackerStart),
             Math.abs(m.f(0).x - attackerStart) > 0.6f * config.comboBreakerPushGap);
+        assertFalse("não corre sozinho", ran);
+        assertEquals("ficou onde quebrou", breakerStart, m.f(1).x, 1f);
+        // Passado o estalo e o atordoamento, quem batia volta a agir.
+        for (int i = 0; i < config.comboBreakerStunFrames && !m.f(0).canAct(); i++) m.step();
+        assertTrue("se recompôs", m.f(0).canAct());
+    }
+
+    /** Com a corrida ligada (a opção antiga), quem quebrou corre sozinho até ele. */
+    @Test public void withTheChaseOptionTheDefenderRunsAlone() {
+        CombatConfig config = new CombatConfig();
+        config.comboBreakerChaseFrames = 40;
+        config.comboBreakerStunFrames = 44;
+        Match m = new Match(config);
+        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+        m.combo("H", 3);
+        assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
+        float breakerStart = m.f(1).x;
+        boolean ran = false;
+        for (int i = 0; i < config.comboBreakerHitstopFrames + config.comboBreakerPushFrames; i++) {
+            m.step();
+            ran |= m.f(1).forwardDashing;
+        }
         assertTrue("correu sem → →", ran);
         for (int i = 0; i < 30; i++) m.step();
         assertTrue("correu um bom pedaço: " + Math.abs(m.f(1).x - breakerStart),
             Math.abs(m.f(1).x - breakerStart) > 0.6f * config.comboBreakerPushGap);
         assertTrue("chegou perto: " + m.gap(), m.gap() <= m.touching() + config.comboBreakerCloseGap + 12f);
         assertEquals("parou de correr", 0, m.f(1).breakerChase);
-        assertTrue("o outro ainda atordoado", m.f(0).inHitstun());
     }
 
-    @Test public void theBreakerLetsTheDefenderComboBack() {
-        Match m = new Match();
+    @Test public void withTheChaseOptionHoldingBackGivesUpTheRun() {
+        CombatConfig config = new CombatConfig();
+        config.comboBreakerChaseFrames = 40;
+        Match m = new Match(config);
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
         m.combo("H", 3);
         assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
-        // Espera a corrida terminar e só então aperta: ainda dá tempo.
-        while (m.f(1).breakerChase > 0) m.step();
-        int lifeBefore = m.first.life;
-        m.in[1].light = true;
-        boolean hit = false;
-        for (int i = 0; i < 40 && !hit; i++) {
-            m.step();
-            for (CombatEngine.HitEvent h : m.engine.events()) if (h.attacker == 1 && !h.blocked) hit = true;
-        }
-        assertTrue("o troco entra", hit);
-        assertTrue(m.first.life < lifeBefore);
-    }
-
-    /** O golpe apertado no meio da corrida espera chegar perto: não sai de longe no vazio. */
-    @Test public void anAttackPressedDuringTheRunWaitsForTheArrival() {
-        Match m = new Match();
-        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
-        m.combo("H", 3);
-        assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
-        // Apertado ainda no congelamento do estalo, antes até de começar a correr.
-        m.step();
-        m.in[1].light = true;
-        float far = m.touching() + m.engine.config.comboBreakerCloseGap + 15f;
-        boolean hit = false, whiffed = false;
-        for (int i = 0; i < 60 && !hit; i++) {
-            m.step();
-            if (m.f(1).attacking() && m.gap() > far) whiffed = true;
-            for (CombatEngine.HitEvent h : m.engine.events()) if (h.attacker == 1 && !h.blocked) hit = true;
-        }
-        assertFalse("não saiu de longe", whiffed);
-        assertTrue("entrou ao chegar", hit);
-    }
-
-    @Test public void holdingBackGivesUpTheRun() {
-        Match m = new Match();
-        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
-        m.combo("H", 3);
-        assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
-        while (!m.f(1).forwardDashing) m.step();
+        for (int i = 0; i < 60 && !m.f(1).forwardDashing; i++) m.step();
+        assertTrue(m.f(1).forwardDashing);
         m.in[1].direction = m.back(1);
         m.step();
         assertEquals(0, m.f(1).breakerChase);
@@ -310,9 +300,9 @@ public class ComboBreakerTest {
         assertFalse(broke);
     }
 
-    /** A CPU que quebra o combo sempre emenda o dela no atordoado. */
-    @Test public void theCpuAlwaysCombosAfterItsBreaker() {
-        for (int level = 1; level <= 8; level++) {
+    /** A CPU forte que quebra o combo vai atrás do troco: quem não defende leva. */
+    @Test public void theCpuGoesForTheCounterAfterItsBreaker() {
+        for (int level = 6; level <= 8; level++) {
             int contact = Match.contactOf("H");
             Match m = new Match();
             m.cpu.superMeter = CombatConfig.METER_PER_BAR;
@@ -344,7 +334,7 @@ public class ComboBreakerTest {
                 m.step();
                 for (CombatEngine.HitEvent h : m.engine.events()) if (h.attacker == 1 && !h.blocked) counter = true;
             }
-            assertTrue("nível " + level + ": depois do breaker a CPU emenda o combo", counter);
+            assertTrue("nível " + level + ": depois do breaker a CPU acerta quem não defende", counter);
         }
     }
 
@@ -378,7 +368,10 @@ public class ComboBreakerTest {
         assertEquals("some quando o combo acaba", -1, (int)cues.get(cues.size() - 1));
     }
 
-    /** A CPU forte quebra alguns combos sozinha (sem tempo certo, só a decisão). */
+    /**
+     * A CPU forte quebra os combos que decide quebrar (45% no nível 8): o aperto cabe no
+     * atordoamento, não chega tarde.
+     */
     @Test public void aStrongCpuBreaksSomeCombos() {
         int broken = 0;
         for (int seed = 0; seed < 30; seed++) {

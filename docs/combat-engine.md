@@ -775,24 +775,28 @@ forte que fechava a sequência: no celular era quase impossível; depois foi o S
 Apanhando sem poder quebrar, os botões vão para o buffer como sempre. O SUPER não quebra.
 
 - **Efeito** (cue `COMBO_BREAKER`): o golpe não entra; quem apanhava fica livre na hora (no ar,
-  cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (44) depois de um
-  congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (170) do corpo de quem
+  cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (20; era 44) depois
+  de um congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (170) do corpo de quem
   quebrou, deslizando em `comboBreakerPushFrames` (10) quadros (no ar, `comboBreakerAirPushSpeed`;
   encurralado, para na parede — quem quebrou não recua). "COMBO BREAKER!", brilho na cor de quem
   quebrou, estalo e tremida; enquanto desliza, o pé arrasta e solta **fumacinha**
   (`ImpactEffects.spawnSkid`, `GameView.updateBreakerSkid`).
-- **Corrida automática**: quem quebrou sai correndo sozinho até ele (sem o → →), na velocidade do
-  dash, por até `comboBreakerChaseFrames` (40) quadros, até ficar a `comboBreakerCloseGap` (30)
-  do corpo dele (ao alcance do L). Trás ou baixo desiste da corrida; pulo também. O golpe
-  apertado no meio da corrida (ou ainda no congelamento) **espera chegar perto** — o buffer não
-  envelhece enquanto corre — e sai no alcance; chegando, ainda sobram ~29 quadros de atordoamento.
+- **Volta ao neutro** (docs/balanco/ajustes.md, etapa 1): quem quebrou **não** corre mais
+  sozinho (`comboBreakerChaseFrames` = 0; era 40) e não ganha um combo de troco garantido. Com
+  20 quadros ainda sobra tempo para um L logo de cara (o alcance real do L passa da folga do
+  empurrão); o relatório traz os números e as alternativas.
+- **Corrida automática (opção)**: com `comboBreakerChaseFrames` > 0, quem quebrou sai correndo
+  sozinho até ele (sem o → →), na velocidade do dash, até ficar a `comboBreakerCloseGap` (30) do
+  corpo dele. Trás ou baixo desiste da corrida; pulo também. O golpe apertado no meio da corrida
+  **espera chegar perto** — o buffer não envelhece enquanto corre.
 - **Não vira luta infinita**: cada quebra custa uma barra, e a barra só volta batendo e
   apanhando; o troco também pode ser quebrado, mas só por quem ainda tiver barra.
-- **CPU**: a partir do nível 4, quando o combo que ela leva fica quebrável, decide uma vez se
-  quebra (`CpuLevel.comboBreaker`: 9% por nível acima do 3, 45% no 8) e, se sim, aperta SUPER
-  (aperta o L) depois de até `AiController.BREAKER_GUESS_FRAMES` (18) quadros de reação. Quando quebra,
-  **sempre emenda o combo** dela (`AiController.breakerFollowUp`: deixa a corrida levar até ele e
-  abre a rota com o primeiro golpe que alcança).
+- **CPU**: a partir do nível 4, em cada combo que ela leva e que fica quebrável, decide uma vez se
+  quebra (`CpuLevel.comboBreaker`: 9% por nível acima do 3, 45% no 8) e, se sim, aperta o L
+  dentro do atordoamento que ainda falta (até `AiController.BREAKER_GUESS_FRAMES`, 18). Antes a
+  decisão do primeiro combo ficava valendo para os seguintes e ela quebrava 15% das chances; agora
+  36%. Quando quebra, vai atrás do troco (`AiController.breakerFollowUp`) se o rival ainda estiver
+  atordoado.
 - **Invencível no estalo**: quem quebrou fica intocável no congelamento e no deslize (o que
   estava no ar, como um projétil, não o pega de novo).
 - **Câmera lenta**: no estalo, 36 quadros a 50% (`GameView.BREAKER_SLOW_*`), para dar para ver

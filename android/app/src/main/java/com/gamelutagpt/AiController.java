@@ -328,6 +328,7 @@ final class AiController {
         justDefenseWait = 0;
         breakerWait = 0;
         breakerDecided = false;
+        breakerSession = null;
         breakerCombo = false;
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
@@ -805,18 +806,29 @@ final class AiController {
             breakerDecided = false;
             return;
         }
+        // Uma decisão por combo: o combo seguinte começa sem quadro livre no meio (a decisão do
+        // anterior ficava valendo e ela quase nunca decidia de novo).
+        if (session != breakerSession) {
+            breakerSession = session;
+            breakerWait = 0;
+            breakerDecided = false;
+        }
         if (!engine.canBreakCombo(me)) return;
         if (!breakerDecided) {
             breakerDecided = true;
-            if (roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
+            // O aperto cabe no atordoamento que ainda falta: esperar mais que ele deixava o combo
+            // acabar antes (decidia quebrar 45% das vezes e quebrava 15%).
+            int cabe = Math.max(1, Math.min(BREAKER_GUESS_FRAMES, me.stunLeft - 1));
+            if (roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(cabe);
         }
         if (breakerWait > 0 && --breakerWait == 0) out.light = true;
     }
 
     /**
-     * Depois de quebrar o combo, sempre emenda o dela: o rival fica atordoado e longe (o estalo
-     * o joga para trás) e ela corre sozinha até ele; ao alcance, abre a rota do caderno com o
-     * primeiro golpe que alcança. Sem nenhum ao alcance, corre até ele enquanto o atordoamento dura.
+     * Depois de quebrar o combo, tenta o troco: o rival fica atordoado um instante e longe (o
+     * estalo o joga para trás); ao alcance, abre a rota do caderno com o primeiro golpe que alcança,
+     * e sem nenhum ao alcance corre até ele enquanto o atordoamento dura (quase sempre ele se
+     * recompõe antes: a luta volta ao neutro).
      */
     private boolean breakerFollowUp(CombatFighter me, CombatFighter target, FighterInput out) {
         if (!breakerCombo) return false;
@@ -888,6 +900,8 @@ final class AiController {
     private int breakerWait;
     /** Já decidiu (quebrar ou não) o combo que está levando. */
     private boolean breakerDecided;
+    /** O combo em que a decisão foi tomada. */
+    private ComboSession breakerSession;
 
 
     /** Quantos quadros antes do contato ela aperta a defesa perfeita (dentro da janela). */

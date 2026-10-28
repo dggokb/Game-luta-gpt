@@ -1994,8 +1994,9 @@ final class CombatEngine {
 
     /**
      * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre) e
-     * quem batia é jogado para longe, arrastando o pé, e fica atordoado, sem o golpe. Quem quebrou
-     * sai correndo sozinho até ele (sem o → →) para dar o troco.
+     * quem batia é jogado para longe, arrastando o pé, e fica atordoado um instante, sem o golpe.
+     * Com {@code comboBreakerChaseFrames} > 0 quem quebrou sai correndo sozinho até ele; com 0 (o
+     * padrão) a luta volta ao neutro.
      */
     private void comboBreaker(CombatFighter a, CombatFighter d) {
         d.state.spendSuperMeter(config.comboBreakerCost);
