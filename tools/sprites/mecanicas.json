@@ -1423,7 +1423,13 @@
         "alcance": 240
       },
       "unica": {
-        "descricao": "Kōga com 8 anos, do treino e da briga dos irmãos no Prólogo: só S1 (a energia que ainda não sai: um estouro de fumaça curto na frente) e S2 (socos girando). Sem Super e sem Ultra."
+        "descricao": "Kōga com 8 anos, do treino e da briga dos irmãos no Prólogo: só S1 (Fumacinha: carrega, dá um tapa com a palma que solta só um clarão e uma fumacinha, e encolhe o ombro; o dano é só o do tapa, sem projétil) e S2 (socos girando, andando para a frente no tempo do vídeo, um acerto por soco). Sem Super e sem Ultra.",
+        "lutador": {
+          "corrida": {
+            "backdashQuadros": 30,
+            "backdashVelocidade": 400
+          }
+        }
       },
       "comandos": {
         "S1": {
@@ -1436,7 +1442,24 @@
         }
       },
       "s1": {
-        "visual": "ESTOURO"
+        "corpoACorpo": {
+          "alcance": 80,
+          "altura": 125,
+          "piso": 60,
+          "empurrao": 60
+        }
+      },
+      "framesGolpe": {
+        "S": [
+          105,
+          4,
+          201
+        ],
+        "S2": [
+          40,
+          4,
+          266
+        ]
       }
     }
   }

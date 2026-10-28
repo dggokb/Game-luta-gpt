@@ -186,6 +186,30 @@ def combos(pack, spec, data):
     fighter['comboStyle'] = spec['estiloCombo']
 
 
+def prune_routes(pack):
+    """Tira do cancelInto (e das rotas próprias guardadas) os golpes que o personagem não tem:
+    as crianças da história não têm S3, S4, Super nem Ultra, e o molde trazia rotas para eles."""
+    fighter = pack['fighter']
+    ids = set(pack['moves']) | set(pack.get('specialMoves', {})) | {'JUMP'}
+    ids |= {k for k, v in (('S', 'energy'), ('SUPER', 'super')) if v in fighter}
+    if fighter.get('ultra'):
+        ids.add('ULTRA')
+
+    def walk(o):
+        if isinstance(o, dict):
+            for key in ('cancelInto', 'rotasProprias'):
+                if isinstance(o.get(key), list):
+                    o[key] = [t for t in o[key] if t in ids]
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(fighter)
+    walk(pack['moves'])
+    walk(pack.get('specialMoves', {}))
+
+
 def combos_only(cid, style, data):
     """Pacote que só recebe as correntes de combo (bloco combos.soCombos)."""
     path = A.ROOT / f'characters/{cid}/character.json'
@@ -625,6 +649,7 @@ def apply(cid, spec, base, combos_data):
         dmg = energy['damage'] if key == 'S' else m['damage']
         report.append(f"  {key:4} {dmg:5}  {m['startupFrames']:2}/{m['activeFrames']:2}/{m['recoveryFrames']:2}"
                       f"  {total / 60:.2f}s  cadência {cadence}")
+    prune_routes(pack)
     if 'SUPER' in hits and 'super' in fighter:
         striking_super(pack, hits['SUPER'], clips)
         a = fighter['super']['attack']

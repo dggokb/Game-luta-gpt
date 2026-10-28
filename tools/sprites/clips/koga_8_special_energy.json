@@ -6,43 +6,44 @@
   "output": "android/app/src/main/res/drawable-nodpi/koga_8_special_energy.webp",
   "report": "tools/sprites/reports/koga_8_special_energy.report.json",
   "preview": "android/app/build/sprite-review/koga_8_special_energy-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 62,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "s1.mp4",
     "personagem": "koga_8",
     "escala": 0.3,
-    "medida": "último quadro = inicio_centro (nota 0.98)",
-    "quadros": "4,14,23,32,39,50,64,76,87,98,109",
-    "celula": 224,
-    "largura": 224,
-    "raiz": "101,206",
-    "colunas": 9,
+    "motivo": "mesma escala dos outros vídeos do Kōga 8 anos (medida no idle)",
+    "quadros": "0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122",
+    "largura": 320,
+    "raiz": "103,232",
+    "colunas": 6,
+    "fixar": "video",
+    "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/koga_8_special_energy_video_normalized.png",
       "celula": [
-        224,
-        224
+        320,
+        256
       ],
       "raiz": [
-        101,
-        206
+        103,
+        232
       ],
       "colunas": 11
     }
   },
-  "frameWidth": 448,
-  "frameHeight": 448,
-  "rootX": 202,
-  "rootY": 412,
-  "pixelScale": 2.0,
+  "frameWidth": 640,
+  "rootX": 206,
+  "rootY": 464,
   "sourceReferences": [
     "art/sprites/source/koga_8_special_energy_video_normalized.png"
-  ]
+  ],
+  "frameHeight": 512,
+  "pixelScale": 2.0
 }

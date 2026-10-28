@@ -1,0 +1,109 @@
+{
+  "_doc": "Clipes do Kōga 8 anos com quadros escolhidos à mão (tools/sprites/montagem.py); o resto sai do personagem.py (tools/sprites/videos/koga_8.json). Vídeos na pasta koga_8 do Drive.",
+  "_opcoes": {
+    "escala": 0.3,
+    "motivo": "mesma escala dos outros vídeos do Kōga 8 anos (medida no idle)"
+  },
+  "dash": {
+    "_doc": "Corrida: um ciclo da passada (quadros 16-39, período de 24 quadros), em loop; cada quadro pelo corpo. O quadro troca a cada 26 px corridos (o ciclo toca ~2x mais rápido que o vídeo na velocidade do dash).",
+    "trechos": [
+      [
+        "dash",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "16-38/2",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false
+    },
+    "animacoes": {
+      "DASH": {
+        "distancia": 26,
+        "loop": true
+      }
+    }
+  },
+  "backdash": {
+    "_doc": "Backdash: o pulinho para trás inteiro, até a guarda (2-92 de 3 em 3).",
+    "trechos": [
+      [
+        "backDash",
+        0,
+        124
+      ]
+    ],
+    "quadros": "2-92/3",
+    "opcoes": {
+      "fixar": "registro"
+    },
+    "animacoes": {
+      "BACKDASH": {}
+    }
+  },
+  "special_energy": {
+    "_doc": "S1 (Fumacinha): o vídeo inteiro, carga, o tapa com o clarão (quadro 21), a fumacinha que não dá em nada e o ombro encolhido.",
+    "trechos": [
+      [
+        "s1",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0-122/2",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_ENERGY": {
+        "impacto": 21
+      }
+    }
+  },
+  "special_s2": {
+    "_doc": "S2 (Socos girando): o vídeo inteiro no tempo dele; o corpo fica no lugar na folha e quem anda é o motor (avanço do golpe), um acerto por soco.",
+    "trechos": [
+      [
+        "s2",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "0-122/2",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S2": {
+        "impacto": 8
+      }
+    }
+  },
+  "idle": {
+    "_doc": "Idle: o vídeo inteiro (respira, soca o ar e volta), de 2 em 2 (a folha HD cabe nos 4096 px das GPUs antigas), câmera fixa (pés plantados).",
+    "trechos": [
+      [
+        "idle",
+        0,
+        192
+      ]
+    ],
+    "quadros": "9-173/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "IDLE": {
+        "loop": true
+      },
+      "COMBAT": {
+        "frames": "0"
+      }
+    }
+  }
+}

@@ -6,9 +6,9 @@ final class GeneratedSpriteLayouts {
 
     static final int KOGA_8_BACKDASH_FRAME_WIDTH = 276;
     static final int KOGA_8_BACKDASH_FRAME_HEIGHT = 439;
-    static final int KOGA_8_BACKDASH_ROOT_X = 138;
+    static final int KOGA_8_BACKDASH_ROOT_X = 139;
     static final int KOGA_8_BACKDASH_ROOT_Y = 430;
-    static final int KOGA_8_BACKDASH_FRAME_COUNT = 10;
+    static final int KOGA_8_BACKDASH_FRAME_COUNT = 31;
 
     static final int KOGA_8_CROUCH_FRAME_WIDTH = 278;
     static final int KOGA_8_CROUCH_FRAME_HEIGHT = 348;
@@ -34,11 +34,11 @@ final class GeneratedSpriteLayouts {
     static final int KOGA_8_CROUCH_MEDIUM_ROOT_Y = 346;
     static final int KOGA_8_CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int KOGA_8_DASH_FRAME_WIDTH = 416;
-    static final int KOGA_8_DASH_FRAME_HEIGHT = 347;
-    static final int KOGA_8_DASH_ROOT_X = 256;
-    static final int KOGA_8_DASH_ROOT_Y = 337;
-    static final int KOGA_8_DASH_FRAME_COUNT = 6;
+    static final int KOGA_8_DASH_FRAME_WIDTH = 389;
+    static final int KOGA_8_DASH_FRAME_HEIGHT = 335;
+    static final int KOGA_8_DASH_ROOT_X = 158;
+    static final int KOGA_8_DASH_ROOT_Y = 333;
+    static final int KOGA_8_DASH_FRAME_COUNT = 12;
 
     static final int KOGA_8_DEFENSE_AIR_FRAME_WIDTH = 223;
     static final int KOGA_8_DEFENSE_AIR_FRAME_HEIGHT = 414;
@@ -102,9 +102,9 @@ final class GeneratedSpriteLayouts {
 
     static final int KOGA_8_IDLE_FRAME_WIDTH = 291;
     static final int KOGA_8_IDLE_FRAME_HEIGHT = 375;
-    static final int KOGA_8_IDLE_ROOT_X = 154;
+    static final int KOGA_8_IDLE_ROOT_X = 146;
     static final int KOGA_8_IDLE_ROOT_Y = 364;
-    static final int KOGA_8_IDLE_FRAME_COUNT = 166;
+    static final int KOGA_8_IDLE_FRAME_COUNT = 83;
 
     static final int KOGA_8_JUMP_FRAME_WIDTH = 275;
     static final int KOGA_8_JUMP_FRAME_HEIGHT = 424;
@@ -160,17 +160,17 @@ final class GeneratedSpriteLayouts {
     static final int KOGA_8_RISE_ROOT_Y = 364;
     static final int KOGA_8_RISE_FRAME_COUNT = 6;
 
-    static final int KOGA_8_SPECIAL_ENERGY_FRAME_WIDTH = 368;
-    static final int KOGA_8_SPECIAL_ENERGY_FRAME_HEIGHT = 358;
-    static final int KOGA_8_SPECIAL_ENERGY_ROOT_X = 163;
-    static final int KOGA_8_SPECIAL_ENERGY_ROOT_Y = 349;
-    static final int KOGA_8_SPECIAL_ENERGY_FRAME_COUNT = 11;
+    static final int KOGA_8_SPECIAL_ENERGY_FRAME_WIDTH = 575;
+    static final int KOGA_8_SPECIAL_ENERGY_FRAME_HEIGHT = 475;
+    static final int KOGA_8_SPECIAL_ENERGY_ROOT_X = 173;
+    static final int KOGA_8_SPECIAL_ENERGY_ROOT_Y = 446;
+    static final int KOGA_8_SPECIAL_ENERGY_FRAME_COUNT = 62;
 
-    static final int KOGA_8_SPECIAL_S2_FRAME_WIDTH = 577;
-    static final int KOGA_8_SPECIAL_S2_FRAME_HEIGHT = 372;
-    static final int KOGA_8_SPECIAL_S2_ROOT_X = 139;
-    static final int KOGA_8_SPECIAL_S2_ROOT_Y = 361;
-    static final int KOGA_8_SPECIAL_S2_FRAME_COUNT = 20;
+    static final int KOGA_8_SPECIAL_S2_FRAME_WIDTH = 399;
+    static final int KOGA_8_SPECIAL_S2_FRAME_HEIGHT = 380;
+    static final int KOGA_8_SPECIAL_S2_ROOT_X = 187;
+    static final int KOGA_8_SPECIAL_S2_ROOT_Y = 364;
+    static final int KOGA_8_SPECIAL_S2_FRAME_COUNT = 62;
 
     static final int KOGA_8_TAUNT_FRAME_WIDTH = 287;
     static final int KOGA_8_TAUNT_FRAME_HEIGHT = 389;

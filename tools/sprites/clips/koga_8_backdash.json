@@ -6,20 +6,20 @@
   "output": "android/app/src/main/res/drawable-nodpi/koga_8_backdash.webp",
   "report": "tools/sprites/reports/koga_8_backdash.report.json",
   "preview": "android/app/build/sprite-review/koga_8_backdash-import.png",
-  "expectedFrames": 10,
+  "expectedFrames": 31,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 11,
   "rootMode": "authored",
   "sourceNote": "koga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
     "arquivo": "backDash.mp4",
     "personagem": "koga_8",
     "escala": 0.3,
-    "medida": "último quadro = inicio_centro (nota 0.98)",
-    "quadros": "0,14,27,41,55,68,82,96,109,123",
+    "motivo": "mesma escala dos outros vídeos do Kōga 8 anos (medida no idle)",
+    "quadros": "2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,74,77,80,83,86,89,92",
     "largura": 160,
     "raiz": "80,238",
-    "colunas": 10,
+    "colunas": 11,
     "fixar": "registro",
     "limpar_chao": true,
     "densidade": 2,
@@ -34,15 +34,15 @@
         80,
         238
       ],
-      "colunas": 10
+      "colunas": 11
     }
   },
   "frameWidth": 320,
   "rootX": 160,
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/koga_8_backdash_video_normalized.png"
-  ]
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }
