@@ -510,6 +510,12 @@ final class CombatConfig {
     int assistCooldownFrames = 240;
     /** After Assist → Tag: neither another assist nor a raw tag for this long. */
     int assistTagCooldownFrames = 300;
+    /**
+     * Assist → Tag pedido com o titular preso (apanhando, defendendo, caído) quando o golpe do
+     * assist acaba: o parceiro espera até 0,6 s e a troca sai assim que o titular se soltar; senão
+     * cai, avisada (docs/balanco/ajustes.md, etapa 3).
+     */
+    int assistTagBufferFrames = 36;
 
     // Batalha 2x2 (BattleFlow): o titular caído fica no chão um pouco e o parceiro entra.
     /** Frames do titular caído no chão antes do parceiro entrar. */

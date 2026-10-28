@@ -13,6 +13,11 @@ final class TeamSystem {
     /** Quem entra vem numa voadora (VoadoraTroca), lutando de verdade até ela acabar. */
     static final int TAG_KICK = 4;
     static final int ASSIST_NONE = 0, ASSIST_ENTER = 1, ASSIST_ATTACK = 2, ASSIST_LEAVE = 3;
+    /**
+     * O golpe do assist acabou com a troca pedida, mas o titular ainda não pode sair (apanhando,
+     * defendendo, caído): o parceiro fica parado esperando até {@link CombatConfig#assistTagBufferFrames}.
+     */
+    static final int ASSIST_WAIT = 4;
 
     /** One side's team. */
     static final class Side {
@@ -39,6 +44,12 @@ final class TeamSystem {
         float assistFromX, assistToX;
         /** TAG pressed again during the assist: it stays as the new point. */
         boolean convert;
+        /**
+         * O último Assist → Tag que não saiu e por quê ("APANHANDO", "DEFENDENDO", "CAÍDO"...), e o
+         * quadro (do time) em que a troca pedida saiu ou caiu: o HUD avisa.
+         */
+        String convertFailReason;
+        int convertResult;
 
         // Former point running off after an Assist → Tag (visual only, no hurtbox).
         FighterState leaving;
@@ -71,9 +82,17 @@ final class TeamSystem {
 
         boolean assistOut() { return assistPhase != ASSIST_NONE; }
 
-        /** Assist → Tag can still be asked for (the assist has not finished its move). */
+        /**
+         * Assist → Tag can still be asked for: while the assist comes in, attacks and runs off
+         * (the run off counts: the press near the end of the assist is not lost).
+         */
         boolean conversionOpen() {
-            return (assistPhase == ASSIST_ENTER || assistPhase == ASSIST_ATTACK) && !convert;
+            return (assistPhase == ASSIST_ENTER || assistPhase == ASSIST_ATTACK || assistPhase == ASSIST_LEAVE) && !convert;
+        }
+
+        /** TAG pressed during the assist and the swap has not happened yet. */
+        boolean conversionPending() {
+            return convert && assistPhase != ASSIST_NONE;
         }
     }
 
@@ -193,7 +212,14 @@ final class TeamSystem {
         } else if (s.assistRequestAge >= 0) {
             if (s.conversionOpen()) {
                 s.convert = true;
+                s.convertFailReason = null;
                 s.assistRequestAge = -1;
+                if (s.assistPhase == ASSIST_LEAVE) {
+                    // Já correndo para fora: para onde está e espera a troca.
+                    s.assistPhase = ASSIST_WAIT;
+                    s.assistFrame = 0;
+                    s.assistToX = s.assist.x;
+                }
             } else if (canAssist(s, point)) {
                 startAssist(s, point, opponent);
                 s.assistRequestAge = -1;
@@ -406,11 +432,30 @@ final class TeamSystem {
                 engine.spawnAssistProjectile(a);
             }
             if (a.attackFrame >= a.attack.totalFrames - 1) {
-                if (s.convert && engine.convertAssist(s, point)) return;
+                if (s.convert && engine.convertAssist(s, point)) {
+                    s.convertResult = 1;
+                    return;
+                }
                 a.status = CombatFighter.Status.NEUTRAL;
                 a.clearAttack();
+                // Troca pedida com o titular ainda preso: o parceiro espera um pouco antes de ir.
+                s.assistPhase = s.convert ? ASSIST_WAIT : ASSIST_LEAVE;
+                s.assistFrame = 0;
+                s.assistToX = a.x;
+            }
+        } else if (s.assistPhase == ASSIST_WAIT) {
+            if (engine.convertAssist(s, point)) {
+                s.convertResult = 1;
+                return;
+            }
+            if (s.assistFrame >= config.assistTagBufferFrames) {
+                // Não deu: a troca cai, avisada, e o parceiro sai correndo.
+                s.convert = false;
+                s.convertFailReason = whyNoSwap(point);
+                s.convertResult = -1;
                 s.assistPhase = ASSIST_LEAVE;
                 s.assistFrame = 0;
+                s.assistToX = a.x;
             }
         } else if (s.assistPhase == ASSIST_LEAVE) {
             float t = Math.min(1f, s.assistFrame / (float)config.assistLeaveFrames);
@@ -444,6 +489,18 @@ final class TeamSystem {
         s.leavingFrame = 0;
         s.point = (s.point + 1) % s.members.length;
         handMeter(s.leaving, s.pointState());
+    }
+
+    /** Por que o titular não pôde sair para a troca (o aviso do HUD). */
+    static String whyNoSwap(CombatFighter point) {
+        if (point.ko()) return "NOCAUTE";
+        switch (point.status) {
+            case HITSTUN: case AIR_HITSTUN: return "APANHANDO";
+            case BLOCKSTUN: return "DEFENDENDO";
+            case KNOCKDOWN: case WAKEUP: return "CAÍDO";
+            case ULTRA: return "NO ULTRA";
+            default: return "OCUPADO";
+        }
     }
 
     /** Assist → Tag, called by the engine once the assist's move ended. */

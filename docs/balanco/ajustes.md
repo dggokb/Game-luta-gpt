@@ -8,7 +8,7 @@ Como ler os números:
 - **Lutas 2x2 por personagem:** são ~75 lutas por personagem, com ruído de ±8 pontos. Diferença
   menor que isso não é efeito da mudança.
 - **1x1 (contra o elenco):** tem ruído de ±3 pontos.
-- **Comparações de regras** (sempre × nunca, Clash): têm ruído de ±4 pontos.
+- **Comparações de regras** (sempre × nunca, Clash): têm ruído de ±5 pontos. Entre as etapas 2 e 3, que não mexeram no Breaker, "sempre quebra" foi de 56% para 61%.
 - **A CPU joga dos dois lados.** O teste com jogadores continua necessário, como pede a auditoria.
 
 Para rodar:
@@ -144,3 +144,53 @@ o contra-ataque automático garantido; corrigir a decisão tardia da CPU.
   vale ver no aparelho se o anel do pulso deixa o ritmo claro.
 - **SPEED a 12 toques/s:** passa todos (444 por segundo). É a habilidade de bater rápido, como o
   documento do Clash descreve; não mexi.
+
+## Etapa 3 — TAG depois da assistência (P0)
+
+**Decisão:**
+- Sem troca instantânea universal.
+- Buffer de 0,6 s quando o assist está terminando.
+- Estados visuais de pedido pendente, execução e falha, e indicador de recarga.
+- Manter as restrições de atordoamento e defesa e avisar quando a troca cai.
+
+**Arquivos:**
+- `android/app/src/main/java/com/gamelutagpt/TeamSystem.java`:
+  - nova fase `ASSIST_WAIT`: o golpe do assist acaba com a troca pedida e o titular preso, então o
+    parceiro espera parado até `assistTagBufferFrames` e a troca sai quando o titular se soltar;
+  - `conversionOpen` passa a aceitar o TAG também enquanto o assist volta correndo;
+  - `conversionPending`, `convertResult`, `convertFailReason` e `whyNoSwap` dão o motivo da queda.
+- `CombatConfig.java`: `assistTagBufferFrames` = 36 (0,6 s).
+- `GameView.java`:
+  - `updateTagCooldownLabels`: texto "TROCA PEDIDA…" ou "TROCA: ESPERANDO VOCÊ SE SOLTAR", e o botão
+    mostra "…";
+  - `announceConversion`: avisa "TROCA!" ou "TROCA CANCELADA: APANHANDO / DEFENDENDO / CAÍDO";
+  - o texto também passou a atualizar quando só o estado do pedido muda.
+- `HudRenderer.java`, `cooldownArc`: um arco em volta do botão TAG mostra a recarga.
+- `docs/combat-engine.md`: tabela do TAG.
+- Testes: `TeamSystemTest`:
+  - a troca recusada agora espera e cai com o motivo;
+  - novos: a troca espera o titular se soltar, e o TAG com o assist já voltando.
+
+**Antes/depois (mesmas sementes; o "antes" é o código depois da etapa 2):**
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| tag.janela_quadros | 33 | 43 | +10 |
+| tag.latencia_tag_cedo | 33 | 33 | +0 |
+| tag.falha_com_rival_batendo | 31% | 0% | -31 pts |
+| tag.cpu_pedidos | 2044 | 1961 | -83 |
+| tag.cpu_perdidos | 22% | 8% | -14 pts |
+
+- `janela_quadros`: até quantos quadros depois de chamar o assist o TAG ainda vira troca.
+- `latencia_tag_cedo`: TAG apertado 1 quadro depois do assist, quadros até o parceiro agir.
+- `falha_com_rival_batendo`: pedidos aceitos que não viraram troca, com a CPU nível 8 batendo.
+- `cpu_perdidos`: o mesmo nas lutas CPU × CPU.
+
+**Resultado:**
+- **A troca que sumia sem aviso** com o rival batendo caiu de 31% para 0%. Nas lutas da CPU, de 22%
+  para 8%; os 8% que sobram ficaram presos mais de 0,6 s e agora aparecem como "TROCA CANCELADA".
+- **A janela** para pedir passou de 33 para 43 quadros.
+- **O tempo de quem aperta cedo** continua 33 quadros, porque a troca sai quando o golpe do assist
+  acaba, como decidido; o "TROCA PEDIDA…" mostra que o aperto foi aceito.
+- **Não testado no aparelho:** as mudanças de HUD (texto, "…", aviso e arco) passaram nos testes do
+  motor, mas não foram vistas no celular.

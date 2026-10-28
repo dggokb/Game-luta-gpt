@@ -859,7 +859,7 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
 | Comando | O que faz |
 | --- | --- |
 | **TAG** | Chama o parceiro como **assist**: ele entra correndo atrás do ponto (`assistBehind` 70 px, 8 frames), faz o golpe que o pack declara (`fighter.assist.move`) e sai (10 frames). Recarga de 240 frames (4 s). |
-| **TAG de novo** enquanto o assist entra ou golpeia | **Assist → Tag**: quando o golpe do assist termina, ele fica como o novo ponto onde está e o antigo sai correndo. O combo continua com o novo ponto. Recusado (o assist só sai) se o ponto estiver apanhando, defendendo, caído ou no ultra. Depois: 300 frames sem assist nem troca. |
+| **TAG de novo** enquanto o assist entra, golpeia ou já volta correndo | **Assist → Tag**: quando o golpe do assist termina, ele fica como o novo ponto onde está e o antigo sai correndo. O combo continua com o novo ponto. Se o ponto estiver apanhando, defendendo, caído ou no ultra nessa hora, o parceiro **espera parado** até `assistTagBufferFrames` (36, 0,6 s) e a troca sai assim que o ponto se soltar; senão cai. O HUD mostra o pedido ("TROCA PEDIDA", "ESPERANDO VOCÊ SE SOLTAR"), a troca ("TROCA!") e a queda com o motivo ("TROCA CANCELADA: APANHANDO"); o botão TAG mostra "…" com o pedido no ar e um arco com a recarga. Depois: 300 frames sem assist nem troca (docs/balanco/ajustes.md, etapa 3). |
 | **↓ + TAG** | **Troca direta com voadora** (como no Marvel vs. Capcom): o ponto sai correndo (20 frames) e o parceiro entra pelo alto numa voadora até o rival (`VoadoraTroca`). Só em NEUTRAL. Recarga de 600 frames (10 s), contada quando a voadora acaba. |
 
 - Os botões são lidos sem precisar segurar: tocar e segurar se confundiriam e atrasariam o

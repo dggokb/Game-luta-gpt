@@ -191,6 +191,7 @@ public class TeamSystemTest {
         m.until(() -> m.team().leaving == null, m.config().assistLeaveFrames + 2);
     }
 
+    /** Preso por mais de 0,6 s depois do golpe do assist: a troca cai, avisada com o motivo. */
     @Test public void assistToTagIsRefusedWhileThePointIsBeingHit() {
         Match m = new Match(500f, 600f);
         m.assist();
@@ -198,8 +199,38 @@ public class TeamSystemTest {
         m.assist();
         m.f(0).status = CombatFighter.Status.HITSTUN;
         m.f(0).stunLeft = m.f(0).stunTotal = 200;
-        m.until(() -> m.team().assistPhase == TeamSystem.ASSIST_LEAVE, 120);
+        m.until(() -> m.team().assistPhase == TeamSystem.ASSIST_WAIT, 120);
+        assertTrue("pending while it waits", m.team().conversionPending());
+        m.until(() -> m.team().assistPhase == TeamSystem.ASSIST_LEAVE, m.config().assistTagBufferFrames + 2);
         assertSame("no tag: the assist just leaves", m.first, m.f(0).state);
+        assertEquals(-1, m.team().convertResult);
+        assertEquals("APANHANDO", m.team().convertFailReason);
+    }
+
+    /** Preso só um pouco quando o golpe do assist acaba: o parceiro espera e a troca sai. */
+    @Test public void assistToTagWaitsForThePointToGetFree() {
+        Match m = new Match(500f, 600f);
+        m.assist();
+        m.steps(2);
+        m.assist();
+        m.until(() -> m.team().assist.attacking() && m.team().assist.attackFrame >= m.team().assist.attack.totalFrames - 2, 120);
+        m.f(0).status = CombatFighter.Status.BLOCKSTUN;
+        m.f(0).stunLeft = m.f(0).stunTotal = 12;
+        m.until(() -> m.team().assistPhase == TeamSystem.ASSIST_WAIT, 10);
+        m.until(() -> m.f(0).state == m.second, m.config().assistTagBufferFrames);
+        assertEquals(1, m.team().convertResult);
+    }
+
+    /** O TAG apertado com o assist já voltando (o golpe acabou) ainda vira troca. */
+    @Test public void assistToTagStillWorksWhileTheAssistRunsOff() {
+        Match m = new Match(500f, 600f);
+        m.assist();
+        m.until(() -> m.team().assistPhase == TeamSystem.ASSIST_LEAVE, 120);
+        m.steps(3);
+        assertTrue(m.team().conversionOpen());
+        m.assist();
+        assertSame("com o titular livre, troca na hora", m.second, m.f(0).state);
+        assertEquals(1, m.team().convertResult);
     }
 
     @Test public void noAssistDuringRawTagOrUltraAndNoTeamForTheDummy() {

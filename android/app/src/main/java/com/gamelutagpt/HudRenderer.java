@@ -1413,8 +1413,21 @@ final class HudRenderer {
         int reserveColor = s.reserve().profile.color | 0xFF000000;
         button(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor, pressed, enabled);
         if (enabled && !pressed) readyHalo(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor);
+        else if (!enabled) cooldownArc(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor, s.tagReadyRatio());
         label(c, enabled ? s.tagButtonTitle() : s.tagButtonLabel(), TAG_X, TAG_Y, enabled ? 18f : 15f,
             enabled ? Color.WHITE : 0xFFB4BCCB);
+    }
+
+    /** O quanto a recarga já andou: um arco que fecha em volta do botão (vazio = acabou de usar). */
+    private void cooldownArc(Canvas c, float x, float y, float r, int color, float ratio) {
+        if (ratio <= 0f || ratio >= 1f) return;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4f);
+        paint.setColor(color);
+        paint.setAlpha(170);
+        c.drawArc(x - r - 6f, y - r - 6f, x + r + 6f, y + r + 6f, -90f, 360f * ratio, false, paint);
+        paint.setAlpha(255);
+        paint.setStyle(Paint.Style.FILL);
     }
 
     /** Slowly rotating arc that tells a button is ready to use. */

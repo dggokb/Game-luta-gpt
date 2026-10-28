@@ -372,6 +372,8 @@ public class GameView extends SurfaceView
     private String tagCooldownButtonLabel = "";
     private int shownAssistTenths = -2;
     private int shownTagSeconds = -2;
+    /** Estado do Assist → Tag mostrado (0 nada, 1 pode pedir, 2 pedida, 3 esperando o titular se soltar). */
+    private int shownConversion = -1;
     private int shownPoint = 0;
     /** Partner on screen: the assist, or the former point running off after Assist → Tag. */
     private SpriteFighterRenderer partnerSpriteRenderer;
@@ -1837,6 +1839,7 @@ public class GameView extends SurfaceView
             impacts.spawn(ImpactEffects.GUARD, p[0], Arena.GROUND_Y - 20f, p[1] >= 0f ? 1 : -1, ImpactEffects.SPECIAL, 0xFF8A8F98);
             beamShake = Math.max(beamShake, 5f);
         }
+        announceConversion(engine.team(PLAYER));
         for (String cue : engine.cues()) {
             String banner = bannerFor(cue);
             if ("SHINKAI".equals(cue)) banner = spawnShinkai();
@@ -3072,18 +3075,32 @@ public class GameView extends SurfaceView
         if (isTagAnimationActive()) {
             tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
             tagCooldownButtonLabel = "...";
-            shownAssistTenths = shownTagSeconds = -2;
+            shownAssistTenths = shownTagSeconds = shownConversion = -2;
             return;
         }
-        if (assistTenths == shownAssistTenths && tagSeconds == shownTagSeconds) return;
+        int conversion = !team.assistOut() ? 0 : team.assistPhase == TeamSystem.ASSIST_WAIT ? 3
+            : team.conversionPending() ? 2 : team.conversionOpen() ? 1 : 0;
+        if (assistTenths == shownAssistTenths && tagSeconds == shownTagSeconds && conversion == shownConversion) return;
         shownAssistTenths = assistTenths;
         shownTagSeconds = tagSeconds;
-        String assist = assistTenths < 0 ? (team.conversionOpen() ? "ASSIST: TAG p/ TROCAR" : "ASSIST: EM CAMPO")
+        shownConversion = conversion;
+        // O pedido de troca no assist tem estado à vista: pedida, esperando o titular se soltar.
+        String assist = conversion == 3 ? "TROCA: ESPERANDO VOCÊ SE SOLTAR"
+            : conversion == 2 ? "TROCA PEDIDA: SAI QUANDO O ASSIST ACABAR"
+            : assistTenths < 0 ? (conversion == 1 ? "ASSIST: TAG p/ TROCAR" : "ASSIST: EM CAMPO")
             : assistTenths == 0 ? "ASSIST: PRONTO"
             : String.format(Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
         String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
         tagCooldownHudLabel = assist + tag;
-        tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
+        tagCooldownButtonLabel = conversion >= 2 ? "\u2026" : assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
+    }
+
+    /** A troca pedida no assist saiu ("TROCA!") ou caiu (avisada, com o motivo). */
+    private void announceConversion(TeamSystem.Side team) {
+        if (team.convertResult == 0) return;
+        if (team.convertResult > 0) showBanner("TROCA!");
+        else showBanner("TROCA CANCELADA: " + (team.convertFailReason != null ? team.convertFailReason : "OCUPADO"));
+        team.convertResult = 0;
     }
 
     /** A IA ligada é o modo batalha (2x2, derrota quando a dupla cai); desligada, o treino. */
