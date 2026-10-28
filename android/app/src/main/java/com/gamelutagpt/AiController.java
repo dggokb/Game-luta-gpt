@@ -859,38 +859,68 @@ final class AiController {
     private boolean breakerCombo;
 
     /**
-     * SHINKAI Clash: empurra do jeito do tipo dela, mais rápido e mais certeiro nos níveis altos
-     * (no nível 8, mais ou menos o ritmo de quem bate rápido com o dedo).
+     * SHINKAI Clash: empurra do jeito do tipo dela, mas com a mesma média de empurrão por quadro em
+     * todos os tipos ({@link #clashRate}): quem vence é o acaso e o nível, não o tipo (antes a
+     * TECHNIQUE da CPU vencia 98% dos confrontos e o POWER 9%; docs/balanco/ajustes.md, etapa 2).
      */
     private void pushInClash(ShinkaiClash c, int self, FighterInput out) {
         if (!c.disputando()) return;
-        int n = level.number;
+        if (c != clashSorteado) {
+            // Cada confronto tem o fôlego dele (±15%): quem vence entre duas CPUs do mesmo nível é
+            // o acaso, não a forma de empurrar de cada tipo.
+            clashSorteado = c;
+            clashFolego = 0.85 + 0.3 * reactRandom.nextDouble();
+        }
+        double taxa = clashRate(level.number) * clashFolego;
         switch (c.tipo[self]) {
             case POWER:
-                if (c.espera[self] == 0 && reactRandom.nextDouble() < 0.05 + 0.015 * n) out.heavy = true;
+                // H (58) a cada espera de 12 e um respiro sorteado: 58 / (12 + 1/p) = taxa.
+                if (c.espera[self] == 0 && roll(1.0 / Math.max(1.0, 58.0 / taxa - 12.0))) out.heavy = true;
                 break;
             case SPEED:
-                if (reactRandom.nextDouble() < 0.03 + 0.012 * n) out.light = true;
+                // L (36) a cada espera de 3 e um respiro: 36 / (3,3 + 1/p) = taxa (medido: ela vê a
+                // espera acabar um pouco depois).
+                if (c.espera[self] == 0 && roll(1.0 / Math.max(1.0, 36.0 / taxa - 3.3))) out.light = true;
                 break;
-            case ENERGY:
-                // Segura até a carga que o nível aguenta e solta.
-                if (clashHold == 0) clashHold = Math.min(ShinkaiClash.CARGA_MAX, 30 + 5 * n);
+            case ENERGY: {
+                // Segura uma carga C e solta: C² / 16 em C + 1 quadros ≈ taxa com C = 16 taxa + 1, um
+                // pouco mais porque a carga que não termina no fim do tempo se perde (sorteada ±10%).
+                if (clashHold == 0) {
+                    double carga = (16.0 * taxa * 1.12 + 1.0) * (0.9 + 0.2 * reactRandom.nextDouble());
+                    clashHold = (int)Math.max(8, Math.min(ShinkaiClash.CARGA_MAX, Math.round(carga)));
+                }
                 if (c.carga[self] < clashHold) {
                     out.holding = true;
                 } else {
                     clashHold = 0;
                 }
                 break;
+            }
             case TECHNIQUE:
             default: {
+                // Só no pulso (105 a cada 24 quadros), com duas chances por pulso: acerta o pulso
+                // com chance q = taxa · 24 / 105.
                 int fase = c.fase();
                 boolean pulso = fase == 0 || fase == ShinkaiClash.BATIDA - 1;
-                if (pulso && !c.batidaUsada[self] && reactRandom.nextDouble() < 0.25 + 0.08 * n) out.medium = true;
-                else if (reactRandom.nextDouble() < 0.01) out.medium = true;
+                double q = Math.min(1.0, taxa * ShinkaiClash.BATIDA / 105.0);
+                double porTentativa = 1.0 - Math.sqrt(1.0 - q);
+                if (pulso && !c.batidaUsada[self] && roll(porTentativa)) out.medium = true;
                 break;
             }
         }
     }
+
+    /**
+     * Empurrão médio por quadro da CPU no SHINKAI Clash, o mesmo em todos os tipos (1,9 no nível
+     * 1, 3,8 no 8: o ENERGY chega nisso com a carga cheia de 70 quadros, o teto dele).
+     */
+    static double clashRate(int level) {
+        return 1.9 + 0.27 * (level - 1);
+    }
+
+    /** O confronto em que o fôlego foi sorteado, e o fôlego (multiplica a taxa de empurrão). */
+    private ShinkaiClash clashSorteado;
+    private double clashFolego = 1.0;
 
     /** SHINKAI Clash (ENERGY): até onde ela segura a carga desta vez. */
     private int clashHold;

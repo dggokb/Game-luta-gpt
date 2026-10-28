@@ -8,9 +8,9 @@ package com.gamelutagpt;
  *   <li>POWER: força bruta, o H empurra muito (mas tem fôlego entre um e outro), o L pouco;</li>
  *   <li>SPEED: velocidade, o L empurra bem e quase sem espera (bater rápido);</li>
  *   <li>ENERGY: alimentar o raio, segurar um botão carrega e soltar empurra (quanto mais tempo,
- *       muito mais forte), e enquanto segura não empurra;</li>
- *   <li>TECHNIQUE: ritmo, um pulso a cada {@link #BATIDA} quadros; apertar no pulso empurra muito,
- *       fora dele quase nada.</li>
+ *       muito mais forte), e enquanto segura não empurra; o toque curto empurra {@link #TOQUE_ENERGY};</li>
+ *   <li>TECHNIQUE: ritmo, um pulso a cada {@link #BATIDA} quadros; vale só o primeiro toque de cada
+ *       pulso: no pulso empurra muito, fora dele quase nada (esmurrar o botão não acha o ritmo).</li>
  * </ul>
  * Segurar trás desiste: sai sem dano, mas perde o SHINKAI. Quem leva a marca até o fim
  * ({@link #META}), ou está na frente quando o tempo acaba, ganha: o golpe dele entra forte, o
@@ -22,8 +22,16 @@ final class ShinkaiClash {
     static final int META = 600;
     /** Quadros de disputa (5 s), depois da entrada. */
     static final int DURACAO = 300;
-    /** O pulso da TECHNIQUE e a janela em volta dele que vale como "no ritmo". */
-    static final int BATIDA = 24, JANELA_BATIDA = 4;
+    /**
+     * O pulso da TECHNIQUE e a janela em volta dele que vale como "no ritmo" (era 4 para cada lado:
+     * 9 de 24 quadros, e toque a esmo caía nela; docs/balanco/ajustes.md, etapa 2).
+     */
+    static final int BATIDA = 24, JANELA_BATIDA = 2;
+    /**
+     * ENERGY: o toque curto (no celular o dedo fica uns quadros no botão, que carrega um pouco)
+     * empurra pelo menos isto. Tocando 12 vezes por segundo ainda fica abaixo de segurar e soltar.
+     */
+    static final int TOQUE_ENERGY = 20;
     /** Quadros segurando trás para desistir. */
     static final int DESISTIR = 30;
     /** A carga máxima do ENERGY. */
@@ -44,7 +52,7 @@ final class ShinkaiClash {
     final int[] espera = new int[2];
     /** ENERGY: quadros segurando. */
     final int[] carga = new int[2];
-    /** TECHNIQUE: este pulso já foi usado. */
+    /** TECHNIQUE: o toque deste pulso já foi usado. */
     final boolean[] batidaUsada = new boolean[2];
     /** Quadros seguidos segurando trás. */
     final int[] recuo = new int[2];
@@ -145,22 +153,21 @@ final class ShinkaiClash {
                     // Soltou: o raio cresce muito mais do que o tempo segurando.
                     int c = carga[i];
                     carga[i] = 0;
-                    return Math.max(8, c * c / 16);
+                    return Math.max(TOQUE_ENERGY, c * c / 16);
                 }
-                // Toque sem segurar (teclado sem "segurando"): um empurrãozinho.
-                return aperto ? 14 : 0;
+                // Toque sem segurar (teclado sem "segurando"): o mesmo empurrão do toque curto.
+                return aperto ? TOQUE_ENERGY : 0;
             }
             case TECHNIQUE:
             default: {
                 int fase = fase();
                 boolean noPulso = fase <= JANELA_BATIDA || fase >= BATIDA - JANELA_BATIDA;
                 if (fase == BATIDA / 2) batidaUsada[i] = false;
-                if (!aperto) return 0;
-                if (noPulso && !batidaUsada[i]) {
-                    batidaUsada[i] = true;
-                    return 105;
-                }
-                return 10;
+                // Um toque por pulso: o primeiro decide (no pulso, muito; fora, quase nada), os
+                // outros até o meio do caminho para o próximo pulso não contam.
+                if (!aperto || batidaUsada[i]) return 0;
+                batidaUsada[i] = true;
+                return noPulso ? 105 : 10;
             }
         }
     }

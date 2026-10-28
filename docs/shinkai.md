@@ -100,8 +100,8 @@ Clash**: um cabo de guerra jogável no meio da tela, sem QTE (`ShinkaiClash` no 
   |---|---|
   | POWER | força: o **H** empurra muito (58), mas tem fôlego de 12 quadros; o M menos, o L pouco |
   | SPEED | velocidade: o **L** empurra bem (36) quase sem espera — bater rápido |
-  | ENERGY | alimentar o raio: **segurar** um botão carrega (até 70 quadros) e **soltar** empurra; a carga cheia vale muito mais que várias curtas (carga²/16), e enquanto segura não empurra |
-  | TECHNIQUE | ritmo: um pulso a cada 24 quadros (o anel que fecha no corpo); apertar **no pulso** empurra muito (105), fora dele quase nada |
+  | ENERGY | alimentar o raio: **segurar** um botão carrega (até 70 quadros) e **soltar** empurra; a carga cheia vale muito mais que várias curtas (carga²/16), e enquanto segura não empurra. O toque curto empurra pelo menos 20 (`ShinkaiClash.TOQUE_ENERGY`; no celular o dedo fica uns quadros no botão e o toque empurrava só 8) |
+  | TECHNIQUE | ritmo: um pulso a cada 24 quadros (o anel que fecha no corpo); **vale só o primeiro toque de cada pulso**: no pulso (2 quadros para cada lado) empurra muito (105), fora dele quase nada (10). Esmurrar o botão não acha mais o ritmo (a janela era de 4 para cada lado e o toque a esmo empurrava mais que o ritmo certo) |
 
   Bem jogados, os quatro empurram parecido (uns 4–5 por quadro); o que muda é o jeito.
 - **Desistir.** Segurar **trás** por meio segundo sai do confronto **sem dano**, mas **perde o
@@ -119,8 +119,10 @@ Clash**: um cabo de guerra jogável no meio da tela, sem QTE (`ShinkaiClash` no 
   o tempo acabando. As poses: POWER e TECHNIQUE no H, SPEED trocando L, M e H a cada empurrão,
   ENERGY no disparo da energia. O fim estoura no encontro na cor de quem venceu, com câmera lenta.
 - **CPU.** Com a barra cheia e o jogador no SHINKAI, às vezes responde e começa o confronto
-  (`SHINKAI_ANSWER_CHANCE`). No confronto ela empurra do jeito do tipo dela, mais rápida e certeira
-  nos níveis altos.
+  (`SHINKAI_ANSWER_CHANCE`). No confronto ela empurra do jeito do tipo dela, mas com a **mesma
+  média de empurrão por quadro em todos os tipos** (`AiController.clashRate`: 2,0 no nível 1,
+  4,1 no 8); o acaso e o nível decidem, não o tipo. Antes a TECHNIQUE da CPU vencia 98% dos
+  confrontos e o POWER 9% (docs/balanco/ajustes.md, etapa 2).
 
 ## CPU
 

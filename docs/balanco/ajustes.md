@@ -77,3 +77,70 @@ o contra-ataque automático garantido; corrigir a decisão tardia da CPU.
 | B. Manter 20 e empurrar mais (170 → ~320) | Só a corrida alcança e chega tarde | Mais espaço de tela entre os dois |
 | C. Manter como está | Fica um L de troco quase garantido (~550 de dano médio) | Quebrar continua forte |
 
+
+## Etapa 2 — SHINKAI Clash (P0)
+
+**Decisão:**
+- **CPU:** a eficácia das entradas fica igual entre os tipos.
+- **TECHNIQUE:** a janela do pulso cai pela metade e só um toque vale por pulso.
+- **ENERGY:** os toques passam a empurrar, e segurar continua valendo mais.
+
+**Arquivos:**
+- `android/app/src/main/java/com/gamelutagpt/ShinkaiClash.java`:
+  - `JANELA_BATIDA` 4 → 2 (de 9 para 5 dos 24 quadros);
+  - TECHNIQUE: o primeiro toque de cada pulso decide (105 no pulso, 10 fora) e os outros não
+    contam;
+  - ENERGY: toque curto, ou soltar uma carga pequena, empurra pelo menos `TOQUE_ENERGY` = 20 (antes
+    8 no celular, 14 no teclado).
+- `android/app/src/main/java/com/gamelutagpt/AiController.java`, `pushInClash` e `clashRate`:
+  - todos os tipos miram o mesmo empurrão médio por quadro: 1,9 no nível 1 e 3,8 no 8 (o teto do
+    ENERGY com a carga cheia);
+  - cada confronto sorteia um fôlego de ±15% por CPU.
+- `docs/shinkai.md`: tabela do Clash e parágrafo da CPU.
+- Testes: `ShinkaiClashTest`:
+  - `techniquePushesOnTheBeat` passa a apertar fora do pulso no pulso anterior;
+  - novos: esmurrar perde para o ritmo, toque do ENERGY e média igual da CPU em todos os tipos.
+
+**Antes/depois (mesmas sementes; o "antes" é o código depois da etapa 1):**
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| clash.cpu_vence.POWER | 9% | 47% | +37 pts |
+| clash.cpu_vence.SPEED | 29% | 49% | +20 pts |
+| clash.cpu_vence.ENERGY | 59% | 40% | -19 pts |
+| clash.cpu_vence.TECHNIQUE | 98% | 55% | -43 pts |
+| clash.tela.POWER.8toques_s | 238 | 238 | +0 |
+| clash.tela.POWER.12toques_s | 238 | 238 | +0 |
+| clash.tela.POWER.melhor_jeito | 238 | 238 | +0 |
+| clash.tela.SPEED.8toques_s | 298 | 298 | +0 |
+| clash.tela.SPEED.12toques_s | 444 | 444 | +0 |
+| clash.tela.SPEED.melhor_jeito | 298 | 298 | +0 |
+| clash.tela.ENERGY.8toques_s | 64 | 162 | +98 |
+| clash.tela.ENERGY.12toques_s | 96 | 242 | +146 |
+| clash.tela.ENERGY.melhor_jeito | 254 | 254 | +0 |
+| clash.tela.TECHNIQUE.8toques_s | 364 | 45 | -319 |
+| clash.tela.TECHNIQUE.12toques_s | 375 | 45 | -330 |
+| clash.tela.TECHNIQUE.melhor_jeito | 250 | 250 | +0 |
+| shinkai.2x2_vence.POWER | 37% | 51% | +14 pts |
+| shinkai.2x2_vence.SPEED | 47% | 52% | +5 pts |
+| shinkai.2x2_vence.ENERGY | 54% | 46% | -8 pts |
+| shinkai.2x2_vence.TECHNIQUE | 56% | 53% | -3 pts |
+
+- `clash.cpu_vence.X`: vitórias de cada tipo da CPU nos confrontos contra os outros três (60 por
+  par).
+- `clash.tela.X`: empurrão por segundo com o dedo na tela (cada toque fica 3 quadros no botão);
+  `melhor_jeito` é H no POWER, L no SPEED, carga cheia no ENERGY e só no pulso na TECHNIQUE.
+- `shinkai.2x2_vence.X`: lutas 2x2 com o tipo forçado nos dois da dupla.
+
+**Resultado:**
+- **CPU:** nenhum tipo decide mais o confronto (40% a 55%, antes 9% a 98%).
+- **Lutas 2x2:** os quatro tipos ficaram entre 46% e 53%.
+- **ENERGY:** tocar rende 2,5 vezes mais (64 → 162 por segundo a 8 toques/s), e segurar e soltar
+  continua melhor (254).
+- **TECHNIQUE:** esmurrar o botão caiu de 364 para 45 por segundo; no ritmo continua 250.
+
+**Riscos para o teste com jogadores:**
+- **TECHNIQUE:** a janela agora tem 5 quadros (83 ms). Quem não pegar o ritmo empurra muito pouco;
+  vale ver no aparelho se o anel do pulso deixa o ritmo claro.
+- **SPEED a 12 toques/s:** passa todos (444 por segundo). É a habilidade de bater rápido, como o
+  documento do Clash descreve; não mexi.

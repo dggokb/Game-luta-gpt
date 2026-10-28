@@ -171,6 +171,12 @@ public final class BateriaAntesDepois {
             for (int toques : new int[] {6, 8, 12}) put("clash.humano." + t.label + "." + toques + "toques_s", BateriaBalanco.empurraoHumano(t, toques, false));
             put("clash.humano." + t.label + ".sabendo_8", BateriaBalanco.empurraoHumano(t, 8, true));
         }
+        // Toque de tela de verdade (o dedo fica 3 quadros apertando) e quem sabe o ritmo (só no pulso).
+        for (Shinkai.Type t : tipos) {
+            put("clash.tela." + t.label + ".8toques_s", empurraoTela(t, 8, false));
+            put("clash.tela." + t.label + ".12toques_s", empurraoTela(t, 12, false));
+            put("clash.tela." + t.label + ".melhor_jeito", empurraoTela(t, 8, true));
+        }
         // Lutas 2x2 com o tipo forçado: média de vitórias de cada tipo contra os outros três.
         for (Shinkai.Type ta : tipos) {
             int va = 0, decididas = 0;
@@ -190,6 +196,39 @@ public final class BateriaAntesDepois {
             }
             put("shinkai.2x2_vence." + ta.label, va / (double)Math.max(1, decididas));
         }
+    }
+
+    /**
+     * Empurrão por segundo com o dedo na tela: cada toque fica 3 quadros apertado (o motor vê o
+     * botão segurando). {@code jeito}: POWER no H, SPEED no L, ENERGY segurando a carga cheia e
+     * soltando, TECHNIQUE só no pulso.
+     */
+    static int empurraoTela(Shinkai.Type tipo, double porSegundo, boolean jeito) {
+        ShinkaiClash c = new ShinkaiClash(tipo, Shinkai.Type.POWER, 0, 1, -1);
+        FighterInput a = new FighterInput(), b = new FighterInput();
+        double intervalo = 60.0 / porSegundo, proximo = 0;
+        int dedo = 0, segurando = 0, fr = 0;
+        for (; fr < ShinkaiClash.DURACAO && !c.acabou(); fr++) {
+            a.clear();
+            boolean toque = false;
+            if (jeito && tipo == Shinkai.Type.ENERGY) {
+                if (segurando < ShinkaiClash.CARGA_MAX) { a.holding = true; segurando++; } else segurando = 0;
+            } else if (jeito && tipo == Shinkai.Type.TECHNIQUE) {
+                toque = (fr + 1) % ShinkaiClash.BATIDA == 0;
+            } else if (fr >= proximo) {
+                toque = true;
+                proximo += intervalo;
+            }
+            if (toque) {
+                dedo = 3;
+                if (tipo == Shinkai.Type.POWER) a.heavy = true;
+                else if (tipo == Shinkai.Type.SPEED) a.light = true;
+                else a.medium = true;
+            }
+            if (dedo > 0) { a.holding = true; dedo--; }
+            c.passo(a, b);
+        }
+        return Math.round(c.marca * 60f / Math.max(1, fr));
     }
 
     // ---------------------------------------------------------------- TAG

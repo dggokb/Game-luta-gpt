@@ -218,8 +218,8 @@ public class ShinkaiClashTest {
     @Test public void techniquePushesOnTheBeat() {
         ShinkaiClash c = puro(Shinkai.Type.TECHNIQUE, Shinkai.Type.POWER);
         FighterInput in = new FighterInput(), nada = new FighterInput();
-        // Fora do pulso: quase nada.
-        while (c.fase() != ShinkaiClash.BATIDA / 2 - 1) c.passo(nada, nada);
+        // Fora do pulso (depois do pulso anterior, antes do meio): quase nada.
+        while (c.fase() != 5) c.passo(nada, nada);
         in.medium = true;
         c.passo(in, nada);
         int fora = c.marca;
@@ -246,5 +246,75 @@ public class ShinkaiClashTest {
         }
         assertEquals(ShinkaiClash.Fim.VITORIA, c.fim);
         assertEquals(1, c.lado);
+    }
+
+    /** Esmurrar o botão não acha o ritmo: só o primeiro toque de cada pulso vale. */
+    @Test public void techniqueMashingLosesToTheRhythm() {
+        ShinkaiClash mash = puro(Shinkai.Type.TECHNIQUE, Shinkai.Type.POWER);
+        ShinkaiClash ritmo = puro(Shinkai.Type.TECHNIQUE, Shinkai.Type.POWER);
+        FighterInput a = new FighterInput(), b = new FighterInput(), nada = new FighterInput();
+        for (int i = 0; i < 240; i++) {
+            a.medium = i % 3 == 0;
+            mash.passo(a, nada);
+            b.medium = (ritmo.quadro + 1 - ritmo.entrada) % ShinkaiClash.BATIDA == 0;
+            ritmo.passo(b, nada);
+        }
+        assertTrue("no ritmo " + ritmo.marca + " > esmurrando " + mash.marca, ritmo.marca > 2 * mash.marca);
+    }
+
+    /** ENERGY: o toque curto de tela (o dedo fica uns quadros no botão) empurra, menos que a carga cheia. */
+    @Test public void energyShortTouchPushesButLessThanTheFullCharge() {
+        ShinkaiClash c = puro(Shinkai.Type.ENERGY, Shinkai.Type.POWER);
+        FighterInput in = new FighterInput(), nada = new FighterInput();
+        int toques = 0;
+        for (int i = 0; i < 71; i++) {
+            in.clear();
+            int t = i % 8;
+            if (t == 0) in.medium = true;
+            in.holding = t < 3;
+            c.passo(in, nada);
+            if (t == 0) toques++;
+        }
+        assertTrue("o toque empurra: " + c.marca, c.marca >= toques * ShinkaiClash.TOQUE_ENERGY - ShinkaiClash.TOQUE_ENERGY);
+        ShinkaiClash cheia = puro(Shinkai.Type.ENERGY, Shinkai.Type.POWER);
+        in.clear();
+        in.holding = true;
+        for (int i = 0; i < ShinkaiClash.CARGA_MAX; i++) cheia.passo(in, nada);
+        in.holding = false;
+        cheia.passo(in, nada);
+        assertTrue("segurar e soltar rende mais no mesmo tempo: " + cheia.marca + " > " + c.marca, cheia.marca > c.marca);
+    }
+
+    /**
+     * A CPU empurra na mesma média em todos os tipos (o tipo não decide o confronto): a soma dos
+     * empurrões de cada tipo na disputa inteira, com a CPU dos dois lados.
+     */
+    @Test public void theCpuPushesTheSameOnAverageWithEveryType() {
+        String[] porTipo = {"p13", "p16", "p08", "p02"};   // POWER, SPEED, ENERGY, TECHNIQUE
+        double[] media = new double[porTipo.length];
+        for (int t = 0; t < porTipo.length; t++) {
+            long soma = 0, quadros = 0;
+            for (int seed = 0; seed < 12; seed++) {
+                Match m = new Match(porTipo[t], porTipo[t]);
+                ShinkaiClash c = m.clash();
+                AiController[] ai = new AiController[2];
+                for (int k = 0; k < 2; k++) {
+                    ai[k] = new AiController(new OpponentAi(new java.util.Random(seed * 2 + k)), new java.util.Random(seed * 7L + k));
+                    ai[k].setEnabled(true);
+                    ai[k].setLevel(8);
+                }
+                while (!c.acabou()) {
+                    ai[0].fill(m.engine, 0, m.in[0]);
+                    ai[1].fill(m.engine, 1, m.in[1]);
+                    m.step();
+                    for (int k = 0; k < 2; k++) if (c.idadeEmpurrao[k] == 0) soma += c.ultimoEmpurrao[k];
+                    quadros += 2;
+                }
+            }
+            media[t] = soma / (double)quadros;
+        }
+        double min = Math.min(Math.min(media[0], media[1]), Math.min(media[2], media[3]));
+        double max = Math.max(Math.max(media[0], media[1]), Math.max(media[2], media[3]));
+        assertTrue("empurrão por quadro POWER/SPEED/ENERGY/TECHNIQUE: " + java.util.Arrays.toString(media), max < 1.15 * min);
     }
 }
