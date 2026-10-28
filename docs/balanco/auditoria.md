@@ -63,7 +63,10 @@ Resposta ao documento "SŌKON Bloodlines — Auditoria de Combate e Plano de Tes
 | T21 | REPRODUZIDO | A dupla oficial só é o melhor parceiro para o Ryūga e o p07; não há sinergia de dupla, e sim força do parceiro. |
 | T23 | REPRODUZIDO | A curva por nível é monotônica: contra o nível 5, N1 vence 0% e N8 89%. |
 | T26 | PENDENTE | FPS: precisa do aparelho (o print do diagnóstico continua pendente). |
-| T27 / T28 | PENDENTE | Precisam de jogadores. |
+| T27 / T28 | ROTEIRO PRONTO · PENDENTE | Roteiro em `docs/balanco/playtest.md`: perfis, seis sessões de ~95 min, CSV com as colunas da `BateriaBase` e questionários. Faltam os jogadores, e o registro de entradas, o CSV no aparelho e o versus no PC ainda não existem. |
+| C04 / F12 | CONFIRMADO · DECIDIR | p13–p16 jogáveis por inteiro (229 testes passam), mas sem intro e vitória, sem nome no jogo para p14 e p16 e com assist que quase não acerta. Recomendação: não liberar ainda. A flag `pronta` não foi mexida. |
+| D03 / F11 | PLANO PRONTO · DECIDIR | `docs/historia/plano-ep04-09-takatoshi.md`: 21 páginas em ordem de prioridade, ficha de chefe do Takatoshi, 32 vídeos e roteiro do ep10. As partes inventadas estão marcadas como **proposta**. |
+| D04 / F13 | ESPECIFICADO | `docs/modo-treino-versus.md`: treino 6–8 dias, versus no PC 3–4 dias. Hoje todos os controles viram o jogador 1 (`Controles.java`). |
 
 ## Fase A
 
@@ -2339,3 +2342,98 @@ Pares em que o lado muda o resultado em 6 ou mais de 10 (3 de 120):
 - Yin-lu (p02) × p16: Yin-lu (p02) vence 2 de 10 pela esquerda e 8 de 10 pela direita
 - p06 × p11: p06 vence 4 de 10 pela esquerda e 10 de 10 pela direita
 
+## Anexo: Auditoria SŌKON, frente F: C04, D03, D04 e roteiro de playtest (T27/T28)
+
+### Frente F — C04: p13, p14, p15 e p16 prontos para o torneio da história?
+
+```text
+ID: C04 / F12
+STATUS: CONFIRMADO (conferência no repositório) · DECIDIR (liberar)
+ARQUIVO E LINHAS: android/app/src/main/assets/historia/torneio/torneio.json:10-11 ("pronta": false);
+  story-core Arcade.java:31-34 e Campanha.java:166-171, 272 (dupla não pronta: fora das oficiais do
+  Arcade, fora dos adversários sorteados e só do lado do rival na chave); testes ArcadeTest:64
+  ("as 6 prontas") e TorneioTest:76, 104.
+CENÁRIO: conferência item a item no HEAD 3703d87a (characters/pNN/character.json, assets, docs,
+  GeneratedCharacters) + testes do app que tocam nos quatro (CharacterSelectTest, MechanicsTest,
+  ShinkaiTest, ShinkaiClashTest, CombatEngineTest, DefesaEGolpeAltoTest, DesgasteDaLutaTest,
+  SpriteMotionTest, UltraDirectorTest, AnimacaoNosEspeciaisTest, EspeciaisContraAgachadoTest,
+  ComandosPorPersonagemTest, CorrentesComboTest, ThrowTest): OK (229 testes).
+RESULTADO: jogáveis por inteiro (todos os golpes, S1–S4, Super e Ultra), já selecionáveis no
+  Arcade e no Modo Teste. Faltam, nos quatro, as animações de intro, vitória, derrota e provocação
+  (que p01–p12 têm), o agarrão próprio em p13/p14/p15, nome no jogo para p14 e p16, e as
+  assistências de p13, p14 e p15 quase não acertam (frente C, T17).
+IMPACTO: liberar hoje põe os quatro na chave da história e no sorteio do Arcade sem intro nem
+  comemoração (ficam parados no READY e na vitória) e com assist que não serve.
+ALTERNATIVAS: (a) liberar agora como estão; (b) liberar depois do mínimo abaixo; (c) liberar
+  p13+p14 antes (têm agarrão de golpe e Ultra cinemático), p15+p16 depois.
+RECOMENDAÇÃO: (b). Ainda não liberar. O mínimo para liberar: nome do p14 e do p16 no jogo;
+  INTRO e VICTORY dos quatro; assist de p13, p14 e p15 que acerte; o comentário do torneio.json
+  ("ainda sem golpes") corrigido; ArcadeTest e TorneioTest atualizados junto com a flag.
+  DEFEAT, TAUNT e agarrão próprio podem vir depois (têm substituto no motor).
+TESTES DE REGRESSÃO: rodar story-core (ArcadeTest, TorneioTest, CampanhaTest) e o app inteiro
+  depois de trocar a flag.
+DEPENDÊNCIAS: F06/T17 (assistências), F12, T21 (duplas oficiais).
+```
+
+#### Lista de conferência
+
+Legenda: **OK** no jogo e conferido; **PARCIAL** existe com ressalva; **FALTA** não existe;
+**igual** ao resto do elenco (não é falta só destes quatro).
+
+##### Golpes e animações de luta
+
+| Item | p13 Krüger Stahl | p14 | p15 Natisuko | p16 | Onde |
+|---|---|---|---|---|---|
+| L, M, H, 2L, 2M, 2H, jL, jM, jH, j2H, 6M | OK | OK | OK | OK | `characters/pNN/character.json` → `moves` |
+| Parado, andar, agachar, pulo, queda, dash, backdash, aterrissar | OK | OK¹ | OK | OK | `animations` (IDLE, WALK_*, CROUCH*, JUMP, FALL, RISE, LAND, DASH, BACKDASH) |
+| Defesa em pé, agachado e no ar | OK | OK | OK | OK | DEFENSE_STAND / CROUCH / AIR |
+| Dano em pé, agachado e no ar; queda, no chão, levantar | OK | OK | OK | OK | HIT_STAND / HIT_CROUCH / HIT_AIR, KNOCKDOWN, GROUNDED, GETUP |
+| Golpe alto (→M) | OK | OK | OK | OK | `GOLPE_ALTO` |
+| S1 | OK (investida) | OK (S1 no ar)¹ | OK (Soco Energizado) | OK (balão) | `fighter.energy`, `SPECIAL_ENERGY` |
+| S2–S4 | OK (pedra, cabeçadas, salto) | OK (tornado, meia-lua, pisão) | OK (repel, rajada, voadora) | OK (caixa, banana, estrelinha) | `specialMoves`, `SPECIAL_S2..S4` |
+| Super | OK | OK | OK | OK | `fighter.super`, `SUPER_WAVE` (p15 também `assets/supers/p15`) |
+| Ultra | OK (sequência, 4 vídeos; rival de cabeça para baixo provisório) | OK (Tufão do Malandro)¹ | OK (Mugen Rendan) | PARCIAL (sem a abertura e a página de mangá: visual provisório) | `fighter.ultra`, `ULTRA_SEQ`; docs/personagens/pNN.md |
+| Agarrão próprio (THROW_GRAB / THROW_TOSS) | PARCIAL (o motor usa o jab e o H) | PARCIAL (idem) | PARCIAL (idem) | OK | `animations`; `GameView.throwPose` faz o substituto |
+| INTRO | FALTA | FALTA | FALTA | FALTA | p01–p12 têm; sem ela o lutador fica parado no READY (`GameView.java:1952`) |
+| VICTORY (pose de vitória na luta) | FALTA | FALTA | FALTA | FALTA | p01–p12 têm (`GameView.java:4180`) |
+| DEFEAT (derrota de pé) | FALTA | FALTA | FALTA | FALTA | p01–p12 têm (`GameView.java:4198`) |
+| TAUNT (provocação do treino) | FALTA | FALTA | FALTA | FALTA | só o tutorial usa |
+| Tela de vitória (vídeo em `assets/vitorias/`) | igual (só o Ryūga tem) | igual | igual | igual | `assets/vitorias/player_base` |
+
+¹ p14: as tarefas de refino que ficaram abertas na sessão (S1 no ar, fumaça quadrada, Super e Ultra)
+seguem pendentes de aprovação no aparelho; o pacote está completo.
+
+##### Sistema, CPU e balanço
+
+| Item | p13 | p14 | p15 | p16 | Onde |
+|---|---|---|---|---|---|
+| SHINKAI | POWER | TECHNIQUE | TECHNIQUE | SPEED | `Shinkai.typeOf` |
+| Assistência | PARCIAL: S (investida) só acerta a 100 px | FALTA: o mergulho do S1 não acerta em nenhuma distância | PARCIAL: M só acerta a 100 px | OK (balão) | frente C, T17 |
+| Estilo da CPU | tanque | chutes | equilibrado | equilibrado | `comboStyle` |
+| Força contra o elenco (1x1, CPU) | 50% | 53% | 20% (penúltimo) | 22% | `docs/balanco/bateria.md` |
+| Testes do motor que os cobrem | OK | OK | OK | OK | 229 testes nas classes listadas; todos passam |
+| Comandos na lista da pausa | OK (gerada dos dados) | OK | OK | OK | `ListaComandos.ficha` |
+| Teste dos comandos (cada comando solta o golpe certo) | FALTA | FALTA | FALTA | FALTA | `ComandosPorPersonagemTest.TABELA` vai só até o p12 |
+
+##### Apresentação e história
+
+| Item | p13 | p14 | p15 | p16 | Onde |
+|---|---|---|---|---|---|
+| Nome no jogo (`displayName`) | OK "Krüger Stahl" | FALTA ("p14") | OK "Natisuko" | FALTA ("p16"; a história já chama de "Bonnie Scarlet") | `character.json`, `historia/temporada.json` |
+| Nome no elenco da história | OK | FALTA | OK | OK | `temporada.json` (`elenco`) |
+| Rosto no seletor | OK | OK | OK | OK | `assets/selection/rostos/p13..p16.webp` |
+| Arte grande no seletor | igual (só p01–p08 têm) | igual | igual | igual | `assets/selection/art/tela/` |
+| Rosto da chave do torneio | OK | OK | OK | OK | `assets/historia/torneio/rostos/p13..p16.jpg` |
+| Página do desafio no porto (ep03, Ryūga) | OK (`pag5_ryuga_p13.jpg`, dupla p13+p14) | — | OK (`pag5_ryuga_p15.jpg`, dupla p15+p16) | — | `assets/historia/ep03/` |
+| Página do porto no lado do Kōga | igual (provisória para todas as duplas) | | | | `docs/historia/torneio.md` |
+| Conversas na luta, narrador | igual (o narrador não usa nomes; conversas só no treino e no ep02) | | | | `historia/narrador.json`, `ep00/conversa_treino.json` |
+| Sons e vozes | igual (sons de luta comuns a todos; ninguém tem voz) | | | | `assets/sons/luta/` |
+| Tradução (en, es) | OK p13/p15/p16; p14 sem nome | | | | `historia/idiomas/` |
+| Fichas em docs/personagens | PARCIAL: as tabelas antigas do Seedance ainda marcam ⬜ o que já está no jogo | PARCIAL (idem) | PARCIAL (idem) | PARCIAL (idem) | `docs/personagens/p13..p16.md` |
+
+#### O que trocar a flag muda
+
+`"pronta": true` põe a dupla no sorteio dos dois lados da chave da história (`Campanha`), entre os
+adversários oficiais do Arcade (`Arcade.java:34`) e no sorteio das lutas variáveis (`Campanha.java:272`).
+Junto com a troca: `ArcadeTest` (espera 6 oficiais), `TorneioTest` (espera dupla sem golpes só do
+lado do rival) e o comentário do `torneio.json`.
