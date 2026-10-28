@@ -149,6 +149,12 @@ final class CombatConfig {
     float projectileAirVelocityScale = 0.32f;
     float projectileAirGravityScale = 0.12f;
     float facingEpsilon = 6f;
+    /**
+     * Crossup: o golpe aéreo que pega também atrás do corpo, logo depois de passar por cima do
+     * rival (o rival tem que defender para o outro lado). {@code crossUpBehind} px atrás da raiz.
+     */
+    String crossUpMove = "jM";
+    float crossUpBehind = 48f;
     /** Space left between two bodies by a teleport or a pull (world units). */
     float teleportGap = 24f;
     /** Wall jump: how close to the wall, the push away from it and the lift (share of a jump). */

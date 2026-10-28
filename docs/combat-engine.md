@@ -735,6 +735,25 @@ SF6/FighterZ, no chip de especial de todos e no Just Defense do Garou).
 
 Testes em `DefesaEGolpeAltoTest`.
 
+### Crossup (jM)
+
+O **jM** de todo personagem cruza: no ar, ele também pega atrás de quem pula (`crossUpMove`,
+`crossUpBehind` 48 px atrás da raiz, na altura do golpe). Passando por cima do rival e
+apertando M na descida, o golpe acerta pelas costas. Os outros aéreos só pegam na frente.
+
+- **Defesa:** "trás" é o lado contrário ao de onde o golpe vem na hora do acerto (vale para todo
+  golpe corpo a corpo). Quem segura o lado antigo depois que o rival passou segura para frente e
+  apanha; quem troca para o lado novo defende.
+- O crossup empurra o rival para longe de quem bateu (para trás dele) e a faísca sai na borda
+  do corpo do rival que encara o golpe.
+- **CPU (defesa):** ela defende pelo lado em que viu o rival, com o atraso de reação do nível.
+  A cada pulo que passa por cima dela, sorteia (metade do `reactGuard` do nível) se lê o lado
+  certo; sem ler, cai no crossup.
+- **CPU (ataque):** com o rival caído perto (70 a 190 px), às vezes (35% do `antiAir` do nível,
+  uma vez por queda) pula para cair por cima dele e desce com o jM; num pulo em que o rival já
+  ficou atrás dela, também usa o jM.
+- Testes: `CrossUpTest`.
+
 ### Combo breaker
 
 Não quebra quem está sendo arremessado: agarrado (THROWN), voando do arremesso até cair, ou

@@ -51,6 +51,8 @@ final class CombatEngine {
         boolean echo;
         /** Qual acerto do projétil de vários acertos é este (0 = o primeiro). */
         int strike;
+        /** Crossup: o golpe pegou atrás de quem bate (ele passou por cima do rival). */
+        boolean cruzou;
     }
 
     /**
@@ -2054,6 +2056,21 @@ final class CombatEngine {
         return strikeDamage * permille / 1000;
     }
 
+    /**
+     * A defesa contra o golpe de {@code a}: "trás" é o lado contrário ao de {@code a} na hora do
+     * acerto. Quem ainda não virou (no atordoamento da defesa, num golpe) e segura o lado antigo
+     * contra um crossup segura para frente: não defende.
+     */
+    private int guardContra(CombatFighter d, CombatFighter a) {
+        int lado = a.x > d.x + config.facingEpsilon ? 1 : a.x < d.x - config.facingEpsilon ? -1 : d.facing;
+        if (lado == d.facing) return effectiveGuard(d);
+        int antes = d.facing;
+        d.facing = lado;
+        int guard = guardFromInput(d);
+        d.facing = antes;
+        return guard;
+    }
+
     /** Guard actually used against an attack: in blockstun the last guard is kept. */
     private int effectiveGuard(CombatFighter f) {
         int guard = guardFromInput(f);
@@ -2438,6 +2455,11 @@ final class CombatEngine {
                 addContact(a, d, a.attack, i, null);
                 return;
             }
+            if (crossUp(a, box, frame, d, body, crouch)) {
+                addContact(a, d, a.attack, i, null);
+                contacts.get(contacts.size() - 1).cruzou = (d.x - a.x) * a.facing < 0f;
+                return;
+            }
         }
     }
 
@@ -2533,6 +2555,38 @@ final class CombatEngine {
         float x0 = g != null ? g[0] - FOLGA_DESENHO : box.x0, x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
         float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
         // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
+        float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
+        if (corpo == null) {
+            return CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
+                d.x - body.halfWidth, d.y - body.height(crouch), d.x + body.halfWidth, d.y);
+        }
+        for (int i = 0; i + 3 < corpo.length; i += 4) {
+            float left = d.facing > 0 ? d.x + corpo[i] : d.x - corpo[i + 1];
+            float right = d.facing > 0 ? d.x + corpo[i + 1] : d.x - corpo[i];
+            if (CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
+                left - FOLGA_DESENHO, d.y - corpo[i + 3] - FOLGA_DESENHO, right + FOLGA_DESENHO, d.y - corpo[i + 2])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** O golpe de {@code a} pega por trás (crossup): no ar, o golpe do crossup e o rival atrás dele. */
+    boolean podeCruzar(CombatFighter a) {
+        return !a.grounded && a.attacking() && a.attack != null && config.crossUpMove.equals(a.attack.id);
+    }
+
+    /**
+     * Crossup: {@code a} passou por cima de {@code d} no ar com o golpe do crossup (o jM) e o
+     * pega atrás da raiz, numa faixa de {@code crossUpBehind} px na altura do golpe.
+     */
+    private boolean crossUp(CombatFighter a, AttackDefinition.Box box, int frame, CombatFighter d,
+                            CharacterDefinition.Body body, boolean crouch) {
+        // Logo embaixo ou já atrás (a pancada da frente não pega com o rival colado embaixo).
+        if (!podeCruzar(a) || (d.x - a.x) * a.facing >= CombatRules.MIN_MELEE_DISTANCE) return false;
+        float[] g = golpeNoDesenho(a, frame);
+        float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
+        float x0 = -config.crossUpBehind, x1 = 0f;
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
         if (corpo == null) {
             return CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
@@ -3276,6 +3330,11 @@ final class CombatEngine {
             float surface = superficie(d, c.projectile.direction, impactY(c));
             return Float.isNaN(surface) ? d.x - c.projectile.direction * half * .6f : surface;
         }
+        if (c.cruzou) {
+            // Crossup: o choque é nas costas de quem bateu, na borda do rival que encara ele.
+            float surface = superficie(d, -a.facing, impactY(c));
+            return Float.isNaN(surface) ? d.x + a.facing * half * .6f : surface;
+        }
         AttackDefinition.Box box = c.attack.hitbox(c.hitbox);
         // A ponta do membro no quadro desenhado (sem medida, a caixa do golpe).
         float[] g = c.hitbox == 0 ? golpeNoDesenho(a, a.attackFrame) : null;
@@ -3344,7 +3403,8 @@ final class CombatEngine {
         }
         boolean pounding = poundTarget(a, d, attack, projectile);
         if (!d.hittable() && !pounding) return;
-        int direction = projectile ? c.projectile.direction : a.facing;
+        // Crossup: o rival é empurrado para o lado de onde ele está (atrás de quem bateu).
+        int direction = projectile ? c.projectile.direction : c.cruzou ? -a.facing : a.facing;
         // The owner's S/SUPER learns about its projectile while it still runs.
         boolean ownerMove = !c.echo && (!projectile || (a.attacking() && a.attack == attack));
         ComboSession session = sessions[d.index];
@@ -3406,7 +3466,8 @@ final class CombatEngine {
         }
 
         // O agarrão de especial não se defende (como o agarrão), nem quem está deitado.
-        int guard = !projectile && attack.mechanics.grab || pounding ? CombatFighter.GUARD_NONE : effectiveGuard(d);
+        int guard = !projectile && attack.mechanics.grab || pounding ? CombatFighter.GUARD_NONE
+            : projectile ? effectiveGuard(d) : guardContra(d, a);
         if (energyChain(c, d)) {
             // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
             // a próxima bola dele chega como se ele já tivesse se recuperado e defendido (sem

@@ -190,6 +190,19 @@ final class AiController {
      */
     private boolean jumpIn;
     static final float JUMP_IN_REACH = 230f;
+    /** O rival no ar mais perto que isso pode cruzar: a CPU decide (uma vez por pulo) se lê o lado. */
+    static final float CROSS_WATCH = 140f;
+    /** Fração do reactGuard do nível com que a CPU lê o crossup (defende para o lado certo). */
+    static final double CROSS_READ = 0.5;
+    /** Com o rival no ar por cima dela: o lado em que ela o viu (com o atraso da reação) e a leitura. */
+    private CpuPerception.Snapshot seenNow;
+    private boolean crossRead = true, rivalOverhead;
+    /** O rival caído perto: um pulo para cruzar no levantar (uma vez por queda). */
+    private boolean crossPlanned;
+    /** Pulando para cruzar: desce com o jM. */
+    private boolean crossJump;
+    /** Sorteios do crossup à parte (não mexem na sequência das outras decisões). */
+    private final java.util.Random crossRandom = new java.util.Random(0x5EED);
     static final int JUMP_HOLD_FRAMES = 5;
     /**
      * Quadros antes da bola chegar em que ela começa a segurar a defesa. Antes disso ela segue
@@ -343,6 +356,10 @@ final class AiController {
         CombatFighter me = engine.fighter(self);
         CombatFighter target = engine.fighter(1 - self);
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
+        seenNow = seen;
+        boolean overhead = seen != null && !seen.grounded && Math.abs(seen.x - me.x) < CROSS_WATCH;
+        if (overhead && !rivalOverhead) crossRead = crossRandom.nextDouble() < level.reactGuard * CROSS_READ;
+        rivalOverhead = overhead;
         ShinkaiClash clash = engine.shinkaiClash();
         if (clash != null) {
             pushInClash(clash, self, out);
@@ -528,8 +545,16 @@ final class AiController {
                 jumpIn = false;
             } else if (!me.grounded && me.canAct() && me.vy >= 0f && seen != null &&
                 Math.abs(seen.x - me.x) <= JUMP_IN_REACH) {
-                // Descendo: solta o aéreo agora (o mais forte que ela tiver).
+                // Descendo: solta o aéreo agora (o mais forte que ela tiver). Passando por cima do
+                // rival (o pulo para cruzar, ou caindo em cima dele): o jM, que pega por trás.
                 jumpIn = false;
+                boolean crossing = crossJump || (target.x - me.x) * me.facing < 0f;
+                crossJump = false;
+                if (crossing && me.character().move("M", true) != null) {
+                    press("M", me, out);
+                    lastReason = "crossup";
+                    return true;
+                }
                 for (String b : new String[] {"H", "M", "L"}) {
                     if (me.character().move(b, true) != null) {
                         press(b, me, out);
@@ -645,6 +670,24 @@ final class AiController {
                 }
             }
         }
+        // O rival caído perto: às vezes pula para cair por cima dele no levantar (crossup).
+        if (seen != null && seen.status != CombatFighter.Status.KNOCKDOWN) crossPlanned = false;
+        if (!crossPlanned && !blockstun && me.grounded && me.canAct() && seen != null &&
+            seen.status == CombatFighter.Status.KNOCKDOWN && me.character().move("M", true) != null) {
+            float gap = Math.abs(seen.x - me.x);
+            crossPlanned = true;
+            if (gap > 70f && gap < 190f && crossRandom.nextDouble() < level.antiAir * 0.35) {
+                out.jump = true;
+                out.direction = me.facing > 0 ? 8 : 6;
+                jumpHold = JUMP_HOLD_FRAMES;
+                jumpHoldDirection = out.direction;
+                jumpIn = true;
+                crossJump = true;
+                guardFrames = 0;
+                lastReason = "pulo cruzado";
+                return true;
+            }
+        }
         if (jumpOverProjectile && !blockstun && me.grounded) {
             jumpOverProjectile = false;
             out.jump = true;
@@ -727,8 +770,13 @@ final class AiController {
             out.direction = 0;
             return true;
         }
-        int back = me.facing > 0 ? 5 : 1;
-        int downBack = me.facing > 0 ? 4 : 2;
+        // "Trás" é o contrário do lado em que ela viu o rival: com o rival passando por cima, ela
+        // vê o lado antigo por um instante (a reação) e defende errado o crossup, a não ser que
+        // tenha lido o pulo.
+        int side = me.facing;
+        if (!crossRead && seenNow != null && Math.abs(seenNow.x - me.x) > 6f) side = seenNow.x > me.x ? 1 : -1;
+        int back = side > 0 ? 5 : 1;
+        int downBack = side > 0 ? 4 : 2;
         out.direction = guardLow ? downBack : back;
         return true;
     }
