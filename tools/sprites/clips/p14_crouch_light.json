@@ -18,7 +18,7 @@
     "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
     "quadros": "19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67",
     "celula": 224,
-    "largura": 320,
+    "largura": 327,
     "raiz": "119,206",
     "colunas": 6,
     "fixar": "video",
@@ -36,9 +36,10 @@
         206
       ],
       "colunas": 11
-    }
+    },
+    "ancorar_pe": true
   },
-  "frameWidth": 640,
+  "frameWidth": 654,
   "frameHeight": 448,
   "rootX": 238,
   "rootY": 412,

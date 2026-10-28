@@ -355,7 +355,7 @@ RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, manter_efeitos=False, cor_efeito=None, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
-              balanco=1.0, objetos=0, rampa=None)
+              balanco=1.0, objetos=0, rampa=None, cabeca_em=None)
 
 
 def parser():
@@ -396,6 +396,9 @@ def parser():
     p.add_argument("--balanco", type=float, default=1.0,
                    help="com --fixar volta: quanto do vaivém do tronco no passo fica (1 = o do vídeo, "
                         "0 = recua/avança constante; 0.5 = uma pausa do vídeo vira só uma freada)")
+    p.add_argument("--cabeca-em", type=float,
+                   help="cada quadro com o topo da cabeça a N px (do jogo) acima da raiz: golpe no ar "
+                        "na altura do pulo (o pé no chão afundava o corpo quando as pernas encolhem)")
     p.add_argument("--pe-no-chao", action=argparse.BooleanOptionalAction, default=False,
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce); "
                         "--no-pe-no-chao desliga o que a receita gravada tiver")
@@ -642,6 +645,9 @@ def main(argv=None):
             x += round(rdx * min(1.0, n / max(1.0, ate)) * d)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
         y = ry - round(bottom * s)
+        if args.cabeca_em is not None:
+            top = int(np.nonzero((k[..., 3] > 128).any(1))[0].min())
+            y = ry - round(top * s) - round(args.cabeca_em * d)
         # Cada quadro fica na própria célula: o que passa da borda é cortado, não invade a vizinha.
         box = Image.new("RGBA", (cw, cell), (0, 0, 0, 0))
         box.paste(img, (x, y))

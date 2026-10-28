@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p14_jump_heavy-import.png",
   "expectedFrames": 7,
   "segmentation": "prepared-grid",
-  "columns": 5,
+  "columns": 4,
   "rootMode": "authored",
   "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -17,31 +17,33 @@
     "escala": 0.4096,
     "medida": "1º quadro = inicio_pulo (nota 0.99)",
     "quadros": "28,42,56,73,90,106,123",
-    "largura": 352,
-    "raiz": "137,238",
-    "colunas": 5,
-    "pe_no_chao": true,
+    "celula": 320,
+    "largura": 448,
+    "raiz": "200,300",
+    "colunas": 4,
+    "fixar": "quadro",
     "densidade": 2,
     "nitidez": true,
+    "cabeca_em": 268.0,
     "referencia": {
       "folha": "art/sprites/source/p14_jump_heavy_video_normalized.png",
       "celula": [
-        352,
-        256
+        448,
+        320
       ],
       "raiz": [
-        137,
-        238
+        200,
+        300
       ],
-      "colunas": 7
+      "colunas": 5
     }
   },
-  "frameWidth": 704,
-  "rootX": 274,
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0,
+  "frameWidth": 896,
+  "rootX": 400,
+  "frameHeight": 640,
+  "rootY": 600,
   "sourceReferences": [
     "art/sprites/source/p14_jump_heavy_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2.0
 }

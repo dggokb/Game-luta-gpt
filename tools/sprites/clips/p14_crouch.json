@@ -33,7 +33,8 @@
         238
       ],
       "colunas": 8
-    }
+    },
+    "ancorar_pe": true
   },
   "frameWidth": 448,
   "rootX": 236,

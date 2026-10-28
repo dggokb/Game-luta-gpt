@@ -35,7 +35,8 @@
         225
       ],
       "colunas": 11
-    }
+    },
+    "ancorar_pe": true
   },
   "frameWidth": 832,
   "rootX": 284,

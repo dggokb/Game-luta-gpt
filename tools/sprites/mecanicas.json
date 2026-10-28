@@ -1352,6 +1352,12 @@
           "S2": 300,
           "S3": 150,
           "S4": 330
+        },
+        "lutador": {
+          "corrida": {
+            "backdashQuadros": 30,
+            "backdashVelocidade": 490
+          }
         }
       },
       "comandos": {

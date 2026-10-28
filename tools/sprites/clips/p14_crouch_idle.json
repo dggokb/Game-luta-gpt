@@ -36,7 +36,8 @@
         206
       ],
       "colunas": 11
-    }
+    },
+    "ancorar_pe": true
   },
   "frameWidth": 448,
   "frameHeight": 448,

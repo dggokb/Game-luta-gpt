@@ -297,7 +297,7 @@
     }
   },
   "walk_back": {
-    "_doc": "Um ciclo inteiro do andar para trás (68-104, período de 37 quadros), no tempo do vídeo; anda a 160 px/s.",
+    "_doc": "Andar para trás: o vídeo quase marca passo (o corpo anda ~2 px por quadro); a 140 px/s o ciclo toca 3x mais rápido, com o pé plantado.",
     "trechos": [
       [
         "tras",
@@ -313,8 +313,9 @@
     "animacoes": {
       "WALK_BACK": {
         "distancia": "video",
-        "velocidade": 160,
-        "loop": true
+        "velocidade": 140,
+        "loop": true,
+        "acelerar": 3
       }
     }
   },

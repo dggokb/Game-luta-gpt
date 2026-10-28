@@ -18,9 +18,9 @@
     {
       "index": 0,
       "outputBbox": [
-        92,
+        114,
         116,
-        440,
+        462,
         451
       ],
       "minimumMargin": 61,
@@ -29,9 +29,9 @@
     {
       "index": 1,
       "outputBbox": [
-        92,
+        114,
         113,
-        440,
+        462,
         451
       ],
       "minimumMargin": 61,
@@ -40,9 +40,9 @@
     {
       "index": 2,
       "outputBbox": [
-        92,
+        114,
         106,
-        440,
+        462,
         451
       ],
       "minimumMargin": 61,
@@ -51,9 +51,9 @@
     {
       "index": 3,
       "outputBbox": [
-        94,
+        116,
         105,
-        445,
+        467,
         451
       ],
       "minimumMargin": 61,
@@ -62,9 +62,9 @@
     {
       "index": 4,
       "outputBbox": [
-        96,
+        118,
         156,
-        473,
+        495,
         452
       ],
       "minimumMargin": 60,
@@ -73,9 +73,9 @@
     {
       "index": 5,
       "outputBbox": [
-        96,
+        116,
         131,
-        468,
+        488,
         464
       ],
       "minimumMargin": 48,
@@ -84,9 +84,9 @@
     {
       "index": 6,
       "outputBbox": [
-        96,
+        116,
         127,
-        468,
+        488,
         459
       ],
       "minimumMargin": 53,
@@ -95,9 +95,9 @@
     {
       "index": 7,
       "outputBbox": [
-        96,
+        116,
         126,
-        468,
+        488,
         457
       ],
       "minimumMargin": 55,
@@ -106,9 +106,9 @@
     {
       "index": 8,
       "outputBbox": [
-        96,
+        116,
         128,
-        467,
+        487,
         456
       ],
       "minimumMargin": 56,
@@ -117,9 +117,9 @@
     {
       "index": 9,
       "outputBbox": [
-        96,
+        116,
         128,
-        468,
+        488,
         456
       ],
       "minimumMargin": 56,
@@ -128,9 +128,9 @@
     {
       "index": 10,
       "outputBbox": [
-        91,
+        111,
         159,
-        490,
+        510,
         454
       ],
       "minimumMargin": 58,
@@ -139,20 +139,20 @@
     {
       "index": 11,
       "outputBbox": [
-        50,
+        70,
         159,
-        546,
+        566,
         454
       ],
-      "minimumMargin": 50,
+      "minimumMargin": 58,
       "opaquePixels": 57041
     },
     {
       "index": 12,
       "outputBbox": [
-        221,
+        241,
         162,
-        528,
+        548,
         483
       ],
       "minimumMargin": 29,
@@ -161,20 +161,20 @@
     {
       "index": 13,
       "outputBbox": [
-        235,
+        255,
         137,
-        779,
+        799,
         434
       ],
-      "minimumMargin": 53,
+      "minimumMargin": 33,
       "opaquePixels": 53539
     },
     {
       "index": 14,
       "outputBbox": [
-        253,
+        273,
         118,
-        731,
+        751,
         438
       ],
       "minimumMargin": 74,
@@ -183,9 +183,9 @@
     {
       "index": 15,
       "outputBbox": [
-        234,
+        254,
         124,
-        564,
+        584,
         438
       ],
       "minimumMargin": 74,
@@ -194,9 +194,9 @@
     {
       "index": 16,
       "outputBbox": [
-        229,
+        249,
         133,
-        547,
+        567,
         438
       ],
       "minimumMargin": 74,
@@ -205,9 +205,9 @@
     {
       "index": 17,
       "outputBbox": [
-        187,
+        207,
         136,
-        577,
+        597,
         436
       ],
       "minimumMargin": 76,
@@ -216,9 +216,9 @@
     {
       "index": 18,
       "outputBbox": [
-        109,
+        129,
         134,
-        549,
+        569,
         433
       ],
       "minimumMargin": 79,
@@ -227,9 +227,9 @@
     {
       "index": 19,
       "outputBbox": [
-        104,
+        124,
         125,
-        547,
+        567,
         432
       ],
       "minimumMargin": 80,
@@ -238,9 +238,9 @@
     {
       "index": 20,
       "outputBbox": [
-        113,
+        133,
         101,
-        503,
+        523,
         431
       ],
       "minimumMargin": 81,
@@ -249,9 +249,9 @@
     {
       "index": 21,
       "outputBbox": [
-        135,
+        155,
         81,
-        474,
+        494,
         433
       ],
       "minimumMargin": 79,
@@ -260,9 +260,9 @@
     {
       "index": 22,
       "outputBbox": [
-        91,
+        111,
         88,
-        440,
+        460,
         452
       ],
       "minimumMargin": 60,
@@ -271,9 +271,9 @@
     {
       "index": 23,
       "outputBbox": [
-        92,
+        112,
         98,
-        440,
+        460,
         452
       ],
       "minimumMargin": 60,
@@ -282,9 +282,9 @@
     {
       "index": 24,
       "outputBbox": [
-        92,
+        112,
         122,
-        440,
+        460,
         452
       ],
       "minimumMargin": 60,
@@ -293,9 +293,9 @@
     {
       "index": 25,
       "outputBbox": [
-        92,
+        112,
         120,
-        440,
+        460,
         451
       ],
       "minimumMargin": 61,
@@ -306,12 +306,12 @@
   "packed": {
     "frameWidth": 745,
     "frameHeight": 418,
-    "rootX": 242,
+    "rootX": 222,
     "rootY": 377,
     "columns": 4,
     "frameCount": 26,
     "cropOffset": [
-      42,
+      62,
       73
     ],
     "sheetWidth": 2176,
@@ -322,7 +322,7 @@
         376,
         356,
         344,
-        46,
+        48,
         39
       ],
       [
@@ -330,7 +330,7 @@
         0,
         356,
         348,
-        46,
+        48,
         36
       ],
       [
@@ -338,7 +338,7 @@
         0,
         356,
         356,
-        46,
+        48,
         29
       ],
       [
@@ -346,7 +346,7 @@
         0,
         360,
         356,
-        48,
+        50,
         28
       ],
       [
@@ -354,7 +354,7 @@
         1400,
         388,
         304,
-        50,
+        52,
         79
       ],
       [
@@ -537,8 +537,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "824e4b9bd651da6c7e41421361a80c651708394bc5c4a9412932e905d4f00e44",
-      "config": "a3f7cfa54c7cf09ae5c87387c7e111f92c351dc80a0f600cc9e905b9ff4f7653",
+      "source": "334542716c81f962079401f9fe104124e54b688b60c9d2233275b4b002d3e429",
+      "config": "6652f887fd4bb73dc70c85ffbd49155522724a248edafdfc8310576854a090ea",
       "profile": "ada62e420c4c7196255232ed2dc358343a2e973d30076d48b105b20cdb2db308"
     },
     "referenceSources": {
