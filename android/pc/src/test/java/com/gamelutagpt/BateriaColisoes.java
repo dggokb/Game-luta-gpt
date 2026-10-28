@@ -176,7 +176,40 @@ public final class BateriaColisoes {
         }
     }
 
+    static final int QUADROS = 110;
+
+    /**
+     * Uma tentativa e, sem acerto, a mesma ação sem o botão (parado, agachado ou o pulo puro): a
+     * falha visual é o que o golpe acrescenta de sobreposição, não o corpo que já encostava.
+     */
     static Caso tentar(String quem, String g, boolean agachado, int dist, int aperto, File png) throws Exception {
+        int[] comGolpe = new int[QUADROS], semGolpe = new int[QUADROS];
+        java.util.Arrays.fill(comGolpe, -1);
+        java.util.Arrays.fill(semGolpe, -1);
+        Caso c = rodada(quem, g, agachado, dist, aperto, false, comGolpe, null, -1, png);
+        if (!c.acertou) {
+            rodada(quem, g, agachado, dist, aperto, true, semGolpe, comGolpe, -1, null);
+            int pior = -1;
+            for (int q = 0; q < QUADROS; q++) {
+                if (comGolpe[q] < 0) continue;
+                int extra = comGolpe[q] - Math.max(0, semGolpe[q]);
+                if (extra > c.sobreMax) { c.sobreMax = extra; pior = q; }
+            }
+            c.sobreBase = pior >= 0 ? Math.max(0, semGolpe[pior]) : 0;
+            c.quadroAcerto = pior;
+            if (png != null && pior >= 0) rodada(quem, g, agachado, dist, aperto, false, new int[QUADROS], null, pior, png);
+        }
+        if (c.acertou && c.folga > 12f) c.tipo = "fantasma";
+        else if (!c.acertou && c.sobreMax >= 60) c.tipo = "falha";
+        return c;
+    }
+
+    /**
+     * {@code sobre[q]}: pixels sobrepostos no quadro q (só nos quadros do golpe, ou nos marcados em
+     * {@code quais}). {@code semBotao}: a mesma ação sem o golpe. {@code fotoEm}: o quadro do PNG da falha.
+     */
+    static Caso rodada(String quem, String g, boolean agachado, int dist, int aperto, boolean semBotao, int[] sobre, int[] quais,
+                       int fotoEm, File png) throws Exception {
         CombatEngine e = jogo.engine;
         float xa = 1000f, xd = xa + dist;
         e.restage(xa, xd);
@@ -188,7 +221,7 @@ public final class BateriaColisoes {
         FighterInput in0 = new FighterInput(), in1 = new FighterInput();
         Caso c = new Caso();
         c.quem = quem; c.golpe = g; c.postura = agachado ? "agachado" : "em pé"; c.distancia = dist; c.aperto = aperto;
-        boolean projetil = g.equals("Sproj");
+        boolean projetil = g.equals("Sproj") && !semBotao;
         boolean viuGolpe = false;
         // O rival assenta na postura antes.
         for (int i = 0; i < 12; i++) {
@@ -197,29 +230,35 @@ public final class BateriaColisoes {
             e.step(in0, in1);
             upd.invoke(jogo, ra, a); upd.invoke(jogo, rd, d);
         }
-        for (int q = 0; q < 110; q++) {
+        for (int q = 0; q < QUADROS; q++) {
             entrada(in0, g, q, aperto);
+            if (semBotao) { in0.light = in0.medium = in0.heavy = false; in0.special = null; }
             in1.clear();
             if (agachado) in1.direction = 3;
             meio = (a.x + d.x) / 2f;
+            boolean querQuadro = quais != null ? quais[q] >= 0 : true;
             // Quem apanha: como estava antes do passo (o corpo que o motor confere).
-            desenhar(CAMADA_D, cd, rd, d);
-            CAMADA_D.getPixels(PD, 0, W, 0, 0, W, H);
-            if (projetil) { desenharProjeteis(e); CAMADA_P.getPixels(PP, 0, W, 0, 0, W, H); }
+            if (querQuadro) {
+                desenhar(CAMADA_D, cd, rd, d);
+                CAMADA_D.getPixels(PD, 0, W, 0, 0, W, H);
+                if (projetil) { desenharProjeteis(e); CAMADA_P.getPixels(PP, 0, W, 0, 0, W, H); }
+            }
             e.step(in0, in1);
             upd.invoke(jogo, ra, a);
             upd.invoke(jogo, rd, d);
+            if (quais != null) {
+                if (querQuadro) {
+                    desenhar(CAMADA_A, ca, ra, a);
+                    CAMADA_A.getPixels(PA, 0, W, 0, 0, W, H);
+                    sobre[q] = sobreposicao(PA, PD);
+                }
+                continue;
+            }
             boolean acerto = false;
             for (CombatEngine.HitEvent h : e.events()) if (h.attacker == 0 && !h.blocked) acerto = true;
             boolean ativo = a.attacking() && a.attack != null && a.attack.isActive(a.attackFrame);
             if (!ativo && !acerto && !(projetil && !e.energyProjectiles.isEmpty())) {
                 if (viuGolpe && !a.attacking() && e.energyProjectiles.isEmpty()) break;
-                if (q == 0 || c.sobreBase == 0 && !viuGolpe) {
-                    // A sobreposição do começo (corpo com corpo, sem golpe).
-                    desenhar(CAMADA_A, ca, ra, a);
-                    CAMADA_A.getPixels(PA, 0, W, 0, 0, W, H);
-                    c.sobreBase = Math.max(c.sobreBase, sobreposicao(PA, PD));
-                }
                 continue;
             }
             viuGolpe = true;
@@ -227,20 +266,21 @@ public final class BateriaColisoes {
             desenhar(CAMADA_A, ca, ra, a);
             CAMADA_A.getPixels(PA, 0, W, 0, 0, W, H);
             if (projetil) for (int i = 0; i < PA.length; i++) if ((PP[i] >>> 24) > (PA[i] >>> 24)) PA[i] = PP[i];
-            int sobre = sobreposicao(PA, PD);
+            int s = sobreposicao(PA, PD);
+            sobre[q] = s;
             if (acerto) {
                 c.acertou = true;
                 c.quadroAcerto = q;
-                c.sobreAcerto = sobre;
-                c.folga = sobre > 0 ? 0f : folga(PA, PD);
+                c.sobreAcerto = s;
+                c.folga = s > 0 ? 0f : folga(PA, PD);
                 if (png != null) salvar(png, c, a, d);
                 break;
             }
-            c.sobreMax = Math.max(c.sobreMax, sobre - c.sobreBase);
-            if (png != null && c.sobreMax == sobre - c.sobreBase && c.sobreMax > 0) salvar(png, c, a, d);
+            if (png != null && q == fotoEm) {
+                c.sobreMax = s;
+                salvar(png, c, a, d);
+            }
         }
-        if (c.acertou && c.folga > 12f) c.tipo = "fantasma";
-        else if (!c.acertou && c.sobreMax >= 60) c.tipo = "falha";
         return c;
     }
 
