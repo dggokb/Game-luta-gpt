@@ -71,6 +71,36 @@ final class CharacterDefinition {
             this.loop=loop;this.distancePerFrame=distancePerFrame;
             float sum=0;for(float d:durations)sum+=d;this.duration=sum;
         }
+        /**
+         * Caixas que acompanham o desenho do golpe (tools/sprites/caixas_sprites.py), por quadro
+         * da folha: o corpo em faixas (cabeça, tronco, pernas: {x0, x1, y0, y1} em sequência, px
+         * à frente da raiz e acima do chão) e o membro que bate ({x0, x1, y0, y1} ou null).
+         * Null sem caixas medidas.
+         */
+        float[][] silhuetaCorpo,silhuetaGolpe;
+        Animation withSilhueta(String corpo,String golpe) {
+            silhuetaCorpo=quadros(corpo);silhuetaGolpe=quadros(golpe);
+            for(float[] g:silhuetaGolpe)if(g!=null&&g.length!=4)throw new IllegalArgumentException(id+": golpe {x0,x1,y0,y1}");
+            for(float[] c:silhuetaCorpo)if(c!=null&&c.length%4!=0)throw new IllegalArgumentException(id+": corpo em caixas de 4");
+            return this;
+        }
+        /** "quadro:n,n,n,...|quadro:..." → por quadro da folha (null onde não há). */
+        private float[][] quadros(String texto) {
+            int maior=-1;
+            for(int f:frames)maior=Math.max(maior,f);
+            float[][] out=new float[maior+1][];
+            if(texto.isEmpty())return out;
+            for(String parte:texto.split("\\|")) {
+                int dois=parte.indexOf(':');
+                int quadro=Integer.parseInt(parte.substring(0,dois));
+                String[] v=parte.substring(dois+1).split(",");
+                float[] caixa=new float[v.length];
+                for(int i=0;i<v.length;i++)caixa[i]=Float.parseFloat(v[i]);
+                if(quadro>maior)throw new IllegalArgumentException(id+": quadro "+quadro+" fora da animação");
+                out[quadro]=caixa;
+            }
+            return out;
+        }
         int frame(float time,float distance) {
             if(distancePerFrame>0) return frames[(int)(Math.max(0,distance)/distancePerFrame)%frames.length];
             float t=Math.max(0,time);

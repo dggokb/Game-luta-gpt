@@ -2424,12 +2424,101 @@ final class CombatEngine {
         for (int i = 0; i < a.attack.hitboxCount(); i++) {
             AttackDefinition.Box box = a.attack.hitbox(i);
             if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
-            if (CombatRules.hitboxTouches(a.x, a.y, a.facing, box, d.x, d.y, body, crouch) ||
-                touchesMoveHurtbox(a, box, d)) {
+            if (golpeToca(a, box, frame, d, body, crouch) || touchesMoveHurtbox(a, box, d)) {
                 addContact(a, d, a.attack, i, null);
                 return;
             }
         }
+    }
+
+    // ---------------------------------------------------------------- caixas do desenho
+
+    /** Folga em volta das caixas medidas no desenho (px): o contorno do traço ainda encosta. */
+    static final float FOLGA_DESENHO = 6f;
+
+    /**
+     * O quadro da folha que a tela mostra de {@code f} no quadro {@code frame} do golpe (a mesma
+     * conta do desenho: o clipe esticado sobre o golpe), ou -1 sem caixas medidas.
+     */
+    static int quadroDoDesenho(CombatFighter f, int frame) {
+        CharacterDefinition.Animation a = desenhoDoGolpe(f);
+        if (a == null || a.silhuetaCorpo == null) return -1;
+        float t = (frame + 0.5f) / CombatConfig.FPS;
+        float clip = f.move != null && f.move.animation == a ? f.move.animationTime(t)
+            : a.timeFor(t, f.attack.totalFrames / (float) CombatConfig.FPS);
+        int q = a.frame(clip, 0f);
+        return q < a.silhuetaCorpo.length ? q : -1;
+    }
+
+    /** A animação do golpe de {@code f}: a do golpe, ou a da S e do Super (sem golpe próprio). */
+    static CharacterDefinition.Animation desenhoDoGolpe(CombatFighter f) {
+        if (f.attack == null) return null;
+        if (f.move != null) return f.move.animation;
+        return f.character().specialAnimations.get(f.attack.id);
+    }
+
+    /**
+     * O membro que bate no quadro {@code frame} do golpe ({x0, x1, y0, y1}), ou null: sem caixa
+     * medida a pancada usa a caixa do golpe.
+     */
+    static float[] golpeNoDesenho(CombatFighter a, int frame) {
+        // Golpe coreografado (prende o rival num lugar, anda com o corpo, pisa o caído, agarra):
+        // o desenho já mostra o caminho que o motor também faz, então a caixa do golpe decide.
+        if (a.attack == null || a.attack.strikeHold != null) return null;
+        AttackDefinition.Mechanics m = a.attack.mechanics;
+        if (m.advanceSpeed > 0f || m.pound || m.grab || m.hopHeight > 0f || m.pull != 0f) return null;
+        int q = quadroDoDesenho(a, frame);
+        return q < 0 ? null : desenhoDoGolpe(a).silhuetaGolpe[q];
+    }
+
+    /** O corpo de quem está golpeando, em faixas (cabeça, tronco, pernas), ou null. */
+    static float[] corpoNoDesenho(CombatFighter d) {
+        if (!d.attacking()) return null;
+        int q = quadroDoDesenho(d, d.attackFrame);
+        return q < 0 ? null : desenhoDoGolpe(d).silhuetaCorpo[q];
+    }
+
+    /**
+     * A pancada {@code box} de {@code a} encosta em {@code d}: o membro do desenho (ou a caixa do
+     * golpe) contra o corpo do desenho de quem está golpeando (ou o corpo da postura).
+     */
+    private boolean golpeToca(CombatFighter a, AttackDefinition.Box box, int frame, CombatFighter d,
+                              CharacterDefinition.Body body, boolean crouch) {
+        if ((d.x - a.x) * a.facing < CombatRules.MIN_MELEE_DISTANCE) return false;
+        float[] g = golpeNoDesenho(a, frame);
+        float x0 = g != null ? g[0] - FOLGA_DESENHO : box.x0, x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
+        float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
+        // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
+        float[] corpo = crouch == d.crouchingBody() ? corpoNoDesenho(d) : null;
+        if (corpo == null) {
+            return CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
+                d.x - body.halfWidth, d.y - body.height(crouch), d.x + body.halfWidth, d.y);
+        }
+        for (int i = 0; i + 3 < corpo.length; i += 4) {
+            float left = d.facing > 0 ? d.x + corpo[i] : d.x - corpo[i + 1];
+            float right = d.facing > 0 ? d.x + corpo[i + 1] : d.x - corpo[i];
+            if (CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
+                left - FOLGA_DESENHO, d.y - corpo[i + 3] - FOLGA_DESENHO, right + FOLGA_DESENHO, d.y - corpo[i + 2])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** O projétil encosta em {@code d}: no corpo do desenho de quem está golpeando, ou no da postura. */
+    private static boolean projetilToca(Projectile p, CombatFighter d, boolean crouch) {
+        float[] corpo = crouch == d.crouchingBody() ? corpoNoDesenho(d) : null;
+        if (corpo == null) {
+            return CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), crouch);
+        }
+        float pl = Math.min(p.previousX, p.x) - p.radius, pr = Math.max(p.previousX, p.x) + p.radius;
+        for (int i = 0; i + 3 < corpo.length; i += 4) {
+            float left = (d.facing > 0 ? d.x + corpo[i] : d.x - corpo[i + 1]) - FOLGA_DESENHO;
+            float right = (d.facing > 0 ? d.x + corpo[i + 1] : d.x - corpo[i]) + FOLGA_DESENHO;
+            float top = d.y - corpo[i + 3] - FOLGA_DESENHO, bottom = d.y - corpo[i + 2];
+            if (pr >= left && pl <= right && p.y + p.radius >= top && p.y - p.radius <= bottom) return true;
+        }
+        return false;
     }
 
     /**
@@ -2508,8 +2597,7 @@ final class CombatEngine {
             CombatFighter d = fighters[1 - p.ownerIndex];
             // An evading body lets the projectile fly on.
             boolean hits = d.hittable() && !evades(d, p.attack, false, true) &&
-                CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(),
-                    d.crouchingBody() && !hitsCrouching(p.attack, fighters[p.ownerIndex]));
+                projetilToca(p, d, d.crouchingBody() && !hitsCrouching(p.attack, fighters[p.ownerIndex]));
             if (!hits) {
                 p.holding = false;   // o rival saiu de baixo: a onda segue voando com os acertos que sobraram
                 continue;

@@ -77,10 +77,18 @@ final class CombatRules {
         float x, float baseY, int facing, AttackDefinition.Box box,
         float left, float top, float right, float bottom
     ) {
-        float boxLeft = facing > 0 ? x + box.x0 : x - box.x1;
-        float boxRight = facing > 0 ? x + box.x1 : x - box.x0;
-        float boxTop = baseY - box.y1;
-        float boxBottom = baseY - box.y0;
+        return overlaps(x, baseY, facing, box.x0, box.x1, box.y0, box.y1, left, top, right, bottom);
+    }
+
+    /** The same with the box as numbers (px ahead of the root and above the ground). */
+    static boolean overlaps(
+        float x, float baseY, int facing, float x0, float x1, float y0, float y1,
+        float left, float top, float right, float bottom
+    ) {
+        float boxLeft = facing > 0 ? x + x0 : x - x1;
+        float boxRight = facing > 0 ? x + x1 : x - x0;
+        float boxTop = baseY - y1;
+        float boxBottom = baseY - y0;
         return boxRight >= left && boxLeft <= right && boxBottom >= top && boxTop <= bottom;
     }
 

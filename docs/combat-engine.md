@@ -924,6 +924,30 @@ pelos dois pulos no ar, pelos quiques (um de cada por combo) e pelo combo breake
 defensor. O H que joga na parede a partir do chão não gasta ponto. Pushback distribuído em 8
 frames.
 
+## Caixas que seguem o desenho (28/10)
+
+As caixas de colisão saem das folhas do jogo (`tools/sprites/caixas_sprites.py`, que roda nas
+folhas já convertidas e grava no `character.json`; rode de novo depois de reconverter um clipe):
+
+- **Postura** (`fighter.body`): altura do IDLE e do agachado parado (sem fio de cabelo), meia
+  largura do tronco, da barriga ao peito. Vale parado, andando, agachado, no ar e apanhando.
+- **Golpe** (`reach`/`hitHeight`/`hitFloor` dos normais): o membro que bate no quadro mais esticado
+  (o que mudou desde o primeiro quadro do golpe). É a caixa de reserva e a que a CPU usa para medir
+  distância.
+- **Quadro a quadro** (`animations.<ANIM>.silhueta`, por quadro da folha, nos golpes normais,
+  especiais, S e Super): o corpo em 3 faixas (cabeça, tronco, pernas) e o membro que bate. O motor
+  acha o quadro que a tela mostra (`move.animationTime` / `Animation.timeFor` do clipe esticado sobre
+  o golpe, a mesma conta do desenho) e:
+  - a pancada usa o membro daquele quadro (sem membro medido, a caixa do golpe);
+  - quem está golpeando apanha nas 3 faixas do quadro, então **o braço ou a perna esticados apanham**
+    (golpes e projéteis); fora dos golpes, a caixa da postura.
+- **Coreografados** ficam com a caixa do golpe: o que prende o rival num lugar (`segurarRival`), anda
+  com o corpo (avanço), pisa o caído, agarra, pula ou puxa (o desenho do vídeo já mostra o caminho
+  que o motor também faz). O Ultra prende o rival pela sequência (`ultras.json`).
+- O lançador (2H) que sobe colado ao corpo alcança um pouco além dele e desce até a cintura.
+
+DEBUG mostra as faixas do corpo (verde) e o membro (vermelho) do quadro que vale.
+
 ## Ajustar caixas no celular (DEBUG > AJUSTAR CAIXAS)
 
 Tela do DEBUG, abaixo de AJUSTAR TAMANHOS. Escolha o personagem (◀ ▶) e o item: **corpo em

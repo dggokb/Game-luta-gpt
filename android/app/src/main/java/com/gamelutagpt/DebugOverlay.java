@@ -21,7 +21,16 @@ final class DebugOverlay {
             CombatFighter f = engine.fighter(i);
             CharacterDefinition.Body body = f.body();
             float hurtTop = f.hurtTop();
-            stroke(c, Color.argb(220, 80, 230, 120), f.x - body.halfWidth, hurtTop, f.x + body.halfWidth, f.y);
+            // Golpeando com caixas medidas no desenho: o corpo em faixas (o que apanha de verdade).
+            float[] corpo = CombatEngine.corpoNoDesenho(f);
+            if (corpo == null) {
+                stroke(c, Color.argb(220, 80, 230, 120), f.x - body.halfWidth, hurtTop, f.x + body.halfWidth, f.y);
+            } else {
+                for (int k = 0; k + 3 < corpo.length; k += 4) {
+                    stroke(c, Color.argb(220, 80, 230, 120), f.x + (f.facing > 0 ? corpo[k] : -corpo[k + 1]), f.y - corpo[k + 3],
+                        f.x + (f.facing > 0 ? corpo[k + 1] : -corpo[k]), f.y - corpo[k + 2]);
+                }
+            }
             stroke(c, Color.argb(200, 255, 214, 92), f.x - body.pushHalfWidth, f.y - body.pushHeight,
                 f.x + body.pushHalfWidth, f.y);
             if (!f.attacking()) continue;
@@ -31,11 +40,21 @@ final class DebugOverlay {
                 AttackDefinition.Box box = a.hurtbox(b);
                 if (box.activeAt(frame)) drawBox(c, f, box, Color.argb(200, 90, 160, 255), false);
             }
-            if (a.kind != AttackDefinition.Kind.NORMAL || !a.isActive(frame)) continue;
+            if (!a.melee() || !a.isActive(frame)) continue;
+            // O membro do desenho neste quadro (a pancada que vale), ou a caixa do golpe.
+            float[] g = CombatEngine.golpeNoDesenho(f, frame);
             for (int b = 0; b < a.hitboxCount(); b++) {
                 AttackDefinition.Box box = a.hitbox(b);
                 boolean used = (f.hitboxMask & (1L << b)) != 0;
-                if (box.activeAt(frame)) drawBox(c, f, box, used ? Color.argb(120, 160, 60, 60) : Color.argb(150, 255, 60, 80), true);
+                if (!box.activeAt(frame)) continue;
+                int cor = used ? Color.argb(120, 160, 60, 60) : Color.argb(150, 255, 60, 80);
+                if (g == null) {
+                    drawBox(c, f, box, cor, true);
+                } else {
+                    paint.setStyle(Paint.Style.FILL);
+                    paint.setColor(cor);
+                    c.drawRect(f.x + (f.facing > 0 ? g[0] : -g[1]), f.y - g[3], f.x + (f.facing > 0 ? g[1] : -g[0]), f.y - g[2], paint);
+                }
             }
         }
         paint.setStyle(Paint.Style.STROKE);

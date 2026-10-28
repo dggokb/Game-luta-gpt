@@ -1144,6 +1144,69 @@ public class MechanicsTest {
             s.f(0).state.superMeter);
     }
 
+    // ------------------------------------------------------------ caixas que seguem o desenho
+
+    @Test public void duringAMoveTheBodyAndTheStrikeFollowTheDrawing() throws Exception {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p14"), BASE, 400f, 900f);
+        CombatFighter f = s.f(0);
+        assertNull("standing still: the stance box", CombatEngine.corpoNoDesenho(f));
+        startMove(s.engine, 0, "H");
+        java.util.Set<String> golpes = new java.util.HashSet<>();
+        float maisLonge = 0f;
+        for (int i = 0; i < f.attack.totalFrames - 1; i++) {
+            float[] corpo = CombatEngine.corpoNoDesenho(f);
+            assertNotNull("the body of the drawing at frame " + f.attackFrame, corpo);
+            assertEquals("head, trunk and legs", 0, corpo.length % 4);
+            float[] g = CombatEngine.golpeNoDesenho(f, f.attackFrame);
+            if (g != null && f.attack.isActive(f.attackFrame)) {
+                golpes.add(java.util.Arrays.toString(g));
+                maisLonge = Math.max(maisLonge, g[1]);
+            }
+            s.step();
+        }
+        assertFalse("the kick has a box from the drawing while active", golpes.isEmpty());
+        assertTrue("and it reaches the foot, past the body: " + maisLonge, maisLonge > f.body().halfWidth + 100f);
+    }
+
+    @Test public void theStretchedLegCanBeHit() throws Exception {
+        CharacterDefinition p14 = GeneratedCharacters.get("p14");
+        float reach = BASE.attack("L").reach;
+        // Longe demais para o soco encostar no corpo dele, perto o bastante para a perna esticada.
+        float gap = p14.fighter.body.halfWidth + reach + 40f;
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(p14, BASE, 400f, 400f + gap);
+        CombatFighter kicker = s.f(0);
+        startMove(s.engine, 0, "H");
+        // Até a perna estar esticada além do soco.
+        for (int i = 0; i < 60; i++) {
+            float[] g = CombatEngine.golpeNoDesenho(kicker, kicker.attackFrame);
+            float[] corpo = CombatEngine.corpoNoDesenho(kicker);
+            float frente = 0f;
+            for (int k = 1; corpo != null && k < corpo.length; k += 4) frente = Math.max(frente, corpo[k]);
+            if (frente > gap - reach + 20f) break;
+            s.step();
+        }
+        int hits = 0;
+        startMove(s.engine, 1, "L");
+        for (int i = 0; i < 30; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 1) hits++;
+        }
+        assertTrue("the jab caught the stretched leg", hits > 0);
+    }
+
+    @Test public void theJabMissesTheBodyFromThere() throws Exception {
+        CharacterDefinition p14 = GeneratedCharacters.get("p14");
+        float gap = p14.fighter.body.halfWidth + BASE.attack("L").reach + 40f;
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(p14, BASE, 400f, 400f + gap);
+        int hits = 0;
+        startMove(s.engine, 1, "L");
+        for (int i = 0; i < 30; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 1) hits++;
+        }
+        assertEquals("standing, nothing to hit at that distance", 0, hits);
+    }
+
     @Test public void anAdvancingSuperStopsAtTheOpponentInsteadOfShovingIt() {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p10"), BASE, 500f, 640f);
         s.f(0).state.superMeter = CombatConfig.MAX_METER;

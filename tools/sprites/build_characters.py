@@ -548,6 +548,19 @@ def validate_impacts(pack):
             raise ValueError(f'{pack["id"]}/{name}: impact frame {i} of {animation} plays at {t:.0%} of the move, '
                              f'outside the active window {start:.0%}-{end:.0%}; retime its durationsMs')
 
+def validate_silhueta(key, a):
+    """Caixas por quadro da folha: corpo = lista de [x0, x1, y0, y1], golpe = [x0, x1, y0, y1]."""
+    sil = a['silhueta']
+    if not isinstance(sil, dict) or set(sil) != {'corpo', 'golpe'}:
+        raise ValueError(f'{key}.silhueta: {{corpo, golpe}}')
+    caixa = lambda c: isinstance(c, list) and len(c) == 4 and all(type(v) is int for v in c) and c[0] <= c[1] and c[2] <= c[3]
+    for parte, dados in sil.items():
+        for quadro, valor in dados.items():
+            if not quadro.isdigit() or int(quadro) not in a['frames']:
+                raise ValueError(f'{key}.silhueta.{parte}: quadro {quadro} não é da animação')
+            if not (caixa(valor) if parte == 'golpe' else isinstance(valor, list) and all(caixa(c) for c in valor)):
+                raise ValueError(f'{key}.silhueta.{parte}.{quadro}: caixas [x0, x1, y0, y1]')
+
 def visual_heights(pack, atlases):
     """World-space visual height (opaque pixels) measured from import reports."""
     def height(state):
@@ -588,6 +601,8 @@ def compile_packs(root, results):
                 raise ValueError(f'{key}: invalid frame index')
             if type(a['loop']) is not bool:
                 raise ValueError(f'{key}: loop must be boolean')
+            if 'silhueta' in a:
+                validate_silhueta(key, a)
             if 'distancePerFrame' in a:
                 positive(a['distancePerFrame'], key)
                 if not a['loop'] or 'durationsMs' in a:
@@ -765,7 +780,13 @@ def compile_packs(root, results):
             atlas = ('new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]
                      +[str(l.get('columns',l['frameCount'])),str(l['frameCount']),f(cfg.get('pixelScale', 1)),str(l['sheetWidth']),str(l['sheetHeight'])]
                      +[q(','.join(str(v) for frame in l['frames'] for v in frame))])+')')
-            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
+            sil = ''
+            if 'silhueta' in a:
+                # Caixas que acompanham o desenho (tools/sprites/caixas_sprites.py), por quadro da folha.
+                junta = lambda d: '|'.join(k+':'+','.join(str(n) for caixa in ([v] if v and type(v[0]) is not list else v) for n in caixa)
+                                           for k, v in sorted(d.items(), key=lambda kv: int(kv[0])) if v)
+                sil = '.withSilhueta('+q(junta(a['silhueta']['corpo']))+','+q(junta(a['silhueta']['golpe']))+')'
+            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+')'+sil+');']
         for key in [b for b in BINDINGS + OPTIONAL_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
