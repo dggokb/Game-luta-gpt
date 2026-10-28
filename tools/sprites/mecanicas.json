@@ -744,6 +744,7 @@
     "p09": {
       "molde": "Grappler",
       "estiloCombo": "tanque",
+      "estiloCpu": "agarrador",
       "vida": 11500,
       "dano": 1.25,
       "ritmo": 1.3,

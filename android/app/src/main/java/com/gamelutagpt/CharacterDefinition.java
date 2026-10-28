@@ -566,6 +566,9 @@ final class CharacterDefinition {
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }
+        /** Estilo da CPU quando difere do estilo de combo (o p09 agarra; as correntes ficam as do tanque). */
+        String cpuStyle;
+        Fighter withCpuStyle(String style) { cpuStyle=style; return this; }
         /** Nome da energia (S1) na lista de comandos, e se o comando dela é de segurar. */
         String energyName;
         boolean energyHold;

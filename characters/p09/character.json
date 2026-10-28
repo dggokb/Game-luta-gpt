@@ -193,6 +193,7 @@
       ]
     },
     "comboStyle": "tanque",
+    "cpuStyle": "agarrador",
     "mecanica": {
       "agarrao": {
         "dano": 2200,

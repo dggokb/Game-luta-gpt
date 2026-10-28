@@ -35,6 +35,9 @@ final class CpuStyle {
         new CpuStyle("alcance", 340f, 0.50, 1.8, 0.6, 0.7, 0.9),
         new CpuStyle("tanque", 100f, 0.80, 0.4, 2.2, 0.6, 0.8),
         new CpuStyle("imprevisivel", 160f, 0.85, 0.8, 1.2, 1.4, 0.5),
+        // O grappler: chega perto e agarra (docs/balanco/ajustes.md, etapa 4b). Só a CPU; as
+        // correntes de combo são as do tanque.
+        new CpuStyle("agarrador", 80f, 0.90, 0.3, 4.0, 0.5, 0.7),
     };
 
     static CpuStyle of(String name) {
@@ -43,7 +46,8 @@ final class CpuStyle {
     }
 
     static CpuStyle of(CharacterDefinition c) {
-        return c == null ? EQUILIBRADO : of(c.fighter.comboStyle);
+        if (c == null) return EQUILIBRADO;
+        return of(c.fighter.cpuStyle != null ? c.fighter.cpuStyle : c.fighter.comboStyle);
     }
 
     /** O imprevisível troca de plano de repente: às vezes faz o oposto do que o estilo pede. */

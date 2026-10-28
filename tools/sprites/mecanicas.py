@@ -184,6 +184,8 @@ def combos(pack, spec, data):
         if uses.get(key):
             m['maxUsesPerChain'] = uses[key]
     fighter['comboStyle'] = spec['estiloCombo']
+    if spec.get('estiloCpu'):
+        fighter['cpuStyle'] = spec['estiloCpu']
 
 
 def prune_routes(pack):

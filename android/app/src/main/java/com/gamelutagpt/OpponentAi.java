@@ -75,6 +75,8 @@ final class OpponentAi {
     static final String[] AIR_ATTACKS = {"L", "M", "H"};
     /** Chance of throwing when the target is right next to it, and of teching a throw. */
     static final double THROW_CHANCE = 0.16;
+    /** O agarrador (estilo com throwing alto), perto mas fora do agarrão: chance de andar para dentro. */
+    static final double GRAPPLER_CLOSE_IN = 0.45;
     static final double TECH_CHANCE = 0.40;
     /** Chance of an air tech when the air hitstun ends. */
     static final double AIR_TECH_CHANCE = 0.70;
@@ -147,6 +149,12 @@ final class OpponentAi {
             CombatRules.reaches(s.self, "L", false, s.distance + STARTER_REACH_MARGIN, s.target) &&
             random.nextDouble() < starterChance(level)) {
             groundAttack = "L";
+        }
+        // O agarrador quer chegar colado: fora do alcance do agarrão (mas perto), às vezes deixa a
+        // cutucada e anda para dentro (docs/balanco/ajustes.md, etapa 4b).
+        if (style.throwing >= 3.0 && groundAttack != null && !s.selfAirborne && s.targetGrounded &&
+            s.distance > s.throwReach && s.distance < 280f && random.nextDouble() < GRAPPLER_CLOSE_IN) {
+            groundAttack = null;
         }
         // Quem luta de longe recua para a distância dele em vez de bater colado.
         boolean keepAway = !s.selfAirborne && s.distance < style.preferredDistance - 60f &&

@@ -39,7 +39,8 @@ final class ComboBook {
         add(route, uses, current);
         // Os estilos que vivem do H (tanque, alcance, imprevisível) vão pela parede; os outros
         // pelo lançador.
-        boolean wall = "tanque".equals(style.name) || "alcance".equals(style.name) || style.erratic();
+        boolean wall = "tanque".equals(style.name) || "agarrador".equals(style.name) || "alcance".equals(style.name) ||
+            style.erratic();
         boolean reversed = false;
         for (int guard = 0; guard < 8; guard++) {
             String next = null;

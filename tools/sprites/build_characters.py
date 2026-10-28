@@ -60,6 +60,8 @@ ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
 COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
+# Estilo só da CPU (fighter.cpuStyle), quando difere do de combo.
+CPU_STYLES = COMBO_STYLES + ('agarrador',)
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
             'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
 STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
@@ -122,6 +124,8 @@ def validate_fighter(pack):
             raise ValueError(f'{name}.pesoAnimacao: expected a number from 0.5 to 2')
     if 'comboStyle' in f and f['comboStyle'] not in COMBO_STYLES:
         raise ValueError(f'{name}.comboStyle: expected one of {list(COMBO_STYLES)}')
+    if 'cpuStyle' in f and f['cpuStyle'] not in CPU_STYLES:
+        raise ValueError(f'{name}.cpuStyle: expected one of {list(CPU_STYLES)}')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
         raise ValueError(f'{name}: autoCombo accepts only L, M and H')
     body = f['body']
@@ -839,6 +843,7 @@ def compile_packs(root, results):
                      if 'walkSpeed' in fi or 'walkBackSpeed' in fi else '')
                    +('.withAnimationWeight('+f(fi['pesoAnimacao'])+')' if 'pesoAnimacao' in fi else '')
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
+                   +('.withCpuStyle('+q(fi['cpuStyle'])+')' if 'cpuStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
                    +('.withEnergyAir()' if energy.get('noAr') else '')
                      if energy and ('nome' in energy or energy.get('segurar')) else '')

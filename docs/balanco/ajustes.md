@@ -287,3 +287,45 @@ Todos os 16 personagens (1x1 contra o elenco e 2x2), antes e depois da etapa 4a:
 | 2x2.p14 | 36% | 36% | +0 pts |
 | 2x2.p15 | 22% | 22% | +0 pts |
 | 2x2.p16 | 40% | 44% | +4 pts |
+
+## Etapa 4b — p09: a CPU agarra mais (P1)
+
+**Decisão:** ajustar a CPU do p09 para explorar mais agarrões.
+
+**Arquivos:**
+- `CpuStyle.java`:
+  - novo estilo de CPU "agarrador": distância preferida 80, agarrar ×4,0, projétil ×0,3, pulo ×0,5;
+  - `CpuStyle.of` usa `fighter.cpuStyle` quando o personagem tem um.
+- `CharacterDefinition.java`: `Fighter.cpuStyle`.
+- `OpponentAi.java`: o agarrador, perto mas fora do agarrão (até 280), em 45% das decisões deixa a
+  cutucada e anda para dentro (`GRAPPLER_CLOSE_IN`).
+- `ComboBook.java`: o agarrador fecha os combos pela parede, como o tanque.
+- `characters/p09/character.json`: `"cpuStyle": "agarrador"`.
+- `tools/sprites/mecanicas.json`: `"estiloCpu": "agarrador"`.
+- `tools/sprites/mecanicas.py` e `tools/sprites/build_characters.py`: levam o campo.
+- `GeneratedCharacters.java`: `.withCpuStyle("agarrador")`.
+- Fica igual: as correntes de combo continuam as do tanque (`comboStyle`), e p07 e p13 não mudam.
+
+**Antes/depois (mesmas sementes; o "antes" é o código depois da etapa 4a):**
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| 1x1.p07 | 13% | 14% | +1 pts |
+| 1x1.p09 | 74% | 62% | -12 pts |
+| 1x1.p13 | 56% | 56% | +0 pts |
+| 1x1.p09_vs_p02 | 85% | 65% | -20 pts |
+| 2x2.p09 | 82% | 75% | -7 pts |
+| p09.vs_p02_400 | 90% | 68% | -22 pts |
+| p09.dano_por_acerto | 733 | 746 | +13 |
+| p09.parte_agarroes | 1% | 8% | +7 pts |
+| p09.parte_2M | 25% | 19% | -6 pts |
+
+**Resultado:**
+- **Agarrões:** passaram de 1% para 8% do dano do p09, e o 2M caiu de 25% para 19%.
+- **Vitórias:** entrando para agarrar ele se expõe mais. Contra o elenco no 1x1, 74% → 62%; contra a
+  Yin-lu, 90% → 68%.
+- **Velocidade (300 → 270):** não precisou na segunda iteração. Ele saiu do topo do 1x1 só com o 2M e
+  a CPU; a decisão fica para depois do teste com jogadores.
+- **Atenção:** a queda vem da CPU, e um p09 humano que só cutuca com o 2M não muda. O teste com
+  jogadores é o que diz se o p09 humano ainda domina.
+- **Testes:** os 541 do app passam, e o `build_characters.py --check` confere o arquivo gerado.
