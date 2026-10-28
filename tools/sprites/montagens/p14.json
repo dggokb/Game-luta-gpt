@@ -220,5 +220,47 @@
         "impacto": 2
       }
     }
+  },
+  "fall_down": {
+    "_doc": "Queda de costas (36-48) e deitado (52-70) do vídeo derruba_levanta.",
+    "trechos": [
+      [
+        "derruba_levanta",
+        0,
+        124
+      ]
+    ],
+    "quadros": "36,38,40,42,44,46,48,52,56,62,70",
+    "opcoes": {
+      "fixar": "quadro",
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "KNOCKDOWN": {
+        "frames": "0-6"
+      },
+      "GROUNDED": {
+        "frames": "7-10"
+      }
+    }
+  },
+  "getup": {
+    "_doc": "Levantar (76-110) do vídeo derruba_levanta.",
+    "trechos": [
+      [
+        "derruba_levanta",
+        0,
+        124
+      ]
+    ],
+    "quadros": "76,79,82,85,88,91,94,97,100,103,106,110",
+    "opcoes": {
+      "fixar": "registro",
+      "pe_no_chao": true,
+      "sem_chao": true
+    },
+    "animacoes": {
+      "GETUP": {}
+    }
   }
 }

@@ -2890,6 +2890,18 @@ final class GeneratedSpriteLayouts {
     static final int P14_FALL_ROOT_Y = 545;
     static final int P14_FALL_FRAME_COUNT = 6;
 
+    static final int P14_FALL_DOWN_FRAME_WIDTH = 677;
+    static final int P14_FALL_DOWN_FRAME_HEIGHT = 413;
+    static final int P14_FALL_DOWN_ROOT_X = 302;
+    static final int P14_FALL_DOWN_ROOT_Y = 403;
+    static final int P14_FALL_DOWN_FRAME_COUNT = 11;
+
+    static final int P14_GETUP_FRAME_WIDTH = 549;
+    static final int P14_GETUP_FRAME_HEIGHT = 477;
+    static final int P14_GETUP_ROOT_X = 240;
+    static final int P14_GETUP_ROOT_Y = 468;
+    static final int P14_GETUP_FRAME_COUNT = 12;
+
     static final int P14_GOLPE_ALTO_FRAME_WIDTH = 476;
     static final int P14_GOLPE_ALTO_FRAME_HEIGHT = 492;
     static final int P14_GOLPE_ALTO_ROOT_X = 171;

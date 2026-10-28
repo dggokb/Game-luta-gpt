@@ -1,0 +1,48 @@
+{
+  "id": "p14_fall_down",
+  "javaName": "P14_FALL_DOWN",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_fall_down_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_fall_down.webp",
+  "report": "tools/sprites/reports/p14_fall_down.report.json",
+  "preview": "android/app/build/sprite-review/p14_fall_down-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruba_levanta.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "36,38,40,42,44,46,48,52,56,62,70",
+    "largura": 384,
+    "raiz": "174,238",
+    "colunas": 5,
+    "fixar": "quadro",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_fall_down_video_normalized.png",
+      "celula": [
+        384,
+        256
+      ],
+      "raiz": [
+        174,
+        238
+      ],
+      "colunas": 11
+    }
+  },
+  "frameWidth": 768,
+  "rootX": 348,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_fall_down_video_normalized.png"
+  ]
+}

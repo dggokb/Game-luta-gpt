@@ -1,0 +1,49 @@
+{
+  "id": "p14_getup",
+  "javaName": "P14_GETUP",
+  "profile": "p14.json",
+  "source": "art/sprites/source/p14_getup_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p14_getup.webp",
+  "report": "tools/sprites/reports/p14_getup.report.json",
+  "preview": "android/app/build/sprite-review/p14_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p14 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruba_levanta.mp4",
+    "personagem": "p14",
+    "escala": 0.411,
+    "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
+    "quadros": "76,79,82,85,88,91,94,97,100,103,106,110",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "142,270",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p14_getup_video_normalized.png",
+      "celula": [
+        320,
+        288
+      ],
+      "raiz": [
+        142,
+        270
+      ],
+      "colunas": 11
+    }
+  },
+  "frameWidth": 640,
+  "frameHeight": 576,
+  "rootX": 284,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p14_getup_video_normalized.png"
+  ]
+}

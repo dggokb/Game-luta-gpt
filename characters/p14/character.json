@@ -2168,6 +2168,76 @@
         107,
         53
       ]
+    },
+    "KNOCKDOWN": {
+      "atlas": "p14_fall_down",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31
+      ]
+    },
+    "GROUNDED": {
+      "atlas": "p14_fall_down",
+      "frames": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        60,
+        60,
+        60,
+        1020
+      ]
+    },
+    "GETUP": {
+      "atlas": "p14_getup",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        25,
+        25
+      ]
     }
   },
   "moves": {
