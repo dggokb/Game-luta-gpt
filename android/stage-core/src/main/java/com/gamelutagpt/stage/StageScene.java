@@ -851,6 +851,9 @@ public final class StageScene {
      * a ponta de baixo é a que mais anda; uma onda desce pelo pano e as faixas estreitam um
      * pouco onde ele dobra. Cada cópia da camada balança num tempo diferente.
      */
+    /** Vértices do pano das bandeiras (reaproveitados). */
+    private float[] bannerXY = new float[0], bannerUV = new float[0];
+
     private void drawBanners(RenderCanvas c, Placed p, float l, float t, float r, float b,
                              boolean mirrored, int alpha, int instance) {
         List<StageDefinition.Banner> list = p.layer.banners;
@@ -876,6 +879,29 @@ public final class StageScene {
             if (mirrored) {
                 c.save();
                 c.scale(-1f, 1f, centerX, 0f);
+            }
+            if (c.desenhaFaixas()) {
+                // O pano numa chamada só: as bordas de cada faixa, com o vento calculado ali.
+                if (bannerXY.length < (rows + 1) * 4) {
+                    bannerXY = new float[(rows + 1) * 4];
+                    bannerUV = new float[(rows + 1) * 4];
+                }
+                for (int j = 0; j <= rows; j++) {
+                    float v = j / (float)rows;
+                    float weight = v * (float)Math.sqrt(v);
+                    float phase = 6.2832f * banner.waves * v - time * 3f * banner.speed + seed * 1.3f;
+                    float dx = side * amp * gust * weight * (0.6f * swing + 0.4f * (float)Math.sin(phase));
+                    float half = bw * 0.5f * (1f - 0.05f * weight * (float)Math.cos(phase));
+                    float cx = centerX + dx, yy = bt + v * bh;
+                    int k = j * 4;
+                    bannerXY[k] = cx - half; bannerXY[k + 1] = yy; bannerXY[k + 2] = cx + half; bannerXY[k + 3] = yy;
+                    // Meio pixel para dentro nas bordas: a repetição não puxa a borda do outro lado.
+                    float sv = Math.max(0.5f, Math.min(srcH - 0.5f, v * srcH));
+                    bannerUV[k] = 0.5f; bannerUV[k + 1] = sv; bannerUV[k + 2] = srcW - 0.5f; bannerUV[k + 3] = sv;
+                }
+                c.drawImageStrip(image, bannerXY, bannerUV, rows + 1, alpha);
+                if (mirrored) c.restore();
+                continue;
             }
             for (int j = 0; j < rows; j++) {
                 float v0 = j / (float)rows, v1 = (j + 1) / (float)rows;
@@ -1029,6 +1055,10 @@ public final class StageScene {
         float imgW = floorImage.width();
         float imgH = floorImage.height();
         float start = Math.max(groundTop, camera.horizonY() + 0.5f);
+        if (c.desenhaFaixas()) {
+            drawFloorStrips(c, floor, start, imgW, imgH);
+            return;
+        }
         for (float y0 = start; y0 < VH; y0 += FLOOR_STRIP) {
             float y1 = Math.min(VH + 1f, y0 + FLOOR_STRIP);
             float zTop = camera.floorDepthAt(y0);
@@ -1078,6 +1108,74 @@ public final class StageScene {
                 tile++;
             }
         }
+    }
+
+    /** Vértices do piso em faixas (reaproveitados de quadro em quadro). */
+    private float[] floorXY = new float[0], floorUV = new float[0], floorTileXY = new float[0], floorTileUV = new float[0];
+
+    /**
+     * O piso inteiro em duas chamadas ({@link RenderCanvas#drawImageStrip}) no lugar de uma por
+     * faixa e por lajota: as mesmas linhas de {@link #FLOOR_STRIP} na tela, mais as de "longe" e
+     * "perto" (onde a regra da imagem muda), com o ponto exato da imagem em cada canto. As
+     * lajotas (que se repetem para os lados e, depois de "longe", para o fundo) cobrem a largura
+     * toda; a cópia do centro, com o emblema, vai por cima entre "perto" e "longe".
+     */
+    private void drawFloorStrips(RenderCanvas c, StageDefinition.Floor floor, float start, float imgW, float imgH) {
+        float yFar = camera.screenY(world.groundY, floor.far);
+        float yNear = camera.screenY(world.groundY, floor.near);
+        int max = (int)Math.ceil((VH + 1f - start) / FLOOR_STRIP) + 4;
+        if (floorXY.length < max * 4) {
+            floorXY = new float[max * 4];
+            floorUV = new float[max * 4];
+            floorTileXY = new float[max * 4];
+            floorTileUV = new float[max * 4];
+        }
+        RenderImage plain = floorPlainImage;
+        float kx = plain.width() / imgW, ky = plain.height() / imgH;
+        boolean emblem = plain != floorImage;
+        float tileLeft = floorCenterX - floorTileWidth * 0.5f;
+        int rows = 0, tileRows = 0;
+        float y = start;
+        while (rows < max) {
+            float z = camera.floorDepthAt(y);
+            if (!Float.isNaN(z)) {
+                z = Math.min(z, floor.extent);
+                float v = floorV(floor, z, imgH);
+                float uLeft = (camera.worldX(0f, z) - tileLeft) / floorTileWidth * imgW;
+                float uRight = (camera.worldX(VW, z) - tileLeft) / floorTileWidth * imgW;
+                int k = rows * 4;
+                floorXY[k] = 0f; floorXY[k + 1] = y; floorXY[k + 2] = VW + 0.5f; floorXY[k + 3] = y;
+                floorUV[k] = uLeft * kx; floorUV[k + 1] = v * ky; floorUV[k + 2] = uRight * kx; floorUV[k + 3] = v * ky;
+                rows++;
+                if (emblem && z <= floor.far + 0.01f) {
+                    int t = tileRows * 4;
+                    floorTileXY[t] = camera.screenX(tileLeft, z); floorTileXY[t + 1] = y;
+                    floorTileXY[t + 2] = camera.screenX(tileLeft + floorTileWidth, z); floorTileXY[t + 3] = y;
+                    floorTileUV[t] = 0f; floorTileUV[t + 1] = v; floorTileUV[t + 2] = imgW; floorTileUV[t + 3] = v;
+                    tileRows++;
+                }
+            }
+            if (y >= VH + 1f) break;
+            float next = Math.min(VH + 1f, y + FLOOR_STRIP);
+            // Linha extra onde a imagem muda de regra (o fim da cópia do centro e o começo da faixa esticada).
+            if (yFar > y + 0.01f && yFar < next - 0.01f) next = yFar;
+            else if (yNear > y + 0.01f && yNear < next - 0.01f) next = yNear;
+            y = next;
+        }
+        c.drawImageStrip(plain, floorXY, floorUV, rows, 255);
+        if (tileRows >= 2) c.drawImageStrip(floorImage, floorTileXY, floorTileUV, tileRows, 255);
+    }
+
+    /**
+     * Linha da imagem do piso na profundidade z (pixels de {@code imgH}): de "longe" (topo) a
+     * "perto" (fundo); mais perto que "perto" fica a última linha esticada; depois de "longe" a
+     * conta continua (negativa) e a imagem se repete para o fundo.
+     */
+    private static float floorV(StageDefinition.Floor floor, float z, float imgH) {
+        float a = (floor.far - z) / (floor.far - floor.near);
+        if (z > floor.far) return a * imgH;
+        // Meio pixel para dentro: a repetição não mistura a última linha com a primeira.
+        return Math.min(a * imgH, imgH - 0.5f);
     }
 
     /** Luzes e fogos que estão sobre o piso viram faixas de brilho no chão molhado. */

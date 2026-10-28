@@ -109,7 +109,27 @@ final class HudRenderer {
                          float x, float y, float w, float h) {
         artSource.set(l, t, r, b);
         artTarget.set(x, y, x + w, y + h);
-        c.drawBitmap(hudArt, artSource, artTarget, imagePaint);
+        c.drawBitmap(artePara(c), artSource, artTarget, imagePaint);
+    }
+
+    /** A moldura na placa de vídeo (feita na primeira vez que a tela é da GPU). */
+    private Bitmap hudArtPlaca;
+
+    /**
+     * A moldura do HUD cobre boa parte do alto da tela em todo quadro: na tela da GPU vai uma
+     * cópia na placa de vídeo (sem a cópia para a placa a cada vez que ela sai do cache).
+     */
+    private Bitmap artePara(Canvas c) {
+        if (!c.isHardwareAccelerated() || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) return hudArt;
+        if (hudArtPlaca == null) {
+            try {
+                hudArtPlaca = hudArt.copy(Bitmap.Config.HARDWARE, false);
+            } catch (RuntimeException e) {
+                hudArtPlaca = null;
+            }
+            if (hudArtPlaca == null) hudArtPlaca = hudArt;
+        }
+        return hudArtPlaca;
     }
 
     private void reset() {

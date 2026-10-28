@@ -1,6 +1,7 @@
 package com.gamelutagpt;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
@@ -48,6 +49,15 @@ final class AndroidRenderCanvas implements RenderCanvas {
         paint.setTypeface(Typeface.DEFAULT_BOLD);
         paint.setTextAlign(Paint.Align.CENTER);
     }
+
+    /**
+     * Faixas numa chamada só ({@link Canvas#drawVertices}): na GPU do Android 10 em diante (antes
+     * disso a GPU não desenha vértices). No PC, -Dgameluta.faixas=true liga para conferir.
+     */
+    static final boolean FAIXAS = android.os.Build.VERSION.SDK_INT >= 29 || Boolean.getBoolean("gameluta.faixas");
+    private final Paint stripPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+    /** A imagem que se repete, uma por bitmap (o chão e as bandeiras usam sempre as mesmas). */
+    private final java.util.Map<Bitmap, BitmapShader> stripShaders = new java.util.WeakHashMap<>();
 
     /** Define o Canvas do quadro atual, já escalado para 1280x720. */
     void begin(Canvas target) {
@@ -149,6 +159,29 @@ final class AndroidRenderCanvas implements RenderCanvas {
         if (srcRect.width() <= 0 || srcRect.height() <= 0) return;
         rect.set(left, top, right, bottom);
         canvas.drawBitmap(bitmap, srcRect, rect, imagePaint);
+    }
+
+    @Override
+    public boolean desenhaFaixas() {
+        return FAIXAS && canvas.isHardwareAccelerated();
+    }
+
+    @Override
+    public void drawImageStrip(RenderImage image, float[] xy, float[] uv, int linhas, int alpha) {
+        if (linhas < 2) return;
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
+        if (!desenhavel(bitmap)) return;
+        BitmapShader shader = stripShaders.get(bitmap);
+        if (shader == null) {
+            shader = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+            stripShaders.put(bitmap, shader);
+        }
+        stripPaint.setShader(shader);
+        stripPaint.setAlpha(alpha);
+        // Esquerda e direita de cada linha, de cima para baixo: a tira de triângulos forma os
+        // quadriláteros entre uma linha e a próxima.
+        canvas.drawVertices(Canvas.VertexMode.TRIANGLE_STRIP, linhas * 4, xy, 0, uv, 0, null, 0, null, 0, 0, stripPaint);
+        stripPaint.setShader(null);
     }
 
     /**

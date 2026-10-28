@@ -48,6 +48,25 @@ public interface RenderCanvas {
         int alpha
     );
 
+    /**
+     * Desenha numa chamada só a imagem esticada numa faixa de quadriláteros empilhados (o chão em
+     * perspectiva, o pano da bandeira): {@code linhas} linhas de vértices, cada uma com o ponto
+     * da esquerda e o da direita ({x, y}: 4 números por linha em {@code xy}) e o ponto da imagem
+     * que cai em cada um ({u, v} em pixels da imagem, 4 por linha em {@code uv}; fora da imagem
+     * ela se repete). Só se chama quando {@link #desenhaFaixas()}.
+     */
+    default void drawImageStrip(RenderImage image, float[] xy, float[] uv, int linhas, int alpha) {
+        throw new UnsupportedOperationException("drawImageStrip");
+    }
+
+    /**
+     * A plataforma desenha {@link #drawImageStrip} de uma vez (no celular, uma chamada no lugar
+     * de centenas de recortes por quadro). Sem isso o cenário desenha recorte por recorte.
+     */
+    default boolean desenhaFaixas() {
+        return false;
+    }
+
     /** Brilho circular: a cor no centro some até ficar transparente na borda. */
     void fillRadialGlow(float cx, float cy, float radius, int argbCenter);
 

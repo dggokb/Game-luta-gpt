@@ -195,6 +195,7 @@ public class Canvas {
     }
 
     private int saveLayer(float left, float top, float right, float bottom, Paint paint, boolean whole) {
+        if (areas != null) contar(new Rectangle2D.Float(left, top, right - left, bottom - top), "camada");
         AffineTransform t = g.getTransform();
         Shape clip = g.getClip();
         Rectangle2D device = new Rectangle2D.Double(0, 0, width, height);
@@ -313,6 +314,38 @@ public class Canvas {
         return clip != null && clip.getBounds2D().isEmpty();
     }
 
+
+    // ------------------------------------------------------------------ medição de pintura (PC)
+
+    /**
+     * Ferramenta: com um mapa aqui, cada desenho soma a área de tela que cobre (a caixa no
+     * dispositivo, cortada pela tela e pelo recorte), por quem chamou. Mede quantas vezes o
+     * quadro pinta a tela (o que pesa na GPU de celular).
+     */
+    public static volatile java.util.Map<String, double[]> areas;
+
+    private void contar(Shape forma, String tipo) {
+        java.util.Map<String, double[]> m = areas;
+        if (m == null || forma == null || g == null) return;
+        Rectangle2D b = g.getTransform().createTransformedShape(forma).getBounds2D();
+        Shape clip = g.getClip();
+        Rectangle2D c = clip != null ? g.getTransform().createTransformedShape(clip).getBounds2D() : new Rectangle2D.Float(0, 0, width, height);
+        Rectangle2D.intersect(b, c, b);
+        Rectangle2D.intersect(b, new Rectangle2D.Float(0, 0, width, height), b);
+        if (b.isEmpty()) return;
+        String quem = "?";
+        for (StackTraceElement e : new Throwable().getStackTrace()) {
+            String k = e.getClassName();
+            if (k.startsWith("android.") || k.startsWith("java.")) continue;
+            if (k.endsWith("AndroidRenderCanvas")) continue;
+            quem = k.substring(k.lastIndexOf('.') + 1) + "." + e.getMethodName() + ":" + e.getLineNumber();
+            break;
+        }
+        double[] v = m.computeIfAbsent(tipo + " " + quem, x -> new double[2]);
+        v[0] += b.getWidth() * b.getHeight();
+        v[1]++;
+    }
+
     // ------------------------------------------------------------------ formas
 
     public void drawColor(int color) { fillDevice(color, AlphaComposite.SrcOver); }
@@ -326,6 +359,10 @@ public class Canvas {
     public void drawRGB(int r, int gr, int b) { drawColor(Color.rgb(r, gr, b)); }
 
     public void drawPaint(Paint paint) {
+        if (areas != null) {
+            try { contar(g.getTransform().createInverse().createTransformedShape(new Rectangle2D.Float(0, 0, width, height)), "cor"); }
+            catch (NoninvertibleTransformException ignored) { }
+        }
         AffineTransform saved = g.getTransform();
         try {
             Shape all = saved.createInverse().createTransformedShape(new Rectangle2D.Float(0, 0, width, height));
@@ -336,6 +373,11 @@ public class Canvas {
     }
 
     private void fillDevice(int color, Composite composite) {
+        if (areas != null) {
+            AffineTransform t0 = g.getTransform();
+            try { contar(t0.createInverse().createTransformedShape(new Rectangle2D.Float(0, 0, width, height)), "cor"); }
+            catch (NoninvertibleTransformException ignored) { }
+        }
         AffineTransform saved = g.getTransform();
         Composite c = g.getComposite();
         g.setTransform(new AffineTransform());
@@ -405,6 +447,7 @@ public class Canvas {
 
     public void drawText(String text, float x, float y, Paint paint) {
         if (text == null || text.isEmpty()) return;
+        if (areas != null) contar(new Rectangle2D.Float(x - paint.measureText(text), y - paint.getTextSize(), paint.measureText(text) * 2f, paint.getTextSize() * 1.3f), "texto");
         if (paint.shader == null && TextImages.ENABLED) {
             drawCachedText(text, x, y, paint);
             return;
@@ -528,6 +571,58 @@ public class Canvas {
         drawText(new String(text, index, count), x, y, paint);
     }
 
+    // ------------------------------------------------------------------ vértices
+
+    public enum VertexMode { TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN }
+
+    /**
+     * PC: só a tira de triângulos com a imagem de um {@link BitmapShader} (o chão e as bandeiras
+     * do cenário). Cada triângulo leva a imagem pela transformação afim que liga os pontos da
+     * imagem aos da tela; a imagem se repete fora dela.
+     */
+    public void drawVertices(VertexMode mode, int vertexCount, float[] verts, int vertOffset, float[] texs, int texOffset,
+                             int[] colors, int colorOffset, short[] indices, int indexOffset, int indexCount, Paint paint) {
+        if (mode != VertexMode.TRIANGLE_STRIP || texs == null || !(paint.shader instanceof BitmapShader)) return;
+        java.awt.Paint textura = paint.shader.toAwt();
+        int n = vertexCount / 2;
+        Composite saved = g.getComposite();
+        java.awt.Paint savedPaint = g.getPaint();
+        Object interp = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+        if (paint.getAlpha() < 255) g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, paint.getAlpha() / 255f));
+        Object aa = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        // Sem suavizar a borda: triângulos vizinhos se encostam sem costura (como na GPU).
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setPaint(textura);
+        AffineTransform base = g.getTransform();
+        for (int i = 0; i + 2 < n; i++) {
+            int a = vertOffset + 2 * i, ta = texOffset + 2 * i;
+            double x0 = verts[a], y0 = verts[a + 1], x1 = verts[a + 2], y1 = verts[a + 3], x2 = verts[a + 4], y2 = verts[a + 5];
+            double u0 = texs[ta], v0 = texs[ta + 1], u1 = texs[ta + 2], v1 = texs[ta + 3], u2 = texs[ta + 4], v2 = texs[ta + 5];
+            // Imagem -> tela: (u,v) -> (x,y) nos três cantos.
+            double du1 = u1 - u0, dv1 = v1 - v0, du2 = u2 - u0, dv2 = v2 - v0;
+            double det = du1 * dv2 - du2 * dv1;
+            if (Math.abs(det) < 1e-9) continue;
+            double dx1 = x1 - x0, dy1 = y1 - y0, dx2 = x2 - x0, dy2 = y2 - y0;
+            double m00 = (dx1 * dv2 - dx2 * dv1) / det, m01 = (dx2 * du1 - dx1 * du2) / det;
+            double m10 = (dy1 * dv2 - dy2 * dv1) / det, m11 = (dy2 * du1 - dy1 * du2) / det;
+            AffineTransform t = new AffineTransform(m00, m10, m01, m11, x0 - m00 * u0 - m01 * v0, y0 - m10 * u0 - m11 * v0);
+            java.awt.geom.Path2D.Double tri = new java.awt.geom.Path2D.Double();
+            tri.moveTo(u0, v0);
+            tri.lineTo(u1, v1);
+            tri.lineTo(u2, v2);
+            tri.closePath();
+            g.setTransform(base);
+            g.transform(t);
+            g.fill(tri);
+        }
+        g.setTransform(base);
+        g.setPaint(savedPaint);
+        if (interp != null) g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interp);
+        if (aa != null) g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, aa);
+        g.setComposite(saved);
+    }
+
     // ------------------------------------------------------------------ bitmaps
 
     public void drawBitmap(Bitmap bitmap, float left, float top, Paint paint) {
@@ -548,6 +643,7 @@ public class Canvas {
             sy1 = Math.min(image.getHeight(), src.bottom);
         }
         if (sx1 <= sx0 || sy1 <= sy0 || dst.width() == 0f || dst.height() == 0f) return;
+        if (areas != null) contar(new Rectangle2D.Float(Math.min(dst.left, dst.right), Math.min(dst.top, dst.bottom), Math.abs(dst.width()), Math.abs(dst.height())), "img");
         int alpha = paint == null ? 255 : paint.getAlpha();
         if (alpha <= 0) return;
         ColorFilter filter = paint == null ? null : paint.colorFilter;
@@ -683,6 +779,7 @@ public class Canvas {
     // ------------------------------------------------------------------ pintura
 
     private void draw(Shape shape, Paint paint) {
+        if (areas != null) contar(shape, "forma");
         switch (paint.style) {
             case FILL:
                 fill(shape, paint);

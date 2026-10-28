@@ -95,6 +95,9 @@ public final class Bitmap {
         return new Bitmap(copy);
     }
 
+    /** PC: uma cópia (a da placa de vídeo é igual à comum aqui). */
+    public Bitmap copy(Config config, boolean isMutable) { return createBitmap(this); }
+
     public static Bitmap createBitmap(Bitmap src) { return createBitmap(src, 0, 0, src.getWidth(), src.getHeight()); }
 
     public static Bitmap createScaledBitmap(Bitmap src, int dstWidth, int dstHeight, boolean filter) {
