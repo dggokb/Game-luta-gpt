@@ -59,8 +59,8 @@ public class ControleNoArTest {
         float x = s.p().x;
         s.in[0].direction = TRAS;
         s.steps(10);
-        assertEquals("segue para frente na velocidade de andar",
-            x + 10 * porQuadro(s.config().walkSpeed), s.p().x, 0.5f);
+        assertEquals("segue para frente na velocidade do pulo",
+            x + 10 * porQuadro(s.config().jumpForwardSpeed), s.p().x, 0.5f);
     }
 
     @Test public void logoDepoisDeSairDoChaoAindaDaParaEscolherADirecao() {
@@ -71,7 +71,7 @@ public class ControleNoArTest {
         s.in[0].direction = 0;
         float x = s.p().x;
         s.steps(10);
-        assertEquals("virou pulo para frente", x + 10 * porQuadro(s.config().walkSpeed), s.p().x, 0.5f);
+        assertEquals("virou pulo para frente", x + 10 * porQuadro(s.config().jumpForwardSpeed), s.p().x, 0.5f);
     }
 
     @Test public void superPuloTemDriftQueMudaAosPoucos() {

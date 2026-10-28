@@ -1706,6 +1706,12 @@ final class CombatEngine {
         return horizontal == f.facing ? config.walkSpeed : config.walkBackSpeed;
     }
 
+    /** Velocidade de lado do pulo normal: mais que a de andar (o pulo vai longe com o mesmo tempo no ar). */
+    private float jumpSpeedX(CombatFighter f, int horizontal) {
+        if (horizontal == 0) return 0f;
+        return horizontal == f.facing ? config.jumpForwardSpeed : config.jumpBackSpeed;
+    }
+
     /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
     private void airDrift(CombatFighter f, int horizontal, float walk, float boost) {
         switch (f.jumpMode) {
@@ -1715,7 +1721,7 @@ final class CombatEngine {
             case CombatFighter.PULO_COMPROMETIDO:
                 // Logo depois de sair do chão ainda dá para escolher a direção; depois, fixa.
                 if (f.jumpFrames < config.jumpDirectionFrames && horizontal != 0) f.jumpDirection = horizontal;
-                f.x += f.jumpDirection * airSpeed(f, f.jumpDirection) * boost * CombatConfig.DT;
+                f.x += f.jumpDirection * jumpSpeedX(f, f.jumpDirection) * boost * CombatConfig.DT;
                 break;
             case CombatFighter.PULO_SUPER: {
                 // Drift: o stick puxa aos poucos; solto, o embalo continua.

@@ -168,7 +168,7 @@ final class AiController {
     /** Erro de mira do pulo no nível 1 (some no 8), em quadros para cada lado. */
     static final float JUMP_OVER_SLOP = 4f;
     /** O quanto o pulo para frente anda por quadro (fecha a distância junto com a bola). */
-    static final float JUMP_FORWARD_STEP = 5.1f;
+    static final float JUMP_FORWARD_STEP = 6.8f;
     /** Pular por cima só vale com o rival a até isto: de mais longe ela cai na frente da próxima. */
     static final float JUMP_OVER_RANGE = 560f;
     /** Bolas do rival nos últimos {@link #ZONING_MEMORY} quadros para ela achar que ele está zoneando. */
@@ -676,7 +676,7 @@ final class AiController {
             seen.status == CombatFighter.Status.KNOCKDOWN && me.character().move("M", true) != null) {
             float gap = Math.abs(seen.x - me.x);
             crossPlanned = true;
-            if (gap > 70f && gap < 190f && crossRandom.nextDouble() < level.antiAir * 0.35) {
+            if (gap > 95f && gap < 250f && crossRandom.nextDouble() < level.antiAir * 0.35) {
                 out.jump = true;
                 out.direction = me.facing > 0 ? 8 : 6;
                 jumpHold = JUMP_HOLD_FRAMES;

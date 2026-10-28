@@ -283,18 +283,19 @@ final class TutorialDirector {
     }
 
     /**
-     * Espaço entre os corpos nas lições de pulo: o pulo para frente é comprometido (anda ~210
+     * Espaço entre os corpos nas lições de pulo: o pulo para frente é comprometido (anda ~280
      * até cair), então o boneco fica longe o bastante para o golpe aéreo pegar na descida, sem
      * passar por cima dele.
      */
-    static final float JUMP_IN_GAP = 140f;
+    static final float JUMP_IN_GAP = 200f;
 
     /**
      * Pulo para frente e H na descida; a cada tentativa aperta num ponto diferente, até achar o
      * ponto em que o golpe aéreo alcança o boneco.
      */
     private static void jumpIn(Ctx c, FighterInput p1, boolean down) {
-        int tryIndex = c.t / 70, frame = c.t % 70;
+        // Cada tentativa: ~46 quadros de pulo e o resto andando de volta (o pulo leva ~280).
+        int tryIndex = c.t / 110, frame = c.t % 110;
         if (frame >= 46) {
             // Entre as tentativas: o pulo para frente é comprometido e leva o lutador longe;
             // ele anda de volta até a distância da lição antes de pular de novo.

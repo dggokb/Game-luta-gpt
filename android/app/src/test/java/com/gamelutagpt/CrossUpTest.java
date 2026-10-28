@@ -19,7 +19,7 @@ public class CrossUpTest {
 
     /** P1 pula para frente por cima do P2 parado e aperta M no quadro {@code press}; P2 segura {@code hold} (absoluto, 0 = nada). */
     private static Pulo pulo(String golpe, int press, int hold) {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, BASE, 500f, 600f);
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, BASE, 500f, 670f);
         Pulo r = new Pulo();
         s.in[0].jump = true;
         s.in[0].direction = 1;

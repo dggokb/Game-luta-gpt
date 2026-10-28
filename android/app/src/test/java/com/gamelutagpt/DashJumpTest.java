@@ -62,7 +62,7 @@ public class DashJumpTest {
         correndo.run(8);
         float longe = correndo.jump(CIMA_FRENTE);
         assertEquals(CombatFighter.PULO_CORRIDA, correndo.modo);
-        assertTrue("pulo da corrida " + longe + " x normal " + andou, longe > andou * 1.6f);
+        assertTrue("pulo da corrida " + longe + " x normal " + andou, longe > andou * 1.35f);
         assertTrue("mas não atravessa a tela: " + longe, longe < 500f);
     }
 
@@ -83,7 +83,7 @@ public class DashJumpTest {
         assertFalse("a corrida também acabou", s.p().forwardDashing);
         // O próximo pulo, parado, é o normal.
         float andou = s.jump(CIMA_FRENTE);
-        float normal = s.engine.config.walkSpeed * 44 * CombatConfig.DT;
+        float normal = s.engine.config.jumpForwardSpeed * 44 * CombatConfig.DT;
         assertTrue("pulo normal de novo: " + andou, andou <= normal);
     }
 }

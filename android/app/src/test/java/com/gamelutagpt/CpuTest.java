@@ -265,7 +265,7 @@ public class CpuTest {
         for (int level = 1; level <= 8; level++) {
             // 10 sementes: a CPU ataca bastante no neutro e às vezes está ocupada quando ele pula.
             for (long seed = 1; seed <= 10; seed++) {
-                Fight f = new Fight(BASE, BASE, 360f, level, seed);
+                Fight f = new Fight(BASE, BASE, 430f, level, seed);
                 int jumpAt = 40 + (int)(seed * 7);
                 int reaction = -1;
                 for (int i = 0; i < jumpAt + 60 && reaction < 0; i++) {

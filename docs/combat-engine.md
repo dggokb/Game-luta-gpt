@@ -613,7 +613,7 @@ Como no FighterZ e no MvC. O jeito de mover de lado no ar é decidido na saída 
 
 | Modo | Quando | No ar |
 |---|---|---|
-| `PULO_COMPROMETIDO` | pulo normal (↖ ↑ ↗), pulo no ar (jM → pulo), depois do wall jump | a direção fica fixa: para frente `walkSpeed`, para trás `walkBackSpeed`, para cima parado. Nos primeiros `jumpDirectionFrames` (3) ainda dá para escolher a direção (o "pré-pulo") |
+| `PULO_COMPROMETIDO` | pulo normal (↖ ↑ ↗), pulo no ar (jM → pulo), depois do wall jump | a direção fica fixa: para frente `jumpForwardSpeed` (400, ~280 de distância), para trás `jumpBackSpeed` (290, ~205), para cima parado. Mais que andar, com o mesmo tempo no ar (~41 quadros). Nos primeiros `jumpDirectionFrames` (3) ainda dá para escolher a direção (o "pré-pulo") |
 | `PULO_SUPER` | super pulo (↓ ↑, ou a perseguição do launcher) | drift: o stick puxa aos poucos (`superJumpDriftAccel`, 900 u/s²) até a velocidade de andar daquele lado; solto, o embalo continua. Dá para frear e virar no meio, mas não de uma vez |
 | `PULO_CORRIDA` | pulo saído do dash para frente | veja abaixo |
 | `PULO_LIVRE` | no ar sem ter pulado: recuperação no ar, depois de apanhar | o stick dirige direto, como antes |

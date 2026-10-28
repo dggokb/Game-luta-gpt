@@ -94,8 +94,15 @@ final class CombatConfig {
     float walkBackSpeed = 220f;
     float dashSpeed = 620f;
     /**
-     * Pulo saído da corrida (dash jump): velocidade para frente no ar. O pulo normal anda
-     * walkSpeed (~210 de distância); este leva o embalo do dash e vai ~1,8x mais longe.
+     * Pulo normal: velocidade de lado no ar, para frente e para trás. Mais que a de andar: com o
+     * mesmo tempo no ar (~41 quadros) vai ~280 para frente (passa do alcance dos golpes de chão
+     * e cruza por cima de perto) e ~205 para trás.
+     */
+    float jumpForwardSpeed = 400f;
+    float jumpBackSpeed = 290f;
+    /**
+     * Pulo saído da corrida (dash jump): velocidade para frente no ar. Leva o embalo do dash e
+     * vai ~400, bem mais que o pulo normal.
      */
     float dashJumpSpeed = 540f;
     /**
