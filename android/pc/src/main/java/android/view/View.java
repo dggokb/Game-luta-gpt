@@ -38,6 +38,9 @@ public class View {
 
     public void invalidate() {}
 
+    /** PC: a tela de 60 Hz. */
+    public Display getDisplay() { return Display.PADRAO; }
+
     /** No PC a janela avisa por setSize; fica para quem sobrescreve (o celular usa). */
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {}
 

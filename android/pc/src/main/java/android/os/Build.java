@@ -14,7 +14,7 @@ public final class Build {
     }
 
     public static final class VERSION_CODES {
-        public static final int N = 24, N_MR1 = 25, O = 26, O_MR1 = 27, P = 28, Q = 29;
+        public static final int N = 24, N_MR1 = 25, O = 26, O_MR1 = 27, P = 28, Q = 29, R = 30;
         private VERSION_CODES() {}
     }
 }

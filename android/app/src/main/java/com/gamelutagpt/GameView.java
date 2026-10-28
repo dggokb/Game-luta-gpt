@@ -1381,7 +1381,18 @@ public class GameView extends SurfaceView
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {}
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+        // O jogo anda a 60 quadros: numa tela de 90 ou 120 Hz o sistema mostra cada quadro por 1
+        // ou 2 batidas da tela, alternando (tremida mesmo a 60 FPS). Pedir 60 deixa a tela no
+        // ritmo do jogo (ou num múltiplo dele).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                surfaceHolder.getSurface().setFrameRate(60f, android.view.Surface.FRAME_RATE_COMPATIBILITY_FIXED_SOURCE);
+            } catch (RuntimeException e) {
+                Log.w(LOG_TAG, "taxa de quadros da tela não mudou", e);
+            }
+        }
+    }
 
     /**
      * Direcional e botões ficam colados nas bordas da tela: no Android com navegação por
@@ -3249,6 +3260,7 @@ public class GameView extends SurfaceView
             String nivel = QualidadeGrafica.NOMES[qualidade.nivel()];
             if (qualidade.modo() == QualidadeGrafica.Modo.AUTO) nivel = "AUTO " + nivel;
             fpsTexto = Math.round(fpsAtual) + " FPS  ·  " + nivel + "  ·  " + canvas.getHeight() + "p";
+            fpsDiagnostico();
         }
         if (fpsAtual < 0f) return;
         canvas.save();
@@ -3265,7 +3277,55 @@ public class GameView extends SurfaceView
         // Verde a 55+, amarelo a 45+, vermelho abaixo.
         fpsPaint.setColor(fpsAtual >= 55f ? 0xFF6CFF7A : fpsAtual >= 45f ? 0xFFFFD84A : 0xFFFF5A5A);
         canvas.drawText(fpsTexto, cx, top + 19f, fpsPaint);
+        // Diagnóstico (uma captura de tela diz onde o quadro pesa): o tempo por parte, as folhas e
+        // a memória do aparelho.
+        fpsPaint.setTextSize(13f);
+        fpsPaint.setTypeface(Typeface.DEFAULT);
+        float y = top - 8f;
+        for (int i = fpsLinhas.length - 1; i >= 0; i--) {
+            String linha = fpsLinhas[i];
+            if (linha == null || linha.isEmpty()) continue;
+            float lw = fpsPaint.measureText(linha) + 16f;
+            fpsCaixa.set(cx - lw * 0.5f, y - 17f, cx + lw * 0.5f, y + 3f);
+            fpsPaint.setColor(0xB0000000);
+            canvas.drawRoundRect(fpsCaixa, 6f, 6f, fpsPaint);
+            fpsPaint.setColor(0xFFFFFFFF);
+            canvas.drawText(linha, cx, y - 2f, fpsPaint);
+            y -= 22f;
+        }
         canvas.restore();
+    }
+
+    /** Linhas do diagnóstico, de cima para baixo (refeitas a cada janela do contador). */
+    private final String[] fpsLinhas = new String[3];
+
+    private void fpsDiagnostico() {
+        String partes = perfil.ultima();
+        int corte = partes.indexOf('|');
+        fpsLinhas[0] = corte >= 0 ? partes.substring(corte + 1).trim() : partes;
+        int[] onde = atlases.ondeEstao();
+        fpsLinhas[1] = "folhas " + (atlases.decodedBytes() >> 20) + " MB (" + onde[0] + " na placa de vídeo, "
+            + onde[1] + " na memória comum)  ·  " + Math.round(taxaDaTela()) + " Hz";
+        String memoria = "";
+        try {
+            android.app.ActivityManager am =
+                (android.app.ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+            if (am != null) {
+                android.app.ActivityManager.MemoryInfo m = new android.app.ActivityManager.MemoryInfo();
+                am.getMemoryInfo(m);
+                memoria = String.format(java.util.Locale.ROOT, "RAM livre %.1f de %.1f GB%s  ·  ",
+                    m.availMem / 1073741824.0, m.totalMem / 1073741824.0, m.lowMemory ? " (POUCA)" : "");
+            }
+        } catch (RuntimeException e) {
+            memoria = "";
+        }
+        fpsLinhas[2] = memoria + Build.MANUFACTURER + " " + Build.MODEL + "  ·  Android " + Build.VERSION.RELEASE;
+    }
+
+    /** Quadros por segundo da tela do aparelho (60, 90, 120...). */
+    private float taxaDaTela() {
+        android.view.Display d = getDisplay();
+        return d != null ? d.getRefreshRate() : 60f;
     }
 
     private void prepararRostosDoHud(CharacterDefinition... lutadores) {

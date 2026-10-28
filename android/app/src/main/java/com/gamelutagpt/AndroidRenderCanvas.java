@@ -1,5 +1,6 @@
 package com.gamelutagpt;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
@@ -121,9 +122,11 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public void drawImage(RenderImage image, float left, float top, float right, float bottom, int alpha) {
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
+        if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
         rect.set(left, top, right, bottom);
-        canvas.drawBitmap(((AndroidRenderAssets.AndroidRenderImage)image).bitmap, null, rect, imagePaint);
+        canvas.drawBitmap(bitmap, null, rect, imagePaint);
     }
 
     @Override
@@ -139,11 +142,21 @@ final class AndroidRenderCanvas implements RenderCanvas {
         float bottom,
         int alpha
     ) {
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
+        if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
         srcRect.set(Math.round(srcLeft), Math.round(srcTop), Math.round(srcRight), Math.round(srcBottom));
         if (srcRect.width() <= 0 || srcRect.height() <= 0) return;
         rect.set(left, top, right, bottom);
-        canvas.drawBitmap(((AndroidRenderAssets.AndroidRenderImage)image).bitmap, srcRect, rect, imagePaint);
+        canvas.drawBitmap(bitmap, srcRect, rect, imagePaint);
+    }
+
+    /**
+     * Imagem da placa de vídeo só se desenha num canvas da GPU: se a tela caiu para o software
+     * depois de a imagem carregar, ela fica de fora (em vez de fechar o jogo).
+     */
+    private boolean desenhavel(Bitmap bitmap) {
+        return canvas.isHardwareAccelerated() || !SpriteAtlasCache.naPlacaDeVideo(bitmap);
     }
 
     @Override

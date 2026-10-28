@@ -295,6 +295,15 @@ final class SpriteAtlasCache {
         synchronized(trava) { return bytesProntos; }
     }
 
+    /** Folhas prontas: {na placa de vídeo, na memória comum} (o diagnóstico do contador de FPS). */
+    int[] ondeEstao() {
+        int[] n=new int[2];
+        synchronized(trava) {
+            for(Entrada e:folhas.values()) if(e.folha!=null)n[naPlacaDeVideo(e.folha.bitmap)?0:1]++;
+        }
+        return n;
+    }
+
     /** Folhas ainda na fila ou decodificando. */
     int pendentes() {
         synchronized(trava) { return folhas.size()-size(); }

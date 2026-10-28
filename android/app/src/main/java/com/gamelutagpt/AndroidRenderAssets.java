@@ -63,9 +63,23 @@ final class AndroidRenderAssets implements RenderAssets {
         while (Math.max(bounds.outWidth, bounds.outHeight) / options.inSampleSize > MAX_IMAGE_SIDE) {
             options.inSampleSize *= 2;
         }
-        Bitmap bitmap;
-        try (InputStream in = assets.open(path)) {
-            bitmap = BitmapFactory.decodeStream(in, null, options);
+        Bitmap bitmap = null;
+        if (SpriteAtlasCache.naPlacaDeVideo && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            // Cenário (camadas do tamanho da tela, várias por quadro), Ultra e páginas: direto na
+            // placa de vídeo, como as folhas dos lutadores. Na memória comum o sistema as copia
+            // para a placa ao desenhar e de novo sempre que saem do cache de texturas.
+            options.inPreferredConfig = Bitmap.Config.HARDWARE;
+            try (InputStream in = assets.open(path)) {
+                bitmap = BitmapFactory.decodeStream(in, null, options);
+            } catch (RuntimeException | OutOfMemoryError e) {
+                bitmap = null;
+            }
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        }
+        if (bitmap == null) {
+            try (InputStream in = assets.open(path)) {
+                bitmap = BitmapFactory.decodeStream(in, null, options);
+            }
         }
         if (bitmap == null) throw new IOException("formato de imagem não suportado");
         return new AndroidRenderImage(bitmap);
