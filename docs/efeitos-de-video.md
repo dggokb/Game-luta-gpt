@@ -83,11 +83,15 @@ Para o vídeo: fundo verde liso, manequim verde sem contorno preto, câmera para
 vídeo começando sem efeito, o efeito dentro do quadro (o que passa da borda é esfumado) e nada
 verde no efeito (some junto com o manequim).
 
-| Efeito | Vídeo | O que é |
+Testados (28/10) e tirados do jogo: ficaram feios e derrubaram o FPS (folhas grandes, efeitos
+longos de 1 a 2 s cobrindo meia tela). O código continua: o efeito só entra se a folha existir.
+Para voltar, o efeito precisa ser curto (0,3 a 0,5 s), pequeno no quadro e com poucos quadros.
+
+| Efeito | Vídeo | O que era |
 |---|---|---|
 | `dano_cabeca` | Mannequin_Air_Damage_Effect (2º golpe) | estouro e anel de choque saindo de trás da cabeça |
 | `dano_tronco` | Spray_no_Tronco | spray de faíscas saindo pelas costas |
-| `dano_baixo` | (falta) | — no lugar, o do tronco mais embaixo |
+| `dano_baixo` | (não houve) | — |
 | `defesa` | Defesa_com_Impacto | a estrela de impacto nos antebraços cruzados e as faíscas |
 
 ## No jogo
