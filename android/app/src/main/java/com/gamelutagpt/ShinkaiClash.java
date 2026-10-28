@@ -51,6 +51,10 @@ final class ShinkaiClash {
     /** A frente de cada lado (para ler trás). */
     final int[] olhando = new int[2];
 
+    /** A coreografia (choque, ar, velocidade), quando o motor põe os dois na arena; null nos testes puros. */
+    CoreografiaClash coreo;
+    private final boolean[] empurrouAgora = new boolean[2];
+
     Fim fim = Fim.NENHUM;
     /** Quem venceu (ou desistiu, em DESISTENCIA), ou −1. */
     int lado = -1;
@@ -90,6 +94,11 @@ final class ShinkaiClash {
                 ultimoEmpurrao[i] = empurrao[i];
                 idadeEmpurrao[i] = 0;
             }
+        }
+        if (coreo != null) {
+            empurrouAgora[0] = empurrao[0] > 0;
+            empurrouAgora[1] = empurrao[1] > 0;
+            coreo.passo(tempo(), frente(), empurrouAgora);
         }
         if (marca >= META) vence(0);
         else if (marca <= -META) vence(1);

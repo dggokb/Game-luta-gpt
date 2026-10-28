@@ -85,6 +85,14 @@ Clash**: um cabo de guerra jogável no meio da tela, sem QTE (`ShinkaiClash` no 
 - **Começo.** O corte de quem respondeu passa (0,8 s); o que estava no ar some (projéteis, ecos,
   capangas), os combos acabam e os dois ficam frente a frente no chão, a `shinkaiClashGap` (300 px)
   um do outro. A luta para: nada anda, e os relógios do SHINKAI esperam.
+- **A coreografia** (`CoreografiaClash`, estilo Dragon Ball, 28/10): os dois não ficam parados. A
+  disputa passa por três cenas: **choque no chão** (0–80 e 240–300: os dois se chocam no meio, o
+  choque anda para o lado de quem perde, o chão racha e pedras sobem), **troca no ar** (sobem e
+  trocam golpes indo e voltando pela arena, cruzando um por cima do outro; quem está ganhando acerta
+  e o outro apanha) e **duelo de velocidade** (somem e reaparecem em pontos diferentes, no chão e no
+  alto, cada aparição um choque, e estouros no ar entre uma e outra). SPEED na disputa abre pela
+  velocidade. Cada choque no ar estoura como golpe de verdade (anel, raios, faíscas, tela tremendo) e
+  os dois deixam rastro. O motor põe os lutadores onde a coreografia manda; acabou no ar, caem dali.
 - **A disputa** (até 5 s, `ShinkaiClash.DURACAO`): cada um empurra a marca com os próprios
   botões, do jeito do tipo dele:
 
@@ -124,7 +132,7 @@ O sumiço dos lutadores SPEED sai sozinho quando ela pede o dash. O parry ela ai
 
 ## Próximos passos (do documento do Drive)
 
-- **SHINKAI Clash v2.** Cenas próprias por par de tipos (POWER × POWER de mãos travadas, SPEED ×
+- **SHINKAI Clash v3.** Cenas próprias por par de tipos (POWER × POWER de mãos travadas, SPEED ×
   SPEED trocando sumiços pela arena) e ligação com o cenário que quebra.
 - **Arte.** O corte usa o rosto do HUD. Uma ilustração parada por personagem (os olhos em close,
   sem vídeo) deixaria o corte ainda melhor. Falta também um som próprio de ativação, ou uma voz.

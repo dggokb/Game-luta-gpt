@@ -740,15 +740,29 @@ final class CombatEngine {
         }
         shinkaiClash = new ShinkaiClash(fighters[0].state.shinkaiType, fighters[1].state.shinkaiType,
             config.shinkaiFlashFrames, fighters[0].facing, fighters[1].facing);
+        shinkaiClash.coreo = new CoreografiaClash(fighters[0].state.shinkaiType, fighters[1].state.shinkaiType,
+            mid, half, Arena.LEFT_BOUND + 60f, Arena.RIGHT_BOUND - 60f, fighters[0].x, fighters[1].x);
         cues.add("SHINKAI_CLASH");
     }
 
     private void stepShinkaiClash(FighterInput first, FighterInput second) {
         ShinkaiClash c = shinkaiClash;
         c.passo(first, second);
+        if (c.coreo != null && c.tempo() > 0) {
+            // A coreografia leva os dois pela arena (choque no chão, troca no ar, velocidade).
+            for (CombatFighter f : fighters) {
+                f.x = c.coreo.x[f.index];
+                f.y = Arena.GROUND_Y - c.coreo.altura[f.index];
+                f.grounded = c.coreo.altura[f.index] <= 0f;
+                f.facing = c.coreo.olha[f.index];
+                f.vx = f.vy = 0f;
+            }
+        }
         if (!c.acabou()) return;
         shinkaiClash = null;
         CombatFighter a = fighters[0], b = fighters[1];
+        // Acabou no ar: os dois caem de onde estão (o perdedor, lançado, voa daí).
+        for (CombatFighter f : fighters) f.grounded = f.y >= Arena.GROUND_Y;
         float mid = (a.x + b.x) / 2f;
         switch (c.fim) {
             case VITORIA: {

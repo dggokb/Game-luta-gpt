@@ -83,8 +83,43 @@ public class ShinkaiClashTest {
         }
         assertEquals("the SHINKAI clocks wait", a, m.first.shinkaiFrames);
         assertEquals(b, m.cpu.shinkaiFrames);
-        assertEquals("nobody walks", x, m.f(0).x, 0.01f);
+        assertEquals("the stick does not move him: the choreography does", c(m).coreo.x[0], m.f(0).x, 0.01f);
         assertFalse(m.f(0).attacking());
+    }
+
+    private static ShinkaiClash c(Match m) { return m.engine.shinkaiClash(); }
+
+    @Test public void theClashTravelsThroughTheGroundTheAirAndTheSpeedScenes() {
+        Match m = new Match("p13", "p16");
+        ShinkaiClash c = m.clash();
+        java.util.Set<CoreografiaClash.Cena> cenas = java.util.EnumSet.noneOf(CoreografiaClash.Cena.class);
+        boolean noAr = false, sumiu = false;
+        int choques = 0;
+        for (int i = 0; i < ShinkaiClash.DURACAO - 2 && m.engine.shinkaiClash() != null; i++) {
+            m.step();
+            cenas.add(c.coreo.cena);
+            noAr |= !m.f(0).grounded && !m.f(1).grounded;
+            sumiu |= !c.coreo.visivel[0] && !c.coreo.visivel[1];
+            if (c.coreo.choque && c.coreo.cena != CoreografiaClash.Cena.CHOQUE) choques++;
+        }
+        assertEquals("ground clash, air exchange and speed duel", 3, cenas.size());
+        assertTrue("they fight in the air", noAr);
+        assertTrue("they vanish in the speed duel", sumiu);
+        assertTrue("blows burst in the air: " + choques, choques >= 8);
+    }
+
+    @Test public void endingInTheAirTheyFallBackToTheGround() {
+        Match m = new Match("p13", "p16");
+        ShinkaiClash c = m.clash();
+        // Ninguém empurra: termina empatado no fim do tempo (o choque final é no chão), e se acabar
+        // no ar os dois caem.
+        while (m.engine.shinkaiClash() != null && c.coreo.cena != CoreografiaClash.Cena.AR) m.step();
+        c.marca = ShinkaiClash.META - 1;
+        m.in[0].heavy = true;
+        m.steps(2);
+        assertNull(m.engine.shinkaiClash());
+        m.steps(120);
+        assertTrue("both land", m.f(0).grounded && m.f(1).grounded);
     }
 
     @Test public void theOneWhoPushesMoreWinsHitsHardAndKeepsItsShinkai() {

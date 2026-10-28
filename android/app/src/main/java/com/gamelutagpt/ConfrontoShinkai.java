@@ -7,11 +7,13 @@ import android.graphics.Path;
 import java.util.Random;
 
 /**
- * O desenho do SHINKAI Clash ({@link ShinkaiClash}): a tela escurece com linhas de velocidade
+ * O desenho do SHINKAI Clash ({@link ShinkaiClash}, coreografia em {@link CoreografiaClash}): a tela escurece com linhas de velocidade
  * saindo do ponto de encontro, cada lutador empurra com o jeito do tipo dele até ali (o raio do
  * ENERGY, as ondas de choque do POWER, a rajada de golpes do SPEED, os cortes e o pulso da
  * TECHNIQUE), o encontro é uma bola de energia nas duas cores que anda conforme a disputa, e uma
- * barra de cabo de guerra no alto mostra quem está ganhando. Espaço do mundo, menos a barra (tela).
+ * barra de cabo de guerra no alto mostra quem está ganhando. No ar e na velocidade cada choque
+ * estoura num anel com raios e faíscas; no chão o chão racha e as pedras sobem. Espaço do mundo,
+ * menos a barra (tela).
  * Só apresentação.
  */
 final class ConfrontoShinkai {
@@ -24,6 +26,15 @@ final class ConfrontoShinkai {
     private final float[] fx = new float[FAISCAS], fy = new float[FAISCAS], fvx = new float[FAISCAS], fvy = new float[FAISCAS];
     private final int[] fIdade = new int[FAISCAS], fCor = new int[FAISCAS];
 
+    /** Os estouros dos choques da coreografia: anel que abre, com raios, no ar ou no chão. */
+    private static final int ANEIS = 10, VIDA_ANEL = 20;
+    private final float[] ax = new float[ANEIS], ay = new float[ANEIS], aForca = new float[ANEIS];
+    private final int[] aIdade = new int[ANEIS], aCor = new int[ANEIS];
+    /** Pedras que sobem do chão no choque (POWER e todos no choque no chão). */
+    private static final int PEDRAS = 24;
+    private final float[] px = new float[PEDRAS], py = new float[PEDRAS], pvx = new float[PEDRAS], pvy = new float[PEDRAS], pTam = new float[PEDRAS];
+    private final int[] pIdade = new int[PEDRAS];
+
     /** O último estado visto (para sumir devagar quando acaba). */
     private ShinkaiClash clash;
     private int saida;
@@ -34,6 +45,13 @@ final class ConfrontoShinkai {
 
     ConfrontoShinkai() {
         java.util.Arrays.fill(fIdade, -1);
+        java.util.Arrays.fill(aIdade, -1);
+        java.util.Arrays.fill(pIdade, -1);
+    }
+
+    /** A cena da coreografia agora (choque no chão quando não há coreografia). */
+    private CoreografiaClash.Cena cena() {
+        return clash == null || clash.coreo == null ? CoreografiaClash.Cena.CHOQUE : clash.coreo.cena;
     }
 
     boolean visivel() { return clash != null; }
@@ -52,17 +70,36 @@ final class ConfrontoShinkai {
                 mao[i] = f.x + f.facing * 58f;
                 maoY[i] = f.y - f.character().visualStandHeight * 0.6f;
             }
-            float meio = (x[0] + x[1]) / 2f, metade = Math.abs(x[1] - x[0]) / 2f - 60f;
-            float dir = Math.signum(x[1] - x[0]);
-            float alvo = meio + dir * c.frente() * metade;
-            encontroX = encontroX == 0f ? alvo : encontroX + (alvo - encontroX) * 0.35f;
-            encontroY = (maoY[0] + maoY[1]) / 2f;
+            CoreografiaClash k = c.coreo;
+            if (k != null && c.disputando()) {
+                // O encontro é o da coreografia (o choque no chão, a troca no ar, a aparição).
+                encontroX = k.encontroX;
+                encontroY = Arena.GROUND_Y - k.encontroY;
+                if (k.choque) anel(k.choqueX, Arena.GROUND_Y - k.choqueY, k.forca, cor[c.frente() >= 0f ? 0 : 1]);
+                if (k.cena == CoreografiaClash.Cena.CHOQUE && k.naCena % 9 == 0) pedras(2);
+            } else {
+                float meio = (x[0] + x[1]) / 2f, metade = Math.abs(x[1] - x[0]) / 2f - 60f;
+                float dir = Math.signum(x[1] - x[0]);
+                float alvo = meio + dir * c.frente() * metade;
+                encontroX = encontroX == 0f ? alvo : encontroX + (alvo - encontroX) * 0.35f;
+                encontroY = (maoY[0] + maoY[1]) / 2f;
+            }
             for (int i = 0; i < 2; i++) {
-                if (c.idadeEmpurrao[i] == 0 && c.disputando()) faiscas(i, Math.min(14, 3 + c.ultimoEmpurrao[i] / 10));
+                if (c.idadeEmpurrao[i] == 0 && c.disputando() && cena() == CoreografiaClash.Cena.CHOQUE) {
+                    faiscas(i, Math.min(14, 3 + c.ultimoEmpurrao[i] / 10));
+                }
             }
         } else if (clash != null && --saida <= 0) {
             clash = null;
             encontroX = 0f;
+        }
+        for (int i = 0; i < ANEIS; i++) if (aIdade[i] >= 0 && ++aIdade[i] >= VIDA_ANEL) aIdade[i] = -1;
+        for (int i = 0; i < PEDRAS; i++) {
+            if (pIdade[i] < 0) continue;
+            if (++pIdade[i] >= 70) { pIdade[i] = -1; continue; }
+            pvy[i] += 260f / 60f;   // sobem devagar e param no ar (a força segura)
+            px[i] += pvx[i] / 60f;
+            py[i] += pvy[i] / 60f;
         }
         for (int i = 0; i < FAISCAS; i++) {
             if (fIdade[i] < 0) continue;
@@ -86,6 +123,43 @@ final class ConfrontoShinkai {
             fvy[i] = (float)Math.sin(a) * v;
             fCor[i] = cor[lado];
             fIdade[i] = 0;
+        }
+    }
+
+    private void anel(float ox, float oy, float forca, int c) {
+        int i = 0;
+        for (int k = 0; k < ANEIS; k++) if (aIdade[k] < 0 || aIdade[k] > aIdade[i]) i = k;
+        for (int k = 0; k < ANEIS; k++) if (aIdade[k] < 0) { i = k; break; }
+        ax[i] = ox;
+        ay[i] = oy;
+        aForca[i] = forca;
+        aCor[i] = c;
+        aIdade[i] = 0;
+        // Faíscas para todo lado no estouro.
+        for (int n = 0; n < 6 + Math.round(8 * forca); n++) {
+            int f = livre();
+            double a = sorte.nextDouble() * Math.PI * 2.0;
+            float v = 400f + sorte.nextFloat() * 700f * forca;
+            fx[f] = ox;
+            fy[f] = oy;
+            fvx[f] = (float)Math.cos(a) * v;
+            fvy[f] = (float)Math.sin(a) * v;
+            fCor[f] = n % 2 == 0 ? c : 0xFFFFFFFF;
+            fIdade[f] = 0;
+        }
+    }
+
+    /** Pedras e terra subindo do chão em volta do choque. */
+    private void pedras(int n) {
+        for (int k = 0; k < n; k++) {
+            int i = 0;
+            for (int j = 0; j < PEDRAS; j++) if (pIdade[j] < 0) { i = j; break; }
+            px[i] = encontroX + (sorte.nextFloat() * 2f - 1f) * 260f;
+            py[i] = Arena.GROUND_Y - 4f;
+            pvx[i] = (sorte.nextFloat() * 2f - 1f) * 30f;
+            pvy[i] = -(160f + sorte.nextFloat() * 220f);
+            pTam[i] = 4f + sorte.nextFloat() * 10f;
+            pIdade[i] = 0;
         }
     }
 
@@ -139,7 +213,10 @@ final class ConfrontoShinkai {
         float k = presenca();
         if (k <= 0f || clash == null) return;
         boolean disputa = clash.disputando();
+        boolean noChao = cena() == CoreografiaClash.Cena.CHOQUE;
+        pedrasEChao(c, k, disputa && noChao);
         for (int i = 0; i < 2; i++) {
+            if (disputa && !noChao) continue;
             if (disputa) {
                 switch (clash.tipo[i]) {
                     case ENERGY: raio(c, i); break;
@@ -153,7 +230,8 @@ final class ConfrontoShinkai {
                 bola(c, mao[i], maoY[i], 8f + 22f * t, cor[i], k);
             }
         }
-        if (disputa) encontro(c, k);
+        if (disputa && noChao) encontro(c, k);
+        aneis(c, k);
         paint.setStyle(Paint.Style.FILL);
         for (int i = 0; i < FAISCAS; i++) {
             if (fIdade[i] < 0) continue;
@@ -163,6 +241,76 @@ final class ConfrontoShinkai {
             paint.setColor(Math.round(200 * v) << 24 | (fCor[i] & 0xFFFFFF));
             c.drawCircle(fx[i], fy[i], 5f * v + 1.5f, paint);
         }
+    }
+
+    /** As pedras flutuando e, no choque no chão, as rachaduras saindo do encontro. */
+    private void pedrasEChao(Canvas c, float k, boolean rachar) {
+        paint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < PEDRAS; i++) {
+            if (pIdade[i] < 0) continue;
+            float v = pIdade[i] < 55 ? 1f : 1f - (pIdade[i] - 55) / 15f;
+            paint.setColor(Math.round(230 * v * k) << 24 | 0x3A2E24);
+            c.drawRect(px[i] - pTam[i] / 2f, py[i] - pTam[i] / 2f, px[i] + pTam[i] / 2f, py[i] + pTam[i] * 0.4f, paint);
+            paint.setColor(Math.round(160 * v * k) << 24 | 0x8A7A66);
+            c.drawRect(px[i] - pTam[i] / 2f, py[i] - pTam[i] / 2f, px[i] + pTam[i] / 4f, py[i] - pTam[i] / 6f, paint);
+        }
+        if (!rachar || clash.coreo == null) return;
+        // As rachaduras crescem enquanto dura o choque no chão.
+        float cresce = Math.min(1f, clash.coreo.naCena / 50f);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        Random r = new Random(77);
+        for (int n = 0; n < 9; n++) {
+            float lado = n % 2 == 0 ? 1f : -1f;
+            float len = (70f + r.nextFloat() * 230f) * cresce;
+            float ox = encontroX, oy = Arena.GROUND_Y + 2f;
+            path.reset();
+            path.moveTo(ox, oy);
+            for (int s = 1; s <= 4; s++) {
+                ox += lado * len / 4f;
+                oy += (r.nextFloat() - 0.4f) * 8f;
+                path.lineTo(ox, oy);
+            }
+            paint.setStrokeWidth(3f + r.nextFloat() * 3f);
+            paint.setColor(Math.round(220 * k) << 24 | 0x120E0A);
+            c.drawPath(path, paint);
+            paint.setStrokeWidth(1.2f);
+            paint.setColor(Math.round(170 * k) << 24 | (cor[n % 2] & 0xFFFFFF));
+            c.drawPath(path, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    /** Os estouros: anel que abre e some, raios curtos e um clarão branco no começo. */
+    private void aneis(Canvas c, float k) {
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        for (int i = 0; i < ANEIS; i++) {
+            if (aIdade[i] < 0) continue;
+            float t = aIdade[i] / (float)VIDA_ANEL, f = aForca[i];
+            float r = (30f + 170f * f) * (float)Math.sqrt(t);
+            paint.setStyle(Paint.Style.FILL);
+            if (aIdade[i] < 3) {
+                paint.setColor(Math.round(230 * k) << 24 | 0xFFFFFF);
+                c.drawCircle(ax[i], ay[i], 40f + 50f * f, paint);
+            }
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth((10f + 10f * f) * (1f - t));
+            paint.setColor(Math.round(240 * (1f - t) * k) << 24 | 0xFFFFFF);
+            c.drawOval(ax[i] - r, ay[i] - r * 0.7f, ax[i] + r, ay[i] + r * 0.7f, paint);
+            paint.setStrokeWidth((5f + 5f * f) * (1f - t));
+            paint.setColor(Math.round(220 * (1f - t) * k) << 24 | (aCor[i] & 0xFFFFFF));
+            c.drawOval(ax[i] - r * 1.15f, ay[i] - r * 0.8f, ax[i] + r * 1.15f, ay[i] + r * 0.8f, paint);
+            Random rr = new Random(i * 13L + (long)(ax[i]));
+            paint.setStrokeWidth(3f * (1f - t) + 1f);
+            for (int n = 0; n < 10; n++) {
+                double a = rr.nextDouble() * Math.PI * 2.0;
+                float d0 = r * 0.6f, d1 = r * (1.1f + rr.nextFloat() * 0.8f);
+                float ca = (float)Math.cos(a), sa = (float)Math.sin(a);
+                paint.setColor(Math.round(230 * (1f - t) * k) << 24 | (n % 3 == 0 ? aCor[i] & 0xFFFFFF : 0xFFFFFF));
+                c.drawLine(ax[i] + ca * d0, ay[i] + sa * d0, ax[i] + ca * d1, ay[i] + sa * d1, paint);
+            }
+        }
+        paint.setStyle(Paint.Style.FILL);
     }
 
     /** ENERGY: o raio da mão até o encontro (engrossa no empurrão; carregando, a bola cresce na mão). */

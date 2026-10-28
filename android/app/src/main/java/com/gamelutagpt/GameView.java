@@ -2326,6 +2326,17 @@ public class GameView extends SurfaceView
             for (int i = 0; i < 2; i++) {
                 if (clash.idadeEmpurrao[i] == 0) beamShake = Math.max(beamShake, 3f + clash.ultimoEmpurrao[i] / 18f);
             }
+            CoreografiaClash k = clash.coreo;
+            if (k != null && k.choque && k.cena != CoreografiaClash.Cena.CHOQUE) {
+                // Cada choque no ar ou na velocidade estoura como golpe de verdade.
+                float y = Arena.GROUND_Y - k.choqueY;
+                int lado = clash.frente() >= 0f ? PLAYER : OPPONENT;
+                int dir = engine.fighter(lado).facing;
+                impacts.spawn(ImpactEffects.HIT, k.choqueX, y, dir, k.forca >= 1f ? ImpactEffects.SPECIAL : ImpactEffects.HEAVY,
+                    clash.tipo[lado].color);
+                beamShake = Math.max(beamShake, 6f + 12f * k.forca);
+                if (k.forca >= 1f) ultraSounds.playFight("acerto_s", 0.8f, 0.9f);
+            }
         }
         corRoupa[PLAYER] = spriteFighterRenderer.corDaRoupa();
         corRoupa[OPPONENT] = opponentSpriteRenderer.corDaRoupa();
@@ -2687,6 +2698,7 @@ public class GameView extends SurfaceView
         ShinkaiClash c = engine.shinkaiClash();
         if (c == null || !c.disputando()) return;
         CharacterDefinition ch = f.character();
+        if (c.coreo != null && c.coreo.pose[side] != CoreografiaClash.Pose.EMPURRA && poseCoreografia(renderer, ch, c.coreo.pose[side])) return;
         boolean pushing = c.idadeEmpurrao[side] < 6;
         if (c.idadeEmpurrao[side] == 0) clashStrikes[side]++;
         if (c.tipo[side] == Shinkai.Type.ENERGY) {
@@ -2705,6 +2717,36 @@ public class GameView extends SurfaceView
         int active = attack.hitbox(0).firstFrame;
         int at = pushing ? active : Math.max(0, active - 4);
         renderer.pose(move.animation.id, move.animationTime((at + 0.5f) * FIXED_STEP), 0f);
+    }
+
+    /**
+     * A pose da coreografia do SHINKAI Clash: o golpe (no chão ou no ar) no quadro em que encosta,
+     * apanhando no ar, ou o pulo. Sem a animação, fica a pose de empurrar.
+     */
+    private boolean poseCoreografia(SpriteFighterRenderer renderer, CharacterDefinition ch, CoreografiaClash.Pose pose) {
+        String state;
+        String move = null;
+        switch (pose) {
+            case SOCO_L: move = "L"; break;
+            case SOCO_M: move = "M"; break;
+            case SOCO_H: move = "H"; break;
+            case AR_L: move = "jL"; break;
+            case AR_M: move = "jM"; break;
+            case AR_H: move = "jH"; break;
+            default: break;
+        }
+        if (move != null) {
+            CharacterDefinition.Move m = ch.moveFor(move);
+            AttackDefinition attack = ch.attack(move);
+            if (m == null || m.animation == null || attack == null || attack.hitboxCount() == 0) return false;
+            renderer.pose(m.animation.id, m.animationTime((attack.hitbox(0).firstFrame + 0.5f) * FIXED_STEP), 0f);
+            return true;
+        }
+        state = pose == CoreografiaClash.Pose.APANHA_AR ? SpriteStates.HIT_AIR : SpriteStates.JUMP;
+        CharacterDefinition.Animation a = ch.animations.get(state);
+        if (a == null) return false;
+        renderer.pose(a.id, pose == CoreografiaClash.Pose.APANHA_AR ? a.timeFor(0.08f, 0.3f) : a.timeFor(0.5f, 1f), 0f);
+        return true;
     }
 
     /** Clarão da tela na ativação do SHINKAI (quadros que faltam e a cor do tipo). */
@@ -4356,6 +4398,7 @@ public class GameView extends SurfaceView
      * Ao sumir a imagem fica onde ela estava, piscando e apagando; ao reaparecer ela pisca.
      */
     private float zanzokenAlpha(CombatFighter f) {
+        if (engine.shinkaiClash() != null && f == engine.fighter(f.index) && !visivelNoClash(f.index)) return 0f;
         if (f.vanishFrames > 0) {
             // O sumiço do SHINKAI SPEED: a imagem fica onde ele estava, piscando e apagando.
             boolean blink = (engine.frame() / 2) % 2 == 0;
@@ -4841,11 +4884,12 @@ public class GameView extends SurfaceView
         for (int i = 0; i < 2; i++) {
             CombatFighter f = engine.fighter(i);
             float[] t = speedTrail[i];
-            if (!f.state.inShinkai(Shinkai.Type.SPEED) || f.vanishFrames > 0) {
+            boolean noClash = clashEmMovimento();
+            if (!(f.state.inShinkai(Shinkai.Type.SPEED) || noClash) || f.vanishFrames > 0 || !visivelNoClash(i)) {
                 speedTrailCount[i] = 0;
                 continue;
             }
-            if (engine.frame() % 3 != 0) continue;
+            if (engine.frame() % (noClash ? 2 : 3) != 0) continue;
             // Guarda as últimas 4 posições (x, y, lado), a mais nova na frente.
             System.arraycopy(t, 0, t, 3, 9);
             t[0] = f.x;
@@ -4855,9 +4899,21 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** SHINKAI Clash fora do choque no chão (no ar ou na velocidade): os dois deixam rastro. */
+    private boolean clashEmMovimento() {
+        ShinkaiClash c = engine.shinkaiClash();
+        return c != null && c.coreo != null && c.disputando() && c.coreo.cena != CoreografiaClash.Cena.CHOQUE;
+    }
+
+    /** Na velocidade do SHINKAI Clash os dois somem entre uma aparição e outra. */
+    private boolean visivelNoClash(int side) {
+        ShinkaiClash c = engine.shinkaiClash();
+        return c == null || c.coreo == null || !c.disputando() || c.coreo.visivel[side];
+    }
+
     private void drawSpeedTrail(Canvas c, SpriteFighterRenderer r, CombatFighter f) {
         int side = f == engine.fighter(PLAYER) ? PLAYER : f == engine.fighter(OPPONENT) ? OPPONENT : -1;
-        if (side < 0 || !f.state.inShinkai(Shinkai.Type.SPEED)) return;
+        if (side < 0 || !(f.state.inShinkai(Shinkai.Type.SPEED) || clashEmMovimento())) return;
         float[] t = speedTrail[side];
         int color = f.state.shinkaiType.color & 0xFFFFFF;
         for (int k = speedTrailCount[side] - 1; k >= 1; k--) {
