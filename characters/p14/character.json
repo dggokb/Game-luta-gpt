@@ -13,11 +13,11 @@
       "H"
     ],
     "body": {
-      "halfWidth": 27,
-      "standHeight": 227,
-      "crouchHeight": 158,
-      "pushHalfWidth": 24,
-      "pushHeight": 218
+      "halfWidth": 25,
+      "standHeight": 244,
+      "crouchHeight": 181,
+      "pushHalfWidth": 22,
+      "pushHeight": 234
     },
     "energy": {
       "damage": 1140,
@@ -2307,7 +2307,7 @@
     "L": {
       "animation": "LIGHT_JAB",
       "damage": 280,
-      "reach": 131,
+      "reach": 168,
       "startupFrames": 5,
       "activeFrames": 5,
       "recoveryFrames": 11,
@@ -2337,18 +2337,19 @@
       "pushbackOnHit": 24,
       "pushbackOnBlock": 30,
       "maxUsesPerCombo": 3,
-      "hitHeight": 185,
+      "hitHeight": 161,
       "rotasProprias": [
         "L",
         "M",
         "2L"
       ],
-      "maxUsesPerChain": 3
+      "maxUsesPerChain": 3,
+      "hitFloor": 126
     },
     "M": {
       "animation": "MEDIUM_KICK",
       "damage": 480,
-      "reach": 136,
+      "reach": 182,
       "startupFrames": 9,
       "activeFrames": 6,
       "recoveryFrames": 16,
@@ -2378,7 +2379,7 @@
       ],
       "pushbackOnHit": 32,
       "pushbackOnBlock": 38,
-      "hitHeight": 185,
+      "hitHeight": 162,
       "rotasProprias": [
         "H",
         "2M",
@@ -2387,12 +2388,13 @@
         "S3",
         "S4"
       ],
-      "maxUsesPerChain": 2
+      "maxUsesPerChain": 2,
+      "hitFloor": 138
     },
     "H": {
       "animation": "HEAVY_STRAIGHT",
       "damage": 760,
-      "reach": 170,
+      "reach": 241,
       "startupFrames": 14,
       "activeFrames": 7,
       "recoveryFrames": 24,
@@ -2420,13 +2422,14 @@
       "pushbackOnHit": 44,
       "pushbackOnBlock": 50,
       "launchType": "wallBounce",
-      "hitHeight": 195,
-      "maxUsesPerChain": 1
+      "hitHeight": 181,
+      "maxUsesPerChain": 1,
+      "hitFloor": 86
     },
     "2L": {
       "animation": "CROUCH_LIGHT",
       "damage": 280,
-      "reach": 135,
+      "reach": 190,
       "low": true,
       "startupFrames": 5,
       "activeFrames": 5,
@@ -2456,17 +2459,18 @@
       "damageProration": 0.9,
       "pushbackOnHit": 22,
       "pushbackOnBlock": 28,
-      "hitHeight": 116,
+      "hitHeight": 57,
       "rotasProprias": [
         "M",
         "2M"
       ],
-      "maxUsesPerChain": 2
+      "maxUsesPerChain": 2,
+      "hitFloor": 4
     },
     "2M": {
       "animation": "CROUCH_MEDIUM",
       "damage": 480,
-      "reach": 132,
+      "reach": 265,
       "low": true,
       "startupFrames": 10,
       "activeFrames": 6,
@@ -2492,13 +2496,14 @@
       "knockback": 40,
       "pushbackOnHit": 0,
       "pushbackOnBlock": 36,
-      "hitHeight": 25,
-      "maxUsesPerChain": 1
+      "hitHeight": 42,
+      "maxUsesPerChain": 1,
+      "hitFloor": 9
     },
     "2H": {
       "animation": "CROUCH_HEAVY",
       "damage": 760,
-      "reach": 79,
+      "reach": 84,
       "startupFrames": 14,
       "activeFrames": 8,
       "recoveryFrames": 24,
@@ -2521,14 +2526,14 @@
       "pushbackOnHit": 0,
       "pushbackOnBlock": 48,
       "juggleCost": 2,
-      "hitHeight": 266,
-      "hitFloor": 25,
+      "hitHeight": 280,
+      "hitFloor": 122,
       "maxUsesPerChain": 1
     },
     "jL": {
       "animation": "JUMP_LIGHT",
       "damage": 280,
-      "reach": 147,
+      "reach": 158,
       "startupFrames": 5,
       "activeFrames": 3,
       "recoveryFrames": 7,
@@ -2554,13 +2559,14 @@
       "damageProration": 0.9,
       "pushbackOnHit": 14,
       "pushbackOnBlock": 20,
-      "hitHeight": 125,
-      "maxUsesPerChain": 1
+      "hitHeight": 134,
+      "maxUsesPerChain": 1,
+      "hitFloor": 98
     },
     "jM": {
       "animation": "JUMP_MEDIUM",
       "damage": 480,
-      "reach": 186,
+      "reach": 194,
       "startupFrames": 7,
       "activeFrames": 4,
       "recoveryFrames": 9,
@@ -2586,17 +2592,18 @@
       ],
       "pushbackOnHit": 20,
       "pushbackOnBlock": 26,
-      "hitHeight": 115,
+      "hitHeight": 157,
       "rotasProprias": [
         "jH",
         "j2H"
       ],
-      "maxUsesPerChain": 2
+      "maxUsesPerChain": 2,
+      "hitFloor": 111
     },
     "jH": {
       "animation": "JUMP_HEAVY",
       "damage": 760,
-      "reach": 170,
+      "reach": 206,
       "startupFrames": 10,
       "activeFrames": 6,
       "recoveryFrames": 12,
@@ -2614,13 +2621,14 @@
       "pushbackOnHit": 28,
       "pushbackOnBlock": 34,
       "juggleCost": 2,
-      "hitHeight": 175,
-      "maxUsesPerChain": 1
+      "hitHeight": 109,
+      "maxUsesPerChain": 1,
+      "hitFloor": 81
     },
     "j2H": {
       "animation": "JUMP_HEAVY_DOWN",
       "damage": 760,
-      "reach": 65,
+      "reach": 108,
       "startupFrames": 10,
       "activeFrames": 6,
       "recoveryFrames": 10,
@@ -2638,13 +2646,14 @@
       "pushbackOnHit": 28,
       "pushbackOnBlock": 34,
       "juggleCost": 2,
-      "hitHeight": 24,
-      "maxUsesPerChain": 1
+      "hitHeight": 45,
+      "maxUsesPerChain": 1,
+      "hitFloor": 1
     },
     "6M": {
       "animation": "GOLPE_ALTO",
       "damage": 575,
-      "reach": 136,
+      "reach": 159,
       "startupFrames": 20,
       "activeFrames": 3,
       "recoveryFrames": 14,
@@ -2669,8 +2678,8 @@
       "pushbackOnHit": 32,
       "pushbackOnBlock": 38,
       "maxUsesPerCombo": 1,
-      "hitHeight": 110,
-      "hitFloor": 40
+      "hitHeight": 123,
+      "hitFloor": 77
     }
   },
   "specialAnimations": {
