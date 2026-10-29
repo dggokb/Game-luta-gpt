@@ -39,7 +39,7 @@ public final class BateriaColisoes {
 
     static final String[] ELENCO = {"player_base", "p02", "p03", "p04", "p05", "p06", "p07", "p08",
         "p09", "p10", "p11", "p12", "p13", "p14", "p15", "p16"};
-    static final String RIVAL = "player_base";
+    static final String RIVAL = System.getProperty("t25.rival", "player_base");
     /** Pixel opaco: o que o motor das caixas também conta (rastro meio transparente não). */
     static final int ALFA = 128;
     static final int W = 1300, H = 1050;
@@ -73,6 +73,8 @@ public final class BateriaColisoes {
     // ------------------------------------------------------------------ desenho
 
     static float meio;
+    /** O corpo de quem apanha antes do passo (o que o motor conferiu). */
+    static float[] corpoAntes;
 
     static void desenhar(Bitmap b, Canvas c, SpriteFighterRenderer r, CombatFighter f) throws Exception {
         b.eraseColor(0);
@@ -90,6 +92,27 @@ public final class BateriaColisoes {
         RC.begin(c);
         drawProj.invoke(efeitos, c, RC, e.energyProjectiles);
         c.restore();
+    }
+
+    /** Por quadro: pixels sobrepostos só dentro da caixa do membro do golpe (a do motor, com a folga). */
+    static int[] membro;
+
+    static int sobreNoMembro(CombatFighter a) {
+        float[] m = CombatEngine.golpeNoDesenho(a, a.attackFrame);
+        if (m == null) return sobreposicao(PA, PD);
+        float x0 = Math.min(m[0], a.body().halfWidth) - CombatEngine.FOLGA_DESENHO, x1 = m[1] + CombatEngine.FOLGA_DESENHO;
+        if (a.attack.reachCap > 0f) x1 = Math.min(x1, a.attack.reachCap + CombatEngine.FOLGA_DESENHO);
+        float l = a.facing > 0 ? a.x + x0 : a.x - x1, r = a.facing > 0 ? a.x + x1 : a.x - x0;
+        float ox = W / 2f - meio, oy = CHAO_PX - Arena.GROUND_Y;
+        int px0 = Math.max(0, Math.round(l + ox)), px1 = Math.min(W - 1, Math.round(r + ox));
+        int py0 = Math.max(0, Math.round(a.y - m[3] - CombatEngine.FOLGA_DESENHO + oy));
+        int py1 = Math.min(H - 1, Math.round(a.y - m[2] + CombatEngine.FOLGA_DESENHO + oy));
+        int n = 0;
+        for (int y = py0; y <= py1; y++) for (int x = px0; x <= px1; x++) {
+            int i = y * W + x;
+            if ((PA[i] >>> 24) >= ALFA && (PD[i] >>> 24) >= ALFA) n++;
+        }
+        return n;
     }
 
     static int sobreposicao(int[] a, int[] d) {
@@ -205,6 +228,12 @@ public final class BateriaColisoes {
             }
             c.sobreBase = pior >= 0 ? Math.max(0, semGolpe[pior]) : 0;
             c.quadroAcerto = pior;
+            if (png != null && pior < 0) {
+                // Sem sobra: a foto do meio dos quadros ativos (o golpe passando longe do corpo).
+                int q0 = -1, q1 = -1;
+                for (int q = 0; q < QUADROS; q++) if (comGolpe[q] >= 0) { if (q0 < 0) q0 = q; q1 = q; }
+                pior = q0 < 0 ? -1 : (q0 + q1) / 2;
+            }
             if (png != null && pior >= 0) rodada(quem, g, agachado, dist, aperto, false, new int[QUADROS], null, pior, png);
         }
         if (c.acertou && c.folga > 12f) c.tipo = "fantasma";
@@ -246,6 +275,7 @@ public final class BateriaColisoes {
             meio = (a.x + d.x) / 2f;
             boolean querQuadro = quais != null ? quais[q] >= 0 : true;
             // Quem apanha: como estava antes do passo (o corpo que o motor confere).
+            corpoAntes = CombatEngine.corpoAtual(d);
             if (querQuadro) {
                 desenhar(CAMADA_D, cd, rd, d);
                 CAMADA_D.getPixels(PD, 0, W, 0, 0, W, H);
@@ -277,6 +307,7 @@ public final class BateriaColisoes {
             if (projetil) for (int i = 0; i < PA.length; i++) if ((PP[i] >>> 24) > (PA[i] >>> 24)) PA[i] = PP[i];
             int s = sobreposicao(PA, PD);
             sobre[q] = s;
+            if (membro != null) membro[q] = sobreNoMembro(a);
             if (acerto) {
                 c.acertou = true;
                 c.quadroAcerto = q;
@@ -313,8 +344,16 @@ public final class BateriaColisoes {
             g.drawRect(Math.round(l + ox), Math.round(a.y - m[3] + oy), Math.round(r - l), Math.round(m[3] - m[2]));
         }
         // O corpo de quem apanha (as faixas da postura), em verde.
-        float[] corpo = CombatEngine.corpoAtual(d);
+        float[] corpo = corpoAntes;
         g.setColor(Color.GREEN);
+        if (corpo == null) {
+            // Sem caixas medidas da postura: a caixa genérica do corpo (Body), tracejada.
+            CharacterDefinition.Body b = d.body();
+            g.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[] {6f, 4f}, 0f));
+            float h = b.height(d.crouchingBody());
+            g.drawRect(Math.round(d.x - b.halfWidth + ox), Math.round(d.y - h + oy), Math.round(2 * b.halfWidth), Math.round(h));
+            g.setStroke(new BasicStroke(2f));
+        }
         if (corpo != null) {
             for (int i = 0; i + 3 < corpo.length; i += 4) {
                 float l = d.facing > 0 ? d.x + corpo[i] : d.x - corpo[i + 1];
@@ -342,7 +381,7 @@ public final class BateriaColisoes {
             AttackDefinition at = ch.attack(g);
             if (at == null) continue;
             int max = Math.round(at.reach) + 160;
-            for (boolean ag : new boolean[] {false, true}) {
+            for (boolean ag : Boolean.getBoolean("t25.soAgachado") ? new boolean[] {true} : new boolean[] {false, true}) {
                 for (int dist = 70; dist <= max; dist += 10) casos.add(tentar(quem, g, ag, dist, -1, null));
             }
         }
@@ -433,6 +472,40 @@ public final class BateriaColisoes {
                     p[4].equals("-1") ? "" : "_a" + p[4]));
                 Caso c = tentar(p[0], p[1], p[2].equals("agachado"), Integer.parseInt(p[3]), Integer.parseInt(p[4]), png);
                 System.out.println(png.getName() + ": " + c.tipo + " folga " + c.folga + " sobre " + c.sobreMax);
+            }
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Refaz as falhas de um casos.tsv contando só a sobreposição dentro da caixa do membro (o braço
+     * ou a perna que o motor usa), não o corpo de quem bate que avança: java ... Refaz casos.tsv saida.tsv
+     */
+    public static final class Refaz {
+        public static void main(String[] args) throws Exception {
+            iniciar();
+            List<String> linhas = Files.readAllLines(new File(args[0]).toPath(), StandardCharsets.UTF_8);
+            try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(new File(args[1]).toPath(), StandardCharsets.UTF_8))) {
+                w.println("quem\tgolpe\tpostura\tdistancia\taperto\tsobre_max\tmembro_max\tquadro_membro");
+                String atual = null;
+                for (String linha : linhas.subList(1, linhas.size())) {
+                    String[] p = linha.split("\t");
+                    if (!p[11].equals("falha")) continue;
+                    if (!p[0].equals(atual)) { preparar(p[0]); atual = p[0]; }
+                    int[] sobre = new int[QUADROS];
+                    membro = new int[QUADROS];
+                    java.util.Arrays.fill(membro, -1);
+                    rodada(p[0], p[1], p[2].equals("agachado"), Integer.parseInt(p[3]), Integer.parseInt(p[4]), false, sobre, null, -1, null);
+                    boolean cruzado = p[1].equals("cruzado");
+                    int max = 0, qm = -1;
+                    for (int q = 0; q < QUADROS; q++) {
+                        if (membro[q] < 0 || (!p[1].startsWith("S") && ladoCerto[q] == cruzado)) continue;
+                        if (membro[q] > max) { max = membro[q]; qm = q; }
+                    }
+                    membro = null;
+                    w.printf(Locale.ROOT, "%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d%n", p[0], p[1], p[2], p[3], p[4], p[9], max, qm);
+                    w.flush();
+                }
             }
             System.exit(0);
         }

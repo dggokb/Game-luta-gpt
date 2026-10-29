@@ -38,7 +38,7 @@ Resposta ao documento "SŌKON Bloodlines — Auditoria de Combate e Plano de Tes
 | F05 / T10 | REPRODUZIDO | Não há loop infinito (o combo mais longo dura 10,3 s), mas há combos de 100%+ com SHINKAI e 3–5 Supers. A etapa 5 reduziu (Ryūga ENERGY 13159 → 10308). |
 | F06 / T17 | REPRODUZIDO | 11 assistências de projétil e 5 de corpo a corpo, quase todas sem função. p12, p13 e p15 só acertam a 100 px, e o assist do p14 não acerta nada. |
 | F07 / T24 | REPRODUZIDO (simulado) · PENDENTE | No toque simulado, 85–100% dos comandos saem certos. Os de carga perdem 20% em qualquer ritmo. Falta medir no aparelho. |
-| F08 / T02 / T25 | REPRODUZIDO | O alcance real passa o calculado pela CPU em 34–48 px em 90 de 96 golpes. O H do Kōga erra o agachado 15 de 16 vezes. Falta a revisão quadro a quadro na tela. |
+| F08 / T02 / T25 | REPRODUZIDO · CORRIGIDO EM PARTE | Etapa G1b: a CPU mede o alcance pelo desenho (CpuReachTable). T25 (frente E): 77% dos acertos com o desenho encostando, 11,5% na folga de 12 px e 11,3% fantasmas (pior 100 px, jM do p05), pela caixa do membro em retângulo. Duas falhas reais: 2M/2L na ponta contra o Ryūga agachado (falta caixa medida no agachado dele) e a Investida do p12 que atravessa. |
 | F09 / T22 | CONFIRMADO + REPRODUZIDO | A CPU não tem código para S2–S4 (`AiController.java`, só o S1). O p09 agarrava 0,2 vez por minuto (a etapa 4b subiu); o p11 nunca envenena. |
 | F10 / A02 | REPRODUZIDO | Ver A02. Sem métrica de balanço na suíte; a `BateriaAntesDepois` cobre isso fora dela. |
 | F11 | CONFIRMADO | ep04–ep09 sem nenhuma imagem nas pastas; o Arcade termina no cartão "TAKATOSHI — Em breve". |
@@ -62,7 +62,7 @@ Resposta ao documento "SŌKON Bloodlines — Auditoria de Combate e Plano de Tes
 | T20 | REPRODUZIDO | O DHC é o pior uso da barra (1670 de dano por barra, contra 3042 do Super). Em p07+p08 ele corta o Super do p07: 4545 → 2196. |
 | T21 | REPRODUZIDO | A dupla oficial só é o melhor parceiro para o Ryūga e o p07; não há sinergia de dupla, e sim força do parceiro. |
 | T23 | REPRODUZIDO | A curva por nível é monotônica: contra o nível 5, N1 vence 0% e N8 89%. |
-| T26 | PENDENTE | FPS: precisa do aparelho (o print do diagnóstico continua pendente). |
+| T26 | MEDIDO NO PC · PENDENTE NO APARELHO | No PC, sem GPU, a 1280×720: média de 29–51 ms por quadro, nenhum cenário a 60 FPS. A simulação gasta no máximo 4,6 ms; o cenário de fundo leva 40–71% do desenho. Uma luta 2x2 decodifica ~1460 MB de sprites, um risco de memória no celular. Falta medir no aparelho. |
 | T27 / T28 | ROTEIRO PRONTO · PENDENTE | Roteiro em `docs/balanco/playtest.md`: perfis, seis sessões de ~95 min, CSV com as colunas da `BateriaBase` e questionários. Faltam os jogadores, e o registro de entradas, o CSV no aparelho e o versus no PC ainda não existem. |
 | C04 / F12 | CONFIRMADO · DECIDIR | p13–p16 jogáveis por inteiro (229 testes passam), mas sem intro e vitória, sem nome no jogo para p14 e p16 e com assist que quase não acerta. Recomendação: não liberar ainda. A flag `pronta` não foi mexida. |
 | D03 / F11 | PLANO PRONTO · DECIDIR | `docs/historia/plano-ep04-09-takatoshi.md`: 21 páginas em ordem de prioridade, ficha de chefe do Takatoshi, 32 vídeos e roteiro do ep10. As partes inventadas estão marcadas como **proposta**. |
@@ -2437,3 +2437,240 @@ seguem pendentes de aprovação no aparelho; o pacote está completo.
 adversários oficiais do Arcade (`Arcade.java:34`) e no sorteio das lutas variáveis (`Campanha.java:272`).
 Junto com a troca: `ArcadeTest` (espera 6 oficiais), `TorneioTest` (espera dupla sem golpes só do
 lado do rival) e o comentário do `torneio.json`.
+
+## Anexo: Auditoria SŌKON, frente E: T25 (colisões) e T26 (tempo de quadro no PC)
+
+### Frente E: T25 (fidelidade das colisões, F08) e T26 (60 FPS, medido no PC)
+
+Nada de produção foi alterado e nada foi commitado. As ferramentas ficaram em `android/pc/src/test/java/com/gamelutagpt/BateriaColisoes.java` (T25) e `android/pc/src/test/java/com/gamelutagpt/BateriaQuadros.java` (T26). Compilei com `javac` direto, em pastas do scratchpad, sem gradle.
+
+---
+
+#### T25: o motor acerta quando o desenho encosta?
+
+**ID:** T25 / F08
+**STATUS:** feito para os 16 personagens. Saíram 2 problemas reais e baratos, e 1 problema de forma da caixa que pede decisão.
+
+##### CENÁRIO
+
+- **Rival:** o golpe é dado contra o Ryūga (player_base) parado e sem defender, em pé e agachado. Os golpes de chão contra agachado foram repetidos contra a Aoi (p02); o motivo está no achado 3.
+- **Golpes por personagem:**
+  - L, M, H, 2L, 2M, 2H de 70 px até o alcance + 160 px, de 10 em 10;
+  - S projétil a 200, 320 e 450 px (todos os 16 têm energia);
+  - jL, jM e jH num pulo para frente, de 160 a 400 px, apertando 24, 28, 32 ou 36 quadros depois do pulo. O pulo dura cerca de 42 quadros e chega a 263 px de altura no quadro 22;
+  - jM cruzado, de 160 a 280 px, apertando 28, 31, 34 ou 37 quadros depois do pulo.
+- **Total:** 11.676 tentativas contra o Ryūga e mais 2.558 contra a p02 agachada.
+- **Desenho:** em cada quadro ativo, os dois lutadores são desenhados como a luta desenha (`GameView.drawFighter`), cada um numa camada. Quem apanha é desenhado como estava antes do passo, que é o corpo que o motor confere. Quem bate é desenhado depois do passo, que é o quadro do golpe que o motor conferiu. Um pixel conta como opaco com alfa ≥ 128.
+- **Acerto fantasma:** o motor acertou e os pixels não se tocam. A folga é a menor distância entre os dois desenhos, em px do mundo. O motor já tem 6 px de tolerância de cada lado (`FOLGA_DESENHO`), então até 12 px conta como "dentro da tolerância". Fantasma é a folga acima de 12 px.
+- **Falha visual:** o motor não acertou, mas o desenho do golpe se sobrepõe ao rival. A sobra é o que o golpe acrescenta de sobreposição em relação à mesma ação sem o botão (parado, agachado ou o pulo puro), e só conta com o rival do lado certo. Depois, cada falha foi refeita contando só os pixels dentro da caixa do membro que o motor usa ("falha no membro"). Assim fica de fora o corpo de quem bate inclinando para dentro do rival.
+- **Limites do método:**
+  - a distância é a inicial, antes de o empurrão assentar;
+  - no S projétil, a camada do projétil está um quadro atrás, o que soma cerca de velocidade/60 px à folga;
+  - na primeira rodada eu apertei os golpes do pulo cedo demais (14, 20 e 26 quadros) e o jL "nunca acertava". O erro era da ferramenta: o jL só pega na descida. Corrigi e refiz.
+
+##### RESULTADO
+
+###### Achado 1: na maioria dos golpes o desenho encosta, mas 11% dos acertos são fantasmas
+
+| | acertos | % |
+|---|---|---|
+| pixels encostando | 4.299 | 77,1% |
+| folga de 1 a 12 px (dentro da tolerância) | 643 | 11,5% |
+| fantasma com folga acima de 12 px | 631 | 11,3% |
+| … acima de 25 px | 268 | 4,8% |
+| … acima de 50 px | 75 | 1,3% |
+| … acima de 75 px | 15 | 0,3% |
+
+O total é de 5.573 acertos contra o Ryūga. Os fantasmas se concentram nos golpes de membro em diagonal:
+
+| golpe | fantasmas / acertos | maior folga |
+|---|---|---|
+| jM em pé | 84 / 510 | 100 px |
+| jH em pé | 77 / 415 | 38 px |
+| H contra agachado | 67 / 225 | 79 px |
+| H em pé | 37 / 303 | 93 px |
+| 2H em pé | 47 / 206 | 74 px |
+| 2H contra agachado | 49 / 154 | 97 px |
+| jL em pé | 51 / 344 | 56 px |
+
+2M é o golpe mais fiel: 1 fantasma em 335 acertos em pé e nenhum contra agachado.
+
+**Causa** (vista nos PNGs): o membro do golpe é um único retângulo que vai do quadril ao pé, ou do ombro ao punho. Num chute em diagonal, o canto vazio desse retângulo encosta na faixa da cabeça do rival. Essa faixa também é larga, porque inclui as mãos da guarda. Exemplos:
+- `p05_jM_empe_400_a24.png`: o pé fica a 100 px da cabeça;
+- `p07_H_empe_220.png`: 92 px;
+- `p10_2H_agachado_190.png`: 97 px.
+
+###### Achado 2: H contra agachado depende do personagem, e o Kōga é o único coerente com o desenho
+
+- **Kōga (p03):** o H nunca acertou agachado, nem o Ryūga (0 de 23) nem a p02 (0 de 23). O desenho também não encosta: o chute passa por cima da cabeça (`p03_H_agachado_120.png`, sobreposição 0). Em pé, o H dele acertou 15 de 23. Pela imagem, o "H do Kōga não pega agachado" é fiel ao desenho, e não um erro de colisão.
+- **Os outros:** os mesmos chutes altos pegam quem está agachado pelo canto vazio do retângulo. Contra a p02 agachada foram 128 fantasmas em 272 acertos de H, com folga de até 114 px (`rival_p02/p15_H_agachado_300.png`: o pé passa 114 px acima da cabeça e o motor acerta). Contra o Ryūga agachado foram 67 em 225.
+- **Conclusão:** a regra "H pega agachado?" hoje sai da forma da caixa, não de uma decisão de projeto.
+
+###### Achado 3: falha real com golpe baixo na ponta, contra o Ryūga agachado
+
+- **O que acontece:** o 2M (29 casos) e o 2L (4 casos) encostam o pé no pé do Ryūga agachado e não acertam. A sobra dentro da caixa do membro vai até 668 pixels (`p13_2M_agachado_300.png`, `p02_2M_agachado_180.png`, `p09_2M_agachado_270.png`, `p14_2L_agachado_260.png`).
+- **Quem tem:** os personagens player_base, p02, p03, p04, p05, p06, p08, p09, p10, p12, p13, p14, p15 e p16. Acontece só nos últimos 10 a 30 px do alcance.
+- **Causa:**
+  - a animação CROUCH do player_base é a única dos 16 sem caixas medidas (`withSilhueta`);
+  - agachado, o Ryūga vira a caixa genérica `Body` (±36 px de largura e 157 px de altura), e o desenho dele agachado tem os pés a cerca de ±70 px;
+  - nos PNGs, essa caixa aparece tracejada.
+- **Prova:** contra a p02 agachada, que tem faixas medidas, essas falhas de 2M e 2L somem (0 casos).
+- **Outras animações do player_base sem caixas:** COMBAT, DEFEAT, GETUP, GROUNDED, INTRO, KNOCKDOWN, LAND, RISE, SPECIAL_CHARGE, SPECIAL_ENERGY_CHARGED, TAUNT, THROW_GRAB, THROW_TOSS, ULTRA_BEAM e VICTORY. Destas, só a CROUCH entra como postura de quem apanha.
+
+###### Achado 4: falha real na Investida (S) do Necro (p12)
+
+- **O que acontece:** a 320 px, o Necro atravessa o corpo do rival sem acertar, com 5.000 a 6.400 pixels sobrepostos, em pé e agachado (`p12_Sproj_empe_320.png`). A 450 px também atravessa, com 450 pixels. A 200 px acerta.
+- **Causa:** o S dele avança 520 px (`advance(520,0,13)`), mas só tem 4 quadros ativos (`frames(10,4,15)`). O corpo chega depois que a janela fecha e passa por dentro.
+
+###### Achado 5: o resto do que parecia falha é só corpo, não golpe (conferido nos PNGs)
+
+- **L e M contra agachado:** 95 casos, como p09 L, p07 M e p13 M. Quem bate inclina o tronco para frente e as pernas entram no desenho do rival, enquanto o soco passa por cima da cabeça (`p09_L_agachado_90.png`). Na caixa do membro, a sobra é de 0 a 9 pixels.
+- **Pulos:** é o corpo aterrissando em cima do rival. jL e jM têm 0 falhas no membro.
+- **p12 jH:** 26 casos de 480 a 790 pixels no membro, no fim da descida, com o jH ainda em quadro. Não dá para afirmar: a caixa desse quadro não foi medida e o motor usa a caixa do golpe. Fica para conferir à mão.
+- **p16 jM cruzado a 190–200 px:** 75 a 79 pixels, no limite.
+- **p02 L contra a p02 agachada:** 10 casos do mesmo tipo. A métrica do membro pegou o tronco, e a imagem mostra o soco por cima (`rival_p02/p02_L_agachado_90.png`).
+
+###### Achado 6: o S projétil contra agachado é fantasma por regra do jogo
+
+- **Contra agachado:** 22 de 39 acertos contra o Ryūga e 43 de 78 contra a p02, com até 96 px.
+- **Por que é de propósito:** a regra `hitsCrouching` do motor diz que especial e Super de chão pegam quem está agachado com a altura de em pé.
+- **Em pé:** as folgas de 13 a 37 px vêm principalmente do quadro de atraso da camada do projétil na medição.
+
+###### Achado 7: o jL só acerta tarde no pulo, e isso é coerente com o desenho
+
+- O membro do jL fica de 60 a 200 px acima dos pés de quem pula. Apertado antes de cerca de 28 quadros (de 42), passa por cima da cabeça, no desenho e no motor.
+- Apertado tarde, acerta 344 vezes em pé e 147 vezes agachado.
+- No jM cruzado, o resultado foi 544 acertos em pé e 322 agachado, com 26 e 19 fantasmas.
+
+##### IMPACTO
+
+- **Fantasmas acima de 25 px:** 4,8% dos acertos. Em jogo, isso aparece sobretudo como o chute alto que pega quem agachou e o jM ou 2H que acerta "no ar".
+- **Falhas reais:** contra o Ryūga, que é o protagonista, aparecem em todo golpe baixo dado na ponta. Isso vale para qualquer jogador contra um Ryūga agachado, inclusive a CPU.
+- **Investida do Necro:** dá a impressão de que o golpe atravessa o rival.
+
+##### ALTERNATIVAS
+
+1. **Medir a CROUCH do player_base** com `tools/sprites/caixas_sprites.py`, como os outros 15. É barato, conserta todas as falhas do achado 3 e deixa o Ryūga igual aos outros.
+2. **Membro em duas caixas em vez de um retângulo** (parte de perto e ponta) para golpes em diagonal, com H, 2H, jM e jH primeiro. Isso corta a maior parte dos fantasmas acima de 25 px. O custo é mudar a exportação do script e o laço de `golpeToca`, que já percorre várias faixas no corpo.
+3. **Alternativa mais barata ao item 2:** estreitar a faixa da cabeça para só a cabeça, sem as mãos da guarda. Corta menos.
+4. **Investida do Necro:** decidir entre janela ativa por todo o avanço, parar o avanço no contato ou reduzir o avanço.
+5. **H contra agachado:** decidir em projeto e aplicar em todos. Hoje o Kōga é o único que "erra", e é ele que está fiel ao desenho.
+
+##### RECOMENDAÇÃO
+
+Fazer o item 1 já, por ser de baixo risco. Decidir os itens 4 e 5 como regra de jogo. Fazer o item 2 depois, rodando esta bateria de novo antes e depois: o resultado é reproduzível com o comando no fim deste arquivo.
+
+---
+
+#### T26: estabilidade a 60 FPS, medida no PC e não no celular
+
+**ID:** T26
+**STATUS:** parcial por natureza. Mede o PC: Java2D na CPU, sem GPU, numa tela de 1280×720. O tempo de quadro do celular não sai daqui.
+
+##### CENÁRIO
+
+Seis cenários, cada um com 900 quadros medidos depois de 420 de aquecimento, dentro do `GameView` real (`advanceSimulation` + `renderFrame`):
+
+- **luta comum:** 2x2 com a CPU do outro lado;
+- **Super:** um Super a cada 3 s;
+- **vários projéteis:** SHINKAI ENERGY com uma onda a cada 14 quadros;
+- **SHINKAI Clash;**
+- **duplas com assist em campo:** TAG a cada 4,2 s;
+- **Ultra:** com a página do mangá.
+
+Uma segunda passada amostra a pilha a cada cerca de 1 ms para atribuir o tempo de desenho à parte chamada pelo `renderFrame`.
+
+##### RESULTADO
+
+Tempos em ms, no PC:
+
+| cenário | desenho: média | p95 | p99 | pior | quadros > 16,7 ms | simulação: média | p95 | p99 | pior |
+|---|---|---|---|---|---|---|---|---|---|
+| luta comum | 36,21 | 59,47 | 78,89 | 107,25 | 900/900 | 0,28 | 0,42 | 0,74 | 1,55 |
+| Super | 38,33 | 59,71 | 80,51 | 122,96 | 900/900 | 0,22 | 0,39 | 0,64 | 4,62 |
+| vários projéteis | 44,96 | 65,82 | 84,06 | 131,22 | 900/900 | 0,23 | 0,36 | 0,62 | 3,26 |
+| SHINKAI Clash | 50,80 | 72,44 | 89,15 | 109,45 | 900/900 | 0,13 | 0,21 | 0,37 | 0,92 |
+| duplas com assist | 34,82 | 51,91 | 63,62 | 86,05 | 900/900 | 0,14 | 0,24 | 0,41 | 0,63 |
+| Ultra | 29,12 | 44,47 | 52,83 | 61,95 | 900/900 | 0,11 | 0,19 | 0,41 | 1,21 |
+
+O que mais pesa no desenho:
+
+| cenário | 1º | 2º | 3º | depois |
+|---|---|---|---|---|
+| luta comum | StageScene.drawBackground 61% | drawHud 12% | drawControls 10% | drawPlayer 4%, drawFloorReflections 4%, drawDamageDummy 3%, ImpactEffects 2% |
+| Super | drawBackground 61% | drawHud 12% | drawControls 9% | drawSuperDarkness 3% |
+| vários projéteis | drawBackground 52% | drawHud 9% | drawFloorReflections 8% | drawControls 7%, drawPlayer 7%, ConfrontoShinkai.desenharFundo 6% |
+| SHINKAI Clash | drawBackground 40% | ConfrontoShinkai.desenharFundo 13% | drawFloorReflections 9% | drawDamageDummy 8%, drawHud 8% |
+| duplas com assist | drawBackground 61% | drawHud 12% | drawControls 9% | |
+| Ultra | drawBackground 71% | PaginaFinal.render 9% | AberturaUltra.render 3% | |
+
+- **A simulação não pesa:** o pior passo foi de 4,6 ms, nunca acima de 16,7 ms. Qualquer perda de quadro vem do desenho.
+- **O cenário é o maior custo em todos os casos.** Depois dele vêm o HUD e os controles na tela.
+- **O Clash é o cenário mais caro.** O fundo do confronto soma 13% e os reflexos no chão 9%.
+- **Os cenários aconteceram de fato:**
+  - o `t26_4.png` mostra o Clash;
+  - a página do Ultra (`PaginaFinal.render`) aparece nas amostras, mas não no quadro do meio salvo em `t26_6.png`;
+  - no `t26_3.png`, que é o quadro do meio, não há projétil visível;
+  - o custo extra de projéteis em relação à luta comum (+8,8 ms de média) mostra que houve projéteis em campo, mas a quantidade por quadro não foi contada.
+- **Memória:** o log de carga registra "atlas 1460MB em 154 folhas" numa luta 2x2 e 704 MB num espelho 1x1, no PC.
+
+##### IMPACTO
+
+- **Não vale como FPS do celular.** O PC desenha na CPU com Java2D. O Android desenha com o Canvas acelerado pela GPU, onde o fundo grande vira uma textura e costuma ficar bem mais barato.
+- **O que vale é a ordem de custo:** cenário ≫ HUD ≈ controles > reflexos e fundo do Clash > lutadores. Ela diz onde cortar primeiro se o aparelho perder quadros.
+- **Memória:** se o celular decodificar as folhas como no PC, 1,4 GB numa luta 2x2 é um risco sério de falta de memória. Precisa ser medido no aparelho.
+
+##### O QUE AINDA PRECISA DO APARELHO
+
+- FPS real e quadros perdidos por cenário: `adb shell dumpsys gfxinfo <pacote> framestats` e Perfetto, nos mesmos 6 cenários;
+- uso de GPU e overdraw: depurar overdraw da GPU nas opções do desenvolvedor;
+- queda por aquecimento em 10 a 15 minutos de luta;
+- memória nativa das folhas: `dumpsys meminfo`, na 2x2 e na troca de dupla;
+- pausas de GC do ART;
+- latência do toque ao golpe.
+
+##### ALTERNATIVAS
+
+1. Pré-desenhar o fundo parado do cenário numa camada única por luta, deixando só o que se mexe por quadro.
+2. Desenhar o HUD e os controles numa camada que só muda quando um valor muda.
+3. No Clash, simplificar `desenharFundo` e desligar os reflexos no chão durante o confronto.
+4. Reduzir a resolução das folhas no carregamento conforme a memória do aparelho.
+
+##### RECOMENDAÇÃO
+
+Medir primeiro no aparelho com `gfxinfo`, Perfetto e `meminfo` nos 6 cenários. Se faltar quadro, atacar nesta ordem: 1, 3, 2. Já a memória das folhas (4) deve ser conferida no aparelho de qualquer jeito.
+
+---
+
+#### Arquivos
+
+**T25** (todos em `scratchpad da sessão (não versionado): `):
+- tabelas completas: `t25/tabelas.md` (por golpe e postura, por personagem, Kōga H agachado, lista completa de fantasmas com distância, lista completa de falhas com distância e sobra no membro, seção contra a p02 agachada);
+- dados brutos:
+  - golpes de chão: `t25c/g*/casos.tsv` e `t25e/g*/casos.tsv` (p03, p04, p15 e p16 refeitos depois de o processo ser morto por falta de memória);
+  - pulos: `t25d/g*/casos.tsv`;
+  - contra a p02 agachada: `t25f/g*/casos.tsv`;
+  - falhas refeitas só no membro: `t25/membro.tsv` e `t25f/membro.tsv`.
+- PNGs em `t25/`. O membro do motor está em vermelho, as faixas do corpo de quem apanha em verde e a caixa genérica do corpo tracejada:
+  - fantasmas: `p05_jM_empe_400_a24.png`, `p10_2H_agachado_190.png`, `p07_H_empe_220.png`, `p14_2H_agachado_140.png`, `p04_M_empe_250.png`, `p15_H_agachado_260.png`, `p02_2H_empe_170.png`, `p02_H_empe_270.png`, `p03_H_empe_210.png`, `p05_jM_agachado_400_a28.png`;
+  - falhas reais: `p13_2M_agachado_300.png`, `p02_2M_agachado_180.png`, `p09_2M_agachado_270.png`, `p14_2L_agachado_260.png`, `p12_Sproj_empe_320.png`, `p12_Sproj_agachado_320.png`, `p12_Sproj_empe_450.png`;
+  - Kōga H agachado: `p03_H_agachado_120.png`, `p03_H_agachado_160.png`;
+  - só corpo, não é falha: `p09_L_agachado_90.png`, `p07_M_agachado_130.png`, `p13_M_agachado_70.png`, `p08_L_agachado_160.png`, `p11_cruzado_empe_200_a31.png`, `p11_cruzado_agachado_200_a31.png`, `player_base_jH_*`, `p04_jM_empe_320_a28.png`, `p15_jH_agachado_360_a28.png`, `p07_cruzado_empe_160_a31.png`;
+  - a conferir: `p12_jH_empe_220_a24.png`, `p12_jH_agachado_300_a28.png`, `p16_cruzado_empe_200_a31.png`;
+  - contra a p02 agachada, em `t25/rival_p02/`: `p15_H_agachado_300.png`, `p02_H_agachado_270.png`, `p03_H_agachado_120.png`, `p13_2M_agachado_300.png` (agora acerta), `p02_L_agachado_90.png`.
+- a pasta antiga `t25b/` é a primeira rodada, com a métrica de falha antiga e o tempo do pulo errado. Não usar.
+
+**T26:** `t26/t26.md`, `t26/run.log` e `t26/t26_1.png` a `t26_6.png` (um quadro do meio de cada cenário).
+
+**Para repetir o T25:**
+
+1. Compile `BateriaColisoes.java` com o classpath do `:pc`, como no `scratchpad/eS.sh`.
+2. Rode `java ... com.gamelutagpt.BateriaColisoes <saida> [ids]`. As opções são `-Dt25.rival=p02`, `-Dt25.soPulos=true`, `-Dt25.soChao=true` e `-Dt25.soAgachado=true`.
+3. Para as fotos, use `BateriaColisoes$Foto <dir> quem:golpe:postura:distancia:aperto`.
+4. Para ver quadro a quadro, use `BateriaColisoes$Sonda`.
+
+Com mais de 4 processos de 3 GB ao mesmo tempo, o contêiner mata a JVM por falta de memória.
+
+---
+
+No repositório: as tabelas completas do T25 estão em [t25-tabelas.md](t25-tabelas.md). Nove imagens estão em [t25/](t25/): fantasmas p05 jM, p10 2H e p15 H; falhas p13 2M, p02 2M e p12 S; Kōga H agachado; p09 L, que é só corpo; e p15 H contra a p02 agachada. O teste é a `BateriaColisoes` (`android/pc/src/test`) e o tempo de quadro é a `BateriaQuadros`.
