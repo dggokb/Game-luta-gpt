@@ -71,6 +71,11 @@ final class AttackDefinition {
          */
         boolean repel;
         /**
+         * Aparar (o S3 do Ryūga): a postura de contra-golpe só bate quando leu um golpe; no vazio
+         * não sai golpe nenhum e ele fica aberto até o fim (o risco de errar a leitura).
+         */
+        boolean parry;
+        /**
          * Agarrão de especial (o S3 do p13): o primeiro quadro ativo pega quem está até
          * {@link #grabRange} à frente e agarrável (as regras do agarrão); pegou, as pancadas
          * seguintes acertam sem caixa nem defesa; errou, o golpe sai no vazio.
@@ -134,6 +139,7 @@ final class AttackDefinition {
         Mechanics armor(int hits, int start, int end) { armorHits = hits; armorStart = start; armorEnd = end; return this; }
         Mechanics counter(Reads reads, int start, int end) { counter = reads; counterStart = start; counterEnd = end; return this; }
         Mechanics repel() { repel = true; return this; }
+        Mechanics parry() { parry = true; return this; }
         Mechanics grab(float range) { grab = true; grabRange = range; return this; }
         Mechanics pound() { pound = true; return this; }
         Mechanics rebound() { rebound = true; return this; }

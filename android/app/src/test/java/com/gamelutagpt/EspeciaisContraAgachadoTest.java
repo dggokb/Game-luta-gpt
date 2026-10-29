@@ -45,7 +45,7 @@ public class EspeciaisContraAgachadoTest {
 
     @Test public void groundSpecialsHitACrouchingTarget() {
         // Os que passavam por cima de quase todo mundo.
-        assertHitsCrouching("player_base", "S3", "player_base");
+        // O S3 do Ryūga (Aparar) só bate no que leu: o AparadorTest confere que ele lê o 2L.
         assertHitsCrouching("player_base", "S4", "p07");
         assertHitsCrouching("p02", "S4", "p05");
         assertHitsCrouching("p06", "S3", "p10");

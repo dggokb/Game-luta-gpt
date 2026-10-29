@@ -239,6 +239,16 @@ final class TutorialDirector {
             String buttons = special.buttons;
             String button = buttons.substring(0, 1);
             boolean hold = special.hold, air = special.air;
+            AttackDefinition.Mechanics m = special.move.attack.mechanics;
+            if (m.counter != AttackDefinition.Reads.NONE && (m.parry || m.repel) && !hold && !air) {
+                // O aparar e o repel só batem no que leram: o boneco ataca e a resposta conta.
+                out.add(new Lesson("ESPECIAL " + id, commandText(command, false, false) + " + " + orList(buttons)
+                    + " quando o boneco atacar", 1, true, close,
+                    (c, dummy) -> { if (c.t % READ_PERIOD == READ_STRIKE) dummy.medium = true; },
+                    c -> c.landed(id),
+                    (c, p1) -> readingSpecial(c, p1, command, button, m)));
+                continue;
+            }
             // O que lança treina a meia distância, como a energia.
             Setup where = special.projectile != null ? c -> c.placeApart(160f) : close;
             out.add(new Lesson("ESPECIAL " + id, commandText(command, hold, air) + " + " + orList(buttons), 1, true, where, null,
@@ -341,17 +351,44 @@ final class TutorialDirector {
             }
             return;
         }
-        // Entre duas direções iguais (↓ ↓) solta o direcional.
+        int[] steps = steps(command);
+        int n = steps.length;
+        int step = t / 3;
+        if (step < n) {
+            p1.direction = MotionParser.relative(steps[step], facing);
+        } else if (step == n) {
+            p1.direction = MotionParser.relative(steps[n - 1], facing);
+            DemoDirector.Ctx.press(p1, button);
+        }
+    }
+
+    /** O comando passo a passo (3 quadros cada); entre duas direções iguais (↓ ↓) solta o direcional. */
+    private static int[] steps(int[] command) {
         int[] steps = new int[command.length * 2];
         int n = 0;
         for (int d : command) {
             if (n > 0 && steps[n - 1] == d) steps[n++] = 0;
             steps[n++] = d;
         }
-        int step = t / 3;
+        return java.util.Arrays.copyOf(steps, n);
+    }
+
+    /** Lição do aparar e do repel: o boneco aperta M a cada {@code READ_PERIOD}, no quadro {@code READ_STRIKE}. */
+    private static final int READ_PERIOD = 70, READ_STRIKE = 30;
+
+    /** Faz o comando para a janela de leitura do golpe pegar o M do boneco no meio. */
+    private static void readingSpecial(Ctx c, FighterInput p1, int[] command, String button, AttackDefinition.Mechanics m) {
+        AttackDefinition dummyM = c.engine.fighter(1).character().attack("M");
+        int strike = READ_STRIKE + (dummyM == null ? 6 : dummyM.startupFrames);
+        int press = strike - (m.counterStart + m.counterEnd) / 2;
+        int[] steps = steps(command);
+        int n = steps.length;
+        int t = c.t % READ_PERIOD - (press - 3 * n);
+        if (t < 0) return;
+        int step = t / 3, facing = c.p1().facing;
         if (step < n) {
             p1.direction = MotionParser.relative(steps[step], facing);
-        } else if (step == n) {
+        } else if (t == 3 * n) {
             p1.direction = MotionParser.relative(steps[n - 1], facing);
             DemoDirector.Ctx.press(p1, button);
         }

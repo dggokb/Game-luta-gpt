@@ -1057,3 +1057,34 @@ global de dano. O relatório da frente, com a causa dos 2% de p15+p16, está em
   - matriz igual;
   - p15+p16 2 → 4%, dentro do ruído.
 - **Bateria fixa ao integrar:** nenhuma métrica mudou mais de 3%.
+
+## Etapa H4-Ryūga — o Aparar vira aparar de verdade (item 4)
+
+Decisão do usuário: o Aparar pode funcionar como aparar real, sem buff gratuito.
+
+- **Mecânica nova (flag `parry`):** uma postura de contra-golpe que só bate no que leu.
+  - Lê qualquer golpe corpo a corpo do 4º ao 13º quadro, anula e responde na hora com os mesmos
+    900 de dano.
+  - No vazio não bate e fica aberta o golpe inteiro (42 quadros).
+  - Antes era um golpe comum de 20 quadros e 900 de dano: ganha a leitura e perde o golpe comum.
+- **Arquivos:**
+  - `AttackDefinition` (`parry`);
+  - `CombatEngine` (o golpe de quem tem repel ou parry só sai se leu);
+  - `characters/player_base/character.json` (S3 com `apara`);
+  - `tools/sprites/build_characters.py` e `mecanicas.json` (aceitam `apara` e emitem `.parry()`);
+  - `GeneratedCharacters` regenerado;
+  - `CpuReachTable` regenerada (só o S3 do Ryūga mudou);
+  - `TutorialDirector`: na lição do Aparar o boneco passa a atacar, senão não há o que aparar.
+- **Testes:**
+  - `AparadorTest` (novo);
+  - `EspeciaisContraAgachadoTest` ajustado (o S3 já não acerta sozinho);
+  - suíte 583 de 583;
+  - gerador passa.
+- **Medida da frente:** uso 0 → 0,4 por minuto, 60% acertam; matriz Ryūga 61 → 59%, dentro do ruído.
+- **Bateria fixa ao integrar:** nenhuma métrica mudou mais de 3%.
+
+**p14 e p07, sem mudança:**
+
+- **p14:** pôr o pisão (S4) no neutro da CPU derrubou o p14 de 31% para 27%; ficou de fora. As
+  ferramentas dele funcionam; falta uso pela CPU.
+- **p07:** nenhuma ferramenta deixa de cumprir a função.

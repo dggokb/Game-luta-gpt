@@ -11086,6 +11086,16 @@
       ],
       "pushbackOnHit": 40,
       "pushbackOnBlock": 50,
+      "mecanica": {
+        "contra": {
+          "le": "tudo",
+          "apara": true,
+          "frames": [
+            4,
+            13
+          ]
+        }
+      },
       "buttons": [
         "L",
         "M",

@@ -2517,8 +2517,8 @@ final class CombatEngine {
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
         if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d) : reboundMissed(a, frame))) return;
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
-        // O repel só bate no que ele repeliu: sem golpe na janela, a explosão não sai.
-        if (a.attack.mechanics.repel && !a.countered) return;
+        // O repel e o aparar só batem no que leram: sem golpe na janela, a resposta não sai.
+        if ((a.attack.mechanics.repel || a.attack.mechanics.parry) && !a.countered) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
         if (a.attack.mechanics.grab) {
             grabStrike(a, d, frame);
