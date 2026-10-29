@@ -1042,3 +1042,18 @@ global de dano. O relatório da frente, com a causa dos 2% de p15+p16, está em
   p15+p16 2 → 5%.
 - **Bateria fixa ao integrar:** só o Breaker mexeu, dentro de ±5: "sempre quebra" vence "nunca" 57 → 60%
   e a CPU vence "nunca" 46 → 50%.
+
+## Etapa H4-p15b — Super da p15 defendido empurra 10 px, não 60 (item 4)
+
+- **Ferramenta:** o Super defendido ficava em −83. O empurrão de 60 px tirava o rival do alcance do
+  chute final, e as pancadas seguintes passavam no vazio.
+- **Arquivos:**
+  - `characters/p15/character.json`: `pushbackOnBlock` do Super 60 → 10;
+  - `GeneratedCharacters.java`, regenerado.
+- **Dano e quadros:** iguais.
+- **Testes:** `SuperP15DefendidoTest` (novo); suíte 581 de 581.
+- **Medida da frente:**
+  - defendido −83 → −9, e as 5 pancadas pegam na defesa;
+  - matriz igual;
+  - p15+p16 2 → 4%, dentro do ruído.
+- **Bateria fixa ao integrar:** nenhuma métrica mudou mais de 3%.
