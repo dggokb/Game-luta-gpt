@@ -54,6 +54,7 @@ PONTA = 45           # px do mundo: o pedaço da ponta do golpe que dá a altura
 FOLGA = 19.5         # CombatRules.VERTICAL_SLACK
 FAIXAS = 3           # caixas do corpo por quadro do golpe (cabeça, tronco, pernas)
 LADO = 60            # px do mundo: o quanto a ponta vai para os lados do ponto que bate
+DIAGONAL = 0.75      # o membro vira duas caixas quando as duas metades cobrem menos que isto da caixa inteira
 _folhas = {}
 ESCOLHIDO = {}   # o quadro medido de cada golpe (a folha de conferência mostra ele)
 
@@ -314,8 +315,22 @@ def ponta(pack, atlas, i, antes, meia, alto=None):
     frente = dx >= meia * 0.5
     if frente.sum() < 30 or np.ptp(dx[frente]) < 10:
         return None   # pedacinho que mexeu (dobra da roupa), não um braço ou perna
-    return [round(float(dx[frente].min())), round(float(dx[frente].max())),
-            round(float(h[frente].min())), round(float(h[frente].max()))]
+    xs, hs = dx[frente], h[frente]
+    caixa = [round(float(xs.min())), round(float(xs.max())), round(float(hs.min())), round(float(hs.max()))]
+    # Membro na diagonal (o chute alto, o 2H que sobe, o jM que desce): um retângulo só tem um
+    # canto vazio do tamanho do membro, que acerta onde o desenho não encosta. Partido ao meio na
+    # frente, cada metade tem a sua faixa de altura (a perna perto do quadril e o pé lá em cima).
+    meio = (caixa[0] + caixa[1]) / 2
+    partes = []
+    for lado in (xs <= meio, xs > meio):
+        if lado.sum() < 10:
+            return caixa
+        partes.append([round(float(xs[lado].min())), round(float(xs[lado].max())),
+                       round(float(hs[lado].min())), round(float(hs[lado].max()))])
+    area = lambda c: max(1, c[1] - c[0]) * max(1, c[3] - c[2])
+    if area(partes[0]) + area(partes[1]) >= DIAGONAL * area(caixa):
+        return caixa
+    return partes[0] + partes[1]
 
 
 def animacoes_de_golpe(pack):

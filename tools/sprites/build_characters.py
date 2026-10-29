@@ -563,7 +563,8 @@ def validate_impacts(pack):
                              f'outside the active window {start:.0%}-{end:.0%}; retime its durationsMs')
 
 def validate_silhueta(key, a):
-    """Caixas por quadro da folha: corpo = lista de [x0, x1, y0, y1], golpe = [x0, x1, y0, y1]."""
+    """Caixas por quadro da folha: corpo = lista de [x0, x1, y0, y1], golpe = [x0, x1, y0, y1] (o
+    membro na diagonal em duas caixas: a de perto do corpo e a da ponta, 8 números em sequência)."""
     sil = a['silhueta']
     if not isinstance(sil, dict) or set(sil) != {'corpo', 'golpe'}:
         raise ValueError(f'{key}.silhueta: {{corpo, golpe}}')
@@ -572,7 +573,8 @@ def validate_silhueta(key, a):
         for quadro, valor in dados.items():
             if not quadro.isdigit() or int(quadro) not in a['frames']:
                 raise ValueError(f'{key}.silhueta.{parte}: quadro {quadro} não é da animação')
-            if not (caixa(valor) if parte == 'golpe' else isinstance(valor, list) and all(caixa(c) for c in valor)):
+            membro = isinstance(valor, list) and len(valor) in (4, 8) and all(caixa(valor[j:j + 4]) for j in range(0, len(valor), 4))
+            if not (membro if parte == 'golpe' else isinstance(valor, list) and all(caixa(c) for c in valor)):
                 raise ValueError(f'{key}.silhueta.{parte}.{quadro}: caixas [x0, x1, y0, y1]')
 
 def visual_heights(pack, atlases):

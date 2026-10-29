@@ -1187,12 +1187,37 @@ public class MechanicsTest {
             float[] g = CombatEngine.golpeNoDesenho(f, f.attackFrame);
             if (g != null && f.attack.isActive(f.attackFrame)) {
                 golpes.add(java.util.Arrays.toString(g));
-                maisLonge = Math.max(maisLonge, g[1]);
+                maisLonge = Math.max(maisLonge, CombatEngine.maxDe(g, 1));
             }
             s.step();
         }
         assertFalse("the kick has a box from the drawing while active", golpes.isEmpty());
         assertTrue("and it reaches the foot, past the body: " + maisLonge, maisLonge > f.body().halfWidth + 100f);
+    }
+
+    /** p09 M contra o Ryūga a {@code gap} px, agachado ou em pé: o soco acertou? */
+    private static boolean p09PunchHits(float gap, boolean crouch) throws Exception {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p09"), BASE, 400f, 400f + gap);
+        s.in[1].direction = crouch ? 3 : 0;
+        for (int i = 0; i < 10; i++) { s.in[1].direction = crouch ? 3 : 0; s.step(); }
+        startMove(s.engine, 0, "M");
+        boolean diagonal = false;
+        for (int i = 0; i < 40; i++) {
+            float[] g = CombatEngine.golpeNoDesenho(s.f(0), s.f(0).attackFrame);
+            if (g != null && g.length == 8 && s.f(0).attack != null && s.f(0).attack.isActive(s.f(0).attackFrame)) diagonal = true;
+            s.in[1].direction = crouch ? 3 : 0;
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0) return true;
+        }
+        assertTrue("the punch goes down on a diagonal: two boxes", diagonal);
+        return false;
+    }
+
+    @Test public void aDiagonalLimbIsTwoBoxesAndItsEmptyCornerDoesNotHit() throws Exception {
+        // T25 (etapa H8c): o soco do p09 passa por cima do Ryūga agachado. Com o membro num
+        // retângulo só, o canto vazio (do ombro para baixo, na frente do punho) acertava a cabeça.
+        assertFalse("over the crouching head", p09PunchHits(180f, true));
+        assertTrue("the standing rival is still hit", p09PunchHits(180f, false));
     }
 
     /** Até onde vai à frente o desenho do corpo parado (a guarda, a base aberta). */

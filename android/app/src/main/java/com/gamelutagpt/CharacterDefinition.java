@@ -74,7 +74,8 @@ final class CharacterDefinition {
         /**
          * Caixas que acompanham o desenho do golpe (tools/sprites/caixas_sprites.py), por quadro
          * da folha: o corpo em faixas (cabeça, tronco, pernas: {x0, x1, y0, y1} em sequência, px
-         * à frente da raiz e acima do chão) e o membro que bate ({x0, x1, y0, y1} ou null).
+         * à frente da raiz e acima do chão) e o membro que bate ({x0, x1, y0, y1}, ou duas caixas
+         * em sequência no membro na diagonal: a de perto do corpo e a da ponta; ou null).
          * Null sem caixas medidas.
          */
         float[][] silhuetaCorpo,silhuetaGolpe;
@@ -84,7 +85,7 @@ final class CharacterDefinition {
         }
         Animation withSilhueta(String corpo,String golpe) {
             silhuetaCorpo=quadros(corpo);silhuetaGolpe=quadros(golpe);
-            for(float[] g:silhuetaGolpe)if(g!=null&&g.length!=4)throw new IllegalArgumentException(id+": golpe {x0,x1,y0,y1}");
+            for(float[] g:silhuetaGolpe)if(g!=null&&g.length!=4&&g.length!=8)throw new IllegalArgumentException(id+": golpe {x0,x1,y0,y1} (uma ou duas caixas)");
             for(float[] c:silhuetaCorpo)if(c!=null&&c.length%4!=0)throw new IllegalArgumentException(id+": corpo em caixas de 4");
             postura=mediana(silhuetaCorpo);
             return this;

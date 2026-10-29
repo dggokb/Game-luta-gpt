@@ -581,3 +581,132 @@ clipe (arte) ou reduzir o avanço de 520 px/s. A decisão é do usuário.
 
 **Duplas oficiais** (T21, H8a → H8b): p11 + p12 64 → 66%; as outras ficaram dentro do ruído (±10).
 O p12 virou o melhor parceiro do Ryūga (73%) e do p09 (82%).
+
+
+## Etapa H8c — membro na diagonal em duas caixas (colisões, item 8)
+
+Decisão do usuário (item 8): corrigir golpes que não correspondem ao desenho, inspecionar L/M/H do
+Kōga e não fazer o H acertar agachado em todo mundo. No T25 (frente E), 11% dos acertos eram
+fantasmas. A causa principal é o membro medido num retângulo só: num chute alto, num 2H que sobe
+ou num soco que desce, o canto vazio do retângulo, do quadril até a frente do pé, encosta na
+cabeça de quem está agachado sem o desenho encostar.
+
+- **Regra:** em cada quadro, o membro medido (`caixas_sprites.ponta`) é partido ao meio na
+  horizontal. Cada metade ganha a sua faixa de altura. Ficam duas caixas quando as duas metades
+  cobrem menos de 75% do retângulo inteiro (`DIAGONAL = 0.75`); nos outros quadros continua uma
+  caixa só. É geometria pura, sem regra por personagem ou por golpe.
+- **Arquivos:**
+  - `tools/sprites/caixas_sprites.py`: `DIAGONAL` e a partição em `ponta`;
+  - `tools/sprites/build_characters.py`: `validate_silhueta` aceita o golpe com 4 ou 8 números;
+  - `CharacterDefinition.withSilhueta`: aceita 4 ou 8 números;
+  - `CombatEngine.golpeToca` testa cada caixa (`membroToca`). A primeira caixa ainda vem desde a
+    frente do corpo, como antes; o `reachCap` vale nas duas. `minDe`/`maxDe` servem o cruzado e o
+    ponto do choque;
+  - `DebugOverlay` desenha as duas caixas;
+  - os `character.json` dos 17 pacotes e o `GeneratedCharacters` foram regenerados (657 atlas, o
+    código do gerador mudou);
+  - a `CpuReachTable` foi regenerada: p02 H 240 → 230 em pé e 234 → 210 agachado; p04 L agachado
+    158 → 104; p06 H agachado 160 → 146, entre outros;
+  - `BateriaColisoes` (pc) mede e desenha as duas caixas.
+- **Teste novo:** `MechanicsTest.aDiagonalLimbIsTwoBoxesAndItsEmptyCornerDoesNotHit`.
+  - O M do p09 desce na diagonal (duas caixas).
+  - A 180 px ele passa por cima do Ryūga agachado e não acerta; em pé, acerta.
+  - Antes era um acerto fantasma do T25.
+- **Suíte:** 567 de 567.
+- **Gerador:** `--check` passa, com 19 personagens e 657 atlas.
+
+**T25 completo** (16 personagens, 11 676 tentativas, rival Ryūga em pé e agachado; mesmas distâncias e apertos):
+
+| medida | antes | depois |
+|---|---|---|
+| tentativas | 11676 | 11676 |
+| acertos | 5973 | 5933 |
+| fantasma | 985 | 950 |
+| fant>25 | 376 | 342 |
+| fant>50 | 113 | 85 |
+| maior | 106 | 106 |
+| falha | 249 | 255 |
+
+- **Onde mudou:**
+  - H contra agachado: fantasmas 86 → 70; acima de 50 px, 26 → 11;
+  - H em pé: fantasmas 37 → 29; acima de 50 px, 8 → 2;
+  - M contra agachado: fantasmas 47 → 42.
+- **Por personagem:** a p15 foi de 40 para 31 fantasmas; a p07, de 45 para 39.
+- **Sem mudança:** 2H, pulos e cruzado. Os maiores fantasmas que sobram são o jM do p05 (13 acima
+  de 50 px), o 2H do p10 (12) e o 2H do p14 (9). O 2H que sobe cobre mais de 75% do retângulo e não
+  é partido.
+- **As 6 "falhas" novas não são falhas.** São o M do p09 e o L do p04 contra agachado, a 150–210 px.
+  A foto conferida mostra o soco passando por cima da cabeça. O que se sobrepõe é a perna e o
+  tronco de quem bate, inclinados, e não o golpe (achado 5 da frente E). Antes eram acertos
+  fantasmas pelo canto do retângulo.
+
+**Kōga L/M/H (inspecionados):** nenhum dos três pega quem está agachado, nem antes nem depois (0 de
+23 cada). O desenho também não encosta: os golpes passam por cima. Em pé, o H tem 8 fantasmas de
+até 41 px. Esse chute não foi partido (cobre mais de 75% do retângulo), e fica para olhar no
+aparelho (item 1.3 de `aparelho.md`). O H não ficou capaz de pegar agachado em ninguém: os acertos
+de H contra agachado caíram de 250 para 240.
+
+**Bateria fixa** (H8b → H8c, mesmas sementes). Mostra o 1x1 e o 2x2 de todos e o que passou de 3%:
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| breaker.troco_garantido_script | 57% | 61% | +4 |
+| breaker.cpu_quebra_das_chances | 37% | 34% | -4 |
+| shinkai.2x2_vence.POWER | 61% | 53% | -8 |
+| shinkai.2x2_vence.ENERGY | 52% | 44% | -8 |
+| shinkai.2x2_vence.TECHNIQUE | 53% | 49% | -4 |
+| 1x1.Ryūga (p01) | 61% | 62% | +1 |
+| 1x1.Yin-lu (p02) | 48% | 47% | -1 |
+| 1x1.Kōga (p03) | 59% | 59% | -0 |
+| 1x1.p04 | 60% | 60% | -0 |
+| 1x1.p05 | 55% | 56% | +1 |
+| 1x1.p06 | 52% | 52% | -1 |
+| 1x1.p07 | 26% | 21% | -5 |
+| 1x1.p08 | 75% | 75% | -0 |
+| 1x1.p09 | 63% | 64% | +1 |
+| 1x1.p10 | 59% | 61% | +2 |
+| 1x1.p11 | 62% | 61% | -1 |
+| 1x1.p12 | 61% | 61% | -0 |
+| 1x1.p13 | 54% | 55% | +0 |
+| 1x1.p14 | 31% | 36% | +4 |
+| 1x1.p15 | 8% | 8% | +0 |
+| 1x1.p16 | 25% | 24% | -1 |
+| 1x1.p09_vs_p02 | 75% | 70% | -5 |
+| 2x2.Ryūga (p01) | 59% | 56% | -3 |
+| 2x2.Yin-lu (p02) | 53% | 47% | -6 |
+| 2x2.Kōga (p03) | 45% | 47% | +2 |
+| 2x2.p04 | 41% | 47% | +6 |
+| 2x2.p05 | 41% | 40% | -1 |
+| 2x2.p06 | 43% | 50% | +6 |
+| 2x2.p07 | 47% | 34% | -13 |
+| 2x2.p08 | 58% | 64% | +6 |
+| 2x2.p09 | 66% | 68% | +2 |
+| 2x2.p10 | 56% | 63% | +7 |
+| 2x2.p11 | 49% | 49% | +0 |
+| 2x2.p12 | 62% | 59% | -2 |
+| 2x2.p13 | 53% | 50% | -2 |
+| 2x2.p14 | 45% | 43% | -2 |
+| 2x2.p15 | 18% | 25% | +7 |
+| 2x2.p16 | 37% | 37% | +0 |
+| p09.vs_p02_400 | 68% | 76% | +8 |
+| combo.max_0barras.p05 | 6041 | 5779 | -262 |
+| combo.max_1barra.p07 | 6481 | 7371 | +890 |
+
+Tudo ficou dentro do ruído (±8 por personagem). A maior variação foi o p07 no 2x2 (−13), na borda
+do ruído; no 1x1 ele foi de 26% para 21% (−5). O combo de 1 barra do p07 subiu (+890): a busca de rotas
+achou outra rota com as caixas novas (não investiguei qual golpe abriu ela).
+
+**Duplas oficiais** (T21, H8b → H8c):
+
+| titular | oficial | vitórias | alternativo 1 | alternativo 2 | alternativo 3 | melhor parceiro |
+|---|---|---|---|---|---|---|
+| Ryūga (p01) | Yin-lu (p02) | 54% → 48% | p04 66% → p04 64% | p07 63% → p07 66% | p12 73% → p12 68% | p12 |
+| Kōga (p03) | p04 | 55% → 63% | p06 48% → p06 46% | p09 57% → p09 68% | p14 48% → p14 41% | p09 |
+| p05 | p06 | 39% → 45% | p08 63% → p08 61% | p11 45% → p11 55% | p16 36% → p16 34% | p08 |
+| p07 | p08 | 63% → 55% | p10 45% → p10 48% | p13 50% → p13 52% | Yin-lu (p02) 34% → Yin-lu (p02) 27% | oficial |
+| p09 | p10 | 75% → 71% | p12 82% → p12 86% | p15 38% → p15 45% | p04 79% → p04 70% | p12 |
+| p11 | p12 | 66% → 71% | p14 46% → p14 50% | Ryūga (p01) 66% → Ryūga (p01) 63% | p06 43% → p06 54% | oficial |
+| p13 | p14 | 38% → 39% | p16 29% → p16 30% | Kōga (p03) 54% → Kōga (p03) 52% | p08 75% → p08 71% | p08 |
+| p15 | p16 | 5% | Yin-lu (p02) 7% → Yin-lu (p02) 11% | p05 9% → p05 4% | p10 13% → p10 23% | p10 |
+
+Todas ficaram dentro do ruído (±10).

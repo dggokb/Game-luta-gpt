@@ -100,13 +100,14 @@ public final class BateriaColisoes {
     static int sobreNoMembro(CombatFighter a) {
         float[] m = CombatEngine.golpeNoDesenho(a, a.attackFrame);
         if (m == null) return sobreposicao(PA, PD);
-        float x0 = Math.min(m[0], a.body().halfWidth) - CombatEngine.FOLGA_DESENHO, x1 = m[1] + CombatEngine.FOLGA_DESENHO;
+        // As duas caixas do membro na diagonal contam pelo retângulo que cobre as duas.
+        float x0 = Math.min(m[0], a.body().halfWidth) - CombatEngine.FOLGA_DESENHO, x1 = CombatEngine.maxDe(m, 1) + CombatEngine.FOLGA_DESENHO;
         if (a.attack.reachCap > 0f) x1 = Math.min(x1, a.attack.reachCap + CombatEngine.FOLGA_DESENHO);
         float l = a.facing > 0 ? a.x + x0 : a.x - x1, r = a.facing > 0 ? a.x + x1 : a.x - x0;
         float ox = W / 2f - meio, oy = CHAO_PX - Arena.GROUND_Y;
         int px0 = Math.max(0, Math.round(l + ox)), px1 = Math.min(W - 1, Math.round(r + ox));
-        int py0 = Math.max(0, Math.round(a.y - m[3] - CombatEngine.FOLGA_DESENHO + oy));
-        int py1 = Math.min(H - 1, Math.round(a.y - m[2] + CombatEngine.FOLGA_DESENHO + oy));
+        int py0 = Math.max(0, Math.round(a.y - CombatEngine.maxDe(m, 3) - CombatEngine.FOLGA_DESENHO + oy));
+        int py1 = Math.min(H - 1, Math.round(a.y - CombatEngine.minDe(m, 2) + CombatEngine.FOLGA_DESENHO + oy));
         int n = 0;
         for (int y = py0; y <= py1; y++) for (int x = px0; x <= px1; x++) {
             int i = y * W + x;
@@ -338,10 +339,10 @@ public final class BateriaColisoes {
         g.setStroke(new BasicStroke(2f));
         // O membro medido do golpe (o que o motor usa), em vermelho.
         float[] m = CombatEngine.golpeNoDesenho(a, a.attackFrame);
-        if (m != null) {
-            float l = a.facing > 0 ? a.x + m[0] : a.x - m[1], r = a.facing > 0 ? a.x + m[1] : a.x - m[0];
+        for (int j = 0; m != null && j + 3 < m.length; j += 4) {
+            float l = a.facing > 0 ? a.x + m[j] : a.x - m[j + 1], r = a.facing > 0 ? a.x + m[j + 1] : a.x - m[j];
             g.setColor(Color.RED);
-            g.drawRect(Math.round(l + ox), Math.round(a.y - m[3] + oy), Math.round(r - l), Math.round(m[3] - m[2]));
+            g.drawRect(Math.round(l + ox), Math.round(a.y - m[j + 3] + oy), Math.round(r - l), Math.round(m[j + 3] - m[j + 2]));
         }
         // O corpo de quem apanha (as faixas da postura), em verde.
         float[] corpo = corpoAntes;

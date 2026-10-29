@@ -53,7 +53,10 @@ final class DebugOverlay {
                 } else {
                     paint.setStyle(Paint.Style.FILL);
                     paint.setColor(cor);
-                    c.drawRect(f.x + (f.facing > 0 ? g[0] : -g[1]), f.y - g[3], f.x + (f.facing > 0 ? g[1] : -g[0]), f.y - g[2], paint);
+                    for (int j = 0; j + 3 < g.length; j += 4) {
+                        c.drawRect(f.x + (f.facing > 0 ? g[j] : -g[j + 1]), f.y - g[j + 3],
+                            f.x + (f.facing > 0 ? g[j + 1] : -g[j]), f.y - g[j + 2], paint);
+                    }
                 }
             }
         }

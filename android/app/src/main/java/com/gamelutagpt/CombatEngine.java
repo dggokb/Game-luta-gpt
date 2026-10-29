@@ -2627,15 +2627,26 @@ final class CombatEngine {
                               CharacterDefinition.Body body, boolean crouch) {
         if ((d.x - a.x) * a.facing < CombatRules.MIN_MELEE_DISTANCE) return false;
         float[] g = golpeNoDesenho(a, frame);
-        // O membro medido é a ponta que mexeu; o braço ou a perna vem inteiro desde a frente do
-        // corpo. De perto (o pulo que cai em cima) a ponta já passou das costas do rival.
-        float x0 = g != null ? Math.min(g[0], a.body().halfWidth) - FOLGA_DESENHO : box.x0;
-        float x1 = g != null ? g[1] + FOLGA_DESENHO : box.x1;
-        // Limite de balanço do golpe (alcanceMaximo): o desenho não acerta além dele.
-        if (a.attack != null && a.attack.reachCap > 0f) x1 = Math.min(x1, a.attack.reachCap + FOLGA_DESENHO);
-        float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
         // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
+        if (g == null) return membroToca(a, box.x0, box.x1, box.y0, box.y1, d, body, crouch, corpo);
+        // O membro medido é a ponta que mexeu; o braço ou a perna vem inteiro desde a frente do
+        // corpo. De perto (o pulo que cai em cima) a ponta já passou das costas do rival. Na
+        // diagonal são duas caixas (a de perto do corpo e a da ponta), cada uma na sua altura.
+        for (int j = 0; j + 3 < g.length; j += 4) {
+            float x0 = (j == 0 ? Math.min(g[0], a.body().halfWidth) : g[j]) - FOLGA_DESENHO;
+            if (membroToca(a, x0, g[j + 1] + FOLGA_DESENHO, g[j + 2] - FOLGA_DESENHO, g[j + 3] + FOLGA_DESENHO, d, body, crouch, corpo)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Uma caixa do membro ({@code x0..x1}, {@code y0..y1} da raiz de {@code a}) contra o corpo de {@code d}. */
+    private boolean membroToca(CombatFighter a, float x0, float x1, float y0, float y1, CombatFighter d,
+                               CharacterDefinition.Body body, boolean crouch, float[] corpo) {
+        // Limite de balanço do golpe (alcanceMaximo): o desenho não acerta além dele.
+        if (a.attack != null && a.attack.reachCap > 0f) x1 = Math.min(x1, a.attack.reachCap + FOLGA_DESENHO);
         if (corpo == null) {
             return CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,
                 d.x - body.halfWidth, d.y - body.height(crouch), d.x + body.halfWidth, d.y);
@@ -2649,6 +2660,20 @@ final class CombatEngine {
             }
         }
         return false;
+    }
+
+    /** O menor valor {@code k} (0 = x0, 2 = y0) entre as caixas do membro. */
+    static float minDe(float[] g, int k) {
+        float v = g[k];
+        for (int j = k + 4; j < g.length; j += 4) v = Math.min(v, g[j]);
+        return v;
+    }
+
+    /** O maior valor {@code k} (1 = x1, 3 = y1) entre as caixas do membro. */
+    static float maxDe(float[] g, int k) {
+        float v = g[k];
+        for (int j = k + 4; j < g.length; j += 4) v = Math.max(v, g[j]);
+        return v;
     }
 
     /** O golpe de {@code a} pega por trás (crossup): no ar, o golpe do crossup e o rival atrás dele. */
@@ -2665,7 +2690,7 @@ final class CombatEngine {
         // Logo embaixo ou já atrás (a pancada da frente não pega com o rival colado embaixo).
         if (!podeCruzar(a) || (d.x - a.x) * a.facing >= CombatRules.MIN_MELEE_DISTANCE) return false;
         float[] g = golpeNoDesenho(a, frame);
-        float y0 = g != null ? g[2] - FOLGA_DESENHO : box.y0, y1 = g != null ? g[3] + FOLGA_DESENHO : box.y1;
+        float y0 = g != null ? minDe(g, 2) - FOLGA_DESENHO : box.y0, y1 = g != null ? maxDe(g, 3) + FOLGA_DESENHO : box.y1;
         float x0 = -config.crossUpBehind, x1 = 0f;
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
         if (corpo == null) {
@@ -3411,7 +3436,7 @@ final class CombatEngine {
         AttackDefinition.Box box = c.attack.hitbox(c.hitbox);
         // A ponta do membro no quadro desenhado (sem medida, a caixa do golpe).
         float[] g = c.hitbox == 0 ? golpeNoDesenho(a, a.attackFrame) : null;
-        float reach = g != null ? g[1] : box.x1;
+        float reach = g != null ? maxDe(g, 1) : box.x1;
         float front = a.x + a.facing * reach;
         // O choque é onde o punho encontra o corpo desenhado do rival, do lado de quem bate (o
         // punho que entra no desenho não leva a faísca para o meio ou para as costas dele).
