@@ -67,6 +67,16 @@ final class SpriteAtlasCache {
     /** Redução da {@link Folha#amostra}. */
     static final int AMOSTRA=4;
 
+    /**
+     * Fração da tela em que o jogo desenha (o nível gráfico, já com o teto de 1080 linhas). Nos
+     * níveis MÉDIO e LEVE a tela sai menor e é ampliada pelo sistema; a folha cheia ali só gasta
+     * memória de vídeo (num 2x2 passa de 2 GB), então ela é decodificada para a tela que de fato
+     * se desenha. Vale a partir do próximo carregamento de luta.
+     */
+    private volatile float escalaRender=1f;
+    /** Abaixo do ALTO a folha pode ampliar um pouco (a tela já é ampliada inteira). */
+    static final float AMPLIACAO_REDUZIDA = 1.1f;
+
     /** Escalas de decodificação, da menor para a maior. */
     private static final float[] ESCALAS = {0.5f, 0.75f, 1f};
 
@@ -156,20 +166,50 @@ final class SpriteAtlasCache {
      * mais que {@link #AMPLIACAO_MAXIMA} na luta e nunca abaixo da arte canônica 1x.
      */
     static float escalaPara(CharacterDefinition character,CharacterDefinition.Atlas atlas,float densidadeTela) {
+        return escalaPara(character,atlas,densidadeTela,AMPLIACAO_MAXIMA*1.01f);
+    }
+
+    static float escalaPara(CharacterDefinition character,CharacterDefinition.Atlas atlas,float densidadeTela,float ampliacao) {
         if(atlas.pixelScale<=1f)return 1f;
         float telaPorPixel=character.profile.worldScale/atlas.pixelScale*CameraRig.CAMERA_ZOOM*densidadeTela;
         for(float escala:ESCALAS) {
             if(escala*atlas.pixelScale<1f-1e-4f)continue;
-            if(telaPorPixel/escala<=AMPLIACAO_MAXIMA*1.01f)return escala;
+            if(telaPorPixel/escala<=ampliacao)return escala;
         }
         return 1f;
     }
 
+    /** A escala desta folha na tela que se desenha agora ({@link #escalaRender}). */
+    private float escalaAgora(CharacterDefinition c,CharacterDefinition.Atlas a) {
+        float r=escalaRender;
+        return r>=0.999f?escalaPara(c,a,densidadeTela)
+            :escalaPara(c,a,densidadeTela*r,AMPLIACAO_REDUZIDA);
+    }
+
+    /** O nível gráfico mudou a fração da tela desenhada; as próximas lutas carregam nessa escala. */
+    void escalaDaRenderizacao(float fracao) {
+        escalaRender=Math.max(0.1f,Math.min(1f,fracao));
+    }
+
     /** Decodes every atlas of the characters before gameplay (in parallel); never called per frame. */
     void preload(CharacterDefinition... characters) {
+        carregar(false,characters);
+    }
+
+    /**
+     * Como o {@link #preload}, no começo de uma luta: a folha pronta noutra escala (o nível
+     * gráfico mudou) é decodificada de novo na escala de agora. No meio da luta, não (o
+     * {@link #preload} simples mantém o que já está na tela).
+     */
+    void preloadNaEscalaAtual(CharacterDefinition... characters) {
+        carregar(true,characters);
+    }
+
+    private void carregar(boolean trocarEscala,CharacterDefinition... characters) {
         List<Entrada> esperadas=new ArrayList<>();
         synchronized(trava) {
             for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) {
+                if(trocarEscala)trocarSeOutraEscala(c,a.atlas);
                 Entrada e=entrada(c,a.atlas,true);
                 if(e.folha==null&&!esperadas.contains(e))esperadas.add(e);
             }
@@ -226,7 +266,7 @@ final class SpriteAtlasCache {
             }
             for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) {
                 if(folhas.containsKey(a.atlas.resource))continue;
-                float escala=escalaPara(c,a.atlas,densidadeTela);
+                float escala=escalaAgora(c,a.atlas);
                 Entrada nova=new Entrada(c,a.atlas,escala);
                 if(bytesProntos+bytesEmAndamento+nova.bytes>orcamentoAntecipado) liberarAntecipadas(queridas,nova.bytes);
                 if(bytesProntos+bytesEmAndamento+nova.bytes>orcamentoAntecipado) { todas=false;continue; }
@@ -336,11 +376,24 @@ final class SpriteAtlasCache {
         }
     }
 
+    /**
+     * Folha pronta noutra escala (o nível gráfico mudou desde que ela carregou): sai, para ser
+     * decodificada de novo na escala de agora. Só no carregamento da luta. Com a trava.
+     */
+    private void trocarSeOutraEscala(CharacterDefinition c,CharacterDefinition.Atlas a) {
+        Entrada e=folhas.get(a.resource);
+        if(e==null||e.folha==null||Math.abs(e.escala-escalaAgora(c,a))<1e-4f)return;
+        folhas.remove(a.resource);
+        e.descartada=true;
+        bytesProntos-=e.folha.bitmap.getByteCount();
+        e.folha.bitmap.recycle();
+    }
+
     /** A entrada da folha, criada (e posta na fila) se ainda não existe. Com a trava. */
     private Entrada entrada(CharacterDefinition c,CharacterDefinition.Atlas a,boolean urgente) {
         Entrada e=folhas.get(a.resource);
         if(e==null) {
-            e=new Entrada(c,a,escalaPara(c,a,densidadeTela));
+            e=new Entrada(c,a,escalaAgora(c,a));
             folhas.put(a.resource,e);
             bytesEmAndamento+=e.bytes;
             e.naFila=true;

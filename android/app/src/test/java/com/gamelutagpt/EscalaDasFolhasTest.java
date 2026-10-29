@@ -38,6 +38,21 @@ public class EscalaDasFolhasTest {
         }
     }
 
+    @Test public void lighterGraphicsLevelsDecodeSmallerSheets() {
+        // Celular 2400x1080: no LEVE a tela sai a 60% e a folha cheia só gastava memória de vídeo.
+        CharacterDefinition c = GeneratedCharacters.get("p15");
+        float densidade = SpriteAtlasCache.densidadeTela(2400, 1080);
+        float leve = densidade * QualidadeGrafica.escalaDaTela(QualidadeGrafica.ESCALA[QualidadeGrafica.LEVE], 1080);
+        for (CharacterDefinition.Animation a : c.animations.values()) {
+            if (a.atlas.pixelScale < 2f) continue; // arte 1x: já é a menor
+            float e = SpriteAtlasCache.escalaPara(c, a.atlas, leve, SpriteAtlasCache.AMPLIACAO_REDUZIDA);
+            float ampliacao = c.profile.worldScale / a.atlas.pixelScale / e * CameraRig.CAMERA_ZOOM * leve;
+            assertTrue(a.atlas.resource + " ampliada " + ampliacao, ampliacao <= SpriteAtlasCache.AMPLIACAO_REDUZIDA);
+            assertEquals(a.atlas.resource, 0.75f, e, 0f);
+        }
+        assertEquals(1f, SpriteAtlasCache.escalaPara(c, c.animation(SpriteStates.IDLE).atlas, densidade), 0f);
+    }
+
     @Test public void canonicalArtAndUnknownScreensStayWhole() {
         assertEquals(1f, escala("p08", 1280, 720), 0f);
         assertEquals(1f, escala(GeneratedCharacters.OPPONENT, 1280, 720), 0f);

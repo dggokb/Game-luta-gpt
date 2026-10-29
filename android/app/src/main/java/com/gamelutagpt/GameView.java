@@ -736,7 +736,7 @@ public class GameView extends SurfaceView
         // mid-fight) and the opponent share the same cache. No celular só os renderers: as
         // folhas vêm com a luta (selectTeamsNow), muitas vezes já antecipadas.
         boolean folhas = carregarFolhasNaHora;
-        if (folhas) atlases.preload(team[0].character, team[1].character, opponentFighter.character);
+        if (folhas) atlases.preloadNaEscalaAtual(team[0].character, team[1].character, opponentFighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character, folhas);
         // O adversário aparece com as cores normais da arte (sem o filtro pálido de antes).
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character, folhas);
@@ -937,12 +937,12 @@ public class GameView extends SurfaceView
             // então a arte dele fica carregada (sem decodificar no meio da luta).
             CharacterDefinition[] luta = comExtras(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
             atlases.retainOnly(luta);
-            atlases.preload(luta);
+            atlases.preloadNaEscalaAtual(luta);
         } else {
             CharacterDefinition[] luta = comExtras(team[0].character, team[1].character, opponentFighter.character);
             atlases.retainOnly(luta);
             // As folhas dos três de uma vez, em paralelo; as antecipadas só são esperadas.
-            atlases.preload(luta);
+            atlases.preloadNaEscalaAtual(luta);
         }
         lutadoresAntecipados = "";
         // Os rostos do HUD saem de folhas de conceito grandes: decodificados aqui, e não no
@@ -3354,6 +3354,8 @@ public class GameView extends SurfaceView
         post(() -> {
             int w = getWidth(), h = getHeight();
             float e = QualidadeGrafica.escalaDaTela(escala, Math.min(w, h));
+            // As folhas dos lutadores acompanham a tela desenhada (a partir da próxima luta).
+            atlases.escalaDaRenderizacao(e);
             if (e >= 0.999f || w <= 0 || h <= 0) {
                 holder.setSizeFromLayout();
             } else {
