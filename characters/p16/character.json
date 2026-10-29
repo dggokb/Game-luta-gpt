@@ -18139,6 +18139,10 @@
       "cancelInto": [
         "H",
         "2M",
+        "S",
+        "S2",
+        "S3",
+        "S4",
         "2H"
       ],
       "pushbackOnHit": 32,
@@ -18146,7 +18150,11 @@
       "hitHeight": 184,
       "rotasProprias": [
         "H",
-        "2M"
+        "2M",
+        "S",
+        "S2",
+        "S3",
+        "S4"
       ],
       "maxUsesPerChain": 1,
       "hitFloor": 130
@@ -18203,7 +18211,13 @@
         ],
         "whiff": null
       },
-      "cancelInto": [],
+      "cancelInto": [
+        "S",
+        "SUPER",
+        "S2",
+        "S3",
+        "S4"
+      ],
       "pushbackOnHit": 44,
       "pushbackOnBlock": 50,
       "launchType": "wallBounce",

@@ -1008,3 +1008,23 @@ saindo do combo.
 - No fim da luta sobra 0,6–0,7 barra a mais sem uso.
 - Todos os tipos, e também o lado sem SHINKAI, terminam com 2,6–3,5 barras paradas: é a CPU que não
   gasta a barra, não o ENERGY.
+
+## Etapa H4-p16 — M e H da p16 cancelam em especial e Super (item 4)
+
+Decisão do usuário (item 4): ajustes individuais por ferramenta que não cumpre a função, sem aumento
+global de dano. O relatório da frente, com a causa dos 2% de p15+p16, está em
+[h4-personagens.md](h4-personagens.md).
+
+- **Ferramenta:** a p16 era a única do elenco cujo M e H não cancelavam em especial nem em Super.
+  Nenhum combo dela fechava.
+- **Arquivos:**
+  - `characters/p16/character.json`: `cancelInto` do M ganha S, S2, S3 e S4; o do H ganha S, SUPER,
+    S2, S3 e S4;
+  - `GeneratedCharacters.java`, regenerado pelo gerador.
+- **Dano:** nada muda.
+- **Testes:** `CancelamentosP16Test` (novo; `M H SUPER` rende 1260 → 2700); suíte 578 de 578.
+- **Medida da frente:** matriz p16 24 → 27%; p15+p16 2 → 4%.
+- **Bateria fixa ao integrar:**
+  - 2x2 p16 37 → 40%;
+  - `combo.max_1barra.p16` 5615 → 4487, efeito da busca em feixe: com mais ações a poda muda, e a
+    rota antiga continua possível.
