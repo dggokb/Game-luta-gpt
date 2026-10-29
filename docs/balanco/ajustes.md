@@ -807,3 +807,87 @@ meio do quadro de jogo), e os clipes precisam ser reajustados. Cada um desses go
 com o quadro desenhado como impacto. Em quase todos isso aumenta o alcance real (é a perna ou o braço
 esticado), então é uma mudança ampla e fica para depois da matriz consolidada. O 2M do p09 está na
 lista e mexe no experimento H2.
+
+
+## Etapa H2 — p09: `alcanceMaximo` 190 no 2M (EXPERIMENTO A/B, item 2)
+
+Decisão do usuário (item 2): testar o `alcanceMaximo` 190 no 2M do p09 como experimento A/B, sem
+mexer na velocidade (300 → 270 fica de fora) e esperando a matriz para consolidar. **Este commit é
+o lado B do experimento. Ele não está consolidado e se desfaz revertendo só ele.**
+
+- **A** = estado da H3 (`alcanceMaximo` 220, etapa 4a).
+- **B** = `alcanceMaximo` 190, com o `reach` declarado também em 190, porque o gerador exige
+  reach ≤ alcanceMaximo.
+- **Sem mudança:** dano (560), quadros (9/5/17), vida, velocidade e agarrões.
+- **Arquivos:**
+  - `characters/p09/character.json`: 2M com `reach` e `alcanceMaximo` 220 → 190;
+  - `GeneratedCharacters.java`, gerado: `.reach(190…).reachCap(190)`;
+  - `CpuReachTable` regenerada: p09 2M 266/260 → 236/230 (em pé/agachado, eixo a eixo contra o Ryūga).
+- **Testes:**
+  - `AgachadoDoRyugaTest.aLowMediumAtTheTipHitsTheCrouchingRyuga`: o caso do p09 passa de 280 para
+    250 px, a ponta nova;
+  - novo `theP09LowMediumStopsAtItsMaximumReach`: a 280 px o 2M não pega mais (com 220 pegava);
+  - suíte: 569 de 569;
+  - gerador: passa.
+
+**Bateria fixa** (A → B, mesmas sementes): só o que mudou mais de 3%, mais o 1x1 e o 2x2 de p09, p02 e p10.
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| 1x1.Yin-lu (p02) | 46% | 46% | -0 |
+| 1x1.p09 | 65% | 64% | -1 |
+| 1x1.p10 | 61% | 60% | -1 |
+| 1x1.p09_vs_p02 | 70% | 75% | +5 |
+| 2x2.Yin-lu (p02) | 50% | 51% | +1 |
+| 2x2.p09 | 68% | 60% | -8 |
+| 2x2.p10 | 60% | 58% | -3 |
+| p09.vs_p02_400 | 76% | 62% | -13 |
+| p09.parte_2M | 23% | 13% | -10 |
+
+**Matriz 16 × 16** (A → B, força contra o elenco):
+
+| personagem | A (220) | B (190) |
+|---|---|---|
+| p08 | 76% | 75% |
+| p04 | 68% | 69% |
+| Kōga (p03) | 61% | 61% |
+| p10 | 61% | 61% |
+| p12 | 61% | 60% |
+| Ryūga (p01) | 58% | 59% |
+| p11 | 58% | 59% |
+| p09 | 62% | 57% |
+| p06 | 57% | 55% |
+| p05 | 53% | 53% |
+| Yin-lu (p02) | 49% | 49% |
+| p13 | 47% | 48% |
+| p14 | 31% | 33% |
+| p07 | 27% | 27% |
+| p16 | 21% | 22% |
+| p15 | 10% | 10% |
+
+faixa: A (220) 10–76 (desvio 17.7); B (190) 10–75 (desvio 17.3)
+
+**Duplas oficiais** (T21, A → B):
+
+| titular | oficial | vitórias | alternativo 1 | alternativo 2 | alternativo 3 | melhor parceiro |
+|---|---|---|---|---|---|---|
+| Ryūga (p01) | Yin-lu (p02) | 52% → 55% | p04 68% → p04 63% | p07 61% → p07 63% | p12 68% | p04 → p12 |
+| Kōga (p03) | p04 | 61% → 64% | p06 41% → p06 45% | p09 68% → p09 63% | p14 45% → p14 46% | p09 → oficial |
+| p05 | p06 | 50% → 46% | p08 61% → p08 63% | p11 55% → p11 61% | p16 34% | p08 |
+| p07 | p08 | 55% → 59% | p10 45% → p10 39% | p13 52% | Yin-lu (p02) 25% → Yin-lu (p02) 27% | oficial |
+| p09 | p10 | 73% → 63% | p12 86% → p12 73% | p15 45% → p15 30% | p04 73% → p04 63% | p12 |
+| p11 | p12 | 70% → 73% | p14 45% → p14 46% | Ryūga (p01) 63% → Ryūga (p01) 57% | p06 45% → p06 43% | oficial |
+| p13 | p14 | 43% → 48% | p16 25% | Kōga (p03) 52% → Kōga (p03) 50% | p08 70% → p08 66% | p08 |
+| p15 | p16 | 5% | Yin-lu (p02) 11% | p05 9% | p10 25% | p10 |
+
+- **Leitura:**
+  - O 2M passa de 23% para 13% do dano do p09.
+  - O p09 contra a Yin-lu a 400 px cai de 76% para 62%.
+  - Na matriz o p09 vai de 62% para 57% (−5, dentro do ruído de ±8), e sai do grupo de cima (4º → 8º).
+  - No 2x2 cai 8 pontos, e a dupla p09 + p10 de 73% para 63%.
+- **Os outros 15:** dentro do ruído.
+- **Decisão do usuário:** consolidar B, voltar para A ou tentar um valor no meio (205). A matriz
+  final de consolidação deve ser rodada com a lista H inteira junta.
+- **Atenção:** o 2M do p09 também está entre os 16 golpes com o quadro do impacto antes da janela
+  ativa (achado da H3). Se esse acerto for feito depois, o 2M passa a bater com o quadro esticado,
+  e o `alcanceMaximo` vira o limite que de fato segura o alcance.
