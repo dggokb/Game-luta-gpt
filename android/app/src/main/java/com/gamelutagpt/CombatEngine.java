@@ -2569,10 +2569,11 @@ final class CombatEngine {
      */
     static float[] golpeNoDesenho(CombatFighter a, int frame) {
         // Golpe coreografado (prende o rival num lugar, anda com o corpo, pisa o caído, agarra):
-        // o desenho já mostra o caminho que o motor também faz, então a caixa do golpe decide.
+        // o desenho já mostra o caminho que o motor também faz, então a caixa do golpe decide. No
+        // avanço com o bote desenhado à frente da raiz (drawnStrike) a ponta desenhada decide.
         if (a.attack == null || a.attack.strikeHold != null) return null;
         AttackDefinition.Mechanics m = a.attack.mechanics;
-        if (m.advanceSpeed > 0f || m.pound || m.grab || m.hopHeight > 0f || m.pull != 0f) return null;
+        if (m.advanceSpeed > 0f && !m.drawnStrike || m.pound || m.grab || m.hopHeight > 0f || m.pull != 0f) return null;
         int q = quadroDoDesenho(a, frame);
         return q < 0 ? null : desenhoDoGolpe(a).silhuetaGolpe[q];
     }

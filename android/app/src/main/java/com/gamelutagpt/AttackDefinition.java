@@ -104,6 +104,11 @@ final class AttackDefinition {
         int advanceStart, advanceEnd;
         /** The body passes through the opponent while advancing (cross-up). */
         boolean passThrough;
+        /**
+         * Avanço cujo desenho também avança à frente da raiz (o bote da Investida do p12): a pancada
+         * é a ponta desenhada, não a caixa do golpe.
+         */
+        boolean drawnStrike;
         /** Frame on which the fighter reappears behind the opponent, or -1. */
         int teleportFrame = -1;
         /** On hit the defender is pulled this far toward the attacker instead of pushed. */
@@ -143,6 +148,7 @@ final class AttackDefinition {
         Mechanics advance(float speed, int start, int end, boolean through) {
             advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;
         }
+        Mechanics drawnStrike() { drawnStrike = true; return this; }
         Mechanics teleport(int frame) { teleportFrame = frame; return this; }
         Mechanics pull(float distance) { pull = distance; return this; }
         Mechanics poison(int damage, int frames) { poisonDamage = damage; poisonFrames = frames; return this; }

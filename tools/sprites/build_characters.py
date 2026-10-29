@@ -177,7 +177,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote'}
+             'chao','rebote','desenho'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -203,6 +203,9 @@ def validate_mechanics(name, mech, m, projectile):
         v = mech['avanco'].get('velocidade')  # negativa: recua (estrela da p16)
         if isinstance(v, bool) or not isinstance(v, (int,float)) or not math.isfinite(v) or v == 0:
             raise ValueError(f'{name}.mecanica.avanco.velocidade: expected a nonzero finite number')
+    # desenho: o avanço cujo bote é desenhado à frente da raiz (a Investida do p12) bate pela ponta desenhada.
+    if 'desenho' in mech and (mech['desenho'] is not True or 'avanco' not in mech):
+        raise ValueError(f'{name}.mecanica.desenho: true, on a move with avanco')
     if 'teleporte' in mech and not (type(mech['teleporte']) is int and 0 <= mech['teleporte'] < total):
         raise ValueError(f'{name}.mecanica.teleporte: a frame inside the move')
     if 'puxar' in mech: positive(mech['puxar'], f'{name}.mecanica.puxar')
@@ -706,6 +709,7 @@ def compile_packs(root, results):
         if 'avanco' in mech:
             v = mech['avanco']
             code += '.advance('+f(v['velocidade'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('atravessa'))).lower()+')'
+        if mech.get('desenho'): code += '.drawnStrike()'
         if 'teleporte' in mech: code += '.teleport('+str(mech['teleporte'])+')'
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
         if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'

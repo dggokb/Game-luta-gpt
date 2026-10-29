@@ -1000,7 +1000,8 @@
           "alcance": 120,
           "altura": 130,
           "empurrao": 80,
-          "avanco": 520
+          "avanco": 520,
+          "desenhoBate": true
         }
       }
     },

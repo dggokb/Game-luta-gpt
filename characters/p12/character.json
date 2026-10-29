@@ -62,7 +62,8 @@
               0,
               13
             ]
-          }
+          },
+          "desenho": true
         },
         "corpoBase": {
           "startupFrames": 10,
@@ -7107,19 +7108,19 @@
       ],
       "loop": false,
       "durationsMs": [
-        38,
+        29,
+        32,
+        29,
+        32,
+        36,
         42,
-        38,
-        42,
-        47,
-        42,
-        47,
-        47,
-        47,
-        47,
-        45
+        57,
+        57,
+        57,
+        57,
+        54
       ],
-      "impactFrame": 4,
+      "impactFrame": 5,
       "silhueta": {
         "corpo": {
           "0": [

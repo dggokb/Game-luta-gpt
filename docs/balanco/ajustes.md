@@ -522,3 +522,62 @@ O `1x1.p09_vs_p02` é uma célula de poucas lutas. A medida de 400 lutas (`p09.v
 
 O T21 tem 8 lutas por adversário e ruído de cerca de ±10. Ryūga + Yin-lu caiu 10, mas no 2x2 da
 bateria fixa o Ryūga subiu de 60% para 64%.
+
+## Etapa H8b — Investida (S1) do p12 bate pelo bote desenhado (colisões, item 8)
+
+Decisão do usuário (item 8): revisar a Investida do p12. O corpo avança 112 px nos quadros 0–13
+e, ao mesmo tempo, o desenho salta até 290 px à frente da raiz (quadros 5 e 6 do clipe). O motor
+usava só a caixa do golpe (120 px), porque a regra geral é que "no avanço o desenho já mostra o
+caminho". Nos quadros ativos (10–13) o clipe ainda mostrava o quadro 4, e o bote aparecia logo
+depois da janela. A 320 px o Necro atravessava o rival no desenho sem acertar (T25, achado 4).
+
+- **Arquivos:**
+  - `AttackDefinition.Mechanics.drawnStrike` é novo, com o construtor `drawnStrike()`.
+  - `CombatEngine.golpeNoDesenho`: num avanço com `drawnStrike`, a ponta desenhada decide a pancada,
+    e não a caixa do golpe.
+  - `tools/sprites/build_characters.py`: a mecânica `"desenho": true`, que exige `avanco`, gera
+    `.drawnStrike()`. O código do gerador mudou, então os 657 atlas foram refeitos uma vez.
+  - `tools/sprites/mecanicas.py` e `mecanicas.json`: em `p12.s1.corpoACorpo`, `"desenhoBate": true`.
+  - `characters/p12/character.json`:
+    - `energy.attack.mecanica.desenho = true`;
+    - o `SPECIAL_ENERGY` passa de `impactFrame` 4 para 5 (o bote);
+    - `durationsMs` refeito pelo `fit_impact`, com o mesmo total: o bote começa junto com a janela
+      ativa.
+  - `CpuReachTable` regenerada: o alcance real da S do p12 foi de 264 para 432 px.
+- **Sem mudança:** dano (940), quadros (10/4/15), custo de vida e o avanço de 520 px/s nos quadros
+  0–13.
+- **Teste novo:** `InvestidaDoNecroTest`, com 3 testes.
+  - Acerta a 320 e a 200 px.
+  - Erra a 520 px.
+  - O dano é o mesmo.
+  - Os testes de acerto e de mecânica falham no código anterior.
+- **Suíte:** 565 de 565.
+- **Gerador:** passa, com 19 personagens e 657 atlas.
+
+**T25 da Investida** (`BateriaColisoes p12`, S nas 3 distâncias, em pé e agachado):
+
+| distância | antes | depois |
+|---|---|---|
+| 200, em pé | fantasma (13 px) | acerta encostando |
+| 320, em pé | atravessa sem acertar (6451 px sobrepostos) | acerta encostando |
+| 450, em pé | atravessa sem acertar (435 px) | acerta encostando |
+| 200, agachado | fantasma (28 px) | acerta encostando |
+| 320, agachado | atravessa sem acertar (6264 px) | acerta encostando |
+| 450, agachado | atravessa sem acertar (283 px) | não acerta, sem encostar |
+
+No p12 inteiro (726 tentativas), os fantasmas foram de 59 para 57 e as falhas de 13 para 9.
+
+**Bateria fixa** (H8a → H8b). Só as linhas do p12 e do p11 mudaram; o resto ficou idêntico.
+
+| 1x1.p11 | 63% | 62% | -1 |
+| 1x1.p12 | 48% | 61% | +13 |
+| 2x2.p11 | 52% | 49% | -4 |
+| 2x2.p12 | 51% | 62% | +10 |
+
+**Atenção para balanço:** a correção é de geometria, mas a Investida passou a pegar até 432 px. O
+p12 subiu 13 pontos no 1x1 e 10 no 2x2. A matriz 16 × 16 da frente H-geo vai dizer se ele passou do
+grupo do meio. Se passar, as opções que não contradizem o desenho são duas: encurtar o salto no
+clipe (arte) ou reduzir o avanço de 520 px/s. A decisão é do usuário.
+
+**Duplas oficiais** (T21, H8a → H8b): p11 + p12 64 → 66%; as outras ficaram dentro do ruído (±10).
+O p12 virou o melhor parceiro do Ryūga (73%) e do p09 (82%).

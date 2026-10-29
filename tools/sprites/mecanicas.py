@@ -294,6 +294,8 @@ def s1(pack, spec):
         attack['knockback'] = melee.get('empurrao', 60)
         if melee.get('avanco'):
             advance(attack, melee['avanco'])
+            if melee.get('desenhoBate'):
+                attack['mecanica']['desenho'] = True   # o bote desenhado à frente da raiz bate
     if 'visual' in s:
         if s['visual'] not in VISUALS:
             raise SystemExit(f"s1.visual {s['visual']}: um de {VISUALS}")
