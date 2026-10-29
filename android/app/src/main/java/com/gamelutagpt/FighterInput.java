@@ -8,6 +8,13 @@ package com.gamelutagpt;
 final class FighterInput {
     /** Screen direction 0..8: 0 neutral, then → ↘ ↓ ↙ ← ↖ ↑ ↗ (see ControlsLayout). */
     int direction;
+    static final int PASSOU_MAX = 8;
+    /**
+     * Direções por onde o direcional passou desde o quadro anterior, antes de {@link #direction}
+     * (o toque é mais rápido que os quadros). O motor põe todas no histórico dos comandos.
+     */
+    final int[] passou = new int[PASSOU_MAX];
+    int passouCount;
     boolean light, medium, heavy;
     /** Auto-combo button: the next step of the character's declared autoCombo route. */
     boolean auto;
@@ -36,6 +43,7 @@ final class FighterInput {
 
     void clear() {
         direction = 0;
+        passouCount = 0;
         holding = false;
         clearPresses();
     }
@@ -48,6 +56,8 @@ final class FighterInput {
 
     void copyFrom(FighterInput other) {
         direction = other.direction;
+        passouCount = other.passouCount;
+        System.arraycopy(other.passou, 0, passou, 0, other.passouCount);
         light = other.light;
         medium = other.medium;
         heavy = other.heavy;

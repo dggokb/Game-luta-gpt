@@ -9,6 +9,13 @@ final class PadInput {
     enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG, THROW, PUSHBLOCK, SHINKAI }
 
     private int direction;
+    /**
+     * Direções por onde o dedo passou desde o último quadro, em ordem. O toque chega mais rápido
+     * que os quadros (120–240 por segundo): num ↓ ↘ → ligeiro a diagonal entrava e saía entre
+     * dois quadros, o comando chegava incompleto e o especial não saía.
+     */
+    private final int[] passou = new int[FighterInput.PASSOU_MAX];
+    private int passouCount;
     /** An attack button is still under a finger. */
     private boolean holding;
     private boolean light, medium, heavy, auto, superAttack, tag, grab, pushblock, shinkai;
@@ -22,6 +29,7 @@ final class PadInput {
     }
 
     void setDirection(int screenDirection) {
+        if (screenDirection != direction && passouCount < passou.length) passou[passouCount++] = direction;
         direction = screenDirection;
     }
 
@@ -48,6 +56,9 @@ final class PadInput {
     void drainInto(FighterInput out) {
         out.clear();
         out.direction = direction;
+        // A primeira da lista é a que o quadro anterior já entregou; as outras só passaram.
+        for (int i = 1; i < passouCount; i++) out.passou[out.passouCount++] = passou[i];
+        passouCount = 0;
         out.holding = holding;
         // L + M (two fingers, up to THROW_LENIENCY_FRAMES apart) or the spot between them:
         // throw. When the first button already started a jab, the engine turns it into the throw.
@@ -81,6 +92,7 @@ final class PadInput {
 
     void reset() {
         direction = 0;
+        passouCount = 0;
         holding = false;
         lightAge = mediumAge = -1;
         clearPresses();

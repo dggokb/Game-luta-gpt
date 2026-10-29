@@ -5264,7 +5264,12 @@ public class GameView extends SurfaceView
         MotionEvent event;
         while ((event = pendingInput.poll()) != null) {
             if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                if (latestMove != null) latestMove.recycle();
+                if (latestMove != null) {
+                    // O movimento é juntado num só por quadro, mas o direcional não pode perder
+                    // por onde o dedo passou (a diagonal do ↓ ↘ →).
+                    moverDirecional(latestMove);
+                    latestMove.recycle();
+                }
                 latestMove = event;
                 continue;
             }
@@ -5283,6 +5288,15 @@ public class GameView extends SurfaceView
             latestMove.recycle();
         }
         syncHeldTouches();
+    }
+
+    /** Só o direcional de um movimento que vai ser juntado com o próximo. */
+    private void moverDirecional(MotionEvent event) {
+        if (dpadPointer == -1 || getWidth() == 0 || getHeight() == 0) return;
+        int pointerIndex = event.findPointerIndex(dpadPointer);
+        if (pointerIndex < 0) return;
+        pad.setDirection(ControlsLayout.dpadDirectionAt(
+            event.getX(pointerIndex) / (getWidth() / VW), event.getY(pointerIndex) / (getHeight() / VH)));
     }
 
     private void clearPendingInput() {

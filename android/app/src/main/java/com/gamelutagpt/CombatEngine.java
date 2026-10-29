@@ -463,6 +463,8 @@ final class CombatEngine {
         // backward or repeated double taps while the hop is active.
         if (f.backdashFrames == 0 && f.backdashCooldown == 0 &&
             in.direction == 0) f.backdashArmed = true;
+        // As direções que o dedo atravessou entre os quadros entram antes, no mesmo quadro.
+        for (int i = 0; i < in.passouCount; i++) f.motion.record(MotionParser.relative(in.passou[i], f.facing), f.clock);
         int relative = MotionParser.relative(in.direction, f.facing);
         f.motion.record(relative, f.clock);
         trackGuardPress(f, relative);
