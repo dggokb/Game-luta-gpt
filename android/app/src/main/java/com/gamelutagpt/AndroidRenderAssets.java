@@ -64,7 +64,7 @@ final class AndroidRenderAssets implements RenderAssets {
             options.inSampleSize *= 2;
         }
         Bitmap bitmap = null;
-        if (SpriteAtlasCache.naPlacaDeVideo && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (SpriteAtlasCache.telaPelaGpu && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // Cenário (camadas do tamanho da tela, várias por quadro), Ultra e páginas: direto na
             // placa de vídeo, como as folhas dos lutadores. Na memória comum o sistema as copia
             // para a placa ao desenhar e de novo sempre que saem do cache de texturas.

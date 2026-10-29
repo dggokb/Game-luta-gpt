@@ -3725,6 +3725,7 @@ public class GameView extends SurfaceView
                 Canvas c = holder.lockHardwareCanvas();
                 // Tela pela GPU: as folhas dos lutadores podem ir direto para a placa de vídeo
                 // (o teste de desempenho pode mandar as próximas para a memória comum).
+                SpriteAtlasCache.telaPelaGpu = true;
                 SpriteAtlasCache.naPlacaDeVideo = SpriteAtlasCache.placaPermitida;
                 return c;
             } catch (RuntimeException ex) {
@@ -3732,6 +3733,7 @@ public class GameView extends SurfaceView
                 hardwareCanvas = false;
             }
         }
+        SpriteAtlasCache.telaPelaGpu = false;
         if (SpriteAtlasCache.naPlacaDeVideo) {
             // O software não desenha folha da placa de vídeo: solta todas (voltam na memória comum).
             SpriteAtlasCache.naPlacaDeVideo = false;

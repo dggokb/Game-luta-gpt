@@ -68,6 +68,12 @@ final class SpriteAtlasCache {
      * para a memória comum mesmo com a tela pela GPU, para comparar no aparelho.
      */
     static volatile boolean placaPermitida = true;
+    /**
+     * A tela é desenhada pela GPU (independe do teste de desempenho): o cenário, os Ultras e as
+     * páginas vão sempre para a placa de vídeo quando ela desenha. Só as folhas dos lutadores
+     * obedecem ao botão FOLHAS.
+     */
+    static volatile boolean telaPelaGpu;
 
     /** Redução da {@link Folha#amostra}. */
     static final int AMOSTRA=4;
