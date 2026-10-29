@@ -27,6 +27,9 @@ def fontesDoApp = tasks.register('fontesDoApp', Sync) {
     description = 'Copia o código do app Android que o jogo de PC compila.'
     from(new File(appMain, 'java')) {
         exclude 'com/gamelutagpt/MainActivity.java'
+        // O teste do desenho em OpenGL é só do celular (no PC o AbrirTesteGl não faz nada).
+        exclude 'com/gamelutagpt/TesteGlActivity.java'
+        exclude 'com/gamelutagpt/GlRenderCanvas.java'
         exclude { element ->
             !element.isDirectory() && new File(substituicoes, element.relativePath.pathString).isFile()
         }

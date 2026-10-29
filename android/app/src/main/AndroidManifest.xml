@@ -7,6 +7,8 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <!-- Modo Teste > TESTE GL: o cenário e os lutadores desenhados em OpenGL, para medir o desenho novo. -->
+    <activity android:name=".TesteGlActivity" android:screenOrientation="landscape" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|uiMode|density" android:exported="false" />
     <!-- DEBUG > AJUSTAR TAMANHOS > SALVAR: entrega o arquivo de ajustes ao Drive (só leitura, não exportado). -->
     <provider android:name=".ArquivosCompartilhados" android:authorities="com.gamelutagpt.arquivos" android:exported="false" android:grantUriPermissions="true" />
   </application>

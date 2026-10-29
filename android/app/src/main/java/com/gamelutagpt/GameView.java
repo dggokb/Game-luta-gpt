@@ -2030,6 +2030,7 @@ public class GameView extends SurfaceView
                     return !TesteDesempenho.cenario ? "CENÁRIO OFF"
                         : TesteDesempenho.cenarioSemEnfeites ? "CENÁRIO SEM ENF." : "CENÁRIO ON";
                 case PERF_HUD: return TesteDesempenho.hud ? "HUD ON" : "HUD OFF";
+                case PERF_GL: return "TESTE GL";
                 default: return null;
             }
         }
@@ -5294,6 +5295,14 @@ public class GameView extends SurfaceView
         syncHeldTouches();
     }
 
+    /** TESTE GL: o cenário e os quatro lutadores desta luta no desenho novo (OpenGL), noutra tela. */
+    private void abrirTesteGl() {
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        for (FighterState member : team) ids.add(member.character.id);
+        for (FighterState member : engine.team(OPPONENT).members) ids.add(member.character.id);
+        AbrirTesteGl.abrir(getContext(), stageId, ids.toArray(new String[0]));
+    }
+
     /** Só o direcional de um movimento que vai ser juntado com o próximo. */
     private void moverDirecional(MotionEvent event) {
         if (dpadPointer == -1 || getWidth() == 0 || getHeight() == 0) return;
@@ -5459,6 +5468,9 @@ public class GameView extends SurfaceView
                     break;
                 case PERF_HUD:
                     TesteDesempenho.hud = !TesteDesempenho.hud;
+                    break;
+                case PERF_GL:
+                    abrirTesteGl();
                     break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it (a dono que

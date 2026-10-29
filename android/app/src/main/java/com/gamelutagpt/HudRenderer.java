@@ -236,7 +236,7 @@ final class HudRenderer {
             if (label == null) continue;
             float top = ControlsLayout.PERF_TOP[i];
             drawToggle(c, s.perfOn(i), label, ControlsLayout.PERF_LEFT, top, ControlsLayout.PERF_RIGHT,
-                top + ControlsLayout.PERF_HEIGHT, 13f);
+                top + ControlsLayout.PERF_HEIGHTS[i], 13f);
         }
     }
 
