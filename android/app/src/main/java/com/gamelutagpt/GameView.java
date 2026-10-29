@@ -2026,7 +2026,9 @@ public class GameView extends SurfaceView
                 case PERF_GRAFICOS: return "GRÁF " + qualidade.rotulo(t -> t);
                 case PERF_FOLHAS: return SpriteAtlasCache.placaPermitida ? "FOLHAS GPU" : "FOLHAS RAM";
                 case PERF_EFEITOS: return TesteDesempenho.efeitos ? "EFEITOS ON" : "EFEITOS OFF";
-                case PERF_CENARIO: return TesteDesempenho.cenario ? "CENÁRIO ON" : "CENÁRIO OFF";
+                case PERF_CENARIO:
+                    return !TesteDesempenho.cenario ? "CENÁRIO OFF"
+                        : TesteDesempenho.cenarioSemEnfeites ? "CENÁRIO SEM ENF." : "CENÁRIO ON";
                 case PERF_HUD: return TesteDesempenho.hud ? "HUD ON" : "HUD OFF";
                 default: return null;
             }
@@ -2036,7 +2038,7 @@ public class GameView extends SurfaceView
                 case PERF_GRAFICOS: return qualidade.nivel() == QualidadeGrafica.ALTO;
                 case PERF_FOLHAS: return SpriteAtlasCache.placaPermitida;
                 case PERF_EFEITOS: return TesteDesempenho.efeitos;
-                case PERF_CENARIO: return TesteDesempenho.cenario;
+                case PERF_CENARIO: return TesteDesempenho.cenario && !TesteDesempenho.cenarioSemEnfeites;
                 case PERF_HUD: return TesteDesempenho.hud;
                 default: return true;
             }
@@ -3530,7 +3532,7 @@ public class GameView extends SurfaceView
             } else if (stageScene != null) {
                 // The stage projects every layer with the same camera the fighters use.
                 perfil.marca(PerfilQuadros.TELA);
-                stageScene.setDetalhe(!qualidade.efeitosLeves());
+                stageScene.setDetalhe(!qualidade.efeitosLeves() && (storyMode || !TesteDesempenho.cenarioSemEnfeites));
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
                 stageScene.setTelao(desenhaTelao);
                 telaoCanvas = canvas;
@@ -5443,7 +5445,15 @@ public class GameView extends SurfaceView
                     TesteDesempenho.efeitos = !TesteDesempenho.efeitos;
                     break;
                 case PERF_CENARIO:
-                    TesteDesempenho.cenario = !TesteDesempenho.cenario;
+                    // ON → SEM ENFEITES (as camadas, sem brilhos, neblina, reflexos e pétalas) → OFF → ON.
+                    if (!TesteDesempenho.cenario) {
+                        TesteDesempenho.cenario = true;
+                    } else if (!TesteDesempenho.cenarioSemEnfeites) {
+                        TesteDesempenho.cenarioSemEnfeites = true;
+                    } else {
+                        TesteDesempenho.cenarioSemEnfeites = false;
+                        TesteDesempenho.cenario = false;
+                    }
                     break;
                 case PERF_HUD:
                     TesteDesempenho.hud = !TesteDesempenho.hud;
