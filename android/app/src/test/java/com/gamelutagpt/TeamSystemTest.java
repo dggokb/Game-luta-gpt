@@ -143,7 +143,10 @@ public class TeamSystemTest {
         assertSame("the point stays on point", m.first, m.f(0).state);
         m.until(() -> m.f(1).state.life < life, 60);
         assertNotNull(m.engine.session(1));
-        assertEquals("the assist stands behind the point", pointX - m.config().assistBehind, m.team().assist.x, 0.5f);
+        // player_two's assist is its H: a melee assist runs up to where the strike reaches.
+        float x = m.team().assist.x;
+        assertTrue("the melee assist stands where its strike reaches: " + x,
+            x > pointX - m.config().assistBehind && x <= pointX + m.config().assistMeleeAhead);
         m.until(() -> m.team().assist == null, 120);
         assertEquals(m.config().assistCooldownFrames, m.team().assistCooldown, 1);
         m.assist();

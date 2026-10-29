@@ -198,7 +198,7 @@
       }
     },
     "assist": {
-      "move": "S"
+      "move": "H"
     },
     "comboStyle": "tanque",
     "walkSpeed": 170,

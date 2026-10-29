@@ -2144,11 +2144,58 @@ final class CombatEngine {
             a.specialStrength = "M";
             return;
         }
-        CharacterDefinition.Move m = a.character().moves.get(move);
-        if (m == null) m = a.character().moves.get("H");
+        CharacterDefinition.Move m = assistNormal(a);
         a.move = m;
         a.attack = m.attack;
         a.crouching = move.startsWith("2");
+    }
+
+    /** O golpe que o assist de {@code a} faz (o S do pacote ou o normal declarado). */
+    static AttackDefinition assistAttack(CombatFighter a) {
+        CharacterDefinition.Fighter profile = a.state.profile;
+        if ("S".equals(profile.assistMove) && profile.energy != null) return profile.energy.attack;
+        return assistNormal(a).attack;
+    }
+
+    private static CharacterDefinition.Move assistNormal(CombatFighter a) {
+        CharacterDefinition.Move m = a.character().moves.get(a.state.profile.assistMove);
+        return m != null ? m : a.character().moves.get("H");
+    }
+
+    /**
+     * Um quadro do corpo do assist no golpe: a investida avança até encostar no rival (ou
+     * atravessa), o mergulho desce na diagonal e, se o chute pegou, quica para trás.
+     */
+    void moveAssist(CombatFighter a) {
+        AttackDefinition.Mechanics m = a.attack.mechanics;
+        if (m.dives() && !a.grounded) {
+            if (m.rebound && a.strikeLanded) {
+                if (!a.reboundHopped) {
+                    a.reboundHopped = true;
+                    a.vy = -config.reboundHopSpeed;
+                }
+                a.vy += config.gravity * config.reboundGravityScale * CombatConfig.DT;
+                a.x -= a.facing * config.reboundBackSpeed * CombatConfig.DT;
+            } else {
+                a.vy = a.attackFrame >= a.attack.startupFrames ? m.diveDescent : 0f;
+                if (a.attackFrame >= a.attack.startupFrames) a.x += a.facing * m.diveForward * CombatConfig.DT;
+            }
+            a.y += a.vy * CombatConfig.DT;
+            if (a.y >= Arena.GROUND_Y) {
+                a.y = Arena.GROUND_Y;
+                a.vy = 0f;
+                a.grounded = true;
+                a.attackFrame = Math.max(a.attackFrame, a.attack.totalFrames - config.diveLandingFrames);
+            }
+        } else if (m.advanceAt(a.attackFrame) && (m.passThrough || m.advanceSpeed < 0f || !touchingAhead(a))) {
+            a.x += a.facing * m.advanceSpeed * CombatConfig.DT;
+        }
+        a.x = Arena.clamp(a.x, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+    }
+
+    /** O mergulho do assist ainda no ar no fim do golpe: o fim espera o chão. */
+    boolean assistAwaitsGround(CombatFighter a) {
+        return a.attack.mechanics.dives() && !a.grounded && a.attackFrame >= a.attack.totalFrames - config.diveLandingFrames - 1;
     }
 
     void spawnAssistProjectile(CombatFighter a) {

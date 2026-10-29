@@ -517,6 +517,15 @@ final class CombatConfig {
     float assistBehind = 70f;
     float assistEnterDistance = 320f;
     int assistCooldownFrames = 240;
+    /**
+     * Assist de corpo a corpo: em vez de bater 70 px atrás do titular (onde só pega o rival
+     * colado), corre até onde o golpe alcança o rival, no máximo isto à frente do titular, no mesmo
+     * tempo de entrada dos outros (assistEnterFrames). O golpe que avança (investida) segue
+     * avançando; o mergulho cai do alto.
+     */
+    float assistMeleeAhead = 220f;
+    /** Altura de onde o assist de mergulho (o S1 do p14, só no ar) começa a descer. */
+    float assistDiveHeight = 240f;
     /** After Assist → Tag: neither another assist nor a raw tag for this long. */
     int assistTagCooldownFrames = 300;
     /**

@@ -42,6 +42,8 @@ final class TeamSystem {
         /** The partner while it is on screen (its own body, attack and hitstop). */
         CombatFighter assist;
         float assistFromX, assistToX;
+        /** O assist entra pulando e bate de mergulho (o golpe dele só sai no ar). */
+        boolean assistDive;
         /** TAG pressed again during the assist: it stays as the new point. */
         boolean convert;
         /**
@@ -320,6 +322,24 @@ final class TeamSystem {
         float to = Arena.clamp(point.x - point.facing * config.assistBehind, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
         int facing = opponent.x >= to ? 1 : -1;
         CombatFighter a = new CombatFighter(point.index, partner, to - facing * config.assistEnterDistance, facing);
+        AttackDefinition move = CombatEngine.assistAttack(a);
+        s.assistDive = move.mechanics.dives();
+        if (move.melee()) {
+            // Corpo a corpo: corre até onde o golpe pega o rival (o mergulho, até onde a descida
+            // chega nele), entre o lugar de sempre atrás do titular e assistMeleeAhead à frente.
+            int dir = opponent.x >= point.x ? 1 : -1;
+            float stop = move.reach * 0.8f;
+            if (s.assistDive) stop += config.assistDiveHeight * move.mechanics.diveForward / move.mechanics.diveDescent;
+            float ahead = ((opponent.x - dir * stop) - point.x) * dir;
+            ahead = Math.max(-config.assistBehind, Math.min(config.assistMeleeAhead, ahead));
+            to = Arena.clamp(point.x + dir * ahead, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            facing = opponent.x >= to ? 1 : -1;
+            // Entra como os outros (assistEnterDistance em assistEnterFrames), só que até o lugar novo:
+            // o mesmo tempo até o golpe, que é o que encaixa o assist no combo.
+            a.x = to - facing * config.assistEnterDistance;
+            a.facing = facing;
+            if (s.assistDive) a.grounded = false;
+        }
         s.assist = a;
         s.assistFromX = a.x;
         s.assistToX = to;
@@ -421,13 +441,16 @@ final class TeamSystem {
             float x = s.assistFromX + (s.assistToX - s.assistFromX) * (1f - (1f - t) * (1f - t));
             a.travel = x - a.x;
             a.x = x;
+            // O de mergulho entra pulando: sobe até a altura de onde desce batendo.
+            if (s.assistDive) a.y = Arena.GROUND_Y - config.assistDiveHeight * (1f - (1f - t) * (1f - t));
             if (t >= 1f) {
                 engine.startAssistMove(a);
                 s.assistPhase = ASSIST_ATTACK;
                 s.assistFrame = 0;
             }
         } else if (s.assistPhase == ASSIST_ATTACK) {
-            a.attackFrame++;
+            if (!engine.assistAwaitsGround(a)) a.attackFrame++;
+            engine.moveAssist(a);
             if (!a.attack.melee() && a.attackFrame == a.attack.startupFrames) {
                 engine.spawnAssistProjectile(a);
             }
