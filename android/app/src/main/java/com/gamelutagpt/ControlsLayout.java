@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, PERF_GRAFICOS, PERF_FOLHAS, PERF_EFEITOS, PERF_CENARIO, PERF_HUD, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
 
     static final float DPAD_X = 185f;
     static final float DPAD_Y = 545f;
@@ -102,6 +102,16 @@ final class ControlsLayout {
     static final float ANIM_BUTTON_RIGHT = 1248f;
     static final float ANIM_BUTTON_BOTTOM = TUTORIAL_BUTTON_BOTTOM;
 
+    /**
+     * Coluna de DESEMPENHO, à esquerda dos botões de teste: GRÁFICOS, FOLHAS, EFEITOS, CENÁRIO e
+     * HUD, uma por linha (as mesmas alturas de IA, DEBUG, VIDA, DUPLA e HISTÓRIA).
+     */
+    static final float PERF_LEFT = 910f;
+    static final float PERF_RIGHT = 1074f;
+    static final float[] PERF_TOP = {AI_BUTTON_TOP, DEBUG_BUTTON_TOP, HEAL_BUTTON_TOP, TEAM_BUTTON_TOP, STORY_BUTTON_TOP};
+    static final float PERF_HEIGHT = 40f;
+    static final Control[] PERF_CONTROLS = {Control.PERF_GRAFICOS, Control.PERF_FOLHAS, Control.PERF_EFEITOS, Control.PERF_CENARIO, Control.PERF_HUD};
+
     // Painel da lição do tutorial (abaixo das barras de vida) e o PULAR dentro dele.
     static final float TUTORIAL_PANEL_LEFT = 330f;
     static final float TUTORIAL_PANEL_TOP = 196f;
@@ -148,6 +158,9 @@ final class ControlsLayout {
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;
         }
+        for (int i = 0; i < PERF_CONTROLS.length; i++) {
+            if (insideRect(x, y, PERF_LEFT, PERF_TOP[i], PERF_RIGHT, PERF_TOP[i] + PERF_HEIGHT)) return PERF_CONTROLS[i];
+        }
         if (dpadCaptures(x, y)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
         if (insideCircle(x, y, SHINKAI_X, SHINKAI_Y, SHINKAI_RADIUS)) return Control.SHINKAI;
@@ -172,6 +185,11 @@ final class ControlsLayout {
             case TEAM_SELECT:
             case STORY:
             case TUTORIAL:
+            case PERF_GRAFICOS:
+            case PERF_FOLHAS:
+            case PERF_EFEITOS:
+            case PERF_CENARIO:
+            case PERF_HUD:
                 return true;
             default:
                 return false;

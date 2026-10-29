@@ -63,6 +63,11 @@ final class SpriteAtlasCache {
      * desenha Bitmap HARDWARE) e desliga, soltando as folhas, se ela voltar ao software.
      */
     static volatile boolean naPlacaDeVideo;
+    /**
+     * Teste de desempenho (Modo Teste, botão FOLHAS): false manda as folhas das próximas lutas
+     * para a memória comum mesmo com a tela pela GPU, para comparar no aparelho.
+     */
+    static volatile boolean placaPermitida = true;
 
     /** Redução da {@link Folha#amostra}. */
     static final int AMOSTRA=4;
@@ -377,12 +382,16 @@ final class SpriteAtlasCache {
     }
 
     /**
-     * Folha pronta noutra escala (o nível gráfico mudou desde que ela carregou): sai, para ser
-     * decodificada de novo na escala de agora. Só no carregamento da luta. Com a trava.
+     * Folha pronta noutra escala (o nível gráfico mudou desde que ela carregou) ou noutro lugar
+     * (placa de vídeo × memória comum, pelo teste de desempenho): sai, para ser decodificada de
+     * novo como vale agora. Só no carregamento da luta. Com a trava.
      */
     private void trocarSeOutraEscala(CharacterDefinition c,CharacterDefinition.Atlas a) {
         Entrada e=folhas.get(a.resource);
-        if(e==null||e.folha==null||Math.abs(e.escala-escalaAgora(c,a))<1e-4f)return;
+        if(e==null||e.folha==null)return;
+        boolean mesmaEscala=Math.abs(e.escala-escalaAgora(c,a))<1e-4f;
+        boolean mesmoLugar=naPlacaDeVideo(e.folha.bitmap)==naPlacaDeVideo;
+        if(mesmaEscala&&mesmoLugar)return;
         folhas.remove(a.resource);
         e.descartada=true;
         bytesProntos-=e.folha.bitmap.getByteCount();

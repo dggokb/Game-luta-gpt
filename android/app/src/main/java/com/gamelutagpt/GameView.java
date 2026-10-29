@@ -2021,6 +2021,26 @@ public class GameView extends SurfaceView
         @Override public String selectButtonLabel() { return selectButtonLabel; }
         @Override public String animacaoLabel() { return AnimacaoLutador.rotulo(); }
         @Override public boolean animacaoLigada() { return AnimacaoLutador.AJUSTES.ligado; }
+        @Override public String perfLabel(int i) {
+            switch (ControlsLayout.PERF_CONTROLS[i]) {
+                case PERF_GRAFICOS: return "GRÁF " + qualidade.rotulo(t -> t);
+                case PERF_FOLHAS: return SpriteAtlasCache.placaPermitida ? "FOLHAS GPU" : "FOLHAS RAM";
+                case PERF_EFEITOS: return TesteDesempenho.efeitos ? "EFEITOS ON" : "EFEITOS OFF";
+                case PERF_CENARIO: return TesteDesempenho.cenario ? "CENÁRIO ON" : "CENÁRIO OFF";
+                case PERF_HUD: return TesteDesempenho.hud ? "HUD ON" : "HUD OFF";
+                default: return null;
+            }
+        }
+        @Override public boolean perfOn(int i) {
+            switch (ControlsLayout.PERF_CONTROLS[i]) {
+                case PERF_GRAFICOS: return qualidade.nivel() == QualidadeGrafica.ALTO;
+                case PERF_FOLHAS: return SpriteAtlasCache.placaPermitida;
+                case PERF_EFEITOS: return TesteDesempenho.efeitos;
+                case PERF_CENARIO: return TesteDesempenho.cenario;
+                case PERF_HUD: return TesteDesempenho.hud;
+                default: return true;
+            }
+        }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -3501,7 +3521,13 @@ public class GameView extends SurfaceView
             }
             // Impact frame, último quadro: a cena com as cores invertidas.
             int negativeLayer = feel.negative() ? canvas.saveLayer(0f, 0f, VW, VH, negativePaint) : -1;
-            if (stageScene != null) {
+            // Teste de desempenho (Modo Teste): o que estiver desligado não é desenhado.
+            final boolean cenario = storyMode || TesteDesempenho.cenario;
+            final boolean enfeites = storyMode || TesteDesempenho.efeitos;
+            if (!cenario) {
+                perfil.marca(PerfilQuadros.TELA);
+                canvas.drawColor(0xFF20242E);
+            } else if (stageScene != null) {
                 // The stage projects every layer with the same camera the fighters use.
                 perfil.marca(PerfilQuadros.TELA);
                 stageScene.setDetalhe(!qualidade.efeitosLeves());
@@ -3519,7 +3545,7 @@ public class GameView extends SurfaceView
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -renderCameraTop);
-            if (stageScene == null) {
+            if (stageScene == null && cenario) {
                 drawScenario(canvas);
                 if (narradorNoPalco) {
                     // Sem o palco 3D: um pouco acima do chão dos lutadores e menor.
@@ -3530,7 +3556,7 @@ public class GameView extends SurfaceView
                     narradorPalco.render(renderCanvas, narradorPalco.x(), GROUND_Y - 28f, 0.75f);
                 }
             }
-            drawFloorReflections(canvas);
+            if (cenario) drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
@@ -3572,15 +3598,19 @@ public class GameView extends SurfaceView
                 canvas.restore();
             }
 
-            shinkaiDetalhes.desenharChao(canvas);
-            desgaste.desenharChao(canvas);
-            drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
-            drawMechanicAura(canvas, player(), tagOffset());
+            if (enfeites) {
+                shinkaiDetalhes.desenharChao(canvas);
+                desgaste.desenharChao(canvas);
+                drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
+                drawMechanicAura(canvas, player(), tagOffset());
+            }
             drawEchoes(canvas);
             drawHenchmen(canvas);
             drawPartner(canvas);
-            drawAirDashTrail(canvas, player());
-            drawAirDashTrail(canvas, opponent());
+            if (enfeites) {
+                drawAirDashTrail(canvas, player());
+                drawAirDashTrail(canvas, opponent());
+            }
             canvas.save();
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
@@ -3592,11 +3622,13 @@ public class GameView extends SurfaceView
             }
             riscosDeslocamento[PLAYER] = tagOffset();
             riscosDeslocamento[OPPONENT] = engine.teams.tagOffset(OPPONENT);
-            riscos.draw(canvas, engine.frame(), riscosLutadores, riscosDeslocamento, riscosVisiveis);
-            shinkaiDetalhes.desenhar(canvas);
-            desgaste.desenhar(canvas);
+            if (enfeites) {
+                riscos.draw(canvas, engine.frame(), riscosLutadores, riscosDeslocamento, riscosVisiveis);
+                shinkaiDetalhes.desenhar(canvas);
+                desgaste.desenhar(canvas);
+            }
             confronto.desenharFrente(canvas);
-            impacts.draw(canvas);
+            if (enfeites) impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
                 if (age >= 0 && age < EffectsRenderer.CANNON_BLAST_FRAMES) {
@@ -3619,7 +3651,7 @@ public class GameView extends SurfaceView
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
             // Na finalização a frente do cenário some junto com o resto dele.
-            if (stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
+            if (cenario && stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
             perfil.marca(PerfilQuadros.FRENTE);
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -3661,7 +3693,8 @@ public class GameView extends SurfaceView
                 if (faixas < 0.999f) {
                     int layer = faixas > 0.001f
                         ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
-                    drawHud(canvas);
+                    if (storyMode || TesteDesempenho.hud) drawHud(canvas);
+                    else hud.drawButtonsOnly(canvas, hudState);
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
@@ -3688,8 +3721,9 @@ public class GameView extends SurfaceView
         if (hardwareCanvas && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
                 Canvas c = holder.lockHardwareCanvas();
-                // Tela pela GPU: as folhas dos lutadores podem ir direto para a placa de vídeo.
-                SpriteAtlasCache.naPlacaDeVideo = true;
+                // Tela pela GPU: as folhas dos lutadores podem ir direto para a placa de vídeo
+                // (o teste de desempenho pode mandar as próximas para a memória comum).
+                SpriteAtlasCache.naPlacaDeVideo = SpriteAtlasCache.placaPermitida;
                 return c;
             } catch (RuntimeException ex) {
                 Log.w(LOG_TAG, "Canvas pela GPU indisponível, usando software", ex);
@@ -5380,6 +5414,25 @@ public class GameView extends SurfaceView
                     break;
                 case ANIMACAO:
                     AnimacaoLutador.proximoNivel();
+                    break;
+                // DESEMPENHO: cada botão desliga uma parte do desenho, para achar o que pesa.
+                case PERF_GRAFICOS:
+                    // AUTO → ALTO → MÉDIO → LEVE; as folhas mudam de tamanho na próxima luta.
+                    qualidade.proximoModo(1);
+                    aplicarQualidade();
+                    break;
+                case PERF_FOLHAS:
+                    // Placa de vídeo × memória comum: vale a partir da próxima luta (DUPLA ou IA).
+                    SpriteAtlasCache.placaPermitida = !SpriteAtlasCache.placaPermitida;
+                    break;
+                case PERF_EFEITOS:
+                    TesteDesempenho.efeitos = !TesteDesempenho.efeitos;
+                    break;
+                case PERF_CENARIO:
+                    TesteDesempenho.cenario = !TesteDesempenho.cenario;
+                    break;
+                case PERF_HUD:
+                    TesteDesempenho.hud = !TesteDesempenho.hud;
                     break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it (a dono que

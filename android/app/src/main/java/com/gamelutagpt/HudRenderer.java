@@ -69,6 +69,9 @@ final class HudRenderer {
         default String selectButtonLabel() { return "◀ SELEÇÃO"; }
         /** Botão do motor de animação (nível ou OFF), ou null para não mostrar. */
         default String animacaoLabel() { return null; }
+        /** Rótulo do botão {@code i} da coluna de DESEMPENHO (null: a coluna não aparece). */
+        default String perfLabel(int i) { return null; }
+        default boolean perfOn(int i) { return true; }
         default boolean animacaoLigada() { return false; }
         /** Quadros que o SHINKAI dura (a barra ativa esvazia nesse tempo). */
         default int shinkaiDuration() { return 480; }
@@ -228,6 +231,20 @@ final class HudRenderer {
             TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 13f);
         if (s.animacaoLabel() != null) drawToggle(c, s.animacaoLigada(), s.animacaoLabel(),
             ANIM_BUTTON_LEFT, ANIM_BUTTON_TOP, ANIM_BUTTON_RIGHT, ANIM_BUTTON_BOTTOM, 13f);
+        for (int i = 0; i < ControlsLayout.PERF_CONTROLS.length; i++) {
+            String label = s.perfLabel(i);
+            if (label == null) continue;
+            float top = ControlsLayout.PERF_TOP[i];
+            drawToggle(c, s.perfOn(i), label, ControlsLayout.PERF_LEFT, top, ControlsLayout.PERF_RIGHT,
+                top + ControlsLayout.PERF_HEIGHT, 13f);
+        }
+    }
+
+    /** Só os botões (de teste e o do topo), para quando o HUD está desligado no teste de desempenho. */
+    void drawButtonsOnly(Canvas c, State s) {
+        if (!s.hideTestButtons()) drawTestButtons(c, s);
+        drawToggle(c, s.pressed(Control.CHARACTER_SELECT), s.selectButtonLabel(),
+            SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }
 
 
