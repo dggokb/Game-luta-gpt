@@ -78,6 +78,9 @@ final class CombatFighter {
     boolean backdashArmed = true;
     /** Horizontal distance moved during the last frame (animation). */
     float travel;
+    /** Entrada do DHC deslizando de dhcFromX a dhcToX (quadro atual e total; 0 = parado). */
+    float dhcFromX, dhcToX;
+    int dhcEnterFrame, dhcEnterFrames;
 
     // Action.
     Status status = Status.NEUTRAL;

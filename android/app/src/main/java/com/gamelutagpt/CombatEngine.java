@@ -392,6 +392,7 @@ final class CombatEngine {
         // 3. State machines, movement, projectiles.
         for (CombatFighter f : fighters) f.anticipatedGuard = anticipatedGuard(f);
         for (CombatFighter f : fighters) advance(f);
+        for (CombatFighter f : fighters) advanceDhcEntry(f);
         teams.advance(this, fighters[0]);
         teams.advance(this, fighters[1]);
         regenerateGuard();
@@ -2878,20 +2879,55 @@ final class CombatEngine {
         point.pushRemaining = 0f;
         point.pushFramesLeft = 0;
         AttackDefinition superAttack = partner.profile.superAttack.attack;
-        if (superAttack.melee() && point.grounded) {
-            // Super corpo a corpo: entra até onde ele pega o rival (só para a frente).
+        point.dhcEnterFrames = 0;
+        float target = point.x;
+        if (point.grounded) {
             CombatFighter o = fighters[1 - point.index];
             int dir = o.x >= point.x ? 1 : -1;
-            float ahead = ((o.x - dir * superAttack.reach * 0.8f) - point.x) * dir;
-            if (ahead > 0f) {
-                point.x = Arena.clamp(point.x + dir * Math.min(ahead, config.dhcMaxAdvance), Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            if (superAttack.melee()) {
+                // Super corpo a corpo: entra até onde ele pega o rival (só para a frente).
+                float ahead = ((o.x - dir * superAttack.reach * 0.8f) - point.x) * dir;
+                if (ahead > 0f) target = point.x + dir * Math.min(ahead, config.dhcMaxAdvance);
+                point.facing = dir;
             }
-            point.facing = dir;
+            // Nunca dentro do corpo do rival (o parceiro pode ser mais largo que o titular).
+            if (o.grounded) {
+                float contact = point.body().pushHalfWidth + o.body().pushHalfWidth;
+                if ((o.x - target) * dir < contact) target = o.x - dir * contact;
+            }
+            target = Arena.clamp(target, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
         }
         startAttack(point, superAttack, null, -1);
         startX[point.index] = point.x;
+        float distance = Math.abs(target - point.x);
+        if (distance > 0.5f) {
+            // Desliza até lá (sem pular de lugar); o Super dele e o rival esperam a entrada.
+            int frames = Math.min(config.dhcEnterMaxFrames, Math.max(1, (int)Math.ceil(distance / config.dhcEnterSpeed)));
+            point.dhcFromX = point.x;
+            point.dhcToX = target;
+            point.dhcEnterFrame = 0;
+            point.dhcEnterFrames = frames;
+            int extra = Math.max(0, frames - point.hitstop);
+            point.hitstop = Math.max(point.hitstop, frames);
+            CombatFighter other = fighters[1 - point.index];
+            other.hitstop += extra;
+            superFreeze += extra;
+        }
         cues.add("DHC");
         return true;
+    }
+
+    /** Um quadro da entrada do DHC: desliza com a mesma curva da entrada do assist. */
+    private void advanceDhcEntry(CombatFighter f) {
+        if (f.dhcEnterFrames <= 0) return;
+        if (!f.attacking() || f.attack.kind != AttackDefinition.Kind.SUPER) {
+            f.dhcEnterFrames = 0;
+            return;
+        }
+        f.dhcEnterFrame++;
+        float t = Math.min(1f, f.dhcEnterFrame / (float)f.dhcEnterFrames);
+        f.x = f.dhcFromX + (f.dhcToX - f.dhcFromX) * (1f - (1f - t) * (1f - t));
+        if (f.dhcEnterFrame >= f.dhcEnterFrames) f.dhcEnterFrames = 0;
     }
 
     /**

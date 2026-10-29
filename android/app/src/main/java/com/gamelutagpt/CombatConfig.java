@@ -446,6 +446,12 @@ final class CombatConfig {
      * está (antes; o Super do parceiro errava o rival que o Super do titular tinha jogado longe).
      */
     float dhcMaxAdvance = 420f;
+    /**
+     * A entrada do DHC desliza (como a do assist, assistEnterFrames), sem pular de lugar: px por
+     * quadro, no máximo dhcEnterMaxFrames quadros. Enquanto desliza, o Super dele e o rival esperam.
+     */
+    float dhcEnterSpeed = 36f;
+    int dhcEnterMaxFrames = 12;
 
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.
     int guardCancelCost = METER_PER_BAR;

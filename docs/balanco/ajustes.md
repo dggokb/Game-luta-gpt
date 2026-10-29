@@ -947,3 +947,37 @@ p06 54% e Ryūga 45%.
 | p09.vs_p02_400 | 62% | 58% |
 
 16 personagens, 8 duplas e matriz dentro do ruído (±8) na medida da frente.
+
+## Etapa H5a — DHC: o parceiro desliza até o lugar do Super (item 5)
+
+Decisão do usuário (item 5): manter a entrada do parceiro até 420 px, só no DHC, respeitando
+colisão e animação, com custo de 2 barras. O relatório está em
+[h5-dhc-assists-energy.md](h5-dhc-assists-energy.md).
+
+**A entrada da G2b tinha dois defeitos:**
+
+- o parceiro aparecia de uma vez até 411 px à frente (117 de 360 pares);
+- em 6 casos ele entrava dentro do corpo do rival.
+
+**O que mudou:**
+
+- `CombatEngine`, `CombatFighter` e `CombatConfig`: o parceiro desliza até o lugar do Super com a
+  mesma curva da entrada do assist. Enquanto ele desliza, o Super dele e o rival esperam, e ele nunca
+  para dentro do corpo do rival.
+- Maior passo: 68 px, o primeiro quadro, igual ao do assist.
+- Sobra 1 caso de corpo dentro: o Super do p14, que passa por dentro do rival de propósito.
+
+**Testes:** `DhcEntradaTest` (novo); suíte 574 de 574.
+
+**Bateria fixa** (depois da H1 → com a H5a): nenhuma métrica mudou mais de 3%. Na medida da frente,
+o 1x1 saiu idêntico.
+
+**Piso de 70% (H5b), medido separado e não aplicado:**
+
+- o DHC sobe só de 2367 para 2408 de dano por barra (+1,7%);
+- o DHC é fraco porque o Super do parceiro acerta pouco depois do Super do titular;
+- recomendo não ligar.
+
+**Achado, não aplicado:** em p05+p06, p13+p14 e p15+p16 o DHC sai só depois que o combo acabou,
+porque o Super do titular erra as pancadas seguintes. Proposta: soltar o DHC quando o rival estiver
+saindo do combo.
