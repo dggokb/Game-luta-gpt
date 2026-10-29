@@ -127,6 +127,91 @@ public class ComboBreakerTest {
         assertTrue("se recompôs", m.f(0).canAct());
     }
 
+    /**
+     * H1 (atordoamento 4): depois do estalo quem quebrou age {@code comboBreakerStunFrames + 1}
+     * quadros antes de quem batia (+5), com ele à folga do empurrão. Medido com os dois parados.
+     */
+    @Test public void afterTheBreakerTheBreakerActsStunPlusOneFramesFirst() {
+        Match m = new Match();
+        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+        m.combo("H", 3);
+        assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
+        int breakerFree = -1, attackerFree = -1;
+        for (int i = 1; i <= 120 && attackerFree < 0; i++) {
+            m.step();
+            if (breakerFree < 0 && m.f(1).canAct()) breakerFree = i;
+            if (attackerFree < 0 && m.f(0).canAct()) attackerFree = i;
+        }
+        assertEquals(m.engine.config.comboBreakerStunFrames + 1, attackerFree - breakerFree);
+    }
+
+    /**
+     * Roteiro padrão (H1): cada um dos 16 quebra o L > M > H do Ryūga e aperta cada normal de chão
+     * assim que alcança (correndo até lá); quem batia defende assim que pode. Normal que demora mais
+     * que a vantagem de quem quebrou para sair nunca entra limpo; os rápidos (L, 2L e alguns M) ainda
+     * entram na ponta do alcance (docs/balanco/ajustes.md, H1; com 20 quadros entrava quase tudo). O
+     * golpe que quem batia deixou no buffer para fechar o combo não sai sozinho depois do estalo.
+     */
+    @Test public void aNormalSlowerThanTheBreakerAdvantageNeverLandsGuaranteed() {
+        String[] roster = {"player_base", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09", "p10", "p11", "p12", "p13", "p14", "p15", "p16"};
+        String[] normals = {"L", "2L", "M", "2M", "H", "2H"};
+        CombatConfig config = new CombatConfig();
+        int advantage = config.comboBreakerStunFrames + 1;
+        int checked = 0;
+        for (String id : roster) {
+            CharacterDefinition ch = GeneratedCharacters.get(id);
+            for (String g : normals) {
+                if (ch.attack(g) == null || ch.attack(g).startupFrames <= advantage) continue;
+                checked++;
+                FighterState breaker = new FighterState(ch, "CPU");
+                breaker.superMeter = CombatConfig.METER_PER_BAR;
+                CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"), breaker, 500f, 600f, config);
+                FighterInput[] in = {new FighterInput(), new FighterInput()};
+                String[] seq = {"L", "M", "H"};
+                int k = 0;
+                boolean broke = false, answered = false;
+                in[0].light = true;
+                for (int i = 0; i < 240 && !answered; i++) {
+                    CombatFighter a = e.fighter(0), d = e.fighter(1);
+                    if (!broke) {
+                        if (k == 2 && e.canBreakCombo(d)) in[1].light = true;
+                    } else {
+                        // Quem batia defende (agachado, menos contra golpe alto ou no ar) assim que pode.
+                        boolean right = d.x >= a.x;
+                        boolean high = !d.grounded || d.attacking() && d.attack != null && d.attack.overhead;
+                        in[0].direction = high ? (right ? 5 : 1) : (right ? 4 : 2);
+                        if (d.canAct()) {
+                            float gap = Math.abs(a.x - d.x);
+                            if (CpuReach.reaches(ch, g, false, gap, a.body(), a.crouchingBody())) {
+                                if (g.startsWith("2")) in[1].direction = d.facing > 0 ? 2 : 4;
+                                if (g.endsWith("L")) in[1].light = true; else if (g.endsWith("M")) in[1].medium = true; else in[1].heavy = true;
+                            } else {
+                                in[1].direction = a.x > d.x ? 1 : 5;
+                                in[1].dash = true;
+                            }
+                        }
+                    }
+                    e.step(in[0], in[1]);
+                    in[0].clearPresses();
+                    in[1].clearPresses();
+                    for (CombatEngine.HitEvent h : e.events()) {
+                        if (!broke && h.attacker == 0 && !h.blocked && k < 2) {
+                            k++;
+                            if ("M".equals(seq[k])) in[0].medium = true; else in[0].heavy = true;
+                        }
+                        if (broke && h.attacker == 1) {
+                            assertTrue(id + " " + g + " (sai em " + ch.attack(g).startupFrames + " q): o troco não entra garantido", h.blocked);
+                            answered = true;
+                        }
+                    }
+                    if (!broke && e.cues().contains("COMBO_BREAKER")) broke = true;
+                }
+                assertTrue(id + " " + g + ": quebrou", broke);
+            }
+        }
+        assertTrue("normais conferidos: " + checked, checked > 40);
+    }
+
     /** Com a corrida ligada (a opção antiga), quem quebrou corre sozinho até ele. */
     @Test public void withTheChaseOptionTheDefenderRunsAlone() {
         CombatConfig config = new CombatConfig();
@@ -328,8 +413,9 @@ public class ComboBreakerTest {
                 broke = m.engine.cues().contains("COMBO_BREAKER");
             }
             assertTrue("nível " + level + ": quebrou", broke);
+            // Com 4 quadros de atordoamento o troco não é garantido: a CPU vai atrás de quem não defende.
             boolean counter = false;
-            for (int i = 0; i < 60 && !counter; i++) {
+            for (int i = 0; i < 120 && !counter; i++) {
                 ai.fill(m.engine, 1, m.in[1]);
                 m.step();
                 for (CombatEngine.HitEvent h : m.engine.events()) if (h.attacker == 1 && !h.blocked) counter = true;

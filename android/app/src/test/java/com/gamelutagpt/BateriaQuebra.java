@@ -21,9 +21,8 @@ public final class BateriaQuebra {
 
     /** Nome, separação (px) e atordoamento (quadros). C é a regra de hoje (etapa 1). */
     static String[][] OPCOES = {
-        {"C: hoje (170 px, 20 q)", "170", "20"},
-        {"A: 320 px, 20 q", "320", "20"},
-        {"B: 170 px, 4 q", "170", "4"},
+        {"antes (170 px, 20 q)", "170", "20"},
+        {"H1: 170 px, 4 q", "170", "4"},
     };
 
     static final String[] ELENCO = BateriaBalanco.ELENCO;
@@ -62,6 +61,15 @@ public final class BateriaQuebra {
         /** Canto (CPU × CPU, 3 s): dano de cada lado e distância de quem quebrou da parede no fim. */
         int danoQuebra, danoBate;
         float paredeQuebra;
+        /**
+         * Garantido: o troco entrou antes de quem batia ter um único quadro livre desde a quebra (não
+         * tinha como defender nem fugir). Oportunista: entrou depois de ele já poder agir (podia
+         * defender ou escapar e não o fez). Nos modos 0–6 quem batia defende perfeito assim que pode.
+         */
+        boolean garantido, oportunista;
+        /** Modo 9 (as duas CPUs livres): o 1º acerto limpo de quem quebrou, quem acertou primeiro e o golpe. */
+        String golpeTroco;
+        int primeiroLivre = -1;
     }
 
     /**
@@ -134,6 +142,14 @@ public final class BateriaQuebra {
             if (modo == 9) {
                 for (CombatEngine.HitEvent h : l.e.events()) {
                     if (h.blocked) continue;
+                    if (c.primeiroLivre < 0) {
+                        c.primeiroLivre = h.attacker;
+                        if (h.attacker == 1) {
+                            c.golpeTroco = h.moveId;
+                            c.garantido = c.livreBate < 0;
+                            c.oportunista = c.livreBate >= 0;
+                        }
+                    }
                     if (h.attacker == 1) c.danoQuebra += h.damage; else c.danoBate += h.damage;
                 }
                 if (depois >= 180) {
@@ -150,6 +166,8 @@ public final class BateriaQuebra {
                 }
                 if (h.attacker != 1) continue;
                 c.gratis = !h.blocked;
+                c.garantido = c.gratis && c.livreBate < 0;
+                c.oportunista = c.gratis && c.livreBate >= 0;
                 return c;
             }
             if (modo >= 7 && c.primeiro >= 0) return c;
@@ -420,6 +438,77 @@ public final class BateriaQuebra {
         BateriaBalanco.AJUSTE_CFG = null;
     }
 
+    /**
+     * Garantido × oportunista (H1): no roteiro, quem quebrou tenta cada troco e quem batia defende
+     * perfeito assim que pode (garantido = entrou antes de ele ter um quadro livre); com as duas CPUs
+     * livres por 3 s, o 1º acerto limpo de quem quebrou é garantido (quem batia ainda não tinha agido)
+     * ou oportunista (quem batia já podia defender ou fugir).
+     */
+    static void garantia(int posicoes) {
+        for (int pos = 0; pos < posicoes; pos++) {
+            final int p = pos;
+            System.out.println();
+            System.out.println("## Garantido × oportunista — " + POSICOES[pos]);
+            System.out.println();
+            StringBuilder resumo = new StringBuilder();
+            resumo.append("| opção | quebras | roteiro, garantido: L | M | H | S1 | S2 | S3 | S4 | algum garantido | CPU livre: quem quebrou acerta primeiro, garantido | oportunista | quem batia acerta primeiro | ninguém em 3 s |\n");
+            resumo.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n");
+            StringBuilder golpesG = new StringBuilder();
+            for (String[] op : OPCOES) {
+                usar(op);
+                Map<String, Caso[]> res = new ConcurrentHashMap<>();
+                pares().parallelStream().forEach(par -> {
+                    Caso[] cs = new Caso[MODOS.length + 1];
+                    for (int m = 0; m < MODOS.length; m++) cs[m] = caso(par[0], par[1], Long.parseLong(par[2]), m, p);
+                    cs[MODOS.length] = caso(par[0], par[1], Long.parseLong(par[2]), 9, p);
+                    res.put(String.join("|", par), cs);
+                });
+                int n = 0, algum = 0, g9 = 0, o9 = 0, b9 = 0, z9 = 0;
+                int[] gm = new int[MODOS.length];
+                int[][] porQ = new int[ELENCO.length][3], porB = new int[ELENCO.length][3];
+                Map<String, Integer> golpeG = new java.util.TreeMap<>(), golpeO = new java.util.TreeMap<>();
+                for (Map.Entry<String, Caso[]> e : res.entrySet()) {
+                    Caso[] cs = e.getValue();
+                    if (!cs[0].quebrou) continue;
+                    String[] par = e.getKey().split("\\|");
+                    int iq = indice(par[1]), ib = indice(par[0]);
+                    n++;
+                    boolean a = false;
+                    for (int m = 0; m < MODOS.length; m++) if (cs[m].garantido) { gm[m]++; a = true; }
+                    if (a) { algum++; porQ[iq][0]++; porB[ib][0]++; }
+                    porQ[iq][2]++; porB[ib][2]++;
+                    Caso c9 = cs[MODOS.length];
+                    if (c9.primeiroLivre == 1 && c9.garantido) { g9++; golpeG.merge(c9.golpeTroco, 1, Integer::sum); }
+                    else if (c9.primeiroLivre == 1) { o9++; porQ[iq][1]++; golpeO.merge(c9.golpeTroco, 1, Integer::sum); }
+                    else if (c9.primeiroLivre == 0) b9++;
+                    else z9++;
+                }
+                int nn = Math.max(1, n);
+                StringBuilder lin = new StringBuilder("| " + op[0] + " | " + n + " |");
+                for (int m = 0; m < MODOS.length; m++) lin.append(' ').append(pct(gm[m] / (double)nn)).append(" |");
+                lin.append(' ').append(pct(algum / (double)nn)).append(" | ").append(pct(g9 / (double)nn)).append(" | ").append(pct(o9 / (double)nn))
+                    .append(" | ").append(pct(b9 / (double)nn)).append(" | ").append(pct(z9 / (double)nn)).append(" |");
+                resumo.append(lin).append('\n');
+                golpesG.append("- ").append(op[0]).append(": garantidos da CPU ").append(golpeG).append("; oportunistas ").append(golpeO).append('\n');
+                System.out.println("### " + op[0] + " — por personagem");
+                System.out.println();
+                System.out.println("| personagem | quebrando: algum troco garantido (roteiro) | quebrando: acerto oportunista da CPU | batendo: toma troco garantido |");
+                System.out.println("|---|---|---|---|");
+                for (int i = 0; i < ELENCO.length; i++) {
+                    System.out.printf(Locale.ROOT, "| %s | %s | %s | %s |%n", nome(ELENCO[i]), pct(porQ[i][0] / (double)Math.max(1, porQ[i][2])),
+                        pct(porQ[i][1] / (double)Math.max(1, porQ[i][2])), pct(porB[i][0] / (double)Math.max(1, porB[i][2])));
+                }
+                System.out.println();
+            }
+            BateriaBalanco.AJUSTE_CFG = null;
+            System.out.println("### Resumo — " + POSICOES[pos]);
+            System.out.println();
+            System.out.print(resumo);
+            System.out.println();
+            System.out.print(golpesG);
+        }
+    }
+
     public static void main(String[] args) {
         String q = args.length > 0 ? args[0] : "tudo";
         long t0 = System.nanoTime();
@@ -430,6 +519,23 @@ public final class BateriaQuebra {
         if (q.equals("troca") || q.equals("tudo")) troca();
         if (q.equals("canto") || q.equals("tudo")) canto();
         if (q.equals("trococpu") || q.equals("tudo")) trocoCpu();
+        if (q.equals("garantia") || q.equals("tudo")) garantia(POSICOES.length);
+        if (q.equals("opcoes")) {
+            // Troca as opções medidas: "nome,separação,atordoamento;..." e o grupo a rodar (args[2]).
+            String[] ops = args[1].split(";");
+            OPCOES = new String[ops.length][];
+            for (int i = 0; i < ops.length; i++) OPCOES[i] = ops[i].split(",");
+            for (String g : args[2].split(",")) {
+                if (g.equals("grupo")) grupo();
+                if (g.equals("golpes")) golpes();
+                if (g.equals("golpesmeio")) golpes(1);
+                if (g.equals("canto")) canto();
+                if (g.equals("trococpu")) trocoCpu();
+                if (g.equals("troca")) troca();
+                if (g.equals("garantia")) garantia(POSICOES.length);
+                if (g.equals("garantiameio")) garantia(1);
+            }
+        }
         if (q.equals("curva")) {
             // Outras opções só no meio: "nome,separação,atordoamento;..."
             String[] ops = args[1].split(";");

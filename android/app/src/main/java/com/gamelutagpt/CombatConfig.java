@@ -421,10 +421,11 @@ final class CombatConfig {
     int comboBreakerCost = METER_PER_BAR;
     /**
      * Atordoamento de quem teve o combo quebrado, depois do estalo. Era 44 com a corrida sozinha:
-     * dava um troco garantido de ~1300 (mais que o dano que a quebra evitava). 20: ele se recompõe
-     * antes de quem quebrou chegar correndo.
+     * dava um troco garantido de ~1300 (mais que o dano que a quebra evitava). 20 ainda deixava um L
+     * de graça em quase toda quebra (o empurrão de 170 px cabe no alcance do L correndo). 4 (H1): ele
+     * se recompõe antes de quem quebrou alcançar; o troco que sobra é oportunista (docs/balanco/ajustes.md).
      */
-    int comboBreakerStunFrames = 20;
+    int comboBreakerStunFrames = 4;
     int comboBreakerHitstopFrames = 16;
     /** O estalo joga quem batia até esta folga do corpo de quem quebrou: longe, só correndo. */
     float comboBreakerPushGap = 170f;

@@ -891,3 +891,59 @@ faixa: A (220) 10–76 (desvio 17.7); B (190) 10–75 (desvio 17.3)
 - **Atenção:** o 2M do p09 também está entre os 16 golpes com o quadro do impacto antes da janela
   ativa (achado da H3). Se esse acerto for feito depois, o 2M passa a bater com o quadro esticado,
   e o `alcanceMaximo` vira o limite que de fato segura o alcance.
+
+## Etapa H1 — Breaker com atordoamento 4 (item 1)
+
+Decisão do usuário (item 1): testar o atordoamento de 4 quadros mantendo a distância atual
+(170 px), com a CPU nova, separando o golpe inevitável (troco garantido) do acerto oportunista.
+O relatório completo está em [h1-breaker.md](h1-breaker.md).
+
+- **Arquivos:**
+  - `CombatConfig.java`: `comboBreakerStunFrames` 20 → 4;
+  - `CombatEngine.comboBreaker`: `a.buffer.clear()`. É obrigatório com 4 quadros: o H que o
+    atacante tinha apertado para fechar o combo saía sozinho, no vazio, e quem quebrou punia de graça.
+- **Testes:**
+  - `ComboBreakerTest`: dois novos. Quem quebrou age 5 quadros antes, e nenhum normal com mais de
+    5 quadros de início entra limpo nos 16. O segundo falha sem o `buffer.clear()`.
+  - `BateriaQuebra`: separa garantido de oportunista.
+  - Suíte: 571 de 571.
+
+**Medida na frente H1** (base `5dedf956`, mesmas sementes):
+
+| medida | antes | H1 |
+|---|---|---|
+| troco garantido no roteiro, meio / canto / de costas para a parede | 96 / 98 / 98% | 33 / 45 / 26% |
+| primeiro acerto garantido, CPUs livres | 68% | 1% |
+| primeiro acerto oportunista de quem quebrou | 20% | 60% |
+| quem batia acerta primeiro | 11% | 33% |
+
+**Ainda há troco garantido.** Sobra o L e o 2L na ponta, de quem tem L longo: p12 80%, p11 68%,
+p06 54% e Ryūga 45%.
+
+**Próximo experimento proposto** (medido, não aplicado): atordoamento 2 com 170 px.
+
+- Troco garantido de 1–3%; com as CPUs livres, garantido 0% e oportunista 64%.
+- Quem quebrou fica com saldo +269 no meio e +284 no canto.
+- Separar mais (220–260 px) não resolve: sobra 18–26% de troco garantido e o canto fica negativo.
+
+**Bateria fixa ao integrar** (depois da H2 → com a H1). Só o que passou de 3%:
+
+| métrica | antes | depois |
+|---|---|---|
+| breaker.troco_garantido_script | 57% | 3% |
+| breaker.troco | 513 | 649 |
+| breaker.sempre_vs_nunca | 62% | 59% |
+| breaker.cpu_quebra_das_chances | 35% | 32% |
+| 1x1.p03 | 58% | 62% |
+| 1x1.p09 | 64% | 60% |
+| 1x1.p09_vs_p02 | 75% | 65% |
+| 2x2.p02 | 51% | 41% |
+| 2x2.p05 | 37% | 43% |
+| 2x2.p07 | 34% | 41% |
+| 2x2.p10 | 58% | 47% |
+| 2x2.p11 | 50% | 54% |
+| 2x2.p14 | 41% | 38% |
+| 2x2.p15 | 25% | 22% |
+| p09.vs_p02_400 | 62% | 58% |
+
+16 personagens, 8 duplas e matriz dentro do ruído (±8) na medida da frente.

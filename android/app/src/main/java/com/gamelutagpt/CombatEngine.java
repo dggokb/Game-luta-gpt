@@ -2030,6 +2030,9 @@ final class CombatEngine {
 
         a.comboBroke = false;
         a.clearAttack();
+        // O golpe que ele tinha apertado para fechar o combo (no buffer) não sai sozinho depois do
+        // atordoamento curto: sairia de longe, no vazio, e quem quebrou puniria de graça.
+        a.buffer.clear();
         a.status = a.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
         a.stunProjectile = null;
         a.hitCrouching = false;
