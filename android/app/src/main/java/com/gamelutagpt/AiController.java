@@ -57,6 +57,21 @@ final class AiController {
     static final double GUARD_CANCEL_LOW_GUARD_CHANCE = 0.5;
     static final double PUSHBLOCK_LOW_GUARD_CHANCE = 0.8;
 
+    // Especiais S2–S4 (a função de cada um vem dos dados: CpuSpecials). Chances no nível 8; os
+    // outros níveis usam menos (pela inteligência e pela reação do nível).
+    /** A cada decisão do neutro: chance de trocar o que decidiu por um especial que serve ali. */
+    static final double SPECIAL_NEUTRAL_CHANCE = 0.06;
+    /** Viu golpe ou bola chegando e tem a postura certa (contra-golpe, esquiva, repel, armadura). */
+    static final double SPECIAL_REACT_CHANCE = 0.45;
+    /** Tirando do ar: parte das vezes com o especial que sobe, em vez do 2H. */
+    static final double SPECIAL_ANTI_AIR_SHARE = 0.5;
+    /** Pulando para dentro com um especial de mergulho: chance (uma vez por pulo). */
+    static final double SPECIAL_DIVE_CHANCE = 0.35;
+    /** No neutro, golpe de especial (sem projétil) só se sair até este quadro. */
+    static final int SPECIAL_NEUTRAL_MAX_STARTUP = 16;
+    /** O especial de vida (p12) só com a vida acima disto. */
+    static final float SPECIAL_LIFE_FLOOR = 0.3f;
+
     private static final int GUARD_NONE = 0, GUARD_HIGH = 1, GUARD_LOW = 2, GUARD_ANY = 3;
     /** Hábito de esperar agachada quando o rival não está atacando (antes 0,35). */
     static final double CALM_HABIT_SCALE = 0.1;
@@ -222,6 +237,19 @@ final class AiController {
     /** Com a bola a esta distância (em quadros), ela não começa golpe: só anda até defender. */
     static final float PROJECTILE_BUSY_FRAMES = 30f;
 
+    /** Sorteios dos especiais à parte (não mexem na sequência das outras decisões). */
+    private final Random specialRandom = new Random(0x5BEC1A1L);
+    /** Golpe e bola do rival para os quais a resposta de especial já foi sorteada. */
+    private int specialMeleeSerial = -1, specialShotSerial = -1;
+    /** Resposta de especial esperando a hora (o golpe/a bola ainda longe da janela dela). */
+    private CpuSpecials.Option meleePlan, shotPlan;
+    /** Pulo atual: o mergulho já foi sorteado, e se vai. */
+    private boolean diveDecided, divePlan;
+    /** Regras de carga do motor da luta atual (os especiais de carga). */
+    private CombatConfig chargeConfig;
+    /** Este anti-aéreo vai com o especial que sobe (se ele alcançar). */
+    private boolean antiAirSpecial;
+
     /** Por que a CPU apertou o último golpe ("neutro", "punir", "antiaereo"): para os testes. */
     String lastReason = "";
 
@@ -346,6 +374,9 @@ final class AiController {
         contactPush = 0f;
         antiAirPlan = false;
         ownHitFrame = -1;
+        specialMeleeSerial = specialShotSerial = -1;
+        meleePlan = shotPlan = null;
+        diveDecided = divePlan = false;
     }
 
     /** Fills the CPU input for the next engine step. */
@@ -354,6 +385,7 @@ final class AiController {
         habitGuardFrame = false;
         if (!enabled) return;
         perception.record(engine, self);
+        chargeConfig = engine.config;
         CombatFighter me = engine.fighter(self);
         CombatFighter target = engine.fighter(1 - self);
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
@@ -447,6 +479,7 @@ final class AiController {
         // Defendendo por reação e o golpe dele errou (já está na recuperação): solta a defesa e
         // pune, em vez de segurar a defesa até o fim da janela.
         if (seen != null && !seen.ko && me.canAct() && punish(engine, me, target, seen, out)) return;
+        if (seen != null && !seen.ko && specialReaction(engine, me, target, seen, out)) return;
         if (defend(engine, me, target, seen, out)) return;
         if (!me.canAct()) {
             movingForward = movingBack = dashing = false;
@@ -487,7 +520,10 @@ final class AiController {
         situation.urgency = urgency;
         situation.rivalZoning = rivalZoning(seen.frame);
         clearRequests();
-        if (ai.think(CombatConfig.DT, situation, actions)) walkInPlan = !roll(level.reactGuard * EDGE_STOP);
+        if (ai.think(CombatConfig.DT, situation, actions)) {
+            walkInPlan = !roll(level.reactGuard * EDGE_STOP);
+            specialNeutral(me, target, seen);
+        }
         if (movingForward && !dashing && attack == null && special == null && !superAttack && !grab && !jump &&
             me.grounded && seen.grounded && seen.status == CombatFighter.Status.NEUTRAL && !seen.attacking() &&
             situation.distance < jabRange(me, target) + EDGE_MARGIN && !walkInPlan) {
@@ -1149,6 +1185,16 @@ final class AiController {
             lastReason = "punir";
             return true;
         }
+        // Longe demais para os golpes comuns: o especial que avança (ou alcança) e sai a tempo.
+        for (CpuSpecials.Option o : CpuSpecials.of(c)) {
+            if (o.role != CpuSpecials.Role.RUSH && o.role != CpuSpecials.Role.POKE && o.role != CpuSpecials.Role.LOW &&
+                o.role != CpuSpecials.Role.ANTI_AIR && o.role != CpuSpecials.Role.ARMOR) continue;
+            if (o.attack.startupFrames > left || !CpuSpecials.reaches(o, gap, target.body()) || !lifeAllows(me, o)) continue;
+            pressSpecial(o, out);
+            guardFrames = 0;
+            lastReason = "punir (" + o.id + ")";
+            return true;
+        }
         return false;
     }
 
@@ -1169,6 +1215,7 @@ final class AiController {
             lastAntiAirSerial = seen.jumpSerial;
             boolean coming = (me.x - seen.x) * seen.vx > 0f || Math.abs(seen.x - me.x) < 200f;
             antiAirPlan = coming && roll(level.antiAir);
+            antiAirSpecial = antiAirPlan && specialRandom.nextDouble() < SPECIAL_ANTI_AIR_SHARE;
         }
         if (!antiAirPlan) return false;
         // Onde ele está agora pelo que ela viu: a trajetória do pulo é previsível.
@@ -1177,12 +1224,270 @@ final class AiController {
         float y = seen.y + seen.vy * t + 0.5f * engine.config.gravity * t * t;
         float gap = Math.abs(x - me.x);
         float height = Arena.GROUND_Y - y;
+        CpuSpecials.Option rising = risingSpecial(me, gap, height, target);
+        if (rising != null && antiAirSpecial) {
+            antiAirPlan = false;
+            pressSpecial(rising, out);
+            lastReason = "antiaereo (" + rising.id + ")";
+            return true;
+        }
         if (height > 240f || height < 0f || !CombatRules.reaches(c, "2H", false, gap, target.body())) return false;
         antiAirPlan = false;
         startRoute(c, "2H");
         press("2H", me, out);
         lastReason = "antiaereo";
         return true;
+    }
+
+    // ---------------------------------------------------------------- especiais (S2–S4)
+
+    /**
+     * As respostas de especial ao que ela viu, antes da defesa: o mergulho no pulo, o
+     * contra-golpe, a esquiva ou a armadura contra o golpe que vem, e o repel ou a esquiva
+     * contra a bola. Cada golpe e cada bola do rival têm um sorteio só (a chance do nível);
+     * quando o tempo ainda não é o da janela ela espera a hora, sem defender por cima.
+     */
+    private boolean specialReaction(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                    CpuPerception.Snapshot seen, FighterInput out) {
+        if (!me.canAct()) return false;
+        List<CpuSpecials.Option> kit = CpuSpecials.of(me.character());
+        if (kit.isEmpty()) return false;
+        float gap = Math.abs(seen.x - me.x);
+        int elapsed = engine.frame() - seen.frame;
+        if (!me.grounded) return dive(me, target, kit, out);
+        diveDecided = false;
+
+        // Golpe corpo a corpo do rival vindo.
+        if (seen.threatening() && seen.attack.melee() && seen.attackSerial != specialMeleeSerial &&
+            gap <= seen.attack.reach + me.body().halfWidth + 60f) {
+            specialMeleeSerial = seen.attackSerial;
+            meleePlan = null;
+            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard) {
+                meleePlan = meleeAnswer(me, target, kit, seen, gap, elapsed, false);
+            }
+            if (meleePlan != null) lastGuardSerial = seen.attackSerial;   // não defende por cima
+        }
+        if (meleePlan != null) {
+            if (!seen.threatening() || seen.attackSerial != specialMeleeSerial) {
+                meleePlan = null;
+            } else if (meleeAnswer(me, target, java.util.Collections.singletonList(meleePlan), seen, gap, elapsed, true) != null) {
+                CpuSpecials.Option o = meleePlan;
+                meleePlan = null;
+                pressSpecial(o, out);
+                guardFrames = 0;
+                lastReason = "resposta (" + o.id + ")";
+                return true;
+            } else {
+                movingForward = movingBack = dashing = false;
+                out.direction = 0;
+                return true;
+            }
+        }
+
+        // Bola do rival vindo.
+        if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != specialShotSerial) {
+            specialShotSerial = seen.projectileSerial;
+            shotPlan = null;
+            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard) {
+                for (CpuSpecials.Option o : kit) {
+                    AttackDefinition.Mechanics m = o.m();
+                    boolean repel = o.role == CpuSpecials.Role.REPEL;
+                    boolean evade = m.evade == AttackDefinition.Reads.ANY ||
+                        m.evade == AttackDefinition.Reads.HIGH && !seen.projectileLow;
+                    if ((repel || evade) && lifeAllows(me, o)) {
+                        shotPlan = o;
+                        break;
+                    }
+                }
+            }
+            if (shotPlan != null) {
+                // Ela vai responder com o especial: não planeja pular nem defender essa bola.
+                lastProjectileSerial = seen.projectileSerial;
+                noteRivalShot(seen.frame);
+            }
+        }
+        if (shotPlan != null) {
+            if (seen.projectileGap == Float.MAX_VALUE || seen.projectileSerial != specialShotSerial) {
+                shotPlan = null;
+                return false;
+            }
+            float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
+            float arrival = seen.projectileGapNow(me.x, elapsed) / speed;
+            AttackDefinition.Mechanics m = shotPlan.m();
+            int start = shotPlan.role == CpuSpecials.Role.REPEL ? m.counterStart : m.evadeStart;
+            int end = shotPlan.role == CpuSpecials.Role.REPEL ? m.counterEnd : m.evadeEnd;
+            if (CpuSpecials.covers(start, end, arrival, 2)) {
+                CpuSpecials.Option o = shotPlan;
+                shotPlan = null;
+                pressSpecial(o, out);
+                guardFrames = 0;
+                lastReason = "contra a bola (" + o.id + ")";
+                return true;
+            }
+            if (arrival < start) {
+                shotPlan = null;   // perdeu a hora: a defesa normal cuida
+                return false;
+            }
+            movingForward = movingBack = dashing = false;
+            out.direction = 0;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * O especial do kit que responde ao golpe que ela viu: contra-golpe que lê aquela altura,
+     * esquiva que passa por ele, ou armadura que aguenta e acerta de volta. {@code now}: só se a
+     * janela cobre o contato apertando já; senão também os que ainda vão caber (esperando).
+     */
+    private CpuSpecials.Option meleeAnswer(CombatFighter me, CombatFighter target, List<CpuSpecials.Option> kit,
+                                           CpuPerception.Snapshot seen, float gap, int elapsed, boolean now) {
+        AttackDefinition a = seen.attack;
+        boolean air = !seen.grounded;
+        // Quadros até o primeiro quadro ativo do golpe dele, contando o que passou desde o que ela viu.
+        float arrival = a.startupFrames - seen.attackFrame - elapsed;
+        for (CpuSpecials.Option o : kit) {
+            if (!lifeAllows(me, o)) continue;
+            AttackDefinition.Mechanics m = o.m();
+            int start, end;
+            if (o.role == CpuSpecials.Role.COUNTER && CpuSpecials.reads(m.counter, a, air)) {
+                start = m.counterStart;
+                end = m.counterEnd;
+            } else if (m.evade != AttackDefinition.Reads.NONE &&
+                (m.evade == AttackDefinition.Reads.ANY || air || !a.low)) {
+                start = m.evadeStart;
+                end = m.evadeEnd;
+            } else if (o.role == CpuSpecials.Role.ARMOR && CpuSpecials.reaches(o, gap, target.body())) {
+                start = m.armorStart;
+                end = m.armorEnd;
+            } else {
+                continue;
+            }
+            if (CpuSpecials.covers(start, end, arrival, a.activeFrames)) return o;
+            if (!now && arrival > start) return o;
+        }
+        return null;
+    }
+
+    /** No ar com especial de mergulho: uma vez por pulo, desce em cima do rival se cair nele. */
+    private boolean dive(CombatFighter me, CombatFighter target, List<CpuSpecials.Option> kit, FighterInput out) {
+        CpuSpecials.Option dive = null;
+        for (CpuSpecials.Option o : kit) if (o.role == CpuSpecials.Role.DIVE) dive = o;
+        // Caído ou levantando não leva golpe: mergulhar nele é cair na punição.
+        if (dive == null || !target.grounded || target.status == CombatFighter.Status.KNOCKDOWN ||
+            target.status == CombatFighter.Status.WAKEUP) return false;
+        if (!diveDecided) {
+            diveDecided = true;
+            divePlan = specialRandom.nextDouble() < SPECIAL_DIVE_CHANCE * level.kitScale / 1.2;
+        }
+        if (!divePlan) return false;
+        AttackDefinition.Mechanics m = dive.m();
+        float ahead = (target.x - me.x) * me.facing;
+        float height = Arena.GROUND_Y - me.y;
+        float reach;
+        if (m.dives()) {
+            float fall = height / Math.max(1f, m.diveDescent);
+            reach = m.diveForward * fall + dive.attack.reach;
+        } else {
+            reach = dive.reach;
+        }
+        if (ahead < 40f || ahead > reach + target.body().halfWidth || height < 60f) return false;
+        divePlan = false;
+        pressSpecial(dive, out);
+        lastReason = "mergulho (" + dive.id + ")";
+        return true;
+    }
+
+    /** O especial que sobe e pega o rival no ar daqui (ou null). */
+    private CpuSpecials.Option risingSpecial(CombatFighter me, float gap, float height, CombatFighter target) {
+        for (CpuSpecials.Option o : CpuSpecials.of(me.character())) {
+            if (o.role != CpuSpecials.Role.ANTI_AIR || !lifeAllows(me, o)) continue;
+            if (height < 0f || height > o.attack.hitHeight + 40f) continue;
+            if (CpuSpecials.reaches(o, gap, target.body())) return o;
+        }
+        return null;
+    }
+
+    /**
+     * Decidiu algo no neutro: às vezes troca pelo especial que serve àquela distância — o
+     * projétil e a armadilha de longe, o puxão e o avanço de meia distância, o agarrão de
+     * especial colado (mais contra quem só defende), o baixo contra quem está em pé.
+     */
+    private void specialNeutral(CombatFighter me, CombatFighter target, CpuPerception.Snapshot seen) {
+        if (situation.selfAirborne || !situation.attackReady || !situation.targetAlive || !seen.grounded) return;
+        if (specialRandom.nextDouble() >= SPECIAL_NEUTRAL_CHANCE * (0.2 + 0.8 * smart())) return;
+        float gap = situation.distance;
+        CharacterDefinition.Body body = target.body();
+        CpuSpecials.Option best = null;
+        double total = 0.0;
+        // O rival atacou há pouco (a pressão dele): a hora da postura e da armadura.
+        boolean pressed = seen.frame - lastOpponentAttackFrame < PRESSURE_FRAMES;
+        for (CpuSpecials.Option o : CpuSpecials.of(me.character())) {
+            if (!lifeAllows(me, o)) continue;
+            // O golpe lento no neutro só leva a punição: ele fica para punir (punish) e para o projétil.
+            boolean quick = o.attack.startupFrames <= SPECIAL_NEUTRAL_MAX_STARTUP;
+            double w = 0.0;
+            switch (o.role) {
+                case PROJECTILE:
+                    if (!situation.projectileActive && gap >= 200f && gap <= o.range) w = 1.0;
+                    break;
+                case TRAP:
+                    if (!situation.projectileActive && gap >= 140f && gap <= 480f) w = 1.0;
+                    break;
+                case GRAB:
+                    if (gap <= me.body().halfWidth + body.halfWidth + o.m().grabRange) w = situation.rivalBlocked ? 3.0 : 1.5;
+                    break;
+                case PULL:
+                    if (gap >= 160f && CpuSpecials.reaches(o, gap, body)) w = 1.0;
+                    break;
+                case ECHO:
+                    if (gap >= 100f && gap <= 360f) w = 1.0;
+                    break;
+                case COUNTER:
+                    // Lendo a pressão: colado em quem acabou de atacar, espera o próximo golpe dele.
+                    if (pressed && gap <= 200f) w = 1.5;
+                    break;
+                case RUSH:
+                    if (quick && gap >= 140f && CpuSpecials.reaches(o, gap, body)) w = 1.0;
+                    break;
+                case LOW:
+                    if (quick && !seen.crouching && CpuSpecials.reaches(o, gap, body)) w = 1.0;
+                    break;
+                case ARMOR:
+                    if (CpuSpecials.reaches(o, gap, body)) w = pressed ? 1.5 : quick ? 0.6 : 0.0;
+                    break;
+                case POKE:
+                    if (quick && CpuSpecials.reaches(o, gap, body)) w = 0.6;
+                    break;
+                default:
+                    break;   // esquiva, repel, o que sobe e o mergulho: só reagindo
+            }
+            if (w <= 0.0) continue;
+            total += w;
+            if (specialRandom.nextDouble() * total < w) best = o;
+        }
+        if (best == null) return;
+        actions.stop();
+        attack = null;
+        grab = superAttack = backdash = jump = superJump = false;
+        special = best.id.equals("S") ? "M" : best.id;
+        lastReason = "neutro (" + best.id + ")";
+    }
+
+    /**
+     * Pode soltar o especial agora: o que custa vida só com vida sobrando, e o de carga só com a
+     * carga feita (trás ou baixo seguro o tempo da carga), como o jogador.
+     */
+    private boolean lifeAllows(CombatFighter me, CpuSpecials.Option o) {
+        if (o.costsLife() && me.state.life <= SPECIAL_LIFE_FLOOR * me.state.profile.maxLife) return false;
+        return !o.hold || chargeConfig == null ||
+            me.motion.charged(o.holdDown, me.clock, chargeConfig.chargeFrames, chargeConfig.chargeKeepFrames);
+    }
+
+    /** Aperta o especial (o S1 de mergulho vai como a energia, com o M). */
+    private static void pressSpecial(CpuSpecials.Option o, FighterInput out) {
+        out.special = o.id.equals("S") ? "M" : o.id;
+        out.light = out.medium = out.heavy = false;
     }
 
     // ---------------------------------------------------------------- caderno de combos
