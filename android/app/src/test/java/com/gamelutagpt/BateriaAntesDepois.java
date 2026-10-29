@@ -395,6 +395,36 @@ public final class BateriaAntesDepois {
         }
     }
 
+    /**
+     * O grupo combos com a busca ampliada (S1 fraco/forte e S2–S4, {@link BateriaCombos#ampliadas}): a
+     * melhor entre a busca antiga e a ampliada, nas mesmas três medidas. O grupo "combos" fica igual.
+     */
+    static void combosAmpliados() {
+        List<String> ids = java.util.Arrays.asList(BateriaBalanco.ELENCO);
+        Map<String, double[]> r = new LinkedHashMap<>();
+        ids.parallelStream().forEach(id -> {
+            String[] amp = BateriaCombos.ampliadas(id, BateriaBalanco.ACOES);
+            double[] v = new double[3];
+            int[][] modos = {{0, 0}, {1, 0}, {0, 1}};
+            for (int i = 0; i < 3; i++) {
+                int barras = modos[i][0];
+                boolean alvo = modos[i][1] == 1;
+                BateriaBalanco.Candidata velha = BateriaBalanco.buscar(id, barras, alvo, 60, 16);
+                BateriaBalanco.Candidata nova = BateriaBalanco.buscar(id, barras, alvo, 60, 16, true, amp);
+                v[i] = Math.max(velha == null ? 0 : velha.x.dano, nova == null ? 0 : nova.x.dano);
+            }
+            synchronized (r) {
+                r.put(id, v);
+            }
+        });
+        for (String id : ids) {
+            double[] v = r.get(id);
+            put("combo_amp.max_0barras." + id, v[0]);
+            put("combo_amp.max_1barra." + id, v[1]);
+            put("combo_amp.assist_2quiques_0barras." + id, v[2]);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         String arquivo = args[0];
         String grupos = args.length > 1 ? args[1] : "breaker,clash,tag,elenco,p09,combos";
@@ -407,6 +437,7 @@ public final class BateriaAntesDepois {
                 case "elenco": elenco(); break;
                 case "p09": p09(); break;
                 case "combos": combos(); break;
+                case "combos_amp": combosAmpliados(); break;
                 default: throw new IllegalArgumentException(g);
             }
         }

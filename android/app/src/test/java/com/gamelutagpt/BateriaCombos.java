@@ -51,11 +51,13 @@ public final class BateriaCombos {
         int primeiroAcertoAte = 1;
         /** Vida real do boneco (para a vida vermelha e o K.O.); senão, vida "infinita". */
         boolean vidaReal;
+        /** O boneco começa encostado na parede da direita (senão, no meio da arena). */
+        boolean canto;
 
         Cenario copia() {
             Cenario c = new Cenario();
             c.gap = gap; c.rivalPula = rivalPula; c.barras = barras; c.shinkai = shinkai;
-            c.primeiroAcertoAte = primeiroAcertoAte; c.vidaReal = vidaReal;
+            c.primeiroAcertoAte = primeiroAcertoAte; c.vidaReal = vidaReal; c.canto = canto;
             return c;
         }
     }
@@ -70,12 +72,75 @@ public final class BateriaCombos {
 
     static final String[] BASE = {"L", "M", "H", "2L", "2M", "2H", "S", "SUPER", "A", "J", "SJ", "D", "jL", "jM", "jH", "j2H", "W6", "W14"};
 
+    // ------------------------------------------------------------------ S1 L/H e S2–S4 na busca
+
+    /**
+     * As ações da busca ampliada: as de {@code base} mais o S1 fraco e forte (quando o S1 é projétil:
+     * o botão muda velocidade e dano) e os especiais de comando S2–S4 que o lutador tem, com L e H
+     * à parte só quando o botão muda o golpe (a distância da pedra, o tempo da armadilha).
+     */
+    static String[] ampliadas(String atk, String[] base) {
+        CharacterDefinition c = ch(atk);
+        List<String> l = new ArrayList<>(Arrays.asList(base));
+        AttackDefinition s1 = c.attack("S");
+        if (s1 != null && s1.kind == AttackDefinition.Kind.PROJECTILE) {
+            l.add("S1L");
+            l.add("S1H");
+        }
+        for (String k : new String[] {"S2", "S3", "S4"}) {
+            CharacterDefinition.Special sp = c.specials.get(k);
+            if (sp == null) continue;
+            l.add(k);
+            if (sp.projectile != null && (sp.projectile.strengthSpeed != null || sp.projectile.trapFuse != null)) {
+                if (botoes(sp).contains("L")) l.add(k + "L");
+                if (botoes(sp).contains("H")) l.add(k + "H");
+            }
+        }
+        return l.toArray(new String[0]);
+    }
+
+    static String botoes(CharacterDefinition.Special sp) {
+        return sp.buttons == null || sp.buttons.isEmpty() ? "LMH" : sp.buttons;
+    }
+
+    /**
+     * Aperta o S1 fraco/forte ou um especial de comando já resolvido ("S2", "S3H"...), como o comando
+     * completo faria (o mesmo registro no buffer, com o botão que escolhe a força). Não confere se o
+     * comando cabia (a carga de [←] →, por exemplo): isso fica marcado na rota. False se não é um deles.
+     */
+    static boolean apertaEspecial(String acao, CombatFighter me, FighterInput in) {
+        if (acao.equals("S1L")) { in.special = "L"; return true; }
+        if (acao.equals("S1H")) { in.special = "H"; return true; }
+        if (!comando(acao)) return false;
+        String key = acao.substring(0, 2);
+        CharacterDefinition.Special sp = me.character().specials.get(key);
+        if (sp == null) return false;
+        String b = botoes(sp);
+        me.commandButton = acao.length() > 2 ? acao.substring(2) : b.contains("M") ? "M" : b.substring(0, 1);
+        me.buffer.push(InputBuffer.Button.SPECIAL, key, false);
+        return true;
+    }
+
+    static boolean comando(String acao) {
+        return acao.length() >= 2 && acao.charAt(0) == 'S' && acao.charAt(1) >= '2' && acao.charAt(1) <= '4';
+    }
+
+    /** Se o especial ampliado pedido saiu agora; null se a ação não é um deles. */
+    static Boolean saiuEspecial(String acao, boolean novo, CombatFighter me) {
+        if (acao.equals("S1L") || acao.equals("S1H")) {
+            return novo && me.attack.id.startsWith("S") && me.attack.kind != AttackDefinition.Kind.SUPER;
+        }
+        if (comando(acao)) return novo && me.attack.id.equals(acao.substring(0, 2));
+        return null;
+    }
+
     /** Executa a rota (cada passo apertado até sair, até 45 quadros) e deixa o combo acabar. */
     static Exec executar(String atk, String parceiro, List<String> rota, Cenario cn) {
         CombatConfig cfg = new CombatConfig();
         FighterState a = new FighterState(ch(atk), "P1"), p = new FighterState(ch(parceiro), "P1");
         FighterState d = new FighterState(ch(BONECO), "P2");
-        CombatEngine e = new CombatEngine(a, d, 900f, 900f + cn.gap, cfg);
+        float x0 = cn.canto ? Arena.RIGHT_BOUND - cn.gap : 900f;
+        CombatEngine e = new CombatEngine(a, d, x0, x0 + cn.gap, cfg);
         e.setTeam(0, a, p);
         if (!cn.vidaReal) d.life = 10_000_000;
         FighterInput in0 = new FighterInput(), in1 = new FighterInput();
@@ -135,7 +200,7 @@ public final class BateriaCombos {
                         case "jM": in0.medium = true; break;
                         case "jH": in0.heavy = true; break;
                         case "j2H": in0.direction = 3; in0.heavy = true; break;
-                        default: break;
+                        default: apertaEspecial(acao, me, in0); break;
                     }
                 }
                 boolean noChao = me.grounded;
@@ -159,7 +224,10 @@ public final class BateriaCombos {
                     case "ULTRA": feito = me.status == CombatFighter.Status.ULTRA || me.inUltraSequence() || e.ultraConnected() >= 0; break;
                     case "S": feito = novo && me.attack.id.startsWith("S") && me.attack.kind != AttackDefinition.Kind.SUPER; break;
                     case "SUPER": feito = novo && me.attack.kind == AttackDefinition.Kind.SUPER; break;
-                    default: feito = novo && me.attack.id.equals(acao); break;
+                    default:
+                        Boolean esp = saiuEspecial(acao, novo, me);
+                        feito = esp != null ? esp : novo && me.attack.id.equals(acao);
+                        break;
                 }
                 if (feito) {
                     antes = me.attack;
@@ -462,6 +530,107 @@ public final class BateriaCombos {
                 d.valida && d.dhc ? d.dano + " (+" + (d.dano - (s.valida ? s.dano : 0)) + ")" : "não emenda", us, melhor);
         }).collect(Collectors.toList());
         for (String l : linhas) System.out.println(l);
+    }
+
+    // ================================================================== G3: busca com S1 L/H e S2–S4
+
+    /** A melhor das buscas (largura 40 e 80); a busca em feixe não é monótona na largura. */
+    static Cand melhorBusca(String atk, Cenario cn, String[] acoes, Cand... outras) {
+        Cand m = null;
+        List<Cand> todas = new ArrayList<>(Arrays.asList(outras));
+        for (int largura : new int[] {40, 80}) todas.add(buscar(atk, cn, new ArrayList<>(), acoes, Meta.DANO, largura, 16));
+        for (Cand c : todas) if (c != null && c.x.valida && (m == null || c.x.dano > m.x.dano)) m = c;
+        return m;
+    }
+
+    /** Os especiais ampliados (S1 fraco/forte, S2–S4) que a rota usa, com "carga" nos de segurar. */
+    static String especiaisDaRota(String atk, Cand c) {
+        if (c == null) return "";
+        Set<String> s = new java.util.LinkedHashSet<>();
+        for (String a : c.rota) {
+            if (a.equals("S1L") || a.equals("S1H")) s.add(a);
+            else if (comando(a)) {
+                CharacterDefinition.Special sp = ch(atk).specials.get(a.substring(0, 2));
+                s.add(a + (sp != null && sp.hold ? " (carga)" : ""));
+            }
+        }
+        return String.join(", ", s);
+    }
+
+    /** O mesmo especial três vezes ou mais na rota (candidato a loop). */
+    static String repetido(Cand c) {
+        if (c == null) return "";
+        Map<String, Integer> n = new LinkedHashMap<>();
+        for (String a : c.rota) if (a.startsWith("S") && !a.equals("SUPER") && !a.equals("SJ")) n.merge(a.length() > 2 && comando(a) ? a.substring(0, 2) : a.startsWith("S1") ? "S" : a, 1, Integer::sum);
+        StringBuilder b = new StringBuilder();
+        for (Map.Entry<String, Integer> e : n.entrySet()) if (e.getValue() >= 3) b.append(b.length() > 0 ? ", " : "").append(e.getKey()).append("×").append(e.getValue());
+        return b.toString();
+    }
+
+    static void g3combos() {
+        titulo("G3b Busca de combos com S1 fraco/forte e S2–S4");
+        System.out.println("Busca em feixe (larguras 40 e 80, fica a melhor; até 16 passos), boneco com vida infinita que cai de pé no ar.");
+        System.out.println("Começo a 140 px, no meio (x 900) ou com o boneco na parede da direita. \"antiga\" = as ações da frente B");
+        System.out.println("(L/M/H, agachados, S1 médio, Super, assist, pulos, dash, golpes no ar, esperas); \"ampliada\" = as mesmas + S1 fraco/forte");
+        System.out.println("+ S2–S4 (L/H à parte só quando o botão muda o golpe) e nunca fica abaixo da antiga. \"sem assist\" tira o assist.");
+        System.out.println();
+        String[][] cenarios = {{"meio", "0", "A"}, {"meio", "1", "A"}, {"canto", "0", "A"}, {"canto", "1", "A"},
+            {"meio", "0", ""}, {"meio", "1", ""}, {"canto", "0", ""}, {"canto", "1", ""}};
+        List<String[]> casos = new ArrayList<>();
+        for (String atk : ELENCO) for (String[] c : cenarios) casos.add(new String[] {atk, c[0], c[1], c[2]});
+        Map<String, Cand[]> res = casos.parallelStream().collect(Collectors.toConcurrentMap(c -> String.join("|", c), c -> {
+            Cenario cn = new Cenario();
+            cn.canto = c[1].equals("canto");
+            cn.barras = Integer.parseInt(c[2]);
+            String[] velhas = c[3].isEmpty() ? Arrays.stream(BASE).filter(a -> !a.equals("A")).toArray(String[]::new) : BASE;
+            Cand antiga = melhorBusca(c[0], cn, velhas);
+            String[] tudo = ampliadas(c[0], velhas);
+            String[] soComando = Arrays.stream(tudo).filter(a -> !a.equals("S1L") && !a.equals("S1H")).toArray(String[]::new);
+            Cand s24 = melhorBusca(c[0], cn, soComando, antiga);
+            Cand ampliada = melhorBusca(c[0], cn, tudo, s24);
+            return new Cand[] {antiga, s24, ampliada};
+        }));
+        double vidaBoneco = ch(BONECO).fighter.maxLife;
+        System.out.println("| lutador | cenário | antiga | + S2–S4 | + S1 fraco/forte | Δ total | especiais novos na rota | rota ampliada |");
+        System.out.println("|---|---|---|---|---|---|---|---|");
+        StringBuilder resumo = new StringBuilder();
+        StringBuilder alertas = new StringBuilder();
+        for (String atk : ELENCO) {
+            int melhorDelta = 0, usos = 0;
+            Set<String> usados = new TreeSet<>();
+            for (String[] cc : cenarios) {
+                Cand[] r = res.get(atk + "|" + String.join("|", cc));
+                Cand a = r[0], m = r[1], b = r[2];
+                int da = a == null ? 0 : a.x.dano, dm = m == null ? 0 : m.x.dano, db = b == null ? 0 : b.x.dano;
+                String esp = especiaisDaRota(atk, b);
+                boolean nova = b != null && b != a && db > da;
+                if (nova && !esp.isEmpty()) {
+                    usos++;
+                    for (String e : esp.split(", ")) usados.add(e);
+                }
+                melhorDelta = Math.max(melhorDelta, db - da);
+                String cen = cc[0] + ", " + cc[1] + " b" + (cc[2].isEmpty() ? ", sem assist" : "");
+                System.out.printf(Locale.ROOT, "| %s | %s | %s | %s | %s | %+d | %s | %s |%n", nome(atk), cen, da, dm, db, db - da,
+                    nova ? esp : "–", nova ? b.texto() : "(igual à antiga)");
+                if (b != null && (db >= vidaBoneco || b.x.duracao > 600 || !repetido(b).isEmpty())) {
+                    alertas.append("- ").append(nome(atk)).append(", ").append(cen).append(": ").append(db).append(" (")
+                        .append(pct(db / vidaBoneco)).append(" da vida do boneco), ").append(f1(b.x.duracao / 60.0)).append(" s")
+                        .append(repetido(b).isEmpty() ? "" : ", repete " + repetido(b)).append(" — ").append(b.texto()).append('\n');
+                }
+            }
+            resumo.append(String.format(Locale.ROOT, "| %s | %d de %d | %+d | %s |%n", nome(atk), usos, cenarios.length, melhorDelta,
+                usados.isEmpty() ? "nenhum" : String.join(", ", usados)));
+        }
+        System.out.println();
+        System.out.println("Resumo por lutador (cenários em que a rota ampliada é melhor E usa um especial novo):");
+        System.out.println();
+        System.out.println("| lutador | cenários com rota nova | maior ganho | especiais novos usados |");
+        System.out.println("|---|---|---|---|");
+        System.out.print(resumo);
+        System.out.println();
+        System.out.println("Alertas (≥ 100% da vida do boneco " + Math.round(vidaBoneco) + ", mais de 10 s ou o mesmo especial 3 vezes):");
+        System.out.println();
+        System.out.print(alertas.length() == 0 ? "- nenhum\n" : alertas.toString());
     }
 
     static String fmt(Cand c, double vm) {
@@ -1081,6 +1250,20 @@ public final class BateriaCombos {
         if (q.equals("t14") || q.equals("tudo")) t14();
         if (q.equals("dbgrota")) { Cenario cn = new Cenario(); cn.gap = Float.parseFloat(args[2]); List<String> r = Arrays.asList(args[3].split(","));
             for (int k = 1; k <= r.size(); k++) { Exec x = executar(args[1], BateriaBalanco.parceiro(args[1]), r.subList(0, k), cn); System.out.println(r.subList(0, k) + " valida " + x.valida + " dano " + x.dano + " acertos " + x.acertos); } }
+        if (q.equals("g3")) g3combos();
+        if (q.equals("amp")) for (String id : ELENCO) System.out.println(id + " " + String.join(" ", ampliadas(id, new String[0])) + " | " + ch(id).specials.keySet()
+            + " S1=" + (ch(id).attack("S") == null ? "-" : ch(id).attack("S").id + "/" + ch(id).attack("S").kind) + " noAr=" + s1NoAr(id));
+        if (q.equals("tempo")) {
+            Cenario cn = new Cenario();
+            cn.barras = Integer.parseInt(args[2]);
+            cn.canto = args.length > 3;
+            for (String[] acoes : new String[][] {BASE, ampliadas(args[1], BASE)}) {
+                long t = System.nanoTime();
+                Cand c = buscar(args[1], cn, new ArrayList<>(), acoes, Meta.DANO, Integer.getInteger("largura", 40), 16);
+                System.out.printf(Locale.ROOT, "%d ações: %s → %s (%.1f s)%n", acoes.length, c == null ? "–" : c.texto(), c == null ? "–" : c.x.dano + "",
+                    (System.nanoTime() - t) / 1e9);
+            }
+        }
         if (q.equals("dbg14")) { DEBUG = true; System.out.println(Arrays.toString(quebra(args[1], args[2], 0))); }
         if (q.equals("dbg13")) { String[] p = defesaPerfeita(args[1], args[2], 0, -1); System.out.println("contato " + p[0]);
             for (int o = -12; o <= 2; o++) System.out.println(o + " " + String.join(" ", defesaPerfeita(args[1], args[2], o, Integer.parseInt(p[0])))); }

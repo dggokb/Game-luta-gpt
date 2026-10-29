@@ -54,6 +54,12 @@ public final class BateriaBalanco {
         void ajustar(Luta luta, int lado, FighterInput in);
     }
 
+    /**
+     * Ajuste da regra aplicado a toda luta criada daqui (a mesma semente com outra config, para medir
+     * uma opção de design antes de mudá-la no jogo); null = a config padrão.
+     */
+    static java.util.function.Consumer<CombatConfig> AJUSTE_CFG;
+
     /** Uma batalha de verdade: dois times, a CPU dos dois lados, o relógio e o K.O. do BattleFlow. */
     static final class Luta {
         final CombatEngine e;
@@ -65,8 +71,13 @@ public final class BateriaBalanco {
         int quadro;
 
         Luta(String[] time0, String[] time1, int nivel, long semente, CombatConfig cfg) {
+            this(time0, time1, nivel, semente, cfg, 420f, 980f);
+        }
+
+        Luta(String[] time0, String[] time1, int nivel, long semente, CombatConfig cfg, float x0, float x1) {
+            if (AJUSTE_CFG != null) AJUSTE_CFG.accept(cfg);
             FighterState[] a = membros(time0, "P1"), b = membros(time1, "P2");
-            e = new CombatEngine(a[0], b[0], 420f, 980f, cfg);
+            e = new CombatEngine(a[0], b[0], x0, x1, cfg);
             e.setTeam(0, a);
             e.setTeam(1, b);
             for (int lado = 0; lado < 2; lado++) {
@@ -1063,7 +1074,7 @@ public final class BateriaBalanco {
                         case "jM": in0.medium = true; break;
                         case "jH": in0.heavy = true; break;
                         case "j2H": in0.direction = baixo; in0.heavy = true; break;
-                        default: break;
+                        default: BateriaCombos.apertaEspecial(acao, me, in0); break;
                     }
                 }
                 boolean noChao = me.grounded;
@@ -1085,7 +1096,10 @@ public final class BateriaBalanco {
                     case "A": feito = !assistAntes && e.team(0).assistOut(); break;
                     case "S": feito = novo && me.attack.id.startsWith("S") && me.attack.kind != AttackDefinition.Kind.SUPER; break;
                     case "SUPER": feito = novo && me.attack.kind == AttackDefinition.Kind.SUPER; break;
-                    default: feito = novo && me.attack.id.equals(acao); break;
+                    default:
+                        Boolean esp = BateriaCombos.saiuEspecial(acao, novo, me);
+                        feito = esp != null ? esp : novo && me.attack.id.equals(acao);
+                        break;
                 }
                 if (feito) {
                     antes = me.attack;
@@ -1139,6 +1153,11 @@ public final class BateriaBalanco {
     }
 
     static Candidata buscar(String atk, int barras, boolean comBonus, int largura, int fundo, boolean comSuper) {
+        return buscar(atk, barras, comBonus, largura, fundo, comSuper, ACOES);
+    }
+
+    /** A mesma busca com outras ações (a busca ampliada com S2–S4: {@link BateriaCombos#ampliadas}). */
+    static Candidata buscar(String atk, int barras, boolean comBonus, int largura, int fundo, boolean comSuper, String[] acoes) {
         List<Candidata> feixe = new ArrayList<>();
         feixe.add(new Candidata(new ArrayList<>(), new Execucao(), 0));
         Candidata melhor = null;
@@ -1146,7 +1165,7 @@ public final class BateriaBalanco {
         for (int nivel = 0; nivel < fundo; nivel++) {
             List<Candidata> filhos = new ArrayList<>();
             for (Candidata c : feixe) {
-                for (String acao : ACOES) {
+                for (String acao : acoes) {
                     if (!comSuper && acao.equals("SUPER")) continue;
                     if (nivel == 0 && !(acao.equals("L") || acao.equals("2L") || acao.equals("M") || acao.equals("2M") || acao.equals("H"))) continue;
                     List<String> r = new ArrayList<>(c.rota);
