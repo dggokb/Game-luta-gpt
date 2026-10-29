@@ -45,8 +45,10 @@ NORMAIS = ('L', 'M', 'H', '2L', '2M', '2H', 'jL', 'jM', 'jH', 'j2H', '6M')
 # Fora: o boneco do treino e o monstro (não estão na seleção). O p01 (player_base) entra; a
 # calibração de desenho dele (P01SpriteCalibration, ~2% de escala e poucos px) fica de fora da conta.
 FORA = {'player_two', 'monster_npc'}
-# Agachar desenhado já calibrado (o jogo redimensiona ao mostrar): a folha crua não serve de medida.
-AGACHAR_CALIBRADO = {'player_base'}
+# Agachar desenhado já calibrado (o jogo redimensiona ao mostrar): a folha crua não serve de medida
+# da altura. A escala de cada quadro do CROUCH é a do SpriteFighterRenderer.P01_CROUCH (em volta da
+# raiz): o corpo agachado que apanha é o último quadro medido e reduzido por ela.
+AGACHAR_CALIBRADO = {'player_base': (0.9545, 0.9457, 0.9104, 0.9055, 0.8996, 0.8889, 0.8683, 0.8604)}
 OPACO = 160          # alfa mínimo de um pixel que conta (0-255)
 PONTA = 45           # px do mundo: o pedaço da ponta do golpe que dá a altura da caixa
 FOLGA = 19.5         # CombatRules.VERTICAL_SLACK
@@ -350,12 +352,18 @@ def silhuetas(pack):
             if g:
                 golpe[str(i)] = g
         a['silhueta'] = {'corpo': corpo, 'golpe': golpe}
+    escala = AGACHAR_CALIBRADO.get(pack['id'])
     for nome in POSTURAS:
         a = pack['animations'].get(nome)
-        if not a or (nome.startswith('CROUCH') and pack['id'] in AGACHAR_CALIBRADO):
+        if not a or (nome == 'CROUCH_IDLE' and escala):
             continue
         quadros = a['frames'][-1:] if nome == 'CROUCH' else sorted(set(a['frames']))
-        a['silhueta'] = {'corpo': {str(i): faixas(pack, a['atlas'], i) for i in quadros}, 'golpe': {}}
+        corpo = {str(i): faixas(pack, a['atlas'], i) for i in quadros}
+        if nome == 'CROUCH' and escala:
+            # O jogo mostra o agachar reduzido em volta da raiz: as caixas encolhem junto.
+            k = escala[min(len(a['frames']) - 1, len(escala) - 1)]
+            corpo = {q: [[round(v * k) for v in c] for c in cs] for q, cs in corpo.items()}
+        a['silhueta'] = {'corpo': corpo, 'golpe': {}}
 
 
 # Ultras com o lugar do rival feito à mão (agarrão, voo, câmera própria, recuo do zanzoken).

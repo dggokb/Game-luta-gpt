@@ -422,3 +422,103 @@ Os 16 personagens, maior combo sem barra e com 1 barra:
 | combo.max_1barra.p15 | 3840 | 3840 | +0 |
 | combo.max_0barras.p16 | 6707 | 6707 | +0 |
 | combo.max_1barra.p16 | 6707 | 6707 | +0 |
+
+## Etapa H8a — Ryūga agachado com o corpo medido no desenho (colisões, item 8)
+
+Decisão do usuário (lista G, item 8): medir o Ryūga agachado. O agachar dele era o único dos 16
+sem caixas medidas: o motor usava a caixa genérica (±36 px, 157 de altura), e o desenho agachado
+tem os pés a −77/+64 px. O 2M e o 2L dados na ponta encostavam o pé no pé dele e não acertavam
+(T25, achado 3).
+
+- **Arquivos:**
+  - `tools/sprites/caixas_sprites.py`: `AGACHAR_CALIBRADO` passa a ter a escala de cada quadro do
+    CROUCH do Ryūga, a mesma do `SpriteFighterRenderer.P01_CROUCH`. O corpo agachado é o último
+    quadro medido, reduzido por ela em volta da raiz, como o jogo mostra.
+  - `characters/player_base/character.json`: `animations.CROUCH.silhueta`, com o quadro 7 em três
+    faixas: [−77, 64, 2, 58], [−65, 48, 58, 114] e [−59, 40, 114, 169].
+  - `GeneratedCharacters.java`: a linha do CROUCH do player_base ganha `.withSilhueta(...)`.
+  - `CpuReachTable.java` foi regenerada pela `GeraAlcanceCpu`. A régua da CPU contra agachado é
+    medida no Ryūga, então ela muda para todos: L e M de vários personagens passam a pegar o Ryūga
+    agachado.
+- **Teste novo:** `AgachadoDoRyugaTest`, com 2 testes.
+  - Confere que o agachar tem caixas medidas.
+  - Confere que o 2M da p02 a 190 px, do p13 a 310 px e do p09 a 280 px acerta o Ryūga agachado.
+  - Os dois testes falham no código anterior e passam no novo.
+- **Suíte:** 562 de 562.
+- **Gerador:** `build_characters.py` passa, com 19 personagens e 657 atlas.
+
+**T25 contra o Ryūga agachado** (`BateriaColisoes`, golpes de chão, 16 atacantes, mesmas distâncias):
+
+| | antes | depois |
+|---|---|---|
+| falhas do 2M e do 2L na ponta | 33 | 0 |
+| falhas no total (o golpe passa pelo corpo e não acerta) | 137 | 67 |
+| acertos de L, M, H, 2L, 2M e 2H | 1097 | 1314 |
+| fantasmas (o motor acerta sem os pixels encostarem) | 181 | 263 |
+
+- **Fantasmas novos:** são 87, quase todos de M, H e 2H (ver a imagem `p04_M_agachado_240`).
+  - O corpo medido confere com o desenho.
+  - A folga vem da caixa do membro de quem bate, que agora alcança um corpo do tamanho certo.
+  - É o mesmo fantasma que a frente E já via contra a p02 agachada; é tratado na H8c.
+- **Falhas que ficaram:** 67, em L e M (31 cada).
+  - Na frente E, essas eram "corpo, não golpe": quem bate avança o corpo e o punho passa por cima.
+
+**Bateria fixa:**
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| breaker.sempre_vs_nunca | 66% | 62% | -3 |
+| breaker.cpu_vs_nunca | 57% | 52% | -5 |
+| shinkai.2x2_vence.SPEED | 55% | 52% | -3 |
+| 1x1.Ryūga (p01) | 64% | 62% | -2 |
+| 1x1.Yin-lu (p02) | 46% | 48% | +2 |
+| 1x1.Kōga (p03) | 63% | 60% | -2 |
+| 1x1.p04 | 64% | 61% | -3 |
+| 1x1.p05 | 54% | 54% | +1 |
+| 1x1.p06 | 53% | 53% | +0 |
+| 1x1.p07 | 28% | 27% | -1 |
+| 1x1.p08 | 79% | 78% | -1 |
+| 1x1.p09 | 63% | 65% | +2 |
+| 1x1.p10 | 59% | 60% | +1 |
+| 1x1.p11 | 61% | 63% | +2 |
+| 1x1.p12 | 47% | 48% | +1 |
+| 1x1.p13 | 55% | 55% | +0 |
+| 1x1.p14 | 32% | 32% | +1 |
+| 1x1.p15 | 8% | 8% | -0 |
+| 1x1.p16 | 26% | 26% | -1 |
+| 1x1.p09_vs_p02 | 57% | 75% | +18 |
+| 2x2.Ryūga (p01) | 60% | 64% | +4 |
+| 2x2.Yin-lu (p02) | 45% | 53% | +8 |
+| 2x2.Kōga (p03) | 46% | 56% | +10 |
+| 2x2.p04 | 57% | 50% | -7 |
+| 2x2.p05 | 50% | 41% | -8 |
+| 2x2.p06 | 53% | 51% | -2 |
+| 2x2.p07 | 41% | 44% | +4 |
+| 2x2.p08 | 59% | 64% | +5 |
+| 2x2.p09 | 66% | 68% | +2 |
+| 2x2.p10 | 50% | 48% | -2 |
+| 2x2.p11 | 54% | 52% | -2 |
+| 2x2.p12 | 55% | 51% | -3 |
+| 2x2.p13 | 55% | 52% | -3 |
+| 2x2.p14 | 37% | 39% | +2 |
+| 2x2.p15 | 23% | 24% | +1 |
+| 2x2.p16 | 31% | 37% | +6 |
+
+O `1x1.p09_vs_p02` é uma célula de poucas lutas. A medida de 400 lutas (`p09.vs_p02_400`) foi de
+69% para 68%.
+
+**Duplas oficiais** (T21, base → H8a):
+
+| dupla | antes | depois |
+|---|---|---|
+| Ryūga + Yin-lu | 64% | 54% |
+| Kōga + p04 | 55% | 59% |
+| p05 + p06 | 36% | 41% |
+| p07 + p08 | 63% | 64% |
+| p09 + p10 | 79% | 77% |
+| p11 + p12 | 64% | 64% |
+| p13 + p14 | 39% | 39% |
+| p15 + p16 | 2% | 5% |
+
+O T21 tem 8 lutas por adversário e ruído de cerca de ±10. Ryūga + Yin-lu caiu 10, mas no 2x2 da
+bateria fixa o Ryūga subiu de 60% para 64%.
