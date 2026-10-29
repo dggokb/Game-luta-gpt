@@ -1028,3 +1028,17 @@ global de dano. O relatório da frente, com a causa dos 2% de p15+p16, está em
   - 2x2 p16 37 → 40%;
   - `combo.max_1barra.p16` 5615 → 4487, efeito da busca em feixe: com mais ações a poda muda, e a
     rota antiga continua possível.
+
+## Etapa H4-p15a — o repel da p15 fica livre logo depois de desfazer a bola (item 4)
+
+- **Ferramenta:** o repel (S2) contra projétil prendia a p15 39 quadros depois de desfazer a bola,
+  mais do que defender. Ela apanhava no golpe seguinte em 80% das vezes.
+- **Arquivos:**
+  - `CombatEngine`: o repel que desfaz um projétil corta a recuperação;
+  - `CombatConfig`: a p15 fica livre 6 quadros depois.
+- **Dano:** nada muda.
+- **Testes:** `RepelProjetilTest` (novo); suíte 580 de 580.
+- **Medida da frente:** apanhar no golpe seguinte cai de 80% para 5%; matriz p15 13 → 14%;
+  p15+p16 2 → 5%.
+- **Bateria fixa ao integrar:** só o Breaker mexeu, dentro de ±5: "sempre quebra" vence "nunca" 57 → 60%
+  e a CPU vence "nunca" 46 → 50%.

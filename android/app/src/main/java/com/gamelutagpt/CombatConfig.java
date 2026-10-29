@@ -218,6 +218,11 @@ final class CombatConfig {
     int poundMissFrames = 36;
     /** O rebote (S1 do p14) que errou o primeiro chute: quadros até cair em guarda. */
     int reboundMissFrames = 20;
+    /**
+     * Repel (S2 da p15) que desfez um projétil: quadros até a aura apagar e ela ficar livre. Sem
+     * isso, desfazer a bola custava o golpe inteiro (64 quadros), mais do que defender.
+     */
+    int repelShotFreeFrames = 6;
     /** O rebote (S1 do p14) que acertou: o pulo para trás (para cima, para trás e o peso). */
     float reboundHopSpeed = 950f;
     float reboundBackSpeed = 300f;

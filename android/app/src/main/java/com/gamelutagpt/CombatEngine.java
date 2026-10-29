@@ -2811,8 +2811,10 @@ final class CombatEngine {
             }
             AttackDefinition.Mechanics stance = d.mechanics();
             if (stance.repel && stance.counterAt(d.attackFrame)) {
-                // Repel: o projétil se desfaz na aura, sem dano nem atordoamento.
+                // Repel: o projétil se desfaz na aura, sem dano nem atordoamento, e a aura apaga
+                // logo depois (quem repeliu fica livre, como quem defendeu).
                 repelled.add(new float[]{p.x, p.y, p.direction});
+                d.hitCutFrame = Math.min(d.attack.totalFrames - 2, d.attackFrame + config.repelShotFreeFrames);
                 cues.add("REPEL");
                 it.remove();
                 continue;
@@ -3868,6 +3870,7 @@ final class CombatEngine {
         cues.add(d.attack.mechanics.repel ? "REPEL" : "COUNTER");
         d.countered = true;
         d.attackFrame = d.attack.startupFrames;
+        d.hitCutFrame = -1;   // um repel que já desfez uma bola ainda responde ao golpe inteiro
         Contact answer = new Contact();
         answer.attacker = d;
         answer.defender = a;
