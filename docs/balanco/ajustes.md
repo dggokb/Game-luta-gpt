@@ -981,3 +981,30 @@ o 1x1 saiu idêntico.
 **Achado, não aplicado:** em p05+p06, p13+p14 e p15+p16 o DHC sai só depois que o combo acabou,
 porque o Super do titular erra as pancadas seguintes. Proposta: soltar o DHC quando o rival estiver
 saindo do combo.
+
+## H5 — assists (item 6) e SHINKAI ENERGY (item 7): só medição e testes
+
+**Assists aprovados (p13 com H, p15 com 2H, p07 com a regra geral):** nenhum precisou de correção.
+
+- **Teste novo:** `AssistSegurancaTest`. A sonda é a `SondaAssist`.
+- **Defendidos:** deixam o rival preso de +21 a +44 quadros, e a CPU não pune o titular que chama o
+  assist e depois defende.
+- **No canto:** o golpe sai dentro da arena e acerta.
+- **Rival pulando por cima do titular:** todos erram enquanto ele está no ar; p13 e p14 pegam no
+  começo do pulo.
+- **Mergulho do p14:** é golpe alto, então acerta quem defende agachado.
+- **Alcance, antiaéreo e sinergia:** os da lista G, sem mudança.
+
+**SHINKAI ENERGY, sem alteração** (`BateriaShinkaiBarra`, com a CPU atualizada):
+
+| tipo | vence 1x1 | vence 2x2 |
+|---|---|---|
+| POWER | 74% | 71% |
+| SPEED | 68% | 59% |
+| TECHNIQUE | 63% | 56% |
+| ENERGY | 69% | 55% |
+
+- O ENERGY ganha 2,28 barras na janela, contra 0,7–0,9 dos outros tipos, e vira mais Ultra.
+- No fim da luta sobra 0,6–0,7 barra a mais sem uso.
+- Todos os tipos, e também o lado sem SHINKAI, terminam com 2,6–3,5 barras paradas: é a CPU que não
+  gasta a barra, não o ENERGY.
