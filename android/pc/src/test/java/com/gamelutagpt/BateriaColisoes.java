@@ -177,6 +177,8 @@ public final class BateriaColisoes {
     }
 
     static final int QUADROS = 110;
+    /** Por quadro da última rodada com golpe: o rival estava na frente (dx >= MIN_MELEE_DISTANCE)? */
+    static final boolean[] ladoCerto = new boolean[QUADROS];
 
     /**
      * Uma tentativa e, sem acerto, a mesma ação sem o botão (parado, agachado ou o pulo puro): a
@@ -187,6 +189,12 @@ public final class BateriaColisoes {
         java.util.Arrays.fill(comGolpe, -1);
         java.util.Arrays.fill(semGolpe, -1);
         Caso c = rodada(quem, g, agachado, dist, aperto, false, comGolpe, null, -1, png);
+        // O golpe da frente só vale com o rival na frente (o motor exige MIN_MELEE_DISTANCE); o
+        // cruzado só vale em cima ou atrás. Fora disso a sobreposição é o corpo passando por cima.
+        boolean cruzado = g.equals("cruzado");
+        for (int q = 0; q < QUADROS; q++) {
+            if (comGolpe[q] >= 0 && ladoCerto[q] != !cruzado && !g.startsWith("S")) comGolpe[q] = -1;
+        }
         if (!c.acertou) {
             rodada(quem, g, agachado, dist, aperto, true, semGolpe, comGolpe, -1, null);
             int pior = -1;
@@ -246,6 +254,7 @@ public final class BateriaColisoes {
             e.step(in0, in1);
             upd.invoke(jogo, ra, a);
             upd.invoke(jogo, rd, d);
+            if (!semBotao && quais == null) ladoCerto[q] = (d.x - a.x) * a.facing >= CombatRules.MIN_MELEE_DISTANCE;
             if (quais != null) {
                 if (querQuadro) {
                     desenhar(CAMADA_A, ca, ra, a);
@@ -328,7 +337,7 @@ public final class BateriaColisoes {
     static List<Caso> varrer(String quem) throws Exception {
         List<Caso> casos = new ArrayList<>();
         CharacterDefinition ch = GeneratedCharacters.get(quem);
-        String[] chao = {"L", "M", "H", "2L", "2M", "2H"};
+        String[] chao = Boolean.getBoolean("t25.soPulos") ? new String[0] : new String[] {"L", "M", "H", "2L", "2M", "2H"};
         for (String g : chao) {
             AttackDefinition at = ch.attack(g);
             if (at == null) continue;
@@ -339,33 +348,31 @@ public final class BateriaColisoes {
         }
         // S: o de corpo (golpe do personagem) ou o projétil (energia).
         boolean temProjetil = ch.fighter.energy != null;
-        for (boolean ag : new boolean[] {false, true}) {
+        for (boolean ag : Boolean.getBoolean("t25.soPulos") ? new boolean[0] : new boolean[] {false, true}) {
             if (temProjetil) {
                 for (int dist : new int[] {200, 320, 450}) casos.add(tentar(quem, "Sproj", ag, dist, -1, null));
             } else {
                 for (int dist = 70; dist <= 360; dist += 15) casos.add(tentar(quem, "S", ag, dist, -1, null));
             }
         }
-        for (String g : new String[] {"jL", "jM", "jH"}) {
+        for (String g : Boolean.getBoolean("t25.soChao") ? new String[0] : new String[] {"jL", "jM", "jH"}) {
             if (ch.attack(g) == null) continue;
             for (boolean ag : new boolean[] {false, true}) {
-                for (int dist = 140; dist <= 380; dist += 20) {
-                    for (int aperto : new int[] {14, 20, 26}) casos.add(tentar(quem, g, ag, dist, aperto, null));
+                for (int dist = 160; dist <= 400; dist += 20) {
+                    for (int aperto : new int[] {24, 28, 32, 36}) casos.add(tentar(quem, g, ag, dist, aperto, null));
                 }
             }
         }
         // Cruzado: pula por cima e solta o jM na descida, já do outro lado.
-        for (boolean ag : new boolean[] {false, true}) {
-            for (int dist = 40; dist <= 160; dist += 10) {
-                for (int aperto : new int[] {20, 26, 30}) casos.add(tentar(quem, "cruzado", ag, dist, aperto, null));
+        for (boolean ag : Boolean.getBoolean("t25.soChao") ? new boolean[0] : new boolean[] {false, true}) {
+            for (int dist = 160; dist <= 280; dist += 10) {
+                for (int aperto : new int[] {28, 31, 34, 37}) casos.add(tentar(quem, "cruzado", ag, dist, aperto, null));
             }
         }
         return casos;
     }
 
-    public static void main(String[] args) throws Exception {
-        File saida = new File(args[0]);
-        saida.mkdirs();
+    static void iniciar() throws Exception {
         Context ctx = DadosDoJogo.localizar().contexto(null);
         jogo = new GameView(ctx);
         jogo.setTouchControlsVisible(false);
@@ -383,6 +390,12 @@ public final class BateriaColisoes {
         efeitos = ef.get(jogo);
         drawProj = EffectsRenderer.class.getDeclaredMethod("drawEnergyProjectiles", Canvas.class, RenderCanvas.class, List.class);
         drawProj.setAccessible(true);
+    }
+
+    public static void main(String[] args) throws Exception {
+        File saida = new File(args[0]);
+        saida.mkdirs();
+        iniciar();
         String[] ids = args.length > 1 ? args[1].split(",") : ELENCO;
         try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(new File(saida, "casos.tsv").toPath(), StandardCharsets.UTF_8))) {
             w.println("quem\tgolpe\tpostura\tdistancia\taperto\tacertou\tquadro\tfolga\tsobre_acerto\tsobre_max\tsobre_base\ttipo");
@@ -409,23 +422,7 @@ public final class BateriaColisoes {
     /** Refaz um caso e salva o PNG (para os piores casos da tabela). */
     public static final class Foto {
         public static void main(String[] args) throws Exception {
-            Context ctx = DadosDoJogo.localizar().contexto(null);
-            jogo = new GameView(ctx);
-            jogo.setTouchControlsVisible(false);
-            upd = GameView.class.getDeclaredMethod("updateFighterSprite", SpriteFighterRenderer.class, CombatFighter.class);
-            upd.setAccessible(true);
-            drawF = GameView.class.getDeclaredMethod("drawFighter", Canvas.class, SpriteFighterRenderer.class, CombatFighter.class,
-                boolean.class, boolean.class);
-            drawF.setAccessible(true);
-            rendP = GameView.class.getDeclaredField("spriteFighterRenderer");
-            rendP.setAccessible(true);
-            rendO = GameView.class.getDeclaredField("opponentSpriteRenderer");
-            rendO.setAccessible(true);
-            Field ef = GameView.class.getDeclaredField("effects");
-            ef.setAccessible(true);
-            efeitos = ef.get(jogo);
-            drawProj = EffectsRenderer.class.getDeclaredMethod("drawEnergyProjectiles", Canvas.class, RenderCanvas.class, List.class);
-            drawProj.setAccessible(true);
+            iniciar();
             File dir = new File(args[0]);
             dir.mkdirs();
             // Cada caso: quem:golpe:postura:distancia:aperto
@@ -436,6 +433,54 @@ public final class BateriaColisoes {
                     p[4].equals("-1") ? "" : "_a" + p[4]));
                 Caso c = tentar(p[0], p[1], p[2].equals("agachado"), Integer.parseInt(p[3]), Integer.parseInt(p[4]), png);
                 System.out.println(png.getName() + ": " + c.tipo + " folga " + c.folga + " sobre " + c.sobreMax);
+            }
+            System.exit(0);
+        }
+    }
+
+    /** Quadro a quadro de um caso (quem:golpe:postura:distancia:aperto): onde estão, o golpe e o corpo. */
+    public static final class Sonda {
+        public static void main(String[] args) throws Exception {
+            iniciar();
+            for (String arg : args) {
+                String[] p = arg.split(":");
+                preparar(p[0]);
+                boolean agachado = p[2].equals("agachado");
+                int aperto = Integer.parseInt(p[4]);
+                CombatEngine e = jogo.engine;
+                e.restage(1000f, 1000f + Integer.parseInt(p[3]));
+                CombatFighter a = e.fighter(0), d = e.fighter(1);
+                a.state.life = d.state.life = 1_000_000;
+                SpriteFighterRenderer ra = (SpriteFighterRenderer)rendP.get(jogo), rd = (SpriteFighterRenderer)rendO.get(jogo);
+                Canvas ca = new Canvas(CAMADA_A), cd = new Canvas(CAMADA_D);
+                FighterInput in0 = new FighterInput(), in1 = new FighterInput();
+                for (int i = 0; i < 12; i++) {
+                    in0.clear(); in1.clear();
+                    if (agachado) in1.direction = 3;
+                    e.step(in0, in1);
+                }
+                System.out.println("== " + arg);
+                for (int q = 0; q < 60; q++) {
+                    entrada(in0, p[1], q, aperto);
+                    in1.clear();
+                    if (agachado) in1.direction = 3;
+                    upd.invoke(jogo, rd, d);
+                    meio = (a.x + d.x) / 2f;
+                    desenhar(CAMADA_D, cd, rd, d);
+                    CAMADA_D.getPixels(PD, 0, W, 0, 0, W, H);
+                    float[] corpo = CombatEngine.corpoAtual(d);
+                    e.step(in0, in1);
+                    upd.invoke(jogo, ra, a);
+                    desenhar(CAMADA_A, ca, ra, a);
+                    CAMADA_A.getPixels(PA, 0, W, 0, 0, W, H);
+                    boolean hit = false;
+                    for (CombatEngine.HitEvent h : e.events()) if (h.attacker == 0) hit = true;
+                    float[] g = a.attacking() ? CombatEngine.golpeNoDesenho(a, a.attackFrame) : null;
+                    System.out.printf(Locale.ROOT, "q%02d dx=%.0f alt=%.0f vy=%.1f %s %s f%d ativo=%b hit=%b membro=%s corpo=%s sobre=%d%n",
+                        q, (d.x - a.x) * a.facing, Arena.GROUND_Y - a.y, a.vy, a.status, a.attack != null ? a.attack.id : "-", a.attackFrame,
+                        a.attacking() && a.attack.isActive(a.attackFrame), hit,
+                        g == null ? "-" : java.util.Arrays.toString(g), corpo == null ? "-" : java.util.Arrays.toString(corpo), sobreposicao(PA, PD));
+                }
             }
             System.exit(0);
         }
