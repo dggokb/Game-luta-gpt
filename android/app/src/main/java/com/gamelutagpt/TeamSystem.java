@@ -44,6 +44,13 @@ final class TeamSystem {
         float assistFromX, assistToX;
         /** O assist entra pulando e bate de mergulho (o golpe dele só sai no ar). */
         boolean assistDive;
+        /**
+         * TAG no Super já solto: o DHC fica pedido e sai quando as pancadas do Super acabam (a
+         * troca não corta o Super no meio).
+         */
+        boolean dhcPending;
+        /** O DHC pedido é de um Super de capangas: vale até eles baterem, mesmo com o Super acabado. */
+        boolean dhcHenchmen;
         /** TAG pressed again during the assist: it stays as the new point. */
         boolean convert;
         /**
@@ -199,6 +206,8 @@ final class TeamSystem {
     void resolve(CombatEngine engine, CombatFighter point, CombatFighter opponent) {
         Side s = sides[point.index];
         if (s.partner() == null) return;
+        // Com o DHC já pedido, outro TAG não chama assist por cima dele.
+        if (s.dhcPending) s.assistRequestAge = -1;
         if (s.assistRequestAge >= 0 && point.status == CombatFighter.Status.BLOCKSTUN) {
             // TAG while blocking: Guard Cancel Tag, when the partner is ready and there is a bar.
             if (!point.frozen() && canGuardCancel(s) && engine.guardCancel(s, point)) {
@@ -206,10 +215,12 @@ final class TeamSystem {
                 lockTeamActions(s);
             }
         } else if (s.assistRequestAge >= 0 && inReleasedSuper(point)) {
-            // TAG during your own Super, once it fired: DHC, the partner comes in with its Super.
-            if (!point.frozen() && dhcReady(s, point) && engine.dhc(s, point)) {
+            // TAG during your own Super, once it fired: DHC, the partner comes in with its Super
+            // as soon as the Super's strikes are over (below).
+            if (dhcReady(s, point)) {
+                s.dhcPending = true;
+                s.dhcHenchmen = point.state.profile.henchmen > 0;
                 s.assistRequestAge = -1;
-                lockTeamActions(s);
             }
         } else if (s.assistRequestAge >= 0) {
             if (s.conversionOpen()) {
@@ -225,6 +236,18 @@ final class TeamSystem {
             } else if (canAssist(s, point)) {
                 startAssist(s, point, opponent);
                 s.assistRequestAge = -1;
+            }
+        }
+        if (s.dhcPending) {
+            // Os capangas do p07 batem depois que o Super dele acaba: o DHC espera por eles com o
+            // titular livre; qualquer outro DHC cai quando o Super acaba.
+            boolean inSuper = inReleasedSuper(point);
+            if (!dhcReady(s, point) || !inSuper && (!s.dhcHenchmen || !point.canAct())) {
+                s.dhcPending = false;
+            } else if (!point.frozen() && (!inSuper || superStrikesDone(point)) &&
+                !engine.henchmenStillToStrike(point.index) && engine.dhc(s, point)) {
+                s.dhcPending = false;
+                lockTeamActions(s);
             }
         }
         if (s.tagRequestAge >= 0 && canRawTag(s, point)) {
@@ -266,6 +289,15 @@ final class TeamSystem {
     private static boolean inReleasedSuper(CombatFighter point) {
         return point.attacking() && point.attack.kind == AttackDefinition.Kind.SUPER &&
             point.attackFrame >= point.attack.startupFrames;
+    }
+
+    /**
+     * As pancadas do Super já saíram todas: a janela de acerto passou ou ele já bateu tudo (o
+     * Super de projétil, assim que solta; o dos capangas espera os capangas, no motor).
+     */
+    private static boolean superStrikesDone(CombatFighter point) {
+        AttackDefinition attack = point.attack;
+        return !attack.melee() || point.attackFrame > attack.lastActiveFrame() || point.hitsOnTarget >= attack.maxHits;
     }
 
     private static boolean dhcReady(Side s, CombatFighter point) {

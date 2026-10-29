@@ -1472,6 +1472,12 @@ final class CombatEngine {
         cues.add("HENCHMEN");
     }
 
+    /** Algum capanga do Super de {@code owner} ainda vai bater (o DHC espera por eles). */
+    boolean henchmenStillToStrike(int owner) {
+        for (Henchman h : henchmen) if (h.owner == owner && !h.struck && h.phase != Henchman.RUN_OUT) return true;
+        return false;
+    }
+
     private void advanceHenchmen() {
         if (superFreeze > 0) return;
         Iterator<Henchman> it = henchmen.iterator();
@@ -2842,7 +2848,18 @@ final class CombatEngine {
         point.locked = false;
         point.pushRemaining = 0f;
         point.pushFramesLeft = 0;
-        startAttack(point, partner.profile.superAttack.attack, null, -1);
+        AttackDefinition superAttack = partner.profile.superAttack.attack;
+        if (superAttack.melee() && point.grounded) {
+            // Super corpo a corpo: entra até onde ele pega o rival (só para a frente).
+            CombatFighter o = fighters[1 - point.index];
+            int dir = o.x >= point.x ? 1 : -1;
+            float ahead = ((o.x - dir * superAttack.reach * 0.8f) - point.x) * dir;
+            if (ahead > 0f) {
+                point.x = Arena.clamp(point.x + dir * Math.min(ahead, config.dhcMaxAdvance), Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            }
+            point.facing = dir;
+        }
+        startAttack(point, superAttack, null, -1);
         startX[point.index] = point.x;
         cues.add("DHC");
         return true;

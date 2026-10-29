@@ -439,6 +439,13 @@ final class CombatConfig {
     int comboBreakerChaseFrames = 0;
     float comboBreakerCloseGap = 30f;
 
+    /**
+     * DHC: o parceiro de Super corpo a corpo entra até onde o Super dele alcança o rival (sob o
+     * clarão do Super), no máximo isto à frente de onde o titular estava; 0 = entra onde o titular
+     * está (antes; o Super do parceiro errava o rival que o Super do titular tinha jogado longe).
+     */
+    float dhcMaxAdvance = 420f;
+
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.
     int guardCancelCost = METER_PER_BAR;
     /** The opponent freezes for the cross-counter flash. */

@@ -486,9 +486,14 @@ fim do golpe) traz o parceiro com o Super dele.
 
 - Custa mais 1 barra (da barra do time) e precisa do parceiro pronto (assist livre, sem
   troca nem assist em campo) e com Super no pack.
-- O parceiro assume o ponto onde o ponto está, começa o Super com o congelamento normal do
-  Super, e o antigo ponto sai correndo. O combo continua com a escala de sempre (piso de
-  Super).
+- O TAG fica **pedido** e o DHC sai quando as pancadas do Super acabam (passou a janela de
+  acerto ou ele já bateu tudo; o de projétil, assim que solta): a troca não corta o Super no
+  meio. No Super de capangas (p07) o pedido espera os capangas baterem, mesmo com o Super já
+  acabado e o ponto livre. Com o DHC pedido, outro TAG não chama assist.
+- O parceiro assume o ponto onde o ponto está (o de Super corpo a corpo, no chão, entra até
+  onde o Super dele pega o rival, no máximo `dhcMaxAdvance` 420 px à frente), começa o Super
+  com o congelamento normal do Super, e o antigo ponto sai correndo. O combo continua com a
+  escala de sempre (piso de Super). Testes em `DhcSemCortarTest`.
 - Depois: 300 frames sem assist nem troca. O botão TAG mostra **DHC** quando dá, e a tela
   mostra "TEAM SUPER!". O ultra não entra em DHC.
 
@@ -858,7 +863,7 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
 
 | Comando | O que faz |
 | --- | --- |
-| **TAG** | Chama o parceiro como **assist**: ele entra correndo atrás do ponto (`assistBehind` 70 px, 8 frames), faz o golpe que o pack declara (`fighter.assist.move`) e sai (10 frames). Recarga de 240 frames (4 s). |
+| **TAG** | Chama o parceiro como **assist**: ele entra correndo atrás do ponto (`assistBehind` 70 px, 8 frames; o de corpo a corpo, até onde o golpe pega o rival, abaixo), faz o golpe que o pack declara (`fighter.assist.move`) e sai (10 frames). Recarga de 240 frames (4 s). |
 | **TAG de novo** enquanto o assist entra, golpeia ou já volta correndo | **Assist → Tag**: quando o golpe do assist termina, ele fica como o novo ponto onde está e o antigo sai correndo. O combo continua com o novo ponto. Se o ponto estiver apanhando, defendendo, caído ou no ultra nessa hora, o parceiro **espera parado** até `assistTagBufferFrames` (36, 0,6 s) e a troca sai assim que o ponto se soltar; senão cai. O HUD mostra o pedido ("TROCA PEDIDA", "ESPERANDO VOCÊ SE SOLTAR"), a troca ("TROCA!") e a queda com o motivo ("TROCA CANCELADA: APANHANDO"); o botão TAG mostra "…" com o pedido no ar e um arco com a recarga. Depois: 300 frames sem assist nem troca (docs/balanco/ajustes.md, etapa 3). |
 | **↓ + TAG** | **Troca direta com voadora** (como no Marvel vs. Capcom): o ponto sai correndo (20 frames) e o parceiro entra pelo alto numa voadora até o rival (`VoadoraTroca`). Só em NEUTRAL. Recarga de 600 frames (10 s), contada quando a voadora acaba. |
 
@@ -867,6 +872,12 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
   durante o hitstop de um golpe.
 - O assist pode ser chamado do neutro ou durante os golpes do ponto (não durante o Super,
   o ultra, a troca, nem apanhando). Nesta versão ele não pode ser atingido.
+- **Assist corpo a corpo** (golpe com caixa de acerto; docs/balanco/auditoria.md, T17): em vez de
+  bater 70 px atrás do ponto, ele entra (no mesmo tempo, `assistEnterFrames`) até onde o golpe pega o
+  rival (80% do `reach`), no máximo `assistMeleeAhead` (220 px) à frente do ponto. O golpe que
+  avança (a investida do p12) avança com ele; o de mergulho (o chute rebote do p14, só no ar) entra
+  pulando até `assistDiveHeight` (240 px) e desce na diagonal, quicando para trás se pegou. Os
+  assists: p12 investida, p13 H (quique na parede), p14 mergulho, p15 2H (lança), p07 tapa de luva.
 - O golpe do assist é um `CombatFighter` próprio do lado (mesmo índice do ponto): usa as
   hitboxes, o frame data, o hitstop e a defesa normais; os acertos entram na
   `ComboSession` do defensor com a escala de sempre. Assist de projétil (`"S"`) lança o
