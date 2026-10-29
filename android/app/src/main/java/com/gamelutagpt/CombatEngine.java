@@ -3524,7 +3524,8 @@ final class CombatEngine {
         }
 
         AttackDefinition.Mechanics stance = d.mechanics();
-        if (!projectile && stance.counterAt(d.attackFrame) && reads(stance.counter, attack, !a.grounded)) {
+        // O contra-golpe lê só o golpe do titular: o assist não apanha (a resposta não tem em quem bater).
+        if (!projectile && a == fighters[a.index] && stance.counterAt(d.attackFrame) && reads(stance.counter, attack, !a.grounded)) {
             counter(d, a);
             return;
         }

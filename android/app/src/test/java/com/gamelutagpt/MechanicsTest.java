@@ -70,6 +70,22 @@ public class MechanicsTest {
         assertTrue("the jab was repelled", s.f(0).state.life < s.f(0).state.profile.maxLife);
     }
 
+    @Test public void counterStanceDoesNotReadTheAssistStrike() {
+        // Antes, a resposta acertava o assist no meio do golpe e o assist ficava sem golpe (o motor caía).
+        for (int delay = 0; delay < 40; delay += 3) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 450f, 650f);
+            s.engine.setTeam(0, s.f(0).state, new FighterState(GeneratedCharacters.get("p15"), "P2"));
+            s.in[0].assist = true;
+            boolean repelled = false;
+            for (int i = 0; i < 180; i++) {
+                if (i >= delay && s.f(1).canAct()) s.in[1].heavy = true;
+                s.step();
+                repelled |= cue(s, "REPEL");
+            }
+            assertFalse("delay " + delay + ": o repel não lê o assist", repelled);
+        }
+    }
+
     @Test public void repelReadsLowStrikesToo() {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 500f, 600f);
         s.in[1].heavy = true;
