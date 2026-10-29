@@ -1220,6 +1220,17 @@ public class MechanicsTest {
         assertTrue("the standing rival is still hit", p09PunchHits(180f, false));
     }
 
+    @Test public void p06LowKickHitsWithTheStretchedLeg() throws Exception {
+        // H3: o quadro do impacto (a perna esticada, 259 px) passava um quadro antes da janela
+        // ativa; na janela o desenho já recolhia (190 px). O primeiro quadro ativo é o esticado.
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p06"), BASE, 400f, 1200f);
+        CombatFighter f = s.f(0);
+        startMove(s.engine, 0, "2M");
+        while (!f.attack.isActive(f.attackFrame)) s.step();
+        float[] g = CombatEngine.golpeNoDesenho(f, f.attackFrame);
+        assertEquals(f.attack.hitbox(0).x1, CombatEngine.maxDe(g, 1), 1f);
+    }
+
     /** Até onde vai à frente o desenho do corpo parado (a guarda, a base aberta). */
     private static float frenteParado(CharacterDefinition c) {
         float[] corpo = c.animations.get(SpriteStates.IDLE).postura;

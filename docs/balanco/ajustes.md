@@ -710,3 +710,100 @@ achou outra rota com as caixas novas (não investiguei qual golpe abriu ela).
 | p15 | p16 | 5% | Yin-lu (p02) 7% → Yin-lu (p02) 11% | p05 9% → p05 4% | p10 13% → p10 23% | p10 |
 
 Todas ficaram dentro do ruído (±10).
+
+
+## Etapa H3 — p06: o 2M bate com a perna esticada (item 3)
+
+Decisão do usuário (item 3): aceitar o 51% do p06 e corrigir os 23 px do 2M só conforme a
+geometria real e a intenção do golpe, sem buff por winrate.
+
+**O que eram os 23 px.** O pacote declara alcance 259 e `impactFrame` 6, o quadro da perna
+esticada, com a ponta a 259 px da raiz. O motor escolhe o quadro do desenho pelo meio de cada
+quadro de jogo. O quadro 6 durava só o último quadro de preparação (q6), e na janela ativa (q7–q10)
+o desenho já recolhia: 190 px, depois 127. A régua da CPU (G1b) mediu então 272 contra 295 do
+pacote, eixo a eixo. O `validate_impacts` do gerador aceita o impacto até um quadro antes da janela,
+e é por isso que passava.
+
+- **Correção, de tempo do clipe e sem dado de golpe:** `characters/p06/character.json`,
+  `CROUCH_MEDIUM.durationsMs`, com o mesmo total de 403 ms.
+  - A preparação (quadros 0–5) passa de 108 para 118 ms.
+  - O recolher (quadro 7) passa de 38 para 28 ms.
+  - Assim o quadro 6 (a perna esticada, 17 ms) cai no primeiro quadro ativo (q7). Os quadros
+    seguintes da janela continuam o recolher.
+- **Sem mudança:** dano (420), quadros (7/4/13), alcance declarado (259), caixas e vantagem.
+- **Arquivos:**
+  - `characters/p06/character.json`;
+  - `GeneratedCharacters.java`, gerado;
+  - `CpuReachTable` regenerada: p06 2M 236/230 → 306/298 (em pé/agachado, eixo a eixo contra o Ryūga).
+- **Teste novo:** `MechanicsTest.p06LowKickHitsWithTheStretchedLeg`. No primeiro quadro ativo, a
+  ponta do desenho é o alcance declarado (259). No clipe anterior dava 190, e o teste falha.
+- **Suíte:** 568 de 568.
+- **Gerador:** passa, com 657 atlas reaproveitados.
+
+**Bateria fixa** (H8c → H3, mesmas sementes). Só estas linhas mudaram mais de 3%:
+
+| métrica | antes | depois | diferença |
+|---|---|---|---|
+| breaker.dano_evitado | 935 | 984 | +48 |
+| 1x1.p05 | 56% | 55% | -1 |
+| 1x1.p06 | 52% | 59% | +7 |
+| 2x2.p05 | 40% | 35% | -5 |
+| 2x2.p06 | 50% | 51% | +1 |
+
+**Matriz 16 × 16** (força contra o elenco, nível 8, 10 sementes por célula). A coluna "G1b" é a base
+da lista H, o HEAD antes de H8a. A coluna "H8c" acumula H8a, H8b e H8c.
+
+| personagem | G1b (29ca0716) | H8c | H3 |
+|---|---|---|---|
+| p08 | 78% | 77% | 76% |
+| p04 | 64% | 69% | 68% |
+| p09 | 64% | 63% | 62% |
+| p10 | 63% | 61% | 61% |
+| Kōga (p03) | 58% | 62% | 61% |
+| p12 | 47% | 61% | 61% |
+| p11 | 63% | 58% | 58% |
+| Ryūga (p01) | 61% | 59% | 58% |
+| p06 | 51% | 49% | 57% |
+| p05 | 51% | 53% | 53% |
+| Yin-lu (p02) | 45% | 50% | 49% |
+| p13 | 55% | 47% | 47% |
+| p14 | 31% | 32% | 31% |
+| p07 | 32% | 26% | 27% |
+| p16 | 24% | 21% | 21% |
+| p15 | 13% | 10% | 10% |
+
+faixa: G1b (29ca0716) 13–78 (desvio 16.8); H8c 10–77 (desvio 17.9); H3 10–76 (desvio 17.7)
+
+- **p06:** 49 → 57% (+8, na borda do ruído de ±8). Volta para perto dos 51% que o usuário aceitou, e
+  não aos 68% de antes da régua real.
+- **O resto:** dentro do ruído.
+- **Acumulado H8a–H8c contra o G1b, mais que o ruído:**
+  - o p12 subiu 47 → 61% (a Investida da H8b);
+  - o p13 caiu 55 → 47%.
+
+**Duplas oficiais** (T21, H8c → H3):
+
+| titular | oficial | vitórias | alternativo 1 | alternativo 2 | alternativo 3 | melhor parceiro |
+|---|---|---|---|---|---|---|
+| Ryūga (p01) | Yin-lu (p02) | 48% → 52% | p04 64% → p04 68% | p07 66% → p07 61% | p12 68% | p12 → p04 |
+| Kōga (p03) | p04 | 63% → 61% | p06 46% → p06 41% | p09 68% | p14 41% → p14 45% | p09 |
+| p05 | p06 | 45% → 50% | p08 61% | p11 55% | p16 34% | p08 |
+| p07 | p08 | 55% | p10 48% → p10 45% | p13 52% | Yin-lu (p02) 27% → Yin-lu (p02) 25% | oficial |
+| p09 | p10 | 71% → 73% | p12 86% | p15 45% | p04 70% → p04 73% | p12 |
+| p11 | p12 | 71% → 70% | p14 50% → p14 45% | Ryūga (p01) 63% | p06 54% → p06 45% | oficial |
+| p13 | p14 | 39% → 43% | p16 30% → p16 25% | Kōga (p03) 52% | p08 71% → p08 70% | p08 |
+| p15 | p16 | 5% | Yin-lu (p02) 11% | p05 4% → p05 9% | p10 23% → p10 25% | p10 |
+
+Todas ficaram dentro do ruído.
+
+**Achado para decidir (não aplicado):** o mesmo descompasso existe em mais 16 golpes. O quadro do
+impacto (`impactFrame`) passa antes da janela ativa, e o motor bate com o quadro seguinte:
+
+- p02 jH; p04 L e 2M; p06 H; p07 L; p09 2M; p11 2M;
+- p13 L, 2L e j2H; p14 L; p15 L, jM e jH; p16 2L e jL.
+
+Para fechar, a regra do `validate_impacts` e do `fit_impact` precisa do mesmo critério do motor (o
+meio do quadro de jogo), e os clipes precisam ser reajustados. Cada um desses golpes passa a bater
+com o quadro desenhado como impacto. Em quase todos isso aumenta o alcance real (é a perna ou o braço
+esticado), então é uma mudança ampla e fica para depois da matriz consolidada. O 2M do p09 está na
+lista e mexe no experimento H2.
