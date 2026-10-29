@@ -22,6 +22,8 @@ Resposta ao documento "SŌKON Bloodlines — Auditoria de Combate e Plano de Tes
 - **IMPLEMENTADO:** com a alteração identificada.
 - **PENDENTE:** precisa do aparelho ou de jogadores.
 
+> **Atualização (lista G):** CPU com S2–S4 e alcance real, assists de p12–p15, DHC, correção do contra-golpe contra assist, Breaker com 320 px medido, busca de combos com S2–S4 e T15–T21 refeitos. O antes e depois dos 16 personagens e das duplas está em [relatorio-lista-g.md](relatorio-lista-g.md).
+
 ## Resumo
 
 | ID | Status | Resultado principal |
