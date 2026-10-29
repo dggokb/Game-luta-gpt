@@ -134,19 +134,20 @@ final class OpponentAi {
         // No ar a distância vista erra mais (os dois se mexem rápido, e o empurrão de quem passa
         // por cima muda o lado): ela só solta o aéreo com uma folga de alcance.
         String airAttack = s.verticalDistance <= 115f
-            ? CombatRules.pickInRange(AIR_ATTACKS, AIR_WEIGHTS,
-                s.self, true, s.distance + AIR_REACH_MARGIN, s.target, random.nextDouble())
+            ? CpuReach.pickInRange(AIR_ATTACKS, AIR_WEIGHTS,
+                s.self, true, s.distance + AIR_REACH_MARGIN, s.target, false, random.nextDouble())
             : null;
         boolean vsCrouch = s.targetCrouching && s.targetGrounded;
-        String groundAttack = CombatRules.pickInRange(vsCrouch ? GROUND_ATTACKS_VS_CROUCH : GROUND_ATTACKS,
+        // A régua real (CpuReach): o alcance do desenho, e só o que pega quem está agachado.
+        String groundAttack = CpuReach.pickInRange(vsCrouch ? GROUND_ATTACKS_VS_CROUCH : GROUND_ATTACKS,
             vsCrouch ? GROUND_WEIGHTS_VS_CROUCH : GROUND_WEIGHTS,
-            s.self, false, s.distance + GROUND_REACH_MARGIN, s.target, random.nextDouble());
+            s.self, false, s.distance + GROUND_REACH_MARGIN, s.target, vsCrouch, random.nextDouble());
 
         // Perto o bastante para o L (o começo do combo do caderno): prefere abrir com ele a
         // cutucar com um golpe solto, mais quanto maior o nível. A cutucada na ponta não emenda.
         // Com folga de alcance: a distância é a vista (com o atraso da reação), e o L é curto.
         if (groundAttack != null && !vsCrouch && !"L".equals(groundAttack) &&
-            CombatRules.reaches(s.self, "L", false, s.distance + STARTER_REACH_MARGIN, s.target) &&
+            CpuReach.reaches(s.self, "L", false, s.distance + STARTER_REACH_MARGIN, s.target, false) &&
             random.nextDouble() < starterChance(level)) {
             groundAttack = "L";
         }
@@ -173,7 +174,7 @@ final class OpponentAi {
             random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u) * (1.0 - 0.9 * smart(level))
         ) {
             actions.superAttack();
-        } else if (s.rivalZoning && energyInRange(s.self, s.distance) && !s.projectileActive &&
+        } else if (s.rivalZoning && energyInRange(s.self, s.distance, s.target) && !s.projectileActive &&
             random.nextDouble() < 0.25 + 0.45 * smart(level)) {
             // Contra quem fica soltando bola: devolve com a dela (as duas se anulam no meio).
             actions.energy(random.nextDouble() < 0.5 ? "M" : "H");
@@ -181,7 +182,7 @@ final class OpponentAi {
             // Ou vai atrás: parada de longe ela só leva bola. Correndo quando está longe.
             actions.moveForward(s.distance > 430f);
         } else if (
-            energyInRange(s.self, s.distance) &&
+            energyInRange(s.self, s.distance, s.target) &&
             !s.projectileActive &&
             random.nextDouble() < Math.min(0.6, 0.24 * style.zoning) * (1.0 - 0.5 * u)
         ) {
@@ -279,8 +280,15 @@ final class OpponentAi {
      * só de perto: o alcance dele mais o que o avanço anda.
      */
     static boolean energyInRange(CharacterDefinition self, float distance) {
+        return energyInRange(self, distance, null);
+    }
+
+    /** O S1 alcança daqui; o de corpo a corpo pela medida real (CpuReach) quando há, e o corpo do rival. */
+    static boolean energyInRange(CharacterDefinition self, float distance, CharacterDefinition.Body target) {
         AttackDefinition s = self.attack("S");
         if (s == null) return false;
+        float[] measured = target != null && s.melee() ? CpuReach.measured(self, "S") : null;
+        if (measured != null) return measured[0] >= 0f && distance <= measured[0] + target.halfWidth;
         if (s.melee()) {
             AttackDefinition.Mechanics m = s.mechanics;
             float advance = m.advanceSpeed > 0f ? m.advanceSpeed * (m.advanceEnd - m.advanceStart + 1) * CombatConfig.DT : 0f;

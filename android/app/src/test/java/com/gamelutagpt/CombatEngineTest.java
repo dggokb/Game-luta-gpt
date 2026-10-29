@@ -838,8 +838,9 @@ public class CombatEngineTest {
             if (!id.isEmpty() && npc.attackFrame == 0 && npc.move != null) {
                 started++;
                 float distance = Math.abs(s.f(0).x - npc.x);
+                // A régua da CPU é o alcance real do golpe (CpuReach: o do desenho, maior que o do pacote).
                 assertTrue(id + " out of reach at " + distance,
-                    distance <= CombatRules.maxCenterDistance(npc.move, BASE.fighter.body) + 0.5f);
+                    distance <= CpuReach.maxCenterDistance(NPC, id, !npc.grounded, BASE.fighter.body, false) + 0.5f);
             }
         }
         assertTrue("CPU attacks once in range", started > 0);

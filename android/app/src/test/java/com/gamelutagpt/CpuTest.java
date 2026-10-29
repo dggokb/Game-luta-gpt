@@ -117,7 +117,10 @@ public class CpuTest {
                     CombatFighter c = e.fighter(1);
                     if (c.attacking() && c.attackFrame == 0 && c.move != null) {
                         inicios++;
-                        if (Math.abs(e.fighter(0).x - c.x) > CombatRules.maxCenterDistance(c.move, target) + 0.5f) fora++;
+                        // A régua é o alcance real do golpe (CpuReach), o do desenho; no ar, o do pacote.
+                        float[] real = c.grounded ? CpuReach.measured(c.character(), c.attack.id) : null;
+                        float max = real != null ? real[0] + target.halfWidth : CombatRules.maxCenterDistance(c.move, target);
+                        if (Math.abs(e.fighter(0).x - c.x) > max + 0.5f) fora++;
                     }
                 }
             }

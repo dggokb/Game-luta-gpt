@@ -34,7 +34,8 @@ public class ExtractedSystemsTest {
             ai.think(1f,situation(distance),r);
             for(String action:r.log) if(action.startsWith("attack:")) {
                 String type=action.substring(7);
-                assertTrue(type+" out of reach",distance<=CombatRules.maxCenterDistance(NPC.move(type,false),PLAYER));
+                // A régua da CPU é o alcance real (CpuReach), o do desenho.
+                assertTrue(type+" out of reach",distance<=CpuReach.maxCenterDistance(NPC,type,false,PLAYER,false));
             }
         }
         // Far beyond every move and outside projectile range: it walks or dashes.

@@ -553,8 +553,8 @@ final class AiController {
         // O dedo já está no botão: com o rival de fato fora do alcance (a distância que ela viu
         // é a de antes da reação, e nesse meio tempo ele foi empurrado, voou de um golpe ou
         // trocou de lado por baixo dela), ela não solta o golpe no vazio.
-        if (attack != null && !CombatRules.reaches(me.character(), attack, !me.grounded,
-            Math.abs(target.x - me.x) + PRESS_REACH_MARGIN, target.body())) {
+        if (attack != null && !CpuReach.reaches(me.character(), attack, !me.grounded,
+            Math.abs(target.x - me.x) + PRESS_REACH_MARGIN, target.body(), target.crouchingBody())) {
             attack = null;
         }
         if (attack != null) {
@@ -877,7 +877,8 @@ final class AiController {
         float gap = Math.abs(target.x - me.x);
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"L", "2L", "M", "2M"}) {
-            if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            if (c.attack(starter) == null ||
+                !CpuReach.reaches(c, starter, false, gap, target.body(), target.crouchingBody())) continue;
             startRoute(c, starter);
             press(starter, me, out);
             lastReason = "combo breaker";
@@ -1007,7 +1008,7 @@ final class AiController {
             jabRange = 0f;
             for (String b : new String[] {"L", "2L"}) {
                 CharacterDefinition.Move move = c.move(b, false);
-                if (move != null) jabRange = Math.max(jabRange, CombatRules.maxCenterDistance(move, me.body()));
+                if (move != null) jabRange = Math.max(jabRange, CpuReach.maxCenterDistance(c, b, false, me.body(), false));
             }
         }
         return jabRange;
@@ -1021,7 +1022,7 @@ final class AiController {
             threatRange = 0f;
             for (String b : OpponentAi.GROUND_ATTACKS) {
                 CharacterDefinition.Move move = c.move(b, false);
-                if (move != null) threatRange = Math.max(threatRange, CombatRules.maxCenterDistance(move, me.body()));
+                if (move != null) threatRange = Math.max(threatRange, CpuReach.maxCenterDistance(c, b, false, me.body(), false));
             }
             threatRange += 40f;
         }
@@ -1117,7 +1118,8 @@ final class AiController {
         }
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"M", "L", "2L"}) {
-            if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            if (c.attack(starter) == null ||
+                !CpuReach.reaches(c, starter, false, gap, target.body(), target.crouchingBody())) continue;
             startRoute(c, starter);
             press(starter, me, out);
             lastReason = "guard break";
@@ -1156,7 +1158,7 @@ final class AiController {
         for (String starter : new String[] {"L", "2L", "M"}) {
             AttackDefinition a = c.attack(starter);
             if (a == null || a.startupFrames > left || c.move(starter, false) == null ||
-                !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+                !CpuReach.reaches(c, starter, false, gap, target.body(), target.crouchingBody())) continue;
             startRoute(c, starter);
             press(starter, me, out);
             guardFrames = 0;
@@ -1178,7 +1180,8 @@ final class AiController {
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"M", "L", "2L"}) {
             AttackDefinition a = c.attack(starter);
-            if (a == null || a.startupFrames > left || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            if (a == null || a.startupFrames > left ||
+                !CpuReach.reaches(c, starter, false, gap, target.body(), seen.crouching)) continue;
             startRoute(c, starter);
             press(starter, me, out);
             guardFrames = 0;
@@ -1189,7 +1192,8 @@ final class AiController {
         for (CpuSpecials.Option o : CpuSpecials.of(c)) {
             if (o.role != CpuSpecials.Role.RUSH && o.role != CpuSpecials.Role.POKE && o.role != CpuSpecials.Role.LOW &&
                 o.role != CpuSpecials.Role.ANTI_AIR && o.role != CpuSpecials.Role.ARMOR) continue;
-            if (o.attack.startupFrames > left || !CpuSpecials.reaches(o, gap, target.body()) || !lifeAllows(me, o)) continue;
+            if (o.attack.startupFrames > left || !CpuSpecials.reaches(o, gap, target.body(), seen.crouching) ||
+                !lifeAllows(me, o)) continue;
             pressSpecial(o, out);
             guardFrames = 0;
             lastReason = "punir (" + o.id + ")";
@@ -1357,7 +1361,7 @@ final class AiController {
                 (m.evade == AttackDefinition.Reads.ANY || air || !a.low)) {
                 start = m.evadeStart;
                 end = m.evadeEnd;
-            } else if (o.role == CpuSpecials.Role.ARMOR && CpuSpecials.reaches(o, gap, target.body())) {
+            } else if (o.role == CpuSpecials.Role.ARMOR && CpuSpecials.reaches(o, gap, target.body(), seen.crouching)) {
                 start = m.armorStart;
                 end = m.armorEnd;
             } else {
@@ -1403,7 +1407,7 @@ final class AiController {
         for (CpuSpecials.Option o : CpuSpecials.of(me.character())) {
             if (o.role != CpuSpecials.Role.ANTI_AIR || !lifeAllows(me, o)) continue;
             if (height < 0f || height > o.attack.hitHeight + 40f) continue;
-            if (CpuSpecials.reaches(o, gap, target.body())) return o;
+            if (CpuSpecials.reaches(o, gap, target.body(), false)) return o;
         }
         return null;
     }
@@ -1438,7 +1442,7 @@ final class AiController {
                     if (gap <= me.body().halfWidth + body.halfWidth + o.m().grabRange) w = situation.rivalBlocked ? 3.0 : 1.5;
                     break;
                 case PULL:
-                    if (gap >= 160f && CpuSpecials.reaches(o, gap, body)) w = 1.0;
+                    if (gap >= 160f && CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 1.0;
                     break;
                 case ECHO:
                     if (gap >= 100f && gap <= 360f) w = 1.0;
@@ -1448,16 +1452,16 @@ final class AiController {
                     if (pressed && gap <= 200f) w = 1.5;
                     break;
                 case RUSH:
-                    if (quick && gap >= 140f && CpuSpecials.reaches(o, gap, body)) w = 1.0;
+                    if (quick && gap >= 140f && CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 1.0;
                     break;
                 case LOW:
-                    if (quick && !seen.crouching && CpuSpecials.reaches(o, gap, body)) w = 1.0;
+                    if (quick && !seen.crouching && CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 1.0;
                     break;
                 case ARMOR:
-                    if (CpuSpecials.reaches(o, gap, body)) w = pressed ? 1.5 : quick ? 0.6 : 0.0;
+                    if (CpuSpecials.reaches(o, gap, body, seen.crouching)) w = pressed ? 1.5 : quick ? 0.6 : 0.0;
                     break;
                 case POKE:
-                    if (quick && CpuSpecials.reaches(o, gap, body)) w = 0.6;
+                    if (quick && CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 0.6;
                     break;
                 default:
                     break;   // esquiva, repel, o que sobe e o mergulho: só reagindo
@@ -1750,7 +1754,8 @@ final class AiController {
 
     /** O golpe no chão alcança o rival dessa distância (golpe sem alcance no pacote: não). */
     private static boolean alcanca(CharacterDefinition c, String option, float gap, CombatFighter target) {
-        return c.move(option, false) != null && CombatRules.reaches(c, option, false, gap, target.body());
+        return c.move(option, false) != null &&
+            CpuReach.reaches(c, option, false, gap, target.body(), target.crouchingBody());
     }
 
     /** O que tentar quando o próximo passo não alcança: o lançador, os fortes, os médios e o fecho. */

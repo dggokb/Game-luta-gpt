@@ -53,8 +53,11 @@ final class CpuSpecials {
         final String id;
         final AttackDefinition attack;
         final Role role;
-        /** Alcance do golpe somado ao avanço até o fim do ativo (golpe corpo a corpo). */
-        final float reach;
+        /**
+         * Ponta do golpe, centro a centro sem o corpo do rival: a medida real (CpuReach) quando há,
+         * senão o alcance do pacote somado ao avanço até o fim do ativo. Contra agachado, a sua.
+         */
+        float reach, reachCrouching;
         /** Projétil: até onde voa. */
         final float range;
         /** Comando de carga ([←] → ou [↓] ↑): só sai com a carga feita, como para o jogador. */
@@ -65,7 +68,18 @@ final class CpuSpecials {
             this.attack = attack;
             this.role = role;
             this.reach = reach;
+            this.reachCrouching = reach;
             this.range = range;
+        }
+
+        /** A ponta medida no motor (CpuReach), se o golpe está na tabela. */
+        Option measured(CharacterDefinition c) {
+            float[] m = CpuReach.measured(c, id);
+            if (m != null) {
+                reach = m[0];
+                reachCrouching = m[1];
+            }
+            return this;
         }
 
         Option charge(CharacterDefinition.Special s) {
@@ -93,7 +107,7 @@ final class CpuSpecials {
             String id = e.getKey();
             AttackDefinition a = c.attack(id);
             if (a == null) continue;
-            out.add(option(id, a, e.getValue()).charge(e.getValue()));
+            out.add(option(id, a, e.getValue()).charge(e.getValue()).measured(c));
         }
         // O S1 de mergulho (só no ar) a OpponentAi não solta: entra aqui.
         AttackDefinition s1 = c.attack("S");
@@ -135,8 +149,9 @@ final class CpuSpecials {
     }
 
     /** O golpe corpo a corpo pega o rival de corpo {@code target} a {@code gap} (centro a centro)? */
-    static boolean reaches(Option o, float gap, CharacterDefinition.Body target) {
-        return gap >= CombatRules.MIN_MELEE_DISTANCE && gap <= o.reach + target.halfWidth;
+    static boolean reaches(Option o, float gap, CharacterDefinition.Body target, boolean crouching) {
+        float tip = crouching ? o.reachCrouching : o.reach;
+        return tip >= 0f && gap >= CombatRules.MIN_MELEE_DISTANCE && gap <= tip + target.halfWidth;
     }
 
     /** A postura lê esse golpe (as regras do motor: alto = em pé e no ar; baixo = baixo no chão). */

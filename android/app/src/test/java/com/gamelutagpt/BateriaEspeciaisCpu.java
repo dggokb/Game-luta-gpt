@@ -152,6 +152,35 @@ public final class BateriaEspeciaisCpu {
         return String.format(Locale.ROOT, "%.1f (%.0f/%.0f)", usos / minutos, 100.0 * acertos / usos, 100.0 * defesas / usos);
     }
 
+    /** As duplas oficiais (as seis do torneio e as duas que ainda não estão prontas). */
+    static final String[][] DUPLAS = {{"player_base", "p02"}, {"p03", "p04"}, {"p05", "p06"}, {"p07", "p08"},
+        {"p09", "p10"}, {"p11", "p12"}, {"p13", "p14"}, {"p15", "p16"}};
+
+    /** 2x2 entre as duplas oficiais, todas contra todas, trocando de lado: vitórias de cada dupla. */
+    static void duplas(int porPar) {
+        int n = DUPLAS.length;
+        int[] vit = new int[n], lutas = new int[n];
+        for (int a = 0; a < n; a++) {
+            for (int b = 0; b < n; b++) {
+                if (a == b) continue;
+                for (int i = 0; i < porPar; i++) {
+                    BateriaBalanco.Luta l = new BateriaBalanco.Luta(DUPLAS[a], DUPLAS[b], BateriaBalanco.NIVEL,
+                        120_000 + a * 1000 + b * 20 + i, new CombatConfig());
+                    int w = l.rodar();
+                    lutas[a]++;
+                    lutas[b]++;
+                    if (w == 0) vit[a]++;
+                    else if (w == 1) vit[b]++;
+                }
+            }
+        }
+        System.out.println("| Dupla | vence |");
+        System.out.println("|---|---|");
+        for (int a = 0; a < n; a++) {
+            System.out.printf(Locale.ROOT, "| %s + %s | %.0f%% |%n", DUPLAS[a][0], DUPLAS[a][1], 100.0 * vit[a] / lutas[a]);
+        }
+    }
+
     static int slot(String id) {
         switch (id) {
             case "S": return 0;
@@ -169,6 +198,7 @@ public final class BateriaEspeciaisCpu {
         long t0 = System.nanoTime();
         if (qual.equals("ficha") || qual.equals("tudo")) ficha();
         if (qual.equals("uso") || qual.equals("tudo")) uso(porPar);
+        if (qual.equals("duplas") || qual.equals("tudo")) duplas(porPar);
         System.out.printf(Locale.ROOT, "%n(%.0f s)%n", (System.nanoTime() - t0) / 1e9);
     }
 }
