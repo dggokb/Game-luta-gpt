@@ -44,6 +44,12 @@ public class Resources {
     private final Map<String, Integer> ids = new HashMap<>();
     private final List<File> files = new ArrayList<>();
     private final Map<String, Prefetched> prefetched = new HashMap<>();
+    /**
+     * Quando a pré-carga de cada personagem começou. Um pedido avulso depois disso (a folha da
+     * vitória no meio da luta) decodificava de novo todas as outras folhas dele, que ficavam 2
+     * minutos esperando e viravam lixo: 9 GB alocados em 30 s de luta, e o coletor parava o jogo.
+     */
+    private final Map<String, Long> prefixosIniciados = new HashMap<>();
     private ExecutorService pool;
 
     private final android.util.DisplayMetrics metrics = android.util.DisplayMetrics.doPc();
@@ -103,6 +109,10 @@ public class Resources {
         int cut = name.indexOf('_');
         if (cut <= 0) return;
         String prefix = name.substring(0, cut + 1);
+        long agora = System.currentTimeMillis();
+        Long desde = prefixosIniciados.get(prefix);
+        if (desde != null && agora - desde < PREFETCH_TTL_MS) return;
+        prefixosIniciados.put(prefix, agora);
         String[] names = drawableDir.list();
         if (names == null) return;
         if (pool == null) {

@@ -169,18 +169,24 @@ final class HudRenderer {
         } else {
             drawArtTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
             drawArtTeam(c, s.opponent(), s.opponentReserve(), s.opponentReserveCharacter(), true, s.opponentTagReadyRatio(), portraits);
+            TesteAutomatico.hud(TesteAutomatico.HUD_TIMES);
             artwork(c, 0, 0, 1672, 280, 0f, 0f, 1280f, 170f);
+            TesteAutomatico.hud(TesteAutomatico.HUD_MOLDURA);
             // Entre as vidas: a barra do SHINKAI de quem está em campo (o assist foi para o círculo).
             drawShinkaiBar(c, active, false, 174f, 96f, 330f, 11f, shinkaiDuration);
             drawShinkaiBar(c, s.opponent(), true, 174f, 96f, 330f, 11f, shinkaiDuration);
+            TesteAutomatico.hud(TesteAutomatico.HUD_SHINKAI);
             drawArtPower(c, active, false);
             drawArtPower(c, s.opponent(), true);
+            TesteAutomatico.hud(TesteAutomatico.HUD_BARRAS);
             text(c, "PLAYER 1", 220f, 65f, 15f, Color.WHITE);
             text(c, "PLAYER 2", 1060f, 65f, 15f, Color.WHITE);
             text(c, "TAG", 222f, 132f, 13f, Color.WHITE);
             text(c, s.opponentReserve() == null ? "TAG OFF" : "TAG", 1058f, 132f, 13f, 0xFFBCC4D8);
         }
+        TesteAutomatico.hud(TesteAutomatico.HUD_TEXTOS);
         drawFrameEffects(c);
+        TesteAutomatico.hud(TesteAutomatico.HUD_EFEITOS);
         // Batalha: 120 segundos; treino e cenas da história: ∞ (nunca um relógio inventado).
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
         drawClock(c, s);
@@ -188,10 +194,13 @@ final class HudRenderer {
         if (s.debugEnabled()) {
             text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
         }
+        TesteAutomatico.hud(TesteAutomatico.HUD_RELOGIO);
         // No tutorial e nas lutas com conversa os botões de teste somem (o canto é dos quadros).
         if (!s.hideTestButtons()) drawTestButtons(c, s);
+        TesteAutomatico.hud(TesteAutomatico.HUD_TESTE);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), s.selectButtonLabel(),
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
+        TesteAutomatico.hud(TesteAutomatico.HUD_SELECAO);
     }
 
     /** Relógio da luta; nos últimos segundos fica vermelho e pulsa uma vez por segundo. */

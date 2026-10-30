@@ -30,6 +30,31 @@ final class TesteAutomatico {
     // O que o desenho em OpenGL conta durante o teste (tudo na thread do jogo).
     /** O teste está gravando (o OpenGL só conta a área pintada enquanto isso). */
     static boolean gravando;
+    /**
+     * A parte "hud" do quadro em pedaços, medida no aparelho (o perfil do PC não bate com o
+     * celular: lá as formas são nativas, e o processador e a placa são outros).
+     */
+    static final int HUD_TELA = 0, HUD_CORTE = 1, HUD_TIMES = 2, HUD_MOLDURA = 3, HUD_SHINKAI = 4, HUD_BARRAS = 5,
+        HUD_TEXTOS = 6, HUD_EFEITOS = 7, HUD_RELOGIO = 8, HUD_TESTE = 9, HUD_SELECAO = 10, HUD_MENSAGENS = 11,
+        HUD_TUTORIAL = 12, HUD_TOQUE = 13, HUD_CINEMA = 14, HUD_RESTO = 15;
+    private static final String[] PARTES_HUD = {"efeitos de tela", "corte/clash", "retratos e vida", "moldura",
+        "barra SHINKAI", "barras de super", "PLAYER/TAG", "efeitos do HUD", "relógio", "botões de teste", "SELEÇÃO",
+        "mensagens/combo", "tutorial", "controle de toque", "cinema/conversa", "vitória/Ultra/pausa"};
+    private static final long[] tempoHud = new long[PARTES_HUD.length];
+    private static long marcaHud;
+
+    static void hudInicio() {
+        if (gravando) marcaHud = System.nanoTime();
+    }
+
+    /** Fecha o pedaço {@code parte} do HUD: o tempo desde a marca anterior vai para ele. */
+    static void hud(int parte) {
+        if (!gravando) return;
+        long agora = System.nanoTime();
+        tempoHud[parte] += agora - marcaHud;
+        marcaHud = agora;
+    }
+
     /** PC, perfil de CPU ({@code -Pjfr}): sem a conta da área, para medir só o jogo. */
     static final boolean SEM_AREA = Boolean.getBoolean("gameluta.semArea");
     private static final java.util.HashMap<String, Integer> textosFeitos = new java.util.HashMap<>();
@@ -128,6 +153,7 @@ final class TesteAutomatico {
         textosFeitos.clear();
         areaDosTextos.clear();
         textosFora = 0;
+        java.util.Arrays.fill(tempoHud, 0);
         areaPorQuem.clear();
         areaNoQuadro.clear();
         quadrosPesados = 0;
@@ -306,6 +332,16 @@ final class TesteAutomatico {
                 PerfilQuadros.NOMES[a], soma[a] / c, PerfilQuadros.NOMES[b], soma[b] / c));
         }
         r.add(porMomento.toString());
+        Integer[] ordem = new Integer[PARTES_HUD.length];
+        for (int i = 0; i < ordem.length; i++) ordem[i] = i;
+        java.util.Arrays.sort(ordem, (x, y) -> Long.compare(tempoHud[y], tempoHud[x]));
+        StringBuilder hud = new StringBuilder("HUD por pedaço (ms/quadro):");
+        for (int j = 0; j < Math.min(9, ordem.length); j++) {
+            double ms = tempoHud[ordem[j]] / 1e6 / n;
+            if (ms < 0.05) break;
+            hud.append(String.format(Locale.ROOT, "  %s %.2f", PARTES_HUD[ordem[j]], ms));
+        }
+        r.add(hud.toString());
         double tn = 0, fo = 0, de = 0;
         int maxTextos = 0, maxFormas = 0;
         for (int[] g : gl) {

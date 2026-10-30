@@ -4157,6 +4157,7 @@ public class GameView extends SurfaceView
             // Na finalização a frente do cenário some junto com o resto dele.
             if (cenario && stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
             perfil.marca(PerfilQuadros.FRENTE);
+            TesteAutomatico.hudInicio();
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
@@ -4188,8 +4189,10 @@ public class GameView extends SurfaceView
                 canvas.drawRect(-40f, VH - bar, VW + 40f, VH + 40f, paint);
             }
 
+            TesteAutomatico.hud(TesteAutomatico.HUD_TELA);
             corteShinkai.desenhar(canvas);
             confronto.desenharBarra(canvas);
+            TesteAutomatico.hud(TesteAutomatico.HUD_CORTE);
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
                 // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.
@@ -4202,10 +4205,12 @@ public class GameView extends SurfaceView
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
+                TesteAutomatico.hud(TesteAutomatico.HUD_TOQUE);
                 cinematica.renderFaixas(renderCanvas);
                 if (TesteDesempenho.mensagens) conversa.render(renderCanvas);
                 if (narracao != null && faixas < 0.5f && TesteDesempenho.mensagens) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
+                TesteAutomatico.hud(TesteAutomatico.HUD_CINEMA);
             }
             telaVitoria.desenhar(canvas);
             if (abertura.isActive()) abertura.render(renderCanvas);
@@ -4217,6 +4222,7 @@ public class GameView extends SurfaceView
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
+            TesteAutomatico.hud(TesteAutomatico.HUD_RESTO);
             perfil.marca(PerfilQuadros.HUD);
         }
     }
@@ -4298,7 +4304,9 @@ public class GameView extends SurfaceView
     private void drawHud(Canvas c) {
         hud.drawHud(c, hudState, characterSelectRenderer);
         if (TesteDesempenho.mensagens) drawMensagens(c);
+        TesteAutomatico.hud(TesteAutomatico.HUD_MENSAGENS);
         hud.drawTutorial(c, tutorial, esquema);
+        TesteAutomatico.hud(TesteAutomatico.HUD_TUTORIAL);
         if (debugOverlay) {
             debug.drawPanel(c, engine, perfil.ultima());
             drawSizeTunerButton(c);

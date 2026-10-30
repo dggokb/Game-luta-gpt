@@ -397,6 +397,29 @@ Próximos candidatos, se o HUD continuar pesando:
   estado delas não muda;
 - formas fixas do HUD sem Path.
 
+### 5.11 PC: travadas de 200 ms (coletor de lixo) e o HUD medido por pedaço
+
+**Relatório do ROG Ally X:**
+- quadro médio de 11,4 ms, p95 de 12,1 ms, 60 FPS;
+- uns 5 quadros de 180 a 240 ms, todos na parte "atualiza".
+
+**Causa: pausas do G1.** Medido aqui com `-Pgc`, pausa total de 478 ms e mistas de 30 a 57 ms.
+- As folhas da dupla p16+p15 decodificadas ocupam 1,7 GB num heap fixo de 3 GB.
+- A pré-carga do PC (`Resources.startSiblings`) redecodificava todas as folhas do personagem a
+  cada pedido avulso. A folha da vitória, por exemplo, é pedida no meio da luta a partir de 40%
+  de vida, e cada vez gerava centenas de MB de lixo.
+
+**Correções:**
+- A pré-carga de cada personagem só recomeça depois de 2 minutos.
+- O jogo de PC roda com ZGC (`-XX:+UseZGC`, pausas abaixo de 1 ms) e metade da RAM
+  (`-XX:MaxRAMPercentage=50`). Com ZGC não houve mais travadas do coletor no teste.
+- Durante a luta, a thread do jogo aloca cerca de 7 MB/s, o que é pouco.
+
+**HUD por pedaço:** o teste automático passou a medir a parte "hud" em pedaços (retratos e vida,
+moldura, barra SHINKAI, barras de super, botões de teste, controle de toque, mensagens...), no
+próprio aparelho. O perfil do PC (5.10) não batia com o celular: a busca de texto e a conta de
+área não mudaram o HUD do celular (4,2 → 5,1 ms, dentro da variação entre rodadas).
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

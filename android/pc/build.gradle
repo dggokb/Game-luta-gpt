@@ -159,8 +159,12 @@ tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 application {
     mainClass = 'com.gamelutagpt.pc.JogoPc'
     applicationName = 'GameLutaGPT'
-    // Os atlas decodificados de uma partida passam de 400 MB.
-    applicationDefaultJvmArgs = ['-Xmx3g', '-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8']
+    // As folhas decodificadas de uma dupla passam de 1,5 GB (p16+p15: 1,7 GB). Com 3 GB fixos o
+    // G1 vivia apertado e parava o jogo para compactar (pausas de 200–480 ms, na "atualiza" do
+    // teste automático). ZGC: o coletor trabalha junto com o jogo (pausas abaixo de 1 ms), com
+    // metade da memória do computador (no ROG Ally X, 12 GB).
+    applicationDefaultJvmArgs = ['-XX:+UseZGC', '-XX:MaxRAMPercentage=50', '-Dfile.encoding=UTF-8',
+                                 '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8']
 }
 
 // gradle :pc:run joga lendo os arquivos direto do repositório (sem copiar nada).
@@ -288,11 +292,13 @@ tasks.register('medirLuta', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.gamelutagpt.pc.MedirLuta'
     workingDir = rootProject.projectDir
+    // O coletor do jogo de PC (ZGC); -Pg1 mede com o G1 de antes.
+    if (!providers.gradleProperty('g1').isPresent()) jvmArgs '-XX:+UseZGC'
     jvmArgs '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
     systemProperty 'gameluta.repo', repoRoot.absolutePath
     systemProperty 'java.awt.headless', 'true'
     systemProperty 'gameluta.semSom', 'true'
-    maxHeapSize = '3g'
+    maxHeapSize = providers.gradleProperty('heap').getOrElse('6g')
     args layout.buildDirectory.dir('medir-luta').get().asFile.absolutePath
     if (providers.gradleProperty('resolucao').isPresent()) args providers.gradleProperty('resolucao').get()
     // -Pgl: a luta pela placa de vídeo (OpenGL), como na janela do jogo (precisa de DISPLAY).
@@ -305,6 +311,10 @@ tasks.register('medirLuta', JavaExec) {
     if (providers.gradleProperty('jfr').isPresent()) {
         systemProperty 'gameluta.semArea', 'true'
         jvmArgs "-XX:StartFlightRecording=filename=${layout.buildDirectory.dir('medir-luta').get().asFile.absolutePath}/luta.jfr,settings=profile,jdk.ExecutionSample#period=1ms"
+    }
+    // -Pgc: registro das pausas do coletor de lixo em pc/build/medir-luta/gc.log.
+    if (providers.gradleProperty('gc').isPresent()) {
+        jvmArgs "-Xlog:gc:file=${layout.buildDirectory.dir('medir-luta').get().asFile.absolutePath}/gc.log"
     }
     // -Parea: de onde vem cada desenho grande (o que pinta a tela muitas vezes), no fim do relatório.
     if (providers.gradleProperty('area').isPresent()) systemProperty 'gameluta.areaPorOrigem', 'true'
