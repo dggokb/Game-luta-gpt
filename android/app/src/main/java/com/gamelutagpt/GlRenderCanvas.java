@@ -203,6 +203,7 @@ final class GlRenderCanvas implements RenderCanvas {
         textos.clear();
         ultimoDoTexto.clear();
         degrades.clear();
+        linhaDoObjeto.clear();
         atlasTexto = novaTextura(ATLAS_TEXTO, ATLAS_TEXTO);
         atlasDegrade = novaTextura(256, LINHAS_DEGRADE);
         geracaoTexto++;
@@ -582,6 +583,13 @@ final class GlRenderCanvas implements RenderCanvas {
     /** O recorte de agora: {@code n} semiplanos já em pixels da janela (null ou 0: sem recorte). */
     void recorte(float[] planos, int n) {
         if (planos == recorte && n == nPlanos) return;
+        // O mesmo recorte noutro vetor (cada clipRect faz o seu): não fecha o lote.
+        int m = planos == null ? 0 : Math.min(n, MAX_PLANOS);
+        if (m == nPlanos && planos != null && recorte != null) {
+            boolean igual = true;
+            for (int i = 0; i < m * 3 && igual; i++) igual = planos[i] == recorte[i];
+            if (igual) return;
+        }
         descarregar();
         recorte = planos;
         nPlanos = planos == null ? 0 : Math.min(n, MAX_PLANOS);
@@ -656,7 +664,12 @@ final class GlRenderCanvas implements RenderCanvas {
      * O tipo do vértice para o degradê (4 linear, 5 radial, com a linha dele na fração). A linha
      * é feita na primeira vez (as cores, já com o alfa multiplicado).
      */
+    /** A linha de cada degradê pelo próprio objeto (os do HUD são campos): sem montar a chave por desenho. */
+    private final java.util.IdentityHashMap<Degrade.Dados, Integer> linhaDoObjeto = new java.util.IdentityHashMap<>();
+
     float tipoDegrade(Degrade.Dados dados) {
+        Integer pronta = linhaDoObjeto.get(dados);
+        if (pronta != null) return (dados.radial() ? 5f : 4f) + (pronta + 0.5f) / LINHAS_DEGRADE * 0.99f;
         int[] cores = dados.cores();
         float[] pos = dados.posicoes();
         chaveDegrade.setLength(0);
@@ -671,11 +684,14 @@ final class GlRenderCanvas implements RenderCanvas {
                 descarregar();
                 executar();
                 degrades.clear();
+                linhaDoObjeto.clear();
             }
             linha = degrades.size();
             degrades.put(chave, linha);
             escreverDegrade(cores, pos, linha);
         }
+        if (linhaDoObjeto.size() > 512) linhaDoObjeto.clear();
+        linhaDoObjeto.put(dados, linha);
         float q = (linha + 0.5f) / LINHAS_DEGRADE * 0.99f;
         return (dados.radial() ? 5f : 4f) + q;
     }
@@ -951,13 +967,10 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {
-        // O contorno vira um anel de 24 traços.
-        int n = 24;
-        for (int i = 0; i < n; i++) {
-            double a0 = Math.PI * 2 * i / n, a1 = Math.PI * 2 * (i + 1) / n;
-            drawLine(cx + radius * (float)Math.cos(a0), cy + radius * (float)Math.sin(a0),
-                cx + radius * (float)Math.cos(a1), cy + radius * (float)Math.sin(a1), width, argb);
-        }
+        if ((argb >>> 24) == 0 || width <= 0f) return;
+        // Anel no shader (tipo 6, a fração é o raio de dentro): um retângulo em vez de 24 traços.
+        float h = width * 0.5f, fora = radius + h, dentro = Math.max(0f, radius - h) / fora;
+        retanguloUv(cx - fora, cy - fora, cx + fora, cy + fora, -1f, -1f, 1f, 1f, argb, 6f + Math.min(0.999f, dentro));
     }
 
     @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) {
@@ -1052,6 +1065,8 @@ final class GlRenderCanvas implements RenderCanvas {
         float origemX, origemY, escala;
         /** Tamanho da fonte em que foi feito (o reaproveitado em outro tamanho estica por ele). */
         float base;
+        /** A escala pedida (antes do teto de pixels) e o contorno com que foi feito. */
+        float escalaPedida, traco;
     }
     private final java.util.HashMap<String, Texto> textos = new java.util.HashMap<>();
     /** Como no CanvasGl: no máximo tantos textos feitos por quadro; os outros reaproveitam o último. */
@@ -1073,24 +1088,47 @@ final class GlRenderCanvas implements RenderCanvas {
             fillArgb |= 0xFF000000;
             strokeArgb |= 0xFF000000;
         }
-        // Na resolução em que vai aparecer (a escala atual), em degraus de um quarto de oitava para
-        // reaproveitar: a faixa da legenda que abre esticando não vira um texto por quadro.
-        float escala = (float)Math.sqrt(Math.abs(a * d - b * c)) * kz;
+        // Na resolução em que vai aparecer: o maior eixo da escala atual (a faixa da legenda que abre
+        // esticando só na largura não muda a altura das letras), em degraus de um quarto de oitava.
+        float escala = Math.max(Math.max((float)Math.hypot(a, c), (float)Math.hypot(b, d)),
+            Math.max((float)Math.hypot(a, b), (float)Math.hypot(c, d))) * kz;
         escala = (float)Math.pow(2.0, Math.ceil(Math.log(Math.max(0.25f, escala)) / Math.log(2) * 4.0) / 4.0);
+        // O contorno no tamanho do degrau, em degraus de 1/8 de oitava (como no CanvasGl).
+        float traco = strokeWidth <= 0f ? 0f
+            : (float)Math.pow(2.0, Math.round(Math.log(strokeWidth / kz) / Math.log(2) * 8.0) / 8.0);
         String chave = text + '\u0000' + base + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000'
-            + strokeWidth + '\u0000' + italic + '\u0000' + escala;
+            + traco + '\u0000' + italic + '\u0000' + escala;
         Texto t = textos.get(chave);
         float k = kz;
         if (t == null) {
+            if (falhos.contains(chave)) return;
             String solta = text + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000' + italic;
-            Texto ultimo = textosNovosRc >= NOVOS_POR_QUADRO ? ultimoDoTexto.get(solta) : null;
-            if (ultimo != null) {
+            Texto ultimo = ultimoDoTexto.get(solta);
+            if (ultimo != null && ultimo.base == base && ultimo.traco == traco
+                && ultimo.escalaPedida >= escala * 0.999f && ultimo.escalaPedida <= escala * 2.01f) {
+                // Entra grande e encolhe (o nome do Ultra, a onomatopeia, o FINAL): o bitmap do
+                // quadro maior serve aos menores.
+                t = ultimo;
+            } else if (ultimo != null && textosNovosRc >= NOVOS_POR_QUADRO) {
                 t = ultimo;
                 k = size / ultimo.base;
             } else {
-                t = criarTexto(text, base * escala, fillArgb, strokeArgb, strokeWidth * escala, italic);
-                if (t == null) return;
+                // No máximo ~0,4 Mpx e o lado da textura dos textos: a placa de vídeo amplia o resto.
+                float pedida = escala;
+                float px = estimarPixels(text, base * escala, traco * escala, italic);
+                float reduz = px > MAX_PIXELS_TEXTO ? (float)Math.sqrt(MAX_PIXELS_TEXTO / px) : 1f;
+                reduz = Math.min(reduz, Math.min(2000f / Math.max(1f, ultimaLargura), 2000f / Math.max(1f, ultimaAltura)));
+                if (reduz < 1f) escala *= reduz;
+                t = criarTexto(text, base * escala, fillArgb, strokeArgb, traco * escala, italic);
+                if (t == null) {
+                    // Não cabe nem reduzido: não tenta de novo a cada quadro.
+                    if (falhos.size() > 256) falhos.clear();
+                    falhos.add(chave);
+                    return;
+                }
                 t.escala = escala;
+                t.escalaPedida = pedida;
+                t.traco = traco;
                 t.base = base;
                 textosNovosRc++;
                 textos.put(chave, t);
@@ -1102,6 +1140,22 @@ final class GlRenderCanvas implements RenderCanvas {
         // Centralizado em x, com a linha de base em y (como no Canvas).
         float l = x - t.origemX * k, top = y - t.origemY * k;
         desenharTexto(t.uv, l, top, l + t.largura * k, top + t.altura * k, alfaComum ? (alfa << 24) | 0xFFFFFF : 0xFFFFFFFF);
+    }
+
+    private static final float MAX_PIXELS_TEXTO = 400_000f;
+    private final java.util.HashSet<String> falhos = new java.util.HashSet<>();
+    private float ultimaLargura, ultimaAltura;
+
+    private float estimarPixels(String text, float size, float strokeWidth, boolean italic) {
+        textoPaint.setTextSize(size);
+        textoPaint.setTextSkewX(italic ? -0.22f : 0f);
+        float largura = textoPaint.measureText(text);
+        Paint.FontMetrics fm = textoPaint.getFontMetrics();
+        textoPaint.setTextSkewX(0f);
+        float margem = strokeWidth + size * 0.25f + 2f;
+        ultimaLargura = largura + margem * 2f;
+        ultimaAltura = fm.bottom - fm.top + margem * 2f;
+        return ultimaLargura * ultimaAltura;
     }
 
     private Texto criarTexto(String text, float size, int fill, int stroke, float strokeWidth, boolean italic) {

@@ -1175,7 +1175,7 @@ final class HudRenderer {
         if (showText) {
             paint.setColor(Color.WHITE);
             paint.setTextSize(12f);
-            c.drawText(fighter.superHudLabel, left, bottom + 13f, paint);
+            c.drawText(fighter.superHudLabel(), left, bottom + 13f, paint);
         }
     }
 
@@ -1394,15 +1394,18 @@ final class HudRenderer {
         else if (f.shinkaiUsed) label(c, "USADO", x, y + 11f, 9f, 0xFFB4BCCB);
     }
 
-    private int shinkaiTenthsShown = -1;
+    private int shinkaiSecondsShown = -1;
     private String shinkaiText = "";
 
-    /** "3.4s": rebuilt only when the tenth changes, not every frame. */
+    /**
+     * "4s", em segundos inteiros (arredondados para cima): no OpenGL cada texto novo vira um
+     * bitmap, e o décimo ("3.4s") fazia dois por 0,1 s durante o SHINKAI inteiro.
+     */
     private String shinkaiLabel(float seconds) {
-        int tenths = Math.max(0, Math.round(seconds * 10f));
-        if (tenths != shinkaiTenthsShown) {
-            shinkaiTenthsShown = tenths;
-            shinkaiText = tenths / 10 + "." + tenths % 10 + "s";
+        int whole = Math.max(0, (int)Math.ceil(seconds - 1e-4f));
+        if (whole != shinkaiSecondsShown) {
+            shinkaiSecondsShown = whole;
+            shinkaiText = whole + "s";
         }
         return shinkaiText;
     }

@@ -249,7 +249,9 @@ final class CanvasGl extends Canvas {
         gl.recorte(recortes[k], nRecortes[k]);
         gl.alfa(alfas[k]);
         gl.inverter(invertidos[k]);
-        gl.filtro(null);
+        // O filtro de cor só vale para imagem, e cada caminho de imagem põe o seu (drawBitmap pelo
+        // Paint, o sprite pelo do lutador, o RenderCanvas sem filtro): zerar aqui fechava o lote a
+        // cada sprite tingido (o contorno do SHINKAI, o rastro, os ecos).
     }
 
     /** Escala da transformação atual (pixels da tela por unidade). */
@@ -702,8 +704,8 @@ final class CanvasGl extends Canvas {
     private void preencher(Path path, Path.FillType tipo) {
         float[][] contornos = aproximar(path);
         if (contornos.length == 0) return;
-        if (contornos.length == 1 && tipo != Path.FillType.INVERSE_WINDING && tipo != Path.FillType.INVERSE_EVEN_ODD && convexo(contornos[0], contornos[0].length / 2)) {
-            leque(contornos[0], contornos[0].length / 2);
+        if (tipo != Path.FillType.INVERSE_WINDING && tipo != Path.FillType.INVERSE_EVEN_ODD && semStencil(contornos)) {
+            for (float[] c : contornos) leque(c, c.length / 2);
             return;
         }
         // Qualquer outra forma: os leques marcam o stencil e a caixa da forma pinta onde ficou marcado.
@@ -766,6 +768,8 @@ final class CanvasGl extends Canvas {
 
     private static void adicionar(java.util.List<float[]> saida, float[] a, int de, int ate) {
         int n = ate - de;
+        // O contorno fechado repete o primeiro ponto no fim: fora (desviava o centro do leque).
+        if (n > 3 && a[de * 3 + 1] == a[(ate - 1) * 3 + 1] && a[de * 3 + 2] == a[(ate - 1) * 3 + 2]) n--;
         if (n < 3) return;
         float[] c = new float[n * 2];
         for (int i = 0; i < n; i++) {
@@ -775,6 +779,60 @@ final class CanvasGl extends Canvas {
         saida.add(c);
     }
 
+    /**
+     * A forma sai em leques, sem o stencil: cada contorno convexo ou estrelado a partir do centro
+     * (estrelas de impacto, chamas do nível, farpas do desgaste, a cauda do projétil) e, com mais
+     * de um, sem as caixas deles se encostarem (o "!" do combo breaker: a cunha e o ponto).
+     */
+    private static boolean semStencil(float[][] contornos) {
+        for (float[] c : contornos) {
+            int n = c.length / 2;
+            if (!convexo(c, n) && !estrelado(c, n)) return false;
+        }
+        if (contornos.length == 1) return true;
+        for (int i = 0; i < contornos.length; i++) {
+            for (int j = i + 1; j < contornos.length; j++) {
+                if (caixasSeTocam(contornos[i], contornos[j])) return false;
+            }
+        }
+        return true;
+    }
+
+    /** Todo ponto vê o centro (a média dos pontos, de onde o leque sai): o leque cobre a forma certa. */
+    private static boolean estrelado(float[] p, int n) {
+        if (n < 3) return false;
+        float cx = 0f, cy = 0f;
+        for (int i = 0; i < n; i++) {
+            cx += p[i * 2];
+            cy += p[i * 2 + 1];
+        }
+        cx /= n;
+        cy /= n;
+        int sinal = 0;
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            float ax = p[i * 2] - cx, ay = p[i * 2 + 1] - cy, bx = p[j * 2] - cx, by = p[j * 2 + 1] - cy;
+            float z = ax * by - ay * bx;
+            if (Math.abs(z) <= 1e-5f * (Math.abs(ax) + Math.abs(ay)) * (Math.abs(bx) + Math.abs(by))) continue;
+            int s = z > 0 ? 1 : -1;
+            if (sinal == 0) sinal = s;
+            else if (s != sinal) return false;
+        }
+        return sinal != 0;
+    }
+
+    private static boolean caixasSeTocam(float[] a, float[] b) {
+        float al = Float.MAX_VALUE, at = Float.MAX_VALUE, ar = -Float.MAX_VALUE, ab = -Float.MAX_VALUE;
+        for (int i = 0; i + 1 < a.length; i += 2) {
+            al = Math.min(al, a[i]); ar = Math.max(ar, a[i]); at = Math.min(at, a[i + 1]); ab = Math.max(ab, a[i + 1]);
+        }
+        float bl = Float.MAX_VALUE, bt = Float.MAX_VALUE, br = -Float.MAX_VALUE, bb = -Float.MAX_VALUE;
+        for (int i = 0; i + 1 < b.length; i += 2) {
+            bl = Math.min(bl, b[i]); br = Math.max(br, b[i]); bt = Math.min(bt, b[i + 1]); bb = Math.max(bb, b[i + 1]);
+        }
+        return al <= br && bl <= ar && at <= bb && bt <= ab;
+    }
+
     private static boolean convexo(float[] p, int n) {
         if (n < 3) return false;
         int sinal = 0;
@@ -782,7 +840,8 @@ final class CanvasGl extends Canvas {
             float ax = p[((i + 1) % n) * 2] - p[i * 2], ay = p[((i + 1) % n) * 2 + 1] - p[i * 2 + 1];
             float bx = p[((i + 2) % n) * 2] - p[((i + 1) % n) * 2], by = p[((i + 2) % n) * 2 + 1] - p[((i + 1) % n) * 2 + 1];
             float z = ax * by - ay * bx;
-            if (Math.abs(z) < 1e-6f) continue;
+            // Tolerância relativa ao tamanho dos lados (forma pequena desenhada ampliada).
+            if (Math.abs(z) <= 1e-5f * (Math.abs(ax) + Math.abs(ay)) * (Math.abs(bx) + Math.abs(by))) continue;
             int s = z > 0 ? 1 : -1;
             if (sinal == 0) sinal = s;
             else if (s != sinal) return false;
@@ -873,7 +932,7 @@ final class CanvasGl extends Canvas {
 
     // ---- Texto: cada texto vira um bitmap feito pelo Paint de verdade, guardado como textura ----
 
-    private static final int TEXTOS = 160;
+    private static final int TEXTOS = 512;
     private static final float MAX_PIXELS_TEXTO = 400_000f;
 
     private static final class Texto {
@@ -884,6 +943,8 @@ final class CanvasGl extends Canvas {
         float origemX, origemY, largura, altura;
         /** Tamanho da fonte em que foi feito (o reaproveitado em outro tamanho estica por ele). */
         float base;
+        /** Escala pedida e contorno com que foi feito (o reaproveitamento do maior confere). */
+        float esc, traco;
     }
 
     /**
@@ -896,7 +957,9 @@ final class CanvasGl extends Canvas {
     private final java.util.HashMap<String, Texto> ultimoDoTexto = new java.util.HashMap<>();
     private final StringBuilder chaveSolta = new StringBuilder();
 
-    private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, false) {
+    // Na ordem de uso (LRU): na de inserção, cada texto passageiro (relógio, combo, dano) tirava
+    // um texto do HUD usado em todo quadro, refeito no quadro seguinte.
+    private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, true) {
         @Override protected boolean removeEldestEntry(Map.Entry<String, Texto> velho) {
             return size() > TEXTOS;
         }
@@ -991,9 +1054,13 @@ final class CanvasGl extends Canvas {
                 .append(p.getStyle().ordinal()).append(',').append(p.getTextAlign().ordinal()).append(',')
                 .append(mascara ? "M" : sh != null ? String.valueOf(System.identityHashCode(sh)) : "");
             solta = chaveSolta.toString();
-            if (textosNovos >= NOVOS_POR_QUADRO) {
-                Texto ultimo = ultimoDoTexto.get(solta);
-                if (ultimo != null && ultimo.geracao == gl.geracaoTexto) {
+            Texto ultimo = ultimoDoTexto.get(solta);
+            if (ultimo != null && ultimo.geracao == gl.geracaoTexto) {
+                if (ultimo.base == base && ultimo.traco == traco && ultimo.esc >= esc * 0.999f && ultimo.esc <= esc * 2.01f) {
+                    // O texto que entra grande e encolhe (o SHINKAI, a vitória, o nome do Ultra):
+                    // o bitmap do quadro maior serve aos menores, a placa de vídeo reduz.
+                    t = ultimo;
+                } else if (textosNovos >= NOVOS_POR_QUADRO) {
                     t = ultimo;
                     k = tamanho / ultimo.base;
                 }
@@ -1017,6 +1084,8 @@ final class CanvasGl extends Canvas {
             t = criarTexto(s, x, y, feito, esc);
             if (t == null) return;
             t.base = base;
+            t.esc = esc;
+            t.traco = traco;
             textosNovos++;
             textos.put(kt, t);
             if (ultimoDoTexto.size() > TEXTOS * 2) ultimoDoTexto.clear();
@@ -1055,6 +1124,9 @@ final class CanvasGl extends Canvas {
         // vídeo estica o resto. Poucos assim enchiam a textura dos textos, que era refeita.
         float px = lw * lh * esc * esc;
         if (px > MAX_PIXELS_TEXTO) esc *= (float)Math.sqrt(MAX_PIXELS_TEXTO / px);
+        // E cabendo na textura dos textos (2048): maior que ela, o texto nem aparecia e era feito
+        // de novo a cada quadro.
+        esc = Math.min(esc, Math.min(2000f / Math.max(1f, lw), 2000f / Math.max(1f, lh)));
         int bw = (int)Math.ceil(lw * esc), bh = (int)Math.ceil(lh * esc);
         if (bw <= 0 || bh <= 0 || bw > 4096 || bh > 4096) return null;
         Bitmap bmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888);
