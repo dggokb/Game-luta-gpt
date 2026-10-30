@@ -1670,9 +1670,15 @@ public class GameView extends SurfaceView
                 aplicarQualidade();
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
-            // Na luta em OpenGL o swap já espera a batida da tela: dormir aqui só somava erro (um
-            // quadro perdido virava dois ou três).
-            if (remaining > 0 && !(glQuadro && desenhoGl.trocaEsperaTela())) {
+            if (glQuadro && desenhoGl.trocaEsperaTela()) {
+                // Na luta em OpenGL o swap já espera a batida da tela: dormir o resto inteiro só
+                // somava erro (um quadro perdido virava dois ou três). Mas com a tela a 120 Hz há
+                // aparelho que ignora a troca a cada duas batidas (o Xiaomi do teste desenhava 74
+                // quadros por segundo para uma luta de 60: trabalho jogado fora e o celular
+                // esquentando). Quadro que voltou cedo dorme até 3 ms antes dos 16,6.
+                remaining -= 3_000_000L;
+            }
+            if (remaining > 0) {
                 try {
                     if (esperaFina) {
                         // PC: o sleep do Windows pode acordar só no tique de 15,6 ms (um quadro de

@@ -459,6 +459,54 @@ No PC (com `-Ptoque`) o controle de toque caiu de 0,11 para 0,06 ms, e os botõe
 lista. No celular espera-se de 1,74 para uns 0,5 ms e de 1,05 para perto de zero, mas falta
 confirmar com o TESTE.
 
+### 5.13 Textos criados numa thread separada e limite de 60 FPS no OpenGL
+
+O relatório do celular depois do 5.12 mostrou:
+- **Quadro médio:** 19,3 ms.
+- **HUD por pedaço:** caiu, com o controle de toque em 0,76 ms e os botões de teste em 0,25 ms.
+- **Picos de HUD no SHINKAI:** de 58 a 90 ms.
+- **Ritmo da tela:** 74 FPS numa tela de 120 Hz.
+
+**Picos no SHINKAI.** No PC (`-Pgl -Ptoque -Parea`) o pior quadro do SHINKAI era "hud 38, textos 10
+em 44 ms". O bitmap de cada texto novo era desenhado na hora, no quadro que o pedia:
+
+| Texto | Custo de cada vez |
+|---|---|
+| O SHINKAI do corte | ~4,5 ms |
+| Os números do dano | 2–3 ms |
+| O COMBO BREAKER! | ~2,5 ms |
+| O nome do Ultra e as onomatopeias da página final (caminho do RenderCanvas) | 3–4 ms |
+
+**Correção.**
+- O bitmap do texto é desenhado na thread "Textos", só na CPU:
+  - `CanvasGl.rasterizar`;
+  - `GlRenderCanvas.criarTexto` com um pincel copiado.
+- Na thread do OpenGL fica só a subida para a textura dos textos (`guardarTexto`), quando ele fica
+  pronto.
+- Enquanto não fica, aparece o mesmo texto em outro tamanho, esticado, ou nada naquele quadro. Ele
+  aparece 1 ou 2 quadros depois.
+- Pedaços gravados (5.12) com texto ainda em preparo não são guardados; o contador é
+  `textosAdiados`.
+
+**Limite de 60 FPS no OpenGL.** Quando a troca de tela volta cedo (tela de 120 Hz), o laço espera o
+resto dos 16,6 ms, descontando 3 ms de folga para a troca. Isso evita esquentar o aparelho rodando
+acima do pedido.
+
+**Medição.** O relatório agora traz "Criando textos" (ms por quadro, pior quadro e total), e os
+piores quadros dizem quantos textos foram feitos e em quanto tempo. Com `-Parea`, cada texto acima
+de 2 ms sai no console como "TEXTO LENTO".
+
+**No PC:**
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Criando textos | 10 textos em 44 ms nos piores quadros | 0,05 ms por quadro |
+| Pior quadro criando textos | — | 3,8 ms (só a subida das linhas do contador de FPS) |
+| Piores quadros do SHINKAI | — | 0 textos |
+| HUD | — | 0,8 ms em média |
+
+Falta confirmar no celular com o TESTE.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

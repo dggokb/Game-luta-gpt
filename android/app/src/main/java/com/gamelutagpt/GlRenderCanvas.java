@@ -1492,8 +1492,14 @@ final class GlRenderCanvas implements RenderCanvas {
         float base;
         /** A escala pedida (antes do teto de pixels) e o contorno com que foi feito. */
         float escalaPedida, traco;
+        /** O bitmap desenhado na thread dos textos, até subir para a placa. */
+        Bitmap bitmap;
     }
     private final java.util.HashMap<String, Texto> textos = new java.util.HashMap<>();
+    /** Textos sendo desenhados na thread dos textos (a do CanvasGl), pela chave. */
+    private final java.util.HashMap<String, java.util.concurrent.Future<Texto>> emPreparo = new java.util.HashMap<>();
+    /** Textos que faltaram ou saíram esticados porque ainda estavam sendo feitos (o CanvasGl não grava). */
+    int textosAdiadosRc;
     /** Como no CanvasGl: no máximo tantos textos feitos por quadro; os outros reaproveitam o último. */
     private static final int NOVOS_POR_QUADRO = 6;
     int textosNovosRc;
@@ -1540,28 +1546,69 @@ final class GlRenderCanvas implements RenderCanvas {
                 t = ultimo;
                 k = size / ultimo.base;
             } else {
-                // No máximo ~0,4 Mpx e o lado da textura dos textos: a placa de vídeo amplia o resto.
-                float pedida = escala;
-                float px = estimarPixels(text, base * escala, traco * escala, italic);
-                float reduz = px > MAX_PIXELS_TEXTO ? (float)Math.sqrt(MAX_PIXELS_TEXTO / px) : 1f;
-                reduz = Math.min(reduz, Math.min(2000f / Math.max(1f, ultimaLargura), 2000f / Math.max(1f, ultimaAltura)));
-                if (reduz < 1f) escala *= reduz;
-                TesteAutomatico.textoPedido(text);
-                t = criarTexto(text, base * escala, fillArgb, strokeArgb, traco * escala, italic);
-                if (t == null) {
-                    // Não cabe nem reduzido: não tenta de novo a cada quadro.
-                    if (falhos.size() > 256) falhos.clear();
-                    falhos.add(chave);
-                    return;
+                // O bitmap é desenhado na thread dos textos (como no CanvasGl): o nome do Ultra e as
+                // onomatopeias custavam 3–4 ms cada no quadro em que apareciam.
+                java.util.concurrent.Future<Texto> pedido = emPreparo.get(chave);
+                if (pedido == null) {
+                    // No máximo ~0,4 Mpx e o lado da textura dos textos: a placa de vídeo amplia o resto.
+                    float pedida = escala;
+                    float px = estimarPixels(text, base * escala, traco * escala, italic);
+                    float reduz = px > MAX_PIXELS_TEXTO ? (float)Math.sqrt(MAX_PIXELS_TEXTO / px) : 1f;
+                    reduz = Math.min(reduz, Math.min(2000f / Math.max(1f, ultimaLargura), 2000f / Math.max(1f, ultimaAltura)));
+                    if (reduz < 1f) escala *= reduz;
+                    final float esc = escala, fBase = base, fTraco = traco;
+                    final int fill = fillArgb, stroke = strokeArgb, limite = maxTextura;
+                    final Paint pincel = new Paint(textoPaint);
+                    pedido = CanvasGl.textosAFazer().submit(() -> {
+                        Texto feito = criarTexto(pincel, text, fBase * esc, fill, stroke, fTraco * esc, italic, limite);
+                        if (feito != null) {
+                            feito.escala = esc;
+                            feito.escalaPedida = pedida;
+                            feito.traco = fTraco;
+                            feito.base = fBase;
+                        }
+                        return feito;
+                    });
+                    if (emPreparo.size() > 256) emPreparo.clear();
+                    emPreparo.put(chave, pedido);
                 }
-                t.escala = escala;
-                t.escalaPedida = pedida;
-                t.traco = traco;
-                t.base = base;
-                textosNovosRc++;
-                textos.put(chave, t);
-                if (ultimoDoTexto.size() > 320) ultimoDoTexto.clear();
-                ultimoDoTexto.put(solta, t);
+                Texto pronto = null;
+                if (pedido.isDone()) {
+                    emPreparo.remove(chave);
+                    try {
+                        pronto = pedido.get();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } catch (java.util.concurrent.ExecutionException e) {
+                        pronto = null;
+                    }
+                    if (pronto != null) {
+                        TesteAutomatico.textoPedido(text);
+                        long antesDoTexto = System.nanoTime();
+                        Bitmap bmp = pronto.bitmap;
+                        pronto.bitmap = null;
+                        pronto.uv = guardarTexto(bmp);
+                        TesteAutomatico.tempoDeTexto(System.nanoTime() - antesDoTexto);
+                        if (pronto.uv == null) pronto = null;
+                    }
+                    if (pronto == null) {
+                        // Não cabe nem reduzido: não tenta de novo a cada quadro.
+                        if (falhos.size() > 256) falhos.clear();
+                        falhos.add(chave);
+                        return;
+                    }
+                    t = pronto;
+                    textosNovosRc++;
+                    textos.put(chave, t);
+                    if (ultimoDoTexto.size() > 320) ultimoDoTexto.clear();
+                    ultimoDoTexto.put(solta, t);
+                } else {
+                    // Ainda sendo feito: o último deste texto esticado, ou nada neste quadro.
+                    textosAdiadosRc++;
+                    if (ultimo == null) return;
+                    t = ultimo;
+                    k = size / ultimo.base;
+                }
             }
         }
         k /= t.escala;
@@ -1586,7 +1633,9 @@ final class GlRenderCanvas implements RenderCanvas {
         return ultimaLargura * ultimaAltura;
     }
 
-    private Texto criarTexto(String text, float size, int fill, int stroke, float strokeWidth, boolean italic) {
+    /** O bitmap do texto, em qualquer thread (com um pincel só dela; não mexe no OpenGL). */
+    private static Texto criarTexto(Paint textoPaint, String text, float size, int fill, int stroke, float strokeWidth,
+                                    boolean italic, int maxTextura) {
         textoPaint.setTextSize(size);
         textoPaint.setTextSkewX(italic ? -0.22f : 0f);
         float largura = textoPaint.measureText(text);
@@ -1608,11 +1657,8 @@ final class GlRenderCanvas implements RenderCanvas {
         textoPaint.setStyle(Paint.Style.FILL);
         textoPaint.setColor(fill);
         cv.drawText(text, bx, by, textoPaint);
-        textoPaint.setTextSkewX(0f);
-        float[] uv = guardarTexto(bmp);
-        if (uv == null) return null;
         Texto t = new Texto();
-        t.uv = uv;
+        t.bitmap = bmp;
         t.largura = w;
         t.altura = h;
         // A âncora: o meio do texto na horizontal e a linha de base.

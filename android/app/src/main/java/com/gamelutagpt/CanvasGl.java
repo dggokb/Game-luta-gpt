@@ -259,6 +259,8 @@ final class CanvasGl extends Canvas {
     private final java.util.HashMap<Object, GlRenderCanvas.Gravacao> gravacoes = new java.util.HashMap<>();
     private Object gravando;
     private int textosAntesDaGravacao;
+    /** Textos que ainda estavam na thread dos textos (faltaram ou saíram esticados): não se grava. */
+    private int textosAdiados;
 
     /**
      * Repete o pedaço {@code chave} gravado com o mesmo {@code estado} (e a mesma transformação,
@@ -276,7 +278,7 @@ final class CanvasGl extends Canvas {
             return true;
         }
         gravando = gl.nPlanos() == 0 ? chave : null;
-        textosAntesDaGravacao = textosNovos + gl.textosNovosRc;
+        textosAntesDaGravacao = textosNovos + textosAdiados + gl.textosNovosRc + gl.textosAdiadosRc;
         if (gravando != null) gl.gravarComecar();
         return false;
     }
@@ -287,7 +289,7 @@ final class CanvasGl extends Canvas {
         gravando = null;
         GlRenderCanvas.Gravacao g = gl.gravarTerminar();
         // Com texto feito agora (talvez um provisório, esticado de outro tamanho) grava no próximo.
-        if (g == null || textosNovos + gl.textosNovosRc != textosAntesDaGravacao) {
+        if (g == null || textosNovos + textosAdiados + gl.textosNovosRc + gl.textosAdiadosRc != textosAntesDaGravacao) {
             gravacoes.remove(chave);
             return;
         }
@@ -988,6 +990,8 @@ final class CanvasGl extends Canvas {
         float base;
         /** Escala pedida e contorno com que foi feito (o reaproveitamento do maior confere). */
         float esc, traco;
+        /** O bitmap desenhado na thread dos textos, até subir para a placa. */
+        Bitmap bitmap;
     }
 
     /**
@@ -1012,6 +1016,8 @@ final class CanvasGl extends Canvas {
     /** Contexto novo: as texturas dos textos se foram. */
     void esquecerTextos() {
         textos.clear();
+        emPreparo.clear();
+        textosFalhos.clear();
         ultimoDoTexto.clear();
         gravacoes.clear();
     }
@@ -1243,32 +1249,70 @@ final class CanvasGl extends Canvas {
             }
         }
         if (t == null) {
-            Paint feito = p;
-            if (mascara || sh == null || p.getAlpha() != 255 || base != tamanho || traco != p.getStrokeWidth()) {
-                // Opaco e no degrau de tamanho: a transparência e o resto da escala vêm no desenho.
-                pincelTexto.set(p);
+            if (textosFalhos.contains(kt)) return;
+            // O bitmap do texto é desenhado na thread dos textos; aqui ele só sobe para a placa
+            // quando fica pronto. Desenhar na hora custava 2–5 ms por texto (o SHINKAI do corte, os
+            // números do dano, o COMBO BREAKER!) e os quadros que faziam vários passavam de 40 ms.
+            java.util.concurrent.Future<Texto> pedido = emPreparo.get(kt);
+            if (pedido == null) {
+                // Uma cópia só dela: a thread dos textos desenha com o pincel enquanto este muda.
+                Paint feito = new Paint(p);
                 if (mascara) {
-                    pincelTexto.setShader(null);
-                    pincelTexto.setColor(0xFFFFFFFF);
+                    feito.setShader(null);
+                    feito.setColor(0xFFFFFFFF);
                 } else if (sh == null) {
-                    pincelTexto.setColor(0xFFFFFFFF);
+                    feito.setColor(0xFFFFFFFF);
                 } else {
-                    pincelTexto.setAlpha(255);
+                    feito.setAlpha(255);
                 }
-                pincelTexto.setTextSize(base);
-                pincelTexto.setStrokeWidth(traco);
-                feito = pincelTexto;
+                feito.setTextSize(base);
+                feito.setStrokeWidth(traco);
+                final String texto = s;
+                final float px = x, py = y, pesc = esc;
+                pedido = textosAFazer().submit(() -> rasterizar(texto, px, py, feito, pesc));
+                if (emPreparo.size() > 256) emPreparo.clear();
+                emPreparo.put(kt, pedido);
             }
-            TesteAutomatico.textoPedido(s);
-            t = criarTexto(s, x, y, feito, esc);
-            if (t == null) return;
-            t.base = base;
-            t.esc = esc;
-            t.traco = traco;
-            textosNovos++;
-            textos.put(kt, t);
-            if (ultimoDoTexto.size() > TEXTOS * 2) ultimoDoTexto.clear();
-            ultimoDoTexto.put(solta, t);
+            Texto pronto = null;
+            if (pedido.isDone()) {
+                emPreparo.remove(kt);
+                try {
+                    pronto = pedido.get();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (java.util.concurrent.ExecutionException e) {
+                    pronto = null;
+                }
+                if (pronto == null) {
+                    if (textosFalhos.size() > 256) textosFalhos.clear();
+                    textosFalhos.add(kt);
+                    return;
+                }
+            }
+            if (pronto != null) {
+                TesteAutomatico.textoPedido(s);
+                long antesDoTexto = System.nanoTime();
+                boolean guardou = guardar(pronto);
+                TesteAutomatico.tempoDeTexto(System.nanoTime() - antesDoTexto);
+                if (!guardou) return;
+                t = pronto;
+                t.base = base;
+                t.esc = esc;
+                t.traco = traco;
+                textosNovos++;
+                textos.put(kt, t);
+                if (ultimoDoTexto.size() > TEXTOS * 2) ultimoDoTexto.clear();
+                ultimoDoTexto.put(solta, t);
+            } else {
+                // Ainda na thread dos textos: o mesmo texto em outro tamanho, esticado, ou nada
+                // neste quadro (ele aparece no próximo ou no outro).
+                textosAdiados++;
+                Texto ultimo = ultimoDoTexto.get(solta);
+                if (ultimo == null || !gl.textoVale(ultimo.uv, ultimo.geracao)) return;
+                t = ultimo;
+                k = tamanho / ultimo.base;
+                esticado = true;
+            }
         }
         // O reaproveitado esticado (passou dos textos novos do quadro) é provisório: fica fora do atalho.
         if (tingido && !esticado) guardarAtalho(s, atalho, t, base, esc, traco, estilo, alinhamento, inclinacao,
@@ -1327,7 +1371,35 @@ final class CanvasGl extends Canvas {
         gl.desenharTexto(t.uv, l, top, r, b, sh == null ? cor : (p.getAlpha() << 24) | 0xFFFFFF);
     }
 
-    private Texto criarTexto(String s, float x, float y, Paint p, float esc) {
+    /** A thread que desenha os bitmaps dos textos (só CPU: a placa de vídeo fica nesta). */
+    private static java.util.concurrent.ExecutorService textosAFazer;
+    private final java.util.HashMap<String, java.util.concurrent.Future<Texto>> emPreparo = new java.util.HashMap<>();
+    private final java.util.HashSet<String> textosFalhos = new java.util.HashSet<>();
+
+    static synchronized java.util.concurrent.ExecutorService textosAFazer() {
+        if (textosAFazer == null) {
+            textosAFazer = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+                Thread th = new Thread(r, "Textos");
+                th.setDaemon(true);
+                return th;
+            });
+        }
+        return textosAFazer;
+    }
+
+    /** Sobe o bitmap desenhado na thread dos textos para a textura dos textos (nesta thread). */
+    private boolean guardar(Texto texto) {
+        Bitmap bmp = texto.bitmap;
+        texto.bitmap = null;
+        if (bmp == null) return false;
+        texto.uv = gl.guardarTexto(bmp);
+        if (texto.uv == null) return false;
+        texto.geracao = gl.geracaoTexto;
+        return true;
+    }
+
+    /** O bitmap do texto, desenhado em qualquer thread (não mexe no OpenGL). Null se não dá. */
+    private static Texto rasterizar(String s, float x, float y, Paint p, float esc) {
         float w = p.measureText(s);
         Paint.FontMetrics fm = p.getFontMetrics();
         float margem = p.getTextSize() * 0.35f + p.getStrokeWidth() + 2f;
@@ -1354,9 +1426,7 @@ final class CanvasGl extends Canvas {
         cv.translate(-l, -t);
         cv.drawText(s, x, y, p);
         Texto texto = new Texto();
-        texto.uv = gl.guardarTexto(bmp);
-        if (texto.uv == null) return null;
-        texto.geracao = gl.geracaoTexto;
+        texto.bitmap = bmp;
         texto.origemX = x - l;
         texto.origemY = y - t;
         texto.largura = bw / esc;

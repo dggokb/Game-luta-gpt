@@ -26,6 +26,8 @@ final class TesteAutomatico {
     private final List<long[]> quadros = new ArrayList<>();
     /** Bytes de textura subidos em cada quadro gravado. */
     private final List<Long> subidas = new ArrayList<>();
+    /** Tempo criando textos em cada quadro gravado (ns). */
+    private final List<Long> temposDeTexto = new ArrayList<>();
 
     // O que o desenho em OpenGL conta durante o teste (tudo na thread do jogo).
     /** O teste está gravando (o OpenGL só conta a área pintada enquanto isso). */
@@ -59,6 +61,14 @@ final class TesteAutomatico {
     static final boolean SEM_AREA = Boolean.getBoolean("gameluta.semArea");
     private static final java.util.HashMap<String, Integer> textosFeitos = new java.util.HashMap<>();
     private static long bytesNoQuadro;
+    /** Tempo criando textos (desenhar o bitmap e mandar para a placa) no quadro de agora. */
+    private static long nsTextosNoQuadro;
+
+    static void tempoDeTexto(long ns) {
+        if (!gravando) return;
+        nsTextosNoQuadro += ns;
+        if (areaPorOrigem && ns > 2_000_000L) System.out.println(String.format(Locale.ROOT, "TEXTO LENTO %.1f ms  %s", ns / 1e6, textoPedido));
+    }
     private static int atlasCheio;
 
     private static String textoPedido = "";
@@ -150,6 +160,8 @@ final class TesteAutomatico {
         gl.clear();
         relatorio = null;
         subidas.clear();
+        temposDeTexto.clear();
+        nsTextosNoQuadro = 0;
         textosFeitos.clear();
         areaDosTextos.clear();
         textosFora = 0;
@@ -244,6 +256,8 @@ final class TesteAutomatico {
         quadros.add(q);
         subidas.add(bytesNoQuadro);
         bytesNoQuadro = 0;
+        temposDeTexto.add(nsTextosNoQuadro);
+        nsTextosNoQuadro = 0;
         contextos.add(contexto);
         gl.add(new int[] {textosNovos, formas, desenhos, telasX10});
         if (areaPorOrigem) {
@@ -395,6 +409,13 @@ final class TesteAutomatico {
                 maxTelas = Math.max(maxTelas, g[3]);
             }
             r.add(String.format(Locale.ROOT, "Área pintada: %.1f telas por quadro (máx %.1f)", telas / 10.0 / n, maxTelas / 10.0));
+            long somaTexto = 0, piorTexto = 0;
+            for (long ns : temposDeTexto) {
+                somaTexto += ns;
+                piorTexto = Math.max(piorTexto, ns);
+            }
+            r.add(String.format(Locale.ROOT, "Criando textos: %.2f ms por quadro, pior quadro %.1f ms, %.0f ms no total",
+                somaTexto / 1e6 / n, piorTexto / 1e6, somaTexto / 1e6));
         }
         Integer[] idx = new Integer[n];
         for (int i = 0; i < n; i++) idx[i] = i;
@@ -406,8 +427,9 @@ final class TesteAutomatico {
             int maior = 0;
             for (int k = 1; k < total; k++) if (q[k] > q[maior]) maior = k;
             long mb = subidas.get(i) >> 20;
-            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d%s)", tempos[i],
+            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d em %.0f ms%s)", tempos[i],
                 PerfilQuadros.NOMES[maior], q[maior] / 1e6, MOMENTOS[momento(contextos.get(i))], gl.get(i)[3] / 10.0, gl.get(i)[0],
+                temposDeTexto.get(i) / 1e6,
                 subidas.get(i) > 0 ? ", subiu " + (mb > 0 ? mb + " MB" : (subidas.get(i) >> 10) + " KB") : ""));
         }
         r.add(piores.toString());
