@@ -60,6 +60,13 @@ public final class MotionEvent {
 
     public float getY(int pointerIndex) { return ys[pointerIndex]; }
 
+    /** No PC cada evento traz um ponto só (sem os do meio que o Android junta). */
+    public int getHistorySize() { return 0; }
+
+    public float getHistoricalX(int pointerIndex, int pos) { return xs[pointerIndex]; }
+
+    public float getHistoricalY(int pointerIndex, int pos) { return ys[pointerIndex]; }
+
     public long getDownTime() { return downTime; }
 
     public long getEventTime() { return eventTime; }

@@ -771,31 +771,73 @@ final class CanvasGl extends Canvas {
         texto(text.subSequence(start, end).toString(), x, y, p);
     }
 
+    private final Paint pincelTexto = new Paint();
+
+    /**
+     * Escala em que o texto é feito: poucos degraus (um quarto de oitava), e a placa de vídeo
+     * estica o resto. Texto que cresce ou encolhe (o aviso de golpe forte, o contador) não vira
+     * um bitmap novo a cada quadro.
+     */
+    private static float degrauDeEscala(float e) {
+        double d = Math.ceil(Math.log(Math.max(0.25f, e)) / Math.log(2) * 4.0) / 4.0;
+        return (float)Math.pow(2.0, d);
+    }
+
     private void texto(String s, float x, float y, Paint p) {
         if (s == null || s.isEmpty()) return;
         prepararGl();
-        float esc = Math.max(0.25f, Math.round(escala() * 8f) / 8f);
+        float esc = degrauDeEscala(escala());
         Shader sh = p.getShader();
+        // Degradê linear: o texto vira só a forma (branca) e o degradê é posto pela placa de vídeo.
+        boolean mascara = sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial();
+        int cor = p.getColor();
         chave.setLength(0);
-        chave.append(s).append('\u0000').append(p.getTextSize()).append(',').append(p.getColor()).append(',')
+        // A transparência da cor fica de fora: entra na hora de desenhar (o texto que some aos
+        // poucos é o mesmo bitmap).
+        chave.append(s).append('\u0000').append(p.getTextSize()).append(',')
+            .append(mascara ? 0 : (cor | 0xFF000000)).append(',')
             .append(p.getStyle().ordinal()).append(',').append(p.getStrokeWidth()).append(',')
             .append(p.getTextAlign().ordinal()).append(',').append(p.getTextSkewX()).append(',')
             .append(p.isFakeBoldText()).append(',').append(p.getTextScaleX()).append(',')
             .append(System.identityHashCode(p.getTypeface())).append(',').append(esc);
         if (Build.VERSION.SDK_INT >= 21) chave.append(',').append(p.getLetterSpacing());
-        // Com degradê o desenho depende de onde o texto está.
-        if (sh != null) chave.append(',').append(System.identityHashCode(sh)).append(',').append(x).append(',').append(y);
+        if (mascara) {
+            chave.append(",M");
+        } else if (sh != null) {
+            // Outro shader: o desenho depende de onde o texto está.
+            chave.append(',').append(System.identityHashCode(sh)).append(',').append(x).append(',').append(y);
+        }
         String k = chave.toString();
         Texto t = textos.get(k);
         if (t != null && t.geracao != gl.geracaoTexto) t = null;
         if (t == null) {
-            t = criarTexto(s, x, y, p, esc);
+            Paint feito = p;
+            if (mascara || (sh == null && (cor >>> 24) != 255)) {
+                pincelTexto.set(p);
+                pincelTexto.setShader(null);
+                pincelTexto.setColor(mascara ? 0xFFFFFFFF : cor | 0xFF000000);
+                feito = pincelTexto;
+            }
+            t = criarTexto(s, x, y, feito, esc);
             if (t == null) return;
             textosNovos++;
             textos.put(k, t);
         }
-        float l = x - t.origemX, top = y - t.origemY;
-        gl.desenharTexto(t.uv, l, top, l + t.largura, top + t.altura, 0xFFFFFFFF);
+        float l = x - t.origemX, top = y - t.origemY, r = l + t.largura, b = top + t.altura;
+        if (mascara) {
+            pincel(p);
+            uv(l, top);
+            float t0 = uvU;
+            uv(r, top);
+            float t1 = uvU;
+            uv(r, b);
+            float t2 = uvU;
+            uv(l, b);
+            gl.desenharTextoDegrade(t.uv, l, top, r, b, t0, t1, t2, uvU, tipoPincel, p.getAlpha());
+            return;
+        }
+        int alfa = sh == null ? cor >>> 24 : p.getAlpha();
+        gl.desenharTexto(t.uv, l, top, r, b, (alfa << 24) | 0xFFFFFF);
     }
 
     private Texto criarTexto(String s, float x, float y, Paint p, float esc) {

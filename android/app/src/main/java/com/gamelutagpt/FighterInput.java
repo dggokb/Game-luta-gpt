@@ -8,7 +8,7 @@ package com.gamelutagpt;
 final class FighterInput {
     /** Screen direction 0..8: 0 neutral, then → ↘ ↓ ↙ ← ↖ ↑ ↗ (see ControlsLayout). */
     int direction;
-    static final int PASSOU_MAX = 8;
+    static final int PASSOU_MAX = 16;
     /**
      * Direções por onde o direcional passou desde o quadro anterior, antes de {@link #direction}
      * (o toque é mais rápido que os quadros). O motor põe todas no histórico dos comandos.

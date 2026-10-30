@@ -62,7 +62,8 @@ final class GlRenderCanvas implements RenderCanvas {
     // lisa; 1: imagem (uTex); 2: círculo (uv de -1 a 1, borda suave); 3: brilho (do centro para
     // fora, de cheio a transparente); 4: degradê linear (u é a posição nele) e 5: radial (uv vai do
     // centro, 1 na borda), com a linha do degradê na textura dos degradês na fração; 6: anel (a
-    // fração é o raio de dentro); 7: texto (na textura dos textos). Cores já multiplicadas pelo
+    // fração é o raio de dentro); 7: texto (na textura dos textos); 8: texto com degradê linear
+    // (a forma do texto na textura dos textos; a posição no degradê vem no vermelho da cor). Cores já multiplicadas pelo
     // alfa. O filtro vale só para imagem e trabalha na cor sem o alfa multiplicado, como o
     // ColorMatrix do Android. O recorte são semiplanos em pixels da janela (y para cima).
     private static final String FRAGMENTOS =
@@ -101,8 +102,12 @@ final class GlRenderCanvas implements RenderCanvas {
         "  } else if (k < 6.5) {\n" +
         "    float d = length(vUv), w = max(fwidth(d), 1e-4);\n" +
         "    c = vCor * (clamp((1.0 - d) / w, 0.0, 1.0) * clamp((d - q) / w, 0.0, 1.0));\n" +
-        "  } else {\n" +
+        "  } else if (k < 7.5) {\n" +
         "    c = texture(uTexto, vUv) * vCor;\n" +
+        "  } else {\n" +
+        "    float m = texture(uTexto, vUv).a;\n" +
+        "    vec4 g = texture(uDegrade, vec2(clamp(vCor.r, 0.0, 1.0) * 0.99609375 + 0.001953125, q / 0.99));\n" +
+        "    c = g * (m * vCor.a);\n" +
         "  }\n" +
         "  if (uInverte) c.rgb = vec3(c.a) - c.rgb;\n" +
         "  cor = c;\n" +
@@ -743,6 +748,40 @@ final class GlRenderCanvas implements RenderCanvas {
         alturaPrateleira = Math.max(alturaPrateleira, h + 2);
         float k = 1f / ATLAS_TEXTO;
         return new float[] {x * k, y * k, (x + w) * k, (y + h) * k};
+    }
+
+    /**
+     * A forma de um texto guardado pintada por um degradê linear: {@code t0..t3} é a posição no
+     * degradê em cada canto (esquerda-cima, direita-cima, direita-baixo, esquerda-baixo).
+     */
+    void desenharTextoDegrade(float[] uv, float l, float t, float r, float b,
+                              float t0, float t1, float t2, float t3, float tipoDegrade, int alpha) {
+        float tipo = 8f + (tipoDegrade - (float)Math.floor(tipoDegrade));
+        float al = alpha / 255f * alfaGlobal;
+        reservar(6);
+        verticeCru(l, t, uv[0], uv[1], t0, al, tipo);
+        verticeCru(r, t, uv[2], uv[1], t1, al, tipo);
+        verticeCru(r, b, uv[2], uv[3], t2, al, tipo);
+        verticeCru(l, t, uv[0], uv[1], t0, al, tipo);
+        verticeCru(r, b, uv[2], uv[3], t2, al, tipo);
+        verticeCru(l, b, uv[0], uv[3], t3, al, tipo);
+    }
+
+    /** Vértice com o vermelho levando um número (não uma cor) e o alfa já pronto. */
+    private void verticeCru(float x, float y, float u, float v, float vermelho, float al, float tipo) {
+        float[] o = dados;
+        int k = posicao;
+        o[k] = a * x + c * y + e;
+        o[k + 1] = b * x + d * y + f;
+        o[k + 2] = u;
+        o[k + 3] = v;
+        o[k + 4] = vermelho;
+        o[k + 5] = 0f;
+        o[k + 6] = 0f;
+        o[k + 7] = al;
+        o[k + 8] = tipo;
+        posicao = k + FLOATS;
+        vertices++;
     }
 
     /** Um texto guardado ({@link #guardarTexto}) no retângulo, sem trocar de textura. */

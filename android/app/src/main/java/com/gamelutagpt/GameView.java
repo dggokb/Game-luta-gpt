@@ -5509,8 +5509,14 @@ public class GameView extends SurfaceView
         if (dpadPointer == -1 || getWidth() == 0 || getHeight() == 0) return;
         int pointerIndex = event.findPointerIndex(dpadPointer);
         if (pointerIndex < 0) return;
-        pad.setDirection(ControlsLayout.dpadDirectionAt(
-            event.getX(pointerIndex) / (getWidth() / VW), event.getY(pointerIndex) / (getHeight() / VH)));
+        float sx = getWidth() / VW, sy = getHeight() / VH;
+        // Cada evento traz os pontos por onde o dedo passou desde o anterior (o Android junta
+        // vários num só): a diagonal de um ↓ ↘ → ligeiro costuma estar só no meio deles.
+        for (int h = 0; h < event.getHistorySize(); h++) {
+            pad.setDirection(ControlsLayout.dpadDirectionAt(
+                event.getHistoricalX(pointerIndex, h) / sx, event.getHistoricalY(pointerIndex, h) / sy));
+        }
+        pad.setDirection(ControlsLayout.dpadDirectionAt(event.getX(pointerIndex) / sx, event.getY(pointerIndex) / sy));
     }
 
     private void clearPendingInput() {
@@ -5729,6 +5735,11 @@ public class GameView extends SurfaceView
             if (dpadPointer != -1) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);
                 if (pointerIndex >= 0) {
+                    // Os pontos do meio que o Android juntou neste evento, antes do último.
+                    for (int h = 0; h < event.getHistorySize(); h++) {
+                        pad.setDirection(ControlsLayout.dpadDirectionAt(
+                            event.getHistoricalX(pointerIndex, h) / sx, event.getHistoricalY(pointerIndex, h) / sy));
+                    }
                     pad.setDirection(ControlsLayout.dpadDirectionAt(
                         event.getX(pointerIndex) / sx, event.getY(pointerIndex) / sy));
                 }
