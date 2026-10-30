@@ -263,15 +263,26 @@ public class Canvas {
 
     public void scale(float sx, float sy) { g.scale(sx, sy); }
 
+    /**
+     * Como no Android: pelos translate/scale de quem estende (o CanvasGl relê a transformação só
+     * quando eles avisam). Direto no Graphics2D, o espelho do lutador virado para a esquerda
+     * ({@code scale(-1, 1, x, 0)}) não chegava ao OpenGL e o adversário aparecia de costas.
+     */
     public final void scale(float sx, float sy, float px, float py) {
-        g.translate(px, py);
-        g.scale(sx, sy);
-        g.translate(-px, -py);
+        if (sx == 1f && sy == 1f) return;
+        translate(px, py);
+        scale(sx, sy);
+        translate(-px, -py);
     }
 
     public void rotate(float degrees) { g.rotate(Math.toRadians(degrees)); }
 
-    public final void rotate(float degrees, float px, float py) { g.rotate(Math.toRadians(degrees), px, py); }
+    public final void rotate(float degrees, float px, float py) {
+        if (degrees == 0f) return;
+        translate(px, py);
+        rotate(degrees);
+        translate(-px, -py);
+    }
 
     public void skew(float sx, float sy) { g.shear(sx, sy); }
 
