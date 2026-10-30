@@ -195,8 +195,10 @@ final class DesenhoGl implements SurfaceHolder.Callback {
                     return false;
                 }
                 corrente = true;
-                // A luta inteira sai por aqui: esta superfície marca o ritmo da tela.
-                EGL14.eglSwapInterval(tela, 1);
+                // A luta inteira sai por aqui: esta superfície marca o ritmo da tela. Numa tela de 120 Hz
+                // que ficou em 120 (o pedido de 60 é só uma preferência), uma troca a cada duas
+                // batidas: o jogo anda a 60, e desenhar 120 quadros era o dobro de trabalho e calor.
+                EGL14.eglSwapInterval(tela, taxaDaTela() >= 100f ? 2 : 1);
             }
             if (contextoNovo) {
                 // Contexto novo: as texturas de antes (e as folhas que só existiam nelas) se foram.
@@ -239,6 +241,15 @@ final class DesenhoGl implements SurfaceHolder.Callback {
      * O contexto foi criado de novo depois de ter texturas (o aparelho perdeu o anterior): as
      * folhas que só estavam lá precisam ser decodificadas de novo. Responde uma vez.
      */
+    private float taxaDaTela() {
+        try {
+            android.view.Display tela = view.getDisplay();
+            return tela != null ? tela.getRefreshRate() : 60f;
+        } catch (RuntimeException e) {
+            return 60f;
+        }
+    }
+
     boolean contextoRecriado() {
         boolean r = recriado;
         recriado = false;
@@ -384,11 +395,6 @@ final class DesenhoGl implements SurfaceHolder.Callback {
      */
     int subir(SpriteAtlasCache atlases, long orcamentoNs) {
         return subir(atlases, orcamentoNs, Integer.MAX_VALUE);
-    }
-
-    /** Sobe no máximo uma folha pronta (uma rara que acabou de carregar, no meio da luta). Devolve quantas faltam. */
-    int subirUma(SpriteAtlasCache atlases) {
-        return subir(atlases, Long.MAX_VALUE / 4, 1);
     }
 
     private int subir(SpriteAtlasCache atlases, long orcamentoNs, int maximo) {

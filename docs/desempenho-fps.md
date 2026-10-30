@@ -198,7 +198,7 @@ A ordem seguida foi CPU primeiro, porque no aparelho o envio para a GPU mede de 
   - `CanvasGl` só relê a matriz quando ela mudou (flag de matriz suja nas sobrescritas de `translate`/`scale`/`rotate`/`skew`/`concat`/`setMatrix`/`restore`).
   - Buffers reaproveitados em recortes, retângulos, arredondados, elipses e linhas.
 - **R2:** cenário e packs de Ultra da luta vêm de um `AndroidRenderAssets` próprio (`daLuta`). Com OpenGL, decodifica em memória comum, sobe e solta o bitmap. Se o Canvas precisar da imagem depois, ela é decodificada de novo.
-- **R3:** com o pack do Ultra carregado (a partir de 2 barras), as imagens dele sobem para o OpenGL uma por quadro (`GameView.preSubirUltra`). O primeiro quadro do raio não paga mais o envio.
+- **R3:** as imagens do pack do Ultra sobem para o OpenGL uma por quadro durante a abertura dele (`GameView.preSubirUltra`; ver 5.5).
 - **R4:** no celular, as folhas só de VICTORY, TAUNT, ULTRA_SEQ e ULTRA_SEQ_FRENTE ficam fora do `preload`/`antecipar` (`SpriteAtlasCache.ocasionaisSobDemanda`). São de 10% a 30% de cada personagem, cerca de 355 MB somando o elenco na escala 1. Elas são pedidas sem bloquear (`pedir`):
   - **ULTRA_SEQ:** a partir de 2 barras. Na ativação, a abertura do Ultra espera a folha, como já esperava o pack.
   - **VICTORY:** quando o rival está com até 40% da vida ou o relógio chega a 20 s. Se a folha ainda não chegou, o vencedor fica parado até ela chegar.
@@ -207,6 +207,44 @@ A ordem seguida foi CPU primeiro, porque no aparelho o envio para a GPU mede de 
   Uma folha rara que fica pronta no meio da luta sobe para o OpenGL num quadro sem outro envio. Se ainda assim alguém desenhar uma folha que não carregou, `get` decodifica só ela, sem passar pelo `preload` (que a pularia). INTRO e SUPER_* continuam no `preload`.
 
 Ainda não feitos: R1, R5, R7, E1–E4.
+
+### 5.5 Varredura de 30/10 (cinco frentes em paralelo)
+
+Medido no aparelho antes dela: 95 textos novos por quadro com as mensagens, 79–99 formas pelo
+stencil por quadro, 7 FPS no SHINKAI, picos ("pior") de 74–194 ms.
+
+- **Textos (CanvasGl e GlRenderCanvas):**
+  - cache na ordem de uso (LRU, 512);
+  - o texto que entra grande e encolhe reaproveita o bitmap do quadro maior;
+  - teto de ~0,4 Mpx e de 2000 px de lado também no caminho do RenderCanvas (texto maior que a textura dos textos era refeito a cada quadro);
+  - chave que não cabe nem reduzida não é tentada de novo;
+  - escala pelo maior eixo (a legenda que abre esticando);
+  - contorno em degraus de 1/8 de oitava;
+  - timer do botão SHINKAI em segundos inteiros;
+  - linhas do diagnóstico do contador a cada 2 s.
+- **Formas:**
+  - preenchimento estrelado a partir do centro (chamas do nível, farpas, estrelas, cauda do projétil) e vários contornos com caixas separadas (o "!") saem em leque, sem stencil;
+  - traço vira tira de triângulos;
+  - anel do RenderCanvas pelo shader.
+- **Lotes:**
+  - cada desenho não zera mais o filtro de cor (cada sprite tingido abria um lote);
+  - o mesmo recorte noutro vetor não fecha o lote;
+  - o contorno do SHINKAI não é desenhado no reflexo do chão.
+- **Engasgos:**
+  - ULTRA_SEQ voltou ao preload: sob demanda, a folha subia para o OpenGL no meio da luta (até ~58 MB num quadro);
+  - as imagens do Ultra sobem durante a abertura dele, com a luta parada;
+  - a comemoração sobe no primeiro desenho, já no KO;
+  - no máximo 3 passos de simulação por quadro;
+  - tela de 120 Hz: uma troca a cada duas batidas (o jogo anda a 60).
+- **Lixo por quadro:**
+  - chave de ajuste de sprite só para folhas com correção;
+  - chave do tamanho calculada uma vez por folha;
+  - linha do degradê pelo próprio objeto;
+  - rótulo do Super (String.format) só quando pedido;
+  - painel do adversário só no DEBUG;
+  - legenda da conversa diagramada uma vez por fala;
+  - onomatopeia dividida uma vez.
+- **Entrada:** ver o commit de especiais no toque (janela pelo primeiro passo solto, direção que chega logo depois do botão, especial com 10 quadros de buffer, botões antes dos pontos L+M/M+H).
 
 ## 6. Anexo: cenários e folhas
 

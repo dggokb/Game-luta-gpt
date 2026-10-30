@@ -196,14 +196,26 @@ final class FighterState {
         lifeHudLabel = "HP " + life + " / " + profile.maxLife + (recoverableLife > 0 ? "  (+" + recoverableLife + ")" : "");
     }
 
+    private int superLevelShown = -1;
+    private int superMeterLabeled = -1;
+
     private void refreshSuperLabels() {
+        // O "LV n" do botão a cada mudança de nível; o rótulo longo (só no DEBUG) fica para quem
+        // pedir: o SHINKAI ENERGY enche a barra a cada passo e era um String.format por passo.
         int level = superMeter / CombatConfig.METER_PER_BAR;
-        superHudLabel = String.format(
-            java.util.Locale.US,
-            "SUPER %.2f / 5  •  LV %d",
-            superBars(),
-            level
-        );
-        superLevelHudLabel = "LV " + level;
+        if (level != superLevelShown) {
+            superLevelShown = level;
+            superLevelHudLabel = "LV " + level;
+        }
+    }
+
+    /** "SUPER 2.40 / 5  •  LV 2", montado só quando a barra mudou desde a última vez. */
+    String superHudLabel() {
+        if (superMeterLabeled != superMeter) {
+            superMeterLabeled = superMeter;
+            superHudLabel = String.format(java.util.Locale.US, "SUPER %.2f / 5  •  LV %d",
+                superBars(), superMeter / CombatConfig.METER_PER_BAR);
+        }
+        return superHudLabel;
     }
 }

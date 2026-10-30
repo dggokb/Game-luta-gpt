@@ -182,6 +182,9 @@ public final class CinematicaLuta {
     private static final class Estouro {
         final Acao acao;
         final float desde;
+        /** As palavras do texto (dividido uma vez, não a cada quadro). */
+        String textoDividido;
+        String[] palavras;
 
         Estouro(Acao acao, float desde) {
             this.acao = acao;
@@ -764,7 +767,11 @@ public final class CinematicaLuta {
         float alpha = resta < SAIDA_ONOMATOPEIA ? Tinta.clamp01(resta / SAIDA_ONOMATOPEIA) : 1f;
         if (alpha <= 0f) return;
         String texto = temporada != null ? temporada.t(a.texto) : a.texto;
-        String[] palavras = texto.trim().split(" +");
+        if (!texto.equals(e.textoDividido)) {
+            e.textoDividido = texto;
+            e.palavras = texto.trim().split(" +");
+        }
+        String[] palavras = e.palavras;
         float cx = a.x * VW;
         float cy = a.y * VH;
         float size = a.tamanho;

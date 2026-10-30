@@ -22,6 +22,8 @@ final class SpriteAutoFix {
     }
     private static final Adjustment NONE=new Adjustment(1f,0f,0f);
     private static final Map<String,Adjustment> values=new HashMap<>();
+    /** Folhas com alguma correção: as outras (quase todas) nem montam a chave a cada desenho. */
+    private static final java.util.Set<String> atlasComAjuste=new java.util.HashSet<>();
     private static boolean loaded;
 
     private static String key(String character,String atlas,int frame) {
@@ -74,9 +76,15 @@ final class SpriteAutoFix {
         }
         values.clear();
         values.putAll(next);
+        atlasComAjuste.clear();
+        for(String k:next.keySet()) {
+            int a=k.indexOf('|'),b=k.lastIndexOf('|');
+            atlasComAjuste.add(k.substring(a+1,b));
+        }
     }
 
     static synchronized Adjustment get(String character,String atlas,int frame) {
+        if(!atlasComAjuste.contains(atlas))return NONE;
         Adjustment result=values.get(key(character,atlas,frame));
         return result==null?NONE:result;
     }

@@ -540,17 +540,30 @@ public final class ConversaLuta {
         return img != null ? img : imagens.get(quem + "_normal");
     }
 
+    private Fala legendaDe;
+    private List<String> legendaLinhas;
+    private float legendaLargura, legendaNomeW;
+    private String legendaNome;
+
     private void drawLegenda(RenderCanvas c) {
         boolean naDireita = naDireita(atual);
         float idade = time - falaDesde - ENTRA * 0.6f;
         if (idade <= 0f) return;
-        String texto = texto(atual);
         float size = LEGENDA_TEXTO;
-        List<String> linhas = Baloes.wrap(c, texto, size, LEGENDA_LARGURA - 34f);
-        float larguraTexto = 0f;
-        for (String linha : linhas) larguraTexto = Math.max(larguraTexto, c.measureText(linha, size, false));
-        String nome = nome(atual.quem).toUpperCase(java.util.Locale.ROOT);
-        float nomeW = c.measureText(nome, 13f, true) + 14f;
+        // A quebra de linhas e as medidas da fala, uma vez por fala (eram refeitas a cada quadro).
+        if (legendaDe != atual) {
+            legendaDe = atual;
+            legendaLinhas = Baloes.wrap(c, texto(atual), size, LEGENDA_LARGURA - 34f);
+            float lt = 0f;
+            for (String linha : legendaLinhas) lt = Math.max(lt, c.measureText(linha, size, false));
+            legendaLargura = lt;
+            legendaNome = nome(atual.quem).toUpperCase(java.util.Locale.ROOT);
+            legendaNomeW = c.measureText(legendaNome, 13f, true) + 14f;
+        }
+        List<String> linhas = legendaLinhas;
+        float larguraTexto = legendaLargura;
+        String nome = legendaNome;
+        float nomeW = legendaNomeW;
         float w = Math.max(larguraTexto, nomeW) + 34f;
         float h = 14f + linhas.size() * LEGENDA_LINHA;
         float top = LEGENDA_TOPO;

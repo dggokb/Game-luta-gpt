@@ -102,11 +102,13 @@ final class SpriteAtlasCache {
      * Animações raras (comemoração, provocação do treino, sequência do Ultra). Com
      * {@link #ocasionaisSobDemanda} elas ficam fora do preload e só carregam quando pedidas ({@link #pedir}).
      */
+    // A sequência do Ultra fica no preload: sob demanda ela subia para o OpenGL no meio da luta
+    // (até ~58 MB num quadro só), um engasgo bem no jogo. A comemoração e a provocação aparecem
+    // com a luta parada (KO, treino), onde o envio não atrapalha.
     static final java.util.Set<String> OCASIONAIS=new java.util.HashSet<>(java.util.Arrays.asList(
-        SpriteStates.VICTORY,SpriteStates.TAUNT,SpriteStates.ULTRA_SEQ,SpriteStates.ULTRA_SEQ_FRENTE));
+        SpriteStates.VICTORY,SpriteStates.TAUNT));
     private volatile boolean ocasionaisSobDemanda;
-    /** Muda quando uma folha fica pronta (quem sobe para o OpenGL sabe que há novidade). */
-    private volatile int geracao;
+
     /** Abaixo do ALTO a folha pode ampliar um pouco (a tela já é ampliada inteira). */
     static final float AMPLIACAO_REDUZIDA = 1.1f;
 
@@ -270,10 +272,6 @@ final class SpriteAtlasCache {
             Entrada e=folhas.get(a.atlas.resource);
             return e!=null&&(e.folha!=null||e.erro!=null);
         }
-    }
-
-    int geracao() {
-        return geracao;
     }
 
     void preload(CharacterDefinition... characters) {
@@ -573,7 +571,7 @@ final class SpriteAtlasCache {
             if(!e.descartada)bytesEmAndamento-=e.bytes;
             if(folha!=null) {
                 if(e.descartada) folha.bitmap.recycle();
-                else { e.folha=folha;bytesProntos+=folha.bytes;geracao++; }
+                else { e.folha=folha;bytesProntos+=folha.bytes; }
             } else if(!e.descartada) {
                 if(propagar) {
                     // Quem chamou recebe o erro; a folha sai do cache (um próximo pedido tenta de novo).

@@ -57,8 +57,17 @@ final class AjusteTamanho {
             + (baked == 1f ? "" : String.format(Locale.US, "~%.4f", baked));
     }
 
+    /** A chave de cada folha, montada uma vez (era montada a cada desenho, com String.format no P01). */
+    private static final java.util.Map<CharacterDefinition.Atlas, String> chaves = new java.util.IdentityHashMap<>();
+
     static synchronized float scale(CharacterDefinition.Atlas a) {
-        Float v = values.get(key(a));
+        if (values.isEmpty()) return 1f;
+        String k = chaves.get(a);
+        if (k == null) {
+            k = key(a);
+            chaves.put(a, k);
+        }
+        Float v = values.get(k);
         return v == null ? 1f : v;
     }
 

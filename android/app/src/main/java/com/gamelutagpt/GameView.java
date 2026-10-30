@@ -952,8 +952,8 @@ public class GameView extends SurfaceView
         java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 
     /**
-     * Com o quadro OpenGL aberto: sobe uma imagem por quadro dos packs de Ultra já carregados,
-     * para o Ultra não pagar o envio das texturas no primeiro quadro em que aparece.
+     * Com o quadro OpenGL aberto, durante a abertura do Ultra (a luta parada): sobe uma imagem por
+     * quadro dos packs já carregados, para o raio não pagar o envio no primeiro quadro dele.
      */
     private boolean preSubirUltra() {
         if (ultras.isEmpty()) return false;
@@ -967,15 +967,6 @@ public class GameView extends SurfaceView
             ultrasNaPlaca.add(pack);
         }
         return false;
-    }
-
-    /** {@link SpriteAtlasCache#geracao()} das folhas que já subiram para o OpenGL. */
-    private int geracaoNaPlaca = -1;
-
-    /** Uma folha rara que ficou pronta no meio da luta sobe antes de aparecer (uma por quadro). */
-    private void subirFolhaNova() {
-        int g = atlases.geracao();
-        if (g != geracaoNaPlaca && desenhoGl.subirUma(atlases) == 0) geracaoNaPlaca = g;
     }
 
     /** O pack pronto do personagem, ou null se ainda não foi pedido ou está carregando. */
@@ -1706,7 +1697,9 @@ public class GameView extends SurfaceView
             finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade());
         }
         float speed = fightClockRunning() ? pausa.velocidade() * feel.timeScale() : 1f;
-        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
+        // No máximo 3 passos por quadro: depois de um engasgo, 6 passos de uma vez (motor, IA e
+        // visual) faziam o quadro seguinte engasgar também. O jogo atrasa um pouco em vez disso.
+        accumulatedTime += clamp(elapsedSeconds, 0f, 0.05f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
             // Pediu carregamento: para aqui; o próximo quadro já é a tela de carregamento.
             if (!loadQueue.isEmpty()) {
@@ -3489,7 +3482,9 @@ public class GameView extends SurfaceView
                     renderFrame(gl);
                     if (pausa.fps()) drawFpsCounter(gl);
                     desenharAvisoGl(gl);
-                    if (!preSubirUltra()) subirFolhaNova();
+                    // As imagens do Ultra sobem durante a abertura dele (a luta parada), uma por quadro:
+                    // no meio da luta cada envio era um engasgo.
+                    if (abertura.isActive() || ultraEsperando != null) preSubirUltra();
                     perfil.marca(PerfilQuadros.TELA);
                     desenhoGl.terminarQuadro();
                     perfil.marca(PerfilQuadros.ENVIO);
@@ -3578,6 +3573,7 @@ public class GameView extends SurfaceView
     // altura em que o jogo está desenhando. Conta a cada 0,5 s; o texto só muda aí (sem alocar
     // por quadro).
     private static final long FPS_JANELA_NS = 500_000_000L;
+    private int fpsJanelas;
     private long fpsInicio = System.nanoTime();
     private int fpsQuadros;
     private float fpsAtual = -1f;
@@ -3596,7 +3592,9 @@ public class GameView extends SurfaceView
             if (qualidade.modo() == QualidadeGrafica.Modo.AUTO) nivel = "AUTO " + nivel;
             fpsTexto = Math.round(fpsAtual) + " FPS  ·  " + nivel + "  ·  " + canvas.getHeight() + "p"
                 + (glQuadro ? "  ·  OpenGL" : "  ·  Canvas");
-            fpsDiagnostico();
+            // As linhas do diagnóstico a cada 2 s: no OpenGL cada linha nova é um bitmap comprido,
+            // e trocá-las a cada 0,5 s enchia a textura dos textos (o contador pesava no que mede).
+            if (++fpsJanelas % 4 == 1) fpsDiagnostico();
         }
         if (fpsAtual < 0f) return;
         canvas.save();
@@ -4270,13 +4268,16 @@ public class GameView extends SurfaceView
         opponentPanel.x = npc.x;
         opponentPanel.visualTop = opponentVisualTop();
         FighterState cpu = opponentPoint();
-        opponentPanel.lifeRatio = cpu.life / (float)cpu.profile.maxLife;
-        opponentPanel.status = opponentStatusLabel();
-        opponentPanel.lifeLabel = cpu.life + " / " + cpu.profile.maxLife;
-        opponentPanel.superLabel = cpu.superHudLabel;
-        opponentPanel.damageLabel = dummyDamageLabel;
-        opponentPanel.damageProgress = dummyDamageLabelFrames / (float)DAMAGE_LABEL_FRAMES;
-        if (debugOverlay) hud.drawOpponentPanel(c, opponentPanel);
+        // O painel do adversário é do DEBUG: os textos dele só são montados com ele ligado.
+        if (debugOverlay) {
+            opponentPanel.lifeRatio = cpu.life / (float)cpu.profile.maxLife;
+            opponentPanel.status = opponentStatusLabel();
+            opponentPanel.lifeLabel = cpu.life + " / " + cpu.profile.maxLife;
+            opponentPanel.superLabel = cpu.superHudLabel();
+            opponentPanel.damageLabel = dummyDamageLabel;
+            opponentPanel.damageProgress = dummyDamageLabelFrames / (float)DAMAGE_LABEL_FRAMES;
+            hud.drawOpponentPanel(c, opponentPanel);
+        }
     }
 
     private String opponentStatusLabel() {
@@ -4995,7 +4996,8 @@ public class GameView extends SurfaceView
         if (ultraFlight(f)) applyFlight(c, f, visualY);
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
-        if (f.state.inShinkai() && renderer.override() == null) drawShinkaiOutline(c, renderer, f, visualY);
+        // No reflexo do chão não: eram mais 10 cópias do lutador por quadro, quase invisíveis ali.
+        if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) drawShinkaiOutline(c, renderer, f, visualY);
         Filtro look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
         if (look == null && renderer.override() == null && ghostArmsActive(f)) drawGhostArms(c, renderer, f, visualY);
