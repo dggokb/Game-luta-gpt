@@ -57,12 +57,28 @@ final class InputBuffer {
         entries.add(new Entry(button, strength, crouch, forward, nextOrder++));
     }
 
-    /** One unfrozen frame passed: everything ages and old presses expire. */
-    void age(int bufferFrames) {
+    /**
+     * One unfrozen frame passed: everything ages and old presses expire. O especial dura mais
+     * ({@code specialFrames}): o comando já foi gasto ao ser lido, e apertado ainda preso na
+     * recuperação ou na defesa ele se perdia.
+     */
+    void age(int bufferFrames, int specialFrames) {
         for (int i = entries.size() - 1; i >= 0; i--) {
             Entry entry = entries.get(i);
             entry.age++;
-            if (entry.age > bufferFrames) entries.remove(i);
+            if (entry.age > (entry.button == Button.SPECIAL ? specialFrames : bufferFrames)) entries.remove(i);
+        }
+    }
+
+    void age(int bufferFrames) {
+        age(bufferFrames, bufferFrames);
+    }
+
+    /** Tira os golpes normais esperando (o botão virou especial com a direção que chegou depois). */
+    void removerNormais() {
+        for (int i = entries.size() - 1; i >= 0; i--) {
+            Button b = entries.get(i).button;
+            if (b == Button.LIGHT || b == Button.MEDIUM || b == Button.HEAVY) entries.remove(i);
         }
     }
 

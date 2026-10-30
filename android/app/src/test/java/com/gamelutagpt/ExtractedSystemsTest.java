@@ -82,8 +82,14 @@ public class ExtractedSystemsTest {
         m.record(3,100);m.record(2,102);m.record(1,104);
         assertTrue(m.matchCommand(quarterCircle,106,15,15));
         assertFalse("A match consumes the history",m.matchCommand(quarterCircle,106,15,15));
-        m.record(3,200);m.record(1,200+16);
-        assertFalse("Steps too far apart",m.matchCommand(quarterCircle,200+17,15,15));
+        m.record(3,200);m.record(2,201);m.record(1,201+16);
+        assertFalse("Steps too far apart (do ↓ solto ao →)",m.matchCommand(quarterCircle,201+17,15,15));
+        m.clear();m.record(3,200);m.record(2,230);m.record(1,233);
+        assertTrue("Agachado um tempo e depois ↘ →: o ↓ conta de quando foi solto",m.matchCommand(quarterCircle,234,15,15));
+        m.clear();m.record(3,100);m.record(0,140);m.record(3,142);
+        assertFalse("Agachado um tempo e tocar ↓ de novo não é ↓ ↓",m.matchCommand(new int[]{3,3},143,15,15));
+        m.clear();m.record(3,100);m.record(0,104);m.record(3,107);
+        assertTrue("↓ ↓ rápido",m.matchCommand(new int[]{3,3},108,15,15));
         m.clear();m.record(3,300);m.record(1,302);
         assertFalse("Too late to press",m.matchCommand(quarterCircle,302+16,15,15));
         m.clear();m.record(1,400);m.record(0,402);m.record(1,410);
@@ -117,6 +123,14 @@ public class ExtractedSystemsTest {
         a=Math.toRadians(40);
         x=ControlsLayout.DPAD_X+(float)(Math.cos(a)*r);y=ControlsLayout.DPAD_Y+(float)(Math.sin(a)*r);
         assertEquals("Passou da folga: ↘",2,ControlsLayout.dpadDirectionAt(x,y,1));
+        a=Math.toRadians(20);
+        x=ControlsLayout.DPAD_X+(float)(Math.cos(a)*r);y=ControlsLayout.DPAD_Y+(float)(Math.sin(a)*r);
+        assertEquals("Da diagonal para a reta troca na divisa (o → do ↓ ↘ →)",1,ControlsLayout.dpadDirectionAt(x,y,2));
+        float borda=ControlsLayout.DPAD_DEADZONE*0.85f;
+        assertEquals("Segurando ↓, a borda da zona morta não vira neutro",3,
+            ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y+borda,3));
+        assertEquals("Do neutro, a zona morta continua neutra",0,
+            ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y+borda,0));
     }
     @Test public void cameraZoomsOutForDistantFightersAndKeepsTallOnesInFrame() {
         CameraRig near=new CameraRig(),far=new CameraRig();

@@ -12,6 +12,8 @@ final class CombatConfig {
 
     /** Frames a press stays usable after the frame it was pressed (hitstop does not count). */
     int bufferFrames = 4;
+    /** O especial (comando já lido) espera mais que o botão comum: apertado na recuperação ou na defesa. */
+    int specialBufferFrames = 10;
     /** A special command must be entered within this many frames... */
     int motionWindowFrames = 15;
     /** ...and its button pressed at most this many frames after the last direction. */

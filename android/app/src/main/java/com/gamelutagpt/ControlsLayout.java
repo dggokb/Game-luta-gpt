@@ -169,11 +169,13 @@ final class ControlsLayout {
         if (dpadCaptures(x, y)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
         if (insideCircle(x, y, SHINKAI_X, SHINKAI_Y, SHINKAI_RADIUS)) return Control.SHINKAI;
-        if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;
-        if (insideCircle(x, y, PUSHBLOCK_X, PUSHBLOCK_Y, THROW_RADIUS)) return Control.PUSHBLOCK;
+        // Os botões antes dos pontos entre eles: o L+M e o M+H só valem no vão. Antes a borda de
+        // cada botão virava agarrão ou pushblock, e o especial apertado ali não saía.
         if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) return Control.LIGHT;
         if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) return Control.MEDIUM;
         if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) return Control.HEAVY;
+        if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;
+        if (insideCircle(x, y, PUSHBLOCK_X, PUSHBLOCK_Y, THROW_RADIUS)) return Control.PUSHBLOCK;
         if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) return Control.COMBO;
         if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) return Control.TAG;
         return Control.NONE;
@@ -238,8 +240,19 @@ final class ControlsLayout {
      * trocando de direção a cada leitura do toque, o que enchia a história do comando.
      */
     static int dpadDirectionAt(float x, float y, int atual) {
+        float dx = x - DPAD_X, dy = y - DPAD_Y;
+        float d2 = dx * dx + dy * dy;
+        // Neutro com folga: segurando uma direção, só volta ao centro bem dentro da zona morta
+        // (o polegar na borda dela fazia ↓ • ↓, que é o ↓ ↓ de um especial, ou → • →, um dash).
+        if (atual != 0) {
+            float dentro = DPAD_DEADZONE * 0.7f;
+            if (d2 < dentro * dentro) return 0;
+            if (d2 < DPAD_DEADZONE * DPAD_DEADZONE) return atual;
+        }
         int nova = dpadDirectionAt(x, y);
-        if (atual == 0 || nova == atual || nova == 0) return nova;
+        // A folga só para sair de uma direção reta: da diagonal para a reta troca na divisa
+        // (senão o → do ↓ ↘ → só entrava 8° depois, onde o polegar muitas vezes nem chega).
+        if (atual == 0 || nova == atual || nova == 0 || atual % 2 == 0) return nova;
         double degrees = Math.toDegrees(Math.atan2(y - DPAD_Y, x - DPAD_X));
         double centro = (atual - 1) * 45.0;
         double diff = Math.abs(((degrees - centro) % 360.0 + 540.0) % 360.0 - 180.0);

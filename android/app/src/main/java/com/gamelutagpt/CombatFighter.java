@@ -97,6 +97,9 @@ final class CombatFighter {
     String specialStrength;
     /** Botão (L, M, H) do último especial de comando (S2..S4): o pavio da caixa da p16. */
     String commandButton;
+    /** Botão de golpe que não fez comando e o quadro dele (a última direção pode vir logo depois). */
+    String botaoSemComando;
+    int botaoSemComandoClock;
     /** O que o último botão de golpe leu (direções, botão e o golpe que saiu), para o contador. */
     String ultimaEntrada;
     /** Step of the autoCombo route this attack came from, or -1. */

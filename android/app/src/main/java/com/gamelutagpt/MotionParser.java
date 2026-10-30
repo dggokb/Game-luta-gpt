@@ -125,13 +125,19 @@ final class MotionParser {
         for (int end = count - 1; end >= 0; end--) {
             if (directions[end] != last) continue;
             if (clock - frames[end] > pressWindow) return -1;
-            int step = steps.length - 2, firstFrame = frames[end];
+            int step = steps.length - 2, firstIdx = end;
             for (int i = end - 1; i >= 0 && step >= 0; i--) {
                 if (directions[i] != steps[step]) continue;
-                firstFrame = frames[i];
+                firstIdx = i;
                 step--;
             }
-            if (step < 0 && frames[end] - firstFrame <= motionWindow) return count - 1 - end;
+            if (step >= 0) continue;
+            // O primeiro passo conta de quando foi SOLTO: agachado (ou andando) um tempo e depois
+            // ↘ → ainda é o comando. No ↓ ↓ (o mesmo passo duas vezes) conta de quando entrou,
+            // senão ficar agachado e tocar ↓ de novo virava o especial.
+            boolean repetido = steps.length >= 2 && steps[0] == steps[1];
+            int firstFrame = repetido || firstIdx >= end ? frames[firstIdx] : frames[firstIdx + 1];
+            if (frames[end] - firstFrame <= motionWindow) return count - 1 - end;
         }
         return -1;
     }

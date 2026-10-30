@@ -489,28 +489,28 @@ final class CombatEngine {
         if (f.motion.doubleTap(5, clock, config.doubleTapFrames) || in.backdash) f.backdashRequest = true;
 
         boolean crouch = ControlsLayout.isDownDirection(in.direction);
-        if (in.light || in.medium || in.heavy) {
-            String button = in.heavy ? "H" : in.medium ? "M" : "L";
+        // M + H (ou o ponto entre eles) fora da defesa é o H: passa pelo comando como ele.
+        boolean heavy = in.heavy || (in.pushblock && f.status != CombatFighter.Status.BLOCKSTUN);
+        if (in.light || in.medium || heavy) {
+            String button = heavy ? "H" : in.medium ? "M" : "L";
             String lido = f.motion.descrever(8);
             // O comando de cada personagem: S2..S4 ou a energia (S1); o mais longo ganha.
             String command = f.character().matchCommand(f.motion, button, f.grounded, clock, config);
             f.ultimaEntrada = lido + "  " + button + "  ⇒ " + (command == null ? "golpe normal" : "S".equals(command) ? "S1" : command);
             if (command != null) {
-                // O especial de [↓] ↑ cancela o pulo que o ↑ pediu.
-                f.pendingJumpAge = -1;
-                f.jumpGrace = 0;
-            }
-            if (command != null && !"S".equals(command)) {
-                f.commandButton = button;
-                f.buffer.push(InputBuffer.Button.SPECIAL, command, false);
-            } else if (command != null) {
-                // The command only arms the special; the strongest button pressed picks its strength.
-                f.buffer.push(InputBuffer.Button.SPECIAL, button, false);
+                armarComando(f, command, button);
+                f.botaoSemComando = null;
             } else {
                 if (in.light) f.buffer.push(InputBuffer.Button.LIGHT, null, crouch);
                 if (in.medium) f.buffer.push(InputBuffer.Button.MEDIUM, null, crouch, relative == 1);
-                if (in.heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+                if (heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+                // A última direção do comando pode chegar logo depois do botão (o polegar ainda
+                // no caminho): ele fica guardado uns quadros (comandoAtrasado).
+                f.botaoSemComando = button;
+                f.botaoSemComandoClock = clock;
             }
+        } else if (f.botaoSemComando != null) {
+            comandoAtrasado(f, clock);
         }
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
@@ -518,11 +518,8 @@ final class CombatEngine {
         if (in.shinkai) f.shinkaiRequestAge = 0;
         trackParryPress(f, in);
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
-        if (in.pushblock) {
-            // Blocking, M + H is the pushblock; otherwise the heavy.
-            if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
-            else f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
-        }
+        // Defendendo, M + H é o pushblock (fora da defesa ele já entrou acima como o H).
+        if (in.pushblock && f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
         if ((in.light || in.medium || in.heavy || in.pushblock) && canBreakCombo(f)) {
             // Apanhando, qualquer botão de golpe (L, M ou H) é o combo breaker: quebra na hora.
             f.techRequestAge = -1;
@@ -1162,6 +1159,50 @@ final class CombatEngine {
      * L + M pressed a couple of frames apart: the jab the first button started becomes the
      * throw while it is still in its first frames (before it could hit).
      */
+    /** O comando saiu: o especial vai para o buffer e cancela o pulo que o ↑ do comando pediu. */
+    private void armarComando(CombatFighter f, String command, String button) {
+        // O especial de [↓] ↑ cancela o pulo que o ↑ pediu; um ↗ no fim do movimento não tira
+        // o lutador do chão antes do especial.
+        f.pendingJumpAge = -1;
+        f.jumpGrace = 0;
+        if (f.grounded) f.jumpSquat = 0;
+        if (!"S".equals(command)) {
+            f.commandButton = button;
+            f.buffer.push(InputBuffer.Button.SPECIAL, command, false);
+        } else {
+            // The command only arms the special; the strongest button pressed picks its strength.
+            f.buffer.push(InputBuffer.Button.SPECIAL, button, false);
+        }
+    }
+
+    /** Quadros em que o botão ainda espera a última direção do comando. */
+    static final int COMANDO_ATRASADO = 2;
+
+    /**
+     * O botão veio um ou dois quadros antes da última direção (↓ ↘ + L e logo →): quando ela
+     * entra, o comando é conferido com aquele botão. O golpe normal que ele começou, ainda
+     * na preparação e saindo do neutro, dá lugar ao especial.
+     */
+    private void comandoAtrasado(CombatFighter f, int clock) {
+        if (clock - f.botaoSemComandoClock > COMANDO_ATRASADO) {
+            f.botaoSemComando = null;
+            return;
+        }
+        if (!f.motion.enteredNow(clock)) return;
+        String button = f.botaoSemComando;
+        String command = f.character().matchCommand(f.motion, button, f.grounded, clock, config);
+        if (command == null) return;
+        f.botaoSemComando = null;
+        f.ultimaEntrada = f.ultimaEntrada + "  (→ atrasado ⇒ " + ("S".equals(command) ? "S1" : command) + ")";
+        f.buffer.removerNormais();
+        if (f.attacking() && f.move != null && f.attack.kind == AttackDefinition.Kind.NORMAL
+            && f.attackFrame < f.attack.startupFrames && f.chain.size() <= 1) {
+            f.status = CombatFighter.Status.NEUTRAL;
+            f.clearAttack();
+        }
+        armarComando(f, command, button);
+    }
+
     private boolean throwOverridesJab(CombatFighter f) {
         if (!f.attacking() || f.move == null || f.attackFrame > PadInput.THROW_LENIENCY_FRAMES) return false;
         String binding = f.move.binding;
@@ -1349,7 +1390,7 @@ final class CombatEngine {
             return;
         }
         f.clock++;
-        if (!breakerChasing(f)) f.buffer.age(config.bufferFrames);
+        if (!breakerChasing(f)) f.buffer.age(config.bufferFrames, config.specialBufferFrames);
         if (f.breakerChase > 0) f.breakerChase--;
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
