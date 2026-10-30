@@ -16,16 +16,23 @@ final class SpriteFighterRenderer {
     private final int[] box=new int[6];
     private final RectF destination=new RectF();
     private final Paint spritePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
-    private final ColorFilter hitFlash=new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
-    private final ColorFilter blockFlash=new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
+    private final Filtro hitFlash=Filtro.porCima(Color.argb(150,255,255,255));
+    private final Filtro blockFlash=Filtro.multiplica(Color.rgb(205,240,255));
     /** Rastro do motor de animação: o lutador clareado e azulado. */
-    private final ColorFilter rastro=new ColorMatrixColorFilter(new ColorMatrix(new float[]{
+    private final Filtro rastro=Filtro.matriz(new float[]{
         0.62f,0f,0f,0f,32f,
         0f,0.72f,0f,0f,58f,
         0f,0f,1f,0f,112f,
-        0f,0f,0f,1f,0f}));
+        0f,0f,0f,1f,0f});
     /** Base color filter when no flash is showing (the p06 shadow echo), or null. */
-    private ColorFilter tint;
+    private Filtro tint;
+    /** O filtro dos próximos quadros (o do pincel do Canvas e o que vai para o OpenGL). */
+    private Filtro filtro;
+
+    private void usarFiltro(Filtro f) {
+        filtro=f;
+        spritePaint.setColorFilter(f!=null?f.canvas:null);
+    }
 
     /** Standalone renderer with its own cache (tools and tests). */
     SpriteFighterRenderer(Context context) { this(context,GeneratedCharacters.defaultCharacter()); }
@@ -104,14 +111,14 @@ final class SpriteFighterRenderer {
     void setAlphaGlobal(int alpha) {alphaGlobal=Math.max(0,Math.min(255,alpha));}
 
     /** Filtro que vale por cima de tudo (a silhueta do impact frame), ou null. */
-    private ColorFilter override;
+    private Filtro override;
 
-    void setOverride(ColorFilter filter) {override=filter;}
-    ColorFilter override() {return override;}
+    void setOverride(Filtro filter) {override=filter;}
+    Filtro override() {return override;}
 
     /** Sprite artwork coordinates, not fighter hitboxes or simulation sizes. */
     void draw(Canvas canvas,float x,float baseY,int facing,boolean damageFlash,boolean guardFlash) {
-        spritePaint.setColorFilter(override!=null?override:damageFlash?hitFlash:guardFlash?blockFlash:tint);
+        usarFiltro(override!=null?override:damageFlash?hitFlash:guardFlash?blockFlash:tint);
         Pose pose=animacao.pose();
         canvas.save();
         if(facing*character.artFacing<0) canvas.scale(-1f,1f,x,0f);
@@ -133,7 +140,7 @@ final class SpriteFighterRenderer {
     void drawRastro(Canvas canvas) {
         Pose pose=animacao.pose();
         if(pose.fantasmas==0)return;
-        spritePaint.setColorFilter(rastro);
+        usarFiltro(rastro);
         for(int i=0;i<pose.fantasmas;i++) {
             Pose.Fantasma f=pose.rastro[i];
             if(f.alfa<=0f||!hasAnimation(f.clipe))continue;
@@ -143,7 +150,7 @@ final class SpriteFighterRenderer {
             canvas.restore();
         }
         spritePaint.setAlpha(255);
-        spritePaint.setColorFilter(tint);
+        usarFiltro(tint);
     }
 
     /**
@@ -238,6 +245,9 @@ final class SpriteFighterRenderer {
         if(alpha<=0||alphaGlobal<=0)return;
         if(!a.frame(frame,box))return;
         SpriteAtlasCache.Folha folha=atlases.get(character,a);
+        // Folha que só está no OpenGL (o bitmap foi solto) e este desenho é no Canvas (as telas de
+        // ajuste): decodifica de novo.
+        if(folha.bitmap.isRecycled()&&DesenhoGl.noQuadro()==null)folha=atlases.recarregar(character,a);
         // A caixa do quadro na folha (pixels da folha original) e onde ela fica na célula; com a
         // folha reduzida, a fonte é a mesma caixa no bitmap menor (arredondada para pixels
         // inteiros) e o destino é o que essa fonte cobre.
@@ -258,7 +268,14 @@ final class SpriteFighterRenderer {
         float top=baseY+fix.dy*scale-a.rootY*heightScale;
         destination.set(left+srcLeft*widthScale,top+srcTop*heightScale,
             left+srcRight*widthScale,top+srcBottom*heightScale);
-        spritePaint.setAlpha(alphaGlobal==255?alpha:alpha*alphaGlobal/255);
+        int alfa=alphaGlobal==255?alpha:alpha*alphaGlobal/255;
+        // Desenho novo: o quadro vai para o OpenGL, com a transformação de agora do Canvas.
+        DesenhoGl gl=DesenhoGl.noQuadro();
+        if(gl!=null) {
+            gl.sprite(canvas,folha.bitmap,source,destination,alfa,filtro);
+            return;
+        }
+        spritePaint.setAlpha(alfa);
         canvas.drawBitmap(folha.bitmap,source,destination,spritePaint);
     }
 
@@ -278,6 +295,7 @@ final class SpriteFighterRenderer {
         SpriteAtlasCache.Folha folha=atlases.get(character,idle.atlas);
         // Folha na placa de vídeo: mede na cópia pequena.
         android.graphics.Bitmap fonte=folha.amostra!=null?folha.amostra:folha.bitmap;
+        if(fonte.isRecycled())return 0xFF3A3440;
         float kx=fonte.getWidth()/(float)idle.atlas.sheetWidth,ky=fonte.getHeight()/(float)idle.atlas.sheetHeight;
         int x0=Math.round(caixa[0]*kx),w=Math.max(1,Math.round(caixa[2]*kx));
         int y0=Math.round((caixa[1]+caixa[3]*0.30f)*ky),h=Math.max(1,Math.round(caixa[3]*0.35f*ky));
@@ -313,12 +331,12 @@ final class SpriteFighterRenderer {
 
     /** Um quadro de uma folha com a raiz em (x, baseY), sem calibração nem flash (ferramentas de conferência). */
     void drawAtlasFrame(Canvas canvas,CharacterDefinition.Atlas atlas,int frame,float x,float baseY) {
-        spritePaint.setColorFilter(null);
+        usarFiltro(null);
         drawAtlas(canvas,atlas,frame,x,baseY,1f,1f,255);
     }
 
     private static float clamp01(float v){return Math.max(0f,Math.min(1f,v));}
-    void setTint(ColorFilter tint){this.tint=tint;}
+    void setTint(Filtro tint){this.tint=tint;}
 
     /**
      * Um quadro de um clipe de {@code ch}, sem pose nem rastro (o telão e o replay dele). Pula
@@ -329,7 +347,7 @@ final class SpriteFighterRenderer {
         if(anim==null||anim.atlas==null||!atlases.pronta(anim.atlas.resource))return;
         CharacterDefinition antes=character;
         character=ch;
-        spritePaint.setColorFilter(null);
+        usarFiltro(null);
         canvas.save();
         if(facing*ch.artFacing<0) canvas.scale(-1f,1f,x,0f);
         drawClip(canvas,clip,frame,x,baseY,255);
@@ -338,12 +356,12 @@ final class SpriteFighterRenderer {
         character=antes;
     }
     /** Sombra roxa e translúcida do próprio lutador (o eco de sombra da p06). */
-    static ColorFilter shadowEcho() {
-        return new ColorMatrixColorFilter(new ColorMatrix(new float[]{
+    static Filtro shadowEcho() {
+        return Filtro.matriz(new float[]{
             0.25f,0.10f,0.10f,0f,70f,
             0.05f,0.10f,0.05f,0f,20f,
             0.30f,0.15f,0.35f,0f,110f,
-            0f,0f,0f,0.55f,0f}));
+            0f,0f,0f,0.55f,0f});
     }
     /** Mostra um clipe num instante dado, sem a simulação (tela de ajuste de tamanho). */
     void pose(String clip,float time,float distance){motion.clip=clip;motion.time=time;motion.distance=distance;}

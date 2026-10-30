@@ -1,7 +1,6 @@
 package com.gamelutagpt;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import com.gamelutagpt.render.RenderCanvas;
 
 /**
  * O telão da arena (semifinal e final): mostra a luta "ao vivo", de perto, como uma
@@ -43,7 +42,6 @@ final class TelaoLuta {
     private final AttackDefinition[] ultimoGolpe = new AttackDefinition[2];
     private final ComboSession[] ultimaSessao = new ComboSession[2];
     private final boolean[] caido = new boolean[2];
-    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     /** Luta nova: esquece o que passou (os lutadores de antes podem nem estar carregados). */
     void reset() {
@@ -99,23 +97,24 @@ final class TelaoLuta {
         }
     }
 
+    /** Quem desenha os quadros dos lutadores no telão, na transformação atual de {@code rc}. */
+    interface Quadros {
+        void quadro(RenderCanvas rc, CharacterDefinition ch, String clip, int frame, float x, float y, int facing);
+    }
+
     /**
      * Desenha a tela do telão no retângulo (l, t, r, b). {@code leve}: sem os parceiros e sem as
      * linhas de TV (modo de efeitos leves).
      */
-    void desenhar(Canvas c, SpriteFighterRenderer desenhista, float l, float t, float r, float b,
+    void desenhar(RenderCanvas c, Quadros desenhista, float l, float t, float r, float b,
                   float chaoY, boolean leve, float tempo) {
         float w = r - l, h = b - t;
         if (w < 8f || h < 8f) return;
         c.save();
-        c.clipRect(l, t, r, b);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setShader(null);
-        paint.setColor(replay() ? 0xFF1A1530 : 0xFF0C1428);
-        c.drawRect(l, t, r, b, paint);
+        c.clipPolygon(new float[] {l, t, r, t, r, b, l, b});
+        c.fillRect(l, t, r, b, replay() ? 0xFF1A1530 : 0xFF0C1428);
         // O chão da transmissão: uma faixa mais clara embaixo.
-        paint.setColor(replay() ? 0xFF2A2140 : 0xFF16233F);
-        c.drawRect(l, b - h * 0.16f, r, b, paint);
+        c.fillRect(l, b - h * 0.16f, r, b, replay() ? 0xFF2A2140 : 0xFF16233F);
         int k = gravados == 0 ? -1 : replay() ? ((int)tocando) % CAPACIDADE : (gravados - 1) % CAPACIDADE;
         if (k >= 0 && quem[k][0] != null && quem[k][1] != null) {
             float cx = (x[k][0] + x[k][1]) * 0.5f;
@@ -125,7 +124,7 @@ final class TelaoLuta {
             s = Math.min(s, w * 0.92f / largura);
             c.save();
             c.translate((l + r) * 0.5f, b - h * 0.08f);
-            c.scale(s, s);
+            c.scale(s, s, 0f, 0f);
             c.translate(-cx, -chaoY);
             // Os parceiros atrás, os titulares na frente.
             if (!leve) {
@@ -138,36 +137,30 @@ final class TelaoLuta {
         }
         if (!leve) {
             // Linhas de TV.
-            paint.setColor(0x16FFFFFF);
-            for (float yy = t + 1f; yy < b; yy += 4f) c.drawRect(l, yy, r, yy + 1f, paint);
+            for (float yy = t + 1f; yy < b; yy += 4f) c.fillRect(l, yy, r, yy + 1f, 0x16FFFFFF);
         }
         // Selo no canto: AO VIVO (ponto vermelho piscando) ou REPLAY.
         float tam = Math.max(8f, h * 0.11f);
-        paint.setTextSize(tam);
-        paint.setFakeBoldText(true);
-        paint.setTextAlign(Paint.Align.LEFT);
+        float base = t + tam * 1.3f;
         if (replay()) {
-            paint.setColor(0xFFFFD54A);
-            c.drawText("REPLAY", l + tam * 0.6f, t + tam * 1.3f, paint);
-            paint.setColor(0xCCFFD54A);
-            paint.setTextAlign(Paint.Align.RIGHT);
-            c.drawText("▶▶ x0.5", r - tam * 0.6f, t + tam * 1.3f, paint);
+            esquerda(c, "REPLAY", l + tam * 0.6f, base, tam, 0xFFFFD54A);
+            String lento = "▶▶ x0.5";
+            esquerda(c, lento, r - tam * 0.6f - c.measureText(lento, tam, false), base, tam, 0xCCFFD54A);
         } else {
-            if (((int)(tempo * 2f)) % 2 == 0) {
-                paint.setColor(0xFFE53935);
-                c.drawCircle(l + tam * 0.9f, t + tam * 0.95f, tam * 0.32f, paint);
-            }
-            paint.setColor(0xEEFFFFFF);
-            c.drawText("AO VIVO", l + tam * 1.5f, t + tam * 1.3f, paint);
+            if (((int)(tempo * 2f)) % 2 == 0) c.fillCircle(l + tam * 0.9f, t + tam * 0.95f, tam * 0.32f, 0xFFE53935);
+            esquerda(c, "AO VIVO", l + tam * 1.5f, base, tam, 0xEEFFFFFF);
         }
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(false);
         c.restore();
     }
 
-    private void desenharLugar(Canvas c, SpriteFighterRenderer desenhista, int k, int i) {
+    /** Texto que começa em x (o {@link RenderCanvas} centraliza). */
+    private static void esquerda(RenderCanvas c, String texto, float x, float base, float tam, int cor) {
+        c.drawText(texto, x + c.measureText(texto, tam, false) * 0.5f, base, tam, cor, 0, 0f, false);
+    }
+
+    private void desenharLugar(RenderCanvas c, Quadros desenhista, int k, int i) {
         CharacterDefinition ch = quem[k][i];
         if (ch == null || clipe[k][i] == null) return;
-        desenhista.drawQuadro(c, ch, clipe[k][i], quadro[k][i], x[k][i], y[k][i], lado[k][i]);
+        desenhista.quadro(c, ch, clipe[k][i], quadro[k][i], x[k][i], y[k][i], lado[k][i]);
     }
 }

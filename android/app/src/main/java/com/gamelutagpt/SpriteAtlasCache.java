@@ -37,12 +37,20 @@ final class SpriteAtlasCache {
     static final class Folha {
         final Bitmap bitmap;
         final float escalaX,escalaY;
+        /** Bytes dos pixels e se nasceu na placa de vídeo (guardados: no OpenGL o bitmap é solto). */
+        final long bytes;
+        final boolean naPlaca;
         /**
          * Folha na placa de vídeo não se lê: a do IDLE leva junto esta cópia pequena em memória
          * comum (1/{@link #AMOSTRA} do lado) para medir a cor da roupa. Null nas outras.
          */
         Bitmap amostra;
-        Folha(Bitmap bitmap,float escalaX,float escalaY) {this.bitmap=bitmap;this.escalaX=escalaX;this.escalaY=escalaY;}
+        Folha(Bitmap bitmap,float escalaX,float escalaY) {
+            this.bitmap=bitmap;this.escalaX=escalaX;this.escalaY=escalaY;
+            bytes=bitmap.getByteCount();naPlaca=naPlacaDeVideo(bitmap);
+        }
+        /** Só está no OpenGL: o bitmap foi solto depois de subir ({@link DesenhoGl}). */
+        boolean soNoOpenGl() {return bitmap.isRecycled();}
         boolean inteira() {return escalaX==1f&&escalaY==1f;}
     }
 
@@ -74,6 +82,11 @@ final class SpriteAtlasCache {
      * obedecem ao botão FOLHAS.
      */
     static volatile boolean telaPelaGpu;
+    /**
+     * A luta é desenhada em OpenGL ({@link DesenhoGl}): as folhas são decodificadas na memória comum,
+     * sobem para a placa de vídeo e o bitmap é solto. A do IDLE leva a {@link Folha#amostra}.
+     */
+    static volatile boolean paraOpenGl;
 
     /** Redução da {@link Folha#amostra}. */
     static final int AMOSTRA=4;
@@ -299,9 +312,15 @@ final class SpriteAtlasCache {
             Entrada e=it.next().getValue();
             if(!e.soAntecipada||e.folha==null||queridas.contains(e.atlas.resource))continue;
             it.remove();e.descartada=true;
-            bytesProntos-=e.folha.bitmap.getByteCount();
-            e.folha.bitmap.recycle();
+            soltar(e.folha);
         }
+    }
+
+    /** Tira a folha pronta da conta e solta o bitmap e a textura dela. Com a trava. */
+    private void soltar(Folha folha) {
+        bytesProntos-=folha.bytes;
+        folha.bitmap.recycle();
+        DesenhoGl.soltarDepois(folha.bitmap);
     }
 
     /**
@@ -350,7 +369,7 @@ final class SpriteAtlasCache {
     int[] ondeEstao() {
         int[] n=new int[2];
         synchronized(trava) {
-            for(Entrada e:folhas.values()) if(e.folha!=null)n[naPlacaDeVideo(e.folha.bitmap)?0:1]++;
+            for(Entrada e:folhas.values()) if(e.folha!=null)n[e.folha.naPlaca?0:1]++;
         }
         return n;
     }
@@ -374,8 +393,7 @@ final class SpriteAtlasCache {
                 it.remove();
                 e.descartada=true;
                 if(e.folha!=null) {
-                    bytesProntos-=e.folha.bitmap.getByteCount();
-                    e.folha.bitmap.recycle();
+                    soltar(e.folha);
                 } else {
                     // Na fila, decodificando ou esperando nova tentativa: sai da conta agora (quem
                     // decodifica vê "descartada" e só recicla o bitmap).
@@ -396,12 +414,48 @@ final class SpriteAtlasCache {
         Entrada e=folhas.get(a.resource);
         if(e==null||e.folha==null)return;
         boolean mesmaEscala=Math.abs(e.escala-escalaAgora(c,a))<1e-4f;
-        boolean mesmoLugar=naPlacaDeVideo(e.folha.bitmap)==naPlacaDeVideo;
+        // Só no OpenGL (bitmap solto) não serve para o Canvas.
+        boolean mesmoLugar=e.folha.naPlaca==naPlacaDeVideo&&(paraOpenGl||!e.folha.soNoOpenGl());
         if(mesmaEscala&&mesmoLugar)return;
         folhas.remove(a.resource);
         e.descartada=true;
-        bytesProntos-=e.folha.bitmap.getByteCount();
-        e.folha.bitmap.recycle();
+        soltar(e.folha);
+    }
+
+    /** As folhas prontas agora (para subir para o OpenGL). */
+    void prontas(List<Folha> saida) {
+        synchronized(trava) {
+            for(Entrada e:folhas.values()) if(e.folha!=null)saida.add(e.folha);
+        }
+    }
+
+    /**
+     * A folha decodificada de novo: a de agora só existe no OpenGL e quem pede desenha no Canvas
+     * (as telas de ajuste no meio de uma luta em OpenGL). Um engasgo, só nessas telas.
+     */
+    Folha recarregar(CharacterDefinition character,CharacterDefinition.Atlas atlas) {
+        synchronized(trava) {
+            Entrada e=folhas.get(atlas.resource);
+            if(e!=null&&e.folha!=null&&e.folha.soNoOpenGl()) {
+                folhas.remove(atlas.resource);
+                e.descartada=true;
+                soltar(e.folha);
+            }
+        }
+        return get(character,atlas);
+    }
+
+    /** Solta as folhas que só estavam no OpenGL (o contexto se perdeu): o próximo preload decodifica de novo. */
+    void soltarSoNoOpenGl() {
+        synchronized(trava) {
+            for(Iterator<Map.Entry<String,Entrada>> it=folhas.entrySet().iterator();it.hasNext();) {
+                Entrada e=it.next().getValue();
+                if(e.folha==null||!e.folha.soNoOpenGl())continue;
+                it.remove();
+                e.descartada=true;
+                soltar(e.folha);
+            }
+        }
     }
 
     /** A entrada da folha, criada (e posta na fila) se ainda não existe. Com a trava. */
@@ -448,7 +502,7 @@ final class SpriteAtlasCache {
             if(!e.descartada)bytesEmAndamento-=e.bytes;
             if(folha!=null) {
                 if(e.descartada) folha.bitmap.recycle();
-                else { e.folha=folha;bytesProntos+=folha.bitmap.getByteCount(); }
+                else { e.folha=folha;bytesProntos+=folha.bytes; }
             } else if(!e.descartada) {
                 if(propagar) {
                     // Quem chamou recebe o erro; a folha sai do cache (um próximo pedido tenta de novo).
@@ -514,7 +568,7 @@ final class SpriteAtlasCache {
             throw new IllegalStateException("Invalid atlas dimensions: "+a.resource);
         }
         CharacterDefinition.Animation idle=character.animations.get(SpriteStates.IDLE);
-        if(naPlacaDeVideo(bitmap)&&idle!=null&&idle.atlas==a) {
+        if((naPlacaDeVideo(bitmap)||paraOpenGl)&&idle!=null&&idle.atlas==a) {
             BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;o.inSampleSize=AMOSTRA;
             folha.amostra=BitmapFactory.decodeResource(context.getResources(),id,o);
         }

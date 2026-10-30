@@ -22,7 +22,16 @@ public class MainActivity extends Activity {
         // O GameView nasce leve e decodifica a arte inicial na thread "Carregando", com a tela
         // de carregamento na frente: a thread da UI fica livre para os toques (sem ANR).
         gameView = new GameView(this, true);
-        setContentView(gameView);
+        // Desenho novo: o mundo da luta em OpenGL numa superfície embaixo; o jogo (HUD, efeitos,
+        // menus) no Canvas por cima dela.
+        android.widget.FrameLayout raiz = new android.widget.FrameLayout(this);
+        android.view.SurfaceView mundo = new android.view.SurfaceView(this);
+        gameView.ligarOpenGl(mundo);
+        raiz.addView(mundo, new android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+        raiz.addView(gameView, new android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(raiz);
     }
 
     @Override

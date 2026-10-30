@@ -2,13 +2,9 @@ package com.gamelutagpt;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import java.util.Random;
 
 /**
@@ -64,12 +60,12 @@ final class DesgasteDaLuta {
     private final FighterState[] donoVisto = new FighterState[2];
 
     /** Filtros do desenho por estágio (0 é o desenho limpo) e da poeira nas pernas. */
-    private final ColorFilter[] tintas = {null, tinta(0.93f, 0.90f, 6f), tinta(0.85f, 0.78f, 10f), tinta(0.77f, 0.66f, 14f)};
-    private final ColorFilter[] sujeira = new ColorFilter[4];
+    private final Filtro[] tintas = {null, tinta(0.93f, 0.90f, 6f), tinta(0.85f, 0.78f, 10f), tinta(0.77f, 0.66f, 14f)};
+    private final Filtro[] sujeira = new Filtro[4];
 
     DesgasteDaLuta() {
         for (int k = 1; k < 4; k++) {
-            sujeira[k] = new PorterDuffColorFilter(Color.argb(18 + 22 * k, 92, 70, 48), PorterDuff.Mode.SRC_ATOP);
+            sujeira[k] = Filtro.porCima(Color.argb(18 + 22 * k, 92, 70, 48));
         }
     }
 
@@ -80,7 +76,7 @@ final class DesgasteDaLuta {
     }
 
     /** Apagado (brilho), sem cor (saturação) e puxado para o marrom de poeira. */
-    private static ColorFilter tinta(float brilho, float saturacao, float terra) {
+    private static Filtro tinta(float brilho, float saturacao, float terra) {
         ColorMatrix m = new ColorMatrix();
         m.setSaturation(saturacao);
         ColorMatrix escuro = new ColorMatrix(new float[] {
@@ -90,7 +86,7 @@ final class DesgasteDaLuta {
             0f, 0f, 0f, 1f, 0f,
         });
         m.postConcat(escuro);
-        return new ColorMatrixColorFilter(m);
+        return Filtro.matriz(m);
     }
 
     /** 0 (inteiro) a 3 (no fim) pela fração de vida. */
@@ -102,12 +98,12 @@ final class DesgasteDaLuta {
     }
 
     /** O filtro do desenho do lutador (null quando inteiro). */
-    ColorFilter tinta(FighterState s) {
+    Filtro tinta(FighterState s) {
         return tintas[estagio(s)];
     }
 
     /** O filtro da poeira nas pernas (null quando inteiro). */
-    ColorFilter sujeira(FighterState s) {
+    Filtro sujeira(FighterState s) {
         return sujeira[estagio(s)];
     }
 
