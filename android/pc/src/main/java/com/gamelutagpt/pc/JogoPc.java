@@ -13,7 +13,6 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
@@ -242,21 +241,46 @@ public final class JogoPc {
     }
 
     /** Chamado na thread do jogo com o quadro pronto. */
+    private final Ampliador ampliador = new Ampliador();
+
     private void apresentar(BufferedImage imagem) {
+        // A tela de carregamento (thread da janela) e o jogo dividem o ampliador.
+        synchronized (ampliador) {
+            apresentarAgora(imagem);
+        }
+    }
+
+    private void apresentarAgora(BufferedImage imagem) {
         BufferStrategy estrategia = tela.getBufferStrategy();
         if (estrategia == null) return;
         Rectangle a = area;
+        // Em pixels de verdade da tela: com a escala do Windows (150% no ROG Ally, por exemplo)
+        // a área da janela é menor que os pixels, e o Java2D ampliava o quadro inteiro.
+        java.awt.geom.AffineTransform escala = tela.getGraphicsConfiguration().getDefaultTransform();
+        double ex = escala.getScaleX(), ey = escala.getScaleY();
+        int dx = (int) Math.round(a.x * ex), dy = (int) Math.round(a.y * ey);
+        int dw = (int) Math.round(a.width * ex), dh = (int) Math.round(a.height * ey);
+        // Quadro menor que a área (qualidade gráfica, escala do Windows): ampliado aqui, em
+        // paralelo; a tela só copia pixel a pixel.
+        BufferedImage mostrar = imagem.getWidth() == dw && imagem.getHeight() == dh
+            ? imagem : ampliador.ampliar(imagem, dw, dh);
         try {
             do {
                 do {
                     Graphics2D g = (Graphics2D) estrategia.getDrawGraphics();
                     try {
+                        g.setTransform(new java.awt.geom.AffineTransform());
                         g.setColor(Color.BLACK);
-                        g.fillRect(0, 0, tela.getWidth(), tela.getHeight());
-                        if (a.width != imagem.getWidth()) {
-                            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        int tw = (int) Math.round(tela.getWidth() * ex), th = (int) Math.round(tela.getHeight() * ey);
+                        if (dy > 0) {
+                            g.fillRect(0, 0, tw, dy);
+                            g.fillRect(0, dy + dh, tw, th - dy - dh);
                         }
-                        g.drawImage(imagem, a.x, a.y, a.width, a.height, null);
+                        if (dx > 0) {
+                            g.fillRect(0, 0, dx, th);
+                            g.fillRect(dx + dw, 0, tw - dx - dw, th);
+                        }
+                        g.drawImage(mostrar, dx, dy, null);
                     } finally {
                         g.dispose();
                     }
