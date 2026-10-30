@@ -3351,6 +3351,7 @@ public class GameView extends SurfaceView
             holder.unlockCanvasAndPost(canvas);
             perfil.marca(PerfilQuadros.ENVIO);
         }
+        if (desenhoGl != null) desenhoGl.manutencao();
         if (desenhoGl != null && desenhoGl.contextoRecriado()) {
             // O aparelho perdeu o contexto do OpenGL (e as folhas que só estavam nele).
             atlases.soltarSoNoOpenGl();

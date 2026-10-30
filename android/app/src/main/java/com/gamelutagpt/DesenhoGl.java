@@ -174,7 +174,9 @@ final class DesenhoGl implements SurfaceHolder.Callback {
                     return false;
                 }
                 corrente = true;
-                EGL14.eglSwapInterval(tela, 1);
+                // Sem esperar a batida da tela aqui: quem marca o ritmo é o Canvas por cima (duas
+                // esperas seguidas, uma de cada superfície, derrubavam o quadro para 30).
+                EGL14.eglSwapInterval(tela, 0);
             }
             if (contextoNovo) {
                 // Contexto novo: as texturas de antes (e as folhas que só existiam nelas) se foram.
@@ -244,9 +246,25 @@ final class DesenhoGl implements SurfaceHolder.Callback {
         if (!quadroAberto) return;
         quadroAberto = false;
         aberto = null;
+        long inicio = System.nanoTime();
         canvas.terminar();
         mostrar();
+        // Média do tempo para mandar o mundo (o que a placa de vídeo segura aparece aqui).
+        msEnvio += ((System.nanoTime() - inicio) / 1e6f - msEnvio) * 0.1f;
         ultimoComMundo = true;
+    }
+
+    private float msEnvio;
+
+    /**
+     * Fora de um quadro do mundo (luta no Canvas, menus): apaga as texturas das folhas que saíram
+     * do cache. Sem isso, ao desligar o OpenGL, as texturas da luta anterior ficavam ocupando a
+     * placa de vídeo junto com as folhas novas.
+     */
+    void manutencao() {
+        if (soltas.isEmpty() || quadroAberto || !preparar()) return;
+        Bitmap b;
+        while ((b = soltas.poll()) != null) canvas.soltar(b);
     }
 
     /** Uma tela que não é a luta: a superfície do mundo fica preta (uma vez). */
@@ -349,7 +367,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     /** Para o contador: chamadas do último quadro, texturas e memória delas. */
     String resumo() {
-        return "OpenGL " + canvas.chamadas + " chamadas · " + canvas.quantasTexturas() + " texturas "
-            + (canvas.bytesTexturas() >> 20) + " MB";
+        return "OpenGL " + canvas.chamadas + " chamadas · envio " + Math.round(msEnvio * 10f) / 10f + " ms · "
+            + canvas.quantasTexturas() + " texturas " + (canvas.bytesTexturas() >> 20) + " MB";
     }
 }

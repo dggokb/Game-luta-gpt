@@ -27,6 +27,7 @@ final class DesenhoGl {
     boolean comecarQuadro(int largura, int altura) { return false; }
     void terminarQuadro() {}
     void semMundo() {}
+    void manutencao() {}
     RenderCanvas mundo(Canvas c) { throw new UnsupportedOperationException(); }
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro) {}
     void recorte(Canvas c, float l, float t, float r, float b) {}
