@@ -11,6 +11,10 @@ import com.studiohartman.jamepad.ControllerState;
  * o SDL conheça (Xbox, PlayStation, Switch Pro, genéricos). Cada botão vira a tecla do
  * Android equivalente e entra no jogo pelo mesmo caminho do teclado ({@code HardwareInput}).
  * O analógico esquerdo vale como D-pad. Sem a biblioteca nativa, segue só com o teclado.
+ *
+ * <p>Segurar View (Select) e apertar Menu (Start) alterna a tela cheia (no ROG Ally e afins
+ * não há F11 à mão). Por isso o View sozinho vale quando é solto: com o Menu no meio, nenhum
+ * dos dois chega ao jogo.
  */
 final class Controles implements Runnable {
     private static final String TAG = "Controles";
@@ -18,6 +22,7 @@ final class Controles implements Runnable {
     private static final float ZONA_MORTA = 0.5f;
     /** Segurar uma direção repete como no teclado (andar o cursor da seleção). */
     private static final long REPETIR_APOS_MS = 400, REPETIR_A_CADA_MS = 110;
+    private static final int START = 12, SELECT = 13;
 
     /** Botões na ordem do estado: código do Android de cada um. */
     private static final int[] CODIGOS = {
@@ -37,7 +42,15 @@ final class Controles implements Runnable {
     /** Tipo do controle que mandou por último (o tutorial mostra os botões dele). */
     private String tipo;
 
-    Controles(GameView jogo) { this.jogo = jogo; }
+    /** O atalho da tela cheia (View + Menu). */
+    private final Runnable telaCheia;
+    /** O View está apertado e ainda não foi mandado ao jogo; o Menu desta vez foi o atalho. */
+    private boolean selectEsperando, atalhoUsado;
+
+    Controles(GameView jogo, Runnable telaCheia) {
+        this.jogo = jogo;
+        this.telaCheia = telaCheia;
+    }
 
     void iniciar() {
         if (Boolean.getBoolean("gameluta.semControle")) return;
@@ -142,7 +155,9 @@ final class Controles implements Runnable {
     }
 
     private void aplicar(boolean[] agora, long ms) {
+        atalhoDaTelaCheia(agora);
         for (int i = 0; i < CODIGOS.length; i++) {
+            if (i == START || i == SELECT) continue;
             int codigo = CODIGOS[i];
             if (agora[i] && !antes[i]) {
                 desde[i] = ms;
@@ -160,5 +175,41 @@ final class Controles implements Runnable {
             }
             antes[i] = agora[i];
         }
+    }
+
+    /** View + Menu: tela cheia. O View sozinho vai ao jogo quando é solto (apertar e soltar). */
+    private void atalhoDaTelaCheia(boolean[] agora) {
+        boolean selectApertou = agora[SELECT] && !antes[SELECT], selectSoltou = !agora[SELECT] && antes[SELECT];
+        boolean startApertou = agora[START] && !antes[START], startSoltou = !agora[START] && antes[START];
+        if (selectApertou) {
+            selectEsperando = true;
+            atalhoUsado = false;
+        }
+        if (startApertou) {
+            if (agora[SELECT]) {
+                atalhoUsado = true;
+                selectEsperando = false;
+                telaCheia.run();
+            } else {
+                tecla(KeyEvent.KEYCODE_BUTTON_START, true);
+            }
+        } else if (startSoltou && !atalhoUsado) {
+            tecla(KeyEvent.KEYCODE_BUTTON_START, false);
+        }
+        if (selectSoltou) {
+            if (selectEsperando) {
+                tecla(KeyEvent.KEYCODE_BUTTON_SELECT, true);
+                tecla(KeyEvent.KEYCODE_BUTTON_SELECT, false);
+            }
+            selectEsperando = false;
+        }
+        if (!agora[START] && !agora[SELECT]) atalhoUsado = false;
+        antes[START] = agora[START];
+        antes[SELECT] = agora[SELECT];
+    }
+
+    private void tecla(int codigo, boolean apertou) {
+        if (apertou) jogo.onKeyDown(codigo, new KeyEvent(KeyEvent.ACTION_DOWN, codigo, 0, tipo != null ? tipo : "XBOX"));
+        else jogo.onKeyUp(codigo, new KeyEvent(KeyEvent.ACTION_UP, codigo));
     }
 }

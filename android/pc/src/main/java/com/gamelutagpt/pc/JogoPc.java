@@ -203,7 +203,8 @@ public final class JogoPc {
         // -Dgameluta.opengl=false desliga.
         if (com.gamelutagpt.OpenGlPc.permitido()) carregado.ligarOpenGl(null);
         jogo = carregado;
-        controles = new Controles(carregado);
+        // View + Menu no controle: tela cheia (como F11 e Alt+Enter), na thread da janela.
+        controles = new Controles(carregado, () -> EventQueue.invokeLater(this::alternarTelaCheia));
         redimensionar();
         carregado.attach(quadro, quadro.largura(), quadro.altura());
         controles.iniciar();
