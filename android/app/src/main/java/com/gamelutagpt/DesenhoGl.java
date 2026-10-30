@@ -248,13 +248,15 @@ final class DesenhoGl implements SurfaceHolder.Callback {
         aberto = null;
         long inicio = System.nanoTime();
         canvas.terminar();
+        // Tempo nas chamadas ao OpenGL durante o quadro (mandar os lotes e desenhar).
+        msLotes += (canvas.nsChamadas / 1e6f - msLotes) * 0.1f;
         mostrar();
         // Média do tempo para mandar o mundo (o que a placa de vídeo segura aparece aqui).
         msEnvio += ((System.nanoTime() - inicio) / 1e6f - msEnvio) * 0.1f;
         ultimoComMundo = true;
     }
 
-    private float msEnvio;
+    private float msEnvio, msLotes;
 
     /**
      * Fora de um quadro do mundo (luta no Canvas, menus): apaga as texturas das folhas que saíram
@@ -367,7 +369,8 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     /** Para o contador: chamadas do último quadro, texturas e memória delas. */
     String resumo() {
-        return "OpenGL " + canvas.chamadas + " chamadas · envio " + Math.round(msEnvio * 10f) / 10f + " ms · "
+        return "OpenGL " + canvas.chamadas + " chamadas · " + canvas.verticesQuadro + " vértices · lotes "
+            + Math.round(msLotes * 10f) / 10f + " ms · envio " + Math.round(msEnvio * 10f) / 10f + " ms · "
             + canvas.quantasTexturas() + " texturas " + (canvas.bytesTexturas() >> 20) + " MB";
     }
 }

@@ -9,8 +9,6 @@ import android.opengl.GLUtils;
 import android.os.Build;
 import com.gamelutagpt.render.RenderCanvas;
 import com.gamelutagpt.render.RenderImage;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -100,11 +98,19 @@ final class GlRenderCanvas implements RenderCanvas {
     private static final int FLOATS = 9;
     private static final int MAX_VERTICES = 6 * 8192;
     private static final int MAX_PLANOS = 8;
-    private final FloatBuffer buffer = ByteBuffer.allocateDirect(MAX_VERTICES * FLOATS * 4)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
-    private int vertices;
+    /**
+     * Os vértices do lote num float[] comum, que vai inteiro para o OpenGL na hora de desenhar
+     * (antes eram postos um número por vez num FloatBuffer direto: no celular isso custava
+     * vários ms por quadro só no cenário).
+     */
+    private final float[] dados = new float[MAX_VERTICES * FLOATS];
+    private final FloatBuffer envio = FloatBuffer.wrap(dados);
+    private int vertices, posicao;
+    /** Por quadro, para o contador: vértices e o tempo nas chamadas ao OpenGL. */
+    int verticesQuadro;
+    long nsChamadas;
     private int texturaAtual;
-    private int programa, uTela, uTex, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo;
+    private int programa, uTela, uTex, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
     private int larguraTela, alturaTela;
     private int maxTextura = 4096;
     /** Chamadas de desenho do quadro (para o contador). */
@@ -151,6 +157,20 @@ final class GlRenderCanvas implements RenderCanvas {
         int[] ids = new int[1];
         GLES30.glGenBuffers(1, ids, 0);
         vbo = ids[0];
+        // O formato dos vértices fica guardado no VAO: cada lote só manda os dados e desenha.
+        GLES30.glGenVertexArrays(1, ids, 0);
+        vao = ids[0];
+        GLES30.glBindVertexArray(vao);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo);
+        int passo = FLOATS * 4;
+        GLES30.glEnableVertexAttribArray(0);
+        GLES30.glVertexAttribPointer(0, 2, GLES30.GL_FLOAT, false, passo, 0);
+        GLES30.glEnableVertexAttribArray(1);
+        GLES30.glVertexAttribPointer(1, 2, GLES30.GL_FLOAT, false, passo, 8);
+        GLES30.glEnableVertexAttribArray(2);
+        GLES30.glVertexAttribPointer(2, 4, GLES30.GL_FLOAT, false, passo, 16);
+        GLES30.glEnableVertexAttribArray(3);
+        GLES30.glVertexAttribPointer(3, 1, GLES30.GL_FLOAT, false, passo, 32);
         GLES30.glGetIntegerv(GLES30.GL_MAX_TEXTURE_SIZE, ids, 0);
         if (ids[0] > 0) maxTextura = ids[0];
         // O contexto é novo: as texturas antigas não existem mais.
@@ -188,8 +208,11 @@ final class GlRenderCanvas implements RenderCanvas {
         a = largura / Arena.VW; b = 0f; c = 0f; d = altura / Arena.VH; e = 0f; f = 0f;
         topo = 0;
         vertices = 0;
+        posicao = 0;
         texturaAtual = 0;
         chamadas = 0;
+        verticesQuadro = 0;
+        nsChamadas = 0;
         filtro = null;
         inverte = false;
         recorte = null;
@@ -335,25 +358,20 @@ final class GlRenderCanvas implements RenderCanvas {
 
     private void descarregar() {
         if (vertices == 0) return;
+        long inicio = System.nanoTime();
         if (uniformesSujos) enviarUniformes();
-        buffer.position(0);
+        envio.position(0);
+        GLES30.glBindVertexArray(vao);
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo);
-        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertices * FLOATS * 4, buffer, GLES30.GL_STREAM_DRAW);
-        int passo = FLOATS * 4;
-        GLES30.glEnableVertexAttribArray(0);
-        GLES30.glVertexAttribPointer(0, 2, GLES30.GL_FLOAT, false, passo, 0);
-        GLES30.glEnableVertexAttribArray(1);
-        GLES30.glVertexAttribPointer(1, 2, GLES30.GL_FLOAT, false, passo, 8);
-        GLES30.glEnableVertexAttribArray(2);
-        GLES30.glVertexAttribPointer(2, 4, GLES30.GL_FLOAT, false, passo, 16);
-        GLES30.glEnableVertexAttribArray(3);
-        GLES30.glVertexAttribPointer(3, 1, GLES30.GL_FLOAT, false, passo, 32);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, posicao * 4, envio, GLES30.GL_STREAM_DRAW);
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texturaAtual);
         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vertices);
         chamadas++;
+        verticesQuadro += vertices;
         vertices = 0;
-        buffer.clear();
+        posicao = 0;
+        nsChamadas += System.nanoTime() - inicio;
     }
 
     private void enviarUniformes() {
@@ -380,8 +398,18 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private void vertice(float x, float y, float u, float v, float r, float g, float bl, float al, float tipo) {
-        buffer.put(a * x + c * y + e).put(b * x + d * y + f).put(u).put(v)
-            .put(r).put(g).put(bl).put(al).put(tipo);
+        float[] o = dados;
+        int k = posicao;
+        o[k] = a * x + c * y + e;
+        o[k + 1] = b * x + d * y + f;
+        o[k + 2] = u;
+        o[k + 3] = v;
+        o[k + 4] = r;
+        o[k + 5] = g;
+        o[k + 6] = bl;
+        o[k + 7] = al;
+        o[k + 8] = tipo;
+        posicao = k + FLOATS;
         vertices++;
     }
 
