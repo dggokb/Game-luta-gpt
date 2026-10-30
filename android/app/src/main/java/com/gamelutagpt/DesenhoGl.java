@@ -195,10 +195,9 @@ final class DesenhoGl implements SurfaceHolder.Callback {
                     return false;
                 }
                 corrente = true;
-                // A luta inteira sai por aqui: esta superfície marca o ritmo da tela. Numa tela de 120 Hz
-                // que ficou em 120 (o pedido de 60 é só uma preferência), uma troca a cada duas
-                // batidas: o jogo anda a 60, e desenhar 120 quadros era o dobro de trabalho e calor.
-                EGL14.eglSwapInterval(tela, taxaDaTela() >= 100f ? 2 : 1);
+                // A luta inteira sai por aqui: esta superfície marca o ritmo da tela (ver ritmoDaTela).
+                intervaloTroca = 0;
+                ritmoDaTela();
             }
             if (contextoNovo) {
                 // Contexto novo: as texturas de antes (e as folhas que só existiam nelas) se foram.
@@ -279,8 +278,27 @@ final class DesenhoGl implements SurfaceHolder.Callback {
      * Abre o quadro: o Canvas que desenha no OpenGL, do tamanho da superfície, começando preto.
      * Null se o OpenGL não está pronto (o quadro sai no Canvas comum).
      */
+    /** Batidas da tela por troca de quadro (0 = ainda não definido) e quadros até reler a taxa. */
+    private int intervaloTroca, quadrosAteReler;
+
+    /**
+     * Numa tela que ficou em 120 Hz (o pedido de 60 é só uma preferência), uma troca a cada duas
+     * batidas: o jogo anda a 60, e desenhar 120 quadros era o dobro de trabalho. A taxa é relida a
+     * cada meio segundo: lida uma vez só, a tela que depois foi para 60 Hz ficava em 30 FPS.
+     */
+    private void ritmoDaTela() {
+        if (--quadrosAteReler > 0 && intervaloTroca != 0) return;
+        quadrosAteReler = 30;
+        int intervalo = taxaDaTela() >= 100f ? 2 : 1;
+        if (intervalo != intervaloTroca) {
+            intervaloTroca = intervalo;
+            EGL14.eglSwapInterval(tela, intervalo);
+        }
+    }
+
     Canvas comecarQuadro() {
         if (!preparar()) return null;
+        ritmoDaTela();
         Bitmap b;
         while ((b = soltas.poll()) != null) canvas.soltar(b);
         int[] w = new int[1], h = new int[1];

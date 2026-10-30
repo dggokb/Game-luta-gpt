@@ -120,7 +120,7 @@ final class SuperFlash {
             // câmera já vai até o foco inteiro (quem ativou no meio da tela, o quadro ao lado).
             introAge++;
             float t = introAge * STEP;
-            signal = introAge <= SIGNAL_FRAMES ? 1f - (introAge - 1) / (float)SIGNAL_FRAMES : 0f;
+            signal = introAge <= SIGNAL_FRAMES ? Math.min(1f, 1f - (introAge - 1) / (float)SIGNAL_FRAMES) : 0f;
             float k = clamp(t / DARKEN);
             darkAlpha = Math.round(DARK * k);
             float z = clamp(t / (DARKEN + POSE));

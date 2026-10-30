@@ -2735,7 +2735,9 @@ public class GameView extends SurfaceView
                 java.util.Arrays.fill(signalLooks, null);
                 signalLookColor = color;
             }
-            int level = Math.round(superFlash.signal * SUPER_LOOK_LEVELS);
+            // O sinal pode passar de 1 no primeiro quadro da entrada (1 + 1/SIGNAL_FRAMES): sem o
+            // limite o índice saía do vetor e o jogo fechava.
+            int level = Math.max(0, Math.min(SUPER_LOOK_LEVELS, Math.round(superFlash.signal * SUPER_LOOK_LEVELS)));
             if (level == 0) return null;
             if (signalLooks[level] == null) {
                 // Lighter toward the fighter's color: the body flares, the art still shows.
@@ -2747,7 +2749,7 @@ public class GameView extends SurfaceView
             return signalLooks[level];
         }
         if (superFlash.frozen >= 0 && f == engine.fighter(superFlash.frozen)) {
-            int level = Math.round(superFlash.frozenDim * SUPER_LOOK_LEVELS);
+            int level = Math.max(0, Math.min(SUPER_LOOK_LEVELS, Math.round(superFlash.frozenDim * SUPER_LOOK_LEVELS)));
             if (level == 0) return null;
             if (frozenLooks[level] == null) {
                 float k = level / (float)SUPER_LOOK_LEVELS;
