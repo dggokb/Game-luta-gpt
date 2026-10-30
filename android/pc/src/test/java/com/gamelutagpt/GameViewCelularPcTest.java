@@ -90,7 +90,7 @@ public class GameViewCelularPcTest {
         CharacterSelect selecao = (CharacterSelect) campo(v, "characterSelect");
         long abre = System.currentTimeMillis() + 120_000;
         while (!selecao.isOpen() && System.currentTimeMillis() < abre) jogo.esperar(0.1);
-        assertTrue("seleção aberta", selecao.isOpen());
+        assertTrue("seleção aberta: " + estado(v, 0f), selecao.isOpen());
         jogo.esperar(0.5);
         for (int i = 0; i < 4; i++) {
             jogo.tecla(KeyEvent.KEYCODE_J);

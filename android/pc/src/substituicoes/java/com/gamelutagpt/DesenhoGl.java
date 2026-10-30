@@ -54,8 +54,12 @@ final class DesenhoGl {
     private static final ConcurrentLinkedQueue<Bitmap> soltas = new ConcurrentLinkedQueue<>();
 
     static void soltarDepois(Bitmap folha) {
-        soltas.add(folha);
+        // Sem OpenGL no PC (a janela sem placa, os testes) ninguém esvazia a fila.
+        if (algum) soltas.add(folha);
     }
+
+    /** Algum desenho em OpenGL foi criado (antes disso não há textura a apagar). */
+    private static volatile boolean algum;
 
     /** O Canvas do quadro como RenderCanvas, se for o do OpenGL. */
     static RenderCanvas comoRenderCanvas(Canvas c) {
@@ -92,6 +96,7 @@ final class DesenhoGl {
 
     DesenhoGl(SurfaceView view, SurfaceView jogo, Ouvinte ouvinte) {
         this.jogo = jogo;
+        algum = true;
         // Não há superfície separada: o quadro sai pela mesma janela do jogo.
         ouvinte.superficieGl(true);
     }
