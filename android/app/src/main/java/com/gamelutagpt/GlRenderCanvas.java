@@ -213,6 +213,7 @@ final class GlRenderCanvas implements RenderCanvas {
         atlasTexto = novaTextura(ladoTexto, ladoTexto);
         atlasDegrade = novaTextura(256, LINHAS_DEGRADE);
         geracaoTexto++;
+        epocaTexturas++;
         prateleiraX = prateleiraY = alturaPrateleira = 0;
         comandos = 0;
         vertices = posicao = inicioLote = 0;
@@ -411,6 +412,105 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Stencil do lote: 0 nenhum; 1 marca (soma); 2 marca (par/ímpar); 3 pinta onde marcou. */
     private int stencil;
 
+    // ---- Gravação: um pedaço do quadro que não muda (o controle de toque, os botões de teste) ----
+
+    /** Sobe quando alguma textura é apagada ou recomeçada: as gravações de antes deixam de valer. */
+    private int epocaTexturas;
+    private int execucoes;
+
+    /** Os vértices (já na tela) e os comandos de um pedaço do quadro, para repetir sem desenhar. */
+    static final class Gravacao {
+        float[] dados;
+        int vertices, comandos, epoca, largura, altura;
+        int[] inicio, quantos, textura, stencil, nPlanos;
+        boolean[] inverte;
+        float[][] filtro, recorte;
+        double area;
+        /** Quem grava confere o resto (a assinatura do estado e a transformação de quando gravou). */
+        long assinatura;
+        final float[] matriz = new float[6];
+        float alfa;
+    }
+
+    private int gravInicioVertice, gravInicioPosicao, gravInicioComando, gravEpoca, gravExecucoes;
+    private double gravArea;
+
+    void gravarComecar() {
+        descarregar();
+        gravInicioVertice = vertices;
+        gravInicioPosicao = posicao;
+        gravInicioComando = comandos;
+        gravEpoca = epocaTexturas;
+        gravExecucoes = execucoes;
+        gravArea = areaPintada;
+    }
+
+    /** O que foi desenhado desde {@link #gravarComecar}, ou null se não deu para gravar inteiro. */
+    Gravacao gravarTerminar() {
+        descarregar();
+        if (execucoes != gravExecucoes || epocaTexturas != gravEpoca || nPendente != 0 || stencil != 0) return null;
+        Gravacao g = new Gravacao();
+        g.vertices = vertices - gravInicioVertice;
+        g.dados = java.util.Arrays.copyOfRange(dados, gravInicioPosicao, posicao);
+        int n = comandos - gravInicioComando;
+        g.comandos = n;
+        g.inicio = new int[n];
+        for (int k = 0; k < n; k++) g.inicio[k] = cmdInicio[gravInicioComando + k] - gravInicioVertice;
+        g.quantos = java.util.Arrays.copyOfRange(cmdQuantos, gravInicioComando, comandos);
+        g.textura = java.util.Arrays.copyOfRange(cmdTextura, gravInicioComando, comandos);
+        g.stencil = java.util.Arrays.copyOfRange(cmdStencil, gravInicioComando, comandos);
+        g.nPlanos = java.util.Arrays.copyOfRange(cmdNPlanos, gravInicioComando, comandos);
+        g.inverte = java.util.Arrays.copyOfRange(cmdInverte, gravInicioComando, comandos);
+        g.filtro = java.util.Arrays.copyOfRange(cmdFiltro, gravInicioComando, comandos);
+        g.recorte = java.util.Arrays.copyOfRange(cmdRecorte, gravInicioComando, comandos);
+        g.epoca = epocaTexturas;
+        g.largura = larguraTela;
+        g.altura = alturaTela;
+        g.area = areaPintada - gravArea;
+        return g;
+    }
+
+    /** Repete uma gravação (copia os vértices e os comandos). False se ela não vale mais. */
+    boolean reproduzir(Gravacao g) {
+        if (g.epoca != epocaTexturas || g.largura != larguraTela || g.altura != alturaTela || g.vertices > MAX_VERTICES / 2) {
+            return false;
+        }
+        descarregar();
+        reservar(g.vertices);
+        while (comandos + g.comandos > cmdInicio.length) {
+            int n = cmdInicio.length * 2;
+            cmdInicio = java.util.Arrays.copyOf(cmdInicio, n);
+            cmdQuantos = java.util.Arrays.copyOf(cmdQuantos, n);
+            cmdTextura = java.util.Arrays.copyOf(cmdTextura, n);
+            cmdStencil = java.util.Arrays.copyOf(cmdStencil, n);
+            cmdNPlanos = java.util.Arrays.copyOf(cmdNPlanos, n);
+            cmdInverte = java.util.Arrays.copyOf(cmdInverte, n);
+            cmdFiltro = java.util.Arrays.copyOf(cmdFiltro, n);
+            cmdRecorte = java.util.Arrays.copyOf(cmdRecorte, n);
+        }
+        System.arraycopy(g.dados, 0, dados, posicao, g.dados.length);
+        for (int k = 0; k < g.comandos; k++) {
+            int c = comandos++;
+            cmdInicio[c] = vertices + g.inicio[k];
+            cmdQuantos[c] = g.quantos[k];
+            cmdTextura[c] = g.textura[k];
+            cmdStencil[c] = g.stencil[k];
+            cmdNPlanos[c] = g.nPlanos[k];
+            cmdInverte[c] = g.inverte[k];
+            cmdFiltro[c] = g.filtro[k];
+            cmdRecorte[c] = g.recorte[k];
+        }
+        vertices += g.vertices;
+        posicao += g.dados.length;
+        inicioLote = vertices;
+        if (TesteAutomatico.gravando) areaPintada += g.area;
+        return true;
+    }
+
+    float alfaGlobal() { return alfaGlobal; }
+
+    int nPlanos() { return nPlanos; }
+
     /** Fecha o lote atual como um comando (a troca de estado vem depois). */
     private void descarregar() {
         if (vertices == inicioLote) return;
@@ -439,6 +539,7 @@ final class GlRenderCanvas implements RenderCanvas {
 
     /** Sobe os vértices gravados de uma vez e desenha os comandos. */
     private void executar() {
+        execucoes++;
         if (comandos == 0) {
             vertices = posicao = inicioLote = 0;
             return;
@@ -914,6 +1015,7 @@ final class GlRenderCanvas implements RenderCanvas {
                 descarregar();
                 executar();
                 degrades.clear();
+                epocaTexturas++;
                 linhaDoObjeto.clear();
             }
             linha = degrades.size();
@@ -1004,6 +1106,7 @@ final class GlRenderCanvas implements RenderCanvas {
             executar();
             if (velho[0] == texturaAtual) texturaAtual = 0;
             GLES30.glDeleteTextures(1, velho, 0);
+            epocaTexturas++;
             texturasDeTextoVivas.remove(velho[0]);
             bytesTexturas -= velho[1];
         }
@@ -1048,6 +1151,7 @@ final class GlRenderCanvas implements RenderCanvas {
             executar();
             prateleiraX = prateleiraY = alturaPrateleira = 0;
             geracaoTexto++;
+            epocaTexturas++;
             TesteAutomatico.atlasDeTextoCheio();
             textos.clear();
             ultimoDoTexto.clear();
@@ -1160,6 +1264,7 @@ final class GlRenderCanvas implements RenderCanvas {
             // envio: fica sem textura (quem precisar dela de novo a decodifica).
             if (!bitmap.isRecycled() && !fonte.isRecycled()) throw e;
             GLES30.glDeleteTextures(1, id, 0);
+            epocaTexturas++;
             return null;
         }
         if (fonte != bitmap) fonte.recycle();
@@ -1192,6 +1297,7 @@ final class GlRenderCanvas implements RenderCanvas {
             texturaAtual = 0;
         }
         GLES30.glDeleteTextures(1, new int[] {t.id}, 0);
+        epocaTexturas++;
         t.id = 0;
         bytesTexturas -= t.bytes;
     }

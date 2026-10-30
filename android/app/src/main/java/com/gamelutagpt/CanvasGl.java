@@ -254,6 +254,49 @@ final class CanvasGl extends Canvas {
         // cada sprite tingido (o contorno do SHINKAI, o rastro, os ecos).
     }
 
+    // ---- Gravação de pedaços que não mudam (o controle de toque, os botões de teste) ----
+
+    private final java.util.HashMap<Object, GlRenderCanvas.Gravacao> gravacoes = new java.util.HashMap<>();
+    private Object gravando;
+    private int textosAntesDaGravacao;
+
+    /**
+     * Repete o pedaço {@code chave} gravado com o mesmo {@code estado} (e a mesma transformação,
+     * transparência e tamanho de tela): true, e quem chama pula o desenho. False: quem chama
+     * desenha e depois chama {@link #gravado}, que guarda o que foi desenhado para os próximos
+     * quadros. O controle de toque redesenhava círculos, arcos, linhas e textos a cada quadro
+     * (1,7 ms no celular) para mudar só quando um botão é apertado.
+     */
+    boolean repetir(Object chave, long estado) {
+        prepararGl();
+        GlRenderCanvas.Gravacao g = gravacoes.get(chave);
+        if (g != null && g.assinatura == estado && g.alfa == gl.alfaGlobal() && gl.nPlanos() == 0
+            && g.matriz[0] == v[0] && g.matriz[1] == v[1] && g.matriz[2] == v[2]
+            && g.matriz[3] == v[3] && g.matriz[4] == v[4] && g.matriz[5] == v[5] && gl.reproduzir(g)) {
+            return true;
+        }
+        gravando = gl.nPlanos() == 0 ? chave : null;
+        textosAntesDaGravacao = textosNovos + gl.textosNovosRc;
+        if (gravando != null) gl.gravarComecar();
+        return false;
+    }
+
+    /** Fecha a gravação aberta por {@link #repetir} (o desenho de agora vale também para os próximos quadros). */
+    void gravado(Object chave, long estado) {
+        if (gravando != chave) return;
+        gravando = null;
+        GlRenderCanvas.Gravacao g = gl.gravarTerminar();
+        // Com texto feito agora (talvez um provisório, esticado de outro tamanho) grava no próximo.
+        if (g == null || textosNovos + gl.textosNovosRc != textosAntesDaGravacao) {
+            gravacoes.remove(chave);
+            return;
+        }
+        g.assinatura = estado;
+        g.alfa = gl.alfaGlobal();
+        System.arraycopy(v, 0, g.matriz, 0, 6);
+        gravacoes.put(chave, g);
+    }
+
     /** Escala da transformação atual (pixels da tela por unidade). */
     private float escala() {
         return (float)Math.sqrt(Math.abs(v[0] * v[4] - v[1] * v[3]));
@@ -970,6 +1013,7 @@ final class CanvasGl extends Canvas {
     void esquecerTextos() {
         textos.clear();
         ultimoDoTexto.clear();
+        gravacoes.clear();
     }
 
     @Override public void drawText(String text, float x, float y, Paint p) {

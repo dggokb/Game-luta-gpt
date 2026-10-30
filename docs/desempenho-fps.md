@@ -420,6 +420,45 @@ moldura, barra SHINKAI, barras de super, botões de teste, controle de toque, me
 próprio aparelho. O perfil do PC (5.10) não batia com o celular: a busca de texto e a conta de
 área não mudaram o HUD do celular (4,2 → 5,1 ms, dentro da variação entre rodadas).
 
+### 5.12 HUD: gravar e repetir o que não muda
+
+O "HUD por pedaço" medido no celular (Xiaomi, 1080p, OpenGL, p15+p16), de 5,3 ms no total:
+
+| Pedaço | ms por quadro |
+|---|---|
+| Controle de toque | 1,74 |
+| Botões de teste | 1,05 |
+| Barras de super | 0,97 |
+| Retratos e vida | 0,69 |
+| Mensagens/combo | 0,19 |
+| Barra SHINKAI | 0,19 |
+
+Os dois primeiros só mudam quando um botão é apertado ou um rótulo muda, mas eram redesenhados a
+cada quadro (círculos, arcos, linhas, painéis e textos).
+
+**Gravação no OpenGL.**
+- `GlRenderCanvas.gravarComecar`/`gravarTerminar` guardam os vértices, já na tela, e os comandos
+  de um pedaço do quadro.
+- `reproduzir` copia os dois de volta.
+- `CanvasGl.repetir(chave, estado)` e `gravado` checam:
+  - a assinatura do estado;
+  - a transformação;
+  - a transparência;
+  - o tamanho da tela;
+  - a época das texturas (qualquer textura apagada invalida as gravações).
+- Gravação com texto feito na hora é descartada e refeita no quadro seguinte, porque o texto pode
+  ter sido um provisório esticado de outro tamanho.
+
+**No HUD:**
+- O direcional, L/M/H, L+M, M+H e COMBO são gravados pela assinatura do que está apertado.
+- TAG, SUPER e SHINKAI ficam ao vivo, porque têm anéis e barras que andam.
+- Os botões de teste são gravados por um hash dos rótulos e de quem está ligado. O "TESTE 21s"
+  regrava uma vez por segundo.
+
+No PC (com `-Ptoque`) o controle de toque caiu de 0,11 para 0,06 ms, e os botões de teste saíram da
+lista. No celular espera-se de 1,74 para uns 0,5 ms e de 1,05 para perto de zero, mas falta
+confirmar com o TESTE.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

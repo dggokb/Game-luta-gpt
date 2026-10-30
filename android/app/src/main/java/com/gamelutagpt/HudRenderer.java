@@ -224,6 +224,39 @@ final class HudRenderer {
     }
 
     private void drawTestButtons(Canvas c, State s) {
+        // Os botões de teste só mudam com um rótulo ou um botão ligado: no OpenGL, gravados e
+        // repetidos (1 ms por quadro no celular).
+        CanvasGl gl = c instanceof CanvasGl ? (CanvasGl) c : null;
+        long estado = 0;
+        if (gl != null) {
+            estado = estadoDosBotoesDeTeste(s);
+            if (gl.repetir(GRAVACAO_TESTE, estado)) return;
+        }
+        drawTestButtonsNow(c, s);
+        if (gl != null) gl.gravado(GRAVACAO_TESTE, estado);
+    }
+
+    /** Tudo o que os botões de teste mostram, num número (rótulos e quem está ligado). */
+    private long estadoDosBotoesDeTeste(State s) {
+        long h = 17;
+        h = h * 31 + (s.aiEnabled() ? 1 : 2);
+        h = h * 31 + (s.debugEnabled() ? 1 : 2);
+        h = h * 31 + (s.pressed(Control.HEAL_PLAYER) ? 1 : 2);
+        h = h * 31 + (s.pressed(Control.HEAL_OPPONENT) ? 1 : 2);
+        h = h * 31 + (s.pressed(Control.TEAM_SELECT) ? 1 : 2);
+        h = h * 31 + s.teamLabel().hashCode();
+        h = h * 31 + (s.storyActive() ? 1 : 2);
+        h = h * 31 + (s.tutorialActive() ? 1 : 2);
+        String anim = s.animacaoLabel();
+        h = h * 31 + (anim == null ? 0 : anim.hashCode() * 2 + (s.animacaoLigada() ? 1 : 0));
+        for (int i = 0; i < ControlsLayout.PERF_CONTROLS.length; i++) {
+            String label = s.perfLabel(i);
+            h = h * 31 + (label == null ? 0 : label.hashCode() * 2 + (s.perfOn(i) ? 1 : 0));
+        }
+        return h;
+    }
+
+    private void drawTestButtonsNow(Canvas c, State s) {
         drawToggle(c, s.aiEnabled(), s.aiEnabled() ? "IA ON" : "IA OFF",
             AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 19f);
         drawToggle(c, s.debugEnabled(), s.debugEnabled() ? "DEBUG ON" : "DEBUG OFF",
@@ -1306,8 +1339,29 @@ final class HudRenderer {
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
+    /** Chaves das gravações no OpenGL (o que não muda de um quadro para o outro). */
+    private static final Object GRAVACAO_TOQUE = new Object(), GRAVACAO_TESTE = new Object();
+
     void drawControls(Canvas c, State s) {
         reset();
+        // D-pad, L/M/H, L+M, M+H e COMBO só mudam com o que está apertado: no OpenGL, gravados e
+        // repetidos (redesenhar custava 1,7 ms por quadro no celular). TAG, SUPER e SHINKAI
+        // (barras e anéis que andam) são desenhados sempre.
+        CanvasGl gl = c instanceof CanvasGl ? (CanvasGl) c : null;
+        long estado = s.dpadDirection()
+            | (s.pressed(Control.LIGHT) ? 1L << 8 : 0) | (s.pressed(Control.MEDIUM) ? 1L << 9 : 0)
+            | (s.pressed(Control.HEAVY) ? 1L << 10 : 0) | (s.pressed(Control.THROW) ? 1L << 11 : 0)
+            | (s.pressed(Control.PUSHBLOCK) ? 1L << 12 : 0) | (s.pressed(Control.COMBO) ? 1L << 13 : 0);
+        if (gl == null || !gl.repetir(GRAVACAO_TOQUE, estado)) {
+            drawFixedControls(c, s);
+            if (gl != null) gl.gravado(GRAVACAO_TOQUE, estado);
+        }
+        drawTagButton(c, s);
+        drawSuperButton(c, s);
+        drawShinkaiButton(c, s);
+    }
+
+    private void drawFixedControls(Canvas c, State s) {
         // D-pad: glassy disc, eight sectors, the active one lit in the player's blue.
         c.save();
         c.translate(DPAD_X, DPAD_Y);
@@ -1367,9 +1421,6 @@ final class HudRenderer {
         drawPairSpot(c, THROW_X, THROW_Y, "L+M", s.pressed(Control.THROW));
         drawPairSpot(c, PUSHBLOCK_X, PUSHBLOCK_Y, "M+H", s.pressed(Control.PUSHBLOCK));
         drawComboButton(c, s.pressed(Control.COMBO));
-        drawTagButton(c, s);
-        drawSuperButton(c, s);
-        drawShinkaiButton(c, s);
     }
 
     /**
