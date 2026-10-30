@@ -787,7 +787,19 @@ final class CanvasGl extends Canvas {
         int geracao;
         /** Onde fica o ponto (x, linha de base) no bitmap, e o tamanho dele, no espaço local. */
         float origemX, origemY, largura, altura;
+        /** Tamanho da fonte em que foi feito (o reaproveitado em outro tamanho estica por ele). */
+        float base;
     }
+
+    /**
+     * Textos feitos por quadro, no máximo: passou disso, o mesmo texto noutro tamanho ou contorno
+     * reaproveita o último bitmap dele, esticado. Uma animação de texto que ninguém previu custa
+     * no máximo isso por quadro, em vez de um bitmap por texto por quadro.
+     */
+    private static final int NOVOS_POR_QUADRO = 6;
+    /** O último bitmap de cada texto (pela palavra, cor e estilo; sem tamanho, escala e contorno). */
+    private final java.util.HashMap<String, Texto> ultimoDoTexto = new java.util.HashMap<>();
+    private final StringBuilder chaveSolta = new StringBuilder();
 
     private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, false) {
         @Override protected boolean removeEldestEntry(Map.Entry<String, Texto> velho) {
@@ -799,6 +811,7 @@ final class CanvasGl extends Canvas {
     /** Contexto novo: as texturas dos textos se foram. */
     void esquecerTextos() {
         textos.clear();
+        ultimoDoTexto.clear();
     }
 
     @Override public void drawText(String text, float x, float y, Paint p) {
@@ -835,6 +848,11 @@ final class CanvasGl extends Canvas {
         return (float)Math.pow(2.0, d);
     }
 
+    private static float degrauDeContorno(float largura) {
+        if (largura <= 0f) return 0f;
+        return (float)Math.pow(2.0, Math.round(Math.log(largura) / Math.log(2) * 8.0) / 8.0);
+    }
+
     private void texto(String s, float x, float y, Paint p) {
         if (s == null || s.isEmpty()) return;
         prepararGl();
@@ -844,9 +862,10 @@ final class CanvasGl extends Canvas {
         float base = degrauDeTamanho(tamanho);
         float k = tamanho / base;
         float esc = degrauDeEscala(escala() * k);
-        // O contorno no tamanho do degrau, em quartos de pixel: contorno proporcional à fonte
-        // (o número de dano) fica igual em todos os quadros do mesmo degrau.
-        float traco = Math.round(p.getStrokeWidth() / k * 4f) / 4f;
+        // O contorno no tamanho do degrau, em degraus de 1/8 de oitava (~9%): tanto o proporcional
+        // à fonte (o número de dano) quanto o fixo com a fonte pulsando (o contador de combo, 12 px)
+        // ficam em um ou dois valores, e não num valor novo a cada quadro.
+        float traco = degrauDeContorno(p.getStrokeWidth() / k);
         Shader sh = p.getShader();
         // Degradê linear: o texto vira só a forma (branca) e o degradê é posto pela placa de vídeo.
         boolean mascara = sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial();
@@ -870,6 +889,21 @@ final class CanvasGl extends Canvas {
         String kt = chave.toString();
         Texto t = textos.get(kt);
         if (t != null && t.geracao != gl.geracaoTexto) t = null;
+        String solta = null;
+        if (t == null) {
+            chaveSolta.setLength(0);
+            chaveSolta.append(s).append('\u0000').append(mascara ? 0 : (cor | 0xFF000000)).append(',')
+                .append(p.getStyle().ordinal()).append(',').append(p.getTextAlign().ordinal()).append(',')
+                .append(mascara ? "M" : sh != null ? String.valueOf(System.identityHashCode(sh)) : "");
+            solta = chaveSolta.toString();
+            if (textosNovos >= NOVOS_POR_QUADRO) {
+                Texto ultimo = ultimoDoTexto.get(solta);
+                if (ultimo != null && ultimo.geracao == gl.geracaoTexto) {
+                    t = ultimo;
+                    k = tamanho / ultimo.base;
+                }
+            }
+        }
         if (t == null) {
             Paint feito = p;
             if (mascara || p.getAlpha() != 255 || base != tamanho || traco != p.getStrokeWidth()) {
@@ -887,8 +921,11 @@ final class CanvasGl extends Canvas {
             }
             t = criarTexto(s, x, y, feito, esc);
             if (t == null) return;
+            t.base = base;
             textosNovos++;
             textos.put(kt, t);
+            if (ultimoDoTexto.size() > TEXTOS * 2) ultimoDoTexto.clear();
+            ultimoDoTexto.put(solta, t);
         }
         float l = x - t.origemX * k, top = y - t.origemY * k, r = l + t.largura * k, b = top + t.altura * k;
         if (mascara) {

@@ -411,7 +411,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     /** Para o contador: chamadas do último quadro, texturas e memória delas. */
     String resumo() {
-        return "OpenGL " + canvasGl.desenhos + " desenhos · " + canvasGl.textosNovos + " textos novos · "
+        return "OpenGL " + canvasGl.desenhos + " desenhos · " + (canvasGl.textosNovos + canvas.textosNovosRc) + " textos novos · "
             + canvasGl.formasStencil + " formas · " + canvas.chamadas + " chamadas · " + canvas.verticesQuadro + " vértices · lotes "
             + Math.round(msLotes * 10f) / 10f + " ms · envio " + Math.round(msEnvio * 10f) / 10f + " ms · "
             + canvas.quantasTexturas() + " texturas " + (canvas.bytesTexturas() >> 20) + " MB";

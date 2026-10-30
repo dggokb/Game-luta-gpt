@@ -201,6 +201,7 @@ final class GlRenderCanvas implements RenderCanvas {
         for (Textura t : texturas.values()) t.id = 0;
         texturas.clear();
         textos.clear();
+        ultimoDoTexto.clear();
         degrades.clear();
         atlasTexto = novaTextura(ATLAS_TEXTO, ATLAS_TEXTO);
         atlasDegrade = novaTextura(256, LINHAS_DEGRADE);
@@ -223,6 +224,7 @@ final class GlRenderCanvas implements RenderCanvas {
 
     /** Começa o quadro numa tela de {@code largura}x{@code altura} pixels, preta, na tela virtual. */
     void comecar(int largura, int altura) {
+        textosNovosRc = 0;
         larguraTela = largura;
         alturaTela = altura;
         GLES30.glViewport(0, 0, largura, altura);
@@ -739,6 +741,7 @@ final class GlRenderCanvas implements RenderCanvas {
             prateleiraX = prateleiraY = alturaPrateleira = 0;
             geracaoTexto++;
             textos.clear();
+            ultimoDoTexto.clear();
         }
         int x = prateleiraX + 1, y = prateleiraY + 1;
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, atlasTexto);
@@ -1047,8 +1050,14 @@ final class GlRenderCanvas implements RenderCanvas {
         float[] uv;
         int largura, altura;
         float origemX, origemY, escala;
+        /** Tamanho da fonte em que foi feito (o reaproveitado em outro tamanho estica por ele). */
+        float base;
     }
     private final java.util.HashMap<String, Texto> textos = new java.util.HashMap<>();
+    /** Como no CanvasGl: no máximo tantos textos feitos por quadro; os outros reaproveitam o último. */
+    private static final int NOVOS_POR_QUADRO = 6;
+    int textosNovosRc;
+    private final java.util.HashMap<String, Texto> ultimoDoTexto = new java.util.HashMap<>();
 
     @Override
     public void drawText(String text, float x, float y, float size, int fillArgb, int strokeArgb, float strokeWidth, boolean italic) {
@@ -1071,13 +1080,25 @@ final class GlRenderCanvas implements RenderCanvas {
         String chave = text + '\u0000' + base + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000'
             + strokeWidth + '\u0000' + italic + '\u0000' + escala;
         Texto t = textos.get(chave);
+        float k = kz;
         if (t == null) {
-            t = criarTexto(text, base * escala, fillArgb, strokeArgb, strokeWidth * escala, italic);
-            if (t == null) return;
-            t.escala = escala;
-            textos.put(chave, t);
+            String solta = text + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000' + italic;
+            Texto ultimo = textosNovosRc >= NOVOS_POR_QUADRO ? ultimoDoTexto.get(solta) : null;
+            if (ultimo != null) {
+                t = ultimo;
+                k = size / ultimo.base;
+            } else {
+                t = criarTexto(text, base * escala, fillArgb, strokeArgb, strokeWidth * escala, italic);
+                if (t == null) return;
+                t.escala = escala;
+                t.base = base;
+                textosNovosRc++;
+                textos.put(chave, t);
+                if (ultimoDoTexto.size() > 320) ultimoDoTexto.clear();
+                ultimoDoTexto.put(solta, t);
+            }
         }
-        float k = kz / t.escala;
+        k /= t.escala;
         // Centralizado em x, com a linha de base em y (como no Canvas).
         float l = x - t.origemX * k, top = y - t.origemY * k;
         desenharTexto(t.uv, l, top, l + t.largura * k, top + t.altura * k, alfaComum ? (alfa << 24) | 0xFFFFFF : 0xFFFFFFFF);
