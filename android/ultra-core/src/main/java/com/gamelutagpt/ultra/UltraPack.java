@@ -55,6 +55,16 @@ public final class UltraPack {
         this.warnings = Collections.unmodifiableList(new ArrayList<>(warnings));
     }
 
+    /** Todas as imagens do pack (painéis, raio, corte e fundo), sem as que faltam. */
+    public List<RenderImage> todasAsImagens() {
+        List<RenderImage> todas = new ArrayList<>();
+        for (RenderImage im : images) if (im != null) todas.add(im);
+        for (RenderImage im : new RenderImage[] {beamBody, beamTip, beamStart, beamImpact, beamAura, beamWind, beamDust, cutIn, stage}) {
+            if (im != null) todas.add(im);
+        }
+        return todas;
+    }
+
     /** Imagem do painel, ou null quando ele usa a arte provisória. */
     public RenderImage image(UltraSlot slot) {
         return images[slot.ordinal()];

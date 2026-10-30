@@ -35,6 +35,8 @@ final class DesenhoGl {
     void manutencao() {}
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro) {}
     void aquecer(com.gamelutagpt.stage.StageScene cenario) {}
+    boolean preSubir(com.gamelutagpt.render.RenderImage imagem) { return false; }
     int subir(SpriteAtlasCache atlases, long orcamentoNs) { return 0; }
+    int subirUma(SpriteAtlasCache atlases) { return 0; }
     String resumo() { return ""; }
 }

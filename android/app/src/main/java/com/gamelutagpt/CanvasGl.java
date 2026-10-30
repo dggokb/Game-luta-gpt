@@ -49,6 +49,14 @@ final class CanvasGl extends Canvas {
 
     private final Matrix matriz = new Matrix();
     private final float[] v = new float[9];
+    private static final float[] IDENTIDADE = {1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f};
+    // Buffers reaproveitados entre desenhos (nada de array novo por forma a cada quadro).
+    private float[] bufA = new float[256], bufB = new float[256], bufC = new float[64], bufPx = new float[64];
+    private final float[] ret8 = new float[8], ret8b = new float[8];
+
+    private static float[] caber(float[] buf, int n) {
+        return buf.length >= n ? buf : new float[Math.max(n, buf.length * 2)];
+    }
     private final Matrix local = new Matrix(), inversa = new Matrix();
     private final float[] ponto = new float[2];
     private final Path caminho = new Path();
@@ -69,6 +77,7 @@ final class CanvasGl extends Canvas {
         this.altura = altura;
         super.restoreToCount(1);
         super.setMatrix(null);
+        matrizSuja = true;
         recortes[1] = null;
         nRecortes[1] = 0;
         alfas[1] = 1f;
@@ -143,7 +152,9 @@ final class CanvasGl extends Canvas {
     // ---- Recorte ----
 
     @Override public boolean clipRect(float l, float t, float r, float b) {
-        recortarPoligono(new float[] {l, t, r, t, r, b, l, b});
+        float[] q = ret8;
+        q[0] = l; q[1] = t; q[2] = r; q[3] = t; q[4] = r; q[5] = b; q[6] = l; q[7] = b;
+        recortarPoligono(q, 4);
         return true;
     }
 
@@ -164,7 +175,7 @@ final class CanvasGl extends Canvas {
         float[] pts = contornos[0];
         // Os recortes do jogo são polígonos convexos; um que não for vira o contorno convexo dele.
         if (!convexo(pts, pts.length / 2)) pts = envoltoria(pts);
-        recortarPoligono(pts);
+        recortarPoligono(pts, pts.length / 2);
         return true;
     }
 
@@ -173,12 +184,11 @@ final class CanvasGl extends Canvas {
     }
 
     /** Recorta ao polígono convexo {@code xy} (espaço atual), somado ao recorte de agora. */
-    void recortarPoligono(float[] xy) {
-        int n = xy.length / 2;
+    void recortarPoligono(float[] xy, int n) {
         if (n < 3) return;
         int k = getSaveCount();
         lerMatriz();
-        float[] px = new float[n * 2];
+        float[] px = bufPx = caber(bufPx, n * 2);
         float area = 0f;
         for (int i = 0; i < n; i++) {
             float x = xy[i * 2], y = xy[i * 2 + 1];
@@ -208,10 +218,27 @@ final class CanvasGl extends Canvas {
 
     // ---- Estado para o OpenGL ----
 
+    /**
+     * A matriz só é lida do Canvas de verdade (duas chamadas nativas) quando alguma coisa a
+     * mudou: as transformações e o restore marcam.
+     */
+    private boolean matrizSuja = true;
+
     private void lerMatriz() {
+        if (!matrizSuja) return;
         super.getMatrix(matriz);
         matriz.getValues(v);
+        matrizSuja = false;
     }
+
+    @Override public void translate(float dx, float dy) { super.translate(dx, dy); matrizSuja = true; }
+    @Override public void scale(float sx, float sy) { super.scale(sx, sy); matrizSuja = true; }
+    @Override public void rotate(float graus) { super.rotate(graus); matrizSuja = true; }
+    @Override public void skew(float sx, float sy) { super.skew(sx, sy); matrizSuja = true; }
+    @Override public void concat(Matrix m) { super.concat(m); matrizSuja = true; }
+    @Override public void setMatrix(Matrix m) { super.setMatrix(m); matrizSuja = true; }
+    @Override public void restore() { super.restore(); matrizSuja = true; }
+    @Override public void restoreToCount(int n) { super.restoreToCount(n); matrizSuja = true; }
 
     /** Leva a transformação, o recorte, a transparência e a inversão de agora para o OpenGL. */
     void prepararGl() {
@@ -334,8 +361,7 @@ final class CanvasGl extends Canvas {
 
     private void cobrirTela(int color) {
         prepararGl();
-        v[0] = 1f; v[1] = 0f; v[2] = 0f; v[3] = 0f; v[4] = 1f; v[5] = 0f;
-        gl.matriz(v);
+        gl.matriz(IDENTIDADE);
         gl.fillRect(0f, 0f, largura, altura, color);
     }
 
@@ -345,8 +371,10 @@ final class CanvasGl extends Canvas {
         Paint.Style st = p.getStyle();
         if (st == Paint.Style.STROKE) {
             float h = largura(p) * 0.5f;
-            anel(new float[] {l - h, t - h, r + h, t - h, r + h, b + h, l - h, b + h},
-                new float[] {l + h, t + h, r - h, t + h, r - h, b - h, l + h, b - h}, 4);
+            float[] fo = ret8, de = ret8b;
+            fo[0] = l - h; fo[1] = t - h; fo[2] = r + h; fo[3] = t - h; fo[4] = r + h; fo[5] = b + h; fo[6] = l - h; fo[7] = b + h;
+            de[0] = l + h; de[1] = t + h; de[2] = r - h; de[3] = t + h; de[4] = r - h; de[5] = b - h; de[6] = l + h; de[7] = b - h;
+            anel(fo, de, 4);
             return;
         }
         if (st == Paint.Style.FILL_AND_STROKE) {
@@ -361,19 +389,27 @@ final class CanvasGl extends Canvas {
     @Override public void drawRect(Rect r, Paint p) { drawRect(r.left, r.top, r.right, r.bottom, p); }
 
     /** Contorno de retângulo arredondado ({@code seg} pontos por canto), recuado {@code d} para fora. */
-    private float[] arredondado(float l, float t, float r, float b, float rx, float ry, float d, int seg) {
+    /** Cosseno e seno dos 7 pontos de cada canto (os 4 cantos em sequência), calculados uma vez. */
+    private static final float[] CANTO_COS = new float[28], CANTO_SEN = new float[28];
+    static {
+        for (int c = 0; c < 4; c++) {
+            for (int i = 0; i < 7; i++) {
+                double a = -Math.PI / 2 + c * Math.PI / 2 + (Math.PI / 2) * i / 6;
+                CANTO_COS[c * 7 + i] = (float)Math.cos(a);
+                CANTO_SEN[c * 7 + i] = (float)Math.sin(a);
+            }
+        }
+    }
+
+    private float[] arredondado(float l, float t, float r, float b, float rx, float ry, float d, float[] pts) {
         rx = Math.max(0f, Math.min(rx, (r - l) * 0.5f));
         ry = Math.max(0f, Math.min(ry, (b - t) * 0.5f));
-        float[] pts = new float[seg * 4 * 2];
-        float[] cx = {r - rx, r - rx, l + rx, l + rx}, cy = {t + ry, b - ry, b - ry, t + ry};
         int k = 0;
         for (int c = 0; c < 4; c++) {
-            double inicio = -Math.PI / 2 + c * Math.PI / 2;
-            for (int i = 0; i < seg; i++) {
-                double a = inicio + (Math.PI / 2) * i / (seg - 1);
-                float ca = (float)Math.cos(a), sa = (float)Math.sin(a);
-                pts[k++] = cx[c] + ca * (rx + d);
-                pts[k++] = cy[c] + sa * (ry + d);
+            float cx = c < 2 ? r - rx : l + rx, cy = c == 1 || c == 2 ? b - ry : t + ry;
+            for (int i = 0; i < 7; i++) {
+                pts[k++] = cx + CANTO_COS[c * 7 + i] * (rx + d);
+                pts[k++] = cy + CANTO_SEN[c * 7 + i] * (ry + d);
             }
         }
         return pts;
@@ -382,14 +418,16 @@ final class CanvasGl extends Canvas {
     @Override public void drawRoundRect(float l, float t, float r, float b, float rx, float ry, Paint p) {
         prepararGl();
         pincel(p);
-        int seg = 7, n = seg * 4;
+        int n = 28;
+        bufA = caber(bufA, n * 2);
+        bufB = caber(bufB, n * 2);
         if (p.getStyle() == Paint.Style.STROKE) {
             float h = largura(p) * 0.5f;
-            anel(arredondado(l, t, r, b, rx, ry, h, seg), arredondado(l, t, r, b, rx, ry, -Math.min(h, Math.min(rx, ry)), seg), n);
+            anel(arredondado(l, t, r, b, rx, ry, h, bufA), arredondado(l, t, r, b, rx, ry, -Math.min(h, Math.min(rx, ry)), bufB), n);
             return;
         }
         float d = p.getStyle() == Paint.Style.FILL_AND_STROKE ? p.getStrokeWidth() * 0.5f : 0f;
-        leque(arredondado(l, t, r, b, rx, ry, d, seg), n);
+        leque(arredondado(l, t, r, b, rx, ry, d, bufA), n);
     }
 
     @Override public void drawRoundRect(RectF r, float rx, float ry, Paint p) {
@@ -397,9 +435,9 @@ final class CanvasGl extends Canvas {
     }
 
     /** Pontos de uma elipse (ou arco dela), de {@code inicio} a {@code inicio + varre} graus. */
-    private static float[] elipse(float cx, float cy, float rx, float ry, float inicio, float varre, int n, boolean fechado) {
+    private static float[] elipse(float cx, float cy, float rx, float ry, float inicio, float varre, int n, boolean fechado,
+                                  float[] pts) {
         int m = fechado ? n : n + 1;
-        float[] pts = new float[m * 2];
         for (int i = 0; i < m; i++) {
             double a = Math.toRadians(inicio + varre * i / n);
             pts[i * 2] = cx + rx * (float)Math.cos(a);
@@ -433,8 +471,10 @@ final class CanvasGl extends Canvas {
                 return;
             }
             int n = segmentos(Math.max(rx, ry), 360f);
-            anel(elipse(cx, cy, rx + h, ry + h, 0f, 360f, n, true),
-                elipse(cx, cy, Math.max(0f, rx - h), Math.max(0f, ry - h), 0f, 360f, n, true), n);
+            bufA = caber(bufA, (n + 1) * 2);
+            bufB = caber(bufB, (n + 1) * 2);
+            anel(elipse(cx, cy, rx + h, ry + h, 0f, 360f, n, true, bufA),
+                elipse(cx, cy, Math.max(0f, rx - h), Math.max(0f, ry - h), 0f, 360f, n, true, bufB), n);
             return;
         }
         if (st == Paint.Style.FILL_AND_STROKE) {
@@ -447,7 +487,8 @@ final class CanvasGl extends Canvas {
             return;
         }
         int n = segmentos(Math.max(rx, ry), 360f);
-        leque(elipse(cx, cy, rx, ry, 0f, 360f, n, true), n);
+        bufA = caber(bufA, (n + 1) * 2);
+        leque(elipse(cx, cy, rx, ry, 0f, 360f, n, true, bufA), n);
     }
 
     @Override public void drawOval(RectF r, Paint p) { drawOval(r.left, r.top, r.right, r.bottom, p); }
@@ -473,21 +514,24 @@ final class CanvasGl extends Canvas {
                 tracar(caminho, p);
                 return;
             }
-            float[] fora = elipse(cx, cy, rx + h, ry + h, inicio, varre, n, false);
-            float[] dentro = elipse(cx, cy, Math.max(0f, rx - h), Math.max(0f, ry - h), inicio, varre, n, false);
+            bufA = caber(bufA, (n + 1) * 2);
+            bufB = caber(bufB, (n + 1) * 2);
+            float[] fora = elipse(cx, cy, rx + h, ry + h, inicio, varre, n, false, bufA);
+            float[] dentro = elipse(cx, cy, Math.max(0f, rx - h), Math.max(0f, ry - h), inicio, varre, n, false, bufB);
             for (int i = 0; i < n; i++) {
                 int j = i + 1;
                 tri(fora[i * 2], fora[i * 2 + 1], fora[j * 2], fora[j * 2 + 1], dentro[j * 2], dentro[j * 2 + 1]);
                 tri(fora[i * 2], fora[i * 2 + 1], dentro[j * 2], dentro[j * 2 + 1], dentro[i * 2], dentro[i * 2 + 1]);
             }
             if (p.getStrokeCap() == Paint.Cap.ROUND) {
-                float[] pa = elipse(cx, cy, rx, ry, inicio, 0f, 1, false), pb = elipse(cx, cy, rx, ry, inicio + varre, 0f, 1, false);
-                ponta(pa[0], pa[1], h);
-                ponta(pb[0], pb[1], h);
+                double a0 = Math.toRadians(inicio), a1 = Math.toRadians(inicio + varre);
+                ponta(cx + rx * (float)Math.cos(a0), cy + ry * (float)Math.sin(a0), h);
+                ponta(cx + rx * (float)Math.cos(a1), cy + ry * (float)Math.sin(a1), h);
             }
             return;
         }
-        float[] arco = elipse(cx, cy, rx, ry, inicio, varre, n, false);
+        bufA = caber(bufA, (n + 1) * 2);
+        float[] arco = elipse(cx, cy, rx, ry, inicio, varre, n, false, bufA);
         // Com centro, leque do centro (fatia); sem, leque da corda (o arco fechado pela reta).
         float ox = centro ? cx : arco[0], oy = centro ? cy : arco[1];
         for (int i = 0; i < n; i++) tri(ox, oy, arco[i * 2], arco[i * 2 + 1], arco[i * 2 + 2], arco[i * 2 + 3]);
@@ -503,7 +547,8 @@ final class CanvasGl extends Canvas {
             gl.retanguloUv(x - raio, y - raio, x + raio, y + raio, -1f, -1f, 1f, 1f, corPincel, 2f);
         } else {
             int n = 16;
-            leque(elipse(x, y, raio, raio, 0f, 360f, n, true), n);
+            bufC = caber(bufC, (n + 1) * 2);
+            leque(elipse(x, y, raio, raio, 0f, 360f, n, true, bufC), n);
         }
     }
 
@@ -743,7 +788,7 @@ final class CanvasGl extends Canvas {
         float origemX, origemY, largura, altura;
     }
 
-    private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, true) {
+    private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, false) {
         @Override protected boolean removeEldestEntry(Map.Entry<String, Texto> velho) {
             return size() > TEXTOS;
         }
@@ -878,7 +923,7 @@ final class CanvasGl extends Canvas {
         @Override public void translate(float dx, float dy) { CanvasGl.this.translate(dx, dy); }
         @Override public void scale(float sx, float sy, float px, float py) { CanvasGl.this.scale(sx, sy, px, py); }
         @Override public void rotate(float graus, float px, float py) { CanvasGl.this.rotate(graus, px, py); }
-        @Override public void clipPolygon(float[] xy) { recortarPoligono(xy); }
+        @Override public void clipPolygon(float[] xy) { recortarPoligono(xy, xy.length / 2); }
 
         @Override public void fillRect(float l, float t, float r, float b, int argb) { prepararGl(); gl.fillRect(l, t, r, b, argb); }
         @Override public void fillPolygon(float[] xy, int argb) { prepararGl(); gl.fillPolygon(xy, argb); }

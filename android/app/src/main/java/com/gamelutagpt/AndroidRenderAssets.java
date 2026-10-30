@@ -16,27 +16,75 @@ final class AndroidRenderAssets implements RenderAssets {
     private static final int MAX_IMAGE_SIDE = 2048;
 
     static final class AndroidRenderImage implements RenderImage {
-        final Bitmap bitmap;
+        private Bitmap bitmap;
+        private final int largura, altura;
+        /** De onde ela veio (para decodificar de novo depois de solta) e quem a carregou. */
+        private final String caminho;
+        private final AndroidRenderAssets dono;
 
         AndroidRenderImage(Bitmap bitmap) {
+            this(bitmap, null, null);
+        }
+
+        AndroidRenderImage(Bitmap bitmap, String caminho, AndroidRenderAssets dono) {
             this.bitmap = bitmap;
+            this.largura = bitmap.getWidth();
+            this.altura = bitmap.getHeight();
+            this.caminho = caminho;
+            this.dono = dono;
+        }
+
+        /**
+         * O bitmap para desenhar. Uma imagem da luta solta depois de subir para o OpenGL é
+         * decodificada de novo se o Canvas pedir (o OpenGL desligado na luta seguinte).
+         */
+        Bitmap bitmap() {
+            if (bitmap.isRecycled() && dono != null && caminho != null) {
+                try {
+                    bitmap = dono.decodificar(caminho);
+                } catch (IOException e) {
+                    android.util.Log.w("AndroidRenderAssets", "imagem não voltou: " + caminho, e);
+                }
+            }
+            return bitmap;
+        }
+
+        /** O bitmap como está (talvez já solto): o OpenGL acha a textura por ele. */
+        Bitmap bruto() {
+            return bitmap;
+        }
+
+        /** Pode ser solta depois de subir para o OpenGL (cenário e Ultra). */
+        boolean soltaNoOpenGl() {
+            return dono != null && dono.daLuta;
         }
 
         @Override
         public int width() {
-            return bitmap.getWidth();
+            return largura;
         }
 
         @Override
         public int height() {
-            return bitmap.getHeight();
+            return altura;
         }
     }
 
     private final AssetManager assets;
+    /**
+     * Imagens da luta (cenário, Ultras): com a luta em OpenGL elas são decodificadas na memória
+     * comum, sobem para a placa de vídeo e o bitmap é solto, como as folhas (antes ficavam na
+     * placa de vídeo duas vezes: o Bitmap HARDWARE e a textura).
+     */
+    final boolean daLuta;
 
     AndroidRenderAssets(AssetManager assets) {
+        this(assets, false);
+    }
+
+    AndroidRenderAssets(AssetManager assets, boolean daLuta) {
         this.assets = assets;
+        this.daLuta = daLuta;
     }
 
     @Override
@@ -52,6 +100,10 @@ final class AndroidRenderAssets implements RenderAssets {
 
     @Override
     public RenderImage loadImage(String path) throws IOException {
+        return new AndroidRenderImage(decodificar(path), path, this);
+    }
+
+    private Bitmap decodificar(String path) throws IOException {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         try (InputStream in = assets.open(path)) {
@@ -64,7 +116,8 @@ final class AndroidRenderAssets implements RenderAssets {
             options.inSampleSize *= 2;
         }
         Bitmap bitmap = null;
-        if (SpriteAtlasCache.telaPelaGpu && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        boolean placa = SpriteAtlasCache.telaPelaGpu && !(daLuta && SpriteAtlasCache.paraOpenGl);
+        if (placa && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // Cenário (camadas do tamanho da tela, várias por quadro), Ultra e páginas: direto na
             // placa de vídeo, como as folhas dos lutadores. Na memória comum o sistema as copia
             // para a placa ao desenhar e de novo sempre que saem do cache de texturas.
@@ -82,6 +135,6 @@ final class AndroidRenderAssets implements RenderAssets {
             }
         }
         if (bitmap == null) throw new IOException("formato de imagem não suportado");
-        return new AndroidRenderImage(bitmap);
+        return bitmap;
     }
 }

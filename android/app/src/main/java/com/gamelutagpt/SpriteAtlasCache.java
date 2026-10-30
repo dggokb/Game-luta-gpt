@@ -98,6 +98,15 @@ final class SpriteAtlasCache {
      * se desenha. Vale a partir do próximo carregamento de luta.
      */
     private volatile float escalaRender=1f;
+    /**
+     * Animações raras (comemoração, provocação do treino, sequência do Ultra). Com
+     * {@link #ocasionaisSobDemanda} elas ficam fora do preload e só carregam quando pedidas ({@link #pedir}).
+     */
+    static final java.util.Set<String> OCASIONAIS=new java.util.HashSet<>(java.util.Arrays.asList(
+        SpriteStates.VICTORY,SpriteStates.TAUNT,SpriteStates.ULTRA_SEQ,SpriteStates.ULTRA_SEQ_FRENTE));
+    private volatile boolean ocasionaisSobDemanda;
+    /** Muda quando uma folha fica pronta (quem sobe para o OpenGL sabe que há novidade). */
+    private volatile int geracao;
     /** Abaixo do ALTO a folha pode ampliar um pouco (a tela já é ampliada inteira). */
     static final float AMPLIACAO_REDUZIDA = 1.1f;
 
@@ -216,6 +225,57 @@ final class SpriteAtlasCache {
     }
 
     /** Decodes every atlas of the characters before gameplay (in parallel); never called per frame. */
+    /** No celular: as folhas só de animações raras não entram no preload (de 10% a 30% da memória do personagem). */
+    void ocasionaisSobDemanda(boolean valor) {
+        ocasionaisSobDemanda=valor;
+    }
+
+    /** A folha só serve a animações raras e fica para quando for pedida. */
+    private boolean adiada(CharacterDefinition c,CharacterDefinition.Atlas atlas) {
+        if(!ocasionaisSobDemanda)return false;
+        for(Map.Entry<String,CharacterDefinition.Animation> a:c.animations.entrySet()) {
+            if(a.getValue().atlas!=null&&a.getValue().atlas.resource.equals(atlas.resource)&&!OCASIONAIS.contains(a.getKey()))return false;
+        }
+        return true;
+    }
+
+    /**
+     * Começa a decodificar, sem esperar, as folhas destas animações do personagem (as raras,
+     * pouco antes de aparecerem). Pode ser chamado a cada quadro: o que já foi pedido não muda.
+     */
+    void pedir(CharacterDefinition c,String... animacoes) {
+        synchronized(trava) {
+            boolean novo=false;
+            for(String nome:animacoes) {
+                CharacterDefinition.Animation a=c.animations.get(nome);
+                if(a==null||a.atlas==null||folhas.containsKey(a.atlas.resource))continue;
+                entrada(c,a.atlas,false);
+                novo=true;
+            }
+            if(novo) {
+                garantirTrabalhadores();
+                trava.notifyAll();
+            }
+        }
+    }
+
+    /**
+     * Não precisa esperar por esta animação: ela não existe, a folha está pronta, ou falhou em
+     * segundo plano (aí o desenho tenta de novo na hora, em vez de a luta esperar para sempre).
+     */
+    boolean pronta(CharacterDefinition c,String animacao) {
+        CharacterDefinition.Animation a=c.animations.get(animacao);
+        if(a==null||a.atlas==null)return true;
+        synchronized(trava) {
+            Entrada e=folhas.get(a.atlas.resource);
+            return e!=null&&(e.folha!=null||e.erro!=null);
+        }
+    }
+
+    int geracao() {
+        return geracao;
+    }
+
     void preload(CharacterDefinition... characters) {
         carregar(false,characters);
     }
@@ -234,12 +294,17 @@ final class SpriteAtlasCache {
         synchronized(trava) {
             for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) {
                 if(trocarEscala)trocarSeOutraEscala(c,a.atlas);
+                if(adiada(c,a.atlas))continue;
                 Entrada e=entrada(c,a.atlas,true);
                 if(e.folha==null&&!esperadas.contains(e))esperadas.add(e);
             }
             garantirTrabalhadores();
         }
-        // Quem espera também decodifica: pega da frente da fila enquanto houver o que fazer.
+        esperar(esperadas);
+    }
+
+    /** Espera as folhas ficarem prontas; quem espera também decodifica (pega da frente da fila). */
+    private void esperar(List<Entrada> esperadas) {
         for(int i=0;i<esperadas.size();i++) {
             while(true) {
                 Entrada e=esperadas.get(i);
@@ -289,7 +354,7 @@ final class SpriteAtlasCache {
                 }
             }
             for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) {
-                if(folhas.containsKey(a.atlas.resource))continue;
+                if(folhas.containsKey(a.atlas.resource)||adiada(c,a.atlas))continue;
                 float escala=escalaAgora(c,a.atlas);
                 Entrada nova=new Entrada(c,a.atlas,escala);
                 if(bytesProntos+bytesEmAndamento+nova.bytes>orcamentoAntecipado) liberarAntecipadas(queridas,nova.bytes);
@@ -337,7 +402,13 @@ final class SpriteAtlasCache {
         Folha folha=e!=null?e.folha:null;
         if(folha!=null)return folha;
         android.util.Log.w(MedicaoCarregamento.TAG,"folha "+atlas.resource+" decodificada na hora de desenhar");
-        preload(character);
+        // Só esta folha (o preload pularia uma rara): o engasgo é o de uma folha.
+        List<Entrada> esta=new ArrayList<>(1);
+        synchronized(trava) {
+            esta.add(entrada(character,atlas,true));
+            garantirTrabalhadores();
+        }
+        esperar(esta);
         synchronized(trava) { e=folhas.get(atlas.resource); }
         if(e==null||e.folha==null)throw new IllegalStateException("Atlas not preloaded: "+atlas.resource);
         return e.folha;
@@ -502,7 +573,7 @@ final class SpriteAtlasCache {
             if(!e.descartada)bytesEmAndamento-=e.bytes;
             if(folha!=null) {
                 if(e.descartada) folha.bitmap.recycle();
-                else { e.folha=folha;bytesProntos+=folha.bytes; }
+                else { e.folha=folha;bytesProntos+=folha.bytes;geracao++; }
             } else if(!e.descartada) {
                 if(propagar) {
                     // Quem chamou recebe o erro; a folha sai do cache (um próximo pedido tenta de novo).

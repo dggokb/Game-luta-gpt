@@ -118,6 +118,8 @@ public class GameView extends SurfaceView
     /** DEBUG > AJUSTAR CAIXAS: hitbox, hurtbox e empurrão no olho, exportados para o Drive. */
     private final TelaAjusteCaixas ajusteCaixas;
     private final AndroidRenderAssets ultraAssets;
+    /** Cenário e Ultras: imagens que, com a luta em OpenGL, ficam só na placa de vídeo. */
+    private final AndroidRenderAssets lutaAssets;
     private SpriteFighterRenderer spriteFighterRenderer;
     private SpriteFighterRenderer opponentSpriteRenderer;
     private final StageRenderer stage = new StageRenderer();
@@ -556,7 +558,10 @@ public class GameView extends SurfaceView
     /** O quadro de agora saiu pelo OpenGL. */
     private boolean glQuadro;
     /** A superfície de cima já foi limpa (transparente) para a luta em OpenGL aparecer. */
-    private boolean camadaDeCimaLimpa;
+    private volatile boolean camadaDeCimaLimpa;
+    /** A superfície de cima está em 1 pixel (luta em OpenGL) e a largura dela agora. */
+    private volatile boolean camadaEncolhida;
+    private volatile int larguraCamada = 2;
     /** Depois do carregamento as folhas sobem para o OpenGL, com a tela de carregamento na frente. */
     private boolean subindoFolhas;
 
@@ -703,6 +708,7 @@ public class GameView extends SurfaceView
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
+        lutaAssets = new AndroidRenderAssets(context.getAssets(), true);
         // Ultra cinematográfico: a sequência do vídeo espera a página de mangá antes do golpe final.
         engine.config.ultraSequencePage = true;
         historia = new PaginaHistoria(this, ultraAssets);
@@ -718,6 +724,7 @@ public class GameView extends SurfaceView
         setKeepScreenOn(true);
         contextoArte = context;
         carregarFolhasNaHora = !emSegundoPlano;
+        atlases.ocasionaisSobDemanda(emSegundoPlano);
         if (!emSegundoPlano) carregarArte(context);
         else anteciparArteDaLuta(context);
     }
@@ -752,7 +759,7 @@ public class GameView extends SurfaceView
         });
         final String id = stageId;
         cenarioAntecipadoId = id;
-        cenarioAntecipado = new java.util.concurrent.FutureTask<>(() -> loadStage(ultraAssets, id));
+        cenarioAntecipado = new java.util.concurrent.FutureTask<>(() -> loadStage(lutaAssets, id));
         Thread t = new Thread(() -> {
             selecaoAntecipada.run();
             cenarioAntecipado.run();
@@ -857,7 +864,7 @@ public class GameView extends SurfaceView
         telaoRenderer = new SpriteFighterRenderer(atlases, team[0].character, false);
         medicao.parte("folhas");
         StageScene cenario = stageId.equals(cenarioAntecipadoId) ? resultado(cenarioAntecipado) : null;
-        stageScene = cenario != null ? cenario : loadStage(ultraAssets, stageId);
+        stageScene = cenario != null ? cenario : loadStage(lutaAssets, stageId);
         cenarioAntecipado = null;
         medicao.parte("cenario");
         CharacterSelectRenderer selecao = resultado(selecaoAntecipada);
@@ -908,7 +915,7 @@ public class GameView extends SurfaceView
         java.util.concurrent.FutureTask<UltraPack> tarefa = ultras.get(id);
         if (tarefa == null) {
             final FighterState quem = fighter;
-            tarefa = new java.util.concurrent.FutureTask<>(() -> loadUltraPack(ultraAssets, quem));
+            tarefa = new java.util.concurrent.FutureTask<>(() -> loadUltraPack(lutaAssets, quem));
             ultras.put(id, tarefa);
             if (agora) {
                 tarefa.run();
@@ -916,7 +923,11 @@ public class GameView extends SurfaceView
                 synchronized (ultras) {
                     if (carregadorDeUltras == null) {
                         carregadorDeUltras = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
-                            Thread t = new Thread(r, "Ultras");
+                            // Prioridade de fundo de verdade (a do Java quase não muda nada no Linux).
+                            Thread t = new Thread(() -> {
+                                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                                r.run();
+                            }, "Ultras");
                             t.setDaemon(true);
                             t.setPriority(Math.max(Thread.MIN_PRIORITY, Thread.NORM_PRIORITY - 2));
                             return t;
@@ -931,6 +942,37 @@ public class GameView extends SurfaceView
         return tarefa;
     }
 
+    /** Packs cujas imagens já estão todas na placa (sem esperar o primeiro quadro do Ultra). */
+    private final java.util.Set<UltraPack> ultrasNaPlaca =
+        java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+
+    /**
+     * Com o quadro OpenGL aberto: sobe uma imagem por quadro dos packs de Ultra já carregados,
+     * para o Ultra não pagar o envio das texturas no primeiro quadro em que aparece.
+     */
+    private boolean preSubirUltra() {
+        if (ultras.isEmpty()) return false;
+        for (java.util.concurrent.FutureTask<UltraPack> tarefa : ultras.values()) {
+            if (!tarefa.isDone()) continue;
+            UltraPack pack = resultado(tarefa);
+            if (pack == null || ultrasNaPlaca.contains(pack)) continue;
+            for (com.gamelutagpt.render.RenderImage imagem : pack.todasAsImagens()) {
+                if (desenhoGl.preSubir(imagem)) return true;
+            }
+            ultrasNaPlaca.add(pack);
+        }
+        return false;
+    }
+
+    /** {@link SpriteAtlasCache#geracao()} das folhas que já subiram para o OpenGL. */
+    private int geracaoNaPlaca = -1;
+
+    /** Uma folha rara que ficou pronta no meio da luta sobe antes de aparecer (uma por quadro). */
+    private void subirFolhaNova() {
+        int g = atlases.geracao();
+        if (g != geracaoNaPlaca && desenhoGl.subirUma(atlases) == 0) geracaoNaPlaca = g;
+    }
+
     /** O pack pronto do personagem, ou null se ainda não foi pedido ou está carregando. */
     private UltraPack ultraPronto(String characterId) {
         java.util.concurrent.FutureTask<UltraPack> tarefa = ultras.get(characterId);
@@ -943,6 +985,7 @@ public class GameView extends SurfaceView
         for (FighterState member : team) ficam.add(member.character.id);
         if (flow.battle()) for (FighterState member : engine.team(OPPONENT).members) ficam.add(member.character.id);
         ultras.keySet().retainAll(ficam);
+        ultrasNaPlaca.clear();
     }
 
     /**
@@ -953,9 +996,25 @@ public class GameView extends SurfaceView
         for (int side = 0; side < 2; side++) {
             for (FighterState member : engine.team(side).members) {
                 if (member.superMeter < ULTRA_PREPARO) continue;
+                atlases.pedir(member.character, SpriteStates.ULTRA_SEQ, SpriteStates.ULTRA_SEQ_FRENTE);
                 if (usaPackReal(member, side)) pedirUltra(member, false);
                 FighterState rival = engine.team(1 - side).pointState();
                 if (usaPackReal(rival, 1 - side)) pedirUltra(rival, false);
+            }
+        }
+    }
+
+    /**
+     * No celular: a comemoração de quem pode ganhar (o rival está com pouca vida ou o relógio
+     * acabando) e a provocação do boneco do treino começam a carregar antes de aparecer.
+     */
+    private void anteciparOcasionais() {
+        if (tutorial.active()) atlases.pedir(engine.fighter(1).character(), SpriteStates.TAUNT);
+        boolean fimDoRelogio = flow.timed() && flow.clockSeconds() <= 20;
+        for (int side = 0; side < 2; side++) {
+            FighterState quem = engine.fighter(side).state;
+            if (fimDoRelogio || quem.life * 10 <= quem.profile.maxLife * 4) {
+                atlases.pedir(engine.fighter(1 - side).character(), SpriteStates.VICTORY);
             }
         }
     }
@@ -975,7 +1034,9 @@ public class GameView extends SurfaceView
 
     /** Os packs que a abertura do Ultra de {@code p} mostra (o dele e o do rival) estão prontos. */
     private boolean ultraProntoParaAbertura(CombatFighter p) {
-        return prontoOuSemPack(p.state) && prontoOuSemPack(engine.fighter(1 - p.index).state);
+        return prontoOuSemPack(p.state) && prontoOuSemPack(engine.fighter(1 - p.index).state)
+            && atlases.pronta(p.character(), SpriteStates.ULTRA_SEQ)
+            && atlases.pronta(p.character(), SpriteStates.ULTRA_SEQ_FRENTE);
     }
 
     private boolean prontoOuSemPack(FighterState f) {
@@ -1386,7 +1447,7 @@ public class GameView extends SurfaceView
         if (wanted.equals(stageId)) return;
         stageScene = null;
         stageId = wanted;
-        stageScene = loadStage(ultraAssets, wanted);
+        stageScene = loadStage(lutaAssets, wanted);
     }
 
     /**
@@ -1489,6 +1550,9 @@ public class GameView extends SurfaceView
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+        // Tamanho novo: o conteúdo de antes não vale (a camada da luta em OpenGL é limpa de novo).
+        larguraCamada = width;
+        camadaDeCimaLimpa = false;
         // O jogo anda a 60 quadros: numa tela de 90 ou 120 Hz o sistema mostra cada quadro por 1
         // ou 2 batidas da tela, alternando (tremida mesmo a 60 FPS). Pedir 60 deixa a tela no
         // ritmo do jogo (ou num múltiplo dele).
@@ -1566,6 +1630,8 @@ public class GameView extends SurfaceView
 
     @Override
     public void run() {
+        // O quadro vem antes do resto do app (e das threads que decodificam arte).
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
         try {
             loop();
         } finally {
@@ -1579,7 +1645,7 @@ public class GameView extends SurfaceView
         final long targetFrame = 16_666_667L;
         while (running) {
             long frameStart = System.nanoTime();
-            float elapsedSeconds = (frameStart - previous) / 1_000_000_000f;
+            float elapsedSeconds = encaixarNoPasso((frameStart - previous) / 1_000_000_000f);
             previous = frameStart;
             perfil.inicio();
             advanceSimulation(elapsedSeconds);
@@ -1592,7 +1658,9 @@ public class GameView extends SurfaceView
                 aplicarQualidade();
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
-            if (remaining > 0) {
+            // Na luta em OpenGL o swap já espera a batida da tela: dormir aqui só somava erro (um
+            // quadro perdido virava dois ou três).
+            if (remaining > 0 && !glQuadro) {
                 try {
                     Thread.sleep(remaining / 1_000_000L, (int)(remaining % 1_000_000L));
                 } catch (InterruptedException e) {
@@ -1600,6 +1668,17 @@ public class GameView extends SurfaceView
                 }
             }
         }
+    }
+
+    /**
+     * O tempo entre quadros perto de um número inteiro de passos (até 2 ms) vira exatamente esse
+     * número: o erro do relógio não se acumula até dar um passo duplo num quadro qualquer.
+     */
+    static float encaixarNoPasso(float segundos) {
+        for (int n = 1; n <= 3; n++) {
+            if (Math.abs(segundos - n * FIXED_STEP) < 0.002f) return n * FIXED_STEP;
+        }
+        return segundos;
     }
 
     // Render cadence can vary; the simulation always advances in whole 60 Hz frames.
@@ -1810,7 +1889,10 @@ public class GameView extends SurfaceView
             startUltraOpening(quem);
             return;
         }
-        if (!carregarFolhasNaHora) anteciparUltras();
+        if (!carregarFolhasNaHora) {
+            anteciparUltras();
+            anteciparOcasionais();
+        }
         if (abertura.isActive()) {
             // Abertura do Ultra: a luta espera parada (sem pausa no meio).
             selectionKeys.clear();
@@ -2237,6 +2319,7 @@ public class GameView extends SurfaceView
         if (phase != ultraPhaseSeen) {
             if (phase == CombatFighter.ULTRA_STARTUP) {
                 ultraSounds.play(ultraFolder(p.state), "ativacao");
+                atlases.pedir(p.character(), SpriteStates.ULTRA_SEQ, SpriteStates.ULTRA_SEQ_FRENTE);
                 if (usaPackReal(p.state, p.index)) pedirUltra(p.state, false);
                 FighterState rival = engine.fighter(1 - p.index).state;
                 if (usaPackReal(rival, 1 - p.index)) pedirUltra(rival, false);
@@ -3398,6 +3481,7 @@ public class GameView extends SurfaceView
                     renderFrame(gl);
                     if (pausa.fps()) drawFpsCounter(gl);
                     desenharAvisoGl(gl);
+                    if (!preSubirUltra()) subirFolhaNova();
                     perfil.marca(PerfilQuadros.TELA);
                     desenhoGl.terminarQuadro();
                     perfil.marca(PerfilQuadros.ENVIO);
@@ -3415,6 +3499,12 @@ public class GameView extends SurfaceView
                 return;
             }
         }
+        if (camadaEncolhida) {
+            // Saiu da luta em OpenGL: a superfície de cima volta ao tamanho da tela antes de desenhar.
+            camadaEncolhida = false;
+            aplicarQualidade();
+        }
+        if (larguraCamada <= 1) return;
         Canvas canvas = lockFrameCanvas();
         perfil.marca(PerfilQuadros.TRAVA);
         if (canvas == null) return;
@@ -3440,8 +3530,16 @@ public class GameView extends SurfaceView
             && !historia.coversScreen() && !telaVitoria.cobreTudo();
     }
 
-    /** A superfície do Canvas, por cima, fica transparente enquanto a luta sai pelo OpenGL (uma vez). */
+    /**
+     * A superfície do Canvas, por cima, fica transparente enquanto a luta sai pelo OpenGL (uma vez
+     * a cada tamanho dela). E encolhe para 1 pixel: o sistema não mistura mais uma camada de tela
+     * cheia a cada quadro, e os buffers dela saem da memória.
+     */
     private void limparCamadaDeCima() {
+        if (!camadaEncolhida) {
+            camadaEncolhida = true;
+            post(() -> holder.setFixedSize(1, 1));
+        }
         if (camadaDeCimaLimpa) return;
         Canvas c = lockFrameCanvas();
         if (c == null) return;
@@ -3583,10 +3681,12 @@ public class GameView extends SurfaceView
             // As folhas dos lutadores acompanham a tela desenhada (a partir da próxima luta).
             atlases.escalaDaRenderizacao(e);
             if (e >= 0.999f || w <= 0 || h <= 0) {
-                holder.setSizeFromLayout();
+                if (camadaEncolhida) holder.setFixedSize(1, 1);
+                else holder.setSizeFromLayout();
                 if (desenhoGl != null) desenhoGl.tamanho(0, 0);
             } else {
-                holder.setFixedSize(Math.max(320, Math.round(w * e)), Math.max(180, Math.round(h * e)));
+                if (camadaEncolhida) holder.setFixedSize(1, 1);
+                else holder.setFixedSize(Math.max(320, Math.round(w * e)), Math.max(180, Math.round(h * e)));
                 if (desenhoGl != null) desenhoGl.tamanho(Math.max(320, Math.round(w * e)), Math.max(180, Math.round(h * e)));
             }
         });
@@ -4416,7 +4516,8 @@ public class GameView extends SurfaceView
         CombatFighter rival = engine.fighter(1 - f.index);
         int side = f.index;
         // Treino: o jogador errou e o boneco provoca (a TAUNT dele, parado no lugar).
-        if (animation == null && tutorial.taunting() && f == engine.fighter(1) && renderer.hasAnimation(SpriteStates.TAUNT)) {
+        if (animation == null && tutorial.taunting() && f == engine.fighter(1) && renderer.hasAnimation(SpriteStates.TAUNT)
+            && atlases.pronta(character, SpriteStates.TAUNT)) {
             animation = SpriteStates.TAUNT;
             animationElapsed = Math.min(character.animations.get(SpriteStates.TAUNT).duration - 0.0001f, tutorial.tauntTime());
         }
@@ -4428,6 +4529,11 @@ public class GameView extends SurfaceView
         boolean beatRival = rival.ko() || (flow.timeOver() && flow.winner() == side);
         boolean celebrating = animation == null && onPoint && matchWon && beatRival && !f.ko() && f.grounded &&
             f.status == CombatFighter.Status.NEUTRAL && !f.attacking() && renderer.hasAnimation(SpriteStates.VICTORY);
+        if (celebrating && !atlases.pronta(character, SpriteStates.VICTORY)) {
+            // A comemoração ainda carregando (só no celular): fica em pé até ela chegar.
+            atlases.pedir(character, SpriteStates.VICTORY);
+            celebrating = false;
+        }
         if (celebrating) {
             // Opponent KO: the winner plays VICTORY once and holds its last pose.
             CharacterDefinition.Animation win = character.animations.get(SpriteStates.VICTORY);

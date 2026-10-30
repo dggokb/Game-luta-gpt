@@ -188,7 +188,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
             gl.drawImage(image, left, top, right, bottom, alpha);
             return;
         }
-        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap();
         if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
         rect.set(left, top, right, bottom);
@@ -212,7 +212,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
             gl.drawImageRegion(image, srcLeft, srcTop, srcRight, srcBottom, left, top, right, bottom, alpha);
             return;
         }
-        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap();
         if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
         srcRect.set(Math.round(srcLeft), Math.round(srcTop), Math.round(srcRight), Math.round(srcBottom));
@@ -234,7 +234,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
             return;
         }
         if (linhas < 2) return;
-        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap();
         if (!desenhavel(bitmap)) return;
         BitmapShader shader = stripShaders.get(bitmap);
         if (shader == null) {
@@ -254,6 +254,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
      * depois de a imagem carregar, ela fica de fora (em vez de fechar o jogo).
      */
     private boolean desenhavel(Bitmap bitmap) {
+        if (bitmap.isRecycled()) return false;
         return canvas.isHardwareAccelerated() || !SpriteAtlasCache.naPlacaDeVideo(bitmap);
     }
 

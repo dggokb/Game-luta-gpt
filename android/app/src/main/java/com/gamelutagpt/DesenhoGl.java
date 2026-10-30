@@ -150,10 +150,11 @@ final class DesenhoGl implements SurfaceHolder.Callback {
                 }
             }
             if (contexto == EGL14.EGL_NO_CONTEXT) {
-                // Com stencil (as formas côncavas do HUD) e 4x de antisserrilhado; sem o que o
-                // aparelho não tiver.
+                // Com stencil (as formas côncavas do HUD). Sem antisserrilhado: custava 10–30% da
+                // placa de vídeo na tela inteira, e círculos, anéis e brilhos já têm a borda suave
+                // no shader.
                 config = null;
-                int[][] pedidos = {{8, 4}, {8, 0}, {0, 0}};
+                int[][] pedidos = {{8, 0}, {0, 0}};
                 for (int[] p : pedidos) {
                     int[] pedido = {
                         EGL14.EGL_RED_SIZE, 8, EGL14.EGL_GREEN_SIZE, 8, EGL14.EGL_BLUE_SIZE, 8, EGL14.EGL_ALPHA_SIZE, 8,
@@ -360,6 +361,11 @@ final class DesenhoGl implements SurfaceHolder.Callback {
             destino.left, destino.top, destino.right, destino.bottom, alpha);
     }
 
+    /** Sobe uma imagem antes de ela aparecer (o pack do Ultra, aos poucos), com o quadro aberto. */
+    boolean preSubir(com.gamelutagpt.render.RenderImage imagem) {
+        return quadroAberto && canvas.subirImagem(imagem);
+    }
+
     /** O cenário uma vez, escondido (as camadas sobem antes da luta, e não no primeiro quadro). */
     void aquecer(com.gamelutagpt.stage.StageScene cenario) {
         Canvas c = comecarQuadro();
@@ -377,17 +383,27 @@ final class DesenhoGl implements SurfaceHolder.Callback {
      * {@code orcamentoNs}. Devolve quantas faltam. Com o quadro aberto ou o contexto pronto.
      */
     int subir(SpriteAtlasCache atlases, long orcamentoNs) {
+        return subir(atlases, orcamentoNs, Integer.MAX_VALUE);
+    }
+
+    /** Sobe no máximo uma folha pronta (uma rara que acabou de carregar, no meio da luta). Devolve quantas faltam. */
+    int subirUma(SpriteAtlasCache atlases) {
+        return subir(atlases, Long.MAX_VALUE / 4, 1);
+    }
+
+    private int subir(SpriteAtlasCache atlases, long orcamentoNs, int maximo) {
         if (!preparar()) return 0;
         long ate = System.nanoTime() + orcamentoNs;
         atlases.prontas(prontas);
         int faltam = 0;
         for (SpriteAtlasCache.Folha folha : prontas) {
             if (canvas.temTextura(folha.bitmap) || folha.bitmap.isRecycled()) continue;
-            if (System.nanoTime() >= ate) {
+            if (maximo <= 0 || System.nanoTime() >= ate) {
                 faltam++;
                 continue;
             }
             canvas.textura(folha.bitmap, true);
+            maximo--;
         }
         prontas.clear();
         return faltam;

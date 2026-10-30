@@ -858,9 +858,20 @@ final class GlRenderCanvas implements RenderCanvas {
         bytesTexturas -= t.bytes;
     }
 
+    /** Sobe a imagem agora (antes de ela aparecer); false se ela já estava na placa. */
+    boolean subirImagem(RenderImage image) {
+        if (!(image instanceof AndroidRenderAssets.AndroidRenderImage)) return false;
+        if (texturas.get(((AndroidRenderAssets.AndroidRenderImage)image).bruto()) != null) return false;
+        return texturaDe(image) != null;
+    }
+
     private Textura texturaDe(RenderImage image) {
         if (!(image instanceof AndroidRenderAssets.AndroidRenderImage)) return null;
-        return textura(((AndroidRenderAssets.AndroidRenderImage)image).bitmap, false);
+        AndroidRenderAssets.AndroidRenderImage im = (AndroidRenderAssets.AndroidRenderImage)image;
+        // Já subiu (e talvez foi solta): a textura é achada pelo mesmo Bitmap.
+        Textura t = texturas.get(im.bruto());
+        if (t != null) return t;
+        return textura(im.bitmap(), im.soltaNoOpenGl());
     }
 
     /** Recorte {@code s*} (pixels do bitmap) esticado no retângulo de destino, com o filtro atual. */

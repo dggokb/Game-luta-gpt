@@ -184,6 +184,30 @@ Com o APK de debug instalado e o cabo ligado. Rodar cada cenário do roteiro T26
 5. **E1** (uma superfície): o fechamento do desenho novo.
 6. **E2 e E3** (conteúdo): em paralelo com E1, no `build_characters.py`; E3 é decisão de arte, E2 só de ferramenta.
 
+### 5.4 O que já foi feito (itens 1, 2 e 3 da revisão)
+
+A ordem seguida foi CPU primeiro, porque no aparelho o envio para a GPU mede de 1,6 a 4 ms por quadro e o gargalo é a CPU (HUD e `CanvasGl`).
+
+- **R6:** MSAA fora. `DesenhoGl` só pede `{stencil 8, MSAA 0}`; as bordas suaves vêm do shader.
+- **R9:**
+  - Sem `Thread.sleep` nos quadros em OpenGL (o swap já espera o vsync).
+  - Passo encaixado: a até 2 ms de n/60 conta exatamente n passos.
+- **R10:** a thread do jogo roda em `THREAD_PRIORITY_DISPLAY`, e a de "Ultras" em `THREAD_PRIORITY_BACKGROUND`. As de "Folhas" ficaram como estavam, porque no Android o fundo vai para os núcleos pequenos e a tela de carregamento ficaria mais lenta.
+- **R11:** na luta em OpenGL, a superfície de cima encolhe para 1×1 (`setFixedSize`) e volta ao tamanho normal fora da luta.
+- **R8:**
+  - `CanvasGl` só relê a matriz quando ela mudou (flag de matriz suja nas sobrescritas de `translate`/`scale`/`rotate`/`skew`/`concat`/`setMatrix`/`restore`).
+  - Buffers reaproveitados em recortes, retângulos, arredondados, elipses e linhas.
+- **R2:** cenário e packs de Ultra da luta vêm de um `AndroidRenderAssets` próprio (`daLuta`). Com OpenGL, decodifica em memória comum, sobe e solta o bitmap. Se o Canvas precisar da imagem depois, ela é decodificada de novo.
+- **R3:** com o pack do Ultra carregado (a partir de 2 barras), as imagens dele sobem para o OpenGL uma por quadro (`GameView.preSubirUltra`). O primeiro quadro do raio não paga mais o envio.
+- **R4:** no celular, as folhas só de VICTORY, TAUNT, ULTRA_SEQ e ULTRA_SEQ_FRENTE ficam fora do `preload`/`antecipar` (`SpriteAtlasCache.ocasionaisSobDemanda`). São de 10% a 30% de cada personagem, cerca de 355 MB somando o elenco na escala 1. Elas são pedidas sem bloquear (`pedir`):
+  - **ULTRA_SEQ:** a partir de 2 barras. Na ativação, a abertura do Ultra espera a folha, como já esperava o pack.
+  - **VICTORY:** quando o rival está com até 40% da vida ou o relógio chega a 20 s. Se a folha ainda não chegou, o vencedor fica parado até ela chegar.
+  - **TAUNT:** enquanto o treino está ativo.
+
+  Uma folha rara que fica pronta no meio da luta sobe para o OpenGL num quadro sem outro envio. Se ainda assim alguém desenhar uma folha que não carregou, `get` decodifica só ela, sem passar pelo `preload` (que a pularia). INTRO e SUPER_* continuam no `preload`.
+
+Ainda não feitos: R1, R5, R7, E1–E4.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:
