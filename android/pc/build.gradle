@@ -29,6 +29,7 @@ def fontesDoApp = tasks.register('fontesDoApp', Sync) {
         exclude 'com/gamelutagpt/MainActivity.java'
         // O desenho em OpenGL é só do celular (no PC o DesenhoGl não faz nada).
         exclude 'com/gamelutagpt/GlRenderCanvas.java'
+        exclude 'com/gamelutagpt/CanvasGl.java'
         exclude { element ->
             !element.isDirectory() && new File(substituicoes, element.relativePath.pathString).isFile()
         }

@@ -19,7 +19,7 @@ public final class TelaCarregando {
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF ring = new RectF();
-    private final Shader background = new LinearGradient(0f, 0f, 0f, Arena.VH,
+    private final Shader background = new Degrade.Linear(0f, 0f, 0f, Arena.VH,
         0xFF0B163F, 0xFF04060F, Shader.TileMode.CLAMP);
     private final String text = texto(Locale.getDefault().getLanguage());
 

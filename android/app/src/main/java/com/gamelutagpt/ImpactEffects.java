@@ -58,10 +58,10 @@ final class ImpactEffects {
         java.util.Arrays.fill(dLife, 1f);
         java.util.Arrays.fill(sAge, 99f);
         // Unit-radius cores, scaled per burst through the canvas: no shader per frame.
-        cores[HIT] = new RadialGradient(0f, 0f, 1f,
+        cores[HIT] = new Degrade.Radial(0f, 0f, 1f,
             new int[]{0xFFFFFFFF, 0xFFFFF4C2, 0xCCFFB23A, 0x00FF5A1E}, new float[]{0f, .28f, .6f, 1f},
             Shader.TileMode.CLAMP);
-        cores[GUARD] = new RadialGradient(0f, 0f, 1f,
+        cores[GUARD] = new Degrade.Radial(0f, 0f, 1f,
             new int[]{0xFFFFFFFF, 0xFFD6F6FF, 0xAA4FC8FF, 0x002A7BFF}, new float[]{0f, .3f, .62f, 1f},
             Shader.TileMode.CLAMP);
     }

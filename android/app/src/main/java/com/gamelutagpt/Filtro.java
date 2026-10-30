@@ -18,6 +18,20 @@ final class Filtro {
     private Filtro(ColorFilter canvas, float[] matriz) {
         this.canvas = canvas;
         this.matriz = matriz;
+        synchronized (MATRIZES) {
+            MATRIZES.put(canvas, matriz);
+        }
+    }
+
+    /** A matriz de cada ColorFilter feito aqui (o PorterDuffColorFilter não deixa ler a dele). */
+    private static final java.util.Map<ColorFilter, float[]> MATRIZES = new java.util.WeakHashMap<>();
+
+    /** A matriz 4x5 de um ColorFilter feito por {@link Filtro}, ou null. */
+    static float[] matrizDe(ColorFilter f) {
+        if (f == null) return null;
+        synchronized (MATRIZES) {
+            return MATRIZES.get(f);
+        }
     }
 
     static Filtro matriz(float[] m) {

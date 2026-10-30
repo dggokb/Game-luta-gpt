@@ -22,16 +22,15 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Desenho novo (B1): o mundo da luta (cenário, lutadores e o que escurece por trás deles) em
- * OpenGL ES 3, numa superfície embaixo da do jogo; o HUD, os efeitos e os controles continuam no
- * Canvas, que fica por cima e transparente onde não desenha.
+ * Desenho novo: a luta inteira (cenário, lutadores, efeitos, HUD e botões) em OpenGL ES 3, numa
+ * superfície embaixo da do jogo. Quem desenha continua escrevendo no Canvas: o {@link CanvasGl}
+ * transforma cada desenho em triângulos. Menus, seleção e páginas seguem no Canvas comum, na
+ * superfície de cima (que na luta fica transparente).
  *
  * <p>Tudo roda na thread do jogo: o {@link GameView} abre o quadro ({@link #comecarQuadro}), desenha
- * o mundo aqui e o resto no Canvas, e fecha ({@link #terminarQuadro}) antes de mandar o Canvas.
- * O contexto do OpenGL vive enquanto o jogo vive (as texturas ficam); a superfície vai e volta com
- * a tela. Os lutadores chegam pelo {@link SpriteFighterRenderer}, com a transformação do Canvas
- * de agora copiada para cá a cada desenho (as poses, o zoom e a câmera continuam sendo feitos no
- * Canvas, que só não desenha).
+ * e fecha ({@link #terminarQuadro}). O contexto do OpenGL vive enquanto o jogo vive (as texturas
+ * ficam); a superfície vai e volta com a tela. Os lutadores chegam pelo {@link SpriteFighterRenderer}
+ * ({@link #sprite}), com o filtro de cor de cada um.
  */
 final class DesenhoGl implements SurfaceHolder.Callback {
     private static final String TAG = "DesenhoGl";
@@ -58,6 +57,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     private final SurfaceView view;
     private final Ouvinte ouvinte;
     private final GlRenderCanvas canvas = new GlRenderCanvas();
+    private final CanvasGl canvasGl = new CanvasGl(canvas);
     private final Matrix matriz = new Matrix();
     private final float[] valores = new float[9];
 
@@ -141,15 +141,26 @@ final class DesenhoGl implements SurfaceHolder.Callback {
                 }
             }
             if (contexto == EGL14.EGL_NO_CONTEXT) {
-                int[] pedido = {
-                    EGL14.EGL_RED_SIZE, 8, EGL14.EGL_GREEN_SIZE, 8, EGL14.EGL_BLUE_SIZE, 8, EGL14.EGL_ALPHA_SIZE, 8,
-                    EGL14.EGL_RENDERABLE_TYPE, 0x40 /* EGL_OPENGL_ES3_BIT_KHR */,
-                    EGL14.EGL_SURFACE_TYPE, EGL14.EGL_WINDOW_BIT,
-                    EGL14.EGL_NONE};
-                EGLConfig[] configs = new EGLConfig[1];
-                int[] n = new int[1];
-                if (!EGL14.eglChooseConfig(tela, pedido, 0, configs, 0, 1, n, 0) || n[0] < 1) return falhar("eglChooseConfig");
-                config = configs[0];
+                // Com stencil (as formas côncavas do HUD) e 4x de antisserrilhado; sem o que o
+                // aparelho não tiver.
+                config = null;
+                int[][] pedidos = {{8, 4}, {8, 0}, {0, 0}};
+                for (int[] p : pedidos) {
+                    int[] pedido = {
+                        EGL14.EGL_RED_SIZE, 8, EGL14.EGL_GREEN_SIZE, 8, EGL14.EGL_BLUE_SIZE, 8, EGL14.EGL_ALPHA_SIZE, 8,
+                        EGL14.EGL_STENCIL_SIZE, p[0],
+                        EGL14.EGL_SAMPLE_BUFFERS, p[1] > 0 ? 1 : 0, EGL14.EGL_SAMPLES, p[1],
+                        EGL14.EGL_RENDERABLE_TYPE, 0x40 /* EGL_OPENGL_ES3_BIT_KHR */,
+                        EGL14.EGL_SURFACE_TYPE, EGL14.EGL_WINDOW_BIT,
+                        EGL14.EGL_NONE};
+                    EGLConfig[] configs = new EGLConfig[1];
+                    int[] n = new int[1];
+                    if (EGL14.eglChooseConfig(tela, pedido, 0, configs, 0, 1, n, 0) && n[0] > 0) {
+                        config = configs[0];
+                        break;
+                    }
+                }
+                if (config == null) return falhar("eglChooseConfig");
                 contexto = EGL14.eglCreateContext(tela, config, EGL14.EGL_NO_CONTEXT,
                     new int[] {EGL14.EGL_CONTEXT_CLIENT_VERSION, 3, EGL14.EGL_NONE}, 0);
                 if (contexto == null || contexto == EGL14.EGL_NO_CONTEXT) {
@@ -174,14 +185,14 @@ final class DesenhoGl implements SurfaceHolder.Callback {
                     return false;
                 }
                 corrente = true;
-                // Sem esperar a batida da tela aqui: quem marca o ritmo é o Canvas por cima (duas
-                // esperas seguidas, uma de cada superfície, derrubavam o quadro para 30).
-                EGL14.eglSwapInterval(tela, 0);
+                // A luta inteira sai por aqui: esta superfície marca o ritmo da tela.
+                EGL14.eglSwapInterval(tela, 1);
             }
             if (contextoNovo) {
                 // Contexto novo: as texturas de antes (e as folhas que só existiam nelas) se foram.
                 if (canvas.quantasTexturas() > 0) recriado = true;
                 canvas.criar();
+                canvasGl.esquecerTextos();
                 contextoNovo = false;
             }
             return true;
@@ -228,17 +239,22 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     // ---- Quadro ----
 
     /**
-     * Abre o quadro do mundo numa tela de {@code largura}x{@code altura} (a do Canvas por cima),
-     * começando preta. False se o OpenGL não está pronto (o quadro sai todo no Canvas).
+     * Abre o quadro: o Canvas que desenha no OpenGL, do tamanho da superfície, começando preto.
+     * Null se o OpenGL não está pronto (o quadro sai no Canvas comum).
      */
-    boolean comecarQuadro(int largura, int altura) {
-        if (!preparar()) return false;
+    Canvas comecarQuadro() {
+        if (!preparar()) return null;
         Bitmap b;
         while ((b = soltas.poll()) != null) canvas.soltar(b);
-        canvas.comecar(largura, altura);
+        int[] w = new int[1], h = new int[1];
+        EGL14.eglQuerySurface(tela, superficie, EGL14.EGL_WIDTH, w, 0);
+        EGL14.eglQuerySurface(tela, superficie, EGL14.EGL_HEIGHT, h, 0);
+        if (w[0] <= 0 || h[0] <= 0) return null;
+        canvas.comecar(w[0], h[0]);
+        canvasGl.comecar(w[0], h[0]);
         quadroAberto = true;
         aberto = this;
-        return true;
+        return canvasGl;
     }
 
     /** Fecha e mostra o quadro do mundo. */
@@ -294,56 +310,41 @@ final class DesenhoGl implements SurfaceHolder.Callback {
         }
     }
 
-    // ---- O que o mundo desenha ----
+    // ---- O que o quadro desenha ----
 
-    /** O canvas do OpenGL com a transformação atual do Canvas, sem filtro nem recorte. */
-    RenderCanvas mundo(Canvas c) {
-        copiarMatriz(c);
-        canvas.filtro(null);
-        canvas.semRecorte();
-        return canvas;
-    }
-
-    /** Triângulos soltos numa cor ({x0, y0, x1, y1, x2, y2} cada), no espaço atual do Canvas. */
-    void fillTriangles(Canvas c, float[] xy, int n, int argb) {
-        mundo(c);
-        canvas.fillTriangles(xy, n, argb);
-    }
-
-    private void copiarMatriz(Canvas c) {
-        c.getMatrix(matriz);
-        matriz.getValues(valores);
-        canvas.matriz(valores);
+    /** O Canvas do quadro como RenderCanvas, se for o do OpenGL ({@link AndroidRenderCanvas} passa a ele). */
+    static RenderCanvas comoRenderCanvas(Canvas c) {
+        return c instanceof CanvasGl ? ((CanvasGl)c).comoRenderCanvas() : null;
     }
 
     /**
      * Um quadro de folha de lutador ({@code fonte} em pixels do bitmap) no retângulo de destino,
-     * pela transformação atual do Canvas, com o filtro de cor. A folha sobe na primeira vez e o
-     * bitmap da memória comum é solto.
+     * pela transformação (e recorte) de agora do Canvas, com o filtro de cor. A folha sobe na
+     * primeira vez e o bitmap da memória comum é solto.
      */
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro) {
-        copiarMatriz(c);
+        if (c instanceof CanvasGl) {
+            ((CanvasGl)c).prepararGl();
+        } else {
+            c.getMatrix(matriz);
+            matriz.getValues(valores);
+            canvas.matriz(valores);
+        }
         canvas.filtro(filtro != null ? filtro.matriz : null);
         canvas.desenharBitmap(folha, true, fonte.left, fonte.top, fonte.right, fonte.bottom,
             destino.left, destino.top, destino.right, destino.bottom, alpha);
     }
 
-    /** Recorta os próximos lutadores ao retângulo (no espaço atual do Canvas), até {@link #semRecorte}. */
-    void recorte(Canvas c, float l, float t, float r, float b) {
-        copiarMatriz(c);
-        canvas.semRecorte();
-        canvas.clipPolygon(new float[] {l, t, r, t, r, b, l, b});
-    }
-
-    void semRecorte() {
-        canvas.semRecorte();
-    }
-
-    /** O Canvas passa a ter a transformação atual do OpenGL (o telão desenha lutadores dentro do cenário). */
-    void matrizNoCanvas(Canvas c) {
-        canvas.matrizAtual(valores);
-        matriz.setValues(valores);
-        c.setMatrix(matriz);
+    /** O cenário uma vez, escondido (as camadas sobem antes da luta, e não no primeiro quadro). */
+    void aquecer(com.gamelutagpt.stage.StageScene cenario) {
+        Canvas c = comecarQuadro();
+        if (c == null) return;
+        RenderCanvas rc = ((CanvasGl)c).comoRenderCanvas();
+        cenario.drawBackground(rc);
+        cenario.drawForeground(rc);
+        canvas.terminar();
+        quadroAberto = false;
+        aberto = null;
     }
 
     /**

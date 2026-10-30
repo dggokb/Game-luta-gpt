@@ -261,7 +261,7 @@ final class EntradaSuper {
         if (reticula == null || cor != corReticula || fx + fy != focoReticula) {
             corReticula = cor;
             focoReticula = fx + fy;
-            reticula = new RadialGradient(fx, fy, 520f,
+            reticula = new Degrade.Radial(fx, fy, 520f,
                 new int[] {Color.argb(0, Color.red(cor), Color.green(cor), Color.blue(cor)),
                     Color.argb(90, Color.red(cor), Color.green(cor), Color.blue(cor)),
                     Color.argb(210, Color.red(cor), Color.green(cor), Color.blue(cor))},

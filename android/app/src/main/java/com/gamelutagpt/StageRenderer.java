@@ -9,7 +9,7 @@ import android.graphics.Shader;
 
 /** Static stage: sky, sun, clouds, mountains, ground and arena bounds. */
 final class StageRenderer {
-    private final LinearGradient skyGradient = new LinearGradient(
+    private final LinearGradient skyGradient = new Degrade.Linear(
         0f,
         Arena.WORLD_TOP,
         0f,

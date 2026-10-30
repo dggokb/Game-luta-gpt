@@ -130,7 +130,7 @@ final class TelaVitoria {
     private final RectF destino = new RectF();
     private final Typeface negrito = Typeface.create("sans-serif-condensed", Typeface.BOLD_ITALIC);
     private final Typeface texto = Typeface.create("sans-serif-condensed", Typeface.BOLD);
-    private final Shader brilhoTitulo = new LinearGradient(0f, TITULO_Y - TITULO_TAM * 0.75f, 0f, TITULO_Y,
+    private final Shader brilhoTitulo = new Degrade.Linear(0f, TITULO_Y - TITULO_TAM * 0.75f, 0f, TITULO_Y,
         new int[] {0xFFFFFFFF, 0xFFFFF1B8, 0xFFFFC23A, 0xFFF0781E}, new float[] {0f, .4f, .75f, 1f},
         Shader.TileMode.CLAMP);
 

@@ -208,26 +208,6 @@ final class ConfrontoShinkai {
         paint.setStyle(Paint.Style.FILL);
     }
 
-    /** O mesmo fundo no desenho em OpenGL ({@link DesenhoGl}): atrás dos lutadores, que estão lá. */
-    void desenharFundo(com.gamelutagpt.render.RenderCanvas c) {
-        float k = presenca();
-        if (k <= 0f) return;
-        c.fillRect(-3000f, -2000f, 6000f, 3000f, Math.round(150 * k) << 24 | 0x05060C);
-        int esq = x[0] <= x[1] ? 0 : 1;
-        c.fillRect(-3000f, -2000f, encontroX, 3000f, Math.round(38 * k) << 24 | (cor[esq] & 0xFFFFFF));
-        c.fillRect(encontroX, -2000f, 6000f, 3000f, Math.round(38 * k) << 24 | (cor[1 - esq] & 0xFFFFFF));
-        Random r = new Random(quadro / 2);
-        for (int i = 0; i < 46; i++) {
-            double a = r.nextDouble() * Math.PI * 2.0;
-            float de = 160f + r.nextFloat() * 120f, ate = de + 260f + r.nextFloat() * 700f;
-            float ca = (float)Math.cos(a), sa = (float)Math.sin(a);
-            float largura = 1.5f + r.nextFloat() * 4f;
-            int lado = ca < 0f == (x[esq] < encontroX) ? esq : 1 - esq;
-            int argb = Math.round((60 + r.nextInt(90)) * k) << 24 | (i % 3 == 0 ? 0xFFFFFF : cor[lado] & 0xFFFFFF);
-            c.drawLine(encontroX + ca * de, encontroY + sa * de * 0.8f, encontroX + ca * ate, encontroY + sa * ate * 0.8f, largura, argb);
-        }
-    }
-
     /** Na frente: o empurrão de cada um até o encontro, o encontro e as faíscas. */
     void desenharFrente(Canvas c) {
         float k = presenca();

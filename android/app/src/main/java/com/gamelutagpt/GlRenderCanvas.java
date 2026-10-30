@@ -59,7 +59,9 @@ final class GlRenderCanvas implements RenderCanvas {
         "  gl_Position = vec4(aPos.x / uTela.x * 2.0 - 1.0, 1.0 - aPos.y / uTela.y * 2.0, 0.0, 1.0);\n" +
         "}\n";
     // Tipo 0: cor lisa; 1: imagem; 2: círculo (uv de -1 a 1, borda suave); 3: brilho (do centro
-    // para fora, de cheio a transparente). Cores já multiplicadas pelo alfa. O filtro vale só para
+    // para fora, de cheio a transparente); 4: degradê linear (u é a posição nele, de 0 a 1, na
+    // textura do degradê); 5: degradê radial (uv vai do centro, 1 na borda); 6 a 7: anel (uv de -1 a
+    // 1; o raio de dentro é tipo - 6). Cores já multiplicadas pelo alfa. O filtro vale só para
     // imagem e trabalha na cor sem o alfa multiplicado, como o ColorMatrix do Android. O recorte
     // são semiplanos em pixels da janela (y para cima).
     private static final String FRAGMENTOS =
@@ -67,12 +69,12 @@ final class GlRenderCanvas implements RenderCanvas {
         "precision mediump float;\n" +
         "uniform sampler2D uTex;\n" +
         "uniform mat4 uCor; uniform vec4 uCorSoma; uniform bool uFiltro; uniform bool uInverte;\n" +
-        "uniform highp vec3 uRecorte[8]; uniform int uNRecorte;\n" +
+        "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in float vTipo;\n" +
         "out vec4 cor;\n" +
         "void main() {\n" +
         "  highp vec3 p = vec3(gl_FragCoord.xy, 1.0);\n" +
-        "  for (int i = 0; i < 8; i++) {\n" +
+        "  for (int i = 0; i < 32; i++) {\n" +
         "    if (i >= uNRecorte) break;\n" +
         "    if (dot(uRecorte[i], p) < 0.0) discard;\n" +
         "  }\n" +
@@ -86,10 +88,17 @@ final class GlRenderCanvas implements RenderCanvas {
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         "    }\n" +
         "    c = t * vCor;\n" +
-        "  } else {\n" +
+        "  } else if (vTipo < 3.5) {\n" +
         "    float d = length(vUv);\n" +
         "    float a = vTipo < 2.5 ? clamp((1.0 - d) / max(fwidth(d), 1e-4), 0.0, 1.0) : clamp(1.0 - d, 0.0, 1.0);\n" +
         "    c = vCor * a;\n" +
+        "  } else if (vTipo < 4.5) {\n" +
+        "    c = texture(uTex, vec2(vUv.x, 0.5)) * vCor;\n" +
+        "  } else if (vTipo < 5.5) {\n" +
+        "    c = texture(uTex, vec2(length(vUv), 0.5)) * vCor;\n" +
+        "  } else {\n" +
+        "    float d = length(vUv), w = max(fwidth(d), 1e-4);\n" +
+        "    c = vCor * (clamp((1.0 - d) / w, 0.0, 1.0) * clamp((d - (vTipo - 6.0)) / w, 0.0, 1.0));\n" +
         "  }\n" +
         "  if (uInverte) c.rgb = vec3(c.a) - c.rgb;\n" +
         "  cor = c;\n" +
@@ -97,7 +106,7 @@ final class GlRenderCanvas implements RenderCanvas {
 
     private static final int FLOATS = 9;
     private static final int MAX_VERTICES = 6 * 8192;
-    private static final int MAX_PLANOS = 8;
+    private static final int MAX_PLANOS = 32;
     /**
      * Os vértices do lote num float[] comum, que vai inteiro para o OpenGL na hora de desenhar
      * (antes eram postos um número por vez num FloatBuffer direto: no celular isso custava
@@ -131,6 +140,8 @@ final class GlRenderCanvas implements RenderCanvas {
     private int nPlanos;
     private boolean uniformesSujos = true;
     private final float[] matrizCor = new float[16];
+    /** Transparência que vale para tudo o que vier (camada com alfa do Canvas), de 0 a 1. */
+    private float alfaGlobal = 1f;
 
     /** Por bitmap (o Bitmap não redefine equals: a chave é o próprio objeto), sem segurá-lo. */
     private final Map<Bitmap, Textura> texturas = new WeakHashMap<>();
@@ -177,6 +188,7 @@ final class GlRenderCanvas implements RenderCanvas {
         for (Textura t : texturas.values()) t.id = 0;
         texturas.clear();
         textos.clear();
+        degrades.clear();
         bytesTexturas = 0;
     }
 
@@ -196,7 +208,9 @@ final class GlRenderCanvas implements RenderCanvas {
         alturaTela = altura;
         GLES30.glViewport(0, 0, largura, altura);
         GLES30.glClearColor(0f, 0f, 0f, 1f);
-        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
+        GLES30.glClearStencil(0);
+        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_STENCIL_BUFFER_BIT);
+        GLES30.glDisable(GLES30.GL_STENCIL_TEST);
         GLES30.glEnable(GLES30.GL_BLEND);
         GLES30.glBlendFunc(GLES30.GL_ONE, GLES30.GL_ONE_MINUS_SRC_ALPHA);
         // Texturas de bitmaps que já não existem (cenário e Ultra de lutas passadas).
@@ -217,6 +231,7 @@ final class GlRenderCanvas implements RenderCanvas {
         inverte = false;
         recorte = null;
         nPlanos = 0;
+        alfaGlobal = 1f;
         uniformesSujos = true;
     }
 
@@ -398,6 +413,9 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private void vertice(float x, float y, float u, float v, float r, float g, float bl, float al, float tipo) {
+        if (alfaGlobal != 1f) {
+            r *= alfaGlobal; g *= alfaGlobal; bl *= alfaGlobal; al *= alfaGlobal;
+        }
         float[] o = dados;
         int k = posicao;
         o[k] = a * x + c * y + e;
@@ -433,6 +451,152 @@ final class GlRenderCanvas implements RenderCanvas {
 
     private void retangulo(float l, float t, float r, float bt, float u0, float v0, float u1, float v1, int argb, float tipo) {
         quad(l, t, r, t, r, bt, l, bt, u0, v0, u1, v1, argb, tipo);
+    }
+
+    // ---- Para o CanvasGl: estado vindo do Canvas e triângulos com uv ----
+
+    /** Transparência de tudo o que vier (as camadas com alfa do Canvas), de 0 a 1. */
+    void alfa(float a) {
+        alfaGlobal = Math.max(0f, Math.min(1f, a));
+    }
+
+    /** O recorte de agora: {@code n} semiplanos já em pixels da janela (null ou 0: sem recorte). */
+    void recorte(float[] planos, int n) {
+        if (planos == recorte && n == nPlanos) return;
+        descarregar();
+        recorte = planos;
+        nPlanos = planos == null ? 0 : Math.min(n, MAX_PLANOS);
+        uniformesSujos = true;
+    }
+
+    /** Cores invertidas (a camada do impact frame). */
+    void inverter(boolean sim) {
+        if (sim) beginInvert(); else endInvert();
+    }
+
+    /** Liga a textura (ou o degradê) dos próximos triângulos. */
+    void textura(int id) {
+        usar(id);
+    }
+
+    /** Um triângulo com uv; cor ARGB sem multiplicar. */
+    void triangulo(float x0, float y0, float u0, float v0, float x1, float y1, float u1, float v1,
+                   float x2, float y2, float u2, float v2, int argb, float tipo) {
+        float al = (argb >>> 24) / 255f;
+        float r = ((argb >> 16) & 0xFF) / 255f * al, g = ((argb >> 8) & 0xFF) / 255f * al, bl = (argb & 0xFF) / 255f * al;
+        reservar(3);
+        vertice(x0, y0, u0, v0, r, g, bl, al, tipo);
+        vertice(x1, y1, u1, v1, r, g, bl, al, tipo);
+        vertice(x2, y2, u2, v2, r, g, bl, al, tipo);
+    }
+
+    /** Retângulo com uv de (u0, v0) a (u1, v1). */
+    void retanguloUv(float l, float t, float r, float b, float u0, float v0, float u1, float v1, int argb, float tipo) {
+        retangulo(l, t, r, b, u0, v0, u1, v1, argb, tipo);
+    }
+
+    /**
+     * Forma qualquer (côncava, com buracos, que se cruza) pelo stencil: entre
+     * {@link #comecarStencil} e {@link #cobrirStencil} vão os leques de cada contorno (só marcam);
+     * depois, o que cobre a forma inteira sai só onde ficou marcado, e a marca é apagada.
+     */
+    void comecarStencil(boolean parImpar) {
+        descarregar();
+        GLES30.glEnable(GLES30.GL_STENCIL_TEST);
+        GLES30.glColorMask(false, false, false, false);
+        GLES30.glStencilMask(0xFF);
+        GLES30.glStencilFunc(GLES30.GL_ALWAYS, 0, 0xFF);
+        if (parImpar) {
+            GLES30.glStencilOp(GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_INVERT);
+        } else {
+            GLES30.glStencilOpSeparate(GLES30.GL_FRONT, GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_INCR_WRAP);
+            GLES30.glStencilOpSeparate(GLES30.GL_BACK, GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_DECR_WRAP);
+        }
+    }
+
+    void cobrirStencil() {
+        descarregar();
+        GLES30.glColorMask(true, true, true, true);
+        GLES30.glStencilFunc(GLES30.GL_NOTEQUAL, 0, 0xFF);
+        GLES30.glStencilOp(GLES30.GL_ZERO, GLES30.GL_ZERO, GLES30.GL_ZERO);
+    }
+
+    void terminarStencil() {
+        descarregar();
+        GLES30.glDisable(GLES30.GL_STENCIL_TEST);
+    }
+
+    // Degradês: uma textura de 256x1 por combinação de cores (guardadas as últimas).
+    private static final int DEGRADES = 64;
+    private final LinkedHashMap<String, Integer> degrades = new LinkedHashMap<String, Integer>(DEGRADES, 0.75f, true) {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Integer> velho) {
+            if (size() <= DEGRADES) return false;
+            int id = velho.getValue();
+            if (id == texturaAtual) {
+                descarregar();
+                texturaAtual = 0;
+            }
+            GLES30.glDeleteTextures(1, new int[] {id}, 0);
+            return true;
+        }
+    };
+    private final StringBuilder chaveDegrade = new StringBuilder();
+
+    /** A textura do degradê (as cores ao longo dele, já com o alfa multiplicado). */
+    int texturaDegrade(Degrade.Dados dados) {
+        int[] cores = dados.cores();
+        float[] pos = dados.posicoes();
+        chaveDegrade.setLength(0);
+        for (int cor : cores) chaveDegrade.append(cor).append(',');
+        chaveDegrade.append('|');
+        if (pos != null) for (float p : pos) chaveDegrade.append(p).append(',');
+        chaveDegrade.append('|').append(dados.modo());
+        String chave = chaveDegrade.toString();
+        Integer pronto = degrades.get(chave);
+        if (pronto != null) return pronto;
+        int n = 256;
+        java.nio.ByteBuffer px = java.nio.ByteBuffer.allocateDirect(n * 4);
+        for (int i = 0; i < n; i++) {
+            float t = i / (float)(n - 1);
+            int k = 0;
+            float t0 = 0f, t1 = 1f;
+            int m = cores.length;
+            // O trecho do degradê onde t cai.
+            for (int j = 0; j < m - 1; j++) {
+                float pa = pos != null ? pos[j] : j / (float)(m - 1);
+                float pb = pos != null ? pos[j + 1] : (j + 1) / (float)(m - 1);
+                if (t <= pb || j == m - 2) {
+                    k = j;
+                    t0 = pa;
+                    t1 = pb;
+                    break;
+                }
+            }
+            float f = m < 2 || t1 <= t0 ? 0f : Math.max(0f, Math.min(1f, (t - t0) / (t1 - t0)));
+            int ca = cores[Math.min(k, m - 1)], cb = cores[Math.min(k + 1, m - 1)];
+            float al = mistura(ca >>> 24, cb >>> 24, f) / 255f;
+            px.put((byte)Math.round(mistura((ca >> 16) & 0xFF, (cb >> 16) & 0xFF, f) * al));
+            px.put((byte)Math.round(mistura((ca >> 8) & 0xFF, (cb >> 8) & 0xFF, f) * al));
+            px.put((byte)Math.round(mistura(ca & 0xFF, cb & 0xFF, f) * al));
+            px.put((byte)Math.round(al * 255f));
+        }
+        px.position(0);
+        int[] id = new int[1];
+        GLES30.glGenTextures(1, id, 0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+        int wrap = dados.modo() == android.graphics.Shader.TileMode.REPEAT ? GLES30.GL_REPEAT
+            : dados.modo() == android.graphics.Shader.TileMode.MIRROR ? GLES30.GL_MIRRORED_REPEAT : GLES30.GL_CLAMP_TO_EDGE;
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, wrap);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA, n, 1, 0, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, px);
+        degrades.put(chave, id[0]);
+        return id[0];
+    }
+
+    private static float mistura(float a, float b, float f) {
+        return a + (b - a) * f;
     }
 
     // ---- Texturas ----

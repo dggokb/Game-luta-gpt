@@ -62,76 +62,132 @@ final class AndroidRenderCanvas implements RenderCanvas {
     /** Define o Canvas do quadro atual, já escalado para 1280x720. */
     void begin(Canvas target) {
         canvas = target;
+        gl = DesenhoGl.comoRenderCanvas(target);
     }
+
+    /** O quadro é do OpenGL ({@link CanvasGl}): tudo vai direto para ele. */
+    private RenderCanvas gl;
 
     @Override
     public void save() {
+        if (gl != null) {
+            gl.save();
+            return;
+        }
         canvas.save();
     }
 
     @Override
     public void restore() {
+        if (gl != null) {
+            gl.restore();
+            return;
+        }
         canvas.restore();
     }
 
     @Override
     public void translate(float dx, float dy) {
+        if (gl != null) {
+            gl.translate(dx, dy);
+            return;
+        }
         canvas.translate(dx, dy);
     }
 
     @Override
     public void scale(float sx, float sy, float px, float py) {
+        if (gl != null) {
+            gl.scale(sx, sy, px, py);
+            return;
+        }
         canvas.scale(sx, sy, px, py);
     }
 
     @Override
     public void rotate(float degrees, float px, float py) {
+        if (gl != null) {
+            gl.rotate(degrees, px, py);
+            return;
+        }
         canvas.rotate(degrees, px, py);
     }
 
     @Override
     public void clipPolygon(float[] xy) {
+        if (gl != null) {
+            gl.clipPolygon(xy);
+            return;
+        }
         canvas.clipPath(polygon(xy));
     }
 
     @Override
     public void fillRect(float left, float top, float right, float bottom, int argb) {
+        if (gl != null) {
+            gl.fillRect(left, top, right, bottom, argb);
+            return;
+        }
         fill(argb);
         canvas.drawRect(left, top, right, bottom, paint);
     }
 
     @Override
     public void fillPolygon(float[] xy, int argb) {
+        if (gl != null) {
+            gl.fillPolygon(xy, argb);
+            return;
+        }
         fill(argb);
         canvas.drawPath(polygon(xy), paint);
     }
 
     @Override
     public void strokePolygon(float[] xy, float width, int argb) {
+        if (gl != null) {
+            gl.strokePolygon(xy, width, argb);
+            return;
+        }
         stroke(argb, width, Paint.Cap.BUTT, Paint.Join.MITER);
         canvas.drawPath(polygon(xy), paint);
     }
 
     @Override
     public void fillCircle(float cx, float cy, float radius, int argb) {
+        if (gl != null) {
+            gl.fillCircle(cx, cy, radius, argb);
+            return;
+        }
         fill(argb);
         canvas.drawCircle(cx, cy, radius, paint);
     }
 
     @Override
     public void strokeCircle(float cx, float cy, float radius, float width, int argb) {
+        if (gl != null) {
+            gl.strokeCircle(cx, cy, radius, width, argb);
+            return;
+        }
         stroke(argb, width, Paint.Cap.BUTT, Paint.Join.MITER);
         canvas.drawCircle(cx, cy, radius, paint);
     }
 
     @Override
     public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) {
+        if (gl != null) {
+            gl.drawLine(x1, y1, x2, y2, width, argb);
+            return;
+        }
         stroke(argb, width, Paint.Cap.ROUND, Paint.Join.ROUND);
         canvas.drawLine(x1, y1, x2, y2, paint);
     }
 
     @Override
     public void drawImage(RenderImage image, float left, float top, float right, float bottom, int alpha) {
+        if (gl != null) {
+            gl.drawImage(image, left, top, right, bottom, alpha);
+            return;
+        }
         Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
         if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
@@ -152,6 +208,10 @@ final class AndroidRenderCanvas implements RenderCanvas {
         float bottom,
         int alpha
     ) {
+        if (gl != null) {
+            gl.drawImageRegion(image, srcLeft, srcTop, srcRight, srcBottom, left, top, right, bottom, alpha);
+            return;
+        }
         Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
         if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
@@ -163,11 +223,16 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public boolean desenhaFaixas() {
+        if (gl != null) return gl.desenhaFaixas();
         return FAIXAS && canvas.isHardwareAccelerated();
     }
 
     @Override
     public void drawImageStrip(RenderImage image, float[] xy, float[] uv, int linhas, int alpha) {
+        if (gl != null) {
+            gl.drawImageStrip(image, xy, uv, linhas, alpha);
+            return;
+        }
         if (linhas < 2) return;
         Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap;
         if (!desenhavel(bitmap)) return;
@@ -194,6 +259,10 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public void fillRadialGlow(float cx, float cy, float radius, int argbCenter) {
+        if (gl != null) {
+            gl.fillRadialGlow(cx, cy, radius, argbCenter);
+            return;
+        }
         int alpha = argbCenter >>> 24;
         if (radius <= 0f || alpha == 0) return;
         // O gradiente da cor, opaco no centro; a força do brilho vem do alfa do pincel.
@@ -210,7 +279,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     private Shader glow(int rgb) {
         for (int i = 0; i < glowCount; i++) if (glowKeys[i] == rgb) return glowShaders[i];
-        Shader shader = new RadialGradient(0f, 0f, 1f, rgb, rgb & 0x00FFFFFF, Shader.TileMode.CLAMP);
+        Shader shader = new Degrade.Radial(0f, 0f, 1f, rgb, rgb & 0x00FFFFFF, Shader.TileMode.CLAMP);
         int slot = glowCount < CACHE ? glowCount++ : (rgb & 0x7FFFFFFF) % CACHE;
         glowKeys[slot] = rgb;
         glowShaders[slot] = shader;
@@ -220,7 +289,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
     private Shader fade(int top, int bottom) {
         long key = ((long)top << 32) | (bottom & 0xFFFFFFFFL);
         for (int i = 0; i < fadeCount; i++) if (fadeKeys[i] == key) return fadeShaders[i];
-        Shader shader = new LinearGradient(0f, 0f, 0f, 1f, top, bottom, Shader.TileMode.CLAMP);
+        Shader shader = new Degrade.Linear(0f, 0f, 0f, 1f, top, bottom, Shader.TileMode.CLAMP);
         int slot = fadeCount < CACHE ? fadeCount++ : (int)((key & 0x7FFFFFFFL) % CACHE);
         fadeKeys[slot] = key;
         fadeShaders[slot] = shader;
@@ -229,6 +298,10 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public void fillVerticalGradient(float left, float top, float right, float bottom, int argbTop, int argbBottom) {
+        if (gl != null) {
+            gl.fillVerticalGradient(left, top, right, bottom, argbTop, argbBottom);
+            return;
+        }
         if (bottom <= top) return;
         gradientPaint.setShader(fade(argbTop, argbBottom));
         canvas.save();
@@ -241,6 +314,10 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public void fillOval(float left, float top, float right, float bottom, int argb) {
+        if (gl != null) {
+            gl.fillOval(left, top, right, bottom, argb);
+            return;
+        }
         fill(argb);
         rect.set(left, top, right, bottom);
         canvas.drawOval(rect, paint);
@@ -257,6 +334,10 @@ final class AndroidRenderCanvas implements RenderCanvas {
         float strokeWidth,
         boolean italic
     ) {
+        if (gl != null) {
+            gl.drawText(text, x, y, size, fillArgb, strokeArgb, strokeWidth, italic);
+            return;
+        }
         paint.setTextSize(size);
         paint.setTextSkewX(italic ? -0.22f : 0f);
         if (strokeWidth > 0f) {
@@ -270,6 +351,7 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public float measureText(String text, float size, boolean italic) {
+        if (gl != null) return gl.measureText(text, size, italic);
         paint.setTextSize(size);
         paint.setTextSkewX(italic ? -0.22f : 0f);
         float width = paint.measureText(text);
@@ -279,11 +361,19 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public void beginInvert() {
+        if (gl != null) {
+            gl.beginInvert();
+            return;
+        }
         canvas.saveLayer(null, invertPaint);
     }
 
     @Override
     public void endInvert() {
+        if (gl != null) {
+            gl.endInvert();
+            return;
+        }
         canvas.restore();
     }
 

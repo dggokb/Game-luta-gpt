@@ -1,0 +1,884 @@
+package com.gamelutagpt;
+
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathMeasure;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Region;
+import android.graphics.Shader;
+import android.os.Build;
+import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+/**
+ * Um Canvas do Android que desenha no OpenGL ({@link GlRenderCanvas}): o quadro inteiro da luta
+ * (HUD, efeitos, botões, contador) sai pela placa de vídeo sem reescrever quem desenha. A
+ * transformação e o save/restore ficam no Canvas de verdade (sem bitmap, ele só faz as contas); o
+ * recorte, a transparência das camadas e as cores invertidas ficam numa pilha daqui, por nível
+ * de save. Cada desenho vira triângulos:
+ *
+ * <ul>
+ *   <li>retângulos, círculos, ovais, arcos e retângulos arredondados direto (contornos viram um
+ *       anel de triângulos);</li>
+ *   <li>caminhos: um contorno convexo vira leque; o resto (côncavo, com buracos, traços) passa
+ *       pelo stencil, com o traço calculado pelo próprio Android ({@link Paint#getFillPath});</li>
+ *   <li>texto: desenhado uma vez num bitmap com o Paint de verdade e guardado como textura;</li>
+ *   <li>degradês: só os {@link Degrade} (os do Android não deixam ler as cores).</li>
+ * </ul>
+ */
+final class CanvasGl extends Canvas {
+    private final GlRenderCanvas gl;
+    private int largura, altura;
+
+    // Estado por nível de save (o índice é o getSaveCount() do Canvas de verdade).
+    private float[][] recortes = new float[64][];
+    private int[] nRecortes = new int[64];
+    private float[] alfas = new float[64];
+    private boolean[] invertidos = new boolean[64];
+
+    private final Matrix matriz = new Matrix();
+    private final float[] v = new float[9];
+    private final Matrix local = new Matrix(), inversa = new Matrix();
+    private final float[] ponto = new float[2];
+    private final Path caminho = new Path();
+    private final RectF caixa = new RectF();
+    private final ComoRenderCanvas comoRenderCanvas = new ComoRenderCanvas();
+
+    CanvasGl(GlRenderCanvas gl) {
+        this.gl = gl;
+    }
+
+    /** Começo do quadro: sem transformação, recorte ou camadas. */
+    void comecar(int largura, int altura) {
+        this.largura = largura;
+        this.altura = altura;
+        super.restoreToCount(1);
+        super.setMatrix(null);
+        recortes[1] = null;
+        nRecortes[1] = 0;
+        alfas[1] = 1f;
+        invertidos[1] = false;
+    }
+
+    /** Este Canvas como {@link RenderCanvas} (o cenário, os Ultras e as páginas desenham por ele). */
+    RenderCanvas comoRenderCanvas() {
+        return comoRenderCanvas;
+    }
+
+    @Override public int getWidth() { return largura; }
+    @Override public int getHeight() { return altura; }
+    @Override public boolean isHardwareAccelerated() { return true; }
+
+    // ---- Pilha ----
+
+    private void empilhar() {
+        int k = getSaveCount();
+        if (k >= recortes.length) {
+            int n = recortes.length * 2;
+            recortes = java.util.Arrays.copyOf(recortes, n);
+            nRecortes = java.util.Arrays.copyOf(nRecortes, n);
+            alfas = java.util.Arrays.copyOf(alfas, n);
+            invertidos = java.util.Arrays.copyOf(invertidos, n);
+        }
+        recortes[k] = recortes[k - 1];
+        nRecortes[k] = nRecortes[k - 1];
+        alfas[k] = alfas[k - 1];
+        invertidos[k] = invertidos[k - 1];
+    }
+
+    @Override public int save() {
+        int r = super.save();
+        empilhar();
+        return r;
+    }
+
+    @Override public int save(int flags) {
+        return save();
+    }
+
+    /** Camada: no OpenGL vira só um save com a transparência (e a inversão) do pincel dela. */
+    private int camada(Paint p) {
+        int r = save();
+        int k = getSaveCount();
+        if (p != null) {
+            alfas[k] *= p.getAlpha() / 255f;
+            if (inverte(p.getColorFilter())) invertidos[k] = !invertidos[k];
+        }
+        return r;
+    }
+
+    private int camadaAlfa(int alpha) {
+        int r = save();
+        alfas[getSaveCount()] *= Math.max(0, Math.min(255, alpha)) / 255f;
+        return r;
+    }
+
+    @Override public int saveLayer(RectF bounds, Paint paint, int flags) { return camada(paint); }
+    @Override public int saveLayer(RectF bounds, Paint paint) { return camada(paint); }
+    @Override public int saveLayer(float l, float t, float r, float b, Paint paint, int flags) { return camada(paint); }
+    @Override public int saveLayer(float l, float t, float r, float b, Paint paint) { return camada(paint); }
+    @Override public int saveLayerAlpha(RectF bounds, int alpha, int flags) { return camadaAlfa(alpha); }
+    @Override public int saveLayerAlpha(RectF bounds, int alpha) { return camadaAlfa(alpha); }
+    @Override public int saveLayerAlpha(float l, float t, float r, float b, int alpha, int flags) { return camadaAlfa(alpha); }
+    @Override public int saveLayerAlpha(float l, float t, float r, float b, int alpha) { return camadaAlfa(alpha); }
+
+    /** O filtro de inverter as cores (o negativo do impact frame). */
+    private static boolean inverte(ColorFilter f) {
+        float[] m = matrizDoFiltro(f);
+        return m != null && m[0] < -0.5f && m[6] < -0.5f && m[12] < -0.5f;
+    }
+
+    // ---- Recorte ----
+
+    @Override public boolean clipRect(float l, float t, float r, float b) {
+        recortarPoligono(new float[] {l, t, r, t, r, b, l, b});
+        return true;
+    }
+
+    @Override public boolean clipRect(int l, int t, int r, int b) { return clipRect((float)l, (float)t, (float)r, (float)b); }
+    @Override public boolean clipRect(Rect r) { return clipRect(r.left, r.top, r.right, r.bottom); }
+    @Override public boolean clipRect(RectF r) { return clipRect(r.left, r.top, r.right, r.bottom); }
+
+    @Override public boolean clipRect(float l, float t, float r, float b, Region.Op op) {
+        return op == Region.Op.INTERSECT ? clipRect(l, t, r, b) : true;
+    }
+
+    @Override public boolean clipRect(RectF r, Region.Op op) { return clipRect(r.left, r.top, r.right, r.bottom, op); }
+    @Override public boolean clipRect(Rect r, Region.Op op) { return clipRect(r.left, r.top, r.right, r.bottom, op); }
+
+    @Override public boolean clipPath(Path path) {
+        float[][] contornos = aproximar(path);
+        if (contornos.length == 0) return true;
+        float[] pts = contornos[0];
+        // Os recortes do jogo são polígonos convexos; um que não for vira o contorno convexo dele.
+        if (!convexo(pts, pts.length / 2)) pts = envoltoria(pts);
+        recortarPoligono(pts);
+        return true;
+    }
+
+    @Override public boolean clipPath(Path path, Region.Op op) {
+        return op == Region.Op.INTERSECT ? clipPath(path) : true;
+    }
+
+    /** Recorta ao polígono convexo {@code xy} (espaço atual), somado ao recorte de agora. */
+    void recortarPoligono(float[] xy) {
+        int n = xy.length / 2;
+        if (n < 3) return;
+        int k = getSaveCount();
+        lerMatriz();
+        float[] px = new float[n * 2];
+        float area = 0f;
+        for (int i = 0; i < n; i++) {
+            float x = xy[i * 2], y = xy[i * 2 + 1];
+            px[i * 2] = v[0] * x + v[1] * y + v[2];
+            px[i * 2 + 1] = altura - (v[3] * x + v[4] * y + v[5]);
+        }
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            area += px[i * 2] * px[j * 2 + 1] - px[j * 2] * px[i * 2 + 1];
+        }
+        float sinal = area >= 0f ? 1f : -1f;
+        int antes = nRecortes[k];
+        int total = Math.min(32, antes + n);
+        float[] planos = new float[32 * 3];
+        if (recortes[k] != null) System.arraycopy(recortes[k], 0, planos, 0, antes * 3);
+        for (int i = 0, p = antes; i < n && p < total; i++, p++) {
+            int j = (i + 1) % n;
+            float xi = px[i * 2], yi = px[i * 2 + 1];
+            float qa = -(px[j * 2 + 1] - yi) * sinal, qb = (px[j * 2] - xi) * sinal;
+            planos[p * 3] = qa;
+            planos[p * 3 + 1] = qb;
+            planos[p * 3 + 2] = -(qa * xi + qb * yi);
+        }
+        recortes[k] = planos;
+        nRecortes[k] = total;
+    }
+
+    // ---- Estado para o OpenGL ----
+
+    private void lerMatriz() {
+        super.getMatrix(matriz);
+        matriz.getValues(v);
+    }
+
+    /** Leva a transformação, o recorte, a transparência e a inversão de agora para o OpenGL. */
+    void prepararGl() {
+        lerMatriz();
+        gl.matriz(v);
+        int k = getSaveCount();
+        gl.recorte(recortes[k], nRecortes[k]);
+        gl.alfa(alfas[k]);
+        gl.inverter(invertidos[k]);
+        gl.filtro(null);
+    }
+
+    /** Escala da transformação atual (pixels da tela por unidade). */
+    private float escala() {
+        return (float)Math.sqrt(Math.abs(v[0] * v[4] - v[1] * v[3]));
+    }
+
+    // ---- Cor e degradê de um pincel ----
+
+    private Degrade.Dados degrade;
+    private boolean degradeLocal;
+    private int corPincel;
+    private float tipoPincel;
+
+    /** Prepara a cor (ou o degradê) do pincel para os vértices que vêm. */
+    private void pincel(Paint p) {
+        Shader s = p.getShader();
+        degrade = s instanceof Degrade.Dados ? (Degrade.Dados)s : null;
+        if (degrade == null) {
+            corPincel = p.getColor();
+            tipoPincel = 0f;
+            return;
+        }
+        corPincel = (p.getAlpha() << 24) | 0xFFFFFF;
+        tipoPincel = degrade.radial() ? 5f : 4f;
+        degradeLocal = s.getLocalMatrix(local) && !local.isIdentity();
+        if (degradeLocal) local.invert(inversa);
+        gl.textura(gl.texturaDegrade(degrade));
+    }
+
+    /** O uv do degradê no ponto (x, y) do espaço atual. */
+    private float uvU, uvV;
+
+    private void uv(float x, float y) {
+        if (degrade == null) {
+            uvU = 0f;
+            uvV = 0f;
+            return;
+        }
+        if (degradeLocal) {
+            ponto[0] = x;
+            ponto[1] = y;
+            inversa.mapPoints(ponto);
+            x = ponto[0];
+            y = ponto[1];
+        }
+        float[] g = degrade.geometria();
+        if (degrade.radial()) {
+            float r = Math.max(1e-4f, g[2]);
+            uvU = (x - g[0]) / r;
+            uvV = (y - g[1]) / r;
+        } else {
+            float dx = g[2] - g[0], dy = g[3] - g[1];
+            float l2 = Math.max(1e-6f, dx * dx + dy * dy);
+            uvU = ((x - g[0]) * dx + (y - g[1]) * dy) / l2;
+            uvV = 0.5f;
+        }
+    }
+
+    private void tri(float x0, float y0, float x1, float y1, float x2, float y2) {
+        uv(x0, y0);
+        float u0 = uvU, v0 = uvV;
+        uv(x1, y1);
+        float u1 = uvU, v1 = uvV;
+        uv(x2, y2);
+        gl.triangulo(x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, uvU, uvV, corPincel, tipoPincel);
+    }
+
+    /** Leque de um polígono convexo (pontos {x, y, ...}), a partir do centro. */
+    private void leque(float[] pts, int n) {
+        if (n < 3) return;
+        float cx = 0f, cy = 0f;
+        for (int i = 0; i < n; i++) {
+            cx += pts[i * 2];
+            cy += pts[i * 2 + 1];
+        }
+        cx /= n;
+        cy /= n;
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            tri(cx, cy, pts[i * 2], pts[i * 2 + 1], pts[j * 2], pts[j * 2 + 1]);
+        }
+    }
+
+    /** O anel entre dois contornos fechados com o mesmo número de pontos. */
+    private void anel(float[] fora, float[] dentro, int n) {
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            tri(fora[i * 2], fora[i * 2 + 1], fora[j * 2], fora[j * 2 + 1], dentro[j * 2], dentro[j * 2 + 1]);
+            tri(fora[i * 2], fora[i * 2 + 1], dentro[j * 2], dentro[j * 2 + 1], dentro[i * 2], dentro[i * 2 + 1]);
+        }
+    }
+
+    private float largura(Paint p) {
+        float w = p.getStrokeWidth();
+        // Traço 0 do Android: um pixel na tela.
+        return w > 0f ? w : 1f / Math.max(1e-4f, escala());
+    }
+
+    // ---- Formas ----
+
+    @Override public void drawColor(int color) {
+        cobrirTela(color);
+    }
+
+    @Override public void drawColor(int color, PorterDuff.Mode mode) {
+        if (mode == PorterDuff.Mode.CLEAR) return;
+        cobrirTela(color);
+    }
+
+    private void cobrirTela(int color) {
+        prepararGl();
+        v[0] = 1f; v[1] = 0f; v[2] = 0f; v[3] = 0f; v[4] = 1f; v[5] = 0f;
+        gl.matriz(v);
+        gl.fillRect(0f, 0f, largura, altura, color);
+    }
+
+    @Override public void drawRect(float l, float t, float r, float b, Paint p) {
+        prepararGl();
+        pincel(p);
+        Paint.Style st = p.getStyle();
+        if (st == Paint.Style.STROKE) {
+            float h = largura(p) * 0.5f;
+            anel(new float[] {l - h, t - h, r + h, t - h, r + h, b + h, l - h, b + h},
+                new float[] {l + h, t + h, r - h, t + h, r - h, b - h, l + h, b - h}, 4);
+            return;
+        }
+        if (st == Paint.Style.FILL_AND_STROKE) {
+            float h = p.getStrokeWidth() * 0.5f;
+            l -= h; t -= h; r += h; b += h;
+        }
+        tri(l, t, r, t, r, b);
+        tri(l, t, r, b, l, b);
+    }
+
+    @Override public void drawRect(RectF r, Paint p) { drawRect(r.left, r.top, r.right, r.bottom, p); }
+    @Override public void drawRect(Rect r, Paint p) { drawRect(r.left, r.top, r.right, r.bottom, p); }
+
+    /** Contorno de retângulo arredondado ({@code seg} pontos por canto), recuado {@code d} para fora. */
+    private float[] arredondado(float l, float t, float r, float b, float rx, float ry, float d, int seg) {
+        rx = Math.max(0f, Math.min(rx, (r - l) * 0.5f));
+        ry = Math.max(0f, Math.min(ry, (b - t) * 0.5f));
+        float[] pts = new float[seg * 4 * 2];
+        float[] cx = {r - rx, r - rx, l + rx, l + rx}, cy = {t + ry, b - ry, b - ry, t + ry};
+        int k = 0;
+        for (int c = 0; c < 4; c++) {
+            double inicio = -Math.PI / 2 + c * Math.PI / 2;
+            for (int i = 0; i < seg; i++) {
+                double a = inicio + (Math.PI / 2) * i / (seg - 1);
+                float ca = (float)Math.cos(a), sa = (float)Math.sin(a);
+                pts[k++] = cx[c] + ca * (rx + d);
+                pts[k++] = cy[c] + sa * (ry + d);
+            }
+        }
+        return pts;
+    }
+
+    @Override public void drawRoundRect(float l, float t, float r, float b, float rx, float ry, Paint p) {
+        prepararGl();
+        pincel(p);
+        int seg = 7, n = seg * 4;
+        if (p.getStyle() == Paint.Style.STROKE) {
+            float h = largura(p) * 0.5f;
+            anel(arredondado(l, t, r, b, rx, ry, h, seg), arredondado(l, t, r, b, rx, ry, -Math.min(h, Math.min(rx, ry)), seg), n);
+            return;
+        }
+        float d = p.getStyle() == Paint.Style.FILL_AND_STROKE ? p.getStrokeWidth() * 0.5f : 0f;
+        leque(arredondado(l, t, r, b, rx, ry, d, seg), n);
+    }
+
+    @Override public void drawRoundRect(RectF r, float rx, float ry, Paint p) {
+        drawRoundRect(r.left, r.top, r.right, r.bottom, rx, ry, p);
+    }
+
+    /** Pontos de uma elipse (ou arco dela), de {@code inicio} a {@code inicio + varre} graus. */
+    private static float[] elipse(float cx, float cy, float rx, float ry, float inicio, float varre, int n, boolean fechado) {
+        int m = fechado ? n : n + 1;
+        float[] pts = new float[m * 2];
+        for (int i = 0; i < m; i++) {
+            double a = Math.toRadians(inicio + varre * i / n);
+            pts[i * 2] = cx + rx * (float)Math.cos(a);
+            pts[i * 2 + 1] = cy + ry * (float)Math.sin(a);
+        }
+        return pts;
+    }
+
+    /** Segmentos para uma curva de raio {@code r} (mais na tela grande, sem passar do razoável). */
+    private int segmentos(float r, float graus) {
+        float px = r * escala() * (float)Math.toRadians(Math.abs(graus));
+        return Math.max(8, Math.min(96, (int)(px / 6f)));
+    }
+
+    @Override public void drawCircle(float cx, float cy, float r, Paint p) {
+        drawOval(cx - r, cy - r, cx + r, cy + r, p);
+    }
+
+    @Override public void drawOval(float l, float t, float r, float b, Paint p) {
+        prepararGl();
+        pincel(p);
+        float cx = (l + r) * 0.5f, cy = (t + b) * 0.5f, rx = (r - l) * 0.5f, ry = (b - t) * 0.5f;
+        Paint.Style st = p.getStyle();
+        boolean circulo = Math.abs(rx - ry) < 0.01f;
+        if (st == Paint.Style.STROKE) {
+            float h = largura(p) * 0.5f;
+            if (degrade == null && circulo) {
+                // Anel no shader: borda suave dos dois lados.
+                float fora = rx + h, dentro = Math.max(0f, rx - h) / fora;
+                gl.retanguloUv(cx - fora, cy - fora, cx + fora, cy + fora, -1f, -1f, 1f, 1f, corPincel, 6f + Math.min(0.999f, dentro));
+                return;
+            }
+            int n = segmentos(Math.max(rx, ry), 360f);
+            anel(elipse(cx, cy, rx + h, ry + h, 0f, 360f, n, true),
+                elipse(cx, cy, Math.max(0f, rx - h), Math.max(0f, ry - h), 0f, 360f, n, true), n);
+            return;
+        }
+        if (st == Paint.Style.FILL_AND_STROKE) {
+            float h = p.getStrokeWidth() * 0.5f;
+            rx += h;
+            ry += h;
+        }
+        if (degrade == null) {
+            gl.retanguloUv(cx - rx, cy - ry, cx + rx, cy + ry, -1f, -1f, 1f, 1f, corPincel, 2f);
+            return;
+        }
+        int n = segmentos(Math.max(rx, ry), 360f);
+        leque(elipse(cx, cy, rx, ry, 0f, 360f, n, true), n);
+    }
+
+    @Override public void drawOval(RectF r, Paint p) { drawOval(r.left, r.top, r.right, r.bottom, p); }
+
+    @Override public void drawArc(float l, float t, float r, float b, float inicio, float varre, boolean centro, Paint p) {
+        if (varre == 0f) return;
+        if (Math.abs(varre) >= 360f) {
+            drawOval(l, t, r, b, p);
+            return;
+        }
+        prepararGl();
+        pincel(p);
+        float cx = (l + r) * 0.5f, cy = (t + b) * 0.5f, rx = (r - l) * 0.5f, ry = (b - t) * 0.5f;
+        int n = segmentos(Math.max(rx, ry), varre);
+        if (p.getStyle() == Paint.Style.STROKE) {
+            float h = largura(p) * 0.5f;
+            if (centro) {
+                // Fatia em contorno: pelo traço do Android.
+                caminho.reset();
+                caminho.moveTo(cx, cy);
+                caminho.arcTo(l, t, r, b, inicio, varre, false);
+                caminho.close();
+                tracar(caminho, p);
+                return;
+            }
+            float[] fora = elipse(cx, cy, rx + h, ry + h, inicio, varre, n, false);
+            float[] dentro = elipse(cx, cy, Math.max(0f, rx - h), Math.max(0f, ry - h), inicio, varre, n, false);
+            for (int i = 0; i < n; i++) {
+                int j = i + 1;
+                tri(fora[i * 2], fora[i * 2 + 1], fora[j * 2], fora[j * 2 + 1], dentro[j * 2], dentro[j * 2 + 1]);
+                tri(fora[i * 2], fora[i * 2 + 1], dentro[j * 2], dentro[j * 2 + 1], dentro[i * 2], dentro[i * 2 + 1]);
+            }
+            if (p.getStrokeCap() == Paint.Cap.ROUND) {
+                float[] pa = elipse(cx, cy, rx, ry, inicio, 0f, 1, false), pb = elipse(cx, cy, rx, ry, inicio + varre, 0f, 1, false);
+                ponta(pa[0], pa[1], h);
+                ponta(pb[0], pb[1], h);
+            }
+            return;
+        }
+        float[] arco = elipse(cx, cy, rx, ry, inicio, varre, n, false);
+        // Com centro, leque do centro (fatia); sem, leque da corda (o arco fechado pela reta).
+        float ox = centro ? cx : arco[0], oy = centro ? cy : arco[1];
+        for (int i = 0; i < n; i++) tri(ox, oy, arco[i * 2], arco[i * 2 + 1], arco[i * 2 + 2], arco[i * 2 + 3]);
+    }
+
+    @Override public void drawArc(RectF r, float inicio, float varre, boolean centro, Paint p) {
+        drawArc(r.left, r.top, r.right, r.bottom, inicio, varre, centro, p);
+    }
+
+    /** Ponta redonda de traço (um círculo na cor do pincel). */
+    private void ponta(float x, float y, float raio) {
+        if (degrade == null) {
+            gl.retanguloUv(x - raio, y - raio, x + raio, y + raio, -1f, -1f, 1f, 1f, corPincel, 2f);
+        } else {
+            int n = 16;
+            leque(elipse(x, y, raio, raio, 0f, 360f, n, true), n);
+        }
+    }
+
+    @Override public void drawLine(float x1, float y1, float x2, float y2, Paint p) {
+        prepararGl();
+        pincel(p);
+        float w = largura(p) * 0.5f;
+        float dx = x2 - x1, dy = y2 - y1;
+        float len = (float)Math.sqrt(dx * dx + dy * dy);
+        if (len <= 1e-5f) {
+            if (p.getStrokeCap() != Paint.Cap.BUTT) ponta(x1, y1, w);
+            return;
+        }
+        float ux = dx / len, uy = dy / len;
+        if (p.getStrokeCap() == Paint.Cap.SQUARE) {
+            x1 -= ux * w; y1 -= uy * w; x2 += ux * w; y2 += uy * w;
+        }
+        float nx = -uy * w, ny = ux * w;
+        tri(x1 + nx, y1 + ny, x2 + nx, y2 + ny, x2 - nx, y2 - ny);
+        tri(x1 + nx, y1 + ny, x2 - nx, y2 - ny, x1 - nx, y1 - ny);
+        if (p.getStrokeCap() == Paint.Cap.ROUND) {
+            ponta(x1, y1, w);
+            ponta(x2, y2, w);
+        }
+    }
+
+    // ---- Caminhos ----
+
+    @Override public void drawPath(Path path, Paint p) {
+        prepararGl();
+        pincel(p);
+        Paint.Style st = p.getStyle();
+        if (st != Paint.Style.FILL) {
+            if (st == Paint.Style.FILL_AND_STROKE) preencher(path, path.getFillType());
+            tracar(path, p);
+            return;
+        }
+        preencher(path, path.getFillType());
+    }
+
+    private final Path traco = new Path();
+
+    /** O traço do caminho pelo próprio Android (pontas, junções e tracejado), preenchido. */
+    private void tracar(Path path, Paint p) {
+        traco.reset();
+        Paint.Style antes = p.getStyle();
+        if (antes != Paint.Style.STROKE) p.setStyle(Paint.Style.STROKE);
+        float w = p.getStrokeWidth();
+        if (w <= 0f) p.setStrokeWidth(largura(p));
+        p.getFillPath(path, traco);
+        p.setStrokeWidth(w);
+        if (antes != Paint.Style.STROKE) p.setStyle(antes);
+        preencher(traco, Path.FillType.WINDING);
+    }
+
+    private void preencher(Path path, Path.FillType tipo) {
+        float[][] contornos = aproximar(path);
+        if (contornos.length == 0) return;
+        if (contornos.length == 1 && tipo != Path.FillType.INVERSE_WINDING && tipo != Path.FillType.INVERSE_EVEN_ODD && convexo(contornos[0], contornos[0].length / 2)) {
+            leque(contornos[0], contornos[0].length / 2);
+            return;
+        }
+        // Qualquer outra forma: os leques marcam o stencil e a caixa da forma pinta onde ficou marcado.
+        path.computeBounds(caixa, true);
+        int cor = corPincel;
+        float tipoAntes = tipoPincel;
+        Degrade.Dados dg = degrade;
+        gl.comecarStencil(tipo == Path.FillType.EVEN_ODD || tipo == Path.FillType.INVERSE_EVEN_ODD);
+        degrade = null;
+        corPincel = 0xFFFFFFFF;
+        tipoPincel = 0f;
+        for (float[] c : contornos) {
+            int n = c.length / 2;
+            for (int i = 1; i + 1 < n; i++) tri(c[0], c[1], c[i * 2], c[i * 2 + 1], c[i * 2 + 2], c[i * 2 + 3]);
+        }
+        gl.cobrirStencil();
+        degrade = dg;
+        corPincel = cor;
+        tipoPincel = tipoAntes;
+        if (degrade != null) gl.textura(gl.texturaDegrade(degrade));
+        tri(caixa.left, caixa.top, caixa.right, caixa.top, caixa.right, caixa.bottom);
+        tri(caixa.left, caixa.top, caixa.right, caixa.bottom, caixa.left, caixa.bottom);
+        gl.terminarStencil();
+    }
+
+    /** Os contornos do caminho como polígonos ({x, y, ...}), com o detalhe que a tela pede. */
+    private float[][] aproximar(Path path) {
+        lerMatriz();
+        float tol = 0.5f / Math.max(1e-3f, escala());
+        java.util.ArrayList<float[]> saida = new java.util.ArrayList<>();
+        if (Build.VERSION.SDK_INT >= 26) {
+            float[] a = path.approximate(tol);
+            int inicio = 0, n = a.length / 3;
+            for (int i = 1; i <= n; i++) {
+                // Um ponto com a mesma fração do anterior começa outro contorno.
+                if (i == n || a[i * 3] == a[(i - 1) * 3]) {
+                    adicionar(saida, a, inicio, i);
+                    inicio = i;
+                }
+            }
+        } else {
+            PathMeasure pm = new PathMeasure(path, false);
+            float[] pos = new float[2];
+            float passo = 3f / Math.max(1e-3f, escala());
+            do {
+                float l = pm.getLength();
+                if (l <= 0f) continue;
+                int n = Math.max(2, (int)Math.ceil(l / passo));
+                float[] c = new float[(n + 1) * 2];
+                for (int i = 0; i <= n; i++) {
+                    pm.getPosTan(l * i / n, pos, null);
+                    c[i * 2] = pos[0];
+                    c[i * 2 + 1] = pos[1];
+                }
+                if (c.length >= 6) saida.add(c);
+            } while (pm.nextContour());
+        }
+        return saida.toArray(new float[0][]);
+    }
+
+    private static void adicionar(java.util.List<float[]> saida, float[] a, int de, int ate) {
+        int n = ate - de;
+        if (n < 3) return;
+        float[] c = new float[n * 2];
+        for (int i = 0; i < n; i++) {
+            c[i * 2] = a[(de + i) * 3 + 1];
+            c[i * 2 + 1] = a[(de + i) * 3 + 2];
+        }
+        saida.add(c);
+    }
+
+    private static boolean convexo(float[] p, int n) {
+        if (n < 3) return false;
+        int sinal = 0;
+        for (int i = 0; i < n; i++) {
+            float ax = p[((i + 1) % n) * 2] - p[i * 2], ay = p[((i + 1) % n) * 2 + 1] - p[i * 2 + 1];
+            float bx = p[((i + 2) % n) * 2] - p[((i + 1) % n) * 2], by = p[((i + 2) % n) * 2 + 1] - p[((i + 1) % n) * 2 + 1];
+            float z = ax * by - ay * bx;
+            if (Math.abs(z) < 1e-6f) continue;
+            int s = z > 0 ? 1 : -1;
+            if (sinal == 0) sinal = s;
+            else if (s != sinal) return false;
+        }
+        return true;
+    }
+
+    /** Envoltória convexa (cadeia monótona). */
+    private static float[] envoltoria(float[] p) {
+        int n = p.length / 2;
+        Integer[] idx = new Integer[n];
+        for (int i = 0; i < n; i++) idx[i] = i;
+        java.util.Arrays.sort(idx, (i, j) -> p[i * 2] != p[j * 2] ? Float.compare(p[i * 2], p[j * 2]) : Float.compare(p[i * 2 + 1], p[j * 2 + 1]));
+        int[] h = new int[2 * n];
+        int k = 0;
+        for (int t = 0; t < n; t++) {
+            int i = idx[t];
+            while (k >= 2 && cruz(p, h[k - 2], h[k - 1], i) <= 0) k--;
+            h[k++] = i;
+        }
+        for (int t = n - 2, base = k + 1; t >= 0; t--) {
+            int i = idx[t];
+            while (k >= base && cruz(p, h[k - 2], h[k - 1], i) <= 0) k--;
+            h[k++] = i;
+        }
+        int m = Math.max(0, k - 1);
+        float[] out = new float[m * 2];
+        for (int i = 0; i < m; i++) {
+            out[i * 2] = p[h[i] * 2];
+            out[i * 2 + 1] = p[h[i] * 2 + 1];
+        }
+        return out;
+    }
+
+    private static float cruz(float[] p, int o, int a, int b) {
+        return (p[a * 2] - p[o * 2]) * (p[b * 2 + 1] - p[o * 2 + 1]) - (p[a * 2 + 1] - p[o * 2 + 1]) * (p[b * 2] - p[o * 2]);
+    }
+
+    // ---- Imagens ----
+
+    private static final Map<ColorFilter, float[]> MATRIZES = new WeakHashMap<>();
+
+    /** A matriz 4x5 de um filtro de cor: os do {@link Filtro} e os ColorMatrixColorFilter. */
+    private static float[] matrizDoFiltro(ColorFilter f) {
+        if (f == null) return null;
+        float[] m = Filtro.matrizDe(f);
+        if (m != null) return m;
+        m = MATRIZES.get(f);
+        if (m == null && f instanceof ColorMatrixColorFilter && Build.VERSION.SDK_INT >= 26) {
+            ColorMatrix cm = new ColorMatrix();
+            ((ColorMatrixColorFilter)f).getColorMatrix(cm);
+            m = cm.getArray().clone();
+            MATRIZES.put(f, m);
+        }
+        return m;
+    }
+
+    private void imagem(Bitmap b, float sl, float st, float sr, float sb, float l, float t, float r, float bt, Paint p) {
+        if (b == null || b.isRecycled()) return;
+        prepararGl();
+        GlRenderCanvas.Textura tx = gl.textura(b, false);
+        if (tx == null) return;
+        gl.filtro(p != null ? matrizDoFiltro(p.getColorFilter()) : null);
+        // O recorte da fonte é em pixels do bitmap; a textura sabe o tamanho dele.
+        gl.desenharTextura(tx, sl, st, sr, sb, l, t, r, bt, p != null ? p.getAlpha() : 255);
+    }
+
+    @Override public void drawBitmap(Bitmap b, Rect src, RectF dst, Paint p) {
+        if (src == null) imagem(b, 0, 0, b.getWidth(), b.getHeight(), dst.left, dst.top, dst.right, dst.bottom, p);
+        else imagem(b, src.left, src.top, src.right, src.bottom, dst.left, dst.top, dst.right, dst.bottom, p);
+    }
+
+    @Override public void drawBitmap(Bitmap b, Rect src, Rect dst, Paint p) {
+        if (src == null) imagem(b, 0, 0, b.getWidth(), b.getHeight(), dst.left, dst.top, dst.right, dst.bottom, p);
+        else imagem(b, src.left, src.top, src.right, src.bottom, dst.left, dst.top, dst.right, dst.bottom, p);
+    }
+
+    @Override public void drawBitmap(Bitmap b, float left, float top, Paint p) {
+        imagem(b, 0, 0, b.getWidth(), b.getHeight(), left, top, left + b.getWidth(), top + b.getHeight(), p);
+    }
+
+    @Override public void drawBitmap(Bitmap b, Matrix m, Paint p) {
+        save();
+        concat(m);
+        imagem(b, 0, 0, b.getWidth(), b.getHeight(), 0, 0, b.getWidth(), b.getHeight(), p);
+        restore();
+    }
+
+    // ---- Texto: cada texto vira um bitmap feito pelo Paint de verdade, guardado como textura ----
+
+    private static final int TEXTOS = 160;
+
+    private static final class Texto {
+        Bitmap bitmap;
+        GlRenderCanvas.Textura textura;
+        /** Onde fica o ponto (x, linha de base) no bitmap, e o tamanho dele, no espaço local. */
+        float origemX, origemY, largura, altura;
+    }
+
+    private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, true) {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Texto> velho) {
+            if (size() <= TEXTOS) return false;
+            gl.soltar(velho.getValue().bitmap);
+            return true;
+        }
+    };
+    private final StringBuilder chave = new StringBuilder();
+
+    /** Contexto novo: as texturas dos textos se foram. */
+    void esquecerTextos() {
+        textos.clear();
+    }
+
+    @Override public void drawText(String text, float x, float y, Paint p) {
+        texto(text, x, y, p);
+    }
+
+    @Override public void drawText(String text, int start, int end, float x, float y, Paint p) {
+        texto(text.substring(start, end), x, y, p);
+    }
+
+    @Override public void drawText(char[] text, int index, int count, float x, float y, Paint p) {
+        texto(new String(text, index, count), x, y, p);
+    }
+
+    @Override public void drawText(CharSequence text, int start, int end, float x, float y, Paint p) {
+        texto(text.subSequence(start, end).toString(), x, y, p);
+    }
+
+    private void texto(String s, float x, float y, Paint p) {
+        if (s == null || s.isEmpty()) return;
+        prepararGl();
+        float esc = Math.max(0.25f, Math.round(escala() * 8f) / 8f);
+        Shader sh = p.getShader();
+        chave.setLength(0);
+        chave.append(s).append('\u0000').append(p.getTextSize()).append(',').append(p.getColor()).append(',')
+            .append(p.getStyle().ordinal()).append(',').append(p.getStrokeWidth()).append(',')
+            .append(p.getTextAlign().ordinal()).append(',').append(p.getTextSkewX()).append(',')
+            .append(p.isFakeBoldText()).append(',').append(p.getTextScaleX()).append(',')
+            .append(System.identityHashCode(p.getTypeface())).append(',').append(esc);
+        if (Build.VERSION.SDK_INT >= 21) chave.append(',').append(p.getLetterSpacing());
+        // Com degradê o desenho depende de onde o texto está.
+        if (sh != null) chave.append(',').append(System.identityHashCode(sh)).append(',').append(x).append(',').append(y);
+        String k = chave.toString();
+        Texto t = textos.get(k);
+        if (t == null) {
+            t = criarTexto(s, x, y, p, esc);
+            if (t == null) return;
+            textos.put(k, t);
+        }
+        float l = x - t.origemX, top = y - t.origemY;
+        gl.desenharTextura(t.textura, 0f, 0f, t.textura.largura, t.textura.altura, l, top, l + t.largura, top + t.altura, 255);
+    }
+
+    private Texto criarTexto(String s, float x, float y, Paint p, float esc) {
+        float w = p.measureText(s);
+        Paint.FontMetrics fm = p.getFontMetrics();
+        float margem = p.getTextSize() * 0.35f + p.getStrokeWidth() + 2f;
+        float esquerda;
+        switch (p.getTextAlign()) {
+            case CENTER: esquerda = x - w * 0.5f; break;
+            case RIGHT: esquerda = x - w; break;
+            default: esquerda = x; break;
+        }
+        float l = esquerda - margem, t = y + fm.top - margem;
+        float lw = w + margem * 2f, lh = (fm.bottom - fm.top) + margem * 2f;
+        int bw = (int)Math.ceil(lw * esc), bh = (int)Math.ceil(lh * esc);
+        if (bw <= 0 || bh <= 0 || bw > 4096 || bh > 4096) return null;
+        Bitmap bmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888);
+        Canvas cv = new Canvas(bmp);
+        cv.scale(esc, esc);
+        cv.translate(-l, -t);
+        cv.drawText(s, x, y, p);
+        Texto texto = new Texto();
+        texto.bitmap = bmp;
+        texto.textura = gl.textura(bmp, true);
+        if (texto.textura == null) return null;
+        texto.origemX = x - l;
+        texto.origemY = y - t;
+        texto.largura = bw / esc;
+        texto.altura = bh / esc;
+        return texto;
+    }
+
+    // ---- Como RenderCanvas: as transformações no Canvas, o desenho no OpenGL ----
+
+    private final class ComoRenderCanvas implements RenderCanvas {
+        @Override public void save() { CanvasGl.this.save(); }
+        @Override public void restore() { CanvasGl.this.restore(); }
+        @Override public void translate(float dx, float dy) { CanvasGl.this.translate(dx, dy); }
+        @Override public void scale(float sx, float sy, float px, float py) { CanvasGl.this.scale(sx, sy, px, py); }
+        @Override public void rotate(float graus, float px, float py) { CanvasGl.this.rotate(graus, px, py); }
+        @Override public void clipPolygon(float[] xy) { recortarPoligono(xy); }
+
+        @Override public void fillRect(float l, float t, float r, float b, int argb) { prepararGl(); gl.fillRect(l, t, r, b, argb); }
+        @Override public void fillPolygon(float[] xy, int argb) { prepararGl(); gl.fillPolygon(xy, argb); }
+        @Override public void strokePolygon(float[] xy, float w, int argb) { prepararGl(); gl.strokePolygon(xy, w, argb); }
+        @Override public void fillCircle(float cx, float cy, float r, int argb) { prepararGl(); gl.fillCircle(cx, cy, r, argb); }
+        @Override public void strokeCircle(float cx, float cy, float r, float w, int argb) { prepararGl(); gl.strokeCircle(cx, cy, r, w, argb); }
+        @Override public void drawLine(float x1, float y1, float x2, float y2, float w, int argb) { prepararGl(); gl.drawLine(x1, y1, x2, y2, w, argb); }
+        @Override public void drawImage(RenderImage im, float l, float t, float r, float b, int a) { prepararGl(); gl.drawImage(im, l, t, r, b, a); }
+
+        @Override public void drawImageRegion(RenderImage im, float sl, float st, float sr, float sb,
+                                              float l, float t, float r, float b, int a) {
+            prepararGl();
+            gl.drawImageRegion(im, sl, st, sr, sb, l, t, r, b, a);
+        }
+
+        @Override public boolean desenhaFaixas() { return true; }
+
+        @Override public void drawImageStrip(RenderImage im, float[] xy, float[] uv, int linhas, int a) {
+            prepararGl();
+            gl.drawImageStrip(im, xy, uv, linhas, a);
+        }
+
+        @Override public void fillRadialGlow(float cx, float cy, float r, int argb) { prepararGl(); gl.fillRadialGlow(cx, cy, r, argb); }
+
+        @Override public void fillVerticalGradient(float l, float t, float r, float b, int cima, int baixo) {
+            prepararGl();
+            gl.fillVerticalGradient(l, t, r, b, cima, baixo);
+        }
+
+        @Override public void fillOval(float l, float t, float r, float b, int argb) { prepararGl(); gl.fillOval(l, t, r, b, argb); }
+
+        @Override public void drawText(String text, float x, float y, float size, int fill, int stroke, float sw, boolean italic) {
+            prepararGl();
+            gl.drawText(text, x, y, size, fill, stroke, sw, italic);
+        }
+
+        @Override public float measureText(String text, float size, boolean italic) { return gl.measureText(text, size, italic); }
+
+        @Override public void beginInvert() {
+            CanvasGl.this.save();
+            int k = getSaveCount();
+            invertidos[k] = !invertidos[k];
+        }
+
+        @Override public void endInvert() { CanvasGl.this.restore(); }
+    }
+}

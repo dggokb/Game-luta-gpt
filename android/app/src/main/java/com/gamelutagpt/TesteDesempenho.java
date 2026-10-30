@@ -18,8 +18,8 @@ final class TesteDesempenho {
     /** O HUD (vidas, barras, retratos, combo); os botões de teste e os controles continuam. */
     static boolean hud = true;
     /**
-     * O mundo da luta (cenário e lutadores) desenhado em OpenGL ({@link DesenhoGl}); desligado,
-     * tudo no Canvas como antes. Vale a partir da próxima luta.
+     * A luta inteira (cenário, lutadores, efeitos, HUD e botões) desenhada em OpenGL
+     * ({@link DesenhoGl}); desligado, tudo no Canvas como antes. Vale a partir da próxima luta.
      */
     static boolean openGl = true;
 

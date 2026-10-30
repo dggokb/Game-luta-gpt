@@ -252,9 +252,9 @@ final class HudRenderer {
     private final Path shape = new Path();
     private final RectF portraitBox = new RectF();
     private final Paint imagePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final Shader pointLifeGradient = new LinearGradient(0f, 63f, 0f, 89f,
+    private final Shader pointLifeGradient = new Degrade.Linear(0f, 63f, 0f, 89f,
         new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
-    private final Shader reserveLifeGradient = new LinearGradient(0f, 119f, 0f, 136f,
+    private final Shader reserveLifeGradient = new Degrade.Linear(0f, 119f, 0f, 136f,
         new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
     private static final String[] LEVELS = {"0", "1", "2", "3", "4", "5"};
 
@@ -921,7 +921,7 @@ final class HudRenderer {
         }
     }
 
-    private final Shader buttonBody = new RadialGradient(0f, -.35f, 1.2f,
+    private final Shader buttonBody = new Degrade.Radial(0f, -.35f, 1.2f,
         new int[]{0xCC3A4560, 0xBB141B2E, 0xAA05080F}, new float[]{0f, .6f, 1f}, Shader.TileMode.CLAMP);
 
     /** Round touch button: dark glassy body, coloured ring, bevel highlight and press glow. */
@@ -965,10 +965,10 @@ final class HudRenderer {
 
     private static final int L_RING = 0xFF45C6FF, M_RING = 0xFFFFC53A, H_RING = 0xFFFF4D5E;
 
-    private final Shader bannerFill = new LinearGradient(0f, 168f, 0f, 214f,
+    private final Shader bannerFill = new Degrade.Linear(0f, 168f, 0f, 214f,
         new int[]{0xFFFFFFFF, 0xFFFFE27A, 0xFFFF9A1F, 0xFFE0461A}, new float[]{0f, .35f, .7f, 1f},
         Shader.TileMode.CLAMP);
-    private final Shader comboFill = new LinearGradient(0f, 250f, 0f, 302f,
+    private final Shader comboFill = new Degrade.Linear(0f, 250f, 0f, 302f,
         new int[]{0xFFFFFFFF, 0xFFFFEA8A, 0xFFFFA81E, 0xFFFF5A1A}, new float[]{0f, .3f, .7f, 1f},
         Shader.TileMode.CLAMP);
 

@@ -56,8 +56,8 @@ final class CharacterSelectRenderer {
     private final Bitmap[] futureFaces=new Bitmap[8];
     private final String[] futureIds=new String[8];
     private final Shader[] auras={
-        new RadialGradient(170,325,340,new int[]{0xAC168DFF,0x701268F2,0x002168FF},new float[]{0,.45f,1},Shader.TileMode.CLAMP),
-        new RadialGradient(1110,325,340,new int[]{0xACFF2948,0x70FF123C,0x00FF2948},new float[]{0,.45f,1},Shader.TileMode.CLAMP)
+        new Degrade.Radial(170,325,340,new int[]{0xAC168DFF,0x701268F2,0x002168FF},new float[]{0,.45f,1},Shader.TileMode.CLAMP),
+        new Degrade.Radial(1110,325,340,new int[]{0xACFF2948,0x70FF123C,0x00FF2948},new float[]{0,.45f,1},Shader.TileMode.CLAMP)
     };
 
     CharacterSelectRenderer(Context context) {

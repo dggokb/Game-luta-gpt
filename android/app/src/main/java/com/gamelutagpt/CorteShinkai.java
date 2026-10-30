@@ -91,7 +91,7 @@ final class CorteShinkai {
         faixa.close();
 
         // Fundo: escuro do lado do rosto para a cor do tipo do outro lado.
-        paint.setShader(new LinearGradient(0f, 0f, 1280f, 0f,
+        paint.setShader(new Degrade.Linear(0f, 0f, 1280f, 0f,
             new int[] {0xFF07080E, mistura(0xFF07080E, cor, 0.55f), cor}, new float[] {0f, 0.45f, 1f},
             Shader.TileMode.CLAMP));
         c.drawPath(faixa, paint);
@@ -132,7 +132,7 @@ final class CorteShinkai {
             // Um véu da cor do tipo por cima do rosto e a borda de dentro sumindo no fundo.
             paint.setColor((0x38 << 24) | (cor & 0xFFFFFF));
             c.drawRect(destino, paint);
-            paint.setShader(new LinearGradient(destino.right - 170f, 0f, destino.right, 0f,
+            paint.setShader(new Degrade.Linear(destino.right - 170f, 0f, destino.right, 0f,
                 0x0007080E, 0xFF07080E, Shader.TileMode.CLAMP));
             c.drawRect(destino.right - 170f, destino.top, destino.right + 2f, destino.bottom, paint);
             paint.setShader(null);

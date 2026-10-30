@@ -395,22 +395,12 @@ public class GameView extends SurfaceView
         telao.desenhar(rc, quadroDoTelao, l, t, r, b, GROUND_Y, qualidade.efeitosLeves(), engine.frame() / 60f);
     }
 
-    /**
-     * Os lutadores do telão: no Canvas a transformação do cenário já está nele; no OpenGL ela é
-     * copiada para o Canvas antes (o lutador lê de lá).
-     */
+    /** Os lutadores do telão, no Canvas do quadro (o RenderCanvas do cenário transforma o mesmo Canvas). */
     private final TelaoLuta.Quadros quadroDoTelao = this::quadroDoTelao;
 
     private void quadroDoTelao(com.gamelutagpt.render.RenderCanvas rc, CharacterDefinition ch, String clip,
                                int frame, float x, float y, int facing) {
-        if (!glQuadro) {
-            telaoRenderer.drawQuadro(telaoCanvas, ch, clip, frame, x, y, facing);
-            return;
-        }
-        telaoCanvas.save();
-        desenhoGl.matrizNoCanvas(telaoCanvas);
         telaoRenderer.drawQuadro(telaoCanvas, ch, clip, frame, x, y, facing);
-        telaoCanvas.restore();
     }
     private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
     /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
@@ -556,21 +546,19 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * Desenho novo (B1): o mundo da luta (cenário, lutadores e o que escurece por trás deles) em
-     * OpenGL, numa superfície embaixo desta; aqui fica o resto, por cima. Null no PC.
+     * Desenho novo: a luta inteira (cenário, lutadores, efeitos, HUD e botões) em OpenGL, numa
+     * superfície embaixo desta; menus e páginas continuam aqui, no Canvas. Null no PC.
      */
     private DesenhoGl desenhoGl;
     private volatile boolean glSuperficiePronta;
-    /** Esta luta desenha o mundo no OpenGL (decidido quando ela carrega: as folhas vão para lá). */
+    /** Esta luta é desenhada em OpenGL (decidido quando ela carrega: as folhas vão para lá). */
     private boolean glNaLuta;
-    /** O quadro de agora desenha o mundo no OpenGL. */
+    /** O quadro de agora saiu pelo OpenGL. */
     private boolean glQuadro;
+    /** A superfície de cima já foi limpa (transparente) para a luta em OpenGL aparecer. */
+    private boolean camadaDeCimaLimpa;
     /** Depois do carregamento as folhas sobem para o OpenGL, com a tela de carregamento na frente. */
     private boolean subindoFolhas;
-    /** Por último, o cenário desenhado uma vez escondido (as camadas dele sobem também). */
-    private boolean aquecerCenario;
-    /** Onde o cenário (e o narrador nele) desenha neste quadro: o Canvas ou o OpenGL. */
-    private com.gamelutagpt.render.RenderCanvas mundoRc;
 
     /**
      * Liga o desenho em OpenGL na superfície que fica embaixo desta (a {@link MainActivity} cria as
@@ -2536,7 +2524,7 @@ public class GameView extends SurfaceView
         float fade = afterBlast <= 0 ? 1f : clamp(1f - afterBlast / (float)engine.config.ultraBeamFadeFrames, 0f, 1f);
         fade *= clamp(a.ultraFrame / 12f, 0f, 1f);
         if (!flash) {
-            escurecerMundo(canvas, Math.round(110f * fade), 8, 6, 20);
+            effects.drawWorldOverlay(canvas, paint, Math.round(110f * fade), 8, 6, 20);
         } else if (beamBlastClock >= 0f) {
             float since = beamClock - beamBlastClock;
             effects.drawWorldOverlay(canvas, paint, Math.round(230f * clamp(1f - since / 0.22f, 0f, 1f)), 255, 250, 225);
@@ -2549,7 +2537,7 @@ public class GameView extends SurfaceView
      * Super entrance ({@link EntradaSuper}) its portrait shows first, behind the fighters.
      */
     private void drawSuperDarkness(Canvas canvas, float zoom, float left, float top) {
-        escurecerMundo(canvas, superFlash.darkAlpha, 0, 0, 8);
+        effects.drawWorldOverlay(canvas, paint, superFlash.darkAlpha, 0, 0, 8);
         CombatFighter u = engine.fighter(superFlash.user);
         if (superFlash.introShowing()) {
             // Entrada do Super: o quadro de mangá com o retrato, na tela (não no mundo), do lado dele.
@@ -3327,32 +3315,73 @@ public class GameView extends SurfaceView
 
     private void drawFrame() {
         if (!holder.getSurface().isValid()) return;
-        if (subindoFolhas && !aquecerCenario) {
-            // As folhas da luta sobem para o OpenGL aos poucos, com a tela de carregamento na frente.
-            if (desenhoGl == null || desenhoGl.subir(atlases, 24_000_000L) == 0) {
-                aquecerCenario = desenhoGl != null && stageScene != null;
-                if (!aquecerCenario) subindoFolhas = false;
+        if (subindoFolhas) subirFolhas();
+        glQuadro = false;
+        if (glNaLuta && desenhoGl != null && telaDaLuta()) {
+            // A luta em OpenGL: o quadro inteiro na superfície de baixo, pelo CanvasGl.
+            Canvas gl = desenhoGl.comecarQuadro();
+            if (gl != null) {
+                glQuadro = true;
+                limparCamadaDeCima();
+                perfil.marca(PerfilQuadros.TRAVA);
+                try {
+                    renderFrame(gl);
+                    if (pausa.fps()) drawFpsCounter(gl);
+                    perfil.marca(PerfilQuadros.TELA);
+                } finally {
+                    desenhoGl.terminarQuadro();
+                    perfil.marca(PerfilQuadros.ENVIO);
+                }
+                depoisDoQuadro();
+                return;
             }
         }
         Canvas canvas = lockFrameCanvas();
         perfil.marca(PerfilQuadros.TRAVA);
         if (canvas == null) return;
-
-        glQuadro = false;
+        camadaDeCimaLimpa = false;
         try {
             renderFrame(canvas);
             if (pausa.fps()) drawFpsCounter(canvas);
             perfil.marca(PerfilQuadros.TELA);
         } finally {
-            // O mundo (OpenGL) vai antes do Canvas que fica por cima, para os dois saírem juntos.
-            if (glQuadro) desenhoGl.terminarQuadro();
-            else if (desenhoGl != null) desenhoGl.semMundo();
-            glQuadro = false;
             holder.unlockCanvasAndPost(canvas);
             perfil.marca(PerfilQuadros.ENVIO);
         }
-        if (desenhoGl != null) desenhoGl.manutencao();
-        if (desenhoGl != null && desenhoGl.contextoRecriado()) {
+        // Fora da luta em OpenGL a superfície de baixo fica preta.
+        if (desenhoGl != null) desenhoGl.semMundo();
+        depoisDoQuadro();
+    }
+
+    /** A tela de agora é a luta (e não menu, seleção, página, carregamento ou ajuste por cima dela). */
+    private boolean telaDaLuta() {
+        return !loadingActive() && !subindoFolhas && !menuInicial.isOpen() && !capitulos.isOpen()
+            && !ajusteTamanho.isOpen() && !ajusteCaixas.isOpen() && !characterSelect.isOpen()
+            && !historia.coversScreen() && !telaVitoria.cobreTudo();
+    }
+
+    /** A superfície do Canvas, por cima, fica transparente enquanto a luta sai pelo OpenGL (uma vez). */
+    private void limparCamadaDeCima() {
+        if (camadaDeCimaLimpa) return;
+        Canvas c = lockFrameCanvas();
+        if (c == null) return;
+        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        holder.unlockCanvasAndPost(c);
+        camadaDeCimaLimpa = true;
+    }
+
+    /** As folhas da luta sobem para o OpenGL aos poucos; por último o cenário, escondido. */
+    private void subirFolhas() {
+        if (desenhoGl == null || desenhoGl.subir(atlases, 24_000_000L) == 0) {
+            if (desenhoGl != null && stageScene != null) desenhoGl.aquecer(stageScene);
+            subindoFolhas = false;
+        }
+    }
+
+    private void depoisDoQuadro() {
+        if (desenhoGl == null) return;
+        desenhoGl.manutencao();
+        if (desenhoGl.contextoRecriado()) {
             // O aparelho perdeu o contexto do OpenGL (e as folhas que só estavam nele).
             atlases.soltarSoNoOpenGl();
             carregando(this::keepFightAtlases);
@@ -3441,7 +3470,7 @@ public class GameView extends SurfaceView
             memoria = "";
         }
         fpsLinhas[2] = memoria + Build.MANUFACTURER + " " + Build.MODEL + "  ·  Android " + Build.VERSION.RELEASE;
-        // O desenho novo: chamadas à placa de vídeo no último quadro e as texturas dele.
+        // O desenho novo: chamadas à placa de vídeo, vértices, tempos e texturas do último quadro.
         fpsLinhas[3] = glQuadro ? desenhoGl.resumo() : null;
     }
 
@@ -3486,18 +3515,6 @@ public class GameView extends SurfaceView
     /** Whole frame into any canvas: the surface in production, a bitmap in visual review tests. */
     private void renderFrame(Canvas canvas) {
         if (loadingActive() || subindoFolhas) {
-            if (aquecerCenario) {
-                // O cenário uma vez no OpenGL, escondido atrás da tela de carregamento: as camadas
-                // sobem agora, e não no primeiro quadro da luta.
-                aquecerCenario = false;
-                subindoFolhas = false;
-                glQuadro = desenhoGl.comecarQuadro(canvas.getWidth(), canvas.getHeight());
-                if (glQuadro) {
-                    com.gamelutagpt.render.RenderCanvas rc = desenhoGl.mundo(canvas);
-                    stageScene.drawBackground(rc);
-                    stageScene.drawForeground(rc);
-                }
-            }
             telaCarregando.draw(canvas, android.os.SystemClock.uptimeMillis() - loadingSince);
             return;
         }
@@ -3622,15 +3639,6 @@ public class GameView extends SurfaceView
             cameraDaLuta = !ultraShotActive && renderZoom == camera.zoom && focoJogador <= 0f && focoRival <= 0f;
 
             renderCanvas.begin(canvas);
-            // Teste de desempenho (Modo Teste): o que estiver desligado não é desenhado.
-            final boolean cenario = storyMode || TesteDesempenho.cenario;
-            final boolean enfeites = storyMode || TesteDesempenho.efeitos;
-            // Desenho novo: o mundo (cenário, lutadores e o que escurece atrás deles) no OpenGL, na
-            // superfície de baixo; aqui, com o Canvas limpo e transparente, o resto por cima. O
-            // cenário antigo (sem pacote) só existe no Canvas.
-            glQuadro = glNaLuta && (stageScene != null || !cenario)
-                && desenhoGl.comecarQuadro(canvas.getWidth(), canvas.getHeight());
-            if (glQuadro) canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
             int cinemaLayer = -1;
             float tilt = feel.tilt() + ultraTilt;
@@ -3641,12 +3649,12 @@ public class GameView extends SurfaceView
             }
             // Impact frame, último quadro: a cena com as cores invertidas.
             int negativeLayer = feel.negative() ? canvas.saveLayer(0f, 0f, VW, VH, negativePaint) : -1;
-            if (negativeLayer >= 0 && glQuadro) mundo(canvas).beginInvert();
-            mundoRc = glQuadro ? mundo(canvas) : renderCanvas;
+            // Teste de desempenho (Modo Teste): o que estiver desligado não é desenhado.
+            final boolean cenario = storyMode || TesteDesempenho.cenario;
+            final boolean enfeites = storyMode || TesteDesempenho.efeitos;
             if (!cenario) {
                 perfil.marca(PerfilQuadros.TELA);
-                if (glQuadro) mundoRc.fillRect(-VW, -VH, VW * 2f, VH * 2f, 0xFF20242E);
-                else canvas.drawColor(0xFF20242E);
+                canvas.drawColor(0xFF20242E);
             } else if (stageScene != null) {
                 // The stage projects every layer with the same camera the fighters use.
                 perfil.marca(PerfilQuadros.TELA);
@@ -3655,19 +3663,16 @@ public class GameView extends SurfaceView
                 stageScene.setTelao(desenhaTelao);
                 telaoCanvas = canvas;
                 if (narradorNoPalco) {
-                    stageScene.drawBackground(mundoRc, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
+                    stageScene.drawBackground(renderCanvas, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
                         desenhaNarradorPalco);
                 } else {
-                    stageScene.drawBackground(mundoRc);
+                    stageScene.drawBackground(renderCanvas);
                 }
             }
 
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -renderCameraTop);
-            // Impact frame e tela preta do Ultra cobrem o mundo inteiro (no OpenGL): o que fica
-            // aqui por cima até eles some junto.
-            if (glQuadro && (feel.impactStyle() != ImpactFeel.NONE || ultraBlackout() > 0)) canvas.clipRect(0f, 0f, 0f, 0f);
             if (stageScene == null && cenario) {
                 drawScenario(canvas);
                 if (narradorNoPalco) {
@@ -3682,16 +3687,15 @@ public class GameView extends SurfaceView
             if (cenario) drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
-            escurecerMundo(canvas, feel.darkAlpha(), 0, 0, 8);
+            effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
             if (finalizacao.ativo()) drawFinalizacao(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (beam) {
                 drawUltraBeamOverlay(canvas, false);
-                raioFinal.drawBehind(glQuadro ? mundo(canvas) : renderCanvas, ultraPack, ultraBeamFrame());
+                raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
             if (isSuperCinematicActive()) drawSuperDarkness(canvas, renderZoom, cameraLeft, renderCameraTop);
             // SHINKAI Clash: a tela escurece atrás dos dois (antes de qualquer corpo).
-            if (glQuadro) confronto.desenharFundo(mundo(canvas));
-            else confronto.desenharFundo(canvas);
+            confronto.desenharFundo(canvas);
             // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
             canvas.save();
             canvas.translate(tagOffset(), 0f);
@@ -3705,10 +3709,10 @@ public class GameView extends SurfaceView
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
             effects.drawSuperProjectiles(canvas, renderCanvas, engine.superProjectiles);
             if (ultraFighter().inUltraSequence()) {
-                escurecerMundo(canvas, ultraDarkAlpha, 0, 0, 8);
+                effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
             }
             if (ultraWindupActive()) {
-                escurecerMundo(canvas, ultraDarkAlpha, 0, 0, 8);
+                effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
                 canvas.save();
                 CombatFighter u = ultraFighter();
                 if (u.facing < 0) {
@@ -3775,14 +3779,9 @@ public class GameView extends SurfaceView
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
             // Na finalização a frente do cenário some junto com o resto dele.
-            if (cenario && stageScene != null && finalizacao.forca() <= 0f) {
-                stageScene.drawForeground(glQuadro ? mundo(canvas) : renderCanvas);
-            }
+            if (cenario && stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
             perfil.marca(PerfilQuadros.FRENTE);
-            if (negativeLayer >= 0) {
-                canvas.restoreToCount(negativeLayer);
-                if (glQuadro) mundo(canvas).endInvert();
-            }
+            if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
             if (shinkaiFlash > 0) {
@@ -3795,13 +3794,9 @@ public class GameView extends SurfaceView
             int blackout = ultraBlackout();
             if (blackout > 0) {
                 // Tela preta do Ultra (a p16: da cartola para o canhão).
-                if (glQuadro) {
-                    mundo(canvas).fillRect(-40f, -40f, VW + 40f, VH + 40f, blackout << 24);
-                } else {
-                    paint.setStyle(Paint.Style.FILL);
-                    paint.setColor(blackout << 24);
-                    canvas.drawRect(-40f, -40f, VW + 40f, VH + 40f, paint);
-                }
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(blackout << 24);
+                canvas.drawRect(-40f, -40f, VW + 40f, VH + 40f, paint);
                 drawSecreto(canvas, renderZoom, cameraLeft, renderCameraTop);
             }
             if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
@@ -3875,21 +3870,6 @@ public class GameView extends SurfaceView
             atlases.retainOnly();
         }
         return holder.lockCanvas();
-    }
-
-    /** O canvas do OpenGL com a transformação de agora do Canvas (só com {@link #glQuadro}). */
-    private com.gamelutagpt.render.RenderCanvas mundo(Canvas c) {
-        return desenhoGl.mundo(c);
-    }
-
-    /**
-     * O mundo escurece (ou clareia) por trás dos lutadores: no OpenGL, que é onde ele e os
-     * lutadores estão; no Canvas, como sempre.
-     */
-    private void escurecerMundo(Canvas c, int alpha, int red, int green, int blue) {
-        if (alpha <= 0) return;
-        if (glQuadro) mundo(c).fillRect(0f, Arena.WORLD_TOP, Arena.WORLD_WIDTH, Arena.VH + 120f, Color.argb(alpha, red, green, blue));
-        else effects.drawWorldOverlay(c, paint, alpha, red, green, blue);
     }
 
     /** Wet floor: each fighter mirrored around the ground line, faded. */
@@ -4842,28 +4822,16 @@ public class GameView extends SurfaceView
         float h = f.character().visualStandHeight;
         r.setOverride(dirt);
         c.save();
-        recortar(c, f.x - h, visualY - h * 0.16f, f.x + h, visualY + 40f);
+        c.clipRect(f.x - h, visualY - h * 0.16f, f.x + h, visualY + 40f);
         r.draw(c, f.x, visualY, f.facing, false, false);
-        soltarRecorte(c);
+        c.restore();
         c.save();
-        recortar(c, f.x - h, visualY - h * 0.36f, f.x + h, visualY - h * 0.16f);
+        c.clipRect(f.x - h, visualY - h * 0.36f, f.x + h, visualY - h * 0.16f);
         r.setAlphaGlobal(130);
         r.draw(c, f.x, visualY, f.facing, false, false);
         r.setAlphaGlobal(255);
-        soltarRecorte(c);
-        r.setOverride(null);
-    }
-
-    /** Recorta os próximos desenhos (no OpenGL também, onde estão os lutadores) até {@link #soltarRecorte}. */
-    private void recortar(Canvas c, float l, float t, float r, float b) {
-        c.clipRect(l, t, r, b);
-        if (glQuadro) desenhoGl.recorte(c, l, t, r, b);
-    }
-
-    /** Desfaz o {@link #recortar} (o restore do save de antes dele). */
-    private void soltarRecorte(Canvas c) {
         c.restore();
-        if (glQuadro) desenhoGl.semRecorte();
+        r.setOverride(null);
     }
 
     /** Cópias azuladas e translúcidas dos braços fantasmas, da mais forte à mais fraca; o alfa baixo vai a zero. */
@@ -4912,11 +4880,11 @@ public class GameView extends SurfaceView
             float dx = f.facing * (4f + 10f * ghostNoise(seed, k));
             float dy = (k - 1) * 24f + (ghostNoise(seed, k + 5) - 0.5f) * 12f;
             c.save();
-            recortar(c, left, top, right, bottom);
+            c.clipRect(left, top, right, bottom);
             c.translate(dx, dy);
             renderer.setOverride(ghostTints[k]);
             renderer.draw(c, f.x, visualY, f.facing, false, false);
-            soltarRecorte(c);
+            c.restore();
         }
         renderer.setOverride(null);
     }
@@ -4983,10 +4951,7 @@ public class GameView extends SurfaceView
         if (secretoStart < 0) return;
         int age = engine.frame() - secretoStart;
         if (age < 0 || age >= SECRETO_FRAMES) return;
-        if (age < 2) {
-            if (glQuadro) mundo(canvas).fillRect(-VW, -VH, VW * 2f, VH * 2f, age == 0 ? 0xB4FFFFFF : 0x50FFFFFF);
-            else canvas.drawColor(age == 0 ? 0xB4FFFFFF : 0x50FFFFFF);
-        }
+        if (age < 2) canvas.drawColor(age == 0 ? 0xB4FFFFFF : 0x50FFFFFF);
         canvas.save();
         canvas.scale(zoom, zoom);
         canvas.translate(-left, -top);
@@ -5028,13 +4993,6 @@ public class GameView extends SurfaceView
         float l = (float)Math.sqrt(dx * dx + dy * dy);
         if (l < 1f || w <= 0f) return;
         float px = -dy / l * w * 0.5f, py = dx / l * w * 0.5f;
-        if (glQuadro) {
-            triangulosInicio();
-            triangulo(cx - dx, cy - dy, cx + px, cy + py, cx + dx, cy + dy);
-            triangulo(cx - dx, cy - dy, cx + dx, cy + dy, cx - px, cy - py);
-            triangulosDesenhar(canvas, paint.getColor());
-            return;
-        }
         impactPath.reset();
         impactPath.moveTo(cx - dx, cy - dy);
         impactPath.lineTo(cx + px, cy + py);
@@ -5047,8 +5005,7 @@ public class GameView extends SurfaceView
     private void drawImpactFrame(Canvas canvas, float zoom, float left, float top) {
         boolean red = feel.impactStyle() == ImpactFeel.RED;
         float x = feel.impactX(), y = feel.impactY();
-        if (glQuadro) mundo(canvas).fillRect(-VW, -VH, VW * 2f, VH * 2f, red ? IMPACT_RED : IMPACT_VOID);
-        else canvas.drawColor(red ? IMPACT_RED : IMPACT_VOID);
+        canvas.drawColor(red ? IMPACT_RED : IMPACT_VOID);
         canvas.save();
         canvas.scale(zoom, zoom);
         canvas.translate(-left, -top);
@@ -5062,9 +5019,9 @@ public class GameView extends SurfaceView
             paint.setColor(IMPACT_VOID);
             drawStar(canvas, x, y, 100f);
             paint.setColor(Color.WHITE);
-            circulo(canvas, x, y, 34f);
+            canvas.drawCircle(x, y, 34f, paint);
         } else {
-            circulo(canvas, x, y, 38f);
+            canvas.drawCircle(x, y, 38f, paint);
         }
         canvas.restore();
     }
@@ -5083,15 +5040,10 @@ public class GameView extends SurfaceView
         boolean ultra = finalizacao.tipo() == FinalizacaoManga.ULTRA;
         int alpha = Math.round(255f * k);
         float w = VW / zoom, h = VH / zoom;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(comAlfa(ultra ? FINAL_PRETO : FINAL_PAPEL, alpha));
         // Sobra em volta para o close inclinado e a tremida.
-        if (glQuadro) {
-            mundo(canvas).fillRect(left - w * 0.4f, top - h * 0.4f, left + w * 1.4f, top + h * 1.4f,
-                comAlfa(ultra ? FINAL_PRETO : FINAL_PAPEL, alpha));
-        } else {
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(comAlfa(ultra ? FINAL_PRETO : FINAL_PAPEL, alpha));
-            canvas.drawRect(left - w * 0.4f, top - h * 0.4f, left + w * 1.4f, top + h * 1.4f, paint);
-        }
+        canvas.drawRect(left - w * 0.4f, top - h * 0.4f, left + w * 1.4f, top + h * 1.4f, paint);
         CombatFighter v = engine.fighter(side);
         // No peito de quem caiu, mas dentro da tela (o raio do Ultra joga o rival para fora dela).
         float x = clamp(v.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)),
@@ -5112,61 +5064,23 @@ public class GameView extends SurfaceView
     private void drawLinhasDeConcentracao(Canvas canvas, float x, float y, float zoom, int color, int count,
                                           float maxWidth) {
         Random r = finalizacaoLinhas;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
         float outer = 1800f / zoom;
         // Todas as cunhas num caminho só: um desenho por cor (antes, um por cunha: centenas).
-        triangulosInicio();
+        impactPath.reset();
         for (int i = 0; i < count; i++) {
             double a = r.nextDouble() * Math.PI * 2;
             float inner = (170f + r.nextFloat() * r.nextFloat() * 260f) / zoom;
             float t = r.nextFloat();
             float half = (0.8f + t * t * maxWidth) / zoom;
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
-            triangulo(x + cos * inner, y + sin * inner,
-                x + cos * outer - sin * half, y + sin * outer + cos * half,
-                x + cos * outer + sin * half, y + sin * outer - cos * half);
-        }
-        triangulosDesenhar(canvas, color);
-    }
-
-    // Triângulos dos quadros de mangá (cunhas, estrelas, cortes): num caminho só no Canvas, ou
-    // soltos no OpenGL quando o mundo é desenhado lá.
-    private float[] triangulos = new float[6 * 128];
-    private int nTriangulos;
-
-    private void triangulosInicio() {
-        nTriangulos = 0;
-        impactPath.reset();
-    }
-
-    private void triangulo(float x0, float y0, float x1, float y1, float x2, float y2) {
-        if (!glQuadro) {
-            impactPath.moveTo(x0, y0);
-            impactPath.lineTo(x1, y1);
-            impactPath.lineTo(x2, y2);
+            impactPath.moveTo(x + cos * inner, y + sin * inner);
+            impactPath.lineTo(x + cos * outer - sin * half, y + sin * outer + cos * half);
+            impactPath.lineTo(x + cos * outer + sin * half, y + sin * outer - cos * half);
             impactPath.close();
-            return;
         }
-        if ((nTriangulos + 1) * 6 > triangulos.length) triangulos = java.util.Arrays.copyOf(triangulos, triangulos.length * 2);
-        int k = nTriangulos++ * 6;
-        triangulos[k] = x0; triangulos[k + 1] = y0;
-        triangulos[k + 2] = x1; triangulos[k + 3] = y1;
-        triangulos[k + 4] = x2; triangulos[k + 5] = y2;
-    }
-
-    private void triangulosDesenhar(Canvas canvas, int color) {
-        if (glQuadro) {
-            desenhoGl.fillTriangles(canvas, triangulos, nTriangulos, color);
-            return;
-        }
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(color);
         canvas.drawPath(impactPath, paint);
-    }
-
-    /** Círculo cheio na cor do pincel (no OpenGL quando o mundo é desenhado lá). */
-    private void circulo(Canvas canvas, float x, float y, float r) {
-        if (glQuadro) mundo(canvas).fillCircle(x, y, r, paint.getColor());
-        else canvas.drawCircle(x, y, r, paint);
     }
 
     private static int comAlfa(int color, int alpha) {
@@ -5176,44 +5090,31 @@ public class GameView extends SurfaceView
     /** Linhas finas no centro e largas na borda, apontando para o impacto. */
     private void drawSpeedLines(Canvas canvas, float x, float y, int color, int count, float maxWidth) {
         Random lines = new Random(feel.impactSeed() * 7919L);
-        triangulosInicio();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        impactPath.reset();
         for (int i = 0; i < count; i++) {
             double a = lines.nextDouble() * Math.PI * 2;
             float r0 = 150f + lines.nextFloat() * 160f, r1 = 2200f;
             float w = (1f + lines.nextFloat() * (maxWidth - 1f)) * 3f;
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
-            triangulo(x + cos * r0, y + sin * r0,
-                x + cos * r1 - sin * w, y + sin * r1 + cos * w,
-                x + cos * r1 + sin * w, y + sin * r1 - cos * w);
+            impactPath.moveTo(x + cos * r0, y + sin * r0);
+            impactPath.lineTo(x + cos * r1 - sin * w, y + sin * r1 + cos * w);
+            impactPath.lineTo(x + cos * r1 + sin * w, y + sin * r1 - cos * w);
+            impactPath.close();
         }
-        triangulosDesenhar(canvas, color);
+        canvas.drawPath(impactPath, paint);
     }
 
     private void drawStar(Canvas canvas, float x, float y, float size) {
         Random jitter = new Random(feel.impactSeed() * 31L + Math.round(size));
         int spikes = 14;
         impactPath.reset();
-        nTriangulos = 0;
-        float firstX = 0f, firstY = 0f, lastX = 0f, lastY = 0f;
         for (int i = 0; i < spikes * 2; i++) {
             double a = i * Math.PI / spikes + (jitter.nextFloat() - 0.5f) * 0.16f;
             float r = i % 2 == 0 ? size * (0.75f + jitter.nextFloat() * 0.5f) : size * 0.32f;
             float px = x + (float)Math.cos(a) * r, py = y + (float)Math.sin(a) * r;
-            if (glQuadro) {
-                // No OpenGL, um leque a partir do centro da estrela.
-                if (i == 0) { firstX = px; firstY = py; } else triangulo(x, y, lastX, lastY, px, py);
-                lastX = px;
-                lastY = py;
-            } else if (i == 0) {
-                impactPath.moveTo(px, py);
-            } else {
-                impactPath.lineTo(px, py);
-            }
-        }
-        if (glQuadro) {
-            triangulo(x, y, lastX, lastY, firstX, firstY);
-            desenhoGl.fillTriangles(canvas, triangulos, nTriangulos, paint.getColor());
-            return;
+            if (i == 0) impactPath.moveTo(px, py); else impactPath.lineTo(px, py);
         }
         impactPath.close();
         canvas.drawPath(impactPath, paint);
@@ -5462,13 +5363,8 @@ public class GameView extends SurfaceView
         float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
         float half = 43f * k * renderer.animacao.pose().escalaX;
-        int cor = Color.argb(Math.round(70 * k), 0, 0, 0);
-        if (glQuadro) {
-            mundo(c).fillOval(f.x - half, GROUND_Y - 10f * k, f.x + half, GROUND_Y + 10f * k, cor);
-            return;
-        }
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(cor);
+        paint.setColor(Color.argb(Math.round(70 * k), 0, 0, 0));
         c.drawOval(f.x - half, GROUND_Y - 10f * k, f.x + half, GROUND_Y + 10f * k, paint);
     }
 
@@ -6614,7 +6510,7 @@ public class GameView extends SurfaceView
         }
         float x = narradorPalco.x();
         if (Float.isNaN(x)) return;
-        narradorPalco.render(mundoRc, stageScene.screenX(x, z), stageScene.groundScreenY(z), stageScene.scale(z));
+        narradorPalco.render(renderCanvas, stageScene.screenX(x, z), stageScene.groundScreenY(z), stageScene.scale(z));
     }
 
     /** Luta narrada: a batalha (IA ON), o Arcade e as lutas do torneio da história. */

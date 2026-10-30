@@ -17,6 +17,8 @@ final class DesenhoGl {
 
     static void soltarDepois(Bitmap folha) {}
 
+    static RenderCanvas comoRenderCanvas(Canvas c) { return null; }
+
     DesenhoGl(SurfaceView view, SurfaceView jogo, Ouvinte ouvinte) {}
 
     void tamanho(int largura, int altura) {}
@@ -24,16 +26,12 @@ final class DesenhoGl {
     boolean contextoRecriado() { return false; }
     void soltarThread() {}
     void liberar() {}
-    boolean comecarQuadro(int largura, int altura) { return false; }
+    Canvas comecarQuadro() { return null; }
     void terminarQuadro() {}
     void semMundo() {}
     void manutencao() {}
-    RenderCanvas mundo(Canvas c) { throw new UnsupportedOperationException(); }
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro) {}
-    void recorte(Canvas c, float l, float t, float r, float b) {}
-    void semRecorte() {}
-    void fillTriangles(Canvas c, float[] xy, int n, int argb) {}
-    void matrizNoCanvas(Canvas c) {}
+    void aquecer(com.gamelutagpt.stage.StageScene cenario) {}
     int subir(SpriteAtlasCache atlases, long orcamentoNs) { return 0; }
     String resumo() { return ""; }
 }

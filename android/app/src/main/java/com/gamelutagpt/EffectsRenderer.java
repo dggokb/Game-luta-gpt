@@ -20,7 +20,7 @@ final class EffectsRenderer {
     private final Path tail = new Path();
     /** Unit-radius glows per colour, created once per fighter colour (never per frame). */
     private final java.util.Map<Integer, Shader> glows = new java.util.HashMap<>();
-    private final Shader whiteCore = new RadialGradient(0f, 0f, 1f,
+    private final Shader whiteCore = new Degrade.Radial(0f, 0f, 1f,
         new int[]{0xFFFFFFFF, 0xF0FFFFFF, 0x00FFFFFF}, new float[]{0f, .45f, 1f}, Shader.TileMode.CLAMP);
 
     /**
@@ -242,7 +242,7 @@ final class EffectsRenderer {
         Shader shader = glows.get(color);
         if (shader == null) {
             int rgb = color & 0xFFFFFF;
-            shader = new RadialGradient(0f, 0f, 1f,
+            shader = new Degrade.Radial(0f, 0f, 1f,
                 new int[]{0xE0000000 | rgb, 0x80000000 | rgb, 0x00000000 | rgb}, new float[]{0f, .45f, 1f},
                 Shader.TileMode.CLAMP);
             glows.put(color, shader);
