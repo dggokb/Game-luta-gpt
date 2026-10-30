@@ -201,6 +201,7 @@ final class GlRenderCanvas implements RenderCanvas {
         for (Textura t : texturas.values()) t.id = 0;
         texturas.clear();
         textosProprios.clear();
+        linhasProprias.clear();
         texturasDeTextoVivas.clear();
         textos.clear();
         ultimoDoTexto.clear();
@@ -600,9 +601,31 @@ final class GlRenderCanvas implements RenderCanvas {
         return larguraTela > 0 && alturaTela > 0 ? (float)(areaPintada / ((double)larguraTela * alturaTela)) : 0f;
     }
 
+    /**
+     * Com recorte (e fora do stencil), os três cantos de cada triângulo esperam aqui e o triângulo
+     * sai já cortado nos semiplanos: a placa de vídeo só pinta o pedaço que aparece. Pelo shader,
+     * que descarta pixel a pixel, ela pagava o triângulo inteiro: a página do Ultra estilhaçando
+     * desenha a explosão inteira em cada caco (53 telas pintadas por quadro).
+     */
+    private final float[] pendente = new float[3 * FLOATS];
+    private int nPendente;
+    private final float[] triA = new float[(3 + MAX_PLANOS) * FLOATS], triB = new float[(3 + MAX_PLANOS) * FLOATS];
+
     private void vertice(float x, float y, float u, float v, float r, float g, float bl, float al, float tipo) {
         if (alfaGlobal != 1f) {
             r *= alfaGlobal; g *= alfaGlobal; bl *= alfaGlobal; al *= alfaGlobal;
+        }
+        if (nPlanos > 0 && stencil == 0) {
+            float[] p = pendente;
+            int k = nPendente * FLOATS;
+            p[k] = a * x + c * y + e;
+            p[k + 1] = b * x + d * y + f;
+            p[k + 2] = u; p[k + 3] = v; p[k + 4] = r; p[k + 5] = g; p[k + 6] = bl; p[k + 7] = al; p[k + 8] = tipo;
+            if (++nPendente == 3) {
+                nPendente = 0;
+                trianguloRecortado();
+            }
+            return;
         }
         float[] o = dados;
         int k = posicao;
@@ -705,6 +728,55 @@ final class GlRenderCanvas implements RenderCanvas {
         p[i * 4 + 1] = b * x + d * y + f;
         p[i * 4 + 2] = u;
         p[i * 4 + 3] = v;
+    }
+
+    /** O triângulo pendente cortado nos semiplanos do recorte, em leque. */
+    private void trianguloRecortado() {
+        float[] p = triA, q = triB;
+        System.arraycopy(pendente, 0, p, 0, 3 * FLOATS);
+        int n = 3;
+        for (int k = 0; k < nPlanos && n >= 3; k++) {
+            float pa = recorte[k * 3], pb = recorte[k * 3 + 1], pc = recorte[k * 3 + 2];
+            int m = 0;
+            boolean tudoDentro = true;
+            for (int i = 0; i < n; i++) {
+                int j = (i + 1) % n;
+                float di = pa * p[i * FLOATS] + pb * (alturaTela - p[i * FLOATS + 1]) + pc;
+                float dj = pa * p[j * FLOATS] + pb * (alturaTela - p[j * FLOATS + 1]) + pc;
+                if (di >= 0f) {
+                    System.arraycopy(p, i * FLOATS, q, m * FLOATS, FLOATS);
+                    m++;
+                } else {
+                    tudoDentro = false;
+                }
+                if ((di >= 0f) != (dj >= 0f)) {
+                    float t = di / (di - dj);
+                    for (int w = 0; w < FLOATS; w++) q[m * FLOATS + w] = p[i * FLOATS + w] + (p[j * FLOATS + w] - p[i * FLOATS + w]) * t;
+                    // O tipo (com o número dele na fração) não se mistura: é o mesmo nos três cantos.
+                    q[m * FLOATS + 8] = p[i * FLOATS + 8];
+                    m++;
+                }
+            }
+            if (tudoDentro) continue;
+            float[] troca = p; p = q; q = troca;
+            n = m;
+        }
+        if (n < 3) return;
+        reservar((n - 2) * 3);
+        for (int i = 1; i < n - 1; i++) {
+            copiarVertice(p, 0);
+            copiarVertice(p, i);
+            copiarVertice(p, i + 1);
+        }
+    }
+
+    private void copiarVertice(float[] p, int i) {
+        float[] o = dados;
+        int k = posicao;
+        System.arraycopy(p, i * FLOATS, o, k, FLOATS);
+        area(o[k], o[k + 1]);
+        posicao = k + FLOATS;
+        vertices++;
     }
 
     /** Vértice já em pixels da tela (sem a transformação), com a cor pronta. */
@@ -891,12 +963,21 @@ final class GlRenderCanvas implements RenderCanvas {
      * cada vez que ela recomeçava todos os textos da tela eram refeitos no mesmo quadro. Ficam os
      * {@link #MAX_TEXTOS_PROPRIOS} mais novos.
      */
-    private static final int TEXTO_PROPRIO = 96 * 1024, MAX_TEXTOS_PROPRIOS = 24;
+    private static final int TEXTO_PROPRIO = 96 * 1024, MAX_TEXTOS_PROPRIOS = 24, MAX_LINHAS_PROPRIAS = 48;
     private final java.util.ArrayDeque<int[]> textosProprios = new java.util.ArrayDeque<>();
-    private final java.util.HashSet<Integer> texturasDeTextoVivas = new java.util.HashSet<>();
+    /** As linhas do diagnóstico (contador de FPS, relatório do teste), cada uma na sua textura. */
+    private final java.util.ArrayDeque<int[]> linhasProprias = new java.util.ArrayDeque<>();
+    boolean textoDeLinha;
+    /**
+     * Cada textura de texto viva e o selo dela: o OpenGL reaproveita o número de uma textura
+     * apagada, e o texto antigo, conferindo só o número, desenhava o texto novo (o contador de
+     * FPS trocado por outra linha).
+     */
+    private final java.util.HashMap<Integer, Integer> texturasDeTextoVivas = new java.util.HashMap<>();
+    private int seloDeTexto;
 
-    /** O lugar {u0, v0, u1, v1, id} de um texto com textura própria. */
-    private float[] guardarTextoProprio(Bitmap bmp) {
+    /** O lugar {u0, v0, u1, v1, id, selo} de um texto com textura própria. */
+    private float[] guardarTextoProprio(Bitmap bmp, java.util.ArrayDeque<int[]> fila, int maximo) {
         int w = bmp.getWidth(), h = bmp.getHeight();
         TesteAutomatico.textoGuardadoFora(w * h);
         int[] id = new int[1];
@@ -911,10 +992,11 @@ final class GlRenderCanvas implements RenderCanvas {
         // O bind acima não atrapalha o lote: quem descarrega liga a textura dele de novo.
         int bytes = w * h * 4;
         bytesTexturas += bytes;
-        textosProprios.addLast(new int[] {id[0], bytes});
-        texturasDeTextoVivas.add(id[0]);
-        while (textosProprios.size() > MAX_TEXTOS_PROPRIOS) {
-            int[] velho = textosProprios.removeFirst();
+        fila.addLast(new int[] {id[0], bytes});
+        int selo = ++seloDeTexto;
+        texturasDeTextoVivas.put(id[0], selo);
+        while (fila.size() > maximo) {
+            int[] velho = fila.removeFirst();
             // Algum desenho gravado pode usar esta textura: sai antes.
             descarregar();
             executar();
@@ -923,12 +1005,14 @@ final class GlRenderCanvas implements RenderCanvas {
             texturasDeTextoVivas.remove(velho[0]);
             bytesTexturas -= velho[1];
         }
-        return new float[] {0f, 0f, 1f, 1f, id[0]};
+        return new float[] {0f, 0f, 1f, 1f, id[0], selo};
     }
 
     /** O lugar guardado de um texto ainda vale (a textura dele existe). */
     boolean textoVale(float[] uv, int geracao) {
-        return uv.length > 4 ? texturasDeTextoVivas.contains((int)uv[4]) : geracao == geracaoTexto;
+        if (uv.length <= 4) return geracao == geracaoTexto;
+        Integer selo = texturasDeTextoVivas.get((int)uv[4]);
+        return selo != null && selo == (int)uv[5];
     }
 
     // Textos: todos numa textura só (prateleiras); cheia, recomeça (os textos são refeitos).
@@ -943,7 +1027,9 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     float[] guardarTexto(Bitmap bmp) {
         int w = bmp.getWidth(), h = bmp.getHeight();
-        if ((w + 2) * (h + 2) > TEXTO_PROPRIO && w <= maxTextura && h <= maxTextura) return guardarTextoProprio(bmp);
+        if ((textoDeLinha || (w + 2) * (h + 2) > TEXTO_PROPRIO) && w <= maxTextura && h <= maxTextura) {
+            return guardarTextoProprio(bmp, textoDeLinha ? linhasProprias : textosProprios, textoDeLinha ? MAX_LINHAS_PROPRIAS : MAX_TEXTOS_PROPRIOS);
+        }
         TesteAutomatico.textoGuardado((w + 2) * (h + 2));
         if (w + 2 > ladoTexto || h + 2 > ladoTexto) {
             bmp.recycle();
@@ -1037,7 +1123,15 @@ final class GlRenderCanvas implements RenderCanvas {
         Textura t = texturas.get(bitmap);
         if (t != null) return t;
         if (bitmap.isRecycled()) return null;
-        int largura = bitmap.getWidth(), altura = bitmap.getHeight();
+        int largura, altura;
+        try {
+            largura = bitmap.getWidth();
+            altura = bitmap.getHeight();
+        } catch (RuntimeException e) {
+            // Solta agora mesmo por outra thread (no PC o bitmap solto não tem tamanho).
+            if (bitmap.isRecycled()) return null;
+            throw e;
+        }
         boolean hardware = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && bitmap.getConfig() == Bitmap.Config.HARDWARE;
         Bitmap fonte = hardware ? bitmap.copy(Bitmap.Config.ARGB_8888, false) : bitmap;
         if (fonte == null) return null;
@@ -1055,8 +1149,17 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
-        GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, fonte, 0);
-        long bytes = (long)fonte.getWidth() * fonte.getHeight() * 4L;
+        long bytes;
+        try {
+            GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, fonte, 0);
+            bytes = (long)fonte.getWidth() * fonte.getHeight() * 4L;
+        } catch (RuntimeException e) {
+            // A folha foi solta por outra thread (o carregamento de uma dupla nova) no meio do
+            // envio: fica sem textura (quem precisar dela de novo a decodifica).
+            if (!bitmap.isRecycled() && !fonte.isRecycled()) throw e;
+            GLES30.glDeleteTextures(1, id, 0);
+            return null;
+        }
         if (fonte != bitmap) fonte.recycle();
         if (soltarBitmap && !hardware) bitmap.recycle();
         // O bind acima não atrapalha o lote: quem descarrega liga a textura dele de novo.

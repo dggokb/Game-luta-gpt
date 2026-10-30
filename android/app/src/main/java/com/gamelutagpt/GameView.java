@@ -1651,6 +1651,11 @@ public class GameView extends SurfaceView
             float elapsedSeconds = encaixarNoPasso((frameStart - previous) / 1_000_000_000f);
             previous = frameStart;
             if (pedirTeste) comecarTeste();
+            String[] dupla = duplaPedida;
+            if (dupla != null) {
+                duplaPedida = null;
+                selectTeams(dupla[0], dupla[1], dupla[2], dupla[3]);
+            }
             perfil.inicio();
             advanceSimulation(elapsedSeconds);
             perfil.marca(PerfilQuadros.ATUALIZA);
@@ -3500,7 +3505,9 @@ public class GameView extends SurfaceView
         if (avisoGl == null && TesteDesempenho.openGl && desenhoGl != null && desenhoGl.motivoFalha() != null) {
             avisoGl = desenhoGl.motivoFalha() + ". Mande print disto.";
         }
-        if (subindoFolhas) subirFolhas();
+        // Não durante um carregamento: a thread dele solta as folhas que saem enquanto a lista
+        // das prontas ainda é percorrida aqui.
+        if (subindoFolhas && !loadingActive()) subirFolhas();
         glQuadro = false;
         if (glNaLuta && desenhoGl != null && telaDaLuta()) {
             // A luta em OpenGL: o quadro inteiro na superfície de baixo, pelo CanvasGl.
@@ -3616,11 +3623,11 @@ public class GameView extends SurfaceView
     private final RectF fpsCaixa = new RectF();
 
     private void drawFpsCounter(Canvas canvas) {
-        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(true);
+        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(true);
         try {
             desenharFps(canvas);
         } finally {
-            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(false);
+            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(false);
         }
     }
 
@@ -3683,6 +3690,16 @@ public class GameView extends SurfaceView
         return true;
     }
 
+    /**
+     * PC ({@code gradle :pc:medirLuta -Pdupla=p15,p16,p13,p14}): troca as duplas da luta, na
+     * thread do jogo (com a tela de carregamento), para medir o Super e o Ultra de quem quiser.
+     */
+    public void escolherDuplas(String jogador, String parceiro, String rival, String parceiroRival) {
+        duplaPedida = new String[] {jogador, parceiro, rival, parceiroRival};
+    }
+
+    private volatile String[] duplaPedida;
+
     /** O pedido do botão (thread da tela) começa na thread do jogo, no começo do quadro. */
     private volatile boolean pedirTeste;
 
@@ -3734,11 +3751,11 @@ public class GameView extends SurfaceView
         alturaDoQuadro = canvas.getHeight();
         String[] r = teste.relatorio();
         if (r == null) return;
-        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(true);
+        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(true);
         try {
             desenharRelatorio(canvas, r);
         } finally {
-            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(false);
+            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(false);
         }
     }
 

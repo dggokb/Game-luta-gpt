@@ -41,6 +41,20 @@ public final class MedirLuta {
         c.tecla(KeyEvent.KEYCODE_ENTER);
         // Intro, READY e GO.
         c.esperar(6.0);
+        // -Dgameluta.dupla=p15,p16,p13,p14: as duplas da luta (jogador, parceiro, rival, parceiro).
+        String dupla = System.getProperty("gameluta.dupla");
+        if (dupla != null) {
+            String[] d = dupla.split(",");
+            c.jogo().escolherDuplas(d[0], d[1], d[2], d[3]);
+            c.esperar(1.0);
+            long carregando = System.currentTimeMillis() + 60_000;
+            while (!c.jogo().iniciarTesteDesempenho()) {
+                if (System.currentTimeMillis() > carregando) throw new IllegalStateException("a dupla não carregou");
+                c.esperar(0.5);
+            }
+            // O pedido acima já valeu: espera a intro passar e pede de novo (o roteiro conta da luta).
+            c.esperar(0.1);
+        }
         long limite = System.currentTimeMillis() + 20_000;
         while (!c.jogo().iniciarTesteDesempenho()) {
             if (System.currentTimeMillis() > limite) throw new IllegalStateException("a luta não começou");

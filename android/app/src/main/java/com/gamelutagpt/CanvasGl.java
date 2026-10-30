@@ -1029,14 +1029,13 @@ final class CanvasGl extends Canvas {
     }
 
     /**
-     * Textos que mudam o tempo todo e não precisam de acerto entre letras (o contador de FPS e o
-     * relatório do teste): letra por letra. As linhas do diagnóstico, compridas e novas a cada
-     * 2 s, ocupavam sozinhas um quarto da textura dos textos; o medidor pesava no que mede.
+     * Textos de diagnóstico (o contador de FPS e o relatório do teste): cada linha numa textura
+     * só dela, fora da textura dos textos. As linhas compridas, novas a cada 2 s, ocupavam um
+     * quarto dela (o medidor pesava no que mede). Letra por letra resolvia isso mas custava uma
+     * chave e uma busca por letra: 23 ms por quadro no celular.
      */
-    private boolean porCaractere;
-
-    void porCaractere(boolean ligado) {
-        porCaractere = ligado;
+    void linhasProprias(boolean ligado) {
+        gl.textoDeLinha = ligado;
     }
 
     /** Só algarismos e os sinais que andam com eles (dano, combo, tempo, porcentagem). */
@@ -1064,7 +1063,7 @@ final class CanvasGl extends Canvas {
         // contador de combo): ele vai pela posição na tela, igual letra por letra.
         Shader sh = p.getShader();
         if (sh != null && !(sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial())) return false;
-        if (!porCaractere && !numero(s)) return false;
+        if (!numero(s)) return false;
         float total = 0f;
         for (int i = 0; i < s.length(); i++) total += p.measureText(caractere(s.charAt(i)));
         glifo = true;

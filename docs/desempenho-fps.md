@@ -341,6 +341,33 @@ As correções, no `CanvasGl`/`GlRenderCanvas`:
   combo breaker que gastava a barra);
 - o resultado é que o Super e o Ultra saem em toda rodada.
 
+### 5.9 Correção do 5.8 (segundo relatório do celular, p16+p15)
+
+O segundo relatório, depois da 5.8, mostrou duas coisas:
+- **"tela" em 23,6 ms**, contra 1,1 antes.
+- **O Ultra da p16 pintando 95 telas.**
+
+Causas e correções:
+- **Contador de FPS letra por letra.** Cada letra montava uma chave com vários números e fazia
+  uma busca: cerca de 500 por quadro custavam 0,4 ms no PC e 23 ms no celular. O contador e o
+  relatório voltaram a ser desenhados por linha, cada linha numa textura própria fora da
+  textura dos textos (no máximo 48). "Tela" voltou a 0,1–0,2 ms.
+- **Explosão em estrela (`ArteProvisoria.spikyStar`).** A página do Ultra estilhaçando desenha a
+  explosão inteira em cada caco e recortava no shader. Agora todo triângulo com recorte (fora do
+  stencil) é cortado nos semiplanos antes de ir para a placa (`GlRenderCanvas.vertice`). O pior
+  quadro do Ultra caiu de 93 para 13 telas.
+- **Número de textura reaproveitado.** O OpenGL reaproveita o número de uma textura apagada, e
+  um texto antigo desenhava o texto novo (o contador de FPS saía trocado por outra linha). Cada
+  textura de texto agora tem um selo, conferido junto com o número.
+- **Crash ao trocar de dupla com o OpenGL ligado.** A thread de carregamento soltava as folhas
+  enquanto o envio delas para a placa percorria a lista. O envio agora espera o carregamento, e
+  a folha solta no meio do envio fica sem textura, sem derrubar o jogo.
+
+`gradle :pc:medirLuta -Pgl -Pdupla=p16,p15,p13,p14` mede com qualquer dupla.
+
+**Lição:** um aumento pequeno no PC (0,4 → 0,8 ms em "tela") era o sinal. Toda parte que
+**dobra** no PC tem de ser olhada antes de ir para o celular.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:
