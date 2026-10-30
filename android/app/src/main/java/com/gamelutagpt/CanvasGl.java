@@ -779,6 +779,7 @@ final class CanvasGl extends Canvas {
     // ---- Texto: cada texto vira um bitmap feito pelo Paint de verdade, guardado como textura ----
 
     private static final int TEXTOS = 160;
+    private static final float MAX_PIXELS_TEXTO = 400_000f;
 
     private static final class Texto {
         /** O lugar na textura dos textos e a geração dela (recomeçou: faz de novo). */
@@ -843,6 +844,9 @@ final class CanvasGl extends Canvas {
         float base = degrauDeTamanho(tamanho);
         float k = tamanho / base;
         float esc = degrauDeEscala(escala() * k);
+        // O contorno no tamanho do degrau, em quartos de pixel: contorno proporcional à fonte
+        // (o número de dano) fica igual em todos os quadros do mesmo degrau.
+        float traco = Math.round(p.getStrokeWidth() / k * 4f) / 4f;
         Shader sh = p.getShader();
         // Degradê linear: o texto vira só a forma (branca) e o degradê é posto pela placa de vídeo.
         boolean mascara = sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial();
@@ -852,7 +856,7 @@ final class CanvasGl extends Canvas {
         // poucos é o mesmo bitmap).
         chave.append(s).append('\u0000').append(base).append(',')
             .append(mascara ? 0 : (cor | 0xFF000000)).append(',')
-            .append(p.getStyle().ordinal()).append(',').append(p.getStrokeWidth()).append(',')
+            .append(p.getStyle().ordinal()).append(',').append(traco).append(',')
             .append(p.getTextAlign().ordinal()).append(',').append(p.getTextSkewX()).append(',')
             .append(p.isFakeBoldText()).append(',').append(p.getTextScaleX()).append(',')
             .append(System.identityHashCode(p.getTypeface())).append(',').append(esc);
@@ -868,7 +872,7 @@ final class CanvasGl extends Canvas {
         if (t != null && t.geracao != gl.geracaoTexto) t = null;
         if (t == null) {
             Paint feito = p;
-            if (mascara || p.getAlpha() != 255 || base != tamanho) {
+            if (mascara || p.getAlpha() != 255 || base != tamanho || traco != p.getStrokeWidth()) {
                 // Opaco e no degrau de tamanho: a transparência e o resto da escala vêm no desenho.
                 pincelTexto.set(p);
                 if (mascara) {
@@ -878,6 +882,7 @@ final class CanvasGl extends Canvas {
                     pincelTexto.setAlpha(255);
                 }
                 pincelTexto.setTextSize(base);
+                pincelTexto.setStrokeWidth(traco);
                 feito = pincelTexto;
             }
             t = criarTexto(s, x, y, feito, esc);
@@ -914,6 +919,10 @@ final class CanvasGl extends Canvas {
         }
         float l = esquerda - margem, t = y + fm.top - margem;
         float lw = w + margem * 2f, lh = (fm.bottom - fm.top) + margem * 2f;
+        // Texto enorme (o número que bate grande) num bitmap de no máximo ~0,4 Mpx: a placa de
+        // vídeo estica o resto. Poucos assim enchiam a textura dos textos, que era refeita.
+        float px = lw * lh * esc * esc;
+        if (px > MAX_PIXELS_TEXTO) esc *= (float)Math.sqrt(MAX_PIXELS_TEXTO / px);
         int bw = (int)Math.ceil(lw * esc), bh = (int)Math.ceil(lh * esc);
         if (bw <= 0 || bh <= 0 || bw > 4096 || bh > 4096) return null;
         Bitmap bmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888);
