@@ -3630,7 +3630,7 @@ public class GameView extends SurfaceView
     }
 
     /** Linhas do diagnóstico, de cima para baixo (refeitas a cada janela do contador). */
-    private final String[] fpsLinhas = new String[4];
+    private final String[] fpsLinhas = new String[5];
 
     private void fpsDiagnostico() {
         String partes = perfil.ultima();
@@ -3655,6 +3655,9 @@ public class GameView extends SurfaceView
         fpsLinhas[2] = memoria + Build.MANUFACTURER + " " + Build.MODEL + "  ·  Android " + Build.VERSION.RELEASE;
         // O desenho novo: chamadas à placa de vídeo, vértices, tempos e texturas do último quadro.
         fpsLinhas[3] = glQuadro ? desenhoGl.resumo() : null;
+        // O que o último botão do jogador leu: um especial que não saiu mostra o porquê.
+        String entrada = engine.fighter(PLAYER).ultimaEntrada;
+        fpsLinhas[4] = entrada == null ? null : "entrada: " + entrada;
     }
 
     /** Quadros por segundo da tela do aparelho (60, 90, 120...). */

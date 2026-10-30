@@ -60,6 +60,19 @@ final class MotionParser {
     static boolean isForward(int d) { return d == 8 || d == 1 || d == 2; }
     static boolean isUp(int d) { return d == 6 || d == 7 || d == 8; }
 
+    private static final String[] SETAS = {"•", "→", "↘", "↓", "↙", "←", "↖", "↑", "↗"};
+
+    /** As últimas direções em setas (para frente é →), da mais velha à de agora. */
+    String descrever(int quantas) {
+        StringBuilder b = new StringBuilder();
+        for (int i = Math.max(0, count - quantas); i < count; i++) {
+            if (b.length() > 0) b.append(' ');
+            int d = directions[i];
+            b.append(d >= 0 && d < SETAS.length ? SETAS[d] : "?");
+        }
+        return b.toString();
+    }
+
     /** Direção segurada agora (0 sem história). */
     int current() {
         return count > 0 ? directions[count - 1] : 0;

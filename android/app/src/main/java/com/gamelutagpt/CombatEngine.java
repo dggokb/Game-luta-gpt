@@ -491,8 +491,10 @@ final class CombatEngine {
         boolean crouch = ControlsLayout.isDownDirection(in.direction);
         if (in.light || in.medium || in.heavy) {
             String button = in.heavy ? "H" : in.medium ? "M" : "L";
+            String lido = f.motion.descrever(8);
             // O comando de cada personagem: S2..S4 ou a energia (S1); o mais longo ganha.
             String command = f.character().matchCommand(f.motion, button, f.grounded, clock, config);
+            f.ultimaEntrada = lido + "  " + button + "  ⇒ " + (command == null ? "golpe normal" : "S".equals(command) ? "S1" : command);
             if (command != null) {
                 // O especial de [↓] ↑ cancela o pulo que o ↑ pediu.
                 f.pendingJumpAge = -1;
