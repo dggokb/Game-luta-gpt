@@ -17,6 +17,9 @@
 Com "framesGolpe" ({"S3": [startup, ativo, recuperação]}) o golpe tem tempo próprio em vez do
 da base vezes o ritmo (especial de vídeo longo: a rajada e a voadora do p15).
 
+Com "fimDoClipe" ({"H": 53}) os quadros do clipe dali em diante passam num instante: o vídeo que
+termina parado na guarda (o H da p15) não prende o lutador depois do movimento.
+
 Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam.
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
 o tempo e a animação (só o dano muda). Depois rode build_characters.py --write.
@@ -70,12 +73,17 @@ def retime(m, new, advantage=None):
             box['frames'] = [lo, min(max(lo, round(remap(box['frames'][1], old, new))), last)]
 
 
-def video_cadence(anim, cfg, total_ms):
-    """durationsMs na proporção do vídeo; None se o clipe não tem receita de vídeo."""
+def video_cadence(anim, cfg, total_ms, fim=None):
+    """durationsMs na proporção do vídeo; None se o clipe não tem receita de vídeo. Com
+    {@code fim}, os quadros dali em diante (o fim do vídeo já parado na guarda) passam num
+    instante: o golpe acaba quando o movimento acaba."""
     v = A.video_seconds(cfg, anim)
     if v is None or len(v) != len(anim['frames']) or v.sum() <= 0:
         return None
     v = np.minimum(v, GAP_CAP * np.median(v))
+    if fim is not None:
+        v = v.copy()
+        v[fim:] = 0
     return [max(1, round(x)) for x in v / v.sum() * total_ms]
 
 
@@ -619,7 +627,8 @@ def apply(cid, spec, base, combos_data):
         anim = pack['animations'].get(anim_id) if anim_id else None
         cadence = 'sem animação' if not keep else 'tempo mantido'
         if anim and not keep and not anim.get('loop') and 'durationsMs' in anim:
-            d = video_cadence(anim, clips.get(anim['atlas'], {}), total * 1000 / 60)
+            d = video_cadence(anim, clips.get(anim['atlas'], {}), total * 1000 / 60,
+                              spec.get('fimDoClipe', {}).get(key))
             if d:
                 anim['durationsMs'], cadence = d, 'vídeo'
             else:
