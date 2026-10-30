@@ -69,6 +69,7 @@ public final class JogoPc {
 
     public static void main(String[] args) throws Exception {
         System.setProperty("sun.java2d.noddraw", "true");
+        GameView.esperaFina = true;
         // Windows: o quadro já sai pronto do desenho por software e o Direct3D do Java2D só o
         // copia para a tela; com alguns drivers essa cópia estraga a imagem até a janela ser
         // recriada (F11 duas vezes). Pelo GDI a cópia é a mesma, sem esse problema.
@@ -401,6 +402,9 @@ public final class JogoPc {
                 Log.w(TAG, "gameluta.resolucao inválida: " + r);
             }
         }
-        return 1920;
+        // A arte é feita para 1280×720, e o PC desenha pelo processador: acima disso o quadro
+        // custava 2,5× (22 ms a 1080p) para pouca diferença na tela. O Ampliador leva à tela.
+        // -Dgameluta.resolucao=1920x1080 volta ao 1080p num PC forte.
+        return 1280;
     }
 }

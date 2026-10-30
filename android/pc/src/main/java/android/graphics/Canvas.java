@@ -389,6 +389,7 @@ public class Canvas {
     }
 
     public void drawRect(float left, float top, float right, float bottom, Paint paint) {
+        if (preencherRetangulo(Math.min(left, right), Math.min(top, bottom), Math.max(left, right), Math.max(top, bottom), paint)) return;
         draw(new Rectangle2D.Float(Math.min(left, right), Math.min(top, bottom), Math.abs(right - left), Math.abs(bottom - top)), paint);
     }
 
@@ -405,6 +406,7 @@ public class Canvas {
 
     public void drawCircle(float cx, float cy, float radius, Paint paint) {
         if (radius <= 0f) return;
+        if (desenharBrilho(cx, cy, radius, paint)) return;
         draw(new Ellipse2D.Float(cx - radius, cy - radius, radius * 2f, radius * 2f), paint);
     }
 
@@ -711,9 +713,11 @@ public class Canvas {
         } else {
             Resampler.Scaled scaled = Resampler.get(source, sx0, sy0, sx1, sy1, dw, dh, flipX, flipY);
             if (scaled == null) {
-                // Tamanho mudando a cada quadro: o caminho normal do Java2D.
+                // Tamanho mudando a cada quadro (o zoom da câmera): ampliada e misturada numa
+                // passada só, em paralelo; sem o retângulo de recorte, o caminho normal do Java2D.
+                boolean feito = blendScaledDirect(source, sx0, sy0, sx1, sy1, dx0, dy0, dw, dh, flipX, flipY, alpha);
                 g.setTransform(t);
-                return false;
+                return feito;
             }
             BufferedImage si = scaled.image;
             if (!blendDirect(si, dx0 + scaled.dx, dy0 + scaled.dy, si.getWidth(), si.getHeight(), alpha)) {
@@ -728,6 +732,139 @@ public class Canvas {
      * Mistura {@code src} (inteira) em ({@code x}, {@code y}) do destino, em coordenadas de
      * dispositivo, pelos núcleos todos. Só quando o recorte atual é um retângulo.
      */
+    /** Como o {@link #blendDirect}, com a imagem escalada na mistura (transformação já zerada). */
+    private boolean blendScaledDirect(BufferedImage src, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0,
+                                      int dw, int dh, boolean flipX, boolean flipY, int alpha) {
+        if (!Blender.ENABLED || image == null || !Blender.supports(src)) return false;
+        if (!(g.getComposite() instanceof AlphaComposite) || ((AlphaComposite) g.getComposite()).getRule() != AlphaComposite.SRC_OVER) return false;
+        int cx0 = 0, cy0 = 0, cx1 = image.getWidth(), cy1 = image.getHeight();
+        Shape clip = g.getClip();
+        if (clip != null) {
+            if (!(clip instanceof java.awt.Rectangle) && !(clip instanceof Rectangle2D)) return false;
+            Rectangle2D r = clip.getBounds2D();
+            cx0 = (int) Math.ceil(r.getMinX() - 1e-6);
+            cy0 = (int) Math.ceil(r.getMinY() - 1e-6);
+            cx1 = (int) Math.floor(r.getMaxX() + 1e-6);
+            cy1 = (int) Math.floor(r.getMaxY() + 1e-6);
+        }
+        Blender.blendScaled(src, sx0, sy0, sx1, sy1, image, dx0, dy0, dw, dh, flipX, flipY, cx0, cy0, cx1, cy1, alpha);
+        return true;
+    }
+
+    /** Brilhos redondos já desenhados, por (degradê, raios em degraus de 2%). */
+    private static final java.util.LinkedHashMap<Object, BufferedImage> BRILHOS =
+        new java.util.LinkedHashMap<Object, BufferedImage>(64, 0.75f, true) {
+            @Override protected boolean removeEldestEntry(java.util.Map.Entry<Object, BufferedImage> e) { return size() > 96; }
+        };
+
+    /**
+     * Brilho redondo (círculo cheio com o degradê radial centrado nele, sem rotação): as lanternas,
+     * os halos e as fogueiras do cenário. O Java2D pinta degradê radial com borda suave numa thread
+     * só (~3–5 ms por quadro); aqui ele é desenhado uma vez por tamanho e só misturado.
+     */
+    private boolean desenharBrilho(float cx, float cy, float radius, Paint paint) {
+        if (!Blender.ENABLED || image == null || paint == null || paint.getStyle() != Paint.Style.FILL) return false;
+        if (!(paint.shader instanceof RadialGradient) || paint.colorFilter != null || paint.xfermode != null) return false;
+        RadialGradient rg = (RadialGradient) paint.shader;
+        if (!rg.naBorda || rg.localTransform() != null || rg.centroX != cx || rg.centroY != cy || rg.raio != radius) return false;
+        AffineTransform t = g.getTransform();
+        if (Math.abs(t.getShearX()) > 1e-6 || Math.abs(t.getShearY()) > 1e-6) return false;
+        double rx = Math.abs(radius * t.getScaleX()), ry = Math.abs(radius * t.getScaleY());
+        if (rx < 2 || ry < 2 || rx * ry > 1_000_000) return false;
+        int qx = (int) Math.round(Math.log(rx) / Math.log(1.02)), qy = (int) Math.round(Math.log(ry) / Math.log(1.02));
+        java.util.List<Object> chave = java.util.Arrays.asList(rg, qx, qy);
+        BufferedImage spr;
+        synchronized (BRILHOS) {
+            spr = BRILHOS.get(chave);
+            if (spr == null) {
+                double ex = Math.pow(1.02, qx), ey = Math.pow(1.02, qy);
+                int w = (int) Math.ceil(ex * 2) + 2, h = (int) Math.ceil(ey * 2) + 2;
+                spr = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
+                Graphics2D sg = spr.createGraphics();
+                sg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                sg.translate(w / 2.0, h / 2.0);
+                sg.scale(ex / radius, ey / radius);
+                sg.translate(-cx, -cy);
+                sg.setPaint(rg.toAwt());
+                sg.fill(new Ellipse2D.Float(cx - radius, cy - radius, radius * 2f, radius * 2f));
+                sg.dispose();
+                BRILHOS.put(chave, spr);
+            }
+        }
+        double dcx = t.getScaleX() * cx + t.getTranslateX(), dcy = t.getScaleY() * cy + t.getTranslateY();
+        int x = (int) Math.round(dcx - spr.getWidth() / 2.0), y = (int) Math.round(dcy - spr.getHeight() / 2.0);
+        g.setTransform(new AffineTransform());
+        boolean feito = blendDirect(spr, x, y, spr.getWidth(), spr.getHeight(), paint.getAlpha());
+        g.setTransform(t);
+        return feito;
+    }
+
+    /**
+     * Retângulo grande sem rotação, cor sólida ou degradê vertical de duas cores, "fonte sobre
+     * destino": pintado linha a linha pelos núcleos todos. O Java2D fazia cada um numa thread só
+     * (~1,5 ms por retângulo translúcido de tela cheia; a neblina, ~1,3 ms).
+     */
+    private boolean preencherRetangulo(float l, float t, float r, float b, Paint paint) {
+        if (!Blender.ENABLED || image == null || paint == null || paint.getStyle() != Paint.Style.FILL) return false;
+        if (paint.colorFilter != null || paint.xfermode != null) return false;
+        LinearGradient lg = null;
+        if (paint.shader != null) {
+            if (!(paint.shader instanceof LinearGradient) || paint.shader.localTransform() != null) return false;
+            lg = (LinearGradient) paint.shader;
+            if (!lg.vertical2) return false;
+        }
+        if (!(g.getComposite() instanceof AlphaComposite)) return false;
+        AlphaComposite ac = (AlphaComposite) g.getComposite();
+        if (ac.getRule() != AlphaComposite.SRC_OVER || ac.getAlpha() < 0.999f) return false;
+        AffineTransform tr = g.getTransform();
+        if (Math.abs(tr.getShearX()) > 1e-6 || Math.abs(tr.getShearY()) > 1e-6) return false;
+        double sy = tr.getScaleY(), ty = tr.getTranslateY();
+        double ax = tr.getScaleX() * l + tr.getTranslateX(), bx = tr.getScaleX() * r + tr.getTranslateX();
+        double ay = sy * t + ty, by = sy * b + ty;
+        int x0 = (int) Math.round(Math.min(ax, bx)), x1 = (int) Math.round(Math.max(ax, bx));
+        int y0 = (int) Math.round(Math.min(ay, by)), y1 = (int) Math.round(Math.max(ay, by));
+        // Só retângulo grande: a borda suavizada do Java2D numa forma pequena aparece.
+        if (x1 - x0 < 48 || y1 - y0 < 24) return false;
+        int cx0 = 0, cy0 = 0, cx1 = image.getWidth(), cy1 = image.getHeight();
+        Shape clip = g.getClip();
+        if (clip != null) {
+            if (!(clip instanceof java.awt.Rectangle) && !(clip instanceof Rectangle2D)) return false;
+            // O recorte vem no espaço do usuário: leva para o dispositivo.
+            Rectangle2D rc = tr.createTransformedShape(clip).getBounds2D();
+            cx0 = (int) Math.ceil(rc.getMinX() - 1e-6);
+            cy0 = (int) Math.ceil(rc.getMinY() - 1e-6);
+            cx1 = (int) Math.floor(rc.getMaxX() + 1e-6);
+            cy1 = (int) Math.floor(rc.getMaxY() + 1e-6);
+        }
+        x0 = Math.max(x0, Math.max(cx0, 0));
+        y0 = Math.max(y0, Math.max(cy0, 0));
+        x1 = Math.min(x1, Math.min(cx1, image.getWidth()));
+        y1 = Math.min(y1, Math.min(cy1, image.getHeight()));
+        if (x1 <= x0 || y1 <= y0) return true;
+        int[] cores = new int[y1 - y0];
+        int extra = lg == null ? 255 : paint.getAlpha();
+        if (lg == null) {
+            java.util.Arrays.fill(cores, Blender.premultiplicar(paint.color, 255));
+        } else {
+            for (int y = y0; y < y1; y++) {
+                // O meio da linha no espaço do degradê, como o Java2D amostra.
+                double ly = (y + 0.5 - ty) / sy;
+                double f = Math.max(0, Math.min(1, (ly - lg.gy0) / (lg.gy1 - lg.gy0)));
+                cores[y - y0] = Blender.premultiplicar(misturar(lg.cor0, lg.cor1, f), extra);
+            }
+        }
+        Blender.fillRows(image, x0, y0, x1, y1, cores);
+        return true;
+    }
+
+    private static int misturar(int c0, int c1, double f) {
+        int a = (int) Math.round((c0 >>> 24) + ((c1 >>> 24) - (c0 >>> 24)) * f);
+        int r = (int) Math.round(((c0 >> 16) & 0xFF) + (((c1 >> 16) & 0xFF) - ((c0 >> 16) & 0xFF)) * f);
+        int gg = (int) Math.round(((c0 >> 8) & 0xFF) + (((c1 >> 8) & 0xFF) - ((c0 >> 8) & 0xFF)) * f);
+        int b = (int) Math.round((c0 & 0xFF) + ((c1 & 0xFF) - (c0 & 0xFF)) * f);
+        return (a << 24) | (r << 16) | (gg << 8) | b;
+    }
+
     private boolean blendDirect(BufferedImage src, int x, int y, int w, int h, int alpha) {
         if (!Blender.ENABLED || image == null || !Blender.supports(src)) return false;
         if (!(g.getComposite() instanceof AlphaComposite) || ((AlphaComposite) g.getComposite()).getRule() != AlphaComposite.SRC_OVER) return false;

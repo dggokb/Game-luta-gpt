@@ -5,9 +5,16 @@ import java.awt.geom.Point2D;
 
 public class RadialGradient extends Shader {
     private final java.awt.Paint paint;
+    /** Centro, raio e se para na borda (o brilho redondo vira um sprite guardado no Canvas). */
+    final float centroX, centroY, raio;
+    final boolean naBorda;
 
     public RadialGradient(float centerX, float centerY, float radius, int[] colors, float[] stops, TileMode tileMode) {
         if (radius <= 0f) throw new IllegalArgumentException("radius must be > 0");
+        centroX = centerX;
+        centroY = centerY;
+        raio = radius;
+        naBorda = tileMode == TileMode.CLAMP;
         paint = colors.length == 1 ? new java.awt.Color(colors[0], true)
             : new RadialGradientPaint(new Point2D.Float(centerX, centerY), radius,
                 fractions(colors.length, stops), colors(colors), cycle(tileMode));

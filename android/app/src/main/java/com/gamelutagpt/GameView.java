@@ -1636,6 +1636,9 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** PC (JogoPc): espera o fim do quadro com precisão (sleep até perto e o resto girando). */
+    public static volatile boolean esperaFina;
+
     private void loop() {
         long previous = System.nanoTime();
         final long targetFrame = 16_666_667L;
@@ -1658,7 +1661,17 @@ public class GameView extends SurfaceView
             // quadro perdido virava dois ou três).
             if (remaining > 0 && !glQuadro) {
                 try {
-                    Thread.sleep(remaining / 1_000_000L, (int)(remaining % 1_000_000L));
+                    if (esperaFina) {
+                        // PC: o sleep do Windows pode acordar só no tique de 15,6 ms (um quadro de
+                        // 10 ms dormia 15,6 e o jogo travava perto de 30). Dorme até 2 ms antes e
+                        // espera o resto girando.
+                        long ate = frameStart + targetFrame;
+                        long dorme = remaining - 2_000_000L;
+                        if (dorme > 0) Thread.sleep(dorme / 1_000_000L, (int)(dorme % 1_000_000L));
+                        while (System.nanoTime() < ate) Thread.onSpinWait();
+                    } else {
+                        Thread.sleep(remaining / 1_000_000L, (int)(remaining % 1_000_000L));
+                    }
                 } catch (InterruptedException e) {
                     break;
                 }
