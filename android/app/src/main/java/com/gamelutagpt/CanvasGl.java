@@ -1133,6 +1133,24 @@ final class CanvasGl extends Canvas {
         // Degradê linear: o texto vira só a forma (branca) e o degradê é posto pela placa de vídeo.
         boolean mascara = sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial();
         int cor = p.getColor();
+        // Atalho: o mesmo texto (o mesmo objeto String: rótulos fixos, os algarismos) com o mesmo
+        // pincel de antes acha o bitmap comparando alguns números, sem montar a chave (que
+        // escrevia vários floats a cada texto de cada quadro: 30% do HUD).
+        boolean tingido = sh == null || mascara;
+        int estilo = p.getStyle().ordinal(), alinhamento = p.getTextAlign().ordinal();
+        float inclinacao = p.getTextSkewX(), largura = p.getTextScaleX();
+        float espacamento = Build.VERSION.SDK_INT >= 21 ? p.getLetterSpacing() : 0f;
+        boolean negrito = p.isFakeBoldText();
+        android.graphics.Typeface fonte = p.getTypeface();
+        Atalho atalho = tingido ? atalhos.get(s) : null;
+        for (Atalho a = atalho; a != null; a = a.proximo) {
+            if (a.base == base && a.esc == esc && a.traco == traco && a.estilo == estilo && a.alinhamento == alinhamento
+                && a.inclinacao == inclinacao && a.largura == largura && a.espacamento == espacamento
+                && a.negrito == negrito && a.fonte == fonte && a.mascara == mascara && gl.textoVale(a.texto.uv, a.texto.geracao)) {
+                desenharTextoPronto(a.texto, x, y, k, mascara, sh, cor, p);
+                return;
+            }
+        }
         chave.setLength(0);
         // A transparência da cor fica de fora: entra na hora de desenhar (o texto que some aos
         // poucos é o mesmo bitmap).
@@ -1156,6 +1174,7 @@ final class CanvasGl extends Canvas {
         Texto t = textos.get(kt);
         if (t != null && !gl.textoVale(t.uv, t.geracao)) t = null;
         String solta = null;
+        boolean esticado = false;
         if (t == null) {
             chaveSolta.setLength(0);
             chaveSolta.append(s).append('\u0000').append(mascara || sh == null ? 0 : (cor | 0xFF000000)).append(',')
@@ -1175,6 +1194,7 @@ final class CanvasGl extends Canvas {
                 } else if (textosNovos >= NOVOS_POR_QUADRO) {
                     t = ultimo;
                     k = tamanho / ultimo.base;
+                    esticado = true;
                 }
             }
         }
@@ -1206,6 +1226,47 @@ final class CanvasGl extends Canvas {
             if (ultimoDoTexto.size() > TEXTOS * 2) ultimoDoTexto.clear();
             ultimoDoTexto.put(solta, t);
         }
+        // O reaproveitado esticado (passou dos textos novos do quadro) é provisório: fica fora do atalho.
+        if (tingido && !esticado) guardarAtalho(s, atalho, t, base, esc, traco, estilo, alinhamento, inclinacao,
+            largura, espacamento, negrito, fonte, mascara);
+        desenharTextoPronto(t, x, y, k, mascara, sh, cor, p);
+    }
+
+    /** Até {@link #ATALHOS_POR_TEXTO} pincéis por texto (o "2" do combo e o do HUD no mesmo quadro). */
+    private static final int ATALHOS_POR_TEXTO = 4;
+    private final java.util.IdentityHashMap<String, Atalho> atalhos = new java.util.IdentityHashMap<>();
+
+    private static final class Atalho {
+        Texto texto;
+        float base, esc, traco, inclinacao, largura, espacamento;
+        int estilo, alinhamento;
+        boolean negrito, mascara;
+        android.graphics.Typeface fonte;
+        Atalho proximo;
+    }
+
+    private void guardarAtalho(String s, Atalho primeiro, Texto t, float base, float esc, float traco, int estilo,
+                               int alinhamento, float inclinacao, float largura, float espacamento, boolean negrito,
+                               android.graphics.Typeface fonte, boolean mascara) {
+        // Textos que mudam a cada quadro (outro objeto String a cada vez) não podem crescer a tabela.
+        if (atalhos.size() > 1024) atalhos.clear();
+        Atalho a = new Atalho();
+        a.texto = t; a.base = base; a.esc = esc; a.traco = traco; a.estilo = estilo; a.alinhamento = alinhamento;
+        a.inclinacao = inclinacao; a.largura = largura; a.espacamento = espacamento; a.negrito = negrito;
+        a.fonte = fonte; a.mascara = mascara;
+        // O novo na frente; a corrente fica com no máximo ATALHOS_POR_TEXTO.
+        a.proximo = primeiro;
+        int n = 1;
+        for (Atalho x = a; x.proximo != null; x = x.proximo) {
+            if (++n > ATALHOS_POR_TEXTO) {
+                x.proximo = null;
+                break;
+            }
+        }
+        atalhos.put(s, a);
+    }
+
+    private void desenharTextoPronto(Texto t, float x, float y, float k, boolean mascara, Shader sh, int cor, Paint p) {
         float l = x - t.origemX * k, top = y - t.origemY * k, r = l + t.largura * k, b = top + t.altura * k;
         if (mascara) {
             pincel(p);

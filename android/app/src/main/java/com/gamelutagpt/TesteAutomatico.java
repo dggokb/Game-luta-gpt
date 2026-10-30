@@ -28,7 +28,10 @@ final class TesteAutomatico {
     private final List<Long> subidas = new ArrayList<>();
 
     // O que o desenho em OpenGL conta durante o teste (tudo na thread do jogo).
-    private static boolean gravando;
+    /** O teste está gravando (o OpenGL só conta a área pintada enquanto isso). */
+    static boolean gravando;
+    /** PC, perfil de CPU ({@code -Pjfr}): sem a conta da área, para medir só o jogo. */
+    static final boolean SEM_AREA = Boolean.getBoolean("gameluta.semArea");
     private static final java.util.HashMap<String, Integer> textosFeitos = new java.util.HashMap<>();
     private static long bytesNoQuadro;
     private static int atlasCheio;

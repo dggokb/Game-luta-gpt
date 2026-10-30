@@ -299,6 +299,13 @@ tasks.register('medirLuta', JavaExec) {
     if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
     // -Pdupla=p15,p16,p13,p14: as duplas da luta (jogador, parceiro, rival, parceiro do rival).
     if (providers.gradleProperty('dupla').isPresent()) systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').get()
+    // -Ptoque: com o controle de toque na tela (como no celular: D-pad e botões no HUD).
+    if (providers.gradleProperty('toque').isPresent()) systemProperty 'gameluta.controleNaTela', 'true'
+    // -Pjfr: gravação do Java Flight Recorder (perfil de CPU) em pc/build/medir-luta/luta.jfr.
+    if (providers.gradleProperty('jfr').isPresent()) {
+        systemProperty 'gameluta.semArea', 'true'
+        jvmArgs "-XX:StartFlightRecording=filename=${layout.buildDirectory.dir('medir-luta').get().asFile.absolutePath}/luta.jfr,settings=profile,jdk.ExecutionSample#period=1ms"
+    }
     // -Parea: de onde vem cada desenho grande (o que pinta a tela muitas vezes), no fim do relatório.
     if (providers.gradleProperty('area').isPresent()) systemProperty 'gameluta.areaPorOrigem', 'true'
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()

@@ -543,6 +543,8 @@ final class GlRenderCanvas implements RenderCanvas {
     private float triX0, triY0, triX1, triY1;
 
     private void area(float x, float y) {
+        // Só no teste automático: a conta (com o corte na tela) custava 20% do HUD em todo quadro.
+        if (!TesteAutomatico.gravando || TesteAutomatico.SEM_AREA) return;
         if (cantoTri == 0) {
             triX0 = x; triY0 = y;
         } else if (cantoTri == 1) {

@@ -368,6 +368,35 @@ Causas e correções:
 **Lição:** um aumento pequeno no PC (0,4 → 0,8 ms em "tela") era o sinal. Toda parte que
 **dobra** no PC tem de ser olhada antes de ir para o celular.
 
+### 5.10 HUD (perfil de CPU no PC: `-Pjfr -Ptoque`)
+
+O relatório do celular depois da 5.9 mostrava o HUD como a maior parte do processador: 4,2 ms em
+média e 7,9 ms no p95. O PC grava o perfil com o Java Flight Recorder, uma amostra por ms:
+- `-Ptoque` liga o controle de toque, como no celular.
+- `-Pjfr` grava em `pc/build/medir-luta/luta.jfr`.
+
+Para ler: `jfr print --events jdk.ExecutionSample` e agrupar as pilhas que passam pelo
+`HudRenderer`.
+
+Dentro do HUD o tempo se dividia assim:
+- **textos: ~30%**, sendo uma chave montada com vários floats para cada texto de cada quadro;
+- **controle de toque: 25%**;
+- **painel de botões de teste: 17–23%**;
+- **barras e molduras: ~35%**, com formas refeitas por Path a cada quadro. No PC elas pesam mais
+  que no celular, porque o `approximate` é Java2D.
+
+Correções:
+- **A conta da área pintada (5.8) só roda durante o teste.** Ela rodava em todo triângulo de
+  todo quadro, cerca de 20% do HUD e de tudo o mais.
+- **Atalho do texto:** o mesmo objeto String com o mesmo pincel acha o bitmap comparando alguns
+  números, sem montar a chave. Guarda até 4 pincéis por texto; os algarismos usam sempre o mesmo
+  objeto.
+
+Próximos candidatos, se o HUD continuar pesando:
+- gravar e repetir os vértices das partes paradas (controle de toque, molduras) enquanto o
+  estado delas não muda;
+- formas fixas do HUD sem Path.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:
