@@ -4,6 +4,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -153,6 +155,75 @@ public class Path {
     public void computeBounds(RectF bounds, boolean exact) {
         Rectangle2D b = shape.getBounds2D();
         bounds.set((float) b.getMinX(), (float) b.getMinY(), (float) b.getMaxX(), (float) b.getMaxY());
+    }
+
+    /**
+     * O caminho em segmentos ({@code acceptableError} em pixels): trios (fração do comprimento
+     * total, x, y). Dois pontos seguidos com a mesma fração são um salto (outro contorno); o
+     * contorno fechado volta ao primeiro ponto. Como o {@code Path.approximate} do Android.
+     */
+    public float[] approximate(float acceptableError) {
+        List<float[]> cs = contornos(shape, Math.max(1e-3f, acceptableError), false);
+        double total = 0;
+        for (float[] c : cs) {
+            for (int i = 2; i < c.length; i += 2) total += Math.hypot(c[i] - c[i - 2], c[i + 1] - c[i - 1]);
+        }
+        int n = 0;
+        for (float[] c : cs) n += c.length / 2;
+        if (n == 0) return new float[] {0f, 0f, 0f, 1f, 0f, 0f};
+        float[] saida = new float[n * 3];
+        double andou = 0;
+        int k = 0;
+        for (float[] c : cs) {
+            for (int i = 0; i < c.length; i += 2) {
+                if (i > 0) andou += Math.hypot(c[i] - c[i - 2], c[i + 1] - c[i - 1]);
+                saida[k++] = total > 0 ? (float) Math.min(1.0, andou / total) : 0f;
+                saida[k++] = c[i];
+                saida[k++] = c[i + 1];
+            }
+        }
+        return saida;
+    }
+
+    /** Cada contorno da forma como uma linha de pontos (x, y, x, y...); o fechado volta ao começo. */
+    static List<float[]> contornos(java.awt.Shape forma, float erro, boolean fecharTodos) {
+        List<float[]> saida = new ArrayList<>();
+        java.awt.geom.PathIterator it = new java.awt.geom.FlatteningPathIterator(forma.getPathIterator(null), erro, 16);
+        float[] seg = new float[6];
+        float[] atual = new float[16];
+        int n = 0;
+        while (!it.isDone()) {
+            int tipo = it.currentSegment(seg);
+            if (tipo == java.awt.geom.PathIterator.SEG_MOVETO) {
+                if (n >= 4) saida.add(fechar(atual, n, fecharTodos));
+                n = 0;
+            }
+            if (tipo == java.awt.geom.PathIterator.SEG_CLOSE) {
+                if (n >= 4) saida.add(fechar(atual, n, true));
+                // Depois do fechamento o próximo segmento começa no mesmo primeiro ponto.
+                float x0 = n >= 2 ? atual[0] : 0f, y0 = n >= 2 ? atual[1] : 0f;
+                n = 0;
+                atual[n++] = x0;
+                atual[n++] = y0;
+                it.next();
+                continue;
+            }
+            if (n + 2 > atual.length) atual = java.util.Arrays.copyOf(atual, atual.length * 2);
+            atual[n++] = seg[0];
+            atual[n++] = seg[1];
+            it.next();
+        }
+        if (n >= 4) saida.add(fechar(atual, n, fecharTodos));
+        return saida;
+    }
+
+    private static float[] fechar(float[] pontos, int n, boolean fechar) {
+        boolean jaFechado = pontos[0] == pontos[n - 2] && pontos[1] == pontos[n - 1];
+        if (!fechar || jaFechado || n < 4) return java.util.Arrays.copyOf(pontos, n);
+        float[] c = java.util.Arrays.copyOf(pontos, n + 2);
+        c[n] = pontos[0];
+        c[n + 1] = pontos[1];
+        return c;
     }
 
     static RoundRectangle2D roundRect(float left, float top, float right, float bottom, float rx, float ry) {

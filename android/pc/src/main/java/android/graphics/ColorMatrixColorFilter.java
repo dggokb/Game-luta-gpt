@@ -7,6 +7,8 @@ public class ColorMatrixColorFilter extends ColorFilter {
 
     public ColorMatrixColorFilter(float[] array) { m = array.clone(); }
 
+    public void getColorMatrix(ColorMatrix destino) { destino.set(m); }
+
     @Override int filter(int c) {
         float r = Color.red(c), g = Color.green(c), b = Color.blue(c), a = Color.alpha(c);
         return Color.argb(

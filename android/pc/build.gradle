@@ -27,9 +27,6 @@ def fontesDoApp = tasks.register('fontesDoApp', Sync) {
     description = 'Copia o código do app Android que o jogo de PC compila.'
     from(new File(appMain, 'java')) {
         exclude 'com/gamelutagpt/MainActivity.java'
-        // O desenho em OpenGL é só do celular (no PC o DesenhoGl não faz nada).
-        exclude 'com/gamelutagpt/GlRenderCanvas.java'
-        exclude 'com/gamelutagpt/CanvasGl.java'
         exclude { element ->
             !element.isDirectory() && new File(substituicoes, element.relativePath.pathString).isFile()
         }
@@ -89,6 +86,15 @@ dependencies {
     implementation 'org.json:json:20240303'
     // Controles (gamepad) pelo SDL, com as bibliotecas nativas de Windows, Linux e macOS.
     implementation 'com.badlogicgames.jamepad:jamepad:2.30.0.0'
+    // A luta pela placa de vídeo: o mesmo desenho em OpenGL do celular (CanvasGl), pelo LWJGL
+    // (OpenGL 3.3 numa janela escondida do GLFW), com as bibliotecas nativas dos três sistemas.
+    implementation platform('org.lwjgl:lwjgl-bom:3.3.4')
+    ['lwjgl', 'lwjgl-glfw', 'lwjgl-opengl'].each { m ->
+        implementation "org.lwjgl:${m}"
+        ['natives-windows', 'natives-linux', 'natives-macos', 'natives-macos-arm64'].each { n ->
+            runtimeOnly "org.lwjgl:${m}::${n}"
+        }
+    }
     testImplementation 'junit:junit:4.13.2'
 }
 
@@ -289,6 +295,8 @@ tasks.register('medirLuta', JavaExec) {
     maxHeapSize = '3g'
     args layout.buildDirectory.dir('medir-luta').get().asFile.absolutePath
     if (providers.gradleProperty('resolucao').isPresent()) args providers.gradleProperty('resolucao').get()
+    // -Pgl: a luta pela placa de vídeo (OpenGL), como na janela do jogo (precisa de DISPLAY).
+    if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
 }
 

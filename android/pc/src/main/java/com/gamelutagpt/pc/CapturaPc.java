@@ -56,6 +56,9 @@ public final class CapturaPc {
 
     public void comecar() {
         jogo.setTouchControlsVisible(Boolean.getBoolean("gameluta.controleNaTela"));
+        // -Dgameluta.opengl=true: a luta pela placa de vídeo também sem janela (precisa de uma tela,
+        // mesmo virtual, como o Xvfb).
+        if (Boolean.getBoolean("gameluta.opengl")) jogo.ligarOpenGl(null);
         jogo.attach(quadro, quadro.largura(), quadro.altura());
     }
 

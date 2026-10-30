@@ -23,6 +23,9 @@ public final class QuadroPc implements SurfaceView.Target {
     private long quadros;
     private long inicio;
     private volatile long ultimoDesenhoNs;
+    /** A área da tela em pixels de verdade (o OpenGL desenha nela direto); 0 = o tamanho do quadro. */
+    private volatile int telaLargura, telaAltura;
+    private long inicioGl;
 
     public QuadroPc(int largura, int altura, Consumer<BufferedImage> apresentar) {
         this.largura = largura;
@@ -38,6 +41,33 @@ public final class QuadroPc implements SurfaceView.Target {
     @Override public void setTamanhoFixo(int largura, int altura) {
         fixoLargura = largura;
         fixoAltura = altura;
+    }
+
+    /** A área do jogo na tela, em pixels de verdade (com a escala do Windows). */
+    public void setTamanhoTela(int largura, int altura) {
+        telaLargura = largura;
+        telaAltura = altura;
+    }
+
+    /**
+     * O OpenGL desenha no tamanho da tela (até 2560 de largura): a placa de vídeo não sente a
+     * diferença, e o quadro chega pronto, sem ser ampliado no processador.
+     */
+    @Override public int larguraGl() {
+        inicioGl = System.nanoTime();
+        int w = telaLargura > 0 ? telaLargura : largura;
+        return Math.min(w, 2560);
+    }
+
+    @Override public int alturaGl() {
+        int w = telaLargura > 0 ? telaLargura : largura, h = telaAltura > 0 ? telaAltura : altura;
+        return w > 2560 ? Math.round(h * 2560f / w) : h;
+    }
+
+    @Override public void mostrarPronto(BufferedImage pronto) {
+        quadros++;
+        ultimoDesenhoNs = System.nanoTime() - inicioGl;
+        apresentar.accept(pronto);
     }
 
     public int largura() { return largura; }

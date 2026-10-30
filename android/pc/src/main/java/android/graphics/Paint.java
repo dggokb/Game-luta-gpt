@@ -123,6 +123,20 @@ public class Paint {
 
     public PathEffect getPathEffect() { return pathEffect; }
 
+    /** O contorno do traço de {@code src} (largura, pontas, junções e tracejado), em {@code dst}. */
+    public boolean getFillPath(Path src, Path dst) {
+        int c = cap == Cap.ROUND ? java.awt.BasicStroke.CAP_ROUND : cap == Cap.SQUARE ? java.awt.BasicStroke.CAP_SQUARE : java.awt.BasicStroke.CAP_BUTT;
+        int j = join == Join.ROUND ? java.awt.BasicStroke.JOIN_ROUND : join == Join.BEVEL ? java.awt.BasicStroke.JOIN_BEVEL : java.awt.BasicStroke.JOIN_MITER;
+        java.awt.BasicStroke traco = pathEffect instanceof DashPathEffect
+            ? new java.awt.BasicStroke(Math.max(0f, strokeWidth), c, j, Math.max(1f, strokeMiter),
+                ((DashPathEffect) pathEffect).intervals, ((DashPathEffect) pathEffect).phase)
+            : new java.awt.BasicStroke(Math.max(0f, strokeWidth), c, j, Math.max(1f, strokeMiter));
+        java.awt.Shape s = traco.createStrokedShape(src.shape);
+        dst.reset();
+        dst.shape.append(s, false);
+        return true;
+    }
+
     public PathEffect setPathEffect(PathEffect effect) { pathEffect = effect; return effect; }
 
     public float getTextSize() { return textSize; }

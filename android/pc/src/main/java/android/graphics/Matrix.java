@@ -132,6 +132,13 @@ public class Matrix {
         return true;
     }
 
+    /** Esta matriz passa a ser {@code t}. */
+    void setAffine(AffineTransform t) {
+        m[0] = t.getScaleX(); m[1] = t.getShearX(); m[2] = t.getTranslateX();
+        m[3] = t.getShearY(); m[4] = t.getScaleY(); m[5] = t.getTranslateY();
+        m[6] = 0; m[7] = 0; m[8] = 1;
+    }
+
     /** A parte afim (ignora perspectiva). */
     AffineTransform toAffine() {
         return new AffineTransform(m[0], m[3], m[1], m[4], m[2], m[5]);

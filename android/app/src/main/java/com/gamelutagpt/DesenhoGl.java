@@ -123,6 +123,12 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     // ---- Contexto (thread do jogo) ----
 
+    /** O mundo sai numa superfície embaixo da do Canvas (no PC, pela mesma). */
+    boolean camadaPorBaixo() { return true; }
+
+    /** A troca do quadro espera a batida da tela (o loop não precisa dormir). */
+    boolean trocaEsperaTela() { return true; }
+
     /** O OpenGL funciona neste aparelho (até agora). */
     boolean disponivel() {
         return !falhou;

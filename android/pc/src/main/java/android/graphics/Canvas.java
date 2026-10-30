@@ -178,6 +178,8 @@ public class Canvas {
         return saveLayer(left, top, right, bottom, paint, false);
     }
 
+    public int saveLayerAlpha(RectF bounds, int alpha, int saveFlags) { return saveLayerAlpha(bounds, alpha); }
+
     public int saveLayerAlpha(RectF bounds, int alpha) {
         Paint p = new Paint();
         p.setAlpha(alpha);
@@ -287,6 +289,43 @@ public class Canvas {
     public boolean clipRect(RectF rect) { return clipRect(rect.left, rect.top, rect.right, rect.bottom); }
 
     public boolean clipRect(Rect rect) { return clipRect(rect.left, rect.top, rect.right, rect.bottom); }
+
+    public boolean clipRect(float left, float top, float right, float bottom, Region.Op op) {
+        return clipShape(new Rectangle2D.Float(Math.min(left, right), Math.min(top, bottom), Math.abs(right - left), Math.abs(bottom - top)), op);
+    }
+
+    public boolean clipRect(RectF rect, Region.Op op) { return clipRect(rect.left, rect.top, rect.right, rect.bottom, op); }
+
+    public boolean clipRect(Rect rect, Region.Op op) { return clipRect(rect.left, rect.top, rect.right, rect.bottom, op); }
+
+    public boolean clipPath(Path path, Region.Op op) { return clipShape(path.shape, op); }
+
+    /** Recorte com operação: INTERSECT como sempre; DIFFERENCE tira a forma do recorte de agora. */
+    private boolean clipShape(Shape s, Region.Op op) {
+        if (op == Region.Op.INTERSECT) {
+            g.clip(s);
+        } else if (op == Region.Op.DIFFERENCE) {
+            Shape atual = g.getClip();
+            java.awt.geom.Area a = new java.awt.geom.Area(atual != null ? atual : new Rectangle2D.Double(-1e6, -1e6, 2e6, 2e6));
+            a.subtract(new java.awt.geom.Area(s));
+            g.setClip(a);
+        } else if (op == Region.Op.REPLACE) {
+            g.setClip(s);
+        }
+        return !isClipEmpty();
+    }
+
+    /** A transformação de agora (afim). */
+    public void getMatrix(Matrix ctm) { ctm.setAffine(g.getTransform()); }
+
+    public Matrix getMatrix() {
+        Matrix m = new Matrix();
+        getMatrix(m);
+        return m;
+    }
+
+    /** Troca a transformação (null = nenhuma). */
+    public void setMatrix(Matrix matrix) { g.setTransform(matrix == null ? new AffineTransform() : matrix.toAffine()); }
 
     public boolean clipPath(Path path) {
         g.clip(path.shape);

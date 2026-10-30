@@ -276,6 +276,24 @@ normal 18 ms, SHINKAI 24, Super 27 e Ultra 42. O fundo pesa 17 ms de média e 48
 A máquina de medida varia entre rodadas (com pouca RAM livre), então compare duas rodadas
 seguidas, antes e depois da mudança.
 
+### 5.7 PC pela placa de vídeo (OpenGL 3.3, LWJGL)
+
+O PC passa a desenhar a luta com o **mesmo** `CanvasGl`/`GlRenderCanvas` do celular. A
+diferença é só a ponte:
+
+- **Tradução das chamadas:** `android.opengl.GLES30` e `GLUtils` viram OpenGL 3.3 pelo LWJGL, e
+  os shaders `#version 300 es` viram `#version 330 core`.
+- **Onde desenha:** o contexto mora numa janela escondida do GLFW, numa thread só dela. O
+  quadro é desenhado num framebuffer do tamanho da área do jogo na tela, em pixels de verdade,
+  lido de volta e mostrado pela janela de sempre. Teclado, controle, menus e páginas continuam
+  iguais.
+- **Volta ao Canvas:** acontece sem OpenGL 3.3, no macOS (lá o GLFW e o AWT disputam a thread
+  principal), com `-Dgameluta.opengl=false` ou quando um quadro dá erro.
+- **Medida sem tela:** `xvfb-run gradle :pc:medirLuta -Pgl` usa o Mesa (llvmpipe, por
+  software). Ali o "envio" é o Mesa desenhando no processador e não vale como medida; o que
+  vale é o resto. Na primeira medida o fundo, a luta e o HUD caíram de cerca de 26 ms para
+  cerca de 1 ms por quadro.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

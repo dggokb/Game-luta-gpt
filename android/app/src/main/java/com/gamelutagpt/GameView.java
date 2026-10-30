@@ -1667,7 +1667,7 @@ public class GameView extends SurfaceView
             long remaining = targetFrame - (System.nanoTime() - frameStart);
             // Na luta em OpenGL o swap já espera a batida da tela: dormir aqui só somava erro (um
             // quadro perdido virava dois ou três).
-            if (remaining > 0 && !glQuadro) {
+            if (remaining > 0 && !(glQuadro && desenhoGl.trocaEsperaTela())) {
                 try {
                     if (esperaFina) {
                         // PC: o sleep do Windows pode acordar só no tique de 15,6 ms (um quadro de
@@ -3507,7 +3507,7 @@ public class GameView extends SurfaceView
             Canvas gl = desenhoGl.comecarQuadro();
             if (gl != null) {
                 glQuadro = true;
-                limparCamadaDeCima();
+                if (desenhoGl.camadaPorBaixo()) limparCamadaDeCima();
                 perfil.marca(PerfilQuadros.TRAVA);
                 try {
                     contarQuadroGl();

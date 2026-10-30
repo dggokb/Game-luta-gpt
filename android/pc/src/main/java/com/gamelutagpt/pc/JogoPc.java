@@ -199,6 +199,9 @@ public final class JogoPc {
         if (animacaoCarregando != null) animacaoCarregando.stop();
         // No PC o controle virtual da tela some: é teclado/controle (-Dgameluta.controleNaTela=true mostra).
         carregado.setTouchControlsVisible(Boolean.getBoolean("gameluta.controleNaTela"));
+        // A luta pela placa de vídeo (OpenGL 3.3); sem ele, ou com erro, ela segue no Canvas.
+        // -Dgameluta.opengl=false desliga.
+        if (com.gamelutagpt.OpenGlPc.permitido()) carregado.ligarOpenGl(null);
         jogo = carregado;
         controles = new Controles(carregado);
         redimensionar();
@@ -230,6 +233,9 @@ public final class JogoPc {
         int qw = Math.min(a.width, MAX_LARGURA);
         int qh = Math.round(qw * 9f / 16f);
         quadro.setTamanho(qw, qh);
+        // O OpenGL desenha direto no tamanho da área em pixels de verdade (escala do Windows).
+        java.awt.geom.AffineTransform escala = tela.getGraphicsConfiguration().getDefaultTransform();
+        quadro.setTamanhoTela((int) Math.round(a.width * escala.getScaleX()), (int) Math.round(a.height * escala.getScaleY()));
         jogo.resize(qw, qh);
     }
 

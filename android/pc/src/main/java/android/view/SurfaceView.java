@@ -16,6 +16,11 @@ public class SurfaceView extends View {
         void endFrame(Canvas canvas);
         /** Tamanho fixo do buffer (0 = o da tela): o jogo desenha menor e quem mostra amplia. */
         default void setTamanhoFixo(int width, int height) {}
+        /** Tamanho do quadro desenhado pela placa de vídeo (0 = sem OpenGL). */
+        default int larguraGl() { return 0; }
+        default int alturaGl() { return 0; }
+        /** O quadro desenhado fora do Canvas (OpenGL), pronto: quem mostra o leva à tela. */
+        default void mostrarPronto(java.awt.image.BufferedImage imagem) {}
     }
 
     private final Holder holder = new Holder();
@@ -33,6 +38,9 @@ public class SurfaceView extends View {
         for (SurfaceHolder.Callback c : holder.callbacks) c.surfaceCreated(holder);
         for (SurfaceHolder.Callback c : holder.callbacks) c.surfaceChanged(holder, 1, width, height);
     }
+
+    /** Extensão do PC: o destino dos quadros agora (null sem janela). */
+    public Target alvo() { return holder.target; }
 
     /** Extensão do PC: nova dimensão da janela. */
     public void resize(int width, int height) {
