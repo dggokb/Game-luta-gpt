@@ -828,10 +828,21 @@ final class CanvasGl extends Canvas {
         return (float)Math.pow(2.0, d);
     }
 
+    /** O tamanho em que o texto é feito: o degrau (um quarto de oitava) mais perto do pedido. */
+    private static float degrauDeTamanho(float tamanho) {
+        double d = Math.round(Math.log(Math.max(1f, tamanho)) / Math.log(2) * 4.0) / 4.0;
+        return (float)Math.pow(2.0, d);
+    }
+
     private void texto(String s, float x, float y, Paint p) {
         if (s == null || s.isEmpty()) return;
         prepararGl();
-        float esc = degrauDeEscala(escala());
+        // Texto que pulsa pelo tamanho da fonte (o contador de golpes, a cada acerto) é feito num
+        // degrau de tamanho e esticado por k no desenho: antes cada quadro era um bitmap novo.
+        float tamanho = p.getTextSize();
+        float base = degrauDeTamanho(tamanho);
+        float k = tamanho / base;
+        float esc = degrauDeEscala(escala() * k);
         Shader sh = p.getShader();
         // Degradê linear: o texto vira só a forma (branca) e o degradê é posto pela placa de vídeo.
         boolean mascara = sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial();
@@ -839,7 +850,7 @@ final class CanvasGl extends Canvas {
         chave.setLength(0);
         // A transparência da cor fica de fora: entra na hora de desenhar (o texto que some aos
         // poucos é o mesmo bitmap).
-        chave.append(s).append('\u0000').append(p.getTextSize()).append(',')
+        chave.append(s).append('\u0000').append(base).append(',')
             .append(mascara ? 0 : (cor | 0xFF000000)).append(',')
             .append(p.getStyle().ordinal()).append(',').append(p.getStrokeWidth()).append(',')
             .append(p.getTextAlign().ordinal()).append(',').append(p.getTextSkewX()).append(',')
@@ -852,23 +863,29 @@ final class CanvasGl extends Canvas {
             // Outro shader: o desenho depende de onde o texto está.
             chave.append(',').append(System.identityHashCode(sh)).append(',').append(x).append(',').append(y);
         }
-        String k = chave.toString();
-        Texto t = textos.get(k);
+        String kt = chave.toString();
+        Texto t = textos.get(kt);
         if (t != null && t.geracao != gl.geracaoTexto) t = null;
         if (t == null) {
             Paint feito = p;
-            if (mascara || (sh == null && (cor >>> 24) != 255)) {
+            if (mascara || p.getAlpha() != 255 || base != tamanho) {
+                // Opaco e no degrau de tamanho: a transparência e o resto da escala vêm no desenho.
                 pincelTexto.set(p);
-                pincelTexto.setShader(null);
-                pincelTexto.setColor(mascara ? 0xFFFFFFFF : cor | 0xFF000000);
+                if (mascara) {
+                    pincelTexto.setShader(null);
+                    pincelTexto.setColor(0xFFFFFFFF);
+                } else {
+                    pincelTexto.setAlpha(255);
+                }
+                pincelTexto.setTextSize(base);
                 feito = pincelTexto;
             }
             t = criarTexto(s, x, y, feito, esc);
             if (t == null) return;
             textosNovos++;
-            textos.put(k, t);
+            textos.put(kt, t);
         }
-        float l = x - t.origemX, top = y - t.origemY, r = l + t.largura, b = top + t.altura;
+        float l = x - t.origemX * k, top = y - t.origemY * k, r = l + t.largura * k, b = top + t.altura * k;
         if (mascara) {
             pincel(p);
             uv(l, top);

@@ -1053,22 +1053,33 @@ final class GlRenderCanvas implements RenderCanvas {
     @Override
     public void drawText(String text, float x, float y, float size, int fillArgb, int strokeArgb, float strokeWidth, boolean italic) {
         if (text == null || text.isEmpty() || size <= 0f) return;
+        // O tamanho num degrau (um quarto de oitava) esticado por kz no desenho, e a transparência
+        // comum ao preenchimento e ao contorno na hora de desenhar: texto que pulsa ou some aos
+        // poucos não vira um bitmap novo a cada quadro.
+        float base = (float)Math.pow(2.0, Math.round(Math.log(Math.max(1f, size)) / Math.log(2) * 4.0) / 4.0);
+        float kz = size / base;
+        int alfa = fillArgb >>> 24;
+        boolean alfaComum = strokeWidth <= 0f || (strokeArgb >>> 24) == alfa;
+        if (alfaComum) {
+            fillArgb |= 0xFF000000;
+            strokeArgb |= 0xFF000000;
+        }
         // Na resolução em que vai aparecer (a escala atual), arredondada para reaproveitar.
-        float escala = (float)Math.sqrt(Math.abs(a * d - b * c));
+        float escala = (float)Math.sqrt(Math.abs(a * d - b * c)) * kz;
         escala = Math.max(0.25f, Math.round(escala * 8f) / 8f);
-        String chave = text + '\u0000' + size + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000'
+        String chave = text + '\u0000' + base + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000'
             + strokeWidth + '\u0000' + italic + '\u0000' + escala;
         Texto t = textos.get(chave);
         if (t == null) {
-            t = criarTexto(text, size * escala, fillArgb, strokeArgb, strokeWidth * escala, italic);
+            t = criarTexto(text, base * escala, fillArgb, strokeArgb, strokeWidth * escala, italic);
             if (t == null) return;
             t.escala = escala;
             textos.put(chave, t);
         }
-        float k = 1f / t.escala;
+        float k = kz / t.escala;
         // Centralizado em x, com a linha de base em y (como no Canvas).
         float l = x - t.origemX * k, top = y - t.origemY * k;
-        desenharTexto(t.uv, l, top, l + t.largura * k, top + t.altura * k, 0xFFFFFFFF);
+        desenharTexto(t.uv, l, top, l + t.largura * k, top + t.altura * k, alfaComum ? (alfa << 24) | 0xFFFFFF : 0xFFFFFFFF);
     }
 
     private Texto criarTexto(String text, float size, int fill, int stroke, float strokeWidth, boolean italic) {
