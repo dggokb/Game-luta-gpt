@@ -1088,3 +1088,27 @@ Decisão do usuário: o Aparar pode funcionar como aparar real, sem buff gratuit
 - **p14:** pôr o pisão (S4) no neutro da CPU derrubou o p14 de 31% para 27%; ficou de fora. As
   ferramentas dele funcionam; falta uso pela CPU.
 - **p07:** nenhuma ferramenta deixa de cumprir a função.
+
+## Breaker: empurrão maior e dash automático de volta (pedido do jogador, 30/10)
+
+**Pedido:** o combo breaker afastar o adversário um pouco mais e ligar de novo o dash automático
+(quem quebra corre sozinho até ele).
+
+**O que mudou:**
+
+| Valor | Antes | Agora |
+|---|---|---|
+| `comboBreakerPushGap` (folga do empurrão) | 170 | 230 |
+| `comboBreakerPushFrames` (o deslize no chão) | 10 | 12 (a mesma velocidade, mais longe) |
+| `comboBreakerAirPushSpeed` (o empurrão no ar) | 260 | 320 |
+| `comboBreakerChaseFrames` (o dash automático) | 0 (desligado desde a etapa 1) | 48 (era 40 antes da etapa 1; mais quadros pela distância maior) |
+
+**O que fica:**
+- O atordoamento de quem batia continua em 4 (etapa H1). Com ele, quem batia se recompõe antes
+  de a corrida chegar: o dash põe quem quebrou ao alcance do L, mas sem combo de troco garantido,
+  que era o problema da corrida com atordoamento de 44.
+- Segurar trás desiste da corrida, como antes.
+
+**Testes:** `ComboBreakerTest` passa a conferir o empurrão, a corrida até o alcance do L (dentro
+dos 48 quadros) e que quem batia já se recompôs quando ela chega. Suíte do motor 588, com as 3
+falhas de caminho de arquivo de antes.

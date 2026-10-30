@@ -420,9 +420,9 @@ final class CombatConfig {
 
     // Combo breaker: apanhando num combo que já entrou, L, M ou H quebra na hora (o "!" sobre a
     // cabeça avisa enquanto dá): o golpe não entra, quem batia é jogado para longe e fica atordoado
-    // um instante, e a luta volta ao neutro (docs/balanco/ajustes.md, etapa 1: quebrar salva do
-    // combo, não dá um combo de troco garantido). Custa barra (sem barra, o "!" não aparece) e não
-    // quebra Super, Ultra nem agarrão.
+    // um instante, e quem quebrou corre sozinho até ele (o dash automático). O atordoamento curto
+    // deixa a corrida chegar sem troco garantido (docs/balanco/ajustes.md). Custa barra (sem barra,
+    // o "!" não aparece) e não quebra Super, Ultra nem agarrão.
     /** Acertos que o combo precisa ter para dar para quebrar (o 1º golpe não quebra). */
     int comboBreakerMinHits = 2;
     int comboBreakerCost = METER_PER_BAR;
@@ -434,17 +434,18 @@ final class CombatConfig {
      */
     int comboBreakerStunFrames = 4;
     int comboBreakerHitstopFrames = 16;
-    /** O estalo joga quem batia até esta folga do corpo de quem quebrou: longe, só correndo. */
-    float comboBreakerPushGap = 170f;
-    /** Quadros que ele desliza para trás, arrastando o pé. */
-    int comboBreakerPushFrames = 10;
-    /** No ar, a velocidade com que ele é jogado para trás. */
-    float comboBreakerAirPushSpeed = 260f;
+    /** O estalo joga quem batia até esta folga do corpo de quem quebrou: longe, só correndo (era 170). */
+    float comboBreakerPushGap = 230f;
+    /** Quadros que ele desliza para trás, arrastando o pé (12: a mesma velocidade de antes, mais longe). */
+    int comboBreakerPushFrames = 12;
+    /** No ar, a velocidade com que ele é jogado para trás (era 260). */
+    float comboBreakerAirPushSpeed = 320f;
     /**
-     * Quem quebrou corria sozinho (sem → →) por até tantos quadros, até ficar a esta folga (ao
-     * alcance do L). 0: não corre, a luta volta ao neutro (era 40).
+     * Quem quebrou corre sozinho (sem → →) por até tantos quadros, até ficar a esta folga (ao
+     * alcance do L). Segurar trás desiste. Estava desligado (0) desde a etapa 1; de volta, com
+     * folga para o empurrão maior (era 40).
      */
-    int comboBreakerChaseFrames = 0;
+    int comboBreakerChaseFrames = 48;
     float comboBreakerCloseGap = 30f;
 
     /**

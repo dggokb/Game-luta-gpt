@@ -7,8 +7,8 @@ import org.junit.Test;
 /**
  * Combo breaker: apanhando num combo que já tem 2 acertos, L, M ou H quebra na hora, em qualquer
  * golpe — por 1 barra. O "!" fica sobre quem apanha enquanto dá. Quem batia é jogado para longe,
- * fica atordoado um instante e a luta volta ao neutro (sem troco garantido; docs/balanco/ajustes.md).
- * A corrida sozinha de quem quebrou continua no motor como opção ({@code comboBreakerChaseFrames}).
+ * fica atordoado um instante e quem quebrou corre sozinho até ele (o dash automático); o
+ * atordoamento curto não deixa troco garantido (docs/balanco/ajustes.md).
  */
 public class ComboBreakerTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
@@ -105,8 +105,11 @@ public class ComboBreakerTest {
         assertNull("o combo acabou", m.engine.session(1) != null && m.engine.session(1).active ? m.engine.session(1) : null);
     }
 
-    /** O estalo joga quem batia para longe (arrastando o pé); quem quebrou não sai correndo sozinho. */
-    @Test public void theBreakerThrowsTheAttackerAwayAndTheFightGoesBackToNeutral() {
+    /**
+     * O estalo joga quem batia para longe (arrastando o pé) e quem quebrou corre sozinho até ele
+     * (sem → →), parando ao alcance do L. Quem batia se recompõe antes de a corrida chegar.
+     */
+    @Test public void theBreakerThrowsTheAttackerAwayAndTheBreakerDashesAfterHim() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;
         m.combo("H", 3);
@@ -114,17 +117,24 @@ public class ComboBreakerTest {
         CombatConfig config = m.engine.config;
         float attackerStart = m.f(0).x, breakerStart = m.f(1).x;
         boolean ran = false;
+        int recompos = -1;
         for (int i = 0; i < config.comboBreakerHitstopFrames + config.comboBreakerPushFrames; i++) {
             m.step();
             ran |= m.f(1).forwardDashing;
+            if (recompos < 0 && m.f(0).canAct()) recompos = i;
         }
         assertTrue("jogado para trás: " + Math.abs(m.f(0).x - attackerStart),
             Math.abs(m.f(0).x - attackerStart) > 0.6f * config.comboBreakerPushGap);
-        assertFalse("não corre sozinho", ran);
-        assertEquals("ficou onde quebrou", breakerStart, m.f(1).x, 1f);
-        // Passado o estalo e o atordoamento, quem batia volta a agir.
-        for (int i = 0; i < config.comboBreakerStunFrames && !m.f(0).canAct(); i++) m.step();
-        assertTrue("se recompôs", m.f(0).canAct());
+        assertTrue("corre sozinho (dash automático)", ran);
+        for (int i = 0; i < config.comboBreakerChaseFrames && m.f(1).breakerChase > 0; i++) {
+            m.step();
+            if (recompos < 0 && m.f(0).canAct()) recompos = i;
+        }
+        assertTrue("correu um bom pedaço: " + Math.abs(m.f(1).x - breakerStart),
+            Math.abs(m.f(1).x - breakerStart) > 0.6f * config.comboBreakerPushGap);
+        assertTrue("chegou ao alcance do L: " + m.gap(), m.gap() <= m.touching() + config.comboBreakerCloseGap + 12f);
+        assertEquals("parou de correr", 0, m.f(1).breakerChase);
+        assertTrue("quem batia já se recompôs", m.f(0).canAct());
     }
 
     /**

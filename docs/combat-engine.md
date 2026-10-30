@@ -780,17 +780,17 @@ forte que fechava a sequência: no celular era quase impossível; depois foi o S
 Apanhando sem poder quebrar, os botões vão para o buffer como sempre. O SUPER não quebra.
 
 - **Efeito** (cue `COMBO_BREAKER`): o golpe não entra; quem apanhava fica livre na hora (no ar,
-  cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (20; era 44) depois
-  de um congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (170) do corpo de quem
-  quebrou, deslizando em `comboBreakerPushFrames` (10) quadros (no ar, `comboBreakerAirPushSpeed`;
+  cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (4; era 44, depois 20) depois
+  de um congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (230; era 170) do corpo de quem
+  quebrou, deslizando em `comboBreakerPushFrames` (12) quadros (no ar, `comboBreakerAirPushSpeed` 320;
   encurralado, para na parede — quem quebrou não recua). "COMBO BREAKER!", brilho na cor de quem
   quebrou, estalo e tremida; enquanto desliza, o pé arrasta e solta **fumacinha**
   (`ImpactEffects.spawnSkid`, `GameView.updateBreakerSkid`).
-- **Volta ao neutro** (docs/balanco/ajustes.md, etapa 1): quem quebrou **não** corre mais
-  sozinho (`comboBreakerChaseFrames` = 0; era 40) e não ganha um combo de troco garantido. Com
-  20 quadros ainda sobra tempo para um L logo de cara (o alcance real do L passa da folga do
-  empurrão); o relatório traz os números e as alternativas.
-- **Corrida automática (opção)**: com `comboBreakerChaseFrames` > 0, quem quebrou sai correndo
+- **Dash automático** (de volta em 30/10, docs/balanco/ajustes.md, "Breaker: empurrão maior e
+  dash automático"): `comboBreakerChaseFrames` = 48 (0 desde a etapa 1; era 40). Com o
+  atordoamento de 4 quem batia se recompõe antes de a corrida chegar: o dash leva até ele, sem
+  combo de troco garantido.
+- **Corrida automática**: com `comboBreakerChaseFrames` > 0, quem quebrou sai correndo
   sozinho até ele (sem o → →), na velocidade do dash, até ficar a `comboBreakerCloseGap` (30) do
   corpo dele. Trás ou baixo desiste da corrida; pulo também. O golpe apertado no meio da corrida
   **espera chegar perto** — o buffer não envelhece enquanto corre.
