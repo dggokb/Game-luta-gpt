@@ -545,6 +545,11 @@ public class GameView extends SurfaceView
     public void release() {
         ultraSounds.release();
         if (desenhoGl != null) desenhoGl.liberar();
+        // As folhas e os packs de Ultra saem já, sem esperar o GameView ser coletado (no PC os
+        // testes abrem outro jogo na mesma JVM com este ainda referenciado).
+        atlases.retainOnly();
+        ultras.clear();
+        if (carregadorDeUltras != null) carregadorDeUltras.shutdownNow();
     }
 
     /**

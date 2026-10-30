@@ -32,6 +32,8 @@ public class GameViewCelularPcTest {
     @AfterClass
     public static void fechar() {
         if (jogo != null) jogo.parar();
+        // O próximo teste abre outro jogo na mesma JVM: este não pode ficar segurando a arte.
+        jogo = null;
     }
 
     /**
