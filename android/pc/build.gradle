@@ -274,6 +274,24 @@ tasks.register('capturar', JavaExec) {
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
 }
 
+// O teste de desempenho automático (o do botão TESTE) sem tela: 30 s de luta roteirizada.
+// gradle :pc:medirLuta [-Presolucao=1920x1080]   →   pc/build/medir-luta/relatorio.txt
+tasks.register('medirLuta', JavaExec) {
+    group = 'verification'
+    description = 'Roda o teste de desempenho automático numa luta, sem tela, e escreve o relatório.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.pc.MedirLuta'
+    workingDir = rootProject.projectDir
+    jvmArgs '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    maxHeapSize = '3g'
+    args layout.buildDirectory.dir('medir-luta').get().asFile.absolutePath
+    if (providers.gradleProperty('resolucao').isPresent()) args providers.gradleProperty('resolucao').get()
+    if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+}
+
 // Revisão do motor de animação: o mesmo roteiro com o motor desligado e ligado, em PNG.
 // gradle :pc:revisarAnimacao   →   pc/build/revisao-animacao/{desligado,ligado}/
 tasks.register('revisarAnimacao', JavaExec) {

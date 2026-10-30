@@ -38,4 +38,5 @@ final class DesenhoGl {
     boolean preSubir(com.gamelutagpt.render.RenderImage imagem) { return false; }
     int subir(SpriteAtlasCache atlases, long orcamentoNs) { return 0; }
     String resumo() { return ""; }
+    int[] contagem() { return new int[3]; }
 }

@@ -15,9 +15,13 @@ final class PerfilQuadros {
     static final long JANELA_NS = 2_000_000_000L;
 
     static final int ATUALIZA = 0, TRAVA = 1, TELA = 2, FUNDO = 3, LUTA = 4, FRENTE = 5, HUD = 6, ENVIO = 7;
-    private static final String[] NOMES = {"atualiza", "trava", "tela", "fundo", "luta", "frente", "hud", "envio"};
+    static final String[] NOMES = {"atualiza", "trava", "tela", "fundo", "luta", "frente", "hud", "envio"};
 
     private final long[] soma = new long[NOMES.length];
+    /** As partes do quadro de agora e as do último que terminou (o teste automático lê). */
+    private final long[] quadro = new long[NOMES.length];
+    final long[] ultimoQuadro = new long[NOMES.length];
+    long ultimoTotal;
     private long marca, inicioQuadro, inicioJanela = System.nanoTime(), pior, quadros, quadrosLuta;
     private boolean luta;
     private volatile String ultima = "";
@@ -27,6 +31,7 @@ final class PerfilQuadros {
     /** Começo de um quadro (antes de atualizar a simulação). */
     void inicio() {
         marca = inicioQuadro = System.nanoTime();
+        java.util.Arrays.fill(quadro, 0);
     }
 
     /** Fecha a parte {@code parte}: o tempo desde a marca anterior vai para ela. */
@@ -34,12 +39,16 @@ final class PerfilQuadros {
         if (parte == FUNDO) luta = true;
         long agora = System.nanoTime();
         soma[parte] += agora - marca;
+        quadro[parte] += agora - marca;
         marca = agora;
     }
 
     /** Fim do quadro: conta e, a cada janela, escreve a linha no log. True quando uma janela fechou. */
     boolean fim() {
         long agora = System.nanoTime();
+        System.arraycopy(quadro, 0, ultimoQuadro, 0, quadro.length);
+        ultimoTotal = 0;
+        for (long q : quadro) ultimoTotal += q;
         pior = Math.max(pior, agora - inicioQuadro);
         quadros++;
         if (luta) quadrosLuta++;

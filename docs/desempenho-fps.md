@@ -246,6 +246,36 @@ stencil por quadro, 7 FPS no SHINKAI, picos ("pior") de 74–194 ms.
   - onomatopeia dividida uma vez.
 - **Entrada:** ver o commit de especiais no toque (janela pelo primeiro passo solto, direção que chega logo depois do botão, especial com 10 quadros de buffer, botões antes dos pontos L+M/M+H).
 
+### 5.6 Teste de desempenho automático (botão TESTE e `gradle :pc:medirLuta`)
+
+O mesmo roteiro no celular, no Ally e no PC sem tela, para medir cada mudança sem depender de
+captura de tela:
+
+- **Como rodar:** no celular, entre numa luta e toque em **TESTE**, no painel de desempenho, ao
+  lado de FOLHAS. No PC sem tela, rode `gradle :pc:medirLuta`; com `-Presolucao=1920x1080` muda o
+  tamanho. A saída vai para `pc/build/medir-luta/relatorio.txt` e as fotos para os PNGs da
+  mesma pasta.
+- **Roteiro:** 30 s de luta (1800 passos) com a IA dos dois lados, sempre no mesmo momento:
+  - SHINKAI do jogador aos 3 s;
+  - Super aos 10 s;
+  - Ultra aos 16,7 s;
+  - SHINKAI do rival aos 23,3 s.
+
+  A vida volta quando cai abaixo de 1/3. As barras de SHINKAI ficam zeradas fora do roteiro,
+  porque um SHINKAI da IA virava um Clash por cima do Ultra. A qualidade AUTO fica parada durante
+  o teste.
+- **Relatório:** uma tela, que fecha com outro toque em TESTE. Também sai no log `Quadros`. Mostra:
+  - o quadro médio, o p95, o pior e quantos quadros passaram de 20 ms;
+  - a média e o p95 de cada parte;
+  - o quadro médio por momento (normal, combo, SHINKAI, Super, Ultra);
+  - no OpenGL, os textos novos, as formas e os desenhos por quadro;
+  - os 5 piores quadros, com a parte que mais pesou e o momento.
+
+Primeira medida no PC sem tela, a 1280×720 em Canvas: quadro médio de 26 ms. Por momento:
+normal 18 ms, SHINKAI 24, Super 27 e Ultra 42. O fundo pesa 17 ms de média e 48 ms de p95.
+A máquina de medida varia entre rodadas (com pouca RAM livre), então compare duas rodadas
+seguidas, antes e depois da mudança.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

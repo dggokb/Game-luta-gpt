@@ -95,6 +95,10 @@ public class GameView extends SurfaceView
     private final FighterInput playerInput = new FighterInput();
     private final FighterInput opponentInput = new FighterInput();
     private final AiController ai = new AiController(new OpponentAi(new Random()));
+    /** Teste de desempenho automático (botão TESTE): a IA joga dos dois lados com o roteiro dele. */
+    private final TesteAutomatico teste = new TesteAutomatico();
+    private final AiController aiTesteJogador = new AiController(new OpponentAi(new Random(7)));
+    private final AiController aiTesteRival = new AiController(new OpponentAi(new Random(11)));
     /** READY → GO depois da intro e, com a IA ligada, a batalha de verdade (2x2). */
     private final BattleFlow flow = new BattleFlow();
     /** Demo buttons: while one plays it drives both fighters (pad and CPU brain are ignored). */
@@ -1646,12 +1650,16 @@ public class GameView extends SurfaceView
             long frameStart = System.nanoTime();
             float elapsedSeconds = encaixarNoPasso((frameStart - previous) / 1_000_000_000f);
             previous = frameStart;
+            if (pedirTeste) comecarTeste();
             perfil.inicio();
             advanceSimulation(elapsedSeconds);
             perfil.marca(PerfilQuadros.ATUALIZA);
             if (!running) break;
             drawFrame();
-            if (perfil.fim() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
+            boolean janela = perfil.fim();
+            if (teste.ativo()) registrarQuadroDoTeste();
+            // No teste a qualidade fica parada: trocar no meio misturava as medidas.
+            if (janela && !teste.ativo() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
                 Log.i(PerfilQuadros.TAG, "gráficos mudaram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
                     + " (luta a " + Math.round(perfil.fps()) + " fps)");
                 aplicarQualidade();
@@ -1951,6 +1959,13 @@ public class GameView extends SurfaceView
             pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
             tutorial.fillDummy(opponentInput);
+        } else if (teste.ativo()) {
+            // Teste de desempenho: a IA joga dos dois lados e o roteiro pede SHINKAI, Super e Ultra.
+            pad.drainInto(ignoredInput);
+            aiTesteJogador.fill(engine, PLAYER, playerInput);
+            aiTesteRival.fill(engine, OPPONENT, opponentInput);
+            teste.roteiro(engine, playerInput, opponentInput);
+            flow.reporRelogio();
         } else {
             pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
@@ -2247,6 +2262,7 @@ public class GameView extends SurfaceView
                         : TesteDesempenho.cenarioSemEnfeites ? "CENÁRIO SEM ENF." : "CENÁRIO ON";
                 case PERF_HUD: return TesteDesempenho.hud ? "HUD ON" : "HUD OFF";
                 case PERF_MSGS: return TesteDesempenho.mensagens ? "MSGS ON" : "MSGS OFF";
+                case PERF_TESTE: return teste.ativo() ? "TESTE " + teste.segundosRestantes() + "s" : "TESTE";
                 case PERF_GL:
                     // O que vale na luta de agora; trocado, vale a partir da próxima.
                     if (TesteDesempenho.openGl != glNaLuta) return TesteDesempenho.openGl ? "OPENGL ON*" : "OPENGL OFF*";
@@ -2262,6 +2278,7 @@ public class GameView extends SurfaceView
                 case PERF_CENARIO: return TesteDesempenho.cenario && !TesteDesempenho.cenarioSemEnfeites;
                 case PERF_HUD: return TesteDesempenho.hud;
                 case PERF_MSGS: return TesteDesempenho.mensagens;
+                case PERF_TESTE: return teste.ativo() || teste.relatorio() != null;
                 case PERF_GL: return TesteDesempenho.openGl;
                 default: return true;
             }
@@ -3496,6 +3513,7 @@ public class GameView extends SurfaceView
                     contarQuadroGl();
                     renderFrame(gl);
                     if (pausa.fps()) drawFpsCounter(gl);
+                    desenharTeste(gl);
                     desenharAvisoGl(gl);
                     // As imagens do Ultra sobem durante a abertura dele (a luta parada), uma por quadro:
                     // no meio da luta cada envio era um engasgo.
@@ -3530,6 +3548,7 @@ public class GameView extends SurfaceView
         try {
             renderFrame(canvas);
             if (pausa.fps()) drawFpsCounter(canvas);
+            desenharTeste(canvas);
             desenharAvisoGl(canvas);
             perfil.marca(PerfilQuadros.TELA);
         } finally {
@@ -3643,6 +3662,112 @@ public class GameView extends SurfaceView
             y -= 22f;
         }
         canvas.restore();
+    }
+
+    /**
+     * Começa o teste de desempenho automático (botão TESTE; no PC, {@code gradle :pc:medirLuta}):
+     * 30 s de luta com a IA dos dois lados. False fora da luta.
+     */
+    public boolean iniciarTesteDesempenho() {
+        if (!telaDaLuta() || demo.active() || tutorial.active() || cinematica.controleTravado()) return false;
+        pedirTeste = true;
+        return true;
+    }
+
+    /** O pedido do botão (thread da tela) começa na thread do jogo, no começo do quadro. */
+    private volatile boolean pedirTeste;
+
+    private void comecarTeste() {
+        pedirTeste = false;
+        for (AiController a : new AiController[] {aiTesteJogador, aiTesteRival}) {
+            a.setEnabled(true);
+            a.setFullKit(true);
+        }
+        String modo = qualidade.modo() == QualidadeGrafica.Modo.AUTO ? "AUTO " : "";
+        teste.comecar(modo + QualidadeGrafica.NOMES[qualidade.nivel()] + " · " + alturaDoQuadro + "p · "
+            + (glNaLuta ? "OpenGL" : "Canvas"));
+        Log.i(PerfilQuadros.TAG, "TESTE começou");
+    }
+
+    /** O teste rodando (ou pedido e ainda não começado). */
+    public boolean testeRodando() { return pedirTeste || teste.ativo(); }
+
+
+    /** As linhas do relatório do último teste, ou null. */
+    public String[] relatorioTeste() { return teste.relatorio(); }
+
+    /** O que estava na tela no quadro que acabou e os números do OpenGL dele. */
+    private void registrarQuadroDoTeste() {
+        int contexto = 0;
+        for (int i = 0; i < 2; i++) {
+            ComboSession s = engine.session(i);
+            if (s != null && s.active && s.hitCount >= 3) contexto |= TesteAutomatico.COMBO;
+            if (engine.fighter(i).state.shinkaiFrames > 0) contexto |= TesteAutomatico.SHINKAI;
+        }
+        if (superFlash.active() || isSuperCinematicActive()) contexto |= TesteAutomatico.SUPER_NA_TELA;
+        if (ultraAttacker >= 0 || engine.ultraSequenceRunning() || paginaFinal.isActive()) contexto |= TesteAutomatico.ULTRA_NA_TELA;
+        int[] g = glQuadro ? desenhoGl.contagem() : SEM_GL;
+        teste.quadro(perfil, contexto, g[0], g[1], g[2]);
+    }
+
+    private static final int[] SEM_GL = new int[3];
+    /** Altura em pixels do último quadro desenhado (o título do relatório). */
+    private int alturaDoQuadro;
+    private final Paint testePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF testeCaixa = new RectF();
+    private String[] testeLinhas;
+    private String[] testeQuebradas;
+
+    /** O relatório do teste numa caixa no meio da tela, até o TESTE ser tocado de novo. */
+    private void desenharTeste(Canvas canvas) {
+        alturaDoQuadro = canvas.getHeight();
+        String[] r = teste.relatorio();
+        if (r == null) return;
+        testePaint.setTextSize(15f);
+        testePaint.setTypeface(Typeface.DEFAULT);
+        testePaint.setTextAlign(Paint.Align.LEFT);
+        if (r != testeLinhas) {
+            testeLinhas = r;
+            testeQuebradas = quebrarLinhas(r, VW - 120f);
+        }
+        float alto = testeQuebradas.length * 20f + 46f;
+        float top = Math.max(70f, (VH - alto) * 0.5f);
+        canvas.save();
+        canvas.scale(canvas.getWidth() / (float) VW, canvas.getHeight() / (float) VH);
+        testeCaixa.set(40f, top, VW - 40f, top + alto);
+        testePaint.setColor(0xF0101018);
+        canvas.drawRoundRect(testeCaixa, 10f, 10f, testePaint);
+        float y = top + 26f;
+        for (String linha : testeQuebradas) {
+            testePaint.setColor(linha.startsWith("TESTE") ? 0xFFFFD84A : 0xFFFFFFFF);
+            canvas.drawText(linha, 60f, y, testePaint);
+            y += 20f;
+        }
+        testePaint.setColor(0xFF9AA0B0);
+        canvas.drawText("toque em TESTE para fechar", 60f, y + 6f, testePaint);
+        canvas.restore();
+    }
+
+    /** Quebra cada linha nos espaços duplos (os itens do relatório) para caber em {@code largura}. */
+    private String[] quebrarLinhas(String[] linhas, float largura) {
+        java.util.List<String> saida = new java.util.ArrayList<>();
+        for (String linha : linhas) {
+            StringBuilder atual = new StringBuilder();
+            for (String item : linha.split("  ")) {
+                if (item.isEmpty()) continue;
+                String junto = atual.length() == 0 ? item : atual + "  " + item;
+                if (atual.length() > 0 && testePaint.measureText(junto) > largura) {
+                    saida.add(atual.toString());
+                    atual.setLength(0);
+                    atual.append("    ").append(item);
+                } else {
+                    atual.setLength(0);
+                    atual.append(junto);
+                }
+            }
+            if (atual.length() > 0) saida.add(atual.toString());
+        }
+        return saida.toArray(new String[0]);
     }
 
     /** Linhas do diagnóstico, de cima para baixo (refeitas a cada janela do contador). */
@@ -5817,6 +5942,11 @@ public class GameView extends SurfaceView
                     break;
                 case PERF_MSGS:
                     TesteDesempenho.mensagens = !TesteDesempenho.mensagens;
+                    break;
+                case PERF_TESTE:
+                    // Com o relatório na tela, o toque fecha; senão começa (só no meio de uma luta).
+                    if (teste.relatorio() != null) teste.fecharRelatorio();
+                    else if (!teste.ativo()) iniciarTesteDesempenho();
                     break;
                 case PERF_GL:
                     // Desenho novo (OpenGL) × Canvas: vale a partir da próxima luta (DUPLA ou IA).

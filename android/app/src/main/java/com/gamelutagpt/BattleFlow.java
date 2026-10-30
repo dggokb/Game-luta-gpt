@@ -87,6 +87,9 @@ final class BattleFlow {
         timeOver = false;
     }
 
+    /** Teste automático: o relógio cheio de novo (o TIME OVER não corta os 30 s). */
+    void reporRelogio() { clockFrames = TIME_LIMIT_FRAMES; }
+
     /** A intro acabou: READY. */
     void startCountdown() {
         phase = Phase.READY;
