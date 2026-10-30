@@ -593,6 +593,7 @@ final class CanvasGl extends Canvas {
 
     /** O traço do caminho pelo próprio Android (pontas, junções e tracejado), preenchido. */
     private void tracar(Path path, Paint p) {
+        if (tracarRapido(path, p)) return;
         traco.reset();
         Paint.Style antes = p.getStyle();
         if (antes != Paint.Style.STROKE) p.setStyle(Paint.Style.STROKE);
@@ -602,6 +603,100 @@ final class CanvasGl extends Canvas {
         p.setStrokeWidth(w);
         if (antes != Paint.Style.STROKE) p.setStyle(antes);
         preencher(traco, Path.FillType.WINDING);
+    }
+
+    /**
+     * Traço sem tracejado (raios, trincas, riscos, brilhos, contornos): cada contorno vira uma
+     * tira de triângulos com junção em esquadria, direto. O caminho do Android (getFillPath, um
+     * polígono enorme com as junções redondas, e depois o stencil, que corta o lote) custava
+     * caro por traço; o SHINKAI desenha dezenas por quadro.
+     */
+    private boolean tracarRapido(Path path, Paint p) {
+        if (Build.VERSION.SDK_INT < 26 || p.getPathEffect() != null) return false;
+        lerMatriz();
+        float[] a = path.approximate(0.5f / Math.max(1e-3f, escala()));
+        int n = a.length / 3;
+        float w = largura(p) * 0.5f;
+        boolean redonda = p.getStrokeCap() == Paint.Cap.ROUND;
+        int inicio = 0;
+        for (int i = 1; i <= n; i++) {
+            // Um ponto com a mesma fração do anterior começa outro contorno.
+            if (i == n || a[i * 3] == a[(i - 1) * 3]) {
+                faixa(a, inicio, i, w, redonda);
+                inicio = i;
+            }
+        }
+        return true;
+    }
+
+    private float[] faixaPts = new float[64];
+
+    /** Um contorno do traço: a tira (esquerda/direita de cada ponto) e as pontas. */
+    private void faixa(float[] a, int de, int ate, float w, boolean redonda) {
+        // Pontos sem os repetidos.
+        int n = 0;
+        if (faixaPts.length < (ate - de) * 2) faixaPts = new float[(ate - de) * 2 + 16];
+        float[] pt = faixaPts;
+        for (int i = de; i < ate; i++) {
+            float x = a[i * 3 + 1], y = a[i * 3 + 2];
+            if (n > 0 && Math.abs(x - pt[n * 2 - 2]) < 1e-4f && Math.abs(y - pt[n * 2 - 1]) < 1e-4f) continue;
+            pt[n * 2] = x;
+            pt[n * 2 + 1] = y;
+            n++;
+        }
+        if (n == 0) return;
+        if (n == 1) {
+            if (redonda) ponta(pt[0], pt[1], w);
+            return;
+        }
+        float plx = 0f, ply = 0f, prx = 0f, pry = 0f;
+        for (int i = 0; i < n; i++) {
+            float x = pt[i * 2], y = pt[i * 2 + 1];
+            // Normais do segmento que chega e do que sai deste ponto.
+            float ax = 0f, ay = 0f, bx = 0f, by = 0f;
+            if (i > 0) {
+                float dx = x - pt[i * 2 - 2], dy = y - pt[i * 2 - 1];
+                float l = (float)Math.sqrt(dx * dx + dy * dy);
+                ax = -dy / l; ay = dx / l;
+            }
+            if (i + 1 < n) {
+                float dx = pt[i * 2 + 2] - x, dy = pt[i * 2 + 3] - y;
+                float l = (float)Math.sqrt(dx * dx + dy * dy);
+                bx = -dy / l; by = dx / l;
+            }
+            if (i == 0) { ax = bx; ay = by; }
+            if (i + 1 == n) { bx = ax; by = ay; }
+            // Esquadria: a soma das normais, esticada para manter a largura (no máximo 2×).
+            float mx = ax + bx, my = ay + by;
+            float ml = (float)Math.sqrt(mx * mx + my * my);
+            if (ml < 1e-4f) { mx = ax; my = ay; ml = 1f; }
+            mx /= ml; my /= ml;
+            float cos = mx * ax + my * ay;
+            if (cos < 0.5f) {
+                // Volta fechada (mais de 120°): a esquadria ficaria comprida demais. A tira fecha
+                // com a normal do segmento que chega e recomeça com a do que sai.
+                float lx = x + ax * w, ly = y + ay * w, rx = x - ax * w, ry = y - ay * w;
+                tri(plx, ply, lx, ly, rx, ry);
+                tri(plx, ply, rx, ry, prx, pry);
+                if (redonda) ponta(x, y, w);
+                plx = x + bx * w; ply = y + by * w; prx = x - bx * w; pry = y - by * w;
+                continue;
+            }
+            float k = w / cos;
+            float lx = x + mx * k, ly = y + my * k, rx = x - mx * k, ry = y - my * k;
+            if (i > 0) {
+                tri(plx, ply, lx, ly, rx, ry);
+                tri(plx, ply, rx, ry, prx, pry);
+            }
+            plx = lx; ply = ly; prx = rx; pry = ry;
+        }
+        if (redonda) {
+            boolean fechado = n > 2 && Math.abs(pt[0] - pt[n * 2 - 2]) < 1e-3f && Math.abs(pt[1] - pt[n * 2 - 1]) < 1e-3f;
+            if (!fechado) {
+                ponta(pt[0], pt[1], w);
+                ponta(pt[n * 2 - 2], pt[n * 2 - 1], w);
+            }
+        }
     }
 
     private void preencher(Path path, Path.FillType tipo) {
