@@ -23,6 +23,7 @@ final class DesenhoGl {
 
     void tamanho(int largura, int altura) {}
     boolean disponivel() { return false; }
+    void desligar(Throwable motivo) {}
     boolean contextoRecriado() { return false; }
     void soltarThread() {}
     void liberar() {}

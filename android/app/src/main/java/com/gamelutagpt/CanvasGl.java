@@ -78,7 +78,8 @@ final class CanvasGl extends Canvas {
 
     @Override public int getWidth() { return largura; }
     @Override public int getHeight() { return altura; }
-    @Override public boolean isHardwareAccelerated() { return true; }
+    // isHardwareAccelerated() fica o do Canvas (false): o construtor do Canvas pergunta isso e,
+    // com true, não cria o canvas nativo que faz as contas de transformação (e o jogo fechava).
 
     // ---- Pilha ----
 

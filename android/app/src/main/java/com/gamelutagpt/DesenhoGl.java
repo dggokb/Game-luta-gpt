@@ -128,6 +128,14 @@ final class DesenhoGl implements SurfaceHolder.Callback {
         return !falhou;
     }
 
+    /** Um quadro deu erro: o OpenGL fica desligado (a luta volta para o Canvas). */
+    void desligar(Throwable motivo) {
+        Log.e(TAG, "desenho em OpenGL desligado", motivo);
+        falhou = true;
+        quadroAberto = false;
+        aberto = null;
+    }
+
     private boolean preparar() {
         if (falhou) return false;
         Surface s = janela;

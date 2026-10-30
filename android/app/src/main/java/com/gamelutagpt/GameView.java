@@ -3328,9 +3328,15 @@ public class GameView extends SurfaceView
                     renderFrame(gl);
                     if (pausa.fps()) drawFpsCounter(gl);
                     perfil.marca(PerfilQuadros.TELA);
-                } finally {
                     desenhoGl.terminarQuadro();
                     perfil.marca(PerfilQuadros.ENVIO);
+                } catch (RuntimeException e) {
+                    // Rede de segurança: o OpenGL sai e a luta segue no Canvas (as folhas soltas
+                    // são decodificadas de novo quando o Canvas pedir), em vez de o jogo fechar.
+                    desenhoGl.desligar(e);
+                    glNaLuta = false;
+                    glQuadro = false;
+                    camadaDeCimaLimpa = false;
                 }
                 depoisDoQuadro();
                 return;
