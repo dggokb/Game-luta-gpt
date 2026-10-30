@@ -59,8 +59,12 @@ final class CanvasGl extends Canvas {
         this.gl = gl;
     }
 
+    /** Por quadro, para o contador: desenhos, textos feitos agora e formas pelo stencil. */
+    int desenhos, textosNovos, formasStencil;
+
     /** Começo do quadro: sem transformação, recorte ou camadas. */
     void comecar(int largura, int altura) {
+        desenhos = textosNovos = formasStencil = 0;
         this.largura = largura;
         this.altura = altura;
         super.restoreToCount(1);
@@ -211,6 +215,7 @@ final class CanvasGl extends Canvas {
 
     /** Leva a transformação, o recorte, a transparência e a inversão de agora para o OpenGL. */
     void prepararGl() {
+        desenhos++;
         lerMatriz();
         gl.matriz(v);
         int k = getSaveCount();
@@ -563,6 +568,7 @@ final class CanvasGl extends Canvas {
         }
         // Qualquer outra forma: os leques marcam o stencil e a caixa da forma pinta onde ficou marcado.
         path.computeBounds(caixa, true);
+        formasStencil++;
         int cor = corPincel;
         float tipoAntes = tipoPincel;
         Degrade.Dados dg = degrade;
@@ -785,6 +791,7 @@ final class CanvasGl extends Canvas {
         if (t == null) {
             t = criarTexto(s, x, y, p, esc);
             if (t == null) return;
+            textosNovos++;
             textos.put(k, t);
         }
         float l = x - t.origemX, top = y - t.origemY;
