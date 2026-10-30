@@ -103,10 +103,6 @@ final class CanvasGl extends Canvas {
         return r;
     }
 
-    @Override public int save(int flags) {
-        return save();
-    }
-
     /** Camada: no OpenGL vira só um save com a transparência (e a inversão) do pincel dela. */
     private int camada(Paint p) {
         int r = save();
