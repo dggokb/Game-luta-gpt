@@ -131,6 +131,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     /** Um quadro deu erro: o OpenGL fica desligado (a luta volta para o Canvas). */
     void desligar(Throwable motivo) {
         Log.e(TAG, "desenho em OpenGL desligado", motivo);
+        motivoFalha = String.valueOf(motivo);
         falhou = true;
         quadroAberto = false;
         aberto = null;
@@ -206,15 +207,31 @@ final class DesenhoGl implements SurfaceHolder.Callback {
             return true;
         } catch (RuntimeException e) {
             Log.e(TAG, "OpenGL falhou", e);
+            motivoFalha = "OpenGL não iniciou: " + e;
             falhou = true;
             return false;
         }
     }
 
     private boolean falhar(String onde) {
-        Log.e(TAG, onde + " falhou: " + EGL14.eglGetError());
+        int erro = EGL14.eglGetError();
+        Log.e(TAG, onde + " falhou: " + erro);
+        motivoFalha = "OpenGL não iniciou: " + onde + " falhou (erro EGL 0x" + Integer.toHexString(erro) + ")";
         falhou = true;
         return false;
+    }
+
+    /** Por que o OpenGL não funciona agora (para mostrar na tela), ou null. */
+    private String motivoFalha;
+
+    String motivoFalha() {
+        return falhou ? motivoFalha : null;
+    }
+
+    /** O jogador religou o OpenGL: tenta de novo. */
+    void tentarDeNovo() {
+        falhou = false;
+        motivoFalha = null;
     }
 
     /**

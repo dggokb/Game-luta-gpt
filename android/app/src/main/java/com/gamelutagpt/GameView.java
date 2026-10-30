@@ -565,6 +565,15 @@ public class GameView extends SurfaceView
      * duas). Antes de a view entrar na tela.
      */
     public void ligarOpenGl(SurfaceView superficie) {
+        // O jogo fechou na última vez durante os primeiros quadros em OpenGL (um erro que nem dá
+        // para pegar, dentro do Android): avisa e começa sem ele, para não fechar de novo.
+        desenhoPrefs = getContext().getSharedPreferences("desenho", Context.MODE_PRIVATE);
+        if (desenhoPrefs.getBoolean(GL_TESTANDO, false)) {
+            desenhoPrefs.edit().putBoolean(GL_TESTANDO, false).apply();
+            TesteDesempenho.openGl = false;
+            avisoGl = "Na última vez o jogo fechou nos primeiros quadros em OpenGL. OpenGL desligado"
+                + " (Modo Teste > OPENGL liga de novo). Mande print disto.";
+        }
         desenhoGl = new DesenhoGl(superficie, this, pronta -> {
             if (pronta) {
                 glSuperficiePronta = true;
@@ -574,6 +583,63 @@ public class GameView extends SurfaceView
                 stopLoop();
             }
         });
+    }
+
+    /** Marca, gravada, de que os primeiros quadros em OpenGL estão sendo desenhados. */
+    private static final String GL_TESTANDO = "gl_testando";
+    /** Quadros em OpenGL até a marca sair (o OpenGL desenhou sem fechar o jogo). */
+    private static final int GL_QUADROS_SEGUROS = 120;
+    private SharedPreferences desenhoPrefs;
+    private int glQuadrosOk = -1;
+    /** Por que o OpenGL saiu (erro e onde), na tela até o jogador mexer no botão OPENGL. */
+    private String avisoGl;
+    private final Paint avisoPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    /** Conta os quadros em OpenGL: a marca entra no primeiro e sai quando já são seguros. */
+    private void contarQuadroGl() {
+        if (desenhoPrefs == null || glQuadrosOk >= GL_QUADROS_SEGUROS) return;
+        if (glQuadrosOk < 0) {
+            desenhoPrefs.edit().putBoolean(GL_TESTANDO, true).commit();
+            glQuadrosOk = 0;
+        }
+        if (++glQuadrosOk >= GL_QUADROS_SEGUROS) desenhoPrefs.edit().putBoolean(GL_TESTANDO, false).apply();
+    }
+
+    /** O erro que desligou o OpenGL, com a linha do jogo onde ele aconteceu. */
+    private static String descreverErro(Throwable e) {
+        StringBuilder b = new StringBuilder("OpenGL desligado por erro: ").append(e);
+        for (StackTraceElement el : e.getStackTrace()) {
+            if (el.getClassName().startsWith("com.gamelutagpt")) {
+                b.append("  em ").append(el.getFileName()).append(':').append(el.getLineNumber());
+                break;
+            }
+        }
+        return b.append(". Mande print disto.").toString();
+    }
+
+    /** O aviso do OpenGL no alto da tela, por cima de tudo. */
+    private void desenharAvisoGl(Canvas c) {
+        if (avisoGl == null) return;
+        c.save();
+        c.scale(c.getWidth() / VW, c.getHeight() / VH);
+        avisoPaint.setTextSize(15f);
+        avisoPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        avisoPaint.setTextAlign(Paint.Align.LEFT);
+        // Quebra em linhas que caibam na tela.
+        java.util.List<String> linhas = new java.util.ArrayList<>();
+        String resto = avisoGl;
+        while (!resto.isEmpty()) {
+            int n = avisoPaint.breakText(resto, true, VW - 40f, null);
+            if (n <= 0) break;
+            linhas.add(resto.substring(0, n));
+            resto = resto.substring(n);
+        }
+        avisoPaint.setStyle(Paint.Style.FILL);
+        avisoPaint.setColor(0xE0600010);
+        c.drawRect(10f, 10f, VW - 10f, 22f + linhas.size() * 20f, avisoPaint);
+        avisoPaint.setColor(Color.WHITE);
+        for (int i = 0; i < linhas.size(); i++) c.drawText(linhas.get(i), 20f, 31f + i * 20f, avisoPaint);
+        c.restore();
     }
 
     /** Quer o OpenGL nas próximas lutas: ligado no Modo Teste e funcionando no aparelho. */
@@ -3315,6 +3381,9 @@ public class GameView extends SurfaceView
 
     private void drawFrame() {
         if (!holder.getSurface().isValid()) return;
+        if (avisoGl == null && TesteDesempenho.openGl && desenhoGl != null && desenhoGl.motivoFalha() != null) {
+            avisoGl = desenhoGl.motivoFalha() + ". Mande print disto.";
+        }
         if (subindoFolhas) subirFolhas();
         glQuadro = false;
         if (glNaLuta && desenhoGl != null && telaDaLuta()) {
@@ -3325,15 +3394,19 @@ public class GameView extends SurfaceView
                 limparCamadaDeCima();
                 perfil.marca(PerfilQuadros.TRAVA);
                 try {
+                    contarQuadroGl();
                     renderFrame(gl);
                     if (pausa.fps()) drawFpsCounter(gl);
+                    desenharAvisoGl(gl);
                     perfil.marca(PerfilQuadros.TELA);
                     desenhoGl.terminarQuadro();
                     perfil.marca(PerfilQuadros.ENVIO);
                 } catch (RuntimeException e) {
-                    // Rede de segurança: o OpenGL sai e a luta segue no Canvas (as folhas soltas
-                    // são decodificadas de novo quando o Canvas pedir), em vez de o jogo fechar.
+                    // O OpenGL sai e a luta segue no Canvas, com o erro na tela para ser corrigido
+                    // (as folhas soltas são decodificadas de novo quando o Canvas pedir).
                     desenhoGl.desligar(e);
+                    avisoGl = descreverErro(e);
+                    if (desenhoPrefs != null) desenhoPrefs.edit().putBoolean(GL_TESTANDO, false).apply();
                     glNaLuta = false;
                     glQuadro = false;
                     camadaDeCimaLimpa = false;
@@ -3349,6 +3422,7 @@ public class GameView extends SurfaceView
         try {
             renderFrame(canvas);
             if (pausa.fps()) drawFpsCounter(canvas);
+            desenharAvisoGl(canvas);
             perfil.marca(PerfilQuadros.TELA);
         } finally {
             holder.unlockCanvasAndPost(canvas);
@@ -5599,6 +5673,8 @@ public class GameView extends SurfaceView
                 case PERF_GL:
                     // Desenho novo (OpenGL) × Canvas: vale a partir da próxima luta (DUPLA ou IA).
                     TesteDesempenho.openGl = !TesteDesempenho.openGl;
+                    avisoGl = null;
+                    if (TesteDesempenho.openGl && desenhoGl != null) desenhoGl.tentarDeNovo();
                     break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it (a dono que
