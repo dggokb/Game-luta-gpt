@@ -58,19 +58,20 @@ final class GlRenderCanvas implements RenderCanvas {
         "  vUv = aUv; vCor = aCor; vTipo = aTipo;\n" +
         "  gl_Position = vec4(aPos.x / uTela.x * 2.0 - 1.0, 1.0 - aPos.y / uTela.y * 2.0, 0.0, 1.0);\n" +
         "}\n";
-    // Tipo 0: cor lisa; 1: imagem; 2: círculo (uv de -1 a 1, borda suave); 3: brilho (do centro
-    // para fora, de cheio a transparente); 4: degradê linear (u é a posição nele, de 0 a 1, na
-    // textura do degradê); 5: degradê radial (uv vai do centro, 1 na borda); 6 a 7: anel (uv de -1 a
-    // 1; o raio de dentro é tipo - 6). Cores já multiplicadas pelo alfa. O filtro vale só para
-    // imagem e trabalha na cor sem o alfa multiplicado, como o ColorMatrix do Android. O recorte
-    // são semiplanos em pixels da janela (y para cima).
+    // O tipo de cada vértice: a parte inteira diz o que é e a fração leva um número dele. 0: cor
+    // lisa; 1: imagem (uTex); 2: círculo (uv de -1 a 1, borda suave); 3: brilho (do centro para
+    // fora, de cheio a transparente); 4: degradê linear (u é a posição nele) e 5: radial (uv vai do
+    // centro, 1 na borda), com a linha do degradê na textura dos degradês na fração; 6: anel (a
+    // fração é o raio de dentro); 7: texto (na textura dos textos). Cores já multiplicadas pelo
+    // alfa. O filtro vale só para imagem e trabalha na cor sem o alfa multiplicado, como o
+    // ColorMatrix do Android. O recorte são semiplanos em pixels da janela (y para cima).
     private static final String FRAGMENTOS =
         "#version 300 es\n" +
         "precision mediump float;\n" +
-        "uniform sampler2D uTex;\n" +
+        "uniform sampler2D uTex; uniform sampler2D uTexto; uniform sampler2D uDegrade;\n" +
         "uniform mat4 uCor; uniform vec4 uCorSoma; uniform bool uFiltro; uniform bool uInverte;\n" +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
-        "in highp vec2 vUv; in vec4 vCor; in float vTipo;\n" +
+        "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
         "void main() {\n" +
         "  highp vec3 p = vec3(gl_FragCoord.xy, 1.0);\n" +
@@ -78,9 +79,11 @@ final class GlRenderCanvas implements RenderCanvas {
         "    if (i >= uNRecorte) break;\n" +
         "    if (dot(uRecorte[i], p) < 0.0) discard;\n" +
         "  }\n" +
+        "  highp float k = floor(vTipo + 0.0005);\n" +
+        "  highp float q = vTipo - k;\n" +
         "  vec4 c;\n" +
-        "  if (vTipo < 0.5) { c = vCor; }\n" +
-        "  else if (vTipo < 1.5) {\n" +
+        "  if (k < 0.5) { c = vCor; }\n" +
+        "  else if (k < 1.5) {\n" +
         "    vec4 t = texture(uTex, vUv);\n" +
         "    if (uFiltro) {\n" +
         "      vec3 s = t.a > 0.0 ? t.rgb / t.a : vec3(0.0);\n" +
@@ -88,24 +91,26 @@ final class GlRenderCanvas implements RenderCanvas {
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         "    }\n" +
         "    c = t * vCor;\n" +
-        "  } else if (vTipo < 3.5) {\n" +
+        "  } else if (k < 3.5) {\n" +
         "    float d = length(vUv);\n" +
-        "    float a = vTipo < 2.5 ? clamp((1.0 - d) / max(fwidth(d), 1e-4), 0.0, 1.0) : clamp(1.0 - d, 0.0, 1.0);\n" +
+        "    float a = k < 2.5 ? clamp((1.0 - d) / max(fwidth(d), 1e-4), 0.0, 1.0) : clamp(1.0 - d, 0.0, 1.0);\n" +
         "    c = vCor * a;\n" +
-        "  } else if (vTipo < 4.5) {\n" +
-        "    c = texture(uTex, vec2(vUv.x, 0.5)) * vCor;\n" +
-        "  } else if (vTipo < 5.5) {\n" +
-        "    c = texture(uTex, vec2(length(vUv), 0.5)) * vCor;\n" +
-        "  } else {\n" +
+        "  } else if (k < 5.5) {\n" +
+        "    highp float t = k < 4.5 ? vUv.x : length(vUv);\n" +
+        "    c = texture(uDegrade, vec2(clamp(t, 0.0, 1.0) * 0.99609375 + 0.001953125, q / 0.99)) * vCor;\n" +
+        "  } else if (k < 6.5) {\n" +
         "    float d = length(vUv), w = max(fwidth(d), 1e-4);\n" +
-        "    c = vCor * (clamp((1.0 - d) / w, 0.0, 1.0) * clamp((d - (vTipo - 6.0)) / w, 0.0, 1.0));\n" +
+        "    c = vCor * (clamp((1.0 - d) / w, 0.0, 1.0) * clamp((d - q) / w, 0.0, 1.0));\n" +
+        "  } else {\n" +
+        "    c = texture(uTexto, vUv) * vCor;\n" +
         "  }\n" +
         "  if (uInverte) c.rgb = vec3(c.a) - c.rgb;\n" +
         "  cor = c;\n" +
         "}\n";
 
     private static final int FLOATS = 9;
-    private static final int MAX_VERTICES = 6 * 8192;
+    /** Vértices de um quadro inteiro (passando disso, o que já tem vai e o quadro continua). */
+    private static final int MAX_VERTICES = 6 * 32768;
     private static final int MAX_PLANOS = 32;
     /**
      * Os vértices do lote num float[] comum, que vai inteiro para o OpenGL na hora de desenhar
@@ -114,12 +119,14 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     private final float[] dados = new float[MAX_VERTICES * FLOATS];
     private final FloatBuffer envio = FloatBuffer.wrap(dados);
-    private int vertices, posicao;
+    private int vertices, posicao, inicioLote;
     /** Por quadro, para o contador: vértices e o tempo nas chamadas ao OpenGL. */
     int verticesQuadro;
     long nsChamadas;
     private int texturaAtual;
-    private int programa, uTela, uTex, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
+    private int programa, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
+    /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
+    private int atlasTexto, atlasDegrade;
     private int larguraTela, alturaTela;
     private int maxTextura = 4096;
     /** Chamadas de desenho do quadro (para o contador). */
@@ -138,7 +145,6 @@ final class GlRenderCanvas implements RenderCanvas {
     private boolean inverte;
     private float[] recorte;
     private int nPlanos;
-    private boolean uniformesSujos = true;
     private final float[] matrizCor = new float[16];
     /** Transparência que vale para tudo o que vier (camada com alfa do Canvas), de 0 a 1. */
     private float alfaGlobal = 1f;
@@ -159,6 +165,8 @@ final class GlRenderCanvas implements RenderCanvas {
         if (ok[0] == 0) throw new IllegalStateException("shader: " + GLES30.glGetProgramInfoLog(programa));
         uTela = GLES30.glGetUniformLocation(programa, "uTela");
         uTex = GLES30.glGetUniformLocation(programa, "uTex");
+        uTexto = GLES30.glGetUniformLocation(programa, "uTexto");
+        uDegrade = GLES30.glGetUniformLocation(programa, "uDegrade");
         uCor = GLES30.glGetUniformLocation(programa, "uCor");
         uCorSoma = GLES30.glGetUniformLocation(programa, "uCorSoma");
         uFiltro = GLES30.glGetUniformLocation(programa, "uFiltro");
@@ -189,6 +197,12 @@ final class GlRenderCanvas implements RenderCanvas {
         texturas.clear();
         textos.clear();
         degrades.clear();
+        atlasTexto = novaTextura(ATLAS_TEXTO, ATLAS_TEXTO);
+        atlasDegrade = novaTextura(256, LINHAS_DEGRADE);
+        geracaoTexto++;
+        prateleiraX = prateleiraY = alturaPrateleira = 0;
+        comandos = 0;
+        vertices = posicao = inicioLote = 0;
         bytesTexturas = 0;
     }
 
@@ -219,10 +233,14 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glUseProgram(programa);
         GLES30.glUniform2f(uTela, largura, altura);
         GLES30.glUniform1i(uTex, 0);
+        GLES30.glUniform1i(uTexto, 1);
+        GLES30.glUniform1i(uDegrade, 2);
         a = largura / Arena.VW; b = 0f; c = 0f; d = altura / Arena.VH; e = 0f; f = 0f;
         topo = 0;
         vertices = 0;
         posicao = 0;
+        inicioLote = 0;
+        comandos = 0;
         texturaAtual = 0;
         chamadas = 0;
         verticesQuadro = 0;
@@ -232,11 +250,11 @@ final class GlRenderCanvas implements RenderCanvas {
         recorte = null;
         nPlanos = 0;
         alfaGlobal = 1f;
-        uniformesSujos = true;
     }
 
     void terminar() {
         descarregar();
+        executar();
     }
 
     int largura() { return larguraTela; }
@@ -264,7 +282,6 @@ final class GlRenderCanvas implements RenderCanvas {
         if (m == filtro) return;
         descarregar();
         filtro = m;
-        uniformesSujos = true;
     }
 
     /** Tira todo recorte (fora da pilha de save/restore: o desenho dos lutadores). */
@@ -273,7 +290,6 @@ final class GlRenderCanvas implements RenderCanvas {
         descarregar();
         recorte = null;
         nPlanos = 0;
-        uniformesSujos = true;
     }
 
     @Override public void save() {
@@ -294,7 +310,6 @@ final class GlRenderCanvas implements RenderCanvas {
             descarregar();
             recorte = pilhaRecorte[topo];
             nPlanos = pilhaNPlanos[topo];
-            uniformesSujos = true;
         }
         pilhaRecorte[topo] = null;
     }
@@ -352,57 +367,151 @@ final class GlRenderCanvas implements RenderCanvas {
         }
         recorte = planos;
         nPlanos = total;
-        uniformesSujos = true;
     }
 
     @Override public void beginInvert() {
         if (inverte) return;
         descarregar();
         inverte = true;
-        uniformesSujos = true;
     }
 
     @Override public void endInvert() {
         if (!inverte) return;
         descarregar();
         inverte = false;
-        uniformesSujos = true;
     }
 
     // ---- Lotes ----
 
+    // O quadro é gravado: cada lote vira um comando (de onde a onde nos vértices, a textura, o
+    // filtro, a inversão, o recorte e o stencil dele) e no fim tudo sobe de uma vez e os comandos
+    // são desenhados. Mandar os vértices a cada troca de estado (centenas por quadro com o HUD)
+    // fazia a placa de vídeo parar a cada envio.
+    private int comandos;
+    private int[] cmdInicio = new int[512], cmdQuantos = new int[512], cmdTextura = new int[512], cmdStencil = new int[512];
+    private int[] cmdNPlanos = new int[512];
+    private boolean[] cmdInverte = new boolean[512];
+    private float[][] cmdFiltro = new float[512][], cmdRecorte = new float[512][];
+    /** Stencil do lote: 0 nenhum; 1 marca (soma); 2 marca (par/ímpar); 3 pinta onde marcou. */
+    private int stencil;
+
+    /** Fecha o lote atual como um comando (a troca de estado vem depois). */
     private void descarregar() {
-        if (vertices == 0) return;
+        if (vertices == inicioLote) return;
+        if (comandos == cmdInicio.length) {
+            int n = comandos * 2;
+            cmdInicio = java.util.Arrays.copyOf(cmdInicio, n);
+            cmdQuantos = java.util.Arrays.copyOf(cmdQuantos, n);
+            cmdTextura = java.util.Arrays.copyOf(cmdTextura, n);
+            cmdStencil = java.util.Arrays.copyOf(cmdStencil, n);
+            cmdNPlanos = java.util.Arrays.copyOf(cmdNPlanos, n);
+            cmdInverte = java.util.Arrays.copyOf(cmdInverte, n);
+            cmdFiltro = java.util.Arrays.copyOf(cmdFiltro, n);
+            cmdRecorte = java.util.Arrays.copyOf(cmdRecorte, n);
+        }
+        int k = comandos++;
+        cmdInicio[k] = inicioLote;
+        cmdQuantos[k] = vertices - inicioLote;
+        cmdTextura[k] = texturaAtual;
+        cmdStencil[k] = stencil;
+        cmdFiltro[k] = filtro;
+        cmdInverte[k] = inverte;
+        cmdRecorte[k] = recorte;
+        cmdNPlanos[k] = nPlanos;
+        inicioLote = vertices;
+    }
+
+    /** Sobe os vértices gravados de uma vez e desenha os comandos. */
+    private void executar() {
+        if (comandos == 0) {
+            vertices = posicao = inicioLote = 0;
+            return;
+        }
         long inicio = System.nanoTime();
-        if (uniformesSujos) enviarUniformes();
         envio.position(0);
         GLES30.glBindVertexArray(vao);
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo);
         GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, posicao * 4, envio, GLES30.GL_STREAM_DRAW);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, atlasTexto);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE2);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, atlasDegrade);
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texturaAtual);
-        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vertices);
-        chamadas++;
+        int tex = -1, sten = 0;
+        float[] fil = null, rec = null;
+        int planos = -1;
+        boolean primeiro = true, inv = false;
+        for (int k = 0; k < comandos; k++) {
+            if (cmdTextura[k] != tex) {
+                tex = cmdTextura[k];
+                GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, tex);
+            }
+            if (primeiro || cmdFiltro[k] != fil) {
+                fil = cmdFiltro[k];
+                enviarFiltro(fil);
+            }
+            if (primeiro || cmdInverte[k] != inv) {
+                inv = cmdInverte[k];
+                GLES30.glUniform1i(uInverte, inv ? 1 : 0);
+            }
+            if (primeiro || cmdRecorte[k] != rec || cmdNPlanos[k] != planos) {
+                rec = cmdRecorte[k];
+                planos = cmdNPlanos[k];
+                GLES30.glUniform1i(uNRecorte, planos);
+                if (planos > 0) GLES30.glUniform3fv(uRecorte, planos, rec, 0);
+            }
+            if (cmdStencil[k] != sten) {
+                sten = cmdStencil[k];
+                aplicarStencil(sten);
+            }
+            primeiro = false;
+            GLES30.glDrawArrays(GLES30.GL_TRIANGLES, cmdInicio[k], cmdQuantos[k]);
+            chamadas++;
+        }
+        if (sten != 0) aplicarStencil(0);
         verticesQuadro += vertices;
-        vertices = 0;
-        posicao = 0;
+        for (int k = 0; k < comandos; k++) {
+            cmdFiltro[k] = null;
+            cmdRecorte[k] = null;
+        }
+        comandos = 0;
+        vertices = posicao = inicioLote = 0;
         nsChamadas += System.nanoTime() - inicio;
     }
 
-    private void enviarUniformes() {
-        uniformesSujos = false;
-        GLES30.glUniform1i(uFiltro, filtro != null ? 1 : 0);
-        if (filtro != null) {
-            // ColorMatrix é por linhas (4x5); o mat4 do GLSL é por colunas.
-            for (int linha = 0; linha < 4; linha++) {
-                for (int coluna = 0; coluna < 4; coluna++) matrizCor[coluna * 4 + linha] = filtro[linha * 5 + coluna];
-            }
-            GLES30.glUniformMatrix4fv(uCor, 1, false, matrizCor, 0);
-            GLES30.glUniform4f(uCorSoma, filtro[4] / 255f, filtro[9] / 255f, filtro[14] / 255f, filtro[19] / 255f);
+    private void aplicarStencil(int modo) {
+        if (modo == 0) {
+            GLES30.glColorMask(true, true, true, true);
+            GLES30.glDisable(GLES30.GL_STENCIL_TEST);
+            return;
         }
-        GLES30.glUniform1i(uInverte, inverte ? 1 : 0);
-        GLES30.glUniform1i(uNRecorte, nPlanos);
-        if (nPlanos > 0) GLES30.glUniform3fv(uRecorte, nPlanos, recorte, 0);
+        GLES30.glEnable(GLES30.GL_STENCIL_TEST);
+        GLES30.glStencilMask(0xFF);
+        if (modo == 3) {
+            GLES30.glColorMask(true, true, true, true);
+            GLES30.glStencilFunc(GLES30.GL_NOTEQUAL, 0, 0xFF);
+            GLES30.glStencilOp(GLES30.GL_ZERO, GLES30.GL_ZERO, GLES30.GL_ZERO);
+            return;
+        }
+        GLES30.glColorMask(false, false, false, false);
+        GLES30.glStencilFunc(GLES30.GL_ALWAYS, 0, 0xFF);
+        if (modo == 2) {
+            GLES30.glStencilOp(GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_INVERT);
+        } else {
+            GLES30.glStencilOpSeparate(GLES30.GL_FRONT, GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_INCR_WRAP);
+            GLES30.glStencilOpSeparate(GLES30.GL_BACK, GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_DECR_WRAP);
+        }
+    }
+
+    private void enviarFiltro(float[] m) {
+        GLES30.glUniform1i(uFiltro, m != null ? 1 : 0);
+        if (m == null) return;
+        // ColorMatrix é por linhas (4x5); o mat4 do GLSL é por colunas.
+        for (int linha = 0; linha < 4; linha++) {
+            for (int coluna = 0; coluna < 4; coluna++) matrizCor[coluna * 4 + linha] = m[linha * 5 + coluna];
+        }
+        GLES30.glUniformMatrix4fv(uCor, 1, false, matrizCor, 0);
+        GLES30.glUniform4f(uCorSoma, m[4] / 255f, m[9] / 255f, m[14] / 255f, m[19] / 255f);
     }
 
     private void usar(int textura) {
@@ -432,7 +541,10 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private void reservar(int n) {
-        if (vertices + n > MAX_VERTICES) descarregar();
+        if (vertices + n > MAX_VERTICES) {
+            descarregar();
+            executar();
+        }
     }
 
     /** Dois triângulos; cor ARGB sem multiplicar (aqui é multiplicada pelo alfa). */
@@ -466,7 +578,6 @@ final class GlRenderCanvas implements RenderCanvas {
         descarregar();
         recorte = planos;
         nPlanos = planos == null ? 0 : Math.min(n, MAX_PLANOS);
-        uniformesSujos = true;
     }
 
     /** Cores invertidas (a camada do impact frame). */
@@ -502,60 +613,70 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     void comecarStencil(boolean parImpar) {
         descarregar();
-        GLES30.glEnable(GLES30.GL_STENCIL_TEST);
-        GLES30.glColorMask(false, false, false, false);
-        GLES30.glStencilMask(0xFF);
-        GLES30.glStencilFunc(GLES30.GL_ALWAYS, 0, 0xFF);
-        if (parImpar) {
-            GLES30.glStencilOp(GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_INVERT);
-        } else {
-            GLES30.glStencilOpSeparate(GLES30.GL_FRONT, GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_INCR_WRAP);
-            GLES30.glStencilOpSeparate(GLES30.GL_BACK, GLES30.GL_KEEP, GLES30.GL_KEEP, GLES30.GL_DECR_WRAP);
-        }
+        stencil = parImpar ? 2 : 1;
     }
 
     void cobrirStencil() {
         descarregar();
-        GLES30.glColorMask(true, true, true, true);
-        GLES30.glStencilFunc(GLES30.GL_NOTEQUAL, 0, 0xFF);
-        GLES30.glStencilOp(GLES30.GL_ZERO, GLES30.GL_ZERO, GLES30.GL_ZERO);
+        stencil = 3;
     }
 
     void terminarStencil() {
         descarregar();
-        GLES30.glDisable(GLES30.GL_STENCIL_TEST);
+        stencil = 0;
     }
 
-    // Degradês: uma textura de 256x1 por combinação de cores (guardadas as últimas).
-    private static final int DEGRADES = 64;
-    private final LinkedHashMap<String, Integer> degrades = new LinkedHashMap<String, Integer>(DEGRADES, 0.75f, true) {
-        @Override protected boolean removeEldestEntry(Map.Entry<String, Integer> velho) {
-            if (size() <= DEGRADES) return false;
-            int id = velho.getValue();
-            if (id == texturaAtual) {
-                descarregar();
-                texturaAtual = 0;
-            }
-            GLES30.glDeleteTextures(1, new int[] {id}, 0);
-            return true;
-        }
-    };
+    // Degradês: uma linha de 256 pixels por combinação de cores, todas numa textura só.
+    private static final int LINHAS_DEGRADE = 128;
+    private final java.util.HashMap<String, Integer> degrades = new java.util.HashMap<>();
     private final StringBuilder chaveDegrade = new StringBuilder();
+    private final java.nio.ByteBuffer linhaDegrade = java.nio.ByteBuffer.allocateDirect(256 * 4);
 
-    /** A textura do degradê (as cores ao longo dele, já com o alfa multiplicado). */
-    int texturaDegrade(Degrade.Dados dados) {
+    private static int novaTextura(int largura, int altura) {
+        int[] id = new int[1];
+        GLES30.glGenTextures(1, id, 0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA, largura, altura, 0, GLES30.GL_RGBA,
+            GLES30.GL_UNSIGNED_BYTE, null);
+        return id[0];
+    }
+
+    /**
+     * O tipo do vértice para o degradê (4 linear, 5 radial, com a linha dele na fração). A linha
+     * é feita na primeira vez (as cores, já com o alfa multiplicado).
+     */
+    float tipoDegrade(Degrade.Dados dados) {
         int[] cores = dados.cores();
         float[] pos = dados.posicoes();
         chaveDegrade.setLength(0);
         for (int cor : cores) chaveDegrade.append(cor).append(',');
         chaveDegrade.append('|');
         if (pos != null) for (float p : pos) chaveDegrade.append(p).append(',');
-        chaveDegrade.append('|').append(dados.modo());
         String chave = chaveDegrade.toString();
-        Integer pronto = degrades.get(chave);
-        if (pronto != null) return pronto;
+        Integer linha = degrades.get(chave);
+        if (linha == null) {
+            if (degrades.size() >= LINHAS_DEGRADE) {
+                // Cheia: o que já foi gravado sai antes de as linhas serem reaproveitadas.
+                descarregar();
+                executar();
+                degrades.clear();
+            }
+            linha = degrades.size();
+            degrades.put(chave, linha);
+            escreverDegrade(cores, pos, linha);
+        }
+        float q = (linha + 0.5f) / LINHAS_DEGRADE * 0.99f;
+        return (dados.radial() ? 5f : 4f) + q;
+    }
+
+    private void escreverDegrade(int[] cores, float[] pos, int linha) {
         int n = 256;
-        java.nio.ByteBuffer px = java.nio.ByteBuffer.allocateDirect(n * 4);
+        java.nio.ByteBuffer px = linhaDegrade;
+        px.clear();
         for (int i = 0; i < n; i++) {
             float t = i / (float)(n - 1);
             int k = 0;
@@ -581,18 +702,52 @@ final class GlRenderCanvas implements RenderCanvas {
             px.put((byte)Math.round(al * 255f));
         }
         px.position(0);
-        int[] id = new int[1];
-        GLES30.glGenTextures(1, id, 0);
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
-        int wrap = dados.modo() == android.graphics.Shader.TileMode.REPEAT ? GLES30.GL_REPEAT
-            : dados.modo() == android.graphics.Shader.TileMode.MIRROR ? GLES30.GL_MIRRORED_REPEAT : GLES30.GL_CLAMP_TO_EDGE;
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, wrap);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
-        GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA, n, 1, 0, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, px);
-        degrades.put(chave, id[0]);
-        return id[0];
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, atlasDegrade);
+        GLES30.glTexSubImage2D(GLES30.GL_TEXTURE_2D, 0, 0, linha, n, 1, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, px);
+    }
+
+    // Textos: todos numa textura só (prateleiras); cheia, recomeça (os textos são refeitos).
+    private static final int ATLAS_TEXTO = 2048;
+    private int prateleiraX, prateleiraY, alturaPrateleira;
+    /** Muda quando a textura dos textos recomeça: quem guardou um lugar nela faz de novo. */
+    int geracaoTexto;
+
+    /**
+     * Guarda o bitmap de um texto na textura dos textos e devolve o lugar dele ({u0, v0, u1, v1}),
+     * ou null se não cabe. O bitmap é solto.
+     */
+    float[] guardarTexto(Bitmap bmp) {
+        int w = bmp.getWidth(), h = bmp.getHeight();
+        if (w + 2 > ATLAS_TEXTO || h + 2 > ATLAS_TEXTO) {
+            bmp.recycle();
+            return null;
+        }
+        if (prateleiraX + w + 2 > ATLAS_TEXTO) {
+            prateleiraX = 0;
+            prateleiraY += alturaPrateleira;
+            alturaPrateleira = 0;
+        }
+        if (prateleiraY + h + 2 > ATLAS_TEXTO) {
+            // Cheia: o que já foi gravado sai com os textos de agora, e ela recomeça.
+            descarregar();
+            executar();
+            prateleiraX = prateleiraY = alturaPrateleira = 0;
+            geracaoTexto++;
+            textos.clear();
+        }
+        int x = prateleiraX + 1, y = prateleiraY + 1;
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, atlasTexto);
+        GLUtils.texSubImage2D(GLES30.GL_TEXTURE_2D, 0, x, y, bmp);
+        bmp.recycle();
+        prateleiraX += w + 2;
+        alturaPrateleira = Math.max(alturaPrateleira, h + 2);
+        float k = 1f / ATLAS_TEXTO;
+        return new float[] {x * k, y * k, (x + w) * k, (y + h) * k};
+    }
+
+    /** Um texto guardado ({@link #guardarTexto}) no retângulo, sem trocar de textura. */
+    void desenharTexto(float[] uv, float l, float t, float r, float b, int argb) {
+        retangulo(l, t, r, b, uv[0], uv[1], uv[2], uv[3], argb, 7f);
     }
 
     private static float mistura(float a, float b, float f) {
@@ -652,6 +807,9 @@ final class GlRenderCanvas implements RenderCanvas {
 
     private void apagar(Textura t) {
         if (t.id == 0) return;
+        // Algum desenho gravado pode usar esta textura: sai antes.
+        descarregar();
+        executar();
         if (t.id == texturaAtual) {
             descarregar();
             texturaAtual = 0;
@@ -829,25 +987,18 @@ final class GlRenderCanvas implements RenderCanvas {
 
     // ---- Texto: cada texto desenhado vira uma textura (guardadas as últimas) ----
 
-    private static final int TEXTOS = 48;
     private final Paint textoPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
         textoPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textoPaint.setTextAlign(Paint.Align.LEFT);
     }
-    /** Um texto pronto: a textura e onde fica o ponto (x, linha de base) dentro dela, em pixels. */
+    /** Um texto pronto: o lugar dele na textura dos textos e o ponto (x, linha de base), em pixels. */
     private static final class Texto {
-        int id;
+        float[] uv;
         int largura, altura;
         float origemX, origemY, escala;
     }
-    private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, true) {
-        @Override protected boolean removeEldestEntry(Map.Entry<String, Texto> velho) {
-            if (size() <= TEXTOS) return false;
-            GLES30.glDeleteTextures(1, new int[] {velho.getValue().id}, 0);
-            return true;
-        }
-    };
+    private final java.util.HashMap<String, Texto> textos = new java.util.HashMap<>();
 
     @Override
     public void drawText(String text, float x, float y, float size, int fillArgb, int strokeArgb, float strokeWidth, boolean italic) {
@@ -864,12 +1015,10 @@ final class GlRenderCanvas implements RenderCanvas {
             t.escala = escala;
             textos.put(chave, t);
         }
-        usar(t.id);
-        filtro(null);
         float k = 1f / t.escala;
         // Centralizado em x, com a linha de base em y (como no Canvas).
         float l = x - t.origemX * k, top = y - t.origemY * k;
-        retangulo(l, top, l + t.largura * k, top + t.altura * k, 0f, 0f, 1f, 1f, 0xFFFFFFFF, 1f);
+        desenharTexto(t.uv, l, top, l + t.largura * k, top + t.altura * k, 0xFFFFFFFF);
     }
 
     private Texto criarTexto(String text, float size, int fill, int stroke, float strokeWidth, boolean italic) {
@@ -895,17 +1044,10 @@ final class GlRenderCanvas implements RenderCanvas {
         textoPaint.setColor(fill);
         cv.drawText(text, bx, by, textoPaint);
         textoPaint.setTextSkewX(0f);
-        int[] id = new int[1];
-        GLES30.glGenTextures(1, id, 0);
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
-        GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bmp, 0);
-        bmp.recycle();
+        float[] uv = guardarTexto(bmp);
+        if (uv == null) return null;
         Texto t = new Texto();
-        t.id = id[0];
+        t.uv = uv;
         t.largura = w;
         t.altura = h;
         // A âncora: o meio do texto na horizontal e a linha de base.

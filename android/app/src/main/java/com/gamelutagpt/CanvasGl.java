@@ -242,10 +242,9 @@ final class CanvasGl extends Canvas {
             return;
         }
         corPincel = (p.getAlpha() << 24) | 0xFFFFFF;
-        tipoPincel = degrade.radial() ? 5f : 4f;
+        tipoPincel = gl.tipoDegrade(degrade);
         degradeLocal = s.getLocalMatrix(local) && !local.isIdentity();
         if (degradeLocal) local.invert(inversa);
-        gl.textura(gl.texturaDegrade(degrade));
     }
 
     /** O uv do degradê no ponto (x, y) do espaço atual. */
@@ -579,7 +578,6 @@ final class CanvasGl extends Canvas {
         degrade = dg;
         corPincel = cor;
         tipoPincel = tipoAntes;
-        if (degrade != null) gl.textura(gl.texturaDegrade(degrade));
         tri(caixa.left, caixa.top, caixa.right, caixa.top, caixa.right, caixa.bottom);
         tri(caixa.left, caixa.top, caixa.right, caixa.bottom, caixa.left, caixa.bottom);
         gl.terminarStencil();
@@ -732,17 +730,16 @@ final class CanvasGl extends Canvas {
     private static final int TEXTOS = 160;
 
     private static final class Texto {
-        Bitmap bitmap;
-        GlRenderCanvas.Textura textura;
+        /** O lugar na textura dos textos e a geração dela (recomeçou: faz de novo). */
+        float[] uv;
+        int geracao;
         /** Onde fica o ponto (x, linha de base) no bitmap, e o tamanho dele, no espaço local. */
         float origemX, origemY, largura, altura;
     }
 
     private final LinkedHashMap<String, Texto> textos = new LinkedHashMap<String, Texto>(TEXTOS, 0.75f, true) {
         @Override protected boolean removeEldestEntry(Map.Entry<String, Texto> velho) {
-            if (size() <= TEXTOS) return false;
-            gl.soltar(velho.getValue().bitmap);
-            return true;
+            return size() > TEXTOS;
         }
     };
     private final StringBuilder chave = new StringBuilder();
@@ -784,13 +781,14 @@ final class CanvasGl extends Canvas {
         if (sh != null) chave.append(',').append(System.identityHashCode(sh)).append(',').append(x).append(',').append(y);
         String k = chave.toString();
         Texto t = textos.get(k);
+        if (t != null && t.geracao != gl.geracaoTexto) t = null;
         if (t == null) {
             t = criarTexto(s, x, y, p, esc);
             if (t == null) return;
             textos.put(k, t);
         }
         float l = x - t.origemX, top = y - t.origemY;
-        gl.desenharTextura(t.textura, 0f, 0f, t.textura.largura, t.textura.altura, l, top, l + t.largura, top + t.altura, 255);
+        gl.desenharTexto(t.uv, l, top, l + t.largura, top + t.altura, 0xFFFFFFFF);
     }
 
     private Texto criarTexto(String s, float x, float y, Paint p, float esc) {
@@ -813,9 +811,9 @@ final class CanvasGl extends Canvas {
         cv.translate(-l, -t);
         cv.drawText(s, x, y, p);
         Texto texto = new Texto();
-        texto.bitmap = bmp;
-        texto.textura = gl.textura(bmp, true);
-        if (texto.textura == null) return null;
+        texto.uv = gl.guardarTexto(bmp);
+        if (texto.uv == null) return null;
+        texto.geracao = gl.geracaoTexto;
         texto.origemX = x - l;
         texto.origemY = y - t;
         texto.largura = bw / esc;
