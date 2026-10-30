@@ -441,7 +441,8 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     /** Teste automático: textos que viraram bitmap, formas com stencil e desenhos do último quadro. */
     int[] contagem() {
-        return new int[] {canvasGl.textosNovos + canvas.textosNovosRc, canvasGl.formasStencil, canvasGl.desenhos};
+        return new int[] {canvasGl.textosNovos + canvas.textosNovosRc, canvasGl.formasStencil, canvasGl.desenhos,
+            Math.round(canvas.telasPintadas() * 10f)};
     }
 
     /** Para o contador: chamadas do último quadro, texturas e memória delas. */

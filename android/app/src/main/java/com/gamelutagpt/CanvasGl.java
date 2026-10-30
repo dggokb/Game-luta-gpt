@@ -1011,19 +1011,125 @@ final class CanvasGl extends Canvas {
         return (float)Math.pow(2.0, Math.round(Math.log(largura) / Math.log(2) * 8.0) / 8.0);
     }
 
+    /** Os textos de um caractere só, sem criar String a cada quadro. */
+    private static final String[] CARACTERES = new String[128];
+    private static final java.util.HashMap<Character, String> OUTROS = new java.util.HashMap<>();
+    static {
+        for (char ch = 0; ch < 128; ch++) CARACTERES[ch] = String.valueOf(ch);
+    }
+
+    private static String caractere(char ch) {
+        if (ch < 128) return CARACTERES[ch];
+        String s = OUTROS.get(ch);
+        if (s == null) {
+            s = String.valueOf(ch);
+            OUTROS.put(ch, s);
+        }
+        return s;
+    }
+
+    /**
+     * Textos que mudam o tempo todo e não precisam de acerto entre letras (o contador de FPS e o
+     * relatório do teste): letra por letra. As linhas do diagnóstico, compridas e novas a cada
+     * 2 s, ocupavam sozinhas um quarto da textura dos textos; o medidor pesava no que mede.
+     */
+    private boolean porCaractere;
+
+    void porCaractere(boolean ligado) {
+        porCaractere = ligado;
+    }
+
+    /** Só algarismos e os sinais que andam com eles (dano, combo, tempo, porcentagem). */
+    private static boolean numero(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if ((ch < '0' || ch > '9') && ch != '+' && ch != '-' && ch != '.' && ch != ',' && ch != '%' && ch != 'x') return false;
+        }
+        return true;
+    }
+
+    /**
+     * Número (o dano que pula a cada golpe, o combo, o tempo): montado com um bitmap por
+     * algarismo, como uma fonte de jogo. Inteiro, cada valor novo era um bitmap novo (e grande:
+     * o dano do SHINKAI tem três camadas e cresce ao bater), e eles enchiam a textura dos textos
+     * várias vezes por luta; a cada vez todos os textos da tela eram refeitos de uma vez.
+     */
+    private boolean textoPorAlgarismo(String s, float x, float y, Paint p) {
+        if (s.length() < 2) {
+            // Um algarismo só (o contador de combo até 9, o nível da barra): já é um glifo.
+            glifo = numero(s);
+            return false;
+        }
+        // Sem shader, ou com o degradê linear que a placa de vídeo põe por cima da forma (o do
+        // contador de combo): ele vai pela posição na tela, igual letra por letra.
+        Shader sh = p.getShader();
+        if (sh != null && !(sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial())) return false;
+        if (!porCaractere && !numero(s)) return false;
+        float total = 0f;
+        for (int i = 0; i < s.length(); i++) total += p.measureText(caractere(s.charAt(i)));
+        glifo = true;
+        Paint.Align alinhamento = p.getTextAlign();
+        float xi = alinhamento == Paint.Align.CENTER ? x - total * 0.5f : alinhamento == Paint.Align.RIGHT ? x - total : x;
+        p.setTextAlign(Paint.Align.LEFT);
+        for (int i = 0; i < s.length(); i++) {
+            String ch = caractere(s.charAt(i));
+            if (ch.charAt(0) != ' ') texto(ch, xi, y, p);
+            xi += p.measureText(ch);
+        }
+        p.setTextAlign(alinhamento);
+        glifo = false;
+        return true;
+    }
+
+    /**
+     * Desenhando letra por letra: o tamanho e a escala do bitmap vão em degraus de uma oitava,
+     * sempre para cima (a placa de vídeo reduz até a metade). O número de dano que bate grande,
+     * com a câmera aproximando, fazia cada algarismo em dezenas de tamanhos.
+     */
+    private boolean glifo;
+
+    private static float meiaOitavaAcima(float v) {
+        return (float)Math.pow(2.0, Math.ceil(Math.log(Math.max(1f, v)) / Math.log(2) * 2.0 - 1e-4) / 2.0);
+    }
+
+    private static float quartoDeOitava(float v) {
+        if (v <= 0f) return 0f;
+        return (float)Math.pow(2.0, Math.round(Math.log(v) / Math.log(2) * 4.0) / 4.0);
+    }
+
     private void texto(String s, float x, float y, Paint p) {
         if (s == null || s.isEmpty()) return;
+        boolean deFora = !glifo;
+        if (textoPorAlgarismo(s, x, y, p)) return;
+        try {
+            textoInteiro(s, x, y, p);
+        } finally {
+            // O glifo de um caractere só vale para esta chamada (letra por letra, quem chama limpa).
+            if (deFora) glifo = false;
+        }
+    }
+
+    private void textoInteiro(String s, float x, float y, Paint p) {
         prepararGl();
         // Texto que pulsa pelo tamanho da fonte (o contador de golpes, a cada acerto) é feito num
         // degrau de tamanho e esticado por k no desenho: antes cada quadro era um bitmap novo.
         float tamanho = p.getTextSize();
-        float base = degrauDeTamanho(tamanho);
-        float k = tamanho / base;
-        float esc = degrauDeEscala(escala() * k);
+        float base, k, esc;
+        if (glifo) {
+            // Um degrau só: o tamanho final em pixels da tela (fonte × escala), em meias oitavas
+            // para cima; o bitmap é feito nele e a placa de vídeo reduz o resto.
+            base = meiaOitavaAcima(tamanho * escala());
+            k = tamanho / base;
+            esc = 1f;
+        } else {
+            base = degrauDeTamanho(tamanho);
+            k = tamanho / base;
+            esc = degrauDeEscala(escala() * k);
+        }
         // O contorno no tamanho do degrau, em degraus de 1/8 de oitava (~9%): tanto o proporcional
         // à fonte (o número de dano) quanto o fixo com a fonte pulsando (o contador de combo, 12 px)
         // ficam em um ou dois valores, e não num valor novo a cada quadro.
-        float traco = degrauDeContorno(p.getStrokeWidth() / k);
+        float traco = glifo ? quartoDeOitava(p.getStrokeWidth() / k) : degrauDeContorno(p.getStrokeWidth() / k);
         Shader sh = p.getShader();
         // Degradê linear: o texto vira só a forma (branca) e o degradê é posto pela placa de vídeo.
         boolean mascara = sh instanceof Degrade.Dados && !((Degrade.Dados)sh).radial();
@@ -1031,8 +1137,11 @@ final class CanvasGl extends Canvas {
         chave.setLength(0);
         // A transparência da cor fica de fora: entra na hora de desenhar (o texto que some aos
         // poucos é o mesmo bitmap).
+        // Sem shader o texto é feito branco e a cor entra no desenho (a placa de vídeo multiplica,
+        // o resultado é o mesmo): um bitmap serve a todas as cores (o contorno escuro, a sombra
+        // colorida e o branco do mesmo número; os rótulos do HUD em cada cor).
         chave.append(s).append('\u0000').append(base).append(',')
-            .append(mascara ? 0 : (cor | 0xFF000000)).append(',')
+            .append(mascara || sh == null ? 0 : (cor | 0xFF000000)).append(',')
             .append(p.getStyle().ordinal()).append(',').append(traco).append(',')
             .append(p.getTextAlign().ordinal()).append(',').append(p.getTextSkewX()).append(',')
             .append(p.isFakeBoldText()).append(',').append(p.getTextScaleX()).append(',')
@@ -1046,16 +1155,20 @@ final class CanvasGl extends Canvas {
         }
         String kt = chave.toString();
         Texto t = textos.get(kt);
-        if (t != null && t.geracao != gl.geracaoTexto) t = null;
+        if (t != null && !gl.textoVale(t.uv, t.geracao)) t = null;
         String solta = null;
         if (t == null) {
             chaveSolta.setLength(0);
-            chaveSolta.append(s).append('\u0000').append(mascara ? 0 : (cor | 0xFF000000)).append(',')
+            chaveSolta.append(s).append('\u0000').append(mascara || sh == null ? 0 : (cor | 0xFF000000)).append(',')
                 .append(p.getStyle().ordinal()).append(',').append(p.getTextAlign().ordinal()).append(',')
+                // A mesma fonte (o reaproveitado só muda de tamanho): com a cor fora da chave, o
+                // "S" em negrito do HUD servia de "S" do relatório.
+                .append(System.identityHashCode(p.getTypeface())).append(',').append(p.isFakeBoldText()).append(',')
+                .append(p.getTextSkewX()).append(',').append(p.getTextScaleX()).append(',')
                 .append(mascara ? "M" : sh != null ? String.valueOf(System.identityHashCode(sh)) : "");
             solta = chaveSolta.toString();
             Texto ultimo = ultimoDoTexto.get(solta);
-            if (ultimo != null && ultimo.geracao == gl.geracaoTexto) {
+            if (ultimo != null && gl.textoVale(ultimo.uv, ultimo.geracao)) {
                 if (ultimo.base == base && ultimo.traco == traco && ultimo.esc >= esc * 0.999f && ultimo.esc <= esc * 2.01f) {
                     // O texto que entra grande e encolhe (o SHINKAI, a vitória, o nome do Ultra):
                     // o bitmap do quadro maior serve aos menores, a placa de vídeo reduz.
@@ -1068,11 +1181,13 @@ final class CanvasGl extends Canvas {
         }
         if (t == null) {
             Paint feito = p;
-            if (mascara || p.getAlpha() != 255 || base != tamanho || traco != p.getStrokeWidth()) {
+            if (mascara || sh == null || p.getAlpha() != 255 || base != tamanho || traco != p.getStrokeWidth()) {
                 // Opaco e no degrau de tamanho: a transparência e o resto da escala vêm no desenho.
                 pincelTexto.set(p);
                 if (mascara) {
                     pincelTexto.setShader(null);
+                    pincelTexto.setColor(0xFFFFFFFF);
+                } else if (sh == null) {
                     pincelTexto.setColor(0xFFFFFFFF);
                 } else {
                     pincelTexto.setAlpha(255);
@@ -1081,6 +1196,7 @@ final class CanvasGl extends Canvas {
                 pincelTexto.setStrokeWidth(traco);
                 feito = pincelTexto;
             }
+            TesteAutomatico.textoPedido(s);
             t = criarTexto(s, x, y, feito, esc);
             if (t == null) return;
             t.base = base;
@@ -1104,8 +1220,7 @@ final class CanvasGl extends Canvas {
             gl.desenharTextoDegrade(t.uv, l, top, r, b, t0, t1, t2, uvU, tipoPincel, p.getAlpha());
             return;
         }
-        int alfa = sh == null ? cor >>> 24 : p.getAlpha();
-        gl.desenharTexto(t.uv, l, top, r, b, (alfa << 24) | 0xFFFFFF);
+        gl.desenharTexto(t.uv, l, top, r, b, sh == null ? cor : (p.getAlpha() << 24) | 0xFFFFFF);
     }
 
     private Texto criarTexto(String s, float x, float y, Paint p, float esc) {

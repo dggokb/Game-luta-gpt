@@ -297,6 +297,8 @@ tasks.register('medirLuta', JavaExec) {
     if (providers.gradleProperty('resolucao').isPresent()) args providers.gradleProperty('resolucao').get()
     // -Pgl: a luta pela placa de vídeo (OpenGL), como na janela do jogo (precisa de DISPLAY).
     if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
+    // -Parea: de onde vem cada desenho grande (o que pinta a tela muitas vezes), no fim do relatório.
+    if (providers.gradleProperty('area').isPresent()) systemProperty 'gameluta.areaPorOrigem', 'true'
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
 }
 

@@ -200,11 +200,16 @@ final class GlRenderCanvas implements RenderCanvas {
         // O contexto é novo: as texturas antigas não existem mais.
         for (Textura t : texturas.values()) t.id = 0;
         texturas.clear();
+        textosProprios.clear();
+        texturasDeTextoVivas.clear();
         textos.clear();
         ultimoDoTexto.clear();
         degrades.clear();
         linhaDoObjeto.clear();
-        atlasTexto = novaTextura(ATLAS_TEXTO, ATLAS_TEXTO);
+        // 4096 onde a placa aceita (quase todas): 2048 enchia algumas vezes por luta, e a cada vez
+        // todos os textos da tela eram refeitos no mesmo quadro.
+        ladoTexto = Math.min(4096, maxTextura);
+        atlasTexto = novaTextura(ladoTexto, ladoTexto);
         atlasDegrade = novaTextura(256, LINHAS_DEGRADE);
         geracaoTexto++;
         prateleiraX = prateleiraY = alturaPrateleira = 0;
@@ -226,6 +231,8 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Começa o quadro numa tela de {@code largura}x{@code altura} pixels, preta, na tela virtual. */
     void comecar(int largura, int altura) {
         textosNovosRc = 0;
+        areaPintada = 0;
+        cantoTri = 0;
         larguraTela = largura;
         alturaTela = altura;
         GLES30.glViewport(0, 0, largura, altura);
@@ -529,6 +536,70 @@ final class GlRenderCanvas implements RenderCanvas {
         texturaAtual = textura;
     }
 
+    /** Área pintada no quadro (pixels, somando cada triângulo): o teste automático lê. */
+    double areaPintada;
+    private int cantoTri;
+    private float triX0, triY0, triX1, triY1;
+
+    private void area(float x, float y) {
+        if (cantoTri == 0) {
+            triX0 = x; triY0 = y;
+        } else if (cantoTri == 1) {
+            triX1 = x; triY1 = y;
+        } else {
+            double t = areaNaTela(triX0, triY0, triX1, triY1, x, y);
+            areaPintada += t;
+            if (TesteAutomatico.areaPorOrigem && t > 0.002 * larguraTela * alturaTela) {
+                TesteAutomatico.areaGrande(t / ((double)larguraTela * alturaTela));
+            }
+        }
+        cantoTri = cantoTri == 2 ? 0 : cantoTri + 1;
+    }
+
+    private final float[] poliA = new float[32], poliB = new float[32];
+
+    /** Área do triângulo dentro da tela (a placa de vídeo não pinta o que fica fora). */
+    private double areaNaTela(float x0, float y0, float x1, float y1, float x2, float y2) {
+        float w = larguraTela, h = alturaTela;
+        float minX = Math.min(x0, Math.min(x1, x2)), maxX = Math.max(x0, Math.max(x1, x2));
+        float minY = Math.min(y0, Math.min(y1, y2)), maxY = Math.max(y0, Math.max(y1, y2));
+        if (maxX <= 0 || maxY <= 0 || minX >= w || minY >= h) return 0;
+        if (minX >= 0 && minY >= 0 && maxX <= w && maxY <= h) {
+            return Math.abs((x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0)) * 0.5;
+        }
+        // Sutherland–Hodgman nos quatro lados da tela.
+        float[] a = poliA, b = poliB;
+        a[0] = x0; a[1] = y0; a[2] = x1; a[3] = y1; a[4] = x2; a[5] = y2;
+        int n = 3;
+        for (int lado = 0; lado < 4 && n > 0; lado++) {
+            int m = 0;
+            for (int i = 0; i < n; i++) {
+                float px = a[i * 2], py = a[i * 2 + 1];
+                float qx = a[((i + 1) % n) * 2], qy = a[((i + 1) % n) * 2 + 1];
+                float dp = lado == 0 ? px : lado == 1 ? w - px : lado == 2 ? py : h - py;
+                float dq = lado == 0 ? qx : lado == 1 ? w - qx : lado == 2 ? qy : h - qy;
+                if (dp >= 0) { b[m * 2] = px; b[m * 2 + 1] = py; m++; }
+                if ((dp >= 0) != (dq >= 0) && m < 15) {
+                    float f = dp / (dp - dq);
+                    b[m * 2] = px + (qx - px) * f; b[m * 2 + 1] = py + (qy - py) * f; m++;
+                }
+            }
+            float[] t = a; a = b; b = t;
+            n = m;
+        }
+        double s = 0;
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            s += a[i * 2] * a[j * 2 + 1] - a[j * 2] * a[i * 2 + 1];
+        }
+        return Math.abs(s) * 0.5;
+    }
+
+    /** Telas inteiras pintadas no último quadro (1 = cada pixel uma vez). */
+    float telasPintadas() {
+        return larguraTela > 0 && alturaTela > 0 ? (float)(areaPintada / ((double)larguraTela * alturaTela)) : 0f;
+    }
+
     private void vertice(float x, float y, float u, float v, float r, float g, float bl, float al, float tipo) {
         if (alfaGlobal != 1f) {
             r *= alfaGlobal; g *= alfaGlobal; bl *= alfaGlobal; al *= alfaGlobal;
@@ -537,6 +608,7 @@ final class GlRenderCanvas implements RenderCanvas {
         int k = posicao;
         o[k] = a * x + c * y + e;
         o[k + 1] = b * x + d * y + f;
+        area(o[k], o[k + 1]);
         o[k + 2] = u;
         o[k + 3] = v;
         o[k + 4] = r;
@@ -560,6 +632,7 @@ final class GlRenderCanvas implements RenderCanvas {
                       float u0, float v0, float u1, float v1, int argb, float tipo) {
         float al = (argb >>> 24) / 255f;
         float r = ((argb >> 16) & 0xFF) / 255f * al, g = ((argb >> 8) & 0xFF) / 255f * al, bl = (argb & 0xFF) / 255f * al;
+        if (nPlanos > 0 && quadRecortado(x0, y0, x1, y1, x2, y2, x3, y3, u0, v0, u1, v1, r, g, bl, al, tipo)) return;
         reservar(6);
         vertice(x0, y0, u0, v0, r, g, bl, al, tipo);
         vertice(x1, y1, u1, v0, r, g, bl, al, tipo);
@@ -567,6 +640,89 @@ final class GlRenderCanvas implements RenderCanvas {
         vertice(x0, y0, u0, v0, r, g, bl, al, tipo);
         vertice(x2, y2, u1, v1, r, g, bl, al, tipo);
         vertice(x3, y3, u0, v1, r, g, bl, al, tipo);
+    }
+
+    /** Polígono do quadrilátero recortado: x, y (tela) e u, v de cada canto, nos dois vetores. */
+    private final float[] corteA = new float[(4 + MAX_PLANOS) * 4], corteB = new float[(4 + MAX_PLANOS) * 4];
+
+    /**
+     * Com recorte: o quadrilátero já sai cortado nos semiplanos, para a placa de vídeo pintar só
+     * o pedaço que aparece. Pelo shader (que descarta pixel a pixel) ela pagava a imagem inteira:
+     * cada painel da página do Ultra desenha a imagem do tamanho da página e mostra uma fatia,
+     * e eram 30 telas pintadas por quadro. As cores e o uv variam em linha reta no quadrilátero,
+     * então o corte é exato. False se nenhum semiplano corta (o caminho de sempre desenha).
+     */
+    private boolean quadRecortado(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3,
+                                  float u0, float v0, float u1, float v1, float r, float g, float bl, float al, float tipo) {
+        float[] p = corteA, q = corteB;
+        canto(p, 0, x0, y0, u0, v0);
+        canto(p, 1, x1, y1, u1, v0);
+        canto(p, 2, x2, y2, u1, v1);
+        canto(p, 3, x3, y3, u0, v1);
+        int n = 4;
+        boolean cortou = false;
+        for (int k = 0; k < nPlanos && n >= 3; k++) {
+            float pa = recorte[k * 3], pb = recorte[k * 3 + 1], pc = recorte[k * 3 + 2];
+            int m = 0;
+            boolean tudoDentro = true;
+            for (int i = 0; i < n; i++) {
+                int j = (i + 1) % n;
+                float di = pa * p[i * 4] + pb * (alturaTela - p[i * 4 + 1]) + pc;
+                float dj = pa * p[j * 4] + pb * (alturaTela - p[j * 4 + 1]) + pc;
+                if (di >= 0f) {
+                    System.arraycopy(p, i * 4, q, m * 4, 4);
+                    m++;
+                } else {
+                    tudoDentro = false;
+                }
+                if ((di >= 0f) != (dj >= 0f)) {
+                    float t = di / (di - dj);
+                    for (int w = 0; w < 4; w++) q[m * 4 + w] = p[i * 4 + w] + (p[j * 4 + w] - p[i * 4 + w]) * t;
+                    m++;
+                }
+            }
+            if (tudoDentro) continue;
+            cortou = true;
+            float[] troca = p; p = q; q = troca;
+            n = m;
+        }
+        if (!cortou) return false;
+        if (n < 3) return true;
+        reservar((n - 2) * 3);
+        if (alfaGlobal != 1f) {
+            r *= alfaGlobal; g *= alfaGlobal; bl *= alfaGlobal; al *= alfaGlobal;
+        }
+        for (int i = 1; i < n - 1; i++) {
+            verticeTela(p[0], p[1], p[2], p[3], r, g, bl, al, tipo);
+            verticeTela(p[i * 4], p[i * 4 + 1], p[i * 4 + 2], p[i * 4 + 3], r, g, bl, al, tipo);
+            verticeTela(p[(i + 1) * 4], p[(i + 1) * 4 + 1], p[(i + 1) * 4 + 2], p[(i + 1) * 4 + 3], r, g, bl, al, tipo);
+        }
+        return true;
+    }
+
+    private void canto(float[] p, int i, float x, float y, float u, float v) {
+        p[i * 4] = a * x + c * y + e;
+        p[i * 4 + 1] = b * x + d * y + f;
+        p[i * 4 + 2] = u;
+        p[i * 4 + 3] = v;
+    }
+
+    /** Vértice já em pixels da tela (sem a transformação), com a cor pronta. */
+    private void verticeTela(float x, float y, float u, float v, float r, float g, float bl, float al, float tipo) {
+        float[] o = dados;
+        int k = posicao;
+        o[k] = x;
+        o[k + 1] = y;
+        area(x, y);
+        o[k + 2] = u;
+        o[k + 3] = v;
+        o[k + 4] = r;
+        o[k + 5] = g;
+        o[k + 6] = bl;
+        o[k + 7] = al;
+        o[k + 8] = tipo;
+        posicao = k + FLOATS;
+        vertices++;
     }
 
     private void retangulo(float l, float t, float r, float bt, float u0, float v0, float u1, float v1, int argb, float tipo) {
@@ -729,8 +885,54 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glTexSubImage2D(GLES30.GL_TEXTURE_2D, 0, 0, linha, n, 1, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, px);
     }
 
+    /**
+     * Texto grande (a onomatopeia da página do Ultra, o SHINKAI do corte, o nome do Ultra): numa
+     * textura só dele, fora da dos textos. Uns poucos desses enchiam a textura compartilhada, e
+     * cada vez que ela recomeçava todos os textos da tela eram refeitos no mesmo quadro. Ficam os
+     * {@link #MAX_TEXTOS_PROPRIOS} mais novos.
+     */
+    private static final int TEXTO_PROPRIO = 96 * 1024, MAX_TEXTOS_PROPRIOS = 24;
+    private final java.util.ArrayDeque<int[]> textosProprios = new java.util.ArrayDeque<>();
+    private final java.util.HashSet<Integer> texturasDeTextoVivas = new java.util.HashSet<>();
+
+    /** O lugar {u0, v0, u1, v1, id} de um texto com textura própria. */
+    private float[] guardarTextoProprio(Bitmap bmp) {
+        int w = bmp.getWidth(), h = bmp.getHeight();
+        TesteAutomatico.textoGuardadoFora(w * h);
+        int[] id = new int[1];
+        GLES30.glGenTextures(1, id, 0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+        GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bmp, 0);
+        bmp.recycle();
+        // O bind acima não atrapalha o lote: quem descarrega liga a textura dele de novo.
+        int bytes = w * h * 4;
+        bytesTexturas += bytes;
+        textosProprios.addLast(new int[] {id[0], bytes});
+        texturasDeTextoVivas.add(id[0]);
+        while (textosProprios.size() > MAX_TEXTOS_PROPRIOS) {
+            int[] velho = textosProprios.removeFirst();
+            // Algum desenho gravado pode usar esta textura: sai antes.
+            descarregar();
+            executar();
+            if (velho[0] == texturaAtual) texturaAtual = 0;
+            GLES30.glDeleteTextures(1, velho, 0);
+            texturasDeTextoVivas.remove(velho[0]);
+            bytesTexturas -= velho[1];
+        }
+        return new float[] {0f, 0f, 1f, 1f, id[0]};
+    }
+
+    /** O lugar guardado de um texto ainda vale (a textura dele existe). */
+    boolean textoVale(float[] uv, int geracao) {
+        return uv.length > 4 ? texturasDeTextoVivas.contains((int)uv[4]) : geracao == geracaoTexto;
+    }
+
     // Textos: todos numa textura só (prateleiras); cheia, recomeça (os textos são refeitos).
-    private static final int ATLAS_TEXTO = 2048;
+    private int ladoTexto = 2048;
     private int prateleiraX, prateleiraY, alturaPrateleira;
     /** Muda quando a textura dos textos recomeça: quem guardou um lugar nela faz de novo. */
     int geracaoTexto;
@@ -741,21 +943,24 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     float[] guardarTexto(Bitmap bmp) {
         int w = bmp.getWidth(), h = bmp.getHeight();
-        if (w + 2 > ATLAS_TEXTO || h + 2 > ATLAS_TEXTO) {
+        if ((w + 2) * (h + 2) > TEXTO_PROPRIO && w <= maxTextura && h <= maxTextura) return guardarTextoProprio(bmp);
+        TesteAutomatico.textoGuardado((w + 2) * (h + 2));
+        if (w + 2 > ladoTexto || h + 2 > ladoTexto) {
             bmp.recycle();
             return null;
         }
-        if (prateleiraX + w + 2 > ATLAS_TEXTO) {
+        if (prateleiraX + w + 2 > ladoTexto) {
             prateleiraX = 0;
             prateleiraY += alturaPrateleira;
             alturaPrateleira = 0;
         }
-        if (prateleiraY + h + 2 > ATLAS_TEXTO) {
+        if (prateleiraY + h + 2 > ladoTexto) {
             // Cheia: o que já foi gravado sai com os textos de agora, e ela recomeça.
             descarregar();
             executar();
             prateleiraX = prateleiraY = alturaPrateleira = 0;
             geracaoTexto++;
+            TesteAutomatico.atlasDeTextoCheio();
             textos.clear();
             ultimoDoTexto.clear();
         }
@@ -765,7 +970,7 @@ final class GlRenderCanvas implements RenderCanvas {
         bmp.recycle();
         prateleiraX += w + 2;
         alturaPrateleira = Math.max(alturaPrateleira, h + 2);
-        float k = 1f / ATLAS_TEXTO;
+        float k = 1f / ladoTexto;
         return new float[] {x * k, y * k, (x + w) * k, (y + h) * k};
     }
 
@@ -792,6 +997,7 @@ final class GlRenderCanvas implements RenderCanvas {
         int k = posicao;
         o[k] = a * x + c * y + e;
         o[k + 1] = b * x + d * y + f;
+        area(o[k], o[k + 1]);
         o[k + 2] = u;
         o[k + 3] = v;
         o[k + 4] = vermelho;
@@ -805,6 +1011,13 @@ final class GlRenderCanvas implements RenderCanvas {
 
     /** Um texto guardado ({@link #guardarTexto}) no retângulo, sem trocar de textura. */
     void desenharTexto(float[] uv, float l, float t, float r, float b, int argb) {
+        if (uv.length > 4) {
+            // Textura própria: desenhado como imagem, sem filtro (o texto já tem as cores dele).
+            filtro(null);
+            usar((int)uv[4]);
+            retangulo(l, t, r, b, 0f, 0f, 1f, 1f, argb, 1f);
+            return;
+        }
         retangulo(l, t, r, b, uv[0], uv[1], uv[2], uv[3], argb, 7f);
     }
 
@@ -847,6 +1060,7 @@ final class GlRenderCanvas implements RenderCanvas {
         if (fonte != bitmap) fonte.recycle();
         if (soltarBitmap && !hardware) bitmap.recycle();
         // O bind acima não atrapalha o lote: quem descarrega liga a textura dele de novo.
+        TesteAutomatico.subiu(bytes);
         t = new Textura(bitmap, esquecidas, id[0], largura, altura, bytes);
         texturas.put(bitmap, t);
         bytesTexturas += bytes;
@@ -1099,11 +1313,13 @@ final class GlRenderCanvas implements RenderCanvas {
         String chave = text + '\u0000' + base + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000'
             + traco + '\u0000' + italic + '\u0000' + escala;
         Texto t = textos.get(chave);
+        if (t != null && !textoVale(t.uv, geracaoTexto)) t = null;
         float k = kz;
         if (t == null) {
             if (falhos.contains(chave)) return;
             String solta = text + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000' + italic;
             Texto ultimo = ultimoDoTexto.get(solta);
+            if (ultimo != null && !textoVale(ultimo.uv, geracaoTexto)) ultimo = null;
             if (ultimo != null && ultimo.base == base && ultimo.traco == traco
                 && ultimo.escalaPedida >= escala * 0.999f && ultimo.escalaPedida <= escala * 2.01f) {
                 // Entra grande e encolhe (o nome do Ultra, a onomatopeia, o FINAL): o bitmap do
@@ -1119,6 +1335,7 @@ final class GlRenderCanvas implements RenderCanvas {
                 float reduz = px > MAX_PIXELS_TEXTO ? (float)Math.sqrt(MAX_PIXELS_TEXTO / px) : 1f;
                 reduz = Math.min(reduz, Math.min(2000f / Math.max(1f, ultimaLargura), 2000f / Math.max(1f, ultimaAltura)));
                 if (reduz < 1f) escala *= reduz;
+                TesteAutomatico.textoPedido(text);
                 t = criarTexto(text, base * escala, fillArgb, strokeArgb, traco * escala, italic);
                 if (t == null) {
                     // Não cabe nem reduzido: não tenta de novo a cada quadro.

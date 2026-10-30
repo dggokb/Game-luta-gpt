@@ -47,8 +47,8 @@ public final class MedirLuta {
             c.esperar(0.5);
         }
         // Algumas fotos no caminho (SHINKAI aos 3 s, Super aos 10 s, Ultra aos 17 s).
-        double[] fotos = {4.0, 10.5, 17.5, 24.0};
-        String[] nomes = {"shinkai", "super", "ultra", "shinkai-rival"};
+        double[] fotos = {4.0, 10.5, 17.5, 18.5, 19.5, 20.5, 21.5, 24.0};
+        String[] nomes = {"shinkai", "super", "ultra", "ultra-2", "ultra-3", "ultra-4", "ultra-5", "shinkai-rival"};
         double passado = 0;
         for (int i = 0; i < fotos.length; i++) {
             c.esperar(fotos[i] - passado);
@@ -63,7 +63,7 @@ public final class MedirLuta {
         }
         String[] relatorio = c.jogo().relatorioTeste();
         c.esperar(0.3);
-        CapturaPc.salvar(c.quadro(), saida, "05-relatorio");
+        CapturaPc.salvar(c.quadro(), saida, "99-relatorio");
         c.parar();
         String cabeca = String.format(Locale.ROOT, "PC sem tela %dx%d", largura, altura);
         String[] linhas = new String[relatorio.length + 1];

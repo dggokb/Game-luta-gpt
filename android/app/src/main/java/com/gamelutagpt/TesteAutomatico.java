@@ -24,6 +24,82 @@ final class TesteAutomatico {
     private boolean ativo;
     private int passos;
     private final List<long[]> quadros = new ArrayList<>();
+    /** Bytes de textura subidos em cada quadro gravado. */
+    private final List<Long> subidas = new ArrayList<>();
+
+    // O que o desenho em OpenGL conta durante o teste (tudo na thread do jogo).
+    private static boolean gravando;
+    private static final java.util.HashMap<String, Integer> textosFeitos = new java.util.HashMap<>();
+    private static long bytesNoQuadro;
+    private static int atlasCheio;
+
+    private static String textoPedido = "";
+    /** Pixels que cada texto ocupou na textura dos textos (somando as vezes que foi feito). */
+    private static final java.util.HashMap<String, Integer> areaDosTextos = new java.util.HashMap<>();
+
+    /**
+     * Diagnóstico (PC, -Dgameluta.areaPorOrigem=true): de onde vem cada triângulo grande, pela
+     * pilha de chamadas. Caro; só para achar quem pinta a tela muitas vezes.
+     */
+    static final boolean areaPorOrigem = Boolean.getBoolean("gameluta.areaPorOrigem");
+    private static final java.util.HashMap<String, Double> areaPorQuem = new java.util.HashMap<>();
+
+    static void areaGrande(double telas) {
+        if (!gravando) return;
+        String quem = origem(2);
+        areaNoQuadro.merge(quem, telas, Double::sum);
+    }
+
+    /** Quem chamou o desenho: os primeiros {@code n} lugares fora do OpenGL e do Canvas. */
+    private static String origem(int n) {
+        StringBuilder sb = new StringBuilder();
+        for (StackTraceElement f : new Throwable().getStackTrace()) {
+            String c = f.getClassName();
+            if (c.endsWith("GlRenderCanvas") || c.endsWith("CanvasGl") || c.endsWith("TesteAutomatico")
+                || c.startsWith("android.") || c.contains("AndroidRenderCanvas") || c.contains("CanvasGl$")) continue;
+            if (sb.length() > 0) sb.append(" < ");
+            sb.append(c.substring(c.lastIndexOf('.') + 1)).append('.').append(f.getMethodName()).append(':').append(f.getLineNumber());
+            if (--n == 0) break;
+        }
+        return sb.length() > 0 ? sb.toString() : "?";
+    }
+
+    /** Desenhos do quadro de agora; vão para {@link #areaPorQuem} só nos quadros pesados. */
+    private static final java.util.HashMap<String, Double> areaNoQuadro = new java.util.HashMap<>();
+    private static int quadrosPesados;
+
+    /** Um texto vai virar bitmap agora (não estava guardado). */
+    static void textoPedido(String texto) {
+        if (!gravando) return;
+        textoPedido = texto.length() > 18 ? texto.substring(0, 18) + "…" : texto;
+        if (areaPorOrigem) textoPedido += " @" + origem(1);
+    }
+
+    /** O bitmap do texto pedido foi para uma textura só dele (não ocupa a dos textos). */
+    static void textoGuardadoFora(int pixels) {
+        if (!gravando) return;
+        textosFeitos.merge(textoPedido, 1, Integer::sum);
+        textosFora++;
+    }
+
+    private static int textosFora;
+
+    /** O bitmap do texto pedido entrou na textura dos textos com {@code pixels} de lugar. */
+    static void textoGuardado(int pixels) {
+        if (!gravando) return;
+        textosFeitos.merge(textoPedido, 1, Integer::sum);
+        areaDosTextos.merge(textoPedido, pixels, Integer::sum);
+    }
+
+    /** Uma textura subiu para a placa de vídeo. */
+    static void subiu(long bytes) {
+        if (gravando) bytesNoQuadro += bytes;
+    }
+
+    /** A textura dos textos encheu e recomeçou (todos os textos são refeitos). */
+    static void atlasDeTextoCheio() {
+        if (gravando) atlasCheio++;
+    }
     private final List<Integer> contextos = new ArrayList<>();
     private final List<int[]> gl = new ArrayList<>();
     private String[] relatorio;
@@ -45,6 +121,16 @@ final class TesteAutomatico {
         contextos.clear();
         gl.clear();
         relatorio = null;
+        subidas.clear();
+        textosFeitos.clear();
+        areaDosTextos.clear();
+        textosFora = 0;
+        areaPorQuem.clear();
+        areaNoQuadro.clear();
+        quadrosPesados = 0;
+        bytesNoQuadro = 0;
+        atlasCheio = 0;
+        gravando = true;
     }
 
     /** Segundos que faltam (para o botão). */
@@ -55,12 +141,13 @@ final class TesteAutomatico {
     /**
      * Um passo da luta: barras zeradas no começo (a IA não gasta antes da hora), vida de volta
      * abaixo de 1/3 (ninguém cai) e os pedidos do roteiro por cima do que a IA quis fazer. Cada
-     * pedido se repete por até 1 s, até pegar (o lutador pode estar apanhando ou no ar).
+     * pedido se repete por até 3 s, até pegar (o lutador pode estar apanhando ou no ar).
      */
     void roteiro(CombatEngine engine, FighterInput jogador, FighterInput rival) {
         if (!ativo) return;
         FighterState p = engine.fighter(GameView.PLAYER).state, o = engine.fighter(GameView.OPPONENT).state;
         if (passos == 0) {
+            superSaiu = ultraSaiu = false;
             for (FighterState f : new FighterState[] {p, o}) {
                 f.superMeter = 0;
                 f.shinkai = 0;
@@ -75,11 +162,25 @@ final class TesteAutomatico {
         if (passos < SHINKAI_RIVAL) o.shinkai = 0;
         if (passos == SHINKAI_JOGADOR) p.shinkai = CombatConfig.SHINKAI_MAX;
         if (janela(SHINKAI_JOGADOR) && !p.shinkaiUsed) jogador.shinkai = true;
-        if (passos == SUPER || passos == ULTRA) p.superMeter = CombatConfig.MAX_METER;
-        if (janela(SUPER) && p.superMeter == CombatConfig.MAX_METER) jogador.superAttack = true;
-        if (janela(ULTRA) && p.superMeter == CombatConfig.MAX_METER) {
-            jogador.ultra = true;
-            jogador.superAttack = true;
+        // A barra fica cheia até o pedido pegar: a barra que desceu é o Super (ou o Ultra) saindo.
+        if (janela(SUPER) && !superSaiu) {
+            if (passos > SUPER && p.superMeter < CombatConfig.MAX_METER) {
+                superSaiu = true;
+            } else {
+                p.superMeter = CombatConfig.MAX_METER;
+                soPedido(jogador);
+                jogador.superAttack = true;
+            }
+        }
+        if (janela(ULTRA) && !ultraSaiu) {
+            if (passos > ULTRA && p.superMeter < CombatConfig.MAX_METER) {
+                ultraSaiu = true;
+            } else {
+                p.superMeter = CombatConfig.MAX_METER;
+                soPedido(jogador);
+                jogador.ultra = true;
+                jogador.superAttack = true;
+            }
         }
         if (passos == SHINKAI_RIVAL) {
             o.shinkai = CombatConfig.SHINKAI_MAX;
@@ -89,25 +190,53 @@ final class TesteAutomatico {
         passos++;
     }
 
+    private boolean superSaiu, ultraSaiu;
+
+    /**
+     * Sem os botões de golpe da IA: apanhando, um deles é o combo breaker, que tem a frente e
+     * gasta a barra (e o roteiro achava que o Super ou o Ultra tinha saído).
+     */
+    private static void soPedido(FighterInput in) {
+        in.light = in.medium = in.heavy = in.pushblock = in.grab = false;
+        in.special = null;
+        in.auto = false;
+    }
+
     private boolean janela(int inicio) {
-        return passos >= inicio && passos < inicio + 60;
+        return passos >= inicio && passos < inicio + 180;
     }
 
     /** Um quadro desenhado da luta: o tempo por parte, o que estava na tela e os números do OpenGL. */
-    void quadro(PerfilQuadros perfil, int contexto, int textosNovos, int formas, int desenhos) {
+    void quadro(PerfilQuadros perfil, int contexto, int textosNovos, int formas, int desenhos, int telasX10) {
         // Só a luta: a intro e o READY ainda não contam.
         if (!ativo || passos == 0) return;
         long[] q = Arrays.copyOf(perfil.ultimoQuadro, perfil.ultimoQuadro.length + 1);
         q[q.length - 1] = perfil.ultimoTotal;
         quadros.add(q);
+        subidas.add(bytesNoQuadro);
+        bytesNoQuadro = 0;
         contextos.add(contexto);
-        gl.add(new int[] {textosNovos, formas, desenhos});
+        gl.add(new int[] {textosNovos, formas, desenhos, telasX10});
+        if (areaPorOrigem) {
+            if (telasX10 >= 200) {
+                quadrosPesados++;
+                for (java.util.Map.Entry<String, Double> e : areaNoQuadro.entrySet()) areaPorQuem.merge(e.getKey(), e.getValue(), Double::sum);
+            }
+            areaNoQuadro.clear();
+        }
         if (passos >= DURACAO) terminar();
     }
 
     private void terminar() {
         ativo = false;
+        gravando = false;
         relatorio = montarRelatorio().toArray(new String[0]);
+        if (!areaPorQuem.isEmpty()) {
+            int n = Math.max(1, quadrosPesados);
+            System.out.println("AREA nos " + quadrosPesados + " quadros com 20+ telas:");
+            areaPorQuem.entrySet().stream().sorted((x, y) -> Double.compare(y.getValue(), x.getValue())).limit(25)
+                .forEach(e -> System.out.println(String.format(Locale.ROOT, "AREA %6.2f telas/quadro  %s", e.getValue() / n, e.getKey())));
+        }
         for (String linha : relatorio) android.util.Log.i(PerfilQuadros.TAG, linha);
     }
 
@@ -156,6 +285,24 @@ final class TesteAutomatico {
             if (c > 0) momentos.append(String.format(Locale.ROOT, "  %s %.1f ms (%d)", MOMENTOS[m], soma / c, c));
         }
         r.add(momentos.toString());
+        // As duas partes que mais pesam em cada momento.
+        StringBuilder porMomento = new StringBuilder("Onde pesa:");
+        for (int m = 0; m < MOMENTOS.length; m++) {
+            double[] soma = new double[total];
+            int c = 0;
+            for (int i = 0; i < n; i++) {
+                if (momento(contextos.get(i)) != m) continue;
+                for (int k = 0; k < total; k++) soma[k] += quadros.get(i)[k] / 1e6;
+                c++;
+            }
+            if (c == 0) continue;
+            int a = 0, b = -1;
+            for (int k = 1; k < total; k++) if (soma[k] > soma[a]) a = k;
+            for (int k = 0; k < total; k++) if (k != a && (b < 0 || soma[k] > soma[b])) b = k;
+            porMomento.append(String.format(Locale.ROOT, "  %s: %s %.1f, %s %.1f", MOMENTOS[m],
+                PerfilQuadros.NOMES[a], soma[a] / c, PerfilQuadros.NOMES[b], soma[b] / c));
+        }
+        r.add(porMomento.toString());
         double tn = 0, fo = 0, de = 0;
         int maxTextos = 0, maxFormas = 0;
         for (int[] g : gl) {
@@ -166,8 +313,49 @@ final class TesteAutomatico {
             maxFormas = Math.max(maxFormas, g[1]);
         }
         if (de > 0) {
-            r.add(String.format(Locale.ROOT, "OpenGL por quadro: textos novos %.1f (máx %d) · formas %.1f (máx %d) · desenhos %.0f",
-                tn / n, maxTextos, fo / n, maxFormas, de / n));
+            long totalSubido = 0;
+            int comSubida = 0;
+            for (long s : subidas) {
+                totalSubido += s;
+                if (s > 0) comSubida++;
+            }
+            r.add(String.format(Locale.ROOT, "OpenGL por quadro: textos novos %.1f (máx %d) · formas %.1f (máx %d) · desenhos %.0f"
+                    + " · texturas subidas %d MB em %d quadros · textura dos textos encheu %d vezes · %d textos grandes à parte",
+                tn / n, maxTextos, fo / n, maxFormas, de / n, totalSubido >> 20, comSubida, atlasCheio, textosFora));
+            List<java.util.Map.Entry<String, Integer>> feitos = new ArrayList<>(textosFeitos.entrySet());
+            feitos.sort((x, y) -> y.getValue() - x.getValue());
+            StringBuilder t = new StringBuilder("Textos refeitos:");
+            for (int j = 0; j < Math.min(6, feitos.size()); j++) {
+                t.append(String.format(Locale.ROOT, "  \"%s\" ×%d", feitos.get(j).getKey(), feitos.get(j).getValue()));
+            }
+            if (!feitos.isEmpty()) r.add(t.toString());
+            // Quem enche a textura dos textos (2048×2048 = 4,2 milhões de pixels).
+            List<java.util.Map.Entry<String, Integer>> areas = new ArrayList<>(areaDosTextos.entrySet());
+            areas.sort((x, y) -> Integer.compare(y.getValue(), x.getValue()));
+            StringBuilder a = new StringBuilder("Textos que mais ocupam (mil pixels):");
+            for (int j = 0; j < Math.min(6, areas.size()); j++) {
+                a.append(String.format(Locale.ROOT, "  \"%s\" %d", areas.get(j).getKey(), areas.get(j).getValue() / 1000));
+            }
+            if (!areas.isEmpty()) r.add(a.toString());
+            if (areaPorOrigem) {
+                java.util.HashMap<String, Integer> porLugar = new java.util.HashMap<>();
+                long soma = 0;
+                for (java.util.Map.Entry<String, Integer> e : areaDosTextos.entrySet()) {
+                    int at = e.getKey().indexOf(" @");
+                    porLugar.merge(at >= 0 ? e.getKey().substring(at + 2) : "?", e.getValue(), Integer::sum);
+                    soma += e.getValue();
+                }
+                System.out.println("TEXTOS: " + (soma / 1000) + " mil pixels no total");
+                porLugar.entrySet().stream().sorted((x, y) -> Integer.compare(y.getValue(), x.getValue())).limit(15)
+                    .forEach(e -> System.out.println("TEXTOS " + (e.getValue() / 1000) + " mil  " + e.getKey()));
+            }
+            double telas = 0;
+            int maxTelas = 0;
+            for (int[] g : gl) {
+                telas += g[3];
+                maxTelas = Math.max(maxTelas, g[3]);
+            }
+            r.add(String.format(Locale.ROOT, "Área pintada: %.1f telas por quadro (máx %.1f)", telas / 10.0 / n, maxTelas / 10.0));
         }
         Integer[] idx = new Integer[n];
         for (int i = 0; i < n; i++) idx[i] = i;
@@ -178,8 +366,10 @@ final class TesteAutomatico {
             long[] q = quadros.get(i);
             int maior = 0;
             for (int k = 1; k < total; k++) if (q[k] > q[maior]) maior = k;
-            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, textos %d, formas %d)", tempos[i],
-                PerfilQuadros.NOMES[maior], q[maior] / 1e6, MOMENTOS[momento(contextos.get(i))], gl.get(i)[0], gl.get(i)[1]));
+            long mb = subidas.get(i) >> 20;
+            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d%s)", tempos[i],
+                PerfilQuadros.NOMES[maior], q[maior] / 1e6, MOMENTOS[momento(contextos.get(i))], gl.get(i)[3] / 10.0, gl.get(i)[0],
+                subidas.get(i) > 0 ? ", subiu " + (mb > 0 ? mb + " MB" : (subidas.get(i) >> 10) + " KB") : ""));
         }
         r.add(piores.toString());
         return r;

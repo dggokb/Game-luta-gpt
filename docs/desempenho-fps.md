@@ -294,6 +294,53 @@ diferença é só a ponte:
   vale é o resto. Na primeira medida o fundo, a luta e o HUD caíram de cerca de 26 ms para
   cerca de 1 ms por quadro.
 
+### 5.8 O que o teste automático achou (relatório do celular + PC com OpenGL)
+
+**Relatório do celular** (Xiaomi, 1080p, OpenGL, p15+p16):
+- quadro médio de 18,8 ms, com 14% acima de 20 ms;
+- o HUD gastava 5,1 ms de média, com 3,7 textos novos por quadro e até 109 num quadro só;
+- os piores quadros eram todos no Ultra: o "envio" levava de 111 a 196 ms, com a placa de vídeo
+  atolada.
+
+O mesmo teste no PC com OpenGL (`-Pgl`, mais `-Parea` para saber de onde vem cada desenho e
+cada texto) achou e corrigiu duas causas.
+
+**1. Página do Ultra: 31 telas pintadas por quadro.**
+- O que acontecia: cada painel desenha a imagem do tamanho da página e mostra só uma fatia pelo
+  recorte. No OpenGL o recorte era feito pixel a pixel no shader, então a placa pagava a imagem
+  inteira de cada painel.
+- A correção: o retângulo recortado agora é cortado nos semiplanos no processador
+  (`GlRenderCanvas.quadRecortado`). O corte é exato, porque cor e uv variam em linha reta. Isso
+  vale para qualquer imagem recortada.
+- Resultado: o pior quadro caiu de 55 para 15 telas.
+
+**2. A textura dos textos enchia cerca de 10 vezes em 30 s.** Cada vez que ela enchia, todos os
+textos da tela eram refeitos no mesmo quadro (até 138).
+
+As causas, em ordem de peso:
+- o próprio contador de FPS, com linhas compridas e novas a cada 2 s;
+- os números de dano do SHINKAI, com um valor novo a cada golpe, em 3 camadas e com a animação
+  de bater;
+- o contador de combo;
+- os textos enormes da página do Ultra e do corte do SHINKAI.
+
+As correções, no `CanvasGl`/`GlRenderCanvas`:
+- **Números montados por algarismo**, como uma fonte de jogo. O algarismo é feito no tamanho
+  final em pixels, em meias oitavas para cima, e a placa reduz o resto.
+- **Contador de FPS e relatório do teste letra por letra.**
+- **Texto de cor lisa feito em branco**, com a cor posta pela placa de vídeo. O resultado é o
+  mesmo, e um bitmap serve a todas as cores.
+- **Textos grandes (mais de cerca de 96 mil pixels) numa textura só deles**, com no máximo 24.
+- **Textura dos textos de 4096²** onde a placa aceita.
+- Resultado: a textura não enche mais em 30 s, e o máximo de textos novos num quadro caiu de 138
+  para cerca de 10.
+
+**O roteiro do teste também ficou mais confiável:**
+- cada pedido de Super ou Ultra tenta por até 3 s;
+- enquanto o roteiro pede, os botões de golpe da IA ficam de fora (apanhando, eles viravam um
+  combo breaker que gastava a barra);
+- o resultado é que o Super e o Ultra saem em toda rodada.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

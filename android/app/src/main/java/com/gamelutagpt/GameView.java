@@ -3616,6 +3616,15 @@ public class GameView extends SurfaceView
     private final RectF fpsCaixa = new RectF();
 
     private void drawFpsCounter(Canvas canvas) {
+        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(true);
+        try {
+            desenharFps(canvas);
+        } finally {
+            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(false);
+        }
+    }
+
+    private void desenharFps(Canvas canvas) {
         fpsQuadros++;
         long agora = System.nanoTime();
         if (agora - fpsInicio >= FPS_JANELA_NS) {
@@ -3705,12 +3714,14 @@ public class GameView extends SurfaceView
             if (engine.fighter(i).state.shinkaiFrames > 0) contexto |= TesteAutomatico.SHINKAI;
         }
         if (superFlash.active() || isSuperCinematicActive()) contexto |= TesteAutomatico.SUPER_NA_TELA;
-        if (ultraAttacker >= 0 || engine.ultraSequenceRunning() || paginaFinal.isActive()) contexto |= TesteAutomatico.ULTRA_NA_TELA;
+        if (ultraAttacker >= 0 || engine.ultraSequenceRunning() || paginaFinal.isActive() || abertura.isActive()) {
+            contexto |= TesteAutomatico.ULTRA_NA_TELA;
+        }
         int[] g = glQuadro ? desenhoGl.contagem() : SEM_GL;
-        teste.quadro(perfil, contexto, g[0], g[1], g[2]);
+        teste.quadro(perfil, contexto, g[0], g[1], g[2], g[3]);
     }
 
-    private static final int[] SEM_GL = new int[3];
+    private static final int[] SEM_GL = new int[4];
     /** Altura em pixels do último quadro desenhado (o título do relatório). */
     private int alturaDoQuadro;
     private final Paint testePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -3723,6 +3734,15 @@ public class GameView extends SurfaceView
         alturaDoQuadro = canvas.getHeight();
         String[] r = teste.relatorio();
         if (r == null) return;
+        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(true);
+        try {
+            desenharRelatorio(canvas, r);
+        } finally {
+            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).porCaractere(false);
+        }
+    }
+
+    private void desenharRelatorio(Canvas canvas, String[] r) {
         testePaint.setTextSize(15f);
         testePaint.setTypeface(Typeface.DEFAULT);
         testePaint.setTextAlign(Paint.Align.LEFT);
@@ -3753,7 +3773,17 @@ public class GameView extends SurfaceView
         java.util.List<String> saida = new java.util.ArrayList<>();
         for (String linha : linhas) {
             StringBuilder atual = new StringBuilder();
+            // Os itens vão separados por espaço duplo; um item comprido demais quebra nos " · ".
+            java.util.List<String> itens = new java.util.ArrayList<>();
             for (String item : linha.split("  ")) {
+                if (testePaint.measureText(item) <= largura || !item.contains(" · ")) {
+                    itens.add(item);
+                    continue;
+                }
+                String[] partes = item.split(" · ");
+                for (int i = 0; i < partes.length; i++) itens.add(i < partes.length - 1 ? partes[i] + " ·" : partes[i]);
+            }
+            for (String item : itens) {
                 if (item.isEmpty()) continue;
                 String junto = atual.length() == 0 ? item : atual + "  " + item;
                 if (atual.length() > 0 && testePaint.measureText(junto) > largura) {
