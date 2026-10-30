@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, PERF_GRAFICOS, PERF_FOLHAS, PERF_EFEITOS, PERF_CENARIO, PERF_HUD, PERF_GL, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, PERF_GRAFICOS, PERF_FOLHAS, PERF_EFEITOS, PERF_CENARIO, PERF_HUD, PERF_MSGS, PERF_GL, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
 
     static final float DPAD_X = 185f;
     static final float DPAD_Y = 545f;
@@ -104,14 +104,18 @@ final class ControlsLayout {
 
     /**
      * Coluna de DESEMPENHO, à esquerda dos botões de teste: GRÁFICOS, FOLHAS, EFEITOS, CENÁRIO,
-     * HUD e TESTE GL, uma por linha (as mesmas alturas de IA, DEBUG, VIDA, DUPLA, HISTÓRIA e TUTORIAL).
+     * HUD | MSGS (meia linha cada) e OPENGL, uma por linha (as mesmas alturas de IA, DEBUG, VIDA,
+     * DUPLA, HISTÓRIA e TUTORIAL).
      */
     static final float PERF_LEFT = 910f;
     static final float PERF_RIGHT = 1074f;
-    static final float[] PERF_TOP = {AI_BUTTON_TOP, DEBUG_BUTTON_TOP, HEAL_BUTTON_TOP, TEAM_BUTTON_TOP, STORY_BUTTON_TOP, TUTORIAL_BUTTON_TOP};
-    /** Altura de cada botão (o último, TESTE GL, na linha mais baixa do TUTORIAL). */
-    static final float[] PERF_HEIGHTS = {40f, 40f, 40f, 40f, 40f, TUTORIAL_BUTTON_BOTTOM - TUTORIAL_BUTTON_TOP};
-    static final Control[] PERF_CONTROLS = {Control.PERF_GRAFICOS, Control.PERF_FOLHAS, Control.PERF_EFEITOS, Control.PERF_CENARIO, Control.PERF_HUD, Control.PERF_GL};
+    private static final float PERF_MEIO = 990f;
+    static final float[] PERF_LEFTS = {PERF_LEFT, PERF_LEFT, PERF_LEFT, PERF_LEFT, PERF_LEFT, PERF_MEIO + 4f, PERF_LEFT};
+    static final float[] PERF_RIGHTS = {PERF_RIGHT, PERF_RIGHT, PERF_RIGHT, PERF_RIGHT, PERF_MEIO, PERF_RIGHT, PERF_RIGHT};
+    static final float[] PERF_TOP = {AI_BUTTON_TOP, DEBUG_BUTTON_TOP, HEAL_BUTTON_TOP, TEAM_BUTTON_TOP, STORY_BUTTON_TOP, STORY_BUTTON_TOP, TUTORIAL_BUTTON_TOP};
+    /** Altura de cada botão (o último, OPENGL, na linha mais baixa do TUTORIAL). */
+    static final float[] PERF_HEIGHTS = {40f, 40f, 40f, 40f, 40f, 40f, TUTORIAL_BUTTON_BOTTOM - TUTORIAL_BUTTON_TOP};
+    static final Control[] PERF_CONTROLS = {Control.PERF_GRAFICOS, Control.PERF_FOLHAS, Control.PERF_EFEITOS, Control.PERF_CENARIO, Control.PERF_HUD, Control.PERF_MSGS, Control.PERF_GL};
 
     // Painel da lição do tutorial (abaixo das barras de vida) e o PULAR dentro dele.
     static final float TUTORIAL_PANEL_LEFT = 330f;
@@ -160,7 +164,7 @@ final class ControlsLayout {
             return Control.CHARACTER_SELECT;
         }
         for (int i = 0; i < PERF_CONTROLS.length; i++) {
-            if (insideRect(x, y, PERF_LEFT, PERF_TOP[i], PERF_RIGHT, PERF_TOP[i] + PERF_HEIGHTS[i])) return PERF_CONTROLS[i];
+            if (insideRect(x, y, PERF_LEFTS[i], PERF_TOP[i], PERF_RIGHTS[i], PERF_TOP[i] + PERF_HEIGHTS[i])) return PERF_CONTROLS[i];
         }
         if (dpadCaptures(x, y)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
@@ -191,6 +195,7 @@ final class ControlsLayout {
             case PERF_EFEITOS:
             case PERF_CENARIO:
             case PERF_HUD:
+            case PERF_MSGS:
             case PERF_GL:
                 return true;
             default:

@@ -252,7 +252,7 @@ final class ShinkaiDetalhes {
         }
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeJoin(Paint.Join.MITER);
-        desenharNumeros(c);
+        if (TesteDesempenho.mensagens) desenharNumeros(c);
     }
 
     /** Os números do dano: batem grandes, assentam, sobem e somem. */

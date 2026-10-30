@@ -2240,6 +2240,7 @@ public class GameView extends SurfaceView
                     return !TesteDesempenho.cenario ? "CENÁRIO OFF"
                         : TesteDesempenho.cenarioSemEnfeites ? "CENÁRIO SEM ENF." : "CENÁRIO ON";
                 case PERF_HUD: return TesteDesempenho.hud ? "HUD ON" : "HUD OFF";
+                case PERF_MSGS: return TesteDesempenho.mensagens ? "MSGS ON" : "MSGS OFF";
                 case PERF_GL:
                     // O que vale na luta de agora; trocado, vale a partir da próxima.
                     if (TesteDesempenho.openGl != glNaLuta) return TesteDesempenho.openGl ? "OPENGL ON*" : "OPENGL OFF*";
@@ -2254,6 +2255,7 @@ public class GameView extends SurfaceView
                 case PERF_EFEITOS: return TesteDesempenho.efeitos;
                 case PERF_CENARIO: return TesteDesempenho.cenario && !TesteDesempenho.cenarioSemEnfeites;
                 case PERF_HUD: return TesteDesempenho.hud;
+                case PERF_MSGS: return TesteDesempenho.mensagens;
                 case PERF_GL: return TesteDesempenho.openGl;
                 default: return true;
             }
@@ -3068,6 +3070,7 @@ public class GameView extends SurfaceView
      * fica parado. O contorno branco fino o separa do cenário.
      */
     private void drawBreakerCue(Canvas c) {
+        if (!TesteDesempenho.mensagens) return;
         CombatFighter f = player();
         if (engine.breakerCue(f) < 0) {
             breakerCueStart = -1;
@@ -4015,8 +4018,8 @@ public class GameView extends SurfaceView
                 }
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
                 cinematica.renderFaixas(renderCanvas);
-                conversa.render(renderCanvas);
-                if (narracao != null && faixas < 0.5f) narracao.render(renderCanvas);
+                if (TesteDesempenho.mensagens) conversa.render(renderCanvas);
+                if (narracao != null && faixas < 0.5f && TesteDesempenho.mensagens) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
             }
             telaVitoria.desenhar(canvas);
@@ -4109,6 +4112,16 @@ public class GameView extends SurfaceView
 
     private void drawHud(Canvas c) {
         hud.drawHud(c, hudState, characterSelectRenderer);
+        if (TesteDesempenho.mensagens) drawMensagens(c);
+        hud.drawTutorial(c, tutorial, esquema);
+        if (debugOverlay) {
+            debug.drawPanel(c, engine, perfil.ultima());
+            drawSizeTunerButton(c);
+        }
+    }
+
+    /** Faixas (agarrão, ROUND, KO) e o contador de combo dos dois lados (MSGS no teste de desempenho). */
+    private void drawMensagens(Canvas c) {
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
@@ -4123,11 +4136,6 @@ public class GameView extends SurfaceView
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
-        hud.drawTutorial(c, tutorial, esquema);
-        if (debugOverlay) {
-            debug.drawPanel(c, engine, perfil.ultima());
-            drawSizeTunerButton(c);
-        }
     }
 
     private void drawSizeTunerButton(Canvas c) {
@@ -5789,6 +5797,9 @@ public class GameView extends SurfaceView
                     break;
                 case PERF_HUD:
                     TesteDesempenho.hud = !TesteDesempenho.hud;
+                    break;
+                case PERF_MSGS:
+                    TesteDesempenho.mensagens = !TesteDesempenho.mensagens;
                     break;
                 case PERF_GL:
                     // Desenho novo (OpenGL) × Canvas: vale a partir da próxima luta (DUPLA ou IA).

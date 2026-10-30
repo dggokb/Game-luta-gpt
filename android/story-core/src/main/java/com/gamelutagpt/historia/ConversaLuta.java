@@ -590,10 +590,8 @@ public final class ConversaLuta {
         float y = top + 10f + LEGENDA_LINHA - 5f;
         for (String linha : linhas) {
             if (visiveis <= 0) break;
-            String parte = linha.length() <= visiveis ? linha : linha.substring(0, visiveis);
+            Tinta.digitado(c, linha, visiveis, tx, y, size, WHITE, INK, 2f, false);
             visiveis -= linha.length() + 1;
-            float pw = c.measureText(parte, size, false);
-            c.drawText(parte, tx + pw * 0.5f, y, size, WHITE, INK, 2f, false);
             y += LEGENDA_LINHA;
         }
         c.restore();

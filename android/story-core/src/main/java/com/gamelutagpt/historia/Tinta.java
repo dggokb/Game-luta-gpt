@@ -4,6 +4,27 @@ package com.gamelutagpt.historia;
 final class Tinta {
     private Tinta() {}
 
+    /**
+     * Uma linha de texto digitada até {@code visiveis} letras, alinhada à esquerda em {@code x}.
+     * A linha vai sempre inteira e um recorte mostra só o que já foi digitado: escrever o pedaço
+     * (um texto novo a cada letra) obrigava o desenho a refazer o texto quase a cada quadro.
+     */
+    static void digitado(com.gamelutagpt.render.RenderCanvas c, String linha, int visiveis, float x, float y,
+                         float size, int fill, int stroke, float strokeWidth, boolean italic) {
+        float lw = c.measureText(linha, size, italic);
+        if (visiveis >= linha.length()) {
+            c.drawText(linha, x + lw * 0.5f, y, size, fill, stroke, strokeWidth, italic);
+            return;
+        }
+        float pw = c.measureText(linha.substring(0, Math.max(0, visiveis)), size, italic);
+        float l = x - strokeWidth - 2f, r = x + pw + strokeWidth * 0.5f;
+        float t = y - size * 1.4f, b = y + size * 0.6f;
+        c.save();
+        c.clipPolygon(new float[] {l, t, r, t, r, b, l, b});
+        c.drawText(linha, x + lw * 0.5f, y, size, fill, stroke, strokeWidth, italic);
+        c.restore();
+    }
+
     static int withAlpha(int argb, int alpha) {
         int a = Math.max(0, Math.min(255, alpha));
         return (a << 24) | (argb & 0x00FFFFFF);

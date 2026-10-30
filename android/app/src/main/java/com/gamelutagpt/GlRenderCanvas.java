@@ -1064,9 +1064,10 @@ final class GlRenderCanvas implements RenderCanvas {
             fillArgb |= 0xFF000000;
             strokeArgb |= 0xFF000000;
         }
-        // Na resolução em que vai aparecer (a escala atual), arredondada para reaproveitar.
+        // Na resolução em que vai aparecer (a escala atual), em degraus de um quarto de oitava para
+        // reaproveitar: a faixa da legenda que abre esticando não vira um texto por quadro.
         float escala = (float)Math.sqrt(Math.abs(a * d - b * c)) * kz;
-        escala = Math.max(0.25f, Math.round(escala * 8f) / 8f);
+        escala = (float)Math.pow(2.0, Math.ceil(Math.log(Math.max(0.25f, escala)) / Math.log(2) * 4.0) / 4.0);
         String chave = text + '\u0000' + base + '\u0000' + fillArgb + '\u0000' + strokeArgb + '\u0000'
             + strokeWidth + '\u0000' + italic + '\u0000' + escala;
         Texto t = textos.get(chave);

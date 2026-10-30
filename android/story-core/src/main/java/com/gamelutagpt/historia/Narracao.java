@@ -359,10 +359,8 @@ public final class Narracao {
         int corTexto = grande ? AMARELO : WHITE;
         for (String linha : linhas) {
             if (visiveis <= 0) break;
-            String parte = linha.length() <= visiveis ? linha : linha.substring(0, visiveis);
+            Tinta.digitado(c, linha, visiveis, x0 + 22f, y, size, corTexto, INK, 2.4f, grande);
             visiveis -= linha.length() + 1;
-            float pw = c.measureText(parte, size, grande);
-            c.drawText(parte, x0 + 22f + pw * 0.5f, y, size, corTexto, INK, 2.4f, grande);
             y += linhaAltura;
         }
     }

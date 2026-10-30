@@ -18,6 +18,11 @@ final class TesteDesempenho {
     /** O HUD (vidas, barras, retratos, combo); os botões de teste e os controles continuam. */
     static boolean hud = true;
     /**
+     * As mensagens da luta: faixas (ROUND, FIGHT, KO, agarrão), contador de combo, números de dano,
+     * o "!" do combo breaker e as legendas da conversa e do narrador.
+     */
+    static boolean mensagens = true;
+    /**
      * A luta inteira (cenário, lutadores, efeitos, HUD e botões) desenhada em OpenGL
      * ({@link DesenhoGl}); desligado, tudo no Canvas como antes. Vale a partir da próxima luta.
      */
