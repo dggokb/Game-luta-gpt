@@ -224,6 +224,23 @@ final class ControlsLayout {
         return sector + 1;
     }
 
+    /** Quanto o dedo precisa passar da divisa (graus) para trocar de direção. */
+    static final float DPAD_HISTERESE_GRAUS = 8f;
+
+    /**
+     * Como {@link #dpadDirectionAt(float, float)}, mas a direção {@code atual} só muda quando o
+     * dedo passa da divisa com folga: o polegar parado em cima dela (entre → e ↘) não fica
+     * trocando de direção a cada leitura do toque, o que enchia a história do comando.
+     */
+    static int dpadDirectionAt(float x, float y, int atual) {
+        int nova = dpadDirectionAt(x, y);
+        if (atual == 0 || nova == atual || nova == 0) return nova;
+        double degrees = Math.toDegrees(Math.atan2(y - DPAD_Y, x - DPAD_X));
+        double centro = (atual - 1) * 45.0;
+        double diff = Math.abs(((degrees - centro) % 360.0 + 540.0) % 360.0 - 180.0);
+        return diff <= 22.5 + DPAD_HISTERESE_GRAUS ? atual : nova;
+    }
+
     static boolean isDownDirection(int direction) {
         return direction == 2 || direction == 3 || direction == 4;
     }

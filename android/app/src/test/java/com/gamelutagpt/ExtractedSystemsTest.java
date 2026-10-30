@@ -94,6 +94,30 @@ public class ExtractedSystemsTest {
         for(int i=0;i<40;i++)m.record(i%2==0?5:1,600+i);
         assertFalse(m.matchCommand(quarterCircle,640,15,15));
     }
+    @Test public void motionParserIgnoresJitterAfterTheCommandAndNeedsNeutralForDash() {
+        int[] quarterCircle={3,1};
+        MotionParser m=new MotionParser();
+        // ↓ → e o polegar tremendo entre → e ↘ até o botão: o último → já está longe do ↓, mas o
+        // primeiro → do comando ainda vale.
+        m.record(3,100);m.record(1,104);
+        for(int i=1;i<=7;i++)m.record(i%2==1?2:1,104+i*2);
+        assertTrue("Tremida depois do comando",m.matchCommand(quarterCircle,119,15,15));
+        // Andando para frente e logo ↓ ↘ →: o → não é o segundo toque do dash.
+        m.clear();m.record(1,200);m.record(3,206);m.record(2,208);m.record(1,210);
+        assertFalse("Meia-lua depois de andar não é dash",m.doubleTap(1,210,18));
+        m.clear();m.record(1,300);m.record(2,302);m.record(1,304);
+        assertFalse("→ ↘ → sem soltar não é dash",m.doubleTap(1,304,18));
+    }
+    @Test public void dpadKeepsTheDirectionNearTheBorder() {
+        float r=ControlsLayout.DPAD_DEADZONE*3f;
+        double a=Math.toRadians(24);
+        float x=ControlsLayout.DPAD_X+(float)(Math.cos(a)*r),y=ControlsLayout.DPAD_Y+(float)(Math.sin(a)*r);
+        assertEquals("24° já é ↘",2,ControlsLayout.dpadDirectionAt(x,y));
+        assertEquals("...mas quem estava no → continua no →",1,ControlsLayout.dpadDirectionAt(x,y,1));
+        a=Math.toRadians(40);
+        x=ControlsLayout.DPAD_X+(float)(Math.cos(a)*r);y=ControlsLayout.DPAD_Y+(float)(Math.sin(a)*r);
+        assertEquals("Passou da folga: ↘",2,ControlsLayout.dpadDirectionAt(x,y,1));
+    }
     @Test public void cameraZoomsOutForDistantFightersAndKeepsTallOnesInFrame() {
         CameraRig near=new CameraRig(),far=new CameraRig();
         for(int i=0;i<600;i++){near.update(1/120f,500,700,Arena.GROUND_Y-230,false);far.update(1/120f,200,1500,Arena.GROUND_Y-230,false);}

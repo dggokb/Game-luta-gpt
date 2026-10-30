@@ -5620,9 +5620,9 @@ public class GameView extends SurfaceView
         // vários num só): a diagonal de um ↓ ↘ → ligeiro costuma estar só no meio deles.
         for (int h = 0; h < event.getHistorySize(); h++) {
             pad.setDirection(ControlsLayout.dpadDirectionAt(
-                event.getHistoricalX(pointerIndex, h) / sx, event.getHistoricalY(pointerIndex, h) / sy));
+                event.getHistoricalX(pointerIndex, h) / sx, event.getHistoricalY(pointerIndex, h) / sy, pad.direction()));
         }
-        pad.setDirection(ControlsLayout.dpadDirectionAt(event.getX(pointerIndex) / sx, event.getY(pointerIndex) / sy));
+        pad.setDirection(ControlsLayout.dpadDirectionAt(event.getX(pointerIndex) / sx, event.getY(pointerIndex) / sy, pad.direction()));
     }
 
     private void clearPendingInput() {
@@ -5844,10 +5844,10 @@ public class GameView extends SurfaceView
                     // Os pontos do meio que o Android juntou neste evento, antes do último.
                     for (int h = 0; h < event.getHistorySize(); h++) {
                         pad.setDirection(ControlsLayout.dpadDirectionAt(
-                            event.getHistoricalX(pointerIndex, h) / sx, event.getHistoricalY(pointerIndex, h) / sy));
+                            event.getHistoricalX(pointerIndex, h) / sx, event.getHistoricalY(pointerIndex, h) / sy, pad.direction()));
                     }
                     pad.setDirection(ControlsLayout.dpadDirectionAt(
-                        event.getX(pointerIndex) / sx, event.getY(pointerIndex) / sy));
+                        event.getX(pointerIndex) / sx, event.getY(pointerIndex) / sy, pad.direction()));
                 }
             }
         } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {

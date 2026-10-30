@@ -6,7 +6,7 @@ package com.gamelutagpt;
  * taps (dash/backdash) and down→up (super jump).
  */
 final class MotionParser {
-    static final int SIZE = 16;
+    static final int SIZE = 32;
 
     private final int[] directions = new int[SIZE];
     private final int[] frames = new int[SIZE];
@@ -106,21 +106,21 @@ final class MotionParser {
      */
     int commandEnd(int[] steps, int clock, int motionWindow, int pressWindow) {
         if (steps.length == 0) return -1;
-        int step = steps.length - 1;
-        int lastIndex = -1, lastFrame = -1, firstFrame = -1;
-        for (int i = count - 1; i >= 0 && step >= 0; i--) {
-            if (directions[i] != steps[step]) continue;
-            if (lastIndex < 0) {
-                lastIndex = i;
-                lastFrame = frames[i];
+        int last = steps[steps.length - 1];
+        // Cada vez que o último passo entrou, da mais nova para a mais velha: o dedo que treme
+        // entre → e ↘ entra no → de novo depois do comando, e só a última vez estouraria a janela.
+        for (int end = count - 1; end >= 0; end--) {
+            if (directions[end] != last) continue;
+            if (clock - frames[end] > pressWindow) return -1;
+            int step = steps.length - 2, firstFrame = frames[end];
+            for (int i = end - 1; i >= 0 && step >= 0; i--) {
+                if (directions[i] != steps[step]) continue;
+                firstFrame = frames[i];
+                step--;
             }
-            firstFrame = frames[i];
-            step--;
+            if (step < 0 && frames[end] - firstFrame <= motionWindow) return count - 1 - end;
         }
-        if (step >= 0) return -1;
-        if (clock - lastFrame > pressWindow) return -1;
-        if (lastFrame - firstFrame > motionWindow) return -1;
-        return count - 1 - lastIndex;
+        return -1;
     }
 
     /**
@@ -154,29 +154,23 @@ final class MotionParser {
      * the last one at most {@code pressWindow} frames ago. A match consumes the history.
      */
     boolean matchCommand(int[] command, int clock, int motionWindow, int pressWindow) {
-        if (command.length == 0) return false;
-        int step = command.length - 1;
-        int lastFrame = -1;
-        int firstFrame = -1;
-        for (int i = count - 1; i >= 0 && step >= 0; i--) {
-            if (directions[i] != command[step]) continue;
-            if (lastFrame < 0) lastFrame = frames[i];
-            firstFrame = frames[i];
-            step--;
-        }
-        if (step >= 0) return false;
-        if (clock - lastFrame > pressWindow) return false;
-        if (lastFrame - firstFrame > motionWindow) return false;
+        if (commandEnd(command, clock, motionWindow, pressWindow) < 0) return false;
         count = 0;
         return true;
     }
 
-    /** {@code direction} entered now, and also entered before within {@code window} frames. */
+    /**
+     * {@code direction} entered now, and also entered before within {@code window} frames, com o
+     * neutro no meio (soltar ou voltar ao centro): o → de um ↓ ↘ → logo depois de andar para
+     * frente não é dash.
+     */
     boolean doubleTap(int direction, int clock, int window) {
         if (!enteredNow(clock) || directions[count - 1] != direction) return false;
+        boolean neutro = false;
         for (int i = count - 2; i >= 0; i--) {
             if (clock - frames[i] > window) return false;
-            if (directions[i] == direction) return true;
+            if (directions[i] == 0) neutro = true;
+            else if (directions[i] == direction) return neutro;
         }
         return false;
     }
