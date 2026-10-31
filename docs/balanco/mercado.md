@@ -138,6 +138,21 @@ Cada uma entra num commit isolado, com antes e depois na `BateriaMercado` e regi
 Sugestão de ordem: 1, 2 e 3 juntas, porque mexem no mesmo equilíbrio entre ataque e defesa.
 Depois 8, 4 e 5; por último 6 e 7.
 
+## Aplicado em 31/10
+
+As propostas 1, 2 e 3 e o relógio (180 s) entraram em commits separados. O antes e depois está em
+[ajustes.md](ajustes.md), na seção "Ataque × defesa e relógio, pela comparação com o mercado".
+
+| Tema | Antes | Agora | Mercado |
+|---|---|---|---|
+| Parada no acerto L/M/H | 5 / 7 / 9 | 8 / 10 / 12 | SF6 9/11/13 |
+| Vantagem na defesa H / 2H | −2 / −4 | −5 / −7 | −5 a −10 |
+| Quebra de guarda só defendendo | 3,5–7 s | 8,6–16 s | SF6 ~20 s; Strive e T8 sem quebra |
+| Lutas 2x2 no tempo | 6–17% | 0% | — |
+
+Continuam abertos: a CPU agarrando e confirmando (4), o combo simples (5), o super pulo (7) e o
+tempo caído (8).
+
 ## Fontes
 
 - SF6, Strive, 2XKO (frame data): FAT, `SF6FrameData.json`, `GGSTFrameData.json`,

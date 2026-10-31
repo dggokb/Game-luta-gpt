@@ -1142,3 +1142,41 @@ desenho, sem o lutador sair do lugar. Dano, quadros e vantagem não mudam.
 **Régua da CPU:** `CpuReachTable.java` regenerada pela `GeraAlcanceCpu` (o `CpuReachTest`
 acusou a diferença). Só mudaram os agachados da p14 (ponta em pé/agachado): 2L 260/252 →
 210/204, 2M 296/290 → 284/278, 2H 138/124 → 160/146.
+
+## Ataque × defesa e relógio, pela comparação com o mercado (pedido do jogador, 31/10)
+
+**Pedido:** aplicar as propostas 1, 2 e 3 de [mercado.md](mercado.md) e o relógio.
+
+**O que mudou** (um commit por item):
+
+| Valor | Antes | Agora | Mercado |
+|---|---|---|---|
+| Parada no acerto (`hitstopFrames`) L / M / H, normais no chão e no ar | 5 / 7 / 9 | 8 / 10 / 12 | SF6 9/11/13 · Strive 11–15 |
+| Vantagem na defesa do H / 2H (`blockstunFrames` −3; `mecanicas.json` vantagem) | −2 / −4 (2H até −9) | −5 / −7 (2H até −12) | H de −5 a −10 |
+| `guardDrainPerBlockstunFrame` | 10 | 5 | SF6 ~20 s até o Burnout; Strive e T8 sem quebra |
+| `TIME_LIMIT_SECONDS` (luta 2x2) | 120 | 180 | DBFZ 300 s para 3 personagens |
+
+**Medido depois** (`BateriaMercado`, 400 lutas por modo, mesmas sementes; `BateriaCombos t08/t14`):
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Lutas 2x2 que acabam no tempo (CPU 8 / CPU 5) | 17% / 6% | **0% / 0%** |
+| Duração da luta 2x2, mediana (CPU 8) | 112 s | 117 s |
+| Duração por personagem derrubado (CPU 8, 2x2) | 55 s | 51 s |
+| Quebra de guarda só defendendo | 3,5–7 s | **8,6–16 s** (p13: 23 s) |
+| Quebra de guarda com pushblock | 11–20 s | 24–30 s |
+| Quebras de guarda por luta (CPU) | 0,1–0,2 | 0 |
+| Combo de 3+: dano mediano / p90 (CPU 8, 2x2) | 17% / 34% | 17% / 34% |
+| Aberturas de 1 acerto só (CPU 8, 2x2) | 78% | 78% |
+| Melhor rota sem barra, mediana do elenco | 42% | 42% |
+
+**Leitura:**
+- O relógio e a guarda fizeram o que se esperava.
+- A CPU converte igual. Ela decide continuar o combo pela própria lógica, não pela parada, então
+  o tempo a mais para confirmar só aparece com gente jogando.
+- A parada maior mudou a melhor rota de alguns personagens (a busca acha outras emendas no ar):
+  p10 36% → 51%, p06 43% → 32%, p07 53% → 47%, p14 48% → 42%. A mediana do elenco não mudou.
+  Vale olhar o p10 e o p06 na próxima rodada.
+
+**Testes:** suíte do motor 590, com as 3 falhas de caminho de arquivo de antes. `BattleFlowTest`
+passa a ler o limite da constante e o `BounceTest` conta os quadros do golpe sem os da parada.
