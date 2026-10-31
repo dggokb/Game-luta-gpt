@@ -327,7 +327,7 @@ final class DesenhoGl {
 
     int[] contagem() {
         return new int[] {canvasGl.textosNovos + canvas.textosNovosRc, canvasGl.formasStencil, canvasGl.desenhos,
-            Math.round(canvas.telasPintadas() * 10f)};
+            Math.round(canvas.telasPintadas() * 10f), Math.round(canvas.msPlaca * 10f), canvas.quadrosAtrasPlaca};
     }
 
     String resumo() {

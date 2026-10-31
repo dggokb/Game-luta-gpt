@@ -197,6 +197,7 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glVertexAttribPointer(3, 1, GLES30.GL_FLOAT, false, passo, 32);
         GLES30.glGetIntegerv(GLES30.GL_MAX_TEXTURE_SIZE, ids, 0);
         if (ids[0] > 0) maxTextura = ids[0];
+        criarConsultas();
         // O contexto é novo: as texturas antigas não existem mais.
         for (Textura t : texturas.values()) t.id = 0;
         texturas.clear();
@@ -237,6 +238,7 @@ final class GlRenderCanvas implements RenderCanvas {
         cantoTri = 0;
         larguraTela = largura;
         alturaTela = altura;
+        consultarPlaca();
         GLES30.glViewport(0, 0, largura, altura);
         GLES30.glClearColor(0f, 0f, 0f, 1f);
         GLES30.glClearStencil(0);
@@ -272,6 +274,62 @@ final class GlRenderCanvas implements RenderCanvas {
     void terminar() {
         descarregar();
         executar();
+        if (consultaAberta) {
+            GLES30.glEndQuery(GL_TIME_ELAPSED);
+            consultaAberta = false;
+            consultaPendente[consultaAtual] = true;
+            quadroDaConsulta[consultaAtual] = quadrosComConsulta++;
+            consultaAtual = (consultaAtual + 1) % CONSULTAS;
+        }
+    }
+
+    // ---- Tempo da placa de vídeo (GL_EXT_disjoint_timer_query) ----
+
+    private static final int GL_TIME_ELAPSED = 0x88BF, GL_GPU_DISJOINT = 0x8FBB, CONSULTAS = 4;
+    private final int[] consultas = new int[CONSULTAS];
+    private final boolean[] consultaPendente = new boolean[CONSULTAS];
+    private final long[] quadroDaConsulta = new long[CONSULTAS];
+    private final int[] resultado = new int[1];
+    private boolean temporizador, consultaAberta;
+    private int consultaAtual;
+    private long quadrosComConsulta;
+    /**
+     * O tempo que a placa de vídeo levou no quadro medido mais recente (ms, -1: sem medição) e
+     * quantos quadros atrás ele foi desenhado: a resposta chega 2 ou 3 quadros depois. A "trava"
+     * só diz quanto o quadro esperou; isto diz quanto a placa trabalhou.
+     */
+    float msPlaca = -1f;
+    int quadrosAtrasPlaca;
+
+    private void criarConsultas() {
+        String ext = GLES30.glGetString(GLES30.GL_EXTENSIONS);
+        temporizador = ext != null && ext.contains("GL_EXT_disjoint_timer_query");
+        java.util.Arrays.fill(consultaPendente, false);
+        consultaAberta = false;
+        if (temporizador) GLES30.glGenQueries(CONSULTAS, consultas, 0);
+    }
+
+    /** Lê as consultas prontas (da mais velha para a mais nova) e abre a deste quadro. */
+    private void consultarPlaca() {
+        if (!temporizador) return;
+        msPlaca = -1f;
+        GLES30.glGetIntegerv(GL_GPU_DISJOINT, resultado, 0);
+        boolean interrompido = resultado[0] != 0;
+        for (int k = 0; k < CONSULTAS; k++) {
+            int i = (consultaAtual + k) % CONSULTAS;
+            if (!consultaPendente[i]) continue;
+            GLES30.glGetQueryObjectuiv(consultas[i], GLES30.GL_QUERY_RESULT_AVAILABLE, resultado, 0);
+            if (resultado[0] == 0) break;
+            GLES30.glGetQueryObjectuiv(consultas[i], GLES30.GL_QUERY_RESULT, resultado, 0);
+            consultaPendente[i] = false;
+            if (!interrompido) {
+                msPlaca = (resultado[0] & 0xFFFFFFFFL) / 1e6f;
+                quadrosAtrasPlaca = (int)(quadrosComConsulta - quadroDaConsulta[i]);
+            }
+        }
+        if (consultaPendente[consultaAtual]) return;
+        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual]);
+        consultaAberta = true;
     }
 
     int largura() { return larguraTela; }

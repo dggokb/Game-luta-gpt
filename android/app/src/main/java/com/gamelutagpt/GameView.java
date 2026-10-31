@@ -3753,10 +3753,10 @@ public class GameView extends SurfaceView
             contexto |= TesteAutomatico.ULTRA_NA_TELA;
         }
         int[] g = glQuadro ? desenhoGl.contagem() : SEM_GL;
-        teste.quadro(perfil, contexto, g[0], g[1], g[2], g[3]);
+        teste.quadro(perfil, contexto, g[0], g[1], g[2], g[3], g[4], g[5]);
     }
 
-    private static final int[] SEM_GL = new int[4];
+    private static final int[] SEM_GL = {0, 0, 0, 0, -10, 0};
     /** Altura em pixels do último quadro desenhado (o título do relatório). */
     private int alturaDoQuadro;
     private final Paint testePaint = new Paint(Paint.ANTI_ALIAS_FLAG);

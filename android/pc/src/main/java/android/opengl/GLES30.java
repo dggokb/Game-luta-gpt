@@ -162,7 +162,32 @@ public final class GLES30 {
 
     // ---- Estado ----
 
-    public static void glGetIntegerv(int pname, int[] params, int offset) { params[offset] = GL11.glGetInteger(pname); }
+    public static void glGetIntegerv(int pname, int[] params, int offset) {
+        // GL_GPU_DISJOINT_EXT: o OpenGL do computador não tem (o tempo nunca é interrompido).
+        params[offset] = pname == 0x8FBB ? 0 : GL11.glGetInteger(pname);
+    }
+
+    // ---- Consultas (o tempo da placa de vídeo: GL_TIME_ELAPSED, do OpenGL 3.3) ----
+
+    public static final int GL_EXTENSIONS = 0x1F03, GL_QUERY_RESULT = 0x8866, GL_QUERY_RESULT_AVAILABLE = 0x8867;
+
+    /** No OpenGL 3.3 o tempo da placa é do núcleo: aparece aqui como a extensão do celular. */
+    public static String glGetString(int nome) {
+        if (nome == GL_EXTENSIONS) return "GL_EXT_disjoint_timer_query";
+        return GL11.glGetString(nome);
+    }
+
+    public static void glGenQueries(int n, int[] ids, int offset) {
+        for (int i = 0; i < n; i++) ids[offset + i] = GL15.glGenQueries();
+    }
+
+    public static void glBeginQuery(int alvo, int id) { GL15.glBeginQuery(alvo, id); }
+
+    public static void glEndQuery(int alvo) { GL15.glEndQuery(alvo); }
+
+    public static void glGetQueryObjectuiv(int id, int pname, int[] params, int offset) {
+        params[offset] = GL15.glGetQueryObjecti(id, pname);
+    }
 
     public static void glViewport(int x, int y, int w, int h) { GL11.glViewport(x, y, w, h); }
 

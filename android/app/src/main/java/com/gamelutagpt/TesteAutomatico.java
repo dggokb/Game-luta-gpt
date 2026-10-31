@@ -81,6 +81,9 @@ final class TesteAutomatico {
      */
     static final boolean areaPorOrigem = Boolean.getBoolean("gameluta.areaPorOrigem");
     private static final java.util.HashMap<String, Double> areaPorQuem = new java.util.HashMap<>();
+    /** O mesmo, nos quadros do Ultra. */
+    private static final java.util.HashMap<String, Double> areaNoUltra = new java.util.HashMap<>();
+    private static int quadrosDoUltra;
 
     static void areaGrande(double telas) {
         if (!gravando) return;
@@ -131,7 +134,9 @@ final class TesteAutomatico {
 
     /** Uma textura subiu para a placa de vídeo. */
     static void subiu(long bytes) {
-        if (gravando) bytesNoQuadro += bytes;
+        if (!gravando) return;
+        bytesNoQuadro += bytes;
+        if (areaPorOrigem) System.out.println(String.format(Locale.ROOT, "SUBIU %.1f MB  %s", bytes / 1048576.0, origem(3)));
     }
 
     /** A textura dos textos encheu e recomeçou (todos os textos são refeitos). */
@@ -140,6 +145,8 @@ final class TesteAutomatico {
     }
     private final List<Integer> contextos = new ArrayList<>();
     private final List<int[]> gl = new ArrayList<>();
+    /** Tempo da placa de vídeo de cada quadro (ms; -1: sem medição). */
+    private final List<Float> placa = new ArrayList<>();
     private String[] relatorio;
     private String descricao = "";
 
@@ -158,6 +165,7 @@ final class TesteAutomatico {
         quadros.clear();
         contextos.clear();
         gl.clear();
+        placa.clear();
         relatorio = null;
         subidas.clear();
         temposDeTexto.clear();
@@ -167,6 +175,8 @@ final class TesteAutomatico {
         textosFora = 0;
         java.util.Arrays.fill(tempoHud, 0);
         areaPorQuem.clear();
+        areaNoUltra.clear();
+        quadrosDoUltra = 0;
         areaNoQuadro.clear();
         quadrosPesados = 0;
         bytesNoQuadro = 0;
@@ -248,7 +258,8 @@ final class TesteAutomatico {
     }
 
     /** Um quadro desenhado da luta: o tempo por parte, o que estava na tela e os números do OpenGL. */
-    void quadro(PerfilQuadros perfil, int contexto, int textosNovos, int formas, int desenhos, int telasX10) {
+    void quadro(PerfilQuadros perfil, int contexto, int textosNovos, int formas, int desenhos, int telasX10,
+                int placaX10, int placaAtras) {
         // Só a luta: a intro e o READY ainda não contam.
         if (!ativo || passos == 0) return;
         long[] q = Arrays.copyOf(perfil.ultimoQuadro, perfil.ultimoQuadro.length + 1);
@@ -260,10 +271,18 @@ final class TesteAutomatico {
         nsTextosNoQuadro = 0;
         contextos.add(contexto);
         gl.add(new int[] {textosNovos, formas, desenhos, telasX10});
+        // O tempo da placa chega 2 ou 3 quadros depois: vai para o quadro que ele mediu.
+        placa.add(-1f);
+        int medido = placa.size() - 1 - placaAtras;
+        if (placaX10 >= 0 && placaAtras >= 1 && medido >= 0) placa.set(medido, placaX10 / 10f);
         if (areaPorOrigem) {
             if (telasX10 >= 200) {
                 quadrosPesados++;
                 for (java.util.Map.Entry<String, Double> e : areaNoQuadro.entrySet()) areaPorQuem.merge(e.getKey(), e.getValue(), Double::sum);
+            }
+            if (momento(contexto) == 4) {
+                quadrosDoUltra++;
+                for (java.util.Map.Entry<String, Double> e : areaNoQuadro.entrySet()) areaNoUltra.merge(e.getKey(), e.getValue(), Double::sum);
             }
             areaNoQuadro.clear();
         }
@@ -279,6 +298,12 @@ final class TesteAutomatico {
             System.out.println("AREA nos " + quadrosPesados + " quadros com 20+ telas:");
             areaPorQuem.entrySet().stream().sorted((x, y) -> Double.compare(y.getValue(), x.getValue())).limit(25)
                 .forEach(e -> System.out.println(String.format(Locale.ROOT, "AREA %6.2f telas/quadro  %s", e.getValue() / n, e.getKey())));
+        }
+        if (!areaNoUltra.isEmpty()) {
+            int n = Math.max(1, quadrosDoUltra);
+            System.out.println("AREA nos " + quadrosDoUltra + " quadros do Ultra:");
+            areaNoUltra.entrySet().stream().sorted((x, y) -> Double.compare(y.getValue(), x.getValue())).limit(25)
+                .forEach(e -> System.out.println(String.format(Locale.ROOT, "ULTRA %6.2f telas/quadro  %s", e.getValue() / n, e.getKey())));
         }
         for (String linha : relatorio) android.util.Log.i(PerfilQuadros.TAG, linha);
     }
@@ -302,6 +327,20 @@ final class TesteAutomatico {
         for (double t : tempos) if (t > 20.0) lentos++;
         r.add(String.format(Locale.ROOT, "TESTE 30 s (%s): %d quadros · quadro médio %.1f ms · p95 %.1f · pior %.0f · acima de 20 ms: %d (%.0f%%)",
             descricao, n, media, ord[(int)(n * 0.95)], ord[n - 1], lentos, lentos * 100.0 / n));
+        // Em faixas: quadros presos à tela de 120 Hz caem em degraus de 8,3 ms (16,7 / 25 / 33).
+        double[] limites = {14.5, 18.5, 22.5, 29.0, 37.0};
+        String[] nomes = {"até 14", "15–18", "19–22", "23–29", "30–37", "38+"};
+        int[] faixas = new int[nomes.length];
+        for (double t : tempos) {
+            int f = 0;
+            while (f < limites.length && t > limites[f]) f++;
+            faixas[f]++;
+        }
+        StringBuilder porFaixa = new StringBuilder("Quadros por faixa (ms):");
+        for (int f = 0; f < nomes.length; f++) {
+            if (faixas[f] > 0) porFaixa.append(String.format(Locale.ROOT, "  %s: %.0f%%", nomes[f], faixas[f] * 100.0 / n));
+        }
+        r.add(porFaixa.toString());
         StringBuilder partes = new StringBuilder("Partes, média/p95 ms:");
         for (int k = 0; k < total; k++) {
             double[] v = new double[n];
@@ -328,6 +367,32 @@ final class TesteAutomatico {
             if (c > 0) momentos.append(String.format(Locale.ROOT, "  %s %.1f ms (%d)", MOMENTOS[m], soma / c, c));
         }
         r.add(momentos.toString());
+        // O que a placa de vídeo levou (a trava é a espera por ela; isto é o trabalho dela).
+        StringBuilder naPlaca = new StringBuilder("Placa de vídeo, ms por quadro:");
+        int medidos = 0;
+        float piorPlaca = 0f;
+        java.util.List<Float> todos = new ArrayList<>();
+        for (int m = 0; m < MOMENTOS.length; m++) {
+            double soma = 0;
+            int c = 0;
+            for (int i = 0; i < n && i < placa.size(); i++) {
+                if (momento(contextos.get(i)) != m || placa.get(i) < 0f) continue;
+                soma += placa.get(i);
+                c++;
+                todos.add(placa.get(i));
+                piorPlaca = Math.max(piorPlaca, placa.get(i));
+            }
+            medidos += c;
+            if (c > 0) naPlaca.append(String.format(Locale.ROOT, "  %s %.1f", MOMENTOS[m], soma / c));
+        }
+        if (medidos > 0) {
+            java.util.Collections.sort(todos);
+            naPlaca.append(String.format(Locale.ROOT, "  · p95 %.1f · pior %.1f (%d quadros medidos)",
+                todos.get(Math.min(todos.size() - 1, (int)(todos.size() * 0.95))), piorPlaca, medidos));
+            r.add(naPlaca.toString());
+        } else {
+            r.add("Placa de vídeo: sem medição (o aparelho não tem GL_EXT_disjoint_timer_query ou está no Canvas)");
+        }
         // As duas partes que mais pesam em cada momento.
         StringBuilder porMomento = new StringBuilder("Onde pesa:");
         for (int m = 0; m < MOMENTOS.length; m++) {
@@ -427,9 +492,12 @@ final class TesteAutomatico {
             int maior = 0;
             for (int k = 1; k < total; k++) if (q[k] > q[maior]) maior = k;
             long mb = subidas.get(i) >> 20;
-            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d em %.0f ms%s)", tempos[i],
+            float placaAqui = i < placa.size() ? placa.get(i) : -1f, placaAntes = i > 0 && i - 1 < placa.size() ? placa.get(i - 1) : -1f;
+            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d em %.0f ms, placa %s/%s antes%s)", tempos[i],
                 PerfilQuadros.NOMES[maior], q[maior] / 1e6, MOMENTOS[momento(contextos.get(i))], gl.get(i)[3] / 10.0, gl.get(i)[0],
                 temposDeTexto.get(i) / 1e6,
+                placaAqui < 0f ? "?" : String.format(Locale.ROOT, "%.1f", placaAqui),
+                placaAntes < 0f ? "?" : String.format(Locale.ROOT, "%.1f", placaAntes),
                 subidas.get(i) > 0 ? ", subiu " + (mb > 0 ? mb + " MB" : (subidas.get(i) >> 10) + " KB") : ""));
         }
         r.add(piores.toString());

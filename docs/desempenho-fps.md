@@ -562,6 +562,37 @@ envio 2,4 ms). Antes ficava em 20–30.
 **Novas opções do `capturar`:** `-Pgl`, `-Pzgc`, `-Pjfr`, `-PesperaSelecao=10`, `-Pfolhas=N`,
 `-Pprecarga=N` e `-Presolucao`.
 
+**Correção da correção (carga da luta).** Com a pré-carga do PC sempre lenta, a carga de
+p15+p16 contra p13+p14 subiu de 19 s para 31 s. Agora são duas filas:
+- A thread de folhas marca no nome quando só antecipa (" antecipando"). O que ela pede vai para
+  a fila lenta.
+- Um pedido com pressa, como a tela de carregamento, usa a fila rápida (um por núcleo) e passa
+  para ela o que esperava na lenta.
+
+Medido: carga em 17 s e seleção a 54 quadros por segundo.
+
+### 5.15 Ultra: o que o relatório do celular diz e o que falta medir
+
+- **Quadro médio no Ultra:** 16,4 ms, o mesmo da luta toda.
+- **Trava maior não é lentidão:** a "trava" maior (5,9 contra 3,0 ms) só preenche o tempo até a
+  tela, porque no Ultra não há HUD e a CPU termina antes.
+- **O que sobra são quadros isolados:** os 5 piores (30–33 ms) são do Ultra, e 15% dos quadros
+  passam de 20 ms.
+- **Área no PC (`-Parea`, quadros do Ultra):** cerca de 4,5 das telas pintadas por quadro são do
+  cenário, como fora do Ultra.
+- **Imagens subindo para a placa:** quase nada no Ultra da p15/p16.
+
+O que entrou no relatório para separar "placa lenta" de "quadro perdeu a batida da tela":
+- **Placa de vídeo, ms por quadro (por momento, p95 e pior):** consulta `GL_TIME_ELAPSED`
+  (`GL_EXT_disjoint_timer_query`, que no PC é do OpenGL 3.3). A resposta vem 2 ou 3 quadros
+  depois e é posta no quadro que ela mediu. Nos piores quadros aparece "placa X/Y antes".
+- **Quadros por faixa:** com a tela de 120 Hz, quadros presos à tela caem em degraus de 8,3 ms.
+- **Com `-Parea`:** a área por origem nos quadros do Ultra e cada imagem que sobe ("SUBIU").
+
+No PC sem tela a placa emulada (llvmpipe) só trabalha na hora da leitura, então o tempo da placa
+dela não vale. No celular, sim.
+
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:
