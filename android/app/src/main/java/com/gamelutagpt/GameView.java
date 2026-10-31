@@ -3753,10 +3753,15 @@ public class GameView extends SurfaceView
             contexto |= TesteAutomatico.ULTRA_NA_TELA;
         }
         int[] g = glQuadro ? desenhoGl.contagem() : SEM_GL;
-        teste.quadro(perfil, contexto, g[0], g[1], g[2], g[3], g[4], g[5]);
+        teste.quadro(perfil, contexto, g);
     }
 
-    private static final int[] SEM_GL = {0, 0, 0, 0, -10, 0};
+    private static final int[] SEM_GL = {0, 0, 0, 0, -10, 0, -10, -10, -10, -10, -10};
+
+    /** Fim de uma parte do quadro (cenário, luta, frente, HUD) para o tempo da placa no teste. */
+    private void marcarPlaca() {
+        if (glQuadro && TesteAutomatico.gravando) desenhoGl.marcarPlaca();
+    }
     /** Altura em pixels do último quadro desenhado (o título do relatório). */
     private int alturaDoQuadro;
     private final Paint testePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -4080,6 +4085,7 @@ public class GameView extends SurfaceView
             }
             if (cenario) drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
+            marcarPlaca();
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
             if (finalizacao.ativo()) drawFinalizacao(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -4172,9 +4178,11 @@ public class GameView extends SurfaceView
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
+            marcarPlaca();
             // Na finalização a frente do cenário some junto com o resto dele.
             if (cenario && stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
             perfil.marca(PerfilQuadros.FRENTE);
+            marcarPlaca();
             TesteAutomatico.hudInicio();
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -4242,6 +4250,7 @@ public class GameView extends SurfaceView
             characterSelectRenderer.drawFightTransition(canvas);
             TesteAutomatico.hud(TesteAutomatico.HUD_RESTO);
             perfil.marca(PerfilQuadros.HUD);
+            marcarPlaca();
         }
     }
 

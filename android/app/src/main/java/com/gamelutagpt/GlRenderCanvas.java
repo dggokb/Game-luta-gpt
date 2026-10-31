@@ -239,6 +239,7 @@ final class GlRenderCanvas implements RenderCanvas {
         larguraTela = largura;
         alturaTela = altura;
         consultarPlaca();
+        nadaPintado = true;
         GLES30.glViewport(0, 0, largura, altura);
         GLES30.glClearColor(0f, 0f, 0f, 1f);
         GLES30.glClearStencil(0);
@@ -274,24 +275,25 @@ final class GlRenderCanvas implements RenderCanvas {
     void terminar() {
         descarregar();
         executar();
-        if (consultaAberta) {
-            GLES30.glEndQuery(GL_TIME_ELAPSED);
-            consultaAberta = false;
-            consultaPendente[consultaAtual] = true;
-            quadroDaConsulta[consultaAtual] = quadrosComConsulta++;
-            consultaAtual = (consultaAtual + 1) % CONSULTAS;
-        }
+        fecharConsulta();
     }
 
     // ---- Tempo da placa de vídeo (GL_EXT_disjoint_timer_query) ----
 
+    /**
+     * Partes do quadro medidas em separado: cenário, lutadores, frente, HUD e o resto (contador,
+     * teste). O GameView marca o fim de cada uma ({@link #marcarPlaca}); fora do teste o quadro
+     * inteiro é uma parte só (marcar fecha o lote).
+     */
+    static final int PARTES = 5;
     private static final int GL_TIME_ELAPSED = 0x88BF, GL_GPU_DISJOINT = 0x8FBB, CONSULTAS = 4;
-    private final int[] consultas = new int[CONSULTAS];
+    private final int[] consultas = new int[CONSULTAS * PARTES];
     private final boolean[] consultaPendente = new boolean[CONSULTAS];
+    private final int[] partesUsadas = new int[CONSULTAS];
     private final long[] quadroDaConsulta = new long[CONSULTAS];
     private final int[] resultado = new int[1];
     private boolean temporizador, consultaAberta;
-    private int consultaAtual;
+    private int consultaAtual, parteAtual;
     private long quadrosComConsulta;
     /**
      * O tempo que a placa de vídeo levou no quadro medido mais recente (ms, -1: sem medição) e
@@ -300,13 +302,15 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     float msPlaca = -1f;
     int quadrosAtrasPlaca;
+    /** O mesmo tempo por parte (-1: a parte não foi medida em separado). */
+    final float[] msPlacaPartes = new float[PARTES];
 
     private void criarConsultas() {
         String ext = GLES30.glGetString(GLES30.GL_EXTENSIONS);
         temporizador = ext != null && ext.contains("GL_EXT_disjoint_timer_query");
         java.util.Arrays.fill(consultaPendente, false);
         consultaAberta = false;
-        if (temporizador) GLES30.glGenQueries(CONSULTAS, consultas, 0);
+        if (temporizador) GLES30.glGenQueries(CONSULTAS * PARTES, consultas, 0);
     }
 
     /** Lê as consultas prontas (da mais velha para a mais nova) e abre a deste quadro. */
@@ -318,18 +322,53 @@ final class GlRenderCanvas implements RenderCanvas {
         for (int k = 0; k < CONSULTAS; k++) {
             int i = (consultaAtual + k) % CONSULTAS;
             if (!consultaPendente[i]) continue;
-            GLES30.glGetQueryObjectuiv(consultas[i], GLES30.GL_QUERY_RESULT_AVAILABLE, resultado, 0);
+            int n = partesUsadas[i];
+            GLES30.glGetQueryObjectuiv(consultas[i * PARTES + n - 1], GLES30.GL_QUERY_RESULT_AVAILABLE, resultado, 0);
             if (resultado[0] == 0) break;
-            GLES30.glGetQueryObjectuiv(consultas[i], GLES30.GL_QUERY_RESULT, resultado, 0);
             consultaPendente[i] = false;
+            float total = 0f;
+            for (int q = 0; q < PARTES; q++) {
+                if (q >= n) {
+                    if (!interrompido) msPlacaPartes[q] = -1f;
+                    continue;
+                }
+                GLES30.glGetQueryObjectuiv(consultas[i * PARTES + q], GLES30.GL_QUERY_RESULT, resultado, 0);
+                float ms = (resultado[0] & 0xFFFFFFFFL) / 1e6f;
+                total += ms;
+                if (!interrompido) msPlacaPartes[q] = n > 1 ? ms : -1f;
+            }
             if (!interrompido) {
-                msPlaca = (resultado[0] & 0xFFFFFFFFL) / 1e6f;
+                msPlaca = total;
                 quadrosAtrasPlaca = (int)(quadrosComConsulta - quadroDaConsulta[i]);
             }
         }
         if (consultaPendente[consultaAtual]) return;
-        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual]);
+        parteAtual = 0;
+        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual * PARTES]);
         consultaAberta = true;
+    }
+
+    /**
+     * Fim de uma parte do quadro: o que ela desenhou vai para a placa agora (sem isso o lote
+     * seguinte levaria o trabalho dela) e a próxima parte começa a contar.
+     */
+    void marcarPlaca() {
+        if (!consultaAberta || parteAtual >= PARTES - 1) return;
+        descarregar();
+        executar();
+        GLES30.glEndQuery(GL_TIME_ELAPSED);
+        parteAtual++;
+        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual * PARTES + parteAtual]);
+    }
+
+    private void fecharConsulta() {
+        if (!consultaAberta) return;
+        GLES30.glEndQuery(GL_TIME_ELAPSED);
+        consultaAberta = false;
+        consultaPendente[consultaAtual] = true;
+        partesUsadas[consultaAtual] = parteAtual + 1;
+        quadroDaConsulta[consultaAtual] = quadrosComConsulta++;
+        consultaAtual = (consultaAtual + 1) % CONSULTAS;
     }
 
     int largura() { return larguraTela; }
@@ -773,6 +812,7 @@ final class GlRenderCanvas implements RenderCanvas {
     private final float[] triA = new float[(3 + MAX_PLANOS) * FLOATS], triB = new float[(3 + MAX_PLANOS) * FLOATS];
 
     private void vertice(float x, float y, float u, float v, float r, float g, float bl, float al, float tipo) {
+        nadaPintado = false;
         if (alfaGlobal != 1f) {
             r *= alfaGlobal; g *= alfaGlobal; bl *= alfaGlobal; al *= alfaGlobal;
         }
@@ -1403,7 +1443,32 @@ final class GlRenderCanvas implements RenderCanvas {
 
     @Override public void fillRect(float l, float t, float r, float bt, int argb) {
         if ((argb >>> 24) == 0) return;
+        if (limparEmVezDePintar(l, t, r, bt, argb)) return;
         retangulo(l, t, r, bt, 0f, 0f, 0f, 0f, argb, 0f);
+    }
+
+    /** Nada foi pintado ainda neste quadro (a cor de fundo pode virar a limpeza da tela). */
+    private boolean nadaPintado;
+    /** Quadros em que a cor de fundo virou limpeza (o teste do PC confere). */
+    int fundosLimpos;
+
+    /**
+     * A cor de fundo do cenário pintava a tela inteira antes de tudo (1 das 7,7 telas pintadas
+     * por quadro, que as camadas cobrem logo depois). Opaca, na tela toda e antes de qualquer
+     * desenho, ela é a cor da limpeza: a placa de vídeo do celular limpa sem pintar pixel a pixel.
+     */
+    private boolean limparEmVezDePintar(float l, float t, float r, float bt, int argb) {
+        if (!nadaPintado || (argb >>> 24) != 255 || alfaGlobal != 1f || nPlanos > 0 || stencil != 0 || b != 0f || c != 0f) {
+            return false;
+        }
+        float x0 = a * l + e, x1 = a * r + e, y0 = d * t + f, y1 = d * bt + f;
+        if (Math.min(x0, x1) > 0f || Math.max(x0, x1) < larguraTela || Math.min(y0, y1) > 0f || Math.max(y0, y1) < alturaTela) {
+            return false;
+        }
+        GLES30.glClearColor(((argb >> 16) & 0xFF) / 255f, ((argb >> 8) & 0xFF) / 255f, (argb & 0xFF) / 255f, 1f);
+        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
+        fundosLimpos++;
+        return true;
     }
 
     @Override public void fillPolygon(float[] xy, int argb) {

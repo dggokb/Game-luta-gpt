@@ -327,7 +327,15 @@ final class DesenhoGl {
 
     int[] contagem() {
         return new int[] {canvasGl.textosNovos + canvas.textosNovosRc, canvasGl.formasStencil, canvasGl.desenhos,
-            Math.round(canvas.telasPintadas() * 10f), Math.round(canvas.msPlaca * 10f), canvas.quadrosAtrasPlaca};
+            Math.round(canvas.telasPintadas() * 10f), Math.round(canvas.msPlaca * 10f), canvas.quadrosAtrasPlaca,
+            Math.round(canvas.msPlacaPartes[0] * 10f), Math.round(canvas.msPlacaPartes[1] * 10f),
+            Math.round(canvas.msPlacaPartes[2] * 10f), Math.round(canvas.msPlacaPartes[3] * 10f),
+            Math.round(canvas.msPlacaPartes[4] * 10f)};
+    }
+
+    /** Fim de uma parte do quadro para o tempo da placa de vídeo (no teste automático). */
+    void marcarPlaca() {
+        if (quadroAberto) canvas.marcarPlaca();
     }
 
     String resumo() {

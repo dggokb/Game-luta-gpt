@@ -21,7 +21,7 @@ final class TesteAutomatico {
     static final int COMBO = 1, SHINKAI = 2, SUPER_NA_TELA = 4, ULTRA_NA_TELA = 8;
     private static final String[] MOMENTOS = {"normal", "combo", "SHINKAI", "Super", "Ultra"};
 
-    private boolean ativo;
+    private volatile boolean ativo;
     private int passos;
     private final List<long[]> quadros = new ArrayList<>();
     /** Bytes de textura subidos em cada quadro gravado. */
@@ -147,7 +147,10 @@ final class TesteAutomatico {
     private final List<int[]> gl = new ArrayList<>();
     /** Tempo da placa de vídeo de cada quadro (ms; -1: sem medição). */
     private final List<Float> placa = new ArrayList<>();
-    private String[] relatorio;
+    /** O mesmo por parte do quadro (null: não medido em partes). */
+    private final List<float[]> placaPartes = new ArrayList<>();
+    private static final String[] PARTES_DA_PLACA = {"cenário", "lutadores", "frente", "HUD", "resto"};
+    private volatile String[] relatorio;
     private String descricao = "";
 
     boolean ativo() { return ativo; }
@@ -166,6 +169,7 @@ final class TesteAutomatico {
         contextos.clear();
         gl.clear();
         placa.clear();
+        placaPartes.clear();
         relatorio = null;
         subidas.clear();
         temposDeTexto.clear();
@@ -258,8 +262,12 @@ final class TesteAutomatico {
     }
 
     /** Um quadro desenhado da luta: o tempo por parte, o que estava na tela e os números do OpenGL. */
-    void quadro(PerfilQuadros perfil, int contexto, int textosNovos, int formas, int desenhos, int telasX10,
-                int placaX10, int placaAtras) {
+    /**
+     * {@code g}: os números do OpenGL ({@link DesenhoGl#contagem}): textos novos, formas,
+     * desenhos, telas ×10, placa ×10, quadros atrás e a placa por parte ×10.
+     */
+    void quadro(PerfilQuadros perfil, int contexto, int[] g) {
+        int textosNovos = g[0], formas = g[1], desenhos = g[2], telasX10 = g[3], placaX10 = g[4], placaAtras = g[5];
         // Só a luta: a intro e o READY ainda não contam.
         if (!ativo || passos == 0) return;
         long[] q = Arrays.copyOf(perfil.ultimoQuadro, perfil.ultimoQuadro.length + 1);
@@ -273,8 +281,16 @@ final class TesteAutomatico {
         gl.add(new int[] {textosNovos, formas, desenhos, telasX10});
         // O tempo da placa chega 2 ou 3 quadros depois: vai para o quadro que ele mediu.
         placa.add(-1f);
+        placaPartes.add(null);
         int medido = placa.size() - 1 - placaAtras;
-        if (placaX10 >= 0 && placaAtras >= 1 && medido >= 0) placa.set(medido, placaX10 / 10f);
+        if (placaX10 >= 0 && placaAtras >= 1 && medido >= 0) {
+            placa.set(medido, placaX10 / 10f);
+            if (g[6] >= 0) {
+                float[] partes = new float[GlRenderCanvas.PARTES];
+                for (int k = 0; k < partes.length; k++) partes[k] = Math.max(0, g[6 + k]) / 10f;
+                placaPartes.set(medido, partes);
+            }
+        }
         if (areaPorOrigem) {
             if (telasX10 >= 200) {
                 quadrosPesados++;
@@ -290,9 +306,11 @@ final class TesteAutomatico {
     }
 
     private void terminar() {
-        ativo = false;
         gravando = false;
+        // O relatório antes de sair de ativo: quem espera o teste acabar (o MedirLuta, em outra
+        // thread) lia o relatório ainda vazio.
         relatorio = montarRelatorio().toArray(new String[0]);
+        ativo = false;
         if (!areaPorQuem.isEmpty()) {
             int n = Math.max(1, quadrosPesados);
             System.out.println("AREA nos " + quadrosPesados + " quadros com 20+ telas:");
@@ -390,6 +408,36 @@ final class TesteAutomatico {
             naPlaca.append(String.format(Locale.ROOT, "  · p95 %.1f · pior %.1f (%d quadros medidos)",
                 todos.get(Math.min(todos.size() - 1, (int)(todos.size() * 0.95))), piorPlaca, medidos));
             r.add(naPlaca.toString());
+            // Onde a placa gasta: cada parte, na média e no momento mais pesado de cada uma.
+            StringBuilder porParte = new StringBuilder("Placa por parte, ms/quadro:");
+            double[] somaParte = new double[GlRenderCanvas.PARTES];
+            double[][] porMomento = new double[MOMENTOS.length][GlRenderCanvas.PARTES];
+            int[] nMomento = new int[MOMENTOS.length];
+            int comPartes = 0;
+            for (int i = 0; i < n && i < placaPartes.size(); i++) {
+                float[] pp = placaPartes.get(i);
+                if (pp == null) continue;
+                comPartes++;
+                int m = momento(contextos.get(i));
+                nMomento[m]++;
+                for (int k = 0; k < pp.length; k++) {
+                    somaParte[k] += pp[k];
+                    porMomento[m][k] += pp[k];
+                }
+            }
+            if (comPartes > 0) {
+                for (int k = 0; k < somaParte.length; k++) {
+                    porParte.append(String.format(Locale.ROOT, "  %s %.1f", PARTES_DA_PLACA[k], somaParte[k] / comPartes));
+                }
+                for (int m = 0; m < MOMENTOS.length; m++) {
+                    if (nMomento[m] == 0 || m == 0) continue;
+                    porParte.append(String.format(Locale.ROOT, "  · %s:", MOMENTOS[m]));
+                    for (int k = 0; k < GlRenderCanvas.PARTES; k++) {
+                        porParte.append(String.format(Locale.ROOT, " %.1f", porMomento[m][k] / nMomento[m]));
+                    }
+                }
+                r.add(porParte.toString());
+            }
         } else {
             r.add("Placa de vídeo: sem medição (o aparelho não tem GL_EXT_disjoint_timer_query ou está no Canvas)");
         }

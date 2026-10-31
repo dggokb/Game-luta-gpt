@@ -592,6 +592,50 @@ O que entrou no relatório para separar "placa lenta" de "quadro perdeu a batida
 No PC sem tela a placa emulada (llvmpipe) só trabalha na hora da leitura, então o tempo da placa
 dela não vale. No celular, sim.
 
+**O relatório seguinte do celular** (1080p, p15+p16):
+
+| Medida | Valor |
+|---|---|
+| Quadro médio | 17,0 ms |
+| p95 | 23,0 ms |
+| Quadros de 15–18 ms | 42% |
+| Quadros de 19–22 ms | 26% |
+| Quadros de 23–29 ms | 6% |
+| Placa no normal | 13,4 ms |
+| Placa no combo | 14,1 ms |
+| Placa no SHINKAI | 16,6 ms |
+| Placa no Super | 16,5 ms |
+| Placa, p95 | 21,3 ms |
+
+Nos piores quadros a placa levou 12–15 ms e a trava foi de 12–13 ms. **A placa de vídeo é o
+limite**: ela está perto dos 16,6 ms de cada quadro, e quando passa o quadro espera a próxima
+batida.
+
+**Primeiro corte: a cor de fundo do cenário vira limpeza.** `StageScene.drawBackground` pintava
+a tela inteira com a cor do cenário antes das camadas, o que dava 1 tela pintada por quadro (cerca
+de 13% do que a placa pinta). Agora `GlRenderCanvas.fillRect` faz um `glClear` com essa cor quando
+ela é:
+- opaca;
+- da tela inteira;
+- sem rotação, recorte ou transparência;
+- antes de qualquer desenho no quadro.
+
+Na placa do celular a limpeza não pinta pixel a pixel. No PC, a origem "drawBackground:530" saiu
+da lista de área.
+
+**Placa por parte (teste automático):** o tempo da placa agora sai por parte do quadro:
+- cenário;
+- lutadores;
+- frente;
+- HUD;
+- resto.
+
+O `GameView` marca o fim de cada parte, e o `GlRenderCanvas.marcarPlaca` manda o lote e começa
+outra consulta. Isso só acontece no teste, porque fecha o lote 4 vezes por quadro.
+
+**Correção no teste:** o `TesteAutomatico` deixava de estar ativo antes de o relatório ficar
+pronto, e o MedirLuta (em outra thread) às vezes lia o relatório vazio.
+
 
 ## 6. Anexo: cenários e folhas
 
