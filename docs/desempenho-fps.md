@@ -505,7 +505,19 @@ de 2 ms sai no console como "TEXTO LENTO".
 | Piores quadros do SHINKAI | — | 0 textos |
 | HUD | — | 0,8 ms em média |
 
-Falta confirmar no celular com o TESTE.
+**No celular** (Xiaomi 24116RACCG, 1080p, OpenGL, p15+p16):
+
+| Medida | Antes (5.12) | Depois |
+|---|---|---|
+| Quadro médio | 19,3 ms | 16,4 ms |
+| p95 | — | 22,3 ms |
+| Pior quadro | 116 ms | 33 ms |
+| Ritmo | 74 FPS | 60 FPS (o limite segura a tela de 120 Hz) |
+| HUD | 3,9 ms | 2,5 ms |
+| Criando textos | — | 0,05 ms por quadro (pior quadro 4 ms) |
+
+- Os cinco piores quadros não criam texto. São do Ultra, com "trava" de 13–19 ms: o quadro
+  espera a placa de vídeo terminar o anterior (5,5–5,9 telas pintadas).
 
 ### 5.14 Seleção de personagem a 20–30 quadros por segundo
 
@@ -543,6 +555,9 @@ do fundo, que já cobre a tela inteira, e foi 1 tela a menos. Sobram cerca de 3,
 **Placa emulada deste servidor:** no xvfb a placa é emulada na CPU (llvmpipe), então o envio
 disputa a CPU com a carga em segundo plano. Desligando cada peça da seleção, o tempo não muda
 (custo fixo). Depois que a carga acaba, a seleção pelo OpenGL vai a 55 quadros por segundo.
+
+**No celular:** a seleção roda a 63 FPS, com quadro de 16,4 ms (tela 9,1 ms, trava 4,5 ms,
+envio 2,4 ms). Antes ficava em 20–30.
 
 **Novas opções do `capturar`:** `-Pgl`, `-Pzgc`, `-Pjfr`, `-PesperaSelecao=10`, `-Pfolhas=N`,
 `-Pprecarga=N` e `-Presolucao`.
