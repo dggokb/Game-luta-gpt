@@ -50,7 +50,14 @@ public class Resources {
      * minutos esperando e viravam lixo: 9 GB alocados em 30 s de luta, e o coletor parava o jogo.
      */
     private final Map<String, Long> prefixosIniciados = new HashMap<>();
-    private ExecutorService pool;
+    /**
+     * Duas filas de pré-carga. Rápida (um por núcleo): alguém espera pelas folhas (a tela de
+     * carregamento). Lenta (metade dos núcleos até 4, na prioridade mais baixa): só antecipação,
+     * com a seleção na tela; com um por núcleo ela caía para 20–30 quadros por segundo. Um
+     * pedido com pressa passa o que estava na fila lenta para a rápida.
+     */
+    private ExecutorService poolRapido;
+    private java.util.concurrent.ThreadPoolExecutor poolLento;
 
     private final android.util.DisplayMetrics metrics = android.util.DisplayMetrics.doPc();
 
@@ -95,6 +102,7 @@ public class Resources {
             if (p == null) startSiblings(name);
         }
         if (p == null) return BitmapFactory.decodeFile(f.getPath());
+        if (!antecipando() && !p.bitmap.isDone()) apressar();
         try {
             return p.bitmap.get();
         } catch (InterruptedException e) {
@@ -115,19 +123,9 @@ public class Resources {
         prefixosIniciados.put(prefix, agora);
         String[] names = drawableDir.list();
         if (names == null) return;
-        if (pool == null) {
-            // Metade dos núcleos (até 4) e na prioridade mais baixa: com um por núcleo, a
-            // antecipação dos quatro lutadores na seleção ocupava a CPU inteira e a seleção caía
-            // para 20–30 quadros por segundo. -Dgameluta.precarga=N fixa quantas.
-            int nucleos = Runtime.getRuntime().availableProcessors();
-            int threads = Math.max(1, Integer.getInteger("gameluta.precarga", Math.min(4, nucleos / 2)));
-            pool = Executors.newFixedThreadPool(threads, r -> {
-                Thread t = new Thread(r, "PreCargaAtlas");
-                t.setDaemon(true);
-                t.setPriority(Thread.MIN_PRIORITY);
-                return t;
-            });
-        }
+        boolean devagar = antecipando();
+        ExecutorService pool = devagar ? poolLento() : poolRapido();
+        if (!devagar) apressar();
         for (String file : names) {
             if (!file.startsWith(prefix) || !(file.endsWith(".png") || file.endsWith(".webp"))) continue;
             String sibling = baseName(new File(file));
@@ -135,6 +133,49 @@ public class Resources {
             String path = new File(drawableDir, file).getPath();
             prefetched.put(sibling, new Prefetched(pool.submit(() -> BitmapFactory.decodeFile(path))));
         }
+    }
+
+    /** A thread decodifica só uma antecipação (o SpriteAtlasCache marca no nome dela). */
+    private static boolean antecipando() {
+        return Thread.currentThread().getName().endsWith(" antecipando");
+    }
+
+    private ExecutorService poolRapido() {
+        if (poolRapido == null) {
+            int threads = Math.max(2, Runtime.getRuntime().availableProcessors());
+            poolRapido = Executors.newFixedThreadPool(threads, r -> {
+                Thread t = new Thread(r, "PreCargaAtlas");
+                t.setDaemon(true);
+                t.setPriority(Thread.NORM_PRIORITY - 1);
+                return t;
+            });
+        }
+        return poolRapido;
+    }
+
+    private ExecutorService poolLento() {
+        if (poolLento == null) {
+            int nucleos = Runtime.getRuntime().availableProcessors();
+            // -Dgameluta.precarga=N fixa quantas.
+            int threads = Math.max(1, Integer.getInteger("gameluta.precarga", Math.min(4, nucleos / 2)));
+            poolLento = new java.util.concurrent.ThreadPoolExecutor(threads, threads, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+                new java.util.concurrent.LinkedBlockingQueue<>(), r -> {
+                    Thread t = new Thread(r, "PreCargaAtlas lenta");
+                    t.setDaemon(true);
+                    t.setPriority(Thread.MIN_PRIORITY);
+                    return t;
+                });
+        }
+        return poolLento;
+    }
+
+    /** Alguém espera: o que ainda está na fila lenta vai para a rápida (o mesmo Future). */
+    private void apressar() {
+        if (poolLento == null || poolLento.getQueue().isEmpty()) return;
+        List<Runnable> fila = new ArrayList<>();
+        poolLento.getQueue().drainTo(fila);
+        ExecutorService rapido = poolRapido();
+        for (Runnable r : fila) rapido.execute(r);
     }
 
     /** Joga fora pré-cargas velhas (atlas que o jogo não chegou a pedir). */

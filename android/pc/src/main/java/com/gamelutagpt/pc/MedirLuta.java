@@ -47,9 +47,13 @@ public final class MedirLuta {
             String[] d = dupla.split(",");
             c.jogo().escolherDuplas(d[0], d[1], d[2], d[3]);
             c.esperar(1.0);
-            long carregando = System.currentTimeMillis() + 60_000;
+            long carregando = System.currentTimeMillis() + 180_000;
             while (!c.jogo().iniciarTesteDesempenho()) {
-                if (System.currentTimeMillis() > carregando) throw new IllegalStateException("a dupla não carregou");
+                if (System.currentTimeMillis() > carregando) {
+                    // Sem o exit, as threads do jogo seguram o processo aberto.
+                    System.err.println("a dupla não carregou");
+                    System.exit(2);
+                }
                 c.esperar(0.5);
             }
             // O pedido acima já valeu: espera a intro passar e pede de novo (o roteiro conta da luta).

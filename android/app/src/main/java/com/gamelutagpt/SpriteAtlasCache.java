@@ -558,12 +558,21 @@ final class SpriteAtlasCache {
     }
 
     /** Decodifica fora da trava e publica o resultado. {@code propagar}: o erro sobe para quem chamou. */
+    /** No nome da thread enquanto ela decodifica só uma antecipação (o PC pré-carrega devagar). */
+    static final String ANTECIPANDO=" antecipando";
+
     private void decodificar(Entrada e,boolean propagar) {
         Folha folha=null;Throwable erro=null;
+        Thread esta=Thread.currentThread();
+        String nome=esta.getName();
+        // Ninguém esperando por ela: o PC pré-carrega os irmãos devagar, sem tirar a CPU da tela.
+        if(e.soAntecipada)esta.setName(nome+ANTECIPANDO);
         try {
             folha=carregar(e.character,e.atlas,e.escala);
         } catch(RuntimeException|OutOfMemoryError ex) {
             erro=ex;
+        } finally {
+            if(e.soAntecipada||!nome.equals(esta.getName()))esta.setName(nome);
         }
         synchronized(trava) {
             e.decodificando=false;
