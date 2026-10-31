@@ -294,7 +294,7 @@
       "recoveryFrames": 5,
       "hitstunFrames": 12,
       "blockstunFrames": 9,
-      "hitstopFrames": 5,
+      "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
           2,
@@ -334,7 +334,7 @@
       "recoveryFrames": 8,
       "hitstunFrames": 15,
       "blockstunFrames": 12,
-      "hitstopFrames": 7,
+      "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
           4,
@@ -370,7 +370,7 @@
       "recoveryFrames": 17,
       "hitstunFrames": 26,
       "blockstunFrames": 19,
-      "hitstopFrames": 9,
+      "hitstopFrames": 12,
       "cancelWindows": {
         "hit": [
           10,
@@ -401,7 +401,7 @@
       "recoveryFrames": 4,
       "hitstunFrames": 11,
       "blockstunFrames": 8,
-      "hitstopFrames": 5,
+      "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
           3,
@@ -440,7 +440,7 @@
       "recoveryFrames": 6,
       "hitstunFrames": 20,
       "blockstunFrames": 10,
-      "hitstopFrames": 7,
+      "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
           6,
@@ -470,7 +470,7 @@
       "recoveryFrames": 9,
       "hitstunFrames": 44,
       "blockstunFrames": 10,
-      "hitstopFrames": 9,
+      "hitstopFrames": 12,
       "cancelWindows": {
         "hit": [
           9,
@@ -498,7 +498,7 @@
       "recoveryFrames": 4,
       "hitstunFrames": 14,
       "blockstunFrames": 10,
-      "hitstopFrames": 5,
+      "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
           4,
@@ -528,7 +528,7 @@
       "recoveryFrames": 6,
       "hitstunFrames": 16,
       "blockstunFrames": 12,
-      "hitstopFrames": 7,
+      "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
           6,
@@ -560,7 +560,7 @@
       "recoveryFrames": 9,
       "hitstunFrames": 18,
       "blockstunFrames": 14,
-      "hitstopFrames": 9,
+      "hitstopFrames": 12,
       "cancelWindows": {
         "hit": null,
         "block": null,

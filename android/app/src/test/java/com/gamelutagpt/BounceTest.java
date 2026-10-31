@@ -267,9 +267,11 @@ public class BounceTest {
         int restante = heavy.totalFrames - a.attackFrame;
         s.in[0].direction = 1;
         int quadros = 0;
+        // Conta só os quadros do golpe: os da parada no acerto (hitstop) não andam a recuperação.
         while (quadros < 60 && !a.forwardDashing) {
+            boolean parado = a.hitstop > 0;
             s.step();
-            quadros++;
+            if (!parado) quadros++;
         }
         assertTrue("segurando → depois da parede, corre", a.forwardDashing);
         assertTrue("corre antes de acabar a recuperação (" + quadros + " de " + restante + ")",
