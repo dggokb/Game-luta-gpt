@@ -517,14 +517,42 @@ final class GlRenderCanvas implements RenderCanvas {
 
     // ---- Gravação: um pedaço do quadro que não muda (o controle de toque, os botões de teste) ----
 
-    /** Sobe quando alguma textura é apagada ou recomeçada: as gravações de antes deixam de valer. */
+    /**
+     * Sobe quando o que todas as gravações usam muda (a textura dos textos ou a dos degradês
+     * recomeça, contexto novo): as gravações de antes deixam de valer.
+     */
     private int epocaTexturas;
     private int execucoes;
+    /**
+     * As texturas apagadas, em ordem (as últimas {@link #APAGADAS}): uma gravação só deixa de
+     * valer se usa uma delas. Antes qualquer textura apagada (um texto grande que saiu, 32 vezes
+     * em 30 s de luta) fazia o controle de toque e os botões serem desenhados de novo.
+     */
+    private static final int APAGADAS = 256;
+    private final int[] apagadas = new int[APAGADAS];
+    private long nApagadas;
+
+    private void apagou(int id) {
+        apagadas[(int)(nApagadas % APAGADAS)] = id;
+        nApagadas++;
+    }
+
+    /** A gravação usa alguma textura apagada desde que foi feita (ou não dá para saber). */
+    private boolean usaApagada(Gravacao g) {
+        if (nApagadas - g.apagadasAte > APAGADAS) return true;
+        for (long k = g.apagadasAte; k < nApagadas; k++) {
+            int id = apagadas[(int)(k % APAGADAS)];
+            for (int t : g.textura) if (t == id) return true;
+        }
+        return false;
+    }
 
     /** Os vértices (já na tela) e os comandos de um pedaço do quadro, para repetir sem desenhar. */
     static final class Gravacao {
         float[] dados;
         int vertices, comandos, epoca, largura, altura;
+        /** Quantas texturas já tinham sido apagadas quando ela foi feita (ou conferida). */
+        long apagadasAte;
         int[] inicio, quantos, textura, stencil, nPlanos;
         boolean[] inverte;
         float[][] filtro, recorte;
@@ -536,6 +564,7 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private int gravInicioVertice, gravInicioPosicao, gravInicioComando, gravEpoca, gravExecucoes;
+    private long gravApagadas;
     private double gravArea;
 
     void gravarComecar() {
@@ -544,6 +573,7 @@ final class GlRenderCanvas implements RenderCanvas {
         gravInicioPosicao = posicao;
         gravInicioComando = comandos;
         gravEpoca = epocaTexturas;
+        gravApagadas = nApagadas;
         gravExecucoes = execucoes;
         gravArea = areaPintada;
     }
@@ -551,7 +581,10 @@ final class GlRenderCanvas implements RenderCanvas {
     /** O que foi desenhado desde {@link #gravarComecar}, ou null se não deu para gravar inteiro. */
     Gravacao gravarTerminar() {
         descarregar();
-        if (execucoes != gravExecucoes || epocaTexturas != gravEpoca || nPendente != 0 || stencil != 0) return null;
+        if (execucoes != gravExecucoes || epocaTexturas != gravEpoca || nApagadas != gravApagadas || nPendente != 0
+            || stencil != 0) {
+            return null;
+        }
         Gravacao g = new Gravacao();
         g.vertices = vertices - gravInicioVertice;
         g.dados = java.util.Arrays.copyOfRange(dados, gravInicioPosicao, posicao);
@@ -567,6 +600,7 @@ final class GlRenderCanvas implements RenderCanvas {
         g.filtro = java.util.Arrays.copyOfRange(cmdFiltro, gravInicioComando, comandos);
         g.recorte = java.util.Arrays.copyOfRange(cmdRecorte, gravInicioComando, comandos);
         g.epoca = epocaTexturas;
+        g.apagadasAte = nApagadas;
         g.largura = larguraTela;
         g.altura = alturaTela;
         g.area = areaPintada - gravArea;
@@ -576,7 +610,15 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Repete uma gravação (copia os vértices e os comandos). False se ela não vale mais. */
     boolean reproduzir(Gravacao g) {
         if (g.epoca != epocaTexturas || g.largura != larguraTela || g.altura != alturaTela || g.vertices > MAX_VERTICES / 2) {
+            TesteAutomatico.gravacaoRefeita();
             return false;
+        }
+        if (g.apagadasAte != nApagadas) {
+            if (usaApagada(g)) {
+                TesteAutomatico.gravacaoRefeita();
+                return false;
+            }
+            g.apagadasAte = nApagadas;
         }
         descarregar();
         reservar(g.vertices);
@@ -1125,6 +1167,7 @@ final class GlRenderCanvas implements RenderCanvas {
                 executar();
                 degrades.clear();
                 epocaTexturas++;
+                TesteAutomatico.gravacoesPerdidas(0);
                 linhaDoObjeto.clear();
             }
             linha = degrades.size();
@@ -1215,7 +1258,8 @@ final class GlRenderCanvas implements RenderCanvas {
             executar();
             if (velho[0] == texturaAtual) texturaAtual = 0;
             GLES30.glDeleteTextures(1, velho, 0);
-            epocaTexturas++;
+            apagou(velho[0]);
+            TesteAutomatico.gravacoesPerdidas(1);
             texturasDeTextoVivas.remove(velho[0]);
             bytesTexturas -= velho[1];
         }
@@ -1261,6 +1305,7 @@ final class GlRenderCanvas implements RenderCanvas {
             prateleiraX = prateleiraY = alturaPrateleira = 0;
             geracaoTexto++;
             epocaTexturas++;
+            TesteAutomatico.gravacoesPerdidas(2);
             TesteAutomatico.atlasDeTextoCheio();
             textos.clear();
             ultimoDoTexto.clear();
@@ -1373,7 +1418,7 @@ final class GlRenderCanvas implements RenderCanvas {
             // envio: fica sem textura (quem precisar dela de novo a decodifica).
             if (!bitmap.isRecycled() && !fonte.isRecycled()) throw e;
             GLES30.glDeleteTextures(1, id, 0);
-            epocaTexturas++;
+            apagou(id[0]);
             return null;
         }
         if (fonte != bitmap) fonte.recycle();
@@ -1406,7 +1451,8 @@ final class GlRenderCanvas implements RenderCanvas {
             texturaAtual = 0;
         }
         GLES30.glDeleteTextures(1, new int[] {t.id}, 0);
-        epocaTexturas++;
+        apagou(t.id);
+        TesteAutomatico.gravacoesPerdidas(3);
         t.id = 0;
         bytesTexturas -= t.bytes;
     }

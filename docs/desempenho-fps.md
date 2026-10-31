@@ -720,6 +720,35 @@ o laço, que continuava gerando quadros a mais.
 - **Sem batida ainda** (começo da luta): dorme pelo relógio, como antes.
 - **Sem pedidos por 1 s** (menus no Canvas, pausa): a thread para de ouvir a batida.
 
+**Resultado no celular:**
+- 58–60 FPS (eram 66);
+- trava 1,7 ms (era 5,3);
+- quadros acima de 20 ms: 1% (eram 10%);
+- pior quadro 26 ms (era 32).
+
+Agora o "quadro" do relatório é só o trabalho dele (12,1 ms em média), porque a espera pela
+batida fica fora.
+
+### 5.17 Picos do HUD: gravações refeitas a cada textura apagada
+
+Nos piores quadros do celular o HUD levou 8–15 ms, sem texto criado (média de 2,7 ms). No PC,
+o HUD gravado (5.12) era refeito 32 vezes em 30 s de luta: qualquer textura apagada (um "texto
+grande" com textura própria saindo da fila de 24) invalidava todas as gravações, inclusive as
+que não usavam aquela textura.
+
+**Correção.**
+- O `GlRenderCanvas` guarda as últimas 256 texturas apagadas.
+- Uma gravação só deixa de valer se um dos comandos dela usa uma delas.
+- A textura dos textos e a dos degradês recomeçando continuam invalidando tudo.
+- No PC: 42 texturas saíram e o HUD gravado foi refeito 0 vezes.
+
+**Novas linhas no relatório:**
+- **HUD por pedaço:** o pior quadro de cada pedaço.
+- **Piores quadros:** o pedaço do HUD que mais pesou (quando passa de 2 ms) e o coletor de lixo
+  do Android (`art.gc.blocking-gc-time`).
+- **Coletor de lixo segurando o jogo:** total, em quantos quadros e o pior.
+- **HUD gravado refeito:** quantas vezes, e quantas texturas saíram, por motivo.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

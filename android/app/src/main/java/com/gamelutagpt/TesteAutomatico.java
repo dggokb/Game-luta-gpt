@@ -43,6 +43,9 @@ final class TesteAutomatico {
         "barra SHINKAI", "barras de super", "PLAYER/TAG", "efeitos do HUD", "relógio", "botões de teste", "SELEÇÃO",
         "mensagens/combo", "tutorial", "controle de toque", "cinema/conversa", "vitória/Ultra/pausa"};
     private static final long[] tempoHud = new long[PARTES_HUD.length];
+    /** O de cada pedaço só no quadro de agora, e o pior quadro de cada um. */
+    private static final long[] hudNoQuadro = new long[PARTES_HUD.length];
+    private static final long[] piorHud = new long[PARTES_HUD.length];
     private static long marcaHud;
 
     static void hudInicio() {
@@ -54,6 +57,7 @@ final class TesteAutomatico {
         if (!gravando) return;
         long agora = System.nanoTime();
         tempoHud[parte] += agora - marcaHud;
+        hudNoQuadro[parte] += agora - marcaHud;
         marcaHud = agora;
     }
 
@@ -141,11 +145,40 @@ final class TesteAutomatico {
         if (areaPorOrigem) System.out.println(String.format(Locale.ROOT, "SUBIU %.1f MB  %s", bytes / 1048576.0, origem(3)));
     }
 
+    /** Por que as gravações do HUD deixaram de valer (uma textura saiu): quantas vezes cada. */
+    private static final String[] MOTIVOS_GRAVACAO = {"degradês", "textos grandes", "textura dos textos", "imagens"};
+    private static final int[] gravacoesPerdidas = new int[MOTIVOS_GRAVACAO.length];
+
+    static void gravacoesPerdidas(int motivo) {
+        if (gravando) gravacoesPerdidas[motivo]++;
+    }
+
+    /** Uma gravação do HUD deixou de valer e foi desenhada de novo. */
+    private static int gravacoesRefeitas;
+
+    static void gravacaoRefeita() {
+        if (gravando) gravacoesRefeitas++;
+    }
+
     /** A textura dos textos encheu e recomeçou (todos os textos são refeitos). */
     static void atlasDeTextoCheio() {
         if (gravando) atlasCheio++;
     }
     private final List<Integer> contextos = new ArrayList<>();
+    /** Por quadro: o pedaço do HUD que mais pesou e quanto (ns); o coletor de lixo (ms). */
+    private final List<long[]> hudMaior = new ArrayList<>();
+    private final List<Integer> coletor = new ArrayList<>();
+    private long coletorAntes = -1;
+
+    /** Tempo total em que o coletor de lixo segurou as threads do jogo (ms; 0 se o aparelho não diz). */
+    private static long msDoColetor() {
+        try {
+            String v = android.os.Debug.getRuntimeStat("art.gc.blocking-gc-time");
+            return v != null ? Long.parseLong(v.trim()) : 0L;
+        } catch (RuntimeException e) {
+            return 0L;
+        }
+    }
     private final List<int[]> gl = new ArrayList<>();
     /** Tempo da placa de vídeo de cada quadro (ms; -1: sem medição). */
     private final List<Float> placa = new ArrayList<>();
@@ -176,6 +209,13 @@ final class TesteAutomatico {
         areaDosTextos.clear();
         textosFora = 0;
         java.util.Arrays.fill(tempoHud, 0);
+        java.util.Arrays.fill(hudNoQuadro, 0);
+        java.util.Arrays.fill(piorHud, 0);
+        java.util.Arrays.fill(gravacoesPerdidas, 0);
+        gravacoesRefeitas = 0;
+        hudMaior.clear();
+        coletor.clear();
+        coletorAntes = -1;
         areaPorQuem.clear();
         areaNoUltra.clear();
         quadrosDoUltra = 0;
@@ -272,6 +312,18 @@ final class TesteAutomatico {
         q[q.length - 1] = perfil.ultimoTotal;
         quadros.add(q);
         subidas.add(bytesNoQuadro);
+        // O pedaço do HUD que mais pesou neste quadro (o pico de HUD dos piores quadros).
+        int maior = 0;
+        for (int k = 0; k < hudNoQuadro.length; k++) {
+            if (hudNoQuadro[k] > hudNoQuadro[maior]) maior = k;
+            piorHud[k] = Math.max(piorHud[k], hudNoQuadro[k]);
+        }
+        hudMaior.add(new long[] {maior, hudNoQuadro[maior]});
+        java.util.Arrays.fill(hudNoQuadro, 0);
+        // Quanto o coletor de lixo do Android segurou as threads neste quadro (ms).
+        long gc = msDoColetor();
+        coletor.add(coletorAntes >= 0 && gc >= coletorAntes ? (int)(gc - coletorAntes) : 0);
+        coletorAntes = gc;
         bytesNoQuadro = 0;
         temposDeTexto.add(nsTextosNoQuadro);
         nsTextosNoQuadro = 0;
@@ -428,9 +480,19 @@ final class TesteAutomatico {
         for (int j = 0; j < Math.min(9, ordem.length); j++) {
             double ms = tempoHud[ordem[j]] / 1e6 / n;
             if (ms < 0.05) break;
-            hud.append(String.format(Locale.ROOT, "  %s %.2f", PARTES_HUD[ordem[j]], ms));
+            hud.append(String.format(Locale.ROOT, "  %s %.2f (pior %.0f)", PARTES_HUD[ordem[j]], ms, piorHud[ordem[j]] / 1e6));
         }
         r.add(hud.toString());
+        StringBuilder perdidas = new StringBuilder(String.format(Locale.ROOT,
+            "HUD gravado refeito %d vezes · texturas que saíram:", gravacoesRefeitas));
+        int totalPerdidas = 0;
+        for (int k = 0; k < gravacoesPerdidas.length; k++) {
+            if (gravacoesPerdidas[k] == 0) continue;
+            totalPerdidas += gravacoesPerdidas[k];
+            perdidas.append(String.format(Locale.ROOT, "  %s %d", MOTIVOS_GRAVACAO[k], gravacoesPerdidas[k]));
+        }
+        if (totalPerdidas == 0) perdidas.append(" nenhuma");
+        r.add(perdidas.toString());
         double tn = 0, fo = 0, de = 0;
         int maxTextos = 0, maxFormas = 0;
         for (int[] g : gl) {
@@ -491,6 +553,14 @@ final class TesteAutomatico {
             }
             r.add(String.format(Locale.ROOT, "Criando textos: %.2f ms por quadro, pior quadro %.1f ms, %.0f ms no total",
                 somaTexto / 1e6 / n, piorTexto / 1e6, somaTexto / 1e6));
+            int gcTotal = 0, gcQuadros = 0, gcPior = 0;
+            for (int ms : coletor) {
+                gcTotal += ms;
+                if (ms > 0) gcQuadros++;
+                gcPior = Math.max(gcPior, ms);
+            }
+            r.add(String.format(Locale.ROOT, "Coletor de lixo segurando o jogo: %d ms no total, em %d quadros, pior %d ms", gcTotal,
+                gcQuadros, gcPior));
         }
         Integer[] idx = new Integer[n];
         for (int i = 0; i < n; i++) idx[i] = i;
@@ -503,12 +573,14 @@ final class TesteAutomatico {
             for (int k = 1; k < total; k++) if (q[k] > q[maior]) maior = k;
             long mb = subidas.get(i) >> 20;
             float placaAqui = i < placa.size() ? placa.get(i) : -1f, placaAntes = i > 0 && i - 1 < placa.size() ? placa.get(i - 1) : -1f;
-            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d em %.0f ms, placa %s/%s antes%s)", tempos[i],
+            piores.append(String.format(Locale.ROOT, "  %.0f ms (%s %.0f, %s, %.1f telas, textos %d em %.0f ms, placa %s/%s antes%s%s%s)", tempos[i],
                 PerfilQuadros.NOMES[maior], q[maior] / 1e6, MOMENTOS[momento(contextos.get(i))], gl.get(i)[3] / 10.0, gl.get(i)[0],
                 temposDeTexto.get(i) / 1e6,
                 placaAqui < 0f ? "?" : String.format(Locale.ROOT, "%.1f", placaAqui),
                 placaAntes < 0f ? "?" : String.format(Locale.ROOT, "%.1f", placaAntes),
-                subidas.get(i) > 0 ? ", subiu " + (mb > 0 ? mb + " MB" : (subidas.get(i) >> 10) + " KB") : ""));
+                subidas.get(i) > 0 ? ", subiu " + (mb > 0 ? mb + " MB" : (subidas.get(i) >> 10) + " KB") : "",
+                hudMaior.get(i)[1] > 2_000_000L ? String.format(Locale.ROOT, ", HUD: %s %.0f ms", PARTES_HUD[(int)hudMaior.get(i)[0]], hudMaior.get(i)[1] / 1e6) : "",
+                coletor.get(i) > 0 ? ", coletor " + coletor.get(i) + " ms" : ""));
         }
         r.add(piores.toString());
         return r;
