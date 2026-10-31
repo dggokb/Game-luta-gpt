@@ -369,7 +369,7 @@
       "activeFrames": 5,
       "recoveryFrames": 17,
       "hitstunFrames": 26,
-      "blockstunFrames": 19,
+      "blockstunFrames": 16,
       "hitstopFrames": 12,
       "cancelWindows": {
         "hit": [
@@ -469,7 +469,7 @@
       "activeFrames": 6,
       "recoveryFrames": 9,
       "hitstunFrames": 44,
-      "blockstunFrames": 10,
+      "blockstunFrames": 7,
       "hitstopFrames": 12,
       "cancelWindows": {
         "hit": [
