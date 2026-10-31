@@ -1,5 +1,7 @@
 # Queda de FPS: análise completa e soluções
 
+> Para pôr imagens novas no jogo (formato, tamanho, onde e como conferir): [imagens-novas.md](imagens-novas.md).
+
 Análise do código na branch `game-luta-sprite-gpt` até o commit `88b2763` (desenho novo: a luta inteira em OpenGL pelo `CanvasGl`) para achar o que derruba o FPS no celular e o que fazer, em ordem de ganho por esforço. Nada aqui foi medido no aparelho: cada causa vem com o jeito de confirmá-la no celular (seção 4). Os números de memória e de imagem foram medidos nos arquivos do repositório.
 
 ## 1. Resumo
