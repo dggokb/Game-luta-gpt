@@ -383,10 +383,11 @@ final class CombatConfig {
      */
     static final int LIFE_SCALE_PERMILLE = 1400;
     /**
-     * Guarda gasta por quadro de blockstun do golpe defendido (um leve ~100, um forte ~180):
-     * umas 10 defesas seguidas quebram (eram 17, e quase nunca quebrava).
+     * Guarda gasta por quadro de blockstun do golpe defendido (um leve ~50, um forte ~85):
+     * umas 20 defesas seguidas quebram, 7–14 s só defendendo (com 10 eram 3,5–7 s, bem mais
+     * rápido que o mercado: docs/balanco/mercado.md).
      */
-    int guardDrainPerBlockstunFrame = 10;
+    int guardDrainPerBlockstunFrame = 5;
     /** Batida de um golpe de várias batidas antes da última: gasta só esta fração (por mil). */
     int guardHoldingDrainPermille = 500;
     /** Quadros sem defender antes de a guarda começar a voltar. */
