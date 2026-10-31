@@ -353,7 +353,7 @@ def torso_x(rgba):
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
-              sem_poeira=False, sem_efeitos=False, manter_efeitos=False, cor_efeito=None, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
+              sem_poeira=False, sem_efeitos=False, manter_efeitos=False, cor_efeito=None, limpar_chao=False, ancorar_pe=False, centralizar=None, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
               balanco=1.0, objetos=0, rampa=None, cabeca_em=None)
 
@@ -413,6 +413,9 @@ def parser():
                    help='faixa de altura onde limpar cada célula, {"4": [0, 0.3]} (fração do corpo, 0 = topo)')
     p.add_argument("--ancorar-pe", action="store_true",
                    help="depois de converter, fixa o pé de apoio no lugar do idle (tools/sprites/ancorar.py)")
+    p.add_argument("--centralizar",
+                   help="REF,LIMITE[,v]: depois de converter, segura o tronco a LIMITE px do da pose REF "
+                        "(CROUCH_IDLE, JUMP; v: também na vertical) (tools/sprites/centralizar.py)")
     p.add_argument("--aparar-borda", type=int, default=0,
                    help="apaga N px nas bordas de cima e dos lados de cada célula: o que passa da "
                         "célula máxima (chicote, capa) sai cortado limpo em vez de colado na borda")
@@ -668,6 +671,10 @@ def main(argv=None):
             import ancorar
             off = ancorar.anchor(pack_id, atlas)
             print("pé de apoio fixado: " + " ".join(f"{d:+d}" for d in off))
+        if args.centralizar and in_place:
+            import centralizar
+            dx, dy = centralizar.centralizar(pack_id, atlas, args.centralizar)
+            print("tronco centralizado: " + " ".join(f"{a:+d}/{b:+d}" for a, b in zip(dx, dy)))
         if args.limpar_quadros and in_place:
             import limpar
             limpar.clean_atlas(pack_id, atlas, args.limpar_quadros, areas=args.limpar_area)

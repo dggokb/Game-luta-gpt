@@ -296,7 +296,11 @@ def video_seconds(cfg, anim):
         q = list(range(start, start + cfg['expectedFrames'] * step, step))
     if len(q) != cfg['expectedFrames']:
         return None
-    gaps = list(np.diff(q)) + [float(np.median(np.diff(q))) if len(q) > 1 else 1.0]
+    d = np.diff(q)
+    passo = float(np.median(d[d > 0])) if (d > 0).any() else 1.0
+    # A emenda de um loop montado fora de ordem (idle 56..122 e 0..54) volta para trás no vídeo:
+    # vale o passo normal (o intervalo negativo virava 5 s parados num quadro).
+    gaps = [float(g) if g > 0 else passo for g in d] + [passo]
     return np.array([gaps[i] for i in anim['frames']], float) / r.get('fps', 24)
 
 

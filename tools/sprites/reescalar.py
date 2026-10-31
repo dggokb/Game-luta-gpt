@@ -23,6 +23,7 @@ from ancorar import clip_path  # noqa: E402
 
 MIN_SCORE = 0.7    # nota mínima da cabeça para valer
 TOLERANCE = 0.04   # fator mais perto de 1 que isso fica 1
+MARGEM = 10        # px livres na borda da célula alargada (o build exige 8)
 
 
 def head_zoom(tmpl, rgba):
@@ -53,21 +54,55 @@ def factors(cid, state, pack, clips):
     return np.round(z, 3), found
 
 
-def rescale(cfg, z):
+def rescale(cfg, z, atlas=None):
+    """Escala cada célula em volta da raiz. Com {@code atlas}, alarga a célula para o que cresce não
+    passar da borda (o tornado do Ultra da p14 já ocupava a célula inteira: aumentado, saía cortado
+    reto); sem ele, corta o que passa (como antes)."""
     sheet = A.Sheet(cfg)
     img = Image.open(A.ROOT / cfg['source']).convert('RGBA')
-    out = Image.new('RGBA', img.size, (0, 0, 0, 0))
+    d, n = sheet.d, len(z)
+    pad = [0, 0, 0, 0]  # esquerda, direita, cima, baixo (px lógicos)
+    if atlas is not None:
+        for i, f in enumerate(z):
+            m = sheet.frame(i)[..., 3] > 0
+            if f == 1 or not m.any():
+                continue
+            xs, ys = np.nonzero(m.any(0))[0], np.nonzero(m.any(1))[0]
+            x0, x1 = sheet.rx + (xs.min() - sheet.rx) / f, sheet.rx + (xs.max() - sheet.rx) / f
+            y0, y1 = sheet.ry + (ys.min() - sheet.ry) / f, sheet.ry + (ys.max() - sheet.ry) / f
+            pad[0] = max(pad[0], int(np.ceil(MARGEM - x0)))
+            pad[1] = max(pad[1], int(np.ceil(x1 - (sheet.w - 1 - MARGEM))))
+            pad[2] = max(pad[2], int(np.ceil(MARGEM - y0)))
+            pad[3] = max(pad[3], int(np.ceil(y1 - (sheet.h - 1 - MARGEM))))
+    pad = [max(0, v) for v in pad]
+    w, h = sheet.pw + d * (pad[0] + pad[1]), sheet.ph + d * (pad[2] + pad[3])
+    rx, ry = sheet.prx + d * pad[0], sheet.pry + d * pad[2]
+    rows = (n + sheet.cols - 1) // sheet.cols
+    out = Image.new('RGBA', (w * sheet.cols, h * rows), (0, 0, 0, 0))
     for i, f in enumerate(z):
         x, y = i % sheet.cols * sheet.pw, i // sheet.cols * sheet.ph
         cell = img.crop((x, y, x + sheet.pw, y + sheet.ph))
+        big = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         if f != 1:
             scaled = cell.resize((round(sheet.pw / f), round(sheet.ph / f)), Image.LANCZOS)
-            cell = Image.new('RGBA', cell.size, (0, 0, 0, 0))
-            # paste aceita posição negativa: fator < 1 aumenta o quadro e corta o que passa da célula
-            cell.paste(scaled, (sheet.prx - round(sheet.prx / f), sheet.pry - round(sheet.pry / f)))
-        out.alpha_composite(cell, (x, y))
+            # paste aceita posição negativa: o que passa da célula (sem alargar) sai cortado
+            big.paste(scaled, (rx - round(sheet.prx / f), ry - round(sheet.pry / f)))
+        else:
+            big.paste(cell, (d * pad[0], d * pad[2]))
+        out.alpha_composite(big, (i % sheet.cols * w, i // sheet.cols * h))
     out.save(A.ROOT / cfg['source'])
     A.Sheet.cache.pop(cfg['source'], None)
+    if any(pad):
+        path = clip_path(atlas)
+        data = json.loads(path.read_text(encoding='utf-8'))
+        data['frameWidth'], data['frameHeight'], data['rootX'], data['rootY'] = w, h, rx, ry
+        if 'video' in data:
+            v = data['video']
+            v['largura'], v['celula'] = w // d, h // d
+            vx, vy = v.get('raiz', '128,238').split(',')
+            v['raiz'] = f'{int(vx) + pad[0]},{int(vy) + pad[2]}'
+        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    return pad
 
 
 def main():
@@ -89,7 +124,7 @@ def main():
         print('   cabeça: ' + ' '.join(f'{zz:.2f}/{r:.2f}' for r, zz in found))
         if args.ver or not (z != 1).any():
             continue
-        rescale(clips[atlas], z)
+        rescale(clips[atlas], z, atlas)
         path = clip_path(atlas)
         data = json.loads(path.read_text(encoding='utf-8'))
         target = data['video'] if 'video' in data else data
