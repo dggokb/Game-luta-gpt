@@ -1677,6 +1677,8 @@ public class GameView extends SurfaceView
             if (!running) break;
             drawFrame();
             boolean janela = perfil.fim();
+            // O trabalho do quadro para a dica de desempenho do Android (o tempo até aqui, sem a espera).
+            if (glQuadro) desenhoGl.relatarTrabalho(System.nanoTime() - frameStart);
             if (teste.ativo()) registrarQuadroDoTeste();
             // No teste a qualidade fica parada: trocar no meio misturava as medidas.
             if (janela && !teste.ativo() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {

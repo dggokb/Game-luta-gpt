@@ -112,6 +112,9 @@ final class DesenhoGl {
     /** PC: o laço anda pelo relógio (a janela mostra o quadro pronto). */
     boolean esperarBatida() { return false; }
 
+    /** PC: sem a dica de desempenho do Android. */
+    void relatarTrabalho(long ns) {}
+
     boolean disponivel() {
         return !falhou;
     }

@@ -274,6 +274,11 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     /** O jogo acabou: tudo do OpenGL é solto. Com o loop parado. */
     void liberar() {
         pararBatida();
+        if (dica != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            dica.close();
+            dica = null;
+        }
+        dicaTentada = false;
         if (tela == EGL14.EGL_NO_DISPLAY) return;
         destruirSuperficie();
         if (contexto != EGL14.EGL_NO_CONTEXT) EGL14.eglDestroyContext(tela, contexto);
@@ -409,6 +414,48 @@ final class DesenhoGl implements SurfaceHolder.Callback {
         if (!temApresentacao || p <= 0) return;
         long batidas = (LATENCIA + p - 1) / p;
         EGLExt.eglPresentationTimeANDROID(tela, superficie, batida + batidas * p - p / 2);
+    }
+
+    // ---- Dica de desempenho para o Android (ADPF) ----
+
+    /**
+     * Nos piores quadros do celular o HUD inteiro levava 9–11 ms (2,5 de média) sem nenhum
+     * pedaço passar de 3–5: tudo mais lento ao mesmo tempo, a CPU baixando a frequência ou
+     * trocando o jogo de núcleo. A sessão de dica (Android 12+) diz ao sistema quanto o trabalho
+     * de cada quadro pode levar e quanto levou, e ele ajusta a CPU para cumprir.
+     */
+    private android.os.PerformanceHintManager.Session dica;
+    private boolean dicaTentada;
+    private int threadDaDica;
+    /** O trabalho da CPU por quadro que o sistema deve garantir (a placa trabalha em paralelo). */
+    private static final long META_DO_QUADRO = 12_000_000L;
+
+    /** O trabalho do quadro (atualizar e desenhar, sem a espera pela batida), na thread do jogo. */
+    void relatarTrabalho(long ns) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || ns <= 0) return;
+        int tid = android.os.Process.myTid();
+        if (dicaTentada && tid != threadDaDica) {
+            // O laço voltou noutra thread (o jogo pausou e voltou): a sessão é da thread velha.
+            if (dica != null) dica.close();
+            dica = null;
+            dicaTentada = false;
+        }
+        if (!dicaTentada) {
+            dicaTentada = true;
+            threadDaDica = tid;
+            try {
+                android.os.PerformanceHintManager m = view.getContext().getSystemService(android.os.PerformanceHintManager.class);
+                if (m != null) dica = m.createHintSession(new int[] {tid}, META_DO_QUADRO);
+            } catch (RuntimeException e) {
+                dica = null;
+            }
+        }
+        if (dica == null) return;
+        try {
+            dica.reportActualWorkDuration(ns);
+        } catch (RuntimeException e) {
+            dica = null;
+        }
     }
 
     private void pararBatida() {

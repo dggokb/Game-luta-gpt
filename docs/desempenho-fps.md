@@ -788,6 +788,25 @@ Os dois piores quadros (25 e 31 ms) são do Ultra, com o pedaço "vitória/Ultra
 10–15 ms. No PC o pico não se repete. O pedaço foi dividido em "vitória/pausa", "abertura do
 Ultra" e "página final do Ultra" para o próximo teste dizer qual dos três pesa.
 
+**Teste seguinte:**
+- quadro médio 11,6 ms, p95 17,8, 1% acima de 20 ms;
+- a página final do Ultra fica em 0,33 ms por quadro na média do teste, com pior quadro de 15 ms;
+- no PC a página quase não aparece no perfil (6 amostras de 46 mil).
+
+Os piores quadros (25–29 ms) têm o HUD inteiro em 9–11 ms (2,5 de média), mas nenhum pedaço passa
+de 3–5 ms: tudo mais lento no mesmo quadro (frequência da CPU, troca de núcleo).
+
+### 5.19 Dica de desempenho para o Android (ADPF)
+
+`DesenhoGl.relatarTrabalho` cria uma sessão do `PerformanceHintManager` (Android 12+) para a
+thread do jogo:
+- a meta é 12 ms de trabalho de CPU por quadro;
+- a cada quadro em OpenGL o laço informa quanto o trabalho levou (atualizar e desenhar, sem a
+  espera pela batida);
+- o sistema ajusta a frequência da CPU para cumprir a meta, em vez de deixar o jogo cair num
+  núcleo lento ou numa frequência baixa;
+- se o laço volta noutra thread (pausa e volta), a sessão é refeita.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:
