@@ -130,6 +130,13 @@ public final class Ajustes {
     /** Quadros da mistura e a opacidade do quadro de antes no começo dela. */
     public int quadrosTransicao = 2;
     public float alfaTransicao = 0.35f;
+    /**
+     * A volta de um golpe para a guarda (ou para o agachado): o último quadro do golpe começa
+     * inteiro por cima e some nesses quadros. As duas poses são quase a mesma (o golpe termina
+     * na guarda), então não vira dupla exposição; só a mão ou o braço que mudam se misturam.
+     */
+    public int quadrosVoltaGolpe = 8;
+    public float alfaVoltaGolpe = 1f;
 
     /** Cópias translúcidas atrás do dash, do backdash e do pulo com embalo da corrida. */
     public boolean rastro = true;

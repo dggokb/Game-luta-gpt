@@ -60,6 +60,11 @@ public final class MotorAnimacao {
 
     private String clipeSaindo;
     private int quadroSaindo, transicaoInicio = Integer.MIN_VALUE;
+    /** Quadros e opacidade inicial da mistura de agora (a volta do golpe mistura mais). */
+    private int quadrosMistura;
+    private float alfaMistura;
+    /** O clipe de antes era um golpe. */
+    private boolean golpeAntes;
 
     /** Rastro: fila circular de cópias e quando cada uma nasceu (no relógio do motor). */
     private final Pose.Fantasma[] copias;
@@ -296,6 +301,13 @@ public final class MotorAnimacao {
             clipeSaindo = clipeAntes;
             quadroSaindo = quadroAntes;
             transicaoInicio = q;
+            // Voltando de um golpe para a guarda: o último quadro do golpe some aos poucos por cima
+            // (a mão do fim do golpe e a da guarda nem sempre são a mesma: a p14 termina o L, o M e o
+            // H de mão aberta, e o idle começa de mão fechada).
+            // Só parado: saindo andando, o quadro do golpe por cima viraria fantasma.
+            boolean voltaDoGolpe = golpeAntes && Math.abs(l.vx) < 1f;
+            quadrosMistura = voltaDoGolpe ? ajustes.quadrosVoltaGolpe : ajustes.quadrosTransicao;
+            alfaMistura = voltaDoGolpe ? ajustes.alfaVoltaGolpe : ajustes.alfaTransicao;
         } else {
             transicaoInicio = Integer.MIN_VALUE;
         }
@@ -354,10 +366,10 @@ public final class MotorAnimacao {
         cansaco.limpar(q);
 
         int n = q - transicaoInicio;
-        if (clipeSaindo != null && n >= 0 && n < ajustes.quadrosTransicao) {
+        if (clipeSaindo != null && n >= 0 && n < quadrosMistura) {
             pose.clipeAnterior = clipeSaindo;
             pose.quadroAnterior = quadroSaindo;
-            pose.alfaAnterior = ajustes.alfaTransicao * (1f - n / (float)ajustes.quadrosTransicao);
+            pose.alfaAnterior = alfaMistura * (1f - n / (float)quadrosMistura);
         } else {
             pose.clipeAnterior = null;
             pose.alfaAnterior = 0f;
@@ -388,6 +400,7 @@ public final class MotorAnimacao {
         preparandoPuloAntes = l.preparandoPulo;
         clipeAntes = l.clipe;
         quadroAntes = l.quadro;
+        golpeAntes = l.golpe;
         olhandoAntes = l.olhando;
     }
 

@@ -40,6 +40,7 @@ Organizado pelos 12 princípios da animação (o que cada efeito resolve):
 | | Tranco da tela | o tremor do golpe tem direção: a tela vai no sentido do golpe e volta por mola (o tremor aleatório ficou menor) | 4 / 9 / 14 px |
 | | Câmera adiantada | a câmera se adianta para o lado de quem corre e volta ao parar | 30 px |
 | Pose a pose | Transição | troca de clipe fora de golpes, reações, decolagem e aterrissagem: o quadro de antes some em 2 quadros | 35% |
+| | Volta do golpe | o golpe terminando na guarda (ou no agachado) com o lutador parado: o último quadro do golpe começa inteiro por cima e some em 8 quadros (`quadrosVoltaGolpe`, `alfaVoltaGolpe`). As duas poses são quase a mesma, então só a mão ou o braço que mudam se misturam: a p14 termina o L, o M e o H de mão aberta e o idle começa de mão fechada. Saindo andando fica a transição comum, sem fantasma do golpe | 100% |
 | | Rastro | só nos dois para a frente e dois para trás (dash, backdash e air dash) e no pulo que sai da corrida; o super pulo e os golpes não deixam (`rastroNosGolpes` liga nos golpes) | até 3 cópias azuladas, 35%, vivem 8 quadros |
 | Direto | Quadros intermediários | fora do jogo: `tools/sprites/intermediarios.py` (abaixo) | — |
 

@@ -185,6 +185,33 @@ public class MotorAnimacaoTest {
     }
 
     @Test
+    public void voltaDoGolpeParadoMisturaMaisEAndandoNao() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura golpe = parado("LIGHT_JAB");
+        golpe.golpe = true;
+        golpe.quadro = 7;
+        m.passo(golpe);
+        m.passo(parado("IDLE"));
+        assertEquals("LIGHT_JAB", m.pose().clipeAnterior);
+        assertEquals(7, m.pose().quadroAnterior);
+        assertEquals("começa inteiro por cima", m.ajustes.alfaVoltaGolpe, m.pose().alfaAnterior, 1e-6f);
+        for (int i = 1; i < m.ajustes.quadrosVoltaGolpe; i++) {
+            m.passo(parado("IDLE"));
+            assertTrue("ainda some aos poucos", m.pose().alfaAnterior > 0f);
+        }
+        m.passo(parado("IDLE"));
+        assertNull(m.pose().clipeAnterior);
+
+        // Saindo andando do golpe: a mistura comum (curta e fraca), sem fantasma do golpe.
+        m.passo(golpe);
+        Leitura andando = parado("WALK_FORWARD");
+        andando.vx = 4f;
+        m.passo(andando);
+        assertEquals(m.ajustes.alfaTransicao, m.pose().alfaAnterior, 1e-6f);
+    }
+
+    @Test
     public void viradoDeLadoNaoMistura() {
         MotorAnimacao m = new MotorAnimacao();
         m.passo(parado("WALK_BACK"));
