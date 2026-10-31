@@ -770,6 +770,24 @@ um custa uns 0,7–1 ms para subir.
 RenderCanvas), contadas em `GlRenderCanvas.subidasDeTexto`. O resto espera o próximo quadro,
 como um texto ainda em preparo: aparece o mesmo texto esticado ou nada por um quadro.
 
+**Resultado no celular** (com o 5.17 e o 5.18):
+
+| Medida | Valor |
+|---|---|
+| Quadro médio | 11,6 ms |
+| p95 | 17,1 ms |
+| Quadros em até 14 ms | 86% |
+| Quadros acima de 20 ms | 1% |
+| FPS | 61 |
+| HUD gravado refeito | 1 vez (38 textos grandes saíram) |
+| Textos por quadro | no máximo 2 |
+| Pior quadro criando textos | 3,0 ms |
+| Coletor de lixo segurando o jogo | 0 ms |
+
+Os dois piores quadros (25 e 31 ms) são do Ultra, com o pedaço "vitória/Ultra/pausa" do HUD em
+10–15 ms. No PC o pico não se repete. O pedaço foi dividido em "vitória/pausa", "abertura do
+Ultra" e "página final do Ultra" para o próximo teste dizer qual dos três pesa.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

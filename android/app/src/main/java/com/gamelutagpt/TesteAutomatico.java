@@ -38,10 +38,11 @@ final class TesteAutomatico {
      */
     static final int HUD_TELA = 0, HUD_CORTE = 1, HUD_TIMES = 2, HUD_MOLDURA = 3, HUD_SHINKAI = 4, HUD_BARRAS = 5,
         HUD_TEXTOS = 6, HUD_EFEITOS = 7, HUD_RELOGIO = 8, HUD_TESTE = 9, HUD_SELECAO = 10, HUD_MENSAGENS = 11,
-        HUD_TUTORIAL = 12, HUD_TOQUE = 13, HUD_CINEMA = 14, HUD_RESTO = 15;
+        HUD_TUTORIAL = 12, HUD_TOQUE = 13, HUD_CINEMA = 14, HUD_RESTO = 15, HUD_ABERTURA = 16, HUD_PAGINA = 17;
     private static final String[] PARTES_HUD = {"efeitos de tela", "corte/clash", "retratos e vida", "moldura",
         "barra SHINKAI", "barras de super", "PLAYER/TAG", "efeitos do HUD", "relógio", "botões de teste", "SELEÇÃO",
-        "mensagens/combo", "tutorial", "controle de toque", "cinema/conversa", "vitória/Ultra/pausa"};
+        "mensagens/combo", "tutorial", "controle de toque", "cinema/conversa", "vitória/pausa", "abertura do Ultra",
+        "página final do Ultra"};
     private static final long[] tempoHud = new long[PARTES_HUD.length];
     /** O de cada pedaço só no quadro de agora, e o pior quadro de cada um. */
     private static final long[] hudNoQuadro = new long[PARTES_HUD.length];

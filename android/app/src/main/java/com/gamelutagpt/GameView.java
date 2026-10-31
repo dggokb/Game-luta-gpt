@@ -4248,10 +4248,13 @@ public class GameView extends SurfaceView
                 TesteAutomatico.hud(TesteAutomatico.HUD_CINEMA);
             }
             telaVitoria.desenhar(canvas);
+            TesteAutomatico.hud(TesteAutomatico.HUD_RESTO);
             if (abertura.isActive()) abertura.render(renderCanvas);
+            TesteAutomatico.hud(TesteAutomatico.HUD_ABERTURA);
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
+            TesteAutomatico.hud(TesteAutomatico.HUD_PAGINA);
             // A pausa por cima da luta parada.
             pausa.render(renderCanvas);
 
