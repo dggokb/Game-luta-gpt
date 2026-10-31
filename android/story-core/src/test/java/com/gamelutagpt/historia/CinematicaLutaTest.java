@@ -114,6 +114,11 @@ public class CinematicaLutaTest {
                 }
                 for (String pagina : r.paginas()) {
                     assertTrue(passo.cinematica + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
+                    // A página é lida com os quadros e balões do passo dela no episódio.
+                    String epId = pagina.substring(0, pagina.indexOf('/'));
+                    Episodio epDaPagina = Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json"));
+                    assertNotNull(passo.cinematica + ": " + pagina + " não é uma página pronta (com quadros) do " + epId,
+                        CinematicaLuta.paginaDoEpisodio(epDaPagina, pagina.substring(pagina.indexOf('/') + 1)));
                 }
                 List<String> textos = new ArrayList<>(r.textos());
                 textos.addAll(CinematicaLuta.TEXTOS_QTE);
@@ -234,8 +239,8 @@ public class CinematicaLutaTest {
     }
 
     /**
-     * O teste dos QTE no convite do Episódio 2: a Yin-lu chega a 80%, a tinta cobre, a página
-     * aparece (e um toque a pula), a tinta cobre de novo e sai; os 4 QTE pedem, e cada acerto é
+     * O teste dos QTE no convite do Episódio 2: a Yin-lu fica com 20% da vida, a tinta cobre, a
+     * página é lida quadro a quadro no toque, a tinta cobre de novo (a página some) e sai; os 4 QTE pedem, e cada acerto é
      * um golpe do jogador. Deixar o tempo acabar e deslizar para trás são erros: o rival bate e
      * o QTE pede de novo. O último golpe é o final, e a cena acaba com a tela limpa.
      */
@@ -247,12 +252,15 @@ public class CinematicaLutaTest {
         palco.quadrosPorMovimento = 20;
         CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, conversa, palco);
         assertTrue(cena.carregar(temporada, CONVITE_EP02, Torneio.RYUGA));
-        assertFalse("o gatilho é a vida da Yin-lu", cena.gatilho(0.5f, 0.85f, 10f, false));
-        assertTrue(cena.gatilho(1f, 0.8f, 12f, false));
+        assertFalse("o gatilho é a vida da Yin-lu", cena.gatilho(0.1f, 0.5f, 10f, false));
+        assertFalse("ela ainda tem mais de 20%", cena.gatilho(1f, 0.25f, 10f, false));
+        assertTrue(cena.gatilho(1f, 0.2f, 12f, false));
         assertTrue(palco.travado);
 
         PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
-        boolean cobriu = false, pulouPagina = false, pedia = false;
+        boolean cobriu = false, pedia = false;
+        int toquesNaPagina = 0;
+        boolean paginaSumiu = false;
         int qtes = 0, quadrosNoQte = 0, toques = 0;
         boolean errouToque = false, errouDeslize = false;
         for (int i = 0; i < 60 * 90 && !cena.acabou(); i++) {
@@ -262,13 +270,13 @@ public class CinematicaLutaTest {
             cena.render(canvas);
             conversa.render(canvas);
             cobriu |= cena.telaCoberta();
-            if (cena.pegaToque() && !cena.qtePedindo() && !pulouPagina && cena.telaCoberta()) {
-                // A página: um toque depois de um instante pula.
-                for (int k = 0; k < 45; k++) cena.update(DT);
+            if (cena.paginaNaTela() && cena.pegaToque() && i % 20 == 0) {
+                // A página: um toque por vez, quadro a quadro, como na história.
                 cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 360f);
-                pulouPagina = true;
+                toquesNaPagina++;
                 continue;
             }
+            paginaSumiu |= toquesNaPagina > 0 && !cena.paginaNaTela();
             boolean pede = cena.qtePedindo();
             if (pede && !pedia) {
                 if (cena.qteErros() == 0) qtes++;
@@ -310,7 +318,8 @@ public class CinematicaLutaTest {
         }
         assertTrue("a cena termina", cena.acabou());
         assertTrue("a tinta cobriu a tela", cobriu);
-        assertTrue("a página apareceu e o toque pulou", pulouPagina);
+        assertTrue("a página foi lida em vários toques: " + toquesNaPagina, toquesNaPagina >= 3);
+        assertTrue("a tinta nova cobriu a página", paginaSumiu);
         assertTrue(errouToque);
         assertTrue(errouDeslize);
         assertEquals(4, qtes);

@@ -7132,6 +7132,10 @@ public class GameView extends SurfaceView
             cinematicaDirector.golpear(lado, golpe);
         }
 
+        @Override public void som(String id) {
+            onHistoriaSom(id);
+        }
+
         @Override public boolean golpeando(int lado) {
             if (cinematicaDirector.movendo(lado)) return true;
             if (golpeDoRoteiro[lado]) {

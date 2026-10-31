@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
 
 /**
  * O teste dos QTE na luta do convite (Ryūga × Yin-lu, Episódio 2), no jogo de verdade do PC:
- * abre o episódio na campanha do Ryūga, passa as páginas, leva a Yin-lu a 80% da vida e joga a
+ * abre o episódio na campanha do Ryūga, passa as páginas, deixa a Yin-lu com 20% da vida e joga a
  * cena (o primeiro QTE erra de propósito, para ver o contra-ataque e o pedido de novo). Os QTE
  * vão pelo caminho do jogo: toques na fila da tela e teclas do teclado. Grava quadros em PNG.
  *
@@ -70,16 +70,16 @@ public final class TesteQteConvite {
         CinematicaLuta cena = (CinematicaLuta)campo("cinematica").get(jogo);
         if (!cena.armada()) throw new IllegalStateException("a cinemática não armou");
 
-        // A luta: depois da intro, a Yin-lu leva um golpe que a deixa com 79%.
+        // A luta: depois da intro, a Yin-lu leva um golpe que a deixa com 19%.
         limite = 60 * 60;
         boolean bateu = false;
         while (!cena.rodando() && limite-- > 0) {
             passo(quadro % 20 == 0);
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
                 FighterState yin = jogo.engine.fighter(GameView.OPPONENT).state;
-                yin.takeDamage(yin.life - Math.round(yin.profile.maxLife * 0.79f), 0);
+                yin.takeDamage(yin.life - Math.round(yin.profile.maxLife * 0.19f), 0);
                 bateu = true;
-                System.out.println("Yin-lu com 79%");
+                System.out.println("Yin-lu com 19%");
             }
         }
         System.out.println("cena começou no quadro " + quadro);
@@ -119,8 +119,8 @@ public final class TesteQteConvite {
                     toque(MotionEvent.ACTION_DOWN, 640f, 420f);
                     toque(MotionEvent.ACTION_UP, 640f, 420f);
                 }
-            } else if (cena.pegaToque() && cena.telaCoberta() && quadro % 60 == 0) {
-                // A página: um toque para seguir.
+            } else if (cena.paginaNaTela() && cena.pegaToque() && quadro % 40 == 0) {
+                // A página: um toque por vez, quadro a quadro.
                 toque(MotionEvent.ACTION_DOWN, 640f, 360f);
                 toque(MotionEvent.ACTION_UP, 640f, 360f);
             }

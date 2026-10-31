@@ -8,7 +8,8 @@ os dois lutadores, põe falas nos quadros laterais, estoura onomatopeias de mang
 encerrar a luta ali. A estreia é o treino do Episódio 1 (jogador × rival, no dojo Shūshinkan); em qualquer outra
 luta é o mesmo motor com outro arquivo.
 
-A cena também pode **pintar a tela de tinta**, mostrar uma **página de mangá** por cima e pedir
+A cena também pode **pintar a tela de tinta**, ler uma **página de mangá** da história (quadro a
+quadro, no mesmo motor das páginas entre as lutas) e pedir
 **quick time events (QTE)**: o jogador toca, martela, desliza ou acerta o tempo, e cada acerto é
 um golpe de verdade do lutador dele que tira um pedaço de vida do roteiro. O teste disso é o
 convite do Episódio 2 (Ryūga × Yin-lu, [abaixo](#o-teste-dos-qte-convite-do-episódio-2)).
@@ -129,7 +130,7 @@ novo).
 | `velocidade` | `valor` (0 a 1), `segundos` (padrão 0,25) | velocidade da luta: 1 normal, 0,3 câmera lenta, 0 congela. Só a luta muda: a cena, as falas, as faixas e as onomatopeias andam no tempo normal. Volta a 1 sozinha no fim da cena | a transição |
 | `terminarLuta` | `vencedor` (`interrompida`, `jogador`, `rival`) | encerra a luta pela cena: `interrompida` e `jogador`, a história segue; `rival` conta como derrota (repete a luta se o passo pedir) | — |
 | `tinta` | `cobrir` (true/false), `segundos` (padrão 0,9), `cor` (padrão `#FFFFFF`) | pinceladas largas atravessam a tela até cobrir tudo (cobrir) ou saem na ordem contrária mostrando a luta (descobrir). Coberta, a tela fica lisa na cor da tinta, por cima até do HUD; uma página na tela some debaixo da tinta nova | a animação |
-| `pagina` | `imagem` ou `imagens` (lista; caminho dentro de `historia/`), `segundos` (padrão 3) | uma página de mangá bate na tela (grande e torta, e assenta, com linhas de impacto). Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). Um toque ou botão pula depois de 0,6 s. Use com a tela coberta | `segundos` ou o toque |
+| `pagina` | `imagem` ou `imagens` (lista de `<episódio>/<imagem>`, ex.: `ep02/pag1_ryuga.jpg`) | uma página pronta da história, lida no motor de mangá das páginas ([motor-paginas.md](motor-paginas.md)): a página inteira, depois cada quadro isolado com o resto escurecido, os balões digitados e os efeitos do quadro, com os quadros e balões do passo dela no `episodio.json`. Um toque (ou botão) segue, como na história. Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). A página fica parada no último quadro até a próxima `tinta` cobrir | o último toque |
 | `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte`, que sempre espera o jogador). Um movimento ou uma fala nunca seguram a cena mais de
@@ -226,17 +227,17 @@ mesmo QTE pede de novo. O HUD fica na tela (sem faixas), então a barra de vida 
 `historia/ep02/cinematica_convite_ryuga.json`, na luta CONVITE da campanha do Ryūga (Ryūga ×
 Yin-lu, no dojo dela):
 
-1. A Yin-lu chega a **80%** da vida (`{"vida": 0.80, "lado": "rival"}`): o controle trava, o golpe
-   termina em câmera lenta e a **tinta branca** cobre a tela.
-2. Uma **página de mangá sorteada** (dos Episódios 0, 1 e 2) bate na tela; um toque segue.
+1. A Yin-lu já perdeu **80%** da vida, ficando com **20%** (`{"vida": 0.20, "lado": "rival"}`): o
+   controle trava, o golpe termina em câmera lenta e a **tinta branca** cobre a tela.
+2. Uma **página de mangá sorteada** (dos Episódios 0, 1 e 2) é lida quadro a quadro, no toque.
 3. A tinta pinta de novo por cima da página, os dois recuam atrás dela e a tinta sai: a luta volta.
 4. **4 QTE**, com falas da Yin-lu e do Ryūga nos quadros laterais entre eles:
 
 | QTE | Tipo | Golpe do Ryūga | Vida da Yin-lu |
 |---|---|---|---|
-| SOCO! | toque | M | −15% |
-| SEQUÊNCIA! | martelar 8 | H | −20% |
-| AVANÇA! | deslizar para frente | S4 (chute giratório) | −20% |
+| SOCO! | toque | M | −5% |
+| SEQUÊNCIA! | martelar 8 | H | −5% |
+| AVANÇA! | deslizar para frente | S4 (chute giratório) | −5% |
 | GOLPE FINAL! | tempo | S2 (punho ascendente) | KO |
 
 Errar qualquer um faz a Yin-lu contra-atacar (−5% ou −6% do Ryūga) e o QTE pede de novo. A Yin-lu
@@ -244,7 +245,7 @@ fala com o rosto da seleção (não tem retrato da história): quem luta ganha s
 reserva na cena.
 
 Para ver no PC sem jogar: `gradle :pc:testeQte` joga a luta inteira de verdade (passa as páginas,
-leva a Yin-lu a 79%, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
+deixa a Yin-lu com 19%, lê a página, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
 teclado) e grava os quadros em `android/pc/build/qte/`.
 
 ## Idiomas

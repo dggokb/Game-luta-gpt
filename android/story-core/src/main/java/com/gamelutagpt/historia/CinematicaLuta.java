@@ -21,8 +21,9 @@ import java.util.Random;
  * perde o controle e um roteiro guia os dois lutadores (pular para trás, correr um na direção
  * do outro, parar), põe falas nos quadros laterais ({@link ConversaLuta}), estoura
  * onomatopeias de mangá na tela, mexe na câmera e pode terminar a luta. Também pinta a tela
- * de tinta, mostra uma página de mangá por cima e pede quick time events (QTE): acertou, o
- * lutador do jogador bate de verdade e o rival perde o pedaço de vida do roteiro.
+ * de tinta, lê uma página de mangá da história quadro a quadro ({@link PaginaGuiada}) e pede
+ * quick time events (QTE): acertou, o lutador do jogador bate de verdade e o rival perde o
+ * pedaço de vida do roteiro.
  *
  * O roteiro fica num arquivo JSON da história ({@code "cinematica"} no passo de luta, caminho
  * dentro de {@code historia/}). Esta classe é só a linha do tempo e o desenho (faixas e
@@ -54,8 +55,6 @@ public final class CinematicaLuta {
     /** QTE de deslizar: quanto o dedo anda (px da tela 1280x720) para valer. */
     static final float DESLIZE = 90f;
     static final float BOTAO_RAIO = 62f;
-    /** A página pode ser pulada com um toque depois disso. */
-    static final float PAGINA_PULAR = 0.6f;
     private static final int INK = Baloes.INK;
     private static final int WHITE = Baloes.WHITE;
 
@@ -90,6 +89,9 @@ public final class CinematicaLuta {
         default boolean golpeando(int lado) {
             return false;
         }
+
+        /** Um som da história ("pagina", "painel", "impacto"), o mesmo das páginas entre as lutas. */
+        default void som(String id) {}
     }
 
     /** Um golpe roteirizado pedido ao {@link Palco}: o acerto (ou o erro) de um QTE. */
@@ -188,7 +190,10 @@ public final class CinematicaLuta {
         /** VELOCIDADE: velocidade da luta (1 = normal, 0,3 = câmera lenta, 0 = congela). */
         float valor = 1f;
         String vencedor;
-        /** PAGINA: as páginas (caminho dentro de {@code historia/}); uma é sorteada a cada luta. */
+        /**
+         * PAGINA: as páginas (caminho dentro de {@code historia/}: {@code ep02/pag1_ryuga.jpg});
+         * uma é sorteada a cada luta e lida com os quadros e balões do passo dela no episódio.
+         */
         List<String> imagens;
         /** QTE: o tipo, quantos toques (MARTELAR) e a direção (DESLIZAR: frente, tras, cima, baixo). */
         TipoQte qte;
@@ -352,11 +357,22 @@ public final class CinematicaLuta {
     private List<Pincelada> pinceladas = Collections.emptyList();
     private int pinturas;
 
-    /** A página sorteada de cada ação PAGINA (escolhida ao carregar a luta). */
-    private final Map<Acao, RenderImage> paginas = new HashMap<>();
-    private RenderImage pagina;
-    private float paginaDesde;
-    private boolean paginaPulada;
+    /** A página sorteada de cada ação PAGINA (escolhida ao carregar a luta): o passo dela e a imagem. */
+    private static final class Pagina {
+        final Episodio.Passo passo;
+        final RenderImage imagem;
+
+        Pagina(Episodio.Passo passo, RenderImage imagem) {
+            this.passo = passo;
+            this.imagem = imagem;
+        }
+    }
+
+    private final Map<Acao, Pagina> paginas = new HashMap<>();
+    /** A leitura quadro a quadro, a mesma das páginas entre as lutas. */
+    private final PaginaGuiada guiada = new PaginaGuiada();
+    /** A página está na tela (fica parada no último quadro até a tinta nova cobrir). */
+    private boolean paginaNaTela;
 
     /** O QTE da ação atual: em que fase está, o que o jogador já fez e o resultado. */
     private enum FaseQte { PEDINDO, RESULTADO, GOLPE }
@@ -407,15 +423,17 @@ public final class CinematicaLuta {
         this.irmao = Torneio.KOGA.equals(irmao) ? Torneio.KOGA : Torneio.RYUGA;
         // A página de cada ação já abre agora (não na hora da cena: a imagem é grande).
         Random sorteio = new Random();
+        Map<String, Episodio> episodios = new HashMap<>();
         for (Acao a : roteiro.acoes) {
             if (a.tipo != Acao.Tipo.PAGINA) continue;
             List<String> opcoes = new ArrayList<>(a.imagens);
             while (!opcoes.isEmpty()) {
                 String escolhida = opcoes.remove(sorteio.nextInt(opcoes.size()));
                 try {
+                    Episodio.Passo passo = passoDaPagina(escolhida, episodios);
                     RenderImage img = assets.loadImage(Temporada.PASTA + "/" + escolhida);
-                    if (img != null) {
-                        paginas.put(a, img);
+                    if (passo != null && img != null) {
+                        paginas.put(a, new Pagina(passo, img));
                         break;
                     }
                 } catch (IOException | RuntimeException ex) {
@@ -425,6 +443,31 @@ public final class CinematicaLuta {
         }
         estado = Estado.ARMADA;
         return true;
+    }
+
+    /**
+     * O passo da página {@code caminho} ({@code ep02/pag1_ryuga.jpg}) no episódio dela, com os
+     * quadros e balões; null se o episódio não tem essa página pronta.
+     */
+    private Episodio.Passo passoDaPagina(String caminho, Map<String, Episodio> episodios) throws IOException {
+        int barra = caminho.indexOf('/');
+        if (barra <= 0) return null;
+        String id = caminho.substring(0, barra);
+        String imagem = caminho.substring(barra + 1);
+        Episodio ep = episodios.get(id);
+        if (ep == null) {
+            ep = Episodio.fromJson(assets.readText(Temporada.pasta(id) + "/episodio.json"));
+            episodios.put(id, ep);
+        }
+        return paginaDoEpisodio(ep, imagem);
+    }
+
+    /** O passo de página pronta (com quadros) que mostra {@code imagem}, ou null. */
+    static Episodio.Passo paginaDoEpisodio(Episodio ep, String imagem) {
+        for (Episodio.Passo p : ep.passos) {
+            if (p.tipo == Episodio.TipoPasso.PAGINA && p.paginaPronta() && imagem.equals(p.imagem) && !p.quadros.isEmpty()) return p;
+        }
+        return null;
     }
 
     /** Esquece a cinemática e tudo o que ela desenha (fim da luta, luta nova). */
@@ -445,7 +488,7 @@ public final class CinematicaLuta {
         coberta = false;
         pinceladas = Collections.emptyList();
         paginas.clear();
-        pagina = null;
+        paginaNaTela = false;
         qte = null;
         dedoNaTela = false;
     }
@@ -614,7 +657,11 @@ public final class CinematicaLuta {
                 if (uma != null) a.imagens.add(uma);
                 for (Object img : Episodio.list(m, "imagens")) a.imagens.add(String.valueOf(img));
                 if (a.imagens.isEmpty()) throw new IllegalArgumentException("pagina sem \"imagem\" nem \"imagens\"");
-                a.segundos = numero(m, "segundos", 3f, 0.3f, 15f);
+                for (String img : a.imagens) {
+                    if (!img.matches("[a-z0-9_]+/[^/]+")) {
+                        throw new IllegalArgumentException("página " + img + " (use \"<episódio>/<imagem>\", ex.: ep02/pag1_ryuga.jpg)");
+                    }
+                }
                 break;
             case "qte":
                 a = qte(m);
@@ -833,9 +880,13 @@ public final class CinematicaLuta {
             // Terminou de cobrir: a tela é um fundo liso, e a página que estava por baixo some.
             if (tintaModo == ModoTinta.COBRINDO) {
                 coberta = true;
-                pagina = null;
+                paginaNaTela = false;
             }
             tintaModo = ModoTinta.NADA;
+        }
+        if (paginaNaTela) {
+            guiada.update(dt);
+            somDaPagina();
         }
         if (estado == Estado.RODANDO) avancar();
     }
@@ -898,9 +949,12 @@ public final class CinematicaLuta {
                 pintar(a.ligar, a.segundos, a.cor);
                 break;
             case PAGINA:
-                pagina = paginas.get(a);
-                paginaDesde = time;
-                paginaPulada = false;
+                Pagina p = paginas.get(a);
+                if (p != null && temporada != null) {
+                    guiada.begin(temporada, p.passo, p.imagem, p.imagem.width(), p.imagem.height());
+                    paginaNaTela = true;
+                    palco.som("pagina");
+                }
                 break;
             case QTE:
                 qte = a;
@@ -932,7 +986,8 @@ public final class CinematicaLuta {
             case TINTA:
                 return idade >= a.segundos;
             case PAGINA:
-                return pagina == null || paginaPulada || idade >= a.segundos;
+                // Lida quadro a quadro, no toque, como as páginas da história.
+                return !paginaNaTela || guiada.finished();
             case QTE:
                 return qtePronto();
             default:
@@ -952,7 +1007,7 @@ public final class CinematicaLuta {
             pinceladas = pinceladas(pinturas++);
         } else {
             coberta = false;
-            pagina = null;
+            paginaNaTela = false;
             if (pinceladas.isEmpty()) pinceladas = pinceladas(pinturas++);
         }
     }
@@ -1058,7 +1113,7 @@ public final class CinematicaLuta {
     /** A cena quer os toques e os botões agora (um QTE na tela, uma página que pode ser pulada). */
     public boolean pegaToque() {
         if (estado != Estado.RODANDO || acao == null) return false;
-        return acao.tipo == Acao.Tipo.QTE || (acao.tipo == Acao.Tipo.PAGINA && pagina != null);
+        return acao.tipo == Acao.Tipo.QTE || (acao.tipo == Acao.Tipo.PAGINA && paginaNaTela);
     }
 
     /** Um QTE está esperando o jogador agora. */
@@ -1075,7 +1130,7 @@ public final class CinematicaLuta {
     public void toque(int fase, float x, float y) {
         if (!pegaToque()) return;
         if (acao.tipo == Acao.Tipo.PAGINA) {
-            if (fase == TOQUE_DESCE) pularPagina();
+            if (fase == TOQUE_DESCE) tocarPagina();
             return;
         }
         if (qteFase != FaseQte.PEDINDO) return;
@@ -1098,7 +1153,7 @@ public final class CinematicaLuta {
     public void botao() {
         if (!pegaToque()) return;
         if (acao.tipo == Acao.Tipo.PAGINA) {
-            pularPagina();
+            tocarPagina();
         } else if (qteFase == FaseQte.PEDINDO && qte.qte != TipoQte.DESLIZAR) {
             apertar();
         }
@@ -1117,8 +1172,20 @@ public final class CinematicaLuta {
         dicasDeToque = toque;
     }
 
-    private void pularPagina() {
-        if (time - paginaDesde >= PAGINA_PULAR) paginaPulada = true;
+    /** Toque na página: completa o texto, abre o próximo balão ou vai para o próximo quadro. */
+    private void tocarPagina() {
+        guiada.tap();
+        somDaPagina();
+    }
+
+    private void somDaPagina() {
+        String som = guiada.takeSound();
+        if (som != null) palco.som(som);
+    }
+
+    /** A página de mangá está na tela agora. */
+    public boolean paginaNaTela() {
+        return paginaNaTela;
     }
 
     private void apertar() {
@@ -1299,7 +1366,7 @@ public final class CinematicaLuta {
     public void renderTela(RenderCanvas c) {
         if (qte != null && acao == qte) desenharQte(c);
         if (coberta) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, tintaCor);
-        if (pagina != null) desenharPagina(c);
+        if (paginaNaTela) guiada.render(c);
         if (tintaModo == ModoTinta.NADA) return;
         float k = Tinta.clamp01((time - tintaDesde) / tintaDuracao);
         float ultimo = 0f;
@@ -1369,40 +1436,6 @@ public final class CinematicaLuta {
         int k = Math.min(n - 1, (int)u);
         float t = u - k;
         return new float[] {p.xs[k] + (p.xs[k + 1] - p.xs[k]) * t, p.ys[k] + (p.ys[k + 1] - p.ys[k]) * t};
-    }
-
-    /** A página de mangá: bate na tela (grande e torta, e assenta), com linhas de impacto atrás. */
-    private void desenharPagina(RenderCanvas c) {
-        float idade = time - paginaDesde;
-        float h = VH - 56f;
-        float w = h * pagina.width() / (float)Math.max(1, pagina.height());
-        if (w > VW - 56f) {
-            w = VW - 56f;
-            h = w * pagina.height() / (float)Math.max(1, pagina.width());
-        }
-        float bate = Tinta.clamp01(idade / 0.28f);
-        int alpha = (int)(255f * Tinta.clamp01(idade / 0.1f));
-        float linhas = Tinta.clamp01(idade / 0.5f);
-        if (linhas < 1f) {
-            int cor = Tinta.withAlpha(INK, (int)(150f * (1f - linhas)));
-            for (int i = 0; i < 28; i++) {
-                double ang = Math.PI * 2 * i / 28 + 0.07 * (i % 3);
-                float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
-                float r0 = 300f + 200f * Tinta.easeOutCubic(linhas);
-                c.drawLine(VW / 2f + cos * r0, VH / 2f + sin * r0, VW / 2f + cos * (r0 + 520f), VH / 2f + sin * (r0 + 520f),
-                    4f + 5f * (i % 2), cor);
-            }
-        }
-        float escala = (1.25f - 0.25f * Tinta.easeOutBack(bate)) * (1f + 0.04f * Tinta.clamp01(idade / 4f));
-        float rot = -4f + 3f * Tinta.easeOutCubic(bate);
-        c.save();
-        c.translate(VW / 2f, VH / 2f);
-        c.rotate(rot, 0f, 0f);
-        c.scale(escala, escala, 0f, 0f);
-        c.fillRect(-w / 2f + 12f, -h / 2f + 14f, w / 2f + 12f, h / 2f + 14f, Tinta.withAlpha(INK, alpha / 4));
-        c.fillRect(-w / 2f - 5f, -h / 2f - 5f, w / 2f + 5f, h / 2f + 5f, Tinta.withAlpha(INK, alpha));
-        c.drawImage(pagina, -w / 2f, -h / 2f, w / 2f, h / 2f, alpha);
-        c.restore();
     }
 
     private static int corQte(TipoQte tipo) {

@@ -403,7 +403,7 @@ tasks.register('conferirQuadros', JavaExec) {
 }
 
 // O teste dos QTE da cinemática no convite do Episódio 2 (Ryūga × Yin-lu), no jogo de verdade:
-// passa as páginas, leva a Yin-lu a 80% e joga a cena, gravando quadros em build/qte/.
+// passa as páginas, deixa a Yin-lu com 20% e joga a cena, gravando quadros em build/qte/.
 // gradle :pc:testeQte [-Psaida=pasta]
 tasks.register('testeQte', JavaExec) {
     group = 'verification'
