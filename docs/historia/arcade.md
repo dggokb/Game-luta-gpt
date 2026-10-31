@@ -35,7 +35,7 @@ mais rápido que na história.
 O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um episódio com
 `sorteio`, `luta` + `"torneio": true`, `chave`, `luta` + `"duelo": true` e cartões `titulo`):
 
-- **Cada luta tem 120 segundos**; no TIME OVER vence a dupla com mais vida (regra em
+- **Cada luta tem 180 segundos**; no TIME OVER vence a dupla com mais vida (regra em
   `docs/combat-engine.md`). **Empate conta como derrota.**
 - **Cenário sorteado** (por enquanto): cada luta sem `"cenario"` no passo sorteia uma pasta de
   `assets/stages` com `stage.json` (hoje Templo da Lua, Dojo Shūshinkan, Dojo da Yin-Lu, Beco do Brucy, Porto Secreto, Arena Costeira, Caminho dos Penhascos, Arena Imperial e Arena Central), sem

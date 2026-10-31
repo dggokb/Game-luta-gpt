@@ -27,7 +27,7 @@ final class BattleFlow {
     /** Resultado na tela antes de a luta recomeçar (fora da história). */
     static final int RESULT_FRAMES = 150;
     /** Duração da batalha, em segundos do relógio. */
-    static final int TIME_LIMIT_SECONDS = 120;
+    static final int TIME_LIMIT_SECONDS = 180;
     /** Quadros por segundo do relógio (o motor roda a 60). */
     static final int FRAMES_PER_SECOND = 60;
     static final int TIME_LIMIT_FRAMES = TIME_LIMIT_SECONDS * FRAMES_PER_SECOND;

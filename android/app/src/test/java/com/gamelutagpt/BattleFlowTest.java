@@ -146,14 +146,14 @@ public class BattleFlowTest {
         assertFalse(m.flow.over());
     }
 
-    @Test public void theClockStartsAt120AndRunsOnlyFromTheGo() {
+    @Test public void theClockStartsFullAndRunsOnlyFromTheGo() {
         Match m = new Match(true);
-        assertEquals("120", m.flow.clockLabel());
+        assertEquals(Integer.toString(BattleFlow.TIME_LIMIT_SECONDS), m.flow.clockLabel());
         m.steps(BattleFlow.READY_FRAMES);
         assertEquals("o READY não gasta tempo", BattleFlow.TIME_LIMIT_SECONDS, m.flow.clockSeconds());
         m.steps(BattleFlow.FRAMES_PER_SECOND);
         assertEquals(BattleFlow.TIME_LIMIT_SECONDS - 1, m.flow.clockSeconds());
-        assertEquals("119", m.flow.clockLabel());
+        assertEquals(Integer.toString(BattleFlow.TIME_LIMIT_SECONDS - 1), m.flow.clockLabel());
         assertFalse(m.flow.clockUrgent());
     }
 
@@ -235,7 +235,7 @@ public class BattleFlowTest {
         assertEquals("∞", m.flow.clockLabel());
         assertFalse("a cena decide o fim, não o tempo", m.flow.over());
         m.flow.setClockHeld(false);
-        assertEquals("o relógio volta de onde estava", "120", m.flow.clockLabel());
+        assertEquals("o relógio volta de onde estava", Integer.toString(BattleFlow.TIME_LIMIT_SECONDS), m.flow.clockLabel());
         m.flow.reset();
         assertFalse(m.flow.timeOver());
     }

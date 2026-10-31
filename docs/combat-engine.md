@@ -405,7 +405,7 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
   - Parceiro caído não vem mais de assist, troca, Guard Cancel nem DHC.
   - Fim: K.O. (`KO_FRAMES`), o resultado (VITÓRIA / DERROTA / EMPATE, `RESULT_FRAMES`) e a
     luta recomeça com as mesmas duplas. Só o vencedor final comemora.
-- **Tempo: 120 segundos** (`TIME_LIMIT_SECONDS`, 60 quadros por segundo) só na batalha; no treino
+- **Tempo: 180 segundos** (`TIME_LIMIT_SECONDS`, 60 quadros por segundo) só na batalha; no treino
   a HUD mostra ∞.
   - O relógio começa a contar no GO e **para** no congelamento do Super e do Ultra (cinemática,
     Página Final, raio), na pausa e enquanto uma cena da história tem o controle. Hitstop
