@@ -63,7 +63,8 @@ final class CharacterSelectRenderer {
     CharacterSelectRenderer(Context context) {
         this.context=context;
         hudConcepts=new HudConceptPortraits(context);
-        flashPaint.setColorFilter(new PorterDuffColorFilter(0xFFFFFFFF,PorterDuff.Mode.SRC_ATOP));
+        // Pelo Filtro: o OpenGL também lê a matriz dele (o PorterDuffColorFilter não deixa).
+        flashPaint.setColorFilter(Filtro.porCima(0xFFFFFFFF).canvas);
         backdrop=read("selection/art/backdrop.png",1);
         stageArt=read("selection/art/reference_stage.png",1);
         // Locked slots show the concepts that are not playable yet, in the grid's pair order.
@@ -99,11 +100,11 @@ final class CharacterSelectRenderer {
     void draw(Canvas c,Paint unused,CharacterSelect s) {
         tick(s);
         c.save();
-        c.drawColor(0xFF060B1C);
         imagePaint.setAlpha(255);
+        // O fundo cobre a tela inteira: a cor por baixo era uma tela pintada a mais por quadro.
         if(backdrop!=null) {
             box.set(0,0,1280,720);c.drawBitmap(backdrop,null,box,imagePaint);
-        }
+        } else c.drawColor(0xFF060B1C);
         ambient(c);
         // Os vizinhos do cursor já ficam prontos: andar pela grade não espera decodificação.
         int cursor=s.cursorIndex(),n=s.ids.length;

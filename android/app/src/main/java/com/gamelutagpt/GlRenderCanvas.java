@@ -1327,6 +1327,14 @@ final class GlRenderCanvas implements RenderCanvas {
         retangulo(l, top, r, bt, sl / w, st / h, sr / w, sb / h, (alpha << 24) | 0xFFFFFF, 1f);
     }
 
+    /** A textura (uv de 0 a 1) num quadrilátero qualquer do espaço atual, com o filtro atual. */
+    void quadTextura(Textura t, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3,
+                     float u0, float v0, float u1, float v1, int alpha) {
+        if (t == null || alpha <= 0) return;
+        usar(t.id);
+        quad(x0, y0, x1, y1, x2, y2, x3, y3, u0, v0, u1, v1, (alpha << 24) | 0xFFFFFF, 1f);
+    }
+
     /** Um bitmap qualquer (as folhas dos lutadores), subindo se ainda não subiu. */
     void desenharBitmap(Bitmap bitmap, boolean soltarBitmap, float sl, float st, float sr, float sb,
                         float l, float top, float r, float bt, int alpha) {

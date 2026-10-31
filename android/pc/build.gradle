@@ -282,6 +282,21 @@ tasks.register('capturar', JavaExec) {
     args layout.buildDirectory.dir('captura').get().asFile.absolutePath
     // -Ptela=1280x720: arte decidida como num celular com essa tela (padrão: sem redução).
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+    // -Pgl: pela placa de vídeo (OpenGL), como na janela do jogo (precisa de DISPLAY, ex.: xvfb-run).
+    if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
+    // -Presolucao=1920x1080: o tamanho da tela capturada.
+    if (providers.gradleProperty('resolucao').isPresent()) args providers.gradleProperty('resolucao').get()
+    // -Pzgc: o coletor do jogo de PC. -Pjfr: perfil de CPU em pc/build/captura/captura.jfr.
+    if (providers.gradleProperty('zgc').isPresent()) jvmArgs '-XX:+UseZGC'
+    if (providers.gradleProperty('jfr').isPresent()) {
+        jvmArgs "-XX:StartFlightRecording=filename=${layout.buildDirectory.dir('captura').get().asFile.absolutePath}/captura.jfr,settings=profile,jdk.ExecutionSample#period=2ms"
+    }
+    // -PesperaSelecao=10: segundos na seleção antes de medir (a carga em segundo plano acaba).
+    if (providers.gradleProperty('esperaSelecao').isPresent()) systemProperty 'gameluta.esperaSelecao', providers.gradleProperty('esperaSelecao').get()
+    // -Pfolhas=N: quantas threads decodificam as folhas em segundo plano.
+    if (providers.gradleProperty('folhas').isPresent()) systemProperty 'gameluta.folhas', providers.gradleProperty('folhas').get()
+    // -Pprecarga=N: quantas threads pré-carregam as folhas do PC.
+    if (providers.gradleProperty('precarga').isPresent()) systemProperty 'gameluta.precarga', providers.gradleProperty('precarga').get()
 }
 
 // O teste de desempenho automático (o do botão TESTE) sem tela: 30 s de luta roteirizada.

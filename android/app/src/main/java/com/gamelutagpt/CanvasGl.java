@@ -969,10 +969,49 @@ final class CanvasGl extends Canvas {
     }
 
     @Override public void drawBitmap(Bitmap b, Matrix m, Paint p) {
+        if (!m.isAffine()) {
+            imagemEmPerspectiva(b, m, p);
+            return;
+        }
         save();
         concat(m);
         imagem(b, 0, 0, b.getWidth(), b.getHeight(), 0, 0, b.getWidth(), b.getHeight(), p);
         restore();
+    }
+
+    /** Pedaços por lado da imagem em perspectiva (cada pedaço é afim; o todo segue a perspectiva). */
+    private static final int PEDACOS_PERSPECTIVA = 4;
+    private final float[] malha = new float[(PEDACOS_PERSPECTIVA + 1) * (PEDACOS_PERSPECTIVA + 1) * 2];
+
+    /**
+     * Imagem com matriz de perspectiva (as cartas inclinadas da grade da seleção): o OpenGL daqui
+     * só leva a parte afim da matriz, então a imagem vai numa malha de pedaços com os cantos
+     * levados pela matriz inteira.
+     */
+    private void imagemEmPerspectiva(Bitmap b, Matrix m, Paint p) {
+        if (b == null || b.isRecycled()) return;
+        prepararGl();
+        GlRenderCanvas.Textura tx = gl.textura(b, false);
+        if (tx == null) return;
+        gl.filtro(p != null ? matrizDoFiltro(p.getColorFilter()) : null);
+        int n = PEDACOS_PERSPECTIVA;
+        float w = b.getWidth(), h = b.getHeight();
+        for (int j = 0; j <= n; j++) {
+            for (int i = 0; i <= n; i++) {
+                malha[(j * (n + 1) + i) * 2] = w * i / n;
+                malha[(j * (n + 1) + i) * 2 + 1] = h * j / n;
+            }
+        }
+        m.mapPoints(malha);
+        int alfa = p != null ? p.getAlpha() : 255;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                int a = (j * (n + 1) + i) * 2, c = ((j + 1) * (n + 1) + i) * 2;
+                gl.quadTextura(tx, malha[a], malha[a + 1], malha[a + 2], malha[a + 3],
+                    malha[c + 2], malha[c + 3], malha[c], malha[c + 1],
+                    (float)i / n, (float)j / n, (float)(i + 1) / n, (float)(j + 1) / n, alfa);
+            }
+        }
     }
 
     // ---- Texto: cada texto vira um bitmap feito pelo Paint de verdade, guardado como textura ----

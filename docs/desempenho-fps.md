@@ -507,6 +507,46 @@ de 2 ms sai no console como "TEXTO LENTO".
 
 Falta confirmar no celular com o TESTE.
 
+### 5.14 Seleção de personagem a 20–30 quadros por segundo
+
+A captura do PC (`gradle :pc:capturar`, que agora mede 3 s parados na seleção) mostrava a
+seleção pelo Canvas a 36–40 quadros por segundo, com 24–25 ms de desenho por quadro. Ela ia
+pelo Canvas mesmo com o OpenGL ligado.
+
+**Causa no PC: a pré-carga das folhas.**
+- A seleção antecipa os quatro lutadores escolhidos.
+- No PC, `Resources` pré-carrega todas as folhas de cada um numa thread por núcleo
+  ("PreCargaAtlas"), com prioridade quase normal.
+- O perfil (`-Pjfr`) mostrou essa thread com mais amostras que tudo.
+
+| Medida | Seleção | Desenho por quadro |
+|---|---|---|
+| Sem nenhuma carga em segundo plano | 57 quadros/s | 13 ms |
+| Pré-carga com 4 threads (antes) | 40 quadros/s | — |
+| Pré-carga com 2 threads | 56 quadros/s | — |
+| Pré-carga com 1 thread | 58 quadros/s | — |
+
+- O número de threads "Folhas" (`-Pfolhas`) não fez diferença.
+- O carregamento inicial ficou entre 9,5 e 11 s em todos os casos.
+- **Correção:** metade dos núcleos (até 4), na prioridade mais baixa (`-Dgameluta.precarga=N`
+  fixa quantas).
+
+**Seleção pelo OpenGL** (`GameView.selecaoPeloGl`), como a luta, quando o OpenGL está ligado:
+- A parte da CPU caiu de 13–25 ms para 1,6–7 ms por quadro.
+- As cartas inclinadas da grade usam matriz de perspectiva. O `CanvasGl` desenha esse
+  `drawBitmap` numa malha de 4×4 pedaços (`GlRenderCanvas.quadTextura`).
+- O clarão branco do retrato passou para o `Filtro.porCima`, que o OpenGL lê.
+
+**Área pintada:** 4,9 telas por quadro, menos que a luta (6,3). Tirei a cor sólida por baixo
+do fundo, que já cobre a tela inteira, e foi 1 tela a menos. Sobram cerca de 3,9.
+
+**Placa emulada deste servidor:** no xvfb a placa é emulada na CPU (llvmpipe), então o envio
+disputa a CPU com a carga em segundo plano. Desligando cada peça da seleção, o tempo não muda
+(custo fixo). Depois que a carga acaba, a seleção pelo OpenGL vai a 55 quadros por segundo.
+
+**Novas opções do `capturar`:** `-Pgl`, `-Pzgc`, `-Pjfr`, `-PesperaSelecao=10`, `-Pfolhas=N`,
+`-Pprecarga=N` e `-Presolucao`.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

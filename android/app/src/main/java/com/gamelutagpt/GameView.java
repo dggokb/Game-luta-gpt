@@ -3515,8 +3515,8 @@ public class GameView extends SurfaceView
         // das prontas ainda é percorrida aqui.
         if (subindoFolhas && !loadingActive()) subirFolhas();
         glQuadro = false;
-        if (glNaLuta && desenhoGl != null && telaDaLuta()) {
-            // A luta em OpenGL: o quadro inteiro na superfície de baixo, pelo CanvasGl.
+        if (desenhoGl != null && (telaDaLuta() ? glNaLuta : selecaoPeloGl())) {
+            // A luta (e a seleção) em OpenGL: o quadro inteiro na superfície de baixo, pelo CanvasGl.
             Canvas gl = desenhoGl.comecarQuadro();
             if (gl != null) {
                 glQuadro = true;
@@ -3571,6 +3571,18 @@ public class GameView extends SurfaceView
         // Fora da luta em OpenGL a superfície de baixo fica preta.
         if (desenhoGl != null) desenhoGl.semMundo();
         depoisDoQuadro();
+    }
+
+    /**
+     * A seleção de personagens vai pelo OpenGL, como a luta. No Canvas a seleção ficava em
+     * 20–30 quadros por segundo (no PC, 25 ms por quadro): são uns 30 recortes por forma (as cartas
+     * inclinadas), contornos largos e brilhos refeitos a cada quadro.
+     */
+    private boolean selecaoPeloGl() {
+        // Pelo querGl (e não pelo glNaLuta, que é das folhas da última carga): a seleção só sobe
+        // as imagens dela, e abre antes da primeira luta.
+        return querGl() && characterSelect.isOpen() && !loadingActive() && !subindoFolhas && !menuInicial.isOpen()
+            && !capitulos.isOpen() && !ajusteTamanho.isOpen() && !ajusteCaixas.isOpen();
     }
 
     /** A tela de agora é a luta (e não menu, seleção, página, carregamento ou ajuste por cima dela). */

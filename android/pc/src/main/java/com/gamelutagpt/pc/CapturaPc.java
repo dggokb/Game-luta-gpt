@@ -112,6 +112,12 @@ public final class CapturaPc {
         return copia.get(i) / 1e6;
     }
 
+    public void zerarMedidas() {
+        synchronized (trava) {
+            desenhos.clear();
+        }
+    }
+
     public int quadrosMedidos() {
         synchronized (trava) {
             return desenhos.size();
@@ -138,6 +144,16 @@ public final class CapturaPc {
         c.tecla(KeyEvent.KEYCODE_J);
         c.esperar(1.5);
         salvar(c.quadro(), saida, "02-selecao");
+        // A seleção parada por 3 s: quadros por segundo e tempo de desenho (-Dgameluta.esperaSelecao:
+        // segundos antes, para a carga dos lutadores em segundo plano acabar).
+        c.esperar(Double.parseDouble(System.getProperty("gameluta.esperaSelecao", "0")));
+        long antes = c.quadrosDesenhados();
+        c.medir(true);
+        c.esperar(3.0);
+        c.medir(false);
+        linhas.add(String.format(Locale.ROOT, "selecao: %.1f quadros/s desenho mediana=%.2fms p95=%.2fms max=%.2fms",
+            (c.quadrosDesenhados() - antes) / 3.0, c.percentilMs(50), c.percentilMs(95), c.percentilMs(100)));
+        c.zerarMedidas();
         // P1, TAG, P2, TAG e confirmar (J = A do controle na seleção).
         for (int i = 0; i < 4; i++) {
             c.tecla(KeyEvent.KEYCODE_J);

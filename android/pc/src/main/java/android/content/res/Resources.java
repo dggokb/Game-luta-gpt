@@ -116,11 +116,15 @@ public class Resources {
         String[] names = drawableDir.list();
         if (names == null) return;
         if (pool == null) {
-            int threads = Math.max(2, Runtime.getRuntime().availableProcessors());
+            // Metade dos núcleos (até 4) e na prioridade mais baixa: com um por núcleo, a
+            // antecipação dos quatro lutadores na seleção ocupava a CPU inteira e a seleção caía
+            // para 20–30 quadros por segundo. -Dgameluta.precarga=N fixa quantas.
+            int nucleos = Runtime.getRuntime().availableProcessors();
+            int threads = Math.max(1, Integer.getInteger("gameluta.precarga", Math.min(4, nucleos / 2)));
             pool = Executors.newFixedThreadPool(threads, r -> {
                 Thread t = new Thread(r, "PreCargaAtlas");
                 t.setDaemon(true);
-                t.setPriority(Thread.NORM_PRIORITY - 1);
+                t.setPriority(Thread.MIN_PRIORITY);
                 return t;
             });
         }
