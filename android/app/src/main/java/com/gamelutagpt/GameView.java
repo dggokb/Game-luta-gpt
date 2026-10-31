@@ -274,6 +274,9 @@ public class GameView extends SurfaceView
     private CinematicaLuta cinematica;
     /** Os comandos dos dois lutadores enquanto a cinemática tem o controle. */
     private final CinematicaDirector cinematicaDirector = new CinematicaDirector();
+    /** Golpe do QTE em andamento por quem bate, e o lado que ele derruba de vez (o último QTE). */
+    private final boolean[] golpeDoRoteiro = new boolean[2];
+    private final boolean[] golpeFinal = new boolean[2];
     /** A cinemática terminou a luta ("jogador", "rival" ou "interrompida"); null = não terminou. */
     private String cinematicaFim;
     /** Quadros de luta desde o "LUTEM!" (gatilho de tempo da cinemática). */
@@ -1252,6 +1255,7 @@ public class GameView extends SurfaceView
             if (hardware.setHeld(keyCode, pressed)) {
                 // O D-pad da tela, quando segurado, continua mandando na direção.
                 if (dpadPointer == -1) pad.setDirection(hardware.direction());
+                if (pressed && cinematica.pegaToque()) direcaoNaCinematica(hardware.direction());
                 continue;
             }
             if (!pressed) continue;
@@ -1260,6 +1264,9 @@ public class GameView extends SurfaceView
                 // Na "Página Final" do jogador qualquer botão vale como o toque no tempo certo.
                 if (paginaFinal.isActive()) {
                     if (ultraAttacker == PLAYER) paginaFinal.tap();
+                } else if (cinematica.pegaToque()) {
+                    // QTE (ou a página de mangá) da cinemática: qualquer botão vale como o toque.
+                    cinematica.botao();
                 } else if (telaVitoria.ativa()) {
                     telaVitoria.pular();
                 } else {
@@ -1283,6 +1290,14 @@ public class GameView extends SurfaceView
                 }
             }
         }
+    }
+
+    /** Direção 0..8 da tela (→ ↘ ↓ ↙ ← ↖ ↑ ↗) para o QTE de deslizar da cinemática. */
+    private void direcaoNaCinematica(int direcao) {
+        if (direcao <= 0 || direcao > 8) return;
+        int[] dx = {0, 1, 1, 0, -1, -1, -1, 0, 1};
+        int[] dy = {0, 0, 1, 1, 1, 0, -1, -1, -1};
+        cinematica.direcao(dx[direcao], dy[direcao]);
     }
 
     /** VIDA P1: os dois do time, para o reserva também estar pronto depois do tag. */
@@ -4228,6 +4243,8 @@ public class GameView extends SurfaceView
                 if (TesteDesempenho.mensagens) conversa.render(renderCanvas);
                 if (narracao != null && faixas < 0.5f && TesteDesempenho.mensagens) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
+                // QTE, tinta e página de mangá cobrem tudo, até o HUD.
+                cinematica.renderTela(renderCanvas);
                 TesteAutomatico.hud(TesteAutomatico.HUD_CINEMA);
             }
             telaVitoria.desenhar(canvas);
@@ -5926,6 +5943,15 @@ public class GameView extends SurfaceView
             }
             return;
         }
+        if (cinematica.pegaToque()) {
+            // QTE (ou a página de mangá) da cinemática: o toque é dela, não do controle.
+            boolean desce = action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN;
+            int fase = desce ? CinematicaLuta.TOQUE_DESCE
+                : action == MotionEvent.ACTION_MOVE ? CinematicaLuta.TOQUE_MOVE : CinematicaLuta.TOQUE_SOBE;
+            int i = action == MotionEvent.ACTION_MOVE ? 0 : index;
+            cinematica.toque(fase, event.getX(i) / sx, event.getY(i) / sy);
+            return;
+        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing (only for the player's
@@ -6701,6 +6727,12 @@ public class GameView extends SurfaceView
         if (luta.cinematica != null && temporada != null && !cinematica.carregar(temporada, luta.cinematica, irmao)) {
             Log.w(LOG_TAG, "cinemática " + luta.cinematica + " não abriu");
         }
+        if (cinematica.ativa()) {
+            // Quem luta pode falar na cena: sem retrato da história, com o rosto da seleção.
+            for (int side = 0; side < 2; side++) {
+                for (FighterState member : engine.team(side).members) avulsoDoLutador(member);
+            }
+        }
         if (luta.tutorial()) {
             // As lições não esperam quadro nenhum: a conversa fala por cima da luta.
             tutorial.setPanels(false);
@@ -6888,13 +6920,22 @@ public class GameView extends SurfaceView
         TeamSystem.Side team = engine.team(side);
         FighterState parceiro = team.partner();
         if (parceiro == null) return;
-        String quem = falante(parceiro.character.id);
-        String codigo = "player_base".equals(parceiro.character.id) ? "p01" : parceiro.character.id;
-        conversa.avulso(quem, codigo.toUpperCase(Locale.ROOT), parceiro.profile.color,
-            "selection/rostos/" + codigo + ".webp");
+        String quem = avulsoDoLutador(parceiro);
         String nome = temporada != null ? temporada.nomeDoLutador(team.pointState().character.id) : null;
         String texto = GritoDaTroca.texto(nome, t -> temporada != null ? temporada.t(t) : t);
         conversa.dizer(temporada, quem, side == OPPONENT, "bravo", texto, GritoDaTroca.SEGURA);
+    }
+
+    /**
+     * O lutador pode falar nos quadros da conversa: o nome e a cor dele valem fora do elenco, e
+     * o rosto da seleção quando não há retrato da história. Devolve quem fala por ele.
+     */
+    private String avulsoDoLutador(FighterState lutador) {
+        String quem = falante(lutador.character.id);
+        String codigo = "player_base".equals(lutador.character.id) ? "p01" : lutador.character.id;
+        conversa.avulso(quem, codigo.toUpperCase(Locale.ROOT), lutador.profile.color,
+            "selection/rostos/" + codigo + ".webp");
+        return quem;
     }
 
     /** Quem fala na conversa por um lutador: o id do elenco da história (com os rostos dele) ou o próprio pack. */
@@ -6965,6 +7006,14 @@ public class GameView extends SurfaceView
         cinematica.descarregar();
         cinematicaDirector.parar();
         cinematicaFim = null;
+        for (int side = 0; side < 2; side++) {
+            golpeDoRoteiro[side] = golpeFinal[side] = false;
+            if (engine == null) continue;
+            for (FighterState member : engine.team(side).members) {
+                member.cenaDano = -1;
+                member.cenaSemDano = false;
+            }
+        }
     }
 
     /**
@@ -6973,6 +7022,7 @@ public class GameView extends SurfaceView
      */
     private void updateCinematica(boolean intro) {
         if (!cinematica.ativa()) return;
+        cinematica.setToque(esquema == Comandos.Esquema.TOQUE);
         boolean ko = flow.battle() ? flow.over() : player().ko() || opponent().ko();
         boolean lutando = !intro && !flow.holdsFighters();
         if (lutando && !ko) storyFightFrames++;
@@ -7016,8 +7066,23 @@ public class GameView extends SurfaceView
     private void protegerVida(boolean proteger) {
         int piso = proteger ? 1 : 0;
         for (int side = 0; side < 2; side++) {
-            for (FighterState member : engine.team(side).members) member.lifeFloor = piso;
+            // O último golpe do QTE derruba de vez: esse lado pode cair.
+            for (FighterState member : engine.team(side).members) member.lifeFloor = golpeFinal[side] ? 0 : piso;
         }
+    }
+
+    /** O golpe do QTE acabou: se não pegou (longe, no ar), o dano do roteiro entra assim mesmo. */
+    private void terminarGolpe(int lado) {
+        FighterState alvo = engine.fighter(lado).state;
+        if (alvo.cenaDano > 0) {
+            int dano = alvo.cenaDano;
+            alvo.cenaDano = -1;
+            if (golpeFinal[lado]) alvo.lifeFloor = 0;
+            alvo.takeDamage(dano, 0);
+        }
+        alvo.cenaDano = -1;
+        alvo.cenaSemDano = false;
+        golpeFinal[lado] = false;
     }
 
     /** O que a cinemática pede à luta. */
@@ -7054,6 +7119,26 @@ public class GameView extends SurfaceView
 
         @Override public boolean aDireita(int lado) {
             return engine.fighter(lado).x > engine.fighter(1 - lado).x;
+        }
+
+        @Override public void golpear(int lado, CinematicaLuta.Golpe golpe) {
+            FighterState alvo = engine.fighter(1 - lado).state;
+            int max = Math.max(1, alvo.profile.maxLife);
+            // O dano do roteiro no lugar do dano do golpe; o golpe final derruba de vez.
+            alvo.cenaDano = golpe.finaliza ? alvo.life : Math.min(Math.round(golpe.dano * max), Math.max(0, alvo.life - 1));
+            alvo.cenaSemDano = false;
+            golpeFinal[1 - lado] = golpe.finaliza;
+            golpeDoRoteiro[lado] = true;
+            cinematicaDirector.golpear(lado, golpe);
+        }
+
+        @Override public boolean golpeando(int lado) {
+            if (cinematicaDirector.movendo(lado)) return true;
+            if (golpeDoRoteiro[lado]) {
+                golpeDoRoteiro[lado] = false;
+                terminarGolpe(1 - lado);
+            }
+            return false;
         }
     };
 

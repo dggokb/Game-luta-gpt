@@ -22,6 +22,13 @@ final class FighterState {
      * o gatilho de vida baixa e enquanto roda, para nenhum golpe pular a cena indo direto ao KO.
      */
     int lifeFloor;
+    /**
+     * Dano exato do próximo golpe que entrar (o golpe do QTE da cinemática), no lugar do dano
+     * do golpe; -1 = o dano normal. Depois dele, as outras batidas do mesmo golpe não tiram
+     * mais nada ({@link #cenaSemDano}) até o roteiro soltar.
+     */
+    int cenaDano = -1;
+    boolean cenaSemDano;
     /** Barra do SHINKAI (0..CombatConfig.SHINKAI_MAX); esvazia ao ativar. */
     int shinkai;
     /** Quadros de SHINKAI que faltam (0 fora dele). */
@@ -60,6 +67,14 @@ final class FighterState {
      */
     void takeDamage(int damage, int recoverablePermille) {
         if (damage <= 0) return;
+        if (cenaDano >= 0) {
+            damage = cenaDano;
+            cenaDano = -1;
+            cenaSemDano = true;
+            if (damage <= 0) return;
+        } else if (cenaSemDano) {
+            return;
+        }
         life = Math.max(Math.min(lifeFloor, life), life - damage);
         recoverableLife += damage * recoverablePermille / 1000;
         if (life == 0) recoverableLife = 0;

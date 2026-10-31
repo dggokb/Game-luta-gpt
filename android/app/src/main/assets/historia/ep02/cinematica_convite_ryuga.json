@@ -1,0 +1,37 @@
+{
+  "_comentario": "TESTE de QTE na luta do convite (Ryūga × Yin-lu). Quando a Yin-lu chega a 80% da vida, a tinta pinta a tela de branco, uma página de mangá sorteada bate na tela, a tinta pinta de novo e sai mostrando a luta. Daí são 4 QTE (tocar, martelar, deslizar e o anel na hora certa), com falas nos quadros laterais entre eles: cada acerto é um golpe de verdade do Ryūga que tira o pedaço de vida do \"dano\"; cada erro, um contra-ataque dela, e o QTE pede de novo. O último derruba (\"final\") e a luta acaba no KO. Motor e formato: docs/historia/motor-cinematicas.md.",
+  "gatilho": { "vida": 0.80, "lado": "rival" },
+  "acoes": [
+    { "acao": "controle", "travar": true },
+    { "acao": "velocidade", "valor": 0.3, "segundos": 0.15, "semEsperar": true },
+    { "acao": "tinta", "cobrir": true, "segundos": 1.0 },
+    { "acao": "velocidade", "valor": 1.0, "segundos": 0.0, "semEsperar": true },
+    { "acao": "pagina", "segundos": 3.2, "imagens": [
+      "ep00/pag2.jpg", "ep00/pag4.jpg", "ep00/pag6.jpg", "ep00/pag8.jpg", "ep00/pag10.jpg",
+      "ep01/pag2.jpg", "ep01/pag4.jpg", "ep01/pag6.jpg", "ep01/pag8.jpg", "ep01/pag10.jpg",
+      "ep02/pag1_ryuga.jpg", "ep02/pag2_ryuga.jpg", "ep02/pag3_ryuga.jpg", "ep02/pag4_ryuga.jpg", "ep02/pag5_ryuga.jpg"
+    ] },
+    { "acao": "tinta", "cobrir": true, "segundos": 0.8 },
+    { "acao": "mover", "quem": "ambos", "movimento": "recuar" },
+    { "acao": "tinta", "cobrir": false, "segundos": 0.9 },
+
+    { "acao": "fala", "quem": "p02", "lado": "rival", "texto": "Nada mal, Ryūga. Mas o aquecimento acabou.", "segura": 1.0 },
+    { "acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "Então vem!", "segura": 0.6 },
+    { "acao": "qte", "tipo": "toque", "texto": "SOCO!", "golpe": "M", "dano": 0.15,
+      "erro": { "golpe": "M", "dano": 0.05 } },
+
+    { "acao": "fala", "quem": "p02", "lado": "rival", "texto": "Hmpf! Foi sorte.", "segura": 0.6 },
+    { "acao": "qte", "tipo": "martelar", "texto": "SEQUÊNCIA!", "vezes": 8, "segundos": 2.6, "golpe": "H", "dano": 0.20,
+      "erro": { "golpe": "H", "dano": 0.06 } },
+
+    { "acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "Ainda tenho mais!", "segura": 0.6 },
+    { "acao": "qte", "tipo": "deslizar", "direcao": "frente", "texto": "AVANÇA!", "golpe": "S4", "dano": 0.20,
+      "erro": { "golpe": "M", "dano": 0.05 } },
+
+    { "acao": "fala", "quem": "p02", "lado": "rival", "texto": "Como ele ficou tão rápido?!", "segura": 0.7 },
+    { "acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "Acabou, Yin-lu!", "segura": 0.5 },
+    { "acao": "qte", "tipo": "tempo", "texto": "GOLPE FINAL!", "segundos": 1.3, "golpe": "S2", "final": true,
+      "erro": { "golpe": "H", "dano": 0.06 } },
+    { "acao": "esperar", "segundos": 1.6 }
+  ]
+}

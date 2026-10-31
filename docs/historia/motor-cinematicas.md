@@ -8,6 +8,11 @@ os dois lutadores, põe falas nos quadros laterais, estoura onomatopeias de mang
 encerrar a luta ali. A estreia é o treino do Episódio 1 (jogador × rival, no dojo Shūshinkan); em qualquer outra
 luta é o mesmo motor com outro arquivo.
 
+A cena também pode **pintar a tela de tinta**, mostrar uma **página de mangá** por cima e pedir
+**quick time events (QTE)**: o jogador toca, martela, desliza ou acerta o tempo, e cada acerto é
+um golpe de verdade do lutador dele que tira um pedaço de vida do roteiro. O teste disso é o
+convite do Episódio 2 (Ryūga × Yin-lu, [abaixo](#o-teste-dos-qte-convite-do-episódio-2)).
+
 ## Como aparece na tela (o treino do Episódio 1)
 
 1. Um dos dois chega a **25% de vida**: a cena começa. O controle trava, o golpe que levou
@@ -123,8 +128,11 @@ novo).
 | `camera` | `zoom` (0,8 a 2; 1 = o da luta), `foco` (`centro`, `jogador`, `rival`, `ryuga`, `koga`), `segundos` | zoom extra sobre a câmera da luta. Sem foco, ancorado no chão (os pés não somem na faixa); com foco, o centro vai até o lutador e o zoom se apoia no peito dele (close: o rosto fica, os pés podem sair). `foco` fica até outra `camera` mudar (`centro` volta) | a transição |
 | `velocidade` | `valor` (0 a 1), `segundos` (padrão 0,25) | velocidade da luta: 1 normal, 0,3 câmera lenta, 0 congela. Só a luta muda: a cena, as falas, as faixas e as onomatopeias andam no tempo normal. Volta a 1 sozinha no fim da cena | a transição |
 | `terminarLuta` | `vencedor` (`interrompida`, `jogador`, `rival`) | encerra a luta pela cena: `interrompida` e `jogador`, a história segue; `rival` conta como derrota (repete a luta se o passo pedir) | — |
+| `tinta` | `cobrir` (true/false), `segundos` (padrão 0,9), `cor` (padrão `#FFFFFF`) | pinceladas largas atravessam a tela até cobrir tudo (cobrir) ou saem na ordem contrária mostrando a luta (descobrir). Coberta, a tela fica lisa na cor da tinta, por cima até do HUD; uma página na tela some debaixo da tinta nova | a animação |
+| `pagina` | `imagem` ou `imagens` (lista; caminho dentro de `historia/`), `segundos` (padrão 3) | uma página de mangá bate na tela (grande e torta, e assenta, com linhas de impacto). Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). Um toque ou botão pula depois de 0,6 s. Use com a tela coberta | `segundos` ou o toque |
+| `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
 
-Toda ação aceita `"semEsperar": true`. Um movimento ou uma fala nunca seguram a cena mais de
+Toda ação aceita `"semEsperar": true` (menos o `qte`, que sempre espera o jogador). Um movimento ou uma fala nunca seguram a cena mais de
 8 s (um lutador preso numa queda não trava o jogo).
 
 Se o roteiro acaba **sem** `terminarLuta`, a luta continua: o controle volta, as faixas saem e
@@ -179,12 +187,74 @@ escada: "DING" em cima, "DONG!" embaixo à direita), treme forte no começo e so
 | `cor` | `#FFD23F` | cor do miolo |
 | `segundos` | 1,6 | tempo na tela (os últimos 0,25 s somem) |
 
+### QTE
+
+O botão redondo aparece no meio da tela (a luta escurece um pouco), com o nome do golpe em
+letreiro em cima e a dica embaixo, que segue o controle em uso: **TOQUE!** no toque, **APERTE!**
+no teclado ou controle. No toque vale a tela inteira; no teclado/controle, qualquer botão (o
+deslize, o direcional). Acertou: **BOA!**, o anel estoura e o lutador do jogador corre até o
+rival e dá o `golpe`. Errou (ou o tempo acabou): **ERROU!**, o rival dá o golpe do `erro` e o
+mesmo QTE pede de novo. O HUD fica na tela (sem faixas), então a barra de vida desce a cada golpe.
+
+| `tipo` | O que o jogador faz | `segundos` (padrão) |
+|---|---|---|
+| `toque` | toca uma vez (o anel em volta é o tempo que falta) | tempo para tocar (1,8) |
+| `martelar` | toca `vezes` vezes (padrão 8); o número no botão é quanto falta, o anel enche | tempo para tudo (2,6) |
+| `deslizar` | desliza o dedo (90 px) na `direcao`: `frente` (para o rival), `tras`, `cima`, `baixo`; no teclado, o direcional. Para o lado contrário é erro | tempo para deslizar (1,8) |
+| `tempo` | toca quando o anel que fecha encosta no botão (folga de 0,17 s para cada lado). Cedo ou tarde é erro | quanto o anel leva para fechar (1,3) |
+
+| Campo | Padrão | O que é |
+|---|---|---|
+| `texto` | — | o nome do golpe em cima do botão ("SOCO!"); precisa de tradução |
+| `quem` | `jogador` | quem bate no acerto (`jogador`, `rival`, `ryuga`, `koga`); no erro bate o outro |
+| `golpe` | `H` | o botão do golpe: `L`, `M`, `H`, agachado (`2L`, `2M`, `2H`) ou um especial (`S` = a energia, `S2`, `S3`...) |
+| `dano` | 0,15 | quanto da vida **máxima** do alvo o golpe tira (no lugar do dano do golpe; nunca o último ponto) |
+| `final` | false | o golpe derruba de vez: o alvo cai (KO) com a vida que tiver |
+| `erro` | nenhum | `{"golpe": "M", "dano": 0.05}`: o contra-ataque de quem errou. Sem ele, o erro só pede de novo |
+| `pos` | `[0.5, 0.6]` | centro do botão na tela |
+
+- O QTE precisa do controle travado antes (`{"acao": "controle", "travar": true}`): quem bate é o
+  roteiro. O arquivo que pede QTE com o controle solto não abre.
+- O golpe sai do motor de luta de verdade: quem bate espera o alvo ficar de pé (levantando de uma
+  queda), corre até ele e aperta o botão; o alvo não defende. O dano é o do roteiro, entra uma vez
+  só (as outras batidas do golpe não tiram mais) e, se o golpe não pegar, entra assim mesmo.
+- Depois do QTE `final`, se o roteiro acaba sem `terminarLuta`, a luta segue no fluxo normal do
+  KO: a fala de vitória, a tela de vitória e a história continuam.
+
+### O teste dos QTE (convite do Episódio 2)
+
+`historia/ep02/cinematica_convite_ryuga.json`, na luta CONVITE da campanha do Ryūga (Ryūga ×
+Yin-lu, no dojo dela):
+
+1. A Yin-lu chega a **80%** da vida (`{"vida": 0.80, "lado": "rival"}`): o controle trava, o golpe
+   termina em câmera lenta e a **tinta branca** cobre a tela.
+2. Uma **página de mangá sorteada** (dos Episódios 0, 1 e 2) bate na tela; um toque segue.
+3. A tinta pinta de novo por cima da página, os dois recuam atrás dela e a tinta sai: a luta volta.
+4. **4 QTE**, com falas da Yin-lu e do Ryūga nos quadros laterais entre eles:
+
+| QTE | Tipo | Golpe do Ryūga | Vida da Yin-lu |
+|---|---|---|---|
+| SOCO! | toque | M | −15% |
+| SEQUÊNCIA! | martelar 8 | H | −20% |
+| AVANÇA! | deslizar para frente | S4 (chute giratório) | −20% |
+| GOLPE FINAL! | tempo | S2 (punho ascendente) | KO |
+
+Errar qualquer um faz a Yin-lu contra-atacar (−5% ou −6% do Ryūga) e o QTE pede de novo. A Yin-lu
+fala com o rosto da seleção (não tem retrato da história): quem luta ganha sempre esse rosto de
+reserva na cena.
+
+Para ver no PC sem jogar: `gradle :pc:testeQte` joga a luta inteira de verdade (passa as páginas,
+leva a Yin-lu a 79%, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
+teclado) e grava os quadros em `android/pc/build/qte/`.
+
 ## Idiomas
 
 Igual às páginas e às conversas: o texto em português é a chave da tradução em
 `historia/idiomas/<idioma>.json`. Falas e onomatopeias de toda cinemática precisam da tradução
 em todos os idiomas (o teste `traducoesCobremOsEpisodiosEOMenu` e o `CinematicaLutaTest`
-avisam a que falta). Onomatopeia pode ficar igual em todos (`"DING DONG!": "DING DONG!"`).
+avisam a que falta). Onomatopeia pode ficar igual em todos (`"DING DONG!": "DING DONG!"`). O
+nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já estão traduzidos
+(`CinematicaLuta.TEXTOS_QTE`).
 
 ## Passo a passo de uma cinemática nova
 
@@ -209,16 +279,20 @@ avisam a que falta). Onomatopeia pode ficar igual em todos (`"DING DONG!": "DING
 
 | O quê | Onde |
 |---|---|
-| Motor (leitura, gatilho, linha do tempo, faixas, onomatopeias, zoom) | `android/story-core/.../historia/CinematicaLuta.java` |
+| Motor (leitura, gatilho, linha do tempo, faixas, onomatopeias, zoom, tinta, página, QTE) | `android/story-core/.../historia/CinematicaLuta.java` |
 | Falas da cena nos quadros (`dizer`, `calar`, rosto espelhado pelo `olhar.json`) | `android/story-core/.../historia/ConversaLuta.java` |
 | Campo `cinematica` do passo de luta | `Episodio.Passo.cinematica` |
 | O que a cena pede à luta (`CinematicaLuta.Palco`: controle, movimentos, lado na tela, fim) e quando confere o gatilho | `GameView.palcoCinematica`, `GameView.updateCinematica` |
 | Câmera lenta e luta congelada | `GameView.cinematicaLenta` |
 | Zoom e foco da câmera (chão ou peito de quem está em foco) | `GameView.renderFrame` (`cinematicZoom`, `chestY`) |
-| Comandos dos lutadores (pulo, backdash, dash, troca) | `android/app/.../CinematicaDirector.java` |
+| Comandos dos lutadores (pulo, backdash, dash, troca, o golpe do QTE) | `android/app/.../CinematicaDirector.java` |
+| Dano do golpe do QTE (exato, uma vez só) e o golpe final que derruba | `FighterState.cenaDano`, `GameView.palcoCinematica` (`golpear`), `GameView.terminarGolpe` |
+| Toque e teclado no QTE e na página | `GameView.handleTouch`, `GameView.processHardwareKeys` (`cinematica.pegaToque()`) |
+| Quem luta fala com o rosto da seleção | `GameView.avulsoDoLutador` |
 | Troca para o titular sem recarga | `TeamSystem.tagToStarter` |
 | Último ponto de vida seguro | `FighterState.lifeFloor`, `GameView.protegerVida` |
 | HUD e controle de toque somem, faixas, quadros e onomatopeias (nessa ordem) | `GameView.renderFrame` |
 | Fim da luta pela cena | `GameView.updateStoryFight` (`cinematicaFim`) |
-| Testes | `story-core/.../CinematicaLutaTest.java` (arquivos e linha do tempo), `app/src/test/.../CinematicaDirectorTest.java` (movimentos no motor de luta) |
+| Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
+| A luta do teste de QTE jogada no PC | `android/pc/src/test/.../TesteQteConvite.java` (`gradle :pc:testeQte`) |
 | Prévia no PC | `android/pc-preview/.../CinematicaPreview.java` (`gradle :pc-preview:runCinematica`) |

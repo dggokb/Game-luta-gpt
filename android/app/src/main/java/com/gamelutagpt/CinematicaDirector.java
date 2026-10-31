@@ -11,19 +11,38 @@ import com.gamelutagpt.historia.CinematicaLuta;
  */
 final class CinematicaDirector {
     static final float FPS = 60f;
+    /**
+     * Golpe do QTE: chega até esse vão entre os corpos antes de bater (px do mundo), ou até
+     * encostar (os corpos se empurram e o vão para de diminuir).
+     */
+    static final float ALCANCE = 30f;
+    /** Golpe do QTE: o tempo máximo para chegar perto e bater. */
+    static final float GOLPE_SEGUNDOS = 5f;
 
     /** Um movimento em andamento. */
     private static final class Ordem {
         final CinematicaLuta.Movimento movimento;
+        /** Um golpe (o QTE) no lugar do movimento. */
+        final CinematicaLuta.Golpe golpe;
         final int limite;
         int frame;
         /** O comando já saiu (o lutador estava livre para obedecer). */
         boolean pediu;
+        int pediuEm;
         boolean saiuDoChao;
+        /** Golpe: o vão no quadro anterior (encostou quando ele para de diminuir). */
+        float vaoAntes = Float.MAX_VALUE;
 
         Ordem(CinematicaLuta.Movimento movimento) {
             this.movimento = movimento;
+            golpe = null;
             limite = Math.max(1, Math.round(movimento.segundos * FPS));
+        }
+
+        Ordem(CinematicaLuta.Golpe golpe) {
+            movimento = null;
+            this.golpe = golpe;
+            limite = Math.round(GOLPE_SEGUNDOS * FPS);
         }
     }
 
@@ -32,6 +51,11 @@ final class CinematicaDirector {
     /** Começa um movimento do lado 0 (jogador) ou 1 (CPU); "parar" cancela o que estiver rodando. */
     void mover(int lado, CinematicaLuta.Movimento movimento) {
         ordens[lado] = movimento.tipo == CinematicaLuta.Movimento.Tipo.PARAR ? null : new Ordem(movimento);
+    }
+
+    /** O lado 0 (jogador) ou 1 (CPU) vai até o outro e dá o golpe do QTE. */
+    void golpear(int lado, CinematicaLuta.Golpe golpe) {
+        ordens[lado] = new Ordem(golpe);
     }
 
     boolean movendo(int lado) {
@@ -62,6 +86,10 @@ final class CinematicaDirector {
         }
         // Quem está apanhando, caído ou no meio de um golpe termina isso antes de obedecer.
         boolean livre = f.canAct() && f.grounded;
+        if (o.golpe != null) {
+            golpe(f, outro, lado, o, in, livre);
+            return;
+        }
         switch (o.movimento.tipo) {
             case TITULAR:
                 // No 2x2, quem estava na vez troca com o titular (os irmãos são os titulares).
@@ -110,6 +138,45 @@ final class CinematicaDirector {
             default:
                 ordens[lado] = null;
         }
+    }
+
+    /**
+     * O golpe do QTE: espera o alvo ficar de pé (levantando de uma queda, ainda apanhando),
+     * corre até ele e aperta o golpe; acaba quando quem bateu pode agir de novo.
+     */
+    private void golpe(CombatFighter f, CombatFighter alvo, int lado, Ordem o, FighterInput in, boolean livre) {
+        if (o.pediu) {
+            if (o.frame - o.pediuEm > 4 && f.canAct() && !f.attacking()) ordens[lado] = null;
+            return;
+        }
+        if (!alvo.hittable() || !alvo.grounded || alvo.inHitstun()) return;
+        float vao = vao(f, alvo);
+        boolean encostou = f.forwardDashing && vao >= o.vaoAntes - 0.5f;
+        o.vaoAntes = vao;
+        if (vao > ALCANCE && !encostou) {
+            if (!livre && !f.forwardDashing) return;
+            in.direction = DemoDirector.Ctx.forward(f);
+            if (!f.forwardDashing) in.dash = true;
+            return;
+        }
+        if (!f.canAct()) return;
+        apertar(o.golpe.golpe, in);
+        o.pediu = true;
+        o.pediuEm = o.frame;
+    }
+
+    /** O botão do golpe: L/M/H, agachado (2L...: ↓ junto) ou um especial já resolvido (S, S2...). */
+    static void apertar(String golpe, FighterInput in) {
+        if (golpe.startsWith("S")) {
+            // "S" é a energia (o forte); S2, S3... o especial com esse id.
+            in.special = golpe.equals("S") || golpe.equals("S1") ? "H" : golpe;
+            return;
+        }
+        char botao = golpe.charAt(golpe.length() - 1);
+        if (golpe.startsWith("2")) in.direction = 3; // ↓
+        in.light = botao == 'L';
+        in.medium = botao == 'M';
+        in.heavy = botao == 'H';
     }
 
     /** Espaço livre entre os dois corpos (px do mundo). */

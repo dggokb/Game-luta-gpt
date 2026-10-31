@@ -67,7 +67,8 @@
       {"area": [0.999, 0.6387, 0.999, 0.9993, 0.0, 0.9993, 0.0, 0.6413], "efeitos": ["impacto", "velocidade"]}
     ] },
 
-    { "tipo": "luta", "irmao": "ryuga", "rotulo": "CONVITE", "cenario": "dojo_yinlu", "dupla": ["player_base"], "cpu": ["p02"], "repetirSeDerrota": false },
+    { "tipo": "luta", "irmao": "ryuga", "rotulo": "CONVITE", "cenario": "dojo_yinlu", "dupla": ["player_base"], "cpu": ["p02"], "repetirSeDerrota": false,
+      "cinematica": "ep02/cinematica_convite_ryuga.json" },
 
     { "tipo": "luta", "irmao": "koga", "rotulo": "CONVITE", "cenario": "beco_brucy", "dupla": ["p03"], "cpu": ["p04"], "repetirSeDerrota": false },
 

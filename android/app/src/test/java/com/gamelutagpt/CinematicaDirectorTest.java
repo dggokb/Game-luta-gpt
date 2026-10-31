@@ -46,6 +46,44 @@ public class CinematicaDirectorTest {
         }
     }
 
+    /**
+     * O golpe do QTE: quem bate corre até o rival e o golpe pega de verdade (o rival entra em
+     * hitstun), com o dano do roteiro uma vez só, mesmo num golpe de várias batidas.
+     */
+    @Test public void golpeDoQteCorreBateETiraODanoDoRoteiro() {
+        for (String golpe : new String[] {"M", "H", "2H", "S2", "S4"}) {
+            Match m = new Match(800f, 1400f);
+            FighterState alvo = m.f(1).state;
+            int dano = alvo.profile.maxLife / 5;
+            int antes = alvo.life;
+            alvo.cenaDano = dano;
+            m.director.golpear(0, new CinematicaLuta.Golpe(golpe, 0.2f, false));
+            boolean apanhou = false;
+            for (int i = 0; i < 400 && m.director.movendo(0); i++) {
+                m.director.fill(m.engine, m.in[0], m.in[1]);
+                m.engine.step(m.in[0], m.in[1]);
+                apanhou |= m.f(1).inHitstun() || m.f(1).status == CombatFighter.Status.KNOCKDOWN;
+            }
+            assertFalse(golpe + ": o golpe acaba", m.director.movendo(0));
+            assertTrue(golpe + ": o golpe pegou", apanhou);
+            assertEquals(golpe + ": o dano do roteiro, uma vez só", antes - dano, alvo.life);
+            alvo.cenaSemDano = false;
+        }
+    }
+
+    /** O golpe final do QTE derruba de vez, com a vida que o rival tiver. */
+    @Test public void golpeFinalDerruba() {
+        Match m = new Match(800f, 1400f);
+        FighterState alvo = m.f(1).state;
+        alvo.cenaDano = alvo.life;
+        m.director.golpear(0, new CinematicaLuta.Golpe("S2", 0f, true));
+        for (int i = 0; i < 400 && m.director.movendo(0); i++) {
+            m.director.fill(m.engine, m.in[0], m.in[1]);
+            m.engine.step(m.in[0], m.in[1]);
+        }
+        assertTrue("KO", m.f(1).ko());
+    }
+
     @Test public void pularParaTrasAfastaOsDoisEPousa() {
         Match m = new Match(1100f, 1350f);
         float antes = CinematicaDirector.vao(m.f(0), m.f(1));

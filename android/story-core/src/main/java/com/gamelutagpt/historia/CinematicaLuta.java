@@ -3,20 +3,26 @@ package com.gamelutagpt.historia;
 import com.gamelutagpt.render.MiniJson;
 import com.gamelutagpt.render.RenderAssets;
 import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Cinemática dentro da luta: num momento certo (o gatilho: alguém com pouca vida, o começo, um
  * tempo de luta, o KO), a luta vira cena. Faixas pretas entram em cima e embaixo, o jogador
  * perde o controle e um roteiro guia os dois lutadores (pular para trás, correr um na direção
  * do outro, parar), põe falas nos quadros laterais ({@link ConversaLuta}), estoura
- * onomatopeias de mangá na tela, mexe na câmera e pode terminar a luta.
+ * onomatopeias de mangá na tela, mexe na câmera e pode terminar a luta. Também pinta a tela
+ * de tinta, mostra uma página de mangá por cima e pede quick time events (QTE): acertou, o
+ * lutador do jogador bate de verdade e o rival perde o pedaço de vida do roteiro.
  *
  * O roteiro fica num arquivo JSON da história ({@code "cinematica"} no passo de luta, caminho
  * dentro de {@code historia/}). Esta classe é só a linha do tempo e o desenho (faixas e
@@ -41,6 +47,15 @@ public final class CinematicaLuta {
     static final float SAIDA_ONOMATOPEIA = 0.25f;
     /** Movimento ou fala nunca seguram a cena para sempre (um lutador preso numa queda...). */
     static final float LIMITE_ESPERA = 8f;
+    /** QTE: quanto o resultado (BOA!/ERROU!) fica antes do golpe sair. */
+    static final float RESULTADO_QTE = 0.4f;
+    /** QTE de tempo: folga (s) em volta do instante em que o anel fecha no botão. */
+    static final float JANELA_TEMPO = 0.17f;
+    /** QTE de deslizar: quanto o dedo anda (px da tela 1280x720) para valer. */
+    static final float DESLIZE = 90f;
+    static final float BOTAO_RAIO = 62f;
+    /** A página pode ser pulada com um toque depois disso. */
+    static final float PAGINA_PULAR = 0.6f;
     private static final int INK = Baloes.INK;
     private static final int WHITE = Baloes.WHITE;
 
@@ -64,7 +79,47 @@ public final class CinematicaLuta {
          * os quadros trocam junto).
          */
         boolean aDireita(int lado);
+
+        /**
+         * O lutador do lado {@code lado} vai até o outro e dá o golpe (o QTE): o alvo perde
+         * {@link Golpe#dano} da vida máxima, ou cai de vez com {@link Golpe#finaliza}.
+         */
+        default void golpear(int lado, Golpe golpe) {}
+
+        /** O golpe pedido para esse lado ainda não acabou. */
+        default boolean golpeando(int lado) {
+            return false;
+        }
     }
+
+    /** Um golpe roteirizado pedido ao {@link Palco}: o acerto (ou o erro) de um QTE. */
+    public static final class Golpe {
+        /** O botão do golpe: "L", "M", "H", agachado ("2L", "2M", "2H") ou um especial ("S", "S2"...). */
+        public final String golpe;
+        /** Quanto da vida máxima do alvo ele tira (0 a 1). */
+        public final float dano;
+        /** O golpe derruba de vez: o alvo cai (KO), tenha a vida que tiver. */
+        public final boolean finaliza;
+
+        public Golpe(String golpe, float dano, boolean finaliza) {
+            this.golpe = golpe;
+            this.dano = dano;
+            this.finaliza = finaliza;
+        }
+    }
+
+    /** Os tipos de QTE: tocar, tocar muitas vezes, deslizar numa direção, tocar na hora do anel. */
+    public enum TipoQte { TOQUE, MARTELAR, DESLIZAR, TEMPO }
+
+    /** Textos fixos do QTE (as dicas embaixo do botão e o resultado), para conferir as traduções. */
+    public static final List<String> TEXTOS_QTE = Collections.unmodifiableList(Arrays.asList(
+        "TOQUE!", "APERTE!", "TOQUE RÁPIDO!", "APERTE RÁPIDO!", "DESLIZE!", "DIRECIONAL!", "NA HORA CERTA!",
+        "BOA!", "ERROU!"));
+
+    /** Fases do toque para {@link #toque}. */
+    public static final int TOQUE_DESCE = 0;
+    public static final int TOQUE_MOVE = 1;
+    public static final int TOQUE_SOBE = 2;
 
     /** Quando a cinemática começa. */
     public static final class Gatilho {
@@ -102,7 +157,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -133,6 +188,15 @@ public final class CinematicaLuta {
         /** VELOCIDADE: velocidade da luta (1 = normal, 0,3 = câmera lenta, 0 = congela). */
         float valor = 1f;
         String vencedor;
+        /** PAGINA: as páginas (caminho dentro de {@code historia/}); uma é sorteada a cada luta. */
+        List<String> imagens;
+        /** QTE: o tipo, quantos toques (MARTELAR) e a direção (DESLIZAR: frente, tras, cima, baixo). */
+        TipoQte qte;
+        int vezes = 8;
+        String direcao = "frente";
+        /** QTE: o golpe de quem acerta ({@link #quemMove} bate) e o contra-ataque de quem erra. */
+        Golpe acerto;
+        Golpe erro;
 
         Acao(Tipo tipo) {
             this.tipo = tipo;
@@ -163,6 +227,15 @@ public final class CinematicaLuta {
             List<String> out = new ArrayList<>();
             for (Acao a : acoes) {
                 if (a.tipo == Acao.Tipo.FALA && !out.contains(a.quem)) out.add(a.quem);
+            }
+            return out;
+        }
+
+        /** Todas as páginas que a cena pode sortear (para conferir os arquivos). */
+        public List<String> paginas() {
+            List<String> out = new ArrayList<>();
+            for (Acao a : acoes) {
+                if (a.imagens != null) out.addAll(a.imagens);
             }
             return out;
         }
@@ -248,6 +321,65 @@ public final class CinematicaLuta {
     }
     private final List<Estouro> estouros = new ArrayList<>();
 
+    /** Uma pincelada da tinta: o caminho (de onde ela entra até onde sai) e a grossura. */
+    private static final class Pincelada {
+        final float[] xs;
+        final float[] ys;
+        final float largura;
+        /** Quando ela começa, na fração da animação toda (0..1). */
+        final float atraso;
+        /** Gotas que respingam quando a ponta passa: fração do caminho, desvio para o lado e raio. */
+        final float[] gotas;
+
+        Pincelada(float[] xs, float[] ys, float largura, float atraso, float[] gotas) {
+            this.xs = xs;
+            this.ys = ys;
+            this.largura = largura;
+            this.atraso = atraso;
+            this.gotas = gotas;
+        }
+    }
+
+    /** Parte da animação que cada pincelada leva para atravessar a tela. */
+    static final float PINCELADA = 0.55f;
+    private enum ModoTinta { NADA, COBRINDO, DESCOBRINDO }
+    private ModoTinta tintaModo = ModoTinta.NADA;
+    private float tintaDesde;
+    private float tintaDuracao = 1f;
+    private int tintaCor = WHITE;
+    /** A tela está toda pintada: a luta fica atrás de um fundo liso da cor da tinta. */
+    private boolean coberta;
+    private List<Pincelada> pinceladas = Collections.emptyList();
+    private int pinturas;
+
+    /** A página sorteada de cada ação PAGINA (escolhida ao carregar a luta). */
+    private final Map<Acao, RenderImage> paginas = new HashMap<>();
+    private RenderImage pagina;
+    private float paginaDesde;
+    private boolean paginaPulada;
+
+    /** O QTE da ação atual: em que fase está, o que o jogador já fez e o resultado. */
+    private enum FaseQte { PEDINDO, RESULTADO, GOLPE }
+    private Acao qte;
+    private FaseQte qteFase;
+    private float qteDesde;
+    private boolean qteAcertou;
+    private int qteToques;
+    private float qteUltimoToque = -999f;
+    /** DESLIZAR: a direção pedida na tela (-1, 0 ou 1 em cada eixo) e onde o dedo desceu. */
+    private int qteDx;
+    private int qteDy;
+    private boolean dedoNaTela;
+    private float dedoX0;
+    private float dedoY0;
+    private float dedoX;
+    private float dedoY;
+    /** De que lado é quem bate agora (o acerto: o jogador; o erro: o rival). */
+    private int qteBatedor;
+    private int qteTentativas;
+    /** O jogador está no toque (as dicas dizem TOQUE) ou no teclado/controle (APERTE). */
+    private boolean dicasDeToque = true;
+
     /**
      * {@code conversa}: os quadros laterais onde as falas aparecem (pode ser null: a cena roda
      * sem falas). {@code palco}: quem mexe na luta.
@@ -273,6 +405,24 @@ public final class CinematicaLuta {
         }
         this.temporada = temporada;
         this.irmao = Torneio.KOGA.equals(irmao) ? Torneio.KOGA : Torneio.RYUGA;
+        // A página de cada ação já abre agora (não na hora da cena: a imagem é grande).
+        Random sorteio = new Random();
+        for (Acao a : roteiro.acoes) {
+            if (a.tipo != Acao.Tipo.PAGINA) continue;
+            List<String> opcoes = new ArrayList<>(a.imagens);
+            while (!opcoes.isEmpty()) {
+                String escolhida = opcoes.remove(sorteio.nextInt(opcoes.size()));
+                try {
+                    RenderImage img = assets.loadImage(Temporada.PASTA + "/" + escolhida);
+                    if (img != null) {
+                        paginas.put(a, img);
+                        break;
+                    }
+                } catch (IOException | RuntimeException ex) {
+                    // Essa não abriu: sorteia outra (sem nenhuma, a cena pula a página).
+                }
+            }
+        }
         estado = Estado.ARMADA;
         return true;
     }
@@ -291,6 +441,13 @@ public final class CinematicaLuta {
         focoRival.zerar();
         velocidade.zerar();
         estouros.clear();
+        tintaModo = ModoTinta.NADA;
+        coberta = false;
+        pinceladas = Collections.emptyList();
+        paginas.clear();
+        pagina = null;
+        qte = null;
+        dedoNaTela = false;
     }
 
     // ------------------------------------------------------------ leitura
@@ -301,10 +458,17 @@ public final class CinematicaLuta {
         Gatilho gatilho = gatilho(root.get("gatilho"));
         List<Acao> acoes = new ArrayList<>();
         int n = 0;
+        boolean travado = false;
         for (Object item : Episodio.list(root, "acoes")) {
             n++;
             try {
-                acoes.add(acao(temporada, Episodio.asMap(item)));
+                Acao a = acao(temporada, Episodio.asMap(item));
+                if (a.tipo == Acao.Tipo.CONTROLE) travado = a.ligar;
+                // Quem bate no QTE é o roteiro: o pad e a IA precisam estar de fora.
+                if (a.tipo == Acao.Tipo.QTE && !travado) {
+                    throw new IllegalArgumentException("qte com o controle solto (antes: {\"acao\": \"controle\", \"travar\": true})");
+                }
+                acoes.add(a);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException("ação " + n + ": " + ex.getMessage(), ex);
             }
@@ -435,12 +599,79 @@ public final class CinematicaLuta {
                     throw new IllegalArgumentException("vencedor " + a.vencedor + " (use jogador, rival ou interrompida)");
                 }
                 break;
+            case "tinta":
+                a = new Acao(Acao.Tipo.TINTA);
+                a.ligar = booleano(m, "cobrir");
+                a.segundos = numero(m, "segundos", 0.9f, 0.1f, 5f);
+                a.cor = WHITE;
+                String tinta = Episodio.string(m, "cor", null);
+                if (tinta != null) a.cor = Temporada.parseColor(tinta);
+                break;
+            case "pagina":
+                a = new Acao(Acao.Tipo.PAGINA);
+                a.imagens = new ArrayList<>();
+                String uma = Episodio.string(m, "imagem", null);
+                if (uma != null) a.imagens.add(uma);
+                for (Object img : Episodio.list(m, "imagens")) a.imagens.add(String.valueOf(img));
+                if (a.imagens.isEmpty()) throw new IllegalArgumentException("pagina sem \"imagem\" nem \"imagens\"");
+                a.segundos = numero(m, "segundos", 3f, 0.3f, 15f);
+                break;
+            case "qte":
+                a = qte(m);
+                break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte)");
         }
-        a.semEsperar = Boolean.TRUE.equals(m.get("semEsperar"));
+        // O QTE sempre espera o jogador.
+        a.semEsperar = a.tipo != Acao.Tipo.QTE && Boolean.TRUE.equals(m.get("semEsperar"));
         return a;
+    }
+
+    private static Acao qte(Map<String, Object> m) {
+        Acao a = new Acao(Acao.Tipo.QTE);
+        String tipo = Episodio.string(m, "tipo", "toque");
+        switch (tipo) {
+            case "toque": a.qte = TipoQte.TOQUE; break;
+            case "martelar": a.qte = TipoQte.MARTELAR; break;
+            case "deslizar": a.qte = TipoQte.DESLIZAR; break;
+            case "tempo": a.qte = TipoQte.TEMPO; break;
+            default: throw new IllegalArgumentException("qte " + tipo + " (use toque, martelar, deslizar ou tempo)");
+        }
+        a.texto = texto(m);
+        float padrao = a.qte == TipoQte.MARTELAR ? 2.6f : a.qte == TipoQte.TEMPO ? 1.3f : 1.8f;
+        a.segundos = numero(m, "segundos", padrao, 0.4f, 10f);
+        a.vezes = Math.round(numero(m, "vezes", 8f, 2f, 40f));
+        a.direcao = Episodio.string(m, "direcao", "frente");
+        if (!a.direcao.matches("frente|tras|cima|baixo")) {
+            throw new IllegalArgumentException("direcao " + a.direcao + " (use frente, tras, cima ou baixo)");
+        }
+        a.quemMove = Episodio.string(m, "quem", "jogador");
+        if (!time(a.quemMove)) throw new IllegalArgumentException("quem bate: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
+        a.x = 0.5f;
+        a.y = 0.6f;
+        List<Object> pos = Episodio.list(m, "pos");
+        if (!pos.isEmpty()) {
+            if (pos.size() != 2 || !(pos.get(0) instanceof Number) || !(pos.get(1) instanceof Number)) {
+                throw new IllegalArgumentException("pos precisa ser [x, y]");
+            }
+            a.x = ((Number)pos.get(0)).floatValue();
+            a.y = ((Number)pos.get(1)).floatValue();
+            if (a.x < 0f || a.x > 1f || a.y < 0f || a.y > 1f) throw new IllegalArgumentException("pos fora da tela");
+        }
+        boolean finaliza = Boolean.TRUE.equals(m.get("final"));
+        a.acerto = golpe(m, "golpe", "H", finaliza);
+        Object erro = m.get("erro");
+        if (erro != null) a.erro = golpe(Episodio.asMap(erro), "golpe", "M", false);
+        return a;
+    }
+
+    private static Golpe golpe(Map<String, Object> m, String chave, String padrao, boolean finaliza) {
+        String g = Episodio.string(m, chave, padrao);
+        if (!g.matches("2?[LMH]|S[1-9]?")) {
+            throw new IllegalArgumentException("golpe " + g + " (use L, M, H, 2L, 2M, 2H ou um especial: S, S2, S3...)");
+        }
+        return new Golpe(g, numero(m, "dano", 0.15f, 0f, 1f), finaliza);
     }
 
     private static Movimento movimento(Map<String, Object> m) {
@@ -598,6 +829,14 @@ public final class CinematicaLuta {
             Estouro e = it.next();
             if (time - e.desde >= e.acao.segundos) it.remove();
         }
+        if (tintaModo != ModoTinta.NADA && time - tintaDesde >= tintaDuracao) {
+            // Terminou de cobrir: a tela é um fundo liso, e a página que estava por baixo some.
+            if (tintaModo == ModoTinta.COBRINDO) {
+                coberta = true;
+                pagina = null;
+            }
+            tintaModo = ModoTinta.NADA;
+        }
         if (estado == Estado.RODANDO) avancar();
     }
 
@@ -655,6 +894,19 @@ public final class CinematicaLuta {
                 travado = false;
                 palco.terminarLuta(a.vencedor);
                 break;
+            case TINTA:
+                pintar(a.ligar, a.segundos, a.cor);
+                break;
+            case PAGINA:
+                pagina = paginas.get(a);
+                paginaDesde = time;
+                paginaPulada = false;
+                break;
+            case QTE:
+                qte = a;
+                qteTentativas = 0;
+                pedirQte();
+                break;
             default:
                 break;
         }
@@ -677,16 +929,231 @@ public final class CinematicaLuta {
             case ESPERAR:
             case CAMERA:
             case VELOCIDADE:
+            case TINTA:
                 return idade >= a.segundos;
+            case PAGINA:
+                return pagina == null || paginaPulada || idade >= a.segundos;
+            case QTE:
+                return qtePronto();
             default:
                 return true;
         }
+    }
+
+    // ------------------------------------------------------------ tinta
+
+    /** Começa a pintar a tela (cobrir) ou a tirar a tinta dela (descobrir). */
+    private void pintar(boolean cobrir, float segundos, int cor) {
+        tintaModo = cobrir ? ModoTinta.COBRINDO : ModoTinta.DESCOBRINDO;
+        tintaDesde = time;
+        tintaDuracao = segundos;
+        if (cobrir) {
+            tintaCor = cor;
+            pinceladas = pinceladas(pinturas++);
+        } else {
+            coberta = false;
+            pagina = null;
+            if (pinceladas.isEmpty()) pinceladas = pinceladas(pinturas++);
+        }
+    }
+
+    /**
+     * Seis pinceladas largas, uma embaixo da outra, cada uma atravessando a tela inteira (de um
+     * lado para o outro, alternando), um pouco tortas e onduladas. Grossas o bastante para,
+     * juntas, cobrirem a tela toda.
+     */
+    static List<Pincelada> pinceladas(int semente) {
+        Random r = new Random(1234L + semente * 7919L);
+        int faixas = 6;
+        float passo = (VH + 60f) / faixas;
+        List<Pincelada> out = new ArrayList<>();
+        for (int i = 0; i < faixas; i++) {
+            boolean paraDireita = (i % 2 == 0) == (semente % 2 == 0);
+            float yc = -30f + passo * (i + 0.5f);
+            float inclinacao = (r.nextFloat() * 2f - 1f) * 22f;
+            float fase = r.nextFloat() * 6.28f;
+            int pontos = 12;
+            float[] xs = new float[pontos];
+            float[] ys = new float[pontos];
+            for (int k = 0; k < pontos; k++) {
+                float u = k / (float)(pontos - 1);
+                float x = -220f + (VW + 440f) * u;
+                xs[k] = paraDireita ? x : VW - x;
+                ys[k] = yc + inclinacao * (u * 2f - 1f) + (float)Math.sin(fase + u * 7f) * 9f;
+            }
+            float largura = 236f + r.nextFloat() * 24f;
+            float atraso = i * 0.075f + r.nextFloat() * 0.03f;
+            int n = 3 + r.nextInt(3);
+            float[] gotas = new float[n * 3];
+            for (int g = 0; g < n; g++) {
+                gotas[g * 3] = 0.15f + 0.8f * r.nextFloat();
+                gotas[g * 3 + 1] = (r.nextBoolean() ? 1f : -1f) * (largura * 0.5f + 10f + r.nextFloat() * 40f);
+                gotas[g * 3 + 2] = 4f + r.nextFloat() * 11f;
+            }
+            out.add(new Pincelada(xs, ys, largura, atraso, gotas));
+        }
+        return out;
+    }
+
+    /** A tela está toda pintada (a luta não aparece). */
+    public boolean telaCoberta() {
+        return coberta;
+    }
+
+    // ------------------------------------------------------------ QTE
+
+    /** O QTE pede de novo (o primeiro pedido ou depois de um erro). */
+    private void pedirQte() {
+        qteFase = FaseQte.PEDINDO;
+        qteDesde = time;
+        qteToques = 0;
+        qteAcertou = false;
+        dedoNaTela = false;
+        // "frente" é na direção do rival na tela, do lado de quem bate.
+        int frente = palco.aDireita(lado(qte.quemMove)) ? -1 : 1;
+        qteDx = qte.direcao.equals("frente") ? frente : qte.direcao.equals("tras") ? -frente : 0;
+        qteDy = qte.direcao.equals("cima") ? -1 : qte.direcao.equals("baixo") ? 1 : 0;
+    }
+
+    private float limiteQte(Acao a) {
+        return a.qte == TipoQte.TEMPO ? a.segundos + JANELA_TEMPO : a.segundos;
+    }
+
+    private void resolverQte(boolean acertou) {
+        if (qte == null || qteFase != FaseQte.PEDINDO) return;
+        qteAcertou = acertou;
+        qteFase = FaseQte.RESULTADO;
+        qteDesde = time;
+    }
+
+    /**
+     * Pedindo: espera o jogador (ou o tempo acabar, que é erro). Resultado: mostra BOA!/ERROU!
+     * e solta o golpe (o jogador bate no acerto; no erro, o rival bate nele). Golpe: espera o
+     * golpe acabar; no acerto a ação termina, no erro o QTE pede de novo.
+     */
+    private boolean qtePronto() {
+        float idade = time - qteDesde;
+        switch (qteFase) {
+            case PEDINDO:
+                if (idade >= limiteQte(qte)) resolverQte(false);
+                return false;
+            case RESULTADO:
+                if (idade < RESULTADO_QTE) return false;
+                int quemBate = lado(qte.quemMove);
+                qteBatedor = qteAcertou ? quemBate : 1 - quemBate;
+                Golpe g = qteAcertou ? qte.acerto : qte.erro;
+                qteFase = FaseQte.GOLPE;
+                qteDesde = time;
+                if (g != null) palco.golpear(qteBatedor, g);
+                return false;
+            default:
+                if (palco.golpeando(qteBatedor) && idade < LIMITE_ESPERA) return false;
+                if (qteAcertou) return true;
+                qteTentativas++;
+                pedirQte();
+                return false;
+        }
+    }
+
+    /** A cena quer os toques e os botões agora (um QTE na tela, uma página que pode ser pulada). */
+    public boolean pegaToque() {
+        if (estado != Estado.RODANDO || acao == null) return false;
+        return acao.tipo == Acao.Tipo.QTE || (acao.tipo == Acao.Tipo.PAGINA && pagina != null);
+    }
+
+    /** Um QTE está esperando o jogador agora. */
+    public boolean qtePedindo() {
+        return pegaToque() && acao.tipo == Acao.Tipo.QTE && qteFase == FaseQte.PEDINDO;
+    }
+
+    /** Quantas vezes o jogador já errou o QTE atual. */
+    public int qteErros() {
+        return qteTentativas;
+    }
+
+    /** O dedo na tela ({@link #TOQUE_DESCE}, {@link #TOQUE_MOVE}, {@link #TOQUE_SOBE}), na tela 1280x720. */
+    public void toque(int fase, float x, float y) {
+        if (!pegaToque()) return;
+        if (acao.tipo == Acao.Tipo.PAGINA) {
+            if (fase == TOQUE_DESCE) pularPagina();
+            return;
+        }
+        if (qteFase != FaseQte.PEDINDO) return;
+        if (fase == TOQUE_DESCE) {
+            dedoNaTela = true;
+            dedoX0 = dedoX = x;
+            dedoY0 = dedoY = y;
+            if (qte.qte != TipoQte.DESLIZAR) apertar();
+        } else if (fase == TOQUE_MOVE) {
+            if (!dedoNaTela) return;
+            dedoX = x;
+            dedoY = y;
+            if (qte.qte == TipoQte.DESLIZAR) conferirDeslize(x - dedoX0, y - dedoY0);
+        } else {
+            dedoNaTela = false;
+        }
+    }
+
+    /** Um botão do teclado ou do controle (qualquer um vale como o toque). */
+    public void botao() {
+        if (!pegaToque()) return;
+        if (acao.tipo == Acao.Tipo.PAGINA) {
+            pularPagina();
+        } else if (qteFase == FaseQte.PEDINDO && qte.qte != TipoQte.DESLIZAR) {
+            apertar();
+        }
+    }
+
+    /** Uma direção do teclado ou do controle ({@code dx}, {@code dy}: -1, 0 ou 1, na tela). */
+    public void direcao(int dx, int dy) {
+        if (!qtePedindo() || qte.qte != TipoQte.DESLIZAR) return;
+        int ao = dx * qteDx + dy * qteDy;
+        if (ao > 0) resolverQte(true);
+        else if (ao < 0) resolverQte(false);
+    }
+
+    /** As dicas embaixo do botão falam do toque (TOQUE!) ou do teclado e controle (APERTE!). */
+    public void setToque(boolean toque) {
+        dicasDeToque = toque;
+    }
+
+    private void pularPagina() {
+        if (time - paginaDesde >= PAGINA_PULAR) paginaPulada = true;
+    }
+
+    private void apertar() {
+        switch (qte.qte) {
+            case TOQUE:
+                resolverQte(true);
+                break;
+            case MARTELAR:
+                qteToques++;
+                qteUltimoToque = time;
+                if (qteToques >= qte.vezes) resolverQte(true);
+                break;
+            case TEMPO:
+                resolverQte(Math.abs(time - qteDesde - qte.segundos) <= JANELA_TEMPO);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /** O dedo andou (dx, dy) desde que desceu: valeu na direção pedida, errou na contrária. */
+    private void conferirDeslize(float dx, float dy) {
+        float ao = dx * qteDx + dy * qteDy;
+        float deLado = Math.abs(dx * qteDy) + Math.abs(dy * qteDx);
+        if (ao >= DESLIZE && ao > deLado) resolverQte(true);
+        else if (ao <= -DESLIZE && -ao > deLado) resolverQte(false);
     }
 
     /** Fim do roteiro sem terminar a luta: o controle volta, as faixas saem e a câmera volta. */
     private void acabar() {
         estado = Estado.ACABOU;
         acao = null;
+        qte = null;
+        // A tinta que ficou na tela sai sozinha.
+        if (coberta || tintaModo == ModoTinta.COBRINDO) pintar(false, 0.6f, tintaCor);
         if (travado) {
             travado = false;
             palco.travarControle(false);
@@ -740,10 +1207,11 @@ public final class CinematicaLuta {
 
     // ------------------------------------------------------------ desenho
 
-    /** Faixas e onomatopeias (sem quadros de conversa entre elas). */
+    /** Faixas, onomatopeias, QTE, tinta e página (sem quadros de conversa entre eles). */
     public void render(RenderCanvas c) {
         renderFaixas(c);
         renderEfeitos(c);
+        renderTela(c);
     }
 
     /** As faixas pretas: por cima da luta e do HUD, por baixo dos quadros da conversa. */
@@ -808,17 +1276,308 @@ public final class CinematicaLuta {
             float dy = (float)Math.cos(time * 53f + i * 2.3f) * tremor;
             float rot = a.rotacao + (n > 1 ? (i % 2 == 0 ? -5f : 5f) : 0f);
             int vis = (int)(255f * alpha * Tinta.clamp01(pop * 3f));
-            String p = palavras[i];
             c.save();
             c.translate(px + dx, py + dy);
             c.rotate(rot, 0f, 0f);
             c.scale(escala, escala, 0f, 0f);
-            // Sombra, contorno branco por fora e preto por dentro: o letreiro de mangá.
-            c.drawText(p, size * 0.05f, size * 0.07f, size, Tinta.withAlpha(INK, vis * 3 / 4), Tinta.withAlpha(INK, vis * 3 / 4), size * 0.30f, true);
-            c.drawText(p, 0f, 0f, size, Tinta.withAlpha(WHITE, vis), Tinta.withAlpha(WHITE, vis), size * 0.34f, true);
-            c.drawText(p, 0f, 0f, size, Tinta.withAlpha(a.cor, vis), Tinta.withAlpha(INK, vis), size * 0.17f, true);
+            letreiro(c, palavras[i], 0f, 0f, size, a.cor, vis);
             c.restore();
         }
+    }
+
+    /** Sombra, contorno branco por fora e preto por dentro: o letreiro de mangá. */
+    private static void letreiro(RenderCanvas c, String p, float x, float y, float size, int cor, int vis) {
+        c.drawText(p, x + size * 0.05f, y + size * 0.07f, size, Tinta.withAlpha(INK, vis * 3 / 4), Tinta.withAlpha(INK, vis * 3 / 4), size * 0.30f, true);
+        c.drawText(p, x, y, size, Tinta.withAlpha(WHITE, vis), Tinta.withAlpha(WHITE, vis), size * 0.34f, true);
+        c.drawText(p, x, y, size, Tinta.withAlpha(cor, vis), Tinta.withAlpha(INK, vis), size * 0.17f, true);
+    }
+
+    /**
+     * O que cobre a luta, por cima de tudo (HUD, quadros, onomatopeias): o QTE, a tinta e a
+     * página de mangá. Com a tela coberta, um fundo liso da cor da tinta esconde a luta.
+     */
+    public void renderTela(RenderCanvas c) {
+        if (qte != null && acao == qte) desenharQte(c);
+        if (coberta) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, tintaCor);
+        if (pagina != null) desenharPagina(c);
+        if (tintaModo == ModoTinta.NADA) return;
+        float k = Tinta.clamp01((time - tintaDesde) / tintaDuracao);
+        float ultimo = 0f;
+        for (Pincelada p : pinceladas) ultimo = Math.max(ultimo, p.atraso);
+        for (Pincelada p : pinceladas) {
+            if (tintaModo == ModoTinta.COBRINDO) {
+                // A ponta do pincel atravessa a tela; quem começa antes fica embaixo.
+                float ate = Tinta.easeOutCubic(Tinta.clamp01((k - p.atraso) / PINCELADA));
+                desenharPincelada(c, p, 0f, ate, true);
+            } else {
+                // A tinta sai na ordem contrária: o rabo da pincelada corre atrás da ponta.
+                float de = Tinta.easeOutCubic(Tinta.clamp01((k - (ultimo - p.atraso)) / PINCELADA));
+                desenharPincelada(c, p, de, 1f, false);
+            }
+        }
+    }
+
+    /** O trecho {@code de..ate} (frações do caminho) de uma pincelada, com a borda e os fios do pincel. */
+    private void desenharPincelada(RenderCanvas c, Pincelada p, float de, float ate, boolean ponta) {
+        if (ate - de <= 0.001f) return;
+        int borda = Tinta.darken(tintaCor, 0.13f);
+        int fio = Tinta.withAlpha(Tinta.darken(tintaCor, 0.07f), 200);
+        caminho(c, p, de, ate, 0f, p.largura + 14f, borda);
+        caminho(c, p, de, ate, 0f, p.largura, tintaCor);
+        // Fios do pincel seco ao longo da pincelada.
+        for (int i = -2; i <= 2; i++) {
+            if (i == 0) continue;
+            caminho(c, p, de, ate, i * p.largura * 0.19f + (i % 2) * 7f, 3f, fio);
+        }
+        // Respingos onde a ponta já passou.
+        for (int g = 0; g < p.gotas.length; g += 3) {
+            float f = p.gotas[g];
+            if (f < de || f > ate) continue;
+            float[] xy = ponto(p, f);
+            float r = p.gotas[g + 2];
+            c.fillCircle(xy[0], xy[1] + p.gotas[g + 1], r + 2f, borda);
+            c.fillCircle(xy[0], xy[1] + p.gotas[g + 1], r, tintaCor);
+        }
+        if (ponta && ate < 1f) {
+            // A ponta: cerdas mais grossas e manchas saindo na frente.
+            float[] xy = ponto(p, ate);
+            for (int i = -3; i <= 3; i++) {
+                float y = xy[1] + i * p.largura * 0.13f;
+                c.fillCircle(xy[0] + (i % 2 == 0 ? 14f : -6f) * Math.signum(p.xs[p.xs.length - 1] - p.xs[0]), y, p.largura * 0.1f, tintaCor);
+            }
+        }
+    }
+
+    /** Desenha o caminho da pincelada entre as frações {@code de} e {@code ate}, deslocado {@code dy}. */
+    private static void caminho(RenderCanvas c, Pincelada p, float de, float ate, float dy, float largura, int cor) {
+        int n = p.xs.length - 1;
+        float[] a = ponto(p, de);
+        int k0 = Math.min(n - 1, (int)(de * n));
+        for (int k = k0; k < n; k++) {
+            float fim = (k + 1) / (float)n;
+            float[] b = fim >= ate ? ponto(p, ate) : new float[] {p.xs[k + 1], p.ys[k + 1]};
+            c.drawLine(a[0], a[1] + dy, b[0], b[1] + dy, largura, cor);
+            if (fim >= ate) return;
+            a = b;
+        }
+    }
+
+    /** O ponto na fração {@code f} (0..1) do caminho da pincelada. */
+    private static float[] ponto(Pincelada p, float f) {
+        int n = p.xs.length - 1;
+        float u = Tinta.clamp01(f) * n;
+        int k = Math.min(n - 1, (int)u);
+        float t = u - k;
+        return new float[] {p.xs[k] + (p.xs[k + 1] - p.xs[k]) * t, p.ys[k] + (p.ys[k + 1] - p.ys[k]) * t};
+    }
+
+    /** A página de mangá: bate na tela (grande e torta, e assenta), com linhas de impacto atrás. */
+    private void desenharPagina(RenderCanvas c) {
+        float idade = time - paginaDesde;
+        float h = VH - 56f;
+        float w = h * pagina.width() / (float)Math.max(1, pagina.height());
+        if (w > VW - 56f) {
+            w = VW - 56f;
+            h = w * pagina.height() / (float)Math.max(1, pagina.width());
+        }
+        float bate = Tinta.clamp01(idade / 0.28f);
+        int alpha = (int)(255f * Tinta.clamp01(idade / 0.1f));
+        float linhas = Tinta.clamp01(idade / 0.5f);
+        if (linhas < 1f) {
+            int cor = Tinta.withAlpha(INK, (int)(150f * (1f - linhas)));
+            for (int i = 0; i < 28; i++) {
+                double ang = Math.PI * 2 * i / 28 + 0.07 * (i % 3);
+                float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+                float r0 = 300f + 200f * Tinta.easeOutCubic(linhas);
+                c.drawLine(VW / 2f + cos * r0, VH / 2f + sin * r0, VW / 2f + cos * (r0 + 520f), VH / 2f + sin * (r0 + 520f),
+                    4f + 5f * (i % 2), cor);
+            }
+        }
+        float escala = (1.25f - 0.25f * Tinta.easeOutBack(bate)) * (1f + 0.04f * Tinta.clamp01(idade / 4f));
+        float rot = -4f + 3f * Tinta.easeOutCubic(bate);
+        c.save();
+        c.translate(VW / 2f, VH / 2f);
+        c.rotate(rot, 0f, 0f);
+        c.scale(escala, escala, 0f, 0f);
+        c.fillRect(-w / 2f + 12f, -h / 2f + 14f, w / 2f + 12f, h / 2f + 14f, Tinta.withAlpha(INK, alpha / 4));
+        c.fillRect(-w / 2f - 5f, -h / 2f - 5f, w / 2f + 5f, h / 2f + 5f, Tinta.withAlpha(INK, alpha));
+        c.drawImage(pagina, -w / 2f, -h / 2f, w / 2f, h / 2f, alpha);
+        c.restore();
+    }
+
+    private static int corQte(TipoQte tipo) {
+        switch (tipo) {
+            case MARTELAR: return 0xFFFF7A2F;
+            case DESLIZAR: return 0xFF3FB6FF;
+            case TEMPO: return 0xFFE84AFF;
+            default: return 0xFFFFD23F;
+        }
+    }
+
+    private String dica(TipoQte tipo) {
+        switch (tipo) {
+            case MARTELAR: return dicasDeToque ? "TOQUE RÁPIDO!" : "APERTE RÁPIDO!";
+            case DESLIZAR: return dicasDeToque ? "DESLIZE!" : "DIRECIONAL!";
+            case TEMPO: return "NA HORA CERTA!";
+            default: return dicasDeToque ? "TOQUE!" : "APERTE!";
+        }
+    }
+
+    private String t(String texto) {
+        return temporada != null ? temporada.t(texto) : texto;
+    }
+
+    /**
+     * O QTE: o nome do golpe em letreiro, o botão redondo com o anel do tempo (no de tempo, o
+     * anel que fecha até o botão; no de martelar, o anel enche a cada toque), a dica embaixo e,
+     * depois, o resultado.
+     */
+    private void desenharQte(RenderCanvas c) {
+        Acao a = qte;
+        float cx = a.x * VW, cy = a.y * VH;
+        float idade = time - qteDesde;
+        // Tempo desde o resultado (negativo: ainda pedindo).
+        float desde = qteFase == FaseQte.PEDINDO ? -1f : qteFase == FaseQte.RESULTADO ? idade : RESULTADO_QTE + idade;
+        float entrada = desde < 0f ? Tinta.clamp01(idade / 0.22f) : 1f;
+        float sumir = desde < 0f ? 0f : Tinta.clamp01((desde - 0.25f) / 0.4f);
+        float vis = entrada * (1f - sumir);
+        if (vis > 0.001f) {
+            int alpha = (int)(255f * vis);
+            c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(80f * vis)));
+            float escala = (0.4f + 0.6f * Tinta.easeOutBack(entrada)) * (1f + 0.25f * sumir);
+            float tremor = desde >= 0f && !qteAcertou ? (float)Math.sin(time * 70f) * 12f * (1f - Tinta.clamp01(desde / 0.4f)) : 0f;
+            float aperto = a.qte == TipoQte.MARTELAR ? 1f - 0.12f * (1f - Tinta.clamp01((time - qteUltimoToque) / 0.12f)) : 1f;
+            int cor = desde >= 0f && !qteAcertou ? 0xFF9A3030 : corQte(a.qte);
+            float r = BOTAO_RAIO;
+            float pedido = desde < 0f ? Tinta.clamp01(idade / a.segundos) : 1f;
+
+            c.save();
+            c.translate(cx + tremor, cy);
+            c.scale(escala, escala, 0f, 0f);
+            // O nome do golpe em cima.
+            letreiro(c, t(a.texto), 0f, -r - 62f, 58f, 0xFFFFD23F, alpha);
+            // O anel de fora: o tempo que falta (no de martelar, quanto já encheu).
+            if (desde < 0f && a.qte != TipoQte.TEMPO) {
+                c.strokeCircle(0f, 0f, r + 22f, 13f, Tinta.withAlpha(INK, alpha * 2 / 3));
+                if (a.qte == TipoQte.MARTELAR) {
+                    arco(c, r + 22f, qteToques / (float)a.vezes, 8f, Tinta.withAlpha(0xFFFFD23F, alpha));
+                } else {
+                    int corAnel = pedido > 0.7f ? 0xFFFF4A3A : WHITE;
+                    arco(c, r + 22f, 1f - pedido, 8f, Tinta.withAlpha(corAnel, alpha));
+                }
+            }
+            c.scale(aperto, aperto, 0f, 0f);
+            c.fillCircle(5f, 7f, r + 10f, Tinta.withAlpha(INK, alpha / 2));
+            c.fillCircle(0f, 0f, r + 8f, Tinta.withAlpha(INK, alpha));
+            c.fillCircle(0f, 0f, r + 2f, Tinta.withAlpha(WHITE, alpha));
+            c.fillCircle(0f, 0f, r - 6f, Tinta.withAlpha(cor, alpha));
+            c.fillCircle(-r * 0.25f, -r * 0.3f, r * 0.33f, Tinta.withAlpha(WHITE, alpha * 80 / 255));
+            // O miolo: a seta do deslize, quantos toques faltam ou o "!".
+            if (a.qte == TipoQte.DESLIZAR) {
+                seta(c, qteDx, qteDy, r * 0.62f, Tinta.withAlpha(INK, alpha));
+            } else {
+                String miolo = a.qte == TipoQte.MARTELAR && desde < 0f ? String.valueOf(Math.max(0, a.vezes - qteToques)) : "!";
+                c.drawText(miolo, 0f, r * 0.03f, r * 1.05f, Tinta.withAlpha(INK, alpha), Tinta.withAlpha(WHITE, alpha), 8f, false);
+            }
+            c.scale(1f / aperto, 1f / aperto, 0f, 0f);
+            if (desde < 0f && a.qte == TipoQte.TEMPO) {
+                // O anel que fecha: tocar quando ele chega no contorno do botão.
+                boolean naHora = Math.abs(idade - a.segundos) <= JANELA_TEMPO;
+                float alvo = r + 9f;
+                c.strokeCircle(0f, 0f, alvo, 6f, Tinta.withAlpha(naHora ? 0xFF7CFF4F : WHITE, alpha));
+                float rr = alvo + r * 2.4f * Math.max(0f, 1f - idade / a.segundos) - (idade > a.segundos ? (idade - a.segundos) * 60f : 0f);
+                c.strokeCircle(0f, 0f, rr, 13f, Tinta.withAlpha(INK, alpha * 2 / 3));
+                c.strokeCircle(0f, 0f, rr, 7f, Tinta.withAlpha(naHora ? 0xFF7CFF4F : 0xFFFFD23F, alpha));
+            }
+            if (desde < 0f && a.qte == TipoQte.DESLIZAR) {
+                // Setas correndo para o lado pedido, mostrando o movimento.
+                for (int i = 0; i < 3; i++) {
+                    float f = ((time * 1.6f + i / 3f) % 1f);
+                    float d = r + 40f + f * 120f;
+                    int va = (int)(alpha * Math.sin(Math.PI * f));
+                    c.save();
+                    c.translate(qteDx * d, qteDy * d);
+                    seta(c, qteDx, qteDy, 22f, Tinta.withAlpha(WHITE, va));
+                    c.restore();
+                }
+            }
+            if (desde < 0f) {
+                c.drawText(t(dica(a.qte)), 0f, r + 58f, 28f, Tinta.withAlpha(WHITE, alpha), Tinta.withAlpha(INK, alpha), 7f, false);
+                if (a.qte == TipoQte.MARTELAR) {
+                    // No de martelar o tempo é a barrinha embaixo.
+                    float bw = 170f;
+                    c.fillRect(-bw / 2f - 3f, r + 80f, bw / 2f + 3f, r + 93f, Tinta.withAlpha(INK, alpha));
+                    c.fillRect(-bw / 2f, r + 83f, -bw / 2f + bw * (1f - pedido), r + 90f,
+                        Tinta.withAlpha(pedido > 0.7f ? 0xFFFF4A3A : WHITE, alpha));
+                }
+            }
+            c.restore();
+        }
+        if (desde >= 0f) desenharResultado(c, cx, cy, desde);
+    }
+
+    /** BOA! (com o anel estourando) ou ERROU!, por cima do botão. */
+    private void desenharResultado(RenderCanvas c, float cx, float cy, float desde) {
+        if (desde >= 0.8f) return;
+        int alpha = (int)(255f * (1f - Tinta.clamp01((desde - 0.55f) / 0.25f)));
+        if (qteAcertou) {
+            float k = Tinta.clamp01(desde / 0.35f);
+            if (k < 1f) {
+                float rr = BOTAO_RAIO + 170f * Tinta.easeOutCubic(k);
+                c.strokeCircle(cx, cy, rr, 16f * (1f - k), Tinta.withAlpha(WHITE, (int)(255f * (1f - k))));
+                for (int i = 0; i < 16; i++) {
+                    double ang = Math.PI * 2 * i / 16;
+                    float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+                    float r0 = BOTAO_RAIO + 30f + 120f * Tinta.easeOutCubic(k);
+                    c.drawLine(cx + cos * r0, cy + sin * r0, cx + cos * (r0 + 60f), cy + sin * (r0 + 60f), 6f,
+                        Tinta.withAlpha(0xFFFFD23F, (int)(255f * (1f - k))));
+                }
+            }
+        }
+        float pop = Tinta.easeOutBack(Tinta.clamp01(desde / 0.16f));
+        float s = 1.8f - 0.8f * pop;
+        c.save();
+        c.translate(cx, cy);
+        c.rotate(qteAcertou ? -6f : 5f, 0f, 0f);
+        c.scale(s, s, 0f, 0f);
+        letreiro(c, t(qteAcertou ? "BOA!" : "ERROU!"), 0f, 0f, 76f, qteAcertou ? 0xFF7CFF4F : 0xFFFF4A3A, alpha);
+        c.restore();
+    }
+
+    /** Arco de {@code frac} da volta (de cima, no sentido do relógio), feito de segmentos. */
+    private static void arco(RenderCanvas c, float raio, float frac, float largura, int cor) {
+        if (frac <= 0.001f) return;
+        int n = Math.max(2, (int)(56 * frac));
+        double a0 = -Math.PI / 2;
+        float px = 0f, py = -raio;
+        for (int i = 1; i <= n; i++) {
+            double ang = a0 + Math.PI * 2 * frac * i / n;
+            float x = (float)Math.cos(ang) * raio, y = (float)Math.sin(ang) * raio;
+            c.drawLine(px, py, x, y, largura, cor);
+            px = x;
+            py = y;
+        }
+    }
+
+    /** Uma seta cheia apontando para (dx, dy), centrada em (0, 0). */
+    private static void seta(RenderCanvas c, int dx, int dy, float tamanho, int cor) {
+        float ux = dx, uy = dy;
+        float len = (float)Math.sqrt(ux * ux + uy * uy);
+        if (len < 0.001f) return;
+        ux /= len;
+        uy /= len;
+        float nx = -uy, ny = ux;
+        float t = tamanho;
+        float[] xy = {
+            ux * t, uy * t,
+            ux * 0.05f * t + nx * 0.8f * t, uy * 0.05f * t + ny * 0.8f * t,
+            ux * 0.05f * t + nx * 0.32f * t, uy * 0.05f * t + ny * 0.32f * t,
+            -ux * t + nx * 0.32f * t, -uy * t + ny * 0.32f * t,
+            -ux * t - nx * 0.32f * t, -uy * t - ny * 0.32f * t,
+            ux * 0.05f * t - nx * 0.32f * t, uy * 0.05f * t - ny * 0.32f * t,
+            ux * 0.05f * t - nx * 0.8f * t, uy * 0.05f * t - ny * 0.8f * t,
+        };
+        c.fillPolygon(xy, cor);
     }
 
     @Override
