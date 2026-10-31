@@ -749,6 +749,27 @@ que não usavam aquela textura.
 - **Coletor de lixo segurando o jogo:** total, em quantos quadros e o pior.
 - **HUD gravado refeito:** quantas vezes, e quantas texturas saíram, por motivo.
 
+### 5.18 No máximo 2 textos sobem para a placa por quadro
+
+**Relatório do celular** (o APK ainda sem o 5.17):
+
+| Medida | Valor |
+|---|---|
+| Quadro médio | 10,8 ms |
+| p95 | 16,0 ms |
+| Quadros em até 14 ms | 91% |
+
+**Os dois piores quadros eram textos subindo juntos:**
+- 35 ms: 9 textos em 5 ms;
+- 32 ms: 7 textos em 7 ms (HUD 23).
+
+Os textos ficam prontos juntos na thread dos textos (no SHINKAI, com os números do dano), e cada
+um custa uns 0,7–1 ms para subir.
+
+**Correção.** No máximo 2 subidas por quadro, somando os dois caminhos (`CanvasGl` e
+RenderCanvas), contadas em `GlRenderCanvas.subidasDeTexto`. O resto espera o próximo quadro,
+como um texto ainda em preparo: aparece o mesmo texto esticado ou nada por um quadro.
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:

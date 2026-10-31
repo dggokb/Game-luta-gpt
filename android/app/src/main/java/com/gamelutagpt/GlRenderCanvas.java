@@ -274,6 +274,7 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Começa o quadro numa tela de {@code largura}x{@code altura} pixels, preta, na tela virtual. */
     void comecar(int largura, int altura) {
         textosNovosRc = 0;
+        subidasDeTexto = 0;
         areaPintada = 0;
         cantoTri = 0;
         larguraTela = largura;
@@ -1691,6 +1692,14 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Como no CanvasGl: no máximo tantos textos feitos por quadro; os outros reaproveitam o último. */
     private static final int NOVOS_POR_QUADRO = 6;
     int textosNovosRc;
+    /**
+     * Textos prontos (da thread dos textos) que subiram para a placa neste quadro, nos dois
+     * caminhos (CanvasGl e RenderCanvas). Passou de {@link #SUBIDAS_DE_TEXTO}, o resto espera o
+     * próximo quadro: no celular cada um custa ~1 ms, e o SHINKAI com os números do dano subia 7
+     * a 9 de uma vez (quadros de 32 a 35 ms).
+     */
+    int subidasDeTexto;
+    static final int SUBIDAS_DE_TEXTO = 2;
     private final java.util.HashMap<String, Texto> ultimoDoTexto = new java.util.HashMap<>();
 
     @Override
@@ -1761,7 +1770,8 @@ final class GlRenderCanvas implements RenderCanvas {
                     emPreparo.put(chave, pedido);
                 }
                 Texto pronto = null;
-                if (pedido.isDone()) {
+                if (pedido.isDone() && subidasDeTexto < SUBIDAS_DE_TEXTO) {
+                    subidasDeTexto++;
                     emPreparo.remove(chave);
                     try {
                         pronto = pedido.get();

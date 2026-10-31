@@ -1313,7 +1313,8 @@ final class CanvasGl extends Canvas {
                 emPreparo.put(kt, pedido);
             }
             Texto pronto = null;
-            if (pedido.isDone()) {
+            if (pedido.isDone() && gl.subidasDeTexto < GlRenderCanvas.SUBIDAS_DE_TEXTO) {
+                gl.subidasDeTexto++;
                 emPreparo.remove(kt);
                 try {
                     pronto = pedido.get();
