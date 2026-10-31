@@ -12,7 +12,7 @@ import java.util.Random;
  * (como a {@link BateriaBalanco}), 2x2 e 1x1, e os dados fixos dos golpes e do movimento. Roda à
  * mão:
  *
- * <pre>java -cp ... com.gamelutagpt.BateriaMercado [fixos|lutas|tudo] [lutas por modo] [nível]</pre>
+ * <pre>java -cp ... com.gamelutagpt.BateriaMercado [fixos|lutas|chao|tudo] [lutas por modo] [nível]</pre>
  */
 public final class BateriaMercado {
     private BateriaMercado() {}
@@ -69,6 +69,52 @@ public final class BateriaMercado {
         linha("derrubado: queda + chão + levantar", cfg.knockdownFallFrames + " + " + cfg.knockdownDownFrames + " + " + cfg.wakeupFrames + " quadros");
         linha("defesa perfeita (janela)", cfg.justDefenseFrames + " quadros");
         linha("relógio", BattleFlow.TIME_LIMIT_SECONDS + " s por luta (2x2 numa luta só, sem rounds)");
+
+        BateriaBalanco.titulo("Tempos e proporções (sem unidade, para comparar com outros jogos)");
+        System.out.println("| item | valor |");
+        System.out.println("|---|---|");
+        for (String g : new String[] {"S", "S2", "S3", "S4", "SUPER"}) {
+            List<Integer> tot = new ArrayList<>();
+            for (String id : BateriaBalanco.ELENCO) {
+                CharacterDefinition c = BateriaBalanco.ch(id);
+                CharacterDefinition.Move m = c.moveFor(g);
+                if (m == null) m = c.move(g, false);
+                if (m != null && m.attack != null) tot.add(m.attack.totalFrames);
+            }
+            if (tot.isEmpty()) continue;
+            double[] v = tot.stream().mapToDouble(Integer::doubleValue).sorted().toArray();
+            linha("duração total do " + g + " (mediana; mín–máx)", n(med(v)) + " quadros (" + n(v[0]) + "–" + n(v[v.length - 1]) + ")");
+        }
+        double andar = cfg.walkSpeed / 60.0;
+        linha("atravessar a tela andando / andando para trás", f1(Arena.VW / cfg.walkSpeed) + " s / " + f1(Arena.VW / cfg.walkBackSpeed) + " s");
+        linha("trás ÷ frente (andar)", f2(cfg.walkBackSpeed / cfg.walkSpeed));
+        // Alcance real (o do desenho, da tabela da CPU): ponta do golpe a partir do eixo do atacante.
+        for (String g : new String[] {"2M", "M", "H", "2L"}) {
+            List<Double> r = new ArrayList<>();
+            for (String id : BateriaBalanco.ELENCO) {
+                float[] m = CpuReach.measured(BateriaBalanco.ch(id), g);
+                if (m != null && m[0] > 0) r.add((double) m[0] + corpo.halfWidth);
+            }
+            double[] v = r.stream().mapToDouble(Double::doubleValue).sorted().toArray();
+            double alc = med(v);
+            linha("alcance do " + g + " entre eixos (mediana)", (int) alc + " px = " + pct(alc / Arena.VW) + " da tela = "
+                + f1(alc / (2 * corpo.pushHalfWidth)) + " corpos (caixa de empurrão) = " + n(Math.round(alc / andar)) + " quadros andando");
+        }
+        List<Double> melhor = new ArrayList<>();
+        for (String id : BateriaBalanco.ELENCO) {
+            double b = 0;
+            for (String g : NORMAIS) {
+                float[] m = CpuReach.measured(BateriaBalanco.ch(id), g);
+                if (m != null) b = Math.max(b, m[0] + corpo.halfWidth);
+            }
+            melhor.add(b);
+        }
+        double mb = med(arr(melhor));
+        linha("melhor normal de alcance (mediana do elenco)", (int) mb + " px = " + pct(mb / Arena.VW) + " da tela = " + n(Math.round(mb / andar)) + " quadros andando");
+        linha("dash: distância ÷ alcance do 2M", "207 px em 20 quadros (T03) ÷ alcance do 2M (acima)");
+        float agarra = 2 * corpo.halfWidth + cfg.throwRange;
+        linha("agarrão entre eixos ÷ largura da caixa de empurrão", (int) agarra + " ÷ " + (int) (2 * corpo.pushHalfWidth) + " = " + f2(agarra / (2 * corpo.pushHalfWidth)));
+        linha("pulo à frente ÷ tela", "280 px (T03) = " + pct(280 / Arena.VW));
     }
 
     // ------------------------------------------------------------------ lutas
@@ -85,15 +131,59 @@ public final class BateriaMercado {
         final List<Sessao> sessoes = new ArrayList<>();
         int lutas, tempo, quedas, supers, ultras, breakers, assists, trocas, shinkais, defendidos, agarroes, quebrasGuarda;
         int vitoriaComMaisVida;
+        // Jogo no chão: dano por origem, contra-golpes, antiaéreos, golpes no vazio, pulos.
+        final java.util.Map<String, Integer> danoPorOrigem = new java.util.TreeMap<>();
+        int acertos, contraGolpes, antiaereos, entradasDoAr, entradasDoArDefendidas, pulos;
+        int normaisNoChao, normaisNoChaoComContato, quadrosLuta;
     }
 
+    /** Luta só no chão: sem super pulo, air dash, SHINKAI, Ultra, Breaker, assist e troca. */
+    static final java.util.function.Consumer<CombatConfig> SO_CHAO = cfg -> {
+        cfg.superJumpFrames = -1;
+        cfg.launcherChaseFrames = 0;
+        cfg.airDashMinHeight = 1e9f;
+        cfg.comboBreakerCost = Integer.MAX_VALUE;
+    };
+
+    static final BateriaBalanco.Mao MAO_CHAO = (luta, lado, in) -> {
+        in.superJump = in.shinkai = in.ultra = in.assist = in.tag = false;
+        if (!luta.f(lado).grounded) in.dash = in.backdash = false;
+    };
+
+    static String origem(CombatEngine.HitEvent h) {
+        String id = h.moveId == null ? "?" : h.moveId;
+        if (id.equals("THROW")) return "agarrão";
+        if (id.startsWith("SUPER") || id.startsWith("ULTRA")) return "Super";
+        if (h.projectile) return "projétil";
+        if (id.startsWith("j")) return "normal no ar";
+        if (id.startsWith("S")) return "especial";
+        return "normal no chão";
+    }
+
+    static boolean normalNoChao(AttackDefinition a) {
+        String id = a.id;
+        return id != null && !id.startsWith("j") && !id.startsWith("S") && !id.equals("THROW") && !id.startsWith("ULTRA")
+            && !id.equals(AttackDefinition.JUMP);
+    }
+
+
     static Medidas lutas(int tamanho, int n, int nivel, long base) {
+        return lutas(tamanho, n, nivel, base, false);
+    }
+
+    static Medidas lutas(int tamanho, int n, int nivel, long base, boolean chao) {
         Medidas md = new Medidas();
+        java.util.function.Consumer<CombatConfig> ajusteAntes = BateriaBalanco.AJUSTE_CFG;
+        if (chao) BateriaBalanco.AJUSTE_CFG = SO_CHAO;
         for (int i = 0; i < n; i++) {
             Random r = new Random(base + i);
             String[] t0 = tamanho == 2 ? BateriaBalanco.par(r) : new String[] {BateriaBalanco.ELENCO[r.nextInt(BateriaBalanco.ELENCO.length)]};
             String[] t1 = tamanho == 2 ? BateriaBalanco.par(r) : new String[] {BateriaBalanco.ELENCO[r.nextInt(BateriaBalanco.ELENCO.length)]};
             BateriaBalanco.Luta l = new BateriaBalanco.Luta(t0, t1, nivel, base + i, new CombatConfig());
+            if (chao) l.mao[0] = l.mao[1] = MAO_CHAO;
+            CombatFighter.Status[] statusAntes = {CombatFighter.Status.NEUTRAL, CombatFighter.Status.NEUTRAL};
+            boolean[] noChaoAntes = {true, true}, contato = new boolean[2];
+            AttackDefinition[] golpeAntes = new AttackDefinition[2];
             ComboSession[] vista = new ComboSession[2];
             int[] barraAntes = new int[2];
             boolean[] assistAntes = new boolean[2];
@@ -145,12 +235,39 @@ public final class BateriaMercado {
                 for (CombatEngine.HitEvent h : l.e.events()) {
                     if (h.blocked) md.defendidos++;
                     if ("THROW".equals(h.moveId)) md.agarroes++;
+                    contato[h.attacker] = true;
+                    boolean doAr = !noChaoAntes[h.attacker] && !h.projectile, noAr = !noChaoAntes[h.defender];
+                    if (doAr && !noAr) {
+                        if (h.blocked) md.entradasDoArDefendidas++;
+                        else md.entradasDoAr++;
+                    }
+                    if (h.blocked) continue;
+                    md.acertos++;
+                    md.danoPorOrigem.merge(origem(h), h.damage, Integer::sum);
+                    if (statusAntes[h.defender] == CombatFighter.Status.ATTACK) md.contraGolpes++;
+                    if (noAr && noChaoAntes[h.attacker] && statusAntes[h.defender] != CombatFighter.Status.AIR_HITSTUN) md.antiaereos++;
+                }
+                for (int lado = 0; lado < 2; lado++) {
+                    CombatFighter f = l.f(lado);
+                    // Golpe novo: fecha o anterior (acertou ou defendido = contato; senão, no vazio).
+                    if (f.attack != golpeAntes[lado]) {
+                        if (golpeAntes[lado] != null && normalNoChao(golpeAntes[lado])) {
+                            md.normaisNoChao++;
+                            if (contato[lado]) md.normaisNoChaoComContato++;
+                        }
+                        golpeAntes[lado] = f.attack;
+                        contato[lado] = false;
+                    }
+                    if (noChaoAntes[lado] && !f.grounded && (statusAntes[lado] == CombatFighter.Status.NEUTRAL)) md.pulos++;
+                    statusAntes[lado] = f.status;
+                    noChaoAntes[lado] = f.grounded;
                 }
                 if (l.e.ultraConnected() >= 0) md.ultras++;
             }
             // O último a cair não troca de titular.
             for (int lado = 0; lado < 2; lado++) if (l.f(lado).state.life <= 0 || l.f(lado).ko()) quedasLuta++;
             md.lutas++;
+            md.quadrosLuta += luta;
             md.duracao.add(luta / 60.0);
             md.interacao.add(luta == 0 ? 0 : (double) interage / luta);
             if (neutro > 0) md.distanciaNeutro.add(soma / neutro);
@@ -161,6 +278,7 @@ public final class BateriaMercado {
             if (l.flow.timeOver()) md.tempo++;
             md.breakers += l.est[0].breakers + l.est[1].breakers;
         }
+        BateriaBalanco.AJUSTE_CFG = ajusteAntes;
         return md;
     }
 
@@ -194,6 +312,10 @@ public final class BateriaMercado {
         linha("combos de 3+ acertos: dano mediano / p90 / máx", f1(med(combos)) + "% / " + f1(q(combos, .9)) + "% / " + f1(combos.length == 0 ? 0 : combos[combos.length - 1]) + "%");
         linha("acertos por abertura: mediana / p90 / máx", n(med(acertos)) + " / " + n(q(acertos, .9)) + " / " + n(acertos.length == 0 ? 0 : acertos[acertos.length - 1]));
         linha("duração da abertura: mediana / p90", f2(med(segs)) + " / " + f2(q(segs, .9)) + " s");
+        double[] segsCombo = md.sessoes.stream().filter(s -> s.acertos >= 3).mapToDouble(s -> s.quadros / 60.0).sorted().toArray();
+        double[] acertosCombo = md.sessoes.stream().filter(s -> s.acertos >= 3).mapToDouble(s -> s.acertos).sorted().toArray();
+        linha("combos de 3+: duração mediana / p90 / máx; acertos medianos", f2(med(segsCombo)) + " / " + f2(q(segsCombo, .9)) + " / "
+            + f2(segsCombo.length == 0 ? 0 : segsCombo[segsCombo.length - 1]) + " s; " + n(med(acertosCombo)) + " acertos");
         linha("aberturas de 1 acerto só", pct((double) soltos / Math.max(1, md.sessoes.size())));
         double total = md.sessoes.stream().mapToDouble(s -> s.danoPct).sum();
         double d1 = md.sessoes.stream().filter(s -> s.acertos == 1).mapToDouble(s -> s.danoPct).sum();
@@ -205,6 +327,17 @@ public final class BateriaMercado {
         linha("por luta: Supers / Ultras / Breakers", f1(md.supers / l) + " / " + f1(md.ultras / l) + " / " + f1(md.breakers / l));
         if (tamanho == 2) linha("por luta: assists / trocas / SHINKAI", f1(md.assists / l) + " / " + f1(md.trocas / l) + " / " + f1(md.shinkais / l));
         linha("por luta: quebras de guarda", f1(md.quebrasGuarda / l));
+        if (md.acertos == 0) return;
+        double min = md.quadrosLuta / 3600.0;
+        int totalDano = md.danoPorOrigem.values().stream().mapToInt(Integer::intValue).sum();
+        StringBuilder origem = new StringBuilder();
+        md.danoPorOrigem.entrySet().stream().sorted((x, y) -> y.getValue() - x.getValue())
+            .forEach(e -> origem.append(origem.length() == 0 ? "" : " · ").append(e.getKey()).append(' ').append(pct((double) e.getValue() / totalDano)));
+        linha("dano por origem", origem.toString());
+        linha("acertos em quem estava atacando (contra-golpe/punição)", pct((double) md.contraGolpes / md.acertos) + " dos acertos");
+        linha("normais no chão que encostam (acerto ou defesa)", pct((double) md.normaisNoChaoComContato / Math.max(1, md.normaisNoChao)) + " (" + f1(md.normaisNoChao / min) + " por minuto)");
+        linha("pulos por minuto (os dois lados)", f1(md.pulos / min));
+        linha("entrada do ar: acerta / defendida / derrubada no antiaéreo", f1(md.entradasDoAr / min) + " / " + f1(md.entradasDoArDefendidas / min) + " / " + f1(md.antiaereos / min) + " por minuto");
     }
 
     // ------------------------------------------------------------------ util
@@ -236,6 +369,11 @@ public final class BateriaMercado {
         int nivel = args.length > 2 ? Integer.parseInt(args[2]) : BateriaBalanco.NIVEL;
         System.out.println("# Bateria do mercado (CPU nível " + nivel + ")");
         if (o.equals("fixos") || o.equals("tudo")) fixos();
+        if (o.equals("chao")) {
+            fixos();
+            relatorio("1x1 só no chão (sem super pulo, air dash, SHINKAI, Ultra, Breaker)", lutas(1, n, nivel, 950_000, true), 1);
+            relatorio("1x1 com tudo (mesmas sementes)", lutas(1, n, nivel, 950_000, false), 1);
+        }
         if (o.equals("lutas") || o.equals("tudo")) {
             relatorio("2x2 (o jogo de verdade)", lutas(2, n, nivel, 900_000), 2);
             relatorio("1x1 (para comparar com os jogos de um personagem)", lutas(1, n, nivel, 950_000), 1);
