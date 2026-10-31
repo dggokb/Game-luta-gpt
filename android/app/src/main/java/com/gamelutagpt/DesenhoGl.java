@@ -10,6 +10,7 @@ import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
+import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.os.Build;
 import android.util.Log;
@@ -287,6 +288,34 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     /** Batidas da tela por troca de quadro (0 = ainda não definido) e quadros até reler a taxa. */
     private int intervaloTroca, quadrosAteReler;
 
+    /** Quando o último quadro pediu para aparecer (System.nanoTime, o relógio da tela). */
+    private long ultimaApresentacao;
+    private Boolean temApresentacao;
+    private static final long QUADRO_60 = 16_666_667L;
+
+    /**
+     * Na tela de 120 Hz o celular do teste ignora a troca a cada duas batidas: o jogo desenhava 74
+     * quadros por segundo, depois 64 com o limite do laço, e os quadros apareciam em intervalos
+     * desiguais (40% em até 14 ms e 19% acima de 19 ms, com a placa de vídeo folgada). Cada
+     * quadro pede para aparecer 16,7 ms depois do anterior (EGL_ANDROID_presentation_time): a
+     * tela mostra um a cada duas batidas, e a fila de quadros segura o laço em 60. Vale também
+     * quando o aparelho diz 60 Hz: o mesmo celular mostrou "60 Hz" com o jogo a 64 quadros por
+     * segundo (a tela estava mais rápida que o informado); numa tela de 60 de verdade não muda nada.
+     */
+    private void marcarApresentacao() {
+        if (temApresentacao == null) {
+            String ext = EGL14.eglQueryString(tela, EGL14.EGL_EXTENSIONS);
+            temApresentacao = ext != null && ext.contains("EGL_ANDROID_presentation_time");
+        }
+        if (!temApresentacao) return;
+        long agora = System.nanoTime();
+        long alvo = ultimaApresentacao + QUADRO_60;
+        // Atrasou (ou é o primeiro): aparece assim que der e o ritmo recomeça daqui.
+        if (alvo < agora || alvo > agora + 4 * QUADRO_60) alvo = agora;
+        EGLExt.eglPresentationTimeANDROID(tela, superficie, alvo);
+        ultimaApresentacao = alvo;
+    }
+
     /**
      * Numa tela que ficou em 120 Hz (o pedido de 60 é só uma preferência), uma troca a cada duas
      * batidas: o jogo anda a 60, e desenhar 120 quadros era o dobro de trabalho. A taxa é relida a
@@ -356,6 +385,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     }
 
     private void mostrar() {
+        marcarApresentacao();
         if (EGL14.eglSwapBuffers(tela, superficie)) return;
         int erro = EGL14.eglGetError();
         Log.w(TAG, "eglSwapBuffers: " + erro);
@@ -442,8 +472,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     /** Teste automático: textos que viraram bitmap, formas com stencil e desenhos do último quadro. */
     int[] contagem() {
         return new int[] {canvasGl.textosNovos + canvas.textosNovosRc, canvasGl.formasStencil, canvasGl.desenhos,
-            Math.round(canvas.telasPintadas() * 10f), Math.round(canvas.msPlaca * 10f), canvas.quadrosAtrasPlaca,
-            canvas.placaEnxuta ? 1 : 0};
+            Math.round(canvas.telasPintadas() * 10f), Math.round(canvas.msPlaca * 10f), canvas.quadrosAtrasPlaca};
     }
 
     /** Para o contador: chamadas do último quadro, texturas e memória delas. */

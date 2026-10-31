@@ -3756,7 +3756,7 @@ public class GameView extends SurfaceView
         teste.quadro(perfil, contexto, g);
     }
 
-    private static final int[] SEM_GL = {0, 0, 0, 0, -10, 0, 0};
+    private static final int[] SEM_GL = {0, 0, 0, 0, -10, 0};
     /** Altura em pixels do último quadro desenhado (o título do relatório). */
     private int alturaDoQuadro;
     private final Paint testePaint = new Paint(Paint.ANTI_ALIAS_FLAG);

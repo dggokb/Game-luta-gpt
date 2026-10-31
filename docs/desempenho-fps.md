@@ -673,6 +673,34 @@ uns 4%: os pilares têm 38% de blocos 16×16 vazios, as outras camadas quase nad
 - No PC sem tela, que roda o programa de pixel na CPU, o quadro médio caiu de 29,5 para 22,5 ms
   com metade dos quadros enxutos.
 
+**Resultado no celular** (A/B no mesmo teste):
+
+| Momento | Completo | Enxuto |
+|---|---|---|
+| Média | 13,5 ms | 11,0 ms (−19%) |
+| Normal | 12,8 ms | 10,3 ms |
+| SHINKAI | 15,2 ms | 11,9 ms |
+| Super | 14,4 ms | 11,8 ms |
+| Ultra | 13,1 ms | 10,9 ms |
+
+O enxuto ficou valendo sempre e a alternância saiu do teste.
+
+### 5.16 Ritmo na tela de 120 Hz (EGL_ANDROID_presentation_time)
+
+No mesmo relatório:
+- o jogo rodou a 64 quadros por segundo;
+- 40% dos quadros ficaram em até 14 ms, 42% em 15–18 e 19% acima de 19;
+- os piores tinham trava de 10–14 ms com a placa em 10–13 ms.
+
+Com a placa folgada, a sobra é ritmo: a tela estava mais rápida que 60 Hz (o celular dizia
+"60 Hz") e os quadros apareciam em intervalos desiguais.
+
+**Correção.** `DesenhoGl.marcarApresentacao` pede para cada quadro aparecer 16,7 ms depois do
+anterior (`EGLExt.eglPresentationTimeANDROID`, quando o aparelho tem a extensão):
+- a tela mostra cada quadro por duas batidas de 120 Hz;
+- a fila de quadros segura o laço em 60;
+- quadro atrasado aparece assim que puder, e o ritmo recomeça dele.
+
 
 ## 6. Anexo: cenários e folhas
 

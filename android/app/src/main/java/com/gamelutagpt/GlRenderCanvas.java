@@ -131,8 +131,9 @@ final class GlRenderCanvas implements RenderCanvas {
     private int texturaAtual;
     /**
      * O mesmo programa sem o recorte por pixel (o laço com discard). Os recortes já saem cortados
-     * na CPU; só o stencil e o que sobra precisam do outro. No teste automático os dois se
-     * alternam quadro a quadro, e o relatório compara o tempo da placa de cada um.
+     * na CPU; só o que sobra precisa do outro. Medido no celular (os dois alternando quadro a
+     * quadro no teste): a placa de vídeo levava 13,5 ms por quadro com o completo e 11,0 com o
+     * enxuto (SHINKAI 15,2 → 11,9).
      */
     private static final String FRAGMENTOS_ENXUTO = FRAGMENTOS.replace(
         "  highp vec3 p = vec3(gl_FragCoord.xy, 1.0);\n" +
@@ -147,9 +148,7 @@ final class GlRenderCanvas implements RenderCanvas {
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
-    /** Este quadro usa o programa enxuto onde não há recorte por pixel. */
-    private boolean enxutoNoQuadro = true;
-    private long quadrosDesenhados;
+
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
     private int larguraTela, alturaTela;
@@ -291,9 +290,6 @@ final class GlRenderCanvas implements RenderCanvas {
         // Texturas de bitmaps que já não existem (cenário e Ultra de lutas passadas).
         java.lang.ref.Reference<? extends Bitmap> ref;
         while ((ref = esquecidas.poll()) != null) apagar((Textura)ref);
-        // No teste, os quadros ímpares usam só o programa completo (a comparação do relatório).
-        enxutoNoQuadro = !TesteAutomatico.gravando || (quadrosDesenhados & 1L) == 0L;
-        quadrosDesenhados++;
         usarPrograma(enxuto);
         GLES30.glUniform2f(uTela, largura, altura);
         usarPrograma(completo);
@@ -328,7 +324,6 @@ final class GlRenderCanvas implements RenderCanvas {
     private static final int GL_TIME_ELAPSED = 0x88BF, GL_GPU_DISJOINT = 0x8FBB, CONSULTAS = 4;
     private final int[] consultas = new int[CONSULTAS];
     private final boolean[] consultaPendente = new boolean[CONSULTAS];
-    private final boolean[] enxutoDaConsulta = new boolean[CONSULTAS];
     private final long[] quadroDaConsulta = new long[CONSULTAS];
     private final int[] resultado = new int[1];
     private boolean temporizador, consultaAberta;
@@ -341,8 +336,6 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     float msPlaca = -1f;
     int quadrosAtrasPlaca;
-    /** O quadro medido usou o programa enxuto (no teste os dois se alternam). */
-    boolean placaEnxuta;
 
     private void criarConsultas() {
         String ext = GLES30.glGetString(GLES30.GL_EXTENSIONS);
@@ -368,7 +361,6 @@ final class GlRenderCanvas implements RenderCanvas {
             if (!interrompido) {
                 msPlaca = (resultado[0] & 0xFFFFFFFFL) / 1e6f;
                 quadrosAtrasPlaca = (int)(quadrosComConsulta - quadroDaConsulta[i]);
-                placaEnxuta = enxutoDaConsulta[i];
             }
         }
         if (consultaPendente[consultaAtual]) return;
@@ -381,7 +373,6 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glEndQuery(GL_TIME_ELAPSED);
         consultaAberta = false;
         consultaPendente[consultaAtual] = true;
-        enxutoDaConsulta[consultaAtual] = enxutoNoQuadro;
         quadroDaConsulta[consultaAtual] = quadrosComConsulta++;
         consultaAtual = (consultaAtual + 1) % CONSULTAS;
     }
@@ -671,7 +662,7 @@ final class GlRenderCanvas implements RenderCanvas {
         int planos = -1;
         boolean primeiro = true, inv = false;
         for (int k = 0; k < comandos; k++) {
-            Programa quer = enxutoNoQuadro && cmdNPlanos[k] == 0 ? enxuto : completo;
+            Programa quer = cmdNPlanos[k] == 0 ? enxuto : completo;
             if (quer != prog) {
                 usarPrograma(quer);
                 primeiro = true;
