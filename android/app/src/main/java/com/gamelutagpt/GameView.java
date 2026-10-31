@@ -2007,9 +2007,10 @@ public class GameView extends SurfaceView
             playerInput.clear();
             opponentInput.clear();
         }
-        // Com a cinemática esperando a vida baixa (ou rodando), ninguém cai antes da cena.
-        // Depois do TIME OVER o resultado já está decidido: ninguém cai mais.
-        protegerVida(cinematica.protegeVida() || flow.timeOver());
+        // Com a cinemática esperando a vida baixa, o lado que o gatilho olha não cai antes da
+        // cena (o outro pode perder); com ela rodando, ninguém cai. Depois do TIME OVER o
+        // resultado já está decidido: ninguém cai mais.
+        protegerVida(flow.timeOver());
         engine.step(playerInput, opponentInput);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
         boolean fightFree = ultraAttacker < 0 && !engine.ultraSequenceRunning();
@@ -7065,10 +7066,15 @@ public class GameView extends SurfaceView
         return f.state.life / (float)Math.max(1, f.state.profile.maxLife);
     }
 
-    /** Segura (ou solta) o último ponto de vida de todos os lutadores dos dois lados. */
-    private void protegerVida(boolean proteger) {
-        int piso = proteger ? 1 : 0;
+    /**
+     * Segura (ou solta) o último ponto de vida dos lutadores: dos dois lados com {@code todos}
+     * (depois do TIME OVER), e de cada lado que a cinemática protege (o gatilho de vida armado
+     * olha só o lado dele; durante a cena, os dois).
+     */
+    private void protegerVida(boolean todos) {
         for (int side = 0; side < 2; side++) {
+            int lado = side == PLAYER ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL;
+            int piso = todos || cinematica.protegeVida(lado) ? 1 : 0;
             // O último golpe do QTE derruba de vez: esse lado pode cair.
             for (FighterState member : engine.team(side).members) member.lifeFloor = golpeFinal[side] ? 0 : piso;
         }

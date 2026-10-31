@@ -77,6 +77,10 @@ public final class TesteQteConvite {
             passo(quadro % 20 == 0);
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
                 FighterState yin = jogo.engine.fighter(GameView.OPPONENT).state;
+                FighterState ryuga = jogo.engine.fighter(GameView.PLAYER).state;
+                // Esperando a cena, só a Yin-lu (o lado do gatilho) tem o último ponto seguro.
+                System.out.println("antes da cena, último ponto seguro: Yin-lu " + (yin.lifeFloor > 0) +
+                    ", Ryūga " + (ryuga.lifeFloor > 0));
                 yin.takeDamage(yin.life - Math.round(yin.profile.maxLife * 0.19f), 0);
                 bateu = true;
                 System.out.println("Yin-lu com 19%");

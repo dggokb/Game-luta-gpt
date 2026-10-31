@@ -162,6 +162,7 @@ public class CinematicaLutaTest {
             assertTrue(cena.carregar(temporada, TREINO_EP01, irmao));
             assertTrue(cena.armada());
             assertTrue("o gatilho de vida segura o KO", cena.protegeVida());
+            assertTrue("de qualquer lado: os dois", cena.protegeVida(CinematicaLuta.JOGADOR) && cena.protegeVida(CinematicaLuta.RIVAL));
 
             assertFalse(cena.gatilho(1f, 0.6f, 12f, false));
             assertFalse(cena.gatilho(0.3f, 0.26f, 20f, false));
@@ -252,10 +253,13 @@ public class CinematicaLutaTest {
         palco.quadrosPorMovimento = 20;
         CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, conversa, palco);
         assertTrue(cena.carregar(temporada, CONVITE_EP02, Torneio.RYUGA));
+        assertTrue("esperando, a Yin-lu não cai antes da cena", cena.protegeVida(CinematicaLuta.RIVAL));
+        assertFalse("o Ryūga pode perder antes da cena", cena.protegeVida(CinematicaLuta.JOGADOR));
         assertFalse("o gatilho é a vida da Yin-lu", cena.gatilho(0.1f, 0.5f, 10f, false));
         assertFalse("ela ainda tem mais de 20%", cena.gatilho(1f, 0.25f, 10f, false));
         assertTrue(cena.gatilho(1f, 0.2f, 12f, false));
         assertTrue(palco.travado);
+        assertTrue("com a cena rodando ninguém cai", cena.protegeVida(CinematicaLuta.JOGADOR) && cena.protegeVida(CinematicaLuta.RIVAL));
 
         PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
         boolean cobriu = false, pedia = false;

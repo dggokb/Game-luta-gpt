@@ -40,9 +40,10 @@ convite do Episódio 2 (Ryūga × Yin-lu, [abaixo](#o-teste-dos-qte-convite-do-e
 A cena toda leva uns 15 segundos.
 
 Quem está apanhando, caído ou no meio de um golpe quando a cena começa termina isso antes de
-obedecer (o pulo sai quando o lutador pode agir). Enquanto o gatilho de vida espera e enquanto
-a cena roda, **ninguém cai**: o jogo segura o último ponto de vida, para um golpe grande não
-pular a cena indo direto ao KO.
+obedecer (o pulo sai quando o lutador pode agir). Enquanto o gatilho de vida espera, **o lado
+que ele olha não cai** (no treino, sem `lado`, os dois): o jogo segura o último ponto de vida,
+para um golpe grande não pular a cena indo direto ao KO. Com `"lado"`, o outro lado pode perder
+normalmente antes da cena. Enquanto a cena roda, **ninguém cai**.
 
 ![Treino do Episódio 1: close no Ryūga, close no Kōga, a corrida e o DING DONG](cinematica-treino.png)
 
@@ -107,7 +108,7 @@ juntas). O treino do Episódio 1, pronto, é `historia/ep01/cinematica_treino.js
 
 | `gatilho` | Quando a cena começa |
 |---|---|
-| `{"vida": 0.25}` | o lutador da vez de qualquer lado chega a 25% da vida. `"lado": "jogador"` ou `"rival"` olha só um lado. Enquanto espera, ninguém cai |
+| `{"vida": 0.25}` | o lutador da vez de qualquer lado chega a 25% da vida. `"lado": "jogador"` ou `"rival"` olha só um lado. Enquanto espera, o lado que o gatilho olha não cai (os dois, sem `lado`); o outro pode perder normalmente |
 | `"inicio"` | logo depois do "LUTEM!" (a intro e o READY/GO tocam normalmente) |
 | `{"tempo": 20}` | 20 segundos de luta depois do "LUTEM!" |
 | `"ko"` | a luta acabou (KO): a cena toca antes do resultado, e o resultado espera ela |

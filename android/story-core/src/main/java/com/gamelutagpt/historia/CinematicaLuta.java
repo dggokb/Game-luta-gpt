@@ -812,14 +812,22 @@ public final class CinematicaLuta {
         return roteiro;
     }
 
-    /**
-     * Ninguém pode cair agora: com o gatilho de vida armado (um golpe grande não pula a cena
-     * indo direto ao KO) e durante a cena (um projétil perdido não derruba ninguém). O jogo
-     * segura o último ponto de vida enquanto isso for verdade.
-     */
+    /** Alguém está protegido agora ({@link #protegeVida(int)} de um dos lados): o relógio espera. */
     public boolean protegeVida() {
+        return protegeVida(JOGADOR) || protegeVida(RIVAL);
+    }
+
+    /**
+     * O lado {@link #JOGADOR} ou {@link #RIVAL} não pode cair agora: com o gatilho de vida
+     * armado olhando esse lado (um golpe grande não pula a cena indo direto ao KO; o outro lado
+     * pode perder normalmente) e, os dois, durante a cena (um projétil perdido não derruba
+     * ninguém). O jogo segura o último ponto de vida enquanto isso for verdade.
+     */
+    public boolean protegeVida(int lado) {
         if (roteiro == null || roteiro.gatilho.tipo == Gatilho.Tipo.KO) return false;
-        return estado == Estado.RODANDO || (estado == Estado.ARMADA && roteiro.gatilho.tipo == Gatilho.Tipo.VIDA);
+        if (estado == Estado.RODANDO) return true;
+        Gatilho g = roteiro.gatilho;
+        return estado == Estado.ARMADA && g.tipo == Gatilho.Tipo.VIDA && (g.lado < 0 || g.lado == lado);
     }
 
     /** O fim da luta espera: a cena está rodando ou é a do KO e ainda não começou. */
