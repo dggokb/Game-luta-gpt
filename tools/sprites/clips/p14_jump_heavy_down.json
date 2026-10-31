@@ -35,7 +35,8 @@
         319
       ],
       "colunas": 11
-    }
+    },
+    "centralizar": "JUMP,12,v"
   },
   "rootX": 250,
   "frameHeight": 704,

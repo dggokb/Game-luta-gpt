@@ -1112,3 +1112,33 @@ Decisão do usuário: o Aparar pode funcionar como aparar real, sem buff gratuit
 **Testes:** `ComboBreakerTest` passa a conferir o empurrão, a corrida até o alcance do L (dentro
 dos 48 quadros) e que quem batia já se recompôs quando ela chega. Suíte do motor 588, com as 3
 falhas de caminho de arquivo de antes.
+
+## p14: alcance dos agachados e dos aéreos pelo desenho no eixo (pedido do jogador, 31/10)
+
+**Pedido:** o 2L, o 2M e o 2H da p14 saíam do eixo do pé do agachado parado; o jL, o jM e o
+j2H, do eixo do pulo.
+
+**Causa (medida):** no vídeo o corpo inteiro anda durante o golpe. O tronco do 2L ia até 46 px à
+frente do agachado parado, o do 2M 36 px, o 2H recuava 39 px e o jL descia até 62 px abaixo do
+tronco do pulo. `tools/sprites/centralizar.py` (novo) põe o tronco de volta no eixo da pose de
+referência (até 16 px de folga no chão e 12 px no ar, para o golpe manter o próprio balanço).
+Depois disso sobram ±2 px.
+
+**Consequência no alcance:** as caixas e o alcance vêm do desenho (`caixas_sprites.py`). Com o
+corpo no lugar, o punho e o pé ficam onde o golpe realmente chega:
+
+| Golpe | `reach` antes | agora | `hitHeight` antes | agora |
+|---|---|---|---|---|
+| 2L | 213 | 164 | | |
+| 2M | 276 | 250 | | |
+| 2H | 100 | 111 | | |
+| jL | 158 | 155 | 134 | 126 |
+| jM | 163 | 171 | | |
+| j2H | 108 | 90 | 45 | 48 |
+
+O 2L perde mais (49 px): antes ele acertava com o corpo inteiro deslizando para a frente no
+desenho, sem o lutador sair do lugar. Dano, quadros e vantagem não mudam.
+
+**Régua da CPU:** `CpuReachTable.java` regenerada pela `GeraAlcanceCpu` (o `CpuReachTest`
+acusou a diferença). Só mudaram os agachados da p14 (ponta em pé/agachado): 2L 260/252 →
+210/204, 2M 296/290 → 284/278, 2H 138/124 → 160/146.

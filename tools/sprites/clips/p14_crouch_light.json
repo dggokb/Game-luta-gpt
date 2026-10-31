@@ -37,7 +37,8 @@
       ],
       "colunas": 11
     },
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "centralizar": "CROUCH_IDLE,16"
   },
   "frameWidth": 654,
   "frameHeight": 448,

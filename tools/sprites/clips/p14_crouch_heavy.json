@@ -18,7 +18,7 @@
     "motivo": "mesma câmera e mesma imagem inicial dos outros vídeos do p14 (H3, escala 0,411)",
     "quadros": "4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40",
     "celula": 320,
-    "largura": 256,
+    "largura": 276,
     "raiz": "142,302",
     "fixar": "video",
     "limpar_chao": true,
@@ -36,12 +36,13 @@
       ],
       "colunas": 11
     },
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "centralizar": "CROUCH_IDLE,16"
   },
   "frameHeight": 640,
   "rootX": 284,
   "rootY": 604,
-  "frameWidth": 512,
+  "frameWidth": 552,
   "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/p14_crouch_heavy_video_normalized.png"
