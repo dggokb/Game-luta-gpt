@@ -48,8 +48,8 @@ gradle -q -I <init com rodarBateria> :pc:rodarBateria -Dclasse=com.gamelutagpt.B
 | Pulo à frente ÷ alcance do 2M | 1,11 | 1,28 | n.e. | Perto |
 | Dano L : M : H : agarrão | 1 : 1,7 : 2,7 : 4 | 1 : 2–2,3 : 2,7–3 : 4 | n.e. | O M rende pouco |
 | **Vantagem na defesa: L / M / H** | **+2 / +1 / −5** | −1 / −1 a −5 / −2 a −3 | +1 a +2 (perto) / −1 a −5 / −5 a −8 | **O L e o M são seguros demais** |
-| **2M (o poke longo)** | **derruba, +1 na defesa** | 2MK: +1 no acerto, −6 na defesa, não derruba | 2B −2; rasteira 2D −11 | **O nosso poke principal derruba e é seguro** |
-| Rasteira (2H) | −7 na defesa | 2HK −10 a −12 | 2D −11 | Ainda segura demais |
+| **2M (a nossa rasteira)** | **derruba, +1 na defesa** | rasteira 2HK: derruba, −10 a −12 na defesa | rasteira 2D: derruba, −11 | **A rasteira é segura: deveria ser o golpe mais arriscado** |
+| 2H (o lançador) | −7 na defesa | — (o SF6 não tem lançador) | — | Perto do −6 dos pesados do COTW |
 | **Contra-golpe** | só o H em pé contra quem ataca: +8 de pausa, sem dano nem quadro a mais | Counter +2 quadros; Punish Counter +4 quadros e mais dano; agarrão +70% | Counter +20% de dano, +2 / +5 quadros | **Acertar quem ataca quase não rende mais** |
 | Defesa: janela da defesa perfeita | 5 quadros | Parry (barra de Drive) | Just Defense 7 quadros | Perto |
 
@@ -85,11 +85,14 @@ gradle -q -I <init com rodarBateria> :pc:rodarBateria -Dclasse=com.gamelutagpt.B
 
 Em ordem do que mais pesa:
 
-1. **O 2M (o nosso poke longo) derruba no acerto e fica +1 na defesa.**
-   - O 2MK do SF6, o poke que estrutura o neutro, fica +1 no acerto, −6 na defesa e não derruba:
-     ele vale pelo cancelamento em especial.
-   - Hoje o nosso melhor golpe de alcance não tem risco e encerra a jogada. Não há motivo para
-     andar para dentro e para fora do alcance dele.
+1. **A rasteira (o 2M) fica +1 na defesa.**
+   - Nos dois jogos a rasteira derruba, mas é o golpe mais arriscado do personagem: −10 a −12 no
+     SF6 e −11 no COTW. Quem a defende pune.
+   - A nossa também é o golpe baixo mais longo e derruba, mas não custa nada se for defendida.
+     Por isso o melhor jeito de jogar no chão é soltar 2M de longe. Não há motivo para andar para
+     dentro e para fora do alcance.
+   - O papel do poke de rua (o 2MK do SF6: +1 no acerto, −6 na defesa, cancela em especial) cabe ao
+     nosso M, que já cancela em S, S2, S3 e S4.
 2. **O contra-golpe não paga.** Nos dois jogos, acertar quem está apertando botão rende mais:
    - no SF6, +2 a +4 quadros e mais dano;
    - no COTW, +20% de dano e +2 / +5 quadros.
@@ -123,10 +126,10 @@ Cada uma vai num commit isolado, com antes e depois na `BateriaMercado chao` e r
 
 | # | Proposta | Hoje → proposto | Referência |
 |---|---|---|---|
-| A | 2M vira poke de rua | derruba / +1 na defesa → **não derruba, +1 no acerto, −4 na defesa**, cancelável em especial | SF6 2MK +1 / −6 |
+| A | Rasteira arriscada | 2M continua derrubando; na defesa +1 → **−10** | SF6 2HK −10 a −12; COTW 2D −11 |
 | B | Contra-golpe para todos os golpes | só H em pé, só pausa → **qualquer acerto em quem está no início ou na recuperação do golpe: +20% de dano e +2 (L) / +4 (M, H) quadros de atordoamento** | COTW +20%, +2 / +5; SF6 +2 / +4 |
 | C | Andar mais rápido | 300 / 220 → **400 / 280 px/s** (andar o 2M: 50 → 38 quadros) | SF6 31–47 quadros |
-| D | L e M na defesa | +2 / +1 → **0 / −2** | SF6 −1 / −1 a −5 |
+| D | L e M na defesa (o M vira o poke de rua) | +2 / +1 → **0 / −2** | SF6 jab −1, 2MK −6, 5MP −1 |
 | E | Agarrão | alcance 40 → **90 px** (0,30 → 0,50 do 2M); dano 1200 → **1650** (12%) | SF6 0,54; 12% |
 | F | Backdash | ~245 → **~160 px** (velocidade 978 → 640) | SF6 0,74 do dash |
 | G | CPU no chão | menos projétil; anda no limite do alcance; pula 1–2 vezes a cada 10 s; agarra de perto | — |
