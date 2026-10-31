@@ -807,6 +807,34 @@ thread do jogo:
   núcleo lento ou numa frequência baixa;
 - se o laço volta noutra thread (pausa e volta), a sessão é refeita.
 
+**Teste seguinte (com ADPF):**
+
+| Medida | Valor |
+|---|---|
+| Quadro médio | 11,4 ms |
+| p95 | 17,2 ms |
+| Quadros em até 14 ms | 84% |
+| Quadros acima de 20 ms | 1% (29 de 2142) |
+| FPS | 59 |
+| Coletor de lixo segurando o jogo | 0 ms |
+| HUD gravado refeito | 2 vezes |
+| Textos por quadro | no máximo 2 |
+
+Os cinco piores quadros (30–34 ms) caem cada um numa parte diferente: cenário 22, tela 11,
+trava 9, luta 12, HUD 14. Nenhuma parte se repete e nenhum pedaço do HUD passa de 7 ms. São
+soluços isolados do aparelho, sem um culpado no jogo. A página final do Ultra ficou em 0,26 ms
+por quadro (pior 13).
+
+### Resumo do celular (Xiaomi 24116RACCG, 1080p, OpenGL, p15+p16)
+
+| Medida | Primeiro relatório | Final |
+|---|---|---|
+| Quadro médio | 18,8 ms | 11,4 ms |
+| Pior quadro | 210 ms | 30–34 ms |
+| Quadros acima de 20 ms | — | 1% |
+| Placa de vídeo | 13,4–16,6 ms | 10,6–12 ms (Super ~16) |
+| FPS | — | 60 constantes |
+
 ## 6. Anexo: cenários e folhas
 
 Imagens de cada pacote de cenário, memória decodificada (×2 no OpenGL hoje, seção 3.1) e camadas:
