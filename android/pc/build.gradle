@@ -334,6 +334,8 @@ tasks.register('medirLuta', JavaExec) {
     }
     // -Parea: de onde vem cada desenho grande (o que pinta a tela muitas vezes), no fim do relatório.
     if (providers.gradleProperty('area').isPresent()) systemProperty 'gameluta.areaPorOrigem', 'true'
+    // -PareaMinima=0: a lista de área por origem com todos os quadros (padrão: só os de 20+ telas).
+    if (providers.gradleProperty('areaMinima').isPresent()) systemProperty 'gameluta.areaMinima', providers.gradleProperty('areaMinima').get()
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
 }
 

@@ -81,6 +81,8 @@ final class TesteAutomatico {
      */
     static final boolean areaPorOrigem = Boolean.getBoolean("gameluta.areaPorOrigem");
     private static final java.util.HashMap<String, Double> areaPorQuem = new java.util.HashMap<>();
+    /** Quadros que entram na lista de área por origem: com tantas telas ×10 ou mais (-Dgameluta.areaMinima). */
+    private static final int AREA_MINIMA_X10 = Math.round(10f * Float.parseFloat(System.getProperty("gameluta.areaMinima", "20")));
     /** O mesmo, nos quadros do Ultra. */
     private static final java.util.HashMap<String, Double> areaNoUltra = new java.util.HashMap<>();
     private static int quadrosDoUltra;
@@ -147,9 +149,8 @@ final class TesteAutomatico {
     private final List<int[]> gl = new ArrayList<>();
     /** Tempo da placa de vídeo de cada quadro (ms; -1: sem medição). */
     private final List<Float> placa = new ArrayList<>();
-    /** O mesmo por parte do quadro (null: não medido em partes). */
-    private final List<float[]> placaPartes = new ArrayList<>();
-    private static final String[] PARTES_DA_PLACA = {"cenário", "lutadores", "frente", "HUD", "resto"};
+    /** O quadro medido usou o programa enxuto (sem o recorte por pixel). */
+    private final List<Boolean> placaEnxuta = new ArrayList<>();
     private volatile String[] relatorio;
     private String descricao = "";
 
@@ -169,7 +170,7 @@ final class TesteAutomatico {
         contextos.clear();
         gl.clear();
         placa.clear();
-        placaPartes.clear();
+        placaEnxuta.clear();
         relatorio = null;
         subidas.clear();
         temposDeTexto.clear();
@@ -281,18 +282,14 @@ final class TesteAutomatico {
         gl.add(new int[] {textosNovos, formas, desenhos, telasX10});
         // O tempo da placa chega 2 ou 3 quadros depois: vai para o quadro que ele mediu.
         placa.add(-1f);
-        placaPartes.add(null);
+        placaEnxuta.add(false);
         int medido = placa.size() - 1 - placaAtras;
         if (placaX10 >= 0 && placaAtras >= 1 && medido >= 0) {
             placa.set(medido, placaX10 / 10f);
-            if (g[6] >= 0) {
-                float[] partes = new float[GlRenderCanvas.PARTES];
-                for (int k = 0; k < partes.length; k++) partes[k] = Math.max(0, g[6 + k]) / 10f;
-                placaPartes.set(medido, partes);
-            }
+            placaEnxuta.set(medido, g[6] == 1);
         }
         if (areaPorOrigem) {
-            if (telasX10 >= 200) {
+            if (telasX10 >= AREA_MINIMA_X10) {
                 quadrosPesados++;
                 for (java.util.Map.Entry<String, Double> e : areaNoQuadro.entrySet()) areaPorQuem.merge(e.getKey(), e.getValue(), Double::sum);
             }
@@ -313,7 +310,7 @@ final class TesteAutomatico {
         ativo = false;
         if (!areaPorQuem.isEmpty()) {
             int n = Math.max(1, quadrosPesados);
-            System.out.println("AREA nos " + quadrosPesados + " quadros com 20+ telas:");
+            System.out.println("AREA nos " + quadrosPesados + " quadros com " + AREA_MINIMA_X10 / 10f + "+ telas:");
             areaPorQuem.entrySet().stream().sorted((x, y) -> Double.compare(y.getValue(), x.getValue())).limit(25)
                 .forEach(e -> System.out.println(String.format(Locale.ROOT, "AREA %6.2f telas/quadro  %s", e.getValue() / n, e.getKey())));
         }
@@ -408,35 +405,29 @@ final class TesteAutomatico {
             naPlaca.append(String.format(Locale.ROOT, "  · p95 %.1f · pior %.1f (%d quadros medidos)",
                 todos.get(Math.min(todos.size() - 1, (int)(todos.size() * 0.95))), piorPlaca, medidos));
             r.add(naPlaca.toString());
-            // Onde a placa gasta: cada parte, na média e no momento mais pesado de cada uma.
-            StringBuilder porParte = new StringBuilder("Placa por parte, ms/quadro:");
-            double[] somaParte = new double[GlRenderCanvas.PARTES];
-            double[][] porMomento = new double[MOMENTOS.length][GlRenderCanvas.PARTES];
-            int[] nMomento = new int[MOMENTOS.length];
-            int comPartes = 0;
-            for (int i = 0; i < n && i < placaPartes.size(); i++) {
-                float[] pp = placaPartes.get(i);
-                if (pp == null) continue;
-                comPartes++;
-                int m = momento(contextos.get(i));
-                nMomento[m]++;
-                for (int k = 0; k < pp.length; k++) {
-                    somaParte[k] += pp[k];
-                    porMomento[m][k] += pp[k];
-                }
+            // Os dois programas, quadro sim quadro não, nos mesmos momentos da luta.
+            double[] somaPrograma = new double[2];
+            int[] nPrograma = new int[2];
+            double[][] porMomentoPrograma = new double[MOMENTOS.length][2];
+            int[][] nMomentoPrograma = new int[MOMENTOS.length][2];
+            for (int i = 0; i < n && i < placa.size(); i++) {
+                if (placa.get(i) < 0f) continue;
+                int e = placaEnxuta.get(i) ? 1 : 0, m = momento(contextos.get(i));
+                somaPrograma[e] += placa.get(i);
+                nPrograma[e]++;
+                porMomentoPrograma[m][e] += placa.get(i);
+                nMomentoPrograma[m][e]++;
             }
-            if (comPartes > 0) {
-                for (int k = 0; k < somaParte.length; k++) {
-                    porParte.append(String.format(Locale.ROOT, "  %s %.1f", PARTES_DA_PLACA[k], somaParte[k] / comPartes));
-                }
+            if (nPrograma[0] > 0 && nPrograma[1] > 0) {
+                StringBuilder ab = new StringBuilder(String.format(Locale.ROOT,
+                    "Programa da placa (quadro sim, quadro não): completo %.1f ms, enxuto %.1f ms", somaPrograma[0] / nPrograma[0],
+                    somaPrograma[1] / nPrograma[1]));
                 for (int m = 0; m < MOMENTOS.length; m++) {
-                    if (nMomento[m] == 0 || m == 0) continue;
-                    porParte.append(String.format(Locale.ROOT, "  · %s:", MOMENTOS[m]));
-                    for (int k = 0; k < GlRenderCanvas.PARTES; k++) {
-                        porParte.append(String.format(Locale.ROOT, " %.1f", porMomento[m][k] / nMomento[m]));
-                    }
+                    if (nMomentoPrograma[m][0] == 0 || nMomentoPrograma[m][1] == 0) continue;
+                    ab.append(String.format(Locale.ROOT, "  · %s %.1f/%.1f", MOMENTOS[m],
+                        porMomentoPrograma[m][0] / nMomentoPrograma[m][0], porMomentoPrograma[m][1] / nMomentoPrograma[m][1]));
                 }
-                r.add(porParte.toString());
+                r.add(ab.toString());
             }
         } else {
             r.add("Placa de vídeo: sem medição (o aparelho não tem GL_EXT_disjoint_timer_query ou está no Canvas)");

@@ -129,7 +129,27 @@ final class GlRenderCanvas implements RenderCanvas {
     int verticesQuadro;
     long nsChamadas;
     private int texturaAtual;
-    private int programa, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
+    /**
+     * O mesmo programa sem o recorte por pixel (o laço com discard). Os recortes já saem cortados
+     * na CPU; só o stencil e o que sobra precisam do outro. No teste automático os dois se
+     * alternam quadro a quadro, e o relatório compara o tempo da placa de cada um.
+     */
+    private static final String FRAGMENTOS_ENXUTO = FRAGMENTOS.replace(
+        "  highp vec3 p = vec3(gl_FragCoord.xy, 1.0);\n" +
+        "  for (int i = 0; i < 32; i++) {\n" +
+        "    if (i >= uNRecorte) break;\n" +
+        "    if (dot(uRecorte[i], p) < 0.0) discard;\n" +
+        "  }\n", "");
+
+    /** Um programa e onde ficam os uniforms dele. */
+    private static final class Programa {
+        int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte;
+    }
+    private Programa completo, enxuto, prog;
+    private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
+    /** Este quadro usa o programa enxuto onde não há recorte por pixel. */
+    private boolean enxutoNoQuadro = true;
+    private long quadrosDesenhados;
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
     private int larguraTela, alturaTela;
@@ -161,23 +181,9 @@ final class GlRenderCanvas implements RenderCanvas {
 
     /** Na thread do OpenGL, com o contexto criado (de novo a cada contexto novo). */
     void criar() {
-        programa = GLES30.glCreateProgram();
-        GLES30.glAttachShader(programa, shader(GLES30.GL_VERTEX_SHADER, VERTICES));
-        GLES30.glAttachShader(programa, shader(GLES30.GL_FRAGMENT_SHADER, FRAGMENTOS));
-        GLES30.glLinkProgram(programa);
-        int[] ok = new int[1];
-        GLES30.glGetProgramiv(programa, GLES30.GL_LINK_STATUS, ok, 0);
-        if (ok[0] == 0) throw new IllegalStateException("shader: " + GLES30.glGetProgramInfoLog(programa));
-        uTela = GLES30.glGetUniformLocation(programa, "uTela");
-        uTex = GLES30.glGetUniformLocation(programa, "uTex");
-        uTexto = GLES30.glGetUniformLocation(programa, "uTexto");
-        uDegrade = GLES30.glGetUniformLocation(programa, "uDegrade");
-        uCor = GLES30.glGetUniformLocation(programa, "uCor");
-        uCorSoma = GLES30.glGetUniformLocation(programa, "uCorSoma");
-        uFiltro = GLES30.glGetUniformLocation(programa, "uFiltro");
-        uInverte = GLES30.glGetUniformLocation(programa, "uInverte");
-        uRecorte = GLES30.glGetUniformLocation(programa, "uRecorte");
-        uNRecorte = GLES30.glGetUniformLocation(programa, "uNRecorte");
+        completo = programa(FRAGMENTOS);
+        enxuto = programa(FRAGMENTOS_ENXUTO);
+        usarPrograma(completo);
         int[] ids = new int[1];
         GLES30.glGenBuffers(1, ids, 0);
         vbo = ids[0];
@@ -221,6 +227,41 @@ final class GlRenderCanvas implements RenderCanvas {
         bytesTexturas = 0;
     }
 
+    private Programa programa(String fragmentos) {
+        Programa p = new Programa();
+        p.id = GLES30.glCreateProgram();
+        GLES30.glAttachShader(p.id, shader(GLES30.GL_VERTEX_SHADER, VERTICES));
+        GLES30.glAttachShader(p.id, shader(GLES30.GL_FRAGMENT_SHADER, fragmentos));
+        GLES30.glLinkProgram(p.id);
+        int[] ok = new int[1];
+        GLES30.glGetProgramiv(p.id, GLES30.GL_LINK_STATUS, ok, 0);
+        if (ok[0] == 0) throw new IllegalStateException("shader: " + GLES30.glGetProgramInfoLog(p.id));
+        p.uTela = GLES30.glGetUniformLocation(p.id, "uTela");
+        p.uTex = GLES30.glGetUniformLocation(p.id, "uTex");
+        p.uTexto = GLES30.glGetUniformLocation(p.id, "uTexto");
+        p.uDegrade = GLES30.glGetUniformLocation(p.id, "uDegrade");
+        p.uCor = GLES30.glGetUniformLocation(p.id, "uCor");
+        p.uCorSoma = GLES30.glGetUniformLocation(p.id, "uCorSoma");
+        p.uFiltro = GLES30.glGetUniformLocation(p.id, "uFiltro");
+        p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
+        p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
+        p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
+        GLES30.glUseProgram(p.id);
+        GLES30.glUniform1i(p.uTex, 0);
+        GLES30.glUniform1i(p.uTexto, 1);
+        GLES30.glUniform1i(p.uDegrade, 2);
+        return p;
+    }
+
+    /** Liga o programa e passa a usar os uniforms dele (quem troca manda o estado de novo). */
+    private void usarPrograma(Programa p) {
+        prog = p;
+        programa = p.id;
+        uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte;
+        uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
+        GLES30.glUseProgram(p.id);
+    }
+
     private static int shader(int tipo, String fonte) {
         int s = GLES30.glCreateShader(tipo);
         GLES30.glShaderSource(s, fonte);
@@ -250,11 +291,13 @@ final class GlRenderCanvas implements RenderCanvas {
         // Texturas de bitmaps que já não existem (cenário e Ultra de lutas passadas).
         java.lang.ref.Reference<? extends Bitmap> ref;
         while ((ref = esquecidas.poll()) != null) apagar((Textura)ref);
-        GLES30.glUseProgram(programa);
+        // No teste, os quadros ímpares usam só o programa completo (a comparação do relatório).
+        enxutoNoQuadro = !TesteAutomatico.gravando || (quadrosDesenhados & 1L) == 0L;
+        quadrosDesenhados++;
+        usarPrograma(enxuto);
         GLES30.glUniform2f(uTela, largura, altura);
-        GLES30.glUniform1i(uTex, 0);
-        GLES30.glUniform1i(uTexto, 1);
-        GLES30.glUniform1i(uDegrade, 2);
+        usarPrograma(completo);
+        GLES30.glUniform2f(uTela, largura, altura);
         a = largura / Arena.VW; b = 0f; c = 0f; d = altura / Arena.VH; e = 0f; f = 0f;
         topo = 0;
         vertices = 0;
@@ -280,20 +323,16 @@ final class GlRenderCanvas implements RenderCanvas {
 
     // ---- Tempo da placa de vídeo (GL_EXT_disjoint_timer_query) ----
 
-    /**
-     * Partes do quadro medidas em separado: cenário, lutadores, frente, HUD e o resto (contador,
-     * teste). O GameView marca o fim de cada uma ({@link #marcarPlaca}); fora do teste o quadro
-     * inteiro é uma parte só (marcar fecha o lote).
-     */
-    static final int PARTES = 5;
+    // Uma consulta por quadro inteiro. Por parte não dá: a placa do celular (que desenha por
+    // blocos da tela) só pinta no fim do quadro, e cada parte media o quadro todo.
     private static final int GL_TIME_ELAPSED = 0x88BF, GL_GPU_DISJOINT = 0x8FBB, CONSULTAS = 4;
-    private final int[] consultas = new int[CONSULTAS * PARTES];
+    private final int[] consultas = new int[CONSULTAS];
     private final boolean[] consultaPendente = new boolean[CONSULTAS];
-    private final int[] partesUsadas = new int[CONSULTAS];
+    private final boolean[] enxutoDaConsulta = new boolean[CONSULTAS];
     private final long[] quadroDaConsulta = new long[CONSULTAS];
     private final int[] resultado = new int[1];
     private boolean temporizador, consultaAberta;
-    private int consultaAtual, parteAtual;
+    private int consultaAtual;
     private long quadrosComConsulta;
     /**
      * O tempo que a placa de vídeo levou no quadro medido mais recente (ms, -1: sem medição) e
@@ -302,15 +341,15 @@ final class GlRenderCanvas implements RenderCanvas {
      */
     float msPlaca = -1f;
     int quadrosAtrasPlaca;
-    /** O mesmo tempo por parte (-1: a parte não foi medida em separado). */
-    final float[] msPlacaPartes = new float[PARTES];
+    /** O quadro medido usou o programa enxuto (no teste os dois se alternam). */
+    boolean placaEnxuta;
 
     private void criarConsultas() {
         String ext = GLES30.glGetString(GLES30.GL_EXTENSIONS);
         temporizador = ext != null && ext.contains("GL_EXT_disjoint_timer_query");
         java.util.Arrays.fill(consultaPendente, false);
         consultaAberta = false;
-        if (temporizador) GLES30.glGenQueries(CONSULTAS * PARTES, consultas, 0);
+        if (temporizador) GLES30.glGenQueries(CONSULTAS, consultas, 0);
     }
 
     /** Lê as consultas prontas (da mais velha para a mais nova) e abre a deste quadro. */
@@ -322,43 +361,19 @@ final class GlRenderCanvas implements RenderCanvas {
         for (int k = 0; k < CONSULTAS; k++) {
             int i = (consultaAtual + k) % CONSULTAS;
             if (!consultaPendente[i]) continue;
-            int n = partesUsadas[i];
-            GLES30.glGetQueryObjectuiv(consultas[i * PARTES + n - 1], GLES30.GL_QUERY_RESULT_AVAILABLE, resultado, 0);
+            GLES30.glGetQueryObjectuiv(consultas[i], GLES30.GL_QUERY_RESULT_AVAILABLE, resultado, 0);
             if (resultado[0] == 0) break;
+            GLES30.glGetQueryObjectuiv(consultas[i], GLES30.GL_QUERY_RESULT, resultado, 0);
             consultaPendente[i] = false;
-            float total = 0f;
-            for (int q = 0; q < PARTES; q++) {
-                if (q >= n) {
-                    if (!interrompido) msPlacaPartes[q] = -1f;
-                    continue;
-                }
-                GLES30.glGetQueryObjectuiv(consultas[i * PARTES + q], GLES30.GL_QUERY_RESULT, resultado, 0);
-                float ms = (resultado[0] & 0xFFFFFFFFL) / 1e6f;
-                total += ms;
-                if (!interrompido) msPlacaPartes[q] = n > 1 ? ms : -1f;
-            }
             if (!interrompido) {
-                msPlaca = total;
+                msPlaca = (resultado[0] & 0xFFFFFFFFL) / 1e6f;
                 quadrosAtrasPlaca = (int)(quadrosComConsulta - quadroDaConsulta[i]);
+                placaEnxuta = enxutoDaConsulta[i];
             }
         }
         if (consultaPendente[consultaAtual]) return;
-        parteAtual = 0;
-        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual * PARTES]);
+        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual]);
         consultaAberta = true;
-    }
-
-    /**
-     * Fim de uma parte do quadro: o que ela desenhou vai para a placa agora (sem isso o lote
-     * seguinte levaria o trabalho dela) e a próxima parte começa a contar.
-     */
-    void marcarPlaca() {
-        if (!consultaAberta || parteAtual >= PARTES - 1) return;
-        descarregar();
-        executar();
-        GLES30.glEndQuery(GL_TIME_ELAPSED);
-        parteAtual++;
-        GLES30.glBeginQuery(GL_TIME_ELAPSED, consultas[consultaAtual * PARTES + parteAtual]);
     }
 
     private void fecharConsulta() {
@@ -366,7 +381,7 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glEndQuery(GL_TIME_ELAPSED);
         consultaAberta = false;
         consultaPendente[consultaAtual] = true;
-        partesUsadas[consultaAtual] = parteAtual + 1;
+        enxutoDaConsulta[consultaAtual] = enxutoNoQuadro;
         quadroDaConsulta[consultaAtual] = quadrosComConsulta++;
         consultaAtual = (consultaAtual + 1) % CONSULTAS;
     }
@@ -656,6 +671,11 @@ final class GlRenderCanvas implements RenderCanvas {
         int planos = -1;
         boolean primeiro = true, inv = false;
         for (int k = 0; k < comandos; k++) {
+            Programa quer = enxutoNoQuadro && cmdNPlanos[k] == 0 ? enxuto : completo;
+            if (quer != prog) {
+                usarPrograma(quer);
+                primeiro = true;
+            }
             if (cmdTextura[k] != tex) {
                 tex = cmdTextura[k];
                 GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, tex);

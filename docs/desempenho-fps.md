@@ -636,6 +636,43 @@ outra consulta. Isso só acontece no teste, porque fecha o lote 4 vezes por quad
 **Correção no teste:** o `TesteAutomatico` deixava de estar ativo antes de o relatório ficar
 pronto, e o MedirLuta (em outra thread) às vezes lia o relatório vazio.
 
+**O relatório seguinte do celular:**
+
+| Medida | Valor |
+|---|---|
+| Quadro médio | 16,5 ms (era 17,0) |
+| p95 | 21,9 ms (era 23,0) |
+| Quadros de 23–29 ms | 3% (eram 6%) |
+
+- **A divisão por parte não serve nesta placa:** cada parte deu cerca de 13 ms e a soma passou de
+  60 ms. A placa do celular desenha por blocos da tela e só pinta no fim do quadro, então cada
+  consulta media o quadro inteiro. A medição voltou a ser uma consulta por quadro.
+- **Tempo da placa por momento:** normal ~13,5 ms, SHINKAI ~14,6 (era 16,6), Super ~16 e Ultra
+  ~12,7.
+
+**Área que sobra (PC, `-Parea -PareaMinima=0`, todos os quadros):**
+
+| Origem | Telas por quadro |
+|---|---|
+| Camadas do cenário | 2,65 |
+| Lutadores | 0,47 |
+| Chão | 0,48 |
+| Neblina | 0,30 |
+| Luzes | 0,24 |
+
+O céu é um JPG opaco da tela inteira. Pular blocos transparentes das camadas renderia no máximo
+uns 4%: os pilares têm 38% de blocos 16×16 vazios, as outras camadas quase nada.
+
+**Custo de cada pixel: programa enxuto.**
+- O programa de pixel único testava até 32 planos de recorte com `discard` em todo pixel, mesmo
+  sem recorte.
+- Os recortes já saem cortados na CPU (5.10), então os lotes sem recorte por pixel usam um
+  programa sem esse laço.
+- No teste automático os dois programas se alternam quadro a quadro. O relatório mostra
+  "Programa da placa: completo X ms, enxuto Y ms", por momento, nos mesmos momentos da luta.
+- No PC sem tela, que roda o programa de pixel na CPU, o quadro médio caiu de 29,5 para 22,5 ms
+  com metade dos quadros enxutos.
+
 
 ## 6. Anexo: cenários e folhas
 
