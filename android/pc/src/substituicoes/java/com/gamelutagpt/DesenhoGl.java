@@ -109,6 +109,9 @@ final class DesenhoGl {
     /** A troca do quadro não espera a batida da tela (quem mostra é a janela do AWT). */
     boolean trocaEsperaTela() { return false; }
 
+    /** PC: o laço anda pelo relógio (a janela mostra o quadro pronto). */
+    boolean esperarBatida() { return false; }
+
     boolean disponivel() {
         return !falhou;
     }

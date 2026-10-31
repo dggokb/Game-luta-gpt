@@ -13,6 +13,8 @@ import android.opengl.EGLDisplay;
 import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -271,6 +273,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     /** O jogo acabou: tudo do OpenGL é solto. Com o loop parado. */
     void liberar() {
+        pararBatida();
         if (tela == EGL14.EGL_NO_DISPLAY) return;
         destruirSuperficie();
         if (contexto != EGL14.EGL_NO_CONTEXT) EGL14.eglDestroyContext(tela, contexto);
@@ -288,43 +291,151 @@ final class DesenhoGl implements SurfaceHolder.Callback {
     /** Batidas da tela por troca de quadro (0 = ainda não definido) e quadros até reler a taxa. */
     private int intervaloTroca, quadrosAteReler;
 
-    /** Quando o último quadro pediu para aparecer (System.nanoTime, o relógio da tela). */
-    private long ultimaApresentacao;
-    private Boolean temApresentacao;
-    private static final long QUADRO_60 = 16_666_667L;
+    // ---- Batida da tela (Choreographer) ----
 
     /**
-     * Na tela de 120 Hz o celular do teste ignora a troca a cada duas batidas: o jogo desenhava 74
-     * quadros por segundo, depois 64 com o limite do laço, e os quadros apareciam em intervalos
-     * desiguais (40% em até 14 ms e 19% acima de 19 ms, com a placa de vídeo folgada). Cada
-     * quadro pede para aparecer 16,7 ms depois do anterior (EGL_ANDROID_presentation_time): a
-     * tela mostra um a cada duas batidas, e a fila de quadros segura o laço em 60. Vale também
-     * quando o aparelho diz 60 Hz: o mesmo celular mostrou "60 Hz" com o jogo a 64 quadros por
-     * segundo (a tela estava mais rápida que o informado); numa tela de 60 de verdade não muda nada.
+     * O laço andava pelo relógio: dormia até uns 13,7 ms do começo do quadro e deixava o resto
+     * com a troca de tela. Numa tela de 120 Hz isso dava 66 quadros por segundo, aparecendo com
+     * 8, 17 ou 25 ms entre si (35% dos quadros em até 14 ms e 19% acima de 19, com a placa de
+     * vídeo folgada). Agora o laço espera a batida da tela (o Choreographer, numa thread só
+     * dele): começa um quadro a cada {@link #batidasPorQuadro} batidas (2 a 120 Hz, 1 a 60 Hz)
+     * e cada quadro pede para aparecer sempre o mesmo número de batidas depois da batida em que
+     * começou (EGL_ANDROID_presentation_time). Assim os quadros aparecem com a mesma distância.
      */
+    private HandlerThread linhaDaBatida;
+    private Handler maoDaBatida;
+    private final Object travaBatida = new Object();
+    /** A última batida vista, a batida em que o quadro de agora começou e o período medido (ns). */
+    private long ultimaBatida, batidaDoQuadro, periodoBatida;
+    /** Quando o laço pediu a batida pela última vez (sem pedidos, a thread para de ouvir). */
+    private long ultimoPedidoBatida;
+    private boolean batidaViva, quadroNaBatida;
+    private final long[] intervalosBatida = new long[32];
+    private int nIntervalosBatida;
+    private Boolean temApresentacao;
+    private static final long QUADRO_60 = 16_666_667L;
+    /** Tempo que o quadro leva da batida em que começa até ficar pronto na placa (CPU + placa). */
+    private static final long LATENCIA = 20_000_000L;
+    private final android.view.Choreographer.FrameCallback aoBater = this::bateu;
+
+    private void bateu(long ns) {
+        synchronized (travaBatida) {
+            if (ultimaBatida != 0) {
+                long d = ns - ultimaBatida;
+                if (d > 3_000_000L && d < 50_000_000L) {
+                    intervalosBatida[nIntervalosBatida++ % intervalosBatida.length] = d;
+                    // O menor intervalo recente é o período (uma batida perdida vale duas).
+                    long menor = Long.MAX_VALUE;
+                    int n = Math.min(nIntervalosBatida, intervalosBatida.length);
+                    for (int i = 0; i < n; i++) menor = Math.min(menor, intervalosBatida[i]);
+                    periodoBatida = menor;
+                }
+            }
+            ultimaBatida = ns;
+            travaBatida.notifyAll();
+            if (System.nanoTime() - ultimoPedidoBatida > 1_000_000_000L) {
+                // O laço parou de pedir (menu no Canvas, jogo pausado): para de acordar a cada batida.
+                batidaViva = false;
+                ultimaBatida = 0;
+                return;
+            }
+        }
+        android.view.Choreographer.getInstance().postFrameCallback(aoBater);
+    }
+
+    /** Com a trava. */
+    private void ligarBatida() {
+        if (linhaDaBatida == null) {
+            linhaDaBatida = new HandlerThread("Batida", android.os.Process.THREAD_PRIORITY_DISPLAY);
+            linhaDaBatida.start();
+            maoDaBatida = new Handler(linhaDaBatida.getLooper());
+        }
+        batidaViva = true;
+        ultimaBatida = 0;
+        maoDaBatida.post(() -> android.view.Choreographer.getInstance().postFrameCallback(aoBater));
+    }
+
+    private static int batidasPorQuadro(long periodo) {
+        // 120 Hz: 2; 60 Hz: 1; 90 Hz: 1 (90 quadros); 144 Hz: 2 (72).
+        return Math.max(1, (int)(QUADRO_60 / (double)periodo + 0.1));
+    }
+
+    /**
+     * O laço espera aqui a batida em que o próximo quadro começa. False se ainda não há batida
+     * (começando, ou a thread parou): o laço dorme pelo relógio, como antes.
+     */
+    boolean esperarBatida() {
+        synchronized (travaBatida) {
+            ultimoPedidoBatida = System.nanoTime();
+            quadroNaBatida = false;
+            if (!batidaViva) {
+                ligarBatida();
+                return false;
+            }
+            long p = periodoBatida;
+            if (p == 0 || ultimaBatida == 0) return false;
+            long alvo = batidaDoQuadro + batidasPorQuadro(p) * p - p / 2;
+            long limite = System.nanoTime() + 100_000_000L;
+            while (ultimaBatida < alvo) {
+                long resta = limite - System.nanoTime();
+                if (resta <= 0 || !batidaViva) return false;
+                try {
+                    travaBatida.wait(resta / 1_000_000L + 1);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
+            }
+            // Atrasou mais que uma batida: recomeça da batida de agora.
+            batidaDoQuadro = ultimaBatida;
+            quadroNaBatida = true;
+            return true;
+        }
+    }
+
+    /** O quadro que começou numa batida aparece sempre o mesmo tanto de batidas depois dela. */
     private void marcarApresentacao() {
+        long batida, p;
+        synchronized (travaBatida) {
+            if (!quadroNaBatida) return;
+            quadroNaBatida = false;
+            batida = batidaDoQuadro;
+            p = periodoBatida;
+        }
         if (temApresentacao == null) {
             String ext = EGL14.eglQueryString(tela, EGL14.EGL_EXTENSIONS);
             temApresentacao = ext != null && ext.contains("EGL_ANDROID_presentation_time");
         }
-        if (!temApresentacao) return;
-        long agora = System.nanoTime();
-        long alvo = ultimaApresentacao + QUADRO_60;
-        // Atrasou (ou é o primeiro): aparece assim que der e o ritmo recomeça daqui.
-        if (alvo < agora || alvo > agora + 4 * QUADRO_60) alvo = agora;
-        EGLExt.eglPresentationTimeANDROID(tela, superficie, alvo);
-        ultimaApresentacao = alvo;
+        if (!temApresentacao || p <= 0) return;
+        long batidas = (LATENCIA + p - 1) / p;
+        EGLExt.eglPresentationTimeANDROID(tela, superficie, batida + batidas * p - p / 2);
+    }
+
+    private void pararBatida() {
+        synchronized (travaBatida) {
+            batidaViva = false;
+            ultimaBatida = 0;
+        }
+        if (linhaDaBatida != null) {
+            linhaDaBatida.quitSafely();
+            linhaDaBatida = null;
+            maoDaBatida = null;
+        }
     }
 
     /**
-     * Numa tela que ficou em 120 Hz (o pedido de 60 é só uma preferência), uma troca a cada duas
-     * batidas: o jogo anda a 60, e desenhar 120 quadros era o dobro de trabalho. A taxa é relida a
-     * cada meio segundo: lida uma vez só, a tela que depois foi para 60 Hz ficava em 30 FPS.
+     * A troca a cada batida quando o laço anda pela batida da tela (ele já começa um quadro a
+     * cada duas a 120 Hz). Sem ela, numa tela que ficou em 120 Hz (o pedido de 60 é só uma
+     * preferência), uma troca a cada duas batidas. Relida a cada meio segundo.
      */
     private void ritmoDaTela() {
         if (--quadrosAteReler > 0 && intervaloTroca != 0) return;
         quadrosAteReler = 30;
-        int intervalo = taxaDaTela() >= 100f ? 2 : 1;
+        boolean pelaBatida;
+        synchronized (travaBatida) {
+            pelaBatida = batidaViva && periodoBatida > 0;
+        }
+        int intervalo = pelaBatida || taxaDaTela() < 100f ? 1 : 2;
         if (intervalo != intervaloTroca) {
             intervaloTroca = intervalo;
             EGL14.eglSwapInterval(tela, intervalo);

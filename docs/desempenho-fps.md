@@ -685,22 +685,40 @@ uns 4%: os pilares têm 38% de blocos 16×16 vazios, as outras camadas quase nad
 
 O enxuto ficou valendo sempre e a alternância saiu do teste.
 
-### 5.16 Ritmo na tela de 120 Hz (EGL_ANDROID_presentation_time)
+### 5.16 Ritmo na tela de 120 Hz: o laço anda pela batida da tela
 
-No mesmo relatório:
-- o jogo rodou a 64 quadros por segundo;
-- 40% dos quadros ficaram em até 14 ms, 42% em 15–18 e 19% acima de 19;
-- os piores tinham trava de 10–14 ms com a placa em 10–13 ms.
+**Os relatórios do celular:**
 
-Com a placa folgada, a sobra é ritmo: a tela estava mais rápida que 60 Hz (o celular dizia
-"60 Hz") e os quadros apareciam em intervalos desiguais.
+| Medida | Antes | Depois do enxuto |
+|---|---|---|
+| Quadros por segundo | 64 | 66 |
+| Quadros em até 14 ms | 40% | 35% |
+| Quadros acima de 19 ms | 19% | 19% |
+| Placa de vídeo | — | 10,7–12,7 ms |
+| p95 da placa | — | 16,1 ms |
 
-**Correção.** `DesenhoGl.marcarApresentacao` pede para cada quadro aparecer 16,7 ms depois do
-anterior (`EGLExt.eglPresentationTimeANDROID`, quando o aparelho tem a extensão):
-- a tela mostra cada quadro por duas batidas de 120 Hz;
-- a fila de quadros segura o laço em 60;
-- quadro atrasado aparece assim que puder, e o ritmo recomeça dele.
+Os piores quadros (30–32 ms) tinham a placa em 10–12 ms.
 
+**A causa era o laço, não o celular.** Ele andava pelo relógio:
+- Dormia até uns 13,7 ms do começo do quadro (16,7 menos 3 de folga) e deixava o resto com a
+  troca de tela.
+- Numa tela de 120 Hz isso produzia mais de 60 quadros por segundo.
+- Os quadros caíam em batidas diferentes e apareciam com 8, 17 ou 25 ms entre si.
+
+A primeira tentativa (cada quadro pedindo para aparecer 16,7 ms depois do anterior) não segurava
+o laço, que continuava gerando quadros a mais.
+
+**Correção** (`DesenhoGl.esperarBatida` / `marcarApresentacao`):
+- **Batida da tela:** uma thread "Batida" ouve o Choreographer. O período da tela é o menor
+  intervalo recente entre batidas.
+- **Início do quadro:** o laço da luta em OpenGL começa cada quadro numa batida. A cada
+  `batidasPorQuadro` batidas: 2 a 120 Hz, 1 a 60 Hz.
+- **Hora de aparecer:** cada quadro pede para aparecer sempre o mesmo número de batidas depois da
+  batida em que começou, as que cobrem 20 ms de CPU mais placa (`EGL_ANDROID_presentation_time`).
+  A distância entre quadros na tela fica igual.
+- **Troca de tela:** com o laço na batida, troca a cada batida, porque o laço já espaça.
+- **Sem batida ainda** (começo da luta): dorme pelo relógio, como antes.
+- **Sem pedidos por 1 s** (menus no Canvas, pausa): a thread para de ouvir a batida.
 
 ## 6. Anexo: cenários e folhas
 

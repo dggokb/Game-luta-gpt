@@ -1686,11 +1686,11 @@ public class GameView extends SurfaceView
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
             if (glQuadro && desenhoGl.trocaEsperaTela()) {
-                // Na luta em OpenGL o swap já espera a batida da tela: dormir o resto inteiro só
-                // somava erro (um quadro perdido virava dois ou três). Mas com a tela a 120 Hz há
-                // aparelho que ignora a troca a cada duas batidas (o Xiaomi do teste desenhava 74
-                // quadros por segundo para uma luta de 60: trabalho jogado fora e o celular
-                // esquentando). Quadro que voltou cedo dorme até 3 ms antes dos 16,6.
+                // Na luta em OpenGL o próximo quadro começa na batida da tela (ver
+                // DesenhoGl.esperarBatida): pelo relógio, a 120 Hz, os quadros apareciam com 8, 17
+                // ou 25 ms entre si.
+                if (desenhoGl.esperarBatida()) continue;
+                // Sem a batida ainda (começando): dorme até 3 ms antes dos 16,6, como antes.
                 remaining -= 3_000_000L;
             }
             if (remaining > 0) {
