@@ -21,7 +21,8 @@ public class BateriaShinkaiRyuga {
         long leituras, esquivas, precisos, rupturas, voluntarios, limites, reativacoes;
         long quadrosExausto, danoLevadoExausto, dor;
         long quadrosLuta, rupturasRival, leiturasRival;
-        long clashDecididos, clashVenceLuta;   // quem venceu o Clash venceu a luta?
+        long clashDecididos, clashVenceLuta;
+        long desgasteNoClash, clashesDoRyuga, segundosNoClash;   // o corpo dele quando o Clash começa   // quem venceu o Clash venceu a luta?
         long danoPreciso, defesas, perfeitas, golposRival;
         final Map<String, int[]> porRival = new TreeMap<>();  // rival → {vitórias, decididas}
     }
@@ -46,6 +47,7 @@ public class BateriaShinkaiRyuga {
         }
         boolean dentro = false, dentroRival = false;
         int venceuClash = -1;
+        long quadrosDesdeLigou = 0;
         int vidaR = l.f(r).state.life;
         while (!l.acabou() && l.quadro < 60 * 60 * 4) {
             int lifeR = l.f(r).state.life;
@@ -54,6 +56,8 @@ public class BateriaShinkaiRyuga {
             FighterState s = fr.state;
             boolean agora = s.inShinkai(), agoraRival = fo.state.inShinkai();
             List<String> cues = l.e.cues();
+            if (agora && !dentro) quadrosDesdeLigou = 0;
+            else if (agora) quadrosDesdeLigou++;
             if (agora && !dentro) {
                 e.janelas++;
                 if (log != null) nota(log, l, "Ryūga liga o SHINKAI " + s.shinkaiType.label);
@@ -65,7 +69,14 @@ public class BateriaShinkaiRyuga {
             }
             if (agoraRival && !dentroRival && log != null) nota(log, l, "rival liga o SHINKAI " + fo.state.shinkaiType.label);
             for (String c : cues) {
-                if (c.equals("SHINKAI_CLASH")) e.clashes++;
+                if (c.equals("SHINKAI_CLASH")) {
+                    e.clashes++;
+                    if (s.shinkaiType == Shinkai.Type.PERCEPCAO) {
+                        e.clashesDoRyuga++;
+                        e.desgasteNoClash += s.sobrecarga;
+                        e.segundosNoClash += quadrosDesdeLigou;
+                    }
+                }
                 if (c.equals("SHINKAI_CLASH_WIN") && venceuClash < 0) venceuClash = l.f(0).state.inShinkai() ? 0 : 1;
                 if (log != null && (c.equals("LEITURA") || c.equals("ESQUIVA") || c.equals("PRECISO") || c.equals("LIMITE") ||
                     c.equals("RUPTURA") || c.startsWith("SHINKAI_CLASH"))) nota(log, l, c + quem(l, c, r));
@@ -148,14 +159,23 @@ public class BateriaShinkaiRyuga {
     }
 
     /** As variantes comparadas (colunas). */
-    static final String[] VARIANTES = {"antigo (ENERGY)", "protótipo", "sem reação rápida da CPU", "sem Ruptura", "sem os dois"};
+    static String[] VARIANTES = {"antigo (ENERGY)", "protótipo", "sem reação rápida da CPU", "sem Ruptura", "sem os dois"};
+    /** Modo clash: o quanto do fôlego o Ryūga recupera ao vencer o Clash, por coluna. */
+    static boolean modoClash;
+    static final String[] VARIANTES_CLASH = {"antigo (ENERGY)", "fôlego 100% (hoje)", "fôlego 60%", "fôlego 40%", "fôlego 20%", "fôlego 0%"};
+    static final int[] FOLEGOS = {0, 1000, 600, 400, 200, 0};
 
     static Est rodar(int variante, int n, int nivel) {
         Shinkai.prototipoDesligado = variante == 0;
         AiController.percepcaoReage = variante != 2 && variante != 4;
         java.util.function.Consumer<CombatConfig> antes = BateriaBalanco.AJUSTE_CFG;
         // Sem Ruptura: a janela do limite some antes de dar tempo de escolher (a CPU espera 12 quadros).
-        if (variante == 3 || variante == 4) BateriaBalanco.AJUSTE_CFG = c -> c.ryugaLimiteJanela = 1;
+        if (!modoClash && (variante == 3 || variante == 4)) BateriaBalanco.AJUSTE_CFG = c -> c.ryugaLimiteJanela = 1;
+        if (modoClash) {
+            AiController.percepcaoReage = true;
+            int folego = FOLEGOS[variante];
+            BateriaBalanco.AJUSTE_CFG = c -> c.ryugaClashFolegoPermille = folego;
+        }
         Est e = new Est();
         int k = 0;
         try {
@@ -187,6 +207,8 @@ public class BateriaShinkaiRyuga {
         boolean narra = Arrays.asList(args).contains("narra");
         semClash = Arrays.asList(args).contains("semClash");
         espelho = Arrays.asList(args).contains("espelho");
+        modoClash = Arrays.asList(args).contains("clash");
+        if (modoClash) VARIANTES = VARIANTES_CLASH;
         Est[] v = new Est[VARIANTES.length];
         for (int i = 0; i < v.length; i++) v[i] = rodar(i, n, nivel);
         System.out.println("# SHINKAI do Ryūga: protótipo (PERCEPÇÃO) × antigo (ENERGY)");
@@ -202,10 +224,16 @@ public class BateriaShinkaiRyuga {
         if (espelho) {
             linha("vitórias do lado medido (os dois iguais: ~50%)", v, e -> pc(e.vitorias, e.decididas));
             linha("duração média da luta (s)", v, e -> String.format(Locale.ROOT, "%.1f", e.quadrosLuta / 60.0 / Math.max(1, e.lutas)));
-            linha("quem vence o Clash vence a luta", v, e -> pc(e.clashVenceLuta, e.clashDecididos));
-        linha("Rupturas por luta (os dois lados)", v, e -> porLuta(e.rupturas + e.rupturasRival, e));
+            linha("quem vence o Clash vence a luta", v, e -> e.clashDecididos == 0 ? "–" : pc(e.clashVenceLuta, e.clashDecididos));
+            linha("Rupturas por luta (os dois lados)", v, e -> porLuta(e.rupturas + e.rupturasRival, e));
             linha("leituras por luta (os dois lados)", v, e -> porLuta(e.leituras + e.leiturasRival, e));
-        } else linha("Ryūga vence", v, e -> pc(e.vitorias, e.decididas));
+        } else {
+            linha("Ryūga vence", v, e -> pc(e.vitorias, e.decididas));
+            linha("quem vence o Clash vence a luta", v, e -> e.clashDecididos == 0 ? "–" : pc(e.clashVenceLuta, e.clashDecididos));
+        }
+        linha("Clash: desgaste do Ryūga quando começa (s desde que ele ligou)", v, e -> e.clashesDoRyuga == 0 ? "–"
+            : String.format(Locale.ROOT, "%.0f%% (%.1f s)", 100.0 * e.desgasteNoClash / e.clashesDoRyuga / CombatConfig.RYUGA_SOBRECARGA_MAX,
+                e.segundosNoClash / 60.0 / e.clashesDoRyuga));
         linha("SHINKAIs ligados por luta", v, e -> porLuta(e.janelas, e));
         linha("duração média do SHINKAI (s)", v, e -> seg(e.quadrosShinkai, e.janelas));
         linha("dano que ele dá por s, no SHINKAI", v, e -> porQuadro(e.danoDado, e.quadrosShinkai));

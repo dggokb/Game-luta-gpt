@@ -112,9 +112,9 @@ Saídas completas:
    uns 4–6 pontos sem Clash. Para quem joga com o Ryūga, isso não existe: a pessoa tem a janela
    de 12 quadros e o brilho no começo do golpe do rival, e só o teste na mão diz se isso basta.
 4. **O Clash engole o SHINKAI.** No jogo normal, 94% das lutas no nível 8 viram Clash, nas duas
-   versões. O vencedor do Clash ganha o SHINKAI cheio de novo: no protótipo, isso zera o desgaste,
-   e o SHINKAI do Ryūga chega a 15 s com a Ruptura. A pergunta "Clash com desgaste" do documento
-   (seção 9) ficou concreta.
+   versões. A CPU responde o SHINKAI do outro com o dela logo no começo (1 a 2 s depois), e quem
+   vence o Clash sai com o SHINKAI inteiro enquanto o outro perde o dele. Veja "Clash com só
+   parte do fôlego" abaixo.
 5. **O fim voluntário quase não é usado** (38 de 274 fins). Devolver metade do fôlego que sobrou
    é pouco. Desligar em 80% devolve só 10% da barra. O ganho real é não ficar exausto, e a
    exaustão de 1,5 s custa pouco: 0,7 s por luta com o dano levado dentro do normal.
@@ -149,17 +149,42 @@ São 480 lutas por coluna, nas mesmas sementes. Saídas completas:
 | Nível 5 sem Clash: saldo por SHINKAI | 3.098 | 2.489 |
 
 **O que o espelho mostra:**
-- **A luta é decidida no Clash, e no nível 8 o novo agrava isso.** Quem vence o Clash ganha o
-  SHINKAI cheio, com o desgaste zerado. No protótipo, isso vira ~10 s de SHINKAI e mais 5 s de
-  Ruptura. O log mostra o padrão: Clash, o vencedor chega ao limite, rompe e fecha a luta. No
-  nível 8, quem vence o Clash passou a vencer 83% das lutas (73% antes). No nível 5 foi o
-  contrário (85% → 80%), porque lá a CPU rompe menos.
+- **A luta é decidida no Clash, e no nível 8 o novo agrava isso.** Quem vence o Clash fica com o
+  SHINKAI (e o perdedor perde o dele). No protótipo, isso vira ~10 s de SHINKAI e mais 5 s de
+  Ruptura, com a CPU reagindo mais rápido. O log mostra o padrão: Clash, o vencedor chega ao
+  limite, rompe e fecha a luta. No nível 8, quem vence o Clash passou a vencer 83% das lutas
+  (73% antes). No nível 5 foi o contrário (85% → 80%), porque lá a CPU rompe menos. **Não é o
+  desgaste zerado no Clash** (medido abaixo): no espelho do nível 8, sem a reação rápida dá 76%,
+  sem a Ruptura 78% e sem os dois 76%.
 - **Dois leitores quase não se leem:** 0,34 leitura por luta somando os dois lados. A luta
   espelhada continua a mesma luta do Ryūga, com um SHINKAI mais longo.
 - **Sem Clash, a luta fica um pouco mais curta** (42,0 → 39,7 s no nível 8): o SHINKAI mais
   longo e a Ruptura aceleram o fim.
 - **No nível 5 sem Clash, o SHINKAI antigo rende mais** (saldo de 3.098 contra 2.489). As bolas em
   sequência do ENERGY punem a CPU fraca, e a leitura do nível 5 quase não sai.
+
+## Clash com só parte do fôlego (pedido do jogador)
+
+Antes, quem vencia o Clash zerava o desgaste: o corpo ficava novo, como o relógio dos outros,
+que volta cheio. Agora a parte que o corpo recupera é ajustável (`ryugaClashFolegoPermille`). A
+mesma bateria rodou com 100% (como era), 60%, 40%, 20% e 0%. Saídas completas:
+- [nível 8](perfis/shinkai-ryuga-clash-folego-nivel8.md);
+- [nível 8, espelho](perfis/shinkai-ryuga-clash-folego-nivel8-espelho.md);
+- [nível 5](perfis/shinkai-ryuga-clash-folego-nivel5.md);
+- [nível 5, espelho](perfis/shinkai-ryuga-clash-folego-nivel5-espelho.md).
+
+| | 100% | 60% | 40% | 20% | 0% |
+|---|---|---|---|---|---|
+| Ryūga vence (nível 8, contra os 15) | 62% | 62% | 62% | 62% | 63% |
+| Quem vence o Clash vence a luta (nível 8, espelho) | 83% | 83% | 83% | 84% | 83% |
+| Quem vence o Clash vence a luta (nível 5, espelho) | 80% | 80% | 81% | 81% | 82% |
+| Duração do SHINKAI (nível 8, espelho) | 13,2 s | 13,2 s | 13,1 s | 13,1 s | 12,9 s |
+
+**Por que não muda:** o Clash começa, em média, 1,1–1,8 s depois que o Ryūga liga, com o corpo
+só 8–15% gasto (o relógio para durante o Clash). Devolver 100% ou 0% disso dá no mesmo.
+
+**Decisão:** sem efeito, então o padrão continua em 100% (o mesmo de antes) e o ajuste fica para
+quando o Clash vier mais tarde na luta.
 
 ## Leitura e próximos passos (para decidir)
 
@@ -176,8 +201,10 @@ São 480 lutas por coluna, nas mesmas sementes. Saídas completas:
   ela devia valer só uma vez por luta, não por round.
 - **Fim voluntário:** devolver mais (por exemplo, todo o fôlego que sobrou) ou deixar a exaustão
   do limite maior, para valer a pena desligar antes.
-- **Clash:** definir se o vencedor zera o desgaste (hoje sim) ou só ganha um pouco de fôlego.
-  O espelho mostra que, no nível 8, zerar faz o Clash decidir 83% das lutas.
+- **Clash:** o fôlego do vencedor não muda nada (abaixo). O que pesa é o Clash em si: a CPU
+  responde o SHINKAI quase sempre e na hora, o perdedor perde o SHINKAI inteiro e leva 2.000 de
+  dano. As alavancas seriam a CPU responder menos (ou mais tarde) ou o perdedor ficar com parte
+  do SHINKAI. Isso muda o Clash de todos os 16, então não testei sem pedido.
 
 ## Como rodar
 
@@ -186,4 +213,5 @@ gradle -q -I <init com rodarBateria> :pc:rodarBateria -Dclasse=com.gamelutagpt.B
 gradle ... "-Dargs=32 8 semClash"     # sem Clash
 gradle ... "-Dargs=32 5"              # nível 5
 gradle ... "-Dargs=32 8 espelho narra" # Ryūga × Ryūga, os dois no SHINKAI da coluna
+gradle ... "-Dargs=32 8 clash [espelho]" # o fôlego que o vencedor do Clash recupera, por coluna
 ```

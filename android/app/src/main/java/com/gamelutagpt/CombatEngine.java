@@ -794,8 +794,8 @@ final class CombatEngine {
                 // O golpe de quem venceu entra: dano forte, o perdedor voa girando e perde o SHINKAI.
                 l.state.takeDamage(config.shinkaiClashDamage, config.recoverableLifePermille);
                 l.state.shinkaiFrames = 0;
-                w.state.shinkaiFrames = config.shinkaiFrames;
-                w.state.sobrecarga = w.state.limiteQuadros = 0;
+                if (w.state.shinkaiType == Shinkai.Type.PERCEPCAO) recuperaNoClash(w.state);
+                else w.state.shinkaiFrames = config.shinkaiFrames;
                 int away = l.x >= w.x ? 1 : -1;
                 l.status = CombatFighter.Status.AIR_HITSTUN;
                 l.grounded = false;
@@ -960,6 +960,15 @@ final class CombatEngine {
             s.limiteQuadros = config.ryugaLimiteJanela;
             cues.add("LIMITE");
         }
+    }
+
+    /** Venceu o Clash: o corpo recupera parte do fôlego (a Ruptura segue como estava). */
+    private void recuperaNoClash(FighterState s) {
+        if (s.rupturaQuadros > 0) return;
+        int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
+        s.limiteQuadros = 0;
+        s.sobrecarga = Math.max(0, s.sobrecarga - max * config.ryugaClashFolegoPermille / 1000);
+        s.shinkaiFrames = Math.max(1, (int)((long)(max - s.sobrecarga) * config.shinkaiFrames / max));
     }
 
     private void encerrar(FighterState s, int exaustao) {

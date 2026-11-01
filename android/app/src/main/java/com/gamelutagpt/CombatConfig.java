@@ -601,6 +601,11 @@ final class CombatConfig {
     int ryugaRupturaQuadros = 300;
     int ryugaRupturaDor = 4;
     int ryugaRupturaDanoPermille = 1400;
+    /**
+     * Venceu o SHINKAI Clash: o corpo recupera esta parte (por mil) do fôlego total. 1000 zera o
+     * desgaste (como o relógio dos outros, que volta cheio).
+     */
+    int ryugaClashFolegoPermille = 1000;
     /** Fim voluntário antes do limite: esta parte do fôlego que sobrou volta para a barra. */
     int ryugaDevolvePermille = 500;
 
