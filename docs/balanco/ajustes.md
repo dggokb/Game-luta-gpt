@@ -1180,3 +1180,43 @@ acusou a diferença). Só mudaram os agachados da p14 (ponta em pé/agachado): 2
 
 **Testes:** suíte do motor 590, com as 3 falhas de caminho de arquivo de antes. `BattleFlowTest`
 passa a ler o limite da constante e o `BounceTest` conta os quadros do golpe sem os da parada.
+
+## Luta no chão: rasteira, contra-golpe, L/M na defesa e backdash (pedido do jogador, 01/11)
+
+**Pedido:** aplicar as propostas A, B, D e F de [chao.md](chao.md). A E (agarrão) ficou de fora,
+por decisão do jogador.
+
+**O que mudou** (um commit por item):
+
+| # | Valor | Antes | Agora | SF6 / COTW |
+|---|---|---|---|---|
+| A | 2M (rasteira) na defesa: `blockstunFrames` −11 | +1 (derruba) | −10 (continua derrubando) | 2HK −10 a −12 / 2D −11 |
+| B | Contra-golpe: 1º acerto do combo em quem está no próprio golpe (`counterHitDamagePermille`, `counterHitLightFrames`, `counterHitFrames`) | só o H em pé, +8 de pausa | qualquer golpe (menos Super e Ultra): +20% de dano, +2 quadros (leve) / +4 (os outros) | Counter +2/+4 quadros / +20% de dano, +2/+5 |
+| D | L / 2L / M na defesa | +2 / +2 / +1 | 0 / 0 / −2 | jab −1, 5MP −1 a −2 |
+| F | `backdashSpeed` (e os próprios do p13, p14 e koga_8 na mesma proporção) | 978 (~245 px) | 640 (~160 px, 0,77 do dash) | backdash 0,74 do dash |
+
+A vantagem base no `mecanicas.json` acompanha A e D (2M [20, −10], L e 2L [5, 0], M [4, −2]),
+para a reconversão repetir.
+
+**Medido depois** (`BateriaMercado chao`, 400 lutas 1x1 por nível, mesmas sementes):
+
+| Medida (só chão) | CPU 8 antes | CPU 8 depois | CPU 5 antes | CPU 5 depois |
+|---|---|---|---|---|
+| Duração da luta (mediana) | 46,1 s | 43,9 s | 39,4 s | 37,9 s |
+| Dano por segundo | 479 | 514 | 548 | 571 |
+| Acertos em quem estava atacando | 35% | 34% | 31% | 30% |
+| Combo de 3+: dano mediano | 11,5% | 11,9% | 11,9% | 12,1% |
+| Dano por origem: projétil / normal | 41% / 38% | 41% / 38% | 31% / 40% | 31% / 42% |
+| Golpes defendidos com −5 ou pior: punidos em até 25 quadros | — | **8%** | — | — |
+
+**Leitura:**
+- O contra-golpe deixa a luta ~5% mais curta: um terço dos acertos agora tira 20% a mais.
+- A CPU não mudou o jeito de jogar. Ela pune só 8% dos golpes inseguros que defende (4 por
+  minuto), então a rasteira em −10 e o M em −2 só viram risco contra gente.
+- Para a CPU mostrar a luta no chão, o próximo passo é a proposta G de [chao.md](chao.md): punir o
+  que defende, andar no limite do alcance, pular de vez em quando e agarrar de perto.
+- A guarda e os combos máximos (`BateriaCombos t08/t14`) não mudaram de forma relevante. Os golpes
+  inseguros quebram a guarda um pouco mais devagar, porque têm menos atordoamento na defesa.
+
+**Testes:** suíte do motor 590, com as 3 falhas de caminho de arquivo de antes. O
+`GlobalMovementTuningTest` passa a esperar o backdash de 640.

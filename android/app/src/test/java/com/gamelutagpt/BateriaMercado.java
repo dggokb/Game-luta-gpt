@@ -134,7 +134,7 @@ public final class BateriaMercado {
         // Jogo no chão: dano por origem, contra-golpes, antiaéreos, golpes no vazio, pulos.
         final java.util.Map<String, Integer> danoPorOrigem = new java.util.TreeMap<>();
         int acertos, contraGolpes, antiaereos, entradasDoAr, entradasDoArDefendidas, pulos;
-        int normaisNoChao, normaisNoChaoComContato, quadrosLuta;
+        int normaisNoChao, normaisNoChaoComContato, quadrosLuta, inseguros, punidos;
     }
 
     /** Luta só no chão: sem super pulo, air dash, SHINKAI, Ultra, Breaker, assist e troca. */
@@ -184,6 +184,8 @@ public final class BateriaMercado {
             CombatFighter.Status[] statusAntes = {CombatFighter.Status.NEUTRAL, CombatFighter.Status.NEUTRAL};
             boolean[] noChaoAntes = {true, true}, contato = new boolean[2];
             AttackDefinition[] golpeAntes = new AttackDefinition[2];
+            // Golpe defendido com −5 ou pior: quadro em que foi defendido (o outro tem 25 quadros para punir).
+            int[] inseguroEm = {-1000, -1000};
             ComboSession[] vista = new ComboSession[2];
             int[] barraAntes = new int[2];
             boolean[] assistAntes = new boolean[2];
@@ -236,6 +238,17 @@ public final class BateriaMercado {
                     if (h.blocked) md.defendidos++;
                     if ("THROW".equals(h.moveId)) md.agarroes++;
                     contato[h.attacker] = true;
+                    if (h.blocked && !h.projectile && l.f(h.attacker).attack != null) {
+                        AttackDefinition g = l.f(h.attacker).attack;
+                        if (g.blockstunFrames - (g.activeFrames - 1 + g.recoveryFrames) <= -5 && inseguroEm[h.attacker] < luta - 25) {
+                            inseguroEm[h.attacker] = luta;
+                            md.inseguros++;
+                        }
+                    }
+                    if (!h.blocked && luta - inseguroEm[h.defender] <= 25) {
+                        md.punidos++;
+                        inseguroEm[h.defender] = -1000;
+                    }
                     boolean doAr = !noChaoAntes[h.attacker] && !h.projectile, noAr = !noChaoAntes[h.defender];
                     if (doAr && !noAr) {
                         if (h.blocked) md.entradasDoArDefendidas++;
@@ -337,6 +350,7 @@ public final class BateriaMercado {
         linha("acertos em quem estava atacando (contra-golpe/punição)", pct((double) md.contraGolpes / md.acertos) + " dos acertos");
         linha("normais no chão que encostam (acerto ou defesa)", pct((double) md.normaisNoChaoComContato / Math.max(1, md.normaisNoChao)) + " (" + f1(md.normaisNoChao / min) + " por minuto)");
         linha("pulos por minuto (os dois lados)", f1(md.pulos / min));
+        linha("golpes defendidos com −5 ou pior: por minuto / punidos em até 25 quadros", f1(md.inseguros / min) + " / " + pct((double) md.punidos / Math.max(1, md.inseguros)));
         linha("entrada do ar: acerta / defendida / derrubada no antiaéreo", f1(md.entradasDoAr / min) + " / " + f1(md.entradasDoArDefendidas / min) + " / " + f1(md.antiaereos / min) + " por minuto");
     }
 

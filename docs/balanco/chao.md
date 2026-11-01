@@ -140,6 +140,15 @@ Sugestão de ordem:
 - **F por último.**
 - **G** pode andar em paralelo.
 
+## Aplicado em 01/11
+
+A, B, D e F entraram, cada uma em um commit. A E (agarrão) ficou de fora. O antes e depois está em
+[ajustes.md](ajustes.md), na seção "Luta no chão: rasteira, contra-golpe, L/M na defesa e
+backdash".
+
+Medido depois: a CPU pune só 8% dos golpes inseguros que defende. As punições novas só aparecem
+contra gente até a CPU aprender a punir (proposta G).
+
 ## Fontes
 
 - SF6: FAT, `SF6FrameData.json` (github.com/D4RKONION/FAT); words.infil.net (SF6); redbull.com
