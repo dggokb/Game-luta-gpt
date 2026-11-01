@@ -2122,7 +2122,7 @@ public class GameView extends SurfaceView
                 }
             }
             if ("GUARD_BREAK".equals(cue)) spawnGuardBreak();
-            if ("JUST_DEFENSE".equals(cue)) spawnJustDefense();
+            if ("JUST_DEFENSE".equals(cue) || "JUST_DEFENSE_ABSORB".equals(cue)) spawnJustDefense();
             if ("COMBO_BREAKER".equals(cue)) spawnComboBreaker();
             if ("OVERHEAD".equals(cue)) spawnOverheadWarning();
             if ("ULTRA_FINISH".equals(cue)) {
@@ -3299,6 +3299,8 @@ public class GameView extends SurfaceView
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             case "GUARD_BREAK": return "GUARD BREAK!";
             case "JUST_DEFENSE": return "DEFESA PERFEITA!";
+            case "JUST_DEFENSE_ABSORB": return "ABSORVEU!";
+            case "ENERGY_RUN": return "CORRIDA DE ENERGIA!";
             case "COMBO_BREAKER": return "COMBO BREAKER!";
             case "DHC": return "TEAM SUPER!";
             case "SHINKAI": return "SHINKAI!";

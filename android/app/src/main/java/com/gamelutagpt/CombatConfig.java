@@ -378,6 +378,14 @@ final class CombatConfig {
 
     // Pushblock (M + H while blocking): pushes the attacker away and shortens the blockstun.
     int pushblockCost = METER_PER_BAR / 4;
+    /**
+     * Corrida de energia (correndo, M + H): por 1/4 de barra a corrida atravessa projéteis e fica
+     * mais rápida por meio segundo. É a ferramenta de todos contra quem só solta bola, como o
+     * Drive Rush do SF6 e o REV do Fatal Fury (docs/balanco/cpu-contra-bola.md).
+     */
+    int energyRunCost = METER_PER_BAR / 4;
+    int energyRunFrames = 30;
+    int energyRunSpeedPermille = 1250;
     float pushblockDistance = 190f;
     /** Blockstun left after a pushblock (at most). */
     int pushblockStunFrames = 8;

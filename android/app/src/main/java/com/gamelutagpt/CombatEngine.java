@@ -489,8 +489,17 @@ final class CombatEngine {
         if (f.motion.doubleTap(5, clock, config.doubleTapFrames) || in.backdash) f.backdashRequest = true;
 
         boolean crouch = ControlsLayout.isDownDirection(in.direction);
+        // Correndo, M + H com 1/4 de barra é a corrida de energia (atravessa bola), não o H.
+        boolean corridaDeEnergia = in.pushblock && f.forwardDashing && f.grounded &&
+            f.status == CombatFighter.Status.NEUTRAL && f.energyRunFrames == 0 &&
+            f.state.superMeter >= config.energyRunCost;
+        if (corridaDeEnergia) {
+            f.state.spendSuperMeter(config.energyRunCost);
+            f.energyRunFrames = config.energyRunFrames;
+            cues.add("ENERGY_RUN");
+        }
         // M + H (ou o ponto entre eles) fora da defesa é o H: passa pelo comando como ele.
-        boolean heavy = in.heavy || (in.pushblock && f.status != CombatFighter.Status.BLOCKSTUN);
+        boolean heavy = in.heavy || (in.pushblock && !corridaDeEnergia && f.status != CombatFighter.Status.BLOCKSTUN);
         if (in.light || in.medium || heavy) {
             String button = heavy ? "H" : in.medium ? "M" : "L";
             String lido = f.motion.descrever(8);
@@ -1713,6 +1722,8 @@ final class CombatEngine {
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         // Na preparação do pulo a corrida segue mesmo soltando a frente (o embalo vai para o pulo).
         if (!holdingForward && f.jumpSquat == 0) f.forwardDashing = false;
+        // A corrida de energia acaba no tempo ou quando a corrida acaba (soltou, apanhou, atacou).
+        if (f.energyRunFrames > 0 && (!f.forwardDashing || --f.energyRunFrames == 0)) f.energyRunFrames = 0;
         float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
@@ -1727,6 +1738,7 @@ final class CombatEngine {
                     // Na preparação do pulo só a corrida segue (o embalo do dash jump).
                     f.x += f.facing * dashSpeed(f) * boost * CombatConfig.DT;
                 } else {
+                    if (f.energyRunFrames > 0) boost *= config.energyRunSpeedPermille / 1000f;
                     float speed = f.forwardDashing && holdingForward ? dashSpeed(f) * boost
                         : walkSpeed(f, holdingForward) * boost;
                     f.x += horizontal * speed * CombatConfig.DT;
@@ -2759,6 +2771,8 @@ final class CombatEngine {
 
     /** O projétil encosta em {@code d}: no corpo do desenho (o quadro do golpe ou a postura). */
     private static boolean projetilToca(Projectile p, CombatFighter d, boolean crouch) {
+        // Na corrida de energia a bola passa por ele.
+        if (d.energyRunFrames > 0) return false;
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
         if (corpo == null) {
             return CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), crouch);
@@ -4001,9 +4015,11 @@ final class CombatEngine {
     private void block(CombatFighter a, CombatFighter d, AttackDefinition attack, int guard, int direction,
                        boolean projectile, boolean holding, boolean meter, int chip) {
         boolean just = justDefense(d);
+        // Defesa perfeita numa bola: absorve. Fica no lugar e livre na hora (pode correr).
+        boolean absorve = just && projectile;
         d.status = CombatFighter.Status.BLOCKSTUN;
         d.clearAttack();
-        d.stunLeft = d.stunTotal = just
+        d.stunLeft = d.stunTotal = absorve ? 1 : just
             ? Math.max(1, attack.blockstunFrames * config.justDefenseBlockstunPermille / 1000)
             : attack.blockstunFrames;
         d.justDefended = just;
@@ -4012,16 +4028,16 @@ final class CombatEngine {
         d.framesSinceBlock = 0;
         d.forwardDashing = false;
         d.backdashFrames = 0;
-        push(d, a, direction * attack.pushbackOnBlock * (holding ? config.strikeHoldPushback : 1f));
+        if (!absorve) push(d, a, direction * attack.pushbackOnBlock * (holding ? config.strikeHoldPushback : 1f));
         if (meter) gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
-        freeze(a, d, holding ? holdingHitstop(attack) : attack.hitstopFrames, projectile);
+        freeze(a, d, absorve ? 2 : holding ? holdingHitstop(attack) : attack.hitstopFrames, projectile);
         events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
         if (just) {
             // A janela vale uma vez: a próxima batida pede outro aperto.
             d.guardPressCounts = false;
             d.state.heal(d.state.profile.maxLife * config.justDefenseHealPermille / 1000);
             gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
-            cues.add("JUST_DEFENSE");
+            cues.add(absorve ? "JUST_DEFENSE_ABSORB" : "JUST_DEFENSE");
             return;
         }
         d.state.chip(chip);

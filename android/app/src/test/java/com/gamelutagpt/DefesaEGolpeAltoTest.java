@@ -278,11 +278,54 @@ public class DefesaEGolpeAltoTest {
         // De novo, apertando trás 3 quadros antes de ela chegar.
         Match m = new Match(500f, 1100f);
         m.in[0].special = "M";
+        float antes = 0f;
         for (int i = 0; i <= contact; i++) {
             if (i >= contact - 3) m.in[1].direction = m.screen(1, 5);
+            antes = m.f(1).x;
             m.step();
         }
-        assertTrue(m.engine.cues().contains("JUST_DEFENSE"));
+        assertTrue("na bola a defesa perfeita absorve", m.engine.cues().contains("JUST_DEFENSE_ABSORB"));
         assertEquals("sem chip na defesa perfeita", m.cpu.profile.maxLife, m.cpu.life);
+        assertTrue("livre na hora", m.f(1).stunLeft <= 1);
+        m.in[1].direction = 0;
+        m.steps(8);
+        assertEquals("sem empurrão: fica no lugar", antes, m.f(1).x, 1f);
+    }
+
+    // ------------------------------------------------------------ corrida de energia
+
+    @Test public void theEnergyRunGoesThroughTheBallForAQuarterBar() {
+        Match m = new Match(500f, 1100f);
+        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+        m.in[0].special = "M";
+        m.step();
+        // O CPU corre para a bola e, correndo, aperta M + H.
+        m.in[1].direction = m.screen(1, 1);
+        m.in[1].dash = true;
+        m.steps(3);
+        assertTrue("correndo", m.f(1).forwardDashing);
+        m.in[1].pushblock = true;
+        m.step();
+        assertTrue("a corrida de energia começou", m.f(1).energyRunFrames > 0);
+        assertEquals("custa 1/4 de barra", CombatConfig.METER_PER_BAR - m.engine.config.energyRunCost, m.cpu.superMeter);
+        assertTrue(m.engine.cues().contains("ENERGY_RUN"));
+        boolean bolaPassou = false;
+        for (int i = 0; i < m.engine.config.energyRunFrames - 2; i++) {
+            m.step();
+            for (CombatEngine.HitEvent e : m.engine.events()) assertNotEquals("a bola não pega nele", 1, e.defender);
+            for (Projectile p : m.engine.energyProjectiles) if (p.ownerIndex == 0 && (p.x - m.f(1).x) * p.direction > 0) bolaPassou = true;
+        }
+        assertTrue("a bola passou por ele", bolaPassou);
+    }
+
+    @Test public void withoutMeterMPlusHWhileRunningIsTheHeavy() {
+        Match m = new Match(500f, 1100f);
+        m.cpu.superMeter = 0;
+        m.in[1].direction = m.screen(1, 1);
+        m.in[1].dash = true;
+        m.steps(3);
+        m.in[1].pushblock = true;
+        m.step();
+        assertEquals(0, m.f(1).energyRunFrames);
     }
 }

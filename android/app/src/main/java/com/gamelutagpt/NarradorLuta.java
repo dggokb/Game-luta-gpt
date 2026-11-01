@@ -105,6 +105,7 @@ final class NarradorLuta {
                     }
                     break;
                 case "JUST_DEFENSE":
+                case "JUST_DEFENSE_ABSORB":
                     for (int s = 0; s < 2; s++) {
                         CombatFighter f = engine.fighter(s);
                         if (f.justDefended && f.status == CombatFighter.Status.BLOCKSTUN && f.stunElapsed == 0) {
