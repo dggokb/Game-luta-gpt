@@ -56,6 +56,11 @@ public final class BateriaPerfis {
                 CharacterDefinition.Move m = c.move(g, false);
                 f.c("início do " + g)[i] = m != null && m.attack != null ? m.attack.startupFrames : 0;
             }
+            for (String g : new String[] {"L", "M", "H", "2H"}) {
+                CharacterDefinition.Move m = c.move(g, false);
+                AttackDefinition at = m == null ? null : m.attack;
+                f.c("vantagem na defesa do " + g)[i] = at == null ? 0 : at.blockstunFrames - (at.activeFrames - 1 + at.recoveryFrames);
+            }
             double melhor = 0;
             for (String g : BateriaMercado.NORMAIS) {
                 float[] r = CpuReach.measured(c, g);
