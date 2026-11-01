@@ -4610,9 +4610,39 @@ public class GameView extends SurfaceView
      * mergulho com o rastro (repete até encostar), 6-9 a estrela do acerto e 10-13 o pulo para
      * trás (subindo 10-11, descendo 12-13). Errou: 10-13 na aterrissagem.
      */
+    /**
+     * O S1 do p14 com os chutes seguintes (montagens/p14.json): o quadro do desenho de cada chute
+     * (o impacto do 1º, 2º, 3º e 4º) e onde começa o pulo para trás encolhido.
+     */
+    private static final int[] REBOUND_KICK_ART = {6, 15, 23, 31};
+    private static final int REBOUND_HOP_ART = 36;
+
     private float reboundTime(CombatFighter f, CharacterDefinition.Animation art) {
         CombatConfig config = engine.config;
         int startup = f.attack.startupFrames;
+        if (f.strikeLanded && f.attack.maxHits > 1 && art.startOf(REBOUND_HOP_ART + 4) < art.duration + 0.0001f) {
+            // Vários chutes: parado no ar, cada chute no impacto dele; depois pula para trás.
+            int hop = engine.reboundHopFrame(f.attack);
+            if (f.attackFrame < hop && !f.reboundHopped) {
+                int n = Math.min(REBOUND_KICK_ART.length, f.attack.hitboxCount());
+                for (int i = 0; i < n; i++) {
+                    int from = f.attack.hitbox(i).firstFrame;
+                    int to = i + 1 < n ? f.attack.hitbox(i + 1).firstFrame : hop;
+                    if (f.attackFrame < to || i == n - 1) {
+                        int artTo = i + 1 < n ? REBOUND_KICK_ART[i + 1] : REBOUND_HOP_ART;
+                        float k = Math.max(0f, Math.min(0.999f, (f.attackFrame - from + 0.5f) / Math.max(1, to - from)));
+                        return art.startOf(REBOUND_KICK_ART[i]) + k * (art.startOf(artTo) - art.startOf(REBOUND_KICK_ART[i]));
+                    }
+                }
+            }
+            if (f.grounded) return art.duration - 0.0001f;
+            // O pulo para trás: encolhe subindo (36-37) e cai encolhido (40-41).
+            float gravity = config.gravity * config.reboundGravityScale;
+            float up = config.reboundHopSpeed / gravity;
+            float since = (f.vy + config.reboundHopSpeed) / gravity;
+            float k = Math.max(0f, Math.min(0.999f, since / (2f * up)));
+            return art.startOf(REBOUND_HOP_ART) + k * (art.duration - art.startOf(REBOUND_HOP_ART));
+        }
         if (f.strikeLanded) {
             if (!f.reboundHopped) return art.startOf(6);   // a pausa do impacto
             float gravity = config.gravity * config.reboundGravityScale;
@@ -4632,8 +4662,9 @@ public class GameView extends SurfaceView
             float k = Math.max(0f, Math.min(0.999f, (f.attackFrame - land + 0.5f) / config.diveLandingFrames));
             return art.startOf(10) + k * (art.startOf(14) - art.startOf(10));
         }
+        // Descendo: o chute com o rastro em loop (o golpe espera no 1º quadro ativo até encostar).
         float dive = art.startOf(6) - art.startOf(4);
-        return art.startOf(4) + ((f.attackFrame - startup) * FIXED_STEP) % dive;
+        return art.startOf(4) + (engine.frame() * FIXED_STEP) % dive;
     }
 
     /** Clip time of a ground hit reaction: the whole clip spread over the hitstun. */

@@ -1442,6 +1442,10 @@ final class CombatEngine {
                 f.charging = false;
                 // Mergulho ainda no ar (o pulo para trás do rebote): o fim espera o chão.
                 if (moveMechanics.dives() && !f.grounded && f.attackFrame >= f.attack.totalFrames - config.diveLandingFrames - 1) break;
+                // O mergulho do rebote fica no chute até encostar (o chute desce inteiro): os chutes
+                // seguintes contam do contato.
+                if (moveMechanics.rebound && moveMechanics.dives() && !f.grounded && !f.strikeLanded && !f.grabMissed &&
+                    f.attackFrame >= f.attack.startupFrames) break;
                 f.attackFrame++;
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
@@ -1750,7 +1754,8 @@ final class CombatEngine {
             // Mergulho: parado durante a preparação, depois desce na diagonal (moveVertically).
             // O rebote acertou: pula para trás, para longe do rival.
             if (f.attack.mechanics.rebound && f.strikeLanded) {
-                f.x -= f.facing * config.reboundBackSpeed * CombatConfig.DT;
+                // Os chutes seguintes: parado no ar, na frente do rival preso.
+                if (!reboundHovering(f)) f.x -= f.facing * config.reboundBackSpeed * CombatConfig.DT;
             } else if (f.attackFrame >= f.attack.startupFrames) {
                 f.x += f.facing * f.attack.mechanics.diveForward * CombatConfig.DT;
             }
@@ -1839,8 +1844,12 @@ final class CombatEngine {
             f.vy = 0f;
         }
         if (f.attacking() && f.attack.mechanics.dives()) {
-            if (f.attack.mechanics.rebound && f.strikeLanded) {
-                // Rebote: o chute pegou, ele quica para cima e para trás e cai.
+            if (f.attack.mechanics.rebound && f.strikeLanded && reboundHovering(f)) {
+                // Os chutes seguintes: parado no ar.
+                scale = 0f;
+                f.vy = 0f;
+            } else if (f.attack.mechanics.rebound && f.strikeLanded) {
+                // Rebote: o(s) chute(s) pegaram, ele quica para cima e para trás e cai.
                 if (!f.reboundHopped) {
                     f.reboundHopped = true;
                     f.vy = -config.reboundHopSpeed;
@@ -2236,7 +2245,9 @@ final class CombatEngine {
     void moveAssist(CombatFighter a) {
         AttackDefinition.Mechanics m = a.attack.mechanics;
         if (m.dives() && !a.grounded) {
-            if (m.rebound && a.strikeLanded) {
+            if (m.rebound && a.strikeLanded && reboundHovering(a)) {
+                a.vy = 0f;
+            } else if (m.rebound && a.strikeLanded) {
                 if (!a.reboundHopped) {
                     a.reboundHopped = true;
                     a.vy = -config.reboundHopSpeed;
@@ -2579,7 +2590,7 @@ final class CombatEngine {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
-        if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d) : reboundMissed(a, frame))) return;
+        if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d, frame) : reboundMissed(a, frame))) return;
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel e o aparar só batem no que leram: sem golpe na janela, a resposta não sai.
         if ((a.attack.mechanics.repel || a.attack.mechanics.parry) && !a.countered) return;
@@ -3099,15 +3110,45 @@ final class CombatEngine {
 
     /**
      * Rebote no mergulho (o S1 do p14, do pulo): o chute bate a descida inteira até acertar; caiu
-     * no chão sem acertar, fica aberto. Acertou: um golpe só, e ele pula para trás (moveVertically).
+     * no chão sem acertar, fica aberto. Acertou: com um chute só, ele pula para trás
+     * (moveVertically); com vários, fica parado no ar e cada chute seguinte acerta no quadro dele
+     * o rival preso na frente (strikeHold), e só depois pula para trás.
      */
-    private boolean reboundDive(CombatFighter a, CombatFighter d) {
-        if (a.grabMissed || a.strikeLanded) return true;
+    private boolean reboundDive(CombatFighter a, CombatFighter d, int frame) {
+        if (a.grabMissed) return true;
+        if (a.strikeLanded) {
+            boolean preso = d.status == CombatFighter.Status.HITSTUN || d.status == CombatFighter.Status.AIR_HITSTUN;
+            if (a.attack.maxHits > 1 && preso) {
+                for (int i = 1; i < a.attack.hitboxCount(); i++) {
+                    if (a.attack.hitbox(i).activeAt(frame) && (a.hitboxMask & (1L << i)) == 0) {
+                        addContact(a, d, a.attack, i, null);
+                        break;
+                    }
+                }
+            }
+            return true;
+        }
         if (a.grounded) {
             a.grabMissed = true;
             return true;
         }
         return false;
+    }
+
+    /**
+     * O rebote de vários chutes (o S1 do p14) que acertou: parado no ar enquanto os chutes saem,
+     * até {@link #reboundHopFrame}.
+     */
+    boolean reboundHovering(CombatFighter f) {
+        AttackDefinition a = f.attack;
+        return a != null && a.mechanics.rebound && a.mechanics.dives() && a.maxHits > 1 && f.strikeLanded &&
+            !f.grounded && f.attackFrame < reboundHopFrame(a);
+    }
+
+    /** Quadro do golpe em que o rebote de vários chutes pula para trás: o último chute e a estrela dele. */
+    int reboundHopFrame(AttackDefinition a) {
+        return Math.min(a.hitbox(a.hitboxCount() - 1).firstFrame + config.reboundFadeFrames,
+            a.totalFrames - config.diveLandingFrames - 1);
     }
 
     /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */

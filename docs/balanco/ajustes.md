@@ -1305,3 +1305,18 @@ cancelamento foram reencaixadas e o impacto da animação também (`fit_impact`)
 
 **Medido depois** (`BateriaPerfis`, S8 → S9): o Natisuko foi de 7% para 13%. Nenhum dos outros 15
 mudou além do ruído. No jeito de lutar, a mudança do Natisuko foi de 0,28, com ruído de 0,14.
+
+## p14: S1 no ar com quatro chutes (pedido do jogador, 01/11)
+
+O jogador pediu que o golpe desça no chute e, se acertar, ele fique parado acertando quatro chutes
+seguidos, com a animação, e só no fim pule para trás.
+
+- Ele mergulha no chute, que fica no quadro de chute até encostar.
+- **Acertou:** fica parado no ar e chuta mais três vezes, com o rival preso 110 px à frente. Os
+  chutes saem nos quadros 12, 31, 48 e 65 do golpe, com pausas de 4 quadros e de 10 no último. O
+  último derruba. Oito quadros depois do último chute ele pula para trás e cai longe.
+- **Errou ou defenderam:** cai e fica aberto, como antes.
+- O dano total continua 1140, dividido entre os quatro chutes. O golpe passou de 12/4/54 para
+  12/56/16, por causa das quatro pancadas.
+- A animação ganhou os chutes 2–4 do vídeo e o pulo encolhido: os quadros 0–37, 40 e 41
+  (`montagens/p14.json`). As caixas do desenho foram medidas para os 40 quadros.

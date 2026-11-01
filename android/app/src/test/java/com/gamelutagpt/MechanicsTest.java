@@ -308,10 +308,80 @@ public class MechanicsTest {
         assertTrue("the miss lands sooner: " + miss[2] + " vs " + hit[2], miss[2] < hit[2]);
     }
 
+    /** O S1 do p14 de agora: do pulo, mergulha; acertou, fica parado no ar e chuta mais três vezes. */
+    private static AttackDefinition airReboundCombo() {
+        return move("jH", 6, 46, 20).damage(1200).stun(20, 10, 4).strikes(6, 20, 34, 48).strikeStop(4, 10)
+            .strikeHold(110f, 110f, 110f, 110f).launch(AttackDefinition.Launch.KNOCKDOWN).knockback(110f)
+            .reach(150f, 120f)
+            .mechanics(new AttackDefinition.Mechanics().rebound().dive(420f, 900f)).build();
+    }
+
+    @Test public void theAirReboundComboHoversForFourKicksThenHopsBack() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(airReboundCombo()), BASE, 500f, 650f);
+        CombatFighter f = s.f(0);
+        f.grounded = false;
+        f.y = Arena.GROUND_Y - 160f;
+        f.vy = 0f;
+        s.in[0].heavy = true;
+        int hits = 0;
+        float firstY = -1f, firstX = 0f, lastHitY = -1f, landX = 0f, maxDrift = 0f;
+        boolean rose = false;
+        for (int i = 0; i < 240; i++) {
+            s.step();
+            s.in[0].heavy = false;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker != 0 || e.blocked) continue;
+                hits++;
+                if (hits == 1) {
+                    firstY = f.y;
+                    firstX = f.x;
+                }
+                lastHitY = f.y;
+            }
+            if (hits >= 1 && hits < 4) maxDrift = Math.max(maxDrift, Math.max(Math.abs(f.y - firstY), Math.abs(f.x - firstX)));
+            if (hits == 4 && f.y < lastHitY - 20f) rose = true;
+            if (!f.grounded) landX = f.x;
+        }
+        assertEquals("four kicks", 4, hits);
+        assertTrue("he stays put in the air between the kicks: " + maxDrift, maxDrift < 2f);
+        assertEquals("the last kick lands where the first did", firstY, lastHitY, 0.5f);
+        assertTrue("then hops up", rose);
+        assertTrue("and lands back, away from the rival: " + firstX + " -> " + landX, landX < firstX - 60f);
+        assertTrue("and the move ends on the ground", f.grounded && !f.attacking());
+    }
+
+    @Test public void theP14DiveKicksFourTimesInPlaceThenHopsBack() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p14"), BASE, 500f, 680f);
+        CombatFighter f = s.f(0);
+        f.grounded = false;
+        f.y = Arena.GROUND_Y - 200f;
+        f.vy = 0f;
+        s.in[0].special = "M";
+        int hits = 0;
+        float firstX = 0f, firstY = 0f, drift = 0f, landX = 0f;
+        for (int i = 0; i < 300; i++) {
+            s.step();
+            s.in[0].special = null;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker == 0 && !e.blocked && ++hits == 1) {
+                    firstX = f.x;
+                    firstY = f.y;
+                }
+            }
+            if (hits >= 1 && hits < 4) drift = Math.max(drift, Math.abs(f.x - firstX) + Math.abs(f.y - firstY));
+            if (!f.grounded) landX = f.x;
+        }
+        assertEquals("four kicks", 4, hits);
+        assertTrue("in place between the kicks: " + drift, drift < 2f);
+        assertTrue("then hops back: " + firstX + " -> " + landX, landX < firstX - 60f);
+        assertTrue("the rival ends down", s.f(1).status == CombatFighter.Status.KNOCKDOWN || s.f(1).state.life < s.f(1).state.profile.maxLife);
+    }
+
     @Test public void theTricksterKicksAndCorkscrews() {
         CharacterDefinition p14 = GeneratedCharacters.get("p14");
         assertTrue("S1 rebounds", p14.fighter.energy.attack.mechanics.rebound);
         assertTrue("S1 dives from the jump", p14.fighter.energy.attack.mechanics.dives() && p14.fighter.energyAir);
+        assertEquals("S1: four kicks", 4, p14.fighter.energy.attack.maxHits);
         assertTrue("the Ultra ends past the rival", p14.fighter.ultraSequence.crossAhead > 0f);
         AttackDefinition sup = p14.fighter.superAttack.attack;
         assertTrue("the Super corkscrews through", sup.mechanics.passThrough && sup.mechanics.advanceSpeed > 0f);

@@ -105,7 +105,7 @@
     }
   },
   "special_energy": {
-    "_doc": "S1 (Chute rebote), só no pulo: encolhe no ar (0-3), mergulha no chute com o rastro (4-5, repete até encostar) e a estrela do vídeo (6-9); acertou, pula para trás (10-13). Cada quadro pelo tronco: quem anda no ar é o motor (o mergulho e o pulo para trás).",
+    "_doc": "S1 (Chute rebote), só no pulo: encolhe no ar (0-3), mergulha no chute com o rastro (4-5, repete até encostar) e a estrela do vídeo (6-9); errou, cai encolhido (10-13). Acertou: fica parado no ar e chuta mais três vezes, como no vídeo (2º chute 14-20, impacto 15; 3º 21-29, impacto 23; 4º 30-35, impacto 31) e pula para trás encolhido (36, 37, 40, 41). Cada quadro pelo tronco: quem anda no ar é o motor (o mergulho e o pulo para trás).",
     "trechos": [
       [
         "s1",
@@ -122,7 +122,7 @@
     "animacoes": {
       "SPECIAL_ENERGY": {
         "impacto": 6,
-        "frames": "0-13"
+        "frames": "0-37,40,41"
       }
     }
   },
