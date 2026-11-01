@@ -182,7 +182,9 @@ public class CpuTest {
      */
     @Test public void aHighLevelCpuBeatsAFireballSpammer() {
         double[] alto = spammer(8), baixo = spammer(3);
-        assertTrue("o nível 8 leva bem menos bolas: " + alto[1], alto[1] < 0.5);
+        // Onda com início de 12 (docs/balanco/ajustes.md): ele solta menos bolas e a conta por bola
+        // subiu um pouco (0,50 → 0,52 em 12 sementes), com menos acertos no total.
+        assertTrue("o nível 8 leva bem menos bolas: " + alto[1], alto[1] < 0.55);
         assertTrue("e tira vida do spammer: " + alto[0], alto[0] > 0.6);
         assertTrue("mais que o nível 3: " + baixo[1] + " → " + alto[1], alto[1] < baixo[1] - 0.15);
     }
@@ -267,9 +269,9 @@ public class CpuTest {
     @Test public void theCpuNeverReactsToAJumpBeforeTheHumanReaction() {
         int reactions = 0;
         for (int level = 1; level <= 8; level++) {
-            // 16 sementes: a CPU ataca bastante no neutro e às vezes está ocupada quando ele pula
-            // (o S de duração de mercado a deixa ocupada mais tempo).
-            for (long seed = 1; seed <= 16; seed++) {
+            // 32 sementes: a CPU solta muita Onda a essa distância e está ocupada quando ele pula
+            // em mais da metade das vezes (o S de mercado, e a Onda com início de 12).
+            for (long seed = 1; seed <= 32; seed++) {
                 Fight f = new Fight(BASE, BASE, 430f, level, seed);
                 int jumpAt = 40 + (int)(seed * 7);
                 int reaction = -1;

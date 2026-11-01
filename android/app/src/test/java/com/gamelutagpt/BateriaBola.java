@@ -124,6 +124,9 @@ public final class BateriaBola {
             .forEach(e -> System.out.println("- " + e.getKey() + ": " + e.getValue()));
     }
 
+    /** Sementes por lutador no modo teste (o CpuTest usa 3). */
+    static int sementesTeste = 3;
+
     /** O spammer do CpuTest (só L, espera 4–11 quadros): bolas soltas, acertos e onde pegou. */
     static void comoNoTeste(int level) {
         java.util.Map<String, Integer> pegou = new java.util.TreeMap<>();
@@ -131,7 +134,7 @@ public final class BateriaBola {
         double perdeu = 0;
         int lutas = 0;
         for (String ch : new String[] {"p03", "player_two", "p05"}) {
-            for (long seed = 1; seed <= 3; seed++) {
+            for (long seed = 1; seed <= sementesTeste; seed++) {
                 CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get("player_base"), "P1"),
                     new FighterState(GeneratedCharacters.get(ch), "CPU"), 250f, 1000f, new CombatConfig());
                 AiController cpu = new AiController(new OpponentAi(new java.util.Random(seed)), new java.util.Random(seed * 31 + 7));
@@ -204,6 +207,7 @@ public final class BateriaBola {
             return;
         }
         if (args.length > 0 && args[0].equals("teste")) {
+            if (args.length > 2) sementesTeste = Integer.parseInt(args[2]);
             comoNoTeste(Integer.parseInt(args[1]));
             return;
         }

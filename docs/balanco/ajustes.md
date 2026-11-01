@@ -1355,3 +1355,38 @@ Não voltam:
 
 Testes: `CpuSpecialsTest.theRepelSendsTheBallBackAtTheThrower` e
 `MechanicsTest.repelSendsAProjectileBack`.
+
+## Ryūga: a Onda sai em 12 quadros, não em 6 (pedido do jogador, 01/11)
+
+**Pedido:** fazer e testar simulando; manter se o resultado for positivo, tirar se não for.
+
+**O que mudou:** o S de projétil do Ryūga e do player_two passou de 6/1/39 para 12/1/33. O total
+segue em 46 quadros, e o impacto da animação foi reencaixado. No SF6 o Hadoken sai em 12–16 quadros;
+com 6, de perto nenhuma reação chegava a tempo.
+
+**Critério combinado antes de rodar:**
+1. A CPU contra o spammer sobe pelo menos 5 pontos no nível 5 ou no 8.
+2. O Ryūga continua acima de 50% de vitórias (CPU × CPU).
+3. Os 16 continuam diferentes.
+
+**Medido** (`BateriaBola`, 60 lutas por lutador e nível; `BateriaPerfis` S10 → S11):
+
+| Medida | Antes | Depois |
+|---|---|---|
+| CPU contra o Ryūga que só solta bola, nível 5 | 13% | 19% |
+| CPU contra o Ryūga que só solta bola, nível 8 | 58% | 60% |
+| Vitórias do Ryūga (CPU × CPU, nível 8) | 67% | 63% |
+| Distância média entre os 16 / pares parecidos | 1,41 / 9 | 1,40 / 8 |
+| Spammer do CpuTest (só L), 12 sementes: acertos por bola no nível 8 | 0,50 | 0,52 |
+| Spammer do CpuTest (só L), 12 sementes: vida que ele perde no nível 8 / 3 | 98% / 61% | 94% / 74% |
+
+**Decisão:** positivo pelo critério, então fica. A CPU sobe 6 pontos no nível 5 (o começo da
+história), o Ryūga continua forte e mais perto do resto, e os 16 seguem diferentes. Ponto
+contra, pequeno: no spammer só de L, o nível 8 leva um pouco mais por bola (0,50 → 0,52), embora
+leve menos bolas no total.
+
+**Testes:**
+- No `CpuTest`, o limite de acertos por bola do nível 8 passou de 0,50 para 0,55. A comparação com
+  o nível 3 e a vida do spammer ficam como estavam.
+- O teste de reação ao pulo passou a usar 32 sementes. A CPU está soltando Onda em mais da metade
+  dos pulos, e o limite segue em 10 reações, nenhuma antes do tempo humano.

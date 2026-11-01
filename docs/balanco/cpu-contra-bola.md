@@ -75,8 +75,9 @@ perfeita absorve a bola, a corrida de energia atravessa a bola) e o S com ~46 qu
 - **A bola de perto do Ryūga sai em 6 quadros.** No SF6 o Hadoken sai em 12–16. A maior parte das
   bolas que ainda pegam a CPU vem de 100–300 px, onde nenhuma reação chega a tempo: nem a da CPU
   (13 quadros no nível 8), nem a de uma pessoa (15–20). O tempo total já está no padrão de mercado;
-  o início, não. **Proposta:** início do S de projétil 6 → 12 no Ryūga e no player_two,
-  com a recuperação encurtada para manter os ~46.
+  o início, não. **Feito:** o S do Ryūga e do player_two passou de 6/1/39 para 12/1/33, mantendo
+  os ~46 quadros. Com 60 lutas por lutador, a CPU contra o spammer foi de 13% para 19% no nível 5
+  e de 58% para 60% no nível 8 (veja `ajustes.md`).
 - **O nível 5 (o começo da história) ainda perde do spammer: 13%.** É o nível que reage devagar
   e muitas vezes nem reage, por desenho. Ele melhora junto com a proposta acima.
 - **O Natisuko (p15) é o mais fraco e caiu mais:** 14% → 10% (S de mercado) → 7%. A bola dele
