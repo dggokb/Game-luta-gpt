@@ -52,7 +52,7 @@ public final class BateriaPerfis {
             float bv = p.backdashSpeed > 0 ? p.backdashSpeed : cfg.backdashSpeed;
             f.c("backdash (px)")[i] = bq * bv / 60.0;
             f.c("air dashes")[i] = p.airDashes;
-            f.c("pulo no ar (quadros)")[i] = 41.0 * p.jumpPermille / 1000;
+            f.c("pulo no ar (quadros)")[i] = 41.0 * pulo(p) / 1000;
             for (String g : new String[] {"L", "M", "H", "2M"}) {
                 CharacterDefinition.Move m = c.move(g, false);
                 f.c("início do " + g)[i] = m != null && m.attack != null ? m.attack.startupFrames : 0;
@@ -97,6 +97,15 @@ public final class BateriaPerfis {
             f.c("couraça (quadros)")[i] = p.armorWindow;
         }
         return f;
+    }
+
+    /** O pulo próprio (jumpPermille); 1000 no código de antes da identidade 4 (a revisão roda nos dois). */
+    static int pulo(CharacterDefinition.Fighter p) {
+        try {
+            return CharacterDefinition.Fighter.class.getDeclaredField("jumpPermille").getInt(p);
+        } catch (ReflectiveOperationException e) {
+            return 1000;
+        }
     }
 
     // ------------------------------------------------------------------ o que faz na luta
@@ -428,6 +437,18 @@ public final class BateriaPerfis {
         }
     }
 
+    /** A ficha em CSV (uma linha por coluna, um valor por lutador), para comparar rodadas. */
+    static void valores(String arquivo, Fichas f) throws IOException {
+        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(Paths.get(arquivo), StandardCharsets.UTF_8))) {
+            w.println("coluna;" + String.join(";", NOMES));
+            for (Map.Entry<String, double[]> e : f.col.entrySet()) {
+                StringBuilder l = new StringBuilder(e.getKey());
+                for (double x : e.getValue()) l.append(';').append(x);
+                w.println(l);
+            }
+        }
+    }
+
     static void csv(String arquivo, double[][] d) throws IOException {
         try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(Paths.get(arquivo), StandardCharsets.UTF_8))) {
             w.println("," + String.join(",", NOMES));
@@ -499,6 +520,9 @@ public final class BateriaPerfis {
             csv(pasta + "/perfis_fixa.csv", dF);
             csv(pasta + "/perfis_luta.csv", dL);
             csv(pasta + "/perfis_total.csv", dT);
+            valores(pasta + "/ficha_fixa.csv", fixa);
+            valores(pasta + "/ficha_luta.csv", luta);
+            valores(pasta + "/ficha_luta2.csv", luta2);
         }
         System.out.println("\n(" + (System.currentTimeMillis() - t0) / 1000 + " s)");
     }
