@@ -20652,7 +20652,7 @@
       "activeFrames": 4,
       "recoveryFrames": 31,
       "hitstunFrames": 54,
-      "blockstunFrames": 35,
+      "blockstunFrames": 24,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
