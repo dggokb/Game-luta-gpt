@@ -2,13 +2,22 @@ package com.gamelutagpt;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * SHINKAI (substitui o Overdrive): a barra de cada lutador enche, cheia ativa uma vez por round
  * por 8 s, e o tipo dele (POWER, SPEED, ENERGY, TECHNIQUE) muda o que ele ganha.
+ *
+ * <p>Este é o SHINKAI antigo: o Ryūga (player_base) volta ao ENERGY dele aqui. O protótipo do
+ * SHINKAI individual do Ryūga (PERCEPCAO) é testado em {@link ShinkaiRyugaTest}.
  */
 public class ShinkaiTest {
+    @Before public void sistemaAntigo() { Shinkai.prototipoDesligado = true; }
+
+    @After public void devolve() { Shinkai.prototipoDesligado = false; }
+
     private static final class Match {
         final FighterState first, cpuState;
         final CombatEngine engine;

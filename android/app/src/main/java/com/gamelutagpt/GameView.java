@@ -2069,7 +2069,7 @@ public class GameView extends SurfaceView
                 // SHINKAI: o dano aparece grande, na cor do tipo, onde o golpe entrou.
                 float nx = Float.isNaN(event.impactX) ? hitFighter.x : event.impactX;
                 float ny = Float.isNaN(event.impactY) ? hitFighter.y - hitFighter.body().height(false) * 0.8f : event.impactY;
-                shinkaiDetalhes.numero(nx, ny - 30f, event.damage, batedor.shinkaiType.color,
+                shinkaiDetalhes.numero(nx, ny - 30f, event.damage, batedor.corShinkai(),
                     "SUPER".equals(event.moveId) && engine.fighter(event.attacker).shinkaiSuper);
             }
             if (!event.blocked && event.damage > 0 && batedor.inShinkai(Shinkai.Type.POWER)) {
@@ -2113,6 +2113,8 @@ public class GameView extends SurfaceView
             if ("SHINKAI".equals(cue)) banner = spawnShinkai();
             if (banner != null) showBanner(banner);
             if ("PARRY".equals(cue)) spawnParry();
+            if ("LEITURA".equals(cue) || "ESQUIVA".equals(cue)) spawnLeitura();
+            if ("PRECISO".equals(cue) || "RUPTURA".equals(cue)) beamShake = Math.max(beamShake, 14f);
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
@@ -3076,6 +3078,17 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("defesa", 1f, 1.7f);
     }
 
+    /** Leitura do Ryūga (protótipo PERCEPCAO): o brilho dourado nele, como o parry. */
+    private void spawnLeitura() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (!f.state.inShinkai(Shinkai.Type.PERCEPCAO) || f.state.precisoQuadros != engine.config.ryugaPrecisoJanela) continue;
+            impacts.spawnSuperGlint(f.x, chestY(f), 0xFFFFFFFF);
+            impacts.spawn(ImpactEffects.GUARD, f.x + f.facing * 30f, chestY(f), f.facing, ImpactEffects.SPECIAL, f.state.corShinkai());
+        }
+        ultraSounds.playFight("defesa", 1f, 1.7f);
+    }
+
     /** Corpo de aço (SHINKAI POWER): o golpe bate e faísca laranja, ele nem se mexe. */
     private void spawnShinkaiArmor() {
         for (int side = 0; side < 2; side++) {
@@ -3322,6 +3335,14 @@ public class GameView extends SurfaceView
             case "ECHO": return "ECO DE SOMBRA!";
             case "HENCHMEN": return "COBRANÇA!";
             case "CLONES": return "LEGIÃO DE SOMBRAS!";
+            // Protótipo do SHINKAI do Ryūga (PERCEPCAO).
+            case "LEITURA": return "LEITURA!";
+            case "ESQUIVA": return "LEU O GOLPE!";
+            case "PRECISO": return "GOLPE PRECISO!";
+            case "LIMITE": return "LIMITE! SHINKAI = RUPTURA";
+            case "RUPTURA": return "RUPTURA!";
+            case "LIMITE_FIM": case "RUPTURA_FIM": return "EXAUSTO!";
+            case "SHINKAI_FIM": return "SHINKAI DESLIGADO";
             default: return null;
         }
     }
@@ -5697,7 +5718,7 @@ public class GameView extends SurfaceView
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
         int frame = engine.frame();
         if (left < 0.2f && (frame / 3) % 3 == 0) return;
-        int color = f.state.shinkaiType.color & 0xFFFFFF;
+        int color = f.state.corShinkai() & 0xFFFFFF;
         int light = ((Color.red(color) + 255) / 2 << 16) | ((Color.green(color) + 255) / 2 << 8) | (Color.blue(color) + 255) / 2;
         r.setOverride(shinkaiTint(0x66000000 | color));
         for (int i = 0; i < 4; i++) {

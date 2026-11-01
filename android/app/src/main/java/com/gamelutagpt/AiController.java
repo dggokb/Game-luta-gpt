@@ -1045,7 +1045,10 @@ final class AiController {
         chargeConfig = engine.config;
         CombatFighter me = engine.fighter(self);
         CombatFighter target = engine.fighter(1 - self);
-        CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
+        // PROTÓTIPO PERCEPCAO: no SHINKAI do Ryūga ela vê o golpe vindo antes (a percepção sobre-humana).
+        reacao = percepcaoReage && me.state.inShinkai(Shinkai.Type.PERCEPCAO)
+            ? Math.max(PERCEPCAO_REACAO_MIN, level.reactionFrames * 6 / 10) : level.reactionFrames;
+        CpuPerception.Snapshot seen = perception.seen(reacao);
         seenNow = seen;
         observar(engine, self, me, seen);
         acompanharPlanos(engine, me, target);
@@ -1104,6 +1107,7 @@ final class AiController {
         }
 
         if (breakerFollowUp(me, target, out)) return;
+        if (leituraFollowUp(me, target, out)) return;
         if (fullKit && !target.ko() && fillKit(engine, me, target, seen, out)) return;
 
         if (cooldown > 0) cooldown--;
@@ -1359,7 +1363,7 @@ final class AiController {
             }
             if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != lastProjectileSerial) {
                 float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
-                float now = seen.projectileGap - speed * level.reactionFrames;
+                float now = seen.projectileGap - speed * reacao;
                 if (now < 560f) {
                     lastProjectileSerial = seen.projectileSerial;
                     noteRivalShot(seen.frame);
@@ -1583,7 +1587,10 @@ final class AiController {
             guardFrames = Math.max(guardFrames, justDefenseWait + 12);
             return;
         }
-        if (!roll(level.justDefense())) return;
+        double perfeita = level.justDefense();
+        // PROTÓTIPO PERCEPCAO (o Ryūga no SHINKAI): ele vê o golpe vindo e a janela é mais larga.
+        if (me.state.inShinkai(Shinkai.Type.PERCEPCAO)) perfeita = Math.min(0.95, perfeita + PERCEPCAO_LEITURA * (0.5 + smart()));
+        if (!roll(perfeita)) return;
         justDefenseWait = framesToContact - JUST_DEFENSE_LEAD;
         guardFrames = Math.max(guardFrames, justDefenseWait + 12);
     }
@@ -1652,6 +1659,23 @@ final class AiController {
     }
 
     private boolean breakerCombo;
+
+    /**
+     * PROTÓTIPO PERCEPCAO: leu o golpe (o rival ficou desequilibrado) e o golpe preciso está
+     * pronto: castiga com o melhor que chega a tempo; longe, corre até ele.
+     */
+    private boolean leituraFollowUp(CombatFighter me, CombatFighter target, FighterInput out) {
+        if (me.state.precisoQuadros <= 0 || !me.state.inShinkai(Shinkai.Type.PERCEPCAO) || !me.grounded ||
+            !target.inHitstun() || target.ko()) return false;
+        if (!me.canAct()) return true;
+        float gap = Math.abs(target.x - me.x);
+        if (punirComOMelhor(me, target, target.stunLeft, gap, target.crouchingBody(), out, "leitura")) return true;
+        movingBack = false;
+        movingForward = dashing = true;
+        out.direction = target.x > me.x ? 1 : 5;
+        out.dash = true;
+        return true;
+    }
 
     /**
      * SHINKAI Clash: empurra do jeito do tipo dela, mas com a mesma média de empurrão por quadro em
@@ -1815,12 +1839,12 @@ final class AiController {
      */
     private float predictedX(CombatEngine engine, CpuPerception.Snapshot seen) {
         float x = seen.x;
-        CpuPerception.Snapshot before = perception.seen(level.reactionFrames + MOTION_SAMPLE);
+        CpuPerception.Snapshot before = perception.seen(reacao + MOTION_SAMPLE);
         // Só o andar/correr do rival continua no mesmo ritmo: o deslizar de quem apanhou ou caiu
         // freia e para (levar adiante passava do ponto e ela batia de longe).
         if (before != null && seen.grounded && before.grounded &&
             seen.status == CombatFighter.Status.NEUTRAL && before.status == CombatFighter.Status.NEUTRAL) {
-            x += (seen.x - before.x) / MOTION_SAMPLE * level.reactionFrames;
+            x += (seen.x - before.x) / MOTION_SAMPLE * reacao;
         }
         // O próprio golpe ela sente na hora: sabe onde o rival estava quando encostou e quanto
         // aquele golpe empurra. Até ver o empurrão acontecer (ele pode atrasar num congelamento),
@@ -1994,7 +2018,7 @@ final class AiController {
             seen.outcome == CombatFighter.Outcome.HIT || seen.attackSerial == lastPunishSerial) return false;
         lastPunishSerial = seen.attackSerial;
         if (!roll(level.punish)) return false;
-        int left = seen.recoveryLeft() - level.reactionFrames;
+        int left = seen.recoveryLeft() - reacao;
         float gap = Math.abs(seen.x - me.x);
         if (ultraPunish(me, target, left, gap, out)) return true;
         return punirComOMelhor(me, target, left, gap, seen.crouching, out, "punir");
@@ -2021,7 +2045,7 @@ final class AiController {
         }
         if (!antiAirPlan) return false;
         // Onde ele está agora pelo que ela viu: a trajetória do pulo é previsível.
-        float t = level.reactionFrames * CombatConfig.DT;
+        float t = reacao * CombatConfig.DT;
         float x = seen.x + seen.vx * t;
         float y = seen.y + seen.vy * t + 0.5f * engine.config.gravity * t * t;
         float gap = Math.abs(x - me.x);
@@ -2576,7 +2600,7 @@ final class AiController {
 
     /** Viu (com a reação do nível) que o golpe atual acertou. */
     private boolean hitSeen(CombatEngine engine) {
-        return ownHitFrame >= 0 && engine.frame() - ownHitFrame >= level.reactionFrames;
+        return ownHitFrame >= 0 && engine.frame() - ownHitFrame >= reacao;
     }
 
     /** Aperta o passo {@code step}: golpe ("2H" agachado, "j2H" ↓ no ar), S1 ou Super. */
@@ -2603,6 +2627,52 @@ final class AiController {
 
     // ---------------------------------------------------------------- kit da batalha
 
+    /** PROTÓTIPO PERCEPCAO: o quanto a percepção soma na chance da defesa perfeita (vezes 0,5 + smart). */
+    static final double PERCEPCAO_LEITURA = 0.35;
+    /** PROTÓTIPO PERCEPCAO: a reação no SHINKAI do Ryūga (60% da do nível, nunca abaixo disto). */
+    static final int PERCEPCAO_REACAO_MIN = 6;
+    /** Para as baterias: desliga a reação mais rápida (mede a assinatura sozinha). */
+    static boolean percepcaoReage = true;
+    /** A reação deste quadro (a do nível, ou a da percepção). */
+    private int reacao = 13;
+    /** No limite, decidiu uma vez se rompe (a janela é curta). */
+    private boolean decidiuLimite;
+
+    /**
+     * PROTÓTIPO PERCEPCAO (o Ryūga): no limite do corpo escolhe a Ruptura (para fechar a luta, ou
+     * perdendo feio) ou deixa acabar; antes do limite, com o corpo quase no fim e nada para
+     * aproveitar, os níveis altos desligam para não ficar exaustos.
+     */
+    private boolean escolhaPercepcao(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        FighterState s = me.state;
+        if (!s.inShinkai(Shinkai.Type.PERCEPCAO)) {
+            decidiuLimite = false;
+            return false;
+        }
+        if (s.limiteQuadros > 0) {
+            // Um tempo de reação antes de decidir.
+            if (decidiuLimite || s.limiteQuadros > engine.config.ryugaLimiteJanela - 12) return false;
+            decidiuLimite = true;
+            float minha = s.life / (float)s.profile.maxLife;
+            float dele = target.state.life / (float)target.state.profile.maxLife;
+            double p = dele < 0.3f ? 0.45 + 0.4 * smart() : minha < dele - 0.25f ? 0.4 : 0.1;
+            if (chance(p)) {
+                out.shinkai = true;
+                return true;
+            }
+            return false;
+        }
+        decidiuLimite = false;
+        if (s.rupturaQuadros > 0 || !me.canAct() || me.attacking()) return false;
+        if (s.sobrecarga < CombatConfig.RYUGA_SOBRECARGA_MAX * 8 / 10 || engine.frame() % KIT_DECISION_FRAMES != 0) return false;
+        if (Math.abs(target.x - me.x) < 300f || target.state.life < target.state.profile.maxLife * 3 / 10) return false;
+        if (chance(0.3 * smart())) {
+            out.shinkai = true;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * O kit da batalha neste frame. Verdadeiro quando apertou algo que pede o frame só para
      * si (a troca, o Ultra e o SHINKAI no neutro): a decisão normal fica para depois.
@@ -2612,6 +2682,7 @@ final class AiController {
         int self = me.index;
         TeamSystem teams = engine.teams;
         TeamSystem.Side team = engine.team(self);
+        if (escolhaPercepcao(engine, me, target, out)) return true;
 
         // Assist em campo: às vezes vira o novo titular (Assist → Tag).
         boolean assistOut = team.assistOut();

@@ -595,6 +595,9 @@ final class CombatEngine {
             f.dashRequest = f.backdashRequest = false;
             return;
         }
+        if (f.shinkaiRequestAge >= 0 && f.state.inShinkai(Shinkai.Type.PERCEPCAO) && shinkaiClash == null) {
+            escolhaNoShinkai(f);
+        }
 
         if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround() &&
             f.state.superMeter >= CombatConfig.ULTRA_COST && temUltra(f.character())) {
@@ -686,8 +689,11 @@ final class CombatEngine {
         s.shinkaiUsed = true;
         s.shinkai = 0;
         s.shinkaiFrames = config.shinkaiFrames;
-        s.shinkaiFreeSuper = true;
+        // PERCEPCAO pode ligar de novo no round (o fim voluntário devolve parte): o Super grátis é só da primeira vez.
+        s.shinkaiFreeSuper = s.ativacoes == 0;
+        s.ativacoes++;
         s.shinkaiAutoParry = s.shinkaiType == Shinkai.Type.TECHNIQUE;
+        s.sobrecarga = s.limiteQuadros = s.rupturaQuadros = s.precisoQuadros = 0;
         f.shinkaiRequestAge = -1;
         if (f.attacking()) {
             f.status = CombatFighter.Status.NEUTRAL;
@@ -789,6 +795,7 @@ final class CombatEngine {
                 l.state.takeDamage(config.shinkaiClashDamage, config.recoverableLifePermille);
                 l.state.shinkaiFrames = 0;
                 w.state.shinkaiFrames = config.shinkaiFrames;
+                w.state.sobrecarga = w.state.limiteQuadros = 0;
                 int away = l.x >= w.x ? 1 : -1;
                 l.status = CombatFighter.Status.AIR_HITSTUN;
                 l.grounded = false;
@@ -915,8 +922,122 @@ final class CombatEngine {
         events.add(new HitEvent(a.index, d.index, 0, true, projectile, moveId));
     }
 
+    // ---------------------------------------------------------------- PROTÓTIPO PERCEPCAO (o Ryūga)
+    // docs/balanco/shinkai-ryuga.md. Só o tipo PERCEPCAO passa por aqui; os outros seguem o relógio.
+
+    /** Um quadro do SHINKAI dele (TeamSystem chama no lugar do relógio): desgaste, limite ou Ruptura. */
+    void desgastar(FighterState s) {
+        if (s.rupturaQuadros > 0) {
+            s.rupturaQuadros--;
+            // Dói: vida de verdade, nunca a última.
+            if (s.life > config.ryugaRupturaDor) s.takeDamage(config.ryugaRupturaDor, 0);
+            s.shinkaiFrames = Math.max(1, s.rupturaQuadros * config.shinkaiFrames / config.ryugaRupturaQuadros);
+            if (s.rupturaQuadros == 0) {
+                encerrar(s, config.ryugaExaustaoRuptura);
+                cues.add("RUPTURA_FIM");
+            }
+            return;
+        }
+        if (s.limiteQuadros > 0) {
+            if (--s.limiteQuadros == 0) {
+                s.finsNoLimite++;
+                encerrar(s, config.ryugaExaustao);
+                cues.add("LIMITE_FIM");
+            }
+            return;
+        }
+        desgaste(s, config.ryugaDesgasteQuadro);
+    }
+
+    /** O corpo gasta {@code quanto}; cheio, chega ao limite (a janela para escolher a Ruptura). */
+    private void desgaste(FighterState s, int quanto) {
+        if (quanto <= 0 || !s.inShinkai(Shinkai.Type.PERCEPCAO) || s.rupturaQuadros > 0 || s.limiteQuadros > 0) return;
+        int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
+        s.sobrecarga = Math.min(max, s.sobrecarga + quanto);
+        // A barra do HUD mostra o fôlego que sobra (o mesmo desenho do relógio).
+        s.shinkaiFrames = Math.max(1, (int)((long)(max - s.sobrecarga) * config.shinkaiFrames / max));
+        if (s.sobrecarga >= max) {
+            s.limiteQuadros = config.ryugaLimiteJanela;
+            cues.add("LIMITE");
+        }
+    }
+
+    private void encerrar(FighterState s, int exaustao) {
+        s.shinkaiFrames = 0;
+        s.limiteQuadros = s.rupturaQuadros = s.precisoQuadros = 0;
+        s.exaustaoQuadros = exaustao;
+    }
+
+    /**
+     * SHINKAI apertado já no SHINKAI dele: antes do limite acaba (sem cansaço, e parte do fôlego
+     * que sobrou volta para a barra: dá para ligar de novo no round); no limite rompe (Ruptura);
+     * na Ruptura acaba (o cansaço da Ruptura fica).
+     */
+    private void escolhaNoShinkai(CombatFighter f) {
+        FighterState s = f.state;
+        f.shinkaiRequestAge = -1;
+        if (s.rupturaQuadros > 0) {
+            s.finsVoluntarios++;
+            encerrar(s, config.ryugaExaustaoRuptura);
+            cues.add("RUPTURA_FIM");
+            return;
+        }
+        if (s.limiteQuadros > 0) {
+            s.limiteQuadros = 0;
+            s.rupturaQuadros = config.ryugaRupturaQuadros;
+            s.shinkaiFrames = config.shinkaiFrames;
+            s.rupturas++;
+            f.hitstop = Math.max(f.hitstop, 16);
+            cues.add("RUPTURA");
+            return;
+        }
+        s.finsVoluntarios++;
+        int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
+        int sobra = max - s.sobrecarga;
+        encerrar(s, 0);
+        s.shinkaiUsed = false;
+        s.shinkai = (int)((long)sobra * CombatConfig.SHINKAI_MAX / max * config.ryugaDevolvePermille / 1000);
+        cues.add("SHINKAI_FIM");
+    }
+
+    /**
+     * Leitura (a defesa perfeita dele no SHINKAI): ele sai livre na hora, quem atacou no chão fica
+     * desequilibrado e o próximo golpe dele é o golpe preciso.
+     */
+    private void leitura(CombatFighter a, CombatFighter d) {
+        d.stunLeft = d.stunTotal = 1;
+        d.state.precisoQuadros = config.ryugaPrecisoJanela;
+        d.state.leituras++;
+        if (a.grounded && a.status == CombatFighter.Status.ATTACK && a.attack != null &&
+            a.attack.kind != AttackDefinition.Kind.SUPER) {
+            a.clearAttack();
+            a.status = CombatFighter.Status.HITSTUN;
+            a.stunLeft = a.stunTotal = config.ryugaLeituraAbre;
+            a.stunElapsed = 0;
+            a.vx = 0f;
+        }
+        desgaste(d.state, config.ryugaDesgasteLeitura);
+        cues.add("LEITURA");
+    }
+
+    /**
+     * Esquiva de leitura: no SHINKAI dele, o backdash passa pelo golpe (nada acerta esta vez) e
+     * abre o golpe preciso. Quem errou fica na recuperação do próprio golpe.
+     */
+    private boolean esquivaDeLeitura(CombatFighter a, CombatFighter d) {
+        if (!d.state.inShinkai(Shinkai.Type.PERCEPCAO) || d.backdashFrames <= 0 || !d.grounded) return false;
+        if (a.attack.kind == AttackDefinition.Kind.SUPER) return false;
+        a.hitboxMask = ~0L;   // passou: o golpe não pega mais nesta vez
+        d.state.esquivas++;
+        d.state.precisoQuadros = config.ryugaPrecisoJanela;
+        desgaste(d.state, config.ryugaDesgasteEsquiva);
+        cues.add("ESQUIVA");
+        return true;
+    }
+
     /** Barra do SHINKAI pelo dano: quem apanhou enche mais, quem bateu menos. */
     private void chargeShinkai(CombatFighter a, CombatFighter d, int damage) {
+        desgaste(d.state, damage * config.ryugaDesgastePorDano);
         d.state.chargeShinkai(damage * config.shinkaiPerDamageTakenPermille / 1000);
         a.state.chargeShinkai(damage * config.shinkaiPerDamageDealtPermille / 1000);
     }
@@ -1058,6 +1179,7 @@ final class CombatEngine {
         f.clearAttack();
         f.attack = attack;
         f.shinkaiSuper = false;
+        desgaste(f.state, config.ryugaDesgasteGolpe);
         // O golpe alto avisa na preparação (o brilho na tela), para dar para ler e defender em pé.
         if (attack.overhead) cues.add("OVERHEAD");
         // Normais e especiais (também os que lançam, como a shuriken) tocam a própria animação.
@@ -1685,6 +1807,8 @@ final class CombatEngine {
         }
         // SHINKAI SPEED: anda, corre e dá air dash mais rápido.
         float boost = f.state.inShinkai(Shinkai.Type.SPEED) ? config.shinkaiSpeed : 1f;
+        // PERCEPCAO: cansado depois do limite (ou da Ruptura).
+        if (f.state.exaustaoQuadros > 0) boost *= config.ryugaExaustoVelocidade;
         if (f.vx != 0f && f.status == CombatFighter.Status.AIR_HITSTUN) {
             f.x += f.vx * CombatConfig.DT;
             boolean reached = f.bounce == CombatFighter.BOUNCE_WALL &&
@@ -2020,7 +2144,8 @@ final class CombatEngine {
     private void trackGuardPress(CombatFighter f, int relative) {
         boolean back = relative == 4 || relative == 5 || (!f.grounded && relative == 6);
         if (back && !f.guardDirectionHeld) {
-            f.guardPressCounts = f.guardPressAge >= config.justDefenseLockoutFrames;
+            f.guardPressCounts = f.guardPressAge >= (f.state.inShinkai(Shinkai.Type.PERCEPCAO)
+                ? config.ryugaPerfeitaBloqueio : config.justDefenseLockoutFrames);
             f.guardPressAge = 0;
         } else if (f.guardPressAge < 999) {
             f.guardPressAge++;
@@ -2030,7 +2155,8 @@ final class CombatEngine {
 
     /** O aperto de trás está na janela da defesa perfeita. */
     private boolean justDefense(CombatFighter d) {
-        return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= config.justDefenseFrames;
+        int janela = d.state.inShinkai(Shinkai.Type.PERCEPCAO) ? config.ryugaPerfeitaJanela : config.justDefenseFrames;
+        return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= janela;
     }
 
     /**
@@ -2605,6 +2731,7 @@ final class CombatEngine {
             AttackDefinition.Box box = a.attack.hitbox(i);
             if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
             if (golpeToca(a, box, frame, d, body, crouch) || touchesMoveHurtbox(a, box, d)) {
+                if (esquivaDeLeitura(a, d)) return;
                 addContact(a, d, a.attack, i, null);
                 return;
             }
@@ -3781,7 +3908,7 @@ final class CombatEngine {
         // Fury: the attacker hits harder the less life it has left.
         int raw = base * a.state.profile.furyScale(a.state.life) / 1000;
         // SHINKAI: todos os golpes batem mais forte; o Super grátis dele, mais ainda.
-        if (a.state.inShinkai()) raw = raw * config.shinkaiDamagePermille / 1000;
+        if (a.state.inShinkai()) raw = raw * (a.state.emRuptura() ? config.ryugaRupturaDanoPermille : config.shinkaiDamagePermille) / 1000;
         if (a.shinkaiSuper && attack.kind == AttackDefinition.Kind.SUPER) raw = raw * config.shinkaiSuperDamagePermille / 1000;
         if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
             // Super armor: the damage goes through, the stun does not; the move carries on.
@@ -3827,6 +3954,14 @@ final class CombatEngine {
             raw = raw * config.counterHitDamagePermille / 1000;
             cues.add("COUNTER_HIT");
         }
+        // PERCEPCAO: o golpe preciso, o primeiro depois da leitura (ou da esquiva).
+        boolean preciso = !projectile && !c.echo && a.state.precisoQuadros > 0 && a.state.inShinkai(Shinkai.Type.PERCEPCAO);
+        if (preciso) {
+            raw = raw * config.ryugaPrecisoDanoPermille / 1000;
+            a.state.precisoQuadros = 0;
+            a.state.precisos++;
+            cues.add("PRECISO");
+        }
         session = sessionFor(a, d);
         // The move's first strike that hits pays meter and sets the combo scale; the later
         // strikes keep that scale (a new combo starts over as a first strike).
@@ -3834,6 +3969,7 @@ final class CombatEngine {
         if (multi || (!projectile && attack.mechanics.rebound)) a.strikeLanded = true;   // o rebote de um chute só também pula para trás
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (counterHit) hitstun += attack.strength == AttackDefinition.Strength.LIGHT ? config.counterHitLightFrames : config.counterHitFrames;
+        if (preciso) hitstun += config.ryugaPrecisoHitstun;
         // A resposta do contra-golpe que leu o golpe dele: atordoado (dá para correr e emendar).
         boolean counterAnswer = !projectile && a.countered && a.attack == attack &&
             attack.mechanics.counter != AttackDefinition.Reads.NONE && !attack.mechanics.repel;
@@ -4099,7 +4235,9 @@ final class CombatEngine {
      */
     private void block(CombatFighter a, CombatFighter d, AttackDefinition attack, int guard, int direction,
                        boolean projectile, boolean holding, boolean meter, int chip) {
-        boolean just = justDefense(d);
+        boolean percepcao = d.state.inShinkai(Shinkai.Type.PERCEPCAO);
+        // Ruptura: a percepção no máximo, toda defesa é perfeita.
+        boolean just = justDefense(d) || (percepcao && d.state.emRuptura());
         // Defesa perfeita numa bola: absorve. Fica no lugar e livre na hora (pode correr).
         boolean absorve = just && projectile;
         d.status = CombatFighter.Status.BLOCKSTUN;
@@ -4123,11 +4261,13 @@ final class CombatEngine {
             d.state.heal(d.state.profile.maxLife * config.justDefenseHealPermille / 1000);
             gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
             cues.add(absorve ? "JUST_DEFENSE_ABSORB" : "JUST_DEFENSE");
+            if (percepcao && !projectile) leitura(a, d);
             return;
         }
         d.state.chip(chip);
         int drain = attack.blockstunFrames * config.guardDrainPerBlockstunFrame;
         if (holding) drain = drain * config.guardHoldingDrainPermille / 1000;
+        if (d.state.exaustaoQuadros > 0) drain = drain * config.ryugaExaustoGuardaPermille / 1000;
         d.state.guard = Math.max(0, d.state.guard - drain);
         if (d.state.guard == 0) guardBreak(a, d, projectile);
     }

@@ -590,7 +590,7 @@ final class HudRenderer {
      * fica apagada. Desenhada no lado dele (espelhada à direita), o texto sempre legível.
      */
     private void drawShinkaiBar(Canvas c, FighterState f, boolean right, float x, float y, float w, float h, int duration) {
-        int color = f.shinkaiType.color;
+        int color = f.corShinkai();
         boolean active = f.inShinkai();
         boolean ready = f.shinkaiReady();
         float fill = active ? f.shinkaiFrames / (float)Math.max(1, duration)
@@ -624,7 +624,8 @@ final class HudRenderer {
         if (!ready && !active) return;
         float cx = right ? Arena.VW - (x + w / 2f) : x + w / 2f;
         float pop = ready ? 1f + 0.08f * (float)Math.sin(now * 7.0) : 1f;
-        text(c, active ? "SHINKAI " + f.shinkaiType.label : "SHINKAI", cx, y + h + 3f, 15f * pop,
+        String nome = f.emRuptura() ? "RUPTURA" : active && f.limiteQuadros > 0 ? "NO LIMITE" : "SHINKAI " + f.shinkaiType.label;
+        text(c, active ? nome : "SHINKAI", cx, y + h + 3f, 15f * pop,
             active ? Color.WHITE : blend(color, Color.WHITE, 0.55f));
     }
 
@@ -1434,7 +1435,7 @@ final class HudRenderer {
         float left = f.inShinkai() ? f.shinkaiFrames / (float)Math.max(1, duration) : 0f;
         boolean ready = f.shinkaiReady();
         boolean pressed = s.pressed(Control.SHINKAI);
-        int ring = f.shinkaiType.color;
+        int ring = f.corShinkai();
         boolean lit = ready || left > 0f;
         button(c, x, y, r, ring, pressed || left > 0f, lit);
         paint.setStyle(Paint.Style.STROKE);

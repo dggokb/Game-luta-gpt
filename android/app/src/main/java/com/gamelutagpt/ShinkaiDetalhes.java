@@ -49,7 +49,7 @@ final class ShinkaiDetalhes {
         for (int i = 0; i < 2; i++) {
             CombatFighter f = engine.fighter(i);
             if (!f.state.inShinkai() || f.vanishFrames > 0) continue;
-            int cor = f.state.shinkaiType.color;
+            int cor = f.state.corShinkai();
             switch (f.state.shinkaiType) {
                 case POWER:
                     if (quadro % 3 == 0) pedra(f.x + (sorte.nextFloat() * 2f - 1f) * 80f, Arena.GROUND_Y, cor);
@@ -62,6 +62,17 @@ final class ShinkaiDetalhes {
                     if (f.attacking() && f.attack.hitboxCount() > 0 && f.attackFrame == f.attack.hitbox(0).firstFrame) {
                         AttackDefinition.Box b = f.attack.hitbox(0);
                         brilho(f.x + f.facing * b.x1, f.y - (b.y0 + b.y1) / 2f, cor);
+                    }
+                    break;
+                case PERCEPCAO:
+                    // Leu o golpe: o brilho no olhar enquanto o golpe preciso espera. Na Ruptura, raios.
+                    if (f.state.precisoQuadros > 0 && quadro % 4 == 0) brilho(f.x + f.facing * 14f, f.y - f.body().standHeight * 0.86f, cor);
+                    if (f.state.emRuptura() && quadro % 3 == 0) raio(f, cor);
+                    // Percepção: ele vê o golpe do rival já no começo (o brilho na ponta, antes de chegar).
+                    CombatFighter o = engine.fighter(1 - i);
+                    if (o.attacking() && o.attackFrame == 1 && o.attack.melee() && o.attack.hitboxCount() > 0) {
+                        AttackDefinition.Box b = o.attack.hitbox(0);
+                        brilho(o.x + o.facing * b.x1, o.y - (b.y0 + b.y1) / 2f, cor);
                     }
                     break;
                 default:

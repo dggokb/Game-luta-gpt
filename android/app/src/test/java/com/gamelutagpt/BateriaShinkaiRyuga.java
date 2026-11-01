@@ -1,0 +1,228 @@
+package com.gamelutagpt;
+
+import java.util.*;
+
+/**
+ * Protótipo do SHINKAI individual do Ryūga (PERCEPCAO; docs/balanco/shinkai-ryuga.md) contra o
+ * SHINKAI antigo. As mesmas lutas (sementes, lados, rivais) rodam duas vezes: com o Ryūga no
+ * protótipo e com ele no ENERGY antigo. O rival usa o SHINKAI antigo do tipo dele nas duas.
+ *
+ * <pre>
+ * args: [lutas por rival] [nível] [narra]
+ *   lutas por rival (padrão 8), nível da CPU (padrão 8), "narra" imprime o log de 3 lutas
+ * </pre>
+ */
+public class BateriaShinkaiRyuga {
+    static final class Est {
+        int lutas, decididas, vitorias, janelas, clashes;
+        long quadrosShinkai, danoDado, danoLevado;            // dentro do SHINKAI do Ryūga
+        long danoDadoFora, danoLevadoFora, quadrosFora;       // fora dele
+        long danoDadoRival, danoLevadoRival, quadrosRival;    // dentro do SHINKAI do rival
+        long leituras, esquivas, precisos, rupturas, voluntarios, limites, reativacoes;
+        long quadrosExausto, danoLevadoExausto, dor;
+        long danoPreciso, defesas, perfeitas, golposRival;
+        final Map<String, int[]> porRival = new TreeMap<>();  // rival → {vitórias, decididas}
+    }
+
+    static final String RYUGA = "player_base";
+    static boolean semClash;
+
+    static void luta(String rival, int lado, int nivel, long semente, Est e, StringBuilder log) {
+        BateriaBalanco.Luta l = new BateriaBalanco.Luta(
+            lado == 0 ? new String[] {RYUGA} : new String[] {rival},
+            lado == 0 ? new String[] {rival} : new String[] {RYUGA}, nivel, semente, new CombatConfig());
+        int r = lado, o = 1 - lado;
+        if (semClash) {
+            // Ninguém responde o SHINKAI do outro com o seu (o Clash esconde a assinatura).
+            BateriaBalanco.Mao m = (lu, ld, in) -> {
+                if (lu.f(1 - ld).state.inShinkai() && !lu.f(ld).state.inShinkai()) in.shinkai = false;
+            };
+            l.mao[0] = m;
+            l.mao[1] = m;
+        }
+        boolean dentro = false, dentroRival = false;
+        int vidaR = l.f(r).state.life;
+        while (!l.acabou() && l.quadro < 60 * 60 * 4) {
+            int lifeR = l.f(r).state.life;
+            l.passo();
+            CombatFighter fr = l.f(r), fo = l.f(o);
+            FighterState s = fr.state;
+            boolean agora = s.inShinkai(), agoraRival = fo.state.inShinkai();
+            List<String> cues = l.e.cues();
+            if (agora && !dentro) {
+                e.janelas++;
+                if (log != null) nota(log, l, "Ryūga liga o SHINKAI " + s.shinkaiType.label);
+            }
+            if (!agora && dentro && log != null) {
+                String como = cues.contains("LIMITE_FIM") ? "no limite (exausto)" : cues.contains("RUPTURA_FIM") ? "depois da Ruptura (exausto)"
+                    : cues.contains("SHINKAI_FIM") ? "desligado por ele" : "acabou";
+                nota(log, l, "SHINKAI do Ryūga " + como);
+            }
+            if (agoraRival && !dentroRival && log != null) nota(log, l, "rival liga o SHINKAI " + fo.state.shinkaiType.label);
+            for (String c : cues) {
+                if (c.startsWith("SHINKAI_CLASH") && c.equals("SHINKAI_CLASH")) e.clashes++;
+                if (log != null && (c.equals("LEITURA") || c.equals("ESQUIVA") || c.equals("PRECISO") || c.equals("LIMITE") ||
+                    c.equals("RUPTURA") || c.startsWith("SHINKAI_CLASH"))) nota(log, l, c);
+            }
+            if (agora) e.quadrosShinkai++;
+            else e.quadrosFora++;
+            if (agoraRival) e.quadrosRival++;
+            if (s.exaustaoQuadros > 0) e.quadrosExausto++;
+            // A dor da Ruptura: vida que caiu sem evento de dano.
+            int caiu = lifeR - s.life;
+            if (agora && cues.contains("JUST_DEFENSE")) e.perfeitas++;
+            if (agora && fo.attacking() && fo.attackFrame == 1) e.golposRival++;
+            for (CombatEngine.HitEvent h : l.e.events()) {
+                if (agora && h.defender == r && h.blocked) e.defesas++;
+                if (h.defender == r) caiu -= h.damage;
+                if (h.damage <= 0) continue;
+                if (h.attacker == r) {
+                    if (agora || dentro) e.danoDado += h.damage; else e.danoDadoFora += h.damage;
+                    if (agoraRival || dentroRival) e.danoDadoRival += h.damage;
+                } else {
+                    if (agora || dentro) e.danoLevado += h.damage; else e.danoLevadoFora += h.damage;
+                    if (agoraRival || dentroRival) e.danoLevadoRival += h.damage;
+                    if (s.exaustaoQuadros > 0) e.danoLevadoExausto += h.damage;
+                }
+            }
+            if (s.emRuptura() && caiu > 0) e.dor += caiu;
+            if (cues.contains("PRECISO")) {
+                for (CombatEngine.HitEvent h : l.e.events()) if (h.attacker == r) e.danoPreciso += h.damage;
+            }
+            dentro = agora;
+            dentroRival = agoraRival;
+        }
+        FighterState s = l.f(r).state;
+        e.leituras += s.leituras;
+        e.esquivas += s.esquivas;
+        e.precisos += s.precisos;
+        e.rupturas += s.rupturas;
+        e.voluntarios += s.finsVoluntarios;
+        e.limites += s.finsNoLimite;
+        e.lutas++;
+        int v = l.flow.winner();
+        int[] pr = e.porRival.computeIfAbsent(rival, k -> new int[2]);
+        if (v == 0 || v == 1) {
+            e.decididas++;
+            pr[1]++;
+            if (v == r) {
+                e.vitorias++;
+                pr[0]++;
+            }
+        }
+        if (log != null) {
+            nota(log, l, (v == r ? "Ryūga vence" : v == o ? "rival vence" : "empate") + String.format(Locale.ROOT,
+                " (leituras %d, esquivas %d, precisos %d, Rupturas %d)", s.leituras, s.esquivas, s.precisos, s.rupturas));
+        }
+    }
+
+    static void nota(StringBuilder log, BateriaBalanco.Luta l, String o) {
+        FighterState a = l.f(0).state, b = l.f(1).state;
+        log.append(String.format(Locale.ROOT, "  %6.2f s  vida %5d × %5d  %s%n", l.quadro / 60.0, a.life, b.life, o));
+    }
+
+    /** As variantes comparadas (colunas). */
+    static final String[] VARIANTES = {"antigo (ENERGY)", "protótipo", "sem reação rápida da CPU", "sem Ruptura", "sem os dois"};
+
+    static Est rodar(int variante, int n, int nivel) {
+        Shinkai.prototipoDesligado = variante == 0;
+        AiController.percepcaoReage = variante != 2 && variante != 4;
+        java.util.function.Consumer<CombatConfig> antes = BateriaBalanco.AJUSTE_CFG;
+        // Sem Ruptura: a janela do limite some antes de dar tempo de escolher (a CPU espera 12 quadros).
+        if (variante == 3 || variante == 4) BateriaBalanco.AJUSTE_CFG = c -> c.ryugaLimiteJanela = 1;
+        Est e = new Est();
+        int k = 0;
+        try {
+            for (String rival : BateriaBalanco.ELENCO) {
+                if (rival.equals(RYUGA)) continue;
+                for (int i = 0; i < n; i++, k++) luta(rival, i & 1, nivel, 77_000 + k, e, null);
+            }
+        } finally {
+            Shinkai.prototipoDesligado = false;
+            AiController.percepcaoReage = true;
+            BateriaBalanco.AJUSTE_CFG = antes;
+        }
+        return e;
+    }
+
+    static String pc(long a, long b) { return String.format(Locale.ROOT, "%.0f%%", 100.0 * a / Math.max(1, b)); }
+
+    static String porLuta(long v, Est e) { return String.format(Locale.ROOT, "%.2f", v / (double)Math.max(1, e.lutas)); }
+
+    static String porQuadro(long dano, long quadros) {
+        return String.format(Locale.ROOT, "%.1f", 60.0 * dano / Math.max(1, quadros));
+    }
+
+    public static void main(String[] args) {
+        long t0 = System.nanoTime();
+        int n = args.length > 0 ? Integer.parseInt(args[0]) : 8;
+        int nivel = args.length > 1 ? Integer.parseInt(args[1]) : 8;
+        boolean narra = Arrays.asList(args).contains("narra");
+        semClash = Arrays.asList(args).contains("semClash");
+        Est[] v = new Est[VARIANTES.length];
+        for (int i = 0; i < v.length; i++) v[i] = rodar(i, n, nivel);
+        System.out.println("# SHINKAI do Ryūga: protótipo (PERCEPÇÃO) × antigo (ENERGY)");
+        System.out.println();
+        System.out.printf(Locale.ROOT, "CPU nível %d dos dois lados, 1x1, o Ryūga contra os 15 (%d lutas cada, metade de cada lado),"
+            + " as mesmas sementes em todas as colunas. O rival usa o SHINKAI antigo do tipo dele.%s%n%n", nivel, n,
+            semClash ? " **Sem Clash**: ninguém liga o SHINKAI com o outro já no dele." : " Jogo normal (com Clash).");
+        StringBuilder cab = new StringBuilder("| medida |"), sep = new StringBuilder("|---|");
+        for (String x : VARIANTES) { cab.append(' ').append(x).append(" |"); sep.append("---|"); }
+        System.out.println(cab);
+        System.out.println(sep);
+        linha("Ryūga vence", v, e -> pc(e.vitorias, e.decididas));
+        linha("SHINKAIs ligados por luta", v, e -> porLuta(e.janelas, e));
+        linha("duração média do SHINKAI (s)", v, e -> seg(e.quadrosShinkai, e.janelas));
+        linha("dano que ele dá por s, no SHINKAI", v, e -> porQuadro(e.danoDado, e.quadrosShinkai));
+        linha("dano que ele leva por s, no SHINKAI", v, e -> porQuadro(e.danoLevado, e.quadrosShinkai));
+        linha("saldo por SHINKAI (dá − leva)", v, BateriaShinkaiRyuga::saldo);
+        linha("dano que ele dá / leva por s, fora", v, e -> porQuadro(e.danoDadoFora, e.quadrosFora) + " / " + porQuadro(e.danoLevadoFora, e.quadrosFora));
+        linha("dano que ele leva por s, no SHINKAI do rival", v, e -> porQuadro(e.danoLevadoRival, e.quadrosRival));
+        linha("SHINKAI Clash por luta", v, e -> porLuta(e.clashes, e));
+        linha("no SHINKAI dele: golpes do rival / defendidos / perfeitas (por luta)", v,
+            e -> porLuta(e.golposRival, e) + " / " + porLuta(e.defesas, e) + " / " + porLuta(e.perfeitas, e));
+        linha("leituras / esquivas / precisos por luta", v, e -> porLuta(e.leituras, e) + " / " + porLuta(e.esquivas, e) + " / " + porLuta(e.precisos, e));
+        linha("dano médio do golpe preciso", v, e -> String.valueOf(e.danoPreciso / Math.max(1, e.precisos)));
+        linha("fim: desligou / no limite / Ruptura (total)", v, e -> e.voluntarios + " / " + e.limites + " / " + e.rupturas);
+        linha("s exausto por luta (dano levado exausto por s)", v, e -> String.format(Locale.ROOT, "%.1f (%s)",
+            e.quadrosExausto / 60.0 / Math.max(1, e.lutas), porQuadro(e.danoLevadoExausto, e.quadrosExausto)));
+        linha("dor da Ruptura por luta", v, e -> porLuta(e.dor, e));
+        System.out.println();
+        System.out.println("## Por rival (Ryūga vence)");
+        System.out.println();
+        System.out.println(cab.toString().replace("| medida |", "| rival | tipo |"));
+        System.out.println(sep.append("---|"));
+        for (String rival : v[0].porRival.keySet()) {
+            StringBuilder b = new StringBuilder("| " + rival + " | " + Shinkai.typeOfAntigo(rival).label + " |");
+            for (Est e : v) { int[] x = e.porRival.get(rival); b.append(' ').append(pc(x[0], x[1])).append(" |"); }
+            System.out.println(b);
+        }
+        if (narra) {
+            System.out.println();
+            System.out.println("## Log de 4 lutas (protótipo)");
+            String[] rivais = {"p03", "p09", "p07", "p11"};
+            for (int i = 0; i < rivais.length; i++) {
+                StringBuilder log = new StringBuilder();
+                luta(rivais[i], i & 1, nivel, 91_000 + i, new Est(), log);
+                System.out.println();
+                System.out.println("### Ryūga (lado " + (i & 1) + ") × " + rivais[i] + " (" + Shinkai.typeOfAntigo(rivais[i]).label + ")");
+                System.out.println();
+                System.out.println("```");
+                System.out.print(log);
+                System.out.println("```");
+            }
+        }
+        System.out.printf(Locale.ROOT, "%n(%.0f s)%n", (System.nanoTime() - t0) / 1e9);
+    }
+
+    static void linha(String nome, Est[] v, java.util.function.Function<Est, String> f) {
+        StringBuilder b = new StringBuilder("| " + nome + " |");
+        for (Est e : v) b.append(' ').append(f.apply(e)).append(" |");
+        System.out.println(b);
+    }
+
+    static String seg(long quadros, long janelas) { return String.format(Locale.ROOT, "%.1f", quadros / 60.0 / Math.max(1, janelas)); }
+
+    static String saldo(Est e) { return String.valueOf((e.danoDado - e.danoLevado) / Math.max(1, e.janelas)); }
+
+}

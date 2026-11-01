@@ -17,7 +17,14 @@ final class Shinkai {
         /** A barra de Super enche sozinha e os projéteis saem maiores, mais rápidos e dois por vez. */
         ENERGY("ENERGY", 0xFFB45CFF),
         /** Cancels livres e o parry (→ bem na hora do golpe: não entra nada). */
-        TECHNIQUE("TECHNIQUE", 0xFFFFE04A);
+        TECHNIQUE("TECHNIQUE", 0xFFFFE04A),
+        /**
+         * PROTÓTIPO do SHINKAI individual (só o Ryūga; docs/balanco/shinkai-ryuga.md): percepção.
+         * Lê o golpe (defesa perfeita mais larga vira leitura: quem atacou fica aberto), esquiva
+         * pelo backdash e o golpe preciso depois. Dura pelo desgaste do corpo, acaba quando ele
+         * quer, e no limite pode romper (Ruptura).
+         */
+        PERCEPCAO("PERCEPÇÃO", 0xFFFFC23A);
 
         final String label;
         /** Cor da aura, da barra e do aviso. */
@@ -29,6 +36,9 @@ final class Shinkai {
         }
     }
 
+    /** A cor da Ruptura do protótipo PERCEPCAO (a aura mais quente). */
+    static final int COR_RUPTURA = 0xFFFF5A2A;
+
     private Shinkai() {}
 
     /** O tipo do lutador; quem não está na lista (lutadores de treino, NPC) é TECHNIQUE. */
@@ -37,6 +47,19 @@ final class Shinkai {
     }
 
     static Type typeOf(String id) {
+        if (prototipoDesligado) return typeOfAntigo(id);
+        switch (id) {
+            case "player_base": case "p01":
+                return Type.PERCEPCAO;
+            default:
+                return typeOfAntigo(id);
+        }
+    }
+
+    /** Para comparar (baterias): o Ryūga volta ao ENERGY do sistema antigo. */
+    static boolean prototipoDesligado;
+
+    static Type typeOfAntigo(String id) {
         switch (id) {
             case "p04": case "p09": case "p12": case "p13":
                 return Type.POWER;

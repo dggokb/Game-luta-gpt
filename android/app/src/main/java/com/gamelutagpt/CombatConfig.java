@@ -569,6 +569,41 @@ final class CombatConfig {
     /** A distância entre os dois no confronto. */
     float shinkaiClashGap = 300f;
 
+    // PROTÓTIPO do SHINKAI individual (docs/balanco/shinkai-ryuga.md): só o Ryūga, tipo PERCEPCAO.
+    // Números de teste, isolados aqui. Duração pelo desgaste do corpo (sobrecarga até SHINKAI_MAX),
+    // não por um relógio fixo.
+    /** O corpo aguenta este tanto de desgaste (sobrecarga); cheio, chega ao limite. */
+    static final int RYUGA_SOBRECARGA_MAX = 100000;
+    /** Desgaste por quadro só por estar no SHINKAI (parado, chega ao limite em ~12 s). */
+    int ryugaDesgasteQuadro = 139;
+    /** Desgaste por golpe que ele começa, por leitura, por esquiva e por ponto de dano levado. */
+    int ryugaDesgasteGolpe = 1500;
+    int ryugaDesgasteLeitura = 6000;
+    int ryugaDesgasteEsquiva = 4000;
+    int ryugaDesgastePorDano = 6;
+    /** Percepção: a janela da defesa perfeita (5 fora) e o bloqueio contra bater sem parar (20 fora). */
+    int ryugaPerfeitaJanela = 12;
+    int ryugaPerfeitaBloqueio = 8;
+    /** Leitura: quem atacou (no chão) fica desequilibrado este tanto; o Ryūga sai livre. */
+    int ryugaLeituraAbre = 24;
+    /** Golpe preciso: o primeiro golpe dele nestes quadros depois da leitura bate mais e atordoa mais. */
+    int ryugaPrecisoJanela = 40;
+    int ryugaPrecisoDanoPermille = 1300;
+    int ryugaPrecisoHitstun = 12;
+    /** No limite do corpo: estes quadros para escolher (SHINKAI de novo = Ruptura; nada = acaba). */
+    int ryugaLimiteJanela = 60;
+    /** Exaustão depois: acabou no limite / depois da Ruptura (andar e dash mais lentos, guarda gasta mais). */
+    int ryugaExaustao = 90;
+    int ryugaExaustaoRuptura = 240;
+    float ryugaExaustoVelocidade = 0.7f;
+    int ryugaExaustoGuardaPermille = 1500;
+    /** Ruptura: dura isto, dói isto por quadro (vida de verdade, nunca a última), bate mais. */
+    int ryugaRupturaQuadros = 300;
+    int ryugaRupturaDor = 4;
+    int ryugaRupturaDanoPermille = 1400;
+    /** Fim voluntário antes do limite: esta parte do fôlego que sobrou volta para a barra. */
+    int ryugaDevolvePermille = 500;
+
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;
     int tagEnterFrames = 23;

@@ -166,6 +166,27 @@ final class FighterState {
     /** TECHNIQUE: a aparada automática do SHINKAI ainda não foi usada. */
     boolean shinkaiAutoParry;
 
+    // PROTÓTIPO PERCEPCAO (o Ryūga; CombatConfig ryuga*): o desgaste no lugar do relógio.
+    /** O desgaste do corpo no SHINKAI (até CombatConfig.RYUGA_SOBRECARGA_MAX). */
+    int sobrecarga;
+    /** No limite do corpo: quadros para escolher a Ruptura (0 fora do limite). */
+    int limiteQuadros;
+    /** Rompeu o limite: quadros que faltam da Ruptura (0 fora dela). */
+    int rupturaQuadros;
+    /** Depois do SHINKAI pelo limite ou da Ruptura: cansado (mais lento, guarda gasta mais). */
+    int exaustaoQuadros;
+    /** Depois de uma leitura: o próximo golpe dele é o golpe preciso. */
+    int precisoQuadros;
+    /** Quantas vezes ligou neste round (o fim voluntário deixa ligar de novo). */
+    int ativacoes;
+    /** Contagens para as baterias (a luta toda). */
+    int leituras, esquivas, precisos, rupturas, finsVoluntarios, finsNoLimite;
+
+    boolean emRuptura() { return rupturaQuadros > 0 && inShinkai(Shinkai.Type.PERCEPCAO); }
+
+    /** A cor da aura e da barra agora (a Ruptura esquenta). */
+    int corShinkai() { return emRuptura() ? Shinkai.COR_RUPTURA : shinkaiType.color; }
+
     /** Dá para pagar o Super agora: uma barra, ou o Super grátis do SHINKAI. */
     boolean canPaySuper() {
         return superMeter >= CombatConfig.SUPER_COST || (inShinkai() && shinkaiFreeSuper);
@@ -183,6 +204,7 @@ final class FighterState {
         shinkaiFrames = 0;
         shinkaiFreeSuper = false;
         shinkaiAutoParry = false;
+        sobrecarga = limiteQuadros = rupturaQuadros = exaustaoQuadros = precisoQuadros = ativacoes = 0;
     }
 
     float superBars() {

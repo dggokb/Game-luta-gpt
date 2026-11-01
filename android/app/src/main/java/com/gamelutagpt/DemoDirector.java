@@ -254,14 +254,13 @@ final class DemoDirector {
                     c -> c.engine.restage(X - 200f, X + 420f),
                     (c, p1, cpu) -> { if (c.t == 0) p1.shinkai = true; },
                     c -> c.cue("SHINKAI")),
-                new Step("ENERGY: DOIS PROJÉTEIS", "no SHINKAI ENERGY (o P01) sai uma bola atrás da outra", 150,
+                new Step("PERCEPÇÃO: DESLIGAR", "o SHINKAI do Ryūga dura pelo desgaste do corpo; SHINKAI de novo desliga e devolve parte da barra", 150,
                     c -> c.engine.restage(X - 300f, X + 500f),
                     (c, p1, cpu) -> {
                         if (c.t == 0) p1.shinkai = true;
-                        if (c.t >= 40 && c.p1().canAct()) p1.special = "L";
-                        c.value = Math.max(c.value, c.engine.countEnergyProjectiles(0));
+                        if (c.t == 80) p1.shinkai = true;
                     },
-                    c -> c.value >= 2),
+                    c -> c.cue("SHINKAI_FIM")),
                 new Step("SHINKAI NO MEIO DO COMBO", "L > M acertou: o SHINKAI congela o CPU e o combo segue com 2L > 2M", 150,
                     c -> c.placeApart(X, 12f),
                     (c, p1, cpu) -> {

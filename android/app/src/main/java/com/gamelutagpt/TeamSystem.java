@@ -398,9 +398,13 @@ final class TeamSystem {
         // O SHINKAI é de quem está em campo: saiu (troca), acabou. O tempo espera os
         // congelamentos (o próprio brilho, os Supers).
         for (FighterState m : s.members) {
+            if (m.exaustaoQuadros > 0 && !engine.superFreezeActive()) m.exaustaoQuadros--;
+            if (m.precisoQuadros > 0 && !engine.superFreezeActive()) m.precisoQuadros--;
             if (m.shinkaiFrames <= 0) continue;
             if (m != s.pointState()) m.shinkaiFrames = 0;
-            else if (!engine.superFreezeActive()) {
+            else if (!engine.superFreezeActive() && m.shinkaiType == Shinkai.Type.PERCEPCAO) {
+                engine.desgastar(m);
+            } else if (!engine.superFreezeActive()) {
                 m.shinkaiFrames--;
                 // ENERGY: a barra de Super enche sozinha.
                 if (m.shinkaiType == Shinkai.Type.ENERGY) m.addSuperMeter(config.shinkaiEnergyMeterPerFrame);

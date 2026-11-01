@@ -1401,3 +1401,14 @@ leve menos bolas no total.
 - **Resultado:** o jogador que entra pulando venceu 44, 47, 41 e 28% contra a CPU nos níveis 5
   a 8; agora vence 58, 60, 56 e 50%. O resto ficou dentro do ruído. Detalhes em
   `tres-frentes.md`. A CPU entrando pulando foi testada e saiu por não ter efeito.
+
+## SHINKAI do Ryūga: protótipo do SHINKAI individual (pedido do jogador, 01/11)
+
+- **O que é:** o Ryūga sai do ENERGY e ganha o tipo `PERCEPCAO`: defesa perfeita mais larga que
+  vira leitura, esquiva pelo backdash, golpe preciso, duração pelo desgaste, fim voluntário e
+  Ruptura. Os outros 15 seguem no SHINKAI antigo.
+- **Resultado:** o Ryūga venceu 57% → 62% no nível 8 (jogo normal) e 65% → 73% sem Clash. A
+  assinatura em si quase não aparece com a CPU (0,3 leitura por luta). Quem rende é a Ruptura e
+  a reação mais rápida da CPU no SHINKAI dele.
+- **A CPU esperando para ler** foi testada e saiu: 73% → 65%.
+- **Detalhes:** `shinkai-ryuga.md`.
