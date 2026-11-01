@@ -68,7 +68,7 @@ public class GlobalMovementTuningTest {
     @Test public void longerBackwardHopAndArcApplyToBoth() {
         CombatEngine e=engine();
         assertEquals(15,e.config.backdashFrames);
-        assertEquals(978f,e.config.backdashSpeed,.001f);
+        assertEquals("backdash ~160 px, menos que o dash (docs/balanco/chao.md)",640f,e.config.backdashSpeed,.001f);
         assertEquals(0f,e.config.backdashVisualLift(15),.001f);
         assertTrue(e.config.backdashVisualLift(7)>37f);
         assertEquals(0f,e.config.backdashVisualLift(0),.001f);

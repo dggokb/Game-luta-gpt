@@ -513,7 +513,7 @@
       "corrida": {
         "dash": 0.65,
         "backdashQuadros": 24,
-        "backdashVelocidade": 520
+        "backdashVelocidade": 340
       }
     },
     "wakeupFrames": 30

@@ -117,7 +117,7 @@ final class CombatConfig {
      * para frear e virar no meio do super pulo, mas não de uma vez.
      */
     float superJumpDriftAccel = 900f;
-    float backdashSpeed = 978f;
+    float backdashSpeed = 640f;
     int backdashFrames = 15;
     int backdashRecoveryFrames = 12; // extra grounded neutral frames before another hop
     /** Visual retreat hop is shared by all fighters; ground collision remains unchanged. */
