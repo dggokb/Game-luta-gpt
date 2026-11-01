@@ -5295,6 +5295,17 @@ public class GameView extends SurfaceView
         c.restore();
     }
 
+    /** O personagem {@code id} está no time do lado 1 (em campo ou na reserva). */
+    private boolean noTimeDoLado1(String id) {
+        CombatFighter emCampo = engine.fighter(0);
+        if (emCampo.character() != null && id.equals(emCampo.character().id)) return true;
+        FighterState[] membros = engine.team(0).members;
+        if (membros != null) {
+            for (FighterState m : membros) if (m != null && m.character != null && id.equals(m.character.id)) return true;
+        }
+        return false;
+    }
+
     /** Cor alternativa: giro da cor das partes coloridas, força e matiz do tingido nos escuros. */
     static final float COR_ALT_GIRO = 0.5f, COR_ALT_ESCUROS = 0.6f, COR_ALT_MATIZ_ESCUROS = 0.6f;
     private final java.util.Map<Filtro, Filtro> corAlternada = new java.util.IdentityHashMap<>();
@@ -5302,12 +5313,12 @@ public class GameView extends SurfaceView
 
     /**
      * O mesmo personagem dos dois lados: o do lado 2 sai com a cor alternativa
-     * ({@link Filtro#corAlternativa}), por cima do desgaste dele. Sem refazer nenhuma animação.
+     * ({@link Filtro#corAlternativa}), por cima do desgaste dele. Sem refazer nenhuma animação. No
+     * 2x2 vale para qualquer um do time 2 (em campo, no assist ou saindo) que também esteja no
+     * time 1, em campo ou na reserva.
      */
     private Filtro corDoLado(CombatFighter f, Filtro tinta) {
-        CombatFighter outro = engine.fighter(1 - f.index);
-        if (f.index != 1 || f.character() == null || outro.character() == null ||
-            !f.character().id.equals(outro.character().id)) return tinta;
+        if (f.index != 1 || f.character() == null || !noTimeDoLado1(f.character().id)) return tinta;
         if (tinta == null) {
             if (corAlternadaSemTinta == null) {
                 corAlternadaSemTinta = Filtro.corAlternativa(null, COR_ALT_GIRO, COR_ALT_ESCUROS, COR_ALT_MATIZ_ESCUROS);
