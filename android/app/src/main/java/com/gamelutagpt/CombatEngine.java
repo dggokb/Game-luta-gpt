@@ -939,7 +939,7 @@ final class CombatEngine {
                     }
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.clearAttack();
-                } else if (f.attackFrame >= f.attack.totalFrames - 1) {
+                } else if (f.attackFrame >= f.attack.totalFrames - 1 || energyQuickRecovery(f)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.clearAttack();
                 }
@@ -2368,6 +2368,13 @@ final class CombatEngine {
             p.fuse = data.trapFuse["L".equals(f.commandButton) ? 0 : "H".equals(f.commandButton) ? 2 : 1];
         }
         (superKind ? superProjectiles : energyProjectiles).add(p);
+    }
+
+    /** SHINKAI ENERGY: a recuperação do S (projétil) curta, para sair bola atrás de bola. */
+    private boolean energyQuickRecovery(CombatFighter f) {
+        AttackDefinition a = f.attack;
+        return a.kind == AttackDefinition.Kind.PROJECTILE && f.state.inShinkai(Shinkai.Type.ENERGY) &&
+            f.attackFrame >= a.startupFrames + a.activeFrames + config.shinkaiEnergyRecoveryFrames - 1;
     }
 
     /** SHINKAI ENERGY: o H (normal) solta junto um mini projétil de energia. */

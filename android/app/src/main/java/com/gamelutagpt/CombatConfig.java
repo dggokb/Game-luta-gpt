@@ -527,6 +527,11 @@ final class CombatConfig {
     float shinkaiEnergyProjectileSpeed = 1.3f;
     /** ENERGY: projéteis de energia ao mesmo tempo (o S sai sem esperar o anterior). */
     int shinkaiEnergyProjectiles = 5;
+    /**
+     * ENERGY: a recuperação do S (o projétil) no SHINKAI, em quadros. Fora dele o S tem a duração
+     * de mercado (~46 quadros); no ENERGY ele volta a sair seguido, que é o tipo.
+     */
+    int shinkaiEnergyRecoveryFrames = 11;
     /** ENERGY: o H solta junto um mini projétil com esta parte do dano da energia. */
     int shinkaiEnergyShotDamagePermille = 450;
     /**
