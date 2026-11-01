@@ -2214,6 +2214,8 @@ public class GameView extends SurfaceView
         }
         introTotalFrames = (int)Math.ceil(longest / FIXED_STEP);
         introFrame = introTotalFrames > 0 ? 0 : -1;
+        // A CPU começa a luta lembrando (mais fraco) do que leu do jogador nas lutas anteriores.
+        ai.leitura().novaLuta();
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
         narradorLuta.reset();
@@ -6474,7 +6476,11 @@ public class GameView extends SurfaceView
         }
         storyEpisode = -1;
         sceneAfter = after;
-        if (historia.campanha() == null) historia.setCampanha(newCampanha());
+        if (historia.campanha() == null) {
+            historia.setCampanha(newCampanha());
+            // Campanha nova: a CPU não sabe nada do jogador ainda.
+            ai.leitura().esquecerTudo();
+        }
         hud.resetEffects();
         pad.reset();
         releaseAllPointers();
@@ -6813,6 +6819,8 @@ public class GameView extends SurfaceView
         pad.reset();
         releaseAllPointers();
         selectionKeys.clear();
+        // Arcade novo: a leitura do jogador começa do zero e vai crescendo de luta em luta.
+        ai.leitura().esquecerTudo();
         historia.start(temporada, arcade);
     }
 

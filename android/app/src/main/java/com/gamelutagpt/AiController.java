@@ -330,6 +330,303 @@ final class AiController {
 
     int level() { return level.number; }
 
+    // ---------------------------------------------------------------- leitura do rival
+
+    /**
+     * O que ela aprendeu do rival e das próprias tentativas ({@link CpuLeitura}). Não zera com
+     * {@link #setEnabled}: passa de round para round, e quem cria a luta pode passar a mesma de
+     * uma luta para a outra ({@link #setLeitura}).
+     */
+    private CpuLeitura leitura = new CpuLeitura();
+    /** Desligada, ela observa mas não usa (as baterias comparam com e sem). */
+    private boolean leituraAtiva = true;
+
+    void setLeitura(CpuLeitura l) { leitura = l != null ? l : new CpuLeitura(); }
+
+    CpuLeitura leitura() { return leitura; }
+
+    void setLeituraAtiva(boolean value) { leituraAtiva = value; }
+
+    /**
+     * Certeza mínima para agir pela leitura: abaixo disso o "padrão" é ruído (quem varia dá 0,2 a
+     * 0,3), e agir nele piorava a luta contra quem não tem hábito.
+     */
+    static final double CERTEZA_MINIMA = 0.3;
+    /**
+     * Resposta arriscada (chegar colado para agarrar quem está levantando: se ele apertar, ela
+     * leva): só com o hábito bem claro.
+     */
+    static final double CERTEZA_ARRISCADA = 0.45;
+
+    /** Chance de agir pelo hábito lido na situação: zero abaixo da certeza mínima. */
+    private double agirPelaLeitura(CpuLeitura.Situacao st) {
+        double c = leitura.certeza(st);
+        return c < CERTEZA_MINIMA ? 0.0 : c * pesoLeitura();
+    }
+
+    /** Quanto a leitura pesa: nada no nível 1, inteira no 8; zero desligada. */
+    private double pesoLeitura() {
+        return leituraAtiva ? smart() : 0.0;
+    }
+
+    /** Observação em andamento: a situação, quando começou e de onde ele partiu. */
+    private CpuLeitura.Situacao obsSituacao;
+    private int obsInicio, obsPulo;
+    private float obsX;
+    private CombatFighter.Status statusVisto;
+    private boolean bolaViva;
+    /** Quadros de antiaéreo pronto (ela leu que ele vai pular). */
+    private int antiAereoLido;
+    /** Quadros parada esperando o que leu (o pulo, o golpe dele). */
+    private int esperaLida;
+    /** A sequência dela foi defendida (a leitura de "depois de defender" vale no fim dela). */
+    private boolean sequenciaDefendida;
+    /** Leitura do levantar já decidida para esta queda (a resposta), ou null. */
+    private CpuLeitura.Resposta levantarLido;
+    private boolean levantarDecidido;
+    /** Quadros do plano "chegar e agarrar" (ela leu que ele só defende). */
+    private int agarrarLido;
+    static final int PLANO_AGARRAR = 70;
+
+    /** A tentativa de chegar que está valendo, e quando começou. */
+    private CpuLeitura.Abordagem abordagem;
+    private int abordagemInicio;
+
+    static final int JANELA_LEITURA = 24, JANELA_BOLA = 30, JANELA_ABORDAGEM = 50;
+    /** Ele andou isto (px) na janela para a frente: avançou. */
+    static final float ANDOU = 40f;
+    /**
+     * Para trás precisa ir longe para ser "recuou" (o backdash): segurar trás é defender, e andar
+     * defendendo não é fugir.
+     */
+    static final float RECUOU = 100f;
+    /** A bola dela está a esta distância dele, vindo: começa a ver o que ele faz com ela. */
+    static final float BOLA_PERTO = 320f;
+
+    /**
+     * Observa o rival pelo que viu: quando ele sai da defesa, quando levanta e quando a bola dela
+     * vai nele, o que ele faz logo em seguida. Também fecha a tentativa dela de chegar (deu certo
+     * ou foi punida).
+     */
+    private void observar(CombatEngine engine, int self, CombatFighter me, CpuPerception.Snapshot seen) {
+        if (abordagem != null) {
+            int passou = engine.frame() - abordagemInicio;
+            boolean encostou = false;
+            for (CombatEngine.HitEvent ev : engine.events()) if (ev.attacker == self && !ev.blocked) encostou = true;
+            if (me.framesSinceHit == 0 && passou > 0) {
+                leitura.falhou(abordagem);
+                abordagem = null;
+            } else if (encostou) {
+                leitura.deuCerto(abordagem);
+                abordagem = null;
+            } else if (passou > JANELA_ABORDAGEM) {
+                abordagem = null;
+            }
+        }
+        if (seen == null) return;
+        // A bola dela chegando perto dele (a própria bola ela sabe onde está).
+        boolean viva = false;
+        for (Projectile p : engine.energyProjectiles) {
+            if (p.ownerIndex != self) continue;
+            float vem = (seen.x - p.x) * p.direction;
+            if (vem > 0f && vem < BOLA_PERTO) viva = true;
+        }
+        if (obsSituacao == null) {
+            if (statusVisto == CombatFighter.Status.BLOCKSTUN && seen.status != CombatFighter.Status.BLOCKSTUN) {
+                comecaObservar(CpuLeitura.Situacao.DEPOIS_DE_DEFENDER, seen);
+            } else if (statusVisto == CombatFighter.Status.WAKEUP && seen.status != CombatFighter.Status.WAKEUP) {
+                comecaObservar(CpuLeitura.Situacao.AO_LEVANTAR, seen);
+            } else if (viva && !bolaViva && seen.grounded && seen.status == CombatFighter.Status.NEUTRAL) {
+                comecaObservar(CpuLeitura.Situacao.CONTRA_BOLA, seen);
+            }
+        } else {
+            int passou = seen.frame - obsInicio;
+            int janela = obsSituacao == CpuLeitura.Situacao.CONTRA_BOLA ? JANELA_BOLA : JANELA_LEITURA;
+            float rumo = (seen.x - obsX) * Math.signum(me.x - obsX);
+            CpuLeitura.Resposta r = null;
+            if (seen.attacking()) r = CpuLeitura.Resposta.ATACA;
+            else if (!seen.grounded && seen.jumpSerial != obsPulo && seen.status == CombatFighter.Status.NEUTRAL) r = CpuLeitura.Resposta.PULA;
+            else if (rumo > ANDOU) r = CpuLeitura.Resposta.AVANCA;
+            else if (rumo < -RECUOU) r = CpuLeitura.Resposta.RECUA;
+            else if (seen.status == CombatFighter.Status.BLOCKSTUN || seen.status == CombatFighter.Status.HITSTUN ||
+                passou > janela) r = CpuLeitura.Resposta.ESPERA;
+            if (r != null) {
+                leitura.observa(obsSituacao, r);
+                obsSituacao = null;
+            }
+        }
+        statusVisto = seen.status;
+        bolaViva = viva;
+    }
+
+    private void comecaObservar(CpuLeitura.Situacao s, CpuPerception.Snapshot seen) {
+        obsSituacao = s;
+        obsInicio = seen.frame;
+        obsX = seen.x;
+        obsPulo = seen.jumpSerial;
+    }
+
+    /** O plano "chegar e agarrar": anda (ou corre, de longe) até o agarrão alcançar e agarra. */
+    private boolean agarrar(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out, String porque) {
+        float gap = Math.abs(target.x - me.x);
+        if (gap <= throwReach(engine, me, target)) {
+            agarrarLido = 0;
+            out.grab = true;
+            lastReason = porque + "agarra quem defende";
+            return true;
+        }
+        out.direction = me.facing > 0 ? 1 : 5;
+        out.dash = gap > throwReach(engine, me, target) + 120f;
+        lastReason = porque + "chega para agarrar";
+        return true;
+    }
+
+    /** A tentativa de chegar que ela acabou de soltar no neutro. */
+    private void marcarAbordagem(CombatEngine engine, FighterInput out, float distance) {
+        if (abordagem != null) return;
+        CpuLeitura.Abordagem a = null;
+        if (out.special != null && isEnergyStrength(out.special)) a = CpuLeitura.Abordagem.BOLA;
+        else if (out.jump && distance > 120f) a = CpuLeitura.Abordagem.PULA;
+        else if (out.dash && distance > 160f) a = CpuLeitura.Abordagem.CORRE;
+        else if (attack != null && distance > 150f) a = CpuLeitura.Abordagem.CUTUCA;
+        if (a == null) return;
+        abordagem = a;
+        abordagemInicio = engine.frame();
+    }
+
+    private static boolean isEnergyStrength(String s) {
+        return "L".equals(s) || "M".equals(s) || "H".equals(s);
+    }
+
+    /** O fator da abordagem para a decisão do neutro: 1 sem leitura, puxado pelo que funcionou. */
+    private double fatorAbordagem(CpuLeitura.Abordagem a) {
+        return 1.0 + (leitura.fator(a) - 1.0) * pesoLeitura();
+    }
+
+    /**
+     * A sequência dela acabou de ser defendida: se ela já leu o que ele faz nessa hora, responde
+     * com o jeito do lutador dela. Pulou: espera com o antiaéreo pronto. Aperta botão: defende e
+     * pune. Fica defendendo: agarra (o zoner volta para a bola). Recua: vai atrás (o zoner
+     * solta a bola).
+     */
+    private boolean lerDepoisDeDefender(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                        CpuPerception.Snapshot seen, FighterInput out) {
+        CpuLeitura.Situacao st = CpuLeitura.Situacao.DEPOIS_DE_DEFENDER;
+        CpuLeitura.Resposta r = leitura.previsto(st);
+        if (r == null || !roll(agirPelaLeitura(st))) return false;
+        return responder(engine, me, target, seen, r, out, "leu: depois de defender, ");
+    }
+
+    /** Ele está caído: na hora em que levanta, responde ao que ele costuma fazer ao levantar. */
+    private boolean lerLevantar(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                CpuPerception.Snapshot seen, FighterInput out) {
+        boolean caido = target.status == CombatFighter.Status.KNOCKDOWN || target.status == CombatFighter.Status.WAKEUP;
+        if (!caido && target.status != CombatFighter.Status.NEUTRAL) {
+            // Levantou e já saiu fazendo algo (ou apanhou): a leitura desta queda acabou.
+            levantarLido = null;
+            levantarDecidido = false;
+            return false;
+        }
+        if (caido) {
+            if (!levantarDecidido) {
+                levantarDecidido = true;
+                CpuLeitura.Situacao st = CpuLeitura.Situacao.AO_LEVANTAR;
+                CpuLeitura.Resposta r = leitura.previsto(st);
+                levantarLido = r != null && roll(agirPelaLeitura(st)) ? r : null;
+            }
+            if (levantarLido == null) return false;
+            float gap = Math.abs(target.x - me.x);
+            CpuStyle style = CpuStyle.of(me.character());
+            boolean zoner = style.zoning >= 1.5;
+            switch (levantarLido) {
+                case ESPERA:
+                    // Vai colar para agarrar quando ele levantar (o zoner fica na distância da bola).
+                    if (leitura.certeza(CpuLeitura.Situacao.AO_LEVANTAR) < CERTEZA_ARRISCADA) return false;
+                    if (!zoner && gap > throwReach(engine, me, target) - 10f) {
+                        out.direction = me.facing > 0 ? 1 : 5;
+                        lastReason = "leu: levantar, chega para agarrar";
+                        return true;
+                    }
+                    return false;
+                case ATACA:
+                    // Ele aperta botão ao levantar: espera defendendo e pune.
+                    guardFrames = Math.max(guardFrames, 20);
+                    guardLow = roll(habitLow());
+                    guardHabit = false;
+                    lastReason = "leu: levantar, espera o botão";
+                    return holdGuard(me, out);
+                case PULA:
+                    antiAereoLido = 45;
+                    return false;
+                default:
+                    return false;
+            }
+        }
+        // Acabou de levantar (o tempo do levantar ela sabe, como quem decorou).
+        if (levantarLido == null) {
+            levantarDecidido = false;
+            return false;
+        }
+        CpuLeitura.Resposta r = levantarLido;
+        levantarLido = null;
+        levantarDecidido = false;
+        boolean arriscada = r == CpuLeitura.Resposta.ESPERA || r == CpuLeitura.Resposta.RECUA;
+        if (arriscada && leitura.certeza(CpuLeitura.Situacao.AO_LEVANTAR) < CERTEZA_ARRISCADA) return false;
+        if (arriscada || r == CpuLeitura.Resposta.PULA) {
+            return responder(engine, me, target, seen, r, out, "leu: levantar, ");
+        }
+        return false;
+    }
+
+    /**
+     * A resposta ao hábito lido, com as ferramentas e o jeito do lutador dela: o zoner responde
+     * de longe, o agarrador agarra, quem pressiona vai atrás.
+     */
+    private boolean responder(CombatEngine engine, CombatFighter me, CombatFighter target, CpuPerception.Snapshot seen,
+                              CpuLeitura.Resposta r, FighterInput out, String porque) {
+        CpuStyle style = CpuStyle.of(me.character());
+        boolean zoner = style.zoning >= 1.5;
+        float gap = Math.abs(target.x - me.x);
+        float alcanceAgarrao = throwReach(engine, me, target);
+        switch (r) {
+            case PULA:
+                // Leu que ele vai pular: segue jogando, com o antiaéreo de reação garantido (o 2H
+                // adiantado, solto antes de ver o pulo, saía no vazio mais do que acertava).
+                antiAereoLido = 40;
+                return false;
+            case ATACA:
+            case AVANCA:
+                guardFrames = Math.max(guardFrames, 18);
+                guardLow = roll(habitLow());
+                guardHabit = false;
+                lastReason = porque + "defende e pune";
+                return holdGuard(me, out);
+            case ESPERA:
+                if (zoner && gap > 200f && OpponentAi.energyInRange(me.character(), gap, target.body()) &&
+                    !engine.energyProjectileAlive(me.index)) {
+                    out.special = "M";
+                    lastReason = porque + "bola em quem defende";
+                    return true;
+                }
+                // Quem só defende: chega colado e agarra (o plano dura até ele atacar ou acabar).
+                agarrarLido = PLANO_AGARRAR;
+                return agarrar(engine, me, target, out, porque);
+            case RECUA:
+                if (zoner && OpponentAi.energyInRange(me.character(), gap + 120f, target.body()) &&
+                    !engine.energyProjectileAlive(me.index)) {
+                    out.special = "M";
+                    lastReason = porque + "bola em quem recua";
+                    return true;
+                }
+                out.direction = me.facing > 0 ? 1 : 5;
+                out.dash = true;
+                lastReason = porque + "vai atrás";
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private void resetKit() {
         kitTimer = 0;
         plannedAttack = null;
@@ -390,6 +687,8 @@ final class AiController {
         CombatFighter target = engine.fighter(1 - self);
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
         seenNow = seen;
+        observar(engine, self, me, seen);
+        if (antiAereoLido > 0) antiAereoLido--;
         boolean overhead = seen != null && !seen.grounded && Math.abs(seen.x - me.x) < CROSS_WATCH;
         if (overhead && !rivalOverhead) crossRead = crossRandom.nextDouble() < level.reactGuard * CROSS_READ;
         rivalOverhead = overhead;
@@ -437,6 +736,8 @@ final class AiController {
 
         if (me.attacking()) {
             if (me.outcome == CombatFighter.Outcome.HIT && ownHitFrame < 0) ownHitFrame = engine.frame();
+            if (me.outcome == CombatFighter.Outcome.BLOCK && me.grounded) sequenciaDefendida = true;
+            if (me.outcome == CombatFighter.Outcome.HIT) sequenciaDefendida = false;
         } else if (route == null) {
             ownHitFrame = -1;
         }
@@ -489,6 +790,24 @@ final class AiController {
         if (punishGuardBreak(me, target, seen, out)) return;
         if (punish(engine, me, target, seen, out)) return;
         if (antiAir(engine, me, target, seen, out)) return;
+        if (sequenciaDefendida && me.grounded && route == null) {
+            sequenciaDefendida = false;
+            if (lerDepoisDeDefender(engine, me, target, seen, out)) return;
+        }
+        if (me.grounded && lerLevantar(engine, me, target, seen, out)) return;
+        if (agarrarLido > 0) {
+            agarrarLido--;
+            // Ele atacou (ou pulou): o plano acabou, a reação de defesa e punição cuida.
+            if (seen.attacking() || !seen.grounded || target.status != CombatFighter.Status.NEUTRAL &&
+                target.status != CombatFighter.Status.BLOCKSTUN) agarrarLido = 0;
+            else if (me.grounded && agarrar(engine, me, target, out, "leu: só defende, ")) return;
+        }
+        if (esperaLida > 0) {
+            // Leu que ele vai pular (ou apertar): fica parada, pronta para tirar do ar.
+            esperaLida--;
+            movingForward = movingBack = dashing = false;
+            return;
+        }
         if (habitGuard(me, target, seen, out)) return;
         if (guardPlanSerial >= 0 && guardingSerial != guardPlanSerial &&
             guardPlanArrival < PROJECTILE_BUSY_FRAMES && me.grounded) {
@@ -519,6 +838,10 @@ final class AiController {
         situation.style = CpuStyle.of(me.character());
         situation.urgency = urgency;
         situation.rivalZoning = rivalZoning(seen.frame);
+        situation.fatorCorre = fatorAbordagem(CpuLeitura.Abordagem.CORRE);
+        situation.fatorPulo = fatorAbordagem(CpuLeitura.Abordagem.PULA);
+        situation.fatorCutuca = fatorAbordagem(CpuLeitura.Abordagem.CUTUCA);
+        situation.fatorBola = fatorAbordagem(CpuLeitura.Abordagem.BOLA) * fatorBolaLida();
         clearRequests();
         if (ai.think(CombatConfig.DT, situation, actions)) {
             walkInPlan = !roll(level.reactGuard * EDGE_STOP);
@@ -557,10 +880,34 @@ final class AiController {
             Math.abs(target.x - me.x) + PRESS_REACH_MARGIN, target.body(), target.crouchingBody())) {
             attack = null;
         }
+        marcarAbordagem(engine, out, situation.distance);
+        if (out.special != null && isEnergyStrength(out.special) &&
+            leitura.previsto(CpuLeitura.Situacao.CONTRA_BOLA) == CpuLeitura.Resposta.PULA &&
+            roll(agirPelaLeitura(CpuLeitura.Situacao.CONTRA_BOLA))) {
+            // Ele costuma pular a bola dela: solta e já fica com o antiaéreo pronto.
+            antiAereoLido = 50;
+        }
         if (attack != null) {
             startRoute(me.character(), attack);
             press(attack, me, out);
             lastReason = "neutro";
+        }
+    }
+
+    /**
+     * A bola contra o que ele costuma fazer com ela: quem pula por cima ganha menos bola (e ela
+     * fica pronta para o antiaéreo); quem fica defendendo ganha mais; quem anda por baixo, menos.
+     */
+    private double fatorBolaLida() {
+        CpuLeitura.Situacao st = CpuLeitura.Situacao.CONTRA_BOLA;
+        CpuLeitura.Resposta r = leitura.previsto(st);
+        if (r == null) return 1.0;
+        double c = agirPelaLeitura(st);
+        switch (r) {
+            case PULA: return 1.0 - 0.45 * c;
+            case AVANCA: return 1.0 - 0.3 * c;
+            case ESPERA: return 1.0 + 0.4 * c;
+            default: return 1.0;
         }
     }
 
@@ -1154,18 +1501,79 @@ final class AiController {
         int left = target.attack.totalFrames - target.attackFrame;
         float gap = Math.abs(target.x - me.x);
         if (ultraPunish(me, target, left, gap, out)) return true;
+        return punirComOMelhor(me, target, left, gap, target.crouchingBody(), out, "punir na defesa");
+    }
+
+    static final String[] NORMAIS_PUNICAO = {"H", "2H", "2M", "M", GolpeAlto.BINDING, "L", "2L"};
+    /** Quadros a mais que o especial de avanço precisa caber na brecha para valer a punição. */
+    static final int FOLGA_ESPECIAL = 8;
+
+    /**
+     * A punição mais forte que entra a tempo e alcança, como o jogador que conhece o frame data:
+     * o Super (se a barra vale), a rota do caderno a partir do primeiro passo que alcança (o L de
+     * longe não chega, o H chega, e o resto da rota vem junto), os outros golpes de chão e os
+     * especiais que avançam, pelo dano.
+     */
+    private boolean punirComOMelhor(CombatFighter me, CombatFighter target, int left, float gap, boolean crouching,
+                                    FighterInput out, String porque) {
         CharacterDefinition c = me.character();
-        for (String starter : new String[] {"L", "2L", "M"}) {
-            AttackDefinition a = c.attack(starter);
-            if (a == null || a.startupFrames > left || c.move(starter, false) == null ||
-                !CpuReach.reaches(c, starter, false, gap, target.body(), target.crouchingBody())) continue;
-            startRoute(c, starter);
-            press(starter, me, out);
+        AttackDefinition sup = c.attack("SUPER");
+        if (sup != null && left >= sup.startupFrames && OpponentAi.superInRange(c, gap) && spendSuper(me, target)) {
+            endRoute();
             guardFrames = 0;
-            lastReason = "punir na defesa";
+            out.superAttack = true;
+            lastReason = porque + " (Super)";
             return true;
         }
-        return false;
+        for (String b : ComboBook.route(c)) {
+            if (b.startsWith("j") || b.startsWith("S") || ComboBook.JUMP.equals(b) || ComboBook.AIR_JUMP.equals(b)) break;
+            if (cabe(c, b, left, gap, target, crouching)) {
+                startRoute(c, b);
+                press(b, me, out);
+                guardFrames = 0;
+                lastReason = porque + " (" + b + ")";
+                return true;
+            }
+        }
+        String melhor = null;
+        int dano = -1;
+        for (String b : NORMAIS_PUNICAO) {
+            CharacterDefinition.Move m = c.move(b, false);
+            if (m != null && m.damage > dano && cabe(c, b, left, gap, target, crouching)) {
+                melhor = b;
+                dano = m.damage;
+            }
+        }
+        CpuSpecials.Option especial = null;
+        for (CpuSpecials.Option o : CpuSpecials.of(c)) {
+            if (o.role != CpuSpecials.Role.RUSH && o.role != CpuSpecials.Role.POKE && o.role != CpuSpecials.Role.LOW &&
+                o.role != CpuSpecials.Role.ANTI_AIR && o.role != CpuSpecials.Role.ARMOR) continue;
+            // O especial que avança leva tempo para chegar: só com folga (de longe ele saía no vazio
+            // e ela levava o troco), e só se nenhum golpe de chão entra.
+            if (melhor != null || o.attack.startupFrames + FOLGA_ESPECIAL > left ||
+                !CpuSpecials.reaches(o, gap, target.body(), crouching) || !lifeAllows(me, o) || o.attack.damage <= dano) continue;
+            especial = o;
+            dano = o.attack.damage;
+        }
+        if (especial != null) {
+            pressSpecial(especial, out);
+            guardFrames = 0;
+            lastReason = porque + " (" + especial.id + ")";
+            return true;
+        }
+        if (melhor == null) return false;
+        startRoute(c, melhor);
+        press(melhor, me, out);
+        guardFrames = 0;
+        lastReason = porque + " (" + melhor + ")";
+        return true;
+    }
+
+    /** O golpe de chão {@code b} sai antes de {@code left} quadros e alcança daqui. */
+    private static boolean cabe(CharacterDefinition c, String b, int left, float gap, CombatFighter target, boolean crouching) {
+        AttackDefinition a = c.attack(b);
+        return a != null && c.move(b, false) != null && a.startupFrames <= left &&
+            CpuReach.reaches(c, b, false, gap, target.body(), crouching);
     }
 
     private boolean punish(CombatEngine engine, CombatFighter me, CombatFighter target,
@@ -1177,29 +1585,7 @@ final class AiController {
         int left = seen.recoveryLeft() - level.reactionFrames;
         float gap = Math.abs(seen.x - me.x);
         if (ultraPunish(me, target, left, gap, out)) return true;
-        CharacterDefinition c = me.character();
-        for (String starter : new String[] {"M", "L", "2L"}) {
-            AttackDefinition a = c.attack(starter);
-            if (a == null || a.startupFrames > left ||
-                !CpuReach.reaches(c, starter, false, gap, target.body(), seen.crouching)) continue;
-            startRoute(c, starter);
-            press(starter, me, out);
-            guardFrames = 0;
-            lastReason = "punir";
-            return true;
-        }
-        // Longe demais para os golpes comuns: o especial que avança (ou alcança) e sai a tempo.
-        for (CpuSpecials.Option o : CpuSpecials.of(c)) {
-            if (o.role != CpuSpecials.Role.RUSH && o.role != CpuSpecials.Role.POKE && o.role != CpuSpecials.Role.LOW &&
-                o.role != CpuSpecials.Role.ANTI_AIR && o.role != CpuSpecials.Role.ARMOR) continue;
-            if (o.attack.startupFrames > left || !CpuSpecials.reaches(o, gap, target.body(), seen.crouching) ||
-                !lifeAllows(me, o)) continue;
-            pressSpecial(o, out);
-            guardFrames = 0;
-            lastReason = "punir (" + o.id + ")";
-            return true;
-        }
-        return false;
+        return punirComOMelhor(me, target, left, gap, seen.crouching, out, "punir");
     }
 
     /**
@@ -1218,7 +1604,7 @@ final class AiController {
         if (seen.jumpSerial != lastAntiAirSerial) {
             lastAntiAirSerial = seen.jumpSerial;
             boolean coming = (me.x - seen.x) * seen.vx > 0f || Math.abs(seen.x - me.x) < 200f;
-            antiAirPlan = coming && roll(level.antiAir);
+            antiAirPlan = coming && roll(antiAereoLido > 0 ? Math.max(level.antiAir, 0.95) : level.antiAir);
             antiAirSpecial = antiAirPlan && specialRandom.nextDouble() < SPECIAL_ANTI_AIR_SHARE;
         }
         if (!antiAirPlan) return false;

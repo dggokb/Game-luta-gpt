@@ -51,6 +51,12 @@ final class OpponentAi {
         float urgency;
         /** O rival anda soltando bola (várias há pouco): ela vai atrás, ou devolve com a dela. */
         boolean rivalZoning;
+        /**
+         * O que a leitura dela aprendeu ({@link CpuLeitura}): quanto puxar cada jeito de chegar
+         * (correr, pular, cutucar de longe, soltar bola). 1 = o estilo puro; abaixo, o que tem
+         * sido punido. Multiplica as chances do estilo, não troca o estilo.
+         */
+        double fatorCorre = 1.0, fatorPulo = 1.0, fatorCutuca = 1.0, fatorBola = 1.0;
     }
 
     /** A pressa começa com este tanto de segundos no relógio e chega ao máximo neste outro. */
@@ -157,6 +163,10 @@ final class OpponentAi {
             s.distance > s.throwReach && s.distance < 280f && random.nextDouble() < GRAPPLER_CLOSE_IN) {
             groundAttack = null;
         }
+        // A cutucada de longe tem sido punida (ele espera e pune no vazio): às vezes deixa.
+        if (groundAttack != null && s.fatorCutuca < 1.0 && s.distance > 150f && random.nextDouble() > s.fatorCutuca) {
+            groundAttack = null;
+        }
         // Quem luta de longe recua para a distância dele em vez de bater colado.
         boolean keepAway = !s.selfAirborne && s.distance < style.preferredDistance - 60f &&
             aggression < 0.5 && random.nextDouble() < 0.5 * (1.0 - u);
@@ -184,7 +194,7 @@ final class OpponentAi {
         } else if (
             energyInRange(s.self, s.distance, s.target) &&
             !s.projectileActive &&
-            random.nextDouble() < Math.min(0.6, 0.24 * style.zoning) * (1.0 - 0.5 * u)
+            random.nextDouble() < Math.min(0.6, 0.24 * style.zoning * s.fatorBola) * (1.0 - 0.5 * u)
         ) {
             double r = random.nextDouble();
             actions.energy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
@@ -198,7 +208,7 @@ final class OpponentAi {
             actions.moveBack();
         } else if (s.distance < 82f && random.nextDouble() < 0.38 * (1.5 - aggression) * (1.0 - u)) {
             actions.backdash();
-        } else if (s.distance > 360f * (1f - 0.4f * u) && random.nextDouble() < 0.38 * (0.5 + aggression)) {
+        } else if (s.distance > 360f * (1f - 0.4f * u) && random.nextDouble() < 0.38 * (0.5 + aggression) * s.fatorCorre) {
             // Longe: corre. Com pressa corre já de mais perto.
             actions.moveForward(true);
         } else if (groundAttack == null && s.distance > CombatRules.MIN_MELEE_DISTANCE &&
@@ -206,7 +216,7 @@ final class OpponentAi {
             // Approach until at least one ground move can reach the target (inside the preferred
             // distance only as often as the style is aggressive).
             actions.moveForward(false);
-        } else if (random.nextDouble() < 0.12 * style.jumping * DECISION_PACE) {
+        } else if (random.nextDouble() < 0.12 * style.jumping * DECISION_PACE * s.fatorPulo) {
             // Decidindo mais vezes, a chance por decisão cai junto: os pulos por segundo ficam.
             actions.jump(random.nextDouble() < 0.32);
         } else if (s.targetAlive && !s.selfAirborne) {
