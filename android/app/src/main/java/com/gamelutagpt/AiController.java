@@ -495,7 +495,8 @@ final class AiController {
 
     /**
      * Uma tentativa em andamento: de onde partiu (vidas e distância). O resultado é a vida que ela
-     * tirou menos a que perdeu (em vinte avos da vida, meio ponto cada) mais o quanto chegou perto.
+     * tirou menos a que perdeu (em vinte avos da vida, meio ponto cada) mais o quanto chegou perto
+     * (só se chegou sem apanhar).
      */
     static final class Tentativa {
         int inicio = -1, vidaEu, vidaEle;
@@ -513,7 +514,10 @@ final class AiController {
             int tirou = vidaEle - target.state.life, perdeu = vidaEu - me.state.life;
             if (tirou < 0 || perdeu < 0) return Double.NaN;
             double unidade = Math.max(1.0, me.state.profile.maxLife * 0.05);
-            double r = 0.5 * (tirou - perdeu) / unidade + (gap - Math.abs(target.x - me.x)) / 400.0;
+            // Chegar perto só vale se chegou sem apanhar: pular e levar o antiaéreo também termina
+            // colado, e contava como bom (ela insistia no pulo contra quem tira do ar).
+            double perto = perdeu > 0 ? 0.0 : (gap - Math.abs(target.x - me.x)) / 400.0;
+            double r = 0.5 * (tirou - perdeu) / unidade + perto;
             return Math.max(-1.5, Math.min(1.5, r));
         }
     }
@@ -634,6 +638,11 @@ final class AiController {
             return false;
         }
         if (me.energyRunFrames > 0) {
+            // Chegou correndo: emenda a pressão (o 2L que abre o combo), sem parar colado.
+            if (seen.projectileGap == Float.MAX_VALUE && pressionar(me, engine.fighter(1 - me.index), out)) {
+                corridaSerial = -1;
+                return true;
+            }
             out.direction = frente;
             out.dash = true;
             dashing = movingForward = true;
@@ -739,11 +748,15 @@ final class AiController {
             double s = smart();
             for (CpuLeitura.PlanoMeio p : CpuLeitura.PlanoMeio.values()) {
                 pode[p.ordinal()] = p != CpuLeitura.PlanoMeio.CORRE || me.state.superMeter >= engine.config.energyRunCost;
+                // Pressionar e agarrar são de perto.
+                if (p == CpuLeitura.PlanoMeio.PRESSIONA || p == CpuLeitura.PlanoMeio.AGARRA) pode[p.ordinal()] = faixa == CpuLeitura.Faixa.PERTO;
                 double prior;
                 switch (p) {
                     case ANDA: prior = 0.2 + 0.5 * (style.aggression - 0.7); break;
                     case ESPERA: prior = 0.2 + 0.5 * (style.patience - 0.8); break;
                     case PULA: prior = -0.7 + 0.7 * style.jumping + 0.5 * level.jumpProjectile; break;
+                    case PRESSIONA: prior = 0.3 + 0.5 * (style.aggression - 0.7); break;
+                    case AGARRA: prior = -0.4 + 0.3 * (style.throwing - 1.0); break;
                     default: prior = -1.0 + (style.aggression - 0.7) + 0.6 * s; break;
                 }
                 logit[p.ordinal()] = prior + aprendido(leitura.valor(faixa, p), leitura.vezes(faixa, p));
@@ -774,6 +787,14 @@ final class AiController {
                 guardFrames = 0;
                 lastReason = "pula antes da bola";
                 return true;
+            case PRESSIONA:
+                // Colado em quem zoneia: o 2L (rápido e baixo) que abre o combo; fora do alcance, anda.
+                if (pressionar(me, target, out)) meioQuadros = 0;
+                return true;
+            case AGARRA:
+                agarrar(engine, me, target, out, "contra quem zoneia: ");
+                if (out.grab) meioQuadros = 0;
+                return true;
             case CORRE:
                 meioQuadros = 0;
                 corridaSerial = Integer.MAX_VALUE;   // sem bola: a corrida vai até acabar
@@ -790,6 +811,27 @@ final class AiController {
                 lastReason = "avança contra a bola";
                 return true;
         }
+    }
+
+    /**
+     * Pressão de perto: o 2L (ou o L) que alcança, começando a rota de combo (o combo segue se
+     * acertar); fora do alcance, anda até ele. Verdadeiro quando apertou.
+     */
+    private boolean pressionar(CombatFighter me, CombatFighter target, FighterInput out) {
+        CharacterDefinition c = me.character();
+        float gap = Math.abs(target.x - me.x);
+        for (String b : new String[] {"2L", "L"}) {
+            if (c.move(b, false) != null && CpuReach.reaches(c, b, false, gap, target.body(), target.crouchingBody())) {
+                startRoute(c, b);
+                press(b, me, out);
+                lastReason = "pressiona (" + b + ")";
+                return true;
+            }
+        }
+        movingForward = true;
+        out.direction = me.facing > 0 ? 1 : 5;
+        lastReason = "chega para pressionar";
+        return false;
     }
 
     /** A tentativa de chegar que ela acabou de soltar no neutro. */

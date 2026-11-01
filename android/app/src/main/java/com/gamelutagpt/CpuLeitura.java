@@ -34,9 +34,10 @@ final class CpuLeitura {
     /**
      * Perto ou na meia distância de quem fica soltando bola, sem bola na tela (a próxima, de perto,
      * chega antes da reação): segue (anda; colado, o neutro decide), espera defendendo (e pune a
-     * bola defendida), pula antes ou corre com a barra. Cada faixa aprende separado.
+     * bola defendida), pula antes ou corre com a barra; colado, também pressiona (o 2L que abre o
+     * combo) ou agarra quem só defende. Cada faixa aprende separado.
      */
-    enum PlanoMeio { ANDA, ESPERA, PULA, CORRE }
+    enum PlanoMeio { ANDA, ESPERA, PULA, CORRE, PRESSIONA, AGARRA }
 
     /** A faixa de distância do plano antes da bola. */
     enum Faixa { PERTO, MEIO }
