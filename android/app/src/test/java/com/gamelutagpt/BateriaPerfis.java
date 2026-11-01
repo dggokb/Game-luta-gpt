@@ -209,12 +209,53 @@ public final class BateriaPerfis {
 
     // ------------------------------------------------------------------ semelhança
 
+    /**
+     * Escala congelada (média e desvio por coluna, de uma rodada de referência): com ela, as notas
+     * de rodadas diferentes ficam comparáveis (se o elenco se espalha, as distâncias crescem). O
+     * desvio tem piso de 10% da média, para uma coluna quase igual na referência não explodir.
+     */
+    static Map<String, double[]> ESCALA;
+
+    static void lerOuGravarEscala(String arquivo, Fichas... fichas) throws IOException {
+        java.nio.file.Path p = Paths.get(arquivo);
+        ESCALA = new LinkedHashMap<>();
+        if (Files.exists(p)) {
+            for (String l : Files.readAllLines(p, StandardCharsets.UTF_8)) {
+                String[] c = l.split(";");
+                if (c.length == 3) ESCALA.put(c[0], new double[] {Double.parseDouble(c[1]), Double.parseDouble(c[2])});
+            }
+            return;
+        }
+        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(p, StandardCharsets.UTF_8))) {
+            for (Fichas f : fichas) for (Map.Entry<String, double[]> e : f.col.entrySet()) {
+                double[] v = e.getValue();
+                double media = Arrays.stream(v).average().orElse(0);
+                double dp = Math.sqrt(Arrays.stream(v).map(x -> (x - media) * (x - media)).sum() / v.length);
+                dp = Math.max(dp, Math.max(0.1 * Math.abs(media), 1e-3));
+                ESCALA.put(e.getKey(), new double[] {media, dp});
+                w.println(e.getKey() + ";" + media + ";" + dp);
+            }
+        }
+    }
+
     /** Notas z por coluna; as colunas iguais para todos ficam de fora (e são listadas). */
     static double[][] notas(Fichas f, List<String> usadas, List<String> iguais) {
         int n = BateriaBalanco.ELENCO.length;
         List<double[]> cols = new ArrayList<>();
         for (Map.Entry<String, double[]> e : f.col.entrySet()) {
             double[] v = e.getValue();
+            if (ESCALA != null) {
+                double[] mdp = ESCALA.get(e.getKey());
+                if (mdp == null) {
+                    iguais.add(e.getKey() + " (fora da escala)");
+                    continue;
+                }
+                usadas.add(e.getKey());
+                double[] z = new double[n];
+                for (int i = 0; i < n; i++) z[i] = (v[i] - mdp[0]) / mdp[1];
+                cols.add(z);
+                continue;
+            }
             double media = Arrays.stream(v).average().orElse(0);
             double dp = Math.sqrt(Arrays.stream(v).map(x -> (x - media) * (x - media)).sum() / n);
             if (dp < 1e-9 || dp / Math.max(1e-9, Math.abs(media)) < 0.005) {
@@ -336,6 +377,50 @@ public final class BateriaPerfis {
         if (!iguais.isEmpty()) System.out.println("\nIguais para os 16: " + String.join("; ", iguais) + ".");
     }
 
+    static double media(double[][] d, int[] quem) {
+        double s = 0;
+        int n = 0;
+        for (int a : quem) for (int b : quem) if (a < b) {
+            s += d[a][b];
+            n++;
+        }
+        return n == 0 ? 0 : s / n;
+    }
+
+    /** O resumo de uma rodada, para pôr lado a lado com as outras (docs/balanco/identidade.md). */
+    static void resumo(double[][] dF, double[][] dL, double[][] dT, double[] ruido, Fichas luta, Fichas fixa) {
+        int[] todos = new int[16];
+        for (int i = 0; i < 16; i++) todos[i] = i;
+        int[] nucleo = {0, 1, 2, 3, 4, 9};
+        int perto = 0;
+        double menor = 9;
+        String par = "";
+        for (int a = 0; a < 16; a++) for (int b = a + 1; b < 16; b++) {
+            if (dT[a][b] < 0.9) perto++;
+            if (dT[a][b] < menor) {
+                menor = dT[a][b];
+                par = NOMES[a] + " e " + NOMES[b];
+            }
+        }
+        double[] v = luta.col.get("vitórias (%)");
+        double mv = Arrays.stream(v).average().orElse(0);
+        double dpv = Math.sqrt(Arrays.stream(v).map(x -> (x - mv) * (x - mv)).sum() / 16);
+        BateriaBalanco.titulo("RESUMO" + (ESCALA != null ? " (escala congelada)" : ""));
+        System.out.println("| medida | valor |");
+        System.out.println("|---|---|");
+        System.out.println("| distância média entre pares: fixa / luta / total | " + f2(media(dF, todos)) + " / " + f2(media(dL, todos)) + " / " + f2(media(dT, todos)) + " |");
+        System.out.println("| núcleo (Ryūga, Yin-lu, Kōga, p04, p05, p10): fixa / luta / total | " + f2(media(dF, nucleo)) + " / " + f2(media(dL, nucleo)) + " / " + f2(media(dT, nucleo)) + " |");
+        System.out.println("| pares com total abaixo de 0,9 | " + perto + " de 120 |");
+        System.out.println("| par mais parecido | " + par + " (" + f2(menor) + ") |");
+        System.out.println("| piso de ruído (média) | " + f2(Arrays.stream(ruido).average().orElse(0)) + " |");
+        System.out.println("| vitórias: desvio / mín / máx | " + f1(dpv) + " / " + f1(Arrays.stream(v).min().orElse(0)) + " / " + f1(Arrays.stream(v).max().orElse(0)) + " |");
+        for (String k : new String[] {"dano de normal no ar (%)", "dano de agarrão (%)", "dano de projétil (%)", "dano de especial (%)",
+            "distância no neutro (px)", "avança no neutro (%)", "pulos por minuto"}) {
+            double[] c = luta.col.get(k);
+            System.out.println("| " + k + ": média / mín / máx | " + f1(Arrays.stream(c).average().orElse(0)) + " / " + f1(Arrays.stream(c).min().orElse(0)) + " / " + f1(Arrays.stream(c).max().orElse(0)) + " |");
+        }
+    }
+
     static void csv(String arquivo, double[][] d) throws IOException {
         try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(Paths.get(arquivo), StandardCharsets.UTF_8))) {
             w.println("," + String.join(",", NOMES));
@@ -351,6 +436,7 @@ public final class BateriaPerfis {
         int sementes = args.length > 0 ? Integer.parseInt(args[0]) : 4;
         int nivel = args.length > 1 ? Integer.parseInt(args[1]) : BateriaBalanco.NIVEL;
         String pasta = args.length > 2 ? args[2] : null;
+        String escala = args.length > 3 ? args[3] : null;
         long t0 = System.currentTimeMillis();
         System.out.println("# Perfis dos 16 (CPU nível " + nivel + ", " + sementes + " sementes por confronto, dos dois lados)");
 
@@ -361,6 +447,7 @@ public final class BateriaPerfis {
         tabelaFichas("Ficha fixa (o que está no pacote)", fixa);
         tabelaFichas("Ficha de luta (o que faz contra os outros 15)", luta);
 
+        if (escala != null) lerOuGravarEscala(escala, fixa, luta);
         List<String> usF = new ArrayList<>(), igF = new ArrayList<>(), usL = new ArrayList<>(), igL = new ArrayList<>();
         double[][] zF = notas(fixa, usF, igF), zL = notas(luta, usL, igL);
         espalhamento("O quanto cada coluna fixa varia", fixa, igF);
@@ -374,7 +461,7 @@ public final class BateriaPerfis {
             for (String k : usL) {
                 double[] v = luta.col.get(k);
                 double media = Arrays.stream(v).average().orElse(0);
-                double dp = Math.sqrt(Arrays.stream(v).map(x -> (x - media) * (x - media)).sum() / 16);
+                double dp = ESCALA != null ? ESCALA.get(k)[1] : Math.sqrt(Arrays.stream(v).map(x -> (x - media) * (x - media)).sum() / 16);
                 double dz = (luta.col.get(k)[i] - luta2.col.get(k)[i]) / dp;
                 s += dz * dz;
                 nc++;
@@ -400,6 +487,7 @@ public final class BateriaPerfis {
         marcas(zF, usF, fixa);
         marcas(zL, usL, luta);
 
+        resumo(dF, dL, dT, ruido, luta, fixa);
         if (pasta != null) {
             csv(pasta + "/perfis_fixa.csv", dF);
             csv(pasta + "/perfis_luta.csv", dL);
