@@ -1239,3 +1239,32 @@ próprio.
 
 Efeito nas vitórias (CPU nível 8, 1x1): Ryūga 62% → 74%, p05 52% → 60%. O resto fica dentro de
 ±4 pontos.
+
+## S de projétil com duração de mercado (pedido do jogador, 01/11)
+
+**Pedido:** o jogador ganhou "só soltando magia" com o Ryūga. A `BateriaBola` (o Ryūga apertando a
+Onda sempre que pode, contra a CPU de cada um dos 16) confirmou: a CPU vencia 1% das lutas, nos
+níveis 5 e 8.
+
+**Causa (medida):** o S de projétil durava 18–29 quadros. A Onda do Ryūga: 6 + 1 + 11 = 18. No
+SF6 o Hadoken dura 47 e no Fatal Fury a bola dura 47–49. Com 18 quadros a próxima bola sai antes
+de dar para pular e chegar.
+
+**O que mudou:**
+- A recuperação do S de projétil vai até ~46 quadros no total, com o início de cada um mantido:
+  Ryūga e player_two 6/1/11 → 6/1/39; p02 9/1/16 → 9/1/36; p03, p04, p06, p08 e p11 → 10/1/35;
+  p05 e p10 8/1/15 → 8/1/37; p09 13/1/23 → 13/1/32; p15 14/1/20 → 14/1/31.
+- A base do `mecanicas.json` vai de [10, 1, 18] para [10, 1, 35].
+- O impacto da animação foi reencaixado (`fit_impact`).
+- Ficam como estavam: o S de perto (p07, Necro, p14), o p16 (26/1/22 = 49), o Krüger e o Koga 8.
+
+**Medido depois:**
+
+| Medida | Antes | Depois |
+|---|---|---|
+| CPU contra o Ryūga que só solta Onda (nível 8 / 5) | 1% / 1% | 11% / 7% |
+| Vitórias do Ryūga (CPU × CPU, 1x1) | 75% | 66% |
+
+No jeito de lutar, 14 dos 16 mudaram além do ruído (`BateriaPerfis`, S6 → S7). A CPU ainda perde
+para quem só solta bola: o resto vem da CPU que aprende e das mecânicas contra bola, os próximos
+passos.

@@ -36,18 +36,18 @@
       "attack": {
         "startupFrames": 10,
         "activeFrames": 1,
-        "recoveryFrames": 18,
+        "recoveryFrames": 35,
         "hitstunFrames": 26,
         "blockstunFrames": 20,
         "hitstopFrames": 6,
         "cancelWindows": {
           "hit": [
             10,
-            28
+            44
           ],
           "block": [
             10,
-            28
+            44
           ],
           "whiff": null
         },
@@ -7015,17 +7015,17 @@
       ],
       "loop": false,
       "durationsMs": [
-        41,
-        41,
-        41,
-        41,
+        25,
+        25,
+        25,
+        25,
         47,
-        47,
-        47,
-        41,
-        47,
-        47,
-        44
+        58,
+        58,
+        51,
+        58,
+        58,
+        54
       ],
       "impactFrame": 4,
       "silhueta": {
