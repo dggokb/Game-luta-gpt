@@ -3725,12 +3725,20 @@ final class CombatEngine {
         }
 
         boolean newSession = sessions[d.index] == null;
+        // Contra-golpe: abriu o combo em quem estava apertando botão (início, ativo ou recuperação).
+        boolean counterHit = newSession && d.attacking() && attack.kind != AttackDefinition.Kind.SUPER
+            && attack.strength != AttackDefinition.Strength.SUPER;
+        if (counterHit) {
+            raw = raw * config.counterHitDamagePermille / 1000;
+            cues.add("COUNTER_HIT");
+        }
         session = sessionFor(a, d);
         // The move's first strike that hits pays meter and sets the combo scale; the later
         // strikes keep that scale (a new combo starts over as a first strike).
         boolean firstStrike = multiProjectile ? c.strike == 0 || newSession : !multi || !a.strikeLanded || newSession;
         if (multi || (!projectile && attack.mechanics.rebound)) a.strikeLanded = true;   // o rebote de um chute só também pula para trás
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
+        if (counterHit) hitstun += attack.strength == AttackDefinition.Strength.LIGHT ? config.counterHitLightFrames : config.counterHitFrames;
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
         // SHINKAI POWER: o H joga na parede, mesmo sozinho no neutro, e ele volta quicando.

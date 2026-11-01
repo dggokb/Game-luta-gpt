@@ -333,6 +333,14 @@ final class CombatConfig {
     /** Congelamento extra do acerto no punish counter e no golpe que nocauteia (peso do impacto). */
     int punishHitstopBonus = 8;
     /**
+     * Contra-golpe: o primeiro acerto de um combo em quem está no meio do próprio golpe (início,
+     * ativo ou recuperação) tira mais e prende mais, como o Counter do SF6 e do COTW
+     * (docs/balanco/chao.md). Super e Ultra não contam.
+     */
+    int counterHitDamagePermille = 1200;
+    int counterHitLightFrames = 2;
+    int counterHitFrames = 4;
+    /**
      * Pose do impacto (como no FighterZ): golpes que acertam congelam um pouco mais, para a pose
      * esticada "grudar" na tela. Os dois lutadores congelam juntos, então a vantagem e os combos
      * não mudam. Defesa não ganha. Com o hitstop do golpe dá ~9/12/15 quadros (fraco/médio/
