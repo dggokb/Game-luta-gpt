@@ -34,18 +34,18 @@
       "attack": {
         "startupFrames": 14,
         "activeFrames": 1,
-        "recoveryFrames": 31,
+        "recoveryFrames": 24,
         "hitstunFrames": 20,
         "blockstunFrames": 14,
         "hitstopFrames": 6,
         "cancelWindows": {
           "hit": [
             14,
-            43
+            37
           ],
           "block": [
             14,
-            43
+            37
           ],
           "whiff": null
         },
@@ -56,7 +56,7 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Seiken Hadō",
+      "nome": "Seiken Had\u014d",
       "visual": "ONDA_CURTA"
     },
     "super": {
@@ -9557,29 +9557,29 @@
       ],
       "loop": false,
       "durationsMs": [
-        21,
-        21,
-        21,
-        21,
-        21,
-        21,
-        21,
-        11,
-        11,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        13,
+        13,
         17,
-        23,
-        23,
-        23,
-        45,
-        45,
-        45,
-        45,
-        23,
-        23,
-        23,
-        23,
-        23,
-        33
+        21,
+        21,
+        21,
+        41,
+        41,
+        41,
+        41,
+        21,
+        21,
+        21,
+        21,
+        21,
+        30
       ],
       "impactFrame": 9,
       "silhueta": {

@@ -81,8 +81,7 @@ perfeita absorve a bola, a corrida de energia atravessa a bola) e o S com ~46 qu
   e muitas vezes nem reage, por desenho. Ele melhora junto com a proposta acima.
 - **O Natisuko (p15) é o mais fraco e caiu mais:** 14% → 10% (S de mercado) → 7%. A bola dele
   tem início de 14 quadros e alcance curto (320). Com 46 quadros no total, ele é quem mais perde.
-  **Proposta:** devolver um pouco de recuperação só a ele (14/1/31 → 14/1/24), num commit isolado
-  com antes e depois.
+  **Feito:** o S dele passou de 14/1/31 para 14/1/24, e ele voltou a 13% (veja `ajustes.md`).
 
 ## Testes que mudaram (e por quê)
 

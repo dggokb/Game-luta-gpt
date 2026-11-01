@@ -1293,3 +1293,15 @@ neutralSpecial 2,5), o nível 1 soltava quase tantos especiais quanto o 8.
 **Medido depois (S7 → S8, as duas mecânicas mais a CPU que aprende):** vitórias da CPU contra o
 Ryūga que só solta Onda, nível 8 / 5: 11% / 7% → 56% / 13%. O Natisuko (p15), que já era o mais
 fraco, foi de 10% para 7% (CPU × CPU). Veja `cpu-contra-bola.md`.
+
+## Natisuko (p15): o S de projétil um pouco mais curto (pedido do jogador, 01/11)
+
+**Por quê:** o Natisuko era o mais fraco do elenco (14% de vitórias, CPU × CPU, nível 8). Com o S
+de mercado ele caiu para 10%, e com a CPU que aprende, para 7%. A bola dele já começa devagar (14
+quadros) e vai pouco longe (alcance de 320). Com 46 quadros no total, quem mais perdia era ele.
+
+**O que mudou:** o S passou de 14/1/31 (46 quadros) para 14/1/24 (39 quadros). As janelas de
+cancelamento foram reencaixadas e o impacto da animação também (`fit_impact`).
+
+**Medido depois** (`BateriaPerfis`, S8 → S9): o Natisuko foi de 7% para 13%. Nenhum dos outros 15
+mudou além do ruído. No jeito de lutar, a mudança do Natisuko foi de 0,28, com ruído de 0,14.
