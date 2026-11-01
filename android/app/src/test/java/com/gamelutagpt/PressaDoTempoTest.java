@@ -25,11 +25,11 @@ public class PressaDoTempoTest {
         assertTrue("fica menos defendendo: " + calm[2] + " → " + hurried[2], hurried[2] < calm[2]);
     }
 
-    /** CPU nível 5 contra outra CPU calma: golpes começados, dano dado e quadros defendendo. */
+    /** CPU nível 5 contra outra CPU calma, em 64 lutas (com 32 o dano ficava no limite, 0,5%): golpes começados, dano dado e quadros defendendo. */
     private static int[] fight(int secondsLeft) {
         String[] ids = {"player_base", "p03", "p05", "p07", "p09", "p12", "p02", "p10"};
         int starts = 0, damage = 0, guarding = 0;
-        for (int seed = 1; seed <= 32; seed++) {
+        for (int seed = 1; seed <= 64; seed++) {
             Random r = new Random(seed);
             FighterState p = new FighterState(GeneratedCharacters.get(ids[r.nextInt(ids.length)]), "P1");
             FighterState c = new FighterState(GeneratedCharacters.get(ids[r.nextInt(ids.length)]), "CPU");
