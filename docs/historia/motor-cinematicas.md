@@ -266,9 +266,9 @@ reserva na cena.
 
 Na campanha do Kōga, o convite é **Kōga × Brucy** (beco do Brucy) com a mesma cena
 (`historia/ep02/cinematica_convite_koga.json`): o Brucy com 20%, falas dele e do Kōga ("Vamos ver
-se você aguenta, \"Líder\"") e os golpes do Kōga (M, H, S4 mergulho, S2 punho em sequência). É
-uma **prévia**: as duas páginas são provisórias (as do Kōga no Episódio 1, `ep01/pag1_koga.jpg` e
-`pag2_koga.jpg`) até chegarem as oficiais.
+se você aguenta, \"Líder\"") e os golpes do Kōga (M, H, S4 mergulho, S2 punho em sequência). As
+duas páginas são a lembrança do beco (`ep02/lembranca_koga1.jpg` e `lembranca_koga2.jpg`): o Kōga
+sozinho contra a gangue, o Brucy chega e os dois derrubam todo mundo.
 
 Para ver no PC sem jogar: `gradle :pc:testeQte` (a do Kōga: `-Pirmao=koga`) joga a luta inteira de verdade (passa as páginas,
 deixa a Yin-lu com 19%, lê as duas páginas, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
