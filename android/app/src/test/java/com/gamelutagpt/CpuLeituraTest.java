@@ -58,4 +58,33 @@ public class CpuLeituraTest {
         l.esquecerTudo();
         assertNull(l.previsto(DEFESA));
     }
+
+    @Test public void oPlanoContraABolaValeOQueRendeuPorUltimo() {
+        CpuLeitura l = new CpuLeitura();
+        CpuLeitura.PlanoBola pula = CpuLeitura.PlanoBola.PULA;
+        assertEquals(0.0, l.valor(pula), 0.0);
+        for (int i = 0; i < 4; i++) l.resultado(pula, -1.0);
+        assertEquals(-1.0, l.valor(pula), 1e-9);
+        l.resultado(pula, 1.0);
+        double depois = l.valor(pula);
+        assertTrue("o resultado novo puxa: " + depois, depois > -1.0 && depois < 0.0);
+        assertEquals(0.0, l.vezes(CpuLeitura.PlanoBola.DEFENDE), 0.0);
+        // Luta nova: o valor fica, a confiança cai (vale tentar de novo).
+        double vezes = l.vezes(pula);
+        l.novaLuta();
+        assertEquals(depois, l.valor(pula), 1e-9);
+        assertEquals(vezes * CpuLeitura.ENTRE_LUTAS, l.vezes(pula), 1e-9);
+        l.esquecerTudo();
+        assertEquals(0.0, l.valor(pula), 0.0);
+        assertEquals(0.0, l.vezes(pula), 0.0);
+    }
+
+    @Test public void cadaFaixaAprendeSeparado() {
+        CpuLeitura l = new CpuLeitura();
+        l.resultado(CpuLeitura.Faixa.PERTO, CpuLeitura.PlanoMeio.ESPERA, 1.0);
+        l.resultado(CpuLeitura.Faixa.MEIO, CpuLeitura.PlanoMeio.ESPERA, -1.0);
+        assertEquals(1.0, l.valor(CpuLeitura.Faixa.PERTO, CpuLeitura.PlanoMeio.ESPERA), 1e-9);
+        assertEquals(-1.0, l.valor(CpuLeitura.Faixa.MEIO, CpuLeitura.PlanoMeio.ESPERA), 1e-9);
+        assertTrue(l.resumo().contains("perto:espera=+1.00"));
+    }
 }

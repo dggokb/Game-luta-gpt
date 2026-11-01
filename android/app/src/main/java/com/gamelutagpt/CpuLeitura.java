@@ -24,6 +24,23 @@ final class CpuLeitura {
 
     enum Abordagem { CORRE, PULA, BOLA, CUTUCA }
 
+    /**
+     * O que ela faz com a bola dele vindo: defende, defesa perfeita (absorve), pula por cima,
+     * corrida de energia (atravessa), devolve outra bola, o especial do kit (repel, esquiva). Cada bola é uma tentativa, e o resultado
+     * dela (vida tirada menos vida perdida, e o quanto chegou perto) vai para o valor do plano.
+     */
+    enum PlanoBola { DEFENDE, PERFEITA, PULA, CORRE, DEVOLVE, ESPECIAL }
+
+    /**
+     * Perto ou na meia distância de quem fica soltando bola, sem bola na tela (a próxima, de perto,
+     * chega antes da reação): segue (anda; colado, o neutro decide), espera defendendo (e pune a
+     * bola defendida), pula antes ou corre com a barra. Cada faixa aprende separado.
+     */
+    enum PlanoMeio { ANDA, ESPERA, PULA, CORRE }
+
+    /** A faixa de distância do plano antes da bola. */
+    enum Faixa { PERTO, MEIO }
+
     /** Peso que as observações de antes ficam a cada observação nova da mesma situação. */
     static final double ESQUECE = 0.85;
     /** Quanto da memória fica de uma luta para a outra. */
@@ -39,6 +56,32 @@ final class CpuLeitura {
     private final double[][] conta = new double[Situacao.values().length][Resposta.values().length];
     private final double[] falhas = new double[Abordagem.values().length];
     private final double[] acertos = new double[Abordagem.values().length];
+    private final double[] valorPlano = new double[PlanoBola.values().length];
+    private final double[] vezesPlano = new double[PlanoBola.values().length];
+
+    private final double[][] valorMeio = new double[Faixa.values().length][PlanoMeio.values().length];
+    private final double[][] vezesMeio = new double[Faixa.values().length][PlanoMeio.values().length];
+
+    private static void soma(double[] valor, double[] vezes, int i, double r) {
+        double antes = vezes[i] * ESQUECE;
+        valor[i] = (valor[i] * antes + r) / (antes + 1.0);
+        vezes[i] = antes + 1.0;
+    }
+
+    /** O plano {@code p} contra a bola rendeu {@code r} (positivo: valeu; negativo: apanhou). */
+    void resultado(PlanoBola p, double r) { soma(valorPlano, vezesPlano, p.ordinal(), r); }
+
+    /** Quanto o plano tem rendido (média com esquecimento; 0 sem tentativa). */
+    double valor(PlanoBola p) { return valorPlano[p.ordinal()]; }
+
+    /** Tentativas do plano (já com o esquecimento). */
+    double vezes(PlanoBola p) { return vezesPlano[p.ordinal()]; }
+
+    void resultado(Faixa f, PlanoMeio p, double r) { soma(valorMeio[f.ordinal()], vezesMeio[f.ordinal()], p.ordinal(), r); }
+
+    double valor(Faixa f, PlanoMeio p) { return valorMeio[f.ordinal()][p.ordinal()]; }
+
+    double vezes(Faixa f, PlanoMeio p) { return vezesMeio[f.ordinal()][p.ordinal()]; }
 
     /** O rival fez {@code r} na situação {@code s}. */
     void observa(Situacao s, Resposta r) {
@@ -104,6 +147,9 @@ final class CpuLeitura {
             falhas[i] *= ENTRE_LUTAS;
             acertos[i] *= ENTRE_LUTAS;
         }
+        // O valor dos planos fica; a confiança nele cai (vale tentar de novo o que falhou).
+        for (int i = 0; i < vezesPlano.length; i++) vezesPlano[i] *= ENTRE_LUTAS;
+        for (double[] v : vezesMeio) for (int i = 0; i < v.length; i++) v[i] *= ENTRE_LUTAS;
     }
 
     /** Campanha nova (ou outro jogador): esquece tudo. */
@@ -111,6 +157,10 @@ final class CpuLeitura {
         for (double[] c : conta) java.util.Arrays.fill(c, 0);
         java.util.Arrays.fill(falhas, 0);
         java.util.Arrays.fill(acertos, 0);
+        java.util.Arrays.fill(valorPlano, 0);
+        java.util.Arrays.fill(vezesPlano, 0);
+        for (double[] v : valorMeio) java.util.Arrays.fill(v, 0);
+        for (double[] v : vezesMeio) java.util.Arrays.fill(v, 0);
     }
 
     /** Uma linha para o depurador e as baterias. */
@@ -123,6 +173,17 @@ final class CpuLeitura {
         }
         for (Abordagem a : Abordagem.values()) {
             s.append(a.name().toLowerCase()).append(String.format(java.util.Locale.ROOT, "×%.2f ", fator(a)));
+        }
+        for (PlanoBola p : PlanoBola.values()) {
+            if (vezesPlano[p.ordinal()] < 0.05) continue;
+            s.append(String.format(java.util.Locale.ROOT, "%s=%+.2f/%.1f ", p.name().toLowerCase(), valor(p), vezes(p)));
+        }
+        for (Faixa f : Faixa.values()) {
+            for (PlanoMeio p : PlanoMeio.values()) {
+                if (vezes(f, p) < 0.05) continue;
+                s.append(String.format(java.util.Locale.ROOT, "%s:%s=%+.2f/%.1f ", f.name().toLowerCase(),
+                    p.name().toLowerCase(), valor(f, p), vezes(f, p)));
+            }
         }
         return s.toString().trim();
     }

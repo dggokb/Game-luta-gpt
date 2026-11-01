@@ -187,7 +187,7 @@ public class CpuTest {
         assertTrue("mais que o nível 3: " + baixo[1] + " → " + alto[1], alto[1] < baixo[1] - 0.15);
     }
 
-    /** Média de {vida que o spammer perdeu, fração das bolas que acertaram a CPU}. */
+    /** Média de {vida que o spammer perdeu, fração das bolas soltas que acertaram a CPU}. */
     private static double[] spammer(int level) {
         double perdeu = 0, acertou = 0;
         int lutas = 0;
@@ -200,7 +200,8 @@ public class CpuTest {
                 cpu.setLevel(level);
                 FighterInput p = new FighterInput(), out = new FighterInput();
                 Random r = new Random(seed * 13 + 5);
-                int vida = e.fighter(0).state.life, hit = 0, blocked = 0, espera = 0;
+                int vida = e.fighter(0).state.life, hit = 0, shots = 0, espera = 0;
+                boolean viva = false;
                 for (int f = 0; f < 60 * 60 && !e.fighter(0).ko() && !e.fighter(1).ko(); f++) {
                     CombatFighter me = e.fighter(0);
                     p.clear();
@@ -213,14 +214,14 @@ public class CpuTest {
                     cpu.fill(e, 1, out);
                     e.step(p, out);
                     for (CombatEngine.HitEvent ev : e.events()) {
-                        if (ev.attacker == 0 && ev.projectile) {
-                            if (ev.blocked) blocked++;
-                            else hit++;
-                        }
+                        if (ev.attacker == 0 && ev.projectile && !ev.blocked) hit++;
                     }
+                    // Bolas soltas: pular por cima ou atravessar correndo também é não levar.
+                    if (e.energyProjectileAlive(0) && !viva) shots++;
+                    viva = e.energyProjectileAlive(0);
                 }
                 perdeu += 1.0 - e.fighter(0).state.life / (double)vida;
-                acertou += hit / (double)Math.max(1, hit + blocked);
+                acertou += hit / (double)Math.max(1, shots);
                 lutas++;
             }
         }
@@ -266,8 +267,9 @@ public class CpuTest {
     @Test public void theCpuNeverReactsToAJumpBeforeTheHumanReaction() {
         int reactions = 0;
         for (int level = 1; level <= 8; level++) {
-            // 10 sementes: a CPU ataca bastante no neutro e às vezes está ocupada quando ele pula.
-            for (long seed = 1; seed <= 10; seed++) {
+            // 16 sementes: a CPU ataca bastante no neutro e às vezes está ocupada quando ele pula
+            // (o S de duração de mercado a deixa ocupada mais tempo).
+            for (long seed = 1; seed <= 16; seed++) {
                 Fight f = new Fight(BASE, BASE, 430f, level, seed);
                 int jumpAt = 40 + (int)(seed * 7);
                 int reaction = -1;

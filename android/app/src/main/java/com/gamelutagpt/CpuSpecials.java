@@ -154,6 +154,20 @@ final class CpuSpecials {
         return tip >= 0f && gap >= CombatRules.MIN_MELEE_DISTANCE && gap <= tip + target.halfWidth;
     }
 
+    /**
+     * Quadros (do aperto) até o especial chegar em quem está a {@code gap}: a largada, mais o
+     * caminho que o avanço ainda precisa andar além do alcance parado. O avanço longo chega bem
+     * depois da largada: punir de longe com ele só vale se o rival ainda estiver preso até lá.
+     */
+    static int contato(Option o, float gap, CharacterDefinition.Body target) {
+        AttackDefinition a = o.attack;
+        AttackDefinition.Mechanics m = a.mechanics;
+        float falta = gap - (a.reach + target.halfWidth);
+        if (falta <= 0f || m.advanceSpeed <= 0f) return a.startupFrames;
+        float passo = m.advanceSpeed * CombatConfig.DT;
+        return Math.max(a.startupFrames, m.advanceStart + (int)Math.ceil(falta / passo));
+    }
+
     /** A postura lê esse golpe (as regras do motor: alto = em pé e no ar; baixo = baixo no chão). */
     static boolean reads(AttackDefinition.Reads reads, AttackDefinition attack, boolean airborneAttacker) {
         switch (reads) {

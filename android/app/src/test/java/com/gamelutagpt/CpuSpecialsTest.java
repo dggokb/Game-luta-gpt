@@ -64,8 +64,12 @@ public class CpuSpecialsTest {
     public void theCpuUsesTheCommandSpecials() {
         Map<String, Integer> p05 = specialsUsed("p05", "p11", 8, 6);
         assertTrue("p05 solta a shuriken (S2): " + p05, p05.getOrDefault("S2", 0) > 0);
-        assertTrue("p05 usa a esquiva-sumiço (S3): " + p05, p05.getOrDefault("S3", 0) > 0);
         assertTrue("p05 entra com o corte (S4): " + p05, p05.getOrDefault("S4", 0) > 0);
+        // A esquiva contra a bola é um dos planos que ela aprende (AiController.escolherPlanoBola):
+        // contra o p11, que solta pouca bola, ela aprende a só defender; contra quem solta bola
+        // de verdade a esquiva-sumiço aparece.
+        Map<String, Integer> contraBola = specialsUsed("p05", "player_base", 8, 6);
+        assertTrue("p05 usa a esquiva-sumiço (S3): " + contraBola, contraBola.getOrDefault("S3", 0) > 0);
         Map<String, Integer> p15 = specialsUsed("p15", "player_base", 8, 6);
         assertTrue("p15 repele a onda (S2): " + p15, p15.getOrDefault("S2", 0) > 0);
     }

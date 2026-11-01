@@ -298,6 +298,7 @@ final class AiController {
         this.kitRandom = kitRandom;
         // A semente das reações sai da IA: a mesma semente dá a mesma luta.
         this.reactRandom = new Random(ai.seed());
+        this.planoRandom = new Random(ai.seed() ^ 0x9A7E5L);
     }
 
     /**
@@ -481,6 +482,316 @@ final class AiController {
         return true;
     }
 
+    // ------------------------------------------- contra a bola: o plano que ela aprende
+
+    /** Quadros que cada tentativa contra a bola tem para mostrar o resultado (ou até a próxima). */
+    static final int JANELA_PLANO = 75;
+    /** Peso do que ela aprendeu sobre o gosto do estilo (no logit do plano). */
+    static final double VALOR_PESO = 2.0;
+    /** Curiosidade pelo plano pouco tentado (nos níveis altos). */
+    static final double EXPLORA = 0.5;
+    /** A corrida de energia começa com a bola a isto (quadros, correndo) dela. */
+    static final float CORRIDA_LEAD = 12f;
+
+    /**
+     * Uma tentativa em andamento: de onde partiu (vidas e distância). O resultado é a vida que ela
+     * tirou menos a que perdeu (em vinte avos da vida, meio ponto cada) mais o quanto chegou perto.
+     */
+    static final class Tentativa {
+        int inicio = -1, vidaEu, vidaEle;
+        float gap;
+
+        void comeca(CombatEngine engine, CombatFighter me, CombatFighter target) {
+            inicio = engine.frame();
+            vidaEu = me.state.life;
+            vidaEle = target.state.life;
+            gap = Math.abs(target.x - me.x);
+        }
+
+        /** O resultado, ou NaN quando não conta (uma luta nova no meio: a vida voltou). */
+        double resultado(CombatFighter me, CombatFighter target) {
+            int tirou = vidaEle - target.state.life, perdeu = vidaEu - me.state.life;
+            if (tirou < 0 || perdeu < 0) return Double.NaN;
+            double unidade = Math.max(1.0, me.state.profile.maxLife * 0.05);
+            double r = 0.5 * (tirou - perdeu) / unidade + (gap - Math.abs(target.x - me.x)) / 400.0;
+            return Math.max(-1.5, Math.min(1.5, r));
+        }
+    }
+
+    private final Random planoRandom;
+    private CpuLeitura.PlanoBola planoBola;
+    private final Tentativa tentativaBola = new Tentativa();
+    /** O plano da bola é a corrida de energia: a bola dele, e em que passo do dash está. */
+    private int corridaSerial = -1, corridaArmada;
+    /** O especial do kit que serve contra a bola que vem (repel ou esquiva), ou null. */
+    private CpuSpecials.Option especialContraBola;
+    /** O plano é devolver bola: solta a dela assim que puder. */
+    private boolean devolverBola;
+    /** O plano é a defesa perfeita: a tentativa sai sempre (com o erro de tempo do nível). */
+    private boolean forcarPerfeita;
+
+    /** O que ela aprendeu do plano, no logit: com o peso do nível e a curiosidade pelo pouco tentado. */
+    private double aprendido(double valor, double vezes) {
+        if (!leituraAtiva) return 0.0;
+        double s = smart();
+        return (0.3 + 0.7 * s) * VALOR_PESO * valor * Math.min(1.0, vezes / 2.0) + EXPLORA * s / (1.0 + vezes);
+    }
+
+    /** Sorteio pelos logits (com mais certeza nos níveis altos) entre os que dá; -1 se nenhum. */
+    private int sortear(double[] logit, boolean[] pode) {
+        // Temperatura: os níveis baixos sorteiam mais solto; nos altos o que rendeu pesa mais, mas
+        // o gosto do estilo ainda aparece (cada um com o seu jeito).
+        double temp = 1.0 - 0.4 * smart();
+        double[] peso = new double[logit.length];
+        double total = 0;
+        for (int i = 0; i < logit.length; i++) {
+            if (!pode[i]) continue;
+            peso[i] = Math.exp(logit[i] / temp);
+            total += peso[i];
+        }
+        if (total <= 0) return -1;
+        double r = planoRandom.nextDouble() * total;
+        int ultimo = -1;
+        for (int i = 0; i < logit.length; i++) {
+            if (!pode[i]) continue;
+            ultimo = i;
+            r -= peso[i];
+            if (r <= 0) return i;
+        }
+        return ultimo;
+    }
+
+    /**
+     * O gosto do estilo e do nível por cada plano contra a bola (logit): o acrobata pula, quem
+     * tem bola devolve, quem é agressivo corre, os níveis altos tentam a defesa perfeita. O que ela
+     * aprende soma em cima disso, então cada um continua com o seu jeito.
+     */
+    private double priorPlano(CpuLeitura.PlanoBola p, CpuStyle style, boolean zoneando) {
+        double s = smart();
+        switch (p) {
+            case DEFENDE: return 0.6;
+            case PERFEITA: return -1.4 + 5.0 * level.justDefense();
+            case PULA: return -0.8 + 1.6 * level.jumpProjectile * style.jumping + (zoneando ? 0.5 : 0.0);
+            case CORRE: return -1.0 + (style.aggression - 0.7) + 0.6 * s + (zoneando ? 0.4 : 0.0);
+            case DEVOLVE: return -0.7 + 0.9 * (style.zoning - 1.0) + 0.3 * s;
+            // O especial do kit contra a bola era a primeira resposta de quem tem (a identidade).
+            case ESPECIAL: return 0.5 + 0.8 * (style.reactSpecial - 1.0) + 0.3 * s;
+            default: return 0.0;
+        }
+    }
+
+    /** Escolhe o plano contra esta bola entre os que dá para fazer agora. */
+    private CpuLeitura.PlanoBola escolherPlanoBola(boolean[] pode, CombatFighter me, boolean zoneando) {
+        CpuStyle style = CpuStyle.of(me.character());
+        CpuLeitura.PlanoBola[] planos = CpuLeitura.PlanoBola.values();
+        double[] logit = new double[planos.length];
+        for (CpuLeitura.PlanoBola p : planos) {
+            logit[p.ordinal()] = priorPlano(p, style, zoneando) + aprendido(leitura.valor(p), leitura.vezes(p));
+        }
+        int i = sortear(logit, pode);
+        return i < 0 ? CpuLeitura.PlanoBola.DEFENDE : planos[i];
+    }
+
+    private void comecarPlanoBola(CpuLeitura.PlanoBola p, CombatEngine engine, CombatFighter me, CombatFighter target) {
+        fecharTentativa(planoBola, tentativaBola, me, target);
+        planoBola = p;
+        tentativaBola.comeca(engine, me, target);
+    }
+
+    /** Fecha a tentativa do plano (da bola ou da meia distância) e soma o resultado. */
+    private void fecharTentativa(Enum<?> plano, Tentativa t, CombatFighter me, CombatFighter target) {
+        if (plano == null || t.inicio < 0) return;
+        double r = t.resultado(me, target);
+        if (!Double.isNaN(r)) {
+            if (plano instanceof CpuLeitura.PlanoBola) leitura.resultado((CpuLeitura.PlanoBola)plano, r);
+            else if (faixaMeio != null) leitura.resultado(faixaMeio, (CpuLeitura.PlanoMeio)plano, r);
+        }
+        t.inicio = -1;
+        if (plano == planoBola) planoBola = null;
+        if (plano == planoMeio) planoMeio = null;
+    }
+
+    /** As tentativas em andamento que passaram da janela: fecha. */
+    private void acompanharPlanos(CombatEngine engine, CombatFighter me, CombatFighter target) {
+        if (planoBola != null && engine.frame() - tentativaBola.inicio >= JANELA_PLANO) {
+            fecharTentativa(planoBola, tentativaBola, me, target);
+        }
+        if (planoMeio != null && engine.frame() - tentativaMeio.inicio >= JANELA_PLANO) {
+            fecharTentativa(planoMeio, tentativaMeio, me, target);
+        }
+    }
+
+    /**
+     * Corrida de energia: parada até a bola ficar a {@link #CORRIDA_LEAD} quadros (correndo), então
+     * corre e aperta M+H no primeiro quadro da corrida (o quarto de barra): passa através da bola
+     * e segue correndo até acabar. Verdadeiro quando o quadro é da corrida.
+     */
+    private boolean correrContraBola(CombatEngine engine, CombatFighter me, CpuPerception.Snapshot seen,
+                                     boolean blockstun, FighterInput out) {
+        int frente = me.facing > 0 ? 1 : 5;
+        if (blockstun || !me.grounded || me.status != CombatFighter.Status.NEUTRAL) {
+            corridaSerial = -1;
+            return false;
+        }
+        if (me.energyRunFrames > 0) {
+            out.direction = frente;
+            out.dash = true;
+            dashing = movingForward = true;
+            lastReason = "corrida de energia";
+            return true;
+        }
+        if (corridaArmada > 0) {
+            // O dash saiu: no primeiro quadro correndo, M+H vira a corrida de energia. Já correu
+            // e acabou (ou não saiu em 4 quadros): o plano acabou.
+            if (me.forwardDashing && corridaArmada == 1) {
+                out.direction = frente;
+                out.dash = true;
+                out.pushblock = true;
+                corridaArmada = 2;
+                lastReason = "corrida de energia";
+                return true;
+            }
+            if (corridaArmada >= 2 || ++corridaArmada > 5) {
+                corridaSerial = -1;
+                return false;
+            }
+            out.direction = frente;
+            out.dash = true;
+            return true;
+        }
+        if (seen.projectileGap == Float.MAX_VALUE || seen.projectileSerial != corridaSerial ||
+            me.state.superMeter < engine.config.energyRunCost) {
+            corridaSerial = -1;   // a bola sumiu ou a barra não dá mais
+            return false;
+        }
+        float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
+        float corre = engine.dashSpeed(me) * engine.config.energyRunSpeedPermille / 1000f * CombatConfig.DT;
+        float lead = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + corre);
+        if (lead <= CORRIDA_LEAD) {
+            out.direction = frente;
+            out.dash = true;
+            corridaArmada = 1;
+            lastReason = "corrida de energia";
+            return true;
+        }
+        movingForward = movingBack = dashing = false;
+        out.direction = 0;
+        return true;
+    }
+
+    /** O plano da bola que está valendo (para o depurador e as baterias). */
+    CpuLeitura.PlanoBola planoBola() { return planoBola; }
+
+    /** Longe disso, contra quem solta bola, ela avança entre uma bola e outra. */
+    static final float AVANCA_CONTRA_BOLA = 320f;
+    /**
+     * A meia distância de quem solta bola: daqui para dentro a bola dele (de perto) chega antes da
+     * reação, então ela decide antes da bola o que fazer ({@link CpuLeitura.PlanoMeio}).
+     */
+    static final float MEIO_PERTO = 200f, MEIO_LONGE = 480f;
+    /** Quadros que um plano da meia distância dura antes de ela decidir de novo. */
+    static final int PLANO_MEIO_QUADROS = 45;
+
+    private CpuLeitura.PlanoMeio planoMeio;
+    private CpuLeitura.Faixa faixaMeio;
+    private final Tentativa tentativaMeio = new Tentativa();
+    private int meioQuadros;
+
+    /**
+     * Contra quem fica soltando bola, entre uma bola e outra: de longe ela avança (corre sem bola na
+     * tela, anda com bola); na meia distância, sem bola, escolhe um plano pelo gosto do estilo e
+     * pelo que rendeu contra este jogador (andar, esperar defendendo, pular antes, correr com a
+     * barra através da próxima). A bola na tela é do plano da bola ({@link #escolherPlanoBola}).
+     */
+    private boolean avancarContraBola(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                      CpuPerception.Snapshot seen, FighterInput out) {
+        if (!rivalZoning(seen.frame) || !me.grounded || !me.canAct() || guardPlanSerial >= 0 || jumpPlanSerial >= 0 ||
+            corridaSerial >= 0 || devolverBola) {
+            meioQuadros = 0;
+            return false;
+        }
+        float gap = Math.abs(seen.x - me.x);
+        CpuStyle style = CpuStyle.of(me.character());
+        if (gap > MEIO_LONGE) {
+            meioQuadros = 0;
+            // Quem tem bola que alcança devolve (a decisão do neutro cuida).
+            if (style.zoning >= 1.5 && OpponentAi.energyInRange(me.character(), gap, target.body()) &&
+                !engine.energyProjectileAlive(me.index)) return false;
+            movingForward = true;
+            movingBack = false;
+            // Corre só sem bola dele na tela (correndo ela não defende); com bola, anda (andando
+            // ela ainda defende quando a bola chega).
+            dashing = gap > 550f && seen.projectileGap == Float.MAX_VALUE;
+            out.direction = me.facing > 0 ? 1 : 5;
+            out.dash = dashing;
+            lastReason = "avança contra a bola";
+            return true;
+        }
+        if (seen.projectileGap != Float.MAX_VALUE || !seen.grounded || gap < CombatRules.MIN_MELEE_DISTANCE) {
+            meioQuadros = 0;
+            return false;
+        }
+        CpuLeitura.Faixa faixa = gap < MEIO_PERTO ? CpuLeitura.Faixa.PERTO : CpuLeitura.Faixa.MEIO;
+        if (faixa != faixaMeio) meioQuadros = 0;
+        if (meioQuadros <= 0 || planoMeio == null) {
+            boolean[] pode = new boolean[CpuLeitura.PlanoMeio.values().length];
+            double[] logit = new double[pode.length];
+            double s = smart();
+            for (CpuLeitura.PlanoMeio p : CpuLeitura.PlanoMeio.values()) {
+                pode[p.ordinal()] = p != CpuLeitura.PlanoMeio.CORRE || me.state.superMeter >= engine.config.energyRunCost;
+                double prior;
+                switch (p) {
+                    case ANDA: prior = 0.2 + 0.5 * (style.aggression - 0.7); break;
+                    case ESPERA: prior = 0.2 + 0.5 * (style.patience - 0.8); break;
+                    case PULA: prior = -0.7 + 0.7 * style.jumping + 0.5 * level.jumpProjectile; break;
+                    default: prior = -1.0 + (style.aggression - 0.7) + 0.6 * s; break;
+                }
+                logit[p.ordinal()] = prior + aprendido(leitura.valor(faixa, p), leitura.vezes(faixa, p));
+            }
+            int i = sortear(logit, pode);
+            fecharTentativa(planoMeio, tentativaMeio, me, target);
+            planoMeio = i < 0 ? CpuLeitura.PlanoMeio.ANDA : CpuLeitura.PlanoMeio.values()[i];
+            faixaMeio = faixa;
+            tentativaMeio.comeca(engine, me, target);
+            meioQuadros = PLANO_MEIO_QUADROS;
+        }
+        meioQuadros--;
+        int frente = me.facing > 0 ? 1 : 5, tras = me.facing > 0 ? 5 : 1;
+        movingBack = dashing = false;
+        movingForward = false;
+        switch (planoMeio) {
+            case ESPERA:
+                out.direction = tras;
+                lastReason = "espera a bola defendendo";
+                return true;
+            case PULA:
+                meioQuadros = 0;
+                out.jump = true;
+                out.direction = me.facing > 0 ? 8 : 6;
+                jumpHold = JUMP_HOLD_FRAMES;
+                jumpHoldDirection = out.direction;
+                jumpIn = true;
+                guardFrames = 0;
+                lastReason = "pula antes da bola";
+                return true;
+            case CORRE:
+                meioQuadros = 0;
+                corridaSerial = Integer.MAX_VALUE;   // sem bola: a corrida vai até acabar
+                corridaArmada = 1;
+                out.direction = frente;
+                out.dash = true;
+                lastReason = "corrida de energia";
+                return true;
+            default:
+                // Colado, "seguir" é deixar o neutro decidir (golpe, agarrão, a bola dela).
+                if (faixa == CpuLeitura.Faixa.PERTO) return false;
+                movingForward = true;
+                out.direction = frente;
+                lastReason = "avança contra a bola";
+                return true;
+        }
+    }
+
     /** A tentativa de chegar que ela acabou de soltar no neutro. */
     private void marcarAbordagem(CombatEngine engine, FighterInput out, float distance) {
         if (abordagem != null) return;
@@ -658,6 +969,13 @@ final class AiController {
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
         jumpPlanSerial = guardPlanSerial = guardingSerial = -1;
+        corridaSerial = -1;
+        corridaArmada = 0;
+        devolverBola = forcarPerfeita = false;
+        planoBola = null;
+        planoMeio = null;
+        tentativaBola.inicio = tentativaMeio.inicio = -1;
+        meioQuadros = 0;
         jumpHold = 0;
         jumpIn = false;
         rivalShotCount = 0;
@@ -688,6 +1006,7 @@ final class AiController {
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
         seenNow = seen;
         observar(engine, self, me, seen);
+        acompanharPlanos(engine, me, target);
         if (antiAereoLido > 0) antiAereoLido--;
         boolean overhead = seen != null && !seen.grounded && Math.abs(seen.x - me.x) < CROSS_WATCH;
         if (overhead && !rivalOverhead) crossRead = crossRandom.nextDouble() < level.reactGuard * CROSS_READ;
@@ -809,6 +1128,7 @@ final class AiController {
             return;
         }
         if (habitGuard(me, target, seen, out)) return;
+        if (avancarContraBola(engine, me, target, seen, out)) return;
         if (guardPlanSerial >= 0 && guardingSerial != guardPlanSerial &&
             guardPlanArrival < PROJECTILE_BUSY_FRAMES && me.grounded) {
             // A bola está chegando e ela vai defender: golpe agora não acaba a tempo. Anda até ela.
@@ -1002,17 +1322,47 @@ final class AiController {
                     lastProjectileSerial = seen.projectileSerial;
                     noteRivalShot(seen.frame);
                     float leadNow = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + JUMP_FORWARD_STEP);
-                    boolean jumpWorth = Math.abs(seen.x - me.x) <= JUMP_OVER_RANGE;
-                    // Contra quem fica soltando bola ela pula mais (é o que vence a bola).
-                    double jumpChance = level.jumpProjectile * style.jumping * (rivalZoning(seen.frame) ? 1.6 : 1.0);
-                    if (!blockstun && me.grounded && !seen.projectileSuper && jumpWorth &&
-                        leadNow > JUMP_OVER_LEAD - 2f && roll(Math.min(0.92, jumpChance))) {
+                    boolean zoneando = rivalZoning(seen.frame);
+                    float chegaEm = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / speed;
+                    boolean livre = !blockstun && me.grounded && me.canAct();
+                    // Os planos que dá para fazer com esta bola (defender sempre dá).
+                    boolean[] pode = new boolean[CpuLeitura.PlanoBola.values().length];
+                    pode[CpuLeitura.PlanoBola.DEFENDE.ordinal()] = true;
+                    pode[CpuLeitura.PlanoBola.PERFEITA.ordinal()] = me.grounded && level.justDefense() > 0;
+                    pode[CpuLeitura.PlanoBola.PULA.ordinal()] = livre && !seen.projectileSuper &&
+                        leadNow > JUMP_OVER_LEAD - 2f && (Math.abs(seen.x - me.x) <= JUMP_OVER_RANGE || zoneando);
+                    pode[CpuLeitura.PlanoBola.CORRE.ordinal()] = livre &&
+                        me.state.superMeter >= engine.config.energyRunCost &&
+                        chegaEm > CORRIDA_LEAD * 0.5f;
+                    AttackDefinition s1 = me.character().attack("S");
+                    pode[CpuLeitura.PlanoBola.DEVOLVE.ordinal()] = livre && s1 != null && !s1.melee() &&
+                        me.character().fighter.energy != null && !engine.energyProjectileAlive(me.index) &&
+                        chegaEm > s1.startupFrames + 3;
+                    pode[CpuLeitura.PlanoBola.ESPECIAL.ordinal()] = livre && especialContraBola != null &&
+                        specialShotSerial == seen.projectileSerial;
+                    // Os níveis baixos muitas vezes nem reagem à bola (a chance do nível).
+                    CpuLeitura.PlanoBola plano = roll(Math.max(level.reactGuard, level.jumpProjectile))
+                        ? escolherPlanoBola(pode, me, zoneando) : null;
+                    if (plano != null) comecarPlanoBola(plano, engine, me, target);
+                    forcarPerfeita = false;
+                    if (plano == CpuLeitura.PlanoBola.PULA) {
                         // Pula por cima, para frente, quando a bola chegar no tempo certo.
                         jumpPlanSerial = seen.projectileSerial;
                         jumpPlanLead = JUMP_OVER_LEAD +
                             (float)((1.0 - smart()) * JUMP_OVER_SLOP * (reactRandom.nextDouble() * 2.0 - 1.0));
-                    } else if (roll(level.reactGuard)) {
-                        // Defende quando ela chegar (projétil do meio: em pé, parada).
+                    } else if (plano == CpuLeitura.PlanoBola.CORRE) {
+                        // Espera a bola chegar perto e corre através dela com a barra.
+                        corridaSerial = seen.projectileSerial;
+                        corridaArmada = 0;
+                    } else if (plano == CpuLeitura.PlanoBola.DEVOLVE) {
+                        devolverBola = true;
+                    } else if (plano == CpuLeitura.PlanoBola.ESPECIAL) {
+                        // O especial sai na hora certa (a resposta de especial cuida).
+                        shotPlan = especialContraBola;
+                    } else if (plano != null) {
+                        // Defende quando ela chegar (projétil do meio: em pé, parada); na defesa
+                        // perfeita ela absorve a bola e sai livre para andar.
+                        forcarPerfeita = plano == CpuLeitura.PlanoBola.PERFEITA;
                         guardPlanSerial = seen.projectileSerial;
                         guardPlanLow = seen.projectileLow && roll(level.guardHeight);
                     }
@@ -1053,6 +1403,16 @@ final class AiController {
                     }
                 }
             }
+            if (devolverBola) {
+                devolverBola = false;
+                if (!blockstun && me.grounded && me.canAct() && !engine.energyProjectileAlive(me.index)) {
+                    // A bola dela anula a dele no meio do caminho.
+                    out.special = "M";
+                    lastReason = "devolve a bola";
+                    return true;
+                }
+            }
+            if (corridaSerial >= 0 && correrContraBola(engine, me, seen, blockstun, out)) return true;
         }
         // O rival caído perto: às vezes pula para cair por cima dele no levantar (crossup).
         if (seen != null && seen.status != CombatFighter.Status.KNOCKDOWN) crossPlanned = false;
@@ -1172,6 +1532,15 @@ final class AiController {
     private void planJustDefense(CombatFighter me, int framesToContact) {
         justDefenseWait = 0;
         if (!me.grounded || framesToContact <= JUST_DEFENSE_LEAD + 1) return;
+        if (forcarPerfeita) {
+            // O plano é absorver: tenta sempre, com o erro de tempo do nível (cedo vira defesa
+            // comum; tarde, apanha).
+            forcarPerfeita = false;
+            int erro = (int)Math.round((1.0 - smart()) * (reactRandom.nextDouble() * 5.0 - 3.0));
+            justDefenseWait = Math.max(0, framesToContact - JUST_DEFENSE_LEAD + erro);
+            guardFrames = Math.max(guardFrames, justDefenseWait + 12);
+            return;
+        }
         if (!roll(level.justDefense())) return;
         justDefenseWait = framesToContact - JUST_DEFENSE_LEAD;
         guardFrames = Math.max(guardFrames, justDefenseWait + 12);
@@ -1551,6 +1920,7 @@ final class AiController {
             // O especial que avança leva tempo para chegar: só com folga (de longe ele saía no vazio
             // e ela levava o troco), e só se nenhum golpe de chão entra.
             if (melhor != null || o.attack.startupFrames + FOLGA_ESPECIAL > left ||
+                CpuSpecials.contato(o, gap, target.body()) + 2 > left ||
                 !CpuSpecials.reaches(o, gap, target.body(), crouching) || !lifeAllows(me, o) || o.attack.damage <= dano) continue;
             especial = o;
             dano = o.attack.damage;
@@ -1678,22 +2048,18 @@ final class AiController {
         if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != specialShotSerial) {
             specialShotSerial = seen.projectileSerial;
             shotPlan = null;
-            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard * CpuStyle.of(me.character()).reactSpecial) {
-                for (CpuSpecials.Option o : kit) {
-                    AttackDefinition.Mechanics m = o.m();
-                    boolean repel = o.role == CpuSpecials.Role.REPEL;
-                    boolean evade = m.evade == AttackDefinition.Reads.ANY ||
-                        m.evade == AttackDefinition.Reads.HIGH && !seen.projectileLow;
-                    if ((repel || evade) && lifeAllows(me, o)) {
-                        shotPlan = o;
-                        break;
-                    }
+            // O especial contra a bola (repel ou esquiva) é um dos planos que ela aprende
+            // ({@link #escolherPlanoBola}): aqui só fica guardado o que o kit tem para esta bola.
+            especialContraBola = null;
+            for (CpuSpecials.Option o : kit) {
+                AttackDefinition.Mechanics m = o.m();
+                boolean repel = o.role == CpuSpecials.Role.REPEL;
+                boolean evade = m.evade == AttackDefinition.Reads.ANY ||
+                    m.evade == AttackDefinition.Reads.HIGH && !seen.projectileLow;
+                if ((repel || evade) && lifeAllows(me, o)) {
+                    especialContraBola = o;
+                    break;
                 }
-            }
-            if (shotPlan != null) {
-                // Ela vai responder com o especial: não planeja pular nem defender essa bola.
-                lastProjectileSerial = seen.projectileSerial;
-                noteRivalShot(seen.frame);
             }
         }
         if (shotPlan != null) {
