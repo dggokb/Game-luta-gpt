@@ -18,12 +18,13 @@ import java.util.Queue;
 import javax.imageio.ImageIO;
 
 /**
- * O teste dos QTE na luta do convite (Ryūga × Yin-lu, Episódio 2), no jogo de verdade do PC:
- * abre o episódio na campanha do Ryūga, passa as páginas, deixa a Yin-lu com 20% da vida e joga a
- * cena (o primeiro QTE erra de propósito, para ver o contra-ataque e o pedido de novo). Os QTE
- * vão pelo caminho do jogo: toques na fila da tela e teclas do teclado. Grava quadros em PNG.
+ * O teste dos QTE na luta do convite do Episódio 2 (Ryūga × Yin-lu, ou Kōga × Brucy na campanha
+ * do Kōga), no jogo de verdade do PC: abre o episódio na campanha, passa as páginas, deixa o
+ * rival com 20% da vida e joga a cena (o primeiro QTE erra de propósito, para ver o contra-ataque
+ * e o pedido de novo). Os QTE vão pelo caminho do jogo: toques na fila da tela e teclas do
+ * teclado. Grava quadros em PNG.
  *
- * <pre>java ... com.gamelutagpt.TesteQteConvite saida/</pre>
+ * <pre>java ... com.gamelutagpt.TesteQteConvite saida/ [ryuga|koga]</pre>
  */
 public final class TesteQteConvite {
     private TesteQteConvite() {}
@@ -37,6 +38,7 @@ public final class TesteQteConvite {
 
     public static void main(String[] args) throws Exception {
         saida = new File(args.length > 0 ? args[0] : "build/qte");
+        String irmao = args.length > 1 ? args[1] : "ryuga";
         saida.mkdirs();
         Context ctx = DadosDoJogo.localizar().contexto(null);
         jogo = new GameView(ctx);
@@ -49,10 +51,10 @@ public final class TesteQteConvite {
         tela = Bitmap.createBitmap(1280, 720, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(tela);
 
-        // Episódio 2 na campanha do Ryūga.
+        // Episódio 2 na campanha do irmão.
         metodo("loadTemporada").invoke(jogo);
         Campanha campanha = Campanha.load((RenderAssets)campo("ultraAssets").get(jogo), 7L);
-        campanha.restaurar("ryuga", -1);
+        campanha.restaurar(irmao, -1);
         PaginaHistoria historia = (PaginaHistoria)campo("historia").get(jogo);
         campo("storyMode").set(jogo, true);
         historia.setBotaoMenu(true);
@@ -70,20 +72,20 @@ public final class TesteQteConvite {
         CinematicaLuta cena = (CinematicaLuta)campo("cinematica").get(jogo);
         if (!cena.armada()) throw new IllegalStateException("a cinemática não armou");
 
-        // A luta: depois da intro, a Yin-lu leva um golpe que a deixa com 19%.
+        // A luta: depois da intro, o rival leva um golpe que o deixa com 19%.
         limite = 60 * 60;
         boolean bateu = false;
         while (!cena.rodando() && limite-- > 0) {
             passo(quadro % 20 == 0);
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
-                FighterState yin = jogo.engine.fighter(GameView.OPPONENT).state;
-                FighterState ryuga = jogo.engine.fighter(GameView.PLAYER).state;
-                // Esperando a cena, só a Yin-lu (o lado do gatilho) tem o último ponto seguro.
-                System.out.println("antes da cena, último ponto seguro: Yin-lu " + (yin.lifeFloor > 0) +
-                    ", Ryūga " + (ryuga.lifeFloor > 0));
-                yin.takeDamage(yin.life - Math.round(yin.profile.maxLife * 0.19f), 0);
+                FighterState rival = jogo.engine.fighter(GameView.OPPONENT).state;
+                FighterState jogador = jogo.engine.fighter(GameView.PLAYER).state;
+                // Esperando a cena, só o rival (o lado do gatilho) tem o último ponto seguro.
+                System.out.println("antes da cena, último ponto seguro: rival " + (rival.lifeFloor > 0) +
+                    ", jogador " + (jogador.lifeFloor > 0));
+                rival.takeDamage(rival.life - Math.round(rival.profile.maxLife * 0.19f), 0);
                 bateu = true;
-                System.out.println("Yin-lu com 19%");
+                System.out.println("rival com 19%");
             }
         }
         System.out.println("cena começou no quadro " + quadro);
@@ -98,14 +100,14 @@ public final class TesteQteConvite {
                 if (cena.qteErros() == 0) qtes++;
                 noQte = 0;
                 toques = 0;
-                System.out.printf(Locale.ROOT, "QTE %d (erros %d) no quadro %d, vida Yin-lu %.0f%%, Ryūga %.0f%%%n", qtes,
+                System.out.printf(Locale.ROOT, "QTE %d (erros %d) no quadro %d, vida do rival %.0f%%, do jogador %.0f%%%n", qtes,
                     cena.qteErros(), quadro, vida(jogo.engine.fighter(GameView.OPPONENT)), vida(jogo.engine.fighter(GameView.PLAYER)));
             }
             pedia = pede;
             if (pede) {
                 noQte++;
                 if (qtes == 1 && cena.qteErros() == 0) {
-                    // Deixa o tempo acabar: a Yin-lu contra-ataca e o QTE pede de novo.
+                    // Deixa o tempo acabar: o rival contra-ataca e o QTE pede de novo.
                 } else if (qtes == 1 && noQte == 20) {
                     toque(MotionEvent.ACTION_DOWN, 300f, 300f);
                     toque(MotionEvent.ACTION_UP, 300f, 300f);
@@ -130,7 +132,7 @@ public final class TesteQteConvite {
             }
             passo(quadro % 6 == 0 || pede && noQte == 12);
         }
-        System.out.printf(Locale.ROOT, "cena acabou no quadro %d: Yin-lu %.0f%% (KO %b), Ryūga %.0f%%%n", quadro,
+        System.out.printf(Locale.ROOT, "cena acabou no quadro %d: rival %.0f%% (KO %b), jogador %.0f%%%n", quadro,
             vida(jogo.engine.fighter(GameView.OPPONENT)), jogo.engine.fighter(GameView.OPPONENT).ko(), vida(jogo.engine.fighter(GameView.PLAYER)));
         // O resultado da luta.
         for (int i = 0; i < 60 * 6; i++) passo(i % 30 == 0);

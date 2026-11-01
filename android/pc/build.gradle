@@ -404,7 +404,7 @@ tasks.register('conferirQuadros', JavaExec) {
 
 // O teste dos QTE da cinemática no convite do Episódio 2 (Ryūga × Yin-lu), no jogo de verdade:
 // passa as páginas, deixa a Yin-lu com 20% e joga a cena, gravando quadros em build/qte/.
-// gradle :pc:testeQte [-Psaida=pasta]
+// gradle :pc:testeQte [-Psaida=pasta] [-Pirmao=koga] (Kōga × Brucy, a cena da campanha do Kōga)
 tasks.register('testeQte', JavaExec) {
     group = 'verification'
     description = 'Joga a cena dos QTE do convite do Episódio 2 e grava os quadros.'
@@ -415,5 +415,6 @@ tasks.register('testeQte', JavaExec) {
     systemProperty 'java.awt.headless', 'true'
     systemProperty 'gameluta.semSom', 'true'
     maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
-    args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('qte').get().asFile.absolutePath)
+    args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('qte').get().asFile.absolutePath),
+        providers.gradleProperty('irmao').getOrElse('ryuga')
 }
