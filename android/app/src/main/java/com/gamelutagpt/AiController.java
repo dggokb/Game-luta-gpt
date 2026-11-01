@@ -2171,7 +2171,9 @@ final class AiController {
      */
     private void specialNeutral(CombatFighter me, CombatFighter target, CpuPerception.Snapshot seen) {
         if (situation.selfAirborne || !situation.attackReady || !situation.targetAlive || !seen.grounded) return;
-        if (specialRandom.nextDouble() >= SPECIAL_NEUTRAL_CHANCE * (0.2 + 0.8 * smart()) * CpuStyle.of(me.character()).neutralSpecial) return;
+        // Os níveis baixos quase não trocam a decisão por especial (o estilo multiplica, mas o
+        // nível 1 fica num décimo do 8).
+        if (specialRandom.nextDouble() >= SPECIAL_NEUTRAL_CHANCE * (0.1 + 0.9 * smart()) * CpuStyle.of(me.character()).neutralSpecial) return;
         float gap = situation.distance;
         CharacterDefinition.Body body = target.body();
         CpuSpecials.Option best = null;
