@@ -63,7 +63,8 @@ final class GlRenderCanvas implements RenderCanvas {
     // fora, de cheio a transparente); 4: degradê linear (u é a posição nele) e 5: radial (uv vai do
     // centro, 1 na borda), com a linha do degradê na textura dos degradês na fração; 6: anel (a
     // fração é o raio de dentro); 7: texto (na textura dos textos); 8: texto com degradê linear
-    // (a forma do texto na textura dos textos; a posição no degradê vem no vermelho da cor). Cores já multiplicadas pelo
+    // (a forma do texto na textura dos textos; a posição no degradê vem no vermelho da cor); 9: o
+    // mesmo com a forma numa textura própria (uTex: o texto grande, fora da textura dos textos). Cores já multiplicadas pelo
     // alfa. O filtro vale só para imagem e trabalha na cor sem o alfa multiplicado, como o
     // ColorMatrix do Android. O recorte são semiplanos em pixels da janela (y para cima).
     private static final String FRAGMENTOS =
@@ -105,7 +106,7 @@ final class GlRenderCanvas implements RenderCanvas {
         "  } else if (k < 7.5) {\n" +
         "    c = texture(uTexto, vUv) * vCor;\n" +
         "  } else {\n" +
-        "    float m = texture(uTexto, vUv).a;\n" +
+        "    float m = k < 8.5 ? texture(uTexto, vUv).a : texture(uTex, vUv).a;\n" +
         "    vec4 g = texture(uDegrade, vec2(clamp(vCor.r, 0.0, 1.0) * 0.99609375 + 0.001953125, q / 0.99));\n" +
         "    c = g * (m * vCor.a);\n" +
         "  }\n" +
@@ -1328,6 +1329,13 @@ final class GlRenderCanvas implements RenderCanvas {
     void desenharTextoDegrade(float[] uv, float l, float t, float r, float b,
                               float t0, float t1, float t2, float t3, float tipoDegrade, int alpha) {
         float tipo = 8f + (tipoDegrade - (float)Math.floor(tipoDegrade));
+        if (uv.length > 4) {
+            // Textura própria (o texto grande: o "VITÓRIA" da tela de vitória): a forma vem dela.
+            // Com o tipo 8 o uv {0, 0, 1, 1} pegava a textura dos textos INTEIRA, e o retângulo do
+            // título saía cheio de pedaços miúdos de todos os outros textos guardados nela.
+            usar((int)uv[4]);
+            tipo += 1f;
+        }
         float al = alpha / 255f * alfaGlobal;
         reservar(6);
         verticeCru(l, t, uv[0], uv[1], t0, al, tipo);
