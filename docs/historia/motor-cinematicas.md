@@ -132,9 +132,10 @@ novo).
 | `terminarLuta` | `vencedor` (`interrompida`, `jogador`, `rival`) | encerra a luta pela cena: `interrompida` e `jogador`, a história segue; `rival` conta como derrota (repete a luta se o passo pedir) | — |
 | `tinta` | `cobrir` (true/false), `segundos` (padrão 0,9), `cor` (padrão `#FFFFFF`) | pinceladas largas atravessam a tela até cobrir tudo (cobrir) ou saem na ordem contrária mostrando a luta (descobrir). Coberta, a tela fica lisa na cor da tinta, por cima até do HUD; uma página na tela some debaixo da tinta nova | a animação |
 | `pagina` | `imagem` ou `imagens` (lista de `<episódio>/<imagem>`, ex.: `ep02/pag1_ryuga.jpg`) | uma página pronta da história, lida no motor de mangá das páginas ([motor-paginas.md](motor-paginas.md)): a página inteira, depois cada quadro isolado com o resto escurecido, os balões digitados e os efeitos do quadro, com os quadros e balões do passo dela no `episodio.json`. Um toque (ou botão) segue, como na história. Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). Uma página feita só para a cena (fora dos episódios) leva os `quadros` no próprio arquivo, no formato dos episódios ([abaixo](#página-feita-para-a-cena)). A página fica parada no último quadro até a próxima `tinta` cobrir; duas `pagina` seguidas são lidas uma depois da outra | o último toque |
-| `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
+| `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`, `impacto`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
+| `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 
-Toda ação aceita `"semEsperar": true` (menos o `qte`, que sempre espera o jogador). Um movimento ou uma fala nunca seguram a cena mais de
+Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
 8 s (um lutador preso numa queda não trava o jogo).
 
 Se o roteiro acaba **sem** `terminarLuta`, a luta continua: o controle volta, as faixas saem e
@@ -231,6 +232,17 @@ mesmo QTE pede de novo. O HUD fica na tela (sem faixas), então a barra de vida 
 | `final` | false | o golpe derruba de vez: o alvo cai (KO) com a vida que tiver |
 | `erro` | nenhum | `{"golpe": "M", "dano": 0.05}`: o contra-ataque de quem errou. Sem ele, o erro só pede de novo |
 | `pos` | `[0.5, 0.6]` | centro do botão na tela |
+| `impacto` | nenhum | o que acontece quando o golpe do acerto pega (abaixo) |
+
+**Impacto** (no `qte` e no `golpe`): `{"texto": "POW!", "congela": 0.2, "zoom": 1.2}` mais os campos
+de uma onomatopeia (`pos`, `tamanho`, `tremor`, `rotacao`, `cor`, `segundos`, padrão 1,2). Quando o
+golpe pega, o letreiro estoura, a luta **congela** `congela` segundos (padrão 0,15) e a câmera
+dá um **tranco** de zoom até `zoom` (padrão 1,15) e volta. O letreiro precisa de tradução.
+
+Para o final ficar com cara de cinema, o roteiro junta as ações em volta dos QTE: faixas e
+closes (`camera` com `foco`) nas falas, `mover` os dois `correr` um para o outro com
+`velocidade` 0,3 logo antes do QTE (o QTE pede em câmera lenta), um `golpe` do rival antes de
+um QTE de revide e, no golpe final, faixas, câmera lenta e um impacto grande com `congela` 0,7.
 
 - O QTE precisa do controle travado antes (`{"acao": "controle", "travar": true}`): quem bate é o
   roteiro. O arquivo que pede QTE com o controle solto não abre.
@@ -251,24 +263,34 @@ Yin-lu, no dojo dela):
    brincar, a Yin-lu manda treinar, eles fogem e ela corre atrás) são lidas quadro a quadro, no
    toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
 3. A tinta pinta de novo por cima da segunda página, os dois recuam atrás dela e a tinta sai: a luta volta.
-4. **4 QTE**, com falas da Yin-lu e do Ryūga nos quadros laterais entre eles:
+4. O **final coreografado**, com falas nos quadros laterais e um impacto em cada acerto:
 
-| QTE | Tipo | Golpe do Ryūga | Vida da Yin-lu |
+| Momento | O que acontece | Golpe do Ryūga | Vida da Yin-lu |
 |---|---|---|---|
-| SOCO! | toque | M | −5% |
-| SEQUÊNCIA! | martelar 8 | H | −5% |
-| AVANÇA! | deslizar para frente | S4 (chute giratório) | −5% |
-| GOLPE FINAL! | tempo | S2 (punho ascendente) | KO |
+| A lembrança | faixas e closes: "Você fugia de todo treino, lembra?" / "Hoje eu vim treinar de verdade!" | — | 20% |
+| CHOQUE! (toque) | os dois correm um para o outro e o QTE pede em câmera lenta; PAH! | M | −5% |
+| REVIDA! (deslizar para frente) | ela ataca primeiro (golpe do roteiro: chute rodopiante, VUSH!); ele revida, TCHAAK! | S4 (chute giratório) | −5% |
+| SEQUÊNCIA! (martelar 10) | a câmera perto dele; DOOM DOOM! | H | −5% |
+| GOLPE FINAL! (tempo) | "Ainda... não acabou!" / "Acabou sim, Yin-lu!"; pulam para trás, faixas, câmera lenta; KRAAAK! e a luta congela | S2 (punho ascendente) | KO |
+| Depois | "Treinei muito... igual você mandou." | — | — |
 
-Errar qualquer um faz a Yin-lu contra-atacar (−5% ou −6% do Ryūga) e o QTE pede de novo. A Yin-lu
+Errar qualquer QTE faz a Yin-lu contra-atacar (−5% do Ryūga) e o QTE pede de novo. A Yin-lu
 fala com o rosto da seleção (não tem retrato da história): quem luta ganha sempre esse rosto de
 reserva na cena.
 
-Na campanha do Kōga, o convite é **Kōga × Brucy** (beco do Brucy) com a mesma cena
-(`historia/ep02/cinematica_convite_koga.json`): o Brucy com 20%, falas dele e do Kōga ("Vamos ver
-se você aguenta, \"Líder\"") e os golpes do Kōga (M, H, S4 mergulho, S2 punho em sequência). As
-duas páginas são a lembrança do beco (`ep02/lembranca_koga1.jpg` e `lembranca_koga2.jpg`): o Kōga
-sozinho contra a gangue, o Brucy chega e os dois derrubam todo mundo.
+Na campanha do Kōga, o convite é **Kōga × Brucy** (beco do Brucy), com a mesma estrutura
+(`historia/ep02/cinematica_convite_koga.json`): o Brucy com 20%, as duas páginas da lembrança do
+beco (`ep02/lembranca_koga1.jpg` e `lembranca_koga2.jpg`: o Kōga sozinho contra a gangue, o Brucy
+chega e os dois derrubam todo mundo) e um final diferente, de briga de rua:
+
+| Momento | O que acontece | Golpe do Kōga | Vida do Brucy |
+|---|---|---|---|
+| O beco | faixas e closes: "Igual naquele beco... só que agora eu tô do outro lado." / "Melhor ainda! Vem, Brucy!" | — | 20% |
+| REVIDA! (toque) | o Brucy bate primeiro (golpe do roteiro: a cabeçada, TUM!); "Heh... essa doeu. Minha vez!"; POW! | H | −5% |
+| INVESTIDA! (deslizar para frente) | o Brucy recua e provoca: "Só isso, Líder?"; BAM BAM BAM! | S3 (avanço em três) | −5% |
+| FÚRIA! (martelar 14) | a câmera perto dele, câmera lenta; TATATATA! | S2 (punho em sequência) | −5% |
+| GOLPE FINAL! (tempo) | "Para de se exibir!" / "Eu dava conta... lembra?"; pulam para trás, faixas, correm um para o outro em câmera lenta; DOOOOM! | S4 (mergulho) | KO |
+| Depois | o Brucy caído: "Eu sei, eu sei..." (como no beco); "Heh... com essa dupla, ninguém segura a gente." | — | — |
 
 Para ver no PC sem jogar: `gradle :pc:testeQte` (a do Kōga: `-Pirmao=koga`) joga a luta inteira de verdade (passa as páginas,
 deixa a Yin-lu com 19%, lê as duas páginas, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo

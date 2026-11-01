@@ -90,6 +90,11 @@ public final class CinematicaLuta {
             return false;
         }
 
+        /** O golpe pedido para esse lado já pegou (o dano do roteiro entrou no alvo). */
+        default boolean golpeEntrou(int lado) {
+            return false;
+        }
+
         /** Um som da história ("pagina", "painel", "impacto"), o mesmo das páginas entre as lutas. */
         default void som(String id) {}
     }
@@ -159,7 +164,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -204,6 +209,13 @@ public final class CinematicaLuta {
         /** QTE: o golpe de quem acerta ({@link #quemMove} bate) e o contra-ataque de quem erra. */
         Golpe acerto;
         Golpe erro;
+        /**
+         * QTE e GOLPE: o impacto quando o golpe pega: um letreiro (uma onomatopeia), a luta
+         * congelando {@link #congela} segundos e um tranco de zoom até {@link #tranco}.
+         */
+        Acao impacto;
+        float congela;
+        float tranco = 1f;
 
         Acao(Tipo tipo) {
             this.tipo = tipo;
@@ -225,6 +237,7 @@ public final class CinematicaLuta {
             List<String> out = new ArrayList<>();
             for (Acao a : acoes) {
                 if (a.texto != null) out.add(a.texto);
+                if (a.impacto != null) out.add(a.impacto.texto);
                 if (a.propria == null) continue;
                 // As falas e legendas da página da cena também precisam de tradução.
                 for (Episodio.Quadro q : a.propria.quadros) {
@@ -410,6 +423,15 @@ public final class CinematicaLuta {
     /** De que lado é quem bate agora (o acerto: o jogador; o erro: o rival). */
     private int qteBatedor;
     private int qteTentativas;
+    /** O golpe em andamento (QTE ou GOLPE) já fez o impacto (letreiro, congelada, tranco). */
+    private boolean impactou;
+    /** A ação GOLPE: quem bate. */
+    private int golpeLado;
+    /** Impacto: a luta fica congelada até aqui; o tranco de zoom volta a partir de {@link #trancoVolta}. */
+    private float congelaAte = -1f;
+    private float trancoVolta = -1f;
+    private final Transicao tranco = new Transicao(1f);
+
     /** O jogador está no toque (as dicas dizem TOQUE) ou no teclado/controle (APERTE). */
     private boolean dicasDeToque = true;
 
@@ -501,6 +523,8 @@ public final class CinematicaLuta {
         focoRival.zerar();
         velocidade.zerar();
         estouros.clear();
+        tranco.zerar();
+        congelaAte = trancoVolta = -1f;
         tintaModo = ModoTinta.NADA;
         coberta = false;
         pinceladas = Collections.emptyList();
@@ -689,14 +713,44 @@ public final class CinematicaLuta {
                 break;
             case "qte":
                 a = qte(m);
+                impacto(a, m);
+                break;
+            case "golpe":
+                a = new Acao(Acao.Tipo.GOLPE);
+                a.quemMove = Episodio.string(m, "quem", "jogador");
+                if (!time(a.quemMove)) throw new IllegalArgumentException("quem bate: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
+                a.acerto = golpe(m, "golpe", "H", Boolean.TRUE.equals(m.get("final")));
+                impacto(a, m);
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe)");
         }
-        // O QTE sempre espera o jogador.
-        a.semEsperar = a.tipo != Acao.Tipo.QTE && Boolean.TRUE.equals(m.get("semEsperar"));
+        // O QTE sempre espera o jogador; o golpe, acabar.
+        a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
+        if ((a.tipo == Acao.Tipo.QTE || a.tipo == Acao.Tipo.GOLPE) && Boolean.TRUE.equals(m.get("semEsperar"))) {
+            throw new IllegalArgumentException(nome + " não aceita semEsperar");
+        }
         return a;
+    }
+
+    /**
+     * O {@code "impacto"} de um QTE ou golpe: {@code {"texto": "POW!", "congela": 0.3, "zoom": 1.2}}
+     * mais os campos de uma onomatopeia (pos, tamanho, tremor, rotacao, cor, segundos).
+     */
+    private static void impacto(Acao a, Map<String, Object> m) {
+        Object json = m.get("impacto");
+        if (json == null) return;
+        Map<String, Object> im = new java.util.LinkedHashMap<>(Episodio.asMap(json));
+        im.put("acao", "onomatopeia");
+        if (!im.containsKey("segundos")) im.put("segundos", 1.2);
+        try {
+            a.impacto = acao(null, im);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("impacto: " + ex.getMessage(), ex);
+        }
+        a.congela = numero(im, "congela", 0.15f, 0f, 2f);
+        a.tranco = numero(im, "zoom", 1.15f, 1f, 1.8f);
     }
 
     private static Acao qte(Map<String, Object> m) {
@@ -920,6 +974,10 @@ public final class CinematicaLuta {
             guiada.update(dt);
             somDaPagina();
         }
+        if (trancoVolta >= 0f && time >= trancoVolta) {
+            tranco.ir(1f, 0.35f);
+            trancoVolta = -1f;
+        }
         if (estado == Estado.RODANDO) avancar();
     }
 
@@ -993,6 +1051,11 @@ public final class CinematicaLuta {
                 qteTentativas = 0;
                 pedirQte();
                 break;
+            case GOLPE:
+                golpeLado = lado(a.quemMove);
+                impactou = false;
+                palco.golpear(golpeLado, a.acerto);
+                break;
             default:
                 break;
         }
@@ -1022,6 +1085,8 @@ public final class CinematicaLuta {
                 return !paginaNaTela || guiada.finished();
             case QTE:
                 return qtePronto();
+            case GOLPE:
+                return golpeAcabou(a, golpeLado, idade);
             default:
                 return true;
         }
@@ -1131,14 +1196,38 @@ public final class CinematicaLuta {
                 Golpe g = qteAcertou ? qte.acerto : qte.erro;
                 qteFase = FaseQte.GOLPE;
                 qteDesde = time;
+                // O impacto é só do acerto (o contra-ataque do rival entra sem letreiro).
+                impactou = !qteAcertou;
                 if (g != null) palco.golpear(qteBatedor, g);
                 return false;
             default:
-                if (palco.golpeando(qteBatedor) && idade < LIMITE_ESPERA) return false;
+                if (!golpeAcabou(qte, qteBatedor, idade)) return false;
                 if (qteAcertou) return true;
                 qteTentativas++;
                 pedirQte();
                 return false;
+        }
+    }
+
+    /**
+     * O golpe de quem bate ({@code lado}) acabou? Quando ele pega (ou acaba sem pegar: o dano
+     * do roteiro entra assim mesmo), sai o impacto da ação: letreiro, congelada e tranco.
+     */
+    private boolean golpeAcabou(Acao a, int lado, float idade) {
+        boolean andando = palco.golpeando(lado) && idade < LIMITE_ESPERA;
+        if (!impactou && (!andando || palco.golpeEntrou(lado))) {
+            impactou = true;
+            impactar(a);
+        }
+        return !andando;
+    }
+
+    private void impactar(Acao a) {
+        if (a.impacto != null) estouros.add(new Estouro(a.impacto, time));
+        if (a.congela > 0f) congelaAte = time + a.congela;
+        if (a.tranco > 1f) {
+            tranco.ir(a.tranco, 0.06f);
+            trancoVolta = time + Math.max(0.12f, a.congela);
         }
     }
 
@@ -1151,6 +1240,21 @@ public final class CinematicaLuta {
     /** Um QTE está esperando o jogador agora. */
     public boolean qtePedindo() {
         return pegaToque() && acao.tipo == Acao.Tipo.QTE && qteFase == FaseQte.PEDINDO;
+    }
+
+    /** O tipo do QTE atual (null sem QTE). */
+    public TipoQte qteTipo() {
+        return qte != null && acao == qte ? qte.qte : null;
+    }
+
+    /** A direção pedida no QTE de deslizar, na tela: {dx, dy} (-1, 0 ou 1). */
+    public int[] qteDirecao() {
+        return new int[] {qteDx, qteDy};
+    }
+
+    /** QTE de tempo: segundos até o anel fechar no botão. */
+    public float qteSegundos() {
+        return qte != null ? qte.segundos : 0f;
     }
 
     /** Quantas vezes o jogador já errou o QTE atual. */
@@ -1276,7 +1380,7 @@ public final class CinematicaLuta {
 
     /** Zoom extra da câmera pedido pela cena (1 = o da luta). */
     public float zoom() {
-        return zoom.valor();
+        return zoom.valor() * tranco.valor();
     }
 
     /**
@@ -1292,7 +1396,9 @@ public final class CinematicaLuta {
      * congela. A cena, as falas e as onomatopeias andam no tempo normal.
      */
     public float velocidade() {
-        return estado == Estado.RODANDO ? velocidade.valor() : 1f;
+        if (estado != Estado.RODANDO) return 1f;
+        // O impacto de um golpe congela a luta um instante.
+        return time < congelaAte ? 0f : velocidade.valor();
     }
 
     private static float suave(float k) {

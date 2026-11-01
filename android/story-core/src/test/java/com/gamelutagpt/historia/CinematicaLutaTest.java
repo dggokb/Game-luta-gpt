@@ -242,40 +242,65 @@ public class CinematicaLutaTest {
     }
 
     /**
-     * O teste dos QTE no convite do Episódio 2: a Yin-lu fica com 20% da vida, a tinta cobre, a
-     * página é lida quadro a quadro no toque, a tinta cobre de novo (a página some) e sai; os 4 QTE pedem, e cada acerto é
-     * um golpe do jogador. Deixar o tempo acabar e deslizar para trás são erros: o rival bate e
-     * o QTE pede de novo. O último golpe é o final, e a cena acaba com a tela limpa.
+     * O convite do Episódio 2 do Ryūga: a Yin-lu fica com 20% da vida, a tinta cobre, as páginas
+     * são lidas quadro a quadro no toque, a tinta cobre de novo (a página some) e sai; o final
+     * coreografado pede 4 QTE e o roteiro tem um golpe dela sem QTE. Deixar o tempo acabar e
+     * deslizar para o lado errado são erros: o rival bate e o QTE pede de novo. O último golpe é
+     * o final, com a luta congelando no impacto, e a cena acaba com a tela limpa.
      */
     @Test
-    public void qteDoConviteDoEpisodio2() throws IOException {
+    public void qteDoConviteDoRyuga() throws IOException {
+        Palco palco = jogarConvite(CONVITE_EP02, Torneio.RYUGA);
+        assertEquals("cada acerto um golpe do jogador; cada erro e o golpe roteirizado, do rival",
+            "[rival M, jogador M, rival S4, rival H, jogador S4, jogador H, jogador S2 final]", golpes(palco).toString());
+    }
+
+    /** O convite do Kōga: o Brucy bate primeiro (sem QTE) e o mergulho é o golpe final. */
+    @Test
+    public void qteDoConviteDoKoga() throws IOException {
+        Palco palco = jogarConvite("ep02/cinematica_convite_koga.json", Torneio.KOGA);
+        assertEquals("[rival S2, rival M, jogador H, rival S4, jogador S3, jogador S2, jogador S4 final]", golpes(palco).toString());
+    }
+
+    private static List<String> golpes(Palco palco) {
+        List<String> golpes = new ArrayList<>();
+        for (String p : palco.pedidos) {
+            if (p.matches("(jogador|rival) (2?[LMH]|S\\d?)( final)?")) golpes.add(p);
+        }
+        return golpes;
+    }
+
+    /**
+     * Joga a cena de um convite: o rival com 20% dispara, as páginas no toque e cada QTE pelo
+     * tipo dele (o primeiro e o primeiro deslize erram de propósito).
+     */
+    private static Palco jogarConvite(String arquivo, String irmao) throws IOException {
         Temporada temporada = Temporada.load(FILES);
         ConversaLuta conversa = new ConversaLuta(FILES);
         Palco palco = new Palco();
         palco.quadrosPorMovimento = 20;
         CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, conversa, palco);
-        assertTrue(cena.carregar(temporada, CONVITE_EP02, Torneio.RYUGA));
-        assertTrue("esperando, a Yin-lu não cai antes da cena", cena.protegeVida(CinematicaLuta.RIVAL));
-        assertFalse("o Ryūga pode perder antes da cena", cena.protegeVida(CinematicaLuta.JOGADOR));
-        assertFalse("o gatilho é a vida da Yin-lu", cena.gatilho(0.1f, 0.5f, 10f, false));
-        assertFalse("ela ainda tem mais de 20%", cena.gatilho(1f, 0.25f, 10f, false));
+        assertTrue(cena.carregar(temporada, arquivo, irmao));
+        assertTrue("esperando, o rival não cai antes da cena", cena.protegeVida(CinematicaLuta.RIVAL));
+        assertFalse("o jogador pode perder antes da cena", cena.protegeVida(CinematicaLuta.JOGADOR));
+        assertFalse("o gatilho é a vida do rival", cena.gatilho(0.1f, 0.5f, 10f, false));
+        assertFalse("ele ainda tem mais de 20%", cena.gatilho(1f, 0.25f, 10f, false));
         assertTrue(cena.gatilho(1f, 0.2f, 12f, false));
         assertTrue(palco.travado);
         assertTrue("com a cena rodando ninguém cai", cena.protegeVida(CinematicaLuta.JOGADOR) && cena.protegeVida(CinematicaLuta.RIVAL));
 
         PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
-        boolean cobriu = false, pedia = false;
-        int toquesNaPagina = 0;
-        boolean paginaSumiu = false;
-        int qtes = 0, quadrosNoQte = 0, toques = 0;
+        boolean cobriu = false, pedia = false, paginaSumiu = false, congelou = false;
         boolean errouToque = false, errouDeslize = false;
-        for (int i = 0; i < 60 * 90 && !cena.acabou(); i++) {
+        int toquesNaPagina = 0, qtes = 0, quadrosNoQte = 0, toques = 0;
+        for (int i = 0; i < 60 * 120 && !cena.acabou(); i++) {
             palco.quadro();
             cena.update(DT);
             conversa.update(DT);
             cena.render(canvas);
             conversa.render(canvas);
             cobriu |= cena.telaCoberta();
+            congelou |= cena.velocidade() == 0f;
             if (cena.paginaNaTela() && cena.pegaToque() && i % 20 == 0) {
                 // A página: um toque por vez, quadro a quadro, como na história.
                 cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 360f);
@@ -292,24 +317,24 @@ public class CinematicaLutaTest {
             pedia = pede;
             if (!pede) continue;
             quadrosNoQte++;
-            switch (qtes) {
-                case 1:
-                    // Primeiro deixa o tempo acabar (erro), depois toca.
-                    if (cena.qteErros() == 0) errouToque = true;
+            switch (cena.qteTipo()) {
+                case TOQUE:
+                    // O primeiro QTE deixa o tempo acabar (erro), depois toca.
+                    if (qtes == 1 && cena.qteErros() == 0) errouToque = true;
                     else if (quadrosNoQte == 10) cena.toque(CinematicaLuta.TOQUE_DESCE, 300f, 300f);
                     break;
-                case 2:
-                    if (quadrosNoQte % 4 == 0 && toques < 8) {
+                case MARTELAR:
+                    if (quadrosNoQte % 4 == 0) {
                         cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 400f);
                         cena.toque(CinematicaLuta.TOQUE_SOBE, 640f, 400f);
                         toques++;
                     }
                     break;
-                case 3:
+                case DESLIZAR:
                     if (quadrosNoQte == 6) {
-                        // O jogador está à esquerda: "frente" é para a direita.
-                        int dx = cena.qteErros() == 0 ? -1 : 1;
-                        errouDeslize |= dx < 0;
+                        // Primeiro para o lado contrário (erro), depois para o pedido.
+                        int dx = cena.qteDirecao()[0] * (cena.qteErros() == 0 ? -1 : 1);
+                        errouDeslize |= cena.qteErros() == 0;
                         cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 420f);
                         cena.toque(CinematicaLuta.TOQUE_MOVE, 640f + dx * 60f, 425f);
                         cena.toque(CinematicaLuta.TOQUE_MOVE, 640f + dx * 130f, 430f);
@@ -317,27 +342,25 @@ public class CinematicaLutaTest {
                     }
                     break;
                 default:
-                    // O anel fecha em 1,3 s: toca na hora.
-                    if (quadrosNoQte == Math.round(1.3f * 60f)) cena.botao();
+                    // O anel fecha no tempo do QTE: toca na hora.
+                    if (quadrosNoQte == Math.round(cena.qteSegundos() * 60f)) cena.botao();
                     break;
             }
         }
-        assertTrue("a cena termina", cena.acabou());
+        assertTrue(arquivo + ": a cena termina", cena.acabou());
         assertTrue("a tinta cobriu a tela", cobriu);
-        assertTrue("a página foi lida em vários toques: " + toquesNaPagina, toquesNaPagina >= 3);
+        assertTrue("as páginas foram lidas em vários toques: " + toquesNaPagina, toquesNaPagina >= 6);
         assertTrue("a tinta nova cobriu a página", paginaSumiu);
         assertTrue(errouToque);
         assertTrue(errouDeslize);
+        assertTrue("o impacto congela a luta", congelou);
         assertEquals(4, qtes);
-        List<String> golpes = new ArrayList<>();
-        for (String p : palco.pedidos) {
-            if (p.matches("(jogador|rival) (2?[LMH]|S\\d?)( final)?")) golpes.add(p);
-        }
-        assertEquals("cada acerto um golpe do jogador; cada erro, um do rival",
-            "[rival M, jogador M, jogador H, rival M, jogador S4, jogador S2 final]", golpes.toString());
         assertTrue("a recuada antes da tinta sair", palco.pedidos.contains("jogador RECUAR"));
         assertFalse("a tela limpa no fim", cena.telaCoberta());
         assertFalse(cena.controleTravado());
+        assertEquals("a luta volta à velocidade normal", 1f, cena.velocidade(), 1e-3f);
+        assertEquals("a câmera volta", 1f, cena.zoom(), 1e-3f);
+        return palco;
     }
 
     /** O QTE precisa do controle travado (quem bate é o roteiro). */

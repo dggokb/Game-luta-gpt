@@ -93,7 +93,7 @@ public final class TesteQteConvite {
         // A cena: tinta, página (pula com um toque), tinta, QTE.
         int qtes = 0, noQte = 0, toques = 0;
         boolean pedia = false;
-        limite = 60 * 90;
+        limite = 60 * 150;
         while (!cena.acabou() && limite-- > 0) {
             boolean pede = cena.qtePedindo();
             if (pede && !pedia) {
@@ -106,22 +106,23 @@ public final class TesteQteConvite {
             pedia = pede;
             if (pede) {
                 noQte++;
+                CinematicaLuta.TipoQte tipo = cena.qteTipo();
                 if (qtes == 1 && cena.qteErros() == 0) {
                     // Deixa o tempo acabar: o rival contra-ataca e o QTE pede de novo.
-                } else if (qtes == 1 && noQte == 20) {
+                } else if (tipo == CinematicaLuta.TipoQte.TOQUE && noQte == 20) {
                     toque(MotionEvent.ACTION_DOWN, 300f, 300f);
                     toque(MotionEvent.ACTION_UP, 300f, 300f);
-                } else if (qtes == 2 && noQte % 5 == 0 && toques < 8) {
+                } else if (tipo == CinematicaLuta.TipoQte.MARTELAR && noQte % 5 == 0) {
                     // Martelar no teclado (J).
                     tecla(KeyEvent.KEYCODE_J);
                     toques++;
-                } else if (qtes == 3 && noQte == 25) {
-                    float dx = jogo.engine.fighter(GameView.PLAYER).x < jogo.engine.fighter(GameView.OPPONENT).x ? 1f : -1f;
+                } else if (tipo == CinematicaLuta.TipoQte.DESLIZAR && noQte == 25) {
+                    float dx = cena.qteDirecao()[0];
                     toque(MotionEvent.ACTION_DOWN, 640f, 420f);
                     toque(MotionEvent.ACTION_MOVE, 640f + dx * 60f, 422f);
                     toque(MotionEvent.ACTION_MOVE, 640f + dx * 140f, 425f);
                     toque(MotionEvent.ACTION_UP, 640f + dx * 140f, 425f);
-                } else if (qtes == 4 && noQte == Math.round(1.3f * 60f)) {
+                } else if (tipo == CinematicaLuta.TipoQte.TEMPO && noQte == Math.round(cena.qteSegundos() * 60f)) {
                     toque(MotionEvent.ACTION_DOWN, 640f, 420f);
                     toque(MotionEvent.ACTION_UP, 640f, 420f);
                 }

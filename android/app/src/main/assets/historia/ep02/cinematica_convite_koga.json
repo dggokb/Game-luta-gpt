@@ -1,5 +1,5 @@
 {
-  "_comentario": "Cena da luta do convite do Kōga (Kōga × Brucy), igual à do Ryūga (cinematica_convite_ryuga.json). Quando o Brucy já perdeu 80% da vida (fica com 20%), a tinta pinta a tela de branco, as duas páginas da lembrança do beco (o Kōga sozinho contra a gangue, o Brucy chega e os dois derrubam todo mundo) são lidas quadro a quadro (o motor das páginas da história: isola cada quadro, abre os balões, um toque segue), a tinta pinta de novo e sai mostrando a luta. Daí são 4 QTE (tocar, martelar, deslizar e o anel na hora certa), com falas nos quadros laterais entre eles: cada acerto é um golpe de verdade do Kōga que tira o pedaço de vida do \"dano\"; cada erro, um contra-ataque dele, e o QTE pede de novo. O último derruba (\"final\") e a luta acaba no KO. Motor e formato: docs/historia/motor-cinematicas.md.",
+  "_comentario": "Cena da luta do convite do Kōga (Kōga × Brucy). Quando o Brucy já perdeu 80% da vida (fica com 20%), a tinta pinta a tela de branco, as duas páginas da lembrança do beco (o Kōga sozinho contra a gangue, o Brucy chega e os dois derrubam todo mundo) são lidas quadro a quadro, a tinta pinta de novo e sai mostrando a luta. Daí o final coreografado, de briga de rua: o Brucy lembra do beco, acerta a cabeçada primeiro e o Kōga revida (QTE), o Brucy recua e provoca e o Kōga avança em três (QTE), a fúria de perto em câmera lenta (QTE) e os dois correndo um para o outro para o mergulho final (QTE), com o Brucy caído respondendo como no beco. Cada acerto é um golpe de verdade do Kōga com letreiro de impacto; cada erro, um contra-ataque dele, e o QTE pede de novo. Motor e formato: docs/historia/motor-cinematicas.md.",
   "gatilho": { "vida": 0.20, "lado": "rival" },
   "acoes": [
     { "acao": "controle", "travar": true },
@@ -27,23 +27,42 @@
     { "acao": "mover", "quem": "ambos", "movimento": "recuar" },
     { "acao": "tinta", "cobrir": false, "segundos": 0.9 },
 
-    { "acao": "fala", "quem": "p04", "lado": "rival", "texto": "Agora é sério. Vamos ver se você aguenta, \"Líder\".", "segura": 1.0 },
-    { "acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "Pode vir!", "segura": 0.6 },
-    { "acao": "qte", "tipo": "toque", "texto": "SOCO!", "golpe": "M", "dano": 0.05,
-      "erro": { "golpe": "M", "dano": 0.05 } },
+    {"acao": "faixas", "entrar": true, "segundos": 0.6, "semEsperar": true},
+    {"acao": "camera", "zoom": 1.6, "foco": "rival", "segundos": 0.6},
+    {"acao": "fala", "quem": "p04", "lado": "rival", "texto": "Igual naquele beco... só que agora eu tô do outro lado.", "segura": 1.0},
+    {"acao": "camera", "zoom": 1.6, "foco": "koga", "segundos": 0.5},
+    {"acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "Melhor ainda! Vem, Brucy!", "segura": 0.6},
+    {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.5, "semEsperar": true},
+    {"acao": "faixas", "entrar": false, "segundos": 0.5},
 
-    { "acao": "fala", "quem": "p04", "lado": "rival", "texto": "Tsc... sorte de principiante.", "segura": 0.6 },
-    { "acao": "qte", "tipo": "martelar", "texto": "SEQUÊNCIA!", "vezes": 8, "segundos": 2.6, "golpe": "H", "dano": 0.05,
-      "erro": { "golpe": "H", "dano": 0.06 } },
+    {"acao": "golpe", "quem": "rival", "golpe": "S2", "dano": 0.04, "impacto": {"texto": "TUM!", "congela": 0.25, "zoom": 1.2, "cor": "#FFFFFF", "pos": [0.5, 0.3]}},
+    {"acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "Heh... essa doeu. Minha vez!", "segura": 0.5},
+    {"acao": "qte", "tipo": "toque", "texto": "REVIDA!", "golpe": "H", "dano": 0.05, "impacto": {"texto": "POW!", "congela": 0.2, "zoom": 1.2}, "erro": {"golpe": "M", "dano": 0.05}},
 
-    { "acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "Eu nem esquentei ainda!", "segura": 0.6 },
-    { "acao": "qte", "tipo": "deslizar", "direcao": "frente", "texto": "AVANÇA!", "golpe": "S4", "dano": 0.05,
-      "erro": { "golpe": "M", "dano": 0.05 } },
+    {"acao": "mover", "quem": "rival", "movimento": "recuar"},
+    {"acao": "fala", "quem": "p04", "lado": "rival", "texto": "Só isso, Líder?", "segura": 0.5},
+    {"acao": "qte", "tipo": "deslizar", "direcao": "frente", "texto": "INVESTIDA!", "golpe": "S3", "dano": 0.05, "impacto": {"texto": "BAM BAM BAM!", "congela": 0.25, "zoom": 1.25, "tamanho": 130}, "erro": {"golpe": "S4", "dano": 0.05}},
 
-    { "acao": "fala", "quem": "p04", "lado": "rival", "texto": "Desde quando você bate assim?!", "segura": 0.7 },
-    { "acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "Acabou, Brucy!", "segura": 0.5 },
-    { "acao": "qte", "tipo": "tempo", "texto": "GOLPE FINAL!", "segundos": 1.3, "golpe": "S2", "final": true,
-      "erro": { "golpe": "H", "dano": 0.06 } },
-    { "acao": "esperar", "segundos": 1.6 }
+    {"acao": "camera", "zoom": 1.35, "foco": "koga", "segundos": 0.5, "semEsperar": true},
+    {"acao": "velocidade", "valor": 0.6, "segundos": 0.3, "semEsperar": true},
+    {"acao": "qte", "tipo": "martelar", "texto": "FÚRIA!", "vezes": 14, "segundos": 3.0, "golpe": "S2", "dano": 0.05, "impacto": {"texto": "TATATATA!", "congela": 0.35, "zoom": 1.3, "tamanho": 140}, "erro": {"golpe": "H", "dano": 0.05}},
+    {"acao": "velocidade", "valor": 1.0, "segundos": 0.3, "semEsperar": true},
+    {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.5, "semEsperar": true},
+
+    {"acao": "fala", "quem": "p04", "lado": "rival", "texto": "Para de se exibir!", "segura": 0.5},
+    {"acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "Eu dava conta... lembra?", "segura": 0.6},
+    {"acao": "mover", "quem": "ambos", "movimento": "pular-tras"},
+    {"acao": "faixas", "entrar": true, "segundos": 0.5, "semEsperar": true},
+    {"acao": "mover", "quem": "ambos", "movimento": "correr", "distancia": 260},
+    {"acao": "velocidade", "valor": 0.3, "segundos": 0.25, "semEsperar": true},
+    {"acao": "camera", "zoom": 1.3, "foco": "centro", "segundos": 0.6, "semEsperar": true},
+    {"acao": "qte", "tipo": "tempo", "texto": "GOLPE FINAL!", "segundos": 1.2, "golpe": "S4", "final": true, "impacto": {"texto": "DOOOOM!", "tamanho": 150, "pos": [0.5, 0.36], "tremor": 20, "congela": 0.7, "zoom": 1.5, "cor": "#FF3B3B", "segundos": 1.8}, "erro": {"golpe": "S2", "dano": 0.05}},
+    {"acao": "velocidade", "valor": 1.0, "segundos": 0.4, "semEsperar": true},
+    {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.8},
+    {"acao": "esperar", "segundos": 0.8},
+    {"acao": "fala", "quem": "p04", "lado": "rival", "texto": "Eu sei, eu sei...", "segura": 1.0},
+    {"acao": "fala", "quem": "koga", "expressao": "normal", "texto": "Heh... com essa dupla, ninguém segura a gente.", "segura": 1.2},
+    {"acao": "faixas", "entrar": false, "segundos": 0.6},
+    {"acao": "esperar", "segundos": 0.4}
   ]
 }

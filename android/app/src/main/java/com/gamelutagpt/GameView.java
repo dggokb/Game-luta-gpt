@@ -7188,6 +7188,10 @@ public class GameView extends SurfaceView
             onHistoriaSom(id);
         }
 
+        @Override public boolean golpeEntrou(int lado) {
+            return golpeDoRoteiro[lado] && engine.fighter(1 - lado).state.cenaSemDano;
+        }
+
         @Override public boolean golpeando(int lado) {
             if (cinematicaDirector.movendo(lado)) return true;
             if (golpeDoRoteiro[lado]) {
