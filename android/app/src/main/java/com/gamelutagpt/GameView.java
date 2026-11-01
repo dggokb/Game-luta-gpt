@@ -5278,7 +5278,7 @@ public class GameView extends SurfaceView
         if (folego != 1f && f.grounded && !f.attacking() && !f.inHitstun()) {
             c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
         }
-        renderer.setTint(desgaste.tinta(f.state));
+        renderer.setTint(corDoLado(f, desgaste.tinta(f.state)));
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
@@ -5286,6 +5286,33 @@ public class GameView extends SurfaceView
         }
         if (look != null) renderer.setOverride(null);
         c.restore();
+    }
+
+    /** Cor alternativa: giro da cor das partes coloridas, força e matiz do tingido nos escuros. */
+    static final float COR_ALT_GIRO = 0.5f, COR_ALT_ESCUROS = 0.6f, COR_ALT_MATIZ_ESCUROS = 0.6f;
+    private final java.util.Map<Filtro, Filtro> corAlternada = new java.util.IdentityHashMap<>();
+    private Filtro corAlternadaSemTinta;
+
+    /**
+     * O mesmo personagem dos dois lados: o do lado 2 sai com a cor alternativa
+     * ({@link Filtro#corAlternativa}), por cima do desgaste dele. Sem refazer nenhuma animação.
+     */
+    private Filtro corDoLado(CombatFighter f, Filtro tinta) {
+        CombatFighter outro = engine.fighter(1 - f.index);
+        if (f.index != 1 || f.character() == null || outro.character() == null ||
+            !f.character().id.equals(outro.character().id)) return tinta;
+        if (tinta == null) {
+            if (corAlternadaSemTinta == null) {
+                corAlternadaSemTinta = Filtro.corAlternativa(null, COR_ALT_GIRO, COR_ALT_ESCUROS, COR_ALT_MATIZ_ESCUROS);
+            }
+            return corAlternadaSemTinta;
+        }
+        Filtro alt = corAlternada.get(tinta);
+        if (alt == null) {
+            alt = Filtro.corAlternativa(tinta, COR_ALT_GIRO, COR_ALT_ESCUROS, COR_ALT_MATIZ_ESCUROS);
+            corAlternada.put(tinta, alt);
+        }
+        return alt;
     }
 
     /**

@@ -71,10 +71,34 @@ final class GlRenderCanvas implements RenderCanvas {
         "#version 300 es\n" +
         "precision mediump float;\n" +
         "uniform sampler2D uTex; uniform sampler2D uTexto; uniform sampler2D uDegrade;\n" +
-        "uniform mat4 uCor; uniform vec4 uCorSoma; uniform bool uFiltro; uniform bool uInverte;\n" +
+        "uniform mat4 uCor; uniform vec4 uCorSoma; uniform bool uFiltro; uniform bool uInverte; uniform vec4 uTroca;\n" +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
+        // Cor alternativa (uTroca: ligada, giro, força nos escuros, matiz dos escuros): gira a cor
+        // do que é colorido, tinge os escuros e deixa a pele (laranja pouco saturado) como está.
+        "vec3 hsv(vec3 c) {\n" +
+        "  vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n" +
+        "  vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n" +
+        "  vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n" +
+        "  float d = q.x - min(q.w, q.y);\n" +
+        "  return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + 1e-6)), d / (q.x + 1e-6), q.x);\n" +
+        "}\n" +
+        "vec3 rgb(vec3 c) {\n" +
+        "  vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0);\n" +
+        "  return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);\n" +
+        "}\n" +
+        "vec3 troca(vec3 s) {\n" +
+        "  vec3 h = hsv(s);\n" +
+        "  bool pele = h.x > 0.02 && h.x < 0.14 && h.y < 0.78 && h.z > 0.28;\n" +
+        "  if (pele) return s;\n" +
+        "  if (h.y > 0.22 && h.z > 0.12) { h.x = fract(h.x + uTroca.y); }\n" +
+        "  else if (h.z < 0.4) {\n" +
+        "    float k = uTroca.z * (1.0 - h.z / 0.4 * 0.5);\n" +
+        "    h = vec3(uTroca.w, mix(h.y, 0.65, k), h.z + 0.07 * k);\n" +
+        "  }\n" +
+        "  return rgb(h);\n" +
+        "}\n" +
         "void main() {\n" +
         "  highp vec3 p = vec3(gl_FragCoord.xy, 1.0);\n" +
         "  for (int i = 0; i < 32; i++) {\n" +
@@ -89,6 +113,7 @@ final class GlRenderCanvas implements RenderCanvas {
         "    vec4 t = texture(uTex, vUv);\n" +
         "    if (uFiltro) {\n" +
         "      vec3 s = t.a > 0.0 ? t.rgb / t.a : vec3(0.0);\n" +
+        "      if (uTroca.x > 0.5) s = troca(s);\n" +
         "      vec4 u = clamp(uCor * vec4(s, t.a) + uCorSoma, 0.0, 1.0);\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         "    }\n" +
@@ -145,10 +170,10 @@ final class GlRenderCanvas implements RenderCanvas {
 
     /** Um programa e onde ficam os uniforms dele. */
     private static final class Programa {
-        int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte;
+        int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
     }
     private Programa completo, enxuto, prog;
-    private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, vbo, vao;
+    private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
@@ -243,6 +268,7 @@ final class GlRenderCanvas implements RenderCanvas {
         p.uCor = GLES30.glGetUniformLocation(p.id, "uCor");
         p.uCorSoma = GLES30.glGetUniformLocation(p.id, "uCorSoma");
         p.uFiltro = GLES30.glGetUniformLocation(p.id, "uFiltro");
+        p.uTroca = GLES30.glGetUniformLocation(p.id, "uTroca");
         p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
         p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
         p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
@@ -257,7 +283,7 @@ final class GlRenderCanvas implements RenderCanvas {
     private void usarPrograma(Programa p) {
         prog = p;
         programa = p.id;
-        uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte;
+        uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte; uTroca = p.uTroca;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
         GLES30.glUseProgram(p.id);
     }
@@ -781,6 +807,9 @@ final class GlRenderCanvas implements RenderCanvas {
         }
         GLES30.glUniformMatrix4fv(uCor, 1, false, matrizCor, 0);
         GLES30.glUniform4f(uCorSoma, m[4] / 255f, m[9] / 255f, m[14] / 255f, m[19] / 255f);
+        // A cor alternativa (Filtro.corAlternativa) vem nos 4 números depois da matriz.
+        if (m.length >= 24) GLES30.glUniform4f(uTroca, m[20], m[21], m[22], m[23]);
+        else GLES30.glUniform4f(uTroca, 0f, 0f, 0f, 0f);
     }
 
     private void usar(int textura) {
