@@ -15670,7 +15670,7 @@
       "activeFrames": 5,
       "recoveryFrames": 11,
       "hitstunFrames": 20,
-      "blockstunFrames": 17,
+      "blockstunFrames": 15,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -15712,7 +15712,7 @@
       "activeFrames": 6,
       "recoveryFrames": 16,
       "hitstunFrames": 25,
-      "blockstunFrames": 22,
+      "blockstunFrames": 19,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
@@ -15793,7 +15793,7 @@
       "activeFrames": 5,
       "recoveryFrames": 11,
       "hitstunFrames": 20,
-      "blockstunFrames": 17,
+      "blockstunFrames": 15,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
