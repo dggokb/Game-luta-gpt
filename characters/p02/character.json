@@ -165,7 +165,8 @@
         92
       ]
     },
-    "comboStyle": "chutes"
+    "comboStyle": "chutes",
+    "cpuStyle": "contra"
   },
   "animations": {
     "IDLE": {

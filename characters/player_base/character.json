@@ -94,7 +94,8 @@
     "assist": {
       "move": "S"
     },
-    "comboStyle": "equilibrado"
+    "comboStyle": "equilibrado",
+    "cpuStyle": "onda"
   },
   "animations": {
     "IDLE": {

@@ -172,7 +172,8 @@
       }
     },
     "walkSpeed": 360,
-    "walkBackSpeed": 230
+    "walkBackSpeed": 230,
+    "cpuStyle": "acrobata"
   },
   "animations": {
     "IDLE": {

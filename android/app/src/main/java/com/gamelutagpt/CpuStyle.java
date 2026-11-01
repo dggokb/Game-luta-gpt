@@ -19,11 +19,21 @@ final class CpuStyle {
     final double jumping;
     /** Multiplica o hábito de esperar defendendo colado. */
     final double patience;
+    /** Multiplica a chance de responder com o especial de reação (contra-golpe, esquiva, aparar). */
+    final double reactSpecial;
+    /** Multiplica a chance de trocar a decisão do neutro por um especial (avanço, teleporte). */
+    final double neutralSpecial;
 
     private CpuStyle(String name, float preferredDistance, double aggression, double zoning, double throwing,
                      double jumping, double patience) {
+        this(name, preferredDistance, aggression, zoning, throwing, jumping, patience, 1.0, 1.0);
+    }
+
+    private CpuStyle(String name, float preferredDistance, double aggression, double zoning, double throwing,
+                     double jumping, double patience, double reactSpecial, double neutralSpecial) {
         this.name = name; this.preferredDistance = preferredDistance; this.aggression = aggression;
         this.zoning = zoning; this.throwing = throwing; this.jumping = jumping; this.patience = patience;
+        this.reactSpecial = reactSpecial; this.neutralSpecial = neutralSpecial;
     }
 
     static final CpuStyle EQUILIBRADO = new CpuStyle("equilibrado", 240f, 0.70, 1.0, 1.0, 1.0, 0.8);
@@ -38,6 +48,14 @@ final class CpuStyle {
         // O grappler: chega perto e agarra (docs/balanco/ajustes.md, etapa 4b). Só a CPU; as
         // correntes de combo são as do tanque.
         new CpuStyle("agarrador", 80f, 0.90, 0.3, 4.0, 0.5, 0.7),
+        // Os do núcleo parecido, cada um jogando com a ferramenta que só ele tem
+        // (docs/balanco/identidade.md, passo 3).
+        new CpuStyle("onda", 300f, 0.60, 1.6, 0.8, 0.8, 0.9, 1.6, 1.0),        // Ryūga: Onda carregada e Aparar
+        new CpuStyle("contra", 200f, 0.65, 0.6, 1.0, 1.0, 1.3, 2.2, 0.8),      // Yin-lu: espera e lê com o contra-golpe
+        new CpuStyle("rekka", 140f, 0.95, 0.4, 1.2, 0.8, 0.5, 1.0, 3.0),       // Kōga: entra com o avanço em três
+        new CpuStyle("esquiva", 130f, 0.90, 0.4, 1.4, 0.8, 0.6, 2.2, 1.5),     // p04: esquiva o que vem e entra
+        new CpuStyle("ninja", 240f, 0.80, 1.2, 1.0, 1.6, 0.6, 1.0, 2.5),       // p05: kunai, shuriken e teleporte
+        new CpuStyle("acrobata", 200f, 0.90, 0.6, 1.0, 2.4, 0.5, 1.6, 1.5),    // p10: pula, air dash e voadora
     };
 
     static CpuStyle of(String name) {

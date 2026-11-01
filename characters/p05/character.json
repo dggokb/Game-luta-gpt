@@ -181,7 +181,8 @@
       }
     },
     "walkSpeed": 340,
-    "walkBackSpeed": 230
+    "walkBackSpeed": 230,
+    "cpuStyle": "ninja"
   },
   "animations": {
     "IDLE": {

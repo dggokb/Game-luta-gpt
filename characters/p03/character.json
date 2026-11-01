@@ -176,7 +176,8 @@
       "corrida": {
         "dash": 1.15
       }
-    }
+    },
+    "cpuStyle": "rekka"
   },
   "animations": {
     "IDLE": {

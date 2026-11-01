@@ -61,7 +61,7 @@ JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
 COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
 # Estilo só da CPU (fighter.cpuStyle), quando difere do de combo.
-CPU_STYLES = COMBO_STYLES + ('agarrador',)
+CPU_STYLES = COMBO_STYLES + ('agarrador', 'onda', 'contra', 'rekka', 'esquiva', 'ninja', 'acrobata')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
             'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
 STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')

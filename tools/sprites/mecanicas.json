@@ -358,7 +358,8 @@
       "super": {
         "acertos": 5,
         "intervalo": 8
-      }
+      },
+      "estiloCpu": "onda"
     },
     "p02": {
       "molde": "Rushdown / contra-golpe",
@@ -401,7 +402,8 @@
       },
       "s1": {
         "visual": "PALMA"
-      }
+      },
+      "estiloCpu": "contra"
     },
     "p03": {
       "molde": "Rushdown",
@@ -476,7 +478,8 @@
           4,
           0
         ]
-      }
+      },
+      "estiloCpu": "rekka"
     },
     "p04": {
       "molde": "Brawler",
@@ -541,7 +544,8 @@
       },
       "s1": {
         "visual": "ESTOURO"
-      }
+      },
+      "estiloCpu": "esquiva"
     },
     "p05": {
       "molde": "Mixup",
@@ -623,7 +627,8 @@
           4,
           0
         ]
-      }
+      },
+      "estiloCpu": "ninja"
     },
     "p06": {
       "molde": "Zoner / trapper",
@@ -975,7 +980,8 @@
           4,
           0
         ]
-      }
+      },
+      "estiloCpu": "acrobata"
     },
     "p11": {
       "molde": "Zoner / trapper",

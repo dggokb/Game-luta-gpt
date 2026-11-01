@@ -1266,7 +1266,7 @@ final class AiController {
             gap <= seen.attack.reach + me.body().halfWidth + 60f) {
             specialMeleeSerial = seen.attackSerial;
             meleePlan = null;
-            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard) {
+            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard * CpuStyle.of(me.character()).reactSpecial) {
                 meleePlan = meleeAnswer(me, target, kit, seen, gap, elapsed, false);
             }
             if (meleePlan != null) lastGuardSerial = seen.attackSerial;   // não defende por cima
@@ -1292,7 +1292,7 @@ final class AiController {
         if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != specialShotSerial) {
             specialShotSerial = seen.projectileSerial;
             shotPlan = null;
-            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard) {
+            if (specialRandom.nextDouble() < SPECIAL_REACT_CHANCE * level.reactGuard * CpuStyle.of(me.character()).reactSpecial) {
                 for (CpuSpecials.Option o : kit) {
                     AttackDefinition.Mechanics m = o.m();
                     boolean repel = o.role == CpuSpecials.Role.REPEL;
@@ -1419,7 +1419,7 @@ final class AiController {
      */
     private void specialNeutral(CombatFighter me, CombatFighter target, CpuPerception.Snapshot seen) {
         if (situation.selfAirborne || !situation.attackReady || !situation.targetAlive || !seen.grounded) return;
-        if (specialRandom.nextDouble() >= SPECIAL_NEUTRAL_CHANCE * (0.2 + 0.8 * smart())) return;
+        if (specialRandom.nextDouble() >= SPECIAL_NEUTRAL_CHANCE * (0.2 + 0.8 * smart()) * CpuStyle.of(me.character()).neutralSpecial) return;
         float gap = situation.distance;
         CharacterDefinition.Body body = target.body();
         CpuSpecials.Option best = null;
