@@ -61,6 +61,29 @@ em GIF, com a origem marcada em vermelho, em `android/app/build/sprite-review/ef
 **A chave do verde é por diferença de cor:** o branco a 50% sobre o verde volta a ser branco a
 50% (a fumaça e o brilho ficam meio transparentes, sem borda verde). Manchinhas de ruído saem.
 
+## Efeitos desenhados em código (anidoodle)
+
+Outro jeito de fazer o vídeo verde: desenhar o efeito em código com o
+[anidoodle](https://github.com/alexgreensh/anidoodle) (Apache-2.0). O mesmo código gera sempre os
+mesmos quadros, o verde sai liso (#00FF00) e dá para ajustar um detalhe sem mudar o resto. O
+código de cada efeito fica em `tools/sprites/efeitos_codigo/<nome>.ts`.
+
+| Efeito | Código | Quadros |
+|---|---|---|
+| `impacto_forte` | `impacto_forte.ts`: clarão, estrela de 12 espinhos longos com linhas de velocidade, o centro rompe e cada espinho vira um caco que voa girando, com gotas | 8 a 24 fps (~0,33 s) |
+
+```bash
+git clone https://github.com/alexgreensh/anidoodle /tmp/anidoodle
+node /tmp/anidoodle/skills/anidoodle/engine/tools/scaffold.mjs /tmp/fx --film impacto_forte --size 1280x720 --fps 24
+cp tools/sprites/efeitos_codigo/impacto_forte.ts /tmp/fx/src/canvas-core/
+(cd /tmp/fx && npm install && node tools/render.mjs impacto_forte --out out/impacto_forte.mp4)
+# o vídeo tem um quadro vazio no começo e no fim: --inicio/--fim os tiram (o impacto aparece no
+# mesmo quadro do acerto)
+python3 tools/sprites/efeito_video.py /tmp/fx/out/impacto_forte.mp4 --nome impacto_forte --ancora centro --altura 220 --inicio 1 --fim 8
+```
+
+Prévia rápida dos quadros sem render: `node tools/still.mjs impacto_forte --frames 1,2,3,4,5,6,7,8 --sheet out/sheet.png`.
+
 ## Efeitos do manequim (dano e defesa)
 
 Outro jeito de fazer o efeito: um manequim verde sobre o fundo verde levando o golpe. O manequim

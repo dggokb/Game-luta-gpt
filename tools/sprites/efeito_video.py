@@ -62,7 +62,9 @@ def cor_do_fundo(quadros):
     """A cor do verde: a mediana dos pixels bem verdes (dos primeiros quadros, quase vazios)."""
     amostra = np.concatenate([q.reshape(-1, 3) for q in quadros[:3]]).astype(np.float32)
     verde = amostra[:, 1] - np.maximum(amostra[:, 0], amostra[:, 2])
-    fundo = amostra[verde > np.percentile(verde, 60)]
+    # >= e não >: num verde liso (efeito desenhado em código, sem ruído) todos os pixels empatam
+    # no percentil e o > não pegaria nenhum (fundo NaN, efeito preto).
+    fundo = amostra[verde >= np.percentile(verde, 60)]
     return np.median(fundo, axis=0)
 
 
