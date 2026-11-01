@@ -72,8 +72,9 @@ public class CinematicaDirectorTest {
     }
 
     /**
-     * A troca de golpes entre os QTE: os dois andam, os dois atacam, quem defende segura a
-     * defesa e nenhum golpe pega (sem a proteção do jogo, só a coreografia). Acaba sozinha.
+     * A troca de golpes entre os QTE, com os lances sorteados: os dois andam, os dois atacam,
+     * quem defende segura a defesa e, com a proteção do jogo (o choque é golpe contra golpe),
+     * ninguém perde vida. Acaba sozinha.
      */
     @Test public void trocaDeGolpesSemAcertar() {
         for (long semente = 1; semente <= 6; semente++) {
@@ -85,6 +86,7 @@ public class CinematicaDirectorTest {
             float x0 = m.f(0).x;
             int quadros = 0;
             while (m.director.trocando() && quadros++ < 60 * 12) {
+                for (int i = 0; i < 2; i++) m.f(i).state.cenaSemDano = true;
                 m.director.fill(m.engine, m.in[0], m.in[1]);
                 m.engine.step(m.in[0], m.in[1]);
                 for (int i = 0; i < 2; i++) {
@@ -100,6 +102,59 @@ public class CinematicaDirectorTest {
             assertEquals(semente + ": nenhum golpe pega", vida0, m.f(0).state.life);
             assertEquals(semente + ": nenhum golpe pega", vida1, m.f(1).state.life);
         }
+    }
+
+    /**
+     * Cada lance da troca sai de verdade no motor de luta: o salto sai do chão, a esquiva pula
+     * para trás com o forte passando, e defesa, vento, esquiva e salto não acertam ninguém
+     * (sem a proteção do jogo).
+     */
+    @Test public void lancesDaTrocaSemAcertar() {
+        String[][] roteiros = {{"bloqueio", "vento"}, {"esquiva", "esquiva"}, {"salto", "salto"}};
+        for (String[] lances : roteiros) {
+            Match m = new Match(900f, 1300f);
+            int vida0 = m.f(0).state.life, vida1 = m.f(1).state.life;
+            m.director.trocar(4f, 5L, java.util.Arrays.asList(lances));
+            boolean pulou = false, defendeu = false, atacou = false;
+            for (int q = 0; m.director.trocando() && q < 60 * 10; q++) {
+                m.director.fill(m.engine, m.in[0], m.in[1]);
+                m.engine.step(m.in[0], m.in[1]);
+                for (int i = 0; i < 2; i++) {
+                    pulou |= !m.f(i).grounded;
+                    defendeu |= m.f(i).status == CombatFighter.Status.BLOCKSTUN;
+                    atacou |= m.f(i).attacking();
+                }
+            }
+            String nome = String.join("+", lances);
+            assertFalse(nome + ": acaba", m.director.trocando());
+            assertTrue(nome + ": alguém ataca", atacou);
+            if (!lances[0].equals("bloqueio")) assertTrue(nome + ": alguém sai do chão", pulou);
+            if (!lances[0].equals("esquiva")) assertTrue(nome + ": alguém defende", defendeu);
+            assertEquals(nome + ": ninguém leva", vida0, m.f(0).state.life);
+            assertEquals(nome + ": ninguém leva", vida1, m.f(1).state.life);
+        }
+    }
+
+    /**
+     * O choque: os dois soltam o forte e os golpes ficam ativos juntos, então os dois "apanham"
+     * no mesmo instante (punho contra punho). Com a proteção do jogo, a vida não muda.
+     */
+    @Test public void choqueDeGolpes() {
+        Match m = new Match(800f, 1400f);
+        int vida0 = m.f(0).state.life, vida1 = m.f(1).state.life;
+        m.director.trocar(2f, 7L, java.util.Arrays.asList("choque"));
+        boolean[] apanhou = new boolean[2];
+        for (int q = 0; m.director.trocando() && q < 60 * 8; q++) {
+            // A proteção do GameView.protegerTroca.
+            for (int i = 0; i < 2; i++) m.f(i).state.cenaSemDano = true;
+            m.director.fill(m.engine, m.in[0], m.in[1]);
+            m.engine.step(m.in[0], m.in[1]);
+            for (int i = 0; i < 2; i++) apanhou[i] |= m.f(i).inHitstun();
+        }
+        assertTrue("o choque saiu", m.director.choques() >= 1);
+        assertTrue("os dois golpes pegaram juntos", apanhou[0] && apanhou[1]);
+        assertEquals(vida0, m.f(0).state.life);
+        assertEquals(vida1, m.f(1).state.life);
     }
 
     /** Um golpe pedido no meio da troca interrompe ela. */

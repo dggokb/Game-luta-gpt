@@ -1,6 +1,9 @@
 package com.gamelutagpt;
 
 import com.gamelutagpt.historia.CinematicaLuta;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -49,18 +52,38 @@ final class CinematicaDirector {
 
     private final Ordem[] ordens = new Ordem[2];
 
+    /** Os lances da troca de golpes. */
+    enum Lance {
+        /** Chega perto e solta de 1 a 3 golpes; o outro defende. */
+        BLOQUEIO,
+        /** Para pouco antes e o golpe passa raspando no vento. */
+        VENTO,
+        /** Solta o golpe forte e o outro pula para trás bem na hora: passa no vento. */
+        ESQUIVA,
+        /** Pula por cima e desce com o golpe; o outro defende e ainda leva o combo defendido. */
+        SALTO,
+        /** Os dois correm e soltam o golpe médio juntos: punho contra punho. */
+        CHOQUE;
+
+        static Lance de(String nome) {
+            return valueOf(nome.toUpperCase(java.util.Locale.ROOT));
+        }
+    }
+
     /**
-     * A troca de golpes sem acertar (entre os QTE): em cada vez, quem ataca chega perto (ou
-     * fica no meio do caminho, e o golpe passa no vento) e solta de 1 a 3 golpes normais em pé;
-     * o outro segura para trás e defende. Depois um dos dois recua (ou nenhum) e a vez troca,
-     * quase sempre de lado. O jogo segura a vida e a guarda enquanto isso ({@link #trocando}).
+     * A troca de golpes sem acertar (entre os QTE): em cada vez sai um lance (os do roteiro em
+     * ordem, depois sorteados): defesa, golpe no vento, esquiva, salto ou choque. Depois um dos
+     * dois recua (ou nenhum) e a vez quase sempre passa para o outro. O jogo segura a vida e a
+     * guarda enquanto isso ({@link #trocando}).
      */
     private static final class Troca {
         final int limite;
         final Random sorteio;
+        final Deque<Lance> roteiro = new ArrayDeque<>();
         int frame;
         int atacante;
-        /** 0 escolhe a vez, 1 chega perto, 2 golpes, 3 separa, 4 acabando. */
+        Lance lance = Lance.BLOQUEIO;
+        /** 0 escolhe o lance, 1 chega perto, 2 golpes, 3 separa, 4 acabando, 5 no ar (salto). */
         int fase;
         int faseFrame;
         int golpes;
@@ -71,16 +94,30 @@ final class CinematicaDirector {
         float vaoAntes;
         /** O mesmo atacou duas vezes seguidas: a próxima é do outro. */
         boolean repetiu;
+        /** Salto: já saiu do chão; já soltou o golpe no ar. */
+        boolean noAr;
+        boolean bateuNoAr;
+        /** Choque: quadros até cada um apertar (o mais lento aperta antes). */
+        int[] apertaEm = {-1, -1};
 
-        Troca(float segundos, long semente) {
+        Troca(float segundos, long semente, List<String> lances) {
             limite = Math.max(1, Math.round(segundos * FPS));
             sorteio = new Random(semente);
             atacante = sorteio.nextInt(2);
+            if (lances != null) for (String l : lances) roteiro.add(Lance.de(l));
+        }
+
+        Lance sortear() {
+            if (!roteiro.isEmpty()) return roteiro.poll();
+            int r = sorteio.nextInt(100);
+            return r < 30 ? Lance.BLOQUEIO : r < 45 ? Lance.VENTO : r < 60 ? Lance.ESQUIVA : r < 77 ? Lance.SALTO : Lance.CHOQUE;
         }
     }
 
     private static final String[] BOTOES = {"L", "M", "H"};
     private Troca troca;
+    /** Choques de golpes (punho contra punho) desde o começo: o jogo põe o impacto em cada um. */
+    private int choques;
 
     /** Começa um movimento do lado 0 (jogador) ou 1 (CPU); "parar" cancela o que estiver rodando. */
     void mover(int lado, CinematicaLuta.Movimento movimento) {
@@ -94,10 +131,30 @@ final class CinematicaDirector {
         ordens[lado] = new Ordem(golpe);
     }
 
-    /** Os dois trocam golpes sem acertar por {@code segundos} (no tempo da luta). */
-    void trocar(float segundos, long semente) {
+    /**
+     * Os dois trocam golpes sem acertar por {@code segundos} (no tempo da luta). {@code lances}:
+     * os primeiros lances em ordem ("bloqueio", "vento", "esquiva", "salto", "choque"); o resto
+     * é sorteado. Pode ser null.
+     */
+    void trocar(float segundos, long semente, List<String> lances) {
         ordens[0] = ordens[1] = null;
-        troca = new Troca(segundos, semente);
+        troca = new Troca(segundos, semente, lances);
+    }
+
+    void trocar(float segundos, long semente) {
+        trocar(segundos, semente, null);
+    }
+
+    /** Quantos choques de golpes já saíram (o jogo compara com o último que viu). */
+    int choques() {
+        return choques;
+    }
+
+    /** De que lado é quem ataca na troca agora (0 ou 1), ou -1 (ninguém, ou os dois no choque). */
+    int atacanteDaTroca() {
+        Troca t = troca;
+        if (t == null || t.lance == Lance.CHOQUE) return -1;
+        return t.fase == 1 || t.fase == 2 || t.fase == 5 ? t.atacante : -1;
     }
 
     /** A troca de golpes ainda não acabou (a vez em andamento termina antes). */
@@ -138,6 +195,7 @@ final class CinematicaDirector {
             return;
         }
         boolean livres = atk.canAct() && def.canAct() && atk.grounded && def.grounded;
+        float vao = vao(atk, def);
         switch (t.fase) {
             case 0:
                 if (t.frame >= t.limite) {
@@ -152,18 +210,28 @@ final class CinematicaDirector {
                     if (passa) t.atacante = 1 - t.atacante;
                     t.repetiu = !passa;
                 }
-                // Um em três passa no vento: para pouco antes e o golpe passa raspando.
-                t.alvoVao = t.sorteio.nextInt(3) == 0 ? 45f + t.sorteio.nextInt(35) : ALCANCE;
+                t.lance = t.sortear();
+                // O salto precisa de espaço para pular: colados, vira defesa.
+                if (t.lance == Lance.SALTO && vao(engine.fighter(t.atacante), engine.fighter(1 - t.atacante)) < 90f) {
+                    t.lance = Lance.BLOQUEIO;
+                }
+                t.alvoVao = t.lance == Lance.VENTO ? 45f + t.sorteio.nextInt(35)
+                    : t.lance == Lance.SALTO ? 230f : t.lance == Lance.CHOQUE ? 60f : ALCANCE;
                 t.vaoAntes = Float.MAX_VALUE;
-                t.golpes = 1 + t.sorteio.nextInt(3);
+                t.golpes = t.lance == Lance.ESQUIVA ? 1 : 1 + t.sorteio.nextInt(3);
                 t.proximoGolpe = 0;
+                t.noAr = t.bateuNoAr = false;
+                t.apertaEm[0] = t.apertaEm[1] = -1;
                 t.fase = 1;
                 t.faseFrame = 0;
                 return;
             case 1: {
-                float vao = vao(atk, def);
                 boolean encostou = t.faseFrame > 4 && vao >= t.vaoAntes - 0.5f && vao < 60f;
                 t.vaoAntes = vao;
+                if (t.lance == Lance.CHOQUE) {
+                    choque(engine, t, in, vao, encostou);
+                    return;
+                }
                 if (vao > t.alvoVao && !encostou && t.faseFrame < 100) {
                     // Longe, corre; perto, anda. Quem vai defender já levanta a guarda.
                     if (atk.canAct() || atk.forwardDashing) in[a].direction = DemoDirector.Ctx.forward(atk);
@@ -171,31 +239,75 @@ final class CinematicaDirector {
                     if (vao < 70f) in[d].direction = DemoDirector.Ctx.back(def);
                     return;
                 }
+                if (t.lance == Lance.SALTO) {
+                    if (!atk.canAct() || !atk.grounded) return;
+                    // Pulo para frente (↗ ou ↖) por cima da distância.
+                    in[a].jump = true;
+                    in[a].direction = atk.facing > 0 ? 8 : 6;
+                    in[d].direction = DemoDirector.Ctx.back(def);
+                    t.fase = 5;
+                    t.faseFrame = 0;
+                    return;
+                }
             }
                 t.fase = 2;
                 t.faseFrame = 0;
                 // fall through: o primeiro golpe sai já.
             case 2:
+                if (t.lance == Lance.ESQUIVA) {
+                    // O forte sai e quem ia levar pula para trás no mesmo instante: passa no vento.
+                    if (t.golpes > 0 && atk.canAct() && def.canAct() && def.grounded) {
+                        CinematicaDirector.apertar("H", in[a]);
+                        in[d].jump = true;
+                        in[d].direction = def.facing > 0 ? 6 : 8;
+                        t.golpes = 0;
+                        t.proximoGolpe = t.faseFrame + 6;
+                    } else if (t.golpes == 0 && t.faseFrame > t.proximoGolpe && atk.canAct() && def.grounded) {
+                        separar(t, -1);
+                    } else if (t.golpes == 0) {
+                        in[d].direction = DemoDirector.Ctx.back(def);
+                    }
+                    if (t.faseFrame > 120) separar(t, -1);
+                    return;
+                }
                 // Quem defende segura para trás (defesa em pé) a vez inteira.
                 in[d].direction = DemoDirector.Ctx.back(def);
                 // A defesa empurrou longe demais: o resto do combo não sai do outro lado da tela.
-                if (t.golpes > 0 && t.faseFrame > 0 && vao(atk, def) > t.alvoVao + 60f) t.golpes = 0;
+                if (t.golpes > 0 && t.faseFrame > 0 && vao > t.alvoVao + 60f) t.golpes = 0;
                 if (t.golpes > 0 && t.faseFrame >= t.proximoGolpe && atk.canAct()) {
                     CinematicaDirector.apertar(BOTOES[t.sorteio.nextInt(BOTOES.length)], in[a]);
                     t.golpes--;
                     t.proximoGolpe = t.faseFrame + 10 + t.sorteio.nextInt(8);
                 } else if ((t.golpes == 0 && atk.canAct() && t.faseFrame > t.proximoGolpe) || t.faseFrame > 150) {
-                    t.fase = 3;
-                    t.faseFrame = 0;
                     int r = t.sorteio.nextInt(10);
-                    t.recua = r < 2 ? a : r < 4 ? d : -1;
+                    separar(t, r < 2 ? a : r < 4 ? d : -1);
                 }
+                return;
+            case 5:
+                // No ar: segura para frente, solta o forte descendo; quem está embaixo defende.
+                in[d].direction = DemoDirector.Ctx.back(def);
+                if (!atk.grounded) {
+                    t.noAr = true;
+                    in[a].direction = DemoDirector.Ctx.forward(atk);
+                    if (!t.bateuNoAr && (atk.vy > 0f || vao < 70f)) {
+                        CinematicaDirector.apertar("H", in[a]);
+                        t.bateuNoAr = true;
+                    }
+                } else if (t.noAr && atk.canAct()) {
+                    // Pousou: o combo defendido continua no chão.
+                    t.fase = 2;
+                    t.faseFrame = 0;
+                    t.alvoVao = ALCANCE;
+                    t.golpes = 1 + t.sorteio.nextInt(2);
+                    t.proximoGolpe = 4;
+                }
+                if (t.faseFrame > 120) separar(t, -1);
                 return;
             case 3:
                 // Separa: um dos dois recua (ou nenhum); quem defendeu segura a defesa um pouco mais.
-                if (t.faseFrame < 12) in[d].direction = DemoDirector.Ctx.back(def);
+                if (t.faseFrame < 12 && t.lance != Lance.CHOQUE) in[d].direction = DemoDirector.Ctx.back(def);
                 if (t.faseFrame == 12 && t.recua >= 0 && engine.fighter(t.recua).canAct()) in[t.recua].backdash = true;
-                if (t.faseFrame >= (t.recua >= 0 ? 30 : 14)) {
+                if (t.faseFrame >= (t.recua >= 0 ? 30 : 14) && (livres || t.faseFrame > 90)) {
                     t.fase = 0;
                     t.faseFrame = 0;
                 }
@@ -204,6 +316,51 @@ final class CinematicaDirector {
                 // Acabando: espera os dois livres (ou um instante) para o roteiro seguir.
                 if (livres || t.faseFrame > 60) troca = null;
         }
+    }
+
+    private static void separar(Troca t, int recua) {
+        t.fase = 3;
+        t.faseFrame = 0;
+        t.recua = recua;
+    }
+
+    /**
+     * Choque: os dois vão um para o outro e soltam o médio de modo que os dois fiquem ativos no
+     * mesmo quadro (quem tem o golpe mais lento aperta antes): os golpes se chocam. O médio, e
+     * não o forte: o forte em pé que pega alguém no meio do golpe vira punish counter (gira e
+     * derruba um lado só).
+     */
+    private void choque(CombatEngine engine, Troca t, FighterInput[] in, float vao, boolean encostou) {
+        CombatFighter[] f = {engine.fighter(0), engine.fighter(1)};
+        if (t.apertaEm[0] < 0) {
+            if (vao > t.alvoVao && !encostou && t.faseFrame < 120) {
+                for (int i = 0; i < 2; i++) {
+                    if (f[i].canAct() || f[i].forwardDashing) in[i].direction = DemoDirector.Ctx.forward(f[i]);
+                    if (vao > 220f && f[i].canAct() && !f[i].forwardDashing) in[i].dash = true;
+                }
+                return;
+            }
+            if (!f[0].canAct() || !f[1].canAct()) return;
+            int s0 = inicio(f[0]), s1 = inicio(f[1]);
+            int base = t.faseFrame;
+            t.apertaEm[0] = base + Math.max(0, s1 - s0);
+            t.apertaEm[1] = base + Math.max(0, s0 - s1);
+        }
+        boolean apertou = false;
+        for (int i = 0; i < 2; i++) {
+            if (t.apertaEm[i] == t.faseFrame) {
+                CinematicaDirector.apertar("M", in[i]);
+                apertou = true;
+            }
+        }
+        if (apertou && t.faseFrame == Math.max(t.apertaEm[0], t.apertaEm[1])) choques++;
+        if (t.faseFrame > Math.max(t.apertaEm[0], t.apertaEm[1])) separar(t, -1);
+    }
+
+    /** Quadros até o médio em pé do lutador ficar ativo. */
+    private static int inicio(CombatFighter f) {
+        AttackDefinition m = f.character().attack("M");
+        return m != null ? m.startupFrames : 6;
     }
 
     private void drive(CombatEngine engine, int lado, FighterInput in) {

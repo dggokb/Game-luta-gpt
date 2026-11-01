@@ -133,7 +133,7 @@ novo).
 | `tinta` | `cobrir` (true/false), `segundos` (padrão 0,9), `cor` (padrão `#FFFFFF`) | pinceladas largas atravessam a tela até cobrir tudo (cobrir) ou saem na ordem contrária mostrando a luta (descobrir). Coberta, a tela fica lisa na cor da tinta, por cima até do HUD; uma página na tela some debaixo da tinta nova | a animação |
 | `pagina` | `imagem` ou `imagens` (lista de `<episódio>/<imagem>`, ex.: `ep02/pag1_ryuga.jpg`) | uma página pronta da história, lida no motor de mangá das páginas ([motor-paginas.md](motor-paginas.md)): a página inteira, depois cada quadro isolado com o resto escurecido, os balões digitados e os efeitos do quadro, com os quadros e balões do passo dela no `episodio.json`. Um toque (ou botão) segue, como na história. Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). Uma página feita só para a cena (fora dos episódios) leva os `quadros` no próprio arquivo, no formato dos episódios ([abaixo](#página-feita-para-a-cena)). A página fica parada no último quadro até a próxima `tinta` cobrir; duas `pagina` seguidas são lidas uma depois da outra | o último toque |
 | `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`, `impacto`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
-| `trocar` | `segundos` | os dois trocam golpes sem acertar: quem ataca corre ou anda até o outro (às vezes para pouco antes e o golpe passa raspando) e solta de 1 a 3 golpes normais em pé; o outro defende. Depois um recua (ou nenhum) e a vez quase sempre passa para o outro. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
+| `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
@@ -190,6 +190,23 @@ escada: "DING" em cima, "DONG!" embaixo à direita), treme forte no começo e so
 | `rotacao` | -6 | inclinação (graus); as palavras alternam ±5° em volta dela |
 | `cor` | `#FFD23F` | cor do miolo |
 | `segundos` | 1,6 | tempo na tela (os últimos 0,25 s somem) |
+
+### Troca de golpes
+
+Cada vez da troca é um **lance**. `"lances": ["choque", "salto"]` diz os primeiros, em ordem; o
+resto é sorteado. A vez quase sempre passa para o outro (nunca três seguidas do mesmo).
+
+| Lance | O que acontece |
+|---|---|
+| `bloqueio` | quem ataca corre (longe) ou anda (perto) até encostar e solta de 1 a 3 golpes normais em pé; o outro defende |
+| `vento` | para pouco antes e o golpe passa raspando |
+| `esquiva` | solta o forte e o outro pula para trás no mesmo instante: o golpe passa no vento |
+| `salto` | pula por cima e desce com o forte; o outro defende e ainda leva o combo defendido no chão (colados, sem espaço para pular, vira `bloqueio`) |
+| `choque` | os dois correm um para o outro e soltam o médio de modo que os golpes fiquem ativos no mesmo quadro: **punho contra punho**. Um letreiro estoura (KRAKOOM!, BAKOOM!, DOOM!), a luta congela um instante e a câmera dá um tranco |
+
+**Câmera viva**: enquanto a troca roda, a câmera chega mais perto (zoom 1,2) e puxa para o lado de
+quem ataca (somada à câmera do roteiro, que continua valendo); cada defesa dá um tranquinho e
+cada choque, um tranco. Quando a troca acaba ela volta.
 
 ### Página feita para a cena
 
@@ -338,6 +355,7 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | Zoom e foco da câmera (chão ou peito de quem está em foco) | `GameView.renderFrame` (`cinematicZoom`, `chestY`) |
 | Comandos dos lutadores (pulo, backdash, dash, troca, o golpe do QTE, a troca de golpes) | `android/app/.../CinematicaDirector.java` |
 | Na troca de golpes ninguém perde vida nem guarda | `GameView.protegerTroca` |
+| Câmera viva, choque e defesa na cena | `CinematicaLuta.atualizarCameraViva`, `choque`, `defesa` (o `GameView` avisa os choques do diretor e as defesas da luta) |
 | Dano do golpe do QTE (exato, uma vez só) e o golpe final que derruba | `FighterState.cenaDano`, `GameView.palcoCinematica` (`golpear`), `GameView.terminarGolpe` |
 | Toque e teclado no QTE e na página | `GameView.handleTouch`, `GameView.processHardwareKeys` (`cinematica.pegaToque()`) |
 | Quem luta fala com o rosto da seleção | `GameView.avulsoDoLutador` |

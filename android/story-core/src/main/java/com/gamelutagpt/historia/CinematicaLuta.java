@@ -95,7 +95,12 @@ public final class CinematicaLuta {
          * outro defende, às vezes o golpe passa no vento, recuam e a vez troca. Ninguém perde
          * vida. Um movimento ou golpe pedido depois interrompe a troca.
          */
-        default void trocar(float segundos) {}
+        default void trocar(float segundos, List<String> lances) {}
+
+        /** De que lado é quem ataca na troca agora ({@link #JOGADOR}, {@link #RIVAL}), ou -1. */
+        default int atacanteDaTroca() {
+            return -1;
+        }
 
         /** A troca de golpes ainda não acabou. */
         default boolean trocando() {
@@ -133,7 +138,7 @@ public final class CinematicaLuta {
     /** Textos fixos do QTE (as dicas embaixo do botão e o resultado), para conferir as traduções. */
     public static final List<String> TEXTOS_QTE = Collections.unmodifiableList(Arrays.asList(
         "TOQUE!", "APERTE!", "TOQUE RÁPIDO!", "APERTE RÁPIDO!", "DESLIZE!", "DIRECIONAL!", "NA HORA CERTA!",
-        "BOA!", "ERROU!"));
+        "BOA!", "ERROU!", "KRAKOOM!", "BAKOOM!", "DOOM!"));
 
     /** Fases do toque para {@link #toque}. */
     public static final int TOQUE_DESCE = 0;
@@ -228,6 +233,8 @@ public final class CinematicaLuta {
         Acao impacto;
         float congela;
         float tranco = 1f;
+        /** TROCAR: os primeiros lances, em ordem (o resto é sorteado). */
+        List<String> lances;
 
         Acao(Tipo tipo) {
             this.tipo = tipo;
@@ -443,6 +450,20 @@ public final class CinematicaLuta {
     private float congelaAte = -1f;
     private float trancoVolta = -1f;
     private final Transicao tranco = new Transicao(1f);
+    /**
+     * Câmera viva na troca de golpes: chega mais perto e puxa para quem ataca (somada à câmera
+     * do roteiro); cada defesa dá um tranquinho e cada choque, um tranco.
+     */
+    private final Transicao vivaZoom = new Transicao(1f);
+    private final Transicao vivaJogador = new Transicao(0f);
+    private final Transicao vivaRival = new Transicao(0f);
+    private boolean viva;
+    private int vivaAtacante = -2;
+    static final float VIVA_ZOOM = 1.2f;
+    static final float VIVA_FOCO = 0.3f;
+    /** O letreiro do choque de golpes (sai um deles, alternando). */
+    static final String[] CHOQUES = {"KRAKOOM!", "BAKOOM!", "DOOM!"};
+    private int choquesVistos;
 
     /** O jogador está no toque (as dicas dizem TOQUE) ou no teclado/controle (APERTE). */
     private boolean dicasDeToque = true;
@@ -536,6 +557,11 @@ public final class CinematicaLuta {
         velocidade.zerar();
         estouros.clear();
         tranco.zerar();
+        vivaZoom.zerar();
+        vivaJogador.zerar();
+        vivaRival.zerar();
+        viva = false;
+        vivaAtacante = -2;
         congelaAte = trancoVolta = -1f;
         tintaModo = ModoTinta.NADA;
         coberta = false;
@@ -731,6 +757,14 @@ public final class CinematicaLuta {
                 a = new Acao(Acao.Tipo.TROCAR);
                 a.segundos = numero(m, "segundos", -1f, 0.5f, 20f);
                 if (a.segundos < 0f) throw new IllegalArgumentException("trocar sem \"segundos\"");
+                a.lances = new ArrayList<>();
+                for (Object l : Episodio.list(m, "lances")) {
+                    String lance = String.valueOf(l);
+                    if (!lance.matches("bloqueio|vento|esquiva|salto|choque")) {
+                        throw new IllegalArgumentException("lance " + lance + " (use bloqueio, vento, esquiva, salto ou choque)");
+                    }
+                    a.lances.add(lance);
+                }
                 break;
             case "golpe":
                 a = new Acao(Acao.Tipo.GOLPE);
@@ -995,6 +1029,7 @@ public final class CinematicaLuta {
             tranco.ir(1f, 0.35f);
             trancoVolta = -1f;
         }
+        atualizarCameraViva();
         if (estado == Estado.RODANDO) avancar();
     }
 
@@ -1069,7 +1104,7 @@ public final class CinematicaLuta {
                 pedirQte();
                 break;
             case TROCAR:
-                palco.trocar(a.segundos);
+                palco.trocar(a.segundos, a.lances);
                 break;
             case GOLPE:
                 golpeLado = lado(a.quemMove);
@@ -1403,7 +1438,52 @@ public final class CinematicaLuta {
 
     /** Zoom extra da câmera pedido pela cena (1 = o da luta). */
     public float zoom() {
-        return zoom.valor() * tranco.valor();
+        return zoom.valor() * tranco.valor() * vivaZoom.valor();
+    }
+
+    /** A câmera viva acompanha a troca de golpes: perto, e puxando para quem ataca. */
+    private void atualizarCameraViva() {
+        boolean trocando = estado == Estado.RODANDO && palco.trocando();
+        if (trocando != viva) {
+            viva = trocando;
+            vivaZoom.ir(trocando ? VIVA_ZOOM : 1f, trocando ? 0.6f : 0.4f);
+            if (!trocando) vivaAtacante = -2;
+        }
+        int atacante = trocando ? palco.atacanteDaTroca() : -1;
+        if (atacante != vivaAtacante) {
+            vivaAtacante = atacante;
+            vivaJogador.ir(atacante == JOGADOR ? VIVA_FOCO : 0f, 0.45f);
+            vivaRival.ir(atacante == RIVAL ? VIVA_FOCO : 0f, 0.45f);
+        }
+    }
+
+    /** Uma defesa na luta durante a cena: um tranquinho de câmera. */
+    public void defesa() {
+        if (estado != Estado.RODANDO) return;
+        tranco.ir(1.05f, 0.05f);
+        trancoVolta = time + 0.08f;
+    }
+
+    /**
+     * Os golpes se chocaram na troca (punho contra punho): o letreiro estoura no meio, a luta
+     * congela um instante e a câmera dá um tranco.
+     */
+    public void choque() {
+        if (estado != Estado.RODANDO) return;
+        Acao a = new Acao(Acao.Tipo.ONOMATOPEIA);
+        a.texto = CHOQUES[choquesVistos++ % CHOQUES.length];
+        a.x = 0.5f;
+        a.y = 0.36f;
+        a.tamanho = 120f;
+        a.tremor = 14f;
+        a.rotacao = choquesVistos % 2 == 0 ? 6f : -6f;
+        a.cor = 0xFFFFFFFF;
+        a.segundos = 0.9f;
+        Acao imp = new Acao(Acao.Tipo.GOLPE);
+        imp.impacto = a;
+        imp.congela = 0.22f;
+        imp.tranco = 1.15f;
+        impactar(imp);
     }
 
     /**
@@ -1411,7 +1491,10 @@ public final class CinematicaLuta {
      * da luta) a 1 (centrada nele). O jogo leva o centro da câmera até lá.
      */
     public float foco(int lado) {
-        return lado == JOGADOR ? focoJogador.valor() : focoRival.valor();
+        float roteiro = focoJogador.valor() + focoRival.valor();
+        float vivo = lado == JOGADOR ? vivaJogador.valor() : vivaRival.valor();
+        // A câmera viva só usa o que o foco do roteiro deixou livre (a soma nunca passa de 1).
+        return (lado == JOGADOR ? focoJogador.valor() : focoRival.valor()) + vivo * Math.max(0f, 1f - roteiro);
     }
 
     /**

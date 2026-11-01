@@ -1982,6 +1982,11 @@ public class GameView extends SurfaceView
             // Cinemática: o roteiro move os dois; o pad e a IA ficam de fora.
             pad.drainInto(ignoredInput);
             cinematicaDirector.fill(engine, playerInput, opponentInput);
+            // Punho contra punho na troca de golpes: a cena põe o impacto.
+            if (cinematicaDirector.choques() != choquesVistos) {
+                choquesVistos = cinematicaDirector.choques();
+                cinematica.choque();
+            }
         } else if (tutorial.active()) {
             // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
             pad.setHolding(attackHeld());
@@ -2052,6 +2057,8 @@ public class GameView extends SurfaceView
         // A voadora da troca que acerta gira o rival como o punish: mesmo impacto e tremor.
         boolean punishNow = engine.cues().contains("PUNISH") || engine.cues().contains("SPIN");
         for (CombatEngine.HitEvent event : engine.events()) {
+            // Na cena, cada defesa dá um tranquinho de câmera.
+            if (event.blocked && cinematica.rodando()) cinematica.defesa();
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
@@ -7152,6 +7159,9 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** Choques de golpes da troca que a cena já mostrou. */
+    private int choquesVistos;
+
     /** A troca de golpes da cinemática está segurando a vida e a guarda dos lutadores. */
     private boolean trocaProtegendo;
 
@@ -7240,8 +7250,13 @@ public class GameView extends SurfaceView
             onHistoriaSom(id);
         }
 
-        @Override public void trocar(float segundos) {
-            cinematicaDirector.trocar(segundos, storyFightFrames);
+        @Override public void trocar(float segundos, java.util.List<String> lances) {
+            cinematicaDirector.trocar(segundos, storyFightFrames, lances);
+        }
+
+        @Override public int atacanteDaTroca() {
+            int lado = cinematicaDirector.atacanteDaTroca();
+            return lado < 0 ? -1 : lado == PLAYER ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL;
         }
 
         @Override public boolean trocando() {
