@@ -108,7 +108,8 @@ public class MechanicsTest {
         s.until(() -> s.f(1).state.life < s.f(1).state.profile.maxLife, 20);
     }
 
-    @Test public void repelDissipatesAProjectile() {
+    /** O repel devolve a bola (pedido do jogador): ela some do lado de quem soltou e volta dela. */
+    @Test public void repelSendsAProjectileBack() {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, with(repel()), 300f, 600f);
         s.in[1].heavy = true;
         s.step();
@@ -117,7 +118,10 @@ public class MechanicsTest {
         boolean seen = false;
         for (int i = 0; i < 6; i++) { s.step(); seen |= cue(s, "REPEL"); }
         assertTrue("REPEL cue", seen);
-        assertTrue("the projectile is gone", s.engine.energyProjectiles.isEmpty());
+        assertEquals("one ball, now going back", 1, s.engine.energyProjectiles.size());
+        Projectile back = s.engine.energyProjectiles.get(0);
+        assertEquals("hers now", 1, back.ownerIndex);
+        assertEquals("flying back at the thrower", -1, back.direction);
         assertEquals("no damage", s.f(1).state.profile.maxLife, s.f(1).state.life);
     }
 

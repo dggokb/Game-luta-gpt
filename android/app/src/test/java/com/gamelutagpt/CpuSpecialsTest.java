@@ -96,6 +96,31 @@ public class CpuSpecialsTest {
     }
 
     @Test
+    public void theRepelSendsTheBallBackAtTheThrower() {
+        CharacterDefinition p15 = GeneratedCharacters.get("p15"), base = GeneratedCharacters.get("player_base");
+        CombatEngine e = new CombatEngine(new FighterState(p15, "P1"), new FighterState(base, "P2"), 500f, 900f, new CombatConfig());
+        CombatFighter natisuko = e.fighter(0), ryuga = e.fighter(1);
+        natisuko.status = CombatFighter.Status.ATTACK;
+        natisuko.attack = p15.attack("S2");
+        natisuko.attackFrame = 5;   // a aura no ar
+        AttackDefinition onda = base.fighter.energy.attack;
+        e.energyProjectiles.add(new Projectile(620f, Arena.GROUND_Y - 160f, 900f, 760f, 24f, 850, 0, 1, -1, onda));
+        FighterInput in0 = new FighterInput(), in1 = new FighterInput();
+        boolean repeliu = false, voltou = false, acertouEle = false;
+        int vida = natisuko.state.life;
+        for (int i = 0; i < 120 && !acertouEle; i++) {
+            e.step(in0, in1);
+            if (e.cues().contains("REPEL")) repeliu = true;
+            for (Projectile p : e.energyProjectiles) if (p.ownerIndex == 0 && p.direction > 0) voltou = true;
+            for (CombatEngine.HitEvent ev : e.events()) if (ev.attacker == 0 && ev.projectile && !ev.blocked) acertouEle = true;
+        }
+        assertTrue("a aura repeliu", repeliu);
+        assertTrue("a bola voltou, agora dela", voltou);
+        assertTrue("e acertou quem soltou", acertouEle);
+        assertEquals("ela não tomou dano", vida, natisuko.state.life);
+    }
+
+    @Test
     public void aChargeSpecialNeedsTheCharge() {
         // Sem segurar trás o tempo da carga, o [←] → não sai (para a CPU também).
         CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get("p09"), "P1"),

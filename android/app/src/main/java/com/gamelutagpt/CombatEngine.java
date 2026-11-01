@@ -2870,6 +2870,7 @@ final class CombatEngine {
 
     private void detectProjectiles(List<Projectile> projectiles) {
         if (superFreeze > 0) return;
+        List<Projectile> refletidos = null;
         Iterator<Projectile> it = projectiles.iterator();
         while (it.hasNext()) {
             Projectile p = it.next();
@@ -2888,12 +2889,18 @@ final class CombatEngine {
             }
             AttackDefinition.Mechanics stance = d.mechanics();
             if (stance.repel && stance.counterAt(d.attackFrame)) {
-                // Repel: o projétil se desfaz na aura, sem dano nem atordoamento, e a aura apaga
-                // logo depois (quem repeliu fica livre, como quem defendeu).
+                // Repel: a bola bate na aura e volta contra quem soltou, agora dela (sem dano nem
+                // atordoamento em quem repeliu), e a aura apaga logo depois (quem repeliu fica
+                // livre, como quem defendeu). A bola do Super só se desfaz.
                 repelled.add(new float[]{p.x, p.y, p.direction});
                 d.hitCutFrame = Math.min(d.attack.totalFrames - 2, d.attackFrame + config.repelShotFreeFrames);
                 cues.add("REPEL");
                 it.remove();
+                Projectile volta = reflete(p, d);
+                if (volta != null) {
+                    if (refletidos == null) refletidos = new ArrayList<>();
+                    refletidos.add(volta);
+                }
                 continue;
             }
             addContact(fighters[p.ownerIndex], d, p.attack, -1, p);
@@ -2907,6 +2914,22 @@ final class CombatEngine {
                 it.remove();
             }
         }
+        if (refletidos != null) projectiles.addAll(refletidos);
+    }
+
+    /**
+     * A bola que o repel devolve: sai de onde bateu na aura, na direção contrária, do tamanho,
+     * velocidade, dano e acertos que tinha, agora de quem repeliu. Não volta: o Super, o chicote
+     * (é o braço) e a caixa em voo.
+     */
+    private Projectile reflete(Projectile p, CombatFighter quem) {
+        if (p.superKind() || p.retracts() || p.trap != null) return null;
+        Projectile v = new Projectile(p.x, p.y, p.range, p.speed, p.radius, p.damage, p.color, quem.index,
+            -p.direction, p.attack, p.visual);
+        v.totalHits = Math.max(1, p.totalHits - p.hitsDone);
+        v.hitInterval = p.hitInterval;
+        v.mini = p.mini;
+        return v;
     }
 
     /** Ultra rush: connects once the defender's body is within reach, else ends in recovery. */

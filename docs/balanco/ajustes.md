@@ -1339,3 +1339,19 @@ quadros, e o golpe de quem leu ainda tinha ~19 pela frente. Correndo, não dava 
 - A CPU nível 8 emendou outro golpe em 4 de 5 contra-golpes.
 - Vitórias (CPU × CPU, S9 → S10): Ryūga 67 → 67, Yin-lu 46 → 47, p11 55 → 54, dentro do ruído.
   Contra-golpe é raro na luta de CPU contra CPU.
+
+## Repel da Natisuko devolve a bola (pedido do jogador, 01/11)
+
+**Antes:** a bola que batia na aura do repel (o S2 da Natisuko) sumia.
+
+**Agora:** a bola volta na direção contrária, de onde bateu, e passa a ser da Natisuko. Ela mantém
+o tamanho, a velocidade, o dano e os acertos que faltavam, e acerta quem soltou. Quem repeliu
+continua sem levar dano e fica livre logo depois (`repelShotFreeFrames`).
+
+Não voltam:
+- a bola do Super, que só se desfaz;
+- o chicote da p08, que é o braço dela;
+- a caixa em voo da p16.
+
+Testes: `CpuSpecialsTest.theRepelSendsTheBallBackAtTheThrower` e
+`MechanicsTest.repelSendsAProjectileBack`.
