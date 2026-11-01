@@ -3,8 +3,8 @@
 
   * vida, dano e projétil (velocidade e alcance) de cada um;
   * frame data dos golpes: o tempo base vezes o ritmo do personagem (golpe a golpe se
-    houver "ritmoGolpe"). A vantagem no hit e na defesa é a mesma para todos (hitstun e
-    blockstun acompanham); janelas de cancelamento e caixas são remapeadas fase a fase
+    houver "ritmoGolpe"). A vantagem no hit e na defesa é a da base (hitstun e blockstun
+    acompanham), ou a do bloco "vantagem" do personagem, golpe a golpe; janelas de cancelamento e caixas são remapeadas fase a fase
     (startup, ativo, recuperação), então continuam no mesmo trecho do golpe;
   * cadência da animação dos golpes: o motor estica a animação sobre o golpe inteiro, então
     só a proporção entre os quadros importa. Cada quadro ganha o tempo que tinha no vídeo
@@ -596,7 +596,8 @@ def apply(cid, spec, base, combos_data):
                 fit_impact(anim, m)
             continue
         if not keep:
-            retime(m, frames(key), base['vantagem'][key])
+            # "vantagem" do personagem ({"L": [acerto, defesa]}) troca a da base só naquele golpe.
+            retime(m, frames(key), spec.get('vantagem', {}).get(key, base['vantagem'][key]))
         m['damage'] = damage(key)
         attacks.append((key, m.get('animation'), m))
     energy = fighter['energy']
