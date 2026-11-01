@@ -3801,6 +3801,10 @@ final class CombatEngine {
         if (multi || (!projectile && attack.mechanics.rebound)) a.strikeLanded = true;   // o rebote de um chute só também pula para trás
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (counterHit) hitstun += attack.strength == AttackDefinition.Strength.LIGHT ? config.counterHitLightFrames : config.counterHitFrames;
+        // A resposta do contra-golpe que leu o golpe dele: atordoado (dá para correr e emendar).
+        boolean counterAnswer = !projectile && a.countered && a.attack == attack &&
+            attack.mechanics.counter != AttackDefinition.Reads.NONE && !attack.mechanics.repel;
+        if (counterAnswer) hitstun = Math.max(hitstun, config.counterAnswerStunFrames);
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
         // SHINKAI POWER: o H joga na parede, mesmo sozinho no neutro, e ele volta quicando.

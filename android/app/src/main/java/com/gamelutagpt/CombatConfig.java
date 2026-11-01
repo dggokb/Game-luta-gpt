@@ -346,6 +346,12 @@ final class CombatConfig {
     int counterHitLightFrames = 2;
     int counterHitFrames = 4;
     /**
+     * O contra-golpe que leu o golpe (o Aparar do Ryūga, o S3 da Yin-lu, o do p11): o rival fica
+     * atordoado pelo menos isto (quadros). Com o atordoamento comum (22–25) quem leu ficava só +5
+     * a +8, a 180 px: não dava para chegar e emendar, e o rival voltava a atacar.
+     */
+    int counterAnswerStunFrames = 50;
+    /**
      * Pose do impacto (como no FighterZ): golpes que acertam congelam um pouco mais, para a pose
      * esticada "grudar" na tela. Os dois lutadores congelam juntos, então a vantagem e os combos
      * não mudam. Defesa não ganha. Com o hitstop do golpe dá ~9/12/15 quadros (fraco/médio/

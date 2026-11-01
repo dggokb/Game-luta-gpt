@@ -1320,3 +1320,22 @@ seguidos, com a animação, e só no fim pule para trás.
   12/56/16, por causa das quatro pancadas.
 - A animação ganhou os chutes 2–4 do vídeo e o pulo encolhido: os quadros 0–37, 40 e 41
   (`montagens/p14.json`). As caixas do desenho foram medidas para os 40 quadros.
+
+## Contra-golpe que leu o golpe deixa o rival atordoado (pedido do jogador, 01/11)
+
+**Pedido:** "Ao dar counter, o adversário é arremessado para a frente e damos dash, mas ele não teve
+punição e pode atacar mesmo assim. Não tem atordoamento?"
+
+**Medido antes:** depois do contra-golpe (o Aparar do Ryūga, o S3 da Yin-lu, o Bloqueio de nervos
+do p11), quem leu ficava só +5 a +8 quadros, com o rival a 180 px. A resposta atordoava 22–25
+quadros, e o golpe de quem leu ainda tinha ~19 pela frente. Correndo, não dava para chegar.
+
+**O que mudou:** a pancada que responde ao golpe lido deixa o rival atordoado pelo menos 50 quadros
+(`counterAnswerStunFrames`). O repel (o S2 da Natisuko) já derruba e não mudou.
+
+**Medido depois:**
+- Quem leu fica +29 a +31 quadros na frente.
+- Correndo e apertando L, o golpe emenda no atordoamento com os três (`ContraGolpeTest`).
+- A CPU nível 8 emendou outro golpe em 4 de 5 contra-golpes.
+- Vitórias (CPU × CPU, S9 → S10): Ryūga 67 → 67, Yin-lu 46 → 47, p11 55 → 54, dentro do ruído.
+  Contra-golpe é raro na luta de CPU contra CPU.
