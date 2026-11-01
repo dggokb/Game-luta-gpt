@@ -143,7 +143,15 @@
         96
       ]
     },
-    "comboStyle": "alcance"
+    "comboStyle": "alcance",
+    "walkSpeed": 250,
+    "walkBackSpeed": 210,
+    "mecanica": {
+      "corrida": {
+        "dash": 0.9,
+        "backdashVelocidade": 720
+      }
+    }
   },
   "animations": {
     "IDLE": {

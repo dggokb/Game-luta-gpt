@@ -175,8 +175,13 @@
     },
     "comboStyle": "aereo",
     "mecanica": {
-      "wallJump": true
-    }
+      "wallJump": true,
+      "corrida": {
+        "dash": 1.1
+      }
+    },
+    "walkSpeed": 340,
+    "walkBackSpeed": 230
   },
   "animations": {
     "IDLE": {

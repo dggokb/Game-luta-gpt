@@ -154,8 +154,13 @@
     },
     "comboStyle": "tanque",
     "mecanica": {
-      "capangas": 2
-    }
+      "capangas": 2,
+      "corrida": {
+        "backdashVelocidade": 720
+      }
+    },
+    "walkSpeed": 280,
+    "walkBackSpeed": 250
   },
   "animations": {
     "IDLE": {

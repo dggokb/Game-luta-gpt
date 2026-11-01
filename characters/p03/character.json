@@ -169,7 +169,14 @@
         92
       ]
     },
-    "comboStyle": "pressao"
+    "comboStyle": "pressao",
+    "walkSpeed": 350,
+    "walkBackSpeed": 230,
+    "mecanica": {
+      "corrida": {
+        "dash": 1.15
+      }
+    }
   },
   "animations": {
     "IDLE": {

@@ -166,8 +166,13 @@
     },
     "comboStyle": "pressao",
     "mecanica": {
-      "airDashes": 2
-    }
+      "airDashes": 2,
+      "corrida": {
+        "dash": 1.2
+      }
+    },
+    "walkSpeed": 360,
+    "walkBackSpeed": 230
   },
   "animations": {
     "IDLE": {

@@ -198,8 +198,13 @@
       "agarrao": {
         "dano": 2200,
         "alcance": 40
+      },
+      "corrida": {
+        "dash": 0.85
       }
-    }
+    },
+    "walkSpeed": 260,
+    "walkBackSpeed": 190
   },
   "animations": {
     "IDLE": {

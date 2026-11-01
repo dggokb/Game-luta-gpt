@@ -434,6 +434,11 @@
               "descida": 900
             }
           }
+        },
+        "lutador": {
+          "corrida": {
+            "dash": 1.15
+          }
         }
       },
       "comandos": {
@@ -552,7 +557,10 @@
           }
         },
         "lutador": {
-          "wallJump": true
+          "wallJump": true,
+          "corrida": {
+            "dash": 1.1
+          }
         }
       },
       "comandos": {
@@ -618,6 +626,12 @@
         },
         "animacao": {
           "S2": "SPECIAL_ECHO"
+        },
+        "lutador": {
+          "corrida": {
+            "dash": 0.9,
+            "backdashVelocidade": 720
+          }
         }
       },
       "ritmoGolpe": {
@@ -671,7 +685,10 @@
           }
         },
         "lutador": {
-          "capangas": 2
+          "capangas": 2,
+          "corrida": {
+            "backdashVelocidade": 720
+          }
         }
       },
       "comandos": {
@@ -726,6 +743,12 @@
               "le": "baixo",
               "janela": "startup"
             }
+          }
+        },
+        "lutador": {
+          "corrida": {
+            "dash": 0.85,
+            "backdashVelocidade": 720
           }
         }
       },
@@ -786,6 +809,9 @@
           "agarrao": {
             "dano": 2200,
             "alcance": 40
+          },
+          "corrida": {
+            "dash": 0.85
           }
         }
       },
@@ -846,7 +872,10 @@
           }
         },
         "lutador": {
-          "airDashes": 2
+          "airDashes": 2,
+          "corrida": {
+            "dash": 1.2
+          }
         }
       },
       "comandos": {
@@ -910,6 +939,12 @@
               "velocidade": 480,
               "janela": "ate_ativo"
             }
+          }
+        },
+        "lutador": {
+          "corrida": {
+            "dash": 0.9,
+            "backdashVelocidade": 720
           }
         }
       },
