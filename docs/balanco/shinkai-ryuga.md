@@ -126,6 +126,41 @@ Saídas completas:
    quase não faz defesa perfeita, então a assinatura dele também não aparece para quem enfrenta o
    Ryūga no começo da história.
 
+## Espelho: Ryūga novo × Ryūga novo
+
+Pedido do jogador: os dois com o PERCEPÇÃO, comparados ao espelho antigo (ENERGY × ENERGY).
+São 480 lutas por coluna, nas mesmas sementes. Saídas completas:
+- [nível 8](perfis/shinkai-ryuga-espelho-nivel8.md) (com o log de 4 lutas);
+- [nível 8 sem Clash](perfis/shinkai-ryuga-espelho-nivel8-sem-clash.md);
+- [nível 5](perfis/shinkai-ryuga-espelho-nivel5.md);
+- [nível 5 sem Clash](perfis/shinkai-ryuga-espelho-nivel5-sem-clash.md).
+
+| Espelho | antigo (ENERGY × ENERGY) | novo (PERCEPÇÃO × PERCEPÇÃO) |
+|---|---|---|
+| Nível 8: lutas com Clash | 95% | 98% |
+| Nível 8: quem vence o Clash vence a luta | 73% | **83%** |
+| Nível 5: quem vence o Clash vence a luta | 85% | 80% |
+| Nível 8: duração da luta | 43,8 s | 43,2 s |
+| Nível 8 sem Clash: duração da luta | 42,0 s | 39,7 s |
+| Nível 8: duração do SHINKAI | 11,4 s | 13,2 s |
+| Nível 8: leituras por luta (os dois) | – | 0,34 |
+| Nível 8: Rupturas por luta (os dois) | – | 0,35 |
+| Nível 8 sem Clash: saldo por SHINKAI | 1.712 | 2.915 |
+| Nível 5 sem Clash: saldo por SHINKAI | 3.098 | 2.489 |
+
+**O que o espelho mostra:**
+- **A luta é decidida no Clash, e no nível 8 o novo agrava isso.** Quem vence o Clash ganha o
+  SHINKAI cheio, com o desgaste zerado. No protótipo, isso vira ~10 s de SHINKAI e mais 5 s de
+  Ruptura. O log mostra o padrão: Clash, o vencedor chega ao limite, rompe e fecha a luta. No
+  nível 8, quem vence o Clash passou a vencer 83% das lutas (73% antes). No nível 5 foi o
+  contrário (85% → 80%), porque lá a CPU rompe menos.
+- **Dois leitores quase não se leem:** 0,34 leitura por luta somando os dois lados. A luta
+  espelhada continua a mesma luta do Ryūga, com um SHINKAI mais longo.
+- **Sem Clash, a luta fica um pouco mais curta** (42,0 → 39,7 s no nível 8): o SHINKAI mais
+  longo e a Ruptura aceleram o fim.
+- **No nível 5 sem Clash, o SHINKAI antigo rende mais** (saldo de 3.098 contra 2.489). As bolas em
+  sequência do ENERGY punem a CPU fraca, e a leitura do nível 5 quase não sai.
+
 ## Leitura e próximos passos (para decidir)
 
 - **A identidade pede o jogador na mão.** Uma assinatura defensiva (ler e castigar) depende de
@@ -142,6 +177,7 @@ Saídas completas:
 - **Fim voluntário:** devolver mais (por exemplo, todo o fôlego que sobrou) ou deixar a exaustão
   do limite maior, para valer a pena desligar antes.
 - **Clash:** definir se o vencedor zera o desgaste (hoje sim) ou só ganha um pouco de fôlego.
+  O espelho mostra que, no nível 8, zerar faz o Clash decidir 83% das lutas.
 
 ## Como rodar
 
@@ -149,4 +185,5 @@ Saídas completas:
 gradle -q -I <init com rodarBateria> :pc:rodarBateria -Dclasse=com.gamelutagpt.BateriaShinkaiRyuga "-Dargs=32 8 narra"
 gradle ... "-Dargs=32 8 semClash"     # sem Clash
 gradle ... "-Dargs=32 5"              # nível 5
+gradle ... "-Dargs=32 8 espelho narra" # Ryūga × Ryūga, os dois no SHINKAI da coluna
 ```
