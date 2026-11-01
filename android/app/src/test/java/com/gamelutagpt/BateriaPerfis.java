@@ -52,6 +52,7 @@ public final class BateriaPerfis {
             float bv = p.backdashSpeed > 0 ? p.backdashSpeed : cfg.backdashSpeed;
             f.c("backdash (px)")[i] = bq * bv / 60.0;
             f.c("air dashes")[i] = p.airDashes;
+            f.c("pulo no ar (quadros)")[i] = 41.0 * p.jumpPermille / 1000;
             for (String g : new String[] {"L", "M", "H", "2M"}) {
                 CharacterDefinition.Move m = c.move(g, false);
                 f.c("início do " + g)[i] = m != null && m.attack != null ? m.attack.startupFrames : 0;
@@ -76,7 +77,8 @@ public final class BateriaPerfis {
             }
             f.c("dano L+M+H (% da vida)")[i] = 100 * dano / p.maxLife;
             CharacterDefinition.Projectile pr = p.energy;
-            boolean temProjetil = pr != null && pr.speed > 0;
+            // O S de perto (tapa, investida, chute) tem caixa de acerto: não é projétil, mesmo com velocidade no pacote.
+            boolean temProjetil = pr != null && pr.speed > 0 && (pr.attack == null || !pr.attack.melee());
             f.c("projétil: velocidade (px/s)")[i] = temProjetil ? pr.speed : 0;
             f.c("projétil: alcance (px)")[i] = temProjetil ? pr.range : 0;
             f.c("agarrão: dano")[i] = p.throwDamage > 0 ? p.throwDamage : cfg.throwDamage;
