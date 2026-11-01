@@ -1220,3 +1220,22 @@ para a reconversão repetir.
 
 **Testes:** suíte do motor 590, com as 3 falhas de caminho de arquivo de antes. O
 `GlobalMovementTuningTest` passa a esperar o backdash de 640.
+
+## Identidade: movimento por arquétipo e estilo de CPU do núcleo (pedido do jogador, 01/11)
+
+As cinco sugestões de [perfis-16.md](perfis-16.md) foram aplicadas e simuladas uma a uma
+([identidade.md](identidade.md)). Ficaram as que mudaram o jeito de lutar:
+
+| Valor | Antes | Agora |
+|---|---|---|
+| Andar / andar para trás / dash: p10, Kōga, p05 | 300 / 220 / 1,0 | 360 / 230 / 1,2 · 350 / 230 / 1,15 · 340 / 230 / 1,1 |
+| Zoners p06, p11 / p08 | 300 / 220 / 1,0, backdash 640 | 250 / 210 / 0,9 · 240 / 210 / 0,85, backdash 720 |
+| Agarrador p09 | 300 / 220 / 1,0 | 260 / 190 / 0,85 |
+| Defensivo p07 | 300 / 220, backdash 640 | 280 / 250, backdash 720 |
+| Estilo da CPU: Ryūga, Yin-lu, Kōga, p04, p05, p10 | equilibrado, chutes, pressão, pressão, aéreo, pressão | onda, contra, rekka, esquiva, ninja, acrobata |
+
+Removidos por não mudarem nada nas lutas da CPU: a vantagem na defesa por personagem e o pulo
+próprio.
+
+Efeito nas vitórias (CPU nível 8, 1x1): Ryūga 62% → 74%, p05 52% → 60%. O resto fica dentro de
+±4 pontos.
