@@ -178,7 +178,8 @@
       "wallJump": true,
       "corrida": {
         "dash": 1.1
-      }
+      },
+      "pulo": 0.88
     },
     "walkSpeed": 340,
     "walkBackSpeed": 230,

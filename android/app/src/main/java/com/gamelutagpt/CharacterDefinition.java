@@ -611,6 +611,15 @@ final class CharacterDefinition {
             if(dashPermille<=0||backdashFrames<0||backdashSpeed<0)throw new IllegalArgumentException("run: dash > 0, backdash >= 0");
             this.dashPermille=dashPermille;this.backdashFrames=backdashFrames;this.backdashSpeed=backdashSpeed;return this;
         }
+        /**
+         * Tempo do pulo comum do lutador, em milésimos do pulo do motor (a mesma altura: menos de
+         * 1000 sobe e desce mais rápido, o acrobata; mais de 1000, mais pesado). O super pulo não muda.
+         */
+        int jumpPermille=1000;
+        Fighter withJump(int permille) {
+            if(permille<500||permille>1500)throw new IllegalArgumentException("jump: 500..1500");
+            jumpPermille=permille;return this;
+        }
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }

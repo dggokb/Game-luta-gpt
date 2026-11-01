@@ -1284,6 +1284,12 @@ final class CombatEngine {
         return c != null && c.fighter.backdashFrames > 0 ? c.fighter.backdashFrames : config.backdashFrames;
     }
 
+    /** Tempo do pulo comum do lutador (1 = o do motor). */
+    static float jumpScale(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        return c == null ? 1f : c.fighter.jumpPermille / 1000f;
+    }
+
     float backdashSpeed(CombatFighter f) {
         CharacterDefinition c = f.character();
         return c != null && c.fighter.backdashSpeed > 0f ? c.fighter.backdashSpeed : config.backdashSpeed;
@@ -1356,7 +1362,7 @@ final class CombatEngine {
         f.grounded = false;
         f.crouching = false;
         f.superJumping = superJump;
-        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed);
+        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed / jumpScale(f));
         f.y -= 2f;
         f.backdashFrames = 0;
         if (superJump) f.launcherChase = 0;
@@ -1820,6 +1826,9 @@ final class CombatEngine {
             (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
             scale = f.vy < 0f ? config.normalJumpRisingGravityScale
                               : config.normalJumpFallingGravityScale;
+            // Pulo próprio do lutador: a mesma altura em outro tempo (velocidade ÷ t, gravidade ÷ t²).
+            float t = jumpScale(f);
+            if (t != 1f) scale /= t * t;
         }
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {

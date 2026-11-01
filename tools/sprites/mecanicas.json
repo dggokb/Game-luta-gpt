@@ -578,7 +578,8 @@
           "wallJump": true,
           "corrida": {
             "dash": 1.1
-          }
+          },
+          "pulo": 0.88
         }
       },
       "comandos": {
@@ -865,7 +866,8 @@
           },
           "corrida": {
             "dash": 0.85
-          }
+          },
+          "pulo": 1.12
         }
       },
       "comandos": {
@@ -938,7 +940,8 @@
           "airDashes": 2,
           "corrida": {
             "dash": 1.2
-          }
+          },
+          "pulo": 0.82
         }
       },
       "comandos": {
@@ -1107,7 +1110,8 @@
           }
         },
         "lutador": {
-          "furia": 400
+          "furia": 400,
+          "pulo": 0.9
         }
       },
       "comandos": {
@@ -1381,7 +1385,8 @@
             "dash": 0.65,
             "backdashQuadros": 24,
             "backdashVelocidade": 340
-          }
+          },
+          "pulo": 1.15
         }
       },
       "comandos": {

@@ -201,7 +201,8 @@
       },
       "corrida": {
         "dash": 0.85
-      }
+      },
+      "pulo": 1.12
     },
     "walkSpeed": 260,
     "walkBackSpeed": 190
