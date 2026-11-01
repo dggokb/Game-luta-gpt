@@ -131,7 +131,7 @@ novo).
 | `velocidade` | `valor` (0 a 1), `segundos` (padrão 0,25) | velocidade da luta: 1 normal, 0,3 câmera lenta, 0 congela. Só a luta muda: a cena, as falas, as faixas e as onomatopeias andam no tempo normal. Volta a 1 sozinha no fim da cena | a transição |
 | `terminarLuta` | `vencedor` (`interrompida`, `jogador`, `rival`) | encerra a luta pela cena: `interrompida` e `jogador`, a história segue; `rival` conta como derrota (repete a luta se o passo pedir) | — |
 | `tinta` | `cobrir` (true/false), `segundos` (padrão 0,9), `cor` (padrão `#FFFFFF`) | pinceladas largas atravessam a tela até cobrir tudo (cobrir) ou saem na ordem contrária mostrando a luta (descobrir). Coberta, a tela fica lisa na cor da tinta, por cima até do HUD; uma página na tela some debaixo da tinta nova | a animação |
-| `pagina` | `imagem` ou `imagens` (lista de `<episódio>/<imagem>`, ex.: `ep02/pag1_ryuga.jpg`) | uma página pronta da história, lida no motor de mangá das páginas ([motor-paginas.md](motor-paginas.md)): a página inteira, depois cada quadro isolado com o resto escurecido, os balões digitados e os efeitos do quadro, com os quadros e balões do passo dela no `episodio.json`. Um toque (ou botão) segue, como na história. Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). A página fica parada no último quadro até a próxima `tinta` cobrir | o último toque |
+| `pagina` | `imagem` ou `imagens` (lista de `<episódio>/<imagem>`, ex.: `ep02/pag1_ryuga.jpg`) | uma página pronta da história, lida no motor de mangá das páginas ([motor-paginas.md](motor-paginas.md)): a página inteira, depois cada quadro isolado com o resto escurecido, os balões digitados e os efeitos do quadro, com os quadros e balões do passo dela no `episodio.json`. Um toque (ou botão) segue, como na história. Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). Uma página feita só para a cena (fora dos episódios) leva os `quadros` no próprio arquivo, no formato dos episódios ([abaixo](#página-feita-para-a-cena)). A página fica parada no último quadro até a próxima `tinta` cobrir; duas `pagina` seguidas são lidas uma depois da outra | o último toque |
 | `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte`, que sempre espera o jogador). Um movimento ou uma fala nunca seguram a cena mais de
@@ -189,6 +189,23 @@ escada: "DING" em cima, "DONG!" embaixo à direita), treme forte no começo e so
 | `cor` | `#FFD23F` | cor do miolo |
 | `segundos` | 1,6 | tempo na tela (os últimos 0,25 s somem) |
 
+### Página feita para a cena
+
+Uma página que não está no fluxo do episódio (a lembrança do convite do Episódio 2) fica na
+pasta do episódio e os quadros e balões vão na própria ação, iguais aos de um passo de página
+do `episodio.json` ([motor-paginas.md](motor-paginas.md)):
+
+```json
+{ "acao": "pagina", "imagem": "ep02/lembranca1.jpg", "quadros": [
+  { "area": [...], "efeitos": ["zoom"],
+    "baloes": [ { "texto": "Vamos brincar, Kōga...", "caixa": [...], "area": [...] } ] }
+] }
+```
+
+O recorte é o mesmo das páginas da história (`tools/historia/recortar_pagina.py`): ele grava a
+página e imprime os quadros e balões. Os balões espetados (onomatopeias e gritos com os nomes)
+ficam na arte; as falas precisam de tradução como as da cena.
+
 ### QTE
 
 O botão redondo aparece no meio da tela (a luta escurece um pouco), com o nome do golpe em
@@ -230,8 +247,10 @@ Yin-lu, no dojo dela):
 
 1. A Yin-lu já perdeu **80%** da vida, ficando com **20%** (`{"vida": 0.20, "lado": "rival"}`): o
    controle trava, o golpe termina em câmera lenta e a **tinta branca** cobre a tela.
-2. Uma **página de mangá sorteada** (dos Episódios 0, 1 e 2) é lida quadro a quadro, no toque.
-3. A tinta pinta de novo por cima da página, os dois recuam atrás dela e a tinta sai: a luta volta.
+2. As **duas páginas da lembrança** (Ryūga, Kōga e Yin-lu crianças no dojo: os irmãos querem
+   brincar, a Yin-lu manda treinar, eles fogem e ela corre atrás) são lidas quadro a quadro, no
+   toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
+3. A tinta pinta de novo por cima da segunda página, os dois recuam atrás dela e a tinta sai: a luta volta.
 4. **4 QTE**, com falas da Yin-lu e do Ryūga nos quadros laterais entre eles:
 
 | QTE | Tipo | Golpe do Ryūga | Vida da Yin-lu |
@@ -246,7 +265,7 @@ fala com o rosto da seleção (não tem retrato da história): quem luta ganha s
 reserva na cena.
 
 Para ver no PC sem jogar: `gradle :pc:testeQte` joga a luta inteira de verdade (passa as páginas,
-deixa a Yin-lu com 19%, lê a página, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
+deixa a Yin-lu com 19%, lê as duas páginas, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
 teclado) e grava os quadros em `android/pc/build/qte/`.
 
 ## Idiomas

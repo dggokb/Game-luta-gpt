@@ -114,6 +114,8 @@ public class CinematicaLutaTest {
                 }
                 for (String pagina : r.paginas()) {
                     assertTrue(passo.cinematica + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
+                }
+                for (String pagina : r.paginasDosEpisodios()) {
                     // A página é lida com os quadros e balões do passo dela no episódio.
                     String epId = pagina.substring(0, pagina.indexOf('/'));
                     Episodio epDaPagina = Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json"));

@@ -195,6 +195,8 @@ public final class CinematicaLuta {
          * uma é sorteada a cada luta e lida com os quadros e balões do passo dela no episódio.
          */
         List<String> imagens;
+        /** PAGINA com os quadros no próprio arquivo da cena (uma página que não está num episódio). */
+        Episodio.Passo propria;
         /** QTE: o tipo, quantos toques (MARTELAR) e a direção (DESLIZAR: frente, tras, cima, baixo). */
         TipoQte qte;
         int vezes = 8;
@@ -223,6 +225,12 @@ public final class CinematicaLuta {
             List<String> out = new ArrayList<>();
             for (Acao a : acoes) {
                 if (a.texto != null) out.add(a.texto);
+                if (a.propria == null) continue;
+                // As falas e legendas da página da cena também precisam de tradução.
+                for (Episodio.Quadro q : a.propria.quadros) {
+                    if (q.legenda != null) out.add(q.legenda);
+                    for (Episodio.BalaoPronto b : q.baloes) out.add(b.texto);
+                }
             }
             return out;
         }
@@ -241,6 +249,15 @@ public final class CinematicaLuta {
             List<String> out = new ArrayList<>();
             for (Acao a : acoes) {
                 if (a.imagens != null) out.addAll(a.imagens);
+            }
+            return out;
+        }
+
+        /** As páginas que vêm de um episódio (as outras têm os quadros no arquivo da cena). */
+        public List<String> paginasDosEpisodios() {
+            List<String> out = new ArrayList<>();
+            for (Acao a : acoes) {
+                if (a.imagens != null && a.propria == null) out.addAll(a.imagens);
             }
             return out;
         }
@@ -430,7 +447,7 @@ public final class CinematicaLuta {
             while (!opcoes.isEmpty()) {
                 String escolhida = opcoes.remove(sorteio.nextInt(opcoes.size()));
                 try {
-                    Episodio.Passo passo = passoDaPagina(escolhida, episodios);
+                    Episodio.Passo passo = a.propria != null ? a.propria : passoDaPagina(escolhida, episodios);
                     RenderImage img = assets.loadImage(Temporada.PASTA + "/" + escolhida);
                     if (passo != null && img != null) {
                         paginas.put(a, new Pagina(passo, img));
@@ -655,6 +672,13 @@ public final class CinematicaLuta {
                 a.imagens = new ArrayList<>();
                 String uma = Episodio.string(m, "imagem", null);
                 if (uma != null) a.imagens.add(uma);
+                if (!Episodio.list(m, "quadros").isEmpty()) {
+                    // A página da cena, com os quadros e balões aqui mesmo (formato dos episódios).
+                    if (uma == null || !Episodio.list(m, "imagens").isEmpty()) {
+                        throw new IllegalArgumentException("pagina com \"quadros\" precisa de uma \"imagem\" só");
+                    }
+                    a.propria = Episodio.paginaDe(m);
+                }
                 for (Object img : Episodio.list(m, "imagens")) a.imagens.add(String.valueOf(img));
                 if (a.imagens.isEmpty()) throw new IllegalArgumentException("pagina sem \"imagem\" nem \"imagens\"");
                 for (String img : a.imagens) {

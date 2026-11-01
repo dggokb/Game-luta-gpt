@@ -436,6 +436,16 @@ public final class Episodio {
         return out;
     }
 
+    /**
+     * Uma página pronta avulsa no formato dos episódios ({@code imagem} e {@code quadros}),
+     * fora de um episódio (a página de uma cinemática da luta).
+     */
+    static Passo paginaDe(Map<String, Object> map) {
+        Passo p = passo(map);
+        if (p.tipo != TipoPasso.PAGINA || !p.paginaPronta()) throw new IllegalArgumentException("página sem \"imagem\"");
+        return p;
+    }
+
     /** Um painel avulso no formato dos episódios (quadros do tutorial). */
     static Painel painelDe(Map<String, Object> map) {
         return painel(map);
