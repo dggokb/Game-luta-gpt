@@ -346,6 +346,15 @@ final class CombatConfig {
     int counterHitLightFrames = 2;
     int counterHitFrames = 4;
     /**
+     * Pulo para dentro (docs/balanco/tres-frentes.md): o golpe no ar (jL, jM, jH) contra quem está
+     * no chão alcança isto (px) abaixo do membro desenhado. O desenho do chute do pulo fica na
+     * altura do corpo, e o pulo sobe mais que o rival: o jH do Ryūga só encostava apertado entre
+     * os quadros 26 e 30 do pulo. Com o alcance para baixo ele pega do alto do pulo até cair.
+     */
+    float jumpInReachDown = 70f;
+    /** O golpe no ar defendido por quem está no chão: quadros a mais de defesa (quem pulou cai na frente). */
+    int jumpInBlockstunBonus = 6;
+    /**
      * O contra-golpe que leu o golpe (o Aparar do Ryūga, o S3 da Yin-lu, o do p11): o rival fica
      * atordoado pelo menos isto (quadros). Com o atordoamento comum (22–25) quem leu ficava só +5
      * a +8, a 180 px: não dava para chegar e emendar, e o rival voltava a atacar.

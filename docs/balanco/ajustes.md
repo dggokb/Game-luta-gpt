@@ -1390,3 +1390,14 @@ leve menos bolas no total.
   o nível 3 e a vida do spammer ficam como estavam.
 - O teste de reação ao pulo passou a usar 32 sementes. A CPU está soltando Onda em mais da metade
   dos pulos, e o limite segue em 10 reações, nenhuma antes do tempo humano.
+
+## Pulo: o golpe no ar alcança e o defendido dá vantagem (pedido do jogador, 01/11)
+
+- **Alcance para baixo:** o golpe normal no ar (jL, jM, jH) contra quem está no chão, bem na
+  frente, alcança 70 px abaixo do membro desenhado (`jumpInReachDown`). O jH do Ryūga só
+  encostava entre os quadros 26 e 30 do pulo; agora encosta do 22 ao 30. O crossup não muda.
+- **Defendido dá vantagem:** o golpe no ar defendido por quem está no chão deixa 6 quadros a mais
+  de defesa (`jumpInBlockstunBonus`).
+- **Resultado:** o jogador que entra pulando venceu 44, 47, 41 e 28% contra a CPU nos níveis 5
+  a 8; agora vence 58, 60, 56 e 50%. O resto ficou dentro do ruído. Detalhes em
+  `tres-frentes.md`. A CPU entrando pulando foi testada e saiu por não ter efeito.

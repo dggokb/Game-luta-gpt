@@ -63,3 +63,44 @@ O zoneador ainda vence a maior parte das lutas. Os próximos passos estão no fi
    (pressão ao cair) e a CPU entrando pulando quando o rival fica parado.
 3. **Os níveis 5 e 8 se parecem demais.** Medir o que muda de um para o outro (confirmar o combo,
    punir, agarrar) e alargar a diferença.
+
+## O pulo (pedido do jogador: "faz os três e simula")
+
+**Medido antes:** o golpe no ar quase nunca encostava em quem está no chão. A janela vem de
+apertar o golpe em vários quadros do pulo contra um rival parado, de várias distâncias:
+
+| Golpe | Antes | Depois |
+|---|---|---|
+| Ryūga jH | só entre os quadros 26 e 30 do pulo | do 22 ao 30 |
+| Ryūga jM | do 26 ao 30 | do 18 ao 30 |
+| Ryūga jL | do 30 ao 34 | do 22 ao 34 |
+| p14 jH | do 22 ao 26 | do 18 ao 26 |
+| Kōga jH | do 6 ao 30 (já era bom) | igual |
+
+O membro desenhado do chute fica na altura do corpo, e o pulo sobe 262 px, mais que o rival
+(241). No Ryūga, o chute só alcançava o rival já perto de cair.
+
+**As três mudanças e o que ficou:**
+1. **Ficou.** O golpe no ar contra quem está no chão e bem na frente alcança 70 px abaixo do
+   desenho (`jumpInReachDown`). Com o rival quase embaixo (o crossup) fica o desenho de sempre.
+2. **Ficou.** O golpe no ar defendido por quem está no chão deixa 6 quadros a mais de defesa
+   (`jumpInBlockstunBonus`): quem pulou cai na frente para começar a pressão.
+3. **Saiu.** Com a CPU entrando pulando (a 200–310 px, rival parado ou se recuperando), o número
+   de pulos dela quase não mudou, nem com o triplo da chance (5,7 contra 4,9 por minuto no nível 5
+   e igual nos outros). Os resultados também ficaram iguais.
+
+**Resultado** (`BateriaLog`, 48 lutas por nível; tabelas em [perfis/log-pulo.md](perfis/log-pulo.md)):
+
+| Pulador (Ryūga) contra a CPU, níveis 5 / 6 / 7 / 8 | Antes (32 lutas) | Depois (48 lutas) |
+|---|---|---|
+| Pulador vence | 44 / 47 / 41 / 28% | 58 / 60 / 56 / 50% |
+| Pulo que acerta | 27 / 24 / 18 / 15% | 42 / 40 / 27 / 20% |
+| Pulo que acertou e virou combo | 36 / 31 / 34 / 42% | 46 / 43 / 50 / 54% |
+
+O zoneador e a CPU × CPU ficaram dentro do ruído. O crossup (`CrossUpTest`) continua igual.
+
+**O que ainda falta:**
+- A CPU quase não pula: 5 a 6 vezes por minuto, e cerca de 75% desses pulos não fazem nada.
+- No nível 8 ela defende 63% dos pulos e tira do ar só 14%. Um jogador que só pula vence metade
+  das lutas contra o nível 8.
+- O próximo passo é a CPU tirar do ar com mais vontade e pular com propósito, pelo que ela aprende.

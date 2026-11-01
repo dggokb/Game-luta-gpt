@@ -2708,17 +2708,27 @@ final class CombatEngine {
         float[] g = golpeNoDesenho(a, frame);
         // Agachado contra especial ou Super de chão o corpo vale em pé (hitsCrouching): a postura.
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
-        if (g == null) return membroToca(a, box.x0, box.x1, box.y0, box.y1, d, body, crouch, corpo);
+        // Pulo para dentro: o golpe no ar alcança abaixo do desenho contra quem está no chão.
+        // Só com ele bem na frente: quase embaixo de quem pula (o crossup) fica o desenho de sempre.
+        boolean naFrente = (d.x - a.x) * a.facing > a.body().halfWidth + d.body().halfWidth;
+        float desce = naFrente && pulandoParaDentro(a, d) ? config.jumpInReachDown : 0f;
+        if (g == null) return membroToca(a, box.x0, box.x1, box.y0 - desce, box.y1, d, body, crouch, corpo);
         // O membro medido é a ponta que mexeu; o braço ou a perna vem inteiro desde a frente do
         // corpo. De perto (o pulo que cai em cima) a ponta já passou das costas do rival. Na
         // diagonal são duas caixas (a de perto do corpo e a da ponta), cada uma na sua altura.
         for (int j = 0; j + 3 < g.length; j += 4) {
             float x0 = (j == 0 ? Math.min(g[0], a.body().halfWidth) : g[j]) - FOLGA_DESENHO;
-            if (membroToca(a, x0, g[j + 1] + FOLGA_DESENHO, g[j + 2] - FOLGA_DESENHO, g[j + 3] + FOLGA_DESENHO, d, body, crouch, corpo)) {
+            if (membroToca(a, x0, g[j + 1] + FOLGA_DESENHO, g[j + 2] - FOLGA_DESENHO - desce, g[j + 3] + FOLGA_DESENHO, d, body, crouch, corpo)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /** {@code a} solta um golpe normal no ar (jL, jM, jH...) em {@code d}, que está no chão. */
+    static boolean pulandoParaDentro(CombatFighter a, CombatFighter d) {
+        return !a.grounded && d.grounded && a.attack != null && a.move != null &&
+            a.attack.kind == AttackDefinition.Kind.NORMAL && a.attack.id.startsWith("j");
     }
 
     /** Uma caixa do membro ({@code x0..x1}, {@code y0..y1} da raiz de {@code a}) contra o corpo de {@code d}. */
@@ -4096,7 +4106,7 @@ final class CombatEngine {
         d.clearAttack();
         d.stunLeft = d.stunTotal = absorve ? 1 : just
             ? Math.max(1, attack.blockstunFrames * config.justDefenseBlockstunPermille / 1000)
-            : attack.blockstunFrames;
+            : attack.blockstunFrames + (!projectile && pulandoParaDentro(a, d) ? config.jumpInBlockstunBonus : 0);
         d.justDefended = just;
         d.stunElapsed = 0;
         d.lastGuard = guard;
