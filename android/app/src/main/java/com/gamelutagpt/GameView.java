@@ -2013,6 +2013,7 @@ public class GameView extends SurfaceView
         // cena (o outro pode perder); com ela rodando, ninguém cai. Depois do TIME OVER o
         // resultado já está decidido: ninguém cai mais.
         protegerVida(flow.timeOver());
+        protegerTroca();
         engine.step(playerInput, opponentInput);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
         boolean fightFree = ultraAttacker < 0 && !engine.ultraSequenceRunning();
@@ -7053,6 +7054,7 @@ public class GameView extends SurfaceView
         cinematica.descarregar();
         cinematicaDirector.parar();
         cinematicaFim = null;
+        trocaProtegendo = false;
         for (int side = 0; side < 2; side++) {
             golpeDoRoteiro[side] = golpeFinal[side] = false;
             if (engine == null) continue;
@@ -7123,6 +7125,29 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** A troca de golpes da cinemática está segurando a vida e a guarda dos lutadores. */
+    private boolean trocaProtegendo;
+
+    /**
+     * Na troca de golpes sem acertar ninguém perde vida (um golpe que escapa da defesa não tira
+     * nada) nem a guarda (tanta defesa não vira guard break). Quando ela acaba, solta.
+     */
+    private void protegerTroca() {
+        boolean trocando = cinematicaDirector.trocando();
+        if (!trocando && !trocaProtegendo) return;
+        for (int side = 0; side < 2; side++) {
+            for (FighterState member : engine.team(side).members) {
+                if (trocando) {
+                    member.guard = CombatConfig.GUARD_MAX;
+                    if (member.cenaDano < 0) member.cenaSemDano = true;
+                } else if (member.cenaDano < 0) {
+                    member.cenaSemDano = false;
+                }
+            }
+        }
+        trocaProtegendo = trocando;
+    }
+
     /** O golpe do QTE acabou: se não pegou (longe, no ar), o dano do roteiro entra assim mesmo. */
     private void terminarGolpe(int lado) {
         FighterState alvo = engine.fighter(lado).state;
@@ -7186,6 +7211,14 @@ public class GameView extends SurfaceView
 
         @Override public void som(String id) {
             onHistoriaSom(id);
+        }
+
+        @Override public void trocar(float segundos) {
+            cinematicaDirector.trocar(segundos, storyFightFrames);
+        }
+
+        @Override public boolean trocando() {
+            return cinematicaDirector.trocando();
         }
 
         @Override public boolean golpeEntrou(int lado) {

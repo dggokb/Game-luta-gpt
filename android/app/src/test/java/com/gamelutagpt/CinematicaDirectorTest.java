@@ -71,6 +71,50 @@ public class CinematicaDirectorTest {
         }
     }
 
+    /**
+     * A troca de golpes entre os QTE: os dois andam, os dois atacam, quem defende segura a
+     * defesa e nenhum golpe pega (sem a proteção do jogo, só a coreografia). Acaba sozinha.
+     */
+    @Test public void trocaDeGolpesSemAcertar() {
+        for (long semente = 1; semente <= 6; semente++) {
+            Match m = new Match(900f, 1300f);
+            int vida0 = m.f(0).state.life, vida1 = m.f(1).state.life;
+            m.director.trocar(5f, semente);
+            boolean[] atacou = new boolean[2];
+            boolean defendeu = false, andou = false;
+            float x0 = m.f(0).x;
+            int quadros = 0;
+            while (m.director.trocando() && quadros++ < 60 * 12) {
+                m.director.fill(m.engine, m.in[0], m.in[1]);
+                m.engine.step(m.in[0], m.in[1]);
+                for (int i = 0; i < 2; i++) {
+                    atacou[i] |= m.f(i).attacking();
+                    defendeu |= m.f(i).status == CombatFighter.Status.BLOCKSTUN;
+                }
+                andou |= Math.abs(m.f(0).x - x0) > 40f;
+            }
+            assertFalse(semente + ": a troca acaba sozinha", m.director.trocando());
+            assertTrue(semente + ": os dois atacam", atacou[0] && atacou[1]);
+            assertTrue(semente + ": alguém defende", defendeu);
+            assertTrue(semente + ": eles se movimentam", andou);
+            assertEquals(semente + ": nenhum golpe pega", vida0, m.f(0).state.life);
+            assertEquals(semente + ": nenhum golpe pega", vida1, m.f(1).state.life);
+        }
+    }
+
+    /** Um golpe pedido no meio da troca interrompe ela. */
+    @Test public void golpeInterrompeATroca() {
+        Match m = new Match(900f, 1300f);
+        m.director.trocar(5f, 3L);
+        for (int i = 0; i < 30; i++) {
+            m.director.fill(m.engine, m.in[0], m.in[1]);
+            m.engine.step(m.in[0], m.in[1]);
+        }
+        m.director.golpear(0, new CinematicaLuta.Golpe("M", 0.1f, false));
+        assertFalse(m.director.trocando());
+        assertTrue(m.director.movendo(0));
+    }
+
     /** O golpe final do QTE derruba de vez, com a vida que o rival tiver. */
     @Test public void golpeFinalDerruba() {
         Match m = new Match(800f, 1400f);

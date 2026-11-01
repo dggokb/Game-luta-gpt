@@ -133,6 +133,7 @@ novo).
 | `tinta` | `cobrir` (true/false), `segundos` (padrão 0,9), `cor` (padrão `#FFFFFF`) | pinceladas largas atravessam a tela até cobrir tudo (cobrir) ou saem na ordem contrária mostrando a luta (descobrir). Coberta, a tela fica lisa na cor da tinta, por cima até do HUD; uma página na tela some debaixo da tinta nova | a animação |
 | `pagina` | `imagem` ou `imagens` (lista de `<episódio>/<imagem>`, ex.: `ep02/pag1_ryuga.jpg`) | uma página pronta da história, lida no motor de mangá das páginas ([motor-paginas.md](motor-paginas.md)): a página inteira, depois cada quadro isolado com o resto escurecido, os balões digitados e os efeitos do quadro, com os quadros e balões do passo dela no `episodio.json`. Um toque (ou botão) segue, como na história. Com `imagens`, uma é sorteada a cada luta (já abre ao carregar a luta). Uma página feita só para a cena (fora dos episódios) leva os `quadros` no próprio arquivo, no formato dos episódios ([abaixo](#página-feita-para-a-cena)). A página fica parada no último quadro até a próxima `tinta` cobrir; duas `pagina` seguidas são lidas uma depois da outra | o último toque |
 | `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`, `impacto`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
+| `trocar` | `segundos` | os dois trocam golpes sem acertar: quem ataca corre ou anda até o outro (às vezes para pouco antes e o golpe passa raspando) e solta de 1 a 3 golpes normais em pé; o outro defende. Depois um recua (ou nenhum) e a vez quase sempre passa para o outro. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
@@ -239,8 +240,9 @@ de uma onomatopeia (`pos`, `tamanho`, `tremor`, `rotacao`, `cor`, `segundos`, pa
 golpe pega, o letreiro estoura, a luta **congela** `congela` segundos (padrão 0,15) e a câmera
 dá um **tranco** de zoom até `zoom` (padrão 1,15) e volta. O letreiro precisa de tradução.
 
-Para o final ficar com cara de cinema, o roteiro junta as ações em volta dos QTE: faixas e
-closes (`camera` com `foco`) nas falas, `mover` os dois `correr` um para o outro com
+Para o final ficar com cara de cinema, o roteiro junta as ações em volta dos QTE: `trocar`
+entre um QTE e outro (os dois se movimentando e trocando golpes defendidos, às vezes por baixo
+das falas), faixas e closes (`camera` com `foco`) nas falas, `mover` os dois `correr` um para o outro com
 `velocidade` 0,3 logo antes do QTE (o QTE pede em câmera lenta), um `golpe` do rival antes de
 um QTE de revide e, no golpe final, faixas, câmera lenta e um impacto grande com `congela` 0,7.
 
@@ -268,10 +270,10 @@ Yin-lu, no dojo dela):
 | Momento | O que acontece | Golpe do Ryūga | Vida da Yin-lu |
 |---|---|---|---|
 | A lembrança | faixas e closes: "Você fugia de todo treino, lembra?" / "Hoje eu vim treinar de verdade!" | — | 20% |
-| CHOQUE! (toque) | os dois correm um para o outro e o QTE pede em câmera lenta; PAH! | M | −5% |
-| REVIDA! (deslizar para frente) | ela ataca primeiro (golpe do roteiro: chute rodopiante, VUSH!); ele revida, TCHAAK! | S4 (chute giratório) | −5% |
-| SEQUÊNCIA! (martelar 10) | a câmera perto dele; DOOM DOOM! | H | −5% |
-| GOLPE FINAL! (tempo) | "Ainda... não acabou!" / "Acabou sim, Yin-lu!"; pulam para trás, faixas, câmera lenta; KRAAAK! e a luta congela | S2 (punho ascendente) | KO |
+| CHOQUE! (toque) | trocam golpes defendidos, pulam para trás e correm um para o outro; o QTE pede em câmera lenta; PAH! | M | −5% |
+| REVIDA! (deslizar para frente) | trocam golpes enquanto ela provoca ("Rápido... mas previsível!"); ela quebra a troca com o chute rodopiante (golpe do roteiro, VUSH!); ele revida, TCHAAK! | S4 (chute giratório) | −5% |
+| SEQUÊNCIA! (martelar 10) | trocam golpes ("Você melhorou... mas eu também!"); a câmera perto dele; DOOM DOOM! | H | −5% |
+| GOLPE FINAL! (tempo) | trocam golpes durante "Ainda... não acabou!" / "Acabou sim, Yin-lu!"; pulam para trás, faixas, câmera lenta; KRAAAK! e a luta congela | S2 (punho ascendente) | KO |
 | Depois | "Treinei muito... igual você mandou." | — | — |
 
 Errar qualquer QTE faz a Yin-lu contra-atacar (−5% do Ryūga) e o QTE pede de novo. A Yin-lu
@@ -286,10 +288,10 @@ chega e os dois derrubam todo mundo) e um final diferente, de briga de rua:
 | Momento | O que acontece | Golpe do Kōga | Vida do Brucy |
 |---|---|---|---|
 | O beco | faixas e closes: "Igual naquele beco... só que agora eu tô do outro lado." / "Melhor ainda! Vem, Brucy!" | — | 20% |
-| REVIDA! (toque) | o Brucy bate primeiro (golpe do roteiro: a cabeçada, TUM!); "Heh... essa doeu. Minha vez!"; POW! | H | −5% |
-| INVESTIDA! (deslizar para frente) | o Brucy recua e provoca: "Só isso, Líder?"; BAM BAM BAM! | S3 (avanço em três) | −5% |
-| FÚRIA! (martelar 14) | a câmera perto dele, câmera lenta; TATATATA! | S2 (punho em sequência) | −5% |
-| GOLPE FINAL! (tempo) | "Para de se exibir!" / "Eu dava conta... lembra?"; pulam para trás, faixas, correm um para o outro em câmera lenta; DOOOOM! | S4 (mergulho) | KO |
+| REVIDA! (toque) | trocam golpes no beco até o Brucy bater primeiro (golpe do roteiro: a cabeçada, TUM!); "Heh... essa doeu. Minha vez!"; POW! | H | −5% |
+| INVESTIDA! (deslizar para frente) | trocam golpes; o Brucy recua e provoca: "Só isso, Líder?"; BAM BAM BAM! | S3 (avanço em três) | −5% |
+| FÚRIA! (martelar 14) | trocam golpes ("Você não cansa, não?" / "Nunca!"); a câmera perto dele, câmera lenta; TATATATA! | S2 (punho em sequência) | −5% |
+| GOLPE FINAL! (tempo) | trocam golpes durante "Para de se exibir!" / "Eu dava conta... lembra?"; pulam para trás, faixas, correm um para o outro em câmera lenta; DOOOOM! | S4 (mergulho) | KO |
 | Depois | o Brucy caído: "Eu sei, eu sei..." (como no beco); "Heh... com essa dupla, ninguém segura a gente." | — | — |
 
 Para ver no PC sem jogar: `gradle :pc:testeQte` (a do Kōga: `-Pirmao=koga`) joga a luta inteira de verdade (passa as páginas,
@@ -334,7 +336,8 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | O que a cena pede à luta (`CinematicaLuta.Palco`: controle, movimentos, lado na tela, fim) e quando confere o gatilho | `GameView.palcoCinematica`, `GameView.updateCinematica` |
 | Câmera lenta e luta congelada | `GameView.cinematicaLenta` |
 | Zoom e foco da câmera (chão ou peito de quem está em foco) | `GameView.renderFrame` (`cinematicZoom`, `chestY`) |
-| Comandos dos lutadores (pulo, backdash, dash, troca, o golpe do QTE) | `android/app/.../CinematicaDirector.java` |
+| Comandos dos lutadores (pulo, backdash, dash, troca, o golpe do QTE, a troca de golpes) | `android/app/.../CinematicaDirector.java` |
+| Na troca de golpes ninguém perde vida nem guarda | `GameView.protegerTroca` |
 | Dano do golpe do QTE (exato, uma vez só) e o golpe final que derruba | `FighterState.cenaDano`, `GameView.palcoCinematica` (`golpear`), `GameView.terminarGolpe` |
 | Toque e teclado no QTE e na página | `GameView.handleTouch`, `GameView.processHardwareKeys` (`cinematica.pegaToque()`) |
 | Quem luta fala com o rosto da seleção | `GameView.avulsoDoLutador` |

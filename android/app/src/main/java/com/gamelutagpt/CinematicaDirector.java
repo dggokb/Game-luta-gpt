@@ -1,6 +1,7 @@
 package com.gamelutagpt;
 
 import com.gamelutagpt.historia.CinematicaLuta;
+import java.util.Random;
 
 /**
  * Os lutadores na cinemática da luta ({@link CinematicaLuta}). Enquanto a cena tem o controle,
@@ -48,14 +49,60 @@ final class CinematicaDirector {
 
     private final Ordem[] ordens = new Ordem[2];
 
+    /**
+     * A troca de golpes sem acertar (entre os QTE): em cada vez, quem ataca chega perto (ou
+     * fica no meio do caminho, e o golpe passa no vento) e solta de 1 a 3 golpes normais em pé;
+     * o outro segura para trás e defende. Depois um dos dois recua (ou nenhum) e a vez troca,
+     * quase sempre de lado. O jogo segura a vida e a guarda enquanto isso ({@link #trocando}).
+     */
+    private static final class Troca {
+        final int limite;
+        final Random sorteio;
+        int frame;
+        int atacante;
+        /** 0 escolhe a vez, 1 chega perto, 2 golpes, 3 separa, 4 acabando. */
+        int fase;
+        int faseFrame;
+        int golpes;
+        float alvoVao;
+        int proximoGolpe;
+        int recua;
+        /** O vão no quadro anterior (encostou quando ele para de diminuir). */
+        float vaoAntes;
+        /** O mesmo atacou duas vezes seguidas: a próxima é do outro. */
+        boolean repetiu;
+
+        Troca(float segundos, long semente) {
+            limite = Math.max(1, Math.round(segundos * FPS));
+            sorteio = new Random(semente);
+            atacante = sorteio.nextInt(2);
+        }
+    }
+
+    private static final String[] BOTOES = {"L", "M", "H"};
+    private Troca troca;
+
     /** Começa um movimento do lado 0 (jogador) ou 1 (CPU); "parar" cancela o que estiver rodando. */
     void mover(int lado, CinematicaLuta.Movimento movimento) {
+        troca = null;
         ordens[lado] = movimento.tipo == CinematicaLuta.Movimento.Tipo.PARAR ? null : new Ordem(movimento);
     }
 
     /** O lado 0 (jogador) ou 1 (CPU) vai até o outro e dá o golpe do QTE. */
     void golpear(int lado, CinematicaLuta.Golpe golpe) {
+        troca = null;
         ordens[lado] = new Ordem(golpe);
+    }
+
+    /** Os dois trocam golpes sem acertar por {@code segundos} (no tempo da luta). */
+    void trocar(float segundos, long semente) {
+        ordens[0] = ordens[1] = null;
+        troca = new Troca(segundos, semente);
+    }
+
+    /** A troca de golpes ainda não acabou (a vez em andamento termina antes). */
+    boolean trocando() {
+        return troca != null;
     }
 
     boolean movendo(int lado) {
@@ -65,14 +112,98 @@ final class CinematicaDirector {
     /** Cancela tudo (fim da cena, luta nova). */
     void parar() {
         ordens[0] = ordens[1] = null;
+        troca = null;
     }
 
     /** O comando dos dois neste quadro (chame antes do {@code engine.step}). */
     void fill(CombatEngine engine, FighterInput p1, FighterInput cpu) {
         p1.clear();
         cpu.clear();
+        if (troca != null) {
+            trocar(engine, new FighterInput[] {p1, cpu});
+            return;
+        }
         drive(engine, 0, p1);
         drive(engine, 1, cpu);
+    }
+
+    private void trocar(CombatEngine engine, FighterInput[] in) {
+        Troca t = troca;
+        t.frame++;
+        t.faseFrame++;
+        int a = t.atacante, d = 1 - a;
+        CombatFighter atk = engine.fighter(a), def = engine.fighter(d);
+        if (atk.ko() || def.ko()) {
+            troca = null;
+            return;
+        }
+        boolean livres = atk.canAct() && def.canAct() && atk.grounded && def.grounded;
+        switch (t.fase) {
+            case 0:
+                if (t.frame >= t.limite) {
+                    t.fase = 4;
+                    t.faseFrame = 0;
+                    return;
+                }
+                if (!livres) return;
+                // Quase sempre a vez passa para o outro (nunca três seguidas do mesmo).
+                if (t.frame > 1) {
+                    boolean passa = t.repetiu || t.sorteio.nextInt(10) < 7;
+                    if (passa) t.atacante = 1 - t.atacante;
+                    t.repetiu = !passa;
+                }
+                // Um em três passa no vento: para pouco antes e o golpe passa raspando.
+                t.alvoVao = t.sorteio.nextInt(3) == 0 ? 45f + t.sorteio.nextInt(35) : ALCANCE;
+                t.vaoAntes = Float.MAX_VALUE;
+                t.golpes = 1 + t.sorteio.nextInt(3);
+                t.proximoGolpe = 0;
+                t.fase = 1;
+                t.faseFrame = 0;
+                return;
+            case 1: {
+                float vao = vao(atk, def);
+                boolean encostou = t.faseFrame > 4 && vao >= t.vaoAntes - 0.5f && vao < 60f;
+                t.vaoAntes = vao;
+                if (vao > t.alvoVao && !encostou && t.faseFrame < 100) {
+                    // Longe, corre; perto, anda. Quem vai defender já levanta a guarda.
+                    if (atk.canAct() || atk.forwardDashing) in[a].direction = DemoDirector.Ctx.forward(atk);
+                    if (vao > t.alvoVao + 140f && atk.canAct() && !atk.forwardDashing) in[a].dash = true;
+                    if (vao < 70f) in[d].direction = DemoDirector.Ctx.back(def);
+                    return;
+                }
+            }
+                t.fase = 2;
+                t.faseFrame = 0;
+                // fall through: o primeiro golpe sai já.
+            case 2:
+                // Quem defende segura para trás (defesa em pé) a vez inteira.
+                in[d].direction = DemoDirector.Ctx.back(def);
+                // A defesa empurrou longe demais: o resto do combo não sai do outro lado da tela.
+                if (t.golpes > 0 && t.faseFrame > 0 && vao(atk, def) > t.alvoVao + 60f) t.golpes = 0;
+                if (t.golpes > 0 && t.faseFrame >= t.proximoGolpe && atk.canAct()) {
+                    CinematicaDirector.apertar(BOTOES[t.sorteio.nextInt(BOTOES.length)], in[a]);
+                    t.golpes--;
+                    t.proximoGolpe = t.faseFrame + 10 + t.sorteio.nextInt(8);
+                } else if ((t.golpes == 0 && atk.canAct() && t.faseFrame > t.proximoGolpe) || t.faseFrame > 150) {
+                    t.fase = 3;
+                    t.faseFrame = 0;
+                    int r = t.sorteio.nextInt(10);
+                    t.recua = r < 2 ? a : r < 4 ? d : -1;
+                }
+                return;
+            case 3:
+                // Separa: um dos dois recua (ou nenhum); quem defendeu segura a defesa um pouco mais.
+                if (t.faseFrame < 12) in[d].direction = DemoDirector.Ctx.back(def);
+                if (t.faseFrame == 12 && t.recua >= 0 && engine.fighter(t.recua).canAct()) in[t.recua].backdash = true;
+                if (t.faseFrame >= (t.recua >= 0 ? 30 : 14)) {
+                    t.fase = 0;
+                    t.faseFrame = 0;
+                }
+                return;
+            default:
+                // Acabando: espera os dois livres (ou um instante) para o roteiro seguir.
+                if (livres || t.faseFrame > 60) troca = null;
+        }
     }
 
     private void drive(CombatEngine engine, int lado, FighterInput in) {

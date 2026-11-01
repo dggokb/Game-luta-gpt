@@ -90,6 +90,18 @@ public final class CinematicaLuta {
             return false;
         }
 
+        /**
+         * Os dois trocam golpes sem acertar por {@code segundos}: chegam perto, um ataca e o
+         * outro defende, às vezes o golpe passa no vento, recuam e a vez troca. Ninguém perde
+         * vida. Um movimento ou golpe pedido depois interrompe a troca.
+         */
+        default void trocar(float segundos) {}
+
+        /** A troca de golpes ainda não acabou. */
+        default boolean trocando() {
+            return false;
+        }
+
         /** O golpe pedido para esse lado já pegou (o dano do roteiro entrou no alvo). */
         default boolean golpeEntrou(int lado) {
             return false;
@@ -164,7 +176,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -715,6 +727,11 @@ public final class CinematicaLuta {
                 a = qte(m);
                 impacto(a, m);
                 break;
+            case "trocar":
+                a = new Acao(Acao.Tipo.TROCAR);
+                a.segundos = numero(m, "segundos", -1f, 0.5f, 20f);
+                if (a.segundos < 0f) throw new IllegalArgumentException("trocar sem \"segundos\"");
+                break;
             case "golpe":
                 a = new Acao(Acao.Tipo.GOLPE);
                 a.quemMove = Episodio.string(m, "quem", "jogador");
@@ -724,7 +741,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -1051,6 +1068,9 @@ public final class CinematicaLuta {
                 qteTentativas = 0;
                 pedirQte();
                 break;
+            case TROCAR:
+                palco.trocar(a.segundos);
+                break;
             case GOLPE:
                 golpeLado = lado(a.quemMove);
                 impactou = false;
@@ -1087,6 +1107,9 @@ public final class CinematicaLuta {
                 return qtePronto();
             case GOLPE:
                 return golpeAcabou(a, golpeLado, idade);
+            case TROCAR:
+                // A vez em andamento termina antes (no tempo da luta: a câmera lenta estica).
+                return !palco.trocando() || idade >= a.segundos + LIMITE_ESPERA;
             default:
                 return true;
         }

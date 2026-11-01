@@ -33,21 +33,23 @@
     {"acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "Hoje eu vim treinar de verdade!", "segura": 0.7},
     {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.5, "semEsperar": true},
     {"acao": "faixas", "entrar": false, "segundos": 0.5},
-
+    {"acao": "trocar", "segundos": 2.5},
+    {"acao": "mover", "quem": "ambos", "movimento": "pular-tras"},
     {"acao": "mover", "quem": "ambos", "movimento": "correr", "distancia": 170},
     {"acao": "velocidade", "valor": 0.3, "segundos": 0.2, "semEsperar": true},
     {"acao": "qte", "tipo": "toque", "texto": "CHOQUE!", "golpe": "M", "dano": 0.05, "impacto": {"texto": "PAH!", "congela": 0.2, "zoom": 1.2}, "erro": {"golpe": "M", "dano": 0.05}},
     {"acao": "velocidade", "valor": 1.0, "segundos": 0.3, "semEsperar": true},
-
+    {"acao": "trocar", "segundos": 3.0, "semEsperar": true},
     {"acao": "fala", "quem": "p02", "lado": "rival", "texto": "Rápido... mas previsível!", "segura": 0.5},
     {"acao": "golpe", "quem": "rival", "golpe": "S4", "dano": 0.04, "impacto": {"texto": "VUSH!", "congela": 0.12, "zoom": 1.12, "cor": "#7FD8FF", "pos": [0.5, 0.3]}},
     {"acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "Esse chute eu já conheço!", "segura": 0.5},
     {"acao": "qte", "tipo": "deslizar", "direcao": "frente", "texto": "REVIDA!", "golpe": "S4", "dano": 0.05, "impacto": {"texto": "TCHAAK!", "congela": 0.25, "zoom": 1.25}, "erro": {"golpe": "H", "dano": 0.05}},
-
+    {"acao": "trocar", "segundos": 3.0, "semEsperar": true},
+    {"acao": "fala", "quem": "p02", "lado": "rival", "texto": "Você melhorou... mas eu também!", "segura": 0.6},
     {"acao": "camera", "zoom": 1.3, "foco": "ryuga", "segundos": 0.5, "semEsperar": true},
     {"acao": "qte", "tipo": "martelar", "texto": "SEQUÊNCIA!", "vezes": 10, "segundos": 2.8, "golpe": "H", "dano": 0.05, "impacto": {"texto": "DOOM DOOM!", "congela": 0.3, "zoom": 1.3, "tamanho": 150}, "erro": {"golpe": "M", "dano": 0.05}},
     {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.5, "semEsperar": true},
-
+    {"acao": "trocar", "segundos": 3.0, "semEsperar": true},
     {"acao": "fala", "quem": "p02", "lado": "rival", "texto": "Ainda... não acabou!", "segura": 0.5},
     {"acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "Acabou sim, Yin-lu!", "segura": 0.5},
     {"acao": "mover", "quem": "ambos", "movimento": "pular-tras"},
