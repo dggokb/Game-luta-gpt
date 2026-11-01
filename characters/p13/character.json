@@ -514,8 +514,7 @@
         "dash": 0.65,
         "backdashQuadros": 24,
         "backdashVelocidade": 340
-      },
-      "pulo": 1.15
+      }
     },
     "wakeupFrames": 30
   },

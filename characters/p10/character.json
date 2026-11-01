@@ -169,8 +169,7 @@
       "airDashes": 2,
       "corrida": {
         "dash": 1.2
-      },
-      "pulo": 0.82
+      }
     },
     "walkSpeed": 360,
     "walkBackSpeed": 230,

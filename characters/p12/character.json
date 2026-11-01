@@ -183,8 +183,7 @@
     },
     "comboStyle": "imprevisivel",
     "mecanica": {
-      "furia": 400,
-      "pulo": 0.9
+      "furia": 400
     }
   },
   "animations": {
