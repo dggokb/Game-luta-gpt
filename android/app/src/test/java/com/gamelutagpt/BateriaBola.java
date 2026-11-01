@@ -29,6 +29,9 @@ public final class BateriaBola {
         };
     }
 
+    /** Desliga o que a CPU aprende (só o gosto do estilo e do nível), para comparar. */
+    static boolean semLeitura;
+
     static final class Placar {
         int lutas, vitoriasCpu, pulos, chegou, acertosCpu;
         long danoCpu, danoBola;
@@ -42,6 +45,7 @@ public final class BateriaBola {
             String[] t1 = dupla ? new String[] {cpu, cpu.equals("p03") ? "p04" : "p03"} : new String[] {cpu};
             BateriaBalanco.Luta l = new BateriaBalanco.Luta(t0, t1, nivel, base + s, new CombatConfig());
             l.mao[0] = spam(defende);
+            if (semLeitura) l.ai[1].setLeituraAtiva(false);
             boolean noAr = false;
             while (!l.acabou() && l.quadro < 60 * 60 * 4) {
                 l.passo();
@@ -209,7 +213,8 @@ public final class BateriaBola {
         }
         int n = args.length > 0 ? Integer.parseInt(args[0]) : 20;
         boolean dupla = args.length > 1 && args[1].equals("2x2");
-        System.out.println("# O Ryūga que só solta bola" + (dupla ? " (2x2)" : " (1x1)"));
+        semLeitura = java.util.Arrays.asList(args).contains("semLeitura");
+        System.out.println("# O Ryūga que só solta bola" + (dupla ? " (2x2)" : " (1x1)") + (semLeitura ? ", sem leitura" : ""));
         System.out.println();
         System.out.println("| CPU | nível 5: CPU vence | nível 8: CPU vence | nível 8: pulos/min | nível 8: tempo colado | nível 8: dano da bola por min (% de vida) |");
         System.out.println("|---|---|---|---|---|---|");

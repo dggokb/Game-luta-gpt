@@ -1268,3 +1268,28 @@ de dar para pular e chegar.
 No jeito de lutar, 14 dos 16 mudaram além do ruído (`BateriaPerfis`, S6 → S7). A CPU ainda perde
 para quem só solta bola: o resto vem da CPU que aprende e das mecânicas contra bola, os próximos
 passos.
+
+## Contra a bola: defesa perfeita absorve e corrida de energia (pedido do jogador, 01/11)
+
+**Pedido:** "não temos um counter para isso" (para quem só solta bola). O jogador escolheu as duas
+mecânicas.
+
+**O que mudou:**
+- **Defesa perfeita absorve a bola:** a defesa apertada em cima da hora contra um projétil não
+  empurra e quase não prende (1 quadro). Ela tem uma parada curta e mostra "ABSORVEU!". Quem
+  absorve sai livre para andar até o rival.
+- **Corrida de energia:** correndo para a frente com 1/4 de barra, M+H vira a corrida de energia
+  (30 quadros, 125% da velocidade do dash), que atravessa projéteis. Sem barra, ou sem estar
+  correndo, M+H continua sendo o golpe forte ou o pushblock.
+- **SHINKAI ENERGY:** com o S de mercado, ele tinha perdido o tipo (muitas bolas de uma vez). No
+  ENERGY a recuperação do projétil volta a 11 quadros.
+
+## CPU: os níveis baixos trocam menos a decisão do neutro por especial (01/11)
+
+O fator do nível no especial do neutro passou de 0,2 + 0,8·esperteza para 0,1 + 0,9·esperteza.
+O nível 1 fica num décimo do 8, e o estilo continua multiplicando. Antes, com o p05 (ninja,
+neutralSpecial 2,5), o nível 1 soltava quase tantos especiais quanto o 8.
+
+**Medido depois (S7 → S8, as duas mecânicas mais a CPU que aprende):** vitórias da CPU contra o
+Ryūga que só solta Onda, nível 8 / 5: 11% / 7% → 56% / 13%. O Natisuko (p15), que já era o mais
+fraco, foi de 10% para 7% (CPU × CPU). Veja `cpu-contra-bola.md`.
