@@ -88,6 +88,19 @@ python3 tools/sprites/efeito_video.py saida --nome defesa --origem 408,341 --alt
 # defesa_poder: --quadros 41-42 --raio 1116,336,420 --chao-tenis 690 (origem 1116,336, altura 306)
 ```
 
+Os mesmos passos deram dois efeitos de luta (com `--brilho --sem-corpo`: o brilho meio
+transparente fica, e as manchas brancas grudadas no corpo, como tênis e olho, saem):
+
+| Folha | Vídeo | Quadros | No jogo |
+|---|---|---|---|
+| `impacto_forte` | Personagem_Recebendo_Dano_Agachado (o estouro na cabeça, 8-11; origem 757,286) | 4 | golpe forte que acerta; especial/Super/KO usam ele 25% maior. Fraco e médio seguem com a faísca clássica |
+| `impacto_chao` | Personagem_Cai_e_Levanta_Rápido (o vento/poeira do corpo no chão, 37-44; origem 420,700) | 8 | knockdown |
+
+Defesas com `--placa` (quadros parados do personagem sem efeito): o efeito é o que clareou em
+relação à placa, então o brilho macio fica inteiro, até por cima do personagem, sem a hachura de
+riscos soltos da chave do verde. `defesa`: `--placa 19-30`; `defesa_2`: `--quadros 27-30 --placa
+36-46 --raio 879,259,380`; `defesa_poder` (o personagem mexe, sem placa): `--brilho`.
+
 `GameView.efeitoDeGolpe`: golpe defendido de projétil ou especial toca a `defesa_poder`; a
 defesa comum alterna `defesa_2` e `defesa`. Sem a pedida, cai na seguinte; sem nenhuma, a faísca
 clássica.
