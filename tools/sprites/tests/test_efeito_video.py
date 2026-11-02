@@ -70,6 +70,42 @@ class EfeitoVideoTests(unittest.TestCase):
             x, y, w, h, dx, dy = max(dados['quadros'], key=lambda q: q[3])
             self.assertAlmostEqual(0, dy + h, delta=3)
 
+    def test_verde_liso_sem_ruido_acha_o_fundo(self):
+        # Efeito desenhado em código: o verde é idêntico em todo pixel. Com ">" no percentil
+        # nenhum pixel passava, o fundo virava NaN e o efeito saía preto.
+        q = np.zeros((40, 60, 3), np.uint8)
+        q[:] = (0, 255, 0)
+        q[15:25, 25:35] = (255, 255, 255)
+        fundo = efeito_video.cor_do_fundo([q, q, q])
+        self.assertFalse(np.isnan(fundo).any())
+        self.assertEqual([0, 255, 0], [round(v) for v in fundo])
+        rgba = efeito_video.chave(q, fundo)
+        self.assertEqual(255, rgba[20, 30, 3], 'o branco fica opaco')
+        self.assertTrue((rgba[20, 30, :3] > 240).all(), 'e branco, não preto')
+
+    def test_pasta_de_png_transparente_guarda_a_cor_do_brilho(self):
+        # Quadros já transparentes (efeito em código): não passam pela chave, então o amarelo a
+        # 40% continua amarelo (no verde ele perdia o tom).
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            pasta = tmp / 'quadros'
+            pasta.mkdir()
+            yy, xx = np.mgrid[0:120, 0:160]
+            for i in range(4):
+                q = np.zeros((120, 160, 4), np.uint8)
+                disco = (xx - 80) ** 2 + (yy - 60) ** 2 <= (10 + 5 * i) ** 2
+                q[disco] = (255, 216, 74, 102)
+                Image.fromarray(q, 'RGBA').save(pasta / f'q{i}.png')
+            _, dados = efeito_video.converter(pasta, 'png', altura=40, saida=tmp / 'assets',
+                                              previa=tmp / 'previa', fps_png=12)
+            self.assertEqual(4, len(dados['quadros']))
+            self.assertEqual([83] * 4, dados['duracoesMs'])
+            folha = np.asarray(Image.open(tmp / 'assets' / 'png' / 'folha.webp').convert('RGBA')).astype(int)
+            x, y, w, h, _, _ = dados['quadros'][-1]
+            r, g, b, a = folha[y + h // 2, x + w // 2]
+            self.assertTrue(90 < a < 115, f'meio transparente como desenhado: {a}')
+            self.assertTrue(r > 245 and 200 < g < 230 and b < 95, f'o amarelo guarda o tom: {(r, g, b)}')
+
 
 if __name__ == '__main__':
     unittest.main()

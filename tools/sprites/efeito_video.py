@@ -17,6 +17,9 @@ Diferente do personagem (recorte tudo ou nada), efeito tem partes meio transpare
     --recorte x0,y0,x1,y1   usa só esse retângulo do vídeo (outra coisa no quadro)
     --passo N         um quadro a cada N do vídeo (24 fps com --passo 2 = 12 fps)
 
+Também aceita uma PASTA de PNGs transparentes no lugar do vídeo (efeito desenhado em código):
+não passa pela chave do verde, e o brilho meio transparente guarda a cor. --fps diz o ritmo.
+
 Sai em android/app/src/main/assets/efeitos/<nome>/: folha.webp (os quadros recortados e
 empacotados) e efeito.json (onde cada quadro está, a origem e o tempo de cada um). A prévia
 (GIF sobre xadrez) vai para android/app/build/sprite-review/efeitos/<nome>.gif.
@@ -56,6 +59,17 @@ def ler_quadros(caminho, inicio, fim, passo):
     if not quadros:
         raise SystemExit('nenhum quadro no trecho pedido')
     return quadros, fps
+
+
+def ler_pngs(pasta, inicio, fim, passo):
+    """Quadros já transparentes (PNG RGBA numa pasta, em ordem de nome): efeito desenhado em
+    código. Não passa pela chave do verde, então brilho e meia-transparência guardam a cor."""
+    arquivos = sorted(Path(pasta).glob('*.png'))
+    quadros = [np.array(Image.open(f).convert('RGBA')) for i, f in enumerate(arquivos)
+               if i >= inicio and (fim is None or i <= fim) and (i - inicio) % passo == 0]
+    if not quadros:
+        raise SystemExit('nenhum PNG no trecho pedido')
+    return quadros
 
 
 def cor_do_fundo(quadros):
@@ -123,13 +137,19 @@ def empacotar(imagens):
 
 
 def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=None,
-              altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA):
-    quadros, fps = ler_quadros(video, inicio, fim, passo)
+              altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0):
+    if Path(video).is_dir():
+        quadros, fps = ler_pngs(video, inicio, fim, passo), fps_png
+    else:
+        quadros, fps = ler_quadros(video, inicio, fim, passo)
     if recorte:
         x0, y0, x1, y1 = recorte
         quadros = [q[y0:y1, x0:x1] for q in quadros]
-    fundo = cor_do_fundo(quadros)
-    rgba = [chave(q, fundo) for q in quadros]
+    if Path(video).is_dir():
+        rgba = quadros
+    else:
+        fundo = cor_do_fundo(quadros)
+        rgba = [chave(q, fundo) for q in quadros]
     ux0, uy0, ux1, uy1 = uniao([caixa(q[..., 3]) for q in rgba])
     # Escala: a altura do efeito inteiro vira `altura` px do mundo (a folha guarda PIXEL_SCALE).
     escala = altura * PIXEL_SCALE / (uy1 - uy0)
@@ -214,7 +234,7 @@ def numeros(texto, n):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('video')
+    p.add_argument('video', help='vídeo no verde, ou pasta de PNGs transparentes')
     p.add_argument('--nome', required=True)
     p.add_argument('--inicio', type=int, default=0)
     p.add_argument('--fim', type=int)
@@ -223,9 +243,10 @@ def main():
     p.add_argument('--origem', type=lambda t: numeros(t, 2))
     p.add_argument('--altura', type=float, default=200.0, help='altura do efeito no mundo (px)')
     p.add_argument('--recorte', type=lambda t: numeros(t, 4))
+    p.add_argument('--fps', type=float, default=24.0, help='quadros por segundo da pasta de PNGs')
     a = p.parse_args()
     destino, dados = converter(a.video, a.nome, a.inicio, a.fim, a.passo, a.ancora, a.origem,
-                               a.altura, a.recorte)
+                               a.altura, a.recorte, fps_png=a.fps)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 
