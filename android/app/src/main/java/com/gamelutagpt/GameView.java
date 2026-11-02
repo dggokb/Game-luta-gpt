@@ -81,11 +81,12 @@ public class GameView extends SurfaceView
     /** Fixed simulation step; rendering runs at whatever rate the device manages. */
     static final float FIXED_STEP = CombatConfig.DT;
     /**
-     * O ritmo da luta nos 100% da VELOCIDADE (pedido do jogador, 02/11: "deixa a velocidade 95% como
-     * 100%, o jogo ficou com mais cara de jogo"). Os outros níveis da pausa escalam junto (90% =
-     * 0,855 do original). O motor e as simulações contam quadros: não mudam.
+     * O ritmo da luta nos 100% da VELOCIDADE (pedido do jogador, 02/11: primeiro "deixa a
+     * velocidade 95% como 100%, o jogo ficou com mais cara de jogo", depois 92%). Os outros níveis
+     * da pausa escalam junto (90% = 0,828 do original). O motor e as simulações contam quadros:
+     * não mudam.
      */
-    static final float RITMO_BASE = 0.95f;
+    static final float RITMO_BASE = 0.92f;
 
     /** Onde fica a VELOCIDADE escolhida na pausa (vale para a próxima vez que o app abrir). */
     private static final String SPEED_PREFS = "jogo_v1";

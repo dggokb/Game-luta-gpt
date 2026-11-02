@@ -1,5 +1,9 @@
 # Ritmo da luta: 100% × 95% (02/11)
 
+> **Atualização:** a pedido do jogador, o ritmo base passou para **92%** (`RITMO_BASE = 0,92`).
+> As tabelas abaixo são da medição a 95%. A 92% os tempos sobem mais 3%; por exemplo, o pulo dura
+> 761 ms e o jab 54 ms.
+
 **Pedido do jogador:** "deixa a velocidade de jogo 95% como 100%, senti que o jogo ficou com bem
 mais cara de jogo". Depois: "simula o jogo com o ritmo novo e vê como ficou". A mudança está em
 `GameView.RITMO_BASE` (veja `ajustes.md`).
