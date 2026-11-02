@@ -618,3 +618,23 @@ por coluna. Tabelas em `perfis/shinkai-vida-nova-elenco.md`. Nível 8:
   - o ENERGY perde: p11 de 77% para 38%, p08 de 73% para 55%;
   - o p15 segue o mais fraco (13%).
 - **Cuidado:** são 60 lutas por lutador em cada coluna, então ±6 pontos é ruído.
+
+### Aura e dragão amarelos (pedido do jogador, 02/11)
+
+A liberação de poder mudou de azul para dourado sem refazer o vídeo, com o
+`tools/sprites/recolorir_efeito.py` aplicado sobre a folha pronta:
+
+```
+python3 tools/sprites/recolorir_efeito.py shinkai_player_base --para 46
+python3 tools/sprites/recolorir_efeito.py shinkai_player_base --de 160-205 --val 0.08 --para 40
+```
+
+- **Primeiro comando:** troca a aura, os raios, o dragão e o brilho azul no corpo.
+  - Pega os tons de ciano, azul e violeta, de 150° a 355°.
+  - A cor nova vem de um degradê pelo brilho de cada pixel: o escuro vira laranja fundo, o médio
+    dourado e o claro amarelo quase branco. Assim a profundidade do efeito continua.
+- **Segundo comando:** pega os fiapos de fumaça verde-azulada escura que sobraram.
+- **O que fica como está:** o colete escuro, a pele, a roupa e o cabelo.
+- **Reproduzir:** o comando de conversão do vídeo, mais acima, gera a folha azul; os dois
+  comandos acima a deixam dourada.
+- O contorno do SHINKAI da PERCEPÇÃO no jogo já era dourado (`0xFFFFC23A`).
