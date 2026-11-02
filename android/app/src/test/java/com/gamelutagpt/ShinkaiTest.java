@@ -48,7 +48,7 @@ public class ShinkaiTest {
             in[0].shinkai = true;
             step();
             assertTrue(engine.cues().contains("SHINKAI"));
-            steps(config().shinkaiFlashFrames);
+            steps(engine.shinkaiAtivacaoQuadros(f(0)));
         }
 
         /** Presses {@code button} until it starts; returns once that attack hit. */
@@ -99,8 +99,15 @@ public class ShinkaiTest {
         assertTrue(m.first.inShinkai());
         assertEquals(0, m.first.shinkai);
         assertTrue(m.f(0).frozen() && m.f(1).frozen());
-        // The activation step is the first frame of the flash; the clock waits through it.
-        m.steps(m.config().shinkaiFlashFrames + m.config().shinkaiFrames - 2);
+        // The activation step is the first frame of the flash; the clock waits through it. O Ryūga
+        // tem a animação de ativação: a luta fica parada o tempo dela (mais que o brilho de sempre).
+        int congela = m.engine.shinkaiAtivacaoQuadros(m.f(0));
+        assertTrue("a animação do Ryūga para a luta mais que o brilho", congela > m.config().shinkaiFlashFrames);
+        assertEquals(Math.round(GeneratedCharacters.get("player_base").animations.get(SpriteStates.SHINKAI_ATIVA).duration * 60f), congela);
+        m.steps(congela - 2);
+        assertTrue("o rival continua parado", m.f(1).frozen());
+        assertTrue(m.engine.superFreezeActive());
+        m.steps(m.config().shinkaiFrames);
         assertTrue(m.first.inShinkai());
         m.steps(3);
         assertFalse(m.first.inShinkai());

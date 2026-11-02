@@ -2806,6 +2806,8 @@ public class GameView extends SurfaceView
      * frames; who is held by the freeze turns darker and colder (still readable, not stuck).
      */
     private Filtro superLook(CombatFighter f) {
+        // Ativação do SHINKAI com animação (o Ryūga): quem não ativou fica no escuro.
+        if (f != null && ativacaoShinkai() && f != engine.fighter(ativacaoLado)) return ativacaoEscuro;
         if (f == null || !superFlash.active() && superFlash.frozen < 0) return null;
         if (superFlash.active() && f == engine.fighter(superFlash.user) && superFlash.signal > 0f) {
             int color = f.state.profile.color;
@@ -2971,12 +2973,47 @@ public class GameView extends SurfaceView
             shinkaiFlash = SHINKAI_FLASH_FRAMES;
             shinkaiFlashColor = color;
             corteShinkai.comecar(side == OPPONENT, characterSelectRenderer.hudPortrait(f.state.character), f.state.shinkaiType);
+            if (f.character().animations.containsKey(SpriteStates.SHINKAI_ATIVA)) {
+                // A animação de ativação: a luta para (o motor congela) e a tela escurece em volta.
+                ativacaoLado = side;
+                ativacaoInicio = engine.frame();
+                ativacaoQuadros = engine.shinkaiAtivacaoQuadros(f);
+            }
             // O nome vem no corte de ativação: sem o aviso por cima dele.
             banner = null;
         }
         beamShake = Math.max(beamShake, 16f);
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
         return banner;
+    }
+
+    /** Lado que está tocando a animação de ativação do SHINKAI (-1: nenhum), desde que quadro e por quantos. */
+    private int ativacaoLado = -1, ativacaoInicio, ativacaoQuadros;
+    /** Escurecido do cenário e do rival durante a ativação (o quanto; sobe e desce em ATIVACAO_FADE quadros). */
+    static final int ATIVACAO_ESCURO = 170, ATIVACAO_FADE = 8;
+    private final Filtro ativacaoEscuro = Filtro.matriz(new float[] {
+        0.35f, 0f, 0f, 0f, 0f,
+        0f, 0.35f, 0f, 0f, 0f,
+        0f, 0f, 0.4f, 0f, 0f,
+        0f, 0f, 0f, 1f, 0f});
+
+    /** A animação de ativação do SHINKAI está tocando agora. */
+    private boolean ativacaoShinkai() {
+        if (ativacaoLado < 0) return false;
+        int passou = engine.frame() - ativacaoInicio;
+        if (passou < 0 || passou >= ativacaoQuadros || !engine.superFreezeActive() && passou > 2) {
+            ativacaoLado = -1;
+            return false;
+        }
+        return true;
+    }
+
+    /** Alfa do escurecido da ativação (entra e sai suave). */
+    private int ativacaoAlfa() {
+        if (!ativacaoShinkai()) return 0;
+        int passou = engine.frame() - ativacaoInicio, falta = ativacaoQuadros - passou;
+        float k = Math.min(1f, Math.min(passou, falta) / (float)ATIVACAO_FADE);
+        return Math.round(ATIVACAO_ESCURO * k);
     }
 
     /** O desenho do SHINKAI Clash (o fundo, os empurrões, o encontro e a barra). */
@@ -4152,7 +4189,7 @@ public class GameView extends SurfaceView
             if (cenario) drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
-            effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
+            effects.drawWorldOverlay(canvas, paint, Math.max(feel.darkAlpha(), ativacaoAlfa()), 0, 0, 8);
             if (finalizacao.ativo()) drawFinalizacao(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (beam) {
                 drawUltraBeamOverlay(canvas, false);
@@ -4754,6 +4791,11 @@ public class GameView extends SurfaceView
         CharacterDefinition character = f.character();
         String animation = reactionState(renderer, f);
         float animationElapsed = reactionElapsed;
+        if (ativacaoShinkai() && f == engine.fighter(ativacaoLado) && character.animations.containsKey(SpriteStates.SHINKAI_ATIVA)) {
+            // A ativação do SHINKAI toca inteira enquanto a luta está parada.
+            animation = SpriteStates.SHINKAI_ATIVA;
+            animationElapsed = (engine.frame() - ativacaoInicio) * FIXED_STEP;
+        }
         CharacterDefinition.Animation introClip = introFrame >= 0 ? character.animations.get(SpriteStates.INTRO) : null;
         if (introClip != null) {
             // A shorter intro holds its last frame (the guard) until the longest one ends.

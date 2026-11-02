@@ -261,7 +261,7 @@ final class DemoDirector {
                         if (c.t == 80) p1.shinkai = true;
                     },
                     c -> c.cue("SHINKAI_FIM")),
-                new Step("SHINKAI NO MEIO DO COMBO", "L > M acertou: o SHINKAI congela o CPU e o combo segue com 2L > 2M", 150,
+                new Step("SHINKAI NO MEIO DO COMBO", "L > M acertou: o SHINKAI congela o CPU e o combo segue com 2L > 2M", 240,
                     c -> c.placeApart(X, 12f),
                     (c, p1, cpu) -> {
                         c.sequence(c.p1(), p1, "L", "M");
@@ -270,7 +270,8 @@ final class DemoDirector {
                             p1.shinkai = true;
                         }
                         // After the flash: a fresh route the M could not cancel into.
-                        if (c.mark >= 0 && c.t > c.mark + 2 && c.t < c.mark + 70) {
+                        // A pausa da ativação é a do brilho ou a da animação do lutador (o Ryūga).
+                        if (c.mark >= 0 && c.t > c.mark + 2 && c.t < c.mark + c.engine.shinkaiAtivacaoQuadros(c.p1()) + 70) {
                             String id = c.attackId(c.p1());
                             // ↓ segurado de 2L a 2M: soltar e apertar de novo seria o ↓↓ de um especial.
                             p1.direction = 3;

@@ -296,3 +296,23 @@ levantar não deixou a CPU mais passiva: com ou sem ela, são 42 a 44 golpes por
 
 Saídas: [perfis/combos-cpu-antes.md](perfis/combos-cpu-antes.md) e
 [perfis/combos-cpu-depois.md](perfis/combos-cpu-depois.md).
+
+### Combos de mais de 8 golpes (02/11)
+
+**Na simulação** (`BateriaCombosLongos`: CPU × CPU, 1x1, os 16 todos contra todos, 240 lutas por
+nível):
+
+| nível | combos por luta (os dois lados) | mais de 8 golpes por luta | lutas com pelo menos um | sem Super nem Ultra | maior |
+|---|---|---|---|---|---|
+| 5 | 22,3 | 0,12 | 11% | 38% | 21 |
+| 8 | 21,1 | 0,27 | 22% | 20% | 21 |
+
+A maior parte dos combos tem 1 ou 2 golpes: 81% no nível 5 e 74% no 8. Quem mais passa de 8 é o
+p14 (35 dos 94), depois p10 (13), p05 (11) e o Ryūga (10).
+
+**Nas lutas reais** (2º e 3º registros, 12 lutas):
+- **você:** 18 combos de mais de 8 golpes (1,5 por luta; 15 sem Super), o maior com 19;
+- **a CPU:** 5 (0,4 por luta; só 1 sem Super), o maior com 22.
+
+A CPU passa de 8 golpes quase só com o Super ou o Ultra. Saída completa:
+[perfis/combos-longos.md](perfis/combos-longos.md).

@@ -701,11 +701,24 @@ final class CombatEngine {
         }
         f.buffer.clear();
         CombatFighter other = fighters[1 - f.index];
-        f.hitstop = Math.max(f.hitstop, config.shinkaiFlashFrames);
-        other.hitstop = Math.max(other.hitstop, config.shinkaiFlashFrames);
-        superFreeze = Math.max(superFreeze, config.shinkaiFlashFrames);
+        int congela = shinkaiAtivacaoQuadros(f);
+        f.hitstop = Math.max(f.hitstop, congela);
+        other.hitstop = Math.max(other.hitstop, congela);
+        superFreeze = Math.max(superFreeze, congela);
         cues.add("SHINKAI");
         if (canClash(other)) startShinkaiClash(f, other);
+    }
+
+    /**
+     * Quadros que a luta fica parada na ativação do SHINKAI: o brilho de sempre, ou a animação de
+     * ativação do lutador (SHINKAI_ATIVA, o Ryūga), se ele tiver: enquanto ela toca o rival e o
+     * relógio esperam (a tela escurece, GameView).
+     */
+    int shinkaiAtivacaoQuadros(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        CharacterDefinition.Animation a = c == null ? null : c.animations.get(SpriteStates.SHINKAI_ATIVA);
+        if (a == null) return config.shinkaiFlashFrames;
+        return Math.max(config.shinkaiFlashFrames, Math.round(a.duration / CombatConfig.DT));
     }
 
     // ---------------------------------------------------------------- SHINKAI Clash

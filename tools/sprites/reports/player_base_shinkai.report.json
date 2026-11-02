@@ -1,0 +1,548 @@
+{
+  "id": "player_base_shinkai",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_shinkai_video_hd.png",
+  "sourceNote": "p01: ativa\u00e7\u00e3o do SHINKAI (cruza os bra\u00e7os no alto e desce com o arco de energia), v\u00eddeo shinkai.mp4 (Drive p01/animations), convertido por video_para_sprite.py.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 640,
+    "rootX": 256,
+    "rootY": 604,
+    "columns": 7,
+    "frameCount": 26
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        96,
+        152,
+        398,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62328
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        96,
+        156,
+        397,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61105
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        96,
+        147,
+        396,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 60805
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        98,
+        130,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61845
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        98,
+        73,
+        396,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 65905
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        99,
+        51,
+        396,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 66441
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        102,
+        41,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 66946
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        102,
+        38,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67145
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        102,
+        37,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67291
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        102,
+        36,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67255
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        102,
+        36,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67363
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        102,
+        36,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67379
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        102,
+        36,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67392
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        102,
+        36,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67557
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        101,
+        32,
+        400,
+        606
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 71459
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        98,
+        160,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62266
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        98,
+        167,
+        400,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 60820
+    },
+    {
+      "index": 17,
+      "outputBbox": [
+        98,
+        167,
+        399,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61631
+    },
+    {
+      "index": 18,
+      "outputBbox": [
+        98,
+        166,
+        398,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61402
+    },
+    {
+      "index": 19,
+      "outputBbox": [
+        100,
+        164,
+        400,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 61435
+    },
+    {
+      "index": 20,
+      "outputBbox": [
+        100,
+        158,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 61631
+    },
+    {
+      "index": 21,
+      "outputBbox": [
+        100,
+        154,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62023
+    },
+    {
+      "index": 22,
+      "outputBbox": [
+        100,
+        151,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62069
+    },
+    {
+      "index": 23,
+      "outputBbox": [
+        100,
+        150,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62214
+    },
+    {
+      "index": 24,
+      "outputBbox": [
+        100,
+        150,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62416
+    },
+    {
+      "index": 25,
+      "outputBbox": [
+        100,
+        149,
+        400,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 62423
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 320,
+    "frameHeight": 590,
+    "rootX": 168,
+    "rootY": 580,
+    "columns": 7,
+    "frameCount": 26,
+    "cropOffset": [
+      88,
+      24
+    ],
+    "sheetWidth": 1252,
+    "sheetHeight": 3596,
+    "frames": [
+      [
+        312,
+        1748,
+        312,
+        464,
+        4,
+        124
+      ],
+      [
+        624,
+        2220,
+        312,
+        460,
+        4,
+        128
+      ],
+      [
+        0,
+        1748,
+        308,
+        468,
+        4,
+        119
+      ],
+      [
+        932,
+        1172,
+        308,
+        484,
+        6,
+        102
+      ],
+      [
+        620,
+        1172,
+        308,
+        540,
+        6,
+        45
+      ],
+      [
+        308,
+        1172,
+        308,
+        564,
+        7,
+        23
+      ],
+      [
+        0,
+        1172,
+        304,
+        572,
+        10,
+        13
+      ],
+      [
+        616,
+        588,
+        304,
+        576,
+        10,
+        10
+      ],
+      [
+        924,
+        588,
+        304,
+        576,
+        10,
+        9
+      ],
+      [
+        312,
+        0,
+        304,
+        580,
+        10,
+        8
+      ],
+      [
+        620,
+        0,
+        304,
+        580,
+        10,
+        8
+      ],
+      [
+        928,
+        0,
+        304,
+        580,
+        10,
+        8
+      ],
+      [
+        0,
+        588,
+        304,
+        580,
+        10,
+        8
+      ],
+      [
+        308,
+        588,
+        304,
+        580,
+        10,
+        8
+      ],
+      [
+        0,
+        0,
+        308,
+        584,
+        9,
+        4
+      ],
+      [
+        0,
+        2688,
+        312,
+        456,
+        6,
+        132
+      ],
+      [
+        940,
+        2688,
+        312,
+        448,
+        6,
+        139
+      ],
+      [
+        0,
+        3148,
+        312,
+        448,
+        6,
+        139
+      ],
+      [
+        316,
+        3148,
+        308,
+        448,
+        6,
+        138
+      ],
+      [
+        628,
+        2688,
+        308,
+        452,
+        8,
+        136
+      ],
+      [
+        316,
+        2688,
+        308,
+        456,
+        8,
+        130
+      ],
+      [
+        940,
+        2220,
+        308,
+        460,
+        8,
+        126
+      ],
+      [
+        628,
+        1748,
+        308,
+        464,
+        8,
+        123
+      ],
+      [
+        940,
+        1748,
+        308,
+        464,
+        8,
+        122
+      ],
+      [
+        0,
+        2220,
+        308,
+        464,
+        8,
+        122
+      ],
+      [
+        312,
+        2220,
+        308,
+        464,
+        8,
+        121
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 36700160,
+      "grid": 21145600,
+      "packed": 18008768
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f2b31395ca0961143f59a9a3e7f1b98f8251d821ba5e6253416f2458cc5ff477",
+      "config": "6a5d354b3e209fdc5c161a0384dd7f931432fa73140521207e168e905d6ae287",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_shinkai_video_normalized.png": "01d9ea1f5a158de37fd44c1a500f0f2131eaa87fbf70fbfc1c39bd3f3d48adf0"
+    }
+  }
+}

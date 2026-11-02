@@ -22,6 +22,7 @@ final class SpriteStates {
  static final String KNOCKDOWN = "KNOCKDOWN";
  static final String GROUNDED = "GROUNDED";
  static final String GETUP = "GETUP";
+ static final String SHINKAI_ATIVA = "SHINKAI_ATIVA";
  static final String THROW_GRAB = "THROW_GRAB";
  static final String THROW_TOSS = "THROW_TOSS";
  static final String INTRO = "INTRO";

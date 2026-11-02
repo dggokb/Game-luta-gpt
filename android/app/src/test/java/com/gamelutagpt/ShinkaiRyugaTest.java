@@ -45,7 +45,7 @@ public class ShinkaiRyugaTest {
             in[0].shinkai = true;
             step();
             assertTrue(engine.cues().contains("SHINKAI"));
-            for (int i = 0; i < config().shinkaiFlashFrames; i++) step();
+            for (int i = 0, n = engine.shinkaiAtivacaoQuadros(engine.fighter(0)); i < n; i++) step();
         }
     }
 

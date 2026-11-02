@@ -318,3 +318,18 @@ gradle ... "-Dargs=32 8 perdedor [espelho|elenco]" # a parte do SHINKAI que o pe
 gradle ... "-Dargs=32 8 assinatura [semClash]" # (a) defesa comum lê, (b) contra-golpe preciso
 gradle ... "-Dargs=32 8 esquiva [semClash|espelho]" # a esquiva automática com recargas diferentes
 ```
+
+## Animação de ativação (02/11)
+
+O vídeo `shinkai.mp4` (Drive, p01/animations) virou a animação `SHINKAI_ATIVA` do Ryūga: ele cruza os
+braços no alto, segura, desce os braços e volta à guarda.
+- **Conversão:** quadros 34–92 do vídeo, 26 na folha (`tools/sprites/clips/player_base_shinkai.json`,
+  HD). A pose parada no alto fica mais curta. Toca em 1,56 s.
+- **No jogo:** ao ligar o SHINKAI, a luta congela pelo tempo da animação, e não pelos 48 quadros de
+  sempre (`CombatEngine.shinkaiAtivacaoQuadros`).
+  - O rival e o relógio ficam parados, e o tempo do SHINKAI espera.
+  - O cenário escurece e o rival fica no escuro (`GameView`, `ativacaoShinkai`).
+  - Só o Ryūga aparece, fazendo a animação. O corte de ativação (retrato e faixa) continua por
+    cima.
+- **Outros personagens:** com a mesma animação no pacote (estado `SHINKAI_ATIVA`), ganham a mesma
+  pausa sem mudar código.
