@@ -9,7 +9,8 @@ A transparência sobre o verde vem da chave do verde do efeito_video.py.
     python3 tools/sprites/efeito_sem_personagem.py . <pasta PNG do vídeo> <saída> --quadros 11-18 [--espelhar]
         [--raio cx,cy,r]                 some suave do raio 0,7r até r (corta o que vai longe)
         [--excluir q0,x0,y0,x1,y1 ...]   a partir do quadro q0 do vídeo, apaga essa caixa
-        [--chao-tenis 640]
+        [--chao-tenis 640]               abaixo disso são os tênis (some suave nos 50 px de cima)
+        [--borda 80]                     some suave perto da borda do vídeo (ponta cortada vira ponta)
 """
 import argparse, sys
 from pathlib import Path
@@ -24,6 +25,7 @@ p.add_argument('--espelhar', action='store_true')
 p.add_argument('--raio')
 p.add_argument('--excluir', nargs='*', default=[])
 p.add_argument('--chao-tenis', type=int, default=640)
+p.add_argument('--borda', type=int, default=80)
 a = p.parse_args()
 sys.path.insert(0, str(Path(a.repo) / 'tools/sprites'))
 import efeito_video as ev
@@ -42,6 +44,12 @@ if a.raio:
     d = np.hypot(xx - cx, yy - cy)
     fade = np.clip((r - d) / (0.3 * r), 0, 1).astype(np.float32)
 caixas = [tuple(int(v) for v in e.split(',')) for e in a.excluir]
+# Sem corte reto: a borda do vídeo e a linha dos tênis apagam aos poucos (a ponta do risco que
+# sairia do quadro termina fina, não quadrada).
+yy, xx = np.mgrid[0:H, 0:W]
+dist_borda = np.minimum(np.minimum(xx, W - 1 - xx), np.minimum(yy, H - 1 - yy)).astype(np.float32)
+fade *= np.clip(dist_borda / max(1, a.borda), 0, 1)
+fade *= np.clip((a.chao_tenis - yy) / 50.0, 0, 1).astype(np.float32)
 
 for n, q in enumerate(range(Q0, Q1 + 1)):
     rgb = quadros[q]
@@ -51,7 +59,7 @@ for n, q in enumerate(range(Q0, Q1 + 1)):
     claro = (c.min(-1) > 140) & (verde < 45)
     perto_do_fundo = cv2.dilate((verde > 120).astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
     cand = ((rgba[..., 3] > 0) & (claro | (rgba[..., 3] < 250))).astype(np.uint8)
-    cand[a.chao_tenis:] = 0
+    cand[a.chao_tenis + 1:] = 0
     for (q0, x0, y0, x1, y1) in caixas:
         if q >= q0: cand[y0:y1, x0:x1] = 0
     nlab, lab = cv2.connectedComponents(cand, connectivity=8)
@@ -61,9 +69,23 @@ for n, q in enumerate(range(Q0, Q1 + 1)):
     manter = encosta[lab] & (claro | (rgba[..., 3] < 250))
     cor = rgba[..., :3].astype(np.int32)
     manter &= (cor.min(-1) > 160) & (cor[..., 0] - cor[..., 2] < 20)
+    # quadradinhos da compressão do vídeo nas partes meio transparentes: o fraco sai, e as
+    # manchinhas soltas (pequenas e sem miolo claro) também
+    manter &= claro | (rgba[..., 3] >= 120)
+    n2, lab2, st2, _ = cv2.connectedComponentsWithStats(manter.astype(np.uint8), connectivity=8)
+    forte = np.zeros(n2, bool)
+    forte[np.unique(lab2[manter & claro])] = True
+    pequeno = st2[:, cv2.CC_STAT_AREA] < 90
+    tirar = pequeno & ~forte
+    tirar[0] = False
+    manter &= ~tirar[lab2]
     out = rgba.copy()
     alfa = np.where(manter, rgba[..., 3], 0).astype(np.float32)
     alfa[manter & claro] = np.maximum(alfa[manter & claro], 235)
+    # contorno macio: a mediana apaga a grade da compressão do vídeo e o desfoque leve tira o
+    # degrau da borda (o jogo ainda reduz a folha, então não se nota a maciez)
+    alfa = cv2.medianBlur(alfa.astype(np.uint8), 5).astype(np.float32)
+    alfa = cv2.GaussianBlur(alfa, (5, 5), 1.3)
     out[..., 3] = np.clip(alfa * fade, 0, 255).astype(np.uint8)
     img = Image.fromarray(out, 'RGBA')
     if a.espelhar: img = img.transpose(Image.FLIP_LEFT_RIGHT)
