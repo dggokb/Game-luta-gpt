@@ -1052,6 +1052,22 @@ final class CombatEngine {
         cues.add("LEITURA");
     }
 
+    /** (a) Leitura na defesa comum: ele sai livre e quem atacou (no chão) fica desequilibrado um pouco. */
+    private void leituraLeve(CombatFighter a, CombatFighter d) {
+        d.stunLeft = d.stunTotal = 1;
+        d.state.leituras++;
+        if (a.grounded && a.status == CombatFighter.Status.ATTACK && a.attack != null &&
+            a.attack.kind != AttackDefinition.Kind.SUPER) {
+            a.clearAttack();
+            a.status = CombatFighter.Status.HITSTUN;
+            a.stunLeft = a.stunTotal = config.ryugaLeituraLeveAbre;
+            a.stunElapsed = 0;
+            a.vx = 0f;
+        }
+        desgaste(d.state, config.ryugaDesgasteLeitura / 2);
+        cues.add("LEITURA");
+    }
+
     /**
      * Esquiva de leitura: no SHINKAI dele, o backdash passa pelo golpe (nada acerta esta vez) e
      * abre o golpe preciso. Quem errou fica na recuperação do próprio golpe.
@@ -3998,7 +4014,8 @@ final class CombatEngine {
             cues.add("COUNTER_HIT");
         }
         // PERCEPCAO: o golpe preciso, o primeiro depois da leitura (ou da esquiva).
-        boolean preciso = !projectile && !c.echo && a.state.precisoQuadros > 0 && a.state.inShinkai(Shinkai.Type.PERCEPCAO);
+        boolean preciso = !projectile && !c.echo && a.state.inShinkai(Shinkai.Type.PERCEPCAO) &&
+            (a.state.precisoQuadros > 0 || (counterHit && config.ryugaContraPreciso));
         if (preciso) {
             raw = raw * config.ryugaPrecisoDanoPermille / 1000;
             a.state.precisoQuadros = 0;
@@ -4307,6 +4324,7 @@ final class CombatEngine {
             if (percepcao && !projectile) leitura(a, d);
             return;
         }
+        if (percepcao && !projectile && !holding && config.ryugaLeituraLeveAbre > 0) leituraLeve(a, d);
         d.state.chip(chip);
         int drain = attack.blockstunFrames * config.guardDrainPerBlockstunFrame;
         if (holding) drain = drain * config.guardHoldingDrainPermille / 1000;

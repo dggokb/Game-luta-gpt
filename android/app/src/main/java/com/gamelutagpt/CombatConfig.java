@@ -602,6 +602,13 @@ final class CombatConfig {
     int ryugaPerfeitaBloqueio = 8;
     /** Leitura: quem atacou (no chão) fica desequilibrado este tanto; o Ryūga sai livre. */
     int ryugaLeituraAbre = 24;
+    /**
+     * (a) Leitura na defesa comum: toda defesa de golpe de perto no SHINKAI dele desequilibra quem
+     * atacou por este tanto (0 = só a defesa perfeita lê). Ele sai livre na hora.
+     */
+    int ryugaLeituraLeveAbre = 14;
+    /** (b) No SHINKAI dele, todo contra-golpe (acertar quem estava apertando botão) é golpe preciso. */
+    boolean ryugaContraPreciso = true;
     /** Golpe preciso: o primeiro golpe dele nestes quadros depois da leitura bate mais e atordoa mais. */
     int ryugaPrecisoJanela = 40;
     int ryugaPrecisoDanoPermille = 1300;

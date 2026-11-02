@@ -186,6 +186,75 @@ só 8–15% gasto (o relógio para durante o Clash). Devolver 100% ou 0% disso d
 **Decisão:** sem efeito, então o padrão continua em 100% (o mesmo de antes) e o ajuste fica para
 quando o Clash vier mais tarde na luta.
 
+## Perder o Clash não desliga o SHINKAI (pedido do jogador)
+
+**Vale para os 16:**
+- **Antes:** quem perdia o Clash perdia o SHINKAI inteiro, além dos 2.000 de dano.
+- **Agora:** "perder o Clash não deveria desativar o SHINKAI". O perdedor leva o golpe, voa e segue
+  no SHINKAI que tinha (`shinkaiClashPerdedorPermille` = 1000, a parte do que ele tinha que
+  fica). Os relógios param durante o Clash, então ele volta com o mesmo tempo.
+
+A bateria (modo `perdedor`) comparou:
+- perder tudo (como era);
+- ficar com metade do que tinha;
+- ficar com tudo (agora).
+
+Cada uma rodou contra os 15, no espelho e com os 16 todos contra todos (modo `elenco`, 480 lutas
+por coluna). Os números já incluem o combo breaker novo (abaixo). Saídas completas:
+- [nível 8](perfis/shinkai-clash-perdedor-nivel8.md);
+- [nível 8, espelho](perfis/shinkai-clash-perdedor-nivel8-espelho.md);
+- [nível 8, elenco](perfis/shinkai-clash-perdedor-nivel8-elenco.md);
+- [nível 5](perfis/shinkai-clash-perdedor-nivel5.md);
+- [nível 5, espelho](perfis/shinkai-clash-perdedor-nivel5-espelho.md);
+- [nível 5, elenco](perfis/shinkai-clash-perdedor-nivel5-elenco.md).
+
+| | perde tudo (antes) | metade | tudo (agora) |
+|---|---|---|---|
+| Quem vence o Clash vence a luta (elenco, nível 8) | 72% | 66% | 61% |
+| Quem vence o Clash vence a luta (elenco, nível 5) | 74% | 65% | 62% |
+| Quem vence o Clash vence a luta (Ryūga × Ryūga, nível 8) | 84% | 68% | 64% |
+| Duração da luta (elenco, nível 8) | 48,6 s | 51,8 s | 52,7 s |
+| Ryūga vence contra os 15 (nível 8) | 64% | 70% | 73% |
+| Ryūga antigo (ENERGY) contra os 15 (nível 8) | 57% | – | 64% |
+
+- **O Clash continua valendo, mas não decide mais a luta sozinho.** Quem vence ainda leva 2.000
+  de dano a mais e fica com o SHINKAI cheio.
+- **As lutas ficam ~4 s mais longas.**
+- **O Ryūga sobe 7–9 pontos contra os 15**, e o antigo (ENERGY) sobe igual. É o personagem, não o
+  protótipo. Ele vence 48% dos Clashes, então não é o perdedor frequente. Ponto a acompanhar: ele
+  já era dos mais fortes.
+- **Também testado (modo `clash`):** o vencedor do Clash recuperar só parte do fôlego do Ryūga.
+  Não muda nada, porque o Clash começa 1,1–1,8 s depois de ele ligar, com o corpo só 8–15%
+  gasto. O padrão ficou como era (100%).
+
+## A assinatura que não se sentia jogando (pedido do jogador)
+
+"A mudança do SHINKAI pra mim não surtiu nada de diferente jogando." Bate com a medida: a leitura
+só saía com a defesa perfeita em cima da hora, ~1 vez a cada 3 lutas. Foram testadas duas
+mudanças (modo `assinatura`). Saídas completas:
+- [nível 8](perfis/shinkai-ryuga-assinatura-nivel8.md);
+- [nível 8 sem Clash](perfis/shinkai-ryuga-assinatura-nivel8-sem-clash.md);
+- [nível 5](perfis/shinkai-ryuga-assinatura-nivel5.md);
+- [nível 5 sem Clash](perfis/shinkai-ryuga-assinatura-nivel5-sem-clash.md).
+
+As duas mudanças:
+- **(a) A defesa comum também lê:** toda defesa de golpe de perto no SHINKAI dele desequilibra
+  quem atacou por 14 quadros, e ele sai livre (`ryugaLeituraLeveAbre`). A perfeita segue mais
+  forte: 24 quadros e o golpe preciso.
+- **(b) Contra-golpe preciso:** no SHINKAI dele, todo contra-golpe (acertar quem estava apertando
+  botão) é golpe preciso (`ryugaContraPreciso`).
+
+| Nível 8, jogo normal | protótipo | + (a) | + (b) | + (a) e (b) |
+|---|---|---|---|---|
+| Ryūga vence | 73% | 71% | 73% | 73% |
+| Leituras por luta | 0,38 | 0,50 | 0,39 | 0,50 |
+| Golpes precisos por luta | 0,24 | 0,19 | 0,65 | 0,63 |
+| Dano do golpe preciso | 735 | 757 | 950 | 994 |
+
+**Decisão:** as duas ficam. Elas aumentam o que aparece na tela (o golpe preciso quase triplica)
+sem mudar a vitória. Ainda é menos de um momento por luta com a CPU, porque a CPU do Ryūga ataca
+em vez de defender. Falta o teste na mão.
+
 ## Leitura e próximos passos (para decidir)
 
 - **A identidade pede o jogador na mão.** Uma assinatura defensiva (ler e castigar) depende de
@@ -201,10 +270,8 @@ quando o Clash vier mais tarde na luta.
   ela devia valer só uma vez por luta, não por round.
 - **Fim voluntário:** devolver mais (por exemplo, todo o fôlego que sobrou) ou deixar a exaustão
   do limite maior, para valer a pena desligar antes.
-- **Clash:** o fôlego do vencedor não muda nada (abaixo). O que pesa é o Clash em si: a CPU
-  responde o SHINKAI quase sempre e na hora, o perdedor perde o SHINKAI inteiro e leva 2.000 de
-  dano. As alavancas seriam a CPU responder menos (ou mais tarde) ou o perdedor ficar com parte
-  do SHINKAI. Isso muda o Clash de todos os 16, então não testei sem pedido.
+- **Clash:** o perdedor segue no SHINKAI e o Clash deixou de decidir a luta (seção acima). Falta
+  testar a CPU respondendo o SHINKAI menos vezes, ou mais tarde.
 
 ## Como rodar
 
@@ -214,4 +281,6 @@ gradle ... "-Dargs=32 8 semClash"     # sem Clash
 gradle ... "-Dargs=32 5"              # nível 5
 gradle ... "-Dargs=32 8 espelho narra" # Ryūga × Ryūga, os dois no SHINKAI da coluna
 gradle ... "-Dargs=32 8 clash [espelho]" # o fôlego que o vencedor do Clash recupera, por coluna
+gradle ... "-Dargs=32 8 perdedor [espelho|elenco]" # a parte do SHINKAI que o perdedor do Clash guarda
+gradle ... "-Dargs=32 8 assinatura [semClash]" # (a) defesa comum lê, (b) contra-golpe preciso
 ```

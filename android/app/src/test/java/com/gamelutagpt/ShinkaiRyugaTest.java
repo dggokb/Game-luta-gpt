@@ -154,6 +154,30 @@ public class ShinkaiRyugaTest {
         assertEquals(1, m.ryuga.precisos);
     }
 
+    @Test public void noShinkaiADefesaComumTambemLeUmPouco() {
+        Match m = new Match("p15", 600f, 700f);
+        m.shinkai();
+        // ↙ segurado bem antes do golpe (defende agachado sem andar): defesa comum, não perfeita.
+        for (int i = 0; i < 30; i++) {
+            m.in[0].direction = 4;
+            m.step();
+        }
+        // 2M do rival (baixo: o M em pé passa por cima de quem está agachado).
+        m.in[1].medium = true;
+        StringBuilder visto = new StringBuilder();
+        for (int i = 0; i < 60 && !m.engine.cues().contains("LEITURA"); i++) {
+            m.in[0].direction = 4;
+            if (i < 4) m.in[1].direction = 4;   // ↓ para o rival (ele olha para a esquerda: ↙ é baixo-frente)
+            else m.in[1].direction = 0;
+            m.step();
+            for (CombatEngine.HitEvent h : m.engine.events()) visto.append(h.moveId).append(h.blocked ? " defendido " : " acertou ");
+        }
+        assertTrue(visto.toString(), m.engine.cues().contains("LEITURA"));
+        assertFalse("não foi a perfeita", m.engine.cues().contains("JUST_DEFENSE"));
+        assertTrue("quem atacou ficou desequilibrado", m.f(1).inHitstun());
+        assertTrue(m.f(1).stunLeft <= m.config().ryugaLeituraLeveAbre);
+    }
+
     @Test public void foraDoShinkaiAMesmaDefesaNaoEPerfeita() {
         Match m = new Match("p15", 600f, 700f);
         leGolpe(m, 10);

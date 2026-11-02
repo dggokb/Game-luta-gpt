@@ -1412,3 +1412,48 @@ leve menos bolas no total.
   a reação mais rápida da CPU no SHINKAI dele.
 - **A CPU esperando para ler** foi testada e saiu: 73% → 65%.
 - **Detalhes:** `shinkai-ryuga.md`.
+
+
+## SHINKAI Clash: perder não desliga o SHINKAI (pedido do jogador, 01–02/11)
+
+- **Antes:** quem perdia o Clash perdia o SHINKAI, e quem vencia o Clash vencia 72% das lutas
+  (elenco, nível 8).
+- **Agora:** o perdedor leva o golpe e segue no SHINKAI que tinha
+  (`shinkaiClashPerdedorPermille` = 1000), e quem vence o Clash vence 61% das lutas.
+- **Efeitos:**
+  - as lutas ficam ~4 s mais longas;
+  - o Ryūga vai de 64% para 73% contra os 15 (o antigo sobe igual).
+- **Testados:**
+  - ficar com metade: 66%;
+  - o vencedor recuperar só parte do fôlego no protótipo: sem efeito.
+- **Detalhes:** `shinkai-ryuga.md`.
+
+## Combo breaker: a corrida chega e o combo emenda (pedido do jogador, 02/11)
+
+"Corrida pós combo breaker tá estranha: o adversário não é atordoado e não dá para emendar combo."
+Duas causas:
+1. **O atordoamento era de 4 quadros** (desde H1, para não dar troco garantido): quem batia se
+   recompunha antes de a corrida chegar. Agora é de 32 (`comboBreakerStunFrames`). Medido na
+   `BateriaQuebra` (garantia): 24 quadros já davam troco para a maioria, e 32 = 40 = 48.
+2. **A corrida parava pela caixa de acerto, mas os corpos encostam pela caixa de empurrão**, mais
+   larga em boa parte do elenco. Ela ficava "correndo" encostada no rival, e o golpe apertado
+   esperava ela acabar. p05, p07, p09, p14 e p15 nunca emendavam. Agora a corrida para onde os
+   corpos encostam.
+
+**Resultado:** cada um dos 16 quebra o L > M > H do Ryūga, corre e emenda um L limpo
+(`ComboBreakerTest`); antes, 0 a 25% conforme o personagem. O troco garantido volta, como o
+jogador pediu: a quebra custa uma barra.
+
+## Pulo: passa por cima do rival de perto (pedido do jogador, 02/11)
+
+"Ryūga não passa nem o Kōga no pulo." Desde 28/10, a caixa de empurrão do corpo é larga (Ryūga
+32 → 48 px, Kōga 31 → 49 px, para os corpos não entrarem um no outro), e o pulo só fica acima da
+cabeça do rival por uns 14 quadros. O Ryūga nunca passava o Kōga, e ninguém passava o p13.
+
+Agora, **no ar contra quem está no chão, o corpo encolhe as pernas (60 px) e fica 40% mais
+estreito**, como no mercado (`airPushHalfWidthPermille`, `airPushLegsTucked`):
+- todo mundo passa por cima de todo mundo pulando de até 200 px;
+- de 250 px em diante, cai na frente (o pulo de ataque normal).
+
+Teste em `PuloCruzaTest`. A lição CRAVADA do tutorial passou a pular de 240 px (era 200, e o
+Kōga criança passava por cima).
