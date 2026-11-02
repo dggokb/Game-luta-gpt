@@ -641,3 +641,9 @@ python3 tools/sprites/recolorir_efeito.py shinkai_player_base --de 160-205 --val
 
 **Voltou ao azul** (pedido do jogador, no mesmo dia: "ficou feio"). A folha voltou à versão azul,
 com os cantos suaves. O `recolorir_efeito.py` continua disponível para outros efeitos.
+
+**Aura da PERCEPÇÃO no azul do dragão** (pedido do jogador). A cor do tipo PERCEPÇÃO passou de
+dourado (`0xFFFFC23A`) para o azul do dragão da liberação de poder (`0xFF1E9CF0`, medido na folha).
+A cor vale para a aura e o contorno no SHINKAI, para a barra e o botão do SHINKAI e para o corte de
+ativação. A camada dourada da vida nova na barra de vida ficou como estava, e a Ruptura segue
+com a cor própria.

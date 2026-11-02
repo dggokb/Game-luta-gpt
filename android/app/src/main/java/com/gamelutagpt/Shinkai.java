@@ -24,7 +24,7 @@ final class Shinkai {
          * pelo backdash e o golpe preciso depois. Dura pelo desgaste do corpo, acaba quando ele
          * quer, e no limite pode romper (Ruptura).
          */
-        PERCEPCAO("PERCEPÇÃO", 0xFFFFC23A);
+        PERCEPCAO("PERCEPÇÃO", 0xFF1E9CF0);   // o azul do dragão da liberação de poder
 
         final String label;
         /** Cor da aura, da barra e do aviso. */
