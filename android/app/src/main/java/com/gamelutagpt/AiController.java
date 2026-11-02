@@ -1047,7 +1047,7 @@ final class AiController {
         CombatFighter target = engine.fighter(1 - self);
         // PROTÓTIPO PERCEPCAO: no SHINKAI do Ryūga ela vê o golpe vindo antes (a percepção sobre-humana).
         reacao = percepcaoReage && me.state.inShinkai(Shinkai.Type.PERCEPCAO)
-            ? Math.max(PERCEPCAO_REACAO_MIN, level.reactionFrames * 6 / 10) : level.reactionFrames;
+            ? Math.max(PERCEPCAO_REACAO_MIN, level.reactionFrames * 6 / 10) : Math.round(level.reactionFrames * escalaReacao);
         CpuPerception.Snapshot seen = perception.seen(reacao);
         seenNow = seen;
         observar(engine, self, me, seen);
@@ -2631,6 +2631,11 @@ final class AiController {
     static final double PERCEPCAO_LEITURA = 0.35;
     /** PROTÓTIPO PERCEPCAO: a reação no SHINKAI do Ryūga (60% da do nível, nunca abaixo disto). */
     static final int PERCEPCAO_REACAO_MIN = 6;
+    /**
+     * Para as baterias (BateriaRitmo): a reação em quadros vezes isto. Simula uma pessoa com o
+     * mesmo tempo de reação em milissegundos num relógio de luta mais lento (95%: 15 → 14 quadros).
+     */
+    float escalaReacao = 1f;
     /** Para as baterias: desliga a reação mais rápida (mede a assinatura sozinha). */
     static boolean percepcaoReage = true;
     /** A reação deste quadro (a do nível, ou a da percepção). */
