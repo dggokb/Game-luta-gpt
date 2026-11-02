@@ -63,6 +63,31 @@ em GIF, com a origem marcada em vermelho, em `android/app/build/sprite-review/ef
 **A chave do verde é por diferença de cor:** o branco a 50% sobre o verde volta a ser branco a
 50% (a fumaça e o brilho ficam meio transparentes, sem borda verde). Manchinhas de ruído saem.
 
+## Defesa: o efeito tirado de um vídeo com personagem
+
+Três vídeos do personagem no verde (o efeito branco por cima dele) viraram as folhas de defesa.
+`tools/sprites/efeito_sem_personagem.py` fica só com o efeito: o pixel claro e pouco saturado
+que encosta no fundo verde (o clarão e os riscos sempre tocam o fundo; o branco do olho fica
+preso no rosto e sai), sem tom de pele/faixa vista através do clarão e sem os tênis. Depois o
+`efeito_video.py` lê a pasta de PNGs. Escala: o personagem de pé mede ~550 px no vídeo e 247 no
+jogo (0,45 do mundo por pixel).
+
+| Folha | Vídeo | Quadros | No jogo |
+|---|---|---|---|
+| `defesa` | Defesa_de_Golpe_Invisível (quadros 12-17; espelhado: no vídeo o golpe vem da direita) | 6 | defesa comum, alternando com a `defesa_2` |
+| `defesa_2` | Defesa_de_Golpe_Invisível_Anime (27-29 e o 29 sumindo em mais 2; espelhado; some suave a 360 px do centro) | 5 | defesa comum, alternando com a `defesa` |
+| `defesa_poder` | Inicio_Centro_-_Chute_Lateral_Anime (o clarão do chute, 41-42, e o 42 sumindo em mais 2; some a 420 px) | 4 | defesa de projétil ou especial |
+
+```bash
+ffmpeg -i defesa.mp4 quadros/%03d.png
+python3 tools/sprites/efeito_sem_personagem.py . quadros saida --quadros 11-18 --espelhar
+python3 tools/sprites/efeito_video.py saida --nome defesa --origem 408,341 --altura 287 --fps 24
+```
+
+`GameView.efeitoDeGolpe`: golpe defendido de projétil ou especial toca a `defesa_poder`; a
+defesa comum alterna `defesa_2` e `defesa`. Sem a pedida, cai na seguinte; sem nenhuma, a faísca
+clássica.
+
 ## Efeitos desenhados em código (anidoodle)
 
 **Tirados do jogo (02/11):** testados no celular e não ficaram bons; as 12 folhas saíram de

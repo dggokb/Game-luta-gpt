@@ -147,6 +147,8 @@ public class GameView extends SurfaceView
     private boolean vitoriaTocada;
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
     private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
+    /** Alterna os dois vídeos de defesa comum (defesa / defesa_2) a cada golpe defendido. */
+    private boolean defesaAlternada;
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
     private final boolean[] ativoAntes = new boolean[2];
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
@@ -2851,7 +2853,7 @@ public class GameView extends SurfaceView
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
-            !efeitoDeGolpe(event.blocked, x, y, direction, size)) {
+            !efeitoDeGolpe(event.blocked, x, y, direction, size, event.projectile || size >= ImpactEffects.SPECIAL)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -5003,9 +5005,16 @@ public class GameView extends SurfaceView
      * de baixo maior. O vídeo é de um golpe para a direita (espelha para a esquerda). False:
      * não há o efeito, e o clássico entra.
      */
-    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size) {
+    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean poder) {
         boolean esquerda = direction < 0;
-        if (defendido) return efeitos.tocar("defesa", x, y, 1f, esquerda);
+        if (defendido) {
+            // Poder (projétil ou especial) defendido tem o seu; a defesa comum alterna entre os dois
+            // vídeos. Sem o efeito pedido, cai no seguinte (e sem nenhum, no clássico).
+            if (poder && efeitos.tocar("defesa_poder", x, y, 1f, esquerda)) return true;
+            defesaAlternada = !defesaAlternada;
+            if (defesaAlternada && efeitos.tocar("defesa_2", x, y, 1f, esquerda)) return true;
+            return efeitos.tocar("defesa", x, y, 1f, esquerda);
+        }
         for (int s = Math.min(size, EFEITO_GOLPE.length - 1); s >= 0; s--) {
             if (efeitos.tocar(EFEITO_GOLPE[s], x, y, 1f + 0.25f * (size - s), esquerda)) return true;
         }
