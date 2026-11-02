@@ -78,21 +78,38 @@ contorno é dos personagens), centrado no ponto do golpe, sem fumaça no acerto.
 
 | Efeito | Código | Quadros |
 |---|---|---|
-| `impacto_forte` | `impacto_forte.ts`: estrela de espinhos com raios de luz atravessando e faíscas miúdas; X de espinhos; estrela redonda com brilho; o miolo abre e a borda vira línguas de fogo que voam e somem | 9 a 24 fps (~0,37 s) |
-| `fumaca_pouso` | `fumaca_pouso.ts`: nuvem larga e baixa (cerca de 4× mais larga que alta) de bolhas grandes em duas fileiras, cinza médio com sombra embaixo, luz só na borda de cima, contorno fino cinza-escuro e poucos caracóis; quatro lâminas de ar largas e opacas cruzando em dois X por trás. Some baixando, encolhendo e ficando transparente | 10 a 24 fps (~0,42 s) |
+| `impacto_fraco` | `impacto_fraco.ts` (família em `impacto_kit.ts`): estrela pequena com dois raios de luz, estrela redonda, poucas línguas de fogo | 6 (~0,25 s) |
+| `impacto_medio` | `impacto_medio.ts`: mais o X de espinhos e três raios de luz | 8 (~0,33 s) |
+| `impacto_forte` | `impacto_forte.ts`: estrela de espinhos com raios de luz atravessando e faíscas miúdas; X de espinhos; estrela redonda com brilho; o miolo abre e a borda vira línguas de fogo que voam e somem | 9 (~0,37 s) |
+| `impacto_especial` | `impacto_especial.ts`: o forte maior, com agulhas vermelhas em leque, raios elétricos em zigue-zague e mais línguas e faíscas | 11 (~0,46 s) |
+| `defesa` | `defesa.ts`: luz fria (azul) para não confundir com o acerto: meia-lua de barreira virada para quem bate, anel fino e faíscas voltando | 6 (~0,25 s) |
+| `arco_golpe` | `arco_golpe.ts`: rastro branco em meia-lua em volta do ombro, de baixo para cima e para a frente, grosso na frente e fino na cauda | 4 (~0,17 s) |
+| `fumaca_pouso` | `fumaca_pouso.ts`: nuvem larga e baixa (cerca de 4× mais larga que alta) de bolhas grandes em duas fileiras, cinza médio com sombra embaixo, luz só na borda de cima, contorno fino cinza-escuro e poucos caracóis; quatro lâminas de ar largas e opacas cruzando em dois X por trás. Some baixando, encolhendo e ficando transparente | 10 (~0,42 s) |
+| `fumaca_pulo` | `fumaca_pulo.ts` (poeira em `poeira_kit.ts`): sopro de bolhas para os dois lados e dois cortes de ar curtos em V | 6 (~0,25 s) |
+| `poeira_corrida` | `poeira_corrida.ts`: bolhas-vírgula, onda serrilhada, pedrinhas e fita de vento espirrando para trás do pé | 8 (~0,33 s) |
+| `poeira_freada` | `poeira_freada.ts`: bolhas baixas arrastadas para a frente, riscos de arrasto e pedrinhas rolando | 8 (~0,33 s) |
+| `impacto_chao` | `impacto_chao.ts`: clarão baixo, estilhaços de pedra em dois tons sem contorno, pedras escuras, brasas e poeira rolando para os lados | 10 (~0,42 s) |
+| `super_pulo` | `super_pulo.ts`: lâminas de ar altas, anel de choque achatado no chão, fitas de vento em espiral e poeira baixa | 10 (~0,42 s) |
+
+Todos a 24 fps. **Escala:** a poeira usa a mesma escala em todos (0,563 do mundo por pixel do
+desenho; a nuvem do pouso fica com ~70 para um lutador de ~247). A `poeira_corrida` e a
+`poeira_freada` usam `--origem` no pé (900,690 e 380,690), porque o pé não é o meio do efeito.
 
 ```bash
 git clone https://github.com/alexgreensh/anidoodle /tmp/anidoodle
 node /tmp/anidoodle/skills/anidoodle/engine/tools/scaffold.mjs /tmp/fx --film impacto_forte --size 1280x960 --fps 24
-cp tools/sprites/efeitos_codigo/impacto_forte.ts /tmp/fx/src/canvas-core/
-(cd /tmp/fx && npm install && node tools/still.mjs impacto_forte --frames 0,1,2,3,4,5,6,7,8 --out out/impacto_forte/)
-cp tools/sprites/efeitos_codigo/fumaca_pouso.ts /tmp/fx/src/canvas-core/
-(cd /tmp/fx && node tools/still.mjs fumaca_pouso --frames 0,1,2,3,4,5,6,7,8,9 --out out/fumaca_pouso/)
-# --altura é a altura do efeito inteiro (com raios e faíscas): 243 deixa a estrela com ~160 do mundo
+cp tools/sprites/efeitos_codigo/*.ts /tmp/fx/src/canvas-core/
+(cd /tmp/fx && npm install)
+# um efeito: os quadros em PNG transparente (--frames 0,1,...,N-1) e depois o conversor
+(cd /tmp/fx && node tools/still.mjs impacto_forte --frames 0,1,2,3,4,5,6,7,8 --out out/impacto_forte/)
 python3 tools/sprites/efeito_video.py /tmp/fx/out/impacto_forte --nome impacto_forte --ancora centro --altura 243 --fps 24
-# poeira de pouso: a nuvem fica com ~70 do mundo (o lutador tem ~247); as lâminas de ar sobem mais
-python3 tools/sprites/efeito_video.py /tmp/fx/out/fumaca_pouso --nome fumaca_pouso --ancora chao --altura 218 --fps 24
 ```
+
+`--altura` de cada um (a altura do efeito inteiro, com raios e faíscas): `impacto_fraco` 132,
+`impacto_medio` 135, `impacto_forte` 243, `impacto_especial` 237, `defesa` 236, `arco_golpe` 226
+(todos `--ancora centro`); `fumaca_pouso` 218, `fumaca_pulo` 76, `impacto_chao` 144, `super_pulo`
+215 (`--ancora chao`); `poeira_corrida` 92 (`--origem 900,690`), `poeira_freada` 41
+(`--origem 380,690`).
 
 ## Efeitos do manequim (dano e defesa)
 
