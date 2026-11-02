@@ -21,6 +21,8 @@ public final class BateriaEspelhoShinkai {
     static final String RYUGA = "player_base";
     /** O SHINKAI do Ryūga é o por reserva (o padrão); "desgaste" volta ao protótipo anterior. */
     static boolean reserva = true;
+    /** Com o SHINKAI Clash (o jogo de verdade): responder a transformação vira o confronto. */
+    static boolean permiteClash;
 
     /** Os golpes contados um a um (o resto vai em "outros"). */
     static final String[] GOLPES = {"L", "M", "H", "2L", "2M", "2H", "jL", "jM", "jH", "j2H", "S", "S2", "S3", "S4", "SUPER", "ULTRA"};
@@ -50,7 +52,7 @@ public final class BateriaEspelhoShinkai {
         final long[] faixa = new long[6], faixaDentro = new long[6];
         // Golpes
         final Map<String, Uso> fora = new LinkedHashMap<>(), dentro = new LinkedHashMap<>();
-        long tirosShinkai;
+        long tirosShinkai, respostas, clashes, quebras, quebraVence, quebraAntes, quebraAntesVence;
         long agarroes, agarroesCertos, techs, perfeitas, guardBreaks, choquesBola, superGratis, barrasGastas;
 
         Est() {
@@ -79,7 +81,7 @@ public final class BateriaEspelhoShinkai {
         BateriaBalanco.Luta l = new BateriaBalanco.Luta(new String[] {RYUGA}, new String[] {RYUGA}, nivel, semente, new CombatConfig());
         BateriaBalanco.Mao m = (lu, ld, in) -> {
             // Sem Clash: ninguém liga com o outro já no SHINKAI; sem SHINKAI: ninguém liga.
-            if (!comShinkai || lu.f(1 - ld).state.inShinkai() && !lu.f(ld).state.inShinkai()) in.shinkai = false;
+            if (!comShinkai || !permiteClash && lu.f(1 - ld).state.inShinkai() && !lu.f(ld).state.inShinkai()) in.shinkai = false;
         };
         l.mao[0] = m;
         l.mao[1] = m;
@@ -97,6 +99,7 @@ public final class BateriaEspelhoShinkai {
         CombatFighter.Status[] antes = {CombatFighter.Status.NEUTRAL, CombatFighter.Status.NEUTRAL};
         int[] maiorAtras = new int[2];   // a maior desvantagem de vida de cada lado na luta
         int primeiro = -1;
+        List<int[]> quebras = new ArrayList<>();
         boolean houveKo = false, alguemDentroNoKo = false;
         while (!l.acabou() && l.quadro < 60 * 60 * 4) {
             boolean[] presoAntes = {preso(l.f(0)), preso(l.f(1))};
@@ -113,6 +116,7 @@ public final class BateriaEspelhoShinkai {
                     e.segundoBarraCheia += l.quadro;
                 }
                 if (agora && !dentro[s]) {
+                    if (dentro[1 - s]) e.respostas++;
                     e.ativacoes++;
                     ativacoes[s]++;
                     if (ligouEm[s] < 0) { ligouEm[s] = l.quadro; ultimoAtras[s] = st.life < o.state.life; }
@@ -127,6 +131,10 @@ public final class BateriaEspelhoShinkai {
                     antesLeit[s] = st.leituras; antesEsq[s] = st.esquivas; antesPrec[s] = st.precisos; antesRup[s] = st.rupturas;
                     antesAbs[s] = st.reservaAbsorveu; antesTec[s] = st.reservaGastaTecnica;
                     rupturaInicio[s] = -1;
+                }
+                if (!agora && dentro[s] && cues.contains("SHINKAI_QUEBRA")) {
+                    // A transformação dele quebrou: quem quebrou já tinha se transformado?
+                    quebras.add(new int[] {1 - s, ativacoes[1 - s] > 0 || dentro[1 - s] ? 1 : 0});
                 }
                 if (!agora && dentro[s]) fecharEpisodio(e, l, s, cues, episodioInicio[s], antesLeit, antesEsq, antesPrec, antesRup);
                 if (agora) e.quadrosDentro++; else e.quadrosFora++;
@@ -160,6 +168,7 @@ public final class BateriaEspelhoShinkai {
                 else if (c.equals("PROJECTILE_CLASH")) e.choquesBola++;
                 else if (c.equals("SHINKAI_SUPER")) e.superGratis++;
                 else if (c.equals("SHINKAI_SHOT")) e.tirosShinkai++;
+                else if (c.equals("SHINKAI_CLASH")) e.clashes++;
             }
             for (CombatEngine.HitEvent h : l.e.events()) {
                 if (h.attacker == h.defender) continue;
@@ -223,6 +232,14 @@ public final class BateriaEspelhoShinkai {
             return;
         }
         if (v == 0) e.vitoriasLado0++;
+        for (int[] q : quebras) {
+            e.quebras++;
+            if (q[0] == v) e.quebraVence++;
+            if (q[1] == 0) {
+                e.quebraAntes++;
+                if (q[0] == v) e.quebraAntesVence++;
+            }
+        }
         e.vidaVencedor += Math.max(0, l.f(v).state.life);
         e.vidaMax += max;
         if (maiorAtras[v] >= max * 3 / 10) e.viradas++;
@@ -258,7 +275,8 @@ public final class BateriaEspelhoShinkai {
         int dur = l.quadro - inicio;
         e.duracaoShinkai += dur;
         e.duracoesShinkai.add(dur);
-        String como = cues.contains("LIMITE_FIM") ? (reserva ? "a reserva acabou (exausto)" : "no limite do corpo (exausto)")
+        String como = cues.contains("SHINKAI_QUEBRA") ? "a transformação quebrou (atordoado e exausto)"
+            : cues.contains("LIMITE_FIM") ? (reserva ? "a reserva acabou (exausto)" : "no limite do corpo (exausto)")
             : cues.contains("RUPTURA_FIM") ? "depois da Ruptura (exausto)"
             : cues.contains("SHINKAI_FIM") ? "desligou ele mesmo"
             : cues.contains("KO_RIVAL") || l.f(1 - s).ko() ? "derrubou o rival (KO) dentro"
@@ -315,7 +333,7 @@ public final class BateriaEspelhoShinkai {
         StringBuilder b = new StringBuilder();
         b.append("\n## Nível ").append(nivel).append(" (").append(com.lutas).append(" lutas em cada coluna, CPU × CPU)\n\n");
         b.append("### A luta\n\n");
-        b.append("| medida | com SHINKAI (sem Clash) | sem SHINKAI |\n|---|---|---|\n");
+        b.append("| medida | com SHINKAI (" + (permiteClash ? "com" : "sem") + " Clash) | sem SHINKAI |\n|---|---|---|\n");
         Est[] ab = {com, sem};
         linha(b, "duração média (s)", f1(com.quadros / 60.0 / com.lutas), f1(sem.quadros / 60.0 / sem.lutas));
         linha(b, "duração mediana (s)", f0(mediana(com.duracoes) / 60.0), f0(mediana(sem.duracoes) / 60.0));
@@ -326,7 +344,7 @@ public final class BateriaEspelhoShinkai {
         double minC = com.quadros / 3600.0, minS = sem.quadros / 3600.0;
         linha(b, "dano por minuto (cada lado)", f0((com.danoDadoDentro + com.danoDadoFora) / minC / 2), f0((sem.danoDadoDentro + sem.danoDadoFora) / minS / 2));
 
-        b.append("\n### O SHINKAI (com SHINKAI, sem Clash)\n\n");
+        b.append("\n### O SHINKAI\n\n");
         b.append("| medida | valor |\n|---|---|\n");
         int lados = com.lutas * 2;
         linha(b, "barra cheia (lados) / segundo médio em que encheu", pc(com.barraCheia, lados) + " / " + f1(com.segundoBarraCheia / 60.0 / Math.max(1, com.barraCheia)) + " s");
@@ -363,6 +381,10 @@ public final class BateriaEspelhoShinkai {
         if (false) {
         }
         linha(b, "quem liga primeiro vence", pc(com.primeiroLigouVence, com.primeiroLigouDecididas));
+        linha(b, "transformações quebradas por luta", f2(com.quebras / (double)com.lutas));
+        linha(b, "quem quebrou a do outro vence", pc(com.quebraVence, com.quebras));
+        linha(b, "quebrou antes de se transformar: vence (quantas)", pc(com.quebraAntesVence, com.quebraAntes) + " (" + com.quebraAntes + ")");
+        linha(b, "respondeu a transformação com a sua (por luta) / SHINKAI Clash por luta", f2(com.respostas / (double)com.lutas) + " / " + f2(com.clashes / (double)com.lutas));
         linha(b, "só um ligou: ele vence", pc(com.soUmLigouVence, com.soUmLigou));
         linha(b, "Super grátis do SHINKAI usado (por SHINKAI)", f2(com.superGratis / (double)a));
         linha(b, "tiros de energia do SHINKAI (por SHINKAI)", f2(com.tirosShinkai / (double)a));
@@ -407,6 +429,10 @@ public final class BateriaEspelhoShinkai {
     public static void main(String[] args) {
         int n = args.length > 0 ? Integer.parseInt(args[0]) : 200;
         // "antigo": o Ryūga com o SHINKAI do sistema antigo (ENERGY) no lugar da PERCEPÇÃO.
+        if (Arrays.asList(args).contains("clash")) {
+            permiteClash = true;
+            args = Arrays.stream(args).filter(a -> !a.equals("clash")).toArray(String[]::new);
+        }
         int primeiroNivel = 1;
         if (args.length > 1 && args[1].equals("antigo")) {
             Shinkai.prototipoDesligado = true;
@@ -423,9 +449,9 @@ public final class BateriaEspelhoShinkai {
         }
         int[] niveis = args.length > primeiroNivel ? Arrays.stream(args, primeiroNivel, args.length).mapToInt(Integer::parseInt).toArray() : new int[] {5, 8};
         StringBuilder out = new StringBuilder();
-        out.append("# Ryūga × Ryūga: SHINKAI sem Clash (02/11)" + (reserva ? " — SHINKAI por reserva" : "") + "\n\n");
+        out.append("# Ryūga × Ryūga: SHINKAI " + (permiteClash ? "com" : "sem") + " Clash (02/11)" + (reserva ? " — SHINKAI por reserva" : "") + "\n\n");
         out.append("CPU contra CPU, os dois o Ryūga (player_base, SHINKAI ").append(Shinkai.typeOf(BateriaBalanco.ch(RYUGA)).label)
-            .append("), o mesmo nível. Com SHINKAI: os dois podem ligar, ninguém liga com o outro já no dele. ")
+            .append("), o mesmo nível. Com SHINKAI: os dois podem ligar").append(permiteClash ? " (ligar com o outro já no dele vira o SHINKAI Clash). " : ", ninguém liga com o outro já no dele. ")
             .append("Sem SHINKAI: ninguém liga. Mesmas sementes nas duas colunas.\n");
         for (int nivel : niveis) {
             Est com = new Est(), sem = new Est();

@@ -70,7 +70,9 @@ public class CpuSpecialsTest {
         // de verdade a esquiva-sumiço aparece.
         Map<String, Integer> contraBola = specialsUsed("p05", "player_base", 8, 6);
         assertTrue("p05 usa a esquiva-sumiço (S3): " + contraBola, contraBola.getOrDefault("S3", 0) > 0);
-        Map<String, Integer> p15 = specialsUsed("p15", "player_base", 8, 6);
+        // A Onda do Ryūga aparece menos nas lutas em que ele se transforma (o SHINKAI é uma vida
+        // nova e a luta fica perto dele): mais lutas para ver o repel.
+        Map<String, Integer> p15 = specialsUsed("p15", "player_base", 8, 14);
         assertTrue("p15 repele a onda (S2): " + p15, p15.getOrDefault("S2", 0) > 0);
     }
 

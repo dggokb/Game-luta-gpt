@@ -646,10 +646,24 @@ final class CombatConfig {
     // apanhar, o SHINKAI fica. A reserva acabando abre a Ruptura (gasta a vida dele). false = o
     // desgaste do protótipo anterior (para comparar).
     boolean ryugaReserva = true;
-    /** A reserva ao ligar (vida: a vida inteira é 10000). */
-    int ryugaReservaVida = 2500;
+    /**
+     * A reserva ao ligar (vida: a vida inteira é 10000). Uma vida nova inteira (pedido do jogador:
+     * "o SHINKAI é um novo life", como a transformação dos animes).
+     */
+    int ryugaReservaVida = 10000;
     /** Reserva neste tanto ou menos: no limite (dá para escolher a Ruptura). */
-    int ryugaReservaLimite = 500;
+    int ryugaReservaLimite = 1500;
+    /**
+     * Um golpe (ou combo) que pegaria a reserva de cima do limite e a zeraria para nela: o limite
+     * sempre aparece e dá a chance da Ruptura (0 = pode zerar de uma vez).
+     */
+    int ryugaReservaTrava = 750;
+    /**
+     * A reserva zerou (a transformação quebrou): ele fica atordoado este tanto (no chão) e cansado
+     * este tanto. Quebrar a transformação do outro é a virada da luta.
+     */
+    int ryugaQuebraAtordoa = 45;
+    int ryugaQuebraExaustao = 300;
     /** O que cada técnica potencializada gasta: especial (S, S2–S4), Super, esquiva; o golpe comum, nada. */
     int ryugaReservaEspecial = 150;
     int ryugaReservaSuper = 400;

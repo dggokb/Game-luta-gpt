@@ -695,7 +695,11 @@ final class CombatEngine {
         s.shinkaiAutoParry = s.shinkaiType == Shinkai.Type.TECHNIQUE;
         s.sobrecarga = s.limiteQuadros = s.rupturaQuadros = s.precisoQuadros = 0;
         s.reserva = s.reservaMax = 0;
-        if (porReserva(s)) s.reserva = s.reservaMax = config.ryugaReservaVida;
+        if (porReserva(s)) {
+            s.reserva = s.reservaMax = config.ryugaReservaVida;
+            s.reservaLimiar = config.ryugaReservaLimite;
+            s.reservaTrava = config.ryugaReservaTrava;
+        }
         f.shinkaiRequestAge = -1;
         if (f.attacking()) {
             f.status = CombatFighter.Status.NEUTRAL;
@@ -964,9 +968,23 @@ final class CombatEngine {
             return;
         }
         if (s.reserva <= 0) {
+            // A transformação quebrou: atordoado no chão e cansado por um bom tempo.
             s.finsNoLimite++;
-            encerrar(s, config.ryugaExaustao);
-            cues.add("LIMITE_FIM");
+            encerrar(s, config.ryugaQuebraExaustao);
+            for (CombatFighter f : fighters) {
+                if (f.state != s || f.ko()) continue;
+                if (f.grounded && f.status != CombatFighter.Status.KNOCKDOWN && f.status != CombatFighter.Status.WAKEUP &&
+                    f.status != CombatFighter.Status.THROWN) {
+                    f.clearAttack();
+                    f.status = CombatFighter.Status.HITSTUN;
+                    f.stunLeft = f.stunTotal = Math.max(f.stunLeft, config.ryugaQuebraAtordoa);
+                    f.stunElapsed = 0;
+                    f.vx = 0f;
+                } else if (f.status == CombatFighter.Status.AIR_HITSTUN) {
+                    f.stunLeft = Math.max(f.stunLeft, config.ryugaQuebraAtordoa);
+                }
+            }
+            cues.add("SHINKAI_QUEBRA");
             return;
         }
         if (s.reserva <= config.ryugaReservaLimite) {

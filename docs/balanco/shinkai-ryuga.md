@@ -522,3 +522,54 @@ O jogador pediu um novo tipo de SHINKAI.
   a escolha não chega a abrir.
 - O tamanho da reserva muda pouco a duração (1.500 → 3.500: de 11,8 s para 14,9 s) e muda a força
   (saldo de 4.000 para 5.700).
+
+### O SHINKAI é uma vida nova (pedido do jogador, 02/11)
+
+O jogador pediu um SHINKAI no estilo anime, como uma vida nova:
+- "ele se transformou, tenho que me transformar";
+- "se eu quebrar a transformação dele antes da minha, ganho";
+- cada SHINKAI terá a sua característica única, e o conjunto vira um **xadrez de poder**.
+
+A reserva passa a ser a base comum. A característica do Ryūga continua a da PERCEPÇÃO.
+
+**O que mudou**
+
+| | antes | agora |
+|---|---|---|
+| reserva | 2.500 | 10.000 (uma vida inteira) |
+| limite (dá para romper) | 500 | 1.500 |
+
+- No HUD, a reserva é uma camada dourada que cobre a barra de vida. Ao encolher, aparece a vida de
+  verdade por baixo. No limite, a camada pisca.
+- **Trava:** de cima do limite, um golpe ou combo não zera a reserva; ela para em 750. O limite
+  sempre aparece, e a Ruptura fica sempre à mão.
+- **Transformação quebrada:** a reserva zerou fora da Ruptura.
+  - Ele fica 0,75 s atordoado no chão e 5 s cansado (mais lento, a guarda gasta mais).
+  - O aviso na tela é "TRANSFORMAÇÃO QUEBRADA!", com tremor.
+
+**Espelho Ryūga × Ryūga, nível 8, 300 lutas.** Tabelas em `perfis/espelho-ryuga-shinkai-vida-*.md`.
+
+| medida | sem Clash | com Clash (o jogo) | sem SHINKAI |
+|---|---|---|---|
+| duração da luta | 41,4 s | 71,9 s | 40,7 s |
+| os dois se transformam | 12% | 93% | — |
+| responde a transformação com a sua (por luta) | — | 1,17 (vira o Clash) | — |
+| duração do SHINKAI | 20,5 s | 29,7 s | — |
+| tempo com alguém transformado | 56% | 64% | — |
+| transformações quebradas por luta | 0,07 | 1,03 | — |
+| quem quebra a do outro vence | 75% | 71% | — |
+| quebrou antes de se transformar: vence | 81% (16 casos) | — | — |
+| só um se transforma: ele vence | 100% | 100% | — |
+| quem se transforma primeiro vence | 88% | 55% | — |
+| viradas | 31% | 38% | 22% |
+| leituras por SHINKAI | 1,14 | 1,63 | — |
+
+**Leitura**
+- **Sem Clash** (ninguém responde), a transformação decide a luta: quem liga primeiro vence 88%.
+- **Com Clash**, que é o jogo de verdade, a resposta acontece:
+  - os dois se transformam em 93% das lutas;
+  - a luta dura quase o dobro;
+  - uma transformação quebra por luta, e quem quebra vence 71%;
+  - quem se transforma primeiro cai para 55%: responder vale;
+  - há mais viradas (38%).
+- Esse é o xadrez de poder: transformar, responder, quebrar.

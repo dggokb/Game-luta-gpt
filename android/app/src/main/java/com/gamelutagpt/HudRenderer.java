@@ -541,12 +541,21 @@ final class HudRenderer {
      * tanto que os golpes ainda gastam antes de chegar à vida).
      */
     private void reservaShinkai(Canvas c, FighterState fighter, float life, float x, float y, float w, float h) {
-        if (fighter.reserva <= 0 || !fighter.inShinkai() || life <= 0f) return;
-        float r = Math.min(life, fighter.reserva / (float)fighter.profile.maxLife);
-        paint.setColor(0xD8FFC23A);
-        c.drawRect(x + w * (life - r), y, x + w * life, y + h * 0.5f, paint);
+        if (fighter.reserva <= 0 || !fighter.inShinkai()) return;
+        // Uma vida nova por cima da vida (camada dourada, como a transformação dos animes): o que
+        // sobra dela cobre a barra; por baixo aparece a vida de verdade quando ela encolhe.
+        float r = Arena.clamp(fighter.reserva / (float)fighter.profile.maxLife, 0f, 1f);
+        paint.setColor(0xF0F2B52A);
+        c.drawRect(x, y, x + w * r, y + h, paint);
         paint.setColor(0xFFFFF1B8);
-        c.drawRect(x + w * (life - r), y, x + w * life, y + 2f, paint);
+        c.drawRect(x, y, x + w * r, y + Math.max(2f, h * 0.18f), paint);
+        if (fighter.limiteQuadros > 0) {
+            // No limite: a camada pisca (a Ruptura está à mão).
+            paint.setColor(0xFFFF5A2A);
+            paint.setAlpha(Math.round(120 + 100 * (float)Math.sin(effects.now * 10.0)));
+            c.drawRect(x, y, x + w * r, y + h, paint);
+            paint.setAlpha(255);
+        }
     }
 
     /** Slanted light band sweeping across a filled region; {@code cycle} advances 1 per sweep. */

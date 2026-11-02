@@ -264,11 +264,17 @@ public class ShinkaiRyugaTest {
         m.ryuga.takeDamage(1000, 0);
         assertEquals("a reserva segura o golpe", vida, m.ryuga.life);
         assertEquals(m.config().ryugaReservaVida - 1000, m.ryuga.reserva);
+        // De cima do limite, um golpe enorme para na trava (o limite sempre aparece).
+        m.ryuga.takeDamage(m.ryuga.reserva + 300, 0);
+        assertEquals(m.config().ryugaReservaTrava, m.ryuga.reserva);
+        assertEquals("parou na trava: o resto se perde", vida, m.ryuga.life);
+        // Já no limite: o que passa da reserva é vida.
         m.ryuga.takeDamage(m.ryuga.reserva + 300, 0);
         assertEquals("o que passa da reserva é vida", vida - 300, m.ryuga.life);
-        assertTrue("a reserva acabou: o SHINKAI acaba, cansado", m.ate("LIMITE_FIM", 3));
+        assertTrue("a reserva acabou: a transformação quebra", m.ate("SHINKAI_QUEBRA", 3));
         assertFalse(m.ryuga.inShinkai());
-        assertTrue(m.ryuga.exaustaoQuadros > 0);
+        assertEquals(m.config().ryugaQuebraExaustao, m.ryuga.exaustaoQuadros, 2);
+        assertEquals("quebrou: atordoado", CombatFighter.Status.HITSTUN, m.f(0).status);
     }
 
     @Test public void asTecnicasPotencializadasGastamAReserva() {
