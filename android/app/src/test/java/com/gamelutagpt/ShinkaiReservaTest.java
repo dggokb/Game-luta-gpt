@@ -48,7 +48,7 @@ public class ShinkaiReservaTest {
             Match m = new Match(id, "p15", 300f, 1500f);
             m.shinkai();
             assertNotEquals(Shinkai.Type.PERCEPCAO, m.a.shinkaiType);
-            assertEquals(id, m.engine.config.ryugaReservaVida, m.a.reserva);
+            assertEquals(id + ": a vida nova é uma vida inteira dele", m.a.profile.maxLife, m.a.reserva);
             for (int i = 0; i < 60 * 15; i++) m.step();
             assertTrue(id + ": parado 15 s, segue no SHINKAI (sem os 8 s de antes)", m.a.inShinkai());
         }
@@ -57,7 +57,7 @@ public class ShinkaiReservaTest {
     @Test public void aReservaQuebraTambemNosOutros() {
         Match m = new Match("p13", "p15", 300f, 1500f);
         m.shinkai();
-        m.a.takeDamage(m.a.reserva - m.engine.config.ryugaReservaLimite + 10, 0);
+        m.a.takeDamage(m.a.reserva - m.a.reservaLimiar + 10, 0);
         assertTrue(m.ate("LIMITE", 3));
         m.a.takeDamage(m.a.reserva + 100, 0);
         assertTrue(m.ate("SHINKAI_QUEBRA", 3));

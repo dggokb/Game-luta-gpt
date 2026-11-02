@@ -444,7 +444,7 @@ public final class BateriaEspelhoShinkai {
             primeiroNivel = 2;
         } else if (args.length > 1 && args[1].startsWith("reserva=")) {
             int v = Integer.parseInt(args[1].substring(8));
-            BateriaBalanco.AJUSTE_CFG = c -> c.ryugaReservaVida = v;
+            BateriaBalanco.AJUSTE_CFG = c -> c.ryugaReservaPermille = v;   // milésimos da vida inteira
             primeiroNivel = 2;
         }
         int[] niveis = args.length > primeiroNivel ? Arrays.stream(args, primeiroNivel, args.length).mapToInt(Integer::parseInt).toArray() : new int[] {5, 8};

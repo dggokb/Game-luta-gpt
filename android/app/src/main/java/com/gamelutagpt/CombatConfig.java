@@ -655,17 +655,18 @@ final class CombatConfig {
     /** SPEED na regra da reserva: o sumiço gasta isto da reserva (no relógio gastava tempo). */
     int shinkaiReservaSumico = 150;
     /**
-     * A reserva ao ligar (vida: a vida inteira é 10000). Uma vida nova inteira (pedido do jogador:
-     * "o SHINKAI é um novo life", como a transformação dos animes).
+     * A reserva ao ligar, em milésimos da vida inteira DELE (cada um tem a sua: o Ryūga 14000).
+     * 1000 = uma vida nova inteira (pedido do jogador: "o SHINKAI é um novo life", como a
+     * transformação dos animes).
      */
-    int ryugaReservaVida = 10000;
-    /** Reserva neste tanto ou menos: no limite (dá para escolher a Ruptura). */
-    int ryugaReservaLimite = 1500;
+    int ryugaReservaPermille = 1000;
+    /** Reserva neste tanto (milésimos da reserva cheia) ou menos: no limite (dá para escolher a Ruptura). */
+    int ryugaReservaLimitePermille = 150;
     /**
      * Um golpe (ou combo) que pegaria a reserva de cima do limite e a zeraria para nela: o limite
      * sempre aparece e dá a chance da Ruptura (0 = pode zerar de uma vez).
      */
-    int ryugaReservaTrava = 750;
+    int ryugaReservaTravaPermille = 75;
     /**
      * A reserva zerou (a transformação quebrou): ele fica atordoado este tanto (no chão) e cansado
      * este tanto. Quebrar a transformação do outro é a virada da luta.
@@ -677,8 +678,8 @@ final class CombatConfig {
     int ryugaReservaSuper = 400;
     int ryugaReservaEsquiva = 100;
     int ryugaReservaNormal = 0;
-    /** Ruptura: a vida que ela não passa (a Ruptura acaba sozinha ao chegar aqui). */
-    int ryugaRupturaPiso = 1000;
+    /** Ruptura: a vida que ela não passa, em milésimos da vida inteira (a Ruptura acaba sozinha ao chegar aqui). */
+    int ryugaRupturaPisoPermille = 100;
 
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;

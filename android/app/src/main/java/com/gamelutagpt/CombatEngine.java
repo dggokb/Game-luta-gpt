@@ -697,9 +697,9 @@ final class CombatEngine {
         s.sobrecarga = s.limiteQuadros = s.rupturaQuadros = s.precisoQuadros = 0;
         s.reserva = s.reservaMax = 0;
         if (porReserva(s)) {
-            s.reserva = s.reservaMax = config.ryugaReservaVida;
-            s.reservaLimiar = config.ryugaReservaLimite;
-            s.reservaTrava = config.ryugaReservaTrava;
+            s.reserva = s.reservaMax = Math.max(1, s.profile.maxLife * config.ryugaReservaPermille / 1000);
+            s.reservaLimiar = s.reservaMax * config.ryugaReservaLimitePermille / 1000;
+            s.reservaTrava = s.reservaMax * config.ryugaReservaTravaPermille / 1000;
         }
         f.shinkaiRequestAge = -1;
         if (f.attacking()) {
@@ -948,6 +948,11 @@ final class CombatEngine {
     // ---------------------------------------------------------------- PROTÓTIPO PERCEPCAO (o Ryūga)
     // docs/balanco/shinkai-ryuga.md. Só o tipo PERCEPCAO passa por aqui; os outros seguem o relógio.
 
+    /** A vida que a Ruptura não passa (o piso, pela vida inteira dele). */
+    int piso(FighterState s) {
+        return s.profile.maxLife * config.ryugaRupturaPisoPermille / 1000;
+    }
+
     /** O SHINKAI dele é o por reserva (o Ryūga com {@link CombatConfig#ryugaReserva}). */
     boolean porReserva(FighterState s) {
         return config.ryugaReserva && (config.shinkaiReservaTodos || s.shinkaiType == Shinkai.Type.PERCEPCAO);
@@ -961,14 +966,14 @@ final class CombatEngine {
     private void quadroDaReserva(FighterState s) {
         if (s.rupturaQuadros > 0) {
             s.rupturaQuadros = Math.min(s.rupturaQuadros + 1, 1 << 20);
-            if (s.life - config.ryugaRupturaDor <= config.ryugaRupturaPiso) {
+            if (s.life - config.ryugaRupturaDor <= piso(s)) {
                 encerrar(s, config.ryugaExaustaoRuptura);
                 cues.add("RUPTURA_FIM");
                 return;
             }
             s.takeDamage(config.ryugaRupturaDor, 0);
-            int faixa = Math.max(1, s.rupturaVidaInicio - config.ryugaRupturaPiso);
-            s.shinkaiFrames = Math.max(1, (int)((long)(s.life - config.ryugaRupturaPiso) * config.shinkaiFrames / faixa));
+            int faixa = Math.max(1, s.rupturaVidaInicio - piso(s));
+            s.shinkaiFrames = Math.max(1, (int)((long)(s.life - piso(s)) * config.shinkaiFrames / faixa));
             return;
         }
         if (s.reserva <= 0) {
@@ -991,7 +996,7 @@ final class CombatEngine {
             cues.add("SHINKAI_QUEBRA");
             return;
         }
-        if (s.reserva <= config.ryugaReservaLimite) {
+        if (s.reserva <= s.reservaLimiar) {
             if (s.limiteQuadros == 0) {
                 s.limiteQuadros = config.ryugaLimiteJanela;
                 cues.add("LIMITE");
@@ -1011,7 +1016,7 @@ final class CombatEngine {
     private void gastarReserva(FighterState s, int quanto) {
         if (quanto <= 0 || !porReserva(s) || !s.inShinkai()) return;
         if (s.rupturaQuadros > 0) {
-            int pode = Math.max(0, s.life - config.ryugaRupturaPiso);
+            int pode = Math.max(0, s.life - piso(s));
             int gasto = Math.min(pode, quanto);
             if (gasto > 0) s.takeDamage(gasto, 0);
             return;
@@ -1168,7 +1173,7 @@ final class CombatEngine {
             cues.add("RUPTURA_FIM");
             return;
         }
-        if (s.reserva <= config.ryugaReservaLimite && s.life - config.ryugaRupturaDor > config.ryugaRupturaPiso) {
+        if (s.reserva <= s.reservaLimiar && s.life - config.ryugaRupturaDor > piso(s)) {
             s.limiteQuadros = 0;
             s.reserva = 0;
             s.rupturaQuadros = 1;

@@ -647,3 +647,18 @@ dourado (`0xFFFFC23A`) para o azul do dragão da liberação de poder (`0xFF1E9C
 A cor vale para a aura e o contorno no SHINKAI, para a barra e o botão do SHINKAI e para o corte de
 ativação. A camada dourada da vida nova na barra de vida ficou como estava, e a Ruptura segue
 com a cor própria.
+
+**A vida nova é a vida inteira de cada um** (relato do jogador: "ativei com quase nada de life e
+não veio uma barra cheia").
+- **O problema:** a reserva era fixa em 10.000, mas o Ryūga tem 14.000 de vida, então a camada
+  cobria só 71% da barra.
+- **Agora tudo é proporcional à vida de cada lutador** (`ryuga*Permille`):
+
+  | | valor |
+  |---|---|
+  | reserva | a vida inteira dele (1000‰) |
+  | limite | 15% da reserva |
+  | trava | 7,5% da reserva |
+  | piso da Ruptura | 10% da vida |
+
+- Conferido desenhando o HUD sem tela, com 600 de vida: a camada cobre a barra inteira.
