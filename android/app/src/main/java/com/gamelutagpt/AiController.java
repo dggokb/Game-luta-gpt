@@ -424,6 +424,21 @@ final class AiController {
                 abordagem = null;
             }
         }
+        // Como ele entra nela: golpes de chão (altura, se entraram) e pulos que chegaram.
+        CombatFighter rival = engine.fighter(1 - self);
+        // Só o golpe que abre (o resto do combo não é "ele entrou de novo").
+        ComboSession sessao = engine.session(self);
+        boolean abre = sessao == null || !sessao.active || sessao.hitCount <= 1;
+        for (CombatEngine.HitEvent ev : engine.events()) {
+            if (ev.projectile || ev.moveId == null) continue;
+            if (ev.defender == self && ev.attacker != self && (abre || ev.blocked)) {
+                AttackDefinition a = rival.character() != null ? rival.character().attack(ev.moveId) : null;
+                if (ev.moveId.startsWith("j")) leitura.puloNela();
+                else if (a != null && a.kind == AttackDefinition.Kind.NORMAL) leitura.golpeDeChao(a.low, !ev.blocked);
+            } else if (ev.attacker == self && !ev.blocked && !rival.grounded && "2H".equals(ev.moveId)) {
+                leitura.tirouDoAr();
+            }
+        }
         if (seen == null) return;
         // A bola dela chegando perto dele (a própria bola ela sabe onde está).
         boolean viva = false;
@@ -702,6 +717,18 @@ final class AiController {
     static final int PLANO_MEIO_QUADROS = 45;
 
     private CpuLeitura.PlanoMeio planoMeio;
+    private boolean esperaBaixo;
+
+    /** Ele tem entrado nela com golpe de chão (rasteira) ou de pulo: vale escolher um plano contra. */
+    private boolean rivalCutucador() {
+        // Os níveis baixos não mudam o jeito (do 4 para cima, mais cedo quanto mais alto).
+        if (level.number < 4) return false;
+        double limiar = CUTUCADOR * (1.5 - smart());
+        return leitura.cutucadas() >= limiar || leitura.pulosNela() >= limiar;
+    }
+
+    /** Golpes de chão (ou pulos) dele que entraram, com o esquecimento, para ela mudar o jeito. */
+    static final double CUTUCADOR = 4.0;
     private CpuLeitura.Faixa faixaMeio;
     private final Tentativa tentativaMeio = new Tentativa();
     private int meioQuadros;
@@ -714,13 +741,22 @@ final class AiController {
      */
     private boolean avancarContraBola(CombatEngine engine, CombatFighter me, CombatFighter target,
                                       CpuPerception.Snapshot seen, FighterInput out) {
-        if (!rivalZoning(seen.frame) || !me.grounded || !me.canAct() || guardPlanSerial >= 0 || jumpPlanSerial >= 0 ||
+        boolean zoneia = rivalZoning(seen.frame);
+        // Quem vive entrando de rasteira ou de pulo nela (pedido do jogador, 02/11): os mesmos
+        // planos da meia distância, aprendendo qual rende contra ele (esperar defendendo baixo,
+        // pular a rasteira, pressionar antes...).
+        boolean cutuca = !zoneia && rivalCutucador();
+        if (!(zoneia || cutuca) || !me.grounded || !me.canAct() || guardPlanSerial >= 0 || jumpPlanSerial >= 0 ||
             corridaSerial >= 0 || devolverBola) {
             meioQuadros = 0;
             return false;
         }
         float gap = Math.abs(seen.x - me.x);
         CpuStyle style = CpuStyle.of(me.character());
+        if (cutuca && gap > MEIO_LONGE) {
+            meioQuadros = 0;
+            return false;
+        }
         if (gap > MEIO_LONGE) {
             meioQuadros = 0;
             // Quem tem bola que alcança devolve (a decisão do neutro cuida).
@@ -767,6 +803,8 @@ final class AiController {
             faixaMeio = faixa;
             tentativaMeio.comeca(engine, me, target);
             meioQuadros = PLANO_MEIO_QUADROS;
+            // Esperando contra quem dá rasteira: agachada (a altura que ela aprendeu).
+            esperaBaixo = cutuca && roll(habitLow());
         }
         meioQuadros--;
         int frente = me.facing > 0 ? 1 : 5, tras = me.facing > 0 ? 5 : 1;
@@ -774,8 +812,8 @@ final class AiController {
         movingForward = false;
         switch (planoMeio) {
             case ESPERA:
-                out.direction = tras;
-                lastReason = "espera a bola defendendo";
+                out.direction = esperaBaixo ? (me.facing > 0 ? 4 : 2) : tras;
+                lastReason = cutuca ? "espera o golpe dele defendendo" : "espera a bola defendendo";
                 return true;
             case PULA:
                 meioQuadros = 0;
@@ -1343,7 +1381,7 @@ final class AiController {
             float gap = Math.abs(seen.x - me.x);
             // (a defesa por hábito fica em habitGuard, depois de punir e tirar do ar)
             if (seen.threatening() && seen.attack.melee() && seen.attackSerial != lastGuardSerial &&
-                gap <= seen.attack.reach + me.body().halfWidth + 60f) {
+                gap <= seen.attack.reach + me.body().halfWidth + 60f && !(antiAirPlan && !seen.grounded && me.grounded)) {
                 lastGuardSerial = seen.attackSerial;
                 // O golpe alto de chão só se defende em pé.
                 int required = !seen.grounded || seen.attack.overhead ? GUARD_HIGH
@@ -1355,11 +1393,13 @@ final class AiController {
                     int elapsed = engine.frame() - seen.frame;
                     planJustDefense(me, seen.attack.startupFrames - seen.attackFrame - elapsed);
                 }
-            } else if (!seen.grounded && seen.jumpSerial != lastJumpSerial && gap < 340f && !antiAirPlan &&
+            } else if (!seen.grounded && seen.jumpSerial != lastJumpSerial && gap < 340f &&
                 seen.status == CombatFighter.Status.NEUTRAL) {
-                // Pulo vindo e ela não vai tirar do ar: defende em pé (pulo só se defende em pé).
+                // Pulo vindo: primeiro decide se tira do ar (antes, a defesa de 40 quadros saía
+                // primeiro e o antiaéreo quase nunca chegava a ser tentado); se não, defende em pé.
                 lastJumpSerial = seen.jumpSerial;
-                decideGuard(GUARD_HIGH, 40);
+                if (me.grounded) decidirAntiAereo(me, seen);
+                if (!antiAirPlan) decideGuard(GUARD_HIGH, 40);
             }
             if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != lastProjectileSerial) {
                 float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
@@ -1534,6 +1574,9 @@ final class AiController {
         // que mais a deixava parecendo grudada no chão. Pressionada, defende (o jab não dá para
         // defender reagindo), mas em janelas curtas: a pressão acabou, ela volta a atacar.
         p = pressured ? p + PRESSURE_GUARD * (1.0 + smart()) * level.reactGuard : p * CALM_HABIT_SCALE;
+        // Aprende: ele tem acertado golpes de chão nela de perto (rápidos demais para defender
+        // reagindo, como a rasteira): ela passa a esperar defendendo no alcance dele.
+        if (seen.grounded) p += APRENDE_GUARDA * Math.min(1.0, leitura.cutucadas() / APRENDE_CUTUCADAS) * smart();
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
         // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.
@@ -1772,10 +1815,24 @@ final class AiController {
         return true;
     }
 
-    /** Chance de defender agachada (por hábito, ou o golpe do meio): sobe com o nível. */
+    /**
+     * Chance de defender agachada (por hábito, ou o golpe do meio): sobe com o nível. Aprende a
+     * altura dele: quem só dá rasteira ela defende baixo; quem só bate alto, em pé.
+     */
     private double habitLow() {
-        return HABIT_LOW + (0.95 - HABIT_LOW) * smart();
+        double base = HABIT_LOW + (0.95 - HABIT_LOW) * smart();
+        double baixa = leitura.parteBaixa();
+        if (baixa < 0.0) return base;
+        double w = leitura.pesoBaixo() * smart();
+        return Math.max(0.05, Math.min(0.97, base * (1.0 - w) + baixa * w));
     }
+
+    /** Pulos dele que chegaram nela até a chance de tirar do ar ir ao máximo do nível. */
+    static final double APRENDE_PULOS = 3.0;
+    /** Golpes de chão dele que entraram nela até a defesa por hábito ir ao máximo. */
+    static final double APRENDE_CUTUCADAS = 4.0;
+    /** O quanto a defesa por hábito sobe com o que ele tem acertado de perto. */
+    static final double APRENDE_GUARDA = 0.45;
 
     /** Plano da última decisão do neutro: entrar andando no alcance do jab do rival. */
     private boolean walkInPlan = true;
@@ -2024,6 +2081,22 @@ final class AiController {
         return punirComOMelhor(me, target, left, gap, seen.crouching, out, "punir");
     }
 
+    /** Um sorteio por pulo dele: vai tirar do ar? (a chance do nível, mais o que ela aprendeu). */
+    private void decidirAntiAereo(CombatFighter me, CpuPerception.Snapshot seen) {
+        if (seen.jumpSerial == lastAntiAirSerial) return;
+        lastAntiAirSerial = seen.jumpSerial;
+        if (me.character().attack("2H") == null) {
+            antiAirPlan = false;
+            return;
+        }
+        boolean coming = (me.x - seen.x) * seen.vx > 0f || Math.abs(seen.x - me.x) < 200f;
+        // Aprende: os pulos dele que chegaram nela puxam a chance para cima (o quanto, pelo nível).
+        double aprendido = Math.min(1.0, leitura.pulosNela() / APRENDE_PULOS);
+        double chance = level.antiAir + (0.97 - level.antiAir) * aprendido * smart();
+        antiAirPlan = coming && roll(antiAereoLido > 0 ? Math.max(chance, 0.95) : chance);
+        antiAirSpecial = antiAirPlan && specialRandom.nextDouble() < SPECIAL_ANTI_AIR_SHARE;
+    }
+
     /**
      * Viu o rival pular para cima dela: com a chance do nível, espera ele chegar (pela trajetória
      * que viu) e sobe com o 2H, que lança e começa o combo aéreo.
@@ -2037,14 +2110,10 @@ final class AiController {
         }
         CharacterDefinition c = me.character();
         if (c.attack("2H") == null) return false;
-        if (seen.jumpSerial != lastAntiAirSerial) {
-            lastAntiAirSerial = seen.jumpSerial;
-            boolean coming = (me.x - seen.x) * seen.vx > 0f || Math.abs(seen.x - me.x) < 200f;
-            antiAirPlan = coming && roll(antiAereoLido > 0 ? Math.max(level.antiAir, 0.95) : level.antiAir);
-            antiAirSpecial = antiAirPlan && specialRandom.nextDouble() < SPECIAL_ANTI_AIR_SHARE;
-        }
+        decidirAntiAereo(me, seen);
         if (!antiAirPlan) return false;
-        // Onde ele está agora pelo que ela viu: a trajetória do pulo é previsível.
+        // Onde ele está agora pelo que ela viu: a trajetória do pulo é previsível. (Contar também o
+        // início do 2H foi testado e piorou: 02/11, docs/balanco/voadora-rasteira.md.)
         float t = reacao * CombatConfig.DT;
         float x = seen.x + seen.vx * t;
         float y = seen.y + seen.vy * t + 0.5f * engine.config.gravity * t * t;

@@ -63,6 +63,34 @@ final class CpuLeitura {
     private final double[][] valorMeio = new double[Faixa.values().length][PlanoMeio.values().length];
     private final double[][] vezesMeio = new double[Faixa.values().length][PlanoMeio.values().length];
 
+    // Como ele entra nela (pedido do jogador, 02/11: "ganhei só com voadora e rasteira, ele tomou
+    // todas"): os golpes de chão dele que chegaram (acertando ou defendidos), quantos eram baixos e
+    // quantos entraram; e os pulos dele que chegaram nela.
+    private double golpesChao, golpesBaixos, cutucadasLevadas, pulosNela;
+
+    /** Um golpe de chão dele chegou nela ({@code baixo}: rasteira; {@code acertou}: não defendeu). */
+    void golpeDeChao(boolean baixo, boolean acertou) {
+        golpesChao = golpesChao * ESQUECE + 1.0;
+        golpesBaixos = golpesBaixos * ESQUECE + (baixo ? 1.0 : 0.0);
+        cutucadasLevadas = cutucadasLevadas * ESQUECE + (acertou ? 1.0 : 0.0);
+    }
+
+    /** A parte baixa dos golpes de chão dele (−1 sem nenhum visto) e o quanto confiar (0 a 1). */
+    double parteBaixa() { return golpesChao <= 0.0 ? -1.0 : golpesBaixos / golpesChao; }
+
+    double pesoBaixo() { return Math.min(1.0, golpesChao / OBSERVACOES_CHEIAS); }
+
+    /** Golpes de chão dele que entraram (com o esquecimento): quanto ele tem acertado de perto. */
+    double cutucadas() { return cutucadasLevadas; }
+
+    /** Um pulo dele chegou nela (acertou ou ela defendeu). */
+    void puloNela() { pulosNela = pulosNela * ESQUECE + 1.0; }
+
+    /** Ela tirou o pulo dele do ar: a lembrança dos pulos que chegaram esmaece um pouco. */
+    void tirouDoAr() { pulosNela *= ESQUECE; }
+
+    double pulosNela() { return pulosNela; }
+
     private static void soma(double[] valor, double[] vezes, int i, double r) {
         double antes = vezes[i] * ESQUECE;
         valor[i] = (valor[i] * antes + r) / (antes + 1.0);
@@ -143,6 +171,10 @@ final class CpuLeitura {
 
     /** Começo de uma luta nova contra o mesmo jogador: a memória fica, mais fraca. */
     void novaLuta() {
+        golpesChao *= ENTRE_LUTAS;
+        golpesBaixos *= ENTRE_LUTAS;
+        cutucadasLevadas *= ENTRE_LUTAS;
+        pulosNela *= ENTRE_LUTAS;
         for (double[] c : conta) for (int i = 0; i < c.length; i++) c[i] *= ENTRE_LUTAS;
         for (int i = 0; i < falhas.length; i++) {
             falhas[i] *= ENTRE_LUTAS;

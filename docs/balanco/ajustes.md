@@ -1475,3 +1475,15 @@ Kōga criança passava por cima).
 1. Golpes, pulos, IA, tempo e efeitos da luta desaceleram juntos. Os quadros de cada golpe, o
 motor e as simulações não mudam (eles contam quadros, não segundos). Menus, história e
 cinemáticas seguem na velocidade normal.
+
+## Ritmo 92% e a CPU contra voadora e rasteira (pedido do jogador, 02/11)
+
+- **Ritmo:** os 100% da VELOCIDADE rodam a 92% do original (era 95%).
+- **Motor:** o alcance extra do golpe no ar contra quem está no chão vale só descendo. Subindo,
+  o chute logo na decolagem acertava no 6º–8º quadro do pulo.
+- **CPU:**
+  - o antiaéreo é decidido antes da defesa do pulo; antes, ele quase nunca era tentado;
+  - ela aprende a altura dos seus golpes de chão, o quanto você acerta de perto e o quanto você
+    entra de pulo;
+  - contra quem repete a rasteira ou o pulo, ela usa os planos de meia distância que aprendem.
+- **Detalhes:** `voadora-rasteira.md`.

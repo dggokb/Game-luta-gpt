@@ -21,7 +21,10 @@ public class PressaDoTempoTest {
     @Test public void aHurriedCpuAttacksMoreAndWaitsLess() {
         int[] calm = fight(-1), hurried = fight(5);
         assertTrue("ataca mais: " + calm[0] + " → " + hurried[0], hurried[0] > calm[0]);
-        assertTrue("bate mais: " + calm[1] + " → " + hurried[1], hurried[1] > calm[1]);
+        // O dano não sobe mais com certeza: a CPU com pressa pula mais para entrar e, com o
+        // antiaéreo funcionando (02/11: a defesa do pulo saía antes e o 2H quase nunca era
+        // tentado), a calma tira esses pulos do ar. Ela não pode bater muito menos.
+        assertTrue("não bate muito menos: " + calm[1] + " → " + hurried[1], hurried[1] > calm[1] * 9 / 10);
         assertTrue("fica menos defendendo: " + calm[2] + " → " + hurried[2], hurried[2] < calm[2]);
     }
 
