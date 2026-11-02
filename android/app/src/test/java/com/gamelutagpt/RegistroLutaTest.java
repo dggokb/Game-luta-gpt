@@ -32,6 +32,22 @@ public class RegistroLutaTest {
         assertTrue(lutas[0].pulos[0] + lutas[0].pulos[1] > 0);
     }
 
+    /** No arcade o motor segue contando de uma luta para a outra: o registro conta do começo de cada luta. */
+    @Test public void oTempoComecaDoZeroEmCadaLuta() {
+        BateriaBalanco.Luta l = new BateriaBalanco.Luta(new String[] {"p02"}, new String[] {"p09"}, 5, 7, new CombatConfig());
+        for (int i = 0; i < 600; i++) l.passo();
+        RegistroLuta r = new RegistroLuta();
+        r.comecar("segunda luta");
+        for (int i = 0; i < 120; i++) {
+            l.passo();
+            r.quadro(l.e, l.flow, l.in[0], l.ai[1].lastReason);
+        }
+        String t = r.exportar("x");
+        assertTrue(t, t.contains("\n   0.02  "));
+        assertTrue(t, t.contains("\n   2.00  ~  vidas"));
+        assertFalse(t, t.contains("  10.0"));
+    }
+
     @Test public void guardaAsUltimasLutas() {
         RegistroLuta r = new RegistroLuta();
         for (int i = 0; i < RegistroLuta.LUTAS_GUARDADAS + 3; i++) {

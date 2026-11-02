@@ -32,6 +32,8 @@ final class RegistroLuta {
     private final boolean[] pulou = new boolean[2], noChao = {true, true};
     private boolean fechada = true;
     private int quadros;
+    /** Quadro do motor no início da luta (o motor segue contando de uma luta do arcade para a outra). */
+    private int inicio = -1;
 
     /** Começa uma luta nova ({@code cabecalho}: modo, nível, personagens...). */
     void comecar(String cabecalho) {
@@ -47,13 +49,16 @@ final class RegistroLuta {
         noChao[0] = noChao[1] = true;
         fechada = false;
         quadros = 0;
+        inicio = -1;
     }
 
     /** Um quadro da luta, depois do passo do motor. */
     void quadro(CombatEngine e, BattleFlow flow, FighterInput jogador, String razaoCpu) {
         if (atual == null || fechada) return;
         quadros++;
-        String t = String.format(Locale.ROOT, "%7.2f", e.frame() / 60.0);
+        if (inicio < 0) inicio = e.frame() - 1;
+        int agora = e.frame() - inicio;
+        String t = String.format(Locale.ROOT, "%7.2f", agora / 60.0);
         if (jogador != null) entradas(t, e.fighter(0), jogador);
         for (int s = 0; s < 2; s++) {
             CombatFighter f = e.fighter(s);
@@ -79,7 +84,7 @@ final class RegistroLuta {
             razao = razaoCpu;
             linha(t, "CPU", "pensa: " + razaoCpu);
         }
-        if (e.frame() % 60 == 0) {
+        if (agora % 60 == 0) {
             FighterState a = e.fighter(0).state, b = e.fighter(1).state;
             linha(t, "~", String.format(Locale.ROOT, "vidas %d × %d  barras %.1f × %.1f  SHINKAI %s × %s  dist %.0f",
                 a.life, b.life, a.superBars(), b.superBars(), shinkai(a), shinkai(b),
