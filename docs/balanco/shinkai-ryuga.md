@@ -380,3 +380,52 @@ aí sim entra o texto de SHINKAI, aí sai, e aí ele termina a ação com o drag
   - Depois o vídeo segue com o dragão.
 - **Pausa:** a pausa inteira passa a 3,7 s, e a `SHINKAI_ATIVA` de reserva foi esticada junto.
 - **Sem marca:** um efeito sem `marcaMs` mantém o corte no começo, como antes.
+
+### Retrato antes da próxima mudança: Ryūga × Ryūga, SHINKAI sem Clash (02/11)
+
+Pedido do jogador antes de mexer no SHINKAI de novo. A bateria é `BateriaEspelhoShinkai`: 300
+lutas CPU × CPU por nível, com SHINKAI (sem Clash) e sem SHINKAI, com as mesmas sementes. As
+tabelas completas estão em `perfis/espelho-ryuga-shinkai.md`. Os números abaixo são do nível 8,
+com o nível 5 entre parênteses.
+
+**Luta**
+- Dura 43,5 s com SHINKAI e 40,7 s sem (37,3 e 33,4). Termina sempre em KO.
+- O vencedor sobra com 55% da vida (42% sem). Há mais viradas: 30% contra 22% (36% contra 20%).
+
+**Barra**
+- Enche em uns 12 s, para todos.
+- Em 30% dos lados ela enche e não é usada (47% no nível 5).
+- Liga em média 1,48 vez por luta (1,08). Os dois ligam em 43% das lutas.
+
+**Quando liga**
+- Por volta de 20–24 s de luta, com 58% da vida contra 61% do rival; em 57% das vezes está atrás.
+- Dura 13,8 s, um terço da luta. Há alguém no SHINKAI em 47% do tempo.
+
+**Como acaba**
+
+| fim | parte dos SHINKAIs |
+|---|---|
+| ele derruba o rival dentro | 41% |
+| no limite do corpo | 26% |
+| depois da Ruptura | 18% |
+| desligado por ele | 14% |
+| ele cai dentro | 2% |
+
+**Força**
+- Dentro, dá 381 de dano por s (fora, 236) e leva 157 por s (fora, 304).
+- Saldo de +3.100 por SHINKAI: 31% da vida.
+
+**Quem liga**
+- Só um ligou: ele vence 89%.
+- Quem liga primeiro vence 62% (70%).
+- 60% das lutas terminam com o vencedor no SHINKAI.
+
+**Dentro do SHINKAI**
+- Por SHINKAI: 0,58 leituras, 0,53 golpes precisos, 0,09 esquivas e 0,33 Rupturas.
+- O Super sobe de 1,4 para 3,1 por minuto. A Onda cai de 19 para 13 por minuto, e os pulos
+  dobram.
+- Combos com 2,9 golpes em média (2,4 fora) e 2.261 de dano por combo (1.460 sem SHINKAI).
+
+**Fora**
+- A Onda é o golpe da luta: 19 por minuto de cada lado.
+- O agarrão quase não aparece (0,38 por luta), e não há guard break.
