@@ -65,6 +65,11 @@ em GIF, com a origem marcada em vermelho, em `android/app/build/sprite-review/ef
 
 ## Efeitos desenhados em código (anidoodle)
 
+**Tirados do jogo (02/11):** testados no celular e não ficaram bons; as 12 folhas saíram de
+`assets/efeitos/` e o jogo voltou aos efeitos clássicos. O código continua em
+`tools/sprites/efeitos_codigo/` e o conversor segue aceitando pasta de PNGs; para voltar um
+efeito, basta gerar a folha de novo (comandos abaixo).
+
 Outro jeito de fazer o efeito: desenhar em código com o
 [anidoodle](https://github.com/alexgreensh/anidoodle) (Apache-2.0). O mesmo código gera sempre os
 mesmos quadros e dá para ajustar um detalhe sem mudar o resto. O código de cada efeito fica em
