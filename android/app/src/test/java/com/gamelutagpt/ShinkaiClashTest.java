@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * SHINKAI Clash: ligar o SHINKAI com o rival já no dele vira um cabo de guerra jogável; cada
  * tipo empurra de um jeito, quem leva a marca até o fim (ou está na frente no fim do tempo)
- * acerta forte e fica com o SHINKAI cheio, e quem perde voa e perde o dele.
+ * acerta forte e fica com o SHINKAI cheio, e quem perde voa e segue no SHINKAI que tinha.
  */
 public class ShinkaiClashTest {
     private static final class Match {
@@ -126,6 +126,7 @@ public class ShinkaiClashTest {
         Match m = new Match("p16", "p13");
         ShinkaiClash c = m.clash();
         int life = m.cpu.life;
+        int antes = m.cpu.shinkaiFrames;
         for (int i = 0; i < 400 && m.engine.shinkaiClash() != null; i++) {
             if (i % 4 == 0) m.in[0].light = true;
             m.step();
@@ -135,7 +136,7 @@ public class ShinkaiClashTest {
         assertEquals(0, c.lado);
         assertTrue(m.engine.cues().contains("SHINKAI_CLASH_WIN"));
         assertEquals(life - m.engine.config.shinkaiClashDamage, m.cpu.life);
-        assertEquals("the loser loses its SHINKAI", 0, m.cpu.shinkaiFrames);
+        assertEquals("the loser keeps the SHINKAI it had (the clocks waited)", antes, m.cpu.shinkaiFrames, 2);
         assertEquals("the winner's is full again", m.engine.config.shinkaiFrames, m.first.shinkaiFrames);
         assertEquals(CombatFighter.Status.AIR_HITSTUN, m.f(1).status);
         assertTrue("thrown away", m.f(1).vx > 0f);

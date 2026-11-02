@@ -791,9 +791,9 @@ final class CombatEngine {
         switch (c.fim) {
             case VITORIA: {
                 CombatFighter w = fighters[c.lado], l = fighters[1 - c.lado];
-                // O golpe de quem venceu entra: dano forte, o perdedor voa girando e perde o SHINKAI.
+                // O golpe de quem venceu entra: dano forte, o perdedor voa girando (e segue no SHINKAI dele).
                 l.state.takeDamage(config.shinkaiClashDamage, config.recoverableLifePermille);
-                l.state.shinkaiFrames = 0;
+                perdeNoClash(l.state);
                 if (w.state.shinkaiType == Shinkai.Type.PERCEPCAO) recuperaNoClash(w.state);
                 else w.state.shinkaiFrames = config.shinkaiFrames;
                 int away = l.x >= w.x ? 1 : -1;
@@ -960,6 +960,29 @@ final class CombatEngine {
             s.limiteQuadros = config.ryugaLimiteJanela;
             cues.add("LIMITE");
         }
+    }
+
+    /** Perdeu o Clash: fica com {@link CombatConfig#shinkaiClashPerdedorPermille} do SHINKAI que tinha. */
+    private void perdeNoClash(FighterState s) {
+        int parte = config.shinkaiClashPerdedorPermille;
+        if (parte >= 1000 || s.shinkaiFrames <= 0) return;
+        if (parte <= 0) {
+            s.shinkaiFrames = 0;
+            return;
+        }
+        if (s.shinkaiType != Shinkai.Type.PERCEPCAO) {
+            s.shinkaiFrames = Math.max(1, s.shinkaiFrames * parte / 1000);
+            return;
+        }
+        if (s.rupturaQuadros > 0) {
+            s.rupturaQuadros = Math.max(1, s.rupturaQuadros * parte / 1000);
+            return;
+        }
+        // O fôlego que sobrava encolhe na mesma parte.
+        int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
+        s.limiteQuadros = 0;
+        s.sobrecarga = max - (int)((long)(max - s.sobrecarga) * parte / 1000);
+        s.shinkaiFrames = Math.max(1, (int)((long)(max - s.sobrecarga) * config.shinkaiFrames / max));
     }
 
     /** Venceu o Clash: o corpo recupera parte do fôlego (a Ruptura segue como estava). */

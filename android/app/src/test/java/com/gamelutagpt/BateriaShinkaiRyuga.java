@@ -21,21 +21,33 @@ public class BateriaShinkaiRyuga {
         long leituras, esquivas, precisos, rupturas, voluntarios, limites, reativacoes;
         long quadrosExausto, danoLevadoExausto, dor;
         long quadrosLuta, rupturasRival, leiturasRival;
-        long clashDecididos, clashVenceLuta;
+        long clashDecididos, clashVenceLuta, clashComVencedor, clashMedidoVence;
         long desgasteNoClash, clashesDoRyuga, segundosNoClash;   // o corpo dele quando o Clash começa   // quem venceu o Clash venceu a luta?
         long danoPreciso, defesas, perfeitas, golposRival;
         final Map<String, int[]> porRival = new TreeMap<>();  // rival → {vitórias, decididas}
     }
 
     static final String RYUGA = "player_base";
+    /** Quem é medido (o lado r): o Ryūga, ou cada um no modo elenco. */
+    static String medido = RYUGA;
+    /** Modo elenco: todos contra todos (os 16), para o que muda o Clash de todo mundo. */
+    static boolean elenco;
+    /** Modo perdedor: a parte do SHINKAI que o perdedor do Clash guarda, por coluna. */
+    static boolean modoPerdedor;
+    static final String[] VARIANTES_PERDEDOR = {"perdedor perde tudo (antes)", "fica com metade do que tinha", "fica com tudo (agora)",
+        "tudo, Ryūga sem Ruptura", "tudo, sem reação rápida", "antigo (ENERGY), perde tudo", "antigo (ENERGY), fica com tudo"};
+    /** Modo assinatura: (a) leitura na defesa comum, (b) contra-golpe preciso. */
+    static boolean modoAssinatura;
+    static final String[] VARIANTES_ASSINATURA = {"antigo (ENERGY)", "protótipo (hoje)", "+ (a) defesa lê", "+ (b) contra-golpe preciso", "+ (a) e (b)"};
+    static final int[] PERDEDOR = {0, 500, 1000, 1000, 1000, 0, 1000};
     static boolean semClash;
     /** Espelho: o Ryūga contra ele mesmo, os dois com o mesmo SHINKAI (o da coluna). */
     static boolean espelho;
 
     static void luta(String rival, int lado, int nivel, long semente, Est e, StringBuilder log) {
         BateriaBalanco.Luta l = new BateriaBalanco.Luta(
-            lado == 0 ? new String[] {RYUGA} : new String[] {rival},
-            lado == 0 ? new String[] {rival} : new String[] {RYUGA}, nivel, semente, new CombatConfig());
+            lado == 0 ? new String[] {medido} : new String[] {rival},
+            lado == 0 ? new String[] {rival} : new String[] {medido}, nivel, semente, new CombatConfig());
         int r = lado, o = 1 - lado;
         if (semClash) {
             // Ninguém responde o SHINKAI do outro com o seu (o Clash esconde a assinatura).
@@ -77,7 +89,7 @@ public class BateriaShinkaiRyuga {
                         e.segundosNoClash += quadrosDesdeLigou;
                     }
                 }
-                if (c.equals("SHINKAI_CLASH_WIN") && venceuClash < 0) venceuClash = l.f(0).state.inShinkai() ? 0 : 1;
+                if (c.equals("SHINKAI_CLASH_WIN") && venceuClash < 0) venceuClash = vencedorDoClash(l);
                 if (log != null && (c.equals("LEITURA") || c.equals("ESQUIVA") || c.equals("PRECISO") || c.equals("LIMITE") ||
                     c.equals("RUPTURA") || c.startsWith("SHINKAI_CLASH"))) nota(log, l, c + quem(l, c, r));
             }
@@ -121,6 +133,10 @@ public class BateriaShinkaiRyuga {
         e.rupturasRival += l.f(o).state.rupturas;
         e.leiturasRival += l.f(o).state.leituras;
         int v = l.flow.winner();
+        if (venceuClash >= 0) {
+            e.clashComVencedor++;
+            if (venceuClash == r) e.clashMedidoVence++;
+        }
         if (venceuClash >= 0 && (v == 0 || v == 1)) {
             e.clashDecididos++;
             if (v == venceuClash) e.clashVenceLuta++;
@@ -140,6 +156,12 @@ public class BateriaShinkaiRyuga {
         }
     }
 
+    /** Quem venceu o Clash neste quadro: quem acertou o golpe do Clash (o perdedor pode seguir no SHINKAI). */
+    static int vencedorDoClash(BateriaBalanco.Luta l) {
+        for (CombatEngine.HitEvent h : l.e.events()) if ("SHINKAI_CLASH".equals(h.moveId)) return h.attacker;
+        return -1;
+    }
+
     /** De quem é o aviso (os avisos do motor não dizem o lado). */
     static String quem(BateriaBalanco.Luta l, String c, int r) {
         int lado = -1;
@@ -147,7 +169,7 @@ public class BateriaShinkaiRyuga {
             FighterState s = l.f(i).state;
             boolean dele = c.equals("LIMITE") ? s.limiteQuadros > 0 : c.equals("RUPTURA") ? s.emRuptura()
                 : c.equals("LEITURA") || c.equals("ESQUIVA") ? s.precisoQuadros == l.e.config.ryugaPrecisoJanela
-                : c.equals("SHINKAI_CLASH_WIN") && s.inShinkai();
+                : c.equals("SHINKAI_CLASH_WIN") && vencedorDoClash(l) == i;
             if (dele) lado = i;
         }
         return lado < 0 ? "" : lado == r ? " (Ryūga medido)" : " (rival)";
@@ -171,6 +193,24 @@ public class BateriaShinkaiRyuga {
         java.util.function.Consumer<CombatConfig> antes = BateriaBalanco.AJUSTE_CFG;
         // Sem Ruptura: a janela do limite some antes de dar tempo de escolher (a CPU espera 12 quadros).
         if (!modoClash && (variante == 3 || variante == 4)) BateriaBalanco.AJUSTE_CFG = c -> c.ryugaLimiteJanela = 1;
+        if (modoAssinatura) {
+            AiController.percepcaoReage = true;
+            boolean la = variante == 2 || variante == 4, lb = variante == 3 || variante == 4;
+            BateriaBalanco.AJUSTE_CFG = c -> {
+                if (la) c.ryugaLeituraLeveAbre = 14;
+                c.ryugaContraPreciso = lb;
+            };
+        }
+        if (modoPerdedor) {
+            AiController.percepcaoReage = variante != 4;
+            Shinkai.prototipoDesligado = variante >= 5;
+            int parte = PERDEDOR[variante];
+            boolean semRuptura = variante == 3;
+            BateriaBalanco.AJUSTE_CFG = c -> {
+                c.shinkaiClashPerdedorPermille = parte;
+                if (semRuptura) c.ryugaLimiteJanela = 1;
+            };
+        }
         if (modoClash) {
             AiController.percepcaoReage = true;
             int folego = FOLEGOS[variante];
@@ -179,6 +219,16 @@ public class BateriaShinkaiRyuga {
         Est e = new Est();
         int k = 0;
         try {
+            if (elenco) {
+                // Os 16 todos contra todos, 2 lutas por par (uma de cada lado).
+                for (String a : BateriaBalanco.ELENCO) for (String b : BateriaBalanco.ELENCO) {
+                    if (a.equals(b)) continue;
+                    medido = a;
+                    for (int i = 0; i < 2; i++, k++) luta(b, i, nivel, 77_000 + k, e, null);
+                }
+                medido = RYUGA;
+                return e;
+            }
             for (String rival : espelho ? new String[] {RYUGA} : BateriaBalanco.ELENCO) {
                 if (rival.equals(RYUGA) && !espelho) continue;
                 if (espelho) n *= 15;   // o mesmo tanto de lutas que contra os 15
@@ -209,10 +259,16 @@ public class BateriaShinkaiRyuga {
         espelho = Arrays.asList(args).contains("espelho");
         modoClash = Arrays.asList(args).contains("clash");
         if (modoClash) VARIANTES = VARIANTES_CLASH;
+        modoPerdedor = Arrays.asList(args).contains("perdedor");
+        if (modoPerdedor) VARIANTES = VARIANTES_PERDEDOR;
+        elenco = Arrays.asList(args).contains("elenco");
+        modoAssinatura = Arrays.asList(args).contains("assinatura");
+        if (modoAssinatura) VARIANTES = VARIANTES_ASSINATURA;
         Est[] v = new Est[VARIANTES.length];
         for (int i = 0; i < v.length; i++) v[i] = rodar(i, n, nivel);
         System.out.println("# SHINKAI do Ryūga: protótipo (PERCEPÇÃO) × antigo (ENERGY)");
         System.out.println();
+        if (elenco) System.out.printf(Locale.ROOT, "**Elenco:** os 16 todos contra todos, 2 lutas por par (%d lutas por coluna); as medidas \"dele\" são do lado medido.%n%n", 16 * 15 * 2);
         if (espelho) System.out.printf(Locale.ROOT, "**Espelho:** o Ryūga contra ele mesmo, os dois com o SHINKAI da coluna (%d lutas por coluna).%n%n", n * 15);
         System.out.printf(Locale.ROOT, "CPU nível %d dos dois lados, 1x1, o Ryūga contra os 15 (%d lutas cada, metade de cada lado),"
             + " as mesmas sementes em todas as colunas. O rival usa o SHINKAI antigo do tipo dele.%s%n%n", nivel, n,
@@ -228,8 +284,10 @@ public class BateriaShinkaiRyuga {
             linha("Rupturas por luta (os dois lados)", v, e -> porLuta(e.rupturas + e.rupturasRival, e));
             linha("leituras por luta (os dois lados)", v, e -> porLuta(e.leituras + e.leiturasRival, e));
         } else {
-            linha("Ryūga vence", v, e -> pc(e.vitorias, e.decididas));
+            linha(elenco ? "lado medido vence (todos contra todos: ~50%)" : "Ryūga vence", v, e -> pc(e.vitorias, e.decididas));
+            linha("duração média da luta (s)", v, e -> String.format(Locale.ROOT, "%.1f", e.quadrosLuta / 60.0 / Math.max(1, e.lutas)));
             linha("quem vence o Clash vence a luta", v, e -> e.clashDecididos == 0 ? "–" : pc(e.clashVenceLuta, e.clashDecididos));
+            linha(elenco ? "o lado medido vence o Clash" : "o Ryūga vence o Clash", v, e -> e.clashComVencedor == 0 ? "–" : pc(e.clashMedidoVence, e.clashComVencedor));
         }
         linha("Clash: desgaste do Ryūga quando começa (s desde que ele ligou)", v, e -> e.clashesDoRyuga == 0 ? "–"
             : String.format(Locale.ROOT, "%.0f%% (%.1f s)", 100.0 * e.desgasteNoClash / e.clashesDoRyuga / CombatConfig.RYUGA_SOBRECARGA_MAX,

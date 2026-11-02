@@ -115,8 +115,10 @@ Clash**: um cabo de guerra jogável no meio da tela, sem QTE (`ShinkaiClash` no 
 - **Desistir.** Segurar **trás** por meio segundo sai do confronto **sem dano**, mas **perde o
   SHINKAI**; o outro segue no dele.
 - **Fim.** Quem leva a marca até o fim (`META` = 600), ou está na frente quando o tempo acaba,
-  **vence**: o golpe dele entra (`shinkaiClashDamage` = 2000), quem perdeu voa girando e **perde o
-  SHINKAI**, e o SHINKAI de quem venceu **volta cheio** (8 s de novo). Empate exato: os dois se
+  **vence**: o golpe dele entra (`shinkaiClashDamage` = 2000), quem perdeu voa girando e **segue no
+  SHINKAI que tinha** (`shinkaiClashPerdedorPermille` = 1000; até 01/11 perdia o SHINKAI), e o
+  SHINKAI de quem venceu **volta cheio** (8 s de novo). Perdendo tudo, quem vencia o Clash vencia
+  72% das lutas; agora, 61% (`balanco/shinkai-ryuga.md`). Empate exato: os dois se
   afastam e seguem no SHINKAI.
 - **Na tela.** A tela escurece com linhas de velocidade saindo do encontro, cada metade puxando
   para a cor de quem está daquele lado. Cada um empurra com o visual do tipo até o encontro (o

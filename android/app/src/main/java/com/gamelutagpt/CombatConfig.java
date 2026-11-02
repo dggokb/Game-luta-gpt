@@ -575,6 +575,13 @@ final class CombatConfig {
      * Quem vence acerta este dano e fica com o SHINKAI cheio; quem perde voa e perde o dele.
      */
     int shinkaiClashDamage = 2000;
+    /**
+     * O perdedor do Clash fica com esta parte (por mil) do SHINKAI que tinha (0 = perde tudo, como
+     * era até 01/11; 1000 = o SHINKAI segue, pedido do jogador: "perder o Clash não deveria desativar
+     * o SHINKAI"). No protótipo do Ryūga, o desgaste fica como estava. Perdendo tudo, quem vencia o
+     * Clash vencia 70–78% das lutas (docs/balanco/shinkai-ryuga.md).
+     */
+    int shinkaiClashPerdedorPermille = 1000;
     /** A distância entre os dois no confronto. */
     float shinkaiClashGap = 300f;
 
