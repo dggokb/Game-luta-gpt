@@ -236,6 +236,22 @@ final class ImpactFeel {
     /** Alfa do clarão branco do KO (na frente de tudo no mundo). */
     int flashAlpha() { return Math.round(flash); }
 
+    /**
+     * A câmera lenta anda um pouco mais rápida que a escala dela (pedido do jogador, 02/11: com o
+     * ritmo de 92% os slow motions ficaram lerdos demais). O ritmo base não entra nela.
+     */
+    static final float LENTA_ACELERA = 1.15f;
+
+    /**
+     * Velocidade do relógio da luta: a VELOCIDADE da pausa × o ritmo base fora da câmera lenta;
+     * na câmera lenta, a escala dela × {@link #LENTA_ACELERA} (sem o ritmo base), nunca mais rápida
+     * que a luta normal.
+     */
+    static float relogio(float velocidade, float ritmo, float lenta) {
+        if (lenta >= 1f) return velocidade * ritmo;
+        return velocidade * Math.min(ritmo, lenta * LENTA_ACELERA);
+    }
+
     /** Velocidade do relógio da luta: abaixo de 1 na câmera lenta do KO. */
     float timeScale() {
         float scale = slowFrames > 0 ? slowScale : 1f;

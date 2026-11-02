@@ -1520,3 +1520,16 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   - o jM cedo entra mais (51% → 67%), porque ela troca em vez de defender;
   - CPU × CPU igual.
 - **Detalhes:** `registro-luta.md`.
+
+## Câmera lenta 25% mais rápida e botão do topo sempre MENU (pedido do jogador, 02/11)
+
+- **Câmera lenta** (KO, Ultra, breaker, finalização, cinemáticas):
+  - não leva mais o ritmo base de 92%;
+  - anda a 1,15 × a escala dela;
+  - no total fica 25% mais rápida que antes. A luta normal segue a 92%.
+  - Detalhes: `ritmo.md`.
+- **Botão do topo:**
+  - no MODO TESTE ele era "◀ SELEÇÃO", e pelo toque não havia como abrir a pausa nem ENVIAR
+    REGISTRO;
+  - agora é "◀ MENU" (a pausa) em todo modo;
+  - a seleção de dupla do teste continua no botão DUPLA e no SELECT do controle.

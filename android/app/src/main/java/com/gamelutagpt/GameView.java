@@ -318,9 +318,13 @@ public class GameView extends SurfaceView
      * Falso no MODO TESTE (inclusive na história tocada pelo botão HISTÓRIA de teste).
      */
     private boolean storyMode;
-    /** Texto do botão do topo da luta: "◀ SELEÇÃO" no teste, "◀ MENU" na história. */
-    private String selectButtonLabel = SELECT_LABEL;
-    private static final String SELECT_LABEL = "◀ SELEÇÃO";
+    /**
+     * Texto do botão do topo da luta. Ele abre a pausa em todo modo (pedido do jogador, 02/11: no MODO TESTE ele era a
+     * SELEÇÃO e não havia como abrir a pausa pelo toque, nem ENVIAR REGISTRO). A seleção de dupla
+     * do teste fica no botão DUPLA e no SELECT do controle.
+     */
+    private String selectButtonLabel = MENU_LABEL;
+    private static final String MENU_LABEL = "◀ " + MenuPausa.MENU;
     /** A última escolha da seleção no modo teste (titular, parceiro, CPU, parceiro do CPU). */
     private String[] testPicks = {"player_base", "p02", "p03", "p04"};
     /** Cenário da luta de teste, escolhido no painel embaixo da grade da seleção. */
@@ -1753,9 +1757,11 @@ public class GameView extends SurfaceView
                 feel.slow(FinalizacaoManga.LENTA_QUADROS, FinalizacaoManga.LENTA_ESCALA);
                 beamShake = Math.max(beamShake, FinalizacaoManga.TREMIDA);
             }
-            finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade() * RITMO_BASE);
+            // O quadro de mangá do K.O. é câmera lenta: anda como ela (sem o ritmo base).
+            finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade() *
+                (finalizacao.ativo() ? ImpactFeel.LENTA_ACELERA : RITMO_BASE));
         }
-        float speed = fightClockRunning() ? pausa.velocidade() * RITMO_BASE * feel.timeScale() : 1f;
+        float speed = fightClockRunning() ? ImpactFeel.relogio(pausa.velocidade(), RITMO_BASE, feel.timeScale()) : 1f;
         // No máximo 3 passos por quadro: depois de um engasgo, 6 passos de uma vez (motor, IA e
         // visual) faziam o quadro seguinte engasgar também. O jogo atrasa um pouco em vez disso.
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.05f) * speed;
@@ -6107,12 +6113,8 @@ public class GameView extends SurfaceView
                     debugOverlay = !debugOverlay;
                     break;
                 case CHARACTER_SELECT:
-                    // No modo história o botão do topo é o MENU (pausa), não a seleção de teste.
-                    if (storyMode) {
-                        openPause();
-                    } else {
-                        openCharacterSelect();
-                    }
+                    // O botão do topo é o MENU (a pausa) em todo modo; a seleção do teste é o DUPLA.
+                    openPause();
                     break;
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
@@ -6277,7 +6279,7 @@ public class GameView extends SurfaceView
         arcadeMode = false;
         arcadeSelectPending = false;
         ai.setLevel(pausa.nivelCpu());
-        selectButtonLabel = SELECT_LABEL;
+        selectButtonLabel = rotuloMenu();
         tutorial.stop();
         descarregarConversa();
         pausa.fechar();
@@ -6454,7 +6456,7 @@ public class GameView extends SurfaceView
      */
     private void startTestMode() {
         storyMode = false;
-        selectButtonLabel = SELECT_LABEL;
+        selectButtonLabel = rotuloMenu();
         historia.setBotaoMenu(false);
         // Treino (IA OFF) no cenário padrão; o botão IA liga o modo batalha.
         setOpponentAiEnabled(false);
@@ -6465,6 +6467,11 @@ public class GameView extends SurfaceView
     }
 
     /** Pausa (MENU ou voltar) por cima da página ou da luta. Não abre no meio de um ultra. */
+    /** "◀ MENU" no idioma da temporada (sem ela, em português). */
+    private String rotuloMenu() {
+        return temporada != null ? "◀ " + temporada.t(MenuPausa.MENU) : MENU_LABEL;
+    }
+
     private void openPause() {
         if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
         loadTemporada();
@@ -7209,7 +7216,9 @@ public class GameView extends SurfaceView
             cinematicaPassada = 0f;
             return false;
         }
-        cinematicaPassada += velocidade;
+        // A luta anda no ritmo base (cada passo já demora 1/0,92): a câmera lenta da cena não
+        // fica ainda mais lenta por isso, e anda um pouco mais rápida (como a do KO).
+        cinematicaPassada += Math.min(1f, velocidade * ImpactFeel.LENTA_ACELERA / RITMO_BASE);
         if (cinematicaPassada >= 1f) {
             cinematicaPassada -= 1f;
             return false;

@@ -71,3 +71,26 @@ reagíveis passam de 36 para 39.
 ```
 gradle -q -I <init com rodarBateria> :pc:rodarBateria -Dclasse=com.gamelutagpt.BateriaRitmo "-Dargs=300"
 ```
+
+## Câmera lenta mais rápida (pedido do jogador, 02/11)
+
+"Agora que diminuímos a velocidade, os slow motions também ficaram mais lerdos, deixando tudo
+muito lerdo."
+- **O que acontecia:** o ritmo de 92% multiplicava também a câmera lenta. KO, último golpe do
+  Ultra, combo breaker, quadro de mangá da finalização e câmera lenta das cinemáticas ficaram 8,7%
+  mais longos.
+- **Agora:**
+  - a câmera lenta não leva o ritmo base;
+  - ela anda a 1,15 × a escala dela (`ImpactFeel.LENTA_ACELERA`), sem passar da velocidade da luta
+    normal;
+  - o quadro de mangá da finalização também anda a 1,15.
+
+| câmera lenta | escala | duração antes (com 92%) | agora |
+|---|---|---|---|
+| K.O. (42 quadros) | 0,35 | 2,17 s | 1,74 s |
+| último golpe do Ultra (30 quadros) | 0,40 | 1,36 s | 1,09 s |
+| combo breaker (36 quadros) | 0,50 | 1,30 s | 1,04 s |
+| finalização de mangá (54 quadros) | 0,30 | 3,26 s | 2,61 s |
+
+Ou seja, 25% mais rápidas que antes deste ajuste e 15% mais rápidas que antes do ritmo de 92%. A
+luta normal segue a 92%.

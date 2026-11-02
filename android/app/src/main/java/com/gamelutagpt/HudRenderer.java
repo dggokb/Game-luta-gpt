@@ -66,7 +66,7 @@ final class HudRenderer {
         /** Tutorial ou luta com conversa: o canto dos botões de teste é dos quadros laterais. */
         default boolean hideTestButtons() { return tutorialActive(); }
         /** Botão do topo da luta: a seleção no modo teste, o MENU (pausa) no modo história. */
-        default String selectButtonLabel() { return "◀ SELEÇÃO"; }
+        default String selectButtonLabel() { return "◀ MENU"; }
         /** Botão do motor de animação (nível ou OFF), ou null para não mostrar. */
         default String animacaoLabel() { return null; }
         /** Rótulo do botão {@code i} da coluna de DESEMPENHO (null: a coluna não aparece). */

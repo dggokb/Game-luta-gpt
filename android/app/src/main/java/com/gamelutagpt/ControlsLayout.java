@@ -127,7 +127,7 @@ final class ControlsLayout {
     static final float TUTORIAL_SKIP_RIGHT = 940f;
     static final float TUTORIAL_SKIP_BOTTOM = 236f;
 
-    // SELEÇÃO: back to the character select (top center).
+    // MENU (top center): opens the pause in every mode (the test's team select is DUPLA).
     static final float SELECT_BUTTON_LEFT = 565f;
     static final float SELECT_BUTTON_TOP = 112f;
     static final float SELECT_BUTTON_RIGHT = 715f;

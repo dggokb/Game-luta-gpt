@@ -155,4 +155,15 @@ public class ImpactFeelTest {
         assertTrue(wall.zoom() < launcher.zoom());
         assertTrue("still a close-up", wall.zoom() > 1f);
     }
+
+    /** A câmera lenta não sofre o ritmo base e anda um pouco mais rápida que a escala dela. */
+    @Test public void aCameraLentaNaoFicaMaisLentaComORitmo() {
+        assertEquals(0.92f, ImpactFeel.relogio(1f, 0.92f, 1f), 1e-6f);
+        assertEquals(0.92f * 0.9f, ImpactFeel.relogio(0.9f, 0.92f, 1f), 1e-6f);
+        // KO a 0,35: anda a 0,35 × 1,15, mais rápido que os 0,35 × 0,92 de antes.
+        assertEquals(0.35f * ImpactFeel.LENTA_ACELERA, ImpactFeel.relogio(1f, 0.92f, 0.35f), 1e-6f);
+        assertTrue(ImpactFeel.relogio(1f, 0.92f, 0.35f) > 0.35f * 0.92f);
+        // Nunca mais rápida que a luta normal.
+        assertEquals(0.92f, ImpactFeel.relogio(1f, 0.92f, 0.9f), 1e-6f);
+    }
 }
