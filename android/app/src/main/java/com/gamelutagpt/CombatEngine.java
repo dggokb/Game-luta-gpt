@@ -2279,10 +2279,15 @@ final class CombatEngine {
         return fighters[1 - f.index].pushFramesLeft > 0 || breakerFar(f);
     }
 
-    /** Ainda fora do alcance do L: a corrida anda. */
+    /**
+     * Ainda fora do alcance do L: a corrida anda. Os corpos encostam pela caixa de empurrão (mais
+     * larga que a de acerto em boa parte do elenco); sem contar isso a corrida ficava "correndo"
+     * encostada, e o golpe apertado esperava ela acabar (p05, p07, p09, p14 e p15 não emendavam).
+     */
     private boolean breakerFar(CombatFighter f) {
         CombatFighter other = fighters[1 - f.index];
-        float close = f.body().halfWidth + other.body().halfWidth + config.comboBreakerCloseGap;
+        float close = Math.max(f.body().halfWidth + other.body().halfWidth + config.comboBreakerCloseGap,
+            f.body().pushHalfWidth + other.body().pushHalfWidth + 4f);
         return Math.abs(other.x - f.x) > close;
     }
 

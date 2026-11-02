@@ -475,8 +475,10 @@ final class CombatConfig {
      * dava um troco garantido de ~1300 (mais que o dano que a quebra evitava). 20 ainda deixava um L
      * de graça em quase toda quebra (o empurrão de 170 px cabe no alcance do L correndo). 4 (H1): ele
      * se recompõe antes de quem quebrou alcançar; o troco que sobra é oportunista (docs/balanco/ajustes.md).
+     * 32 (pedido do jogador, 02/11: "o adversário não é atordoado e não dá para emendar"): a corrida
+     * chega e o combo entra (troco garantido de 45–100% conforme o personagem; 40 e 48 dão o mesmo).
      */
-    int comboBreakerStunFrames = 4;
+    int comboBreakerStunFrames = 32;
     int comboBreakerHitstopFrames = 16;
     /** O estalo joga quem batia até esta folga do corpo de quem quebrou: longe, só correndo (era 170). */
     float comboBreakerPushGap = 230f;

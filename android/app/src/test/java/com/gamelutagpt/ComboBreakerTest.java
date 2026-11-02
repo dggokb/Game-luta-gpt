@@ -107,7 +107,8 @@ public class ComboBreakerTest {
 
     /**
      * O estalo joga quem batia para longe (arrastando o pé) e quem quebrou corre sozinho até ele
-     * (sem → →), parando ao alcance do L. Quem batia se recompõe antes de a corrida chegar.
+     * (sem → →), parando ao alcance do L. Quem batia ainda está atordoado quando a corrida chega
+     * (pedido do jogador, 02/11: o atordoamento de 4 quadros não deixava emendar).
      */
     @Test public void theBreakerThrowsTheAttackerAwayAndTheBreakerDashesAfterHim() {
         Match m = new Match();
@@ -134,7 +135,7 @@ public class ComboBreakerTest {
             Math.abs(m.f(1).x - breakerStart) > 0.6f * config.comboBreakerPushGap);
         assertTrue("chegou ao alcance do L: " + m.gap(), m.gap() <= m.touching() + config.comboBreakerCloseGap + 12f);
         assertEquals("parou de correr", 0, m.f(1).breakerChase);
-        assertTrue("quem batia já se recompôs", m.f(0).canAct());
+        assertFalse("quem batia ainda está atordoado", m.f(0).canAct());
     }
 
     /**
@@ -156,70 +157,66 @@ public class ComboBreakerTest {
     }
 
     /**
-     * Roteiro padrão (H1): cada um dos 16 quebra o L > M > H do Ryūga e aperta cada normal de chão
-     * assim que alcança (correndo até lá); quem batia defende assim que pode. Normal que demora mais
-     * que a vantagem de quem quebrou para sair nunca entra limpo; os rápidos (L, 2L e alguns M) ainda
-     * entram na ponta do alcance (docs/balanco/ajustes.md, H1; com 20 quadros entrava quase tudo). O
-     * golpe que quem batia deixou no buffer para fechar o combo não sai sozinho depois do estalo.
+     * Roteiro padrão: cada um dos 16 quebra o L > M > H do Ryūga, corre e aperta o primeiro normal
+     * rápido (L, 2L ou M) que alcança; quem batia defende assim que pode. Com o atordoamento de 32
+     * (pedido do jogador, 02/11) a corrida chega e o troco entra limpo para quase todo o elenco
+     * (com 4 quadros, quase nunca).
      */
-    @Test public void aNormalSlowerThanTheBreakerAdvantageNeverLandsGuaranteed() {
+    @Test public void afterTheBreakerTheChaseLandsAQuickNormal() {
         String[] roster = {"player_base", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09", "p10", "p11", "p12", "p13", "p14", "p15", "p16"};
-        String[] normals = {"L", "2L", "M", "2M", "H", "2H"};
         CombatConfig config = new CombatConfig();
-        int advantage = config.comboBreakerStunFrames + 1;
-        int checked = 0;
+        int limpos = 0;
+        StringBuilder falhas = new StringBuilder();
         for (String id : roster) {
             CharacterDefinition ch = GeneratedCharacters.get(id);
-            for (String g : normals) {
-                if (ch.attack(g) == null || ch.attack(g).startupFrames <= advantage) continue;
-                checked++;
-                FighterState breaker = new FighterState(ch, "CPU");
-                breaker.superMeter = CombatConfig.METER_PER_BAR;
-                CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"), breaker, 500f, 600f, config);
-                FighterInput[] in = {new FighterInput(), new FighterInput()};
-                String[] seq = {"L", "M", "H"};
-                int k = 0;
-                boolean broke = false, answered = false;
-                in[0].light = true;
-                for (int i = 0; i < 240 && !answered; i++) {
-                    CombatFighter a = e.fighter(0), d = e.fighter(1);
-                    if (!broke) {
-                        if (k == 2 && e.canBreakCombo(d)) in[1].light = true;
-                    } else {
-                        // Quem batia defende (agachado, menos contra golpe alto ou no ar) assim que pode.
-                        boolean right = d.x >= a.x;
-                        boolean high = !d.grounded || d.attacking() && d.attack != null && d.attack.overhead;
-                        in[0].direction = high ? (right ? 5 : 1) : (right ? 4 : 2);
-                        if (d.canAct()) {
-                            float gap = Math.abs(a.x - d.x);
-                            if (CpuReach.reaches(ch, g, false, gap, a.body(), a.crouchingBody())) {
-                                if (g.startsWith("2")) in[1].direction = d.facing > 0 ? 2 : 4;
-                                if (g.endsWith("L")) in[1].light = true; else if (g.endsWith("M")) in[1].medium = true; else in[1].heavy = true;
-                            } else {
-                                in[1].direction = a.x > d.x ? 1 : 5;
-                                in[1].dash = true;
-                            }
+            FighterState breaker = new FighterState(ch, "CPU");
+            breaker.superMeter = CombatConfig.METER_PER_BAR;
+            CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"), breaker, 500f, 600f, config);
+            FighterInput[] in = {new FighterInput(), new FighterInput()};
+            String[] seq = {"L", "M", "H"};
+            int k = 0;
+            boolean broke = false, answered = false, limpo = false;
+            in[0].light = true;
+            for (int i = 0; i < 240 && !answered; i++) {
+                CombatFighter a = e.fighter(0), d = e.fighter(1);
+                if (!broke) {
+                    if (k == 2 && e.canBreakCombo(d)) in[1].light = true;
+                } else {
+                    boolean right = d.x >= a.x;
+                    in[0].direction = right ? 4 : 2;
+                    if (d.canAct()) {
+                        float gap = Math.abs(a.x - d.x);
+                        String g = null;
+                        for (String c : new String[] {"L", "2L", "M"}) {
+                            if (ch.attack(c) != null && CpuReach.reaches(ch, c, false, gap, a.body(), a.crouchingBody())) { g = c; break; }
+                        }
+                        if (g != null) {
+                            if (g.startsWith("2")) in[1].direction = d.facing > 0 ? 2 : 4;
+                            if (g.endsWith("L")) in[1].light = true; else in[1].medium = true;
+                        } else {
+                            in[1].direction = a.x > d.x ? 1 : 5;
+                            in[1].dash = true;
                         }
                     }
-                    e.step(in[0], in[1]);
-                    in[0].clearPresses();
-                    in[1].clearPresses();
-                    for (CombatEngine.HitEvent h : e.events()) {
-                        if (!broke && h.attacker == 0 && !h.blocked && k < 2) {
-                            k++;
-                            if ("M".equals(seq[k])) in[0].medium = true; else in[0].heavy = true;
-                        }
-                        if (broke && h.attacker == 1) {
-                            assertTrue(id + " " + g + " (sai em " + ch.attack(g).startupFrames + " q): o troco não entra garantido", h.blocked);
-                            answered = true;
-                        }
-                    }
-                    if (!broke && e.cues().contains("COMBO_BREAKER")) broke = true;
                 }
-                assertTrue(id + " " + g + ": quebrou", broke);
+                e.step(in[0], in[1]);
+                in[0].clearPresses();
+                in[1].clearPresses();
+                if (e.cues().contains("COMBO_BREAKER")) broke = true;
+                for (CombatEngine.HitEvent h : e.events()) {
+                    if (!broke && h.attacker == 0 && !h.blocked && k < 2) {
+                        k++;
+                        if ("M".equals(seq[k])) in[0].medium = true; else in[0].heavy = true;
+                    }
+                    if (broke && h.attacker == 1) {
+                        limpo = !h.blocked;
+                        answered = true;
+                    }
+                }
             }
+            if (limpo) limpos++; else falhas.append(' ').append(id);
         }
-        assertTrue("normais conferidos: " + checked, checked > 40);
+        assertEquals("o troco entrou limpo (falhou:" + falhas + ")", 16, limpos);
     }
 
     /** Com a corrida ligada (a opção antiga), quem quebrou corre sozinho até ele. */
