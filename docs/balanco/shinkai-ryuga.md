@@ -429,3 +429,29 @@ com o nível 5 entre parênteses.
 **Fora**
 - A Onda é o golpe da luta: 19 por minuto de cada lado.
 - O agarrão quase não aparece (0,38 por luta), e não há guard break.
+
+**O mesmo espelho com o SHINKAI antigo do Ryūga (ENERGY)**
+
+Rodado com `BateriaEspelhoShinkai 300 antigo 5 8`; as tabelas estão em
+`perfis/espelho-ryuga-shinkai-antigo.md`. Comparação no nível 8, PERCEPÇÃO → ENERGY:
+
+| medida | PERCEPÇÃO | ENERGY |
+|---|---|---|
+| duração da luta | 43,5 s | 45,9 s |
+| duração do SHINKAI | 13,8 s | 11,5 s |
+| tempo com alguém no SHINKAI | 47% | 38% |
+| dano dado por s dentro | 381 | 317 |
+| saldo por SHINKAI | +3.100 | +1.740 |
+| derruba o rival dentro | 41% dos SHINKAIs | 18% |
+| a luta termina com o vencedor no SHINKAI | 60% | 27% |
+| só um liga: ele vence | 89% | 92% |
+| quem liga primeiro vence | 62% | 59% |
+| os dois ligam | 43% | 54% |
+| a barra enche e não é usada | 30% | 24% |
+| Ultra por minuto dentro | 0,4 | 0,7 |
+| combos de 9 golpes ou mais dentro | 5% | 9% |
+| combo breakers por luta | 0,86 | 1,32 |
+
+O ENERGY rende quase metade do saldo e quase não fecha a luta lá dentro. Mesmo assim, quem liga
+sozinho vence 9 em 10: ligar decide a luta nos dois. O ENERGY acaba sempre no tempo (82%) ou no KO.
+Cada SHINKAI solta só um tiro de energia (1,04).

@@ -48,6 +48,7 @@ public final class BateriaEspelhoShinkai {
         final long[] faixa = new long[6], faixaDentro = new long[6];
         // Golpes
         final Map<String, Uso> fora = new LinkedHashMap<>(), dentro = new LinkedHashMap<>();
+        long tirosShinkai;
         long agarroes, agarroesCertos, techs, perfeitas, guardBreaks, choquesBola, superGratis, barrasGastas;
 
         Est() {
@@ -153,6 +154,7 @@ public final class BateriaEspelhoShinkai {
                 else if (c.equals("GUARD_BREAK")) e.guardBreaks++;
                 else if (c.equals("PROJECTILE_CLASH")) e.choquesBola++;
                 else if (c.equals("SHINKAI_SUPER")) e.superGratis++;
+                else if (c.equals("SHINKAI_SHOT")) e.tirosShinkai++;
             }
             for (CombatEngine.HitEvent h : l.e.events()) {
                 if (h.attacker == h.defender) continue;
@@ -254,7 +256,7 @@ public final class BateriaEspelhoShinkai {
             : cues.contains("SHINKAI_FIM") ? "desligou ele mesmo"
             : cues.contains("KO_RIVAL") || l.f(1 - s).ko() ? "derrubou o rival (KO) dentro"
             : cues.contains("KO_PROPRIO") || l.f(s).ko() || st.life <= 0 ? "caiu (KO) dentro"
-            : cues.contains("FIM_DA_LUTA") ? "o tempo da luta acabou dentro" : "acabou (outro)";
+            : cues.contains("FIM_DA_LUTA") ? "o tempo da luta acabou dentro" : "acabou o tempo do SHINKAI";
         e.fim.merge(como, 1, Integer::sum);
         e.leituras += st.leituras - antesLeit[s];
         e.esquivas += st.esquivas - antesEsq[s];
@@ -344,6 +346,7 @@ public final class BateriaEspelhoShinkai {
         linha(b, "quem liga primeiro vence", pc(com.primeiroLigouVence, com.primeiroLigouDecididas));
         linha(b, "só um ligou: ele vence", pc(com.soUmLigouVence, com.soUmLigou));
         linha(b, "Super grátis do SHINKAI usado (por SHINKAI)", f2(com.superGratis / (double)a));
+        linha(b, "tiros de energia do SHINKAI (por SHINKAI)", f2(com.tirosShinkai / (double)a));
 
         b.append("\n### Combos (os dois lados juntos)\n\n");
         b.append("| medida | com SHINKAI: todos | dentro do SHINKAI | sem SHINKAI |\n|---|---|---|---|\n");
@@ -384,7 +387,13 @@ public final class BateriaEspelhoShinkai {
 
     public static void main(String[] args) {
         int n = args.length > 0 ? Integer.parseInt(args[0]) : 200;
-        int[] niveis = args.length > 1 ? Arrays.stream(args, 1, args.length).mapToInt(Integer::parseInt).toArray() : new int[] {5, 8};
+        // "antigo": o Ryūga com o SHINKAI do sistema antigo (ENERGY) no lugar da PERCEPÇÃO.
+        int primeiroNivel = 1;
+        if (args.length > 1 && args[1].equals("antigo")) {
+            Shinkai.prototipoDesligado = true;
+            primeiroNivel = 2;
+        }
+        int[] niveis = args.length > primeiroNivel ? Arrays.stream(args, primeiroNivel, args.length).mapToInt(Integer::parseInt).toArray() : new int[] {5, 8};
         StringBuilder out = new StringBuilder();
         out.append("# Ryūga × Ryūga: SHINKAI sem Clash (retrato antes da mudança, 02/11)\n\n");
         out.append("CPU contra CPU, os dois o Ryūga (player_base, SHINKAI ").append(Shinkai.typeOf(BateriaBalanco.ch(RYUGA)).label)
