@@ -70,7 +70,9 @@ Três vídeos do personagem no verde (o efeito branco por cima dele) viraram as 
 que encosta no fundo verde (o clarão e os riscos sempre tocam o fundo; o branco do olho fica
 preso no rosto e sai), sem tom de pele/faixa vista através do clarão e sem os tênis. Depois o
 `efeito_video.py` lê a pasta de PNGs. Escala: o personagem de pé mede ~550 px no vídeo e 247 no
-jogo (0,45 do mundo por pixel).
+jogo (0,45 do mundo por pixel). Sem corte reto: o que chega perto da borda do vídeo ou da linha
+dos tênis some aos poucos (a ponta do risco termina fina, não quadrada), e a mediana mais um
+desfoque leve na transparência tiram a grade e o degrau da compressão do vídeo.
 
 | Folha | Vídeo | Quadros | No jogo |
 |---|---|---|---|
@@ -81,7 +83,9 @@ jogo (0,45 do mundo por pixel).
 ```bash
 ffmpeg -i defesa.mp4 quadros/%03d.png
 python3 tools/sprites/efeito_sem_personagem.py . quadros saida --quadros 11-18 --espelhar
-python3 tools/sprites/efeito_video.py saida --nome defesa --origem 408,341 --altura 287 --fps 24
+python3 tools/sprites/efeito_video.py saida --nome defesa --origem 408,341 --altura 259 --fps 24
+# defesa_2: --quadros 27-29 --espelhar --raio 879,259,360 (origem 465,259, altura 223)
+# defesa_poder: --quadros 41-42 --raio 1116,336,420 --chao-tenis 690 (origem 1116,336, altura 306)
 ```
 
 `GameView.efeitoDeGolpe`: golpe defendido de projétil ou especial toca a `defesa_poder`; a
