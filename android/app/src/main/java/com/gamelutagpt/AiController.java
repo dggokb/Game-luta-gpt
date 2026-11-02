@@ -3230,6 +3230,7 @@ final class AiController {
             return false;
         }
         decidiuLimite = false;
+        if (engine.porReserva(s)) return escolhaNaReserva(engine, me, target, out);
         if (s.rupturaQuadros > 0 || !me.canAct() || me.attacking()) return false;
         if (s.sobrecarga < CombatConfig.RYUGA_SOBRECARGA_MAX * 8 / 10 || engine.frame() % KIT_DECISION_FRAMES != 0) return false;
         if (Math.abs(target.x - me.x) < 300f || target.state.life < target.state.profile.maxLife * 3 / 10) return false;
@@ -3239,6 +3240,38 @@ final class AiController {
         }
         return false;
     }
+
+    /**
+     * SHINKAI por reserva (sem cronômetro), fora do limite: na Ruptura a vida dele paga o poder,
+     * então ela desliga quando a vida dela fica baixa e o rival ainda não está no fim, ou quando a
+     * Ruptura já durou e não fechou. Com a reserva baixa (antes do limite), longe e sem nada para
+     * fechar, os níveis altos desligam para guardar parte dela na barra.
+     */
+    private boolean escolhaNaReserva(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        FighterState s = me.state;
+        if (!me.canAct() || me.attacking() || engine.frame() % KIT_DECISION_FRAMES != 0) return false;
+        float minha = s.life / (float)s.profile.maxLife;
+        float dele = target.state.life / (float)target.state.profile.maxLife;
+        if (s.rupturaQuadros > 0) {
+            boolean fechando = dele < 0.2f;
+            boolean sangrando = minha < 0.3f || s.rupturaQuadros > RUPTURA_LONGA && dele > minha;
+            if (!fechando && sangrando && chance(0.4 + 0.5 * smart())) {
+                out.shinkai = true;
+                return true;
+            }
+            return false;
+        }
+        if (s.reserva > s.reservaMax * 4 / 10) return false;
+        if (Math.abs(target.x - me.x) < 300f || dele < 0.3f) return false;
+        if (chance(0.2 * smart())) {
+            out.shinkai = true;
+            return true;
+        }
+        return false;
+    }
+
+    /** Ruptura por reserva que já durou isto (quadros) e não fechou a luta: hora de pensar em sair. */
+    static final int RUPTURA_LONGA = 360;
 
     /**
      * O kit da batalha neste frame. Verdadeiro quando apertou algo que pede o frame só para

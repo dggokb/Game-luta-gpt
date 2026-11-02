@@ -19,6 +19,8 @@ public final class BateriaEspelhoShinkai {
     private BateriaEspelhoShinkai() {}
 
     static final String RYUGA = "player_base";
+    /** O SHINKAI do Ryūga é o por reserva (o padrão); "desgaste" volta ao protótipo anterior. */
+    static boolean reserva = true;
 
     /** Os golpes contados um a um (o resto vai em "outros"). */
     static final String[] GOLPES = {"L", "M", "H", "2L", "2M", "2H", "jL", "jM", "jH", "j2H", "S", "S2", "S3", "S4", "SUPER", "ULTRA"};
@@ -36,7 +38,7 @@ public final class BateriaEspelhoShinkai {
         long quadrosDentro, quadrosFora, quadrosExausto;
         long segundoAtiv, vidaPropriaAtiv, vidaRivalAtiv, superAtiv, atrasNaVida;
         long duracaoShinkai, danoDadoDentro, danoLevadoDentro, danoDadoFora, danoLevadoFora, danoLevadoExausto;
-        long quadrosAlguemDentro;
+        long quadrosAlguemDentro, reservaAbsorveu, reservaTecnica, quadrosRuptura;
         long koDentro, morreuDentro, leituras, esquivas, precisos, rupturas, limites, dor;
         long barraCheia, segundoBarraCheia;
         int primeiroLigouVence, primeiroLigouDecididas, soUmLigouVence, soUmLigou, atrasLigouVence, atrasLigou;
@@ -123,10 +125,13 @@ public final class BateriaEspelhoShinkai {
                     e.superAtiv += st.superMeter;
                     if (st.life < o.state.life) e.atrasNaVida++;
                     antesLeit[s] = st.leituras; antesEsq[s] = st.esquivas; antesPrec[s] = st.precisos; antesRup[s] = st.rupturas;
+                    antesAbs[s] = st.reservaAbsorveu; antesTec[s] = st.reservaGastaTecnica;
+                    rupturaInicio[s] = -1;
                 }
                 if (!agora && dentro[s]) fecharEpisodio(e, l, s, cues, episodioInicio[s], antesLeit, antesEsq, antesPrec, antesRup);
                 if (agora) e.quadrosDentro++; else e.quadrosFora++;
                 if (st.exaustaoQuadros > 0) e.quadrosExausto++;
+                if (st.emRuptura() && rupturaInicio[s] < 0) rupturaInicio[s] = l.quadro;
                 if (st.emRuptura()) {
                     int caiu = vidaAntes[s] - st.life;
                     for (CombatEngine.HitEvent h : l.e.events()) if (h.defender == s) caiu -= h.damage;
@@ -245,13 +250,15 @@ public final class BateriaEspelhoShinkai {
         return ultimoAtras[s];
     }
 
+    static final int[] antesAbs = new int[2], antesTec = new int[2], rupturaInicio = {-1, -1};
+
     static void fecharEpisodio(Est e, BateriaBalanco.Luta l, int s, List<String> cues, int inicio,
                                int[] antesLeit, int[] antesEsq, int[] antesPrec, int[] antesRup) {
         FighterState st = l.f(s).state;
         int dur = l.quadro - inicio;
         e.duracaoShinkai += dur;
         e.duracoesShinkai.add(dur);
-        String como = cues.contains("LIMITE_FIM") ? "no limite do corpo (exausto)"
+        String como = cues.contains("LIMITE_FIM") ? (reserva ? "a reserva acabou (exausto)" : "no limite do corpo (exausto)")
             : cues.contains("RUPTURA_FIM") ? "depois da Ruptura (exausto)"
             : cues.contains("SHINKAI_FIM") ? "desligou ele mesmo"
             : cues.contains("KO_RIVAL") || l.f(1 - s).ko() ? "derrubou o rival (KO) dentro"
@@ -262,6 +269,9 @@ public final class BateriaEspelhoShinkai {
         e.esquivas += st.esquivas - antesEsq[s];
         e.precisos += st.precisos - antesPrec[s];
         e.rupturas += st.rupturas - antesRup[s];
+        e.reservaAbsorveu += st.reservaAbsorveu - antesAbs[s];
+        e.reservaTecnica += st.reservaGastaTecnica - antesTec[s];
+        if (rupturaInicio[s] >= 0) { e.quadrosRuptura += l.quadro - rupturaInicio[s]; rupturaInicio[s] = -1; }
         if (como.startsWith("no limite")) e.limites++;
     }
 
@@ -342,7 +352,16 @@ public final class BateriaEspelhoShinkai {
         linha(b, "saldo por SHINKAI (dá − leva)", f0((com.danoDadoDentro - com.danoLevadoDentro) / (double)a));
         linha(b, "a luta acaba com o vencedor no SHINKAI / com o perdedor no SHINKAI", pc(com.koDentro, com.lutas) + " / " + pc(com.morreuDentro, com.lutas));
         linha(b, "s exausto por luta (dano levado exausto por s)", f1(com.quadrosExausto / 60.0 / com.lutas) + " (" + f0(com.danoLevadoExausto / Math.max(1, com.quadrosExausto / 60.0)) + ")");
-        linha(b, "dor da Ruptura por luta", f0(com.dor / (double)com.lutas));
+        linha(b, "dor da Ruptura por luta (vida que ela pagou)", f0(com.dor / (double)com.lutas));
+        if (reserva) {
+            linha(b, "reserva: dano que ela segurou / gasto em técnicas (por SHINKAI)", f0(com.reservaAbsorveu / (double)a) + " / " + f0(com.reservaTecnica / (double)a));
+            linha(b, "Ruptura: duração média (s)", f1(com.quadrosRuptura / 60.0 / Math.max(1, com.rupturas)));
+            long vidaPerdida = com.danoLevadoDentro - com.reservaAbsorveu;
+            linha(b, "vida de verdade que perde por SHINKAI (o que passou da reserva)", f0(vidaPerdida / (double)a));
+            linha(b, "saldo na vida por SHINKAI (dá − vida que perdeu)", f0((com.danoDadoDentro - vidaPerdida) / (double)a));
+        }
+        if (false) {
+        }
         linha(b, "quem liga primeiro vence", pc(com.primeiroLigouVence, com.primeiroLigouDecididas));
         linha(b, "só um ligou: ele vence", pc(com.soUmLigouVence, com.soUmLigou));
         linha(b, "Super grátis do SHINKAI usado (por SHINKAI)", f2(com.superGratis / (double)a));
@@ -391,11 +410,20 @@ public final class BateriaEspelhoShinkai {
         int primeiroNivel = 1;
         if (args.length > 1 && args[1].equals("antigo")) {
             Shinkai.prototipoDesligado = true;
+            reserva = false;
+            primeiroNivel = 2;
+        } else if (args.length > 1 && args[1].equals("desgaste")) {
+            reserva = false;
+            BateriaBalanco.AJUSTE_CFG = c -> c.ryugaReserva = false;
+            primeiroNivel = 2;
+        } else if (args.length > 1 && args[1].startsWith("reserva=")) {
+            int v = Integer.parseInt(args[1].substring(8));
+            BateriaBalanco.AJUSTE_CFG = c -> c.ryugaReservaVida = v;
             primeiroNivel = 2;
         }
         int[] niveis = args.length > primeiroNivel ? Arrays.stream(args, primeiroNivel, args.length).mapToInt(Integer::parseInt).toArray() : new int[] {5, 8};
         StringBuilder out = new StringBuilder();
-        out.append("# Ryūga × Ryūga: SHINKAI sem Clash (retrato antes da mudança, 02/11)\n\n");
+        out.append("# Ryūga × Ryūga: SHINKAI sem Clash (02/11)" + (reserva ? " — SHINKAI por reserva" : "") + "\n\n");
         out.append("CPU contra CPU, os dois o Ryūga (player_base, SHINKAI ").append(Shinkai.typeOf(BateriaBalanco.ch(RYUGA)).label)
             .append("), o mesmo nível. Com SHINKAI: os dois podem ligar, ninguém liga com o outro já no dele. ")
             .append("Sem SHINKAI: ninguém liga. Mesmas sementes nas duas colunas.\n");

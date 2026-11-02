@@ -17,9 +17,16 @@ public class ShinkaiRyugaTest {
         boolean viu;
 
         Match(String outro, float xa, float xb) {
+            this(outro, xa, xb, true);
+        }
+
+        /** {@code reserva} false: o desgaste do protótipo anterior (no lugar da reserva de vida). */
+        Match(String outro, float xa, float xb, boolean reserva) {
             ryuga = new FighterState(GeneratedCharacters.get("player_base"), "P1");
             rival = new FighterState(GeneratedCharacters.get(outro), "CPU");
-            engine = new CombatEngine(ryuga, rival, xa, xb, new CombatConfig());
+            CombatConfig c = new CombatConfig();
+            c.ryugaReserva = reserva;
+            engine = new CombatEngine(ryuga, rival, xa, xb, c);
         }
 
         CombatFighter f(int i) { return engine.fighter(i); }
@@ -61,7 +68,7 @@ public class ShinkaiRyugaTest {
     }
 
     @Test public void paradoChegaAoLimiteEmUns12SegundosEAcabaExausto() {
-        Match m = new Match("p15", 300f, 1500f);
+        Match m = new Match("p15", 300f, 1500f, false);
         m.shinkai();
         assertEquals(Shinkai.Type.PERCEPCAO, m.ryuga.shinkaiType);
         int quadros = 0;
@@ -78,7 +85,7 @@ public class ShinkaiRyugaTest {
     }
 
     @Test public void golpesGastamOCorpoMaisRapido() {
-        Match parado = new Match("p15", 300f, 1500f), batendo = new Match("p15", 300f, 1500f);
+        Match parado = new Match("p15", 300f, 1500f, false), batendo = new Match("p15", 300f, 1500f, false);
         parado.shinkai();
         batendo.shinkai();
         for (int i = 0; i < 240; i++) {
@@ -90,7 +97,7 @@ public class ShinkaiRyugaTest {
     }
 
     @Test public void desligarAntesDoLimiteNaoCansaEDevolveParteDaBarra() {
-        Match m = new Match("p15", 300f, 1500f);
+        Match m = new Match("p15", 300f, 1500f, false);
         m.shinkai();
         for (int i = 0; i < 120; i++) m.step();
         int sobra = CombatConfig.RYUGA_SOBRECARGA_MAX - m.ryuga.sobrecarga;
@@ -108,7 +115,7 @@ public class ShinkaiRyugaTest {
     }
 
     @Test public void noLimiteORupturaDoiMasNuncaDerrubaEDepoisCansaMais() {
-        Match m = new Match("p15", 300f, 1500f);
+        Match m = new Match("p15", 300f, 1500f, false);
         m.shinkai();
         assertTrue(m.ate("LIMITE", 2000));
         m.ryuga.life = 300;   // a dor nunca tira a última vida
@@ -237,5 +244,81 @@ public class ShinkaiRyugaTest {
         }
         assertTrue(esquivou);
         assertTrue(m.ryuga.precisoQuadros > 0);
+    }
+
+    // ------------------------------------------------ SHINKAI por reserva (o padrão desde 02/11)
+
+    @Test public void reservaSemCronometroParadoOShinkaiFica() {
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        assertEquals(m.config().ryugaReservaVida, m.ryuga.reserva);
+        for (int i = 0; i < 60 * 30; i++) m.step();
+        assertTrue("parado 30 s: segue no SHINKAI", m.ryuga.inShinkai());
+        assertEquals("sem gastar nem apanhar, a reserva fica", m.config().ryugaReservaVida, m.ryuga.reserva);
+    }
+
+    @Test public void osGolpesGastamAReservaAntesDaVida() {
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        int vida = m.ryuga.life;
+        m.ryuga.takeDamage(1000, 0);
+        assertEquals("a reserva segura o golpe", vida, m.ryuga.life);
+        assertEquals(m.config().ryugaReservaVida - 1000, m.ryuga.reserva);
+        m.ryuga.takeDamage(m.ryuga.reserva + 300, 0);
+        assertEquals("o que passa da reserva é vida", vida - 300, m.ryuga.life);
+        assertTrue("a reserva acabou: o SHINKAI acaba, cansado", m.ate("LIMITE_FIM", 3));
+        assertFalse(m.ryuga.inShinkai());
+        assertTrue(m.ryuga.exaustaoQuadros > 0);
+    }
+
+    @Test public void asTecnicasPotencializadasGastamAReserva() {
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        m.in[0].special = "M";
+        for (int i = 0; i < 4; i++) m.step();
+        assertEquals("a Onda gasta", m.config().ryugaReservaVida - m.config().ryugaReservaEspecial, m.ryuga.reserva);
+    }
+
+    @Test public void comAReservaNoFimRompeEARupturaGastaAVidaAteDesligar() {
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        m.ryuga.takeDamage(m.config().ryugaReservaVida - m.config().ryugaReservaLimite + 50, 0);
+        assertTrue(m.ate("LIMITE", 3));
+        m.in[0].shinkai = true;
+        assertTrue(m.ate("RUPTURA", 3));
+        assertTrue(m.ryuga.emRuptura());
+        assertEquals(0, m.ryuga.reserva);
+        int vida = m.ryuga.life;
+        for (int i = 0; i < 120; i++) m.step();
+        assertTrue("a Ruptura gasta a vida dele", m.ryuga.life < vida - 300);
+        assertTrue("sem cronômetro: segue rompido", m.ryuga.emRuptura());
+        m.in[0].shinkai = true;
+        assertTrue("desliga quando quiser", m.ate("RUPTURA_FIM", 3));
+        assertFalse(m.ryuga.inShinkai());
+        assertEquals(m.config().ryugaExaustaoRuptura, m.ryuga.exaustaoQuadros, 2);
+    }
+
+    @Test public void aRupturaNaoPassaDoPiso() {
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        m.ryuga.takeDamage(m.config().ryugaReservaVida - 100, 0);
+        m.in[0].shinkai = true;
+        assertTrue(m.ate("RUPTURA", 3));
+        m.ryuga.life = m.config().ryugaRupturaPiso + 200;
+        assertTrue("chegou ao piso: acaba sozinha", m.ate("RUPTURA_FIM", 200));
+        assertTrue(m.ryuga.life > m.config().ryugaRupturaPiso);
+    }
+
+    @Test public void desligarAntesDoLimiteDevolveParteDaReservaParaABarra() {
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        m.ryuga.takeDamage(1000, 0);
+        int sobra = m.ryuga.reserva;
+        m.in[0].shinkai = true;
+        assertTrue(m.ate("SHINKAI_FIM", 3));
+        assertEquals(0, m.ryuga.exaustaoQuadros);
+        assertFalse(m.ryuga.shinkaiUsed);
+        int esperado = (int)((long)sobra * CombatConfig.SHINKAI_MAX / m.config().ryugaReservaVida * m.config().ryugaDevolvePermille / 1000);
+        assertEquals(esperado, m.ryuga.shinkai, 2);
     }
 }

@@ -455,3 +455,70 @@ Rodado com `BateriaEspelhoShinkai 300 antigo 5 8`; as tabelas estão em
 O ENERGY rende quase metade do saldo e quase não fecha a luta lá dentro. Mesmo assim, quem liga
 sozinho vence 9 em 10: ligar decide a luta nos dois. O ENERGY acaba sempre no tempo (82%) ou no KO.
 Cada SHINKAI solta só um tiro de energia (1,04).
+
+### SHINKAI por reserva de vida (pedido do jogador, 02/11)
+
+O jogador pediu um novo tipo de SHINKAI.
+- A barra enche na luta; cheia, ele liga.
+- Ao ligar, ele ganha uma **reserva de vida** à parte da vida normal.
+- A habilidade exclusiva fica disponível: a leitura, a esquiva e o golpe preciso da PERCEPÇÃO.
+- Os golpes que ele leva gastam a reserva primeiro.
+- As técnicas potencializadas também gastam a reserva.
+- A reserva acabou, o SHINKAI acaba. **Não há cronômetro**: parado, sem gastar e sem apanhar, o
+  SHINKAI fica.
+
+**Ruptura**
+- Com a reserva no fim (500 ou menos), o jogador escolhe ultrapassar o limite.
+- Rompido, a vida normal paga o poder: 4 por quadro, e as técnicas também saem da vida.
+- Ele pode desligar quando quiser.
+- Ao chegar ao piso (10% da vida), a Ruptura acaba sozinha e não derruba ninguém.
+
+**Números (`CombatConfig`, `ryugaReserva*`)**
+
+| | valor |
+|---|---|
+| reserva | 2.500 (25% da vida) |
+| especial (S, S2–S4) | gasta 150 |
+| Super | gasta 400 |
+| esquiva | gasta 100 |
+| golpe comum | não gasta |
+| desligar antes do limite | metade da reserva que sobrou volta para a barra |
+| fim da reserva | 1,5 s de cansaço |
+| fim da Ruptura | 4 s de cansaço |
+
+- O protótipo do desgaste continua em `ryugaReserva = false`, para comparar.
+- No HUD, a reserva aparece em dourado por cima da ponta da vida, e a barra do SHINKAI mostra a
+  reserva que sobra.
+
+**CPU**
+- No limite, ela decide como antes.
+- Na Ruptura, desliga com a vida baixa ou quando já rompeu há 6 s sem fechar a luta.
+- Com a reserva baixa, longe e sem nada para fechar, os níveis altos desligam e guardam parte na
+  barra.
+
+**Espelho Ryūga × Ryūga, sem Clash** (`BateriaEspelhoShinkai 300 5 8`; tabelas em
+`perfis/espelho-ryuga-shinkai-reserva.md`). Nível 8:
+
+| medida | ENERGY (antigo) | PERCEPÇÃO (desgaste) | reserva |
+|---|---|---|---|
+| duração da luta | 45,9 s | 43,5 s | 43,9 s |
+| duração do SHINKAI | 11,5 s | 13,8 s | 13,5 s |
+| dano dado por s dentro | 317 | 381 | 402 |
+| dano levado por s dentro (sem descontar a reserva) | 167 | 157 | 120 |
+| vida de verdade perdida por SHINKAI | 1.921 | 2.162 | 453 |
+| saldo na vida por SHINKAI | +1.740 | +3.100 | +4.980 |
+| como acaba | 82% no tempo | 41% KO, 26% limite, 18% Ruptura, 14% desliga | 46% KO, 43% reserva acabou, 8% desliga, 3% Ruptura |
+| Rupturas por SHINKAI | — | 0,33 | 0,16 |
+| a luta termina com o vencedor no SHINKAI | 27% | 60% | 68% |
+| só um liga: ele vence | 92% | 89% | 96% |
+| quem liga primeiro vence | 59% | 62% | 64% |
+| viradas | 29% | 30% | 31% |
+
+**Leitura**
+- A reserva segura 1.169 de dano por SHINKAI, e as técnicas gastam 747.
+- O que passa para a vida cai a um quinto.
+- É o SHINKAI mais forte dos três.
+- A Ruptura aparece menos (0,16 por SHINKAI): o rival costuma estourar a reserva de uma vez, e
+  a escolha não chega a abrir.
+- O tamanho da reserva muda pouco a duração (1.500 → 3.500: de 11,8 s para 14,9 s) e muda a força
+  (saldo de 4.000 para 5.700).

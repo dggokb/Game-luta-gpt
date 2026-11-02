@@ -640,6 +640,24 @@ final class CombatConfig {
     /** Fim voluntário antes do limite: esta parte do fôlego que sobrou volta para a barra. */
     int ryugaDevolvePermille = 500;
 
+    // SHINKAI POR RESERVA (pedido do jogador, 02/11; docs/balanco/shinkai-ryuga.md): no lugar do
+    // desgaste, ao ligar ele ganha uma reserva de vida à parte. Os golpes que leva gastam a reserva
+    // primeiro; as técnicas potencializadas também gastam. Sem cronômetro: parado, sem gastar e sem
+    // apanhar, o SHINKAI fica. A reserva acabando abre a Ruptura (gasta a vida dele). false = o
+    // desgaste do protótipo anterior (para comparar).
+    boolean ryugaReserva = true;
+    /** A reserva ao ligar (vida: a vida inteira é 10000). */
+    int ryugaReservaVida = 2500;
+    /** Reserva neste tanto ou menos: no limite (dá para escolher a Ruptura). */
+    int ryugaReservaLimite = 500;
+    /** O que cada técnica potencializada gasta: especial (S, S2–S4), Super, esquiva; o golpe comum, nada. */
+    int ryugaReservaEspecial = 150;
+    int ryugaReservaSuper = 400;
+    int ryugaReservaEsquiva = 100;
+    int ryugaReservaNormal = 0;
+    /** Ruptura: a vida que ela não passa (a Ruptura acaba sozinha ao chegar aqui). */
+    int ryugaRupturaPiso = 1000;
+
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;
     int tagEnterFrames = 23;

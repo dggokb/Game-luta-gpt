@@ -694,6 +694,8 @@ final class CombatEngine {
         s.ativacoes++;
         s.shinkaiAutoParry = s.shinkaiType == Shinkai.Type.TECHNIQUE;
         s.sobrecarga = s.limiteQuadros = s.rupturaQuadros = s.precisoQuadros = 0;
+        s.reserva = s.reservaMax = 0;
+        if (porReserva(s)) s.reserva = s.reservaMax = config.ryugaReservaVida;
         f.shinkaiRequestAge = -1;
         if (f.attacking()) {
             f.status = CombatFighter.Status.NEUTRAL;
@@ -938,8 +940,80 @@ final class CombatEngine {
     // ---------------------------------------------------------------- PROTÓTIPO PERCEPCAO (o Ryūga)
     // docs/balanco/shinkai-ryuga.md. Só o tipo PERCEPCAO passa por aqui; os outros seguem o relógio.
 
+    /** O SHINKAI dele é o por reserva (o Ryūga com {@link CombatConfig#ryugaReserva}). */
+    boolean porReserva(FighterState s) {
+        return config.ryugaReserva && s.shinkaiType == Shinkai.Type.PERCEPCAO;
+    }
+
+    /**
+     * SHINKAI por reserva, um quadro: sem cronômetro. A reserva no limite abre a escolha da
+     * Ruptura; acabou, o SHINKAI acaba (cansado). Na Ruptura a vida dele paga o poder, quadro a
+     * quadro, até ele desligar ou chegar ao piso.
+     */
+    private void quadroDaReserva(FighterState s) {
+        if (s.rupturaQuadros > 0) {
+            s.rupturaQuadros = Math.min(s.rupturaQuadros + 1, 1 << 20);
+            if (s.life - config.ryugaRupturaDor <= config.ryugaRupturaPiso) {
+                encerrar(s, config.ryugaExaustaoRuptura);
+                cues.add("RUPTURA_FIM");
+                return;
+            }
+            s.takeDamage(config.ryugaRupturaDor, 0);
+            int faixa = Math.max(1, s.rupturaVidaInicio - config.ryugaRupturaPiso);
+            s.shinkaiFrames = Math.max(1, (int)((long)(s.life - config.ryugaRupturaPiso) * config.shinkaiFrames / faixa));
+            return;
+        }
+        if (s.reserva <= 0) {
+            s.finsNoLimite++;
+            encerrar(s, config.ryugaExaustao);
+            cues.add("LIMITE_FIM");
+            return;
+        }
+        if (s.reserva <= config.ryugaReservaLimite) {
+            if (s.limiteQuadros == 0) {
+                s.limiteQuadros = config.ryugaLimiteJanela;
+                cues.add("LIMITE");
+            } else if (s.limiteQuadros > 1) {
+                s.limiteQuadros--;   // só conta o tempo desde que chegou ao limite (a escolha não tem prazo)
+            }
+        } else {
+            s.limiteQuadros = 0;
+        }
+        s.shinkaiFrames = Math.max(1, (int)((long)s.reserva * config.shinkaiFrames / Math.max(1, s.reservaMax)));
+    }
+
+    /**
+     * Uma técnica potencializada no SHINKAI por reserva gasta {@code quanto} da reserva; na
+     * Ruptura, da vida (sem passar do piso).
+     */
+    private void gastarReserva(FighterState s, int quanto) {
+        if (quanto <= 0 || !porReserva(s) || !s.inShinkai()) return;
+        if (s.rupturaQuadros > 0) {
+            int pode = Math.max(0, s.life - config.ryugaRupturaPiso);
+            int gasto = Math.min(pode, quanto);
+            if (gasto > 0) s.takeDamage(gasto, 0);
+            return;
+        }
+        int gasto = Math.min(s.reserva, quanto);
+        s.reserva -= gasto;
+        s.reservaGastaTecnica += gasto;
+    }
+
+    /** O que o golpe que ele começa gasta da reserva (especial, Super; o comum, quase nada). */
+    private int custoDaTecnica(AttackDefinition attack) {
+        if (attack.kind == AttackDefinition.Kind.SUPER) return config.ryugaReservaSuper;
+        String id = attack.id;
+        boolean especial = attack.kind == AttackDefinition.Kind.PROJECTILE || id.equals("S") ||
+            id.length() == 2 && id.charAt(0) == 'S' && Character.isDigit(id.charAt(1));
+        return especial ? config.ryugaReservaEspecial : config.ryugaReservaNormal;
+    }
+
     /** Um quadro do SHINKAI dele (TeamSystem chama no lugar do relógio): desgaste, limite ou Ruptura. */
     void desgastar(FighterState s) {
+        if (porReserva(s)) {
+            quadroDaReserva(s);
+            return;
+        }
         if (s.rupturaQuadros > 0) {
             s.rupturaQuadros--;
             // Dói: vida de verdade, nunca a última.
@@ -964,6 +1038,7 @@ final class CombatEngine {
 
     /** O corpo gasta {@code quanto}; cheio, chega ao limite (a janela para escolher a Ruptura). */
     private void desgaste(FighterState s, int quanto) {
+        if (porReserva(s)) return;
         if (quanto <= 0 || !s.inShinkai(Shinkai.Type.PERCEPCAO) || s.rupturaQuadros > 0 || s.limiteQuadros > 0) return;
         int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
         s.sobrecarga = Math.min(max, s.sobrecarga + quanto);
@@ -987,6 +1062,10 @@ final class CombatEngine {
             s.shinkaiFrames = Math.max(1, s.shinkaiFrames * parte / 1000);
             return;
         }
+        if (porReserva(s)) {
+            if (s.rupturaQuadros == 0) s.reserva = Math.max(1, s.reserva * parte / 1000);
+            return;
+        }
         if (s.rupturaQuadros > 0) {
             s.rupturaQuadros = Math.max(1, s.rupturaQuadros * parte / 1000);
             return;
@@ -1001,6 +1080,11 @@ final class CombatEngine {
     /** Venceu o Clash: o corpo recupera parte do fôlego (a Ruptura segue como estava). */
     private void recuperaNoClash(FighterState s) {
         if (s.rupturaQuadros > 0) return;
+        if (porReserva(s)) {
+            s.limiteQuadros = 0;
+            s.reserva = Math.min(s.reservaMax, s.reserva + s.reservaMax * config.ryugaClashFolegoPermille / 1000);
+            return;
+        }
         int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
         s.limiteQuadros = 0;
         s.sobrecarga = Math.max(0, s.sobrecarga - max * config.ryugaClashFolegoPermille / 1000);
@@ -1009,6 +1093,7 @@ final class CombatEngine {
 
     private void encerrar(FighterState s, int exaustao) {
         s.shinkaiFrames = 0;
+        s.reserva = 0;
         s.limiteQuadros = s.rupturaQuadros = s.precisoQuadros = 0;
         s.exaustaoQuadros = exaustao;
     }
@@ -1021,6 +1106,10 @@ final class CombatEngine {
     private void escolhaNoShinkai(CombatFighter f) {
         FighterState s = f.state;
         f.shinkaiRequestAge = -1;
+        if (porReserva(s)) {
+            escolhaNaReserva(f, s);
+            return;
+        }
         if (s.rupturaQuadros > 0) {
             s.finsVoluntarios++;
             encerrar(s, config.ryugaExaustaoRuptura);
@@ -1039,6 +1128,37 @@ final class CombatEngine {
         s.finsVoluntarios++;
         int max = CombatConfig.RYUGA_SOBRECARGA_MAX;
         int sobra = max - s.sobrecarga;
+        encerrar(s, 0);
+        s.shinkaiUsed = false;
+        s.shinkai = (int)((long)sobra * CombatConfig.SHINKAI_MAX / max * config.ryugaDevolvePermille / 1000);
+        cues.add("SHINKAI_FIM");
+    }
+
+    /**
+     * SHINKAI por reserva, apertado já no SHINKAI: na Ruptura desliga (o cansaço da Ruptura
+     * fica); com a reserva no limite rompe (a reserva acaba, a vida paga dali em diante); antes
+     * do limite desliga, e parte da reserva que sobrou volta para a barra.
+     */
+    private void escolhaNaReserva(CombatFighter f, FighterState s) {
+        if (s.rupturaQuadros > 0) {
+            s.finsVoluntarios++;
+            encerrar(s, config.ryugaExaustaoRuptura);
+            cues.add("RUPTURA_FIM");
+            return;
+        }
+        if (s.reserva <= config.ryugaReservaLimite && s.life - config.ryugaRupturaDor > config.ryugaRupturaPiso) {
+            s.limiteQuadros = 0;
+            s.reserva = 0;
+            s.rupturaQuadros = 1;
+            s.rupturaVidaInicio = s.life;
+            s.shinkaiFrames = config.shinkaiFrames;
+            s.rupturas++;
+            f.hitstop = Math.max(f.hitstop, 16);
+            cues.add("RUPTURA");
+            return;
+        }
+        s.finsVoluntarios++;
+        int sobra = s.reserva, max = Math.max(1, s.reservaMax);
         encerrar(s, 0);
         s.shinkaiUsed = false;
         s.shinkai = (int)((long)sobra * CombatConfig.SHINKAI_MAX / max * config.ryugaDevolvePermille / 1000);
@@ -1093,6 +1213,7 @@ final class CombatEngine {
         d.state.esquivas++;
         d.state.precisoQuadros = config.ryugaPrecisoJanela;
         desgaste(d.state, config.ryugaDesgasteEsquiva);
+        gastarReserva(d.state, config.ryugaReservaEsquiva);
         cues.add("ESQUIVA");
         return true;
     }
@@ -1117,6 +1238,7 @@ final class CombatEngine {
         d.state.esquivas++;
         d.state.precisoQuadros = config.ryugaPrecisoJanela;
         desgaste(d.state, config.ryugaDesgasteEsquiva);
+        gastarReserva(d.state, config.ryugaReservaEsquiva);
         cues.add("ESQUIVA");
         return true;
     }
@@ -1266,6 +1388,7 @@ final class CombatEngine {
         f.attack = attack;
         f.shinkaiSuper = false;
         desgaste(f.state, config.ryugaDesgasteGolpe);
+        gastarReserva(f.state, custoDaTecnica(attack));
         // O golpe alto avisa na preparação (o brilho na tela), para dar para ler e defender em pé.
         if (attack.overhead) cues.add("OVERHEAD");
         // Normais e especiais (também os que lançam, como a shuriken) tocam a própria animação.

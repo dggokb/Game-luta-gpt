@@ -520,6 +520,7 @@ final class HudRenderer {
         paint.setColor(0x99FFFFFF);
         c.drawRect(x, y + 2f, x + w * life, y + 4f, paint);
         sheen(c, x, y, w * life, h, (float)(effects.now * .42 + (y < 100f ? 0 : .37)));
+        reservaShinkai(c, fighter, life, x, y, w, h);
         if (hudArt == null) drawLifeEffects(c, fx, x, y, w, h);
         c.restore();
         paint.setStyle(Paint.Style.STROKE);
@@ -533,6 +534,19 @@ final class HudRenderer {
         c.drawPath(shape, paint);
         paint.setAlpha(255);
         paint.setStyle(Paint.Style.FILL);
+    }
+
+    /**
+     * SHINKAI por reserva: a reserva de vida à parte, em dourado por cima da ponta da vida (o
+     * tanto que os golpes ainda gastam antes de chegar à vida).
+     */
+    private void reservaShinkai(Canvas c, FighterState fighter, float life, float x, float y, float w, float h) {
+        if (fighter.reserva <= 0 || !fighter.inShinkai() || life <= 0f) return;
+        float r = Math.min(life, fighter.reserva / (float)fighter.profile.maxLife);
+        paint.setColor(0xD8FFC23A);
+        c.drawRect(x + w * (life - r), y, x + w * life, y + h * 0.5f, paint);
+        paint.setColor(0xFFFFF1B8);
+        c.drawRect(x + w * (life - r), y, x + w * life, y + 2f, paint);
     }
 
     /** Slanted light band sweeping across a filled region; {@code cycle} advances 1 per sweep. */
@@ -1275,6 +1289,7 @@ final class HudRenderer {
             paint.setColor(lifeColor(ratio));
             c.drawRoundRect(left, top, left + width * ratio, bottom, 8, 8, paint);
         }
+        reservaShinkai(c, fighter, ratio, left, top, width, bottom - top);
 
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(showText ? 2f : 1.5f);

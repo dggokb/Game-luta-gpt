@@ -75,6 +75,14 @@ final class FighterState {
         } else if (cenaSemDano) {
             return;
         }
+        if (reserva > 0 && shinkaiFrames > 0) {
+            // SHINKAI por reserva: o golpe gasta a reserva primeiro; só o que passar dela é vida.
+            int segura = Math.min(reserva, damage);
+            reserva -= segura;
+            reservaAbsorveu += segura;
+            damage -= segura;
+            if (damage <= 0) return;
+        }
         life = Math.max(Math.min(lifeFloor, life), life - damage);
         recoverableLife += damage * recoverablePermille / 1000;
         if (life == 0) recoverableLife = 0;
@@ -183,6 +191,12 @@ final class FighterState {
     int ativacoes;
     /** Contagens para as baterias (a luta toda). */
     int leituras, esquivas, precisos, rupturas, finsVoluntarios, finsNoLimite;
+    /** SHINKAI por reserva: a reserva de vida que sobra e a que ganhou ao ligar (0 fora dele). */
+    int reserva, reservaMax;
+    /** Ruptura por reserva: a vida quando rompeu (a barra mostra o quanto ainda dá até o piso). */
+    int rupturaVidaInicio;
+    /** Para as baterias: dano que a reserva segurou e o que as técnicas gastaram dela (a luta toda). */
+    int reservaAbsorveu, reservaGastaTecnica;
 
     boolean emRuptura() { return rupturaQuadros > 0 && inShinkai(Shinkai.Type.PERCEPCAO); }
 
@@ -207,6 +221,7 @@ final class FighterState {
         shinkaiFreeSuper = false;
         shinkaiAutoParry = false;
         sobrecarga = limiteQuadros = rupturaQuadros = exaustaoQuadros = precisoQuadros = ativacoes = 0;
+        reserva = reservaMax = rupturaVidaInicio = 0;
         esquivaRecarga = rastroQuadros = 0;
     }
 
