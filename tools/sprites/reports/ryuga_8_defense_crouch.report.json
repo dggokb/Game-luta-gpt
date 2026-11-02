@@ -1,0 +1,184 @@
+{
+  "id": "ryuga_8_defense_crouch",
+  "characterProfile": "ryuga_8",
+  "source": "art/sprites/source/ryuga_8_defense_crouch_video_normalized.png",
+  "sourceNote": "ryuga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 320,
+    "rootX": 182,
+    "rootY": 284,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        48,
+        63,
+        282,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 23698
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        47,
+        71,
+        280,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22937
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        104,
+        62,
+        336,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22179
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        92,
+        58,
+        324,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22717
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        93,
+        58,
+        324,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22686
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        90,
+        57,
+        322,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 22621
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        65,
+        53,
+        299,
+        285
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 23935
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 310,
+    "frameHeight": 253,
+    "rootX": 146,
+    "rootY": 241,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      36,
+      43
+    ],
+    "sheetWidth": 248,
+    "sheetHeight": 1704,
+    "frames": [
+      [
+        0,
+        996,
+        248,
+        236,
+        6,
+        14
+      ],
+      [
+        0,
+        1476,
+        248,
+        228,
+        4,
+        22
+      ],
+      [
+        0,
+        1236,
+        244,
+        236,
+        62,
+        13
+      ],
+      [
+        0,
+        252,
+        244,
+        244,
+        50,
+        8
+      ],
+      [
+        0,
+        500,
+        244,
+        244,
+        51,
+        8
+      ],
+      [
+        0,
+        748,
+        244,
+        244,
+        48,
+        8
+      ],
+      [
+        0,
+        0,
+        248,
+        248,
+        23,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 3440640,
+      "grid": 2196040,
+      "packed": 1690368
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "40f3ea6de26b255e9730fe5297a5e5029be9c3b8578fd5d24af1afd4a4a5c3f2",
+      "config": "8574b9b8e915a42b59490cd91f4d72244baedee3412654824e0a33df865bcdb1",
+      "profile": "6eed417b2002f5d045bf4741be4857ab631b05cf89d8c8cca4a88065eabffbce"
+    }
+  }
+}

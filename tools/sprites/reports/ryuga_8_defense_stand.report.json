@@ -1,0 +1,203 @@
+{
+  "id": "ryuga_8_defense_stand",
+  "characterProfile": "ryuga_8",
+  "source": "art/sprites/source/ryuga_8_defense_stand_video_normalized.png",
+  "sourceNote": "ryuga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 448,
+    "rootX": 202,
+    "rootY": 412,
+    "columns": 8,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        93,
+        85,
+        327,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28683
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        64,
+        89,
+        304,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 29898
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        54,
+        109,
+        331,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28279
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        53,
+        108,
+        330,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28341
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        53,
+        108,
+        330,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28387
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        53,
+        109,
+        330,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28288
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        66,
+        91,
+        306,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28375
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        93,
+        79,
+        326,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 29004
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 298,
+    "frameHeight": 355,
+    "rootX": 159,
+    "rootY": 343,
+    "columns": 8,
+    "frameCount": 8,
+    "cropOffset": [
+      43,
+      69
+    ],
+    "sheetWidth": 588,
+    "sheetHeight": 1340,
+    "frames": [
+      [
+        252,
+        0,
+        248,
+        344,
+        44,
+        10
+      ],
+      [
+        0,
+        352,
+        256,
+        340,
+        15,
+        14
+      ],
+      [
+        0,
+        696,
+        292,
+        320,
+        5,
+        34
+      ],
+      [
+        296,
+        696,
+        292,
+        320,
+        4,
+        33
+      ],
+      [
+        0,
+        1020,
+        292,
+        320,
+        4,
+        33
+      ],
+      [
+        296,
+        1020,
+        292,
+        320,
+        4,
+        33
+      ],
+      [
+        260,
+        352,
+        256,
+        336,
+        17,
+        16
+      ],
+      [
+        0,
+        0,
+        248,
+        348,
+        44,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5505024,
+      "grid": 3385280,
+      "packed": 3151680
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c60b87069e958f2ed22083a06dcc27da9a90a7c9576061e7ada55f389545913c",
+      "config": "8836013297c8d636a3f867fad267af544f015aebe2b97fb679a613e0c3b55ff3",
+      "profile": "6eed417b2002f5d045bf4741be4857ab631b05cf89d8c8cca4a88065eabffbce"
+    }
+  }
+}

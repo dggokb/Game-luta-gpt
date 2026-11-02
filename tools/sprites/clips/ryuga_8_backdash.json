@@ -1,0 +1,32 @@
+{
+  "id": "ryuga_8_backdash",
+  "javaName": "RYUGA_8_BACKDASH",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_backdash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_backdash.webp",
+  "report": "tools/sprites/reports/ryuga_8_backdash.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_backdash-import.png",
+  "expectedFrames": 22,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "tras.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "motivo": "mesma escala dos outros vídeos do Ryūga 8 anos (medida no idle)",
+    "quadros": "20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62",
+    "celula": 224,
+    "largura": 160,
+    "raiz": "84,206",
+    "colunas": 11,
+    "pe_no_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 320,
+  "frameHeight": 448,
+  "rootX": 168,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

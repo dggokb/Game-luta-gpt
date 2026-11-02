@@ -1,0 +1,32 @@
+{
+  "id": "ryuga_8_walk_forward",
+  "javaName": "RYUGA_8_WALK_FORWARD",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_walk_forward_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_walk_forward.webp",
+  "report": "tools/sprites/reports/ryuga_8_walk_forward.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_walk_forward-import.png",
+  "expectedFrames": 15,
+  "segmentation": "prepared-grid",
+  "columns": 10,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "frente.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.97)",
+    "quadros": "57,59,61,63,65,67,69,71,73,75,77,79,81,83,85",
+    "celula": 224,
+    "largura": 192,
+    "raiz": "106,206",
+    "colunas": 10,
+    "pe_no_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 384,
+  "frameHeight": 448,
+  "rootX": 212,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

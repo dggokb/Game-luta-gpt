@@ -1,0 +1,12 @@
+{
+  "IDLE": "idle",
+  "WALK_FORWARD": "frente",
+  "WALK_BACK": "tras",
+  "DASH": "dash",
+  "CROUCH": "agacha",
+  "JUMP": "pulo",
+  "DEFENSE_CROUCH": "defesaAgachado",
+  "DEFENSE_AIR": "defesaPulo",
+  "TAUNT": "provoca",
+  "DEFENSE_STAND": "defesa"
+}

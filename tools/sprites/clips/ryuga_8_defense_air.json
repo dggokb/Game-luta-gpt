@@ -1,0 +1,31 @@
+{
+  "id": "ryuga_8_defense_air",
+  "javaName": "RYUGA_8_DEFENSE_AIR",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_defense_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_defense_air.webp",
+  "report": "tools/sprites/reports/ryuga_8_defense_air.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_defense_air-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaPulo.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): o vídeo começa agachado ou no ar, sem a imagem inicial em pé",
+    "quadros": "7,24,41,58,76,93,110",
+    "celula": 224,
+    "largura": 128,
+    "raiz": "62,206",
+    "colunas": 7,
+    "pe_no_chao": true,
+    "densidade": 2
+  },
+  "frameHeight": 448,
+  "rootX": 124,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

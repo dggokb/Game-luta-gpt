@@ -1,0 +1,32 @@
+{
+  "id": "ryuga_8_fall",
+  "javaName": "RYUGA_8_FALL",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_fall_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_fall.webp",
+  "report": "tools/sprites/reports/ryuga_8_fall.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.97)",
+    "quadros": "78,79,80,80,81,82",
+    "celula": 224,
+    "largura": 160,
+    "raiz": "87,206",
+    "colunas": 6,
+    "pe_no_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 320,
+  "frameHeight": 448,
+  "rootX": 174,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

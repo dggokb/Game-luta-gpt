@@ -61,7 +61,7 @@ ALIASES = {
     'JUMP_MEDIUM': ['jm', 'socopulo'], 'JUMP_HEAVY': ['jh', 'pulosocoforte', 'pulochuteforteparafrente'],
     'JUMP_HEAVY_DOWN': ['j2h', 'pulosocoparabaixo', 'pulosocoparabaixoforte'], 'SPECIAL_ENERGY': ['s1'],
     'SPECIAL_S2': ['s2'], 'SPECIAL_S3': ['s3'], 'SPECIAL_S4': ['s4'], 'SUPER_WAVE': ['super'], 'ULTRA_BEAM': ['ultra'],
-    'DEFENSE_STAND': ['defesaempe', 'defesacima', 'defendecima'], 'DEFENSE_CROUCH': ['defesaagachado', 'defesaagaxado', 'defesabaixo', 'defesanochao', 'defesaembaixo', 'defesachao', 'defendebaixo'],
+    'DEFENSE_STAND': ['defesaempe', 'defesacima', 'defendecima', 'defesa'], 'DEFENSE_CROUCH': ['defesaagachado', 'defesaagaxado', 'defesabaixo', 'defesanochao', 'defesaembaixo', 'defesachao', 'defendebaixo'],
     'DEFENSE_AIR': ['defesanoar', 'defesapulo', 'defesapulando'], 'HIT_STAND': ['levargolpeempe', 'danoempe', 'damoempe', 'danocima'],
     'HIT_CROUCH': ['levargolpeagachada', 'levargolpeagachado', 'danochao', 'danoagachado', 'danobaixo'],
     'HIT_AIR': ['levargolpenoar', 'danopulando', 'danoar', 'golpenoar', 'danopulo', 'dano pulo'], 'KNOCKDOWN': ['derrubado', 'cair_levantar', 'caindo', 'queda_levanta', 'derrubar_levantar', 'derruma_levanta', 'derrumba_levanta', 'derruba_levanta'],

@@ -1,0 +1,25 @@
+{
+  "_doc": "Clipes do Ryūga 8 anos com quadros escolhidos à mão (tools/sprites/montagem.py); o resto sai do personagem.py (tools/sprites/videos/ryuga_8.json). Vídeos na pasta ryuga_8 do Drive.",
+  "_opcoes": {
+    "escala": 0.3,
+    "motivo": "mesma escala dos outros vídeos do Ryūga 8 anos (medida no idle)",
+    "densidade": 2
+  },
+  "backdash": {
+    "_doc": "Backdash sem vídeo próprio (ainda): o recuo do andar para trás (quadros 20-62 de 2 em 2), tocado no tempo do backdash. Trocar pelo vídeo do pulinho para trás quando ele chegar.",
+    "trechos": [
+      [
+        "tras",
+        0,
+        124
+      ]
+    ],
+    "quadros": "20-62/2",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "BACKDASH": {}
+    }
+  }
+}

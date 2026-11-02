@@ -1517,6 +1517,56 @@
           266
         ]
       }
+    },
+    "ryuga_8": {
+      "molde": "Criança do tutorial (Ryūga com 8 anos); golpes, dano e queda ainda emprestados do koga_8",
+      "estiloCombo": "equilibrado",
+      "vida": 8000,
+      "dano": 0.6,
+      "ritmo": 1.0,
+      "projetil": {
+        "velocidade": 420,
+        "alcance": 240
+      },
+      "unica": {
+        "descricao": "Kōga com 8 anos, do treino e da briga dos irmãos no Prólogo: só S1 (Fumacinha: carrega, dá um tapa com a palma que solta só um clarão e uma fumacinha, e encolhe o ombro; o dano é só o do tapa, sem projétil) e S2 (socos girando, andando para a frente no tempo do vídeo, um acerto por soco). Sem Super e sem Ultra.",
+        "lutador": {
+          "corrida": {
+            "backdashQuadros": 30,
+            "backdashVelocidade": 262
+          }
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Fumacinha",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Socos girando",
+          "comando": "→↓↘"
+        }
+      },
+      "s1": {
+        "corpoACorpo": {
+          "alcance": 80,
+          "altura": 125,
+          "piso": 60,
+          "empurrao": 60
+        }
+      },
+      "framesGolpe": {
+        "S": [
+          105,
+          4,
+          201
+        ],
+        "S2": [
+          40,
+          4,
+          266
+        ]
+      }
     }
   }
 }

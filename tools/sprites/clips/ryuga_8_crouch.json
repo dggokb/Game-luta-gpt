@@ -1,0 +1,31 @@
+{
+  "id": "ryuga_8_crouch",
+  "javaName": "RYUGA_8_CROUCH",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_crouch.webp",
+  "report": "tools/sprites/reports/ryuga_8_crouch.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_crouch-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agacha.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.97)",
+    "quadros": "7,16,25,34,42,51,60,69",
+    "celula": 224,
+    "largura": 160,
+    "raiz": "80,206",
+    "limpar_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 320,
+  "frameHeight": 448,
+  "rootX": 160,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

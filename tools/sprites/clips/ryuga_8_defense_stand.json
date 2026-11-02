@@ -1,0 +1,33 @@
+{
+  "id": "ryuga_8_defense_stand",
+  "javaName": "RYUGA_8_DEFENSE_STAND",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_defense_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_defense_stand.webp",
+  "report": "tools/sprites/reports/ryuga_8_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesa.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "medida": "último quadro = inicio_centro (nota 0.97)",
+    "quadros": "19,27,36,44,52,60,69,77",
+    "celula": 224,
+    "largura": 192,
+    "raiz": "101,206",
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 384,
+  "frameHeight": 448,
+  "rootX": 202,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

@@ -238,3 +238,26 @@ Ficou a versão simples.
 **CPU × CPU:** igual. A luta dura 55 s no nível 5 e 62 s no 8, e ela pula 2,9 e 6,7 vezes por luta.
 
 Saída completa: [perfis/ar-contra-ar.md](perfis/ar-contra-ar.md). Teste: `CpuArArTest`.
+
+## O terceiro registro real (02/11, tarde): ar contra ar e câmera lenta novos
+
+Arcade com p02 + p15: 5 lutas nos níveis 5, 5, 6, 7 e 8 (a final 1x1, contra a p15). O jogador
+venceu todas.
+
+| luta | nível | vida que sobrou (você × CPU) | dano seu × da CPU | golpes por minuto (você × CPU) |
+|---|---|---|---|---|
+| 1 | 5 | 3035 × 318 | 36,5 mil × 23,1 mil | 48 × 22 |
+| 2 | 5 | 7239 × 252 | 32,0 mil × 11,9 mil | 48 × 26 |
+| 3 | 6 | 4861 × 671 | 33,3 mil × 30,4 mil | 51 × 25 |
+| 4 | 7 | 362 × 404 | 40,9 mil × 30,3 mil | 43 × 23 |
+| 5 | 8 | 7385 × 43 | 16,5 mil × 5,4 mil | 49 × 22 |
+
+- **Ar contra ar ficou parelho:** 10 trocas para cada lado (no 2º registro eram 19 × 14). A CPU usa
+  o jL quando vê você no ar ("ar contra ar") e ganhou 4 assim.
+- **O levantar segue bom:** você acertou em 20 dos 71 levantares; ela defendeu 23 e acertou primeiro
+  em 5.
+- **A CPU ataca metade do que você ataca:** 22 a 26 golpes por minuto, contra 43 a 51 seus. No 2º
+  registro a final do nível 8 tinha 32 a 34 por minuto; agora 22. A final ficou fácil: ela acertou
+  só 11 golpes em 79 s.
+- **Onde ela perde dano:** 35% do seu dano começa com ela atacando. O caso mais comum é o pulo dela
+  com jH, que você tira com o L ou o M no chão: 7 combos, ~10 mil.

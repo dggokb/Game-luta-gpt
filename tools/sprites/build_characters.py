@@ -613,7 +613,11 @@ def compile_packs(root, results):
                 raise ValueError(f'{key}: unknown atlas {a["atlas"]}')
             cfg,report = atlases[a['atlas']]
             if cfg['profile'] != pack['profile']:
-                raise ValueError(f'{key}: atlas and character profiles differ')
+                # Arte emprestada de outro personagem (o Ryūga 8 anos usa golpes e danos do Kōga
+                # 8 anos até ter os vídeos dele): vale se o perfil dela desenha na mesma escala.
+                other = read(safe(root / 'tools/sprites/profiles', cfg['profile']))
+                if other['worldScale'] != profile['worldScale']:
+                    raise ValueError(f'{key}: atlas and character profiles differ')
             frames = a['frames']
             if not frames or any(type(i) is not int or i < 0 or i >= report['layout']['frameCount'] for i in frames):
                 raise ValueError(f'{key}: invalid frame index')
