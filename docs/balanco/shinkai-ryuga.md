@@ -638,3 +638,6 @@ python3 tools/sprites/recolorir_efeito.py shinkai_player_base --de 160-205 --val
 - **Reproduzir:** o comando de conversão do vídeo, mais acima, gera a folha azul; os dois
   comandos acima a deixam dourada.
 - O contorno do SHINKAI da PERCEPÇÃO no jogo já era dourado (`0xFFFFC23A`).
+
+**Voltou ao azul** (pedido do jogador, no mesmo dia: "ficou feio"). A folha voltou à versão azul,
+com os cantos suaves. O `recolorir_efeito.py` continua disponível para outros efeitos.
