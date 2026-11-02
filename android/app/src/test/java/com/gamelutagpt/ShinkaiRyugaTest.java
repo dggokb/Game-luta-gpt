@@ -185,6 +185,44 @@ public class ShinkaiRyugaTest {
         assertEquals(0, m.ryuga.leituras);
     }
 
+    @Test public void paradoEleEsquivaSozinhoComORastroERecarrega() {
+        Match m = new Match("p15", 600f, 700f);
+        m.shinkai();
+        m.in[1].medium = true;
+        boolean esquivou = false;
+        for (int i = 0; i < 60 && !esquivou; i++) {
+            m.step();
+            esquivou = m.engine.cues().contains("ESQUIVA");
+            for (CombatEngine.HitEvent e : m.engine.events()) assertFalse("não apanhou", e.defender == 0 && !e.blocked);
+        }
+        assertTrue("o golpe passou direto", esquivou);
+        assertTrue("recuou no backdash", m.f(0).backdashFrames > 0);
+        assertTrue("rastro dourado", m.ryuga.rastroQuadros > 0);
+        assertTrue("golpe preciso pronto", m.ryuga.precisoQuadros > 0);
+        assertEquals(m.config().ryugaEsquivaAutoRecarga, m.ryuga.esquivaRecarga, 2);
+        // Logo depois, sem recarga, o golpe seguinte entra (os dois de volta ao lugar).
+        for (int i = 0; i < 40; i++) m.step();
+        assertTrue(m.ryuga.esquivaRecarga > 0);
+        m.f(0).x = 600f;
+        m.f(1).x = 700f;
+        m.in[1].medium = true;
+        boolean apanhou = false;
+        for (int i = 0; i < 60 && !apanhou; i++) {
+            m.step();
+            assertFalse(m.engine.cues().contains("ESQUIVA"));
+            for (CombatEngine.HitEvent e : m.engine.events()) apanhou |= e.defender == 0;
+        }
+        assertTrue("sem recarga não esquiva de novo", apanhou);
+    }
+
+    @Test public void segurandoADefesaEleNaoEsquivaSozinho() {
+        Match m = new Match("p15", 600f, 700f);
+        m.shinkai();
+        leGolpe(m, 10);
+        assertEquals(0, m.ryuga.esquivas);
+        assertEquals(1, m.ryuga.leituras);
+    }
+
     @Test public void oBackdashNoShinkaiPassaPeloGolpe() {
         Match m = new Match("p15", 600f, 700f);
         m.shinkai();

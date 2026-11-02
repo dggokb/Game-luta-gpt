@@ -1073,9 +1073,34 @@ final class CombatEngine {
      * abre o golpe preciso. Quem errou fica na recuperação do próprio golpe.
      */
     private boolean esquivaDeLeitura(CombatFighter a, CombatFighter d) {
-        if (!d.state.inShinkai(Shinkai.Type.PERCEPCAO) || d.backdashFrames <= 0 || !d.grounded) return false;
+        if (!d.state.inShinkai(Shinkai.Type.PERCEPCAO) || !d.grounded) return false;
         if (a.attack.kind == AttackDefinition.Kind.SUPER) return false;
+        if (d.backdashFrames <= 0) return esquivaAutomatica(a, d);
         a.hitboxMask = ~0L;   // passou: o golpe não pega mais nesta vez
+        d.state.esquivas++;
+        d.state.precisoQuadros = config.ryugaPrecisoJanela;
+        desgaste(d.state, config.ryugaDesgasteEsquiva);
+        cues.add("ESQUIVA");
+        return true;
+    }
+
+    /**
+     * (c) Esquiva automática: livre (parado ou andando para frente, sem segurar a defesa) e com a
+     * esquiva carregada, o golpe passa
+     * direto e ele recua no backdash, invulnerável, com o rastro dourado; o golpe preciso fica pronto.
+     */
+    private boolean esquivaAutomatica(CombatFighter a, CombatFighter d) {
+        if (config.ryugaEsquivaAutoRecarga <= 0 || d.state.esquivaRecarga > 0) return false;
+        if (d.status != CombatFighter.Status.NEUTRAL || d.attacking() || d.locked) return false;
+        // Segurando a defesa ele lê (a leitura); a esquiva sozinha é para quando foi pego desprevenido.
+        if (guardFromInput(d) != CombatFighter.GUARD_NONE) return false;
+        a.hitboxMask = ~0L;
+        d.forwardDashing = false;
+        d.backdashFrames = backdashFrames(d);
+        d.backdashCooldown = d.backdashFrames + config.backdashRecoveryFrames;
+        d.invulnFrames = Math.max(d.invulnFrames, Math.min(12, d.backdashFrames));
+        d.state.esquivaRecarga = config.ryugaEsquivaAutoRecarga;
+        d.state.rastroQuadros = config.ryugaRastroQuadros;
         d.state.esquivas++;
         d.state.precisoQuadros = config.ryugaPrecisoJanela;
         desgaste(d.state, config.ryugaDesgasteEsquiva);

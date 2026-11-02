@@ -255,6 +255,39 @@ As duas mudanças:
 sem mudar a vitória. Ainda é menos de um momento por luta com a CPU, porque a CPU do Ryūga ataca
 em vez de defender. Falta o teste na mão.
 
+## Esquiva automática com rastro dourado (pedido do jogador)
+
+Para a assinatura aparecer na tela sem depender de defender em cima da hora: no SHINKAI dele, o
+golpe de perto que ia acertar o Ryūga **desprevenido** (parado ou andando para frente, sem
+segurar a defesa) passa direto. Ele recua no backdash, invulnerável, deixando um **rastro
+dourado** ("LEU O GOLPE!"), e o golpe preciso fica pronto. Depois disso, a esquiva sozinha
+recarrega por 3 s (`ryugaEsquivaAutoRecarga` = 180) e gasta o corpo como a esquiva manual.
+
+Segurando a defesa, ele não esquiva sozinho: aí vale a leitura. Na primeira versão a esquiva
+saía também defendendo e engolia as leituras (0,51 → 0,24 por luta). Separadas, as leituras
+voltaram (0,53).
+
+Saídas completas:
+- [nível 8](perfis/shinkai-ryuga-esquiva-nivel8.md);
+- [nível 8 sem Clash](perfis/shinkai-ryuga-esquiva-nivel8-sem-clash.md);
+- [nível 8, espelho](perfis/shinkai-ryuga-esquiva-nivel8-espelho.md);
+- [nível 5](perfis/shinkai-ryuga-esquiva-nivel5.md);
+- [nível 5 sem Clash](perfis/shinkai-ryuga-esquiva-nivel5-sem-clash.md);
+- [nível 5, espelho](perfis/shinkai-ryuga-esquiva-nivel5-espelho.md).
+
+| Nível 8 | sem esquiva | recarga 3 s (fica) | recarga 1,5 s | recarga 0,75 s |
+|---|---|---|---|---|
+| Ryūga vence (jogo normal) | 74% | 75% | 75% | 75% |
+| Ryūga vence (sem Clash) | 70% | 73% | 73% | 73% |
+| Dano que ele leva por s no SHINKAI (sem Clash) | 201 | 168 | 168 | 167 |
+| Leituras / esquivas / precisos por luta (normal) | 0,51 / 0 / 0,61 | 0,53 / 0,39 / 0,66 | 0,53 / 0,40 / 0,67 | 0,53 / 0,42 / 0,67 |
+
+- **A recarga quase não importa:** contra a CPU, a esquiva raramente teria chance de sair duas
+  vezes em 3 s. Por isso fica a de 3 s, a mais segura contra quem joga.
+- **O ganho:** um momento a mais por luta, visível (o rastro), e o Ryūga leva 10–15% menos dano
+  no SHINKAI.
+- **O custo:** o Ryūga sobe 1–3 pontos, e ele já é dos mais fortes (73–75% contra os 15).
+
 ## Leitura e próximos passos (para decidir)
 
 - **A identidade pede o jogador na mão.** Uma assinatura defensiva (ler e castigar) depende de
@@ -283,4 +316,5 @@ gradle ... "-Dargs=32 8 espelho narra" # Ryūga × Ryūga, os dois no SHINKAI da
 gradle ... "-Dargs=32 8 clash [espelho]" # o fôlego que o vencedor do Clash recupera, por coluna
 gradle ... "-Dargs=32 8 perdedor [espelho|elenco]" # a parte do SHINKAI que o perdedor do Clash guarda
 gradle ... "-Dargs=32 8 assinatura [semClash]" # (a) defesa comum lê, (b) contra-golpe preciso
+gradle ... "-Dargs=32 8 esquiva [semClash|espelho]" # a esquiva automática com recargas diferentes
 ```

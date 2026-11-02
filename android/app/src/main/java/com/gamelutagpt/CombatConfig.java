@@ -607,6 +607,14 @@ final class CombatConfig {
      * atacou por este tanto (0 = só a defesa perfeita lê). Ele sai livre na hora.
      */
     int ryugaLeituraLeveAbre = 14;
+    /**
+     * (c) Esquiva automática: no SHINKAI dele, o golpe de perto que ia acertar ele livre (parado ou
+     * andando) passa direto; ele recua no backdash com o rastro dourado e o golpe preciso fica
+     * pronto. Depois espera este tanto para esquivar sozinho de novo (0 = desligada).
+     */
+    int ryugaEsquivaAutoRecarga = 180;
+    /** Quadros do rastro dourado depois da esquiva. */
+    int ryugaRastroQuadros = 30;
     /** (b) No SHINKAI dele, todo contra-golpe (acertar quem estava apertando botão) é golpe preciso. */
     boolean ryugaContraPreciso = true;
     /** Golpe preciso: o primeiro golpe dele nestes quadros depois da leitura bate mais e atordoa mais. */

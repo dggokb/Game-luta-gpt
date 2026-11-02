@@ -39,6 +39,10 @@ public class BateriaShinkaiRyuga {
     /** Modo assinatura: (a) leitura na defesa comum, (b) contra-golpe preciso. */
     static boolean modoAssinatura;
     static final String[] VARIANTES_ASSINATURA = {"antigo (ENERGY)", "protótipo (hoje)", "+ (a) defesa lê", "+ (b) contra-golpe preciso", "+ (a) e (b)"};
+    /** Modo esquiva: a esquiva automática com recargas diferentes. */
+    static boolean modoEsquiva;
+    static final String[] VARIANTES_ESQUIVA = {"antigo (ENERGY)", "sem esquiva auto (hoje)", "recarga 3 s", "recarga 1,5 s", "recarga 0,75 s"};
+    static final int[] RECARGAS = {0, 0, 180, 90, 45};
     static final int[] PERDEDOR = {0, 500, 1000, 1000, 1000, 0, 1000};
     static boolean semClash;
     /** Espelho: o Ryūga contra ele mesmo, os dois com o mesmo SHINKAI (o da coluna). */
@@ -193,6 +197,11 @@ public class BateriaShinkaiRyuga {
         java.util.function.Consumer<CombatConfig> antes = BateriaBalanco.AJUSTE_CFG;
         // Sem Ruptura: a janela do limite some antes de dar tempo de escolher (a CPU espera 12 quadros).
         if (!modoClash && (variante == 3 || variante == 4)) BateriaBalanco.AJUSTE_CFG = c -> c.ryugaLimiteJanela = 1;
+        if (modoEsquiva) {
+            AiController.percepcaoReage = true;
+            int recarga = RECARGAS[variante];
+            BateriaBalanco.AJUSTE_CFG = c -> c.ryugaEsquivaAutoRecarga = recarga;
+        }
         if (modoAssinatura) {
             AiController.percepcaoReage = true;
             boolean la = variante == 2 || variante == 4, lb = variante == 3 || variante == 4;
@@ -263,6 +272,8 @@ public class BateriaShinkaiRyuga {
         if (modoPerdedor) VARIANTES = VARIANTES_PERDEDOR;
         elenco = Arrays.asList(args).contains("elenco");
         modoAssinatura = Arrays.asList(args).contains("assinatura");
+        modoEsquiva = Arrays.asList(args).contains("esquiva");
+        if (modoEsquiva) VARIANTES = VARIANTES_ESQUIVA;
         if (modoAssinatura) VARIANTES = VARIANTES_ASSINATURA;
         Est[] v = new Est[VARIANTES.length];
         for (int i = 0; i < v.length; i++) v[i] = rodar(i, n, nivel);

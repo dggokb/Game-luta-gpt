@@ -1457,3 +1457,12 @@ estreito**, como no mercado (`airPushHalfWidthPermille`, `airPushLegsTucked`):
 
 Teste em `PuloCruzaTest`. A lição CRAVADA do tutorial passou a pular de 240 px (era 200, e o
 Kōga criança passava por cima).
+
+## SHINKAI do Ryūga: esquiva automática com rastro dourado (pedido do jogador, 02/11)
+
+- **O que é:** no SHINKAI dele, o golpe de perto que pega o Ryūga desprevenido (sem segurar a
+  defesa) passa direto. Ele recua com o rastro dourado e o golpe preciso fica pronto. A esquiva
+  recarrega em 3 s.
+- **Resultado:** +0,3–0,4 esquiva por luta, 10–15% menos dano levado no SHINKAI, Ryūga +1–3
+  pontos, leituras iguais.
+- **Detalhes:** `shinkai-ryuga.md`.

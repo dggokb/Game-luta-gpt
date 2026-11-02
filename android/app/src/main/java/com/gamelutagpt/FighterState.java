@@ -175,6 +175,8 @@ final class FighterState {
     int rupturaQuadros;
     /** Depois do SHINKAI pelo limite ou da Ruptura: cansado (mais lento, guarda gasta mais). */
     int exaustaoQuadros;
+    /** Esquiva automática: quadros até poder esquivar sozinho de novo; rastro dourado que sobra. */
+    int esquivaRecarga, rastroQuadros;
     /** Depois de uma leitura: o próximo golpe dele é o golpe preciso. */
     int precisoQuadros;
     /** Quantas vezes ligou neste round (o fim voluntário deixa ligar de novo). */
@@ -205,6 +207,7 @@ final class FighterState {
         shinkaiFreeSuper = false;
         shinkaiAutoParry = false;
         sobrecarga = limiteQuadros = rupturaQuadros = exaustaoQuadros = precisoQuadros = ativacoes = 0;
+        esquivaRecarga = rastroQuadros = 0;
     }
 
     float superBars() {

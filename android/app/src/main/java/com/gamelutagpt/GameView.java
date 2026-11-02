@@ -5744,11 +5744,12 @@ public class GameView extends SurfaceView
             CombatFighter f = engine.fighter(i);
             float[] t = speedTrail[i];
             boolean noClash = clashEmMovimento();
-            if (!(f.state.inShinkai(Shinkai.Type.SPEED) || noClash) || f.vanishFrames > 0 || !visivelNoClash(i)) {
+            boolean rastroRyuga = f.state.inShinkai(Shinkai.Type.PERCEPCAO) && f.state.rastroQuadros > 0;
+            if (!(f.state.inShinkai(Shinkai.Type.SPEED) || noClash || rastroRyuga) || f.vanishFrames > 0 || !visivelNoClash(i)) {
                 speedTrailCount[i] = 0;
                 continue;
             }
-            if (engine.frame() % (noClash ? 2 : 3) != 0) continue;
+            if (engine.frame() % (noClash || rastroRyuga ? 2 : 3) != 0) continue;
             // Guarda as últimas 4 posições (x, y, lado), a mais nova na frente.
             System.arraycopy(t, 0, t, 3, 9);
             t[0] = f.x;
@@ -5772,9 +5773,11 @@ public class GameView extends SurfaceView
 
     private void drawSpeedTrail(Canvas c, SpriteFighterRenderer r, CombatFighter f) {
         int side = f == engine.fighter(PLAYER) ? PLAYER : f == engine.fighter(OPPONENT) ? OPPONENT : -1;
-        if (side < 0 || !(f.state.inShinkai(Shinkai.Type.SPEED) || clashEmMovimento())) return;
+        boolean rastroRyuga = f.state.inShinkai(Shinkai.Type.PERCEPCAO) && f.state.rastroQuadros > 0;
+        if (side < 0 || !(f.state.inShinkai(Shinkai.Type.SPEED) || clashEmMovimento() || rastroRyuga)) return;
         float[] t = speedTrail[side];
-        int color = f.state.shinkaiType.color & 0xFFFFFF;
+        // Protótipo do Ryūga: o rastro dourado da esquiva automática.
+        int color = f.state.corShinkai() & 0xFFFFFF;
         for (int k = speedTrailCount[side] - 1; k >= 1; k--) {
             float x = t[k * 3], y = t[k * 3 + 1];
             if (Math.abs(x - f.x) < 14f && Math.abs(y - fighterVisualY(f)) < 14f) continue;
