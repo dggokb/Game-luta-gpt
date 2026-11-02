@@ -56,34 +56,65 @@ Mesma base do acerto normal, com mais coisas:
 - **Brasas laranja** brilhando no chão, espalhadas.
 - Clarão amarelo-vermelho com raios elétricos por cima, no instante do golpe.
 
-## 5. Poeira
+## 5. Ar e poeira
 
-- Na base de quem dá um golpe forte (Piccolo, quadro 13) e em quem cai (A16, ~57,3 s): **nuvens
-  redondas em dois tons** (base e sombra embaixo), **sem contorno**, da **cor do chão** (marrom no
-  deserto, cinza na cidade), que se espalham e somem em uns 10 quadros.
+Vistos no trailer de lançamento (pouso dos três lutadores ~6,7 s, Cell carregando ~15,2 s,
+dash do Gohan ~22,8 s, air dash do Piccolo ~56,6 s) e no da Gamescom (passos do A16 ~69 s).
+
+**Poeira** (é a parte com mais "desenho" de todos os efeitos):
+- **Nuvem de pouso:** faixa larga e baixa colada no chão, feita de bolhas em couve-flor. Cinza
+  claro com sombra cinza média embaixo, **contorno fino cinza-escuro** (não preto) e linhas de
+  caracol dentro das bolhas. Abre para os lados e some em ~10 quadros.
+- **Poeira de passo / dash:** bolinhas pequenas com rabinho curvo (forma de vírgula) saindo dos
+  pés, em dois tons, mais pedrinhas com contorno escuro. Arrastam para trás do movimento.
+- **Poeira de carga / impacto forte:** nuvens grandes rolando para fora, rente ao chão, com pedras
+  subindo.
+- **A cor é a do chão:** cinza na cidade, bege-marrom no deserto e na arena de pedra. É
+  diferente das faíscas, que são sempre luz.
+
+**Ar** (vento e deslocamento):
+- **Cortes de ar em V no pouso:** duas lâminas altas, cinza-claras e meio transparentes, subindo
+  em diagonal e cruzando como um X a partir do ponto do pouso.
+- **Fitas de vento no dash:** traços longos e curvos, afinando nas pontas, **da cor do chão**
+  (bege), girando em volta de quem avança. Sem contorno.
+- **Bolha de ar:** no golpe que chega com o dash, uma cúpula transparente com borda clara cresce
+  em volta do impacto; dentro, um estouro branco com raios brancos em zigue-zague.
+- **Rastro do air dash:** uma "proa" de vento branca e meio transparente na frente do corpo (como
+  o ar sendo empurrado) e linhas de velocidade escuras e finas correndo para trás.
+- **Estouro de ar no chão:** respingos brancos chapados com bordas em zigue-zague (como papel
+  rasgado), sem contorno, saindo do chão no pouso de um golpe aéreo.
+- **Espiral de aura:** arcos de vento laranja brilhantes girando em volta do corpo na carga.
+
+**Para o jogo (vídeos de `efeitos-de-video.md`):**
+
+| Efeito | Como fazer, pelo FighterZ |
+|---|---|
+| `fumaca_pouso` | Faixa baixa de bolhas em couve-flor, cinza-bege em dois tons, contorno fino cinza-escuro, linhas de caracol; mais dois cortes de ar em V subindo |
+| `fumaca_pulo` | Duas ou três bolhas pequenas com rabinho, para os lados, rápidas |
+| `poeira_corrida` | Bolinhas-vírgula e pedrinhas espirrando para trás, mais uma fita de vento bege curta |
+| `poeira_freada` | Bolinhas arrastadas rente ao chão para a frente |
+| `impacto_chao` | Nuvem rolando para os lados, estilhaços de pedra em dois tons (sem contorno) e pedras escuras |
+| `super_pulo` | Cortes de ar em V altos, bolha de ar achatada no chão e nuvem baixa |
 
 ## 6. Lançar longe (Cell, ~12,6 s)
 
 - Onda de choque em **meia-lua amarela semitransparente** seguindo quem voa.
 - Pedras pretas e estrelinha branca de 4 pontas (quem sumiu ao longe).
 
-## O que isso muda no nosso `impacto_forte`
+## O que mudou no nosso `impacto_forte` (v3)
 
-A v2 acertou as cores, mas errou no resto:
-
-| v2 (o que fiz) | FighterZ | v3 (o que fazer) |
+| v2 | FighterZ | v3 |
 |---|---|---|
-| Contorno preto grosso em tudo | Sem contorno, luz com halo | Tirar todo o contorno; halo macio em volta |
-| Fumaça cinza que fica | Nenhuma fumaça no acerto | Tirar a fumaça (poeira só no chão) |
-| Centro deslocado para trás do ponto | Centrado no contato, em cima de quem apanha | Centrar no ponto do golpe |
-| Pedaços com contorno (pareciam sementes) | Línguas de fogo de luz | Línguas sem contorno, miolo claro e ponta vermelha |
-| Anel de choque | Raios de luz atravessando e o X | Raios de luz no 1º quadro e o X no 2º |
-| Poucas faíscas | Dezenas de faíscas miúdas numa área grande | Muitas faíscas pequenas |
+| Contorno preto grosso em tudo | Sem contorno, luz com halo | Sem contorno; halo macio em volta |
+| Fumaça cinza que fica | Nenhuma fumaça no acerto | Sem fumaça |
+| Centro deslocado para trás do ponto | Centrado no contato | Centrado no ponto do golpe |
+| Pedaços com contorno (pareciam sementes) | Línguas de fogo de luz | Línguas sem contorno, miolo claro, ponta vermelha, dentes de chama |
+| Anel de choque | Raios de luz e X no impacto | Raios de luz no quadro 0 e X no 1 |
+| Poucas faíscas | Dezenas de faíscas miúdas | 46 faíscas pequenas |
 
-A família de acerto fica: `impacto_fraco` (estrela pequena + poucas línguas), `impacto_medio`
-(+ X), `impacto_forte` (+ raios de luz e mais línguas), `impacto_especial` (+ agulhas vermelhas e
-raios elétricos). A poeira e o impacto no chão são outra família: cinza ou da cor do chão, em dois
-tons, sem contorno.
+A família de acerto fica: `impacto_fraco` (estrela pequena e poucas línguas), `impacto_medio`
+(mais o X), `impacto_forte` (mais raios de luz e línguas grandes), `impacto_especial` (mais
+agulhas vermelhas e raios elétricos).
 
 ## O que os trailers não mostram
 

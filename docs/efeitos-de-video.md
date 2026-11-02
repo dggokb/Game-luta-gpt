@@ -65,26 +65,29 @@ em GIF, com a origem marcada em vermelho, em `android/app/build/sprite-review/ef
 
 ## Efeitos desenhados em código (anidoodle)
 
-Outro jeito de fazer o vídeo verde: desenhar o efeito em código com o
+Outro jeito de fazer o efeito: desenhar em código com o
 [anidoodle](https://github.com/alexgreensh/anidoodle) (Apache-2.0). O mesmo código gera sempre os
-mesmos quadros, o verde sai liso (#00FF00) e dá para ajustar um detalhe sem mudar o resto. O
-código de cada efeito fica em `tools/sprites/efeitos_codigo/<nome>.ts`.
+mesmos quadros e dá para ajustar um detalhe sem mudar o resto. O código de cada efeito fica em
+`tools/sprites/efeitos_codigo/<nome>.ts`.
+
+Os quadros saem em **PNG transparente** (sem o verde) e o `efeito_video.py` lê a pasta direto: o
+brilho meio transparente guarda a cor (no verde, o amarelo a 30% perdia o tom na chave).
+
+Estilo (do estudo em `docs/efeitos-referencia-fighterz.md`): **efeito é luz, sem contorno** (o
+contorno é dos personagens), centrado no ponto do golpe, sem fumaça no acerto.
 
 | Efeito | Código | Quadros |
 |---|---|---|
-| `impacto_forte` | `impacto_forte.ts`: X de clarão, explosão em 3 tons (branco, amarelo, laranja) mais longa para a frente, anel de choque de lado, riscos de faísca, o miolo rompe e vira pedaços de energia, faíscas com gravidade e fumaça que se desfaz por buracos | 9 a 24 fps (~0,37 s) |
+| `impacto_forte` | `impacto_forte.ts`: estrela de espinhos com raios de luz atravessando e faíscas miúdas; X de espinhos; estrela redonda com brilho; o miolo abre e a borda vira línguas de fogo que voam e somem | 9 a 24 fps (~0,37 s) |
 
 ```bash
 git clone https://github.com/alexgreensh/anidoodle /tmp/anidoodle
-node /tmp/anidoodle/skills/anidoodle/engine/tools/scaffold.mjs /tmp/fx --film impacto_forte --size 1280x720 --fps 24
+node /tmp/anidoodle/skills/anidoodle/engine/tools/scaffold.mjs /tmp/fx --film impacto_forte --size 1280x960 --fps 24
 cp tools/sprites/efeitos_codigo/impacto_forte.ts /tmp/fx/src/canvas-core/
-(cd /tmp/fx && npm install && node tools/render.mjs impacto_forte --out out/impacto_forte.mp4)
-# o vídeo tem um quadro vazio no começo e no fim: --inicio/--fim os tiram (o impacto aparece no
-# mesmo quadro do acerto)
-python3 tools/sprites/efeito_video.py /tmp/fx/out/impacto_forte.mp4 --nome impacto_forte --ancora centro --altura 220 --inicio 1 --fim 9
+(cd /tmp/fx && npm install && node tools/still.mjs impacto_forte --frames 0,1,2,3,4,5,6,7,8 --out out/impacto_forte/)
+# --altura é a altura do efeito inteiro (com raios e faíscas): 243 deixa a estrela com ~160 do mundo
+python3 tools/sprites/efeito_video.py /tmp/fx/out/impacto_forte --nome impacto_forte --ancora centro --altura 243 --fps 24
 ```
-
-Prévia rápida dos quadros sem render: `node tools/still.mjs impacto_forte --frames 1,2,3,4,5,6,7,8,9 --sheet out/sheet.png`.
 
 ## Efeitos do manequim (dano e defesa)
 
