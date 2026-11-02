@@ -1504,3 +1504,19 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   - CPU × CPU igual.
 - **No registro:** o relógio de cada luta agora começa do zero no arcade.
 - **Detalhes:** `registro-luta.md`.
+
+## CPU disputa o ar contra ar (registro real do jogador, 02/11)
+
+- **O problema:** o jM do jogador ganhava sempre do jH da CPU quando os dois pulavam.
+  - Ela via o rival com o atraso da reação e sem a velocidade do pulo, uns 110 px mais longe.
+  - Só soltava golpe descendo, e o mais forte (lento e curto).
+- **Agora:**
+  - ela prevê a trajetória pelo que viu nos últimos quadros;
+  - solta o golpe que sai primeiro e alcança;
+  - disputa com a chance do antiaéreo do nível.
+- **Ar contra ar montado (`BateriaArAr`), nível 8:**
+  - contra o jM, ela acerta 25% das cenas (era 1%), e o jM entra igual (49% contra 50%);
+  - na média dos golpes, ela acerta 33% (era 10%) e você 44% (era 47%);
+  - o jM cedo entra mais (51% → 67%), porque ela troca em vez de defender;
+  - CPU × CPU igual.
+- **Detalhes:** `registro-luta.md`.

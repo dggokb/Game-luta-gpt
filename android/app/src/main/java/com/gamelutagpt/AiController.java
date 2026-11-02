@@ -1339,9 +1339,26 @@ final class AiController {
     private boolean defend(CombatEngine engine, CombatFighter me, CombatFighter target,
                            CpuPerception.Snapshot seen, FighterInput out) {
         boolean blockstun = me.status == CombatFighter.Status.BLOCKSTUN;
+        float ultimoX = arArUltimoX;
+        arArUltimoX = me.grounded ? Float.NaN : me.x;
+        // Um sorteio por pulo (o primeiro quadro no ar): se vai disputar o ar neste pulo.
+        if (me.grounded) arArSorteado = false;
+        else if (!arArSorteado) {
+            arArSorteado = true;
+            arArPlano = roll(level.antiAir);
+        }
         if (jumpIn) {
+            String arAr = !me.grounded && me.canAct() ? golpeArAr(engine, me, seen, ultimoX) : null;
             if (me.grounded && jumpHold == 0 || !me.canAct() && !me.attacking()) {
                 jumpIn = false;
+            } else if (arAr != null) {
+                // Ele também está no ar e ao alcance: o golpe que sai primeiro e chega (o jM dele,
+                // rápido e longo, ganhava do jH dela, lento, curto e só descendo: registro real).
+                jumpIn = false;
+                crossJump = false;
+                press(arAr, me, out);
+                lastReason = "ar contra ar";
+                return true;
             } else if (!me.grounded && me.canAct() && me.vy >= 0f && seen != null &&
                 Math.abs(seen.x - me.x) <= JUMP_IN_REACH) {
                 // Descendo: solta o aéreo agora (o mais forte que ela tiver). Passando por cima do
@@ -1885,6 +1902,65 @@ final class AiController {
             saidaPlano = -1;
         }
         return false;
+    }
+
+    /**
+     * Ar contra ar: com o rival pulando (livre ou golpeando) perto, o golpe no ar (L, M ou H) que
+     * sai mais cedo e chega até ele, contando o quanto os dois se aproximam até o golpe ficar
+     * ativo. Null: ninguém no ar, ou nenhum golpe alcança ainda.
+     */
+    private String golpeArAr(CombatEngine engine, CombatFighter me, CpuPerception.Snapshot seen, float ultimoX) {
+        if (!arArLigado || !arArPlano || seen == null || seen.ko || seen.grounded ||
+            seen.status != CombatFighter.Status.NEUTRAL && seen.status != CombatFighter.Status.ATTACK) return null;
+        // A trajetória dele pelo que ela viu (o pulo segue reto no ar): onde ele está agora.
+        CpuPerception.Snapshot antes = perception.seen(reacao + MOTION_SAMPLE);
+        int amostra = MOTION_SAMPLE;
+        if (antes == null || antes.grounded) {
+            antes = perception.seen(reacao + 1);
+            amostra = 1;
+        }
+        float vRival = antes == null ? 0f : (seen.x - antes.x) / amostra;
+        int passou = Math.max(0, engine.frame() - seen.frame);
+        float x = seen.x + vRival * passou;
+        float gap = Math.abs(x - me.x);
+        if (gap > JUMP_IN_REACH + 80f) return null;
+        float lado = Math.signum(x - me.x);
+        // O próprio andar no ar ela sabe (o quanto andou do quadro passado para este).
+        float vEu = Float.isNaN(ultimoX) ? 0f : me.x - ultimoX;
+        float aproxima = Math.max(0f, vEu * lado - vRival * lado);
+        String melhor = null;
+        int cedo = Integer.MAX_VALUE;
+        for (String b : new String[] {"L", "M", "H"}) {
+            CharacterDefinition.Move m = me.character().move(b, true);
+            if (m == null || m.attack == null) continue;
+            AttackDefinition a = m.attack;
+            if (a.reach + aproxima * a.startupFrames < gap) continue;
+            if (a.startupFrames < cedo) {
+                cedo = a.startupFrames;
+                melhor = b;
+            }
+        }
+        return melhor;
+    }
+
+    /** Baterias: desliga a escolha do golpe no ar contra ar (antes × depois). */
+    static boolean arArLigado = true;
+    /** Onde ela estava no quadro passado (a velocidade dela no ar; o pulo não usa vx). */
+    private float arArUltimoX = Float.NaN;
+    /** Neste pulo ela vai disputar o ar (chance do nível, sorteada uma vez por pulo). */
+    private boolean arArPlano, arArSorteado;
+
+    /** Baterias: ela pula para dentro agora (o mesmo que o plano do pulo faz). */
+    void pularParaDentro(CombatFighter me, FighterInput out) {
+        out.clear();
+        out.jump = true;
+        out.direction = me.facing > 0 ? 8 : 6;
+        jumpHold = JUMP_HOLD_FRAMES;
+        jumpHoldDirection = out.direction;
+        jumpIn = true;
+        crossJump = false;
+        guardFrames = 0;
+        lastReason = "pulo para dentro";
     }
 
     /** Pelo que ela viu (há {@code reacao} quadros), ele já está tocando o chão agora. */

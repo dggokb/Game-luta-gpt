@@ -174,7 +174,8 @@ vitórias e 2 derrotas. O jogador: "melhorou bastante".
   - O teste: escolher o golpe que sai primeiro e alcança, sem esperar descer. A simulação
     (`BateriaArAr`, um jogador que pula junto quando ela pula) não mostrou diferença. Quase não
     houve troca no ar entre os dois. Pela regra (simula; positivo fica, senão sai), saiu.
-  - Precisa de um teste que monte a troca no ar de propósito.
+  - Precisa de um teste que monte a troca no ar de propósito. Feito: veja "Ar contra ar
+    montado", abaixo.
 - **Os pulos dela rendem pouco:**
   - ela pulou 123 vezes nas 7 lutas;
   - apanhou no ar em 40 (33%) e acertou em 30 (24%);
@@ -184,3 +185,56 @@ vitórias e 2 derrotas. O jogador: "melhorou bastante".
 - **"Levanta defendendo"** também aparecia ao sair do atordoamento, no meio do combo. Agora é "sai
   do atordoamento defendendo".
 - **O relógio de cada luta já começa do zero.** A correção funcionou.
+
+### Ar contra ar montado (pedido do jogador: "faz a simulação do ar contra ar e testa de novo")
+
+**A cena.** `BateriaArAr` põe os dois parados a 300, 380 ou 460 de distância. A CPU pula para dentro
+(o plano dela) e o jogador pula também, de 10 quadros antes a 10 depois. No ar, o jogador solta:
+- o jM ao alcançar (o do registro);
+- o jM cedo;
+- o jL;
+- o jH descendo;
+- nada.
+
+São p15 e Ryūga contra os 16, nos níveis 5 e 8, com 300 cenas por linha.
+
+**Antes:** contra o jM ela não acertava nunca (0–1% das cenas). Ou defendia no ar (12–35%), ou
+levava o golpe. Dois motivos:
+- **Não via onde você estava.** Ela vê você com o atraso da reação (13 quadros no nível 8). A
+  velocidade do pulo não aparece no `vx` (fica 0), então ela via você uns 110 px mais longe do que
+  você estava e achava que nada alcançava.
+- **Escolhia mal o golpe.** Só soltava descendo, e o mais forte (jH: 8–12 quadros, curto). O jM sai
+  em 5–6 e alcança mais.
+
+**Agora:**
+- **Ela prevê a trajetória.** Usa o que viu nos últimos quadros: o pulo segue reto.
+- **Disputa no momento certo:** solta o golpe que sai primeiro e chega lá, subindo ou descendo.
+- **Nem sempre disputa.** A chance de disputar no pulo é a do antiaéreo do nível: 50% no 5, 85% no
+  8. Senão, faz como antes.
+
+Fração das cenas, nível 8 (você acerta / ela acerta / troca / defendido):
+
+| seu golpe | antes | agora |
+|---|---|---|
+| jM ao alcançar | 50 / 1 / 0 / 35% | 49 / 25 / 5 / 5% |
+| jM cedo | 51 / 0 / 0 / 38% | 67 / 13 / 3 / 6% |
+| jL | 67 / 3 / 0 / 17% | 56 / 22 / 4 / 3% |
+| jH descendo | 20 / 38 / 21 / 0% | 3 / 73 / 3 / 1% |
+
+**Média dos quatro golpes, nível 8:**
+- você acerta 44% das cenas (era 47%);
+- ela acerta 33% (era 10%).
+
+**No nível 5:** você acerta 57% (era 58%) e ela 19% (era 10%).
+
+**O que não muda.** Ela não vê o seu golpe sair antes de decidir: a reação dela não deixa. Por isso
+o jM cedo, apertado antes de ela ver você no ar, agora entra mais (ela troca em vez de defender).
+Também tentei:
+- defender se o seu golpe já está saindo: ela nunca chega a ver a tempo;
+- só disputar se o golpe dela for mais rápido que o seu mais rápido que alcança: deu quase igual.
+
+Ficou a versão simples.
+
+**CPU × CPU:** igual. A luta dura 55 s no nível 5 e 62 s no 8, e ela pula 2,9 e 6,7 vezes por luta.
+
+Saída completa: [perfis/ar-contra-ar.md](perfis/ar-contra-ar.md). Teste: `CpuArArTest`.
