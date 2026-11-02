@@ -128,3 +128,59 @@ O nível 5 continua deixando passar metade: é o nível de aprender. Saídas com
 - [perfis/levantar-antes.md](perfis/levantar-antes.md)
 - [perfis/levantar-sem-troca.md](perfis/levantar-sem-troca.md)
 - [perfis/levantar-depois.md](perfis/levantar-depois.md)
+
+## O segundo registro real (02/11): depois da correção do levantar
+
+Arcade com p02 + p15: 7 lutas, níveis 5, 5, 6, 6, 7 (2x2) e 8, 8 (1x1, contra p02). Foram 5
+vitórias e 2 derrotas. O jogador: "melhorou bastante".
+
+| luta | nível | resultado | vida que sobrou (você × CPU) | dano seu × da CPU |
+|---|---|---|---|---|
+| 1 | 5 | venceu | 4908 × 514 | 34,9 mil × 28,1 mil |
+| 2 | 5 | venceu | 4377 × 261 | 36,2 mil × 29,5 mil |
+| 3 | 6 | perdeu | 0 × 4506 | 19,4 mil × 35,0 mil |
+| 4 | 6 | venceu (revanche) | 7598 × 302 | 32,7 mil × 16,4 mil |
+| 5 | 7 | venceu | 1745 × 812 | 33,2 mil × 34,1 mil |
+| 6 | 8 | perdeu | 626 × 615 | 13,9 mil × 14,8 mil |
+| 7 | 8 | venceu (revanche) | 5901 × 316 | 15,5 mil × 9,7 mil |
+
+### O que melhorou
+- **O levantar:**
+
+  | | 1º registro | 2º registro |
+  |---|---|---|
+  | levantares com você perto | 50 | 68 |
+  | você acerta | 26 | 14 |
+  | ela defende | 2 | 22 |
+  | ela acerta primeiro | 8 | 12 |
+
+- **Rasteira e jM:** caíram de 56% para 25% do seu dano. A rasteira sozinha foi de 21% para 8%.
+- **Você passou a variar:** jab (L), bola (S), TAG e 2H abrem combos tanto quanto o jM.
+- **O nível sobe certo:** quatro das sete lutas acabaram com alguém abaixo de 900 de vida. O 8
+  perdeu por 11 de vida e depois ganhou a revanche com folga.
+- **A CPU usa o kit todo:**
+  - defesa perfeita: 30;
+  - parry e guard cancel;
+  - corrida de energia, TAG e SHINKAI;
+  - Ultra que mata você 4 vezes;
+  - combo breaker: 22 dos seus 157 combos, 14%.
+- **O dano da CPU vem de vários lugares:** a bola (21%), o jH (15%), o L (12%) e o 2L (10%).
+  Muito dele entrou com você apertando golpe: troca de golpes, não falha dela.
+
+### O que ainda é estranho
+- **Ar contra ar:** você ganhou 19 trocas no ar e ela 14. Em 8, o seu jM bateu no jH dela.
+  - Por quê: o jH sai em 8 a 12 quadros e alcança pouco; o jM sai em 5 a 6 e alcança mais. Ela só
+    solta o golpe descendo.
+  - O teste: escolher o golpe que sai primeiro e alcança, sem esperar descer. A simulação
+    (`BateriaArAr`, um jogador que pula junto quando ela pula) não mostrou diferença. Quase não
+    houve troca no ar entre os dois. Pela regra (simula; positivo fica, senão sai), saiu.
+  - Precisa de um teste que monte a troca no ar de propósito.
+- **Os pulos dela rendem pouco:**
+  - ela pulou 123 vezes nas 7 lutas;
+  - apanhou no ar em 40 (33%) e acertou em 30 (24%);
+  - o seu pulo acertou em 35% (49 de 140) e apanhou em 22%.
+- **O nome "pula antes da bola"** aparecia também contra quem pula ou cutuca, sem bola nenhuma.
+  Agora é "pula na meia distância".
+- **"Levanta defendendo"** também aparecia ao sair do atordoamento, no meio do combo. Agora é "sai
+  do atordoamento defendendo".
+- **O relógio de cada luta já começa do zero.** A correção funcionou.

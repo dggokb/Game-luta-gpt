@@ -833,7 +833,7 @@ final class AiController {
                 jumpHoldDirection = out.direction;
                 jumpIn = true;
                 guardFrames = 0;
-                lastReason = "pula antes da bola";
+                lastReason = cutuca ? "pula na meia distância" : "pula antes da bola";
                 return true;
             case PRESSIONA:
                 // Colado em quem zoneia: o 2L (rápido e baixo) que abre o combo; fora do alcance, anda.
@@ -1875,7 +1875,7 @@ final class AiController {
             guardFrames = SAIDA_QUADROS + reactRandom.nextInt(SAIDA_SPREAD);
             int side = seen.x > me.x ? 1 : seen.x < me.x ? -1 : me.facing;
             out.direction = guardLow ? (side > 0 ? 4 : 2) : (side > 0 ? 5 : 1);
-            if (lastReason == null || !lastReason.startsWith("levanta defendendo")) lastReason = "levanta defendendo";
+            lastReason = me.status == CombatFighter.Status.WAKEUP ? "levanta defendendo" : "sai do atordoamento defendendo";
             return true;
         }
         if (saidaPresa) {
