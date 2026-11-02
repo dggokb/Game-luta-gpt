@@ -1533,3 +1533,31 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
     REGISTRO;
   - agora é "◀ MENU" (a pausa) em todo modo;
   - a seleção de dupla do teste continua no botão DUPLA e no SELECT do controle.
+
+## CPU pressiona nos níveis 7 e 8 e vai atrás depois do antiaéreo (pedido do jogador, 02/11)
+
+- **O problema:** no 3º registro a CPU atacava 22–26 vezes por minuto e o jogador 43–51.
+  - Depois da sequência defendida, ela voltava ao neutro.
+  - Com o jogador caído, esperava.
+  - Depois do antiaéreo, parava.
+- **Agora, a pressão** (0 até o nível 6; 0,5 no 7; 0,8 no 8):
+  - o respiro entre os golpes encurta;
+  - a parada na beira do jab e o recuo somem; quem luta de longe (zoner) mantém a distância dele;
+  - com a sequência defendida e ele perto, ela segue em cima: outro golpe rápido (que pega quem
+    aperta botão) ou o agarrão (30%);
+  - com ele caído, ela chega perto e solta o 2L em cima do levantar (ou o agarrão, 25%).
+- **Depois do antiaéreo** (qualquer golpe de chão dela que pega ele pulando), com a chance de
+  confirmar do nível:
+  - se ele cai atordoado ao alcance, ela emenda um golpe de chão;
+  - se ele foi alto, ela dá o super pulo atrás e bate no ar;
+  - se ele cai no chão, ela fica em cima do levantar.
+- **Simulado (`BateriaPressao`, 80 lutas por nível e jogador):**
+  - contra o laço do registro, no nível 8: a CPU vence 84% (era 76%) e tira 13% mais dano por
+    minuto;
+  - contra quem defende: ela segue em cima de 72% das sequências defendidas (era 58%), com 57
+    golpes por minuto (era 50);
+  - o golpe no levantar acerta dois terços das vezes; o pulo atrás do antiaéreo, quase todas;
+  - CPU nova contra a antiga, no mesmo nível: 55% no 7, 51% no 8;
+  - o nível 5 fica igual.
+- **Ficou:** o resultado é positivo.
+- **Detalhes:** `registro-luta.md` e `perfis/pressao-cpu.md`.

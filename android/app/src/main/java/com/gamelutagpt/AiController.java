@@ -1146,7 +1146,18 @@ final class AiController {
         }
         wakeupPlan = -2;
 
+        // Ele estava no ar por conta própria (pulando, não jogado por golpe) no quadro de antes.
+        boolean alvoPulava = alvoNoAr;
+        alvoNoAr = !target.grounded && (target.status == CombatFighter.Status.NEUTRAL || target.status == CombatFighter.Status.ATTACK);
         if (me.attacking()) {
+            // Qualquer golpe de chão dela que pega ele pulando conta como antiaéreo (não só o 2H
+            // de reação: a cutucada que acerta quem pula também derruba).
+            if (me.outcome == CombatFighter.Outcome.HIT && ownHitFrame < 0 && me.grounded && alvoPulava) marcarAntiAereo(engine);
+            if (me.outcome == CombatFighter.Outcome.HIT && engine.frame() - aaQuadro < 45 && !aaAcertou) {
+                aaAcertou = true;
+                aaJuggleFeito = aaJuggleDecidido = false;
+                okiDoAntiAereo = true;
+            }
             if (me.outcome == CombatFighter.Outcome.HIT && ownHitFrame < 0) ownHitFrame = engine.frame();
             if (!me.grounded && me.outcome == CombatFighter.Outcome.HIT) pousoEmenda = true;
             if (me.outcome == CombatFighter.Outcome.BLOCK && me.grounded) sequenciaDefendida = true;
@@ -1178,11 +1189,12 @@ final class AiController {
         }
         if (route != null && runComboFromNeutral(engine, me, target, out)) return;
         if (emendaDoPulo(me, target, out)) return;
+        if (seguirAntiAereo(engine, me, target, out)) return;
         if (lastAttack != null) {
             cooldown = Math.max(cooldown,
                 lastAttack.kind == AttackDefinition.Kind.SUPER ? SUPER_COOLDOWN
                     : lastAttack.kind == AttackDefinition.Kind.PROJECTILE ? ENERGY_COOLDOWN
-                    : ATTACK_COOLDOWN);
+                    : Math.round(ATTACK_COOLDOWN * (1f - 0.5f * (float)pressao())));
             lastAttack = null;
         }
         if (target.ko()) {
@@ -1209,8 +1221,10 @@ final class AiController {
         if (sequenciaDefendida && me.grounded && route == null) {
             sequenciaDefendida = false;
             if (lerDepoisDeDefender(engine, me, target, seen, out)) return;
+            if (seguirEmCima(engine, me, target, seen, out)) return;
         }
         if (me.grounded && lerLevantar(engine, me, target, seen, out)) return;
+        if (okiPressao(engine, me, target, out)) return;
         if (agarrarLido > 0) {
             agarrarLido--;
             // Ele atacou (ou pulou): o plano acabou, a reação de defesa e punição cuida.
@@ -1254,6 +1268,7 @@ final class AiController {
         situation.rivalBlocked = seen.frame - lastRivalBlockFrame < RIVAL_BLOCK_MEMORY;
         situation.style = CpuStyle.of(me.character());
         situation.urgency = urgency;
+        situation.pressao = pressao();
         situation.rivalZoning = rivalZoning(seen.frame);
         situation.fatorCorre = fatorAbordagem(CpuLeitura.Abordagem.CORRE);
         situation.fatorPulo = fatorAbordagem(CpuLeitura.Abordagem.PULA);
@@ -1261,7 +1276,7 @@ final class AiController {
         situation.fatorBola = fatorAbordagem(CpuLeitura.Abordagem.BOLA) * fatorBolaLida();
         clearRequests();
         if (ai.think(CombatConfig.DT, situation, actions)) {
-            walkInPlan = !roll(level.reactGuard * EDGE_STOP);
+            walkInPlan = !roll(level.reactGuard * EDGE_STOP * (1.0 - pressao()));
             specialNeutral(me, target, seen);
         }
         if (movingForward && !dashing && attack == null && special == null && !superAttack && !grab && !jump &&
@@ -1271,7 +1286,7 @@ final class AiController {
             // distância que ela vê é a de antes da reação, e os dois estão andando). Para ali
             // e espera defendendo; entra pelo dash, pelo pulo, pela punição ou pelo golpe dela.
             movingForward = false;
-            if (roll(level.reactGuard * 0.25)) {
+            if (roll(level.reactGuard * 0.25 * (1.0 - pressao()))) {
                 guardFrames = 8 + reactRandom.nextInt(8);
                 guardLow = true;
                 guardHabit = true;
@@ -2036,6 +2051,243 @@ final class AiController {
     /** Baterias: desliga o levantar defendendo / a troca para baixo quando ele cai do pulo (antes × depois). */
     static boolean saidaLigada = true, trocaBaixaLigada = true;
 
+    /**
+     * Pressão dos níveis altos (pedido de 02/11: "ela não pressiona"): golpes mais seguidos no
+     * neutro e, com a sequência defendida, segue em cima (outro golpe rápido ou o agarrão) em vez
+     * de voltar ao neutro. Por instância (a bateria compara a nova com a antiga na mesma luta).
+     */
+    /**
+     * O quanto ela vai para cima (0 até o nível 6; 0,5 no 7; 0,8 no 8): encurta o respiro entre os
+     * golpes, tira o recuo e a parada na beira do jab, segue em cima da sequência defendida e fica
+     * em cima de quem caiu.
+     */
+    private double pressao() {
+        if (!pressaoLigada) return 0.0;
+        return level.number <= 6 ? 0.0 : level.number == 7 ? PRESSAO_7 : PRESSAO_8;
+    }
+
+    static double PRESSAO_7 = 0.5, PRESSAO_8 = 0.8;
+    /** Fração do seguir em cima que vai para o agarrão (contra quem fica defendendo). */
+    static double PRESSAO_AGARRA = 0.3;
+    /** Fração das quedas em que ela vai no agarrão quando ele levanta (o resto é o golpe em cima). */
+    static double OKI_AGARRA = 0.25;
+
+    /**
+     * A sequência dela acabou de ser defendida e ele ainda está perto: segue em cima (outro golpe
+     * rápido logo em seguida, que pega quem aperta botão, ou o agarrão em quem fica defendendo)
+     * em vez de voltar ao neutro.
+     */
+    private boolean seguirEmCima(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                 CpuPerception.Snapshot seen, FighterInput out) {
+        double p = pressao();
+        if (p <= 0.0 || !me.canAct() || !seen.grounded) return false;
+        float gap = Math.abs(target.x - me.x);
+        if (gap > SEGUE_PERTO || !roll(p)) return false;
+        if (roll(PRESSAO_AGARRA)) {
+            agarrarLido = PLANO_AGARRAR / 2;
+            return agarrar(engine, me, target, out, "pressão: ");
+        }
+        if (pressionar(me, target, out)) {
+            lastReason = "pressão: emenda " + lastReason.substring(lastReason.indexOf('('));
+            return true;
+        }
+        return false;
+    }
+
+    /** Distância (centros) até onde ela segue em cima da sequência defendida. */
+    static final float SEGUE_PERTO = 230f;
+
+    /** Ela ficou em cima de quem caiu nesta queda (decidido uma vez por queda). */
+    private boolean okiDecidido, okiPlano, okiAgarra, okiDoAntiAereo;
+
+    /**
+     * Ele caiu: com a pressão do nível (ou depois do antiaéreo dela), chega perto e, quando ele
+     * levanta, solta o golpe baixo rápido em cima da hora (o tempo do levantar ela sabe, como quem
+     * decorou) ou vai no agarrão. Rolando para longe, deixa.
+     */
+    private boolean okiPressao(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        boolean caido = target.status == CombatFighter.Status.KNOCKDOWN || target.status == CombatFighter.Status.WAKEUP;
+        if (!caido) {
+            okiDecidido = false;
+            okiDoAntiAereo = false;
+            return false;
+        }
+        if (!okiDecidido) {
+            okiDecidido = true;
+            double p = Math.max(pressao(), okiDoAntiAereo ? seguirAA() : 0.0);
+            okiPlano = p > 0.0 && roll(p);
+            okiAgarra = okiPlano && roll(OKI_AGARRA);
+        }
+        if (!okiPlano || !me.grounded || !me.canAct()) return false;
+        if (target.rollFrames > 0 || target.wakeup == CombatFighter.WAKE_BACK_ROLL ||
+            target.wakeup == CombatFighter.WAKE_FORWARD_ROLL) {
+            okiPlano = false;
+            return false;
+        }
+        CharacterDefinition c = me.character();
+        String meaty = c.move("2L", false) != null && c.attack("2L") != null ? "2L" : "L";
+        AttackDefinition golpe = c.attack(meaty);
+        if (golpe == null) return false;
+        float gap = Math.abs(target.x - me.x);
+        boolean perto = okiAgarra ? gap <= throwReach(engine, me, target) - 8f
+            : CpuReach.reaches(c, meaty, false, gap + OKI_FOLGA, target.body(), target.crouchingBody());
+        int livre = livreEm(engine, target);
+        if (!perto) {
+            out.direction = me.facing > 0 ? 1 : 5;
+            out.dash = gap > 300f && livre > 25;
+            lastReason = "fica em cima de quem caiu";
+            return true;
+        }
+        if (livre < 0) return false;
+        movingForward = movingBack = dashing = false;
+        if (okiAgarra) {
+            if (livre <= 1) {
+                // Levantou: o plano de agarrar pega no primeiro quadro em que ele pode ser agarrado.
+                agarrarLido = 10;
+                okiPlano = false;
+            }
+            lastReason = "espera ele levantar para agarrar";
+            return true;
+        }
+        if (livre <= golpe.startupFrames - 1) {
+            okiPlano = false;
+            startRoute(c, meaty);
+            press(meaty, me, out);
+            lastReason = "golpe em cima do levantar (" + meaty + ")";
+            return true;
+        }
+        lastReason = "espera ele levantar";
+        return true;
+    }
+
+    /** Folga do golpe em cima do levantar (ele levanta um pouco mais para lá ou para cá). */
+    static final float OKI_FOLGA = 15f;
+
+    /** Quadros até ele poder agir de novo (caindo ou levantando), ou -1 rolando ou ainda no ar. */
+    static int livreEm(CombatEngine e, CombatFighter r) {
+        CombatConfig c = e.config;
+        if (r.status == CombatFighter.Status.WAKEUP) {
+            if (r.rollFrames > 0) return -1;
+            return Math.max(0, e.wakeupFrames(r) - r.knockdownFrame);
+        }
+        if (r.status != CombatFighter.Status.KNOCKDOWN || r.knockdownFrame < c.knockdownFallFrames) return -1;
+        if (r.wakeup == CombatFighter.WAKE_BACK_ROLL || r.wakeup == CombatFighter.WAKE_FORWARD_ROLL) return -1;
+        int down = c.knockdownDownFrames;
+        if (r.wakeup == CombatFighter.WAKE_QUICK) down = Math.min(down, c.quickRiseDownFrames);
+        if (r.wakeup == CombatFighter.WAKE_DELAY) down += c.delayWakeupFrames;
+        return Math.max(0, c.knockdownFallFrames + down - r.knockdownFrame) + e.wakeupFrames(r);
+    }
+
+    /** O antiaéreo que ela soltou (quadro), se acertou, e se a emenda no ar já foi tentada. */
+    private int aaQuadro = -1000;
+    private boolean aaAcertou, aaJuggleFeito, aaJuggleDecidido, aaJugglePlano, alvoNoAr;
+
+    private void marcarAntiAereo(CombatEngine engine) {
+        aaQuadro = engine.frame();
+        aaAcertou = false;
+    }
+
+    /** Chance de ir atrás depois do antiaéreo que acertou (pelo nível). */
+    private double seguirAA() {
+        return seguirAntiAereoLigado ? level.confirm * (0.5 + 0.5 * smart()) : 0.0;
+    }
+
+    /**
+     * O antiaéreo acertou e ele está caindo atordoado: emenda um golpe de chão que alcança onde ele
+     * vai estar (uma tentativa). Se não der, a queda dele fica com o golpe em cima do levantar
+     * ({@link #okiPressao}).
+     */
+    private boolean seguirAntiAereo(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        if (aaNoAr > 0) {
+            // Pulou atrás dele: o golpe aéreo quando ele estiver ao alcance; caiu, acabou.
+            if (me.grounded && ++aaNoAr > 12 || target.status != CombatFighter.Status.AIR_HITSTUN) {
+                aaNoAr = 0;
+                return false;
+            }
+            if (me.grounded) {
+                out.superJump = true;
+                out.direction = target.x > me.x ? 8 : 6;
+                return true;
+            }
+            if (!me.canAct()) return false;
+            float gap = Math.abs(target.x - me.x);
+            if (Math.abs(target.y - me.y) <= 115f) {
+                for (String b : new String[] {"H", "M", "L"}) {
+                    if (me.character().move(b, true) == null || !CombatRules.reaches(me.character(), b, true, gap, target.body())) continue;
+                    aaNoAr = 0;
+                    press("j" + b, me, out);
+                    lastReason = "antiaéreo: pula atrás e bate (j" + b + ")";
+                    return true;
+                }
+            }
+            out.direction = target.x > me.x ? 1 : 5;
+            return true;
+        }
+        if (!aaAcertou || aaJuggleFeito || !juggleLigado) return false;
+        if (target.status != CombatFighter.Status.AIR_HITSTUN) {
+            if (target.status != CombatFighter.Status.HITSTUN) aaAcertou = false;
+            return false;
+        }
+        if (!me.grounded || !me.canAct() || target.stunLeft <= 0) return false;
+        if (!aaJuggleDecidido) {
+            aaJuggleDecidido = true;
+            aaJugglePlano = roll(seguirAA());
+        }
+        if (!aaJugglePlano) return false;
+        CharacterDefinition c = me.character();
+        float g = engine.config.gravity;
+        for (int i = 0; i < JUGGLE.length; i++) {
+            String b = JUGGLE[i];
+            AttackDefinition a = c.attack(b);
+            if (a == null || c.move(b, false) == null || target.stunLeft <= a.startupFrames) continue;
+            // Onde ele vai estar quando o golpe sair (ele cai e anda com o empurrão): na altura que
+            // o golpe pega e ao alcance.
+            float t = a.startupFrames * CombatConfig.DT;
+            float x = target.x + target.vx * t;
+            float y = target.y + target.vy * t + 0.5f * g * t * t;
+            float altura = Arena.GROUND_Y - y;
+            if (altura < 0f || altura > JUGGLE_ALTURA[i]) continue;
+            if (!CombatRules.reaches(c, b, false, Math.abs(x - me.x), target.body())) continue;
+            aaJuggleFeito = true;
+            startRoute(c, b);
+            press(b, me, out);
+            lastReason = "antiaéreo: emenda no ar (" + b + ")";
+            return true;
+        }
+        // Ainda alto e atordoado por um bom tempo: super pulo atrás dele.
+        float altura = Arena.GROUND_Y - target.y;
+        if (puloAtrasLigado && altura > 150f && target.stunLeft >= AA_PULO_STUN && Math.abs(target.x - me.x) < 300f) {
+            aaJuggleFeito = true;
+            aaNoAr = 1;
+            out.superJump = true;
+            out.direction = target.x > me.x ? 8 : 6;
+            lastReason = "antiaéreo: pula atrás";
+            return true;
+        }
+        // Ainda alto: anda para debaixo dele e espera a hora.
+        float gap = Math.abs(target.x - me.x);
+        movingForward = gap > 110f;
+        out.direction = movingForward ? (me.facing > 0 ? 1 : 5) : 0;
+        lastReason = "antiaéreo: espera ele cair";
+        return true;
+    }
+
+    /** Golpes de chão para emendar no rival que cai do antiaéreo (o mais forte que alcança primeiro). */
+    static final String[] JUGGLE = {"2H", "H", "M", "L"};
+    /** Até que altura (do chão) cada um pega quem cai. */
+    static final float[] JUGGLE_ALTURA = {170f, 110f, 90f, 80f};
+    static boolean juggleLigado = true, puloAtrasLigado = true;
+    /** Atordoamento que ainda falta para valer o super pulo atrás dele (a subida leva uns 20 quadros). */
+    static final int AA_PULO_STUN = 24;
+    /** Quadros do super pulo atrás dele depois do antiaéreo (0: não está pulando). */
+    private int aaNoAr;
+
+    static boolean pressaoPadrao = true;
+    boolean pressaoLigada = pressaoPadrao;
+    /** Depois do antiaéreo que acertou: vai atrás (emenda no ar ou fica em cima de quem cai). */
+    static boolean seguirAntiAereoPadrao = true;
+    boolean seguirAntiAereoLigado = seguirAntiAereoPadrao;
+
     /** Rival mais perto que isto no levantar: ela levanta defendendo (se decidir). */
     static final float SAIDA_PERTO = 300f;
     /** Chance de levantar defendendo, sem ter aprendido nada dele (× a defesa do nível). */
@@ -2341,6 +2593,7 @@ final class AiController {
             antiAirPlan = false;
             pressSpecial(rising, out);
             lastReason = "antiaereo (" + rising.id + ")";
+            marcarAntiAereo(engine);
             return true;
         }
         if (height > 240f || height < 0f || !CombatRules.reaches(c, "2H", false, gap, target.body())) return false;
@@ -2348,6 +2601,7 @@ final class AiController {
         startRoute(c, "2H");
         press("2H", me, out);
         lastReason = "antiaereo";
+        marcarAntiAereo(engine);
         return true;
     }
 

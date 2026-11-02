@@ -316,3 +316,32 @@ p14 (35 dos 94), depois p10 (13), p05 (11) e o Ryūga (10).
 
 A CPU passa de 8 golpes quase só com o Super ou o Ultra. Saída completa:
 [perfis/combos-longos.md](perfis/combos-longos.md).
+
+### Pressão e seguir o antiaéreo (pedido do jogador: "sim, faz as duas e simula")
+
+A CPU contra dois jogadores roteirizados (`BateriaPressao`): o laço do registro (rasteira, pulo
+com jM) e um que defende mais (segura a defesa com reação de 14 quadros, cutuca e pula às vezes).
+
+| nível 8 | antes | agora |
+|---|---|---|
+| CPU vence o laço | 76% | 84% |
+| dano dela por minuto (laço) | 14.403 | 16.274 |
+| golpes por minuto (contra quem defende) | 50 | 57 |
+| segue em cima da sequência defendida | 58% | 72% |
+| dano nos 4 s depois do antiaéreo (laço) | 966 | 1.063 |
+
+- **Medido à parte:**
+  - golpe em cima do levantar: 523 tentativas contra quem defende, 345 acertam e 109 são
+    defendidas;
+  - pulo atrás do antiaéreo contra o laço: 78 de 78 acertam;
+  - a emenda de chão no antiaéreo quase não aparece, porque o 2H joga alto e o atordoamento acaba
+    antes da queda.
+- **Ajustes testados sem diferença fora do ruído** (CPU nova contra a antiga, 600 lutas):
+  - pressão 0,8/1,0;
+  - agarrão 10% ou 50%;
+  - agarrão no levantar 0% ou 50%;
+  - sem o pulo atrás.
+- **Efeito colateral corrigido:** com a pressão, o zoner largava a bola (o p15 deixou de ter onda
+  para repelir).
+  - Agora quem luta de longe não ganha a agressividade do neutro; só a pressão da sequência e a do
+    levantar.

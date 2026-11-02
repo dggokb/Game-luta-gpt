@@ -49,6 +49,8 @@ final class OpponentAi {
          * não deixar o tempo acabar. Ver {@link #urgency(int)}.
          */
         float urgency;
+        /** Pressão dos níveis altos (0 a 1): mais vontade de ir para cima no neutro. */
+        double pressao;
         /** O rival anda soltando bola (várias há pouco): ela vai atrás, ou devolve com a dela. */
         boolean rivalZoning;
         /**
@@ -126,7 +128,10 @@ final class OpponentAi {
         // Com pressa ela decide mais rápido (até 35% menos tempo entre as decisões).
         decisionTimer = (min + random.nextFloat() * (max - min)) * (1f - 0.35f * u) * DECISION_PACE;
         // E luta como o estilo agressivo: no fim do tempo todo mundo vai para cima.
-        double aggression = style.aggression + (1.0 - style.aggression) * u;
+        // A pressão dos níveis altos também empurra para cima no neutro, menos quem luta de longe
+        // (o zoner segue na distância dele; a pressão dele é a da sequência e a do levantar).
+        double pressao = style.zoning >= 1.5 ? 0.0 : 0.6 * s.pressao;
+        double aggression = style.aggression + (1.0 - style.aggression) * Math.max(u, pressao);
         actions.stop();
         // O imprevisível às vezes larga o plano e faz qualquer coisa.
         if (style.erratic() && !s.selfAirborne && s.targetAlive && random.nextDouble() < 0.12) {
