@@ -254,14 +254,15 @@ final class DemoDirector {
                     c -> c.engine.restage(X - 200f, X + 420f),
                     (c, p1, cpu) -> { if (c.t == 0) p1.shinkai = true; },
                     c -> c.cue("SHINKAI")),
-                new Step("PERCEPÇÃO: DESLIGAR", "o SHINKAI do Ryūga dura pelo desgaste do corpo; SHINKAI de novo desliga e devolve parte da barra", 150,
+                new Step("PERCEPÇÃO: DESLIGAR", "o SHINKAI do Ryūga dura pelo desgaste do corpo; SHINKAI de novo desliga e devolve parte da barra", 320,
                     c -> c.engine.restage(X - 300f, X + 500f),
                     (c, p1, cpu) -> {
                         if (c.t == 0) p1.shinkai = true;
-                        if (c.t == 80) p1.shinkai = true;
+                        // Depois da ativação (a pausa dela, com a liberação de poder em vídeo).
+                        if (c.t == c.engine.shinkaiAtivacaoQuadros(c.p1()) + 40) p1.shinkai = true;
                     },
                     c -> c.cue("SHINKAI_FIM")),
-                new Step("SHINKAI NO MEIO DO COMBO", "L > M acertou: o SHINKAI congela o CPU e o combo segue com 2L > 2M", 240,
+                new Step("SHINKAI NO MEIO DO COMBO", "L > M acertou: o SHINKAI congela o CPU e o combo segue com 2L > 2M", 320,
                     c -> c.placeApart(X, 12f),
                     (c, p1, cpu) -> {
                         c.sequence(c.p1(), p1, "L", "M");

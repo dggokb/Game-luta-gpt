@@ -137,7 +137,8 @@ def empacotar(imagens):
 
 
 def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=None,
-              altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0):
+              altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0,
+              escala_mundo=None, resolucao=None, velocidade=1.0, apagar=None):
     if Path(video).is_dir():
         quadros, fps = ler_pngs(video, inicio, fim, passo), fps_png
     else:
@@ -150,9 +151,16 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
     else:
         fundo = cor_do_fundo(quadros)
         rgba = [chave(q, fundo) for q in quadros]
+    if apagar:
+        # A marca d'água do gerador: some do efeito.
+        for q in rgba:
+            q[apagar[1]:apagar[3], apagar[0]:apagar[2], 3] = 0
     ux0, uy0, ux1, uy1 = uniao([caixa(q[..., 3]) for q in rgba])
-    # Escala: a altura do efeito inteiro vira `altura` px do mundo (a folha guarda PIXEL_SCALE).
-    escala = altura * PIXEL_SCALE / (uy1 - uy0)
+    pixel_scale = resolucao or PIXEL_SCALE
+    # Escala: a altura do efeito inteiro vira `altura` px do mundo (a folha guarda pixel_scale);
+    # com escala_mundo, cada px do vídeo vira esse tanto de px do mundo (o personagem dentro do
+    # efeito no tamanho dele no jogo).
+    escala = (escala_mundo if escala_mundo else altura / (uy1 - uy0)) * pixel_scale
     if origem:
         ox, oy = origem[0] - (recorte[0] if recorte else 0), origem[1] - (recorte[1] if recorte else 0)
     elif ancora == 'chao':
@@ -182,15 +190,15 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
     destino = Path(saida) / nome
     destino.mkdir(parents=True, exist_ok=True)
     Image.fromarray(folha, 'RGBA').save(destino / 'folha.webp', lossless=True, method=6)
-    ms = round(1000.0 * passo / fps)
+    ms = round(1000.0 * passo / fps / velocidade)
     dados = {
         'nome': nome,
         'video': Path(video).name,
         'trecho': [inicio, fim if fim is not None else inicio + (len(quadros) - 1) * passo],
         'passo': passo,
         'ancora': 'origem' if origem else ancora,
-        'pixelScale': PIXEL_SCALE,
-        'altura': altura,
+        'pixelScale': pixel_scale,
+        'altura': round(escala / pixel_scale * (uy1 - uy0), 1),
         # Cada quadro: x, y, largura, altura na folha e onde o canto de cima fica em relação à
         # origem (pixels da folha).
         'quadros': [[lx, ly, im.shape[1], im.shape[0], round(dx, 1), round(dy, 1)]
@@ -244,9 +252,14 @@ def main():
     p.add_argument('--altura', type=float, default=200.0, help='altura do efeito no mundo (px)')
     p.add_argument('--recorte', type=lambda t: numeros(t, 4))
     p.add_argument('--fps', type=float, default=24.0, help='quadros por segundo da pasta de PNGs')
+    p.add_argument('--escala-mundo', type=float, help='px do mundo por px do vídeo (no lugar de --altura)')
+    p.add_argument('--resolucao', type=float, help=f'px da folha por px do mundo (padrão {PIXEL_SCALE})')
+    p.add_argument('--velocidade', type=float, default=1.0, help='toca N vezes mais rápido que o vídeo')
+    p.add_argument('--apagar', type=lambda t: numeros(t, 4), help='x0,y0,x1,y1: apaga (marca d\'água)')
     a = p.parse_args()
     destino, dados = converter(a.video, a.nome, a.inicio, a.fim, a.passo, a.ancora, a.origem,
-                               a.altura, a.recorte, fps_png=a.fps)
+                               a.altura, a.recorte, fps_png=a.fps, escala_mundo=a.escala_mundo,
+                               resolucao=a.resolucao, velocidade=a.velocidade, apagar=a.apagar)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 

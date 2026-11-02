@@ -333,3 +333,27 @@ braços no alto, segura, desce os braços e volta à guarda.
     cima.
 - **Outros personagens:** com a mesma animação no pacote (estado `SHINKAI_ATIVA`), ganham a mesma
   pausa sem mudar código.
+
+### Liberação de poder em vídeo e cinemática (02/11)
+
+O vídeo `Inicio_Centro - Liberação de Poder Shinkai` substitui a animação simples. Nele o Ryūga
+solta raios, a aura azul sobe e um dragão de energia gira em volta dele.
+- **Conversão:** vira o efeito `assets/efeitos/shinkai_player_base` pelo `efeito_video.py`, com
+  recorte suave: o meio transparente fica meio transparente.
+  - O trecho vai do quadro 3 ao 105, 1 quadro a cada 3, tocado 1,5× mais rápido: 35 quadros,
+    2,9 s.
+  - A escala é a do Ryūga no jogo (a guarda de 450 px do vídeo vira 224 px), com a origem nos pés
+    dele. A marca d'água sai.
+  - A folha tem 2014×2564 px, 0,75 px por px do mundo (5 MB).
+  - O conversor ganhou `--escala-mundo`, `--resolucao`, `--velocidade` e `--apagar`.
+- **No jogo:** ao ligar o SHINKAI, o efeito toca nos pés dele, virado para o lado em que ele olha,
+  e o sprite dele some enquanto isso. Quem desenha o Ryūga é o próprio vídeo.
+  - A pausa tem o tempo do efeito: a animação `SHINKAI_ATIVA` (a reserva, sem o vídeo) foi
+    esticada para os mesmos 2,9 s.
+- **Cinemática:**
+  - a câmera fecha nele (32% mais de zoom), trazendo o corpo, a aura e o dragão aos poucos para o
+    meio da tela;
+  - entram as faixas pretas de cinema e o HUD some;
+  - tudo isso entra e sai em 18 quadros;
+  - o rival e o cenário ficam escuros, e o rival, o relógio e o tempo do SHINKAI ficam parados.
+- **Qualquer personagem com `efeitos/shinkai_<id>`** ganha a mesma cena sem mexer no código.

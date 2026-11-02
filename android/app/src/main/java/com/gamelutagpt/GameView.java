@@ -2978,6 +2978,9 @@ public class GameView extends SurfaceView
                 ativacaoLado = side;
                 ativacaoInicio = engine.frame();
                 ativacaoQuadros = engine.shinkaiAtivacaoQuadros(f);
+                // Com o vídeo da liberação de poder (efeito shinkai_<id>: ele, a aura, os raios e o
+                // dragão), o efeito toca nos pés dele e o sprite some enquanto isso.
+                ativacaoEfeito = efeitos.tocar("shinkai_" + f.character().id, x, fighterVisualY(f), 1f, f.facing < 0);
             }
             // O nome vem no corte de ativação: sem o aviso por cima dele.
             banner = null;
@@ -2989,6 +2992,8 @@ public class GameView extends SurfaceView
 
     /** Lado que está tocando a animação de ativação do SHINKAI (-1: nenhum), desde que quadro e por quantos. */
     private int ativacaoLado = -1, ativacaoInicio, ativacaoQuadros;
+    /** A ativação está tocando o vídeo dela (efeito): o sprite do lutador fica escondido. */
+    private boolean ativacaoEfeito;
     /** Escurecido do cenário e do rival durante a ativação (o quanto; sobe e desce em ATIVACAO_FADE quadros). */
     static final int ATIVACAO_ESCURO = 170, ATIVACAO_FADE = 8;
     private final Filtro ativacaoEscuro = Filtro.matriz(new float[] {
@@ -3006,6 +3011,18 @@ public class GameView extends SurfaceView
             return false;
         }
         return true;
+    }
+
+    /** Zoom a mais da câmera na liberação do SHINKAI e a altura (acima dos pés) que vai ao meio da tela. */
+    static final float ATIVACAO_ZOOM = 0.32f, ATIVACAO_FOCO_ALTURA = 150f;
+    /** Quadros da entrada e da saída da cena (zoom, faixas pretas, HUD). */
+    static final int ATIVACAO_CINE_FADE = 18;
+
+    /** A cena da liberação do SHINKAI: 0 fora, sobe até 1 na entrada e volta na saída. */
+    private float ativacaoCinema() {
+        if (!ativacaoShinkai()) return 0f;
+        int passou = engine.frame() - ativacaoInicio, falta = ativacaoQuadros - passou;
+        return Math.min(1f, Math.min(passou, falta) / (float)ATIVACAO_CINE_FADE);
     }
 
     /** Alfa do escurecido da ativação (entra e sai suave). */
@@ -4071,7 +4088,10 @@ public class GameView extends SurfaceView
             }
 
             float cinematicZoom = cinematica.zoom();
-            float baseZoom = camera.zoom * superFlash.zoom * cinematicZoom;
+            // Liberação do SHINKAI: a câmera fecha em quem ativou, como numa cena.
+            float ativCine = ativacaoCinema();
+            float ativZoom = 1f + ATIVACAO_ZOOM * ativCine;
+            float baseZoom = camera.zoom * superFlash.zoom * cinematicZoom * ativZoom;
             float punchZoom = feel.zoom();
             float renderZoom = baseZoom * ultraCameraZoom * punchZoom;
             float visibleWorldWidth = VW / renderZoom;
@@ -4103,6 +4123,20 @@ public class GameView extends SurfaceView
                 k = k * k * (3f - 2f * k);
                 float screenX = fromX + (VW * 0.5f - fromX) * k;
                 float screenY = fromY + (VH * SUPER_FOCUS_Y - fromY) * k;
+                renderCameraX = ux - screenX / renderZoom + visibleWorldWidth / 2f;
+                renderCameraTop = uy - screenY / renderZoom;
+            }
+            if (ativCine > 0f) {
+                // O corpo dele (com a aura e o dragão em volta) vai para o meio da tela, aos poucos.
+                CombatFighter u = engine.fighter(ativacaoLado);
+                float ux = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+                float uy = fighterVisualY(u) - ATIVACAO_FOCO_ALTURA;
+                float plainZoom = baseZoom / ativZoom;
+                float plainLeft = clamp(renderCameraX - VW / plainZoom / 2f, 0f, WORLD_WIDTH - VW / plainZoom);
+                float fromX = (ux - plainLeft) * plainZoom, fromY = (uy - renderCameraTop) * plainZoom;
+                float k = ativCine * ativCine * (3f - 2f * ativCine);
+                float screenX = fromX + (VW * 0.5f - fromX) * k;
+                float screenY = fromY + (VH * 0.54f - fromY) * k;
                 renderCameraX = ux - screenX / renderZoom + visibleWorldWidth / 2f;
                 renderCameraTop = uy - screenY / renderZoom;
             }
@@ -4302,13 +4336,14 @@ public class GameView extends SurfaceView
                 canvas.drawRect(-40f, -40f, VW + 40f, VH + 40f, paint);
                 drawSecreto(canvas, renderZoom, cameraLeft, renderCameraTop);
             }
-            if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
+            float barras = Math.max(ultraBars, ativacaoCinema());
+            if (barras < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
                 drawGroundMarkers(canvas, renderZoom, cameraLeft, renderCameraTop);
                 drawGuardGauges(canvas, renderZoom, cameraLeft, renderCameraTop);
             }
-            if (ultraBars > 0.001f) {
-                // Faixas pretas de cinema durante o Ultra.
-                float bar = AberturaUltra.BAR * ultraBars;
+            if (barras > 0.001f) {
+                // Faixas pretas de cinema durante o Ultra e a liberação do SHINKAI.
+                float bar = AberturaUltra.BAR * barras;
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(0xFF0B0E16);
                 canvas.drawRect(-40f, -40f, VW + 40f, bar, paint);
@@ -4322,7 +4357,7 @@ public class GameView extends SurfaceView
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
                 // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.
-                float faixas = Math.max(cinematica.faixas(), ultraBars);
+                float faixas = Math.max(cinematica.faixas(), barras);
                 if (faixas < 0.999f) {
                     int layer = faixas > 0.001f
                         ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
@@ -5340,6 +5375,8 @@ public class GameView extends SurfaceView
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
         if (hiddenByUltra(f)) return;
+        // A liberação do SHINKAI em vídeo já desenha o lutador (no efeito).
+        if (ativacaoEfeito && ativacaoShinkai() && f == engine.fighter(ativacaoLado)) return;
         float zanzoken = zanzokenAlpha(f);
         if (zanzoken <= 0f) return;
         if (zanzoken < 1f && renderer.override() == null) {
