@@ -1487,3 +1487,20 @@ cinemáticas seguem na velocidade normal.
     entra de pulo;
   - contra quem repete a rasteira ou o pulo, ela usa os planos de meia distância que aprendem.
 - **Detalhes:** `voadora-rasteira.md`.
+
+## CPU levanta defendendo (registro real do jogador, 02/11)
+
+O primeiro registro de luta real mostrou o laço que ganhava dela: rasteira; no levantar, rasteira
+em cima da hora ou o jM caindo; depois do jM, a rasteira.
+- **Por que funcionava:** ela levantava parada e só defendia depois do tempo de reação. Depois do
+  jM, continuava defendendo em pé.
+- **Agora:**
+  - levantando ou atordoada, perto de você, ela já segura a defesa (a altura aprendida de você);
+  - a chance sobe com o que você já fez nela;
+  - defendendo em pé contra o pulo, ela agacha quando vê você caindo.
+- **Resultado (`BateriaLevantar`, 120 arcades):**
+  - rasteira em cima da hora no levantar: 87% → 55% no nível 5 e 68% → 30% no 8;
+  - rasteira depois do jM: 87% → 74% no 5 e 66% → 36% no 8;
+  - CPU × CPU igual.
+- **No registro:** o relógio de cada luta agora começa do zero no arcade.
+- **Detalhes:** `registro-luta.md`.

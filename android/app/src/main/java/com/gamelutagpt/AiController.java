@@ -153,6 +153,16 @@ final class AiController {
     /** O quadro que ela acabou de soltar foi defesa por hábito (não reação a nada que viu). */
     private boolean habitGuardFrame;
 
+    /**
+     * Defendendo em pé porque o rival vinha pelo ar: quando ele cai perto, ela troca para a defesa
+     * baixa (o registro real: jM defendido em pé, a rasteira ao cair entrava sempre).
+     */
+    private boolean altaPorPulo;
+    /** Levantar ou sair do atordoamento defendendo: -1 ainda não decidiu, 0 não, 1 sim. */
+    private int saidaPlano = -1;
+    private boolean saidaPresa;
+    private boolean saidaBaixa;
+
     /** Está esperando defendendo por hábito (não reagindo a nada que viu). */
     boolean guardingByHabit() { return habitGuardFrame || guardHabit && guardFrames > 0; }
     private int anticipationTimer;
@@ -1177,6 +1187,7 @@ final class AiController {
             movingForward = movingBack = dashing = false;
             return;
         }
+        if (saidaDefendendo(me, out)) return;
         boolean wasBlocking = blockedLastFrame;
         blockedLastFrame = me.status == CombatFighter.Status.BLOCKSTUN;
         if (wasBlocking && !blockedLastFrame && punishOnBlock(engine, me, target, seen, out)) return;
@@ -1389,6 +1400,7 @@ final class AiController {
                 // Com pressa (fim do tempo) ela larga a defesa mais cedo para voltar a atacar.
                 int segura = (int)Math.round((REACT_GUARD_FRAMES + REACT_GUARD_EXTRA * smart()) * (1.0 - 0.4 * urgency));
                 if (decideGuard(required, segura)) {
+                    altaPorPulo = !seen.grounded;
                     // Quadros até o golpe ficar ativo, contando o que passou desde o que ela viu.
                     int elapsed = engine.frame() - seen.frame;
                     planJustDefense(me, seen.attack.startupFrames - seen.attackFrame - elapsed);
@@ -1399,7 +1411,7 @@ final class AiController {
                 // primeiro e o antiaéreo quase nunca chegava a ser tentado); se não, defende em pé.
                 lastJumpSerial = seen.jumpSerial;
                 if (me.grounded) decidirAntiAereo(me, seen);
-                if (!antiAirPlan) decideGuard(GUARD_HIGH, 40);
+                if (!antiAirPlan && decideGuard(GUARD_HIGH, 40)) altaPorPulo = true;
             }
             if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != lastProjectileSerial) {
                 float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
@@ -1595,6 +1607,13 @@ final class AiController {
     private boolean holdGuard(CombatFighter me, FighterInput out) {
         if (guardFrames <= 0) return false;
         guardFrames--;
+        if (trocaBaixaLigada && altaPorPulo && seenNow != null && (seenNow.grounded || caindoAgora(seenNow))) {
+            // Ele está caindo do pulo: o que vem agora é de chão (a rasteira ao cair). Agacha, se
+            // for o hábito dela contra ele. (Pelo que ela viu, ele cai daqui a pouco: quem joga
+            // vê a queda e já agacha, não espera ver ele no chão.)
+            altaPorPulo = false;
+            if (!guardLow && Math.abs(seenNow.x - me.x) < SAIDA_PERTO) guardLow = roll(habitLow());
+        }
         habitGuardFrame = guardHabit;
         movingForward = movingBack = dashing = false;
         if (justDefenseWait > 0) {
@@ -1826,6 +1845,69 @@ final class AiController {
         double w = leitura.pesoBaixo() * smart();
         return Math.max(0.05, Math.min(0.97, base * (1.0 - w) + baixa * w));
     }
+
+    /**
+     * Levantar (e sair do atordoamento) defendendo, como quem joga: segura trás (ou trás-baixo) já
+     * deitada, e no primeiro quadro livre está defendendo. Sem isso ela levantava parada e só
+     * decidia defender depois da reação: a rasteira em cima da hora e o jM no levantar entravam
+     * sempre (registro real, 01/11). A chance sobe com o que ele tem feito nela (golpes de perto e
+     * pulos que entraram) e com o nível; a altura é a que ela aprendeu dele (rival no ar: em pé).
+     */
+    private boolean saidaDefendendo(CombatFighter me, FighterInput out) {
+        if (!saidaLigada) return false;
+        boolean presa = me.grounded && (me.status == CombatFighter.Status.WAKEUP && !me.rolling() ||
+            me.status == CombatFighter.Status.HITSTUN);
+        CpuPerception.Snapshot seen = seenNow;
+        if (presa) {
+            saidaPresa = true;
+            if (seen == null || seen.ko || Math.abs(seen.x - me.x) >= SAIDA_PERTO || out.superAttack) return false;
+            if (saidaPlano < 0) {
+                double aprendeu = Math.min(1.0, (leitura.cutucadas() + leitura.pulosNela()) / APRENDE_CUTUCADAS);
+                double p = level.reactGuard * (SAIDA_BASE + SAIDA_APRENDE * aprendeu * (0.5 + 0.5 * smart()));
+                saidaPlano = roll(p * (1.0 - 0.6 * urgency)) ? 1 : 0;
+                saidaBaixa = roll(habitLow());
+            }
+            if (saidaPlano == 0) return false;
+            // Ainda presa: só a direção (segura a defesa para o primeiro quadro livre).
+            guardHabit = false;
+            altaPorPulo = !seen.grounded;
+            guardLow = seen.grounded && saidaBaixa;
+            guardFrames = SAIDA_QUADROS + reactRandom.nextInt(SAIDA_SPREAD);
+            int side = seen.x > me.x ? 1 : seen.x < me.x ? -1 : me.facing;
+            out.direction = guardLow ? (side > 0 ? 4 : 2) : (side > 0 ? 5 : 1);
+            if (lastReason == null || !lastReason.startsWith("levanta defendendo")) lastReason = "levanta defendendo";
+            return true;
+        }
+        if (saidaPresa) {
+            // Livre agora: a defesa segura (guardFrames) continua na defesa comum.
+            saidaPresa = false;
+            if (saidaPlano != 1) guardFrames = 0;
+            saidaPlano = -1;
+        }
+        return false;
+    }
+
+    /** Pelo que ela viu (há {@code reacao} quadros), ele já está tocando o chão agora. */
+    private boolean caindoAgora(CpuPerception.Snapshot s) {
+        if (s.grounded || s.vy <= 0f) return s.grounded;
+        // O golpe no ar dele ainda vem (não bateu): fica em pé até ele bater.
+        if (s.attacking() && s.outcome == CombatFighter.Outcome.NONE) return false;
+        float h = Math.max(0f, Arena.GROUND_Y - s.y);
+        float g = chargeConfig != null ? chargeConfig.gravity : 1650f;
+        double t = (-s.vy + Math.sqrt((double)s.vy * s.vy + 2.0 * g * h)) / g;
+        return t / CombatConfig.DT <= reacao + 1;
+    }
+
+    /** Baterias: desliga o levantar defendendo / a troca para baixo quando ele cai do pulo (antes × depois). */
+    static boolean saidaLigada = true, trocaBaixaLigada = true;
+
+    /** Rival mais perto que isto no levantar: ela levanta defendendo (se decidir). */
+    static final float SAIDA_PERTO = 300f;
+    /** Chance de levantar defendendo, sem ter aprendido nada dele (× a defesa do nível). */
+    static final double SAIDA_BASE = 0.3;
+    /** O quanto sobe com o que ele já fez nela de perto e pulando. */
+    static final double SAIDA_APRENDE = 0.6;
+    static final int SAIDA_QUADROS = 14, SAIDA_SPREAD = 8;
 
     /** Pulos dele que chegaram nela até a chance de tirar do ar ir ao máximo do nível. */
     static final double APRENDE_PULOS = 3.0;
