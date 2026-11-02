@@ -79,14 +79,19 @@ contorno é dos personagens), centrado no ponto do golpe, sem fumaça no acerto.
 | Efeito | Código | Quadros |
 |---|---|---|
 | `impacto_forte` | `impacto_forte.ts`: estrela de espinhos com raios de luz atravessando e faíscas miúdas; X de espinhos; estrela redonda com brilho; o miolo abre e a borda vira línguas de fogo que voam e somem | 9 a 24 fps (~0,37 s) |
+| `fumaca_pouso` | `fumaca_pouso.ts`: nuvem larga e baixa (cerca de 4× mais larga que alta) de bolhas grandes em duas fileiras, cinza médio com sombra embaixo, luz só na borda de cima, contorno fino cinza-escuro e poucos caracóis; quatro lâminas de ar largas e opacas cruzando em dois X por trás. Some baixando, encolhendo e ficando transparente | 10 a 24 fps (~0,42 s) |
 
 ```bash
 git clone https://github.com/alexgreensh/anidoodle /tmp/anidoodle
 node /tmp/anidoodle/skills/anidoodle/engine/tools/scaffold.mjs /tmp/fx --film impacto_forte --size 1280x960 --fps 24
 cp tools/sprites/efeitos_codigo/impacto_forte.ts /tmp/fx/src/canvas-core/
 (cd /tmp/fx && npm install && node tools/still.mjs impacto_forte --frames 0,1,2,3,4,5,6,7,8 --out out/impacto_forte/)
+cp tools/sprites/efeitos_codigo/fumaca_pouso.ts /tmp/fx/src/canvas-core/
+(cd /tmp/fx && node tools/still.mjs fumaca_pouso --frames 0,1,2,3,4,5,6,7,8,9 --out out/fumaca_pouso/)
 # --altura é a altura do efeito inteiro (com raios e faíscas): 243 deixa a estrela com ~160 do mundo
 python3 tools/sprites/efeito_video.py /tmp/fx/out/impacto_forte --nome impacto_forte --ancora centro --altura 243 --fps 24
+# poeira de pouso: a nuvem fica com ~70 do mundo (o lutador tem ~247); as lâminas de ar sobem mais
+python3 tools/sprites/efeito_video.py /tmp/fx/out/fumaca_pouso --nome fumaca_pouso --ancora chao --altura 218 --fps 24
 ```
 
 ## Efeitos do manequim (dano e defesa)
