@@ -1,67 +1,91 @@
-# Efeitos do Dragon Ball FighterZ: levantamento (referência de gênero)
+# Efeitos do Dragon Ball FighterZ: análise quadro a quadro (referência de gênero)
 
-Para guiar os efeitos **originais** do jogo: o que o FighterZ mostra em cada evento da luta, o
-que o nosso jogo já tem e o que falta. Não é para copiar arte.
+Para guiar os efeitos **originais** do jogo. Não é para copiar arte: é para entender o que faz o
+efeito funcionar.
 
-## Fontes e o quanto confiar
+**De onde vem:** os dois trailers oficiais da página do jogo na Steam (Gamescom e lançamento,
+1920×1080 a 30 fps) e as 9 capturas oficiais da mesma página, analisados quadro a quadro. Os
+quadros ficam fora do repositório (são do jogo deles). Números de quadro abaixo são a 30 fps (o
+jogo roda a 60: cada quadro do trailer são dois do jogo).
 
-- **[Dustloop]** wiki da comunidade (não é documento da Arc System Works):
-  [Mechanics](https://www.dustloop.com/w/DBFZ/Mechanics) e
-  [Damage](https://www.dustloop.com/w/DBFZ/Damage). Descreve as regras (quadros, estados) e quase
-  nada do visual; o que ele diz do visual está marcado.
-- **[Kotaku]** [análise da animação de Guilty Gear e FighterZ](https://kotaku.com/breaking-down-the-animation-of-guilty-gear-and-dragonba-1836849279)
-  (2019): animação "limitada" como no anime, poucos quadros, fluidez sem quadros sobrando. Aponta a
-  palestra da GDC de Junya Motomura (Arc System Works):
-  [youtube.com/watch?v=yhGjCzxJV3E](https://www.youtube.com/watch?v=yhGjCzxJV3E).
-- **[jogo]** o que se vê jogando, de memória: pode ter erro de detalhe. Para fechar um efeito,
-  conferir em vídeo de luta quadro a quadro.
+## 1. Acerto normal (Piccolo acerta o Kuririn, trailer da Gamescom, ~27,6 s)
 
-## O que faz os efeitos dele funcionarem
+O efeito inteiro dura **uns 11 quadros (~0,37 s)**. Fica **em cima de quem apanha, centrado no
+ponto do contato** (o punho na cabeça).
 
-1. **Poucos desenhos, segurados.** O efeito troca de desenho a cada 2 ou 3 quadros (como no anime),
-   não a cada quadro; a força vem das poses, não da suavidade. [Kotaku]
-2. **O congelamento (hitstop) segura o efeito.** De 6 a 16 quadros pelo nível do golpe
-   [Dustloop]: o clarão do acerto fica parado no auge enquanto a luta congela, e só depois o resto
-   anda. Golpe mais forte = congela mais = efeito maior.
-3. **Camadas, cada uma com uma função:** clarão (o instante), faísca (a força, na direção do
-   golpe), anel/onda (o choque), riscos e partículas (o que sobra). [jogo]
-4. **Cor diz o que aconteceu:** vermelho no contra-golpe [Dustloop], verde na largada do Dragon
-   Rush [Dustloop], branco no tech de chão [Dustloop], a cor da aura de cada um no Sparking. [jogo]
-5. **A câmera e a tela fazem metade do trabalho:** ângulo e zoom mudam nos golpes "Smash" (os que
-   quicam na parede/chão) [Dustloop]; o cenário escurece no Super; tremor nos impactos. [jogo]
-6. **Fogo e fumaça só onde há explosão de verdade** (raio de ki, cenário destruído no KO).
-   O acerto comum é clarão + faísca, sem fogo: foi o erro do `impacto_forte` v2. [jogo]
+| Quadro | O que aparece |
+|---|---|
+| 13 (antes) | Linhas de velocidade brancas, finas, ao longo do braço que estica. Poeira na base de quem bate |
+| 14 (contato) | **A câmera dá um soco para dentro (zoom).** Estrela de espinhos enorme: miolo branco, amarelo, borda laranja-avermelhada. **3 ou 4 raios de luz** finos e longos atravessam a tela saindo do ponto. Dezenas de **faíscas amarelas miúdas** espalhadas numa área grande |
+| 15 | A estrela vira um **X**: duas formas de espinho compridas e cruzadas, miolo claro e borda vermelha. Os raios continuam |
+| 16-17 | Volta a estrela redonda, mais densa, com **brilho difuso** em volta (halo claro e macio) e **pontinhos escuros** dentro (sujeira, pele) |
+| 18 | O miolo **abre**: fica vermelho-escuro com pontinhos pretos, e a borda se divide em **línguas de fogo** gordas apontando para fora (como pétalas) |
+| 19-20 | As línguas se soltam e voam para fora em todas as direções; o centro fica vazio |
+| 21-23 | Sobram 3 ou 4 línguas pequenas, curvas (forma de vírgula), indo para fora e encolhendo |
+| 25 | Acabou; só faíscas soltas |
 
-## Evento por evento
+**O que mais importa:**
+- **Sem contorno preto.** O efeito é luz: branco, amarelo, laranja e vermelho, com halo macio. O
+  contorno fica para os personagens. É o contraste que faz o efeito "brilhar" sobre eles.
+- **Sem fumaça.** No acerto não tem nenhuma.
+- **Fogo, sim.** As línguas de fogo laranja são o efeito de acerto padrão do jogo, mas como
+  **luz sem contorno**, saindo do ponto do golpe, não como explosão com fumaça.
+- **O impacto é o instante:** câmera, raios de luz e X nos 2 primeiros quadros; depois o efeito
+  só se desfaz.
+- **Faíscas miúdas** (pontos e traços amarelos) numa área bem maior que a estrela.
 
-| Evento | No FighterZ | Nosso jogo hoje | Falta / proposta |
-|---|---|---|---|
-| **Golpe fraco / médio / forte** | Faísca clara (branco, borda amarela) do tamanho do nível, aberta para onde o golpe vai, com riscos; congelamento de 6 a 16 quadros [Dustloop] [jogo] | `ImpactEffects` (faísca clássica), `RiscosDeImpacto` (riscos de mangá), `ImpactFeel` (soco de câmera, cenário escurecendo nos fortes); `impacto_forte` v2 em teste | **Principal lacuna.** Uma família só (`impacto_fraco/medio/forte`): clarão + faísca direcional, sem fogo nem fumaça |
-| **Defesa** | Faísca própria de bloqueio, diferente da de acerto [jogo] | Faísca de defesa (arco e hexágono azul) | Vídeo `defesa`: estalo curto, cor fria |
-| **Contra-golpe** | Clarão vermelho em quem apanhou, "COUNTER" e voz do narrador [Dustloop] | Aura de counter, giro de parafuso no punish | Já coberto |
-| **Smash (quique na parede/chão)** | A câmera muda de ângulo e aproxima [Dustloop]; no impacto, cratera, pedras e poeira [jogo] | Cues WALL_BOUNCE/GROUND_BOUNCE, câmera e escurecida | `impacto_chao` (pendente) e um `impacto_parede` novo: pedras e poeira |
-| **Queda (knockdown)** | Poeira e pedrinhas no chão [jogo] | Poeira clássica | `impacto_chao` (pendente) |
-| **Tech / levantar** | Pisca branco e rola [Dustloop] | Air tech e opções de levantar | Piscar branco curto no corpo, se ainda não houver |
-| **Agarrão (Dragon Rush)** | Clarão verde no quadro 7 da largada [Dustloop] | Agarrão e tech | Clarão de agarrão numa cor própria (aviso para quem vai fugir) |
-| **Dash / super dash** | Aura, linhas de velocidade e rastro [jogo] | Rastro no dash (motor de animação) | `poeira_corrida` e `poeira_freada` (pendentes) |
-| **Pulo / pouso** | Sopro de poeira [jogo] | Sopros clássicos | `fumaca_pulo` e `fumaca_pouso` (pendentes) |
-| **Projétil (ki blast)** | Bola brilhante com rastro; o super dash rebate [Dustloop] [jogo] | Brilho, cauda de cometa, faíscas; anulação de projéteis | Estouro do choque entre dois projéteis |
-| **Raio** | Raio com núcleo branco e camadas de cor [jogo] | Ultra com raio estilo Kamehameha | Já coberto |
-| **Troca / assist** | Parceiro entra voando com super dash; o assist do tipo C tem um círculo dourado [Dustloop] | Assist, tag, DHC | Rastro de entrada do parceiro |
-| **Sparking (modo turbinado)** | Explosão de aura e aura que fica; o retrato pisca quando está acabando [Dustloop] [jogo] | SHINKAI: corte de mangá, auras, clash | Já coberto |
-| **Super** | Congelamento, cenário escuro, brilho do corpo [Dustloop] [jogo] | `SuperFlash` | Já coberto |
-| **Super nível 3 / cinemática** | Cena com câmera própria, ninguém interrompe [Dustloop] | Ultra "Página Final" | Já coberto |
-| **KO** | Câmera lenta e clarão; o golpe final pode jogar o rival através do cenário (Destructive Finish) ou virar cena do anime (Dramatic Finish) [jogo] | Clarão e câmera lenta no KO, finalização de mangá no Super/Ultra | Já coberto (o "através do cenário" seria um extra grande) |
+## 2. Acerto forte / sequência de Super (A16 em A18, ~48,9 s)
 
-## Conclusão
+Mesma base do acerto normal, com mais coisas:
+- **Agulhas vermelhas:** espinhos finos e longos, vermelho-vivo, saindo do ponto em leque.
+- **Raios elétricos** amarelo-esbranquiçados em zigue-zague.
+- Estrelas grandes com X a cada golpe da sequência e línguas de fogo maiores.
+- Pedras cinza voando quando o golpe pega o chão.
 
-A apresentação grande (Super, Ultra, KO, SHINKAI, impact frames) o jogo já tem. O que falta é a
-**camada de base**, que aparece o tempo todo: faíscas de acerto e defesa, poeira de movimento e
-impacto no chão/parede. São os efeitos da lista de `docs/efeitos-de-video.md`.
+## 3. Projétil / raio acertando (A16 em A18, ~57,3 s)
 
-Ordem sugerida:
-1. `impacto_fraco`, `impacto_medio`, `impacto_forte` como **uma família**: o mesmo desenho
-   crescendo com o nível, clarão + faísca direcional, sem fogo.
-2. `defesa`.
-3. `impacto_chao` + poeiras (`fumaca_pouso`, `fumaca_pulo`, `poeira_corrida`, `poeira_freada`).
-4. `impacto_parede` (novo).
+- O raio é uma faixa branca-amarela com borda laranja.
+- No impacto: estrela com **agulhas vermelhas cruzadas** muito longas, depois 2 ou 3 línguas de
+  fogo pequenas que caem.
+
+## 4. Impacto no chão (A16 bate no chão, ~51,6 s)
+
+- **Estilhaços cinza** grandes e angulosos, saindo em leque do ponto: cinza-claro com sombra
+  cinza-escura, **sem contorno**, como pedra desenhada em dois tons.
+- Pedras escuras voando.
+- **Brasas laranja** brilhando no chão, espalhadas.
+- Clarão amarelo-vermelho com raios elétricos por cima, no instante do golpe.
+
+## 5. Poeira
+
+- Na base de quem dá um golpe forte (Piccolo, quadro 13) e em quem cai (A16, ~57,3 s): **nuvens
+  redondas em dois tons** (base e sombra embaixo), **sem contorno**, da **cor do chão** (marrom no
+  deserto, cinza na cidade), que se espalham e somem em uns 10 quadros.
+
+## 6. Lançar longe (Cell, ~12,6 s)
+
+- Onda de choque em **meia-lua amarela semitransparente** seguindo quem voa.
+- Pedras pretas e estrelinha branca de 4 pontas (quem sumiu ao longe).
+
+## O que isso muda no nosso `impacto_forte`
+
+A v2 acertou as cores, mas errou no resto:
+
+| v2 (o que fiz) | FighterZ | v3 (o que fazer) |
+|---|---|---|
+| Contorno preto grosso em tudo | Sem contorno, luz com halo | Tirar todo o contorno; halo macio em volta |
+| Fumaça cinza que fica | Nenhuma fumaça no acerto | Tirar a fumaça (poeira só no chão) |
+| Centro deslocado para trás do ponto | Centrado no contato, em cima de quem apanha | Centrar no ponto do golpe |
+| Pedaços com contorno (pareciam sementes) | Línguas de fogo de luz | Línguas sem contorno, miolo claro e ponta vermelha |
+| Anel de choque | Raios de luz atravessando e o X | Raios de luz no 1º quadro e o X no 2º |
+| Poucas faíscas | Dezenas de faíscas miúdas numa área grande | Muitas faíscas pequenas |
+
+A família de acerto fica: `impacto_fraco` (estrela pequena + poucas línguas), `impacto_medio`
+(+ X), `impacto_forte` (+ raios de luz e mais línguas), `impacto_especial` (+ agulhas vermelhas e
+raios elétricos). A poeira e o impacto no chão são outra família: cinza ou da cor do chão, em dois
+tons, sem contorno.
+
+## O que os trailers não mostram
+
+**Defesa:** nenhuma defesa clara nos trailers. Para fazer a `defesa`, precisa de outro vídeo
+(gameplay com bloqueio).
