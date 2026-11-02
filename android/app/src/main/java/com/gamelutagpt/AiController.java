@@ -1148,6 +1148,7 @@ final class AiController {
 
         if (me.attacking()) {
             if (me.outcome == CombatFighter.Outcome.HIT && ownHitFrame < 0) ownHitFrame = engine.frame();
+            if (!me.grounded && me.outcome == CombatFighter.Outcome.HIT) pousoEmenda = true;
             if (me.outcome == CombatFighter.Outcome.BLOCK && me.grounded) sequenciaDefendida = true;
             if (me.outcome == CombatFighter.Outcome.HIT) sequenciaDefendida = false;
         } else if (route == null) {
@@ -1176,6 +1177,7 @@ final class AiController {
             return;
         }
         if (route != null && runComboFromNeutral(engine, me, target, out)) return;
+        if (emendaDoPulo(me, target, out)) return;
         if (lastAttack != null) {
             cooldown = Math.max(cooldown,
                 lastAttack.kind == AttackDefinition.Kind.SUPER ? SUPER_COOLDOWN
@@ -1963,6 +1965,63 @@ final class AiController {
         lastReason = "pulo para dentro";
     }
 
+    /**
+     * O pulo que acertou e o combo no chão (pedido do jogador, 02/11: "ela não comba"): o golpe no
+     * ar do pulo para dentro saía sozinho e, ao cair, ela não emendava nada. Agora, caindo com ele
+     * ainda atordoado (ela sente o próprio golpe), emenda o combo do chão pelo primeiro golpe que
+     * alcança, com a chance de confirmar do nível.
+     */
+    private boolean emendaDoPulo(CombatFighter me, CombatFighter target, FighterInput out) {
+        if (!pousoEmenda || !me.grounded || !me.canAct()) return false;
+        pousoEmenda = false;
+        if (!emendaLigada || route != null || !target.inHitstun() || !target.grounded) return false;
+        if (!roll(level.confirm * (0.6 + 0.4 * smart()))) return false;
+        CharacterDefinition c = me.character();
+        float gap = projectedGap(me, target);
+        List<String> book = ComboBook.route(c);
+        String primeiro = book.isEmpty() ? null : book.get(0);
+        for (String abre : new String[] {primeiro, "L", "2L", "M", "2M"}) {
+            if (abre == null || abre.startsWith("j") || ComboBook.commits(abre) || !alcanca(c, abre, gap, target)) continue;
+            startRoute(c, abre);
+            press(abre, me, out);
+            lastReason = "pulo que acertou: emenda no chão";
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * A bola (S de projétil) sai no contato do golpe, sem esperar ver que acertou: como quem joga
+     * cancela o M na bola de olho fechado (defendida, a bola de longe é segura). Antes ela esperava
+     * a reação inteira e a janela do cancelamento já tinha fechado.
+     */
+    private static boolean cancelaNoContato(CharacterDefinition c, String step) {
+        if (!contatoLigado || !"S".equals(step)) return false;
+        AttackDefinition a = c.attack("S");
+        return a != null && a.kind == AttackDefinition.Kind.PROJECTILE;
+    }
+
+    /** Baterias: desliga o cancelamento na bola no contato (antes × depois). */
+    static boolean contatoLigado = true;
+
+    /** Baterias: a rota de combo atual e o passo (depuração). */
+    String rotaAtual() { return route == null ? "-" : route + "@" + step + (awaitingStart ? " esperando" : "") + " decidiu=" + stepDecided + " go=" + stepGo; }
+
+    /** Baterias: o SHINKAI do combo só no golpe que acertou (antes × depois). */
+    static boolean shinkaiNoAcerto = true;
+    /** O SHINKAI cortou o golpe do combo que acertou: o próximo passo sai do neutro. */
+    private boolean cortePeloShinkai;
+
+    /** O golpe solto que já decidiu se segue no combo (quadro em que ele começou). */
+    private int soltoDecidido = Integer.MIN_VALUE;
+    /** Baterias: desliga o combo depois do golpe solto (antes × depois). */
+    static boolean soltoLigado = true;
+
+    /** O golpe no ar acertou: ao cair, emenda no chão (emendaDoPulo). */
+    private boolean pousoEmenda;
+    /** Baterias: desliga a emenda do pulo (antes × depois). */
+    static boolean emendaLigada = true;
+
     /** Pelo que ela viu (há {@code reacao} quadros), ele já está tocando o chão agora. */
     private boolean caindoAgora(CpuPerception.Snapshot s) {
         if (s.grounded || s.vy <= 0f) return s.grounded;
@@ -2604,6 +2663,23 @@ final class AiController {
                 awaitingStart = false;
                 lastSeenAttack = me.attack;
                 lastSeenAttackFrame = me.attackFrame;
+            } else if (soltoLigado && me.grounded && me.attack.kind == AttackDefinition.Kind.NORMAL &&
+                me.outcome == CombatFighter.Outcome.HIT) {
+                // Golpe de chão solto (cutucada, pressão, reação) que acertou: segue no combo dele,
+                // com a chance de confirmar do nível (uma decisão por golpe). Antes só o golpe que
+                // já saía como começo de combo seguia: o M e o 2L soltos paravam no primeiro acerto.
+                int inicio = engine.frame() - me.attackFrame;
+                if (inicio != soltoDecidido) {
+                    soltoDecidido = inicio;
+                    if (roll(level.confirm)) {
+                        int acerto = ownHitFrame;
+                        startRoute(me.character(), me.attack.id);
+                        ownHitFrame = acerto;
+                        awaitingStart = false;
+                        lastSeenAttack = me.attack;
+                        lastSeenAttackFrame = me.attackFrame;
+                    }
+                }
             }
             return;
         }
@@ -2640,7 +2716,7 @@ final class AiController {
         }
         if (!stepGo) return;
         if (ComboBook.commits(next) || ComboBook.AIR_JUMP.equals(next)) {
-            if (!hitSeen(engine)) return;
+            if (!hitSeen(engine) && !cancelaNoContato(me.character(), next)) return;
             if (!commitDecided) {
                 commitDecided = true;
                 commitGo = roll(level.confirm);
@@ -2730,7 +2806,11 @@ final class AiController {
             }
             return true;
         }
-        if (routeCut && linkAfterCut(engine, me, target, next, out)) return true;
+        if ((routeCut || cortePeloShinkai) && linkAfterCut(engine, me, target, next, out)) {
+            cortePeloShinkai = false;
+            return true;
+        }
+        cortePeloShinkai = false;
         endRoute();
         return false;
     }
@@ -2776,8 +2856,9 @@ final class AiController {
             if (!me.attack.cancelsInto(option) || option.equals(route.get(step + 1))) continue;
             AttackDefinition a = c.attack(option);
             if (a == null || a.maxUsesPerChain > 0 && me.chain.contains(option)) continue;
-            // O que compromete (lançador, especial, Super) só depois de ver que acertou.
-            if (ComboBook.commits(option) && !hitSeen(engine)) continue;
+            // O que compromete (lançador, especial, Super) só depois de ver que acertou; a bola
+            // sai no contato (cancelaNoContato).
+            if (ComboBook.commits(option) && !hitSeen(engine) && !cancelaNoContato(c, option)) continue;
             boolean reaches;
             if ("S".equals(option)) {
                 reaches = me.state.profile.energy != null && !engine.energyProjectileAlive(me.index) &&
@@ -2959,9 +3040,12 @@ final class AiController {
             if (teams.dhcReady(self, me)) {
                 if (dhcPlan) out.assist = true;
             } else if (hitSeen(engine) && me.attack.kind != AttackDefinition.Kind.SUPER) {
-                if (shinkaiPlan && teams.canShinkai(me)) {
+                // O SHINKAI corta o golpe que acertou (não o próximo, ainda saindo: ele sumia e o
+                // combo morria ali) e a rota emenda o passo seguinte (linkAfterCut).
+                if (shinkaiPlan && teams.canShinkai(me) && (!shinkaiNoAcerto || me.outcome == CombatFighter.Outcome.HIT)) {
                     out.shinkai = true;
                     shinkaiPlan = false;
+                    if (shinkaiNoAcerto && route != null) cortePeloShinkai = true;
                 } else if (assistPlan && teams.canAssist(self, me)) {
                     out.assist = true;
                     assistPlan = false;

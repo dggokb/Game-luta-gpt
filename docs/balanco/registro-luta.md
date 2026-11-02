@@ -261,3 +261,38 @@ venceu todas.
   só 11 golpes em 79 s.
 - **Onde ela perde dano:** 35% do seu dano começa com ela atacando. O caso mais comum é o pulo dela
   com jH, que você tira com o L ou o M no chão: 7 combos, ~10 mil.
+
+### "A CPU é fácil: não comba, não pressiona, não pune" (02/11)
+
+No terceiro registro, os combos da CPU sem Super têm 1,2 a 2 golpes em média; na final do nível 8
+foram 9 combos de 1,2 golpe. `BateriaCombosCpu` mede os combos dela contra o laço do jogador
+(níveis 5 a 8, 200 lutas por nível). Ela mostra onde o combo morria:
+
+- **O pulo que acertava não emendava nada.** O golpe no ar do pulo para dentro saía sem rota de
+  combo; ao cair, ela não continuava. Agora, caindo com ele ainda atordoado, ela emenda o combo do
+  chão pelo primeiro golpe que alcança (chance de confirmar do nível × 0,6–1).
+- **O golpe solto não seguia.** Cutucada, pressão e reação que acertavam paravam no primeiro
+  golpe; só o golpe que já saía como começo de combo seguia. Agora qualquer golpe de chão que
+  acerta segue no combo dele (chance de confirmar do nível).
+- **O SHINKAI no meio do combo matava o combo.** Ele cortava o golpe seguinte, ainda saindo (o 2H
+  sumia), e a rota achava que já tinha passado dele. Agora ele só corta o golpe que acertou, e o
+  passo seguinte sai do neutro.
+- **A bola no cancelamento** sai no contato do golpe, sem esperar a reação inteira (como quem
+  cancela o M na bola).
+
+| nível 8 (contra o laço) | antes | agora |
+|---|---|---|
+| golpes por combo | 2,57 | 2,70 |
+| combos de 4 golpes ou mais | 24% | 27% |
+| dano por combo | 1366 | 1418 |
+| pulos que acertam e param no 1º golpe | 107 | 33 |
+
+No nível 7, os combos vão de 2,27 para 2,39 golpes e de 1256 para 1319 de dano. A defesa ao
+levantar não deixou a CPU mais passiva: com ou sem ela, são 42 a 44 golpes por minuto no nível 8.
+
+**O que ainda segura os combos:**
+- o antiaéreo (2H ou M em quem pula) que acerta e não continua (2/3 das tentativas falham);
+- o M de longe, que empurra o rival para fora do alcance do golpe seguinte.
+
+Saídas: [perfis/combos-cpu-antes.md](perfis/combos-cpu-antes.md) e
+[perfis/combos-cpu-depois.md](perfis/combos-cpu-depois.md).
