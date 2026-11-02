@@ -12,7 +12,7 @@ import com.gamelutagpt.render.RenderCanvas;
  * Não depende de plataforma e não é thread-safe: chame tudo da thread do loop do jogo.
  */
 public final class MenuPausa {
-    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, GRAFICOS, FPS, MENU }
+    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, GRAFICOS, FPS, REGISTRO, MENU }
 
     public static final String PAUSA = "PAUSA";
     public static final String CONTINUAR = "CONTINUAR";
@@ -27,13 +27,15 @@ public final class MenuPausa {
     public static final String FPS = "FPS";
     /** Níveis dos gráficos (quem usa a pausa monta o rótulo com eles). */
     public static final String[] NIVEIS_GRAFICOS = {"AUTO", "ALTO", "MÉDIO", "LEVE"};
+    /** Manda a linha do tempo das últimas lutas contra a CPU (para entender a luta real). */
+    public static final String REGISTRO = "ENVIAR REGISTRO";
     public static final String MENU_INICIAL = "MENU INICIAL";
     public static final String AVISO = "Voltar ao menu perde o progresso deste episódio.";
     public static final String AVISO_ARCADE = "Voltar ao menu encerra o Arcade.";
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
     public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, NIVEL_CPU,
-        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", FPS, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
+        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", FPS, REGISTRO, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
 
     /** A opção GRÁFICOS: quem usa a pausa diz o que mostrar e o que fazer ao trocar. */
     public interface Graficos {
@@ -49,16 +51,17 @@ public final class MenuPausa {
     /** Níveis da CPU (o motor tem de 1 a 8); quem usa a pausa lê e guarda o escolhido. */
     public static final int NIVEL_MIN = 1, NIVEL_MAX = 8, NIVEL_PADRAO = 5;
 
-    // Oito opções entre o título e o aviso: 42 de altura, 47 entre uma e outra.
+    // Nove opções entre o título e o aviso: 39 de altura, 43 entre uma e outra.
     static final float[][] CAIXAS = {
-        {420f, 290f, 860f, 332f},
-        {420f, 337f, 860f, 379f},
-        {420f, 384f, 860f, 426f},
-        {420f, 431f, 860f, 473f},
-        {420f, 478f, 860f, 520f},
-        {420f, 525f, 860f, 567f},
-        {420f, 572f, 860f, 614f},
-        {420f, 619f, 860f, 661f},
+        {420f, 290f, 860f, 329f},
+        {420f, 333f, 860f, 372f},
+        {420f, 376f, 860f, 415f},
+        {420f, 419f, 860f, 458f},
+        {420f, 462f, 860f, 501f},
+        {420f, 505f, 860f, 544f},
+        {420f, 548f, 860f, 587f},
+        {420f, 591f, 860f, 630f},
+        {420f, 634f, 860f, 673f},
     };
     /** O mesmo toque que abriu a pausa não pode escolher nada. */
     static final float TAP_DELAY = 0.2f;
@@ -317,7 +320,7 @@ public final class MenuPausa {
             Tinta.withAlpha(BotaoMenu.INK, (int)(255f * in)), size * 0.14f, true);
         String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(IMPACTO) + ":  " + t(impacto ? LIGADO : DESLIGADO),
             rotuloNivel(), t(COMANDOS), rotuloGraficos(), t(FPS) + ":  " + t(fps ? LIGADO : DESLIGADO),
-            t(MENU_INICIAL)};
+            t(REGISTRO), t(MENU_INICIAL)};
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
         }

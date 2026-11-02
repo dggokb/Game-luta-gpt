@@ -103,6 +103,8 @@ public class GameView extends SurfaceView
     private final FighterInput playerInput = new FighterInput();
     private final FighterInput opponentInput = new FighterInput();
     private final AiController ai = new AiController(new OpponentAi(new Random()));
+    /** A linha do tempo das lutas contra a CPU (pausa → ENVIAR REGISTRO). */
+    private final RegistroLuta registro = new RegistroLuta();
     /** Teste de desempenho automático (botão TESTE): a IA joga dos dois lados com o roteiro dele. */
     private final TesteAutomatico teste = new TesteAutomatico();
     private final AiController aiTesteJogador = new AiController(new OpponentAi(new Random(7)));
@@ -2028,6 +2030,7 @@ public class GameView extends SurfaceView
         protegerVida(flow.timeOver());
         protegerTroca();
         engine.step(playerInput, opponentInput);
+        if (ai.enabled() && !tutorial.active() && !teste.ativo()) registro.quadro(engine, flow, playerInput, ai.lastReason);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
         boolean fightFree = ultraAttacker < 0 && !engine.ultraSequenceRunning();
         // Cena da história esperando a vida baixar (ou o K.O.), ou rodando: o relógio espera.
@@ -2234,6 +2237,7 @@ public class GameView extends SurfaceView
         introFrame = introTotalFrames > 0 ? 0 : -1;
         // A CPU começa a luta lembrando (mais fraco) do que leu do jogador nas lutas anteriores.
         ai.leitura().novaLuta();
+        registro.comecar(cabecalhoDoRegistro());
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
         narradorLuta.reset();
@@ -6527,6 +6531,39 @@ public class GameView extends SurfaceView
         pad.reset();
         releaseAllPointers();
         if (opcao == MenuPausa.Opcao.MENU) openMainMenu();
+        else if (opcao == MenuPausa.Opcao.REGISTRO) enviarRegistro();
+    }
+
+    /** Modo, nível, ritmo e quem luta, no começo de cada luta do registro. */
+    private String cabecalhoDoRegistro() {
+        String modo = storyMode ? (arcadeMode ? "ARCADE" : "HISTÓRIA") : "VERSUS";
+        StringBuilder b = new StringBuilder();
+        b.append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new java.util.Date()));
+        b.append(" | modo ").append(modo).append(duel ? " 1x1" : " 2x2");
+        b.append(" | CPU nível ").append(ai.level());
+        b.append(" | velocidade ").append(Math.round(pausa.velocidade() * 100)).append("% (ritmo base ").append(Math.round(RITMO_BASE * 100)).append("%)");
+        b.append(" | JOG: ");
+        for (FighterState m : engine.team(0).members) b.append(m.character.id).append(' ');
+        b.append("| CPU: ");
+        for (FighterState m : engine.team(1).members) b.append(m.character.id).append(' ');
+        return b.toString().trim();
+    }
+
+    /** ENVIAR REGISTRO (pausa): as últimas lutas num arquivo de texto, pelo menu Compartilhar (Drive). */
+    private void enviarRegistro() {
+        if (registro.lutas() == 0) {
+            showBanner("NENHUMA LUTA CONTRA A CPU AINDA");
+            return;
+        }
+        String date = new java.text.SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(new java.util.Date());
+        String texto = registro.exportar("Registro de lutas • v" + BuildConfig.VERSION_NAME + " • " + date);
+        try {
+            ArquivosCompartilhados.compartilhar(getContext(), "registro-luta-" + date + ".txt", "text/plain", texto);
+            showBanner("REGISTRO: ESCOLHA O DRIVE");
+        } catch (IOException | RuntimeException e) {
+            Log.e("GameLuta", "registro de luta", e);
+            showBanner("NÃO DEU PARA SALVAR O REGISTRO");
+        }
     }
 
     // ------------------------------------------------------------ modo história

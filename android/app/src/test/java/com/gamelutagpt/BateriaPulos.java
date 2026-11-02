@@ -18,28 +18,34 @@ public final class BateriaPulos {
         final Map<String, int[]> porLutador = new TreeMap<>();   // pulos, quadros em luta (/60)
     }
 
+    /**
+     * Conta só o pulo de verdade: sai do chão livre (não lançado), fora do SHINKAI Clash (a
+     * coreografia leva os dois pelo ar). O pulo dura até tocar o chão, mesmo com golpe no ar no
+     * meio. (A primeira versão contava qualquer "no ar e livre": o Clash, quem se recupera no ar
+     * depois de lançado e o mesmo pulo de novo depois do golpe no ar, quase o dobro.)
+     */
     static void luta(String a, String b, int nivel, long semente, Est e) {
         BateriaBalanco.Luta l = new BateriaBalanco.Luta(new String[] {a}, new String[] {b}, nivel, semente, new CombatConfig());
-        boolean[] noAr = new boolean[2];
+        boolean[] noAr = new boolean[2], noChao = {true, true};
         int[] resultado = new int[2];   // 0 nada, 1 defendido, 2 acertou, 3 tirado
         String[] quem = {a, b};
         while (!l.acabou() && l.quadro < 60 * 60 * 4) {
             l.passo();
             for (int s = 0; s < 2; s++) {
                 CombatFighter f = l.f(s);
-                boolean ar = !f.grounded;
-                if (ar && !noAr[s] && f.status == CombatFighter.Status.NEUTRAL) {
+                if (!f.grounded && noChao[s] && f.status == CombatFighter.Status.NEUTRAL && l.e.shinkaiClash() == null) {
                     e.pulos++;
                     if (f.superJumping) e.superPulos++;
                     e.porLutador.computeIfAbsent(quem[s], k -> new int[2])[0]++;
                     resultado[s] = 0;
                     noAr[s] = true;
-                } else if (!ar && noAr[s]) {
+                } else if (f.grounded && noAr[s]) {
                     if (resultado[s] == 3) e.tirado++;
                     else if (resultado[s] == 2) e.acertou++;
                     else if (resultado[s] == 1) e.defendido++;
                     noAr[s] = false;
                 }
+                noChao[s] = f.grounded;
             }
             for (CombatEngine.HitEvent h : l.e.events()) {
                 if (noAr[h.attacker] && !l.f(h.attacker).grounded) resultado[h.attacker] = Math.max(resultado[h.attacker], h.blocked ? 1 : 2);

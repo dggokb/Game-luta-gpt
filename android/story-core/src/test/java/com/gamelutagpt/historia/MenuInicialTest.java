@@ -107,7 +107,7 @@ public class MenuInicialTest {
         MenuPausa p = new MenuPausa();
         p.abrir(null, true);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.cursor());
-        float[] menu = MenuPausa.CAIXAS[7];
+        float[] menu = MenuPausa.CAIXAS[8];
         assertNull("o toque que abriu a pausa não escolhe", p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         for (int i = 0; i < 20; i++) p.update(DT);
         assertNull(p.tap(640f, 675f));
@@ -122,7 +122,7 @@ public class MenuInicialTest {
 
         p.abrir(null, false);
         for (int i = 0; i < 20; i++) p.update(DT);
-        for (int i = 0; i < 7; i++) p.mover(1);
+        for (int i = 0; i < 8; i++) p.mover(1);
         assertEquals(MenuPausa.Opcao.MENU, p.confirmar());
         assertNull(p.confirmar());
     }
