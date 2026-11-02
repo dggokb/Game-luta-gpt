@@ -357,3 +357,26 @@ solta raios, a aura azul sobe e um dragão de energia gira em volta dele.
   - tudo isso entra e sai em 18 quadros;
   - o rival e o cenário ficam escuros, e o rival, o relógio e o tempo do SHINKAI ficam parados.
 - **Qualquer personagem com `efeitos/shinkai_<id>`** ganha a mesma cena sem mexer no código.
+
+### Cantos do vídeo e a ordem da cena (02/11)
+
+O jogador viu cortes nos cantos do vídeo e pediu outra ordem: "câmera pausa, ele levanta as mãos,
+aí sim entra o texto de SHINKAI, aí sai, e aí ele termina a ação com o dragão".
+- **Cantos:** havia três cortes.
+  - O brilho encostava na beira do quadro do vídeo e virava uma linha reta.
+  - A marca d'água deixava um dente reto no canto de cima.
+  - O verde borrado de alguns quadros virava um véu cinza retangular.
+- **Correção no conversor (`efeito_video.py`):** quatro opções novas.
+  - `--borda 130`: o efeito some aos poucos perto da beira, numa superelipse de cantos
+    arredondados;
+  - `--apagar` agora tem a beira borrada;
+  - `--alfa-corte 0.12`, `--escuro 110` e `--cinza 0.3` tiram o véu meio transparente sem cor;
+  - o brilho azul e o personagem, opacos, ficam iguais.
+- **Ordem:** a câmera fecha e ele levanta as mãos.
+  - No quadro 8 do vídeo, as mãos no alto, o vídeo para (`--segurar 8,800`, que grava `marcaMs`
+    no `efeito.json`).
+  - Aí entra o corte de ativação (os olhos, a faixa e "SHINKAI" com o tipo), que fica 0,8 s e
+    sai.
+  - Depois o vídeo segue com o dragão.
+- **Pausa:** a pausa inteira passa a 3,7 s, e a `SHINKAI_ATIVA` de reserva foi esticada junto.
+- **Sem marca:** um efeito sem `marcaMs` mantém o corte no começo, como antes.

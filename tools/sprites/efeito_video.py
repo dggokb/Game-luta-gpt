@@ -102,6 +102,30 @@ def chave(quadro, fundo):
     return np.dstack([cor, a * 255.0]).astype(np.uint8)
 
 
+def mascara_bordas(w, h, borda, apagar):
+    """Multiplicador do alfa: some aos poucos nos últimos `borda` px do quadro do vídeo (o
+    brilho que encosta na beira não vira uma linha reta no jogo) e no retângulo `apagar` (a
+    marca d'água), com a beira dele borrada para não deixar um dente no efeito."""
+    m = np.ones((h, w), np.float32)
+    if borda:
+        # Superelipse (cantos arredondados): a beira do quadro não vira um retângulo no jogo.
+        ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+        nx = np.abs(xs - (w - 1) / 2.0) / ((w - 1) / 2.0)
+        ny = np.abs(ys - (h - 1) / 2.0) / ((h - 1) / 2.0)
+        r = (nx ** 4 + ny ** 4) ** 0.25
+        dentro = 1.0 - 2.0 * borda / float(min(w, h))
+        t = np.clip((1.0 - r) / max(1e-3, 1.0 - dentro), 0.0, 1.0)
+        m *= t * t * (3.0 - 2.0 * t)
+    if apagar:
+        r = np.ones((h, w), np.float32)
+        r[apagar[1]:apagar[3], apagar[0]:apagar[2]] = 0.0
+        k = max(3, (min(apagar[2] - apagar[0], apagar[3] - apagar[1]) // 2) | 1)
+        r = cv2.GaussianBlur(r, (0, 0), k / 2.0)
+        r[apagar[1]:apagar[3], apagar[0]:apagar[2]] = 0.0
+        m *= r
+    return m
+
+
 def caixa(alfa, limiar=10):
     ys, xs = np.where(alfa > limiar)
     if len(xs) == 0:
@@ -138,7 +162,8 @@ def empacotar(imagens):
 
 def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=None,
               altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0,
-              escala_mundo=None, resolucao=None, velocidade=1.0, apagar=None):
+              escala_mundo=None, resolucao=None, velocidade=1.0, apagar=None, borda=0,
+              alfa_corte=0.0, escuro=0, cinza=0.0, segurar=None):
     if Path(video).is_dir():
         quadros, fps = ler_pngs(video, inicio, fim, passo), fps_png
     else:
@@ -151,10 +176,31 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
     else:
         fundo = cor_do_fundo(quadros)
         rgba = [chave(q, fundo) for q in quadros]
-    if apagar:
-        # A marca d'água do gerador: some do efeito.
+    if apagar or borda or alfa_corte or escuro or cinza:
+        h, w = rgba[0].shape[:2]
+        mascara = mascara_bordas(w, h, borda, apagar)
         for q in rgba:
-            q[apagar[1]:apagar[3], apagar[0]:apagar[2], 3] = 0
+            a = q[..., 3].astype(np.float32) / 255.0
+            if alfa_corte:
+                # O véu do fundo (verde escuro ou borrado que a chave deixa meio transparente)
+                # some; o efeito de verdade (alfa alto) fica igual.
+                a = np.clip((a - alfa_corte) / (1.0 - alfa_corte), 0.0, 1.0)
+            if cinza:
+                # Véu cinza claro (verde borrado que a chave deixa meio transparente e o despill
+                # acinzenta): o brilho do efeito tem cor; o cinza meio transparente some.
+                cor = q[..., :3].astype(np.float32)
+                v = cor.max(axis=2)
+                sat = (v - cor.min(axis=2)) / np.maximum(v, 1.0)
+                veu = (sat < cinza) & (a < 0.75)
+                a = np.where(veu, a * (sat / cinza) ** 2, a)
+            if escuro:
+                # Véu cinza-escuro (resto do fundo) some; o preto do personagem é opaco e fica.
+                cor = q[..., :3].astype(np.float32)
+                v = cor.max(axis=2)
+                sat = (v - cor.min(axis=2)) / np.maximum(v, 1.0)
+                veu = (v < escuro) & (sat < 0.45) & (a < 0.85)
+                a = np.where(veu, a * np.clip(v / escuro, 0.0, 1.0) ** 2, a)
+            q[..., 3] = np.clip(a * mascara * 255.0, 0, 255).astype(np.uint8)
     ux0, uy0, ux1, uy1 = uniao([caixa(q[..., 3]) for q in rgba])
     pixel_scale = resolucao or PIXEL_SCALE
     # Escala: a altura do efeito inteiro vira `altura` px do mundo (a folha guarda pixel_scale);
@@ -205,6 +251,12 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
                     for (lx, ly), im, (dx, dy) in zip(lugares, recortados, desloc)],
         'duracoesMs': [ms] * len(recortados),
     }
+    if segurar:
+        # O vídeo para nesse quadro por mais `ms` (o jogo põe algo por cima nessa hora: o corte
+        # de ativação do SHINKAI); marcaMs diz quando a parada começa.
+        q, extra = segurar
+        dados['marcaMs'] = sum(dados['duracoesMs'][:q])
+        dados['duracoesMs'][q] += extra
     (destino / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     gif_previa(dados, recortados, Path(previa) / f'{nome}.gif')
     return destino, dados
@@ -256,10 +308,17 @@ def main():
     p.add_argument('--resolucao', type=float, help=f'px da folha por px do mundo (padrão {PIXEL_SCALE})')
     p.add_argument('--velocidade', type=float, default=1.0, help='toca N vezes mais rápido que o vídeo')
     p.add_argument('--apagar', type=lambda t: numeros(t, 4), help='x0,y0,x1,y1: apaga (marca d\'água)')
+    p.add_argument('--borda', type=int, default=0, help='px do vídeo em que o efeito some aos poucos na beira do quadro')
+    p.add_argument('--alfa-corte', type=float, default=0.0, help='alfa abaixo disso some (véu do fundo); o resto é reesticado')
+    p.add_argument('--escuro', type=int, default=0, help='véu cinza mais escuro que isso (0-255) e meio transparente some')
+    p.add_argument('--cinza', type=float, default=0.0, help='véu meio transparente com saturação abaixo disso (0-1) some')
+    p.add_argument('--segurar', type=lambda t: numeros(t, 2), help='quadro,ms: o vídeo para nesse quadro por mais ms (marcaMs no json)')
     a = p.parse_args()
     destino, dados = converter(a.video, a.nome, a.inicio, a.fim, a.passo, a.ancora, a.origem,
                                a.altura, a.recorte, fps_png=a.fps, escala_mundo=a.escala_mundo,
-                               resolucao=a.resolucao, velocidade=a.velocidade, apagar=a.apagar)
+                               resolucao=a.resolucao, velocidade=a.velocidade, apagar=a.apagar,
+                               borda=a.borda, alfa_corte=a.alfa_corte, escuro=a.escuro, cinza=a.cinza,
+                               segurar=a.segurar)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 

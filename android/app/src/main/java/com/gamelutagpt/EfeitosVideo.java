@@ -42,6 +42,8 @@ final class EfeitosVideo {
         final float[][] desloc;
         /** Fim de cada quadro (ms desde o começo). */
         final float[] fim;
+        /** Quando o vídeo para para algo do jogo entrar por cima (ms; -1: não tem). */
+        float marcaMs = -1f;
 
         Folha(String nome, Bitmap bitmap, float pixelScale, int[][] quadros, float[][] desloc, float[] fim) {
             this.nome = nome;
@@ -128,7 +130,9 @@ final class EfeitosVideo {
             t += (float)ms.getDouble(Math.min(i, ms.length() - 1));
             fim[i] = t;
         }
-        return new Folha(nome, bitmap, (float)dados.optDouble("pixelScale", 1.0), quadros, desloc, fim);
+        Folha f = new Folha(nome, bitmap, (float)dados.optDouble("pixelScale", 1.0), quadros, desloc, fim);
+        f.marcaMs = (float)dados.optDouble("marcaMs", -1.0);
+        return f;
     }
 
     private static String texto(InputStream in) throws IOException {
@@ -144,6 +148,12 @@ final class EfeitosVideo {
         Map<String, Folha> novas = new HashMap<>(folhas);
         novas.put(f.nome, f);
         folhas = novas;
+    }
+
+    /** A marca do efeito (ms em que o vídeo para para algo entrar por cima); -1 se não tem. */
+    float marcaMs(String nome) {
+        Folha f = folhas.get(nome);
+        return f == null ? -1f : f.marcaMs;
     }
 
     /** O efeito existe nos assets (depois de {@link #carregar}). */

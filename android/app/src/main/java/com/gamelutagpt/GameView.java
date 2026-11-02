@@ -2644,6 +2644,10 @@ public class GameView extends SurfaceView
     private void updateUltraBeam() {
         beamShake = Math.max(0f, beamShake - FIXED_STEP * 60f);
         if (shinkaiFlash > 0) shinkaiFlash--;
+        if (corteAtraso > 0) {
+            if (!ativacaoShinkai()) corteAtraso = -1;
+            else if (engine.frame() - ativacaoInicio >= corteAtraso) comecarCorte();
+        }
         corteShinkai.passo();
         shinkaiDetalhes.passo(engine, engine.frame());
         confronto.passo(engine);
@@ -2972,7 +2976,8 @@ public class GameView extends SurfaceView
             impacts.spawnSuperGlint(x, chestY(f), color);
             shinkaiFlash = SHINKAI_FLASH_FRAMES;
             shinkaiFlashColor = color;
-            corteShinkai.comecar(side == OPPONENT, characterSelectRenderer.hudPortrait(f.state.character), f.state.shinkaiType);
+            corteAtraso = -1;
+            String efeito = "shinkai_" + f.character().id;
             if (f.character().animations.containsKey(SpriteStates.SHINKAI_ATIVA)) {
                 // A animação de ativação: a luta para (o motor congela) e a tela escurece em volta.
                 ativacaoLado = side;
@@ -2980,14 +2985,29 @@ public class GameView extends SurfaceView
                 ativacaoQuadros = engine.shinkaiAtivacaoQuadros(f);
                 // Com o vídeo da liberação de poder (efeito shinkai_<id>: ele, a aura, os raios e o
                 // dragão), o efeito toca nos pés dele e o sprite some enquanto isso.
-                ativacaoEfeito = efeitos.tocar("shinkai_" + f.character().id, x, fighterVisualY(f), 1f, f.facing < 0);
+                ativacaoEfeito = efeitos.tocar(efeito, x, fighterVisualY(f), 1f, f.facing < 0);
+                // A cena (pedido do jogador): a câmera fecha, ele levanta as mãos, o vídeo para e
+                // aí entra o corte com o nome; o corte sai e ele termina com o dragão.
+                float marca = ativacaoEfeito ? efeitos.marcaMs(efeito) : -1f;
+                if (marca >= 0f) corteAtraso = Math.round(marca / (FIXED_STEP * 1000f));
             }
+            corteLado = side;
+            if (corteAtraso <= 0) comecarCorte();
             // O nome vem no corte de ativação: sem o aviso por cima dele.
             banner = null;
         }
         beamShake = Math.max(beamShake, 16f);
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
         return banner;
+    }
+
+    /** Quadros (desde o começo da ativação) até o corte de ativação entrar; -1: já entrou. */
+    private int corteAtraso = -1, corteLado;
+
+    private void comecarCorte() {
+        corteAtraso = -1;
+        CombatFighter f = engine.fighter(corteLado);
+        corteShinkai.comecar(corteLado == OPPONENT, characterSelectRenderer.hudPortrait(f.state.character), f.state.shinkaiType);
     }
 
     /** Lado que está tocando a animação de ativação do SHINKAI (-1: nenhum), desde que quadro e por quantos. */
