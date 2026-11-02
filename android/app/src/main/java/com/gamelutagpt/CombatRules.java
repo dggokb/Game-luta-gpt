@@ -188,11 +188,21 @@ final class CombatRules {
         float bx, float bBaseY, CharacterDefinition.Body b,
         float minX, float maxX, int tieDirection, float[] out
     ) {
+        return resolvePush(ax, aBaseY, a.pushHalfWidth, a.pushHeight, bx, bBaseY, b.pushHalfWidth, b.pushHeight,
+            minX, maxX, tieDirection, out);
+    }
+
+    /** O mesmo, com a caixa dada: {@code aBaseY} é a base dela e {@code aHeight} a altura. */
+    static boolean resolvePush(
+        float ax, float aBaseY, float aHalfWidth, float aHeight,
+        float bx, float bBaseY, float bHalfWidth, float bHeight,
+        float minX, float maxX, int tieDirection, float[] out
+    ) {
         out[0] = ax;
         out[1] = bx;
-        boolean vertical = aBaseY - a.pushHeight < bBaseY && bBaseY - b.pushHeight < aBaseY;
+        boolean vertical = aBaseY - aHeight < bBaseY && bBaseY - bHeight < aBaseY;
         if (!vertical) return false;
-        float minDistance = a.pushHalfWidth + b.pushHalfWidth;
+        float minDistance = aHalfWidth + bHalfWidth;
         float dx = bx - ax;
         float overlap = minDistance - Math.abs(dx);
         if (overlap <= 0f) return false;

@@ -236,6 +236,13 @@ final class CombatConfig {
     int reboundFadeFrames = 8;
     /** O empurrão dos corpos encostados anda no máximo isto por quadro (cada um). */
     float pushStepMax = 12f;
+    /**
+     * Empurrão no ar contra quem está no chão (como no mercado): o corpo no pulo encolhe as pernas
+     * e fica mais estreito, então o pulo de perto passa por cima. Antes (corpo inteiro e largo) o
+     * Ryūga não passava nem do Kōga.
+     */
+    int airPushHalfWidthPermille = 600;
+    float airPushLegsTucked = 60f;
     /** Upward speed given to an airborne defender by a strike before the last (stays in reach). */
     float strikeHoldLift = 260f;
     /** An advancing move stops this close to the opponent's body (px past the pushboxes). */

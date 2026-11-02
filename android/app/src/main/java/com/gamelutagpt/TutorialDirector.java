@@ -297,7 +297,7 @@ final class TutorialDirector {
      * até cair), então o boneco fica longe o bastante para o golpe aéreo pegar na descida, sem
      * passar por cima dele.
      */
-    static final float JUMP_IN_GAP = 200f;
+    static final float JUMP_IN_GAP = 240f;
 
     /**
      * Pulo para frente e H na descida; a cada tentativa aperta num ponto diferente, até achar o

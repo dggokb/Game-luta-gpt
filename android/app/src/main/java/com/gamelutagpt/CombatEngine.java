@@ -2095,7 +2095,13 @@ final class CombatEngine {
         CombatFighter a = fighters[0], b = fighters[1];
         // A wake-up roll passes through the other body, and so does a cross-up rush.
         if (a.rolling() || b.rolling() || passingThrough(a) || passingThrough(b)) return;
-        if (CombatRules.resolvePush(a.x, a.y, a.body(), b.x, b.y, b.body(),
+        // No ar contra quem está no chão: pernas encolhidas e corpo mais estreito (o pulo passa por cima).
+        boolean arA = !a.grounded && b.grounded, arB = !b.grounded && a.grounded;
+        CharacterDefinition.Body ba = a.body(), bb = b.body();
+        float wa = ba.pushHalfWidth * (arA ? config.airPushHalfWidthPermille / 1000f : 1f);
+        float wb = bb.pushHalfWidth * (arB ? config.airPushHalfWidthPermille / 1000f : 1f);
+        float la = arA ? config.airPushLegsTucked : 0f, lb = arB ? config.airPushLegsTucked : 0f;
+        if (CombatRules.resolvePush(a.x, a.y - la, wa, ba.pushHeight - la, b.x, b.y - lb, wb, bb.pushHeight - lb,
             Arena.LEFT_BOUND, Arena.RIGHT_BOUND, a.facing, pushResult)) {
             // Aos poucos (pushStepMax por quadro): quem cai por cima do rival escorrega para o
             // lado, sem pular de uma vez a largura das duas caixas.
