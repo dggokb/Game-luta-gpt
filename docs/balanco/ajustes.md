@@ -1466,3 +1466,12 @@ Kōga criança passava por cima).
 - **Resultado:** +0,3–0,4 esquiva por luta, 10–15% menos dano levado no SHINKAI, Ryūga +1–3
   pontos, leituras iguais.
 - **Detalhes:** `shinkai-ryuga.md`.
+
+## Ritmo da luta: os 100% da VELOCIDADE rodam a 95% (pedido do jogador, 02/11)
+
+"Deixa a velocidade 95% como 100%: senti que o jogo ficou com bem mais cara de jogo."
+`GameView.RITMO_BASE = 0,95` multiplica a VELOCIDADE da pausa. O que o menu chama de 100% agora é
+0,95 do relógio original, e os outros níveis descem junto (90% = 0,855). Para voltar, basta pôr
+1. Golpes, pulos, IA, tempo e efeitos da luta desaceleram juntos. Os quadros de cada golpe, o
+motor e as simulações não mudam (eles contam quadros, não segundos). Menus, história e
+cinemáticas seguem na velocidade normal.

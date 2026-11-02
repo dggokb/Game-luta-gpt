@@ -80,6 +80,13 @@ public class GameView extends SurfaceView
 
     /** Fixed simulation step; rendering runs at whatever rate the device manages. */
     static final float FIXED_STEP = CombatConfig.DT;
+    /**
+     * O ritmo da luta nos 100% da VELOCIDADE (pedido do jogador, 02/11: "deixa a velocidade 95% como
+     * 100%, o jogo ficou com mais cara de jogo"). Os outros níveis da pausa escalam junto (90% =
+     * 0,855 do original). O motor e as simulações contam quadros: não mudam.
+     */
+    static final float RITMO_BASE = 0.95f;
+
     /** Onde fica a VELOCIDADE escolhida na pausa (vale para a próxima vez que o app abrir). */
     private static final String SPEED_PREFS = "jogo_v1";
     private static final String SPEED_KEY = "velocidade";
@@ -1743,9 +1750,9 @@ public class GameView extends SurfaceView
                 feel.slow(FinalizacaoManga.LENTA_QUADROS, FinalizacaoManga.LENTA_ESCALA);
                 beamShake = Math.max(beamShake, FinalizacaoManga.TREMIDA);
             }
-            finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade());
+            finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade() * RITMO_BASE);
         }
-        float speed = fightClockRunning() ? pausa.velocidade() * feel.timeScale() : 1f;
+        float speed = fightClockRunning() ? pausa.velocidade() * RITMO_BASE * feel.timeScale() : 1f;
         // No máximo 3 passos por quadro: depois de um engasgo, 6 passos de uma vez (motor, IA e
         // visual) faziam o quadro seguinte engasgar também. O jogo atrasa um pouco em vez disso.
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.05f) * speed;
