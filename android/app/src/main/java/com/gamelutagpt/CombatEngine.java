@@ -2938,7 +2938,9 @@ final class CombatEngine {
 
     /** {@code a} solta um golpe normal no ar (jL, jM, jH...) em {@code d}, que está no chão. */
     static boolean pulandoParaDentro(CombatFighter a, CombatFighter d) {
-        return !a.grounded && d.grounded && a.attack != null && a.move != null &&
+        // Só descendo (o pulo de ataque): subindo, o alcance extra fazia o chute logo na decolagem
+        // acertar quem está em pé no 6º–8º quadro do pulo, antes de qualquer reação (02/11).
+        return !a.grounded && d.grounded && a.vy > 0f && a.attack != null && a.move != null &&
             a.attack.kind == AttackDefinition.Kind.NORMAL && a.attack.id.startsWith("j");
     }
 
