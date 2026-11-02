@@ -26,7 +26,7 @@ public class ShinkaiTest {
         Match(String p1, String cpu, float xa, float xb) {
             first = new FighterState(GeneratedCharacters.get(p1), "P1");
             cpuState = new FighterState(GeneratedCharacters.get(cpu), "CPU");
-            engine = new CombatEngine(first, cpuState, xa, xb, new CombatConfig());
+            engine = new CombatEngine(first, cpuState, xa, xb, relogio());
         }
 
         Match(float xa, float xb) { this("player_base", "player_base", xa, xb); }
@@ -431,5 +431,16 @@ public class ShinkaiTest {
             plain.step();
         }
         assertEquals(0, plain.engine.countEnergyProjectiles(0));
+    }
+
+    /**
+     * Estes testes medem a característica de cada tipo no relógio de sempre (8 s): a regra da
+     * reserva (vida nova, desde 02/11) fica só no do Ryūga aqui; a dos outros tem testes próprios
+     * (ShinkaiReservaTest).
+     */
+    static CombatConfig relogio() {
+        CombatConfig c = new CombatConfig();
+        c.shinkaiReservaTodos = false;
+        return c;
     }
 }

@@ -3212,7 +3212,7 @@ final class AiController {
      */
     private boolean escolhaPercepcao(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
         FighterState s = me.state;
-        if (!s.inShinkai(Shinkai.Type.PERCEPCAO)) {
+        if (!s.inShinkai() || s.shinkaiType != Shinkai.Type.PERCEPCAO && !engine.porReserva(s)) {
             decidiuLimite = false;
             return false;
         }

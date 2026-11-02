@@ -647,6 +647,14 @@ final class CombatConfig {
     // desgaste do protótipo anterior (para comparar).
     boolean ryugaReserva = true;
     /**
+     * A regra da reserva (vida nova, sem cronômetro, limite, Ruptura, transformação quebrada) vale
+     * para todos os SHINKAIs, cada tipo com a sua característica (POWER, SPEED, ENERGY,
+     * TECHNIQUE, PERCEPÇÃO). false = só o do Ryūga; os outros no relógio de sempre.
+     */
+    boolean shinkaiReservaTodos = true;
+    /** SPEED na regra da reserva: o sumiço gasta isto da reserva (no relógio gastava tempo). */
+    int shinkaiReservaSumico = 150;
+    /**
      * A reserva ao ligar (vida: a vida inteira é 10000). Uma vida nova inteira (pedido do jogador:
      * "o SHINKAI é um novo life", como a transformação dos animes).
      */

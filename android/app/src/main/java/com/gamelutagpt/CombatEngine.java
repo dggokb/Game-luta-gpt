@@ -595,7 +595,8 @@ final class CombatEngine {
             f.dashRequest = f.backdashRequest = false;
             return;
         }
-        if (f.shinkaiRequestAge >= 0 && f.state.inShinkai(Shinkai.Type.PERCEPCAO) && shinkaiClash == null) {
+        if (f.shinkaiRequestAge >= 0 && f.state.inShinkai() && (f.state.shinkaiType == Shinkai.Type.PERCEPCAO || porReserva(f.state)) &&
+            shinkaiClash == null) {
             escolhaNoShinkai(f);
         }
 
@@ -813,7 +814,7 @@ final class CombatEngine {
                 // O golpe de quem venceu entra: dano forte, o perdedor voa girando (e segue no SHINKAI dele).
                 l.state.takeDamage(config.shinkaiClashDamage, config.recoverableLifePermille);
                 perdeNoClash(l.state);
-                if (w.state.shinkaiType == Shinkai.Type.PERCEPCAO) recuperaNoClash(w.state);
+                if (w.state.shinkaiType == Shinkai.Type.PERCEPCAO || porReserva(w.state)) recuperaNoClash(w.state);
                 else w.state.shinkaiFrames = config.shinkaiFrames;
                 int away = l.x >= w.x ? 1 : -1;
                 l.status = CombatFighter.Status.AIR_HITSTUN;
@@ -874,7 +875,9 @@ final class CombatEngine {
      * (nada acerta) e aparece atrás dele; cada um gasta um pouco do tempo do SHINKAI.
      */
     private boolean canVanish(CombatFighter f) {
-        if (!f.state.inShinkai(Shinkai.Type.SPEED) || f.state.shinkaiFrames <= config.shinkaiVanishCost) return false;
+        if (!f.state.inShinkai(Shinkai.Type.SPEED)) return false;
+        if (porReserva(f.state) ? f.state.rupturaQuadros == 0 && f.state.reserva <= config.shinkaiReservaSumico
+            : f.state.shinkaiFrames <= config.shinkaiVanishCost) return false;
         if (f.status != CombatFighter.Status.NEUTRAL || !f.grounded || f.busyOnGround() || f.vanishFrames > 0) return false;
         CombatFighter other = fighters[1 - f.index];
         return Math.abs(other.x - f.x) <= config.shinkaiVanishRange;
@@ -882,7 +885,8 @@ final class CombatEngine {
 
     private void vanish(CombatFighter f) {
         CombatFighter other = fighters[1 - f.index];
-        f.state.shinkaiFrames -= config.shinkaiVanishCost;
+        if (porReserva(f.state)) gastarReserva(f.state, config.shinkaiReservaSumico);
+        else f.state.shinkaiFrames -= config.shinkaiVanishCost;
         f.vanishFrames = config.shinkaiVanishFrames;
         f.vanishFromX = f.x;
         // Atrás do rival; encurralado, do lado que cabe.
@@ -946,7 +950,7 @@ final class CombatEngine {
 
     /** O SHINKAI dele é o por reserva (o Ryūga com {@link CombatConfig#ryugaReserva}). */
     boolean porReserva(FighterState s) {
-        return config.ryugaReserva && s.shinkaiType == Shinkai.Type.PERCEPCAO;
+        return config.ryugaReserva && (config.shinkaiReservaTodos || s.shinkaiType == Shinkai.Type.PERCEPCAO);
     }
 
     /**
@@ -1076,12 +1080,12 @@ final class CombatEngine {
             s.shinkaiFrames = 0;
             return;
         }
-        if (s.shinkaiType != Shinkai.Type.PERCEPCAO) {
-            s.shinkaiFrames = Math.max(1, s.shinkaiFrames * parte / 1000);
-            return;
-        }
         if (porReserva(s)) {
             if (s.rupturaQuadros == 0) s.reserva = Math.max(1, s.reserva * parte / 1000);
+            return;
+        }
+        if (s.shinkaiType != Shinkai.Type.PERCEPCAO) {
+            s.shinkaiFrames = Math.max(1, s.shinkaiFrames * parte / 1000);
             return;
         }
         if (s.rupturaQuadros > 0) {

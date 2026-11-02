@@ -203,7 +203,7 @@ final class FighterState {
     /** Para as baterias: dano que a reserva segurou e o que as técnicas gastaram dela (a luta toda). */
     int reservaAbsorveu, reservaGastaTecnica;
 
-    boolean emRuptura() { return rupturaQuadros > 0 && inShinkai(Shinkai.Type.PERCEPCAO); }
+    boolean emRuptura() { return rupturaQuadros > 0 && shinkaiFrames > 0; }
 
     /** A cor da aura e da barra agora (a Ruptura esquenta). */
     int corShinkai() { return emRuptura() ? Shinkai.COR_RUPTURA : shinkaiType.color; }

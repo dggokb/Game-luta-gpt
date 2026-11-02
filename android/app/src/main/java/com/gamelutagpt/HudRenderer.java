@@ -1475,7 +1475,7 @@ final class HudRenderer {
         paint.setStyle(Paint.Style.FILL);
         if (ready && !pressed) readyHalo(c, x, y, r, ring);
         label(c, "SHINKAI", x, y + (left > 0f || f.shinkaiUsed ? -7f : 0f), 13f, lit ? Color.WHITE : 0xFFB4BCCB);
-        if (left > 0f) label(c, shinkaiLabel(f.shinkaiFrames / 60f), x, y + 11f, 10f, Color.WHITE);
+        if (left > 0f) label(c, f.reservaMax > 0 ? reservaLabel(f) : shinkaiLabel(f.shinkaiFrames / 60f), x, y + 11f, 10f, Color.WHITE);
         else if (f.shinkaiUsed) label(c, "USADO", x, y + 11f, 9f, 0xFFB4BCCB);
     }
 
@@ -1486,6 +1486,19 @@ final class HudRenderer {
      * "4s", em segundos inteiros (arredondados para cima): no OpenGL cada texto novo vira um
      * bitmap, e o décimo ("3.4s") fazia dois por 0,1 s durante o SHINKAI inteiro.
      */
+    private int reservaShown = -1;
+    private String reservaText = "";
+
+    /** Regra da reserva: sem cronômetro, o botão mostra quanto da vida nova sobra (ou RUPTURA). */
+    private String reservaLabel(FighterState f) {
+        int pct = f.emRuptura() ? -2 : Math.round(100f * f.reserva / Math.max(1, f.reservaMax));
+        if (pct != reservaShown) {
+            reservaShown = pct;
+            reservaText = pct == -2 ? "RUPT." : pct + "%";
+        }
+        return reservaText;
+    }
+
     private String shinkaiLabel(float seconds) {
         int whole = Math.max(0, (int)Math.ceil(seconds - 1e-4f));
         if (whole != shinkaiSecondsShown) {

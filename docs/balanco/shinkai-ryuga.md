@@ -573,3 +573,48 @@ A reserva passa a ser a base comum. A característica do Ryūga continua a da PE
   - quem se transforma primeiro cai para 55%: responder vale;
   - há mais viradas (38%).
 - Esse é o xadrez de poder: transformar, responder, quebrar.
+
+### A regra da vida nova para todos (pedido do jogador, 02/11)
+
+"Mantém as características dos outros, mas põe a nova regra de SHINKAI."
+- Todos os SHINKAIs ganham a vida nova (reserva de 10.000) e ficam sem cronômetro.
+- Todos ganham o limite, a Ruptura, a trava e a transformação quebrada.
+- Cada um mantém a característica do tipo:
+  - POWER: armadura e dano;
+  - SPEED: sumiço e eco; o sumiço agora gasta 150 da reserva;
+  - ENERGY: tiros e barra de Super enchendo;
+  - TECHNIQUE: aparada;
+  - PERCEPÇÃO (o Ryūga): leitura, esquiva e golpe preciso.
+- **No código:**
+  - `shinkaiReservaTodos` em `CombatConfig`; `false` volta o relógio de 8 s para os outros.
+  - Os testes antigos de cada tipo rodam no relógio (`ShinkaiTest`, `ShinkaiClashTest`); a regra
+    nova para todos é testada em `ShinkaiReservaTest`.
+- **No HUD:**
+  - o botão do SHINKAI mostra a porcentagem da reserva que sobra (ou "RUPT.") no lugar dos
+    segundos;
+  - a camada dourada cobre a barra de vida.
+
+**Simulação do elenco** (`BateriaShinkaiElenco 2 5 8`): os 16 contra todos, com Clash, 480 lutas
+por coluna. Tabelas em `perfis/shinkai-vida-nova-elenco.md`. Nível 8:
+
+| medida | relógio (antes) | vida nova (agora) | sem SHINKAI |
+|---|---|---|---|
+| duração da luta | 58 s | 86 s | 48 s |
+| viradas | 29% | 37% | 24% |
+| SHINKAI Clash por luta | 0,90 | 1,30 | — |
+| transformações quebradas por luta | — | 0,88 | — |
+| quem quebra a do outro vence | — | 78% | — |
+| quem se transforma primeiro vence | 49% | 51% | — |
+| desvio das vitórias do elenco | 18,5 pontos (7%–77%) | 16,5 pontos (13%–73%) | 18,2 pontos (8%–83%) |
+
+**Por tipo**
+- O SHINKAI dura 35–39 s (era 14–18 s).
+- A vida perdida lá dentro cai a uns 7%.
+- **Quebrada x KO:**
+  - POWER e PERCEPÇÃO quebram menos (26–27%) e derrubam mais (40–41%);
+  - TECHNIQUE e SPEED quebram mais (37–43%) e derrubam menos (18–29%).
+- **Quem ganha e quem perde:**
+  - o POWER ganha: p04 de 51% para 65%, p09 de 52% para 63%, p12 de 48% para 62%;
+  - o ENERGY perde: p11 de 77% para 38%, p08 de 73% para 55%;
+  - o p15 segue o mais fraco (13%).
+- **Cuidado:** são 60 lutas por lutador em cada coluna, então ±6 pontos é ruído.

@@ -18,7 +18,7 @@ public class ShinkaiClashTest {
         Match(String p1, String p2) {
             first = new FighterState(GeneratedCharacters.get(p1), "P1");
             cpu = new FighterState(GeneratedCharacters.get(p2), "CPU");
-            engine = new CombatEngine(first, cpu, 500f, 900f, new CombatConfig());
+            engine = new CombatEngine(first, cpu, 500f, 900f, relogio());
         }
 
         CombatFighter f(int i) { return engine.fighter(i); }
@@ -317,5 +317,16 @@ public class ShinkaiClashTest {
         double min = Math.min(Math.min(media[0], media[1]), Math.min(media[2], media[3]));
         double max = Math.max(Math.max(media[0], media[1]), Math.max(media[2], media[3]));
         assertTrue("empurrão por quadro POWER/SPEED/ENERGY/TECHNIQUE: " + java.util.Arrays.toString(media), max < 1.15 * min);
+    }
+
+    /**
+     * Estes testes medem a característica de cada tipo no relógio de sempre (8 s): a regra da
+     * reserva (vida nova, desde 02/11) fica só no do Ryūga aqui; a dos outros tem testes próprios
+     * (ShinkaiReservaTest).
+     */
+    static CombatConfig relogio() {
+        CombatConfig c = new CombatConfig();
+        c.shinkaiReservaTodos = false;
+        return c;
     }
 }
