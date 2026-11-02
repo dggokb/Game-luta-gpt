@@ -12,14 +12,16 @@ usa o efeito clássico dele, então cada vídeo novo entra sozinho.
 - O vídeo **começa vazio e termina vazio** (o efeito nasce e some dentro dele).
 - 1 a 2 segundos, 24 fps, 1280×720 ou maior.
 - O efeito **no meio do quadro**, grande (ocupando uns 60% da altura), sem sair da tela.
-- Estilo dos vídeos de referência: branco com sombra cinza e contorno fino escuro, traço de
-  anime desenhado à mão; nada de brilho neon nem cor (a cor do lutador pode vir depois).
+- Estilo: efeito 2D de anime desenhado à mão, colorido, em camadas, com sombreado de anime
+  (base, sombra e brilho) e contorno escuro de pincel. Acerto em branco/amarelo/laranja;
+  fumaça e poeira em cinza-claro com sombra lilás. **Nada verde** no efeito (some com o fundo).
+  (Antes era só branco e cinza; a cor foi liberada em 01/11.)
 - **Um efeito por vídeo.** Golpes e corridas sempre **para a direita** (o jogo espelha).
 
 Exemplo de pedido (troque a descrição do efeito):
 
-> Efeito visual 2D de anime para jogo de luta, desenhado à mão, branco com sombreado cinza e
-> contorno fino escuro. [EFEITO]. Fundo verde chapado #00FF00, sem personagem, sem chão, sem
+> Efeito visual 2D de anime para jogo de luta, desenhado à mão, colorido, com sombreado de
+> anime em camadas e contorno escuro de pincel, sem nada verde. [EFEITO]. Fundo verde chapado #00FF00, sem personagem, sem chão, sem
 > sombra, câmera parada, efeito centralizado. O vídeo começa vazio e termina vazio.
 
 ## Lista de efeitos
@@ -60,6 +62,29 @@ em GIF, com a origem marcada em vermelho, em `android/app/build/sprite-review/ef
 
 **A chave do verde é por diferença de cor:** o branco a 50% sobre o verde volta a ser branco a
 50% (a fumaça e o brilho ficam meio transparentes, sem borda verde). Manchinhas de ruído saem.
+
+## Efeitos desenhados em código (anidoodle)
+
+Outro jeito de fazer o vídeo verde: desenhar o efeito em código com o
+[anidoodle](https://github.com/alexgreensh/anidoodle) (Apache-2.0). O mesmo código gera sempre os
+mesmos quadros, o verde sai liso (#00FF00) e dá para ajustar um detalhe sem mudar o resto. O
+código de cada efeito fica em `tools/sprites/efeitos_codigo/<nome>.ts`.
+
+| Efeito | Código | Quadros |
+|---|---|---|
+| `impacto_forte` | `impacto_forte.ts`: X de clarão, explosão em 3 tons (branco, amarelo, laranja) mais longa para a frente, anel de choque de lado, riscos de faísca, o miolo rompe e vira pedaços de energia, faíscas com gravidade e fumaça que se desfaz por buracos | 9 a 24 fps (~0,37 s) |
+
+```bash
+git clone https://github.com/alexgreensh/anidoodle /tmp/anidoodle
+node /tmp/anidoodle/skills/anidoodle/engine/tools/scaffold.mjs /tmp/fx --film impacto_forte --size 1280x720 --fps 24
+cp tools/sprites/efeitos_codigo/impacto_forte.ts /tmp/fx/src/canvas-core/
+(cd /tmp/fx && npm install && node tools/render.mjs impacto_forte --out out/impacto_forte.mp4)
+# o vídeo tem um quadro vazio no começo e no fim: --inicio/--fim os tiram (o impacto aparece no
+# mesmo quadro do acerto)
+python3 tools/sprites/efeito_video.py /tmp/fx/out/impacto_forte.mp4 --nome impacto_forte --ancora centro --altura 220 --inicio 1 --fim 9
+```
+
+Prévia rápida dos quadros sem render: `node tools/still.mjs impacto_forte --frames 1,2,3,4,5,6,7,8,9 --sheet out/sheet.png`.
 
 ## Efeitos do manequim (dano e defesa)
 
