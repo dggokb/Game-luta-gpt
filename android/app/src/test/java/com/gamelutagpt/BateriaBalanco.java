@@ -148,7 +148,7 @@ public final class BateriaBalanco {
         else e.startUltraBeam(atacante, Math.round(dano * 0.5f), 5);
     }
 
-    private static final Map<String, Integer> ULTRA = new HashMap<>();
+    private static final Map<String, Integer> ULTRA = new java.util.concurrent.ConcurrentHashMap<>();   // as baterias rodam lutas em paralelo
 
     static int danoUltra(String id) {
         return ULTRA.computeIfAbsent(id, k -> {
