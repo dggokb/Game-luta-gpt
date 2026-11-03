@@ -946,6 +946,11 @@ final class CombatEngine {
 
     private void parry(CombatFighter a, CombatFighter d, boolean projectile, String moveId) {
         if (d.parryAge < 0) d.state.shinkaiAutoParry = false;
+        FighterState ds = d.state;
+        if (porReserva(ds) && ds.rupturaQuadros == 0 && config.shinkaiParryReservaPermille > 0) {
+            // TECHNIQUE na regra da reserva: a aparada devolve um pouco da vida nova.
+            ds.reserva = Math.min(ds.reservaMax, ds.reserva + ds.reservaMax * config.shinkaiParryReservaPermille / 1000);
+        }
         d.parryAge = -1;
         d.status = CombatFighter.Status.NEUTRAL;
         d.clearAttack();
@@ -4185,7 +4190,7 @@ final class CombatEngine {
         }
         if (shinkaiArmor(d, attack, projectile, pounding)) {
             // SHINKAI POWER, corpo de aço: aguenta o golpe sem perder a ação, com menos dano.
-            int soft = raw * config.shinkaiPowerArmorPermille / 1000;
+            int soft = raw * (porReserva(d.state) ? config.shinkaiPowerArmorReservaPermille : config.shinkaiPowerArmorPermille) / 1000;
             d.state.takeDamage(soft, config.recoverableLifePermille);
             freeze(a, d, attack.hitstopFrames, projectile);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.HIT;

@@ -540,6 +540,13 @@ final class CombatConfig {
     int shinkaiSuperDamagePermille = 1200;
     /** POWER: o golpe que a couraça segura tira esta parte do dano. O H joga na parede e ele quica. */
     int shinkaiPowerArmorPermille = 700;
+    /**
+     * POWER na regra da reserva (vida nova): o golpe que a couraça segura tira esta parte (por
+     * mil). Com a vida nova a couraça já sai de graça; 1000 = segura o golpe sem tirar menos dano.
+     */
+    int shinkaiPowerArmorReservaPermille = 1000;
+    /** TECHNIQUE na regra da reserva: cada aparada devolve esta parte (por mil) da vida nova cheia. */
+    int shinkaiParryReservaPermille = 150;
     /** SPEED: andar, dash e air dash mais rápidos, um air dash a mais. */
     float shinkaiSpeed = 1.3f;
     /** SPEED, o sumiço (→ → com o rival até esta distância): some, aparece atrás dele. */

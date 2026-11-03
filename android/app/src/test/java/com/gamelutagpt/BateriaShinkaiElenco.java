@@ -34,8 +34,29 @@ public final class BateriaShinkaiElenco {
         PorTipo tipo(Shinkai.Type t) { return porTipo.computeIfAbsent(t, k -> new PorTipo()); }
     }
 
+    /** Ajustes da coluna "vida nova" (args "ajuste:chave=valor,..."). */
+    static java.util.function.Consumer<CombatConfig> ajusteVidaNova;
+
     static void configurar(int modo) {
-        BateriaBalanco.AJUSTE_CFG = modo == 0 ? c -> { c.ryugaReserva = false; c.shinkaiReservaTodos = false; } : null;
+        BateriaBalanco.AJUSTE_CFG = modo == 0 ? c -> { c.ryugaReserva = false; c.shinkaiReservaTodos = false; }
+            : modo == 1 ? ajusteVidaNova : null;
+    }
+
+    static java.util.function.Consumer<CombatConfig> ajuste(String texto) {
+        java.util.function.Consumer<CombatConfig> todos = c -> {};
+        for (String kv : texto.split(",")) {
+            String[] a = kv.split("=");
+            int v = Integer.parseInt(a[1]);
+            java.util.function.Consumer<CombatConfig> um;
+            switch (a[0]) {
+                case "power": um = c -> c.shinkaiPowerArmorReservaPermille = v; break;
+                case "parry": um = c -> c.shinkaiParryReservaPermille = v; break;
+                case "reserva": um = c -> c.ryugaReservaPermille = v; break;
+                default: throw new IllegalArgumentException(a[0]);
+            }
+            todos = todos.andThen(um);
+        }
+        return todos;
     }
 
     static void luta(String a, String b, int nivel, long semente, int modo, Est e) {
@@ -152,8 +173,15 @@ public final class BateriaShinkaiElenco {
 
     public static void main(String[] args) {
         int k = args.length > 0 ? Integer.parseInt(args[0]) : 2;
+        String rotulo = "";
+        if (args.length > 1 && args[1].startsWith("ajuste:")) {
+            ajusteVidaNova = ajuste(args[1].substring(7));
+            rotulo = " — ajuste " + args[1].substring(7);
+            args = Arrays.copyOfRange(args, 1, args.length);
+            args[0] = String.valueOf(k);
+        }
         int[] niveis = args.length > 1 ? Arrays.stream(args, 1, args.length).mapToInt(Integer::parseInt).toArray() : new int[] {5, 8};
-        StringBuilder out = new StringBuilder("# SHINKAI: a regra da vida nova para todos (02/11)\n\n");
+        StringBuilder out = new StringBuilder("# SHINKAI: a regra da vida nova para todos (02/11)" + rotulo + "\n\n");
         out.append("CPU × CPU, os 16 contra todos (cada par dos dois lados, ").append(k)
             .append(" luta(s) por par), com o SHINKAI Clash. Mesmas sementes nas três colunas.\n");
         String[] elenco = BateriaBalanco.ELENCO;

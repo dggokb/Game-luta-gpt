@@ -694,3 +694,31 @@ SHINKAIs do jogador acabaram desistindo no Clash e 4 trocando de lutador.
   duas vidas novas ficam inteiras.
 - **POWER:** domina (p13 87%, p04 82%); a armadura com uma vida nova inteira pesa muito.
 - **TECHNIQUE:** cai (p15 7%, p14 17%).
+
+### POWER e TECHNIQUE na vida nova (pedido do jogador: "simula os ajustes", 03/11)
+
+Na regra da vida nova sem o minigame, o POWER dominava (80% de vitórias na média; o p13 87%) e a
+TECHNIQUE caía (22%; o p15 7%). Os ajustes estão em `CombatConfig`, e todas as variantes simuladas
+estão em `perfis/shinkai-ajustes-power-technique.md`.
+
+**Os dois ajustes**
+- **POWER** (`shinkaiPowerArmorReservaPermille`, 700 → 1000): com a vida nova a couraça já sai de
+  graça. Ela continua segurando o golpe sem perder a ação, mas não tira menos dano.
+- **TECHNIQUE** (`shinkaiParryReservaPermille`, 0 → 150): cada aparada devolve 15% da vida nova.
+
+**Resultado no nível 8** (16 × 16, 480 lutas)
+
+| medida | sem ajuste | com os dois ajustes |
+|---|---|---|
+| desvio das vitórias do elenco | 23,5 pontos | 20,0 pontos |
+| pior–melhor | 7%–87% | 10%–77% |
+| POWER (média) | 80% | 71% |
+| TECHNIQUE (média) | 22% | 29% |
+| duração da luta | 99 s | 102 s |
+
+**Testado e não aplicado: vida nova de 70%** (`ryugaReservaPermille` 700). Fica ainda mais
+equilibrado: desvio 18,5, lutas de 82 s e viradas 38%. Mas a vida nova deixa de cobrir a barra
+inteira, e o jogador pediu "uma vida nova cheia".
+
+**Por que a TECHNIQUE não sobe mais:** o p15 é fraco até sem SHINKAI (8%), então o problema dele
+é do personagem, não do SHINKAI.
