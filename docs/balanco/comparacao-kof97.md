@@ -62,3 +62,13 @@ de tamanho é a altura do corpo em pé: o Ryo no vídeo, o Ryūga (224 px) no no
     (só 13–15% tirados do ar), e o pior e o melhor personagem se afastaram no nível 5.
 - **Ficou:** pulo 0,8 e queda 22 com o quique; os números completos estão em
   `perfis/kof-pulo-queda.md`.
+
+### Pulo levemente menos rápido (pedido do jogador, 03/11)
+
+- O pulo passou de 20% para **15% mais rápido** que o original, com a mesma altura e a mesma
+  distância: ~36 quadros no ar (eram 42 no original e 34 no de 20%), cerca de 0,65 s na tela.
+- **Simulado (`BateriaKof`, 960 lutas por nível, contra o pulo 20% mais rápido):**
+  - fica praticamente igual: pulo que acertou 23–24% → 22–23%, tirado do ar 17–18% → 18%;
+  - a duração das lutas não muda (95–96 s no nível 8);
+  - o desvio das vitórias fica 19,9 / 17,9 (era 19,9 / 18,4).
+- **Ficou** para o jogador testar. Os números estão em `perfis/kof-pulo-queda.md`.

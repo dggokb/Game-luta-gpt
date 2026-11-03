@@ -42,3 +42,13 @@
 | pulo=0.8 | 8 | 96 s | 30432 | 6.0 | 47.4 | 17% | 23% | 26% | 12.0 | 27% | 21% | 17–77% | 20.5 |
 | pulo=0.7 | 5 | 80 s | 33357 | 4.1 | 39.4 | 13% | 25% | 12% | 11.7 | 16% | 17% | 10–87% | 20.3 |
 | pulo=0.7 | 8 | 96 s | 30752 | 6.2 | 42.0 | 15% | 24% | 23% | 12.2 | 29% | 22% | 13–77% | 19.6 |
+
+## Pulo 15% mais rápido (o jogador pediu levemente menos rápido, 03/11)
+
+A base aqui é o pulo 20% mais rápido; pulo=1.0625 leva ao 15% (0,8 × 1,0625 = 0,85).
+
+| variante | nível | duração | dano/min | pulos/min (cada) | quadros no ar | tirado | acertou | defendido | quedas/luta | levantou e apanhou | levantou e defendeu | vitória pior–melhor | desvio |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| base | 5 | 80 s | 34043 | 3.9 | 46.5 | 17% | 24% | 16% | 11.7 | 17% | 16% | 12–78% | 19.9 |
+| base | 8 | 95 s | 31320 | 6.2 | 47.8 | 18% | 23% | 26% | 12.3 | 25% | 22% | 11–78% | 18.4 |
+| pulo=1.0625 | 5 | 78 s | 33953 | 3.7 | 49.2 | 18% | 23% | 15% | 11.5 | 18% | 15% | 8–77% | 19.9 |

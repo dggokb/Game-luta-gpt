@@ -184,7 +184,8 @@ public class ComboBreakerTest {
                 } else {
                     boolean right = d.x >= a.x;
                     in[0].direction = right ? 4 : 2;
-                    if (d.canAct()) {
+                    // O troco é do chão: quem quebrou ainda no ar (o p13) cai antes de responder.
+                    if (d.canAct() && d.grounded) {
                         float gap = Math.abs(a.x - d.x);
                         String g = null;
                         for (String c : new String[] {"L", "2L", "M"}) {

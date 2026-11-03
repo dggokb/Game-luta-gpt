@@ -1574,3 +1574,10 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   - o equilíbrio do elenco não muda.
 - **Ficou:** o resultado é positivo.
 - **Detalhes:** `comparacao-kof97.md` e `perfis/kof-pulo-queda.md`.
+
+## Pulo levemente menos rápido (pedido do jogador, 03/11)
+
+- O pulo ficou 15% mais rápido que o original (era 20%), com a mesma altura e a mesma distância:
+  ~36 quadros no ar.
+- **Simulado (`BateriaKof`, 960 lutas por nível):** igual ao de 20% dentro do ruído.
+- **Ficou** para o jogador testar. **Detalhes:** `comparacao-kof97.md`.

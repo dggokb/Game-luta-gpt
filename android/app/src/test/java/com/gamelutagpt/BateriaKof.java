@@ -18,7 +18,7 @@ public final class BateriaKof {
     private BateriaKof() {}
 
     static void pulo(CombatConfig c, float k) {
-        c.jumpSpeed /= k;   // (o jogo usa +11 para o passo de 60 Hz chegar à mesma altura)
+        c.jumpSpeed /= k;   // (o jogo corrige a velocidade para o passo de 60 Hz chegar à mesma altura)
         c.airJumpSpeed /= k;
         c.normalJumpRisingGravityScale /= k * k;
         c.normalJumpFallingGravityScale /= k * k;
