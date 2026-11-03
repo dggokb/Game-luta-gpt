@@ -16,6 +16,8 @@ A transparência sobre o verde vem da chave do verde do efeito_video.py.
                                          até por cima do personagem (sem placa: chave do verde)
         [--brilho]                       sem placa: guarda o brilho meio transparente sobre o verde
         [--cores]                        guarda efeito colorido (amarelo, laranja, vermelho), não só o branco
+        [--dourado]                      pinta o efeito de dourado (como o dano da Bonnie): miolo creme,
+                                         dourado no meio, laranja na borda; o dano fica separado da defesa branca
         [--sem-corpo]                    tira manchas brancas grudadas no corpo (tênis, olho), mesmo
                                          encostando no verde: as que têm >= 30% da volta no corpo
 """
@@ -37,6 +39,7 @@ p.add_argument('--placa')
 p.add_argument('--brilho', action='store_true')
 p.add_argument('--sem-corpo', action='store_true')
 p.add_argument('--cores', action='store_true')
+p.add_argument('--dourado', action='store_true')
 a = p.parse_args()
 sys.path.insert(0, str(Path(a.repo) / 'tools/sprites'))
 import efeito_video as ev
@@ -97,6 +100,31 @@ dist_borda = np.minimum(np.minimum(xx, W - 1 - xx), np.minimum(yy, H - 1 - yy)).
 fade *= np.clip(dist_borda / max(1, a.borda), 0, 1)
 fade *= np.clip((a.chao_tenis - yy) / 50.0, 0, 1).astype(np.float32)
 
+CREME, OURO, LARANJA = (np.array(c, np.float32) for c in ((255, 247, 214), (255, 206, 72), (255, 128, 28)))
+
+
+def dourar(out):
+    """Pinta pela distância até a borda (como a luz do vídeo da Bonnie): o miolo das manchas grandes
+    fica creme, o meio e os raios finos dourados, a borda laranja."""
+    al = out[..., 3].astype(np.float32) / 255.0
+    cheio = (al > 0.45).astype(np.uint8)
+    dist = cv2.distanceTransform(cheio, cv2.DIST_L2, 5)
+    dist = cv2.GaussianBlur(dist, (5, 5), 1.2)
+    u = np.clip(dist / 14.0, 0, 1)[..., None]          # 0 na borda, 1 a 14 px para dentro
+    cor = np.where(u < 0.35, LARANJA + (OURO - LARANJA) * (u / 0.35),
+                   OURO + (CREME - OURO) * np.clip((u - 0.35) / 0.65, 0, 1) ** 1.5)
+    out[..., :3] = np.clip(cor, 0, 255).astype(np.uint8)
+    return out
+
+
+def salvar(out, n):
+    if a.dourado:
+        out = dourar(out)
+    img = Image.fromarray(out, 'RGBA')
+    if a.espelhar: img = img.transpose(Image.FLIP_LEFT_RIGHT)
+    img.save(saida / f'q{n}.png')
+
+
 for n, q in enumerate(range(Q0, Q1 + 1)):
     rgb = quadros[q]
     if placa is not None:
@@ -105,9 +133,7 @@ for n, q in enumerate(range(Q0, Q1 + 1)):
             if q >= q0: alfa[y0:y1, x0:x1] = 0
         alfa = cv2.GaussianBlur(alfa, (3, 3), 0.7)
         out = np.dstack([cor, np.clip(alfa * fade, 0, 255)]).astype(np.uint8)
-        img = Image.fromarray(out, 'RGBA')
-        if a.espelhar: img = img.transpose(Image.FLIP_LEFT_RIGHT)
-        img.save(saida / f'q{n}.png')
+        salvar(out, n)
         continue
     rgba = ev.chave(rgb, fundo)
     c = rgb.astype(np.int32)
@@ -193,7 +219,5 @@ for n, q in enumerate(range(Q0, Q1 + 1)):
         k = (out[..., 3:4].astype(np.float32) / 255.0) ** 0.5
         out[..., :3] = (np.array([252, 248, 252], np.float32) * (1 - k) + out[..., :3] * k).astype(np.uint8)
         out[..., 1] = np.minimum(out[..., 1], np.maximum(out[..., 0], out[..., 2]))
-    img = Image.fromarray(out, 'RGBA')
-    if a.espelhar: img = img.transpose(Image.FLIP_LEFT_RIGHT)
-    img.save(saida / f'q{n}.png')
+    salvar(out, n)
 print('quadros', Q1 - Q0 + 1, '->', saida)
