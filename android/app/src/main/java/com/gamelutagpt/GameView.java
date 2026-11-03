@@ -174,6 +174,8 @@ public class GameView extends SurfaceView
     private final boolean[] lyingSeen = new boolean[2];
     private final boolean[] downSeen = new boolean[2];
     private final boolean[] wasAirborne = new boolean[2];
+    /** Quique da queda já mostrado (poeira): 0 caindo, 1 bateu no chão, 2 assentou. */
+    private final int[] quiqueFase = new int[2];
     /** Já mostrou o efeito de saída deste super pulo (um por pulo). */
     private final boolean[] superJumpSeen = new boolean[2];
     /** Quem já levou o golpe do KO (o clarão e a câmera lenta saem uma vez por nocaute). */
@@ -1507,7 +1509,7 @@ public class GameView extends SurfaceView
         try {
             StagePack pack = StagePack.load(assets, folder);
             for (String warning : pack.warnings) Log.w(LOG_TAG, folder + ": " + warning);
-            StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CameraRig.CAMERA_ZOOM,
+            StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CameraRig.CAMERA_REST_ZOOM,
                 (PLAYER_START_X + OPPONENT_START_X) * 0.5f, CameraRig.CAMERA_GROUND_SCREEN_Y);
             return new StageScene(pack, world);
         } catch (IOException | RuntimeException ex) {
@@ -5177,6 +5179,14 @@ public class GameView extends SurfaceView
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
             efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
         }
+        // A queda: poeira quando o corpo bate no chão e quando assenta depois do quique.
+        int fase = 0;
+        if (f.status == CombatFighter.Status.KNOCKDOWN) {
+            int t = f.knockdownFrame - engine.config.knockdownFallFrames;
+            fase = t < 0 ? 0 : t < engine.config.knockdownBounceFrames ? 1 : 2;
+            if (fase > quiqueFase[i]) efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
+        }
+        quiqueFase[i] = fase;
         AttackDefinition a = f.attacking() ? f.attack : null;
         boolean ativo = a != null && a.melee() && a.isActive(f.attackFrame);
         if (ativo && !ativoAntes[i] && a.strength != AttackDefinition.Strength.LIGHT &&
@@ -5187,13 +5197,14 @@ public class GameView extends SurfaceView
         ativoAntes[i] = ativo;
     }
 
-    /** Altura em que o lutador é desenhado (o pulinho do backdash sobe só o desenho). */
+    /** Altura em que o lutador é desenhado (o pulinho do backdash e o quique da queda sobem só o desenho). */
     private float fighterVisualY(CombatFighter f) {
         float visualY = f.y;
         if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
             visualY -= engine.config.backdashVisualLift(f.backdashFrames, engine.backdashFrames(f));
         }
         if (f.attacking() && f.grounded) visualY -= f.attack.mechanics.hopLift(f.attackFrame);
+        if (f.status == CombatFighter.Status.KNOCKDOWN && !f.ko()) visualY -= engine.config.knockdownBounceLift(f.knockdownFrame);
         return visualY;
     }
 

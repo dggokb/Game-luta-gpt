@@ -1561,3 +1561,16 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   - o nível 5 fica igual.
 - **Ficou:** o resultado é positivo.
 - **Detalhes:** `registro-luta.md` e `perfis/pressao-cpu.md`.
+
+## Pulo mais rápido, queda com quique e câmera mais perto (pedido do jogador, 03/11)
+
+- **Pulo:** 20% mais rápido, com a mesma altura e a mesma distância (~34 quadros no ar; eram 42).
+- **Queda:** o corpo quica no chão e fica deitado 22 quadros (eram 50), ~0,9 s até em pé, como o
+  KOF '97.
+- **Câmera:** com os dois perto, o zoom vai a 1,36 (era 1,24); os pés ficam na mesma altura da tela.
+- **Simulado (`BateriaKof`, 960 lutas por nível):**
+  - o pulo acerta mais (21 → 23–25%) e é tirado do ar menos (19 → 17–18%);
+  - a luta fica ~5 s mais curta;
+  - o equilíbrio do elenco não muda.
+- **Ficou:** o resultado é positivo.
+- **Detalhes:** `comparacao-kof97.md` e `perfis/kof-pulo-queda.md`.

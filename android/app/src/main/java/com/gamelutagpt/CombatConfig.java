@@ -73,11 +73,25 @@ final class CombatConfig {
     int wallChaseFrames = 54;
     int knockdownFallFrames = 13;
     /**
-     * Lying on the ground before the normal wake-up (was 72: too long to watch; 30 left no time to
+     * Lying on the ground before the normal wake-up (was 72: too long to watch; then 50, room to
      * run in and set up a cross-up as in City of the Wolves, which lies ~58 and rises in ~14).
+     * Agora 22 com o quique, como o KOF '97 (cai, quica, levanta rápido: ~0,9 s da queda até em pé;
+     * docs/balanco/comparacao-kof97.md).
      */
-    int knockdownDownFrames = 50;
+    int knockdownDownFrames = 22;
     int wakeupFrames = 16;
+    /**
+     * Quique ao cair (como no KOF '97, docs/balanco/comparacao-kof97.md): o corpo bate no chão e sobe
+     * um pouco deitado antes de assentar. Só o desenho sobe; conta dentro do tempo deitado.
+     */
+    int knockdownBounceFrames = 14;
+    float knockdownBounceHeight = 30f;
+    /** Quanto o corpo caído sobe no desenho no quadro {@code knockdownFrame} da queda. */
+    float knockdownBounceLift(int knockdownFrame) {
+        int t = knockdownFrame - knockdownFallFrames;
+        if (t < 0 || t >= knockdownBounceFrames) return 0f;
+        return knockdownBounceHeight * (float)Math.sin(Math.PI * t / knockdownBounceFrames);
+    }
     /** Longest wake-up: a longer GETUP clip plays faster to fit it. */
     int maxWakeupFrames = 24;
 
@@ -97,16 +111,17 @@ final class CombatConfig {
     float dashSpeed = 620f;
     /**
      * Pulo normal: velocidade de lado no ar, para frente e para trás. Mais que a de andar: com o
-     * mesmo tempo no ar (~41 quadros) vai ~280 para frente (passa do alcance dos golpes de chão
-     * e cruza por cima de perto) e ~205 para trás.
+     * mesmo tempo no ar (~34 quadros) vai ~280 para frente (passa do alcance dos golpes de chão
+     * e cruza por cima de perto) e ~205 para trás. (Eram 400 e 290 com ~42 quadros no ar; o pulo
+     * ficou 20% mais rápido com a mesma distância, docs/balanco/comparacao-kof97.md.)
      */
-    float jumpForwardSpeed = 400f;
-    float jumpBackSpeed = 290f;
+    float jumpForwardSpeed = 500f;
+    float jumpBackSpeed = 362.5f;
     /**
      * Pulo saído da corrida (dash jump): velocidade para frente no ar. Leva o embalo do dash e
      * vai ~400, bem mais que o pulo normal.
      */
-    float dashJumpSpeed = 540f;
+    float dashJumpSpeed = 675f;
     /**
      * Pulo normal comprometido: nos primeiros quadros no ar a direção ainda pode ser escolhida
      * (o "pré-pulo" dos jogos de luta), depois fica fixa.
@@ -131,10 +146,13 @@ final class CombatConfig {
         float fraction = (total - framesLeft) / (float)total;
         return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
     }
-    // 60 FPS normal jump: ~42 airborne frames, apex ~1.16x P01's standing hurtbox.
+    // 60 FPS normal jump: ~34 airborne frames, apex ~1.16x P01's standing hurtbox.
     // Sized for the 226-unit P01 (the 156-unit version used 1030 / 1.70 / 2.00, apex ~182):
     // speed and gravity scale by 226/156, so the cadence stays and only the height grows.
-    float jumpSpeed = 1492f;
+    // Pulo 20% mais rápido com a mesma altura (como o KOF '97, docs/balanco/comparacao-kof97.md):
+    // velocidade /0,8 (+11 para o passo de 60 Hz chegar à mesma altura) e gravidade do pulo /0,64.
+    // Eram 1492 / 2,463 / 2,897, com ~42 quadros no ar.
+    float jumpSpeed = 1876f;
     /**
      * Preparação do pulo do chão (jump squat): quadros agachando antes de sair do chão, sem
      * golpe, dash nem andar (a corrida segue no embalo). O pulo que cancela um golpe sai na hora
@@ -146,11 +164,11 @@ final class CombatConfig {
      * tocar o chão (defender pode). O golpe aéreo que aterrissa continua livre na hora.
      */
     int jumpLandingFrames = 3;
-    float normalJumpRisingGravityScale = 2.463f;
-    float normalJumpFallingGravityScale = 2.897f;
+    float normalJumpRisingGravityScale = 3.848f;
+    float normalJumpFallingGravityScale = 4.527f;
     float superJumpSpeed = 1450f;
     /** Cancelamento de pulo no ar (jM → pulo, uma vez por voo): impulso para cima. */
-    float airJumpSpeed = 900f;
+    float airJumpSpeed = 1134f;
     float gravity = 1650f;
     float launchSpeed = 1450f;
     float slamSpeed = 1850f;

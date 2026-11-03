@@ -46,7 +46,7 @@ public class CameraRigRoundEndTest {
             c.updateForRound(CombatConfig.DT,winnerX,900f,Arena.GROUND_Y-900f,true,false);
         float raised=c.top,x=c.x,zoom=c.zoom;
         float groundTop=Arena.clamp(Arena.GROUND_Y-CameraRig.CAMERA_GROUND_SCREEN_Y/zoom,
-            Arena.WORLD_TOP,CameraRig.GROUND_CAMERA_TOP);
+            Arena.WORLD_TOP,CameraRig.groundTopLimit(zoom));
         assertTrue("the camera went up with the jump",raised<groundTop-200f);
         // KO up there: the bodies fall back to the floor.
         float height=900f;

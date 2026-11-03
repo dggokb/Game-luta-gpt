@@ -26,3 +26,39 @@ de tamanho é a altura do corpo em pé: o Ryo no vídeo, o Ryūga (224 px) no no
 4. **Levantar rápido** e o quique ao cair, que deixam a luta sem pausa.
 5. **Bonecos grandes na tela**: os dois sempre perto, e a corrida fecha a distância em meio
    segundo.
+
+## Aplicado: pulo mais rápido, queda com quique e câmera mais perto (pedido do jogador, 03/11)
+
+- **Pulo 20% mais rápido, com a mesma altura e a mesma distância:**
+  - fica ~34 quadros no ar (eram ~42): cerca de 0,6 s na tela (era 0,77 s);
+  - a velocidade de subida e de lado foi dividida por 0,8 e a gravidade do pulo por 0,64;
+  - vale também para o pulo da corrida, o pulo no ar (jM → pulo) e o pulo na parede;
+  - o super pulo não mudou.
+- **Queda com quique:**
+  - o corpo bate no chão, sobe ~30 px deitado e assenta (14 quadros), com poeira na batida e ao
+    assentar; só o desenho sobe;
+  - fica deitado 22 quadros (eram 50) antes do levantar normal;
+  - da queda até em pé: ~0,9 s (era 1,4 s), como o KOF;
+  - o levantar rápido, o rolamento e o levantar atrasado continuam.
+- **Câmera mais perto:**
+  - com os dois perto, o zoom vai até 1,36 (era 1,24): os bonecos ficam ~10% maiores;
+  - os pés continuam na mesma altura da tela;
+  - a partir de ~420 px de distância nada muda (o começo do round é igual).
+- **Simulado (`BateriaKof`, CPU × CPU, os 16 contra todos, 960 lutas por nível):**
+
+  | | base | pulo 0,8 | pulo 0,8 + queda 22 (ficou) | pulo 0,8 + queda 30 |
+  |---|---|---|---|---|
+  | duração, nível 5 / 8 | 82 / 100 s | 81 / 96 s | 79 / 95 s | 80 / 98 s |
+  | dano por minuto, nível 8 | 29700 | 30383 | 31195 | 30930 |
+  | pulo tirado do ar, nível 5 / 8 | 19 / 19% | 16 / 18% | 17 / 18% | 17 / 18% |
+  | pulo que acertou, nível 5 / 8 | 21 / 21% | 24 / 22% | 25 / 23% | 24 / 22% |
+  | levantou e apanhou, nível 8 | 27% | 27% | 25% | 26% |
+  | desvio das vitórias, nível 5 / 8 | 20,1 / 17,9 | 20,6 / 19,3 | 19,6 / 19,1 | 19,8 / 19,2 |
+
+  - O pulo rápido vale mais: menos antiaéreo pega e mais pulos acertam.
+  - A luta fica ~5 s mais curta, com mais dano por minuto.
+  - O equilíbrio do elenco fica igual (a diferença no desvio está dentro do ruído).
+  - O pulo 30% mais rápido (como o KOF, 0,54 s) também foi testado: o pulo ficou forte demais
+    (só 13–15% tirados do ar), e o pior e o melhor personagem se afastaram no nível 5.
+- **Ficou:** pulo 0,8 e queda 22 com o quique; os números completos estão em
+  `perfis/kof-pulo-queda.md`.

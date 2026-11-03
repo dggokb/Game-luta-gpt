@@ -8,13 +8,29 @@ import com.gamelutagpt.motion.Mola;
  * same screen height and follows a Super Jump vertically. Pure math, unit-testable.
  */
 final class CameraRig {
-    static final float CAMERA_ZOOM = 1.24f;
+    /**
+     * Zoom mais perto (os dois perto um do outro). Era 1,24; 1,36 deixa os bonecos maiores como no
+     * KOF '97 (docs/balanco/comparacao-kof97.md). Longe (a partir de ~420 px) nada muda.
+     */
+    static final float CAMERA_ZOOM = 1.36f;
+    /** A câmera "de repouso" em que os cenários foram montados (stage.json). */
+    static final float CAMERA_REST_ZOOM = 1.24f;
     static final float CAMERA_MIN_ZOOM = 0.78f;
     static final float CAMERA_FIGHTER_MARGIN_X = 520f;
     static final float CAMERA_GROUND_SCREEN_Y = 552f;
     static final float CAMERA_TOP_MARGIN_SCREEN = 64f;
     static final float CAMERA_BOTTOM_MARGIN_SCREEN = 45f;
     static final float GROUND_CAMERA_TOP = 72f;
+    /**
+     * Altura na tela do chão no zoom de repouso com a câmera no {@link #GROUND_CAMERA_TOP}. Mais perto
+     * que isso, o topo desce junto para os pés ficarem nesta altura (não afundar até a borda de baixo).
+     */
+    static final float GROUND_SCREEN_Y_CLOSE = (Arena.GROUND_Y - GROUND_CAMERA_TOP) * CAMERA_REST_ZOOM;
+
+    /** O topo mais baixo da câmera no chão para este zoom. */
+    static float groundTopLimit(float zoom) {
+        return Math.max(GROUND_CAMERA_TOP, Arena.GROUND_Y - GROUND_SCREEN_Y_CLOSE / zoom);
+    }
 
     /** Quanto a câmera se adianta para o lado de quem corre (pixels do mundo). */
     static final float CAMERA_RUN_LEAD = 60f;
@@ -57,7 +73,7 @@ final class CameraRig {
             return;
         }
         float groundTop = Arena.clamp(Arena.GROUND_Y - CAMERA_GROUND_SCREEN_Y / zoom,
-            Arena.WORLD_TOP, GROUND_CAMERA_TOP);
+            Arena.WORLD_TOP, groundTopLimit(zoom));
         float keepInFrame = highestFighterTop - CAMERA_TOP_MARGIN_SCREEN / zoom;
         float target = Math.min(groundTop, Math.max(top, keepInFrame));
         if (target > top + 1f)
@@ -146,7 +162,7 @@ final class CameraRig {
         targetCameraTop = Arena.clamp(
             targetCameraTop,
             Arena.WORLD_TOP,
-            GROUND_CAMERA_TOP
+            groundTopLimit(zoom)
         );
 
         float verticalFollow =
