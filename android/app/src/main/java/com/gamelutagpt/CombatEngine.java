@@ -1211,14 +1211,22 @@ final class CombatEngine {
     }
 
     /**
+     * O lutador em campo (não o assist do parceiro, que é outro corpo com o mesmo lado). O assist tem
+     * o golpe e o tempo dele no {@link TeamSystem}: desequilibrá-lo aqui o deixava no golpe sem golpe.
+     */
+    private boolean emCampo(CombatFighter f) {
+        return fighters[f.index] == f;
+    }
+
+    /**
      * Leitura (a defesa perfeita dele no SHINKAI): ele sai livre na hora, quem atacou no chão fica
-     * desequilibrado e o próximo golpe dele é o golpe preciso.
+     * desequilibrado e o próximo golpe dele é o golpe preciso. O assist não fica desequilibrado.
      */
     private void leitura(CombatFighter a, CombatFighter d) {
         d.stunLeft = d.stunTotal = 1;
         d.state.precisoQuadros = config.ryugaPrecisoJanela;
         d.state.leituras++;
-        if (a.grounded && a.status == CombatFighter.Status.ATTACK && a.attack != null &&
+        if (emCampo(a) && a.grounded && a.status == CombatFighter.Status.ATTACK && a.attack != null &&
             a.attack.kind != AttackDefinition.Kind.SUPER) {
             a.clearAttack();
             a.status = CombatFighter.Status.HITSTUN;
@@ -1234,7 +1242,7 @@ final class CombatEngine {
     private void leituraLeve(CombatFighter a, CombatFighter d) {
         d.stunLeft = d.stunTotal = 1;
         d.state.leituras++;
-        if (a.grounded && a.status == CombatFighter.Status.ATTACK && a.attack != null &&
+        if (emCampo(a) && a.grounded && a.status == CombatFighter.Status.ATTACK && a.attack != null &&
             a.attack.kind != AttackDefinition.Kind.SUPER) {
             a.clearAttack();
             a.status = CombatFighter.Status.HITSTUN;

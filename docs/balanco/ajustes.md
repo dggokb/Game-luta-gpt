@@ -1581,3 +1581,22 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   ~36 quadros no ar.
 - **Simulado (`BateriaKof`, 960 lutas por nível):** igual ao de 20% dentro do ruído.
 - **Ficou** para o jogador testar. **Detalhes:** `comparacao-kof97.md`.
+
+## Lutas 2x2 que estouram o tempo (pedido do jogador, 03/11)
+
+- **Medido (`BateriaTempo`, CPU × CPU, duplas sorteadas, 240 lutas por nível, relógio de 180 s):**
+
+  | nível | TIME OVER | duração média | vida no fim pelo tempo (vencedor / perdedor) |
+  |---|---|---|---|
+  | 3 | 1% | 133 s | 39% / 10% |
+  | 5 | 20% | 162 s | 52% / 21% |
+  | 8 | 35% | 181 s | 75% / 32% |
+
+  - A duração conta também a abertura, o K.O. e as pausas do relógio (Supers, SHINKAI).
+  - A vida no fim inclui a vida nova do SHINKAI.
+  - Quem mais aparece nas lutas que vão ao tempo: p07 (31%), p15 (29%) e Yin-lu (25%).
+- **Bug achado pela bateria (corrigido):** a leitura do Ryūga no SHINKAI (PERCEPÇÃO), na defesa
+  perfeita contra o golpe de um **assist**, desequilibrava o assist; ele ficava no golpe sem golpe e
+  o motor dava erro (a luta 2x2 podia fechar). Agora a leitura só desequilibra quem está em campo,
+  e um assist sem golpe sai de cena. Teste: `Luta2x2SemErroTest`.
+- **Detalhes:** `perfis/tempo-2x2.md`.

@@ -36,7 +36,12 @@ public final class BateriaTempo {
         r.t1 = t1;
         boolean[] antes = new boolean[2];
         while (!l.acabou() && l.quadro < 60 * 60 * 6) {
-            l.passo();
+            try {
+                l.passo();
+            } catch (RuntimeException ex) {
+                throw new IllegalStateException(Arrays.toString(t0) + " x " + Arrays.toString(t1) + " nível " + nivel
+                    + " semente " + semente + " quadro " + l.quadro, ex);
+            }
             for (int s = 0; s < 2; s++) {
                 boolean em = l.f(s).state.inShinkai();
                 if (em && !antes[s]) r.shinkais++;
@@ -61,7 +66,11 @@ public final class BateriaTempo {
             else ns.add(Integer.parseInt(a));
         }
         int[] niveis = ns.isEmpty() ? new int[] {3, 5, 8} : ns.stream().mapToInt(Integer::intValue).toArray();
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);   // um erro numa luta encerra a bateria em vez de deixá-la parada
+            return t;
+        });
         String[] el = BateriaBalanco.ELENCO;
         System.out.println("# Lutas que estouram o tempo (" + BattleFlow.TIME_LIMIT_SECONDS + " s no relógio, CPU × CPU)");
         System.out.println();

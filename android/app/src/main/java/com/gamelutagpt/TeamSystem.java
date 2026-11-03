@@ -491,6 +491,16 @@ final class TeamSystem {
                 s.assistFrame = 0;
             }
         } else if (s.assistPhase == ASSIST_ATTACK) {
+            if (a.attack == null) {
+                // Perdeu o golpe no meio (alguma regra o tirou): sai de cena em vez de ficar no golpe.
+                a.status = CombatFighter.Status.NEUTRAL;
+                a.clearAttack();
+                s.convert = false;
+                s.assistPhase = ASSIST_LEAVE;
+                s.assistFrame = 0;
+                s.assistToX = a.x;
+                return;
+            }
             if (!engine.assistAwaitsGround(a)) a.attackFrame++;
             engine.moveAssist(a);
             if (!a.attack.melee() && a.attackFrame == a.attack.startupFrames) {
