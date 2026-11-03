@@ -2139,6 +2139,14 @@ public class GameView extends SurfaceView
             if ("SHINKAI_QUEBRA".equals(cue)) beamShake = Math.max(beamShake, 22f);
             if ("SHINKAI_CHOQUE".equals(cue)) beamShake = Math.max(beamShake, 20f);
             if ("ULTRA_SHINKAI".equals(cue)) beamShake = Math.max(beamShake, 26f);
+            if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
+            if ("ULTRA_FINISH_DRAGAO".equals(cue)) {
+                // O último golpe do dragão: tela tremendo, câmera lenta e impact frame em quem voou.
+                beamShake = Math.max(beamShake, 24f);
+                feel.slow(ImpactFeel.ULTRA_SLOW_FRAMES, ImpactFeel.ULTRA_SLOW_SCALE);
+                CombatFighter hit = ultraVictim();
+                if (pausa.impacto() && hit != null) feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
+            }
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
@@ -2493,6 +2501,11 @@ public class GameView extends SurfaceView
                 : clamp(1f - (p.ultraFrame - fire) / 8f, 0f, 1f);
             ultraDarkAlpha = 0;
             ultraCameraZoom = 1f + BEAM_CHARGE_ZOOM * (1f - (1f - t) * (1f - t));
+        } else if (phase == CombatFighter.ULTRA_DRAGAO) {
+            // O dragão do Ultra SHINKAI: o fundo escurece enquanto ele atravessa e clareia no fim.
+            float t = clamp(p.ultraFrame / (float)engine.config.dragaoQuadros, 0f, 1f);
+            ultraDarkAlpha = Math.round(150f * (t < 0.8f ? 1f : (1f - t) / 0.2f));
+            ultraCameraZoom = 1f;
         } else {
             ultraDarkAlpha = 0;
             ultraCameraZoom = 1f;
@@ -5199,6 +5212,23 @@ public class GameView extends SurfaceView
             efeitos.tocar("arco_golpe", x + f.facing * 12f, f.y - f.character().visualStandHeight * 0.6f, 1f, f.facing < 0);
         }
         ativoAntes[i] = ativo;
+    }
+
+    /**
+     * O dragão do Ultra SHINKAI sai do punho de quem acabou de entrar na fase do dragão: o efeito
+     * desenhado por {@code tools/sprites/dragao_ultra.py}, com a cabeça andando como no motor.
+     */
+    private void soltarDragao() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (!f.inUltraDragao() || f.ultraFrame != 0) continue;
+            String nome = "ultra_shinkai_" + f.state.character.id;
+            float x = f.x + f.facing * engine.config.dragaoOrigem;
+            float y = f.y - f.character().visualStandHeight * 0.62f;
+            efeitos.tocar(nome, x, y, 1f, f.facing < 0);
+            ultraSounds.play(ultraFolder(f.state), "investida");
+            ultraSounds.playFight("punish", 1f, 0.8f);
+        }
     }
 
     /** Altura em que o lutador é desenhado (o pulinho do backdash e o quique da queda sobem só o desenho). */

@@ -18,6 +18,8 @@ final class CombatFighter {
     static final int ULTRA_BEAM = 4;
     /** Ultra que segue o vídeo: a sequência de golpes nos quadros da animação. */
     static final int ULTRA_SEQUENCE = 5;
+    /** Ultra SHINKAI do Ryūga: o soco parado e o dragão que atravessa a tela (sem investida). */
+    static final int ULTRA_DRAGAO = 6;
 
     /** Phases of {@link Status#THROW} (L + M). */
     static final int THROW_STARTUP = 0;
@@ -180,6 +182,8 @@ final class CombatFighter {
     int ultraPhase;
     /** O Ultra em andamento é o Ultra SHINKAI (cinco barras, dano maior, encerra o SHINKAI no fim). */
     boolean ultraShinkai;
+    /** Dragão: 0 vindo, 1 pegou (acertos em {@link #dragaoAcertos}), 2 passou (defendido ou errou), 3 acabou o combo. */
+    int dragaoEstado, dragaoAcertos, dragaoInicio, dragaoDanoPequeno, dragaoDanoFinal;
     /** Frames spent in the current ultra phase. */
     int ultraFrame;
     /** Damage scale of the ultra, fixed when the rush connects (permille). */
@@ -371,6 +375,11 @@ final class CombatFighter {
     }
 
     /** Dando a sequência do Ultra: nada interrompe. */
+    /** Ultra SHINKAI do Ryūga: o dragão atravessando a tela. */
+    boolean inUltraDragao() {
+        return status == Status.ULTRA && ultraPhase == ULTRA_DRAGAO;
+    }
+
     boolean inUltraSequence() {
         return status == Status.ULTRA && ultraPhase == ULTRA_SEQUENCE;
     }

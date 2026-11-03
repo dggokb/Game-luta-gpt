@@ -75,6 +75,61 @@ public class UltraShinkaiTest {
         assertEquals("gasta três das cinco barras", 2 * CombatConfig.METER_PER_BAR, s.f(0).state.superMeter);
     }
 
+    /** Ryūga transformado, com as cinco barras, e o rival longe (o dragão atravessa a tela). */
+    private static CombatEngineTest.Sim dragao(float distancia) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, GeneratedCharacters.get("p03"), 400f, 400f + distancia);
+        s.f(1).state.life = 1_000_000;
+        transformar(s);
+        return s;
+    }
+
+    @Test public void oDragaoDoRyugaAtravessaATelaEDaOComboSemInvestida() {
+        CombatEngineTest.Sim s = dragao(700f);
+        float x = s.f(0).x;
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        int golpes = 0, dano = 0;
+        boolean dragao = false, voou = false;
+        for (int i = 0; i < 400 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            if (s.engine.cues().contains("ULTRA_DRAGAO")) dragao = true;
+            for (CombatEngine.HitEvent h : s.engine.events()) {
+                if (h.attacker == 0 && "ULTRA".equals(h.moveId) && !h.blocked) { golpes++; dano += h.damage; }
+            }
+            if (s.f(1).launched) voou = true;
+        }
+        assertTrue("o dragão saiu", dragao);
+        assertEquals("ele fica no soco parado (sem investida)", x, s.f(0).x, 1f);
+        assertEquals("os golpes pequenos e o último", s.engine.config.dragaoAcertos + 1, golpes);
+        assertEquals("o dobro do dano de base", s.engine.config.dragaoDano * 2, dano, s.engine.config.dragaoDano * 0.02);
+        assertTrue("o último golpe joga longe", voou);
+        assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
+    }
+
+    @Test public void defendidoODragaoPassaSemOCombo() {
+        CombatEngineTest.Sim s = dragao(500f);
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        int golpes = 0;
+        boolean defendeu = false;
+        for (int i = 0; i < 400 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            s.in[1].direction = 1;   // → é para trás (o rival olha para a esquerda): defende
+            for (CombatEngine.HitEvent h : s.engine.events()) {
+                if (h.attacker != 0) continue;
+                if (h.blocked) defendeu = true; else golpes++;
+            }
+        }
+        assertTrue("defendeu o dragão", defendeu);
+        assertEquals("sem o combo", 0, golpes);
+    }
+
     @Test public void desligadoNaConfigOBotaoSoltaOUltraDeSempre() {
         CombatEngineTest.Sim s = luta();
         s.engine.config.ultraShinkai = false;

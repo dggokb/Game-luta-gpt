@@ -705,6 +705,28 @@ final class CombatConfig {
     boolean ultraShinkai = true;
     int ultraShinkaiDanoPermille = 2000;
     /**
+     * Ultra SHINKAI do dragão (o Ryūga): depois da ativação ele fica no soco parado e um dragão azul do
+     * tamanho da tela sai do punho e atravessa a arena; quem ele pega leva o combo enquanto o corpo
+     * passa e voa no último golpe. Os lutadores com esse Ultra SHINKAI (ids, separados por vírgula).
+     */
+    String ultraDragao = "player_base";
+    /** Onde o dragão nasce: à frente do lutador (px). */
+    float dragaoOrigem = 60f;
+    /** A cabeça anda isto por quadro (px). */
+    float dragaoVelocidade = 40f;
+    /** Do focinho à ponta do rabo (px): enquanto passa por quem pegou, os golpes caem. */
+    float dragaoComprimento = 1360f;
+    /** Pega quem estiver até esta altura do chão (o super pulo passa por cima). */
+    float dragaoAltura = 450f;
+    /** Golpes pequenos, um a cada {@link #dragaoIntervalo} quadros, e o último que joga longe. */
+    int dragaoAcertos = 7;
+    int dragaoIntervalo = 4;
+    /** Dano de base do combo (antes do {@link #ultraShinkaiDanoPermille}); o último leva 30%. */
+    int dragaoDano = 4200;
+    int dragaoFinalPermille = 300;
+    /** O soco fica parado até o rabo passar da arena; depois volta à guarda. */
+    int dragaoQuadros = 70;
+    /**
      * A reserva ao ligar, em milésimos da vida inteira DELE (cada um tem a sua: o Ryūga 14000).
      * 1000 = uma vida nova inteira (pedido do jogador: "o SHINKAI é um novo life", como a
      * transformação dos animes). Agora 500, meia vida (escolha do jogador, 03/11): no 2x2 o TIME OVER

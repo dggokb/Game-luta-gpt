@@ -1631,3 +1631,22 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   - a CPU solta 0,1 Ultra SHINKAI por luta (precisa estar no SHINKAI com as cinco barras);
   - o equilíbrio fica igual (desvio 19,5 → 18,8 no nível 5; 16,8 → 16,7 no 8).
 - **Ficou.** **Detalhes:** `perfis/ultra-shinkai.md`; teste `UltraShinkaiTest`.
+
+### Ultra SHINKAI do Ryūga: o dragão (pedido do jogador, 03/11)
+
+- **Sem investida.** Depois da ativação, o Ryūga fica no soco parado.
+- **O dragão:** um dragão azul do tamanho da tela sai do punho e atravessa a arena.
+  - O desenho vem de `tools/sprites/dragao_ultra.py`; a folha fica em
+    `assets/efeitos/ultra_shinkai_player_base`.
+  - O fundo escurece enquanto ele passa.
+- **Os golpes:**
+  - quem ele pega fica preso e leva 7 golpes enquanto o corpo passa, mais o último, que joga longe
+    com câmera lenta;
+  - o dano é 4200 de base, que o Ultra SHINKAI dobra (8400);
+  - defendido, toma a defesa do Ultra e o dragão segue;
+  - no super pulo, alto o bastante, passa por baixo.
+- **Motor:** `ULTRA_DRAGAO` (`CombatConfig.ultraDragao` lista quem tem). A cabeça anda 40 px por
+  quadro, igual ao desenho.
+- **Simulado (`BateriaKof`, 960 lutas por nível):** o Ryūga fica com 77% / 68% (era 77% / 69%) e o
+  desvio do elenco não muda.
+- **Testes:** dois novos em `UltraShinkaiTest` (o combo atravessando a tela sem andar, e o defendido).

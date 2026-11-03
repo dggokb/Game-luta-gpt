@@ -435,6 +435,8 @@ final class CombatEngine {
         updateUltraBeam(fighters[1], fighters[0]);
         updateUltraSequence(fighters[0], fighters[1]);
         updateUltraSequence(fighters[1], fighters[0]);
+        updateDragao(fighters[0], fighters[1]);
+        updateDragao(fighters[1], fighters[0]);
         for (CombatFighter f : fighters) fimDoUltraShinkai(f);
 
         // 6. Combo sessions and the team meter.
@@ -1867,7 +1869,14 @@ final class CombatEngine {
             case ULTRA:
                 if (f.ultraPhase != CombatFighter.ULTRA_CINEMATIC && !f.ultraPaused) f.ultraFrame++;
                 if (f.ultraPhase == CombatFighter.ULTRA_STARTUP && f.ultraFrame >= config.ultraStartupFrames) {
-                    f.ultraPhase = CombatFighter.ULTRA_RUSH;
+                    if (f.ultraShinkai && temDragao(f.character())) {
+                        // O dragão: sem investida, ele fica no soco e o dragão sai do punho.
+                        f.ultraPhase = CombatFighter.ULTRA_DRAGAO;
+                        f.dragaoEstado = f.dragaoAcertos = 0;
+                        cues.add("ULTRA_DRAGAO");
+                    } else {
+                        f.ultraPhase = CombatFighter.ULTRA_RUSH;
+                    }
                     f.ultraFrame = 0;
                 }
                 break;
@@ -3890,6 +3899,99 @@ final class CombatEngine {
     }
 
     /** Damage already scaled; one more hit on the combo counter. */
+    /** O lutador tem o Ultra SHINKAI do dragão ({@link CombatConfig#ultraDragao}). */
+    boolean temDragao(CharacterDefinition c) {
+        if (c == null || config.ultraDragao == null) return false;
+        for (String id : config.ultraDragao.split(",")) if (id.trim().equals(c.id)) return true;
+        return false;
+    }
+
+    /** Onde a cabeça do dragão está agora: a distância à frente do punho (px). */
+    float dragaoCabeca(CombatFighter a) {
+        return config.dragaoVelocidade * a.ultraFrame;
+    }
+
+    /**
+     * O dragão atravessando: quando a cabeça chega em quem está na frente (e o corpo ainda passa por
+     * ele), defendeu = toma a defesa do Ultra e o dragão segue; senão fica preso levando os golpes
+     * enquanto o corpo passa, e o último o joga longe. O soco segura até o rabo sair da arena.
+     */
+    private void updateDragao(CombatFighter a, CombatFighter d) {
+        if (!a.inUltraDragao()) return;
+        float origem = a.x + a.facing * config.dragaoOrigem;
+        float frente = (d.x - origem) * a.facing;
+        float cabeca = dragaoCabeca(a);
+        boolean passando = frente + d.body().halfWidth >= 0f && cabeca >= frente - d.body().halfWidth &&
+            cabeca - config.dragaoComprimento <= frente + d.body().halfWidth;
+        if (a.dragaoEstado == 0 && passando && d.hittable() && !d.ko()) {
+            int guard = effectiveGuard(d);
+            if (Arena.GROUND_Y - d.y > config.dragaoAltura) {
+                a.dragaoEstado = 2;   // alto demais: passou por baixo
+            } else if (guardStops(guard, ultraAttack, false, false)) {
+                block(a, d, ultraAttack, guard, a.facing, false);
+                a.dragaoEstado = 2;
+            } else {
+                ComboSession session = sessionFor(a, d);
+                a.ultraScale = session.scaleFor(ultraAttack, config);
+                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
+                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
+                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
+                a.dragaoEstado = 1;
+                a.dragaoInicio = a.ultraFrame;
+                a.ultraVictim = d;
+                a.ultraVictimState = d.state;
+            }
+        }
+        if (a.dragaoEstado == 1) {
+            if (d != a.ultraVictim || d.state != a.ultraVictimState) {
+                a.dragaoEstado = 3;   // outro entrou no lugar (2x2): o resto é só o desenho
+            } else {
+                int devidos = Math.min(config.dragaoAcertos, 1 + (a.ultraFrame - a.dragaoInicio) / Math.max(1, config.dragaoIntervalo));
+                while (a.dragaoAcertos < devidos) {
+                    a.dragaoAcertos++;
+                    golpeDoDragao(a, d, a.dragaoDanoPequeno, false);
+                }
+                int fim = a.dragaoInicio + config.dragaoAcertos * config.dragaoIntervalo + config.ultraBeamBlastGap;
+                if (a.dragaoAcertos >= config.dragaoAcertos && a.ultraFrame >= fim) {
+                    golpeDoDragao(a, d, a.dragaoDanoFinal, true);
+                    launchUltraVictim(a, d);
+                    d.hitstop = Math.max(d.hitstop, config.ultraBeamBlastHitstopFrames);
+                    a.dragaoEstado = 3;
+                    cues.add("ULTRA_FINISH_DRAGAO");
+                } else {
+                    // Preso no dragão: no lugar e no ar onde estava, levando os golpes.
+                    d.clearAttack();
+                    d.vx = 0f;
+                    d.vy = 0f;
+                    d.bounce = CombatFighter.BOUNCE_NONE;
+                    d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+                    d.stunProjectile = null;
+                    d.stunLeft = d.stunTotal = Math.max(d.stunLeft, fim - a.ultraFrame + 20);
+                    d.stunElapsed = 0;
+                }
+            }
+        }
+        if (a.ultraFrame >= config.dragaoQuadros) {
+            // O rabo saiu da arena: o soco volta à guarda (a recuperação do Ultra).
+            a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+            a.ultraFrame = 0;
+        }
+    }
+
+    private void golpeDoDragao(CombatFighter a, CombatFighter d, int dano, boolean ultimo) {
+        int before = events.size();
+        dealUltraDamage(a, d, dano);
+        for (int e = before; e < events.size(); e++) {
+            HitEvent event = events.get(e);
+            event.impactX = d.x - a.facing * d.body().halfWidth * 0.4f;
+            event.impactY = d.y - d.body().height(false) * 0.55f;
+            event.strength = ultimo ? AttackDefinition.Strength.HEAVY : AttackDefinition.Strength.MEDIUM;
+        }
+        d.hitstop = Math.max(d.hitstop, ultimo ? 0 : 2);
+        d.framesSinceHit = 0;
+        d.x = Arena.clamp(d.x + a.facing * 3f, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+    }
+
     /** O Ultra SHINKAI acabou (acertou, defendido ou errou): a transformação termina junto. */
     private void fimDoUltraShinkai(CombatFighter f) {
         if (!f.ultraShinkai || f.status == CombatFighter.Status.ULTRA) return;

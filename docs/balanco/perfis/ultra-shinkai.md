@@ -1,14 +1,14 @@
-# Ultra SHINKAI ligado (base) e desligado (us=0), 1x1, 16 contra todos, 960 lutas por nível (03/11)
+# Ultra SHINKAI ligado (base, com o dragão do Ryūga) e desligado (us=0), 1x1, 16 contra todos, 960 lutas por nível (03/11)
 
 | variante | nível | duração | dano/min | pulos/min (cada) | quadros no ar | tirado | acertou | defendido | quedas/luta | levantou e apanhou | levantou e defendeu | vitória pior–melhor | desvio | Ultra SHINKAI/luta |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | us=0 | 5 | 60 s | 33085 | 3.1 | 48.8 | 18% | 22% | 15% | 9.1 | 19% | 15% | 13–77% | 19.5 | 0.00 |
 | us=0 | 8 | 71 s | 29919 | 5.5 | 49.5 | 19% | 20% | 27% | 9.0 | 25% | 23% | 10–74% | 16.8 | 0.00 |
 | base | 5 | 60 s | 33175 | 3.1 | 48.8 | 18% | 22% | 15% | 9.0 | 19% | 15% | 13–77% | 18.8 | 0.10 |
-| base | 8 | 70 s | 30023 | 5.5 | 49.5 | 19% | 20% | 27% | 9.0 | 25% | 23% | 11–73% | 16.7 | 0.10 |
+| base | 8 | 70 s | 30013 | 5.5 | 49.5 | 19% | 20% | 27% | 9.0 | 25% | 23% | 11–73% | 16.6 | 0.10 |
 | lutador | us=0 n5 | us=0 n8 | base n5 | base n8 |
 |---|---|---|---|---|
-| p02 | 37% | 47% | 38% | 48% |
+| p02 | 37% | 47% | 38% | 49% |
 | p03 | 23% | 33% | 25% | 33% |
 | p04 | 58% | 62% | 58% | 63% |
 | p05 | 43% | 49% | 43% | 48% |
@@ -23,4 +23,4 @@
 | p14 | 31% | 29% | 31% | 29% |
 | p15 | 13% | 10% | 13% | 11% |
 | p16 | 21% | 28% | 21% | 28% |
-| player_base | 77% | 69% | 77% | 69% |
+| player_base | 77% | 69% | 77% | 68% |
