@@ -654,6 +654,8 @@ final class CombatConfig {
     boolean shinkaiReservaTodos = true;
     /** SPEED na regra da reserva: o sumiço gasta isto da reserva (no relógio gastava tempo). */
     int shinkaiReservaSumico = 150;
+    /** Depois da cena de ativação, este tanto de quadros em que apertar SHINKAI de novo não desliga. */
+    int shinkaiGraca = 30;
     /**
      * A reserva ao ligar, em milésimos da vida inteira DELE (cada um tem a sua: o Ryūga 14000).
      * 1000 = uma vida nova inteira (pedido do jogador: "o SHINKAI é um novo life", como a

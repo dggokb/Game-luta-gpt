@@ -40,6 +40,8 @@ public class ShinkaiReservaTest {
             step();
             assertTrue(engine.cues().contains("SHINKAI"));
             for (int i = 0, n = engine.shinkaiAtivacaoQuadros(engine.fighter(0)); i < n; i++) step();
+            // A folga depois da cena (um toque ali não desliga).
+            for (int i = 0; i < engine.config.shinkaiGraca; i++) step();
         }
     }
 
@@ -96,5 +98,27 @@ public class ShinkaiReservaTest {
             m.step();
         }
         assertEquals(antes - m.engine.config.shinkaiReservaSumico, m.a.reserva);
+    }
+
+    @Test public void apertarDeNovoNaAtivacaoNaoDesliga() {
+        // Registro real (03/11): o jogador apertou SHINKAI de novo logo depois de ligar e o
+        // SHINKAI desligou no fim da cena.
+        Match m = new Match("p13", "p15", 300f, 1500f);
+        m.a.shinkai = CombatConfig.SHINKAI_MAX;
+        m.in[0].shinkai = true;
+        m.step();
+        assertTrue(m.engine.cues().contains("SHINKAI"));
+        for (int i = 0; i < 6; i++) m.step();
+        m.in[0].shinkai = true;   // o segundo toque, durante a cena
+        boolean desligou = false;
+        for (int i = 0, n = m.engine.shinkaiAtivacaoQuadros(m.engine.fighter(0)) + 40; i < n; i++) {
+            m.step();
+            if (m.engine.cues().contains("SHINKAI_FIM")) desligou = true;
+        }
+        assertFalse("o toque da ativação não desliga", desligou);
+        assertTrue(m.a.inShinkai());
+        // Depois, um toque de verdade desliga.
+        m.in[0].shinkai = true;
+        assertTrue(m.ate("SHINKAI_FIM", 3));
     }
 }

@@ -595,6 +595,8 @@ final class CombatEngine {
             f.dashRequest = f.backdashRequest = false;
             return;
         }
+        // Toque da ativação (apertou duas vezes, ou durante a cena): não desliga o SHINKAI que acabou de ligar.
+        if (f.shinkaiRequestAge >= 0 && f.state.inShinkai() && frame < f.shinkaiTravaAte) f.shinkaiRequestAge = -1;
         if (f.shinkaiRequestAge >= 0 && f.state.inShinkai() && (f.state.shinkaiType == Shinkai.Type.PERCEPCAO || porReserva(f.state)) &&
             shinkaiClash == null) {
             escolhaNoShinkai(f);
@@ -709,6 +711,7 @@ final class CombatEngine {
         f.buffer.clear();
         CombatFighter other = fighters[1 - f.index];
         int congela = shinkaiAtivacaoQuadros(f);
+        f.shinkaiTravaAte = frame + congela + config.shinkaiGraca;
         f.hitstop = Math.max(f.hitstop, congela);
         other.hitstop = Math.max(other.hitstop, congela);
         superFreeze = Math.max(superFreeze, congela);

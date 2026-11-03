@@ -271,6 +271,11 @@ final class CombatFighter {
     /** Frames since the SHINKAI was asked for, or -1. */
     int shinkaiRequestAge = -1;
     /**
+     * Até este quadro do motor um SHINKAI apertado já no SHINKAI não desliga (nem rompe): os
+     * toques da ativação (o jogador aperta duas vezes, ou aperta durante a cena) se perdem.
+     */
+    int shinkaiTravaAte;
+    /**
      * SHINKAI SPEED, o sumiço: quadros que ainda falta ele ficar sumido (0 fora dele). No fim
      * ele aparece em {@link #vanishToX}; {@link #vanishFromX} é de onde sumiu (o rastro).
      */

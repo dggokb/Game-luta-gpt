@@ -53,6 +53,8 @@ public class ShinkaiRyugaTest {
             step();
             assertTrue(engine.cues().contains("SHINKAI"));
             for (int i = 0, n = engine.shinkaiAtivacaoQuadros(engine.fighter(0)); i < n; i++) step();
+            // A folga depois da cena (um toque ali não desliga).
+            for (int i = 0; i < engine.config.shinkaiGraca; i++) step();
         }
     }
 

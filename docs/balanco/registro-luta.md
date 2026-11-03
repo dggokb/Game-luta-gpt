@@ -345,3 +345,20 @@ com jM) e um que defende mais (segura a defesa com reação de 14 quadros, cutuc
   para repelir).
   - Agora quem luta de longe não ganha a agressividade do neutro; só a pressão da sequência e a do
     levantar.
+
+## O quarto registro real (02/11, noite): "do nada eu perco meu SHINKAI"
+
+Foram 5 lutas: arcade 2x2 nos níveis 5–7 e 1x1 no nível 8, com Ryūga e p15. Houve 10 SHINKAIs do
+jogador; veja como cada um acabou:
+
+| como acabou | vezes | o que aconteceu |
+|---|---|---|
+| desistiu no SHINKAI Clash | 5 | A CPU respondeu a transformação, o Clash começou e, 1,3 s depois, o jogador segurou ← (por reflexo, defendendo). No Clash isso é "desistir": ele perde o SHINKAI. |
+| trocou de lutador (TAG) | 4 | Na dupla, a troca tira quem está no SHINKAI de campo, e o SHINKAI acaba. |
+| desligou sem querer | 1 | Apertou SHINKAI duas vezes (21,63 s e 21,77 s). O segundo toque ficou guardado durante a cena e desligou o SHINKAI assim que ela acabou. |
+
+**Corrigido:** um toque de SHINKAI durante a cena de ativação, ou até 0,5 s depois dela, não
+desliga o SHINKAI (`shinkaiGraca`). Teste novo: `ShinkaiReservaTest.apertarDeNovoNaAtivacaoNaoDesliga`.
+
+**Para decidir com o jogador:** o SHINKAI Clash na regra nova ("está atrapalhando a fluidez") e a
+troca com o SHINKAI ligado.
