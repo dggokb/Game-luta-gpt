@@ -1690,3 +1690,18 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
 - **Relâmpagos (Beco do Brucy):** quando cai um, o corpo clareia no clarão (até +60%).
 - **Sem custo:** é a mesma matriz de cor que o lutador já usava (o desgaste), só composta. Fica
   guardada por tinta e nível do clarão, sem desenho a mais.
+
+## Raios no cenário com os dois no SHINKAI (pedido do jogador, 03/11)
+
+- **Quando:** só com os dois lutadores no SHINKAI.
+- **Como:**
+  - a cada 0,3–0,8 s estala um raio, na cor do SHINKAI de um e do outro, alternando;
+  - 70% deles caem no fundo, do alto da tela até perto do chão, com um galho;
+  - 30% estalam entre os dois, de peito a peito;
+  - cada raio vive 9 quadros e pisca uma vez antes de sumir.
+- **Leve:**
+  - no máximo 4 raios de uma vez, cada um um caminho de ~10 pedaços desenhado duas vezes (o
+    brilho e o miolo);
+  - os caminhos são montados só quando o raio nasce;
+  - no gráfico LEVE caem com metade da frequência.
+- **Código:** `RaiosShinkai` (teste `RaiosShinkaiTest`).

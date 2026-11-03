@@ -2182,6 +2182,7 @@ public class GameView extends SurfaceView
         updateUltraBeam();
         impacts.update(FIXED_STEP);
         efeitos.passo();
+        passoRaiosShinkai();
         feel.step();
         playMotionSounds();
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
@@ -4293,6 +4294,8 @@ public class GameView extends SurfaceView
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, Math.max(feel.darkAlpha(), ativacaoAlfa()), 0, 0, 8);
+            // Os dois no SHINKAI: raios estalando no cenário, atrás dos lutadores.
+            if (cenario) raiosShinkai.desenhar(canvas);
             if (finalizacao.ativo()) drawFinalizacao(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (beam) {
                 drawUltraBeamOverlay(canvas, false);
@@ -5277,6 +5280,19 @@ public class GameView extends SurfaceView
             ultraSounds.play(ultraFolder(f.state), "investida");
             ultraSounds.playFight("punish", 1f, 0.8f);
         }
+    }
+
+    /** Raios no cenário com os dois no SHINKAI (cores dos tipos). */
+    private final RaiosShinkai raiosShinkai = new RaiosShinkai(0x5A1C41L);
+
+    private void passoRaiosShinkai() {
+        CombatFighter a = engine.fighter(PLAYER), b = engine.fighter(OPPONENT);
+        boolean ativos = a.state.inShinkai() && b.state.inShinkai() && !a.ko() && !b.ko();
+        float metade = VW / (2f * camera.zoom);
+        float xa = a.x + tagOffset(), xb = b.x + engine.teams.tagOffset(OPPONENT);
+        raiosShinkai.passo(ativos, a.state.shinkaiType.color, b.state.shinkaiType.color,
+            xa, chestY(a), xb, chestY(b), camera.x - metade, camera.x + metade, camera.top, GROUND_Y,
+            qualidade.efeitosLeves());
     }
 
     /** Altura em que o lutador é desenhado (o pulinho do backdash e o quique da queda sobem só o desenho). */
