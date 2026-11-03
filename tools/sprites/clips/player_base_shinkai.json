@@ -2,7 +2,7 @@
   "id": "player_base_shinkai",
   "javaName": "SHINKAI_ATIVA",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_shinkai_video_hd.png",
+  "source": "art/sprites/source/player_base_shinkai_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_shinkai.webp",
   "report": "tools/sprites/reports/player_base_shinkai.report.json",
   "preview": "android/app/build/sprite-review/player_base_shinkai-import.png",
@@ -10,9 +10,10 @@
   "segmentation": "prepared-grid",
   "columns": 7,
   "rootMode": "authored",
-  "sourceNote": "p01: ativação do SHINKAI (cruza os braços no alto e desce com o arco de energia), vídeo shinkai.mp4 (Drive p01/animations), convertido por video_para_sprite.py.",
+  "sourceNote": "p01: ativação do SHINKAI (cruza os braços no alto e desce com o arco de energia), vídeo shinkai.mp4 (Drive p01/animations), convertido por video_para_sprite.py. Real-ESRGAN AnimeVideo-v3 4x from original 1x, downsampled to 2x; preserves original approved HD alpha.",
   "sourceReferences": [
-    "art/sprites/source/player_base_shinkai_video_normalized.png"
+    "art/sprites/source/player_base_shinkai_video_normalized.png",
+    "art/sprites/source/player_base_shinkai_video_hd.png"
   ],
   "video": {
     "arquivo": "shinkai.mp4",
