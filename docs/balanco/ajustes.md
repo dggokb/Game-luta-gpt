@@ -1615,3 +1615,19 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
 
 - **Ficou 50%:** quase acaba com o TIME OVER no 2x2, e o equilíbrio do elenco fica igual.
 - **Detalhes:** `perfis/shinkai-vida-nova-75-50.md`.
+
+## Ultra SHINKAI (pedido do jogador, 03/11)
+
+- **O que é:** o golpe final da transformação.
+  - **Comando:** o mesmo do Ultra (↓ + SUPER). No SHINKAI e com as cinco barras, o botão vira
+    "U.SHINKAI" (anel dourado) e solta o Ultra SHINKAI; fora disso, o Ultra de sempre (três barras).
+  - **Custo:** as cinco barras.
+  - **Dano:** o dobro do Ultra (`ultraShinkaiDanoPermille` 2000).
+  - **Depois:** quando o Ultra SHINKAI acaba (acertou, defendido ou errou) o SHINKAI termina
+    ("SHINKAI ESGOTADO").
+  - **Visual por ora:** a animação do Ultra de cada um, com o aviso "ULTRA SHINKAI!" e a tela
+    tremendo. A cinemática própria começa pelo Ryūga, com os vídeos do jogador.
+- **Simulado (`BateriaKof`, 1x1, 960 lutas por nível, ligado × desligado):**
+  - a CPU solta 0,1 Ultra SHINKAI por luta (precisa estar no SHINKAI com as cinco barras);
+  - o equilíbrio fica igual (desvio 19,5 → 18,8 no nível 5; 16,8 → 16,7 no 8).
+- **Ficou.** **Detalhes:** `perfis/ultra-shinkai.md`; teste `UltraShinkaiTest`.

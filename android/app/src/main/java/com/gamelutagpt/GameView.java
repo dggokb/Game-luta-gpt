@@ -2138,6 +2138,7 @@ public class GameView extends SurfaceView
             if ("PRECISO".equals(cue) || "RUPTURA".equals(cue)) beamShake = Math.max(beamShake, 14f);
             if ("SHINKAI_QUEBRA".equals(cue)) beamShake = Math.max(beamShake, 22f);
             if ("SHINKAI_CHOQUE".equals(cue)) beamShake = Math.max(beamShake, 20f);
+            if ("ULTRA_SHINKAI".equals(cue)) beamShake = Math.max(beamShake, 26f);
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
@@ -2306,6 +2307,7 @@ public class GameView extends SurfaceView
         }
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
+        @Override public boolean ultraShinkaiReady() { return engine.ultraShinkaiPronto(activeFighter()); }
         @Override public int dpadDirection() { return pad.direction(); }
         @Override public int shinkaiDuration() { return engine.config.shinkaiFrames; }
         @Override public int demoPlaying() { return demo.demo(); }
@@ -3443,6 +3445,8 @@ public class GameView extends SurfaceView
             case "SHINKAI_QUEBRA": return "TRANSFORMAÇÃO QUEBRADA!";
             case "SHINKAI_CHOQUE": return "CHOQUE DE AURAS!";
             case "SHINKAI_FIM": return "SHINKAI DESLIGADO";
+            case "ULTRA_SHINKAI": return "ULTRA SHINKAI!";
+            case "ULTRA_SHINKAI_FIM": return "SHINKAI ESGOTADO";
             default: return null;
         }
     }

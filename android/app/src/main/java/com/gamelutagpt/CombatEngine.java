@@ -435,6 +435,7 @@ final class CombatEngine {
         updateUltraBeam(fighters[1], fighters[0]);
         updateUltraSequence(fighters[0], fighters[1]);
         updateUltraSequence(fighters[1], fighters[0]);
+        for (CombatFighter f : fighters) fimDoUltraShinkai(f);
 
         // 6. Combo sessions and the team meter.
         updateSessions();
@@ -533,7 +534,7 @@ final class CombatEngine {
             // Apanhando, qualquer botão de golpe (L, M ou H) é o combo breaker: quebra na hora.
             f.techRequestAge = -1;
             comboBreaker(fighters[1 - f.index], f);
-        } else if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST && temUltra(f.character())) {
+        } else if (in.ultra && podeUltra(f)) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
             f.buffer.push(InputBuffer.Button.SUPER, null, false);
@@ -541,6 +542,16 @@ final class CombatEngine {
     }
 
     /** Tem Ultra (sequência ou raio): as crianças da história ainda não têm. */
+    /** O botão do Ultra solta algo agora: o Ultra (três barras) ou o Ultra SHINKAI (cinco, no SHINKAI). */
+    boolean podeUltra(CombatFighter f) {
+        return temUltra(f.character()) && f.state.superMeter >= CombatConfig.ULTRA_COST;
+    }
+
+    /** No SHINKAI e com as cinco barras: o botão do Ultra vira o Ultra SHINKAI. */
+    boolean ultraShinkaiPronto(FighterState s) {
+        return config.ultraShinkai && s.inShinkai() && s.superMeter >= CombatConfig.ULTRA_SHINKAI_COST;
+    }
+
     static boolean temUltra(CharacterDefinition c) {
         return c.fighter.ultraSequence != null || c.specialAnimations.containsKey("ULTRA");
     }
@@ -603,7 +614,7 @@ final class CombatEngine {
         }
 
         if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround() &&
-            f.state.superMeter >= CombatConfig.ULTRA_COST && temUltra(f.character())) {
+            podeUltra(f)) {
             startUltra(f);
             f.dashRequest = f.backdashRequest = false;
             return;
@@ -1541,7 +1552,9 @@ final class CombatEngine {
         f.forwardDashing = false;
         f.backdashFrames = 0;
         f.crouching = false;
-        f.state.spendSuperMeter(CombatConfig.ULTRA_COST);
+        f.ultraShinkai = ultraShinkaiPronto(f.state);
+        f.state.spendSuperMeter(f.ultraShinkai ? CombatConfig.ULTRA_SHINKAI_COST : CombatConfig.ULTRA_COST);
+        if (f.ultraShinkai) cues.add("ULTRA_SHINKAI");
         // Like the Super: the opponent and the projectiles wait for the rush.
         CombatFighter other = fighters[1 - f.index];
         other.hitstop = Math.max(other.hitstop, config.ultraStartupFrames);
@@ -3877,7 +3890,17 @@ final class CombatEngine {
     }
 
     /** Damage already scaled; one more hit on the combo counter. */
+    /** O Ultra SHINKAI acabou (acertou, defendido ou errou): a transformação termina junto. */
+    private void fimDoUltraShinkai(CombatFighter f) {
+        if (!f.ultraShinkai || f.status == CombatFighter.Status.ULTRA) return;
+        f.ultraShinkai = false;
+        if (!f.state.inShinkai()) return;
+        encerrar(f.state, 0);
+        cues.add("ULTRA_SHINKAI_FIM");
+    }
+
     private int dealUltraDamage(CombatFighter a, CombatFighter d, int damage) {
+        if (a.ultraShinkai) damage = (int)((long)damage * config.ultraShinkaiDanoPermille / 1000);
         if (d.ko()) {
             // Já zerado e ainda preso no Ultra: o golpe acerta (faísca, som), mas não tira nada.
             events.add(new HitEvent(a.index, d.index, 0, false, false, ultraAttack.id));

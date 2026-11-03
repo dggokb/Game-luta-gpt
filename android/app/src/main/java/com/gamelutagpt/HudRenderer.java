@@ -57,6 +57,8 @@ final class HudRenderer {
         boolean canSuper();
         /** ↓ held with three bars: the SUPER button would start the ultra. */
         boolean ultraReady();
+        /** No SHINKAI e com as cinco barras: o Ultra que sai é o Ultra SHINKAI. */
+        default boolean ultraShinkaiReady() { return false; }
         int dpadDirection();
         boolean pressed(Control control);
         /** A luta atual faz parte de um episódio do modo história. */
@@ -1564,11 +1566,13 @@ final class HudRenderer {
     private void drawSuperButton(Canvas c, State s) {
         boolean pressed = s.pressed(Control.SUPER);
         boolean ultra = s.ultraReady();
+        boolean ultraShinkai = ultra && s.ultraShinkaiReady();
         boolean enabled = ultra || s.canSuper();
-        int ring = ultra ? 0xFFFF6AD5 : 0xFFFFD45A;
+        int ring = ultraShinkai ? 0xFFF2B52A : ultra ? 0xFFFF6AD5 : 0xFFFFD45A;
         button(c, SUPER_X, SUPER_Y, SUPER_RADIUS, ring, pressed, enabled);
         if (enabled && !pressed) readyHalo(c, SUPER_X, SUPER_Y, SUPER_RADIUS, ring);
-        label(c, ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 8f, 18f, enabled ? Color.WHITE : 0xFFB4BCCB);
+        label(c, ultraShinkai ? "U.SHINKAI" : ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 8f,
+            ultraShinkai ? 13f : 18f, enabled ? Color.WHITE : 0xFFB4BCCB);
         label(c, s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 15f, 13f, enabled ? ring : 0xFF9AA2B2);
     }
 }

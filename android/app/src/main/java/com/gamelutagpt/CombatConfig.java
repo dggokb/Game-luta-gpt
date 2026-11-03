@@ -213,6 +213,8 @@ final class CombatConfig {
     static final int SUPER_COST = METER_PER_BAR;
     /** Ultra (↓ + SUPER): three bars. */
     static final int ULTRA_COST = 3 * METER_PER_BAR;
+    /** Ultra SHINKAI: o mesmo botão do Ultra, só no SHINKAI e com as cinco barras (a barra cheia). */
+    static final int ULTRA_SHINKAI_COST = 5 * METER_PER_BAR;
 
     // Ultra: activation (the opponent freezes), rush, then either the cinematic (hit),
     // blockstun for the defender (guarded) or a punishable recovery (whiff or block).
@@ -695,6 +697,13 @@ final class CombatConfig {
      * estava e ele volta transformado (pedido do jogador, 03/11). false = a troca apaga o SHINKAI.
      */
     boolean shinkaiGuardaNaTroca = true;
+    /**
+     * Ultra SHINKAI (pedido do jogador, 03/11): no SHINKAI e com as cinco barras o botão do Ultra solta
+     * o Ultra SHINKAI. É o golpe final da transformação: bate {@link #ultraShinkaiDanoPermille} do
+     * Ultra e, quando acaba (acertou, defendido ou errou), o SHINKAI termina.
+     */
+    boolean ultraShinkai = true;
+    int ultraShinkaiDanoPermille = 2000;
     /**
      * A reserva ao ligar, em milésimos da vida inteira DELE (cada um tem a sua: o Ryūga 14000).
      * 1000 = uma vida nova inteira (pedido do jogador: "o SHINKAI é um novo life", como a

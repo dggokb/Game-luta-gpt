@@ -9,7 +9,7 @@ import java.util.function.Consumer;
  * rápido com a mesma altura e queda mais curta. CPU × CPU, 1x1, os 16 todos contra todos (cada par
  * dos dois lados), a mesma semente em cada variante.
  *
- * <pre>args: [-n=5,8] [-r=repetições] variante... (base | pulo=K | queda=N | reserva=permille | combinadas com +)</pre>
+ * <pre>args: [-n=5,8] [-r=repetições] variante... (base | pulo=K | queda=N | reserva=permille | us=0/1 (Ultra SHINKAI) | combinadas com +)</pre>
  *
  * pulo=K: o pulo normal leva K do tempo (altura e distância iguais): velocidade de subida e de lado /K,
  * gravidade do pulo /K². queda=N: quadros deitado antes do levantar normal.
@@ -36,6 +36,7 @@ public final class BateriaKof {
             switch (kv[0]) {
                 case "pulo": { float k = Float.parseFloat(kv[1]); a = prev.andThen(c -> pulo(c, k)); break; }
                 case "queda": { int n = Integer.parseInt(kv[1]); a = prev.andThen(c -> c.knockdownDownFrames = n); break; }
+                case "us": { boolean on = !"0".equals(kv[1]); a = prev.andThen(c -> c.ultraShinkai = on); break; }
                 case "reserva": { int n = Integer.parseInt(kv[1]); a = prev.andThen(c -> c.ryugaReservaPermille = n); break; }
                 default: throw new IllegalArgumentException(p);
             }
@@ -46,7 +47,7 @@ public final class BateriaKof {
     static final class Est {
         int lutas, pulos, tirado, acertou, defendido;
         long quadros, quadrosNoAr, dano;
-        int quedas, levantou, levantouApanhou, levantouDefendeu;
+        int quedas, levantou, levantouApanhou, levantouDefendeu, ultraShinkai;
         final Map<String, int[]> vitorias = new TreeMap<>();   // vitórias, lutas
 
         synchronized void somar(Est o) {
@@ -54,6 +55,7 @@ public final class BateriaKof {
             quadros += o.quadros; quadrosNoAr += o.quadrosNoAr; dano += o.dano;
             quedas += o.quedas; levantou += o.levantou; levantouApanhou += o.levantouApanhou;
             levantouDefendeu += o.levantouDefendeu;
+            ultraShinkai += o.ultraShinkai;
             for (Map.Entry<String, int[]> en : o.vitorias.entrySet()) {
                 int[] v = vitorias.computeIfAbsent(en.getKey(), k -> new int[2]);
                 v[0] += en.getValue()[0];
@@ -99,6 +101,7 @@ public final class BateriaKof {
                 }
                 antes[s] = f.status;
             }
+            if (l.e.cues().contains("ULTRA_SHINKAI")) e.ultraShinkai++;
             for (CombatEngine.HitEvent h : l.e.events()) {
                 if (!h.blocked) e.dano += h.damage;
                 if (noAr[h.attacker] && !l.f(h.attacker).grounded) resultado[h.attacker] = Math.max(resultado[h.attacker], h.blocked ? 1 : 2);
@@ -137,8 +140,8 @@ public final class BateriaKof {
         System.out.println("# KOF '97: pulo e queda (CPU × CPU, 1x1, 16 todos contra todos, " + 240 * reps + " lutas por nível)");
         Map<String, double[]> porLutador = new LinkedHashMap<>();
         System.out.println();
-        System.out.println("| variante | nível | duração | dano/min | pulos/min (cada) | quadros no ar | tirado | acertou | defendido | quedas/luta | levantou e apanhou | levantou e defendeu | vitória pior–melhor | desvio |");
-        System.out.println("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
+        System.out.println("| variante | nível | duração | dano/min | pulos/min (cada) | quadros no ar | tirado | acertou | defendido | quedas/luta | levantou e apanhou | levantou e defendeu | vitória pior–melhor | desvio | Ultra SHINKAI/luta |");
+        System.out.println("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
         for (String v : variantes) {
             Consumer<CombatConfig> ajuste = variante(v);
             for (int nivel : niveis) {
@@ -159,12 +162,13 @@ public final class BateriaKof {
                 double desvio = Math.sqrt(Arrays.stream(pct).map(x -> (x - media) * (x - media)).average().orElse(0));
                 int p = Math.max(1, total.pulos), lv = Math.max(1, total.levantou);
                 System.out.printf(Locale.ROOT,
-                    "| %s | %d | %.0f s | %.0f | %.1f | %.1f | %.0f%% | %.0f%% | %.0f%% | %.1f | %.0f%% | %.0f%% | %.0f–%.0f%% | %.1f |%n",
+                    "| %s | %d | %.0f s | %.0f | %.1f | %.1f | %.0f%% | %.0f%% | %.0f%% | %.1f | %.0f%% | %.0f%% | %.0f–%.0f%% | %.1f | %.2f |%n",
                     v, nivel, total.quadros / 60.0 / total.lutas, total.dano / min, total.pulos / (2.0 * min),
                     total.quadrosNoAr / (double)p, 100.0 * total.tirado / p, 100.0 * total.acertou / p,
                     100.0 * total.defendido / p, total.quedas / (double)total.lutas,
                     100.0 * total.levantouApanhou / lv, 100.0 * total.levantouDefendeu / lv,
-                    Arrays.stream(pct).min().orElse(0), Arrays.stream(pct).max().orElse(0), desvio);
+                    Arrays.stream(pct).min().orElse(0), Arrays.stream(pct).max().orElse(0), desvio,
+                    total.ultraShinkai / (double)total.lutas);
             }
         }
         pool.shutdown();

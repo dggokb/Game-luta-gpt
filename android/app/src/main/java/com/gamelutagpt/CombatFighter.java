@@ -178,6 +178,8 @@ final class CombatFighter {
 
     // Ultra.
     int ultraPhase;
+    /** O Ultra em andamento é o Ultra SHINKAI (cinco barras, dano maior, encerra o SHINKAI no fim). */
+    boolean ultraShinkai;
     /** Frames spent in the current ultra phase. */
     int ultraFrame;
     /** Damage scale of the ultra, fixed when the rush connects (permille). */
