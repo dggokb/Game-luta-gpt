@@ -143,6 +143,10 @@ final class CharacterDefinition {
             float hold=durations[0];
             return hold+Math.max(0f,Math.min(1f,progress))*(duration-hold-0.0001f);
         }
+        /** Quantos quadros o clipe tem. */
+        int frameCount() {
+            return durations.length;
+        }
         /** Clip time that shows the given frame of the clip (its middle). */
         float timeOfFrame(int index) {
             int i=Math.max(0,Math.min(durations.length-1,index));

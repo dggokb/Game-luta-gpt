@@ -1557,10 +1557,12 @@ final class CombatEngine {
         f.ultraShinkai = ultraShinkaiPronto(f.state);
         f.state.spendSuperMeter(f.ultraShinkai ? CombatConfig.ULTRA_SHINKAI_COST : CombatConfig.ULTRA_COST);
         if (f.ultraShinkai) cues.add("ULTRA_SHINKAI");
-        // Like the Super: the opponent and the projectiles wait for the rush.
+        // Like the Super: the opponent and the projectiles wait for the rush (no dragão, a cena
+        // inteira: a luta para como na transformação do SHINKAI).
         CombatFighter other = fighters[1 - f.index];
-        other.hitstop = Math.max(other.hitstop, config.ultraStartupFrames);
-        superFreeze = Math.max(superFreeze, config.ultraStartupFrames);
+        int preparo = ultraPreparo(f);
+        other.hitstop = Math.max(other.hitstop, preparo);
+        superFreeze = Math.max(superFreeze, preparo);
     }
 
     /**
@@ -1868,11 +1870,12 @@ final class CombatEngine {
                 break;
             case ULTRA:
                 if (f.ultraPhase != CombatFighter.ULTRA_CINEMATIC && !f.ultraPaused) f.ultraFrame++;
-                if (f.ultraPhase == CombatFighter.ULTRA_STARTUP && f.ultraFrame >= config.ultraStartupFrames) {
+                if (f.ultraPhase == CombatFighter.ULTRA_STARTUP && f.ultraFrame >= ultraPreparo(f)) {
                     if (f.ultraShinkai && temDragao(f.character())) {
-                        // O dragão: sem investida, ele fica no soco e o dragão sai do punho.
+                        // O dragão: sem investida, ele fica no soco e o dragão entra de fora da tela.
                         f.ultraPhase = CombatFighter.ULTRA_DRAGAO;
                         f.dragaoEstado = f.dragaoAcertos = 0;
+                        comecarDragao(f, fighters[1 - f.index]);
                         cues.add("ULTRA_DRAGAO");
                     } else {
                         f.ultraPhase = CombatFighter.ULTRA_RUSH;
@@ -3906,9 +3909,26 @@ final class CombatEngine {
         return false;
     }
 
-    /** Onde a cabeça do dragão está agora: a distância à frente do punho (px). */
+    /** Quadros da ativação do Ultra: a cena do dragão é mais longa que a de sempre. */
+    int ultraPreparo(CombatFighter f) {
+        return f.ultraShinkai && temDragao(f.character()) ? config.dragaoPreparo : config.ultraStartupFrames;
+    }
+
+    /** Onde a cabeça do dragão está agora: a distância à frente do punho (px; negativa atrás dele). */
     float dragaoCabeca(CombatFighter a) {
-        return config.dragaoVelocidade * a.ultraFrame;
+        return config.dragaoVelocidade * a.ultraFrame - config.dragaoAtras;
+    }
+
+    /**
+     * O dragão começa a passar: a luta segue parada (o relógio e os projéteis esperam) e quem está
+     * na frente fica parado até a cabeça chegar nele, como numa cena.
+     */
+    private void comecarDragao(CombatFighter a, CombatFighter d) {
+        superFreeze = Math.max(superFreeze, config.dragaoQuadros);
+        float origem = a.x + a.facing * config.dragaoOrigem;
+        float frente = (d.x - origem) * a.facing - d.body().halfWidth;
+        int chega = (int)Math.ceil((frente + config.dragaoAtras) / config.dragaoVelocidade);
+        if (chega > 0) d.hitstop = Math.max(d.hitstop, Math.min(chega, config.dragaoQuadros));
     }
 
     /**
@@ -3921,7 +3941,7 @@ final class CombatEngine {
         float origem = a.x + a.facing * config.dragaoOrigem;
         float frente = (d.x - origem) * a.facing;
         float cabeca = dragaoCabeca(a);
-        boolean passando = frente + d.body().halfWidth >= 0f && cabeca >= frente - d.body().halfWidth &&
+        boolean passando = cabeca >= frente - d.body().halfWidth &&
             cabeca - config.dragaoComprimento <= frente + d.body().halfWidth;
         if (a.dragaoEstado == 0 && passando && d.hittable() && !d.ko()) {
             int guard = effectiveGuard(d);

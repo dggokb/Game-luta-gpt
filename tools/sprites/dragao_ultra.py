@@ -2,9 +2,11 @@
 """Dragão azul do Ultra SHINKAI do Ryūga, desenhado por código (pedido do jogador, 03/11).
 
 Gera a folha de efeito `assets/efeitos/ultra_shinkai_player_base` (folha.webp + efeito.json) no formato
-do `EfeitosVideo`: a origem é o punho do Ryūga, o dragão sai dele e atravessa a arena para a direita
-(o jogo espelha quando ele olha para a esquerda). A cabeça anda o mesmo que o motor
-(`CombatConfig.dragaoVelocidade`, px por quadro de 60 Hz), então os golpes caem quando o desenho passa.
+do `EfeitosVideo`: um ciclo do dragão ondulando, com a ponta do focinho na origem e o corpo atrás. O jogo
+toca o ciclo repetindo e leva a origem pela tela (`EfeitosVideo.tocarAndando`) na velocidade do motor
+(`CombatConfig.dragaoVelocidade`, px por quadro de 60 Hz): ele entra de fora da tela, por trás do Ryūga,
+atravessa e sai do outro lado (o jogo espelha quando ele olha para a esquerda). O comprimento de onda é o
+quanto a cabeça anda num ciclo, então o corpo segue o caminho da cabeça e o ciclo emenda sem pulo.
 
     python3 tools/sprites/dragao_ultra.py [--previa arquivo.png]
 """
@@ -21,12 +23,13 @@ RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SAIDA = os.path.join(RAIZ, "android", "app", "src", "main", "assets", "efeitos", "ultra_shinkai_player_base")
 
 # Mundo (px do jogo; o Ryūga tem 224 de altura). y para baixo, origem no punho.
-VELOCIDADE = 40.0          # px por quadro de 60 Hz (CombatConfig.dragaoVelocidade)
+VELOCIDADE = 24.0          # px por quadro de 60 Hz (CombatConfig.dragaoVelocidade)
 PASSO = 2                  # quadros de 60 Hz por quadro da folha (30 qps)
-QUADROS = 36               # 72 quadros de 60 Hz: o rabo sai da arena (CombatConfig.dragaoQuadros = 70)
+QUADROS = 16               # um ciclo da onda (o jogo repete)
 CABECA = 360.0             # comprimento da cabeça
 CORPO_INICIO, CORPO_FIM = 300.0, 1360.0   # do focinho para trás (CombatConfig.dragaoComprimento)
-ONDA_A, ONDA_L = 85.0, 620.0
+ONDA_A = 85.0
+ONDA_L = VELOCIDADE * PASSO * QUADROS   # o quanto a cabeça anda num ciclo (768)
 CENTRO_Y = -70.0
 ESCALA = 0.35              # px da folha por px do mundo (pixelScale)
 SS = 2                     # supersample
@@ -200,11 +203,11 @@ def brilho(img, raio_px, cor, forca):
 
 
 def quadro(i, cab):
-    """O quadro i: a cabeça a VELOCIDADE * PASSO * i do punho."""
+    """O quadro i do ciclo: o focinho na origem, o corpo atrás, a onda adiantada de i/QUADROS."""
     sc = ESCALA * SS
-    cabeca_x = VELOCIDADE * PASSO * i
-    fase = i * 0.42
-    x0, x1 = -80.0, cabeca_x + 60.0
+    cabeca_x = 0.0
+    fase = 2 * math.pi * i / QUADROS
+    x0, x1 = -(CORPO_FIM + 260.0), 60.0
     y0, y1 = -460.0, 300.0
     W, H = int((x1 - x0) * sc) + 2, int((y1 - y0) * sc) + 2
     tela = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -220,12 +223,6 @@ def quadro(i, cab):
     q.alpha_composite(img, (lado // 2 - ox, lado // 2 - oy))
     q = q.rotate(-math.degrees(ang), resample=Image.BICUBIC, center=(lado // 2, lado // 2))
     tela.alpha_composite(q, (int((hx - x0) * sc) - lado // 2, int((hy - y0) * sc) - lado // 2))
-    # Some atrás do punho: o dragão sai dele.
-    arr = np.array(tela, dtype=np.float32)
-    xs = (np.arange(W) / sc + x0)
-    corte = np.clip((xs + 10.0) / 50.0, 0, 1)
-    arr[..., 3] *= corte[None, :]
-    tela = Image.fromarray(arr.astype(np.uint8), "RGBA")
     # Faíscas em volta do corpo (as mesmas em cada quadro, andando junto).
     rnd = random.Random(7 + i)
     fx = Image.new("RGBA", tela.size, (0, 0, 0, 0))
@@ -235,32 +232,15 @@ def quadro(i, cab):
         x, y, _ = espinha(min(s, CORPO_FIM), cabeca_x, fase)
         x -= max(0.0, s - CORPO_FIM)
         y += rnd.uniform(-1, 1) * raio(min(s, CORPO_FIM)) * 1.8
-        if x < 0:
-            continue
         r = rnd.uniform(2, 6) * sc
         px, py = (x - x0) * sc, (y - y0) * sc
         fd.ellipse([px - r, py - r, px + r, py + r], fill=BRANCO + (rnd.randint(140, 255),))
     tela.alpha_composite(fx)
-    # Clarão no punho no começo.
-    if i < 7:
-        t = i / 6.0
-        r = (70 + 150 * t) * sc
-        cl = Image.new("RGBA", tela.size, (0, 0, 0, 0))
-        cd = ImageDraw.Draw(cl)
-        px, py = (0 - x0) * sc, (0 - y0) * sc
-        cd.ellipse([px - r, py - r, px + r, py + r], fill=BRANCO + (int(255 * (1 - t)),))
-        cl = cl.filter(ImageFilter.GaussianBlur(18 * sc))
-        tela.alpha_composite(cl)
     # Brilho de energia por baixo de tudo.
     final = Image.new("RGBA", tela.size, (0, 0, 0, 0))
     final.alpha_composite(brilho(tela, 26 * sc, (64, 200, 255), 1.4))
     final.alpha_composite(brilho(tela, 8 * sc, (150, 230, 255), 1.1))
     final.alpha_composite(tela)
-    # Fim: some nos últimos quadros.
-    if i >= QUADROS - 4:
-        k = (QUADROS - i) / 4.0
-        a = final.split()[3].point(lambda v: int(v * k))
-        final.putalpha(a)
     final = final.resize((max(1, W // SS), max(1, H // SS)), Image.LANCZOS)
     bbox = final.getbbox()
     if bbox is None:
@@ -315,11 +295,11 @@ def main():
     print("folha", folha.size, "quadros", len(imgs))
     if args.previa:
         fundo = Image.new("RGBA", (int(1700 * ESCALA * 2), int(760 * ESCALA * 2) * 4), (30, 30, 46, 255))
-        for k, i in enumerate((4, 12, 20, 28)):
+        for k, i in enumerate((0, 4, 8, 12)):
             q = imgs[i].resize((imgs[i].width * 2, imgs[i].height * 2))
             dx, dy = desloc[i]
             oy = int(760 * ESCALA * 2) * k + int(460 * ESCALA * 2)
-            fundo.alpha_composite(q, (int(80 * ESCALA * 2 + dx * 2), int(oy + dy * 2)))
+            fundo.alpha_composite(q, (int(1620 * ESCALA * 2 + dx * 2), int(oy + dy * 2)))
         fundo.convert("RGB").save(args.previa)
 
 

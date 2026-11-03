@@ -2429,7 +2429,9 @@ public class GameView extends SurfaceView
                 FighterState rival = engine.fighter(1 - p.index).state;
                 if (usaPackReal(rival, 1 - p.index)) pedirUltra(rival, false);
                 // Pack ainda carregando: a luta espera parada no começo do Ultra (update).
-                if (ultraProntoParaAbertura(p)) {
+                if (p.ultraShinkai && engine.temDragao(p.character())) {
+                    cenaDoDragao(p);
+                } else if (ultraProntoParaAbertura(p)) {
                     startUltraOpening(p);
                 } else {
                     ultraEsperando = p;
@@ -2442,7 +2444,11 @@ public class GameView extends SurfaceView
         // O Ultra com a câmera da luta (o Mugen Rendan da p15) não fecha nela na ativação.
         CharacterDefinition.UltraSequence own = p.state.profile.ultraSequence;
         float startupZoom = own != null && own.fightCamera ? 0f : ULTRA_STARTUP_ZOOM;
-        if (phase == CombatFighter.ULTRA_STARTUP) {
+        if (phase == CombatFighter.ULTRA_STARTUP && p.ultraShinkai && engine.temDragao(p.character())) {
+            // A cena do dragão (como a transformação): o zoom, o escuro e as faixas são da ativação.
+            ultraDarkAlpha = 0;
+            ultraCameraZoom = 1f;
+        } else if (phase == CombatFighter.ULTRA_STARTUP) {
             float t = clamp(p.ultraFrame / (float)engine.config.ultraStartupFrames, 0f, 1f);
             ultraDarkAlpha = Math.round(205f * Math.min(1f, t * 3f));
             ultraCameraZoom = 1f + startupZoom * (1f - (1f - t) * (1f - t));
@@ -3002,6 +3008,7 @@ public class GameView extends SurfaceView
                 ativacaoLado = side;
                 ativacaoInicio = engine.frame();
                 ativacaoQuadros = engine.shinkaiAtivacaoQuadros(f);
+                ativacaoUltra = false;
                 // Com o vídeo da liberação de poder (efeito shinkai_<id>: ele, a aura, os raios e o
                 // dragão), o efeito toca nos pés dele e o sprite some enquanto isso.
                 ativacaoEfeito = efeitos.tocar(efeito, x, fighterVisualY(f), 1f, f.facing < 0);
@@ -3033,6 +3040,25 @@ public class GameView extends SurfaceView
     private int ativacaoLado = -1, ativacaoInicio, ativacaoQuadros;
     /** A ativação está tocando o vídeo dela (efeito): o sprite do lutador fica escondido. */
     private boolean ativacaoEfeito;
+    /** A cena é a do Ultra SHINKAI do dragão (a mesma câmera da ativação, sem a pose dela). */
+    private boolean ativacaoUltra;
+
+    /**
+     * Ultra SHINKAI do dragão: a cena da transformação do SHINKAI (a luta parada, a câmera fecha
+     * nele, o resto escurece, as faixas e o corte com o retrato) enquanto ele arma o soco.
+     */
+    private void cenaDoDragao(CombatFighter p) {
+        ativacaoLado = p.index;
+        ativacaoInicio = engine.frame();
+        ativacaoQuadros = engine.config.dragaoPreparo;
+        ativacaoEfeito = false;
+        ativacaoUltra = true;
+        corteLado = p.index;
+        corteAtraso = 10;
+        shinkaiFlash = SHINKAI_FLASH_FRAMES;
+        shinkaiFlashColor = p.state.shinkaiType.color;
+        ultraSounds.playFight("acerto_s", 1f, 0.7f);
+    }
     /** Escurecido do cenário e do rival durante a ativação (o quanto; sobe e desce em ATIVACAO_FADE quadros). */
     static final int ATIVACAO_ESCURO = 170, ATIVACAO_FADE = 8;
     private final Filtro ativacaoEscuro = Filtro.matriz(new float[] {
@@ -4869,7 +4895,7 @@ public class GameView extends SurfaceView
         CharacterDefinition character = f.character();
         String animation = reactionState(renderer, f);
         float animationElapsed = reactionElapsed;
-        if (ativacaoShinkai() && f == engine.fighter(ativacaoLado) && character.animations.containsKey(SpriteStates.SHINKAI_ATIVA)) {
+        if (ativacaoShinkai() && !ativacaoUltra && f == engine.fighter(ativacaoLado) && character.animations.containsKey(SpriteStates.SHINKAI_ATIVA)) {
             // A ativação do SHINKAI toca inteira enquanto a luta está parada.
             animation = SpriteStates.SHINKAI_ATIVA;
             animationElapsed = (engine.frame() - ativacaoInicio) * FIXED_STEP;
@@ -5040,6 +5066,26 @@ public class GameView extends SurfaceView
                 : sequence.startupFrame;
             animation = sequenceArt.id;
             animationElapsed = Math.min(sequenceArt.duration - 0.0001f, frames * FIXED_STEP);
+        }
+        CharacterDefinition.Move jab = f.ultraShinkai && engine.temDragao(character) ? character.moves.get("L") : null;
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && jab != null && jab.animation != null) {
+            // Ultra SHINKAI do dragão: o soco (jab) armado devagar na cena, esticado enquanto o dragão
+            // passa e de volta à guarda na recuperação.
+            CharacterDefinition.Animation clip = jab.animation;
+            int quadros = clip.frameCount();
+            int estica = Math.min(3, quadros - 1);
+            int quadro;
+            if (f.ultraPhase == CombatFighter.ULTRA_STARTUP) {
+                float t = clamp(f.ultraFrame / (float)engine.config.dragaoPreparo, 0f, 1f);
+                quadro = t < 0.82f ? 0 : t < 0.9f ? 1 : estica;
+            } else if (f.ultraPhase == CombatFighter.ULTRA_RECOVERY) {
+                float t = clamp(f.ultraFrame / (float)engine.config.ultraRecoveryFrames, 0f, 1f);
+                quadro = Math.min(quadros - 1, estica + Math.round(t * (quadros - 1 - estica)));
+            } else {
+                quadro = estica;
+            }
+            animation = clip.id;
+            animationElapsed = clip.timeOfFrame(quadro);
         }
         if (animation == null && f.status == CombatFighter.Status.ULTRA) {
             // Activation uses the Super charge clip; rush and recovery reuse the heavy strike.
@@ -5223,9 +5269,11 @@ public class GameView extends SurfaceView
             CombatFighter f = engine.fighter(side);
             if (!f.inUltraDragao() || f.ultraFrame != 0) continue;
             String nome = "ultra_shinkai_" + f.state.character.id;
-            float x = f.x + f.facing * engine.config.dragaoOrigem;
+            CombatConfig cfg = engine.config;
+            // A cabeça entra de fora da tela, por trás dele, e anda como no motor até o rabo sair do outro lado.
+            float x = f.x + f.facing * (cfg.dragaoOrigem - cfg.dragaoAtras);
             float y = f.y - f.character().visualStandHeight * 0.62f;
-            efeitos.tocar(nome, x, y, 1f, f.facing < 0);
+            efeitos.tocarAndando(nome, x, y, 1f, f.facing < 0, cfg.dragaoVelocidade, cfg.dragaoQuadros * FIXED_STEP * 1000f);
             ultraSounds.play(ultraFolder(f.state), "investida");
             ultraSounds.playFight("punish", 1f, 0.8f);
         }

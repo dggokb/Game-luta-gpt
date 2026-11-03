@@ -1665,17 +1665,42 @@ final class GlRenderCanvas implements RenderCanvas {
             GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT);
         }
         float w = tx.largura, h = tx.altura, al = alpha / 255f;
-        // Cada linha traz a esquerda e a direita; entre duas linhas, um quadrilátero.
+        // Cada linha traz a esquerda e a direita; entre duas linhas, um quadrilátero. Ele é
+        // dividido em colunas: no chão em perspectiva a linha de cima e a de baixo mostram
+        // larguras diferentes da imagem, e um quadrilátero da tela inteira em dois triângulos
+        // entorta a imagem de um jeito em cada triângulo (um dente por faixa nas linhas
+        // diagonais do piso). Em colunas estreitas o dente fica menor que um pixel.
         for (int i = 0; i < linhas - 1; i++) {
             int p = i * 4, q = p + 4;
-            reservar(6);
-            vertice(xy[p], xy[p + 1], uv[p] / w, uv[p + 1] / h, al, al, al, al, 1f);
-            vertice(xy[p + 2], xy[p + 3], uv[p + 2] / w, uv[p + 3] / h, al, al, al, al, 1f);
-            vertice(xy[q + 2], xy[q + 3], uv[q + 2] / w, uv[q + 3] / h, al, al, al, al, 1f);
-            vertice(xy[p], xy[p + 1], uv[p] / w, uv[p + 1] / h, al, al, al, al, 1f);
-            vertice(xy[q + 2], xy[q + 3], uv[q + 2] / w, uv[q + 3] / h, al, al, al, al, 1f);
-            vertice(xy[q], xy[q + 1], uv[q] / w, uv[q + 1] / h, al, al, al, al, 1f);
+            float largura = Math.max(Math.abs(xy[p + 2] - xy[p]), Math.abs(xy[q + 2] - xy[q]));
+            int colunas = Math.max(1, Math.min(FAIXA_COLUNAS, Math.round(largura / FAIXA_COLUNA_PX)));
+            reservar(6 * colunas);
+            for (int k = 0; k < colunas; k++) {
+                float a = k / (float)colunas, b = (k + 1) / (float)colunas;
+                float pxa = lerp(xy[p], xy[p + 2], a), pya = lerp(xy[p + 1], xy[p + 3], a);
+                float pxb = lerp(xy[p], xy[p + 2], b), pyb = lerp(xy[p + 1], xy[p + 3], b);
+                float qxa = lerp(xy[q], xy[q + 2], a), qya = lerp(xy[q + 1], xy[q + 3], a);
+                float qxb = lerp(xy[q], xy[q + 2], b), qyb = lerp(xy[q + 1], xy[q + 3], b);
+                float pua = lerp(uv[p], uv[p + 2], a) / w, pva = lerp(uv[p + 1], uv[p + 3], a) / h;
+                float pub = lerp(uv[p], uv[p + 2], b) / w, pvb = lerp(uv[p + 1], uv[p + 3], b) / h;
+                float qua = lerp(uv[q], uv[q + 2], a) / w, qva = lerp(uv[q + 1], uv[q + 3], a) / h;
+                float qub = lerp(uv[q], uv[q + 2], b) / w, qvb = lerp(uv[q + 1], uv[q + 3], b) / h;
+                vertice(pxa, pya, pua, pva, al, al, al, al, 1f);
+                vertice(pxb, pyb, pub, pvb, al, al, al, al, 1f);
+                vertice(qxb, qyb, qub, qvb, al, al, al, al, 1f);
+                vertice(pxa, pya, pua, pva, al, al, al, al, 1f);
+                vertice(qxb, qyb, qub, qvb, al, al, al, al, 1f);
+                vertice(qxa, qya, qua, qva, al, al, al, al, 1f);
+            }
         }
+    }
+
+    /** Colunas das faixas: no máximo tantas, uma a cada tantos pixels da tela virtual. */
+    private static final int FAIXA_COLUNAS = 24;
+    private static final float FAIXA_COLUNA_PX = 48f;
+
+    private static float lerp(float a, float b, float t) {
+        return a + (b - a) * t;
     }
 
     @Override public void fillRadialGlow(float cx, float cy, float radius, int argbCenter) {

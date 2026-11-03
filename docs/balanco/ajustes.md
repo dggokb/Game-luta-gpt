@@ -1650,3 +1650,21 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
 - **Simulado (`BateriaKof`, 960 lutas por nível):** o Ryūga fica com 77% / 68% (era 77% / 69%) e o
   desvio do elenco não muda.
 - **Testes:** dois novos em `UltraShinkaiTest` (o combo atravessando a tela sem andar, e o defendido).
+
+### Ultra SHINKAI do Ryūga v2 e chão serrilhado (pedido do jogador, 03/11)
+
+- **Cena igual à transformação:** a luta para (relógio e projéteis esperam), a câmera fecha no
+  Ryūga, o resto escurece, entram as faixas pretas e o corte com o retrato. Ele arma o **soco
+  (jab)** devagar e solta (80 quadros).
+- **O dragão:**
+  - entra de fora da tela por trás dele, atravessa a tela inteira mais devagar (24 px por quadro;
+    eram 40) e sai do outro lado (170 quadros);
+  - quem está na frente fica parado até a cabeça chegar;
+  - depois leva os 7 golpes, um a cada 8 quadros, e voa no último.
+- **O desenho:** um ciclo de 16 quadros do corpo ondulando, que o jogo leva pela tela
+  (`EfeitosVideo.tocarAndando`). O corpo segue o caminho da cabeça e o ciclo emenda sem pulo.
+- **Chão serrilhado:**
+  - cada faixa do piso em perspectiva era um quadrilátero da largura da tela em dois triângulos;
+  - cada triângulo esticava a imagem de um jeito, e isso dava um dente por faixa nas linhas
+    diagonais (mais visível com a câmera mais perto);
+  - agora a faixa é dividida em colunas: 24 no OpenGL e 16 no Canvas.

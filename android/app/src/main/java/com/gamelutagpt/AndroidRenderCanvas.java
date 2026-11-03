@@ -243,10 +243,41 @@ final class AndroidRenderCanvas implements RenderCanvas {
         }
         stripPaint.setShader(shader);
         stripPaint.setAlpha(alpha);
-        // Esquerda e direita de cada linha, de cima para baixo: a tira de triângulos forma os
-        // quadriláteros entre uma linha e a próxima.
-        canvas.drawVertices(Canvas.VertexMode.TRIANGLE_STRIP, linhas * 4, xy, 0, uv, 0, null, 0, null, 0, 0, stripPaint);
+        // Esquerda e direita de cada linha, de cima para baixo: entre uma linha e a próxima, um
+        // quadrilátero dividido em colunas (no chão em perspectiva, dois triângulos da largura da
+        // tela entortam a imagem cada um de um jeito: um dente por faixa nas linhas diagonais).
+        // Uma tira só: em cada par de linhas, cima e baixo alternando coluna a coluna; entre um par
+        // e o próximo, dois cantos repetidos (triângulos sem área) emendam as tiras.
+        int n = (linhas - 1) * ((STRIP_COLUNAS + 1) * 4 + 4);
+        if (stripXY.length < n) {
+            stripXY = new float[n];
+            stripUV = new float[n];
+        }
+        int k = 0;
+        for (int i = 0; i < linhas - 1; i++) {
+            int p = i * 4, q = p + 4;
+            if (i > 0) k = cantoFaixa(xy, uv, p, 0f, k);   // emenda: repete o primeiro canto
+            for (int c = 0; c <= STRIP_COLUNAS; c++) {
+                float t = c / (float)STRIP_COLUNAS;
+                k = cantoFaixa(xy, uv, p, t, k);
+                k = cantoFaixa(xy, uv, q, t, k);
+            }
+            if (i < linhas - 2) k = cantoFaixa(xy, uv, q, 1f, k);   // emenda: repete o último canto
+        }
+        canvas.drawVertices(Canvas.VertexMode.TRIANGLE_STRIP, k, stripXY, 0, stripUV, 0, null, 0, null, 0, 0, stripPaint);
         stripPaint.setShader(null);
+    }
+
+    private static final int STRIP_COLUNAS = 16;
+    private float[] stripXY = new float[0], stripUV = new float[0];
+
+    /** Um canto da coluna: o ponto na fração {@code t} da linha que começa em {@code p}. */
+    private int cantoFaixa(float[] xy, float[] uv, int p, float t, int k) {
+        stripXY[k] = xy[p] + (xy[p + 2] - xy[p]) * t;
+        stripXY[k + 1] = xy[p + 1] + (xy[p + 3] - xy[p + 1]) * t;
+        stripUV[k] = uv[p] + (uv[p + 2] - uv[p]) * t;
+        stripUV[k + 1] = uv[p + 1] + (uv[p + 3] - uv[p + 1]) * t;
+        return k + 2;
     }
 
     /**

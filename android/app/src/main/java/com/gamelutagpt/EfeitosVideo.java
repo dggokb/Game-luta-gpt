@@ -69,6 +69,8 @@ final class EfeitosVideo {
 
     private final Folha[] tocando = new Folha[VAGAS];
     private final float[] x = new float[VAGAS], y = new float[VAGAS], escala = new float[VAGAS], idadeMs = new float[VAGAS];
+    /** Efeito que anda (px do mundo por passo) e repete os quadros até {@link #fimMs} (-1: toca uma vez). */
+    private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
     private int proxima;
 
@@ -177,6 +179,21 @@ final class EfeitosVideo {
         escala[i] = tamanho;
         espelhado[i] = espelhar;
         idadeMs[i] = 0f;
+        vx[i] = 0f;
+        fimMs[i] = -1f;
+        return true;
+    }
+
+    /**
+     * Toca o efeito andando: a origem anda {@code vxPorPasso} px do mundo a cada passo (para a
+     * esquerda se espelhado) e os quadros se repetem até {@code duracaoMs} (o dragão do Ultra
+     * SHINKAI: um ciclo do corpo ondulando, levado pela tela).
+     */
+    boolean tocarAndando(String nome, float px, float py, float tamanho, boolean espelhar, float vxPorPasso, float duracaoMs) {
+        if (!tocar(nome, px, py, tamanho, espelhar)) return false;
+        int i = (proxima + VAGAS - 1) % VAGAS;
+        vx[i] = espelhar ? -vxPorPasso : vxPorPasso;
+        fimMs[i] = duracaoMs;
         return true;
     }
 
@@ -185,7 +202,9 @@ final class EfeitosVideo {
         for (int i = 0; i < VAGAS; i++) {
             if (tocando[i] == null) continue;
             idadeMs[i] += MS_POR_PASSO;
-            if (idadeMs[i] >= tocando[i].duracaoMs()) tocando[i] = null;
+            x[i] += vx[i];
+            float fim = fimMs[i] >= 0f ? fimMs[i] : tocando[i].duracaoMs();
+            if (idadeMs[i] >= fim) tocando[i] = null;
         }
     }
 
@@ -206,7 +225,8 @@ final class EfeitosVideo {
             int i = (proxima + j) % VAGAS;
             Folha f = tocando[i];
             if (f == null) continue;
-            int q = f.quadroEm(idadeMs[i]);
+            float idade = fimMs[i] >= 0f && f.duracaoMs() > 0f ? idadeMs[i] % f.duracaoMs() : idadeMs[i];
+            int q = f.quadroEm(idade);
             if (q < 0) continue;
             int[] r = f.quadros[q];
             fonte.set(r[0], r[1], r[0] + r[2], r[1] + r[3]);
