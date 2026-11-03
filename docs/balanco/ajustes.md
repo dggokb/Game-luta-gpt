@@ -1600,3 +1600,18 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   o motor dava erro (a luta 2x2 podia fechar). Agora a leitura só desequilibra quem está em campo,
   e um assist sem golpe sai de cena. Teste: `Luta2x2SemErroTest`.
 - **Detalhes:** `perfis/tempo-2x2.md`.
+
+## Vida nova do SHINKAI pela metade (escolha do jogador, 03/11)
+
+- A vida nova do SHINKAI passou a ser **50% da vida** do lutador (era a vida inteira). A barra
+  dourada aparece como meia barra; o limite da Ruptura (15%) e a trava (7,5%) seguem a vida nova.
+- **Medido (100% → 75% → 50%):**
+
+  | vida nova | 2x2 TIME OVER (nível 5 / 8) | 2x2 duração no nível 8 | 1x1 duração no nível 8 | desvio 1x1 (nível 5 / 8) |
+  |---|---|---|---|---|
+  | 100% | 20% / 35% | 181 s | 96 s | 20,1 / 17,0 |
+  | 75% | 3% / 16% | 166 s | 83 s | 21,6 / 16,7 |
+  | 50% | 1% / 4% | 148 s | 71 s | 19,5 / 16,8 |
+
+- **Ficou 50%:** quase acaba com o TIME OVER no 2x2, e o equilíbrio do elenco fica igual.
+- **Detalhes:** `perfis/shinkai-vida-nova-75-50.md`.

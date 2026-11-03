@@ -698,9 +698,10 @@ final class CombatConfig {
     /**
      * A reserva ao ligar, em milésimos da vida inteira DELE (cada um tem a sua: o Ryūga 14000).
      * 1000 = uma vida nova inteira (pedido do jogador: "o SHINKAI é um novo life", como a
-     * transformação dos animes).
+     * transformação dos animes). Agora 500, meia vida (escolha do jogador, 03/11): no 2x2 o TIME OVER
+     * do nível 8 caiu de 35% para 4% e o equilíbrio do elenco ficou igual (docs/balanco/ajustes.md).
      */
-    int ryugaReservaPermille = 1000;
+    int ryugaReservaPermille = 500;
     /** Reserva neste tanto (milésimos da reserva cheia) ou menos: no limite (dá para escolher a Ruptura). */
     int ryugaReservaLimitePermille = 150;
     /**
