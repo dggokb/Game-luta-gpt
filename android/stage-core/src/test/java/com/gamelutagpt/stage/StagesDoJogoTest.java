@@ -26,6 +26,11 @@ public class StagesDoJogoTest {
                 for (StageDefinition.Banner b : layer.banners) existe(pasta, b.image);
                 for (StageDefinition.Crowd cr : layer.crowds) if (cr.mask != null) existe(pasta, cr.mask);
             }
+            // A luz do lugar nos lutadores: todo cenário tem a sua, sem apagar nem estourar o corpo.
+            assertTrue(pasta.getName() + " sem luzLutadores", def.fighterLight != null);
+            for (float k : def.fighterLight.factors()) {
+                assertTrue(pasta.getName() + " luz " + k, k > 0.55f && k < 1.15f);
+            }
             if (def.floor != null) {
                 existe(pasta, def.floor.image);
                 if (def.floor.plainImage != null) existe(pasta, def.floor.plainImage);

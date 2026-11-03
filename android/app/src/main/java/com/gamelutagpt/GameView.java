@@ -5529,7 +5529,7 @@ public class GameView extends SurfaceView
         if (folego != 1f && f.grounded && !f.attacking() && !f.inHitstun()) {
             c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
         }
-        renderer.setTint(corDoLado(f, desgaste.tinta(f.state)));
+        renderer.setTint(corDoLado(f, luzNoLutador(desgaste.tinta(f.state))));
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
@@ -5561,6 +5561,63 @@ public class GameView extends SurfaceView
      * 2x2 vale para qualquer um do time 2 (em campo, no assist ou saindo) que também esteja no
      * time 1, em campo ou na reserva.
      */
+    /**
+     * A luz do cenário no lutador (stage.json "luzLutadores": sol, noite, chuva, lanternas) por
+     * cima do desgaste, e o clarão do relâmpago quando cai um. É a mesma matriz de cor que o
+     * lutador já usava: não custa desenho a mais. Guardada por tinta e nível do clarão.
+     */
+    private Filtro luzNoLutador(Filtro tinta) {
+        com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
+        com.gamelutagpt.stage.StageDefinition.FighterLight luz = def != null ? def.fighterLight : null;
+        int clarao = 0;
+        if (stageScene != null && def != null && def.lightning != null) {
+            clarao = Math.max(0, Math.min(LUZ_CLARAO_NIVEIS, Math.round(stageScene.lightningFlash() * LUZ_CLARAO_NIVEIS)));
+        }
+        if (luz == null && clarao == 0) return tinta;
+        if (def != luzDoCenario) {
+            luzes.clear();
+            luzSemTinta = new Filtro[LUZ_CLARAO_NIVEIS + 1];
+            luzDoCenario = def;
+        }
+        Filtro[] niveis;
+        if (tinta == null) {
+            niveis = luzSemTinta;
+        } else {
+            niveis = luzes.get(tinta);
+            if (niveis == null) {
+                niveis = new Filtro[LUZ_CLARAO_NIVEIS + 1];
+                luzes.put(tinta, niveis);
+            }
+        }
+        if (niveis[clarao] == null) {
+            float[] k = luz != null ? luz.factors() : new float[] {1f, 1f, 1f};
+            // O relâmpago: a luz do lugar some e o corpo clareia (até +60% e um pouco de azul).
+            float c = clarao / (float)LUZ_CLARAO_NIVEIS;
+            int cor = def.lightning != null ? def.lightning.color : 0xFFFFFFFF;
+            float[] m = new float[20];
+            for (int i = 0; i < 3; i++) {
+                float relampago = 1f + 0.6f * (((cor >> (16 - 8 * i)) & 0xFF) / 255f);
+                m[i * 6] = k[i] + (relampago - k[i]) * c;
+                m[i * 5 + 4] = 40f * c * (((cor >> (16 - 8 * i)) & 0xFF) / 255f);
+            }
+            m[18] = 1f;
+            ColorMatrix luzMatriz = new ColorMatrix(m);
+            if (tinta != null && tinta.matriz != null) {
+                ColorMatrix junto = new ColorMatrix(tinta.matriz);
+                junto.postConcat(luzMatriz);
+                niveis[clarao] = Filtro.matriz(junto);
+            } else {
+                niveis[clarao] = Filtro.matriz(luzMatriz);
+            }
+        }
+        return niveis[clarao];
+    }
+
+    private static final int LUZ_CLARAO_NIVEIS = 4;
+    private com.gamelutagpt.stage.StageDefinition luzDoCenario;
+    private Filtro[] luzSemTinta = new Filtro[LUZ_CLARAO_NIVEIS + 1];
+    private final java.util.Map<Filtro, Filtro[]> luzes = new java.util.IdentityHashMap<>();
+
     private Filtro corDoLado(CombatFighter f, Filtro tinta) {
         if (f.index != 1 || f.character() == null || !noTimeDoLado1(f.character().id)) return tinta;
         if (tinta == null) {

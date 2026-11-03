@@ -30,7 +30,8 @@ import java.util.Map;
  *             "centroX": 700, "reflexoLutadores": 0.25 },
  *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" },
  *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
- *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 }
+ *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 },
+ *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9 }
  * }
  * </pre>
  */
@@ -450,9 +451,38 @@ public final class StageDefinition {
     public final Rain rain;
     /** Null quando o cenário não tem relâmpagos. */
     public final Lightning lightning;
+    /** A luz do cenário nos lutadores (sol, noite, chuva, lanternas); null = sem tom. */
+    public final FighterLight fighterLight;
+
+    /**
+     * A luz do lugar sobre os lutadores: cada canal da cor multiplicado por
+     * {@code brilho × ((1 − forca) + forca × cor)}. Uma matriz de cor só, somada ao filtro que o
+     * lutador já usa (o desgaste): não custa um desenho a mais.
+     */
+    public static final class FighterLight {
+        public final int color;
+        public final float strength, brightness;
+
+        FighterLight(int color, float strength, float brightness) {
+            this.color = color;
+            this.strength = strength;
+            this.brightness = brightness;
+        }
+
+        /** O fator de cada canal (vermelho, verde, azul). */
+        public float[] factors() {
+            float[] f = new float[3];
+            for (int i = 0; i < 3; i++) {
+                float c = ((color >> (16 - 8 * i)) & 0xFF) / 255f;
+                f[i] = brightness * ((1f - strength) + strength * c);
+            }
+            return f;
+        }
+    }
 
     private StageDefinition(String name, float cameraDistance, float horizon, int backgroundColor,
-                            List<Layer> layers, Floor floor, Petals petals, Rain rain, Lightning lightning) {
+                            List<Layer> layers, Floor floor, Petals petals, Rain rain, Lightning lightning,
+                            FighterLight fighterLight) {
         this.name = name;
         this.cameraDistance = cameraDistance;
         this.horizon = horizon;
@@ -462,6 +492,7 @@ public final class StageDefinition {
         this.petals = petals;
         this.rain = rain;
         this.lightning = lightning;
+        this.fighterLight = fighterLight;
     }
 
     // ------------------------------------------------------------- leitura
@@ -553,8 +584,16 @@ public final class StageDefinition {
                 clamp01(number(lightningMap, "claraoCena", 0.12f)));
         }
 
+        FighterLight light = null;
+        Map<String, Object> lightMap = object(map, "luzLutadores");
+        if (lightMap != null) {
+            float brilho = number(lightMap, "brilho", 1f);
+            if (brilho <= 0f || brilho > 2f) throw new IllegalArgumentException("luzLutadores: \"brilho\" entre 0 e 2");
+            light = new FighterLight(color(lightMap, "cor", 0xFFFFFFFF), clamp01(number(lightMap, "forca", 0.3f)), brilho);
+        }
+
         return new StageDefinition(name.trim(), distance, horizon,
-            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning);
+            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light);
     }
 
     @SuppressWarnings("unchecked")

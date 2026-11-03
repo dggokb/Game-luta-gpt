@@ -6,6 +6,7 @@
     "horizonte": 0.4
   },
   "corFundo": "#070B1E",
+  "luzLutadores": { "cor": "#A8C4FF", "forca": 0.4, "brilho": 0.88 },
   "camadas": [
     {
       "id": "ceu",

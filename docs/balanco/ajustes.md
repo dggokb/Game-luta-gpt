@@ -1668,3 +1668,25 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
   - cada triângulo esticava a imagem de um jeito, e isso dava um dente por faixa nas linhas
     diagonais (mais visível com a câmera mais perto);
   - agora a faixa é dividida em colunas: 24 no OpenGL e 16 no Canvas.
+
+## Luz do cenário nos lutadores (pedido do jogador, 03/11)
+
+- Cada cenário tem a sua luz nos lutadores (`stage.json`, `"luzLutadores": {cor, forca, brilho}`).
+  Cada canal da cor é multiplicado por `brilho × ((1 − forca) + forca × cor)`.
+
+  | cenário | luz | cor, força, brilho |
+  |---|---|---|
+  | Arena Central | noite com névoa: lilás | #B4B8EC, 0,35, 0,92 |
+  | Arena Costeira | noite: azul | #A8B4E6, 0,35, 0,90 |
+  | Arena Imperial | cerejeira vermelha | #FFA090, 0,30, 0,95 |
+  | Beco do Brucy | chuva à noite: azul e mais escuro | #9CA8D8, 0,40, 0,82 |
+  | Caminho dos Penhascos | dia rosado | #FFE4DC, 0,15, 1,00 |
+  | Dojo Shūshinkan | lanternas: laranja | #FFC890, 0,35, 0,92 |
+  | Dojo Liánwǔguǎn | sol: quase neutra, um pouco mais clara | #FFF0D4, 0,15, 1,03 |
+  | Porto Secreto | luzes quentes da noite | #FFD8A8, 0,25, 0,90 |
+  | Templo da Lua | neon roxo | #C8A8F0, 0,35, 0,88 |
+  | Terraço da Lua | luar: azul | #A8C4FF, 0,40, 0,88 |
+
+- **Relâmpagos (Beco do Brucy):** quando cai um, o corpo clareia no clarão (até +60%).
+- **Sem custo:** é a mesma matriz de cor que o lutador já usava (o desgaste), só composta. Fica
+  guardada por tinta e nível do clarão, sem desenho a mais.

@@ -697,4 +697,15 @@ public class StageSceneTest {
         @Override public void beginInvert() {}
         @Override public void endInvert() {}
     }
+
+    @Test
+    public void aLuzDosLutadoresViraUmFatorPorCanal() {
+        StageDefinition def = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], "
+            + "\"luzLutadores\": {\"cor\": \"#FF8000\", \"forca\": 0.5, \"brilho\": 0.8}}");
+        float[] k = def.fighterLight.factors();
+        org.junit.Assert.assertEquals(0.8f, k[0], 1e-3f);              // vermelho cheio
+        org.junit.Assert.assertEquals(0.8f * (0.5f + 0.5f * 128f / 255f), k[1], 1e-3f);
+        org.junit.Assert.assertEquals(0.4f, k[2], 1e-3f);              // sem azul: metade da força some
+        org.junit.Assert.assertNull(StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": []}").fighterLight);
+    }
 }
