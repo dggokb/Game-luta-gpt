@@ -121,4 +121,17 @@ public class ShinkaiReservaTest {
         m.in[0].shinkai = true;
         assertTrue(m.ate("SHINKAI_FIM", 3));
     }
+
+    @Test public void responderATransformacaoEhUmChoqueDeAurasSemMinigame() {
+        Match m = new Match("p13", "p15", 600f, 900f);
+        m.shinkai();
+        // O rival responde com a dele.
+        m.b.shinkai = CombatConfig.SHINKAI_MAX;
+        m.in[1].shinkai = true;
+        m.step();
+        assertTrue(m.engine.cues().contains("SHINKAI_CHOQUE"));
+        assertNull("sem o minigame do Clash", m.engine.shinkaiClash());
+        for (int i = 0; i < 240; i++) m.step();
+        assertTrue("os dois seguem transformados", m.a.inShinkai() && m.b.inShinkai());
+    }
 }

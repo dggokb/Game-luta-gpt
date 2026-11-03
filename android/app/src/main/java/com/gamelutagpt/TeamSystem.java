@@ -403,8 +403,10 @@ final class TeamSystem {
             if (m.esquivaRecarga > 0 && !engine.superFreezeActive()) m.esquivaRecarga--;
             if (m.rastroQuadros > 0 && !engine.superFreezeActive()) m.rastroQuadros--;
             if (m.shinkaiFrames <= 0) continue;
-            if (m != s.pointState()) m.shinkaiFrames = 0;
-            else if (!engine.superFreezeActive() && (m.shinkaiType == Shinkai.Type.PERCEPCAO || engine.porReserva(m))) {
+            if (m != s.pointState()) {
+                // Fora de campo: na regra da reserva a transformação fica guardada (volta transformado).
+                if (!(config.shinkaiGuardaNaTroca && engine.porReserva(m))) m.shinkaiFrames = 0;
+            } else if (!engine.superFreezeActive() && (m.shinkaiType == Shinkai.Type.PERCEPCAO || engine.porReserva(m))) {
                 engine.desgastar(m);
                 // ENERGY: a barra de Super enche sozinha (também na regra da reserva).
                 if (m.shinkaiType == Shinkai.Type.ENERGY && m.shinkaiFrames > 0) m.addSuperMeter(config.shinkaiEnergyMeterPerFrame);

@@ -657,6 +657,19 @@ final class CombatConfig {
     /** Depois da cena de ativação, este tanto de quadros em que apertar SHINKAI de novo não desliga. */
     int shinkaiGraca = 30;
     /**
+     * Responder a transformação do outro com a sua: false (o padrão desde 03/11, pedido do
+     * jogador: "o Clash está atrapalhando a fluidez") = os dois ficam transformados, com um choque
+     * de auras que afasta os dois e a luta segue; true = o SHINKAI Clash de antes (o minigame).
+     */
+    boolean shinkaiClashMinigame = false;
+    /** O choque de auras: quanto cada um é empurrado (vezes o empurrão do combo breaker). */
+    float shinkaiChoqueEmpurrao = 0.7f;
+    /**
+     * Na regra da reserva, quem sai de campo (troca) guarda a transformação: a vida nova fica como
+     * estava e ele volta transformado (pedido do jogador, 03/11). false = a troca apaga o SHINKAI.
+     */
+    boolean shinkaiGuardaNaTroca = true;
+    /**
      * A reserva ao ligar, em milésimos da vida inteira DELE (cada um tem a sua: o Ryūga 14000).
      * 1000 = uma vida nova inteira (pedido do jogador: "o SHINKAI é um novo life", como a
      * transformação dos animes).

@@ -2135,6 +2135,7 @@ public class GameView extends SurfaceView
             if ("LEITURA".equals(cue) || "ESQUIVA".equals(cue)) spawnLeitura();
             if ("PRECISO".equals(cue) || "RUPTURA".equals(cue)) beamShake = Math.max(beamShake, 14f);
             if ("SHINKAI_QUEBRA".equals(cue)) beamShake = Math.max(beamShake, 22f);
+            if ("SHINKAI_CHOQUE".equals(cue)) beamShake = Math.max(beamShake, 20f);
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
@@ -3438,6 +3439,7 @@ public class GameView extends SurfaceView
             case "RUPTURA": return "RUPTURA!";
             case "LIMITE_FIM": case "RUPTURA_FIM": return "EXAUSTO!";
             case "SHINKAI_QUEBRA": return "TRANSFORMAÇÃO QUEBRADA!";
+            case "SHINKAI_CHOQUE": return "CHOQUE DE AURAS!";
             case "SHINKAI_FIM": return "SHINKAI DESLIGADO";
             default: return null;
         }

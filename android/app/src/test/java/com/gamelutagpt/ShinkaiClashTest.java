@@ -327,6 +327,8 @@ public class ShinkaiClashTest {
     static CombatConfig relogio() {
         CombatConfig c = new CombatConfig();
         c.shinkaiReservaTodos = false;
+        // O minigame do Clash (desligado no jogo desde 03/11) segue testado aqui.
+        c.shinkaiClashMinigame = true;
         return c;
     }
 }

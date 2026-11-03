@@ -68,7 +68,7 @@ public class CpuSpecialsTest {
         // A esquiva contra a bola é um dos planos que ela aprende (AiController.escolherPlanoBola):
         // contra o p11, que solta pouca bola, ela aprende a só defender; contra quem solta bola
         // de verdade a esquiva-sumiço aparece.
-        Map<String, Integer> contraBola = specialsUsed("p05", "player_base", 8, 6);
+        Map<String, Integer> contraBola = specialsUsed("p05", "player_base", 8, 14);
         assertTrue("p05 usa a esquiva-sumiço (S3): " + contraBola, contraBola.getOrDefault("S3", 0) > 0);
         // A Onda do Ryūga aparece menos nas lutas em que ele se transforma (o SHINKAI é uma vida
         // nova e a luta fica perto dele): mais lutas para ver o repel.

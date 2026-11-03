@@ -716,7 +716,17 @@ final class CombatEngine {
         other.hitstop = Math.max(other.hitstop, congela);
         superFreeze = Math.max(superFreeze, congela);
         cues.add("SHINKAI");
-        if (canClash(other)) startShinkaiClash(f, other);
+        if (canClash(other)) {
+            if (config.shinkaiClashMinigame) {
+                startShinkaiClash(f, other);
+            } else {
+                // Respondeu a transformação: choque de auras (os dois afastam) e a luta segue com os dois transformados.
+                float mid = (f.x + other.x) / 2f;
+                pushApart(f, mid, config.shinkaiChoqueEmpurrao);
+                pushApart(other, mid, config.shinkaiChoqueEmpurrao);
+                cues.add("SHINKAI_CHOQUE");
+            }
+        }
     }
 
     /**

@@ -662,3 +662,35 @@ não veio uma barra cheia").
   | piso da Ruptura | 10% da vida |
 
 - Conferido desenhando o HUD sem tela, com 600 de vida: a camada cobre a barra inteira.
+
+### Sem o minigame do Clash, e a troca guarda a transformação (decisão do jogador, 03/11)
+
+Veio do quarto registro real ("do nada eu perco meu SHINKAI"; ver `registro-luta.md`): 5 dos 10
+SHINKAIs do jogador acabaram desistindo no Clash e 4 trocando de lutador.
+
+**Resposta à transformação**
+- Quem responde se transforma na hora: um **choque de auras** afasta os dois, a tela treme e
+  aparece "CHOQUE DE AURAS!".
+- A luta segue com os dois transformados.
+- O minigame continua no código (`shinkaiClashMinigame`) e nos testes do Clash.
+
+**Troca**
+- Na regra da reserva, quem sai de campo guarda a vida nova e volta transformado
+  (`shinkaiGuardaNaTroca`).
+
+**Elenco** (`BateriaShinkaiElenco 2 8`): 16 × 16, nível 8, sem o minigame. Tabelas em
+`perfis/shinkai-vida-nova-elenco-sem-clash.md`.
+
+| medida | com o minigame | choque de auras |
+|---|---|---|
+| duração da luta | 86 s | 99 s |
+| viradas | 37% | 35% |
+| quem quebra a transformação do outro vence | 78% | 84% |
+| quem se transforma primeiro vence | 51% | 51% |
+| pior–melhor do elenco | 13%–73% | 7%–87% |
+
+**Leitura**
+- **Lutas mais longas:** o Clash tirava 2.000 de vida e às vezes o SHINKAI inteiro; sem ele, as
+  duas vidas novas ficam inteiras.
+- **POWER:** domina (p13 87%, p04 82%); a armadura com uma vida nova inteira pesa muito.
+- **TECHNIQUE:** cai (p15 7%, p14 17%).
