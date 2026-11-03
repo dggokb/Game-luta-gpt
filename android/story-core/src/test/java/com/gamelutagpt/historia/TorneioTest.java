@@ -381,7 +381,7 @@ public class TorneioTest {
 
     @Test
     public void ep03TemAsPaginasDoAdversarioDoPorto() throws IOException {
-        List<String> chegada = java.util.Arrays.asList("pag1_ryuga.jpg", "pag2_ryuga.jpg", "pag3_ryuga.jpg", "pag4_ryuga.jpg");
+        List<String> chegada = java.util.Arrays.asList("pag1_ryuga.jpg", "pag2_ryuga.jpg", "pag3.jpg", "pag4_ryuga.jpg");
         List<String> p05 = paginas("ep03", campanhaComPorto(Torneio.RYUGA, "p05"));
         assertEquals(chegada, p05.subList(0, 4));
         assertEquals(java.util.Arrays.asList("pag5_ryuga_p05.jpg", "LUTA"), p05.subList(4, 6));
@@ -400,38 +400,48 @@ public class TorneioTest {
             assertEquals(chegada, paginas.subList(0, 4));
             assertFalse(paginas.contains("pag3_q1.jpg"));
         }
-        // As páginas do Ryūga não aparecem para o Kōga, nem contra o p05.
-        List<String> koga = paginas("ep03", campanhaComPorto(Torneio.KOGA, "p05"));
-        assertFalse(koga.contains("pag5_ryuga_p05.jpg"));
-        assertEquals(java.util.Arrays.asList("pag1_q1.jpg", "pag2_koga.jpg", "pag3_q1.jpg", "LUTA"), koga.subList(0, 4));
+        // O Kōga tem a chegada dele (a viagem, pag3, é a mesma) e a página do adversário do porto;
+        // as do Ryūga não aparecem para ele.
+        List<String> chegadaKoga = java.util.Arrays.asList("pag1_koga.jpg", "pag2_koga.jpg", "pag3.jpg", "pag4_koga.jpg");
+        for (String adversario : new String[] {"p05", "p07", "p09", "p11"}) {
+            List<String> koga = paginas("ep03", campanhaComPorto(Torneio.KOGA, adversario));
+            assertEquals(chegadaKoga, koga.subList(0, 4));
+            assertEquals(java.util.Arrays.asList("pag5_koga_" + adversario + ".jpg", "LUTA"), koga.subList(4, 6));
+            assertFalse(koga.contains("pag5_ryuga_" + adversario + ".jpg"));
+            assertFalse(koga.contains("pag3_q1.jpg"));
+        }
     }
 
     @Test
-    public void cadaDuplaTemUmaPaginaNoPortoDoRyugaEAsSemGolpesEntramQuandoFicaremProntas() throws IOException {
+    public void cadaDuplaTemUmaPaginaNoPortoDosDoisIrmaosEAsSemGolpesEntramQuandoFicaremProntas() throws IOException {
         GameAssets assets = new GameAssets();
         Temporada temporada = Temporada.load(assets);
         Episodio ep03 = temporada.loadEpisodio(assets, "ep03");
-        List<String> cobertas = new ArrayList<>();
-        for (Episodio.Passo passo : ep03.passos) {
-            if (passo.adversario != null && Torneio.RYUGA.equals(passo.irmao)) cobertas.addAll(passo.adversario);
-        }
         List<String> duplas = new ArrayList<>();
         for (Torneio.Dupla d : duplas()) if (d.irmao == null) duplas.add(d.id);
-        java.util.Collections.sort(cobertas);
-        assertEquals(duplas, cobertas);
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            List<String> cobertas = new ArrayList<>();
+            for (Episodio.Passo passo : ep03.passos) {
+                if (passo.adversario != null && irmao.equals(passo.irmao)) cobertas.addAll(passo.adversario);
+            }
+            java.util.Collections.sort(cobertas);
+            assertEquals(irmao, duplas, cobertas);
+        }
         // Com a dupla pronta, o porto pode sorteá-la e a página dela aparece.
         for (String id : new String[] {"p13", "p15"}) {
             List<Torneio.Dupla> pronta = new ArrayList<>();
             for (Torneio.Dupla d : duplas()) pronta.add(id.equals(d.id) ? new Torneio.Dupla(d.id, d.lutadores, d.irmao, true) : d);
-            Campanha campanha = null;
-            for (long semente = 0; semente < 500 && campanha == null; semente++) {
-                Campanha c = new Campanha(pronta, semente);
-                c.escolher(Torneio.RYUGA);
-                if (id.equals(c.adversarioPorto().id)) campanha = c;
+            for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+                Campanha campanha = null;
+                for (long semente = 0; semente < 500 && campanha == null; semente++) {
+                    Campanha c = new Campanha(pronta, semente);
+                    c.escolher(irmao);
+                    if (id.equals(c.adversarioPorto().id)) campanha = c;
+                }
+                assertNotNull(id, campanha);
+                List<String> paginas = paginas("ep03", campanha);
+                assertEquals(java.util.Arrays.asList("pag5_" + irmao + "_" + id + ".jpg", "LUTA"), paginas.subList(4, 6));
             }
-            assertNotNull(id, campanha);
-            List<String> paginas = paginas("ep03", campanha);
-            assertEquals(java.util.Arrays.asList("pag5_ryuga_" + id + ".jpg", "LUTA"), paginas.subList(4, 6));
         }
     }
 

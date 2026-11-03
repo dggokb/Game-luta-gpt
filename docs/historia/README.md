@@ -148,9 +148,19 @@ ep01 = 12 a 22).
 | meio | 15 a 21 | `pag4` a `pag10` (comuns) | iguais |
 | fim | 22 | `pag11` (conversa com o Dafu) | `pag11_koga` (sai do dojo pensando na dupla) |
 
-No ep03 (A Chegada), o Ryūga tem 4 páginas prontas antes do desafio no porto: `pag1_ryuga` (o cais do
-continente com a Yin-lu), `pag2_ryuga` (a revelação: o Kōga também vem), `pag3_ryuga` (a viagem e a ilha) e
-`pag4_ryuga` (a chegada no meio da multidão). As páginas do Kōga no ep03 ainda são provisórias.
+No ep03 (A Chegada), cada irmão tem 4 páginas prontas antes do desafio no porto e uma página para cada
+dupla que o porto pode sortear:
+
+| ep03 | Ryūga | Kōga |
+|---|---|---|
+| o cais do continente | `pag1_ryuga` (com a Yin-lu) | `pag1_koga` (com o Brucy: "vamos para uma ilha?") |
+| a revelação | `pag2_ryuga` (o Kōga também vem) | `pag2_koga` (o Ryūga também foi convidado) |
+| a viagem e a ilha | `pag3` (comum) | `pag3` (comum) |
+| a chegada | `pag4_ryuga` (no meio da multidão) | `pag4_koga` (o "cheiro de briga" do Brucy) |
+| o desafio no cais | `pag5_ryuga_pNN` | `pag5_koga_pNN` |
+
+`pNN` é a dupla do adversário (`p05`, `p07`, `p09`, `p11`, `p13`, `p15`); só a página da dupla sorteada
+aparece (`"adversario"` no passo).
 
 ## Revisar no PC
 
