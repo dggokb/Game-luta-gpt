@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * Quantas lutas estouram o tempo (TIME OVER, pedido do jogador, 03/11). CPU × CPU no mesmo nível dos
  * dois lados: 1x1 com os 16 todos contra todos (cada par dos dois lados) e duplas sorteadas.
  *
- * <pre>args: [1x1|2x2|tudo] [níveis...] (padrão 2x2 3 5 8)</pre>
+ * <pre>args: [1x1|2x2|tudo] [reserva=permille] [níveis...] (padrão 2x2 3 5 8)</pre>
  */
 public final class BateriaTempo {
     private BateriaTempo() {}
@@ -29,8 +29,13 @@ public final class BateriaTempo {
         return m == 0 ? 0 : v / m;
     }
 
+    /** Vida nova do SHINKAI (permille da vida); -1 = a do jogo. */
+    static int reserva = -1;
+
     static Res luta(String[] t0, String[] t1, int nivel, long semente) {
-        BateriaBalanco.Luta l = new BateriaBalanco.Luta(t0, t1, nivel, semente, new CombatConfig());
+        CombatConfig cfg = new CombatConfig();
+        if (reserva >= 0) cfg.ryugaReservaPermille = reserva;
+        BateriaBalanco.Luta l = new BateriaBalanco.Luta(t0, t1, nivel, semente, cfg);
         Res r = new Res();
         r.t0 = t0;
         r.t1 = t1;
@@ -61,7 +66,8 @@ public final class BateriaTempo {
         List<String> modos = new ArrayList<>(Collections.singletonList("2x2"));
         List<Integer> ns = new ArrayList<>();
         for (String a : args) {
-            if (a.equals("tudo")) modos = Arrays.asList("1x1", "2x2");
+            if (a.startsWith("reserva=")) reserva = Integer.parseInt(a.substring(8));
+            else if (a.equals("tudo")) modos = Arrays.asList("1x1", "2x2");
             else if (a.contains("x")) modos = Collections.singletonList(a);
             else ns.add(Integer.parseInt(a));
         }
@@ -72,7 +78,8 @@ public final class BateriaTempo {
             return t;
         });
         String[] el = BateriaBalanco.ELENCO;
-        System.out.println("# Lutas que estouram o tempo (" + BattleFlow.TIME_LIMIT_SECONDS + " s no relógio, CPU × CPU)");
+        System.out.println("# Lutas que estouram o tempo (" + BattleFlow.TIME_LIMIT_SECONDS + " s no relógio, CPU × CPU, vida nova "
+            + (reserva >= 0 ? reserva / 10 : new CombatConfig().ryugaReservaPermille / 10) + "%)");
         System.out.println();
         System.out.println("| modo | nível | lutas | TIME OVER | duração média | 90% das lutas até | SHINKAIs por luta | vida no TIME OVER (vencedor / perdedor) |");
         System.out.println("|---|---|---|---|---|---|---|---|");

@@ -9,7 +9,7 @@ import java.util.function.Consumer;
  * rápido com a mesma altura e queda mais curta. CPU × CPU, 1x1, os 16 todos contra todos (cada par
  * dos dois lados), a mesma semente em cada variante.
  *
- * <pre>args: [-n=5,8] [-r=repetições] variante... (base | pulo=K | queda=N | pulo=K+queda=N)</pre>
+ * <pre>args: [-n=5,8] [-r=repetições] variante... (base | pulo=K | queda=N | reserva=permille | combinadas com +)</pre>
  *
  * pulo=K: o pulo normal leva K do tempo (altura e distância iguais): velocidade de subida e de lado /K,
  * gravidade do pulo /K². queda=N: quadros deitado antes do levantar normal.
@@ -36,6 +36,7 @@ public final class BateriaKof {
             switch (kv[0]) {
                 case "pulo": { float k = Float.parseFloat(kv[1]); a = prev.andThen(c -> pulo(c, k)); break; }
                 case "queda": { int n = Integer.parseInt(kv[1]); a = prev.andThen(c -> c.knockdownDownFrames = n); break; }
+                case "reserva": { int n = Integer.parseInt(kv[1]); a = prev.andThen(c -> c.ryugaReservaPermille = n); break; }
                 default: throw new IllegalArgumentException(p);
             }
         }
