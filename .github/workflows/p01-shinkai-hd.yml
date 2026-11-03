@@ -1,0 +1,154 @@
+name: P01 Shinkai HD - fighter sprite and activation effect
+
+on:
+  push:
+    branches:
+      - test/p01-shinkai-hd-20261103
+    paths:
+      - .github/workflows/p01-shinkai-hd.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p01-shinkai-hd-20261103
+  cancel-in-progress: false
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project Pillow dependency
+        run: python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Validate existing sprite and effect formats before super-resolution
+        run: |
+          python -m py_compile tools/sprites/p01_shinkai_hd.py
+          python tools/sprites/p01_shinkai_hd.py plan
+
+  render:
+    needs: inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        mode: [sprite, effect]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original CPU Real-ESRGAN dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt numpy scipy
+      - name: Download and checksum-check AnimeVideo-v3 model
+        run: |
+          curl --retry 3 -fLsS "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth" -o /tmp/realesr-animevideov3.pth
+          echo "Model will be SHA-256 verified by script before any render"
+      - name: Render HD while preserving approved alpha and effect timing
+        run: |
+          python -u tools/sprites/p01_shinkai_hd.py render --mode "${{ matrix.mode }}" --weights /tmp/realesr-animevideov3.pth --output-dir /tmp/shinkai-hd
+      - name: Save rendered P01 Shinkai data for safe integration
+        uses: actions/upload-artifact@v4
+        with:
+          name: shinkai-${{ matrix.mode }}
+          path: /tmp/shinkai-hd/
+          if-no-files-found: error
+          retention-days: 3
+
+  integrate:
+    needs: [inventory, render]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow for current WebP runtime
+        run: python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Download both verified HD sheets
+        uses: actions/download-artifact@v4
+        with:
+          pattern: shinkai-*
+          merge-multiple: true
+          path: /tmp/shinkai-hd
+      - name: Ensure both model outputs and manifests exist
+        run: |
+          test -s /tmp/shinkai-hd/player_base_shinkai.png
+          test -s /tmp/shinkai-hd/sprite-manifest.json
+          test -s /tmp/shinkai-hd/shinkai-effect.webp
+          test -s /tmp/shinkai-hd/shinkai-effect.json
+          test -s /tmp/shinkai-hd/effect-manifest.json
+      - name: Check 26 sprite and 35 effect frames and integrate only Shinkai assets
+        run: |
+          python -u tools/sprites/p01_shinkai_hd.py integrate --input-dir /tmp/shinkai-hd
+          git diff --check
+      - name: Ensure no changes in gameplay or other fighters
+        run: |
+          python - <<'PY'
+          import subprocess
+          rows=subprocess.check_output(['git','status','--porcelain','-uall'],text=True).splitlines()
+          allowed={
+            'art/sprites/source/player_base_shinkai_sr_hd.png',
+            'tools/sprites/clips/player_base_shinkai.json',
+            'tools/sprites/reports/player_base_shinkai.report.json',
+            'android/app/src/main/res/drawable-nodpi/player_base_shinkai.webp',
+            'android/app/src/main/assets/efeitos/shinkai_player_base/efeito.json',
+            'android/app/src/main/assets/efeitos/shinkai_player_base/folha.webp',
+            'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java',
+            'android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java',
+            'android/app/src/main/java/com/gamelutagpt/SpriteStates.java',
+            'docs/art/p01-shinkai-hd-results.json',
+          }
+          found={row[3:] for row in rows}
+          if found-allowed:
+              raise SystemExit('Unexpected non-Shinkai change: '+str(sorted(found-allowed)))
+          must={
+            'art/sprites/source/player_base_shinkai_sr_hd.png',
+            'tools/sprites/clips/player_base_shinkai.json',
+            'android/app/src/main/res/drawable-nodpi/player_base_shinkai.webp',
+            'android/app/src/main/assets/efeitos/shinkai_player_base/efeito.json',
+            'android/app/src/main/assets/efeitos/shinkai_player_base/folha.webp'
+          }
+          if not must.issubset(found):
+              raise SystemExit('Missing improved Shinkai assets: '+str(sorted(must-found)))
+          print('Validated Shinkai-only modified paths:',len(found))
+          PY
+      - name: Commit approved render artifacts to isolated test branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- art/sprites/source/player_base_shinkai_sr_hd.png
+          git add -- tools/sprites/clips/player_base_shinkai.json
+          git add -- tools/sprites/reports/player_base_shinkai.report.json
+          git add -- android/app/src/main/res/drawable-nodpi/player_base_shinkai.webp
+          git add -- android/app/src/main/assets/efeitos/shinkai_player_base/efeito.json
+          git add -- android/app/src/main/assets/efeitos/shinkai_player_base/folha.webp
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add -- android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          git add -- docs/art/p01-shinkai-hd-results.json
+          git diff --cached --check
+          git diff --cached --quiet && { echo "No Shinkai HD changes, abort"; exit 1; }
+          git commit -m "Generate P01 Shinkai 26 sprite + 35 effect frames in HD for testing [skip ci]"
+          git push origin HEAD:test/p01-shinkai-hd-20261103
+      - name: Archive lightweight verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-Shinkai-HD-validation
+          path: docs/art/p01-shinkai-hd-results.json
+          if-no-files-found: warn
+          retention-days: 3
