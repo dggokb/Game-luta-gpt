@@ -1,0 +1,13 @@
+{
+  "status": "P01 Shinkai HD source + effect integrated on test branch; visual review required",
+  "fighterFrames": 26,
+  "fighterPixelScale": 2,
+  "fighterMasterModel": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "fighterAtlasSha256": "c815655466eb1223209ae2b119868a84193da89f7c783e220bfb36d6e3efd196",
+  "effectFrames": 35,
+  "effectPixelScale": 1.125,
+  "effectAtlasSha256": "ae9a857a71b5fea37dc2879d7ee2a57ec2313f6a42f4a9af7aaaddca39fcbbee",
+  "unchangedFrameCounts": true,
+  "unchangedEffectTiming": true,
+  "unchangedFighterAlpha": true
+}

@@ -1,8 +1,8 @@
 {
   "id": "player_base_shinkai",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_shinkai_video_hd.png",
-  "sourceNote": "p01: ativa\u00e7\u00e3o do SHINKAI (cruza os bra\u00e7os no alto e desce com o arco de energia), v\u00eddeo shinkai.mp4 (Drive p01/animations), convertido por video_para_sprite.py.",
+  "source": "art/sprites/source/player_base_shinkai_sr_hd.png",
+  "sourceNote": "p01: ativa\u00e7\u00e3o do SHINKAI (cruza os bra\u00e7os no alto e desce com o arco de energia), v\u00eddeo shinkai.mp4 (Drive p01/animations), convertido por video_para_sprite.py. Real-ESRGAN AnimeVideo-v3 4x from original 1x, downsampled to 2x; preserves original approved HD alpha.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -537,12 +537,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f2b31395ca0961143f59a9a3e7f1b98f8251d821ba5e6253416f2458cc5ff477",
-      "config": "6a5d354b3e209fdc5c161a0384dd7f931432fa73140521207e168e905d6ae287",
+      "source": "bf92a81d7138db1a8a84d538848139d0a1ed2420372c40d1498b311fc661546c",
+      "config": "f8a9742931d320da9666a234728a6881269a1ccbd7551a522949d3c5c7da5826",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_shinkai_video_normalized.png": "01d9ea1f5a158de37fd44c1a500f0f2131eaa87fbf70fbfc1c39bd3f3d48adf0"
+      "art/sprites/source/player_base_shinkai_video_normalized.png": "01d9ea1f5a158de37fd44c1a500f0f2131eaa87fbf70fbfc1c39bd3f3d48adf0",
+      "art/sprites/source/player_base_shinkai_video_hd.png": "f2b31395ca0961143f59a9a3e7f1b98f8251d821ba5e6253416f2458cc5ff477"
     }
   }
 }
