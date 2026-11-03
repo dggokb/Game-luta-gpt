@@ -30,7 +30,9 @@ public final class Episodio {
      */
     public Episodio trecho(String de, String ate) {
         int first = de == null ? 0 : indiceDaMarca(de);
-        int last = ate == null ? passos.size() - 1 : indiceDaMarca(ate);
+        // A mesma marca pode estar num passo de cada irmão (o treino do Ryūga e o do Kōga):
+        // o trecho vai até o último deles.
+        int last = ate == null ? passos.size() - 1 : ultimoDaMarca(ate);
         if (last < first) throw new IllegalArgumentException(id + ": a marca \"" + ate + "\" vem antes de \"" + de + "\"");
         return new Episodio(id, numero, titulo, new ArrayList<>(passos.subList(first, last + 1)));
     }
@@ -41,6 +43,14 @@ public final class Episodio {
             if (marca.equals(passos.get(i).marca)) return i;
         }
         throw new IllegalArgumentException(id + ": nenhum passo com a marca \"" + marca + "\"");
+    }
+
+    /** Posição do último passo com essa {@code marca} (uma por irmão). */
+    public int ultimoDaMarca(String marca) {
+        int i = passos.size() - 1;
+        while (i >= 0 && !marca.equals(passos.get(i).marca)) i--;
+        if (i < 0) throw new IllegalArgumentException(id + ": nenhum passo com a marca \"" + marca + "\"");
+        return i;
     }
 
     /**
@@ -297,7 +307,8 @@ public final class Episodio {
         if (passos.isEmpty()) throw new IllegalArgumentException(id + ": episódio sem passos");
         java.util.Set<String> marcas = new java.util.HashSet<>();
         for (Passo p : passos) {
-            if (p.marca != null && !marcas.add(p.marca)) {
+            // Repetir a marca só vale em passos de irmãos diferentes (um para cada).
+            if (p.marca != null && !marcas.add(p.marca + "\u0000" + p.irmao)) {
                 throw new IllegalArgumentException(id + ": marca repetida \"" + p.marca + "\"");
             }
         }

@@ -39,6 +39,23 @@ public class CenasTest {
         assertEquals(2, ep.trecho("treino", null).passos.size());
     }
 
+    /** O treino do ep00 tem um passo para cada irmão com a mesma marca: o trecho vai até os dois. */
+    @Test
+    public void marcaUmaVezPorIrmaoFechaOTrechoNoUltimo() {
+        Episodio ep = Episodio.fromJson("{\"id\":\"e\",\"passos\":[{\"tipo\":\"titulo\"}," +
+            "{\"tipo\":\"luta\",\"marca\":\"treino\",\"irmao\":\"ryuga\"}," +
+            "{\"tipo\":\"luta\",\"marca\":\"treino\",\"irmao\":\"koga\"}," +
+            "{\"tipo\":\"proximo\",\"titulo\":\"B\"}]}");
+        assertEquals(3, ep.trecho(null, "treino").passos.size());
+        assertEquals("koga", ep.trecho(null, "treino").passos.get(2).irmao);
+        assertEquals(3, ep.trecho("treino", null).passos.size());
+        try {
+            Episodio.fromJson("{\"id\":\"e\",\"passos\":[{\"tipo\":\"titulo\",\"marca\":\"x\",\"irmao\":\"koga\"}," +
+                "{\"tipo\":\"titulo\",\"marca\":\"x\",\"irmao\":\"koga\"}]}");
+            fail("a mesma marca duas vezes no mesmo irmão");
+        } catch (IllegalArgumentException expected) {}
+    }
+
     @Test
     public void lutaSemModoNaoETutorialESemDuplaVale() {
         Episodio ep = Episodio.fromJson("{\"id\":\"e\",\"passos\":[{\"tipo\":\"luta\"}]}");
@@ -79,7 +96,7 @@ public class CenasTest {
         assertNull(ep01.ate);
     }
 
-    /** Toda cena do cenas.json abre; a intro termina na página 4 e o tutorial no treino do dojo. */
+    /** Toda cena do cenas.json abre; a intro termina na página 4 e o tutorial no treino do dojo (um por irmão). */
     @Test
     public void cenasDoJogoAbrem() throws IOException {
         Temporada temporada = Temporada.fromJson(read("historia/temporada.json"));
@@ -98,9 +115,12 @@ public class CenasTest {
         Episodio.Passo treino = tutorial.passos.get(tutorial.passos.size() - 1);
         assertTrue(treino.tutorial());
         assertEquals("dojo_shinshinkan", treino.cenario);
-        // A escolha do irmão e o treino, logo depois da intro.
-        assertEquals(intro.passos.size() + 2, tutorial.passos.size());
+        // A escolha do irmão e o treino de cada um (Ryūga e Kōga), logo depois da intro.
+        assertEquals(intro.passos.size() + 3, tutorial.passos.size());
         assertEquals(Episodio.TipoPasso.ESCOLHA, tutorial.passos.get(intro.passos.size()).tipo);
+        assertEquals("ryuga", tutorial.passos.get(intro.passos.size() + 1).irmao);
+        assertEquals("koga", treino.irmao);
+        assertTrue(tutorial.passos.get(intro.passos.size() + 1).tutorial());
     }
 
     private static String read(String path) throws IOException {
