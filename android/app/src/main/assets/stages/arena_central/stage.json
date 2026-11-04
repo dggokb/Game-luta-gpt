@@ -2,7 +2,7 @@
   "nome": "Arena Central",
   "camera": {
     "distancia": 1000,
-    "horizonte": 0.4
+    "horizonte": 0.52
   },
   "corFundo": "#2A1030",
   "luzLutadores": {
@@ -20,17 +20,17 @@
     }
   },
   "sombraLutadores": {
-    "alfa": 0.42,
-    "x": 0.75,
-    "y": 0.22
+    "alfa": 0.62,
+    "x": 0.6,
+    "y": 0.36
   },
   "camadas": [
     {
       "id": "ceu",
       "imagem": "ceu.jpg",
       "profundidade": 100000,
-      "topo": -0.75,
-      "base": 0.42,
+      "topo": -0.7,
+      "base": 0.38,
       "x": 0.5,
       "repetir": "espelhar",
       "corAcima": "#2A1030"
@@ -48,8 +48,8 @@
       "id": "neblina-longe",
       "tipo": "neblina",
       "profundidade": 5000,
-      "topo": 0.32,
-      "base": 0.46,
+      "topo": 0.38,
+      "base": 0.56,
       "cor": "#7A3050",
       "alfa": 0.25
     },
@@ -67,42 +67,28 @@
       "imagem": "arquibancada.png",
       "profundidade": 3500,
       "noChao": true,
-      "altura": 0.5,
+      "altura": 0.42,
       "x": 0.5,
       "repetir": "nao"
     },
     {
-      "id": "telao",
-      "imagem": "telao.png",
-      "profundidade": 3420,
+      "id": "torres",
+      "imagem": "pilastra.png",
+      "profundidade": 3300,
       "noChao": true,
-      "altura": 0.3,
-      "x": 0.86,
-      "repetir": "nao",
-      "telao": {
-        "x": 0.07,
-        "y": 0.1171,
-        "largura": 0.86,
-        "altura": 0.5878
-      }
-    },
-    {
-      "id": "trelica",
-      "imagem": "trelica.png",
-      "profundidade": 3350,
-      "topo": -0.03,
-      "base": 0.13,
-      "x": 0.5,
-      "repetir": "espelhar"
+      "altura": 0.78,
+      "x": 0.26,
+      "repetir": "espelhar",
+      "periodo": 0.48
     }
   ],
   "chao": {
     "imagem": "chao.jpg",
     "imagemLajotas": "chao_liso.jpg",
-    "perto": -600,
-    "longe": 600,
+    "perto": -520,
+    "longe": 420,
     "ate": 3500,
-    "centroX": 836,
+    "centroX": 700,
     "reflexoLutadores": 0.2,
     "reflexoLuzes": 0.5
   }

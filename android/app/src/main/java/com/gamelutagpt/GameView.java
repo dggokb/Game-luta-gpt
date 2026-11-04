@@ -4529,6 +4529,8 @@ public class GameView extends SurfaceView
         drawCastShadow(c, spriteFighterRenderer, player(), tagOffset(), sombra);
     }
 
+    /** Quanto a sola do desenho fica acima da linha do chão (a sombra comprida sai dela). */
+    private static final float SOMBRA_SOLA = 12f;
     private Filtro sombraFiltro;
     private com.gamelutagpt.stage.StageDefinition.FighterShadow sombraDe;
     private final android.graphics.Matrix sombraMatriz = new android.graphics.Matrix();
@@ -4540,10 +4542,12 @@ public class GameView extends SurfaceView
         // No alto do pulo a sombra clareia (como a de contato).
         float altura = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - altura / SHADOW_FADE_HEIGHT, 0.25f, 1f);
-        // Um ponto a h acima do chão (y = GROUND_Y - h) vai para x + skewX·h e GROUND_Y + squashY·h.
+        // Um ponto a h acima da sola (y = sola - h) vai para x + skewX·h e sola + squashY·h. A sola
+        // do desenho fica um pouco acima da linha do chão: a sombra sai dela, sem vão.
+        float sola = GROUND_Y - SOMBRA_SOLA;
         float[] v = sombraValores;
-        v[0] = 1f; v[1] = -sombra.skewX; v[2] = sombra.skewX * GROUND_Y + offsetX;
-        v[3] = 0f; v[4] = -sombra.squashY; v[5] = GROUND_Y * (1f + sombra.squashY);
+        v[0] = 1f; v[1] = -sombra.skewX; v[2] = sombra.skewX * sola + offsetX;
+        v[3] = 0f; v[4] = -sombra.squashY; v[5] = sola * (1f + sombra.squashY);
         v[6] = 0f; v[7] = 0f; v[8] = 1f;
         sombraMatriz.setValues(v);
         c.save();
