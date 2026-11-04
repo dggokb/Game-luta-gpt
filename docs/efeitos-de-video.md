@@ -100,9 +100,9 @@ sempre: na tela do celular a folha encolhe em vez de esticar, e o contorno fica 
 
 | Folha | Vídeo | Quadros | No jogo |
 |---|---|---|---|
-| `impacto_forte` | Personagem_Recebendo_Dano_Agachado (o estouro na cabeça, 8-11; `--brilho --chao-tenis 690 --sem-corpo --dourado`; origem 1514,572 dobrada, altura 294) | 4 | golpe forte que acerta |
+| `impacto_forte` | Personagem_Recebendo_Dano_Agachado (o estouro na cabeça, 8-11; `--brilho --chao-tenis 690 --sem-corpo --dourado`; os raios por cima do corpo não saem do vídeo, então cada quadro é somado com ele mesmo girado 180° em volta do centro 1396,766 e o anel fecha; origem 1396,766 dobrada: o centro de onde saem os raios, `--escala-mundo 0.231`) | 4 | golpe forte que acerta |
 | `impacto_fraco` | Red-Haired_Clown_Fighter_Guard_Stance (a faísca branca no punho, 27-31; `--placa 33-40 --raio 1058,311,360 --excluir 0,0,0,980,768 --dourado`; origem 2116,622 dobrada, altura 181) | 5 | golpe fraco; o médio usa ele 25% maior |
-| `impacto_especial` | Bonnie_Tomando_Dano (só o impacto e as faíscas, 8-12, sem o jato que vem antes; `--cores --brilho --sem-corpo --espelhar --raio 693,394,300 --dourado`; origem 1300,788 dobrada, altura 244) | 5 | especial, Super e KO |
+| `impacto_especial` | Bonnie_Tomando_Dano (só o impacto e as faíscas, 8-12, sem o jato que vem antes; `--cores --brilho --sem-corpo --espelhar --raio 693,394,300 --dourado`; origem 1262,768 dobrada: o miolo do clarão, altura 244) | 5 | especial, Super e KO |
 | `impacto_chao` | Personagem_Cai_e_Levanta_Rápido (o vento/poeira do corpo no chão, 37-44; origem 420,700) | 8 | knockdown |
 
 Defesas com `--placa` (quadros parados do personagem sem efeito): o efeito é o que clareou em
