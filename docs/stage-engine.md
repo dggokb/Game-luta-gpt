@@ -238,6 +238,21 @@ frações dela, como as bandeiras:
 
 - **Reflexo dos lutadores**: `chao.reflexoLutadores` (0 a 1). O `GameView` desenha cada
   lutador espelhado em torno da linha do chão com essa opacidade (`saveLayerAlpha`).
+- **Sombra comprida** (`"sombraLutadores"`): a silhueta de cada lutador deitada no chão, para
+  o lado contrário da luz (uma cópia do sprite por lutador, preta e translúcida, sem rastro nem
+  contorno; no pulo ela clareia). Dois jeitos:
+  - **sol** `{ "alfa": 0.6, "x": 0.6, "y": 0.36 }`: a mesma sombra em todo lugar; um ponto a
+    `h` acima do chão cai `x·h` para o lado e `y·h` para baixo na tela;
+  - **focos** `{ "alfa": 0.6, "focos": [ { "x": -145, "altura": 1080, "profundidade": 2008 } ] }`:
+    cada foco (holofote, tocha, poste) é um ponto no mundo, com o `x` do mundo, a `altura`
+    acima do chão e a `profundidade` (positiva atrás dos lutadores, negativa na frente). A
+    sombra de cada lutador sai para o lado contrário do foco: comprida longe dele, curta
+    embaixo dele, e vira de lado quando o lutador passa por baixo. `alcance` (opcional) faz
+    ela clarear com a distância até sumir, e `alfa` no foco troca o da sombra. Até 3 focos;
+    cada um custa uma cópia de cada lutador por quadro. A conta é a da câmera de repouso
+    (`FighterShadow.fromFocus`).
+  Na Arena Central o foco é o holofote da torre da esquerda do conceito (tela x 340, no alto
+  da torre, na profundidade do fundo).
 - **Pétalas**: partículas em 3D (x, y, z) caindo com vento. As de longe são pequenas e
   apagadas, as da frente (`z < 0`) passam grandes na frente dos lutadores.
 - **Chuva** (`"chuva"` no stage.json): riscos em 3D caindo, inclinados pelo vento, finos e

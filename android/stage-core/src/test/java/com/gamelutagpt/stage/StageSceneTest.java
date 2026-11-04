@@ -727,6 +727,29 @@ public class StageSceneTest {
         org.junit.Assert.assertEquals(0.4f, def.fighterShadow.alpha, 1e-6f);
         org.junit.Assert.assertEquals(-0.6f, def.fighterShadow.skewX, 1e-6f);
         org.junit.Assert.assertEquals(0.25f, def.fighterShadow.squashY, 1e-6f);
+        org.junit.Assert.assertTrue(def.fighterShadow.focos.isEmpty());
+        // Foco atrás dos lutadores, à esquerda: a sombra vai para a direita e para perto da câmera,
+        // mais comprida longe dele, para o outro lado quando o lutador passa, e some fora do alcance.
+        StageDefinition.FighterShadow foco = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [],"
+            + "\"sombraLutadores\": {\"alfa\": 0.5, \"focos\": [{\"x\": 0, \"altura\": 1150, \"profundidade\": 2000,"
+            + " \"alcance\": 4000}]}}").fighterShadow;
+        org.junit.Assert.assertEquals(1, foco.focos.size());
+        float[] perto = new float[3], longe = new float[3], outroLado = new float[3], fora = new float[3];
+        float k = StageDefinition.FighterShadow.depthToScreen(552f, 0.47f * 720f, 1000f);
+        foco.fromFocus(foco.focos.get(0), 200f, k, perto);
+        foco.fromFocus(foco.focos.get(0), 900f, k, longe);
+        foco.fromFocus(foco.focos.get(0), -300f, k, outroLado);
+        foco.fromFocus(foco.focos.get(0), 5000f, k, fora);
+        org.junit.Assert.assertEquals(0.2f, perto[0], 1e-4f);
+        org.junit.Assert.assertTrue(longe[0] > perto[0]);
+        org.junit.Assert.assertTrue(outroLado[0] < 0f);
+        org.junit.Assert.assertEquals(2000f / 1000f * k, perto[1], 1e-4f);
+        org.junit.Assert.assertTrue(perto[2] > longe[2] && longe[2] > 0f);
+        org.junit.Assert.assertEquals(0f, fora[2], 1e-6f);
+        try {
+            StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"sombraLutadores\": {\"focos\": [{\"x\": 0}]}}");
+            org.junit.Assert.fail("foco sem altura");
+        } catch (IllegalArgumentException expected) {}
         org.junit.Assert.assertNull(StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": []}").fighterShadow);
         try {
             StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"sombraLutadores\": {\"alfa\": 0}}");

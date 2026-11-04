@@ -4508,18 +4508,18 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * Sombra comprida dos lutadores (stage.json "sombraLutadores", o sol baixo do conceito): a
-     * silhueta deitada no chão, inclinada para o lado contrário da luz. Uma cópia do sprite por
-     * lutador, como o reflexo, sem rastro, poeira nem contorno.
+     * Sombra comprida dos lutadores (stage.json "sombraLutadores"): a silhueta deitada no chão,
+     * para o lado contrário da luz. Com sol, a mesma para todos; com focos de luz, uma por foco,
+     * que estica, encurta e vira conforme o lutador anda em volta dele. Uma cópia do sprite por
+     * lutador e por foco, como o reflexo, sem rastro, poeira nem contorno.
      */
     private void drawCastShadows(Canvas c) {
         com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
         com.gamelutagpt.stage.StageDefinition.FighterShadow sombra = def != null ? def.fighterShadow : null;
         if (sombra == null) return;
-        if (sombraFiltro == null || sombraDe != sombra) {
-            sombraFiltro = Filtro.silhueta(Math.round(255 * sombra.alpha) << 24);
-            sombraDe = sombra;
-        }
+        if (sombraFiltro == null) sombraFiltro = Filtro.silhueta(0xFF000000);
+        sombraProfundidade = com.gamelutagpt.stage.StageDefinition.FighterShadow.depthToScreen(
+            CameraRig.CAMERA_GROUND_SCREEN_Y, def.horizon * Arena.VH, def.cameraDistance);
         CombatFighter npc = opponent();
         drawCastShadow(c, opponentSpriteRenderer, npc, engine.teams.tagOffset(OPPONENT), sombra);
         CombatFighter partner = partnerBody(engine.team(PLAYER));
@@ -4532,9 +4532,10 @@ public class GameView extends SurfaceView
     /** Quanto a sola do desenho fica acima da linha do chão (a sombra comprida sai dela). */
     private static final float SOMBRA_SOLA = 12f;
     private Filtro sombraFiltro;
-    private com.gamelutagpt.stage.StageDefinition.FighterShadow sombraDe;
+    private float sombraProfundidade;
     private final android.graphics.Matrix sombraMatriz = new android.graphics.Matrix();
     private final float[] sombraValores = new float[9];
+    private final float[] sombraFoco = new float[3];
 
     private void drawCastShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX,
                                 com.gamelutagpt.stage.StageDefinition.FighterShadow sombra) {
@@ -4542,18 +4543,31 @@ public class GameView extends SurfaceView
         // No alto do pulo a sombra clareia (como a de contato).
         float altura = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - altura / SHADOW_FADE_HEIGHT, 0.25f, 1f);
-        // Um ponto a h acima da sola (y = sola - h) vai para x + skewX·h e sola + squashY·h. A sola
+        if (sombra.focos.isEmpty()) {
+            drawCastShadowCopy(c, renderer, f, offsetX, sombra.skewX, sombra.squashY, sombra.alpha * k);
+            return;
+        }
+        for (int i = 0; i < sombra.focos.size(); i++) {
+            sombra.fromFocus(sombra.focos.get(i), f.x + offsetX, sombraProfundidade, sombraFoco);
+            if (sombraFoco[2] <= 0.01f) continue;
+            drawCastShadowCopy(c, renderer, f, offsetX, sombraFoco[0], sombraFoco[1], sombraFoco[2] * k);
+        }
+    }
+
+    private void drawCastShadowCopy(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX,
+                                    float lado, float frente, float alfa) {
+        // Um ponto a h acima da sola (y = sola - h) vai para x + lado·h e sola + frente·h. A sola
         // do desenho fica um pouco acima da linha do chão: a sombra sai dela, sem vão.
         float sola = GROUND_Y - SOMBRA_SOLA;
         float[] v = sombraValores;
-        v[0] = 1f; v[1] = -sombra.skewX; v[2] = sombra.skewX * sola + offsetX;
-        v[3] = 0f; v[4] = -sombra.squashY; v[5] = sola * (1f + sombra.squashY);
+        v[0] = 1f; v[1] = -lado; v[2] = lado * sola + offsetX;
+        v[3] = 0f; v[4] = -frente; v[5] = sola * (1f + frente);
         v[6] = 0f; v[7] = 0f; v[8] = 1f;
         sombraMatriz.setValues(v);
         c.save();
         c.concat(sombraMatriz);
         renderer.setOverride(sombraFiltro);
-        renderer.setAlphaGlobal(Math.round(255f * k));
+        renderer.setAlphaGlobal(Math.round(255f * Math.min(1f, alfa)));
         drawingReflection = true;
         drawFighter(c, renderer, f, false, false);
         drawingReflection = false;

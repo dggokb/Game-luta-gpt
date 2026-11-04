@@ -34,6 +34,8 @@ import java.util.Map;
  *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9, "pes": "#C0C4DC",
  *                     "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } },
  *   "sombraLutadores": { "alfa": 0.42, "x": 0.6, "y": 0.22 }
+ *   // ou, com focos de luz (a sombra segue cada um):
+ *   // "sombraLutadores": { "alfa": 0.6, "focos": [ { "x": -145, "altura": 1080, "profundidade": 2008 } ] }
  * }
  * </pre>
  */
@@ -460,17 +462,82 @@ public final class StageDefinition {
 
     /**
      * Sombra projetada ({@code "sombraLutadores"}): a silhueta do lutador deitada no chão, para
-     * o lado contrário da luz. Um ponto a {@code h} acima do chão cai a {@code x·h} para o lado
-     * (positivo = direita) e {@code y·h} para baixo na tela (para perto da câmera). {@code alfa}
-     * é o escuro dela.
+     * o lado contrário da luz. {@code alfa} é o escuro dela.
+     *
+     * <p>Sol (luz muito longe, a mesma sombra em todo lugar): um ponto a {@code h} acima do chão
+     * cai a {@code x·h} para o lado (positivo = direita) e {@code y·h} para baixo na tela (para
+     * perto da câmera).
+     *
+     * <p>Focos ({@code "focos"}: holofote, tocha, poste): cada um é um ponto no mundo
+     * ({@code x}, {@code altura} acima do chão e {@code profundidade}, positiva atrás dos
+     * lutadores) e a sombra de cada lutador sai para o lado contrário dele: comprida longe do
+     * foco, curta embaixo dele, e vira de lado quando o lutador passa por baixo. Com
+     * {@code alcance} ela clareia com a distância até sumir; {@code alfa} do foco troca o da
+     * sombra. Até {@link #MAX_FOCOS} (cada foco é uma cópia do lutador a mais por quadro).
      */
     public static final class FighterShadow {
+        public static final int MAX_FOCOS = 3;
+        /** Meia altura de um lutador (mundo): a conta do foco usa esse ponto do corpo. */
+        static final float MEIO_CORPO = 150f;
+        /** Até onde a sombra estica (para o lado e para a frente), por unidade de altura. */
+        static final float MAX_LADO = 2.4f, MAX_FRENTE = 1.1f, MAX_TRAS = 0.5f;
+
         public final float alpha, skewX, squashY;
+        /** Os focos de luz; vazio = sol (usa {@link #skewX} e {@link #squashY}). */
+        public final List<Focus> focos;
 
         FighterShadow(float alpha, float skewX, float squashY) {
+            this(alpha, skewX, squashY, Collections.<Focus>emptyList());
+        }
+
+        FighterShadow(float alpha, float skewX, float squashY, List<Focus> focos) {
             this.alpha = alpha;
             this.skewX = skewX;
             this.squashY = squashY;
+            this.focos = Collections.unmodifiableList(new ArrayList<>(focos));
+        }
+
+        /**
+         * A sombra de um lutador em {@code fighterX} (no chão, profundidade 0) por um foco:
+         * {@code out[0]} para o lado e {@code out[1]} para baixo na tela por unidade de altura
+         * (como o {@code x} e o {@code y} do sol), {@code out[2]} o escuro (0 = some).
+         * {@code depthToScreen} converte profundidade do chão em linhas da tela no plano dos
+         * lutadores ({@link #depthToScreen}).
+         */
+        public void fromFocus(Focus f, float fighterX, float depthToScreen, float[] out) {
+            float h = Math.max(f.height * 0.3f, f.height - MEIO_CORPO);
+            float lado = (fighterX - f.x) / h;
+            float frente = f.depth / h * depthToScreen;
+            out[0] = Math.max(-MAX_LADO, Math.min(MAX_LADO, lado));
+            out[1] = Math.max(-MAX_TRAS, Math.min(MAX_FRENTE, frente));
+            float a = Float.isNaN(f.alpha) ? alpha : f.alpha;
+            if (f.range > 0f) {
+                float dx = fighterX - f.x;
+                float d = (float)Math.sqrt(dx * dx + f.depth * f.depth);
+                a *= Math.max(0f, 1f - d / f.range);
+            }
+            out[2] = a;
+        }
+
+        /**
+         * Quantas linhas da tela (no plano dos lutadores, antes do zoom) o chão anda por unidade
+         * de profundidade, na câmera de repouso: {@code (chão na tela − horizonte) / distância}.
+         */
+        public static float depthToScreen(float groundScreenY, float horizonScreenY, float cameraDistance) {
+            return (groundScreenY - horizonScreenY) / cameraDistance;
+        }
+    }
+
+    /** Um foco de luz da sombra ({@code "focos"} em {@code "sombraLutadores"}). */
+    public static final class Focus {
+        public final float x, height, depth, alpha, range;
+
+        Focus(float x, float height, float depth, float alpha, float range) {
+            this.x = x;
+            this.height = height;
+            this.depth = depth;
+            this.alpha = alpha;
+            this.range = range;
         }
     }
 
@@ -667,7 +734,26 @@ public final class StageDefinition {
             float y = number(shadowMap, "y", 0.22f);
             if (alfa <= 0f || alfa > 1f) throw new IllegalArgumentException("sombraLutadores: \"alfa\" entre 0 e 1");
             if (y < 0f || y > 1f) throw new IllegalArgumentException("sombraLutadores: \"y\" entre 0 e 1");
-            shadow = new FighterShadow(alfa, number(shadowMap, "x", 0.5f), y);
+            List<Focus> focos = new ArrayList<>();
+            Object focosField = shadowMap.get("focos");
+            if (focosField instanceof List) {
+                for (Object item : (List<Object>)focosField) {
+                    if (!(item instanceof Map)) continue;
+                    Map<String, Object> fm = (Map<String, Object>)item;
+                    float altura = number(fm, "altura", 0f);
+                    if (altura <= 0f) throw new IllegalArgumentException("sombraLutadores.focos: \"altura\" acima do chão (> 0)");
+                    float fa = number(fm, "alfa", Float.NaN);
+                    if (!Float.isNaN(fa) && (fa <= 0f || fa > 1f)) {
+                        throw new IllegalArgumentException("sombraLutadores.focos: \"alfa\" entre 0 e 1");
+                    }
+                    focos.add(new Focus(number(fm, "x", 700f), altura, number(fm, "profundidade", 0f), fa,
+                        Math.max(0f, number(fm, "alcance", 0f))));
+                }
+                if (focos.size() > FighterShadow.MAX_FOCOS) {
+                    throw new IllegalArgumentException("sombraLutadores: no máximo " + FighterShadow.MAX_FOCOS + " focos");
+                }
+            }
+            shadow = new FighterShadow(alfa, number(shadowMap, "x", 0.5f), y, focos);
         }
 
         return new StageDefinition(name.trim(), distance, horizon,
