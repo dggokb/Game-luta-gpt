@@ -19,12 +19,16 @@ PREVIEW_BACKGROUND = (32, 36, 44, 255)
 def save_atlas(image, path):
     """Writes a runtime atlas; the extension picks the format.
 
-    WEBP is lossless (every visible pixel identical to the PNG, ~20% smaller APK);
-    its encoder is deterministic, which --check relies on to compare bytes.
+    WEBP is lossy at quality 95 with the alpha kept exact (alpha_quality 100): the
+    silhouette, the outline and every hit box drawn from the alpha stay identical, and
+    the color differs ~3/255 on average, invisible in play. Each sheet is 35-43% of the
+    old lossless one (928 MB -> ~330 MB for the cast; the lossless sources stay in
+    art/sprites/source). The encoder is deterministic for a given libwebp (Pillow is
+    pinned in requirements.txt), which --check relies on to compare bytes.
     """
     path = Path(path)
     if path.suffix == ".webp":
-        image.convert("RGBA").save(path, format="WEBP", lossless=True, quality=100, method=4)
+        image.convert("RGBA").save(path, format="WEBP", quality=95, alpha_quality=100, method=4)
     else:
         image.save(path, format="PNG", optimize=True)
 

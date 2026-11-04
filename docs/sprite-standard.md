@@ -18,8 +18,13 @@ O build descobre todos os `character.json` e todos os clips. Não existe uma lis
 manual de personagens no renderer. `GeneratedCharacters.java`,
 `GeneratedSpriteLayouts.java`, `SpriteStates.java`, os atlas em `drawable-nodpi` e os
 relatórios em `tools/sprites/reports` são saídas geradas e versionadas. Não editar à mão.
-Os atlas saem em WEBP sem perda (`import_sprites.save_atlas`): cada pixel visível é igual ao
-PNG, com cerca de 20% menos espaço no APK. O `output` de um clip termina em `.webp`.
+Os atlas saem em WEBP com perda leve (`import_sprites.save_atlas`, qualidade 95, desde 04/11):
+- o alfa fica exato (`alpha_quality` 100): contorno, silhueta e caixas tiradas dele não mudam;
+- a cor muda em média ~3/255 (o pior, ~6/255), o que não se vê na luta;
+- cada folha fica com 35–43% do tamanho da sem perda (o elenco foi de 887 MB para 329 MB);
+- os PNG sem perda continuam em `art/sprites/source`.
+
+O `output` de um clip termina em `.webp`.
 
 ## Fluxo de trabalho
 

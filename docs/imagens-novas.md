@@ -40,7 +40,7 @@ de imagem entra, qual ferramenta prepara e as regras que valem para todas.
 
 | Tipo | Onde fica | Como preparar | Formato |
 | --- | --- | --- | --- |
-| Folhas dos lutadores | `android/app/src/main/res/drawable-nodpi/` (geradas) | `python3 tools/sprites/build_characters.py --write` a partir dos clips e de `art/sprites/source/` ([sprite-standard.md](sprite-standard.md)) | WebP sem perda, gerado. Não editar à mão |
+| Folhas dos lutadores | `android/app/src/main/res/drawable-nodpi/` (geradas) | `python3 tools/sprites/build_characters.py --write` a partir dos clips e de `art/sprites/source/` ([sprite-standard.md](sprite-standard.md)) | WebP qualidade 95 com o alfa exato, gerado. Não editar à mão |
 | Ultra do lutador (vídeo) | folha `ULTRA_SEQ` + `character.json` | `tools/sprites/ultras.py` ([ultras/](ultras/)) | WebP sem perda, gerado |
 | Abertura e página do Ultra | `assets/ultras/<id>/`: `carga.jpg`, `corte.png`, `final.jpg`, `golpe.jpg`, `olhos.jpg`, `palco.jpg` e `ultra.json` | à mão, nos tamanhos do p02 (900×900, 1600×900, 1600×286); só o `corte` tem transparência | JPG (opacas) e PNG (`corte`) |
 | Cenário | `assets/stages/<id>/` + `stage.json` | `python tools/stage/preparar_cenario.py --entrada <pasta> --id <id>` ([tools/stage/README.md](../tools/stage/README.md)). Corta as margens, passa céu e piso para JPG e reduz o que passa de 2048 px | JPG (céu, piso) e PNG (camadas) |
