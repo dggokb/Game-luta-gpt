@@ -1,6 +1,7 @@
 """Regressoes da montagem aprovada da Arena Central (sem Android)."""
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -8,7 +9,7 @@ import numpy as np
 from PIL import Image
 
 from arena_central_final import (ART, BASE, DEST, LEFT, OVERLAP, RIGHT,
-                                 panorama)
+                                 panorama, render_rest_preview)
 
 
 class ArenaCentralFinalTest(unittest.TestCase):
@@ -41,6 +42,15 @@ class ArenaCentralFinalTest(unittest.TestCase):
             alpha = np.asarray(image.convert("RGBA"))[:, :, 3]
         self.assertLess(alpha[75].max(), 2)
         self.assertGreater(alpha[-1].min(), 253)
+
+    def test_rest_camera_reconstructs_approved_floor(self):
+        with Image.open(LEFT) as left, Image.open(RIGHT) as right:
+            original = panorama(left, right)
+        with tempfile.TemporaryDirectory() as folder:
+            difference = render_rest_preview(original, Path(folder) / "repouso.png")
+        # A diferenca restante e da compressao WebP e da dupla interpolacao;
+        # o piso nao pode se deslocar ou trocar de perspectiva na camera inicial.
+        self.assertLess(difference, 10.0)
 
 
 if __name__ == "__main__":

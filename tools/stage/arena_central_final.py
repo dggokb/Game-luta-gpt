@@ -103,9 +103,35 @@ def floor_texture(pan: Image.Image) -> None:
     )
 
 
+def render_rest_preview(pan: Image.Image, target: Path) -> float:
+    """Previa da tela de repouso usando a mesma projecao do piso no StageScene."""
+    pan = pan.resize((round(pan.width * VH / pan.height), VH), Image.Resampling.LANCZOS)
+    src = np.asarray(pan, dtype=np.uint8)
+    center = src.shape[1] // 2
+    expected = src[:, center - VW // 2:center + VW // 2]
+    with Image.open(DEST / "piso_panorama.webp") as floor:
+        tex = np.asarray(floor.convert("RGB"), dtype=np.uint8)
+    frame = expected.copy()
+    horizon = HORIZON * VH
+    eye_height = (SCREEN_GROUND_Y - horizon) / REST_ZOOM
+    distance = CAMERA_DISTANCE / REST_ZOOM
+    floor_width = (FLOOR_FAR - FLOOR_NEAR) * tex.shape[1] / tex.shape[0]
+    ys = np.arange(round(BASE * VH) + 2, VH, dtype=np.float32) + 0.5
+    z = CAMERA_DISTANCE * eye_height / (ys - horizon) - distance
+    scale = CAMERA_DISTANCE / (distance + z)
+    worldx = REST_CENTER_X + (np.arange(VW, dtype=np.float32)[None, :] - VW / 2) / scale[:, None]
+    tx = np.clip(((worldx - REST_CENTER_X) / floor_width + 0.5) * tex.shape[1], 0, tex.shape[1] - 1)
+    ty = np.clip((FLOOR_FAR - z) / (FLOOR_FAR - FLOOR_NEAR) * tex.shape[0], 0, tex.shape[0] - 1)
+    floor_pixels = tex[np.floor(ty).astype(int)[:, None], np.floor(tx).astype(int)]
+    frame[round(BASE * VH) + 2:] = floor_pixels
+    Image.fromarray(frame, "RGB").save(target)
+    return float(np.abs(frame[420:].astype(np.int16) - expected[420:].astype(np.int16)).mean())
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preview", type=Path)
+    parser.add_argument("--rest-preview", type=Path)
     args = parser.parse_args()
     DEST.mkdir(parents=True, exist_ok=True)
     with Image.open(LEFT) as l, Image.open(RIGHT) as r:
@@ -114,6 +140,9 @@ def main() -> None:
     floor_texture(pan)
     if args.preview:
         pan.save(args.preview)
+    if args.rest_preview:
+        difference = render_rest_preview(pan, args.rest_preview)
+        print(f"Camera de repouso: erro medio RGB {difference:.2f}/255 contra a pintura")
     print(f"Arena Central: {pan.width}x{pan.height}, quatro assets gerados sem repeticao/espelho")
 
 
