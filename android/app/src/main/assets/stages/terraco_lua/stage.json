@@ -10,7 +10,7 @@
   "camadas": [
     {
       "id": "ceu",
-      "imagem": "../arena_central/ceu_lua.jpg",
+      "imagem": "ceu_lua.jpg",
       "profundidade": 100000,
       "topo": -0.75,
       "base": 0.42,
@@ -49,7 +49,7 @@
     {
       "id": "mar-plano",
       "tipo": "agua",
-      "imagem": "../arena_central/mar_plano.jpg",
+      "imagem": "mar_plano.jpg",
       "perto": 1620,
       "longe": 8500,
       "tamanho": 1300,
@@ -65,7 +65,7 @@
     },
     {
       "id": "templo-longe",
-      "imagem": "../arena_central/templo_longe.png",
+      "imagem": "templo_longe.png",
       "profundidade": 8600,
       "topo": 0.0,
       "base": 0.45,
@@ -83,7 +83,7 @@
     },
     {
       "id": "estadio",
-      "imagem": "../arena_central/arquibancada.png",
+      "imagem": "arquibancada.png",
       "profundidade": 5000,
       "x": 0.72,
       "repetir": "nao",
@@ -118,7 +118,7 @@
     },
     {
       "id": "mureta",
-      "imagem": "../arena_central/barreira.png",
+      "imagem": "barreira.png",
       "profundidade": 1600,
       "noChao": true,
       "altura": 0.045,
