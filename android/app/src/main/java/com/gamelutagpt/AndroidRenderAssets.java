@@ -14,6 +14,12 @@ import java.nio.charset.StandardCharsets;
 final class AndroidRenderAssets implements RenderAssets {
     /** Imagens maiores que isso são reduzidas ao carregar, para poupar memória. */
     private static final int MAX_IMAGE_SIDE = 2048;
+    /**
+     * As camadas e o piso dos cenários podem ir até 4096 (o tamanho de textura que quase toda
+     * placa aceita): um panorama de cenário é largo e aparece ampliado na tela; reduzido para
+     * 2048 ele ficava borrado no celular.
+     */
+    private static final int MAX_STAGE_SIDE = 4096;
 
     static final class AndroidRenderImage implements RenderImage {
         private Bitmap bitmap;
@@ -112,7 +118,8 @@ final class AndroidRenderAssets implements RenderAssets {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 1;
-        while (Math.max(bounds.outWidth, bounds.outHeight) / options.inSampleSize > MAX_IMAGE_SIDE) {
+        int maximo = path.startsWith("stages/") ? MAX_STAGE_SIDE : MAX_IMAGE_SIDE;
+        while (Math.max(bounds.outWidth, bounds.outHeight) / options.inSampleSize > maximo) {
             options.inSampleSize *= 2;
         }
         Bitmap bitmap = null;

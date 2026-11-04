@@ -420,12 +420,18 @@ pelo `tools/stage/cenario_panorama.py` com as sementes de `art/stages/arena_cent
 ```bash
 pip install opencv-python numpy pillow
 python3 tools/stage/cenario_panorama.py art/stages/arena_central/recorte.json \
-    android/app/src/main/assets/stages/arena_central
+    android/app/src/main/assets/stages/arena_central --unidade 1.2 --largura 4800
+python3 tools/stage/animar_central.py
 ```
 
-- A tela de repouso do jogo fica no meio do panorama (`janela`: escala 0,903, x 409, y 54,
-  achada pelo conceito 16:9 com SIFT, `--referencia`). O chão encontra o muro na linha 424 do
-  panorama (0,569 da tela).
+- O panorama tem 3966 x 1586 px (a arte de 4000 px, ajustada para ser exatamente o dobro da
+  primeira versão de 1983 px, em que as marcações foram feitas). A tela de repouso do jogo fica
+  no meio dele (`janela`: escala 1,805, x 818, y 109, achada pelo conceito 16:9 com SIFT,
+  `--referencia`). O chão encontra o muro na linha 848 do panorama (0,569 da tela).
+- Resolução: o jogo reduz à metade imagens com mais de 2048 px de lado, menos as de cenário,
+  que vão até 4096 (`AndroidRenderAssets.MAX_STAGE_SIDE`). O piso sai com 4000 x 1932
+  (`--unidade 1.2 --largura 4800`). O GrabCut roda numa cópia de ~2000 px e a máscara volta
+  ampliada; o `animar_central.py` multiplica as posições pela largura do panorama.
 - A luta começa no meio do mundo (x 1300, de 0 a 2600): a mesma quantidade de arena dos dois
   lados.
 - Camadas (paralaxe), de trás para a frente: `ceu.jpg` a 15000, `montanhas.webp`

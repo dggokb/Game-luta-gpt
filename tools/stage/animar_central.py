@@ -39,6 +39,9 @@ from montar_porto import plateia as mascara_plateia  # noqa: E402
 
 PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/arena_central"
 ESTADIO, MONTANHAS = "estadio.webp", "montanhas.webp"
+# As posições abaixo foram medidas no panorama de 1983 px de largura; o script multiplica pela
+# largura do panorama de agora (o de 3966 px é o mesmo desenho em 2x).
+LARGURA_MEDIDA = 1983
 
 # Estandartes: (x0, y0, x1, y1) com folga em volta do pano. Nas torres e postes eles pendem
 # soltos (balançam mais); no muro e nas sacadas, presos na parede.
@@ -96,16 +99,18 @@ def pano(img, caixa):
     vermelho = (r > 95) & (r > g * 1.8) & (r > b * 1.5) & (sat > 0.5) & (a > 200)
     dourado = (r > 150) & (g > 95) & (b < g * 0.7) & (sat > 0.45) & (a > 200)
     v = vermelho.astype(np.uint8)
-    n, lab, st, _ = cv2.connectedComponentsWithStats(cv2.morphologyEx(v, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8)))
+    q = img.shape[1] / LARGURA_MEDIDA
+    k3, k5 = max(3, round(3 * q)) | 1, max(5, round(5 * q)) | 1
+    n, lab, st, _ = cv2.connectedComponentsWithStats(cv2.morphologyEx(v, cv2.MORPH_CLOSE, np.ones((k3, k3), np.uint8)))
     if n < 2:
         return None
     maior = 1 + int(np.argmax(st[1:, cv2.CC_STAT_AREA]))
-    if st[maior, cv2.CC_STAT_AREA] < 60:
+    if st[maior, cv2.CC_STAT_AREA] < 60 * q * q:
         return None
     corpo = (lab == maior).astype(np.uint8)
-    perto = cv2.dilate(corpo, np.ones((5, 5), np.uint8)).astype(bool)
+    perto = cv2.dilate(corpo, np.ones((k5, k5), np.uint8)).astype(bool)
     m = (corpo.astype(bool) | (dourado & perto)).astype(np.uint8)
-    m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
+    m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((k5, k5), np.uint8))
     # Buracos (o emblema, que não é vermelho nem dourado vivo) preenchidos.
     # (Com uma margem vazia em volta: o canto da caixa pode ser pano.)
     cheio = np.pad(m, 1)
@@ -164,6 +169,14 @@ def main():
     estadio = Image.open(pasta / ESTADIO).convert("RGBA")
     w, h = estadio.size
     img = np.array(estadio)
+    k = w / LARGURA_MEDIDA
+    global TORRES, PAREDE, BRASEIROS, HOLOFOTES_SOMBRA, LUZES, GENTE, NAO_GENTE, QUEDAS, TOCHA_CHAMA
+    em = lambda caixas: [tuple(round(v * k) for v in c) for c in caixas]
+    TORRES, PAREDE, GENTE, NAO_GENTE, QUEDAS = em(TORRES), em(PAREDE), em(GENTE), em(NAO_GENTE), em(QUEDAS)
+    BRASEIROS = em(BRASEIROS)
+    HOLOFOTES_SOMBRA = [(x * k, y * k, a) for x, y, a in HOLOFOTES_SOMBRA]
+    LUZES = [(x * k, y * k, r * k, cor, rf) for x, y, r, cor, rf in LUZES]
+    TOCHA_CHAMA *= k
 
     bandeiras = []
     img = soltar(img, TORRES, sb.SOLTA, pasta, bandeiras)
@@ -219,7 +232,7 @@ def main():
     # A água: a folha do cachoeiras.py para a camada das montanhas.
     mw, mh = Image.open(pasta / MONTANHAS).size
     cachoeiras.AREAS[MONTANHAS] = {
-        "tela": 1.1,
+        "tela": 1.1 / k,
         "areas": [(round(x / mw, 4), round(y / mh, 4), round(cw / mw, 4), round(ch / mh, 4)) for x, y, cw, ch in QUEDAS],
     }
     feitas = cachoeiras.montar(pasta, MONTANHAS)

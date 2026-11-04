@@ -67,7 +67,27 @@ def janela_por_referencia(panorama, referencia):
 
 
 def separa(img, livre, cam):
-    """GrabCut da camada ``cam`` dentro de ``livre`` (o que ainda não foi de outra camada)."""
+    """GrabCut da camada ``cam`` dentro de ``livre`` (o que ainda não foi de outra camada).
+
+    Num panorama grande o corte roda numa cópia de ~2000 px (as sementes foram acertadas nesse
+    tamanho, e o GrabCut separa melhor sem o detalhe miúdo) e a máscara volta ampliada, com a
+    borda suave."""
+    H, W = img.shape[:2]
+    f = max(1, round(W / 2000))
+    if f > 1:
+        peq = cv2.resize(img, (W // f, H // f), interpolation=cv2.INTER_AREA)
+        livre_p = cv2.resize(livre.astype(np.uint8), (W // f, H // f), interpolation=cv2.INTER_NEAREST).astype(bool)
+        cam_p = dict(cam)
+        for chave in ('sim', 'nao', 'talvez_sim', 'talvez_nao'):
+            cam_p[chave] = [[v // f for v in r] for r in cam.get(chave, [])]
+        cam_p['provavel'] = cam.get('provavel', 0) // f
+        m = separa_direto(peq, livre_p, cam_p)
+        m = cv2.resize(m.astype(np.float32), (W, H), interpolation=cv2.INTER_LINEAR) > 0.5
+        return m & livre
+    return separa_direto(img, livre, cam)
+
+
+def separa_direto(img, livre, cam):
     h, w = img.shape[:2]
     m = np.full((h, w), cv2.GC_PR_BGD if cam.get('padrao') == 'nao' else cv2.GC_PR_FGD, np.uint8)
     m[:int(cam.get('provavel', 0)), :] = cv2.GC_PR_BGD
@@ -249,11 +269,14 @@ def main():
         else:
             # A borda de 2 px da camada ainda tem um pouco do que estava na frente (meio pixel de
             # torre, de bandeira): não serve de fonte para o espelho.
-            nucleo = cv2.erode(mascara.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool)
+            e = max(5, round(5 * w / 1983.0)) | 1
+            nucleo = cv2.erode(mascara.astype(np.uint8), np.ones((e, e), np.uint8)).astype(bool)
             nevoa = cam.get('nevoa')
             if nevoa:
                 nevoa = np.array([int(nevoa[5:7], 16), int(nevoa[3:5], 16), int(nevoa[1:3], 16)], np.float32)
-            cor = preenche(img, nucleo, nevoa=nevoa, embaixo_espelho=int(cam.get('espelhar_embaixo', 0)))
+            px = w / 1983.0   # os tamanhos do preenchimento foram acertados num panorama de 1983 px
+            cor = preenche(img, nucleo, faixa_lado=round(120 * px), buraco_estreito=round(260 * px), nevoa=nevoa,
+                           embaixo_espelho=int(cam.get('espelhar_embaixo', 0)))
         cor = cor[:ate]
         a = cv2.GaussianBlur(alfa[:ate].astype(np.float32), (3, 3), 0)
         arquivo = cam.get('arquivo', cam['id'] + '.png')
