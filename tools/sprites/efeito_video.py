@@ -137,7 +137,8 @@ def empacotar(imagens):
 
 
 def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=None,
-              altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0):
+              altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0,
+              pixel_scale=PIXEL_SCALE):
     if Path(video).is_dir():
         quadros, fps = ler_pngs(video, inicio, fim, passo), fps_png
     else:
@@ -152,7 +153,7 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
         rgba = [chave(q, fundo) for q in quadros]
     ux0, uy0, ux1, uy1 = uniao([caixa(q[..., 3]) for q in rgba])
     # Escala: a altura do efeito inteiro vira `altura` px do mundo (a folha guarda PIXEL_SCALE).
-    escala = altura * PIXEL_SCALE / (uy1 - uy0)
+    escala = altura * pixel_scale / (uy1 - uy0)
     if origem:
         ox, oy = origem[0] - (recorte[0] if recorte else 0), origem[1] - (recorte[1] if recorte else 0)
     elif ancora == 'chao':
@@ -189,7 +190,7 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
         'trecho': [inicio, fim if fim is not None else inicio + (len(quadros) - 1) * passo],
         'passo': passo,
         'ancora': 'origem' if origem else ancora,
-        'pixelScale': PIXEL_SCALE,
+        'pixelScale': pixel_scale,
         'altura': altura,
         # Cada quadro: x, y, largura, altura na folha e onde o canto de cima fica em relação à
         # origem (pixels da folha).
@@ -244,9 +245,12 @@ def main():
     p.add_argument('--altura', type=float, default=200.0, help='altura do efeito no mundo (px)')
     p.add_argument('--recorte', type=lambda t: numeros(t, 4))
     p.add_argument('--fps', type=float, default=24.0, help='quadros por segundo da pasta de PNGs')
+    p.add_argument('--escala-folha', type=float, default=PIXEL_SCALE,
+                   help='pixels da folha por pixel do mundo (mais = mais nítido na tela, folha maior)')
     a = p.parse_args()
     destino, dados = converter(a.video, a.nome, a.inicio, a.fim, a.passo, a.ancora, a.origem,
-                               a.altura, a.recorte, fps_png=a.fps)
+                               a.altura, a.recorte, fps_png=a.fps,
+                               pixel_scale=a.escala_folha)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 

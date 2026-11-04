@@ -16,8 +16,10 @@ A transparência sobre o verde vem da chave do verde do efeito_video.py.
                                          até por cima do personagem (sem placa: chave do verde)
         [--brilho]                       sem placa: guarda o brilho meio transparente sobre o verde
         [--cores]                        guarda efeito colorido (amarelo, laranja, vermelho), não só o branco
-        [--dourado]                      pinta o efeito de dourado (como o dano da Bonnie): miolo creme,
-                                         dourado no meio, laranja na borda; o dano fica separado da defesa branca
+        [--dourado]                      refaz o efeito em dourado de traço limpo (como o dano da Bonnie):
+                                         contorno fino laranja-escuro, laranja, dourado e miolo creme; o dano
+                                         fica separado da defesa branca. Sai no DOBRO do tamanho do vídeo
+                                         (a --origem do efeito_video.py também dobra)
         [--sem-corpo]                    tira manchas brancas grudadas no corpo (tênis, olho), mesmo
                                          encostando no verde: as que têm >= 30% da volta no corpo
 """
@@ -100,21 +102,53 @@ dist_borda = np.minimum(np.minimum(xx, W - 1 - xx), np.minimum(yy, H - 1 - yy)).
 fade *= np.clip(dist_borda / max(1, a.borda), 0, 1)
 fade *= np.clip((a.chao_tenis - yy) / 50.0, 0, 1).astype(np.float32)
 
-CREME, OURO, LARANJA = (np.array(c, np.float32) for c in ((255, 247, 214), (255, 206, 72), (255, 128, 28)))
+CREME, OURO, LARANJA, BORDA = (np.array(c, np.float32) for c in
+                               ((255, 250, 228), (255, 204, 58), (255, 132, 20), (214, 62, 8)))
+AMPLIA = 2          # o dourado é refeito no dobro do tamanho do vídeo: contorno liso na folha
+
+
+def degrau(x, a, b):
+    t = np.clip((x - a) / (b - a), 0, 1)
+    return t * t * (3 - 2 * t)
 
 
 def dourar(out):
-    """Pinta pela distância até a borda (como a luz do vídeo da Bonnie): o miolo das manchas grandes
-    fica creme, o meio e os raios finos dourados, a borda laranja."""
+    """Refaz o efeito em traço de anime (o vídeo vem borrado e com a grade da compressão: o
+    contorno saía serrilhado e as cores misturadas). Alisa a mancha, corta numa borda limpa e pinta
+    em faixas de cor chapadas como no vídeo da Bonnie: contorno laranja-escuro fino, laranja,
+    dourado e o miolo creme nas manchas grossas; por fora, um brilho dourado fraco."""
     al = out[..., 3].astype(np.float32) / 255.0
-    cheio = (al > 0.45).astype(np.uint8)
-    dist = cv2.distanceTransform(cheio, cv2.DIST_L2, 5)
-    dist = cv2.GaussianBlur(dist, (5, 5), 1.2)
-    u = np.clip(dist / 14.0, 0, 1)[..., None]          # 0 na borda, 1 a 14 px para dentro
-    cor = np.where(u < 0.35, LARANJA + (OURO - LARANJA) * (u / 0.35),
-                   OURO + (CREME - OURO) * np.clip((u - 0.35) / 0.65, 0, 1) ** 1.5)
-    out[..., :3] = np.clip(cor, 0, 255).astype(np.uint8)
-    return out
+    h, w = al.shape
+    al = cv2.resize(al, (w * AMPLIA, h * AMPLIA), interpolation=cv2.INTER_CUBIC)
+    liso = cv2.GaussianBlur(al, (0, 0), 1.7 * AMPLIA)
+    forma = degrau(liso, 0.30, 0.40)
+    # sem pontinhos soltos: some a mancha pequena (o que sobrou da compressão)
+    cheio = (forma > 0.5).astype(np.uint8)
+    n, lab, st, _ = cv2.connectedComponentsWithStats(cheio, connectivity=8)
+    pequeno = st[:, cv2.CC_STAT_AREA] < 110 * AMPLIA * AMPLIA
+    pequeno[0] = False
+    longe = cv2.dilate(pequeno[lab].astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+    forma[longe] = 0
+    cheio[longe] = 0
+    # furinhos dentro da mancha (viravam um anel laranja solto): fecha
+    nf, labf, stf, _ = cv2.connectedComponentsWithStats(1 - cheio, connectivity=4)
+    furo = stf[:, cv2.CC_STAT_AREA] < 160 * AMPLIA * AMPLIA
+    furo[labf[0, 0]] = False
+    fechar = furo[labf]
+    cheio[fechar] = 1
+    forma[fechar] = 1
+    d = cv2.distanceTransform(cheio, cv2.DIST_L2, 5) / AMPLIA      # em pixels do vídeo
+    d = cv2.GaussianBlur(d, (0, 0), 0.8 * AMPLIA)
+    # faixas chapadas com a passagem de 1 px (nítida, sem degrau)
+    k1, k2, k3 = degrau(d, 1.0, 1.6), degrau(d, 3.0, 3.6), degrau(d, 7.5, 8.5)
+    cor = BORDA + (LARANJA - BORDA) * k1[..., None]
+    cor = cor + (OURO - cor) * k2[..., None]
+    cor = cor + (CREME - cor) * k3[..., None]
+    brilho = cv2.GaussianBlur(forma, (0, 0), 7 * AMPLIA) * 0.45
+    alfa = np.maximum(forma, brilho)
+    cor = np.where((forma > 0.02)[..., None], cor, OURO)
+    cor = OURO + (cor - OURO) * np.clip(forma / np.maximum(alfa, 1e-3), 0, 1)[..., None]
+    return np.dstack([np.clip(cor, 0, 255), np.clip(alfa * 255, 0, 255)]).astype(np.uint8)
 
 
 def salvar(out, n):
