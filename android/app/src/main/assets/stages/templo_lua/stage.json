@@ -253,7 +253,7 @@
     "imagem": "chao.jpg",
     "perto": -600,
     "longe": 560,
-    "centroX": 700,
+    "centroX": 1300,
     "reflexoLutadores": 0.22,
     "reflexoLuzes": 0.45,
     "imagemLajotas": "chao_lajotas.jpg"

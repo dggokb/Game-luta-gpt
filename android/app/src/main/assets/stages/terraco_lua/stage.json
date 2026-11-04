@@ -149,7 +149,7 @@
     "perto": -600,
     "longe": 600,
     "ate": 1600,
-    "centroX": 700,
+    "centroX": 1300,
     "reflexoLutadores": 0.15,
     "reflexoLuzes": 0.5
   }

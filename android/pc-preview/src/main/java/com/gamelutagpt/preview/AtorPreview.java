@@ -15,7 +15,7 @@ public final class AtorPreview {
     File dir = new File(a[0]);
     StagePack pack = StagePack.load(new FileRenderAssets(dir.getParentFile().getParentFile()), "stages/" + dir.getName());
     for (String w : pack.warnings) System.out.println("aviso: " + w);
-    StageScene scene = new StageScene(pack, new StageWorld(565f, 2600f, 1.24f, 700f, 552f));
+    StageScene scene = new StageScene(pack, new StageWorld(565f, 2600f, 1.24f, 1300f, 552f));
     String[] anims = a[2].split(",");
     float[] times = {0.05f, 0.12f, 0.4f, 0.8f, 1.2f, 1.6f, 2.0f, 2.6f, 3.2f};
     int cw = 200, chh = 300;

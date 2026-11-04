@@ -426,8 +426,11 @@ python3 tools/stage/cenario_panorama.py art/stages/arena_central/recorte.json \
 - A tela de repouso do jogo fica no meio do panorama (`janela`: escala 0,903, x 409, y 54,
   achada pelo conceito 16:9 com SIFT, `--referencia`). O chão encontra o muro na linha 424 do
   panorama (0,569 da tela).
-- Camadas (paralaxe), de trás para a frente: `ceu.jpg` a 60000 (quase parado), `montanhas.webp`
-  a 5000 (montanhas, cachoeiras, o sol) e `estadio.webp` no fim do chão (1618: muro, torres,
+- A luta começa no meio do mundo (x 1300, de 0 a 2600): a mesma quantidade de arena dos dois
+  lados.
+- Camadas (paralaxe), de trás para a frente: `ceu.jpg` a 15000, `montanhas.webp`
+  a 2600 (montanhas, cachoeiras, o sol; mais perto que o céu de verdade para a imagem não
+  ficar ampliada demais, com o borrão de imagem esticada) e `estadio.webp` no fim do chão (1618: muro, torres,
   pavilhão e as arquibancadas dos lados). O GrabCut separa cada uma; o que a da frente tapa é
   inventado espelhando o que está do lado (atrás das torres) ou como névoa (o pé das montanhas,
   o horizonte), para a câmera andar e o super pulo não abrirem buraco.
@@ -435,9 +438,9 @@ python3 tools/stage/cenario_panorama.py art/stages/arena_central/recorte.json \
   lados vindos do panorama e só o que passa dele espelhado.
 - **Animação** (`tools/stage/animar_central.py`, rodar depois do corte): 27 estandartes soltos
   balançando (torres e postes soltos, muro e sacadas presos), fogo nos 5 braseiros do muro, 19
-  luzes (os holofotes das torres e as lanternas, as baixas refletindo no chão), a plateia das
-  arquibancadas pulando (máscara `estadio_plateia.webp`, sem o pavilhão e as escadas) com
-  flashes, e as 3 cachoeiras da camada das montanhas correndo (`montanhas_agua.png`). As
+  luzes (os holofotes das torres e as lanternas), flashes de câmera na plateia (máscara
+  `estadio_plateia.webp`, sem o pavilhão e as escadas; sem o pulo, que borrava a gente miúda),
+  o piso fosco (sem reflexo das luzes), e as 3 cachoeiras da camada das montanhas correndo (`montanhas_agua.png`). As
   posições estão no script, em pixels do panorama.
 - Para trocar a arte: o panorama novo no lugar, conferir/ajustar as sementes (o
   `--mascaras pasta/` grava cada máscara para conferir), rodar de novo e depois o

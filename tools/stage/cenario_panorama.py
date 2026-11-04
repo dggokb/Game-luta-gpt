@@ -29,6 +29,7 @@ O JSON (caminhos relativos a ele):
       "camadas": [            // na ordem do recorte
         { "id": "chao", "descartar": true, "padrao": "nao", "sim": [[x0, y0, x1, y1], ...] },
         { "id": "ceu", "profundidade": 60000, "arquivo": "ceu.jpg", "ate": 360,
+          "espelhar_embaixo": 140,   // o que fica atrás do resto: as nuvens espelhadas (sem névoa)
           "padrao": "nao",    // fora das sementes: provável que não seja dela ("sim" o contrário)
           "talvez_sim": [[...]], "talvez_nao": [[...]],   // prováveis
           "sim": [[...]], "nao": [[...]] },                 // certeza
@@ -88,7 +89,7 @@ def _vai_e_volta(n, k):
     return np.where(i < k, i, 2 * k - 1 - i)
 
 
-def preenche(img, conhecido, faixa_lado=120, buraco_estreito=260, nevoa=None):
+def preenche(img, conhecido, faixa_lado=120, buraco_estreito=260, nevoa=None, embaixo_espelho=0):
     """Inventa o que não é ``conhecido`` (o que a camada da frente tapa) espelhando o que está
     em volta, para manter a textura (nuvem, montanha) quando a câmera anda e destapa um pedaço:
 
@@ -117,6 +118,10 @@ def preenche(img, conhecido, faixa_lado=120, buraco_estreito=260, nevoa=None):
                 fonte = x1 + _vai_e_volta(n, k)[::-1]
             else:
                 continue
+            # Só copia do que é mesmo desta camada (ao lado pode haver outro buraco, ou a borda de
+            # uma bandeira): senão o buraco fica para o preenchimento de cima para baixo.
+            if not feito[y, fonte].all():
+                continue
             out[y, x0:x1] = out[y, fonte]
             feito[y, x0:x1] = True
     # Embaixo (o que fica atrás das arquibancadas): a última cor de cada coluna escorrendo para
@@ -132,6 +137,12 @@ def preenche(img, conhecido, faixa_lado=120, buraco_estreito=260, nevoa=None):
         for y0, y1 in zip(np.where(d == -1)[0], np.where(d == 1)[0]):
             if y0 == 0:
                 continue  # nada em cima: fica para o inpaint
+            if embaixo_espelho:
+                # O céu: as nuvens de cima espelhadas para baixo (indo e voltando numa faixa).
+                k = min(embaixo_espelho, y0)
+                out[y0:y1, x] = out[y0 - 1 - _vai_e_volta(y1 - y0, k), x]
+                feito[y0:y1, x] = True
+                continue
             out[y0:y1, x] = out[y0 - 1, x]
             ultimas.append(out[y0 - 1, x].astype(np.float32))
             embaixo[y0:y1, x] = True
@@ -149,9 +160,6 @@ def preenche(img, conhecido, faixa_lado=120, buraco_estreito=260, nevoa=None):
         out[embaixo] = np.clip(mistura[embaixo], 0, 255).astype(np.uint8)
     if not feito.all():
         out = cv2.inpaint(out, (~feito).astype(np.uint8) * 255, 5, cv2.INPAINT_TELEA)
-    # Uma passada leve de desfoque só no inventado, para as costuras do espelho não marcarem.
-    suave = cv2.GaussianBlur(out, (5, 5), 0)
-    out[~conhecido] = suave[~conhecido]
     out[conhecido] = img[conhecido]
     return out
 
@@ -245,7 +253,7 @@ def main():
             nevoa = cam.get('nevoa')
             if nevoa:
                 nevoa = np.array([int(nevoa[5:7], 16), int(nevoa[3:5], 16), int(nevoa[1:3], 16)], np.float32)
-            cor = preenche(img, nucleo, nevoa=nevoa)
+            cor = preenche(img, nucleo, nevoa=nevoa, embaixo_espelho=int(cam.get('espelhar_embaixo', 0)))
         cor = cor[:ate]
         a = cv2.GaussianBlur(alfa[:ate].astype(np.float32), (3, 3), 0)
         arquivo = cam.get('arquivo', cam['id'] + '.png')

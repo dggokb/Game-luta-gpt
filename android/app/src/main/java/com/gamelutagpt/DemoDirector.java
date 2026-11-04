@@ -107,7 +107,7 @@ final class DemoDirector {
         }
     }
 
-    private static final float X = 760f;
+    private static final float X = Arena.WORLD_WIDTH * 0.5f - 540f;
     private static final int BAR = CombatConfig.METER_PER_BAR;
 
     static Step[] steps(int demo) {

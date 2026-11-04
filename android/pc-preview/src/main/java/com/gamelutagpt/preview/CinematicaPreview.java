@@ -169,7 +169,7 @@ public final class CinematicaPreview {
         bonecos[1] = new Boneco(1420f, -1, new Color(temporada.personagem(rival).cor, true));
 
         StageScene scene = new StageScene(StagePack.load(new FileRenderAssets(new File(assetsDir, "stages")), cenario),
-            new StageWorld(GROUND_Y, WORLD_WIDTH, CAMERA_ZOOM, 700f, GROUND_SCREEN_Y));
+            new StageWorld(GROUND_Y, WORLD_WIDTH, CAMERA_ZOOM, 1300f, GROUND_SCREEN_Y));
         ConversaLuta conversa = new ConversaLuta(assets);
         CinematicaLuta cena = new CinematicaLuta(assets, conversa, palco);
         if (!cena.carregar(temporada, arquivo, irmao)) throw new IOException("cinemática não abriu: " + arquivo);

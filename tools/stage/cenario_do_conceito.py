@@ -32,7 +32,7 @@ GROUND_Y = 565.0          # Arena.GROUND_Y
 REST_ZOOM = 1.24          # CameraRig.CAMERA_REST_ZOOM
 GROUND_SCREEN_Y = 552.0   # CameraRig.CAMERA_GROUND_SCREEN_Y
 BASE_DISTANCE = 1000.0    # stage.json camera.distancia
-REST_CENTER_X = 700.0     # (PLAYER_START_X + OPPONENT_START_X) / 2
+REST_CENTER_X = 1300.0    # (PLAYER_START_X + OPPONENT_START_X) / 2: o meio do mundo
 
 
 def camera(horizonte):

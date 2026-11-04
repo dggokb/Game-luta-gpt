@@ -179,7 +179,7 @@
     "imagemLajotas": "chao_lajotas.jpg",
     "perto": -600,
     "longe": 700,
-    "centroX": 700,
+    "centroX": 1300,
     "reflexoLutadores": 0.0,
     "reflexoLuzes": 0.0
   },

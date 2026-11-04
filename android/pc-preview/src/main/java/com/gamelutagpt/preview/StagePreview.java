@@ -49,7 +49,7 @@ public final class StagePreview {
     private float zoom = CAMERA_ZOOM, left, top;
 
     private StagePreview(StagePack pack) {
-        StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CAMERA_ZOOM, 700f, GROUND_SCREEN_Y);
+        StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CAMERA_ZOOM, 1300f, GROUND_SCREEN_Y);
         scene = new StageScene(pack, world);
         script(0f);
     }
@@ -59,10 +59,10 @@ public final class StagePreview {
         float loop = t % 12f;
         float a, b;
         if (loop < 2f) {
-            a = 420f; b = 980f;
+            a = 1020f; b = 1580f;
         } else if (loop < 4f) {
             float k = smooth((loop - 2f) / 2f);
-            a = 420f - 250f * k; b = 980f + 450f * k;
+            a = 1020f - 350f * k; b = 1580f + 350f * k;
         } else if (loop < 6f) {
             float k = smooth((loop - 4f) / 2f);
             a = 170f + 480f * k; b = 1430f - 670f * k;

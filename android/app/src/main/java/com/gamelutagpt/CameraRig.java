@@ -35,7 +35,7 @@ final class CameraRig {
     /** Quanto a câmera se adianta para o lado de quem corre (pixels do mundo). */
     static final float CAMERA_RUN_LEAD = 60f;
 
-    float x = 700f;
+    float x = Arena.WORLD_WIDTH * 0.5f;
     float top = GROUND_CAMERA_TOP;
     float zoom = CAMERA_ZOOM;
     /** Adiantamento atual: vai e volta por mola (motion-core), sem tranco. */

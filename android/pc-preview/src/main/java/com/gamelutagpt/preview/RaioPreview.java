@@ -51,7 +51,7 @@ public final class RaioPreview {
         UltraPack pack = UltraPack.load(new FileRenderAssets(ultraDir.getParentFile()), ultraDir.getName());
         StagePack stagePack = StagePack.load(new FileRenderAssets(stageDir.getParentFile()), stageDir.getName());
         for (String warning : pack.warnings) System.out.println("aviso: " + warning);
-        StageScene scene = new StageScene(stagePack, new StageWorld(GROUND_Y, 2600f, ZOOM, 700f, 552f));
+        StageScene scene = new StageScene(stagePack, new StageWorld(GROUND_Y, 2600f, ZOOM, 1300f, 552f));
         Folha beamSprite = Folha.ler("player_base_ultra_beam");
         Folha hitSprite = Folha.ler("player_base_hit_stand");
         RaioFinal raio = new RaioFinal();

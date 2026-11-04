@@ -14,8 +14,8 @@ largura e começam na linha 0 dele):
 * **fogos**: as chamas dos braseiros do muro, que também são focos da sombra dos lutadores
   (sombra comprida e fraca para a frente, junto com a dos holofotes);
 * **luzes**: os holofotes das torres e as lanternas, pulsando (as baixas refletem no chão);
-* **plateia**: só a gente das arquibancadas (máscara pela textura, dentro dos retângulos
-  das arquibancadas) pula, mais nos golpes fortes, com flashes de câmera;
+* **plateia**: flashes de câmera na gente das arquibancadas (máscara pela textura, dentro
+  dos retângulos das arquibancadas); sem pulo, que no panorama borrava a gente miúda;
 * **cachoeiras**: a água das três quedas da camada das montanhas corre.
 
 Grava as imagens novas na pasta do cenário e os campos nas camadas do stage.json. Rode de
@@ -32,6 +32,7 @@ from PIL import Image
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 import cachoeiras  # noqa: E402
+import cenario_do_conceito as cc  # noqa: E402
 import pontos_plateia  # noqa: E402
 import soltar_bandeiras as sb  # noqa: E402
 from montar_porto import plateia as mascara_plateia  # noqa: E402
@@ -44,7 +45,7 @@ ESTADIO, MONTANHAS = "estadio.webp", "montanhas.webp"
 TORRES = [(444, 165, 496, 327), (696, 196, 740, 312), (748, 232, 774, 308), (1228, 198, 1280, 355),
           (1298, 240, 1325, 320)]
 PAREDE = [(25, 135, 105, 392), (8, 120, 34, 180), (102, 88, 123, 133), (105, 165, 130, 220),
-          (172, 120, 196, 170), (267, 210, 290, 262), (212, 275, 255, 398), (334, 310, 366, 400),
+          (172, 120, 196, 170), (267, 210, 290, 262), (212, 275, 255, 386), (334, 310, 366, 400),
           (648, 338, 673, 380), (809, 341, 841, 420), (892, 342, 913, 380), (925, 297, 949, 342),
           (1026, 297, 1050, 342), (1095, 341, 1127, 415), (1142, 342, 1164, 382), (1329, 342, 1355, 382),
           (1511, 250, 1540, 340), (1636, 222, 1671, 315), (1698, 204, 1719, 252), (1842, 144, 1864, 205),
@@ -82,11 +83,45 @@ NAO_GENTE = [(885, 235, 1085, 345), (750, 285, 805, 350), (1160, 285, 1215, 350)
 QUEDAS = [(1410, 185, 75, 95), (1685, 110, 35, 68), (1798, 70, 26, 35)]
 
 
+def pano(img, caixa):
+    """O pano do estandarte dentro da caixa: o vermelho forte e a borda dourada encostada nele,
+    numa peça só, com o emblema (os buracos) preenchido. Mais estrito que o soltar_bandeiras:
+    no panorama ao pôr do sol a pedra, a treliça e a grade também puxam para o laranja, e
+    vinham junto (balançavam com o pano)."""
+    import cv2
+    x0, y0, x1, y1 = caixa
+    r, g, b, a = (img[y0:y1, x0:x1, k].astype(np.float32) for k in range(4))
+    mx = np.maximum(np.maximum(r, g), b)
+    sat = (mx - np.minimum(np.minimum(r, g), b)) / np.maximum(mx, 1)
+    vermelho = (r > 95) & (r > g * 1.8) & (r > b * 1.5) & (sat > 0.5) & (a > 200)
+    dourado = (r > 150) & (g > 95) & (b < g * 0.7) & (sat > 0.45) & (a > 200)
+    v = vermelho.astype(np.uint8)
+    n, lab, st, _ = cv2.connectedComponentsWithStats(cv2.morphologyEx(v, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8)))
+    if n < 2:
+        return None
+    maior = 1 + int(np.argmax(st[1:, cv2.CC_STAT_AREA]))
+    if st[maior, cv2.CC_STAT_AREA] < 60:
+        return None
+    corpo = (lab == maior).astype(np.uint8)
+    perto = cv2.dilate(corpo, np.ones((5, 5), np.uint8)).astype(bool)
+    m = (corpo.astype(bool) | (dourado & perto)).astype(np.uint8)
+    m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
+    # Buracos (o emblema, que não é vermelho nem dourado vivo) preenchidos.
+    # (Com uma margem vazia em volta: o canto da caixa pode ser pano.)
+    cheio = np.pad(m, 1)
+    borda = np.zeros((cheio.shape[0] + 2, cheio.shape[1] + 2), np.uint8)
+    cv2.floodFill(cheio, borda, (0, 0), 2)
+    m = ((m == 1) | (cheio[1:-1, 1:-1] == 0)).astype(bool)
+    out = np.zeros(img.shape[:2], bool)
+    out[y0:y1, x0:x1] = m
+    return out
+
+
 def soltar(img, caixas, balanco, pasta, lista):
-    """Solta os estandartes das caixas (o mesmo corte do soltar_bandeiras)."""
+    """Solta os estandartes das caixas (o corte do soltar_bandeiras, com o pano daqui)."""
     h, w = img.shape[:2]
     for x0, y0, x1, y1 in caixas:
-        m = sb.pano(img, (x0 / w, y0 / h, x1 / w, y1 / h))
+        m = pano(img, (x0, y0, x1, y1))
         if m is None:
             raise SystemExit(f"sem estandarte em {(x0, y0, x1, y1)} (o estádio já foi animado? refaça as camadas)")
         ys = np.nonzero(m.any(axis=1))[0]
@@ -97,11 +132,11 @@ def soltar(img, caixas, balanco, pasta, lista):
         leva[:corte - sb.SOBRA] = False
         yy, xx = np.nonzero(leva)
         bx0, bx1, by0, by1 = xx.min(), xx.max() + 1, yy.min(), yy.max() + 1
-        pano = np.zeros((by1 - by0, bx1 - bx0, 4), np.uint8)
+        pano_img = np.zeros((by1 - by0, bx1 - bx0, 4), np.uint8)
         recorte = leva[by0:by1, bx0:bx1]
-        pano[recorte] = img[by0:by1, bx0:bx1][recorte]
+        pano_img[recorte] = img[by0:by1, bx0:bx1][recorte]
         nome = f"estadio_bandeira{len(lista) + 1}.png"
-        Image.fromarray(pano).save(pasta / nome, optimize=True)
+        Image.fromarray(pano_img).save(pasta / nome, optimize=True)
         img = sb.tapar(img, solta, "parede")
         lista.append({"imagem": nome, "x": round(float(bx0 / w), 4), "y": round(float(by0 / h), 4),
                       "largura": round(float((bx1 - bx0) / w), 4), "altura": round(float((by1 - by0) / h), 4),
@@ -112,7 +147,6 @@ def soltar(img, caixas, balanco, pasta, lista):
 def no_mundo(px, py, janela, stage):
     """Um ponto do panorama no estádio (camada no fim do chão) em coordenadas do mundo:
     x, altura acima do chão e profundidade, pela câmera de repouso do cenario_do_conceito."""
-    import cenario_do_conceito as cc
     escala, jx, jy = janela["escala"], janela["x"], janela["y"]
     z = stage["chao"]["longe"]
     horizon, eye_y, distance = cc.camera(stage["camera"]["horizonte"])
@@ -168,13 +202,18 @@ def main():
         fx, fy, fz = no_mundo(x, y - TOCHA_CHAMA, janela, stage)
         focos.append({"x": fx, "altura": fy, "profundidade": fz, "alfa": TOCHA_ALFA, "alcance": TOCHA_ALCANCE})
     stage["sombraLutadores"]["focos"] = focos
+    # Piso de pedra fosca: as luzes e o fogo não refletem nele.
+    stage["chao"]["reflexoLuzes"] = 0
+    stage["chao"]["centroX"] = round(cc.REST_CENTER_X)
     for camada in stage["camadas"]:
         if camada.get("imagem") == ESTADIO:
             camada["bandeiras"] = bandeiras
             camada["fogos"] = fogos
             camada["luzes"] = luzes
+            # Sem pulo: no panorama a gente é miúda e a coluna pulando borrava (parecia meleca);
+            # ficam os flashes de câmera.
             camada["plateia"] = [{"topo": round(topo, 4), "base": round(base, 4), "mascara": "estadio_plateia.webp",
-                                  "pulo": 0.006, "colunas": 160, "flashes": flashes}]
+                                  "pulo": 0, "colunas": 160, "flashes": flashes}]
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     # A água: a folha do cachoeiras.py para a camada das montanhas.

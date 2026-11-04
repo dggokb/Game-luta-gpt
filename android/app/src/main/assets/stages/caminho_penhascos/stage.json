@@ -156,7 +156,7 @@
     "imagemLajotas": "chao_grade.jpg",
     "perto": -600,
     "longe": 520,
-    "centroX": 700,
+    "centroX": 1300,
     "reflexoLutadores": 0.08,
     "reflexoLuzes": 0.3
   },

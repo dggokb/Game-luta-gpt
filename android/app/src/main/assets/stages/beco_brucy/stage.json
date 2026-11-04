@@ -328,7 +328,7 @@
     "imagemLajotas": "chao_asfalto.jpg",
     "perto": -600,
     "longe": 750,
-    "centroX": 700,
+    "centroX": 1300,
     "reflexoLutadores": 0.35,
     "reflexoLuzes": 0.7
   },

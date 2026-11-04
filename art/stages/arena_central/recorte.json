@@ -48,7 +48,7 @@
     {
       "id": "ceu",
       "arquivo": "ceu.jpg",
-      "profundidade": 60000,
+      "profundidade": 15000,
       "ate": 360,
       "padrao": "nao",
       "talvez_sim": [
@@ -224,12 +224,13 @@
           360,
           115
         ]
-      ]
+      ],
+      "espelhar_embaixo": 140
     },
     {
       "id": "montanhas",
       "arquivo": "montanhas.webp",
-      "profundidade": 5000,
+      "profundidade": 2600,
       "ate": 430,
       "padrao": "nao",
       "talvez_sim": [

@@ -73,8 +73,11 @@ public class GameView extends SurfaceView
     private static final float VH = Arena.VH;
     private static final float GROUND_Y = Arena.GROUND_Y;
     private static final float WORLD_WIDTH = Arena.WORLD_WIDTH;
-    private static final float PLAYER_START_X = 420f;
-    private static final float OPPONENT_START_X = 980f;
+    // A luta começa no meio do mundo (0 a WORLD_WIDTH): os dois cantos ficam à mesma distância
+    // e o cenário tem o mesmo tanto de mapa dos dois lados (antes começava em 700, perto da
+    // parede da esquerda e longe da da direita).
+    private static final float PLAYER_START_X = Arena.WORLD_WIDTH * 0.5f - 280f;
+    private static final float OPPONENT_START_X = Arena.WORLD_WIDTH * 0.5f + 280f;
     static final int PLAYER = 0;
     static final int OPPONENT = 1;
 
@@ -4246,6 +4249,13 @@ public class GameView extends SurfaceView
             cameraDaLuta = !ultraShotActive && renderZoom == camera.zoom && focoJogador <= 0f && focoRival <= 0f;
 
             renderCanvas.begin(canvas);
+            // Tela mais larga (ou mais estreita) que 16:9: a cena não estica. Ela usa a mesma
+            // escala nos dois eixos (a maior, para encher a tela) e perde uma faixa igual em cima e
+            // embaixo (ou dos lados); o HUD e os botões continuam ocupando a tela toda. Antes, num
+            // celular 20:9, o cenário e os lutadores saíam 25% mais largos que o desenho.
+            int proporcao = canvas.save();
+            float escalaCena = Math.max(sx, sy);
+            if (sx != sy) canvas.scale(escalaCena / sx, escalaCena / sy, VW * 0.5f, VH * 0.5f);
             // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
             int cinemaLayer = -1;
             float tilt = feel.tilt() + ultraTilt;
@@ -4395,6 +4405,7 @@ public class GameView extends SurfaceView
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
+            canvas.restoreToCount(proporcao);
             if (shinkaiFlash > 0) {
                 // Clarão do SHINKAI: a tela inteira na cor do tipo, apagando.
                 paint.setStyle(Paint.Style.FILL);
@@ -5754,7 +5765,7 @@ public class GameView extends SurfaceView
     private static final int LUZ_PASSOS = (LUZ_CLARAO_NIVEIS + 1) * (LUZ_DIRECOES + 1);
     private final float[] luzFoco = new float[3];
     /** O meio da câmera no quadro (a contraluz do foco é vista dele). */
-    private float luzCameraX = 700f;
+    private float luzCameraX = Arena.WORLD_WIDTH * 0.5f;
     private com.gamelutagpt.stage.StageDefinition luzDoCenario;
     private Filtro[] luzSemTinta = new Filtro[LUZ_PASSOS];
     private final java.util.Map<Filtro, Filtro[]> luzes = new java.util.IdentityHashMap<>();
