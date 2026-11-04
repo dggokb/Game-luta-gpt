@@ -53,6 +53,26 @@ public class StageSceneTest {
     }
 
     @Test
+    public void arenaCentralSkyAndGrandstandsHaveActualParallax() {
+        StageCamera camera = new StageCamera(GROUND_Y, 1000f, 0.47f * 720f);
+        camera.set(1.24f, 180f, 100f);
+        float skyAtStart = camera.screenX(1200f, 4300f);
+        float standsAtStart = camera.screenX(1200f, 2008f);
+        camera.set(1.24f, 580f, 100f);
+        float skyShift = skyAtStart - camera.screenX(1200f, 4300f);
+        float standsShift = standsAtStart - camera.screenX(1200f, 2008f);
+        assertTrue("a arquibancada precisa acompanhar mais a camera que o ceu",
+            standsShift > skyShift * 1.6f);
+        assertTrue("o ceu nao deve ficar colado nem completamente parado", skyShift > 50f);
+
+        camera.set(0.92f, 580f, 100f);
+        float farZoomOut = camera.scale(4300f);
+        float standsZoomOut = camera.scale(2008f);
+        camera.set(1.24f, 580f, 100f);
+        assertTrue(camera.scale(2008f) / standsZoomOut > camera.scale(4300f) / farZoomOut);
+    }
+
+    @Test
     public void floorDepthInvertsTheGroundProjection() {
         StageCamera camera = camera();
         for (float z : new float[] {-300f, 0f, 250f, 550f}) {

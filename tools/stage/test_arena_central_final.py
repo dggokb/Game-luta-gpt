@@ -23,17 +23,18 @@ class ArenaCentralFinalTest(unittest.TestCase):
         np.testing.assert_array_equal(result[:, :w - OVERLAP], a[:, :w - OVERLAP])
         np.testing.assert_array_equal(result[:, w:], b[:, OVERLAP:])
 
-    def test_stage_has_one_architecture_plane_without_mirror(self):
+    def test_stage_has_real_parallax_without_mirroring_architecture(self):
         stage = json.loads((DEST / "stage.json").read_text(encoding="utf-8"))
         layers = stage["camadas"]
-        # Arquibancadas em dois planos = camarote duplicado ao pular.
-        self.assertEqual(1, len(layers))
+        self.assertEqual(2, len(layers))
+        self.assertGreater(layers[0]["profundidade"], layers[1]["profundidade"])
         for layer in layers:
             self.assertEqual("nao", layer["repetir"])
             self.assertFalse(layer.get("virar", False))
             self.assertTrue((DEST / layer["imagem"]).is_file())
             self.assertEqual(BASE, layer["base"])
-            self.assertEqual(-SKY_OVERSCAN, layer["topo"])
+        self.assertEqual(-SKY_OVERSCAN, layers[0]["topo"])
+        self.assertEqual(0, layers[1]["topo"])
         self.assertNotEqual(stage["chao"]["imagem"], stage["chao"]["imagemLajotas"])
         for key in ("imagem", "imagemLajotas"):
             self.assertTrue((DEST / stage["chao"][key]).is_file())
@@ -48,6 +49,20 @@ class ArenaCentralFinalTest(unittest.TestCase):
         overscan = round(825 * SKY_OVERSCAN)
         self.assertEqual(round(825 * (BASE + SKY_OVERSCAN)), image.shape[0])
         self.assertLess(np.abs(image[overscan - 1] - image[overscan]).mean(), 8)
+
+    def test_distant_sky_contains_no_second_camarote(self):
+        with Image.open(DEST / "arquibancadas_panorama.webp") as image:
+            near = np.asarray(image.convert("RGBA"))
+        with Image.open(DEST / "fundo_panorama.webp") as image:
+            far = np.asarray(image.convert("RGB"))
+        overscan = round(825 * SKY_OVERSCAN)
+        # O camarote central so existe no recorte proximo, e e opaco.
+        center = near.shape[1] // 2
+        self.assertGreater(near[255:330, center - 100:center + 100, 3].min(), 250)
+        self.assertGreater(np.abs(
+            far[overscan + 255:overscan + 330, center - 100:center + 100].astype(np.int16)
+            - near[255:330, center - 100:center + 100, :3].astype(np.int16)
+        ).mean(), 20)
 
     def test_rest_camera_reconstructs_approved_floor(self):
         with Image.open(LEFT) as left, Image.open(RIGHT) as right:

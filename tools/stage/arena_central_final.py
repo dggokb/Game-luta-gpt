@@ -12,7 +12,7 @@ import argparse
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,21 +55,68 @@ def layers(pan: Image.Image) -> None:
     limit = round(pan.height * BASE)
     background = pan.crop((0, 0, pan.width, limit))
     source = np.asarray(background.convert("RGB"), dtype=np.uint8)
-    # A pintura arquitetonica e UMA estrutura. Separar a mesma imagem inteira
-    # em dois planos criou um segundo camarote no pulo e fendas nas torres.
-    # Ate termos mascara real dos elementos arquitetonicos, ela fica num plano
-    # unico. O chao continua independente com perspectiva/parallax de verdade.
+    # Sky e arquitetura NAO podem conter a mesma pintura opaca: ela criava
+    # camarotes duplicados no salto. O plano proximo e um recorte com alpha;
+    # por tras dele ha somente ceu limpo, sem torres/arquibancadas.
+    mask = Image.new("L", (pan.width, limit), 0)
+    draw = ImageDraw.Draw(mask)
+    # Tudo abaixo da linha de arquibancadas existe APENAS no plano proximo.
+    # Manter a faixa coesa evita que publico, escadas e camarote aparecam duas
+    # vezes em zoom, dash e salto; o ceu real segue em profundidade separada.
+    draw.rectangle((0, 175, pan.width, limit), fill=255)
+    for y in range(150, 175):
+        draw.line((0, y, pan.width, y), fill=round((y - 150) * 255 / 25))
+    draw.polygon([(0, 0), (220, 0), (410, 65), (480, 125),
+                  (500, 175), (0, 175)], fill=255)
+    draw.polygon([(470, 140), (520, 78), (575, 56), (610, 24),
+                  (700, 22), (805, 72), (850, 145), (850, 175),
+                  (470, 175)], fill=255)
+    draw.rectangle((1100, 80, 1180, 180), fill=255)
+    draw.rectangle((2500, 100, 2570, 180), fill=255)
+    # Holofotes: travessa superior + torre de trelica + pano pendurado.
+    for light_left, light_right, stem_left, stem_right in (
+        (1408, 1545, 1454, 1506),
+        (2072, 2195, 2110, 2160),
+    ):
+        draw.rectangle((light_left, 0, light_right, 47), fill=255)
+        draw.rectangle((stem_left, 32, stem_right, 180), fill=255)
+        draw.polygon([(stem_left - 18, 183), (stem_right + 14, 187),
+                      (stem_right + 3, 210), (stem_left - 19, 205)], fill=255)
+    draw.polygon([(3160, 150), (3270, 85), (3440, 32), (3630, 0),
+                  (3630, 180), (3160, 180)], fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(radius=3))
+
+    # Preenche os buracos ocultos atras das construcoes com nuvens reais da
+    # regiao entre as duas torres. Interpolar uma coluna horizontalmente gerava
+    # listras quando a camera abria o espaco atras das bandeiras.
+    alpha = np.asarray(mask, dtype=np.uint8)
+    cloud_patch = source[:175, 1580:2050]
+    patch_w = cloud_patch.shape[1]
+    xx = np.arange(pan.width) % (patch_w * 2)
+    mirrored = np.where(xx < patch_w, xx, patch_w * 2 - xx - 1)
+    cloud = cloud_patch[:, mirrored]
+    sky_surface = source.copy()
+    for y in range(limit):
+        if y >= 175:
+            reflected_y = max(0, 349 - y)
+            behind = cloud[reflected_y]
+        else:
+            behind = cloud[y]
+        # Onde o recorte nao existe, a paisagem distante continua intacta.
+        a = alpha[y].astype(np.float32)[:, None] / 255.0
+        sky_surface[y] = np.clip(source[y] * (1 - a) + behind * a, 0, 255).astype(np.uint8)
+
     overscan = round(pan.height * SKY_OVERSCAN)
-    # Extensao acima da tela contra a faixa roxa chapada nos saltos. Refletir
-    # apenas as linhas do alto (nunca o edificio), suavizando o trecho que so
-    # aparece fora da camera de repouso; nao esticar uma linha em listras.
-    reflected = np.flip(source[:overscan], axis=0).copy()
+    # A extensao superior usa ceu SEM construcoes, com continuidade na borda.
+    reflected = np.flip(sky_surface[:overscan], axis=0).copy()
     soft = np.asarray(Image.fromarray(reflected).filter(
         ImageFilter.GaussianBlur(radius=12)), dtype=np.float32)
     t = np.linspace(0, 1, overscan, dtype=np.float32)[:, None, None]
     extra = np.clip(soft * (1 - t) + reflected * t, 0, 255).astype(np.uint8)
-    whole = Image.fromarray(np.concatenate([extra, source], axis=0), "RGB")
+    whole = Image.fromarray(np.concatenate([extra, sky_surface], axis=0), "RGB")
     whole.save(DEST / "fundo_panorama.webp", "WEBP", quality=95, method=6)
+    foreground = Image.fromarray(np.dstack([source, alpha]), "RGBA")
+    foreground.save(DEST / "arquibancadas_panorama.webp", "WEBP", quality=96, method=6)
 
 
 def floor_texture(pan: Image.Image) -> None:
@@ -138,7 +185,11 @@ def render_rest_preview(pan: Image.Image, target: Path) -> float:
     sky_y = round(SKY_OVERSCAN * VH)
     left = center - VW // 2
     far = sky.crop((left, sky_y, left + VW, sky_y + round(BASE * VH))).convert("RGBA")
-    foreground = far.convert("RGB")
+    with Image.open(DEST / "arquibancadas_panorama.webp") as near_source:
+        near = near_source.convert("RGBA").resize(
+            (display_width, round(BASE * VH)), Image.Resampling.LANCZOS
+        ).crop((left, 0, left + VW, round(BASE * VH)))
+    foreground = Image.alpha_composite(far, near).convert("RGB")
     frame[:foreground.height] = np.asarray(foreground)
     horizon = HORIZON * VH
     eye_height = (SCREEN_GROUND_Y - horizon) / REST_ZOOM
@@ -171,7 +222,7 @@ def main() -> None:
     if args.rest_preview:
         difference = render_rest_preview(pan, args.rest_preview)
         print(f"Camera de repouso: erro medio RGB {difference:.2f}/255 contra a pintura")
-    print(f"Arena Central: {pan.width}x{pan.height}, fundo unico + piso, sem repeticao/espelho")
+    print(f"Arena Central: {pan.width}x{pan.height}, ceu + arquitetura recortada + piso")
 
 
 if __name__ == "__main__":
