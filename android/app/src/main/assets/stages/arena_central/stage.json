@@ -33,23 +33,14 @@
   },
   "camadas": [
     {
-      "id": "ceu_montanhas_panorama",
+      "id": "arena_panorama",
       "imagem": "fundo_panorama.webp",
-      "profundidade": 8000,
-      "topo": 0,
+      "profundidade": 2008,
+      "topo": -0.18,
       "base": 0.555,
       "x": 0.5,
       "repetir": "nao",
       "corAcima": "#5A2950"
-    },
-    {
-      "id": "arquibancadas_panorama",
-      "imagem": "arquibancadas_panorama.webp",
-      "profundidade": 2008,
-      "topo": 0,
-      "base": 0.555,
-      "x": 0.5,
-      "repetir": "nao"
     }
   ],
   "chao": {

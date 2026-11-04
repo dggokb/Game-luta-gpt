@@ -12,7 +12,7 @@ import argparse
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +23,7 @@ RIGHT = ART / "panorama_direita.webp"
 OVERLAP = 180
 BASE = 0.555
 HORIZON = 0.47
+SKY_OVERSCAN = 0.18
 VW, VH = 1280, 720
 CAMERA_DISTANCE = 1000.0
 REST_ZOOM = 1.24
@@ -53,17 +54,22 @@ def panorama(left: Image.Image, right: Image.Image) -> Image.Image:
 def layers(pan: Image.Image) -> None:
     limit = round(pan.height * BASE)
     background = pan.crop((0, 0, pan.width, limit))
-    background.save(DEST / "fundo_panorama.webp", "WEBP", quality=94, method=6)
-
-    # Mesmo desenho na camera de repouso. A mascara deixa o ceu/montanhas
-    # mais distantes e prende as arquibancadas ao plano do limite do piso.
-    rgba = np.asarray(background.convert("RGBA")).copy()
-    y = np.arange(limit, dtype=np.float32)
-    alpha = np.clip((y - 180) / 85, 0, 1)
-    rgba[:, :, 3] = np.round(alpha[:, None] * 255).astype(np.uint8)
-    Image.fromarray(rgba, "RGBA").save(
-        DEST / "arquibancadas_panorama.webp", "WEBP", quality=96, method=6
-    )
+    source = np.asarray(background.convert("RGB"), dtype=np.uint8)
+    # A pintura arquitetonica e UMA estrutura. Separar a mesma imagem inteira
+    # em dois planos criou um segundo camarote no pulo e fendas nas torres.
+    # Ate termos mascara real dos elementos arquitetonicos, ela fica num plano
+    # unico. O chao continua independente com perspectiva/parallax de verdade.
+    overscan = round(pan.height * SKY_OVERSCAN)
+    # Extensao acima da tela contra a faixa roxa chapada nos saltos. Refletir
+    # apenas as linhas do alto (nunca o edificio), suavizando o trecho que so
+    # aparece fora da camera de repouso; nao esticar uma linha em listras.
+    reflected = np.flip(source[:overscan], axis=0).copy()
+    soft = np.asarray(Image.fromarray(reflected).filter(
+        ImageFilter.GaussianBlur(radius=12)), dtype=np.float32)
+    t = np.linspace(0, 1, overscan, dtype=np.float32)[:, None, None]
+    extra = np.clip(soft * (1 - t) + reflected * t, 0, 255).astype(np.uint8)
+    whole = Image.fromarray(np.concatenate([extra, source], axis=0), "RGB")
+    whole.save(DEST / "fundo_panorama.webp", "WEBP", quality=95, method=6)
 
 
 def floor_texture(pan: Image.Image) -> None:
@@ -97,10 +103,14 @@ def floor_texture(pan: Image.Image) -> None:
     Image.fromarray(np.clip(pixels, 0, 255).astype(np.uint8), "RGB").save(
         DEST / "piso_panorama.webp", "WEBP", quality=94, method=6
     )
-    # Amostra de pedras sem o grande simbolo dourado, usada fora da textura central.
-    pan.crop((200, 575, 800, 715)).save(
-        DEST / "piso_lajotas.webp", "WEBP", quality=90, method=6
-    )
+    # Nao ampliar um recorte de 600x140 a dimensao de um campo inteiro: isso
+    # causava faixas desfocadas quando o zoom/pulo revelava lajotas fora do centro.
+    # A textura ortografica nao contem o emblema e tem resolucao equivalente
+    # a imagem principal do piso, evitando diferenca grotesca entre as copias.
+    with Image.open(ART / "piso_neutro_fonte.webp") as neutral:
+        neutral.convert("RGB").resize((columns, rows), Image.Resampling.LANCZOS).save(
+            DEST / "piso_lajotas.webp", "WEBP", quality=94, method=6
+        )
 
 
 def render_rest_preview(pan: Image.Image, target: Path) -> float:
@@ -112,6 +122,16 @@ def render_rest_preview(pan: Image.Image, target: Path) -> float:
     with Image.open(DEST / "piso_panorama.webp") as floor:
         tex = np.asarray(floor.convert("RGB"), dtype=np.uint8)
     frame = expected.copy()
+    display_width = src.shape[1]
+    with Image.open(DEST / "fundo_panorama.webp") as sky_source:
+        sky = sky_source.convert("RGB").resize(
+            (display_width, round((BASE + SKY_OVERSCAN) * VH)), Image.Resampling.LANCZOS
+        )
+    sky_y = round(SKY_OVERSCAN * VH)
+    left = center - VW // 2
+    far = sky.crop((left, sky_y, left + VW, sky_y + round(BASE * VH))).convert("RGBA")
+    foreground = far.convert("RGB")
+    frame[:foreground.height] = np.asarray(foreground)
     horizon = HORIZON * VH
     eye_height = (SCREEN_GROUND_Y - horizon) / REST_ZOOM
     distance = CAMERA_DISTANCE / REST_ZOOM
@@ -125,7 +145,7 @@ def render_rest_preview(pan: Image.Image, target: Path) -> float:
     floor_pixels = tex[np.floor(ty).astype(int)[:, None], np.floor(tx).astype(int)]
     frame[round(BASE * VH) + 2:] = floor_pixels
     Image.fromarray(frame, "RGB").save(target)
-    return float(np.abs(frame[420:].astype(np.int16) - expected[420:].astype(np.int16)).mean())
+    return float(np.abs(frame.astype(np.int16) - expected.astype(np.int16)).mean())
 
 
 def main() -> None:
@@ -143,7 +163,7 @@ def main() -> None:
     if args.rest_preview:
         difference = render_rest_preview(pan, args.rest_preview)
         print(f"Camera de repouso: erro medio RGB {difference:.2f}/255 contra a pintura")
-    print(f"Arena Central: {pan.width}x{pan.height}, quatro assets gerados sem repeticao/espelho")
+    print(f"Arena Central: {pan.width}x{pan.height}, fundo unico + piso, sem repeticao/espelho")
 
 
 if __name__ == "__main__":
