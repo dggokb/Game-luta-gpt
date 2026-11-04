@@ -1582,6 +1582,14 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
 - **Simulado (`BateriaKof`, 960 lutas por nível):** igual ao de 20% dentro do ruído.
 - **Ficou** para o jogador testar. **Detalhes:** `comparacao-kof97.md`.
 
+## Pulo de volta ao original (pedido do jogador, 04/11)
+
+- O jogador jogou com o pulo 15% mais rápido e pediu o original de volta: ~42 quadros no ar,
+  com a mesma altura e distância de sempre. A queda com quique e a câmera mais perto ficam.
+- Simulado antes, na comparação com o KOF '97: o original é tirado do ar um pouco mais (19%
+  contra 17–18%) e acerta um pouco menos (21% contra 23–24%), sem mexer no equilíbrio do
+  elenco. **Detalhes:** `comparacao-kof97.md`.
+
 ## Lutas 2x2 que estouram o tempo (pedido do jogador, 03/11)
 
 - **Medido (`BateriaTempo`, CPU × CPU, duplas sorteadas, 240 lutas por nível, relógio de 180 s):**

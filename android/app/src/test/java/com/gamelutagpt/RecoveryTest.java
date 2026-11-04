@@ -100,7 +100,7 @@ public class RecoveryTest {
         quick.knockedDown();
         quick.in[0].direction = 7;          // ↑
         int quickFrames = quick.framesUntilFree(300);
-        assertTrue(quickFrames + 12 < normalFrames);
+        assertTrue(quickFrames + 20 < normalFrames);
 
         Sim late = new Sim();
         late.knockedDown();

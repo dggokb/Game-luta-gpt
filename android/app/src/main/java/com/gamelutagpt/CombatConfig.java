@@ -111,17 +111,17 @@ final class CombatConfig {
     float dashSpeed = 620f;
     /**
      * Pulo normal: velocidade de lado no ar, para frente e para trás. Mais que a de andar: com o
-     * mesmo tempo no ar (~36 quadros) vai ~280 para frente (passa do alcance dos golpes de chão
-     * e cruza por cima de perto) e ~205 para trás. (Eram 400 e 290 com ~42 quadros no ar; o pulo
-     * ficou 15% mais rápido com a mesma distância, docs/balanco/comparacao-kof97.md.)
+     * mesmo tempo no ar (~42 quadros) vai ~280 para frente (passa do alcance dos golpes de chão
+     * e cruza por cima de perto) e ~205 para trás. (O pulo mais rápido do KOF '97, 03/11, foi
+     * testado e o jogador pediu de volta o original em 04/11: docs/balanco/comparacao-kof97.md.)
      */
-    float jumpForwardSpeed = 470.6f;
-    float jumpBackSpeed = 341.2f;
+    float jumpForwardSpeed = 400f;
+    float jumpBackSpeed = 290f;
     /**
      * Pulo saído da corrida (dash jump): velocidade para frente no ar. Leva o embalo do dash e
      * vai ~400, bem mais que o pulo normal.
      */
-    float dashJumpSpeed = 635.3f;
+    float dashJumpSpeed = 540f;
     /**
      * Pulo normal comprometido: nos primeiros quadros no ar a direção ainda pode ser escolhida
      * (o "pré-pulo" dos jogos de luta), depois fica fixa.
@@ -146,14 +146,12 @@ final class CombatConfig {
         float fraction = (total - framesLeft) / (float)total;
         return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
     }
-    // 60 FPS normal jump: ~36 airborne frames, apex ~1.16x P01's standing hurtbox.
+    // 60 FPS normal jump: ~42 airborne frames, apex ~1.16x P01's standing hurtbox.
     // Sized for the 226-unit P01 (the 156-unit version used 1030 / 1.70 / 2.00, apex ~182):
     // speed and gravity scale by 226/156, so the cadence stays and only the height grows.
-    // Pulo 15% mais rápido com a mesma altura (como o KOF '97, docs/balanco/comparacao-kof97.md):
-    // velocidade /0,85 (+7 para o passo de 60 Hz chegar à mesma altura) e gravidade do pulo /0,7225.
-    // Eram 1492 / 2,463 / 2,897, com ~42 quadros no ar (o 20% mais rápido, 1876 / 3,848 / 4,527,
-    // ficou só um dia: o jogador pediu levemente menos rápido).
-    float jumpSpeed = 1762f;
+    // O original (03/11 testamos 20% e 15% mais rápido, 1876 / 3,848 / 4,527 e 1762 / 3,409 /
+    // 4,010; o jogador pediu de volta este em 04/11).
+    float jumpSpeed = 1492f;
     /**
      * Preparação do pulo do chão (jump squat): quadros agachando antes de sair do chão, sem
      * golpe, dash nem andar (a corrida segue no embalo). O pulo que cancela um golpe sai na hora
@@ -165,11 +163,11 @@ final class CombatConfig {
      * tocar o chão (defender pode). O golpe aéreo que aterrissa continua livre na hora.
      */
     int jumpLandingFrames = 3;
-    float normalJumpRisingGravityScale = 3.409f;
-    float normalJumpFallingGravityScale = 4.010f;
+    float normalJumpRisingGravityScale = 2.463f;
+    float normalJumpFallingGravityScale = 2.897f;
     float superJumpSpeed = 1450f;
     /** Cancelamento de pulo no ar (jM → pulo, uma vez por voo): impulso para cima. */
-    float airJumpSpeed = 1066f;
+    float airJumpSpeed = 900f;
     float gravity = 1650f;
     float launchSpeed = 1450f;
     float slamSpeed = 1850f;

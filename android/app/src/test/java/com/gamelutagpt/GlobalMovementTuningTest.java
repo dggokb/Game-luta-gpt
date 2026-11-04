@@ -14,10 +14,10 @@ public class GlobalMovementTuningTest {
 
     @Test public void higherNormalJumpAppliesToBothAndKeepsSuperJump() {
         CombatEngine e=engine();
-        assertEquals(1762f,e.config.jumpSpeed,.001f);
+        assertEquals(1492f,e.config.jumpSpeed,.001f);
         assertEquals(1450f,e.config.superJumpSpeed,.001f);
-        assertEquals(3.409f,e.config.normalJumpRisingGravityScale,.001f);
-        assertEquals(4.010f,e.config.normalJumpFallingGravityScale,.001f);
+        assertEquals(2.463f,e.config.normalJumpRisingGravityScale,.001f);
+        assertEquals(2.897f,e.config.normalJumpFallingGravityScale,.001f);
         FighterInput[] pad={new FighterInput(),new FighterInput()};
         pad[0].jump=true;pad[1].jump=true;
         e.step(pad[0],pad[1]);
@@ -58,9 +58,8 @@ public class GlobalMovementTuningTest {
             e.step(jump,neutral);
             airborne++;
         }
-        // ~42 até 03/11; 15% mais rápido com a mesma altura (docs/balanco/comparacao-kof97.md).
-        assertTrue("Normal jump expected ~35-36 frames, got "+airborne,
-            airborne>=34 && airborne<=37);
+        assertTrue("Normal jump expected ~41-43 frames, got "+airborne,
+            airborne>=40 && airborne<=44);
         float rivalHeight=e.fighter(1).body().standHeight;
         assertTrue("Normal jump must clear standing rival",apex>rivalHeight*1.10f);
         assertTrue("Normal jump should not reach superjump heights",apex<rivalHeight*1.23f);

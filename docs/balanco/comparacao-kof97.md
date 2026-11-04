@@ -72,3 +72,12 @@ de tamanho é a altura do corpo em pé: o Ryo no vídeo, o Ryūga (224 px) no no
   - a duração das lutas não muda (95–96 s no nível 8);
   - o desvio das vitórias fica 19,9 / 17,9 (era 19,9 / 18,4).
 - **Ficou** para o jogador testar. Os números estão em `perfis/kof-pulo-queda.md`.
+
+### Pulo de volta ao original (pedido do jogador, 04/11)
+
+- Depois de jogar, o jogador pediu o pulo original de volta: ~42 quadros no ar, 1492 /
+  2,463 / 2,897, para frente 400, para trás 290, corrida 540 e pulo no ar 900.
+- A queda com quique e a câmera mais perto continuam.
+- Nas simulações, o pulo original perdia um pouco para o rápido: era tirado do ar 19% das vezes
+  (contra 17–18%) e acertava 21% (contra 23–24%), com o equilíbrio do elenco igual. A diferença
+  é pequena; a escolha foi pela sensação na mão.
