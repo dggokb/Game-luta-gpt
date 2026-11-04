@@ -713,6 +713,22 @@ public class StageSceneTest {
     }
 
     @Test
+    public void sombraCompridaDosLutadores() {
+        StageDefinition def = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], "
+            + "\"sombraLutadores\": {\"alfa\": 0.4, \"x\": -0.6, \"y\": 0.25}}");
+        org.junit.Assert.assertEquals(0.4f, def.fighterShadow.alpha, 1e-6f);
+        org.junit.Assert.assertEquals(-0.6f, def.fighterShadow.skewX, 1e-6f);
+        org.junit.Assert.assertEquals(0.25f, def.fighterShadow.squashY, 1e-6f);
+        org.junit.Assert.assertNull(StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": []}").fighterShadow);
+        try {
+            StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"sombraLutadores\": {\"alfa\": 0}}");
+            org.junit.Assert.fail("sombra sem escuro");
+        } catch (IllegalArgumentException esperado) {
+            // alfa 0 não desenha nada
+        }
+    }
+
+    @Test
     public void contraluzEPesDoCenario() {
         StageDefinition def = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], "
             + "\"luzLutadores\": {\"cor\": \"#FFFFFF\", \"pes\": \"#808080\", "

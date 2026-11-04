@@ -4291,6 +4291,7 @@ public class GameView extends SurfaceView
                 }
             }
             if (cenario) drawFloorReflections(canvas);
+            if (cenario) drawCastShadows(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, Math.max(feel.darkAlpha(), ativacaoAlfa()), 0, 0, 8);
@@ -4504,6 +4505,57 @@ public class GameView extends SurfaceView
         CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
         if (cpuPartner != null) drawReflection(c, opponentPartnerRenderer, cpuPartner, 0f, alpha);
         drawReflection(c, spriteFighterRenderer, player(), tagOffset(), alpha);
+    }
+
+    /**
+     * Sombra comprida dos lutadores (stage.json "sombraLutadores", o sol baixo do conceito): a
+     * silhueta deitada no chão, inclinada para o lado contrário da luz. Uma cópia do sprite por
+     * lutador, como o reflexo, sem rastro, poeira nem contorno.
+     */
+    private void drawCastShadows(Canvas c) {
+        com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
+        com.gamelutagpt.stage.StageDefinition.FighterShadow sombra = def != null ? def.fighterShadow : null;
+        if (sombra == null) return;
+        if (sombraFiltro == null || sombraDe != sombra) {
+            sombraFiltro = Filtro.silhueta(Math.round(255 * sombra.alpha) << 24);
+            sombraDe = sombra;
+        }
+        CombatFighter npc = opponent();
+        drawCastShadow(c, opponentSpriteRenderer, npc, engine.teams.tagOffset(OPPONENT), sombra);
+        CombatFighter partner = partnerBody(engine.team(PLAYER));
+        if (partner != null) drawCastShadow(c, partnerSpriteRenderer, partner, 0f, sombra);
+        CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
+        if (cpuPartner != null) drawCastShadow(c, opponentPartnerRenderer, cpuPartner, 0f, sombra);
+        drawCastShadow(c, spriteFighterRenderer, player(), tagOffset(), sombra);
+    }
+
+    private Filtro sombraFiltro;
+    private com.gamelutagpt.stage.StageDefinition.FighterShadow sombraDe;
+    private final android.graphics.Matrix sombraMatriz = new android.graphics.Matrix();
+    private final float[] sombraValores = new float[9];
+
+    private void drawCastShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX,
+                                com.gamelutagpt.stage.StageDefinition.FighterShadow sombra) {
+        if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || renderer.override() != null) return;
+        // No alto do pulo a sombra clareia (como a de contato).
+        float altura = Math.max(0f, GROUND_Y - fighterVisualY(f));
+        float k = clamp(1f - altura / SHADOW_FADE_HEIGHT, 0.25f, 1f);
+        // Um ponto a h acima do chão (y = GROUND_Y - h) vai para x + skewX·h e GROUND_Y + squashY·h.
+        float[] v = sombraValores;
+        v[0] = 1f; v[1] = -sombra.skewX; v[2] = sombra.skewX * GROUND_Y + offsetX;
+        v[3] = 0f; v[4] = -sombra.squashY; v[5] = GROUND_Y * (1f + sombra.squashY);
+        v[6] = 0f; v[7] = 0f; v[8] = 1f;
+        sombraMatriz.setValues(v);
+        c.save();
+        c.concat(sombraMatriz);
+        renderer.setOverride(sombraFiltro);
+        renderer.setAlphaGlobal(Math.round(255f * k));
+        drawingReflection = true;
+        drawFighter(c, renderer, f, false, false);
+        drawingReflection = false;
+        renderer.setAlphaGlobal(255);
+        renderer.setOverride(null);
+        c.restore();
     }
 
     private void drawReflection(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX, int alpha) {

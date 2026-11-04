@@ -19,6 +19,11 @@
       ]
     }
   },
+  "sombraLutadores": {
+    "alfa": 0.42,
+    "x": 0.75,
+    "y": 0.22
+  },
   "camadas": [
     {
       "id": "ceu",

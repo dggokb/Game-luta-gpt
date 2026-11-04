@@ -32,7 +32,8 @@ import java.util.Map;
  *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
  *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 },
  *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9, "pes": "#C0C4DC",
- *                     "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } }
+ *                     "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } },
+ *   "sombraLutadores": { "alfa": 0.42, "x": 0.6, "y": 0.22 }
  * }
  * </pre>
  */
@@ -454,6 +455,24 @@ public final class StageDefinition {
     public final Lightning lightning;
     /** A luz do cenário nos lutadores (sol, noite, chuva, lanternas); null = sem tom. */
     public final FighterLight fighterLight;
+    /** A sombra comprida dos lutadores no chão (sol baixo), ou null. */
+    public final FighterShadow fighterShadow;
+
+    /**
+     * Sombra projetada ({@code "sombraLutadores"}): a silhueta do lutador deitada no chão, para
+     * o lado contrário da luz. Um ponto a {@code h} acima do chão cai a {@code x·h} para o lado
+     * (positivo = direita) e {@code y·h} para baixo na tela (para perto da câmera). {@code alfa}
+     * é o escuro dela.
+     */
+    public static final class FighterShadow {
+        public final float alpha, skewX, squashY;
+
+        FighterShadow(float alpha, float skewX, float squashY) {
+            this.alpha = alpha;
+            this.skewX = skewX;
+            this.squashY = squashY;
+        }
+    }
 
     /**
      * A luz do lugar sobre os lutadores: cada canal da cor multiplicado por
@@ -511,7 +530,7 @@ public final class StageDefinition {
 
     private StageDefinition(String name, float cameraDistance, float horizon, int backgroundColor,
                             List<Layer> layers, Floor floor, Petals petals, Rain rain, Lightning lightning,
-                            FighterLight fighterLight) {
+                            FighterLight fighterLight, FighterShadow fighterShadow) {
         this.name = name;
         this.cameraDistance = cameraDistance;
         this.horizon = horizon;
@@ -522,6 +541,7 @@ public final class StageDefinition {
         this.rain = rain;
         this.lightning = lightning;
         this.fighterLight = fighterLight;
+        this.fighterShadow = fighterShadow;
     }
 
     // ------------------------------------------------------------- leitura
@@ -640,8 +660,18 @@ public final class StageDefinition {
                 pes, rimCor, rimForca, rimX, rimY);
         }
 
+        FighterShadow shadow = null;
+        Map<String, Object> shadowMap = object(map, "sombraLutadores");
+        if (shadowMap != null) {
+            float alfa = number(shadowMap, "alfa", 0.4f);
+            float y = number(shadowMap, "y", 0.22f);
+            if (alfa <= 0f || alfa > 1f) throw new IllegalArgumentException("sombraLutadores: \"alfa\" entre 0 e 1");
+            if (y < 0f || y > 1f) throw new IllegalArgumentException("sombraLutadores: \"y\" entre 0 e 1");
+            shadow = new FighterShadow(alfa, number(shadowMap, "x", 0.5f), y);
+        }
+
         return new StageDefinition(name.trim(), distance, horizon,
-            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light);
+            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light, shadow);
     }
 
     @SuppressWarnings("unchecked")
