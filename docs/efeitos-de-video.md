@@ -91,14 +91,18 @@ python3 tools/sprites/efeito_video.py saida --nome defesa --origem 408,341 --alt
 Os mesmos passos deram dois efeitos de luta (com `--brilho --sem-corpo`: o brilho meio
 transparente fica, e as manchas brancas grudadas no corpo, como tênis e olho, saem; `--cores` guarda
 efeito colorido: tira o halo verde-claro do vídeo e devolve o dourado que a chave deixa oliva;
-`--dourado` pinta pela distância até a borda, miolo creme, dourado e borda laranja: **o dano é
-dourado e a defesa é branca**, para ler na hora o que aconteceu):
+`--dourado` refaz o efeito em traço de anime: alisa a mancha borrada do vídeo no dobro do
+tamanho, corta numa borda limpa, tira os pontinhos soltos e pinta em faixas chapadas (contorno fino
+laranja-escuro, laranja, dourado e miolo creme), com um brilho fraco por fora. **O dano é dourado e
+a defesa é branca**, para ler na hora o que aconteceu. Como sai no dobro do tamanho, a `--origem`
+do conversor também dobra, e a folha vai com `--resolucao 2.5` (mais pixels que o 1.5 de
+sempre: na tela do celular a folha encolhe em vez de esticar, e o contorno fica nítido):
 
 | Folha | Vídeo | Quadros | No jogo |
 |---|---|---|---|
-| `impacto_forte` | Personagem_Recebendo_Dano_Agachado (o estouro na cabeça, 8-11; `--brilho --chao-tenis 690 --sem-corpo --dourado`; origem 757,286) | 4 | golpe forte que acerta |
-| `impacto_fraco` | Red-Haired_Clown_Fighter_Guard_Stance (a faísca branca no punho, 27-31; `--placa 33-40 --raio 1058,311,360 --excluir 0,0,0,980,768 --dourado`; origem 1058,311) | 5 | golpe fraco; o médio usa ele 25% maior |
-| `impacto_especial` | Bonnie_Tomando_Dano (só o impacto e as faíscas, 8-12, sem o jato que vem antes; `--cores --brilho --sem-corpo --espelhar --raio 693,394,300 --dourado`; origem 650,394) | 5 | especial, Super e KO |
+| `impacto_forte` | Personagem_Recebendo_Dano_Agachado (o estouro na cabeça, 8-11; `--brilho --chao-tenis 690 --sem-corpo --dourado`; origem 1514,572 dobrada, altura 294) | 4 | golpe forte que acerta |
+| `impacto_fraco` | Red-Haired_Clown_Fighter_Guard_Stance (a faísca branca no punho, 27-31; `--placa 33-40 --raio 1058,311,360 --excluir 0,0,0,980,768 --dourado`; origem 2116,622 dobrada, altura 181) | 5 | golpe fraco; o médio usa ele 25% maior |
+| `impacto_especial` | Bonnie_Tomando_Dano (só o impacto e as faíscas, 8-12, sem o jato que vem antes; `--cores --brilho --sem-corpo --espelhar --raio 693,394,300 --dourado`; origem 1300,788 dobrada, altura 244) | 5 | especial, Super e KO |
 | `impacto_chao` | Personagem_Cai_e_Levanta_Rápido (o vento/poeira do corpo no chão, 37-44; origem 420,700) | 8 | knockdown |
 
 Defesas com `--placa` (quadros parados do personagem sem efeito): o efeito é o que clareou em
