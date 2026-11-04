@@ -29,6 +29,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / 'android/app/src/main/assets/selection'
 CONCEPTS = ROOT / 'art/concepts'
+# Fonte que só a ferramenta usa (fora dos assets: não vai no APK).
+FONTES = ROOT / 'art/selection'
 # ids da arte (player_base é p01).
 HEROES = ('p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'p07', 'p08')
 FACES = tuple(f'p{n:02d}' for n in range(1, 17))
@@ -80,7 +82,7 @@ def outputs():
     out = {}
     for hero in HEROES:
         if hero == 'p05':
-            atlas = Image.open(ASSETS / 'art/heroes_p02_p05.png').convert('RGBA')
+            atlas = Image.open(FONTES / 'heroes_p02_p05.png').convert('RGBA')
             w, h = atlas.width // 2, atlas.height // 2
             image = atlas.crop((w, h, w + w, h + h))
         else:

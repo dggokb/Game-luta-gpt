@@ -58,7 +58,7 @@ Geração/edição feita com imagegen integrado, com preservação da identidade
 
 ## Continuação a partir do HEAD 20f8a28526b9a79c55909ea55b692c503503f068
 
-- O renderer decodifica `heroes_p02_p05.png` uma vez, divide em quatro células iguais
+- O renderer decodifica `heroes_p02_p05.png` (hoje em `art/selection/`, fora do APK) uma vez, divide em quatro células iguais
   com alpha e associa P02/P03/P04/P05 em ordem de leitura. Não há procura por
   arquivos individuais ausentes para esses IDs.
 - P06 e P07: extração/recriação da pose de ação superior direita dos concepts,
