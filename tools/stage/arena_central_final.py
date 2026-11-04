@@ -62,7 +62,7 @@ def layers(pan: Image.Image) -> None:
     alpha = np.clip((y - 180) / 85, 0, 1)
     rgba[:, :, 3] = np.round(alpha[:, None] * 255).astype(np.uint8)
     Image.fromarray(rgba, "RGBA").save(
-        DEST / "arquibancadas_panorama.webp", "WEBP", lossless=True, method=6
+        DEST / "arquibancadas_panorama.webp", "WEBP", quality=96, method=6
     )
 
 

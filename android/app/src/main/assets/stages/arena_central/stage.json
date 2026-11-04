@@ -33,40 +33,33 @@
   },
   "camadas": [
     {
-      "id": "fundo",
-      "imagem": "fundo_conceito.jpg",
+      "id": "ceu_montanhas_panorama",
+      "imagem": "fundo_panorama.webp",
+      "profundidade": 8000,
+      "topo": 0,
+      "base": 0.555,
+      "x": 0.5,
+      "repetir": "nao",
+      "corAcima": "#5A2950"
+    },
+    {
+      "id": "arquibancadas_panorama",
+      "imagem": "arquibancadas_panorama.webp",
       "profundidade": 2008,
       "topo": 0,
       "base": 0.555,
       "x": 0.5,
-      "repetir": "espelhar",
-      "corAcima": "#5A2950"
-    },
-    {
-      "id": "arquibancada_esquerda",
-      "imagem": "lateral_estadio.webp",
-      "profundidade": 2007,
-      "topo": 0.22,
-      "base": 0.555,
-      "x": -0.16,
-      "virar": true
-    },
-    {
-      "id": "arquibancada_direita",
-      "imagem": "lateral_estadio.webp",
-      "profundidade": 2007,
-      "topo": 0.22,
-      "base": 0.555,
-      "x": 1.16
+      "repetir": "nao"
     }
   ],
   "chao": {
-    "imagem": "chao_conceito.jpg",
-    "imagemLajotas": "chao_conceito.jpg",
+    "imagem": "piso_panorama.webp",
+    "imagemLajotas": "piso_lajotas.webp",
     "perto": -700,
     "longe": 2008,
     "ate": 2008,
     "centroX": 700,
-    "reflexoLuzes": 0.5
+    "reflexoLutadores": 0.1,
+    "reflexoLuzes": 0.25
   }
 }
