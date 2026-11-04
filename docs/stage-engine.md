@@ -248,8 +248,10 @@ frações dela, como as bandeiras:
     acima do chão e a `profundidade` (positiva atrás dos lutadores, negativa na frente). A
     sombra de cada lutador sai para o lado contrário do foco: comprida longe dele, curta
     embaixo dele, e vira de lado quando o lutador passa por baixo. `alcance` (opcional) faz
-    ela clarear com a distância até sumir, e `alfa` no foco troca o da sombra. Até 3 focos;
-    cada um custa uma cópia de cada lutador por quadro. A conta é a da câmera de repouso
+    ela clarear com a distância até sumir, e `alfa` no foco troca o da sombra. Até 8 focos;
+    cada lutador desenha só a sombra dos 3 mais fortes sobre ele (cada uma custa uma cópia do
+    lutador por quadro). Um foco mais baixo que o corpo (uma tocha) dá sombra comprida: ela fica
+    na direção certa e é só encurtada (até 1,4 da altura). A conta é a da câmera de repouso
     (`FighterShadow.fromFocus`).
   Como sombra de verdade (no OpenGL): dura onde encosta nos pés e abrindo em penumbra e
   clareando até a ponta (a cabeça), num anel de 8 vizinhos com raio que cresce dos pés para a
@@ -260,7 +262,10 @@ frações dela, como as bandeiras:
   sobre cada um, na direção em que ele aparece na tela visto do peito do lutador (em passos de
   15 graus): vira de lado quando o lutador passa por baixo, e acende menos (35%) com o foco na
   frente dos lutadores, que aí ilumina de frente.
-  Na Arena Central o foco é o holofote da torre da esquerda do conceito (tela x 340, no alto
+  Na Arena Central os focos são os dois holofotes (o da esquerda forte, o da direita fraco) e
+  as chamas dos 5 braseiros do muro (com `alcance`: sombra comprida para a frente, que some
+  longe da tocha), calculados pelo `tools/stage/animar_central.py`. O holofote principal é
+  o da torre da esquerda do conceito (tela x 340, no alto
   da torre, na profundidade do estádio: x −27, altura 955, profundidade 1618), com a sombra roxo-escura (`#1C0A14`, alfa 0,72, `suave` 0,55).
 - **Pétalas**: partículas em 3D (x, y, z) caindo com vento. As de longe são pequenas e
   apagadas, as da frente (`z < 0`) passam grandes na frente dos lutadores.

@@ -474,14 +474,19 @@ public final class StageDefinition {
      * lutadores) e a sombra de cada lutador sai para o lado contrário dele: comprida longe do
      * foco, curta embaixo dele, e vira de lado quando o lutador passa por baixo. Com
      * {@code alcance} ela clareia com a distância até sumir; {@code alfa} do foco troca o da
-     * sombra. Até {@link #MAX_FOCOS} (cada foco é uma cópia do lutador a mais por quadro).
+     * sombra. Até {@link #MAX_FOCOS} focos; cada lutador desenha a sombra dos
+     * {@link #POR_LUTADOR} mais fortes sobre ele (cada uma é uma cópia do lutador a mais por
+     * quadro). Uma tocha baixa (mais baixa que a cabeça) dá sombra comprida: ela fica na direção
+     * certa e só é encurtada até {@link #MAX_COMPRIMENTO}.
      */
     public static final class FighterShadow {
-        public static final int MAX_FOCOS = 3;
+        public static final int MAX_FOCOS = 8;
+        /** Quantas sombras (as dos focos mais fortes) cada lutador desenha. */
+        public static final int POR_LUTADOR = 3;
         /** Meia altura de um lutador (mundo): a conta do foco usa esse ponto do corpo. */
         static final float MEIO_CORPO = 150f;
         /** Até onde a sombra estica (para o lado e para a frente), por unidade de altura. */
-        static final float MAX_LADO = 2.4f, MAX_FRENTE = 1.1f, MAX_TRAS = 0.5f;
+        static final float MAX_COMPRIMENTO = 1.4f, MAX_TRAS = 0.5f;
 
         public final float alpha, skewX, squashY;
         /** Os focos de luz; vazio = sol (usa {@link #skewX} e {@link #squashY}). */
@@ -538,8 +543,12 @@ public final class StageDefinition {
             float h = Math.max(f.height * 0.3f, f.height - MEIO_CORPO);
             float lado = (fighterX - f.x) / h;
             float frente = f.depth / h * depthToScreen;
-            out[0] = Math.max(-MAX_LADO, Math.min(MAX_LADO, lado));
-            out[1] = Math.max(-MAX_TRAS, Math.min(MAX_FRENTE, frente));
+            frente = Math.max(-MAX_TRAS, frente);
+            // Comprida demais (foco baixo, quase na altura do corpo): mesma direção, mais curta.
+            float comprimento = (float)Math.sqrt(lado * lado + frente * frente);
+            float k = comprimento > MAX_COMPRIMENTO ? MAX_COMPRIMENTO / comprimento : 1f;
+            out[0] = lado * k;
+            out[1] = frente * k;
             float a = Float.isNaN(f.alpha) ? alpha : f.alpha;
             if (f.range > 0f) {
                 float dx = fighterX - f.x;

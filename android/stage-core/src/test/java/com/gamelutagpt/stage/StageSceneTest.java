@@ -766,6 +766,20 @@ public class StageSceneTest {
         org.junit.Assert.assertEquals(2000f / 1000f * k, perto[1], 1e-4f);
         org.junit.Assert.assertTrue(perto[2] > longe[2] && longe[2] > 0f);
         org.junit.Assert.assertEquals(0f, fora[2], 1e-6f);
+        // Uma tocha baixa e longe para o lado: a sombra fica comprida na direção certa, encurtada.
+        StageDefinition.FighterShadow tocha = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [],"
+            + "\"sombraLutadores\": {\"focos\": [{\"x\": -500, \"altura\": 110, \"profundidade\": 1600}]}}").fighterShadow;
+        float[] baixa = new float[3];
+        tocha.fromFocus(tocha.focos.get(0), 500f, k, baixa);
+        float h = 0.3f * 110f;
+        float lado = 1000f / h, frente = 1600f / h * k;
+        org.junit.Assert.assertEquals(1.4f, (float)Math.hypot(baixa[0], baixa[1]), 1e-3f);
+        org.junit.Assert.assertEquals(lado / frente, baixa[0] / baixa[1], 1e-3f);
+        // Até 8 focos (cada lutador desenha os 3 mais fortes).
+        StringBuilder oito = new StringBuilder();
+        for (int i = 0; i < 8; i++) oito.append(i == 0 ? "" : ",").append("{\"x\": ").append(i * 100).append(", \"altura\": 900}");
+        org.junit.Assert.assertEquals(8, StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [],"
+            + "\"sombraLutadores\": {\"focos\": [" + oito + "]}}").fighterShadow.focos.size());
         // A contraluz vê o foco do peito do lutador: à esquerda e no alto; do outro lado, à direita.
         float[] rim = new float[3];
         StageDefinition.FighterShadow.rimFromFocus(foco.focos.get(0), 600f, 700f, 381f, 565f, 806f, rim);

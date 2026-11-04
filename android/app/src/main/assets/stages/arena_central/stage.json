@@ -25,9 +25,51 @@
     "suave": 0.55,
     "focos": [
       {
-        "x": -27,
-        "altura": 955,
-        "profundidade": 1618
+        "x": -35,
+        "altura": 970,
+        "profundidade": 1618,
+        "alfa": 0.72
+      },
+      {
+        "x": 1423,
+        "altura": 970,
+        "profundidade": 1618,
+        "alfa": 0.35
+      },
+      {
+        "x": -1335,
+        "altura": 64,
+        "profundidade": 1618,
+        "alfa": 0.55,
+        "alcance": 3000
+      },
+      {
+        "x": -505,
+        "altura": 113,
+        "profundidade": 1618,
+        "alfa": 0.55,
+        "alcance": 3000
+      },
+      {
+        "x": 386,
+        "altura": 116,
+        "profundidade": 1618,
+        "alfa": 0.55,
+        "alcance": 3000
+      },
+      {
+        "x": 931,
+        "altura": 116,
+        "profundidade": 1618,
+        "alfa": 0.55,
+        "alcance": 3000
+      },
+      {
+        "x": 1745,
+        "altura": 121,
+        "profundidade": 1618,
+        "alfa": 0.55,
+        "alcance": 3000
       }
     ]
   },
@@ -46,6 +88,31 @@
       "id": "montanhas",
       "imagem": "montanhas.webp",
       "cachoeiras": { "imagem": "montanhas_agua.png", "quadros": 8, "fps": 12, "areas": [[0.711, 0.4302, 0.0378, 0.2209], [0.8497, 0.2558, 0.0177, 0.1581], [0.9067, 0.1628, 0.0131, 0.0814]] },
+      "cachoeiras": {
+        "imagem": "montanhas_agua.png",
+        "quadros": 8,
+        "fps": 12,
+        "areas": [
+          [
+            0.711,
+            0.4302,
+            0.0378,
+            0.2209
+          ],
+          [
+            0.8497,
+            0.2558,
+            0.0177,
+            0.1581
+          ],
+          [
+            0.9067,
+            0.1628,
+            0.0131,
+            0.0814
+          ]
+        ]
+      },
       "profundidade": 5000,
       "topo": -0.0837,
       "base": 0.5779,

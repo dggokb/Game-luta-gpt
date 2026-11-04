@@ -11,7 +11,8 @@ largura e começam na linha 0 dele):
 
 * **bandeiras**: cada estandarte vermelho sai da imagem do estádio (o ``soltar_bandeiras``
   acha o pano pela cor dentro do retângulo) e balança; o lugar dele é tapado com a parede;
-* **fogos**: as chamas dos braseiros do muro;
+* **fogos**: as chamas dos braseiros do muro, que também são focos da sombra dos lutadores
+  (sombra comprida e fraca para a frente, junto com a dos holofotes);
 * **luzes**: os holofotes das torres e as lanternas, pulsando (as baixas refletem no chão);
 * **plateia**: só a gente das arquibancadas (máscara pela textura, dentro dos retângulos
   das arquibancadas) pula, mais nos golpes fortes, com flashes de câmera;
@@ -51,6 +52,11 @@ PAREDE = [(25, 135, 105, 392), (8, 120, 34, 180), (102, 88, 123, 133), (105, 165
 
 # Braseiros: o ponto onde a chama encosta na bacia e a altura dela (pixels).
 BRASEIROS = [(229, 410, 26), (538, 392, 24), (870, 391, 24), (1073, 391, 24), (1376, 389, 24)]
+
+# Focos da sombra dos lutadores: os holofotes (o da esquerda é o sol do conceito, o mais forte)
+# e as chamas dos braseiros (baixas: sombra comprida e fraca, que some longe da tocha).
+HOLOFOTES_SOMBRA = [(713, 63, 0.72), (1256, 63, 0.35)]
+TOCHA_ALFA, TOCHA_ALCANCE, TOCHA_CHAMA = 0.55, 3000, 10
 
 # Luzes: (x, y, raio em pixels, cor, reflete no chão).
 HOLOFOTE, LANTERNA = "#FFE6B0", "#FFB45A"
@@ -103,6 +109,19 @@ def soltar(img, caixas, balanco, pasta, lista):
     return img
 
 
+def no_mundo(px, py, janela, stage):
+    """Um ponto do panorama no estádio (camada no fim do chão) em coordenadas do mundo:
+    x, altura acima do chão e profundidade, pela câmera de repouso do cenario_do_conceito."""
+    import cenario_do_conceito as cc
+    escala, jx, jy = janela["escala"], janela["x"], janela["y"]
+    z = stage["chao"]["longe"]
+    horizon, eye_y, distance = cc.camera(stage["camera"]["horizonte"])
+    s = cc.BASE_DISTANCE / (distance + z)
+    chao_y = horizon + (cc.GROUND_Y - eye_y) * s
+    sx, sy = (px - jx) / escala, (py - jy) / escala
+    return round(cc.REST_CENTER_X + (sx - cc.VW / 2) / s), round((chao_y - sy) / s), z
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", type=Path, default=PASTA)
@@ -140,6 +159,15 @@ def main():
 
     stage_path = pasta / "stage.json"
     stage = json.loads(stage_path.read_text(encoding="utf-8"))
+    janela = json.loads((AQUI.parents[1] / "art/stages/arena_central/recorte.json").read_text(encoding="utf-8"))["janela"]
+    focos = []
+    for x, y, alfa in HOLOFOTES_SOMBRA:
+        fx, fy, fz = no_mundo(x, y, janela, stage)
+        focos.append({"x": fx, "altura": fy, "profundidade": fz, "alfa": alfa})
+    for x, y, t in BRASEIROS:
+        fx, fy, fz = no_mundo(x, y - TOCHA_CHAMA, janela, stage)
+        focos.append({"x": fx, "altura": fy, "profundidade": fz, "alfa": TOCHA_ALFA, "alcance": TOCHA_ALCANCE})
+    stage["sombraLutadores"]["focos"] = focos
     for camada in stage["camadas"]:
         if camada.get("imagem") == ESTADIO:
             camada["bandeiras"] = bandeiras

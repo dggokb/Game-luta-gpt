@@ -4540,7 +4540,7 @@ public class GameView extends SurfaceView
     private float sombraProfundidade;
     private final android.graphics.Matrix sombraMatriz = new android.graphics.Matrix();
     private final float[] sombraValores = new float[9];
-    private final float[] sombraFoco = new float[3];
+    private final float[][] sombraFocos = new float[com.gamelutagpt.stage.StageDefinition.FighterShadow.MAX_FOCOS][3];
 
     private void drawCastShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX,
                                 com.gamelutagpt.stage.StageDefinition.FighterShadow sombra) {
@@ -4552,10 +4552,18 @@ public class GameView extends SurfaceView
             drawCastShadowCopy(c, renderer, f, offsetX, sombra.skewX, sombra.squashY, sombra.alpha * k);
             return;
         }
-        for (int i = 0; i < sombra.focos.size(); i++) {
-            sombra.fromFocus(sombra.focos.get(i), f.x + offsetX, sombraProfundidade, sombraFoco);
-            if (sombraFoco[2] <= 0.01f) continue;
-            drawCastShadowCopy(c, renderer, f, offsetX, sombraFoco[0], sombraFoco[1], sombraFoco[2] * k);
+        // Todos os focos; desenha as sombras dos mais fortes sobre este lutador.
+        int n = Math.min(sombra.focos.size(), sombraFocos.length);
+        for (int i = 0; i < n; i++) sombra.fromFocus(sombra.focos.get(i), f.x + offsetX, sombraProfundidade, sombraFocos[i]);
+        for (int vez = 0; vez < com.gamelutagpt.stage.StageDefinition.FighterShadow.POR_LUTADOR; vez++) {
+            int melhor = -1;
+            for (int i = 0; i < n; i++) {
+                if (sombraFocos[i][2] > 0.01f && (melhor < 0 || sombraFocos[i][2] > sombraFocos[melhor][2])) melhor = i;
+            }
+            if (melhor < 0) break;
+            float[] o = sombraFocos[melhor];
+            drawCastShadowCopy(c, renderer, f, offsetX, o[0], o[1], o[2] * k);
+            o[2] = 0f;
         }
     }
 
