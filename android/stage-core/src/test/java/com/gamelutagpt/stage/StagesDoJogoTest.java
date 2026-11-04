@@ -31,6 +31,11 @@ public class StagesDoJogoTest {
             for (float k : def.fighterLight.factors()) {
                 assertTrue(pasta.getName() + " luz " + k, k > 0.55f && k < 1.15f);
             }
+            // E a contraluz na borda, com os pés um pouco mais escuros (sem apagar).
+            assertTrue(pasta.getName() + " sem contraluz", def.fighterLight.rimStrength > 0.3f);
+            for (float k : def.fighterLight.feetFactors()) {
+                assertTrue(pasta.getName() + " pés " + k, k > 0.6f && k <= 1f);
+            }
             if (def.floor != null) {
                 existe(pasta, def.floor.image);
                 if (def.floor.plainImage != null) existe(pasta, def.floor.plainImage);

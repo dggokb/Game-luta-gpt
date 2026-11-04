@@ -1691,6 +1691,37 @@ em cima da hora ou o jM caindo; depois do jM, a rasteira.
 - **Sem custo:** é a mesma matriz de cor que o lutador já usava (o desgaste), só composta. Fica
   guardada por tinta e nível do clarão, sem desenho a mais.
 
+### Contraluz e degradê (04/11)
+
+O jogador jogou e não reparou na luz, e com o tom mais forte o personagem chapado parecia só
+"pintado por cima". Em troca, dois truques que funcionam com cores chapadas:
+
+- **Contraluz:** um fio de luz na borda do corpo, do lado de onde vem a luz do lugar
+  (`"contraluz": {cor, forca, direcao: [x, y]}`; x para a direita, y para baixo, na tela).
+  - No sombreador: onde o vizinho do lado da luz (a 0,8% da altura da tela, e a metade disso)
+    é transparente, a borda acende. Só dentro do quadro da folha: o vizinho não pega o quadro
+    ao lado.
+  - A direção é na tela: quem olha para o outro lado (desenhado espelhado) recebe a luz do
+    mesmo lado.
+  - No relâmpago, a borda acende mais e na cor dele.
+- **Degradê dos pés (`"pes"`):** a cabeça como está e os pés multiplicados por essa cor.
+- A tinta geral ficou um pouco mais leve, porque a luz agora vem da borda.
+- **Custo:** duas leituras a mais da textura por pixel do lutador, só no OpenGL. Nenhum
+  desenho a mais. No Canvas (gráfico LEVE sem a placa de vídeo) fica só a tinta.
+
+  | cenário | tinta (cor, força, brilho) | pés | contraluz (cor, força, de onde) |
+  |---|---|---|---|
+  | Arena Central | #B4B8EC, 0,25, 0,95 | #D8DAE8 | #C8D8FF, 0,7, de cima |
+  | Arena Costeira | #A8B4E6, 0,25, 0,94 | #D4DAEA | #BFE0FF, 0,75, cima à direita |
+  | Arena Imperial | #FFA090, 0,20, 0,97 | #E8D8D0 | #FF9A40, 0,9, cima à esquerda |
+  | Beco do Brucy | #9CA8D8, 0,35, 0,86 | #B8B8D0 | #60A8FF, 0,9, cima à direita |
+  | Caminho dos Penhascos | #FFE4DC, 0,10, 1,00 | #E8E0DC | #FFF0D8, 0,6, cima à esquerda |
+  | Dojo Shūshinkan | #FFC890, 0,25, 0,95 | #E0D0C0 | #FFC070, 0,75, de cima |
+  | Dojo Liánwǔguǎn | #FFF0D4, 0,10, 1,03 | #E8E4DC | #FFE8C0, 0,6, cima à direita |
+  | Porto Secreto | #FFD8A8, 0,20, 0,93 | #E0D0C4 | #FFB060, 0,85, cima à esquerda |
+  | Templo da Lua | #C8A8F0, 0,30, 0,90 | #C8C0DC | #D0B8FF, 0,8, cima à direita |
+  | Terraço da Lua | #A8C4FF, 0,30, 0,90 | #C0C8E0 | #C8DCFF, 0,85, cima à esquerda |
+
 ## Raios no cenário com os dois no SHINKAI (pedido do jogador, 03/11)
 
 - **Quando:** só com os dois lutadores no SHINKAI.

@@ -707,5 +707,31 @@ public class StageSceneTest {
         org.junit.Assert.assertEquals(0.8f * (0.5f + 0.5f * 128f / 255f), k[1], 1e-3f);
         org.junit.Assert.assertEquals(0.4f, k[2], 1e-3f);              // sem azul: metade da força some
         org.junit.Assert.assertNull(StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": []}").fighterLight);
+        // Sem contraluz nem pés: nada além da tinta.
+        org.junit.Assert.assertEquals(0f, def.fighterLight.rimStrength, 0f);
+        org.junit.Assert.assertEquals(0xFFFFFFFF, def.fighterLight.feet);
+    }
+
+    @Test
+    public void contraluzEPesDoCenario() {
+        StageDefinition def = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], "
+            + "\"luzLutadores\": {\"cor\": \"#FFFFFF\", \"pes\": \"#808080\", "
+            + "\"contraluz\": {\"cor\": \"#FF8000\", \"forca\": 0.9, \"direcao\": [-3, -4]}}}");
+        StageDefinition.FighterLight luz = def.fighterLight;
+        org.junit.Assert.assertEquals(0.9f, luz.rimStrength, 1e-6f);
+        org.junit.Assert.assertEquals(0xFFFF8000, luz.rimColor);
+        // A direção sai normalizada: luz em cima e à esquerda.
+        org.junit.Assert.assertEquals(-0.6f, luz.rimDirX, 1e-5f);
+        org.junit.Assert.assertEquals(-0.8f, luz.rimDirY, 1e-5f);
+        org.junit.Assert.assertEquals(128f / 255f, luz.feetFactors()[1], 1e-5f);
+        for (String errado : new String[] {"[0, 0]", "[1]"}) {
+            try {
+                StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"luzLutadores\": "
+                    + "{\"contraluz\": {\"direcao\": " + errado + "}}}");
+                org.junit.Assert.fail(errado);
+            } catch (IllegalArgumentException esperado) {
+                // direção sem sentido
+            }
+        }
     }
 }

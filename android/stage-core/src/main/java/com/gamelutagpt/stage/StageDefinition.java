@@ -31,7 +31,8 @@ import java.util.Map;
  *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" },
  *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
  *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 },
- *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9 }
+ *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9, "pes": "#C0C4DC",
+ *                     "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } }
  * }
  * </pre>
  */
@@ -462,11 +463,39 @@ public final class StageDefinition {
     public static final class FighterLight {
         public final int color;
         public final float strength, brightness;
+        /**
+         * Degradê de cima para baixo: a cabeça fica como está e os pés multiplicados por esta cor
+         * ({@code "pes"}; branco = sem degradê).
+         */
+        public final int feet;
+        /**
+         * Contraluz ({@code "contraluz"}): um fio de luz na borda do corpo do lado de onde a luz vem.
+         * {@code rimDirX/Y}: para onde fica a luz na tela (x para a direita, y para baixo), já
+         * normalizado; força 0 = sem contraluz.
+         */
+        public final int rimColor;
+        public final float rimStrength, rimDirX, rimDirY;
 
         FighterLight(int color, float strength, float brightness) {
+            this(color, strength, brightness, 0xFFFFFFFF, 0xFFFFFFFF, 0f, 0f, -1f);
+        }
+
+        FighterLight(int color, float strength, float brightness, int feet,
+                     int rimColor, float rimStrength, float rimDirX, float rimDirY) {
             this.color = color;
             this.strength = strength;
             this.brightness = brightness;
+            this.feet = feet;
+            this.rimColor = rimColor;
+            this.rimStrength = rimStrength;
+            float n = (float)Math.sqrt(rimDirX * rimDirX + rimDirY * rimDirY);
+            this.rimDirX = n > 0f ? rimDirX / n : 0f;
+            this.rimDirY = n > 0f ? rimDirY / n : -1f;
+        }
+
+        /** O fator dos pés em cada canal (vermelho, verde, azul). */
+        public float[] feetFactors() {
+            return new float[] {((feet >> 16) & 0xFF) / 255f, ((feet >> 8) & 0xFF) / 255f, (feet & 0xFF) / 255f};
         }
 
         /** O fator de cada canal (vermelho, verde, azul). */
@@ -589,7 +618,26 @@ public final class StageDefinition {
         if (lightMap != null) {
             float brilho = number(lightMap, "brilho", 1f);
             if (brilho <= 0f || brilho > 2f) throw new IllegalArgumentException("luzLutadores: \"brilho\" entre 0 e 2");
-            light = new FighterLight(color(lightMap, "cor", 0xFFFFFFFF), clamp01(number(lightMap, "forca", 0.3f)), brilho);
+            int pes = color(lightMap, "pes", 0xFFFFFFFF);
+            int rimCor = 0xFFFFFFFF;
+            float rimForca = 0f, rimX = 0f, rimY = -1f;
+            Map<String, Object> rim = object(lightMap, "contraluz");
+            if (rim != null) {
+                rimCor = color(rim, "cor", 0xFFFFFFFF);
+                rimForca = number(rim, "forca", 0.8f);
+                if (rimForca < 0f || rimForca > 2f) throw new IllegalArgumentException("contraluz: \"forca\" entre 0 e 2");
+                Object dir = rim.get("direcao");
+                if (dir != null) {
+                    if (!(dir instanceof List) || ((List<?>)dir).size() != 2) {
+                        throw new IllegalArgumentException("contraluz: \"direcao\" é [x, y]");
+                    }
+                    rimX = ((Number)((List<?>)dir).get(0)).floatValue();
+                    rimY = ((Number)((List<?>)dir).get(1)).floatValue();
+                    if (rimX == 0f && rimY == 0f) throw new IllegalArgumentException("contraluz: \"direcao\" não pode ser [0, 0]");
+                }
+            }
+            light = new FighterLight(color(lightMap, "cor", 0xFFFFFFFF), clamp01(number(lightMap, "forca", 0.3f)), brilho,
+                pes, rimCor, rimForca, rimX, rimY);
         }
 
         return new StageDefinition(name.trim(), distance, horizon,

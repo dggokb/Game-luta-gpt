@@ -5618,12 +5618,23 @@ public class GameView extends SurfaceView
             }
             m[18] = 1f;
             ColorMatrix luzMatriz = new ColorMatrix(m);
+            ColorMatrix junto = luzMatriz;
             if (tinta != null && tinta.matriz != null) {
-                ColorMatrix junto = new ColorMatrix(tinta.matriz);
+                junto = new ColorMatrix(java.util.Arrays.copyOf(tinta.matriz, 20));
                 junto.postConcat(luzMatriz);
-                niveis[clarao] = Filtro.matriz(junto);
+            }
+            if (luz != null && (luz.rimStrength > 0f || (luz.feet & 0xFFFFFF) != 0xFFFFFF)) {
+                // Contraluz e degradê dos pés (só no OpenGL). No relâmpago a borda acende na cor dele.
+                float[] rim = new float[3];
+                for (int i = 0; i < 3; i++) {
+                    float base = ((luz.rimColor >> (16 - 8 * i)) & 0xFF) / 255f;
+                    float raio = ((cor >> (16 - 8 * i)) & 0xFF) / 255f;
+                    rim[i] = base + (raio - base) * c;
+                }
+                niveis[clarao] = Filtro.comLuz(junto.getArray(), rim, luz.rimStrength + 1.2f * c,
+                    luz.rimDirX, luz.rimDirY, luz.feetFactors());
             } else {
-                niveis[clarao] = Filtro.matriz(luzMatriz);
+                niveis[clarao] = Filtro.matriz(junto);
             }
         }
         return niveis[clarao];

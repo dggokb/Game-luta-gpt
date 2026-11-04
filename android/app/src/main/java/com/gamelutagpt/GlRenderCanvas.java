@@ -72,6 +72,10 @@ final class GlRenderCanvas implements RenderCanvas {
         "precision mediump float;\n" +
         "uniform sampler2D uTex; uniform sampler2D uTexto; uniform sampler2D uDegrade;\n" +
         "uniform mat4 uCor; uniform vec4 uCorSoma; uniform bool uFiltro; uniform bool uInverte; uniform vec4 uTroca;\n" +
+        // Luz do cenário no lutador (uLuz: ligada, força da contraluz, deslocamento em uv até o
+        // vizinho do lado da luz; uLuzCor: a cor da contraluz; uLuzPes: o fator dos pés; uLuzRet: o
+        // retângulo do quadro na folha, uv de cima à esquerda e de baixo à direita).
+        "uniform highp vec4 uLuz; uniform vec4 uLuzCor; uniform vec4 uLuzPes; uniform highp vec4 uLuzRet;\n" +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
@@ -115,6 +119,15 @@ final class GlRenderCanvas implements RenderCanvas {
         "      vec3 s = t.a > 0.0 ? t.rgb / t.a : vec3(0.0);\n" +
         "      if (uTroca.x > 0.5) s = troca(s);\n" +
         "      vec4 u = clamp(uCor * vec4(s, t.a) + uCorSoma, 0.0, 1.0);\n" +
+        // Contraluz: onde o vizinho do lado da luz é transparente, a borda acende (dois vizinhos,
+        // perto e longe, para a borda sair macia). Degradê: os pés vão para o fator dos pés.
+        "      if (uLuz.x > 0.5) {\n" +
+        "        float v1 = texture(uTex, clamp(vUv + uLuz.zw, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        float v2 = texture(uTex, clamp(vUv + uLuz.zw * 0.5, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        float borda = clamp(t.a - 0.5 * (v1 + v2), 0.0, 1.0);\n" +
+        "        highp float y = clamp((vUv.y - uLuzRet.y) / max(uLuzRet.w - uLuzRet.y, 1e-6), 0.0, 1.0);\n" +
+        "        u.rgb = clamp(u.rgb * mix(vec3(1.0), uLuzPes.rgb, y) + borda * uLuzCor.rgb * uLuz.y, 0.0, 1.0);\n" +
+        "      }\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         "    }\n" +
         "    c = t * vCor;\n" +
@@ -171,9 +184,11 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Um programa e onde ficam os uniforms dele. */
     private static final class Programa {
         int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
+        int uLuz, uLuzCor, uLuzPes, uLuzRet;
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
+    private int uLuz, uLuzCor, uLuzPes, uLuzRet;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
@@ -269,6 +284,10 @@ final class GlRenderCanvas implements RenderCanvas {
         p.uCorSoma = GLES30.glGetUniformLocation(p.id, "uCorSoma");
         p.uFiltro = GLES30.glGetUniformLocation(p.id, "uFiltro");
         p.uTroca = GLES30.glGetUniformLocation(p.id, "uTroca");
+        p.uLuz = GLES30.glGetUniformLocation(p.id, "uLuz");
+        p.uLuzCor = GLES30.glGetUniformLocation(p.id, "uLuzCor");
+        p.uLuzPes = GLES30.glGetUniformLocation(p.id, "uLuzPes");
+        p.uLuzRet = GLES30.glGetUniformLocation(p.id, "uLuzRet");
         p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
         p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
         p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
@@ -284,6 +303,7 @@ final class GlRenderCanvas implements RenderCanvas {
         prog = p;
         programa = p.id;
         uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte; uTroca = p.uTroca;
+        uLuz = p.uLuz; uLuzCor = p.uLuzCor; uLuzPes = p.uLuzPes; uLuzRet = p.uLuzRet;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
         GLES30.glUseProgram(p.id);
     }
@@ -810,7 +830,63 @@ final class GlRenderCanvas implements RenderCanvas {
         // A cor alternativa (Filtro.corAlternativa) vem nos 4 números depois da matriz.
         if (m.length >= 24) GLES30.glUniform4f(uTroca, m[20], m[21], m[22], m[23]);
         else GLES30.glUniform4f(uTroca, 0f, 0f, 0f, 0f);
+        // A luz do cenário: só no filtro já preparado para um quadro da folha (luzDoQuadro).
+        int L = Filtro.LUZ;
+        if (m.length >= LUZ_QUADRO && m[L] > 0.5f) {
+            GLES30.glUniform4f(uLuz, 1f, m[L + 4], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
+            GLES30.glUniform4f(uLuzCor, m[L + 1], m[L + 2], m[L + 3], 1f);
+            GLES30.glUniform4f(uLuzPes, m[L + 7], m[L + 8], m[L + 9], 1f);
+            GLES30.glUniform4f(uLuzRet, m[Filtro.COM_LUZ + 2], m[Filtro.COM_LUZ + 3], m[Filtro.COM_LUZ + 4], m[Filtro.COM_LUZ + 5]);
+        } else {
+            GLES30.glUniform4f(uLuz, 0f, 0f, 0f, 0f);
+        }
     }
+
+    /** O filtro com a luz já preparado para um quadro: + deslocamento (2) e retângulo do quadro (4). */
+    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 6;
+    /** Largura da contraluz em fração da altura da tela. */
+    static final float LARGURA_CONTRALUZ = 0.008f;
+    /**
+     * Os filtros com a luz de cada quadro desenhado (o deslocamento e o retângulo mudam a cada
+     * quadro da folha). Uma roda reaproveitada, para não criar lixo: os comandos de um quadro da
+     * tela usam no máximo umas dezenas antes de a roda dar a volta.
+     */
+    private final float[][] rodaLuz = new float[96][LUZ_QUADRO];
+    private int vezLuz;
+
+    /**
+     * O filtro atual tem a luz do cenário: copia para a roda com o vizinho do lado da luz (em uv)
+     * e o retângulo do quadro {@code s*} da textura {@code t} desenhado em {@code l, top, r, bt}.
+     */
+    private void luzDoQuadro(Textura t, float sl, float st, float sr, float sb, float l, float top, float r, float bt) {
+        float[] m = filtro;
+        // Outro quadro com o mesmo filtro (sem voltar ao original entre os dois): parte do original.
+        if (m != null && m.length >= LUZ_QUADRO && filtroComLuz != null) m = filtroComLuz;
+        if (m == null || m.length < Filtro.COM_LUZ || m.length >= LUZ_QUADRO || m[Filtro.LUZ] < 0.5f) return;
+        float det = a * d - b * c;
+        if (Math.abs(det) < 1e-9f || r == l || bt == top || sr == sl || sb == st) return;
+        // A direção da luz na tela, levada para o espaço do desenho (a inversa da parte linear da
+        // matriz: o espelho de quem olha para o outro lado já vira junto).
+        float largura = alturaTela * LARGURA_CONTRALUZ;
+        float dx = m[Filtro.LUZ + 5] * largura, dy = m[Filtro.LUZ + 6] * largura;
+        float qx = (d * dx - c * dy) / det, qy = (-b * dx + a * dy) / det;
+        float[] q = rodaLuz[vezLuz];
+        vezLuz = (vezLuz + 1) % rodaLuz.length;
+        System.arraycopy(m, 0, q, 0, Filtro.COM_LUZ);
+        q[Filtro.COM_LUZ] = qx * (sr - sl) / (r - l) / t.largura;
+        q[Filtro.COM_LUZ + 1] = qy * (sb - st) / (bt - top) / t.altura;
+        // Meio texel para dentro: o vizinho não sai do quadro (a folha tem os outros do lado).
+        float mu = 0.5f / t.largura, mv = 0.5f / t.altura;
+        q[Filtro.COM_LUZ + 2] = Math.min(sl, sr) / t.largura + mu;
+        q[Filtro.COM_LUZ + 3] = Math.min(st, sb) / t.altura + mv;
+        q[Filtro.COM_LUZ + 4] = Math.max(sl, sr) / t.largura - mu;
+        q[Filtro.COM_LUZ + 5] = Math.max(st, sb) / t.altura - mv;
+        filtro(q);
+        filtroComLuz = m;
+    }
+
+    /** O filtro original de antes de {@link #luzDoQuadro} (para o próximo quadro preparar o dele). */
+    private float[] filtroComLuz;
 
     private void usar(int textura) {
         if (textura == texturaAtual) return;
@@ -1516,6 +1592,7 @@ final class GlRenderCanvas implements RenderCanvas {
                          float l, float top, float r, float bt, int alpha) {
         if (t == null || alpha <= 0) return;
         usar(t.id);
+        luzDoQuadro(t, sl, st, sr, sb, l, top, r, bt);
         float w = t.largura, h = t.altura;
         retangulo(l, top, r, bt, sl / w, st / h, sr / w, sb / h, (alpha << 24) | 0xFFFFFF, 1f);
     }
