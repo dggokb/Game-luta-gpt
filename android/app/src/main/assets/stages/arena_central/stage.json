@@ -4,7 +4,7 @@
     "distancia": 1000,
     "horizonte": 0.47
   },
-  "corFundo": "#5A2950",
+  "corFundo": "#4E3070",
   "luzLutadores": {
     "cor": "#FFA090",
     "forca": 0.2,
@@ -25,41 +25,49 @@
     "suave": 0.55,
     "focos": [
       {
-        "x": -145,
-        "altura": 1080,
-        "profundidade": 2008
+        "x": -27,
+        "altura": 955,
+        "profundidade": 1618
       }
     ]
   },
   "camadas": [
     {
-      "id": "ceu_montanhas",
-      "imagem": "fundo_panorama.webp",
-      "profundidade": 4300,
-      "topo": -0.18,
-      "base": 0.555,
-      "x": 0.5,
-      "repetir": "nao",
-      "corAcima": "#5A2950"
+      "id": "ceu",
+      "imagem": "ceu.jpg",
+      "profundidade": 60000,
+      "topo": -0.0837,
+      "base": 0.4702,
+      "x": 0.504,
+      "repetir": "espelhar",
+      "corAcima": "#4E3070"
     },
     {
-      "id": "arquitetura_recortada",
-      "imagem": "arquibancadas_panorama.webp",
-      "profundidade": 2008,
-      "topo": 0,
-      "base": 0.555,
-      "x": 0.5,
-      "repetir": "nao"
+      "id": "montanhas",
+      "imagem": "montanhas.webp",
+      "profundidade": 5000,
+      "topo": -0.0837,
+      "base": 0.5779,
+      "x": 0.504,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "estadio",
+      "imagem": "estadio.webp",
+      "profundidade": 1618,
+      "topo": -0.0837,
+      "base": 0.6548,
+      "x": 0.504,
+      "repetir": "espelhar"
     }
   ],
   "chao": {
-    "imagem": "piso_panorama.webp",
-    "imagemLajotas": "piso_lajotas.webp",
+    "imagem": "chao.jpg",
+    "imagemLajotas": "chao.jpg",
     "perto": -700,
-    "longe": 2008,
-    "ate": 2008,
+    "longe": 1618,
+    "ate": 1618,
     "centroX": 700,
-    "reflexoLutadores": 0.1,
-    "reflexoLuzes": 0.25
+    "reflexoLuzes": 0.5
   }
 }

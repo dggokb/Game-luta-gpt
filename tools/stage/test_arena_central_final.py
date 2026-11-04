@@ -12,6 +12,13 @@ from arena_central_final import (BASE, DEST, LEFT, OVERLAP, RIGHT, SKY_OVERSCAN,
                                  panorama, render_rest_preview)
 
 
+# O jogo usa hoje o recorte do panorama em camadas (tools/stage/cenario_panorama.py). Os testes
+# que leem as imagens exportadas por este gerador só valem quando o stage.json usa elas: rode o
+# arena_central_final.py e troque o stage.json para voltar a esta montagem.
+EM_USO = "fundo_panorama.webp" in (DEST / "stage.json").read_text(encoding="utf-8")
+SO_EM_USO = unittest.skipUnless(EM_USO, "stage.json usa o panorama em camadas (cenario_panorama.py)")
+
+
 class ArenaCentralFinalTest(unittest.TestCase):
     def test_panorama_preserves_both_illustrations_outside_join(self):
         with Image.open(LEFT) as left, Image.open(RIGHT) as right:
@@ -23,6 +30,7 @@ class ArenaCentralFinalTest(unittest.TestCase):
         np.testing.assert_array_equal(result[:, :w - OVERLAP], a[:, :w - OVERLAP])
         np.testing.assert_array_equal(result[:, w:], b[:, OVERLAP:])
 
+    @SO_EM_USO
     def test_stage_has_real_parallax_without_mirroring_architecture(self):
         stage = json.loads((DEST / "stage.json").read_text(encoding="utf-8"))
         layers = stage["camadas"]
@@ -43,6 +51,7 @@ class ArenaCentralFinalTest(unittest.TestCase):
             self.assertEqual(emblem.size, plain.size,
                              "lajotas nao podem virar um borrão ampliado")
 
+    @SO_EM_USO
     def test_sky_extends_above_screen_without_flat_color_strip(self):
         with Image.open(DEST / "fundo_panorama.webp") as image:
             image = np.asarray(image.convert("RGB"), dtype=np.int16)
@@ -50,6 +59,7 @@ class ArenaCentralFinalTest(unittest.TestCase):
         self.assertEqual(round(825 * (BASE + SKY_OVERSCAN)), image.shape[0])
         self.assertLess(np.abs(image[overscan - 1] - image[overscan]).mean(), 8)
 
+    @SO_EM_USO
     def test_distant_sky_contains_no_second_camarote(self):
         with Image.open(DEST / "arquibancadas_panorama.webp") as image:
             near = np.asarray(image.convert("RGBA"))
@@ -64,6 +74,7 @@ class ArenaCentralFinalTest(unittest.TestCase):
             - near[255:330, center - 100:center + 100, :3].astype(np.int16)
         ).mean(), 20)
 
+    @SO_EM_USO
     def test_rest_camera_reconstructs_approved_floor(self):
         with Image.open(LEFT) as left, Image.open(RIGHT) as right:
             original = panorama(left, right)
@@ -73,6 +84,7 @@ class ArenaCentralFinalTest(unittest.TestCase):
         # o piso nao pode se deslocar ou trocar de perspectiva na camera inicial.
         self.assertLess(difference, 10.0)
 
+    @SO_EM_USO
     def test_floor_outer_edges_use_stones_instead_of_stretched_border(self):
         with Image.open(DEST / "piso_panorama.webp") as image:
             floor = np.asarray(image.convert("RGB"), dtype=np.int16)

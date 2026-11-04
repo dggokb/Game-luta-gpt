@@ -261,7 +261,7 @@ frações dela, como as bandeiras:
   15 graus): vira de lado quando o lutador passa por baixo, e acende menos (35%) com o foco na
   frente dos lutadores, que aí ilumina de frente.
   Na Arena Central o foco é o holofote da torre da esquerda do conceito (tela x 340, no alto
-  da torre, na profundidade do fundo), com a sombra roxo-escura (`#1C0A14`, alfa 0,72, `suave` 0,55).
+  da torre, na profundidade do estádio: x −27, altura 955, profundidade 1618), com a sombra roxo-escura (`#1C0A14`, alfa 0,72, `suave` 0,55).
 - **Pétalas**: partículas em 3D (x, y, z) caindo com vento. As de longe são pequenas e
   apagadas, as da frente (`z < 0`) passam grandes na frente dos lutadores.
 - **Chuva** (`"chuva"` no stage.json): riscos em 3D caindo, inclinados pelo vento, finos e

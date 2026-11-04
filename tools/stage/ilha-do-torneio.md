@@ -413,26 +413,37 @@ pés dos lutadores, ele fica só a −250 com `periodo` grande, aparecendo quand
 
 ### Notas da Arena Central
 
-**Hoje (versão carmesim, do conceito):** o cenário é a própria arte de conceito
-(`conceito_sem_hud.png`, a tela inteira sem HUD), cortada em duas peças pelo
-`tools/stage/cenario_do_conceito.py`:
+**Hoje (panorama em camadas):** a arte é o panorama largo da arena
+(`art/stages/arena_central/panorama.webp`, o conceito com as arquibancadas laterais), cortado
+pelo `tools/stage/cenario_panorama.py` com as sementes de `art/stages/arena_central/recorte.json`:
 
 ```bash
-python3 tools/stage/cenario_do_conceito.py conceito_sem_hud.png \
-    android/app/src/main/assets/stages/arena_central --horizonte 0.47 --base 0.555
+pip install opencv-python numpy pillow
+python3 tools/stage/cenario_panorama.py art/stages/arena_central/recorte.json \
+    android/app/src/main/assets/stages/arena_central
 ```
 
-- `fundo_conceito.jpg`: do topo da pintura até a linha 0,555 (onde a arquibancada encosta
-  no chão), uma camada plana na profundidade do fim do chão (2008), com `corAcima` roxo
-  para o super pulo.
-- `chao_conceito.jpg`: o chão da pintura "desentortado" para vista de cima pela mesma conta
-  da câmera do jogo (StageCamera, zoom 1,24 de repouso, horizonte 0,47). Na câmera do
-  começo da luta o jogo projeta de volta e o chão fica como no conceito (lótus, anéis,
-  riscos de luz e sombras pintadas); quando a câmera anda ele continua em perspectiva.
-- O horizonte 0,47 (e não 0,52) deixa o chão com 2008 de fundo em vez de 4877: textura de
-  3000x1354 em vez de 3000x2789, sem mudar o que aparece na câmera de repouso.
-- Para trocar a arte: pinte o conceito na tela 16:9, rode o script e copie os números que
-  ele imprime para a camada `fundo` e o `chao` do `stage.json`.
+- A tela de repouso do jogo fica no meio do panorama (`janela`: escala 0,903, x 409, y 54,
+  achada pelo conceito 16:9 com SIFT, `--referencia`). O chão encontra o muro na linha 424 do
+  panorama (0,569 da tela).
+- Camadas (paralaxe), de trás para a frente: `ceu.jpg` a 60000 (quase parado), `montanhas.webp`
+  a 5000 (montanhas, cachoeiras, o sol) e `estadio.webp` no fim do chão (1618: muro, torres,
+  pavilhão e as arquibancadas dos lados). O GrabCut separa cada uma; o que a da frente tapa é
+  inventado espelhando o que está do lado (atrás das torres) ou como névoa (o pé das montanhas,
+  o horizonte), para a câmera andar e o super pulo não abrirem buraco.
+- `chao.jpg`: o chão do panorama "desentortado" (a conta do `cenario_do_conceito.py`), com os
+  lados vindos do panorama e só o que passa dele espelhado.
+- Para trocar a arte: o panorama novo no lugar, conferir/ajustar as sementes (o
+  `--mascaras pasta/` grava cada máscara para conferir) e rodar de novo.
+
+**Alternativa (as duas artes juntas):** o `tools/stage/arena_central_final.py` monta a arena a
+partir de `panorama_esquerda.webp` + `panorama_direita.webp` (duas camadas: céu e montanhas a
+4300, arquibancadas recortadas a 2008, piso próprio). As imagens dele não estão no jogo; para
+voltar a ela, rode o script e troque o `stage.json` (o `test_arena_central_final.py` volta a
+valer sozinho quando o `stage.json` usa `fundo_panorama.webp`).
+
+**Antes (o conceito 16:9 inteiro):** `cenario_do_conceito.py` com o `conceito_sem_hud.png`
+cortado em fundo plano + chão; os lados vinham espelhados.
 
 **Antes (versão em camadas, histórico):** montada pelo `montar_central.py` com as
 imagens abaixo (as peças já saíram da pasta; ficam no histórico do git).

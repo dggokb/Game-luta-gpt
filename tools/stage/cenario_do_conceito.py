@@ -46,6 +46,51 @@ def scale(z, distance):
     return BASE_DISTANCE / np.maximum(1.0, distance + z)
 
 
+def chao(src, janela, horizonte, base_y, perto, unidade, largura_mundo):
+    """O chão "desentortado" (textura vista de cima) e a profundidade do fim dele.
+
+    ``src``: a pintura (array float RGB). ``janela`` = (escala, x0, y0): o pixel (sx, sy) da tela
+    de repouso (1280x720) fica em (x0 + escala*sx, y0 + escala*sy) na pintura; para um conceito
+    do tamanho da tela é (1, 0, 0). ``base_y``: a linha da tela onde o chão encontra o fundo.
+    Fora da pintura (dos lados e embaixo) o chão continua espelhado na borda.
+    """
+    h_img, w_img = src.shape[:2]
+    escala, x0, y0 = janela
+    horizon, eye_y, distance = camera(horizonte)
+    eye_h = GROUND_Y - eye_y
+    longe = BASE_DISTANCE * eye_h / (base_y - horizon) - distance
+    rows = int(round((longe - perto) / unidade))
+    cols = int(round(largura_mundo / unidade))
+    # O motor estica a largura pela proporção da imagem: largura = (longe-perto)*cols/rows.
+    largura = (longe - perto) * cols / rows
+    v = (np.arange(rows) + 0.5) / rows
+    u = (np.arange(cols) + 0.5) / cols
+    z = longe - v * (longe - perto)                       # topo da imagem = longe
+    xw = REST_CENTER_X - largura / 2 + u * largura
+    s = scale(z, distance)
+    sy = horizon + eye_h * s                              # linha da tela de cada fileira
+    sx = VW / 2 + (xw[None, :] - REST_CENTER_X) * s[:, None]
+    sy = np.broadcast_to(np.maximum(sy, base_y)[:, None], sx.shape)
+    # Na pintura.
+    px = x0 + escala * sx
+    py = y0 + escala * sy
+
+    def espelha(a, n):
+        p = 2 * (n - 1)
+        a = np.mod(a, p)
+        return np.where(a > n - 1, p - a, a)
+
+    px = espelha(px, w_img)
+    py = np.where(py > h_img - 1, 2 * (h_img - 1) - py, py)
+    py = np.clip(py, y0 + escala * base_y, h_img - 1)
+    xi = np.floor(px).astype(int); yi = np.floor(py).astype(int)
+    x1 = np.clip(xi + 1, 0, w_img - 1); y1 = np.clip(yi + 1, 0, h_img - 1)
+    fx = (px - xi)[..., None]; fy = (py - yi)[..., None]
+    out = (src[yi, xi] * (1 - fx) * (1 - fy) + src[yi, x1] * fx * (1 - fy)
+           + src[y1, xi] * (1 - fx) * fy + src[y1, x1] * fx * fy)
+    return np.clip(out, 0, 255).astype(np.uint8), longe, (cols, rows)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('conceito')
@@ -60,50 +105,14 @@ def main():
 
     img = Image.open(args.conceito).convert('RGB').resize((VW, VH), Image.LANCZOS)
     src = np.asarray(img).astype(np.float32)
-    horizon, eye_y, distance = camera(args.horizonte)
-    eye_h = GROUND_Y - eye_y
-
-    # Profundidade do chão na linha da base (onde a arquibancada encosta).
     base_y = args.base * VH
-    longe = BASE_DISTANCE * eye_h / (base_y - horizon) - distance
-
-    # Fundo: do topo até a base, na profundidade "longe" (a do fim do chão).
-    fundo = img.crop((0, 0, VW, int(round(base_y))))
-    fundo.save(os.path.join(args.saida, 'fundo_conceito.jpg'), quality=90, optimize=True)
-
-    # Chão: textura vista de cima, texel quadrado de "unidade" no mundo.
+    tex, longe, (cols, rows) = chao(src, (1.0, 0.0, 0.0), args.horizonte, base_y, args.perto,
+                                    args.unidade, args.largura)
     perto = args.perto
-    rows = int(round((longe - perto) / args.unidade))
-    cols = int(round(args.largura / args.unidade))
-    # O motor estica a largura pela proporção da imagem: largura = (longe-perto)*cols/rows.
-    largura = (longe - perto) * cols / rows
-    v = (np.arange(rows) + 0.5) / rows
-    u = (np.arange(cols) + 0.5) / cols
-    z = longe - v * (longe - perto)                       # topo da imagem = longe
-    xw = REST_CENTER_X - largura / 2 + u * largura
-    s = scale(z, distance)
-    sy = horizon + eye_h * s                              # linha da tela de cada fileira
-    sx = VW / 2 + (xw[None, :] - REST_CENTER_X) * s[:, None]
-    sy = np.broadcast_to(sy[:, None], sx.shape)
-
-    def espelha(a, n):
-        # Reflete nas bordas (o conceito repetido em espelho fora da pintura).
-        p = 2 * (n - 1)
-        a = np.mod(a, p)
-        return np.where(a > n - 1, p - a, a)
-
-    sx = espelha(sx, VW)
-    # Abaixo da pintura (câmera afastada) o chão continua espelhado na borda de baixo.
-    sy = np.where(sy > VH - 1, 2 * (VH - 1) - sy, sy)
-    sy = np.clip(sy, base_y, VH - 1)
-    # Amostragem bilinear.
-    x0 = np.floor(sx).astype(int); y0 = np.floor(sy).astype(int)
-    x1 = np.clip(x0 + 1, 0, VW - 1); y1 = np.clip(y0 + 1, 0, VH - 1)
-    fx = (sx - x0)[..., None]; fy = (sy - y0)[..., None]
-    out = (src[y0, x0] * (1 - fx) * (1 - fy) + src[y0, x1] * fx * (1 - fy)
-           + src[y1, x0] * (1 - fx) * fy + src[y1, x1] * fx * fy)
-    Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(
-        os.path.join(args.saida, 'chao_conceito.jpg'), quality=88, optimize=True)
+    # Fundo: do topo até a base, na profundidade "longe" (a do fim do chão).
+    img.crop((0, 0, VW, int(round(base_y)))).save(os.path.join(args.saida, 'fundo_conceito.jpg'),
+                                                  quality=90, optimize=True)
+    Image.fromarray(tex).save(os.path.join(args.saida, 'chao_conceito.jpg'), quality=88, optimize=True)
 
     print(f'horizonte {args.horizonte}: chao perto {perto:.0f} longe {longe:.0f} ({cols}x{rows} texels), centroX {REST_CENTER_X:.0f}')
     print(f'camada fundo: profundidade {longe:.0f}, topo 0, base {args.base}, x 0.5 (na câmera de repouso)')
