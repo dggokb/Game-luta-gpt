@@ -764,6 +764,9 @@ public final class StageDefinition {
         switch (b.kind) {
             case IMAGE:
                 b.image = string(map, "imagem", null);
+                // As arquibancadas das pontas podem compartilhar a mesma arte,
+                // com uma das laterais invertida horizontalmente.
+                b.flip = bool(map, "virar", false);
                 if (b.image == null) throw new IllegalArgumentException(where + " precisa de \"imagem\"");
                 requireDepth(b, where);
                 if (b.onGround) {

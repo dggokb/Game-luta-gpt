@@ -32,8 +32,25 @@
       "topo": 0,
       "base": 0.555,
       "x": 0.5,
-      "repetir": "espelhar",
+      "repetir": "nao",
       "corAcima": "#5A2950"
+    },
+    {
+      "id": "arquibancada_esquerda",
+      "imagem": "lateral_estadio.webp",
+      "profundidade": 2007,
+      "topo": 0.22,
+      "base": 0.555,
+      "x": -0.16,
+      "virar": true
+    },
+    {
+      "id": "arquibancada_direita",
+      "imagem": "lateral_estadio.webp",
+      "profundidade": 2007,
+      "topo": 0.22,
+      "base": 0.555,
+      "x": 1.16
     }
   ],
   "chao": {
