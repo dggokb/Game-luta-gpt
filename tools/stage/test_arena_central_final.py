@@ -58,6 +58,15 @@ class ArenaCentralFinalTest(unittest.TestCase):
         # o piso nao pode se deslocar ou trocar de perspectiva na camera inicial.
         self.assertLess(difference, 10.0)
 
+    def test_floor_outer_edges_use_stones_instead_of_stretched_border(self):
+        with Image.open(DEST / "piso_panorama.webp") as image:
+            floor = np.asarray(image.convert("RGB"), dtype=np.int16)
+        with Image.open(DEST / "piso_lajotas.webp") as image:
+            stones = np.asarray(image.convert("RGB"), dtype=np.int16)
+        self.assertLess(np.abs(floor[-100:, :75] - stones[-100:, :75]).mean(), 8)
+        self.assertGreater(floor[-100:, :75].std(), 15,
+                           "a borda nao pode ser uma coluna achatada da pintura")
+
 
 if __name__ == "__main__":
     unittest.main()

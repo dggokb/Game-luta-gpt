@@ -85,11 +85,15 @@ def floor_texture(pan: Image.Image) -> None:
     z = FLOOR_FAR - (np.arange(rows, dtype=np.float32) + 0.5) / rows * (FLOOR_FAR - FLOOR_NEAR)
     x = REST_CENTER_X + ((np.arange(columns, dtype=np.float32) + 0.5) / columns - 0.5) * floor_width
     scale = CAMERA_DISTANCE / (rest_distance + z)
-    sx = panorama_center + (x[None, :] - REST_CENTER_X) * scale[:, None]
-    sy = horizon + eye_height * scale
-    # Fora do panorama original o motor usa uma textura de lajotas neutras.
-    sx = np.clip(sx, 0, src.shape[1] - 1)
-    sy = np.clip(sy, BASE * VH, VH - 1)
+    raw_sx = panorama_center + (x[None, :] - REST_CENTER_X) * scale[:, None]
+    raw_sy = horizon + eye_height * scale
+    # Fora do panorama NAO esticar a coluna final de pixels: ela virava uma
+    # mancha enorme quando a camera girava/abria o campo de visao.
+    outside_x = np.maximum(np.maximum(-raw_sx, raw_sx - (src.shape[1] - 1)), 0)
+    outside_y = np.maximum(raw_sy - (VH - 1), 0)[:, None]
+    outside = np.maximum(outside_x, outside_y)
+    sx = np.clip(raw_sx, 0, src.shape[1] - 1)
+    sy = np.clip(raw_sy, BASE * VH, VH - 1)
     x0 = np.floor(sx).astype(np.int32)
     y0 = np.floor(sy).astype(np.int32)[:, None]
     x1 = np.minimum(x0 + 1, src.shape[1] - 1)
@@ -100,6 +104,13 @@ def floor_texture(pan: Image.Image) -> None:
               + src[y0, x1] * fx * (1 - fy)
               + src[y1, x0] * (1 - fx) * fy
               + src[y1, x1] * fx * fy)
+    # A faixa neutra nunca altera o que se ve na camera de repouso. Os texels
+    # de fora recebem pedra ortografica, e a transicao evita uma costura dura.
+    with Image.open(ART / "piso_neutro_fonte.webp") as neutral:
+        neutral = neutral.convert("RGB").resize((columns, rows), Image.Resampling.LANCZOS)
+    stones = np.asarray(neutral, dtype=np.float32)
+    blend = np.clip(outside / 70.0, 0, 1)[..., None]
+    pixels = pixels * (1 - blend) + stones * blend
     Image.fromarray(np.clip(pixels, 0, 255).astype(np.uint8), "RGB").save(
         DEST / "piso_panorama.webp", "WEBP", quality=94, method=6
     )
@@ -107,10 +118,7 @@ def floor_texture(pan: Image.Image) -> None:
     # causava faixas desfocadas quando o zoom/pulo revelava lajotas fora do centro.
     # A textura ortografica nao contem o emblema e tem resolucao equivalente
     # a imagem principal do piso, evitando diferenca grotesca entre as copias.
-    with Image.open(ART / "piso_neutro_fonte.webp") as neutral:
-        neutral.convert("RGB").resize((columns, rows), Image.Resampling.LANCZOS).save(
-            DEST / "piso_lajotas.webp", "WEBP", quality=94, method=6
-        )
+    neutral.save(DEST / "piso_lajotas.webp", "WEBP", quality=94, method=6)
 
 
 def render_rest_preview(pan: Image.Image, target: Path) -> float:
