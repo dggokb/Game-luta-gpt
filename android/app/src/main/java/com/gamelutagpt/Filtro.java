@@ -106,6 +106,22 @@ final class Filtro {
         return new Filtro(new ColorMatrixColorFilter(java.util.Arrays.copyOf(m, 20)), m);
     }
 
+    /**
+     * Sombra de verdade no chão (só no OpenGL; no Canvas é a silhueta lisa): a silhueta na cor
+     * {@code rgb}, dura nos pés e abrindo (borrada) e clareando até a cabeça, que é a ponta da
+     * sombra deitada. {@code suave} de 0 a 1: o quanto ela abre e clareia. O {@code m[LUZ]} = 2
+     * avisa o sombreador (a contraluz é 1).
+     */
+    static Filtro sombra(int rgb, float suave) {
+        float[] m = new float[COM_LUZ];
+        int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        m[4] = r; m[9] = g; m[14] = b; m[18] = 1f;
+        m[LUZ] = 2f;
+        m[LUZ + 1] = 1f - 0.6f * suave;    // o escuro que sobra na ponta
+        m[LUZ + 4] = 0.06f * suave;        // o raio da penumbra na ponta (fração da altura do quadro)
+        return new Filtro(new PorterDuffColorFilter(0xFF000000 | rgb, PorterDuff.Mode.SRC_IN), m);
+    }
+
     /** Giro de matiz (graus) que mantém o brilho: a conta do ColorMatrix de giro de cor. */
     static float[] giroDeMatiz(float graus) {
         double a = Math.toRadians(graus);

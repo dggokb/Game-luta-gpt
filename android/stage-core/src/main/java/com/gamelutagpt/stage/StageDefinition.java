@@ -35,7 +35,8 @@ import java.util.Map;
  *                     "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } },
  *   "sombraLutadores": { "alfa": 0.42, "x": 0.6, "y": 0.22 }
  *   // ou, com focos de luz (a sombra segue cada um):
- *   // "sombraLutadores": { "alfa": 0.6, "focos": [ { "x": -145, "altura": 1080, "profundidade": 2008 } ] }
+ *   // "sombraLutadores": { "alfa": 0.6, "cor": "#1A0A18", "suave": 0.5,
+ *   //                     "focos": [ { "x": -145, "altura": 1080, "profundidade": 2008 } ] }
  * }
  * </pre>
  */
@@ -485,16 +486,45 @@ public final class StageDefinition {
         public final float alpha, skewX, squashY;
         /** Os focos de luz; vazio = sol (usa {@link #skewX} e {@link #squashY}). */
         public final List<Focus> focos;
+        /** A cor da sombra ({@code "cor"}, RGB): a luz ambiente que sobra nela (preto = nenhuma). */
+        public final int color;
+        /**
+         * O quanto ela abre e clareia longe dos pés ({@code "suave"}, 0 a 1): a sombra de verdade
+         * é dura onde encosta no corpo e vai ficando borrada e fraca na ponta (penumbra).
+         */
+        public final float softness;
 
         FighterShadow(float alpha, float skewX, float squashY) {
-            this(alpha, skewX, squashY, Collections.<Focus>emptyList());
+            this(alpha, skewX, squashY, Collections.<Focus>emptyList(), 0, 0.5f);
         }
 
-        FighterShadow(float alpha, float skewX, float squashY, List<Focus> focos) {
+        FighterShadow(float alpha, float skewX, float squashY, List<Focus> focos, int color, float softness) {
             this.alpha = alpha;
             this.skewX = skewX;
             this.squashY = squashY;
             this.focos = Collections.unmodifiableList(new ArrayList<>(focos));
+            this.color = color & 0xFFFFFF;
+            this.softness = Math.max(0f, Math.min(1f, softness));
+        }
+
+        /**
+         * Para onde fica o foco visto do peito do lutador, na tela (x para a direita, y para
+         * baixo; {@code out[0..1]}, tamanho 1), e quanto a contraluz acende ({@code out[2]}: cheia
+         * com o foco atrás dos lutadores, fraca com ele na frente, iluminando de frente). A conta
+         * da câmera de repouso: um ponto na profundidade {@code z} aparece {@code D / (D + z)}
+         * menor, puxado para o centro da câmera e para a linha do olho.
+         */
+        public static void rimFromFocus(Focus f, float fighterX, float cameraX, float eyeY, float groundY,
+                                        float restDistance, float[] out) {
+            float z = Math.max(f.depth, -0.8f * restDistance);
+            float r = restDistance / (restDistance + z);
+            float lx = cameraX + (f.x - cameraX) * r;
+            float ly = eyeY + (groundY - eyeY) * r - f.height * r;
+            float dx = lx - fighterX, dy = ly - (groundY - MEIO_CORPO);
+            float n = (float)Math.sqrt(dx * dx + dy * dy);
+            out[0] = n > 1e-3f ? dx / n : 0f;
+            out[1] = n > 1e-3f ? dy / n : -1f;
+            out[2] = f.depth >= 0f ? 1f : 0.35f;
         }
 
         /**
@@ -753,7 +783,10 @@ public final class StageDefinition {
                     throw new IllegalArgumentException("sombraLutadores: no máximo " + FighterShadow.MAX_FOCOS + " focos");
                 }
             }
-            shadow = new FighterShadow(alfa, number(shadowMap, "x", 0.5f), y, focos);
+            float suave = number(shadowMap, "suave", 0.5f);
+            if (suave < 0f || suave > 1f) throw new IllegalArgumentException("sombraLutadores: \"suave\" entre 0 e 1");
+            shadow = new FighterShadow(alfa, number(shadowMap, "x", 0.5f), y, focos,
+                color(shadowMap, "cor", 0xFF000000), suave);
         }
 
         return new StageDefinition(name.trim(), distance, horizon,

@@ -20,7 +20,9 @@
     }
   },
   "sombraLutadores": {
-    "alfa": 0.6,
+    "alfa": 0.72,
+    "cor": "#1C0A14",
+    "suave": 0.55,
     "focos": [
       {
         "x": -145,

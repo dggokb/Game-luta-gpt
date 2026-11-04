@@ -4225,6 +4225,7 @@ public class GameView extends SurfaceView
                 renderCameraTop = focusY - playerScreenY / renderZoom;
             }
             float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+            luzCameraX = cameraLeft + visibleWorldWidth / 2f;
             if (punchZoom != 1f) {
                 // Soco de câmera: aproxima segurando o ponto do impacto no mesmo lugar da tela.
                 // No close de cinema o impacto vai para o meio da tela.
@@ -4517,7 +4518,10 @@ public class GameView extends SurfaceView
         com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
         com.gamelutagpt.stage.StageDefinition.FighterShadow sombra = def != null ? def.fighterShadow : null;
         if (sombra == null) return;
-        if (sombraFiltro == null) sombraFiltro = Filtro.silhueta(0xFF000000);
+        if (sombraFiltro == null || sombraDe != sombra) {
+            sombraFiltro = Filtro.sombra(sombra.color, sombra.softness);
+            sombraDe = sombra;
+        }
         sombraProfundidade = com.gamelutagpt.stage.StageDefinition.FighterShadow.depthToScreen(
             CameraRig.CAMERA_GROUND_SCREEN_Y, def.horizon * Arena.VH, def.cameraDistance);
         CombatFighter npc = opponent();
@@ -4532,6 +4536,7 @@ public class GameView extends SurfaceView
     /** Quanto a sola do desenho fica acima da linha do chão (a sombra comprida sai dela). */
     private static final float SOMBRA_SOLA = 12f;
     private Filtro sombraFiltro;
+    private com.gamelutagpt.stage.StageDefinition.FighterShadow sombraDe;
     private float sombraProfundidade;
     private final android.graphics.Matrix sombraMatriz = new android.graphics.Matrix();
     private final float[] sombraValores = new float[9];
@@ -5615,7 +5620,7 @@ public class GameView extends SurfaceView
         if (folego != 1f && f.grounded && !f.attacking() && !f.inHitstun()) {
             c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
         }
-        renderer.setTint(corDoLado(f, luzNoLutador(desgaste.tinta(f.state))));
+        renderer.setTint(corDoLado(f, luzNoLutador(desgaste.tinta(f.state), f)));
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
@@ -5652,7 +5657,7 @@ public class GameView extends SurfaceView
      * cima do desgaste, e o clarão do relâmpago quando cai um. É a mesma matriz de cor que o
      * lutador já usava: não custa desenho a mais. Guardada por tinta e nível do clarão.
      */
-    private Filtro luzNoLutador(Filtro tinta) {
+    private Filtro luzNoLutador(Filtro tinta, CombatFighter f) {
         com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
         com.gamelutagpt.stage.StageDefinition.FighterLight luz = def != null ? def.fighterLight : null;
         int clarao = 0;
@@ -5662,8 +5667,32 @@ public class GameView extends SurfaceView
         if (luz == null && clarao == 0) return tinta;
         if (def != luzDoCenario) {
             luzes.clear();
-            luzSemTinta = new Filtro[LUZ_CLARAO_NIVEIS + 1];
+            luzSemTinta = new Filtro[LUZ_PASSOS];
             luzDoCenario = def;
+        }
+        // Com focos de luz a contraluz vem do foco mais forte sobre este lutador, na direção dele
+        // na tela (em LUZ_DIRECOES passos, para guardar os filtros): vira de lado quando o
+        // lutador passa por baixo do foco.
+        int passo = 0;
+        float rimX = luz != null ? luz.rimDirX : 0f, rimY = luz != null ? luz.rimDirY : -1f, rimK = 1f;
+        com.gamelutagpt.stage.StageDefinition.FighterShadow sombra = def.fighterShadow;
+        if (luz != null && luz.rimStrength > 0f && sombra != null && !sombra.focos.isEmpty() && f != null) {
+            com.gamelutagpt.stage.StageDefinition.Focus melhor = null;
+            float forte = -1f;
+            for (int i = 0; i < sombra.focos.size(); i++) {
+                sombra.fromFocus(sombra.focos.get(i), f.x, 1f, luzFoco);
+                if (luzFoco[2] > forte) { forte = luzFoco[2]; melhor = sombra.focos.get(i); }
+            }
+            float olho = GROUND_Y - (CameraRig.CAMERA_GROUND_SCREEN_Y - def.horizon * Arena.VH) / CameraRig.CAMERA_REST_ZOOM;
+            com.gamelutagpt.stage.StageDefinition.FighterShadow.rimFromFocus(melhor, f.x, luzCameraX, olho, GROUND_Y,
+                def.cameraDistance / CameraRig.CAMERA_REST_ZOOM, luzFoco);
+            int d = Math.round((float)(Math.atan2(luzFoco[1], luzFoco[0]) / (2 * Math.PI) * LUZ_DIRECOES));
+            d = ((d % LUZ_DIRECOES) + LUZ_DIRECOES) % LUZ_DIRECOES;
+            double ang = d * 2 * Math.PI / LUZ_DIRECOES;
+            rimX = (float)Math.cos(ang);
+            rimY = (float)Math.sin(ang);
+            rimK = luzFoco[2];
+            passo = 1 + d;
         }
         Filtro[] niveis;
         if (tinta == null) {
@@ -5671,11 +5700,12 @@ public class GameView extends SurfaceView
         } else {
             niveis = luzes.get(tinta);
             if (niveis == null) {
-                niveis = new Filtro[LUZ_CLARAO_NIVEIS + 1];
+                niveis = new Filtro[LUZ_PASSOS];
                 luzes.put(tinta, niveis);
             }
         }
-        if (niveis[clarao] == null) {
+        int chave = clarao * (LUZ_DIRECOES + 1) + passo;
+        if (niveis[chave] == null) {
             float[] k = luz != null ? luz.factors() : new float[] {1f, 1f, 1f};
             // O relâmpago: a luz do lugar some e o corpo clareia (até +60% e um pouco de azul).
             float c = clarao / (float)LUZ_CLARAO_NIVEIS;
@@ -5701,18 +5731,24 @@ public class GameView extends SurfaceView
                     float raio = ((cor >> (16 - 8 * i)) & 0xFF) / 255f;
                     rim[i] = base + (raio - base) * c;
                 }
-                niveis[clarao] = Filtro.comLuz(junto.getArray(), rim, luz.rimStrength + 1.2f * c,
-                    luz.rimDirX, luz.rimDirY, luz.feetFactors());
+                niveis[chave] = Filtro.comLuz(junto.getArray(), rim, luz.rimStrength * rimK + 1.2f * c,
+                    rimX, rimY, luz.feetFactors());
             } else {
-                niveis[clarao] = Filtro.matriz(junto);
+                niveis[chave] = Filtro.matriz(junto);
             }
         }
-        return niveis[clarao];
+        return niveis[chave];
     }
 
     private static final int LUZ_CLARAO_NIVEIS = 4;
+    /** Direções da contraluz guardadas com foco de luz (a cada 15 graus). */
+    private static final int LUZ_DIRECOES = 24;
+    private static final int LUZ_PASSOS = (LUZ_CLARAO_NIVEIS + 1) * (LUZ_DIRECOES + 1);
+    private final float[] luzFoco = new float[3];
+    /** O meio da câmera no quadro (a contraluz do foco é vista dele). */
+    private float luzCameraX = 700f;
     private com.gamelutagpt.stage.StageDefinition luzDoCenario;
-    private Filtro[] luzSemTinta = new Filtro[LUZ_CLARAO_NIVEIS + 1];
+    private Filtro[] luzSemTinta = new Filtro[LUZ_PASSOS];
     private final java.util.Map<Filtro, Filtro[]> luzes = new java.util.IdentityHashMap<>();
 
     private Filtro corDoLado(CombatFighter f, Filtro tinta) {

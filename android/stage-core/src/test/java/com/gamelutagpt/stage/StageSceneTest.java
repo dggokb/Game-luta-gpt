@@ -80,7 +80,7 @@ public class StageSceneTest {
 
     @Test
     public void staticImageCanBeFlippedWithoutRepeating() {
-        StageDefinition def = StageDefinition.fromJson("{\"camadas\":[{\"imagem\":\"lateral.png\","
+        StageDefinition def = StageDefinition.fromJson("{\"nome\":\"T\",\"camadas\":[{\"imagem\":\"lateral.png\","
             + "\"profundidade\":2007,\"topo\":0.22,\"base\":0.555,\"x\":-0.16,\"virar\":true}]}");
         assertTrue(def.layers.get(0).flip);
         assertEquals(StageDefinition.Repeat.NONE, def.layers.get(0).repeat);
@@ -746,6 +746,20 @@ public class StageSceneTest {
         org.junit.Assert.assertEquals(2000f / 1000f * k, perto[1], 1e-4f);
         org.junit.Assert.assertTrue(perto[2] > longe[2] && longe[2] > 0f);
         org.junit.Assert.assertEquals(0f, fora[2], 1e-6f);
+        // A contraluz vê o foco do peito do lutador: à esquerda e no alto; do outro lado, à direita.
+        float[] rim = new float[3];
+        StageDefinition.FighterShadow.rimFromFocus(foco.focos.get(0), 600f, 700f, 381f, 565f, 806f, rim);
+        org.junit.Assert.assertTrue(rim[0] < 0f && rim[1] < -0.8f);
+        org.junit.Assert.assertEquals(1f, rim[0] * rim[0] + rim[1] * rim[1], 1e-4f);
+        org.junit.Assert.assertEquals(1f, rim[2], 1e-6f);
+        StageDefinition.FighterShadow.rimFromFocus(foco.focos.get(0), -900f, 700f, 381f, 565f, 806f, rim);
+        org.junit.Assert.assertTrue(rim[0] > 0f);
+        org.junit.Assert.assertEquals(0.5f, foco.softness, 1e-6f);
+        org.junit.Assert.assertEquals(0, foco.color);
+        StageDefinition.FighterShadow cor = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [],"
+            + "\"sombraLutadores\": {\"cor\": \"#2A1020\", \"suave\": 0.2}}").fighterShadow;
+        org.junit.Assert.assertEquals(0x2A1020, cor.color);
+        org.junit.Assert.assertEquals(0.2f, cor.softness, 1e-6f);
         try {
             StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"sombraLutadores\": {\"focos\": [{\"x\": 0}]}}");
             org.junit.Assert.fail("foco sem altura");

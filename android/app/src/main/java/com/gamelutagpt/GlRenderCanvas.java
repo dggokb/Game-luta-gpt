@@ -116,12 +116,32 @@ final class GlRenderCanvas implements RenderCanvas {
         "  else if (k < 1.5) {\n" +
         "    vec4 t = texture(uTex, vUv);\n" +
         "    if (uFiltro) {\n" +
+        // Sombra (uLuz.x = 2): o alfa é borrado num anel de 8 vizinhos cujo raio cresce dos pés
+        // (de baixo do quadro, dura) até a cabeça (a ponta, aberta), e clareia até uLuzCor.x.
+        "      highp float ys = 1.0;\n" +
+        "      if (uLuz.x > 1.5) {\n" +
+        "        ys = clamp((vUv.y - uLuzRet.y) / max(uLuzRet.w - uLuzRet.y, 1e-6), 0.0, 1.0);\n" +
+        "        highp vec2 rr = uLuz.zw * (1.0 - ys);\n" +
+        "        highp vec2 dd = rr * 0.7071;\n" +
+        "        float soma = t.a * 2.0;\n" +
+        "        soma += texture(uTex, clamp(vUv + vec2(rr.x, 0.0), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv - vec2(rr.x, 0.0), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv + vec2(0.0, rr.y), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv - vec2(0.0, rr.y), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv + dd, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv - dd, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv + vec2(dd.x, -dd.y), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        soma += texture(uTex, clamp(vUv + vec2(-dd.x, dd.y), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        t.a = soma / 10.0;\n" +
+        "      }\n" +
         "      vec3 s = t.a > 0.0 ? t.rgb / t.a : vec3(0.0);\n" +
         "      if (uTroca.x > 0.5) s = troca(s);\n" +
         "      vec4 u = clamp(uCor * vec4(s, t.a) + uCorSoma, 0.0, 1.0);\n" +
         // Contraluz: onde o vizinho do lado da luz é transparente, a borda acende (dois vizinhos,
         // perto e longe, para a borda sair macia). Degradê: os pés vão para o fator dos pés.
-        "      if (uLuz.x > 0.5) {\n" +
+        "      if (uLuz.x > 1.5) {\n" +
+        "        u.a *= mix(uLuzCor.x, 1.0, ys);\n" +
+        "      } else if (uLuz.x > 0.5) {\n" +
         "        float v1 = texture(uTex, clamp(vUv + uLuz.zw, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         "        float v2 = texture(uTex, clamp(vUv + uLuz.zw * 0.5, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         "        float borda = clamp(t.a - 0.5 * (v1 + v2), 0.0, 1.0);\n" +
@@ -833,7 +853,7 @@ final class GlRenderCanvas implements RenderCanvas {
         // A luz do cenário: só no filtro já preparado para um quadro da folha (luzDoQuadro).
         int L = Filtro.LUZ;
         if (m.length >= LUZ_QUADRO && m[L] > 0.5f) {
-            GLES30.glUniform4f(uLuz, 1f, m[L + 4], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
+            GLES30.glUniform4f(uLuz, m[L] > 1.5f ? 2f : 1f, m[L + 4], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
             GLES30.glUniform4f(uLuzCor, m[L + 1], m[L + 2], m[L + 3], 1f);
             GLES30.glUniform4f(uLuzPes, m[L + 7], m[L + 8], m[L + 9], 1f);
             GLES30.glUniform4f(uLuzRet, m[Filtro.COM_LUZ + 2], m[Filtro.COM_LUZ + 3], m[Filtro.COM_LUZ + 4], m[Filtro.COM_LUZ + 5]);
@@ -867,14 +887,21 @@ final class GlRenderCanvas implements RenderCanvas {
         if (Math.abs(det) < 1e-9f || r == l || bt == top || sr == sl || sb == st) return;
         // A direção da luz na tela, levada para o espaço do desenho (a inversa da parte linear da
         // matriz: o espelho de quem olha para o outro lado já vira junto).
-        float largura = alturaTela * LARGURA_CONTRALUZ;
-        float dx = m[Filtro.LUZ + 5] * largura, dy = m[Filtro.LUZ + 6] * largura;
-        float qx = (d * dx - c * dy) / det, qy = (-b * dx + a * dy) / det;
         float[] q = rodaLuz[vezLuz];
         vezLuz = (vezLuz + 1) % rodaLuz.length;
         System.arraycopy(m, 0, q, 0, Filtro.COM_LUZ);
-        q[Filtro.COM_LUZ] = qx * (sr - sl) / (r - l) / t.largura;
-        q[Filtro.COM_LUZ + 1] = qy * (sb - st) / (bt - top) / t.altura;
+        if (m[Filtro.LUZ] > 1.5f) {
+            // Sombra: o raio da penumbra na ponta, em uv, igual nos dois eixos (em texels).
+            float raio = m[Filtro.LUZ + 4] * Math.abs(sb - st);
+            q[Filtro.COM_LUZ] = raio / t.largura;
+            q[Filtro.COM_LUZ + 1] = raio / t.altura;
+        } else {
+            float largura = alturaTela * LARGURA_CONTRALUZ;
+            float dx = m[Filtro.LUZ + 5] * largura, dy = m[Filtro.LUZ + 6] * largura;
+            float qx = (d * dx - c * dy) / det, qy = (-b * dx + a * dy) / det;
+            q[Filtro.COM_LUZ] = qx * (sr - sl) / (r - l) / t.largura;
+            q[Filtro.COM_LUZ + 1] = qy * (sb - st) / (bt - top) / t.altura;
+        }
         // Meio texel para dentro: o vizinho não sai do quadro (a folha tem os outros do lado).
         float mu = 0.5f / t.largura, mv = 0.5f / t.altura;
         q[Filtro.COM_LUZ + 2] = Math.min(sl, sr) / t.largura + mu;
