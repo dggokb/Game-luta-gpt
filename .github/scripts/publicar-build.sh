@@ -31,6 +31,13 @@ if [ -n "$padrao" ]; then
       done
 fi
 
-gh release upload "$tag" "$@" -R "$repo" --clobber
+# O envio falha às vezes do lado do GitHub (502 ao trocar o asset, 404 no uploads.github.com
+# logo depois): tenta de novo antes de derrubar o job.
+for tentativa in 1 2 3 4; do
+  if gh release upload "$tag" "$@" -R "$repo" --clobber; then break; fi
+  if [ "$tentativa" = 4 ]; then exit 1; fi
+  echo "Envio falhou (tentativa $tentativa); de novo em $((tentativa * 10)) s"
+  sleep $((tentativa * 10))
+done
 gh release edit "$tag" -R "$repo" --notes "$notas" >/dev/null || true
 echo "Publicado em: https://github.com/${repo}/releases/tag/${tag}"
