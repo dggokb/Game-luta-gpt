@@ -78,6 +78,14 @@ public class StageSceneTest {
         assertEquals(1000f, def.cameraDistance, 0f);
     }
 
+    @Test
+    public void staticImageCanBeFlippedWithoutRepeating() {
+        StageDefinition def = StageDefinition.fromJson("{\"camadas\":[{\"imagem\":\"lateral.png\","
+            + "\"profundidade\":2007,\"topo\":0.22,\"base\":0.555,\"x\":-0.16,\"virar\":true}]}");
+        assertTrue(def.layers.get(0).flip);
+        assertEquals(StageDefinition.Repeat.NONE, def.layers.get(0).repeat);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void layerNeedsPlacement() {
         StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 10}]}");

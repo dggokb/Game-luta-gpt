@@ -633,7 +633,7 @@ public final class StageScene {
                 top = baseTop + dy;
                 bottom = baseBottom + dy;
             }
-            boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
+            boolean mirrored = layer.flip ^ (layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0);
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
             drawWaterfalls(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
@@ -663,7 +663,7 @@ public final class StageScene {
                 top = baseTop + dy;
                 bottom = baseBottom + dy;
             }
-            boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
+            boolean mirrored = layer.flip ^ (layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0);
             drawLights(c, layer, l, top, r, bottom, mirrored, k);
         }
     }
