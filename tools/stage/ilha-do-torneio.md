@@ -413,6 +413,30 @@ pés dos lutadores, ele fica só a −250 com `periodo` grande, aparecendo quand
 
 ### Notas da Arena Central
 
+**Hoje (versão carmesim, do conceito):** o cenário é a própria arte de conceito
+(`conceito_sem_hud.png`, a tela inteira sem HUD), cortada em duas peças pelo
+`tools/stage/cenario_do_conceito.py`:
+
+```bash
+python3 tools/stage/cenario_do_conceito.py conceito_sem_hud.png \
+    android/app/src/main/assets/stages/arena_central --horizonte 0.47 --base 0.555
+```
+
+- `fundo_conceito.jpg`: do topo da pintura até a linha 0,555 (onde a arquibancada encosta
+  no chão), uma camada plana na profundidade do fim do chão (2008), com `corAcima` roxo
+  para o super pulo.
+- `chao_conceito.jpg`: o chão da pintura "desentortado" para vista de cima pela mesma conta
+  da câmera do jogo (StageCamera, zoom 1,24 de repouso, horizonte 0,47). Na câmera do
+  começo da luta o jogo projeta de volta e o chão fica como no conceito (lótus, anéis,
+  riscos de luz e sombras pintadas); quando a câmera anda ele continua em perspectiva.
+- O horizonte 0,47 (e não 0,52) deixa o chão com 2008 de fundo em vez de 4877: textura de
+  3000x1354 em vez de 3000x2789, sem mudar o que aparece na câmera de repouso.
+- Para trocar a arte: pinte o conceito na tela 16:9, rode o script e copie os números que
+  ele imprime para a camada `fundo` e o `chao` do `stage.json`.
+
+**Antes (versão em camadas, histórico):** montada pelo `montar_central.py` com as
+imagens abaixo (as peças já saíram da pasta; ficam no histórico do git).
+
 As imagens do GPT passam pelo `montar_central.py` (o `camarote.png` é ignorado: objeto
 colado na câmera):
 
@@ -458,9 +482,8 @@ os penhascos, e o templo do Takatoshi no pico, pequeno. É onde Ryūga e Kōga c
 onde os agentes mascarados dos magnatas cercam os dois (o episódio bônus do documento da
 história, seção 7.1).
 
-**Provisório no jogo** (até a arte chegar): o `stage.json` usa peças da Central e da
-Imperial pelo caminho `"../arena_central/..."` (céu, templo ao longe, estádio, mureta, mar
-liso) e só tem uma imagem própria, a `lua.png`, recortada do `ceu_lua.jpg`. O céu ainda é
+**Provisório no jogo** (até a arte chegar): o `stage.json` usa cópias das peças antigas da
+Central (céu, templo ao longe, estádio, mureta, mar liso, na pasta do próprio terraço) e só tem uma imagem própria, a `lua.png`, recortada do `ceu_lua.jpg`. O céu ainda é
 o crepúsculo da Central escurecido por uma névoa, e o piso é o da Imperial.
 
 Composição: piso do terraço até 1600 (pedra escura, `reflexoLutadores` ~0,2), mureta 1600

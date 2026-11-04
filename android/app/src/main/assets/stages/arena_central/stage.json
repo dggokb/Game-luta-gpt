@@ -2,9 +2,9 @@
   "nome": "Arena Central",
   "camera": {
     "distancia": 1000,
-    "horizonte": 0.52
+    "horizonte": 0.47
   },
-  "corFundo": "#2A1030",
+  "corFundo": "#5A2950",
   "luzLutadores": {
     "cor": "#FFA090",
     "forca": 0.2,
@@ -26,68 +26,22 @@
   },
   "camadas": [
     {
-      "id": "ceu",
-      "imagem": "ceu.jpg",
-      "profundidade": 100000,
-      "topo": -0.7,
-      "base": 0.38,
+      "id": "fundo",
+      "imagem": "fundo_conceito.jpg",
+      "profundidade": 2008,
+      "topo": 0,
+      "base": 0.555,
       "x": 0.5,
       "repetir": "espelhar",
-      "corAcima": "#2A1030"
-    },
-    {
-      "id": "templo-longe",
-      "imagem": "templo_longe.png",
-      "profundidade": 8600,
-      "topo": 0.12,
-      "base": 0.46,
-      "x": 0.62,
-      "repetir": "espelhar"
-    },
-    {
-      "id": "neblina-longe",
-      "tipo": "neblina",
-      "profundidade": 5000,
-      "topo": 0.38,
-      "base": 0.56,
-      "cor": "#7A3050",
-      "alfa": 0.25
-    },
-    {
-      "id": "barreira",
-      "imagem": "barreira.png",
-      "profundidade": 3520,
-      "noChao": true,
-      "altura": 0.16,
-      "x": 0.5,
-      "repetir": "espelhar"
-    },
-    {
-      "id": "arquibancada",
-      "imagem": "arquibancada.png",
-      "profundidade": 3500,
-      "noChao": true,
-      "altura": 0.42,
-      "x": 0.5,
-      "repetir": "nao"
-    },
-    {
-      "id": "torres",
-      "imagem": "pilastra.png",
-      "profundidade": 3300,
-      "noChao": true,
-      "altura": 0.78,
-      "x": 0.26,
-      "repetir": "espelhar",
-      "periodo": 0.48
+      "corAcima": "#5A2950"
     }
   ],
   "chao": {
-    "imagem": "chao.jpg",
-    "imagemLajotas": "chao_liso.jpg",
-    "perto": -520,
-    "longe": 420,
-    "ate": 3500,
+    "imagem": "chao_conceito.jpg",
+    "imagemLajotas": "chao_conceito.jpg",
+    "perto": -700,
+    "longe": 2008,
+    "ate": 2008,
     "centroX": 700,
     "reflexoLutadores": 0.2,
     "reflexoLuzes": 0.5
