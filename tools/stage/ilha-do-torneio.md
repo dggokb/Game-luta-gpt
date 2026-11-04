@@ -433,8 +433,15 @@ python3 tools/stage/cenario_panorama.py art/stages/arena_central/recorte.json \
   o horizonte), para a câmera andar e o super pulo não abrirem buraco.
 - `chao.jpg`: o chão do panorama "desentortado" (a conta do `cenario_do_conceito.py`), com os
   lados vindos do panorama e só o que passa dele espelhado.
+- **Animação** (`tools/stage/animar_central.py`, rodar depois do corte): 27 estandartes soltos
+  balançando (torres e postes soltos, muro e sacadas presos), fogo nos 5 braseiros do muro, 19
+  luzes (os holofotes das torres e as lanternas, as baixas refletindo no chão), a plateia das
+  arquibancadas pulando (máscara `estadio_plateia.webp`, sem o pavilhão e as escadas) com
+  flashes, e as 3 cachoeiras da camada das montanhas correndo (`montanhas_agua.png`). As
+  posições estão no script, em pixels do panorama.
 - Para trocar a arte: o panorama novo no lugar, conferir/ajustar as sementes (o
-  `--mascaras pasta/` grava cada máscara para conferir) e rodar de novo.
+  `--mascaras pasta/` grava cada máscara para conferir), rodar de novo e depois o
+  `animar_central.py` (conferindo as posições dele).
 
 **Alternativa (as duas artes juntas):** o `tools/stage/arena_central_final.py` monta a arena a
 partir de `panorama_esquerda.webp` + `panorama_direita.webp` (duas camadas: céu e montanhas a
