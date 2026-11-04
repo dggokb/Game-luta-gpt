@@ -386,14 +386,5 @@
     "reflexoLutadores": 0.32,
     "reflexoLuzes": 0.6,
     "imagemLajotas": "chao_tabuas.jpg"
-  },
-  "petalas": {
-    "quantidade": 30,
-    "cor": "#FFB7D5",
-    "perto": -350,
-    "longe": 1000,
-    "vento": 35,
-    "queda": 55,
-    "tamanho": 6
   }
 }
