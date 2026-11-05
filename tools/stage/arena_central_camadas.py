@@ -47,11 +47,7 @@ PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/arena_central"
 # A tela de repouso no quadro de 4000 x 1596 (a janela do panorama de 3966 x 1586 ampliada).
 ESCALA, X0, Y0 = 1.8188, 825.2, 109.5
 CEU_Y = -1449                 # onde o céu começa no quadro
-MURO_Y = 866                  # o pé do muro no meio: onde o chão acaba (como no concept)
-# A pintura do muro tem embaixo uma base de pedra (até a linha ~903) que no concept fica
-# coberta pelo chão: sai nas colunas em que a estrutura acaba antes de BASE_ATE (o muro do meio;
-# os prédios dos lados descem mais e ficam inteiros).
-BASE_ATE = 915
+MURO_Y = 856                  # o pé do muro no meio: onde o chão acaba (como no concept)
 PROF_CEU, PROF_MONTANHAS = 20000, 5000
 TORRES = ["torre_bandeira", "torre_refletor_esquerda", "torre_refletor_direita"]
 
@@ -59,7 +55,7 @@ TORRES = ["torre_bandeira", "torre_refletor_esquerda", "torre_refletor_direita"]
 # em z = Z_EMBLEMA, no meio da arena (x = REST_CENTER_X). O piso vai de PERTO até o muro.
 RAIO_ANEL = 380.0
 Z_EMBLEMA = 0.0
-PERTO = -500.0
+PERTO = -900.0
 LARGURA_TEX = 4096
 # Na textura de cima (4000 px): centro do emblema, raio do vermelho de fora e as juntas das
 # fiadas que não passam pelo emblema.
@@ -203,12 +199,6 @@ def main():
                     "topo": t, "base": b, "x": x, "repetir": "espelhar"})
 
     est = Image.open(ARTE / "estrutura.webp")
-    a = np.array(est)
-    alfa = a[..., 3]
-    fundo_col = np.where(alfa.any(0), alfa.shape[0] - 1 - np.argmax(alfa[::-1] > 0, 0), 0)
-    cols = fundo_col < BASE_ATE
-    a[MURO_Y + 2:, cols, 3] = 0
-    est = Image.fromarray(a)
     bb = est.getbbox()
     est.crop(bb).save(pasta / "estrutura.webp", quality=92, alpha_quality=100, method=6)
     t, b, x = caixa(*bb)
