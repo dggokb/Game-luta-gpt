@@ -80,6 +80,9 @@ altura mínima do air dash) e também **cancelando um normal que encostou** (ace
 - **SPEED:** com o rival a até 560 (`shinkaiVanishRange`), → → no chão continua sendo o sumiço;
   mais longe, Dragon Rush. **TECHNIQUE:** com golpe do rival vindo, o → tocado é a aparada (dois
   toques não viram Dragon Rush no meio dela).
+- **Dois Dragon Rush que se encontram** (os dois no SHINKAI, de frente, nenhum encostou ainda)
+  abrem o **SHINKAI Clash** (o minigame), em vez de trocar pancada (`dragonRushClash`; vale mesmo
+  com o Clash da ativação desligado, `shinkaiClashMinigame`). Quem saiu depois é quem respondeu.
 - **Desenho (provisório):** o jH do lutador (sem ele, o H): preparo até a pose de bater, segura a
   pose no voo e volta na recuperação, com o rastro de velocidade. Teste: `DragonRushTest`.
 

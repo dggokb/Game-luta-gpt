@@ -2152,6 +2152,7 @@ public class GameView extends SurfaceView
             }
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("DRAGON_RUSH".equals(cue)) ultraSounds.playFight("ar_h", 0.9f, 0.85f);
+            if ("DRAGON_RUSH_CLASH".equals(cue)) beamShake = Math.max(beamShake, 24f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
             // Bounces shake the screen like the beam's hits.

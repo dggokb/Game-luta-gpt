@@ -419,6 +419,15 @@ final class CombatEngine {
         advanceEchoes();
         advanceHenchmen();
 
+        // Dois Dragon Rush se encontrando no voo: em vez de trocar pancada, o SHINKAI Clash.
+        CombatFighter quemRespondeu = dragonRushesSeEncontram();
+        if (quemRespondeu != null) {
+            startShinkaiClash(quemRespondeu, fighters[1 - quemRespondeu.index]);
+            cues.add("DRAGON_RUSH_CLASH");
+            for (int i = 0; i < 2; i++) fighters[i].travel = 0f;
+            return;
+        }
+
         // 4. Collisions (simultaneous: trades are possible).
         contacts.clear();
         detectMelee(fighters[0], fighters[1]);
@@ -986,6 +995,29 @@ final class CombatEngine {
         f.vx = 0f;
         f.vy = 0f;
         cues.add("DRAGON_RUSH");
+    }
+
+    /**
+     * Os dois no Dragon Rush (preparo ou voo, nenhum encostou ainda), um de frente para o outro,
+     * perto o bastante para a pancada pegar: devolve quem respondeu (o que saiu depois, que abre
+     * o Clash com o corte dele), ou null.
+     */
+    private CombatFighter dragonRushesSeEncontram() {
+        if (!config.dragonRushClash) return null;
+        CombatFighter a = fighters[0], b = fighters[1];
+        for (CombatFighter f : fighters) {
+            if (!dragonRush(f) || f.outcome != CombatFighter.Outcome.NONE || f.attackFrame > f.attack.lastActiveFrame()) {
+                return null;
+            }
+        }
+        // Ao menos um já voando (os dois parados no preparo não se encontram).
+        if (!dragonRushVoando(a) && !dragonRushVoando(b)) return null;
+        if (!canClash(a) || !canClash(b)) return null;
+        // De frente: cada um olha para o outro.
+        if ((b.x - a.x) * a.facing <= 0f || (a.x - b.x) * b.facing <= 0f) return null;
+        float alcance = config.dragonRushReach + Math.max(a.body().halfWidth, b.body().halfWidth) + 30f;
+        if (Math.abs(b.x - a.x) > alcance || Math.abs(b.y - a.y) > 160f) return null;
+        return a.attackFrame <= b.attackFrame ? a : b;
     }
 
     /** No voo do Dragon Rush (ativo, ainda sem encostar). */

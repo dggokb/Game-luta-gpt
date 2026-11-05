@@ -131,6 +131,48 @@ public class DragonRushTest {
         assertFalse("o segundo Dragon Rush não sai no mesmo combo", m.engine.cues().contains("DRAGON_RUSH"));
     }
 
+    @Test public void doisDragonRushQueSeEncontramAbremOShinkaiClash() {
+        Match m = new Match("p13", "player_base", 500f, 1300f);
+        m.shinkai();
+        // O P2 também transforma (responder a ativação é o choque de auras, não o Clash).
+        m.second.shinkai = CombatConfig.SHINKAI_MAX;
+        m.in[1].shinkai = true;
+        m.step();
+        m.steps(m.engine.shinkaiAtivacaoQuadros(m.f(1)) + 4);
+        assertTrue(m.second.inShinkai());
+        assertNull("a ativação não abre o Clash", m.engine.shinkaiClash());
+        m.in[0].dash = true;
+        m.in[1].dash = true;
+        m.step();
+        boolean clash = false, pancada = false;
+        for (int i = 0; i < 60 && !clash; i++) {
+            m.step();
+            clash = m.engine.cues().contains("DRAGON_RUSH_CLASH");
+            for (CombatEngine.HitEvent e : m.engine.events()) if (CombatEngine.DRAGON_RUSH.equals(e.moveId)) pancada = true;
+        }
+        assertTrue("os dois Dragon Rush se encontraram", clash);
+        assertFalse("ninguém apanhou: virou o Clash", pancada);
+        assertNotNull(m.engine.shinkaiClash());
+    }
+
+    @Test public void dragonRushNoRivalTransformadoParadoNaoAbreClash() {
+        Match m = new Match("p13", "player_base", 500f, 1300f);
+        m.shinkai();
+        m.second.shinkai = CombatConfig.SHINKAI_MAX;
+        m.in[1].shinkai = true;
+        m.step();
+        m.steps(m.engine.shinkaiAtivacaoQuadros(m.f(1)) + 4);
+        m.in[0].dash = true;
+        m.step();
+        assertTrue(CombatEngine.dragonRush(m.f(0)));
+        // Só um voou: acerta, erra ou o rival esquiva, mas não vira o Clash.
+        for (int i = 0; i < 60; i++) {
+            m.step();
+            assertNull(m.engine.shinkaiClash());
+        }
+        assertFalse(CombatEngine.dragonRush(m.f(0)));
+    }
+
     @Test public void speedPertoAindaSome() {
         Match m = new Match("p16", "p15", 600f, 900f);
         m.shinkai();

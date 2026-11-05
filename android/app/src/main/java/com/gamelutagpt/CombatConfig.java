@@ -705,6 +705,11 @@ final class CombatConfig {
      * de auras que afasta os dois e a luta segue; true = o SHINKAI Clash de antes (o minigame).
      */
     boolean shinkaiClashMinigame = false;
+    /**
+     * Dois Dragon Rush que se encontram no voo (os dois no SHINKAI) abrem o SHINKAI Clash (o
+     * minigame), mesmo com {@link #shinkaiClashMinigame} desligado na ativação.
+     */
+    boolean dragonRushClash = true;
     /** O choque de auras: quanto cada um é empurrado (vezes o empurrão do combo breaker). */
     float shinkaiChoqueEmpurrao = 0.7f;
     /**
