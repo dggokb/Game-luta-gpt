@@ -25,6 +25,11 @@ Quando a pintura nasceu de uma tela do jogo (um concept com o HUD, limpo e esten
 lados), o enquadramento já é o da câmera de repouso: ``--tela-px`` (quantos pixels da imagem
 cabem na largura da tela), ``--centro X`` (o x da imagem no meio da tela) e ``--horizonte F``
 (a altura do horizonte, fração da tela, medida pelo anel). Aí a escala não sai da largura.
+
+Paralaxe do fundo: ``--fundo IMG`` (céu e montanhas sem a arena, cobrindo da linha 0 até a altura
+dela, na largura da pintura) e ``--mascara IMG`` (branco onde é arena, na mesma escala). A parede
+vira PNG com transparência onde era céu e o fundo vai para ``--prof-fundo`` (bem mais longe),
+com o céu espelhado em cima para o super pulo.
 """
 import argparse
 import json
@@ -51,6 +56,9 @@ def main():
     ap.add_argument('--tela-px', type=float, default=None)
     ap.add_argument('--centro', type=float, default=None)
     ap.add_argument('--horizonte', type=float, default=None)
+    ap.add_argument('--fundo', default=None)
+    ap.add_argument('--mascara', default=None)
+    ap.add_argument('--prof-fundo', type=float, default=9000.0)
     a = ap.parse_args()
 
     im = Image.open(a.fonte).convert('RGB')
@@ -97,7 +105,36 @@ def main():
     rampa = np.clip((np.arange(hp) - ex) / max(1, base_px), 0, 1)[:, None, None]
     parede = parede * (1 - 0.10 - 0.08 * rampa) + nevoa * (0.10 + 0.08 * rampa)
     pimg = Image.fromarray(np.clip(parede, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.1))
-    pimg.save(os.path.join(a.saida, 'parede.jpg'), quality=92)
+    camadas = []
+    if a.fundo:
+        # Arena recortada (a máscara é o alfa) e o fundo numa camada própria, bem mais longe.
+        masc = Image.open(a.mascara).convert('L')
+        masc = masc.resize((W, round(masc.height * W / masc.width)), Image.LANCZOS)
+        alfa = Image.new('L', (W, base_px), 255)
+        alfa.paste(masc.crop((0, 0, W, min(base_px, masc.height))), (0, 0))
+        par = pimg.crop((0, ex, W, ex + base_px)).convert('RGBA')
+        par.putalpha(alfa)
+        par.save(os.path.join(a.saida, 'parede.webp'), quality=90, method=6)
+        fim = Image.open(a.fundo).convert('RGB')
+        fh = round(fim.height * W / fim.width)
+        fundo = np.asarray(fim.resize((W, fh), Image.LANCZOS)).astype(np.float32).copy()
+        fundo[:6] = fundo[6]   # a imagem gerada vem com a 1ª linha clara: espelhada, vira um risco
+        ftopo = fundo[:ex][::-1].copy()
+        fundo = np.concatenate([ftopo * (1 - t * 0.85) + np.array([40, 20, 56], np.float32) * (t * 0.85), fundo], 0)
+        fundo = fundo * 0.94 + nevoa * 0.06
+        Image.fromarray(np.clip(fundo, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8)).save(
+            os.path.join(a.saida, 'fundo.jpg'), quality=90)
+        camadas.append({"id": "fundo", "imagem": "fundo.jpg", "profundidade": a.prof_fundo,
+                        "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(fh) / VH, 4),
+                        "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
+        camadas.append({"id": "parede", "imagem": "parede.webp", "profundidade": round(zj + 1, 1),
+                        "topo": round(tela_y(0) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
+                        "x": round(x_frac, 4), "repetir": "espelhar"})
+    else:
+        pimg.save(os.path.join(a.saida, 'parede.jpg'), quality=92)
+        camadas.append({"id": "parede", "imagem": "parede.jpg", "profundidade": round(zj + 1, 1),
+                        "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
+                        "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
 
     # Chão: da junção para baixo; névoa só perto da junção, sumindo até o pé dos lutadores.
     cy0 = int(a.juncao) - 2
@@ -115,11 +152,7 @@ def main():
         "luzLutadores": {"cor": "#FF9A70", "forca": 0.28, "brilho": 0.95, "pes": "#D8B8A8",
                          "contraluz": {"cor": "#FFB060", "forca": 1.0, "direcao": [-1, -1]}},
         "sombraLutadores": {"alfa": 0.72, "cor": "#1A0A12", "suave": 0.5, "x": 0.03, "y": 0.05},
-        "camadas": [
-            {"id": "parede", "imagem": "parede.jpg", "profundidade": round(zj + 1, 1),
-             "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
-             "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"}
-        ],
+        "camadas": camadas,
         "chao": {"imagem": "chao.jpg", "perto": -3000, "longe": round(zj, 1), "ate": round(zj, 1),
                  "reflexoLuzes": 0,
                  "projecao": {"topo": round(tela_y(cy0) / VH, 4), "base": round(tela_y(H) / VH, 4),

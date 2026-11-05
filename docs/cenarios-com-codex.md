@@ -49,11 +49,22 @@ concept). Dois pedidos podem rodar ao mesmo tempo.
    (`--tela-px`, `--centro`, `--chao`, `--juncao`, `--horizonte`). Ele corta na linha do pé da
    arquibancada: a parede vai para o fundo e o chão vira projeção (ver
    [stage-engine.md](stage-engine.md)).
+7. **Paralaxe do fundo** (`prompt_5_sem_arena.txt`, `prompt_6_arena_verde.txt`): o topo do
+   panorama (sem o chão) com a arena inteira removida, e o Codex pinta o vale e as montanhas que
+   ficavam atrás → `4_fundo_sem_arena_4096.webp`. Para recortar a arena, a mesma imagem com o céu
+   e as montanhas em verde chapado. O Codex repinta a arena um pouco deslocada, então o verde só
+   serve de molde: ele é alinhado à pintura original (SIFT + polinômio de 3º grau + fluxo óptico)
+   e vira a máscara `5_mascara_arena_4096.png`. Embaixo de onde há céu em cada coluna, tudo é
+   arena. A parede vira `parede.webp` com transparência na profundidade da junção, e o fundo vai
+   para 9000 (anda ~1/6 do que andam os lutadores). A imagem gerada vem com a 1ª linha clara:
+   o script troca as 6 primeiras linhas pela 7ª antes de espelhar o céu.
 
 O horizonte sai do anel dourado do chão (um círculo): com as bordas de longe e de perto e a meia
 largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade da junção
 (1566). Para a Arena, os argumentos com a imagem de 4096 são:
 
 ```
---tela-px 2048 --centro 2048 --chao 883.14 --juncao 645.51 --horizonte 0.4542 --ceu-extra 600
+--tela-px 2048 --centro 2048 --chao 883.14 --juncao 645.51 --horizonte 0.4542 --ceu-extra 600 \
+--fundo art/stages/arena_pintura/4_fundo_sem_arena_4096.webp \
+--mascara art/stages/arena_pintura/5_mascara_arena_4096.png
 ```

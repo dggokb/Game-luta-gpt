@@ -28,14 +28,23 @@
   },
   "camadas": [
     {
-      "id": "parede",
-      "imagem": "parede.jpg",
-      "profundidade": 1567.5,
+      "id": "fundo",
+      "imagem": "fundo.jpg",
+      "profundidade": 9000.0,
       "topo": -0.5208,
-      "base": 0.5686,
+      "base": 1.0009,
       "x": 0.5,
       "repetir": "espelhar",
       "corAcima": "#281234"
+    },
+    {
+      "id": "parede",
+      "imagem": "parede.webp",
+      "profundidade": 1567.5,
+      "topo": 0.0001,
+      "base": 0.5686,
+      "x": 0.5,
+      "repetir": "espelhar"
     }
   ],
   "chao": {
