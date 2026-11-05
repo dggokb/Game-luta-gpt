@@ -420,7 +420,8 @@ pelo `tools/stage/cenario_panorama.py` com as sementes de `art/stages/arena_cent
 ```bash
 pip install opencv-python numpy pillow
 python3 tools/stage/cenario_panorama.py art/stages/arena_central/recorte.json \
-    android/app/src/main/assets/stages/arena_central --unidade 1.2 --largura 4800
+    android/app/src/main/assets/stages/arena_central --perto -500 --largura 4800 \
+    --linhas 1400 --colunas 4096
 python3 tools/stage/animar_central.py
 ```
 
@@ -429,24 +430,33 @@ python3 tools/stage/animar_central.py
   no meio dele (`janela`: escala 1,805, x 818, y 109, achada pelo conceito 16:9 com SIFT,
   `--referencia`). O chão encontra o muro na linha 848 do panorama (0,569 da tela).
 - Resolução: o jogo reduz à metade imagens com mais de 2048 px de lado, menos as de cenário,
-  que vão até 4096 (`AndroidRenderAssets.MAX_STAGE_SIDE`). O piso sai com 4000 x 1932
-  (`--unidade 1.2 --largura 4800`). O GrabCut roda numa cópia de ~2000 px e a máscara volta
+  que vão até 4096 (`AndroidRenderAssets.MAX_STAGE_SIDE`). O piso sai com 4096 x 1400 em
+  perspectiva (`--linhas 1400 --colunas 4096`, `linhasPerspectiva` no `stage.json`: as linhas
+  iguais na tela, a mesma nitidez perto e longe; antes, iguais na profundidade, o chão perto da
+  câmera saía borrado). O GrabCut roda numa cópia de ~2000 px e a máscara volta
   ampliada; o `animar_central.py` multiplica as posições pela largura do panorama.
 - A luta começa no meio do mundo (x 1300, de 0 a 2600): a mesma quantidade de arena dos dois
   lados.
-- Camadas (paralaxe), de trás para a frente: `ceu.jpg` a 15000, `montanhas.webp`
-  a 2600 (montanhas, cachoeiras, o sol; mais perto que o céu de verdade para a imagem não
-  ficar ampliada demais, com o borrão de imagem esticada) e `estadio.webp` no fim do chão (1618: muro, torres,
-  pavilhão e as arquibancadas dos lados). O GrabCut separa cada uma; o que a da frente tapa é
-  inventado espelhando o que está do lado (atrás das torres) ou como névoa (o pé das montanhas,
-  o horizonte), para a câmera andar e o super pulo não abrirem buraco.
+- Camadas (paralaxe), de trás para a frente: `fundo.jpg` a 5000 (céu, montanhas, cachoeiras e
+  o sol numa imagem só: o GrabCut separa céu e montanhas e o `"juntar_com"` junta as duas, sem
+  pedaço solto entre elas) e `estadio.webp` no fim do chão (1618: muro, torres, pavilhão e as
+  arquibancadas dos lados).
+- O que o estádio tapa no fundo (`"preencher": "paisagem"`): atrás das torres, dos postes e
+  do pavilhão, pedaços do lado colados por Poisson (faixas inteiras deslocadas, sem degrau de
+  linha em linha: o espelho linha a linha de antes virava blocos no céu); embaixo do pé das
+  montanhas, um lago com névoa. O fundo tem `"apoio": 1618` (desce junto com o estádio no
+  super pulo; a faixa roxa chapada do que ninguém pintou não abre mais) e `"acima": 320`
+  (mais céu em cima, espelhado, borrando e escurecendo para a cor do zênite: é o que aparece
+  quando a câmera sobe).
 - `chao.jpg`: o chão do panorama "desentortado" (a conta do `cenario_do_conceito.py`), com os
-  lados vindos do panorama e só o que passa dele espelhado.
+  lados vindos do panorama e só o que passa dele espelhado. No fundo do chão (`"limpar_chao"`)
+  o que caiu fora do piso ou da pintura vira piso do lado colado por Poisson, e o
+  `"nitidez_longe"` realça a parte de longe (macia na pintura, cresce na tela no super pulo).
 - **Animação** (`tools/stage/animar_central.py`, rodar depois do corte): 27 estandartes soltos
   balançando (torres e postes soltos, muro e sacadas presos), fogo nos 5 braseiros do muro, 19
   luzes (os holofotes das torres e as lanternas), flashes de câmera na plateia (máscara
   `estadio_plateia.webp`, sem o pavilhão e as escadas; sem o pulo, que borrava a gente miúda),
-  o piso fosco (sem reflexo das luzes), e as 3 cachoeiras da camada das montanhas correndo (`montanhas_agua.png`). As
+  o piso fosco (sem reflexo das luzes), e as 3 cachoeiras do fundo correndo (`fundo_agua.png`). As
   posições estão no script, em pixels do panorama.
 - Para trocar a arte: o panorama novo no lugar, conferir/ajustar as sementes (o
   `--mascaras pasta/` grava cada máscara para conferir), rodar de novo e depois o

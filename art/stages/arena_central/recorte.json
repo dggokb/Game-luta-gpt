@@ -8,6 +8,8 @@
   },
   "juncao": 848,
   "horizonte": 0.47,
+  "nitidez_longe": 1.2,
+  "limpar_chao": true,
   "chao": "chao.jpg",
   "camadas": [
     {
@@ -47,9 +49,9 @@
     },
     {
       "id": "ceu",
-      "arquivo": "ceu.jpg",
-      "profundidade": 15000,
-      "ate": 720,
+      "arquivo": "fundo.jpg",
+      "profundidade": 5000,
+      "ate": 848,
       "padrao": "nao",
       "talvez_sim": [
         [
@@ -225,13 +227,12 @@
           230
         ]
       ],
-      "espelhar_embaixo": 280
+      "preencher": "paisagem",
+      "acima": 320,
+      "corZenite": "#4E3070"
     },
     {
       "id": "montanhas",
-      "arquivo": "montanhas.webp",
-      "profundidade": 2600,
-      "ate": 860,
       "padrao": "nao",
       "talvez_sim": [
         [
@@ -479,7 +480,7 @@
           200
         ]
       ],
-      "nevoa": "#7E6280"
+      "juntar_com": "ceu"
     },
     {
       "id": "estadio",

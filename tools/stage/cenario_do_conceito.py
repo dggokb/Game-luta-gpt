@@ -46,26 +46,40 @@ def scale(z, distance):
     return BASE_DISTANCE / np.maximum(1.0, distance + z)
 
 
-def chao(src, janela, horizonte, base_y, perto, unidade, largura_mundo):
+def chao(src, janela, horizonte, base_y, perto, unidade, largura_mundo, linhas=None, colunas=None, com_fora=False, margem=0.0):
     """O chão "desentortado" (textura vista de cima) e a profundidade do fim dele.
 
     ``src``: a pintura (array float RGB). ``janela`` = (escala, x0, y0): o pixel (sx, sy) da tela
     de repouso (1280x720) fica em (x0 + escala*sx, y0 + escala*sy) na pintura; para um conceito
     do tamanho da tela é (1, 0, 0). ``base_y``: a linha da tela onde o chão encontra o fundo.
     Fora da pintura (dos lados e embaixo) o chão continua espelhado na borda.
+
+    Com ``linhas`` e ``colunas``: a imagem tem esse tamanho, a largura do mundo é
+    ``largura_mundo`` e as linhas vão em perspectiva (iguais na tela de repouso, como o motor
+    lê com ``"linhasPerspectiva"``: a distância da câmera de repouso, que a função devolve).
+    ``com_fora``: devolve no fim também onde a textura caiu fora da pintura dos lados (o espelho),
+    ou a menos de ``margem`` (fração da largura) da borda dela.
     """
     h_img, w_img = src.shape[:2]
     escala, x0, y0 = janela
     horizon, eye_y, distance = camera(horizonte)
     eye_h = GROUND_Y - eye_y
     longe = BASE_DISTANCE * eye_h / (base_y - horizon) - distance
-    rows = int(round((longe - perto) / unidade))
-    cols = int(round(largura_mundo / unidade))
-    # O motor estica a largura pela proporção da imagem: largura = (longe-perto)*cols/rows.
-    largura = (longe - perto) * cols / rows
+    perspectiva = linhas is not None
+    if perspectiva:
+        rows, cols, largura = int(linhas), int(colunas), float(largura_mundo)
+    else:
+        rows = int(round((longe - perto) / unidade))
+        cols = int(round(largura_mundo / unidade))
+        # O motor estica a largura pela proporção da imagem: largura = (longe-perto)*cols/rows.
+        largura = (longe - perto) * cols / rows
     v = (np.arange(rows) + 0.5) / rows
     u = (np.arange(cols) + 0.5) / cols
-    z = longe - v * (longe - perto)                       # topo da imagem = longe
+    if perspectiva:
+        p_longe, p_perto = 1.0 / (distance + longe), 1.0 / (distance + perto)
+        z = 1.0 / (p_longe + v * (p_perto - p_longe)) - distance
+    else:
+        z = longe - v * (longe - perto)                   # topo da imagem = longe
     xw = REST_CENTER_X - largura / 2 + u * largura
     s = scale(z, distance)
     sy = horizon + eye_h * s                              # linha da tela de cada fileira
@@ -80,6 +94,7 @@ def chao(src, janela, horizonte, base_y, perto, unidade, largura_mundo):
         a = np.mod(a, p)
         return np.where(a > n - 1, p - a, a)
 
+    fora = (px < margem * w_img) | (px > (1 - margem) * w_img - 1)
     px = espelha(px, w_img)
     py = np.where(py > h_img - 1, 2 * (h_img - 1) - py, py)
     py = np.clip(py, y0 + escala * base_y, h_img - 1)
@@ -88,7 +103,8 @@ def chao(src, janela, horizonte, base_y, perto, unidade, largura_mundo):
     fx = (px - xi)[..., None]; fy = (py - yi)[..., None]
     out = (src[yi, xi] * (1 - fx) * (1 - fy) + src[yi, x1] * fx * (1 - fy)
            + src[y1, xi] * (1 - fx) * fy + src[y1, x1] * fx * fy)
-    return np.clip(out, 0, 255).astype(np.uint8), longe, (cols, rows)
+    res = (np.clip(out, 0, 255).astype(np.uint8), longe, (cols, rows), distance)
+    return res + (fora,) if com_fora else res
 
 
 def main():
@@ -106,7 +122,7 @@ def main():
     img = Image.open(args.conceito).convert('RGB').resize((VW, VH), Image.LANCZOS)
     src = np.asarray(img).astype(np.float32)
     base_y = args.base * VH
-    tex, longe, (cols, rows) = chao(src, (1.0, 0.0, 0.0), args.horizonte, base_y, args.perto,
+    tex, longe, (cols, rows), _ = chao(src, (1.0, 0.0, 0.0), args.horizonte, base_y, args.perto,
                                     args.unidade, args.largura)
     perto = args.perto
     # Fundo: do topo até a base, na profundidade "longe" (a do fim do chão).

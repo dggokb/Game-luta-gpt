@@ -188,9 +188,9 @@ public final class StageScene {
         floorImage = floor != null ? pack.image(floor.image) : null;
         RenderImage plain = floor != null ? pack.image(floor.plainImage) : null;
         floorPlainImage = plain != null ? plain : floorImage;
-        floorTileWidth = floorImage != null
-            ? (floor.far - floor.near) * floorImage.width() / (float)floorImage.height()
-            : 1f;
+        floorTileWidth = floorImage == null ? 1f
+            : !Float.isNaN(floor.width) ? floor.width
+            : (floor.far - floor.near) * floorImage.width() / (float)floorImage.height();
         floorCenterX = floor != null && !Float.isNaN(floor.centerX) ? floor.centerX : world.restCenterX;
 
         int petals = def.petals != null ? def.petals.count : 0;
@@ -1078,8 +1078,8 @@ public final class StageScene {
                 v0 = (a - base) * imgH;
                 v1 = Math.min(1f, b - base) * imgH;
             } else {
-                v0 = clamp((floor.far - zTop) / depth, 0f, 1f) * imgH;
-                v1 = clamp((floor.far - zBottom) / depth, 0f, 1f) * imgH;
+                v0 = clamp(floorV(floor, zTop, imgH), 0f, imgH);
+                v1 = clamp(floorV(floor, zBottom, imgH), 0f, imgH);
             }
             if (v1 - v0 < 1f) {
                 float mid = Math.min(imgH - 0.5f, Math.max(0.5f, (v0 + v1) * 0.5f));
@@ -1171,9 +1171,16 @@ public final class StageScene {
      * "perto" (fundo); mais perto que "perto" fica a última linha esticada; depois de "longe" a
      * conta continua (negativa) e a imagem se repete para o fundo.
      */
-    private static float floorV(StageDefinition.Floor floor, float z, float imgH) {
+    static float floorV(StageDefinition.Floor floor, float z, float imgH) {
         float a = (floor.far - z) / (floor.far - floor.near);
         if (z > floor.far) return a * imgH;
+        if (!Float.isNaN(floor.rowDistance)) {
+            // Linhas em perspectiva: proporcional a 1/(distância + z), como a linha da tela.
+            float pFar = 1f / Math.max(1f, floor.rowDistance + floor.far);
+            float pNear = 1f / Math.max(1f, floor.rowDistance + floor.near);
+            float p = 1f / Math.max(1f, floor.rowDistance + Math.max(z, floor.near));
+            a = (p - pFar) / (pNear - pFar);
+        }
         // Meio pixel para dentro: a repetição não mistura a última linha com a primeira.
         return Math.min(a * imgH, imgH - 0.5f);
     }

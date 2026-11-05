@@ -38,7 +38,7 @@ import soltar_bandeiras as sb  # noqa: E402
 from montar_porto import plateia as mascara_plateia  # noqa: E402
 
 PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/arena_central"
-ESTADIO, MONTANHAS = "estadio.webp", "montanhas.webp"
+ESTADIO, MONTANHAS = "estadio.webp", "fundo.jpg"
 # As posições abaixo foram medidas no panorama de 1983 px de largura; o script multiplica pela
 # largura do panorama de agora (o de 3966 px é o mesmo desenho em 2x).
 LARGURA_MEDIDA = 1983
@@ -206,7 +206,10 @@ def main():
 
     stage_path = pasta / "stage.json"
     stage = json.loads(stage_path.read_text(encoding="utf-8"))
-    janela = json.loads((AQUI.parents[1] / "art/stages/arena_central/recorte.json").read_text(encoding="utf-8"))["janela"]
+    recorte = json.loads((AQUI.parents[1] / "art/stages/arena_central/recorte.json").read_text(encoding="utf-8"))
+    janela = recorte["janela"]
+    # O fundo pode ter céu a mais em cima ("acima", em pixels do panorama): desce as quedas.
+    acima = next((c.get("acima", 0) for c in recorte["camadas"] if c.get("arquivo") == MONTANHAS), 0)
     focos = []
     for x, y, alfa in HOLOFOTES_SOMBRA:
         fx, fy, fz = no_mundo(x, y, janela, stage)
@@ -219,6 +222,10 @@ def main():
     stage["chao"]["reflexoLuzes"] = 0
     stage["chao"]["centroX"] = round(cc.REST_CENTER_X)
     for camada in stage["camadas"]:
+        if camada.get("imagem") == MONTANHAS:
+            # O cachoeiras.anotar põe o campo de novo, numa linha (o de uma rodada anterior, já
+            # aberto em várias linhas pelo json.dumps, ele não acharia e ficaria duplicado).
+            camada.pop("cachoeiras", None)
         if camada.get("imagem") == ESTADIO:
             camada["bandeiras"] = bandeiras
             camada["fogos"] = fogos
@@ -233,7 +240,8 @@ def main():
     mw, mh = Image.open(pasta / MONTANHAS).size
     cachoeiras.AREAS[MONTANHAS] = {
         "tela": 1.1 / k,
-        "areas": [(round(x / mw, 4), round(y / mh, 4), round(cw / mw, 4), round(ch / mh, 4)) for x, y, cw, ch in QUEDAS],
+        "areas": [(round(x / mw, 4), round((y + acima) / mh, 4), round(cw / mw, 4), round(ch / mh, 4))
+                  for x, y, cw, ch in QUEDAS],
     }
     feitas = cachoeiras.montar(pasta, MONTANHAS)
     if not cachoeiras.anotar(pasta, MONTANHAS, feitas):

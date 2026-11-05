@@ -158,6 +158,15 @@ uma camada parada (só muda a posição).
 lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
 chão de uma arena ir do ringue até a arquibancada lá no fundo.
 
+**Chão pintado em perspectiva** (`"linhasPerspectiva"` e `"largura"` no `chao`): por padrão as
+linhas da imagem do piso vão iguais na profundidade (de `longe` a `perto`), o que serve para um
+piso de lajotas feito de cima. Um chão tirado de uma pintura (o panorama da Arena Central) tem
+as linhas iguais *na tela*: com `linhasPerspectiva` (a distância da câmera de repouso, que o
+`cenario_panorama.py --linhas` imprime) a linha de cada profundidade z sai de 1/(D+z), e a imagem
+fica com a mesma nitidez perto e longe (linear em z, a pintura de perto virava borrão esticado
+e a de longe ficava espremida). `largura`: a largura da imagem no mundo (sem ela, a da
+proporção da imagem).
+
 **Mar deitado** (`agua` com `"imagem"`): a textura do mar vista de cima é desenhada em
 perspectiva entre `perto` e `longe`, em faixas, igual ao piso: ondas grandes perto e pequenas
 e juntas no horizonte, andando devagar (`corrente`, unidades por segundo; `tamanho` é a largura
@@ -172,6 +181,9 @@ sobre o mar). O mar é uma imagem plana lá no fundo; sem o apoio, quando a câm
 pulo, o que está mais perto desce mais que ele e desliza por cima da água (parece voar). Com
 o apoio, a base da camada acompanha na vertical o ponto do mar em que ela está na câmera de
 repouso; o tamanho e o movimento para os lados continuam os da própria profundidade.
+Também serve para um fundo pintado atrás de um estádio (a Arena Central: céu e montanhas a
+5000 com `"apoio": 1618`): no super pulo o fundo desce junto com o estádio e não abre, entre as
+montanhas e a arquibancada, a faixa do que ninguém pintou; para os lados a paralaxe fica.
 
 Camadas de imagem podem ter **luzes** (brilho que pulsa, com reflexo no piso) e **fogos**
 (chama em três camadas tremulando, brilho e brasas), presos a pontos da imagem; eles se

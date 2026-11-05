@@ -353,9 +353,29 @@ public final class StageDefinition {
          * o chão de uma arena ir do ringue até a arquibancada, lá no fundo.
          */
         public final float extent;
+        /**
+         * Largura da imagem no mundo ({@code "largura"}); NaN = a da proporção da imagem
+         * ({@code (far - near) * largura / altura}, lajota quadrada).
+         */
+        public final float width;
+        /**
+         * Linhas da imagem em perspectiva ({@code "linhasPerspectiva"}: a distância da câmera de
+         * repouso): a linha da imagem anda junto com a linha da tela, em vez de igual na
+         * profundidade. Assim o chão perto da câmera, que ocupa metade da tela, tem tantas linhas
+         * quanto a tela (com linhas iguais na profundidade, ele ficava com poucas, esticadas).
+         * NaN = linhas iguais na profundidade.
+         */
+        public final float rowDistance;
 
         Floor(String image, String plainImage, float near, float far, float centerX,
               float fighterReflection, float lightReflection, float extent) {
+            this(image, plainImage, near, far, centerX, fighterReflection, lightReflection, extent, Float.NaN, Float.NaN);
+        }
+
+        Floor(String image, String plainImage, float near, float far, float centerX,
+              float fighterReflection, float lightReflection, float extent, float width, float rowDistance) {
+            this.width = width;
+            this.rowDistance = rowDistance;
             this.extent = Math.max(far, extent);
             this.image = image;
             this.plainImage = plainImage;
@@ -688,7 +708,8 @@ public final class StageDefinition {
             floor = new Floor(image, string(floorMap, "imagemLajotas", null), near, far,
                 number(floorMap, "centroX", Float.NaN),
                 number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f),
-                number(floorMap, "ate", far));
+                number(floorMap, "ate", far), number(floorMap, "largura", Float.NaN),
+                number(floorMap, "linhasPerspectiva", Float.NaN));
         }
 
         Petals petals = null;
