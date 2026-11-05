@@ -2153,6 +2153,14 @@ public class GameView extends SurfaceView
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
             if ("DRAGON_RUSH".equals(cue)) ultraSounds.playFight("ar_h", 0.9f, 0.85f);
             if ("DRAGON_RUSH_CLASH".equals(cue)) beamShake = Math.max(beamShake, 24f);
+            // O voo desfez uma bola de energia; os golpes finais da sequência.
+            if ("DRAGON_RUSH_ATRAVESSA".equals(cue)) {
+                ultraSounds.playFight("ar_h", 0.7f, 1.5f);
+                beamShake = Math.max(beamShake, 6f);
+            }
+            if ("DRAGON_RUSH_FIM".equals(cue) || "DRAGON_RUSH_CIMA".equals(cue) || "DRAGON_RUSH_TROCA".equals(cue)) {
+                beamShake = Math.max(beamShake, 14f);
+            }
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
             // Bounces shake the screen like the beam's hits.
@@ -5026,7 +5034,17 @@ public class GameView extends SurfaceView
             // o H) — preparo até a pose de bater, segura no voo, volta na recuperação.
             CharacterDefinition.Move voo = character.moves.get("jH");
             if (voo == null || voo.animation == null) voo = character.moves.get("H");
-            if (voo != null && voo.animation != null) {
+            // Na sequência, as pancadas apertadas: alterna o golpe médio e o fraco (na pose de bater).
+            CharacterDefinition.Move soco = null;
+            if (f.rushSeq > 0 && f.rushSocos > 0) {
+                boolean medio = f.rushSocos % 2 == 1;
+                soco = character.moves.get(f.grounded ? (medio ? "M" : "L") : (medio ? "jM" : "jL"));
+                if (soco == null || soco.animation == null) soco = character.moves.get(medio ? "M" : "L");
+            }
+            if (soco != null && soco.animation != null) {
+                animation = soco.animation.id;
+                animationElapsed = soco.animationTime((soco.attack.startupFrames + 0.5f) * FIXED_STEP);
+            } else if (voo != null && voo.animation != null) {
                 AttackDefinition rush = f.attack, pose = voo.attack;
                 float frames;
                 if (f.attackFrame < rush.startupFrames) {

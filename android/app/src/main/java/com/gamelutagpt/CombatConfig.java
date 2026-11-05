@@ -581,10 +581,26 @@ final class CombatConfig {
     int dragonRushRecovery = 16;
     /** Velocidade do voo (unidades por segundo): ~1800 = a tela em menos de meio segundo. */
     float dragonRushSpeed = 1800f;
-    int dragonRushDamage = 320;
+    /** O impacto; o golpe final da sequência dá {@link #dragonRushFimDano} (juntos, os 320 de antes). */
+    int dragonRushDamage = 200;
     /** Acerto: o rival fica preso 34 quadros (a recuperação de 16 sobra +18 sem cancelar). */
     int dragonRushHitstun = 34, dragonRushBlockstun = 14, dragonRushHitstop = 13;
     float dragonRushReach = 118f, dragonRushHeight = 170f;
+    /**
+     * Depois do impacto (acertou): a sequência. O rival fica preso na frente (no chão ou no ar)
+     * por {@link #dragonRushSequencia} quadros; cada botão de ataque apertado nela é mais uma
+     * pancada de {@link #dragonRushSocoDano} (até {@link #dragonRushSocoMax}, uma a cada
+     * {@link #dragonRushSocoIntervalo} quadros). No fim, o golpe final pela direção segurada:
+     * ↑ lança para o combo no ar, ← troca de lado (joga para o outro lado), nada (ou →) deixa
+     * o rival preso na frente, como antes.
+     */
+    int dragonRushSequencia = 30;
+    int dragonRushSocoDano = 36, dragonRushSocoMax = 5, dragonRushSocoIntervalo = 4, dragonRushSocoHitstop = 3;
+    int dragonRushFimDano = 120, dragonRushFimHitstop = 9;
+    /** O voo atravessa as bolas de energia (desfaz as comuns; o Super acerta). */
+    boolean dragonRushAtravessaEnergia = true;
+    /** O 2H no início ou ativo vence o voo (a cabeça dele está fora do alcance do Dragon Rush). */
+    boolean dragonRushPerdeParaAntiAereo = true;
     /** SPEED, o sumiço (→ → com o rival até esta distância): some, aparece atrás dele. */
     float shinkaiVanishRange = 560f;
     int shinkaiVanishFrames = 10;

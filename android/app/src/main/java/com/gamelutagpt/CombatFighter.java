@@ -287,6 +287,14 @@ final class CombatFighter {
      */
     int vanishFrames;
     float vanishFromX, vanishToX;
+    /**
+     * Dragon Rush que acertou, a sequência: quadros que ainda faltam (0 fora dela), as pancadas
+     * dadas, os botões apertados esperando a vez, a espera até a próxima pancada e a altura em
+     * que o rival fica preso. {@link #rushFim}: o golpe final escolhido (0 reto, 1 para cima,
+     * 2 trocou de lado), para o desenho.
+     */
+    int rushSeq, rushSocos, rushSocosPedidos, rushSocoEspera, rushFim;
+    float rushSeqY;
     /** Quadros desde que ele apareceu do último sumiço (o reaparecer pisca). */
     int sinceVanish = 999;
     /** SHINKAI TECHNIQUE, o parry: quadros desde o último → apertado (de novo), ou -1. */
@@ -438,6 +446,7 @@ final class CombatFighter {
         armorUsed = 0;
         charge = 0;
         charging = false;
+        rushSeq = rushSocosPedidos = 0;
     }
 
     /** The charge reached the point where it counts as a charged shot. */

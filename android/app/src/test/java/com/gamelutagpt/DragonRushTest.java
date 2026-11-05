@@ -80,9 +80,10 @@ public class DragonRushTest {
         m.in[0].dash = true;
         m.step();
         assertNotNull(m.until(CombatEngine.DRAGON_RUSH, 60));
-        // Logo depois do impacto: o H cancela a recuperação e pega o rival ainda preso.
+        // Depois da sequência (o H apertado nela vira pancada): o H cancela a recuperação e pega
+        // o rival ainda preso.
         CombatEngine.HitEvent h = null;
-        for (int i = 0; i < 40 && h == null; i++) {
+        for (int i = 0; i < 140 && h == null; i++) {
             if (!m.f(0).attacking() || CombatEngine.DRAGON_RUSH.equals(m.f(0).attack.id)) m.in[0].heavy = true;
             m.step();
             for (CombatEngine.HitEvent e : m.engine.events()) if (e.attacker == 0 && "H".equals(e.moveId)) h = e;
@@ -120,7 +121,7 @@ public class DragonRushTest {
         assertNotNull(m.until(CombatEngine.DRAGON_RUSH, 60));
         // Emenda o L e tenta outro Dragon Rush no meio do combo: não sai.
         CombatEngine.HitEvent l = null;
-        for (int i = 0; i < 40 && l == null; i++) {
+        for (int i = 0; i < 140 && l == null; i++) {
             if (!m.f(0).attacking() || CombatEngine.DRAGON_RUSH.equals(m.f(0).attack.id)) m.in[0].light = true;
             m.step();
             for (CombatEngine.HitEvent e : m.engine.events()) if (e.attacker == 0 && "L".equals(e.moveId)) l = e;
@@ -171,6 +172,141 @@ public class DragonRushTest {
             assertNull(m.engine.shinkaiClash());
         }
         assertFalse(CombatEngine.dragonRush(m.f(0)));
+    }
+
+    /** Acerta o Dragon Rush (p13 no Ryūga parado) e devolve o Match já na sequência. */
+    private static Match naSequencia(float xa, float xb) {
+        Match m = new Match("p13", "player_base", xa, xb);
+        m.shinkai();
+        m.in[0].dash = true;
+        m.step();
+        assertNotNull("o Dragon Rush acertou", m.until(CombatEngine.DRAGON_RUSH, 60));
+        assertTrue("começou a sequência", m.f(0).rushSeq > 0);
+        return m;
+    }
+
+    /** Passa a sequência segurando {@code dir} (e apertando L a cada {@code mash} quadros, 0 = nunca). */
+    private static int[] passarSequencia(Match m, int dir, int mash) {
+        int socos = 0, dano = 0;
+        for (int i = 0; i < 120 && (m.f(0).rushSeq > 0 || i == 0); i++) {
+            m.in[0].direction = dir;
+            if (mash > 0 && i % mash == 0) m.in[0].light = true;
+            m.step();
+            for (CombatEngine.HitEvent e : m.engine.events()) {
+                if (e.attacker == 0 && CombatEngine.DRAGON_RUSH_SOCO.equals(e.moveId)) {
+                    socos++;
+                    dano += e.damage;
+                }
+            }
+        }
+        return new int[]{socos, dano};
+    }
+
+    @Test public void naSequenciaApertarAtaqueDaMaisPancadas() {
+        Match parado = naSequencia(500f, 1250f);
+        int vida0 = parado.second.life;
+        int[] semApertar = passarSequencia(parado, 0, 0);
+        int perdeuParado = vida0 - parado.second.life;
+        assertEquals("sem apertar, nenhuma pancada", 0, semApertar[0]);
+
+        Match apertando = naSequencia(500f, 1250f);
+        int vida1 = apertando.second.life;
+        int[] comApertar = passarSequencia(apertando, 0, 2);
+        int perdeuApertando = vida1 - apertando.second.life;
+        assertEquals("apertando, as 5 pancadas", new CombatConfig().dragonRushSocoMax, comApertar[0]);
+        assertTrue("apertar dá mais dano (" + perdeuApertando + " x " + perdeuParado + ")",
+            perdeuApertando > perdeuParado + 100);
+        // Os botões viraram pancadas, não um L (nem cancelaram a sequência).
+        assertFalse("o L não saiu no meio", "L".equals(apertando.f(0).attack == null ? null : apertando.f(0).attack.id)
+            && apertando.f(0).rushSeq > 0);
+    }
+
+    @Test public void segurarParaCimaLancaORival() {
+        Match m = naSequencia(500f, 1250f);
+        passarSequencia(m, 7, 0);
+        assertTrue(m.engine.cues().contains("DRAGON_RUSH_CIMA") || m.f(0).rushFim == 1);
+        float alto = 0f;
+        for (int i = 0; i < 50; i++) {
+            m.step();
+            alto = Math.max(alto, Arena.GROUND_Y - m.f(1).y);
+        }
+        assertTrue("o rival subiu (" + alto + ")", alto > 120f);
+        assertEquals(CombatFighter.Status.AIR_HITSTUN, m.f(1).status);
+    }
+
+    @Test public void segurarParaTrasTrocaDeLado() {
+        Match m = naSequencia(500f, 1250f);
+        assertTrue("o rival estava na frente (à direita)", m.f(1).x > m.f(0).x);
+        passarSequencia(m, 5, 0);
+        assertEquals(2, m.f(0).rushFim);
+        assertTrue("o rival foi para trás dele (à esquerda)", m.f(1).x < m.f(0).x);
+        assertEquals("ele virou para o rival", -1, m.f(0).facing);
+        assertTrue(m.f(1).inHitstun());
+    }
+
+    @Test public void semDirecaoORivalFicaNaFrentePreso() {
+        Match m = naSequencia(500f, 1250f);
+        passarSequencia(m, 0, 0);
+        assertEquals(0, m.f(0).rushFim);
+        assertTrue(m.f(1).x > m.f(0).x);
+        assertEquals(CombatFighter.Status.HITSTUN, m.f(1).status);
+    }
+
+    @Test public void oVooAtravessaABolaDeEnergia() {
+        // p15 solta a bola (S1) e o p13 voa por dentro dela até acertar.
+        Match m = new Match("p13", "p15", 400f, 1300f);
+        m.shinkai();
+        m.in[1].special = "S";
+        m.step();
+        boolean bolaNoAr = false;
+        for (int i = 0; i < 40 && !bolaNoAr; i++) {
+            m.step();
+            bolaNoAr = !m.engine.energyProjectiles.isEmpty();
+        }
+        assertTrue("a bola saiu", bolaNoAr);
+        m.in[0].dash = true;
+        m.step();
+        boolean atravessou = false, apanhouDaBola = false;
+        CombatEngine.HitEvent hit = null;
+        for (int i = 0; i < 60 && hit == null; i++) {
+            m.step();
+            atravessou |= m.engine.cues().contains("DRAGON_RUSH_ATRAVESSA");
+            for (CombatEngine.HitEvent e : m.engine.events()) {
+                if (e.attacker == 1 && e.projectile) apanhouDaBola = true;
+                if (e.attacker == 0 && CombatEngine.DRAGON_RUSH.equals(e.moveId)) hit = e;
+            }
+        }
+        assertTrue("passou pela bola", atravessou);
+        assertFalse("a bola não pegou", apanhouDaBola);
+        assertNotNull("e acertou o rival", hit);
+    }
+
+    @Test public void o2HDoRivalVenceOVoo() {
+        Match m = new Match("p13", "player_base", 500f, 1100f);
+        m.shinkai();
+        m.in[0].dash = true;
+        m.step();
+        // O rival sobe com o 2H quando o voo está chegando.
+        boolean apertou = false, rushAcertou = false, doisHAcertou = false;
+        for (int i = 0; i < 60; i++) {
+            float gap = Math.abs(m.f(1).x - m.f(0).x);
+            if (!apertou && gap < 330f) {
+                m.in[1].direction = 3;
+                m.in[1].heavy = true;
+                apertou = true;
+            } else if (apertou) {
+                m.in[1].direction = 3;
+            }
+            m.step();
+            for (CombatEngine.HitEvent e : m.engine.events()) {
+                if (e.attacker == 0 && CombatEngine.DRAGON_RUSH.equals(e.moveId)) rushAcertou = true;
+                if (e.attacker == 1 && "2H".equals(e.moveId) && !e.blocked) doisHAcertou = true;
+            }
+            if (doisHAcertou) break;
+        }
+        assertTrue(apertou);
+        assertTrue("o 2H pegou quem vinha voando", doisHAcertou);
+        assertFalse("o voo não acertou", rushAcertou);
     }
 
     @Test public void speedPertoAindaSome() {

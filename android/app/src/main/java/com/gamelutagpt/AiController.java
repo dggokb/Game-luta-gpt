@@ -262,6 +262,9 @@ final class AiController {
 
     /** Por que a CPU apertou o último golpe ("neutro", "punir", "antiaereo"): para os testes. */
     String lastReason = "";
+    /** Dragon Rush: o voo dele já sorteado (anti-rush) e o compasso das pancadas na sequência dela. */
+    private int lastRushSerial = -1, rushTick;
+    private boolean antiRushPlan;
 
     // Requests of the current decision, delivered once.
     private String attack;
@@ -1118,6 +1121,10 @@ final class AiController {
             return;
         }
         techDelay = -2;
+        if (me.rushSeq > 0) {
+            sequenciaDoRush(me, out);
+            return;
+        }
         // O próprio combo breaker ela sente na hora: o troco vem garantido.
         if (me.comboBroke && engine.cues().contains("COMBO_BREAKER")) breakerCombo = true;
         for (CombatEngine.HitEvent ev : engine.events()) {
@@ -1209,6 +1216,7 @@ final class AiController {
         // pune, em vez de segurar a defesa até o fim da janela.
         if (seen != null && !seen.ko && me.canAct() && punish(engine, me, target, seen, out)) return;
         if (seen != null && !seen.ko && specialReaction(engine, me, target, seen, out)) return;
+        if (seen != null && !seen.ko && me.canAct() && antiRush(engine, me, target, seen, out)) return;
         if (defend(engine, me, target, seen, out)) return;
         if (!me.canAct()) {
             movingForward = movingBack = dashing = false;
@@ -2548,6 +2556,45 @@ final class AiController {
         float gap = Math.abs(seen.x - me.x);
         if (ultraPunish(me, target, left, gap, out)) return true;
         return punirComOMelhor(me, target, left, gap, seen.crouching, out, "punir");
+    }
+
+    /**
+     * O Dragon Rush dela acertou: aperta para as pancadas (mais, quanto maior o nível) e, de
+     * costas para a parede no fim, troca de lado (o rival vai para o canto).
+     */
+    private void sequenciaDoRush(CombatFighter me, FighterInput out) {
+        if (++rushTick % 3 == 0 && reactRandom.nextDouble() < 0.4 + 0.6 * level.punish) out.light = true;
+        float costas = me.facing > 0 ? me.x - Arena.LEFT_BOUND : Arena.RIGHT_BOUND - me.x;
+        if (me.rushSeq <= 3 && costas < 320f) out.direction = MotionParser.relative(5, me.facing);
+    }
+
+    /**
+     * O Dragon Rush dele vindo: com a chance do anti-aéreo do nível (um sorteio por voo), sobe o
+     * 2H quando o voo chega no tempo dele (o 2H vence o voo).
+     */
+    private boolean antiRush(CombatEngine engine, CombatFighter me, CombatFighter target,
+                             CpuPerception.Snapshot seen, FighterInput out) {
+        if (!me.grounded || seen.attack == null || !CombatEngine.DRAGON_RUSH.equals(seen.attack.id) ||
+            seen.outcome != CombatFighter.Outcome.NONE || seen.attackFrame > seen.attack.lastActiveFrame()) return false;
+        CharacterDefinition c = me.character();
+        AttackDefinition aa = c.attack("2H");
+        if (aa == null || c.move("2H", false) == null) return false;
+        if (seen.attackSerial != lastRushSerial) {
+            lastRushSerial = seen.attackSerial;
+            antiRushPlan = roll(level.antiAir);
+        }
+        if (!antiRushPlan) return false;
+        // Onde ele está agora: o voo é reto e rápido (o que ela viu, mais o que ele andou desde então).
+        CombatConfig cfg = engine.config;
+        float passo = cfg.dragonRushSpeed * CombatConfig.DT;
+        int voando = Math.max(0, reacao - Math.max(0, seen.attack.startupFrames - seen.attackFrame));
+        float gap = Math.abs(seen.x - me.x) - passo * voando - me.body().halfWidth - target.body().halfWidth;
+        if (gap > cfg.dragonRushReach + passo * (aa.startupFrames + aa.activeFrames / 2f)) return false;
+        antiRushPlan = false;
+        startRoute(c, "2H");
+        press("2H", me, out);
+        lastReason = "anti-rush";
+        return true;
     }
 
     /** Um sorteio por pulo dele: vai tirar do ar? (a chance do nível, mais o que ela aprendeu). */

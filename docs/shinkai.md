@@ -72,9 +72,26 @@ altura mínima do air dash) e também **cancelando um normal que encostou** (ace
 - **Voo:** 6 quadros de preparo parado e até 26 de voo reto na direção do rival, a
   `dragonRushSpeed` (1800 por segundo), **subindo se ele está no ar**; para encostado nele. Sem
   gravidade no voo; na recuperação (16 quadros) cai devagar, dá tempo de emendar no ar.
-- **Acerto:** 320 de dano (golpe forte, com pausa de impacto), o rival preso 34 quadros, e da
-  pancada até o fim cancela em normal, especial, Super ou pulo (**combo**). Defendido: 14 de
-  bloqueio, recuperação de 16 (−2).
+- **Acerto:** 200 de dano (golpe forte, com pausa de impacto) e começa a **sequência**
+  (`dragonRushSequencia`, 30 quadros): o rival fica **preso na frente**, no chão ou no ar (não cai).
+  - **Apertar ataque** (L, M, H ou especial) na sequência dá mais uma pancada de 36
+    (`dragonRushSocoDano`, na escala do combo, mais um acerto no contador), até 5, uma a cada 4
+    quadros. Os botões viram pancadas, não golpes. As pancadas não matam (o K.O. fica para o fim).
+  - **No fim, a direção segurada escolhe o golpe final** (120 de dano, pausa curta):
+    **↑** (ou diagonal para cima) **lança** o rival para o combo no ar (o super pulo persegue);
+    **←** (ou trás-baixo) **troca de lado**: o rival passa para trás dele (no canto, quem sai do
+    lugar é ele) e é jogado para o lado de onde ele veio; **nada ou →** deixa o rival preso na
+    frente (34 quadros). Da pancada final até o fim da recuperação cancela em normal, especial,
+    Super ou pulo (**combo**).
+  - Sem apertar nada, o total é o mesmo de antes (200 + 120 = 320).
+  - Defendido: 14 de bloqueio, recuperação de 16 (−2), sem sequência.
+- **Atravessa as bolas de energia** (`dragonRushAtravessaEnergia`): no preparo e no voo, a bola
+  comum que encosta nele se desfaz (cue `DRAGON_RUSH_ATRAVESSA`) e o voo segue. A do Super acerta.
+  O chicote (é o braço) também.
+- **Perde para o 2H** (`dragonRushPerdeParaAntiAereo`): com o 2H do rival no início ou ativo, o voo
+  não acerta (a cabeça dele fica fora do alcance) e o 2H pega quem chega (contra-golpe). A CPU
+  sobe o 2H contra o voo com a chance de anti-aéreo do nível; na sequência dela, aperta (mais,
+  quanto maior o nível) e, de costas para a parede, troca de lado.
 - **Um por combo** (`maxUsesPerCombo` 1). No POWER ele não joga na parede (o H joga): o rival fica
   perto para o combo seguir.
 - **SPEED:** com o rival a até 560 (`shinkaiVanishRange`), → → no chão continua sendo o sumiço;
@@ -84,7 +101,8 @@ altura mínima do air dash) e também **cancelando um normal que encostou** (ace
   abrem o **SHINKAI Clash** (o minigame), em vez de trocar pancada (`dragonRushClash`; vale mesmo
   com o Clash da ativação desligado, `shinkaiClashMinigame`). Quem saiu depois é quem respondeu.
 - **Desenho (provisório):** o jH do lutador (sem ele, o H): preparo até a pose de bater, segura a
-  pose no voo e volta na recuperação, com o rastro de velocidade. Teste: `DragonRushTest`.
+  pose no voo e volta na recuperação, com o rastro de velocidade. Na sequência, cada pancada
+  alterna a pose de bater do M e do L (jM/jL no ar). Teste: `DragonRushTest`.
 
 ## Protótipo: o SHINKAI individual do Ryūga
 

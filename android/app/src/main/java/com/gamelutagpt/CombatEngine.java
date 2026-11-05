@@ -171,7 +171,10 @@ final class CombatEngine {
     private final AttackDefinition throwAttack;
     /** O Dragon Rush do SHINKAI (o mesmo para todos): → → voa no rival. */
     static final String DRAGON_RUSH = "DRAGON_RUSH";
-    final AttackDefinition dragonRushAttack;
+    /** As pancadas apertadas na sequência e os golpes finais dela (reto/trocando de lado, para cima). */
+    static final String DRAGON_RUSH_SOCO = "DRAGON_RUSH_SOCO_M", DRAGON_RUSH_FIM = "DRAGON_RUSH_FIM_H",
+        DRAGON_RUSH_CIMA = "DRAGON_RUSH_CIMA_H";
+    final AttackDefinition dragonRushAttack, dragonRushFimAttack, dragonRushCimaAttack;
 
     CombatEngine(FighterState first, FighterState second, float firstX, float secondX, CombatConfig config) {
         this.config = config;
@@ -206,6 +209,24 @@ final class CombatEngine {
             .proration(850)
             .pushback(16f, 60f)
             .maxUsesPerCombo(1)
+            .reach(config.dragonRushReach, config.dragonRushHeight, 0f)
+            .build();
+        // Os golpes finais da sequência (não são apertados: o fim da sequência aplica um deles).
+        dragonRushFimAttack = new AttackDefinition.Builder(DRAGON_RUSH_FIM, AttackDefinition.Kind.NORMAL)
+            .damage(config.dragonRushFimDano)
+            .frames(1, 1, 1)
+            .stun(config.dragonRushHitstun, config.dragonRushBlockstun, config.dragonRushFimHitstop)
+            .proration(900)
+            .pushback(16f, 60f)
+            .reach(config.dragonRushReach, config.dragonRushHeight, 0f)
+            .build();
+        dragonRushCimaAttack = new AttackDefinition.Builder(DRAGON_RUSH_CIMA, AttackDefinition.Kind.NORMAL)
+            .damage(config.dragonRushFimDano)
+            .frames(1, 1, 1)
+            .stun(config.dragonRushHitstun, config.dragonRushBlockstun, config.dragonRushFimHitstop)
+            .proration(900)
+            .launch(AttackDefinition.Launch.LAUNCH)
+            .knockback(40f)
             .reach(config.dragonRushReach, config.dragonRushHeight, 0f)
             .build();
     }
@@ -554,6 +575,10 @@ final class CombatEngine {
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
         if (in.grab) f.throwRequestAge = 0;
         if (in.shinkai) f.shinkaiRequestAge = 0;
+        // Dragon Rush, a sequência: cada botão de ataque é mais uma pancada (não vira golpe).
+        if (f.rushSeq > 0 && (in.light || in.medium || in.heavy || in.special != null)) {
+            f.rushSocosPedidos = Math.min(2, f.rushSocosPedidos + 1);
+        }
         trackParryPress(f, in);
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
         // Defendendo, M + H é o pushblock (fora da defesa ele já entrou acima como o H).
@@ -626,6 +651,14 @@ final class CombatEngine {
         endFinishedStates(f);
         if (f.locked || f.ko()) {
             f.dashRequest = f.backdashRequest = false;
+            return;
+        }
+        if (f.rushSeq > 0) {
+            // Na sequência do Dragon Rush os botões são as pancadas (contadas na leitura) e a
+            // direção escolhe o golpe final: nada mais sai até ela acabar.
+            f.buffer.clear();
+            f.dashRequest = f.backdashRequest = false;
+            f.pendingJumpAge = f.throwRequestAge = f.ultraRequestAge = -1;
             return;
         }
 
@@ -987,6 +1020,7 @@ final class CombatEngine {
         startAttack(f, dragonRushAttack, "H", -1);
         // Sem desenho próprio (por enquanto): o GameView mostra o jH esticado no voo.
         f.move = null;
+        f.rushSeq = f.rushSocos = f.rushSocosPedidos = f.rushSocoEspera = f.rushFim = 0;
         f.airDashFrames = 0;
         f.wallJumpFrames = 0;
         f.jumpSquat = 0;
@@ -1060,6 +1094,117 @@ final class CombatEngine {
             f.grounded = true;
             f.vy = 0f;
         }
+    }
+
+    /**
+     * O Dragon Rush acertou: começa a sequência. O rival fica preso na frente (na altura em que
+     * foi pego) até o golpe final; o golpe fica parado no fim do voo.
+     */
+    private void iniciarSequenciaDragonRush(CombatFighter a, CombatFighter d) {
+        a.rushSeq = config.dragonRushSequencia;
+        a.rushSocos = a.rushSocosPedidos = a.rushSocoEspera = 0;
+        a.rushSeqY = Math.min(Arena.GROUND_Y, d.y);
+        segurarNaSequencia(a, d);
+        cues.add("DRAGON_RUSH_SEQUENCIA");
+    }
+
+    /** Um quadro da sequência: segura o rival, dá a pancada apertada, no fim o golpe final. */
+    private void sequenciaDragonRush(CombatFighter f) {
+        CombatFighter d = fighters[1 - f.index];
+        if (d.ko() || !d.inHitstun()) {
+            f.rushSeq = 0;
+            return;
+        }
+        segurarNaSequencia(f, d);
+        if (f.rushSocoEspera > 0) f.rushSocoEspera--;
+        if (f.rushSocosPedidos > 0 && f.rushSocoEspera == 0 && f.rushSocos < config.dragonRushSocoMax) {
+            f.rushSocosPedidos--;
+            socoDragonRush(f, d);
+            f.rushSocoEspera = config.dragonRushSocoIntervalo;
+        }
+        if (--f.rushSeq == 0) fimDragonRush(f, d);
+    }
+
+    /** O rival na frente, parado (no ar ele não cai), preso até o golpe final. */
+    private void segurarNaSequencia(CombatFighter a, CombatFighter d) {
+        // Encostado sem as caixas de empurrão se sobreporem (senão o empurrão arrasta os dois).
+        CharacterDefinition.Body ba = a.body(), bd = d.body();
+        holdAhead(a, d, Math.max(ba.halfWidth + bd.halfWidth, ba.pushHalfWidth + bd.pushHalfWidth) + 6f);
+        if (a.rushSeqY < Arena.GROUND_Y - 0.5f) {
+            d.y = a.rushSeqY;
+            d.vy = 0f;
+            d.grounded = false;
+        }
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        d.stunLeft = d.stunTotal = Math.max(d.stunLeft, a.rushSeq + 10);
+        d.techRequestAge = -1;
+    }
+
+    /**
+     * Uma pancada apertada na sequência: dano pequeno na escala do combo (mais um acerto no
+     * contador), sem derrubar: o K.O. fica para o golpe final.
+     */
+    private void socoDragonRush(CombatFighter f, CombatFighter d) {
+        ComboSession session = sessions[d.index];
+        if (session == null) return;
+        int raw = config.dragonRushSocoDano;
+        if (f.state.inShinkai()) {
+            raw = raw * (f.state.emRuptura() ? config.ryugaRupturaDanoPermille : config.shinkaiDamagePermille) / 1000;
+        }
+        int dano = session.registerFollowUp(raw);
+        dano = Math.min(dano, d.state.reserva + d.state.life - 1);
+        if (dano > 0) {
+            d.state.takeDamage(dano, config.recoverableLifePermille);
+            chargeShinkai(f, d, dano);
+        }
+        f.rushSocos++;
+        freeze(f, d, config.dragonRushSocoHitstop, false);
+        cues.add("DRAGON_RUSH_SOCO");
+        HitEvent e = new HitEvent(f.index, d.index, Math.max(0, dano), false, false, DRAGON_RUSH_SOCO);
+        e.strength = AttackDefinition.Strength.MEDIUM;
+        e.impactX = (f.x + d.x) * 0.5f;
+        e.impactY = d.y - d.body().height(false) * 0.6f;
+        events.add(e);
+    }
+
+    /**
+     * O fim da sequência: o golpe final pela direção segurada. ↑ (ou diagonal para cima) lança
+     * (o super pulo persegue); ← (ou trás-baixo) joga o rival para o outro lado dele; nada ou →
+     * deixa o rival preso na frente para emendar.
+     */
+    private void fimDragonRush(CombatFighter f, CombatFighter d) {
+        int rel = MotionParser.relative(f.input.direction, f.facing);
+        boolean cima = ControlsLayout.isUpDirection(rel);
+        boolean troca = !cima && (rel == 5 || rel == 4);
+        if (troca) {
+            // O rival passa para trás dele (na parede quem sai do lugar é ele) e os dois viram.
+            float gap = Math.abs(d.x - f.x);
+            float alvo = f.x - f.facing * gap;
+            d.x = Arena.clamp(alvo, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            if (d.x != alvo) f.x = Arena.clamp(d.x + f.facing * gap, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            faceOpponent(f);
+            faceOpponent(d);
+        }
+        f.rushFim = cima ? 1 : troca ? 2 : 0;
+        Contact c = new Contact();
+        c.attacker = f;
+        c.defender = d;
+        c.attack = cima ? dragonRushCimaAttack : dragonRushFimAttack;
+        c.hitbox = 0;
+        applyContact(c);
+        cues.add(cima ? "DRAGON_RUSH_CIMA" : troca ? "DRAGON_RUSH_TROCA" : "DRAGON_RUSH_FIM");
+    }
+
+    /** No preparo ou no voo do Dragon Rush (nada encostou ainda). */
+    static boolean dragonRushAntesDoImpacto(CombatFighter f) {
+        return dragonRush(f) && f.outcome == CombatFighter.Outcome.NONE && f.attackFrame <= f.attack.lastActiveFrame();
+    }
+
+    /** O 2H dele no início ou ativo: a cabeça fica fora do alcance do Dragon Rush (ele perde). */
+    private boolean antiAereoContraRush(CombatFighter d) {
+        return config.dragonRushPerdeParaAntiAereo && d.attacking() && "2H".equals(d.attack.id) &&
+            d.attackFrame <= d.attack.lastActiveFrame();
     }
 
     /** O sumiço anda: no último quadro ele aparece do outro lado, já virado para o rival. */
@@ -1989,6 +2134,11 @@ final class CombatEngine {
                     f.attackFrame < f.attack.lastActiveFrame()) {
                     f.attackFrame = f.attack.lastActiveFrame();
                     f.vx = f.vy = 0f;
+                }
+                // Acertou: a sequência segura o golpe (e o rival) até o golpe final.
+                if (f.rushSeq > 0) {
+                    sequenciaDragonRush(f);
+                    break;
                 }
                 f.attackFrame++;
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
@@ -3175,6 +3325,8 @@ final class CombatEngine {
         // O repel e o aparar só batem no que leram: sem golpe na janela, a resposta não sai.
         if ((a.attack.mechanics.repel || a.attack.mechanics.parry) && !a.countered) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
+        // O 2H dele vence o voo do Dragon Rush: o voo não acerta, o 2H pega quem chega.
+        if (a.attack == dragonRushAttack && antiAereoContraRush(d)) return;
         if (a.attack.mechanics.grab) {
             grabStrike(a, d, frame);
             return;
@@ -3478,6 +3630,12 @@ final class CombatEngine {
                 projetilToca(p, d, d.crouchingBody() && !hitsCrouching(p.attack, fighters[p.ownerIndex]));
             if (!hits) {
                 p.holding = false;   // o rival saiu de baixo: a onda segue voando com os acertos que sobraram
+                continue;
+            }
+            if (config.dragonRushAtravessaEnergia && !p.superKind() && !p.retracts() && dragonRushAntesDoImpacto(d)) {
+                // O Dragon Rush atravessa a bola de energia: ela se desfaz na aura, ele segue.
+                cues.add("DRAGON_RUSH_ATRAVESSA");
+                it.remove();
                 continue;
             }
             AttackDefinition.Mechanics stance = d.mechanics();
@@ -4556,7 +4714,7 @@ final class CombatEngine {
         // SHINKAI POWER: o H joga na parede, mesmo sozinho no neutro, e ele volta quicando.
         boolean powerBounce = lastStrike && !projectile && !c.echo && a.state.inShinkai(Shinkai.Type.POWER) &&
             attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY &&
-            !DRAGON_RUSH.equals(attack.id);   // o Dragon Rush deixa o rival perto, para emendar
+            !attack.id.startsWith(DRAGON_RUSH);   // o Dragon Rush e o golpe final dele: a direção decide
         if (powerBounce) launch = AttackDefinition.Launch.WALL_BOUNCE;
         // Pancadas no chão (o Super do p13): a primeira, a queda do pulo, já derruba.
         if (!projectile && attack.mechanics.pound && c.hitbox == 0) launch = AttackDefinition.Launch.KNOCKDOWN;
@@ -4717,6 +4875,10 @@ final class CombatEngine {
         if (d.ko()) stop += config.koHitstopBonus;
         freeze(a, d, stop, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
+        // Dragon Rush que acertou: a sequência (pancadas apertadas e o golpe final pela direção).
+        if (ownerMove && !projectile && attack == dragonRushAttack && !d.ko() && d.inHitstun()) {
+            iniciarSequenciaDragonRush(a, d);
+        }
         // Em pé, girando ou indo para a parede corta; derrubado (a rasteira) não emenda nada e vai
         // inteiro, como lançado para o combo no ar.
         if (ownerMove && lastStrike && !projectile &&
