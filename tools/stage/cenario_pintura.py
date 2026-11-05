@@ -20,6 +20,11 @@ horizonte. Com isso a profundidade da junção sai sozinha.
 Medidas na pintura (pixels da imagem de entrada): ``--emblema X``, ``--chao Y`` (a linha do pé
 dos lutadores, no centro do anel), ``--anel-longe Y`` (a borda de longe do anel),
 ``--anel-meia X`` (a meia largura do anel), ``--juncao Y``.
+
+Quando a pintura nasceu de uma tela do jogo (um concept com o HUD, limpo e estendido para os
+lados), o enquadramento já é o da câmera de repouso: ``--tela-px`` (quantos pixels da imagem
+cabem na largura da tela), ``--centro X`` (o x da imagem no meio da tela) e ``--horizonte F``
+(a altura do horizonte, fração da tela, medida pelo anel). Aí a escala não sai da largura.
 """
 import argparse
 import json
@@ -43,6 +48,9 @@ def main():
     ap.add_argument('--juncao', type=float, default=872)
     ap.add_argument('--ceu-extra', type=int, default=520)
     ap.add_argument('--nevoa', default='#6E4A78')
+    ap.add_argument('--tela-px', type=float, default=None)
+    ap.add_argument('--centro', type=float, default=None)
+    ap.add_argument('--horizonte', type=float, default=None)
     a = ap.parse_args()
 
     im = Image.open(a.fonte).convert('RGB')
@@ -50,11 +58,14 @@ def main():
     # Escala: na linha do pé, a pintura cobre o mundo todo (a câmera vai de 0 a 2600).
     lado = min(a.emblema, W - a.emblema)
     k = ZOOM * MUNDO / 2 / lado                     # px da tela de repouso por px da pintura
+    if a.tela_px:
+        k = VW / a.tela_px
+    centro = a.centro if a.centro is not None else a.emblema
 
     def tela_y(py):
         return GY + (py - a.chao) * k
 
-    x_frac = 0.5 + (W / 2 - a.emblema) * k / VW
+    x_frac = 0.5 + (W / 2 - centro) * k / VW
 
     # Horizonte pelo anel: raio R (mundo) pela meia largura; a borda de longe em z = R.
     dz = D / ZOOM
@@ -62,6 +73,8 @@ def main():
     yl = tela_y(a.anel_longe)
     f = dz / (dz + R)
     hz = (yl - GY * f) / (1 - f)                    # y do horizonte na tela
+    if a.horizonte is not None:
+        hz = a.horizonte * VH
     yj = tela_y(a.juncao)
     if yj <= hz:
         raise SystemExit(f'junção ({yj:.0f}) acima do horizonte ({hz:.0f}): confira as medidas')

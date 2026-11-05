@@ -2,7 +2,7 @@
   "nome": "Arena Central (pintura)",
   "camera": {
     "distancia": 1000.0,
-    "horizonte": 0.3129
+    "horizonte": 0.4542
   },
   "corFundo": "#2A1438",
   "luzLutadores": {
@@ -30,10 +30,10 @@
     {
       "id": "parede",
       "imagem": "parede.jpg",
-      "profundidade": 3714.1,
-      "topo": -1.1881,
-      "base": 0.4053,
-      "x": 0.5083,
+      "profundidade": 1567.5,
+      "topo": -0.5208,
+      "base": 0.5686,
+      "x": 0.5,
       "repetir": "espelhar",
       "corAcima": "#281234"
     }
@@ -41,13 +41,13 @@
   "chao": {
     "imagem": "chao.jpg",
     "perto": -3000,
-    "longe": 3713.1,
-    "ate": 3713.1,
+    "longe": 1566.5,
+    "ate": 1566.5,
     "reflexoLuzes": 0,
     "projecao": {
-      "topo": 0.3916,
-      "base": 1.2054,
-      "x": 0.5083
+      "topo": 0.5582,
+      "base": 1.4471,
+      "x": 0.5
     }
   }
 }
