@@ -53,13 +53,23 @@ public final class Torneio {
         public final String irmao;
         /** Falso enquanto um dos dois ainda não tem golpes (fica longe do jogador). */
         public final boolean pronta;
+        /** O que a dupla diz no card do sorteio (em português, traduzível), ou null. */
+        public final String fala;
+        /** Quem diz a fala: 0 = o titular (lado esquerdo do card), 1 = o parceiro. */
+        public final int quemFala;
 
         public Dupla(String id, String[] lutadores, String irmao, boolean pronta) {
+            this(id, lutadores, irmao, pronta, null, 0);
+        }
+
+        public Dupla(String id, String[] lutadores, String irmao, boolean pronta, String fala, int quemFala) {
             if (lutadores == null || lutadores.length != 2) throw new IllegalArgumentException(id + ": dupla precisa de 2 lutadores");
             this.id = id;
             this.lutadores = lutadores.clone();
             this.irmao = irmao;
             this.pronta = pronta;
+            this.fala = fala;
+            this.quemFala = quemFala == 1 ? 1 : 0;
         }
 
         /** Código do retrato (historia/torneio/rostos/pNN.jpg) de cada lutador. */
@@ -77,8 +87,10 @@ public final class Torneio {
             List<Object> lutadores = Episodio.list(d, "lutadores");
             if (lutadores.size() != 2) throw new IllegalArgumentException("dupla precisa de \"lutadores\": [titular, parceiro]");
             String id = Episodio.string(d, "id", String.valueOf(lutadores.get(0)));
+            Object quem = d.get("quemFala");
             out.add(new Dupla(id, new String[] {String.valueOf(lutadores.get(0)), String.valueOf(lutadores.get(1))},
-                Episodio.string(d, "irmao", null), !Boolean.FALSE.equals(d.get("pronta"))));
+                Episodio.string(d, "irmao", null), !Boolean.FALSE.equals(d.get("pronta")),
+                Episodio.string(d, "fala", null), quem instanceof Number ? ((Number) quem).intValue() : 0));
         }
         return out;
     }

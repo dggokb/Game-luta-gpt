@@ -53,6 +53,7 @@ public final class PaginaHistoria {
     private final PaginaGuiada guiada = new PaginaGuiada();
     private final Rostos rostos;
     private final ChaveTorneio chave;
+    private final SorteioCinema sorteioCinema;
     private final EscolhaIrmao escolha;
     /** Irmão escolhido e a chave do torneio; null = sem escolha nem torneio (passos pulados). */
     private Campanha campanha;
@@ -85,6 +86,7 @@ public final class PaginaHistoria {
         this.assets = assets;
         rostos = new Rostos(assets);
         chave = new ChaveTorneio(rostos);
+        sorteioCinema = new SorteioCinema(assets, rostos);
         escolha = new EscolhaIrmao(rostos);
     }
 
@@ -251,9 +253,18 @@ public final class PaginaHistoria {
                 escolha.tap(x, y);
                 break;
             case SORTEIO:
-                // Toque no meio do sorteio mostra a chave inteira; depois, segue.
+                // Toque no meio do sorteio: na história, o próximo marco da cena (do giro ao card,
+                // do card à vaga); no Arcade, a chave inteira. Depois, segue.
                 if (time < ChaveTorneio.duracaoSorteio(campanha.torneio())) {
-                    time = ChaveTorneio.duracaoSorteio(campanha.torneio());
+                    Torneio t = campanha.torneio();
+                    if (SorteioCinema.ativo(t)) {
+                        float antes = time;
+                        time = SorteioCinema.proximoMarco(temporada, t, time);
+                        String som = SorteioCinema.som(t, antes, time);
+                        if (som != null) listener.onHistoriaSom(som);
+                    } else {
+                        time = ChaveTorneio.duracaoSorteio(t);
+                    }
                 } else {
                     exit();
                 }
@@ -282,6 +293,7 @@ public final class PaginaHistoria {
     public void update(float dt) {
         if (!coversScreen()) return;
         frame++;
+        float antes = time;
         time += dt;
         shake = Math.max(0f, shake - dt * 60f);
         if (exitAt >= 0f) {
@@ -291,6 +303,9 @@ public final class PaginaHistoria {
         Episodio.Passo p = passo();
         if (p.tipo == Episodio.TipoPasso.TITULO && time >= TITLE_DURATION) {
             exit();
+        } else if (p.tipo == Episodio.TipoPasso.SORTEIO && SorteioCinema.ativo(campanha.torneio())) {
+            String som = SorteioCinema.som(campanha.torneio(), antes, time);
+            if (som != null) listener.onHistoriaSom(som);
         } else if (p.tipo == Episodio.TipoPasso.ESCOLHA) {
             escolha.update(dt);
             if (escolha.terminou()) {
@@ -456,6 +471,7 @@ public final class PaginaHistoria {
 
     private void releaseImages() {
         images.clear();
+        sorteioCinema.liberar();
     }
 
     private void tapPage() {
@@ -548,6 +564,7 @@ public final class PaginaHistoria {
                 break;
             case SORTEIO:
                 chave.draw(c, temporada, campanha.torneio(), true, time);
+                if (SorteioCinema.ativo(campanha.torneio())) sorteioCinema.draw(c, temporada, campanha.torneio(), time);
                 break;
             case CHAVE:
                 chave.draw(c, temporada, campanha.torneio(), false, time);
