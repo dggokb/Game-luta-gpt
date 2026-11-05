@@ -29,12 +29,12 @@ public class SorteioCinemaTest {
         return Torneio.duplasFromJson(new GameAssets().readText(Torneio.ARQUIVO));
     }
 
-    /** Toda dupla do torneio tem o card de mangá; as sorteadas também têm a fala. */
+    /** Toda dupla do torneio (os irmãos também) tem o card de mangá e a fala dele. */
     @Test
     public void todaDuplaTemCardEAsSorteadasTemFala() throws IOException {
         for (Torneio.Dupla d : duplas()) {
             assertTrue("sem card: " + d.id, new File(ASSETS, SorteioCinema.PASTA + d.id + ".jpg").isFile());
-            if (d.irmao == null) assertNotNull("sem fala no sorteio: " + d.id, d.fala);
+            assertNotNull("sem fala no sorteio: " + d.id, d.fala);
         }
     }
 
@@ -45,6 +45,12 @@ public class SorteioCinemaTest {
         Torneio historia = Torneio.sortear(duplas, Torneio.RYUGA, new Random(3));
         assertTrue(SorteioCinema.ativo(historia));
         assertEquals(6, historia.ordemSorteio().length);
+        // Primeiro os irmãos, nas pontas; depois as sorteadas.
+        assertEquals(8, SorteioCinema.entradas(historia));
+        assertEquals(0, SorteioCinema.vagaDo(historia, 0));
+        assertEquals(7, SorteioCinema.vagaDo(historia, 1));
+        assertFalse(SorteioCinema.gira(1));
+        assertTrue(SorteioCinema.gira(2));
         assertEquals(SorteioCinema.duracao(historia), ChaveTorneio.duracaoSorteio(historia), 1e-6f);
         List<Torneio.Dupla> outras = new java.util.ArrayList<>();
         for (int i = 0; i < 15; i++) {
@@ -69,14 +75,14 @@ public class SorteioCinemaTest {
             float depois = SorteioCinema.proximoMarco(temporada, t, time);
             assertTrue("o toque tem que avançar: " + time, depois > time);
             time = depois;
-            assertTrue("toques demais", ++toques <= 1 + 4 * t.ordemSorteio().length + 1);
+            assertTrue("toques demais", ++toques <= 1 + 4 * SorteioCinema.entradas(t) + 1);
         }
         // Cada dupla bate na vaga depois da anterior.
-        for (int k = 1; k < t.ordemSorteio().length; k++) {
+        for (int k = 1; k < SorteioCinema.entradas(t); k++) {
             assertTrue(SorteioCinema.chegada(k) > SorteioCinema.chegada(k - 1));
         }
         // O card estala com o som de impacto.
-        assertEquals("impacto", SorteioCinema.som(t, SorteioCinema.inicio(0) + SorteioCinema.GIRO - 0.01f,
-            SorteioCinema.inicio(0) + SorteioCinema.GIRO + 0.01f));
+        assertEquals("impacto", SorteioCinema.som(t, SorteioCinema.inicioCard(2) - 0.01f, SorteioCinema.inicioCard(2) + 0.01f));
+        assertEquals("impacto", SorteioCinema.som(t, SorteioCinema.inicioCard(0) - 0.01f, SorteioCinema.inicioCard(0) + 0.01f));
     }
 }

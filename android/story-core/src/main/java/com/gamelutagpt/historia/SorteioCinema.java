@@ -11,7 +11,8 @@ import java.util.Map;
 
 /**
  * O sorteio da história em cena de cinema (ep04), por cima da chave de {@link ChaveTorneio}.
- * Os irmãos caem nas pontas e cada uma das outras duplas sai assim:
+ * Primeiro os cards dos irmãos (sem giro: as vagas deles são as pontas), depois cada uma das
+ * outras duplas sai assim:
  *
  * <ol>
  *   <li><b>Giro</b>: a tela escurece, a vaga da vez pisca e, no meio, os rostos das duplas que
@@ -34,12 +35,14 @@ final class SorteioCinema {
 
     static final String PASTA = Temporada.PASTA + "/torneio/cards/";
 
-    /** Os irmãos nas pontas, antes da primeira dupla. */
-    static final float INTRO = 1.3f;
+    /** Os holofotes na chave vazia, antes do primeiro card. */
+    static final float INTRO = 1.0f;
     static final float GIRO = 1.1f;
     static final float CARD = 3.1f;
     static final float VOO = 0.4f;
     static final float POR_DUPLA = GIRO + CARD + VOO;
+    /** As duplas dos irmãos entram primeiro (Ryūga na ponta esquerda, Kōga na direita), sem giro. */
+    static final int FIXAS = 2;
     /** O balão abre um pouco depois do card e o texto é digitado nesta velocidade. */
     static final float BALAO = 0.35f;
     static final float DIGITA = PaginaHistoria.TYPE_SPEED;
@@ -68,42 +71,69 @@ final class SorteioCinema {
         return t != null && t.rival() != null;
     }
 
-    /** Quando a dupla {@code k} (na ordem do sorteio) começa a girar. */
-    static float inicio(int k) {
-        return INTRO + k * POR_DUPLA;
+    /** Quantos cards a cena mostra: os dois irmãos e as duplas sorteadas. */
+    static int entradas(Torneio t) {
+        return FIXAS + t.ordemSorteio().length;
     }
 
-    /** Quando a dupla {@code k} bate na vaga dela. */
+    /** A vaga do card {@code k}: 0 = o Ryūga (vaga 0), 1 = o Kōga (última vaga), depois o sorteio. */
+    static int vagaDo(Torneio t, int k) {
+        if (k == 0) return 0;
+        if (k == 1) return t.vagas() - 1;
+        return t.ordemSorteio()[k - FIXAS];
+    }
+
+    /** Os irmãos não giram: as vagas deles são fixas. */
+    static boolean gira(int k) {
+        return k >= FIXAS;
+    }
+
+    /** Quando o card {@code k} começa (o giro, ou o card direto nos irmãos). */
+    static float inicio(int k) {
+        return INTRO + Math.min(k, FIXAS) * (CARD + VOO) + Math.max(0, k - FIXAS) * POR_DUPLA;
+    }
+
+    /** Quando o card {@code k} estala no meio da tela. */
+    static float inicioCard(int k) {
+        return inicio(k) + (gira(k) ? GIRO : 0f);
+    }
+
+    /** Quando o card {@code k} bate na vaga dele. */
     static float chegada(int k) {
         return inicio(k + 1);
     }
 
-    static float duracao(Torneio t) {
-        return chegada(t.ordemSorteio().length - 1) + ChaveTorneio.SLAM;
+    /** Quando a dupla da vaga bate nela (para a chave desenhar a vaga cheia). */
+    static float chegadaDaVaga(Torneio t, int vaga) {
+        for (int k = 0; k < entradas(t); k++) {
+            if (vagaDo(t, k) == vaga) return chegada(k);
+        }
+        return 0f;
     }
 
-    /** O tempo em que a fala da dupla {@code k} termina de ser digitada. */
+    static float duracao(Torneio t) {
+        return chegada(entradas(t) - 1) + ChaveTorneio.SLAM;
+    }
+
+    /** O tempo em que a fala do card {@code k} termina de ser digitada. */
     static float falaCompleta(Temporada temporada, Torneio t, int k) {
         String fala = fala(temporada, t, k);
-        float inicioCard = inicio(k) + GIRO;
-        return fala == null ? inicioCard + BALAO : inicioCard + BALAO + fala.length() / DIGITA;
+        return inicioCard(k) + BALAO + (fala == null ? 0f : fala.length() / DIGITA);
     }
 
     /**
      * Para onde o toque leva o tempo: do giro ao card, do card com o texto pela metade ao texto
-     * inteiro, do texto inteiro ao voo e do voo à dupla seguinte. Depois do fim, devolve o próprio
+     * inteiro, do texto inteiro ao voo e do voo ao card seguinte. Depois do fim, devolve o próprio
      * tempo (o passo segue).
      */
     static float proximoMarco(Temporada temporada, Torneio t, float time) {
         if (time < INTRO) return INTRO;
-        int n = t.ordemSorteio().length;
-        for (int k = 0; k < n; k++) {
-            float s = inicio(k);
+        for (int k = 0; k < entradas(t); k++) {
             if (time >= chegada(k)) continue;
-            if (time < s + GIRO) return s + GIRO;
+            if (time < inicioCard(k)) return inicioCard(k);
             float completa = falaCompleta(temporada, t, k);
             if (time < completa) return completa;
-            if (time < s + GIRO + CARD) return s + GIRO + CARD;
+            if (time < inicioCard(k) + CARD) return inicioCard(k) + CARD;
             return chegada(k);
         }
         return Math.max(time, duracao(t));
@@ -112,10 +142,9 @@ final class SorteioCinema {
     /** O som de um marco cruzado entre {@code antes} e {@code agora} (o último deles), ou null. */
     static String som(Torneio t, float antes, float agora) {
         String som = null;
-        for (int k = 0; k < t.ordemSorteio().length; k++) {
-            float s = inicio(k);
-            if (cruzou(antes, agora, s)) som = "painel";
-            if (cruzou(antes, agora, s + GIRO)) som = "impacto";
+        for (int k = 0; k < entradas(t); k++) {
+            if (gira(k) && cruzou(antes, agora, inicio(k))) som = "painel";
+            if (cruzou(antes, agora, inicioCard(k))) som = "impacto";
             if (cruzou(antes, agora, chegada(k))) som = "painel";
         }
         return som;
@@ -126,7 +155,7 @@ final class SorteioCinema {
     }
 
     private static String fala(Temporada temporada, Torneio t, int k) {
-        Torneio.Dupla d = t.participante(0, t.ordemSorteio()[k]);
+        Torneio.Dupla d = t.participante(0, vagaDo(t, k));
         return d == null || d.fala == null ? null : temporada.t(d.fala);
     }
 
@@ -150,29 +179,27 @@ final class SorteioCinema {
 
     /** Por cima da chave desenhada por {@link ChaveTorneio#draw}. */
     void draw(RenderCanvas c, Temporada temporada, Torneio t, float time) {
-        int[] ordem = t.ordemSorteio();
         if (time < INTRO) {
             drawHolofotes(c, time);
             return;
         }
-        for (int k = 0; k < ordem.length; k++) {
-            float s = inicio(k);
-            if (time < s || time >= chegada(k)) continue;
-            int vaga = ordem[k];
+        for (int k = 0; k < entradas(t); k++) {
+            if (time < inicio(k) || time >= chegada(k)) continue;
+            int vaga = vagaDo(t, k);
             Torneio.Dupla d = t.participante(0, vaga);
-            float u = time - s;
-            if (u < GIRO) {
-                drawGiro(c, temporada, t, k, u / GIRO, time);
-            } else if (u < GIRO + CARD) {
-                drawCard(c, temporada, t, d, vaga, u - GIRO, time);
+            float card = time - inicioCard(k);
+            if (card < 0f) {
+                drawGiro(c, temporada, t, k - FIXAS, (time - inicio(k)) / GIRO, time);
+            } else if (card < CARD) {
+                drawCard(c, temporada, t, d, vaga, card, time);
             } else {
-                drawVoo(c, temporada, t, d, vaga, (u - GIRO - CARD) / VOO);
+                drawVoo(c, temporada, t, d, vaga, (card - CARD) / VOO);
             }
             return;
         }
     }
 
-    /** Dois holofotes varrendo a chave enquanto os irmãos caem nas pontas. */
+    /** Dois holofotes varrendo a chave vazia antes do primeiro card. */
     private void drawHolofotes(RenderCanvas c, float time) {
         float a = Tinta.clamp01(time / 0.4f) * Tinta.clamp01((INTRO - time) / 0.4f);
         float x1 = 200f + 880f * Tinta.easeOutCubic(time / INTRO);
@@ -185,7 +212,11 @@ final class SorteioCinema {
         c.fillRect(-40f, -40f, VW + 40f, PaginaHistoria.VH + 40f, Tinta.withAlpha(0xFF000000, alpha));
     }
 
-    /** A vaga da vez pisca e os rostos das duplas que faltam passam até parar na sorteada. */
+    /**
+     * A vaga da vez pisca e os rostos das duplas que faltam passam até parar na sorteada.
+     *
+     * @param k a dupla na ordem do sorteio (sem os irmãos)
+     */
     private void drawGiro(RenderCanvas c, Temporada temporada, Torneio t, int k, float u, float time) {
         int[] ordem = t.ordemSorteio();
         escurece(c, (int)(165 * Tinta.clamp01(u * 4f)));

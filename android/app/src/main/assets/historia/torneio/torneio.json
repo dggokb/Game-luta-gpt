@@ -1,8 +1,8 @@
 {
   "_comentario": "As 8 duplas fixas do torneio do modo história (docs/historia/torneio.md). A do Ryūga fica na ponta esquerda da chave e a do Kōga na ponta direita; as outras são sorteadas. \"pronta\": false = dupla ainda sem golpes: o sorteio a põe no lado do rival, longe do jogador. Retratos: torneio/rostos/pNN.jpg (tools/historia/rostos_torneio.py). \"fala\": o que a dupla diz no card de mangá do sorteio (cards/<id>.jpg, tools/historia/cards_sorteio.py); \"quemFala\": 0 = o titular (esquerda do card), 1 = o parceiro.",
   "duplas": [
-    { "id": "ryuga", "irmao": "ryuga", "lutadores": ["player_base", "p02"] },
-    { "id": "koga", "irmao": "koga", "lutadores": ["p03", "p04"] },
+    { "id": "ryuga", "irmao": "ryuga", "lutadores": ["player_base", "p02"], "fala": "Não importa quem venha... eu vou até o fim.", "quemFala": 0 },
+    { "id": "koga", "irmao": "koga", "lutadores": ["p03", "p04"], "fala": "Tanto faz a chave. No final, vai ser eu e você, Ryūga.", "quemFala": 0 },
     { "id": "p05", "lutadores": ["p05", "p06"], "fala": "Hum... a chave é só um detalhe. Ninguém escapa da gente...", "quemFala": 1 },
     { "id": "p07", "lutadores": ["p07", "p08"], "fala": "Parece que temos um bom negócio pela frente...", "quemFala": 0 },
     { "id": "p09", "lutadores": ["p09", "p10"], "fala": "HEYYY! Quem vai ser o primeiro a pegar fogo?!", "quemFala": 0 },

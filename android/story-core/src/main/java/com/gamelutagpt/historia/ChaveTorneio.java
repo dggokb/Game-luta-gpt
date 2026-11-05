@@ -167,11 +167,11 @@ final class ChaveTorneio {
 
     /** Quando a vaga aparece no sorteio: as fixas logo, as outras na ordem sorteada. */
     private static float horaDaVaga(Torneio t, int vaga) {
+        // Na história, a dupla bate na vaga quando o card dela chega voando (SorteioCinema).
+        if (SorteioCinema.ativo(t)) return SorteioCinema.chegadaDaVaga(t, vaga);
         int[] ordem = t.ordemSorteio();
         for (int k = 0; k < ordem.length; k++) {
-            if (ordem[k] != vaga) continue;
-            // Na história, a dupla bate na vaga quando o card dela chega voando (SorteioCinema).
-            return SorteioCinema.ativo(t) ? SorteioCinema.chegada(k) : SORTEIO_INICIO + k * passoSorteio(t);
+            if (ordem[k] == vaga) return SORTEIO_INICIO + k * passoSorteio(t);
         }
         return 0.25f;
     }
