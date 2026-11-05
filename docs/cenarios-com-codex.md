@@ -55,7 +55,7 @@ concept). Dois pedidos podem rodar ao mesmo tempo.
    e as montanhas em verde chapado. O Codex repinta a arena um pouco deslocada, então o verde só
    serve de molde: ele é alinhado à pintura original (SIFT + polinômio de 3º grau + fluxo óptico)
    e vira a máscara `5_mascara_arena_4096.png`. Embaixo de onde há céu em cada coluna, tudo é
-   arena. A parede vira `parede.webp` com transparência na profundidade da junção, e o fundo vai
+   arena. A parede vira `parede.png` com transparência na profundidade da junção, e o fundo vai
    para 9000 (anda ~1/6 do que andam os lutadores). A imagem gerada vem com a 1ª linha clara:
    o script troca as 6 primeiras linhas pela 7ª antes de espelhar o céu.
 

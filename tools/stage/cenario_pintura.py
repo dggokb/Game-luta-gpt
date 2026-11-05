@@ -114,7 +114,8 @@ def main():
         alfa.paste(masc.crop((0, 0, W, min(base_px, masc.height))), (0, 0))
         par = pimg.crop((0, ex, W, ex + base_px)).convert('RGBA')
         par.putalpha(alfa)
-        par.save(os.path.join(a.saida, 'parede.webp'), quality=90, method=6)
+        # PNG (sem perda): a WebP com perda e transparência saía com blocos de céu no celular.
+        par.save(os.path.join(a.saida, 'parede.png'), optimize=True)
         fim = Image.open(a.fundo).convert('RGB')
         fh = round(fim.height * W / fim.width)
         fundo = np.asarray(fim.resize((W, fh), Image.LANCZOS)).astype(np.float32).copy()
@@ -127,7 +128,7 @@ def main():
         camadas.append({"id": "fundo", "imagem": "fundo.jpg", "profundidade": a.prof_fundo,
                         "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(fh) / VH, 4),
                         "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
-        camadas.append({"id": "parede", "imagem": "parede.webp", "profundidade": round(zj + 1, 1),
+        camadas.append({"id": "parede", "imagem": "parede.png", "profundidade": round(zj + 1, 1),
                         "topo": round(tela_y(0) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
                         "x": round(x_frac, 4), "repetir": "espelhar"})
     else:

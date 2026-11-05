@@ -39,7 +39,7 @@
     },
     {
       "id": "parede",
-      "imagem": "parede.webp",
+      "imagem": "parede.png",
       "profundidade": 1567.5,
       "topo": 0.0001,
       "base": 0.5686,
