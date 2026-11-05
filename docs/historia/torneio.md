@@ -100,7 +100,9 @@ todas as duplas tiverem página). O `TorneioTest.ep03TemAsPaginasDoAdversarioDoP
 ### O sorteio em cena (ep04)
 
 Na história, o sorteio é uma cena (`SorteioCinema`, por cima da chave): os holofotes varrem a
-chave e os irmãos caem nas pontas; depois, para cada uma das 6 outras duplas, na ordem sorteada:
+chave vazia, entram os cards dos irmãos (primeiro o do Ryūga, que voa para a ponta esquerda,
+depois o do Kōga, para a direita; sem giro, as vagas deles são fixas) e depois, para cada uma
+das 6 outras duplas, na ordem sorteada:
 
 1. **Giro** (1,1 s): a tela escurece, a vaga da vez pisca em dourado e, no meio, os rostos das
    duplas que ainda não saíram passam cada vez mais devagar ("SORTEANDO...") até parar na sorteada.
@@ -123,6 +125,8 @@ irmãos ficam em lados opostos". O Arcade continua com o sorteio rápido.
 
 | Dupla | Fala no card |
 |---|---|
+| Ryūga + Yin-lu | (Ryūga) "Não importa quem venha... eu vou até o fim." |
+| Kōga + Brucy | (Kōga) "Tanto faz a chave. No final, vai ser eu e você, Ryūga." |
 | p05 + p06 | (p06) "Hum... a chave é só um detalhe. Ninguém escapa da gente..." |
 | p07 + p08 | (p07) "Parece que temos um bom negócio pela frente..." |
 | p09 + p10 | (p09) "HEYYY! Quem vai ser o primeiro a pegar fogo?!" |
