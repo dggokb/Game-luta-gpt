@@ -169,6 +169,9 @@ final class CombatEngine {
     private final AttackDefinition ultraAttack;
     /** Combat data of the throw (damage, scaling, meter); its timing lives in CombatConfig.throw*. */
     private final AttackDefinition throwAttack;
+    /** O Dragon Rush do SHINKAI (o mesmo para todos): → → voa no rival. */
+    static final String DRAGON_RUSH = "DRAGON_RUSH";
+    final AttackDefinition dragonRushAttack;
 
     CombatEngine(FighterState first, FighterState second, float firstX, float secondX, CombatConfig config) {
         this.config = config;
@@ -190,6 +193,20 @@ final class CombatEngine {
             .launch(AttackDefinition.Launch.KNOCKDOWN)
             .knockback(config.throwKnockback)
             .reach(config.throwRange, 78f)
+            .build();
+        int rushTotal = config.dragonRushStartup + config.dragonRushFlight + config.dragonRushRecovery;
+        dragonRushAttack = new AttackDefinition.Builder(DRAGON_RUSH, AttackDefinition.Kind.NORMAL)
+            .damage(config.dragonRushDamage)
+            .frames(config.dragonRushStartup, config.dragonRushFlight, config.dragonRushRecovery)
+            .stun(config.dragonRushHitstun, config.dragonRushBlockstun, config.dragonRushHitstop)
+            // Encostou (acerto): dali até o fim cancela em normal, especial, Super ou pulo.
+            .windows(AttackDefinition.window(config.dragonRushStartup, rushTotal - 1), null, null)
+            .cancelInto("L", "M", "H", "2L", "2M", "2H", "jL", "jM", "jH", "j2H", "S", "S2", "S3", "S4",
+                "SUPER", AttackDefinition.JUMP)
+            .proration(850)
+            .pushback(16f, 60f)
+            .maxUsesPerCombo(1)
+            .reach(config.dragonRushReach, config.dragonRushHeight, 0f)
             .build();
     }
 
@@ -663,8 +680,14 @@ final class CombatEngine {
             f.clearAttack();
         }
 
+        // SPEED: perto, → → continua o sumiço; longe (ou nos outros tipos), o Dragon Rush.
         if (f.dashRequest && canVanish(f)) {
             vanish(f);
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
+        if (f.dashRequest && podeDragonRush(f)) {
+            startDragonRush(f);
             f.dashRequest = f.backdashRequest = false;
             return;
         }
@@ -923,6 +946,88 @@ final class CombatEngine {
         f.forwardDashing = false;
         f.backdashFrames = 0;
         cues.add("VANISH");
+    }
+
+    /**
+     * Dragon Rush: no SHINKAI, → → (no chão ou no ar) voa no rival. Sai do neutro ou cancelando
+     * um normal que encostou (acerto ou defesa); um por combo (o rival já apanhou um nesse combo:
+     * não sai).
+     */
+    boolean podeDragonRush(CombatFighter f) {
+        if (!f.state.inShinkai() || f.vanishFrames > 0 || f.locked || f.ko()) return false;
+        CombatFighter other = fighters[1 - f.index];
+        if (other.ko()) return false;
+        // TECHNIQUE: com golpe do rival vindo, o → tocado é a aparada (dois toques seguidos não
+        // viram Dragon Rush no meio dela).
+        if (f.state.inShinkai(Shinkai.Type.TECHNIQUE) && f.status == CombatFighter.Status.NEUTRAL &&
+            (other.attacking() || projectileThreat(energyProjectiles, f, 260f))) return false;
+        ComboSession session = sessions[1 - f.index];
+        if (session != null && !session.allows(dragonRushAttack)) return false;
+        if (f.status == CombatFighter.Status.NEUTRAL) {
+            if (f.grounded) return !f.busyOnGround();
+            return Arena.GROUND_Y - f.y >= config.airDashMinHeight;
+        }
+        // Cancelando um normal que encostou, na janela dele.
+        return f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL && f.move != null &&
+            f.outcome != CombatFighter.Outcome.NONE && CancelSystem.windowOpen(f);
+    }
+
+    private void startDragonRush(CombatFighter f) {
+        if (f.attacking()) cues.add("SHINKAI_CANCEL");
+        faceOpponent(f);
+        startAttack(f, dragonRushAttack, "H", -1);
+        // Sem desenho próprio (por enquanto): o GameView mostra o jH esticado no voo.
+        f.move = null;
+        f.airDashFrames = 0;
+        f.wallJumpFrames = 0;
+        f.jumpSquat = 0;
+        f.landingLag = 0;
+        f.crouching = false;
+        f.vx = 0f;
+        f.vy = 0f;
+        cues.add("DRAGON_RUSH");
+    }
+
+    /** No voo do Dragon Rush (ativo, ainda sem encostar). */
+    static boolean dragonRushVoando(CombatFighter f) {
+        return f.attacking() && DRAGON_RUSH.equals(f.attack.id) && f.outcome == CombatFighter.Outcome.NONE &&
+            f.attackFrame >= f.attack.startupFrames && f.attackFrame <= f.attack.lastActiveFrame();
+    }
+
+    /** No Dragon Rush (preparo, voo ou recuperação). */
+    static boolean dragonRush(CombatFighter f) {
+        return f.attacking() && DRAGON_RUSH.equals(f.attack.id);
+    }
+
+    /**
+     * O voo: reto na direção do rival (o pé dele, ou a altura dele no ar), na velocidade do
+     * Dragon Rush; para encostado nele (a caixa do golpe pega). Muda {@code f.x}, {@code f.y}.
+     */
+    private void voarDragonRush(CombatFighter f) {
+        CombatFighter d = fighters[1 - f.index];
+        float encosta = f.body().halfWidth + d.body().halfWidth;
+        float alvoX = d.x - f.facing * encosta;
+        float alvoY = Math.min(Arena.GROUND_Y, d.y);
+        float dx = alvoX - f.x, dy = alvoY - f.y;
+        float dist = (float) Math.hypot(dx, dy);
+        float passo = config.dragonRushSpeed * CombatConfig.DT;
+        // Já encostado (de frente): espera a caixa pegar, sem empurrar o rival.
+        if ((dx * f.facing) <= 0f && Math.abs(dy) < 8f) {
+            f.vx = f.vy = 0f;
+            return;
+        }
+        float k = dist <= passo ? 1f : passo / dist;
+        f.vx = dx * k / CombatConfig.DT;
+        f.vy = dy * k / CombatConfig.DT;
+        f.x += dx * k;
+        f.y += dy * k;
+        if (f.y < Arena.GROUND_Y - 0.5f) {
+            f.grounded = false;
+        } else {
+            f.y = Arena.GROUND_Y;
+            f.grounded = true;
+            f.vy = 0f;
+        }
     }
 
     /** O sumiço anda: no último quadro ele aparece do outro lado, já virado para o rival. */
@@ -1847,6 +1952,12 @@ final class CombatEngine {
                 // seguintes contam do contato.
                 if (moveMechanics.rebound && moveMechanics.dives() && !f.grounded && !f.strikeLanded && !f.grabMissed &&
                     f.attackFrame >= f.attack.startupFrames) break;
+                // Dragon Rush: encostou (acerto ou defesa), o voo acaba e começa a recuperação.
+                if (DRAGON_RUSH.equals(f.attack.id) && f.outcome != CombatFighter.Outcome.NONE &&
+                    f.attackFrame < f.attack.lastActiveFrame()) {
+                    f.attackFrame = f.attack.lastActiveFrame();
+                    f.vx = f.vy = 0f;
+                }
                 f.attackFrame++;
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
@@ -2159,6 +2270,10 @@ final class CombatEngine {
                     f.x += horizontal * speed * CombatConfig.DT;
                 }
             }
+        } else if (dragonRush(f)) {
+            // Dragon Rush: o voo anda sozinho (x e y, moveVertically não mexe); preparo e
+            // recuperação parados (no ar, a recuperação cai devagar).
+            if (dragonRushVoando(f)) voarDragonRush(f);
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
         } else if (f.attacking() && !f.grounded && f.attack.mechanics.dives()) {
@@ -2248,6 +2363,15 @@ final class CombatEngine {
             (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
             scale = f.vy < 0f ? config.normalJumpRisingGravityScale
                               : config.normalJumpFallingGravityScale;
+        }
+        if (dragonRush(f)) {
+            // Preparo e voo: parado no ar (o voo já andou em moveHorizontally). Encostou ou acabou
+            // o voo: cai devagar na recuperação (dá tempo de emendar no ar).
+            if (f.attackFrame <= f.attack.lastActiveFrame()) {
+                f.vy = 0f;
+                return;
+            }
+            scale = 0.45f;
         }
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
@@ -4399,7 +4523,8 @@ final class CombatEngine {
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
         // SHINKAI POWER: o H joga na parede, mesmo sozinho no neutro, e ele volta quicando.
         boolean powerBounce = lastStrike && !projectile && !c.echo && a.state.inShinkai(Shinkai.Type.POWER) &&
-            attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY;
+            attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY &&
+            !DRAGON_RUSH.equals(attack.id);   // o Dragon Rush deixa o rival perto, para emendar
         if (powerBounce) launch = AttackDefinition.Launch.WALL_BOUNCE;
         // Pancadas no chão (o Super do p13): a primeira, a queda do pulo, já derruba.
         if (!projectile && attack.mechanics.pound && c.hitbox == 0) launch = AttackDefinition.Launch.KNOCKDOWN;

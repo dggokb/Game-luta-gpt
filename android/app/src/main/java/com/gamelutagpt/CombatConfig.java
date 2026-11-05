@@ -568,6 +568,23 @@ final class CombatConfig {
     int shinkaiParryReservaPermille = 150;
     /** SPEED: andar, dash e air dash mais rápidos, um air dash a mais. */
     float shinkaiSpeed = 1.3f;
+    /**
+     * Dragon Rush (todo SHINKAI): → → não corre, voa no rival (no chão e no ar), na direção dele
+     * (sobe se ele está no ar). Encostou: pancada pesada que deixa emendar normais e especiais
+     * (cancela na janela de acerto). Um por combo. No chão ou no ar, de um normal que encostou
+     * também sai (cancela o normal). No SPEED, com o rival até {@link #shinkaiVanishRange}, → → no
+     * chão continua sendo o sumiço.
+     */
+    int dragonRushStartup = 6;
+    /** Quadros de voo (o golpe ativo): passou disso sem encostar, recupera no ar. */
+    int dragonRushFlight = 26;
+    int dragonRushRecovery = 16;
+    /** Velocidade do voo (unidades por segundo): ~1800 = a tela em menos de meio segundo. */
+    float dragonRushSpeed = 1800f;
+    int dragonRushDamage = 320;
+    /** Acerto: o rival fica preso 34 quadros (a recuperação de 16 sobra +18 sem cancelar). */
+    int dragonRushHitstun = 34, dragonRushBlockstun = 14, dragonRushHitstop = 13;
+    float dragonRushReach = 118f, dragonRushHeight = 170f;
     /** SPEED, o sumiço (→ → com o rival até esta distância): some, aparece atrás dele. */
     float shinkaiVanishRange = 560f;
     int shinkaiVanishFrames = 10;

@@ -63,6 +63,26 @@ botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` 
     o botão SUPER acende mesmo sem barra (`FighterState.canPaySuper`). Os seguintes pagam barra;
   - recuperam a vida vermelha em campo (`shinkaiRegenPerFrame` = 12 por quadro).
 
+## Dragon Rush (todos os tipos)
+
+No SHINKAI, o **→ →** não corre: o lutador **voa no rival** (`CombatEngine.DRAGON_RUSH`, o mesmo
+golpe para todos, montado no construtor do motor). Sai do neutro no chão ou no ar (a partir da
+altura mínima do air dash) e também **cancelando um normal que encostou** (acerto ou defesa).
+
+- **Voo:** 6 quadros de preparo parado e até 26 de voo reto na direção do rival, a
+  `dragonRushSpeed` (1800 por segundo), **subindo se ele está no ar**; para encostado nele. Sem
+  gravidade no voo; na recuperação (16 quadros) cai devagar, dá tempo de emendar no ar.
+- **Acerto:** 320 de dano (golpe forte, com pausa de impacto), o rival preso 34 quadros, e da
+  pancada até o fim cancela em normal, especial, Super ou pulo (**combo**). Defendido: 14 de
+  bloqueio, recuperação de 16 (−2).
+- **Um por combo** (`maxUsesPerCombo` 1). No POWER ele não joga na parede (o H joga): o rival fica
+  perto para o combo seguir.
+- **SPEED:** com o rival a até 560 (`shinkaiVanishRange`), → → no chão continua sendo o sumiço;
+  mais longe, Dragon Rush. **TECHNIQUE:** com golpe do rival vindo, o → tocado é a aparada (dois
+  toques não viram Dragon Rush no meio dela).
+- **Desenho (provisório):** o jH do lutador (sem ele, o H): preparo até a pose de bater, segura a
+  pose no voo e volta na recuperação, com o rastro de velocidade. Teste: `DragonRushTest`.
+
 ## Protótipo: o SHINKAI individual do Ryūga
 
 O documento do Drive `SOKON_SHINKAI_REVISAO_CONCEITUAL_2026-11-01.md` propõe 17 SHINKAIs
@@ -78,7 +98,7 @@ A divisão abaixo é o ponto de partida. Para mudar, basta editar `Shinkai.typeO
 | Tipo | Quem | Cor | O que ganha |
 |---|---|---|---|
 | **POWER** | p04, p09, p12, p13 | laranja | **Corpo de aço**: aguenta qualquer golpe sem perder a ação e leva só 70% do dano (`shinkaiPowerArmorPermille`). Agarrão e Super entram normal. **O H joga o rival na parede**, mesmo sozinho no neutro, e ele volta quicando — dá para continuar o combo. O chão trinca a cada golpe. |
-| **SPEED** | p03, p05, p10, p16 | ciano | **Imagem residual**: todo golpe normal é repetido por uma imagem ciano no mesmo lugar `shinkaiSpeedEchoDelay` (7) quadros depois, com metade do dano — **todo golpe bate duas vezes**. 30% mais rápido ao andar, no dash e no air dash (`shinkaiSpeed`) e um air dash a mais. **Sumiço**: o dash (→ →), com o rival a até 560 px, vira sumir por 10 quadros (nada acerta) e aparecer **atrás do rival**, já virado para ele. Cada sumiço gasta 45 quadros do SHINKAI. |
+| **SPEED** | p03, p05, p10, p16 | ciano | **Imagem residual**: todo golpe normal é repetido por uma imagem ciano no mesmo lugar `shinkaiSpeedEchoDelay` (7) quadros depois, com metade do dano — **todo golpe bate duas vezes**. 30% mais rápido ao andar, no dash e no air dash (`shinkaiSpeed`) e um air dash a mais. **Sumiço**: o dash (→ →), com o rival a até 560 px (mais longe, o Dragon Rush de todos), vira sumir por 10 quadros (nada acerta) e aparecer **atrás do rival**, já virado para ele. Cada sumiço gasta 45 quadros do SHINKAI. |
 | **ENERGY** | p06, p08, p11 (o p01 está no protótipo acima) | roxo | **O H solta junto um mini projétil** roxo (45% do dano da energia, `shinkaiEnergyShotDamagePermille`). O **S sai sem esperar o anterior** (até `shinkaiEnergyProjectiles` = 5 na tela), maior e 30% mais rápido. A **barra de Super enche sozinha** (uma barra a cada 4 s). |
 | **TECHNIQUE** | p02, p07, p14, p15 (e quem não está na lista) | dourado | **Aparada automática**: o primeiro golpe que chega com ele livre (parado ou andando) é aparado sozinho — "PARRY!", nada entra e ele sai livre. Depois, o parry é o toque → até 10 quadros antes do golpe (também defendendo, também contra projétil; agarrão não se apara). **Cancels livres**: o golpe que acertou ou foi defendido cancela em qualquer outro. |
 

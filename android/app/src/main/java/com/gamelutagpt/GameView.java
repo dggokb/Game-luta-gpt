@@ -2151,6 +2151,7 @@ public class GameView extends SurfaceView
                 if (pausa.impacto() && hit != null) feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
             }
             if ("VANISH".equals(cue)) ultraSounds.playFight("ar_h", 0.8f, 1.35f);
+            if ("DRAGON_RUSH".equals(cue)) ultraSounds.playFight("ar_h", 0.9f, 0.85f);
             if ("SHINKAI_ARMOR".equals(cue)) spawnShinkaiArmor();
             if (cue.startsWith("SHINKAI_CLASH")) spawnShinkaiClash(cue);
             // Bounces shake the screen like the beam's hits.
@@ -5019,6 +5020,26 @@ public class GameView extends SurfaceView
                     blocking, blocking ? f.stunElapsed / (float)Math.max(1, f.stunTotal) : 0f);
             }
         }
+        if (animation == null && CombatEngine.dragonRush(f)) {
+            // Dragon Rush (sem desenho próprio, por enquanto): o golpe forte do pulo (jH; sem ele,
+            // o H) — preparo até a pose de bater, segura no voo, volta na recuperação.
+            CharacterDefinition.Move voo = character.moves.get("jH");
+            if (voo == null || voo.animation == null) voo = character.moves.get("H");
+            if (voo != null && voo.animation != null) {
+                AttackDefinition rush = f.attack, pose = voo.attack;
+                float frames;
+                if (f.attackFrame < rush.startupFrames) {
+                    frames = pose.startupFrames * (f.attackFrame + 0.5f) / rush.startupFrames;
+                } else if (f.attackFrame <= rush.lastActiveFrame()) {
+                    frames = pose.startupFrames + 0.5f;
+                } else {
+                    float t = (f.attackFrame - rush.lastActiveFrame()) / (float)Math.max(1, rush.recoveryFrames);
+                    frames = pose.startupFrames + pose.activeFrames + pose.recoveryFrames * clamp(t, 0f, 1f);
+                }
+                animation = voo.animation.id;
+                animationElapsed = voo.animationTime(Math.min(frames, pose.totalFrames - 0.5f) * FIXED_STEP);
+            }
+        }
         if (animation == null && f.attacking()) {
             float elapsed = (f.attackFrame + 0.5f) * FIXED_STEP;
             float total = f.attack.totalFrames * FIXED_STEP;
@@ -6177,11 +6198,12 @@ public class GameView extends SurfaceView
             float[] t = speedTrail[i];
             boolean noClash = clashEmMovimento();
             boolean rastroRyuga = f.state.inShinkai(Shinkai.Type.PERCEPCAO) && f.state.rastroQuadros > 0;
-            if (!(f.state.inShinkai(Shinkai.Type.SPEED) || noClash || rastroRyuga) || f.vanishFrames > 0 || !visivelNoClash(i)) {
+            boolean rush = CombatEngine.dragonRush(f);
+            if (!(f.state.inShinkai(Shinkai.Type.SPEED) || noClash || rastroRyuga || rush) || f.vanishFrames > 0 || !visivelNoClash(i)) {
                 speedTrailCount[i] = 0;
                 continue;
             }
-            if (engine.frame() % (noClash || rastroRyuga ? 2 : 3) != 0) continue;
+            if (engine.frame() % (noClash || rastroRyuga || rush ? 2 : 3) != 0) continue;
             // Guarda as últimas 4 posições (x, y, lado), a mais nova na frente.
             System.arraycopy(t, 0, t, 3, 9);
             t[0] = f.x;
@@ -6206,7 +6228,8 @@ public class GameView extends SurfaceView
     private void drawSpeedTrail(Canvas c, SpriteFighterRenderer r, CombatFighter f) {
         int side = f == engine.fighter(PLAYER) ? PLAYER : f == engine.fighter(OPPONENT) ? OPPONENT : -1;
         boolean rastroRyuga = f.state.inShinkai(Shinkai.Type.PERCEPCAO) && f.state.rastroQuadros > 0;
-        if (side < 0 || !(f.state.inShinkai(Shinkai.Type.SPEED) || clashEmMovimento() || rastroRyuga)) return;
+        if (side < 0 || !(f.state.inShinkai(Shinkai.Type.SPEED) || clashEmMovimento() || rastroRyuga ||
+            CombatEngine.dragonRush(f))) return;
         float[] t = speedTrail[side];
         // Protótipo do Ryūga: o rastro dourado da esquiva automática.
         int color = f.state.corShinkai() & 0xFFFFFF;
