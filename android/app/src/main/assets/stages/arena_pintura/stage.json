@@ -1,19 +1,18 @@
 {
   "nome": "Arena Central (pintura)",
   "camera": {
-    "distancia": 1000,
-    "horizonte": 0.47
+    "distancia": 1000.0,
+    "horizonte": 0.3129
   },
-  "corFundo": "#2E163C",
-  "chaoNaPintura": true,
+  "corFundo": "#2A1438",
   "luzLutadores": {
-    "cor": "#FFA090",
-    "forca": 0.2,
-    "brilho": 0.97,
-    "pes": "#E8D0C8",
+    "cor": "#FF9A70",
+    "forca": 0.28,
+    "brilho": 0.95,
+    "pes": "#D8B8A8",
     "contraluz": {
-      "cor": "#FF9A50",
-      "forca": 0.9,
+      "cor": "#FFB060",
+      "forca": 1.0,
       "direcao": [
         -1,
         -1
@@ -21,22 +20,34 @@
     }
   },
   "sombraLutadores": {
-    "alfa": 0.6,
-    "cor": "#1C0A14",
-    "suave": 0.55,
-    "x": 0.05,
+    "alfa": 0.72,
+    "cor": "#1A0A12",
+    "suave": 0.5,
+    "x": 0.03,
     "y": 0.05
   },
   "camadas": [
     {
-      "id": "pintura",
-      "imagem": "pintura.jpg",
-      "profundidade": 1.0,
-      "topo": -1.1866,
-      "base": 1.205,
+      "id": "parede",
+      "imagem": "parede.jpg",
+      "profundidade": 3714.1,
+      "topo": -1.1881,
+      "base": 0.4053,
       "x": 0.5083,
       "repetir": "espelhar",
-      "corAcima": "#2E163C"
+      "corAcima": "#281234"
     }
-  ]
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "perto": -3000,
+    "longe": 3713.1,
+    "ate": 3713.1,
+    "reflexoLuzes": 0,
+    "projecao": {
+      "topo": 0.3916,
+      "base": 1.2054,
+      "x": 0.5083
+    }
+  }
 }

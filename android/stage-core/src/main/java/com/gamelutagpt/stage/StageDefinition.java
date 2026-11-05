@@ -366,6 +366,15 @@ public final class StageDefinition {
          * NaN = linhas iguais na profundidade.
          */
         public final float rowDistance;
+        /**
+         * Chão projetado de uma pintura ({@code "projecao": {"topo", "base", "x"}}): a imagem é o
+         * pedaço de baixo da pintura, em perspectiva, e fica na tela de repouso entre {@code topo}
+         * e {@code base} (frações da altura) com o centro em {@code x} (fração da largura). Cada
+         * ponto do chão pega o pixel em que a câmera de repouso o vê: parada, a tela é a pintura
+         * sem deformar; andando, cada faixa do chão anda na velocidade da profundidade dela.
+         * Null = o piso visto de cima (o modo normal).
+         */
+        public float[] projection;
 
         Floor(String image, String plainImage, float near, float far, float centerX,
               float fighterReflection, float lightReflection, float extent) {
@@ -716,6 +725,12 @@ public final class StageDefinition {
                 number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f),
                 number(floorMap, "ate", far), number(floorMap, "largura", Float.NaN),
                 number(floorMap, "linhasPerspectiva", Float.NaN));
+            Map<String, Object> proj = object(floorMap, "projecao");
+            if (proj != null) {
+                float pt = number(proj, "topo", Float.NaN), pb = number(proj, "base", Float.NaN);
+                if (!(pb > pt)) throw new IllegalArgumentException("chao.projecao precisa de \"topo\" e \"base\" (base > topo)");
+                floor.projection = new float[] {pt, pb, number(proj, "x", 0.5f)};
+            }
         }
 
         Petals petals = null;

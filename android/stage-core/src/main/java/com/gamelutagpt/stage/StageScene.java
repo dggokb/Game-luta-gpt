@@ -134,6 +134,7 @@ public final class StageScene {
         // A câmera de repouso converte o que o stage.json descreve em tela para o mundo.
         StageCamera rest = new StageCamera(world.groundY, def.cameraDistance, def.horizon * VH);
         rest.set(world.restZoom, world.restLeft(), world.restTop());
+        restCamera = rest;
         camera.set(world.restZoom, world.restLeft(), world.restTop());
 
         for (StageDefinition.Layer layer : def.layers) {
@@ -1056,6 +1057,10 @@ public final class StageScene {
         float imgW = floorImage.width();
         float imgH = floorImage.height();
         float start = Math.max(groundTop, camera.horizonY() + 0.5f);
+        if (floor.projection != null) {
+            drawProjectedFloor(c, floor.projection, start, imgW, imgH);
+            return;
+        }
         if (c.desenhaFaixas()) {
             drawFloorStrips(c, floor, start, imgW, imgH);
             return;
@@ -1109,6 +1114,132 @@ public final class StageScene {
                 tile++;
             }
         }
+    }
+
+    /** A câmera de repouso (onde o stage.json diz o que aparece na tela). */
+    private StageCamera restCamera;
+
+    /**
+     * Chão projetado da pintura ({@link StageDefinition.Floor#projection}): em cada faixa da tela,
+     * a profundidade do chão naquela linha, e daí a linha e o trecho da pintura que a câmera de
+     * repouso vê nessa profundidade. Passando da borda da pintura, a cópia espelhada ao lado.
+     */
+    private void drawProjectedFloor(RenderCanvas c, float[] proj, float start, float imgW, float imgH) {
+        StageCamera rest = restCamera;
+        float k = (proj[1] - proj[0]) * VH / imgH;          // px da tela de repouso por px da imagem
+        float x0 = proj[2] * VW - imgW * k * 0.5f, y0 = proj[0] * VH;
+        boolean malha = c.desenhaFaixas();
+        if (malha) drawProjectedFloorMesh(c, rest, k, x0, y0, start, imgW, imgH);
+        // Sem a malha, faixas de 2 px (com 3 a escala de lado muda de uma faixa para outra e as
+        // linhas diagonais saem em serrilha quando a câmera não está no repouso). Com a malha, as
+        // faixas só desenham as cópias espelhadas de fora da pintura.
+        float passo = malha ? FLOOR_STRIP : 2f;
+        for (float sy0 = start; sy0 < VH; sy0 += passo) {
+            float sy1 = Math.min(VH + 1f, sy0 + passo);
+            float zTop = camera.floorDepthAt(sy0), zBottom = camera.floorDepthAt(sy1);
+            if (Float.isNaN(zTop) || Float.isNaN(zBottom)) continue;
+            float v0 = (rest.screenY(world.groundY, zTop) - y0) / k;
+            float v1 = (rest.screenY(world.groundY, zBottom) - y0) / k;
+            if (v1 <= 0f || v0 >= imgH) continue;
+            v0 = clamp(v0, 0f, imgH);
+            v1 = clamp(v1, 0f, imgH);
+            if (v1 - v0 < 1f) {
+                float mid = Math.min(imgH - 0.5f, Math.max(0.5f, (v0 + v1) * 0.5f));
+                v0 = mid - 0.5f;
+                v1 = mid + 0.5f;
+            }
+            float zMid = (zTop + zBottom) * 0.5f;
+            float uL = (rest.screenX(camera.worldX(0f, zMid), zMid) - x0) / k;
+            float uR = (rest.screenX(camera.worldX(VW, zMid), zMid) - x0) / k;
+            float span = uR - uL;
+            if (span <= 0f) continue;
+            // Passou da borda da pintura: a cópia ao lado, espelhada (esconde a emenda).
+            int tile = (int)Math.floor(uL / imgW);
+            float u = uL;
+            while (u < uR) {
+                float end = Math.min(uR, (tile + 1) * imgW);
+                float sxa = (u - uL) / span * VW, sxb = (end - uL) / span * VW;
+                float a = u - tile * imgW, b = end - tile * imgW;
+                if (tile == 0) {
+                    if (!malha) drawRegionExact(c, a, v0, b, v1, sxa, sy0, sxb, sy1, imgW, imgH);
+                } else if ((tile & 1) == 0) {
+                    drawRegionExact(c, a, v0, b, v1, sxa, sy0, sxb, sy1, imgW, imgH);
+                } else {
+                    c.save();
+                    c.scale(-1f, 1f, (sxa + sxb) * 0.5f, 0f);
+                    drawRegionExact(c, imgW - b, v0, imgW - a, v1, sxa, sy0, sxb, sy1, imgW, imgH);
+                    c.restore();
+                }
+                u = end;
+                tile++;
+            }
+        }
+    }
+
+    /** Linhas da malha do chão projetado (reaproveitadas). */
+    private float[] projXY = new float[0], projUV = new float[0];
+
+    /**
+     * A parte do chão projetado que cai dentro da pintura, numa malha só: em cada linha da tela
+     * (de {@link #FLOOR_STRIP} em {@link #FLOOR_STRIP} px) o ponto exato da pintura nas duas
+     * pontas; entre as linhas a imagem é interpolada, sem degrau de uma faixa para a outra.
+     */
+    private void drawProjectedFloorMesh(RenderCanvas c, StageCamera rest, float k, float x0, float y0,
+                                        float start, float imgW, float imgH) {
+        int max = (int)((VH - start) / FLOOR_STRIP) + 3;
+        if (projXY.length < max * 4) {
+            projXY = new float[max * 4];
+            projUV = new float[max * 4];
+        }
+        int linhas = 0;
+        for (float y = start; linhas < max; y = Math.min(VH + 1f, y + FLOOR_STRIP)) {
+            float z = camera.floorDepthAt(y);
+            if (!Float.isNaN(z)) {
+                float v = clamp((rest.screenY(world.groundY, z) - y0) / k, 0f, imgH);
+                float uL = (rest.screenX(camera.worldX(0f, z), z) - x0) / k;
+                float uR = (rest.screenX(camera.worldX(VW, z), z) - x0) / k;
+                float span = uR - uL;
+                if (span > 0f) {
+                    float xL = 0f, xR = VW;
+                    if (uL < 0f) {
+                        xL = -uL / span * VW;
+                        uL = 0f;
+                    }
+                    if (uR > imgW) {
+                        xR = VW - (uR - imgW) / span * VW;
+                        uR = imgW;
+                    }
+                    int p = linhas * 4;
+                    projXY[p] = xL;
+                    projXY[p + 1] = y;
+                    projXY[p + 2] = Math.max(xL, xR);
+                    projXY[p + 3] = y;
+                    projUV[p] = uL;
+                    projUV[p + 1] = v;
+                    projUV[p + 2] = Math.max(uL, uR);
+                    projUV[p + 3] = v;
+                    linhas++;
+                }
+            }
+            if (y >= VH + 1f) break;
+        }
+        if (linhas >= 2) c.drawImageStrip(floorImage, projXY, projUV, linhas, 255);
+    }
+
+    /**
+     * Um pedaço do chão projetado com a origem em pixels inteiros (o Canvas arredonda o recorte da
+     * imagem): o recorte cresce até o pixel inteiro e o destino cresce na mesma proporção, então o
+     * desenho não pula meio pixel de uma faixa para a outra (as bordas do emblema ficavam em
+     * serrilha).
+     */
+    private void drawRegionExact(RenderCanvas c, float a, float v0, float b, float v1,
+                                 float x0, float y0, float x1, float y1, float imgW, float imgH) {
+        if (b - a < 1e-3f || x1 - x0 < 1e-3f) return;
+        float ai = (float)Math.floor(a), bi = Math.min(imgW, (float)Math.ceil(b));
+        float ti = (float)Math.floor(v0), di = Math.min(imgH, (float)Math.ceil(v1));
+        float kx = (x1 - x0) / (b - a), ky = (y1 - y0) / Math.max(1e-3f, v1 - v0);
+        c.drawImageRegion(floorImage, ai, ti, bi, di,
+            x0 - (a - ai) * kx, y0 - (v0 - ti) * ky, x1 + (bi - b) * kx, y1 + (di - v1) * ky, 255);
     }
 
     /** Vértices do piso em faixas (reaproveitados de quadro em quadro). */

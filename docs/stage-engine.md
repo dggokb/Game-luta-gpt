@@ -154,11 +154,17 @@ com a profundidade (ondas rolando).
 os barcos do porto. Com `repetir`, os que saem de um lado voltam pelo outro. Custo: o mesmo de
 uma camada parada (só muda a posição).
 
-**Cenário de uma pintura só** (`"chaoNaPintura": true`, sem `chao`): a pintura inteira (céu,
-arena e chão) é uma camada `imagem` na profundidade 1, que anda com os lutadores; o motor não
-desenha o chão liso por cima dela. Sem recorte nem chão desentortado, a pintura fica como foi
-pintada. Montado por `tools/stage/cenario_pintura.py` (a escala cobre o mundo inteiro na câmera
-e põe céu espelhado em cima para o super pulo). Exemplo: `stages/arena_pintura`.
+**Cenário de uma pintura só** (`tools/stage/cenario_pintura.py`, exemplo `stages/arena_pintura`):
+a pintura é cortada numa linha reta só, onde o chão encontra a arquibancada. A parte de cima
+(céu e arquibancada) vira uma camada `imagem` na profundidade da junção (um plano em pé no
+fundo, com céu espelhado em cima para o super pulo, leve névoa e desfoque). A de baixo vira o
+chão com `"projecao": {"topo", "base", "x"}` (onde a imagem fica na tela de repouso): cada ponto
+do chão pega o pixel que a câmera de repouso vê ali. Parada, a tela é a pintura sem deformar;
+andando, cada faixa do chão anda na velocidade da sua profundidade e encontra a parede na junção.
+O horizonte sai do anel do chão (um círculo em volta dos lutadores). Com a malha
+(`drawImageStrip`) o chão é contínuo; sem ela, faixas de 2 px. Fora da pintura, a cópia espelhada.
+`"chaoNaPintura": true` (sem `chao`): o chão já está pintado numa camada e o motor não desenha o
+chão liso por cima.
 
 **Chão até o fundo** (`"ate"` no `chao`): atrás da borda de cima da imagem do piso, a imagem
 lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
