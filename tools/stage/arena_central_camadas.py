@@ -49,6 +49,7 @@ ESCALA, X0, Y0 = 1.8188, 825.2, 109.5
 CEU_Y = -1449                 # onde o céu começa no quadro
 MURO_Y = 856                  # o pé do muro no meio: onde o chão acaba (como no concept)
 PROF_CEU, PROF_MONTANHAS = 20000, 5000
+ATRAS_TORRES = 300           # as torres dos holofotes ficam esta profundidade atrás do muro
 TORRES = ["torre_bandeira", "torre_refletor_esquerda", "torre_refletor_direita"]
 
 # O piso: o anel vermelho do emblema (borda de fora) mede RAIO_ANEL no mundo; o emblema fica
@@ -210,8 +211,10 @@ def main():
         bb = im.getbbox()
         im.crop(bb).save(pasta / f"{nome}.webp", quality=92, alpha_quality=100, method=6)
         t, b, x = caixa(*bb)
-        # Um pouco na frente do muro (elas ficam no pé dele).
-        camadas.append({"id": nome, "imagem": f"{nome}.webp", "profundidade": round(longe - 30, 1),
+        # As dos holofotes atrás do muro e das arquibancadas (como no concept: o pé delas some
+        # atrás da gente); a da bandeira, na ponta esquerda, na frente do prédio do lado.
+        prof = longe + ATRAS_TORRES if "refletor" in nome else longe - 30
+        camadas.append({"id": nome, "imagem": f"{nome}.webp", "profundidade": round(prof, 1),
                         "topo": t, "base": b, "x": x})
 
     largura = piso(pasta, longe)
@@ -221,8 +224,8 @@ def main():
     stage["camadas"] = camadas
     focos = []
     for px, py, alfa in HOLOFOTES:
-        x, altura = no_mundo(px, py, longe - 30)
-        focos.append({"x": x, "altura": altura, "profundidade": round(longe - 30), "alfa": alfa})
+        x, altura = no_mundo(px, py, longe + ATRAS_TORRES)
+        focos.append({"x": x, "altura": altura, "profundidade": round(longe + ATRAS_TORRES), "alfa": alfa})
     for px, py in BRASEIROS:
         x, altura = no_mundo(px, py, longe)
         focos.append({"x": x, "altura": altura, "profundidade": round(longe), "alfa": TOCHA_ALFA,
