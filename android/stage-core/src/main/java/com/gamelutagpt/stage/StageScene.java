@@ -1047,6 +1047,7 @@ public final class StageScene {
         StageDefinition.Floor floor = pack.definition.floor;
         float groundTop = camera.screenY(world.groundY, floor != null ? floor.extent : 0f);
         if (floorImage == null) {
+            if (pack.definition.floorInPainting) return;   // o chão é o da pintura
             // Sem imagem: um chão liso, para o cenário continuar jogável.
             float y = Math.max(groundTop, camera.horizonY());
             c.fillVerticalGradient(-10f, y, VW + 10f, VH + 10f, 0xFF2A2230, 0xFF120E18);

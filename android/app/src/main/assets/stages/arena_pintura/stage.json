@@ -1,0 +1,42 @@
+{
+  "nome": "Arena Central (pintura)",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.47
+  },
+  "corFundo": "#2E163C",
+  "chaoNaPintura": true,
+  "luzLutadores": {
+    "cor": "#FFA090",
+    "forca": 0.2,
+    "brilho": 0.97,
+    "pes": "#E8D0C8",
+    "contraluz": {
+      "cor": "#FF9A50",
+      "forca": 0.9,
+      "direcao": [
+        -1,
+        -1
+      ]
+    }
+  },
+  "sombraLutadores": {
+    "alfa": 0.6,
+    "cor": "#1C0A14",
+    "suave": 0.55,
+    "x": 0.05,
+    "y": 0.05
+  },
+  "camadas": [
+    {
+      "id": "pintura",
+      "imagem": "pintura.jpg",
+      "profundidade": 1.0,
+      "topo": -1.1866,
+      "base": 1.205,
+      "x": 0.5083,
+      "repetir": "espelhar",
+      "corAcima": "#2E163C"
+    }
+  ]
+}

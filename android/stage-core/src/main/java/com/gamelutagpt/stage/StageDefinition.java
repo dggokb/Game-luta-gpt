@@ -470,6 +470,11 @@ public final class StageDefinition {
     public final int backgroundColor;
     public final List<Layer> layers;
     public final Floor floor;
+    /**
+     * {@code "chaoNaPintura": true}: o chão já está pintado na camada (o cenário é uma pintura
+     * só); sem {@code chao}, não desenha o chão liso por cima dela.
+     */
+    public final boolean floorInPainting;
     /** Null quando o cenário não tem pétalas. */
     public final Petals petals;
     /** Null quando o cenário não tem chuva. */
@@ -656,8 +661,9 @@ public final class StageDefinition {
 
     private StageDefinition(String name, float cameraDistance, float horizon, int backgroundColor,
                             List<Layer> layers, Floor floor, Petals petals, Rain rain, Lightning lightning,
-                            FighterLight fighterLight, FighterShadow fighterShadow) {
+                            FighterLight fighterLight, FighterShadow fighterShadow, boolean floorInPainting) {
         this.name = name;
+        this.floorInPainting = floorInPainting;
         this.cameraDistance = cameraDistance;
         this.horizon = horizon;
         this.backgroundColor = backgroundColor;
@@ -820,7 +826,8 @@ public final class StageDefinition {
         }
 
         return new StageDefinition(name.trim(), distance, horizon,
-            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light, shadow);
+            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light, shadow,
+            bool(map, "chaoNaPintura", false));
     }
 
     @SuppressWarnings("unchecked")

@@ -154,6 +154,12 @@ com a profundidade (ondas rolando).
 os barcos do porto. Com `repetir`, os que saem de um lado voltam pelo outro. Custo: o mesmo de
 uma camada parada (só muda a posição).
 
+**Cenário de uma pintura só** (`"chaoNaPintura": true`, sem `chao`): a pintura inteira (céu,
+arena e chão) é uma camada `imagem` na profundidade 1, que anda com os lutadores; o motor não
+desenha o chão liso por cima dela. Sem recorte nem chão desentortado, a pintura fica como foi
+pintada. Montado por `tools/stage/cenario_pintura.py` (a escala cobre o mundo inteiro na câmera
+e põe céu espelhado em cima para o super pulo). Exemplo: `stages/arena_pintura`.
+
 **Chão até o fundo** (`"ate"` no `chao`): atrás da borda de cima da imagem do piso, a imagem
 lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
 chão de uma arena ir do ringue até a arquibancada lá no fundo.
