@@ -50,6 +50,7 @@ CEU_Y = -1449                 # onde o céu começa no quadro
 MURO_Y = 856                  # o pé do muro no meio: onde o chão acaba (como no concept)
 PROF_CEU, PROF_MONTANHAS = 20000, 5000
 ATRAS_TORRES = 300           # as torres dos holofotes ficam esta profundidade atrás do muro
+LARGURA_TORRES = 1.25          # as torres saem um pouco mais largas que na pintura
 TORRES = ["torre_bandeira", "torre_refletor_esquerda", "torre_refletor_direita"]
 
 # O piso: o anel vermelho do emblema (borda de fora) mede RAIO_ANEL no mundo; o emblema fica
@@ -209,7 +210,11 @@ def main():
     for nome in TORRES:
         im = Image.open(ARTE / f"{nome}.webp")
         bb = im.getbbox()
-        im.crop(bb).save(pasta / f"{nome}.webp", quality=92, alpha_quality=100, method=6)
+        torre = im.crop(bb)
+        # Mais largas que na pintura (a altura e o meio ficam): o motor tira a largura da
+        # proporção da imagem.
+        torre = torre.resize((round(torre.width * LARGURA_TORRES), torre.height), Image.LANCZOS)
+        torre.save(pasta / f"{nome}.webp", quality=92, alpha_quality=100, method=6)
         t, b, x = caixa(*bb)
         # As dos holofotes atrás do muro e das arquibancadas (como no concept: o pé delas some
         # atrás da gente); a da bandeira, na ponta esquerda, na frente do prédio do lado.
