@@ -347,6 +347,11 @@ public class PaginaHistoriaTest {
         textos.addAll(java.util.Arrays.asList(EscolhaIrmao.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuCapitulos.TEXTOS));
         textos.addAll(java.util.Arrays.asList(ChaveTorneio.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(SorteioCinema.TEXTOS));
+        // As falas das duplas nos cards do sorteio.
+        for (Torneio.Dupla d : Torneio.duplasFromJson(read(Torneio.ARQUIVO))) {
+            if (d.fala != null) textos.add(d.fala);
+        }
         textos.addAll(java.util.Arrays.asList(Torneio.NOMES_RODADAS));
         File[] idiomas = new File(ASSETS, "historia/idiomas").listFiles();
         assertNotNull(idiomas);

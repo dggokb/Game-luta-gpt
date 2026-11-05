@@ -10,7 +10,8 @@ import com.gamelutagpt.render.RenderCanvas;
  * riscado.
  *
  * No sorteio, as duplas fixas (os irmãos; no Arcade, a do jogador) aparecem primeiro e as
- * outras caem uma a uma nas vagas, na ordem sorteada. Na chave, a rodada que acabou de ser
+ * outras caem uma a uma nas vagas, na ordem sorteada. Na história, cada uma sai antes num card
+ * de mangá no meio da tela ({@link SorteioCinema}). Na chave, a rodada que acabou de ser
  * decidida aparece por último.
  */
 final class ChaveTorneio {
@@ -98,6 +99,7 @@ final class ChaveTorneio {
 
     /** Quanto dura a animação do sorteio (as duplas sorteadas, uma a uma). */
     static float duracaoSorteio(Torneio t) {
+        if (SorteioCinema.ativo(t)) return SorteioCinema.duracao(t);
         return SORTEIO_INICIO + t.ordemSorteio().length * passoSorteio(t) + SLAM;
     }
 
@@ -167,7 +169,9 @@ final class ChaveTorneio {
     private static float horaDaVaga(Torneio t, int vaga) {
         int[] ordem = t.ordemSorteio();
         for (int k = 0; k < ordem.length; k++) {
-            if (ordem[k] == vaga) return SORTEIO_INICIO + k * passoSorteio(t);
+            if (ordem[k] != vaga) continue;
+            // Na história, a dupla bate na vaga quando o card dela chega voando (SorteioCinema).
+            return SorteioCinema.ativo(t) ? SorteioCinema.chegada(k) : SORTEIO_INICIO + k * passoSorteio(t);
         }
         return 0.25f;
     }

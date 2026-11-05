@@ -97,6 +97,39 @@ Quando chegar a página de um adversário: grave como `pagN_<irmao>_<dupla>.jpg`
 com `"irmao"` e `"adversario"` antes da luta (no Kōga, tire também o desafio provisório dele quando
 todas as duplas tiverem página). O `TorneioTest.ep03TemAsPaginasDoAdversarioDoPorto` confere a ordem.
 
+### O sorteio em cena (ep04)
+
+Na história, o sorteio é uma cena (`SorteioCinema`, por cima da chave): os holofotes varrem a
+chave e os irmãos caem nas pontas; depois, para cada uma das 6 outras duplas, na ordem sorteada:
+
+1. **Giro** (1,1 s): a tela escurece, a vaga da vez pisca em dourado e, no meio, os rostos das
+   duplas que ainda não saíram passam cada vez mais devagar ("SORTEANDO...") até parar na sorteada.
+2. **Card** (3,1 s): o card de mangá da dupla estala no meio com linhas de foco (som de impacto),
+   o nome numa pincelada vermelha, a etiqueta **LADO DO RYŪGA** (azul) ou **LADO DO KŌGA**
+   (vermelha) e um balão com a fala da dupla, digitado.
+3. **Voo** (0,4 s): o card encolhe e voa até a vaga, que bate na chave.
+
+O toque pula para o próximo marco (do giro ao card, completa a fala, do card ao voo, para a
+próxima dupla); PULAR pula a cena inteira. No fim aparece a chave inteira com o rodapé "Os
+irmãos ficam em lados opostos". O Arcade continua com o sorteio rápido.
+
+- **Cards**: `historia/torneio/cards/<dupla>.jpg` (900×570), montados por
+  `python3 tools/historia/cards_sorteio.py` com recortes das páginas do porto (um lutador de
+  cada lado, divisa branca inclinada) e, para os irmãos, o quadro dos quatro na página do
+  pré-sorteio. Para trocar a arte de um lutador, mude a linha dele em `RECORTES` no script.
+- **Falas** (provisórias, para ajustar): `"fala"` de cada dupla no `torneio.json` e
+  `"quemFala"` (0 = o titular, à esquerda do card; 1 = o parceiro). Traduzidas em
+  `idiomas/en.json` e `es.json` (o teste de traduções cobre).
+
+| Dupla | Fala no card |
+|---|---|
+| p05 + p06 | (p06) "Hum... a chave é só um detalhe. Ninguém escapa da gente..." |
+| p07 + p08 | (p07) "Parece que temos um bom negócio pela frente..." |
+| p09 + p10 | (p09) "HEYYY! Quem vai ser o primeiro a pegar fogo?!" |
+| p11 + p12 (Necro) | (p11) "Hu hu hu... mais cobaias para a minha criação..." |
+| p13 (Krüger Stahl) + p14 | (p13) "Algum problema? Quem cair com a gente, cai feio." |
+| p15 (Natisuko) + p16 (Bonnie Scarlet) | (p16) "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!" |
+
 ### A regra escondida
 
 Depois da FINAL (2x2), a dupla campeã luta entre si, **1x1** (Ryūga × p02 ou Kōga × p04).
@@ -137,7 +170,7 @@ Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
 | Passo | O que faz |
 |---|---|
 | `{ "tipo": "escolha" }` | a tela ESCOLHA SEU CAMINHO |
-| `{ "tipo": "sorteio" }` | sorteia a chave e mostra as duplas caindo nas vagas, uma a uma |
+| `{ "tipo": "sorteio" }` | sorteia a chave e mostra as duplas caindo nas vagas, uma a uma (na história, em cena de cinema com o card de mangá de cada dupla: veja **O sorteio em cena** abaixo) |
 | `{ "tipo": "chave" }` | a chave com os resultados até aqui e a próxima luta |
 | `{ "tipo": "luta", "torneio": true }` | luta contra o próximo adversário da chave; o rótulo é o nome da rodada (QUARTAS DE FINAL, SEMIFINAL, FINAL). No fim, a rodada inteira se resolve |
 | `{ "tipo": "luta", "emboscada": true }` | a emboscada fora da arena: o jogador contra a dupla que perdeu a outra quarta do lado dele (rótulo EMBOSCADA). Só toca entre as quartas e a semifinal |
@@ -160,8 +193,8 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
 | ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`, e a do Kōga no Beco do Brucy, `beco_brucy`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
-| ep03 — A Chegada | os irmãos chegam de barco à Ilha do Torneio, no Porto Secreto. **Ryūga: 4 páginas prontas** (`pag1_ryuga` a `pag4_ryuga`: o cais do continente e a Yin-lu desconfiada da ilha, "conhecemos um sim", a revelação do Kōga, a viagem e a ilha (legenda "Ilha do torneio: local desconhecido"), a chegada no meio da multidão, os dois em alerta). Kōga: página do porto e página dele com o Brucy (provisórias). Depois, o desafio no cais (veja **O desafio no porto** abaixo; para os dois, por enquanto, segue o rascunho): a dupla do p07 + p08 (gananciosos, "uma dupla a menos na chave seria ótimo para os nossos negócios") desafia o jogador no cais, **luta 2x2 DESAFIO** no `porto_secreto`, o mensageiro encerra a briga, página do irmão vendo o outro irmão chegar. Antes do sorteio: a chave ainda não existe |
-| ep04 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
+| ep03 — A Chegada | os irmãos chegam de barco à Ilha do Torneio, no Porto Secreto. **Ryūga: 4 páginas prontas** (`pag1_ryuga` a `pag4_ryuga`: o cais do continente e a Yin-lu desconfiada da ilha, "conhecemos um sim", a revelação do Kōga, a viagem e a ilha (legenda "Ilha do torneio: local desconhecido"), a chegada no meio da multidão, os dois em alerta). Kōga: página do porto e página dele com o Brucy (provisórias). Depois, o desafio no cais (veja **O desafio no porto** abaixo; para os dois, por enquanto, segue o rascunho): a dupla do p07 + p08 (gananciosos, "uma dupla a menos na chave seria ótimo para os nossos negócios") desafia o jogador no cais, **luta 2x2 DESAFIO** no `porto_secreto`, o mensageiro encerra a briga, página do irmão vendo o outro irmão chegar. Antes do sorteio: a chave ainda não existe. **Depois do desafio**: `pag6_ryuga_1` (Drive 34, só no Ryūga; no Kōga, as provisórias do mensageiro e do barco ficam no lugar das páginas 33 e 34 dele, que ainda faltam) e `pag6_2` a `pag6_4` (Drive 35 a 37, **comuns aos dois irmãos**: de 35 em diante as páginas servem para os dois) |
+| ep04 — O Sorteio | **páginas prontas comuns aos dois irmãos**: `pag1` a `pag3` (Drive 38 a 40: a entrada no salão, as oito duplas, o apresentador e os "idealizadores" nos telões, a regra das 8 lutas e do Campeão, "Esse é o espírito!"), o **sorteio em cena**, `pag4` a `pag6` (Drive 41 a 43: os irmãos em chaves diferentes, "só na final", a saída e os magnatas na sala de cima), **quartas**, chave |
 | ep05 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep06 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
 | ep07 — Sob a Mesma Lua | o episódio bônus do documento da história (7.1): a noite antes da final, Ryūga e Kōga conversam no terraço sob a lua cheia, os magnatas (só silhuetas, "???") mandam agentes desgastar os dois, e a única TAG Ryūga + Kōga: **BONUS STAGE — BROTHERS UNITED**, 3 ondas de agentes no `terraco_lua`. Fora da chave: não muda nada no torneio. Páginas provisórias (cenas `terraco` e `magnatas` na arte provisória) |
