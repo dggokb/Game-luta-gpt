@@ -80,17 +80,21 @@ def limpar_borda(rgb, alfa):
     return out
 
 
-def fundo_composto(saida, W, altura):
-    """O céu com as montanhas por cima, como aparecem atrás da arena na câmera de repouso."""
+def fundo_composto(saida, W, altura, fuga=(0.0, 0.0), sp=1.0):
+    """O céu com as montanhas por cima, como aparecem atrás de cada pixel da arena na câmera de
+    repouso (com a arena aproximada ``sp`` vezes em volta do ponto de fuga)."""
+    import cv2
     ceu = Image.open(os.path.join(saida, 'ceu.jpg')).convert('RGB')
     mont = Image.open(os.path.join(saida, 'montanhas.webp')).convert('RGBA')
     exc = ceu.height - mont.height
-    f = ceu.crop((0, exc, W, ceu.height))
-    f.paste(mont, (0, 0), mont)
+    f = ceu.copy()
+    f.paste(mont, (0, exc), mont)
     f = np.asarray(f).astype(np.float32)
-    if f.shape[0] < altura:
-        f = np.concatenate([f, np.repeat(f[-1:], altura - f.shape[0], 0)], 0)
-    return f[:altura]
+    fx, fy = fuga
+    # Pixel p da arena -> o fundo em fuga + (p - fuga) * sp (mais a faixa de céu em cima).
+    M = np.float32([[sp, 0, fx * (1 - sp)], [0, sp, fy * (1 - sp) + exc]])
+    return cv2.warpAffine(f, M, (W, altura), flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
+                          borderMode=cv2.BORDER_REPLICATE)
 
 
 def relevo(rgb, alfa, W, fundo=None):
@@ -133,7 +137,7 @@ def chave_verde(rgb):
     return out, alfa
 
 
-def ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena=None):
+def ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena=None, fuga=(0.0, 0.0), sp=1.0):
     """Céu e montanhas pintados à parte, cada um inteiro: o céu é o --ceu e as montanhas o
     --montanhas-verde recortado pelo próprio verde (o recorte bate certinho com a pintura dele).
     As montanhas vão para as cores do pôr do sol (as da imagem original nas montanhas)."""
@@ -155,6 +159,7 @@ def ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena=None):
         h = min(hm, alfa_arena.shape[0])
         fr = alfa_arena[:h].mean(1)
         pe = int(np.argmax(fr > 0.6)) if (fr > 0.6).any() else h
+        pe = int(round(fuga[1] + (pe - fuga[1]) * sp))     # com a arena aproximada
         ceu_px = np.asarray(Image.open(a.ceu).convert('RGB').resize((W, hm), Image.LANCZOS)).astype(np.float32)
         cor = ceu_px[int(pe * 0.55):int(pe * 0.8)].reshape(-1, 3).mean(0) * 0.6 + monte[alfa > 0.9].mean(0) * 0.4
         y = np.arange(hm, dtype=np.float32)
@@ -274,6 +279,9 @@ def main():
     ap.add_argument('--anel-longe', type=float, default=980)
     ap.add_argument('--anel-meia', type=float, default=1500)
     ap.add_argument('--juncao', type=float, default=872)
+    ap.add_argument('--aproximar', type=float, default=1.0,
+                    help='a arena (parede) numa fração da profundidade da junção (1 = onde a pintura põe; '
+                         'menor = mais perto e maior, e o chão acaba antes)')
     ap.add_argument('--ceu-extra', type=int, default=520)
     ap.add_argument('--nevoa', default='#6E4A78')
     ap.add_argument('--tela-px', type=float, default=None)
@@ -317,6 +325,16 @@ def main():
         raise SystemExit(f'junção ({yj:.0f}) acima do horizonte ({hz:.0f}): confira as medidas')
     zj = dz * (GY - hz) / (yj - hz) - dz            # profundidade da junção
     print(f'escala {k:.4f} px/px  raio {R:.0f}  horizonte {hz:.1f} ({hz / VH:.4f})  junção z={zj:.0f}')
+    # Arena mais perto: a parede vai para a profundidade zp e cresce em volta do ponto de fuga
+    # (o meio da tela na altura do horizonte), como um plano que chega perto da câmera; o pé dela
+    # cai no chão em zp e o chão acaba ali (o que ficava atrás some atrás do muro).
+    zp = zj * a.aproximar
+    sp = (dz + zj) / (dz + zp)
+    fuga = (centro, a.chao + (hz - GY) / k)          # o ponto de fuga em px da pintura
+    tela_y_parede = lambda py: hz + (tela_y(py) - hz) * sp
+    x_parede = 0.5 + (x_frac - 0.5) * sp
+    if a.aproximar != 1.0:
+        print(f'arena em z={zp:.0f} (x{sp:.3f} na tela)')
 
     nevoa = np.array([int(a.nevoa[i:i + 2], 16) for i in (1, 3, 5)], np.float32)
     os.makedirs(a.saida, exist_ok=True)
@@ -353,8 +371,8 @@ def main():
         alfa_arena = np.asarray(Image.fromarray(np.asarray(alfa)).filter(ImageFilter.MinFilter(3))).astype(np.float32) / 255
         fundo_atras = None
         if a.ceu and a.montanhas_verde:
-            camadas.extend(ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena))
-            fundo_atras = fundo_composto(a.saida, W, base_px)
+            camadas.extend(ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena, fuga, sp))
+            fundo_atras = fundo_composto(a.saida, W, base_px, fuga, sp)
         par = Image.fromarray(relevo(par, alfa_arena, W, fundo_atras), 'RGBA')
         # PNG (sem perda): a WebP com perda e transparência saía com blocos de céu no celular.
         par.save(os.path.join(a.saida, 'parede.png'), optimize=True)
@@ -375,9 +393,9 @@ def main():
             camadas.append({"id": "fundo", "imagem": "fundo.jpg", "profundidade": a.prof_fundo,
                             "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(fh) / VH, 4),
                             "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
-        camadas.append({"id": "parede", "imagem": "parede.png", "profundidade": round(zj + 1, 1),
-                        "topo": round(tela_y(0) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
-                        "x": round(x_frac, 4), "repetir": "espelhar"})
+        camadas.append({"id": "parede", "imagem": "parede.png", "profundidade": round(zp + 1, 1),
+                        "topo": round(tela_y_parede(0) / VH, 4), "base": round(tela_y_parede(base_px) / VH, 4),
+                        "x": round(x_parede, 4), "repetir": "espelhar"})
     else:
         pimg.save(os.path.join(a.saida, 'parede.jpg'), quality=92)
         camadas.append({"id": "parede", "imagem": "parede.jpg", "profundidade": round(zj + 1, 1),
@@ -415,7 +433,7 @@ def main():
         "poeira": {"quantidade": 240, "cor": "#FFD49A", "alfa": 0.85, "tamanho": 2.8, "vento": 18,
                    "perto": -260, "longe": 2400, "topo": 0.1, "base": 0.95},
         "camadas": camadas,
-        "chao": {"imagem": "chao.jpg", "perto": -3000, "longe": round(zj, 1), "ate": round(zj, 1),
+        "chao": {"imagem": "chao.jpg", "perto": -3000, "longe": round(zp, 1), "ate": round(zp, 1),
                  "reflexoLuzes": 0,
                  "projecao": {"topo": round(tela_y(cy0) / VH, 4), "base": round(tela_y(H) / VH, 4),
                               "x": round(x_frac, 4)}},

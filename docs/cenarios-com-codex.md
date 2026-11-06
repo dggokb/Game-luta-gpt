@@ -103,3 +103,8 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
     recorte. No ar, `poeira` dourada contra o sol baixo. O pulo simples não mexe no zoom
     (`camera.zoomNoPulo: false`). As cachoeiras são achadas pelo contraste com a rocha em volta
     (a névoa clareia o pé das montanhas).
+13. **Arena mais perto** (`--aproximar 0.7`): a parede vai para 70% da profundidade da junção
+    (1566 → 1097) e cresce 1,25x em volta do ponto de fuga (o meio da tela na altura do
+    horizonte), como um plano que chega perto da câmera; o chão acaba no pé dela. O anel
+    vermelho (z ≈ 500) continua com chão atrás. A borda com a cor do fundo e a névoa nas
+    montanhas acompanham a arena aproximada.
