@@ -156,6 +156,7 @@ def main():
     ap.add_argument('--mascara-ceu', default=None)
     ap.add_argument('--prof-ceu', type=float, default=30000.0)
     ap.add_argument('--zoom', type=float, default=1.0)
+    ap.add_argument('--chao-largo', default=None)
     a = ap.parse_args()
 
     im = Image.open(a.fonte).convert('RGB')
@@ -245,13 +246,23 @@ def main():
                         "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
 
     # Chão: da junção para baixo; névoa só perto da junção, sumindo até o pé dos lutadores.
+    # Com --chao-largo (a mesma pintura com mais chão dos dois lados, por igual, e a mesma altura),
+    # o chão sai dela: com a câmera aberta o chão perto da tela passava da borda da pintura e
+    # aparecia a cópia espelhada (o degrau da beira dobrado). Fica no máximo 4096 de largura.
     cy0 = int(a.juncao) - 2
-    chao = np.asarray(im.crop((0, cy0, W, H))).astype(np.float32)
+    fonte_chao = im
+    if a.chao_largo:
+        larga = Image.open(a.chao_largo).convert('RGB')
+        fonte_chao = larga.resize((round(larga.width * H / larga.height), H), Image.LANCZOS)
+    chao = np.asarray(fonte_chao.crop((0, cy0, fonte_chao.width, H))).astype(np.float32)
     hc = chao.shape[0]
     rows = np.arange(hc) + cy0
     n = np.clip((a.chao - rows) / max(1, a.chao - a.juncao), 0, 1)[:, None, None] ** 1.5 * 0.16
     chao = chao * (1 - n) + nevoa * n
-    Image.fromarray(np.clip(chao, 0, 255).astype(np.uint8)).save(os.path.join(a.saida, 'chao.jpg'), quality=93)
+    chao_img = Image.fromarray(np.clip(chao, 0, 255).astype(np.uint8))
+    if chao_img.width > 4096:
+        chao_img = chao_img.resize((4096, round(chao_img.height * 4096 / chao_img.width)), Image.LANCZOS)
+    chao_img.save(os.path.join(a.saida, 'chao.jpg'), quality=93)
 
     stage = {
         "nome": "Arena Central (pintura)",

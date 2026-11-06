@@ -85,3 +85,8 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
 10. **Luz e câmera**: sombra comprida dos lutadores na direção do sol do conceito (atrás à
     esquerda) e `camera.zoom` 0,8 (só neste cenário a câmera da luta abre 20%, mais perto do
     enquadramento do conceito).
+11. **Chão mais largo** (`prompt_9_chao_lado.txt`): com a câmera aberta, o chão perto da tela
+    passava da borda da pintura e aparecia a cópia espelhada (o degrau da beira dobrado). O Codex
+    continua o chão 520 px para cada lado (`8_chao_largo.webp`) e o `cenario_pintura.py` tira o
+    chão dele (`--chao-largo`), com no máximo 4096 de largura. Sem a malha (Canvas), o chão
+    projetado vai em faixas de 1 px (com 2 as linhas curvas saíam serrilhadas).

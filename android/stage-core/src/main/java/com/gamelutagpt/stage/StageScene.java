@@ -1130,10 +1130,10 @@ public final class StageScene {
         float x0 = proj[2] * VW - imgW * k * 0.5f, y0 = proj[0] * VH;
         boolean malha = c.desenhaFaixas();
         if (malha) drawProjectedFloorMesh(c, rest, k, x0, y0, start, imgW, imgH);
-        // Sem a malha, faixas de 2 px (com 3 a escala de lado muda de uma faixa para outra e as
+        // Sem a malha, faixas de 1 px (com 3 a escala de lado muda de uma faixa para outra e as
         // linhas diagonais saem em serrilha quando a câmera não está no repouso). Com a malha, as
         // faixas só desenham as cópias espelhadas de fora da pintura.
-        float passo = malha ? FLOOR_STRIP : 2f;
+        float passo = malha ? FLOOR_STRIP : 1f;
         for (float sy0 = start; sy0 < VH; sy0 += passo) {
             float sy1 = Math.min(VH + 1f, sy0 + passo);
             float zTop = camera.floorDepthAt(sy0), zBottom = camera.floorDepthAt(sy1);
