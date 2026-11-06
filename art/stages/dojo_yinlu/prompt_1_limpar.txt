@@ -1,0 +1,7 @@
+Use your image generation tool to EDIT the attached image concept.png. It is a 2D fighting game screenshot of a Chinese martial arts school courtyard on a sunny day (anime / painterly style, very high detail): a stone-paved courtyard with a round flower emblem in the middle, a big red wooden gate with a tiled roof and a gold sign in the center, a whitewashed wall with a tiled roof, stone balustrades and stone lanterns, red pillars with red banners and hanging lanterns at the sides, green trees and a blue sky with clouds. A flat gray band at the top and a wider flat gray band at the bottom are placeholders.
+
+Produce a clean background plate:
+- Remove BOTH fighters, their shadows, and ALL HUD/UI elements (health bars, portraits, timer '180', 'BATALHA', MENU button, the virtual joystick circle, the round buttons ASSIST/SHINKAI/SUPER/L/M/H/L+M/M+H/COMBO, the SUPER meters). Fill those areas with the scenery that would be behind them (stone paving, the emblem, stairs, balustrade, pillars, wall).
+- Replace the gray band at the TOP with the continuation of the sky, the tree tops and the roof eaves.
+- Replace the gray band at the BOTTOM with the continuation of the stone-paved courtyard coming closer to the camera: the same stones getting bigger toward the bottom, with the same dappled sunlight and leaf shadows.
+Do NOT change anything else: same framing, same camera, same perspective and horizon, same painting style, lighting and colors. Keep the output size 1672x941. Save the result as limpo.png in the current directory. Do not write code files.
