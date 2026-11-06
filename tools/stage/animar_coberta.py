@@ -271,6 +271,12 @@ def main():
     pan = np.asarray(Image.open(PANORAMA).convert("RGB"))
     base = base_da_barreira(pan)
     novas, xa, xb = lados(pasta, parede, base, h)
+    # As pontas ficam no mesmo plano da parede (a pintura é uma só; com cada coluna na sua
+    # profundidade, a ponta andava diferente do meio e a pintura se desmontava no canto), só que
+    # desenhadas depois do chão: a barreira que desce até o canto cobre o chão projetado.
+    for cam in novas:
+        cam.pop("curva", None)
+        cam["profundidade"] = round(stage["chao"]["ate"] - 0.5, 1)
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("parede-")] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
     limpar_chao(pasta, base, pan.shape[0])

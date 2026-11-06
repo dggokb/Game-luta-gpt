@@ -202,3 +202,9 @@ python3 tools/stage/animar_coberta.py
    que o meio e abria um degrau). No chão projetado, onde a pintura tem barreira, entra o chão da
    pintura de antes da volta (`chao_sem_volta.jpg`), senão a barreira era esticada como chão.
    Agora `--parede-ate 1150`.
+   **Desfeito em parte:** com cada coluna da ponta na sua profundidade, a ponta andava bem mais
+   que o meio e, no canto, a pintura se desmontava (pedaços de arquibancada soltos sobre o chão).
+   As pontas voltam ao plano da parede (só desenhadas depois do chão). Medido nas capturas: a
+   parede, lá no fundo, anda só ~90 px da pintura entre o repouso e o canto; a volta pintada fora
+   da tela de repouso quase não aparece. Para o estádio "fechar" na tela, a volta tem de estar
+   dentro do enquadramento de repouso (as bordas da tela do concept).
