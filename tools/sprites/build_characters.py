@@ -40,7 +40,12 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # Agarrão de especial que não pegou (o S3 do p13): a pegada no vazio no lugar das cabeçadas.
             'SPECIAL_S3_ERRO', 'SPECIAL_ENERGY_ERRO',
             # Super de pancadas no chão que errou a queda (o p13): ele levanta, sem os socos.
-            'SUPER_WAVE_ERRO')
+            'SUPER_WAVE_ERRO',
+            # SHINKAI: o Dragon Rush com desenho próprio (preparo, voo, duas pancadas e os três
+            # golpes finais, um quadro cada) e o poder no SHINKAI (preparo, palma esquerda, palma
+            # direita: dois disparos). Ainda sem arte (vêm dos vídeos): sem eles, as poses de antes
+            # (jH, M/L e o SPECIAL_ENERGY).
+            'DRAGON_RUSH', 'SPECIAL_ENERGY_SHINKAI')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')

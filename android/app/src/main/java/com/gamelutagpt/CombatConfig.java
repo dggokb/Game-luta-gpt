@@ -692,6 +692,13 @@ final class CombatConfig {
     int ryugaRupturaDor = 4;
     int ryugaRupturaDanoPermille = 1400;
     /**
+     * O poder (S) do Ryūga no SHINKAI: dois disparos, a palma esquerda no tempo de sempre e a
+     * direita {@link #ryugaDisparoDireita} quadros depois, cada um com {@link #ryugaDisparoPermille}
+     * do dano (juntos, 120%: um a mais, mas cada um mais fraco). Desligado (0), um disparo só.
+     */
+    int ryugaDisparoDireita = 9;
+    int ryugaDisparoPermille = 600;
+    /**
      * Venceu o SHINKAI Clash: o corpo recupera esta parte (por mil) do fôlego total. 1000 zera o
      * desgaste (como o relógio dos outros, que volta cheio).
      */

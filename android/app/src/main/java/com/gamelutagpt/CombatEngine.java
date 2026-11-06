@@ -717,6 +717,12 @@ final class CombatEngine {
             else if (f.grounded) f.breakerChase = 0;
         }
 
+        // SHINKAI: segurar → depois do H que jogou na parede não corre: é o Dragon Rush.
+        if (f.state.inShinkai() && wallChaseRun(f) && podeDragonRush(f)) {
+            startDragonRush(f);
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
         if (wallChaseCancel(f)) {
             f.status = CombatFighter.Status.NEUTRAL;
             f.clearAttack();
@@ -991,7 +997,8 @@ final class CombatEngine {
     }
 
     /**
-     * Dragon Rush: no SHINKAI, → → (no chão ou no ar) voa no rival. Sai do neutro ou cancelando
+     * Dragon Rush: no SHINKAI, → → (no chão ou no ar) voa no rival; segurar → depois do H que
+     * jogou na parede também (no lugar da corrida). Sai do neutro ou cancelando
      * um normal que encostou (acerto ou defesa); um por combo (o rival já apanhou um nesse combo:
      * não sai).
      */
@@ -1009,9 +1016,10 @@ final class CombatEngine {
             if (f.grounded) return !f.busyOnGround();
             return Arena.GROUND_Y - f.y >= config.airDashMinHeight;
         }
-        // Cancelando um normal que encostou, na janela dele.
+        // Cancelando um normal que encostou, na janela dele (ou o H que jogou na parede, com →
+        // segurado: corta a recuperação como a corrida cortaria).
         return f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL && f.move != null &&
-            f.outcome != CombatFighter.Outcome.NONE && CancelSystem.windowOpen(f);
+            f.outcome != CombatFighter.Outcome.NONE && (CancelSystem.windowOpen(f) || wallChaseCancel(f));
     }
 
     private void startDragonRush(CombatFighter f) {
@@ -1020,7 +1028,9 @@ final class CombatEngine {
         startAttack(f, dragonRushAttack, "H", -1);
         // Sem desenho próprio (por enquanto): o GameView mostra o jH esticado no voo.
         f.move = null;
-        f.rushSeq = f.rushSocos = f.rushSocosPedidos = f.rushSocoEspera = f.rushFim = 0;
+        f.rushSeq = f.rushSocos = f.rushSocosPedidos = f.rushSocoEspera = 0;
+        f.rushFim = -1;
+        f.wallChase = 0;
         f.airDashFrames = 0;
         f.wallJumpFrames = 0;
         f.jumpSquat = 0;
@@ -2142,7 +2152,10 @@ final class CombatEngine {
                 }
                 f.attackFrame++;
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
-                    spawnProjectile(f);
+                    // No SHINKAI do Ryūga, o primeiro sai da palma esquerda e o segundo da direita.
+                    spawnProjectile(f, doisDisparos(f, config) ? 0 : -1);
+                } else if (f.attackFrame == f.attack.startupFrames + config.ryugaDisparoDireita && doisDisparos(f, config)) {
+                    spawnProjectile(f, 1);
                 } else if (f.attackFrame == f.attack.startupFrames && energyShot(f)) {
                     spawnEnergyShot(f);
                 }
@@ -3048,6 +3061,24 @@ final class CombatEngine {
     // ---------------------------------------------------------------- projectiles
 
     private void spawnProjectile(CombatFighter f) {
+        spawnProjectile(f, -1);
+    }
+
+    /**
+     * O poder (S) do Ryūga no SHINKAI (o protótipo PERCEPÇÃO): dois disparos, um de cada palma.
+     * Só o poder de energia do perfil (não os especiais que lançam nem o Super).
+     */
+    static boolean doisDisparos(CombatFighter f, CombatConfig config) {
+        return config.ryugaDisparoDireita > 0 && f.state.inShinkai(Shinkai.Type.PERCEPCAO) &&
+            f.attack != null && f.attack.kind == AttackDefinition.Kind.PROJECTILE && f.state.profile.energy != null &&
+            f.character().specials.get(f.attack.id) == null;
+    }
+
+    /**
+     * @param mao no poder em dois disparos (veja {@link #doisDisparos}): 0 a palma esquerda (a de
+     * perto, um pouco mais baixa), 1 a direita; -1 o disparo de sempre
+     */
+    private void spawnProjectile(CombatFighter f, int mao) {
         CharacterDefinition.Fighter profile = f.state.profile;
         boolean superKind = f.attack.kind == AttackDefinition.Kind.SUPER;
         if (superKind && profile.henchmen > 0) {
@@ -3092,6 +3123,11 @@ final class CombatEngine {
             radius *= 1.3f;
         }
         float height = superKind ? data.spawnHeight(false, !f.grounded) : data.spawnHeight(f.crouching, !f.grounded);
+        if (mao >= 0) {
+            // Dois disparos: cada um com parte do dano, a palma esquerda um pouco abaixo da direita.
+            damage = damage * config.ryugaDisparoPermille / 1000;
+            height += mao == 0 ? -8f : 8f;
+        }
         // Projétil baixo (sombra): corre colado no chão, mesmo lançado do alto.
         float base = !superKind && f.attack.low ? Arena.GROUND_Y : f.y;
         Projectile p = new Projectile(

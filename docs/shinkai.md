@@ -68,6 +68,9 @@ botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` 
 No SHINKAI, o **→ →** não corre: o lutador **voa no rival** (`CombatEngine.DRAGON_RUSH`, o mesmo
 golpe para todos, montado no construtor do motor). Sai do neutro no chão ou no ar (a partir da
 altura mínima do air dash) e também **cancelando um normal que encostou** (acerto ou defesa).
+No combo, **segurar → depois do H que jogou na parede** também é o Dragon Rush (fora do SHINKAI é a
+corrida): corta a recuperação do H como a corrida cortaria. Se o Dragon Rush do combo já foi
+usado, volta a ser a corrida.
 
 - **Voo:** 6 quadros de preparo parado e até 26 de voo reto na direção do rival, a
   `dragonRushSpeed` (1800 por segundo), **subindo se ele está no ar**; para encostado nele. Sem
@@ -100,11 +103,23 @@ altura mínima do air dash) e também **cancelando um normal que encostou** (ace
 - **Dois Dragon Rush que se encontram** (os dois no SHINKAI, de frente, nenhum encostou ainda)
   abrem o **SHINKAI Clash** (o minigame), em vez de trocar pancada (`dragonRushClash`; vale mesmo
   com o Clash da ativação desligado, `shinkaiClashMinigame`). Quem saiu depois é quem respondeu.
-- **Desenho (provisório):** o jH do lutador (sem ele, o H): preparo até a pose de bater, segura a
-  pose no voo e volta na recuperação, com o rastro de velocidade. Na sequência, cada pancada
-  alterna a pose de bater do M e do L (jM/jL no ar). Teste: `DragonRushTest`.
+- **Desenho:** quem tiver a animação `DRAGON_RUSH` (um quadro por fase: 0 preparo, 1 voo, 2 e 3
+  as pancadas, que se alternam, 4 o golpe final reto, 5 o para cima, 6 a troca de lado) usa ela
+  (`GameView.quadroDragonRush`); ninguém tem ainda (a arte vem dos vídeos). Sem ela, o
+  provisório: o jH do lutador (sem ele, o H), preparo até a pose de bater, segura no voo e volta
+  na recuperação; na sequência, cada pancada alterna a pose de bater do M e do L (jM/jL no ar).
+  `rushFim` é -1 até o golpe final. Teste: `DragonRushTest`.
 
 ## Protótipo: o SHINKAI individual do Ryūga
+
+**O poder (S) em dois disparos:** no SHINKAI, o Ryūga não junta as mãos: solta o primeiro com a
+**palma esquerda**, no tempo de sempre, e o segundo com a **direita**, `ryugaDisparoDireita` (9)
+quadros depois. Cada um tem `ryugaDisparoPermille` (60%) do dano: juntos, 120% (um a mais, cada
+um mais fraco). A esquerda sai um pouco mais baixa. A carga vale para os dois. Só o poder de
+energia, não os especiais que lançam nem o Super (`CombatEngine.doisDisparos`). Desenho: a
+animação `SPECIAL_ENERGY_SHINKAI` (preparo, palma esquerda, palma direita), quando existir (vem
+dos vídeos); até lá, o desenho do poder de sempre. Teste:
+`ShinkaiRyugaTest.noShinkaiOPoderSaiEmDoisDisparosUmDeCadaMao`.
 
 O documento do Drive `SOKON_SHINKAI_REVISAO_CONCEITUAL_2026-11-01.md` propõe 17 SHINKAIs
 individuais, com duração pelo desgaste do corpo e a Ruptura. O primeiro protótipo é o do

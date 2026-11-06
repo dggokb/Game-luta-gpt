@@ -15,9 +15,27 @@ public class DragonRushTest {
         final FighterInput[] in = {new FighterInput(), new FighterInput()};
 
         Match(String p1, String p2, float xa, float xb) {
-            first = new FighterState(GeneratedCharacters.get(p1), "P1");
-            second = new FighterState(GeneratedCharacters.get(p2), "P2");
+            this(GeneratedCharacters.get(p1), GeneratedCharacters.get(p2), xa, xb);
+        }
+
+        Match(CharacterDefinition p1, CharacterDefinition p2, float xa, float xb) {
+            first = new FighterState(p1, "P1");
+            second = new FighterState(p2, "P2");
             engine = new CombatEngine(first, second, xa, xb, new CombatConfig());
+        }
+
+        String attackId(int i) { return f(i).attacking() ? f(i).attack.id : ""; }
+
+        /** L > M > H de perto; volta quando o H acerta. */
+        void chainToHeavy() {
+            in[0].light = true;
+            for (int i = 0; i < 120; i++) {
+                if (attackId(0).equals("L")) in[0].medium = true;
+                if (attackId(0).equals("M")) in[0].heavy = true;
+                step();
+                for (CombatEngine.HitEvent e : engine.events()) if ("H".equals(e.moveId)) return;
+            }
+            fail("H never hit");
         }
 
         CombatFighter f(int i) { return engine.fighter(i); }
@@ -57,6 +75,29 @@ public class DragonRushTest {
         m.step();
         assertFalse(m.engine.cues().contains("DRAGON_RUSH"));
         assertTrue(m.f(0).forwardDashing);
+    }
+
+    /**
+     * No SHINKAI, segurar → depois do H que jogou na parede não corre (como fora dele): sai o
+     * Dragon Rush, cortando a recuperação do H, e ele acerta o rival.
+     */
+    @Test public void noShinkaiSegurarParaFrenteNoComboEhDragonRush() {
+        Match m = new Match(GeneratedCharacters.get("player_base"), GeneratedCharacters.opponentCharacter(), 500f, 900f);
+        m.shinkai();
+        m.f(1).x = m.f(0).x + 100f;
+        m.chainToHeavy();
+        assertEquals(CombatFighter.BOUNCE_WALL, m.f(1).bounce);
+        m.in[0].direction = 1;
+        boolean rush = false;
+        for (int i = 0; i < 60 && !rush; i++) {
+            m.step();
+            assertFalse("no SHINKAI não corre", m.f(0).forwardDashing);
+            rush = m.engine.cues().contains("DRAGON_RUSH");
+        }
+        assertTrue("segurando → no combo, sai o Dragon Rush", rush);
+        assertEquals(CombatEngine.DRAGON_RUSH, m.f(0).attack.id);
+        assertEquals("a janela da parede foi usada", 0, m.f(0).wallChase);
+        assertNotNull("o Dragon Rush pega o rival", m.until(CombatEngine.DRAGON_RUSH, 60));
     }
 
     @Test public void noShinkaiVoaNoRivalEAcertaDeLonge() {
@@ -246,6 +287,7 @@ public class DragonRushTest {
 
     @Test public void semDirecaoORivalFicaNaFrentePreso() {
         Match m = naSequencia(500f, 1250f);
+        assertEquals("antes do golpe final, -1 (o desenho ainda não mostra o golpe final)", -1, m.f(0).rushFim);
         passarSequencia(m, 0, 0);
         assertEquals(0, m.f(0).rushFim);
         assertTrue(m.f(1).x > m.f(0).x);

@@ -4924,6 +4924,34 @@ public class GameView extends SurfaceView
     private static final int[] REBOUND_KICK_ART = {6, 15, 23, 31};
     private static final int REBOUND_HOP_ART = 36;
 
+    /**
+     * O quadro do Dragon Rush com desenho próprio (SpriteStates.DRAGON_RUSH): 0 preparo, 1 voo,
+     * 2 e 3 as pancadas (alternadas), 4 o golpe final reto, 5 para cima, 6 a troca de lado.
+     */
+    static int quadroDragonRush(CombatFighter f) {
+        AttackDefinition rush = f.attack;
+        if (f.rushSeq > 0) {
+            // A sequência: cada pancada alterna as duas; antes da primeira, no chão, a de dentro.
+            if (f.rushSocos > 0) return f.rushSocos % 2 == 1 ? 2 : 3;
+            return f.grounded ? 3 : 1;
+        }
+        if (f.rushFim >= 0) return f.rushFim == 1 ? 5 : f.rushFim == 2 ? 6 : 4;
+        if (rush == null || f.attackFrame < rush.startupFrames) return 0;
+        // No voo e na recuperação de quem não pegou ninguém (errou ou foi defendido).
+        return f.attackFrame <= rush.lastActiveFrame() || !f.grounded ? 1 : 0;
+    }
+
+    /**
+     * O quadro do poder em dois disparos (SpriteStates.SPECIAL_ENERGY_SHINKAI): 0 preparo, 1 a
+     * palma esquerda (do primeiro disparo até o segundo), 2 a direita; -1 na volta à guarda.
+     */
+    private int quadroDoisDisparos(CombatFighter f) {
+        int primeiro = f.attack.startupFrames, segundo = primeiro + engine.config.ryugaDisparoDireita;
+        if (f.attackFrame < primeiro) return 0;
+        if (f.attackFrame < segundo) return 1;
+        return f.attackFrame < segundo + 12 ? 2 : -1;
+    }
+
     private float reboundTime(CombatFighter f, CharacterDefinition.Animation art) {
         CombatConfig config = engine.config;
         int startup = f.attack.startupFrames;
@@ -5039,8 +5067,14 @@ public class GameView extends SurfaceView
                     blocking, blocking ? f.stunElapsed / (float)Math.max(1, f.stunTotal) : 0f);
             }
         }
+        CharacterDefinition.Animation rushArte = character.animations.get(SpriteStates.DRAGON_RUSH);
+        if (animation == null && CombatEngine.dragonRush(f) && rushArte != null) {
+            // Dragon Rush com desenho próprio (um quadro por fase; temporário, do Codex).
+            animation = rushArte.id;
+            animationElapsed = rushArte.startOf(quadroDragonRush(f)) + 0.001f;
+        }
         if (animation == null && CombatEngine.dragonRush(f)) {
-            // Dragon Rush (sem desenho próprio, por enquanto): o golpe forte do pulo (jH; sem ele,
+            // Dragon Rush sem desenho próprio: o golpe forte do pulo (jH; sem ele,
             // o H) — preparo até a pose de bater, segura no voo, volta na recuperação.
             CharacterDefinition.Move voo = character.moves.get("jH");
             if (voo == null || voo.animation == null) voo = character.moves.get("H");
@@ -5118,7 +5152,15 @@ public class GameView extends SurfaceView
                         special = charged;
                     }
                 }
-                if (animation == null && special != null) {
+                CharacterDefinition.Animation doisDisparos = character.animations.get(SpriteStates.SPECIAL_ENERGY_SHINKAI);
+                int pose = animation == null && doisDisparos != null && CombatEngine.doisDisparos(f, engine.config)
+                    ? quadroDoisDisparos(f) : -1;
+                if (pose >= 0) {
+                    // SHINKAI do Ryūga: o preparo, a palma esquerda e a palma direita (dois disparos);
+                    // a volta à guarda é a do poder de sempre.
+                    animation = doisDisparos.id;
+                    animationElapsed = doisDisparos.startOf(pose) + 0.001f;
+                } else if (animation == null && special != null) {
                     animation = special.id;
                     animationElapsed = special.timeFor(elapsed, total);
                 }

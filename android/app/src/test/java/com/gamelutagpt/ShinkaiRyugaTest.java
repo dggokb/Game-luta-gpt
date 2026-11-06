@@ -329,4 +329,52 @@ public class ShinkaiRyugaTest {
         int esperado = (int)((long)sobra * CombatConfig.SHINKAI_MAX / m.ryuga.reservaMax * m.config().ryugaDevolvePermille / 1000);
         assertEquals(esperado, m.ryuga.shinkai, 2);
     }
+
+    /** Solta o S (meia-lua para trás + M, como no CombatEngineTest) e anda até o fim do golpe. */
+    private static void soltaOPoder(Match m) {
+        m.in[0].direction = 3;
+        m.step();
+        m.in[0].direction = 2;
+        m.step();
+        m.in[0].direction = 1;
+        m.step();
+        m.in[0].medium = true;
+        m.step();
+        m.in[0].direction = 5;
+        assertEquals("S", m.f(0).attack.id);
+    }
+
+    /**
+     * No SHINKAI o poder do Ryūga sai em dois disparos: a palma esquerda no tempo de sempre e a
+     * direita depois, cada um com 60% do dano. Fora dele, um disparo só, com o dano inteiro.
+     */
+    @Test public void noShinkaiOPoderSaiEmDoisDisparosUmDeCadaMao() {
+        AttackDefinition s = GeneratedCharacters.get("player_base").attack("S");
+        int cheio = GeneratedCharacters.get("player_base").fighter.energy.damage;
+
+        Match fora = new Match("p15", 300f, 1500f);
+        soltaOPoder(fora);
+        for (int i = 0; i < s.startupFrames + fora.config().ryugaDisparoDireita + 4; i++) fora.step();
+        assertEquals("fora do SHINKAI, um disparo", 1, fora.engine.energyProjectiles.size());
+        assertEquals(cheio, fora.engine.energyProjectiles.get(0).damage);
+
+        Match m = new Match("p15", 300f, 1500f);
+        m.shinkai();
+        assertEquals(Shinkai.Type.PERCEPCAO, m.ryuga.shinkaiType);
+        soltaOPoder(m);
+        int quadro = 1;
+        while (m.engine.energyProjectiles.isEmpty() && quadro < 60) {
+            m.step();
+            quadro++;
+        }
+        assertEquals("a palma esquerda sai sozinha", 1, m.engine.energyProjectiles.size());
+        for (int i = 0; i < m.config().ryugaDisparoDireita - 1; i++) m.step();
+        assertEquals("a direita ainda não saiu", 1, m.engine.energyProjectiles.size());
+        m.step();
+        assertEquals("a palma direita, logo depois", 2, m.engine.energyProjectiles.size());
+        Projectile esq = m.engine.energyProjectiles.get(0), dir = m.engine.energyProjectiles.get(1);
+        assertEquals(cheio * m.config().ryugaDisparoPermille / 1000, esq.damage);
+        assertEquals(esq.damage, dir.damage);
+        assertTrue("a esquerda sai um pouco abaixo da direita", esq.y > dir.y);
+    }
 }
