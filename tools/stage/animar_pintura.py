@@ -60,6 +60,10 @@ def bandeiras(img, h, w):
         x, y, cw, ch = st[:4]
         if cw > 3.2 * ch or cw > 0.04 * w or ch < 30:      # faixa larga: painel, não estandarte
             continue
+        # Estandarte é comprido: caixas baixas eram o holofote, uma lanterna, um pedaço do painel
+        # de lava do muro ou o enfeite do pavilhão (soltos, viravam recortes balançando).
+        if ch < 1.6 * cw:
+            continue
         f = 6
         caixa = (max(0, x - f), max(0, y - f), min(w, x + cw + f), min(h, y + ch + f))
         if ac.pano(img, caixa) is None:
@@ -92,34 +96,19 @@ def soltar(img, caixa, balanco, fundo, pasta, lista):
     return sb.tapar(img, solta, fundo)
 
 
-# Braseiros: (x, y da base da chama) marcados na parede.png reduzida a 2048 de largura (ver o
-# docs/cenarios-com-codex.md). O ajuste fino acha a chama de verdade perto de cada ponto.
-BRASEIROS = [(72, 290), (200, 290), (338, 286), (515, 287), (613, 290), (898, 287), (1075, 287),
-             (1336, 287), (1425, 290), (1565, 292), (1640, 293), (1795, 293), (1958, 287)]
+# Braseiros: (x, y da borda da bacia, altura da chama pintada), em pixels da parede.png (4096 de
+# largura), marcados à mão com uma régua por cima. A chama animada nasce na borda da bacia, com
+# 3/4 da altura da pintada (a pintada continua embaixo dela). A detecção pela cor pegava os
+# painéis de lava do muro, e a lista antiga (de outra versão da parede) estava deslocada à direita.
+BRASEIROS = [(146, 607, 90), (408, 604, 54), (696, 602, 30), (1031, 595, 41), (1257, 593, 49),
+             (1843, 594, 41), (2202, 593, 48), (2742, 593, 40), (2926, 595, 31), (3209, 599, 36),
+             (3343, 595, 58), (3676, 590, 57), (4006, 575, 51)]
 
 
 def fogos(img, h, w):
-    hsv = cv2.cvtColor(np.ascontiguousarray(img[..., :3]), cv2.COLOR_RGB2HSV).astype(np.float32)
-    chama = (hsv[..., 0] >= 6) & (hsv[..., 0] <= 32) & (hsv[..., 1] > 90) & (hsv[..., 2] > 225) & (img[..., 3] > 200)
-    k = w / 2048
-    lista = []
-    for bx, by in BRASEIROS:
-        x, y = bx * k, by * k
-        r = 34 * k
-        x0, x1, y0, y1 = int(x - r), int(x + r), int(y - 2.5 * r), int(y + 0.4 * r)
-        m = chama[max(0, y0):y1, max(0, x0):x1]
-        ys, xs = np.nonzero(m)
-        if len(xs) > 30:
-            cx = x0 + np.median(xs)
-            base = y0 + np.percentile(ys, 92)
-            alto = max(14 * k, (np.percentile(ys, 92) - np.percentile(ys, 5)) * 1.1)
-        else:
-            cx, base, alto = x, y, 20 * k
-        # O motor desenha a chama ~3x o "tamanho" (com o brilho em volta): a fração é um terço da
-        # chama pintada, para a animada cobrir a pintada sem passar muito dela.
-        lista.append({"x": round(float(cx / w), 4), "y": round(float(base / h), 4),
-                      "tamanho": round(float(alto / h / 3.0), 4)})
-    return lista
+    k = w / 4096
+    return [{"x": round(bx * k / w, 4), "y": round((by + 2) * k / h, 4),
+             "tamanho": round(max(30, alto) * 0.75 * k / h, 4)} for bx, by, alto in BRASEIROS]
 
 
 def luzes(img, h, w, fogo):

@@ -83,9 +83,11 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
    as montanhas vêm desse verde mesmo, recortadas pela própria cor (`--montanhas-verde`), sem
    molde alinhado: o recorte e a pintura são a mesma imagem e não sobra halo. A 1ª linha (clara)
    fica transparente e as cores são casadas com as da pintura.
-9. **Animação** (`tools/stage/animar_pintura.py`): solta as bandeiras grandes (nas torres o
-   buraco fica transparente, aparece o fundo), põe chama animada nos braseiros (`BRASEIROS`,
-   marcados à mão e ajustados pela cor), pulsa os holofotes, mexe a plateia com flashes e corre
+9. **Animação** (`tools/stage/animar_pintura.py`): solta as bandeiras grandes e compridas (nas
+   torres o buraco fica transparente, aparece o fundo; caixas baixas, como holofote, lanterna,
+   painel de lava e enfeite do pavilhão, ficam pintadas), põe chama animada nos braseiros
+   (`BRASEIROS`: borda da bacia e altura da chama, em pixels da `parede.png`, marcados à mão com
+   uma régua; refazer se a parede mudar), pulsa os holofotes, mexe a plateia com flashes e corre
    a água das cachoeiras.
 10. **Luz e câmera**: sombra comprida dos lutadores na direção do sol do conceito (atrás à
     esquerda) e `camera.zoom` 0,8 (só neste cenário a câmera da luta abre 20%, mais perto do
