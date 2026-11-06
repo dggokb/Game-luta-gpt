@@ -29,6 +29,7 @@ import java.util.Map;
  *   "chao": { "imagem": "chao.jpg", "imagemLajotas": "chao_lajotas.jpg", "perto": -420, "longe": 560,
  *             "centroX": 700, "reflexoLutadores": 0.25 },
  *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" },
+ *   "poeira": { "quantidade": 140, "cor": "#FFD8A0", "alfa": 0.5, "tamanho": 2.2, "vento": 25 },
  *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
  *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 },
  *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9, "pes": "#C0C4DC",
@@ -415,6 +416,34 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * Poeira no ar: grãozinhos de luz boiando em 3D (sobem e descem devagar, vão com o vento e
+     * piscam quando pegam a luz). Os da frente dos lutadores ficam maiores e desfocados.
+     */
+    public static final class Dust {
+        public final int count;
+        public final int color;
+        public final float near, far;
+        /** Vento em unidades do mundo por segundo; tamanho em px na profundidade 0. */
+        public final float wind, size;
+        /** Opacidade máxima (0 a 1). */
+        public final float alpha;
+        /** Faixa da tela de repouso onde a poeira boia (frações; topo &lt; base). */
+        public final float top, bottom;
+
+        Dust(int count, int color, float near, float far, float wind, float size, float alpha, float top, float bottom) {
+            this.count = count;
+            this.color = color;
+            this.near = near;
+            this.far = far;
+            this.wind = wind;
+            this.size = size;
+            this.alpha = alpha;
+            this.top = top;
+            this.bottom = bottom;
+        }
+    }
+
     /** Chuva: riscos caindo em 3D, com respingos no piso. */
     public static final class Rain {
         public final int count;
@@ -476,6 +505,8 @@ public final class StageDefinition {
     public final float cameraDistance;
     /** {@code camera.zoom}: multiplica o zoom da câmera da luta neste cenário (1 = o normal). */
     public float cameraZoom = 1f;
+    /** {@code camera.zoomNoPulo} (padrão true): false = o pulo não abre o zoom da câmera da luta. */
+    public boolean cameraZoomNoPulo = true;
     /** Altura do horizonte na tela (fração). */
     public final float horizon;
     public final int backgroundColor;
@@ -488,6 +519,8 @@ public final class StageDefinition {
     public final boolean floorInPainting;
     /** Null quando o cenário não tem pétalas. */
     public final Petals petals;
+    /** Null quando o cenário não tem poeira no ar. */
+    public Dust dust;
     /** Null quando o cenário não tem chuva. */
     public final Rain rain;
     /** Null quando o cenário não tem relâmpagos. */
@@ -848,6 +881,19 @@ public final class StageDefinition {
             color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light, shadow,
             bool(map, "chaoNaPintura", false));
         def.cameraZoom = zoomCenario;
+        def.cameraZoomNoPulo = bool(camera, "zoomNoPulo", true);
+        Map<String, Object> dustMap = object(map, "poeira");
+        if (dustMap != null) {
+            float near = number(dustMap, "perto", -250f), far = number(dustMap, "longe", 2500f);
+            if (far <= near) throw new IllegalArgumentException("poeira: \"longe\" deve ser maior que \"perto\"");
+            float alfa = number(dustMap, "alfa", 0.5f);
+            if (alfa <= 0f || alfa > 1f) throw new IllegalArgumentException("poeira: \"alfa\" entre 0 e 1");
+            float top = number(dustMap, "topo", 0.15f), bottom = number(dustMap, "base", 0.95f);
+            if (top >= bottom) throw new IllegalArgumentException("poeira: \"topo\" acima da \"base\"");
+            def.dust = new Dust(Math.max(0, Math.round(number(dustMap, "quantidade", 120f))),
+                color(dustMap, "cor", 0xFFFFE0B0), near, far, number(dustMap, "vento", 20f),
+                Math.max(0.5f, number(dustMap, "tamanho", 2f)), alfa, top, bottom);
+        }
         return def;
     }
 

@@ -95,6 +95,7 @@ public class StageSceneTest {
         assertEquals(StageDefinition.Kind.WATER, def.layers.get(1).kind);
         assertEquals(900f, def.layers.get(1).sortDepth(), 0f);
         assertNull(def.petals);
+        assertNull(def.dust);
         assertEquals(1000f, def.cameraDistance, 0f);
     }
 
@@ -172,8 +173,9 @@ public class StageSceneTest {
             + "{\"imagem\": \"frente.png\", \"profundidade\": -200, \"topo\": 0.8, \"base\": 1.1},"
             + "{\"imagem\": \"falta.png\", \"profundidade\": 50, \"topo\": 0.1, \"base\": 0.2}],"
             + "\"chao\": {\"imagem\": \"chao.jpg\", \"imagemLajotas\": \"lajotas.jpg\", \"reflexoLutadores\": 0.2},"
-            + "\"petalas\": {\"quantidade\": 30}}";
+            + "\"petalas\": {\"quantidade\": 30}, \"poeira\": {\"quantidade\": 40, \"tamanho\": 3}}";
         StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
+        assertEquals(40, pack.definition.dust.count);
         assertEquals("a imagem que falta vira aviso", 1, pack.warnings.size());
 
         StageScene scene = new StageScene(pack, WORLD);

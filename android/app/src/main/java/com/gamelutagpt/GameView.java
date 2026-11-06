@@ -1491,6 +1491,7 @@ public class GameView extends SurfaceView
     /** O zoom próprio do cenário (camera.zoom no stage.json) na câmera da luta. */
     private void zoomDoCenario() {
         camera.escala = stageScene != null ? stageScene.definition().cameraZoom : 1f;
+        camera.zoomNoPulo = stageScene == null || stageScene.definition().cameraZoomNoPulo;
     }
 
     /**

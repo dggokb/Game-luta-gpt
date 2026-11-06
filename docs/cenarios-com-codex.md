@@ -75,9 +75,14 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
    pinta o céu em verde (molde) e, à parte, só o céu sem terra. `tools/stage/alinhar_mascara.py`
    alinha o molde à pintura e dá `6_mascara_ceu_4096.png`. O `cenario_pintura.py` com `--ceu` e
    `--mascara-ceu` monta três planos: **céu** (30000), **montanhas** (`--prof-fundo`, 7000) e a
-   **arena**. Céu e montanhas são os pixels da própria pintura no que aparece; o pintado à parte
-   só preenche o que fica escondido, alinhado (o sol no mesmo lugar) e com as cores dela. Os dois
-   ficam apoiados na arena (`apoio`): no super pulo descem com ela.
+   **arena**. O céu é todo o pintado à parte (pedaços do céu da pintura davam dois sóis e
+   fantasmas das torres); em cima ele é continuado espelhando a faixa de cima, sem esticar (o
+   esticado virava riscos verticais). Céu e montanhas **não** ficam apoiados na arena: cada um
+   anda pela sua profundidade, e o super pulo tem paralaxe.
+   As montanhas (`prompt_10_montanhas_verde.txt`): o Codex repinta o fundo com o céu em verde e
+   as montanhas vêm desse verde mesmo, recortadas pela própria cor (`--montanhas-verde`), sem
+   molde alinhado: o recorte e a pintura são a mesma imagem e não sobra halo. A 1ª linha (clara)
+   fica transparente e as cores são casadas com as da pintura.
 9. **Animação** (`tools/stage/animar_pintura.py`): solta as bandeiras grandes (nas torres o
    buraco fica transparente, aparece o fundo), põe chama animada nos braseiros (`BRASEIROS`,
    marcados à mão e ajustados pela cor), pulsa os holofotes, mexe a plateia com flashes e corre
@@ -90,3 +95,8 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
     continua o chão 520 px para cada lado (`8_chao_largo.webp`) e o `cenario_pintura.py` tira o
     chão dele (`--chao-largo`), com no máximo 4096 de largura. Sem a malha (Canvas), o chão
     projetado vai em faixas de 1 px (com 2 as linhas curvas saíam serrilhadas).
+12. **Relevo e ar**: a borda da arena (o recorte) é limpa da cor do fundo antigo; atrás das
+    construções vai uma sombra roxa difusa, deslocada para longe do sol, que escurece as
+    montanhas em volta delas (a arena deixa de parecer colada), e as bordas viradas para o sol
+    ganham uma luz de contorno quente e fraca. No ar, `poeira` dourada contra o sol baixo. O
+    pulo simples não mexe no zoom (`camera.zoomNoPulo: false`).

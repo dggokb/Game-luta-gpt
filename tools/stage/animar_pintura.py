@@ -154,7 +154,7 @@ def quedas(fundo, extra):
     """Caixas (x, y, largura, altura em pixels) das quedas d'água: claro, pouco saturado e alto."""
     px = np.asarray(fundo).astype(np.float32)
     mx, mn = px.max(axis=2), px.min(axis=2)
-    agua = (mn > 165) & ((mx - mn) / np.maximum(mx, 1) < 0.22)
+    agua = (mn > 135) & ((mx - mn) / np.maximum(mx, 1) < 0.30)
     agua[:extra] = False
     m = cv2.morphologyEx(agua.astype(np.uint8), cv2.MORPH_OPEN, np.ones((9, 2), np.uint8))
     m = cv2.dilate(m, np.ones((15, 9), np.uint8))

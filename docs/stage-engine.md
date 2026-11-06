@@ -42,6 +42,9 @@ olhoY     = topo + H / zoom
 `camera.zoom` (opcional, padrão 1) multiplica o zoom da câmera da luta só neste cenário
 (`CameraRig.escala`): menor que 1 abre a câmera, com os lutadores menores e mais cenário na tela
 (a Arena Central pintada usa 0,8, para chegar perto do enquadramento do conceito).
+`camera.zoomNoPulo` (padrão true): com false, o pulo não abre o zoom da câmera (como no super
+pulo, ela só sobe junto se o lutador sair da margem de cima). Num cenário com o chão em
+perspectiva, o vaivém do zoom a cada pulo dava tontura.
 
 ## Câmera de repouso
 
@@ -67,7 +70,7 @@ não em unidades do mundo.
       é o `ate` do chão (o chão liso até a arquibancada), não o `longe` das lajotas: as
       pilastras da Central a 3350 ficam em cima do chão, que vai até 3500. Antes o chão vinha
       por cima delas, cobria a base e no super pulo pareciam coladas na arquibancada;
-   6. respingos, chuva e pétalas atrás dos lutadores.
+   6. respingos, chuva, pétalas e poeira atrás dos lutadores.
 
    `drawBackground(canvas, z, desenho)` encaixa mais um desenho na profundidade `z`: depois
    das camadas mais fundas que ele e antes das mais rasas. É assim que o narrador fica no
@@ -76,7 +79,7 @@ não em unidades do mundo.
    `scale` e `worldX` projetam um ponto naquela profundidade.
 3. No mundo da luta: reflexo dos lutadores (espelhados no chão, com transparência), os
    lutadores, projéteis e efeitos.
-4. `drawForeground`: camadas com `z ≤ 0` e respingos, chuva e pétalas na frente.
+4. `drawForeground`: camadas com `z ≤ 0` e respingos, chuva, pétalas e poeira na frente.
 5. HUD, controles e a cinemática do ultra.
 
 ## O piso
@@ -297,6 +300,11 @@ frações dela, como as bandeiras:
   da torre, na profundidade do estádio: x −27, altura 955, profundidade 1618), com a sombra roxo-escura (`#1C0A14`, alfa 0,72, `suave` 0,55).
 - **Pétalas**: partículas em 3D (x, y, z) caindo com vento. As de longe são pequenas e
   apagadas, as da frente (`z < 0`) passam grandes na frente dos lutadores.
+- **Poeira** (`"poeira"`: `quantidade`, `cor`, `alfa`, `tamanho`, `vento`, `perto`, `longe`,
+  `topo`, `base`): grãozinhos de luz boiando em 3D entre `topo` e `base` da tela de repouso. Vão
+  com o vento, sobem e descem devagar e piscam (pegam e perdem a luz); não caem. Os de longe
+  ficam pequenos e apagados; os da frente dos lutadores, maiores e com halo (fora de foco). No
+  modo leve, 1 em cada 3.
 - **Chuva** (`"chuva"` no stage.json): riscos em 3D caindo, inclinados pelo vento, finos e
   apagados no fundo e grossos na frente dos lutadores. Cada gota que bate no chão dentro
   do piso deixa um **respingo** (anel achatado que abre e duas gotinhas que pulam, 0,32 s).

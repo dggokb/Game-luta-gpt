@@ -43,6 +43,12 @@ final class CameraRig {
      * abre a câmera (os lutadores menores e mais cenário na tela, como num conceito pintado de longe).
      */
     float escala = 1f;
+    /**
+     * {@code camera.zoomNoPulo} no stage.json (padrão true). False: o pulo não abre o zoom (como o
+     * super pulo, a câmera só sobe junto se ele sair da margem de cima). Num cenário com o chão em
+     * perspectiva, o zoom indo e voltando a cada pulo dá tontura.
+     */
+    boolean zoomNoPulo = true;
     /** Adiantamento atual: vai e volta por mola (motion-core), sem tranco. */
     private final Canal lead = new Canal(Mola.PESADA);
     private int leadFrame;
@@ -110,7 +116,7 @@ final class CameraRig {
         // a camera sobe/desce junto com o lutador e o zoom continua
         // respondendo somente a separacao horizontal.
         float targetZoom = Arena.clamp(
-            superJumpActive
+            superJumpActive || !zoomNoPulo
                 ? targetZoomX
                 : Math.min(targetZoomX, targetZoomY),
             CAMERA_MIN_ZOOM,

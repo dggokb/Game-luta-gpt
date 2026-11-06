@@ -105,6 +105,7 @@ public final class StageScene {
     private final float[] petalX, petalY, petalZ, petalPhase, petalSpin;
     // Chuva: gotas no mundo 3D (y é a ponta de baixo do risco) e respingos no piso.
     private final float[] rainX, rainY, rainZ, rainSpeed;
+    private float[] dustX = new float[0], dustY = new float[0], dustZ = new float[0], dustPhase = new float[0];
     private final float[] splashX, splashZ, splashAge;
     private int nextSplash;
     private final Rand rainRand = new Rand(31);
@@ -208,6 +209,22 @@ public final class StageScene {
             petalY[i] = camera.worldY(rand.range(-0.1f, 1f) * VH, petalZ[i]);
             petalPhase[i] = rand.range(0f, 6.283f);
             petalSpin[i] = rand.range(-200f, 200f);
+        }
+
+        if (def.dust != null) {
+            int n = def.dust.count;
+            dustX = new float[n];
+            dustY = new float[n];
+            dustZ = new float[n];
+            dustPhase = new float[n];
+            rand.reset(123);
+            for (int i = 0; i < n; i++) {
+                dustZ[i] = rand.range(def.dust.near, def.dust.far);
+                float half = VW * 0.6f / camera.scale(dustZ[i]);
+                dustX[i] = world.restCenterX + rand.range(-half, half);
+                dustY[i] = camera.worldY(rand.range(def.dust.top, def.dust.bottom) * VH, dustZ[i]);
+                dustPhase[i] = rand.range(0f, 6.283f);
+            }
         }
 
         StageDefinition.Rain rain = def.rain;
@@ -454,6 +471,7 @@ public final class StageScene {
         updateActors(dt);
         updateRain(dt);
         updateLightning(dt);
+        updateDust(dt);
         StageDefinition.Petals petals = pack.definition.petals;
         if (petals == null) return;
         for (int i = 0; i < petalX.length; i++) {
@@ -467,6 +485,21 @@ public final class StageScene {
             if (petalY[i] > world.groundY || camera.screenY(petalY[i], z) > VH + 20f) {
                 petalY[i] = camera.worldY(-20f, z);
             }
+        }
+    }
+
+    /** A poeira vai com o vento e dá a volta pelos lados da câmera, sem cair. */
+    private void updateDust(float dt) {
+        StageDefinition.Dust dust = pack.definition.dust;
+        if (dust == null) return;
+        float center = camera.centerX();
+        for (int i = 0; i < dustX.length; i++) {
+            float ph = dustPhase[i];
+            dustX[i] += (dust.wind + (float)Math.sin(time * 0.37f + ph) * 14f) * dt;
+            dustY[i] += (float)Math.sin(time * 0.53f + ph * 1.7f) * 9f * dt;
+            float half = VW * 0.6f / camera.scale(dustZ[i]);
+            if (dustX[i] < center - half) dustX[i] += 2f * half;
+            if (dustX[i] > center + half) dustX[i] -= 2f * half;
         }
     }
 
@@ -571,6 +604,7 @@ public final class StageScene {
         drawSplashes(c, true);
         drawRain(c, true);
         drawPetals(c, true);
+        drawDust(c, true);
     }
 
     /** O que fica na frente dos lutadores (profundidade ≤ 0). */
@@ -581,6 +615,7 @@ public final class StageScene {
         drawSplashes(c, false);
         drawRain(c, false);
         drawPetals(c, false);
+        drawDust(c, false);
     }
 
     private void drawLayer(RenderCanvas c, Placed p) {
@@ -1539,6 +1574,37 @@ public final class StageScene {
             c.fillOval(sx - size, sy - size * (0.25f + 0.35f * flip), sx + size, sy + size * (0.25f + 0.35f * flip),
                 withAlpha(petals.color, alpha));
             c.restore();
+        }
+    }
+
+    /**
+     * Poeira: pontinhos que piscam devagar (pegam e perdem a luz). Longe ficam pequenos e
+     * apagados; perto, maiores e com um halo (fora de foco). No modo leve, 1 em cada 3.
+     */
+    private void drawDust(RenderCanvas c, boolean behind) {
+        StageDefinition.Dust dust = pack.definition.dust;
+        if (dust == null) return;
+        int step = detalhe ? 1 : 3;
+        float zoom = camera.zoom();
+        for (int i = 0; i < dustX.length; i += step) {
+            float z = dustZ[i];
+            if ((z > 0f) != behind || z <= camera.nearestDepth() + 50f) continue;
+            float scale = camera.scale(z) / zoom;
+            float r = dust.size * camera.scale(z);
+            if (r < 0.35f) continue;
+            float sx = camera.screenX(dustX[i], z);
+            float sy = camera.screenY(dustY[i], z);
+            if (sx < -20f || sx > VW + 20f || sy < -20f || sy > VH + 20f) continue;
+            float ph = dustPhase[i];
+            float brilho = 0.35f + 0.65f * (0.5f + 0.5f * (float)Math.sin(time * (0.8f + ph * 0.25f) + ph * 3f));
+            float a = dust.alpha * brilho * clamp(scale * 1.3f, 0.3f, 1f);
+            if (r > 2.5f) {
+                // Fora de foco: um disco grande e fraco com o miolo um pouco mais forte.
+                c.fillCircle(sx, sy, r * 1.8f, withAlpha(dust.color, Math.round(255f * a * 0.18f)));
+                c.fillCircle(sx, sy, r, withAlpha(dust.color, Math.round(255f * a * 0.35f)));
+            } else {
+                c.fillCircle(sx, sy, Math.max(0.6f, r), withAlpha(dust.color, Math.round(255f * a)));
+            }
         }
     }
 
