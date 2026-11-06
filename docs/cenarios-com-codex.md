@@ -174,7 +174,7 @@ python3 tools/stage/animar_coberta.py
    fachos em ângulos diferentes, ±7°, e `"onda"` em fase oposta: barato, duas imagens por quadro),
    cada spot do teto ganha um brilho pulsando em cima da lâmpada (achados no panorama original,
    sem o escurecimento de cima, e um por lâmpada), e o chão encerado reflete os lutadores.
-5. **Os lados fechando** (estádio): a pintura estendida curva a barreira e a arquibancada para
+5. **Os lados fechando** (desfeito; ver o passo 8) (estádio): a pintura estendida curva a barreira e a arquibancada para
    perto da câmera nas pontas, mas a parede era um plano só, na profundidade da junção do meio; a
    base curva virava chão esticado. `--parede-ate 700` deixa as linhas de baixo na parede, e o
    `animar_coberta.py` acha a base da barreira coluna a coluna e faz das pontas as camadas
@@ -192,7 +192,7 @@ python3 tools/stage/animar_coberta.py
    cada lanterna da barreira (achada na pintura, uma por lanterna, também nas pontas curvas) vira
    uma luz com reflexo, e o motor desenha o risco no chão, sempre vertical embaixo dela, com a
    câmera em qualquer lugar. No modo leve, sem reflexos.
-7. **O estádio fechando nos cantos** (`prompt_5_volta_esq.txt`, `prompt_5_volta_dir.txt`): a
+7. **O estádio fechando nos cantos** (desfeito; ver o passo 8) (`prompt_5_volta_esq.txt`, `prompt_5_volta_dir.txt`): a
    câmera não passa muito das bordas da pintura, então a volta do estádio tem de estar nela. As
    faixas das pontas (560 px de cada lado no panorama de 3344) viram cinza e o Codex pinta a
    arquibancada, os pilares e a barreira com as lanternas virando para a câmera até o canto de
@@ -208,3 +208,13 @@ python3 tools/stage/animar_coberta.py
    parede, lá no fundo, anda só ~90 px da pintura entre o repouso e o canto; a volta pintada fora
    da tela de repouso quase não aparece. Para o estádio "fechar" na tela, a volta tem de estar
    dentro do enquadramento de repouso (as bordas da tela do concept).
+8. **A ponta do estádio como peça própria** (`prompt_6_ponta.txt`, `4_ponta_verde.png`): o
+   panorama volta a ser o do concept (sem volta pintada, `--parede-ate 700`) e o Codex pinta uma
+   peça nova, sobre verde: o fim da arquibancada curvando para a câmera, com um pilar grande,
+   bandeira e lanternas na barreira. Recortada pela chave verde, ampliada (Real-ESRGAN) e
+   reduzida, vira `ponta.png`; o fim de dentro some num degradê de 420 px (senão a peça acabava
+   num corte reto no meio do chão). `pontas()` no `animar_coberta.py` põe a peça no chão
+   (`"noChao"`) em profundidade 300, 100 além de cada ponta da arena (`PONTA_PROF`,
+   `PONTA_FORA`, `PONTA_LARGURA` = 700 de largura no mundo), a da direita espelhada (`"virar"`).
+   Perto da câmera, ela anda mais que a parede: no repouso fica fora da tela (igual ao concept);
+   com a câmera no canto, entra a arquibancada fechando o estádio.

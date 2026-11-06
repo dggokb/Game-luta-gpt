@@ -36,6 +36,9 @@ TELA = (1785, 227, 2238, 400)                 # a tela azul do telão (x0, y0, x
 PLATEIA = (250, 455)                          # faixa das arquibancadas (linhas do panorama)
 MAX_LUZES = 70
 MAX_FACHOS = 11
+PONTA_PROF = 300.0                            # a peça da ponta: profundidade, largura e centro no mundo
+PONTA_LARGURA = 700.0
+PONTA_FORA = 100.0                            # o centro dela fica isso antes da ponta da arena (0 / 2600)
 PROF_MIN = 700.0                              # as pontas não chegam mais perto que isso (parallax suave, sem degrau)
 CHAO_FOSCO = False                            # True: o chão repintado fosco + reflexos do motor
 BALANCO = 7                                   # graus: o facho vai de −7 a +7 (cruzamento das imagens)
@@ -99,14 +102,6 @@ def base_da_barreira(pan):
     ys = np.convolve(np.pad(ys, 4, mode="edge"), np.ones(9) / 9, mode="valid")
     ys = np.maximum(ys, JUNCAO)
     base = np.interp(np.arange(w), xs, ys)
-    # Nas pontas, onde o estádio faz a volta e a barreira desce até o canto de baixo, a base é a
-    # marcada à mão (os reflexos do chão confundem a busca).
-    for pts in (PONTAS_ESQ, PONTAS_DIR):
-        px, py = zip(*pts)
-        sel = (np.arange(w) >= px[0]) & (np.arange(w) <= px[-1])
-        base[sel] = np.interp(np.arange(w)[sel], px, py)
-    base[:PONTAS_ESQ[0][0]] = PONTAS_ESQ[0][1]
-    base[PONTAS_DIR[-1][0]:] = PONTAS_DIR[-1][1]
     return base
 
 
@@ -243,6 +238,24 @@ def limpar_chao(pasta, base, pan_h):
     Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(caminho, quality=93)
 
 
+def pontas():
+    """As pontas do estádio (a arquibancada virando para a câmera, com o pilar grande no fim):
+    uma peça pintada à parte (``ponta.png``, do Codex sobre verde) em pé no chão, perto da
+    câmera, depois de cada ponta da arena (a da direita é a mesma, virada). Aparece quando a
+    câmera vai para o canto; no repouso fica fora da tela."""
+    escala = D / (D / ZOOM_QUADRO + PONTA_PROF)               # câmera de repouso nessa profundidade
+    img = Image.open(PASTA / "ponta.png")
+    altura_mundo = PONTA_LARGURA * img.height / img.width
+    altura = altura_mundo * escala / 720
+    centro = 1300.0
+    camadas = []
+    for nome, wx, virar in (("esq", -PONTA_FORA, False), ("dir", 2600 + PONTA_FORA, True)):
+        x = (640 + (wx - centro) * escala) / 1280
+        camadas.append({"id": f"ponta-{nome}", "imagem": "ponta.png", "profundidade": PONTA_PROF,
+                        "noChao": True, "altura": round(altura, 4), "x": round(x, 4), "virar": virar})
+    return camadas
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", type=Path, default=PASTA)
@@ -270,31 +283,17 @@ def main():
                           "pulo": 0.003, "colunas": 200, "flashes": flashes}]
     pan = np.asarray(Image.open(PANORAMA).convert("RGB"))
     base = base_da_barreira(pan)
-    novas, xa, xb = lados(pasta, parede, base, h)
-    # As pontas ficam no mesmo plano da parede (a pintura é uma só; com cada coluna na sua
-    # profundidade, a ponta andava diferente do meio e a pintura se desmontava no canto), só que
-    # desenhadas depois do chão: a barreira que desce até o canto cobre o chão projetado.
-    for cam in novas:
-        cam.pop("curva", None)
-        cam["profundidade"] = round(stage["chao"]["ate"] - 0.5, 1)
-    stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("parede-")] + novas
+    novas, xa, xb = pontas(), 0, w
+    stage["camadas"] = [c for c in stage["camadas"]
+                       if not c["id"].startswith("parede-") and not c["id"].startswith("ponta-")] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
-    limpar_chao(pasta, base, pan.shape[0])
     lant = lanternas(pan, base)
-    colunas = [cam["_colunas"] for cam in novas]
     sx = w / pan.shape[1]
     # O chão é o encerado pintado, igual ao concept (os reflexos das lanternas estão na pintura).
     # Com CHAO_FOSCO (a pintura repintada sem os reflexos), o motor desenha os reflexos.
-    parede["luzes"] = [l for l in holofotes(w, h) if xa / w < l["x"] < xb / w]
-    for cam in novas:
-        c0, c1 = cam.pop("_colunas")
-        cam.pop("luzes", None)
+    parede["luzes"] = holofotes(w, h)
     if CHAO_FOSCO:
-        parede["luzes"] += [luz_reflexo(x * sx / w, (y + EXTRA) / h, max(10.0, r * 0.9) / h)
-                            for x, y, r in lant if xa < x < xb]
-        for cam, (c0, c1) in zip(novas, colunas):
-            cam["luzes"] = [luz_reflexo((x - c0) / (c1 - c0), (y + EXTRA) / h, max(10.0, r * 0.9) / h)
-                            for x, y, r in lant if (x <= xa if c0 == 0 else x >= xb) and c0 <= x < c1]
+        parede["luzes"] += [luz_reflexo(x * sx / w, (y + EXTRA) / h, max(10.0, r * 0.9) / h) for x, y, r in lant]
     parede.pop("fachos", None)
     camadas_fachos, nfachos = fachos(pasta, parede, lampadas, xa, xb, w, h)
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("fachos-")] + camadas_fachos
@@ -304,7 +303,7 @@ def main():
     stage["chao"]["reflexoComprimento"] = 0.5 if CHAO_FOSCO else 0
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"telão {parede['telao']}, plateia com {len(flashes)} flashes, {len(parede['luzes'])} holofotes, "
-          f"{nfachos} fachos, {len(novas)} pontas curvas")
+          f"{nfachos} fachos, {len(novas)} pontas")
 
 
 if __name__ == "__main__":
