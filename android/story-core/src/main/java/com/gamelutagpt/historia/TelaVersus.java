@@ -15,8 +15,8 @@ import java.util.Map;
  * tremor, os nomes entram em pinceladas e, no fim, um clarão branco leva para a luta.
  *
  * As poses ficam em {@code historia/torneio/versus/pNN.png} (de
- * {@code tools/historia/versus_poses.py}): PNG transparente, virado para a direita, pés na base,
- * 2 pixels por pixel do mundo. Para trocar por uma ilustração, basta gravar no mesmo nome.
+ * {@code tools/historia/versus_arte.py}, das ilustrações do Codex): PNG transparente, virado para a
+ * direita, pés na base, 4 pixels por pixel do mundo (a altura do lutador no jogo).
  */
 final class TelaVersus {
     static final String PASTA = Temporada.PASTA + "/torneio/versus/";
@@ -31,7 +31,7 @@ final class TelaVersus {
 
     private static final float VW = PaginaHistoria.VW, VH = PaginaHistoria.VH;
     /** Pixels da tela por pixel da pose: o titular, o parceiro (atrás e menor). */
-    private static final float ESCALA_TITULAR = 1.5f, ESCALA_PARCEIRO = 1.16f;
+    private static final float ESCALA_TITULAR = 0.75f, ESCALA_PARCEIRO = 0.58f;
     private static final int INK = Baloes.INK;
     private static final int WHITE = Baloes.WHITE;
     private static final int GOLD = 0xFFF2C14E;

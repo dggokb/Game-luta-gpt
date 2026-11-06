@@ -4,7 +4,8 @@
 Por enquanto a pose vem dos sprites do jogo: o último quadro da animação de entrada (intro), que
 é a guarda de luta virada para a direita; quem ainda não tem intro (p13 a p16) usa o primeiro
 quadro do idle. O recorte vai justo no desenho, com os pés na base da imagem, em PNG transparente, todos na mesma
-escala (2 pixels por pixel do mundo): o tamanho relativo dos lutadores é o do jogo.
+escala (4 pixels por pixel do mundo): o tamanho relativo dos lutadores é o do jogo. Só serve de
+reserva: as poses da tela são as ilustrações de versus_arte.py.
 
 Para trocar por uma ilustração (a arte gerada da tela de versus), grave a imagem no mesmo nome:
 PNG transparente, o lutador inteiro, virado para a direita, com os pés na borda de baixo e na
@@ -22,8 +23,8 @@ FONTE = os.path.join(ROOT, "android", "app", "src", "main", "java", "com", "game
 RES = os.path.join(ROOT, "android", "app", "src", "main", "res", "drawable-nodpi")
 SAIDA = os.path.join(ROOT, "android", "app", "src", "main", "assets", "historia", "torneio", "versus")
 
-# Pixels da imagem por pixel do mundo (o pixelScale dos sprites grandes); os de 1.0 dobram.
-DENSIDADE = 2.0
+# Pixels da imagem por pixel do mundo (a da tela de versus, igual à das ilustrações).
+DENSIDADE = 4.0
 # Código do retrato (pNN) -> pack de luta.
 PACKS = {"p01": "player_base", **{"p%02d" % i: "p%02d" % i for i in range(2, 17)}}
 
