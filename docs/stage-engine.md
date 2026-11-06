@@ -169,7 +169,9 @@ chão com `"projecao": {"topo", "base", "x"}` (onde a imagem fica na tela de rep
 do chão pega o pixel que a câmera de repouso vê ali. Parada, a tela é a pintura sem deformar;
 andando, cada faixa do chão anda na velocidade da sua profundidade e encontra a parede na junção.
 O horizonte sai do anel do chão (um círculo em volta dos lutadores). Com a malha
-(`drawImageStrip`) o chão é contínuo; sem ela, faixas de 2 px. Fora da pintura, a cópia espelhada.
+(`drawImageStrip`) o chão é contínuo; sem ela, faixas de 1 px. Fora da pintura, a cópia espelhada.
+Mais perto que o pé da imagem (câmera bem aberta num canto: a câmera de repouso nem alcança
+esse chão), repete a última linha em vez de deixar o fundo aparecer embaixo.
 `"chaoNaPintura": true` (sem `chao`): o chão já está pintado numa camada e o motor não desenha o
 chão liso por cima.
 

@@ -1164,6 +1164,12 @@ public final class StageScene {
         float k = (proj[1] - proj[0]) * VH / imgH;          // px da tela de repouso por px da imagem
         float x0 = proj[2] * VW - imgW * k * 0.5f, y0 = proj[0] * VH;
         boolean malha = c.desenhaFaixas();
+        // Mais perto que o pé da pintura (câmera bem aberta num canto: a linha de baixo da tela vê
+        // um chão que a câmera de repouso nem alcança), repete a última linha da pintura em vez de
+        // deixar o fundo aparecer embaixo.
+        float zPe = rest.floorDepthAt(y0 + imgH * k - 0.5f);
+        if (Float.isNaN(zPe)) zPe = -Float.MAX_VALUE;
+        projZPe = zPe;
         if (malha) drawProjectedFloorMesh(c, rest, k, x0, y0, start, imgW, imgH);
         // Sem a malha, faixas de 1 px (com 3 a escala de lado muda de uma faixa para outra e as
         // linhas diagonais saem em serrilha quando a câmera não está no repouso). Com a malha, as
@@ -1173,6 +1179,8 @@ public final class StageScene {
             float sy1 = Math.min(VH + 1f, sy0 + passo);
             float zTop = camera.floorDepthAt(sy0), zBottom = camera.floorDepthAt(sy1);
             if (Float.isNaN(zTop) || Float.isNaN(zBottom)) continue;
+            zTop = Math.max(zTop, zPe);
+            zBottom = Math.max(zBottom, zPe);
             float v0 = (rest.screenY(world.groundY, zTop) - y0) / k;
             float v1 = (rest.screenY(world.groundY, zBottom) - y0) / k;
             if (v1 <= 0f || v0 >= imgH) continue;
@@ -1211,6 +1219,9 @@ public final class StageScene {
         }
     }
 
+    /** Profundidade do pé da pintura do chão projetado (mais perto que isso repete a última linha). */
+    private float projZPe = -Float.MAX_VALUE;
+
     /** Linhas da malha do chão projetado (reaproveitadas). */
     private float[] projXY = new float[0], projUV = new float[0];
 
@@ -1230,6 +1241,7 @@ public final class StageScene {
         for (float y = start; linhas < max; y = Math.min(VH + 1f, y + FLOOR_STRIP)) {
             float z = camera.floorDepthAt(y);
             if (!Float.isNaN(z)) {
+                z = Math.max(z, projZPe);
                 float v = clamp((rest.screenY(world.groundY, z) - y0) / k, 0f, imgH);
                 float uL = (rest.screenX(camera.worldX(0f, z), z) - x0) / k;
                 float uR = (rest.screenX(camera.worldX(VW, z), z) - x0) / k;

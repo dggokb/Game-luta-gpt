@@ -108,3 +108,26 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
     horizonte), como um plano que chega perto da câmera; o chão acaba no pé dela. O anel
     vermelho (z ≈ 500) continua com chão atrás. A borda com a cor do fundo e a névoa nas
     montanhas acompanham a arena aproximada.
+14. **Plano do meio** (`prompt_11_meio_verde.txt`, `--meio-verde`): entre a arena e as montanhas
+    não havia nada (a plateia colada em montanhas lá longe). O Codex pinta, sobre verde chapado,
+    colinas com mata de outono, pinheiros, pagodes e uma torre de vigia na névoa
+    (`10_meio_verde_2x.webp`, já com o Real-ESRGAN x2). Recortado pelo próprio verde, vira a
+    camada `meio` a 2000 (`--prof-meio`), com a silhueta 45 px acima da plateia na tela de
+    repouso (`--meio-acima`), largura da tela, repetida espelhada. A borda da arena também pega a
+    cor dele.
+15. **Chão sem o degrau da esquerda** (`prompt_12_sem_meio_fio.txt`): o chão alargado tinha um
+    meio-fio curvo à esquerda que, com a câmera no canto, virava faixas escuras esticadas. O
+    Codex repinta a faixa como piso liso e ela volta para o `8_chao_largo.webp` (Real-ESRGAN,
+    mistura suave na borda). O chão ganha mais 35% embaixo (espelhado) e o motor repete a última
+    linha se a câmera vir um chão ainda mais perto.
+
+Os argumentos completos da Arena hoje:
+
+```
+--tela-px 2048 --centro 2048 --chao 883.14 --juncao 645.51 --horizonte 0.4542 --ceu-extra 600 \
+--aproximar 0.7 --fundo 4_fundo_sem_arena_4096.webp --mascara 5_mascara_arena_4096.png \
+--ceu 7_ceu_4096.webp --mascara-ceu 6_mascara_ceu_4096.png --montanhas-verde 9_montanhas_verde_4096.png \
+--meio-verde 10_meio_verde_2x.webp --prof-fundo 4000 --prof-ceu 12000 --zoom 0.8 --chao-largo 8_chao_largo.webp
+```
+
+(as imagens em `art/stages/arena_pintura/`; depois, `tools/stage/animar_pintura.py`).

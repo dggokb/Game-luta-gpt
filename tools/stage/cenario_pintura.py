@@ -80,15 +80,57 @@ def limpar_borda(rgb, alfa):
     return out
 
 
-def fundo_composto(saida, W, altura, fuga=(0.0, 0.0), sp=1.0):
-    """O céu com as montanhas por cima, como aparecem atrás de cada pixel da arena na câmera de
-    repouso (com a arena aproximada ``sp`` vezes em volta do ponto de fuga)."""
+def plano_do_meio(a, y_silhueta, nevoa):
+    """O plano do meio (--meio-verde) recortado pelo próprio verde: mata, colinas e telhados entre
+    a arena e as montanhas. A silhueta (a mediana do topo, coluna a coluna) fica em ``y_silhueta``
+    na tela de repouso; a largura da imagem é a da tela (repete espelhada para os lados).
+    Devolve (camada, imagem RGBA, y do topo na tela de repouso)."""
+    mv = Image.open(a.meio_verde).convert('RGB')
+    LW = 2048
+    mv = np.asarray(mv.resize((LW, round(mv.height * LW / mv.width)), Image.LANCZOS))
+    cor, alfa = chave_verde(mv)
+    alfa[:6] = 0
+    # Um pouco da névoa do pôr do sol (está mais longe que a arena) e o verde que sobrar some.
+    cor = cor * 0.9 + nevoa * 0.1
+    linhas = np.where(alfa.max(1) > 0.5)[0]
+    y0 = max(0, int(linhas[0]) - 4)
+    cor, alfa = cor[y0:], alfa[y0:]
+    topo_col = np.argmax(alfa > 0.5, axis=0)
+    sil = float(np.median(topo_col))
+    esc = VW / LW                                   # px da tela de repouso por px da imagem
+    topo = y_silhueta - sil * esc
+    base = topo + alfa.shape[0] * esc
+    rgba = np.dstack([np.clip(cor, 0, 255), alfa * 255]).astype(np.uint8)
+    img = Image.fromarray(rgba, 'RGBA')
+    img.save(os.path.join(a.saida, 'meio.webp'), quality=90, alpha_quality=100, method=6)
+    print(f"plano do meio: silhueta em y={y_silhueta:.0f} (tela de repouso), {img.size[0]}x{img.size[1]}")
+    camada = {"id": "meio", "imagem": "meio.webp", "profundidade": a.prof_meio,
+              "topo": round(topo / VH, 4), "base": round(base / VH, 4), "x": 0.5, "repetir": "espelhar"}
+    return camada, img, topo
+
+
+def fundo_composto(saida, W, altura, fuga=(0.0, 0.0), sp=1.0, meio=None):
+    """O céu com as montanhas (e o plano do meio) por cima, como aparecem atrás de cada pixel da
+    arena na câmera de repouso (com a arena aproximada ``sp`` vezes em volta do ponto de fuga).
+    ``meio``: (imagem, linha do topo na pintura, largura na pintura, coluna do meio)."""
     import cv2
     ceu = Image.open(os.path.join(saida, 'ceu.jpg')).convert('RGB')
     mont = Image.open(os.path.join(saida, 'montanhas.webp')).convert('RGBA')
     exc = ceu.height - mont.height
     f = ceu.copy()
     f.paste(mont, (0, exc), mont)
+    if meio is not None:
+        img, linha, larg, centro = meio
+        img = img.resize((round(larg), round(img.height * larg / img.width)), Image.LANCZOS)
+        esp = img.transpose(Image.FLIP_LEFT_RIGHT)
+        x = centro - larg / 2
+        while x > 0:
+            x -= larg
+        i = round((centro - larg / 2 - x) / larg)
+        while x < W:
+            f.paste(img if i % 2 == 0 else esp, (round(x), round(linha) + exc), img if i % 2 == 0 else esp)
+            x += larg
+            i += 1
     f = np.asarray(f).astype(np.float32)
     fx, fy = fuga
     # Pixel p da arena -> o fundo em fuga + (p - fuga) * sp (mais a faixa de céu em cima).
@@ -279,6 +321,11 @@ def main():
     ap.add_argument('--anel-longe', type=float, default=980)
     ap.add_argument('--anel-meia', type=float, default=1500)
     ap.add_argument('--juncao', type=float, default=872)
+    ap.add_argument('--meio-verde', default=None,
+                    help='plano do meio (colinas, mata, vila) pintado sobre verde chapado: entre a arena e as montanhas')
+    ap.add_argument('--prof-meio', type=float, default=2000)
+    ap.add_argument('--meio-acima', type=float, default=45,
+                    help='quanto (px da tela de repouso) a silhueta do plano do meio aparece acima da plateia')
     ap.add_argument('--aproximar', type=float, default=1.0,
                     help='a arena (parede) numa fração da profundidade da junção (1 = onde a pintura põe; '
                          'menor = mais perto e maior, e o chão acaba antes)')
@@ -372,7 +419,14 @@ def main():
         fundo_atras = None
         if a.ceu and a.montanhas_verde:
             camadas.extend(ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena, fuga, sp))
-            fundo_atras = fundo_composto(a.saida, W, base_px, fuga, sp)
+            meio = None
+            if a.meio_verde:
+                fr = alfa_arena.mean(1)
+                pe = int(np.argmax(fr > 0.6)) if (fr > 0.6).any() else base_px
+                meio = plano_do_meio(a, tela_y_parede(pe) - a.meio_acima, nevoa)
+                camadas.append(meio[0])
+            fundo_atras = fundo_composto(a.saida, W, base_px, fuga, sp,
+                                         None if meio is None else (meio[1], (meio[2] - GY) / k + a.chao, VW / k, centro))
         par = Image.fromarray(relevo(par, alfa_arena, W, fundo_atras), 'RGBA')
         # PNG (sem perda): a WebP com perda e transparência saía com blocos de céu no celular.
         par.save(os.path.join(a.saida, 'parede.png'), optimize=True)
@@ -412,6 +466,10 @@ def main():
         larga = Image.open(a.chao_largo).convert('RGB')
         fonte_chao = larga.resize((round(larga.width * H / larga.height), H), Image.LANCZOS)
     chao = np.asarray(fonte_chao.crop((0, cy0, fonte_chao.width, H))).astype(np.float32)
+    # Com a câmera aberta num canto, a linha de baixo da tela via um chão mais perto que o fim da
+    # pintura (sobrava uma faixa roxa embaixo): mais 35% de chão, espelhado (fica sob o HUD).
+    mais = int((H - cy0) * 0.35)
+    chao = np.concatenate([chao, chao[::-1][:mais]], 0)
     hc = chao.shape[0]
     rows = np.arange(hc) + cy0
     n = np.clip((a.chao - rows) / max(1, a.chao - a.juncao), 0, 1)[:, None, None] ** 1.5 * 0.16
@@ -435,7 +493,7 @@ def main():
         "camadas": camadas,
         "chao": {"imagem": "chao.jpg", "perto": -3000, "longe": round(zp, 1), "ate": round(zp, 1),
                  "reflexoLuzes": 0,
-                 "projecao": {"topo": round(tela_y(cy0) / VH, 4), "base": round(tela_y(H) / VH, 4),
+                 "projecao": {"topo": round(tela_y(cy0) / VH, 4), "base": round(tela_y(H + mais) / VH, 4),
                               "x": round(x_frac, 4)}},
     }
     with open(os.path.join(a.saida, 'stage.json'), 'w') as fh:

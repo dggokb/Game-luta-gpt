@@ -1,0 +1,14 @@
+The attached image (referencia.png, 1672x941) is a painted background of a fighting game arena: a sunset sky, distant purple mountains, and in front the stone stadium with the crowd and banners, lit by a low sun at the back left.
+
+Create a NEW image file named meio_verde.png, exactly 1672x941 pixels, in the SAME painting style, palette and lighting as the reference (anime / painterly fighting-game background, warm sunset back light from the upper left, purple shadows, soft atmospheric haze).
+
+Content of meio_verde.png: ONLY a middle-ground band of scenery that would stand BETWEEN the stadium and the far mountains, seen from the same camera:
+- rolling forested hills with tall dark pines and a few autumn trees (orange/red), tops catching a warm rim light from the sunset;
+- a few distant pagoda-style roofs, a small watchtower and tiny warm lantern lights of a village nestled among the trees, slightly silhouetted;
+- soft golden-pink mist drifting at the bottom of the band.
+The band's TOP edge is an irregular natural silhouette (tree tops, hills, roofs) that varies between about y=330 and y=470. Below the silhouette the scenery continues solid all the way down to the bottom edge of the image (y=941), getting a bit hazier near the bottom.
+It must be seamless horizontally in feeling (no single big object at the left or right edges), and slightly hazy and lower contrast than the stadium (it is farther away), but sharper and more saturated than the far mountains.
+
+EVERYTHING ABOVE the band's silhouette (where sky and far mountains would be) must be pure flat chroma green #00FF00, with crisp edges and no green spill on the scenery. Do NOT draw the stadium, the crowd, the sky, the sun or the far mountains. No text, no characters.
+
+Save the result as meio_verde.png in the current directory.

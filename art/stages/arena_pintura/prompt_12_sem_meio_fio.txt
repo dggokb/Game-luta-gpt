@@ -1,0 +1,8 @@
+The attached image canvas.png (1672x941) is part of a painted fighting-game arena floor at sunset: large cracked stone floor tiles in perspective, a red and gold ring on the right, the stadium wall with fire braziers at the top.
+
+There is a flat gray (#808080) area. Paint ONLY inside the gray area, keep every other pixel exactly as it is.
+
+Inside the gray area, continue the SAME flat stone floor seamlessly from both sides: the same tile size, cracks, warm sunset light streaks and perspective, so it reads as one continuous flat paved floor. Where the gray touches the wall at the very top, continue the wall base and floor naturally.
+Do NOT paint any curb, step, raised edge, border, stairs, ring or line along the gray shape: the floor must be completely flat and level there. No new objects, no text.
+
+Save the result as sem_meio_fio.png (same size, 1672x941) in the current directory.
