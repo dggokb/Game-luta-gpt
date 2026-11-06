@@ -1840,13 +1840,13 @@
     "perto": -3000,
     "longe": 1734.7,
     "ate": 1734.7,
-    "reflexoLuzes": 0.55,
+    "reflexoLuzes": 0.5,
     "projecao": {
       "topo": 0.5236,
       "base": 1.2675,
       "x": 0.5
     },
     "reflexoLutadores": 0.22,
-    "reflexoComprimento": 0.85
+    "reflexoComprimento": 0.5
   }
 }

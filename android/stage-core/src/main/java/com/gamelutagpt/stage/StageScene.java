@@ -1505,11 +1505,16 @@ public final class StageScene {
         if (len > 0f && sy < VH) {
             // O risco do chão encerado: vertical na tela (desce na direção de quem olha), largo e
             // fraco por fora, estreito e forte no miolo, sumindo para baixo.
+            // Três faixas que encolhem e somem cada vez antes: o risco afina e apaga para a frente,
+            // sem borda reta (uma faixa larga do mesmo tamanho até embaixo parecia uma coluna).
             float bottom = sy + (VH + 40f - sy) * len;
             int a = Math.round(255f * strength * pulse);
-            float w = radius * 0.9f;
-            c.fillVerticalGradient(sx - w, sy, sx + w, bottom, withAlpha(color, a / 3), withAlpha(color, 0));
-            c.fillVerticalGradient(sx - w * 0.35f, sy, sx + w * 0.35f, bottom, withAlpha(color, a * 2 / 3), withAlpha(color, 0));
+            float w = radius * 0.5f;
+            for (int k = 0; k < 3; k++) {
+                float ww = w * (1f - 0.3f * k);
+                float bb = sy + (bottom - sy) * (1f - 0.25f * k);
+                c.fillVerticalGradient(sx - ww, sy, sx + ww, bb, withAlpha(color, a / 3), withAlpha(color, 0));
+            }
         }
     }
 

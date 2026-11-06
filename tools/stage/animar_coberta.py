@@ -250,8 +250,8 @@ def main():
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("fachos-")] + camadas_fachos
 
     stage["chao"]["reflexoLutadores"] = 0.22
-    stage["chao"]["reflexoLuzes"] = 0.55
-    stage["chao"]["reflexoComprimento"] = 0.85
+    stage["chao"]["reflexoLuzes"] = 0.5
+    stage["chao"]["reflexoComprimento"] = 0.5
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"telão {parede['telao']}, plateia com {len(flashes)} flashes, {len(parede['luzes'])} holofotes, "
           f"{nfachos} fachos, {len(novas)} pontas curvas")
