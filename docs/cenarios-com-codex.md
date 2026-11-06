@@ -170,4 +170,5 @@ python3 tools/stage/animar_coberta.py
    embaixo dos lutadores). A junção chão/barreira fica em z ≈ 1735.
 4. **Animação** (`tools/stage/animar_coberta.py`): a tela do telão vira o `"telao"` da camada (a
    luta ao vivo e o replay do `TelaoLuta`), a plateia pula com flashes (sem o telão e a treliça),
-   os 40 holofotes maiores do teto pulsam, e o chão encerado reflete os lutadores.
+   cada spot do teto ganha um brilho pulsando em cima da lâmpada (achados no panorama original,
+   sem o escurecimento de cima, e um por lâmpada), e o chão encerado reflete os lutadores.

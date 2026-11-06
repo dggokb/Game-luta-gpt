@@ -29,23 +29,37 @@ PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/arena_coberta"
 EXTRA = 500                                   # --ceu-extra do cenario_pintura.py
 TELA = (1785, 227, 2238, 400)                 # a tela azul do telão (x0, y0, x1, y1) no panorama
 PLATEIA = (250, 455)                          # faixa das arquibancadas (linhas do panorama)
-MAX_LUZES = 40
+MAX_LUZES = 70
+SEPARA = 38                                   # px do panorama: mais perto, é a mesma lâmpada
+TETO = 300                                    # só as lâmpadas acima desta linha do panorama (o teto)
+PANORAMA = AQUI.parents[1] / "art/stages/arena_coberta/2_panorama_4096.webp"
 
 
-def holofotes(img):
-    """Os holofotes do teto: pontos brancos-amarelados no alto, os maiores primeiro."""
-    h, w = img.shape[:2]
-    mn = img[..., :3].min(axis=2)
-    m = (mn > 225).astype(np.uint8)
-    m[:EXTRA] = 0
-    m[EXTRA + 300:] = 0
-    m = cv2.dilate(m, np.ones((5, 5), np.uint8))
+def holofotes(w, h):
+    """Os spots do teto: as lâmpadas (branco-amarelado forte) no alto do panorama original (na
+    parede o alto está escurecido e as da fileira de cima sumiam). Uma luz por spot: as que ficam
+    a menos de SEPARA px de uma maior são a mesma lâmpada."""
+    pan = np.asarray(Image.open(PANORAMA).convert("RGB")).astype(np.int16)
+    sx = w / pan.shape[1]
+    mn = pan.min(axis=2)
+    m = ((mn > 215) & (pan[..., 0] > 240)).astype(np.uint8)
+    m[TETO:] = 0
+    m[:, int(TELA[0] - 40):int(TELA[2] + 40)][TELA[1] - 10:] = 0       # o telão e as lâmpadas dele
+    m = cv2.morphologyEx(m, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     n, _, st, cen = cv2.connectedComponentsWithStats(m, 8)
-    achados = sorted([(st[i, cv2.CC_STAT_AREA], st[i], cen[i]) for i in range(1, n) if st[i, cv2.CC_STAT_AREA] >= 40],
-                     key=lambda t: -t[0])[:MAX_LUZES]
-    return [{"x": round(float(c[0] / w), 4), "y": round(float(c[1] / h), 4),
-             "raio": round(float(max(s[2], s[3]) * 1.6 / h), 4), "cor": "#FFE8B8", "pulsar": 0.05,
-             "reflexo": False} for _, s, c in achados]
+    achados = sorted([(st[i, cv2.CC_STAT_AREA], st[i], cen[i]) for i in range(1, n)
+                      if st[i, cv2.CC_STAT_AREA] >= 25 and st[i, 2] < 4 * st[i, 3] + 8],
+                     key=lambda t: -t[0])
+    luzes = []
+    for _, s_, c in achados:
+        if any(np.hypot(c[0] - x, c[1] - y) < SEPARA for x, y, _ in luzes):
+            continue
+        luzes.append((c[0], c[1], max(s_[2], s_[3])))
+        if len(luzes) >= MAX_LUZES:
+            break
+    return [{"x": round(float(x * sx / w), 4), "y": round(float((y + EXTRA) / h), 4),
+             "raio": round(float(max(10, r * 1.5) / h), 4), "cor": "#FFE8B8", "pulsar": 0.05,
+             "reflexo": False} for x, y, r in sorted(luzes)]
 
 
 def main():
@@ -73,7 +87,7 @@ def main():
     flashes = pontos_plateia.pontos(pasta / "parede_plateia.webp", topo, base, 220, 11)
     parede["plateia"] = [{"topo": round(topo, 4), "base": round(base, 4), "mascara": "parede_plateia.webp",
                           "pulo": 0.003, "colunas": 200, "flashes": flashes}]
-    parede["luzes"] = holofotes(img)
+    parede["luzes"] = holofotes(w, h)
 
     stage["chao"]["reflexoLutadores"] = 0.22
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

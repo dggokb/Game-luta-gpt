@@ -949,105 +949,17 @@
       ],
       "luzes": [
         {
-          "x": 0.7369,
-          "y": 0.5542,
-          "raio": 0.0311,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8472,
-          "y": 0.5873,
-          "raio": 0.0295,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.2972,
-          "y": 0.5933,
-          "raio": 0.0264,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8285,
-          "y": 0.6213,
-          "raio": 0.028,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.9638,
-          "y": 0.6925,
-          "raio": 0.028,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.2154,
-          "y": 0.5505,
-          "raio": 0.028,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.7025,
-          "y": 0.5932,
-          "raio": 0.0249,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.6304,
-          "y": 0.6807,
-          "raio": 0.0249,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.3688,
-          "y": 0.6807,
-          "raio": 0.0249,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
           "x": 0.014,
-          "y": 0.679,
-          "raio": 0.0217,
+          "y": 0.6788,
+          "raio": 0.016,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.1281,
-          "y": 0.5466,
-          "raio": 0.028,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8089,
-          "y": 0.65,
-          "raio": 0.0233,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1492,
-          "y": 0.5797,
-          "raio": 0.0233,
+          "x": 0.0503,
+          "y": 0.7042,
+          "raio": 0.0146,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
@@ -1055,7 +967,87 @@
         {
           "x": 0.0718,
           "y": 0.5632,
-          "raio": 0.0233,
+          "raio": 0.016,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.0819,
+          "y": 0.591,
+          "raio": 0.0131,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.0944,
+          "y": 0.6182,
+          "raio": 0.0117,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.0978,
+          "y": 0.4961,
+          "raio": 0.032,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.1281,
+          "y": 0.5463,
+          "raio": 0.0204,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.1492,
+          "y": 0.5796,
+          "raio": 0.016,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.1794,
+          "y": 0.6219,
+          "raio": 0.0146,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.1806,
+          "y": 0.4959,
+          "raio": 0.0335,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.1968,
+          "y": 0.6415,
+          "raio": 0.0131,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.2153,
+          "y": 0.5506,
+          "raio": 0.0218,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.2205,
+          "y": 0.6665,
+          "raio": 0.0102,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
@@ -1063,167 +1055,151 @@
         {
           "x": 0.2426,
           "y": 0.587,
-          "raio": 0.0249,
+          "raio": 0.0175,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.3413,
-          "y": 0.6522,
-          "raio": 0.0202,
+          "x": 0.2589,
+          "y": 0.4994,
+          "raio": 0.0262,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.6588,
-          "y": 0.6522,
-          "raio": 0.0202,
+          "x": 0.2972,
+          "y": 0.5933,
+          "raio": 0.0189,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.7903,
-          "y": 0.6736,
-          "raio": 0.0202,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.3735,
-          "y": 0.685,
-          "raio": 0.0202,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.6245,
-          "y": 0.6861,
-          "raio": 0.0202,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1793,
-          "y": 0.6218,
-          "raio": 0.0217,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.7534,
-          "y": 0.7081,
-          "raio": 0.0202,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1968,
-          "y": 0.6416,
-          "raio": 0.0202,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0817,
-          "y": 0.5911,
-          "raio": 0.0186,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.6759,
-          "y": 0.6393,
-          "raio": 0.0186,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0504,
-          "y": 0.7039,
-          "raio": 0.0202,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0943,
-          "y": 0.6184,
-          "raio": 0.0186,
+          "x": 0.3062,
+          "y": 0.5136,
+          "raio": 0.0189,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
           "x": 0.3241,
-          "y": 0.6389,
-          "raio": 0.0186,
+          "y": 0.6392,
+          "raio": 0.0117,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.2205,
-          "y": 0.6666,
-          "raio": 0.0171,
+          "x": 0.3358,
+          "y": 0.5149,
+          "raio": 0.0233,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.6435,
-          "y": 0.6699,
-          "raio": 0.0186,
+          "x": 0.3413,
+          "y": 0.6521,
+          "raio": 0.0131,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.7744,
-          "y": 0.6883,
-          "raio": 0.0171,
+          "x": 0.3688,
+          "y": 0.6807,
+          "raio": 0.0175,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.5741,
+          "x": 0.3693,
+          "y": 0.5156,
+          "raio": 0.0262,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.3908,
+          "y": 0.6904,
+          "raio": 0.0097,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.392,
+          "y": 0.5162,
+          "raio": 0.0189,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.4135,
+          "y": 0.5168,
+          "raio": 0.0204,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.4248,
+          "y": 0.6723,
+          "raio": 0.0097,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.4555,
+          "y": 0.5167,
+          "raio": 0.0175,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.4912,
+          "y": 0.5167,
+          "raio": 0.0218,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.5099,
+          "y": 0.5167,
+          "raio": 0.0204,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.5442,
+          "y": 0.5168,
+          "raio": 0.0189,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.574,
           "y": 0.6725,
-          "raio": 0.0155,
+          "raio": 0.0102,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.3778,
-          "y": 0.6864,
-          "raio": 0.0155,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.3907,
-          "y": 0.6902,
-          "raio": 0.0155,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.6088,
-          "y": 0.6902,
-          "raio": 0.0155,
+          "x": 0.5858,
+          "y": 0.5167,
+          "raio": 0.0204,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
@@ -1231,39 +1207,183 @@
         {
           "x": 0.5949,
           "y": 0.7001,
-          "raio": 0.0155,
+          "raio": 0.0097,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.2371,
-          "y": 0.6839,
-          "raio": 0.0171,
+          "x": 0.6075,
+          "y": 0.5165,
+          "raio": 0.0189,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.1169,
-          "y": 0.6528,
-          "raio": 0.0171,
+          "x": 0.6088,
+          "y": 0.6903,
+          "raio": 0.0097,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.4039,
-          "y": 0.6999,
-          "raio": 0.014,
+          "x": 0.6301,
+          "y": 0.5157,
+          "raio": 0.0248,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
         },
         {
-          "x": 0.4248,
-          "y": 0.6724,
-          "raio": 0.014,
+          "x": 0.6304,
+          "y": 0.6807,
+          "raio": 0.0189,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.6436,
+          "y": 0.6697,
+          "raio": 0.0102,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.6589,
+          "y": 0.6522,
+          "raio": 0.0131,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.664,
+          "y": 0.5153,
+          "raio": 0.0233,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.6759,
+          "y": 0.6392,
+          "raio": 0.0117,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.6952,
+          "y": 0.514,
+          "raio": 0.0175,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7024,
+          "y": 0.5933,
+          "raio": 0.0189,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7369,
+          "y": 0.5541,
+          "raio": 0.0233,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7534,
+          "y": 0.7079,
+          "raio": 0.0131,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7612,
+          "y": 0.5236,
+          "raio": 0.0306,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7746,
+          "y": 0.6885,
+          "raio": 0.0102,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7876,
+          "y": 0.5259,
+          "raio": 0.0277,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.7903,
+          "y": 0.6737,
+          "raio": 0.016,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.8089,
+          "y": 0.65,
+          "raio": 0.016,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.8286,
+          "y": 0.6213,
+          "raio": 0.0218,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.8472,
+          "y": 0.5874,
+          "raio": 0.0218,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.8757,
+          "y": 0.5256,
+          "raio": 0.0306,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.955,
+          "y": 0.508,
+          "raio": 0.0277,
+          "cor": "#FFE8B8",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.9638,
+          "y": 0.6921,
+          "raio": 0.0233,
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
