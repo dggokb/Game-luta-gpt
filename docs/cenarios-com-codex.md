@@ -258,3 +258,29 @@ python3 tools/stage/cenario_pintura.py $A/7_panorama_oval_4096.webp $D --tela-px
   --extra $A/stage_extra.json --chao-largo $A/7_chao_fosco_4096.webp
 python3 tools/stage/animar_coberta.py
 ```
+
+## Dojo da Yin Lu (`stages/dojo_yinlu`)
+
+O mesmo caminho da Arena Coberta refeita, com o concept novo do pátio do 連武館
+(`art/stages/dojo_yinlu/`):
+
+1. `prompt_1_limpar.txt`: o concept sem lutadores, HUD e botões, com céu e pátio completados →
+   `1_limpo.png`.
+2. `prompt_2_patio_inteiro.txt`: o pátio inteiro numa imagem só, com o limpo no meio como guia, fechado
+   nos lados por galerias cobertas (os pilares vermelhos com bandeiras e lanternas ficam nelas) →
+   `2_patio_b.png` (a versão escolhida; a A tinha as galerias vindo até a câmera, abaixo da base da
+   mureta, e o chão projetado as esticaria).
+3. Real-ESRGAN x2 e 4096 → `3_panorama_4096.webp`.
+4. Montagem (a escala pelo portão, que ocupa 38% da tela como no concept; o horizonte pelo emblema
+   do chão; a junção na base das galerias, abaixo da escada, para a base delas ficar na parede):
+
+```
+D=android/app/src/main/assets/stages/dojo_yinlu; A=art/stages/dojo_yinlu
+python3 tools/stage/cenario_pintura.py $A/3_panorama_4096.webp $D --tela-px 2900 --centro 2046 \
+  --chao 1506 --anel-longe 1455 --anel-meia 156 --juncao 1432 --ceu-extra 300 --nitida \
+  --cor-acima '#1F6FE0' --nevoa '#CFE3F5' --zoom 0.8 --zoom-repouso 0.948 \
+  --nome 'Dojo Liánwǔguǎn' --extra $A/stage_extra.json
+```
+
+(e tirar a `poeira` que o script põe: de dia, as folhas caindo do `stage_extra.json` bastam).
+O cenário antigo em camadas (`tools/stage/montar_yinlu.py`) saiu.

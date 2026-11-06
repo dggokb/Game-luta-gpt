@@ -1,0 +1,7 @@
+{
+  "corFundo": "#2F7BE0",
+  "luzLutadores": {"cor": "#FFF0D4", "forca": 0.1, "brilho": 1.03, "pes": "#E8E4DC",
+                   "contraluz": {"cor": "#FFE8C0", "forca": 0.6, "direcao": [1, -1]}},
+  "sombraLutadores": {"alfa": 0.5, "cor": "#2A2418", "suave": 0.5, "x": 0.25, "y": 0.18},
+  "petalas": {"quantidade": 40, "cor": "#7FC24A", "perto": -350, "longe": 1600, "vento": 50, "queda": 60, "tamanho": 7}
+}
