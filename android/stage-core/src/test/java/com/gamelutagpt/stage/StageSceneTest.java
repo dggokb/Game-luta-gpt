@@ -101,6 +101,27 @@ public class StageSceneTest {
     }
 
     @Test
+    public void camadaCurvaVemEmFatiasNaProfundidadeDeCadaColuna() throws IOException {
+        // Ponta da arquibancada: a coluna da esquerda bem mais perto que a da direita.
+        String json = "{\"nome\": \"T\", \"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 1500,"
+            + " \"topo\": 0.2, \"base\": 0.6, \"curva\": [[0, 600], [0.5, 1500], [1, 1500]],"
+            + " \"onda\": {\"amplitude\": 1, \"velocidade\": 2}}]}";
+        StageDefinition def = StageDefinition.fromJson(json);
+        StageDefinition.Layer layer = def.layers.get(0);
+        assertEquals(600f, layer.sortDepth(), 0f);
+        assertEquals(1050f, layer.curveDepth(0.25f), 0.01f);
+        assertEquals(1500f, layer.curveDepth(0.9f), 0f);
+        assertEquals(1f, layer.waveAmp, 0f);
+        StageScene scene = new StageScene(StagePack.load(new FakeAssets(json), "stages/t"), WORLD);
+        CountingCanvas canvas = new CountingCanvas();
+        scene.drawBackground(canvas);
+        assertTrue("várias fatias", canvas.regions > 3);
+        // Na câmera de repouso a pintura aparece igual: topo e base onde o stage.json diz.
+        assertEquals(0.2f * StageWorld.VH, canvas.lastImageTop, 0.5f);
+        assertEquals(0.6f * StageWorld.VH, canvas.lastImageBottom, 0.5f);
+    }
+
+    @Test
     public void zoomRepousoDescreveAsCamadasNaCameraDaLuta() throws IOException {
         // Uma camada que vai do horizonte ao chão na câmera de zoom 0,95: com a câmera da luta
         // nesse zoom (o chão no mesmo lugar da tela), ela aparece onde o stage.json diz.

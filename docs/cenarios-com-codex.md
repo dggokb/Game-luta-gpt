@@ -153,7 +153,7 @@ caminho, mais curto (não tem céu nem montanhas):
 ```
 python3 tools/stage/cenario_pintura.py art/stages/arena_coberta/2_panorama_4096.webp \
   android/app/src/main/assets/stages/arena_coberta --tela-px 2048 --centro 2048 --chao 798 \
-  --juncao 520 --horizonte 0.3786 --ceu-extra 500 --nitida --cor-acima '#0E0E1A' --nevoa '#2A2030' \
+  --juncao 520 --parede-ate 700 --horizonte 0.3786 --ceu-extra 500 --nitida --cor-acima '#0E0E1A' --nevoa '#2A2030' \
   --zoom 0.8 --zoom-repouso 0.948 --nome 'Arena Coberta' --extra art/stages/arena_coberta/stage_extra.json
 python3 tools/stage/animar_coberta.py
 ```
@@ -170,5 +170,13 @@ python3 tools/stage/animar_coberta.py
    embaixo dos lutadores). A junção chão/barreira fica em z ≈ 1735.
 4. **Animação** (`tools/stage/animar_coberta.py`): a tela do telão vira o `"telao"` da camada (a
    luta ao vivo e o replay do `TelaoLuta`), a plateia pula com flashes (sem o telão e a treliça),
+   fachos de luz saindo de 10 spots da fileira de cima, varrendo devagar (duas imagens com os
+   fachos em ângulos diferentes, ±7°, e `"onda"` em fase oposta: barato, duas imagens por quadro),
    cada spot do teto ganha um brilho pulsando em cima da lâmpada (achados no panorama original,
    sem o escurecimento de cima, e um por lâmpada), e o chão encerado reflete os lutadores.
+5. **Os lados fechando** (estádio): a pintura estendida curva a barreira e a arquibancada para
+   perto da câmera nas pontas, mas a parede era um plano só, na profundidade da junção do meio; a
+   base curva virava chão esticado. `--parede-ate 700` deixa as linhas de baixo na parede, e o
+   `animar_coberta.py` acha a base da barreira coluna a coluna e faz das pontas as camadas
+   `parede-esq` e `parede-dir` com `"curva"` (cada coluna na profundidade da sua base, sem a
+   parte de baixo: ali aparece o chão projetado). No meio reto, a parede plana continua.

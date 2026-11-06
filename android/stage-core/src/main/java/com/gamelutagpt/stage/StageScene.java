@@ -42,6 +42,9 @@ public final class StageScene {
         final float top, bottom, width, firstCenterX, period;
         /** Com {@code apoio}: y do mundo, na profundidade do apoio, onde fica a base. */
         float supportBaseY = Float.NaN;
+        /** Camada curva: os cortes das fatias (u) e a ordem de desenho (de trás para a frente). */
+        float[] curveCuts;
+        int[] curveOrder;
         /** Água com reflexo do sol: x do sol no mundo, na profundidade do céu. */
         float sunWorldX = Float.NaN;
         /** Imagens das bandeiras da camada, na ordem dela (null = não carregou). */
@@ -633,8 +636,73 @@ public final class StageScene {
         }
     }
 
+    /** Largura (px da imagem) das fatias da camada curva; trechos com a mesma profundidade juntam. */
+    private static final float CURVE_SLICE = 16f;
+
+    /**
+     * Camada curva ({@link StageDefinition.Layer#curveU}): em fatias verticais, cada uma na
+     * profundidade da sua coluna. A fatia vai da tela de repouso para o mundo na profundidade dela
+     * e daí para a câmera da luta; as de trás primeiro (as da frente cobrem a emenda).
+     */
+    private void drawCurvedLayer(RenderCanvas c, Placed p) {
+        StageDefinition.Layer layer = p.layer;
+        RenderImage img = p.image;
+        if (img == null) return;
+        float iw = img.width(), ih = img.height();
+        if (p.curveCuts == null) {
+            java.util.ArrayList<Float> cuts = new java.util.ArrayList<>();
+            cuts.add(0f);
+            float lastZ = layer.curveDepth(0f);
+            for (float x = CURVE_SLICE; x < iw; x += CURVE_SLICE) {
+                float z = layer.curveDepth(x / iw);
+                if (Math.abs(z - lastZ) >= 3f) {
+                    cuts.add(x / iw);
+                    lastZ = z;
+                }
+            }
+            cuts.add(1f);
+            int n = cuts.size() - 1;
+            p.curveCuts = new float[n + 1];
+            for (int i = 0; i <= n; i++) p.curveCuts[i] = cuts.get(i);
+            Integer[] order = new Integer[n];
+            for (int i = 0; i < n; i++) order[i] = i;
+            final float[] k = p.curveCuts;
+            java.util.Arrays.sort(order, (a, b) -> Float.compare(
+                layer.curveDepth((k[b] + k[b + 1]) * 0.5f), layer.curveDepth((k[a] + k[a + 1]) * 0.5f)));
+            p.curveOrder = new int[n];
+            for (int i = 0; i < n; i++) p.curveOrder[i] = order[i];
+        }
+        StageCamera rest = restCamera;
+        float rt = layer.top * VH, rb = layer.bottom * VH;
+        float wr = (rb - rt) * iw / ih;
+        float rl = layer.x * VW - wr * 0.5f;
+        int alpha = Math.round(255f * layer.alpha);
+        for (int i : p.curveOrder) {
+            float u0 = p.curveCuts[i], u1 = p.curveCuts[i + 1];
+            float z = layer.curveDepth((u0 + u1) * 0.5f);
+            float sx0 = camera.screenX(rest.worldX(rl + u0 * wr, z), z);
+            float sx1 = camera.screenX(rest.worldX(rl + u1 * wr, z), z);
+            if (sx1 < -2f || sx0 > VW + 2f) continue;
+            float sy0 = camera.screenY(rest.worldY(rt, z), z);
+            float sy1 = camera.screenY(rest.worldY(rb, z), z);
+            c.drawImageRegion(img, u0 * iw, 0f, u1 * iw, ih, sx0, sy0, sx1 + 0.75f, sy1, alpha);
+        }
+    }
+
+    /** {@code "onda"}: o alfa da camada vai e volta (duas camadas em fase oposta = um cruzamento). */
+    private float pulse(StageDefinition.Layer layer) {
+        if (layer.waveAmp <= 0f) return 1f;
+        if (!detalhe) return layer.waveLight;
+        float s = 0.5f + 0.5f * (float)Math.sin(time * layer.waveSpeed + layer.wavePhase);
+        return 1f - layer.waveAmp * s;
+    }
+
     private void drawImageLayer(RenderCanvas c, Placed p) {
         StageDefinition.Layer layer = p.layer;
+        if (layer.curveU != null) {
+            drawCurvedLayer(c, p);
+            return;
+        }
         float z = p.z;
         float scale = camera.scale(z);
         float top = camera.screenY(p.top, z);
@@ -647,7 +715,8 @@ public final class StageScene {
         float halfWidth = p.width * 0.5f * scale;
         if (layer.fillAbove != 0 && top > -10f) c.fillRect(-10f, -10f, VW + 10f, top + 1f, layer.fillAbove);
         if (bottom < 0f || top > VH) return;
-        int alpha = Math.round(255f * layer.alpha);
+        int alpha = Math.round(255f * layer.alpha * pulse(layer));
+        if (alpha <= 0) return;
 
         // Deriva: a camada anda sozinha (barcos); com repetição, dá a volta.
         float startX = p.firstCenterX + time * layer.sail;

@@ -49,6 +49,17 @@ perspectiva, o vaivém do zoom a cada pulo dava tontura.
 lugar da câmera de repouso do jogo (1,24), com o chão no mesmo lugar da tela. Para um cenário
 pintado a partir de uma tela da luta: com a câmera da luta nesse zoom, a pintura aparece igual.
 
+**Camada curva** (`"curva": [[u, profundidade], ...]` numa camada `imagem`): a camada não é um
+plano; cada coluna (u = fração da largura) fica na sua profundidade, interpolada. Desenhada em
+fatias verticais (16 px), de trás para a frente. Parada, a tela é igual à pintura; andando, cada
+fatia anda na velocidade da sua profundidade. Para a arquibancada que dá a volta na arena e chega
+perto da câmera nas pontas. Sem repetição, bandeiras, plateia ou telão.
+
+**Onda** (`"onda": {"amplitude", "velocidade", "fase", "leve"}`): o alfa da camada vai de 1 a
+1 − amplitude e volta. Duas camadas com a mesma luz pintada em ângulos diferentes, em fase oposta,
+cruzam uma na outra e a luz parece varrer (os fachos dos spots da Arena Coberta). No leve, alfa
+fixo (`leve`).
+
 ## Câmera de repouso
 
 O `stage.json` descreve **onde cada camada aparece na tela** (frações de 0 a 1) na câmera

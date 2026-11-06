@@ -343,6 +343,9 @@ def main():
     ap.add_argument('--zoom', type=float, default=1.0)
     ap.add_argument('--chao-largo', default=None)
     ap.add_argument('--nome', default='Arena Central (pintura)')
+    ap.add_argument('--parede-ate', type=float, default=None,
+                    help='a parede vai até esta linha da pintura (padrão: a junção + 10); mais embaixo, '
+                         'para as pontas curvas da arquibancada (o centro fica coberto pelo chão)')
     ap.add_argument('--zoom-repouso', type=float, default=None,
                     help='o zoom da câmera em que o concept foi enquadrado (a da luta, ex. 0,948); vai para '
                          'camera.zoomRepouso e as medidas (--tela-px, --chao...) valem nessa câmera')
@@ -400,7 +403,7 @@ def main():
     os.makedirs(a.saida, exist_ok=True)
 
     # Parede: do topo até um pouco abaixo da junção (o chão cobre), com céu espelhado em cima.
-    base_px = int(a.juncao) + 10
+    base_px = int(a.parede_ate) if a.parede_ate else int(a.juncao) + 10
     parede = np.asarray(im.crop((0, 0, W, base_px))).astype(np.float32)
     ex = a.ceu_extra
     topo = parede[:ex][::-1].copy()

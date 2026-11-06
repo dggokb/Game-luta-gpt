@@ -295,8 +295,40 @@ public final class StageDefinition {
             flip = b.flip;
         }
 
-        /** Profundidade usada para ordenar (a água usa a borda de trás). */
+        /**
+         * {@code "curva": [[u, profundidade], ...]}: a camada não é um plano só; cada coluna (u =
+         * fração da largura da imagem) fica na sua profundidade (interpolada entre os pontos). A
+         * arquibancada que dá a volta na arena, chegando perto da câmera nas pontas. Null = plano.
+         * A camada curva é desenhada em fatias (sem repetição, bandeiras, plateia ou telão).
+         */
+        public float[] curveU, curveZ;
+        /**
+         * {@code "onda": {"amplitude", "velocidade", "fase", "leve"}}: o alfa vai de 1 a 1 − amplitude
+         * e volta. Duas camadas iguais em fase oposta (fachos de luz pintados em dois ângulos)
+         * cruzam uma na outra, e a luz parece varrer. {@code leve}: o alfa fixo no modo leve.
+         */
+        public float waveAmp, waveSpeed = 1f, wavePhase, waveLight = 1f;
+
+        /** Profundidade da coluna {@code u} da camada curva. */
+        public float curveDepth(float u) {
+            if (curveU == null) return depth;
+            if (u <= curveU[0]) return curveZ[0];
+            for (int i = 1; i < curveU.length; i++) {
+                if (u <= curveU[i]) {
+                    float t = (u - curveU[i - 1]) / Math.max(1e-6f, curveU[i] - curveU[i - 1]);
+                    return curveZ[i - 1] + (curveZ[i] - curveZ[i - 1]) * t;
+                }
+            }
+            return curveZ[curveZ.length - 1];
+        }
+
+        /** Profundidade usada para ordenar (a água usa a borda de trás; a curva, a mais perto). */
         public float sortDepth() {
+            if (curveZ != null) {
+                float min = Float.MAX_VALUE;
+                for (float z : curveZ) min = Math.min(min, z);
+                return min;
+            }
             return kind == Kind.WATER ? waterFar : depth;
         }
     }
@@ -1087,7 +1119,33 @@ public final class StageDefinition {
                     number(f, "balanco", 0.12f), number(f, "ondas", 1.2f), number(f, "velocidade", 1f)));
             }
         }
-        return new Layer(b);
+        Layer layer = new Layer(b);
+        Object curva = map.get("curva");
+        if (curva instanceof List && !((List<Object>)curva).isEmpty()) {
+            List<Object> pts = (List<Object>)curva;
+            layer.curveU = new float[pts.size()];
+            layer.curveZ = new float[pts.size()];
+            for (int i = 0; i < pts.size(); i++) {
+                Object pt = pts.get(i);
+                if (!(pt instanceof List) || ((List<Object>)pt).size() != 2) {
+                    throw new IllegalArgumentException(where + ": \"curva\" é uma lista de [u, profundidade]");
+                }
+                layer.curveU[i] = ((Number)((List<Object>)pt).get(0)).floatValue();
+                layer.curveZ[i] = ((Number)((List<Object>)pt).get(1)).floatValue();
+                if (i > 0 && layer.curveU[i] <= layer.curveU[i - 1]) {
+                    throw new IllegalArgumentException(where + ": \"curva\" com u crescente");
+                }
+                if (layer.curveZ[i] <= 0f) throw new IllegalArgumentException(where + ": \"curva\" atrás dos lutadores (> 0)");
+            }
+        }
+        Map<String, Object> onda = object(map, "onda");
+        if (onda != null) {
+            layer.waveAmp = clamp01(number(onda, "amplitude", 1f));
+            layer.waveSpeed = number(onda, "velocidade", 1f);
+            layer.wavePhase = number(onda, "fase", 0f);
+            layer.waveLight = clamp01(number(onda, "leve", 0.5f));
+        }
+        return layer;
     }
 
     /** Coordenada {@code k} (0 = x, 1 = y) de uma lista de pontos [[x, y], ...]. */
