@@ -153,7 +153,7 @@ caminho, mais curto (não tem céu nem montanhas):
 ```
 python3 tools/stage/cenario_pintura.py art/stages/arena_coberta/2_panorama_4096.webp \
   android/app/src/main/assets/stages/arena_coberta --tela-px 2048 --centro 2048 --chao 798 \
-  --juncao 520 --parede-ate 700 --horizonte 0.3786 --ceu-extra 500 --nitida --cor-acima '#0E0E1A' --nevoa '#2A2030' \
+  --juncao 520 --parede-ate 1150 --horizonte 0.3786 --ceu-extra 500 --nitida --cor-acima '#0E0E1A' --nevoa '#2A2030' \
   --zoom 0.8 --zoom-repouso 0.948 --nome 'Arena Coberta' --extra art/stages/arena_coberta/stage_extra.json
 python3 tools/stage/animar_coberta.py
 ```
@@ -192,3 +192,13 @@ python3 tools/stage/animar_coberta.py
    cada lanterna da barreira (achada na pintura, uma por lanterna, também nas pontas curvas) vira
    uma luz com reflexo, e o motor desenha o risco no chão, sempre vertical embaixo dela, com a
    câmera em qualquer lugar. No modo leve, sem reflexos.
+7. **O estádio fechando nos cantos** (`prompt_5_volta_esq.txt`, `prompt_5_volta_dir.txt`): a
+   câmera não passa muito das bordas da pintura, então a volta do estádio tem de estar nela. As
+   faixas das pontas (560 px de cada lado no panorama de 3344) viram cinza e o Codex pinta a
+   arquibancada, os pilares e a barreira com as lanternas virando para a câmera até o canto de
+   baixo (o lado esquerdo com o direito pronto, espelhado, como referência). A base da barreira
+   nas pontas é marcada à mão (`PONTAS_ESQ`, `PONTAS_DIR` no `animar_coberta.py`); as camadas
+   curvas chegam no máximo a 700 de profundidade (`PROF_MIN`: mais perto, a ponta andava bem mais
+   que o meio e abria um degrau). No chão projetado, onde a pintura tem barreira, entra o chão da
+   pintura de antes da volta (`chao_sem_volta.jpg`), senão a barreira era esticada como chão.
+   Agora `--parede-ate 1150`.

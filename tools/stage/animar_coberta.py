@@ -36,9 +36,16 @@ TELA = (1785, 227, 2238, 400)                 # a tela azul do telão (x0, y0, x
 PLATEIA = (250, 455)                          # faixa das arquibancadas (linhas do panorama)
 MAX_LUZES = 70
 MAX_FACHOS = 11
+PROF_MIN = 700.0                              # as pontas não chegam mais perto que isso (parallax suave, sem degrau)
 CHAO_FOSCO = False                            # True: o chão repintado fosco + reflexos do motor
 BALANCO = 7                                   # graus: o facho vai de −7 a +7 (cruzamento das imagens)
 ALFA_FACHO = 0.42
+# A base da barreira nas pontas (x, y no panorama de 4096), onde o estádio faz a volta.
+PONTAS_ESQ = [(0, 1200), (250, 1153), (270, 1100), (320, 960), (370, 850), (420, 760), (480, 680),
+              (560, 610), (640, 560), (700, 527), (760, 520)]
+PONTAS_DIR = [(3336, 522), (3396, 530), (3516, 590), (3636, 690), (3706, 780), (3776, 860),
+              (3856, 970), (3916, 1100), (3946, 1153), (4095, 1200)]
+CHAO_SEM_VOLTA = AQUI.parents[1] / "art/stages/arena_coberta/chao_sem_volta.jpg"
 JUNCAO = 520                                  # --juncao do cenario_pintura.py (linha do panorama)
 SEPARA = 38                                   # px do panorama: mais perto, é a mesma lâmpada
 TETO = 300                                    # só as lâmpadas acima desta linha do panorama (o teto)
@@ -91,7 +98,16 @@ def base_da_barreira(pan):
     ys = np.array([ys[max(0, i - 3):i + 4].max() for i in range(len(ys))], np.float32)
     ys = np.convolve(np.pad(ys, 4, mode="edge"), np.ones(9) / 9, mode="valid")
     ys = np.maximum(ys, JUNCAO)
-    return np.interp(np.arange(w), xs, ys)
+    base = np.interp(np.arange(w), xs, ys)
+    # Nas pontas, onde o estádio faz a volta e a barreira desce até o canto de baixo, a base é a
+    # marcada à mão (os reflexos do chão confundem a busca).
+    for pts in (PONTAS_ESQ, PONTAS_DIR):
+        px, py = zip(*pts)
+        sel = (np.arange(w) >= px[0]) & (np.arange(w) <= px[-1])
+        base[sel] = np.interp(np.arange(w)[sel], px, py)
+    base[:PONTAS_ESQ[0][0]] = PONTAS_ESQ[0][1]
+    base[PONTAS_DIR[-1][0]:] = PONTAS_DIR[-1][1]
+    return base
 
 
 def lados(pasta, parede, base, h):
@@ -100,7 +116,7 @@ def lados(pasta, parede, base, h):
     w = img.shape[1]
     t, b = parede["topo"] * 720, parede["base"] * 720
     linha_y = lambda r: t + r / h * (b - t)                       # linha da parede -> y na tela de repouso
-    prof = lambda y: max(60.0, ((GY - HORIZONTE) * D / max(1.0, y - HORIZONTE) - D) / ZOOM_QUADRO)
+    prof = lambda y: float(max(PROF_MIN, ((GY - HORIZONTE) * D / max(1.0, float(y) - HORIZONTE) - D) / ZOOM_QUADRO))
     wr = (b - t) * w / h
     esq = 0.5 * 1280 - wr / 2
     curva = base > JUNCAO + 4
@@ -208,6 +224,25 @@ def luz_reflexo(u, v, raio_frac):
             "pulsar": 0.04, "reflexo": True}
 
 
+def limpar_chao(pasta, base, pan_h):
+    """O chão projetado é a parte de baixo da pintura; nas pontas, onde a barreira desce até o
+    canto, ali há barreira, não chão (com a câmera no canto ela era esticada como chão). Fora da
+    barreira entra o chão da pintura de antes da volta (CHAO_SEM_VOLTA: ali era só chão), com a
+    borda macia."""
+    caminho = pasta / "chao.jpg"
+    chao = np.asarray(Image.open(caminho).convert("RGB")).astype(np.float32)
+    velho = np.asarray(Image.open(CHAO_SEM_VOLTA).convert("RGB").resize(
+        (chao.shape[1], chao.shape[0]), Image.LANCZOS)).astype(np.float32)
+    hc, w = chao.shape[:2]
+    y0 = JUNCAO - 2                                     # a linha do panorama da 1ª linha do chão
+    r = np.arange(hc)
+    y = np.where(y0 + r < pan_h, y0 + r, pan_h - 1 - (y0 + r - pan_h))    # embaixo: espelhado
+    fora = (base[None, :] > y[:, None] - 6).astype(np.float32)
+    fora = cv2.GaussianBlur(cv2.dilate(fora, np.ones((9, 9), np.uint8)), (0, 0), 4)[..., None]
+    out = chao * (1 - fora) + velho * fora
+    Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(caminho, quality=93)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", type=Path, default=PASTA)
@@ -238,6 +273,7 @@ def main():
     novas, xa, xb = lados(pasta, parede, base, h)
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("parede-")] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
+    limpar_chao(pasta, base, pan.shape[0])
     lant = lanternas(pan, base)
     colunas = [cam["_colunas"] for cam in novas]
     sx = w / pan.shape[1]
