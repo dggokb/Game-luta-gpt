@@ -313,12 +313,13 @@ public final class StageDefinition {
          * frente para o meio (paralela ao olhar da câmera), indo da profundidade {@code longe} (onde
          * encontra o fundo, em {@code x} = fração da tela de repouso) até {@code perto}. A imagem
          * é a fachada desenrolada, sem perspectiva pintada: a esquerda dela fica no fundo, e o
-         * motor põe a perspectiva. {@code topo} vale na profundidade {@code longe}; a base é o
+         * motor põe a perspectiva. {@code abre} (mundo, padrão 0): quanto a ponta de perto fica
+         * mais para fora (a parede na diagonal, a arquibancada fazendo a volta). {@code topo} vale na profundidade {@code longe}; a base é o
          * chão. {@code "virar"}: a imagem vem espelhada e o motor lê as colunas de trás para frente (a
          * parede da esquerda, que na tela vai da direita para a esquerda; no Canvas cada fatia
          * sai do lado certo). NaN = não é parede lateral.
          */
-        public float sideX = Float.NaN, sideFar, sideNear;
+        public float sideX = Float.NaN, sideFar, sideNear, sideOpen;
 
         /** Profundidade da coluna {@code u} da camada curva. */
         public float curveDepth(float u) {
@@ -1163,6 +1164,7 @@ public final class StageDefinition {
             layer.sideX = number(lateral, "x", 0f);
             layer.sideFar = number(lateral, "longe", layer.depth);
             layer.sideNear = number(lateral, "perto", 60f);
+            layer.sideOpen = number(lateral, "abre", 0f);
             if (layer.sideNear <= 0f || layer.sideFar <= layer.sideNear) {
                 throw new IllegalArgumentException(where + ": \"lateral\" precisa de 0 < perto < longe");
             }

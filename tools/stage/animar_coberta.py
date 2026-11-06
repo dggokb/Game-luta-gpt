@@ -39,6 +39,7 @@ MAX_FACHOS = 11
 LATERAL_PERTO = 60.0                          # as paredes dos lados vêm do fundo até essa profundidade
 LATERAL_TRECHO = (1060, 1690)                 # o trecho da parede (px) que vira a fachada dos lados
 LATERAL_LUZ = 0.85                            # um pouco mais escura que o fundo
+LATERAL_ABRE = 1200.0                         # a ponta de perto fica isso mais para fora (diagonal)
 PROF_MIN = 700.0                              # as pontas não chegam mais perto que isso (parallax suave, sem degrau)
 CHAO_FOSCO = False                            # True: o chão repintado fosco + reflexos do motor
 BALANCO = 7                                   # graus: o facho vai de −7 a +7 (cruzamento das imagens)
@@ -238,6 +239,45 @@ def limpar_chao(pasta, base, pan_h):
     Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(caminho, quality=93)
 
 
+ARTE = AQUI.parents[1] / "art/stages/arena_coberta"
+REFLEXO_PROF = 1734.6                         # logo antes do fim do chão: desenhado depois dele
+
+
+def reflexos_do_chao(pasta, stage):
+    """O chão aprovado (o encerado do concept) em duas partes. O piso fosco (o do Codex, mesmas
+    lajotas) vai no chão em perspectiva; os reflexos das luzes (o que o encerado tem a mais que
+    o fosco) viram uma camada na profundidade da parede, por cima do chão. Com a câmera parada,
+    a soma é o encerado aprovado; com a câmera andando ou afastada, os riscos continuam retos
+    embaixo de cada lanterna (pintados no chão, abriam em leque)."""
+    pintado = np.asarray(Image.open(ARTE / "chao_encerado.jpg").convert("RGB")).astype(np.float32)
+    fosco = np.asarray(Image.open(ARTE / "chao_fosco.jpg").convert("RGB").resize(
+        (pintado.shape[1], pintado.shape[0]), Image.LANCZOS)).astype(np.float32)
+    # O fosco na cor do encerado fora dos reflexos: o ganho de cada linha pelo tom mais escuro
+    # (percentil 30), suavizado entre as linhas.
+    ganho = np.percentile(pintado, 30, axis=1) / np.maximum(1.0, np.percentile(fosco, 30, axis=1))
+    ganho = cv2.GaussianBlur(ganho[:, None, :], (1, 0), sigmaX=1, sigmaY=12)[:, 0, :]
+    base = np.clip(fosco * ganho[:, None, :], 0, 255)
+    # Os reflexos: onde o encerado é mais claro, a cor e o alfa que somados à base dão o encerado.
+    dif = pintado - base
+    alfa = np.max(np.where(dif > 0, dif / np.maximum(1.0, 255.0 - base), 0.0), axis=2)
+    # Só os riscos de luz: sem as juntas das lajotas e o emblema (finos; andariam com a parede).
+    alfa = np.where(np.max(dif, axis=2) > 12.0, alfa, 0.0).astype(np.float32)
+    alfa = cv2.medianBlur((alfa * 255).astype(np.uint8), 5).astype(np.float32) / 255.0
+    alfa = cv2.GaussianBlur(alfa, (0, 0), 0.7)
+    alfa = np.minimum(alfa, 0.97)
+    cor = np.clip(base + dif / np.maximum(alfa[..., None], 1e-3), 0, 255)
+    # A cor do brilho lisa (sem as lajotas dentro: a camada anda com a parede, as lajotas com o chão).
+    peso = cv2.GaussianBlur(alfa, (0, 0), 1.2)
+    cor = cv2.GaussianBlur(cor * alfa[..., None], (0, 0), 1.2) / np.maximum(peso[..., None], 1e-3)
+    cor = np.where(alfa[..., None] > 1e-3, np.clip(cor, 0, 255), 0)
+    Image.fromarray(base.astype(np.uint8)).save(pasta / "chao.jpg", quality=93)
+    rgba = np.dstack([cor, np.clip(alfa * 255.0, 0, 255)]).astype(np.uint8)
+    Image.fromarray(rgba, "RGBA").save(pasta / "reflexos_chao.webp", quality=88, alpha_quality=90, method=6)
+    proj = stage["chao"]["projecao"]
+    return {"id": "reflexos-chao", "imagem": "reflexos_chao.webp", "profundidade": REFLEXO_PROF,
+            "topo": proj["topo"], "base": proj["base"], "x": proj["x"], "repetir": "espelhar"}
+
+
 def laterais(pasta, parede, w, h):
     """As paredes dos lados (o estádio fechando): planos em x fixo do mundo, do fundo até perto da
     câmera (``"lateral"`` no motor, que põe a perspectiva). A imagem é a fachada desenrolada: um
@@ -249,7 +289,7 @@ def laterais(pasta, parede, w, h):
     linha_chao = round((0.5236 - parede["topo"]) / (parede["base"] - parede["topo"]) * h)
     escala = D / (D / ZOOM_QUADRO + longe)                   # câmera de repouso no fundo
     px_por_tela = w / ((parede["base"] - parede["topo"]) * 720 * w / h)
-    largura = round((longe - perto) * escala * px_por_tela)
+    largura = round(float(np.hypot(longe - perto, LATERAL_ABRE)) * escala * px_por_tela)
     img = Image.open(pasta / parede["imagem"]).convert("RGB")
     trecho = img.crop((LATERAL_TRECHO[0], 0, LATERAL_TRECHO[1], linha_chao))
     tira = Image.new("RGB", (largura, linha_chao))
@@ -263,7 +303,7 @@ def laterais(pasta, parede, w, h):
     (pasta / "lateral.jpg").unlink(missing_ok=True)
     return [{"id": f"lateral-{nome}", "imagem": f"lateral_{nome}.jpg", "profundidade": longe,
              "topo": parede["topo"], "base": 0.5236, "x": 0.5, "virar": nome == "esq",
-             "lateral": {"x": x, "longe": longe, "perto": perto}}
+             "lateral": {"x": x, "longe": longe, "perto": perto, "abre": LATERAL_ABRE}}
             for nome, x in (("esq", -0.005), ("dir", 1.005))]
 
 
@@ -295,7 +335,9 @@ def main():
     pan = np.asarray(Image.open(PANORAMA).convert("RGB"))
     base = base_da_barreira(pan)
     novas, xa, xb = laterais(pasta, parede, w, h), 0, w
-    stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith(("parede-", "ponta-", "lateral-"))] + novas
+    novas.append(reflexos_do_chao(pasta, stage))
+    stage["camadas"] = [c for c in stage["camadas"]
+                        if not c["id"].startswith(("parede-", "ponta-", "lateral-", "reflexos-"))] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
     lant = lanternas(pan, base)
     sx = w / pan.shape[1]
@@ -313,7 +355,7 @@ def main():
     stage["chao"]["reflexoComprimento"] = 0.5 if CHAO_FOSCO else 0
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"telão {parede['telao']}, plateia com {len(flashes)} flashes, {len(parede['luzes'])} holofotes, "
-          f"{nfachos} fachos, {len(novas)} paredes laterais")
+          f"{nfachos} fachos, {len(novas) - 1} paredes laterais e os reflexos do chão")
 
 
 if __name__ == "__main__":

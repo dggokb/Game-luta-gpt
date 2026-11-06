@@ -392,5 +392,7 @@ profundidade `longe` (onde encontra o fundo, em `x` = fração da tela de repous
 A imagem é a fachada desenrolada, sem perspectiva pintada (a coluna 0 no fundo); `topo` vale na
 profundidade `longe` e a base é o chão. O motor desenha em fatias de largura igual na tela (passos
 iguais na escala; a profundidade sai de 1/escala), numa chamada só no OpenGL (`drawImageStrip`).
+`"abre"` (mundo, padrão 0): a ponta de perto fica isso mais para fora, a parede na diagonal
+(a arquibancada fazendo a volta; reta, ela converge forte e parece torta).
 `"virar": true`: a imagem vem espelhada e as colunas são lidas de trás para frente (a parede da
 esquerda, que na tela vai da direita para a esquerda). Desenhada depois do chão (fica em pé nele).

@@ -125,10 +125,11 @@ public class StageSceneTest {
     public void paredeLateralSoApareceComACameraNoCantoEVemAteAFrente() throws IOException {
         // Parede do lado: encontra o fundo na borda esquerda da tela de repouso e vem até perto.
         String json = "{\"nome\": \"T\", \"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 1500,"
-            + " \"topo\": 0.1, \"base\": 0.5, \"lateral\": {\"x\": -0.01, \"longe\": 1500, \"perto\": 60}}]}";
+            + " \"topo\": 0.1, \"base\": 0.5, \"lateral\": {\"x\": -0.01, \"longe\": 1500, \"perto\": 60, \"abre\": 400}}]}";
         StageDefinition.Layer layer = StageDefinition.fromJson(json).layers.get(0);
         assertEquals(60f, layer.sortDepth(), 0f);
         assertEquals(1500f, layer.sideFar, 0f);
+        assertEquals(400f, layer.sideOpen, 0f);
         StageScene scene = new StageScene(StagePack.load(new FakeAssets(json), "stages/t"), WORLD);
         CountingCanvas canvas = new CountingCanvas();
         scene.drawBackground(canvas);

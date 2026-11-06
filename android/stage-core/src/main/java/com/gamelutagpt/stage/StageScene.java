@@ -706,17 +706,15 @@ public final class StageScene {
         float iw = img.width(), ih = img.height();
         float far = layer.sideFar, near = layer.sideNear;
         float wx = restCamera.worldX(layer.sideX * VW, far);
+        // A parede abre para fora vindo para perto (na diagonal, como a arquibancada fazendo a volta).
+        float open = layer.sideOpen * (layer.sideX < 0.5f ? -1f : 1f);
         float yTop = restCamera.worldY(layer.top * VH, far), yBot = world.groundY;
-        float dx = wx - camera.centerX();
-        if (Math.abs(dx) < 1f) return;
         float sFar = camera.scale(far), sNear = camera.scale(near);
-        // A escala em que a parede cruza cada borda da tela.
-        float sA = (-VW * 0.5f) / dx, sB = (VW * 0.5f) / dx;
-        float s0 = Math.max(sFar, Math.min(sA, sB)), s1 = Math.min(sNear, Math.max(sA, sB));
-        if (s1 <= s0) return;
+        float xFar = camera.screenX(wx, far), xNear = camera.screenX(wx + open, near);
+        if (Math.max(xFar, xNear) < 0f || Math.min(xFar, xNear) > VW) return;
         boolean malha = c.desenhaFaixas();
         float fatia = malha ? SIDE_SLICE : SIDE_SLICE_CANVAS;
-        int n = Math.max(1, Math.min(500, (int)Math.ceil(Math.abs(dx) * (s1 - s0) / fatia)));
+        int n = Math.max(1, Math.min(500, (int)Math.ceil(Math.min(Math.abs(xNear - xFar), 3f * VW) / fatia)));
         float invFar = 1f / sFar, invNear = 1f / sNear;
         int alpha = Math.round(255f * layer.alpha);
         if (malha && sideXY.length < 4 * (n + 1)) {
@@ -725,20 +723,23 @@ public final class StageScene {
         }
         float lastX = 0f, lastU = 0f;
         for (int i = 0; i <= n; i++) {
-            float s = s0 + (s1 - s0) * i / n;
+            // Passos iguais na escala (fatias de largura parecida na tela).
+            float s = sFar + (sNear - sFar) * i / n;
             float z = far + (1f / s - invFar) / (invNear - invFar) * (near - far);
-            float u = (far - z) / (far - near) * iw;
-            if (layer.flip) u = iw - u;
-            float x = camera.screenX(wx, z);
+            float k = (far - z) / (far - near);
+            float u = layer.flip ? iw - k * iw : k * iw;
+            float x = camera.screenX(wx + open * k, z);
             float top = camera.screenY(yTop, z), bottom = camera.screenY(yBot, z);
             if (malha) {
-                int k = i * 4;
-                sideXY[k] = x; sideXY[k + 1] = top; sideXY[k + 2] = x; sideXY[k + 3] = bottom;
-                sideUV[k] = u; sideUV[k + 1] = 0f; sideUV[k + 2] = u; sideUV[k + 3] = ih;
+                int q = i * 4;
+                sideXY[q] = x; sideXY[q + 1] = top; sideXY[q + 2] = x; sideXY[q + 3] = bottom;
+                sideUV[q] = u; sideUV[q + 1] = 0f; sideUV[q + 2] = u; sideUV[q + 3] = ih;
             } else if (i > 0) {
-                // Recorte por recorte (Canvas): a altura da ponta mais perto, sem fresta.
                 float l = Math.min(lastX, x), r = Math.max(lastX, x);
-                c.drawImageRegion(img, Math.min(lastU, u), 0f, Math.max(lastU, u), ih, l, top, r + 0.75f, bottom, alpha);
+                if (r >= 0f && l <= VW) {
+                    // Recorte por recorte (Canvas): a altura da ponta mais perto, sem fresta.
+                    c.drawImageRegion(img, Math.min(lastU, u), 0f, Math.max(lastU, u), ih, l, top, r + 0.75f, bottom, alpha);
+                }
             }
             lastX = x;
             lastU = u;

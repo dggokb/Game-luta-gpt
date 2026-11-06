@@ -219,3 +219,13 @@ python3 tools/stage/animar_coberta.py
    15% mais escuro. No repouso as paredes ficam fora da tela (igual ao concept); com a câmera
    no canto ou afastada (lutadores longe), a arquibancada vem do fundo até a câmera e a arena
    fecha. O chão continua o encerado aprovado (o mesmo `chao.jpg` da comparação com o concept).
+   **Ajustes:** a parede reta (paralela ao olhar) convergia forte e parecia torta no canto;
+   agora ela abre na diagonal (`LATERAL_ABRE` = 1200 no mundo, `"abre"` no motor), como a
+   arquibancada fazendo a volta.
+9. **O chão aprovado sem o leque**: os riscos de reflexo pintados no chão encerado abriam em
+   leque com a câmera andando ou afastada (o chão é projetado em perspectiva). O chão vira duas
+   partes (`reflexos_do_chao()` no `animar_coberta.py`): o piso fosco do Codex (`chao_fosco.jpg`,
+   mesmas lajotas, na cor do encerado linha a linha) no chão projetado, e os reflexos (o que o
+   encerado aprovado, `chao_encerado.jpg`, tem a mais) numa camada (`reflexos_chao.webp`) na
+   profundidade da parede, desenhada logo depois do chão. Com a câmera parada a soma é o chão
+   aprovado; com a câmera andando, cada risco fica reto embaixo da sua lanterna.

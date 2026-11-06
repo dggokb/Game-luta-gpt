@@ -1217,7 +1217,8 @@
       "lateral": {
         "x": -0.005,
         "longe": 1734.7,
-        "perto": 60.0
+        "perto": 60.0,
+        "abre": 1200.0
       }
     },
     {
@@ -1231,8 +1232,18 @@
       "lateral": {
         "x": 1.005,
         "longe": 1734.7,
-        "perto": 60.0
+        "perto": 60.0,
+        "abre": 1200.0
       }
+    },
+    {
+      "id": "reflexos-chao",
+      "imagem": "reflexos_chao.webp",
+      "profundidade": 1734.6,
+      "topo": 0.5236,
+      "base": 1.2675,
+      "x": 0.5,
+      "repetir": "espelhar"
     },
     {
       "id": "fachos-a",
