@@ -291,7 +291,7 @@ final class CombatFighter {
      * Dragon Rush que acertou, a sequência: quadros que ainda faltam (0 fora dela), as pancadas
      * dadas, os botões apertados esperando a vez, a espera até a próxima pancada e a altura em
      * que o rival fica preso. {@link #rushFim}: o golpe final escolhido (0 reto, 1 para cima,
-     * 2 trocou de lado), para o desenho.
+     * 2 trocou de lado; -1 ainda não houve), para o desenho.
      */
     int rushSeq, rushSocos, rushSocosPedidos, rushSocoEspera, rushFim;
     float rushSeqY;

@@ -3664,6 +3664,12 @@ final class GeneratedSpriteLayouts {
     static final int DEFENSE_STAND_ROOT_Y = 452;
     static final int DEFENSE_STAND_FRAME_COUNT = 8;
 
+    static final int DRAGON_RUSH_SET_FRAME_WIDTH = 593;
+    static final int DRAGON_RUSH_SET_FRAME_HEIGHT = 556;
+    static final int DRAGON_RUSH_SET_ROOT_X = 222;
+    static final int DRAGON_RUSH_SET_ROOT_Y = 548;
+    static final int DRAGON_RUSH_SET_FRAME_COUNT = 7;
+
     static final int ENERGY_SET_FRAME_WIDTH = 456;
     static final int ENERGY_SET_FRAME_HEIGHT = 489;
     static final int ENERGY_SET_ROOT_X = 189;
@@ -3681,6 +3687,12 @@ final class GeneratedSpriteLayouts {
     static final int ENERGY_CHARGED_ROOT_X = 201;
     static final int ENERGY_CHARGED_ROOT_Y = 459;
     static final int ENERGY_CHARGED_FRAME_COUNT = 20;
+
+    static final int ENERGY_SHINKAI_SET_FRAME_WIDTH = 424;
+    static final int ENERGY_SHINKAI_SET_FRAME_HEIGHT = 442;
+    static final int ENERGY_SHINKAI_SET_ROOT_X = 171;
+    static final int ENERGY_SHINKAI_SET_ROOT_Y = 434;
+    static final int ENERGY_SHINKAI_SET_FRAME_COUNT = 3;
 
     static final int FALL_DOWN_FRAME_WIDTH = 625;
     static final int FALL_DOWN_FRAME_HEIGHT = 421;

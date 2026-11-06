@@ -1,0 +1,184 @@
+{
+  "id": "player_base_dragon_rush",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_dragon_rush_temp.png",
+  "sourceNote": "Poses tempor\u00e1rias (Codex) do Dragon Rush do Ry\u016bga: preparo, voo, duas pancadas e os tr\u00eas golpes finais (reto, para cima, troca de lado). tools/sprites/poses_temporarias.py. Refer\u00eancia para os v\u00eddeos.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 300,
+    "rootY": 610,
+    "columns": 4,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        98,
+        244,
+        603,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 93739
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        104,
+        370,
+        663,
+        540
+      ],
+      "minimumMargin": 100,
+      "opaquePixels": 40379
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        166,
+        166,
+        501,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 63780
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        140,
+        189,
+        539,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 65246
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        86,
+        198,
+        621,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 74561
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        213,
+        70,
+        431,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 48290
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        156,
+        166,
+        516,
+        610
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 69118
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 593,
+    "frameHeight": 556,
+    "rootX": 222,
+    "rootY": 548,
+    "columns": 4,
+    "frameCount": 7,
+    "cropOffset": [
+      78,
+      62
+    ],
+    "sheetWidth": 576,
+    "sheetHeight": 2428,
+    "frames": [
+      [
+        0,
+        1868,
+        516,
+        376,
+        16,
+        178
+      ],
+      [
+        0,
+        2248,
+        568,
+        180,
+        22,
+        304
+      ],
+      [
+        232,
+        0,
+        344,
+        452,
+        84,
+        100
+      ],
+      [
+        0,
+        1008,
+        408,
+        432,
+        58,
+        123
+      ],
+      [
+        0,
+        1444,
+        544,
+        420,
+        4,
+        132
+      ],
+      [
+        0,
+        0,
+        228,
+        548,
+        131,
+        4
+      ],
+      [
+        0,
+        552,
+        368,
+        452,
+        74,
+        100
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 15728640,
+      "grid": 10550656,
+      "packed": 5594112
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "973c173b07d1fb346695cfbf5321104eb4ca82e1f378afe594bbe522ac575122",
+      "config": "9810bbd6ffc6f1aa6fda516dd17c8aaf731f4e45fa9d9477aa627e523a68bebd",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

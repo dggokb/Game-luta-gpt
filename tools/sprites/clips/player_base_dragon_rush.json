@@ -1,0 +1,20 @@
+{
+  "id": "player_base_dragon_rush",
+  "javaName": "DRAGON_RUSH_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_dragon_rush_temp.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_dragon_rush.webp",
+  "report": "tools/sprites/reports/player_base_dragon_rush.report.json",
+  "preview": "android/app/build/sprite-review/dragon_rush-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "frameWidth": 768,
+  "rootX": 300,
+  "sourceNote": "Poses temporárias (Codex) do Dragon Rush do Ryūga: preparo, voo, duas pancadas e os três golpes finais (reto, para cima, troca de lado). tools/sprites/poses_temporarias.py. Referência para os vídeos.",
+  "sourceReferences": [],
+  "frameHeight": 640,
+  "rootY": 610,
+  "pixelScale": 2.0
+}

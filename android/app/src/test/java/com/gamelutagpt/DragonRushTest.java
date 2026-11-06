@@ -246,6 +246,7 @@ public class DragonRushTest {
 
     @Test public void semDirecaoORivalFicaNaFrentePreso() {
         Match m = naSequencia(500f, 1250f);
+        assertEquals("antes do golpe final, -1 (o desenho ainda não mostra o golpe final)", -1, m.f(0).rushFim);
         passarSequencia(m, 0, 0);
         assertEquals(0, m.f(0).rushFim);
         assertTrue(m.f(1).x > m.f(0).x);
