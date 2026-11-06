@@ -128,8 +128,14 @@ public final class StageScene {
 
     public StageScene(StagePack pack, StageWorld world) {
         this.pack = pack;
-        this.world = world;
         StageDefinition def = pack.definition;
+        // "camera.zoomRepouso": o cenário foi enquadrado (pintado) numa câmera de outro zoom, a da
+        // luta: é nela que o stage.json descreve as camadas (o chão continua no mesmo lugar da tela).
+        if (!Float.isNaN(def.cameraRestZoom)) {
+            world = new StageWorld(world.groundY, world.worldWidth, def.cameraRestZoom, world.restCenterX,
+                world.restGroundScreenY);
+        }
+        this.world = world;
         this.camera = new StageCamera(world.groundY, def.cameraDistance, def.horizon * VH);
 
         // A câmera de repouso converte o que o stage.json descreve em tela para o mundo.

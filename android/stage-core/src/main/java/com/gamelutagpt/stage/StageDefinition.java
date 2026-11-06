@@ -507,6 +507,12 @@ public final class StageDefinition {
     public float cameraZoom = 1f;
     /** {@code camera.zoomNoPulo} (padrão true): false = o pulo não abre o zoom da câmera da luta. */
     public boolean cameraZoomNoPulo = true;
+    /**
+     * {@code camera.zoomRepouso}: o zoom da câmera em que o stage.json descreve as camadas (NaN =
+     * a câmera de repouso do jogo). Para um cenário pintado a partir de uma tela da luta: a pintura
+     * bate com a luta nesse zoom, sem as proporções de chão e fundo mudarem.
+     */
+    public float cameraRestZoom = Float.NaN;
     /** Altura do horizonte na tela (fração). */
     public final float horizon;
     public final int backgroundColor;
@@ -882,6 +888,10 @@ public final class StageDefinition {
             bool(map, "chaoNaPintura", false));
         def.cameraZoom = zoomCenario;
         def.cameraZoomNoPulo = bool(camera, "zoomNoPulo", true);
+        def.cameraRestZoom = number(camera, "zoomRepouso", Float.NaN);
+        if (!Float.isNaN(def.cameraRestZoom) && def.cameraRestZoom <= 0f) {
+            throw new IllegalArgumentException("camera: \"zoomRepouso\" deve ser positivo");
+        }
         Map<String, Object> dustMap = object(map, "poeira");
         if (dustMap != null) {
             float near = number(dustMap, "perto", -250f), far = number(dustMap, "longe", 2500f);

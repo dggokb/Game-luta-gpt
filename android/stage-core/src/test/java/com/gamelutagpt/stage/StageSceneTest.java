@@ -97,6 +97,26 @@ public class StageSceneTest {
         assertNull(def.petals);
         assertNull(def.dust);
         assertEquals(1000f, def.cameraDistance, 0f);
+        assertTrue(Float.isNaN(def.cameraRestZoom));
+    }
+
+    @Test
+    public void zoomRepousoDescreveAsCamadasNaCameraDaLuta() throws IOException {
+        // Uma camada que vai do horizonte ao chão na câmera de zoom 0,95: com a câmera da luta
+        // nesse zoom (o chão no mesmo lugar da tela), ela aparece onde o stage.json diz.
+        String json = "{\"nome\": \"T\", \"camera\": {\"horizonte\": 0.4, \"zoomRepouso\": 0.95},"
+            + "\"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 1500, \"topo\": 0.2, \"base\": 0.6}]}";
+        StageDefinition def = StageDefinition.fromJson(json);
+        assertEquals(0.95f, def.cameraRestZoom, 1e-6f);
+        StageScene scene = new StageScene(StagePack.load(new FakeAssets(json), "stages/t"), WORLD);
+        float zoom = 0.95f;
+        float top = WORLD.groundY - WORLD.restGroundScreenY / zoom;
+        float left = WORLD.restCenterX - StageWorld.VW / (2f * zoom);
+        scene.setCamera(zoom, left, top);
+        CountingCanvas canvas = new CountingCanvas();
+        scene.drawBackground(canvas);
+        assertEquals(0.2f * StageWorld.VH, canvas.lastImageTop, 0.5f);
+        assertEquals(0.6f * StageWorld.VH, canvas.lastImageBottom, 0.5f);
     }
 
     @Test
@@ -708,14 +728,20 @@ public class StageSceneTest {
         @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
         @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
         @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) { lines++; }
+        float lastImageTop = Float.NaN, lastImageBottom = Float.NaN;
+
         @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
             images++;
             ordem.add(image);
+            lastImageTop = t;
+            lastImageBottom = b;
         }
         @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
                                               float l, float t, float r, float b, int alpha) {
             regions++;
             ordem.add(image);
+            lastImageTop = t;
+            lastImageBottom = b;
             if (image == watch) watched.add(new float[] {st, sb, l, r});
             assertTrue("recorte dentro da imagem", sl >= -0.01f && sr <= image.width() + 0.01f && sr > sl);
             assertTrue(st >= -0.01f && sb <= image.height() + 0.01f && sb > st);

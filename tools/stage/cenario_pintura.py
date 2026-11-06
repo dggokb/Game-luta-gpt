@@ -343,6 +343,9 @@ def main():
     ap.add_argument('--zoom', type=float, default=1.0)
     ap.add_argument('--chao-largo', default=None)
     ap.add_argument('--nome', default='Arena Central (pintura)')
+    ap.add_argument('--zoom-repouso', type=float, default=None,
+                    help='o zoom da câmera em que o concept foi enquadrado (a da luta, ex. 0,948); vai para '
+                         'camera.zoomRepouso e as medidas (--tela-px, --chao...) valem nessa câmera')
     ap.add_argument('--nitida', action='store_true',
                     help='sem --fundo: a parede sem desfoque e quase sem névoa (cenário coberto, sem céu)')
     ap.add_argument('--cor-acima', default='#281234',
@@ -356,6 +359,9 @@ def main():
     W, H = im.size
     # Escala: na linha do pé, a pintura cobre o mundo todo (a câmera vai de 0 a 2600).
     lado = min(a.emblema, W - a.emblema)
+    global ZOOM
+    if a.zoom_repouso:
+        ZOOM = a.zoom_repouso
     k = ZOOM * MUNDO / 2 / lado                     # px da tela de repouso por px da pintura
     if a.tela_px:
         k = VW / a.tela_px
@@ -508,7 +514,8 @@ def main():
 
     stage = {
         "nome": a.nome,
-        "camera": {"distancia": D, "horizonte": round(hz / VH, 4), "zoom": a.zoom, "zoomNoPulo": False},
+        "camera": {"distancia": D, "horizonte": round(hz / VH, 4), "zoom": a.zoom, "zoomNoPulo": False,
+                   **({"zoomRepouso": a.zoom_repouso} if a.zoom_repouso else {})},
         "corFundo": "#2A1438",
         "luzLutadores": {"cor": "#FF9A70", "forca": 0.34, "brilho": 0.95, "pes": "#D8B8A8",
                          "contraluz": {"cor": "#FFB060", "forca": 1.0, "direcao": [-1, -1]}},

@@ -45,6 +45,9 @@ olhoY     = topo + H / zoom
 `camera.zoomNoPulo` (padrão true): com false, o pulo não abre o zoom da câmera (como no super
 pulo, ela só sobe junto se o lutador sair da margem de cima). Num cenário com o chão em
 perspectiva, o vaivém do zoom a cada pulo dava tontura.
+`camera.zoomRepouso` (opcional): o zoom da câmera em que o stage.json descreve as camadas, no
+lugar da câmera de repouso do jogo (1,24), com o chão no mesmo lugar da tela. Para um cenário
+pintado a partir de uma tela da luta: com a câmera da luta nesse zoom, a pintura aparece igual.
 
 ## Câmera de repouso
 

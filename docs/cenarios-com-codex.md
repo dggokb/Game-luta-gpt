@@ -152,15 +152,22 @@ caminho, mais curto (não tem céu nem montanhas):
 
 ```
 python3 tools/stage/cenario_pintura.py art/stages/arena_coberta/2_panorama_4096.webp \
-  android/app/src/main/assets/stages/arena_coberta --tela-px 1637 --centro 2048 --chao 772 \
-  --juncao 522 --horizonte 0.3999 --ceu-extra 500 --nitida --cor-acima '#0E0E1A' --nevoa '#2A2030' \
-  --zoom 0.8 --nome 'Arena Coberta' --extra art/stages/arena_coberta/stage_extra.json
+  android/app/src/main/assets/stages/arena_coberta --tela-px 2048 --centro 2048 --chao 798 \
+  --juncao 520 --horizonte 0.3786 --ceu-extra 500 --nitida --cor-acima '#0E0E1A' --nevoa '#2A2030' \
+  --zoom 0.8 --zoom-repouso 0.948 --nome 'Arena Coberta' --extra art/stages/arena_coberta/stage_extra.json
 python3 tools/stage/animar_coberta.py
 ```
 
-   O horizonte (0,40) sai do emblema do chão, um círculo: com a borda de longe, a de perto e a
-   meia largura, resolve-se a altura do horizonte e a profundidade (o meio do emblema fica em
-   z ≈ 0, embaixo dos lutadores). A junção chão/barreira fica em z ≈ 2300.
+   **Enquadrar pela câmera da luta** (`--zoom-repouso`): o concept é uma tela da luta, e a
+   câmera da luta na largada (zoom 0,948 com o `camera.zoom` 0,8) não é a de repouso do motor
+   (1,24). Medido pela de repouso, o chão e o fundo ficavam em proporções erradas na luta (o
+   telão 30% maior, a barreira baixa). Com `camera.zoomRepouso` o stage.json descreve as
+   camadas nessa câmera, e as medidas saem direto do concept: a largura da tela do celular é
+   2048 px do panorama (`--tela-px`), e `--chao` é a linha dos pés no panorama. Para conferir,
+   capturar no formato do celular (1870×841) e pôr lado a lado com o concept.
+   O horizonte (0,379) sai do emblema do chão, um círculo: com a borda de longe, a de perto e a
+   meia largura, resolve-se a altura do horizonte e a profundidade (o meio do emblema fica
+   embaixo dos lutadores). A junção chão/barreira fica em z ≈ 1735.
 4. **Animação** (`tools/stage/animar_coberta.py`): a tela do telão vira o `"telao"` da camada (a
    luta ao vivo e o replay do `TelaoLuta`), a plateia pula com flashes (sem o telão e a treliça),
    os 40 holofotes maiores do teto pulsam, e o chão encerado reflete os lutadores.
