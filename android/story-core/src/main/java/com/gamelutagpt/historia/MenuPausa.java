@@ -6,13 +6,13 @@ import com.gamelutagpt.render.RenderCanvas;
  * Pausa por cima da história ou da luta (botão MENU ou a tecla voltar): CONTINUAR, a VELOCIDADE
  * da luta, o IMPACTO (impact frames ligados ou não: a tela pisca nos golpes grandes), o NÍVEL da CPU
  * (1 a 8), a lista de COMANDOS de cada personagem ({@link TelaComandos}), os GRÁFICOS (quem usa a
- * pausa diz o rótulo e o que muda, {@link Graficos}), o FPS (o contador no canto) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
+ * pausa diz o rótulo e o que muda, {@link Graficos}), o FPS (o contador no canto), os BOTÕES DE TESTE (o painel do canto: IA, DEBUG, GRÁF...) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
  * o jogo enquanto a pausa está aberta e desenha a pausa por cima da tela parada.
  *
  * Não depende de plataforma e não é thread-safe: chame tudo da thread do loop do jogo.
  */
 public final class MenuPausa {
-    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, GRAFICOS, FPS, REGISTRO, MENU }
+    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, GRAFICOS, FPS, BOTOES, REGISTRO, MENU }
 
     public static final String PAUSA = "PAUSA";
     public static final String CONTINUAR = "CONTINUAR";
@@ -25,6 +25,8 @@ public final class MenuPausa {
     public static final String GRAFICOS = "GRÁFICOS";
     /** O contador de quadros por segundo no canto da tela. */
     public static final String FPS = "FPS";
+    /** Os botões de teste do canto (IA, DEBUG, VIDA, GRÁF, OPENGL...): aparecem ou somem. */
+    public static final String BOTOES = "BOTÕES DE TESTE";
     /** Níveis dos gráficos (quem usa a pausa monta o rótulo com eles). */
     public static final String[] NIVEIS_GRAFICOS = {"AUTO", "ALTO", "MÉDIO", "LEVE"};
     /** Manda a linha do tempo das últimas lutas contra a CPU (para entender a luta real). */
@@ -35,7 +37,7 @@ public final class MenuPausa {
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
     public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, NIVEL_CPU,
-        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", FPS, REGISTRO, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
+        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", FPS, BOTOES, REGISTRO, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
 
     /** A opção GRÁFICOS: quem usa a pausa diz o que mostrar e o que fazer ao trocar. */
     public interface Graficos {
@@ -51,17 +53,18 @@ public final class MenuPausa {
     /** Níveis da CPU (o motor tem de 1 a 8); quem usa a pausa lê e guarda o escolhido. */
     public static final int NIVEL_MIN = 1, NIVEL_MAX = 8, NIVEL_PADRAO = 5;
 
-    // Nove opções entre o título e o aviso: 39 de altura, 43 entre uma e outra.
+    // Dez opções entre o título e o aviso: 35 de altura, 39 entre uma e outra.
     static final float[][] CAIXAS = {
-        {420f, 290f, 860f, 329f},
-        {420f, 333f, 860f, 372f},
-        {420f, 376f, 860f, 415f},
-        {420f, 419f, 860f, 458f},
-        {420f, 462f, 860f, 501f},
-        {420f, 505f, 860f, 544f},
-        {420f, 548f, 860f, 587f},
-        {420f, 591f, 860f, 630f},
-        {420f, 634f, 860f, 673f},
+        {420f, 286f, 860f, 321f},
+        {420f, 325f, 860f, 360f},
+        {420f, 364f, 860f, 399f},
+        {420f, 403f, 860f, 438f},
+        {420f, 442f, 860f, 477f},
+        {420f, 481f, 860f, 516f},
+        {420f, 520f, 860f, 555f},
+        {420f, 559f, 860f, 594f},
+        {420f, 598f, 860f, 633f},
+        {420f, 637f, 860f, 672f},
     };
     /** O mesmo toque que abriu a pausa não pode escolher nada. */
     static final float TAP_DELAY = 0.2f;
@@ -75,6 +78,7 @@ public final class MenuPausa {
     private int velocidade = nivel(VELOCIDADE_PADRAO);
     private boolean impacto = true;
     private boolean fps = true;
+    private boolean botoes = true;
     private int nivelCpu = NIVEL_PADRAO;
     private final TelaComandos comandos = new TelaComandos();
     private Graficos graficos;
@@ -139,6 +143,15 @@ public final class MenuPausa {
         fps = ligado;
     }
 
+    /** Os botões de teste do canto aparecem (e respondem ao toque). */
+    public boolean botoes() {
+        return botoes;
+    }
+
+    public void setBotoes(boolean ligado) {
+        botoes = ligado;
+    }
+
     /** Nível da CPU, de 1 a 8. */
     public int nivelCpu() {
         return nivelCpu;
@@ -178,6 +191,10 @@ public final class MenuPausa {
         }
         if (open && cursor() == Opcao.FPS) {
             if (direcao != 0) fps = !fps;
+            return true;
+        }
+        if (open && cursor() == Opcao.BOTOES) {
+            if (direcao != 0) botoes = !botoes;
             return true;
         }
         if (open && cursor() == Opcao.NIVEL_CPU) {
@@ -224,6 +241,10 @@ public final class MenuPausa {
         }
         if (cursor() == Opcao.FPS) {
             fps = !fps;
+            return null;
+        }
+        if (cursor() == Opcao.BOTOES) {
+            botoes = !botoes;
             return null;
         }
         if (cursor() == Opcao.NIVEL_CPU) {
@@ -279,6 +300,10 @@ public final class MenuPausa {
                     fps = !fps;
                     return null;
                 }
+                if (cursor() == Opcao.BOTOES) {
+                    botoes = !botoes;
+                    return null;
+                }
                 if (cursor() == Opcao.NIVEL_CPU) {
                     ajustar(x < (CAIXAS[i][0] + CAIXAS[i][2]) * 0.5f ? -1 : 1);
                     return null;
@@ -320,7 +345,7 @@ public final class MenuPausa {
             Tinta.withAlpha(BotaoMenu.INK, (int)(255f * in)), size * 0.14f, true);
         String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(IMPACTO) + ":  " + t(impacto ? LIGADO : DESLIGADO),
             rotuloNivel(), t(COMANDOS), rotuloGraficos(), t(FPS) + ":  " + t(fps ? LIGADO : DESLIGADO),
-            t(REGISTRO), t(MENU_INICIAL)};
+            t(BOTOES) + ":  " + t(botoes ? LIGADO : DESLIGADO), t(REGISTRO), t(MENU_INICIAL)};
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
         }

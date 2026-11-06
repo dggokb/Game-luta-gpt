@@ -97,6 +97,7 @@ public class GameView extends SurfaceView
     /** IMPACTO da pausa (impact frames ligados), salvo junto com a velocidade. */
     private static final String IMPACT_KEY = "impacto";
     private static final String FPS_KEY = "contadorFps";
+    private static final String BOTOES_KEY = "botoesTeste";
     /** Nível da CPU (1 a 8) escolhido na pausa. */
     private static final String CPU_LEVEL_KEY = "nivel_cpu";
 
@@ -711,6 +712,7 @@ public class GameView extends SurfaceView
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
         pausa.setFps(speedPrefs.getBoolean(FPS_KEY, true));
+        pausa.setBotoes(speedPrefs.getBoolean(BOTOES_KEY, true));
         pausa.setNivelCpu(speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO));
         pausa.setGraficos(new MenuPausa.Graficos() {
             @Override public String rotulo(java.util.function.UnaryOperator<String> traduzir) {
@@ -6990,6 +6992,9 @@ public class GameView extends SurfaceView
         if (speedPrefs != null && speedPrefs.getBoolean(FPS_KEY, true) != pausa.fps()) {
             speedPrefs.edit().putBoolean(FPS_KEY, pausa.fps()).apply();
         }
+        if (speedPrefs != null && speedPrefs.getBoolean(BOTOES_KEY, true) != pausa.botoes()) {
+            speedPrefs.edit().putBoolean(BOTOES_KEY, pausa.botoes()).apply();
+        }
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
         }
@@ -7831,11 +7836,11 @@ public class GameView extends SurfaceView
     };
 
     /**
-     * Botões de teste escondidos: no modo história (o jogo de verdade), no tutorial e nas lutas
-     * com conversa (o canto é dos quadros).
+     * Botões de teste escondidos: no modo história (o jogo de verdade), no tutorial, nas lutas
+     * com conversa (o canto é dos quadros) e quando o jogador desliga na pausa (BOTÕES DE TESTE).
      */
     private boolean testButtonsHidden() {
-        return storyMode || tutorial.active() || conversa.ativa() || cinematica.ativa();
+        return storyMode || tutorial.active() || conversa.ativa() || cinematica.ativa() || !pausa.botoes();
     }
 
     /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
