@@ -180,7 +180,8 @@ python3 tools/stage/animar_coberta.py
    `animar_coberta.py` acha a base da barreira coluna a coluna e faz das pontas as camadas
    `parede-esq` e `parede-dir` com `"curva"` (cada coluna na profundidade da sua base, sem a
    parte de baixo: ali aparece o chão projetado). No meio reto, a parede plana continua.
-6. **Chão fosco** (`prompt_4_chao_fosco.txt`): o chão pintado era encerado, com os reflexos das
+6. **Chão fosco (testado e desfeito: o chão fica o encerado pintado, igual ao concept;
+   `CHAO_FOSCO` no `animar_coberta.py`)** (`prompt_4_chao_fosco.txt`): o chão pintado era encerado, com os reflexos das
    lanternas e luzes em riscos verticais; no chão projetado, com a câmera no canto, eles abriam
    em leque. O chão (menos o emblema, até a base da barreira) vira cinza e o Codex repinta o
    mesmo piso fosco, com a pintura original junto como referência (`--image` duas vezes: o

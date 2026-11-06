@@ -36,6 +36,7 @@ TELA = (1785, 227, 2238, 400)                 # a tela azul do telão (x0, y0, x
 PLATEIA = (250, 455)                          # faixa das arquibancadas (linhas do panorama)
 MAX_LUZES = 70
 MAX_FACHOS = 11
+CHAO_FOSCO = False                            # True: o chão repintado fosco + reflexos do motor
 BALANCO = 7                                   # graus: o facho vai de −7 a +7 (cruzamento das imagens)
 ALFA_FACHO = 0.42
 JUNCAO = 520                                  # --juncao do cenario_pintura.py (linha do panorama)
@@ -238,20 +239,27 @@ def main():
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("parede-")] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
     lant = lanternas(pan, base)
+    colunas = [cam["_colunas"] for cam in novas]
     sx = w / pan.shape[1]
-    parede["luzes"] = [l for l in holofotes(w, h) if xa / w < l["x"] < xb / w] + [
-        luz_reflexo(x * sx / w, (y + EXTRA) / h, max(10.0, r * 0.9) / h) for x, y, r in lant if xa < x < xb]
+    # O chão é o encerado pintado, igual ao concept (os reflexos das lanternas estão na pintura).
+    # Com CHAO_FOSCO (a pintura repintada sem os reflexos), o motor desenha os reflexos.
+    parede["luzes"] = [l for l in holofotes(w, h) if xa / w < l["x"] < xb / w]
     for cam in novas:
         c0, c1 = cam.pop("_colunas")
-        cam["luzes"] = [luz_reflexo((x - c0) / (c1 - c0), (y + EXTRA) / h, max(10.0, r * 0.9) / h)
-                        for x, y, r in lant if (x <= xa if c0 == 0 else x >= xb) and c0 <= x < c1]
+        cam.pop("luzes", None)
+    if CHAO_FOSCO:
+        parede["luzes"] += [luz_reflexo(x * sx / w, (y + EXTRA) / h, max(10.0, r * 0.9) / h)
+                            for x, y, r in lant if xa < x < xb]
+        for cam, (c0, c1) in zip(novas, colunas):
+            cam["luzes"] = [luz_reflexo((x - c0) / (c1 - c0), (y + EXTRA) / h, max(10.0, r * 0.9) / h)
+                            for x, y, r in lant if (x <= xa if c0 == 0 else x >= xb) and c0 <= x < c1]
     parede.pop("fachos", None)
     camadas_fachos, nfachos = fachos(pasta, parede, lampadas, xa, xb, w, h)
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("fachos-")] + camadas_fachos
 
     stage["chao"]["reflexoLutadores"] = 0.22
-    stage["chao"]["reflexoLuzes"] = 0.5
-    stage["chao"]["reflexoComprimento"] = 0.5
+    stage["chao"]["reflexoLuzes"] = 0.5 if CHAO_FOSCO else 0
+    stage["chao"]["reflexoComprimento"] = 0.5 if CHAO_FOSCO else 0
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"telão {parede['telao']}, plateia com {len(flashes)} flashes, {len(parede['luzes'])} holofotes, "
           f"{nfachos} fachos, {len(novas)} pontas curvas")
