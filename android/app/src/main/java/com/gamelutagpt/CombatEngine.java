@@ -717,6 +717,12 @@ final class CombatEngine {
             else if (f.grounded) f.breakerChase = 0;
         }
 
+        // SHINKAI: segurar → depois do H que jogou na parede não corre: é o Dragon Rush.
+        if (f.state.inShinkai() && wallChaseRun(f) && podeDragonRush(f)) {
+            startDragonRush(f);
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
         if (wallChaseCancel(f)) {
             f.status = CombatFighter.Status.NEUTRAL;
             f.clearAttack();
@@ -991,7 +997,8 @@ final class CombatEngine {
     }
 
     /**
-     * Dragon Rush: no SHINKAI, → → (no chão ou no ar) voa no rival. Sai do neutro ou cancelando
+     * Dragon Rush: no SHINKAI, → → (no chão ou no ar) voa no rival; segurar → depois do H que
+     * jogou na parede também (no lugar da corrida). Sai do neutro ou cancelando
      * um normal que encostou (acerto ou defesa); um por combo (o rival já apanhou um nesse combo:
      * não sai).
      */
@@ -1009,9 +1016,10 @@ final class CombatEngine {
             if (f.grounded) return !f.busyOnGround();
             return Arena.GROUND_Y - f.y >= config.airDashMinHeight;
         }
-        // Cancelando um normal que encostou, na janela dele.
+        // Cancelando um normal que encostou, na janela dele (ou o H que jogou na parede, com →
+        // segurado: corta a recuperação como a corrida cortaria).
         return f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL && f.move != null &&
-            f.outcome != CombatFighter.Outcome.NONE && CancelSystem.windowOpen(f);
+            f.outcome != CombatFighter.Outcome.NONE && (CancelSystem.windowOpen(f) || wallChaseCancel(f));
     }
 
     private void startDragonRush(CombatFighter f) {
@@ -1022,6 +1030,7 @@ final class CombatEngine {
         f.move = null;
         f.rushSeq = f.rushSocos = f.rushSocosPedidos = f.rushSocoEspera = 0;
         f.rushFim = -1;
+        f.wallChase = 0;
         f.airDashFrames = 0;
         f.wallJumpFrames = 0;
         f.jumpSquat = 0;

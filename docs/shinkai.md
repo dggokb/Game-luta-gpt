@@ -68,6 +68,9 @@ botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` 
 No SHINKAI, o **→ →** não corre: o lutador **voa no rival** (`CombatEngine.DRAGON_RUSH`, o mesmo
 golpe para todos, montado no construtor do motor). Sai do neutro no chão ou no ar (a partir da
 altura mínima do air dash) e também **cancelando um normal que encostou** (acerto ou defesa).
+No combo, **segurar → depois do H que jogou na parede** também é o Dragon Rush (fora do SHINKAI é a
+corrida): corta a recuperação do H como a corrida cortaria. Se o Dragon Rush do combo já foi
+usado, volta a ser a corrida.
 
 - **Voo:** 6 quadros de preparo parado e até 26 de voo reto na direção do rival, a
   `dragonRushSpeed` (1800 por segundo), **subindo se ele está no ar**; para encostado nele. Sem
