@@ -126,7 +126,8 @@ def lados(pasta, parede, base, h):
         pts = [[round((x - c0) / (c1 - c0), 4), round(prof(linha_y(base[x] + EXTRA)), 1)] for x in us]
         camadas.append({"id": f"parede-{nome}", "imagem": arq, "profundidade": max(p[1] for p in pts),
                         "topo": parede["topo"], "base": parede["base"],
-                        "x": round((esq + (c0 + c1) / 2 / w * wr) / 1280, 4), "curva": pts})
+                        "x": round((esq + (c0 + c1) / 2 / w * wr) / 1280, 4), "curva": pts,
+                        "_colunas": (c0, c1)})
     print(f"lados: meio reto de {xa} a {xb}; junção do meio z={prof(linha_y(JUNCAO + EXTRA)):.0f}, "
           f"pontas z={prof(linha_y(base[0] + EXTRA)):.0f} / {prof(linha_y(base[-1] + EXTRA)):.0f}")
     return camadas, xa, xb
@@ -144,6 +145,7 @@ def fachos(pasta, parede, luzes_pan, xa, xb, w, h):
     passo = max(1, int(np.ceil(len(cima) / MAX_FACHOS)))
     escolhidos = cima[::passo]
     alvo_y = 760 + EXTRA
+    corte = JUNCAO - 8 + EXTRA                          # os fachos param na barreira (o chão fica limpo)
     for nome, sinal in (("a", -1), ("b", 1)):
         luz = np.zeros((fh, fw), np.float32)
         cor = np.zeros((fh, fw, 3), np.float32)
@@ -163,6 +165,7 @@ def fachos(pasta, parede, luzes_pan, xa, xb, w, h):
             c = np.array((190, 150, 255) if i % 4 == 2 else (255, 226, 170), np.float32)
             luz = np.maximum(luz, cone)
             cor += cone[..., None] * c
+        luz *= np.clip((corte - yy * escala) / 40.0, 0, 1)    # some antes do chão
         rgb = cor / np.maximum(luz[..., None], 1e-4)
         rgb = rgb + (255 - rgb) * (luz ** 3)[..., None] * 0.5          # o miolo mais branco
         a = np.clip(luz * ALFA_FACHO, 0, 1) * 255
@@ -171,10 +174,37 @@ def fachos(pasta, parede, luzes_pan, xa, xb, w, h):
     camadas = []
     for nome, fase in (("a", 0.0), ("b", 3.1416)):
         camadas.append({"id": f"fachos-{nome}", "imagem": f"fachos_{nome}.png",
-                        "profundidade": round(parede["profundidade"] - 1, 1), "topo": parede["topo"],
+                        "profundidade": round(parede["profundidade"] + 1, 1), "topo": parede["topo"],
                         "base": parede["base"], "x": parede["x"],
                         "onda": {"amplitude": 1, "velocidade": 0.45, "fase": fase, "leve": 0.5}})
     return camadas, len(escolhidos)
+
+
+def lanternas(pan, base):
+    """As lanternas da barreira (amarelo forte, logo acima do pé dela), uma por lanterna, em
+    pixels do panorama: viram luzes com reflexo, e o motor desenha o risco no chão encerado,
+    sempre vertical (o chão é pintado fosco: o reflexo pintado abria em leque com a câmera no
+    canto)."""
+    im = pan.astype(np.int16)
+    r, g, b = im[..., 0], im[..., 1], im[..., 2]
+    m = ((r > 235) & (g > 170) & (b < 200)).astype(np.uint8)
+    yy = np.arange(pan.shape[0])[:, None]
+    m[(yy < base[None, :] - 60) | (yy > base[None, :] - 6)] = 0
+    m = cv2.dilate(m, np.ones((5, 5), np.uint8))
+    n, _, st, cen = cv2.connectedComponentsWithStats(m, 8)
+    achados = sorted([(st[i, 4], cen[i], st[i]) for i in range(1, n)
+                      if 40 <= st[i, 4] <= 2500 and st[i, 2] <= 50 and st[i, 3] <= 70], key=lambda t: -t[0])
+    lista = []
+    for _, (cx, cy), s_ in achados:
+        if any(abs(cx - x) < 40 for x, _, _ in lista):
+            continue
+        lista.append((float(cx), float(cy), float(max(s_[2], s_[3]))))
+    return sorted(lista)
+
+
+def luz_reflexo(u, v, raio_frac):
+    return {"x": round(u, 4), "y": round(v, 4), "raio": round(raio_frac, 4), "cor": "#FFC060",
+            "pulsar": 0.04, "reflexo": True}
 
 
 def main():
@@ -207,12 +237,21 @@ def main():
     novas, xa, xb = lados(pasta, parede, base, h)
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("parede-")] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
-    parede["luzes"] = [l for l in holofotes(w, h) if xa / w < l["x"] < xb / w]
+    lant = lanternas(pan, base)
+    sx = w / pan.shape[1]
+    parede["luzes"] = [l for l in holofotes(w, h) if xa / w < l["x"] < xb / w] + [
+        luz_reflexo(x * sx / w, (y + EXTRA) / h, max(10.0, r * 0.9) / h) for x, y, r in lant if xa < x < xb]
+    for cam in novas:
+        c0, c1 = cam.pop("_colunas")
+        cam["luzes"] = [luz_reflexo((x - c0) / (c1 - c0), (y + EXTRA) / h, max(10.0, r * 0.9) / h)
+                        for x, y, r in lant if (x <= xa if c0 == 0 else x >= xb) and c0 <= x < c1]
     parede.pop("fachos", None)
     camadas_fachos, nfachos = fachos(pasta, parede, lampadas, xa, xb, w, h)
     stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith("fachos-")] + camadas_fachos
 
     stage["chao"]["reflexoLutadores"] = 0.22
+    stage["chao"]["reflexoLuzes"] = 0.55
+    stage["chao"]["reflexoComprimento"] = 0.85
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"telão {parede['telao']}, plateia com {len(flashes)} flashes, {len(parede['luzes'])} holofotes, "
           f"{nfachos} fachos, {len(novas)} pontas curvas")

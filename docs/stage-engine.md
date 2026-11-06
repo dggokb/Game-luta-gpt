@@ -377,3 +377,9 @@ da água, ou usar imagens menores.
 jogo, o fundo anda e cresce menos, a profundidade do piso é invertida corretamente, a
 validação do stage.json, o desenho completo com e sem imagens em várias câmeras sem
 deixar o Canvas desbalanceado e a bandeira presa em cima balançando embaixo.
+
+**Reflexo comprido das luzes** (`"reflexoComprimento"` no `chao`, 0 a 1): o reflexo de cada luz
+com `"reflexo": true` vira um risco vertical descendo pelo chão encerado, até essa fração do
+caminho para a borda de baixo da tela. Desenhado na tela, fica na vertical com a câmera em
+qualquer lugar (um reflexo pintado no chão projetado abre em leque nos cantos). As luzes de
+camadas curvas refletem na profundidade da sua coluna.

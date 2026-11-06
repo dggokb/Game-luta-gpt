@@ -1445,12 +1445,31 @@ public final class StageScene {
         StageDefinition.Floor floor = pack.definition.floor;
         if (floor == null || floorImage == null || floor.lightReflection <= 0f) return;
         for (Placed p : placed) {
-            if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.extent) continue;
+            // A parede no fim do chão (a 1 de profundidade atrás dele) também reflete.
+            if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.extent + 2f) continue;
             if (p.layer.lights.isEmpty() && p.layer.fires.isEmpty()) continue;
             int first = 0, last = 0;
             if (p.layer.repeat != StageDefinition.Repeat.NONE) {
                 first = (int)Math.floor((camera.worldX(0f, p.z) - p.width - p.firstCenterX) / p.period);
                 last = (int)Math.ceil((camera.worldX(VW, p.z) + p.width - p.firstCenterX) / p.period);
+            }
+            if (p.layer.curveU != null) {
+                // Camada curva: cada luz na profundidade da sua coluna.
+                StageCamera rest = restCamera;
+                RenderImage img = p.image;
+                if (img == null) continue;
+                float rt = p.layer.top * VH, rb = p.layer.bottom * VH;
+                float wr = (rb - rt) * img.width() / img.height();
+                float rl = p.layer.x * VW - wr * 0.5f;
+                for (StageDefinition.Light light : p.layer.lights) {
+                    if (!light.reflect) continue;
+                    float z = p.layer.curveDepth(light.x);
+                    float wx = rest.worldX(rl + light.x * wr, z);
+                    float wy = rest.worldY(rt + light.y * (rb - rt), z);
+                    float wh = rest.worldY(rb, z) - rest.worldY(rt, z);
+                    reflection(c, wx, wy, z, light.radius * wh, light.color, floor.lightReflection);
+                }
+                continue;
             }
             float h = p.bottom - p.top;
             for (int k = first; k <= last; k++) {
@@ -1482,6 +1501,16 @@ public final class StageScene {
         c.scale(0.55f, 2.6f, sx, sy);
         c.fillRadialGlow(sx, sy, radius, withAlpha(color, Math.round(255f * strength * pulse)));
         c.restore();
+        float len = pack.definition.floor.lightReflectionLength;
+        if (len > 0f && sy < VH) {
+            // O risco do chão encerado: vertical na tela (desce na direção de quem olha), largo e
+            // fraco por fora, estreito e forte no miolo, sumindo para baixo.
+            float bottom = sy + (VH + 40f - sy) * len;
+            int a = Math.round(255f * strength * pulse);
+            float w = radius * 0.9f;
+            c.fillVerticalGradient(sx - w, sy, sx + w, bottom, withAlpha(color, a / 3), withAlpha(color, 0));
+            c.fillVerticalGradient(sx - w * 0.35f, sy, sx + w * 0.35f, bottom, withAlpha(color, a * 2 / 3), withAlpha(color, 0));
+        }
     }
 
     // ------------------------------------------------------ água e neblina

@@ -180,3 +180,14 @@ python3 tools/stage/animar_coberta.py
    `animar_coberta.py` acha a base da barreira coluna a coluna e faz das pontas as camadas
    `parede-esq` e `parede-dir` com `"curva"` (cada coluna na profundidade da sua base, sem a
    parte de baixo: ali aparece o chão projetado). No meio reto, a parede plana continua.
+6. **Chão fosco** (`prompt_4_chao_fosco.txt`): o chão pintado era encerado, com os reflexos das
+   lanternas e luzes em riscos verticais; no chão projetado, com a câmera no canto, eles abriam
+   em leque. O chão (menos o emblema, até a base da barreira) vira cinza e o Codex repinta o
+   mesmo piso fosco, com a pintura original junto como referência (`--image` duas vezes: o
+   tamanho, a cor e as lajotas saem iguais). Primeiro o centro, depois cada lado continuando o
+   centro; nas emendas, o lado é casado com o centro linha a linha (a cor) e misturado em 80 px.
+   Tirar os reflexos pela imagem (filtros) não deu: os riscos são dourados e estourados.
+   Os reflexos das lanternas voltam desenhados pelo motor (`"reflexoComprimento"` no `chao`):
+   cada lanterna da barreira (achada na pintura, uma por lanterna, também nas pontas curvas) vira
+   uma luz com reflexo, e o motor desenha o risco no chão, sempre vertical embaixo dela, com a
+   câmera em qualquer lugar. No modo leve, sem reflexos.

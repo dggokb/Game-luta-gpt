@@ -381,6 +381,13 @@ public final class StageDefinition {
         /** Opacidade do reflexo das luzes no piso. */
         public final float lightReflection;
         /**
+         * {@code "reflexoComprimento"}: o reflexo de cada luz vira um risco vertical descendo pelo
+         * chão encerado, até esta fração do caminho para a borda de baixo da tela (0 = só o brilho
+         * curto). Desenhado na tela, fica sempre na vertical embaixo da luz, com a câmera em
+         * qualquer lugar (pintado no chão projetado, abria em leque nos cantos).
+         */
+        public float lightReflectionLength;
+        /**
          * Até onde o chão continua atrás do piso ({@code "ate"}), repetindo a imagem lisa na
          * profundidade; igual a {@code far} = o piso acaba na borda de cima da imagem. Para
          * o chão de uma arena ir do ringue até a arquibancada, lá no fundo.
@@ -800,6 +807,7 @@ public final class StageDefinition {
                 number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f),
                 number(floorMap, "ate", far), number(floorMap, "largura", Float.NaN),
                 number(floorMap, "linhasPerspectiva", Float.NaN));
+            floor.lightReflectionLength = clamp01(number(floorMap, "reflexoComprimento", 0f));
             Map<String, Object> proj = object(floorMap, "projecao");
             if (proj != null) {
                 float pt = number(proj, "topo", Float.NaN), pb = number(proj, "base", Float.NaN);
