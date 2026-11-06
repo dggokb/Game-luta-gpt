@@ -54,6 +54,9 @@ public final class PaginaHistoria {
     private final Rostos rostos;
     private final ChaveTorneio chave;
     private final SorteioCinema sorteioCinema;
+    private final TelaVersus telaVersus;
+    /** A tela de versus está na frente da luta do passo atual (a luta só começa depois dela). */
+    private boolean versus;
     private final EscolhaIrmao escolha;
     /** Irmão escolhido e a chave do torneio; null = sem escolha nem torneio (passos pulados). */
     private Campanha campanha;
@@ -87,6 +90,7 @@ public final class PaginaHistoria {
         rostos = new Rostos(assets);
         chave = new ChaveTorneio(rostos);
         sorteioCinema = new SorteioCinema(assets, rostos);
+        telaVersus = new TelaVersus(assets);
         escolha = new EscolhaIrmao(rostos);
     }
 
@@ -160,6 +164,7 @@ public final class PaginaHistoria {
         this.episodio = episodio;
         active = true;
         waitingFight = false;
+        versus = false;
         warnings.clear();
         loadLogo();
         stepIndex = -1;
@@ -243,6 +248,11 @@ public final class PaginaHistoria {
     /** Toque em (x, y), em coordenadas de tela 1280x720. */
     public void tap(float x, float y) {
         if (!coversScreen() || exitAt >= 0f) return;
+        if (versus) {
+            // Qualquer toque (o PULAR também) vai direto ao clarão que leva para a luta.
+            time = TelaVersus.toque(time);
+            return;
+        }
         Episodio.Passo p = passo();
         if (temSkip(p) && x >= SKIP_LEFT && x <= SKIP_RIGHT && y >= SKIP_TOP && y <= SKIP_BOTTOM) {
             skip();
@@ -301,6 +311,15 @@ public final class PaginaHistoria {
             return;
         }
         Episodio.Passo p = passo();
+        if (versus) {
+            String som = TelaVersus.som(antes, time);
+            if (som != null) {
+                listener.onHistoriaSom(som);
+                shake = 18f;
+            }
+            if (time >= TelaVersus.DURACAO) comecaLuta();
+            return;
+        }
         if (p.tipo == Episodio.TipoPasso.TITULO && time >= TITLE_DURATION) {
             exit();
         } else if (p.tipo == Episodio.TipoPasso.SORTEIO && SorteioCinema.ativo(campanha.torneio())) {
@@ -358,15 +377,40 @@ public final class PaginaHistoria {
                 beginPage(p);
                 break;
             case LUTA:
-                waitingFight = true;
                 releaseImages();
-                listener.onHistoriaLuta(p);
+                String[][] lados = ladosDoVersus(p);
+                if (lados != null) {
+                    // Luta do torneio: a tela de versus primeiro; a luta começa no fim dela.
+                    versus = true;
+                    telaVersus.begin(lados, rotulo(p));
+                    listener.onHistoriaSom("painel");
+                } else {
+                    comecaLuta();
+                }
                 break;
             default:
                 releaseImages();
                 listener.onHistoriaSom("pagina");
                 break;
         }
+    }
+
+    /**
+     * As duplas da tela de versus antes da luta {jogador, adversário}, ou null sem tela: só nas
+     * lutas do torneio (quartas, semifinal, final) e no duelo da regra escondida.
+     */
+    private String[][] ladosDoVersus(Episodio.Passo luta) {
+        if (campanha == null || !(luta.torneio || luta.duelo)) return null;
+        String[][] lados = lados(luta);
+        return lados == null || lados[0].length == 0 || lados[1].length == 0 ? null : lados;
+    }
+
+    /** Pede a luta do passo atual ao jogo (depois da tela de versus, se houver). */
+    private void comecaLuta() {
+        versus = false;
+        telaVersus.liberar();
+        waitingFight = true;
+        listener.onHistoriaLuta(passo());
     }
 
     /**
@@ -472,6 +516,7 @@ public final class PaginaHistoria {
     private void releaseImages() {
         images.clear();
         sorteioCinema.liberar();
+        telaVersus.liberar();
     }
 
     private void tapPage() {
@@ -575,6 +620,9 @@ public final class PaginaHistoria {
                 } else {
                     drawPage(c, p);
                 }
+                break;
+            case LUTA:
+                if (versus) telaVersus.draw(c, temporada, time);
                 break;
             default:
                 break;

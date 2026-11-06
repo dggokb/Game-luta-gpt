@@ -134,6 +134,27 @@ irmãos ficam em lados opostos". O Arcade continua com o sorteio rápido.
 | p13 (Krüger Stahl) + p14 | (p13) "Algum problema? Quem cair com a gente, cai feio." |
 | p15 (Natisuko) + p16 (Bonnie Scarlet) | (p16) "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!" |
 
+### A tela de versus
+
+Antes de cada luta do torneio (quartas, semifinal, final; também no Arcade) e do duelo da regra
+escondida, a `TelaVersus` (4,6 s), montada como uma arte de tela de versus:
+
+- o **templo à noite** de fundo, partido na diagonal por um raio, cada metade com a cor do seu
+  lado: o Ryūga é azul e o Kōga é vermelho (quem não é irmão fica com a cor que sobrou);
+- o **espírito** de cada irmão atrás da dupla dele: o dragão do Ryūga, o tigre do Kōga;
+- os lutadores **da cintura para cima**, cada um numa pose de assinatura: o titular grande perto
+  do meio, o parceiro atrás, do lado de fora; o da direita espelhado, olhando para o meio;
+- o **logo** em cima com a rodada, o **VS de prata** que bate no meio com clarão, raios, tremor e
+  o som de impacto, e as **placas** embaixo (P1 / CPU, o nome do titular e o parceiro em "TAG");
+- fumaça embaixo, brasas subindo e linhas de velocidade; um clarão branco leva para a luta.
+
+O toque (ou o PULAR), depois de 0,9 s, vai direto ao clarão final. Repetir a luta depois de uma
+derrota não mostra a tela de novo. O desafio no porto e a emboscada não têm versus.
+
+As peças (`historia/torneio/versus/`) foram geradas no Codex e preparadas por
+`tools/historia/versus_arte.py`; os originais e os prompts ficam em `art/versus/`. Como gerar e
+trocar: [prompts-versus.md](prompts-versus.md).
+
 ### A regra escondida
 
 Depois da FINAL (2x2), a dupla campeã luta entre si, **1x1** (Ryūga × p02 ou Kōga × p04).
