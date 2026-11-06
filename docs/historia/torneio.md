@@ -134,6 +134,23 @@ irmãos ficam em lados opostos". O Arcade continua com o sorteio rápido.
 | p13 (Krüger Stahl) + p14 | (p13) "Algum problema? Quem cair com a gente, cai feio." |
 | p15 (Natisuko) + p16 (Bonnie Scarlet) | (p16) "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!" |
 
+### A tela de versus
+
+Antes de cada luta do torneio (quartas, semifinal, final; também no Arcade) e do duelo da regra
+escondida, a `TelaVersus` (4,4 s): a tela se parte na diagonal, azul do lado do jogador e
+vermelha do adversário, com linhas de velocidade; as duplas entram deslizando das bordas (o
+titular na frente, o parceiro atrás e mais apagado; o adversário espelhado, olhando para o
+meio); o "VS" bate no meio com clarão, raios, tremor e o som de impacto; o nome da rodada entra
+numa pincelada em cima e os nomes das duplas embaixo; um clarão branco leva para a luta. Faixas
+de cinema em cima e embaixo. O toque (ou o PULAR), depois de 0,9 s, vai direto ao clarão final.
+Repetir a luta depois de uma derrota não mostra a tela de novo. O desafio no porto e a
+emboscada não têm versus.
+
+Arte de cada lutador: `historia/torneio/versus/pNN.png` (PNG transparente, virado para a
+direita, pés na base, 2 pixels por pixel do mundo). **Provisória**: poses dos sprites
+(`python3 tools/historia/versus_poses.py`). As ilustrações definitivas saem dos prompts de
+[prompts-versus.md](prompts-versus.md) e entram no mesmo nome, sem mudar o jogo.
+
 ### A regra escondida
 
 Depois da FINAL (2x2), a dupla campeã luta entre si, **1x1** (Ryūga × p02 ou Kōga × p04).
