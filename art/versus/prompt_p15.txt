@@ -1,0 +1,9 @@
+You have an image generation tool. Use it to create ONE new image (do not write any code files).
+
+Attached: concept.png is the character sheet of the fighter (outfit, hair, colors, face and proportions must match it exactly). style.png shows the art style to use (2D anime fighting game key art, bold clean lineart, strong cel shading, dramatic rim light).
+
+Create a WAIST-UP illustration of THIS character for a fighting game VERSUS screen (like the character portraits of a VS screen): woman with a long black ponytail, white karate gi top open over a black top, white pants, black belt. Three-quarter view facing to the RIGHT of the image. Pose: fists in a tight karate guard with one fist forward, focused glare. Show the character from the top of the head down to the hips; the image is cut at the hips at the bottom edge. The character is large and fills the frame (head near the top edge), but BOTH hands, both arms and all the hair stay fully inside the image with some green around them: nothing is cut by the left, right or top edges. This must be a dramatic signature pose, NOT a plain fighting guard.
+
+Background: flat solid pure green (#00FF00) everywhere around the character, no gradient, no shadow, no text, no energy effects or particles over the green.
+
+Portrait orientation 1024x1536. Save the result as p15.png in the current directory.

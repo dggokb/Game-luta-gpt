@@ -137,19 +137,23 @@ irmãos ficam em lados opostos". O Arcade continua com o sorteio rápido.
 ### A tela de versus
 
 Antes de cada luta do torneio (quartas, semifinal, final; também no Arcade) e do duelo da regra
-escondida, a `TelaVersus` (4,4 s): a tela se parte na diagonal, azul do lado do jogador e
-vermelha do adversário, com linhas de velocidade; as duplas entram deslizando das bordas (o
-titular na frente, o parceiro atrás e mais apagado; o adversário espelhado, olhando para o
-meio); o "VS" bate no meio com clarão, raios, tremor e o som de impacto; o nome da rodada entra
-numa pincelada em cima e os nomes das duplas embaixo; um clarão branco leva para a luta. Faixas
-de cinema em cima e embaixo. O toque (ou o PULAR), depois de 0,9 s, vai direto ao clarão final.
-Repetir a luta depois de uma derrota não mostra a tela de novo. O desafio no porto e a
-emboscada não têm versus.
+escondida, a `TelaVersus` (4,6 s), montada como uma arte de tela de versus:
 
-Arte de cada lutador: `historia/torneio/versus/pNN.png` (PNG transparente, virado para a
-direita, pés na base, 2 pixels por pixel do mundo). **Provisória**: poses dos sprites
-(`python3 tools/historia/versus_poses.py`). As ilustrações definitivas saem dos prompts de
-[prompts-versus.md](prompts-versus.md) e entram no mesmo nome, sem mudar o jogo.
+- o **templo à noite** de fundo, partido na diagonal por um raio, cada metade com a cor do seu
+  lado: o Ryūga é azul e o Kōga é vermelho (quem não é irmão fica com a cor que sobrou);
+- o **espírito** de cada irmão atrás da dupla dele: o dragão do Ryūga, o tigre do Kōga;
+- os lutadores **da cintura para cima**, cada um numa pose de assinatura: o titular grande perto
+  do meio, o parceiro atrás, do lado de fora; o da direita espelhado, olhando para o meio;
+- o **logo** em cima com a rodada, o **VS de prata** que bate no meio com clarão, raios, tremor e
+  o som de impacto, e as **placas** embaixo (P1 / CPU, o nome do titular e o parceiro em "TAG");
+- fumaça embaixo, brasas subindo e linhas de velocidade; um clarão branco leva para a luta.
+
+O toque (ou o PULAR), depois de 0,9 s, vai direto ao clarão final. Repetir a luta depois de uma
+derrota não mostra a tela de novo. O desafio no porto e a emboscada não têm versus.
+
+As peças (`historia/torneio/versus/`) foram geradas no Codex e preparadas por
+`tools/historia/versus_arte.py`; os originais e os prompts ficam em `art/versus/`. Como gerar e
+trocar: [prompts-versus.md](prompts-versus.md).
 
 ### A regra escondida
 

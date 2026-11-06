@@ -12,7 +12,8 @@ estão em docs/historia/prompts-versus.md.
 - Templo: o fundo, cortado em 16:9 (1600×900, JPG).
 - Logo: o logo do jogo (historia/logo.jpg), com o preto virando transparência.
 
-    python3 tools/historia/versus_arte.py <pasta do Codex, com uma pasta por peça: p01/p01.png...>
+    python3 tools/historia/versus_arte.py art/versus     # os originais do Codex guardados no repo
+    python3 tools/historia/versus_arte.py <pasta>        # ou a pasta do Codex (p01/p01.png, ...)
 """
 import os
 import sys
@@ -53,8 +54,12 @@ def main():
     os.makedirs(SAIDA, exist_ok=True)
 
     def origem(nome):
-        p = os.path.join(pasta, nome, nome + ".png")
-        return p if os.path.exists(p) else None
+        # A pasta do Codex (uma pasta por peça) ou os originais guardados em art/versus/.
+        for p in (os.path.join(pasta, nome, nome + ".png"), os.path.join(pasta, nome + ".webp"),
+                  os.path.join(pasta, nome + ".png")):
+            if os.path.exists(p):
+                return p
+        return None
 
     for n in LUTADORES:
         if not origem(n):

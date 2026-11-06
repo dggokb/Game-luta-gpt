@@ -1,57 +1,71 @@
-# Prompts da tela de versus (uma ilustração por lutador)
+# Tela de versus: as peças geradas no Codex
 
-A tela de versus (`TelaVersus`, antes de cada luta do torneio e do duelo) mostra o titular de
-cada dupla na frente e o parceiro atrás. A arte de cada lutador fica em
-`android/app/src/main/assets/historia/torneio/versus/pNN.png`. Por enquanto são poses tiradas dos
-sprites (`tools/historia/versus_poses.py`), provisórias: a ideia é trocar por ilustrações.
+A tela de versus (`TelaVersus`, antes de cada luta do torneio e do duelo) é uma **montagem**,
+como a arte de referência (o Ryūga e a Yin-lu contra o Kōga e o Brucy, com o dragão e o tigre).
+Cada peça é uma imagem separada, e o jogo junta tudo e anima:
 
-## Como gerar
+| Peça | Imagem do Codex | No jogo |
+|---|---|---|
+| 16 lutadores | da cintura para cima, virado para a direita, numa pose de assinatura (não a guarda do sprite), fundo verde liso | `versus/pNN.png`: sem o verde, 1100 px de altura. O titular fica grande perto do meio e o parceiro atrás, do lado de fora; o da direita é espelhado |
+| dragão | dragão de energia azul e branca em pinceladas, sobre o preto | `versus/dragao.png`: o preto vira transparência. Fica atrás da dupla do Ryūga |
+| tigre | tigre de energia vermelha, sobre o preto | `versus/tigre.png`: fica atrás da dupla do Kōga |
+| templo | o pátio do templo à noite, com a lua, vazio | `versus/templo.jpg` (16:9): o fundo, partido na diagonal e tingido de azul e de vermelho |
+| VS | letras "VS" de prata escovada, rachadas, fundo verde | `versus/vs.png` |
+| logo | o logo do jogo (`historia/logo.jpg`), não é gerado | `versus/logo.png`: o preto vira transparência |
 
-- Uma imagem por lutador, **1024×1536 (em pé)**, com o concept dele (`art/concepts/pNN.png`)
-  anexado como referência de roupa, cabelo e cores.
-- **Fundo verde liso (#00FF00)**, sem chão, sem sombra no fundo e sem efeitos passando por cima
-  do verde: o recorte tira o verde (como nos efeitos de vídeo).
-- Corpo inteiro, dos pés à cabeça, **virado para a direita** (três quartos), numa **pose de
-  assinatura** do personagem (não a guarda de luta do sprite), ocupando a altura quase toda (pés
-  a uns 2% da borda de baixo).
-- Mesmo estilo para os 16: o dos storyboards da abertura (`sokon_storyboard_06B...`, no Drive),
-  anime de luta, traço limpo, cel shading forte, luz de contorno.
+Os originais do Codex e os prompts de cada um ficam em `art/versus/` (`pNN.webp` e
+`prompt_pNN.txt`, `dragao`, `tigre`, `templo`, `vs`). Para refazer as peças do jogo:
 
-Prompt base (troque o trecho entre colchetes):
+```bash
+python3 tools/historia/versus_arte.py art/versus
+```
 
-> Full-body anime fighting game character illustration for a VERSUS screen, in the same style as
-> the attached concept sheet: [DESCRIÇÃO]. Pose: [POSE], facing RIGHT, NOT a plain fighting
-> guard, whole body visible from head to feet, feet near the bottom edge.
-> Clean bold lineart, strong cel shading, dramatic rim light, high detail, 2D anime fighting
-> game key art. Flat solid pure green background (#00FF00), no floor, no shadow on the
-> background, no text, no effects over the background. Portrait 1024x1536.
+## Como gerar (Codex)
 
-## Poses (uma de assinatura para cada um, não a guarda do sprite)
+O Codex entra com a conta do ChatGPT (`npm install -g @openai/codex`, `codex login --device-auth`;
+veja [../cenarios-com-codex.md](../cenarios-com-codex.md)). Cada pedido, numa pasta com as
+imagens anexadas:
 
-| Lutador | [POSE] |
+```bash
+codex exec --skip-git-repo-check --sandbox workspace-write -i concept.png -i style.png - < prompt.txt
+```
+
+- **Lutadores**: anexam o concept do lutador (`art/concepts/pNN.png`, roupa, cabelo e cores) e
+  o storyboard 06B da abertura (`style.png`, o estilo: arte de luta anime, traço limpo, cel
+  shading forte, luz de contorno). 1024×1536, da cintura para cima, as duas mãos e o cabelo
+  inteiros dentro da imagem, fundo #00FF00 sem efeitos por cima.
+- **Dragão e tigre**: anexam o logo (o mesmo visual de pinceladas de energia). 1536×1024, só a
+  criatura, fundo preto.
+- **Templo**: anexa o estilo. 1536×1024, sem ninguém e sem texto, escuro, simétrico.
+- **VS**: 1024×1024, só as letras, fundo verde.
+
+Para trocar um lutador: gere de novo com o prompt dele (`art/versus/prompt_pNN.txt`), grave como
+`art/versus/pNN.webp` e rode o `versus_arte.py`. O jogo não muda.
+
+## Poses dos lutadores
+
+| Lutador | Pose |
 |---|---|
-| p01 Ryūga | deep lunging stance throwing a powerful straight punch toward the right, the other fist pulled back at the hip, belt ends and pants flowing, fierce battle shout |
-| p02 Yin-lu | elegant kung fu crane pose standing on one leg, one open palm thrust forward, the other arm raised gracefully behind, calm sharp gaze |
-| p03 Kōga | cocky forward lean, beckoning the opponent with one hand ("come on"), the other fist clenched low, wild arrogant grin |
-| p04 Brucy | wide street-boxer stance, punching one bandaged fist into his open palm, big confident grin |
-| p05 | crouched low like a predator, katana half drawn from the sheath, tattered cloth flowing |
-| p06 | leaning forward, one clawed hand reaching toward the right, the other arm swept back, mask eyes glowing |
-| p07 | elegant menacing stance, one hand adjusting the fedora brim, the other ready to strike |
-| p08 | hip cocked, cracking the whip in a wide arc around her, dangerous smile |
-| p09 | slamming both fists together in front of his chest, roaring with laughter |
-| p10 | pointing at the opponent with one hand, the other on her hip, annoyed smirk |
-| p11 | unhinged, gloved hands raised like claws, crazy grin, lab coat flaring |
-| p12 Necro | hunched aggressive zombie stance, clawed hands forward, mouth open |
-| p13 Krüger Stahl | towering, punching his fist into his open palm, looking down menacingly |
-| p14 | relaxed confident stance, one hand raised beckoning, crooked smirk |
-| p15 Natisuko | one leg raised in a chambered side kick, arms in a tight karate guard, focused glare |
-| p16 Bonnie Scarlet | playful jump with one leg kicked back, fists up, wide clown grin |
+| p01 Ryūga | soco reto avançando para a direita, o outro punho puxado para trás, grito de luta |
+| p02 Yin-lu | golpe de palma aberta para a frente, a outra mão erguida atrás, olhar calmo |
+| p03 Kōga | chamando o adversário com a mão ("vem"), o outro punho fechado, sorriso arrogante |
+| p04 Brucy | socando a palma aberta com o punho enfaixado, sorriso confiante |
+| p05 | katana meio desembainhada, olhos por cima da máscara, pano rasgado esvoaçando |
+| p06 | uma mão em garra para a direita, olhos da máscara brilhando roxos |
+| p07 | ajeitando a aba do chapéu, sorriso perigoso, gola do casaco erguida |
+| p08 | chicote esticado entre as mãos perto do rosto, sorriso perigoso |
+| p09 | batendo os dois punhos na frente do peito, gargalhando |
+| p10 | apontando para o adversário, a outra mão na cintura, irritada |
+| p11 | mãos enluvadas erguidas como garras, sorriso louco, jaleco esvoaçando |
+| p12 Necro | mãos em garra para a frente, boca aberta rosnando, ombros curvados |
+| p13 Krüger Stahl | socando a palma aberta, olhando de cima, ameaçador |
+| p14 | uma mão erguida chamando, sorriso torto, cabelo ao vento |
+| p15 Natisuko | guarda de karatê fechada com um punho à frente, olhar concentrado |
+| p16 Bonnie Scarlet | punhos perto do rosto, piscando, sorriso largo de palhaça |
 
-O prompt base usa "Pose: [POSE]" no lugar da guarda.
+## Descrições (vão no prompt de cada lutador)
 
-## Descrições
-
-| Lutador | [DESCRIÇÃO] |
+| Lutador | Descrição |
 |---|---|
 | p01 Ryūga | young man, spiky brown hair, sleeveless blue-and-white martial arts top with red collar over a black tank top, white baggy pants with blue stripes, red and black belt, black fingerless gloves, blue-white sneakers |
 | p02 Yin-lu | young woman, short silver bob hair with a dark headband, teal sleeveless qipao top with gold buttons, orange waist sash, navy baggy pants, fingerless gloves |
@@ -69,10 +83,3 @@ O prompt base usa "Pose: [POSE]" no lugar da guarda.
 | p14 | man with long black hair tied back, black outfit with red details, fingerless gloves |
 | p15 Natisuko | woman with a long black ponytail, white karate gi top open over a black top, white pants, black belt |
 | p16 Bonnie Scarlet | red-haired clown girl, red clown nose, star face paint, red and white striped stockings, harlequin fighter outfit |
-
-## Depois de gerar
-
-Ponha as imagens no Drive (`pNN.png`). O recorte tira o verde com a chave do
-`tools/sprites/efeito_video.py`, ajusta a escala (um lutador de altura comum com uns 470 pixels,
-pés na base, 2 pixels por pixel do mundo) e grava em `historia/torneio/versus/pNN.png`. O jogo
-não muda.
