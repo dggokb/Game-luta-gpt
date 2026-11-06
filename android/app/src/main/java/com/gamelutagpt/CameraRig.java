@@ -38,6 +38,11 @@ final class CameraRig {
     float x = Arena.WORLD_WIDTH * 0.5f;
     float top = GROUND_CAMERA_TOP;
     float zoom = CAMERA_ZOOM;
+    /**
+     * Zoom do cenário ({@code camera.zoom} no stage.json): multiplica o zoom da luta. Menor que 1
+     * abre a câmera (os lutadores menores e mais cenário na tela, como num conceito pintado de longe).
+     */
+    float escala = 1f;
     /** Adiantamento atual: vai e volta por mola (motion-core), sem tranco. */
     private final Canal lead = new Canal(Mola.PESADA);
     private int leadFrame;
@@ -110,7 +115,7 @@ final class CameraRig {
                 : Math.min(targetZoomX, targetZoomY),
             CAMERA_MIN_ZOOM,
             CAMERA_ZOOM
-        );
+        ) * escala;
 
         float zoomFollow =
             1f - (float)Math.pow(0.0025f, dt);

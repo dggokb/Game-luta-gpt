@@ -68,3 +68,20 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
 --fundo art/stages/arena_pintura/4_fundo_sem_arena_4096.webp \
 --mascara art/stages/arena_pintura/5_mascara_arena_4096.png
 ```
+
+## Três planos de fundo, animação, luz e câmera
+
+8. **Céu separado das montanhas** (`prompt_7_ceu_verde.txt`, `prompt_8_so_ceu.txt`): o Codex
+   pinta o céu em verde (molde) e, à parte, só o céu sem terra. `tools/stage/alinhar_mascara.py`
+   alinha o molde à pintura e dá `6_mascara_ceu_4096.png`. O `cenario_pintura.py` com `--ceu` e
+   `--mascara-ceu` monta três planos: **céu** (30000), **montanhas** (`--prof-fundo`, 7000) e a
+   **arena**. Céu e montanhas são os pixels da própria pintura no que aparece; o pintado à parte
+   só preenche o que fica escondido, alinhado (o sol no mesmo lugar) e com as cores dela. Os dois
+   ficam apoiados na arena (`apoio`): no super pulo descem com ela.
+9. **Animação** (`tools/stage/animar_pintura.py`): solta as bandeiras grandes (nas torres o
+   buraco fica transparente, aparece o fundo), põe chama animada nos braseiros (`BRASEIROS`,
+   marcados à mão e ajustados pela cor), pulsa os holofotes, mexe a plateia com flashes e corre
+   a água das cachoeiras.
+10. **Luz e câmera**: sombra comprida dos lutadores na direção do sol do conceito (atrás à
+    esquerda) e `camera.zoom` 0,8 (só neste cenário a câmera da luta abre 20%, mais perto do
+    enquadramento do conceito).

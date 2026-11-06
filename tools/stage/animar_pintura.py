@@ -6,15 +6,14 @@
 
 A pintura é parada, com a luz pintada. Este script põe nela o que o motor sabe mexer, como o
 ``animar_central.py`` faz na Arena antiga, mas sem posições medidas à mão: tudo é achado pela
-cor na ``parede.png`` (a arena recortada) e no ``fundo.jpg`` (céu e montanhas).
+cor na ``parede.png`` (a arena recortada) e no ``montanhas.webp``.
 
 * **bandeiras**: cada pano vermelho da arena é solto e balança (nas torres, pendurado e
   solto; na parede, preso); o lugar dele é tapado com a parede;
-* **fogos**: as chamas dos braseiros (laranja forte no muro) ganham a chama animada;
-* **luzes**: os holofotes das torres (branco no alto) e as lanternas (pontos amarelos no muro),
-  pulsando; as baixas refletem no chão;
+* **fogos**: as chamas dos braseiros (os pontos em ``BRASEIROS``, com ajuste fino pela cor);
+* **luzes**: os holofotes das torres (branco no alto), pulsando;
 * **plateia**: a gente das arquibancadas pula de leve e solta flashes de câmera;
-* **cachoeiras**: a água das quedas do fundo corre.
+* **cachoeiras**: a água das quedas das montanhas corre.
 
 Rode sempre depois do ``cenario_pintura.py`` (ele refaz a parede com as bandeiras pintadas).
 """
@@ -36,7 +35,7 @@ import soltar_bandeiras as sb  # noqa: E402
 from montar_porto import plateia as mascara_plateia  # noqa: E402
 
 PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/arena_pintura"
-PAREDE, FUNDO = "parede.png", "fundo.jpg"
+PAREDE, FUNDO = "parede.png", "montanhas.webp"
 MAX_BANDEIRAS = 24
 
 
@@ -69,19 +68,58 @@ def bandeiras(img, h, w):
     return torres, parede
 
 
+def soltar(img, caixa, balanco, fundo, pasta, lista):
+    """O ``animar_central.soltar`` de uma bandeira, com o buraco tapado do jeito pedido: nas
+    torres a bandeira pende no ar ("vao": transparente, aparece o fundo); na parede, a parede."""
+    m = ac.pano(img, caixa)
+    h, w = img.shape[:2]
+    ys = np.nonzero(m.any(axis=1))[0]
+    corte = ys[0] + max(3, round(sb.PRESO * (ys[-1] - ys[0])))
+    solta = m.copy()
+    solta[:corte] = False
+    leva = m.copy()
+    leva[:corte - sb.SOBRA] = False
+    yy, xx = np.nonzero(leva)
+    bx0, bx1, by0, by1 = xx.min(), xx.max() + 1, yy.min(), yy.max() + 1
+    pano_img = np.zeros((by1 - by0, bx1 - bx0, 4), np.uint8)
+    recorte = leva[by0:by1, bx0:bx1]
+    pano_img[recorte] = img[by0:by1, bx0:bx1][recorte]
+    nome = f"parede_bandeira{len(lista) + 1}.png"
+    Image.fromarray(pano_img).save(pasta / nome, optimize=True)
+    lista.append({"imagem": nome, "x": round(float(bx0 / w), 4), "y": round(float(by0 / h), 4),
+                  "largura": round(float((bx1 - bx0) / w), 4), "altura": round(float((by1 - by0) / h), 4),
+                  "balanco": balanco})
+    return sb.tapar(img, solta, fundo)
+
+
+# Braseiros: (x, y da base da chama) marcados na parede.png reduzida a 2048 de largura (ver o
+# docs/cenarios-com-codex.md). O ajuste fino acha a chama de verdade perto de cada ponto.
+BRASEIROS = [(72, 290), (200, 290), (338, 286), (515, 287), (613, 290), (898, 287), (1075, 287),
+             (1336, 287), (1425, 290), (1565, 292), (1640, 293), (1795, 293), (1958, 287)]
+
+
 def fogos(img, h, w):
-    r, g, b, a = (img[..., k].astype(np.float32) for k in range(4))
-    chama = (r > 225) & (g > 110) & (b < 120) & (r - b > 130) & (a > 200)
-    chama[:int(0.72 * h)] = False
-    m = cv2.morphologyEx(chama.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((7, 7), np.uint8))
+    hsv = cv2.cvtColor(np.ascontiguousarray(img[..., :3]), cv2.COLOR_RGB2HSV).astype(np.float32)
+    chama = (hsv[..., 0] >= 6) & (hsv[..., 0] <= 32) & (hsv[..., 1] > 90) & (hsv[..., 2] > 225) & (img[..., 3] > 200)
+    k = w / 2048
     lista = []
-    for st, _ in componentes(m, 120):
-        x, y, cw, ch = st[:4]
-        if ch < 12:
-            continue
-        lista.append({"x": round(float((x + cw / 2) / w), 4), "y": round(float((y + ch * 0.92) / h), 4),
-                      "tamanho": round(float(ch * 0.9 / h), 4)})
-    return sorted(lista, key=lambda f: f["x"])
+    for bx, by in BRASEIROS:
+        x, y = bx * k, by * k
+        r = 34 * k
+        x0, x1, y0, y1 = int(x - r), int(x + r), int(y - 2.5 * r), int(y + 0.4 * r)
+        m = chama[max(0, y0):y1, max(0, x0):x1]
+        ys, xs = np.nonzero(m)
+        if len(xs) > 30:
+            cx = x0 + np.median(xs)
+            base = y0 + np.percentile(ys, 92)
+            alto = max(14 * k, (np.percentile(ys, 92) - np.percentile(ys, 5)) * 1.1)
+        else:
+            cx, base, alto = x, y, 20 * k
+        # O motor desenha a chama ~3x o "tamanho" (com o brilho em volta): a fração é um terço da
+        # chama pintada, para a animada cobrir a pintada sem passar muito dela.
+        lista.append({"x": round(float(cx / w), 4), "y": round(float(base / h), 4),
+                      "tamanho": round(float(alto / h / 3.0), 4)})
+    return lista
 
 
 def luzes(img, h, w, fogo):
@@ -91,11 +129,13 @@ def luzes(img, h, w, fogo):
     branco = (np.minimum(np.minimum(r, g), b) > 205) & (a > 200)
     branco[int(0.30 * h):] = False
     m = cv2.dilate(branco.astype(np.uint8), np.ones((25, 25), np.uint8))
-    for st, cen in componentes(m, 400):
+    for st, cen in componentes(m, 2500):
         raio = max(st[2], st[3]) * 0.75
         lista.append({"x": round(float(cen[0] / w), 4), "y": round(float(cen[1] / h), 4),
                       "raio": round(float(raio / h), 4), "cor": ac.HOLOFOTE, "pulsar": 0.04, "reflexo": False})
-    # Lanternas: pontos amarelos pequenos no muro e nas sacadas, longe das chamas.
+    return lista
+    # Lanternas: pontos amarelos pequenos no muro e nas sacadas, longe das chamas (desligado: a
+    # cor pegava reflexo de sol na pedra e nos estandartes).
     amarelo = (r > 235) & (g > 175) & (b < 170) & (b > 40) & (a > 200)
     amarelo[:int(0.40 * h)] = False
     for st, cen in componentes(amarelo, 18):
@@ -142,14 +182,10 @@ def main():
     luz = luzes(img, h, w, fogo)
 
     lista = []
-    for caixas, balanco in ((torres, sb.SOLTA), (parede, sb.NA_PAREDE)):
+    for caixas, balanco, fundo in ((torres, sb.SOLTA, "vao"), (parede, sb.NA_PAREDE, "parede")):
         for caixa in caixas:
             if ac.pano(img, caixa) is not None:   # a de antes pode ter tapado esta
-                img = ac.soltar(img, [caixa], balanco, pasta, lista)
-    for b in lista:                          # o soltar dá o nome do estádio antigo
-        novo = b["imagem"].replace("estadio_", "parede_")
-        (pasta / b["imagem"]).rename(pasta / novo)
-        b["imagem"] = novo
+                img = soltar(img, caixa, balanco, fundo, pasta, lista)
     Image.fromarray(img).save(pasta / PAREDE, optimize=True)
 
     # A gente das arquibancadas (fora do pavilhão do meio e do muro de baixo).
@@ -168,21 +204,19 @@ def main():
     p["plateia"] = [{"topo": topo, "base": base, "mascara": "parede_plateia.webp", "pulo": 0.004,
                      "colunas": 200, "flashes": flashes}]
     stage["chao"]["reflexoLuzes"] = 0.3
-    camada["fundo"].pop("cachoeiras", None)
+    camada["montanhas"].pop("cachoeiras", None)
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     fundo = Image.open(pasta / FUNDO).convert("RGB")
     fw, fh = fundo.size
-    # As linhas de céu espelhado em cima (o cenario_pintura põe --ceu-extra na escala da pintura).
-    extra = int(round(-camada["fundo"]["topo"] / (camada["fundo"]["base"] - camada["fundo"]["topo"]) * fh))
-    caixas = quedas(fundo, extra)
+    caixas = quedas(fundo, 0)
     if caixas:
         cachoeiras.AREAS[FUNDO] = {"tela": 1.1 / (fw / 1983),
                                    "areas": [(round(x / fw, 4), round(y / fh, 4), round(cw / fw, 4), round(ch / fh, 4))
                                              for x, y, cw, ch in caixas]}
         feitas = cachoeiras.montar(pasta, FUNDO)
         if not cachoeiras.anotar(pasta, FUNDO, feitas):
-            raise SystemExit("camada do fundo não achada no stage.json")
+            raise SystemExit("camada das montanhas não achada no stage.json")
     print(f"{len(lista)} bandeiras ({len(torres)} nas torres), {len(fogo)} fogos, {len(luz)} luzes, "
           f"plateia com {len(flashes)} flashes, {len(caixas)} quedas d'água")
 

@@ -39,6 +39,10 @@ olhoY     = topo + H / zoom
   (`topo` diminui): o piso perto desce bastante e o fundo quase não se mexe.
 - `z > 0` está atrás dos lutadores; `z < 0` na frente.
 
+`camera.zoom` (opcional, padrão 1) multiplica o zoom da câmera da luta só neste cenário
+(`CameraRig.escala`): menor que 1 abre a câmera, com os lutadores menores e mais cenário na tela
+(a Arena Central pintada usa 0,8, para chegar perto do enquadramento do conceito).
+
 ## Câmera de repouso
 
 O `stage.json` descreve **onde cada camada aparece na tela** (frações de 0 a 1) na câmera

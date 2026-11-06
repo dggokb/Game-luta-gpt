@@ -898,6 +898,7 @@ public class GameView extends SurfaceView
         medicao.parte("folhas");
         StageScene cenario = stageId.equals(cenarioAntecipadoId) ? resultado(cenarioAntecipado) : null;
         stageScene = cenario != null ? cenario : loadStage(lutaAssets, stageId);
+        zoomDoCenario();
         cenarioAntecipado = null;
         medicao.parte("cenario");
         CharacterSelectRenderer selecao = resultado(selecaoAntecipada);
@@ -1484,6 +1485,12 @@ public class GameView extends SurfaceView
         stageScene = null;
         stageId = wanted;
         stageScene = loadStage(lutaAssets, wanted);
+        zoomDoCenario();
+    }
+
+    /** O zoom próprio do cenário (camera.zoom no stage.json) na câmera da luta. */
+    private void zoomDoCenario() {
+        camera.escala = stageScene != null ? stageScene.definition().cameraZoom : 1f;
     }
 
     /**

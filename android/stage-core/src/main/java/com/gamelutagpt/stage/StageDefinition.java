@@ -474,6 +474,8 @@ public final class StageDefinition {
 
     public final String name;
     public final float cameraDistance;
+    /** {@code camera.zoom}: multiplica o zoom da câmera da luta neste cenário (1 = o normal). */
+    public float cameraZoom = 1f;
     /** Altura do horizonte na tela (fração). */
     public final float horizon;
     public final int backgroundColor;
@@ -701,6 +703,8 @@ public final class StageDefinition {
         float distance = number(camera, "distancia", 1000f);
         float horizon = number(camera, "horizonte", 0.40f);
         if (distance <= 0f) throw new IllegalArgumentException("camera.distancia deve ser positiva");
+        float zoomCenario = number(camera, "zoom", 1f);
+        if (!(zoomCenario > 0.3f && zoomCenario <= 2f)) throw new IllegalArgumentException("camera.zoom fora de 0,3 a 2");
 
         List<Layer> layers = new ArrayList<>();
         Object layersField = map.get("camadas");
@@ -840,9 +844,11 @@ public final class StageDefinition {
                 color(shadowMap, "cor", 0xFF000000), suave);
         }
 
-        return new StageDefinition(name.trim(), distance, horizon,
+        StageDefinition def = new StageDefinition(name.trim(), distance, horizon,
             color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning, light, shadow,
             bool(map, "chaoNaPintura", false));
+        def.cameraZoom = zoomCenario;
+        return def;
     }
 
     @SuppressWarnings("unchecked")

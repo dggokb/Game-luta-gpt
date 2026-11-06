@@ -30,6 +30,14 @@ Paralaxe do fundo: ``--fundo IMG`` (céu e montanhas sem a arena, cobrindo da li
 dela, na largura da pintura) e ``--mascara IMG`` (branco onde é arena, na mesma escala). A parede
 vira PNG com transparência onde era céu e o fundo vai para ``--prof-fundo`` (bem mais longe),
 com o céu espelhado em cima para o super pulo.
+
+Fundo em dois planos: com ``--ceu IMG`` (só o céu, sem terra) e ``--mascara-ceu IMG`` (branco no
+céu da pintura), o fundo vira o **céu** (``--prof-ceu``) e as **montanhas** (``--prof-fundo``, com
+transparência no céu). Os dois usam os pixels da própria pintura no que aparece; o ``--fundo`` e
+o ``--ceu`` (pintados à parte) só entram no que fica escondido atrás da arena e das montanhas,
+com as cores ajustadas às da pintura. Os dois ficam apoiados na arena (``apoio``): no super pulo
+descem com ela (não abre o que ninguém pintou) e para os lados cada um anda na sua velocidade.
+``--zoom`` vai para ``camera.zoom`` (menor que 1 abre a câmera da luta neste cenário).
 """
 import argparse
 import json
@@ -40,6 +48,91 @@ from PIL import Image, ImageFilter
 
 D, ZOOM, VW, VH, GY = 1000.0, 1.24, 1280.0, 720.0, 552.0   # câmera de repouso do jogo
 MUNDO = 2600.0                                              # largura da arena
+
+
+def casar_cores(fonte, alvo, m_fonte, m_alvo):
+    """As cores de ``fonte`` com a média e o desvio de ``alvo`` (cada um medido na sua máscara)."""
+    out = fonte.copy()
+    for c in range(3):
+        f, g = fonte[..., c][m_fonte], alvo[..., c][m_alvo]
+        if f.size > 100 and g.size > 100:
+            out[..., c] = (fonte[..., c] - f.mean()) * (g.std() / max(f.std(), 1e-3)) + g.mean()
+    return out
+
+
+def ceu_e_montanhas(a, im, W, base_px, ex, t, nevoa, tela_y, x_frac, zj):
+    """O fundo em dois planos (céu e montanhas), com a pintura no que aparece e o pintado à parte
+    só no que fica escondido. Devolve as duas camadas do stage.json."""
+    from PIL import ImageFilter as F
+    ceu_m = np.asarray(Image.open(a.mascara_ceu).convert('L')).astype(np.float32) / 255
+    hm = ceu_m.shape[0]
+    ceu_m = np.asarray(Image.fromarray((ceu_m * 255).astype(np.uint8)).resize((W, round(hm * W / ceu_m.shape[1])))).astype(np.float32) / 255
+    hm = ceu_m.shape[0]
+    arena = np.asarray(Image.open(a.mascara).convert('L').resize((W, hm))).astype(np.float32) / 255
+    orig = np.asarray(im.crop((0, 0, W, hm))).astype(np.float32)
+    so_ceu = np.asarray(Image.open(a.ceu).convert('RGB').resize((W, hm), Image.LANCZOS)).astype(np.float32)
+    terra = np.asarray(Image.open(a.fundo).convert('RGB').resize((W, hm), Image.LANCZOS)).astype(np.float32)
+    terra[:6] = terra[6]
+    so_ceu[:6] = so_ceu[6]
+    ceu_b, arena_b = ceu_m > 0.5, arena > 0.5
+    monte_b = ~ceu_b & ~arena_b
+    so_ceu = casar_cores(so_ceu, orig, np.ones_like(ceu_b), ceu_b)
+    terra = casar_cores(terra, orig, ~ceu_b, monte_b)
+    # Céu: a pintura no céu; atrás das montanhas e da arena, o céu pintado à parte (borda suave).
+    # O que fica escondido atrás das montanhas e da arena: o céu pintado à parte (sem torres nem
+    # morros), alinhado ao da pintura (o sol no mesmo lugar) e com as cores dela: a diferença de
+    # cor, lisa, medida onde há céu e continuada para o resto. A máscara encolhe antes, para a
+    # borda das torres e das montanhas não vir junto (ficava um fantasma delas no céu).
+    import cv2
+    duro = np.asarray(Image.fromarray((ceu_m * 255).astype(np.uint8)).filter(F.MinFilter(9))) > 128
+    q = 8
+    pequeno = lambda x: cv2.resize(x, (W // q, hm // q), interpolation=cv2.INTER_AREA)
+    go, gc = pequeno(orig.mean(2)), pequeno(so_ceu.mean(2))
+    mq = pequeno(duro.astype(np.float32)) > 0.99
+    melhor = (0, 0, 1e18)
+    for dy in range(-12, 13):
+        for dx in range(-24, 25):
+            m = np.roll(np.roll(gc, dy, 0), dx, 1)
+            e = np.mean(((go - m) ** 2)[mq])
+            if e < melhor[2]:
+                melhor = (dx, dy, e)
+    so_ceu = cv2.warpAffine(so_ceu, np.float32([[1, 0, melhor[0] * q], [0, 1, melhor[1] * q]]), (W, hm),
+                            borderMode=cv2.BORDER_REFLECT)
+    dif = pequeno(orig - so_ceu)
+    dif[~mq] = 0
+    # Duas escalas: perto do céu, a correção fina; longe dele, a larga (sem anel na emenda).
+    lisa = np.zeros_like(dif)
+    for sigma in (40, 6):
+        peso = cv2.GaussianBlur(mq.astype(np.float32), (0, 0), sigma, borderType=cv2.BORDER_REFLECT)[..., None]
+        est = cv2.GaussianBlur(dif, (0, 0), sigma, borderType=cv2.BORDER_REFLECT) / np.maximum(peso, 1e-4)
+        conf = np.clip(peso / 0.15, 0, 1)
+        lisa = est * conf + lisa * (1 - conf) if sigma == 6 else np.where(peso > 1e-4, est, 0)
+    lisa = cv2.resize(lisa, (W, hm), interpolation=cv2.INTER_CUBIC)
+    cheio = so_ceu + lisa
+    k = cv2.GaussianBlur(duro.astype(np.float32), (0, 0), 3)[..., None]
+    ceu = orig * k + cheio * (1 - k)
+    # O céu de cima (super pulo) espelha o céu sem torres, não o da pintura (as lâmpadas das torres
+    # tocam a borda de cima e viravam riscos).
+    alto = min(ex, int(0.18 * hm))      # só a faixa de cima (o sol fica mais embaixo)
+    topo = cv2.resize(np.ascontiguousarray(cheio[:alto][::-1]), (W, ex), interpolation=cv2.INTER_CUBIC)
+    ceu = np.concatenate([topo * (1 - t * 0.85) + np.array([40, 20, 56], np.float32) * (t * 0.85), ceu], 0)
+    Image.fromarray(np.clip(ceu, 0, 255).astype(np.uint8)).save(os.path.join(a.saida, 'ceu.jpg'), quality=90)
+    # Montanhas: transparentes no céu; a pintura nelas; atrás da arena, a terra pintada à parte.
+    ka = np.asarray(Image.fromarray((arena * 255).astype(np.uint8)).filter(F.MaxFilter(15)).filter(
+        F.GaussianBlur(12))).astype(np.float32)[..., None] / 255
+    monte = orig * (1 - ka) + terra * ka
+    monte = monte * 0.93 + nevoa * 0.07
+    rgba = np.dstack([np.clip(monte, 0, 255), (1 - ceu_m) * 255]).astype(np.uint8)
+    Image.fromarray(rgba, 'RGBA').save(os.path.join(a.saida, 'montanhas.webp'), quality=90, alpha_quality=100, method=6)
+    apoio = round(zj + 1, 1)
+    return [
+        {"id": "ceu", "imagem": "ceu.jpg", "profundidade": a.prof_ceu, "apoio": apoio,
+         "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(hm) / VH, 4),
+         "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"},
+        {"id": "montanhas", "imagem": "montanhas.webp", "profundidade": a.prof_fundo, "apoio": apoio,
+         "topo": round(tela_y(0) / VH, 4), "base": round(tela_y(hm) / VH, 4),
+         "x": round(x_frac, 4), "repetir": "espelhar"},
+    ]
 
 
 def main():
@@ -59,6 +152,10 @@ def main():
     ap.add_argument('--fundo', default=None)
     ap.add_argument('--mascara', default=None)
     ap.add_argument('--prof-fundo', type=float, default=9000.0)
+    ap.add_argument('--ceu', default=None)
+    ap.add_argument('--mascara-ceu', default=None)
+    ap.add_argument('--prof-ceu', type=float, default=30000.0)
+    ap.add_argument('--zoom', type=float, default=1.0)
     a = ap.parse_args()
 
     im = Image.open(a.fonte).convert('RGB')
@@ -123,18 +220,21 @@ def main():
         par.putalpha(alfa)
         # PNG (sem perda): a WebP com perda e transparência saía com blocos de céu no celular.
         par.save(os.path.join(a.saida, 'parede.png'), optimize=True)
-        fim = Image.open(a.fundo).convert('RGB')
-        fh = round(fim.height * W / fim.width)
-        fundo = np.asarray(fim.resize((W, fh), Image.LANCZOS)).astype(np.float32).copy()
-        fundo[:6] = fundo[6]   # a imagem gerada vem com a 1ª linha clara: espelhada, vira um risco
-        ftopo = fundo[:ex][::-1].copy()
-        fundo = np.concatenate([ftopo * (1 - t * 0.85) + np.array([40, 20, 56], np.float32) * (t * 0.85), fundo], 0)
-        fundo = fundo * 0.88 + nevoa * 0.12
-        Image.fromarray(np.clip(fundo, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8)).save(
-            os.path.join(a.saida, 'fundo.jpg'), quality=90)
-        camadas.append({"id": "fundo", "imagem": "fundo.jpg", "profundidade": a.prof_fundo,
-                        "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(fh) / VH, 4),
-                        "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
+        if a.ceu:
+            camadas.extend(ceu_e_montanhas(a, im, W, base_px, ex, t, nevoa, tela_y, x_frac, zj))
+        else:
+            fim = Image.open(a.fundo).convert('RGB')
+            fh = round(fim.height * W / fim.width)
+            fundo = np.asarray(fim.resize((W, fh), Image.LANCZOS)).astype(np.float32).copy()
+            fundo[:6] = fundo[6]   # a imagem gerada vem com a 1ª linha clara: espelhada, vira um risco
+            ftopo = fundo[:ex][::-1].copy()
+            fundo = np.concatenate([ftopo * (1 - t * 0.85) + np.array([40, 20, 56], np.float32) * (t * 0.85), fundo], 0)
+            fundo = fundo * 0.88 + nevoa * 0.12
+            Image.fromarray(np.clip(fundo, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8)).save(
+                os.path.join(a.saida, 'fundo.jpg'), quality=90)
+            camadas.append({"id": "fundo", "imagem": "fundo.jpg", "profundidade": a.prof_fundo,
+                            "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(fh) / VH, 4),
+                            "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
         camadas.append({"id": "parede", "imagem": "parede.png", "profundidade": round(zj + 1, 1),
                         "topo": round(tela_y(0) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
                         "x": round(x_frac, 4), "repetir": "espelhar"})
@@ -155,11 +255,12 @@ def main():
 
     stage = {
         "nome": "Arena Central (pintura)",
-        "camera": {"distancia": D, "horizonte": round(hz / VH, 4)},
+        "camera": {"distancia": D, "horizonte": round(hz / VH, 4), "zoom": a.zoom},
         "corFundo": "#2A1438",
-        "luzLutadores": {"cor": "#FF9A70", "forca": 0.28, "brilho": 0.95, "pes": "#D8B8A8",
+        "luzLutadores": {"cor": "#FF9A70", "forca": 0.34, "brilho": 0.95, "pes": "#D8B8A8",
                          "contraluz": {"cor": "#FFB060", "forca": 1.0, "direcao": [-1, -1]}},
-        "sombraLutadores": {"alfa": 0.72, "cor": "#1A0A12", "suave": 0.5, "x": 0.03, "y": 0.05},
+        # O sol do conceito, baixo, atrás à esquerda: sombra comprida para a direita e para a frente.
+        "sombraLutadores": {"alfa": 0.62, "cor": "#1A0A12", "suave": 0.55, "x": 1.05, "y": 0.2},
         "camadas": camadas,
         "chao": {"imagem": "chao.jpg", "perto": -3000, "longe": round(zj, 1), "ate": round(zj, 1),
                  "reflexoLuzes": 0,
