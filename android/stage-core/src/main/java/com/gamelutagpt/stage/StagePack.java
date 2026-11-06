@@ -86,6 +86,8 @@ public final class StagePack {
             if (!names.contains(definition.floor.image)) names.add(definition.floor.image);
             String plain = definition.floor.plainImage;
             if (plain != null && !names.contains(plain)) names.add(plain);
+            String risco = definition.floor.lightReflectionImage;
+            if (risco != null && !names.contains(risco)) names.add(risco);
         }
 
         Map<String, RenderImage> images = new HashMap<>();

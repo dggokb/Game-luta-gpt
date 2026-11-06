@@ -229,3 +229,32 @@ python3 tools/stage/animar_coberta.py
    encerado aprovado, `chao_encerado.jpg`, tem a mais) numa camada (`reflexos_chao.webp`) na
    profundidade da parede, desenhada logo depois do chão. Com a câmera parada a soma é o chão
    aprovado; com a câmera andando, cada risco fica reto embaixo da sua lanterna.
+
+### Arena Coberta refeita: a arena oval inteira num desenho só
+
+Tudo das laterais acima (paredes montadas, peças da ponta, volta pintada) foi desfeito: emenda e
+recorte sempre apareciam. O cenário passou a ser **um desenho só, feito inteiro pelo Codex**:
+
+1. `prompt_8a_arena_larga.txt`: o concept em tamanho menor no meio de uma tela cinza (o guia da
+   composição) e o concept inteiro como referência de estilo. O Codex pinta a arena oval inteira
+   na escala do concept (o meio é a vista da largada; o oval só fecha longe, nas pontas), com a
+   arquitetura de estádio: barreira contínua, arquibancada em rampa dividida por escadas, nenhum
+   pilar na frente do povo, bandeiras no anel do teto e nos camarotes.
+2. `prompt_8_arena_oval.txt`: o mesmo desenho repintado inteiro, só sem os pilares na barreira →
+   `6_arena_oval_aprovada.png` (e `6_visao_jogo_aprovada.png`, a prévia com HUD e lutadores,
+   `prompt_9_visao_jogo.txt`).
+3. Real-ESRGAN x2 e 4096 de largura → `7_panorama_oval_4096.webp`.
+4. O mesmo desenho com o chão **sem os riscos de luz** (o Codex repinta só o chão), casado na cor
+   com o aprovado linha a linha → `7_chao_fosco_4096.webp`, usado como `--chao-largo`. Pintados,
+   os riscos abriam em leque com a câmera andando; agora o motor desenha o reflexo de cada
+   lanterna da barreira (`reflexoImagem`: um brilho curto e macio, `risco.png`), sempre reto.
+5. Montagem e animação:
+
+```
+D=android/app/src/main/assets/stages/arena_coberta; A=art/stages/arena_coberta
+python3 tools/stage/cenario_pintura.py $A/7_panorama_oval_4096.webp $D --tela-px 2048 --centro 2048 \
+  --chao 1288 --juncao 1010 --parede-ate 1190 --horizonte 0.3786 --ceu-extra 300 --nitida \
+  --cor-acima '#0E0E1A' --nevoa '#2A2030' --zoom 0.8 --zoom-repouso 0.948 --nome 'Arena Coberta' \
+  --extra $A/stage_extra.json --chao-largo $A/7_chao_fosco_4096.webp
+python3 tools/stage/animar_coberta.py
+```

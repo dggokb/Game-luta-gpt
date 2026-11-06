@@ -98,6 +98,8 @@ public final class StageScene {
     private final StageCamera camera;
     private final List<Placed> placed = new ArrayList<>();
     private final RenderImage floorImage;
+    /** O risco de reflexo das luzes no chão ({@code "reflexoImagem"}), ou null. */
+    private final RenderImage reflectionStreak;
     /** Lajotas sem emblema para as cópias fora do centro (ou a própria imagem do piso). */
     private final RenderImage floorPlainImage;
     private final float floorTileWidth;
@@ -197,6 +199,7 @@ public final class StageScene {
 
         StageDefinition.Floor floor = def.floor;
         floorImage = floor != null ? pack.image(floor.image) : null;
+        reflectionStreak = floor != null && floor.lightReflectionImage != null ? pack.image(floor.lightReflectionImage) : null;
         RenderImage plain = floor != null ? pack.image(floor.plainImage) : null;
         floorPlainImage = plain != null ? plain : floorImage;
         floorTileWidth = floorImage == null ? 1f
@@ -1527,9 +1530,11 @@ public final class StageScene {
 
     /** Luzes e fogos que estão sobre o piso viram faixas de brilho no chão molhado. */
     private void drawFloorReflections(RenderCanvas c) {
-        if (!detalhe) return;
         StageDefinition.Floor floor = pack.definition.floor;
         if (floor == null || floorImage == null || floor.lightReflection <= 0f) return;
+        // No modo leve só os riscos do chão encerado (fazem parte do chão, como se fossem pintados);
+        // o brilho redondo embaixo de cada luz fica para o detalhe.
+        if (!detalhe && floor.lightReflectionLength <= 0f) return;
         for (Placed p : placed) {
             // A parede no fim do chão (a 1 de profundidade atrás dele) também reflete.
             if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.extent + 2f) continue;
@@ -1583,10 +1588,12 @@ public final class StageScene {
         if (sx < -200f || sx > VW + 200f || sy > VH + 200f) return;
         float radius = Math.max(4f, radiusWorld * camera.scale(z) * 1.6f);
         float pulse = 1f + 0.08f * (float)Math.sin(time * 9f + wx * 0.01f);
-        c.save();
-        c.scale(0.55f, 2.6f, sx, sy);
-        c.fillRadialGlow(sx, sy, radius, withAlpha(color, Math.round(255f * strength * pulse)));
-        c.restore();
+        if (detalhe) {
+            c.save();
+            c.scale(0.55f, 2.6f, sx, sy);
+            c.fillRadialGlow(sx, sy, radius, withAlpha(color, Math.round(255f * strength * pulse)));
+            c.restore();
+        }
         float len = pack.definition.floor.lightReflectionLength;
         if (len > 0f && sy < VH) {
             // O risco do chão encerado: vertical na tela (desce na direção de quem olha), largo e
@@ -1596,10 +1603,18 @@ public final class StageScene {
             float bottom = sy + (VH + 40f - sy) * len;
             int a = Math.round(255f * strength * pulse);
             float w = radius * 0.5f;
+            if (reflectionStreak != null) {
+                // O risco pintado (macio dos lados, com o brilho quebrado das lajotas), esticado.
+                float ww = w * 4.2f;
+                c.drawImage(reflectionStreak, sx - ww, sy - radius * 0.3f, sx + ww, bottom, Math.min(255, a));
+                return;
+            }
+            // O miolo fica claro (quase branco) e vai mais longe; as faixas de fora, mais curtas.
             for (int k = 0; k < 3; k++) {
-                float ww = w * (1f - 0.3f * k);
-                float bb = sy + (bottom - sy) * (1f - 0.25f * k);
-                c.fillVerticalGradient(sx - ww, sy, sx + ww, bb, withAlpha(color, a / 3), withAlpha(color, 0));
+                float ww = w * (1f - 0.35f * k);
+                float bb = sy + (bottom - sy) * (0.6f + 0.2f * k);
+                int cor = k == 2 ? mix(color, 0xFFFFF4DC, 0.6f) : color;
+                c.fillVerticalGradient(sx - ww, sy, sx + ww, bb, withAlpha(cor, a * (k + 1) / 6), withAlpha(cor, 0));
             }
         }
     }
@@ -1906,6 +1921,14 @@ public final class StageScene {
     }
 
     // --------------------------------------------------------------- util
+
+    /** Cor entre {@code a} e {@code b} (t = 0 a 1), alfa de {@code a}. */
+    static int mix(int a, int b, float t) {
+        int r = Math.round(((a >> 16) & 0xFF) + (((b >> 16) & 0xFF) - ((a >> 16) & 0xFF)) * t);
+        int g = Math.round(((a >> 8) & 0xFF) + (((b >> 8) & 0xFF) - ((a >> 8) & 0xFF)) * t);
+        int bl = Math.round((a & 0xFF) + ((b & 0xFF) - (a & 0xFF)) * t);
+        return (a & 0xFF000000) | (r << 16) | (g << 8) | bl;
+    }
 
     static int withAlpha(int color, int alpha) {
         int a = Math.max(0, Math.min(255, alpha));

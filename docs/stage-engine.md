@@ -396,3 +396,10 @@ iguais na escala; a profundidade sai de 1/escala), numa chamada só no OpenGL (`
 (a arquibancada fazendo a volta; reta, ela converge forte e parece torta).
 `"virar": true`: a imagem vem espelhada e as colunas são lidas de trás para frente (a parede da
 esquerda, que na tela vai da direita para a esquerda). Desenhada depois do chão (fica em pé nele).
+
+### Reflexo das luzes como imagem (`"reflexoImagem"` no `chao`)
+
+Com `"reflexoComprimento"`, o reflexo de cada luz com `"reflexo": true` desce reto pelo chão.
+`"reflexoImagem": "risco.png"` troca os degradês por essa imagem (já na cor, alfa macio), esticada
+do pé da luz até o comprimento. Os riscos aparecem também no modo leve (fazem parte do chão); o
+brilho redondo embaixo da luz, só no detalhe.

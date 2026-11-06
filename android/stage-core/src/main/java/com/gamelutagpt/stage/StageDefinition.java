@@ -401,6 +401,11 @@ public final class StageDefinition {
          */
         public float lightReflectionLength;
         /**
+         * {@code "reflexoImagem"}: a imagem do risco (já na cor, alfa macio dos lados e sumindo para
+         * baixo), esticada do pé de cada luz até o comprimento; null = o risco em degradês.
+         */
+        public String lightReflectionImage;
+        /**
          * Até onde o chão continua atrás do piso ({@code "ate"}), repetindo a imagem lisa na
          * profundidade; igual a {@code far} = o piso acaba na borda de cima da imagem. Para
          * o chão de uma arena ir do ringue até a arquibancada, lá no fundo.
@@ -821,6 +826,7 @@ public final class StageDefinition {
                 number(floorMap, "ate", far), number(floorMap, "largura", Float.NaN),
                 number(floorMap, "linhasPerspectiva", Float.NaN));
             floor.lightReflectionLength = clamp01(number(floorMap, "reflexoComprimento", 0f));
+            floor.lightReflectionImage = string(floorMap, "reflexoImagem", null);
             Map<String, Object> proj = object(floorMap, "projecao");
             if (proj != null) {
                 float pt = number(proj, "topo", Float.NaN), pb = number(proj, "base", Float.NaN);
