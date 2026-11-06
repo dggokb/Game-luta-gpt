@@ -122,6 +122,28 @@ public class StageSceneTest {
     }
 
     @Test
+    public void paredeLateralSoApareceComACameraNoCantoEVemAteAFrente() throws IOException {
+        // Parede do lado: encontra o fundo na borda esquerda da tela de repouso e vem até perto.
+        String json = "{\"nome\": \"T\", \"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 1500,"
+            + " \"topo\": 0.1, \"base\": 0.5, \"lateral\": {\"x\": -0.01, \"longe\": 1500, \"perto\": 60}}]}";
+        StageDefinition.Layer layer = StageDefinition.fromJson(json).layers.get(0);
+        assertEquals(60f, layer.sortDepth(), 0f);
+        assertEquals(1500f, layer.sideFar, 0f);
+        StageScene scene = new StageScene(StagePack.load(new FakeAssets(json), "stages/t"), WORLD);
+        CountingCanvas canvas = new CountingCanvas();
+        scene.drawBackground(canvas);
+        assertEquals("no repouso fica fora da tela", 0, canvas.regions);
+        // A câmera vai para a esquerda: a parede entra, em várias fatias, e a base é o chão.
+        float zoom = WORLD.restZoom;
+        float top = WORLD.groundY - WORLD.restGroundScreenY / zoom;
+        scene.setCamera(zoom, WORLD.restCenterX - StageWorld.VW / (2f * zoom) - 600f, top);
+        canvas = new CountingCanvas();
+        scene.drawBackground(canvas);
+        assertTrue("várias fatias", canvas.regions > 10);
+        assertTrue("a fatia mais perto desce além do fundo", canvas.lastImageBottom > 0.5f * StageWorld.VH);
+    }
+
+    @Test
     public void zoomRepousoDescreveAsCamadasNaCameraDaLuta() throws IOException {
         // Uma camada que vai do horizonte ao chão na câmera de zoom 0,95: com a câmera da luta
         // nesse zoom (o chão no mesmo lugar da tela), ela aparece onde o stage.json diz.

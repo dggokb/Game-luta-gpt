@@ -689,6 +689,63 @@ public final class StageScene {
         }
     }
 
+    /** Largura na tela das fatias da parede lateral (no Canvas, mais finas: a base sobe em degraus). */
+    private static final float SIDE_SLICE = 6f, SIDE_SLICE_CANVAS = 3f;
+    private float[] sideXY = new float[0], sideUV = new float[0];
+
+    /**
+     * Parede lateral ({@link StageDefinition.Layer#sideX}): um plano em x fixo do mundo, do fundo
+     * até perto da câmera. Na tela, x e a escala andam juntos (x = meio + (X − centro)·escala), então
+     * fatias de largura igual na tela são passos iguais na escala; a profundidade de cada uma sai
+     * de 1/escala (linear na profundidade) e a coluna da imagem, da profundidade.
+     */
+    private void drawSideWall(RenderCanvas c, Placed p) {
+        StageDefinition.Layer layer = p.layer;
+        RenderImage img = p.image;
+        if (img == null) return;
+        float iw = img.width(), ih = img.height();
+        float far = layer.sideFar, near = layer.sideNear;
+        float wx = restCamera.worldX(layer.sideX * VW, far);
+        float yTop = restCamera.worldY(layer.top * VH, far), yBot = world.groundY;
+        float dx = wx - camera.centerX();
+        if (Math.abs(dx) < 1f) return;
+        float sFar = camera.scale(far), sNear = camera.scale(near);
+        // A escala em que a parede cruza cada borda da tela.
+        float sA = (-VW * 0.5f) / dx, sB = (VW * 0.5f) / dx;
+        float s0 = Math.max(sFar, Math.min(sA, sB)), s1 = Math.min(sNear, Math.max(sA, sB));
+        if (s1 <= s0) return;
+        boolean malha = c.desenhaFaixas();
+        float fatia = malha ? SIDE_SLICE : SIDE_SLICE_CANVAS;
+        int n = Math.max(1, Math.min(500, (int)Math.ceil(Math.abs(dx) * (s1 - s0) / fatia)));
+        float invFar = 1f / sFar, invNear = 1f / sNear;
+        int alpha = Math.round(255f * layer.alpha);
+        if (malha && sideXY.length < 4 * (n + 1)) {
+            sideXY = new float[4 * (n + 1)];
+            sideUV = new float[4 * (n + 1)];
+        }
+        float lastX = 0f, lastU = 0f;
+        for (int i = 0; i <= n; i++) {
+            float s = s0 + (s1 - s0) * i / n;
+            float z = far + (1f / s - invFar) / (invNear - invFar) * (near - far);
+            float u = (far - z) / (far - near) * iw;
+            if (layer.flip) u = iw - u;
+            float x = camera.screenX(wx, z);
+            float top = camera.screenY(yTop, z), bottom = camera.screenY(yBot, z);
+            if (malha) {
+                int k = i * 4;
+                sideXY[k] = x; sideXY[k + 1] = top; sideXY[k + 2] = x; sideXY[k + 3] = bottom;
+                sideUV[k] = u; sideUV[k + 1] = 0f; sideUV[k + 2] = u; sideUV[k + 3] = ih;
+            } else if (i > 0) {
+                // Recorte por recorte (Canvas): a altura da ponta mais perto, sem fresta.
+                float l = Math.min(lastX, x), r = Math.max(lastX, x);
+                c.drawImageRegion(img, Math.min(lastU, u), 0f, Math.max(lastU, u), ih, l, top, r + 0.75f, bottom, alpha);
+            }
+            lastX = x;
+            lastU = u;
+        }
+        if (malha) c.drawImageStrip(img, sideXY, sideUV, n + 1, alpha);
+    }
+
     /** {@code "onda"}: o alfa da camada vai e volta (duas camadas em fase oposta = um cruzamento). */
     private float pulse(StageDefinition.Layer layer) {
         if (layer.waveAmp <= 0f) return 1f;
@@ -699,6 +756,10 @@ public final class StageScene {
 
     private void drawImageLayer(RenderCanvas c, Placed p) {
         StageDefinition.Layer layer = p.layer;
+        if (!Float.isNaN(layer.sideX)) {
+            drawSideWall(c, p);
+            return;
+        }
         if (layer.curveU != null) {
             drawCurvedLayer(c, p);
             return;

@@ -308,6 +308,17 @@ public final class StageDefinition {
          * cruzam uma na outra, e a luz parece varrer. {@code leve}: o alfa fixo no modo leve.
          */
         public float waveAmp, waveSpeed = 1f, wavePhase, waveLight = 1f;
+        /**
+         * {@code "lateral": {"x", "longe", "perto"}}: a camada é uma parede do lado da arena, de
+         * frente para o meio (paralela ao olhar da câmera), indo da profundidade {@code longe} (onde
+         * encontra o fundo, em {@code x} = fração da tela de repouso) até {@code perto}. A imagem
+         * é a fachada desenrolada, sem perspectiva pintada: a esquerda dela fica no fundo, e o
+         * motor põe a perspectiva. {@code topo} vale na profundidade {@code longe}; a base é o
+         * chão. {@code "virar"}: a imagem vem espelhada e o motor lê as colunas de trás para frente (a
+         * parede da esquerda, que na tela vai da direita para a esquerda; no Canvas cada fatia
+         * sai do lado certo). NaN = não é parede lateral.
+         */
+        public float sideX = Float.NaN, sideFar, sideNear;
 
         /** Profundidade da coluna {@code u} da camada curva. */
         public float curveDepth(float u) {
@@ -324,6 +335,7 @@ public final class StageDefinition {
 
         /** Profundidade usada para ordenar (a água usa a borda de trás; a curva, a mais perto). */
         public float sortDepth() {
+            if (!Float.isNaN(sideX)) return sideNear;
             if (curveZ != null) {
                 float min = Float.MAX_VALUE;
                 for (float z : curveZ) min = Math.min(min, z);
@@ -1144,6 +1156,15 @@ public final class StageDefinition {
                     throw new IllegalArgumentException(where + ": \"curva\" com u crescente");
                 }
                 if (layer.curveZ[i] <= 0f) throw new IllegalArgumentException(where + ": \"curva\" atrás dos lutadores (> 0)");
+            }
+        }
+        Map<String, Object> lateral = object(map, "lateral");
+        if (lateral != null) {
+            layer.sideX = number(lateral, "x", 0f);
+            layer.sideFar = number(lateral, "longe", layer.depth);
+            layer.sideNear = number(lateral, "perto", 60f);
+            if (layer.sideNear <= 0f || layer.sideFar <= layer.sideNear) {
+                throw new IllegalArgumentException(where + ": \"lateral\" precisa de 0 < perto < longe");
             }
         }
         Map<String, Object> onda = object(map, "onda");

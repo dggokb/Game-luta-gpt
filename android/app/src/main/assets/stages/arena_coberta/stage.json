@@ -949,110 +949,6 @@
       ],
       "luzes": [
         {
-          "x": 0.014,
-          "y": 0.5826,
-          "raio": 0.0138,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0503,
-          "y": 0.6044,
-          "raio": 0.0125,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0718,
-          "y": 0.4834,
-          "raio": 0.0138,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0819,
-          "y": 0.5073,
-          "raio": 0.0112,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0944,
-          "y": 0.5306,
-          "raio": 0.01,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.0978,
-          "y": 0.4259,
-          "raio": 0.0275,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1281,
-          "y": 0.4689,
-          "raio": 0.0175,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1492,
-          "y": 0.4975,
-          "raio": 0.0138,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1794,
-          "y": 0.5338,
-          "raio": 0.0125,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1806,
-          "y": 0.4256,
-          "raio": 0.0288,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.1968,
-          "y": 0.5506,
-          "raio": 0.0112,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.2153,
-          "y": 0.4726,
-          "raio": 0.0187,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.2205,
-          "y": 0.5721,
-          "raio": 0.0088,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
           "x": 0.2426,
           "y": 0.5038,
           "raio": 0.015,
@@ -1307,106 +1203,36 @@
           "cor": "#FFE8B8",
           "pulsar": 0.05,
           "reflexo": false
-        },
-        {
-          "x": 0.7612,
-          "y": 0.4494,
-          "raio": 0.0262,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.7746,
-          "y": 0.591,
-          "raio": 0.0088,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.7876,
-          "y": 0.4514,
-          "raio": 0.0238,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.7903,
-          "y": 0.5783,
-          "raio": 0.0138,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8089,
-          "y": 0.5579,
-          "raio": 0.0138,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8286,
-          "y": 0.5333,
-          "raio": 0.0187,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8472,
-          "y": 0.5042,
-          "raio": 0.0187,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.8757,
-          "y": 0.4512,
-          "raio": 0.0262,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.955,
-          "y": 0.436,
-          "raio": 0.0238,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.9638,
-          "y": 0.594,
-          "raio": 0.02,
-          "cor": "#FFE8B8",
-          "pulsar": 0.05,
-          "reflexo": false
         }
       ]
     },
     {
-      "id": "ponta-esq",
-      "imagem": "ponta.png",
-      "profundidade": 300.0,
-      "noChao": true,
-      "altura": 0.5833,
-      "x": -0.3073,
-      "virar": false
+      "id": "lateral-esq",
+      "imagem": "lateral_esq.jpg",
+      "profundidade": 1734.7,
+      "topo": -0.3601,
+      "base": 0.5236,
+      "x": 0.5,
+      "virar": true,
+      "lateral": {
+        "x": -0.005,
+        "longe": 1734.7,
+        "perto": 60.0
+      }
     },
     {
-      "id": "ponta-dir",
-      "imagem": "ponta.png",
-      "profundidade": 300.0,
-      "noChao": true,
-      "altura": 0.5833,
-      "x": 1.3073,
-      "virar": true
+      "id": "lateral-dir",
+      "imagem": "lateral_dir.jpg",
+      "profundidade": 1734.7,
+      "topo": -0.3601,
+      "base": 0.5236,
+      "x": 0.5,
+      "virar": false,
+      "lateral": {
+        "x": 1.005,
+        "longe": 1734.7,
+        "perto": 60.0
+      }
     },
     {
       "id": "fachos-a",

@@ -208,13 +208,14 @@ python3 tools/stage/animar_coberta.py
    parede, lá no fundo, anda só ~90 px da pintura entre o repouso e o canto; a volta pintada fora
    da tela de repouso quase não aparece. Para o estádio "fechar" na tela, a volta tem de estar
    dentro do enquadramento de repouso (as bordas da tela do concept).
-8. **A ponta do estádio como peça própria** (`prompt_6_ponta.txt`, `4_ponta_verde.png`): o
-   panorama volta a ser o do concept (sem volta pintada, `--parede-ate 700`) e o Codex pinta uma
-   peça nova, sobre verde: o fim da arquibancada curvando para a câmera, com um pilar grande,
-   bandeira e lanternas na barreira. Recortada pela chave verde, ampliada (Real-ESRGAN) e
-   reduzida, vira `ponta.png`; o fim de dentro some num degradê de 420 px (senão a peça acabava
-   num corte reto no meio do chão). `pontas()` no `animar_coberta.py` põe a peça no chão
-   (`"noChao"`) em profundidade 300, 100 além de cada ponta da arena (`PONTA_PROF`,
-   `PONTA_FORA`, `PONTA_LARGURA` = 700 de largura no mundo), a da direita espelhada (`"virar"`).
-   Perto da câmera, ela anda mais que a parede: no repouso fica fora da tela (igual ao concept);
-   com a câmera no canto, entra a arquibancada fechando o estádio.
+8. **As paredes dos lados (o estádio fechando de verdade)**: a peça da ponta (`ponta.png`, uma
+   arquibancada pintada sobre verde e posta no chão perto da câmera) foi testada e desfeita: ela
+   aparecia na frente de tudo, sem ligação com o fundo. Agora cada lado é uma parede de verdade:
+   um plano em x fixo do mundo, do fundo (profundidade 1734,7, encontrando a parede na borda da
+   tela de repouso) até perto da câmera (60), com `"lateral"` no motor, que põe a perspectiva
+   (`docs/stage-engine.md`). A imagem (`lateral_dir.jpg`, e a espelhada `lateral_esq.jpg`) é a
+   fachada desenrolada: o trecho da própria parede do fundo do pilar com a bandeira até antes do
+   telão (`LATERAL_TRECHO` no `animar_coberta.py`), repetido, do teto até a base da barreira,
+   15% mais escuro. No repouso as paredes ficam fora da tela (igual ao concept); com a câmera
+   no canto ou afastada (lutadores longe), a arquibancada vem do fundo até a câmera e a arena
+   fecha. O chão continua o encerado aprovado (o mesmo `chao.jpg` da comparação com o concept).

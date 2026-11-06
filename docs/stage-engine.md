@@ -383,3 +383,14 @@ com `"reflexo": true` vira um risco vertical descendo pelo chão encerado, até 
 caminho para a borda de baixo da tela. Desenhado na tela, fica na vertical com a câmera em
 qualquer lugar (um reflexo pintado no chão projetado abre em leque nos cantos). As luzes de
 camadas curvas refletem na profundidade da sua coluna.
+
+### Parede lateral (`"lateral"`)
+
+`"lateral": {"x": 0, "longe": 1735, "perto": 60}` numa camada de imagem: a camada vira uma parede
+do lado da arena, um plano em x fixo do mundo (paralelo ao olhar da câmera) que vai da
+profundidade `longe` (onde encontra o fundo, em `x` = fração da tela de repouso) até `perto`.
+A imagem é a fachada desenrolada, sem perspectiva pintada (a coluna 0 no fundo); `topo` vale na
+profundidade `longe` e a base é o chão. O motor desenha em fatias de largura igual na tela (passos
+iguais na escala; a profundidade sai de 1/escala), numa chamada só no OpenGL (`drawImageStrip`).
+`"virar": true`: a imagem vem espelhada e as colunas são lidas de trás para frente (a parede da
+esquerda, que na tela vai da direita para a esquerda). Desenhada depois do chão (fica em pé nele).

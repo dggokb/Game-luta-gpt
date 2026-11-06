@@ -36,9 +36,9 @@ TELA = (1785, 227, 2238, 400)                 # a tela azul do telão (x0, y0, x
 PLATEIA = (250, 455)                          # faixa das arquibancadas (linhas do panorama)
 MAX_LUZES = 70
 MAX_FACHOS = 11
-PONTA_PROF = 300.0                            # a peça da ponta: profundidade, largura e centro no mundo
-PONTA_LARGURA = 700.0
-PONTA_FORA = 100.0                            # o centro dela fica isso antes da ponta da arena (0 / 2600)
+LATERAL_PERTO = 60.0                          # as paredes dos lados vêm do fundo até essa profundidade
+LATERAL_TRECHO = (1060, 1690)                 # o trecho da parede (px) que vira a fachada dos lados
+LATERAL_LUZ = 0.85                            # um pouco mais escura que o fundo
 PROF_MIN = 700.0                              # as pontas não chegam mais perto que isso (parallax suave, sem degrau)
 CHAO_FOSCO = False                            # True: o chão repintado fosco + reflexos do motor
 BALANCO = 7                                   # graus: o facho vai de −7 a +7 (cruzamento das imagens)
@@ -238,22 +238,33 @@ def limpar_chao(pasta, base, pan_h):
     Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(caminho, quality=93)
 
 
-def pontas():
-    """As pontas do estádio (a arquibancada virando para a câmera, com o pilar grande no fim):
-    uma peça pintada à parte (``ponta.png``, do Codex sobre verde) em pé no chão, perto da
-    câmera, depois de cada ponta da arena (a da direita é a mesma, virada). Aparece quando a
-    câmera vai para o canto; no repouso fica fora da tela."""
-    escala = D / (D / ZOOM_QUADRO + PONTA_PROF)               # câmera de repouso nessa profundidade
-    img = Image.open(PASTA / "ponta.png")
-    altura_mundo = PONTA_LARGURA * img.height / img.width
-    altura = altura_mundo * escala / 720
-    centro = 1300.0
-    camadas = []
-    for nome, wx, virar in (("esq", -PONTA_FORA, False), ("dir", 2600 + PONTA_FORA, True)):
-        x = (640 + (wx - centro) * escala) / 1280
-        camadas.append({"id": f"ponta-{nome}", "imagem": "ponta.png", "profundidade": PONTA_PROF,
-                        "noChao": True, "altura": round(altura, 4), "x": round(x, 4), "virar": virar})
-    return camadas
+def laterais(pasta, parede, w, h):
+    """As paredes dos lados (o estádio fechando): planos em x fixo do mundo, do fundo até perto da
+    câmera (``"lateral"`` no motor, que põe a perspectiva). A imagem é a fachada desenrolada: um
+    trecho da própria parede do fundo (do pilar com a bandeira até antes do telão), repetido, do
+    chão até o topo, um pouco mais escura (está de lado para a luz). Encontram o fundo nas bordas
+    da tela de repouso: no repouso não aparecem (igual ao concept); com a câmera no canto ou
+    afastada, a arquibancada vem do fundo até a câmera."""
+    longe, perto = float(parede["profundidade"]) - 1.0, LATERAL_PERTO
+    linha_chao = round((0.5236 - parede["topo"]) / (parede["base"] - parede["topo"]) * h)
+    escala = D / (D / ZOOM_QUADRO + longe)                   # câmera de repouso no fundo
+    px_por_tela = w / ((parede["base"] - parede["topo"]) * 720 * w / h)
+    largura = round((longe - perto) * escala * px_por_tela)
+    img = Image.open(pasta / parede["imagem"]).convert("RGB")
+    trecho = img.crop((LATERAL_TRECHO[0], 0, LATERAL_TRECHO[1], linha_chao))
+    tira = Image.new("RGB", (largura, linha_chao))
+    for x in range(0, largura, trecho.width):
+        tira.paste(trecho, (x, 0))
+    tira = Image.fromarray((np.asarray(tira).astype(np.float32) * LATERAL_LUZ).astype(np.uint8))
+    tira.save(pasta / "lateral_dir.jpg", quality=90)
+    # A da esquerda vai da direita (fundo) para a esquerda (perto) na tela: a imagem espelhada,
+    # com "virar" (o motor lê a coluna de trás para frente), para cada fatia sair do lado certo.
+    tira.transpose(Image.FLIP_LEFT_RIGHT).save(pasta / "lateral_esq.jpg", quality=90)
+    (pasta / "lateral.jpg").unlink(missing_ok=True)
+    return [{"id": f"lateral-{nome}", "imagem": f"lateral_{nome}.jpg", "profundidade": longe,
+             "topo": parede["topo"], "base": 0.5236, "x": 0.5, "virar": nome == "esq",
+             "lateral": {"x": x, "longe": longe, "perto": perto}}
+            for nome, x in (("esq", -0.005), ("dir", 1.005))]
 
 
 def main():
@@ -283,15 +294,14 @@ def main():
                           "pulo": 0.003, "colunas": 200, "flashes": flashes}]
     pan = np.asarray(Image.open(PANORAMA).convert("RGB"))
     base = base_da_barreira(pan)
-    novas, xa, xb = pontas(), 0, w
-    stage["camadas"] = [c for c in stage["camadas"]
-                       if not c["id"].startswith("parede-") and not c["id"].startswith("ponta-")] + novas
+    novas, xa, xb = laterais(pasta, parede, w, h), 0, w
+    stage["camadas"] = [c for c in stage["camadas"] if not c["id"].startswith(("parede-", "ponta-", "lateral-"))] + novas
     lampadas = holofotes(w, h, so_lampadas=True)
     lant = lanternas(pan, base)
     sx = w / pan.shape[1]
     # O chão é o encerado pintado, igual ao concept (os reflexos das lanternas estão na pintura).
     # Com CHAO_FOSCO (a pintura repintada sem os reflexos), o motor desenha os reflexos.
-    parede["luzes"] = holofotes(w, h)
+    parede["luzes"] = [l for l in holofotes(w, h) if 0.24 < l["x"] < 0.76]   # fora disso, atrás das paredes dos lados
     if CHAO_FOSCO:
         parede["luzes"] += [luz_reflexo(x * sx / w, (y + EXTRA) / h, max(10.0, r * 0.9) / h) for x, y, r in lant]
     parede.pop("fachos", None)
@@ -303,7 +313,7 @@ def main():
     stage["chao"]["reflexoComprimento"] = 0.5 if CHAO_FOSCO else 0
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"telão {parede['telao']}, plateia com {len(flashes)} flashes, {len(parede['luzes'])} holofotes, "
-          f"{nfachos} fachos, {len(novas)} pontas")
+          f"{nfachos} fachos, {len(novas)} paredes laterais")
 
 
 if __name__ == "__main__":
