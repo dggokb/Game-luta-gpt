@@ -690,8 +690,9 @@ public final class StageScene {
     }
 
     /** Largura na tela das fatias da parede lateral (no Canvas, mais finas: a base sobe em degraus). */
-    private static final float SIDE_SLICE = 6f, SIDE_SLICE_CANVAS = 3f;
+    private static final float SIDE_SLICE = 6f, SIDE_SLICE_CANVAS = 1.5f;
     private float[] sideXY = new float[0], sideUV = new float[0];
+    private final float[] sideClip = new float[8];
 
     /**
      * Parede lateral ({@link StageDefinition.Layer#sideX}): um plano em x fixo do mundo, do fundo
@@ -714,17 +715,36 @@ public final class StageScene {
         if (Math.max(xFar, xNear) < 0f || Math.min(xFar, xNear) > VW) return;
         boolean malha = c.desenhaFaixas();
         float fatia = malha ? SIDE_SLICE : SIDE_SLICE_CANVAS;
-        int n = Math.max(1, Math.min(500, (int)Math.ceil(Math.min(Math.abs(xNear - xFar), 3f * VW) / fatia)));
         float invFar = 1f / sFar, invNear = 1f / sNear;
+        // Na tela, x é linear na escala s (também com "abre": x = a + b·s); só o trecho visível.
+        float a = VW * 0.5f + open / (invNear - invFar);
+        float b = (wx - camera.centerX()) - open * invFar / (invNear - invFar);
+        float s0 = Math.min(sFar, sNear), s1 = Math.max(sFar, sNear);
+        if (Math.abs(b) > 1e-4f) {
+            float sA = (0f - a) / b, sB = (VW - a) / b;
+            s0 = Math.max(s0, Math.min(sA, sB));
+            s1 = Math.min(s1, Math.max(sA, sB));
+        }
+        if (s1 <= s0) return;
+        int n = Math.max(1, Math.min(600, (int)Math.ceil(Math.abs(b) * (s1 - s0) / fatia)));
         int alpha = Math.round(255f * layer.alpha);
         if (malha && sideXY.length < 4 * (n + 1)) {
             sideXY = new float[4 * (n + 1)];
             sideUV = new float[4 * (n + 1)];
         }
-        float lastX = 0f, lastU = 0f;
+        float lastX = 0f, lastU = 0f, lastTop = 0f, lastBottom = 0f;
+        if (!malha) {
+            // A parede é um plano: na tela, um quadrilátero de lados retos. Recortada por ele, as
+            // fatias (retângulos) não deixam degraus no chão nem no alto.
+            c.save();
+            float[] q = sideClip;
+            q[0] = xFar; q[1] = camera.screenY(yTop, far); q[2] = xNear; q[3] = camera.screenY(yTop, near);
+            q[4] = xNear; q[5] = camera.screenY(yBot, near); q[6] = xFar; q[7] = camera.screenY(yBot, far);
+            c.clipPolygon(q);
+        }
         for (int i = 0; i <= n; i++) {
-            // Passos iguais na escala (fatias de largura parecida na tela).
-            float s = sFar + (sNear - sFar) * i / n;
+            // Passos iguais na escala = fatias da mesma largura na tela.
+            float s = s0 + (s1 - s0) * i / n;
             float z = far + (1f / s - invFar) / (invNear - invFar) * (near - far);
             float k = (far - z) / (far - near);
             float u = layer.flip ? iw - k * iw : k * iw;
@@ -737,14 +757,18 @@ public final class StageScene {
             } else if (i > 0) {
                 float l = Math.min(lastX, x), r = Math.max(lastX, x);
                 if (r >= 0f && l <= VW) {
-                    // Recorte por recorte (Canvas): a altura da ponta mais perto, sem fresta.
-                    c.drawImageRegion(img, Math.min(lastU, u), 0f, Math.max(lastU, u), ih, l, top, r + 0.75f, bottom, alpha);
+                    // Recorte por recorte (Canvas): da ponta mais alta à mais baixa (o recorte acerta).
+                    c.drawImageRegion(img, Math.min(lastU, u), 0f, Math.max(lastU, u), ih, l,
+                        Math.min(lastTop, top), r + 0.75f, Math.max(lastBottom, bottom), alpha);
                 }
             }
             lastX = x;
             lastU = u;
+            lastTop = top;
+            lastBottom = bottom;
         }
         if (malha) c.drawImageStrip(img, sideXY, sideUV, n + 1, alpha);
+        else c.restore();
     }
 
     /** {@code "onda"}: o alfa da camada vai e volta (duas camadas em fase oposta = um cruzamento). */
