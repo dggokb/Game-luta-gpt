@@ -80,31 +80,42 @@ def limpar_borda(rgb, alfa):
     return out
 
 
-def relevo(rgb, alfa, W, sol=(-0.6, -0.8)):
-    """Relevo da arena contra o fundo: uma luz de contorno quente nas bordas viradas para o sol
-    (atrás à esquerda, no alto) e uma sombra difusa atrás das construções, para fora do recorte,
-    que escurece as montanhas em volta delas. Devolve RGBA (a sombra entra no alfa)."""
+def fundo_composto(saida, W, altura):
+    """O céu com as montanhas por cima, como aparecem atrás da arena na câmera de repouso."""
+    ceu = Image.open(os.path.join(saida, 'ceu.jpg')).convert('RGB')
+    mont = Image.open(os.path.join(saida, 'montanhas.webp')).convert('RGBA')
+    exc = ceu.height - mont.height
+    f = ceu.crop((0, exc, W, ceu.height))
+    f.paste(mont, (0, 0), mont)
+    f = np.asarray(f).astype(np.float32)
+    if f.shape[0] < altura:
+        f = np.concatenate([f, np.repeat(f[-1:], altura - f.shape[0], 0)], 0)
+    return f[:altura]
+
+
+def relevo(rgb, alfa, W, fundo=None):
+    """Tira a cara de recorte da arena contra o fundo. (1) "Light wrap": a cor do fundo que fica
+    atrás entra um pouco pela borda da arena (o contorno passa a ter a luz do céu e das
+    montanhas em vez de um corte limpo). (2) Uma sombra difusa e fraca atrás das construções,
+    para fora do recorte (dá volume sem virar contorno). Devolve RGBA (a sombra entra no alfa)."""
     import cv2
     k = W / 4096
     rgb = rgb.astype(np.float32)
-    # Luz de contorno: a borda de dentro, mais forte de onde vem o sol.
-    gx = cv2.Sobel(alfa, cv2.CV_32F, 1, 0, ksize=5)
-    gy = cv2.Sobel(alfa, cv2.CV_32F, 0, 1, ksize=5)
-    n = np.maximum(np.hypot(gx, gy), 1e-4)
-    voltado = np.clip(-(gx * sol[0] + gy * sol[1]) / n, 0, 1)
-    borda = cv2.GaussianBlur(np.clip(np.hypot(gx, gy) / 8, 0, 1), (0, 0), 6 * k)
-    borda = borda * alfa
-    aro = np.clip(borda * cv2.GaussianBlur(voltado, (0, 0), 3 * k) * 1.6, 0, 1)[..., None]
-    quente = np.array([255, 170, 90], np.float32)
-    rgb = rgb + (quente - rgb) * aro * 0.28
-    # Sombra: o recorte borrado, um pouco para baixo e para a direita (o sol vem de trás à
-    # esquerda), roxo-escuro, só fora da arena.
-    dx, dy = int(14 * k), int(10 * k)
-    som = cv2.GaussianBlur(alfa, (0, 0), 22 * k)
-    som = np.roll(np.roll(som, dy, 0), dx, 1) * 0.55
-    fora = 1 - alfa
-    a_som = som * fora
-    cor_som = np.array([26, 12, 34], np.float32)
+    if fundo is not None:
+        fora = 1 - alfa
+        s = 5 * k
+        soma = cv2.GaussianBlur(fundo * fora[..., None], (0, 0), s)
+        peso = cv2.GaussianBlur(fora, (0, 0), s)
+        cor_fundo = soma / np.maximum(peso[..., None], 1e-4)
+        w = np.clip(peso * 1.6, 0, 1) * alfa * 0.55
+        rgb = rgb + (cor_fundo - rgb) * w[..., None]
+    # A borda do alfa 1 px mais macia (sem degrau de pixel).
+    alfa = cv2.GaussianBlur(alfa, (0, 0), 0.8 * k)
+    dx, dy = int(10 * k), int(8 * k)
+    som = cv2.GaussianBlur(alfa, (0, 0), 26 * k)
+    som = np.roll(np.roll(som, dy, 0), dx, 1) * 0.32
+    a_som = som * (1 - alfa)
+    cor_som = np.array([30, 14, 40], np.float32)
     a_tot = alfa + a_som
     rgb_tot = (rgb * alfa[..., None] + cor_som * a_som[..., None]) / np.maximum(a_tot[..., None], 1e-4)
     return np.dstack([np.clip(rgb_tot, 0, 255), np.clip(a_tot, 0, 1) * 255]).astype(np.uint8)
@@ -122,7 +133,7 @@ def chave_verde(rgb):
     return out, alfa
 
 
-def ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac):
+def ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena=None):
     """Céu e montanhas pintados à parte, cada um inteiro: o céu é o --ceu e as montanhas o
     --montanhas-verde recortado pelo próprio verde (o recorte bate certinho com a pintura dele).
     As montanhas vão para as cores do pôr do sol (as da imagem original nas montanhas)."""
@@ -138,6 +149,19 @@ def ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac):
     monte_orig = ~ceu_m & ~arena_m
     monte = casar_cores(monte, orig, alfa > 0.9, monte_orig)
     monte = monte * 0.9 + nevoa * 0.1
+    if alfa_arena is not None:
+        # Perspectiva aérea: as montanhas vão sumindo na névoa quente do pôr do sol perto do pé
+        # (onde a arena as encontra). Sem isso a arquibancada ficava "colada" em morros nítidos.
+        h = min(hm, alfa_arena.shape[0])
+        fr = alfa_arena[:h].mean(1)
+        pe = int(np.argmax(fr > 0.6)) if (fr > 0.6).any() else h
+        ceu_px = np.asarray(Image.open(a.ceu).convert('RGB').resize((W, hm), Image.LANCZOS)).astype(np.float32)
+        cor = ceu_px[int(pe * 0.55):int(pe * 0.8)].reshape(-1, 3).mean(0) * 0.6 + monte[alfa > 0.9].mean(0) * 0.4
+        y = np.arange(hm, dtype=np.float32)
+        ini = pe * 0.45
+        n = np.clip((y - ini) / max(1.0, pe - ini), 0, 1) ** 1.6 * 0.6
+        monte = monte * (1 - n[:, None, None]) + cor * n[:, None, None]
+        print(f"névoa nas montanhas: pé da arquibancada na linha {pe}, cor {cor.astype(int)}")
     rgba = np.dstack([np.clip(monte, 0, 255), alfa * 255]).astype(np.uint8)
     Image.fromarray(rgba, 'RGBA').save(os.path.join(a.saida, 'montanhas.webp'), quality=90, alpha_quality=100, method=6)
     ceu = np.asarray(Image.open(a.ceu).convert('RGB').resize((W, hm), Image.LANCZOS)).astype(np.float32)
@@ -327,11 +351,15 @@ def main():
         par = pimg.crop((0, ex, W, ex + base_px))
         par = limpar_borda(np.asarray(par), np.asarray(alfa))
         alfa_arena = np.asarray(Image.fromarray(np.asarray(alfa)).filter(ImageFilter.MinFilter(3))).astype(np.float32) / 255
-        par = Image.fromarray(relevo(par, alfa_arena, W), 'RGBA')
+        fundo_atras = None
+        if a.ceu and a.montanhas_verde:
+            camadas.extend(ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac, alfa_arena))
+            fundo_atras = fundo_composto(a.saida, W, base_px)
+        par = Image.fromarray(relevo(par, alfa_arena, W, fundo_atras), 'RGBA')
         # PNG (sem perda): a WebP com perda e transparência saía com blocos de céu no celular.
         par.save(os.path.join(a.saida, 'parede.png'), optimize=True)
         if a.ceu and a.montanhas_verde:
-            camadas.extend(ceu_e_montanhas_verde(a, W, ex, t, nevoa, tela_y, x_frac))
+            pass   # céu e montanhas já montados acima (a borda da arena usa o fundo)
         elif a.ceu:
             camadas.extend(ceu_e_montanhas(a, im, W, base_px, ex, t, nevoa, tela_y, x_frac, zj))
         else:

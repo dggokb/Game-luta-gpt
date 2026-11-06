@@ -151,10 +151,14 @@ def luzes(img, h, w, fogo):
 
 
 def quedas(fundo, extra):
-    """Caixas (x, y, largura, altura em pixels) das quedas d'água: claro, pouco saturado e alto."""
+    """Caixas (x, y, largura, altura em pixels) das quedas d'água: mais claro que a rocha em volta,
+    pouco saturado e alto. Pelo contraste local (e não um limiar fixo): a névoa no pé das
+    montanhas clareia tudo e apaga a diferença absoluta."""
     px = np.asarray(fundo).astype(np.float32)
     mx, mn = px.max(axis=2), px.min(axis=2)
-    agua = (mn > 135) & ((mx - mn) / np.maximum(mx, 1) < 0.30)
+    lum = px.mean(axis=2)
+    perto = cv2.GaussianBlur(lum, (0, 0), 18)
+    agua = (lum - perto > 28) & ((mx - mn) / np.maximum(mx, 1) < 0.32) & (mn > 95)
     agua[:extra] = False
     m = cv2.morphologyEx(agua.astype(np.uint8), cv2.MORPH_OPEN, np.ones((9, 2), np.uint8))
     m = cv2.dilate(m, np.ones((15, 9), np.uint8))

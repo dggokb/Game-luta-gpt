@@ -95,8 +95,11 @@ largura, resolve-se a altura do horizonte (0,454 na Arena) e daí a profundidade
     continua o chão 520 px para cada lado (`8_chao_largo.webp`) e o `cenario_pintura.py` tira o
     chão dele (`--chao-largo`), com no máximo 4096 de largura. Sem a malha (Canvas), o chão
     projetado vai em faixas de 1 px (com 2 as linhas curvas saíam serrilhadas).
-12. **Relevo e ar**: a borda da arena (o recorte) é limpa da cor do fundo antigo; atrás das
-    construções vai uma sombra roxa difusa, deslocada para longe do sol, que escurece as
-    montanhas em volta delas (a arena deixa de parecer colada), e as bordas viradas para o sol
-    ganham uma luz de contorno quente e fraca. No ar, `poeira` dourada contra o sol baixo. O
-    pulo simples não mexe no zoom (`camera.zoomNoPulo: false`).
+12. **Sem cara de recorte**: a borda da arena é limpa da cor do fundo antigo e recebe um pouco da
+    cor do céu e das montanhas que ficam atrás dela ("light wrap", 5 px), com o alfa 1 px mais
+    macio. As montanhas somem numa névoa quente perto do pé da arquibancada (perspectiva aérea:
+    entre elas e a arena tem ar). Atrás das construções, uma sombra roxa difusa e fraca. Uma
+    luz de contorno nítida foi tentada e saiu: virava um risco laranja em volta, o próprio
+    recorte. No ar, `poeira` dourada contra o sol baixo. O pulo simples não mexe no zoom
+    (`camera.zoomNoPulo: false`). As cachoeiras são achadas pelo contraste com a rocha em volta
+    (a névoa clareia o pé das montanhas).
