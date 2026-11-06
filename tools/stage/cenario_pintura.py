@@ -107,6 +107,13 @@ def main():
     pimg = Image.fromarray(np.clip(parede, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.1))
     camadas = []
     if a.fundo:
+        # Com o fundo separado, a arena fica nítida (como o chão): sem desfoque e quase sem névoa;
+        # quem dá a distância é o fundo, mais apagado.
+        nitida = np.asarray(im.crop((0, 0, W, base_px))).astype(np.float32)
+        nitida = nitida * 0.96 + nevoa * 0.04
+        pimg = Image.new('RGB', (W, ex + base_px))
+        pimg.paste(Image.fromarray(np.clip(nitida, 0, 255).astype(np.uint8)).filter(
+            ImageFilter.UnsharpMask(radius=1.4, percent=35, threshold=2)), (0, ex))
         # Arena recortada (a máscara é o alfa) e o fundo numa camada própria, bem mais longe.
         masc = Image.open(a.mascara).convert('L')
         masc = masc.resize((W, round(masc.height * W / masc.width)), Image.LANCZOS)
@@ -122,7 +129,7 @@ def main():
         fundo[:6] = fundo[6]   # a imagem gerada vem com a 1ª linha clara: espelhada, vira um risco
         ftopo = fundo[:ex][::-1].copy()
         fundo = np.concatenate([ftopo * (1 - t * 0.85) + np.array([40, 20, 56], np.float32) * (t * 0.85), fundo], 0)
-        fundo = fundo * 0.94 + nevoa * 0.06
+        fundo = fundo * 0.88 + nevoa * 0.12
         Image.fromarray(np.clip(fundo, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8)).save(
             os.path.join(a.saida, 'fundo.jpg'), quality=90)
         camadas.append({"id": "fundo", "imagem": "fundo.jpg", "profundidade": a.prof_fundo,
