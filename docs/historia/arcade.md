@@ -32,6 +32,12 @@ mais rápido que na história.
 
 ## As lutas
 
+Antes de cada luta da chave e do duelo entra a **tela de versus**, a mesma da história
+([torneio.md](torneio.md#a-tela-de-versus)): a dupla do jogador à esquerda (P1), a do CPU à
+direita. O lado de um irmão tem a cor e o espírito dele (Ryūga: azul e dragão; Kōga: vermelho e
+tigre); uma dupla livre fica com a cor que sobrou, sem espírito. Todo o elenco do Arcade (p01 a
+p16) tem arte.
+
 O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um episódio com
 `sorteio`, `luta` + `"torneio": true`, `chave`, `luta` + `"duelo": true` e cartões `titulo`):
 

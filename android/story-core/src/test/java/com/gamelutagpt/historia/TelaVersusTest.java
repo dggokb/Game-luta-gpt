@@ -89,6 +89,29 @@ public class TelaVersusTest {
         assertEquals(1, rec2.fights.size());
     }
 
+    /** No Arcade (chave de 16, dupla livre) a luta também espera a tela de versus. */
+    @Test
+    public void arcadeTambemTemVersus() throws IOException {
+        GameAssets assets = new GameAssets();
+        Temporada temporada = Temporada.load(assets);
+        List<Torneio.Dupla> oficiais = Arcade.oficiais(Torneio.duplasFromJson(assets.readText(Torneio.ARQUIVO)));
+        List<String> elenco = new ArrayList<>();
+        for (int i = 1; i <= 16; i++) elenco.add(i == 1 ? "player_base" : String.format("p%02d", i));
+        Torneio chave = Arcade.chave(Arcade.livre("p05", "p11"), oficiais, elenco, new java.util.Random(2));
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, assets);
+        p.setCampanha(Campanha.arcade(chave));
+        p.start(temporada, Episodio.fromJson(assets.readText(Arcade.EPISODIO)));
+        for (int i = 0; i < 5000 && p.passo().tipo != Episodio.TipoPasso.LUTA; i++) {
+            for (float t = 0f; t < 0.6f && p.passo().tipo != Episodio.TipoPasso.LUTA; t += DT) p.update(DT);
+            if (p.passo().tipo != Episodio.TipoPasso.LUTA) p.tap(640f, 360f);
+        }
+        assertTrue(p.passo().torneio);
+        assertEquals("a luta espera a tela de versus", 0, rec.fights.size());
+        run(p, TelaVersus.DURACAO + 0.2f);
+        assertEquals(1, rec.fights.size());
+    }
+
     /** O desafio no porto não é do torneio: a luta começa direto, sem versus. */
     @Test
     public void desafioNoPortoNaoTemVersus() throws IOException {
