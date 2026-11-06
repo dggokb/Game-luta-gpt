@@ -30,6 +30,9 @@ imagens anexadas:
 codex exec --skip-git-repo-check --sandbox workspace-write -i concept.png -i style.png - < prompt.txt
 ```
 
+- **Revisão**: confira cada imagem de perto antes de usar: cinco dedos em cada mão, os dois braços
+  saindo dos ombros, armas inteiras (a lâmina saindo da bainha). Poses simples erram menos (o p05 e
+  a p06 foram refeitos com poses mais simples). O prompt de cada um já pede a anatomia certa.
 - **Lutadores**: anexam o concept do lutador (`art/concepts/pNN.png`, roupa, cabelo e cores) e
   o storyboard 06B da abertura (`style.png`, o estilo: arte de luta anime, traço limpo, cel
   shading forte, luz de contorno). 1024×1536, da cintura para cima, as duas mãos e o cabelo
@@ -50,8 +53,8 @@ Para trocar um lutador: gere de novo com o prompt dele (`art/versus/prompt_pNN.t
 | p02 Yin-lu | golpe de palma aberta para a frente, a outra mão erguida atrás, olhar calmo |
 | p03 Kōga | chamando o adversário com a mão ("vem"), o outro punho fechado, sorriso arrogante |
 | p04 Brucy | socando a palma aberta com o punho enfaixado, sorriso confiante |
-| p05 | katana meio desembainhada, olhos por cima da máscara, pano rasgado esvoaçando |
-| p06 | uma mão em garra para a direita, olhos da máscara brilhando roxos |
+| p05 | em guarda com a katana desembainhada, as duas mãos no cabo, a lâmina erguida na diagonal |
+| p06 | uma mão em garra perto do rosto mascarado, a outra na cintura, olhos brilhando roxos |
 | p07 | ajeitando a aba do chapéu, sorriso perigoso, gola do casaco erguida |
 | p08 | chicote esticado entre as mãos perto do rosto, sorriso perigoso |
 | p09 | batendo os dois punhos na frente do peito, gargalhando |
