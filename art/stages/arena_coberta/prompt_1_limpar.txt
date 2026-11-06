@@ -1,0 +1,8 @@
+Use your image generation tool to EDIT the attached image concept.png. It is a 2D fighting game screenshot of an indoor tournament arena (anime / painterly style): a big stone floor with a red and gold emblem in the middle, huge stands full of people on both sides, red banners with gold emblems on the pillars, spotlights and a lighting rig on the ceiling, and a large video screen (telão) on a metal truss structure in the center back. A flat gray band at the top and a wider flat gray band at the bottom are placeholders.
+
+Produce a clean background plate:
+- Remove BOTH fighters, the small referee figure on the left, their shadows, and ALL HUD/UI elements (health bars, portraits, timer '180', 'BATALHA', 'AO VIVO' text, MENU button, the virtual joystick, the round buttons ASSIST/SHINKAI/SUPER/L/M/H/L+M/M+H/COMBO, SUPER meters). Fill those areas with the scenery that would be behind them (stone floor tiles, the emblem, stands, pillars, banners).
+- The video screen: keep its frame and truss exactly, but make the screen itself an EMPTY dark navy-blue glowing panel with faint horizontal scanlines (no characters, no text).
+- Replace the gray band at the TOP with the continuation of the ceiling: dark roof beams, the lighting rig and more spotlights.
+- Replace the gray band at the BOTTOM with the continuation of the stone floor coming closer to the camera: the same large polished stone tiles getting bigger toward the bottom, warm reflections, and the lower part of the red and gold emblem continuing its shape.
+Do NOT change anything else: same framing, same camera, same perspective and horizon, same painting style, lighting and colors. Keep the output size 1672x941. Save the result as limpo.png in the current directory. Do not write code files.

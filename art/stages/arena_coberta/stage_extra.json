@@ -1,0 +1,8 @@
+{
+  "corFundo": "#0E0E1A",
+  "luzLutadores": {"cor": "#FFD49A", "forca": 0.26, "brilho": 1.0, "pes": "#E8D0B0",
+                   "contraluz": {"cor": "#FFC070", "forca": 0.9, "direcao": [0, -1]}},
+  "sombraLutadores": {"alfa": 0.55, "cor": "#140C08", "suave": 0.6, "x": 0.0, "y": 0.2},
+  "poeira": {"quantidade": 200, "cor": "#FFE2B0", "alfa": 0.6, "tamanho": 2.4, "vento": 6,
+             "perto": -260, "longe": 2400, "topo": 0.0, "base": 0.85}
+}

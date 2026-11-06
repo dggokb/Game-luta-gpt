@@ -342,6 +342,13 @@ def main():
     ap.add_argument('--prof-ceu', type=float, default=30000.0)
     ap.add_argument('--zoom', type=float, default=1.0)
     ap.add_argument('--chao-largo', default=None)
+    ap.add_argument('--nome', default='Arena Central (pintura)')
+    ap.add_argument('--nitida', action='store_true',
+                    help='sem --fundo: a parede sem desfoque e quase sem névoa (cenário coberto, sem céu)')
+    ap.add_argument('--cor-acima', default='#281234',
+                    help='a cor para onde escurece o que vem espelhado em cima (e o corAcima)')
+    ap.add_argument('--extra', default=None,
+                    help='JSON com chaves que substituem as do stage.json (luz, sombra, poeira...)')
     ap.add_argument('--montanhas-verde', default=None)
     a = ap.parse_args()
 
@@ -392,13 +399,33 @@ def main():
     ex = a.ceu_extra
     topo = parede[:ex][::-1].copy()
     t = (np.linspace(1, 0, ex)[:, None, None]) ** 1.2
-    topo = topo * (1 - t * 0.85) + np.array([40, 20, 56], np.float32) * (t * 0.85)
+    cor_acima = np.array([int(a.cor_acima[i:i + 2], 16) for i in (1, 3, 5)], np.float32)
+    if a.nitida:
+        # Coberto: em cima do teto pintado é escuro (espelhado, o telão e os holofotes apareciam
+        # de cabeça para baixo). A cor da 1ª linha, bem borrada, vai sumindo no escuro.
+        import cv2
+        linha = cv2.GaussianBlur(parede[:8].mean(0, keepdims=True), (0, 0), sigmaX=40, sigmaY=0.1)
+        dist = np.arange(ex, 0, -1, dtype=np.float32)[:, None, None]     # linhas até a pintura
+        tt = np.clip(dist / 160, 0, 1) ** 0.7
+        topo = np.repeat(linha, ex, 0) * (1 - tt) + cor_acima * tt
+        # E o alto da pintura vai entrando nesse escuro (sem o corte reto em cima das bandeiras).
+        n = 70
+        w = ((1 - np.arange(n, dtype=np.float32) / n) ** 1.5 * 0.75)[:, None, None]
+        parede[:n] = parede[:n] * (1 - w) + linha * w
+    else:
+        topo = topo * (1 - t * 0.85) + cor_acima * (t * 0.85)
     parede = np.concatenate([topo, parede], 0)
-    # Névoa de profundidade: mais forte embaixo (o pé da arquibancada, junto do chão), leve no céu.
     hp = parede.shape[0]
-    rampa = np.clip((np.arange(hp) - ex) / max(1, base_px), 0, 1)[:, None, None]
-    parede = parede * (1 - 0.10 - 0.08 * rampa) + nevoa * (0.10 + 0.08 * rampa)
-    pimg = Image.fromarray(np.clip(parede, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.1))
+    if a.nitida:
+        # Coberto (sem céu nem fundo separado): nítida como o chão, só um véu de névoa.
+        parede = parede * 0.97 + nevoa * 0.03
+        pimg = Image.fromarray(np.clip(parede, 0, 255).astype(np.uint8)).filter(
+            ImageFilter.UnsharpMask(radius=1.4, percent=35, threshold=2))
+    else:
+        # Névoa de profundidade: mais forte embaixo (o pé da arquibancada, junto do chão), leve no céu.
+        rampa = np.clip((np.arange(hp) - ex) / max(1, base_px), 0, 1)[:, None, None]
+        parede = parede * (1 - 0.10 - 0.08 * rampa) + nevoa * (0.10 + 0.08 * rampa)
+        pimg = Image.fromarray(np.clip(parede, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.1))
     camadas = []
     if a.fundo:
         # Com o fundo separado, a arena fica nítida (como o chão): sem desfoque e quase sem névoa;
@@ -452,9 +479,9 @@ def main():
                         "x": round(x_parede, 4), "repetir": "espelhar"})
     else:
         pimg.save(os.path.join(a.saida, 'parede.jpg'), quality=92)
-        camadas.append({"id": "parede", "imagem": "parede.jpg", "profundidade": round(zj + 1, 1),
-                        "topo": round(tela_y(-ex) / VH, 4), "base": round(tela_y(base_px) / VH, 4),
-                        "x": round(x_frac, 4), "repetir": "espelhar", "corAcima": "#281234"})
+        camadas.append({"id": "parede", "imagem": "parede.jpg", "profundidade": round(zp + 1, 1),
+                        "topo": round(tela_y_parede(-ex) / VH, 4), "base": round(tela_y_parede(base_px) / VH, 4),
+                        "x": round(x_parede, 4), "repetir": "espelhar", "corAcima": a.cor_acima})
 
     # Chão: da junção para baixo; névoa só perto da junção, sumindo até o pé dos lutadores.
     # Com --chao-largo (a mesma pintura com mais chão dos dois lados, por igual, e a mesma altura),
@@ -480,7 +507,7 @@ def main():
     chao_img.save(os.path.join(a.saida, 'chao.jpg'), quality=93)
 
     stage = {
-        "nome": "Arena Central (pintura)",
+        "nome": a.nome,
         "camera": {"distancia": D, "horizonte": round(hz / VH, 4), "zoom": a.zoom, "zoomNoPulo": False},
         "corFundo": "#2A1438",
         "luzLutadores": {"cor": "#FF9A70", "forca": 0.34, "brilho": 0.95, "pes": "#D8B8A8",
@@ -496,6 +523,9 @@ def main():
                  "projecao": {"topo": round(tela_y(cy0) / VH, 4), "base": round(tela_y(H + mais) / VH, 4),
                               "x": round(x_frac, 4)}},
     }
+    if a.extra:
+        with open(a.extra, encoding='utf-8') as fh:
+            stage.update(json.load(fh))
     with open(os.path.join(a.saida, 'stage.json'), 'w') as fh:
         json.dump(stage, fh, ensure_ascii=False, indent=2)
         fh.write('\n')
