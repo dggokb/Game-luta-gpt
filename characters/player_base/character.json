@@ -10732,42 +10732,6 @@
         124,
         121
       ]
-    },
-    "DRAGON_RUSH": {
-      "atlas": "player_base_dragon_rush",
-      "frames": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ],
-      "loop": false,
-      "durationsMs": [
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100
-      ]
-    },
-    "SPECIAL_ENERGY_SHINKAI": {
-      "atlas": "player_base_energy_shinkai",
-      "frames": [
-        0,
-        1,
-        2
-      ],
-      "loop": false,
-      "durationsMs": [
-        100,
-        100,
-        100
-      ]
     }
   },
   "moves": {

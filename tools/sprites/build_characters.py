@@ -43,7 +43,8 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             'SUPER_WAVE_ERRO',
             # SHINKAI: o Dragon Rush com desenho próprio (preparo, voo, duas pancadas e os três
             # golpes finais, um quadro cada) e o poder no SHINKAI (preparo, palma esquerda, palma
-            # direita: dois disparos). Sem eles, as poses de antes (jH, M/L e o SPECIAL_ENERGY).
+            # direita: dois disparos). Ainda sem arte (vêm dos vídeos): sem eles, as poses de antes
+            # (jH, M/L e o SPECIAL_ENERGY).
             'DRAGON_RUSH', 'SPECIAL_ENERGY_SHINKAI')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
