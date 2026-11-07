@@ -5753,6 +5753,9 @@ public class GameView extends SurfaceView
     private boolean noTimeDoLado1(String id) {
         CombatFighter emCampo = engine.fighter(0);
         if (emCampo.character() != null && id.equals(emCampo.character().id)) return true;
+        // No duelo (1x1) a reserva não luta: o parceiro dela é só um lugar (no duelo dos irmãos,
+        // o outro irmão). O Kōga do outro lado não é "o mesmo dos dois lados".
+        if (duel) return false;
         FighterState[] membros = engine.team(0).members;
         if (membros != null) {
             for (FighterState m : membros) if (m != null && m.character != null && id.equals(m.character.id)) return true;
