@@ -1524,6 +1524,9 @@
       "vida": 8000,
       "dano": 0.6,
       "ritmo": 1.0,
+      "ritmoGolpe": {
+        "L": 1.5
+      },
       "projetil": {
         "velocidade": 420,
         "alcance": 240

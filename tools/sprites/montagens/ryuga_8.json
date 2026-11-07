@@ -104,7 +104,7 @@
     }
   },
   "crouch_idle": {
-    "_doc": "Agachado parado, respirando (agacha 20-70), em loop.",
+    "_doc": "Agachado parado, respirando (agacha 20-66), ida e volta em loop: do 68 em diante ele já começa a levantar (a volta pulava).",
     "trechos": [
       [
         "agacha",
@@ -112,12 +112,13 @@
         124
       ]
     ],
-    "quadros": "20-70/2",
+    "quadros": "20-66/2",
     "opcoes": {
       "fixar": "video"
     },
     "animacoes": {
       "CROUCH_IDLE": {
+        "frames": "0-23,22-1",
         "loop": true
       }
     }
@@ -226,7 +227,7 @@
     }
   },
   "medium_kick": {
-    "_doc": "M: o soco do vídeo (28-76) e a volta para a guarda, pés plantados.",
+    "_doc": "M: o soco do vídeo (28-88) e a volta inteira para a guarda (no 84 ele já está na imagem inicial), pés plantados.",
     "trechos": [
       [
         "M",
@@ -234,7 +235,7 @@
         124
       ]
     ],
-    "quadros": "28,32,36,38,40,44,52,60,64,68,72,76",
+    "quadros": "28,32,36,38,40,44,52,60,64,68,72,76,80,84,88",
     "opcoes": {
       "fixar": "video",
       "manter_efeitos": true
@@ -246,7 +247,7 @@
     }
   },
   "heavy_straight": {
-    "_doc": "H: o chute alto do vídeo (8-96), com o rastro. No vídeo ele dá um passinho com o pé de apoio (~120 px para a frente e de volta): fixar pe deixa o pé de trás no lugar do idle, o chute no eixo.",
+    "_doc": "H: o chute alto do vídeo (8-108: no 104 ele já está na imagem inicial), com o rastro. No vídeo ele dá um passinho com o pé de apoio (~120 px para a frente e de volta): fixar pe deixa o pé de trás no lugar do idle, o chute no eixo.",
     "trechos": [
       [
         "H",
@@ -254,7 +255,7 @@
         124
       ]
     ],
-    "quadros": "8-96/4",
+    "quadros": "8-108/4",
     "opcoes": {
       "fixar": "pe",
       "manter_efeitos": true
@@ -287,7 +288,7 @@
     }
   },
   "crouch_medium": {
-    "_doc": "2M: a rasteira (16-104), do agachado ao agachado (no vídeo ele sobe um instante antes de voltar).",
+    "_doc": "2M: a rasteira (16-104 de 4 em 4: 23 quadros), do agachado ao agachado (no vídeo ele sobe um instante antes de voltar).",
     "trechos": [
       [
         "2M",
@@ -295,7 +296,7 @@
         124
       ]
     ],
-    "quadros": "16,22,26,30,36,44,52,56,60,64,72,80,88,96,104",
+    "quadros": "16-104/4",
     "opcoes": {
       "fixar": "video",
       "manter_efeitos": true,
@@ -303,7 +304,7 @@
     },
     "animacoes": {
       "CROUCH_MEDIUM": {
-        "impacto": 7
+        "impacto": 10
       }
     }
   },
@@ -346,6 +347,40 @@
       "GOLPE_ALTO": {
         "impacto": 4
       }
+    }
+  },
+  "fall": {
+    "_doc": "Queda do pulo: só a descida no ar (59-69). Do 70 em diante ele já estica as pernas para o chão: isso é o pouso (o jogo segura o último quadro da queda até encostar).",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "59-69/2",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "FALL": {}
+    }
+  },
+  "land": {
+    "_doc": "Pouso: encosta no chão e volta para a guarda (72-84).",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "72-84/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "LAND": {}
     }
   }
 }
