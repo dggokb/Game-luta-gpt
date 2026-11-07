@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_crouch_medium.webp",
   "report": "tools/sprites/reports/ryuga_8_crouch_medium.report.json",
   "preview": "android/app/build/sprite-review/ryuga_8_crouch_medium-import.png",
-  "expectedFrames": 15,
+  "expectedFrames": 23,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -16,10 +16,10 @@
     "personagem": "ryuga_8",
     "escala": 0.3,
     "motivo": "mesma escala dos outros vídeos do Ryūga 8 anos (medida no idle)",
-    "quadros": "16,22,26,30,36,44,52,56,60,64,72,80,88,96,104",
-    "celula": 192,
+    "quadros": "16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100,104",
+    "celula": 224,
     "largura": 320,
-    "raiz": "136,168",
+    "raiz": "136,200",
     "colunas": 6,
     "fixar": "video",
     "deslocar": "9,0",
@@ -28,8 +28,8 @@
     "densidade": 2
   },
   "frameWidth": 640,
-  "frameHeight": 384,
+  "frameHeight": 448,
   "rootX": 272,
-  "rootY": 336,
+  "rootY": 400,
   "pixelScale": 2.0
 }
