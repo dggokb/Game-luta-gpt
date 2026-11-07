@@ -158,6 +158,7 @@ def arvores_dentro(pasta, parede, w, h):
     freq = [round(float(f), 3) for f in rng.uniform(0.5, 0.75, len(grupos))]
     return {"id": "arvores-dentro", "imagem": "arvores_dentro.png",
             "profundidade": planos_yinlu.PROF_PATIO - 0.1, **posicao(parede, w, h, x0, y0, x1, y1),
+            "apoio": parede["profundidade"],
             "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
                       "amplitude": DENTRO_AMP, "amortecimento": 0.35, "raio": 0.1}}
 

@@ -182,12 +182,15 @@ def montar(pasta):
         {"id": "nuvens", "imagem": "nuvens.png", "profundidade": PROF_NUVENS, "topo": frac(-ALTO),
          "base": frac(BASE), "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA},
         {"id": "mata", "imagem": "mata.png", "profundidade": PROF_MATA, "topo": frac(MATA[0]),
-         "base": frac(MATA[1]), "x": parede["x"], "repetir": "espelhar"},
+         "base": frac(MATA[1]), "x": parede["x"], "repetir": "espelhar", "apoio": parede["profundidade"]},
         {"id": "arvores-plano", "imagem": "arvores.png", "profundidade": PROF_ARVORES, "topo": frac(-ALTO),
-         "base": frac(BASE), "x": parede["x"], "repetir": "espelhar"},
+         "base": frac(BASE), "x": parede["x"], "repetir": "espelhar", "apoio": parede["profundidade"]},
         {"id": "patio", "imagem": "patio.jpg", "profundidade": PROF_PATIO,
-         **retangulo(parede, W, hp, *PATIO)},
+         **retangulo(parede, W, hp, *PATIO), "apoio": parede["profundidade"]},
     ]
+    # Mata, árvores e pátio "apoiados" no muro: na vertical andam junto com ele (no super pulo a
+    # câmera sobe e, soltos, eles subiam atrás do muro: a mata aparecia demais e, no vão do
+    # portão, aparecia a grama embaixo do pátio). Na horizontal a paralaxe continua.
     stage["camadas"] = camadas
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"planos: céu {PROF_CEU:.0f}, nuvens {PROF_NUVENS:.0f}, mata {PROF_MATA:.0f}, árvores {PROF_ARVORES:.0f},"

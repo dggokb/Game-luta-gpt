@@ -57,7 +57,8 @@
       "topo": 0.2623,
       "base": 0.55744,
       "x": 0.5044,
-      "repetir": "espelhar"
+      "repetir": "espelhar",
+      "apoio": 641.0
     },
     {
       "id": "arvores-plano",
@@ -67,6 +68,7 @@
       "base": 0.6564,
       "x": 0.5044,
       "repetir": "espelhar",
+      "apoio": 641.0,
       "vento": {
         "colunas": 96,
         "linhas": 30,
@@ -3234,7 +3236,8 @@
       "profundidade": 850.0,
       "topo": 0.37515,
       "base": 0.59216,
-      "x": 0.50294
+      "x": 0.50294,
+      "apoio": 641.0
     },
     {
       "id": "parede",
@@ -3302,6 +3305,7 @@
       "topo": 0.37515,
       "base": 0.59216,
       "x": 0.50294,
+      "apoio": 641.0,
       "vento": {
         "colunas": 24,
         "linhas": 12,
