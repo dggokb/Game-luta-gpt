@@ -159,7 +159,7 @@ public class PaginaHistoriaTest {
         "{\"tipo\":\"proximo\",\"titulo\":\"Depois\"}]}";
 
     @Test
-    public void paginaProntaLeQuadroAQuadroEVoltaParaAPaginaInteira() {
+    public void paginaProntaJaAbreNoPrimeiroQuadroELeQuadroAQuadro() {
         Recorder rec = new Recorder();
         PaginaHistoria p = new PaginaHistoria(rec, new NoImages());
         Episodio ep = Episodio.fromJson(EPISODIO_PRONTO);
@@ -169,9 +169,8 @@ public class PaginaHistoriaTest {
 
         p.start(Temporada.fromJson(TEMPORADA), ep);
         RenderCanvas canvas = new NullCanvas();
-        // A página inteira aparece e a câmera entra sozinha no primeiro quadro.
-        assertFalse(p.waitingTap());
-        run(p, PaginaGuiada.OVERVIEW_HOLD + PaginaGuiada.MOVE + 0.1f);
+        // Sem a página inteira antes: já abre no primeiro quadro e, passada a virada, espera o toque.
+        run(p, PaginaGuiada.ENTRY + 0.05f);
         p.render(canvas);
         assertTrue(p.waitingTap());
         assertFalse(p.pageComplete());
@@ -193,7 +192,7 @@ public class PaginaHistoriaTest {
         "    {\"texto\":\"SIM!\",\"caixa\":[0.6,0.1,0.8,0.2],\"area\":[0.6,0.1,0.8,0.1,0.8,0.2,0.6,0.2]}]}]}]}";
 
     @Test
-    public void baloesDaPaginaProntaAbremUmPorToqueNoIdiomaAtual() {
+    public void baloesDaPaginaProntaJaVemComTodoOTextoNoIdiomaAtual() {
         Recorder rec = new Recorder();
         PaginaHistoria p = new PaginaHistoria(rec, new NoImages());
         Temporada temporada = Temporada.fromJson(TEMPORADA);
@@ -217,20 +216,40 @@ public class PaginaHistoriaTest {
         assertEquals(2, q.baloes.size());
 
         p.start(temporada, ep);
-        RenderCanvas canvas = new NullCanvas();
-        // Chega no quadro (impacto) e o primeiro balão abre sozinho.
-        run(p, PaginaGuiada.OVERVIEW_HOLD + PaginaGuiada.WHIP + PaginaGuiada.FIRST_BALLOON_DELAY + 0.05f);
-        assertTrue(rec.sounds.contains("impacto"));
-        assertFalse(p.waitingTap()); // digitando
-        p.tap(640f, 360f);           // completa o texto
+        final List<String> textos = new ArrayList<>();
+        RenderCanvas canvas = new NullCanvas() {
+            @Override public void drawText(String text, float x, float y, float size, int fill, int stroke,
+                                           float strokeWidth, boolean italic) {
+                textos.add(text);
+            }
+        };
+        // Desde o primeiro quadro, todos os balões já estão com o texto inteiro (sem digitar).
         p.update(DT);
         p.render(canvas);
+        assertTrue("todo o texto já escrito: " + textos, textos.contains("Boys!") && textos.contains("SIM!"));
+        // Passada a virada, o impacto chega (com som) e o único quadro já é o último.
+        run(p, PaginaGuiada.ENTRY + 0.05f);
+        assertTrue(rec.sounds.contains("impacto"));
         assertTrue(p.waitingTap());
-        assertFalse(p.pageComplete()); // falta o segundo balão
-        p.tap(640f, 360f);
-        run(p, 1f);
         assertTrue(p.pageComplete());
-        p.render(canvas);
+    }
+
+    /** O impacto assenta como mola e o tremor pulsa: movimento suave, sem sacudir a tela. */
+    @Test
+    public void impactoETremorSaoSuaves() {
+        Episodio.Quadro q = Episodio.fromJson(EPISODIO_BALOES).passos.get(0).quadros.get(0);
+        float antes = PaginaGuiada.punch(q, 0f) + PaginaGuiada.heartbeat(q, 0f);
+        assertEquals(PaginaGuiada.PUNCH_ZOOM, antes, 1e-4f);
+        float maior = 0f;
+        for (float t = DT; t < 3f; t += DT) {
+            float agora = PaginaGuiada.punch(q, t) + PaginaGuiada.heartbeat(q, t);
+            // De um quadro de 60 fps para o seguinte o zoom muda pouco (sem tranco aleatório).
+            maior = Math.max(maior, Math.abs(agora - antes));
+            antes = agora;
+        }
+        assertTrue("muda suave: " + maior, maior < 0.02f);
+        assertEquals("o tranco some", 0f, PaginaGuiada.punch(q, 1.5f), 1e-6f);
+        assertTrue("o tremor continua pulsando", PaginaGuiada.heartbeat(q, PaginaGuiada.BEAT_PERIOD * 2 + 0.25f) > 0.01f);
     }
 
     @Test
@@ -437,7 +456,7 @@ public class PaginaHistoriaTest {
     }
 
     /** Canvas que não desenha nada, só para exercitar o código de desenho. */
-    static final class NullCanvas implements RenderCanvas {
+    static class NullCanvas implements RenderCanvas {
         @Override public void save() {}
         @Override public void restore() {}
         @Override public void translate(float dx, float dy) {}

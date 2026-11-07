@@ -14,14 +14,13 @@ só para as páginas provisórias que ainda não viraram páginas prontas.
 
 ## Como a página é lida
 
-1. **Página inteira** (0,9 s): a página aparece toda, para o jogador ver a diagramação.
-2. **Quadro a quadro**: a câmera entra sozinha no primeiro quadro. O quadro em foco fica
-   aceso e o resto da página escurece. O zoom leva o quadro até preencher a tela (no máximo 3×
+1. **Já no primeiro quadro**: a página não aparece inteira antes; ao começar (ou ao virar da
+   página anterior) ela já abre no primeiro quadro.
+2. **Quadro a quadro**: o quadro em foco fica aceso e o resto da página escurece. O zoom leva o quadro até preencher a tela (no máximo 3×
    a imagem, para não borrar). Quadros mais altos que a tela são percorridos de cima para
    baixo; os outros ganham um zoom lento enquanto estão na tela.
-3. **Balões**: o primeiro balão do quadro abre sozinho logo que a câmera chega e o texto é
-   digitado. Cada toque completa o texto ou abre o próximo balão. Com todos os balões abertos,
-   o toque leva ao próximo quadro.
+3. **Balões**: todo o texto da página já está escrito desde o começo (nada é digitado). O
+   toque leva ao próximo quadro.
 4. **Fim**: no último quadro, o toque passa direto para a próxima página (ou para a luta, o
    "próximo episódio" etc.). A página não volta a aparecer inteira.
 
@@ -35,8 +34,8 @@ tem; use à vontade nos quadros de ação.
 
 | Efeito | O que faz | Quando usar |
 |---|---|---|
-| `impacto` | A câmera chega de supetão (0,24 s, acelerando), com um tranco de zoom de 10% que assenta, a tela treme forte e um clarão branco. Toca o som `impacto` | golpes, gritos, onomatopeias de pancada |
-| `tremor` | A tela treme de leve o tempo todo enquanto o quadro está na tela | tensão, força, olhares de raiva, preparação de golpe |
+| `impacto` | A câmera chega de supetão (0,24 s, acelerando), com um tranco de zoom de 10% que assenta como mola (uma ou duas oscilações largas) e um clarão branco. A tela não treme Toca o som `impacto` | golpes, gritos, onomatopeias de pancada |
+| `tremor` | O quadro pulsa num ritmo de coração (duas batidas suaves de zoom e uma pausa) enquanto está na tela. Antes a tela tremia, o que incomodava | tensão, força, olhares de raiva, preparação de golpe |
 | `velocidade` | Linhas de foco de mangá (da borda para o centro) tremeluzindo por cima do quadro | ação, movimento rápido, chegada de golpe |
 | `zoom` | A câmera avança 12% sobre o quadro, desacelerando | olhares, falas importantes, momentos dramáticos |
 
