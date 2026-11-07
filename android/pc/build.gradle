@@ -404,6 +404,23 @@ tasks.register('conferirQuadros', JavaExec) {
 
 // O teste dos QTE da cinemática no convite do Episódio 2 (Ryūga × Yin-lu), no jogo de verdade:
 // passa as páginas, deixa a Yin-lu com 20% e joga a cena, gravando quadros em build/qte/.
+// gradle :pc:testeMovimentos -Plutador=ryuga_8 [-Prival=koga_8] [-Psaida=pasta]
+// Os movimentos e golpes de um lutador pelo pad, contra um boneco parado, gravados por trecho.
+tasks.register('testeMovimentos', JavaExec) {
+    group = 'verification'
+    description = 'Joga os movimentos e golpes de um lutador e grava os quadros.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.gamelutagpt.TesteMovimentosPc'
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
+    args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('movimentos').get().asFile.absolutePath),
+        providers.gradleProperty('lutador').getOrElse('ryuga_8'),
+        providers.gradleProperty('rival').getOrElse('koga_8')
+}
+
 // gradle :pc:testeCena -Pepisodio=ep00 -Pmarca=briga-irmaos [-Pirmao=koga] [-Pvida=0.49] [-Psaida=pasta]
 // A cinemática de uma luta da história, direto na luta, com todos os QTE acertados (as cenas em vídeo).
 tasks.register('testeCena', JavaExec) {

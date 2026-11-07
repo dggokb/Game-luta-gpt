@@ -253,6 +253,8 @@ public final class CinematicaLuta {
         boolean emendar;
         /** VIDEO emendado com semEsperar: a cena segue quando ele começa (não quando acaba). */
         boolean soComecar;
+        /** VIDEO: quantas vezes mais rápido que o vídeo ele toca (1 = o tempo do vídeo). */
+        float ritmo = 1f;
 
         Acao(Tipo tipo) {
             this.tipo = tipo;
@@ -833,6 +835,7 @@ public final class CinematicaLuta {
                 if (a.parar) a.clipe = null;
                 a.repetir = Boolean.TRUE.equals(m.get("repetir"));
                 a.emendar = Boolean.TRUE.equals(m.get("emendar"));
+                a.ritmo = numero(m, "ritmo", 1f, 0.25f, 4f);
                 a.esquerda = Episodio.string(m, "esquerda", null);
                 if (a.esquerda != null && !time(a.esquerda)) {
                     throw new IllegalArgumentException("esquerda " + a.esquerda + " (use jogador, rival, ryuga ou koga)");
@@ -1091,9 +1094,9 @@ public final class CinematicaLuta {
         // O vídeo anda no ritmo da luta: para na congelada do impacto e fica lento na câmera lenta.
         if (video != null) videoDesde += dt * (1f - velocidade());
         time += dt;
-        if (videoProximo != null && (time - videoDesde) * 1000f >= videoTrocaMs) {
+        if (videoProximo != null && msDoVideo() >= videoTrocaMs) {
             // A volta acabou: o vídeo emendado começa de onde a volta passou.
-            float sobra = (time - videoDesde) * 1000f - videoTrocaMs;
+            float sobra = (msDoVideo() - videoTrocaMs) / video.ritmo;
             video = videoProximo;
             videoProximo = null;
             videoDesde = time - sobra / 1000f;
@@ -1199,7 +1202,7 @@ public final class CinematicaLuta {
                 if (a.emendar && !a.parar && video != null && video.repetir && duracaoVideo.containsKey(a.clipe)) {
                     // Entra quando a volta do loop acabar (no ms da volta seguinte).
                     float total = duracaoVideo.get(video.clipe);
-                    float ms = (time - videoDesde) * 1000f;
+                    float ms = msDoVideo();
                     videoProximo = a;
                     videoTrocaMs = total > 0f ? (float)Math.ceil(ms / total) * total : ms;
                     break;
@@ -1251,7 +1254,7 @@ public final class CinematicaLuta {
                 if (videoProximo == a) return false;
                 if (a.soComecar) return true;
                 // O loop não espera; o vídeo que toca uma vez espera acabar.
-                return video != a || a.repetir || (time - videoDesde) * 1000f >= duracaoVideo.get(a.clipe);
+                return video != a || a.repetir || msDoVideo() >= duracaoVideo.get(a.clipe);
             default:
                 return true;
         }
@@ -1410,11 +1413,16 @@ public final class CinematicaLuta {
         return new ArrayList<>(duracaoVideo.keySet());
     }
 
+    /** Milissegundos do vídeo atual desde o começo dele (no ritmo dele), sem dar a volta. */
+    private float msDoVideo() {
+        return video == null ? 0f : (time - videoDesde) * 1000f * video.ritmo;
+    }
+
     /** Milissegundos do vídeo agora: no loop, dentro de uma volta; senão para no último quadro. */
     public float videoMs() {
         if (video == null) return 0f;
         float total = duracaoVideo.get(video.clipe);
-        float ms = (time - videoDesde) * 1000f;
+        float ms = msDoVideo();
         if (total <= 0f) return 0f;
         return video.repetir ? ms % total : Math.min(ms, total - 1f);
     }

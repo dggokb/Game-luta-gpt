@@ -3892,35 +3892,41 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_BACKDASH_ROOT_Y = 386;
     static final int RYUGA_8_BACKDASH_FRAME_COUNT = 31;
 
-    static final int RYUGA_8_CROUCH_FRAME_WIDTH = 261;
-    static final int RYUGA_8_CROUCH_FRAME_HEIGHT = 348;
-    static final int RYUGA_8_CROUCH_ROOT_X = 131;
-    static final int RYUGA_8_CROUCH_ROOT_Y = 336;
-    static final int RYUGA_8_CROUCH_FRAME_COUNT = 8;
+    static final int RYUGA_8_CROUCH_FRAME_WIDTH = 255;
+    static final int RYUGA_8_CROUCH_FRAME_HEIGHT = 351;
+    static final int RYUGA_8_CROUCH_ROOT_X = 120;
+    static final int RYUGA_8_CROUCH_ROOT_Y = 339;
+    static final int RYUGA_8_CROUCH_FRAME_COUNT = 7;
 
-    static final int RYUGA_8_CROUCH_HEAVY_FRAME_WIDTH = 306;
-    static final int RYUGA_8_CROUCH_HEAVY_FRAME_HEIGHT = 462;
-    static final int RYUGA_8_CROUCH_HEAVY_ROOT_X = 160;
-    static final int RYUGA_8_CROUCH_HEAVY_ROOT_Y = 448;
-    static final int RYUGA_8_CROUCH_HEAVY_FRAME_COUNT = 12;
+    static final int RYUGA_8_CROUCH_HEAVY_FRAME_WIDTH = 317;
+    static final int RYUGA_8_CROUCH_HEAVY_FRAME_HEIGHT = 466;
+    static final int RYUGA_8_CROUCH_HEAVY_ROOT_X = 135;
+    static final int RYUGA_8_CROUCH_HEAVY_ROOT_Y = 447;
+    static final int RYUGA_8_CROUCH_HEAVY_FRAME_COUNT = 14;
 
-    static final int RYUGA_8_CROUCH_LIGHT_FRAME_WIDTH = 454;
-    static final int RYUGA_8_CROUCH_LIGHT_FRAME_HEIGHT = 293;
-    static final int RYUGA_8_CROUCH_LIGHT_ROOT_X = 160;
-    static final int RYUGA_8_CROUCH_LIGHT_ROOT_Y = 279;
-    static final int RYUGA_8_CROUCH_LIGHT_FRAME_COUNT = 11;
+    static final int RYUGA_8_CROUCH_IDLE_FRAME_WIDTH = 255;
+    static final int RYUGA_8_CROUCH_IDLE_FRAME_HEIGHT = 254;
+    static final int RYUGA_8_CROUCH_IDLE_ROOT_X = 120;
+    static final int RYUGA_8_CROUCH_IDLE_ROOT_Y = 242;
+    static final int RYUGA_8_CROUCH_IDLE_FRAME_COUNT = 26;
 
-    static final int RYUGA_8_CROUCH_MEDIUM_FRAME_WIDTH = 548;
-    static final int RYUGA_8_CROUCH_MEDIUM_FRAME_HEIGHT = 348;
-    static final int RYUGA_8_CROUCH_MEDIUM_ROOT_X = 228;
-    static final int RYUGA_8_CROUCH_MEDIUM_ROOT_Y = 319;
-    static final int RYUGA_8_CROUCH_MEDIUM_FRAME_COUNT = 16;
+    static final int RYUGA_8_CROUCH_LIGHT_FRAME_WIDTH = 407;
+    static final int RYUGA_8_CROUCH_LIGHT_FRAME_HEIGHT = 292;
+    static final int RYUGA_8_CROUCH_LIGHT_ROOT_X = 126;
+    static final int RYUGA_8_CROUCH_LIGHT_ROOT_Y = 278;
+    static final int RYUGA_8_CROUCH_LIGHT_FRAME_COUNT = 14;
 
-    static final int RYUGA_8_DASH_FRAME_WIDTH = 335;
-    static final int RYUGA_8_DASH_FRAME_HEIGHT = 359;
-    static final int RYUGA_8_DASH_ROOT_X = 202;
-    static final int RYUGA_8_DASH_ROOT_Y = 347;
-    static final int RYUGA_8_DASH_FRAME_COUNT = 6;
+    static final int RYUGA_8_CROUCH_MEDIUM_FRAME_WIDTH = 540;
+    static final int RYUGA_8_CROUCH_MEDIUM_FRAME_HEIGHT = 343;
+    static final int RYUGA_8_CROUCH_MEDIUM_ROOT_X = 222;
+    static final int RYUGA_8_CROUCH_MEDIUM_ROOT_Y = 314;
+    static final int RYUGA_8_CROUCH_MEDIUM_FRAME_COUNT = 15;
+
+    static final int RYUGA_8_DASH_FRAME_WIDTH = 375;
+    static final int RYUGA_8_DASH_FRAME_HEIGHT = 324;
+    static final int RYUGA_8_DASH_ROOT_X = 95;
+    static final int RYUGA_8_DASH_ROOT_Y = 318;
+    static final int RYUGA_8_DASH_FRAME_COUNT = 12;
 
     static final int RYUGA_8_DEFENSE_AIR_FRAME_WIDTH = 211;
     static final int RYUGA_8_DEFENSE_AIR_FRAME_HEIGHT = 368;
@@ -3946,10 +3952,28 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_FALL_ROOT_Y = 364;
     static final int RYUGA_8_FALL_FRAME_COUNT = 6;
 
-    static final int RYUGA_8_HEAVY_STRAIGHT_FRAME_WIDTH = 501;
-    static final int RYUGA_8_HEAVY_STRAIGHT_FRAME_HEIGHT = 429;
-    static final int RYUGA_8_HEAVY_STRAIGHT_ROOT_X = 159;
-    static final int RYUGA_8_HEAVY_STRAIGHT_ROOT_Y = 414;
+    static final int RYUGA_8_FALL_DOWN_FRAME_WIDTH = 338;
+    static final int RYUGA_8_FALL_DOWN_FRAME_HEIGHT = 267;
+    static final int RYUGA_8_FALL_DOWN_ROOT_X = 81;
+    static final int RYUGA_8_FALL_DOWN_ROOT_Y = 254;
+    static final int RYUGA_8_FALL_DOWN_FRAME_COUNT = 11;
+
+    static final int RYUGA_8_GETUP_FRAME_WIDTH = 345;
+    static final int RYUGA_8_GETUP_FRAME_HEIGHT = 357;
+    static final int RYUGA_8_GETUP_ROOT_X = 176;
+    static final int RYUGA_8_GETUP_ROOT_Y = 344;
+    static final int RYUGA_8_GETUP_FRAME_COUNT = 12;
+
+    static final int RYUGA_8_GOLPE_ALTO_FRAME_WIDTH = 493;
+    static final int RYUGA_8_GOLPE_ALTO_FRAME_HEIGHT = 390;
+    static final int RYUGA_8_GOLPE_ALTO_ROOT_X = 124;
+    static final int RYUGA_8_GOLPE_ALTO_ROOT_Y = 373;
+    static final int RYUGA_8_GOLPE_ALTO_FRAME_COUNT = 13;
+
+    static final int RYUGA_8_HEAVY_STRAIGHT_FRAME_WIDTH = 498;
+    static final int RYUGA_8_HEAVY_STRAIGHT_FRAME_HEIGHT = 427;
+    static final int RYUGA_8_HEAVY_STRAIGHT_ROOT_X = 163;
+    static final int RYUGA_8_HEAVY_STRAIGHT_ROOT_Y = 412;
     static final int RYUGA_8_HEAVY_STRAIGHT_FRAME_COUNT = 23;
 
     static final int RYUGA_8_HIT_AIR_FRAME_WIDTH = 255;
@@ -3970,7 +3994,7 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_HIT_STAND_ROOT_Y = 336;
     static final int RYUGA_8_HIT_STAND_FRAME_COUNT = 9;
 
-    static final int RYUGA_8_IDLE_FRAME_WIDTH = 256;
+    static final int RYUGA_8_IDLE_FRAME_WIDTH = 255;
     static final int RYUGA_8_IDLE_FRAME_HEIGHT = 369;
     static final int RYUGA_8_IDLE_ROOT_X = 120;
     static final int RYUGA_8_IDLE_ROOT_Y = 357;
@@ -4012,23 +4036,23 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_LAND_ROOT_Y = 333;
     static final int RYUGA_8_LAND_FRAME_COUNT = 4;
 
-    static final int RYUGA_8_LIGHT_JAB_FRAME_WIDTH = 294;
-    static final int RYUGA_8_LIGHT_JAB_FRAME_HEIGHT = 361;
-    static final int RYUGA_8_LIGHT_JAB_ROOT_X = 126;
+    static final int RYUGA_8_LIGHT_JAB_FRAME_WIDTH = 281;
+    static final int RYUGA_8_LIGHT_JAB_FRAME_HEIGHT = 360;
+    static final int RYUGA_8_LIGHT_JAB_ROOT_X = 121;
     static final int RYUGA_8_LIGHT_JAB_ROOT_Y = 344;
-    static final int RYUGA_8_LIGHT_JAB_FRAME_COUNT = 11;
+    static final int RYUGA_8_LIGHT_JAB_FRAME_COUNT = 7;
 
-    static final int RYUGA_8_MEDIUM_KICK_FRAME_WIDTH = 306;
+    static final int RYUGA_8_MEDIUM_KICK_FRAME_WIDTH = 292;
     static final int RYUGA_8_MEDIUM_KICK_FRAME_HEIGHT = 358;
-    static final int RYUGA_8_MEDIUM_KICK_ROOT_X = 142;
+    static final int RYUGA_8_MEDIUM_KICK_ROOT_X = 125;
     static final int RYUGA_8_MEDIUM_KICK_ROOT_Y = 344;
-    static final int RYUGA_8_MEDIUM_KICK_FRAME_COUNT = 14;
+    static final int RYUGA_8_MEDIUM_KICK_FRAME_COUNT = 12;
 
-    static final int RYUGA_8_RISE_FRAME_WIDTH = 266;
-    static final int RYUGA_8_RISE_FRAME_HEIGHT = 356;
-    static final int RYUGA_8_RISE_ROOT_X = 136;
-    static final int RYUGA_8_RISE_ROOT_Y = 344;
-    static final int RYUGA_8_RISE_FRAME_COUNT = 6;
+    static final int RYUGA_8_RISE_FRAME_WIDTH = 254;
+    static final int RYUGA_8_RISE_FRAME_HEIGHT = 377;
+    static final int RYUGA_8_RISE_ROOT_X = 119;
+    static final int RYUGA_8_RISE_ROOT_Y = 365;
+    static final int RYUGA_8_RISE_FRAME_COUNT = 9;
 
     static final int RYUGA_8_SPECIAL_ENERGY_FRAME_WIDTH = 501;
     static final int RYUGA_8_SPECIAL_ENERGY_FRAME_HEIGHT = 463;
@@ -4048,16 +4072,16 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_TAUNT_ROOT_Y = 355;
     static final int RYUGA_8_TAUNT_FRAME_COUNT = 33;
 
-    static final int RYUGA_8_WALK_BACK_FRAME_WIDTH = 275;
+    static final int RYUGA_8_WALK_BACK_FRAME_WIDTH = 276;
     static final int RYUGA_8_WALK_BACK_FRAME_HEIGHT = 380;
     static final int RYUGA_8_WALK_BACK_ROOT_X = 157;
     static final int RYUGA_8_WALK_BACK_ROOT_Y = 368;
-    static final int RYUGA_8_WALK_BACK_FRAME_COUNT = 17;
+    static final int RYUGA_8_WALK_BACK_FRAME_COUNT = 33;
 
     static final int RYUGA_8_WALK_FORWARD_FRAME_WIDTH = 293;
-    static final int RYUGA_8_WALK_FORWARD_FRAME_HEIGHT = 368;
+    static final int RYUGA_8_WALK_FORWARD_FRAME_HEIGHT = 370;
     static final int RYUGA_8_WALK_FORWARD_ROOT_X = 166;
-    static final int RYUGA_8_WALK_FORWARD_ROOT_Y = 356;
-    static final int RYUGA_8_WALK_FORWARD_FRAME_COUNT = 15;
+    static final int RYUGA_8_WALK_FORWARD_ROOT_Y = 358;
+    static final int RYUGA_8_WALK_FORWARD_FRAME_COUNT = 30;
 
 }

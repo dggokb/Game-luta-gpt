@@ -65,6 +65,8 @@ final class HudRenderer {
         default boolean storyActive() { return false; }
         /** O treino guiado dos golpes (modo tutorial) está rodando. */
         default boolean tutorialActive() { return false; }
+        /** A luta não tem SUPER, ULTRA nem SHINKAI (o treino, a briga das crianças): os botões somem. */
+        default boolean semPoderes() { return tutorialActive(); }
         /** Tutorial ou luta com conversa: o canto dos botões de teste é dos quadros laterais. */
         default boolean hideTestButtons() { return tutorialActive(); }
         /** Botão do topo da luta: a seleção no modo teste, o MENU (pausa) no modo história. */
@@ -1384,8 +1386,8 @@ final class HudRenderer {
             if (gl != null) gl.gravado(GRAVACAO_TOQUE, estado);
         }
         drawTagButton(c, s);
-        // No treino das crianças não há SUPER, ULTRA nem SHINKAI: os botões somem.
-        if (!s.tutorialActive()) {
+        // No treino e na briga das crianças não há SUPER, ULTRA nem SHINKAI: os botões somem.
+        if (!s.semPoderes()) {
             drawSuperButton(c, s);
             drawShinkaiButton(c, s);
         }

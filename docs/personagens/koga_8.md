@@ -13,7 +13,7 @@ anos existir.
 - Caixas (corpo, golpes, posturas) medidas no desenho dele (`caixas_sprites.py`).
 - Golpes: L, M, H, agachados, no ar (jL, jM, jH, j2H), S1 e S2. Sem S3, S4, Super, Ultra nem
   agarrão. Provocação (TAUNT): o boneco do treino provoca quando o jogador erra.
-- **S1 "Fumacinha"** (↓↘→): o vídeo inteiro no tempo dele (5,2 s): carrega, dá o tapa com a palma
+- **S1 "Fumacinha"** (↓↘→): o vídeo inteiro, 1,3x mais rápido que ele (4 s): carrega, dá o tapa com a palma
   (o clarão), sai só uma fumacinha e ele encolhe o ombro. Sem projétil: o dano é só o do tapa, de
   perto (`s1.corpoACorpo`).
 - **S2 "Socos girando"** (→↓↘): o vídeo inteiro no tempo dele, andando para a frente (170 px até

@@ -134,6 +134,12 @@ public final class Episodio {
          * ({@link NivelCpu}): a briga dos irmãos crianças, logo depois do treino. 0 = a curva.
          */
         public int nivelCpu;
+        /**
+         * {@code "semPoderes": true}: luta sem SUPER, ULTRA e SHINKAI dos dois lados (os botões
+         * somem, o pad e a CPU não os pedem, as barras ficam vazias): as lutas das crianças no
+         * Prólogo. O treino ({@link #tutorial}) é sempre assim.
+         */
+        public boolean semPoderes;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -374,6 +380,7 @@ public final class Episodio {
             throw new IllegalArgumentException("nivelCpu vai de 1 a " + MenuPausa.NIVEL_MAX);
         }
         passo.nivelCpu = nivelCpu;
+        passo.semPoderes = Boolean.TRUE.equals(map.get("semPoderes")) || passo.tutorial();
         return passo;
     }
 

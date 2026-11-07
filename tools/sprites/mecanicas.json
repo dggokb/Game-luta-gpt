@@ -1507,9 +1507,9 @@
       },
       "framesGolpe": {
         "S": [
-          105,
-          4,
-          201
+          81,
+          3,
+          155
         ],
         "S2": [
           40,
@@ -1519,7 +1519,7 @@
       }
     },
     "ryuga_8": {
-      "molde": "Criança do tutorial (Ryūga com 8 anos); só a queda e o levantar ainda emprestados do koga_8",
+      "molde": "Criança do tutorial (Ryūga com 8 anos)",
       "estiloCombo": "equilibrado",
       "vida": 8000,
       "dano": 0.6,
@@ -1544,7 +1544,7 @@
         },
         "S2": {
           "nome": "Chute desastrado",
-          "comando": "→↓↘"
+          "comando": "↓↙←"
         }
       },
       "s1": {
@@ -1557,9 +1557,9 @@
       },
       "framesGolpe": {
         "S": [
-          100,
-          4,
-          206
+          77,
+          3,
+          158
         ],
         "S2": [
           55,

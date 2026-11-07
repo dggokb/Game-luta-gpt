@@ -425,6 +425,22 @@ public class CinematicaLutaTest {
         }
     }
 
+    /** O treino e a briga dos irmãos (as lutas das crianças no Prólogo) não têm SUPER, ULTRA nem SHINKAI. */
+    @Test
+    public void lutasDasCriancasSemPoderes() throws IOException {
+        Temporada temporada = Temporada.load(FILES);
+        Episodio ep = temporada.loadEpisodio(FILES, "ep00");
+        int lutas = 0;
+        for (Episodio.Passo p : ep.passos) {
+            if (p.tipo != Episodio.TipoPasso.LUTA) continue;
+            lutas++;
+            assertTrue((p.marca) + " sem poderes", p.semPoderes);
+        }
+        assertEquals("treino e briga, nas duas campanhas", 4, lutas);
+        assertFalse("fora do Prólogo os poderes continuam",
+            Episodio.fromJson("{\"passos\":[{\"tipo\":\"luta\",\"dupla\":[\"p02\"],\"cpu\":[\"p03\"]}]}").passos.get(0).semPoderes);
+    }
+
     /** O QTE precisa do controle travado (quem bate é o roteiro). */
     @Test
     public void qteSemControleTravadoNaoAbre() {
