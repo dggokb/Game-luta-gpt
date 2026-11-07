@@ -140,6 +140,11 @@ public final class Episodio {
          * Prólogo. O treino ({@link #tutorial}) é sempre assim.
          */
         public boolean semPoderes;
+        /**
+         * {@code "semShinkai": true}: luta sem SHINKAI (o SUPER e o ULTRA continuam): a primeira
+         * luta dos irmãos adultos (o treino do Episódio 1). Toda luta {@link #semPoderes} também.
+         */
+        public boolean semShinkai;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -381,6 +386,7 @@ public final class Episodio {
         }
         passo.nivelCpu = nivelCpu;
         passo.semPoderes = Boolean.TRUE.equals(map.get("semPoderes")) || passo.tutorial();
+        passo.semShinkai = Boolean.TRUE.equals(map.get("semShinkai")) || passo.semPoderes;
         return passo;
     }
 

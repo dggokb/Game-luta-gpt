@@ -2047,14 +2047,19 @@ public class GameView extends SurfaceView
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }
-        if (semPoderesNaLuta()) {
+        boolean semPoderes = semPoderesNaLuta();
+        if (semPoderes || semShinkaiNaLuta()) {
             // O treino e a briga das crianças: SUPER, ULTRA e SHINKAI não saem, de nenhum lado.
-            TutorialDirector.semPoderes(playerInput);
-            TutorialDirector.semPoderes(opponentInput);
+            // A primeira luta dos irmãos adultos: só o SHINKAI.
+            if (semPoderes) {
+                TutorialDirector.semPoderes(playerInput);
+                TutorialDirector.semPoderes(opponentInput);
+            }
+            playerInput.shinkai = opponentInput.shinkai = false;
             for (int side = 0; side < 2; side++) {
                 for (FighterState m : engine.team(side).members) {
                     if (m == null) continue;
-                    m.superMeter = 0;
+                    if (semPoderes) m.superMeter = 0;
                     m.shinkai = 0;
                 }
             }
@@ -2365,6 +2370,7 @@ public class GameView extends SurfaceView
         @Override public boolean storyActive() { return historia.isActive() && !tutorial.active(); }
         @Override public boolean tutorialActive() { return tutorial.active(); }
         @Override public boolean semPoderes() { return semPoderesNaLuta(); }
+        @Override public boolean semShinkai() { return semShinkaiNaLuta(); }
         @Override public boolean hideTestButtons() { return testButtonsHidden(); }
         @Override public String selectButtonLabel() { return selectButtonLabel; }
         @Override public String animacaoLabel() { return AnimacaoLutador.rotulo(); }
@@ -5772,6 +5778,13 @@ public class GameView extends SurfaceView
         if (tutorial.active()) return true;
         Episodio.Passo luta = historia.waitingFight() ? historia.passo() : null;
         return luta != null && luta.semPoderes;
+    }
+
+    /** A luta não tem SHINKAI (as sem poderes e a primeira luta dos irmãos adultos). */
+    private boolean semShinkaiNaLuta() {
+        if (tutorial.active()) return true;
+        Episodio.Passo luta = historia.waitingFight() ? historia.passo() : null;
+        return luta != null && luta.semShinkai;
     }
 
     private boolean noTimeDoLado1(String id) {

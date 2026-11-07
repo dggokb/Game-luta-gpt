@@ -61,6 +61,14 @@ public final class TesteMovimentosPc {
         trecho("H", 0, PadInput.Button.HEAVY, 50);
         trecho("6M", 1, PadInput.Button.MEDIUM, 50);
         solta(20);
+        // S2: meia-lua para trás (↓↙←) + L, e o golpe inteiro.
+        trecho = "S2";
+        pad.setDirection(3); passo(false); passo(false);
+        pad.setDirection(4); passo(false); passo(false);
+        pad.setDirection(5); passo(false);
+        pad.press(PadInput.Button.LIGHT);
+        for (int i = 0; i < 330; i++) { pad.setDirection(0); passo(i % 6 == 0); }
+        solta(20);
         trecho("tras", 5, null, 70);
         trecho("frente", 1, null, 70);
         solta(20);

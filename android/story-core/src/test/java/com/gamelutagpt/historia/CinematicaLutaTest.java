@@ -437,6 +437,13 @@ public class CinematicaLutaTest {
             assertTrue((p.marca) + " sem poderes", p.semPoderes);
         }
         assertEquals("treino e briga, nas duas campanhas", 4, lutas);
+        // A primeira luta dos irmãos adultos (o treino do Episódio 1): sem SHINKAI, com SUPER.
+        Episodio.Passo treino = null;
+        for (Episodio.Passo p : temporada.loadEpisodio(FILES, "ep01").passos) {
+            if (p.tipo == Episodio.TipoPasso.LUTA && treino == null) treino = p;
+        }
+        assertTrue("o treino do Episódio 1 sem SHINKAI", treino.semShinkai);
+        assertFalse("mas com SUPER", treino.semPoderes);
         assertFalse("fora do Prólogo os poderes continuam",
             Episodio.fromJson("{\"passos\":[{\"tipo\":\"luta\",\"dupla\":[\"p02\"],\"cpu\":[\"p03\"]}]}").passos.get(0).semPoderes);
     }

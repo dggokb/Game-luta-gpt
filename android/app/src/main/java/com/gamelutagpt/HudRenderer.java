@@ -67,6 +67,8 @@ final class HudRenderer {
         default boolean tutorialActive() { return false; }
         /** A luta não tem SUPER, ULTRA nem SHINKAI (o treino, a briga das crianças): os botões somem. */
         default boolean semPoderes() { return tutorialActive(); }
+        /** A luta não tem SHINKAI (a primeira luta dos irmãos adultos): o botão dele some. */
+        default boolean semShinkai() { return semPoderes(); }
         /** Tutorial ou luta com conversa: o canto dos botões de teste é dos quadros laterais. */
         default boolean hideTestButtons() { return tutorialActive(); }
         /** Botão do topo da luta: a seleção no modo teste, o MENU (pausa) no modo história. */
@@ -1387,10 +1389,8 @@ final class HudRenderer {
         }
         drawTagButton(c, s);
         // No treino e na briga das crianças não há SUPER, ULTRA nem SHINKAI: os botões somem.
-        if (!s.semPoderes()) {
-            drawSuperButton(c, s);
-            drawShinkaiButton(c, s);
-        }
+        if (!s.semPoderes()) drawSuperButton(c, s);
+        if (!s.semShinkai()) drawShinkaiButton(c, s);
     }
 
     private void drawFixedControls(Canvas c, State s) {
