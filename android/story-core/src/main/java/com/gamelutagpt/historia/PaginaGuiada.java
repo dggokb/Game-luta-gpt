@@ -8,45 +8,48 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Leitura guiada de uma página pronta (a página inteira numa imagem): a câmera mostra a
- * página toda e entra quadro a quadro com o resto da página escurecido; depois do último
- * quadro a página sai direto para a próxima. É o jeito que os leitores de mangá mostram uma
- * página em pé numa tela deitada.
+ * Leitura guiada de uma página pronta (a página inteira numa imagem): a página já abre no
+ * primeiro quadro (sem mostrar a página inteira antes) e a câmera passa quadro a quadro com o
+ * resto da página escurecido; depois do último quadro a página sai direto para a próxima, que
+ * também já abre no primeiro quadro. É o jeito que os leitores de mangá mostram uma página em
+ * pé numa tela deitada.
  *
  * Os balões de fala desenhados na página têm o miolo pintado de branco e o texto escrito
- * pelo jogo, no idioma atual, digitando um balão por vez. Os efeitos de cada quadro
- * (impacto, tremor, velocidade, zoom) dão o movimento que a arte parada não tem.
+ * pelo jogo, no idioma atual, todo já escrito desde o começo da página (sem digitar). Os
+ * efeitos de cada quadro (impacto, tremor, velocidade, zoom) dão o movimento que a arte parada
+ * não tem, sempre com a câmera suave: nada de sacudir a tela.
  */
 final class PaginaGuiada {
     static final float VW = PaginaHistoria.VW;
     static final float VH = PaginaHistoria.VH;
-    /** A página inteira fica na tela antes do primeiro quadro. */
-    static final float OVERVIEW_HOLD = 0.9f;
+    /** A página abre no primeiro quadro; o tranco do impacto espera o escuro da virada sair. */
+    static final float ENTRY = PaginaHistoria.PAGE_FADE;
     static final float MOVE = 0.5f;
     /** Chegada de supetão nos quadros de impacto. */
     static final float WHIP = 0.24f;
-    static final float FIRST_BALLOON_DELAY = 0.25f;
     /** Zoom máximo sobre a imagem (quadros pequenos não ficam borrados demais). */
     static final float MAX_SCALE = 3.0f;
     /** Velocidade do passeio da câmera em quadros mais altos que a tela, em px de tela por segundo. */
     static final float PAN_SPEED = 110f;
     static final int DIM_ALPHA = 220;
-    static final float PUNCH = 0.30f;
+    /** Impacto: zoom a mais na chegada, que assenta como mola (uma ou duas oscilações). */
+    static final float PUNCH_ZOOM = 0.10f;
+    static final float PUNCH_DECAY = 7f;
+    static final float PUNCH_FREQ = 15f;
+    /** Tremor: o quadro pulsa como batida de coração (duas batidas, uma pausa). */
+    static final float BEAT_PERIOD = 1.15f;
+    static final float BEAT_ZOOM = 0.022f;
     private static final int CAPTION_BG = 0xD9000000;
     private static final int PAPER = 0xFFFFFFFF;
 
-    private final Rand rand = new Rand(17);
     private final Rand lines = new Rand(23);
     private Temporada temporada;
     private RenderImage image;
     private List<Episodio.Quadro> quadros;
     private float pageW;
     private float pageH;
-    /** Quadro em foco, ou -1 na página inteira (começo e fim). */
-    private int panel = -1;
-    /** Balões já abertos no quadro em foco (os dos quadros anteriores ficam todos abertos). */
-    private int balloonsShown;
-    private float balloonAt;
+    /** Quadro em foco. */
+    private int panel;
     private boolean arrived;
     /** O último quadro foi lido: a página já pode sair (ela some congelada no último quadro). */
     private boolean done;
@@ -59,7 +62,6 @@ final class PaginaGuiada {
     private float moveTime = -1f;
     private float moveDuration = MOVE;
     private float dimFrom, dim;
-    private float shake;
     private float flash;
     private String sound;
     /** Tamanho do texto de cada balão no idioma atual, medido no primeiro desenho. */
@@ -72,54 +74,37 @@ final class PaginaGuiada {
         this.quadros = passo.quadros;
         pageW = width;
         pageH = height;
-        panel = -1;
-        balloonsShown = 0;
+        panel = 0;
         arrived = false;
         done = false;
         stateTime = 0f;
         time = 0f;
-        shake = 0f;
         flash = 0f;
         sound = null;
         fitted.clear();
-        float[] overview = overview();
-        camX = overview[0];
-        camY = overview[1];
-        camS = overview[2];
+        // Já no primeiro quadro, parado; ele "chega" (efeitos) quando a virada da página clareia.
+        float[] goal = target(0, 0f);
+        camX = goal[0];
+        camY = goal[1];
+        camS = goal[2];
         moveTime = -1f;
-        dim = 0f;
-        dimFrom = 0f;
+        dim = 1f;
+        dimFrom = 1f;
     }
 
     void update(float dt) {
         time += dt;
         stateTime += dt;
-        shake = Math.max(0f, shake - dt * 55f);
         flash = Math.max(0f, flash - dt);
         if (moveTime >= 0f) moveTime += dt;
-        if (panel < 0 && !done && stateTime >= OVERVIEW_HOLD) goTo(0);
-        if (panel >= 0 && !done && !arrived && moving() < 0f) arrive();
-        // O primeiro balão do quadro abre sozinho logo depois que a câmera chega.
-        if (arrived && !done && balloonsShown == 0 && current().baloes.size() > 0 &&
-            time - arrivedAt >= FIRST_BALLOON_DELAY) {
-            openBalloon();
-        }
+        boolean entrando = panel == 0 && moveTime < 0f && stateTime < ENTRY;
+        if (!done && !arrived && !entrando && moving() < 0f) arrive();
         updateCamera();
     }
 
-    /** Toque: completa o texto, abre o próximo balão ou passa para o próximo quadro. */
+    /** Toque: passa para o próximo quadro (o texto já está todo escrito); no último, fecha a página. */
     void tap() {
         if (done) return;
-        if (panel >= 0 && arrived) {
-            if (typing()) {
-                balloonAt = -1000f;
-                return;
-            }
-            if (balloonsShown < current().baloes.size()) {
-                openBalloon();
-                return;
-            }
-        }
         if (panel < quadros.size() - 1) {
             goTo(panel + 1);
         } else {
@@ -133,14 +118,12 @@ final class PaginaGuiada {
     }
 
     boolean waitingTap() {
-        if (panel < 0 || done || !arrived || typing()) return false;
-        // O primeiro balão ainda vai abrir sozinho.
-        return !(balloonsShown == 0 && current().baloes.size() > 0);
+        return !done && arrived;
     }
 
-    /** Último quadro em foco, com todos os balões abertos (o próximo toque fecha a página). */
+    /** Último quadro em foco (o próximo toque fecha a página). */
     boolean onLastPanel() {
-        return waitingTap() && panel == quadros.size() - 1 && balloonsShown >= current().baloes.size();
+        return waitingTap() && panel == quadros.size() - 1;
     }
 
     /** Som pedido desde a última consulta ("painel", "impacto"), ou null. */
@@ -156,7 +139,6 @@ final class PaginaGuiada {
 
     private void goTo(int index) {
         panel = index;
-        balloonsShown = 0;
         arrived = false;
         stateTime = 0f;
         dimFrom = dim;
@@ -169,21 +151,9 @@ final class PaginaGuiada {
         arrivedAt = time;
         Episodio.Quadro q = current();
         if (q.impacto) {
-            shake = 18f;
             flash = 0.14f;
             sound = "impacto";
         }
-    }
-
-    private void openBalloon() {
-        balloonsShown++;
-        balloonAt = time;
-    }
-
-    private boolean typing() {
-        if (panel < 0 || balloonsShown == 0) return false;
-        Episodio.BalaoPronto b = current().baloes.get(balloonsShown - 1);
-        return (time - balloonAt) * PaginaHistoria.TYPE_SPEED < temporada.t(b.texto).length();
     }
 
     private void startMove(float duration) {
@@ -202,11 +172,6 @@ final class PaginaGuiada {
     }
 
     // ------------------------------------------------------------ câmera
-
-    private float[] overview() {
-        float s = Math.min(VW * 0.96f / pageW, VH * 0.96f / pageH);
-        return new float[] {pageW * 0.5f, pageH * 0.5f, s};
-    }
 
     /** Onde a câmera deve estar agora para o quadro (passeio em quadros altos, zoom e tranco). */
     private float[] target(int index, float since) {
@@ -237,12 +202,29 @@ final class PaginaGuiada {
             float k = Tinta.clamp01(since / duration);
             s *= 1f + amount * (q.zoom ? 1f - (1f - k) * (1f - k) : k);
         }
-        if (q.impacto && since < PUNCH) {
-            // Tranco: chega com zoom a mais e assenta.
-            float u = 1f - since / PUNCH;
-            s *= 1f + 0.10f * u * u;
-        }
+        s *= 1f + punch(q, since) + heartbeat(q, since);
         return new float[] {cx, cy, s};
+    }
+
+    /**
+     * Impacto: o quadro chega com zoom a mais e assenta como mola, uma ou duas oscilações
+     * largas (no lugar do tremor aleatório da tela, que incomodava).
+     */
+    static float punch(Episodio.Quadro q, float since) {
+        if (!q.impacto || since < 0f || since > 1f) return 0f;
+        return PUNCH_ZOOM * (float)(Math.exp(-since * PUNCH_DECAY) * Math.cos(since * PUNCH_FREQ));
+    }
+
+    /** Tremor: o quadro pulsa num ritmo de coração (duas batidas suaves e uma pausa). */
+    static float heartbeat(Episodio.Quadro q, float since) {
+        if (!q.tremor || since <= 0f) return 0f;
+        float t = since % BEAT_PERIOD;
+        return BEAT_ZOOM * (bump(t, 0.25f) + 0.6f * bump(t, 0.49f));
+    }
+
+    private static float bump(float t, float center) {
+        float d = (t - center) / 0.085f;
+        return (float)Math.exp(-d * d);
     }
 
     private float[] box(float[] a) {
@@ -257,15 +239,8 @@ final class PaginaGuiada {
     }
 
     private void updateCamera() {
-        float[] goal;
-        float goalDim;
-        if (panel < 0) {
-            goal = overview();
-            goalDim = 0f;
-        } else {
-            goal = target(panel, arrived ? time - arrivedAt : 0f);
-            goalDim = 1f;
-        }
+        float[] goal = target(panel, arrived ? time - arrivedAt : 0f);
+        float goalDim = 1f;
         float k = moving();
         if (k < 0f) {
             camX = goal[0];
@@ -288,31 +263,23 @@ final class PaginaGuiada {
     void render(RenderCanvas c) {
         c.fillRect(-40f, -40f, VW + 40f, VH + 40f, 0xFF000000);
         c.save();
-        float jolt = shake;
-        if (panel >= 0 && arrived && !done && current().tremor) jolt = Math.max(jolt, 3.2f);
-        if (jolt > 0f) {
-            rand.reset((long)(time * 600f));
-            c.translate(rand.range(-jolt, jolt), rand.range(-jolt, jolt));
-        }
         drawLayer(c, false);
         if (dim > 0f) {
             c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(0xFF000000, (int)(DIM_ALPHA * dim)));
-            if (panel >= 0) {
-                float[] poly = screen(current().area);
-                c.save();
-                c.clipPolygon(poly);
-                drawLayer(c, true);
-                if (current().velocidade && arrived && !done) drawSpeedLines(c, poly);
-                c.restore();
-                if (image == null) c.strokePolygon(poly, 5f, Baloes.INK);
-            }
+            float[] poly = screen(current().area);
+            c.save();
+            c.clipPolygon(poly);
+            drawLayer(c, true);
+            if (current().velocidade && arrived && !done) drawSpeedLines(c, poly);
+            c.restore();
+            if (image == null) c.strokePolygon(poly, 5f, Baloes.INK);
         }
         c.restore();
         if (flash > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(0xFFFFFFFF, (int)(210f * flash / 0.14f)));
         drawCaption(c);
     }
 
-    /** A página com os balões: apagados, e com o texto dos que já foram lidos. */
+    /** A página com os balões, todos já com o texto inteiro. */
     private void drawLayer(RenderCanvas c, boolean focusOnly) {
         float left = sx(0f), top = sy(0f), right = sx(pageW), bottom = sy(pageH);
         if (image != null) {
@@ -327,22 +294,12 @@ final class PaginaGuiada {
                 Episodio.BalaoPronto b = baloes.get(j);
                 c.fillPolygon(screen(b.area), PAPER);
                 if (b.moldura) c.strokePolygon(screen(b.area), 3f * camS, Baloes.INK);
-                int visible = visibleChars(i, j, temporada.t(b.texto));
-                if (visible > 0) drawBalloonText(c, b, visible);
+                drawBalloonText(c, b);
             }
         }
     }
 
-    /** Quantos caracteres do balão aparecem: lidos inteiros, o atual digitando, os próximos nada. */
-    private int visibleChars(int panelIndex, int balloon, String text) {
-        if (done) return text.length();
-        if (panel < 0 || panelIndex > panel) return 0;
-        if (panelIndex < panel || balloon < balloonsShown - 1) return text.length();
-        if (balloon > balloonsShown - 1) return 0;
-        return Math.min(text.length(), (int)((time - balloonAt) * PaginaHistoria.TYPE_SPEED) + 1);
-    }
-
-    private void drawBalloonText(RenderCanvas c, Episodio.BalaoPronto b, int visible) {
+    private void drawBalloonText(RenderCanvas c, Episodio.BalaoPronto b) {
         Object[] fit = fit(c, b);
         float size = (Float)fit[0];
         @SuppressWarnings("unchecked")
@@ -353,14 +310,8 @@ final class PaginaGuiada {
         float cx = sx((b.caixa[0] + b.caixa[2]) * 0.5f * pageW);
         float cy = sy((b.caixa[1] + b.caixa[3]) * 0.5f * pageH);
         float y = cy - lines.size() * lineH * k * 0.5f + size * k * 0.86f;
-        int left = visible;
         for (String line : lines) {
-            if (left <= 0) break;
-            String shown = left >= line.length() ? line : line.substring(0, left);
-            float full = c.measureText(line, size * k, false);
-            float part = c.measureText(shown, size * k, false);
-            c.drawText(shown, cx - full * 0.5f + part * 0.5f, y, size * k, Baloes.INK, 0, 0f, false);
-            left -= line.length() + 1;
+            c.drawText(line, cx, y, size * k, Baloes.INK, 0, 0f, false);
             y += lineH * k;
         }
     }
@@ -415,7 +366,7 @@ final class PaginaGuiada {
     }
 
     private void drawCaption(RenderCanvas c) {
-        if (panel < 0 || done || !arrived) return;
+        if (done || !arrived) return;
         String text = temporada.t(current().legenda);
         if (text == null) return;
         float alpha = Tinta.clamp01((time - arrivedAt) / 0.25f);
