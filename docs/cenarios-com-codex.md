@@ -327,3 +327,40 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
 
 Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
 (mais fundo), a parede opaca os cobria.
+
+## Arena Imperial (`stages/arena_imperial`)
+
+Refeita como uma pintura só (antes era montada em peças recortadas: céu, mar, penhascos,
+arquibancadas, palácio, árvores, pórticos, telão; o telão escorregava pelo cenário e tudo tinha
+cara de recorte). Arte em `art/stages/arena_imperial_pintura/`.
+
+1. `0_concept.png`: o print do jogo. `prompt_1_limpar.txt` → `1_limpo.png` (sem lutadores, HUD,
+   botões; telão vazio; céu e chão completados). `prompt_2_sem_bandeiras_ceu.txt`: as duas
+   bandeiras que ficaram soltas no céu saem → `2_sem_bandeiras.png`.
+2. **Inteira** (`prompt_5_inteira.txt`): estendida em metades, cada lado saía com outra
+   perspectiva no chão e a emenda não fechava; o print vai pequeno no meio de uma tela cinza e o
+   Codex pinta a arena toda de uma vez, com um horizonte e um ponto de fuga → `3_inteira.png`;
+   Real-ESRGAN x2 e 4096 → `4_panorama_4096.webp`.
+3. Chão sem os riscos de luz (`prompt_11_chao_fosco.txt`, casado com o aprovado linha a linha →
+   `14_chao_fosco_4096.webp`, o `--chao-largo`): o motor desenha o reflexo de cada lanterna da
+   mureta (pintados, os riscos abriam em leque com a câmera afastada).
+4. Planos: `prompt_6_arena_verde.txt` (céu e montanhas em verde → molde `10_mascara_arena_4096.png`),
+   `prompt_7_sem_arena.txt` (só o céu e as montanhas, com o vale atrás → `12_sem_arena_4096.webp`),
+   `prompt_8_ceu_magenta.txt` (o céu dele em magenta → molde `15_mascara_montanhas_4096.png`) e
+   `prompt_9_so_ceu.txt` (só o céu → `13_so_ceu_4096.webp`).
+
+```
+D=android/app/src/main/assets/stages/arena_imperial; A=art/stages/arena_imperial_pintura
+python3 tools/stage/cenario_pintura.py $A/4_panorama_4096.webp $D --tela-px 2048 --centro 2048 \
+  --chao 1387 --anel-longe 1347 --anel-meia 202 --juncao 1262 --ceu-extra 300 --nitida \
+  --cor-acima '#2A1A3A' --nevoa '#3A2030' --zoom 0.8 --zoom-repouso 0.948 --nome 'Arena Imperial' \
+  --extra $A/stage_extra.json --chao-largo $A/14_chao_fosco_4096.webp
+python3 tools/stage/animar_imperial.py
+```
+
+O `animar_imperial.py` separa céu (30000), montanhas (6000) e arena (`parede.webp`, com o alfa do
+molde; no que aparece em repouso, céu e montanhas são os pixels da pintura), põe o telão com a luta
+ao vivo, a plateia dos dois prédios, as lanternas (as da mureta com reflexo no chão), a água das
+duas cachoeiras e o vento nas folhas do bordo vermelho. Parede e montanhas em WebP sem perda (o
+PNG da parede passava de 9 MB). `lanterna.png` e `chao_placas.jpg` da arena antiga ficam: o Terraço
+da Lua usa.
