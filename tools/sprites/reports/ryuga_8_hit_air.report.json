@@ -1,0 +1,127 @@
+{
+  "id": "ryuga_8_hit_air",
+  "characterProfile": "ryuga_8",
+  "source": "art/sprites/source/ryuga_8_hit_air_video_normalized.png",
+  "sourceNote": "ryuga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 384,
+    "rootX": 200,
+    "rootY": 348,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        110,
+        76,
+        271,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 25390
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        42,
+        44,
+        277,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28435
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        46,
+        46,
+        278,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 28801
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        110,
+        57,
+        278,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 26596
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 255,
+    "frameHeight": 326,
+    "rootX": 167,
+    "rootY": 314,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      33,
+      34
+    ],
+    "sheetWidth": 864,
+    "sheetHeight": 320,
+    "frames": [
+      [
+        688,
+        0,
+        176,
+        288,
+        71,
+        36
+      ],
+      [
+        0,
+        0,
+        248,
+        320,
+        4,
+        4
+      ],
+      [
+        252,
+        0,
+        244,
+        316,
+        7,
+        6
+      ],
+      [
+        500,
+        0,
+        184,
+        308,
+        70,
+        17
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 1966080,
+      "grid": 1330080,
+      "packed": 1105920
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "ae7ed5ea8f33aca4d20c60465851529dee73d3c427948b53b6fbd3f6e387b7e2",
+      "config": "a1cd62bb85e3f0ce809e01481ffb661f3c8c6fff8dfb3387f43b4b971cea257d",
+      "profile": "6eed417b2002f5d045bf4741be4857ab631b05cf89d8c8cca4a88065eabffbce"
+    }
+  }
+}

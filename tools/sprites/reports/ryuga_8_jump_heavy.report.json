@@ -1,0 +1,184 @@
+{
+  "id": "ryuga_8_jump_heavy",
+  "characterProfile": "ryuga_8",
+  "source": "art/sprites/source/ryuga_8_jump_heavy_video_normalized.png",
+  "sourceNote": "ryuga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 384,
+    "rootX": 192,
+    "rootY": 348,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        102,
+        74,
+        265,
+        350
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 25958
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        50,
+        79,
+        377,
+        350
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 31260
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        52,
+        84,
+        393,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31674
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        57,
+        85,
+        397,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 31558
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        70,
+        80,
+        370,
+        349
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 29735
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        109,
+        76,
+        281,
+        350
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 24704
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        122,
+        67,
+        286,
+        350
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26025
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 365,
+    "frameHeight": 303,
+    "rootX": 150,
+    "rootY": 291,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      42,
+      57
+    ],
+    "sheetWidth": 1024,
+    "sheetHeight": 584,
+    "frames": [
+      [
+        180,
+        0,
+        176,
+        288,
+        54,
+        11
+      ],
+      [
+        548,
+        0,
+        340,
+        284,
+        4,
+        16
+      ],
+      [
+        316,
+        300,
+        352,
+        280,
+        5,
+        20
+      ],
+      [
+        672,
+        300,
+        352,
+        276,
+        10,
+        22
+      ],
+      [
+        0,
+        300,
+        312,
+        284,
+        23,
+        17
+      ],
+      [
+        360,
+        0,
+        184,
+        288,
+        62,
+        13
+      ],
+      [
+        0,
+        0,
+        176,
+        296,
+        74,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4816896,
+      "grid": 3096660,
+      "packed": 2392064
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c0eea579f20222d3fdd89e9414f552ee762e6e28a9d769ffffa2b0c604381266",
+      "config": "d48f64574967877fed84f3c85f7ee13a03929e8fe8b9956e4a8017a81f001b1c",
+      "profile": "6eed417b2002f5d045bf4741be4857ab631b05cf89d8c8cca4a88065eabffbce"
+    }
+  }
+}

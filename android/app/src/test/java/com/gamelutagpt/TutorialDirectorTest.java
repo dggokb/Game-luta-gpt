@@ -76,6 +76,39 @@ public class TutorialDirectorTest {
         }
     }
 
+    /** O Ryūga com 8 anos (vídeos dele): S1 e S2 no tempo do vídeo; o S2 acerta e ele cai. */
+    @Test public void ryugaCrianca() {
+        everyLessonCanBeDone("ryuga_8", "koga_8");
+    }
+
+    /**
+     * O treino é das crianças: SUPER, ULTRA e SHINKAI não saem, nem com as barras cheias e o
+     * botão apertado; as barras ficam vazias.
+     */
+    @Test public void semSuperUltraNemShinkaiNoTreino() {
+        Treino t = new Treino("ryuga_8", "koga_8");
+        t.tutorial.start(t.engine, t.team, HOME);
+        for (int i = 0; i < 240; i++) {
+            t.team[0].superMeter = 3 * CombatConfig.METER_PER_BAR;
+            t.team[0].shinkai = CombatConfig.SHINKAI_MAX;
+            t.p1.clear();
+            t.p1.superAttack = i % 20 == 0;
+            t.p1.ultra = i % 20 == 5;
+            t.p1.shinkai = i % 20 == 10;
+            if (i % 20 == 15) { t.p1.superAttack = true; t.p1.assist = true; } // SUPER + TAG
+            TutorialDirector.semPoderes(t.p1);
+            t.tutorial.fillDummy(t.npc);
+            t.engine.step(t.p1, t.npc);
+            t.tutorial.afterStep();
+            CombatFighter p = t.engine.fighter(0);
+            assertFalse("sem SHINKAI no treino", p.state.inShinkai());
+            assertFalse("sem SUPER no treino", p.attacking() && p.attack.kind == AttackDefinition.Kind.SUPER);
+            assertFalse("sem ULTRA no treino", p.firingBeam());
+            assertEquals("barra vazia", 0, p.state.superMeter);
+            assertEquals("SHINKAI vazio", 0, p.state.shinkai);
+        }
+    }
+
     /** Errou (golpe no vazio): o boneco provoca, parado, e para de provocar sozinho. */
     @Test public void errarFazOBonecoProvocar() {
         Treino t = new Treino("koga_8", "koga_8");

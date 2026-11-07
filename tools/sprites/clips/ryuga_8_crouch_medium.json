@@ -1,0 +1,33 @@
+{
+  "id": "ryuga_8_crouch_medium",
+  "javaName": "RYUGA_8_CROUCH_MEDIUM",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_crouch_medium_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_crouch_medium.webp",
+  "report": "tools/sprites/reports/ryuga_8_crouch_medium.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_crouch_medium-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2M.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): todos os vídeos do Ryūga 8 anos têm a câmera do idle",
+    "quadros": "15,23,31,40,48,56,64,68,73,77,82,86,91,95,100,104",
+    "celula": 224,
+    "largura": 320,
+    "raiz": "137,200",
+    "colunas": 6,
+    "manter_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 640,
+  "frameHeight": 448,
+  "rootX": 274,
+  "rootY": 400,
+  "pixelScale": 2.0
+}

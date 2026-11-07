@@ -1,0 +1,184 @@
+{
+  "id": "ryuga_8_jump_heavy_down",
+  "characterProfile": "ryuga_8",
+  "source": "art/sprites/source/ryuga_8_jump_heavy_down_video_normalized.png",
+  "sourceNote": "ryuga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 512,
+    "rootX": 198,
+    "rootY": 476,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        109,
+        199,
+        272,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 25900
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        120,
+        96,
+        285,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 27241
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        71,
+        67,
+        326,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 37966
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        59,
+        145,
+        283,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 27167
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        59,
+        147,
+        283,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26984
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        59,
+        150,
+        284,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 26861
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        105,
+        184,
+        270,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 26737
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 286,
+    "frameHeight": 429,
+    "rootX": 149,
+    "rootY": 417,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      49,
+      59
+    ],
+    "sheetWidth": 844,
+    "sheetHeight": 772,
+    "frames": [
+      [
+        668,
+        428,
+        176,
+        292,
+        53,
+        134
+      ],
+      [
+        272,
+        0,
+        180,
+        396,
+        65,
+        31
+      ],
+      [
+        0,
+        0,
+        268,
+        424,
+        16,
+        4
+      ],
+      [
+        456,
+        0,
+        236,
+        348,
+        4,
+        80
+      ],
+      [
+        0,
+        428,
+        236,
+        344,
+        4,
+        82
+      ],
+      [
+        240,
+        428,
+        240,
+        344,
+        4,
+        84
+      ],
+      [
+        484,
+        428,
+        180,
+        308,
+        50,
+        119
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 5505024,
+      "grid": 3435432,
+      "packed": 2606272
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "aec9e383c6ef7a7d5939df38ba14df5fa8ac3e5f759ceafce9352732738583b6",
+      "config": "f54e35dadf0ee31cfff766a4f9916a25dff1999d401543c82248e5c15bab640a",
+      "profile": "6eed417b2002f5d045bf4741be4857ab631b05cf89d8c8cca4a88065eabffbce"
+    }
+  }
+}

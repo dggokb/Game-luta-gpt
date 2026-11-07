@@ -1519,7 +1519,7 @@
       }
     },
     "ryuga_8": {
-      "molde": "Criança do tutorial (Ryūga com 8 anos); golpes, dano e queda ainda emprestados do koga_8",
+      "molde": "Criança do tutorial (Ryūga com 8 anos); só a queda e o levantar ainda emprestados do koga_8",
       "estiloCombo": "equilibrado",
       "vida": 8000,
       "dano": 0.6,
@@ -1529,7 +1529,7 @@
         "alcance": 240
       },
       "unica": {
-        "descricao": "Kōga com 8 anos, do treino e da briga dos irmãos no Prólogo: só S1 (Fumacinha: carrega, dá um tapa com a palma que solta só um clarão e uma fumacinha, e encolhe o ombro; o dano é só o do tapa, sem projétil) e S2 (socos girando, andando para a frente no tempo do vídeo, um acerto por soco). Sem Super e sem Ultra.",
+        "descricao": "Ryūga com 8 anos, do treino e da briga dos irmãos no Prólogo: só S1 (Fumacinha: carrega, empurra a palma com um clarão e sai só uma fumacinha; o dano é só o da palma, de perto, sem projétil) e S2 (Chute desastrado: dá um passo, chuta alto, perde o equilíbrio e cai no chão; levanta no tempo do vídeo, aberto para o contra-ataque). Sem Super, sem Ultra e sem SHINKAI.",
         "lutador": {
           "corrida": {
             "backdashQuadros": 30,
@@ -1543,7 +1543,7 @@
           "comando": "↓↘→"
         },
         "S2": {
-          "nome": "Socos girando",
+          "nome": "Chute desastrado",
           "comando": "→↓↘"
         }
       },
@@ -1557,14 +1557,14 @@
       },
       "framesGolpe": {
         "S": [
-          105,
+          100,
           4,
-          201
+          206
         ],
         "S2": [
-          40,
+          55,
           4,
-          266
+          251
         ]
       }
     }

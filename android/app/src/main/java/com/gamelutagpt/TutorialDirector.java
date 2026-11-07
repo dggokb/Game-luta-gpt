@@ -616,16 +616,29 @@ final class TutorialDirector {
         l.example.drive(ctx, p1);
     }
 
+    /**
+     * O treino é das crianças (8 anos): SUPER, ULTRA e SHINKAI não existem nele. O botão
+     * apertado não chega ao motor (nem SUPER + TAG, que é o atalho do SHINKAI).
+     */
+    static void semPoderes(FighterInput in) {
+        in.superAttack = false;
+        in.ultra = false;
+        in.shinkai = false;
+    }
+
     /** Depois do passo do motor: confere a lição, segura a vida e anda o treino. */
     void afterStep() {
         reactions.clear();
         if (!active()) return;
         frame++;
         if (panelWanted != null) return;
-        // Treino: ninguém cai. A vida volta cheia e o Ultra tem barra para sair.
+        // Treino: ninguém cai, a vida volta cheia. Sem SUPER, ULTRA e SHINKAI (crianças): as
+        // barras ficam vazias.
         for (int i = 0; i < 2; i++) {
             FighterState s = ctx.engine.fighter(i).state;
             if (s.life < s.profile.maxLife) s.restoreLife();
+            s.superMeter = 0;
+            s.shinkai = 0;
         }
         if (complete >= 0) {
             if (++complete >= COMPLETE_FRAMES && !holdEnd) finished = true;

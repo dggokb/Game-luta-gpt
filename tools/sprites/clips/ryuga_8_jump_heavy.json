@@ -1,0 +1,33 @@
+{
+  "id": "ryuga_8_jump_heavy",
+  "javaName": "RYUGA_8_JUMP_HEAVY",
+  "profile": "ryuga_8.json",
+  "source": "art/sprites/source/ryuga_8_jump_heavy_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/ryuga_8_jump_heavy.webp",
+  "report": "tools/sprites/reports/ryuga_8_jump_heavy.report.json",
+  "preview": "android/app/build/sprite-review/ryuga_8_jump_heavy-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jH.mp4",
+    "personagem": "ryuga_8",
+    "escala": 0.3,
+    "motivo": "mesma câmera do idle (0,30): todos os vídeos do Ryūga 8 anos têm a câmera do idle",
+    "quadros": "5,56,108,111,114,118,121",
+    "celula": 192,
+    "largura": 224,
+    "raiz": "96,174",
+    "colunas": 7,
+    "pe_no_chao": true,
+    "manter_efeitos": true,
+    "densidade": 2
+  },
+  "frameWidth": 448,
+  "frameHeight": 384,
+  "rootX": 192,
+  "rootY": 348,
+  "pixelScale": 2.0
+}
