@@ -5,7 +5,8 @@
 
     python3 tools/stage/animar_imperial.py [pasta]
 
-* **planos**: o **céu** (pintado sem a terra, bem longe), as **montanhas** e o vale (pintados sem
+* **planos**: o **céu** (o degradê e o sol, pintados sem as nuvens, bem longe), as **nuvens**
+  (recortadas pelo molde verde, andando devagar com ``"deriva"``), as **montanhas** e o vale (pintados sem
   a arena, recortados pelo molde magenta) e a **arena** (``parede.png``: os pixels da pintura, com
   o alfa do molde verde). No que aparece na tela de repouso, céu e montanhas são os da pintura; o
   que só aparece com a câmera andando vem das imagens pintadas à parte, com as cores casadas;
@@ -48,6 +49,9 @@ PALACIO = (1560, 2560)                        # o meio (palácio, escadaria): se
 QUEDAS = [(1640, 1010, 190, 215), (2250, 1015, 150, 210)]   # (x, y, largura, altura) no panorama
 ARVORE = (2280, 840, 2760, 1185)              # caixa do bordo vermelho (x0, y0, x1, y1)
 PROF_CEU, PROF_MONTANHAS = 30000.0, 6000.0
+PROF_NUVENS, DERIVA_NUVENS = 10000.0, 45.0
+NUVEM_FRIO, NUVEM_QUENTE = -10.0, 60.0
+HORIZONTE_FIXO = 420                           # px acima do sol: daqui para baixo o céu fica parado         # vermelho − azul: céu (frio) → nuvem (quente)     # as nuvens andam ~4 px por segundo na tela
 PROF_MEIO, APOIO_MEIO = 2000.0, 1100.0       # o plano do meio: colinas, mata, pagodes (Codex)
 MEIO = (740, 1300)                            # linhas do panorama: o alto das colinas e o pé (atrás da arena)
 CEU_EXTRA = 900                               # linhas de céu acima do panorama (super pulo)
@@ -109,7 +113,36 @@ def planos(pasta, stage, parede):
     escuro = np.array([58, 26, 74], np.float32)          # roxo do alto do céu
     tc = (np.linspace(1, 0, CEU_EXTRA)[:, None, None]) ** 1.3
     ceu = np.concatenate([topo * (1 - tc * 0.8) + escuro * tc * 0.8, ceu], 0)
-    Image.fromarray(np.clip(ceu, 0, 255).astype(np.uint8)).save(pasta / "ceu.jpg", quality=92)
+    # As nuvens numa camada que anda devagar, com os pixels da pintura. São quentes (laranja,
+    # vermelho) e o céu entre elas, frio (azul-roxo): o alfa sai da "temperatura" (vermelho menos
+    # azul). Atrás, o céu limpo do Codex (o degradê e o sol), casado com o que aparece entre as
+    # nuvens (médias por linha, lisas na vertical: sem faixas).
+    hc = ceu.shape[0]
+    quente = ceu[..., 0] - ceu[..., 2]
+    an = np.clip((quente - NUVEM_FRIO) / (NUVEM_QUENTE - NUVEM_FRIO), 0, 1)
+    an = cv2.GaussianBlur(an, (0, 0), 1.2)
+    # O sol fica no céu (parado): fora do recorte das nuvens, e a correção de cor não mexe nele.
+    lum = cv2.GaussianBlur(ceu.mean(2), (0, 0), 6)
+    sy, sx = np.unravel_index(int(np.argmax(lum)), lum.shape)
+    yy, xx = np.mgrid[0:hc, 0:w]
+    dist = np.hypot(xx - sx, (yy - sy) * 1.6).astype(np.float32)
+    # Perto do horizonte as nuvens são uma faixa contínua em volta do sol: recortadas, o sol
+    # sumia atrás delas e ficava um buraco escuro andando. Ali o céu fica a pintura (parada) e as
+    # nuvens que andam vão sumindo; o sol fica no céu.
+    fixo = np.clip((yy - (sy - HORIZONTE_FIXO)) / 260.0, 0, 1).astype(np.float32)
+    an *= 1 - fixo
+    perto_sol = np.ones_like(dist)
+    limpo = ler(ART / "22_ceu_limpo_4096.webp", w, hc)
+    peso = (1 - an) ** 3
+    soma_c = cv2.GaussianBlur((ceu * peso[..., None]).sum(1)[:, None, :], (0, 0), sigmaX=0.1, sigmaY=60)[:, 0, :]
+    soma_l = cv2.GaussianBlur((limpo * peso[..., None]).sum(1)[:, None, :], (0, 0), sigmaX=0.1, sigmaY=60)[:, 0, :]
+    soma_p = cv2.GaussianBlur(peso.sum(1)[:, None, None].astype(np.float32), (0, 0), sigmaX=0.1, sigmaY=60).reshape(-1, 1)
+    dif = (soma_c - soma_l) / np.maximum(soma_p, 1)
+    limpo = np.clip(limpo + dif[:, None, :] * perto_sol[..., None], 0, 255)
+    limpo = limpo * (1 - fixo[..., None]) + ceu * fixo[..., None]
+    Image.fromarray(limpo.astype(np.uint8)).save(pasta / "ceu.jpg", quality=92)
+    Image.fromarray(np.dstack([np.clip(ceu, 0, 255), an * 255]).astype(np.uint8), "RGBA").resize(
+        (w * 3 // 4, hc * 3 // 4), Image.LANCZOS).save(pasta / "nuvens.webp", lossless=True, quality=100, method=6)
 
     # Montanhas: a pintura onde aparecem; atrás da arena, o "sem arena" casado.
     sem = casar(ler(ART / "12_sem_arena_4096.webp", w, 2305)[:hp], pan, terra & ~arena, monte_vis)
@@ -126,6 +159,8 @@ def planos(pasta, stage, parede):
     return [
         {"id": "ceu", "imagem": "ceu.jpg", "profundidade": PROF_CEU, "topo": frac(-CEU_EXTRA),
          "base": frac(hp), "x": parede["x"], "repetir": "espelhar", "corAcima": cor},
+        {"id": "nuvens", "imagem": "nuvens.webp", "profundidade": PROF_NUVENS, "topo": frac(-CEU_EXTRA),
+         "base": frac(hp), "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA_NUVENS},
         {"id": "montanhas", "imagem": "montanhas.webp", "profundidade": PROF_MONTANHAS, "topo": frac(0),
          "base": frac(hp), "x": parede["x"], "repetir": "espelhar"},
     ], frac

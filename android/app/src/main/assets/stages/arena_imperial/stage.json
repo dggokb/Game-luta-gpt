@@ -52,6 +52,16 @@
       "corAcima": "#431F4E"
     },
     {
+      "id": "nuvens",
+      "imagem": "nuvens.webp",
+      "profundidade": 10000.0,
+      "topo": -1.2185,
+      "base": 0.6668,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "deriva": 45.0
+    },
+    {
       "id": "montanhas",
       "imagem": "montanhas.webp",
       "profundidade": 6000.0,

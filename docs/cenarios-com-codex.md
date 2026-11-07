@@ -364,7 +364,17 @@ python3 tools/stage/animar_imperial.py
    (Real-ESRGAN x2 → `17_meio_2x.webp`), a 2000, do alto das colinas na linha 740 do panorama
    até atrás da arena, repetido espelhado e com `"apoio"` em 1100 (no super pulo anda menos).
 
-O `animar_imperial.py` separa céu (30000), montanhas (6000), plano do meio (2000) e arena (`parede.webp`, com o alfa do
+6. Nuvens andando: são laranja e vermelhas sobre um céu azul-roxo (da mesma família de cor do
+   pôr do sol: não dá para usar a chave de branco da Yin Lu). O alfa sai da "temperatura" de cada
+   pixel (vermelho menos azul) e a camada `nuvens` (10000, `"deriva": 45`) usa os pixels da
+   pintura; atrás, o céu limpo do Codex (`prompt_20_ceu_limpo.txt` → `22_ceu_limpo_4096.webp`, o
+   degradê e o sol), casado em cor com o que aparece entre as nuvens. Perto do horizonte as nuvens
+   são uma faixa contínua em volta do sol: recortadas, o sol sumia atrás delas e um buraco escuro
+   andava junto; dali para baixo (`HORIZONTE_FIXO`) o céu fica a pintura, parado. O molde verde
+   do Codex (`prompt_19_nuvens_verde.txt`) foi tentado e saiu: ele repinta as nuvens com outras
+   formas e o molde não bate.
+
+O `animar_imperial.py` separa céu (30000), nuvens (10000), montanhas (6000), plano do meio (2000) e arena (`parede.webp`, com o alfa do
 molde; no que aparece em repouso, céu e montanhas são os pixels da pintura), põe o telão com a luta
 ao vivo, a plateia dos dois prédios, as lanternas (as da mureta com reflexo no chão), a água das
 duas cachoeiras e o vento nas folhas do bordo vermelho. Parede e montanhas em WebP sem perda (o
