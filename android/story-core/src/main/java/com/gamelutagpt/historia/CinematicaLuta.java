@@ -181,7 +181,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -499,6 +499,9 @@ public final class CinematicaLuta {
     private float videoDesde;
     /** O vídeo que espera a volta do loop acabar ({@link Acao#emendar}) e em que ms do loop ele entra. */
     private Acao videoProximo;
+    /** O clarão na tela (ação CLARAO): desde quando e quanto dura. */
+    private Acao clarao;
+    private float claraoDesde;
     private float videoTrocaMs;
     private final Map<String, Float> duracaoVideo = new HashMap<>();
 
@@ -628,6 +631,7 @@ public final class CinematicaLuta {
         dedoNaTela = false;
         video = null;
         videoProximo = null;
+        clarao = null;
         duracaoVideo.clear();
     }
 
@@ -825,6 +829,15 @@ public final class CinematicaLuta {
                     a.lances.add(lance);
                 }
                 break;
+            case "clarao":
+                // Clarão de impacto: a tela fica da cor e volta à luta em "segundos" (um corte
+                // escondido no branco, como o golpe que pega no anime).
+                a = new Acao(Acao.Tipo.CLARAO);
+                a.segundos = numero(m, "segundos", 0.3f, 0.05f, 3f);
+                a.cor = WHITE;
+                String clarao = Episodio.string(m, "cor", null);
+                if (clarao != null) a.cor = Temporada.parseColor(clarao);
+                break;
             case "video":
                 a = new Acao(Acao.Tipo.VIDEO);
                 a.parar = Boolean.TRUE.equals(m.get("parar"));
@@ -850,7 +863,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -1198,6 +1211,10 @@ public final class CinematicaLuta {
             case TROCAR:
                 palco.trocar(a.segundos, a.lances);
                 break;
+            case CLARAO:
+                clarao = a;
+                claraoDesde = time;
+                break;
             case VIDEO:
                 if (a.emendar && !a.parar && video != null && video.repetir && duracaoVideo.containsKey(a.clipe)) {
                     // Entra quando a volta do loop acabar (no ms da volta seguinte).
@@ -1235,6 +1252,7 @@ public final class CinematicaLuta {
             case FALA:
                 return conversa == null || !conversa.falando() || idade >= LIMITE_ESPERA;
             case ONOMATOPEIA:
+            case CLARAO:
             case ESPERAR:
             case CAMERA:
             case VELOCIDADE:
@@ -1672,6 +1690,12 @@ public final class CinematicaLuta {
 
     /** As faixas pretas: por cima da luta e do HUD, por baixo dos quadros da conversa. */
     public void renderFaixas(RenderCanvas c) {
+        if (clarao != null) {
+            // Começa cheio e some aos poucos (mais rápido no começo).
+            float k = 1f - Tinta.clamp01((time - claraoDesde) / clarao.segundos);
+            if (k > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(clarao.cor, (int)(255 * k * k)));
+            else clarao = null;
+        }
         float k = faixas();
         if (k <= 0.001f) return;
         float h = faixaAltura * k;
