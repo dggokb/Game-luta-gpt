@@ -53,6 +53,22 @@ def casar(fonte, alvo, mf, ma):
     return np.clip(out, 0, 255)
 
 
+def tirar_postes(img, y0, terraco, ref):
+    """Tira os postes (e o brilho das lanternas) das linhas y0.. do céu: o céu ao lado, deslocado na
+    horizontal, entra no lugar (as estrelas e o degradê seguem; um inpaint deixava borrões)."""
+    quente = (ref[..., 0] - ref[..., 2]) > 10                  # a luz das lanternas (o céu é azul)
+    m = np.zeros(img.shape[:2], np.uint8)
+    m[y0:y0 + len(terraco)] = cv2.dilate((terraco | quente).astype(np.uint8), np.ones((61, 61), np.uint8))
+    m[:y0 + int(terraco.any(1).argmax()) - 40] = 0              # só a faixa dos postes (a lua fica)
+    out, falta = img.copy(), m.astype(bool)
+    for d in (220, -220, 440, -440, 660, -660):
+        ok = falta & ~np.roll(m.astype(bool), d, 1)
+        out[ok] = np.roll(img, d, 1)[ok]
+        falta &= ~ok
+    k = cv2.GaussianBlur(m.astype(np.float32), (0, 0), 6)[..., None]
+    return img * (1 - k) + out * k
+
+
 def ler(caminho, w, h):
     return np.asarray(Image.open(caminho).convert("RGB").resize((w, h), Image.LANCZOS)).astype(np.float32)
 
@@ -112,6 +128,10 @@ def planos(pasta, parede):
     dist = np.hypot(gx - sx, gy - sy).astype(np.float32)
     an *= np.clip((dist - 140) / 60, 0, 1)                      # a lua fica no céu (parada)
     an *= np.clip((FUNDO_TOPO + 10 - gy) / 40.0, 0, 1)
+    postes = cv2.dilate((terraco[:len(ceu)] | ((ceu[..., 0] - ceu[..., 2]) > 10)).astype(np.uint8),
+                        np.ones((61, 61), np.uint8))
+    postes[:int(terraco.any(1).argmax()) - 40] = 0
+    an *= 1 - postes                                            # sem a borda dourada dos postes
     an = cv2.GaussianBlur(an.astype(np.float32), (0, 0), 1.0)
     peso = (1 - an) ** 3
     soma = lambda x: cv2.GaussianBlur((x * peso[..., None]).sum(1)[:, None, :], (0, 0), sigmaX=0.1, sigmaY=50)[:, 0, :]
@@ -129,8 +149,12 @@ def planos(pasta, parede):
     tc = (np.linspace(1, 0, CEU_EXTRA)[:, None, None]) ** 1.3
     # O céu vai até embaixo (no super pulo o fundo, mais perto, desce mais que o céu e abriria
     # uma faixa vazia entre os dois): embaixo do horizonte, o próprio céu limpo (mar e névoa).
-    resto = limpo[len(lp):] + dif[-1][None, None, :] * 0.5
+    # (o mar sem o terraço: o céu limpo do Codex ainda tem a mureta e os postes embaixo)
+    resto = sem[len(lp):hp]
     ceu_img = np.concatenate([topo * (1 - tc * 0.7) + escuro * tc * 0.7, lp, resto], 0)
+    # Os postes do céu limpo saem (no super pulo o céu desce menos que o terraço, e o pedaço de
+    # poste dele ficava solto no ar acima do poste de verdade).
+    ceu_img = tirar_postes(ceu_img, CEU_EXTRA, terraco[:len(lp)], lp)
     Image.fromarray(np.clip(ceu_img, 0, 255).astype(np.uint8)).save(pasta / "ceu.jpg", quality=93)
     Image.fromarray(np.dstack([ceu, an * 255]).astype(np.uint8), "RGBA").resize(
         (w * 3 // 4, len(ceu) * 3 // 4), Image.LANCZOS).save(pasta / "nuvens.webp", lossless=True, quality=100, method=6)

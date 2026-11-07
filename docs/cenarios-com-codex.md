@@ -413,4 +413,8 @@ e o terraço (`parede.webp`, mureta e postes com o alfa do molde); acende as lan
 mureta com reflexo no chão, pelo motor). O céu vai até embaixo: no super pulo o fundo, mais
 perto, desce mais que o céu e abria uma faixa vazia entre os dois. Pelo mesmo motivo o fundo continua
 850 linhas abaixo da mureta (`FUNDO_MAIS`, o mar de nuvens do `11_sem_terraco`): o terraço desce
-mais que o fundo e abria uma faixa preta embaixo, entre o mar e a mureta.
+mais que o fundo e abria uma faixa preta embaixo, entre o mar e a mureta. O céu limpo do Codex ainda tinha
+a mureta e os postes embaixo: no céu eles saem (`tirar_postes`, o céu ao lado deslocado na
+horizontal entra no lugar; um inpaint deixava borrões laranja), embaixo do horizonte entra o mar
+sem terraço, e as nuvens perdem a faixa dos postes (a borda dourada deles passava no recorte por
+brilho). Sem isso, no super pulo aparecia um poste solto no ar acima do poste de verdade.
