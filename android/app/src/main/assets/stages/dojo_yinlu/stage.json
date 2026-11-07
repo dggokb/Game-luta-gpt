@@ -38,7 +38,87 @@
       "base": 0.6564,
       "x": 0.5044,
       "repetir": "espelhar",
-      "corAcima": "#1F6FE0"
+      "corAcima": "#1F6FE0",
+      "luzes": [
+        {
+          "x": 0.1235,
+          "y": 0.8583,
+          "raio": 0.0267,
+          "cor": "#FFC860",
+          "pulsar": 0.12,
+          "reflexo": false
+        },
+        {
+          "x": 0.3149,
+          "y": 0.8583,
+          "raio": 0.0267,
+          "cor": "#FFC860",
+          "pulsar": 0.12,
+          "reflexo": false
+        },
+        {
+          "x": 0.6858,
+          "y": 0.8583,
+          "raio": 0.0267,
+          "cor": "#FFC860",
+          "pulsar": 0.12,
+          "reflexo": false
+        },
+        {
+          "x": 0.8711,
+          "y": 0.8583,
+          "raio": 0.0267,
+          "cor": "#FFC860",
+          "pulsar": 0.12,
+          "reflexo": false
+        },
+        {
+          "x": 0.4399,
+          "y": 0.7936,
+          "raio": 0.0349,
+          "cor": "#FFC860",
+          "pulsar": 0.12,
+          "reflexo": false
+        },
+        {
+          "x": 0.5601,
+          "y": 0.7936,
+          "raio": 0.0349,
+          "cor": "#FFC860",
+          "pulsar": 0.12,
+          "reflexo": false
+        }
+      ]
+    },
+    {
+      "id": "raios-a",
+      "imagem": "raios_a.png",
+      "profundidade": 640.5,
+      "topo": -0.1891,
+      "base": 0.6564,
+      "x": 0.5044,
+      "repetir": "espelhar",
+      "onda": {
+        "amplitude": 0.8,
+        "velocidade": 0.35,
+        "fase": 0.0,
+        "leve": 0.5
+      }
+    },
+    {
+      "id": "raios-b",
+      "imagem": "raios_b.png",
+      "profundidade": 640.5,
+      "topo": -0.1891,
+      "base": 0.6564,
+      "x": 0.5044,
+      "repetir": "espelhar",
+      "onda": {
+        "amplitude": 0.8,
+        "velocidade": 0.35,
+        "fase": 3.1416,
+        "leve": 0.5
+      }
     }
   ],
   "chao": {
@@ -61,5 +141,16 @@
     "vento": 50,
     "queda": 60,
     "tamanho": 7
+  },
+  "poeira": {
+    "quantidade": 120,
+    "cor": "#FFF2C8",
+    "alfa": 0.45,
+    "tamanho": 2.2,
+    "vento": 10,
+    "perto": -200,
+    "longe": 1500,
+    "topo": 0.15,
+    "base": 0.8
   }
 }

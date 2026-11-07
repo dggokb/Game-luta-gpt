@@ -116,7 +116,7 @@ def fachos(pasta, parede, luzes_pan, xa, xb, w, h):
     camadas = []
     for nome, fase in (("a", 0.0), ("b", 3.1416)):
         camadas.append({"id": f"fachos-{nome}", "imagem": f"fachos_{nome}.png",
-                        "profundidade": round(parede["profundidade"] + 1, 1), "topo": parede["topo"],
+                        "profundidade": round(parede["profundidade"] - 0.5, 1), "topo": parede["topo"],
                         "base": parede["base"], "x": parede["x"],
                         "onda": {"amplitude": 1, "velocidade": 0.45, "fase": fase, "leve": 0.5}})
     return camadas, len(escolhidos)

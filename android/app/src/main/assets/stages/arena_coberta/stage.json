@@ -1721,7 +1721,7 @@
     {
       "id": "fachos-a",
       "imagem": "fachos_a.png",
-      "profundidade": 1736.7,
+      "profundidade": 1735.2,
       "topo": -0.6118,
       "base": 0.6816,
       "x": 0.5,
@@ -1735,7 +1735,7 @@
     {
       "id": "fachos-b",
       "imagem": "fachos_b.png",
-      "profundidade": 1736.7,
+      "profundidade": 1735.2,
       "topo": -0.6118,
       "base": 0.6816,
       "x": 0.5,

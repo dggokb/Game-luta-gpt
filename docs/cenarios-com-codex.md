@@ -282,4 +282,11 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
   --nome 'Dojo Liánwǔguǎn' --extra $A/stage_extra.json
 ```
 
-(e tirar a `poeira` que o script põe: de dia, as folhas caindo do `stage_extra.json` bastam).
+(e tirar a `poeira` que o script põe; quem põe a poeira é a animação).
+6. Animação (`tools/stage/animar_yinlu.py`): as quatro lanternas de pedra e as duas do portão
+   brilham e tremulam (`luzes` da parede), raios de sol entre as árvores em duas imagens que cruzam
+   uma na outra (`"onda"` em fase oposta) e poeira dourada no ar; as folhas caindo e a luz do sol nos
+   lutadores vêm do `stage_extra.json`.
+
+Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
+(mais fundo), a parede opaca os cobria.
