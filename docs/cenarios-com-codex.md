@@ -411,4 +411,6 @@ python3 tools/stage/animar_terraco.py
 claras que o céu limpo, `"deriva": 30`), fundo (6000: mar, mar de nuvens, ilhas, estádio e templo)
 e o terraço (`parede.webp`, mureta e postes com o alfa do molde); acende as lanternas (as da
 mureta com reflexo no chão, pelo motor). O céu vai até embaixo: no super pulo o fundo, mais
-perto, desce mais que o céu e abria uma faixa vazia entre os dois.
+perto, desce mais que o céu e abria uma faixa vazia entre os dois. Pelo mesmo motivo o fundo continua
+850 linhas abaixo da mureta (`FUNDO_MAIS`, o mar de nuvens do `11_sem_terraco`): o terraço desce
+mais que o fundo e abria uma faixa preta embaixo, entre o mar e a mureta.

@@ -37,6 +37,7 @@ EXTRA = 300                                   # --ceu-extra do cenario_pintura.p
 JUNCAO = 1258                                 # --juncao do cenario_pintura.py (pé da mureta)
 HORIZONTE = 1068                              # a linha do mar (o ponto de fuga do piso)
 FUNDO_TOPO = 1035                             # daqui para baixo é o fundo (mar, ilhas)
+FUNDO_MAIS = 850                              # linhas de mar de nuvens abaixo da mureta (super pulo)
 SEM_HORIZONTE = 985                           # o horizonte no 11_sem_terraco_4096.webp
 PROF_CEU, PROF_NUVENS, PROF_FUNDO = 30000.0, 12000.0, 6000.0
 DERIVA_NUVENS = 30.0
@@ -83,13 +84,19 @@ def planos(pasta, parede):
     # o mar de nuvens pintado sem o terraço, com o horizonte no mesmo lugar e as cores casadas.
     sem = ler(ART / "11_sem_terraco_4096.webp", w, 2305)
     desl = HORIZONTE - SEM_HORIZONTE
-    sem = np.roll(sem, desl, 0)[:hp]
+    sem = np.roll(sem, desl, 0)[:hp + FUNDO_MAIS]
     vis = alem & (yy >= FUNDO_TOPO + 30)
-    sem = casar(sem, pan, (yy >= HORIZONTE + 40)[:, 0][:, None] & np.ones((1, w), bool), vis)
+    mf = np.zeros(sem.shape[:2], bool)
+    mf[HORIZONTE + 40:hp] = True
+    sem = casar(sem, pan, mf, vis)
     k = cv2.GaussianBlur(cv2.erode(vis.astype(np.uint8), np.ones((15, 15), np.uint8)).astype(np.float32),
                          (0, 0), 4)[..., None]
-    fundo = pan * k + sem * (1 - k)
-    af = np.clip((yy - FUNDO_TOPO) / 30.0, 0, 1) * np.ones((1, w), np.float32)
+    fundo = pan * k + sem[:hp] * (1 - k)
+    # Embaixo, o mar de nuvens continua (no super pulo o terraço, mais perto, desce mais que o
+    # fundo; sem isto aparecia uma faixa escura entre o mar e a mureta).
+    fundo = np.concatenate([fundo, sem[hp:]], 0)
+    yy2 = np.arange(len(fundo), dtype=np.float32)[:, None]
+    af = np.clip((yy2 - FUNDO_TOPO) / 30.0, 0, 1) * np.ones((1, w), np.float32)
     Image.fromarray(np.dstack([fundo, af * 255]).astype(np.uint8), "RGBA").save(
         pasta / "fundo.webp", lossless=True, quality=100, method=6)
 
@@ -135,7 +142,7 @@ def planos(pasta, parede):
          "x": parede["x"], "repetir": "espelhar", "corAcima": "#060A1E", "luzes": [lua]},
         {"id": "nuvens", "imagem": "nuvens.webp", "profundidade": PROF_NUVENS, "topo": frac(0), "base": frac(hc),
          "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA_NUVENS},
-        {"id": "fundo", "imagem": "fundo.webp", "profundidade": PROF_FUNDO, "topo": frac(0), "base": frac(hp),
+        {"id": "fundo", "imagem": "fundo.webp", "profundidade": PROF_FUNDO, "topo": frac(0), "base": frac(hp + FUNDO_MAIS),
          "x": parede["x"], "repetir": "espelhar"},
     ]
 
