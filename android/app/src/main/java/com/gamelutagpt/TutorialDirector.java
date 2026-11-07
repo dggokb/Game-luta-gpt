@@ -153,7 +153,8 @@ final class TutorialDirector {
         // Movimento.
         out.add(new Lesson("ANDAR", "Segure → para andar e ← para recuar", 1, false, apart, null,
             c -> c.forward >= 120f && c.back >= 80f,
-            (c, p1) -> p1.direction = c.t < 40 ? 1 : 5));
+            // Anda até cumprir a frente (quem anda devagar, como as crianças, leva mais tempo).
+            (c, p1) -> p1.direction = c.forward < 125f ? 1 : 5));
         out.add(new Lesson("AGACHAR", "Segure ↓ para agachar", 1, false, apart, null,
             c -> c.p1().crouching,
             (c, p1) -> p1.direction = 3));
