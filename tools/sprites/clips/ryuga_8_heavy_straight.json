@@ -15,18 +15,19 @@
     "arquivo": "H.mp4",
     "personagem": "ryuga_8",
     "escala": 0.3,
-    "motivo": "mesma câmera do idle (0,30): todos os vídeos do Ryūga 8 anos têm a câmera do idle",
-    "quadros": "1,8,14,21,28,34,41,48,55,61,68,70,73,76,78,80,83,86,88,90,93,96,98",
+    "motivo": "mesma escala dos outros vídeos do Ryūga 8 anos (medida no idle)",
+    "quadros": "8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96",
     "largura": 288,
-    "raiz": "98,238",
+    "raiz": "101,238",
     "colunas": 7,
+    "fixar": "video",
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2
   },
   "frameWidth": 576,
   "frameHeight": 512,
-  "rootX": 196,
+  "rootX": 202,
   "rootY": 476,
   "pixelScale": 2.0
 }

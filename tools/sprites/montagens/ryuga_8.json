@@ -6,7 +6,7 @@
     "densidade": 2
   },
   "backdash": {
-    "_doc": "Backdash: o vídeo do pulinho para trás inteiro, até a guarda (2-92 de 3 em 3), como o do Kōga 8 anos.",
+    "_doc": "Backdash: o vídeo do pulinho para trás inteiro, até a guarda (2-92 de 3 em 3), como o do Kōga 8 anos. O tempo de cada quadro é o do backdash do motor (30 quadros ~ 16 ms cada), não o do vídeo.",
     "trechos": [
       [
         "backDash",
@@ -61,6 +61,290 @@
     "animacoes": {
       "SPECIAL_S2": {
         "impacto": 11
+      }
+    }
+  },
+  "idle": {
+    "_doc": "Idle: o mesmo trecho de antes (36-110), agora com a câmera do vídeo (pés plantados, no registro de todos os clipes).",
+    "trechos": [
+      [
+        "idle",
+        0,
+        124
+      ]
+    ],
+    "quadros": "36-110",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "IDLE": {
+        "loop": true
+      },
+      "COMBAT": {
+        "frames": "0"
+      }
+    }
+  },
+  "crouch": {
+    "_doc": "Agachar: a descida (6-18), pés plantados.",
+    "trechos": [
+      [
+        "agacha",
+        0,
+        124
+      ]
+    ],
+    "quadros": "6-18/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH": {}
+    }
+  },
+  "crouch_idle": {
+    "_doc": "Agachado parado, respirando (agacha 20-70), em loop.",
+    "trechos": [
+      [
+        "agacha",
+        0,
+        124
+      ]
+    ],
+    "quadros": "20-70/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH_IDLE": {
+        "loop": true
+      }
+    }
+  },
+  "rise": {
+    "_doc": "Levantar (agacha 72-88).",
+    "trechos": [
+      [
+        "agacha",
+        0,
+        124
+      ]
+    ],
+    "quadros": "72-88/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "RISE": {}
+    }
+  },
+  "walk_forward": {
+    "_doc": "Andar para frente: um ciclo inteiro (57-86) no tempo do vídeo, a 150 px/s (criança; o motor anda a 300).",
+    "trechos": [
+      [
+        "frente",
+        0,
+        124
+      ]
+    ],
+    "quadros": "57-86",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "WALK_FORWARD": {
+        "distancia": "video",
+        "velocidade": 150,
+        "loop": true
+      }
+    }
+  },
+  "walk_back": {
+    "_doc": "Andar para trás: um ciclo (26-58) no tempo do vídeo, a 110 px/s.",
+    "trechos": [
+      [
+        "tras",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "26-58",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "WALK_BACK": {
+        "distancia": "video",
+        "velocidade": 110,
+        "loop": true
+      }
+    }
+  },
+  "dash": {
+    "_doc": "Corrida: um ciclo da passada (40-62), cada quadro fixo pelo corpo, em loop pela distância (como o do Kōga 8 anos).",
+    "trechos": [
+      [
+        "dash",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "40-62/2",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false
+    },
+    "animacoes": {
+      "DASH": {
+        "distancia": 26,
+        "loop": true
+      }
+    }
+  },
+  "light_jab": {
+    "_doc": "L: o jab (28-44); no vídeo o braço fica esticado até o fim, então a volta é a ida de trás para a frente.",
+    "trechos": [
+      [
+        "L",
+        0,
+        124
+      ]
+    ],
+    "quadros": "28,32,34,36,38,40,44",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "LIGHT_JAB": {
+        "frames": "0-6,5-0",
+        "impacto": 5
+      }
+    }
+  },
+  "medium_kick": {
+    "_doc": "M: o soco do vídeo (28-76) e a volta para a guarda, pés plantados.",
+    "trechos": [
+      [
+        "M",
+        0,
+        124
+      ]
+    ],
+    "quadros": "28,32,36,38,40,44,52,60,64,68,72,76",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "MEDIUM_KICK": {
+        "impacto": 4
+      }
+    }
+  },
+  "heavy_straight": {
+    "_doc": "H: o chute alto do vídeo (8-96), com o rastro, pés plantados.",
+    "trechos": [
+      [
+        "H",
+        0,
+        124
+      ]
+    ],
+    "quadros": "8-96/4",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "HEAVY_STRAIGHT": {
+        "impacto": 6
+      }
+    }
+  },
+  "crouch_light": {
+    "_doc": "2L: o soco agachado (8-60), do agachado ao agachado; deslocar 9: o agachado do vídeo fica 30 px à frente da guarda em pé (o registro do agachar).",
+    "trechos": [
+      [
+        "2L",
+        0,
+        124
+      ]
+    ],
+    "quadros": "8-60/4",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true,
+      "deslocar": "9,0"
+    },
+    "animacoes": {
+      "CROUCH_LIGHT": {
+        "impacto": 3
+      }
+    }
+  },
+  "crouch_medium": {
+    "_doc": "2M: a rasteira (16-104), do agachado ao agachado (no vídeo ele sobe um instante antes de voltar).",
+    "trechos": [
+      [
+        "2M",
+        0,
+        124
+      ]
+    ],
+    "quadros": "16,22,26,30,36,44,52,56,60,64,72,80,88,96,104",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true,
+      "deslocar": "9,0"
+    },
+    "animacoes": {
+      "CROUCH_MEDIUM": {
+        "impacto": 7
+      }
+    }
+  },
+  "crouch_heavy": {
+    "_doc": "2H: o gancho para cima (16-92), do agachado ao agachado.",
+    "trechos": [
+      [
+        "2H",
+        0,
+        124
+      ]
+    ],
+    "quadros": "16,24,32,36,40,44,48,56,64,72,80,84,88,92",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true,
+      "deslocar": "9,0"
+    },
+    "animacoes": {
+      "CROUCH_HEAVY": {
+        "impacto": 5
+      }
+    }
+  },
+  "golpe_alto": {
+    "_doc": "→ + M (6M, golpe alto): o chute do M_BAIXO (28-96), sem o trecho parado com a perna esticada.",
+    "trechos": [
+      [
+        "M_BAIXO",
+        0,
+        124
+      ]
+    ],
+    "quadros": "28,32,36,40,44,48,52,60,76,84,88,92,96",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "GOLPE_ALTO": {
+        "impacto": 4
       }
     }
   }

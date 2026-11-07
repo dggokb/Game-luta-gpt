@@ -25,5 +25,6 @@
   "BACKDASH": "backDash",
   "SPECIAL_ENERGY": "s1",
   "SPECIAL_S2": "s2",
-  "GOLPE_ALTO": "M_BAIXO"
+  "GOLPE_ALTO": "M_BAIXO",
+  "KNOCKDOWN": "derruba_levanta"
 }

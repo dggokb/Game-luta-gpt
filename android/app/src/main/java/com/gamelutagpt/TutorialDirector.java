@@ -153,7 +153,8 @@ final class TutorialDirector {
         // Movimento.
         out.add(new Lesson("ANDAR", "Segure → para andar e ← para recuar", 1, false, apart, null,
             c -> c.forward >= 120f && c.back >= 80f,
-            (c, p1) -> p1.direction = c.t < 40 ? 1 : 5));
+            // Anda até cumprir a frente (quem anda devagar, como as crianças, leva mais tempo).
+            (c, p1) -> p1.direction = c.forward < 125f ? 1 : 5));
         out.add(new Lesson("AGACHAR", "Segure ↓ para agachar", 1, false, apart, null,
             c -> c.p1().crouching,
             (c, p1) -> p1.direction = 3));
@@ -180,13 +181,15 @@ final class TutorialDirector {
         if (character.moves.containsKey("jH")) {
             out.add(new Lesson("GOLPE NO AR", "Pule para frente (↗) e aperte {H} no ar", 1, true,
                 c -> c.placeApart(JUMP_IN_GAP), null,
-                c -> c.landed("jH"),
+                // O texto pede o golpe no ar, não o acerto: sair o jH já vale (pular por cima do
+                // boneco também conta).
+                c -> c.doing("jH") && !c.p1().grounded || c.landed("jH"),
                 (c, p1) -> jumpIn(c, p1, false)));
         }
         if (character.moves.containsKey("j2H")) {
             out.add(new Lesson("CRAVADA", "No ar, segure ↓ e aperte {H}: crava o rival no chão", 1, true,
                 c -> c.placeApart(JUMP_IN_GAP), null,
-                c -> c.landed("j2H"),
+                c -> c.doing("j2H") && !c.p1().grounded || c.landed("j2H"),
                 (c, p1) -> jumpIn(c, p1, true)));
         }
 

@@ -1,0 +1,9 @@
+Generate ONE image with your image generation tool and save it in the current folder as ryuga_jab.png.
+
+The attached image ryuga_centro.png is the reference: the same fighter (Ryūga: spiky brown hair, sleeveless blue-and-white top with red collar over a black tank top, white baggy pants with blue stripes, black and red belt, black fingerless gloves with red stripes, blue-white-red sneakers), same art style (clean anime fighting-game art, strong cel shading), facing RIGHT.
+
+The new image: the SAME canvas size (1344x768, landscape), the SAME pure flat green background (#00FF00, no shadows, no gradient, no floor, no effects), the fighter at the SAME size and SAME place as in the reference: centered, feet on the same ground line near the bottom (y about 733), body about 71% of the image height.
+
+Pose: ONE quick jab with the FRONT hand: the fist that is farther forward, on the RIGHT side of the frame, punches straight forward to the right at shoulder height, arm almost fully extended, knuckles leading. The other fist stays up guarding the chin. Legs in the same fighting stance as the reference, feet planted on the ground. Exactly two arms coming from the shoulders, five fingers on each hand (fists closed), anatomy correct.
+
+No text, no motion lines, no impact effects, nothing else in the image.

@@ -1,0 +1,260 @@
+{
+  "id": "ryuga_8_fall_down",
+  "characterProfile": "ryuga_8",
+  "source": "art/sprites/source/ryuga_8_fall_down_video_normalized.png",
+  "sourceNote": "ryuga_8 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 320,
+    "rootX": 104,
+    "rootY": 284,
+    "columns": 10,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        42,
+        40,
+        335,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 25528
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        42,
+        40,
+        335,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 25528
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        48,
+        86,
+        346,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 24253
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        39,
+        130,
+        350,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 22504
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        39,
+        130,
+        350,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 22504
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        39,
+        130,
+        350,
+        286
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 22504
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        33,
+        136,
+        349,
+        288
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 22303
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        33,
+        136,
+        349,
+        288
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 22303
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        33,
+        136,
+        349,
+        288
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 22303
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        33,
+        136,
+        349,
+        288
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 22303
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        33,
+        136,
+        349,
+        288
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 22303
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 338,
+    "frameHeight": 267,
+    "rootX": 81,
+    "rootY": 254,
+    "columns": 10,
+    "frameCount": 11,
+    "cropOffset": [
+      23,
+      30
+    ],
+    "sheetWidth": 328,
+    "sheetHeight": 2096,
+    "frames": [
+      [
+        0,
+        0,
+        308,
+        260,
+        13,
+        4
+      ],
+      [
+        0,
+        264,
+        308,
+        260,
+        13,
+        4
+      ],
+      [
+        0,
+        528,
+        312,
+        212,
+        19,
+        50
+      ],
+      [
+        0,
+        744,
+        324,
+        168,
+        10,
+        94
+      ],
+      [
+        0,
+        916,
+        324,
+        168,
+        10,
+        94
+      ],
+      [
+        0,
+        1088,
+        324,
+        168,
+        10,
+        94
+      ],
+      [
+        0,
+        1260,
+        328,
+        164,
+        4,
+        100
+      ],
+      [
+        0,
+        1428,
+        328,
+        164,
+        4,
+        100
+      ],
+      [
+        0,
+        1596,
+        328,
+        164,
+        4,
+        100
+      ],
+      [
+        0,
+        1764,
+        328,
+        164,
+        4,
+        100
+      ],
+      [
+        0,
+        1932,
+        328,
+        164,
+        4,
+        100
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 9830400,
+      "grid": 7219680,
+      "packed": 2749952
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "343559d570d66827f03ec94a2648e89ce68de0d49e4dd339727ac5e3b781d27b",
+      "config": "5197bb314921ddb99bc2bffd4dc0270bcb08b9464c2da48462c7e219460335b3",
+      "profile": "6eed417b2002f5d045bf4741be4857ab631b05cf89d8c8cca4a88065eabffbce"
+    }
+  }
+}
