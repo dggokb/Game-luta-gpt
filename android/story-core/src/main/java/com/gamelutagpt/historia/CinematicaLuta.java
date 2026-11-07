@@ -181,7 +181,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -235,6 +235,24 @@ public final class CinematicaLuta {
         float tranco = 1f;
         /** TROCAR: os primeiros lances, em ordem (o resto é sorteado). */
         List<String> lances;
+        /**
+         * VIDEO: a cena dos dois lutadores num vídeo ({@code historia/<clipe>/}: folha.webp e
+         * efeito.json, do efeito_video.py), no chão da luta e no lugar deles; null com
+         * {@link #parar}. {@link #repetir}: em loop (não espera); senão espera acabar e fica no
+         * último quadro. {@link #esquerda}: quem está à esquerda no vídeo (o jogo espelha o vídeo
+         * quando esse lutador está à direita na luta).
+         */
+        String clipe;
+        boolean repetir;
+        boolean parar;
+        String esquerda;
+        /**
+         * VIDEO: com um loop na tela, o vídeo novo espera a volta dele acabar (os vídeos começam
+         * e acabam na mesma pose: a troca não pula).
+         */
+        boolean emendar;
+        /** VIDEO emendado com semEsperar: a cena segue quando ele começa (não quando acaba). */
+        boolean soComecar;
 
         Acao(Tipo tipo) {
             this.tipo = tipo;
@@ -290,6 +308,15 @@ public final class CinematicaLuta {
             List<String> out = new ArrayList<>();
             for (Acao a : acoes) {
                 if (a.imagens != null && a.propria == null) out.addAll(a.imagens);
+            }
+            return out;
+        }
+
+        /** Os vídeos que a cena toca (para conferir os arquivos). */
+        public List<String> videos() {
+            List<String> out = new ArrayList<>();
+            for (Acao a : acoes) {
+                if (a.clipe != null && !out.contains(a.clipe)) out.add(a.clipe);
             }
             return out;
         }
@@ -465,6 +492,14 @@ public final class CinematicaLuta {
     static final String[] CHOQUES = {"KRAKOOM!", "BAKOOM!", "DOOM!"};
     private int choquesVistos;
 
+    /** O vídeo na tela agora (ação VIDEO) e quando começou; a duração de cada clipe (ms). */
+    private Acao video;
+    private float videoDesde;
+    /** O vídeo que espera a volta do loop acabar ({@link Acao#emendar}) e em que ms do loop ele entra. */
+    private Acao videoProximo;
+    private float videoTrocaMs;
+    private final Map<String, Float> duracaoVideo = new HashMap<>();
+
     /** O jogador está no toque (as dicas dizem TOQUE) ou no teclado/controle (APERTE). */
     private boolean dicasDeToque = true;
 
@@ -513,8 +548,27 @@ public final class CinematicaLuta {
                 }
             }
         }
+        // A duração de cada vídeo vem do efeito.json dele (a folha quem lê é o jogo).
+        for (String clipe : roteiro.videos()) {
+            try {
+                duracaoVideo.put(clipe, duracaoMs(assets.readText(Temporada.PASTA + "/" + clipe + "/efeito.json")));
+            } catch (IOException | RuntimeException ex) {
+                // Sem o vídeo: a ação passa direto e os lutadores continuam na tela.
+            }
+        }
         estado = Estado.ARMADA;
         return true;
+    }
+
+    /** A soma das durações de um efeito.json (os quadros curtos repetem a última). */
+    static float duracaoMs(String json) {
+        Map<String, Object> m = Episodio.asMap(MiniJson.parse(json));
+        List<Object> ms = Episodio.list(m, "duracoesMs");
+        int n = Episodio.list(m, "quadros").size();
+        if (ms.isEmpty() || n == 0) return 0f;
+        float total = 0f;
+        for (int i = 0; i < n; i++) total += ((Number)ms.get(Math.min(i, ms.size() - 1))).floatValue();
+        return total;
     }
 
     /**
@@ -570,6 +624,9 @@ public final class CinematicaLuta {
         paginaNaTela = false;
         qte = null;
         dedoNaTela = false;
+        video = null;
+        videoProximo = null;
+        duracaoVideo.clear();
     }
 
     // ------------------------------------------------------------ leitura
@@ -766,6 +823,21 @@ public final class CinematicaLuta {
                     a.lances.add(lance);
                 }
                 break;
+            case "video":
+                a = new Acao(Acao.Tipo.VIDEO);
+                a.parar = Boolean.TRUE.equals(m.get("parar"));
+                a.clipe = Episodio.string(m, "clipe", null);
+                if (!a.parar && (a.clipe == null || !a.clipe.matches("[a-z0-9_]+/[a-z0-9_]+"))) {
+                    throw new IllegalArgumentException("video sem \"clipe\" (\"<episódio>/<nome>\", ex.: ep00/qt1) nem \"parar\"");
+                }
+                if (a.parar) a.clipe = null;
+                a.repetir = Boolean.TRUE.equals(m.get("repetir"));
+                a.emendar = Boolean.TRUE.equals(m.get("emendar"));
+                a.esquerda = Episodio.string(m, "esquerda", null);
+                if (a.esquerda != null && !time(a.esquerda)) {
+                    throw new IllegalArgumentException("esquerda " + a.esquerda + " (use jogador, rival, ryuga ou koga)");
+                }
+                break;
             case "golpe":
                 a = new Acao(Acao.Tipo.GOLPE);
                 a.quemMove = Episodio.string(m, "quem", "jogador");
@@ -775,10 +847,16 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
+        if (a.tipo == Acao.Tipo.VIDEO && a.emendar && a.semEsperar) {
+            // Emendado: espera a volta do loop acabar e o vídeo começar; depois a cena segue
+            // (os letreiros marcam os golpes do vídeo pelo tempo desde o começo dele).
+            a.semEsperar = false;
+            a.soComecar = true;
+        }
         if ((a.tipo == Acao.Tipo.QTE || a.tipo == Acao.Tipo.GOLPE) && Boolean.TRUE.equals(m.get("semEsperar"))) {
             throw new IllegalArgumentException(nome + " não aceita semEsperar");
         }
@@ -836,7 +914,9 @@ public final class CinematicaLuta {
             if (a.x < 0f || a.x > 1f || a.y < 0f || a.y > 1f) throw new IllegalArgumentException("pos fora da tela");
         }
         boolean finaliza = Boolean.TRUE.equals(m.get("final"));
-        a.acerto = golpe(m, "golpe", "H", finaliza);
+        // "golpe": "nenhum": o acerto não bate na luta (o golpe é o vídeo que vem depois); o
+        // impacto sai na hora do BOA!.
+        a.acerto = "nenhum".equals(m.get("golpe")) ? null : golpe(m, "golpe", "H", finaliza);
         Object erro = m.get("erro");
         if (erro != null) a.erro = golpe(Episodio.asMap(erro), "golpe", "M", false);
         return a;
@@ -1008,7 +1088,16 @@ public final class CinematicaLuta {
     }
 
     public void update(float dt) {
+        // O vídeo anda no ritmo da luta: para na congelada do impacto e fica lento na câmera lenta.
+        if (video != null) videoDesde += dt * (1f - velocidade());
         time += dt;
+        if (videoProximo != null && (time - videoDesde) * 1000f >= videoTrocaMs) {
+            // A volta acabou: o vídeo emendado começa de onde a volta passou.
+            float sobra = (time - videoDesde) * 1000f - videoTrocaMs;
+            video = videoProximo;
+            videoProximo = null;
+            videoDesde = time - sobra / 1000f;
+        }
         for (Iterator<Estouro> it = estouros.iterator(); it.hasNext(); ) {
             Estouro e = it.next();
             if (time - e.desde >= e.acao.segundos) it.remove();
@@ -1106,6 +1195,19 @@ public final class CinematicaLuta {
             case TROCAR:
                 palco.trocar(a.segundos, a.lances);
                 break;
+            case VIDEO:
+                if (a.emendar && !a.parar && video != null && video.repetir && duracaoVideo.containsKey(a.clipe)) {
+                    // Entra quando a volta do loop acabar (no ms da volta seguinte).
+                    float total = duracaoVideo.get(video.clipe);
+                    float ms = (time - videoDesde) * 1000f;
+                    videoProximo = a;
+                    videoTrocaMs = total > 0f ? (float)Math.ceil(ms / total) * total : ms;
+                    break;
+                }
+                videoProximo = null;
+                video = a.parar || !duracaoVideo.containsKey(a.clipe) ? null : a;
+                videoDesde = time;
+                break;
             case GOLPE:
                 golpeLado = lado(a.quemMove);
                 impactou = false;
@@ -1145,6 +1247,11 @@ public final class CinematicaLuta {
             case TROCAR:
                 // A vez em andamento termina antes (no tempo da luta: a câmera lenta estica).
                 return !palco.trocando() || idade >= a.segundos + LIMITE_ESPERA;
+            case VIDEO:
+                if (videoProximo == a) return false;
+                if (a.soComecar) return true;
+                // O loop não espera; o vídeo que toca uma vez espera acabar.
+                return video != a || a.repetir || (time - videoDesde) * 1000f >= duracaoVideo.get(a.clipe);
             default:
                 return true;
         }
@@ -1289,6 +1396,34 @@ public final class CinematicaLuta {
         }
     }
 
+    /**
+     * O vídeo dos dois lutadores na tela agora ({@code ep00/qt1}: a pasta dentro de
+     * {@code historia/}), ou null. Com vídeo, o jogo esconde os lutadores e desenha o quadro de
+     * {@link #videoMs} no chão da luta.
+     */
+    public String video() {
+        return video != null && estado != Estado.NENHUMA && estado != Estado.ARMADA ? video.clipe : null;
+    }
+
+    /** Os vídeos da cinemática carregada (para o jogo ler as folhas antes da cena). */
+    public List<String> videos() {
+        return new ArrayList<>(duracaoVideo.keySet());
+    }
+
+    /** Milissegundos do vídeo agora: no loop, dentro de uma volta; senão para no último quadro. */
+    public float videoMs() {
+        if (video == null) return 0f;
+        float total = duracaoVideo.get(video.clipe);
+        float ms = (time - videoDesde) * 1000f;
+        if (total <= 0f) return 0f;
+        return video.repetir ? ms % total : Math.min(ms, total - 1f);
+    }
+
+    /** O lado ({@link #JOGADOR}, {@link #RIVAL}) de quem está à esquerda no vídeo, ou -1 (não espelha). */
+    public int videoEsquerda() {
+        return video == null || video.esquerda == null ? -1 : lado(video.esquerda);
+    }
+
     /** A cena quer os toques e os botões agora (um QTE na tela, uma página que pode ser pulada). */
     public boolean pegaToque() {
         if (estado != Estado.RODANDO || acao == null) return false;
@@ -1413,6 +1548,8 @@ public final class CinematicaLuta {
         estado = Estado.ACABOU;
         acao = null;
         qte = null;
+        video = null;
+        videoProximo = null;
         // A tinta que ficou na tela sai sozinha.
         if (coberta || tintaModo == ModoTinta.COBRINDO) pintar(false, 0.6f, tintaCor);
         if (travado) {

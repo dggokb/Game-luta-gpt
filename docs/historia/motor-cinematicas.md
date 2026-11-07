@@ -135,6 +135,7 @@ novo).
 | `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`, `impacto`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
 | `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
+| `video` | `clipe` (`<episódio>/<nome>`), `repetir`, `esquerda`, `emendar`, ou `parar` ([abaixo](#cena-em-vídeo)) | os dois lutadores num vídeo só, no chão da luta e no lugar deles | `repetir`: nada; senão o vídeo acabar (com `emendar` + `semEsperar`: o vídeo começar) |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
 8 s (um lutador preso numa queda não trava o jogo).
@@ -271,6 +272,71 @@ um QTE de revide e, no golpe final, faixas, câmera lenta e um impacto grande co
 - Depois do QTE `final`, se o roteiro acaba sem `terminarLuta`, a luta segue no fluxo normal do
   KO: a fala de vitória, a tela de vitória e a história continuam.
 
+### Cena em vídeo
+
+Para a cena com cara de anime, os dois lutadores podem virar **um vídeo só** (gerado com os
+dois juntos no verde): enquanto o vídeo está na tela, o jogo esconde os lutadores de verdade (e
+as sombras) e desenha o quadro do vídeo no chão da luta, no meio deles (`CenaVideo`). A câmera,
+as faixas, a tinta, os letreiros e o QTE continuam por cima.
+
+```json
+{ "acao": "video", "clipe": "ep00/qt1", "repetir": true, "esquerda": "koga", "semEsperar": true }
+```
+
+| Campo | O que é |
+|---|---|
+| `clipe` | a pasta do vídeo dentro de `historia/` (`ep00/qt1` = `historia/ep00/qt1/folha.webp` e `efeito.json`) |
+| `repetir` | em loop (a ação não espera: o QTE seguinte pede por cima do vídeo) |
+| `esquerda` | quem está à esquerda no vídeo (`ryuga`, `koga`, `jogador`, `rival`): o vídeo espelha quando esse lutador está à direita na luta, então a mesma cena vale para as duas campanhas |
+| `emendar` | com um loop na tela, o vídeo novo espera a volta do loop acabar (os vídeos começam e acabam na mesma pose: a troca não pula). Com `semEsperar`, a cena segue quando ele começa (os letreiros marcam os golpes pelo tempo do vídeo) |
+| `parar` | tira o vídeo (os lutadores voltam) |
+
+O vídeo anda no ritmo da luta: para na congelada de um impacto, fica lento na câmera lenta e
+congela com `velocidade` 0. O que toca uma vez fica no último quadro até outro vídeo, `parar` ou
+o fim da cena. A troca entre a luta e o vídeo (os lutadores podem estar em outro lugar) fica
+bonita atrás de uma `tinta` rápida (cobrir, o vídeo, descobrir).
+
+**QTE sem golpe:** `"golpe": "nenhum"` no QTE: o acerto não bate na luta (o golpe é o vídeo que
+vem depois); o `impacto` sai na hora do BOA!. O erro (sem `erro`) só pede de novo.
+
+**Fazer o vídeo:** os dois juntos no verde, 1344×768, com a câmera das imagens iniciais (os
+pés em y ≈ 735). Cada vídeo começa e acaba na guarda dos dois, para emendar. Converter com o
+`efeito_video.py` para a pasta do episódio, com a origem no chão no meio dos dois no primeiro
+quadro e a escala dos sprites (0,3 px do mundo por px do vídeo nas crianças):
+
+```bash
+python3 tools/sprites/efeito_video.py qt1.mp4 --nome qt1 --origem 665,735 --escala-mundo 0.3 \
+    --resolucao 1.2 --passo 2 --saida android/app/src/main/assets/historia/ep00
+```
+
+A folha precisa caber em 4096 px (GPUs antigas): `--passo 2` (12 por segundo) e `--resolucao`
+1,2 deixam os 5 s de vídeo em ~2000×3800. As folhas são lidas numa thread à parte quando a luta
+carrega a cinemática e soltas no fim dela.
+
+### A briga dos irmãos (Prólogo): o teste da cena em vídeo
+
+`historia/ep00/cinematica_briga.json`, na luta IRMÃOS das duas campanhas (depois do treino),
+com os três vídeos dos meninos do Drive (`ryuga_8/qt1`, `qt2`, `qt3`):
+
+| Momento | O que acontece |
+|---|---|
+| Um dos dois com 50% | câmera lenta, faixas; a tinta cobre e sai com o **qt1** em loop (os dois trocando golpes e errando); o Dafu: "Ei, ei! Devagar, meninos!" |
+| TROCA DE GOLPES! (martelar 10) | PÁ! PÁ! PÁ!; no fim da volta do loop entra o **qt2** (se acertam e caem), com PAH!, POW!, BAM!, TUM! nos golpes do vídeo |
+| — | a tinta cobre e sai com o qt1 de novo; a câmera chega perto |
+| GOLPE FINAL! (tempo) | no fim da volta entra o **qt3**: o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
+
+A cena é a mesma nas duas campanhas: o Kōga é quem está à esquerda nos vídeos, e o vídeo
+espelha quando ele está à direita (campanha do Ryūga). Para ver no PC:
+
+```bash
+cd android
+gradle :pc:testeCena -Pepisodio=ep00 -Pmarca=briga-irmaos [-Pirmao=koga]
+```
+
+O `testeCena` abre só aquela luta da história, tira a vida até o gatilho, acerta todos os QTE
+e grava um PNG a cada 6 quadros em `android/pc/build/cena/`. Serve para qualquer luta da
+história com cinemática (`-Pvida` muda a vida do gatilho).
+
 ### O teste dos QTE (convite do Episódio 2)
 
 `historia/ep02/cinematica_convite_ryuga.json`, na luta CONVITE da campanha do Ryūga (Ryūga ×
@@ -363,6 +429,7 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | Último ponto de vida seguro | `FighterState.lifeFloor`, `GameView.protegerVida` |
 | HUD e controle de toque somem, faixas, quadros e onomatopeias (nessa ordem) | `GameView.renderFrame` |
 | Fim da luta pela cena | `GameView.updateStoryFight` (`cinematicaFim`) |
-| Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
+| Cena em vídeo (as folhas, esconder os lutadores, espelhar) | `android/app/.../CenaVideo.java`, `GameView.drawCenaVideo` |
+| Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite, a briga em vídeo), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
 | A luta do teste de QTE jogada no PC | `android/pc/src/test/.../TesteQteConvite.java` (`gradle :pc:testeQte`) |
 | Prévia no PC | `android/pc-preview/.../CinematicaPreview.java` (`gradle :pc-preview:runCinematica`) |

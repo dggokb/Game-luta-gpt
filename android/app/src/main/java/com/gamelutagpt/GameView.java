@@ -154,6 +154,10 @@ public class GameView extends SurfaceView
      * evento tenta o dele e, se ainda não existe, usa o efeito clássico do ImpactEffects.
      */
     private final EfeitosVideo efeitos;
+    /** A cena em vídeo da cinemática (os dois lutadores num vídeo só, no lugar deles). */
+    private final CenaVideo cenaVideo;
+    /** Neste quadro a cena em vídeo está na tela: os lutadores (e as sombras) não são desenhados. */
+    private boolean cenaEmVideo;
     private final EntradaSuper entradaSuper;
     /** A tela de vitória do lutador do jogador (só quem tem a cena em assets/vitorias). */
     private final TelaVitoria telaVitoria;
@@ -701,6 +705,7 @@ public class GameView extends SurfaceView
     public GameView(Context context, boolean emSegundoPlano) {
         super(context);
         efeitos = new EfeitosVideo(context.getAssets());
+        cenaVideo = new CenaVideo(context.getAssets());
         effects.loadImages(context.getAssets());
         entradaSuper = new EntradaSuper(context.getAssets());
         telaVitoria = new TelaVitoria(context.getAssets());
@@ -4337,6 +4342,8 @@ public class GameView extends SurfaceView
             if (isSuperCinematicActive()) drawSuperDarkness(canvas, renderZoom, cameraLeft, renderCameraTop);
             // SHINKAI Clash: a tela escurece atrás dos dois (antes de qualquer corpo).
             confronto.desenharFundo(canvas);
+            // A cena em vídeo da cinemática: os dois lutadores num vídeo só, no lugar deles.
+            cenaEmVideo = cenaVideo.pronta(cinematica.video());
             // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
             canvas.save();
             canvas.translate(tagOffset(), 0f);
@@ -4384,6 +4391,8 @@ public class GameView extends SurfaceView
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
+            if (cenaEmVideo) drawCenaVideo(canvas);
+            cenaEmVideo = false;
             drawUltraArms(canvas);
             for (int i = 0; i < 2; i++) {
                 riscosLutadores[i] = engine.fighter(i);
@@ -5694,7 +5703,7 @@ public class GameView extends SurfaceView
 
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
-        if (hiddenByUltra(f)) return;
+        if (hiddenByUltra(f) || cenaEmVideo) return;
         // A liberação do SHINKAI em vídeo já desenha o lutador (no efeito).
         if (ativacaoEfeito && ativacaoShinkai() && f == engine.fighter(ativacaoLado)) return;
         float zanzoken = zanzokenAlpha(f);
@@ -6410,6 +6419,18 @@ public class GameView extends SurfaceView
         telao.gravar(lugar, r.character(), r.motion.clip, r.motion.frame(), x, fighterVisualY(f), f.facing);
     }
 
+    /**
+     * A cena em vídeo no chão, no meio dos dois lutadores (que ficam escondidos). Espelha quando
+     * quem está à esquerda no vídeo está à direita na luta.
+     */
+    private void drawCenaVideo(Canvas c) {
+        CombatFighter p = player(), o = opponent();
+        float px = p.x + tagOffset(), ox = o.x + engine.teams.tagOffset(OPPONENT);
+        int esquerda = cinematica.videoEsquerda();
+        boolean espelhar = esquerda >= 0 && (esquerda == PLAYER ? px > ox : ox > px);
+        cenaVideo.desenhar(c, cinematica.video(), cinematica.videoMs(), CenaVideo.origemX(px, ox), GROUND_Y, espelhar);
+    }
+
     /** The partner behind the point: the assist doing its move, or the former point leaving. */
     private void drawPartner(Canvas c) {
         CombatFighter partner = partnerBody(engine.team(PLAYER));
@@ -6431,7 +6452,7 @@ public class GameView extends SurfaceView
      * junto com o achatar da aterrissagem.
      */
     private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
-        if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f) return;
+        if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || cenaEmVideo) return;
         float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
         float half = 43f * k * renderer.animacao.pose().escalaX;
@@ -7406,6 +7427,8 @@ public class GameView extends SurfaceView
         if (luta.cinematica != null && temporada != null && !cinematica.carregar(temporada, luta.cinematica, irmao)) {
             Log.w(LOG_TAG, "cinemática " + luta.cinematica + " não abriu");
         }
+        // As cenas em vídeo da cinemática (folhas grandes): lidas agora, numa thread à parte.
+        cenaVideo.carregar(cinematica.videos());
         if (cinematica.ativa()) {
             // Quem luta pode falar na cena: sem retrato da história, com o rosto da seleção.
             for (int side = 0; side < 2; side++) {
@@ -7685,6 +7708,7 @@ public class GameView extends SurfaceView
     private void descarregarConversa() {
         conversa.descarregar();
         cinematica.descarregar();
+        cenaVideo.soltar();
         cinematicaDirector.parar();
         cinematicaFim = null;
         trocaProtegendo = false;

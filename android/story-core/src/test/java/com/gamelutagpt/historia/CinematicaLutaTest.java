@@ -3,6 +3,7 @@ package com.gamelutagpt.historia;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
@@ -361,6 +363,66 @@ public class CinematicaLutaTest {
         assertEquals("a luta volta à velocidade normal", 1f, cena.velocidade(), 1e-3f);
         assertEquals("a câmera volta", 1f, cena.zoom(), 1e-3f);
         return palco;
+    }
+
+    /**
+     * A briga dos irmãos (Prólogo) em vídeo, nas duas campanhas: o qt1 em loop enquanto o QTE
+     * pede, o qt2 emendado no fim da volta, o qt1 de novo e o soco final do qt3, que congela.
+     * Ninguém bate de verdade (os QTE são "golpe": "nenhum") e o vídeo espelha pelo lado do Kōga.
+     */
+    @Test
+    public void brigaDosIrmaosEmVideo() throws IOException {
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            Temporada temporada = Temporada.load(FILES);
+            ConversaLuta conversa = new ConversaLuta(FILES);
+            Palco palco = new Palco();
+            CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, conversa, palco);
+            assertTrue(cena.carregar(temporada, "ep00/cinematica_briga.json", irmao));
+            assertEquals(new java.util.HashSet<>(java.util.Arrays.asList("ep00/qt1", "ep00/qt2", "ep00/qt3")),
+                new java.util.HashSet<>(cena.videos()));
+            for (String v : cena.videos()) {
+                assertTrue("sem a folha de " + v, new File(ASSETS, "historia/" + v + "/folha.webp").isFile());
+            }
+            assertNull("sem vídeo antes da cena", cena.video());
+            assertTrue(cena.gatilho(1f, 0.5f, 12f, false));
+            int lado = Torneio.KOGA.equals(irmao) ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL;
+            List<String> sequencia = new ArrayList<>();
+            boolean congelouNoSoco = false;
+            int quadrosNoQte = 0;
+            PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
+            for (int i = 0; i < 60 * 90 && !cena.acabou(); i++) {
+                palco.quadro();
+                cena.update(DT);
+                conversa.update(DT);
+                cena.render(canvas);
+                String v = cena.video();
+                if (v != null && (sequencia.isEmpty() || !v.equals(sequencia.get(sequencia.size() - 1)))) {
+                    sequencia.add(v);
+                    assertTrue(v + " começa do começo (emendado na pose da guarda): " + cena.videoMs(), cena.videoMs() < 120f);
+                }
+                if (v != null) assertEquals("o Kōga é quem está à esquerda no vídeo", lado, cena.videoEsquerda());
+                congelouNoSoco |= "ep00/qt3".equals(v) && cena.velocidade() == 0f && cena.videoMs() > 1300f;
+                if (!cena.qtePedindo()) {
+                    quadrosNoQte = 0;
+                    continue;
+                }
+                quadrosNoQte++;
+                if (cena.qteTipo() == CinematicaLuta.TipoQte.MARTELAR && quadrosNoQte % 4 == 0) {
+                    cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 400f);
+                    cena.toque(CinematicaLuta.TOQUE_SOBE, 640f, 400f);
+                } else if (cena.qteTipo() == CinematicaLuta.TipoQte.TEMPO && quadrosNoQte == Math.round(cena.qteSegundos() * 60f)) {
+                    cena.botao();
+                }
+            }
+            assertTrue(irmao + ": a cena termina", cena.acabou());
+            assertEquals(Arrays.asList("ep00/qt1", "ep00/qt2", "ep00/qt1", "ep00/qt3"), sequencia);
+            assertTrue("o soco do qt3 congela", congelouNoSoco);
+            assertEquals("interrompida", palco.vencedor);
+            for (String pedido : palco.pedidos) {
+                assertFalse("ninguém bate de verdade: " + pedido, pedido.matches("(jogador|rival) (2?[LMH]|S\\d?)( final)?"));
+            }
+            assertTrue("a tinta cobre o soco (a pag5 começa nele)", cena.telaCoberta());
+        }
     }
 
     /** O QTE precisa do controle travado (quem bate é o roteiro). */
