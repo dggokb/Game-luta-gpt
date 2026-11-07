@@ -294,6 +294,24 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
    (`arvores_dentro.png`, vento mais fraco; o templo e as portas não mexem). As lanternas do
    portão ficam num poste e não balançam; as borlas vermelhas embaixo delas sim (recortadas pela
    cor, `borla_1/2.png`, com `"pendulos"`; atrás, o poste continuado de cima para baixo).
+7. **Planos** (`tools/stage/planos_yinlu.py`, chamado pelo `animar_yinlu.py`): num plano só, o céu,
+   as árvores e o muro andavam juntos (parecia uma foto), e no super pulo aparecia o céu esticado
+   em cima das copas cortadas. O Codex trabalha em duas metades do topo do panorama (2248 px cada,
+   400 de sobra, reduzidas para 1672 de largura) e cada metade volta com Real-ESRGAN x2; o
+   `tools/stage/juntar_metades.py` junta as duas por um caminho que passa pelo céu (degradê deixava
+   folhas fantasmas, corte reto cortava galho):
+   - `prompt_10_alto.txt`: a metade embaixo e cinza em cima → as copas e o céu continuados para cima
+     → `10_alto_4096.webp` (565 linhas acima da pintura; da linha 0 para baixo, a pintura mesma);
+   - `prompt_11_sem_muro.txt` → `11_sem_muro_4096.webp`: as árvores sem o muro, com tronco e chão;
+   - `prompt_12_so_ceu.txt` → `12_so_ceu_4096.webp`: só o céu, com as nuvens inteiras;
+   - `prompt_13_muro_verde.txt`: o muro e o portão sobre verde; `alinhar_mascara.py` dá
+     `13_mascara_muro_4096.png`.
+
+   Ficam quatro planos: **céu** (degradê, 30000), **nuvens** (do "só céu", separadas do azul pela
+   saturação, a 3500, andando com `"deriva": 20`), **árvores** (a pintura onde aparecem, o "sem
+   muro" atrás do muro e do portão, a 1000, com o vento) e a **parede** (`parede.png`: os mesmos
+   pixels de antes, com o alfa do molde). A parede continua nas linhas de antes (as lanternas, as
+   borlas e as árvores de dentro do portão não mudaram de lugar).
 
 Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
 (mais fundo), a parede opaca os cobria.

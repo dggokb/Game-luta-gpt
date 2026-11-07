@@ -8,9 +8,9 @@ concept sem os pilares (``art/stages/dojo_yinlu/9_panorama_4096.webp``).
 * **raios de sol**: fachos de luz entre as árvores, em duas imagens que cruzam uma na outra
   (``"onda"`` em fase oposta), como o sol passando pelas folhas que o vento mexe;
 * **poeira**: grãos dourados de pó flutuando na luz;
-* **vento nas árvores**: as copas viram a camada ``arvores`` (recortadas da parede, que fica com
-  o céu no lugar delas) com ``"vento"``: o tronco parado, os galhos como molas que o vento empurra
-  para um lado e que voltam devagar, e as folhas indo junto com o galho;
+* **planos** (``planos_yinlu.py``, rodado antes): céu, nuvens andando, árvores e muro separados;
+* **vento nas árvores**: o plano das árvores ganha ``"vento"``: o tronco parado, os galhos como
+  molas que o vento empurra para um lado e que voltam devagar, e as folhas indo junto;
 * **borlas**: as lanternas do portão ficam num poste (paradas); as borlas vermelhas penduradas
   embaixo delas balançam com o vento (``"pendulos"`` no ``"vento"``), presas pelo cordão;
 * **árvores do pátio de dentro**: as copas vistas pelo portão, com o mesmo vento, mais fraco;
@@ -26,6 +26,8 @@ import cv2
 import numpy as np
 from PIL import Image
 
+import planos_yinlu
+
 AQUI = Path(__file__).resolve().parent
 PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/dojo_yinlu"
 # (x, y, raio) em px da parede: as janelas das lanternas de pedra e as lanternas do portão.
@@ -39,9 +41,6 @@ DENTRO_AMP = 0.035
 RAIOS = [(330, 4), (900, -2), (1500, 5), (2620, -4), (3150, 3), (3720, -3)]   # (x no alto, graus)
 ANGULO = 24          # graus: o sol vem do alto à esquerda
 ALFA_RAIO = 0.5
-TELHADO = 708        # linha da parede onde fica o telhado do muro: as árvores ficam acima dela
-ARVORE_TOPO = 250    # acima disso é o céu esticado (borrado), que não mexe
-PORTAO = (1620, 500, 2470, TELHADO)   # o telhado do portão não balança
 VENTO_GRUPOS = 28    # galhos (molas)
 VENTO_AMP = 0.0085   # deslocamento na ponta, em fração da altura da imagem das árvores
 
@@ -92,53 +91,35 @@ def posicao(parede, w, h, x0, y0, x1, y1):
             "x": round(cx / 1280.0, 5)}
 
 
-def arvores(img, pasta, parede, w, h):
-    """Recorta as copas da parede numa camada com vento e põe o céu no lugar delas."""
-    b, g, r = [img[..., i].astype(np.int16) for i in range(3)]
-    ceu = (b > r + 35) & (b > g + 10)
-    nuvem = (b > 200) & (g > 200) & (r > 200) & (np.abs(b - r) < 40)
-    arv = (~ceu & ~nuvem).astype(np.uint8)
-    arv[:ARVORE_TOPO] = 0
-    arv[TELHADO - 3:] = 0
-    x0, y0, x1, y1 = PORTAO
-    arv[y0:y1, x0:x1] = 0
-    arv = cv2.morphologyEx(arv, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+def vento_arvores(pasta, camada, h):
+    """O vento no plano das árvores (``arvores.png`` do ``planos_yinlu.py``): os troncos (a
+    madeira grossa da metade de baixo) não mexem, os galhos são molas e as folhas vão junto."""
+    rgba = cv2.imread(str(pasta / camada["imagem"]), cv2.IMREAD_UNCHANGED)
+    hh, w = rgba.shape[:2]
+    b, g, r = [rgba[..., i].astype(np.int16) for i in range(3)]
+    arv = (rgba[..., 3] > 128).astype(np.uint8)
     folha = ((g > b + 25) & (g > r * 0.75)).astype(np.uint8) & arv
     madeira = arv & (1 - folha)
     tronco = cv2.morphologyEx(madeira, cv2.MORPH_OPEN, np.ones((15, 15), np.uint8))
     n, lab, st, _ = cv2.connectedComponentsWithStats(tronco, 8)
     tronco = np.isin(lab, [i for i in range(1, n) if st[i, 4] > 1200]).astype(np.uint8)
-    tronco[: (ARVORE_TOPO + TELHADO) // 2] = 0
-    # Alcance: 0 no tronco, 1 na ponta dos galhos; some perto do portão, do telhado e do céu borrado.
+    tronco[: hh // 2] = 0
+    tronco[hh - 60:] = 1                                  # o pé (atrás do muro) fica parado
     alcance = np.clip(cv2.distanceTransform(1 - tronco, cv2.DIST_L2, 5) / 380.0, 0, 1) ** 1.2
-    portao = np.zeros_like(arv); portao[y0:y1, x0:x1] = 1
-    alcance *= np.clip(cv2.distanceTransform(1 - portao, cv2.DIST_L2, 5) / 100.0, 0, 1)
-    yy = np.arange(h, dtype=np.float32)[:, None]
-    alcance *= np.clip((yy - ARVORE_TOPO) / 80.0, 0, 1) * np.clip((TELHADO - yy) / 40.0, 0, 1)
-    sem = tirar(img, arv)
-    # A camada: só a faixa das árvores, com o alfa macio.
-    a = cv2.GaussianBlur(arv.astype(np.float32), (0, 0), 0.8)
-    rgba = np.dstack([img[..., 2], img[..., 1], img[..., 0], (a * 255).astype(np.uint8)])[ARVORE_TOPO:TELHADO]
-    Image.fromarray(rgba, "RGBA").save(pasta / "arvores.png", optimize=True)
-    hh = TELHADO - ARVORE_TOPO
-    cols, rows = 96, 12
-    al = alcance[ARVORE_TOPO:TELHADO]
-    al = cv2.GaussianBlur(al, (0, 0), 20)
+    cols, rows = 96, 30
+    al = cv2.GaussianBlur(alcance, (0, 0), 20)
     reach = [round(float(al[min(hh - 1, int(j * hh / rows)), min(w - 1, int(i * w / cols))]), 3)
              for j in range(rows + 1) for i in range(cols + 1)]
-    ys, xs = np.nonzero(arv[ARVORE_TOPO:TELHADO])
-    pts = np.float32(np.column_stack([xs, ys]))[::25]
+    ys, xs = np.nonzero(arv & (alcance > 0.2).astype(np.uint8))
+    pts = np.float32(np.column_stack([xs, ys]))[::40]
     _, _, cent = cv2.kmeans(pts, VENTO_GRUPOS, None, (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.5),
                             3, cv2.KMEANS_PP_CENTERS)
     rng = np.random.default_rng(5)
-    grupos = [[round(float(cx / w), 4), round(float(cy / hh), 4)] for cx, cy in cent]
-    freq = [round(float(f), 3) for f in rng.uniform(0.45, 0.7, VENTO_GRUPOS)]
-    t, b_ = parede["topo"], parede["base"]
-    return sem, {"id": "arvores", "imagem": "arvores.png", "profundidade": round(parede["profundidade"] - 0.3, 1),
-                 "topo": round(t + (b_ - t) * ARVORE_TOPO / h, 4), "base": round(t + (b_ - t) * TELHADO / h, 4),
-                 "x": parede["x"], "repetir": "espelhar",
-                 "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
-                           "amplitude": VENTO_AMP * h / hh, "amortecimento": 0.35, "raio": 0.018}}
+    camada["vento"] = {"colunas": cols, "linhas": rows, "alcance": reach,
+                       "grupos": [[round(float(cx / w), 4), round(float(cy / hh), 4)] for cx, cy in cent],
+                       "freq": [round(float(f), 3) for f in rng.uniform(0.45, 0.7, VENTO_GRUPOS)],
+                       # o mesmo deslocamento de antes (8 px da parede na ponta), nesta altura
+                       "amplitude": round(VENTO_AMP * h / hh, 5), "amortecimento": 0.35, "raio": 0.018}
 
 
 def arvores_dentro(img, pasta, parede, w, h):
@@ -237,6 +218,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", type=Path, default=PASTA)
     pasta = ap.parse_args().pasta
+    planos_yinlu.montar(pasta)       # céu, nuvens, árvores e muro, sempre da pintura inteira
     stage_path = pasta / "stage.json"
     stage = json.loads(stage_path.read_text(encoding="utf-8"))
     parede = next(c for c in stage["camadas"] if c["id"] == "parede")
@@ -244,22 +226,16 @@ def main():
     parede["luzes"] = [{"x": round(x / w, 4), "y": round(y / h, 4), "raio": round(r / h, 4),
                         "cor": "#FFC860", "pulsar": 0.12, "reflexo": False} for x, y, r in LANTERNAS]
     raios(pasta, w, h, 960)
-    # A parede com as árvores pintadas: recém-saída do cenario_pintura.py (sem a camada "arvores"
-    # ainda), vai para a pasta de arte; senão volta de lá (para recortar sempre da pintura inteira).
-    inteira = AQUI.parents[1] / "art/stages/dojo_yinlu/parede_com_arvores.jpg"
-    if any(c["id"] == "arvores" for c in stage["camadas"]):
-        (pasta / parede["imagem"]).write_bytes(inteira.read_bytes())
-    else:
-        inteira.write_bytes((pasta / parede["imagem"]).read_bytes())
-    camadas = [c for c in stage["camadas"] if not c["id"].startswith(("raios-", "arvores", "lanterna-", "borla-"))]
-    img = cv2.imread(str(pasta / parede["imagem"]))
-    img, camada = arvores(img, pasta, parede, w, h)
-    camadas.append(camada)
+    camadas = [c for c in stage["camadas"] if c["id"] not in ("arvores", "arvores-dentro")
+               and not c["id"].startswith(("raios-", "lanterna-", "borla-"))]
+    vento_arvores(pasta, next(c for c in camadas if c["id"] == "arvores-plano"), h)
+    rgba = cv2.imread(str(pasta / parede["imagem"]), cv2.IMREAD_UNCHANGED)
+    img = rgba[..., :3].copy()
     img, camada = arvores_dentro(img, pasta, parede, w, h)
     camadas.append(camada)
     img, novas = borlas(img, pasta, parede, w, h)
     camadas += novas
-    cv2.imwrite(str(pasta / parede["imagem"]), img, [cv2.IMWRITE_JPEG_QUALITY, 92])
+    cv2.imwrite(str(pasta / parede["imagem"]), np.dstack([img, rgba[..., 3]]))
     for nome, fase in (("a", 0.0), ("b", 3.1416)):
         camadas.append({"id": f"raios-{nome}", "imagem": f"raios_{nome}.png",
                         "profundidade": round(parede["profundidade"] - 0.5, 1), "topo": parede["topo"],
