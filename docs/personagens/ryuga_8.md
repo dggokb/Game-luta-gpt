@@ -22,6 +22,10 @@ o Kōga joga com o Kōga 8 anos contra ele (`historia/ep00/episodio.json`, passo
   - dash: um ciclo da passada em loop pela distância (como o do Kōga 8 anos); backdash no tempo
     do motor (30 quadros), não no do vídeo;
   - L: no vídeo o braço fica esticado até o fim, então a volta é a ida de trás para a frente;
+  - H: no vídeo ele dá um passinho com o pé de apoio; `fixar: pe` deixa o pé de trás no lugar
+    do idle (o chute no eixo);
+  - S2: com a câmera do vídeo (os pés não deslizam na queda); o passo para a frente quem anda é o
+    motor, e a `rampa` desconta o mesmo do desenho;
   - 2L, 2M, 2H: do agachado ao agachado, com `deslocar` 9 (o agachado do vídeo fica 30 px à
     frente da guarda em pé, a mesma posição do agachar).
 - **S1 "Fumacinha"** (↓↘→): o vídeo inteiro, 1,3x mais rápido que ele (4 s): carrega, empurra a palma com o

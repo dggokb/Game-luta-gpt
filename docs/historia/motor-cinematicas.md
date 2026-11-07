@@ -289,7 +289,7 @@ as faixas, a tinta, os letreiros e o QTE continuam por cima.
 | `repetir` | em loop (a ação não espera: o QTE seguinte pede por cima do vídeo) |
 | `esquerda` | quem está à esquerda no vídeo (`ryuga`, `koga`, `jogador`, `rival`): o vídeo espelha quando esse lutador está à direita na luta, então a mesma cena vale para as duas campanhas |
 | `emendar` | com um loop na tela, o vídeo novo espera a volta do loop acabar (os vídeos começam e acabam na mesma pose: a troca não pula). Com `semEsperar`, a cena segue quando ele começa (os letreiros marcam os golpes pelo tempo do vídeo) |
-| `ritmo` | quantas vezes mais rápido que o vídeo ele toca (padrão 1; a troca de golpes da briga dos irmãos toca a 1,3) |
+| `ritmo` | quantas vezes mais rápido que o vídeo ele toca (padrão 1; na briga dos irmãos a troca de golpes toca a 1,8 e a queda a 1,7) |
 | `parar` | tira o vídeo (os lutadores voltam) |
 
 O vídeo anda no ritmo da luta: para na congelada de um impacto, fica lento na câmera lenta e
@@ -322,7 +322,7 @@ com os três vídeos dos meninos do Drive (`ryuga_8/qt1`, `qt2`, `qt3`):
 | Momento | O que acontece |
 |---|---|
 | Um dos dois com 50% | câmera lenta, faixas; a tinta cobre e sai com o **qt1** em loop (os dois trocando golpes e errando); o Dafu: "Ei, ei! Devagar, meninos!" |
-| TROCA DE GOLPES! (martelar 14, em 4,2 s; o qt1 toca a 1,3x e repete enquanto o QTE espera) | PÁ! PÁ! PÁ!; no fim da volta do loop entra o **qt2** (se acertam e caem), com PAH!, POW!, BAM!, TUM! nos golpes do vídeo |
+| TROCA DE GOLPES! (martelar 14, em 4,2 s; o qt1 toca a 1,8x e repete enquanto o QTE espera; o qt2 a 1,7x) | PÁ! PÁ! PÁ!; no fim da volta do loop entra o **qt2** (se acertam e caem), com PAH!, POW!, BAM!, TUM! nos golpes do vídeo |
 | — | a tinta cobre e sai com o qt1 de novo; a câmera chega perto |
 | GOLPE FINAL! (tempo) | no fim da volta entra o **qt3**: o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
 

@@ -18,16 +18,16 @@
     "motivo": "mesma escala dos outros vídeos do Ryūga 8 anos (medida no idle)",
     "quadros": "8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96",
     "largura": 288,
-    "raiz": "101,238",
+    "raiz": "147,238",
     "colunas": 7,
-    "fixar": "video",
+    "fixar": "pe",
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2
   },
   "frameWidth": 576,
   "frameHeight": 512,
-  "rootX": 202,
+  "rootX": 294,
   "rootY": 476,
   "pixelScale": 2.0
 }

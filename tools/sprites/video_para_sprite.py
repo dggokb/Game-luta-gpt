@@ -387,7 +387,7 @@ def parser():
                    help="remove poeira cinza-esverdeada na faixa dos pés (seguro com cabelo claro e pele)")
     p.add_argument("--colunas", type=int, default=8)
     p.add_argument("--raiz", default="128,238")
-    p.add_argument("--fixar", choices=["tronco", "volta", "quadro", "registro", "video"], default="tronco",
+    p.add_argument("--fixar", choices=["tronco", "volta", "quadro", "registro", "video", "pe"], default="tronco",
                    help="tronco: anula o deslizamento lateral; quadro: cada quadro no próprio tronco "
                         "(o jogo é que empurra, ex.: defesa); registro: idem, com o tronco medido como "
                         "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo; "
@@ -433,7 +433,7 @@ def parser():
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--rampa", default=None,
-                   help="DX,ATE: desloca os quadros aos poucos, de 0 no primeiro a DX px da célula no "
+                   help="DX,ATE[,DESDE]: desloca os quadros aos poucos, de 0 no quadro DESDE (padrão 0) a DX px da célula no "
                         "quadro ATE (e DX dali em diante); emenda clipes de vídeos diferentes (a queda "
                         "deitada no lugar em que o vídeo do levantar começa)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -603,13 +603,22 @@ def main(argv=None):
     elif args.fixar == "registro":
         xs = np.array([registration_x(k) for k in keyed])
         offsets = -(xs - xs[0])
+    elif args.fixar == "pe":
+        # O pé de trás (o mais à esquerda: o personagem olha para a direita) fica onde está no
+        # 1º quadro do vídeo: o golpe que dá um passinho no vídeo fica no eixo do idle.
+        def pe_de_tras(k):
+            a = k[..., 3] > 128
+            base = int(np.nonzero(a.any(1))[0].max())
+            return float(np.nonzero(a[max(0, base - 25):base + 1].any(0))[0].min())
+        p0 = pe_de_tras(keyed_frame(0, args.sem_poeira))
+        offsets = -(np.array([pe_de_tras(k) for k in keyed]) - p0)
     else:
         offsets = np.zeros(len(xs))
     # Chão e posição de referência vêm do 1º quadro do vídeo (a imagem inicial): poses no
     # ar ficam acima do chão e todos os clipes do personagem se alinham entre si.
     first = keyed_frame(0, args.sem_poeira)
     foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
-    ref_x = torso_x(first) if args.fixar == "video" else xs[0]
+    ref_x = torso_x(first) if args.fixar in ("video", "pe") else xs[0]
     # Densidade d: a folha sai d vezes maior em px (célula, raiz, borda), mesma geometria lógica.
     d = args.densidade
     rx, ry = (int(v) for v in args.raiz.split(","))
@@ -644,8 +653,9 @@ def main(argv=None):
             img = sharpen(img, d)
         x = rx - round((ref_x - off) * s)
         if args.rampa:
-            rdx, ate = (float(v) for v in str(args.rampa).split(","))
-            x += round(rdx * min(1.0, n / max(1.0, ate)) * d)
+            r = [float(v) for v in str(args.rampa).split(",")]
+            rdx, ate, desde = r[0], r[1], (r[2] if len(r) > 2 else 0.0)
+            x += round(rdx * min(1.0, max(0.0, n - desde) / max(1.0, ate - desde)) * d)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
         y = ry - round(bottom * s)
         if args.cabeca_em is not None:

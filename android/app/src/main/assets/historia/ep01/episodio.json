@@ -75,7 +75,7 @@
     ] },
 
     { "tipo": "luta", "rotulo": "TREINO", "cenario": "dojo_shinshinkan", "dupla": "jogador", "cpu": "rival", "solo": true, "repetirSeDerrota": false,
-      "cinematica": "ep01/cinematica_treino.json" },
+      "semShinkai": true, "cinematica": "ep01/cinematica_treino.json" },
 
     { "tipo": "pagina", "imagem": "pag7.jpg", "quadros": [
       {"area": [0.999, 0.0, 0.999, 0.303, 0.0, 0.301, 0.0, 0.0], "efeitos": ["velocidade", "zoom"]},

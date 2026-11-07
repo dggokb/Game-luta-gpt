@@ -44,19 +44,19 @@
     }
   },
   "special_s2": {
-    "_doc": "S2 (Chute desastrado): o vídeo inteiro no tempo dele: o passo para a frente, o chute alto (encosta no quadro 22 do vídeo), ele perde o equilíbrio, cai no chão, fica deitado e se levanta. O corpo fica no lugar na folha e quem anda é o motor (o passo do vídeo, ~80 px).",
+    "_doc": "S2 (Chute desastrado): o vídeo inteiro no tempo dele: o passo para a frente, o chute alto (encosta no quadro 22 do vídeo), ele perde o equilíbrio, cai no chão, fica deitado e se levanta. Com a câmera do vídeo (os pés não deslizam na queda); o passo (quadros 8-22 do vídeo, ~82 px) quem anda é o motor (pancadas.json avanço 4-11), e a rampa desconta o mesmo do desenho.",
     "trechos": [
       [
         "s2",
         0,
-        124,
-        "fixo_corpo"
+        124
       ]
     ],
     "quadros": "0-122/2",
     "opcoes": {
       "fixar": "video",
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "rampa": "-82,11,4"
     },
     "animacoes": {
       "SPECIAL_S2": {
@@ -246,7 +246,7 @@
     }
   },
   "heavy_straight": {
-    "_doc": "H: o chute alto do vídeo (8-96), com o rastro, pés plantados.",
+    "_doc": "H: o chute alto do vídeo (8-96), com o rastro. No vídeo ele dá um passinho com o pé de apoio (~120 px para a frente e de volta): fixar pe deixa o pé de trás no lugar do idle, o chute no eixo.",
     "trechos": [
       [
         "H",
@@ -256,7 +256,7 @@
     ],
     "quadros": "8-96/4",
     "opcoes": {
-      "fixar": "video",
+      "fixar": "pe",
       "manter_efeitos": true
     },
     "animacoes": {
