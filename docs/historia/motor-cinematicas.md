@@ -135,6 +135,7 @@ novo).
 | `qte` | `tipo`, `texto`, `golpe`, `dano`, `final`, `erro`, `impacto`... ([abaixo](#qte)) | um quick time event | o jogador acertar e o golpe acabar |
 | `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
+| `clarao` | `segundos` (padrão 0,3), `cor` (padrão `#FFFFFF`) | clarão de impacto: a tela fica da cor e volta à luta (some mais rápido no começo). Esconde um corte, como o golpe que pega no anime | `segundos` |
 | `video` | `clipe` (`<episódio>/<nome>`), `repetir`, `esquerda`, `emendar`, ou `parar` ([abaixo](#cena-em-vídeo)) | os dois lutadores num vídeo só, no chão da luta e no lugar deles | `repetir`: nada; senão o vídeo acabar (com `emendar` + `semEsperar`: o vídeo começar) |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
@@ -323,8 +324,7 @@ com os três vídeos dos meninos do Drive (`ryuga_8/qt1`, `qt2`, `qt3`):
 |---|---|
 | Um dos dois com 50% | câmera lenta, faixas; a tinta cobre e sai com o **qt1** em loop (os dois trocando golpes e errando); o Dafu: "Ei, ei! Devagar, meninos!" |
 | TROCA DE GOLPES! (martelar 14, em 4,2 s; o qt1 toca a 1,8x e repete enquanto o QTE espera; o qt2 a 1,7x) | PÁ! PÁ! PÁ!; no fim da volta do loop entra o **qt2** (se acertam e caem), com PAH!, POW!, BAM!, TUM! nos golpes do vídeo |
-| — | a tinta cobre e sai com o qt1 de novo; a câmera chega perto |
-| GOLPE FINAL! (tempo) | no fim da volta entra o **qt3**: o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
+| GOLPE FINAL! (tempo) | o qt2 fica parado no fim (o Kōga sentado, o Ryūga de pé) com a câmera chegando perto; no acerto, um **clarão** e o **qt3** entra por baixo dele (ele começa parado em guarda: o corte some no branco): o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
 
 A cena é a mesma nas duas campanhas: o Kōga é quem está à esquerda nos vídeos, e o vídeo
 espelha quando ele está à direita (campanha do Ryūga). Para ver no PC:

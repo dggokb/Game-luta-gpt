@@ -367,7 +367,8 @@ public class CinematicaLutaTest {
 
     /**
      * A briga dos irmãos (Prólogo) em vídeo, nas duas campanhas: o qt1 em loop enquanto o QTE
-     * pede, o qt2 emendado no fim da volta, o qt1 de novo e o soco final do qt3, que congela.
+     * pede, o qt2 emendado no fim da volta (fica parado no fim no GOLPE FINAL!) e o soco final do
+     * qt3, que entra no clarão e congela.
      * Ninguém bate de verdade (os QTE são "golpe": "nenhum") e o vídeo espelha pelo lado do Kōga.
      */
     @Test
@@ -415,7 +416,7 @@ public class CinematicaLutaTest {
                 }
             }
             assertTrue(irmao + ": a cena termina", cena.acabou());
-            assertEquals(Arrays.asList("ep00/qt1", "ep00/qt2", "ep00/qt1", "ep00/qt3"), sequencia);
+            assertEquals(Arrays.asList("ep00/qt1", "ep00/qt2", "ep00/qt3"), sequencia);
             assertTrue("o soco do qt3 congela", congelouNoSoco);
             assertEquals("interrompida", palco.vencedor);
             for (String pedido : palco.pedidos) {
