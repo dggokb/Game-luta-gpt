@@ -2,7 +2,7 @@
   "nome": "Dojo Liánwǔguǎn",
   "camera": {
     "distancia": 1000.0,
-    "horizonte": 0.2813,
+    "horizonte": 0.4517,
     "zoom": 0.8,
     "zoomNoPulo": false,
     "zoomRepouso": 0.948
@@ -33,10 +33,10 @@
     {
       "id": "parede",
       "imagem": "parede.jpg",
-      "profundidade": 109.8,
-      "topo": -0.3405,
-      "base": 0.7274,
-      "x": 0.5007,
+      "profundidade": 641.0,
+      "topo": -0.1891,
+      "base": 0.6564,
+      "x": 0.5044,
       "repetir": "espelhar",
       "corAcima": "#1F6FE0"
     }
@@ -44,13 +44,13 @@
   "chao": {
     "imagem": "chao.jpg",
     "perto": -3000,
-    "longe": 108.8,
-    "ate": 108.8,
+    "longe": 640.0,
+    "ate": 640.0,
     "reflexoLuzes": 0,
     "projecao": {
-      "topo": 0.7201,
-      "base": 1.4441,
-      "x": 0.5007
+      "topo": 0.646,
+      "base": 1.2207,
+      "x": 0.5044
     }
   },
   "petalas": {

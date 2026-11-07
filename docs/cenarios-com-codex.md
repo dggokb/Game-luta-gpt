@@ -261,26 +261,25 @@ python3 tools/stage/animar_coberta.py
 
 ## Dojo da Yin Lu (`stages/dojo_yinlu`)
 
-O mesmo caminho da Arena Coberta refeita, com o concept novo do pátio do 連武館
-(`art/stages/dojo_yinlu/`):
+O concept aprovado (o pátio com o portão do 連武館, `art/stages/dojo_yinlu/0_concept.png`) sem os dois
+pilares vermelhos dos lados (pilar com meio telhado não fazia sentido, e perto da câmera ele não
+funciona no canto). Tentativas descartadas na mesma pasta: galerias nos lados (2_, 4_), colunata (5_),
+só dois pilares (6_), concepts novos (7_).
 
-1. `prompt_1_limpar.txt`: o concept sem lutadores, HUD e botões, com céu e pátio completados →
-   `1_limpo.png`.
-2. `prompt_2_patio_inteiro.txt`: o pátio inteiro numa imagem só, com o limpo no meio como guia, fechado
-   nos lados por galerias cobertas (os pilares vermelhos com bandeiras e lanternas ficam nelas) →
-   `2_patio_b.png` (a versão escolhida; a A tinha as galerias vindo até a câmera, abaixo da base da
-   mureta, e o chão projetado as esticaria).
-3. Real-ESRGAN x2 e 4096 → `3_panorama_4096.webp`.
-4. Montagem (a escala pelo portão, que ocupa 38% da tela como no concept; o horizonte pelo emblema
-   do chão; a junção na base das galerias, abaixo da escada, para a base delas ficar na parede):
+1. `prompt_1_limpar.txt`: o concept sem lutadores, HUD e botões → `1_limpo.png`.
+2. `prompt_7_sem_pilar.txt`: sem os pilares, bandeiras, lanternas penduradas e beirais → `8_limpo_sem_pilar.png`.
+3. `prompt_8_estender_esq/dir.txt`: metade da tela e metade cinza, o muro, a mureta e o pátio
+   continuam retos (o Codex devolve a metade dada idêntica); `prompt_9_emenda.txt` fecha a emenda
+   da direita → `8_panorama_codex.png` (2 telas).
+4. Real-ESRGAN x2 e 4096 → `9_panorama_4096.webp`.
+5. Montagem (escala da tela do concept, horizonte pelo emblema do chão, junção no começo do pátio):
 
 ```
 D=android/app/src/main/assets/stages/dojo_yinlu; A=art/stages/dojo_yinlu
-python3 tools/stage/cenario_pintura.py $A/3_panorama_4096.webp $D --tela-px 2900 --centro 2046 \
-  --chao 1506 --anel-longe 1455 --anel-meia 156 --juncao 1432 --ceu-extra 300 --nitida \
+python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048 --centro 2039 \
+  --chao 801 --anel-longe 772 --anel-meia 139 --juncao 664 --ceu-extra 300 --nitida \
   --cor-acima '#1F6FE0' --nevoa '#CFE3F5' --zoom 0.8 --zoom-repouso 0.948 \
   --nome 'Dojo Liánwǔguǎn' --extra $A/stage_extra.json
 ```
 
 (e tirar a `poeira` que o script põe: de dia, as folhas caindo do `stage_extra.json` bastam).
-O cenário antigo em camadas (`tools/stage/montar_yinlu.py`) saiu.
