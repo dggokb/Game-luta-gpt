@@ -1,0 +1,6 @@
+{
+  "corFundo": "#070B1E",
+  "luzLutadores": {"cor": "#A8C4FF", "forca": 0.3, "brilho": 0.92, "pes": "#C0C8E0",
+                   "contraluz": {"cor": "#C8DCFF", "forca": 0.85, "direcao": [0, -1]}},
+  "sombraLutadores": {"alfa": 0.4, "cor": "#04060F", "suave": 0.5, "x": 0.0, "y": 0.22}
+}

@@ -1,156 +1,579 @@
 {
   "nome": "Terraço da Lua",
-  "_provisorio": "Montado com peças da Arena Central e da Arena Imperial até a arte do terraço chegar (prompt em tools/stage/terraco-da-lua.md).",
   "camera": {
-    "distancia": 1000,
-    "horizonte": 0.4
+    "distancia": 1000.0,
+    "horizonte": 0.5149,
+    "zoom": 0.8,
+    "zoomNoPulo": false,
+    "zoomRepouso": 0.948
   },
   "corFundo": "#070B1E",
-  "luzLutadores": { "cor": "#A8C4FF", "forca": 0.3, "brilho": 0.9, "pes": "#C0C8E0", "contraluz": { "cor": "#C8DCFF", "forca": 0.85, "direcao": [-1, -1] } },
+  "luzLutadores": {
+    "cor": "#A8C4FF",
+    "forca": 0.3,
+    "brilho": 0.92,
+    "pes": "#C0C8E0",
+    "contraluz": {
+      "cor": "#C8DCFF",
+      "forca": 0.85,
+      "direcao": [
+        0,
+        -1
+      ]
+    }
+  },
+  "sombraLutadores": {
+    "alfa": 0.4,
+    "cor": "#04060F",
+    "suave": 0.5,
+    "x": 0.0,
+    "y": 0.22
+  },
   "camadas": [
     {
       "id": "ceu",
-      "imagem": "ceu_lua.jpg",
-      "profundidade": 100000,
-      "topo": -0.75,
-      "base": 0.42,
-      "x": 0.42,
+      "imagem": "ceu.jpg",
+      "profundidade": 30000.0,
+      "topo": -1.19343,
+      "base": 0.6885,
+      "x": 0.5,
       "repetir": "espelhar",
-      "corAcima": "#0B1030"
-    },
-    {
-      "id": "noite",
-      "tipo": "neblina",
-      "profundidade": 90000,
-      "topo": 0.05,
-      "base": 0.46,
-      "cor": "#0A1030",
-      "alfa": 0.75
-    },
-    {
-      "id": "lua",
-      "imagem": "lua.png",
-      "profundidade": 80000,
-      "topo": 0.03,
-      "base": 0.19,
-      "x": 0.74,
-      "repetir": "nao",
+      "corAcima": "#060A1E",
       "luzes": [
         {
-          "x": 0.5,
-          "y": 0.5,
-          "raio": 1.1,
-          "cor": "#C8D4FF",
-          "pulsar": 0.03,
+          "x": 0.5039,
+          "y": 0.8118,
+          "raio": 0.0692,
+          "cor": "#BFD8FF",
+          "pulsar": 0.04,
           "reflexo": false
         }
       ]
     },
     {
-      "id": "mar-plano",
-      "tipo": "agua",
-      "imagem": "mar_plano.jpg",
-      "perto": 1620,
-      "longe": 8500,
-      "tamanho": 1300,
-      "corrente": 14,
-      "corLonge": "#0E1530",
-      "alfa": 1,
-      "brilhos": 70,
-      "sol": {
-        "x": 0.74,
-        "cor": "#DDE6FF",
-        "alfa": 0.55
-      }
+      "id": "nuvens",
+      "imagem": "nuvens.webp",
+      "profundidade": 12000.0,
+      "topo": -0.41219,
+      "base": 0.52097,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "deriva": 30.0
     },
     {
-      "id": "templo-longe",
-      "imagem": "templo_longe.png",
-      "profundidade": 8600,
-      "topo": 0.0,
-      "base": 0.45,
-      "x": 0.2,
-      "repetir": "nao"
-    },
-    {
-      "id": "neblina-longe",
-      "tipo": "neblina",
-      "profundidade": 6000,
-      "topo": 0.32,
-      "base": 0.47,
-      "cor": "#1E2250",
-      "alfa": 0.45
-    },
-    {
-      "id": "estadio",
-      "imagem": "arquibancada.png",
-      "profundidade": 5000,
-      "x": 0.72,
-      "repetir": "nao",
-      "luzes": [
-        {
-          "x": 0.5,
-          "y": 0.79,
-          "raio": 0.05,
-          "cor": "#FFC070",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.38,
-          "y": 0.82,
-          "raio": 0.05,
-          "cor": "#FFC070",
-          "pulsar": 0.05,
-          "reflexo": false
-        },
-        {
-          "x": 0.62,
-          "y": 0.82,
-          "raio": 0.05,
-          "cor": "#FFC070",
-          "pulsar": 0.05,
-          "reflexo": false
-        }
-      ],
-      "noChao": true,
-      "altura": 0.17
-    },
-    {
-      "id": "mureta",
-      "imagem": "barreira.png",
-      "profundidade": 1600,
-      "noChao": true,
-      "altura": 0.045,
+      "id": "fundo",
+      "imagem": "fundo.webp",
+      "profundidade": 6000.0,
+      "topo": -0.41219,
+      "base": 0.6885,
+      "x": 0.5,
       "repetir": "espelhar"
     },
     {
-      "id": "lanternas",
-      "imagem": "../arena_imperial/lanterna.png",
-      "profundidade": 1500,
-      "noChao": true,
-      "altura": 0.075,
-      "x": 0.14,
+      "id": "parede",
+      "imagem": "parede.webp",
+      "profundidade": 556.1,
+      "topo": -0.6726,
+      "base": 0.6885,
+      "x": 0.5,
       "repetir": "espelhar",
-      "periodo": 0.5,
       "luzes": [
         {
-          "x": 0.47,
-          "y": 0.33,
-          "raio": 0.18,
-          "cor": "#FFC878",
-          "pulsar": 0.06
+          "x": 0.0438,
+          "y": 0.7775,
+          "raio": 0.0073,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.0441,
+          "y": 0.9165,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.0444,
+          "y": 0.8258,
+          "raio": 0.0057,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.0456,
+          "y": 0.9427,
+          "raio": 0.0054,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.0524,
+          "y": 0.8092,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.0619,
+          "y": 0.8755,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.064,
+          "y": 0.819,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.1197,
+          "y": 0.9111,
+          "raio": 0.0061,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.1337,
+          "y": 0.8873,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.2065,
+          "y": 0.783,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.2068,
+          "y": 0.9237,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.2077,
+          "y": 0.8242,
+          "raio": 0.007,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.2115,
+          "y": 0.9897,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.2121,
+          "y": 0.9554,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.2241,
+          "y": 0.7985,
+          "raio": 0.0067,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.2242,
+          "y": 0.875,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.2252,
+          "y": 0.9605,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.2346,
+          "y": 0.9514,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.2687,
+          "y": 0.9337,
+          "raio": 0.0051,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.3246,
+          "y": 0.9606,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.3333,
+          "y": 0.9344,
+          "raio": 0.0051,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.3648,
+          "y": 0.7813,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.365,
+          "y": 0.9164,
+          "raio": 0.0073,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.3667,
+          "y": 0.9427,
+          "raio": 0.0054,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.3703,
+          "y": 0.9898,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.3711,
+          "y": 0.814,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.3818,
+          "y": 0.8393,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.3821,
+          "y": 0.88,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.3856,
+          "y": 0.8007,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.4436,
+          "y": 0.9605,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.4532,
+          "y": 0.9381,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.5001,
+          "y": 0.9693,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.5483,
+          "y": 0.9387,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.6153,
+          "y": 0.8199,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.6178,
+          "y": 0.8779,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.6284,
+          "y": 0.8123,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.6297,
+          "y": 0.9903,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.6339,
+          "y": 0.9373,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.6351,
+          "y": 0.7776,
+          "raio": 0.0067,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.6498,
+          "y": 0.9326,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.6674,
+          "y": 0.9379,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.6834,
+          "y": 0.8934,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.6993,
+          "y": 0.9603,
+          "raio": 0.008,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.7297,
+          "y": 0.9923,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.7303,
+          "y": 0.9373,
+          "raio": 0.0083,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.766,
+          "y": 0.9486,
+          "raio": 0.0089,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.7723,
+          "y": 0.7996,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.7759,
+          "y": 0.8774,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.7889,
+          "y": 0.9909,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.7936,
+          "y": 0.923,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.7936,
+          "y": 0.8338,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.7938,
+          "y": 0.7818,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.8079,
+          "y": 0.9605,
+          "raio": 0.0048,
+          "cor": "#FFC060",
+          "pulsar": 0.05,
+          "reflexo": true
+        },
+        {
+          "x": 0.8509,
+          "y": 0.8954,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.8651,
+          "y": 0.8867,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.8734,
+          "y": 0.9072,
+          "raio": 0.0045,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.9384,
+          "y": 0.8775,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.9384,
+          "y": 0.8408,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.9493,
+          "y": 0.8145,
+          "raio": 0.0054,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.9563,
+          "y": 0.7812,
+          "raio": 0.0077,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
         }
       ]
     }
   ],
   "chao": {
-    "imagem": "../arena_imperial/chao_placas.jpg",
-    "perto": -600,
-    "longe": 600,
-    "ate": 1600,
-    "centroX": 1300,
-    "reflexoLutadores": 0.15,
-    "reflexoLuzes": 0.5
+    "imagem": "chao.jpg",
+    "perto": -3000,
+    "longe": 555.1,
+    "ate": 555.1,
+    "reflexoLuzes": 0.8,
+    "projecao": {
+      "topo": 0.6781,
+      "base": 1.9073,
+      "x": 0.5
+    },
+    "reflexoLutadores": 0.3,
+    "reflexoComprimento": 0.4,
+    "reflexoImagem": "risco.png"
   }
 }

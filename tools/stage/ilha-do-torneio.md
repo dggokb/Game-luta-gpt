@@ -519,9 +519,11 @@ os penhascos, e o templo do Takatoshi no pico, pequeno. É onde Ryūga e Kōga c
 onde os agentes mascarados dos magnatas cercam os dois (o episódio bônus do documento da
 história, seção 7.1).
 
-**Provisório no jogo** (até a arte chegar): o `stage.json` usa cópias das peças antigas da
-Central (céu, templo ao longe, estádio, mureta, mar liso, na pasta do próprio terraço) e só tem uma imagem própria, a `lua.png`, recortada do `ceu_lua.jpg`. O céu ainda é
-o crepúsculo da Central escurecido por uma névoa, e o piso é o da Imperial.
+**No jogo hoje**: uma pintura só, no alto de um penhasco acima das nuvens (concept A aprovado,
+pintado inteiro pelo Codex), separada em céu, nuvens, fundo e terraço pelo
+`tools/stage/animar_terraco.py`; o passo a passo está em
+[docs/cenarios-com-codex.md](../../docs/cenarios-com-codex.md). A composição abaixo era a do
+plano de peças, antes da pintura.
 
 Composição: piso do terraço até 1600 (pedra escura, `reflexoLutadores` ~0,2), mureta 1600
 (fim do piso), postes de luz 1500 (`luzes`), mar em perspectiva de 1620 a 8500 (`agua`, com

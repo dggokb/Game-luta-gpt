@@ -380,3 +380,35 @@ ao vivo, a plateia dos dois prédios, as lanternas (as da mureta com reflexo no 
 duas cachoeiras e o vento nas folhas do bordo vermelho. Parede e montanhas em WebP sem perda (o
 PNG da parede passava de 9 MB). `lanterna.png` e `chao_placas.jpg` da arena antiga ficam: o Terraço
 da Lua usa.
+
+## Terraço da Lua (`stages/terraco_lua`)
+
+O cenário do ep07 (Sob a Mesma Lua: o Ryūga e o Kōga na véspera da final, depois os agentes). Era
+provisório (peças da Central e da Imperial). Arte em `art/stages/terraco_lua_pintura/`.
+
+1. Concepts na vista do jogo, no estilo da Imperial (`prompt_1_concept_a/b.txt`); pedido "mais
+   alto": o terraço no topo de um penhasco, acima das nuvens (`prompt_2_alto_a.txt`) → aprovado o
+   A, `2_alto_a.png`.
+2. Inteira (`prompt_3_inteira.txt`: o concept pequeno no meio, cinza em volta) → `3_inteira.png`;
+   Real-ESRGAN x2 → `7_panorama_4096.webp`.
+3. Molde do terraço (`prompt_4_terraco_verde.txt` → `8_mascara_terraco_4096.png`), céu sem as
+   nuvens (`prompt_7_ceu_limpo.txt` → `10_ceu_limpo_4096.webp`, saiu alinhado), sem o terraço
+   (`prompt_5_sem_terraco.txt` → `11_sem_terraco_4096.webp`: o Codex mudou o horizonte de lugar;
+   só o mar de nuvens dele entra, deslocado para o horizonte da pintura, atrás da mureta) e o chão
+   sem os riscos de luz (`prompt_6_chao_fosco.txt` → `12_chao_fosco_4096.webp`).
+
+```
+D=android/app/src/main/assets/stages/terraco_lua; A=art/stages/terraco_lua_pintura
+python3 tools/stage/cenario_pintura.py $A/7_panorama_4096.webp $D --tela-px 2048 --centro 2048 \
+  --chao 1358 --anel-longe 1322 --anel-meia 162 --juncao 1258 --horizonte 0.5149 --ceu-extra 300 \
+  --nitida --cor-acima '#060A1E' --nevoa '#101830' --zoom 0.8 --zoom-repouso 0.948 \
+  --nome 'Terraço da Lua' --extra $A/stage_extra.json --chao-largo $A/12_chao_fosco_4096.webp
+python3 tools/stage/animar_terraco.py
+```
+
+(o horizonte é o ponto de fuga das juntas do piso, linha 1068; o anel do mosaico dava 966). O
+`animar_terraco.py` separa céu (30000, com o brilho da lua), nuvens (12000, as da pintura mais
+claras que o céu limpo, `"deriva": 30`), fundo (6000: mar, mar de nuvens, ilhas, estádio e templo)
+e o terraço (`parede.webp`, mureta e postes com o alfa do molde); acende as lanternas (as da
+mureta com reflexo no chão, pelo motor). O céu vai até embaixo: no super pulo o fundo, mais
+perto, desce mais que o céu e abria uma faixa vazia entre os dois.
