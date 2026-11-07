@@ -11,8 +11,11 @@ céu, as árvores e o muro andando juntos: parecia uma foto). Fica:
   devagar com o vento (``"deriva"``);
 * **árvores** (``arvores.png``): as copas no meio do caminho (o vento nos galhos é do
   ``animar_yinlu.py``); atrás do muro e do portão, o que o Codex pintou sem eles;
-* **parede** (``parede.png``): o muro, o portão e o que se vê pelo portão, recortados pelo molde
-  verde, nos mesmos pixels de antes.
+* **mata** (``mata.png``): uma fileira de árvores mais longe e apagadas, nos vãos entre as copas;
+* **pátio** (``patio.jpg``): o pátio de dentro, pintado à parte mais largo que o vão do portão,
+  um pouco atrás do muro (pelo vão ele anda diferente do portão);
+* **parede** (``parede.png``): o muro e o portão, recortados pelo molde verde (e o vão do portão
+  pelo dele), nos mesmos pixels de antes.
 
 Em cima, as copas e o céu continuados pelo Codex (o topo da pintura cortava as copas; no super
 pulo aparecia o céu esticado). As imagens do Codex estão em ``art/stages/dojo_yinlu`` (prompts
@@ -34,7 +37,11 @@ PASTA = RAIZ / "android/app/src/main/assets/stages/dojo_yinlu"
 ALTO = 565            # linhas acima da pintura (o que o Codex continuou), em px do panorama
 EXTRA = 300           # o --ceu-extra do cenario_pintura.py: a linha 0 da parede é a -300 do panorama
 BASE = 674            # a última linha da parede (--juncao + 10)
+PROF_PATIO = 850.0    # o pátio de dentro, visto pelo vão do portão
 PROF_ARVORES = 1000.0
+PROF_MATA = 1800.0    # a mata ao longe, entre as árvores e as nuvens
+PATIO = (1800, 650, 2290, 900)   # px da parede: o retângulo do pátio pintado à parte
+MATA = (220, 560)     # linhas do panorama: o alto das copas da mata e o pé (atrás do muro)
 PROF_NUVENS = 3500.0
 PROF_CEU = 30000.0
 DERIVA = 20.0         # unidades do mundo por segundo
@@ -50,6 +57,14 @@ def salvar(caminho, rgba, metade=False):
     if metade:
         img = img.resize((img.width // 2, img.height // 2), Image.LANCZOS)
     img.save(caminho, optimize=True)
+
+
+def retangulo(parede, w, h, x0, y0, x1, y1):
+    """topo, base e x (frações da tela de repouso) de um retângulo da parede (px)."""
+    t, b = parede["topo"], parede["base"]
+    alt = (b - t) * 720.0
+    cx = parede["x"] * 1280.0 + ((x0 + x1) / 2 - w / 2) / h * alt
+    return {"topo": round(t + (b - t) * y0 / h, 5), "base": round(t + (b - t) * y1 / h, 5), "x": round(cx / 1280.0, 5)}
 
 
 def ceu_cor(img):
@@ -89,6 +104,12 @@ def montar(pasta):
     r0 = ALTO - EXTRA                                    # linha -300 do panorama no "alto"
     m[:] = muro[r0:r0 + hp].astype(np.float32) if muro.shape[0] >= r0 + hp else 0
     m[EXTRA + 640:] = 1                                  # o pé do muro e a mureta: sempre muro
+    # O vão do portão: transparente (o pátio de dentro é outra camada, um pouco mais longe).
+    px0, py0, px1, py1 = PATIO
+    vao = cv2.imread(str(ART / "15_mascara_vao.png"), cv2.IMREAD_GRAYSCALE) > 128
+    m[py0:py1, px0:px1][vao] = 0
+    patio = cv2.imread(str(ART / "14_patio.webp"))
+    cv2.imwrite(str(pasta / "patio.jpg"), patio, [cv2.IMWRITE_JPEG_QUALITY, 94])
     a = cv2.GaussianBlur(m, (0, 0), 0.7)
     rgba = np.dstack([pintada[..., 2], pintada[..., 1], pintada[..., 0], (a * 255).astype(np.uint8)])
     salvar(pasta / "parede.png", rgba)
@@ -144,7 +165,15 @@ def montar(pasta):
     rgba = np.dstack([cor[..., 2], cor[..., 1], cor[..., 0], an * 255])
     salvar(pasta / "nuvens.png", np.clip(rgba, 0, 255).astype(np.uint8), metade=True)   # macias
 
-    camadas = [c for c in stage["camadas"] if c["id"] not in ("ceu", "nuvens", "arvores-plano")]
+    # A mata ao longe: recortada do magenta, com a névoa da distância (puxando para o azul do céu).
+    mata = cv2.imread(str(ART / "16_mata.png"), cv2.IMREAD_UNCHANGED)
+    cor_ceu = linha[min(len(linha) - 1, ALTO + MATA[0])]
+    am = mata[..., 3:4].astype(np.float32) / 255
+    rgb = mata[..., :3].astype(np.float32) * 0.72 + cor_ceu * 0.28
+    salvar(pasta / "mata.png", np.dstack([np.clip(rgb[..., ::-1], 0, 255), am * 255]).astype(np.uint8),
+           metade=True)   # BGR → RGB
+
+    camadas = [c for c in stage["camadas"] if c["id"] not in ("ceu", "nuvens", "arvores-plano", "mata", "patio")]
     i = camadas.index(parede)
     camadas[i:i] = [
         {"id": "ceu", "imagem": "ceu.jpg", "profundidade": PROF_CEU, "topo": frac(-ALTO - mais),
@@ -152,12 +181,17 @@ def montar(pasta):
              int(v) for v in np.clip(topo[0][::-1], 0, 255))},
         {"id": "nuvens", "imagem": "nuvens.png", "profundidade": PROF_NUVENS, "topo": frac(-ALTO),
          "base": frac(BASE), "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA},
+        {"id": "mata", "imagem": "mata.png", "profundidade": PROF_MATA, "topo": frac(MATA[0]),
+         "base": frac(MATA[1]), "x": parede["x"], "repetir": "espelhar"},
         {"id": "arvores-plano", "imagem": "arvores.png", "profundidade": PROF_ARVORES, "topo": frac(-ALTO),
          "base": frac(BASE), "x": parede["x"], "repetir": "espelhar"},
+        {"id": "patio", "imagem": "patio.jpg", "profundidade": PROF_PATIO,
+         **retangulo(parede, W, hp, *PATIO)},
     ]
     stage["camadas"] = camadas
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"planos: céu {PROF_CEU:.0f}, nuvens {PROF_NUVENS:.0f}, árvores {PROF_ARVORES:.0f}, parede {parede['profundidade']}")
+    print(f"planos: céu {PROF_CEU:.0f}, nuvens {PROF_NUVENS:.0f}, mata {PROF_MATA:.0f}, árvores {PROF_ARVORES:.0f},"
+          f" pátio {PROF_PATIO:.0f}, parede {parede['profundidade']}")
 
 
 def main():

@@ -35,7 +35,6 @@ LANTERNAS = [(506, 836, 26), (1290, 836, 26), (2809, 836, 26), (3568, 836, 26),
              (1802, 773, 34), (2294, 773, 34)]
 BORLAS = [(1801, 792, 1814, 834), (2286, 792, 2299, 835)]   # embaixo das lanternas do portão
 BORLA_GRAUS = 16.0
-DENTRO = (1925, 728, 2165, 872)   # o vão do portão, entre as portas: as copas do pátio de dentro
 TEMPLO = (1974, 750, 2120, 872)   # o templo do fundo e a escada: não mexem
 DENTRO_AMP = 0.035
 RAIOS = [(330, 4), (900, -2), (1500, 5), (2620, -4), (3150, 3), (3720, -3)]   # (x no alto, graus)
@@ -122,46 +121,45 @@ def vento_arvores(pasta, camada, h):
                        "amplitude": round(VENTO_AMP * h / hh, 5), "amortecimento": 0.35, "raio": 0.018}
 
 
-def arvores_dentro(img, pasta, parede, w, h):
-    """As copas do pátio de dentro, vistas pelo vão do portão: a mesma mola dos galhos, mais
-    fraca (estão longe); paradas perto das portas e da verga, para não passar por cima delas."""
-    x0, y0, x1, y1 = DENTRO
-    q = img[y0:y1, x0:x1]
-    b, g, r = [q[..., i].astype(np.int16) for i in range(3)]
+def arvores_dentro(pasta, parede, w, h):
+    """As copas do pátio de dentro (na camada ``patio`` do ``planos_yinlu.py``): a mesma mola dos
+    galhos, mais fraca (estão longe); o templo e o chão parados."""
+    x0, y0, x1, y1 = planos_yinlu.PATIO
+    img = cv2.imread(str(pasta / "patio.jpg"))
+    hh, ww = img.shape[:2]
+    b, g, r = [img[..., i].astype(np.int16) for i in range(3)]
     ceu = (b > r + 35) & (b > g + 10)
     nuvem = (b > 190) & (g > 190) & (r > 190) & (np.abs(b - r) < 45)
     folha = (~ceu & ~nuvem).astype(np.uint8)
     tx0, ty0, tx1, ty1 = TEMPLO
-    folha[ty0 - y0:ty1 - y0, tx0 - x0:tx1 - x0] = 0
+    folha[ty0 - y0:, tx0 - x0:tx1 - x0] = 0                         # o templo e o caminho
+    folha[hh - 22:] = 0                                              # o chão
     folha = cv2.morphologyEx(folha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-    arv = np.zeros(img.shape[:2], np.uint8)
-    arv[y0:y1, x0:x1] = folha
-    sem = tirar(img, arv)
+    sem = tirar(img, folha)
+    cv2.imwrite(str(pasta / "patio.jpg"), sem, [cv2.IMWRITE_JPEG_QUALITY, 94])
     a = cv2.GaussianBlur(folha.astype(np.float32), (0, 0), 0.8)
-    rgba = np.dstack([q[..., 2], q[..., 1], q[..., 0], (a * 255).astype(np.uint8)])
+    rgba = np.dstack([img[..., 2], img[..., 1], img[..., 0], (a * 255).astype(np.uint8)])
     Image.fromarray(rgba, "RGBA").save(pasta / "arvores_dentro.png", optimize=True)
-    hh, ww = y1 - y0, x1 - x0
     cols, rows = 24, 12
     yy, xx = np.mgrid[0:rows + 1, 0:cols + 1].astype(np.float32)
     py, px = yy * hh / rows, xx * ww / cols
-    alcance = np.clip((hh - 10 - py) / 90.0, 0, 1)                     # o pé das copas parado
-    alcance *= np.clip(np.minimum(px, ww - px) / 14.0, 0, 1)           # as portas
-    alcance *= np.clip(py / 12.0, 0, 1)                                # a verga
+    alcance = np.clip((hh - 30 - py) / 90.0, 0, 1)                     # o pé das copas parado
+    alcance *= np.clip(np.minimum(px, ww - px) / 10.0, 0, 1) * np.clip(py / 10.0, 0, 1)   # as bordas
     gx, gy = px + x0, py + y0                                          # o templo
-    fora = np.hypot(np.maximum(np.maximum(tx0 - gx, gx - tx1), 0), np.maximum(np.maximum(ty0 - gy, gy - ty1), 0))
+    fora = np.hypot(np.maximum(np.maximum(tx0 - gx, gx - tx1), 0), np.maximum(ty0 - gy, 0))
     alcance *= np.clip(fora / 12.0, 0, 1)
     reach = [round(float(v), 3) for v in alcance.ravel()]
     ys, xs = np.nonzero(folha)
     pts = np.float32(np.column_stack([xs, ys]))[::5]
-    _, _, cent = cv2.kmeans(pts, 6, None, (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.5),
+    _, _, cent = cv2.kmeans(pts, 8, None, (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.5),
                             3, cv2.KMEANS_PP_CENTERS)
     rng = np.random.default_rng(9)
     grupos = [[round(float(cx / ww), 4), round(float(cy / hh), 4)] for cx, cy in cent]
     freq = [round(float(f), 3) for f in rng.uniform(0.5, 0.75, len(grupos))]
-    return sem, {"id": "arvores-dentro", "imagem": "arvores_dentro.png",
-                 "profundidade": round(parede["profundidade"] - 0.3, 1), **posicao(parede, w, h, x0, y0, x1, y1),
-                 "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
-                           "amplitude": DENTRO_AMP, "amortecimento": 0.35, "raio": 0.12}}
+    return {"id": "arvores-dentro", "imagem": "arvores_dentro.png",
+            "profundidade": planos_yinlu.PROF_PATIO - 0.1, **posicao(parede, w, h, x0, y0, x1, y1),
+            "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
+                      "amplitude": DENTRO_AMP, "amortecimento": 0.35, "raio": 0.1}}
 
 
 def borlas(img, pasta, parede, w, h):
@@ -231,7 +229,7 @@ def main():
     vento_arvores(pasta, next(c for c in camadas if c["id"] == "arvores-plano"), h)
     rgba = cv2.imread(str(pasta / parede["imagem"]), cv2.IMREAD_UNCHANGED)
     img = rgba[..., :3].copy()
-    img, camada = arvores_dentro(img, pasta, parede, w, h)
+    camada = arvores_dentro(pasta, parede, w, h)
     camadas.append(camada)
     img, novas = borlas(img, pasta, parede, w, h)
     camadas += novas

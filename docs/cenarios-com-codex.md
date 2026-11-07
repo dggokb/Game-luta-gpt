@@ -313,5 +313,12 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
    pixels de antes, com o alfa do molde). A parede continua nas linhas de antes (as lanternas, as
    borlas e as árvores de dentro do portão não mudaram de lugar).
 
+   Mais dois planos: o **pátio de dentro** visto pelo portão (`prompt_14_patio.txt`: o recorte em
+   volta do portão sem o portão, o pátio pintado mais largo que o vão; alinhado por SIFT ao que se
+   via e com as cores casadas → `14_patio.webp`; o vão sai do molde `prompt_15_vao_verde.txt` →
+   `15_mascara_vao.png`), a 850, com o vento das copas de dentro; e a **mata ao longe**
+   (`prompt_16_mata.txt`: uma fileira de árvores distantes sobre magenta → `16_mata.png`), a 1800,
+   com névoa puxando para o azul do céu, aparecendo nos vãos entre as copas.
+
 Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
 (mais fundo), a parede opaca os cobria.
