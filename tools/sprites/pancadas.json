@@ -438,18 +438,12 @@
     "ryuga_8": {
       "S2": {
         "pancadas": [
-          8,
-          14,
-          21,
-          27,
-          33,
-          39,
-          45
+          11
         ],
         "avanco": {
-          "distancia": 170,
-          "de": 2,
-          "ate": 52
+          "distancia": 82,
+          "de": 4,
+          "ate": 11
         }
       }
     }

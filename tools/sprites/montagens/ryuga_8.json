@@ -6,20 +6,62 @@
     "densidade": 2
   },
   "backdash": {
-    "_doc": "Backdash sem vídeo próprio (ainda): o recuo do andar para trás (quadros 20-62 de 2 em 2), tocado no tempo do backdash. Trocar pelo vídeo do pulinho para trás quando ele chegar.",
+    "_doc": "Backdash: o vídeo do pulinho para trás inteiro, até a guarda (2-92 de 3 em 3), como o do Kōga 8 anos.",
     "trechos": [
       [
-        "tras",
+        "backDash",
         0,
         124
       ]
     ],
-    "quadros": "20-62/2",
+    "quadros": "2-92/3",
     "opcoes": {
-      "pe_no_chao": true
+      "fixar": "registro",
+      "manter_efeitos": true
     },
     "animacoes": {
       "BACKDASH": {}
+    }
+  },
+  "special_energy": {
+    "_doc": "S1 (Fumacinha): o vídeo inteiro no tempo dele (5,2 s): carrega, empurra a palma com o clarão (quadro 40 do vídeo), sai só uma fumacinha e ele volta para a guarda. Com todos os efeitos do vídeo.",
+    "trechos": [
+      [
+        "s1",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0-122/2",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_ENERGY": {
+        "impacto": 20
+      }
+    }
+  },
+  "special_s2": {
+    "_doc": "S2 (Chute desastrado): o vídeo inteiro no tempo dele: o passo para a frente, o chute alto (encosta no quadro 22 do vídeo), ele perde o equilíbrio, cai no chão, fica deitado e se levanta. O corpo fica no lugar na folha e quem anda é o motor (o passo do vídeo, ~80 px).",
+    "trechos": [
+      [
+        "s2",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "0-122/2",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S2": {
+        "impacto": 11
+      }
     }
   }
 }

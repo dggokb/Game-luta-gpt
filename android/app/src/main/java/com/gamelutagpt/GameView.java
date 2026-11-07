@@ -2024,6 +2024,7 @@ public class GameView extends SurfaceView
             // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
             pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
+            TutorialDirector.semPoderes(playerInput);
             tutorial.fillDummy(opponentInput);
         } else if (teste.ativo()) {
             // Teste de desempenho: a IA joga dos dois lados e o roteiro pede SHINKAI, Super e Ultra.

@@ -1384,8 +1384,11 @@ final class HudRenderer {
             if (gl != null) gl.gravado(GRAVACAO_TOQUE, estado);
         }
         drawTagButton(c, s);
-        drawSuperButton(c, s);
-        drawShinkaiButton(c, s);
+        // No treino das crianças não há SUPER, ULTRA nem SHINKAI: os botões somem.
+        if (!s.tutorialActive()) {
+            drawSuperButton(c, s);
+            drawShinkaiButton(c, s);
+        }
     }
 
     private void drawFixedControls(Canvas c, State s) {

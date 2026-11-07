@@ -15,18 +15,19 @@
     "arquivo": "pulo.mp4",
     "personagem": "ryuga_8",
     "escala": 0.3,
-    "medida": "último quadro = inicio_centro (nota 0.97)",
-    "quadros": "0,15,16,36,57,77",
+    "motivo": "mesma câmera do idle (0,30): todos os vídeos do Ryūga 8 anos têm a câmera do idle",
+    "quadros": "0,23,24,36,47,59",
     "celula": 224,
     "largura": 160,
-    "raiz": "76,206",
+    "raiz": "77,206",
     "colunas": 6,
     "pe_no_chao": true,
+    "manter_efeitos": true,
     "densidade": 2
   },
   "frameWidth": 320,
   "frameHeight": 448,
-  "rootX": 152,
+  "rootX": 154,
   "rootY": 412,
   "pixelScale": 2.0
 }

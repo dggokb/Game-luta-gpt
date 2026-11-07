@@ -22,6 +22,8 @@ pacote em characters/<id>/:
 O nome de cada vídeo por estado fica em tools/sprites/videos/<id>.json (criado na 1ª vez a
 partir dos nomes conhecidos; edite se um vídeo tiver outro nome). Escala manual, só quando
 a medida falha: --manual ESTADO=0.36 --motivo "..." (fica gravada na receita e é reusada).
+Com --manter-efeitos os quadros com efeito do vídeo entram como estão (clarão, poeira, rastro)
+e o efeito de luz fica com o halo meio transparente (Ryūga 8 anos).
 
 Precisa de opencv e numpy: pip install -r tools/sprites/requirements-animar.txt
 """
@@ -43,6 +45,8 @@ sys.path.insert(0, str(HERE))
 from video_para_sprite import best_loop, key, read_frames, torso_x  # noqa: E402
 
 CACHE = ROOT / 'android/app/build/video-cache'
+# --manter-efeitos: não troca os quadros com efeito e mantém o brilho do vídeo em todos os clipes.
+MANTER_EFEITOS = False
 P01 = json.loads((ROOT / 'characters/player_base/character.json').read_text(encoding='utf-8'))
 
 # Estados que o script monta; THROW vira o atlas de agarrar (0-3) e jogar (3-8).
@@ -187,7 +191,9 @@ def loop_frames(path, d, n_min, passo):
 
 def clean(d, quadros):
     """Troca quadros com efeito do vídeo (silhueta bem maior ou muito branco/amarelo claro
-    que o resto do trecho) pelo vizinho limpo mais perto."""
+    que o resto do trecho) pelo vizinho limpo mais perto. Com --manter-efeitos, nada troca."""
+    if MANTER_EFEITOS:
+        return list(quadros)
     area = d['masks'].reshape(len(d['masks']), -1).sum(1).astype(float)
     light = d['bright']
     seg = slice(min(quadros), max(quadros) + 1)
@@ -282,7 +288,7 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     args.append(f"--balanco={opts.get('balanco', 1.0)}")
     if opts.get('sem_efeitos'):
         args.append('--sem-efeitos')  # rastro e brilho desenhados pelo vídeo (machado do p15)
-    if opts.get('manter_efeitos'):
+    if opts.get('manter_efeitos') or MANTER_EFEITOS:
         args.append('--manter-efeitos')  # bola de energia e raio desenhados pelo vídeo (S1 do p15)
     if opts.get('cor_efeito'):
         args.append(f"--cor-efeito={opts['cor_efeito']}")  # a aura vermelha do S2 do p15
@@ -449,7 +455,11 @@ def main():
     p.add_argument('--motivo', help='por que a escala é manual')
     p.add_argument('--densidade', type=int,
                    help='px de textura por px do jogo (2 = HD direto do vídeo); padrão: o da receita')
+    p.add_argument('--manter-efeitos', action='store_true',
+                   help='quadros com efeito do vídeo entram como estão, com o brilho mantido')
     args = p.parse_args()
+    global MANTER_EFEITOS
+    MANTER_EFEITOS = args.manter_efeitos
     char = args.personagem
     if not (ROOT / f'art/keys/{char}/tamanho.json').exists():
         raise SystemExit(f'calibre antes: python3 tools/sprites/tamanho.py calibrar {char} <vídeo de agachar> --escala-de p01')
