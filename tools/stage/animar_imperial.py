@@ -9,6 +9,8 @@
   a arena, recortados pelo molde magenta) e a **arena** (``parede.png``: os pixels da pintura, com
   o alfa do molde verde). No que aparece na tela de repouso, céu e montanhas são os da pintura; o
   que só aparece com a câmera andando vem das imagens pintadas à parte, com as cores casadas;
+* **plano do meio**: entre as montanhas e a arena, colinas com bordos e pinheiros, pagodes e um
+  portal na névoa (pintados pelo Codex sobre magenta, ``16_meio.png``), a ``PROF_MEIO``;
 * **telão**: a tela do telão recebe a luta ao vivo e o replay (``"telao"``);
 * **plateia**: a gente dos dois prédios pula de leve e solta flashes de câmera;
 * **lanternas**: as penduradas e as da mureta brilham e tremulam; as da mureta refletem no chão
@@ -46,6 +48,8 @@ PALACIO = (1560, 2560)                        # o meio (palácio, escadaria): se
 QUEDAS = [(1640, 1010, 190, 215), (2250, 1015, 150, 210)]   # (x, y, largura, altura) no panorama
 ARVORE = (2280, 840, 2760, 1185)              # caixa do bordo vermelho (x0, y0, x1, y1)
 PROF_CEU, PROF_MONTANHAS = 30000.0, 6000.0
+PROF_MEIO, APOIO_MEIO = 2000.0, 1100.0       # o plano do meio: colinas, mata, pagodes (Codex)
+MEIO = (740, 1300)                            # linhas do panorama: o alto das colinas e o pé (atrás da arena)
 CEU_EXTRA = 900                               # linhas de céu acima do panorama (super pulo)
 MAX_LUZES = 50
 VENTO_GRUPOS = 10
@@ -90,8 +94,10 @@ def planos(pasta, stage, parede):
 
     # Céu: a pintura onde ele aparece; atrás da arena e das montanhas, o "só céu" casado.
     so = casar(ler(ART / "13_so_ceu_4096.webp", w, 2305)[:hp], pan, np.ones((hp, w), bool), ceu_vis)
-    k = cv2.GaussianBlur(cv2.erode(ceu_vis.astype(np.uint8), np.ones((9, 9), np.uint8)).astype(np.float32),
-                         (0, 0), 20)[..., None]
+    # A mistura começa bem longe da arena e das montanhas (perto, a pintura traz a borda dos
+    # telhados, que virava um fantasma no céu quando a arena desce no super pulo).
+    k = cv2.GaussianBlur(cv2.erode(ceu_vis.astype(np.uint8), np.ones((81, 81), np.uint8)).astype(np.float32),
+                         (0, 0), 14)[..., None]
     ceu = pan * k + so * (1 - k)
     alto = ceu[:600][::-1]
     pedacos, n = [], 0
@@ -107,8 +113,8 @@ def planos(pasta, stage, parede):
 
     # Montanhas: a pintura onde aparecem; atrás da arena, o "sem arena" casado.
     sem = casar(ler(ART / "12_sem_arena_4096.webp", w, 2305)[:hp], pan, terra & ~arena, monte_vis)
-    k = cv2.GaussianBlur(cv2.erode(monte_vis.astype(np.uint8), np.ones((9, 9), np.uint8)).astype(np.float32),
-                         (0, 0), 6)[..., None]
+    k = cv2.GaussianBlur(cv2.erode(monte_vis.astype(np.uint8), np.ones((31, 31), np.uint8)).astype(np.float32),
+                         (0, 0), 5)[..., None]
     monte = pan * k + sem * (1 - k)
     am = cv2.GaussianBlur(terra.astype(np.float32), (0, 0), 0.8)
     # WebP sem perda (com perda, o alfa saía em blocos no celular); longe, em meia resolução.
@@ -123,6 +129,26 @@ def planos(pasta, stage, parede):
         {"id": "montanhas", "imagem": "montanhas.webp", "profundidade": PROF_MONTANHAS, "topo": frac(0),
          "base": frac(hp), "x": parede["x"], "repetir": "espelhar"},
     ], frac
+
+
+def meio(pasta, parede, frac):
+    """O plano do meio, recortado do magenta, com um pouco da névoa das montanhas (a distância)."""
+    m = np.asarray(Image.open(ART / "17_meio_2x.webp").convert("RGB")).astype(np.float32)
+    r, g, b = m[..., 0], m[..., 1], m[..., 2]
+    magenta = np.clip((np.minimum(r, b) - g - 70) / 50, 0, 1)
+    a = cv2.GaussianBlur(1 - magenta, (0, 0), 0.9)
+    ys = np.nonzero(a.mean(1) > 0.01)[0]
+    m, a = m[max(0, ys.min() - 6):], a[max(0, ys.min() - 6):]
+    rgb = m.copy()
+    borda = a < 0.99                              # só na borda do recorte: tira o rosa do magenta
+    rgb[..., 2][borda] = np.minimum(rgb[..., 2], rgb[..., 1] * 1.2 + 25)[borda]
+    rgb[..., 0][borda] = np.minimum(rgb[..., 0], np.maximum(rgb[..., 1], rgb[..., 2]) * 1.8 + 40)[borda]
+    nevoa = np.array([214, 150, 160], np.float32)
+    rgb = rgb * 0.86 + nevoa * 0.14
+    Image.fromarray(np.dstack([np.clip(rgb, 0, 255), a * 255]).astype(np.uint8), "RGBA").save(
+        pasta / "meio.webp", lossless=True, quality=100, method=6)
+    return {"id": "meio", "imagem": "meio.webp", "profundidade": PROF_MEIO, "topo": frac(MEIO[0]),
+            "base": frac(MEIO[1]), "x": parede["x"], "repetir": "espelhar", "apoio": APOIO_MEIO}
 
 
 def tirar(img, m):
@@ -242,7 +268,7 @@ def main():
     cachoeiras.AREAS["parede.png"] = {"tela": 0.97, "areas": [
         (round(x / w, 4), round((y + EXTRA) / h, 4), round(cw / w, 4), round(ch / h, 4)) for x, y, cw, ch in QUEDAS]}
 
-    stage["camadas"] = fundos + [parede, camada_arvore]
+    stage["camadas"] = fundos + [meio(pasta, parede, frac), parede, camada_arvore]
     stage["chao"]["reflexoLutadores"] = 0.25
     stage["chao"]["reflexoLuzes"] = 0.85
     stage["chao"]["reflexoComprimento"] = 0.45

@@ -358,7 +358,13 @@ python3 tools/stage/cenario_pintura.py $A/4_panorama_4096.webp $D --tela-px 2048
 python3 tools/stage/animar_imperial.py
 ```
 
-O `animar_imperial.py` separa céu (30000), montanhas (6000) e arena (`parede.webp`, com o alfa do
+5. Plano do meio (`prompt_16_meio.txt`): entre as montanhas e a arena não havia nada (o vale
+   escuro atrás dos telhados). O Codex pinta, sobre magenta e no estilo da arena, colinas com
+   bordos vermelhos e pinheiros, pagodes, um portal e uma cachoeira na névoa → `16_meio.png`
+   (Real-ESRGAN x2 → `17_meio_2x.webp`), a 2000, do alto das colinas na linha 740 do panorama
+   até atrás da arena, repetido espelhado e com `"apoio"` em 1100 (no super pulo anda menos).
+
+O `animar_imperial.py` separa céu (30000), montanhas (6000), plano do meio (2000) e arena (`parede.webp`, com o alfa do
 molde; no que aparece em repouso, céu e montanhas são os pixels da pintura), põe o telão com a luta
 ao vivo, a plateia dos dois prédios, as lanternas (as da mureta com reflexo no chão), a água das
 duas cachoeiras e o vento nas folhas do bordo vermelho. Parede e montanhas em WebP sem perda (o
