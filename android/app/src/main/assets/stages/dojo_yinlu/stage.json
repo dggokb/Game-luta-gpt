@@ -58,7 +58,7 @@
       "base": 0.55744,
       "x": 0.5044,
       "repetir": "espelhar",
-      "apoio": 641.0
+      "apoio": 1000.0
     },
     {
       "id": "arvores-plano",
@@ -68,7 +68,7 @@
       "base": 0.6564,
       "x": 0.5044,
       "repetir": "espelhar",
-      "apoio": 641.0,
+      "apoio": 820.0,
       "vento": {
         "colunas": 96,
         "linhas": 30,

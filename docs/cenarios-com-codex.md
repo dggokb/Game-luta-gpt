@@ -319,9 +319,11 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
    `15_mascara_vao.png`), a 850, com o vento das copas de dentro; e a **mata ao longe**
    (`prompt_16_mata.txt`: uma fileira de árvores distantes sobre magenta → `16_mata.png`), a 1800,
    com névoa puxando para o azul do céu, aparecendo nos vãos entre as copas.
-   Mata, árvores e pátio ficam com `"apoio"` na profundidade da parede: na vertical andam junto
-   com o muro (no super pulo, soltos, subiam atrás dele e a mata aparecia demais; no vão do portão
-   aparecia a grama embaixo do pátio). Na horizontal a paralaxe continua; céu e nuvens, soltos.
+   Mata, árvores e pátio ficam com `"apoio"`: no super pulo, soltos, subiam atrás do muro (a mata
+   aparecia demais; no vão do portão aparecia a grama embaixo do pátio); presos ao muro (apoio na
+   profundidade da parede), ficava parado demais. As árvores apoiam em 820 (~metade do movimento) e
+   a mata em 1000 (~40%); o pátio fica preso ao muro (só 5 px de pintura embaixo do vão). Na
+   horizontal a paralaxe continua; céu e nuvens, soltos.
 
 Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
 (mais fundo), a parede opaca os cobria.

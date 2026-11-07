@@ -40,6 +40,11 @@ BASE = 674            # a última linha da parede (--juncao + 10)
 PROF_PATIO = 850.0    # o pátio de dentro, visto pelo vão do portão
 PROF_ARVORES = 1000.0
 PROF_MATA = 1800.0    # a mata ao longe, entre as árvores e as nuvens
+# No super pulo (a câmera sobe), a base anda na vertical como se estivesse nesta profundidade:
+# entre a da parede (641, presa ao muro) e a da própria camada (solta). Soltas, subiam demais atrás
+# do muro; presas, ficava parado demais. O pátio fica preso: só 5 px de pintura sobram embaixo do vão.
+APOIO_ARVORES = 820.0  # ~metade do movimento de solta
+APOIO_MATA = 1000.0    # ~40%
 PATIO = (1800, 650, 2290, 900)   # px da parede: o retângulo do pátio pintado à parte
 MATA = (220, 560)     # linhas do panorama: o alto das copas da mata e o pé (atrás do muro)
 PROF_NUVENS = 3500.0
@@ -182,15 +187,14 @@ def montar(pasta):
         {"id": "nuvens", "imagem": "nuvens.png", "profundidade": PROF_NUVENS, "topo": frac(-ALTO),
          "base": frac(BASE), "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA},
         {"id": "mata", "imagem": "mata.png", "profundidade": PROF_MATA, "topo": frac(MATA[0]),
-         "base": frac(MATA[1]), "x": parede["x"], "repetir": "espelhar", "apoio": parede["profundidade"]},
+         "base": frac(MATA[1]), "x": parede["x"], "repetir": "espelhar", "apoio": APOIO_MATA},
         {"id": "arvores-plano", "imagem": "arvores.png", "profundidade": PROF_ARVORES, "topo": frac(-ALTO),
-         "base": frac(BASE), "x": parede["x"], "repetir": "espelhar", "apoio": parede["profundidade"]},
+         "base": frac(BASE), "x": parede["x"], "repetir": "espelhar", "apoio": APOIO_ARVORES},
         {"id": "patio", "imagem": "patio.jpg", "profundidade": PROF_PATIO,
          **retangulo(parede, W, hp, *PATIO), "apoio": parede["profundidade"]},
     ]
-    # Mata, árvores e pátio "apoiados" no muro: na vertical andam junto com ele (no super pulo a
-    # câmera sobe e, soltos, eles subiam atrás do muro: a mata aparecia demais e, no vão do
-    # portão, aparecia a grama embaixo do pátio). Na horizontal a paralaxe continua.
+    # Mata, árvores e pátio "apoiados" (ver APOIO_*): na vertical andam menos que soltos; na
+    # horizontal a paralaxe continua.
     stage["camadas"] = camadas
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"planos: céu {PROF_CEU:.0f}, nuvens {PROF_NUVENS:.0f}, mata {PROF_MATA:.0f}, árvores {PROF_ARVORES:.0f},"
