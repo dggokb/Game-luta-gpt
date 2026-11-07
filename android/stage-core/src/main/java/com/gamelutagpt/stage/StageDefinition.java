@@ -183,6 +183,20 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * {@code "vento"} numa camada de imagem (as copas recortadas): uma grade de {@code colunas} x
+     * {@code linhas} sobre a imagem; cada vértice tem o {@code alcance} (0 no tronco, que não mexe,
+     * até 1 na ponta dos galhos). Os {@code grupos} (x, y em fração da imagem) são os galhos: cada um
+     * uma mola com a sua frequência ({@code freq}, Hz) empurrada pelo vento, que vem em rajadas
+     * lentas e atravessa a tela; cada vértice segue os galhos perto dele ({@code raio}, fração da
+     * largura). {@code amplitude}: o deslocamento na ponta, em fração da altura da imagem.
+     */
+    public static final class Wind {
+        public int cols, rows;
+        public float[] reach, groupX, groupY, freq;
+        public float amp, damping, radius;
+    }
+
     public static final class Layer {
         public final String id;
         public final Kind kind;
@@ -320,6 +334,8 @@ public final class StageDefinition {
          * sai do lado certo). NaN = não é parede lateral.
          */
         public float sideX = Float.NaN, sideFar, sideNear, sideOpen;
+        /** {@code "vento"}: a camada balança com o vento (árvores); null = parada. */
+        public Wind wind;
 
         /** Profundidade da coluna {@code u} da camada curva. */
         public float curveDepth(float u) {
@@ -1165,6 +1181,33 @@ public final class StageDefinition {
                 if (layer.curveZ[i] <= 0f) throw new IllegalArgumentException(where + ": \"curva\" atrás dos lutadores (> 0)");
             }
         }
+        Map<String, Object> vento = object(map, "vento");
+        if (vento != null) {
+            Wind w = new Wind();
+            w.cols = Math.max(1, Math.round(number(vento, "colunas", 32f)));
+            w.rows = Math.max(1, Math.round(number(vento, "linhas", 12f)));
+            w.reach = lista(vento, "alcance");
+            List<Object> grupos = (List<Object>)vento.get("grupos");
+            int ng = grupos == null ? 0 : grupos.size();
+            w.groupX = new float[ng];
+            w.groupY = new float[ng];
+            for (int i = 0; i < ng; i++) {
+                List<Object> pt = (List<Object>)grupos.get(i);
+                w.groupX[i] = ((Number)pt.get(0)).floatValue();
+                w.groupY[i] = ((Number)pt.get(1)).floatValue();
+            }
+            w.freq = lista(vento, "freq");
+            w.amp = number(vento, "amplitude", 0.005f);
+            w.damping = number(vento, "amortecimento", 0.35f);
+            w.radius = number(vento, "raio", 0.03f);
+            if (w.reach == null || w.reach.length != (w.cols + 1) * (w.rows + 1)) {
+                throw new IllegalArgumentException(where + ": \"vento\" precisa de (colunas+1)*(linhas+1) valores de alcance");
+            }
+            if (ng == 0 || w.freq == null || w.freq.length != ng) {
+                throw new IllegalArgumentException(where + ": \"vento\" precisa de grupos e uma freq por grupo");
+            }
+            layer.wind = w;
+        }
         Map<String, Object> lateral = object(map, "lateral");
         if (lateral != null) {
             layer.sideX = number(lateral, "x", 0f);
@@ -1183,6 +1226,17 @@ public final class StageDefinition {
             layer.waveLight = clamp01(number(onda, "leve", 0.5f));
         }
         return layer;
+    }
+
+    /** Uma lista de números ({@code [1, 2.5, ...]}), ou null. */
+    @SuppressWarnings("unchecked")
+    private static float[] lista(Map<String, Object> map, String key) {
+        Object o = map.get(key);
+        if (!(o instanceof List)) return null;
+        List<Object> l = (List<Object>)o;
+        float[] out = new float[l.size()];
+        for (int i = 0; i < out.length; i++) out[i] = ((Number)l.get(i)).floatValue();
+        return out;
     }
 
     /** Coordenada {@code k} (0 = x, 1 = y) de uma lista de pontos [[x, y], ...]. */

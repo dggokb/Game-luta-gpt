@@ -49,6 +49,8 @@ public final class StageScene {
         float sunWorldX = Float.NaN;
         /** Imagens das bandeiras da camada, na ordem dela (null = não carregou). */
         final RenderImage[] banners;
+        /** Vento: a mola de cada galho (ângulo e velocidade) e o peso de cada galho em cada vértice. */
+        float[] windTh, windVel, windWeights, windXY, windUV;
 
         Placed(StageDefinition.Layer layer, RenderImage image, float z,
                float top, float bottom, float width, float firstCenterX, float period, RenderImage[] banners) {
@@ -479,6 +481,7 @@ public final class StageScene {
 
     public void update(float dt) {
         time += dt;
+        updateWind(dt);
         hype = Math.max(0f, hype - dt * 0.45f);
         updateActors(dt);
         updateRain(dt);
@@ -782,6 +785,97 @@ public final class StageScene {
         return 1f - layer.waveAmp * s;
     }
 
+    /** O vento nas árvores: rajadas lentas, sempre empurrando para o mesmo lado (0 a ~1). */
+    private static float windForce(float t) {
+        float v = 0.55f + 0.30f * (float)Math.sin(2 * Math.PI * 0.07 * t) + 0.20f * (float)Math.sin(2 * Math.PI * 0.19 * t + 1.0);
+        return Math.max(0f, v);
+    }
+
+    /**
+     * Cada galho é uma mola: o vento empurra para um lado, a mola traz de volta e o atrito acalma
+     * (vai e volta suave, sem tremer). O vento chega primeiro nos galhos da esquerda.
+     */
+    private void updateWind(float dt) {
+        for (Placed p : placed) {
+            StageDefinition.Wind w = p.layer.wind;
+            if (w == null) continue;
+            int ng = w.freq.length;
+            if (p.windTh == null) {
+                p.windTh = new float[ng];
+                p.windVel = new float[ng];
+                for (int g = 0; g < ng; g++) p.windTh[g] = windForce(-w.groupX[g] * 1.5f);
+                int nv = (w.cols + 1) * (w.rows + 1);
+                p.windWeights = new float[nv * ng];
+                for (int j = 0; j <= w.rows; j++) {
+                    for (int i = 0; i <= w.cols; i++) {
+                        int v = j * (w.cols + 1) + i;
+                        float fx = i / (float)w.cols, fy = j / (float)w.rows, sum = 0f;
+                        for (int g = 0; g < ng; g++) {
+                            float ddx = fx - w.groupX[g];
+                            float ddy = (fy - w.groupY[g]) * p.image.height() / Math.max(1f, p.image.width());
+                            float wg = (float)Math.exp(-(ddx * ddx + ddy * ddy) / (2f * w.radius * w.radius));
+                            p.windWeights[v * ng + g] = wg;
+                            sum += wg;
+                        }
+                        for (int g = 0; g < ng; g++) p.windWeights[v * ng + g] /= Math.max(1e-6f, sum);
+                    }
+                }
+            }
+            float step = Math.min(dt, 0.1f) / 4f;
+            for (int s = 0; s < 4; s++) {
+                float tt = time - dt + step * (s + 1);
+                for (int g = 0; g < ng; g++) {
+                    float w0 = 2f * (float)Math.PI * w.freq[g];
+                    float force = windForce(tt - w.groupX[g] * 1.5f) * w0 * w0;
+                    float acc = force - w0 * w0 * p.windTh[g] - 2f * w.damping * w0 * p.windVel[g];
+                    p.windVel[g] += acc * step;
+                    p.windTh[g] += p.windVel[g] * step;
+                }
+            }
+        }
+    }
+
+    /**
+     * A camada com vento desenhada como uma grade que se deforma: coluna por coluna, uma faixa com
+     * uma linha por vértice. No Canvas (sem faixas) ou no modo leve, parada.
+     */
+    private void drawWindLayer(RenderCanvas c, Placed p, float l, float top, float r, float bottom,
+                               boolean mirrored, int alpha) {
+        StageDefinition.Wind w = p.layer.wind;
+        RenderImage img = p.image;
+        if (!c.desenhaFaixas() || !detalhe || p.windTh == null) {
+            drawImage(c, img, l, top, r, bottom, mirrored, alpha);
+            return;
+        }
+        int ng = w.freq.length, cols = w.cols, rows = w.rows;
+        float iw = img.width(), ih = img.height(), h = bottom - top;
+        if (p.windXY == null) {
+            p.windXY = new float[(rows + 1) * 4];
+            p.windUV = new float[(rows + 1) * 4];
+        }
+        float sign = mirrored ? -1f : 1f;
+        for (int i = 0; i < cols; i++) {
+            float x0 = l + (r - l) * i / cols, x1 = l + (r - l) * (i + 1) / cols;
+            if (x1 < -40f || x0 > VW + 40f) continue;
+            for (int j = 0; j <= rows; j++) {
+                float y = top + h * j / rows;
+                for (int e = 0; e < 2; e++) {
+                    int ci = mirrored ? cols - (i + e) : i + e;          // a coluna da imagem
+                    int v = j * (cols + 1) + ci;
+                    float bend = 0f;
+                    for (int g = 0; g < ng; g++) bend += p.windWeights[v * ng + g] * p.windTh[g];
+                    float dx = w.amp * h * w.reach[v] * (bend - 0.55f) * sign;
+                    int q = j * 4 + e * 2;
+                    p.windXY[q] = (e == 0 ? x0 : x1) + dx;
+                    p.windXY[q + 1] = y + 0.25f * Math.abs(dx);
+                    p.windUV[q] = iw * ci / cols;
+                    p.windUV[q + 1] = ih * j / rows;
+                }
+            }
+            c.drawImageStrip(img, p.windXY, p.windUV, rows + 1, alpha);
+        }
+    }
+
     private void drawImageLayer(RenderCanvas c, Placed p) {
         StageDefinition.Layer layer = p.layer;
         if (!Float.isNaN(layer.sideX)) {
@@ -834,7 +928,8 @@ public final class StageScene {
                 bottom = baseBottom + dy;
             }
             boolean mirrored = layer.flip ^ (layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0);
-            drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
+            if (layer.wind != null) drawWindLayer(c, p, l, top, r, bottom, mirrored, alpha);
+            else drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
             drawWaterfalls(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawBanners(c, p, l, top, r, bottom, mirrored, alpha, k);

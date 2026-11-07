@@ -403,3 +403,19 @@ Com `"reflexoComprimento"`, o reflexo de cada luz com `"reflexo": true` desce re
 `"reflexoImagem": "risco.png"` troca os degradês por essa imagem (já na cor, alfa macio), esticada
 do pé da luz até o comprimento. Os riscos aparecem também no modo leve (fazem parte do chão); o
 brilho redondo embaixo da luz, só no detalhe.
+
+### Vento nas árvores (`"vento"` numa camada de imagem)
+
+```json
+"vento": {"colunas": 96, "linhas": 12, "alcance": [...], "grupos": [[x, y], ...],
+          "freq": [...], "amplitude": 0.018, "amortecimento": 0.35, "raio": 0.018}
+```
+
+A camada vira uma grade de `colunas` × `linhas` que se deforma (uma faixa por coluna). Cada grupo
+(`grupos`, posição 0–1 na imagem, um galho) é uma mola com sua `freq` (Hz): o vento empurra para um
+lado com rajadas lentas, a mola traz de volta e o `amortecimento` acalma — vai e volta suave, sem
+tremer, e cada galho no seu tempo (o vento chega primeiro nos da esquerda). `alcance` dá, por
+vértice ((colunas+1)×(linhas+1), linha a linha), quanto ele segue o galho: 0 no tronco (parado em
+vento calmo), 1 nas pontas. `raio` é a largura (fração da largura da imagem) da influência de cada
+grupo. O deslocamento é `amplitude` × altura da camada × alcance, com uma leve descida junto (o
+galho faz arco). No Canvas e no modo leve a camada fica parada (imagem normal).

@@ -287,6 +287,10 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
    brilham e tremulam (`luzes` da parede), raios de sol entre as árvores em duas imagens que cruzam
    uma na outra (`"onda"` em fase oposta) e poeira dourada no ar; as folhas caindo e a luz do sol nos
    lutadores vêm do `stage_extra.json`.
+   As árvores balançam com o vento (`"vento"` do motor): o script separa as copas da parede
+   (`arvores.png`, a parede fica com o céu borrado atrás), acha os troncos (alcance 0) e as pontas
+   (alcance 1) e agrupa os galhos. A parede original fica em `art/stages/dojo_yinlu/parede_com_arvores.jpg`
+   (rodar de novo parte dela).
 
 Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
 (mais fundo), a parede opaca os cobria.
