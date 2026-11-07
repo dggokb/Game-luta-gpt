@@ -419,3 +419,16 @@ vértice ((colunas+1)×(linhas+1), linha a linha), quanto ele segue o galho: 0 n
 vento calmo), 1 nas pontas. `raio` é a largura (fração da largura da imagem) da influência de cada
 grupo. O deslocamento é `amplitude` × altura da camada × alcance, com uma leve descida junto (o
 galho faz arco). No Canvas e no modo leve a camada fica parada (imagem normal).
+
+Peças penduradas (a borla embaixo de uma lanterna) usam `"pendulos"` no lugar de
+`alcance`/`grupos`/`freq`:
+
+```json
+"vento": {"colunas": 4, "linhas": 10, "amortecimento": 0.25, "pendulos": [
+  {"pivo": [0.43, 0.0], "graus": 16, "freq": 1.1, "atraso": 0.67, "peso": [1, 1, ...]}]}
+```
+
+Cada pêndulo gira em volta do `pivo` (fração da imagem): uma mola de frequência `freq` (Hz) que
+o vento empurra até `graus` para o lado e de volta. `peso` (um por vértice, 0 a 1) diz quanto cada
+vértice gira (1 em tudo = a peça inteira, recortada com alfa). `atraso`: segundos até a rajada
+chegar (nas árvores é `x do galho × 1,5`).

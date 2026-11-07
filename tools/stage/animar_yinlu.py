@@ -11,6 +11,9 @@ concept sem os pilares (``art/stages/dojo_yinlu/9_panorama_4096.webp``).
 * **vento nas árvores**: as copas viram a camada ``arvores`` (recortadas da parede, que fica com
   o céu no lugar delas) com ``"vento"``: o tronco parado, os galhos como molas que o vento empurra
   para um lado e que voltam devagar, e as folhas indo junto com o galho;
+* **borlas**: as lanternas do portão ficam num poste (paradas); as borlas vermelhas penduradas
+  embaixo delas balançam com o vento (``"pendulos"`` no ``"vento"``), presas pelo cordão;
+* **árvores do pátio de dentro**: as copas vistas pelo portão, com o mesmo vento, mais fraco;
 * as folhas caindo e a luz do sol nos lutadores vêm do ``stage_extra.json``.
 
 As posições são em pixels da ``parede.jpg`` (4096 de largura).
@@ -28,6 +31,11 @@ PASTA = AQUI.parents[1] / "android/app/src/main/assets/stages/dojo_yinlu"
 # (x, y, raio) em px da parede: as janelas das lanternas de pedra e as lanternas do portão.
 LANTERNAS = [(506, 836, 26), (1290, 836, 26), (2809, 836, 26), (3568, 836, 26),
              (1802, 773, 34), (2294, 773, 34)]
+BORLAS = [(1801, 792, 1814, 834), (2286, 792, 2299, 835)]   # embaixo das lanternas do portão
+BORLA_GRAUS = 16.0
+DENTRO = (1925, 728, 2165, 872)   # o vão do portão, entre as portas: as copas do pátio de dentro
+TEMPLO = (1974, 750, 2120, 872)   # o templo do fundo e a escada: não mexem
+DENTRO_AMP = 0.035
 RAIOS = [(330, 4), (900, -2), (1500, 5), (2620, -4), (3150, 3), (3720, -3)]   # (x no alto, graus)
 ANGULO = 24          # graus: o sol vem do alto à esquerda
 ALFA_RAIO = 0.5
@@ -61,9 +69,31 @@ def raios(pasta, w, h, chao_y):
         Image.fromarray(img, "RGBA").save(pasta / f"raios_{nome}.png", optimize=True)
 
 
-def arvores(pasta, parede, w, h):
+def tirar(img, arv):
+    """A parede sem o que está na máscara. Atrás (aparece só nos poucos pixels que a peça anda):
+    dentro, ela mesma borrada; na borda, uma faixa fina continuada (inpaint só na faixa)."""
+    tampa = cv2.dilate(arv, np.ones((9, 9), np.uint8))
+    dentro = cv2.erode(tampa, np.ones((15, 15), np.uint8))
+    borda = (tampa & (1 - dentro)).astype(np.uint8)
+    borrada = cv2.GaussianBlur(img.astype(np.float32), (0, 0), 6)
+    sem = img.copy()
+    sem[dentro > 0] = borrada[dentro > 0].astype(np.uint8)
+    sem = cv2.inpaint(sem, borda, 4, cv2.INPAINT_TELEA)
+    m3 = cv2.GaussianBlur(tampa.astype(np.float32), (0, 0), 1.5)[..., None]
+    return (img * (1 - m3) + sem * m3).astype(np.uint8)
+
+
+def posicao(parede, w, h, x0, y0, x1, y1):
+    """topo, base e x (frações da tela de repouso) de um retângulo da parede."""
+    t, b = parede["topo"], parede["base"]
+    alt = (b - t) * 720.0                       # altura da parede na tela (720 de altura)
+    cx = parede["x"] * 1280.0 + ((x0 + x1) / 2 - w / 2) / h * alt
+    return {"topo": round(t + (b - t) * y0 / h, 5), "base": round(t + (b - t) * y1 / h, 5),
+            "x": round(cx / 1280.0, 5)}
+
+
+def arvores(img, pasta, parede, w, h):
     """Recorta as copas da parede numa camada com vento e põe o céu no lugar delas."""
-    img = cv2.imread(str(pasta / parede["imagem"]))
     b, g, r = [img[..., i].astype(np.int16) for i in range(3)]
     ceu = (b > r + 35) & (b > g + 10)
     nuvem = (b > 200) & (g > 200) & (r > 200) & (np.abs(b - r) < 40)
@@ -85,18 +115,7 @@ def arvores(pasta, parede, w, h):
     alcance *= np.clip(cv2.distanceTransform(1 - portao, cv2.DIST_L2, 5) / 100.0, 0, 1)
     yy = np.arange(h, dtype=np.float32)[:, None]
     alcance *= np.clip((yy - ARVORE_TOPO) / 80.0, 0, 1) * np.clip((TELHADO - yy) / 40.0, 0, 1)
-    # Atrás das copas (aparece só nos poucos pixels que elas andam): dentro, a própria copa
-    # borrada; na borda com o céu, uma faixa fina com o céu continuado (inpaint só na faixa).
-    tampa = cv2.dilate(arv, np.ones((9, 9), np.uint8))
-    dentro = cv2.erode(tampa, np.ones((15, 15), np.uint8))
-    borda = (tampa & (1 - dentro)).astype(np.uint8)
-    borrada = cv2.GaussianBlur(img.astype(np.float32), (0, 0), 6)
-    sem = img.copy()
-    sem[dentro > 0] = borrada[dentro > 0].astype(np.uint8)
-    sem = cv2.inpaint(sem, borda, 4, cv2.INPAINT_TELEA)
-    m3 = cv2.GaussianBlur(tampa.astype(np.float32), (0, 0), 1.5)[..., None]
-    sem = (img * (1 - m3) + sem * m3).astype(np.uint8)
-    cv2.imwrite(str(pasta / parede["imagem"]), sem, [cv2.IMWRITE_JPEG_QUALITY, 92])
+    sem = tirar(img, arv)
     # A camada: só a faixa das árvores, com o alfa macio.
     a = cv2.GaussianBlur(arv.astype(np.float32), (0, 0), 0.8)
     rgba = np.dstack([img[..., 2], img[..., 1], img[..., 0], (a * 255).astype(np.uint8)])[ARVORE_TOPO:TELHADO]
@@ -115,11 +134,103 @@ def arvores(pasta, parede, w, h):
     grupos = [[round(float(cx / w), 4), round(float(cy / hh), 4)] for cx, cy in cent]
     freq = [round(float(f), 3) for f in rng.uniform(0.45, 0.7, VENTO_GRUPOS)]
     t, b_ = parede["topo"], parede["base"]
-    return {"id": "arvores", "imagem": "arvores.png", "profundidade": round(parede["profundidade"] - 0.3, 1),
-            "topo": round(t + (b_ - t) * ARVORE_TOPO / h, 4), "base": round(t + (b_ - t) * TELHADO / h, 4),
-            "x": parede["x"], "repetir": "espelhar",
-            "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
-                      "amplitude": VENTO_AMP * h / hh, "amortecimento": 0.35, "raio": 0.018}}
+    return sem, {"id": "arvores", "imagem": "arvores.png", "profundidade": round(parede["profundidade"] - 0.3, 1),
+                 "topo": round(t + (b_ - t) * ARVORE_TOPO / h, 4), "base": round(t + (b_ - t) * TELHADO / h, 4),
+                 "x": parede["x"], "repetir": "espelhar",
+                 "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
+                           "amplitude": VENTO_AMP * h / hh, "amortecimento": 0.35, "raio": 0.018}}
+
+
+def arvores_dentro(img, pasta, parede, w, h):
+    """As copas do pátio de dentro, vistas pelo vão do portão: a mesma mola dos galhos, mais
+    fraca (estão longe); paradas perto das portas e da verga, para não passar por cima delas."""
+    x0, y0, x1, y1 = DENTRO
+    q = img[y0:y1, x0:x1]
+    b, g, r = [q[..., i].astype(np.int16) for i in range(3)]
+    ceu = (b > r + 35) & (b > g + 10)
+    nuvem = (b > 190) & (g > 190) & (r > 190) & (np.abs(b - r) < 45)
+    folha = (~ceu & ~nuvem).astype(np.uint8)
+    tx0, ty0, tx1, ty1 = TEMPLO
+    folha[ty0 - y0:ty1 - y0, tx0 - x0:tx1 - x0] = 0
+    folha = cv2.morphologyEx(folha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+    arv = np.zeros(img.shape[:2], np.uint8)
+    arv[y0:y1, x0:x1] = folha
+    sem = tirar(img, arv)
+    a = cv2.GaussianBlur(folha.astype(np.float32), (0, 0), 0.8)
+    rgba = np.dstack([q[..., 2], q[..., 1], q[..., 0], (a * 255).astype(np.uint8)])
+    Image.fromarray(rgba, "RGBA").save(pasta / "arvores_dentro.png", optimize=True)
+    hh, ww = y1 - y0, x1 - x0
+    cols, rows = 24, 12
+    yy, xx = np.mgrid[0:rows + 1, 0:cols + 1].astype(np.float32)
+    py, px = yy * hh / rows, xx * ww / cols
+    alcance = np.clip((hh - 10 - py) / 90.0, 0, 1)                     # o pé das copas parado
+    alcance *= np.clip(np.minimum(px, ww - px) / 14.0, 0, 1)           # as portas
+    alcance *= np.clip(py / 12.0, 0, 1)                                # a verga
+    gx, gy = px + x0, py + y0                                          # o templo
+    fora = np.hypot(np.maximum(np.maximum(tx0 - gx, gx - tx1), 0), np.maximum(np.maximum(ty0 - gy, gy - ty1), 0))
+    alcance *= np.clip(fora / 12.0, 0, 1)
+    reach = [round(float(v), 3) for v in alcance.ravel()]
+    ys, xs = np.nonzero(folha)
+    pts = np.float32(np.column_stack([xs, ys]))[::5]
+    _, _, cent = cv2.kmeans(pts, 6, None, (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.5),
+                            3, cv2.KMEANS_PP_CENTERS)
+    rng = np.random.default_rng(9)
+    grupos = [[round(float(cx / ww), 4), round(float(cy / hh), 4)] for cx, cy in cent]
+    freq = [round(float(f), 3) for f in rng.uniform(0.5, 0.75, len(grupos))]
+    return sem, {"id": "arvores-dentro", "imagem": "arvores_dentro.png",
+                 "profundidade": round(parede["profundidade"] - 0.3, 1), **posicao(parede, w, h, x0, y0, x1, y1),
+                 "vento": {"colunas": cols, "linhas": rows, "alcance": reach, "grupos": grupos, "freq": freq,
+                           "amplitude": DENTRO_AMP, "amortecimento": 0.35, "raio": 0.12}}
+
+
+def borlas(img, pasta, parede, w, h):
+    """As borlas vermelhas embaixo das lanternas do portão: recortadas pela cor (o corpo vermelho
+    e o cordão até a lanterna), cada uma um pêndulo preso no alto do cordão. Atrás delas o poste
+    escuro continua de cima para baixo (cada coluna ligando o que está acima e abaixo)."""
+    camadas = []
+    for k, (bx0, by0, bx1, by1) in enumerate(BORLAS):
+        x0, y0, x1, y1 = bx0 - 8, by0 - 2, bx1 + 8, by1 + 6
+        q = img[y0:y1, x0:x1].astype(np.int16)
+        b, g, r = q[..., 0], q[..., 1], q[..., 2]
+        red = ((r > g + 40) & (g < r * 0.5) & (b < r * 0.6) & (r > 70)).astype(np.uint8)
+        red[:, :8] = 0                                       # só entre as bordas da borla
+        red[:, -8:] = 0
+        red = cv2.morphologyEx(red, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))
+        n, lab, st, _ = cv2.connectedComponentsWithStats(red, 8)
+        corpo = (lab == 1 + int(np.argmax(st[1:, 4]))).astype(np.uint8)
+        corpo = cv2.morphologyEx(corpo, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
+        ys, xs = np.nonzero(corpo)
+        cx = int(round(xs.mean()))
+        mask = corpo.copy()
+        mask[0:ys.min() + 1, cx - 1:cx + 2] = 1             # o cordão até a lanterna
+        hh, ww = y1 - y0, x1 - x0
+        # A parede sem a borla: cada coluna liga o que está logo acima e logo abaixo dela.
+        tampa = cv2.dilate(mask, np.ones((5, 5), np.uint8))
+        bloco = img[y0:y1, x0:x1].astype(np.float32)
+        for c in range(ww):
+            rows = np.nonzero(tampa[:, c])[0]
+            if len(rows) == 0:
+                continue
+            a, z = max(rows.min() - 1, 0), min(rows.max() + 1, hh - 1)
+            t = ((np.arange(a, z + 1) - a) / max(1, z - a))[:, None]
+            bloco[a:z + 1, c] = bloco[a, c] * (1 - t) + bloco[z, c] * t
+        bloco = cv2.GaussianBlur(bloco, (0, 0), 0.6) * tampa[..., None] + bloco * (1 - tampa[..., None])
+        sem = img.copy()
+        sem[y0:y1, x0:x1] = bloco.astype(np.uint8)
+        img = sem
+        alfa = cv2.GaussianBlur(mask.astype(np.float32), (0, 0), 0.6)
+        qq = q.astype(np.uint8)
+        rgba = np.dstack([qq[..., 2], qq[..., 1], qq[..., 0], (np.clip(alfa * 1.3, 0, 1) * 255).astype(np.uint8)])
+        nome = f"borla_{k + 1}.png"
+        Image.fromarray(rgba, "RGBA").save(pasta / nome, optimize=True)
+        cols, rows = 4, 10
+        camadas.append({
+            "id": f"borla-{k + 1}", "imagem": nome, "profundidade": round(parede["profundidade"] - 0.3, 1),
+            **posicao(parede, w, h, x0, y0, x1, y1),
+            "vento": {"colunas": cols, "linhas": rows, "amortecimento": 0.25, "pendulos": [
+                {"pivo": [round((cx + 0.5) / ww, 4), 0.0], "graus": BORLA_GRAUS, "freq": 1.1,
+                 "atraso": round(cx / w * 1.5, 3), "peso": [1.0] * ((cols + 1) * (rows + 1))}]}})
+    return img, camadas
 
 
 def main():
@@ -140,8 +251,15 @@ def main():
         (pasta / parede["imagem"]).write_bytes(inteira.read_bytes())
     else:
         inteira.write_bytes((pasta / parede["imagem"]).read_bytes())
-    camadas = [c for c in stage["camadas"] if not c["id"].startswith(("raios-", "arvores"))]
-    camadas.append(arvores(pasta, parede, w, h))
+    camadas = [c for c in stage["camadas"] if not c["id"].startswith(("raios-", "arvores", "lanterna-", "borla-"))]
+    img = cv2.imread(str(pasta / parede["imagem"]))
+    img, camada = arvores(img, pasta, parede, w, h)
+    camadas.append(camada)
+    img, camada = arvores_dentro(img, pasta, parede, w, h)
+    camadas.append(camada)
+    img, novas = borlas(img, pasta, parede, w, h)
+    camadas += novas
+    cv2.imwrite(str(pasta / parede["imagem"]), img, [cv2.IMWRITE_JPEG_QUALITY, 92])
     for nome, fase in (("a", 0.0), ("b", 3.1416)):
         camadas.append({"id": f"raios-{nome}", "imagem": f"raios_{nome}.png",
                         "profundidade": round(parede["profundidade"] - 0.5, 1), "topo": parede["topo"],

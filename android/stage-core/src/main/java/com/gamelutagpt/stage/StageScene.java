@@ -51,6 +51,8 @@ public final class StageScene {
         final RenderImage[] banners;
         /** Vento: a mola de cada galho (ângulo e velocidade) e o peso de cada galho em cada vértice. */
         float[] windTh, windVel, windWeights, windXY, windUV;
+        /** Pêndulos: ângulo e velocidade de cada um. */
+        float[] pendTh, pendVel;
 
         Placed(StageDefinition.Layer layer, RenderImage image, float z,
                float top, float bottom, float width, float firstCenterX, float period, RenderImage[] banners) {
@@ -799,6 +801,10 @@ public final class StageScene {
         for (Placed p : placed) {
             StageDefinition.Wind w = p.layer.wind;
             if (w == null) continue;
+            if (w.pendulums != null) {
+                updatePendulums(p, w, dt);
+                continue;
+            }
             int ng = w.freq.length;
             if (p.windTh == null) {
                 p.windTh = new float[ng];
@@ -835,6 +841,56 @@ public final class StageScene {
         }
     }
 
+    /** Peças penduradas: cada uma uma mola (a gravidade) que o vento empurra para o lado e volta. */
+    private void updatePendulums(Placed p, StageDefinition.Wind w, float dt) {
+        StageDefinition.Pendulum[] ps = w.pendulums;
+        int n = ps.length;
+        if (p.pendTh == null) {
+            p.pendTh = new float[n];
+            p.pendVel = new float[n];
+            for (int i = 0; i < n; i++) p.pendTh[i] = ps[i].amp * (windForce(time - ps[i].delay) - 0.55f);
+        }
+        float step = Math.min(dt, 0.1f) / 4f;
+        for (int s = 0; s < 4; s++) {
+            float tt = time - dt + step * (s + 1);
+            for (int i = 0; i < n; i++) {
+                StageDefinition.Pendulum q = ps[i];
+                float w0 = 2f * (float)Math.PI * q.freq;
+                float alvo = q.amp * (windForce(tt - q.delay) - 0.55f);
+                float acc = w0 * w0 * (alvo - p.pendTh[i]) - 2f * w.damping * w0 * p.pendVel[i];
+                p.pendVel[i] += acc * step;
+                p.pendTh[i] += p.pendVel[i] * step;
+            }
+        }
+    }
+
+    /**
+     * Onde o vértice (coluna {@code ci}, linha {@code j}) de uma camada de pêndulos vai parar: gira em
+     * volta do pivô de cada pêndulo pelo peso dele. Devolve o
+     * deslocamento em {@code out} (dx, dy), na tela, com a camada de largura {@code lw} e altura {@code h}.
+     */
+    private static void pendulumOffset(Placed p, StageDefinition.Wind w, int ci, int j, float lw, float h, float[] out) {
+        StageDefinition.Pendulum[] ps = w.pendulums;
+        int v = j * (w.cols + 1) + ci;
+        float x0 = lw * ci / w.cols, y0 = h * j / w.rows, x = x0, y = y0;
+        for (int i = 0; i < ps.length; i++) {
+            StageDefinition.Pendulum q = ps[i];
+            float wt = q.weight[v];
+            if (wt <= 0f) continue;
+            float px = q.px * lw, py = q.py * h;
+            float a = p.pendTh[i] * wt;
+            float cs = (float)Math.cos(a), sn = (float)Math.sin(a);
+            float ox = x - px, oy = y - py;
+            // Ângulo positivo leva a ponta de baixo para a direita (para onde o vento sopra).
+            x = px + ox * cs + oy * sn;
+            y = py - ox * sn + oy * cs;
+        }
+        out[0] = x - x0;
+        out[1] = y - y0;
+    }
+
+    private final float[] pendOut = new float[2];
+
     /**
      * A camada com vento desenhada como uma grade que se deforma: coluna por coluna, uma faixa com
      * uma linha por vértice. No Canvas (sem faixas) ou no modo leve, parada.
@@ -843,11 +899,11 @@ public final class StageScene {
                                boolean mirrored, int alpha) {
         StageDefinition.Wind w = p.layer.wind;
         RenderImage img = p.image;
-        if (!c.desenhaFaixas() || !detalhe || p.windTh == null) {
+        if (!c.desenhaFaixas() || !detalhe || (p.windTh == null && p.pendTh == null)) {
             drawImage(c, img, l, top, r, bottom, mirrored, alpha);
             return;
         }
-        int ng = w.freq.length, cols = w.cols, rows = w.rows;
+        int ng = w.freq == null ? 0 : w.freq.length, cols = w.cols, rows = w.rows;
         float iw = img.width(), ih = img.height(), h = bottom - top;
         if (p.windXY == null) {
             p.windXY = new float[(rows + 1) * 4];
@@ -862,12 +918,20 @@ public final class StageScene {
                 for (int e = 0; e < 2; e++) {
                     int ci = mirrored ? cols - (i + e) : i + e;          // a coluna da imagem
                     int v = j * (cols + 1) + ci;
-                    float bend = 0f;
-                    for (int g = 0; g < ng; g++) bend += p.windWeights[v * ng + g] * p.windTh[g];
-                    float dx = w.amp * h * w.reach[v] * (bend - 0.55f) * sign;
+                    float dx, dy;
+                    if (w.pendulums != null) {
+                        pendulumOffset(p, w, ci, j, r - l, h, pendOut);
+                        dx = pendOut[0] * sign;
+                        dy = pendOut[1];
+                    } else {
+                        float bend = 0f;
+                        for (int g = 0; g < ng; g++) bend += p.windWeights[v * ng + g] * p.windTh[g];
+                        dx = w.amp * h * w.reach[v] * (bend - 0.55f) * sign;
+                        dy = 0.25f * Math.abs(dx);
+                    }
                     int q = j * 4 + e * 2;
                     p.windXY[q] = (e == 0 ? x0 : x1) + dx;
-                    p.windXY[q + 1] = y + 0.25f * Math.abs(dx);
+                    p.windXY[q + 1] = y + dy;
                     p.windUV[q] = iw * ci / cols;
                     p.windUV[q + 1] = ih * j / rows;
                 }

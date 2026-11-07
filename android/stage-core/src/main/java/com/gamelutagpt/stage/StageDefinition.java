@@ -195,6 +195,19 @@ public final class StageDefinition {
         public int cols, rows;
         public float[] reach, groupX, groupY, freq;
         public float amp, damping, radius;
+        /** Com {@code "pendulos"} no lugar dos galhos: peças penduradas que giram (null = galhos). */
+        public Pendulum[] pendulums;
+    }
+
+    /**
+     * Uma peça pendurada ({@code "pendulos"} no {@code "vento"}): gira em volta do {@code pivo}
+     * (fração da imagem) como um pêndulo de frequência {@code freq} (Hz), que o vento empurra até
+     * {@code graus} para o lado e de volta. Cada vértice da grade gira com o {@code peso} dele (0 a
+     * 1; 1 em tudo = a peça inteira gira). {@code atraso}: segundos até a rajada chegar aqui.
+     */
+    public static final class Pendulum {
+        public float px, py, amp, freq, delay;
+        public float[] weight;
     }
 
     public static final class Layer {
@@ -1187,6 +1200,7 @@ public final class StageDefinition {
             w.cols = Math.max(1, Math.round(number(vento, "colunas", 32f)));
             w.rows = Math.max(1, Math.round(number(vento, "linhas", 12f)));
             w.reach = lista(vento, "alcance");
+            List<Object> pend = (List<Object>)vento.get("pendulos");
             List<Object> grupos = (List<Object>)vento.get("grupos");
             int ng = grupos == null ? 0 : grupos.size();
             w.groupX = new float[ng];
@@ -1200,11 +1214,33 @@ public final class StageDefinition {
             w.amp = number(vento, "amplitude", 0.005f);
             w.damping = number(vento, "amortecimento", 0.35f);
             w.radius = number(vento, "raio", 0.03f);
-            if (w.reach == null || w.reach.length != (w.cols + 1) * (w.rows + 1)) {
-                throw new IllegalArgumentException(where + ": \"vento\" precisa de (colunas+1)*(linhas+1) valores de alcance");
-            }
-            if (ng == 0 || w.freq == null || w.freq.length != ng) {
-                throw new IllegalArgumentException(where + ": \"vento\" precisa de grupos e uma freq por grupo");
+            int nv = (w.cols + 1) * (w.rows + 1);
+            if (pend != null) {
+                w.pendulums = new Pendulum[pend.size()];
+                for (int i = 0; i < w.pendulums.length; i++) {
+                    Map<String, Object> m = (Map<String, Object>)pend.get(i);
+                    Pendulum q = new Pendulum();
+                    List<Object> pv = (List<Object>)m.get("pivo");
+                    if (pv == null || pv.size() != 2) throw new IllegalArgumentException(where + ": pêndulo sem \"pivo\" [x, y]");
+                    q.px = ((Number)pv.get(0)).floatValue();
+                    q.py = ((Number)pv.get(1)).floatValue();
+                    q.amp = (float)Math.toRadians(number(m, "graus", 3f));
+                    q.freq = number(m, "freq", 0.7f);
+                    q.delay = number(m, "atraso", 0f);
+                    q.weight = lista(m, "peso");
+                    if (q.weight == null || q.weight.length != nv) {
+                        throw new IllegalArgumentException(where + ": pêndulo precisa de (colunas+1)*(linhas+1) pesos");
+                    }
+                    if (q.freq <= 0f) throw new IllegalArgumentException(where + ": pêndulo com freq > 0");
+                    w.pendulums[i] = q;
+                }
+            } else {
+                if (w.reach == null || w.reach.length != nv) {
+                    throw new IllegalArgumentException(where + ": \"vento\" precisa de (colunas+1)*(linhas+1) valores de alcance");
+                }
+                if (ng == 0 || w.freq == null || w.freq.length != ng) {
+                    throw new IllegalArgumentException(where + ": \"vento\" precisa de grupos e uma freq por grupo");
+                }
             }
             layer.wind = w;
         }

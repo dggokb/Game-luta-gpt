@@ -290,7 +290,10 @@ python3 tools/stage/cenario_pintura.py $A/9_panorama_4096.webp $D --tela-px 2048
    As árvores balançam com o vento (`"vento"` do motor): o script separa as copas da parede
    (`arvores.png`, a parede fica com o céu borrado atrás), acha os troncos (alcance 0) e as pontas
    (alcance 1) e agrupa os galhos. A parede original fica em `art/stages/dojo_yinlu/parede_com_arvores.jpg`
-   (rodar de novo parte dela).
+   (rodar de novo parte dela). As copas do pátio de dentro, vistas pelo portão, são outra camada
+   (`arvores_dentro.png`, vento mais fraco; o templo e as portas não mexem). As lanternas do
+   portão ficam num poste e não balançam; as borlas vermelhas embaixo delas sim (recortadas pela
+   cor, `borla_1/2.png`, com `"pendulos"`; atrás, o poste continuado de cima para baixo).
 
 Os fachos da Arena Coberta e os raios do dojo ficam meia unidade na frente da parede: atrás dela
 (mais fundo), a parede opaca os cobria.
