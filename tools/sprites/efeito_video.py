@@ -16,6 +16,8 @@ Diferente do personagem (recorte tudo ou nada), efeito tem partes meio transpare
     --altura H        o efeito inteiro (a maior altura entre os quadros) vira H px do mundo
     --recorte x0,y0,x1,y1   usa só esse retângulo do vídeo (outra coisa no quadro)
     --passo N         um quadro a cada N do vídeo (24 fps com --passo 2 = 12 fps)
+    --saida PASTA     sai em PASTA/<nome>/ (a cena de dois lutadores de uma cinemática fica no
+                      episódio: android/app/src/main/assets/historia/ep00)
 
 Também aceita uma PASTA de PNGs transparentes no lugar do vídeo (efeito desenhado em código):
 não passa pela chave do verde, e o brilho meio transparente guarda a cor. --fps diz o ritmo.
@@ -313,12 +315,14 @@ def main():
     p.add_argument('--escuro', type=int, default=0, help='véu cinza mais escuro que isso (0-255) e meio transparente some')
     p.add_argument('--cinza', type=float, default=0.0, help='véu meio transparente com saturação abaixo disso (0-1) some')
     p.add_argument('--segurar', type=lambda t: numeros(t, 2), help='quadro,ms: o vídeo para nesse quadro por mais ms (marcaMs no json)')
+    p.add_argument('--saida', type=Path, help='pasta onde sai <nome>/ (padrão: assets/efeitos). As cenas da história '
+                   '(os dois lutadores num vídeo, motor de cinemáticas) vão em assets/historia/<episódio>')
     a = p.parse_args()
     destino, dados = converter(a.video, a.nome, a.inicio, a.fim, a.passo, a.ancora, a.origem,
                                a.altura, a.recorte, fps_png=a.fps, escala_mundo=a.escala_mundo,
                                resolucao=a.resolucao, velocidade=a.velocidade, apagar=a.apagar,
                                borda=a.borda, alfa_corte=a.alfa_corte, escuro=a.escuro, cinza=a.cinza,
-                               segurar=a.segurar)
+                               segurar=a.segurar, saida=a.saida or SAIDA)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 
