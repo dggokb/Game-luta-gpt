@@ -414,46 +414,46 @@
     {
       "index": 36,
       "outputBbox": [
-        188,
+        179,
         320,
-        687,
+        679,
         671
       ],
       "minimumMargin": 33,
-      "opaquePixels": 79919
+      "opaquePixels": 79928
     },
     {
       "index": 37,
       "outputBbox": [
-        193,
+        173,
         301,
-        514,
+        494,
         655
       ],
       "minimumMargin": 49,
-      "opaquePixels": 58020
+      "opaquePixels": 58037
     },
     {
       "index": 38,
       "outputBbox": [
-        192,
+        159,
         209,
-        506,
+        473,
         655
       ],
       "minimumMargin": 49,
-      "opaquePixels": 65922
+      "opaquePixels": 65923
     },
     {
       "index": 39,
       "outputBbox": [
-        194,
+        149,
         197,
-        501,
+        456,
         650
       ],
       "minimumMargin": 54,
-      "opaquePixels": 64981
+      "opaquePixels": 64969
     }
   ],
   "passed": true,
@@ -480,7 +480,7 @@
         165
       ],
       [
-        2192,
+        2188,
         2004,
         328,
         352,
@@ -488,7 +488,7 @@
         272
       ],
       [
-        2524,
+        2520,
         2004,
         324,
         344,
@@ -496,7 +496,7 @@
         277
       ],
       [
-        2852,
+        2848,
         2004,
         324,
         344,
@@ -592,7 +592,7 @@
         31
       ],
       [
-        2376,
+        2380,
         1060,
         240,
         460,
@@ -696,7 +696,7 @@
         50
       ],
       [
-        2620,
+        2624,
         1060,
         256,
         460,
@@ -764,31 +764,31 @@
         2004,
         512,
         364,
-        138,
+        129,
         279
       ],
       [
         1852,
         2004,
-        336,
+        332,
         364,
-        143,
+        123,
         261
       ],
       [
-        2880,
+        2884,
         1060,
         324,
         460,
-        143,
+        109,
         168
       ],
       [
         2056,
         1060,
-        316,
+        320,
         468,
-        144,
+        99,
         156
       ]
     ],
@@ -803,12 +803,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8da3b3caea90348406d9b7da24f8fea9159c82b596f46a198ca238163a27f565",
+      "source": "b5b404115f5e0e0de0ad52795d4e9e87719f5c04c8dc96a40a15705b784da7fa",
       "config": "85ba7f1b7a7ea35e0a7aebf5c805de9c51c11d3e9c88f3ae07ce491709a55fbf",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_special_s3_video_normalized.png": "8da3b3caea90348406d9b7da24f8fea9159c82b596f46a198ca238163a27f565"
+      "art/sprites/source/player_base_special_s3_video_normalized.png": "b5b404115f5e0e0de0ad52795d4e9e87719f5c04c8dc96a40a15705b784da7fa"
     }
   }
 }
