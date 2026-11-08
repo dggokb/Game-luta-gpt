@@ -318,13 +318,13 @@ carrega a cinemática e soltas no fim dela.
 ### A briga dos irmãos (Prólogo): o teste da cena em vídeo
 
 `historia/ep00/cinematica_briga.json`, na luta IRMÃOS das duas campanhas (depois do treino),
-com os três vídeos dos meninos do Drive (`ryuga_8/qt1`, `qt2`, `qt3`):
+com os vídeos dos meninos do Drive (`ryuga_8/qt1`, `qt2`, `qt3`) e o do Kōga se levantando (`levanta`, que emenda o qt2 no qt3):
 
 | Momento | O que acontece |
 |---|---|
 | Um dos dois com 50% | câmera lenta, faixas; a tinta cobre e sai com o **qt1** em loop (os dois trocando golpes e errando); o Dafu: "Ei, ei! Devagar, meninos!" |
 | TROCA DE GOLPES! (martelar 14, em 4,2 s; o qt1 toca a 1,8x e repete enquanto o QTE espera; o qt2 a 1,7x) | PÁ! PÁ! PÁ!; no fim da volta do loop entra o **qt2** (se acertam e caem), com PAH!, POW!, BAM!, TUM! nos golpes do vídeo |
-| GOLPE FINAL! (tempo) | o qt2 fica parado no fim (o Kōga sentado, o Ryūga de pé) com a câmera chegando perto; no acerto, um **clarão** e o **qt3** entra por baixo dele (ele começa parado em guarda: o corte some no branco): o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
+| GOLPE FINAL! (tempo) | o Kōga se levanta e avança num soco que assusta o Ryūga (**levanta**, que começa no último quadro do qt2 e acaba no primeiro do qt3: sem corte), PAH!; com os dois em guarda o QTE pede, e o acerto vira o **qt3**: o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
 
 A cena é a mesma nas duas campanhas: o Kōga é quem está à esquerda nos vídeos, e o vídeo
 espelha quando ele está à direita (campanha do Ryūga). Para ver no PC:
