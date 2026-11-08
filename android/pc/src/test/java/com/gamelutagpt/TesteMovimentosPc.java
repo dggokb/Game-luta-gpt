@@ -46,6 +46,7 @@ public final class TesteMovimentosPc {
         metodo("selectTeamsNow", String.class, String.class, String.class, String.class, boolean.class)
             .invoke(jogo, lutador, rival, rival, lutador, true);
         metodo("setOpponentAiEnabled", boolean.class).invoke(jogo, false);
+        medirEscalas(lutador);
         // Depois da intro e do LUTEM!.
         for (int i = 0; i < 60 * 12 && ((int)campo("introFrame").get(jogo) >= 0 || ((BattleFlow)campo("flow").get(jogo)).holdsFighters()); i++) passo(false);
         for (int i = 0; i < 30; i++) passo(false);
@@ -158,6 +159,31 @@ public final class TesteMovimentosPc {
         pad.press(botao);
         for (int i = 0; i < quadros; i++) { pad.setDirection(0); passo(i % 3 == 0); }
         solta(30);
+    }
+
+    /**
+     * Altura e largura do desenho (px da tela, pixels opacos) do 1º quadro de cada animação, numa
+     * tela vazia: confere se tudo está na mesma escala (idle, pulo, golpes no ar, agachado).
+     */
+    static void medirEscalas(String lutador) throws Exception {
+        SpriteFighterRenderer r = (SpriteFighterRenderer)campo("spriteFighterRenderer").get(jogo);
+        for (String clip : new String[]{"IDLE", "JUMP", "FALL", "LAND", "JUMP_LIGHT", "JUMP_MEDIUM", "JUMP_HEAVY",
+                "JUMP_HEAVY_DOWN", "CROUCH_IDLE", "SPECIAL_S2", "HEAVY_STRAIGHT"}) {
+            if (!r.hasAnimation(clip)) continue;
+            for (float t : new float[]{0f, 0.25f}) {
+                Bitmap b = Bitmap.createBitmap(900, 900, Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(b);
+                r.motion.clip = clip;
+                r.motion.time = t;
+                r.draw(c, 450f, 800f, 1, false, false);
+                java.awt.image.BufferedImage im = b.image();
+                int x0 = 900, x1 = -1, y0 = 900, y1 = -1;
+                for (int y = 0; y < 900; y++) for (int x = 0; x < 900; x++) {
+                    if ((im.getRGB(x, y) >>> 24) > 128) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+                }
+                System.out.println("ESCALA " + clip + " t=" + t + " altura " + (y1 - y0) + " largura " + (x1 - x0) + " pe " + y1);
+            }
+        }
     }
 
     static void toques(int dir) throws Exception {

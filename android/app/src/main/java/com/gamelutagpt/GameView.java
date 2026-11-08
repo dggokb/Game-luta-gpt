@@ -2227,6 +2227,7 @@ public class GameView extends SurfaceView
         updateUltraBeam();
         impacts.update(FIXED_STEP);
         efeitos.passo();
+        acompanharDragao();
         passoRaiosShinkai();
         feel.step();
         playMotionSounds();
@@ -5550,11 +5551,12 @@ public class GameView extends SurfaceView
             float y = f.y - f.character().visualStandHeight * 0.62f;
             if (efeitos.temCena(nome)) {
                 // O vídeo do dragão atravessando a tela (dragao_ultra): ele mesmo entra de um lado e
-                // sai do outro; toca uma vez no meio da tela, na altura do peito, do lado em que ele olha.
-                // No tamanho que cobre a tela que a câmera mostra (as bordas do vídeo ficam fora dela).
+                // sai do outro; toca uma vez no meio da tela, do lado em que ele olha, no tamanho
+                // que cobre a tela que a câmera mostra (as bordas do vídeo ficam fora dela), e
+                // acompanha a câmera enquanto passa (acompanharDragao).
                 float largura = efeitos.larguraCena(nome);
-                float tamanho = largura > 0f ? Math.max(1f, VW / Math.max(0.01f, camera.zoom) / largura * 1.06f) : 1f;
-                efeitos.tocar(nome, camera.x, y, tamanho, f.facing < 0);
+                float tamanho = largura > 0f ? Math.max(1f, VW / Math.max(0.01f, camera.zoom) / largura * 1.12f) : 1f;
+                efeitos.tocar(nome, camera.x, meioDaTelaY(), tamanho, f.facing < 0);
             } else {
                 // O dragão por código (um ciclo): a cabeça entra de fora da tela, por trás dele, e
                 // anda como no motor até o rabo sair do outro lado.
@@ -5598,6 +5600,21 @@ public class GameView extends SurfaceView
     /** A bola padrão do personagem (não o mini do SHINKAI nem um desenho próprio). */
     private static boolean projetilDoPersonagem(Projectile p) {
         return !p.mini && (p.visual == null || "ONDA".equals(p.visual)) && p.ownerIndex >= 0 && p.ownerIndex < 2;
+    }
+
+    /** Altura do meio da tela que a câmera mostra, um pouco acima (o dragão passa por cima dos dois). */
+    private float meioDaTelaY() {
+        return camera.top + VH / Math.max(0.01f, camera.zoom) * 0.42f;
+    }
+
+    /** O dragão em cena (o vídeo) segue a câmera enquanto atravessa: o corte da tela nunca aparece. */
+    private void acompanharDragao() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (!f.inUltraDragao()) continue;
+            String nome = "ultra_shinkai_" + f.state.character.id;
+            if (efeitos.temCena(nome)) efeitos.mover(nome, camera.x, meioDaTelaY());
+        }
     }
 
     /** Raios no cenário com os dois no SHINKAI (cores dos tipos). */

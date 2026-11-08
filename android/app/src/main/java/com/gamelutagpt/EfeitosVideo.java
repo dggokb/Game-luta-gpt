@@ -218,6 +218,19 @@ final class EfeitosVideo {
         return true;
     }
 
+    /**
+     * Leva os efeitos {@code nome} que estão tocando para (x, y): a cena que acompanha a câmera
+     * (o dragão do Ultra SHINKAI fica sempre cobrindo a tela, mesmo com a câmera andando).
+     */
+    void mover(String nome, float px, float py) {
+        for (int i = 0; i < VAGAS; i++) {
+            if (tocando[i] != null && tocando[i].nome.equals(nome)) {
+                x[i] = px;
+                y[i] = py;
+            }
+        }
+    }
+
     /** Um passo de 60 Hz. */
     void passo() {
         for (int i = 0; i < VAGAS; i++) {
