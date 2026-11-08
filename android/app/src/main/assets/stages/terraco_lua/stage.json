@@ -35,15 +35,15 @@
       "imagem": "ceu.jpg",
       "profundidade": 30000.0,
       "topo": -1.19343,
-      "base": 0.6885,
+      "base": 1.42634,
       "x": 0.5,
       "repetir": "espelhar",
       "corAcima": "#060A1E",
       "luzes": [
         {
           "x": 0.5039,
-          "y": 0.8118,
-          "raio": 0.0692,
+          "y": 0.5832,
+          "raio": 0.0497,
           "cor": "#BFD8FF",
           "pulsar": 0.04,
           "reflexo": false
@@ -59,16 +59,6 @@
       "x": 0.5,
       "repetir": "espelhar",
       "deriva": 30.0
-    },
-    {
-      "id": "fundo",
-      "imagem": "fundo.webp",
-      "profundidade": 6000.0,
-      "topo": -0.41219,
-      "base": 1.42634,
-      "x": 0.5,
-      "repetir": "espelhar",
-      "apoio": 30000.0
     },
     {
       "id": "parede",

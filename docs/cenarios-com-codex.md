@@ -407,16 +407,19 @@ python3 tools/stage/animar_terraco.py
 ```
 
 (o horizonte é o ponto de fuga das juntas do piso, linha 1068; o anel do mosaico dava 966). O
-`animar_terraco.py` separa céu (30000, com o brilho da lua), nuvens (12000, as da pintura mais
-claras que o céu limpo, `"deriva": 30`), fundo (6000: mar, mar de nuvens, ilhas, estádio e templo)
-e o terraço (`parede.webp`, mureta e postes com o alfa do molde); acende as lanternas (as da
-mureta com reflexo no chão, pelo motor). O céu vai até embaixo: no super pulo o fundo, mais
-perto, desce mais que o céu e abria uma faixa vazia entre os dois. Pelo mesmo motivo o fundo continua
-850 linhas abaixo da mureta (`FUNDO_MAIS`, o mar de nuvens do `11_sem_terraco`): o terraço desce
-mais que o fundo e abria uma faixa preta embaixo, entre o mar e a mureta. O céu limpo do Codex ainda tinha
-a mureta e os postes embaixo: no céu eles saem (`tirar_postes`, o céu ao lado deslocado na
-horizontal entra no lugar; um inpaint deixava borrões laranja), embaixo do horizonte entra o mar
-sem terraço, e as nuvens perdem a faixa dos postes (a borda dourada deles passava no recorte por
-brilho). Sem isso, no super pulo aparecia um poste solto no ar acima do poste de verdade. O fundo tem
-`"apoio"` no céu (30000): na vertical anda com ele, porque o horizonte está no infinito; solto
-(6000), no super pulo descia mais que o céu e a borda de cima (ilhas cortadas) aparecia recortada.
+`animar_terraco.py` separa o céu (30000, com o brilho da lua) numa imagem só com o mar, o mar
+de nuvens, as ilhas, o estádio e o templo, as nuvens (12000, as da pintura mais claras que o céu
+limpo, `"deriva": 30`) e o terraço (`parede.webp`, mureta e postes com o alfa do molde); acende
+as lanternas (as da mureta com reflexo no chão, pelo motor).
+
+O céu e o mar ficam juntos porque o horizonte está no infinito: não há paralaxe entre eles. Em
+duas camadas (céu a 30000, mar e ilhas a 6000, mesmo com `"apoio"` no céu) a emenda logo acima do
+horizonte aparecia como uma linha e as ilhas saíam cortadas, e na horizontal as ilhas
+escorregavam sobre o céu. Na imagem única, em cima vai o céu limpo do Codex e, do horizonte para
+baixo e nas ilhas que sobem acima dele (onde a pintura difere do céu limpo e não é nuvem), a
+pintura. A imagem continua 850 linhas abaixo da mureta (`FUNDO_MAIS`, o mar de nuvens do
+`11_sem_terraco`): no super pulo o terraço desce mais que o céu e abria uma faixa preta embaixo.
+O céu limpo do Codex ainda tinha a mureta e os postes embaixo: eles saem (`tirar_postes`, o céu
+ao lado deslocado na horizontal entra no lugar; um inpaint deixava borrões laranja), atrás da
+mureta entra o mar sem terraço, e as nuvens perdem a faixa dos postes (a borda dourada deles
+passava no recorte por brilho). Sem isso, no super pulo aparecia um poste solto no ar.

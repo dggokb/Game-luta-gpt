@@ -5,11 +5,11 @@
 
     python3 tools/stage/animar_terraco.py [pasta]
 
-* **planos**: o **céu** (estrelas e a lua, pintado sem as nuvens, bem longe), as **nuvens**
-  (as da pintura, mais claras que o céu limpo atrás: andam devagar com ``"deriva"``), o
-  **fundo** (o mar, o mar de nuvens lá embaixo, as ilhas, o estádio e o templo; abaixo do que se
-  vê, o mar de nuvens pintado sem o terraço) e o **terraço** (``parede.webp``: a mureta e os
-  postes, com o alfa do molde verde);
+* **planos**: o **céu** numa imagem só com o mar, as ilhas, o estádio e o templo (o horizonte
+  está no infinito: entre eles não há paralaxe; em cima, o céu pintado sem as nuvens; abaixo da
+  mureta, o mar de nuvens pintado sem o terraço), as **nuvens** (as da pintura, mais claras que
+  o céu limpo atrás: andam devagar com ``"deriva"``) e o **terraço** (``parede.webp``: a mureta
+  e os postes, com o alfa do molde verde);
 * **lanternas**: as da mureta e as dos postes brilham e tremulam; as da mureta refletem no chão
   (o chão é o pintado sem os riscos de luz: o motor desenha o reflexo, sempre reto);
 * **lua**: um brilho grande e lento em volta dela.
@@ -39,7 +39,7 @@ HORIZONTE = 1068                              # a linha do mar (o ponto de fuga 
 FUNDO_TOPO = 1035                             # daqui para baixo é o fundo (mar, ilhas)
 FUNDO_MAIS = 850                              # linhas de mar de nuvens abaixo da mureta (super pulo)
 SEM_HORIZONTE = 985                           # o horizonte no 11_sem_terraco_4096.webp
-PROF_CEU, PROF_NUVENS, PROF_FUNDO = 30000.0, 12000.0, 6000.0
+PROF_CEU, PROF_NUVENS = 30000.0, 12000.0
 DERIVA_NUVENS = 30.0
 CEU_EXTRA = 900                               # linhas de céu acima do panorama (super pulo)
 MAX_LUZES = 60
@@ -111,10 +111,7 @@ def planos(pasta, parede):
     # Embaixo, o mar de nuvens continua (no super pulo o terraço, mais perto, desce mais que o
     # fundo; sem isto aparecia uma faixa escura entre o mar e a mureta).
     fundo = np.concatenate([fundo, sem[hp:]], 0)
-    yy2 = np.arange(len(fundo), dtype=np.float32)[:, None]
-    af = np.clip((yy2 - FUNDO_TOPO) / 30.0, 0, 1) * np.ones((1, w), np.float32)
-    Image.fromarray(np.dstack([fundo, af * 255]).astype(np.uint8), "RGBA").save(
-        pasta / "fundo.webp", lossless=True, quality=100, method=6)
+    (pasta / "fundo.webp").unlink(missing_ok=True)
 
     # Céu: o limpo (estrelas e lua), casado em cor com o que aparece entre as nuvens; nuvens: a
     # pintura onde ela é mais clara que o céu limpo (as nuvens são prata sobre o azul-marinho).
@@ -147,30 +144,33 @@ def planos(pasta, parede):
     topo = np.concatenate(pedacos[::-1], 0)[-CEU_EXTRA:]
     escuro = np.array([6, 10, 30], np.float32)
     tc = (np.linspace(1, 0, CEU_EXTRA)[:, None, None]) ** 1.3
-    # O céu vai até embaixo (no super pulo o fundo, mais perto, desce mais que o céu e abriria
-    # uma faixa vazia entre os dois): embaixo do horizonte, o próprio céu limpo (mar e névoa).
-    # (o mar sem o terraço: o céu limpo do Codex ainda tem a mureta e os postes embaixo)
-    resto = sem[len(lp):hp]
-    ceu_img = np.concatenate([topo * (1 - tc * 0.7) + escuro * tc * 0.7, lp, resto], 0)
-    # Os postes do céu limpo saem (no super pulo o céu desce menos que o terraço, e o pedaço de
-    # poste dele ficava solto no ar acima do poste de verdade).
-    ceu_img = tirar_postes(ceu_img, CEU_EXTRA, terraco[:len(lp)], lp)
+    # Céu, mar e ilhas numa imagem só: o horizonte está no infinito, então não há paralaxe entre
+    # eles (em duas camadas, a emenda logo acima do horizonte aparecia como uma linha e as ilhas
+    # saíam cortadas). Em cima, o céu limpo (sem os postes que o Codex deixou nele); do horizonte
+    # para baixo e nas ilhas que sobem acima dele, a pintura; embaixo da mureta, o mar de nuvens.
+    lp = tirar_postes(lp, 0, terraco[:len(lp)], lp)
+    gy1 = np.arange(len(lp), dtype=np.float32)[:, None]
+    m = np.clip((gy1 - (FUNDO_TOPO - 10)) / 30.0, 0, 1) * np.ones((1, w), np.float32)
+    ilha = (np.abs(ceu - lp).mean(2) > 30) & (an < 0.3) & (gy1 >= FUNDO_TOPO - 160)
+    ilha &= ~cv2.dilate(terraco[:len(lp)].astype(np.uint8), np.ones((25, 25), np.uint8)).astype(bool)
+    ilha = cv2.GaussianBlur(cv2.dilate(ilha.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(np.float32),
+                            (0, 0), 2)
+    m = np.maximum(m, ilha)[..., None]
+    junto = fundo.copy()
+    junto[:len(lp)] = lp * (1 - m) + fundo[:len(lp)] * m
+    ceu_img = np.concatenate([topo * (1 - tc * 0.7) + escuro * tc * 0.7, junto], 0)
     Image.fromarray(np.clip(ceu_img, 0, 255).astype(np.uint8)).save(pasta / "ceu.jpg", quality=93)
     Image.fromarray(np.dstack([ceu, an * 255]).astype(np.uint8), "RGBA").resize(
         (w * 3 // 4, len(ceu) * 3 // 4), Image.LANCZOS).save(pasta / "nuvens.webp", lossless=True, quality=100, method=6)
     hc = len(ceu)
-    lua = {"x": round(sx / w, 4), "y": round((sy + CEU_EXTRA) / (hp + CEU_EXTRA), 4),
-           "raio": round(150 / (hp + CEU_EXTRA), 4), "cor": "#BFD8FF", "pulsar": 0.04, "reflexo": False}
+    hc_total = len(ceu_img)
+    lua = {"x": round(sx / w, 4), "y": round((sy + CEU_EXTRA) / hc_total, 4),
+           "raio": round(150 / hc_total, 4), "cor": "#BFD8FF", "pulsar": 0.04, "reflexo": False}
     return [
-        {"id": "ceu", "imagem": "ceu.jpg", "profundidade": PROF_CEU, "topo": frac(-CEU_EXTRA), "base": frac(hp),
+        {"id": "ceu", "imagem": "ceu.jpg", "profundidade": PROF_CEU, "topo": frac(-CEU_EXTRA), "base": frac(hp + FUNDO_MAIS),
          "x": parede["x"], "repetir": "espelhar", "corAcima": "#060A1E", "luzes": [lua]},
         {"id": "nuvens", "imagem": "nuvens.webp", "profundidade": PROF_NUVENS, "topo": frac(0), "base": frac(hc),
          "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA_NUVENS},
-        {"id": "fundo", "imagem": "fundo.webp", "profundidade": PROF_FUNDO, "topo": frac(0), "base": frac(hp + FUNDO_MAIS),
-         "x": parede["x"], "repetir": "espelhar",
-         # Na vertical anda com o céu: o horizonte está no infinito. Solto (6000), no super pulo
-         # descia mais que o céu e a borda de cima (ilhas cortadas) aparecia sobre o céu.
-         "apoio": PROF_CEU},
     ]
 
 
@@ -217,7 +217,7 @@ def main():
     stage["chao"]["reflexoImagem"] = animar_coberta.risco(pasta)
     stage.pop("poeira", None)
     stage_path.write_text(json.dumps(stage, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"planos céu/nuvens/fundo/terraço, {len(lant)} lanternas ({sum(1 for l in lant if l[3])} com reflexo)")
+    print(f"planos céu (com mar e ilhas)/nuvens/terraço, {len(lant)} lanternas ({sum(1 for l in lant if l[3])} com reflexo)")
 
 
 if __name__ == "__main__":
