@@ -6,6 +6,114 @@ A régua é o **Ryūga adulto** (`player_base`), que está sendo refeito com as 
 
 ![Neutro dos seis jogos e o nosso](comparativo_neutro.jpg)
 
+**Peso das referências.** O **Dragon Ball FighterZ é a base principal**: quando as referências divergem, seguimos o que ele faz. Os outros cinco servem para confirmar o que é regra geral (o que todos fazem) e para cobrir o que o FighterZ não mostra nos vídeos (defesa, KO, sprite 2D).
+
+## Por que a luta parece amadora
+
+Esta seção trata do que **já está feito**, mas de um jeito que denuncia o amador. O que só **ainda não existe** fica fora da lista: som e música, poeiras sem arquivo, arte antiga de dano, queda, intro e vitória. Esses itens pesam, mas se resolvem fazendo; os de baixo continuam errados mesmo quando o resto ficar pronto.
+
+![Um golpe do FighterZ e um nosso, quadro a quadro](comparativo_golpe.jpg)
+
+### 1. O golpe não acontece na tela
+
+O FighterZ, golpe forte (V02 q0184–q0191):
+- no quadro do contato, a faísca já está no tamanho máximo e cobre **metade da tela**, com núcleo amarelo, estrela de 8–12 espinhos laranja-vermelhos e raios retos cruzando a tela;
+- o rastro do soco (smear) **fica congelado** junto com a pose esticada;
+- tudo fica parado ≈12 quadros, a faísca se quebra em chama e pontos pretos, e só então o atingido é empurrado.
+
+Por ≈0,3 s o golpe **é** a tela inteira. MvC3, MSHvSF, SF6 e CotW fazem o mesmo, com 26–50% da altura da tela (MSHvSF até 2× o personagem).
+
+O nosso (Ryūga, avanço + chute):
+- a faísca é um **estouro branco pequeno, de ~1/6 da altura**, sem cor e sem direção;
+- a perna ainda não está esticada no quadro da faísca, e a pose de impacto não é segurada pela arte;
+- o atingido quase não muda de pose.
+
+O golpe acerta, mas **não parece um golpe**. Este é o item que mais pesa.
+
+### 2. Tudo grita ao mesmo tempo, e o principal sussurra
+
+O FighterZ e os outros são econômicos no golpe comum: **pausa + faísca + pose**. Os extras ficam guardados para momentos que merecem:
+- câmera de cinema só no lançador;
+- tela escura só no Super e na esquiva;
+- tremor só no close.
+
+No nosso, todo golpe recebe tudo isto:
+- soco de câmera e tranco (zoom 1,2–5%, 4–14 px);
+- escurecimento do cenário no forte e no especial;
+- o atingido **piscando branco** a pausa inteira e tremendo 9 px;
+- **número de dano flutuando** sobre os lutadores ("11", "1107", "2202");
+- faixas grandes no centro da tela (PUSHBLOCK!, PUNISH COUNTER);
+- impact frame vermelho na punição;
+- câmera de cinema também na parede e no KO.
+
+É muito enfeite em volta de um núcleo fraco (o item 1). O jogo profissional faz o contrário: núcleo enorme e poucos extras. Isso também cria **escala**: quando o Super escurece a tela, o jogador sente, porque o golpe comum não escurece.
+
+### 3. Linguagem de outro tipo de jogo
+
+Número de dano flutuante e faixa grande no meio da tela a cada evento são linguagem de jogo de RPG/celular. Nenhuma das seis referências tem número de dano sobre os lutadores.
+
+Nelas:
+- o dano aparece na barra (amarela no SF6, vermelha no CotW);
+- o contador de combo fica **do lado de quem bate**: no FighterZ, gigante em pincel, "N golpes";
+- os eventos são textos pequenos, dourados e inclinados, empilhados no canto (FighterZ: "¡Primer ataque!", "¡Contraataque!");
+- no fim do combo, uma nota ("¡Genial!").
+
+### 4. Cada peça vem de um mundo diferente
+
+No FighterZ **tudo é desenhado no mesmo estilo**: personagem em 2 tons com contorno tingido, faísca chapada, poeira em 2 tons nas cores do chão, texto em pincel. O CotW coloca manchas de nanquim na faísca para combinar com o contorno de nanquim dos lutadores.
+
+No nosso, cada peça tem uma origem:
+- lutador tirado de vídeo, com sombreado suave e sem contorno;
+- faíscas recortadas de outros vídeos, com brilho realista;
+- cenário pintado à parte;
+- HUD com molduras de raio;
+- textos na fonte do sistema.
+
+Cada peça pode ser boa sozinha, mas juntas não parecem um jogo só. É por isso que o jogo parece "montado".
+
+### 5. O lutador perde para o cenário
+
+O FighterZ não escurece o fundo laranja saturado. Ele separa o lutador por **linha e matiz**: ≈3× mais contorno, cores frias ou complementares e sombra dura no formato da silhueta. Os outros cinco também fazem o lutador vencer o fundo em algum critério.
+
+No nosso, o fundo vence em saturação, em preto e em detalhe (0,59 × 0,39 de saturação). O olho não sabe para onde olhar, e o lutador não tem contorno que o recorte.
+
+### 6. Animação de vídeo e não de desenho
+
+O FighterZ anima o corpo em **poses seguradas (≈10–12 por segundo)** e deixa só a aura e os efeitos a 60. É isso que dá a cara de anime e o "tranco" dos golpes.
+
+O nosso mostra uma imagem do vídeo **por quadro de jogo**, ≈55–60 poses por segundo. O movimento fica liso e realista, com o mesmo peso do começo ao fim, e é o "genérico" que você sentiu nas animações refeitas do Ryūga. As poses do vídeo estão boas; falta escolher as poses-chave e segurá-las (seção E).
+
+### 7. O tempo da luta está mole
+
+- **A luta inteira roda a 92%** da velocidade (`RITMO_BASE = 0.92f`, `GameView.java:92`). As seis referências rodam a 100%.
+- A pausa no acerto do golpe **fraco** (12 quadros) é igual à do **forte** no FighterZ (≈12). Sem diferença entre fraco e forte, nada pesa mais que nada.
+- A **defesa** congela quase tanto quanto o acerto (8/10/12 contra 5–8 nas referências).
+
+O resultado é uma luta que parece estar um pouco em câmera lenta o tempo todo.
+
+### 8. A câmera não fica quieta
+
+Zoom de 0,78 a 1,36 conforme a distância, mais soco e tranco em todo golpe. No FighterZ o zoom varia no máximo 3% no neutro, e a câmera só trabalha no close de cinema, que corta seco e volta seco. Câmera inquieta parece insegurança; câmera parada que corta na hora certa parece direção.
+
+### O que fazer, na ordem
+
+1. **Núcleo do golpe** (itens 1 e 6):
+   - faíscas desenhadas no estilo do FighterZ (L, M, H, contra-ataque, defesa), grandes, no tamanho máximo no contato, com raios no forte;
+   - smear congelado na pose de impacto;
+   - poses-chave do Ryūga seguradas.
+2. **Limpar o ruído** (itens 2, 3 e 8), só código:
+   - tirar o número de dano flutuante, o soco/tranco/escurecimento dos normais e o flash branco do atingido;
+   - textos de evento pequenos do lado de quem bate e contador de combo no estilo FighterZ;
+   - zoom de neutro quase fixo.
+3. **Tempo** (item 7): luta a 100% e pausa L 8 / M 11 / H 14, com pausa própria longa no lançador (≈25 no FighterZ). Defesa 5/6/7.
+4. **Unidade visual** (itens 4 e 5):
+   - contorno tingido de 2–3 px e sombreamento mais duro no lutador (sombreador);
+   - sombra dura da silhueta no chão;
+   - efeitos e HUD redesenhados na mesma linguagem;
+   - fundo que não vence o lutador.
+
+As seções abaixo detalham cada área com os números dos seis jogos.
+
 ## Como foi feito
 
 - **Referências.** O usuário gravou a tela do celular com seis vídeos do YouTube: 11 gravações, ~2 min 13 s ao todo, 2400×1080 a ~24 quadros por segundo. Cada gravação foi analisada quadro a quadro com o mesmo roteiro ([roteiro-de-analise.md](roteiro-de-analise.md), seções A a M). As análises completas, com 88 folhas de imagens, estão em [`referencias/`](referencias/):
@@ -35,12 +143,12 @@ A régua é o **Ryūga adulto** (`player_base`), que está sendo refeito com as 
 
 | # | Item | O que os seis fazem | O nosso hoje | Ajuste proposto |
 |---|---|---|---|---|
-| 1 | **Lutador × fundo** | O lutador sempre vence o fundo em pelo menos um critério:<br>• SF6: saturação 90% × 15–18%, bordas 6–8× mais nítidas<br>• MvC3: 63% × 27–43%, fundo de um matiz só<br>• CotW: 21% de pretos × 7–10%<br>• FighterZ: ≈3× mais linhas<br>• Tōkon: lutador 30–50 pontos mais escuro que o fundo pastel e mais saturado<br>• MSHvSF: brilho e saturação 82–87 × 51–68, mais sombra opaca | O **fundo vence em tudo**:<br>• saturação: Ryūga 0,39 × fundo 0,59<br>• pretos: 17% × 18,5%<br>• bordas (detalhe): 25 × 30<br>• estandartes a 0,82 de saturação, tochas acesas e cerejeiras na altura da luta | Na faixa da luta, todo cenário fica com saturação de no máximo 0,40 e contraste local baixo. Pode ser uma correção de cor no motor só para as camadas do cenário (saturação ×0,6, contraste ×0,8), regulável por cenário. No lutador: contorno escuro e contraluz (item 3). Nada de fogo nem luz forte atrás dos lutadores. |
+| 1 | **Lutador × fundo** | O lutador sempre vence o fundo em pelo menos um critério:<br>• SF6: saturação 90% × 15–18%, bordas 6–8× mais nítidas<br>• MvC3: 63% × 27–43%, fundo de um matiz só<br>• CotW: 21% de pretos × 7–10%<br>• FighterZ: ≈3× mais linhas<br>• Tōkon: lutador 30–50 pontos mais escuro que o fundo pastel e mais saturado<br>• MSHvSF: brilho e saturação 82–87 × 51–68, mais sombra opaca | O **fundo vence em tudo**:<br>• saturação: Ryūga 0,39 × fundo 0,59<br>• pretos: 17% × 18,5%<br>• bordas (detalhe): 25 × 30<br>• estandartes a 0,82 de saturação, tochas acesas e cerejeiras na altura da luta | **Como o FighterZ:** primeiro o lutador, com contorno tingido de 2–3 px, sombreamento mais duro, cores frias ou complementares e sombra dura da silhueta no chão. Depois, se ainda faltar, uma correção leve de cor do cenário por `stage.json` (saturação e contraste na faixa da luta). Nada de fogo nem luz forte atrás dos lutadores. |
 | 2 | **Som** | Música o tempo todo, som de acerto por força, vozes (grito no forte, nome do especial/Super), locutor no ROUND/FIGHT/KO | 14 WAVs sintetizados, **sem música, sem voz, sem som por personagem**; os sons do Ultra procuram pastas que não existem e ficam mudos | Música por cenário. Sons de acerto separados para fraco, médio, forte, defesa e golpe no vazio. Vozes do Ryūga (≥6: L/M/H, especial, Super, dano, KO). Locutor. |
 | 3 | **Render do lutador** | Contorno de 2–6 px a 1080p, preto (MvC3, CotW, MSHvSF) ou tingido pela cor do material (FighterZ, Tōkon). Sombreamento de 2 tons com borda dura. Contraluz azul-lavanda no Tōkon. O SF6 é exceção (sem contorno, separa por saturação/nitidez). | Sprite tirado de vídeo, sombreado suave e sem contorno. O lutador some no fundo cheio. | Passada de contorno no sombreador do lutador (2–3 px a 1080p, cor escura do próprio material) e uma contraluz fina do lado oposto à luz do cenário. Testar ligado/desligado no mesmo quadro. |
 | 4 | **Animação: poses** | Animação **limitada**: ≈10–14 poses por segundo (MSHvSF 13, FighterZ 10–12, Tōkon 10–14). Antecipação de 1 desenho. **Pose de impacto exagerada e segurada** (3–6 quadros da gravação). 3–5 desenhos por golpe no MSHvSF. O SF6 é 3D a 60, mas também segura tudo no hitstop. | O vídeo é esticado até caber no frame data: o L tem **11 imagens em 11 quadros**, o M 18 em 18 e o H 30 em 32, ou seja, **≈55–60 poses por segundo**, cara de vídeo rotoscopado. A pose de impacto não é segurada pela arte; só o hitstop congela. O motor de animação não interpola. | Para cada golpe: escolher **3–6 poses-chave** (guarda → antecipação → impacto exagerado → 1–2 de volta) e segurar cada uma 2–4 quadros. A de impacto fica pela duração dos ativos. É a principal causa do "genérico" nas animações novas (detalhe abaixo). |
 | 5 | **Pausa no acerto** | Cresce com a força e com a importância:<br>• MvC3 ≈5 → 10 → 12<br>• SF6 ≈10 no acerto, ≈15 anti-aéreo/forte, ≈20 punição<br>• FighterZ 12 no forte, 25 no lançador<br>• Tōkon 7–8<br>• MSHvSF 5–8<br>• Defesa: 5–8 (SF6) ou ≈0 (MvC3) | Acerto: L 12, M 15, H 18 (base 8/10/12 + 4/5/6). Defesa: 8/10/12. **O fraco já é tão longo quanto o forte do MvC3**, e a defesa congela tanto quanto um acerto. | Acerto **L 8, M 11, H 14**. Punição +6, KO +16 (como está). Defesa **5/6/7**. A diferença entre os níveis é o que dá a escala de peso. |
-| 6 | **Tremor e câmera nos golpes comuns** | MvC3, MSHvSF, FighterZ e Tōkon: **nenhum tremor** nos normais. SF6: só no contra-ataque (±0,5%, zoom +2,3%) e na parede/queda (±1%). CotW: ±2–3 px, às vezes nada. | Soco de câmera e tranco **em todo golpe**: zoom +1,2/2,5/5%, tranco 4/9/14 px, cenário escurecendo no H (70 por 3 quadros) e no especial (100 por 4). Impact frame vermelho na punição e em combo longo. | Tirar soco, tranco e escurecimento de L/M/H e dos especiais comuns. Manter tremor curto só em contra-ataque/punição, parede, queda forte e KO. Impact frame só no Super, no Ultra e no KO. |
+| 6 | **Tremor e câmera nos golpes comuns** | MvC3, MSHvSF, FighterZ e Tōkon: **nenhum tremor** nos normais. SF6: só no contra-ataque (±0,5%, zoom +2,3%) e na parede/queda (±1%). CotW: ±2–3 px, às vezes nada. | Soco de câmera e tranco **em todo golpe**: zoom +1,2/2,5/5%, tranco 4/9/14 px, cenário escurecendo no H (70 por 3 quadros) e no especial (100 por 4). Impact frame vermelho na punição e em combo longo. | Tirar soco, tranco e escurecimento de L/M/H e dos especiais comuns. Manter tremor curto só em contra-ataque/punição, parede, queda forte e KO. **Câmera de cinema só no lançador**, no ritmo do FighterZ: corte seco para ≈1,7×, tremor diagonal por 5–6 quadros, 3 quadros parados, corte de volta. Impact frame só no Super, no Ultra e no KO. |
 | 7 | **Faísca de acerto** | Nasce **no tamanho máximo no quadro do contato**, aponta no sentido do golpe, tem 26–50% da altura da tela (MSHvSF até 2× o personagem) e dura ≈170–300 ms em **duas fases** (explosão → cacos ou disco que somem). Cor e forma mudam por força e por tipo de acerto. | Faíscas recortadas de vídeo (168–260 ms, até ~370 u). **Não existe faísca do médio**: o fraco é ampliado 1,25×. Não dá para afirmar que nascem no tamanho máximo nem que apontam no sentido do golpe. | Três faíscas desenhadas próprias (L/M/H) e uma de contra-ataque, maior e com outra cor. Tamanho máximo no 1º quadro, orientadas pelo vetor do golpe, duas fases. A arte segue a mesma direção do contorno. |
 | 8 | **Faísca de defesa** | Sempre **fria** e diferente da de acerto: cacos azul-ciano do tamanho do corpo (MvC3, ≈4 quadros), arco ciano (CotW, ≈7 quadros), estilhaços azuis (SF6, no hadoken) | Rodízio de três "estouros brancos com vento", 168–260 ms. A tinta azul-clara no defensor ajuda, mas a faísca não tem cor fria. | Faísca de defesa ciano, menor e mais rápida (4–6 quadros), em arco na frente de quem defende. |
 | 9 | **Reações de dano** | Poses direcionais e por força: cabeça para trás, dobrar ao meio, desmoronar, voar até a parede (SF6). Rosto, tronco e agachado (CotW). Queda com giro, micro-quique, ~0,7–0,8 s no chão e levantar rápido. **Ninguém pisca branco** (só tinta de efeito, como a queimadura). | Um clipe só em pé e um agachado, esticados pelo hitstun, com **arte antiga**. O atingido **pisca branco** a pausa toda (+8 quadros) e treme até 9 px. | Pelo menos alto, baixo/tronco e forte em pé, mais agachado, ar e queda com quique. Tirar o flash branco (no máximo 1–2 quadros). Tremor do atingido 2–4 px. |
@@ -156,7 +264,16 @@ As poses do vídeo estão boas. O que falta é o **ritmo de desenho animado de l
 | Tōkon | Pinceladas laranja cobrem a tela em 1 quadro; cartão de revista inclinado com o nome (≈0,8 s); **mundo em cinza com os lutadores coloridos**; feixe ≈1,3 s depois; tela branca com nanquim. |
 | **Nosso** | Super de 1,0 s, escuro 190, zoom até 1,36×; retrato de entrada só no p15; Ultra com página de mangá. |
 
-**Princípio:** o Super acontece "em outro mundo". O cenário é trocado ou apagado (preto, cinza, linhas), o lutador fica sozinho e o efeito pode ser enorme. **Ajuste:** no Super do Ryūga, dessaturar o cenário (Tōkon) ou trocá-lo por um fundo de linhas na cor dele, e mostrar um cartão com o nome do golpe.
+**Princípio:** o Super acontece "em outro mundo". O cenário é trocado ou apagado (preto, cinza, linhas), o lutador fica sozinho e o efeito pode ser enorme. **Ajuste, seguindo o FighterZ:** o Super do Ryūga vira uma sequência encenada de 3–4 s:
+1. fundo de 73% para 36% de brilho em 3 quadros;
+2. carga;
+3. corte;
+4. close inclinado;
+5. flash de 1 quadro;
+6. cenário de outra cor;
+7. tela branca e fumaça.
+
+Um cartão com o nome do golpe pode entrar no começo (Tōkon).
 
 ### H. Reação ao acerto
 
