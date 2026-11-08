@@ -61,6 +61,16 @@
       "deriva": 30.0
     },
     {
+      "id": "neblina",
+      "imagem": "neblina.webp",
+      "profundidade": 2500.0,
+      "topo": 0.48017,
+      "base": 1.42634,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "deriva": 8.0
+    },
+    {
       "id": "parede",
       "imagem": "parede.webp",
       "profundidade": 556.1,
@@ -550,26 +560,6 @@
           "reflexo": false
         }
       ]
-    },
-    {
-      "id": "neblina",
-      "tipo": "neblina",
-      "profundidade": 540.0,
-      "topo": 0.6785,
-      "base": 1.1085,
-      "cor": "#94ACDC",
-      "alfa": 0.78
-    },
-    {
-      "id": "neblina_bancos",
-      "tipo": "neblina",
-      "profundidade": 530.0,
-      "topo": 0.8355,
-      "base": 1.0665,
-      "cor": "#94ACDC",
-      "alfa": 0.4,
-      "fiapos": 6,
-      "deriva": 22
     }
   ],
   "chao": {

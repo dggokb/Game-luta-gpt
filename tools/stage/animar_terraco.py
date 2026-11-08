@@ -13,7 +13,8 @@
 * **lanternas**: as da mureta e as dos postes brilham e tremulam; as da mureta refletem no chão
   (o chão é o pintado sem os riscos de luz: o motor desenha o reflexo, sempre reto);
 * **lua**: um brilho grande e lento em volta dela.
-* **névoa**: rente ao piso, densa perto da câmera e sumindo até a mureta, com bancos que andam.
+* **névoa**: sobre o mar, atrás da mureta: densa logo atrás dela e sumindo até o horizonte, em
+  bancos que andam devagar.
 
 As posições são em pixels do panorama de 4096; a parede tem ``EXTRA`` linhas em cima.
 """
@@ -44,9 +45,9 @@ PROF_CEU, PROF_NUVENS = 30000.0, 12000.0
 DERIVA_NUVENS = 30.0
 CEU_EXTRA = 900                               # linhas de céu acima do panorama (super pulo)
 MAX_LUZES = 60
-NEBLINA_PROF = 540.0                          # logo na frente da mureta (o piso vai até 555)
-NEBLINA_ALTURA = 0.42                         # da mureta para baixo, em frações da tela de repouso
-NEBLINA_COR, NEBLINA_ALFA, NEBLINA_BANCOS_ALFA = "#94ACDC", 0.78, 0.4
+NEBLINA_PROF = 2500.0                         # névoa sobre o mar, atrás da mureta
+NEBLINA_CHEIA = 1185                          # linha (panorama) em que ela chega no máximo: atrás da mureta
+NEBLINA_COR, NEBLINA_ALFA, NEBLINA_DERIVA = (157, 180, 224), 0.72, 8.0
 
 
 def casar(fonte, alvo, mf, ma):
@@ -167,6 +168,7 @@ def planos(pasta, parede):
     Image.fromarray(np.dstack([ceu, an * 255]).astype(np.uint8), "RGBA").resize(
         (w * 3 // 4, len(ceu) * 3 // 4), Image.LANCZOS).save(pasta / "nuvens.webp", lossless=True, quality=100, method=6)
     hc = len(ceu)
+    nevoa = neblina(pasta, w, hp)
     hc_total = len(ceu_img)
     lua = {"x": round(sx / w, 4), "y": round((sy + CEU_EXTRA) / hc_total, 4),
            "raio": round(150 / hc_total, 4), "cor": "#BFD8FF", "pulsar": 0.04, "reflexo": False}
@@ -175,7 +177,34 @@ def planos(pasta, parede):
          "x": parede["x"], "repetir": "espelhar", "corAcima": "#060A1E", "luzes": [lua]},
         {"id": "nuvens", "imagem": "nuvens.webp", "profundidade": PROF_NUVENS, "topo": frac(0), "base": frac(hc),
          "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA_NUVENS},
+        {"id": "neblina", "imagem": "neblina.webp", "profundidade": NEBLINA_PROF, "topo": frac(nevoa[0]),
+         "base": frac(nevoa[1]), "x": parede["x"], "repetir": "espelhar", "deriva": NEBLINA_DERIVA},
     ]
+
+
+def neblina(pasta, w, hp):
+    """Névoa sobre o mar, atrás da mureta: some no horizonte e fica cada vez mais densa até atrás
+    da mureta (e assim para baixo, o que o super pulo mostra), em bancos largos e achatados que
+    andam devagar. Metade da resolução (é só névoa). Devolve as linhas do panorama que ela cobre."""
+    r0, r1 = HORIZONTE - 40, hp + FUNDO_MAIS
+    ww, hh = w // 2, (r1 - r0) // 2
+    rng = np.random.default_rng(7)
+    ruido = np.zeros((hh, ww), np.float32)
+    for esc, peso in ((48, 0.5), (20, 0.3), (8, 0.2)):
+        r = rng.random((max(2, hh // esc), max(2, ww // (esc * 4)))).astype(np.float32)
+        ruido += cv2.resize(r, (ww, hh), interpolation=cv2.INTER_CUBIC) * peso
+    ruido = cv2.GaussianBlur(ruido, (0, 0), sigmaX=24, sigmaY=6)
+    ruido = (ruido - ruido.min()) / max(1e-3, ruido.max() - ruido.min())
+    ruido = np.minimum(ruido, ruido[:, ::-1])                       # lados casam no espelho
+    linha = r0 + np.arange(hh, dtype=np.float32)[:, None] * 2
+    t = np.clip((linha - r0) / (NEBLINA_CHEIA - r0), 0, 1)
+    perfil = t * t * (3 - 2 * t)                                    # suave no horizonte
+    alfa = np.clip(perfil * NEBLINA_ALFA * (0.65 + 0.5 * ruido), 0, 1)
+    cor = np.empty((hh, ww, 3), np.float32)
+    cor[:] = NEBLINA_COR
+    Image.fromarray(np.dstack([cor, alfa * 255]).astype(np.uint8), "RGBA").save(
+        pasta / "neblina.webp", lossless=True, quality=100, method=6)
+    return r0, r0 + hh * 2
 
 
 def lanternas(pan):
@@ -199,20 +228,6 @@ def lanternas(pan):
     return sorted(lista)
 
 
-def neblina(parede):
-    """Névoa rente ao piso do terraço, na frente da mureta e atrás dos lutadores: mais densa
-    perto da câmera e sumindo para o fundo (o degradê da neblina vai do transparente em cima ao
-    cheio embaixo), mais uns bancos baixos que andam devagar com o vento."""
-    j = parede["base"]
-    return [
-        {"id": "neblina", "tipo": "neblina", "profundidade": NEBLINA_PROF, "topo": round(j - 0.01, 4),
-         "base": round(j + NEBLINA_ALTURA, 4), "cor": NEBLINA_COR, "alfa": NEBLINA_ALFA},
-        {"id": "neblina_bancos", "tipo": "neblina", "profundidade": NEBLINA_PROF - 10,
-         "topo": round(j + NEBLINA_ALTURA * 0.35, 4), "base": round(j + NEBLINA_ALTURA * 0.9, 4),
-         "cor": NEBLINA_COR, "alfa": NEBLINA_BANCOS_ALFA, "fiapos": 6, "deriva": 22},
-    ]
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", type=Path, default=PASTA)
@@ -228,7 +243,7 @@ def main():
                         "raio": round(min(14.0 if ref else 12.0, max(7.0, r * 0.5)) / h, 4),
                         "cor": "#FFC060", "pulsar": 0.05 if ref else 0.08, "reflexo": bool(ref)}
                        for x, y, r, ref in lant]
-    stage["camadas"] = fundos + [parede] + neblina(parede)
+    stage["camadas"] = fundos + [parede]
     stage["chao"]["reflexoLutadores"] = 0.3
     stage["chao"]["reflexoLuzes"] = 0.8
     stage["chao"]["reflexoComprimento"] = 0.4

@@ -424,7 +424,7 @@ ao lado deslocado na horizontal entra no lugar; um inpaint deixava borrões lara
 mureta entra o mar sem terraço, e as nuvens perdem a faixa dos postes (a borda dourada deles
 passava no recorte por brilho). Sem isso, no super pulo aparecia um poste solto no ar.
 
-Rente ao piso há névoa (`neblina`, duas camadas `"tipo": "neblina"` a 540 e 530, na frente da
-mureta e atrás dos lutadores): o degradê vai do transparente na mureta ao cheio embaixo da tela,
-então ela é mais densa perto da câmera e some para o fundo; a segunda tem bancos baixos
-(`"fiapos": 6`) que andam devagar (`"deriva": 22`).
+Sobre o mar, atrás da mureta, há névoa (`neblina.webp`, a 2500, `"deriva": 8`): some no
+horizonte e fica mais densa até atrás da mureta (linha 1185), e assim para baixo (o que o super
+pulo mostra), em bancos largos e achatados (ruído esticado na horizontal, simétrico para o
+`"espelhar"`). Gerada pelo script, a meia resolução.
