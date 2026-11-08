@@ -2,21 +2,34 @@
   "id": "player_base_walk_forward",
   "javaName": "WALK_FORWARD_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_walk_forward_sr_2x.png",
+  "source": "art/sprites/source/player_base_walk_forward_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_walk_forward.webp",
   "report": "tools/sprites/reports/player_base_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/walk_forward-import.png",
-  "expectedFrames": 20,
+  "expectedFrames": 46,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "P01 WALK_FORWARD test: same approved idle Real-ESRGAN AnimeVideo-v3 method; 4x masters uniformly reduced to 2x runtime, 20 frames, authored root and distancePerFrame 12.5 unchanged. Visual approval pending.",
   "sourceReferences": [
     "art/sprites/source/player_base_walk_forward_video_normalized.png"
   ],
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 256,
-  "rootY": 476,
-  "pixelScale": 2
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 232,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "frente.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "116,270",
+    "colunas": 9,
+    "pe_no_chao": true,
+    "densidade": 2
+  }
 }

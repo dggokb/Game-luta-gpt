@@ -4657,6 +4657,7 @@ final class CombatEngine {
             // a próxima bola dele chega como se ele já tivesse se recuperado e defendido (sem
             // arranhão nem gasto de guarda: ele não escolheu defender).
             d.status = CombatFighter.Status.BLOCKSTUN;
+            d.defesas++;
             d.clearAttack();
             d.stunLeft = d.stunTotal = attack.blockstunFrames;
             d.stunElapsed = 0;
@@ -5024,6 +5025,7 @@ final class CombatEngine {
         // Defesa perfeita numa bola: absorve. Fica no lugar e livre na hora (pode correr).
         boolean absorve = just && projectile;
         d.status = CombatFighter.Status.BLOCKSTUN;
+        d.defesas++;
         d.clearAttack();
         d.stunLeft = d.stunTotal = absorve ? 1 : just
             ? Math.max(1, attack.blockstunFrames * config.justDefenseBlockstunPermille / 1000)

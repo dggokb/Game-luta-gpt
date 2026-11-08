@@ -99,7 +99,8 @@ public class DefesaEGolpeAltoTest {
         for (String id : new String[] {"player_base", "p02", "p06", "p10"}) {
             CharacterDefinition c = GeneratedCharacters.get(id);
             CharacterDefinition.Move m = c.moves.get("M"), oh = c.moves.get(GolpeAlto.BINDING);
-            if (m.animation == null) continue;
+            // Só o 6M montado do M (o p01 tem o vídeo próprio, o M_BAIXO).
+            if (m.animation == null || !GolpeAlto.derived(c, GolpeAlto.BINDING)) continue;
             float fps = CombatConfig.FPS;
             int windUp = Math.max(0, m.attack.startupFrames - 2);
             // A preparação roda no ritmo do M (sem câmera lenta)...

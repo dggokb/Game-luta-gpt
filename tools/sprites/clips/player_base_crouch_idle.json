@@ -1,0 +1,33 @@
+{
+  "id": "player_base_crouch_idle",
+  "javaName": "PLAYER_BASE_CROUCH_IDLE",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_crouch_idle_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_idle.webp",
+  "report": "tools/sprites/reports/player_base_crouch_idle.report.json",
+  "preview": "android/app/build/sprite-review/player_base_crouch_idle-import.png",
+  "expectedFrames": 35,
+  "segmentation": "prepared-grid",
+  "columns": 10,
+  "rootMode": "authored",
+  "sourceNote": "player_base gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69",
+    "celula": 224,
+    "largura": 192,
+    "raiz": "102,206",
+    "colunas": 10,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2
+  },
+  "frameWidth": 384,
+  "frameHeight": 448,
+  "rootX": 204,
+  "rootY": 412,
+  "pixelScale": 2.0
+}

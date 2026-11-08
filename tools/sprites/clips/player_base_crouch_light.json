@@ -2,21 +2,35 @@
   "id": "player_base_crouch_light",
   "javaName": "CROUCH_LIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_crouch_light_sr_hd.png",
+  "source": "art/sprites/source/player_base_crouch_light_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_light.webp",
   "report": "tools/sprites/reports/player_base_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/crouch_light-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 20,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 4,
   "rootMode": "authored",
-  "frameWidth": 768,
-  "rootX": 280,
+  "frameWidth": 832,
+  "rootX": 310,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "sourceReferences": [
     "art/sprites/source/player_base_crouch_light_video_normalized.png"
   ],
   "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "rootY": 468,
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "2L.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "32,33,34,35,36,37,38,39,40,42,46,50,54,58,60,62,64,66,68,70",
+    "largura": 416,
+    "raiz": "155,234",
+    "colunas": 4,
+    "fixar": "video",
+    "manter_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2
+  }
 }

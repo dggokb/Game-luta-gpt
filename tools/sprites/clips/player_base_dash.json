@@ -2,25 +2,39 @@
   "id": "player_base_dash",
   "javaName": "DASH_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_dash_sr_hd.png",
+  "source": "art/sprites/source/player_base_dash_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_dash.webp",
   "report": "tools/sprites/reports/player_base_dash.report.json",
   "preview": "android/app/build/sprite-review/dash-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 4,
+  "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 1024,
-  "rootX": 600,
+  "frameWidth": 640,
+  "rootX": 348,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "sourceReferences": [
     "art/sprites/source/player_base_dash_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
+  "frameHeight": 448,
+  "rootY": 412,
   "pixelScale": 2.0,
   "ajusteTamanho": 0.95,
   "regua": [
     "ajuste no app 20261014-0532: 95% (DASH)"
-  ]
+  ],
+  "video": {
+    "arquivo": "player_base_dash.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "40,41,42,43,44,45,46,47,48,49,50,51",
+    "celula": 224,
+    "largura": 320,
+    "raiz": "174,206",
+    "colunas": 6,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2
+  }
 }

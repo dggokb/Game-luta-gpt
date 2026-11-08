@@ -2,11 +2,11 @@
   "id": "player_base_idle",
   "javaName": "IDLE",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_idle_sr_2x.png",
+  "source": "art/sprites/source/player_base_idle_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.webp",
   "report": "tools/sprites/reports/player_base_idle.report.json",
   "preview": "android/app/build/sprite-review/idle-import.png",
-  "expectedFrames": 76,
+  "expectedFrames": 30,
   "segmentation": "prepared-grid",
   "columns": 10,
   "rootMode": "authored",
@@ -14,9 +14,23 @@
   "sourceReferences": [
     "art/sprites/source/player_base_idle_video_normalized.png"
   ],
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 256,
-  "rootY": 476,
-  "pixelScale": 2
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 202,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "idle.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "101,270",
+    "colunas": 10,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2
+  }
 }

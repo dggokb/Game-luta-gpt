@@ -152,14 +152,14 @@ public class CombatRulesTest {
     @Test public void launcherUppercutFrameCoversTheWholeActiveWindow() {
         CharacterDefinition.Move launcher=BASE.moves.get("2H");
         assertEquals("CROUCH_HEAVY",launcher.animation.id);
-        // Video art: frames 4-7 are the arm stretched up; they cover the active window.
+        // Video art: frames 5-9 are the uppercut with the arm stretched up; they cover the active window.
         for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.002f) {
             int frame=launcher.animation.frame(launcher.animationTime(t),0);
-            assertTrue("t="+t+" frame "+frame,frame>=4&&frame<=7);
+            assertTrue("t="+t+" frame "+frame,frame>=5&&frame<=9);
         }
         assertEquals(0,launcher.animation.frame(launcher.animationTime(0),0));
         // Recovery comes back down to the crouching guard (last frame).
-        assertEquals(11,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
+        assertEquals(19,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
     }
     @Test public void airJabExtendedFramesCoverTheActiveWindow() {
         CharacterDefinition.Move jab=BASE.move("L",true);
@@ -167,16 +167,19 @@ public class CombatRulesTest {
         assertEquals("JUMP_LIGHT",jab.animation.id);
         for(float t=jab.activeStart;t<jab.activeEnd;t+=.002f) {
             int frame=jab.animation.frame(jab.animationTime(t),0);
-            assertTrue("t="+t+" frame="+frame,frame==1||frame==2);
+            assertTrue("t="+t+" frame="+frame,frame>=5&&frame<=9);   // o soco esticado do vídeo
         }
     }
     @Test public void airMediumAndHeavyStrikeFramesCoverTheirActiveWindows() {
-        String[][] cases={{"M","JUMP_MEDIUM","2"},{"H","JUMP_HEAVY","2"}};
+        // Os chutes no ar do vídeo: a perna esticada (7-11) cobre a janela ativa.
+        String[][] cases={{"M","JUMP_MEDIUM"},{"H","JUMP_HEAVY"}};
         for(String[] c:cases) {
             CharacterDefinition.Move move=BASE.move(c[0],true);
             assertEquals(c[1],move.animation.id);
-            for(float t=move.activeStart;t<move.activeEnd;t+=.002f)
-                assertEquals(c[1]+" t="+t,Integer.parseInt(c[2]),move.animation.frame(move.animationTime(t),0));
+            for(float t=move.activeStart;t<move.activeEnd;t+=.002f) {
+                int frame=move.animation.frame(move.animationTime(t),0);
+                assertTrue(c[1]+" t="+t+" frame "+frame,frame>=7&&frame<=11);
+            }
         }
         // player_two still keeps the airborne pose fallback.
         assertEquals(SpriteStates.POSE_AIR,GeneratedCharacters.get("player_two").move("M",true).pose);

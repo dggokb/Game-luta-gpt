@@ -642,10 +642,12 @@ public class CombatEngineTest {
 
     @Test public void walkingBackIsSlowerThanWalkingForward() {
         CombatConfig config = new CombatConfig();
-        Sim forward = new Sim(BASE, NPC, 500f, 1500f);
+        // Quem anda na velocidade do motor (o p01 anda na do vídeo dele: walkSpeed próprio).
+        CharacterDefinition p02 = GeneratedCharacters.get("p02");
+        Sim forward = new Sim(p02, NPC, 500f, 1500f);
         forward.in[0].direction = 1;
         forward.steps(30);
-        Sim back = new Sim(BASE, NPC, 1000f, 1500f);
+        Sim back = new Sim(p02, NPC, 1000f, 1500f);
         back.in[0].direction = 5;
         back.steps(30);
         float advanced = forward.f(0).x - 500f;

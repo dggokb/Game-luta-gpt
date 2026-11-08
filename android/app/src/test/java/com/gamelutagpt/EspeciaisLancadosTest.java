@@ -30,7 +30,8 @@ public class EspeciaisLancadosTest {
     }
 
     @Test public void theShurikenHitsAJumpingRival() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p05"), RIVAL, 300f, 620f);
+        // O Ryūga pula encolhido (vídeos de 11/2026): a estrela pega o corpo na subida um pouco mais longe.
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p05"), RIVAL, 300f, 680f);
         s.in[1].direction = 7;
         s.steps(8);
         s.in[1].direction = 0;

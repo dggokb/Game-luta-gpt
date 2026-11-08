@@ -61,7 +61,8 @@ public class GlobalMovementTuningTest {
         assertTrue("Normal jump expected ~41-43 frames, got "+airborne,
             airborne>=40 && airborne<=44);
         float rivalHeight=e.fighter(1).body().standHeight;
-        assertTrue("Normal jump must clear standing rival",apex>rivalHeight*1.10f);
+        // O Ryūga dos vídeos de 11/2026 mede 245 de pé (o cabelo): o pulo passa a cabeça dele com folga.
+        assertTrue("Normal jump must clear standing rival",apex>rivalHeight*1.06f);
         assertTrue("Normal jump should not reach superjump heights",apex<rivalHeight*1.23f);
     }
 
