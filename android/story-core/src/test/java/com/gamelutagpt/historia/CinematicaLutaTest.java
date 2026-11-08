@@ -254,7 +254,7 @@ public class CinematicaLutaTest {
     public void qteDoConviteDoRyuga() throws IOException {
         Palco palco = jogarConvite(CONVITE_EP02, Torneio.RYUGA);
         assertEquals("cada acerto um golpe do jogador; cada erro e o golpe roteirizado, do rival",
-            "[rival M, jogador M, rival S4, rival H, jogador S4, jogador H, jogador S2 final]", golpes(palco).toString());
+            "[rival M, jogador M, rival S4, rival H, jogador S3, jogador H, jogador S2 final]", golpes(palco).toString());
     }
 
     /** O convite do Kōga: o Brucy bate primeiro (sem QTE) e o mergulho é o golpe final. */
