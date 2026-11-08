@@ -662,5 +662,23 @@
     "animacoes": {
       "ULTRA_BEAM": {}
     }
+  },
+  "ultra_dragao": {
+    "_doc": "Ultra SHINKAI do dragão (vídeo ultra_shinkai): a carga com a aura azul e os raios (0-54, durante a cena antes do dragão), o empurrão da palma que solta o dragão (60), a aura segurando enquanto ele atravessa (63-81) e a volta à guarda (84-108). O dragão é o efeitos/ultra_shinkai_player_base, do vídeo dragao_ultra (roxo trocado por azul). Depois de converter, o véu ciano da aura (alfa abaixo de 60 de 255) é cortado na folha normalizada, e o resto do alfa reesticado: sem isso fica uma caixa clara em volta dele.",
+    "trechos": [
+      [
+        "ultra_shinkai",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0-54/3,60,63,66,69,72,75,78,81,84-108/3",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "ULTRA_DRAGAO": {}
+    }
   }
 }

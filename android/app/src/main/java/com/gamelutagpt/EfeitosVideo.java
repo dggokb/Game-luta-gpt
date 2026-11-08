@@ -44,6 +44,10 @@ final class EfeitosVideo {
         final float[] fim;
         /** Quando o vídeo para para algo do jogo entrar por cima (ms; -1: não tem). */
         float marcaMs = -1f;
+        /** A folha é uma cena com o movimento dentro dela (não é levada pela tela). */
+        boolean cena;
+        /** Largura do quadro do vídeo da cena no mundo (px; 0: não tem). */
+        float larguraCena;
 
         Folha(String nome, Bitmap bitmap, float pixelScale, int[][] quadros, float[][] desloc, float[] fim) {
             this.nome = nome;
@@ -134,6 +138,8 @@ final class EfeitosVideo {
         }
         Folha f = new Folha(nome, bitmap, (float)dados.optDouble("pixelScale", 1.0), quadros, desloc, fim);
         f.marcaMs = (float)dados.optDouble("marcaMs", -1.0);
+        f.cena = dados.optBoolean("cena", false);
+        f.larguraCena = (float)dados.optDouble("larguraCena", 0.0);
         return f;
     }
 
@@ -156,6 +162,21 @@ final class EfeitosVideo {
     float marcaMs(String nome) {
         Folha f = folhas.get(nome);
         return f == null ? -1f : f.marcaMs;
+    }
+
+    /**
+     * O efeito é uma cena inteira (o vídeo já tem o movimento, como o dragão do Ultra SHINKAI que
+     * atravessa a tela): o efeito.json marca "cena": true.
+     */
+    boolean temCena(String nome) {
+        Folha f = folhas.get(nome);
+        return f != null && f.cena;
+    }
+
+    /** Largura do quadro do vídeo da cena no mundo (px), ou 0. */
+    float larguraCena(String nome) {
+        Folha f = folhas.get(nome);
+        return f == null ? 0f : f.larguraCena;
     }
 
     /** O efeito existe nos assets (depois de {@link #carregar}). */

@@ -93,6 +93,18 @@ public final class TesteMovimentosPc {
         passo(false);   // o ↓ junto com o SUPER no mesmo quadro
         for (int i = 0; i < 60 * 14; i++) { pad.setDirection(0); passo(i % 8 == 0); }
         solta(30);
+        // SHINKAI (a ativação do vídeo shinai) e o Ultra SHINKAI (↓ + SUPER no SHINKAI): o dragão azul.
+        jogo.engine.fighter(GameView.PLAYER).state.shinkai = CombatConfig.SHINKAI_MAX;
+        trecho = "Shinkai";
+        pad.press(PadInput.Button.SHINKAI);
+        for (int i = 0; i < 60 * 6; i++) { pad.setDirection(0); passo(i % 8 == 0); }
+        jogo.engine.fighter(GameView.PLAYER).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        trecho = "UltraShinkai";
+        pad.setDirection(3); passo(false);
+        pad.press(PadInput.Button.SUPER);
+        passo(false);
+        for (int i = 0; i < 60 * 10; i++) { pad.setDirection(0); passo(i % 6 == 0); }
+        solta(30);
         trecho("tras", 5, null, 70);
         trecho("frente", 1, null, 70);
         solta(20);
