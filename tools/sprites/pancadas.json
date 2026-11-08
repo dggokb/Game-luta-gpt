@@ -21,6 +21,18 @@
           "distancia": 247,
           "de": 3,
           "ate": 35
+        },
+        "salto": {
+          "altura": 110,
+          "de": 3,
+          "ate": 35
+        }
+      },
+      "S2": {
+        "salto": {
+          "altura": 170,
+          "de": 6,
+          "ate": 23
         }
       }
     },

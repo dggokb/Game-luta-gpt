@@ -11,8 +11,8 @@
   "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
-  "frameHeight": 704,
-  "rootY": 658,
+  "frameHeight": 640,
+  "rootY": 604,
   "sourceReferences": [
     "art/sprites/source/player_base_jump_video_normalized.png"
   ],
@@ -29,11 +29,12 @@
     "escala": 0.4139,
     "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
     "quadros": "35,37,39,41,43,45,48,51,54,57",
-    "celula": 352,
+    "celula": 320,
     "largura": 160,
-    "raiz": "84,329",
+    "raiz": "84,302",
     "colunas": 10,
     "fixar": "video",
+    "pe_no_chao": true,
     "limpar_chao": true,
     "densidade": 2
   }

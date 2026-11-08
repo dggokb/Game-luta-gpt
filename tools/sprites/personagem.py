@@ -292,6 +292,10 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args.append('--manter-efeitos')  # bola de energia e raio desenhados pelo vídeo (S1 do p15)
     if opts.get('cor_efeito'):
         args.append(f"--cor-efeito={opts['cor_efeito']}")  # a aura vermelha do S2 do p15
+    if opts.get('reescala'):
+        # Fator de tamanho por quadro (divide a escala): o chute no ar do p01 que estica o corpo
+        # inteiro e fica maior que a guarda.
+        args.append('--reescala=' + ','.join(str(v) for v in opts['reescala']))
     if opts.get('rampa'):
         args.append(f"--rampa={opts['rampa']}")  # emenda com outro vídeo (queda -> levantar do p15)
     if opts.get('recorte_suave'):

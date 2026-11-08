@@ -11,7 +11,7 @@
   "columns": 6,
   "rootMode": "authored",
   "frameWidth": 640,
-  "rootX": 180,
+  "rootX": 176,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
   "sourceReferences": [
     "art/sprites/source/player_base_jump_light_video_normalized.png"
@@ -27,9 +27,10 @@
     "quadros": "3,6,9,12,14,15,17,20,24,30,36,42,48,54,60,63,66,69,72,75",
     "celula": 320,
     "largura": 320,
-    "raiz": "90,227",
+    "raiz": "88,227",
     "colunas": 6,
     "fixar": "video",
+    "deslocar": "2,0",
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2

@@ -12,7 +12,7 @@
   "rootMode": "authored",
   "frameWidth": 576,
   "frameHeight": 704,
-  "rootX": 310,
+  "rootX": 298,
   "rootY": 654,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2H com o braco esquerdo, a partir de inicio_agachado: guarda agachada, sobe, topo do uppercut, volta a guarda. Escala pelo corpo agachado (0.535, igual ao 2M); quadros com borrao pulados.",
   "sourceReferences": [
@@ -27,9 +27,10 @@
     "quadros": "16,19,22,25,27,28,29,31,34,40,50,60,70,80,88,91,94,97,100,103",
     "celula": 352,
     "largura": 288,
-    "raiz": "155,327",
+    "raiz": "149,327",
     "colunas": 7,
     "fixar": "video",
+    "deslocar": "6,0",
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2
