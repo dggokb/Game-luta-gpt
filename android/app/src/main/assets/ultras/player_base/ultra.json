@@ -68,7 +68,9 @@
         179
       ]
     },
-    "_doc": "Corpo, ponta e esfera recortados do vídeo poder_ultra (quadro 56, pasta p01 do Drive, 11/2026): o feixe do vídeo, esticado pelo jogo até o adversário."
+    "_doc": "Corpo, ponta e esfera recortados do vídeo poder_ultra (quadros 46-68 de 2 em 2, pasta p01 do Drive, 11/2026): cada imagem é uma tira de 12 quadros (um embaixo do outro), trocados a 12 por segundo, como no vídeo; o jogo estica o feixe até o adversário.",
+    "quadros": 12,
+    "qps": 12
   },
   "abertura": {
     "corte": "corte.png",

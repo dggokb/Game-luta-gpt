@@ -171,14 +171,14 @@ public class CombatRulesTest {
         }
     }
     @Test public void airMediumAndHeavyStrikeFramesCoverTheirActiveWindows() {
-        // Os chutes no ar do vídeo: a perna esticada (7-11) cobre a janela ativa.
+        // Os chutes no ar do vídeo: a perna esticada (7-12) cobre a janela ativa.
         String[][] cases={{"M","JUMP_MEDIUM"},{"H","JUMP_HEAVY"}};
         for(String[] c:cases) {
             CharacterDefinition.Move move=BASE.move(c[0],true);
             assertEquals(c[1],move.animation.id);
             for(float t=move.activeStart;t<move.activeEnd;t+=.002f) {
                 int frame=move.animation.frame(move.animationTime(t),0);
-                assertTrue(c[1]+" t="+t+" frame "+frame,frame>=7&&frame<=11);
+                assertTrue(c[1]+" t="+t+" frame "+frame,frame>=7&&frame<=12);
             }
         }
         // player_two still keeps the airborne pose fallback.

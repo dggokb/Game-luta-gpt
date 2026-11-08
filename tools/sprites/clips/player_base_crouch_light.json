@@ -11,7 +11,7 @@
   "columns": 4,
   "rootMode": "authored",
   "frameWidth": 832,
-  "rootX": 310,
+  "rootX": 298,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "sourceReferences": [
     "art/sprites/source/player_base_crouch_light_video_normalized.png"
@@ -26,9 +26,10 @@
     "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
     "quadros": "32,33,34,35,36,37,38,39,40,42,46,50,54,58,60,62,64,66,68,70",
     "largura": 416,
-    "raiz": "155,234",
+    "raiz": "149,234",
     "colunas": 4,
     "fixar": "video",
+    "deslocar": "6,0",
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2

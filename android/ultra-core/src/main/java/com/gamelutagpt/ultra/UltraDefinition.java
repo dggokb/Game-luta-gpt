@@ -74,6 +74,12 @@ public final class UltraDefinition {
          * lutador, em pixels do mundo. Null quando o sprite não tem pose própria.
          */
         public final float[] chargeHands, fireHands;
+        /**
+         * Corpo, ponta e esfera animados: cada imagem é uma tira de {@code quadros} quadros um
+         * embaixo do outro (os quadros do vídeo do poder), trocados a {@code qps} por segundo.
+         */
+        public int quadros = 1;
+        public float qps = 12f;
 
         public static final int DEFAULT_HITS = 20;
         public static final float DEFAULT_THICKNESS = 150f;
@@ -284,6 +290,8 @@ public final class UltraDefinition {
                 handsField(raio, "carga"),
                 handsField(raio, "disparo")
             );
+            beam.quadros = Math.max(1, numberField(raio, "quadros", 1).intValue());
+            beam.qps = Math.max(1f, numberField(raio, "qps", 12).floatValue());
         }
         Opening opening = Opening.DEFAULT;
         if (map.get("abertura") instanceof Map) {

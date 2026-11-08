@@ -11,8 +11,8 @@
   "columns": 11,
   "rootMode": "authored",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
-  "frameHeight": 640,
-  "rootY": 604,
+  "frameHeight": 448,
+  "rootY": 412,
   "sourceReferences": [
     "art/sprites/source/player_base_fall_video_normalized.png"
   ],
@@ -29,11 +29,12 @@
     "escala": 0.4139,
     "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
     "quadros": "60,62,64,66,68,70,72,74,76,78,80,82,84,86",
-    "celula": 320,
+    "celula": 224,
     "largura": 160,
-    "raiz": "84,302",
+    "raiz": "84,206",
     "colunas": 11,
     "fixar": "video",
+    "pe_no_chao": true,
     "limpar_chao": true,
     "densidade": 2
   }

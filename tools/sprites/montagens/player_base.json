@@ -45,7 +45,7 @@
     }
   },
   "walk_forward": {
-    "_doc": "Andar para frente: um ciclo inteiro (38-83). No vídeo ele anda ~50 px/s (passo de guarda); no jogo anda a 170 px/s com o ciclo 3,5x mais rápido, o pé plantado.",
+    "_doc": "Andar para frente: um ciclo inteiro (38-83). No vídeo o pé de apoio escorrega para trás ~5 px por quadro enquanto o corpo anda ~4,6: o passo de verdade (pé no chão em relação ao corpo) é ~8,5 px por quadro do vídeo; no jogo anda a 170 px/s com o ciclo 1,86x mais rápido que o vídeo, com o pé plantado.",
     "trechos": [
       [
         "frente",
@@ -61,7 +61,7 @@
       "WALK_FORWARD": {
         "distancia": "video",
         "velocidade": 170,
-        "acelerar": 3.5,
+        "acelerar": 1.86,
         "loop": true
       }
     }
@@ -182,7 +182,7 @@
     }
   },
   "jump": {
-    "_doc": "Subida do pulo: sai do chão esticado (35) e encolhe no ar (37-57). O agachar antes do impulso (20-32) fica de fora: o motor já sai do chão.",
+    "_doc": "Subida do pulo: sai do chão esticado (35) e encolhe no ar (37-57). O agachar antes do impulso (20-32) fica de fora: o motor já sai do chão. Com os pés na raiz (pe_no_chao): o motor é quem sobe; os golpes no ar ficam com os pés do encolhido no mesmo lugar.",
     "trechos": [
       [
         "pulo",
@@ -193,14 +193,14 @@
     "quadros": "35,37,39,41,43,45,48,51,54,57",
     "opcoes": {
       "fixar": "video",
-      "pe_no_chao": false
+      "pe_no_chao": true
     },
     "animacoes": {
       "JUMP": {}
     }
   },
   "fall_air": {
-    "_doc": "Descida do pulo: encolhido no ar (60-86); o pé só estica na aterrissagem.",
+    "_doc": "Descida do pulo: encolhido no ar (60-86); o pé só estica na aterrissagem. Pés na raiz, como o pulo e os golpes no ar.",
     "trechos": [
       [
         "pulo",
@@ -211,7 +211,7 @@
     "quadros": "60-86/2",
     "opcoes": {
       "fixar": "video",
-      "pe_no_chao": false
+      "pe_no_chao": true
     },
     "animacoes": {
       "FALL": {}
@@ -276,7 +276,7 @@
     }
   },
   "heavy_straight": {
-    "_doc": "H: chute alto circular (impacto no 26), perna no alto até o 44 e a volta à guarda (80).",
+    "_doc": "H: chute alto circular (impacto no 26), perna no alto até o 44 e a volta até a guarda assentada (98, igual ao 1º quadro do vídeo).",
     "trechos": [
       [
         "H",
@@ -284,7 +284,7 @@
         124
       ]
     ],
-    "quadros": "11-47/3,50-80/3",
+    "quadros": "11-47/3,50-98/3",
     "opcoes": {
       "fixar": "video"
     },
@@ -315,7 +315,7 @@
     }
   },
   "crouch_light": {
-    "_doc": "2L: soco agachado (impacto no 39) e de volta agachado (70).",
+    "_doc": "2L: soco agachado (impacto no 39) e de volta agachado (70). Deslocado 6 px: o vídeo começa agachado e o registro (o tronco do 1º quadro) sairia 6 px fora do eixo do agachar, que começa de pé.",
     "trechos": [
       [
         "2L",
@@ -326,7 +326,8 @@
     "quadros": "32-40,42-58/4,60-70/2",
     "opcoes": {
       "fixar": "video",
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "6,0"
     },
     "animacoes": {
       "CROUCH_LIGHT": {
@@ -335,7 +336,7 @@
     }
   },
   "crouch_medium": {
-    "_doc": "2M: a rasteira do vídeo: ele se ergue (18-27), avança baixo e varre com o rastro (impacto no 48), segura e volta agachado (111).",
+    "_doc": "2M: a rasteira do vídeo: ele se ergue (18-27), avança baixo e varre com o rastro (impacto no 48), segura e volta agachado (111). Deslocado 6 px: o vídeo começa agachado e o registro (o tronco do 1º quadro) sairia 6 px fora do eixo do agachar, que começa de pé.",
     "trechos": [
       [
         "2M",
@@ -346,7 +347,8 @@
     "quadros": "12,18,24,30,33,36,39,42,45,48,51,57,63,69,75,81,84,87,90,93,96,99,102,105,108,111",
     "opcoes": {
       "fixar": "video",
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "6,0"
     },
     "animacoes": {
       "CROUCH_MEDIUM": {
@@ -355,7 +357,7 @@
     }
   },
   "crouch_heavy": {
-    "_doc": "2H: uppercut lançador saindo de agachado (impacto no 28, com o clarão), braço no alto e de volta agachado (103).",
+    "_doc": "2H: uppercut lançador saindo de agachado (impacto no 28, com o clarão), braço no alto e de volta agachado (103). Deslocado 6 px: o vídeo começa agachado e o registro (o tronco do 1º quadro) sairia 6 px fora do eixo do agachar, que começa de pé.",
     "trechos": [
       [
         "2H",
@@ -366,7 +368,8 @@
     "quadros": "16,19,22,25,27,28,29,31,34,40,50,60,70,80,88,91,94,97,100,103",
     "opcoes": {
       "fixar": "video",
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "6,0"
     },
     "animacoes": {
       "CROUCH_HEAVY": {
@@ -387,7 +390,8 @@
     "opcoes": {
       "fixar": "video",
       "pe_no_chao": false,
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "2,0"
     },
     "animacoes": {
       "JUMP_LIGHT": {
@@ -408,7 +412,8 @@
     "opcoes": {
       "fixar": "video",
       "pe_no_chao": false,
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "2,0"
     },
     "animacoes": {
       "JUMP_MEDIUM": {
@@ -417,7 +422,7 @@
     }
   },
   "jump_heavy": {
-    "_doc": "jH: chute alto no ar com o arco (impacto no 16) e o joelho de volta (66); o vídeo depois pousa, fica de fora.",
+    "_doc": "jH: chute alto no ar com o arco (impacto no 16) e o joelho de volta (66); o vídeo depois pousa, fica de fora. O chute estica o corpo inteiro (650 px, mais que a guarda de 541): os quadros do chute saem 18% menores (reescala). O vídeo não volta ao encolhido (ele pousa): a volta é pelo inverso até o encolhido do pulo.",
     "trechos": [
       [
         "jH",
@@ -429,11 +434,37 @@
     "opcoes": {
       "fixar": "video",
       "pe_no_chao": false,
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "2,0",
+      "reescala": [
+        1.0,
+        1.0,
+        1.0,
+        1.05,
+        1.12,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18,
+        1.18
+      ]
     },
     "animacoes": {
       "JUMP_HEAVY": {
-        "impacto": 7
+        "impacto": 7,
+        "frames": "0-21,4,2,1,0"
       }
     }
   },
@@ -450,7 +481,8 @@
     "opcoes": {
       "fixar": "video",
       "pe_no_chao": false,
-      "manter_efeitos": true
+      "manter_efeitos": true,
+      "deslocar": "2,0"
     },
     "animacoes": {
       "JUMP_HEAVY_DOWN": {

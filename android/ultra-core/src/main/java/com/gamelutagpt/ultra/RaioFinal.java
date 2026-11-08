@@ -250,10 +250,11 @@ public final class RaioFinal {
             // A esfera desenhada (a do começo do raio, do vídeo do poder), crescendo com a carga,
             // no lugar da bola por código (a imagem já some aos poucos à direita da esfera).
             float[] center = def.beam.startCenter;
+            float fh = start.height() / (float)def.beam.quadros, v0 = quadroVideo(def, f) * fh;
             float h = radius * 3.2f;
-            float w = h * start.width() / start.height();
+            float w = h * start.width() / fh;
             float left = x - w * center[0], top = y - h * center[1];
-            c.drawImage(start, left, top, left + w, top + h, 255);
+            c.drawImageRegion(start, 0f, v0, start.width(), v0 + fh, left, top, left + w, top + h, 255);
             return;
         }
         c.fillRadialGlow(x, y, radius * 2.6f, withAlpha(def.color, 210));
@@ -271,31 +272,40 @@ public final class RaioFinal {
             drawPlainBody(c, pack.definition, origin, tipX, f.originY, thickness, alpha);
             return;
         }
-        float scale = thickness / body.height();
+        int n = pack.definition.beam.quadros, q = quadroVideo(pack.definition, f);
+        float fh = body.height() / (float)n, v0 = q * fh;
+        float scale = thickness / fh;
         float end = tipX;
         if (tip != null) {
             // A ponta tem o próprio pedaço de feixe: o corpo vai até o meio dela.
+            float tfh = tip.height() / (float)n, tv0 = q * tfh;
             float tipW = tip.width() * scale;
-            float tipH = tip.height() * scale;
+            float tipH = tfh * scale;
             float tipRight = tipX + tipW * 0.10f;
             float tipLeft = tipRight - tipW;
             end = Math.max(origin, tipLeft + tipW * 0.45f);
             float srcLeft = Math.max(0f, (origin - tipLeft) / scale);
             if (srcLeft < tip.width() - 1f) {
-                drawWavyTiles(c, body, scale, f, origin, end, thickness, alpha);
-                c.drawImageRegion(tip, srcLeft, 0f, tip.width(), tip.height(),
+                drawWavyTiles(c, body, v0, fh, scale, f, origin, end, thickness, alpha);
+                c.drawImageRegion(tip, srcLeft, tv0, tip.width(), tv0 + tfh,
                     tipLeft + srcLeft * scale, f.originY - tipH * 0.5f, tipRight, f.originY + tipH * 0.5f, alpha);
                 return;
             }
         }
-        drawWavyTiles(c, body, scale, f, origin, end, thickness, alpha);
+        drawWavyTiles(c, body, v0, fh, scale, f, origin, end, thickness, alpha);
+    }
+
+    /** O quadro do vídeo do poder agora (corpo, ponta e esfera animados; 0 com imagem parada). */
+    private static int quadroVideo(UltraDefinition def, Frame f) {
+        int n = def.beam.quadros;
+        return n <= 1 ? 0 : ((int)(Math.max(0f, f.time) * def.beam.qps)) % n;
     }
 
     /**
      * Corpo repetido de {@code from} até {@code end}, com a textura correndo para a frente e
      * a espessura ondulando ao longo do feixe (fatias verticais de alturas diferentes).
      */
-    private static void drawWavyTiles(RenderCanvas c, RenderImage body, float scale, Frame f, float from, float end,
+    private static void drawWavyTiles(RenderCanvas c, RenderImage body, float v0, float fh, float scale, Frame f, float from, float end,
                                       float thickness, int alpha) {
         float tileW = body.width() * scale;
         if (end <= from || tileW <= 0f) return;
@@ -313,13 +323,13 @@ public final class RaioFinal {
             float u0 = ((left - from - offset) % tileW + tileW) % tileW;
             float u1 = u0 + (right - left);
             if (u1 <= tileW) {
-                c.drawImageRegion(body, u0 / scale, 0f, u1 / scale, body.height(),
+                c.drawImageRegion(body, u0 / scale, v0, u1 / scale, v0 + fh,
                     left, f.originY - half, right, f.originY + half, alpha);
             } else {
                 float split = left + (tileW - u0);
-                c.drawImageRegion(body, u0 / scale, 0f, body.width(), body.height(),
+                c.drawImageRegion(body, u0 / scale, v0, body.width(), v0 + fh,
                     left, f.originY - half, split, f.originY + half, alpha);
-                c.drawImageRegion(body, 0f, 0f, (u1 - tileW) / scale, body.height(),
+                c.drawImageRegion(body, 0f, v0, (u1 - tileW) / scale, v0 + fh,
                     split, f.originY - half, right, f.originY + half, alpha);
             }
         }
@@ -426,12 +436,14 @@ public final class RaioFinal {
             c.fillRadialGlow(origin, f.originY, size * 0.25f, withAlpha(0xFFFFFFFF, alpha));
             return;
         }
+        float fh = start.height() / (float)pack.definition.beam.quadros;
+        float v0 = quadroVideo(pack.definition, f) * fh;
         float h = size;
-        float w = h * start.width() / start.height();
+        float w = h * start.width() / fh;
         float[] center = pack.definition.beam.startCenter;
         float left = origin - w * center[0];
         float top = f.originY - h * center[1];
-        c.drawImage(start, left, top, left + w, top + h, alpha);
+        c.drawImageRegion(start, 0f, v0, start.width(), v0 + fh, left, top, left + w, top + h, alpha);
     }
 
     private void drawHitImpact(RenderCanvas c, UltraPack pack, Frame f, float tipX, float thickness) {
