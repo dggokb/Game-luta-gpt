@@ -3664,23 +3664,23 @@ final class GeneratedSpriteLayouts {
     static final int DEFENSE_CROUCH_ROOT_Y = 369;
     static final int DEFENSE_CROUCH_FRAME_COUNT = 6;
 
-    static final int DEFENSE_STAND_FRAME_WIDTH = 654;
-    static final int DEFENSE_STAND_FRAME_HEIGHT = 642;
-    static final int DEFENSE_STAND_ROOT_X = 182;
-    static final int DEFENSE_STAND_ROOT_Y = 612;
-    static final int DEFENSE_STAND_FRAME_COUNT = 18;
+    static final int DEFENSE_STAND_FRAME_WIDTH = 325;
+    static final int DEFENSE_STAND_FRAME_HEIGHT = 482;
+    static final int DEFENSE_STAND_ROOT_X = 172;
+    static final int DEFENSE_STAND_ROOT_Y = 469;
+    static final int DEFENSE_STAND_FRAME_COUNT = 13;
 
-    static final int PLAYER_BASE_DEFENSE_STAND_2_FRAME_WIDTH = 652;
-    static final int PLAYER_BASE_DEFENSE_STAND_2_FRAME_HEIGHT = 646;
-    static final int PLAYER_BASE_DEFENSE_STAND_2_ROOT_X = 345;
-    static final int PLAYER_BASE_DEFENSE_STAND_2_ROOT_Y = 609;
-    static final int PLAYER_BASE_DEFENSE_STAND_2_FRAME_COUNT = 18;
+    static final int PLAYER_BASE_DEFENSE_STAND_2_FRAME_WIDTH = 327;
+    static final int PLAYER_BASE_DEFENSE_STAND_2_FRAME_HEIGHT = 488;
+    static final int PLAYER_BASE_DEFENSE_STAND_2_ROOT_X = 172;
+    static final int PLAYER_BASE_DEFENSE_STAND_2_ROOT_Y = 471;
+    static final int PLAYER_BASE_DEFENSE_STAND_2_FRAME_COUNT = 14;
 
-    static final int PLAYER_BASE_DEFENSE_STAND_3_FRAME_WIDTH = 812;
-    static final int PLAYER_BASE_DEFENSE_STAND_3_FRAME_HEIGHT = 644;
-    static final int PLAYER_BASE_DEFENSE_STAND_3_ROOT_X = 306;
-    static final int PLAYER_BASE_DEFENSE_STAND_3_ROOT_Y = 613;
-    static final int PLAYER_BASE_DEFENSE_STAND_3_FRAME_COUNT = 17;
+    static final int PLAYER_BASE_DEFENSE_STAND_3_FRAME_WIDTH = 368;
+    static final int PLAYER_BASE_DEFENSE_STAND_3_FRAME_HEIGHT = 476;
+    static final int PLAYER_BASE_DEFENSE_STAND_3_ROOT_X = 172;
+    static final int PLAYER_BASE_DEFENSE_STAND_3_ROOT_Y = 464;
+    static final int PLAYER_BASE_DEFENSE_STAND_3_FRAME_COUNT = 12;
 
     static final int ENERGY_SET_FRAME_WIDTH = 748;
     static final int ENERGY_SET_FRAME_HEIGHT = 639;
@@ -3832,17 +3832,17 @@ final class GeneratedSpriteLayouts {
     static final int SPECIAL_S2_SET_ROOT_Y = 615;
     static final int SPECIAL_S2_SET_FRAME_COUNT = 28;
 
-    static final int SPECIAL_S3_SET_FRAME_WIDTH = 499;
-    static final int SPECIAL_S3_SET_FRAME_HEIGHT = 486;
-    static final int SPECIAL_S3_SET_ROOT_X = 176;
-    static final int SPECIAL_S3_SET_ROOT_Y = 469;
-    static final int SPECIAL_S3_SET_FRAME_COUNT = 21;
+    static final int SPECIAL_S3_SET_FRAME_WIDTH = 998;
+    static final int SPECIAL_S3_SET_FRAME_HEIGHT = 650;
+    static final int SPECIAL_S3_SET_ROOT_X = 233;
+    static final int SPECIAL_S3_SET_ROOT_Y = 613;
+    static final int SPECIAL_S3_SET_FRAME_COUNT = 44;
 
-    static final int SPECIAL_S4_SET_FRAME_WIDTH = 998;
-    static final int SPECIAL_S4_SET_FRAME_HEIGHT = 650;
-    static final int SPECIAL_S4_SET_ROOT_X = 233;
-    static final int SPECIAL_S4_SET_ROOT_Y = 613;
-    static final int SPECIAL_S4_SET_FRAME_COUNT = 40;
+    static final int SPECIAL_S4_SET_FRAME_WIDTH = 499;
+    static final int SPECIAL_S4_SET_FRAME_HEIGHT = 486;
+    static final int SPECIAL_S4_SET_ROOT_X = 176;
+    static final int SPECIAL_S4_SET_ROOT_Y = 469;
+    static final int SPECIAL_S4_SET_FRAME_COUNT = 21;
 
     static final int SUPER_SET_FRAME_WIDTH = 969;
     static final int SUPER_SET_FRAME_HEIGHT = 651;

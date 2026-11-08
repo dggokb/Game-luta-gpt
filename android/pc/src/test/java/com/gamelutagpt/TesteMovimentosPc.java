@@ -69,17 +69,17 @@ public final class TesteMovimentosPc {
         pulo("jM", PadInput.Button.MEDIUM, false);
         pulo("jH", PadInput.Button.HEAVY, false);
         pulo("j2H", PadInput.Button.HEAVY, true);
-        // S2: meia-lua para trás (↓↙←) + L, e o golpe inteiro.
-        trecho = "S2";
+        // S3 do p01: meia-lua para trás (↓↙←) + L, o chute giratório inteiro.
+        trecho = "S3";
         pad.setDirection(3); passo(false); passo(false);
         pad.setDirection(4); passo(false); passo(false);
         pad.setDirection(5); passo(false);
         pad.press(PadInput.Button.LIGHT);
         for (int i = 0; i < 330; i++) { pad.setDirection(0); passo(i % 6 == 0); }
         solta(20);
-        // S2 do p01 (→↓↘ + L, o punho ascendente) e S3 (↓↓ + L, o chute voador que avança).
+        // S2 do p01 (→↓↘ + L, o punho ascendente) e S4 (↓↓ + L, o Aparar).
         comando("S2p", new int[]{1, 3, 2}, PadInput.Button.LIGHT, 90);
-        comando("S3", new int[]{3, 0, 3}, PadInput.Button.LIGHT, 110);
+        comando("S4", new int[]{3, 0, 3}, PadInput.Button.LIGHT, 110);
         // S1 (↓↘→ + L), o S1 segurando o botão (carregado) e o Super: o projétil anda até o boneco.
         especial("S1", PadInput.Button.LIGHT, 0, 90);
         especial("S1c", PadInput.Button.LIGHT, 70, 120);

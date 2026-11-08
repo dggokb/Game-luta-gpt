@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
- * O contra-golpe que leu o golpe (o Aparar do Ryūga, o S3 da Yin-lu, o do p11) deixa o rival
+ * O contra-golpe que leu o golpe (o Aparar do Ryūga, S4; o S3 da Yin-lu, o do p11) deixa o rival
  * atordoado: quem leu fica bem na frente e dá tempo de correr e emendar (pedido do jogador: antes o
  * rival era empurrado e voltava a atacar, +5 a +8 a 180 px).
  */
@@ -15,7 +15,7 @@ public class ContraGolpeTest {
         CharacterDefinition me = GeneratedCharacters.get(id), rival = GeneratedCharacters.get("player_base");
         CombatEngine e = new CombatEngine(new FighterState(me, "P1"), new FighterState(rival, "P2"), 500f, 640f, new CombatConfig());
         FighterInput a = new FighterInput(), b = new FighterInput();
-        a.special = "S3";
+        a.special = id.equals("player_base") ? "S4" : "S3";
         boolean countered = false, rivalPressed = false, emendou = false;
         int at = -1, meFree = -1, rivalFree = -1;
         for (int i = 0; i < 200; i++) {
