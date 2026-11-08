@@ -717,11 +717,15 @@ final class CombatEngine {
             else if (f.grounded) f.breakerChase = 0;
         }
 
-        // SHINKAI: segurar → depois do H que jogou na parede não corre: é o Dragon Rush.
-        if (f.state.inShinkai() && wallChaseRun(f) && podeDragonRush(f)) {
-            startDragonRush(f);
-            f.dashRequest = f.backdashRequest = false;
-            return;
+        // SHINKAI: segurar → depois do H que jogou na parede não corre: é o Dragon Rush. Com o
+        // Dragon Rush do combo já usado, nada (no SHINKAI ninguém corre).
+        if (f.state.inShinkai() && wallChaseRun(f)) {
+            if (podeDragonRush(f)) {
+                startDragonRush(f);
+                f.dashRequest = f.backdashRequest = false;
+                return;
+            }
+            f.wallChase = 0;
         }
         if (wallChaseCancel(f)) {
             f.status = CombatFighter.Status.NEUTRAL;
@@ -739,6 +743,9 @@ final class CombatEngine {
             f.dashRequest = f.backdashRequest = false;
             return;
         }
+        // No SHINKAI o → → é sempre o Dragon Rush (ou o sumiço do SPEED): sem ele (já usado no
+        // combo, ou no meio de um golpe que não cancela), o → → não vira corrida.
+        if (f.dashRequest && f.state.inShinkai() && f.grounded) f.dashRequest = false;
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround()) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {

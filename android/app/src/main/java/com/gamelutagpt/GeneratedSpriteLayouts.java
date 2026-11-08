@@ -4072,7 +4072,7 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_TAUNT_ROOT_Y = 355;
     static final int RYUGA_8_TAUNT_FRAME_COUNT = 33;
 
-    static final int RYUGA_8_WALK_BACK_FRAME_WIDTH = 276;
+    static final int RYUGA_8_WALK_BACK_FRAME_WIDTH = 275;
     static final int RYUGA_8_WALK_BACK_FRAME_HEIGHT = 380;
     static final int RYUGA_8_WALK_BACK_ROOT_X = 157;
     static final int RYUGA_8_WALK_BACK_ROOT_Y = 368;

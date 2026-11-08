@@ -17,8 +17,9 @@ o Kōga joga com o Kōga 8 anos contra ele (`historia/ep00/episodio.json`, passo
   câmera do vídeo (`fixar: video`: os pés ficam onde estão no vídeo, todos os clipes no mesmo
   registro):
   - idle; agachar (descida 6-18), **agachado parado** (CROUCH_IDLE, 20-70 em loop) e levantar;
-  - andar no tempo do vídeo: para frente a 150 px/s, para trás a 110 (criança; o motor anda a
-    300/220, o que deixava o ciclo duas vezes mais rápido);
+  - andar no tempo do vídeo: para frente a 150 px/s (criança; o motor anda a 300, o que deixava
+    o ciclo duas vezes mais rápido); para trás o corpo anda o que o vídeo anda (~40 px/s), sem o
+    pé deslizar;
   - dash: um ciclo da passada em loop pela distância (como o do Kōga 8 anos); backdash no tempo
     do motor (30 quadros), não no do vídeo;
   - L: no vídeo o braço fica esticado até o fim, então a volta é a ida de trás para a frente;
