@@ -130,6 +130,8 @@ final class CombatFighter {
     int stunLeft;
     int stunTotal;
     int stunElapsed;
+    /** Golpes defendidos na luta (só apresentação: alterna o desenho da defesa em pé). */
+    int defesas;
     boolean hitCrouching;
     boolean launched;
     /**

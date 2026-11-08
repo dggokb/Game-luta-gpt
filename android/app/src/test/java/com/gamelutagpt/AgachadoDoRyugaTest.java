@@ -37,10 +37,12 @@ public class AgachadoDoRyugaTest {
     }
 
     @Test public void aLowMediumAtTheTipHitsTheCrouchingRyuga() {
-        assertTrue("2M da p02 a 190 px", lowMediumHits("p02", 190f));
-        assertTrue("2M do p13 a 310 px", lowMediumHits("p13", 310f));
-        // H2 (experimento B): o 2M do p09 tem alcanceMaximo 190; a ponta pega a 250 px, não mais a 280.
-        assertTrue("2M do p09 a 250 px", lowMediumHits("p09", 250f));
+        // O Ryūga agachado dos vídeos de 11/2026 fica mais recolhido: a ponta do 2M da p02 pega a 170.
+        assertTrue("2M da p02 a 170 px", lowMediumHits("p02", 170f));
+        assertTrue("2M do p13 a 290 px", lowMediumHits("p13", 290f));
+        // H2 (experimento B): o 2M do p09 tem alcanceMaximo 190; a ponta pega a 230 px (o agachado
+        // novo, 20 px mais recolhido), não mais a 280.
+        assertTrue("2M do p09 a 230 px", lowMediumHits("p09", 230f));
     }
 
     @Test public void theP09LowMediumStopsAtItsMaximumReach() {

@@ -13,7 +13,8 @@ import javax.imageio.ImageIO;
 /**
  * Joga os movimentos e os golpes de um lutador no jogo de verdade do PC, pelo controle (o pad do
  * jogo), contra um boneco parado, e grava os quadros de cada um numa pasta: idle, agachar e ficar
- * agachado, golpes agachados, L, M, H, →+M, andar para frente e para trás, dash e backdash.
+ * agachado, golpes agachados, L, M, H, →+M, pulo e golpes no ar, andar para frente e para trás,
+ * dash, backdash e o segundo idle.
  *
  * <pre>gradle :pc:testeMovimentos -Plutador=ryuga_8 [-Prival=koga_8]</pre>
  */
@@ -61,6 +62,12 @@ public final class TesteMovimentosPc {
         trecho("H", 0, PadInput.Button.HEAVY, 50);
         trecho("6M", 1, PadInput.Button.MEDIUM, 50);
         solta(20);
+        // Pulo parado e os golpes no ar (↑ e o botão no alto; j2H segurando ↓).
+        pulo("pulo", null, false);
+        pulo("jL", PadInput.Button.LIGHT, false);
+        pulo("jM", PadInput.Button.MEDIUM, false);
+        pulo("jH", PadInput.Button.HEAVY, false);
+        pulo("j2H", PadInput.Button.HEAVY, true);
         // S2: meia-lua para trás (↓↙←) + L, e o golpe inteiro.
         trecho = "S2";
         pad.setDirection(3); passo(false); passo(false);
@@ -80,8 +87,21 @@ public final class TesteMovimentosPc {
         trecho = "backdash";
         toques(5);
         for (int i = 0; i < 45; i++) { pad.setDirection(0); passo(i % 2 == 0); }
+        // Parado um tempo: o segundo idle (IDLE_2) entra a cada 3 voltas do idle.
+        trecho = "idle2";
+        for (int i = 0; i < 60 * 16; i++) { pad.setDirection(0); passo(i % 6 == 0); }
         System.out.println("quadros em " + saida);
         System.exit(0);
+    }
+
+    static void pulo(String nome, PadInput.Button botao, boolean baixo) throws Exception {
+        trecho = nome;
+        for (int i = 0; i < 80; i++) {
+            pad.setDirection(i < 3 ? 7 : baixo && i >= 12 ? 3 : 0);
+            if (botao != null && i == 14) pad.press(botao);
+            passo(i % 2 == 0);
+        }
+        solta(20);
     }
 
     static void toques(int dir) throws Exception {

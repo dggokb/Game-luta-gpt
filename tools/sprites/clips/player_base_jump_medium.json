@@ -2,21 +2,35 @@
   "id": "player_base_jump_medium",
   "javaName": "JUMP_MEDIUM",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_jump_medium_sr_hd.png",
+  "source": "art/sprites/source/player_base_jump_medium_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_medium.webp",
   "report": "tools/sprites/reports/player_base_jump_medium.report.json",
   "preview": "android/app/build/sprite-review/jump_medium-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 5,
   "rootMode": "authored",
-  "frameWidth": 1024,
-  "rootX": 340,
+  "frameWidth": 704,
+  "rootX": 284,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
-  "frameHeight": 640,
-  "rootY": 600,
+  "frameHeight": 512,
+  "rootY": 460,
   "sourceReferences": [
     "art/sprites/source/player_base_jump_medium_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "jM.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "0,3,6,9,12,15,18,21,24,30,36,42,48,54,60,66,72,78,81,84,87,90",
+    "largura": 352,
+    "raiz": "142,230",
+    "colunas": 5,
+    "fixar": "video",
+    "manter_efeitos": true,
+    "limpar_chao": true,
+    "densidade": 2
+  }
 }

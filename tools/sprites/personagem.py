@@ -304,13 +304,15 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args += ['--escala', str(manual[0]), '--motivo', manual[1]]
     if densidade:
         args += ['--densidade', str(densidade)]
-    run(args + ['--celula', '512', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
+    # Célula da medida mais alta que a final (640, raiz a 170 do pé da célula): o golpe no ar que
+    # desce a perna abaixo dos pés do 1º quadro do vídeo (o jH do p01) não é cortado na medida.
+    run(args + ['--celula', '640', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
     d = int(json.loads(clip.read_text(encoding='utf-8')).get('pixelScale', 1))
     sheet = Image.open(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
     # A folha da medida pode sair com menos colunas que as pedidas (largura máxima da folha):
     # lê as colunas que ela tem, senão só os primeiros quadros entram na medida.
     per_row = max(1, sheet.width // (768 * d))
-    boxes = [body_box(sheet.crop((i % per_row * 768 * d, i // per_row * 512 * d, (i % per_row + 1) * 768 * d, (i // per_row + 1) * 512 * d)))
+    boxes = [body_box(sheet.crop((i % per_row * 768 * d, i // per_row * 640 * d, (i % per_row + 1) * 768 * d, (i // per_row + 1) * 640 * d)))
              for i in range(len(quadros))]
     boxes = [[v // d for v in b] for b in boxes if b]
     x0, y0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
@@ -319,7 +321,7 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     left, right, up, down = 384 - x0 + m, x1 - 384 + m, 470 - y0 + m, max(18, y1 - 470 + m)
     w = min(768, -(-(left + right) // 32) * 32)
     h = min(512, -(-(up + down) // 32) * 32)
-    wide, tall = left + right > 768 or x0 <= 1 or x1 >= 767, up + down > 512 or y0 <= 1
+    wide, tall = left + right > 768 or x0 <= 1 or x1 >= 767, up + down > 512 or y0 <= 1 or y1 >= 639
     if wide or tall:  # passa da célula máxima (chicote, capa): célula máxima e borda cortada limpa
         args += ['--aparar-borda', '10']
         w, h = (768 if wide else w), (512 if tall else h)

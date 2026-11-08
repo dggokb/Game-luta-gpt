@@ -309,6 +309,7 @@
       "dano": 1.0,
       "ritmo": 1.0,
       "manterTempo": true,
+      "cadenciaVideo": true,
       "projetil": {
         "velocidade": 760,
         "alcance": 720

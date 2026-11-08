@@ -20,7 +20,8 @@ da base vezes o ritmo (especial de vídeo longo: a rajada e a voadora do p15).
 Com "fimDoClipe" ({"H": 53}) os quadros do clipe dali em diante passam num instante: o vídeo que
 termina parado na guarda (o H da p15) não prende o lutador depois do movimento.
 
-Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam.
+Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam; com
+"cadenciaVideo" junto, a animação (do vídeo novo) ainda é espalhada no tempo mantido do golpe.
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
 o tempo e a animação (só o dano muda). Depois rode build_characters.py --write.
 
@@ -572,6 +573,9 @@ def apply(cid, spec, base, combos_data):
             sup.pop(k, None)
     fighter['maxLife'] = spec['vida']
     keep = spec.get('manterTempo', False)   # arte própria calibrada golpe a golpe (p01)
+    # cadenciaVideo (com manterTempo): o tempo dos golpes fica, mas a animação nova (do vídeo) é
+    # espalhada nele na cadência do vídeo, com o impacto no começo da janela ativa (p01 refeito).
+    video = spec.get('cadenciaVideo', False)
 
     def pace(key):
         return spec.get('ritmoGolpe', {}).get(key, spec['ritmo'])
@@ -589,8 +593,13 @@ def apply(cid, spec, base, combos_data):
     attacks = []
     for key, m in list(pack['moves'].items()) + list(pack.get('specialMoves', {}).items()):
         if key not in base['frames']:
-            anim = pack['animations'].get(m.get('animation')) if key == '6M' and not keep else None
+            anim = pack['animations'].get(m.get('animation')) if key == '6M' and (not keep or video) else None
             if anim and 'durationsMs' in anim:
+                if keep and video:
+                    # p01 refeito: o clipe do vídeo encolhe para o tempo do golpe, na cadência do vídeo.
+                    total = (m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']) * 1000 / 60
+                    k = total / sum(anim['durationsMs'])
+                    anim['durationsMs'] = [max(1, round(x * k)) for x in anim['durationsMs']]
                 # O golpe alto (→M) mantém o tempo e a cadência próprios; só o impacto vai para o
                 # começo da janela ativa quando o clipe novo o deixou fora dela (o p14).
                 fit_impact(anim, m)
@@ -626,7 +635,7 @@ def apply(cid, spec, base, combos_data):
         total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
         anim = pack['animations'].get(anim_id) if anim_id else None
         cadence = 'sem animação' if not keep else 'tempo mantido'
-        if anim and not keep and not anim.get('loop') and 'durationsMs' in anim:
+        if anim and (not keep or video) and not anim.get('loop') and 'durationsMs' in anim:
             d = video_cadence(anim, clips.get(anim['atlas'], {}), total * 1000 / 60,
                               spec.get('fimDoClipe', {}).get(key))
             if d:

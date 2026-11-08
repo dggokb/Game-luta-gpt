@@ -845,7 +845,9 @@ public class MechanicsTest {
     @Test public void theShadowRepeatsTheNextMoveLater() {
         AttackDefinition call = move("H", 6, 3, 10)
             .mechanics(new AttackDefinition.Mechanics().echo(300, 20, 500)).build();
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(call), BASE, 500f, 600f);
+        // Com o jab da p02 (149 px): o do Ryūga refeito (11/2026) alcança 114 e a cópia, no lugar
+        // de onde ele bateu, não chega no rival empurrado pelo jab.
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(CombatEngineTest.withMoves(GeneratedCharacters.get("p02"), call), BASE, 500f, 600f);
         s.in[0].heavy = true;
         s.until(() -> s.f(0).echoLeft > 0, 10);
         s.until(() -> !s.f(0).attacking(), 40);

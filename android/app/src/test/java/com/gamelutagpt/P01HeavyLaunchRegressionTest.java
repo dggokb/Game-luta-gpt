@@ -15,9 +15,8 @@ public class P01HeavyLaunchRegressionTest {
         // Same recovery as the other fighters' H (it was 52 frames and left P01 stuck at the end).
         assertEquals(32,h.totalFrames);
         assertEquals(AttackDefinition.Launch.WALL_BOUNCE,h.launch);
-        assertEquals(h.startupFrames/(float)h.totalFrames,
-            art.timeOfFrame(10)/art.duration,0.03f);
-        assertEquals("Contact must actually show artwork frame 10",10,
+        // O chute do vídeo encosta no quadro 5 (o pé no alto), no começo da janela ativa.
+        assertEquals("Contact must actually show artwork frame 5",5,
             art.frame(art.timeFor(h.startupFrames/(float)CombatConfig.FPS,
                 h.totalFrames/(float)CombatConfig.FPS),0f));
     }

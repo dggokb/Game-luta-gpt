@@ -165,8 +165,10 @@ public class GameView extends SurfaceView
     private boolean vitoriaTocada;
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
     private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
-    /** Alterna os dois vídeos de defesa comum (defesa / defesa_2) a cada golpe defendido. */
-    private boolean defesaAlternada;
+    /** Roda os vídeos de defesa comum (defesa, defesa_2, defesa_3) a cada golpe defendido. */
+    private int defesaVez;
+    /** Alterna o impacto forte com o estouro (o do vídeo da defesa do Ryūga) a cada golpe forte. */
+    private boolean estouroVez;
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
     private final boolean[] ativoAntes = new boolean[2];
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
@@ -5069,6 +5071,15 @@ public class GameView extends SurfaceView
         return -88f * lean * f.facing;
     }
 
+    private static final String[] DEFESAS_EM_PE = {SpriteStates.DEFENSE_STAND, SpriteStates.DEFENSE_STAND_2, SpriteStates.DEFENSE_STAND_3};
+
+    /** A defesa em pé da vez {@code n}, entre as que o lutador tem (só DEFENSE_STAND, se não tiver as outras). */
+    static String defesaEmPe(SpriteFighterRenderer renderer, int n) {
+        int tem = 1;
+        while (tem < DEFESAS_EM_PE.length && renderer.hasAnimation(DEFESAS_EM_PE[tem])) tem++;
+        return DEFESAS_EM_PE[Math.floorMod(n, tem)];
+    }
+
     /** Picks the clip of one fighter from its engine state. Same rules for both sides. */
     private void updateFighterSprite(SpriteFighterRenderer renderer, CombatFighter f) {
         CharacterDefinition character = f.character();
@@ -5093,10 +5104,13 @@ public class GameView extends SurfaceView
                 : guard == CombatFighter.GUARD_AIR
                     ? SpriteStates.DEFENSE_AIR
                     : SpriteStates.DEFENSE_STAND;
+            boolean blocking = f.status == CombatFighter.Status.BLOCKSTUN;
+            // Defesa em pé variada (quem tem DEFENSE_STAND_2/_3): cada golpe defendido usa a
+            // seguinte; a guarda antes do golpe já mostra a que vem.
+            if (defense.equals(SpriteStates.DEFENSE_STAND)) defense = defesaEmPe(renderer, blocking ? f.defesas : f.defesas + 1);
             if (renderer.hasAnimation(defense)) {
                 animation = defense;
                 // Held guard while a threat approaches; impact and recovery during blockstun.
-                boolean blocking = f.status == CombatFighter.Status.BLOCKSTUN;
                 animationElapsed = character.animation(defense).guardTime(
                     blocking, blocking ? f.stunElapsed / (float)Math.max(1, f.stunTotal) : 0f);
             }
@@ -5446,9 +5460,18 @@ public class GameView extends SurfaceView
             // Poder (projétil ou especial) defendido tem o seu; a defesa comum alterna entre os dois
             // vídeos. Sem o efeito pedido, cai no seguinte (e sem nenhum, no clássico).
             if (poder && efeitos.tocar("defesa_poder", x, y, 1f, esquerda)) return true;
-            defesaAlternada = !defesaAlternada;
-            if (defesaAlternada && efeitos.tocar("defesa_2", x, y, 1f, esquerda)) return true;
+            // defesa_3: o estouro branco com o vento, recortado do vídeo da defesa do Ryūga.
+            defesaVez = (defesaVez + 1) % 3;
+            if (defesaVez == 2 && efeitos.tocar("defesa_3", x, y, 1f, esquerda)) return true;
+            if (defesaVez == 1 && efeitos.tocar("defesa_2", x, y, 1f, esquerda)) return true;
             return efeitos.tocar("defesa", x, y, 1f, esquerda);
+        }
+        // O estouro amarelo com o anel (recortado do vídeo da defesa do Ryūga): o do especial e,
+        // alternando com o impacto forte, o do golpe forte.
+        if (size >= EFEITO_GOLPE.length - 1 && efeitos.tocar("impacto_estouro", x, y, 1f, esquerda)) return true;
+        if (size == EFEITO_GOLPE.length - 2) {
+            estouroVez = !estouroVez;
+            if (estouroVez && efeitos.tocar("impacto_estouro", x, y, 0.85f, esquerda)) return true;
         }
         for (int s = Math.min(size, EFEITO_GOLPE.length - 1); s >= 0; s--) {
             if (efeitos.tocar(EFEITO_GOLPE[s], x, y, 1f + 0.25f * (size - s), esquerda)) return true;

@@ -1,193 +1,212 @@
 {
   "id": "player_base_crouch",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_sr_hd.png",
+  "source": "art/sprites/source/player_base_crouch_video_normalized.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
-    "columns": 8,
-    "frameCount": 8
+    "frameWidth": 384,
+    "frameHeight": 576,
+    "rootX": 204,
+    "rootY": 540,
+    "columns": 9,
+    "frameCount": 9
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        110,
-        29,
-        421,
-        478
+        42,
+        91,
+        345,
+        542
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 66723
+      "minimumMargin": 34,
+      "opaquePixels": 62410
     },
     {
       "index": 1,
       "outputBbox": [
-        107,
-        33,
-        421,
-        477
+        42,
+        91,
+        345,
+        542
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 67076
+      "minimumMargin": 34,
+      "opaquePixels": 62327
     },
     {
       "index": 2,
       "outputBbox": [
-        93,
-        48,
-        420,
-        474
+        41,
+        106,
+        345,
+        542
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 68166
+      "minimumMargin": 34,
+      "opaquePixels": 61669
     },
     {
       "index": 3,
       "outputBbox": [
-        92,
-        65,
-        420,
-        475
+        40,
+        131,
+        346,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 68959
+      "minimumMargin": 34,
+      "opaquePixels": 60332
     },
     {
       "index": 4,
       "outputBbox": [
-        88,
-        87,
-        419,
-        475
+        39,
+        171,
+        347,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 69491
+      "minimumMargin": 34,
+      "opaquePixels": 58681
     },
     {
       "index": 5,
       "outputBbox": [
-        84,
-        95,
-        419,
-        475
+        39,
+        187,
+        347,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 69361
+      "minimumMargin": 34,
+      "opaquePixels": 58172
     },
     {
       "index": 6,
       "outputBbox": [
-        77,
-        106,
-        419,
-        475
+        39,
+        201,
+        347,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 69011
+      "minimumMargin": 34,
+      "opaquePixels": 57489
     },
     {
       "index": 7,
       "outputBbox": [
-        73,
-        109,
-        419,
-        475
+        39,
+        206,
+        347,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 68949
+      "minimumMargin": 34,
+      "opaquePixels": 57267
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        39,
+        207,
+        347,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 57522
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 373,
-    "frameHeight": 475,
-    "rootX": 195,
-    "rootY": 460,
-    "columns": 8,
-    "frameCount": 8,
+    "frameWidth": 328,
+    "frameHeight": 471,
+    "rootX": 175,
+    "rootY": 459,
+    "columns": 9,
+    "frameCount": 9,
     "cropOffset": [
-      61,
-      16
+      29,
+      81
     ],
-    "sheetWidth": 364,
-    "sheetHeight": 3412,
+    "sheetWidth": 968,
+    "sheetHeight": 1252,
     "frames": [
       [
         0,
         0,
-        332,
-        468,
-        40,
+        316,
+        464,
+        7,
         4
       ],
       [
+        320,
         0,
-        472,
-        332,
+        312,
         464,
-        38,
-        8
+        9,
+        4
       ],
       [
+        636,
         0,
-        940,
-        344,
-        444,
-        24,
-        23
-      ],
-      [
-        0,
-        1388,
-        348,
-        428,
-        22,
-        40
-      ],
-      [
-        0,
-        1820,
-        348,
-        408,
-        18,
-        62
-      ],
-      [
-        0,
-        2232,
-        352,
-        400,
-        14,
-        70
-      ],
-      [
-        0,
-        2636,
-        360,
-        388,
+        316,
+        448,
         6,
-        81
+        19
       ],
       [
         0,
-        3028,
-        364,
+        468,
+        320,
+        424,
+        5,
+        44
+      ],
+      [
+        324,
+        468,
+        320,
         384,
         4,
-        84
+        83
+      ],
+      [
+        648,
+        468,
+        320,
+        368,
+        4,
+        100
+      ],
+      [
+        0,
+        896,
+        320,
+        356,
+        4,
+        114
+      ],
+      [
+        324,
+        896,
+        320,
+        348,
+        4,
+        119
+      ],
+      [
+        648,
+        896,
+        320,
+        348,
+        4,
+        120
       ]
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "grid": 5669600,
-      "packed": 4967872
+      "canonical": 7962624,
+      "grid": 5561568,
+      "packed": 4847744
     },
     "pixelScale": 2.0
   },
@@ -195,12 +214,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "680d0d717f425c797e1acbcfa014f15f6ea367c3fb5aaa5eb6c9c87b833e9c60",
-      "config": "7a6f302736174ffce182492258f4362f05a4dcb3fed7ed80ea05007cf14bc0d2",
+      "source": "995c467716e45fd7988fe34e4950c4784c6ee7b3e6d4a37429ee816ec095f9df",
+      "config": "e91c1b57b23625e3e1e91ecff26ab9a695a79b0ad0a2819d6460d29d94495ba5",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_crouch_video_normalized.png": "0a7d543d0dd16f9e1553664401323119213d6b5e8cead588c8aee47421653f4e"
+      "art/sprites/source/player_base_crouch_video_normalized.png": "995c467716e45fd7988fe34e4950c4784c6ee7b3e6d4a37429ee816ec095f9df"
     }
   }
 }

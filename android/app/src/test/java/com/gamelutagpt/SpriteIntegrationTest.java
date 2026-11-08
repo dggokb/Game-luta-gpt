@@ -200,10 +200,8 @@ public class SpriteIntegrationTest {
     }
     @Test public void actualJumpUsesAirFramesThenHeldCrouchAtLanding()throws Exception {
         touch(MotionEvent.ACTION_DOWN,175,465);frames(8);assertEquals(SpriteMotion.Clip.JUMP,motion().clip);
-        touch(MotionEvent.ACTION_MOVE,175,645);frames(60);assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
-        // Holding down after landing keeps the last (fully crouched) pose of the crouch clip.
-        CharacterDefinition.Animation crouch=GeneratedCharacters.defaultCharacter().animation(SpriteMotion.Clip.CROUCH);
-        assertEquals(crouch.frame(crouch.duration+1,0),motion().frame());
+        // Holding down after landing: the crouch, then the crouched breathing (CROUCH_IDLE, p01 11/2026).
+        touch(MotionEvent.ACTION_MOVE,175,645);frames(60);assertEquals(SpriteMotion.Clip.CROUCH_IDLE,motion().clip);
     }
     @Test public void facingChangesSelectForwardInBothDirections()throws Exception {
         player().x=1400f;npc().x=1000f;player().facing=-1;npc().facing=1;
@@ -276,18 +274,18 @@ public class SpriteIntegrationTest {
         CharacterDefinition character=renderer.character();
         CharacterDefinition.Animation idle=character.animation("IDLE");
         assertEquals(2f,idle.atlas.pixelScale,0f);
-        assertEquals(76,idle.atlas.count);
-        assertEquals(76*.042f,idle.duration,.00001f);
+        // O idle do vídeo novo (11/2026): uma respirada, 30 quadros de 2 em 2 do vídeo a 24 qps.
+        assertEquals(30,idle.atlas.count);
+        assertEquals(30*.083f,idle.duration,.001f);
         Field field=SpriteFighterRenderer.class.getDeclaredField("destination");field.setAccessible(true);
         Bitmap screen=Bitmap.createBitmap(600,400,Bitmap.Config.ARGB_8888);
         Canvas canvas=new Canvas(screen);
         for(int facing:new int[]{1,-1}) {
-            renderer.motion.clip="IDLE";renderer.motion.time=75*.042f+.01f;
+            renderer.motion.clip="IDLE";renderer.motion.time=29*.083f+.01f;
             renderer.draw(canvas,300f,300f,facing,false,false);
             RectF destination=(RectF)field.get(renderer);
-            // O idle do P01 é desenhado no tamanho fixo do idle (P01_IDLE_SCALE), em volta da raiz.
-            Field idleSize=SpriteFighterRenderer.class.getDeclaredField("P01_IDLE_SCALE");idleSize.setAccessible(true);
-            float scale=character.profile.worldScale/2f*idleSize.getFloat(null);
+            // O idle do vídeo é desenhado sem calibração (só o ajuste de tamanho do app), em volta da raiz.
+            float scale=character.profile.worldScale/2f*P01SpriteCalibration.get(idle.atlas.resource,renderer.motion.frame())[0];
             // A folha pode vir reduzida para a tela (SpriteAtlasCache): o destino cobre a caixa do
             // quadro arredondada em pixels inteiros da folha menor, em volta da mesma raiz.
             float[] span=drawnSpan(renderer,idle.atlas,renderer.motion.frame());
@@ -540,7 +538,8 @@ public class SpriteIntegrationTest {
         float jabRatio=jabUpper/(float)walkUpper;
         float heavyRatio=heavyUpper/(float)idleUpper;
         assertTrue("Idle off-model: "+idleRatio,idleRatio>=.94f && idleRatio<=1.12f);
-        assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.14f);
+        // O jab do vídeo (11/2026) já sai com o ombro adiantado no 1º quadro ativo do relógio.
+        assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.20f);
         assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {

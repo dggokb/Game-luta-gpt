@@ -1,155 +1,250 @@
 {
   "id": "player_base_rise",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_rise_sr_hd.png",
+  "source": "art/sprites/source/player_base_rise_video_normalized.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
-    "columns": 6,
-    "frameCount": 6
+    "frameWidth": 384,
+    "frameHeight": 576,
+    "rootX": 200,
+    "rootY": 540,
+    "columns": 10,
+    "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        77,
-        105,
-        419,
-        475
+        34,
+        214,
+        344,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 69391
+      "minimumMargin": 34,
+      "opaquePixels": 57475
     },
     {
       "index": 1,
       "outputBbox": [
-        83,
-        97,
-        419,
-        475
+        34,
+        214,
+        349,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 69841
+      "minimumMargin": 34,
+      "opaquePixels": 57917
     },
     {
       "index": 2,
       "outputBbox": [
-        89,
-        88,
-        419,
-        475
+        35,
+        187,
+        348,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 70211
+      "minimumMargin": 34,
+      "opaquePixels": 59808
     },
     {
       "index": 3,
       "outputBbox": [
-        93,
-        63,
-        420,
-        475
+        36,
+        157,
+        343,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 71136
+      "minimumMargin": 34,
+      "opaquePixels": 60980
     },
     {
       "index": 4,
       "outputBbox": [
-        93,
-        47,
-        420,
-        475
+        37,
+        109,
+        342,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 72329
+      "minimumMargin": 34,
+      "opaquePixels": 61893
     },
     {
       "index": 5,
       "outputBbox": [
-        93,
-        41,
-        420,
-        475
+        38,
+        86,
+        341,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 72344
+      "minimumMargin": 34,
+      "opaquePixels": 63146
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        38,
+        79,
+        341,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 63132
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        38,
+        81,
+        341,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 63049
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        39,
+        86,
+        341,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62994
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        39,
+        90,
+        341,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62735
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        39,
+        93,
+        341,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62487
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 370,
-    "frameHeight": 460,
-    "rootX": 193,
-    "rootY": 448,
-    "columns": 6,
-    "frameCount": 6,
+    "frameWidth": 335,
+    "frameHeight": 483,
+    "rootX": 176,
+    "rootY": 471,
+    "columns": 10,
+    "frameCount": 11,
     "cropOffset": [
-      63,
-      28
+      24,
+      69
     ],
-    "sheetWidth": 360,
-    "sheetHeight": 2544,
+    "sheetWidth": 1284,
+    "sheetHeight": 1316,
     "frames": [
       [
-        0,
-        2156,
-        360,
-        388,
+        332,
+        948,
+        324,
+        344,
         4,
-        68
+        138
+      ],
+      [
+        660,
+        948,
+        328,
+        340,
+        4,
+        139
       ],
       [
         0,
-        1756,
-        356,
-        396,
-        11,
-        61
+        948,
+        328,
+        368,
+        5,
+        112
       ],
       [
-        0,
-        1344,
-        348,
-        408,
-        18,
-        51
+        964,
+        480,
+        320,
+        400,
+        6,
+        82
       ],
       [
-        0,
-        908,
-        348,
-        432,
-        21,
-        27
-      ],
-      [
-        0,
-        456,
-        344,
+        640,
+        480,
+        320,
         448,
-        22,
-        10
+        7,
+        34
+      ],
+      [
+        640,
+        0,
+        312,
+        468,
+        10,
+        11
       ],
       [
         0,
         0,
-        344,
-        452,
-        22,
+        316,
+        476,
+        8,
         4
+      ],
+      [
+        320,
+        0,
+        316,
+        476,
+        8,
+        6
+      ],
+      [
+        956,
+        0,
+        316,
+        468,
+        8,
+        11
+      ],
+      [
+        0,
+        480,
+        316,
+        464,
+        8,
+        15
+      ],
+      [
+        320,
+        480,
+        316,
+        460,
+        8,
+        19
       ]
     ],
     "decodedBytes": {
-      "canonical": 6291456,
-      "grid": 4084800,
-      "packed": 3663360
+      "canonical": 17694720,
+      "grid": 12944400,
+      "packed": 6758976
     },
     "pixelScale": 2.0
   },
@@ -157,12 +252,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a4b1ddbc8610b00a1894c2c6e5b3e4a3bd428ae1759211db6cef635946a49edc",
-      "config": "cada4b3d0e67f7af5084b81e01d3ad5d9d6c26e063500df55a7d99abd43b0444",
+      "source": "ed368ba3a871f1b1e6953bea856e661f7c7d71377caca232bd29feb29eff2bef",
+      "config": "13f6d5bcef45cf14ac68734cba7a342982d84b4742e9e566fec9c15bcfafdf45",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_rise_video_normalized.png": "431483e33c5c6f76189e7cd313b583d40f34d06b82dccdc2201f76cfcdaaa099"
+      "art/sprites/source/player_base_rise_video_normalized.png": "ed368ba3a871f1b1e6953bea856e661f7c7d71377caca232bd29feb29eff2bef"
     }
   }
 }

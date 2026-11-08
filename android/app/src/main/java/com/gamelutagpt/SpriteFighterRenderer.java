@@ -191,7 +191,11 @@ final class SpriteFighterRenderer {
         CharacterDefinition.Animation anim=character.animation(clip);
         boolean p01="player_base".equals(character.id)||"p01_training".equals(character.id);
 
-        if(p01 && SpriteStates.IDLE.equals(clip)) {
+        if(p01 && P01SpriteCalibration.video(anim.atlas.resource)) {
+            // Folha dos vídeos novos (11/2026): todos os quadros na mesma escala, com os pés na
+            // raiz da câmera do vídeo; só o ajuste de tamanho do app (tuned), sem calibração.
+            drawP01Calibrated(canvas,anim,frame,x,baseY,alpha);
+        } else if(p01 && SpriteStates.IDLE.equals(clip)) {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,
                 P01_IDLE_SCALE,P01_IDLE_SCALE,alpha);
         } else if(p01 && SpriteStates.DASH.equals(clip)) {
@@ -237,6 +241,10 @@ final class SpriteFighterRenderer {
 
     private void drawP01Idle(Canvas canvas,float x,float baseY,int alpha) {
         CharacterDefinition.Animation idle=character.animation(SpriteStates.IDLE);
+        if(P01SpriteCalibration.video(idle.atlas.resource)) {
+            drawP01Calibrated(canvas,idle,idle.frame(0f,0f),x,baseY,alpha);
+            return;
+        }
         drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,P01_IDLE_SCALE,P01_IDLE_SCALE,alpha);
     }
 

@@ -59,16 +59,24 @@ def tuned(key):
     return float(json.loads(clip.read_text()).get("ajusteTamanho", 1.0)) if clip.exists() else 1.0
 
 
+def video(key):
+    """Folha refeita dos vídeos novos (11/2026, montagens/player_base.json): todos os quadros na
+    mesma escala e com a raiz da câmera do vídeo, então o desenho não é calibrado (escala 1)."""
+    clip = CLIPS / f"{key}.json"
+    return clip.exists() and json.loads(clip.read_text()).get("video", {}).get("personagem") == "player_base"
+
+
 def compute():
     idle = json.loads((REPORTS / "player_base_idle.report.json").read_text())
     left, top, right, bottom = idle["frames"][0]["outputBbox"]
     idle_height = (bottom - top) * STAND_SCALE
     idle_width = (right - left) * STAND_SCALE
     data, audit, factors = {}, {}, {}
+    videos = set()
     for filename in sorted(REPORTS.glob("player_base_*.report.json")):
         report = json.loads(filename.read_text())
         key = report["id"]
-        if key in SKIP:
+        if key in SKIP and not video(key):
             audit[key] = {"frames": len(report["frames"]), "mode": "existing calibrated transition"}
             continue
         root_x = report["layout"]["rootX"]
@@ -87,6 +95,12 @@ def compute():
         factor = tuned(key)
         if factor != 1.0:
             factors[key] = factor
+        if video(key):
+            rows = [(factor, factor, 0.0, 0.0)] * len(report["frames"])
+            data[key] = rows
+            videos.add(key)
+            audit[key] = {"frames": len(rows), "mode": "video (uniform scale)"}
+            continue
         for entry in report["frames"]:
             box = entry["outputBbox"]
             width = box[2] - box[0]
@@ -172,10 +186,10 @@ def compute():
             "max_drawn_height": max(heights),
             "max_abs_ground_foot_error": max(abs(x) for x in feet)
         }
-    return data, audit, idle_height, idle_width, factors
+    return data, audit, idle_height, idle_width, factors, videos
 
 
-def make_java(data, factors=None):
+def make_java(data, factors=None, videos=()):
     out = [
         "package com.gamelutagpt;",
         "import java.util.HashMap;",
@@ -185,8 +199,11 @@ def make_java(data, factors=None):
         " private static final HashMap<String,float[][]> VALUES = new HashMap<>();",
         " private static final float[] DEFAULT = {1f,1f,0f,0f};",
         " private static final HashMap<String,Float> TUNED = new HashMap<>();",
+        " private static final java.util.HashSet<String> VIDEO = new java.util.HashSet<>();",
         " static {"
     ]
+    for name in sorted(videos):
+        out.append(f'  VIDEO.add("{name}");')
     for name, factor in sorted((factors or {}).items()):
         out.append(f'  TUNED.put("{name}",{factor:.4f}f);')
     for name, rows in sorted(data.items()):
@@ -206,6 +223,10 @@ def make_java(data, factors=None):
         " static float tuned(String atlas) {",
         "  Float value=TUNED.get(atlas);return value==null?1f:value;",
         " }",
+        " /** Folha dos vídeos novos: mesma escala em todos os quadros, desenhada sem calibração. */",
+        " static boolean video(String atlas) {",
+        "  return VIDEO.contains(atlas);",
+        " }",
         " static int frames(String atlas) {",
         "  float[][] entries=VALUES.get(atlas);return entries==null?0:entries.length;",
         " }",
@@ -219,9 +240,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    data, audit, stand_h, stand_w, factors = compute()
+    data, audit, stand_h, stand_w, factors, videos = compute()
     expected = len(list(REPORTS.glob("player_base_*.report.json")))
-    assert len(data) + len(SKIP) == expected, "Missing atlas calibration"
+    assert len(data) + len(SKIP - videos) == expected, "Missing atlas calibration"
     assert len(data) >= 35, "Missing P01 sprite states"
     for key in ("player_base_dash", "player_base_crouch_light",
                 "player_base_crouch_medium", "player_base_crouch_heavy",
@@ -237,7 +258,7 @@ def main():
                 "player_base_special_s2", "player_base_special_s4")), "Ground foot drift"
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(make_java(data, factors), encoding="utf-8")
+    destination.write_text(make_java(data, factors, videos), encoding="utf-8")
     audit_file = ROOT / "android/app/build/sprite-review/p01-idle-master-audit.json"
     audit_file.parent.mkdir(parents=True, exist_ok=True)
     audit_file.write_text(json.dumps({"idle_visible_width":stand_w,"idle_visible_height":stand_h,

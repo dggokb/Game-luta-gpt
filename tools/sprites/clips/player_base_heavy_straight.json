@@ -2,21 +2,35 @@
   "id": "player_base_heavy_straight",
   "javaName": "HEAVY_STRAIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_heavy_straight_sr_hd.png",
+  "source": "art/sprites/source/player_base_heavy_straight_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_heavy_straight.webp",
   "report": "tools/sprites/reports/player_base_heavy_straight.report.json",
   "preview": "android/app/build/sprite-review/heavy_straight-import.png",
-  "expectedFrames": 23,
+  "expectedFrames": 24,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 1024,
-  "rootX": 440,
+  "frameWidth": 640,
+  "rootX": 192,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "sourceReferences": [
     "art/sprites/source/player_base_heavy_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "frameHeight": 640,
+  "rootY": 604,
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "H.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,74,77,80",
+    "celula": 320,
+    "largura": 320,
+    "raiz": "96,302",
+    "colunas": 6,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2
+  }
 }

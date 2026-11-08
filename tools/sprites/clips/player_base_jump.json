@@ -2,25 +2,39 @@
   "id": "player_base_jump",
   "javaName": "JUMP_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_jump_sr_hd.png",
+  "source": "art/sprites/source/player_base_jump_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_jump.webp",
   "report": "tools/sprites/reports/player_base_jump.report.json",
   "preview": "android/app/build/sprite-review/jump-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
-  "frameHeight": 640,
-  "rootY": 600,
+  "frameHeight": 704,
+  "rootY": 658,
   "sourceReferences": [
     "art/sprites/source/player_base_jump_video_normalized.png"
   ],
-  "frameWidth": 512,
-  "rootX": 256,
+  "frameWidth": 320,
+  "rootX": 168,
   "pixelScale": 2.0,
   "ajusteTamanho": 0.96,
   "regua": [
     "ajuste no app 20261014-0532: 96% (JUMP)"
-  ]
+  ],
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "player_base",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "35,37,39,41,43,45,48,51,54,57",
+    "celula": 352,
+    "largura": 160,
+    "raiz": "84,329",
+    "colunas": 10,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2
+  }
 }
