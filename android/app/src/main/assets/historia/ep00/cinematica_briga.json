@@ -1,5 +1,5 @@
 {
-  "_doc": "A briga dos irmãos (Prólogo, depois do treino), com os QTE em vídeo: os dois meninos num vídeo só no lugar dos lutadores (ep00/qt1, qt2 e qt3, do Drive ryuga_8). qt1 em loop enquanto o QTE pede (os dois trocando golpes e errando); a troca acertada vira o qt2 (se acertam e caem), que fica parado no fim (o Kōga sentado) enquanto o GOLPE FINAL! pede; no acerto, um clarão e o qt3 (o soco do Ryūga no Kōga), que congela no impacto e a tinta cobre: a página seguinte (pag5) começa nesse soco. Vale para as duas campanhas: o vídeo espelha quando o Kōga está à direita.",
+  "_doc": "A briga dos irmãos (Prólogo, depois do treino), com os QTE em vídeo: os dois meninos num vídeo só no lugar dos lutadores (ep00/qt1, qt2 e qt3, do Drive ryuga_8). qt1 em loop enquanto o QTE pede (os dois trocando golpes e errando); a troca acertada vira o qt2 (se acertam e caem), depois o Kōga se levanta e avança (levanta: começa no fim do qt2 e acaba no começo do qt3, sem corte); com os dois em guarda o GOLPE FINAL! pede e o acerto vira o qt3 (o soco do Ryūga no Kōga), que congela no impacto e a tinta cobre: a página seguinte (pag5) começa nesse soco. Vale para as duas campanhas: o vídeo espelha quando o Kōga está à direita.",
   "gatilho": { "vida": 0.5 },
   "acoes": [
     { "acao": "controle", "travar": true },
@@ -37,10 +37,15 @@
     { "acao": "esperar", "segundos": 0.35 },
     { "acao": "onomatopeia", "texto": "TUM!", "pos": [0.4, 0.62], "tamanho": 110, "segundos": 0.6, "semEsperar": true },
     { "acao": "esperar", "segundos": 0.29 },
-    { "acao": "camera", "zoom": 1.5, "segundos": 1.6, "semEsperar": true },
-    { "acao": "esperar", "segundos": 0.6 },
+    { "acao": "video", "clipe": "ep00/levanta", "ritmo": 1.3, "esquerda": "koga", "semEsperar": true },
+    { "acao": "esperar", "segundos": 0.75 },
+    { "acao": "onomatopeia", "texto": "PAH!", "pos": [0.55, 0.3], "tamanho": 120, "rotacao": 8, "segundos": 0.6, "semEsperar": true },
+    { "acao": "camera", "zoom": 1.48, "segundos": 0.08, "semEsperar": true },
+    { "acao": "esperar", "segundos": 0.25 },
+    { "acao": "camera", "zoom": 1.5, "segundos": 1.4, "semEsperar": true },
+    { "acao": "esperar", "segundos": 1.25 },
     { "acao": "qte", "tipo": "tempo", "texto": "GOLPE FINAL!", "segundos": 1.3, "golpe": "nenhum" },
-    { "acao": "clarao", "segundos": 0.35, "semEsperar": true },
+
     { "acao": "video", "clipe": "ep00/qt3", "esquerda": "koga", "semEsperar": true },
     { "acao": "esperar", "segundos": 1.35 },
     { "acao": "velocidade", "valor": 0.3, "segundos": 0.15, "semEsperar": true },
