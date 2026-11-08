@@ -90,7 +90,7 @@ public final class BateriaColisoes {
         c.save();
         c.translate(W / 2f - meio, CHAO_PX - Arena.GROUND_Y);
         RC.begin(c);
-        drawProj.invoke(efeitos, c, RC, e.energyProjectiles);
+        drawProj.invoke(efeitos, c, RC, e.energyProjectiles, java.util.Collections.emptySet());
         c.restore();
     }
 
@@ -428,7 +428,7 @@ public final class BateriaColisoes {
         Field ef = GameView.class.getDeclaredField("effects");
         ef.setAccessible(true);
         efeitos = ef.get(jogo);
-        drawProj = EffectsRenderer.class.getDeclaredMethod("drawEnergyProjectiles", Canvas.class, RenderCanvas.class, List.class);
+        drawProj = EffectsRenderer.class.getDeclaredMethod("drawEnergyProjectiles", Canvas.class, RenderCanvas.class, List.class, java.util.Set.class);
         drawProj.setAccessible(true);
     }
 

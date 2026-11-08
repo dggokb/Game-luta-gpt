@@ -255,8 +255,9 @@ final class EffectsRenderer {
      * chicote...) vêm do ProjetilVisual, o mesmo do visualizador no PC. {@code rc} já desenha
      * no mesmo {@code c}, com a câmera do mundo.
      */
-    void drawEnergyProjectiles(Canvas c, RenderCanvas rc, List<Projectile> projectiles) {
+    void drawEnergyProjectiles(Canvas c, RenderCanvas rc, List<Projectile> projectiles, java.util.Set<Projectile> emFolha) {
         for (Projectile p : projectiles) {
+            if (emFolha.contains(p)) continue;   // desenhado com a folha do vídeo (GameView)
             // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
             float scale = p.radius / 24f;
             if ("LUVA".equals(p.visual)) continue;   // a luva da caixa: quem desenha é a armadilha
@@ -314,8 +315,9 @@ final class EffectsRenderer {
     }
 
     /** Onda do Super (a do p01 acerta várias vezes) ou o desenho próprio dele (o fogo do p09, no chão). */
-    void drawSuperProjectiles(Canvas c, RenderCanvas rc, List<Projectile> projectiles) {
+    void drawSuperProjectiles(Canvas c, RenderCanvas rc, List<Projectile> projectiles, java.util.Set<Projectile> emFolha) {
         for (Projectile p : projectiles) {
+            if (emFolha.contains(p)) continue;   // desenhado com a folha do vídeo (GameView)
             if (p.visual == null || "ONDA".equals(p.visual)) {
                 // Parada no rival entre um acerto e outro, a onda pulsa.
                 float pulse = p.holding ? 1f + 0.12f * (float)Math.sin(p.hitCooldown * 1.3f) : 1f;

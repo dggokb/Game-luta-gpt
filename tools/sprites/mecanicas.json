@@ -315,22 +315,12 @@
         "alcance": 720
       },
       "unica": {
-        "descricao": "Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. Aparar (S3): postura que lê qualquer golpe corpo a corpo do 4º ao 13º quadro e responde na hora; no vazio não bate e fica aberto até o fim.",
+        "descricao": "Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. Chute voador (S3): salta para cima e para a frente dando quatro chutes no ar e pousa adiante; o último derruba.",
         "golpes": {
           "S": {
             "carga": {
               "frames": 60,
               "bonus": 800
-            }
-          },
-          "S3": {
-            "contra": {
-              "le": "tudo",
-              "janela": [
-                4,
-                13
-              ],
-              "apara": true
             }
           }
         }
@@ -345,7 +335,7 @@
           "comando": "→↓↘"
         },
         "S3": {
-          "nome": "Aparar",
+          "nome": "Chute voador",
           "comando": "↓↓"
         },
         "S4": {
@@ -359,6 +349,12 @@
       "super": {
         "acertos": 5,
         "intervalo": 8
+      },
+      "especiais": {
+        "S3": {
+          "lancar": "knockdown",
+          "empurrao": 70
+        }
       },
       "estiloCpu": "onda"
     },

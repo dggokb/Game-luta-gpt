@@ -411,9 +411,9 @@ public class CpuTest {
     }
 
     /**
-     * O maior combo corpo a corpo que a CPU tira de um jogador parado (que não defende): os
-     * acertos de golpe seguidos na mesma sessão de combo (o Super e o S1, projéteis de vários
-     * acertos, não são combo do livro).
+     * O maior combo que a CPU tira de um jogador parado (que não defende): os acertos seguidos na
+     * mesma sessão de combo, sem os do Super (o projétil de vários acertos sozinho não é combo do
+     * livro).
      */
     private static int longestCombo(int level) {
         int longest = 0;
@@ -424,7 +424,7 @@ public class CpuTest {
             for (int i = 0; i < 900; i++) {
                 f.step();
                 for (CombatEngine.HitEvent h : f.engine.events()) {
-                    if (h.attacker != 1 || h.blocked || h.projectile) continue;
+                    if (h.attacker != 1 || h.blocked || "SUPER".equals(h.moveId)) continue;
                     ComboSession s = f.engine.session(0);
                     seguidos = s != null && s == sessao ? seguidos + 1 : 1;
                     sessao = s;

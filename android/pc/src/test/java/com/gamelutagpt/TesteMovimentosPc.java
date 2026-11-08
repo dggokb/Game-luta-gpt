@@ -76,6 +76,23 @@ public final class TesteMovimentosPc {
         pad.press(PadInput.Button.LIGHT);
         for (int i = 0; i < 330; i++) { pad.setDirection(0); passo(i % 6 == 0); }
         solta(20);
+        // S2 do p01 (→↓↘ + L, o punho ascendente) e S3 (↓↓ + L, o chute voador que avança).
+        comando("S2p", new int[]{1, 3, 2}, PadInput.Button.LIGHT, 90);
+        comando("S3", new int[]{3, 0, 3}, PadInput.Button.LIGHT, 110);
+        // S1 (↓↘→ + L), o S1 segurando o botão (carregado) e o Super: o projétil anda até o boneco.
+        especial("S1", PadInput.Button.LIGHT, 0, 90);
+        especial("S1c", PadInput.Button.LIGHT, 70, 120);
+        jogo.engine.fighter(GameView.PLAYER).state.superMeter = CombatConfig.SUPER_COST;
+        especial("Super", PadInput.Button.SUPER, -1, 150);
+        // Ultra (↓ + SUPER com três barras): a abertura, a carga e o raio até o boneco.
+        solta(40);
+        jogo.engine.fighter(GameView.PLAYER).state.superMeter = CombatConfig.ULTRA_COST;
+        trecho = "Ultra";
+        pad.setDirection(3); passo(false);
+        pad.press(PadInput.Button.SUPER);
+        passo(false);   // o ↓ junto com o SUPER no mesmo quadro
+        for (int i = 0; i < 60 * 14; i++) { pad.setDirection(0); passo(i % 8 == 0); }
+        solta(30);
         trecho("tras", 5, null, 70);
         trecho("frente", 1, null, 70);
         solta(20);
@@ -102,6 +119,33 @@ public final class TesteMovimentosPc {
             passo(i % 2 == 0);
         }
         solta(20);
+    }
+
+    /** Meia-lua para a frente (↓↘→) e o botão; segura o botão {@code segura} quadros (carga). -1: só o botão. */
+    static void especial(String nome, PadInput.Button botao, int segura, int quadros) throws Exception {
+        trecho = nome;
+        if (segura >= 0) {
+            pad.setDirection(3); passo(false); passo(false);
+            pad.setDirection(2); passo(false); passo(false);
+            pad.setDirection(1); passo(false);
+        }
+        pad.press(botao);
+        for (int i = 0; i < quadros; i++) {
+            pad.setDirection(0);
+            pad.setHolding(segura > 0 && i < segura);
+            passo(i % 3 == 0);
+        }
+        pad.setHolding(false);
+        solta(20);
+    }
+
+    /** Uma sequência de direções (2 quadros cada) e o botão; grava {@code quadros} quadros. */
+    static void comando(String nome, int[] direcoes, PadInput.Button botao, int quadros) throws Exception {
+        trecho = nome;
+        for (int d : direcoes) { pad.setDirection(d); passo(false); passo(false); }
+        pad.press(botao);
+        for (int i = 0; i < quadros; i++) { pad.setDirection(0); passo(i % 3 == 0); }
+        solta(30);
     }
 
     static void toques(int dir) throws Exception {

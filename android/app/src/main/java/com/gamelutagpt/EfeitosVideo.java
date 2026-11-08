@@ -219,6 +219,31 @@ final class EfeitosVideo {
         return n;
     }
 
+    /**
+     * Desenha o quadro de {@code ms} do efeito (em loop) com a origem em (x, y): o projétil que
+     * é uma folha de vídeo (o cometa do S1 e a esfera do Super do Ryūga), levado pelo motor.
+     * False se o efeito não existe (quem chama desenha o clássico).
+     */
+    boolean desenharEm(Canvas c, String nome, float ms, float px, float py, float tamanho, boolean espelhar) {
+        Folha f = folhas.get(nome);
+        if (f == null || f.quadros.length == 0 || f.duracaoMs() <= 0f) return false;
+        int q = Math.max(0, f.quadroEm(ms % f.duracaoMs()));
+        int[] r = f.quadros[q];
+        fonte.set(r[0], r[1], r[0] + r[2], r[1] + r[3]);
+        float k = tamanho / f.pixelScale;
+        float left = f.desloc[q][0] * k, top = f.desloc[q][1] * k;
+        destino.set(px + left, py + top, px + left + r[2] * k, py + top + r[3] * k);
+        if (espelhar) {
+            c.save();
+            c.scale(-1f, 1f, px, 0f);
+            c.drawBitmap(f.bitmap, fonte, destino, paint);
+            c.restore();
+        } else {
+            c.drawBitmap(f.bitmap, fonte, destino, paint);
+        }
+        return true;
+    }
+
     /** Desenha no espaço do mundo (o canvas já com a câmera), do mais velho para o mais novo. */
     void desenhar(Canvas c) {
         for (int j = 0; j < VAGAS; j++) {

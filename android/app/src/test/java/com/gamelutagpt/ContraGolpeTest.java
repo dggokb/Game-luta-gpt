@@ -51,7 +51,8 @@ public class ContraGolpeTest {
     }
 
     @Test public void theCounterLeavesTheRivalStunnedAndTheFollowUpConnects() {
-        for (String id : new String[] {"player_base", "p02", "p11"}) {
+        // O Ryūga não tem mais o Aparar (o S3 virou o chute voador, 11/2026).
+        for (String id : new String[] {"p02", "p11"}) {
             int[] r = contraGolpe(id);
             assertTrue(id + ": vantagem " + r[0], r[0] >= 25);
             assertTrue(id + ": correu e emendou o L no atordoamento", r[1] == 1);

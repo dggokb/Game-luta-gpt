@@ -511,5 +511,156 @@
     "animacoes": {
       "DEFENSE_STAND_3": {}
     }
+  },
+  "energy": {
+    "_doc": "S1 (Onda): junta as mãos com a carga do vídeo (4-40) e empurra as palmas com o clarão (42, o disparo); a volta à guarda (72-110). O cometa é o projétil (efeitos/onda_player_base, recortado do vídeo s1 74-77, levado pelo motor): o s1_corpo é o s1 com o verde por cima dele depois do disparo (o corpo não leva o cometa junto).",
+    "trechos": [
+      [
+        "s1_corpo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "4-42/2,72-110/3",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_ENERGY": {
+        "impacto": 19
+      }
+    }
+  },
+  "energy_charge": {
+    "_doc": "S1 segurado (Onda carregável): a bola crescendo nas mãos (44-66), ida e volta em loop.",
+    "trechos": [
+      [
+        "s1_corpo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "44-66/2",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_CHARGE": {
+        "frames": "0-11,10-1",
+        "loop": true
+      }
+    }
+  },
+  "energy_charged": {
+    "_doc": "S1 carregado: o mesmo S1 com a bola grande nas mãos antes de soltar (62-70); o projétil sai maior.",
+    "trechos": [
+      [
+        "s1_corpo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "4-42/2,62,66,70,72-110/3",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_ENERGY_CHARGED": {
+        "impacto": 22
+      }
+    }
+  },
+  "super": {
+    "_doc": "Super (Onda Máxima): a carga com o brilho do vídeo (0-39) e o disparo com o estouro (42); a volta à guarda (96-120). A esfera girando com os raios é o projétil (efeitos/super_player_base, do vídeo super 66-76); o super_corpo é o super sem a esfera depois do disparo.",
+    "trechos": [
+      [
+        "super_corpo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0-42/3,96-120/3",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SUPER_WAVE": {
+        "impacto": 14,
+        "golpe": "SUPER"
+      }
+    }
+  },
+  "special_s2": {
+    "_doc": "S2 (Punho ascendente): agacha (8-18), sobe com o punho no alto (20-22: o impacto, subindo), fica no ar com o punho erguido (24-70), pousa com a poeira (73-80) e volta à guarda (84-104). A subida está no desenho (câmera do vídeo): o motor deixa o lutador no chão.",
+    "trechos": [
+      [
+        "s2",
+        0,
+        124
+      ]
+    ],
+    "quadros": "8,12,15,17,18,19,20,21,22,24,27,30,34,38,42,46,50,54,58,62,66,70,73,76,78,80,84,88,92,96,100,104",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S2": {
+        "impacto": 7
+      }
+    }
+  },
+  "special_s3": {
+    "_doc": "S3 (Chute voador): agacha, salta para cima e para a frente e dá quatro chutes no ar (24, 40, 66 e 84 do vídeo, com as estrelas e os anéis do vídeo), pousa com a poeira (99-105) e volta à guarda. O avanço do vídeo (~250 px, quadros 10-102) sai do desenho ('fixo') e quem anda é o motor (pancadas.json avanço): ele termina onde pousou. A subida está no desenho.",
+    "trechos": [
+      [
+        "s3",
+        0,
+        10
+      ],
+      [
+        "s3",
+        10,
+        103,
+        "fixo"
+      ],
+      [
+        "s3",
+        103,
+        124
+      ]
+    ],
+    "quadros": "3,6,8,10,12,14,16-100/3,102,105,108,111,114",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S3": {
+        "impacto": 9
+      }
+    }
+  },
+  "ultra_beam": {
+    "_doc": "Ultra (Raio da Casa): as 9 poses que o raio pede (RaioFinal.poseFrame), do vídeo do Super: guarda (0), carga com o brilho dourado (24, 30), o disparo com o estouro (42), segurando o raio com as palmas para a frente (96, 99, 102) e a volta (108, 114). O raio é o do poder_ultra (assets/ultras/player_base/raio_*.png).",
+    "trechos": [
+      [
+        "super_corpo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0,24,30,42,96,99,102,108,114",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "ULTRA_BEAM": {}
+    }
   }
 }
