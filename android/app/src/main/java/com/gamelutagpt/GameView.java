@@ -3108,8 +3108,10 @@ public class GameView extends SurfaceView
     private boolean ativacaoUltra;
 
     /**
-     * Ultra SHINKAI do dragão: a cena da transformação do SHINKAI (a luta parada, a câmera fecha
-     * nele, o resto escurece, as faixas e o corte com o retrato) enquanto ele arma o soco.
+     * Ultra SHINKAI do dragão: a luta parada, a câmera fecha nele e o resto escurece enquanto ele
+     * carrega (a animação própria, ULTRA_DRAGAO). Quem não tem a animação própria arma o soco com
+     * a cena da transformação do SHINKAI (o corte com o retrato); quem tem não repete o corte da
+     * transformação: o Ultra é outra cena.
      */
     private void cenaDoDragao(CombatFighter p) {
         ativacaoLado = p.index;
@@ -3117,10 +3119,12 @@ public class GameView extends SurfaceView
         ativacaoQuadros = engine.config.dragaoPreparo;
         ativacaoEfeito = false;
         ativacaoUltra = true;
-        corteLado = p.index;
-        corteAtraso = 10;
-        shinkaiFlash = SHINKAI_FLASH_FRAMES;
-        shinkaiFlashColor = p.state.shinkaiType.color;
+        if (!p.character().animations.containsKey(SpriteStates.ULTRA_DRAGAO)) {
+            corteLado = p.index;
+            corteAtraso = 10;
+            shinkaiFlash = SHINKAI_FLASH_FRAMES;
+            shinkaiFlashColor = p.state.shinkaiType.color;
+        }
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
     }
     /** Escurecido do cenário e do rival durante a ativação (o quanto; sobe e desce em ATIVACAO_FADE quadros). */
@@ -5089,6 +5093,9 @@ public class GameView extends SurfaceView
         return DEFESAS_EM_PE[Math.floorMod(n, tem)];
     }
 
+    /** Quadros da ULTRA_DRAGAO (montagens/player_base.json): fim da carga, o empurrão, a aura e a volta. */
+    private static final int DRAGAO_CARGA_FIM = 18, DRAGAO_EMPURRA = 19, DRAGAO_SEGURA = 20, DRAGAO_VOLTA = 27;
+
     /** Picks the clip of one fighter from its engine state. Same rules for both sides. */
     private void updateFighterSprite(SpriteFighterRenderer renderer, CombatFighter f) {
         CharacterDefinition character = f.character();
@@ -5313,6 +5320,29 @@ public class GameView extends SurfaceView
             animation = sequenceArt.id;
             animationElapsed = Math.min(sequenceArt.duration - 0.0001f, frames * FIXED_STEP);
         }
+        CharacterDefinition.Animation dragaoArte = f.ultraShinkai && engine.temDragao(character)
+            ? character.animations.get(SpriteStates.ULTRA_DRAGAO) : null;
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && dragaoArte != null) {
+            // Ultra SHINKAI do dragão com o desenho próprio (vídeo ultra_shinkai): a carga com a aura
+            // na cena, o empurrão da palma que solta o dragão, a aura segurando enquanto ele passa e
+            // a volta à guarda na recuperação.
+            int quadro;
+            if (f.ultraPhase == CombatFighter.ULTRA_STARTUP) {
+                float t = clamp(f.ultraFrame / (float)engine.config.dragaoPreparo, 0f, 1f);
+                quadro = Math.round(t * DRAGAO_CARGA_FIM);
+            } else if (f.ultraPhase == CombatFighter.ULTRA_RECOVERY) {
+                float t = clamp(f.ultraFrame / (float)engine.config.ultraRecoveryFrames, 0f, 1f);
+                quadro = DRAGAO_VOLTA + Math.round(t * (dragaoArte.frameCount() - 1 - DRAGAO_VOLTA));
+            } else {
+                // O empurrão nos primeiros quadros, depois a aura vai e volta (ida e volta).
+                int ciclo = DRAGAO_VOLTA - 1 - DRAGAO_SEGURA;
+                int k = Math.max(0, f.ultraFrame - 6) / 4;
+                int vai = k % (2 * ciclo);
+                quadro = f.ultraFrame < 6 ? DRAGAO_EMPURRA : DRAGAO_SEGURA + (vai < ciclo ? vai : 2 * ciclo - vai);
+            }
+            animation = dragaoArte.id;
+            animationElapsed = dragaoArte.timeOfFrame(Math.max(0, Math.min(dragaoArte.frameCount() - 1, quadro)));
+        }
         CharacterDefinition.Move jab = f.ultraShinkai && engine.temDragao(character) ? character.moves.get("L") : null;
         if (animation == null && f.status == CombatFighter.Status.ULTRA && jab != null && jab.animation != null) {
             // Ultra SHINKAI do dragão: o soco (jab) armado devagar na cena, esticado enquanto o dragão
@@ -5525,10 +5555,20 @@ public class GameView extends SurfaceView
             if (!f.inUltraDragao() || f.ultraFrame != 0) continue;
             String nome = "ultra_shinkai_" + f.state.character.id;
             CombatConfig cfg = engine.config;
-            // A cabeça entra de fora da tela, por trás dele, e anda como no motor até o rabo sair do outro lado.
-            float x = f.x + f.facing * (cfg.dragaoOrigem - cfg.dragaoAtras);
             float y = f.y - f.character().visualStandHeight * 0.62f;
-            efeitos.tocarAndando(nome, x, y, 1f, f.facing < 0, cfg.dragaoVelocidade, cfg.dragaoQuadros * FIXED_STEP * 1000f);
+            if (efeitos.temCena(nome)) {
+                // O vídeo do dragão atravessando a tela (dragao_ultra): ele mesmo entra de um lado e
+                // sai do outro; toca uma vez no meio da tela, na altura do peito, do lado em que ele olha.
+                // No tamanho que cobre a tela que a câmera mostra (as bordas do vídeo ficam fora dela).
+                float largura = efeitos.larguraCena(nome);
+                float tamanho = largura > 0f ? Math.max(1f, VW / Math.max(0.01f, camera.zoom) / largura * 1.06f) : 1f;
+                efeitos.tocar(nome, camera.x, y, tamanho, f.facing < 0);
+            } else {
+                // O dragão por código (um ciclo): a cabeça entra de fora da tela, por trás dele, e
+                // anda como no motor até o rabo sair do outro lado.
+                float x = f.x + f.facing * (cfg.dragaoOrigem - cfg.dragaoAtras);
+                efeitos.tocarAndando(nome, x, y, 1f, f.facing < 0, cfg.dragaoVelocidade, cfg.dragaoQuadros * FIXED_STEP * 1000f);
+            }
             ultraSounds.play(ultraFolder(f.state), "investida");
             ultraSounds.playFight("punish", 1f, 0.8f);
         }

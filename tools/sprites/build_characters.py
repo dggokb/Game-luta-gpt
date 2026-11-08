@@ -47,7 +47,10 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # (jH, M/L e o SPECIAL_ENERGY).
             'DRAGON_RUSH', 'SPECIAL_ENERGY_SHINKAI',
             # Defesa em pé variada: o jogo alterna entre DEFENSE_STAND e estas a cada golpe defendido.
-            'DEFENSE_STAND_2', 'DEFENSE_STAND_3')
+            'DEFENSE_STAND_2', 'DEFENSE_STAND_3',
+            # Ultra SHINKAI do dragão com desenho próprio: a carga (0-18), o empurrão que solta o
+            # dragão (19), a aura segurando enquanto ele passa (20-26) e a volta (27-35).
+            'ULTRA_DRAGAO')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')

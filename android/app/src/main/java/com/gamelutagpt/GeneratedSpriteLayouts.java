@@ -3868,6 +3868,12 @@ final class GeneratedSpriteLayouts {
     static final int ULTRA_BEAM_ROOT_Y = 615;
     static final int ULTRA_BEAM_FRAME_COUNT = 9;
 
+    static final int PLAYER_BASE_ULTRA_DRAGAO_FRAME_WIDTH = 1061;
+    static final int PLAYER_BASE_ULTRA_DRAGAO_FRAME_HEIGHT = 632;
+    static final int PLAYER_BASE_ULTRA_DRAGAO_ROOT_X = 541;
+    static final int PLAYER_BASE_ULTRA_DRAGAO_ROOT_Y = 595;
+    static final int PLAYER_BASE_ULTRA_DRAGAO_FRAME_COUNT = 36;
+
     static final int VICTORY_FRAME_WIDTH = 326;
     static final int VICTORY_FRAME_HEIGHT = 577;
     static final int VICTORY_ROOT_X = 171;
