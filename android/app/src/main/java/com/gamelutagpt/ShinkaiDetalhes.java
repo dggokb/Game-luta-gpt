@@ -102,10 +102,17 @@ final class ShinkaiDetalhes {
     }
 
     /**
+     * Revisão da base (docs/revisao-base): número de dano flutuando sobre os lutadores é linguagem
+     * de RPG; nenhuma das referências faz. Desligado (o dano aparece na barra e no contador).
+     */
+    static boolean MOSTRAR_NUMEROS = false;
+
+    /**
      * O dano de um golpe no SHINKAI, grande e na cor do tipo. Golpes seguidos no mesmo lugar
      * (o combo) somam no número que ainda está na tela.
      */
     void numero(float x, float y, int dano, int cor, boolean grande) {
+        if (!MOSTRAR_NUMEROS) return;
         for (int i = 0; i < NUMEROS; i++) {
             if (nIdade[i] >= 0 && nIdade[i] < 24 && nCor[i] == cor && Math.abs(nx[i] - x) < 160f) {
                 nValor[i] += dano;

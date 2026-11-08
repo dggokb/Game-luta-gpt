@@ -367,3 +367,22 @@ Em ordem, cada etapa medida antes/depois com a mesma luta Ryūga × Ryūga captu
 7. **HUD e round:** textos de evento do lado do atacante, fonte própria, abertura de ≈3 s, modo teste escondível.
 
 As etapas 1 e 2 dependem só de código e dão para fazer já. A 3 usa as imagens que já existem. As etapas 4 a 6 precisam de arte e de som novos.
+
+## Andamento
+
+**Feito (só código), commit "Revisão da base: limpeza do impacto":**
+- **Pausa no acerto:** L/M/H passam de 12/15/18 para 8/11/14 (`CombatConfig.*HitHoldFrames` 0/1/2). Na defesa dos normais, de 8/10/12 para 5/6/7 (`normalBlockHitstopScale` 0,6). Os especiais não mudam.
+- **Câmera e cenário:** golpe comum e especial comum não dão soco de câmera, tranco nem escurecimento (`ImpactFeel.ZOOM/KICK/DARK` zerados). Punição e KO continuam.
+- **Tremor da tela:** só no KO e no golpe que fecha um Super (nada em M/H/especial).
+- **Quem apanha:** treme no máximo 4 px (era 9) e não pisca branco. A tinta azul da defesa fica.
+- **Impact frame:** o vermelho saiu da punição e do fim de combo; fica o preto no KO, no Super e no Ultra.
+- **Câmera de cinema:** no lançador e no KO, não mais no golpe que joga na parede.
+- **Velocidade:** a luta roda a 100% (`RITMO_BASE` 1,0; era 0,92).
+- **Sombra de contato:** alfa 165 (era 70) e um pouco mais larga.
+- **SHINKAI:** o número de dano flutuante foi desligado (`ShinkaiDetalhes.MOSTRAR_NUMEROS`).
+
+**Ficou para depois:**
+- **Zoom fixo.** O motor não tem limite de distância entre os lutadores, e é o zoom que abre a câmera para os dois caberem. Fixar o zoom precisa antes de uma regra de distância máxima, que mexe na jogabilidade.
+- **Textos de evento do lado de quem bate.** Os avisos do motor não dizem de quem são; isso precisa ser acrescentado no motor.
+
+**Depende de vídeo:** os prompts estão em [prompts-videos.md](prompts-videos.md) (faíscas no estilo FighterZ, defesa fria, poeiras e as reações de dano, queda, defesas, intro e vitória do Ryūga).

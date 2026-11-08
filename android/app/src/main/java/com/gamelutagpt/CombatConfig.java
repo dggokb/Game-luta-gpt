@@ -394,9 +394,14 @@ final class CombatConfig {
      */
     /** Golpe normal que acertou: quadros para voltar à guarda antes de a recuperação acabar. */
     int hitCutGuardFrames = 3;
-    int lightHitHoldFrames = 4;
-    int mediumHitHoldFrames = 5;
-    int heavyHitHoldFrames = 6;
+    int lightHitHoldFrames = 0;
+    int mediumHitHoldFrames = 1;
+    int heavyHitHoldFrames = 2;
+    /**
+     * Revisão da base (docs/revisao-base): a pausa da defesa dos golpes normais é 60% da do
+     * acerto (5/6/7 quadros), como nas referências (SF6 5–8, MvC3 ~0); o acerto fica 8/11/14.
+     */
+    float normalBlockHitstopScale = 0.6f;
     int koHitstopBonus = 16;
     float spinLift = 820f;
     int spinHitstunFrames = 30;

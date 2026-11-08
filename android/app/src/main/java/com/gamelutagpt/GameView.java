@@ -89,7 +89,7 @@ public class GameView extends SurfaceView
      * da pausa escalam junto (90% = 0,828 do original). O motor e as simulações contam quadros:
      * não mudam.
      */
-    static final float RITMO_BASE = 0.92f;
+    static final float RITMO_BASE = 1f;
 
     /** Onde fica a VELOCIDADE escolhida na pausa (vale para a próxima vez que o app abrir). */
     private static final String SPEED_PREFS = "jogo_v1";
@@ -2997,8 +2997,7 @@ public class GameView extends SurfaceView
         boolean normal = !event.projectile && !ultraHit && (event.strength == AttackDefinition.Strength.LIGHT ||
             event.strength == AttackDefinition.Strength.MEDIUM || event.strength == AttackDefinition.Strength.HEAVY);
         if (!event.blocked && (normal || knockout)) feel.kick(direction, size);
-        if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 4f : 6f);
-        else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 2f);
+        // Revisão da base: golpe comum não treme a tela (o peso vem da pausa e da faísca).
         if (knockout) beamShake = Math.max(beamShake, 18f);
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
         // A plateia do cenário vibra com o golpe (forte no pesado, festa no KO).
@@ -3018,7 +3017,8 @@ public class GameView extends SurfaceView
         // A pancada que fecha o golpe (o chute do Super da p15) treme a tela como um KO.
         if (!event.blocked && event.finalStrike) beamShake = Math.max(beamShake, 14f);
         if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
-            (knockout || bigBlow(attacker, defender))) {
+            (knockout || (bigBlow(attacker, defender) && !(attacker.attack != null &&
+                attacker.attack.launch == AttackDefinition.Launch.WALL_BOUNCE)))) {
             // O H que joga na parede ganha um close mais aberto que o lançador e o KO.
             boolean wall = !knockout && attacker.attack != null &&
                 attacker.attack.launch == AttackDefinition.Launch.WALL_BOUNCE;
@@ -3449,7 +3449,6 @@ public class GameView extends SurfaceView
     }
 
     /** Combo a partir deste tamanho: o golpe que o encerra derrubando ganha o impact frame. */
-    private static final int IMPACT_COMBO_HITS = 5;
 
     /**
      * Impact frame de um acerto: VOID no KO e no Super, RED no punish counter e no golpe que
@@ -3458,13 +3457,8 @@ public class GameView extends SurfaceView
     private int impactStyleFor(CombatEngine.HitEvent event, CombatFighter defender, int size,
                                boolean punish, boolean knockout) {
         if (knockout || event.strength == AttackDefinition.Strength.SUPER) return ImpactFeel.VOID;
-        if (punish && size >= ImpactEffects.HEAVY) return ImpactFeel.RED;
-        boolean sentFlying = defender.status == CombatFighter.Status.KNOCKDOWN || defender.hardFall ||
-            defender.spinning || defender.bounce != CombatFighter.BOUNCE_NONE;
-        if (!sentFlying) return ImpactFeel.NONE;
-        ComboSession combo = engine.session(event.defender);
-        if (combo == null && engine.framesSinceSessionEnd(event.defender) == 0) combo = engine.lastSession(event.defender);
-        return combo != null && combo.hitCount >= IMPACT_COMBO_HITS ? ImpactFeel.RED : ImpactFeel.NONE;
+        // Revisão da base: punish e fim de combo não piscam mais (reservado ao Super, Ultra e KO).
+        return ImpactFeel.NONE;
     }
 
     private static final String[] HIT_SOUNDS = {"acerto_l", "acerto_m", "acerto_h", "acerto_s"};
@@ -4859,7 +4853,7 @@ public class GameView extends SurfaceView
         c.translate(engine.teams.tagOffset(OPPONENT), 0f);
         drawContactShadow(c, opponentSpriteRenderer, npc);
 
-        drawFighter(c, opponentSpriteRenderer, npc, npc.framesSinceHit < 4 && !npc.ko(), false);
+        drawFighter(c, opponentSpriteRenderer, npc, false, false);
         c.restore();
 
         opponentPanel.x = npc.x;
@@ -6608,7 +6602,7 @@ public class GameView extends SurfaceView
 
     private void drawPlayer(Canvas c) {
         CombatFighter p = player();
-        drawFighter(c, spriteFighterRenderer, p, p.framesSinceHit < 8, p.framesSinceBlock < 7);
+        drawFighter(c, spriteFighterRenderer, p, false, p.framesSinceBlock < 7);
     }
 
     /** Altura (pixels do mundo) em que a sombra de contato chega ao menor e mais clara. */
@@ -6622,9 +6616,9 @@ public class GameView extends SurfaceView
         if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || cenaEmVideo) return;
         float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
-        float half = 43f * k * renderer.animacao.pose().escalaX;
+        float half = 52f * k * renderer.animacao.pose().escalaX;
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(Math.round(70 * k), 0, 0, 0));
+        paint.setColor(Color.argb(Math.round(165 * k), 0, 0, 0));
         c.drawOval(f.x - half, GROUND_Y - 10f * k, f.x + half, GROUND_Y + 10f * k, paint);
     }
 

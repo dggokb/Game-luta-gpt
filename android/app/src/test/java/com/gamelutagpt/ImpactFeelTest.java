@@ -6,40 +6,38 @@ import org.junit.Test;
 
 /** Peso dos golpes na tela: soco de câmera, escurecida, clarão e câmera lenta do KO. */
 public class ImpactFeelTest {
-    @Test public void heavierBlowsPunchTheCameraHarderAndItSettles() {
-        ImpactFeel light = new ImpactFeel(), heavy = new ImpactFeel();
+    /** Revisão da base: golpe comum não mexe a câmera; só o punish counter e o KO dão o soco. */
+    @Test public void onlyPunishAndKoPunchTheCameraAndItSettles() {
+        ImpactFeel light = new ImpactFeel(), heavy = new ImpactFeel(), punish = new ImpactFeel();
         light.onHit(500f, 300f, ImpactEffects.LIGHT, false, false);
         heavy.onHit(500f, 300f, ImpactEffects.HEAVY, false, false);
+        punish.onHit(500f, 300f, ImpactEffects.HEAVY, true, false);
         assertEquals("a jab does not move the camera", 1f, light.zoom(), 0f);
-        assertTrue(heavy.zoom() > 1.02f);
-        assertEquals(500f, heavy.focusX(), 0f);
-        for (int i = 0; i < 60; i++) heavy.step();
-        assertEquals("back to the normal framing", 1f, heavy.zoom(), 0.001f);
+        assertEquals("a plain heavy does not either", 1f, heavy.zoom(), 0f);
+        assertTrue(punish.zoom() > 1.02f);
+        assertEquals(500f, punish.focusX(), 0f);
+        for (int i = 0; i < 60; i++) punish.step();
+        assertEquals("back to the normal framing", 1f, punish.zoom(), 0.001f);
     }
 
-    @Test public void strongBlowsKickTheScreenAlongTheHitAndItSettles() {
+    @Test public void plainBlowsDoNotKickTheScreen() {
         ImpactFeel f = new ImpactFeel();
-        f.kick(-1, ImpactEffects.HEAVY);
-        float most = 0f;
-        for (int i = 0; i < 12; i++) {
+        for (int size = ImpactEffects.LIGHT; size <= ImpactEffects.SPECIAL; size++) {
+            f.kick(-1, size);
             f.step();
-            most = Math.min(most, f.kickX());
+            assertEquals("no kick for size " + size, 0f, f.kickX(), 0f);
         }
-        assertTrue("goes the way of the hit: " + most, most < -5f);
-        for (int i = 0; i < 60; i++) f.step();
-        assertEquals("settles", 0f, f.kickX(), 0.05f);
-        f.kick(1, ImpactEffects.LIGHT);
-        f.step();
-        assertEquals("a jab does not kick", 0f, f.kickX(), 0f);
     }
 
-    @Test public void onlyStrongBlowsDarkenTheStageAndOnlyForAMoment() {
+    @Test public void onlyPunishDarkensTheStageAndOnlyForAMoment() {
         ImpactFeel f = new ImpactFeel();
         f.onHit(0f, 0f, ImpactEffects.MEDIUM, false, false);
-        assertEquals(0, f.darkAlpha());
         f.onHit(0f, 0f, ImpactEffects.HEAVY, false, false);
+        f.onHit(0f, 0f, ImpactEffects.SPECIAL, false, false);
+        assertEquals("plain blows keep the stage as it is", 0, f.darkAlpha());
+        f.onHit(0f, 0f, ImpactEffects.HEAVY, true, false);
         assertTrue(f.darkAlpha() > 0);
-        for (int i = 0; i < ImpactFeel.DARK_FRAMES[ImpactEffects.HEAVY]; i++) f.step();
+        for (int i = 0; i < ImpactFeel.PUNISH_DARK_FRAMES; i++) f.step();
         assertEquals(0, f.darkAlpha());
     }
 
@@ -63,7 +61,7 @@ public class ImpactFeelTest {
         d.hitstop = 9;
         d.framesSinceHit = 0;
         float a = ImpactFeel.hitShake(d, 0), b = ImpactFeel.hitShake(d, 1);
-        assertTrue(Math.abs(a) > 4f);
+        assertTrue("a small shake, not a jolt: " + a, Math.abs(a) > 2f && Math.abs(a) <= 4f);
         assertEquals("alternates sides", -a, b, 0f);
         d.framesSinceHit = 999;
         d.framesSinceBlock = 0;

@@ -11,7 +11,7 @@ import com.gamelutagpt.motion.Mola;
  */
 final class ImpactFeel {
     /** Zoom extra por tamanho de golpe (LIGHT, MEDIUM, HEAVY, SPECIAL), punish counter e KO. */
-    static final float[] ZOOM = {0f, 0.012f, 0.025f, 0.05f};
+    static final float[] ZOOM = {0f, 0f, 0f, 0f};
     static final float PUNISH_ZOOM = 0.07f, KO_ZOOM = 0.09f;
     /**
      * Mola da volta do zoom (motion-core): o soco entra seco e volta firme ao enquadramento
@@ -22,11 +22,11 @@ final class ImpactFeel {
      * Tranco da tela no sentido do golpe (pixels da tela) por tamanho (LIGHT, MEDIUM, HEAVY,
      * SPECIAL): vai e volta por mola, firme.
      */
-    static final float[] KICK = {0f, 4f, 9f, 14f};
+    static final float[] KICK = {0f, 0f, 0f, 0f};
     static final Mola KICK_SPRING = new Mola(4.5f, 0.75f);
     /** Cenário escurecido (alfa 0..255) e quantos quadros dura, por tamanho de golpe. */
-    static final int[] DARK = {0, 0, 70, 100};
-    static final int[] DARK_FRAMES = {0, 0, 3, 4};
+    static final int[] DARK = {0, 0, 0, 0};
+    static final int[] DARK_FRAMES = {0, 0, 0, 0};
     static final int PUNISH_DARK = 140, PUNISH_DARK_FRAMES = 6;
     /** KO: clarão branco (alfa) e a câmera lenta (quadros da luta e a velocidade deles). */
     static final int KO_FLASH = 210;
@@ -286,8 +286,8 @@ final class ImpactFeel {
     static float hitShake(CombatFighter f, int frame) {
         if (f.hitstop <= 0) return 0f;
         float amplitude;
-        if (f.framesSinceHit == 0) amplitude = Math.min(9f, 2.5f + f.hitstop * 0.7f);
-        else if (f.framesSinceBlock == 0) amplitude = 2.5f;
+        if (f.framesSinceHit == 0) amplitude = Math.min(4f, 1.5f + f.hitstop * 0.25f);
+        else if (f.framesSinceBlock == 0) amplitude = 1.5f;
         else return 0f;
         return (frame % 2 == 0 ? 1f : -1f) * amplitude;
     }

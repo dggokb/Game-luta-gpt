@@ -4999,6 +4999,15 @@ final class CombatEngine {
     }
 
     /** Hitstop of a strike before the last: shorter, the move keeps its rhythm. */
+    /** Pausa na defesa: menor que a do acerto nos golpes normais (L/M/H); especiais como antes. */
+    private int blockHitstop(AttackDefinition attack) {
+        AttackDefinition.Strength s = attack.strength;
+        boolean normal = s == AttackDefinition.Strength.LIGHT || s == AttackDefinition.Strength.MEDIUM ||
+            s == AttackDefinition.Strength.HEAVY;
+        if (!normal) return attack.hitstopFrames;
+        return Math.max(4, Math.round(attack.hitstopFrames * config.normalBlockHitstopScale));
+    }
+
     private static int holdingHitstop(AttackDefinition attack) {
         return Math.max(3, attack.hitstopFrames * 2 / 3);
     }
@@ -5038,7 +5047,7 @@ final class CombatEngine {
         d.backdashFrames = 0;
         if (!absorve) push(d, a, direction * attack.pushbackOnBlock * (holding ? config.strikeHoldPushback : 1f));
         if (meter) gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
-        freeze(a, d, absorve ? 2 : holding ? holdingHitstop(attack) : attack.hitstopFrames, projectile);
+        freeze(a, d, absorve ? 2 : holding ? holdingHitstop(attack) : blockHitstop(attack), projectile);
         events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
         if (just) {
             // A janela vale uma vez: a próxima batida pede outro aperto.
