@@ -118,11 +118,11 @@ public class VisualReviewTest {
         Projectile small=new Projectile(p.x+40f,npc.y-140f,900f,600f,24f,10,0xFF22BFFF,0,1,null);
         small.x+=180f;orbs.add(small);
         AndroidRenderCanvas rc=new AndroidRenderCanvas();rc.begin(c);
-        effects.drawEnergyProjectiles(c,rc,orbs);
+        effects.drawEnergyProjectiles(c,rc,orbs,java.util.Collections.emptySet());
         orbs.clear();
         Projectile big=new Projectile(p.x-200f,npc.y-300f,900f,600f,58f,10,0xFFFF4FA0,0,1,null);
         big.x+=260f;orbs.add(big);
-        effects.drawSuperProjectiles(c,rc,orbs);
+        effects.drawSuperProjectiles(c,rc,orbs,java.util.Collections.emptySet());
         c.save();c.translate(-200f,0f);
         effects.drawSuperCharge(c,new Paint(),900f,npc.y,.37f,0xFF22BFFF);
         c.restore();

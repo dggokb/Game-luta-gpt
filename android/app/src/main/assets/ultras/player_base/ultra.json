@@ -40,12 +40,12 @@
     "ponta": "raio_ponta.png",
     "inicio": "raio_inicio.png",
     "centroInicio": [
-      0.443,
-      0.479
+      0.381,
+      0.5
     ],
     "impacto": "raio_impacto.png",
     "hits": 20,
-    "espessura": 210,
+    "espessura": 200,
     "aura": {
       "imagem": "raio_aura.png",
       "quadros": 4
@@ -60,14 +60,15 @@
     },
     "maos": {
       "carga": [
-        2,
-        140
+        48,
+        139
       ],
       "disparo": [
-        125,
-        174
+        93,
+        179
       ]
-    }
+    },
+    "_doc": "Corpo, ponta e esfera recortados do vídeo poder_ultra (quadro 56, pasta p01 do Drive, 11/2026): o feixe do vídeo, esticado pelo jogo até o adversário."
   },
   "abertura": {
     "corte": "corte.png",

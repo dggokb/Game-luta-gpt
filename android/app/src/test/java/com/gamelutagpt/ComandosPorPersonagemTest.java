@@ -14,7 +14,7 @@ import org.junit.Test;
 public class ComandosPorPersonagemTest {
     /** Personagem, e de S1 a S4: nome e comando (como a lista mostra, sem os botões). */
     private static final String[][] TABELA = {
-        {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Aparar", "↓ ↓", "Chute giratório", "↓ ↙ ←"},
+        {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute voador", "↓ ↓", "Chute giratório", "↓ ↙ ←"},
         {"p02", "Palma", "↓ ↘ →", "Chute da garça", "[↓] ↑", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "[←] →"},
         {"p03", "Onda curta", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},

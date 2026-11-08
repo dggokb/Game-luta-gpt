@@ -50,7 +50,7 @@ final class CpuStyle {
         new CpuStyle("agarrador", 80f, 0.90, 0.3, 4.0, 0.5, 0.7),
         // Os do núcleo parecido, cada um jogando com a ferramenta que só ele tem
         // (docs/balanco/identidade.md, passo 3).
-        new CpuStyle("onda", 300f, 0.60, 1.6, 0.8, 0.8, 0.9, 1.6, 1.0),        // Ryūga: Onda carregada e Aparar
+        new CpuStyle("onda", 300f, 0.60, 1.6, 0.8, 0.8, 0.9, 1.6, 1.0),        // Ryūga: Onda carregada e Chute voador
         new CpuStyle("contra", 200f, 0.65, 0.6, 1.0, 1.0, 1.3, 2.2, 0.8),      // Yin-lu: espera e lê com o contra-golpe
         new CpuStyle("rekka", 140f, 0.95, 0.4, 1.2, 0.8, 0.5, 1.0, 3.0),       // Kōga: entra com o avanço em três
         new CpuStyle("esquiva", 130f, 0.90, 0.4, 1.4, 0.8, 0.6, 2.2, 1.5),     // p04: esquiva o que vem e entra

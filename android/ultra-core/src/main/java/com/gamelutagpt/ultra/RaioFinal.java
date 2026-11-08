@@ -245,6 +245,17 @@ public final class RaioFinal {
             c.drawLine(x + cos * far, y + sin * far, x + cos * Math.max(radius, near), y + sin * Math.max(radius, near),
                 2.5f, spark);
         }
+        RenderImage start = pack.beamStart;
+        if (start != null) {
+            // A esfera desenhada (a do começo do raio, do vídeo do poder), crescendo com a carga,
+            // no lugar da bola por código (a imagem já some aos poucos à direita da esfera).
+            float[] center = def.beam.startCenter;
+            float h = radius * 3.2f;
+            float w = h * start.width() / start.height();
+            float left = x - w * center[0], top = y - h * center[1];
+            c.drawImage(start, left, top, left + w, top + h, 255);
+            return;
+        }
         c.fillRadialGlow(x, y, radius * 2.6f, withAlpha(def.color, 210));
         c.fillRadialGlow(x, y, radius * 1.4f, withAlpha(def.accentColor, 240));
         c.fillRadialGlow(x, y, radius * 0.75f, 0xFFFFFFFF);

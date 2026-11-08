@@ -1,307 +1,269 @@
 {
   "id": "player_base_energy_charge",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_energy_charge_video_hd.png",
+  "source": "art/sprites/source/player_base_energy_charge_video_normalized.png",
   "sourceNote": "p01: carga da Onda (loop), v\u00eddeo Seedance carga.mp4, convertido por video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 768,
-    "frameHeight": 512,
-    "rootX": 280,
-    "rootY": 476,
-    "columns": 5,
-    "frameCount": 14
+    "frameWidth": 1536,
+    "frameHeight": 704,
+    "rootX": 482,
+    "rootY": 648,
+    "columns": 2,
+    "frameCount": 12
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        137,
-        36,
-        462,
-        485
+        316,
+        56,
+        1252,
+        677
       ],
       "minimumMargin": 27,
-      "opaquePixels": 73248
+      "opaquePixels": 282195
     },
     {
       "index": 1,
       "outputBbox": [
-        137,
-        36,
-        462,
-        485
+        315,
+        67,
+        906,
+        655
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 73095
+      "minimumMargin": 49,
+      "opaquePixels": 218729
     },
     {
       "index": 2,
       "outputBbox": [
-        137,
-        38,
-        462,
-        485
+        315,
+        68,
+        915,
+        655
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 73104
+      "minimumMargin": 49,
+      "opaquePixels": 219578
     },
     {
       "index": 3,
       "outputBbox": [
-        137,
-        40,
-        464,
-        485
+        315,
+        59,
+        924,
+        655
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72846
+      "minimumMargin": 49,
+      "opaquePixels": 226551
     },
     {
       "index": 4,
       "outputBbox": [
-        137,
-        40,
-        464,
-        485
+        321,
+        90,
+        894,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72758
+      "minimumMargin": 54,
+      "opaquePixels": 180928
     },
     {
       "index": 5,
       "outputBbox": [
-        137,
-        42,
-        466,
-        485
+        321,
+        95,
+        893,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72661
+      "minimumMargin": 54,
+      "opaquePixels": 176893
     },
     {
       "index": 6,
       "outputBbox": [
-        137,
-        42,
-        467,
-        485
+        320,
+        96,
+        889,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72656
+      "minimumMargin": 54,
+      "opaquePixels": 177933
     },
     {
       "index": 7,
       "outputBbox": [
-        137,
-        42,
-        467,
-        485
+        320,
+        96,
+        889,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72543
+      "minimumMargin": 54,
+      "opaquePixels": 174621
     },
     {
       "index": 8,
       "outputBbox": [
-        137,
-        40,
-        464,
-        485
+        321,
+        104,
+        889,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72637
+      "minimumMargin": 54,
+      "opaquePixels": 176806
     },
     {
       "index": 9,
       "outputBbox": [
-        139,
-        40,
-        464,
-        485
+        321,
+        111,
+        889,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72653
+      "minimumMargin": 54,
+      "opaquePixels": 176729
     },
     {
       "index": 10,
       "outputBbox": [
-        137,
-        38,
-        463,
-        485
+        316,
+        122,
+        884,
+        655
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 72883
+      "minimumMargin": 49,
+      "opaquePixels": 169463
     },
     {
       "index": 11,
       "outputBbox": [
-        137,
-        38,
-        462,
-        485
+        320,
+        57,
+        1002,
+        650
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 73018
-    },
-    {
-      "index": 12,
-      "outputBbox": [
-        137,
-        36,
-        462,
-        485
-      ],
-      "minimumMargin": 27,
-      "opaquePixels": 73089
-    },
-    {
-      "index": 13,
-      "outputBbox": [
-        137,
-        36,
-        462,
-        485
-      ],
-      "minimumMargin": 27,
-      "opaquePixels": 73150
+      "minimumMargin": 54,
+      "opaquePixels": 282519
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 346,
-    "frameHeight": 465,
-    "rootX": 151,
-    "rootY": 448,
-    "columns": 5,
-    "frameCount": 14,
+    "frameWidth": 954,
+    "frameHeight": 638,
+    "rootX": 175,
+    "rootY": 601,
+    "columns": 2,
+    "frameCount": 12,
     "cropOffset": [
-      129,
-      28
+      307,
+      47
     ],
-    "sheetWidth": 2388,
-    "sheetHeight": 920,
+    "sheetWidth": 1788,
+    "sheetHeight": 2972,
     "frames": [
       [
         0,
         0,
-        336,
-        460,
+        948,
+        632,
         4,
         4
       ],
       [
-        340,
-        0,
-        336,
-        460,
+        696,
+        636,
+        600,
+        600,
         4,
-        4
-      ],
-      [
-        1360,
-        0,
-        336,
-        456,
-        4,
-        6
-      ],
-      [
-        1700,
-        0,
-        336,
-        456,
-        4,
-        8
-      ],
-      [
-        2040,
-        0,
-        336,
-        456,
-        4,
-        8
-      ],
-      [
-        1360,
-        464,
-        340,
-        452,
-        4,
-        10
-      ],
-      [
-        1704,
-        464,
-        340,
-        452,
-        4,
-        10
-      ],
-      [
-        2048,
-        464,
-        340,
-        452,
-        4,
-        10
+        15
       ],
       [
         0,
-        464,
-        336,
-        456,
+        1244,
+        612,
+        600,
         4,
-        8
+        16
       ],
       [
-        340,
-        464,
-        336,
-        456,
-        6,
-        8
-      ],
-      [
-        680,
-        464,
-        336,
-        456,
-        4,
-        6
-      ],
-      [
-        1020,
-        464,
-        336,
-        456,
-        4,
-        6
-      ],
-      [
-        680,
+        952,
         0,
-        336,
-        460,
+        620,
+        608,
         4,
-        4
+        7
       ],
       [
-        1020,
+        616,
+        1244,
+        584,
+        572,
+        9,
+        38
+      ],
+      [
+        1204,
+        1244,
+        584,
+        568,
+        8,
+        43
+      ],
+      [
         0,
-        336,
-        460,
+        1848,
+        580,
+        568,
+        8,
+        44
+      ],
+      [
+        584,
+        1848,
+        580,
+        568,
+        8,
+        44
+      ],
+      [
+        1168,
+        1848,
+        580,
+        560,
+        8,
+        52
+      ],
+      [
+        0,
+        2420,
+        580,
+        552,
+        8,
+        59
+      ],
+      [
+        584,
+        2420,
+        580,
+        544,
         4,
-        4
+        70
+      ],
+      [
+        0,
+        636,
+        692,
+        604,
+        9,
+        5
       ]
     ],
     "decodedBytes": {
-      "canonical": 23592960,
-      "grid": 9653400,
-      "packed": 8787840
+      "canonical": 51904512,
+      "grid": 29215296,
+      "packed": 21255744
     },
     "pixelScale": 2.0
   },
@@ -309,12 +271,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a97dd7194ded4633573ac900c6a749d52d37d7eb3a5e40c6a56c9889d49d3341",
-      "config": "2045d0b495c66bc06dbb3ebc2ebcb3e49461925738b1a230ceeb0540e1ba5530",
+      "source": "a4cd6a519974153250c7b1d9369f4abd33645d4dc360a9b359f05699392b9aa5",
+      "config": "462ba9cb0b2e0c1037d51c2e48db8c10a84cba0a114d8c296af5d893c91ff501",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_energy_charge_video_normalized.png": "5492c531bc056e38d461298fb25447183e2986fe4db4775cb209b346be7d0f78"
+      "art/sprites/source/player_base_energy_charge_video_normalized.png": "a4cd6a519974153250c7b1d9369f4abd33645d4dc360a9b359f05699392b9aa5"
     }
   }
 }

@@ -2873,11 +2873,19 @@ public class GameView extends SurfaceView
                 u.state.profile.color);
             canvas.restore();
         }
+        // Quem tem o poder do vídeo (a esfera do Super, super_<id>: o Ryūga) carrega com o brilho do
+        // próprio vídeo: sem a bola de carga por código por cima.
+        if (poderDoVideo(u)) return;
         float x = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         canvas.save();
         if (u.facing < 0) canvas.scale(-1f, 1f, x, 0f);
         effects.drawSuperCharge(canvas, paint, x, u.y, superFlash.chargeTime, u.state.profile.color);
         canvas.restore();
+    }
+
+    /** O lutador tem a esfera do Super tirada do vídeo dele (efeitos/super_<id>). */
+    private boolean poderDoVideo(CombatFighter f) {
+        return efeitos.tem("super_" + f.character().id);
     }
 
     /** Levels of the two Super looks: the activation glow and the dim of whoever is held. */
@@ -4379,9 +4387,10 @@ public class GameView extends SurfaceView
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawTraps(canvas, engine.traps);
-            effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
+            desenharProjeteisEmFolha(canvas);
+            effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles, projeteisEmFolha);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
-            effects.drawSuperProjectiles(canvas, renderCanvas, engine.superProjectiles);
+            effects.drawSuperProjectiles(canvas, renderCanvas, engine.superProjectiles, projeteisEmFolha);
             if (ultraFighter().inUltraSequence()) {
                 effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
             }
@@ -4393,7 +4402,7 @@ public class GameView extends SurfaceView
                     canvas.scale(-1f, 1f, u.x, 0f);
                 }
                 if (u.ultraPhase == CombatFighter.ULTRA_STARTUP) {
-                    effects.drawSuperCharge(canvas, paint, u.x, u.y, ultraAuraTime, u.state.profile.color);
+                    if (!poderDoVideo(u)) effects.drawSuperCharge(canvas, paint, u.x, u.y, ultraAuraTime, u.state.profile.color);
                 } else {
                     effects.drawUltraRush(canvas, paint, u.x, u.y, u.state.profile.color);
                 }
@@ -5523,6 +5532,40 @@ public class GameView extends SurfaceView
             ultraSounds.play(ultraFolder(f.state), "investida");
             ultraSounds.playFight("punish", 1f, 0.8f);
         }
+    }
+
+    /** Projéteis desenhados com a folha tirada do vídeo do personagem neste quadro. */
+    private final java.util.Set<Projectile> projeteisEmFolha =
+        java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    /** A esfera do Super no vídeo é maior que a onda desenhada por código: desenhada menor. */
+    private static final float SUPER_FOLHA_ESCALA = 0.7f;
+    /** O cometa do S1 tem a origem na ponta: a bola fica em volta do centro do projétil. */
+    private static final float ONDA_FOLHA_PONTA = 22f;
+
+    /**
+     * S1 e Super com a folha tirada do vídeo do personagem (efeitos/onda_<id> e super_<id>; o
+     * Ryūga): desenhados aqui, em loop no relógio da luta, no lugar da bola por código. Quem não
+     * tem a folha continua com o desenho clássico.
+     */
+    private void desenharProjeteisEmFolha(Canvas c) {
+        projeteisEmFolha.clear();
+        float ms = engine.frame() * FIXED_STEP * 1000f;
+        for (Projectile p : engine.energyProjectiles) {
+            if (!projetilDoPersonagem(p)) continue;
+            float k = p.radius / 24f;
+            String nome = "onda_" + engine.fighter(p.ownerIndex).character().id;
+            if (efeitos.desenharEm(c, nome, ms, p.x + p.direction * ONDA_FOLHA_PONTA * k, p.y, k, p.direction < 0)) projeteisEmFolha.add(p);
+        }
+        for (Projectile p : engine.superProjectiles) {
+            if (!projetilDoPersonagem(p)) continue;
+            String nome = "super_" + engine.fighter(p.ownerIndex).character().id;
+            if (efeitos.desenharEm(c, nome, ms, p.x, p.y, SUPER_FOLHA_ESCALA, p.direction < 0)) projeteisEmFolha.add(p);
+        }
+    }
+
+    /** A bola padrão do personagem (não o mini do SHINKAI nem um desenho próprio). */
+    private static boolean projetilDoPersonagem(Projectile p) {
+        return !p.mini && (p.visual == null || "ONDA".equals(p.visual)) && p.ownerIndex >= 0 && p.ownerIndex < 2;
     }
 
     /** Raios no cenário com os dois no SHINKAI (cores dos tipos). */
