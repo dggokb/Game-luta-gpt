@@ -124,6 +124,16 @@ final class AndroidRenderAssets implements RenderAssets {
         }
         Bitmap bitmap = null;
         boolean placa = SpriteAtlasCache.telaPelaGpu && !(daLuta && SpriteAtlasCache.paraOpenGl);
+        // Cenário da luta, como as folhas: as camadas grandes saem a 3/4 em 720p e nos níveis
+        // MÉDIO/LEVE (a tela não mostra mais que isso; uma camada de 4096 tem até 36 MB).
+        float escala = SpriteAtlasCache.escalaCenario;
+        if (daLuta && escala < 1f && path.startsWith("stages/")
+                && Math.max(bounds.outWidth, bounds.outHeight) > MAX_IMAGE_SIDE
+                && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            bitmap = decodificarEscalado(path, Math.max(1, Math.round(bounds.outWidth / (float)options.inSampleSize * escala)),
+                Math.max(1, Math.round(bounds.outHeight / (float)options.inSampleSize * escala)), placa);
+            if (bitmap != null) return bitmap;
+        }
         if (placa && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // Cenário (camadas do tamanho da tela, várias por quadro), Ultra e páginas: direto na
             // placa de vídeo, como as folhas dos lutadores. Na memória comum o sistema as copia
@@ -143,5 +153,20 @@ final class AndroidRenderAssets implements RenderAssets {
         }
         if (bitmap == null) throw new IOException("formato de imagem não suportado");
         return bitmap;
+    }
+
+    /** Decodifica já no tamanho pedido (ImageDecoder, Android 9+), sem a imagem inteira na memória. */
+    private Bitmap decodificarEscalado(String path, int largura, int altura, boolean placa) {
+        try {
+            return android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(assets, path),
+                (decoder, info, source) -> {
+                    decoder.setAllocator(placa ? android.graphics.ImageDecoder.ALLOCATOR_HARDWARE
+                        : android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE);
+                    decoder.setTargetSize(largura, altura);
+                });
+        } catch (IOException | RuntimeException | OutOfMemoryError e) {
+            android.util.Log.w("AndroidRenderAssets", "cenário reduzido falhou: " + path, e);
+            return null;
+        }
     }
 }

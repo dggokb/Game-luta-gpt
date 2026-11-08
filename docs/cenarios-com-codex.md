@@ -417,4 +417,6 @@ mais que o fundo e abria uma faixa preta embaixo, entre o mar e a mureta. O céu
 a mureta e os postes embaixo: no céu eles saem (`tirar_postes`, o céu ao lado deslocado na
 horizontal entra no lugar; um inpaint deixava borrões laranja), embaixo do horizonte entra o mar
 sem terraço, e as nuvens perdem a faixa dos postes (a borda dourada deles passava no recorte por
-brilho). Sem isso, no super pulo aparecia um poste solto no ar acima do poste de verdade.
+brilho). Sem isso, no super pulo aparecia um poste solto no ar acima do poste de verdade. O fundo tem
+`"apoio"` no céu (30000): na vertical anda com ele, porque o horizonte está no infinito; solto
+(6000), no super pulo descia mais que o céu e a borda de cima (ilhas cortadas) aparecia recortada.

@@ -99,6 +99,12 @@ final class SpriteAtlasCache {
      */
     private volatile float escalaRender=1f;
     /**
+     * Escala das imagens grandes do cenário (lado maior que 2048) na luta, a mesma regra das
+     * folhas: inteira com 1080 linhas ou mais desenhadas, 3/4 em 720p e nos níveis MÉDIO/LEVE.
+     * Lida por {@link AndroidRenderAssets} ao decodificar o cenário.
+     */
+    static volatile float escalaCenario=1f;
+    /**
      * Animações raras (comemoração, provocação do treino, sequência do Ultra). Com
      * {@link #ocasionaisSobDemanda} elas ficam fora do preload e só carregam quando pedidas ({@link #pedir}).
      */
@@ -157,6 +163,7 @@ final class SpriteAtlasCache {
     SpriteAtlasCache(Context context) {
         this.context=context;SpriteAutoFix.load(context);
         densidadeTela=densidadeTela(context.getResources().getDisplayMetrics());
+        atualizarEscalaCenario();
         orcamentoAntecipado=orcamentoAntecipado(context);
         // Um núcleo fica para o loop do jogo (menu, seleção, tela de carregamento). No PC,
         // -Dgameluta.folhas=N fixa quantos (0: só a thread que espera, como antes).
@@ -224,6 +231,11 @@ final class SpriteAtlasCache {
     /** O nível gráfico mudou a fração da tela desenhada; as próximas lutas carregam nessa escala. */
     void escalaDaRenderizacao(float fracao) {
         escalaRender=Math.max(0.1f,Math.min(1f,fracao));
+        atualizarEscalaCenario();
+    }
+
+    private void atualizarEscalaCenario() {
+        escalaCenario=densidadeTela==Float.MAX_VALUE||densidadeTela*escalaRender>=1.4f?1f:0.75f;
     }
 
     /** Decodes every atlas of the characters before gameplay (in parallel); never called per frame. */

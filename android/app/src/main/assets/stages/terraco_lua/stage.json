@@ -67,7 +67,8 @@
       "topo": -0.41219,
       "base": 1.42634,
       "x": 0.5,
-      "repetir": "espelhar"
+      "repetir": "espelhar",
+      "apoio": 30000.0
     },
     {
       "id": "parede",

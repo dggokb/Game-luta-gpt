@@ -1,11 +1,13 @@
 package android.graphics;
 
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.util.Size;
 import java.io.IOException;
 
 /**
- * PC: o ImageDecoder do Android 9 no que o jogo usa (fonte de um drawable, tamanho alvo).
+ * PC: o ImageDecoder do Android 9 no que o jogo usa (fonte de um drawable ou de um asset, tamanho
+ * alvo).
  * Decodifica inteiro e reduz por média de área, que é o que o redimensionador do libwebp faz
  * ao decodificar em escala no celular.
  */
@@ -15,8 +17,19 @@ public final class ImageDecoder {
     public static final class Source {
         final Resources resources;
         final int id;
+        final AssetManager assets;
+        final String path;
 
-        Source(Resources resources, int id) { this.resources = resources; this.id = id; }
+        Source(Resources resources, int id) { this.resources = resources; this.id = id; this.assets = null; this.path = null; }
+
+        Source(AssetManager assets, String path) { this.resources = null; this.id = 0; this.assets = assets; this.path = path; }
+
+        Bitmap decodificar() throws IOException {
+            if (assets == null) return resources.decodeDrawable(id);
+            try (java.io.InputStream in = assets.open(path)) {
+                return BitmapFactory.decodeStream(in);
+            }
+        }
     }
 
     public static final class ImageInfo {
@@ -39,6 +52,8 @@ public final class ImageDecoder {
 
     public static Source createSource(Resources res, int resId) { return new Source(res, resId); }
 
+    public static Source createSource(AssetManager assets, String fileName) { return new Source(assets, fileName); }
+
     public void setAllocator(int allocator) {}
 
     public void setTargetSize(int width, int height) {
@@ -48,8 +63,8 @@ public final class ImageDecoder {
     }
 
     public static Bitmap decodeBitmap(Source source, OnHeaderDecodedListener listener) throws IOException {
-        Bitmap full = source.resources.decodeDrawable(source.id);
-        if (full == null) throw new IOException("não decodificou #" + source.id);
+        Bitmap full = source.decodificar();
+        if (full == null) throw new IOException("não decodificou " + (source.path != null ? source.path : "#" + source.id));
         ImageDecoder decoder = new ImageDecoder();
         if (listener != null) listener.onHeaderDecoded(decoder, new ImageInfo(new Size(full.getWidth(), full.getHeight())), source);
         if (decoder.targetWidth == 0 || (decoder.targetWidth == full.getWidth() && decoder.targetHeight == full.getHeight())) return full;

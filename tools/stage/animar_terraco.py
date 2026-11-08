@@ -167,7 +167,10 @@ def planos(pasta, parede):
         {"id": "nuvens", "imagem": "nuvens.webp", "profundidade": PROF_NUVENS, "topo": frac(0), "base": frac(hc),
          "x": parede["x"], "repetir": "espelhar", "deriva": DERIVA_NUVENS},
         {"id": "fundo", "imagem": "fundo.webp", "profundidade": PROF_FUNDO, "topo": frac(0), "base": frac(hp + FUNDO_MAIS),
-         "x": parede["x"], "repetir": "espelhar"},
+         "x": parede["x"], "repetir": "espelhar",
+         # Na vertical anda com o céu: o horizonte está no infinito. Solto (6000), no super pulo
+         # descia mais que o céu e a borda de cima (ilhas cortadas) aparecia sobre o céu.
+         "apoio": PROF_CEU},
     ]
 
 

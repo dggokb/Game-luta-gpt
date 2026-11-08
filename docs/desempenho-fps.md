@@ -25,6 +25,7 @@ A recomendação é atacar 1 primeiro (mudanças pequenas, ganho grande e imedia
 - **Duas superfícies** (`MainActivity.onCreate`): um `SurfaceView` embaixo para o OpenGL (`DesenhoGl`, formato `RGBA_8888`, `eglSwapInterval 1`, stencil de 8 bits e MSAA 4× se houver) e o `GameView` por cima (`setZOrderMediaOverlay`, formato `TRANSLUCENT`, Canvas pela GPU via `lockHardwareCanvas`). **Na luta**, `drawFrame` desenha o quadro inteiro (cenário, lutadores, efeitos, HUD, botões, contador) no `CanvasGl`, um `Canvas` do Android cujas operações viram triângulos no `GlRenderCanvas`; a superfície de cima é limpa uma vez e não recebe mais nada. **Fora da luta** (menus, seleção, páginas, carregamento), tudo vai pelo Canvas de cima e a de baixo fica preta.
 - **OpenGL** (`GlRenderCanvas`): os vértices do quadro inteiro vão para um `float[]` (até 196 mil vértices, 7 MB), cada troca de estado fecha um comando (textura, filtro, inversão, recorte, stencil), e no fim do quadro um único `glBufferData` sobe tudo e os comandos são desenhados em sequência. Textos ficam numa textura de 2048×2048, degradês numa textura de linhas. Formas côncavas passam pelo stencil.
 - **Folhas** (`SpriteAtlasCache`): WebP em `drawable-nodpi`, decodificadas em paralelo na escala que a tela pede (1 em 1080p+, 3/4 em 720p e nos níveis MÉDIO/LEVE em 1080p), subidas ao OpenGL atrás da tela de carregamento (`DesenhoGl.subir`, 24 ms por quadro; depois `aquecer` desenha o cenário uma vez escondido) e o bitmap da memória comum é solto. Antecipação em segundo plano com orçamento de 35% da RAM (384 MB a 2,5 GB).
+- **Cenário** (`AndroidRenderAssets`, imagens da luta): na mesma regra das folhas, as camadas com lado maior que 2048 saem a 3/4 em 720p e nos níveis MÉDIO/LEVE (`SpriteAtlasCache.escalaCenario`, decodificadas já no tamanho pelo `ImageDecoder`, Android 9+); com o OpenGL na luta sobem para a placa e o bitmap é solto. Os panoramas pintados (Terraço da Lua, Arena Imperial) têm 130–160 MB em RGBA na escala 1; a 3/4, uns 56% disso.
 - **Qualidade** (`QualidadeGrafica`): AUTO desce um nível com 2 janelas de 2 s abaixo de 50 fps e sobe depois de ~30 s acima de 56. ALTO = teto de 1080 linhas; MÉDIO 0,8; LEVE 0,6 e sem enfeites. O buffer das duas superfícies fica menor (`setFixedSize`) e o sistema amplia.
 
 ## 3. Diagnóstico por causa
@@ -208,7 +209,7 @@ A ordem seguida foi CPU primeiro, porque no aparelho o envio para a GPU mede de 
 
   Uma folha rara que fica pronta no meio da luta sobe para o OpenGL num quadro sem outro envio. Se ainda assim alguém desenhar uma folha que não carregou, `get` decodifica só ela, sem passar pelo `preload` (que a pularia). INTRO e SUPER_* continuam no `preload`.
 
-Ainda não feitos: R1, R5, R7, E1–E4.
+Ainda não feitos: R1, R5, R7, E1–E3 e o resto do E4 (a escala do cenário pela tela e pelo nível já existe; a pela memória do aparelho, não).
 
 ### 5.5 Varredura de 30/10 (cinco frentes em paralelo)
 

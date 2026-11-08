@@ -624,6 +624,12 @@ public class GameView extends SurfaceView
             } else {
                 glSuperficiePronta = false;
                 stopLoop();
+                // Saiu da tela (outro app, print) antes dos quadros seguros: não é um fechamento
+                // em OpenGL; a marca volta no próximo quadro e conta de novo.
+                if (desenhoPrefs != null && glQuadrosOk >= 0 && glQuadrosOk < GL_QUADROS_SEGUROS) {
+                    desenhoPrefs.edit().putBoolean(GL_TESTANDO, false).apply();
+                    glQuadrosOk = -1;
+                }
             }
         });
     }
