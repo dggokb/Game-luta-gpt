@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * Aparar, o S3 do Ryūga (frente H4): postura que lê qualquer golpe corpo a corpo do 4º ao 13º
+ * Aparar, o S4 do Ryūga (frente H4): postura que lê qualquer golpe corpo a corpo do 4º ao 13º
  * quadro e responde na hora; no vazio não bate (era um golpe comum de 20 quadros) e fica aberto
  * até o fim.
  */
@@ -19,7 +19,7 @@ public class AparadorTest {
         int myLife = me.state.life, rivalLife = rival.state.life;
         boolean cue = false;
         me.commandButton = "M";
-        me.buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+        me.buffer.push(InputBuffer.Button.SPECIAL, "S4", false);
         for (int fr = 0; fr < 80; fr++) {
             if (fr == delay) {
                 if (button.startsWith("2")) s.in[1].direction = 2;
@@ -56,12 +56,12 @@ public class AparadorTest {
         CombatFighter me = s.f(0), rival = s.f(1);
         int life = rival.state.life;
         me.commandButton = "M";
-        me.buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+        me.buffer.push(InputBuffer.Button.SPECIAL, "S4", false);
         s.step();
-        assertEquals("S3", s.attackId(0));
+        assertEquals("S4", s.attackId(0));
         int frames = 1;
         while (!me.canAct() && frames < 100) { s.step(); frames++; }
         assertEquals("no vazio não bate no rival colado", life, rival.state.life);
-        assertTrue("fica aberto o golpe inteiro: " + frames, frames >= RYUGA.attack("S3").totalFrames - 2);
+        assertTrue("fica aberto o golpe inteiro: " + frames, frames >= RYUGA.attack("S4").totalFrames - 2);
     }
 }

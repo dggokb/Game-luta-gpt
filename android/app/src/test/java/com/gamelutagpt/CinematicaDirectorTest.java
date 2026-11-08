@@ -51,7 +51,7 @@ public class CinematicaDirectorTest {
      * hitstun), com o dano do roteiro uma vez só, mesmo num golpe de várias batidas.
      */
     @Test public void golpeDoQteCorreBateETiraODanoDoRoteiro() {
-        for (String golpe : new String[] {"M", "H", "2H", "S2", "S4"}) {
+        for (String golpe : new String[] {"M", "H", "2H", "S2", "S3"}) {
             Match m = new Match(800f, 1400f);
             FighterState alvo = m.f(1).state;
             int dano = alvo.profile.maxLife / 5;
