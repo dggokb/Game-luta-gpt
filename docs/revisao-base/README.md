@@ -385,4 +385,12 @@ As etapas 1 e 2 dependem só de código e dão para fazer já. A 3 usa as imagen
 - **Zoom fixo.** O motor não tem limite de distância entre os lutadores, e é o zoom que abre a câmera para os dois caberem. Fixar o zoom precisa antes de uma regra de distância máxima, que mexe na jogabilidade.
 - **Textos de evento do lado de quem bate.** Os avisos do motor não dizem de quem são; isso precisa ser acrescentado no motor.
 
+**Feito com os 10 vídeos de efeito (commit "Revisão da base: efeitos novos"):**
+- Impactos fraco, médio (que não existia) e forte, contra-ataque, defesa, rastro do chute forte e as quatro poeiras (pulo, pouso, arrancada e freada), todos no mesmo desenho, estilo FighterZ.
+- Os golpes forte e especial usam sempre os impactos novos; saiu a alternância com o "estouro" recortado de outro vídeo.
+- A defesa é sempre o escudo ciano (antes alternava três vídeos brancos).
+- O contra-golpe e a punição tocam a faísca magenta (o motor passa `counterHit` no evento de acerto).
+- O rastro do chute forte sai 70 px à frente de quem chuta.
+- Cada vídeo foi cortado para começar no quadro em que o efeito já está grande e acelerado para a duração de um impacto: fraco 228 ms, médio 312, forte e contra-ataque ≈390, defesa ≈200; poeiras 0,45–0,6 s.
+
 **Depende de vídeo:** os prompts estão em [prompts-videos.md](prompts-videos.md) (faíscas no estilo FighterZ, defesa fria, poeiras e as reações de dano, queda, defesas, intro e vitória do Ryūga).

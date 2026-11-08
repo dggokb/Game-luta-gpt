@@ -1,5 +1,7 @@
 # Prompts dos vídeos da revisão da base
 
+> **Efeitos (seções 1 e 2): os 10 vídeos chegaram e estão no jogo** (ver o README, "Andamento"). Falta só a seção 3 (Ryūga), que fica para depois.
+
 São as partes da revisão ([README.md](README.md)) que dependem de vídeo. Os outros itens são só código e já estão no jogo.
 
 - **Efeitos** seguem o padrão de [docs/efeitos-de-video.md](../efeitos-de-video.md):

@@ -165,10 +165,6 @@ public class GameView extends SurfaceView
     private boolean vitoriaTocada;
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
     private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
-    /** Roda os vídeos de defesa comum (defesa, defesa_2, defesa_3) a cada golpe defendido. */
-    private int defesaVez;
-    /** Alterna o impacto forte com o estouro (o do vídeo da defesa do Ryūga) a cada golpe forte. */
-    private boolean estouroVez;
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
     private final boolean[] ativoAntes = new boolean[2];
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
@@ -2976,7 +2972,8 @@ public class GameView extends SurfaceView
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
-            !efeitoDeGolpe(event.blocked, x, y, direction, size, event.projectile || size >= ImpactEffects.SPECIAL)) {
+            !efeitoDeGolpe(event.blocked, x, y, direction, size, event.projectile || size >= ImpactEffects.SPECIAL,
+                event.counterHit || punish)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -5488,25 +5485,15 @@ public class GameView extends SurfaceView
      * de baixo maior. O vídeo é de um golpe para a direita (espelha para a esquerda). False:
      * não há o efeito, e o clássico entra.
      */
-    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean poder) {
+    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean poder,
+                                  boolean contra) {
         boolean esquerda = direction < 0;
-        if (defendido) {
-            // Poder (projétil ou especial) defendido tem o seu; a defesa comum alterna entre os dois
-            // vídeos. Sem o efeito pedido, cai no seguinte (e sem nenhum, no clássico).
-            if (poder && efeitos.tocar("defesa_poder", x, y, 1f, esquerda)) return true;
-            // defesa_3: o estouro branco com o vento, recortado do vídeo da defesa do Ryūga.
-            defesaVez = (defesaVez + 1) % 3;
-            if (defesaVez == 2 && efeitos.tocar("defesa_3", x, y, 1f, esquerda)) return true;
-            if (defesaVez == 1 && efeitos.tocar("defesa_2", x, y, 1f, esquerda)) return true;
-            return efeitos.tocar("defesa", x, y, 1f, esquerda);
-        }
-        // O estouro amarelo com o anel (recortado do vídeo da defesa do Ryūga): o do especial e,
-        // alternando com o impacto forte, o do golpe forte.
-        if (size >= EFEITO_GOLPE.length - 1 && efeitos.tocar("impacto_estouro", x, y, 1f, esquerda)) return true;
-        if (size == EFEITO_GOLPE.length - 2) {
-            estouroVez = !estouroVez;
-            if (estouroVez && efeitos.tocar("impacto_estouro", x, y, 0.85f, esquerda)) return true;
-        }
+        // Revisão da base (docs/revisao-base): todos os impactos no mesmo desenho (estilo FighterZ),
+        // com a defesa fria (escudo ciano que se quebra) e o contra-golpe em magenta.
+        if (defendido) return efeitos.tocar("defesa", x, y, poder ? 1.2f : 1f, esquerda);
+        if (contra && efeitos.tocar("impacto_contra", x, y, size >= ImpactEffects.HEAVY ? 1f : 0.8f, esquerda)) return true;
+        // Especial e Super: o impacto forte um pouco maior.
+        if (size >= EFEITO_GOLPE.length - 1 && efeitos.tocar("impacto_forte", x, y, 1.15f, esquerda)) return true;
         for (int s = Math.min(size, EFEITO_GOLPE.length - 1); s >= 0; s--) {
             if (efeitos.tocar(EFEITO_GOLPE[s], x, y, 1f + 0.25f * (size - s), esquerda)) return true;
         }
@@ -5535,7 +5522,7 @@ public class GameView extends SurfaceView
         if (ativo && !ativoAntes[i] && a.strength != AttackDefinition.Strength.LIGHT &&
             a.strength != AttackDefinition.Strength.MEDIUM) {
             // A origem do arco é o ombro (o vídeo: um golpe de baixo para cima, para a direita).
-            efeitos.tocar("arco_golpe", x + f.facing * 12f, f.y - f.character().visualStandHeight * 0.6f, 1f, f.facing < 0);
+            efeitos.tocar("arco_golpe", x + f.facing * 70f, f.y - f.character().visualStandHeight * 0.55f, 1f, f.facing < 0);
         }
         ativoAntes[i] = ativo;
     }

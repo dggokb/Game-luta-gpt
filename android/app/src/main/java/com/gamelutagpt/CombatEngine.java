@@ -32,6 +32,8 @@ final class CombatEngine {
         AttackDefinition.Strength strength;
         /** Última pancada de um golpe com pausa final própria (o chute que fecha o Super da p15). */
         boolean finalStrike;
+        /** Contra-golpe: abriu o combo em quem estava no meio de um golpe (apresentação). */
+        boolean counterHit;
         HitEvent(int attacker, int defender, int damage, boolean blocked, boolean projectile, String moveId) {
             this.attacker = attacker;
             this.defender = defender;
@@ -4931,6 +4933,7 @@ final class CombatEngine {
         }
         HitEvent hit = new HitEvent(a.index, d.index, damage, false, projectile, attack.id);
         hit.finalStrike = finalStrike;
+        hit.counterHit = counterHit;
         events.add(hit);
     }
 
