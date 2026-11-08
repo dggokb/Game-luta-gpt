@@ -25,6 +25,7 @@ final class SpriteMotion {
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
                 float attackElapsed,boolean combat,boolean locked) {
         dt=Math.max(0,Math.min(.1f,dt));
+        boolean estavaNoAr=!wasGrounded;
         String next;
         if(attackAnimation!=null) next=attackAnimation;
         else if(!grounded) next=velocityY < -35 ? Clip.JUMP : Clip.FALL;
@@ -38,7 +39,11 @@ final class SpriteMotion {
         else next=idle();
         wasGrounded=grounded;
         if(!next.equals(clip)){
+            String antes=clip;
             clip=next;time=distance=0;
+            // Golpe no ar que acabou ainda subindo: o pulo volta já encolhido (o fim da subida),
+            // não do impulso esticado do chão (ficava uma piscada desse quadro).
+            if(next.equals(Clip.JUMP) && estavaNoAr && !antes.equals(Clip.JUMP)) time=character.animation(Clip.JUMP).duration;
             // Still holding down after a crouching attack (or block): stay crouched instead
             // of standing up and crouching again.
             if(next.equals(Clip.CROUCH) && wasCrouching) time=character.animation(Clip.CROUCH).duration;

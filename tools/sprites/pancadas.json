@@ -4,14 +4,6 @@
     "player_base": {
       "S4": {
         "pancadas": [
-          4,
-          8,
-          12
-        ],
-        "avanco": 260
-      },
-      "S3": {
-        "pancadas": [
           9,
           14,
           23,

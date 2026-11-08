@@ -627,7 +627,7 @@
     }
   },
   "special_s2": {
-    "_doc": "S2 (Punho ascendente, shoryuken): agacha (8-18), sobe com o punho no alto (20-22: o impacto, subindo), fica no ar com o punho erguido (24-70) e pousa (73-78); dali vai direto para a guarda (84-104), sem voltar a outra pose. O jogo o lança para cima num arco (pancadas.json salto), e o golpe dura ~1 s.",
+    "_doc": "S2 (Punho ascendente, shoryuken): agacha (8-18), sobe com o punho no alto (20-22: o impacto, subindo), fica no ar com o punho erguido (24-70) e pousa (73-78); dali vai direto para a guarda (84-104), sem voltar a outra pose. O jogo o lança para cima num arco (pancadas.json salto), e o golpe dura ~1 s. O vídeo dá um salto de ~120 px para a frente (18-22) e termina lá: o tronco fica travado no lugar em todos os quadros (fixar quadro), ele sobe reto e pousa onde saiu (sem pular de volta ao trocar para o idle).",
     "trechos": [
       [
         "s2",
@@ -637,44 +637,12 @@
     ],
     "quadros": "8,12,15,17,18,19,20,21,22,24,27,30,34,38,42,46,50,54,58,62,66,70,73,76,78,84,92,104",
     "opcoes": {
-      "fixar": "video",
+      "fixar": "quadro",
       "manter_efeitos": true
     },
     "animacoes": {
       "SPECIAL_S2": {
         "impacto": 7
-      }
-    }
-  },
-  "special_s3": {
-    "_doc": "S3 (Chute voador): agacha, salta para cima e para a frente e dá quatro chutes no ar (24, 40, 66 e 84 do vídeo, com as estrelas e os anéis do vídeo), pousa com a poeira (99-105) e volta à guarda. O avanço do vídeo (~250 px, quadros 10-102) sai do desenho ('fixo') e quem anda é o motor (pancadas.json avanço): ele termina onde pousou. A subida está no desenho. O pouso e a volta (103-124) terminam com o tronco na raiz ('alinha'): ele assume a guarda onde pousou, sem pular ao trocar para o idle.",
-    "trechos": [
-      [
-        "s3",
-        0,
-        10
-      ],
-      [
-        "s3",
-        10,
-        103,
-        "fixo"
-      ],
-      [
-        "s3",
-        103,
-        124,
-        "alinha"
-      ]
-    ],
-    "quadros": "3,6,8,10,12,14,16-100/3,102,105,108,111,114",
-    "opcoes": {
-      "fixar": "video",
-      "manter_efeitos": true
-    },
-    "animacoes": {
-      "SPECIAL_S3": {
-        "impacto": 9
       }
     }
   },
@@ -712,6 +680,38 @@
     },
     "animacoes": {
       "ULTRA_DRAGAO": {}
+    }
+  },
+  "special_s4": {
+    "_doc": "S4 (Chute giratório, ↓↙←: o vídeo s3): agacha, salta para cima e para a frente e dá quatro chutes no ar (24, 40, 66 e 84 do vídeo, com as estrelas e os anéis do vídeo), pousa com a poeira (99-105) e volta à guarda. O avanço do vídeo (~250 px, quadros 10-102) sai do desenho ('fixo') e quem anda é o motor (pancadas.json avanço): ele termina onde pousou. A subida está no desenho. O pouso e a volta (103-124) terminam com o tronco na raiz ('alinha'): ele assume a guarda onde pousou, sem pular ao trocar para o idle.",
+    "trechos": [
+      [
+        "s3",
+        0,
+        10
+      ],
+      [
+        "s3",
+        10,
+        103,
+        "fixo"
+      ],
+      [
+        "s3",
+        103,
+        124,
+        "alinha"
+      ]
+    ],
+    "quadros": "3,6,8,10,12,14,16-100/3,102,105,108,111,114",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true
+    },
+    "animacoes": {
+      "SPECIAL_S4": {
+        "impacto": 9
+      }
     }
   }
 }
