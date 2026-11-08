@@ -12,7 +12,7 @@
   "rootMode": "authored",
   "sourceNote": "ryuga_8 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "ryuga_8_walk_back.mp4",
+    "arquivo": "tras.mp4",
     "personagem": "ryuga_8",
     "escala": 0.3,
     "motivo": "mesma escala dos outros vídeos do Ryūga 8 anos (medida no idle)",

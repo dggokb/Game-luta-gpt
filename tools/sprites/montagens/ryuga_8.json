@@ -162,13 +162,12 @@
     }
   },
   "walk_back": {
-    "_doc": "Andar para trás: um ciclo (26-58) no tempo do vídeo, a 110 px/s.",
+    "_doc": "Andar para trás: um ciclo (26-58) no tempo do vídeo e o corpo anda o que o vídeo anda (velocidade do vídeo: o pé não desliza).",
     "trechos": [
       [
         "tras",
         0,
-        124,
-        "fixo_corpo"
+        124
       ]
     ],
     "quadros": "26-58",
@@ -178,7 +177,7 @@
     "animacoes": {
       "WALK_BACK": {
         "distancia": "video",
-        "velocidade": 110,
+        "velocidade": "video",
         "loop": true
       }
     }

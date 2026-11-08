@@ -100,6 +100,25 @@ public class DragonRushTest {
         assertNotNull("o Dragon Rush pega o rival", m.until(CombatEngine.DRAGON_RUSH, 60));
     }
 
+    /** No SHINKAI ninguém corre: com o Dragon Rush do combo já usado, o → → não vira corrida. */
+    @Test public void noShinkaiOSegundoDoisParaFrenteNoComboNaoCorre() {
+        Match m = new Match("p13", "player_base", 500f, 1250f);
+        m.shinkai();
+        m.in[0].dash = true;
+        assertNotNull("o primeiro Dragon Rush pega", m.until(CombatEngine.DRAGON_RUSH, 60));
+        // Espera o Dragon Rush acabar com o rival ainda no combo (preso / caindo).
+        for (int i = 0; i < 240 && (m.f(0).attacking() || m.f(0).rushSeq > 0); i++) m.step();
+        assertFalse(m.f(0).attacking());
+        assertTrue("o rival ainda no combo", m.f(1).inHitstun() || !m.f(1).grounded);
+        m.in[0].dash = true;
+        m.in[0].direction = 1;
+        for (int i = 0; i < 20; i++) {
+            m.step();
+            assertFalse("no SHINKAI o → → não corre", m.f(0).forwardDashing);
+            assertFalse("e o segundo Dragon Rush do combo não sai", m.engine.cues().contains("DRAGON_RUSH"));
+        }
+    }
+
     @Test public void noShinkaiVoaNoRivalEAcertaDeLonge() {
         Match m = new Match("p13", "player_base", 500f, 1250f);
         m.shinkai();
