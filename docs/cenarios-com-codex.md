@@ -423,3 +423,8 @@ O céu limpo do Codex ainda tinha a mureta e os postes embaixo: eles saem (`tira
 ao lado deslocado na horizontal entra no lugar; um inpaint deixava borrões laranja), atrás da
 mureta entra o mar sem terraço, e as nuvens perdem a faixa dos postes (a borda dourada deles
 passava no recorte por brilho). Sem isso, no super pulo aparecia um poste solto no ar.
+
+Rente ao piso há névoa (`neblina`, duas camadas `"tipo": "neblina"` a 540 e 530, na frente da
+mureta e atrás dos lutadores): o degradê vai do transparente na mureta ao cheio embaixo da tela,
+então ela é mais densa perto da câmera e some para o fundo; a segunda tem bancos baixos
+(`"fiapos": 6`) que andam devagar (`"deriva": 22`).

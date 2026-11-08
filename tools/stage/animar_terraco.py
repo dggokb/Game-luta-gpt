@@ -13,6 +13,7 @@
 * **lanternas**: as da mureta e as dos postes brilham e tremulam; as da mureta refletem no chão
   (o chão é o pintado sem os riscos de luz: o motor desenha o reflexo, sempre reto);
 * **lua**: um brilho grande e lento em volta dela.
+* **névoa**: rente ao piso, densa perto da câmera e sumindo até a mureta, com bancos que andam.
 
 As posições são em pixels do panorama de 4096; a parede tem ``EXTRA`` linhas em cima.
 """
@@ -43,6 +44,9 @@ PROF_CEU, PROF_NUVENS = 30000.0, 12000.0
 DERIVA_NUVENS = 30.0
 CEU_EXTRA = 900                               # linhas de céu acima do panorama (super pulo)
 MAX_LUZES = 60
+NEBLINA_PROF = 540.0                          # logo na frente da mureta (o piso vai até 555)
+NEBLINA_ALTURA = 0.42                         # da mureta para baixo, em frações da tela de repouso
+NEBLINA_COR, NEBLINA_ALFA, NEBLINA_BANCOS_ALFA = "#94ACDC", 0.78, 0.4
 
 
 def casar(fonte, alvo, mf, ma):
@@ -195,6 +199,20 @@ def lanternas(pan):
     return sorted(lista)
 
 
+def neblina(parede):
+    """Névoa rente ao piso do terraço, na frente da mureta e atrás dos lutadores: mais densa
+    perto da câmera e sumindo para o fundo (o degradê da neblina vai do transparente em cima ao
+    cheio embaixo), mais uns bancos baixos que andam devagar com o vento."""
+    j = parede["base"]
+    return [
+        {"id": "neblina", "tipo": "neblina", "profundidade": NEBLINA_PROF, "topo": round(j - 0.01, 4),
+         "base": round(j + NEBLINA_ALTURA, 4), "cor": NEBLINA_COR, "alfa": NEBLINA_ALFA},
+        {"id": "neblina_bancos", "tipo": "neblina", "profundidade": NEBLINA_PROF - 10,
+         "topo": round(j + NEBLINA_ALTURA * 0.35, 4), "base": round(j + NEBLINA_ALTURA * 0.9, 4),
+         "cor": NEBLINA_COR, "alfa": NEBLINA_BANCOS_ALFA, "fiapos": 6, "deriva": 22},
+    ]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", type=Path, default=PASTA)
@@ -210,7 +228,7 @@ def main():
                         "raio": round(min(14.0 if ref else 12.0, max(7.0, r * 0.5)) / h, 4),
                         "cor": "#FFC060", "pulsar": 0.05 if ref else 0.08, "reflexo": bool(ref)}
                        for x, y, r, ref in lant]
-    stage["camadas"] = fundos + [parede]
+    stage["camadas"] = fundos + [parede] + neblina(parede)
     stage["chao"]["reflexoLutadores"] = 0.3
     stage["chao"]["reflexoLuzes"] = 0.8
     stage["chao"]["reflexoComprimento"] = 0.4
