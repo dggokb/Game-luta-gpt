@@ -401,13 +401,13 @@ As etapas 1 e 2 dependem só de código e dão para fazer já. A 3 usa as imagen
   - o Super e o Ultra têm a deles: a magenta 1,5× maior.
   - A estrela de 4 pontas com anel não é faísca de acerto. É o choque de projéteis e o "preciso" da Percepção do SHINKAI, e ficou como estava.
 - **Contador de combo:** a faixa DANO/ESCALA/JUGGLE só aparece com o modo de depuração ligado. Na luta fica só o número de acertos.
-- **Contorno do corpo.** Um fio de 2,6 px (na tela de 720; proporcional nas outras), roxo-escuro (`#1C1230`), por fora da silhueta, para separar o lutador do cenário.
-  - Sai no mesmo desenho do lutador, no sombreador (8 vizinhos do alfa), sem cópia a mais.
-  - Fica de fora no reflexo, nos piscados de acerto/defesa e no Canvas.
+- **Contorno do corpo:** foi testado e retirado. Os sprites já têm linha desenhada, e um contorno de shader por cima contraria o que a Arc System Works documenta (ver [direcao.md](direcao.md), seção 9).
 - **Sombra de contato dura.** Mancha chapada mais larga (meia-largura 60), mais alta (±12) e mais escura (alfa 190), puxada para o roxo do contorno. Prende o corpo no chão.
 - **Poses-chave do Ryūga.** Os golpes normais (L, M, H, agachados e no ar) não mostram mais os 16–30 quadros do vídeo em sequência.
   - Cada um segura 6 a 10 poses: a guarda, a preparação, o contato, o membro esticado no alcance máximo (parado até ~150 ms), a volta a cada ~70 ms e a guarda no fim. É o "anime em 2s e 3s" das referências.
   - O tempo do golpe não muda. As caixas seguem o desenho e o alcance máximo foi mantido; só o soco fraco e o chute médio perderam 2 e 4 px, e a tabela de alcance da CPU foi refeita.
   - As poses ficam marcadas em `posesChave` no `character.json` e são lidas por `Animation.withPoses`.
+
+**Direção (pesquisa com fontes) e o que foi aplicado:** [direcao.md](direcao.md). É a regra para tudo daqui em diante: cada efeito, pausa, reação e aviso responde a um eixo do jogo (força, resultado, contra-golpe), com fonte. As tentativas soltas anteriores (contorno, faíscas de estilos diferentes, poeiras, rastro, quadros segurados por igual) foram revistas por ela.
 
 **Depende de vídeo:** os prompts estão em [prompts-videos.md](prompts-videos.md) (faíscas no estilo FighterZ, defesa fria, poeiras e as reações de dano, queda, defesas, intro e vitória do Ryūga).

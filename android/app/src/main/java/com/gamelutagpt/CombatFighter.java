@@ -146,6 +146,8 @@ final class CombatFighter {
     int anticipatedGuard;
     /** Frames during which nothing of this fighter advances (hitstop, super freeze). */
     int hitstop;
+    /** A pausa inteira do último acerto ou defesa (o tremor de quem apanha decai ao longo dela). */
+    int hitstopTotal;
     float pushRemaining;
     int pushFramesLeft;
     CombatFighter pushSource;

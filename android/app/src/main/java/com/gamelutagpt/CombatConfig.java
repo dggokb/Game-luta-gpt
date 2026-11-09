@@ -387,21 +387,21 @@ final class CombatConfig {
      */
     int counterAnswerStunFrames = 50;
     /**
-     * Pose do impacto (como no FighterZ): golpes que acertam congelam um pouco mais, para a pose
-     * esticada "grudar" na tela. Os dois lutadores congelam juntos, então a vantagem e os combos
-     * não mudam. Defesa não ganha. Com o hitstop do golpe dá ~9/12/15 quadros (fraco/médio/
-     * forte), o que o Fatal Fury: City of the Wolves congela medido em gameplay (era 5/10/13).
+     * Pausa no acerto por força, igual à do Dragon Ball FighterZ: 8/11/16 quadros (fraco/médio/
+     * forte; Dustloop, tabela por nível de ataque). O golpe já traz 8/10/12; estes somam o resto
+     * no acerto. Os dois lutadores congelam juntos (no projétil, só quem apanha).
+     * docs/revisao-base/direcao.md, regra I1.
      */
     /** Golpe normal que acertou: quadros para voltar à guarda antes de a recuperação acabar. */
     int hitCutGuardFrames = 3;
     int lightHitHoldFrames = 0;
     int mediumHitHoldFrames = 1;
-    int heavyHitHoldFrames = 2;
+    int heavyHitHoldFrames = 4;
     /**
-     * Revisão da base (docs/revisao-base): a pausa da defesa dos golpes normais é 60% da do
-     * acerto (5/6/7 quadros), como nas referências (SF6 5–8, MvC3 ~0); o acerto fica 8/11/14.
+     * A defesa congela o mesmo que o golpe traz (sem o extra do acerto): no Guilty Gear a pausa da
+     * defesa é a do acerto (Dustloop); a do SF6 não foi encontrada. Regra I3.
      */
-    float normalBlockHitstopScale = 0.6f;
+    float normalBlockHitstopScale = 1f;
     int koHitstopBonus = 16;
     float spinLift = 820f;
     int spinHitstunFrames = 30;

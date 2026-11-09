@@ -166,7 +166,6 @@ public class GameView extends SurfaceView
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
     private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
-    private final boolean[] ativoAntes = new boolean[2];
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
     private final ImpactFeel feel = new ImpactFeel();
     /** Golpe que mata e ganha a luta com Super ou Ultra: o quadro de mangá com linhas de ação. */
@@ -2122,7 +2121,7 @@ public class GameView extends SurfaceView
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
-            if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
+            if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!", event.attacker & 1);
             CombatFighter hitFighter = engine.fighter(event.defender);
             FighterState batedor = engine.fighter(event.attacker).state;
             if (!event.blocked && event.damage > 0 && batedor.inShinkai()) {
@@ -2171,7 +2170,8 @@ public class GameView extends SurfaceView
         for (String cue : engine.cues()) {
             String banner = bannerFor(cue);
             if ("SHINKAI".equals(cue)) banner = spawnShinkai();
-            if (banner != null) showBanner(banner);
+            boolean doAtacante = "COUNTER".equals(cue) || "PUNISH".equals(cue);
+            if (banner != null) showBanner(banner, doAtacante ? ultimoAtacante : -1);
             if ("PARRY".equals(cue)) spawnParry();
             if ("LEITURA".equals(cue) || "ESQUIVA".equals(cue)) spawnLeitura();
             if ("PRECISO".equals(cue) || "RUPTURA".equals(cue)) beamShake = Math.max(beamShake, 14f);
@@ -2971,13 +2971,16 @@ public class GameView extends SurfaceView
         int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
+        ultimoAtacante = event.attacker & 1;
+        if (!event.blocked && (event.counterHit || punish)) {
+            contraPiscaAte[event.defender & 1] = engine.frame() + CONTRA_PISCA_QUADROS;
+        }
         if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
-                event.projectile || size >= ImpactEffects.SPECIAL,
-                (event.counterHit || punish) && !event.midStrike,
-                event.strength == AttackDefinition.Strength.SUPER || ultraHit)) {
+                event.strength == AttackDefinition.Strength.SUPER || ultraHit,
+                defender.hitstopTotal, event.attacker)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -2989,7 +2992,7 @@ public class GameView extends SurfaceView
             secretoSeed++;
         }
         // Golpe forte (H, especiais, Super, Ultra): os riscos de mangá no corpo e no rastro do golpe.
-        if (!event.blocked && size >= ImpactEffects.HEAVY) {
+        if (!event.blocked && (ultraHit || event.strength == AttackDefinition.Strength.SUPER)) {
             riscos.spawn(engine.frame(), event.defender, x, y, direction, size == ImpactEffects.HEAVY ? 1f : 1.25f,
                 defender.y);
         }
@@ -3003,7 +3006,8 @@ public class GameView extends SurfaceView
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
         // A plateia do cenário vibra com o golpe (forte no pesado, festa no KO).
         if (!event.blocked && stageScene != null) {
-            stageScene.cheer(knockout ? 1f : size >= ImpactEffects.HEAVY ? 0.65f : size == ImpactEffects.MEDIUM ? 0.35f : 0.15f);
+            // Só no KO: o cenário não pode se mexer a cada golpe (regra L6).
+            if (knockout) stageScene.cheer(1f);
         }
         // Os socos no chão do meio (o Super do p13, como metralhadora) não piscam: só a queda e o último.
         boolean poundRun = !event.projectile && attacker.attacking() && attacker.attack.mechanics.pound &&
@@ -3510,9 +3514,19 @@ public class GameView extends SurfaceView
     }
 
     private void showBanner(String text) {
+        showBanner(text, -1);
+    }
+
+    /** Aviso do lado de quem causou o evento (0 ou 1), ou -1 (aviso de sistema, no meio). */
+    private void showBanner(String text, int lado) {
         throwBanner = text;
+        throwBannerLado = lado;
         throwBannerFrames = THROW_BANNER_FRAMES;
     }
+
+    private int throwBannerLado = -1;
+    /** Quem bateu por último neste passo (o lado do aviso de contra-golpe e de punição). */
+    private int ultimoAtacante = -1;
 
     /** Call-out for a system notice of the engine (throw tech, active defense), or null. */
     private static String bannerFor(String cue) {
@@ -3529,9 +3543,9 @@ public class GameView extends SurfaceView
             case "DHC": return "TEAM SUPER!";
             case "SHINKAI": return "SHINKAI!";
             case "PARRY": return "PARRY!";
-            case "COUNTER": return "CONTRA-GOLPE!";
+            case "COUNTER": return "COUNTER!";
             case "REPEL": return "REPEL!";
-            case "PUNISH": return "PUNISH COUNTER!";
+            case "PUNISH": return "PUNISH!";
             case "ARMOR": return "ARMADURA!";
             case "POISON": return "VENENO!";
             case "CHARGED": return "ONDA CARREGADA!";
@@ -4339,12 +4353,14 @@ public class GameView extends SurfaceView
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
                 stageScene.setTelao(desenhaTelao);
                 telaoCanvas = canvas;
+                graduarCenario(true);
                 if (narradorNoPalco) {
                     stageScene.drawBackground(renderCanvas, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
                         desenhaNarradorPalco);
                 } else {
                     stageScene.drawBackground(renderCanvas);
                 }
+                graduarCenario(false);
             }
 
             canvas.save();
@@ -4464,7 +4480,11 @@ public class GameView extends SurfaceView
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
             // Na finalização a frente do cenário some junto com o resto dele.
-            if (cenario && stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
+            if (cenario && stageScene != null && finalizacao.forca() <= 0f) {
+                graduarCenario(true);
+                stageScene.drawForeground(renderCanvas);
+                graduarCenario(false);
+            }
             perfil.marca(PerfilQuadros.FRENTE);
             TesteAutomatico.hudInicio();
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
@@ -4714,7 +4734,8 @@ public class GameView extends SurfaceView
     private void drawMensagens(Canvas c) {
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
-            hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
+            hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.15f * Math.max(0f, 1f - t * 6f),
+                throwBannerLado);
         }
         String call = flow.banner();
         // Com a tela de vitória entrando, o "VITÓRIA" é o dela.
@@ -5438,9 +5459,9 @@ public class GameView extends SurfaceView
         if (pose.deslize != 0) {
             int d = pose.deslize;
             // O vídeo é de quem olha (e corre) para a direita: a poeira sai para trás, à esquerda.
+            // Poeira só no arranque (e no pouso e na queda); a freada fica sem.
             boolean largada = f.forwardDashing || f.backdashFrames > 0;
-            String nome = largada ? "poeira_corrida" : "poeira_freada";
-            if (efeitos.tocar(nome, x, GROUND_Y, 1f, d < 0)) pose.deslize = 0;
+            if (largada && efeitos.tocar("poeira_corrida", x, GROUND_Y, 1f, d < 0)) pose.deslize = 0;
         }
         if (pose.poeira >= POEIRA_NUVEM) {
             impacts.spawnDust(x, GROUND_Y, pose.poeira);
@@ -5486,25 +5507,57 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * Golpe que acertou (ou defendido) com o efeito de vídeo: o do tamanho dele, ou o do tamanho
-     * de baixo maior. O vídeo é de um golpe para a direita (espelha para a esquerda). False:
-     * não há o efeito, e o clássico entra.
+     * A gramática do efeito de golpe (docs/revisao-base/direcao.md, regras E1–E7; coluna de efeitos
+     * do SF6 e o limite de tamanho do 2XKO): um único desenho de faísca (o impacto forte) em
+     * três tamanhos na proporção 1 : 1,3 : 1,6 (fraco, médio, forte/especial), um pouco para dentro
+     * de quem apanha (o acerto "transborda" para a vítima); na defesa, o escudo ciano parado antes,
+     * do lado de quem bate. A faísca dura a pausa do golpe e mais alguns quadros, e some antes de
+     * quem apanhou poder agir; cada atacante tem uma só faísca na tela (a nova tira a anterior).
+     * O Super e o Ultra usam o efeito-âncora maior (o magenta), o único fora da escala. O
+     * contra-golpe não muda a faísca: é sinalizado no corpo de quem apanha (piscar vermelho) e no
+     * aviso curto. False: não há o efeito (entra o clássico).
      */
-    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean poder,
-                                  boolean contra, boolean superGolpe) {
+    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
+                                  int pausa, int atacante) {
         boolean esquerda = direction < 0;
-        // Revisão da base (docs/revisao-base): todos os impactos no mesmo desenho (estilo FighterZ),
-        // com a defesa fria (escudo ciano que se quebra) e o contra-golpe em magenta.
-        if (defendido) return efeitos.tocar("defesa", x, y, poder ? 1.2f : 1f, esquerda);
-        // Super e Ultra: o contra-golpe magenta grande (o maior impacto do jogo); especial: o forte.
-        if (superGolpe && efeitos.tocar("impacto_contra", x, y, 1.5f, esquerda)) return true;
-        if (contra && efeitos.tocar("impacto_contra", x, y, size >= ImpactEffects.HEAVY ? 1f : 0.8f, esquerda)) return true;
-        if (size >= EFEITO_GOLPE.length - 1 && efeitos.tocar("impacto_forte", x, y, 1f, esquerda)) return true;
-        for (int s = Math.min(size, EFEITO_GOLPE.length - 1); s >= 0; s--) {
-            if (efeitos.tocar(EFEITO_GOLPE[s], x, y, 1f + 0.25f * (size - s), esquerda)) return true;
+        float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
+        String nome;
+        float escala;
+        float px;
+        if (defendido) {
+            nome = "defesa";
+            escala = size >= ImpactEffects.HEAVY ? 1.1f : size == ImpactEffects.MEDIUM ? 0.95f : 0.8f;
+            px = x - direction * 12f;
+        } else if (superGolpe) {
+            nome = "impacto_contra";
+            escala = 1.2f;
+            px = x + direction * 12f;
+        } else {
+            nome = "impacto_forte";
+            escala = FAISCA_ESCALA[Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size))];
+            px = x + direction * 12f;
         }
-        return false;
+        int a = atacante & 1;
+        efeitos.parar(faiscaVaga[a], faiscaNome[a]);
+        int vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, ms);
+        if (vaga < 0) return false;
+        faiscaVaga[a] = vaga;
+        faiscaNome[a] = nome;
+        return true;
     }
+
+    /**
+     * O contra-golpe no corpo de quem apanhou (docs/revisao-base/direcao.md, regras I5 e E12): pisca
+     * em vermelho por 12 quadros, a cada 2, pelo filtro de cor, como no Dragon Ball FighterZ.
+     */
+    private static final Filtro CONTRA_PISCA = Filtro.porCima(Color.argb(130, 255, 36, 48));
+    private static final int CONTRA_PISCA_QUADROS = 12;
+    private final int[] contraPiscaAte = new int[2];
+
+    /** Tamanho da faísca única por força (fraco, médio, forte, especial): 1 : 1,3 : 1,6. */
+    private static final float[] FAISCA_ESCALA = {0.55f, 0.72f, 0.88f, 0.88f};
+    private final int[] faiscaVaga = {-1, -1};
+    private final String[] faiscaNome = {"", ""};
 
     /**
      * Efeitos de vídeo do movimento (só quando o efeito existe): fumaça na decolagem e o arco do
@@ -5523,14 +5576,8 @@ public class GameView extends SurfaceView
             if (fase > quiqueFase[i]) efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
         }
         quiqueFase[i] = fase;
-        AttackDefinition a = f.attacking() ? f.attack : null;
-        boolean ativo = a != null && a.melee() && a.isActive(f.attackFrame);
-        if (ativo && !ativoAntes[i] && a.strength != AttackDefinition.Strength.LIGHT &&
-            a.strength != AttackDefinition.Strength.MEDIUM) {
-            // A origem do arco é o ombro (o vídeo: um golpe de baixo para cima, para a direita).
-            efeitos.tocar("arco_golpe", x + f.facing * 70f, f.y - f.character().visualStandHeight * 0.55f, 1f, f.facing < 0);
-        }
-        ativoAntes[i] = ativo;
+        // Sem rastro no golpe: as linhas de velocidade atrapalham ler a distância entre os
+        // lutadores (coluna de efeitos do SF6, docs/revisao-base/direcao.md).
     }
 
     /**
@@ -5856,7 +5903,10 @@ public class GameView extends SurfaceView
         c.save();
         // Quem apanhou treme durante o congelamento do acerto.
         float shake = ImpactFeel.hitShake(f, engine.frame());
-        if (shake != 0f) c.translate(shake, 0f);
+        if (shake != 0f) {
+            if (ImpactFeel.hitShakeVertical(f)) c.translate(0f, shake);
+            else c.translate(shake, 0f);
+        }
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
         if (f.spinning && !f.grounded) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
@@ -5868,6 +5918,11 @@ public class GameView extends SurfaceView
         // No reflexo do chão não: eram mais 10 cópias do lutador por quadro, quase invisíveis ali.
         if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) drawShinkaiOutline(c, renderer, f, visualY);
         Filtro look = renderer.override() == null ? superLook(f) : null;
+        // Contra-golpe: quem apanhou pisca em vermelho (como no FighterZ), sem efeito a mais.
+        if (look == null && renderer.override() == null && engine.frame() < contraPiscaAte[f.index & 1] &&
+            (engine.frame() / 2) % 2 == 0) {
+            look = CONTRA_PISCA;
+        }
         if (look != null) renderer.setOverride(look);
         if (look == null && renderer.override() == null && ghostArmsActive(f)) drawGhostArms(c, renderer, f, visualY);
         // Desgaste: no vermelho ele respira ofegante (o corpo infla e esvazia a partir dos pés).
@@ -5876,7 +5931,7 @@ public class GameView extends SurfaceView
             c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
         }
         Filtro tinta = corDoLado(f, luzNoLutador(desgaste.tinta(f.state), f));
-        renderer.setTint(drawingReflection ? tinta : comContorno(tinta));
+        renderer.setTint(tinta);
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
@@ -6014,29 +6069,6 @@ public class GameView extends SurfaceView
             }
         }
         return niveis[chave];
-    }
-
-    /**
-     * O fio de fora do corpo (2–3 px): separa o lutador do cenário como nas referências (Dragon
-     * Ball FighterZ, MvC). Escuro e puxado para o roxo, não preto chapado, para não ficar recortado.
-     */
-    private static final int CONTORNO_COR = 0x1C1230;
-    private static final float CONTORNO_LARGURA = 2.6f / 720f;
-    private final java.util.Map<Filtro, Filtro> contornos = new java.util.IdentityHashMap<>();
-    private Filtro contornoSemTinta;
-
-    private Filtro comContorno(Filtro tinta) {
-        if (tinta == null) {
-            if (contornoSemTinta == null) contornoSemTinta = Filtro.comContorno(null, CONTORNO_COR, CONTORNO_LARGURA);
-            return contornoSemTinta;
-        }
-        Filtro c = contornos.get(tinta);
-        if (c == null) {
-            if (contornos.size() > 512) contornos.clear();
-            c = Filtro.comContorno(tinta, CONTORNO_COR, CONTORNO_LARGURA);
-            contornos.put(tinta, c);
-        }
-        return c;
     }
 
     private static final int LUZ_CLARAO_NIVEIS = 4;
@@ -6622,13 +6654,24 @@ public class GameView extends SurfaceView
         drawFighter(c, spriteFighterRenderer, p, false, p.framesSinceBlock < 7);
     }
 
+    /**
+     * O cenário atrás dos lutadores em valor e saturação (docs/revisao-base/direcao.md, regra do
+     * contraste): 72% da saturação e 82% do valor. O lutador fica em cor cheia.
+     */
+    private static final Filtro GRADUACAO_CENARIO = Filtro.cenario(0.72f, 0.82f);
+
+    private static void graduarCenario(boolean ligar) {
+        GlRenderCanvas.graduacao = ligar ? GRADUACAO_CENARIO.matriz : null;
+        AndroidRenderCanvas.graduacao = ligar ? GRADUACAO_CENARIO.canvas : null;
+    }
+
     /** Altura (pixels do mundo) em que a sombra de contato chega ao menor e mais clara. */
     private static final float SHADOW_FADE_HEIGHT = 420f;
 
     /**
      * Sombra de contato no chão: encolhe e clareia com a altura (lê o pulo e o pouso) e abre
      * junto com o achatar da aterrissagem. Dura (borda seca, sem degradê) e escura puxada para o
-     * roxo do contorno, como a mancha chapada embaixo do lutador nas referências: prende o
+     * roxo, como a mancha chapada embaixo do lutador nas referências: prende o
      * corpo no chão.
      */
     private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {

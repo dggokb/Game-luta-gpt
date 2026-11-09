@@ -280,15 +280,26 @@ final class ImpactFeel {
     }
 
     /**
-     * Tremida de quem apanhou durante o congelamento do acerto (hitstop), alternando de lado a
-     * cada quadro; menor na defesa. 0 fora dele.
+     * Tremor de quem apanhou durante a pausa do acerto (as regras do Sakurai, Famitsu nº 490 e
+     * "8 técnicas de hitstop"; docs/revisao-base/direcao.md, I8–I10): só o desenho de quem apanha
+     * treme (a caixa de dano fica parada e quem bate não treme), começa grande e decai até 0 no
+     * fim da pausa, trocando de lado a cada quadro. A força segue a pausa: ~2 px no fraco (8
+     * quadros), ~3 no médio (11), ~5 no forte (16), em pixels da tela de 720. Na defesa, 40%.
+     * No chão o tremor é de lado; no ar, de cima para baixo ({@link #hitShakeVertical}).
      */
     static float hitShake(CombatFighter f, int frame) {
         if (f.hitstop <= 0) return 0f;
-        float amplitude;
-        if (f.framesSinceHit == 0) amplitude = Math.min(4f, 1.5f + f.hitstop * 0.25f);
-        else if (f.framesSinceBlock == 0) amplitude = 1.5f;
-        else return 0f;
+        boolean acerto = f.framesSinceHit == 0;
+        if (!acerto && f.framesSinceBlock != 0) return 0f;
+        int total = Math.max(f.hitstop, f.hitstopTotal);
+        float amplitude = Math.max(1.5f, Math.min(6f, 2f + (total - 8) * 0.375f));
+        if (!acerto) amplitude *= 0.4f;
+        amplitude *= f.hitstop / (float)total;
         return (frame % 2 == 0 ? 1f : -1f) * amplitude;
+    }
+
+    /** No ar o tremor é vertical (no chão, vertical enfiaria os pés no cenário). */
+    static boolean hitShakeVertical(CombatFighter f) {
+        return !f.grounded;
     }
 }

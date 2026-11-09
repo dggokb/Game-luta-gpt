@@ -1046,43 +1046,48 @@ final class HudRenderer {
 
     /** Big centered call-out over the fight ("AGARRÃO!", "TECH!"). */
     void drawBanner(Canvas c, String text, int alpha, float scale) {
+        drawBanner(c, text, alpha, scale, -1);
+    }
+
+    /**
+     * Aviso curto da luta (docs/revisao-base/direcao.md, regras H1–H3): texto pequeno, dourado e
+     * inclinado, num lugar fixo embaixo da barra de vida de quem causou o evento ({@code lado} 0
+     * à esquerda, 1 à direita), fora do terço central onde a luta acontece. Sem lado (aviso de
+     * sistema), embaixo do relógio, menor ainda.
+     */
+    void drawBanner(Canvas c, String text, int alpha, float scale, int lado) {
         if (text == null || alpha <= 0) return;
         reset();
-        float cx = Arena.VW * 0.5f, cy = 210f;
         float a = alpha / 255f;
-        // Slashed backing strip that widens in with the scale pop.
-        float half = 330f * Math.min(1f, 2.2f - scale * 1.1f + .35f);
-        shape.reset();
-        shape.moveTo(cx - half + 24f, cy - 52f);
-        shape.lineTo(cx + half + 24f, cy - 52f);
-        shape.lineTo(cx + half - 24f, cy + 14f);
-        shape.lineTo(cx - half - 24f, cy + 14f);
-        shape.close();
-        paint.setColor(Color.argb(Math.round(170 * a), 8, 6, 20));
-        c.drawPath(shape, paint);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2.5f);
-        paint.setColor(Color.argb(Math.round(230 * a), 255, 196, 70));
-        c.drawLine(cx - half + 24f, cy - 52f, cx + half + 24f, cy - 52f, paint);
-        c.drawLine(cx - half - 24f, cy + 14f, cx + half - 24f, cy + 14f, paint);
-        paint.setStyle(Paint.Style.FILL);
+        boolean semLado = lado != 0 && lado != 1;
+        float size = semLado ? 26f : 32f;
+        float cy = semLado ? 132f : 150f;
+        float cx;
+        Paint.Align align;
+        if (semLado) {
+            cx = Arena.VW * 0.5f;
+            align = Paint.Align.CENTER;
+        } else if (lado == 0) {
+            cx = 70f;
+            align = Paint.Align.LEFT;
+        } else {
+            cx = Arena.VW - 70f;
+            align = Paint.Align.RIGHT;
+        }
         c.save();
-        c.scale(scale, scale, cx, cy - 18f);
-        paint.setTextAlign(Paint.Align.CENTER);
+        c.scale(scale, scale, cx, cy - size * 0.35f);
+        paint.setTextAlign(align);
         paint.setFakeBoldText(true);
-        paint.setTextSize(58f);
+        paint.setTextSize(size);
         paint.setTextSkewX(-0.22f);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeWidth(14f);
-        paint.setColor(Color.argb(Math.round(150 * a), 255, 70, 20));
-        c.drawText(text, cx, cy, paint);
-        paint.setStrokeWidth(8f);
+        paint.setStrokeWidth(6f);
         paint.setColor(Color.argb(alpha, 20, 8, 24));
         c.drawText(text, cx, cy, paint);
         paint.setStyle(Paint.Style.FILL);
         paint.setShader(bannerFill);
-        paint.setAlpha(alpha);
+        paint.setAlpha(Math.round(255 * a));
         c.drawText(text, cx, cy, paint);
         paint.setShader(null);
         c.restore();

@@ -5165,6 +5165,7 @@ final class CombatEngine {
 
     private static void freeze(CombatFighter a, CombatFighter d, int frames, boolean projectile) {
         d.hitstop = Math.max(d.hitstop, frames);
+        d.hitstopTotal = d.hitstop;
         if (!projectile) a.hitstop = Math.max(a.hitstop, frames);
     }
 

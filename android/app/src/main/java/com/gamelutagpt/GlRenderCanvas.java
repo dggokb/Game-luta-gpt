@@ -1771,10 +1771,17 @@ final class GlRenderCanvas implements RenderCanvas {
         quad(x1 + nx, y1 + ny, x2 + nx, y2 + ny, x2 - nx, y2 - ny, x1 - nx, y1 - ny, 0f, 0f, 0f, 0f, argb, 0f);
     }
 
+    /**
+     * A graduação do cenário (a matriz 4x5 de {@link Filtro#cenario}): enquanto não é null, as
+     * imagens do RenderCanvas (as camadas do cenário) saem com ela. Ligada só em volta do
+     * desenho do cenário, na linha do desenho.
+     */
+    static float[] graduacao;
+
     @Override public void drawImage(RenderImage image, float l, float t, float r, float bt, int alpha) {
         Textura tx = alpha > 0 ? texturaDe(image) : null;
         if (tx == null) return;
-        filtro(null);
+        filtro(graduacao);
         desenharTextura(tx, 0f, 0f, tx.largura, tx.altura, l, t, r, bt, alpha);
     }
 
@@ -1783,7 +1790,7 @@ final class GlRenderCanvas implements RenderCanvas {
                                 float l, float t, float r, float bt, int alpha) {
         Textura tx = alpha > 0 ? texturaDe(image) : null;
         if (tx == null) return;
-        filtro(null);
+        filtro(graduacao);
         desenharTextura(tx, sl, st, sr, sb, l, t, r, bt, alpha);
     }
 
@@ -1793,7 +1800,7 @@ final class GlRenderCanvas implements RenderCanvas {
         if (linhas < 2 || alpha <= 0) return;
         Textura tx = texturaDe(image);
         if (tx == null) return;
-        filtro(null);
+        filtro(graduacao);
         usar(tx.id);
         if (!tx.repetir) {
             // A faixa repete a imagem (o chão, o pano): a textura passa a repetir.

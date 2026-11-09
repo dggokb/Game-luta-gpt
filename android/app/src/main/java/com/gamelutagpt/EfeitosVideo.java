@@ -73,6 +73,10 @@ final class EfeitosVideo {
 
     private final Folha[] tocando = new Folha[VAGAS];
     private final float[] x = new float[VAGAS], y = new float[VAGAS], escala = new float[VAGAS], idadeMs = new float[VAGAS];
+    /** Velocidade de cada efeito (1 = a do vídeo; {@link #tocarDurando}). */
+    private final float[] ritmo = new float[VAGAS];
+    /** A vaga do último efeito tocado. */
+    private int ultima = -1;
     /** Efeito que anda (px do mundo por passo) e repete os quadros até {@link #fimMs} (-1: toca uma vez). */
     private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
@@ -202,7 +206,26 @@ final class EfeitosVideo {
         idadeMs[i] = 0f;
         vx[i] = 0f;
         fimMs[i] = -1f;
+        ritmo[i] = 1f;
+        ultima = i;
         return true;
+    }
+
+    /**
+     * Toca o efeito inteiro em {@code duracaoMs} (mais rápido ou mais devagar que o vídeo): a
+     * faísca dura a pausa do golpe e some antes de quem apanhou poder agir
+     * (docs/revisao-base/direcao.md, regra E6). Devolve a vaga, ou -1 se o efeito não existe.
+     */
+    int tocarDurando(String nome, float px, float py, float tamanho, boolean espelhar, float duracaoMs) {
+        if (!tocar(nome, px, py, tamanho, espelhar)) return -1;
+        float natural = tocando[ultima].duracaoMs();
+        ritmo[ultima] = natural > 0f && duracaoMs > 0f ? natural / duracaoMs : 1f;
+        return ultima;
+    }
+
+    /** Tira da tela o efeito da vaga, se ainda for o mesmo ({@code nome}). */
+    void parar(int vaga, String nome) {
+        if (vaga >= 0 && vaga < VAGAS && tocando[vaga] != null && tocando[vaga].nome.equals(nome)) tocando[vaga] = null;
     }
 
     /**
@@ -235,7 +258,7 @@ final class EfeitosVideo {
     void passo() {
         for (int i = 0; i < VAGAS; i++) {
             if (tocando[i] == null) continue;
-            idadeMs[i] += MS_POR_PASSO;
+            idadeMs[i] += MS_POR_PASSO * ritmo[i];
             x[i] += vx[i];
             float fim = fimMs[i] >= 0f ? fimMs[i] : tocando[i].duracaoMs();
             if (idadeMs[i] >= fim) tocando[i] = null;

@@ -148,6 +148,21 @@ final class Filtro {
         return new Filtro(new PorterDuffColorFilter(0xFF000000 | rgb, PorterDuff.Mode.SRC_IN), m);
     }
 
+    /**
+     * A graduação do cenário: o cenário fica atrás dos lutadores em valor e saturação. É a regra
+     * da direção de arte de Street Fighter IV/V (Toshiyuki Kamei, CEDEC 2016 / GDC 2017): o
+     * personagem em cor cheia e o cenário mais escuro, de paleta limitada e pouca saturação, para o
+     * lutador ler na frente de qualquer fundo (docs/revisao-base/direcao.md).
+     */
+    static Filtro cenario(float saturacao, float valor) {
+        ColorMatrix m = new ColorMatrix();
+        m.setSaturation(saturacao);
+        ColorMatrix escuro = new ColorMatrix();
+        escuro.setScale(valor, valor, valor, 1f);
+        m.postConcat(escuro);
+        return matriz(m);
+    }
+
     /** Giro de matiz (graus) que mantém o brilho: a conta do ColorMatrix de giro de cor. */
     static float[] giroDeMatiz(float graus) {
         double a = Math.toRadians(graus);
