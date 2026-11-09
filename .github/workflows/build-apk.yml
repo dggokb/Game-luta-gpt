@@ -14,6 +14,7 @@ on:
       - main
       - game-luta-sprite-gpt
       - game-luta-sprite-astra
+      - game-luta-sprite-fable
       - 'claude/**'
   pull_request:
   workflow_dispatch:
