@@ -144,6 +144,8 @@ public class GameView extends SurfaceView
     private final EffectsRenderer effects = new EffectsRenderer();
     /** Hit and guard sparks at the real contact point (presentation only). */
     private final ImpactEffects impacts = new ImpactEffects();
+    /** Partículas dos poderes: fagulhas e estouro da bola de energia, fita dos objetos arremessados. */
+    private final Particulas particulas = new Particulas();
     /** Riscos de mangá dos golpes fortes (no corpo de quem apanhou e no rastro do golpe). */
     private final RiscosDeImpacto riscos = new RiscosDeImpacto();
     private final CombatFighter[] riscosLutadores = new CombatFighter[2];
@@ -2229,6 +2231,7 @@ public class GameView extends SurfaceView
         for (CombatEngine.ProjectileClash clash : engine.clashes()) spawnClash(clash);
         updateUltraBeam();
         impacts.update(FIXED_STEP);
+        particulas.passo(FIXED_STEP, engine.energyProjectiles, engine.superProjectiles);
         efeitos.passo();
         acompanharDragao();
         passoRaiosShinkai();
@@ -2288,6 +2291,7 @@ public class GameView extends SurfaceView
         telao.reset();
         hud.resetEffects();
         impacts.clear();
+        particulas.limpar();
         riscos.clear();
         secretoStart = -1;
         efeitos.limpar();
@@ -2982,6 +2986,10 @@ public class GameView extends SurfaceView
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        }
+        // A bola de energia estoura na cor dela (o impacto de ar acima é o corpo recebendo a pancada).
+        if (event.projectile) {
+            particulas.acerto(x, y, direction, event.blocked, event.strength == AttackDefinition.Strength.SUPER);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
         if (!event.blocked && ultraBlackout() > 0) {
@@ -4403,6 +4411,7 @@ public class GameView extends SurfaceView
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawTraps(canvas, engine.traps);
+            if (enfeites) particulas.desenharFitas(renderCanvas);
             desenharProjeteisEmFolha(canvas);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles, projeteisEmFolha);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
@@ -4457,7 +4466,10 @@ public class GameView extends SurfaceView
                 desgaste.desenhar(canvas);
             }
             confronto.desenharFrente(canvas);
-            if (enfeites) impacts.draw(canvas);
+            if (enfeites) {
+                impacts.draw(canvas);
+                particulas.desenhar(renderCanvas);
+            }
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
                 if (age >= 0 && age < EffectsRenderer.CANNON_BLAST_FRAMES) {
