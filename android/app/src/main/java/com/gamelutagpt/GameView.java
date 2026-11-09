@@ -6660,9 +6660,13 @@ public class GameView extends SurfaceView
      */
     private static final Filtro GRADUACAO_CENARIO = Filtro.cenario(0.72f, 0.82f);
 
+    /**
+     * Só no OpenGL (o desenho da luta no celular), onde a matriz de cor sai de graça no sombreador.
+     * No Canvas o filtro em cada camada grande do cenário custava a luta inteira (CPU, pixel a
+     * pixel): lá o cenário fica como está.
+     */
     private static void graduarCenario(boolean ligar) {
         GlRenderCanvas.graduacao = ligar ? GRADUACAO_CENARIO.matriz : null;
-        AndroidRenderCanvas.graduacao = ligar ? GRADUACAO_CENARIO.canvas : null;
     }
 
     /** Altura (pixels do mundo) em que a sombra de contato chega ao menor e mais clara. */

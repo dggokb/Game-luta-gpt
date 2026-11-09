@@ -20,8 +20,6 @@ import com.gamelutagpt.render.RenderImage;
 final class AndroidRenderCanvas implements RenderCanvas {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint imagePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    /** A graduação do cenário no Canvas (a mesma de {@link GlRenderCanvas#graduacao}); null: sem. */
-    static android.graphics.ColorFilter graduacao;
     private final Paint invertPaint = new Paint();
     private final Path path = new Path();
     private final RectF rect = new RectF();
@@ -193,7 +191,6 @@ final class AndroidRenderCanvas implements RenderCanvas {
         Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap();
         if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
-        imagePaint.setColorFilter(graduacao);
         rect.set(left, top, right, bottom);
         canvas.drawBitmap(bitmap, null, rect, imagePaint);
     }
@@ -218,7 +215,6 @@ final class AndroidRenderCanvas implements RenderCanvas {
         Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bitmap();
         if (!desenhavel(bitmap)) return;
         imagePaint.setAlpha(alpha);
-        imagePaint.setColorFilter(graduacao);
         srcRect.set(Math.round(srcLeft), Math.round(srcTop), Math.round(srcRight), Math.round(srcBottom));
         if (srcRect.width() <= 0 || srcRect.height() <= 0) return;
         rect.set(left, top, right, bottom);
