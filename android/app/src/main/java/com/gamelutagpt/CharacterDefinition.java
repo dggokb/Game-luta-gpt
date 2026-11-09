@@ -127,12 +127,30 @@ final class CharacterDefinition {
             }
             return out;
         }
+        /**
+         * Poses-chave (anime em "2s e 3s"): cada quadro do clipe mostra a última pose-chave
+         * até ele, então o golpe segura a preparação, o impacto e a volta em vez de deslizar
+         * como vídeo. O tempo e as caixas seguem o clipe; só o desenho fica parado. Null: todos.
+         */
+        private int[] pose;
+        Animation withPoses(int[] chaves) {
+            pose=new int[frames.length];
+            int atual=0;
+            for(int i=0;i<frames.length;i++) {
+                for(int c:chaves)if(c<=i&&c>atual)atual=c;
+                pose[i]=atual;
+            }
+            return this;
+        }
+        private int shown(int i) {
+            return frames[pose==null?i:pose[i]];
+        }
         int frame(float time,float distance) {
-            if(distancePerFrame>0) return frames[(int)(Math.max(0,distance)/distancePerFrame)%frames.length];
+            if(distancePerFrame>0) return shown((int)(Math.max(0,distance)/distancePerFrame)%frames.length);
             float t=Math.max(0,time);
             if(loop)t%=duration;
-            for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return frames[i];t-=durations[i]; }
-            return frames[frames.length-1];
+            for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return shown(i);t-=durations[i]; }
+            return shown(frames.length-1);
         }
         /**
          * Guard clips: the first frame is the held guard; the remaining frames are the

@@ -393,4 +393,21 @@ As etapas 1 e 2 dependem só de código e dão para fazer já. A 3 usa as imagen
 - O rastro do chute forte sai 70 px à frente de quem chuta.
 - Cada vídeo foi cortado para começar no quadro em que o efeito já está grande e acelerado para a duração de um impacto: fraco 228 ms, médio 312, forte e contra-ataque ≈390, defesa ≈200; poeiras 0,45–0,6 s.
 
+**Feito depois da reavaliação 1 (commit "Revisão da base: faíscas, contador, contorno e poses"):**
+- **Tamanho das faíscas.** Reconvertidas menores: forte 250 px de altura (≈35% da tela de 720; era 420 e cobria a luta), médio 180, fraco 130, contra-ataque 240, defesa 150. Também mais rápidas.
+- **Qual faísca cada acerto toca:**
+  - num golpe de vários acertos, só o último usa a forte; os do meio usam a média (`HitEvent.midStrike`);
+  - o contra-ataque e a punição tocam a magenta só no último acerto;
+  - o Super e o Ultra têm a deles: a magenta 1,5× maior.
+  - A estrela de 4 pontas com anel não é faísca de acerto. É o choque de projéteis e o "preciso" da Percepção do SHINKAI, e ficou como estava.
+- **Contador de combo:** a faixa DANO/ESCALA/JUGGLE só aparece com o modo de depuração ligado. Na luta fica só o número de acertos.
+- **Contorno do corpo.** Um fio de 2,6 px (na tela de 720; proporcional nas outras), roxo-escuro (`#1C1230`), por fora da silhueta, para separar o lutador do cenário.
+  - Sai no mesmo desenho do lutador, no sombreador (8 vizinhos do alfa), sem cópia a mais.
+  - Fica de fora no reflexo, nos piscados de acerto/defesa e no Canvas.
+- **Sombra de contato dura.** Mancha chapada mais larga (meia-largura 60), mais alta (±12) e mais escura (alfa 190), puxada para o roxo do contorno. Prende o corpo no chão.
+- **Poses-chave do Ryūga.** Os golpes normais (L, M, H, agachados e no ar) não mostram mais os 16–30 quadros do vídeo em sequência.
+  - Cada um segura 6 a 10 poses: a guarda, a preparação, o contato, o membro esticado no alcance máximo (parado até ~150 ms), a volta a cada ~70 ms e a guarda no fim. É o "anime em 2s e 3s" das referências.
+  - O tempo do golpe não muda. As caixas seguem o desenho e o alcance máximo foi mantido; só o soco fraco e o chute médio perderam 2 e 4 px, e a tabela de alcance da CPU foi refeita.
+  - As poses ficam marcadas em `posesChave` no `character.json` e são lidas por `Animation.withPoses`.
+
 **Depende de vídeo:** os prompts estão em [prompts-videos.md](prompts-videos.md) (faíscas no estilo FighterZ, defesa fria, poeiras e as reações de dano, queda, defesas, intro e vitória do Ryūga).

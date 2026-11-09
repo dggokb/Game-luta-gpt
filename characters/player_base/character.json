@@ -4411,7 +4411,15 @@
             199
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        3,
+        6,
+        13,
+        14,
+        15
+      ]
     },
     "MEDIUM_KICK": {
       "atlas": "player_base_medium_kick",
@@ -4904,7 +4912,17 @@
             105
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        3,
+        5,
+        7,
+        8,
+        11,
+        14,
+        17
+      ]
     },
     "HEAVY_STRAIGHT": {
       "atlas": "player_base_heavy_straight",
@@ -5741,7 +5759,19 @@
             196
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        4,
+        5,
+        8,
+        12,
+        16,
+        20,
+        25,
+        29
+      ]
     },
     "DEFENSE_STAND": {
       "atlas": "player_base_defense_stand",
@@ -7339,7 +7369,15 @@
             184
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        4,
+        7,
+        9,
+        12,
+        19
+      ]
     },
     "CROUCH_MEDIUM": {
       "atlas": "player_base_crouch_medium",
@@ -8066,7 +8104,16 @@
             153
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        4,
+        9,
+        12,
+        16,
+        20,
+        25
+      ]
     },
     "CROUCH_HEAVY": {
       "atlas": "player_base_crouch_heavy",
@@ -8611,7 +8658,17 @@
             152
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        3,
+        5,
+        12,
+        13,
+        16,
+        19
+      ]
     },
     "JUMP_LIGHT": {
       "atlas": "player_base_jump_light",
@@ -9178,7 +9235,16 @@
             75
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        5,
+        7,
+        8,
+        12,
+        19
+      ]
     },
     "JUMP_MEDIUM": {
       "atlas": "player_base_jump_medium",
@@ -9785,7 +9851,16 @@
             156
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        4,
+        7,
+        11,
+        17,
+        19,
+        21
+      ]
     },
     "JUMP_HEAVY": {
       "atlas": "player_base_jump_heavy",
@@ -10422,7 +10497,18 @@
             35
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        4,
+        7,
+        10,
+        13,
+        17,
+        21,
+        25
+      ]
     },
     "DEFENSE_AIR": {
       "atlas": "player_base_defense_air",

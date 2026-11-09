@@ -76,6 +76,8 @@ final class GlRenderCanvas implements RenderCanvas {
         // vizinho do lado da luz; uLuzCor: a cor da contraluz; uLuzPes: o fator dos pés; uLuzRet: o
         // retângulo do quadro na folha, uv de cima à esquerda e de baixo à direita).
         "uniform highp vec4 uLuz; uniform vec4 uLuzCor; uniform vec4 uLuzPes; uniform highp vec4 uLuzRet;\n" +
+        // Contorno do corpo (uContorno: cor e ligado; uContornoR: a largura em uv).
+        "uniform vec4 uContorno; uniform highp vec2 uContornoR;\n" +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
@@ -149,6 +151,19 @@ final class GlRenderCanvas implements RenderCanvas {
         "        u.rgb = clamp(u.rgb * mix(vec3(1.0), uLuzPes.rgb, y) + borda * uLuzCor.rgb * uLuz.y, 0.0, 1.0);\n" +
         "      }\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
+        // Contorno: onde é transparente e um vizinho a uContornoR é corpo, um fio da cor por fora.
+        "      if (uContorno.w > 0.5) {\n" +
+        "        highp vec2 rc = uContornoR, dc = rc * 0.7071;\n" +
+        "        float o = texture(uTex, clamp(vUv + vec2(rc.x, 0.0), uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        o = max(o, texture(uTex, clamp(vUv - vec2(rc.x, 0.0), uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        o = max(o, texture(uTex, clamp(vUv + vec2(0.0, rc.y), uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        o = max(o, texture(uTex, clamp(vUv - vec2(0.0, rc.y), uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        o = max(o, texture(uTex, clamp(vUv + dc, uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        o = max(o, texture(uTex, clamp(vUv - dc, uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        o = max(o, texture(uTex, clamp(vUv + vec2(dc.x, -dc.y), uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        o = max(o, texture(uTex, clamp(vUv + vec2(-dc.x, dc.y), uLuzRet.xy, uLuzRet.zw)).a);\n" +
+        "        t += vec4(uContorno.rgb, 1.0) * (o * (1.0 - t.a));\n" +
+        "      }\n" +
         "    }\n" +
         "    c = t * vCor;\n" +
         "  } else if (k < 3.5) {\n" +
@@ -204,11 +219,11 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Um programa e onde ficam os uniforms dele. */
     private static final class Programa {
         int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
-        int uLuz, uLuzCor, uLuzPes, uLuzRet;
+        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR;
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
-    private int uLuz, uLuzCor, uLuzPes, uLuzRet;
+    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
@@ -308,6 +323,8 @@ final class GlRenderCanvas implements RenderCanvas {
         p.uLuzCor = GLES30.glGetUniformLocation(p.id, "uLuzCor");
         p.uLuzPes = GLES30.glGetUniformLocation(p.id, "uLuzPes");
         p.uLuzRet = GLES30.glGetUniformLocation(p.id, "uLuzRet");
+        p.uContorno = GLES30.glGetUniformLocation(p.id, "uContorno");
+        p.uContornoR = GLES30.glGetUniformLocation(p.id, "uContornoR");
         p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
         p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
         p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
@@ -324,6 +341,7 @@ final class GlRenderCanvas implements RenderCanvas {
         programa = p.id;
         uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte; uTroca = p.uTroca;
         uLuz = p.uLuz; uLuzCor = p.uLuzCor; uLuzPes = p.uLuzPes; uLuzRet = p.uLuzRet;
+        uContorno = p.uContorno; uContornoR = p.uContornoR;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
         GLES30.glUseProgram(p.id);
     }
@@ -852,18 +870,26 @@ final class GlRenderCanvas implements RenderCanvas {
         else GLES30.glUniform4f(uTroca, 0f, 0f, 0f, 0f);
         // A luz do cenário: só no filtro já preparado para um quadro da folha (luzDoQuadro).
         int L = Filtro.LUZ;
-        if (m.length >= LUZ_QUADRO && m[L] > 0.5f) {
+        boolean quadro = m.length >= LUZ_QUADRO;
+        if (quadro && m[L] > 0.5f) {
             GLES30.glUniform4f(uLuz, m[L] > 1.5f ? 2f : 1f, m[L + 4], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
             GLES30.glUniform4f(uLuzCor, m[L + 1], m[L + 2], m[L + 3], 1f);
             GLES30.glUniform4f(uLuzPes, m[L + 7], m[L + 8], m[L + 9], 1f);
-            GLES30.glUniform4f(uLuzRet, m[Filtro.COM_LUZ + 2], m[Filtro.COM_LUZ + 3], m[Filtro.COM_LUZ + 4], m[Filtro.COM_LUZ + 5]);
         } else {
             GLES30.glUniform4f(uLuz, 0f, 0f, 0f, 0f);
         }
+        if (quadro) GLES30.glUniform4f(uLuzRet, m[Filtro.COM_LUZ + 2], m[Filtro.COM_LUZ + 3], m[Filtro.COM_LUZ + 4], m[Filtro.COM_LUZ + 5]);
+        int C = Filtro.CONTORNO;
+        if (quadro && m[C + 3] > 0f) {
+            GLES30.glUniform4f(uContorno, m[C], m[C + 1], m[C + 2], 1f);
+            GLES30.glUniform2f(uContornoR, m[Filtro.COM_LUZ + 6], m[Filtro.COM_LUZ + 7]);
+        } else {
+            GLES30.glUniform4f(uContorno, 0f, 0f, 0f, 0f);
+        }
     }
 
-    /** O filtro com a luz já preparado para um quadro: + deslocamento (2) e retângulo do quadro (4). */
-    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 6;
+    /** O filtro com a luz já preparado para um quadro: + deslocamento (2), retângulo do quadro (4) e largura do contorno em uv (2). */
+    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 8;
     /** Largura da contraluz em fração da altura da tela. */
     static final float LARGURA_CONTRALUZ = 0.008f;
     /**
@@ -882,7 +908,8 @@ final class GlRenderCanvas implements RenderCanvas {
         float[] m = filtro;
         // Outro quadro com o mesmo filtro (sem voltar ao original entre os dois): parte do original.
         if (m != null && m.length >= LUZ_QUADRO && filtroComLuz != null) m = filtroComLuz;
-        if (m == null || m.length < Filtro.COM_LUZ || m.length >= LUZ_QUADRO || m[Filtro.LUZ] < 0.5f) return;
+        if (m == null || m.length < Filtro.COM_LUZ || m.length >= LUZ_QUADRO) return;
+        if (m[Filtro.LUZ] < 0.5f && m[Filtro.CONTORNO + 3] <= 0f) return;
         float det = a * d - b * c;
         if (Math.abs(det) < 1e-9f || r == l || bt == top || sr == sl || sb == st) return;
         // A direção da luz na tela, levada para o espaço do desenho (a inversa da parte linear da
@@ -890,7 +917,14 @@ final class GlRenderCanvas implements RenderCanvas {
         float[] q = rodaLuz[vezLuz];
         vezLuz = (vezLuz + 1) % rodaLuz.length;
         System.arraycopy(m, 0, q, 0, Filtro.COM_LUZ);
-        if (m[Filtro.LUZ] > 1.5f) {
+        q[Filtro.COM_LUZ] = q[Filtro.COM_LUZ + 1] = 0f;
+        // O contorno: a largura na tela levada para texels do quadro (a escala da matriz, igual nos dois eixos).
+        float contorno = m[Filtro.CONTORNO + 3] * alturaTela / (float)Math.sqrt(Math.abs(det));
+        q[Filtro.COM_LUZ + 6] = contorno * Math.abs((sr - sl) / (r - l)) / t.largura;
+        q[Filtro.COM_LUZ + 7] = contorno * Math.abs((sb - st) / (bt - top)) / t.altura;
+        if (m[Filtro.LUZ] < 0.5f) {
+            // Sem luz do cenário: só o contorno.
+        } else if (m[Filtro.LUZ] > 1.5f) {
             // Sombra: o raio da penumbra na ponta, em uv, igual nos dois eixos (em texels).
             float raio = m[Filtro.LUZ + 4] * Math.abs(sb - st);
             q[Filtro.COM_LUZ] = raio / t.largura;

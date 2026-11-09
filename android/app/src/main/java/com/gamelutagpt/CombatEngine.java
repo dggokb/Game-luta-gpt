@@ -34,6 +34,8 @@ final class CombatEngine {
         boolean finalStrike;
         /** Contra-golpe: abriu o combo em quem estava no meio de um golpe (apresentação). */
         boolean counterHit;
+        /** Pancada do meio de um golpe de vários acertos (a faísca forte fica para a última). */
+        boolean midStrike;
         HitEvent(int attacker, int defender, int damage, boolean blocked, boolean projectile, String moveId) {
             this.attacker = attacker;
             this.defender = defender;
@@ -4934,6 +4936,7 @@ final class CombatEngine {
         HitEvent hit = new HitEvent(a.index, d.index, damage, false, projectile, attack.id);
         hit.finalStrike = finalStrike;
         hit.counterHit = counterHit;
+        hit.midStrike = !lastStrike;
         events.add(hit);
     }
 

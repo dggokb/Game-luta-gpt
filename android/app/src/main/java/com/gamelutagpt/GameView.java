@@ -2972,8 +2972,12 @@ public class GameView extends SurfaceView
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
-            !efeitoDeGolpe(event.blocked, x, y, direction, size, event.projectile || size >= ImpactEffects.SPECIAL,
-                event.counterHit || punish)) {
+            !efeitoDeGolpe(event.blocked, x, y, direction,
+                // Golpe de vários acertos: a faísca grande fica para a última pancada.
+                event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
+                event.projectile || size >= ImpactEffects.SPECIAL,
+                (event.counterHit || punish) && !event.midStrike,
+                event.strength == AttackDefinition.Strength.SUPER || ultraHit)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -4718,6 +4722,7 @@ public class GameView extends SurfaceView
             float t = flow.bannerProgress();
             hud.drawBanner(c, call, Math.round(255f * clamp((1f - t) * 5f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
         }
+        hud.mostrarInfoCombo = debugOverlay;
         hud.drawCombo(c, engine.session(OPPONENT), engine.lastSession(OPPONENT),
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
@@ -5486,14 +5491,15 @@ public class GameView extends SurfaceView
      * não há o efeito, e o clássico entra.
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean poder,
-                                  boolean contra) {
+                                  boolean contra, boolean superGolpe) {
         boolean esquerda = direction < 0;
         // Revisão da base (docs/revisao-base): todos os impactos no mesmo desenho (estilo FighterZ),
         // com a defesa fria (escudo ciano que se quebra) e o contra-golpe em magenta.
         if (defendido) return efeitos.tocar("defesa", x, y, poder ? 1.2f : 1f, esquerda);
+        // Super e Ultra: o contra-golpe magenta grande (o maior impacto do jogo); especial: o forte.
+        if (superGolpe && efeitos.tocar("impacto_contra", x, y, 1.5f, esquerda)) return true;
         if (contra && efeitos.tocar("impacto_contra", x, y, size >= ImpactEffects.HEAVY ? 1f : 0.8f, esquerda)) return true;
-        // Especial e Super: o impacto forte um pouco maior.
-        if (size >= EFEITO_GOLPE.length - 1 && efeitos.tocar("impacto_forte", x, y, 1.15f, esquerda)) return true;
+        if (size >= EFEITO_GOLPE.length - 1 && efeitos.tocar("impacto_forte", x, y, 1f, esquerda)) return true;
         for (int s = Math.min(size, EFEITO_GOLPE.length - 1); s >= 0; s--) {
             if (efeitos.tocar(EFEITO_GOLPE[s], x, y, 1f + 0.25f * (size - s), esquerda)) return true;
         }
@@ -5869,7 +5875,8 @@ public class GameView extends SurfaceView
         if (folego != 1f && f.grounded && !f.attacking() && !f.inHitstun()) {
             c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
         }
-        renderer.setTint(corDoLado(f, luzNoLutador(desgaste.tinta(f.state), f)));
+        Filtro tinta = corDoLado(f, luzNoLutador(desgaste.tinta(f.state), f));
+        renderer.setTint(drawingReflection ? tinta : comContorno(tinta));
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
@@ -6007,6 +6014,29 @@ public class GameView extends SurfaceView
             }
         }
         return niveis[chave];
+    }
+
+    /**
+     * O fio de fora do corpo (2–3 px): separa o lutador do cenário como nas referências (Dragon
+     * Ball FighterZ, MvC). Escuro e puxado para o roxo, não preto chapado, para não ficar recortado.
+     */
+    private static final int CONTORNO_COR = 0x1C1230;
+    private static final float CONTORNO_LARGURA = 2.6f / 720f;
+    private final java.util.Map<Filtro, Filtro> contornos = new java.util.IdentityHashMap<>();
+    private Filtro contornoSemTinta;
+
+    private Filtro comContorno(Filtro tinta) {
+        if (tinta == null) {
+            if (contornoSemTinta == null) contornoSemTinta = Filtro.comContorno(null, CONTORNO_COR, CONTORNO_LARGURA);
+            return contornoSemTinta;
+        }
+        Filtro c = contornos.get(tinta);
+        if (c == null) {
+            if (contornos.size() > 512) contornos.clear();
+            c = Filtro.comContorno(tinta, CONTORNO_COR, CONTORNO_LARGURA);
+            contornos.put(tinta, c);
+        }
+        return c;
     }
 
     private static final int LUZ_CLARAO_NIVEIS = 4;
@@ -6597,16 +6627,18 @@ public class GameView extends SurfaceView
 
     /**
      * Sombra de contato no chão: encolhe e clareia com a altura (lê o pulo e o pouso) e abre
-     * junto com o achatar da aterrissagem.
+     * junto com o achatar da aterrissagem. Dura (borda seca, sem degradê) e escura puxada para o
+     * roxo do contorno, como a mancha chapada embaixo do lutador nas referências: prende o
+     * corpo no chão.
      */
     private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
         if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || cenaEmVideo) return;
         float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
-        float half = 52f * k * renderer.animacao.pose().escalaX;
+        float half = 60f * k * renderer.animacao.pose().escalaX;
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(Math.round(165 * k), 0, 0, 0));
-        c.drawOval(f.x - half, GROUND_Y - 10f * k, f.x + half, GROUND_Y + 10f * k, paint);
+        paint.setColor(Color.argb(Math.round(190 * k), 22, 14, 38));
+        c.drawOval(f.x - half, GROUND_Y - 12f * k, f.x + half, GROUND_Y + 12f * k, paint);
     }
 
     private void drawControls(Canvas c) {

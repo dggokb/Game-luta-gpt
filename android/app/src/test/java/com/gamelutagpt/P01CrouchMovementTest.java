@@ -30,10 +30,10 @@ public class P01CrouchMovementTest {
                     frame>=displayed.get(displayed.size()-1));
                 displayed.add(frame);
             }
-            // Golpe rápido com o vídeo inteiro: nem todo quadro cabe a 60 qps, mas a maior parte aparece.
+            // O golpe segura poses-chave (posesChave): não mostra o vídeo inteiro, mas mostra a
+            // guarda, a preparação, o impacto e a volta.
             long distinct=displayed.stream().distinct().count();
-            assertTrue("Too few "+moves[i]+" poses; played "+displayed,
-                distinct>=Math.min(art.atlas.count,a.totalFrames)/2);
+            assertTrue("Too few "+moves[i]+" poses; played "+displayed,distinct>=4);
         }
         assertEquals(AttackDefinition.Launch.LAUNCH,P01.attack("2H").launch);
         assertTrue(P01.attack("2H").cancelsInto(AttackDefinition.JUMP));

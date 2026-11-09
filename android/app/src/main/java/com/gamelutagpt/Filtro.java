@@ -86,8 +86,34 @@ final class Filtro {
 
     /** Onde começa a luz do cenário na matriz do filtro (depois dos 20 da matriz e dos 4 da troca). */
     static final int LUZ = 24;
-    /** Números do filtro com a luz: 24 + ligada, cor da contraluz (3), força, direção (2), pés (3), sobra. */
-    static final int COM_LUZ = 36;
+    /** Números do filtro com a luz: 24 + ligada, cor da contraluz (3), força, direção (2), pés (3), contorno (4). */
+    static final int COM_LUZ = 38;
+    /** O contorno do corpo (só no OpenGL): a cor (3, de 0 a 1) e a largura (fração da altura da tela; 0 desliga). */
+    static final int CONTORNO = 34;
+
+    /**
+     * {@code base} (a tinta, a luz e a cor alternativa, como já vinham) com o contorno do corpo:
+     * um fio de {@code largura} (fração da altura da tela) na cor {@code rgb} por fora da silhueta,
+     * no mesmo desenho do lutador. O corpo da arte já tem a linha de dentro; o fio de fora separa o
+     * lutador do cenário (o recorte das referências). No Canvas fica só a matriz.
+     */
+    static Filtro comContorno(Filtro base, int rgb, float largura) {
+        float[] b = base != null && base.matriz.length >= 20 ? base.matriz : new float[] {
+            1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0};
+        float[] m = new float[COM_LUZ];
+        System.arraycopy(b, 0, m, 0, Math.min(b.length, CONTORNO));
+        m[CONTORNO] = ((rgb >> 16) & 0xFF) / 255f;
+        m[CONTORNO + 1] = ((rgb >> 8) & 0xFF) / 255f;
+        m[CONTORNO + 2] = (rgb & 0xFF) / 255f;
+        m[CONTORNO + 3] = largura;
+        // Cor alternativa: no Canvas o giro vai junto na matriz (o filtro guarda só os números).
+        ColorMatrix cm = new ColorMatrix(java.util.Arrays.copyOf(b, 20));
+        if (b.length >= 24 && b[20] > 0.5f) {
+            cm = new ColorMatrix(giroDeMatiz(b[21] * 360f));
+            cm.postConcat(new ColorMatrix(java.util.Arrays.copyOf(b, 20)));
+        }
+        return new Filtro(new ColorMatrixColorFilter(cm), m);
+    }
 
     /**
      * A matriz {@code base} (a tinta do lugar e o desgaste) com a luz do cenário que só o OpenGL

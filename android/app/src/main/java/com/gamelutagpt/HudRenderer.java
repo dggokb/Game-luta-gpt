@@ -1103,6 +1103,9 @@ final class HudRenderer {
      * Combo counter of one ComboSession: hits, damage and current scaling. The left side
      * shows the player's combos, the right side the CPU's. Single hits are not combos.
      */
+    /** Mostra dano, escala e juggle embaixo do contador de combo (o DEBUG liga). */
+    boolean mostrarInfoCombo;
+
     void drawCombo(Canvas c, ComboSession active, ComboSession last, int framesSinceEnd, boolean leftSide) {
         ComboSession combo = active;
         int alpha = 255;
@@ -1162,7 +1165,15 @@ final class HudRenderer {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.argb(alpha, 255, 255, 255));
         c.drawText("HITS", hitsX, 296f, paint);
-        // Damage and scaling on a slanted strip.
+        // Damage and scaling on a slanted strip: só com o DEBUG ligado (revisão da base: o jogador
+        // vê o número e "HITS", como nas referências; dano, escala e juggle são dados de teste).
+        if (!mostrarInfoCombo) {
+            paint.setStrokeJoin(Paint.Join.MITER);
+            paint.setTextSkewX(0f);
+            paint.setFakeBoldText(false);
+            paint.setTextAlign(Paint.Align.LEFT);
+            return;
+        }
         String info = comboInfo(side, combo);
         paint.setTextSize(17f);
         paint.setTextSkewX(-0.12f);

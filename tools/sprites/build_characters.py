@@ -825,6 +825,9 @@ def compile_packs(root, results):
                 junta = lambda d: '|'.join(k+':'+','.join(str(n) for caixa in ([v] if v and type(v[0]) is not list else v) for n in caixa)
                                            for k, v in sorted(d.items(), key=lambda kv: int(kv[0])) if v)
                 sil = '.withSilhueta('+q(junta(a['silhueta']['corpo']))+','+q(junta(a['silhueta']['golpe']))+')'
+            if 'posesChave' in a:
+                # Poses-chave seguradas (anime em 2s e 3s): o quadro mostra a última pose até ele.
+                sil += '.withPoses(new int[]{'+','.join(map(str,a['posesChave']))+'})'
             lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+')'+sil+');']
         for key in [b for b in BINDINGS + OPTIONAL_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
