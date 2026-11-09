@@ -212,3 +212,21 @@ No motor: `AttackDefinition.Reads.AIR` (a esquiva que só o golpe de quem está 
 4. O H e o S2 da p08 usam a mesma animação: a cadência dela é a do S2, sem o impacto segurado.
 5. `player_two` e `monster_npc` não mudaram. As duas crianças do prólogo ficaram com o tempo
    antigo e ganharam só o impacto segurado; o Ryūga criança recua a 110 px/s em vez de 39,6.
+
+## O efeito do acerto
+
+A review trocou os efeitos de vídeo do acerto por um impacto de ar desenhado em código e tirou
+do golpe comum o clarão branco, as linhas, o rastro e o soco de câmera. Essas regras ficam. O
+que mudou aqui foi só o desenho do impacto (`tools/sprites/impacto_ar.py`):
+
+- antes era um clarão macio com rajadas finas e uma elipse translúcida, que sumia em cima do
+  cenário e da roupa clara;
+- agora é borda dura e tons chapados, no traço dos lutadores: estrela branca de espinhos
+  desiguais com borda lilás e fio de nanquim, miolo de nanquim com um ponto branco no quadro do
+  contato, depois cacos e um anel de pressão quebrado;
+- o tamanho é o mesmo (a estrela do forte com 128 px do mundo; fraco e médio em 0,625 e 0,8125),
+  o tempo é o mesmo (a pausa do golpe + 8 quadros) e o motor não mudou: as folhas
+  `impacto_ar` e `impacto_ar_super` têm os mesmos nomes.
+
+Conferido em quadro renderizado fora do jogo (o chute forte do Kōga no Ryūga, com a pausa de 16
+quadros e o tremor só de quem apanha). Falta ver no aparelho.

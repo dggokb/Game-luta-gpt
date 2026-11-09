@@ -3,14 +3,21 @@
 
 Golpe normal é pancada: ninguém solta poder, então o acerto não tem faísca, fogo nem energia.
 O que se vê é o ar deslocado, na mesma família dos estouros de ar da defesa (defesa,
-defesa_2, defesa_3: brancos, translúcidos, de pontas macias, tirados dos vídeos de defesa):
-- um clarão curto de compressão no ponto do golpe;
-- rajadas de vento saindo dele, mais compridas para o lado de quem apanha (o golpe empurra o ar
-  para dentro da vítima) e mais curtas para trás;
-- um anel de pressão em pé (a onda de choque vista de lado) que abre e some.
+defesa_2, defesa_3: estrelas brancas de pontas rasgadas, tiradas dos vídeos de defesa).
 
-``impacto_ar``: o acerto (o jogo escala 1 : 1,3 : 1,6 por força). ``impacto_ar_super``: o mesmo
-estouro com mais rajadas e um anel a mais, para o Super e o Ultra.
+O traço é o do resto do jogo: borda dura e tons chapados (branco, a borda fria lilás e um fio
+de nanquim em volta, que segura o estouro em cima de roupa branca e de cenário claro). Nada
+borrado: a primeira versão era um clarão macio com uma elipse perfeita e sumia na tela.
+- uma estrela de ar de espinhos gordos e desiguais, mais compridos para o lado de quem apanha (o
+  golpe empurra o ar para dentro da vítima) e curtos para trás;
+- no contato, o miolo de nanquim com um ponto branco (a mancha de tinta do City of the Wolves:
+  combina com o contorno dos lutadores e marca o quadro do golpe sem piscar ninguém);
+- depois a estrela esvazia pelo meio, os espinhos afinam e viram cacos, e um anel de pressão em
+  pé (a onda de choque vista de lado), quebrado em pedaços, abre e some.
+
+``impacto_ar``: o acerto (o jogo escala 1 : 1,3 : 1,6 por força; a estrela do forte tem 128 px do
+mundo, a regra de tamanho da revisão, e só os cacos e o anel passam um pouco dela). ``impacto_ar_super``: o mesmo
+estouro com mais espinhos e um anel a mais, para o Super e o Ultra.
 
 Animação limitada (6 desenhos com tempos diferentes); o jogo estica a folha para a pausa do
 golpe + alguns quadros. O golpe vai para a direita (+x); o jogo espelha para a esquerda. Semente
@@ -22,100 +29,150 @@ fixa: a folha sai igual em qualquer máquina.
 import argparse
 import json
 import math
-import random
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 SAIDA = ROOT / 'android/app/src/main/assets/efeitos'
-LADO = 256          # célula em px da folha
-PIXEL_SCALE = 2.0   # 256 px da folha = 128 px do mundo no tamanho 1 (o forte)
+LADO = 320          # célula em px da folha: a estrela do contato ocupa 256 (128 px do mundo no forte);
+                    # a sobra é para os cacos e o anel, que passam dela
+PIXEL_SCALE = 2.0   # 2 px da folha = 1 px do mundo no tamanho 1 (o forte)
 SS = 3              # supersampling
 BRANCO = (250, 250, 255)
-LILAS = (206, 212, 255)    # a borda fria dos estouros de ar da defesa
+LILAS = (190, 200, 255)    # a borda fria dos estouros de ar da defesa
+NANQUIM = (24, 26, 52)     # o fio de fora e o miolo do contato
 TEMPOS = [33, 67, 50, 50, 33, 33]
 
+N = LADO * SS
+YY, XX = np.mgrid[0:N, 0:N].astype(np.float32)
+_RETICULA = np.random.default_rng(11).random((64, 64)).astype(np.float32)
 
-def _camada():
-    return Image.new('L', (LADO * SS, LADO * SS), 0)
-
-
-def _pt(cx, cy, r, a, achata=1.0):
-    return (cx + r * math.cos(a), cy + r * math.sin(a) * achata)
-
-
-def _rajada(d, cx, cy, a, r0, r1, larg, alfa):
-    """Uma rajada: lâmina fina que afina até a ponta, cheia na base."""
-    if r1 <= r0:
-        return
-    base_l = _pt(cx, cy, r0, a - larg)
-    base_r = _pt(cx, cy, r0, a + larg)
-    meio_l = _pt(cx, cy, r0 + (r1 - r0) * 0.35, a - larg * 0.55)
-    meio_r = _pt(cx, cy, r0 + (r1 - r0) * 0.35, a + larg * 0.55)
-    d.polygon([base_l, meio_l, _pt(cx, cy, r1, a), meio_r, base_r], fill=int(255 * alfa))
+# Espinhos (ângulo, comprimento, meia largura): compridos para a frente (+x), curtos para trás.
+ESPINHOS = [(0.02, 1.00, 0.30), (0.66, 0.80, 0.25), (1.34, 0.62, 0.24), (2.08, 0.46, 0.25), (2.86, 0.38, 0.26),
+            (3.58, 0.44, 0.24), (4.34, 0.58, 0.25), (5.04, 0.72, 0.25), (5.70, 0.88, 0.26)]
+# Os do Super: finos e longos, entre os outros.
+ESPINHOS_SUPER = [(0.34, 1.04, 0.12), (1.00, 0.84, 0.11), (1.72, 0.62, 0.11), (4.70, 0.74, 0.11), (5.38, 0.96, 0.12),
+                  (3.20, 0.50, 0.11)]
+MIOLO = 0.26   # raio do corpo da estrela sem os espinhos (fração do tamanho)
 
 
-def _rajadas(semente, n):
-    rnd = random.Random(semente)
-    out = []
-    for i in range(n):
-        a = (i + rnd.uniform(-0.35, 0.35)) / n * 2 * math.pi
-        # Para a frente (+x, quem apanha) o ar vai longe; para trás, pouco.
-        frente = max(0.0, math.cos(a))
-        comp = rnd.uniform(0.55, 1.0) * (0.45 + 0.65 * frente)
-        out.append((a, comp, rnd.uniform(0.7, 1.2)))
-    return out
+def _ruido(x, y):
+    xi, yi = np.floor(x).astype(int), np.floor(y).astype(int)
+    fx, fy = x - xi, y - yi
+    fx, fy = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy)
+    a, b = _RETICULA[yi % 64, xi % 64], _RETICULA[yi % 64, (xi + 1) % 64]
+    c, d = _RETICULA[(yi + 1) % 64, xi % 64], _RETICULA[(yi + 1) % 64, (xi + 1) % 64]
+    return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy
+
+
+def _dentro(d):
+    """Borda dura com 1 px de antialias (d = distância para dentro, em px da grade)."""
+    return np.clip(d + 0.5, 0.0, 1.0)
+
+
+def _estrela(dx, dy, espinhos, gira, fino, raio):
+    """Distância para dentro da estrela (px da grade; positiva dentro): o corpo redondo mais
+    espinhos de lados retos e desiguais, cada um um triângulo da base até a ponta."""
+    d = raio * MIOLO - np.hypot(dx, dy)
+    for a, comp, larg in espinhos:
+        ux, uy = math.cos(a + gira), -math.sin(a + gira)
+        ao_longo = dx * ux + dy * uy
+        de_lado = np.abs(-dx * uy + dy * ux)
+        ponta = comp * raio
+        meia = raio * MIOLO * math.sin(min(1.2, larg * fino)) * 2.1
+        tri = (meia * (1 - ao_longo / ponta) - de_lado) / math.hypot(1.0, meia / ponta)
+        d = np.maximum(d, np.where(ao_longo >= 0, tri, -1e9))
+    return d
+
+
+def _cacos(dx, dy, espinhos, raio, de, ate, fino):
+    """Distância para dentro dos cacos: de cada espinho sobra um losango fino, do trecho
+    {@code de} ao {@code ate} do comprimento dele (o ar se desfazendo em lascas)."""
+    d = np.full_like(dx, -1e9)
+    for a, comp, larg in espinhos:
+        ux, uy = math.cos(a), -math.sin(a)
+        ao_longo = dx * ux + dy * uy
+        de_lado = np.abs(-dx * uy + dy * ux)
+        p0, p1 = de * comp * raio, ate * comp * raio
+        meia = raio * MIOLO * math.sin(min(1.2, larg)) * 2.1 * fino
+        quebra = p0 + (p1 - p0) * 0.28                       # o ponto mais largo, perto da base
+        sobe = (ao_longo - p0) / max(1.0, quebra - p0)
+        desce = (p1 - ao_longo) / max(1.0, p1 - quebra)
+        d = np.maximum(d, meia * np.minimum(sobe, desce) - de_lado)
+    return d
+
+
+def _pinta(rgb, alfa, cor, cobertura):
+    """Tinta chapada por cima (alfa reto, composição "over")."""
+    cor = np.asarray(cor, np.float32)
+    fora = alfa * (1 - cobertura)
+    novo = cobertura + fora
+    rgb[:] = (cor * cobertura[..., None] + rgb * fora[..., None]) / np.maximum(novo, 1e-6)[..., None]
+    alfa[:] = novo
 
 
 def estouro(semente, super_=False):
-    rnd = random.Random(semente + 5)
-    raj = _rajadas(semente, 22 if super_ else 16)
-    R = LADO * SS * 0.48
-    cx, cy = LADO * SS * 0.44, LADO * SS / 2    # o centro um pouco para trás: as rajadas da frente cabem
-    # (rajadas: começo, fim, largura, alfa | clarão: raio, alfa | anel: raio, espessura, alfa)
+    espinhos = ESPINHOS + (ESPINHOS_SUPER if super_ else [])
+    R = N * 0.40                                # raio: a estrela do contato fica com ~256 px da folha de
+                                                # ponta a ponta (128 px do mundo no forte), como na review
+    cx, cy = N * 0.40, N / 2.0                  # o centro um pouco para trás: os espinhos da frente cabem
+    dx, dy = XX - cx, YY - cy
+    r = np.hypot(dx, dy)
+    fio = SS * 1.7                               # o fio de nanquim, ~1,7 px da folha
+    claro = SS * 2.2                             # a borda fria que sobra em volta do branco
+    # Os seis desenhos: a estrela abre num quadro, fica (com o miolo de nanquim), esvazia pelo
+    # meio e se desfaz em cacos; o anel de pressão abre por trás.
+    # (estrela: tamanho, miolo de nanquim, buraco | cacos: de, até, largura | anel: raio, espessura, falhas)
     roteiro = [
-        (0.04, 0.55, 0.20, 1.00, 0.24, 1.00, 0.00, 0, 0),
-        (0.08, 1.00, 0.13, 0.95, 0.15, 1.00, 0.00, 0, 0),
-        (0.26, 1.05, 0.085, 0.80, 0.08, 0.80, 0.50, 0.040, 0.75),
-        (0.58, 1.08, 0.055, 0.55, 0.00, 0.00, 0.66, 0.028, 0.50),
-        (0.82, 1.10, 0.035, 0.32, 0.00, 0.00, 0.78, 0.016, 0.28),
-        (0.96, 1.12, 0.022, 0.16, 0.00, 0.00, 0.00, 0, 0),
+        ((0.62, 0.60, 0.00), None, None),
+        ((1.00, 0.52, 0.00), None, None),
+        ((1.06, 0.00, 0.46), None, (0.56, 0.050, 0.30)),
+        (None, (0.50, 1.07, 0.44), (0.72, 0.034, 0.40)),
+        (None, (0.74, 1.12, 0.30), (0.88, 0.020, 0.52)),
+        (None, (0.95, 1.16, 0.20), None),
     ]
     quadros = []
-    for r0, r1, larg, ar, rc, ac, ra, ea, aa in roteiro:
-        miolo, borda = _camada(), _camada()
-        dm, db = ImageDraw.Draw(miolo), ImageDraw.Draw(borda)
-        for a, c, w in raj:
-            fim = R * (r0 + (r1 - r0) * c)
-            ini = R * r0
-            _rajada(db, cx, cy, a, ini, fim, larg * w * 1.6, ar)
-            _rajada(dm, cx, cy, a, ini, ini + (fim - ini) * 0.8, larg * w * 0.7, ar)
-        if rc > 0:
-            r = R * rc
-            # Compressão: achatada no eixo do golpe (o ar é empurrado de lado).
-            db.ellipse([cx - r * 0.75, cy - r * 1.25, cx + r * 0.75, cy + r * 1.25], fill=int(255 * ac))
-            dm.ellipse([cx - r * 0.45, cy - r * 0.85, cx + r * 0.45, cy + r * 0.85], fill=int(255 * ac))
-        if ra > 0:
-            aneis = [(ra, ea, aa)] + ([(ra * 0.7, ea * 0.7, aa * 0.8)] if super_ else [])
-            for rr, ee, a2 in aneis:
-                r = R * rr
-                # O anel em pé (a onda de choque vista de lado), mais aberto do lado da vítima.
-                caixa = [cx - r * 0.42, cy - r, cx + r * 0.55, cy + r]
-                db.ellipse(caixa, outline=int(255 * a2), width=max(1, int(R * ee * 1.8)))
-                dm.ellipse(caixa, outline=int(255 * a2), width=max(1, int(R * ee * 0.8)))
-        # Ar é macio: a borda borrada, o miolo quase nítido.
-        borda = borda.filter(ImageFilter.GaussianBlur(SS * 2.2))
-        miolo = miolo.filter(ImageFilter.GaussianBlur(SS * 0.8))
-        b = np.asarray(borda, dtype=np.float32) / 255
-        m = np.asarray(miolo, dtype=np.float32) / 255
-        alfa = np.clip(b * 0.75 + m, 0, 1)
-        t = np.clip(m / np.maximum(alfa, 1e-6), 0, 1)[..., None]
-        cor = np.array(LILAS, np.float32) * (1 - t) + np.array(BRANCO, np.float32) * t
-        rgba = np.dstack([cor, alfa[..., None] * 255]).astype(np.uint8)
-        im = Image.fromarray(rgba, 'RGBA').resize((LADO, LADO), Image.LANCZOS)
-        quadros.append(im)
+    for i, (estrela, cacos, anel) in enumerate(roteiro):
+        rgb = np.zeros((N, N, 3), np.float32)
+        alfa = np.zeros((N, N), np.float32)
+        if anel:
+            # O anel em pé (a onda de choque vista de lado), mais aberto do lado da vítima e
+            # quebrado em pedaços; por baixo da estrela.
+            ra, ea, falha = anel
+            for k, (rr, ee) in enumerate([(ra, ea)] + ([(ra * 0.72, ea * 0.8)] if super_ else [])):
+                ex = np.where(dx > 0, 0.56, 0.42)
+                er = np.hypot(dx / ex, dy)
+                n = _ruido(np.arctan2(dy, dx / ex) * 2.4 + 7.0 + k * 3.1 + semente, np.full_like(er, i * 1.7))
+                esp = R * ee * np.clip((n - falha) * 3.0, 0, 1.3)
+                d = esp - np.abs(er - R * rr)
+                vivo = (n > falha + 0.04)
+                _pinta(rgb, alfa, NANQUIM, _dentro(d + fio * 0.7) * vivo * 0.85)
+                _pinta(rgb, alfa, LILAS, _dentro(d) * vivo)
+                _pinta(rgb, alfa, BRANCO, _dentro(d - R * ee * 0.42) * vivo)
+        if estrela:
+            tam, miolo, buraco = estrela
+            fora = _estrela(dx, dy, espinhos, 0.0, 1.0, R * tam)
+            # O buraco do meio também é uma estrela (girada): a estrela fica vazada.
+            oco = -_estrela(dx, dy, ESPINHOS, 0.36, 1.0, R * tam * buraco) if buraco > 0 else np.full_like(r, 1e9)
+        else:
+            de, ate, larg = cacos
+            fora, oco, miolo = _cacos(dx, dy, espinhos, R, de, ate, larg), np.full_like(r, 1e9), 0
+        _pinta(rgb, alfa, NANQUIM, _dentro(fora + fio) * _dentro(oco + fio) * 0.9)
+        _pinta(rgb, alfa, LILAS, _dentro(fora) * _dentro(oco))
+        # O branco fica a um fio da borda: a borda fria aparece como contorno, não como degradê.
+        _pinta(rgb, alfa, BRANCO, _dentro(fora - claro) * _dentro(oco - claro))
+        if miolo > 0:
+            # O miolo de nanquim do contato: uma estrela menor, girada, com o ponto branco.
+            _pinta(rgb, alfa, NANQUIM, _dentro(_estrela(dx, dy, ESPINHOS, 0.36, 0.85, R * tam * miolo)))
+            _pinta(rgb, alfa, BRANCO, _dentro(_estrela(dx, dy, ESPINHOS, 0.05, 0.7, R * tam * miolo * 0.40)))
+        # Reduz com o alfa pré-multiplicado (sem franja escura na borda).
+        pre = np.dstack([rgb * alfa[..., None], alfa[..., None] * 255.0])
+        pre = pre.reshape(LADO, SS, LADO, SS, 4).mean(axis=(1, 3))
+        a = pre[..., 3:4]
+        cor = np.where(a > 0.5, pre[..., :3] / np.maximum(a / 255.0, 1e-6), 0)
+        quadros.append(Image.fromarray(np.dstack([cor, a]).clip(0, 255).astype(np.uint8), 'RGBA'))
     return quadros
 
 
@@ -146,12 +203,15 @@ def todos():
 
 
 def previa(caminho):
+    """Os dois estouros, em fundo escuro e em fundo claro (o fio de nanquim tem de segurar nos dois)."""
     fs = todos()
-    cel = LADO // 2 + 8
-    out = Image.new('RGBA', (cel * 6 + 8, cel * len(fs) + 8), (34, 28, 52, 255))
-    for j, qs in enumerate(fs.values()):
+    cel = LADO + 8
+    out = Image.new('RGBA', (cel * 6 + 8, cel * len(fs) * 2 + 8), (34, 28, 52, 255))
+    for j, qs in enumerate(list(fs.values()) * 2):
+        if j >= len(fs):
+            out.paste((232, 226, 214, 255), (0, 4 + j * cel, out.width, 4 + (j + 1) * cel))
         for i, q in enumerate(qs):
-            out.alpha_composite(q.resize((LADO // 2, LADO // 2), Image.LANCZOS), (8 + i * cel, 8 + j * cel))
+            out.alpha_composite(q, (8 + i * cel, 8 + j * cel))
     out.convert('RGB').save(caminho)
 
 

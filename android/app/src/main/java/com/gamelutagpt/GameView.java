@@ -5514,13 +5514,14 @@ public class GameView extends SurfaceView
     /**
      * O efeito de golpe (docs/revisao-base/direcao.md, regras E1–E7). Golpe é pancada: ninguém solta
      * poder, então não há faísca nem fogo, só ar deslocado. A família toda é de estouros de ar
-     * brancos e translúcidos:
+     * brancos:
      * - defesa: os três estouros de ar tirados dos vídeos de defesa (defesa, defesa_2, defesa_3), um
      *   de cada vez, e o defesa_poder quando o defendido é um poder (projétil ou especial);
-     * - acerto: o impacto de ar desenhado no mesmo estilo (tools/sprites/impacto_ar.py), em
-     *   1 : 1,3 : 1,6 por força (o forte com 128 px, do tamanho do punho e do peito), um pouco para
-     *   dentro de quem apanha (as rajadas vão mais longe para o lado dela);
-     * - Super e Ultra: o mesmo impacto com mais rajadas e um anel a mais, 1,25×.
+     * - acerto: o impacto de ar desenhado em código no traço dos lutadores (borda dura, tons
+     *   chapados e miolo de nanquim no contato; tools/sprites/impacto_ar.py), em 1 : 1,3 : 1,6 por
+     *   força (a estrela do forte com 128 px, do tamanho do punho e do peito), um pouco para dentro
+     *   de quem apanha (os espinhos vão mais longe para o lado dela);
+     * - Super e Ultra: o mesmo impacto com mais espinhos e um anel a mais, 1,25×.
      * Os estouros da defesa vinham do tamanho do vídeo (288 px, mais que o lutador) e ficam a 60–80%.
      * O efeito dura a pausa do golpe e mais alguns quadros, e some antes de quem apanhou poder agir;
      * cada atacante tem um só na tela (o novo tira o anterior). O contra-golpe não muda o efeito: é
