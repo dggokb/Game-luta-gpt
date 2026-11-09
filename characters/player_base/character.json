@@ -4411,7 +4411,15 @@
             199
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        3,
+        6,
+        13,
+        14,
+        15
+      ]
     },
     "MEDIUM_KICK": {
       "atlas": "player_base_medium_kick",
@@ -4904,7 +4912,17 @@
             105
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        3,
+        5,
+        7,
+        8,
+        12,
+        15,
+        17
+      ]
     },
     "HEAVY_STRAIGHT": {
       "atlas": "player_base_heavy_straight",
@@ -5741,7 +5759,18 @@
             196
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        4,
+        5,
+        8,
+        12,
+        19,
+        25,
+        29
+      ]
     },
     "DEFENSE_STAND": {
       "atlas": "player_base_defense_stand",
@@ -6204,14 +6233,14 @@
       ],
       "loop": false,
       "durationsMs": [
+        90,
+        25,
+        25,
+        40,
         30,
-        35,
+        30,
+        45,
         40,
-        40,
-        45,
-        45,
-        45,
-        45,
         60
       ],
       "silhueta": {
@@ -6398,7 +6427,109 @@
           ]
         },
         "golpe": {}
-      }
+      },
+      "posesChave": [
+        0,
+        3,
+        6,
+        8
+      ]
+    },
+    "HIT_HIGH": {
+      "atlas": "player_base_hit_high",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        25,
+        25,
+        40,
+        35,
+        30,
+        40,
+        40,
+        60
+      ],
+      "posesChave": [
+        0,
+        4,
+        6,
+        8
+      ]
+    },
+    "HIT_BODY": {
+      "atlas": "player_base_hit_body",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        25,
+        25,
+        40,
+        35,
+        30,
+        40,
+        40,
+        60
+      ],
+      "posesChave": [
+        0,
+        4,
+        6,
+        8
+      ]
+    },
+    "HIT_HEAVY": {
+      "atlas": "player_base_hit_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        25,
+        25,
+        40,
+        35,
+        30,
+        40,
+        40,
+        60
+      ],
+      "posesChave": [
+        0,
+        4,
+        6,
+        8
+      ]
     },
     "HIT_CROUCH": {
       "atlas": "player_base_hit_crouch",
@@ -6415,15 +6546,15 @@
       ],
       "loop": false,
       "durationsMs": [
+        90,
+        25,
+        25,
         40,
+        30,
+        30,
+        45,
         40,
-        40,
-        40,
-        40,
-        40,
-        40,
-        40,
-        40
+        60
       ],
       "silhueta": {
         "corpo": {
@@ -6609,7 +6740,13 @@
           ]
         },
         "golpe": {}
-      }
+      },
+      "posesChave": [
+        0,
+        3,
+        6,
+        8
+      ]
     },
     "HIT_AIR": {
       "atlas": "player_base_hit_air",
@@ -7339,7 +7476,16 @@
             184
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        4,
+        7,
+        9,
+        12,
+        15,
+        19
+      ]
     },
     "CROUCH_MEDIUM": {
       "atlas": "player_base_crouch_medium",
@@ -8066,7 +8212,17 @@
             153
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        4,
+        9,
+        12,
+        16,
+        20,
+        23,
+        25
+      ]
     },
     "CROUCH_HEAVY": {
       "atlas": "player_base_crouch_heavy",
@@ -8611,7 +8767,17 @@
             152
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        3,
+        5,
+        12,
+        14,
+        17,
+        19
+      ]
     },
     "JUMP_LIGHT": {
       "atlas": "player_base_jump_light",
@@ -9178,7 +9344,17 @@
             75
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        5,
+        7,
+        8,
+        11,
+        14,
+        19
+      ]
     },
     "JUMP_MEDIUM": {
       "atlas": "player_base_jump_medium",
@@ -9785,7 +9961,17 @@
             156
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        4,
+        7,
+        11,
+        17,
+        19,
+        20,
+        21
+      ]
     },
     "JUMP_HEAVY": {
       "atlas": "player_base_jump_heavy",
@@ -10422,7 +10608,18 @@
             35
           ]
         }
-      }
+      },
+      "posesChave": [
+        0,
+        2,
+        4,
+        7,
+        10,
+        13,
+        18,
+        22,
+        25
+      ]
     },
     "DEFENSE_AIR": {
       "atlas": "player_base_defense_air",
@@ -17243,7 +17440,7 @@
       "recoveryFrames": 14,
       "hitstunFrames": 20,
       "blockstunFrames": 11,
-      "hitstopFrames": 7,
+      "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
           20,

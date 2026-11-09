@@ -271,12 +271,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "adb26196d7abad6497866fca73aeeb284de13d3f982306219b42eda0d989c8eb",
-      "config": "2639b05da3f0ec9f11b42f37ffab1d286f53075abb095b0c7c4283c2e23c7aee",
+      "source": "af219f7956b7b176f7171c441080e44f3fb9c530a7c3dfb6c61256fdf0f12bad",
+      "config": "dde56a8143966c1b9eb7b0780c0637c477aec84e4585aa8b327cdcf5f5591c39",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_dash_video_normalized.png": "adb26196d7abad6497866fca73aeeb284de13d3f982306219b42eda0d989c8eb"
+      "art/sprites/source/player_base_dash_video_normalized.png": "af219f7956b7b176f7171c441080e44f3fb9c530a7c3dfb6c61256fdf0f12bad"
     }
   }
 }

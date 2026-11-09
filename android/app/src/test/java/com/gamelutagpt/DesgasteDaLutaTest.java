@@ -40,8 +40,8 @@ public class DesgasteDaLutaTest {
     public void aCleanFighterHasNoFilter() {
         DesgasteDaLuta d = new DesgasteDaLuta();
         assertNull(d.tinta(lutador(1f)));
-        assertNull(d.sujeira(lutador(1f)));
+        assertNull(d.poeiraNosPes(lutador(1f)));
         assertNotNull(d.tinta(lutador(0.2f)));
-        assertNotNull(d.sujeira(lutador(0.2f)));
+        assertNotNull(d.poeiraNosPes(lutador(0.2f)));
     }
 }

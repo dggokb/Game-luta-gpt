@@ -26,7 +26,7 @@ public class EfeitosVideoTest {
     @Test public void efeitoQueNaoExisteNaoToca() {
         EfeitosVideo e = new EfeitosVideo(null);
         e.carregar();
-        assertFalse(e.tocar("impacto_forte", 0f, 0f, 1f, false));
+        assertFalse(e.tocar("impacto_ar", 0f, 0f, 1f, false));
         assertEquals(0, e.tocando());
     }
 

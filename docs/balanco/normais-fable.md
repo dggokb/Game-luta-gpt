@@ -67,16 +67,16 @@ quadro não mudava a função.
 | **Ryūga (p01)** | Fundamento calmo: jab honesto de 5 quadros, o soco de energia que cutuca de longe e o 2H que tira do ar de verdade | 2L: alcance até 150; 2H: anti-aéreo |
 | **Yin-lu (p02)** | Garça: palma rápida e curta de perto, rasteira ligeira e o chute alto que tira do ar | L: alcance até 135; M: alcance até 170; 2H: anti-aéreo |
 | **Kōga (p03)** | Pressão: jab que deixa na vantagem, o M que anda para dentro e a rasteira longa e arriscada | L: alcance até 125; 2L: alcance até 150; M: avança |
-| **p04** | Boxeador de rua: o único jab de 3 quadros, socos curtos e seguros, gancho pesado e o uppercut anti-aéreo; os chutes são lentos | L, 2L, M e H com alcance curto (135, 140, 165, 170); H: pausa 14; 2H: anti-aéreo |
+| **p04** | Boxeador de rua: o único jab de 3 quadros, socos curtos e seguros, gancho pesado e o uppercut anti-aéreo; os chutes são lentos | L, 2L, M e H com alcance curto (135, 140, 165, 170); H: pausa 13; 2H: anti-aéreo |
 | **p05** | Ninja: tudo sai rápido e curto; a estocada longa do M e a rasteira ligeira abrem a guarda, mas errar custa caro | 2L: alcance até 135 |
 | **p06** | Sombra: fraca de perto (jab lento), a estocada longa para cutucar e o H que empurra para longe, onde ela manda | H: não joga na parede, empurra |
-| **p07** | Cavalheiro pesado: lento, mas cada golpe pesa e o H defendido ainda deixa ele na vantagem | M: pausa 12; H: pausa 15 |
+| **p07** | Cavalheiro pesado: lento, mas cada golpe pesa e o H defendido ainda deixa ele na vantagem | M: pausa 11; H: pausa 14 |
 | **p08** | Chicote: de perto só tapa e chute lentos; o H cruza a tela, mas demora e não rende combo, só espaço | H: não joga na parede, empurra |
 | **p09** | Agarrador: jab lento que deixa na vantagem (para agarrar) e a ombrada que aguenta um golpe e passa por cima | L, 2L e M com alcance curto (140, 170, 185); H: armadura de 1 golpe |
 | **p10** | Acrobata: jab curto na vantagem, chute lateral longo para cutucar, H rápido e a bananeira que tira do ar | L: alcance até 120; 2H: anti-aéreo |
 | **p11** | Cirurgião: o bisturi alcança longe mas sai devagar; o chute empurra para longe e abre espaço para o veneno | L: alcance até 160; 2L: alcance até 165; H: não joga na parede, empurra |
-| **Necro (p12)** | Fera: a garra longa é lenta, o M dá o bote para dentro e a mordida, curta e rápida, é o golpe que dói | L: alcance até 185; M: avança; H: pausa 14 |
-| **Krüger (p13)** | Colosso: o mais lento do jogo; cada golpe pesa e quem aguenta os golpes fracos é a couraça, não a vantagem na defesa | 2L: alcance até 200; H: pausa 15 |
+| **Necro (p12)** | Fera: a garra longa é lenta, o M dá o bote para dentro e a mordida, curta e rápida, é o golpe que dói | L: alcance até 185; M: avança; H: pausa 13 |
+| **Krüger (p13)** | Colosso: o mais lento do jogo; cada golpe pesa e quem aguenta os golpes fracos é a couraça, não a vantagem na defesa | 2L: alcance até 200; H: pausa 14 |
 | **p14** | Malandro dos chutes: anda bem, cutuca de média distância e muda o ritmo; nenhum golpe é o melhor em nada | L: alcance até 150 |
 | **Natisuko (p15)** | Base firme: golpes retos, curtos e seguros na defesa, o chute alto que alcança longe e o chute vertical que tira do ar | 2H: anti-aéreo |
 | **Bonnie (p16)** | Palhaça: rápida e solta; o H se joga para a frente e pega quem recua | H: avança |
@@ -104,7 +104,7 @@ depois  0 1 2 3 4 5 6 7 8 10 | 10 11 11 11 11 | 12 13 13 14 ...
 - O quadro do impacto entra junto com o primeiro quadro ativo (como já era).
 - O desenho mais esticado dos que o vídeo mostrava na janela ativa fica até o fim dela (no
   máximo 5 quadros). Às vezes é o seguinte ao do impacto: o braço ainda está indo.
-- No acerto, a pausa do golpe (8/10/12 quadros) continua somando por cima.
+- No acerto, a pausa do golpe continua somando por cima (8/11/16 quadros por força, da `game-luta-sprite-review`; a "pausa" própria da tabela acima troca os 10 ou 12 que o golpe traz).
 - Como o desenho é por onde o golpe acerta (`CombatEngine.golpeNoDesenho`), o alcance agora vale a
   janela ativa inteira. O alcance real medido pelo `GeraAlcanceCpu` só mudou onde há limite ou
   avanço de propósito.
@@ -157,6 +157,24 @@ vantagem na defesa nem pune (`chao.md`); para gente a diferença deve ser maior.
 - **O balanço não foi o alvo e continua torto:** Krüger (79%) e Ryūga (76%) no topo, Natisuko
   (21%) e p16 (26%) no fundo. A Natisuko e o p14 subiram (os golpes dela eram de 16–17 quadros);
   o p10 caiu de 62% para 48%.
+
+## Junto com a `game-luta-sprite-review`
+
+A `game-luta-sprite-review` saiu do mesmo commit e ataca o mesmo problema pelo outro lado (o
+impacto, os efeitos, a câmera, o HUD e as poses do Ryūga; `docs/revisao-base/`). Ela foi trazida
+inteira para cá. As duas se somam:
+
+| Da review | Como encaixa com os normais |
+|---|---|
+| Luta a 100% (`RITMO_BASE = 1`) | o jab deixou de ser de 3 quadros ao mesmo tempo em que o jogo deixou de rodar a 92% |
+| Pausa no acerto 8/11/16 por força; defesa sem o extra | a "pausa" própria dos pesados (p04, p07, Necro, Krüger) baixou 1 quadro para não passar de 18 no total |
+| Poses-chave do Ryūga (`posesChave`) | ficam por cima do tempo novo do golpe: o impacto entra no primeiro quadro ativo e a pose segura a partir dele |
+| Sem soco de câmera, tranco, escurecimento e flash branco nos golpes comuns | nada a mudar nos normais |
+| Reações em pé por golpe do Ryūga, efeitos de ar, avisos pequenos, sons CC0, cenário menos saturado no OpenGL | independentes dos normais |
+
+Depois da junção: `build_characters.py` passa com 689 folhas, os testes do motor passam (incluindo
+os novos `ReacaoDoGolpeTest`, `ImpactFeelTest` e `DesgasteDaLutaTest`), e as 175 rotas de corrente
+e o L, M, H dos 16 continuam emendando.
 
 ## Onde mexer
 

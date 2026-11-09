@@ -233,12 +233,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "6264dc540ba8fae6b9f7d68e23a048fe25b5522b68cde58f69b78bcf1c70efe6",
-      "config": "951c4c0f827414203afdc1d3ffe43fb51dcdb10a31f44d11559f6db01bdd5ffd",
+      "source": "d58e7618bf323eb6655978efdf69a18b1c67e3aa3af5d45b9ece4bd2ddd7b100",
+      "config": "85ca5213a0797e49bbc4793c77c4ae313fbc40a0b4112d714fc19c39ec0be53a",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_jump_video_normalized.png": "6264dc540ba8fae6b9f7d68e23a048fe25b5522b68cde58f69b78bcf1c70efe6"
+      "art/sprites/source/player_base_jump_video_normalized.png": "d58e7618bf323eb6655978efdf69a18b1c67e3aa3af5d45b9ece4bd2ddd7b100"
     }
   }
 }

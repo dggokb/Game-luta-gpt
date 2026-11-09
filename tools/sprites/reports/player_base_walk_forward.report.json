@@ -917,12 +917,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "793e7991f3e7ec50898acc38ad3b8c5cfbd2a981b73cc4d107c1e43d54d64968",
-      "config": "16e5054239aeb64b9fdb3542515c800fe2076b09c5a368961148b7cb8570dfed",
+      "source": "52268dd457274ce11801e81753728a00087377d7969be4c32e47547059f8fc39",
+      "config": "baedf30bb108761156ac72f228c1375cc806d754473c5a2d84b5d7ebcc11d744",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_walk_forward_video_normalized.png": "793e7991f3e7ec50898acc38ad3b8c5cfbd2a981b73cc4d107c1e43d54d64968"
+      "art/sprites/source/player_base_walk_forward_video_normalized.png": "52268dd457274ce11801e81753728a00087377d7969be4c32e47547059f8fc39"
     }
   }
 }

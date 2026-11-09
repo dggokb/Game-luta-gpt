@@ -423,12 +423,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c30223cf26686ab519ee0e1748d5a34e950dfd17274635c6b0d63909928f8024",
-      "config": "472fa6678d21516689df2a25687c1e01d4a21081e7cded0b14653658a01883d9",
+      "source": "e638da4c12080ca9337199c89ffc994371f61310ac64222e24017c7c09bce9a8",
+      "config": "ef174dc26cfff2d8eee6287378d212f5e751ad6da654aa718ad0a34c8e4cb375",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_crouch_heavy_video_normalized.png": "c30223cf26686ab519ee0e1748d5a34e950dfd17274635c6b0d63909928f8024"
+      "art/sprites/source/player_base_crouch_heavy_video_normalized.png": "e638da4c12080ca9337199c89ffc994371f61310ac64222e24017c7c09bce9a8"
     }
   }
 }

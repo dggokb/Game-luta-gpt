@@ -290,12 +290,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "734d0a4f783990f64604e6fb7c7905a7ddbf6e254cb4ea4467315cbc5e47f3cc",
-      "config": "81d1951ef4fdc0348a658ea7880a4738ee2bb143b9f0d074ce24002859c5e926",
+      "source": "4c237b21dfe756e0587cc7da1ceefced1b40b8840fb1cea008f6c06c93a42738",
+      "config": "b4e9932512d8524d280255d041ed1da5db2308556078e6193edb399ecb7d7463",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_defense_stand_video_normalized.png": "734d0a4f783990f64604e6fb7c7905a7ddbf6e254cb4ea4467315cbc5e47f3cc"
+      "art/sprites/source/player_base_defense_stand_video_normalized.png": "4c237b21dfe756e0587cc7da1ceefced1b40b8840fb1cea008f6c06c93a42738"
     }
   }
 }

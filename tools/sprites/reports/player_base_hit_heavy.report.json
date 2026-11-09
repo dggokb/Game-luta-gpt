@@ -1,0 +1,225 @@
+{
+  "id": "player_base_hit_heavy",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_hit_heavy_video_normalized.png",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Reacao em pe da mecanica de ataque (docs/revisao-base/mecanica-ataque.md): comeca na pose de dor (o 1o quadro da pausa), segura e volta a guarda; pe de tras no lugar da guarda (--fixar pe), o empurrao vem do jogo.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 576,
+    "rootX": 400,
+    "rootY": 540,
+    "columns": 5,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        44,
+        79,
+        402,
+        543
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 68209
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        20,
+        90,
+        374,
+        542
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 67052
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        15,
+        93,
+        370,
+        542
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 67155
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        29,
+        89,
+        369,
+        542
+      ],
+      "minimumMargin": 29,
+      "opaquePixels": 66151
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        127,
+        69,
+        407,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 61526
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        175,
+        53,
+        442,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 64054
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        237,
+        76,
+        513,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 61961
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        238,
+        91,
+        541,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62335
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        238,
+        91,
+        541,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62386
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 545,
+    "frameHeight": 510,
+    "rootX": 395,
+    "rootY": 497,
+    "columns": 5,
+    "frameCount": 9,
+    "cropOffset": [
+      5,
+      43
+    ],
+    "sheetWidth": 1604,
+    "sheetHeight": 972,
+    "frames": [
+      [
+        872,
+        0,
+        372,
+        476,
+        34,
+        30
+      ],
+      [
+        0,
+        508,
+        368,
+        464,
+        8,
+        41
+      ],
+      [
+        1012,
+        508,
+        368,
+        460,
+        4,
+        45
+      ],
+      [
+        1248,
+        0,
+        356,
+        468,
+        17,
+        40
+      ],
+      [
+        284,
+        0,
+        292,
+        488,
+        117,
+        20
+      ],
+      [
+        0,
+        0,
+        280,
+        504,
+        164,
+        4
+      ],
+      [
+        580,
+        0,
+        288,
+        480,
+        226,
+        27
+      ],
+      [
+        372,
+        508,
+        316,
+        464,
+        227,
+        42
+      ],
+      [
+        692,
+        508,
+        316,
+        464,
+        228,
+        42
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 17694720,
+      "grid": 11118000,
+      "packed": 6236352
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "a60dc47bb4536d2136566c8b7c992436310ecd692867be149a8964e16a53b809",
+      "config": "f63f6abdd1c1a1b24786769aafd1b029fd595d45c32e7625eadc1b4f59dd28d9",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_hit_heavy_video_normalized.png": "a60dc47bb4536d2136566c8b7c992436310ecd692867be149a8964e16a53b809"
+    }
+  }
+}

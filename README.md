@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-fable` (saiu da `game-luta-sprite-gpt` na 0.102). Versão `0.103-normais-fable` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-fable` (saiu da `game-luta-sprite-gpt` na 0.102 e traz a `game-luta-sprite-review` inteira: [docs/revisao-base/](docs/revisao-base/README.md)). Versão `0.103-normais-fable` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Normais com identidade
 
