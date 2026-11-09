@@ -45,6 +45,17 @@ def read_frames(path):
     return frames, cap.get(cv2.CAP_PROP_FPS)
 
 
+def repetido(a, b, hi=64 * 12, lo=64 * 5, frac=0.33):
+    """O mesmo teste do filtro mpdecimate do ffmpeg: blocos de 8x8, nenhum muda mais que hi e
+    menos de frac deles muda mais que lo. O vídeo de IA repete muito quadro (nas reações do
+    Ryūga só 49 a 82 dos 124 são desenhos diferentes), e dois quadros iguais na folha são uma
+    espera que ninguém pediu."""
+    ga, gb = (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY).astype(np.int32) for f in (a, b))
+    h, w = (ga.shape[0] // 8) * 8, (ga.shape[1] // 8) * 8
+    d = np.abs(ga[:h, :w] - gb[:h, :w]).reshape(h // 8, 8, w // 8, 8).sum((1, 3))
+    return d.max() <= hi and (d > lo).mean() < frac
+
+
 def best_loop(frames, lo, hi, min_len):
     """Compara os quadros recortados em volta do tronco, para funcionar mesmo se o
     personagem desliza no vídeo. Só os quadros de lo a hi são recortados."""
@@ -558,6 +569,10 @@ def main(argv=None):
         start, end = args.inicio or 0, args.fim or len(frames)
     picked = ([int(v) for v in args.quadros.split(",")] if args.quadros
               else list(range(start, end, args.passo)))
+    for a, b in zip(picked, picked[1:]):
+        if repetido(frames[a], frames[b]):
+            print(f"aviso: os quadros {a} e {b} são o mesmo desenho (o vídeo repete quadro); "
+                  "para segurar a pose use durationsMs, não o quadro repetido")
     cache = {}
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
