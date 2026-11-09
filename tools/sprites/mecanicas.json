@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho).",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais.",
   "base": {
     "frames": {
       "L": [
@@ -143,6 +143,28 @@
       "S4": 1000,
       "S": 850,
       "SUPER": 3200
+    },
+    "impacto": {
+      "segurar": 5
+    },
+    "corrente": {
+      "folga": 8,
+      "teto": 7,
+      "rotas": {
+        "L": [
+          "M",
+          "2M"
+        ],
+        "2L": [
+          "M",
+          "2M"
+        ],
+        "M": [
+          "H",
+          "2M",
+          "2H"
+        ]
+      }
     }
   },
   "combos": {
@@ -366,7 +388,65 @@
           "empurrao": 70
         }
       },
-      "estiloCpu": "onda"
+      "estiloCpu": "onda",
+      "papelNormais": "Fundamento calmo: jab honesto de 5 quadros, o soco de energia que cutuca de longe e o 2H que tira do ar de verdade.",
+      "andar": [
+        280,
+        210
+      ],
+      "framesGolpe": {
+        "L": [
+          5,
+          3,
+          7
+        ],
+        "2L": [
+          6,
+          3,
+          8
+        ],
+        "M": [
+          7,
+          5,
+          11
+        ],
+        "2H": [
+          8,
+          6,
+          18
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          0
+        ],
+        "2L": [
+          4,
+          -1
+        ],
+        "M": [
+          4,
+          -2
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "2L": {
+          "alcance": 150
+        },
+        "2H": {
+          "mecanica": {
+            "esquiva": {
+              "de": "aereo",
+              "janela": "antiaereo"
+            }
+          }
+        }
+      }
     },
     "p02": {
       "molde": "Rushdown / contra-golpe",
@@ -410,7 +490,86 @@
       "s1": {
         "visual": "PALMA"
       },
-      "estiloCpu": "contra"
+      "estiloCpu": "contra",
+      "papelNormais": "Garça: palma rápida e curta de perto, rasteira ligeira e o chute alto que tira do ar.",
+      "andar": [
+        310,
+        250
+      ],
+      "framesGolpe": {
+        "L": [
+          4,
+          3,
+          6
+        ],
+        "2L": [
+          5,
+          3,
+          7
+        ],
+        "M": [
+          7,
+          4,
+          10
+        ],
+        "2M": [
+          6,
+          4,
+          12
+        ],
+        "H": [
+          8,
+          4,
+          16
+        ],
+        "2H": [
+          8,
+          5,
+          18
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          1
+        ],
+        "2L": [
+          4,
+          0
+        ],
+        "M": [
+          4,
+          -1
+        ],
+        "2M": [
+          20,
+          -9
+        ],
+        "H": [
+          5,
+          -5
+        ],
+        "2H": [
+          25,
+          -11
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 135
+        },
+        "M": {
+          "alcance": 170
+        },
+        "2H": {
+          "mecanica": {
+            "esquiva": {
+              "de": "aereo",
+              "janela": "antiaereo"
+            }
+          }
+        }
+      }
     },
     "p03": {
       "molde": "Rushdown",
@@ -472,7 +631,82 @@
       "s1": {
         "visual": "ONDA_CURTA"
       },
-      "estiloCpu": "rekka"
+      "estiloCpu": "rekka",
+      "papelNormais": "Pressão: jab que deixa na vantagem, o M que anda para dentro e a rasteira longa e arriscada.",
+      "framesGolpe": {
+        "L": [
+          4,
+          3,
+          6
+        ],
+        "2L": [
+          5,
+          3,
+          8
+        ],
+        "M": [
+          6,
+          4,
+          9
+        ],
+        "2M": [
+          9,
+          4,
+          15
+        ],
+        "H": [
+          9,
+          5,
+          16
+        ],
+        "2H": [
+          10,
+          6,
+          20
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          2
+        ],
+        "2L": [
+          4,
+          -1
+        ],
+        "M": [
+          5,
+          0
+        ],
+        "2M": [
+          20,
+          -12
+        ],
+        "H": [
+          5,
+          -4
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 125
+        },
+        "2L": {
+          "alcance": 150
+        },
+        "M": {
+          "mecanica": {
+            "avanco": {
+              "velocidade": 200,
+              "janela": "ate_ativo"
+            }
+          }
+        }
+      }
     },
     "p04": {
       "molde": "Brawler",
@@ -538,7 +772,93 @@
       "s1": {
         "visual": "ESTOURO"
       },
-      "estiloCpu": "esquiva"
+      "estiloCpu": "esquiva",
+      "papelNormais": "Boxeador de rua: o único jab de 3 quadros do jogo, socos curtos e seguros, gancho pesado e o uppercut anti-aéreo; os chutes são lentos.",
+      "andar": [
+        310,
+        200
+      ],
+      "framesGolpe": {
+        "L": [
+          3,
+          3,
+          6
+        ],
+        "2L": [
+          5,
+          3,
+          7
+        ],
+        "M": [
+          6,
+          4,
+          10
+        ],
+        "2M": [
+          9,
+          4,
+          15
+        ],
+        "H": [
+          10,
+          5,
+          16
+        ],
+        "2H": [
+          8,
+          6,
+          20
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          1
+        ],
+        "2L": [
+          4,
+          0
+        ],
+        "M": [
+          4,
+          -1
+        ],
+        "2M": [
+          20,
+          -11
+        ],
+        "H": [
+          5,
+          -3
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 135
+        },
+        "2L": {
+          "alcance": 140
+        },
+        "M": {
+          "alcance": 165
+        },
+        "H": {
+          "alcance": 170,
+          "pausa": 14
+        },
+        "2H": {
+          "mecanica": {
+            "esquiva": {
+              "de": "aereo",
+              "janela": "antiaereo"
+            }
+          }
+        }
+      }
     },
     "p05": {
       "molde": "Mixup",
@@ -607,7 +927,71 @@
           }
         }
       },
-      "estiloCpu": "ninja"
+      "estiloCpu": "ninja",
+      "papelNormais": "Ninja: tudo sai rápido e curto; a estocada longa do M e a rasteira ligeira abrem a guarda, mas errar custa caro.",
+      "framesGolpe": {
+        "L": [
+          4,
+          3,
+          6
+        ],
+        "2L": [
+          5,
+          3,
+          6
+        ],
+        "M": [
+          7,
+          3,
+          11
+        ],
+        "2M": [
+          6,
+          3,
+          11
+        ],
+        "H": [
+          8,
+          4,
+          15
+        ],
+        "2H": [
+          9,
+          5,
+          17
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          0
+        ],
+        "2L": [
+          4,
+          0
+        ],
+        "M": [
+          3,
+          -4
+        ],
+        "2M": [
+          20,
+          -9
+        ],
+        "H": [
+          5,
+          -5
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "2L": {
+          "alcance": 135
+        }
+      }
     },
     "p06": {
       "molde": "Zoner / trapper",
@@ -674,6 +1058,74 @@
       },
       "super": {
         "clones": 2
+      },
+      "papelNormais": "Sombra: fraca de perto (jab lento), a estocada longa para cutucar e o H que não joga na parede: empurra para longe, onde ela manda.",
+      "framesGolpe": {
+        "L": [
+          6,
+          3,
+          8
+        ],
+        "2L": [
+          6,
+          3,
+          9
+        ],
+        "M": [
+          8,
+          4,
+          12
+        ],
+        "2M": [
+          10,
+          4,
+          16
+        ],
+        "H": [
+          12,
+          5,
+          20
+        ],
+        "2H": [
+          11,
+          6,
+          22
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          4,
+          -2
+        ],
+        "2L": [
+          4,
+          -2
+        ],
+        "M": [
+          3,
+          -3
+        ],
+        "2M": [
+          20,
+          -12
+        ],
+        "H": [
+          5,
+          -7
+        ],
+        "2H": [
+          25,
+          -13
+        ]
+      },
+      "normais": {
+        "H": {
+          "lancar": "none",
+          "recuo": [
+            70,
+            60
+          ]
+        }
       }
     },
     "p07": {
@@ -735,6 +1187,73 @@
           "baixo": true,
           "altura": 70
         }
+      },
+      "papelNormais": "Cavalheiro pesado: lento, mas cada golpe pesa e o H defendido ainda deixa ele na vantagem.",
+      "framesGolpe": {
+        "L": [
+          5,
+          4,
+          9
+        ],
+        "2L": [
+          6,
+          4,
+          9
+        ],
+        "M": [
+          9,
+          5,
+          13
+        ],
+        "2M": [
+          10,
+          5,
+          16
+        ],
+        "H": [
+          13,
+          6,
+          20
+        ],
+        "2H": [
+          11,
+          7,
+          22
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          -1
+        ],
+        "2L": [
+          4,
+          -1
+        ],
+        "M": [
+          5,
+          0
+        ],
+        "2M": [
+          20,
+          -10
+        ],
+        "H": [
+          6,
+          1
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "M": {
+          "pausa": 12
+        },
+        "H": {
+          "pausa": 15
+        }
       }
     },
     "p08": {
@@ -784,6 +1303,74 @@
       },
       "s1": {
         "visual": "CHICOTE"
+      },
+      "papelNormais": "Chicote: de perto só tapa e chute lentos; o H cruza a tela, mas demora e não rende combo, só espaço.",
+      "framesGolpe": {
+        "L": [
+          6,
+          3,
+          8
+        ],
+        "2L": [
+          6,
+          3,
+          9
+        ],
+        "M": [
+          8,
+          4,
+          13
+        ],
+        "2M": [
+          9,
+          4,
+          15
+        ],
+        "H": [
+          14,
+          5,
+          24
+        ],
+        "2H": [
+          12,
+          6,
+          22
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          4,
+          -2
+        ],
+        "2L": [
+          4,
+          -2
+        ],
+        "M": [
+          3,
+          -4
+        ],
+        "2M": [
+          20,
+          -11
+        ],
+        "H": [
+          2,
+          -8
+        ],
+        "2H": [
+          25,
+          -13
+        ]
+      },
+      "normais": {
+        "H": {
+          "lancar": "none",
+          "recuo": [
+            70,
+            70
+          ]
+        }
       }
     },
     "p09": {
@@ -854,6 +1441,87 @@
         "rente": 58,
         "acertos": 3,
         "intervalo": 10
+      },
+      "papelNormais": "Agarrador: jab lento que deixa na vantagem (para agarrar) e a ombrada com armadura, que aguenta um golpe e passa por cima.",
+      "framesGolpe": {
+        "L": [
+          6,
+          4,
+          9
+        ],
+        "2L": [
+          7,
+          4,
+          10
+        ],
+        "M": [
+          9,
+          5,
+          14
+        ],
+        "2M": [
+          10,
+          5,
+          17
+        ],
+        "H": [
+          12,
+          6,
+          20
+        ],
+        "2H": [
+          13,
+          8,
+          23
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          2
+        ],
+        "2L": [
+          4,
+          0
+        ],
+        "M": [
+          5,
+          -2
+        ],
+        "2M": [
+          20,
+          -10
+        ],
+        "H": [
+          5,
+          -4
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 140
+        },
+        "2L": {
+          "alcance": 170
+        },
+        "M": {
+          "alcance": 185
+        },
+        "H": {
+          "mecanica": {
+            "armadura": {
+              "golpes": 1,
+              "janela": "ate_ativo"
+            }
+          }
+        }
+      },
+      "danoGolpe": {
+        "2M": 448
       }
     },
     "p10": {
@@ -916,7 +1584,79 @@
           "efeito": "VAPOR"
         }
       },
-      "estiloCpu": "acrobata"
+      "estiloCpu": "acrobata",
+      "papelNormais": "Acrobata: jab curto na vantagem, chute lateral longo para cutucar, H rápido e a bananeira que tira do ar.",
+      "framesGolpe": {
+        "L": [
+          4,
+          3,
+          6
+        ],
+        "2L": [
+          5,
+          3,
+          6
+        ],
+        "M": [
+          8,
+          3,
+          11
+        ],
+        "2M": [
+          6,
+          3,
+          11
+        ],
+        "H": [
+          8,
+          4,
+          14
+        ],
+        "2H": [
+          8,
+          5,
+          17
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          5,
+          1
+        ],
+        "2L": [
+          4,
+          0
+        ],
+        "M": [
+          3,
+          -4
+        ],
+        "2M": [
+          20,
+          -9
+        ],
+        "H": [
+          5,
+          -3
+        ],
+        "2H": [
+          25,
+          -11
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 120
+        },
+        "2H": {
+          "mecanica": {
+            "esquiva": {
+              "de": "aereo",
+              "janela": "antiaereo"
+            }
+          }
+        }
+      }
     },
     "p11": {
       "molde": "Zoner / trapper",
@@ -999,6 +1739,80 @@
             }
           }
         }
+      },
+      "papelNormais": "Cirurgião: o bisturi alcança longe mas sai devagar; o chute não joga na parede, empurra para longe e abre espaço para o veneno.",
+      "framesGolpe": {
+        "L": [
+          6,
+          3,
+          9
+        ],
+        "2L": [
+          6,
+          3,
+          9
+        ],
+        "M": [
+          7,
+          4,
+          11
+        ],
+        "2M": [
+          9,
+          4,
+          15
+        ],
+        "H": [
+          11,
+          5,
+          19
+        ],
+        "2H": [
+          11,
+          6,
+          22
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          4,
+          -2
+        ],
+        "2L": [
+          4,
+          -2
+        ],
+        "M": [
+          3,
+          -2
+        ],
+        "2M": [
+          20,
+          -11
+        ],
+        "H": [
+          5,
+          -6
+        ],
+        "2H": [
+          25,
+          -13
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 160
+        },
+        "2L": {
+          "alcance": 165
+        },
+        "H": {
+          "lancar": "none",
+          "recuo": [
+            70,
+            60
+          ]
+        }
       }
     },
     "p12": {
@@ -1061,6 +1875,85 @@
           "avanco": 520,
           "desenhoBate": true
         }
+      },
+      "papelNormais": "Fera: a garra longa é lenta, o M dá o bote para dentro e a mordida, curta e rápida, é o golpe que dói.",
+      "andar": [
+        330,
+        190
+      ],
+      "framesGolpe": {
+        "L": [
+          6,
+          4,
+          10
+        ],
+        "2L": [
+          6,
+          3,
+          9
+        ],
+        "M": [
+          8,
+          4,
+          12
+        ],
+        "2M": [
+          9,
+          4,
+          14
+        ],
+        "H": [
+          9,
+          5,
+          16
+        ],
+        "2H": [
+          10,
+          6,
+          19
+        ]
+      },
+      "vantagemGolpe": {
+        "L": [
+          4,
+          -3
+        ],
+        "2L": [
+          4,
+          -2
+        ],
+        "M": [
+          4,
+          -4
+        ],
+        "2M": [
+          20,
+          -11
+        ],
+        "H": [
+          5,
+          -2
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 185
+        },
+        "M": {
+          "mecanica": {
+            "avanco": {
+              "velocidade": 200,
+              "janela": "ate_ativo"
+            }
+          }
+        },
+        "H": {
+          "pausa": 14
+        }
       }
     },
     "p15": {
@@ -1074,19 +1967,19 @@
       },
       "framesGolpe": {
         "M": [
-          8,
+          6,
           4,
-          16
+          11
         ],
         "H": [
-          17,
+          12,
           5,
-          16
+          18
         ],
         "2M": [
-          16,
+          11,
           4,
-          31
+          20
         ],
         "S": [
           14,
@@ -1107,6 +2000,21 @@
           16,
           10,
           46
+        ],
+        "L": [
+          5,
+          3,
+          7
+        ],
+        "2L": [
+          6,
+          3,
+          8
+        ],
+        "2H": [
+          9,
+          6,
+          20
         ]
       },
       "especiais": {
@@ -1155,6 +2063,47 @@
       "super": {
         "acertos": 3,
         "intervalo": 8
+      },
+      "papelNormais": "Base firme: golpes retos, curtos e seguros na defesa, o chute alto que alcança longe e o chute vertical que tira do ar.",
+      "andar": [
+        280,
+        220
+      ],
+      "vantagemGolpe": {
+        "L": [
+          5,
+          1
+        ],
+        "2L": [
+          4,
+          0
+        ],
+        "M": [
+          5,
+          0
+        ],
+        "2M": [
+          20,
+          -12
+        ],
+        "H": [
+          5,
+          -3
+        ],
+        "2H": [
+          25,
+          -11
+        ]
+      },
+      "normais": {
+        "2H": {
+          "mecanica": {
+            "esquiva": {
+              "de": "aereo",
+              "janela": "antiaereo"
+            }
+          }
+        }
       }
     },
     "p16": {
@@ -1183,6 +2132,36 @@
           17,
           26,
           20
+        ],
+        "L": [
+          4,
+          3,
+          7
+        ],
+        "2L": [
+          5,
+          3,
+          7
+        ],
+        "M": [
+          6,
+          4,
+          10
+        ],
+        "2M": [
+          8,
+          4,
+          14
+        ],
+        "H": [
+          10,
+          5,
+          18
+        ],
+        "2H": [
+          9,
+          6,
+          18
         ]
       },
       "especiais": {
@@ -1245,6 +2224,47 @@
       "super": {
         "acertos": 5,
         "intervalo": 8
+      },
+      "papelNormais": "Palhaça: rápida e solta; o H se joga para a frente e pega quem recua.",
+      "andar": [
+        330,
+        250
+      ],
+      "vantagemGolpe": {
+        "L": [
+          5,
+          0
+        ],
+        "2L": [
+          4,
+          -1
+        ],
+        "M": [
+          4,
+          -2
+        ],
+        "2M": [
+          20,
+          -10
+        ],
+        "H": [
+          5,
+          -5
+        ],
+        "2H": [
+          25,
+          -11
+        ]
+      },
+      "normais": {
+        "H": {
+          "mecanica": {
+            "avanco": {
+              "velocidade": 160,
+              "janela": "ate_ativo"
+            }
+          }
+        }
       }
     },
     "p13": {
@@ -1255,9 +2275,9 @@
       "ritmo": 1.25,
       "framesGolpe": {
         "L": [
+          7,
           4,
-          4,
-          12
+          11
         ],
         "S": [
           18,
@@ -1278,6 +2298,31 @@
           34,
           4,
           30
+        ],
+        "2L": [
+          8,
+          4,
+          11
+        ],
+        "M": [
+          10,
+          5,
+          14
+        ],
+        "2M": [
+          11,
+          5,
+          18
+        ],
+        "H": [
+          14,
+          6,
+          22
+        ],
+        "2H": [
+          13,
+          8,
+          22
         ]
       },
       "danoGolpe": {
@@ -1360,6 +2405,45 @@
           "lancar": "knockdown",
           "empurrao": 70
         }
+      },
+      "papelNormais": "Colosso: o mais lento do jogo; cada golpe pesa e quem aguenta os golpes fracos é a couraça, não a vantagem na defesa.",
+      "andar": [
+        200,
+        150
+      ],
+      "vantagemGolpe": {
+        "L": [
+          5,
+          0
+        ],
+        "2L": [
+          4,
+          -1
+        ],
+        "M": [
+          5,
+          -2
+        ],
+        "2M": [
+          20,
+          -10
+        ],
+        "H": [
+          6,
+          -4
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "2L": {
+          "alcance": 200
+        },
+        "H": {
+          "pausa": 15
+        }
       }
     },
     "p14": {
@@ -1388,6 +2472,36 @@
           17,
           12,
           24
+        ],
+        "L": [
+          5,
+          4,
+          8
+        ],
+        "2L": [
+          6,
+          3,
+          8
+        ],
+        "M": [
+          7,
+          4,
+          11
+        ],
+        "2M": [
+          9,
+          5,
+          16
+        ],
+        "H": [
+          11,
+          5,
+          19
+        ],
+        "2H": [
+          10,
+          6,
+          20
         ]
       },
       "danoGolpe": {
@@ -1473,6 +2587,42 @@
         "2M": 1.45,
         "H": 1.35,
         "2H": 1.35
+      },
+      "papelNormais": "Malandro dos chutes: anda bem, cutuca de média distância e muda o ritmo; nenhum golpe é o melhor em nada.",
+      "andar": [
+        290,
+        230
+      ],
+      "vantagemGolpe": {
+        "L": [
+          5,
+          -1
+        ],
+        "2L": [
+          4,
+          -1
+        ],
+        "M": [
+          4,
+          -1
+        ],
+        "2M": [
+          20,
+          -11
+        ],
+        "H": [
+          5,
+          -6
+        ],
+        "2H": [
+          25,
+          -12
+        ]
+      },
+      "normais": {
+        "L": {
+          "alcance": 150
+        }
       }
     },
     "koga_8": {
@@ -1576,7 +2726,11 @@
           4,
           251
         ]
-      }
+      },
+      "andar": [
+        150,
+        110
+      ]
     }
   }
 }

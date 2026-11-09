@@ -642,8 +642,10 @@ public class CombatEngineTest {
 
     @Test public void walkingBackIsSlowerThanWalkingForward() {
         CombatConfig config = new CombatConfig();
-        // Quem anda na velocidade do motor (o p01 anda na do vídeo dele: walkSpeed próprio).
-        CharacterDefinition p02 = GeneratedCharacters.get("p02");
+        // Quem anda na velocidade do motor: o lutador de teste (os 16 têm o passo próprio, "andar"
+        // no mecanicas.json).
+        CharacterDefinition p02 = GeneratedCharacters.get("player_two");
+        assertEquals("o lutador de teste anda na velocidade do motor", 0f, p02.fighter.walkSpeed, 0f);
         Sim forward = new Sim(p02, NPC, 500f, 1500f);
         forward.in[0].direction = 1;
         forward.steps(30);

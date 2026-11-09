@@ -9,7 +9,8 @@ public class P01AttackPacingTest {
     private static final String[] MOVES={"L","M","jL","jM","jH"};
     private static final String[] CLIPS={"LIGHT_JAB","MEDIUM_KICK","JUMP_LIGHT","JUMP_MEDIUM","JUMP_HEAVY"};
     private static final int[][] TIMINGS={
-        {2,4,5}, {4,6,8}, {4,2,5}, {6,4,8}, {9,6,12}
+        // L e M com o tempo da função deles (docs/balanco/normais-fable.md): jab de 5, soco de 7.
+        {5,3,7}, {7,5,11}, {4,2,5}, {6,4,8}, {9,6,12}
     };
     /** O quadro do impacto de cada clipe (os vídeos novos de 11/2026, montagens/player_base.json). */
     private static final int[] IMPACT_FRAMES={6,5,5,7,7};

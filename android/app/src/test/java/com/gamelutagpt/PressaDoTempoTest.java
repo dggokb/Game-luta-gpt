@@ -24,7 +24,9 @@ public class PressaDoTempoTest {
         // O dano não sobe mais com certeza: a CPU com pressa pula mais para entrar e, com o
         // antiaéreo funcionando (02/11: a defesa do pulo saía antes e o 2H quase nunca era
         // tentado), a calma tira esses pulos do ar. Ela não pode bater muito menos.
-        assertTrue("não bate muito menos: " + calm[1] + " → " + hurried[1], hurried[1] > calm[1] * 9 / 10);
+        // Com o 2H anti-aéreo de verdade (Ryūga, Yin-lu, p04, p10, Natisuko: normais-fable.md) o pulo
+        // da pressa custa mais caro: a folga passou de 10% para 15%.
+        assertTrue("não bate muito menos: " + calm[1] + " → " + hurried[1], hurried[1] > calm[1] * 17 / 20);
         assertTrue("fica menos defendendo: " + calm[2] + " → " + hurried[2], hurried[2] < calm[2]);
     }
 

@@ -12,7 +12,8 @@ public class P01CrouchMovementTest {
     @Test public void lowAttacksKeepTheirContactAndAllSourceFrames() {
         String[] moves={"2L","2M","2H"};
         String[] clips={"CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY"};
-        int[][] expected={{2,4,6},{12,4,18},{9,6,14}};
+        // 2L de 6 e 2H de 8 (o anti-aéreo): docs/balanco/normais-fable.md.
+        int[][] expected={{6,3,8},{12,4,18},{8,6,18}};
         int[] impact={7,9,5};
         for(int i=0;i<moves.length;i++){
             AttackDefinition a=P01.attack(moves[i]);

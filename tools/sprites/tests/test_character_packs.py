@@ -115,6 +115,11 @@ class CharacterPackTests(unittest.TestCase):
                 if key in m: m[key]=[t for t in m[key] if t not in pack.get('specialMoves',{})]
             # Reach and hit height follow each character's art size (worldScale).
             for k in ('reach','hitHeight'): m.pop(k,None)
+            # O tempo e a função dos normais são de cada personagem (mecanicas.json: framesGolpe,
+            # vantagemGolpe, normais; docs/balanco/normais-fable.md). O lutador de teste fica com
+            # o molde antigo, então só o resto do golpe é dado compartilhado.
+            for k in ('startupFrames','activeFrames','recoveryFrames','hitstunFrames','blockstunFrames',
+                      'cancelWindows','alcanceMaximo','normalBase','mecanica'): m.pop(k,None)
             return m
         for binding in ('L','M','H'):
             self.assertEqual(shared(first,binding),shared(second,binding))

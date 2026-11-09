@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 102
-        versionName '0.102-hud-contadores-super5'
+        versionCode 103
+        versionName '0.103-normais-fable'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     // Chave de debug fixa, versionada: sem ela cada máquina do CI cria a sua e cada APK sai

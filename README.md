@@ -1,6 +1,15 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.102-hud-contadores-super5` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-fable` (saiu da `game-luta-sprite-gpt` na 0.102). Versão `0.103-normais-fable` (fonte única: `versionName` em `android/app/build.gradle`).
+
+## Normais com identidade
+
+Cada lutador tem o tempo, a vantagem na defesa, o alcance e a função dos próprios golpes normais
+(jab de 3 a 7 quadros, 2H que tira do ar de verdade em cinco deles, armadura na ombrada do p09, M
+que avança no Kōga e no Necro, H dos zoners que empurra em vez de jogar na parede), o passo próprio
+e o desenho do impacto segurado na janela ativa. A corrente L > M > H e o resto do motor não
+mudaram. Tudo em `tools/sprites/mecanicas.json`; números, o que foi conferido e o que falta:
+[docs/balanco/normais-fable.md](docs/balanco/normais-fable.md).
 
 ## Motor de animação e efeitos
 

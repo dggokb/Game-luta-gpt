@@ -20,6 +20,27 @@ da base vezes o ritmo (especial de vídeo longo: a rajada e a voadora do p15).
 Com "fimDoClipe" ({"H": 53}) os quadros do clipe dali em diante passam num instante: o vídeo que
 termina parado na guarda (o H da p15) não prende o lutador depois do movimento.
 
+Normais com identidade (docs/balanco/normais-fable.md), tudo opcional e por personagem:
+
+  * "framesGolpe" também nos normais (vale mesmo com "manterTempo"): o tempo que a função do
+    golpe pede. A régua: quem alcança mais longe paga em tempo;
+  * "vantagemGolpe" ({"L": [acerto, defesa]}): a vantagem própria do golpe em vez da da base;
+  * "normais" ({"H": {...}}): o que o golpe faz. "lancar" (none, knockdown, launch, wallBounce,
+    groundBounce, slam), "empurrao" (px da queda), "recuo" ([acerto, defesa], px do empurrão),
+    "pausa" (quadros parados no acerto), "alcance" (limite de balanço: o desenho não acerta além
+    dele) e "mecanica" (a mesma dos especiais, com "janela": startup, ate_ativo, antiaereo ou
+    [de, até]; esquiva "de": "aereo" é o anti-aéreo de verdade);
+  * "andar" ([frente, trás] em px/s): o passo do personagem;
+  * base "corrente" {"folga", "teto", "rotas"}: o atordoamento de cada normal do chão sobe
+    sozinho até cobrir a preparação dos normais da rota (L > M, M > H...), com "folga" quadros e
+    sem passar de "teto" de vantagem no acerto, para a corrente continuar emendando com os tempos
+    novos;
+  * base "impacto" {"segurar": quadros}: nos normais o desenho do impacto fica na tela a janela
+    ativa (até esse tanto de quadros), em vez de passar no tempo do vídeo.
+
+--so-normais grava só os normais (golpes, animações deles e o andar); especiais, S1, Super e o
+resto do character.json ficam como estão no arquivo.
+
 Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam; com
 "cadenciaVideo" junto, a animação (do vídeo novo) ainda é espalhada no tempo mantido do golpe.
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
@@ -88,15 +109,19 @@ def video_cadence(anim, cfg, total_ms, fim=None):
     return [max(1, round(x)) for x in v / v.sum() * total_ms]
 
 
-def fit_impact(anim, m):
+def fit_impact(anim, m, segurar=0):
     """Quadro do impacto começando junto com o primeiro frame ativo (o golpe encosta quando
-    acerta): redistribui o tempo antes e depois dele, mesmo total."""
+    acerta): redistribui o tempo antes e depois dele, mesmo total. Com {@code segurar} (normais),
+    o desenho mais esticado da janela ativa fica na tela enquanto o golpe acerta, até esse tanto
+    de quadros do jogo, em vez de recolher no tempo do vídeo (hold_impact)."""
     i, d = anim.get('impactFrame'), anim['durationsMs']
     if i is None or not 0 < i < len(d):
         return
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     start = m['startupFrames'] / total
     whole, before = sum(d), sum(d[:i])
+    if segurar and i < len(d) - 1:
+        return hold_impact(anim, m, min(m['activeFrames'], segurar))
     if start - 0.75 / total <= before / whole <= start < (before + d[i]) / whole:
         return settle(anim, i, start)
     # começa meio frame antes do acerto e dura pelo menos um frame de jogo
@@ -106,6 +131,55 @@ def fit_impact(anim, m):
     tail = [x * (1 - lead - hold) * whole / after for x in d[i + 1:]] if after else []
     anim['durationsMs'] = [max(1, round(x)) for x in head + [hold * whole] + tail]
     settle(anim, i, start)
+
+
+def stretch(anim, j):
+    """Até onde o membro do desenho j vai à frente da raiz (silhueta.golpe), ou None sem medida."""
+    box = anim.get('silhueta', {}).get('golpe', {}).get(str(j))
+    return max(box[1::4]) if box else None
+
+
+def hold_impact(anim, m, held):
+    """Normal com o impacto segurado: a preparação cabe no startup, o quadro do impacto entra
+    junto com o primeiro frame ativo e o desenho mais esticado dos que o vídeo mostrava na janela
+    ativa (às vezes o seguinte ao do impacto: o braço ainda está indo) fica {@code held} quadros
+    do jogo na tela; o resto do clipe é a recuperação. O desenho é por onde o golpe acerta
+    (CombatEngine.golpeNoDesenho), então o alcance vale a janela ativa inteira."""
+    i, d = anim['impactFrame'], anim['durationsMs']
+    s, a = m['startupFrames'], m['activeFrames']
+    total = s + a + m['recoveryFrames']
+    whole, frame = sum(d), sum(d) / total
+    # Quadros que o vídeo mostra, a partir do impacto, no tempo da janela ativa: o mais esticado
+    # é o que fica.
+    shown = [j for j in range(i, len(d)) if sum(d[i:j]) < a * frame]
+    peak = max(shown, key=lambda j: (stretch(anim, j) or 0, -j))
+    if stretch(anim, i) is None or peak == len(d) - 1:
+        peak = i
+    lead = (s - 0.5) * frame                       # o impacto entra meio frame antes do acerto
+    head = [x * lead / sum(d[:i]) for x in d[:i]]
+    if peak > i:
+        # impacto um frame, os de passagem num instante, depois o esticado
+        mid = [frame] + [1] * (peak - i - 1) + [max(1, held - 0.5) * frame]
+    else:
+        mid = [(held + 0.5) * frame]
+    rest = whole - lead - sum(mid)
+    after = sum(d[peak + 1:])
+    tail = [x * rest / after for x in d[peak + 1:]] if after else []
+    # Clipe de muitos quadros num golpe curto (20 desenhos em 7 frames): arredondar um a um comia
+    # o tempo da preparação e o impacto entrava cedo; a soma de cada trecho fica.
+    anim['durationsMs'] = spread(head) + [max(1, round(x)) for x in mid] + spread(tail)
+    settle(anim, i, s / total)
+
+
+def spread(xs):
+    """Arredonda mantendo a soma do trecho (o erro de um quadro passa para o seguinte)."""
+    out, acc, done = [], 0.0, 0
+    for x in xs:
+        acc += x
+        v = max(1, round(acc) - done)
+        out.append(v)
+        done += v
+    return out
 
 
 def settle(anim, i, start):
@@ -123,11 +197,12 @@ def settle(anim, i, start):
 
 def window(name, m):
     """Janela nomeada em frames do golpe: startup = antes do golpe sair, ate_ativo = do início
-    ao último frame ativo."""
+    ao último frame ativo, antiaereo = do 3º frame ao último ativo."""
     s, a = m['startupFrames'], m['activeFrames']
     if isinstance(name, list):
         return name
-    return {'startup': [1, s - 1], 'ate_ativo': [0, s + a - 1]}[name]
+    # antiaereo: do meio da preparação ao último frame ativo (o começo ainda apanha no ar).
+    return {'startup': [1, s - 1], 'ate_ativo': [0, s + a - 1], 'antiaereo': [min(3, s - 1), s + a - 1]}[name]
 
 
 def unique(pack, spec):
@@ -166,6 +241,75 @@ def unique(pack, spec):
         targets[key]['animation'] = animation
     if u.get('lutador'):
         fighter['mecanica'] = dict(u['lutador'])
+
+
+NORMAL_KEYS = ('launchType', 'knockback', 'pushbackOnHit', 'pushbackOnBlock', 'hitstopFrames', 'reach',
+               'alcanceMaximo')
+LAUNCHES = ('none', 'knockdown', 'launch', 'slam', 'wallBounce', 'groundBounce')
+
+
+def restore_normal(m):
+    """Desfaz o bloco "normais" gravado antes (refazer dá sempre o mesmo resultado)."""
+    for key, value in m.pop('normalBase', {}).items():
+        if value is None:
+            m.pop(key, None)
+        else:
+            m[key] = value
+
+
+def normais(pack, spec):
+    """O que cada normal faz (bloco "normais"): lancar, empurrao, recuo, pausa, alcance e mecanica.
+    Guarda o que mudou em "normalBase"."""
+    for key, n in spec.get('normais', {}).items():
+        m = pack['moves'][key]
+        base = {}
+
+        def put(field, value):
+            base[field] = m.get(field)
+            m[field] = value
+        if 'lancar' in n:
+            if n['lancar'] not in LAUNCHES:
+                raise SystemExit(f"normais.{key}.lancar {n['lancar']}: um de {LAUNCHES}")
+            put('launchType', n['lancar'])
+        if 'empurrao' in n:
+            put('knockback', n['empurrao'])
+        if 'recuo' in n:
+            put('pushbackOnHit', n['recuo'][0])
+            put('pushbackOnBlock', n['recuo'][1])
+        if 'pausa' in n:
+            put('hitstopFrames', n['pausa'])
+        if 'alcance' in n:
+            put('alcanceMaximo', n['alcance'])
+            put('reach', min(m['reach'], n['alcance']))
+        if base:
+            m['normalBase'] = base
+        if 'mecanica' in n:
+            mech = m.setdefault('mecanica', {})
+            for kind, value in n['mecanica'].items():
+                if isinstance(value, dict) and 'janela' in value:
+                    mech[kind] = {k: v for k, v in value.items() if k != 'janela'}
+                    mech[kind]['frames'] = window(value['janela'], m)
+                else:
+                    mech[kind] = value
+
+
+def chain_stun(pack, cfg):
+    """A corrente do chão continua emendando com o tempo próprio de cada golpe: o atordoamento de
+    um normal cobre a preparação dos normais da rota ("rotas": L > M, M > H...) em que ele cancela,
+    com "folga" quadros (o cancelamento sai depois da pausa do acerto). A vantagem no acerto sobe
+    no máximo até "teto": rasteira lenta demais depois do jab segue sem emendar. Golpe que derruba
+    ou lança não entra."""
+    moves = pack['moves']
+    for key, targets in cfg['rotas'].items():
+        m = moves.get(key)
+        if not m or m.get('launchType', 'none') != 'none':
+            continue
+        own = m['activeFrames'] - 1 + m['recoveryFrames']
+        for t in targets:
+            if t in moves and t in m['cancelInto']:
+                need = moves[t]['startupFrames'] + cfg['folga']
+                if need - own <= cfg['teto']:
+                    m['hitstunFrames'] = max(m['hitstunFrames'], need)
 
 
 ARROWS = {'→': 1, '↘': 2, '↓': 3, '↙': 4, '←': 5, '↖': 6, '↑': 7, '↗': 8}
@@ -560,6 +704,8 @@ def apply(cid, spec, base, combos_data):
     fighter, report = pack['fighter'], []
     for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values()):
         restore(m)
+    for m in pack['moves'].values():
+        restore_normal(m)
     for m in pack.get('specialMoves', {}).values():
         restore_special(m)
     # Sem Super (as crianças da história): só o resto.
@@ -604,8 +750,12 @@ def apply(cid, spec, base, combos_data):
                 # começo da janela ativa quando o clipe novo o deixou fora dela (o p14).
                 fit_impact(anim, m)
             continue
-        if not keep:
-            retime(m, frames(key), base['vantagem'][key])
+        own_time = key in spec.get('framesGolpe', {})   # tempo próprio vale mesmo com manterTempo
+        advantage = spec.get('vantagemGolpe', {}).get(key, base['vantagem'][key])
+        if not keep or own_time:
+            retime(m, frames(key), advantage)
+        elif key in spec.get('vantagemGolpe', {}):
+            retime(m, [m['startupFrames'], m['activeFrames'], m['recoveryFrames']], advantage)
         m['damage'] = damage(key)
         attacks.append((key, m.get('animation'), m))
     energy = fighter['energy']
@@ -617,8 +767,13 @@ def apply(cid, spec, base, combos_data):
     attacks.append(('S', pack.get('specialAnimations', {}).get('S'), energy['attack']))
     if 'super' in fighter:
         fighter['super']['damage'] = damage('SUPER')
+    if 'andar' in spec:
+        fighter['walkSpeed'], fighter['walkBackSpeed'] = spec['andar']
     unique(pack, spec)
+    normais(pack, spec)
     combos(pack, spec, combos_data)
+    if base.get('corrente'):
+        chain_stun(pack, base['corrente'])
     commands(pack, spec)
     s1(pack, spec)
     especiais(pack, spec)
@@ -642,7 +797,10 @@ def apply(cid, spec, base, combos_data):
                 anim['durationsMs'], cadence = d, 'vídeo'
             else:
                 cadence = 'mantida'
-            fit_impact(anim, m)
+            hold = base.get('impacto', {}).get('segurar', 0) if key in pack['moves'] else 0
+            fit_impact(anim, m, hold)
+            if hold:
+                cadence += ', impacto segurado'
         h = hits.get(key, {})
         if 'pancadas' in h:
             strike(m, anim, h['pancadas'])
@@ -680,15 +838,32 @@ def apply(cid, spec, base, combos_data):
     return pack, path, report
 
 
+def only_normals(new, old):
+    """O character.json do arquivo com só os normais do pacote refeito: os golpes, as animações
+    deles e o andar. Especiais, S1, Super e o resto ficam como estavam."""
+    old['moves'] = new['moves']
+    for m in new['moves'].values():
+        if m.get('animation') in new['animations']:
+            old['animations'][m['animation']] = new['animations'][m['animation']]
+    for key in ('walkSpeed', 'walkBackSpeed'):
+        if key in new['fighter']:
+            old['fighter'][key] = new['fighter'][key]
+    return old
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('personagens', nargs='*')
     p.add_argument('--write', action='store_true', help='grava os character.json')
+    p.add_argument('--so-normais', action='store_true',
+                   help='grava só os normais (golpes, animações deles e o andar); o resto fica como está')
     args = p.parse_args()
     data = json.loads(DATA.read_text(encoding='utf-8'))
     for cid in args.personagens or list(data['personagens']):
         spec = data['personagens'][cid]
         pack, path, report = apply(cid, spec, data['base'], data['combos'])
+        if args.so_normais:
+            pack = only_normals(pack, json.loads(path.read_text(encoding='utf-8')))
         print(f"{cid} ({spec['molde']}): vida {spec['vida']}, dano {spec['dano']}x, ritmo {spec['ritmo']}x, "
               f"Super {pack['fighter']['super']['damage'] if 'super' in pack['fighter'] else '-'}, combo {spec['estiloCombo']}")
         print('\n'.join(report))

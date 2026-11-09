@@ -4902,15 +4902,15 @@
       "durationsMs": [
         22,
         20,
-        17,
-        21,
-        19,
-        21,
-        19,
-        19,
-        21,
-        19,
-        19
+        59,
+        15,
+        15,
+        15,
+        14,
+        14,
+        16,
+        14,
+        14
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -5215,19 +5215,19 @@
       "loop": false,
       "durationsMs": [
         31,
+        30,
         31,
-        31,
-        22,
+        75,
+        16,
         20,
-        26,
+        15,
+        21,
         20,
-        26,
-        26,
+        16,
         20,
-        26,
-        20,
-        26,
-        26
+        15,
+        21,
+        20
       ],
       "impactFrame": 3,
       "silhueta": {
@@ -5660,19 +5660,19 @@
         14,
         18,
         14,
-        23,
-        31,
+        90,
+        26,
+        20,
         25,
-        31,
-        31,
-        31,
-        31,
-        31,
-        31,
+        26,
         25,
-        31,
-        31,
-        31
+        26,
+        26,
+        25,
+        20,
+        26,
+        26,
+        25
       ],
       "impactFrame": 10,
       "silhueta": {
@@ -7194,15 +7194,15 @@
       "durationsMs": [
         21,
         21,
+        59,
+        14,
+        15,
+        14,
         17,
-        19,
-        19,
-        19,
-        23,
-        19,
-        19,
-        19,
-        19
+        14,
+        15,
+        14,
+        14
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -7532,20 +7532,20 @@
       "durationsMs": [
         18,
         18,
+        19,
         18,
         18,
         18,
-        18,
-        26,
-        33,
-        28,
-        24,
-        37,
-        28,
-        28,
-        33,
-        28,
-        28
+        17,
+        1,
+        59,
+        25,
+        39,
+        30,
+        30,
+        34,
+        30,
+        30
       ],
       "impactFrame": 6,
       "silhueta": {
@@ -7971,18 +7971,18 @@
       ],
       "loop": false,
       "durationsMs": [
+        40,
+        34,
         39,
-        33,
-        39,
+        45,
+        92,
+        48,
+        43,
+        48,
         44,
-        44,
-        56,
-        50,
-        56,
-        50,
-        56,
-        50,
-        50
+        48,
+        43,
+        43
       ],
       "impactFrame": 4,
       "silhueta": {
@@ -8300,12 +8300,12 @@
       "loop": false,
       "durationsMs": [
         29,
-        29,
-        22,
-        36,
-        36,
-        31,
-        36
+        30,
+        59,
+        26,
+        26,
+        23,
+        26
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -8499,12 +8499,12 @@
       "loop": false,
       "durationsMs": [
         55,
-        38,
-        55,
-        39,
-        39,
-        39,
-        39
+        37,
+        76,
+        34,
+        33,
+        34,
+        33
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -8692,12 +8692,12 @@
       "loop": false,
       "durationsMs": [
         71,
-        71,
-        46,
-        57,
-        57,
-        57,
-        57
+        70,
+        17,
+        1,
+        75,
+        91,
+        91
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -12304,12 +12304,12 @@
       "loop": false,
       "durationsMs": [
         69,
-        72,
-        48,
-        53,
-        53,
-        50,
-        53
+        73,
+        92,
+        42,
+        42,
+        40,
+        43
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -12552,7 +12552,7 @@
       "startupFrames": 3,
       "activeFrames": 3,
       "recoveryFrames": 7,
-      "hitstunFrames": 14,
+      "hitstunFrames": 15,
       "blockstunFrames": 9,
       "hitstopFrames": 8,
       "cancelWindows": {
@@ -12666,7 +12666,7 @@
       "startupFrames": 3,
       "activeFrames": 3,
       "recoveryFrames": 7,
-      "hitstunFrames": 14,
+      "hitstunFrames": 15,
       "blockstunFrames": 9,
       "hitstopFrames": 8,
       "cancelWindows": {

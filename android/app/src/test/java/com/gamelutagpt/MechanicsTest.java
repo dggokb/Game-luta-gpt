@@ -466,6 +466,39 @@ public class MechanicsTest {
         assertTrue("a low strike still hits", low.f(1).state.life < low.f(1).state.profile.maxLife);
     }
 
+    @Test public void antiAirEvasionSlipsOnlyTheStrikeOfAnAirborneAttacker() {
+        // Anti-aéreo (o 2H de quem tira do ar): o golpe de quem vem pelo ar passa, o de chão acerta.
+        AttackDefinition antiAir = move("H", 20, 3, 10)
+            .mechanics(new AttackDefinition.Mechanics().evade(AttackDefinition.Reads.AIR, 0, 22)).build();
+        CombatEngineTest.Sim ground = new CombatEngineTest.Sim(BASE, with(antiAir), 500f, 600f);
+        ground.in[1].heavy = true;
+        ground.step();
+        ground.in[0].light = true;
+        ground.steps(10);
+        assertTrue("the standing jab still hits an anti-air", ground.f(1).state.life < ground.f(1).state.profile.maxLife);
+
+        AttackDefinition slow = move("H", 40, 3, 10)
+            .mechanics(new AttackDefinition.Mechanics().evade(AttackDefinition.Reads.AIR, 0, 42)).build();
+        boolean[] hit = new boolean[2];
+        for (int k = 0; k < 2; k++) {
+            CombatEngineTest.Sim air = new CombatEngineTest.Sim(BASE, with(k == 0 ? slow : move("H", 40, 3, 10).build()), 500f, 600f);
+            air.in[0].direction = 7;
+            air.steps(5);
+            air.in[0].direction = 0;
+            air.until(() -> !air.f(0).grounded && air.f(0).vy > 0f, 80);
+            air.in[1].heavy = true;
+            air.step();
+            air.in[1].heavy = false;
+            air.in[0].heavy = true;
+            air.step();
+            air.in[0].heavy = false;
+            air.steps(30);
+            hit[k] = air.f(1).state.life < air.f(1).state.profile.maxLife;
+        }
+        assertTrue("control: the jump-in hits a plain heavy", hit[1]);
+        assertFalse("the jump-in passes through the anti-air", hit[0]);
+    }
+
     @Test public void evasionLetsAProjectileFlyThrough() {
         AttackDefinition dodge = move("H", 40, 3, 30)
             .mechanics(new AttackDefinition.Mechanics().evade(AttackDefinition.Reads.HIGH, 0, 72)).build();
@@ -1342,11 +1375,17 @@ public class MechanicsTest {
             if (frente > gap - reach + 20f) break;
             s.step();
         }
+        int stretched = kicker.attackFrame;
+        // O soco sai de modo a ficar ativo com a perna esticada (o desenho do impacto dura a janela
+        // ativa do chute; o jab leva o startup dele para chegar).
+        CombatEngineTest.Sim t = new CombatEngineTest.Sim(p14, BASE, 400f, 400f + gap);
+        startMove(t.engine, 0, "H");
+        t.steps(Math.max(0, stretched - BASE.attack("L").startupFrames));
         int hits = 0;
-        startMove(s.engine, 1, "L");
+        startMove(t.engine, 1, "L");
         for (int i = 0; i < 30; i++) {
-            s.step();
-            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 1) hits++;
+            t.step();
+            for (CombatEngine.HitEvent e : t.engine.events()) if (e.attacker == 1) hits++;
         }
         assertTrue("the jab caught the stretched leg", hits > 0);
     }
