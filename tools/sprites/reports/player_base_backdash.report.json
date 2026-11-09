@@ -575,12 +575,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "96031c46d6c0695842e19e036dfc9b8e24033bcfec77db8375556c2885d7ddf1",
+      "source": "f87a8dad526a3629f7875c848ff310b4e988f0d8a3e41589c5f7a02784e2f10c",
       "config": "c56915b9e377a28b93c0ec54930b653bbe12b4c7e6d0b2551245be39dfae73ff",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_backdash_video_normalized.png": "96031c46d6c0695842e19e036dfc9b8e24033bcfec77db8375556c2885d7ddf1"
+      "art/sprites/source/player_base_backdash_video_normalized.png": "f87a8dad526a3629f7875c848ff310b4e988f0d8a3e41589c5f7a02784e2f10c"
     }
   }
 }

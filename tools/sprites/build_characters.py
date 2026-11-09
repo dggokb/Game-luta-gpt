@@ -16,7 +16,6 @@ import PIL
 from PIL import Image, features
 import import_sprites as importer
 import folhas
-import harmonia_cor
 
 ROOT = Path(__file__).resolve().parents[2]
 JAVA = 'android/app/src/main/java/com/gamelutagpt/'
@@ -913,9 +912,6 @@ def pack_atlas(stage, cfg, report):
     path = stage / cfg['output']
     image = Image.open(path);image.load()
     image = image.convert('RGBA')
-    if 'harmonia' in cfg:
-        # A cor de cada material levada à do clipe de referência (tools/sprites/harmonia_cor.py).
-        image = harmonia_cor.aplicar(image, cfg['harmonia'])
     alpha = image.getchannel('A')
     boxes = [alpha.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)).getbbox() for i in range(n)]
     boxes = [b for b in boxes if b]
@@ -966,7 +962,7 @@ def cache_dir():
 
 def code_fingerprint():
     h = hashlib.sha256()
-    for path in (Path(importer.__file__), Path(folhas.__file__), Path(harmonia_cor.__file__), Path(__file__)):
+    for path in (Path(importer.__file__), Path(folhas.__file__), Path(__file__)):
         h.update(path.read_bytes())
     h.update(f'{PIL.__version__}/{features.version("webp")}'.encode())
     return h.hexdigest()

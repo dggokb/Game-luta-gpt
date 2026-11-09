@@ -10,13 +10,17 @@ cada material anda:
 
 - as âncoras são os materiais do clipe de referência (a guarda): k-means em Lab, gravadas
   no JSON de cada clipe em "harmonia" (``--gravar``);
-- na montagem da folha (build_characters.pack_atlas), cada pixel do clipe vai para a âncora
-  mais próxima, a média de cada material do clipe é medida e cada pixel anda o deslocamento
-  do material dele (peso suave pela distância), com teto; o traço escuro não anda.
+- ``--aplicar`` corrige a arte-fonte de cada clipe (o PNG de "source"): cada pixel vai para a
+  âncora mais próxima, a média de cada material do clipe é medida e cada pixel anda o
+  deslocamento do material dele (peso suave pela distância), com teto; o traço escuro não
+  anda. Aplicar de novo não muda nada (os materiais já batem com as âncoras).
 
-Sem aleatório nem álgebra de BLAS na montagem: o resultado é o mesmo em qualquer máquina.
+É ferramenta de autoria (numpy), como as outras: o gerador das folhas (build_characters.py)
+continua só com o Pillow e monta a folha a partir da fonte já corrigida.
+Sem aleatório nem BLAS: o resultado é o mesmo em qualquer máquina.
 
     python3 tools/sprites/harmonia_cor.py --gravar player_base_idle CLIPE...
+    python3 tools/sprites/harmonia_cor.py --aplicar CLIPE...
 """
 import json
 import sys
@@ -133,7 +137,20 @@ def gravar(referencia, clipes):
         print('harmonia ->', nome)
 
 
+def aplicar_fontes(clipes):
+    for nome in clipes:
+        cfg = json.loads((CLIPS / f'{nome}.json').read_text(encoding='utf-8'))
+        fonte = ROOT / cfg['source']
+        img = Image.open(fonte)
+        img.load()
+        aplicar(img, cfg['harmonia']).save(fonte, format='PNG', optimize=True)
+        print('fonte corrigida ->', cfg['source'])
+
+
 if __name__ == '__main__':
-    if len(sys.argv) < 4 or sys.argv[1] != '--gravar':
+    if len(sys.argv) >= 4 and sys.argv[1] == '--gravar':
+        gravar(sys.argv[2], sys.argv[3:])
+    elif len(sys.argv) >= 3 and sys.argv[1] == '--aplicar':
+        aplicar_fontes(sys.argv[2:])
+    else:
         sys.exit(__doc__)
-    gravar(sys.argv[2], sys.argv[3:])

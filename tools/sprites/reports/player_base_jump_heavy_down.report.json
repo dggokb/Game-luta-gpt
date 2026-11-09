@@ -518,12 +518,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8f4b477f75962922270d4721cee3fbe678df32073d18272e72bc5123f126e5b1",
+      "source": "53ffd8cf3de3a1b2676641a995b2b102193049fe80bbcb9284e2b345ac4c2caa",
       "config": "a22dbce1247187ac278b6d0e1393fd605803cb19cb9039c3f5f34a250edc07f6",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_jump_heavy_down_video_normalized.png": "8f4b477f75962922270d4721cee3fbe678df32073d18272e72bc5123f126e5b1"
+      "art/sprites/source/player_base_jump_heavy_down_video_normalized.png": "53ffd8cf3de3a1b2676641a995b2b102193049fe80bbcb9284e2b345ac4c2caa"
     }
   }
 }

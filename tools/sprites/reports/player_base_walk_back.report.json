@@ -746,12 +746,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "e90ad07063700343de76ddd9d4a765987fb9c8838561bd4ad433ab940413e026",
+      "source": "cf02a9d0319eaf77cccf6f9aeafe78402e2248110621492b8bf4aaab2198c868",
       "config": "f0cef218bc037026ea6615bbc1e43fea1776e884e8ccb45e31763b49f577ef70",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_walk_back_video_normalized.png": "e90ad07063700343de76ddd9d4a765987fb9c8838561bd4ad433ab940413e026"
+      "art/sprites/source/player_base_walk_back_video_normalized.png": "cf02a9d0319eaf77cccf6f9aeafe78402e2248110621492b8bf4aaab2198c868"
     }
   }
 }

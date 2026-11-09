@@ -461,12 +461,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2eafc9e4aaf15fe94bc74e65d93ccf4c6f90d13041baf136f87817b608e6c57c",
+      "source": "2a8718fa6700b12766c67d065c1b29a692f919531b98dc1b52cad3024df8ee90",
       "config": "e376ac99eb1d3cba5250419b33eb067275741f596dcc90441a6f62e87a16589a",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_jump_medium_video_normalized.png": "2eafc9e4aaf15fe94bc74e65d93ccf4c6f90d13041baf136f87817b608e6c57c"
+      "art/sprites/source/player_base_jump_medium_video_normalized.png": "2a8718fa6700b12766c67d065c1b29a692f919531b98dc1b52cad3024df8ee90"
     }
   }
 }
