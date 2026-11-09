@@ -22,9 +22,9 @@ Cada estado é uma animação do personagem (`SpriteStates`). Sem o clipe própr
 
 | Estado | Quando | Pose | Sem o clipe |
 |---|---|---|---|
-| `HIT_HIGH` | Em pé, golpe fraco ou médio que pega acima de 72% da altura de quem apanha | Cabeça joga para trás, queixo para cima, olhos fechados | `HIT_STAND` |
-| `HIT_BODY` | Em pé, golpe fraco ou médio que pega abaixo disso | Dobra o tronco, braços sobre a barriga | `HIT_STAND` |
-| `HIT_HEAVY` | Em pé, golpe forte, especial, Super ou Ultra | O corpo inteiro vai para trás em arco, um pé sai do chão | `HIT_STAND` |
+| `HIT_HIGH` | Em pé, golpe fraco ou médio que pega acima de 72% da altura de quem apanha | Cabeça joga para trás, queixo para cima, olhos fechados | `HIT_STAND` (Ryūga: já tem) |
+| `HIT_BODY` | Em pé, golpe fraco ou médio que pega abaixo disso | Dobra o tronco, braços sobre a barriga | `HIT_STAND` (Ryūga: já tem) |
+| `HIT_HEAVY` | Em pé, golpe forte, especial, Super ou Ultra | O corpo inteiro vai para trás em arco, um pé sai do chão | `HIT_STAND` (Ryūga: já tem) |
 | `HIT_CROUCH` | Agachado, qualquer golpe | Encolhe agachado | (já existe) |
 | `HIT_AIR` | No ar, lançado, quique no chão ou na parede | Corpo arqueado para trás no ar | (já existe) |
 | `KNOCKDOWN` / `GROUNDED` / `GETUP` | Queda (rasteira, golpe que derruba, fim de combo no ar) | Cai de costas, fica no chão, levanta | (já existem) |
@@ -53,3 +53,13 @@ Vantagem = atordoamento − (quadros ativos restantes + recuperação). Positiva
 | j2H | 9 | 6 | 9 | 16 | 18 / 14 | — | — | quica no chão |
 
 Na faixa das referências: fracos levemente positivos no acerto e neutros na defesa; médios e fortes negativos na defesa; rasteira e lançador puníveis.
+
+## 4. Reações do Ryūga no jogo
+
+Os três vídeos (rosto, tronco, forte) entraram em `tools/sprites/clips/player_base_hit_{high,body,heavy}.json`:
+- quadros escolhidos sem o clarão e os riscos do vídeo; o 1º quadro já é a pose de dor;
+- pé de trás no lugar da guarda (`--fixar pe`): o empurrão vem do jogo, não do vídeo;
+- cor harmonizada com a guarda (`harmonia_cor.py`);
+- a pose de dor fica ~44% do tempo (`durationsMs` 70,25,25,40,35,30,40,40,60; `posesChave` 0,4,6,8).
+
+As caixas de corpo durante o dano continuam as do `HIT_STAND`: a reação muda o desenho, não a jogabilidade.

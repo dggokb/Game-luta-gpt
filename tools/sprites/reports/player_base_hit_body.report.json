@@ -1,0 +1,225 @@
+{
+  "id": "player_base_hit_body",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_hit_body_video_normalized.png",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Reacao em pe da mecanica de ataque (docs/revisao-base/mecanica-ataque.md): comeca na pose de dor (o 1o quadro da pausa), segura e volta a guarda; pe de tras no lugar da guarda (--fixar pe), o empurrao vem do jogo.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 576,
+    "rootX": 400,
+    "rootY": 540,
+    "columns": 5,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        237,
+        200,
+        534,
+        543
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 53253
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        238,
+        190,
+        537,
+        543
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 54118
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        238,
+        190,
+        537,
+        543
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 54319
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        238,
+        178,
+        533,
+        543
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 54523
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        237,
+        133,
+        534,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 56531
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        237,
+        133,
+        534,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 56407
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        237,
+        105,
+        537,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 58734
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        238,
+        90,
+        541,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62340
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        238,
+        91,
+        540,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 62261
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 322,
+    "frameHeight": 473,
+    "rootX": 173,
+    "rootY": 460,
+    "columns": 5,
+    "frameCount": 9,
+    "cropOffset": [
+      227,
+      80
+    ],
+    "sheetWidth": 948,
+    "sheetHeight": 1264,
+    "frames": [
+      [
+        632,
+        896,
+        312,
+        356,
+        4,
+        114
+      ],
+      [
+        0,
+        896,
+        312,
+        368,
+        4,
+        104
+      ],
+      [
+        316,
+        896,
+        312,
+        368,
+        4,
+        103
+      ],
+      [
+        632,
+        468,
+        308,
+        380,
+        6,
+        92
+      ],
+      [
+        0,
+        468,
+        312,
+        424,
+        4,
+        47
+      ],
+      [
+        316,
+        468,
+        312,
+        424,
+        4,
+        47
+      ],
+      [
+        636,
+        0,
+        312,
+        452,
+        4,
+        19
+      ],
+      [
+        0,
+        0,
+        312,
+        464,
+        7,
+        4
+      ],
+      [
+        316,
+        0,
+        316,
+        464,
+        4,
+        5
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 17694720,
+      "grid": 6092240,
+      "packed": 4793088
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "7f31d2e063e37f0974b4bc85cc3ef7253fae9942f11a490b02cc2e5cfccc1d81",
+      "config": "509c20e425bc6ea2450659bba1c1668485f82a7ea965723fd9043faae1c2f982",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_hit_body_video_normalized.png": "7f31d2e063e37f0974b4bc85cc3ef7253fae9942f11a490b02cc2e5cfccc1d81"
+    }
+  }
+}

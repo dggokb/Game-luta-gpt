@@ -6435,6 +6435,102 @@
         8
       ]
     },
+    "HIT_HIGH": {
+      "atlas": "player_base_hit_high",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        25,
+        25,
+        40,
+        35,
+        30,
+        40,
+        40,
+        60
+      ],
+      "posesChave": [
+        0,
+        4,
+        6,
+        8
+      ]
+    },
+    "HIT_BODY": {
+      "atlas": "player_base_hit_body",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        25,
+        25,
+        40,
+        35,
+        30,
+        40,
+        40,
+        60
+      ],
+      "posesChave": [
+        0,
+        4,
+        6,
+        8
+      ]
+    },
+    "HIT_HEAVY": {
+      "atlas": "player_base_hit_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        25,
+        25,
+        40,
+        35,
+        30,
+        40,
+        40,
+        60
+      ],
+      "posesChave": [
+        0,
+        4,
+        6,
+        8
+      ]
+    },
     "HIT_CROUCH": {
       "atlas": "player_base_hit_crouch",
       "frames": [
