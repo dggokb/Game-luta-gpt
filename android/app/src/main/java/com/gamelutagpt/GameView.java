@@ -5957,13 +5957,10 @@ public class GameView extends SurfaceView
         if (folego != 1f && f.grounded && !f.attacking() && !f.inHitstun()) {
             c.scale(1f + (folego - 1f) * 0.4f, folego, f.x, visualY);
         }
-        Filtro tinta = corDoLado(f, luzNoLutador(desgaste.tinta(f.state), f));
+        Filtro tinta = corDoLado(f, luzNoLutador(desgaste.tinta(f.state), desgaste.poeiraNosPes(f.state), f));
         renderer.setTint(tinta);
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         renderer.setTint(null);
-        if (look == null && renderer.override() == null && !damageFlash && !guardFlash && !drawingReflection) {
-            drawDirt(c, renderer, f, visualY);
-        }
         if (look != null) renderer.setOverride(null);
         c.restore();
     }
@@ -6014,15 +6011,17 @@ public class GameView extends SurfaceView
      * A luz do cenário no lutador (stage.json "luzLutadores": sol, noite, chuva, lanternas) por
      * cima do desgaste, e o clarão do relâmpago quando cai um. É a mesma matriz de cor que o
      * lutador já usava: não custa desenho a mais. Guardada por tinta e nível do clarão.
+     * {@code poeira} (o desgaste) entra no degradê dos pés: a mesma passada, sem corte e por
+     * baixo da luz do lugar (a tinta do desgaste é por estágio, então a chave já a separa).
      */
-    private Filtro luzNoLutador(Filtro tinta, CombatFighter f) {
+    private Filtro luzNoLutador(Filtro tinta, float[] poeira, CombatFighter f) {
         com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
         com.gamelutagpt.stage.StageDefinition.FighterLight luz = def != null ? def.fighterLight : null;
         int clarao = 0;
         if (stageScene != null && def != null && def.lightning != null) {
             clarao = Math.max(0, Math.min(LUZ_CLARAO_NIVEIS, Math.round(stageScene.lightningFlash() * LUZ_CLARAO_NIVEIS)));
         }
-        if (luz == null && clarao == 0) return tinta;
+        if (def == null || (luz == null && clarao == 0 && poeira == null)) return tinta;
         if (def != luzDoCenario) {
             luzes.clear();
             luzSemTinta = new Filtro[LUZ_PASSOS];
@@ -6081,16 +6080,18 @@ public class GameView extends SurfaceView
                 junto = new ColorMatrix(java.util.Arrays.copyOf(tinta.matriz, 20));
                 junto.postConcat(luzMatriz);
             }
-            if (luz != null && (luz.rimStrength > 0f || (luz.feet & 0xFFFFFF) != 0xFFFFFF)) {
+            if (poeira != null || (luz != null && (luz.rimStrength > 0f || (luz.feet & 0xFFFFFF) != 0xFFFFFF))) {
                 // Contraluz e degradê dos pés (só no OpenGL). No relâmpago a borda acende na cor dele.
                 float[] rim = new float[3];
+                float[] pes = luz != null ? luz.feetFactors() : new float[] {1f, 1f, 1f};
                 for (int i = 0; i < 3; i++) {
-                    float base = ((luz.rimColor >> (16 - 8 * i)) & 0xFF) / 255f;
+                    float base = luz != null ? ((luz.rimColor >> (16 - 8 * i)) & 0xFF) / 255f : 1f;
                     float raio = ((cor >> (16 - 8 * i)) & 0xFF) / 255f;
                     rim[i] = base + (raio - base) * c;
+                    if (poeira != null) pes[i] *= poeira[i];
                 }
-                niveis[chave] = Filtro.comLuz(junto.getArray(), rim, luz.rimStrength * rimK + 1.2f * c,
-                    rimX, rimY, luz.feetFactors());
+                float forca = (luz != null ? luz.rimStrength * rimK : 0f) + 1.2f * c;
+                niveis[chave] = Filtro.comLuz(junto.getArray(), rim, forca, rimX, rimY, pes);
             } else {
                 niveis[chave] = Filtro.matriz(junto);
             }
@@ -6123,28 +6124,6 @@ public class GameView extends SurfaceView
             corAlternada.put(tinta, alt);
         }
         return alt;
-    }
-
-    /**
-     * Desgaste: a poeira subindo dos pés, o próprio quadro de novo por cima, tingido de terra e
-     * recortado em duas faixas (mais forte embaixo). Segue a animação e a rotação do corpo.
-     */
-    private void drawDirt(Canvas c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
-        Filtro dirt = desgaste.sujeira(f.state);
-        if (dirt == null) return;
-        float h = f.character().visualStandHeight;
-        r.setOverride(dirt);
-        c.save();
-        c.clipRect(f.x - h, visualY - h * 0.16f, f.x + h, visualY + 40f);
-        r.draw(c, f.x, visualY, f.facing, false, false);
-        c.restore();
-        c.save();
-        c.clipRect(f.x - h, visualY - h * 0.36f, f.x + h, visualY - h * 0.16f);
-        r.setAlphaGlobal(130);
-        r.draw(c, f.x, visualY, f.facing, false, false);
-        r.setAlphaGlobal(255);
-        c.restore();
-        r.setOverride(null);
     }
 
     /** Cópias azuladas e translúcidas dos braços fantasmas, da mais forte à mais fraca; o alfa baixo vai a zero. */

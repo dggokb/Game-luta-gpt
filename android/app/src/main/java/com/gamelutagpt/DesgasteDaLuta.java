@@ -59,13 +59,20 @@ final class DesgasteDaLuta {
     private final int[] estagioVisto = new int[2];
     private final FighterState[] donoVisto = new FighterState[2];
 
-    /** Filtros do desenho por estágio (0 é o desenho limpo) e da poeira nas pernas. */
+    /** Filtros do desenho por estágio (0 é o desenho limpo). */
     private final Filtro[] tintas = {null, tinta(0.93f, 0.90f, 6f), tinta(0.85f, 0.78f, 10f), tinta(0.77f, 0.66f, 14f)};
-    private final Filtro[] sujeira = new Filtro[4];
+    /**
+     * A poeira nas pernas: o fator de cada canal nos pés (o degradê dos pés do sombreador, que
+     * sobe até a cabeça), o marrom (92, 70, 48) na força 18 + 22·estágio de 255. Antes era o
+     * desenho de novo por cima em duas faixas de corte reto e sem a luz do cenário: as pernas
+     * ficavam mais claras que o corpo e com dois riscos (joelho e canela).
+     */
+    private final float[][] poeira = new float[4][];
 
     DesgasteDaLuta() {
         for (int k = 1; k < 4; k++) {
-            sujeira[k] = Filtro.porCima(Color.argb(18 + 22 * k, 92, 70, 48));
+            float a = (18 + 22 * k) / 255f;
+            poeira[k] = new float[] {1f - a + a * 92 / 255f, 1f - a + a * 70 / 255f, 1f - a + a * 48 / 255f};
         }
     }
 
@@ -102,9 +109,9 @@ final class DesgasteDaLuta {
         return tintas[estagio(s)];
     }
 
-    /** O filtro da poeira nas pernas (null quando inteiro). */
-    Filtro sujeira(FighterState s) {
-        return sujeira[estagio(s)];
+    /** O fator da poeira nos pés, por canal (null quando inteiro). */
+    float[] poeiraNosPes(FighterState s) {
+        return poeira[estagio(s)];
     }
 
     /** Respiração ofegante no vermelho: quanto o corpo infla agora (1 = parado). */
