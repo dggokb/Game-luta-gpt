@@ -11,6 +11,9 @@ e o desenho do impacto segurado na janela ativa. A corrente L > M > H e o resto 
 mudaram. Tudo em `tools/sprites/mecanicas.json`; números, o que foi conferido e o que falta:
 [docs/balanco/normais-fable.md](docs/balanco/normais-fable.md).
 
+Efeitos visuais: o estilo ainda está em aberto e o próximo passo é testar imagens geradas dentro
+do jogo. Onde paramos e como continuar: [docs/vfx-continuar.md](docs/vfx-continuar.md).
+
 ## Motor de animação e efeitos
 
 **Motor de animação** (`android/motion-core`): o movimento por cima dos quadros desenhados,

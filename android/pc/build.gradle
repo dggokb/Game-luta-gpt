@@ -299,6 +299,27 @@ tasks.register('capturar', JavaExec) {
     if (providers.gradleProperty('precarga').isPresent()) systemProperty 'gameluta.precarga', providers.gradleProperty('precarga').get()
 }
 
+// Grava quadros seguidos de um roteiro numa luta do MODO TESTE, sem janela (ver GravarLuta).
+// gradle :pc:gravarLuta -Proteiro="espera:1 grava:90:esp especial:J fim" [-Pdupla=p05,p09,player_base,p04]
+//     [-Presolucao=960x540] [-Pcarga=600]   →   pc/build/gravar-luta/*.png
+tasks.register('gravarLuta', JavaExec) {
+    group = 'verification'
+    description = 'Roda o jogo sem tela e grava os quadros de um roteiro em pc/build/gravar-luta.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.pc.GravarLuta'
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    maxHeapSize = '4g'
+    if (providers.gradleProperty('dupla').isPresent()) systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').get()
+    if (providers.gradleProperty('carga').isPresent()) systemProperty 'gameluta.carga', providers.gradleProperty('carga').get()
+    if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
+    def passos = providers.gradleProperty('roteiro').getOrElse('espera:1 foto:luta').trim().split(/\s+/) as List
+    args([layout.buildDirectory.dir('gravar-luta').get().asFile.absolutePath,
+          providers.gradleProperty('resolucao').getOrElse('960x540')] + passos)
+}
+
 // O teste de desempenho automático (o do botão TESTE) sem tela: 30 s de luta roteirizada.
 // gradle :pc:medirLuta [-Presolucao=1920x1080]   →   pc/build/medir-luta/relatorio.txt
 tasks.register('medirLuta', JavaExec) {

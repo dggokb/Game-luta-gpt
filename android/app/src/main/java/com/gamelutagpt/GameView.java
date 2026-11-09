@@ -144,8 +144,6 @@ public class GameView extends SurfaceView
     private final EffectsRenderer effects = new EffectsRenderer();
     /** Hit and guard sparks at the real contact point (presentation only). */
     private final ImpactEffects impacts = new ImpactEffects();
-    /** Partículas dos poderes: fagulhas e estouro da bola de energia, fita dos objetos arremessados. */
-    private final Particulas particulas = new Particulas();
     /** Riscos de mangá dos golpes fortes (no corpo de quem apanhou e no rastro do golpe). */
     private final RiscosDeImpacto riscos = new RiscosDeImpacto();
     private final CombatFighter[] riscosLutadores = new CombatFighter[2];
@@ -1706,6 +1704,13 @@ public class GameView extends SurfaceView
             float elapsedSeconds = encaixarNoPasso((frameStart - previous) / 1_000_000_000f);
             previous = frameStart;
             if (pedirTeste) comecarTeste();
+            int barra = superPedido;
+            if (barra >= 0) {
+                superPedido = -1;
+                for (int side = 0; side < 2; side++) {
+                    for (FighterState m : engine.team(side).members) if (m != null) m.superMeter = barra;
+                }
+            }
             String[] dupla = duplaPedida;
             if (dupla != null) {
                 duplaPedida = null;
@@ -2231,7 +2236,6 @@ public class GameView extends SurfaceView
         for (CombatEngine.ProjectileClash clash : engine.clashes()) spawnClash(clash);
         updateUltraBeam();
         impacts.update(FIXED_STEP);
-        particulas.passo(FIXED_STEP, engine.energyProjectiles, engine.superProjectiles);
         efeitos.passo();
         acompanharDragao();
         passoRaiosShinkai();
@@ -2291,7 +2295,6 @@ public class GameView extends SurfaceView
         telao.reset();
         hud.resetEffects();
         impacts.clear();
-        particulas.limpar();
         riscos.clear();
         secretoStart = -1;
         efeitos.limpar();
@@ -2986,10 +2989,6 @@ public class GameView extends SurfaceView
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
-        }
-        // A bola de energia estoura na cor dela (o impacto de ar acima é o corpo recebendo a pancada).
-        if (event.projectile) {
-            particulas.acerto(x, y, direction, event.blocked, event.strength == AttackDefinition.Strength.SUPER);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
         if (!event.blocked && ultraBlackout() > 0) {
@@ -3998,6 +3997,27 @@ public class GameView extends SurfaceView
 
     private volatile String[] duplaPedida;
 
+    /**
+     * PC ({@code gradle :pc:gravarLuta}): a barra de Super dos dois times no valor pedido (1000 por
+     * barra), aplicada na thread do jogo, para gravar Super e Ultra sem esperar a barra encher.
+     */
+    public void encherSuper(int valor) {
+        superPedido = Math.max(0, Math.min(CombatConfig.MAX_METER, valor));
+    }
+
+    private volatile int superPedido = -1;
+
+    /** PC ({@code gradle :pc:gravarLuta}): a luta carregou, a entrada acabou e os comandos já valem. */
+    public boolean lutaPronta() {
+        return telaDaLuta() && introFrame < 0 && duplaPedida == null && !demo.active() && !tutorial.active()
+            && !cinematica.controleTravado();
+    }
+
+    /** PC ({@code gradle :pc:gravarLuta}): os botões de teste do canto fora (ou dentro) da gravação. */
+    public void mostrarBotoesDeTeste(boolean ligado) {
+        pausa.setBotoes(ligado);
+    }
+
     /** O pedido do botão (thread da tela) começa na thread do jogo, no começo do quadro. */
     private volatile boolean pedirTeste;
 
@@ -4411,7 +4431,6 @@ public class GameView extends SurfaceView
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawTraps(canvas, engine.traps);
-            if (enfeites) particulas.desenharFitas(renderCanvas);
             desenharProjeteisEmFolha(canvas);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles, projeteisEmFolha);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
@@ -4466,10 +4485,7 @@ public class GameView extends SurfaceView
                 desgaste.desenhar(canvas);
             }
             confronto.desenharFrente(canvas);
-            if (enfeites) {
-                impacts.draw(canvas);
-                particulas.desenhar(renderCanvas);
-            }
+            if (enfeites) impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
                 if (age >= 0 && age < EffectsRenderer.CANNON_BLAST_FRAMES) {

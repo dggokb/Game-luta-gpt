@@ -228,27 +228,9 @@ que mudou aqui foi só o desenho do impacto (`tools/sprites/impacto_ar.py`):
   o tempo é o mesmo (a pausa do golpe + 8 quadros) e o motor não mudou: as folhas
   `impacto_ar` e `impacto_ar_super` têm os mesmos nomes.
 
-Conferido no jogo de verdade rodando sem tela (o desenho do PC pelo Java2D, o mesmo código da
-luta): o impacto aparece no acerto do golpe e do projétil. Falta ver no aparelho, onde a luta é
-desenhada em OpenGL.
+Conferido no jogo rodando sem tela (o desenho do PC). Falta ver no aparelho.
 
-## Partículas dos poderes
-
-Golpe comum continua sendo só ar. Quem solta poder ganhou partículas, num sistema pequeno do
-próprio motor (`Particulas.java`, sem biblioteca de fora):
-
-| O quê | Quando | Como é |
-|---|---|---|
-| Fagulhas | a bola de energia em voo (`ONDA`, `ONDA_CURTA`, `PALMA` e a bola padrão; S1 e Super) | cacos na cor do poder com miolo branco, que se soltam da borda do cometa e ficam para trás |
-| Estouro | a bola acerta | 14 cacos (20 no Super) no sentido do golpe, atravessando quem apanhou, e algumas brasas que sobem |
-| Rebote | a bola é defendida | 8 cacos que voltam e sobem |
-| Desmanche | a bola acaba no ar (fim do alcance, choque de projéteis) | 6 cacos curtos |
-| Fita | objeto arremessado em voo (`KUNAI`, `SHURIKEN`, `MACHADO`, `MACHADINHO`, `BISTURI`, `SERINGA`, `PEDRA`) | um risco fino de ar que afina até a ponta e segue o arco do objeto |
-
-- No traço do jogo: borda dura e tons chapados; a partícula não desbota, encolhe até sumir.
-- A onda de vários acertos (a Onda Máxima) solta pouco a cada pancada e guarda o estouro para a última.
-- Sombra, chicote, fogo, balão, caixa e o estouro do p04 não soltam nada: têm desenho próprio.
-- Fila fixa de 224 partículas no relógio da luta; desenha com polígonos do `RenderCanvas` (sem
-  alocar nada por quadro) e some com o botão EFEITOS desligado.
-- Conferido no jogo rodando sem tela (S1 e Super do Ryūga, bisturi da p11, pedras do Krüger) e em
-  `ParticulasTest`. Falta ver no aparelho.
+Este desenho não é o final. Ele tem contorno e tons chapados, e o estudo de estilo do projeto
+(`docs/efeitos-referencia-fighterz.md`) pede o contrário: efeito é luz, sem contorno. As partículas
+por código que vieram depois dele foram reprovadas e retiradas. O que vem agora é imagem gerada
+testada dentro do jogo: [docs/vfx-continuar.md](../vfx-continuar.md).
