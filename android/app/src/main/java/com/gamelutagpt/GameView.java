@@ -2972,6 +2972,7 @@ public class GameView extends SurfaceView
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         ultimoAtacante = event.attacker & 1;
+        if (!event.blocked) reacao[event.defender & 1] = reacaoDoGolpe(event, defender, y);
         if (!event.blocked && (event.counterHit || punish)) {
             contraPiscaAte[event.defender & 1] = engine.frame() + CONTRA_PISCA_QUADROS;
         }
@@ -4956,6 +4957,11 @@ public class GameView extends SurfaceView
                 break;
             case HITSTUN:
                 state = f.hitCrouching ? SpriteStates.HIT_CROUCH : SpriteStates.HIT_STAND;
+                // A reação em pé do golpe que acertou (rosto, tronco ou forte), se o clipe existe.
+                if (!f.hitCrouching) {
+                    String porGolpe = REACAO_EM_PE[reacao[f.index & 1]];
+                    if (renderer.hasAnimation(porGolpe)) state = porGolpe;
+                }
                 // Stretched over the hitstun, like the guard reaction: the clip ends back in
                 // guard as control returns, whether the stun is short or long.
                 reactionElapsed = hitReactionTime(f.character().animations.get(state), f.stunElapsed, f.stunTotal);
@@ -5553,6 +5559,27 @@ public class GameView extends SurfaceView
     private static final Filtro CONTRA_PISCA = Filtro.porCima(Color.argb(130, 255, 36, 48));
     private static final int CONTRA_PISCA_QUADROS = 12;
     private final int[] contraPiscaAte = new int[2];
+
+    /**
+     * Qual reação em pé o golpe pede (docs/revisao-base/mecanica-ataque.md): o forte (H, especial,
+     * Super, Ultra) empurra o corpo inteiro; o resto depende de onde pegou: acima de 72% da altura
+     * de quem apanha (a cabeça) joga a cabeça para trás, abaixo dobra o tronco. É a divisão
+     * cabeça/corpo do Dragon Ball FighterZ (atributo do golpe) somada à reação forte do SF.
+     */
+    static int reacaoDoGolpe(CombatEngine.HitEvent event, CombatFighter defender, float impactY) {
+        AttackDefinition.Strength s = event.strength;
+        if (s == AttackDefinition.Strength.HEAVY || s == AttackDefinition.Strength.SPECIAL ||
+            s == AttackDefinition.Strength.SUPER) {
+            return REACAO_FORTE;
+        }
+        float alto = defender.character().visualStandHeight;
+        if (Float.isNaN(impactY)) return REACAO_TRONCO;
+        return defender.y - impactY >= alto * DANO_CABECA_ACIMA ? REACAO_ROSTO : REACAO_TRONCO;
+    }
+
+    static final int REACAO_TRONCO = 0, REACAO_ROSTO = 1, REACAO_FORTE = 2;
+    private static final String[] REACAO_EM_PE = {SpriteStates.HIT_BODY, SpriteStates.HIT_HIGH, SpriteStates.HIT_HEAVY};
+    private final int[] reacao = new int[2];
 
     /** Tamanho da faísca única por força (fraco, médio, forte, especial): 1 : 1,3 : 1,6. */
     private static final float[] FAISCA_ESCALA = {0.55f, 0.72f, 0.88f, 0.88f};

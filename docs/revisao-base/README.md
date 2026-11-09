@@ -408,6 +408,6 @@ As etapas 1 e 2 dependem só de código e dão para fazer já. A 3 usa as imagen
   - O tempo do golpe não muda. As caixas seguem o desenho e o alcance máximo foi mantido; só o soco fraco e o chute médio perderam 2 e 4 px, e a tabela de alcance da CPU foi refeita.
   - As poses ficam marcadas em `posesChave` no `character.json` e são lidas por `Animation.withPoses`.
 
-**Direção (pesquisa com fontes) e o que foi aplicado:** [direcao.md](direcao.md). É a regra para tudo daqui em diante: cada efeito, pausa, reação e aviso responde a um eixo do jogo (força, resultado, contra-golpe), com fonte. As tentativas soltas anteriores (contorno, faíscas de estilos diferentes, poeiras, rastro, quadros segurados por igual) foram revistas por ela.
+**Direção (pesquisa com fontes) e o que foi aplicado:** [direcao.md](direcao.md). **Mecânica de ataque fechada (reações, pausas, números de cada golpe):** [mecanica-ataque.md](mecanica-ataque.md). É a regra para tudo daqui em diante: cada efeito, pausa, reação e aviso responde a um eixo do jogo (força, resultado, contra-golpe), com fonte. As tentativas soltas anteriores (contorno, faíscas de estilos diferentes, poeiras, rastro, quadros segurados por igual) foram revistas por ela.
 
 **Depende de vídeo:** os prompts estão em [prompts-videos.md](prompts-videos.md) (faíscas no estilo FighterZ, defesa fria, poeiras e as reações de dano, queda, defesas, intro e vitória do Ryūga).

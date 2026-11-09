@@ -22,6 +22,9 @@ JAVA = 'android/app/src/main/java/com/gamelutagpt/'
 # Semantic vocabulary. The runtime (generated SpriteStates.java) and this validator share it.
 REQUIRED = ('IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND')
 OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP',
+            # Reações em pé por golpe (docs/revisao-base/mecanica-ataque.md): no rosto, no tronco e o
+            # forte que empurra. Sem o clipe, o jogo usa HIT_STAND.
+            'HIT_HIGH','HIT_BODY','HIT_HEAVY',
             # Ativação do SHINKAI (a luta para escurecida enquanto ela toca).
             'SHINKAI_ATIVA',
             'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT',
