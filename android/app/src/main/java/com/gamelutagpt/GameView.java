@@ -164,7 +164,6 @@ public class GameView extends SurfaceView
     /** A tela de vitória desta luta já tocou (ou não tinha cena). */
     private boolean vitoriaTocada;
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
-    private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
     private final ImpactFeel feel = new ImpactFeel();
@@ -2981,7 +2980,7 @@ public class GameView extends SurfaceView
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
-                defender.hitstopTotal, event.attacker)) {
+                event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -5513,44 +5512,52 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * A gramática do efeito de golpe (docs/revisao-base/direcao.md, regras E1–E7; coluna de efeitos
-     * do SF6 e o limite de tamanho do 2XKO): um único desenho de faísca (o impacto forte) em
-     * três tamanhos na proporção 1 : 1,3 : 1,6 (fraco, médio, forte/especial), um pouco para dentro
-     * de quem apanha (o acerto "transborda" para a vítima); na defesa, o escudo ciano parado antes,
-     * do lado de quem bate. A faísca dura a pausa do golpe e mais alguns quadros, e some antes de
-     * quem apanhou poder agir; cada atacante tem uma só faísca na tela (a nova tira a anterior).
-     * O Super e o Ultra usam o efeito-âncora maior (o magenta), o único fora da escala. O
-     * contra-golpe não muda a faísca: é sinalizado no corpo de quem apanha (piscar vermelho) e no
-     * aviso curto. False: não há o efeito (entra o clássico).
+     * O efeito de golpe (docs/revisao-base/direcao.md, regras E1–E7). Golpe é pancada: ninguém solta
+     * poder, então não há faísca nem fogo, só ar deslocado. A família toda é de estouros de ar
+     * brancos e translúcidos:
+     * - defesa: os três estouros de ar tirados dos vídeos de defesa (defesa, defesa_2, defesa_3), um
+     *   de cada vez, e o defesa_poder quando o defendido é um poder (projétil ou especial);
+     * - acerto: o impacto de ar desenhado no mesmo estilo (tools/sprites/impacto_ar.py), em
+     *   1 : 1,3 : 1,6 por força (o forte com 128 px, do tamanho do punho e do peito), um pouco para
+     *   dentro de quem apanha (as rajadas vão mais longe para o lado dela);
+     * - Super e Ultra: o mesmo impacto com mais rajadas e um anel a mais, 1,25×.
+     * Os estouros da defesa vinham do tamanho do vídeo (288 px, mais que o lutador) e ficam a 60–80%.
+     * O efeito dura a pausa do golpe e mais alguns quadros, e some antes de quem apanhou poder agir;
+     * cada atacante tem um só na tela (o novo tira o anterior). O contra-golpe não muda o efeito: é
+     * sinalizado no corpo de quem apanha (piscar vermelho) e no aviso curto. False: não há o efeito
+     * (entra o clássico).
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
-                                  int pausa, int atacante) {
+                                  boolean poder, int pausa, int atacante) {
         boolean esquerda = direction < 0;
         float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
-        String nome;
-        float escala;
-        float px;
-        if (defendido) {
-            nome = "defesa";
-            escala = size >= ImpactEffects.HEAVY ? 1.1f : size == ImpactEffects.MEDIUM ? 0.95f : 0.8f;
-            px = x - direction * 12f;
-        } else if (superGolpe) {
-            nome = "impacto_contra";
-            escala = 1.2f;
-            px = x + direction * 12f;
-        } else {
-            nome = "impacto_forte";
-            escala = FAISCA_ESCALA[Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size))];
-            px = x + direction * 12f;
-        }
         int a = atacante & 1;
         efeitos.parar(faiscaVaga[a], faiscaNome[a]);
-        int vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, ms);
+        int vaga = -1;
+        String nome = null;
+        if (defendido) {
+            float escala = size >= ImpactEffects.HEAVY ? 0.8f : size == ImpactEffects.MEDIUM ? 0.7f : 0.6f;
+            String[] ordem = poder ? DEFESA_PODER : DEFESAS[defesaVez = (defesaVez + 1) % DEFESAS.length];
+            for (String n : ordem) {
+                vaga = efeitos.tocarDurando(n, x, y, escala, esquerda, ms);
+                if (vaga >= 0) { nome = n; break; }
+            }
+        } else {
+            nome = superGolpe ? "impacto_ar_super" : "impacto_ar";
+            float escala = superGolpe ? 1.25f : FAISCA_ESCALA[Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size))];
+            vaga = efeitos.tocarDurando(nome, x + direction * 12f, y, escala, esquerda, ms);
+        }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
         faiscaNome[a] = nome;
         return true;
     }
+
+    /** As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. */
+    private static final String[][] DEFESAS = {
+        {"defesa", "defesa_2", "defesa_3"}, {"defesa_2", "defesa_3", "defesa"}, {"defesa_3", "defesa", "defesa_2"}};
+    private static final String[] DEFESA_PODER = {"defesa_poder", "defesa", "defesa_2", "defesa_3"};
+    private int defesaVez;
 
     /**
      * O contra-golpe no corpo de quem apanhou (docs/revisao-base/direcao.md, regras I5 e E12): pisca
@@ -5582,7 +5589,7 @@ public class GameView extends SurfaceView
     private final int[] reacao = new int[2];
 
     /** Tamanho da faísca única por força (fraco, médio, forte, especial): 1 : 1,3 : 1,6. */
-    private static final float[] FAISCA_ESCALA = {0.55f, 0.72f, 0.88f, 0.88f};
+    private static final float[] FAISCA_ESCALA = {0.625f, 0.8125f, 1f, 1f};
     private final int[] faiscaVaga = {-1, -1};
     private final String[] faiscaNome = {"", ""};
 
