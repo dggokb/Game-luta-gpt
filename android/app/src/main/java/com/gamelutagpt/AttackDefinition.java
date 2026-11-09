@@ -52,8 +52,11 @@ final class AttackDefinition {
         boolean activeAt(int frame) { return frame >= firstFrame && frame <= lastFrame; }
     }
 
-    /** What a counter stance catches, and what an evasion slips under. */
-    enum Reads { NONE, HIGH, LOW, ANY }
+    /**
+     * What a counter stance catches, and what an evasion slips under. AIR (só na esquiva): o
+     * anti-aéreo, que passa só pelos golpes de quem está no ar (o 2H de quem tira do ar de verdade).
+     */
+    enum Reads { NONE, HIGH, LOW, ANY, AIR }
 
     /**
      * Character mechanics of a move (docs/personagens/mecanicas.md), all optional. Frame
@@ -101,7 +104,10 @@ final class AttackDefinition {
          */
         float hopHeight;
         int hopStart, hopEnd;
-        /** Evasion: HIGH slips standing/air strikes and projectiles, ANY everything. */
+        /**
+         * Evasion: HIGH slips standing/air strikes and projectiles, ANY everything, AIR only the
+         * strikes of an airborne attacker (anti-air: projectiles and grounded strikes still hit).
+         */
         Reads evade = Reads.NONE;
         int evadeStart, evadeEnd;
         /** Travel (world units per second) in [advanceStart, advanceEnd]; negative goes back. */

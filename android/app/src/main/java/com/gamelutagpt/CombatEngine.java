@@ -3622,12 +3622,15 @@ final class CombatEngine {
 
     /**
      * The defender's move slips this strike: a dodge under standing/air strikes and
-     * projectiles (HIGH), or a vanish that nothing touches (ANY). Low strikes and low projectiles still hit a HIGH dodge.
+     * projectiles (HIGH), a vanish that nothing touches (ANY), or an anti-air that only the strikes
+     * of an airborne attacker miss (AIR). Low strikes and low projectiles still hit a HIGH dodge.
      */
     private static boolean evades(CombatFighter d, AttackDefinition attack, boolean airborneAttacker, boolean projectile) {
         AttackDefinition.Mechanics m = d.mechanics();
         if (!m.evadeAt(d.attackFrame)) return false;
         if (m.evade == AttackDefinition.Reads.ANY) return true;
+        // Anti-aéreo: só o golpe de quem vem pelo ar passa; projétil e golpe de chão acertam.
+        if (m.evade == AttackDefinition.Reads.AIR) return airborneAttacker && !projectile;
         if (projectile) return !attack.low;
         return airborneAttacker || !attack.low;
     }

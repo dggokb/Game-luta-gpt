@@ -2763,7 +2763,8 @@ final class AiController {
                 start = m.counterStart;
                 end = m.counterEnd;
             } else if (m.evade != AttackDefinition.Reads.NONE &&
-                (m.evade == AttackDefinition.Reads.ANY || air || !a.low)) {
+                (m.evade == AttackDefinition.Reads.ANY || air ||
+                    (m.evade != AttackDefinition.Reads.AIR && !a.low))) {
                 start = m.evadeStart;
                 end = m.evadeEnd;
             } else if (o.role == CpuSpecials.Role.ARMOR && CpuSpecials.reaches(o, gap, target.body(), seen.crouching)) {

@@ -181,7 +181,7 @@ def validate_fighter(pack):
         if move == 'S' and 'energy' not in f:
             raise ValueError(f'{name}.assist: S needs fighter.energy')
 
-READS = {'alto':'HIGH','baixo':'LOW','tudo':'ANY'}
+READS = {'alto':'HIGH','baixo':'LOW','tudo':'ANY','aereo':'AIR'}   # aereo: só a esquiva (anti-aéreo)
 
 def validate_mechanics(name, mech, m, projectile):
     """Mecânica do golpe (docs/personagens/mecanicas.md); espelha AttackDefinition.Builder."""
@@ -198,7 +198,7 @@ def validate_mechanics(name, mech, m, projectile):
             raise ValueError(f'{name}.mecanica.{key}.frames: expected [a, b] inside 0..{total-1}')
     if 'armadura' in mech:
         frames('armadura', mech['armadura']); positive_int(mech['armadura'].get('golpes'), f'{name}.mecanica.armadura.golpes')
-    for key,field,allowed in (('contra','le',('alto','baixo','tudo')),('esquiva','de',('alto','tudo'))):
+    for key,field,allowed in (('contra','le',('alto','baixo','tudo')),('esquiva','de',('alto','tudo','aereo'))):
         if key in mech:
             frames(key, mech[key])
             if mech[key].get(field) not in allowed:
