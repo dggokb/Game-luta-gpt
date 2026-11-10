@@ -193,6 +193,23 @@ limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, 
 da lista fica na frente (desenhar do miolo para fora), e o segundo grupo se chama
 `contents/group#2`.
 
+## Teste da receita "quadros gerados + acabamento" com o dano_forte (10/11, noite)
+
+Recomendação 1 do relatório `reports/Pipeline profissional de VFX anime.md`, sem desenhar nada no
+programa: `art/vfx/effectcraft/dano_forte_ec.py` importa `art/vfx/dano/dano_forte.mp4` no
+EffectCraft (ele decodifica mp4 sem tela, igual ao ffmpeg a 1/255), remapeia o tempo por expressão
+(12 desenhos: o impacto segurado por dois, depois o vídeo de dois em dois até o quadro 24), troca o
+degradê macio por faixas chapadas (Colorama Custom sem interpolar, cortes medidos no vídeo: halo
+até ~0,31 de intensidade vira transparente, desenho de 0,36 para cima), tira o preto (Unmult),
+refaz o halo limpo (Glow A e B) e come o corpo no fim por erosão (Fractal Noise em Stencil Luma,
+contraste 400, brilho de 300 caindo a −50). Monta e renderiza em 1,9 s.
+
+No jogo: `efeito_video.py <pasta> --nome dano_forte_ec --fps 8 --origem 427,384 --escala-mundo
+0.30 --borda 50` (o mesmo ponto, escala e ritmo da `impacto_ar_forte`); o nome apontou para ela
+só na cópia local. Vídeo: `android/app/build/sprite-review/acerto_forte_hoje_x_receita_dano_forte.mp4`.
+Primeiro passe errado: com o corte em 0,10 o halo virou uma mancha laranja chapada, e com
+contraste 600 a erosão já comia o desenho 0.
+
 ## Regra 2 revista (10/11, noite)
 
 Depois de ver a faísca do golpe forte refeita no EffectCraft, o dono revisou a regra do desenho
