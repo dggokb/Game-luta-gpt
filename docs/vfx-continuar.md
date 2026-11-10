@@ -221,6 +221,11 @@ dano_forte_anel_ec --fps 8 --origem 427,543 --escala-mundo 0.30 --borda 50`. No 
 do quadro 15 ao 23 da gravação (acerto no 11). Vídeo:
 `android/app/build/sprite-review/acerto_forte_hoje_x_receita_com_anel_3d.mp4`.
 
+**No jogo (pedido do dono, 10/11):** `dano_forte_anel_ec` foi para a `game-luta-sprite-fable`
+como a faísca do golpe forte e especial (`GameView.efeitoDeGolpe`, antes da `impacto_ar_forte`,
+que fica como reserva se a folha nova faltar). Para voltar: apagar
+`android/app/src/main/assets/efeitos/dano_forte_anel_ec` (o jogo cai sozinho na `impacto_ar_forte`).
+
 ## Regra 2 revista (10/11, noite)
 
 Depois de ver a faísca do golpe forte refeita no EffectCraft, o dono revisou a regra do desenho
