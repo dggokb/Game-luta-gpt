@@ -1,15 +1,15 @@
 {
  "nome": "rastro_fita",
- "origem": "tools/sprites/rastro_fita.py (arco_textura_03.png)",
+ "origem": "tools/sprites/rastro_fita.py (arco_textura_04.png)",
  "ancora": "fita",
  "pixelScale": 1.0,
- "altura": 96,
+ "altura": 192,
  "quadros": [
   [
    0,
    0,
-   512,
-   96,
+   1024,
+   192,
    0.0,
    0.0
   ]

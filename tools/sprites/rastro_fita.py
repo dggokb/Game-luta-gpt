@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """A textura da fita do rastro do golpe (assets/efeitos/rastro_fita).
 
-Entra a fita RETA gerada no GPT/Codex em fundo preto (art/vfx/arco_textura_03.png): nasce fina à
+Entra a fita RETA gerada no GPT/Codex em fundo preto (art/vfx/arco_textura_04.png): nasce fina à
 esquerda (a ponta velha do rastro) e chega à grossura cheia à direita (a ponta nova, onde está o
-punho ou o pé), com a borda de cima nítida. O jogo dobra ela ao longo da linha de ação de cada
-golpe (RastroDoGolpe, EfeitosVideo.fita) e pinta da cor do membro: por isso ela é gravada nas
-cores que o jogo sabe pintar (efeito_imagem.tingivel).
+punho ou o pé). O jogo dobra ela ao longo da linha de ação de cada golpe, numa malha só
+(RastroDoGolpe, EfeitosVideo.fita). Sai nas cores dela: a malha não pinta.
 
-    python3 tools/sprites/rastro_fita.py art/vfx/arco_textura_03.png
+    python3 tools/sprites/rastro_fita.py art/vfx/arco_textura_04.png
 """
 import argparse
 import json
@@ -22,26 +21,27 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import efeito_imagem as ei  # noqa: E402
 
-LARGURA, ALTURA = 512, 96   # px da folha: o jogo estica no caminho, não precisa de mais
+LARGURA, ALTURA = 1024, 192   # px da folha: os riscos finos precisam de resolução
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('textura')
     p.add_argument('--nome', default='rastro_fita')
+    p.add_argument('--veu', type=float, default=0.5,
+                   help='expoente da opacidade: menor que 1 levanta o véu meio transparente sem estourar os riscos')
     a = p.parse_args()
-    rgba = ei.tingivel(ei.recortar_fundo(Image.open(a.textura), 'preto'))
+    rgba = ei.recortar_fundo(Image.open(a.textura), 'preto')
     ys, xs = np.nonzero(rgba[..., 3] > 0.04)
     rgba = rgba[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-    # Reduz o quanto é branco e a opacidade em separado, por média (sem o repique do Lanczos, que
-    # deixava a borda dos riscos mais escura que a cor de pintar e virava serrilhado preto no jogo).
-    base = np.array(ei.TINTA_BASE, dtype=np.float32)
-    branco = (rgba[..., 0] - base[0]) / (1.0 - base[0])
-    alfa = rgba[..., 3]
+    # Reduz por média com a cor multiplicada pela opacidade (sem repique na borda dos riscos). O
+    # expoente levanta o véu meio transparente sem estourar os riscos, que já são opacos.
     menor = lambda m: cv2.resize(m.astype(np.float32), (LARGURA, ALTURA), interpolation=cv2.INTER_AREA)
-    alfa_p = menor(alfa)
-    branco_p = np.clip(menor(branco * alfa) / np.maximum(alfa_p, 1e-4), 0.0, 1.0)[..., None]
-    rgba = np.dstack([base + (1.0 - base) * branco_p, np.clip(alfa_p, 0.0, 1.0)])
+    alfa = menor(rgba[..., 3])
+    cor = np.dstack([menor(rgba[..., c] * rgba[..., 3]) for c in range(3)]) / np.maximum(alfa, 1e-4)[..., None]
+    # Uma linha transparente em cima e embaixo: a malha repete a imagem fora dela.
+    alfa[0, :] = alfa[-1, :] = 0.0
+    rgba = np.dstack([np.clip(cor, 0.0, 1.0), np.clip(alfa, 0.0, 1.0) ** a.veu])
     fita = Image.fromarray((rgba * 255).round().astype(np.uint8), 'RGBA')
     pasta = ei.SAIDA / a.nome
     pasta.mkdir(parents=True, exist_ok=True)
