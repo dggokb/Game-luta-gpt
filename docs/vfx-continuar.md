@@ -51,6 +51,40 @@ Skills de terceiros olhadas no mesmo dia e descartadas: `vfx-spell-effects` (Swi
 `create-game-vfx` (lista genérica para Three.js), `Claude-Code-Game-Studios` (projeto-modelo
 inteiro, sem VFX), `rea` (engenharia reversa de código, não abre arte de jogo).
 
+## Teste do EffectCraft para fabricar efeitos de ponto (10/11, noite)
+
+O dono pediu para testar se o [EffectCraft](https://github.com/storytold/effectcraft) (clone de
+After Effects em Rust, com linha de comando sem tela) serve para fabricar os efeitos de ponto.
+Feito com **um efeito só**, a faísca de defesa. **Nada no jogo foi trocado:** espera a aprovação
+dele no vídeo `android/app/build/sprite-review/defesa_atual_x_effectcraft.mp4` (fica só na sessão).
+
+- **Onde fica**: clonado fora do repositório (`/home/user/storytold/effectcraft`); o download de
+  releases é bloqueado aqui, então foi compilado: `cargo build --release -p effectcraft-cli`,
+  **14 min 17 s** em 4 núcleos, 2,2 GB em `target/`. Compilou sem erro.
+- **Confirmado**: renderiza na CPU sem tela (sem DISPLAY nem Wayland); `render-frame --transparent`
+  sai PNG RGBA; a render queue (`renderQueue.add` com `format: png, channels: rgba` e
+  `renderQueue.render {"wait": true}`) sai a sequência PNG com alfa reto.
+- **O efeito**: `art/vfx/effectcraft/defesa_ec.py` monta o projeto (`defesa_ec.ecproj`, ao lado)
+  só pela linha de comando (`effectcraft-cli run --commands`) e exporta 8 PNG. Montar e
+  renderizar leva **1,2 s**. A forma vem da imagem gerada que já está no jogo (`defesa_01.png`,
+  regra 2 da skill): o EffectCraft tira o preto (efeito Unmult), corta em pedaços por máscara e
+  anima cada um. Receita do relatório: 8 quadros a 60 por segundo, opaca de 0 a 3 e depois
+  75/50/25/0 %, crescendo sempre; camadas anel (nasce no quadro 1), escudo (cresce 92 -> 113 %),
+  faíscas (recuam rápido e freiam, esticadas no começo), estrela (gira 30° por quadro, começa em
+  0°) e clarão (3 quadros). Só o anel e o clarão são formas do EffectCraft.
+- **No jogo**: `tools/sprites/efeito_video.py <pasta dos PNG> --nome defesa_ec --fps 60 --origem
+  410,492 --escala-mundo 0.2965 --resolucao 2.0` (a mesma escala e o mesmo contato da `defesa`
+  de hoje): folha de 1941×946, 8 quadros. Para gravar, a lista `DEFESAS`/`DEFESA_PODER` do
+  `GameView` apontou para `defesa_ec` **só na cópia local**, e voltou. A folha não foi para o
+  repositório; o script e o comando acima a refazem.
+- **Gravar uma defesa**: `gradle :pc:gravarLuta -Proteiro="tecla:F3 segura:A espera:0.5
+  grava:420:e espera:7.5 fim"` (F3 liga a CPU, o jogador recua defendendo). A CPU não repete as
+  jogadas, então as defesas caem em quadros diferentes a cada gravação. Nas duas gravações as 4
+  defesas foram de **projétil** (`defesa_poder`); a defesa de golpe de perto não apareceu.
+
+Não conferido: a defesa de golpe de perto, o celular (a gravação é o desenho do PC), e o tamanho
+contra a `defesa_poder` (ela foi feita com 260; a `defesa_ec` usa a escala da comum, 220).
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada
