@@ -226,6 +226,21 @@ como a faísca do golpe forte e especial (`GameView.efeitoDeGolpe`, antes da `im
 que fica como reserva se a folha nova faltar). Para voltar: apagar
 `android/app/src/main/assets/efeitos/dano_forte_anel_ec` (o jogo cai sozinho na `impacto_ar_forte`).
 
+## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
+
+Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
+feia. Duas tentativas, nenhuma no jogo:
+1. a mesma `poeira_corrida_01.png` animada em partes (revelar a partir do pé, riscos que somem
+   cedo, nuvem que rola e se desfaz por erosão de borda dura) — o movimento ficou bom, mas o
+   desenho é o que ele acha feio;
+2. fumaça cel "metaball" feita no EffectCraft (`art/vfx/effectcraft/poeira_dash_ec.py`: tufos +
+   Gaussian Blur + Channel Threshold no alfa + duas cores + erosão) — três passes, todos com cara
+   de programa (pão, bolinhas, faixa lisa). Pela regra 2 revista, não serve.
+
+Roteiro que grava o dash: `gradle :pc:gravarLuta -Proteiro="espera:0.5 grava:40:d tecla:D tecla:D fim"`
+(a poeira aparece do quadro 8 ao 20). Próximo passo: arte gerada nova (imagem com 4 a 6 desenhos
+lado a lado, ou vídeo em fundo verde), e o EffectCraft só no acabamento, como no `dano_forte`.
+
 ## Regra 2 revista (10/11, noite)
 
 Depois de ver a faísca do golpe forte refeita no EffectCraft, o dono revisou a regra do desenho
