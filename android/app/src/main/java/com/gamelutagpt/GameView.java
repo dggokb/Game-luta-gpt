@@ -5549,7 +5549,10 @@ public class GameView extends SurfaceView
      *   chapados e miolo de nanquim no contato; tools/sprites/impacto_ar.py), em 1 : 1,3 : 1,6 por
      *   força (a estrela do forte com 128 px, do tamanho do punho e do peito), um pouco para dentro
      *   de quem apanha (os espinhos vão mais longe para o lado dela);
-     * - Super e Ultra: o mesmo impacto com mais espinhos e um anel a mais, 1,25×.
+     * - Super e Ultra: o mesmo impacto com mais espinhos e um anel a mais, 1,25×;
+     * - forte e especial: a explosão própria (impacto_ar_forte), se existe;
+     * - do médio para cima, a lança de luz (lanca_luz) atravessando na linha do golpe.
+     * Tudo gira na inclinação do golpe (o chute que sobe joga para cima).
      * Os estouros da defesa vinham do tamanho do vídeo (288 px, mais que o lutador) e ficam a 60–80%.
      * O efeito dura a pausa do golpe e mais alguns quadros, e some antes de quem apanhou poder agir;
      * cada atacante tem um só na tela (o novo tira o anterior). O contra-golpe não muda o efeito: é
@@ -5572,10 +5575,19 @@ public class GameView extends SurfaceView
                 if (vaga >= 0) { nome = n; break; }
             }
         } else {
-            nome = superGolpe ? "impacto_ar_super" : "impacto_ar";
-            float escala = superGolpe ? 1.25f : FAISCA_ESCALA[Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size))];
+            int forca = Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size));
+            float px = x + direction * 12f;
+            // A lança de luz atravessa na linha do golpe a partir do contato (do médio para cima),
+            // por baixo da faísca: tocada antes, desenhada antes.
+            efeitos.parar(lancaVaga[a], LANCA);
+            lancaVaga[a] = superGolpe || size >= ImpactEffects.MEDIUM
+                ? efeitos.tocarDurando(LANCA, px, y, superGolpe ? 1.4f : LANCA_ESCALA[forca], esquerda, ms, angulo) : -1;
+            // O forte e o especial têm a explosão própria, se ela existe; senão a faísca maior.
+            boolean forte = !superGolpe && size >= ImpactEffects.HEAVY && efeitos.tem("impacto_ar_forte");
+            nome = superGolpe ? "impacto_ar_super" : forte ? "impacto_ar_forte" : "impacto_ar";
+            float escala = superGolpe ? 1.25f : forte ? FORTE_ESCALA[forca] : FAISCA_ESCALA[forca];
             // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
-            vaga = efeitos.tocarDurando(nome, x + direction * 12f, y, escala, esquerda, ms, angulo);
+            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, ms, angulo);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
@@ -5618,8 +5630,17 @@ public class GameView extends SurfaceView
     private static final String[] REACAO_EM_PE = {SpriteStates.HIT_BODY, SpriteStates.HIT_HIGH, SpriteStates.HIT_HEAVY};
     private final int[] reacao = new int[2];
 
-    /** Tamanho da faísca única por força (fraco, médio, forte, especial): 1 : 1,3 : 1,6. */
-    private static final float[] FAISCA_ESCALA = {0.625f, 0.8125f, 1f, 1f};
+    /**
+     * Tamanho da faísca por força (fraco, médio, forte, especial). As referências (FighterZ) cobrem
+     * o tronco e a cabeça de quem apanha num golpe forte: o fraco ainda pequeno, o forte grande.
+     */
+    private static final float[] FAISCA_ESCALA = {0.8f, 1f, 1.3f, 1.4f};
+    /** O forte e o especial com a explosão própria (impacto_ar_forte, já desenhada maior). */
+    private static final float[] FORTE_ESCALA = {1f, 1f, 1f, 1.15f};
+    /** A lança de luz que atravessa na linha do golpe (o fraco não tem). */
+    private static final String LANCA = "lanca_luz";
+    private static final float[] LANCA_ESCALA = {0f, 0.75f, 1f, 1.2f};
+    private final int[] lancaVaga = {-1, -1};
     private final int[] faiscaVaga = {-1, -1};
     private final String[] faiscaNome = {"", ""};
 

@@ -22,7 +22,10 @@ tempo): cada faixa vira um quadro e o estouro por código não entra (a animaç�
     --tamanho T     o lado maior do efeito em px do mundo no tamanho 1 (128: o do acerto forte)
     --fundo F       preto (padrão: o brilho vira transparência), verde, ou transparente (PNG com alfa)
     --origem x,y    o ponto de contato na imagem, de 0 a 1 (padrão 0.5,0.5: o meio)
-    --parado        sem o estouro: a imagem inteira some aos poucos (fumaça, brilho que fica)
+    --parado        sem o estouro: a imagem inteira some aos poucos (brilho que fica)
+    --nuvem         poeira e vapor: nasce do ponto, abre e continua crescendo devagar enquanto some
+    --ancora A      centro (padrão) ou chao: só anota no efeito.json (com chao, ponha a --origem
+                    na linha do chão da imagem: o jogo toca estes no GROUND_Y)
     --quadros N     a imagem tem N quadros lado a lado (faixas iguais); --origem vale dentro de cada faixa
     --previa P.png  só mostra os quadros (fundo escuro e claro), não grava no jogo
 
@@ -38,9 +41,13 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 SAIDA = ROOT / 'android/app/src/main/assets/efeitos'
 PIXEL_SCALE = 2.0   # 2 px da folha = 1 px do mundo (o mesmo dos outros efeitos)
+LARGURA_MAX = 4096  # px: a folha passa disso em fileiras
 # O estouro: (escala, opacidade, ms). O pico passa um pouco do tamanho e assenta; a cauda some.
 ESTOURO = [(0.55, 1.0, 33), (1.12, 1.0, 50), (1.0, 1.0, 67), (1.0, 0.8, 50), (1.03, 0.5, 33), (1.06, 0.22, 33)]
 PARADO = [(1.0, 1.0, 67), (1.0, 1.0, 67), (1.0, 0.8, 50), (1.0, 0.55, 50), (1.0, 0.3, 33), (1.0, 0.12, 33)]
+# A nuvem (poeira, vapor): nasce do ponto, abre rápido, continua crescendo devagar e se desfaz (~0,4 s).
+NUVEM = [(0.45, 1.0, 33), (0.75, 1.0, 33), (0.92, 1.0, 50), (1.0, 0.92, 50), (1.05, 0.75, 67),
+         (1.09, 0.52, 67), (1.12, 0.3, 67), (1.14, 0.12, 50)]
 
 
 def recortar_fundo(imagem, fundo):
@@ -116,20 +123,27 @@ def quadros_da_folha(rgba, n, tamanho, origem):
     return quadros, tempos[:n], lado
 
 
-def gravar(nome, quadros, tempos, lado, origem_do_arquivo):
+def gravar(nome, quadros, tempos, lado, origem_do_arquivo, ancora='centro'):
     pasta = SAIDA / nome
     pasta.mkdir(parents=True, exist_ok=True)
     caixas = [q.getchannel('A').point(lambda v: 255 if v > 3 else 0).getbbox() or (0, 0, 1, 1) for q in quadros]
-    largura = sum(b[2] - b[0] for b in caixas) + 2 * len(caixas)
-    alto = max(b[3] - b[1] for b in caixas)
-    folha = Image.new('RGBA', (largura, alto), (0, 0, 0, 0))
-    lista, x = [], 0
-    for q, b in zip(quadros, caixas):
-        folha.paste(q.crop(b), (x, 0))
-        lista.append([x, 0, b[2] - b[0], b[3] - b[1], float(b[0] - lado / 2), float(b[1] - lado / 2)])
-        x += b[2] - b[0] + 2
+    # Em fileiras de no máximo LARGURA_MAX px (a textura que celular velho aceita).
+    posicoes, x, y, alto_fileira, largura = [], 0, 0, 0, 0
+    for b in caixas:
+        w, h = b[2] - b[0], b[3] - b[1]
+        if x and x + w > LARGURA_MAX:
+            x, y, alto_fileira = 0, y + alto_fileira + 2, 0
+        posicoes.append((x, y))
+        largura = max(largura, x + w)
+        alto_fileira = max(alto_fileira, h)
+        x += w + 2
+    folha = Image.new('RGBA', (largura, y + alto_fileira), (0, 0, 0, 0))
+    lista = []
+    for q, b, (px, py) in zip(quadros, caixas, posicoes):
+        folha.paste(q.crop(b), (px, py))
+        lista.append([px, py, b[2] - b[0], b[3] - b[1], float(b[0] - lado / 2), float(b[1] - lado / 2)])
     folha.save(pasta / 'folha.webp', lossless=True, quality=100, method=6)
-    dados = {'nome': nome, 'origem': f'tools/sprites/efeito_imagem.py ({origem_do_arquivo})', 'ancora': 'centro',
+    dados = {'nome': nome, 'origem': f'tools/sprites/efeito_imagem.py ({origem_do_arquivo})', 'ancora': ancora,
              'pixelScale': PIXEL_SCALE, 'altura': lado / PIXEL_SCALE, 'quadros': lista, 'duracoesMs': tempos}
     (pasta / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print(nome, '->', pasta.relative_to(ROOT), folha.size)
@@ -155,6 +169,8 @@ def main():
     p.add_argument('--fundo', choices=('preto', 'verde', 'transparente'), default='preto')
     p.add_argument('--origem', default='0.5,0.5')
     p.add_argument('--parado', action='store_true')
+    p.add_argument('--nuvem', action='store_true')
+    p.add_argument('--ancora', choices=('centro', 'chao'), default='centro')
     p.add_argument('--quadros', type=int, default=1)
     p.add_argument('--previa')
     a = p.parse_args()
@@ -165,11 +181,12 @@ def main():
     if a.quadros > 1:
         quadros, tempos, lado = quadros_da_folha(rgba, a.quadros, a.tamanho, origem)
     else:
-        quadros, tempos, lado = quadros_de(rgba, a.tamanho, origem, PARADO if a.parado else ESTOURO)
+        roteiro = NUVEM if a.nuvem else PARADO if a.parado else ESTOURO
+        quadros, tempos, lado = quadros_de(rgba, a.tamanho, origem, roteiro)
     if a.previa:
         previa(quadros, lado, a.previa)
     if a.nome:
-        gravar(a.nome, quadros, tempos, lado, Path(a.imagem).name)
+        gravar(a.nome, quadros, tempos, lado, Path(a.imagem).name, a.ancora)
 
 
 if __name__ == '__main__':
