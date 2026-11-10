@@ -147,6 +147,15 @@ Mesmo ponto, tamanho e ritmo da folha de hoje: `efeito_video.py <pasta> --nome i
 Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_refeito_effectcraft.mp4` (só na
 sessão). **Nada no jogo foi trocado**: o `efeitoDeGolpe` apontou para ela só na cópia local.
 
+**Anel de pressão de ar (pedido seguinte):** um anel branco-azulado meio transparente em volta
+do amarelo, que nasce no desenho 1, abre rápido freando (raio 72 -> 212 px da folha), ondula
+(Turbulent Displace), afina e se desfaz em arcos por erosão: um ruído de borda dura (Fractal
+Noise, contraste 320) como máscara de luminância, com o brilho caindo de 100 a −75; dentro, um
+disco fraco e macio de pressão. A tela cresceu 70 px à esquerda e 60 em cima e embaixo; o
+contato passou a `--origem 245,231` (mesma escala). No jogo, o anel vai do quadro 12 ao 22 da
+gravação. Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_refeito_com_anel_de_ar.mp4`.
+O Roughen Edges sozinho não partiu o anel (só deixou a borda áspera e depois apagou de uma vez).
+
 Ficou parecido na forma, no tempo e na direção; ficou diferente no traço: a de hoje tem borda
 serrilhada e textura de desenho à mão, mais laranja e brasas mais acesas; a refeita é mais
 limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, o primeiro grupo

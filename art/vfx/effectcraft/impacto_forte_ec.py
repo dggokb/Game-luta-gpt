@@ -19,7 +19,7 @@ O que tem na referência, e como fica aqui:
     python3 art/vfx/effectcraft/impacto_forte_ec.py --saida PASTA [--cli CAMINHO]
 
 Sai: art/vfx/effectcraft/impacto_forte_ec.ecproj e PASTA/impacto_forte_ec_0000.png ... 0011.png.
-No jogo: efeito_video.py PASTA --nome impacto_forte_ec --fps 8 --origem 175,171 --escala-mundo 0.6667
+No jogo: efeito_video.py PASTA --nome impacto_forte_ec --fps 8 --origem 245,231 --escala-mundo 0.6667
 --resolucao 1.5 (o mesmo ponto, tamanho e ritmo da impacto_ar_forte).
 """
 import argparse
@@ -36,8 +36,12 @@ CLI_PADRAO = Path('/home/user/storytold/effectcraft/target/release/effectcraft-c
 
 FPS = 30
 QUADROS = 12
-LARGO, ALTO = 585, 342          # a tela da folha atual (px da folha)
-CENTRO = (150.0, 170.0)         # o miolo da estrela (o contato do jogo fica em 175,171)
+# A tela da folha atual era 585 x 342 com o miolo em (150, 170); cresceu 70 para a esquerda e 60
+# em cima e embaixo para caber o anel de pressão de ar. O contato do jogo fica em (245, 231).
+FOLGA = (70, 60)
+LARGO, ALTO = 585 + FOLGA[0], 342 + 2 * FOLGA[1]
+CENTRO = (150.0 + FOLGA[0], 170.0 + FOLGA[1])
+CONTATO = (175 + FOLGA[0], 171 + FOLGA[1])
 
 # As faixas, de fora para dentro: (cor, escala do contorno).
 FAIXAS = [('#6e1b0e', 1.00), ('#ff6a0d', 0.93), ('#ffb21a', 0.80), ('#ffe27a', 0.60), ('#fffbe8', 0.38)]
@@ -173,6 +177,51 @@ def passos():
         s += grupo('riscos_escuros', k + 1, losango(comp, 3.2, ang, atras=-comp * 0.45), '#5a160c')
     s += chaves('riscos_escuros', 'transform/opacity', [90, 90, 70, 45, 20, 0])
     s += chaves('riscos_escuros', 'transform/scale', [[s_, s_, 100] for s_ in (100, 104, 108, 112, 116, 120)])
+
+    # Anel de pressão de ar em volta do amarelo: branco-azulado meio transparente (é ar, não
+    # fogo), nasce no desenho 1, abre rápido e freia, afina e se desfaz em pedaços (Roughen
+    # Edges com a borda crescendo come o traço). Dentro, um disco fraco e macio (a pressão). O traço muda no tamanho da elipse, não na escala
+    # da camada, para afinar enquanto abre.
+    for nome, comeca, raios, larguras, opac in (
+            ('pressao', 1, [72, 114, 144, 166, 182, 194, 202, 208, 212],
+             [28, 24, 20, 16, 13, 10, 7, 4, 2], [95, 90, 80, 66, 52, 38, 24, 12, 0]),):
+        s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': nome, 'size': [140, 140],
+                                                       'stroke': '#f4fbff', 'strokeWidth': 20}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': 'contents/group/contents/fill/opacity', 'value': 0}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': 'transform/position', 'value': [*CENTRO, 0]}}]
+        antes = [None] * comeca
+        s += chaves(nome, 'contents/group/contents/ellipse/size', antes + [[2 * r, 2 * r] for r in raios])
+        s += chaves(nome, 'contents/group/contents/stroke/width', antes + larguras)
+        s += chaves(nome, 'transform/opacity', [0] * comeca + opac)
+        # O ar ondula: o anel não é um círculo de compasso.
+        s += [{'command': 'effect.apply', 'params': {'effect': 'Turbulent Displace', 'layers': [nome]}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/amount', 'value': 14}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/size', 'value': 45}}]
+        s += chaves(nome, '@fx/evolution', antes + [25 * i for i in range(9)])
+        s += [{'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': [nome]}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/blurriness', 'value': 2.5}},
+              {'command': 'effect.apply', 'params': {'effect': 'Glow', 'layers': [nome]}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/threshold', 'value': 40}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/radius', 'value': 12}},
+              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/intensity', 'value': 0.8}}]
+    # Desfaz em pedaços por erosão (a técnica do relatório): um ruído cinza de borda dura serve de
+    # máscara de luminância; o brilho dele cai a cada desenho, os buracos crescem e o anel se
+    # parte em arcos até sumir. O ruído fica parado, então os buracos só crescem.
+    s += [{'command': 'layer.newSolid', 'params': {'name': 'erosao', 'color': '#000000', 'width': LARGO, 'height': ALTO}},
+          {'command': 'effect.apply', 'params': {'effect': 'Fractal Noise', 'layers': ['erosao']}},
+          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/contrast', 'value': 320}},
+          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/overflow', 'value': 0}},
+          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/transform/scale', 'value': 45}},
+          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/complexity', 'value': 3}},
+          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/evolutionOptions/seed', 'value': 5}}]
+    s += chaves('erosao', 'effects/#1/brightness', [100, 100, 90, 60, 35, 12, -10, -30, -50, -75])
+    s += [{'command': 'layer.setTrackMatte', 'params': {'layers': ['pressao'], 'matte': 'erosao', 'kind': 'luma'}}]
+    s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': 'pressao_disco', 'size': [140, 140], 'fill': '#eaf6ff'}},
+          {'command': 'prop.set', 'params': {'layer': 'pressao_disco', 'path': 'transform/position', 'value': [*CENTRO, 0]}},
+          {'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': ['pressao_disco']}},
+          {'command': 'prop.set', 'params': {'layer': 'pressao_disco', 'path': 'effects/#1/blurriness', 'value': 30}}]
+    s += chaves('pressao_disco', 'contents/group/contents/ellipse/size', [None, [140, 140], [230, 230], [290, 290], [330, 330], [360, 360]])
+    s += chaves('pressao_disco', 'transform/opacity', [0, 22, 16, 10, 5, 0])
 
     # Jatos: três pontas longas na direção do golpe, nas faixas.
     jatos = [(-14, 410, 40), (0, 425, 34), (20, 270, 32), (-32, 190, 26), (38, 165, 22)]
