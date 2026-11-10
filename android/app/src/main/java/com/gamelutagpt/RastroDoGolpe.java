@@ -13,8 +13,9 @@ import android.graphics.Canvas;
  * Aqui a fita nasce junto com o movimento: a cada desenho que a tela mostra, a cabeça dela vai
  * para onde a ponta do membro está, e o que ficou para trás some em {@link #VIDA} quadros. Ela
  * é atravessada no caminho, do lado do membro (larga no balanço, que varre uma área; fina na
- * estocada), e sai da cor do membro. Na pausa do acerto o golpe não anda e a fita fica parada na tela, como o
- * membro. Só apresentação; golpes sem caminho (os com efeito já desenhado na arte, os especiais)
+ * estocada), e sai da cor do membro. É exagerada de propósito: nas referências (Marvel Tōkon,
+ * docs/efeitos-referencia-tokon.md) o corte de ar é do tamanho do membro ou maior e fica na tela.
+ * Na pausa do acerto o golpe não anda e a fita fica parada na tela, como o membro. Só apresentação; golpes sem caminho (os com efeito já desenhado na arte, os especiais)
  * ficam sem.
  */
 final class RastroDoGolpe {
@@ -24,11 +25,11 @@ final class RastroDoGolpe {
     /** Pedaços da fita entre dois pontos do caminho. */
     private static final int PASSOS = 8;
     /** Quadros que um ponto da fita dura depois que a ponta passou por ele (fraco, médio, forte). */
-    private static final int[] VIDA = {5, 6, 8};
+    private static final int[] VIDA = {8, 10, 13};
     /** O quanto do membro atravessado no caminho a fita cobre, e os limites em px (fraco, médio, forte). */
-    private static final float[] LARGURA = {0.6f, 0.8f, 1f};
-    private static final float[] LARGURA_MAX = {34f, 52f, 72f};
-    private static final float LARGURA_MIN = 16f;
+    private static final float[] LARGURA = {1.1f, 1.5f, 1.9f};
+    private static final float[] LARGURA_MAX = {80f, 120f, 160f};
+    private static final float LARGURA_MIN = 44f;
 
     private final EfeitosVideo efeitos;
     private final Lado[] lados = {new Lado(), new Lado()};
@@ -40,12 +41,12 @@ final class RastroDoGolpe {
     private final float[] fx = new float[AMOSTRAS], fy = new float[AMOSTRAS], dx = new float[AMOSTRAS], dy = new float[AMOSTRAS];
     private final float[] alfa = new float[AMOSTRAS];
     /** O quanto da largura fica para fora da ponta no balanço (o punho e o pé têm grossura). */
-    private static final float FORA = 0.3f;
+    private static final float FORA = 0.22f;
     /** Menos que isto (px) de membro atravessado no caminho, em média, é estocada. */
     private static final float ESTOCADA = 24f;
     /** Na estocada: a distância dos riscos ao caminho e a grossura deles (fraco, médio, forte). */
-    private static final float AO_LADO = 14f;
-    private static final float[] RISCO = {9f, 12f, 16f};
+    private static final float AO_LADO = 6f;
+    private static final float[] RISCO = {26f, 36f, 48f};
 
     /** O rastro do golpe em curso de um lutador. */
     private static final class Lado {
@@ -95,7 +96,7 @@ final class RastroDoGolpe {
         }
     }
 
-    /** Desenha no espaço do mundo (o canvas já com a câmera), por cima dos lutadores. */
+    /** Desenha no espaço do mundo (o canvas já com a câmera), atrás dos lutadores. */
     void desenhar(Canvas c) {
         for (Lado l : lados) {
             if (l.ataque == null || l.cabeca < 1) continue;
@@ -146,7 +147,8 @@ final class RastroDoGolpe {
         jx[n] = l.x + l.facing * curva(p0[2], p1[2], p2[2], p3[2], t);
         jy[n] = l.y - curva(p0[3], p1[3], p2[3], p3[3], t);
         float idade = l.quadro - (l.chegada[j] + (l.chegada[j + 1] - l.chegada[j]) * t);
-        alfa[n] = Math.max(0f, Math.min(1f, 1f - idade / vida));
+        // Cheia na primeira metade da vida, depois some: o corte de ar fica na tela, não pisca.
+        alfa[n] = Math.max(0f, Math.min(1f, 2f * (1f - idade / vida)));
         return n + 1;
     }
 

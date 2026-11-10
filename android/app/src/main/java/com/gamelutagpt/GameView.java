@@ -4431,6 +4431,9 @@ public class GameView extends SurfaceView
             canvas.translate(tagOffset(), 0f);
             drawContactShadow(canvas, spriteFighterRenderer, player());
             canvas.restore();
+            // O rastro do golpe atrás dos dois lutadores: o corte de ar aparece em volta do braço ou
+            // da perna, sem cobrir o desenho de quem bate.
+            if (enfeites) rastros.desenhar(canvas);
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
@@ -4499,8 +4502,6 @@ public class GameView extends SurfaceView
                 }
             }
             drawBreakerCue(canvas);
-            // O rastro do golpe por cima dos lutadores e por baixo da faísca do acerto.
-            if (enfeites) rastros.desenhar(canvas);
             efeitos.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {

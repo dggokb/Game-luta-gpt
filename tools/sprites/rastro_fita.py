@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """A textura da fita do rastro do golpe (assets/efeitos/rastro_fita).
 
-Entra a fita RETA gerada no GPT/Codex em fundo preto (art/vfx/arco_textura_01.png): nasce fina à
+Entra a fita RETA gerada no GPT/Codex em fundo preto (art/vfx/arco_textura_02.png): nasce fina à
 esquerda (a ponta velha do rastro) e chega à grossura cheia à direita (a ponta nova, onde está o
 punho ou o pé), com a borda de cima nítida. O jogo dobra ela ao longo da linha de ação de cada
 golpe (RastroDoGolpe, EfeitosVideo.fita) e pinta da cor do membro: por isso ela é gravada nas
 cores que o jogo sabe pintar (efeito_imagem.tingivel).
 
-    python3 tools/sprites/rastro_fita.py art/vfx/arco_textura_01.png
+    python3 tools/sprites/rastro_fita.py art/vfx/arco_textura_02.png
 """
 import argparse
 import json
 import sys
 from pathlib import Path
 
+import cv2
 import numpy as np
 from PIL import Image
 
@@ -32,7 +33,16 @@ def main():
     rgba = ei.tingivel(ei.recortar_fundo(Image.open(a.textura), 'preto'))
     ys, xs = np.nonzero(rgba[..., 3] > 0.04)
     rgba = rgba[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-    fita = Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), 'RGBA').resize((LARGURA, ALTURA), Image.LANCZOS)
+    # Reduz o quanto é branco e a opacidade em separado, por média (sem o repique do Lanczos, que
+    # deixava a borda dos riscos mais escura que a cor de pintar e virava serrilhado preto no jogo).
+    base = np.array(ei.TINTA_BASE, dtype=np.float32)
+    branco = (rgba[..., 0] - base[0]) / (1.0 - base[0])
+    alfa = rgba[..., 3]
+    menor = lambda m: cv2.resize(m.astype(np.float32), (LARGURA, ALTURA), interpolation=cv2.INTER_AREA)
+    alfa_p = menor(alfa)
+    branco_p = np.clip(menor(branco * alfa) / np.maximum(alfa_p, 1e-4), 0.0, 1.0)[..., None]
+    rgba = np.dstack([base + (1.0 - base) * branco_p, np.clip(alfa_p, 0.0, 1.0)])
+    fita = Image.fromarray((rgba * 255).round().astype(np.uint8), 'RGBA')
     pasta = ei.SAIDA / a.nome
     pasta.mkdir(parents=True, exist_ok=True)
     fita.save(pasta / 'folha.webp', lossless=True, quality=100, method=6)
