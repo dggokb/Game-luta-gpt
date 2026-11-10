@@ -457,6 +457,9 @@ def main():
         if a.write:
             aplicar(pack, novo, golpes)
             silhuetas(pack)
+            # A inclinação do membro que bate (a faísca segue o golpe) acompanha as caixas novas.
+            import angulo_golpe
+            angulo_golpe.gravar(pack)
             meia = empurrao(pack)
             if meia:
                 pack['fighter']['body']['pushHalfWidth'] = meia

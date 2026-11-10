@@ -80,6 +80,8 @@ final class EfeitosVideo {
     /** Efeito que anda (px do mundo por passo) e repete os quadros até {@link #fimMs} (-1: toca uma vez). */
     private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
+    /** Inclinação de cada vaga (graus, positivo para cima no sentido do efeito). */
+    private final float[] angulo = new float[VAGAS];
     private int proxima;
 
     private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
@@ -203,6 +205,7 @@ final class EfeitosVideo {
         y[i] = py;
         escala[i] = tamanho;
         espelhado[i] = espelhar;
+        angulo[i] = 0f;
         idadeMs[i] = 0f;
         vx[i] = 0f;
         fimMs[i] = -1f;
@@ -217,7 +220,16 @@ final class EfeitosVideo {
      * (docs/revisao-base/direcao.md, regra E6). Devolve a vaga, ou -1 se o efeito não existe.
      */
     int tocarDurando(String nome, float px, float py, float tamanho, boolean espelhar, float duracaoMs) {
+        return tocarDurando(nome, px, py, tamanho, espelhar, duracaoMs, 0f);
+    }
+
+    /**
+     * Como o de cima, inclinado {@code graus} em volta da origem (positivo para cima, no sentido em
+     * que o efeito aponta): a faísca segue a linha do golpe (o chute que sobe).
+     */
+    int tocarDurando(String nome, float px, float py, float tamanho, boolean espelhar, float duracaoMs, float graus) {
         if (!tocar(nome, px, py, tamanho, espelhar)) return -1;
+        angulo[ultima] = graus;
         float natural = tocando[ultima].duracaoMs();
         ritmo[ultima] = natural > 0f && duracaoMs > 0f ? natural / duracaoMs : 1f;
         return ultima;
@@ -315,9 +327,12 @@ final class EfeitosVideo {
             float k = escala[i] / f.pixelScale;
             float left = f.desloc[q][0] * k, top = f.desloc[q][1] * k;
             destino.set(x[i] + left, y[i] + top, x[i] + left + r[2] * k, y[i] + top + r[3] * k);
-            if (espelhado[i]) {
+            if (espelhado[i] || angulo[i] != 0f) {
                 c.save();
-                c.scale(-1f, 1f, x[i], 0f);
+                // A tela tem y para baixo: para cima é girar ao contrário do relógio (ao contrário,
+                // espelhado, porque o efeito aponta para a esquerda).
+                if (angulo[i] != 0f) c.rotate(espelhado[i] ? angulo[i] : -angulo[i], x[i], y[i]);
+                if (espelhado[i]) c.scale(-1f, 1f, x[i], 0f);
                 c.drawBitmap(f.bitmap, fonte, destino, paint);
                 c.restore();
             } else {

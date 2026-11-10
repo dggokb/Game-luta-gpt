@@ -28,6 +28,8 @@ final class CombatEngine {
         final String moveId;
         /** Contact point in world space for presentation (NaN when the move has none, e.g. throws). */
         float impactX = Float.NaN, impactY = Float.NaN;
+        /** Inclinação do golpe no contato (graus, positivo para cima, no sentido do golpe): a faísca segue o membro. */
+        float impactAngle;
         /** Button class of the contact, or null when unknown. Presentation only. */
         AttackDefinition.Strength strength;
         /** Última pancada de um golpe com pausa final própria (o chute que fecha o Super da p15). */
@@ -468,13 +470,14 @@ final class CombatEngine {
         // 5. Reactions and pushback.
         for (Contact contact : contacts) {
             // The point is measured before pushback moves the defender.
-            float ix = impactX(contact), iy = impactY(contact);
+            float ix = impactX(contact), iy = impactY(contact), angulo = impactAngle(contact);
             int before = events.size();
             applyContact(contact);
             for (int e = before; e < events.size(); e++) {
                 HitEvent event = events.get(e);
                 event.impactX = ix;
                 event.impactY = iy;
+                event.impactAngle = angulo;
                 event.strength = contact.attack.strength;
             }
         }
@@ -4563,6 +4566,25 @@ final class CombatEngine {
             }
         }
         return d.x - direction * melhor;
+    }
+
+    /**
+     * A inclinação do golpe no contato (graus, positivo para cima, no sentido do golpe), para a
+     * faísca seguir a linha do membro: o chute que sobe joga a faísca para cima, o baixo para
+     * baixo. Medida no desenho (tools/sprites/angulo_golpe.py); projétil, crossup, golpe sem a
+     * medida: 0 (reto).
+     */
+    private static float impactAngle(Contact c) {
+        if (c.projectile != null || c.cruzou || c.hitbox != 0) return 0f;
+        return anguloNoDesenho(c.attacker, c.attacker.attackFrame);
+    }
+
+    /** A inclinação do membro de {@code a} no quadro {@code frame} do golpe, ou 0 sem medida. */
+    static float anguloNoDesenho(CombatFighter a, int frame) {
+        if (golpeNoDesenho(a, frame) == null) return 0f;
+        float[] angulos = desenhoDoGolpe(a).anguloGolpe;
+        int q = quadroDoDesenho(a, frame);
+        return angulos == null || q < 0 || q >= angulos.length ? 0f : angulos[q];
     }
 
     private static float impactY(Contact c) {

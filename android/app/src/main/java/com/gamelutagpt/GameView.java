@@ -2987,7 +2987,7 @@ public class GameView extends SurfaceView
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
-                event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker)) {
+                event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -5557,7 +5557,7 @@ public class GameView extends SurfaceView
      * (entra o clássico).
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
-                                  boolean poder, int pausa, int atacante) {
+                                  boolean poder, int pausa, int atacante, float angulo) {
         boolean esquerda = direction < 0;
         float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
         int a = atacante & 1;
@@ -5574,7 +5574,8 @@ public class GameView extends SurfaceView
         } else {
             nome = superGolpe ? "impacto_ar_super" : "impacto_ar";
             float escala = superGolpe ? 1.25f : FAISCA_ESCALA[Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size))];
-            vaga = efeitos.tocarDurando(nome, x + direction * 12f, y, escala, esquerda, ms);
+            // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
+            vaga = efeitos.tocarDurando(nome, x + direction * 12f, y, escala, esquerda, ms, angulo);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;

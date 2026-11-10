@@ -37,6 +37,25 @@ Para voltar o impacto de ar ao da review (macio, branco, sem contorno):
 git checkout 10cef7e -- tools/sprites/impacto_ar.py android/app/src/main/assets/efeitos/impacto_ar android/app/src/main/assets/efeitos/impacto_ar_super
 ```
 
+## Rodada de 10/11: primeiras imagens do Codex e o lugar da faísca
+
+- **Três variações do acerto** geradas no Codex (imagem única, fundo preto, apontando para a
+  direita), em `art/vfx/acerto_01.png` a `_03.png` com o pedido ao lado: **01** luz macia sem
+  contorno (línguas de fogo e raios longos; a recomendada), **02** estrela recortada em faixas
+  duras com anel, **03** branco contido (fina demais: some no jogo). Nenhuma foi gravada como
+  `impacto_ar` ainda: falta a escolha. O miolo não vem no meio da imagem; no jogo vai com
+  `--origem 0.27,0.51` (01), `0.35,0.49` (02), `0.46,0.5` (03).
+- **O lugar** (`CombatEngine.impactX`): colados, o pé desenhado entra no desenho do rival e a
+  faísca ficava presa na borda dele, na canela de quem chutava. Agora vai até a ponta desenhada,
+  sem passar do meio do corpo do rival.
+- **A direção**: a faísca gira na linha do membro que bate (o chute alto sobe, o soco reto fica
+  reto, o chute agachado desce). A inclinação é medida no desenho por
+  `tools/sprites/angulo_golpe.py` (gravada em `silhueta.angulo` de cada animação de golpe; o
+  `caixas_sprites.py --write` refaz junto) e o `EfeitosVideo.tocarDurando` gira o efeito. Só o
+  acerto gira; a defesa fica como estava.
+- Na gravação, `tecla:L` é o golpe **forte** (J K L = L M H). Com `espera:1.3` o chute às vezes
+  não chega (a caminhada varia); `espera:1.8` encosta no rival e acerta sempre.
+
 ## O estilo ainda está em aberto
 
 Três direções foram postas na mesa; nenhuma foi escolhida. A decisão é para ser tomada **vendo

@@ -79,6 +79,12 @@ final class CharacterDefinition {
          * Null sem caixas medidas.
          */
         float[][] silhuetaCorpo,silhuetaGolpe;
+        /**
+         * A inclinação do membro que bate, por quadro da folha (graus, positivo para cima, no
+         * sentido do golpe; tools/sprites/angulo_golpe.py): a faísca de acerto segue a linha do
+         * golpe. Null sem medida; 0 nos quadros sem ela.
+         */
+        float[] anguloGolpe;
         /** Onde começa o quadro {@code index} da animação (s); o fim dela além do último. */
         float startOf(int index) {
             float t=0f;for(int i=0;i<Math.min(index,durations.length);i++)t+=durations[i];return t;
@@ -88,6 +94,13 @@ final class CharacterDefinition {
             for(float[] g:silhuetaGolpe)if(g!=null&&g.length!=4&&g.length!=8)throw new IllegalArgumentException(id+": golpe {x0,x1,y0,y1} (uma ou duas caixas)");
             for(float[] c:silhuetaCorpo)if(c!=null&&c.length%4!=0)throw new IllegalArgumentException(id+": corpo em caixas de 4");
             postura=mediana(silhuetaCorpo);
+            return this;
+        }
+        Animation withSilhueta(String corpo,String golpe,String angulo) {
+            withSilhueta(corpo,golpe);
+            float[][] q=quadros(angulo);
+            anguloGolpe=new float[q.length];
+            for(int i=0;i<q.length;i++)if(q[i]!=null)anguloGolpe[i]=q[i][0];
             return this;
         }
         /**
