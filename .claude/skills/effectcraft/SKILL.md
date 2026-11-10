@@ -71,6 +71,10 @@ com anel de pressão de ar em 3/4, faixas chapadas, faíscas das pontas).
 | Partículas | `Particle Emitter 2D` (pontos em px, `particleType` Star, `gravity` 0, `resistance`) | faíscas e brasas sem desenhar uma a uma |
 | Erosão de anime | `Fractal Noise` na própria camada, `blendingMode` 19 (Stencil Luma), `brightness` caindo | o efeito se parte em pedaços de borda dura |
 | Brilho de anime | `Glow` com `colors` 1 (A & B), `colorA`/`colorB` | halo colorido do laranja ao vermelho, ciano no ar |
+| Anéis de onda | `Radio Waves`: `waveStroke/profile` Taper, `startWidth` > `endWidth`, pontos em px | pressão de ar, impacto |
+| Rampa de cor | `Colorama`: paleta Custom (8), `interpolatePalette` false, `cycles` 0.999 | ruído vira fogo/fumaça em faixas chapadas |
+| Traço afinando | `stroke/taper/*` (units 1 = %, `startWidth` 0) | corte de golpe numa forma só |
+| Espinhos finos | operador `pucker` (`amount` −60) numa estrela | estrela de impacto de anime |
 | Linha dupla | `Repeater` (2 cópias, escala 86-90 %, `endOpacity` 40) | onda de choque |
 
 Os 20 efeitos de geração e simulação testados (Advanced Lightning, Beam, Radio Waves, Radial Light
@@ -96,6 +100,10 @@ Alpha, Starfield) aplicam e renderizam sem tela em menos de 0,1 s por quadro de 
    último valor fica preso.
 9. `prop.set` não aceita `expression`: é `prop.setExpression`.
 10. Lottie perde Glow, ruído e distorções: para o jogo, a folha de quadros continua o caminho.
+11. **Glow com nomes de `operation` trocados**: 0 ("On Top") é o normal do After Effects ("Behind").
+12. **Colorama**: `cycles` 0.999, senão o branco puro volta para a primeira cor da paleta.
+13. **Shatter** sai em arame por padrão: `view` 0 para renderizar.
+14. Turbulent Noise não tem Cycle Evolution; para repetir sem emenda, Fractal Noise.
 
 ## Inventário
 
