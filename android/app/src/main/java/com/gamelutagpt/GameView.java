@@ -5730,6 +5730,8 @@ public class GameView extends SurfaceView
         }
         rastroVaga[i] = efeitos.tocarDurando(rastroNome[i], x + f.facing * rastroPonta[i][0], f.y - rastroPonta[i][1],
             escala, f.facing < 0, quadros * FIXED_STEP * 1000f, ponta[2]);
+        // Da cor de onde sai: a luva, a faixa, o tênis de quem bate.
+        efeitos.tingir(rastroVaga[i], rastroNome[i], (int) ponta[5]);
     }
 
     /** Quanto o membro de {@code f} esticou no quadro {@code q} do golpe (px), ou -infinito sem medida. */

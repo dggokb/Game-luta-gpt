@@ -45,6 +45,21 @@ public class AnguloDoGolpeTest {
         assertEquals(null, BASE.animation("CROUCH_LIGHT").rastroGolpe);
     }
 
+    @Test public void socoRetoNaoTemArcoDeChute() {
+        // O Brucy (p04) é boxeador: o soco médio e o forte são retos (a onda na linha do braço),
+        // não o arco de quem sobe a perna do chão.
+        CharacterDefinition brucy = GeneratedCharacters.get("p04");
+        for (String golpe : new String[] {"MEDIUM_KICK", "HEAVY_STRAIGHT"}) {
+            int com = 0;
+            for (float[] r : brucy.animation(golpe).rastroGolpe) {
+                if (r == null || r[1] < 150f) continue;   // só o braço esticado na altura do ombro
+                assertEquals(golpe, 0f, r[4], 0f);
+                com++;
+            }
+            assertTrue(golpe, com > 0);
+        }
+    }
+
     @Test public void quadroSemMedidaFicaReto() {
         // O quadro 0 é a guarda, antes do membro sair: sem caixa de golpe, sem inclinação.
         assertEquals(0f, angulo("HEAVY_STRAIGHT", 0), 0f);

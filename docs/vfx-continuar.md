@@ -102,8 +102,8 @@ virada para onde o membro aponta. É o mesmo desenho que a arte do Ryūga (playe
 
 | Nome no jogo | Imagem | Como foi posto |
 |---|---|---|
-| `rastro_golpe` (fraco e médio) | `rastro_02.png` (a onda com riscos de ar) | `--sopro --origem 0.84,0.48 --tamanho 170` |
-| `rastro_forte` (forte) | `rastro_01.png` (a meia-lua grande) | `--sopro --origem 0.52,0.5 --tamanho 170` |
+| `rastro_golpe` (golpe reto: fraco, soco, rasteira) | `rastro_02.png` (a onda com riscos de ar) | `--sopro --tingivel --origem 0.84,0.48 --tamanho 170` |
+| `rastro_forte` (soco forte) | `rastro_01.png` (a meia-lua grande) | `--sopro --tingivel --origem 0.52,0.5 --tamanho 170` |
 
 - **Onde sai** (`tools/sprites/angulo_golpe.py`, `silhueta.rastro` de cada animação: x, y e graus
   da ponta por quadro): só golpe normal, e só onde a arte não tem efeito desenhado
@@ -118,17 +118,28 @@ virada para onde o membro aponta. É o mesmo desenho que a arte do Ryūga (playe
 - A regra antiga (direcao.md: golpe sem linhas de velocidade, para não atrapalhar a leitura da
   distância) foi respeitada no que dá: o rastro é curto e colado na ponta, não uma linha atrás
   do membro. Se atrapalhar no jogo, é tirar as duas pastas de `assets/efeitos`.
-- **O arco do balanço** (o que o usuário queria: a onda na ponta não era o pedido). No médio e
-  no forte o rastro é um arco de ar por onde o membro passou, como nas referências. A textura é
+- **O arco do balanço** (o que o usuário queria: a onda na ponta não era o pedido). A textura é
   uma fita reta gerada no Codex (`art/vfx/arco_textura_01.png`); o
   `tools/sprites/rastro_arco.py` curva ela num arco de círculo e anima (a ponta nova varre o arco
   em dois quadros e a fita se desfaz pela ponta velha). Folhas: `rastro_arco` (95°),
-  `rastro_arco_forte` (`--abertura 130 --grossura 0.36`) e as duas `_desce` (`--desce`). O
-  `silhueta.rastro` ganhou o comprimento do membro (o raio) e o sentido (+1 subiu, -1 desceu,
-  0 reto); o jogo põe o centro do arco na raiz do membro, escala pelo raio e gira na inclinação.
-  O sentido é uma regra, não uma medida: o golpe inclinado para baixo desceu, os outros subiram
-  (o desenho tem poucos quadros entre a guarda e o membro esticado para medir o caminho). O
-  fraco e o rasteiro continuam com a onda na ponta.
+  `rastro_arco_forte` (`--abertura 130 --grossura 0.36`) e as duas `_desce` (`--desce`). O jogo
+  põe o centro do arco na raiz do membro, escala pelo comprimento dele e gira na inclinação.
+- **Cada tipo de movimento tem o seu** (pedido: "o Brucy dá um soco e o arco é igual ao do
+  chute"). O `silhueta.rastro` é `[x, y, graus, raio, sentido, cor]`, e o sentido sai do tipo
+  (`angulo_golpe.sentido`): o **chute** é um balanço (o arco de baixo para cima, ou de cima para
+  baixo se a perna aponta para baixo); o **soco** é reto (a onda com riscos na linha do braço,
+  `rastro_golpe`, e a meia-lua `rastro_forte` no forte), menos o gancho (sobe) e o martelo
+  (desce), a partir de 35°; o fraco e o rasteiro são sempre retos. Braço ou perna: no chão, pelo
+  apoio (um pé só é chute; os dois afastados, `APOIO` px, é soco); no ar, pela lista
+  `SOCO_NO_AR`. É regra pelo desenho do membro esticado: os poucos quadros entre a guarda e ele
+  não dão para medir o caminho.
+- **Da cor de onde sai**: a cor do rastro é a do membro na ponta (a luva vermelha do Krüger, o
+  tênis azul da Yin-lu, a faixa branca do Brucy), medida em `angulo_golpe.cor_da_ponta` (a cor
+  mais comum em 45 px, sem o contorno; o escuro vira cinza e a pele nua fica branca). As folhas
+  de rastro são gravadas "para pintar" (`efeito_imagem.py --tingivel`, e sempre no
+  `rastro_arco.py`): do azul de ar (`TINTA_BASE`) ao branco do miolo; o `EfeitosVideo.tingir`
+  troca o azul pela cor com uma matriz de cor (o mesmo caminho dos filtros dos lutadores, no
+  OpenGL e no PC).
 - Personagem novo ou arte nova: `python3 tools/sprites/angulo_golpe.py <id> --write`, olhar o
   quadro do impacto de cada golpe e pôr em `ARTE_COM_EFEITO` ou `MEDIDA_ERRADA` o que não servir.
 

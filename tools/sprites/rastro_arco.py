@@ -37,8 +37,9 @@ VARRIDA = [(0.0, 0.55, 1.0, 17), (0.0, 1.0, 1.0, 33), (0.18, 1.0, 0.9, 33), (0.4
 
 
 def fita(caminho):
-    """A textura recortada: RGBA reto (float), a ponta nova à direita e a borda nítida em cima."""
-    rgba = ei.recortar_fundo(Image.open(caminho), 'preto')
+    """A textura recortada: RGBA reto (float), a ponta nova à direita e a borda nítida em cima, nas
+    cores que o jogo pinta (o arco sai da cor do braço ou da perna)."""
+    rgba = ei.tingivel(ei.recortar_fundo(Image.open(caminho), 'preto'))
     ys, xs = np.nonzero(rgba[..., 3] > 0.04)
     return rgba[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
 

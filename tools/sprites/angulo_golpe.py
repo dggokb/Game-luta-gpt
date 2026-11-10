@@ -16,12 +16,14 @@ arte não traz um efeito desenhado: é onde o jogo toca o rastro de ar quando a 
     python3 tools/sprites/build_characters.py --write     # leva para o jogo
 """
 import argparse
+import colorsys
 import json
 import math
 import sys
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -215,9 +217,9 @@ RASTRO_GIRO = 80        # graus: o rastro acompanha o membro quase em pé (a fa�
 
 
 def rastros(pack):
-    """{animação: {quadro: [x, y, graus, raio, sentido]}}: onde a ponta do golpe está, para onde
-    aponta, o comprimento do membro e de onde ele veio, nos golpes normais em que a arte NÃO traz
-    um efeito desenhado. É com isso que o jogo toca o rastro quando o membro estica: o arco do
+    """{animação: {quadro: [x, y, graus, raio, sentido, cor]}}: onde a ponta do golpe está, para
+    onde aponta, o comprimento do membro, de onde ele veio e a cor dele na ponta (0xRRGGBB), nos
+    golpes normais em que a arte NÃO traz um efeito desenhado. É com isso que o jogo toca o rastro quando o membro estica: o arco do
     balanço (`rastro_arco`: sentido +1, o membro subiu até ali; -1, desceu) ou, no golpe reto
     (sentido 0), a onda de ar na ponta (`rastro_golpe`). Especiais e Super têm os efeitos deles.
 
@@ -245,7 +247,7 @@ def rastros(pack):
             i = ordem.index(max(medidos, key=lambda q: max(golpe[str(q)][1::4])))
         perto = ordem[max(0, i - 1):i + 4]
         base = semitransparente(pack, a, ordem[0])
-        pontas, tem_efeito, antes = {}, False, []
+        pontas, tem_efeito = {}, False
         for q in ordem:
             if str(q) not in golpe:
                 continue
@@ -259,37 +261,85 @@ def rastros(pack):
             if d:
                 g = max(-RASTRO_GIRO, min(RASTRO_GIRO, d[2]))
                 raio = max(RAIO_MIN, min(RAIO_MAX, d[3]))
-                pontas[str(q)] = [int(round(d[0])), int(round(d[1])), int(round(g)), int(round(raio)),
-                                  0 if golpe_id in FRACOS else sentido(antes, d[1], g, d[3], cintura * 2)]
-                antes.append((g, d[3]))
+                tipo = 0 if golpe_id in FRACOS else sentido(braco(pack, a, q, golpe_id), d[1], g, cintura * 2)
+                pontas[str(q)] = [int(round(d[0])), int(round(d[1])), int(round(g)), int(round(raio)), tipo,
+                                  cor_da_ponta(pack, a, q, dx, h, d[0], d[1])]
         if not tem_efeito and pontas:
             saida[nome] = pontas
     return saida
 
 
 RAIO_MIN, RAIO_MAX = 70, 240   # px do mundo: o comprimento de membro que o arco aceita
-BALANCO = 12                   # graus: inclinado para baixo mais que isto, o membro desceu
-VIRADA = 20                    # graus: o membro mudou de inclinação desde um quadro anterior
-JA_FORA = 0.6                  # ... em que ele já estava com esta fração do comprimento para fora
+BALANCO = 12                   # graus: a perna inclinada para baixo mais que isto desceu
+GANCHO = 35                    # graus: o braço inclinado mais que isto é gancho (sobe) ou martelo (desce)
 BAIXO = 0.35                   # da altura em pé: abaixo disto o golpe é rasteiro (o arco entraria no chão)
+FRACOS = {'L', '2L', 'jL'}     # o golpe fraco é curto e reto: fica com a onda de ar na ponta
+APOIO = 120                    # px: com os dois pés no chão a esta distância, quem bate é o braço
+# No ar não há pés no chão para dizer: os golpes de braço (o resto é chute). Conferido no olho.
+SOCO_NO_AR = {'koga_8': {'jM'}, 'p04': {'jM', 'jH'}, 'p12': {'jM'}, 'p15': {'jH'}}
 
 
-FRACOS = {'L', '2L', 'jL'}      # o golpe fraco é curto e reto: fica com a onda de ar na ponta
+def braco(pack, a, q, golpe_id):
+    """O membro que bate no quadro q é um braço (e não uma perna)?
+
+    No chão, pelo apoio: no chute o corpo fica num pé só; no soco, nos dois, afastados (a largura
+    do que toca o chão). No ar, pela lista SOCO_NO_AR."""
+    if golpe_id.startswith('j'):
+        return golpe_id in SOCO_NO_AR.get(pack['id'], ())
+    dx, h = cx.quadro(pack, a['atlas'], q)
+    no_chao = h <= h.min() + 0.1 * np.ptp(h)
+    return float(np.ptp(dx[no_chao])) >= APOIO
 
 
-def sentido(antes, y, graus, comprimento, altura):
-    """De onde o membro veio até a inclinação {@code graus}: +1 subiu, -1 desceu, 0 golpe reto.
+def sentido(e_braco, y, graus, altura):
+    """O tipo de movimento, para o rastro: +1 o membro subiu até ali, -1 desceu, 0 golpe reto.
 
-    Vale o quadro medido anterior mais próximo ({@code antes}: (graus, comprimento) na ordem da
-    animação) em que o membro já estava para fora e com outra inclinação. Sem ele: o golpe
-    inclinado para baixo desceu e os outros subiram (o chute na horizontal saiu do chão). O golpe
-    rasteiro fica reto: o arco de quem desce até o chão viraria um pisão."""
+    Cada um tem o seu: o SOCO é reto (a onda de ar com riscos na linha do braço), menos o gancho,
+    que sobe, e o martelo, que desce. O CHUTE é um balanço: a perna sai do chão e sobe em arco,
+    ou desce se aponta para baixo. É uma regra pelo desenho do membro esticado: os poucos quadros
+    entre a guarda e ele não dão para medir o caminho. O golpe rasteiro fica reto (o arco de quem
+    desce até o chão viraria um pisão)."""
     if y < altura * BAIXO:
         return 0
-    for g, c in reversed(antes):
-        if c >= comprimento * JA_FORA and abs(graus - g) >= VIRADA:
-            return 1 if graus > g else -1
+    if e_braco:
+        return 1 if graus >= GANCHO else -1 if graus <= -GANCHO else 0
     return -1 if graus <= -BALANCO else 1
+
+
+_cores = {}
+
+
+def cor_da_ponta(pack, a, q, dx, h, x, y):
+    """A cor do membro na ponta (0xRRGGBB): a luva, a faixa, o tênis. O rastro sai dessa cor.
+
+    A cor mais comum nos 45 px em volta da ponta, sem o contorno escuro; clareada para ler como
+    ar (o sapato preto dá um rastro cinza). A pele nua não tinge: fica o branco do ar."""
+    if a['atlas'] not in _cores:
+        clip = json.loads((HERE / 'clips' / f"{a['atlas']}.json").read_text(encoding='utf-8'))
+        _cores[a['atlas']] = np.asarray(Image.open(ROOT / clip['source']).convert('RGB'))
+    _, rep, k = cx.ler(pack['id'], a['atlas'])
+    lay = rep['layout']
+    perto = (dx - x) ** 2 + (h - y) ** 2 <= 45 ** 2
+    if perto.sum() < 20:
+        return 0xFFFFFF
+    lado = -1 if pack.get('artFacing') == 'left' else 1
+    r, c = divmod(q, lay['columns'])
+    xs = np.round(lay['rootX'] + lado * dx[perto] / k).astype(int) + c * lay['frameWidth']
+    ys = np.round(lay['rootY'] - h[perto] / k).astype(int) + r * lay['frameHeight']
+    img = _cores[a['atlas']]
+    rgb = img[np.clip(ys, 0, img.shape[0] - 1), np.clip(xs, 0, img.shape[1] - 1)].astype(float) / 255.0
+    claros = rgb[rgb.max(axis=1) >= 0.25]
+    if len(claros) >= 0.3 * len(rgb):
+        rgb = claros
+    caixas = (rgb * 5.999).astype(int)
+    chave = caixas[:, 0] * 36 + caixas[:, 1] * 6 + caixas[:, 2]
+    cor = rgb[chave == np.bincount(chave).argmax()].mean(axis=0)
+    hh, ss, vv = colorsys.rgb_to_hsv(*cor)
+    if 0.02 <= hh <= 0.12 and 0.2 <= ss <= 0.65 and vv >= 0.5:
+        return 0xFFFFFF   # pele
+    # O escuro clareado não tem cor de verdade (o matiz do preto é ruído): vira cinza.
+    cor = colorsys.hsv_to_rgb(hh, min(ss, 0.8) * min(1.0, vv / 0.35), max(vv, 0.78))
+    return (int(round(cor[0] * 255)) << 16) | (int(round(cor[1] * 255)) << 8) | int(round(cor[2] * 255))
 
 
 def gravar(pack, medidos=None):

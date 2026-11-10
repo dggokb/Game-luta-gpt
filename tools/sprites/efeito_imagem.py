@@ -23,6 +23,7 @@ tempo): cada faixa vira um quadro e o estouro por código não entra (a animaç�
     --fundo F       preto (padrão: o brilho vira transparência), verde, ou transparente (PNG com alfa)
     --origem x,y    o ponto de contato na imagem, de 0 a 1 (padrão 0.5,0.5: o meio)
     --parado        sem o estouro: a imagem inteira some aos poucos (brilho que fica)
+    --tingivel      grava nas cores que o jogo pinta (o rastro sai da cor do membro que bate)
     --sopro         rastro de ar: aparece quase inteiro e some rápido
     --nuvem         poeira e vapor: nasce do ponto, abre e continua crescendo devagar enquanto some
     --ancora A      centro (padrão) ou chao: só anota no efeito.json (com chao, ponha a --origem
@@ -72,6 +73,24 @@ def recortar_fundo(imagem, fundo):
         cor = rgb.copy()
         cor[..., 1] = np.minimum(cor[..., 1], np.maximum(cor[..., 0], cor[..., 2]))
     return np.dstack([cor, alfa])
+
+
+# O efeito que o jogo pinta (o rastro do golpe sai da cor do braço ou da perna): a cor vai do
+# TINTA_BASE (o corpo do efeito) ao branco (o miolo), e o jogo troca o TINTA_BASE pela cor
+# (EfeitosVideo.tingir lê o quanto é branco no canal vermelho). Sem pintar, é azul de ar.
+TINTA_BASE = (0.35, 0.7, 1.0)
+
+
+def tingivel(rgba):
+    """A mesma imagem nas cores que o jogo sabe pintar: do TINTA_BASE ao branco, pelo quanto cada
+    pixel é branco (o menor canal sobre o maior, contado a partir do tom mais colorido dela)."""
+    rgb, alfa = rgba[..., :3], rgba[..., 3]
+    branco = rgb.min(axis=2) / np.maximum(rgb.max(axis=2), 1e-4)
+    visivel = alfa > 0.3
+    piso = np.percentile(branco[visivel], 15) if visivel.any() else 0.0
+    w = np.clip((branco - piso) / max(1e-4, 1.0 - piso), 0.0, 1.0)[..., None]
+    base = np.array(TINTA_BASE, dtype=np.float32)
+    return np.dstack([base + (1.0 - base) * w, alfa]).astype(np.float32)
 
 
 def quadros_de(rgba, tamanho, origem, roteiro):
@@ -174,6 +193,7 @@ def main():
     p.add_argument('--parado', action='store_true')
     p.add_argument('--nuvem', action='store_true')
     p.add_argument('--sopro', action='store_true')
+    p.add_argument('--tingivel', action='store_true')
     p.add_argument('--ancora', choices=('centro', 'chao'), default='centro')
     p.add_argument('--quadros', type=int, default=1)
     p.add_argument('--previa')
@@ -182,6 +202,8 @@ def main():
         p.error('diga --nome (grava no jogo) ou --previa (só mostra)')
     origem = tuple(float(v) for v in a.origem.split(','))
     rgba = recortar_fundo(Image.open(a.imagem), a.fundo)
+    if a.tingivel:
+        rgba = tingivel(rgba)
     if a.quadros > 1:
         quadros, tempos, lado = quadros_da_folha(rgba, a.quadros, a.tamanho, origem)
     else:
