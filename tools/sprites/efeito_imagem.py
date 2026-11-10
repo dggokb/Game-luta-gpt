@@ -23,6 +23,7 @@ tempo): cada faixa vira um quadro e o estouro por código não entra (a animaç�
     --fundo F       preto (padrão: o brilho vira transparência), verde, ou transparente (PNG com alfa)
     --origem x,y    o ponto de contato na imagem, de 0 a 1 (padrão 0.5,0.5: o meio)
     --parado        sem o estouro: a imagem inteira some aos poucos (brilho que fica)
+    --sopro         rastro de ar: aparece quase inteiro e some rápido
     --nuvem         poeira e vapor: nasce do ponto, abre e continua crescendo devagar enquanto some
     --ancora A      centro (padrão) ou chao: só anota no efeito.json (com chao, ponha a --origem
                     na linha do chão da imagem: o jogo toca estes no GROUND_Y)
@@ -45,6 +46,8 @@ LARGURA_MAX = 4096  # px: a folha passa disso em fileiras
 # O estouro: (escala, opacidade, ms). O pico passa um pouco do tamanho e assenta; a cauda some.
 ESTOURO = [(0.55, 1.0, 33), (1.12, 1.0, 50), (1.0, 1.0, 67), (1.0, 0.8, 50), (1.03, 0.5, 33), (1.06, 0.22, 33)]
 PARADO = [(1.0, 1.0, 67), (1.0, 1.0, 67), (1.0, 0.8, 50), (1.0, 0.55, 50), (1.0, 0.3, 33), (1.0, 0.12, 33)]
+# O sopro (o rastro de ar do golpe): aparece quase inteiro, abre um pouco e some rápido (~0,17 s).
+SOPRO = [(0.6, 0.9, 17), (0.9, 1.0, 33), (1.0, 0.85, 33), (1.06, 0.55, 33), (1.1, 0.28, 33), (1.13, 0.1, 17)]
 # A nuvem (poeira, vapor): nasce do ponto, abre rápido, continua crescendo devagar e se desfaz (~0,4 s).
 NUVEM = [(0.45, 1.0, 33), (0.75, 1.0, 33), (0.92, 1.0, 50), (1.0, 0.92, 50), (1.05, 0.75, 67),
          (1.09, 0.52, 67), (1.12, 0.3, 67), (1.14, 0.12, 50)]
@@ -170,6 +173,7 @@ def main():
     p.add_argument('--origem', default='0.5,0.5')
     p.add_argument('--parado', action='store_true')
     p.add_argument('--nuvem', action='store_true')
+    p.add_argument('--sopro', action='store_true')
     p.add_argument('--ancora', choices=('centro', 'chao'), default='centro')
     p.add_argument('--quadros', type=int, default=1)
     p.add_argument('--previa')
@@ -181,7 +185,7 @@ def main():
     if a.quadros > 1:
         quadros, tempos, lado = quadros_da_folha(rgba, a.quadros, a.tamanho, origem)
     else:
-        roteiro = NUVEM if a.nuvem else PARADO if a.parado else ESTOURO
+        roteiro = NUVEM if a.nuvem else SOPRO if a.sopro else PARADO if a.parado else ESTOURO
         quadros, tempos, lado = quadros_de(rgba, a.tamanho, origem, roteiro)
     if a.previa:
         previa(quadros, lado, a.previa)

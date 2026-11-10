@@ -8,6 +8,9 @@ corpo entram a cabeça e o ombro que mexeram). Grava só isto, em graus (positiv
 silhueta de cada animação de golpe (`silhueta.angulo`, por quadro da folha): não mexe nas caixas,
 no alcance nem no corpo, que o caixas_sprites.py --write mediria de novo.
 
+Mede também a ponta do golpe (`silhueta.rastro`: x, y e graus por quadro) nos golpes em que a
+arte não traz um efeito desenhado: é onde o jogo toca o rastro de ar quando a janela ativa abre.
+
     python3 tools/sprites/angulo_golpe.py                 # mostra
     python3 tools/sprites/angulo_golpe.py player_base --write
     python3 tools/sprites/build_characters.py --write     # leva para o jogo
@@ -55,8 +58,8 @@ def membro_da_caixa(pack, a, i, nome, lancador):
     return dx[frente], h[frente]
 
 
-def angulo(dx, h, cintura):
-    """Graus da linha do membro na parte da frente (positivo para cima), ou None.
+def linha(dx, h, cintura):
+    """Graus da linha do membro na parte da frente (positivo para cima; 90 em pé), ou None.
 
     Só a parte da frente (FRENTE da largura): perto do corpo o que mexeu inclui a cabeça e o ombro
     (o corpo que inclina para trás no chute). A linha é seguida da ponta para trás, coluna por
@@ -88,13 +91,74 @@ def angulo(dx, h, cintura):
     cs, ms = np.array(pontos, dtype=float).T
     if np.median(alturas) > 1.5 * np.ptp(cs):
         # O pedaço seguido é mais alto que largo: o membro em pé.
-        return MAXIMO if ms.mean() > cintura else -MAXIMO
+        return 90.0 if ms.mean() > cintura else -90.0
     # A linha sem a mão ou o pé da ponta (os dedos abertos para cima entortavam o soco reto).
     braco = cs <= x1 - MAO * largo
     if braco.sum() >= 5:
         cs, ms = cs[braco], ms[braco]
-    g = math.degrees(math.atan(np.polyfit(cs, ms, 1)[0]))
-    return int(round(max(-MAXIMO, min(MAXIMO, g))))
+    return math.degrees(math.atan(np.polyfit(cs, ms, 1)[0]))
+
+
+def semitransparente(pack, a, q):
+    """Quantos pixels meio transparentes o quadro q tem (o brilho de um efeito desenhado na arte)."""
+    alfa, rep, _ = cx.ler(pack['id'], a['atlas'])
+    lay = rep['layout']
+    fw, fh, cols = lay['frameWidth'], lay['frameHeight'], lay['columns']
+    r, c = divmod(q, cols)
+    cel = alfa[r * fh:(r + 1) * fh, c * fw:(c + 1) * fw]
+    return int(((cel >= 24) & (cel < cx.OPACO)).sum())
+
+
+CONFERE_RAIO = 110      # px do mundo: o pedaço do membro perto da ponta que dá a segunda medida
+CONFERE_GRAUS = 25      # as duas medidas da direção têm de bater até aqui
+CONFERE_PONTA = 40      # ... e as duas pontas, até aqui (px)
+
+
+def ponta_do_golpe(dx, h, graus):
+    """(x, y) da ponta do membro: o fim dele na linha de {@code graus}."""
+    ao_longo = dx * math.cos(math.radians(graus)) + h * math.sin(math.radians(graus))
+    fim = ao_longo >= np.percentile(ao_longo, 98)
+    return float(dx[fim].mean()), float(h[fim].mean())
+
+
+def ponta_pelo_corpo(dx, h, corpo_dx, corpo_h):
+    """(x, y, graus) por outro caminho: a ponta é o pixel do membro mais longe do meio do corpo, e
+    a direção é o eixo mais comprido dos pixels do membro em volta dela (apontando para a ponta)."""
+    d2 = (dx - corpo_dx.mean()) ** 2 + (h - corpo_h.mean()) ** 2
+    longe = d2 >= np.percentile(d2, 99)
+    tx, ty = dx[longe].mean(), h[longe].mean()
+    perto = (dx - tx) ** 2 + (h - ty) ** 2 <= CONFERE_RAIO ** 2
+    if perto.sum() < 30:
+        return None
+    px, py = dx[perto] - dx[perto].mean(), h[perto] - h[perto].mean()
+    _, eixos = np.linalg.eigh(np.cov(np.vstack([px, py])))
+    ex, ey = eixos[:, 1]
+    if ex * (tx - dx[perto].mean()) + ey * (ty - h[perto].mean()) < 0:
+        ex, ey = -ex, -ey
+    return float(tx), float(ty), math.degrees(math.atan2(ey, ex))
+
+
+def direcao_conferida(pack, a, q, nome, lancador, cintura):
+    """(x, y, graus) da ponta do golpe no quadro q, ou None quando as duas medidas não batem.
+
+    O membro medido às vezes não é o que bate (a perna que dá o passo vai mais à frente que o
+    punho; a mão aberta fica em pé na ponta do braço). A linha do membro e a medida pelo corpo
+    erram em lugares diferentes: só vale quando as duas concordam na ponta e na direção. Sem
+    isso o golpe fica reto e sem rastro, como era antes."""
+    dx, h = membro_da_caixa(pack, a, q, nome, lancador)
+    if len(dx) < 30:
+        return None
+    g = linha(dx, h, cintura)
+    if g is None:
+        return None
+    x, y = ponta_do_golpe(dx, h, g)
+    outra = ponta_pelo_corpo(dx, h, *cx.quadro(pack, a['atlas'], q))
+    if outra is None:
+        return None
+    desvio = abs((outra[2] - g + 180) % 360 - 180)
+    if desvio > CONFERE_GRAUS or math.hypot(outra[0] - x, outra[1] - y) > CONFERE_PONTA:
+        return None
+    return x, y, g
 
 
 def medir(pack):
@@ -103,19 +167,95 @@ def medir(pack):
     # O golpe para baixo no ar (j2H): a ponta mais à frente do desenho é o joelho, não o pé que
     # desce; a faísca vai para baixo de qualquer jeito.
     para_baixo = pack['moves'].get('j2H', {}).get('animation')
+    errada = {pack['moves'][g]['animation'] for g in MEDIDA_ERRADA.get(pack['id'], ()) if g in pack['moves']}
     saida = {}
     for nome in cx.animacoes_de_golpe(pack):
         a = pack['animations'][nome]
-        golpe = a.get('silhueta', {}).get('golpe', {})
+        golpe = {} if nome in errada else a.get('silhueta', {}).get('golpe', {})
         angulos = {}
         for q in golpe:
             if nome == para_baixo:
                 angulos[q] = -MAXIMO
                 continue
-            g = angulo(*membro_da_caixa(pack, a, int(q), nome, lancador), pack['fighter']['body']['standHeight'] * 0.5)
+            d = direcao_conferida(pack, a, int(q), nome, lancador, pack['fighter']['body']['standHeight'] * 0.5)
+            g = int(round(max(-MAXIMO, min(MAXIMO, d[2])))) if d else 0
             if g:
                 angulos[q] = g
         saida[nome] = angulos
+    return saida
+
+
+# A arte destes golpes já traz o efeito desenhado (onda de ar em meia-lua, estouro, arco no chão,
+# borrão): o rastro do jogo não entra por cima. Conferido no olho, quadro por quadro; os outros
+# personagens não têm efeito na arte. Golpe novo com efeito desenhado entra aqui.
+ARTE_COM_EFEITO = {
+    'player_base': {'2L', 'M', '2M', '2H', 'jL', 'jM', 'jH', 'j2H', '6M'},
+    'ryuga_8': {'2L', '6M'},
+    'p10': {'jM'},
+    'p13': {'2L'},
+    'p15': {'jL'},
+    'p16': {'2H', 'jH', '6M'},
+}
+# Golpes em que a medida sai errada mesmo com as duas contas batendo (o pé de apoio no lugar do
+# punho, a barra do jaleco, o efeito desenhado puxando a linha): ficam retos e sem rastro.
+# Conferido no olho nas folhas do quadro do impacto.
+MEDIDA_ERRADA = {
+    'p02': {'2L'},
+    'p09': {'jH'},
+    'p10': {'jH'},
+    'p11': {'jH'},
+    'p13': {'jM'},
+    'p15': {'jL'},
+    'p16': {'2H', 'jH'},
+}
+RASTRO_BRILHO = 0.6     # rede de segurança: pixels meio transparentes a mais perto do impacto (por pixel do membro)
+RASTRO_GIRO = 80        # graus: o rastro acompanha o membro quase em pé (a faísca para em MAXIMO)
+
+
+def rastros(pack):
+    """{animação: {quadro: [x, y, graus]}}: onde a ponta do golpe está e para onde aponta, nos
+    golpes normais em que a arte NÃO traz um efeito desenhado. É ali que o jogo toca o rastro de
+    ar (`rastro_golpe`) quando a janela ativa abre. Especiais e Super têm os efeitos deles.
+
+    Fica sem rastro o que está em ARTE_COM_EFEITO e, por segurança, o golpe com muitos pixels meio
+    transparentes a mais perto do quadro do impacto (um antes, três depois) do que no primeiro
+    quadro: dois efeitos um em cima do outro é pior que nenhum."""
+    lancador = pack['moves'].get('2H', {}).get('animation')
+    cintura = pack['fighter']['body']['standHeight'] * 0.5
+    saida = {}
+    for golpe_id, m in pack['moves'].items():
+        nome = m.get('animation')
+        # O golpe para baixo no ar (j2H): a ponta mais à frente do desenho é o joelho.
+        fora = ARTE_COM_EFEITO.get(pack['id'], set()) | MEDIDA_ERRADA.get(pack['id'], set())
+        if not nome or nome in saida or golpe_id == 'j2H' or golpe_id in fora:
+            continue
+        a = pack['animations'][nome]
+        golpe = a.get('silhueta', {}).get('golpe', {})
+        if not golpe:
+            continue
+        ordem = list(dict.fromkeys(a['frames']))
+        if 'impactFrame' in a:
+            i = ordem.index(a['frames'][a['impactFrame']])
+        else:
+            medidos = [q for q in ordem if str(q) in golpe]
+            i = ordem.index(max(medidos, key=lambda q: max(golpe[str(q)][1::4])))
+        perto = ordem[max(0, i - 1):i + 4]
+        base = semitransparente(pack, a, ordem[0])
+        pontas, tem_efeito = {}, False
+        for q in ordem:
+            if str(q) not in golpe:
+                continue
+            dx, h = membro_da_caixa(pack, a, q, nome, lancador)
+            if len(dx) < 30:
+                continue
+            if q in perto and (semitransparente(pack, a, q) - base) / len(dx) >= RASTRO_BRILHO:
+                tem_efeito = True
+                break
+            d = direcao_conferida(pack, a, q, nome, lancador, cintura)
+            if d:
+                pontas[str(q)] = [int(round(d[0])), int(round(d[1])), int(round(max(-RASTRO_GIRO, min(RASTRO_GIRO, d[2]))))]
+        if not tem_efeito and pontas:
+            saida[nome] = pontas
     return saida
 
 
@@ -130,6 +270,13 @@ def gravar(pack, medidos=None):
             sil['angulo'] = angulos
         else:
             sil.pop('angulo', None)
+    pontas = rastros(pack)
+    for nome, a in pack['animations'].items():
+        if 'silhueta' in a:
+            if nome in pontas:
+                a['silhueta']['rastro'] = pontas[nome]
+            else:
+                a['silhueta'].pop('rastro', None)
 
 
 def main():
@@ -147,6 +294,8 @@ def main():
         for nome, angulos in medidos.items():
             if angulos:
                 print(f"    {por_anim.get(nome, nome):6} {nome:28} " + ' '.join(f'{q}:{g:+d}' for q, g in sorted(angulos.items(), key=lambda kv: int(kv[0]))))
+        com_rastro = rastros(pack)
+        print('    rastro em: ' + ', '.join(por_anim.get(n, n) for n in com_rastro))
         if a.write:
             gravar(pack, medidos)
             path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')

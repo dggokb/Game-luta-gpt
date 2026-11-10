@@ -91,11 +91,35 @@ especial usam `impacto_ar_forte` quando ele existe; a `lanca_luz` sai junto do m
 Os efeitos de chão vêm em fundo verde (branco some no preto) e com `--nuvem` (nasce do ponto,
 abre e continua crescendo enquanto some). A folha passa de 4096 px em fileiras.
 
-Ficou para o usuário decidir:
-- **Rastro do golpe** (o arco que acompanha o braço ou a perna): as referências têm, mas o
-  `efeitosDeMovimento` tirou de propósito ("as linhas de velocidade atrapalham ler a distância
-  entre os lutadores", direcao.md). Não foi mexido.
-- O tamanho no celular: a gravação é o desenho do PC; conferir no aparelho.
+Ficou para o usuário conferir: o tamanho e o brilho no celular (a gravação é o desenho do PC).
+
+## Rastro do golpe (10/11)
+
+Pedido do usuário. O rastro é uma onda de ar na ponta do braço ou da perna quando o golpe estica,
+virada para onde o membro aponta. É o mesmo desenho que a arte do Ryūga (player_base) já traz em
+9 dos 11 normais (a meia-lua na frente do punho): a imagem foi gerada a partir desses quadros
+(`art/vfx/ref_rastro_ryuga.png`) para os outros 15 lutadores ficarem iguais a ele.
+
+| Nome no jogo | Imagem | Como foi posto |
+|---|---|---|
+| `rastro_golpe` (fraco e médio) | `rastro_02.png` (a onda com riscos de ar) | `--sopro --origem 0.84,0.48 --tamanho 170` |
+| `rastro_forte` (forte) | `rastro_01.png` (a meia-lua grande) | `--sopro --origem 0.52,0.5 --tamanho 170` |
+
+- **Onde sai** (`tools/sprites/angulo_golpe.py`, `silhueta.rastro` de cada animação: x, y e graus
+  da ponta por quadro): só golpe normal, e só onde a arte não tem efeito desenhado
+  (`ARTE_COM_EFEITO`, conferido no olho) nem a medida sai errada (`MEDIDA_ERRADA`). Hoje são
+  cerca de 125 golpes; especiais e Super ficam com os efeitos deles.
+- **A medida é conferida por dois caminhos** (a linha do membro e a ponta mais longe do corpo):
+  quadro em que os dois não batem fica sem ponta e sem inclinação. Isso também limpou a
+  inclinação da faísca, que em alguns golpes pegava o pé de apoio ou a mão aberta.
+- **Quando sai** (`GameView.rastroDoGolpe`): no primeiro quadro em que a tela mostra o membro
+  esticado, dentro da janela ativa ou até 3 quadros depois; dura de 6 a 10 quadros e anda junto
+  com quem bate (o golpe no pulo). Fraco em 0,75.
+- A regra antiga (direcao.md: golpe sem linhas de velocidade, para não atrapalhar a leitura da
+  distância) foi respeitada no que dá: o rastro é curto e colado na ponta, não uma linha atrás
+  do membro. Se atrapalhar no jogo, é tirar as duas pastas de `assets/efeitos`.
+- Personagem novo ou arte nova: `python3 tools/sprites/angulo_golpe.py <id> --write`, olhar o
+  quadro do impacto de cada golpe e pôr em `ARTE_COM_EFEITO` ou `MEDIDA_ERRADA` o que não servir.
 
 ## O estilo ainda está em aberto
 

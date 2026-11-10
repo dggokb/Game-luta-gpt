@@ -31,6 +31,15 @@ public class AnguloDoGolpeTest {
         assertTrue(angulo("CROUCH_MEDIUM", 9) < -10f);
     }
 
+    @Test public void rastroSoOndeAArteNaoTemEfeito() {
+        // O chute alto não tem efeito desenhado: a ponta do pé, à frente e acima da cintura, subindo.
+        float[] pe = BASE.animation("HEAVY_STRAIGHT").rastroGolpe[5];
+        assertNotNull(pe);
+        assertTrue(pe[0] > 120f && pe[1] > 150f && pe[2] > 15f);
+        // O soco agachado já traz a meia-lua de ar na arte: sem rastro por cima.
+        assertEquals(null, BASE.animation("CROUCH_LIGHT").rastroGolpe);
+    }
+
     @Test public void quadroSemMedidaFicaReto() {
         // O quadro 0 é a guarda, antes do membro sair: sem caixa de golpe, sem inclinação.
         assertEquals(0f, angulo("HEAVY_STRAIGHT", 0), 0f);

@@ -235,6 +235,14 @@ final class EfeitosVideo {
         return ultima;
     }
 
+    /** Leva o efeito da vaga para (x, y), se ainda for o mesmo ({@code nome}): o efeito preso a quem anda. */
+    void levar(int vaga, String nome, float px, float py) {
+        if (vaga >= 0 && vaga < VAGAS && tocando[vaga] != null && tocando[vaga].nome.equals(nome)) {
+            x[vaga] = px;
+            y[vaga] = py;
+        }
+    }
+
     /** Tira da tela o efeito da vaga, se ainda for o mesmo ({@code nome}). */
     void parar(int vaga, String nome) {
         if (vaga >= 0 && vaga < VAGAS && tocando[vaga] != null && tocando[vaga].nome.equals(nome)) tocando[vaga] = null;

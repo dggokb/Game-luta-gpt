@@ -582,14 +582,19 @@ def validate_impacts(pack):
 def validate_silhueta(key, a):
     """Caixas por quadro da folha: corpo = lista de [x0, x1, y0, y1], golpe = [x0, x1, y0, y1] (o
     membro na diagonal em duas caixas: a de perto do corpo e a da ponta, 8 números em sequência);
-    angulo (opcional) = graus inteiros do membro que bate, por quadro (tools/sprites/angulo_golpe.py)."""
+    angulo (opcional) = graus inteiros do membro que bate, por quadro; rastro (opcional) = [x, y,
+    graus] da ponta do golpe, por quadro (os dois do tools/sprites/angulo_golpe.py)."""
     sil = a['silhueta']
-    if not isinstance(sil, dict) or not {'corpo', 'golpe'} <= set(sil) <= {'corpo', 'golpe', 'angulo'}:
-        raise ValueError(f'{key}.silhueta: {{corpo, golpe}} (e angulo)')
+    if not isinstance(sil, dict) or not {'corpo', 'golpe'} <= set(sil) <= {'corpo', 'golpe', 'angulo', 'rastro'}:
+        raise ValueError(f'{key}.silhueta: {{corpo, golpe}} (e angulo, rastro)')
+    for quadro, ponta in sil.get('rastro', {}).items():
+        if (not quadro.isdigit() or int(quadro) not in a['frames'] or not isinstance(ponta, list) or len(ponta) != 3
+                or any(type(v) is not int for v in ponta) or not -90 <= ponta[2] <= 90):
+            raise ValueError(f'{key}.silhueta.rastro.{quadro}: [x, y, graus] inteiros num quadro da animação')
     for quadro, graus in sil.get('angulo', {}).items():
         if not quadro.isdigit() or int(quadro) not in a['frames'] or type(graus) is not int or not -90 <= graus <= 90:
             raise ValueError(f'{key}.silhueta.angulo.{quadro}: graus inteiros de -90 a 90 num quadro da animação')
-    sil = {k: v for k, v in sil.items() if k != 'angulo'}
+    sil = {k: v for k, v in sil.items() if k in ('corpo', 'golpe')}
     caixa = lambda c: isinstance(c, list) and len(c) == 4 and all(type(v) is int for v in c) and c[0] <= c[1] and c[2] <= c[3]
     for parte, dados in sil.items():
         for quadro, valor in dados.items():
@@ -832,9 +837,12 @@ def compile_packs(root, results):
                 # Caixas que acompanham o desenho (tools/sprites/caixas_sprites.py), por quadro da folha.
                 junta = lambda d: '|'.join(k+':'+','.join(str(n) for caixa in ([v] if v and type(v[0]) is not list else v) for n in caixa)
                                            for k, v in sorted(d.items(), key=lambda kv: int(kv[0])) if v)
-                angulo = a['silhueta'].get('angulo')
-                sil = ('.withSilhueta('+q(junta(a['silhueta']['corpo']))+','+q(junta(a['silhueta']['golpe']))+
-                       (','+q('|'.join(k+':'+str(v) for k, v in sorted(angulo.items(), key=lambda kv: int(kv[0])))) if angulo else '')+')')
+                angulo, rastro = a['silhueta'].get('angulo'), a['silhueta'].get('rastro')
+                por_quadro = lambda d, texto: q('|'.join(k+':'+texto(v) for k, v in sorted((d or {}).items(), key=lambda kv: int(kv[0]))))
+                extra = ','+por_quadro(angulo, str) if angulo or rastro else ''
+                if rastro:
+                    extra += ','+por_quadro(rastro, lambda v: ','.join(map(str, v)))
+                sil = '.withSilhueta('+q(junta(a['silhueta']['corpo']))+','+q(junta(a['silhueta']['golpe']))+extra+')'
             if 'posesChave' in a:
                 # Poses-chave seguradas (anime em 2s e 3s): o quadro mostra a última pose até ele.
                 sil += '.withPoses(new int[]{'+','.join(map(str,a['posesChave']))+'})'
