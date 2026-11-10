@@ -166,6 +166,17 @@ golpe. Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_anel_de_ar_
 Aprendido: **na camada de forma do EffectCraft a máscara conta a partir do centro do conteúdo
 (0, 0)**, não do canto da camada (a doc de lá fala do contrário para os pontos de efeito).
 
+**Mais pressão de ar que fumaça (pedido seguinte):** o anel grosso, desfocado e ondulando lia
+como fumaça. Agora: traço fino e nítido branco (9 -> 1 px da folha) com uma segunda linha mais
+fraca logo dentro (Repeater, 2 cópias a 86 × 90 %, a de dentro a 40 %), brilho ciano curto
+(Glow com cores A e B), quase sem desfoque e sem ondulação, uma bolha quase transparente só nos
+2 primeiros desenhos, e abre e some mais rápido (some no desenho 7). O disco esfumado saiu.
+A erosão passou para dentro da camada: **Fractal Noise no modo "Stencil Luma"**. Com track matte
+o EffectCraft 0.23.1 abria o buraco também nas camadas de baixo (apagava o brilho laranja, e no
+fundo escuro parecia mancha preta). Vídeo:
+`android/app/build/sprite-review/acerto_forte_atual_x_pressao_de_ar.mp4` (nesta gravação a
+câmera do jogo ficou um pouco mais perto que na de hoje; o acerto é no mesmo quadro).
+
 Ficou parecido na forma, no tempo e na direção; ficou diferente no traço: a de hoje tem borda
 serrilhada e textura de desenho à mão, mais laranja e brasas mais acesas; a refeita é mais
 limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, o primeiro grupo
