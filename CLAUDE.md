@@ -13,6 +13,11 @@ Regra prática (de 10/11, pelo que se viu até aqui):
 | Implementar com receita definida, ajustar parâmetros, instalar efeitos, gravar vídeos, documentar, avaliar links e skills | Opus |
 | Problema aberto sem caminho claro, ou erro difícil sem pista | Fable |
 
+**Se a tarefa for de Opus e a sessão estiver no Fable, não execute: mande só o prompt pronto**
+para ele colar numa sessão Opus. O prompt tem que se bastar sozinho (branch, o que ler antes, a
+tarefa, como conferir, o que não mandar para a `game-luta-sprite-fable`). Só execute no Fable o
+que ele mandar fazer ali mesmo.
+
 Nenhum modelo testa no celular daqui, e quem julga o resultado visual é o dono, em vídeo.
 
 ## Git
