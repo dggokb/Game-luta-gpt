@@ -130,6 +130,29 @@ Ficou em aberto para ele julgar: a faísca nova é radial (não aponta a linha d
 atual), o clarão branco cobre a cabeça do rival nos 2 primeiros desenhos, e o desenho é todo
 feito no programa, o que esbarra na regra 2 da skill (forma desenhada por código já reprovada).
 
+## A faísca do golpe forte de hoje refeita no EffectCraft (10/11, noite)
+
+Pedido: "não consegue fazer igual à referência do que está no jogo hoje?". O alvo foi a
+`impacto_ar_forte` (do vídeo `art/vfx/dano/dano_forte.mp4`), medida na própria folha quadro a
+quadro. `art/vfx/effectcraft/impacto_forte_ec.py` desenha tudo no EffectCraft com caminhos de
+vértices (`prop.set` em `contents/group/contents/path/path`):
+- estrela de espinhos irregulares (os 10 medidos e 10 menores sorteados) em 5 faixas chapadas,
+  da borda vermelho-escura ao núcleo branco; encolhe até sumir no desenho 8;
+- cinco jatos pontudos na direção do golpe, nas faixas; pedaços que se soltam da ponta no
+  desenho 2 e brasas que voam para a direita e freiam;
+- halo laranja (Glow com cores A e B) e uma mancha laranja atrás.
+
+Mesmo ponto, tamanho e ritmo da folha de hoje: `efeito_video.py <pasta> --nome impacto_forte_ec
+--fps 8 --origem 175,171 --escala-mundo 0.6667 --resolucao 1.5`. Monta e renderiza em 0,3 s.
+Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_refeito_effectcraft.mp4` (só na
+sessão). **Nada no jogo foi trocado**: o `efeitoDeGolpe` apontou para ela só na cópia local.
+
+Ficou parecido na forma, no tempo e na direção; ficou diferente no traço: a de hoje tem borda
+serrilhada e textura de desenho à mão, mais laranja e brasas mais acesas; a refeita é mais
+limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, o primeiro grupo
+da lista fica na frente (desenhar do miolo para fora), e o segundo grupo se chama
+`contents/group#2`.
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada
