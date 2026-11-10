@@ -97,7 +97,8 @@ Alpha, Starfield) aplicam e renderizam sem tela em menos de 0,1 s por quadro de 
 9. `prop.set` não aceita `expression`: é `prop.setExpression`.
 10. Lottie perde Glow, ruído e distorções: para o jogo, a folha de quadros continua o caminho.
 
-## Ainda não explorado
+## Inventário
 
-O inventário completo dos 308 efeitos e dos recursos além deles (precomps, presets, motion blur,
-plug-ins WebAssembly, operadores de forma) está sendo levantado; vai para `docs/effectcraft-guia.md`.
+O que mais o programa tem e quando usar (3D, expressões, modelos parametrizados, operadores de
+forma, partículas, scripts, precomps, motion blur, presets, plug-ins WebAssembly, MCP) está em
+`docs/effectcraft-guia.md`.
