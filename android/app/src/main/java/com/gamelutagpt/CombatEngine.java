@@ -4530,12 +4530,14 @@ final class CombatEngine {
         float[] g = c.hitbox == 0 ? golpeNoDesenho(a, a.attackFrame) : null;
         float reach = g != null ? maxDe(g, 1) : box.x1;
         float front = a.x + a.facing * reach;
-        // O choque é onde o punho encontra o corpo desenhado do rival, do lado de quem bate (o
-        // punho que entra no desenho não leva a faísca para o meio ou para as costas dele).
+        // O choque é onde o punho encontra o corpo desenhado do rival, do lado de quem bate. Colados,
+        // a ponta desenhada já está dentro do desenho dele (o pé na cara): a faísca vai até a ponta,
+        // que é onde o olho vê o golpe, mas nunca passa do meio do corpo dele para as costas.
         float surface = superficie(d, a.facing, impactY(c));
         if (!Float.isNaN(surface)) {
             float into = 10f;
-            return a.facing > 0 ? Math.min(front, surface + into) : Math.max(front, surface - into);
+            return a.facing > 0 ? Math.min(front, Math.max(surface + into, d.x))
+                : Math.max(front, Math.min(surface - into, d.x));
         }
         return Math.max(d.x - half, Math.min(d.x + half, front));
     }
