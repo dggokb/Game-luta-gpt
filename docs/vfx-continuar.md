@@ -210,6 +210,17 @@ só na cópia local. Vídeo: `android/app/build/sprite-review/acerto_forte_hoje_
 Primeiro passe errado: com o corte em 0,10 o halo virou uma mancha laranja chapada, e com
 contraste 600 a erosão já comia o desenho 0.
 
+**Com o anel de pressão de ar em 3D (pedido seguinte):** `dano_forte_ec.py --anel` gera
+`dano_forte_anel_ec`. A camada do vídeo vira um plano 3D em z = 0 (sem câmera o 3D enquadra igual
+ao 2D: diferença zero, conferido) e o anel é uma forma 3D girada (X −10°, Y 66°) que atravessa a
+faísca: o arco da frente passa por cima dos jatos e o de trás fica atrás da estrela, sem as duas
+camadas com máscara do `impacto_forte_ec`. Fino e nítido, linha dupla (Repeater), bolha só no
+começo, brilho ciano, avança na direção do golpe, se parte em arcos por erosão (Fractal Noise em
+Stencil Luma). A tela cresce 160 px em cima e embaixo: `efeito_video.py <pasta> --nome
+dano_forte_anel_ec --fps 8 --origem 427,543 --escala-mundo 0.30 --borda 50`. No jogo o anel vai
+do quadro 15 ao 23 da gravação (acerto no 11). Vídeo:
+`android/app/build/sprite-review/acerto_forte_hoje_x_receita_com_anel_3d.mp4`.
+
 ## Regra 2 revista (10/11, noite)
 
 Depois de ver a faísca do golpe forte refeita no EffectCraft, o dono revisou a regra do desenho
