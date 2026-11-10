@@ -66,6 +66,11 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
     erosão e rampa de cor no lugar dos desenhos à mão. O desenho do PC precisa do equivalente,
     porque é no vídeo gravado lá que ele julga.
 
+## Pendente combinado com o dono
+
+- **Rastro como folha fabricada no EffectCraft**, lado a lado com o rastro por erosão da branch
+  `claude/rastro-erosao`. A receita está no fim da rodada do rastro em `docs/vfx-continuar.md`.
+
 ## Erros que já aconteceram (não repita)
 
 | Erro | O certo |
@@ -110,6 +115,10 @@ gradle :pc:gravarLuta -Pdupla=p04,p12,player_base,p02 -Proteiro="espera:0.6 grav
 
 - `J K L` são fraco, médio e forte. `espera:1.8` encosta no rival; com menos o golpe erra.
 - Olhe os quadros um a um antes de mandar (a tela pula desenhos; o defeito some no vídeo corrido).
+- A gravação anda em tempo real: se o desenho do PC ficar lento, o vídeo pula quadros de jogo e o
+  efeito parece mais curto. Confira o FPS do canto antes de comparar duas versões.
+- O caminho OpenGL também roda no PC: `xvfb-run -a gradle :pc:gravarLuta -Pgl ...` (Mesa por
+  software). Serve para ver o código OpenGL e compilar shader; não é o celular.
 - A gravação é o desenho do PC. O celular é OpenGL: diga que não foi visto no aparelho.
 - `gradle :pc:testarMotor` tem 3 falhas antigas que não são do VFX (não acham `historia/` e a
   pasta de ultras). Qualquer outra é nova.

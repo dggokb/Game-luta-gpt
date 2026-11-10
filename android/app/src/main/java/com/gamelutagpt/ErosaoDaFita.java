@@ -3,7 +3,11 @@ package com.gamelutagpt;
 /**
  * A imagem do rastro do golpe num instante, pela receita de reports/VFX de luta estilo anime.md
  * (a parte "No Android, uma forma gerada e um shader pequeno"): uma forma em cinza, um ruído que
- * repete, erosão do alfa e rampa de cor do personagem, por cima de uma base escura.
+ * repete, erosão do alfa e rampa de cor do personagem, por cima de uma base escura. Do relatório
+ * reports/Pipeline profissional de VFX anime.md: a frente da erosão é uma faixa chapada na cor do
+ * personagem (a "erosão com borda luminosa") e a parte clara ganha um halo em duas cores (o Glow A
+ * e B do After Effects), que é o que faz o efeito ler como luz. Do Ogawa (Arc System Works): depois
+ * do acerto a cor desbota ("a segunda metade deve parecer que não tem área de acerto").
  *
  * <p>O relatório monta isso como shader. Aqui a mesma conta roda na CPU, numa imagem pequena
  * ({@link #LARGURA} x {@link #ALTURA}), e o desenho só estica a imagem na malha da fita: assim o
@@ -24,8 +28,16 @@ final class ErosaoDaFita {
     private static final float TORCE_X = 0.02f, TORCE_Y = 0.035f;
     /** Meia largura da borda da erosão: perto de zero é o recorte chapado do anime. */
     private static final float BORDA = 0.035f;
-    /** A faixa clara logo atrás da frente da erosão (o "fio" que está se desfazendo). */
-    private static final float FIO = 0.03f;
+    /**
+     * A faixa chapada na cor do personagem logo atrás da frente da erosão (a borda luminosa), e o
+     * limiar a partir do qual ela aparece (no começo da vida não há frente de erosão para marcar).
+     */
+    private static final float FAIXA_BORDA = 0.07f, BORDA_DE = 0.12f, BORDA_ATE = 0.35f;
+    /** O halo em volta da parte clara: raio (px da imagem), força e o quanto a faixa conta a mais. */
+    private static final int HALO_RAIO = 3;
+    private static final float HALO_ALFA = 0.55f, HALO_FAIXA = 1.6f;
+    /** O quanto a cor desbota no fim da vida (0: nada; 1: cinza). */
+    private static final float DESBOTA_MAX = 0.8f;
     /** O brilho que a frente da fita ganha (a borda que corta, como a Arc System Works faz). */
     private static final float BRILHO_FRENTE = 0.35f;
     /** A base escura sob o corte: a opacidade. Ela some junto com o corte, nunca depois. */
@@ -44,9 +56,14 @@ final class ErosaoDaFita {
 
     private final float[] forma, ruido, base;
     private final int tw, th;
-    /** A rampa da cor atual: 256 tons, do escuro ao branco, e a cor da base. */
-    private final int[] rampa = new int[256];
-    private int rampaDe = -1, corBase;
+    /** A rampa da cor atual: 256 tons, do escuro ao branco; a cor da base, da faixa e do halo (A, B). */
+    private final int[] rampa = new int[256], haloCor = new int[64];
+    private int rampaDe = -1, corBase, corFaixa, haloA, haloB;
+    private float rampaDesbota = -1f;
+    /** Rascunho de cada pixel: o alfa e a cor do corte, o alfa da base e a luz que vai para o halo. */
+    private final float[] aCorte = new float[LARGURA * ALTURA], aBase = new float[LARGURA * ALTURA];
+    private final float[] luz = new float[LARGURA * ALTURA], borrao = new float[LARGURA * ALTURA];
+    private final int[] corCorte = new int[LARGURA * ALTURA];
 
     /** Os pixels da textura de forma (ARGB, os canais lidos como números de 0 a 1). */
     ErosaoDaFita(int[] argb, int largura, int altura) {
@@ -71,10 +88,12 @@ final class ErosaoDaFita {
      * avança, do Cyanilux) em vez de se espremer no trecho já andado. Antes do fundo e depois da
      * frente não há nada. {@code rolagemPx}: o quanto o ruído já correu pela fita. {@code erosao}
      * (0 a 1): o quanto a fita inteira já foi comida. {@code vies}: o quanto a mais o fundo é
-     * comido (o fundo some primeiro, em bordas irregulares).
+     * comido (o fundo some primeiro, em bordas irregulares). {@code desbota} (0 a 1): o quanto a
+     * cor já perdeu (depois do acerto).
      */
-    void assar(int[] saida, int rgb, float totalPx, float fundoPx, float frentePx, float rolagemPx, float erosao, float vies) {
-        if (rgb != rampaDe) montarRampa(rgb);
+    void assar(int[] saida, int rgb, float totalPx, float fundoPx, float frentePx, float rolagemPx, float erosao, float vies,
+               float desbota) {
+        if (rgb != rampaDe || desbota != rampaDesbota) montarRampa(rgb, desbota);
         float formaDe = frentePx - totalPx, janela = Math.max(1f, frentePx - fundoPx);
         float nasce = Math.max(1f, Math.min(NASCE_MAX, NASCE * totalPx));
         // O que só depende da coluna sai do laço: se ela está no trecho, onde cai no ruído e na
@@ -99,7 +118,7 @@ final class ErosaoDaFita {
                 // Fora do trecho, ou fora da base (que cobre a forma, alargada), não há nada.
                 float b = colDentro[i] ? trava(base, colForma[i], vy) : 0f;
                 if (b < 0.004f) {
-                    saida[k] = 0;
+                    aCorte[k] = aBase[k] = luz[k] = 0f;
                     continue;
                 }
                 float n = repete(ruido, colRuido[i], vy);
@@ -110,14 +129,58 @@ final class ErosaoDaFita {
                 // Forma vezes ruído contra o limiar.
                 float campo = claro * (0.45f + 0.55f * n);
                 float fica = suave(corte - BORDA, corte + BORDA, campo);
-                float fio = limiar > 0.02f ? fica * (1f - suave(corte + BORDA, corte + BORDA + FIO, campo)) : 0f;
-                float g = limita(claro + 0.6f * fio + colBrilho[i] * claro);
-                // O véu fica meio transparente; os riscos, cheios.
-                float aCorte = fica * Math.min(1f, s * 2.2f);
+                // A borda luminosa: o que acabou de escapar da erosão, numa faixa chapada.
+                float faixa = fica * (1f - suave(corte + BORDA, corte + BORDA + FAIXA_BORDA, campo))
+                    * suave(BORDA_DE, BORDA_ATE, limiar);
+                float g = limita(claro + colBrilho[i] * claro);
+                int cor = rampa[(int) (g * 255f + 0.5f)];
+                if (faixa > 0.01f) cor = mistura(cor, corFaixa, suave(0.35f, 0.65f, faixa));
+                // O véu fica meio transparente; os riscos e a faixa, cheios.
+                float a = fica * Math.min(1f, Math.max(s * 2.2f, faixa));
+                aCorte[k] = a;
+                corCorte[k] = cor;
+                // A luz que vai para o halo: a parte clara e, mais forte, a faixa.
+                luz[k] = a * Math.min(1f, Math.max(g - 0.3f, 0f) * 1.4f + faixa * HALO_FAIXA);
                 // A base: a mesma erosão do corte, mais macia, e apagando com ela (não sobra sozinha).
                 float resto = 1f - limiar;
-                float aBase = BASE_ALFA * b * suave(corte - 0.08f, corte + 0.08f, b * (0.45f + 0.55f * n) * 0.6f) * resto * resto;
-                saida[k] = sobre(rampa[(int) (g * 255f + 0.5f)], aCorte, corBase, aBase);
+                aBase[k] = BASE_ALFA * b * suave(corte - 0.08f, corte + 0.08f, b * (0.45f + 0.55f * n) * 0.6f) * resto * resto;
+            }
+        }
+        borrar(luz, borrao, HALO_RAIO);
+        for (int k = 0; k < saida.length; k++) {
+            float h = Math.min(1f, borrao[k] * 2f);
+            float aHalo = HALO_ALFA * h;
+            if (aCorte[k] <= 0f && aBase[k] <= 0f && aHalo <= 0.004f) {
+                saida[k] = 0;
+                continue;
+            }
+            // Do fundo para cima: a base escura, o halo (B por fora, A perto da luz) e o corte.
+            saida[k] = sobre(corCorte[k], aCorte[k], haloCor[(int) (h * 63f)], aHalo, corBase, aBase[k]);
+        }
+    }
+
+    /**
+     * Desfoque de caixa em x e em y, duas vezes (fica perto de um desfoque gaussiano): {@code m}
+     * vai borrado para {@code saida}. Usa {@code m} de rascunho.
+     */
+    private static void borrar(float[] m, float[] saida, int r) {
+        for (int vez = 0; vez < 2; vez++) {
+            caixa(m, saida, r, LARGURA, ALTURA, 1, LARGURA);
+            caixa(saida, m, r, ALTURA, LARGURA, LARGURA, 1);
+        }
+        System.arraycopy(m, 0, saida, 0, m.length);
+    }
+
+    /** Média móvel de 2r+1 ao longo de {@code n} pontos (passo {@code d}), em {@code linhas} linhas (passo {@code dl}). */
+    private static void caixa(float[] de, float[] para, int r, int n, int linhas, int d, int dl) {
+        float k = 1f / (2 * r + 1);
+        for (int l = 0; l < linhas; l++) {
+            int o = l * dl;
+            float soma = 0f;
+            for (int i = -r; i <= r; i++) soma += de[o + Math.max(0, Math.min(n - 1, i)) * d];
+            for (int i = 0; i < n; i++) {
+                para[o + i * d] = soma * k;
+                soma += de[o + Math.min(n - 1, i + r + 1) * d] - de[o + Math.max(0, i - r) * d];
             }
         }
     }
@@ -133,33 +196,47 @@ final class ErosaoDaFita {
 
     /**
      * A rampa do personagem a partir da cor do membro: sombra (a cor escurecida), a cor e branco,
-     * em faixas chapadas. A cor medida costuma vir quase cinza (pele, roupa clara): fica o tom
-     * dela, com saturação de pelo menos {@link #SAT_MIN}, senão o véu sai branco e os riscos
-     * brancos somem nele.
+     * em faixas chapadas; e a cor da faixa da erosão e do halo (A perto da luz, B por fora). A cor
+     * medida costuma vir quase cinza (pele, roupa clara): fica o tom dela, com saturação de pelo
+     * menos {@link #SAT_MIN}, senão o véu sai branco e os riscos brancos somem nele. {@code desbota}
+     * tira a saturação (depois do acerto).
      */
-    private void montarRampa(int rgb) {
+    private void montarRampa(int rgb, float desbota) {
         rampaDe = rgb;
+        rampaDesbota = desbota;
         float[] hsv = hsv(rgb);
+        float k = 1f - DESBOTA_MAX * desbota;
         float sat = Math.max(SAT_MIN, Math.min(0.8f, hsv[1] * 2.5f));
-        int cor = rgb(hsv[0], sat, 0.92f);
-        int sombra = rgb(hsv[0], Math.min(1f, sat + 0.15f), 0.58f);
-        corBase = rgb(hsv[0], Math.min(1f, sat + 0.2f), 0.16f);
-        for (int k = 0; k < 256; k++) {
-            float g = k / 255f;
+        int cor = rgb(hsv[0], sat * k, 0.92f);
+        int sombra = rgb(hsv[0], Math.min(1f, sat + 0.15f) * k, 0.58f);
+        corBase = rgb(hsv[0], Math.min(1f, sat + 0.2f) * k, 0.16f);
+        corFaixa = rgb(hsv[0], Math.min(1f, sat + 0.35f) * k, 1f);
+        haloA = rgb(hsv[0], Math.min(1f, sat + 0.1f) * k, 1f);
+        haloB = rgb(hsv[0] + 0.04f, Math.min(1f, sat + 0.45f) * k, 0.85f);
+        for (int i = 0; i < haloCor.length; i++) haloCor[i] = mistura(haloB, haloA, i / (haloCor.length - 1f));
+        for (int i = 0; i < 256; i++) {
+            float g = i / 255f;
             int c = mistura(sombra, cor, suave(FAIXA_COR - FAIXA_MACIA, FAIXA_COR + FAIXA_MACIA, g));
-            rampa[k] = mistura(c, 0xFFFFFF, suave(FAIXA_BRANCO - FAIXA_MACIA, FAIXA_BRANCO + FAIXA_MACIA, g));
+            rampa[i] = mistura(c, 0xFFFFFF, suave(FAIXA_BRANCO - FAIXA_MACIA, FAIXA_BRANCO + FAIXA_MACIA, g));
         }
     }
 
-    /** O corte (cor c1, alfa a1) por cima da base (c0, a0): ARGB sem pré-multiplicar. */
-    private static int sobre(int c1, float a1, int c0, float a0) {
-        float a = a1 + a0 * (1f - a1);
+    /** Três camadas, de cima para baixo (cor, alfa): ARGB sem pré-multiplicar. */
+    private static int sobre(int c2, float a2, int c1, float a1, int c0, float a0) {
+        // Pré-multiplicado, de baixo para cima.
+        float r = ((c0 >> 16) & 255) * a0, g = ((c0 >> 8) & 255) * a0, b = (c0 & 255) * a0, a = a0;
+        r = ((c1 >> 16) & 255) * a1 + r * (1f - a1);
+        g = ((c1 >> 8) & 255) * a1 + g * (1f - a1);
+        b = (c1 & 255) * a1 + b * (1f - a1);
+        a = a1 + a * (1f - a1);
+        r = ((c2 >> 16) & 255) * a2 + r * (1f - a2);
+        g = ((c2 >> 8) & 255) * a2 + g * (1f - a2);
+        b = (c2 & 255) * a2 + b * (1f - a2);
+        a = a2 + a * (1f - a2);
         if (a <= 0.002f) return 0;
-        float k1 = a1 / a, k0 = a0 * (1f - a1) / a;
-        int r = (int) (((c1 >> 16) & 255) * k1 + ((c0 >> 16) & 255) * k0 + 0.5f);
-        int g = (int) (((c1 >> 8) & 255) * k1 + ((c0 >> 8) & 255) * k0 + 0.5f);
-        int b = (int) ((c1 & 255) * k1 + (c0 & 255) * k0 + 0.5f);
-        return (Math.min(255, (int) (a * 255f + 0.5f)) << 24) | (Math.min(255, r) << 16) | (Math.min(255, g) << 8) | Math.min(255, b);
+        float d = 1f / a;
+        return (Math.min(255, (int) (a * 255f + 0.5f)) << 24) | (Math.min(255, (int) (r * d + 0.5f)) << 16)
+            | (Math.min(255, (int) (g * d + 0.5f)) << 8) | Math.min(255, (int) (b * d + 0.5f));
     }
 
     /** Amostra suave travada nas bordas (a forma não se repete). */

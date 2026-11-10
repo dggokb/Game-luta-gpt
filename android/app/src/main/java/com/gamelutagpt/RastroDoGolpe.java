@@ -33,8 +33,12 @@ import com.gamelutagpt.render.RenderImage;
  */
 final class RastroDoGolpe {
     private static final String FORMA = "rastro_forma";
-    /** Quadros de jogo por passo da erosão e do ruído (4: 15 desenhos por segundo). */
-    private static final int PASSO = 4;
+    /** Quadros de jogo por passo da erosão e do ruído (5: 12 desenhos por segundo, o degrau do anime). */
+    private static final int PASSO = 5;
+    /**
+     * Depois que a frente termina de varrer (os quadros ativos do golpe) a cor desbota até o fim
+     * da vida (Ogawa, Arc System Works: a segunda metade não parece ter área de acerto).
+     */
     /** Px do mundo que o ruído corre pela fita a cada quadro (para trás, contra o golpe). */
     private static final float ROLAGEM = 7f;
     /** A erosão da fita inteira: parada até esta fração da vida, depois sobe até {@link #EROSAO_MAX}. */
@@ -114,7 +118,11 @@ final class RastroDoGolpe {
         Lado l = lados[i];
         CharacterDefinition.Animation a = f.attacking() && f.attack != null ? CombatEngine.desenhoDoGolpe(f) : null;
         if (a == null || a.caminhoGolpe == null) {
-            l.ataque = null;
+            // O golpe acabou (ou outro sem caminho começou): a fita termina a vida dela com relógio
+            // próprio, parada onde estava, e o fundo a apaga de trás para a frente. Antes, ela
+            // sumia de uma vez no fim do golpe fraco.
+            if (l.ataque != null && (l.quadro - l.saida + 1 - ATRASO[l.forca]) < l.varrida) l.quadro++;
+            else l.ataque = null;
             return;
         }
         if (f.attack != l.ataque || a != l.desenho || f.attackFrame < l.quadro) {
@@ -253,7 +261,8 @@ final class RastroDoGolpe {
         float vida = l.varrida + ATRASO[l.forca];
         float t = passo / vida;
         float comida = t <= EROSAO_INICIO ? 0f : Math.min(1f, (t - EROSAO_INICIO) / (1f - EROSAO_INICIO)) * EROSAO_MAX;
-        erosao.assar(pixels, cor, total, de, ate, -ROLAGEM * passo, comida, VIES_FUNDO);
+        float desbota = Math.max(0f, Math.min(1f, (passo - l.varrida) / (float) ATRASO[l.forca]));
+        erosao.assar(pixels, cor, total, de, ate, -ROLAGEM * passo, comida, VIES_FUNDO, desbota);
         l.bitmap.setPixels(pixels, 0, ErosaoDaFita.LARGURA, 0, 0, ErosaoDaFita.LARGURA, ErosaoDaFita.ALTURA);
         l.assado = l.quadro;
         return true;

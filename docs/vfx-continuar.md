@@ -24,7 +24,8 @@ jogo encaixar no caminho que já detecta.
 
 **Teste da receita do relatório (10/11, noite; branch `claude/rastro-erosao`, esperando o dono
 aprovar no vídeo):** a fita deixou de ser a textura única esticada e virou a receita do
-`reports/VFX de luta estilo anime.md`. Ver "Rodada de 10/11 (noite): o rastro pela receita" abaixo.
+`reports/VFX de luta estilo anime.md`. Ver "Rodada de 10/11 (noite): o rastro pela receita" abaixo. Depois dele, falta o
+teste do rastro como folha fabricada no EffectCraft (combinado com o dono; ver o fim da rodada).
 
 ## Rodada de 10/11 (noite): o rastro pela receita do relatório
 
@@ -66,6 +67,39 @@ estavam. Feito, numa branch da sessão (não na `game-luta-sprite-fable`):
 - **Para o dono decidir no vídeo:** a cor (p11 sai rosa-lilás, p14 lavanda, porque é o tom medido
   com saturação puxada); o véu agora cobre o membro na pausa do acerto mais que a textura antiga;
   a base escura quase não aparece no cenário escuro (é para cenário claro).
+
+**Segunda rodada (10/11, noite), com o que se aprendeu no EffectCraft** (`reports/Pipeline
+profissional de VFX anime.md`), a pedido do dono, na mesma branch:
+
+- A branch recebeu a `game-luta-sprite-fable` (merge): o chute forte agora passa por cima da
+  faísca nova `dano_forte_anel_ec`.
+- **Erosão com borda luminosa:** o que acabou de escapar da erosão vira uma faixa chapada na cor
+  do personagem (antes, um fio branco fino). Só aparece onde a erosão já anda (limiar de 0,12 a
+  0,35), senão vira contorno da fita inteira.
+- **Halo em duas cores** (o Glow A e B do After Effects): a parte clara e a faixa ganham um halo
+  borrado (caixa de raio 3, duas vezes), A perto da luz e B por fora, na mesma imagem. É o que faz
+  ler como luz sem mistura aditiva, que o Java2D não tem.
+- **12 desenhos por segundo:** a erosão e o ruído andam de 5 em 5 quadros (antes 4).
+- **Desbota depois dos quadros ativos** (Ogawa: a segunda metade não parece ter área de acerto):
+  quando a frente termina de varrer, a saturação cai até 80% a menos no fim da vida.
+- **A fita não some mais de uma vez no fim do golpe:** depois que o golpe acaba ela termina a vida
+  com relógio próprio, parada onde estava, e o fundo a apaga.
+- Custo: 1,1 ms por imagem no PC (o halo custou 0,35 ms); a gravação ficou em 52 a 60 FPS, como a
+  de antes. No celular não foi medido.
+- Conferido nos mesmos três golpes, quadro a quadro, ao lado da `game-luta-sprite-fable` atual.
+  `testarMotor`: só as 3 falhas antigas. Celular: não visto.
+- Visto e não mexido: no soco fraco do p11, o véu rosa com halo cobre a faísca na pausa do acerto
+  (o rastro é a camada de cima, regra 9); no jab do Krüger o rastro ainda só sai depois do acerto
+  (mexe no tempo; o dono não liberou).
+
+**Próximo teste combinado com o dono (não esquecer):** o rastro como **folha fabricada no
+EffectCraft**, lado a lado com este. Receita 1 do relatório de pipeline: uma faixa reta gerada
+(imagem ou vídeo, Codex ou do dono) entra no EffectCraft como compositor (Unmult, tempo em degraus
+de 12 por segundo, faixas no Colorama, Glow A e B, erosão em Stencil Luma no fim) e sai uma folha
+de 6 a 8 quadros da faixa reta; o jogo dobra a folha no caminho detectado e troca o quadro pela
+idade da fita (os "6 desenhos que avançam enquanto somem" da Arc). A variante de cada personagem
+sai de um modelo parametrizado (`.ectemplate` + `values.json`). Precisa compilar o EffectCraft
+na sessão (skill `effectcraft`) e de uma faixa reta gerada como fonte.
 
 ## A pesquisa de como os estúdios fazem (10/11)
 
