@@ -4818,7 +4818,7 @@
                     }
                   ],
                   "expr": {
-                    "text": "var d = [0, 0, 2, 4, 6, 8, 10, 12, 14, 17, 20, 24]; var i = Math.min(Math.floor(time * 12 + 0.001), d.length - 1); d[i] / 24 + 0.001;",
+                    "text": "var d = [0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; var i = Math.min(Math.floor(time * 12 + 0.001), d.length - 1); d[i] / 24 + 0.001;",
                     "enabled": true
                   },
                   "ui": {
@@ -6051,7 +6051,7 @@
                           "name": "Contrast",
                           "value": {
                             "t": "Scalar",
-                            "v": 400.0
+                            "v": 500.0
                           },
                           "ui": {
                             "kind": "Slider",
@@ -6082,7 +6082,7 @@
                               "time": 0,
                               "value": {
                                 "t": "Scalar",
-                                "v": 300.0
+                                "v": 420.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6108,7 +6108,7 @@
                               "time": 21168000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 300.0
+                                "v": 420.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6134,7 +6134,7 @@
                               "time": 42336000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 300.0
+                                "v": 420.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6160,7 +6160,7 @@
                               "time": 63504000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 300.0
+                                "v": 330.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6186,7 +6186,7 @@
                               "time": 84672000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 260.0
+                                "v": 250.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6212,7 +6212,7 @@
                               "time": 105840000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 210.0
+                                "v": 175.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6238,7 +6238,7 @@
                               "time": 127008000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 160.0
+                                "v": 105.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6264,7 +6264,7 @@
                               "time": 148176000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 115.0
+                                "v": 45.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6290,7 +6290,7 @@
                               "time": 169344000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 75.0
+                                "v": -15.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6316,7 +6316,7 @@
                               "time": 190512000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": 35.0
+                                "v": -70.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6342,7 +6342,7 @@
                               "time": 211680000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": -5.0
+                                "v": -120.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6368,7 +6368,7 @@
                               "time": 232848000000,
                               "value": {
                                 "t": "Scalar",
-                                "v": -50.0
+                                "v": -170.0
                               },
                               "in_interp": "Linear",
                               "out_interp": "Linear",
@@ -6467,7 +6467,7 @@
                               "name": "Uniform Scaling",
                               "value": {
                                 "t": "Bool",
-                                "v": true
+                                "v": false
                               },
                               "ui": {
                                 "kind": "Checkbox"
@@ -6486,7 +6486,7 @@
                               "name": "Scale",
                               "value": {
                                 "t": "Scalar",
-                                "v": 70.0
+                                "v": 100.0
                               },
                               "ui": {
                                 "kind": "Slider",
@@ -6510,7 +6510,7 @@
                               "name": "Scale Width",
                               "value": {
                                 "t": "Scalar",
-                                "v": 100.0
+                                "v": 70.0
                               },
                               "ui": {
                                 "kind": "Slider",
@@ -6534,7 +6534,7 @@
                               "name": "Scale Height",
                               "value": {
                                 "t": "Scalar",
-                                "v": 100.0
+                                "v": 16.0
                               },
                               "ui": {
                                 "kind": "Slider",
@@ -6951,8 +6951,8 @@
                       "value": {
                         "t": "Vec3",
                         "v": [
-                          672.0,
-                          384.0,
+                          427.0,
+                          383.0,
                           0.0
                         ]
                       },
@@ -6974,8 +6974,8 @@
                       "value": {
                         "t": "Vec3",
                         "v": [
-                          672.0,
-                          544.0,
+                          427.0,
+                          543.0,
                           0.0
                         ]
                       },
@@ -7002,6 +7002,368 @@
                           100.0
                         ]
                       },
+                      "keys": [
+                        {
+                          "time": 0,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              100.0,
+                              100.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 21168000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              100.0,
+                              100.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 42336000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              100.0,
+                              100.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 63504000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              104.0,
+                              104.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 84672000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              110.0,
+                              110.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 105840000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              118.0,
+                              118.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 127008000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              128.0,
+                              128.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 148176000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              140.0,
+                              140.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 169344000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              154.0,
+                              154.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 190512000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              170.0,
+                              170.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 211680000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              186.0,
+                              186.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        },
+                        {
+                          "time": 232848000000,
+                          "value": {
+                            "t": "Vec3",
+                            "v": [
+                              202.0,
+                              202.0,
+                              100.0
+                            ]
+                          },
+                          "in_interp": "Linear",
+                          "out_interp": "Linear",
+                          "in_ease": [],
+                          "out_ease": [],
+                          "continuous": false,
+                          "auto_bezier": false,
+                          "spatial_in": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_out": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "spatial_auto": true,
+                          "spatial_continuous": false,
+                          "roving": false
+                        }
+                      ],
                       "ui": {
                         "kind": "Percent"
                       },

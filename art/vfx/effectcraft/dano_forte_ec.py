@@ -33,13 +33,20 @@ VIDEO = AQUI.parent / 'dano' / 'dano_forte.mp4'
 CLI_PADRAO = Path('/home/user/storytold/effectcraft/target/release/effectcraft-cli')
 
 LARGO, ALTO, FPS_VIDEO = 1344, 768, 24
+MIOLO = (427.0, 383.0)              # o miolo branco do vídeo (o contato da folha de hoje)
 FPS = 12                                  # um desenho por quadro da composição
 # Quadro do vídeo mostrado em cada desenho: o impacto (0) segurado por dois desenhos, depois o
 # vídeo de dois em dois e, no fim, mais espaçado (a cauda de brasas).
-DESENHOS = [0, 0, 2, 4, 6, 8, 10, 12, 14, 17, 20, 24]
+DESENHOS = [0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+# Escala por desenho, a partir do contato (pedido de 10/11, vendo o Tōkon: "o nosso está diminuindo
+# no final; lá ele se expande dissipando em partículas"). O vídeo encolhe sozinho; a escala o abre.
+ESCALA = [100, 100, 100, 104, 110, 118, 128, 140, 154, 170, 186, 202]
 # Erosão por desenho (brilho do ruído com contraste 400: de 250 para cima não come nada; quanto
 # menor, maiores os buracos).
-EROSAO = [300, 300, 300, 300, 260, 210, 160, 115, 75, 35, -5, -50]
+EROSAO = [420, 420, 420, 330, 250, 175, 105, 45, -15, -70, -120, -170]
+# Grão esticado na direção do golpe: a erosão quebra a faísca em lascas compridas (não confete)
+# que se espalham com a escala, como no Tōkon.
+EROSAO_GRAO = (70, 16)               # largura e altura do ruído, em %
 # Faixas por intensidade (0 a 1), medidas no vídeo: o halo macio vai até ~0,31 e o desenho
 # (jatos, espinhos) fica de 0,4 para cima. Abaixo de 0,36 vira preto (transparente: o Glow refaz
 # um halo limpo); depois, do laranja-avermelhado da borda ao branco do núcleo. Sem interpolar =
@@ -64,7 +71,8 @@ def passos(anel=False):
             {'command': 'layer.addItem', 'params': {'item': VIDEO.name}},
             {'command': 'layer.rename', 'params': {'layer': '$1.layer', 'name': 'dano'}},
         ]}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'transform/position', 'value': [LARGO / 2, ALTO / 2 + folga, 0]}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'transform/anchor', 'value': [*MIOLO, 0]}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'transform/position', 'value': [MIOLO[0], MIOLO[1] + folga, 0]}},
         {'command': 'layer.enableTimeRemap', 'params': {'layers': ['dano']}},
         {'command': 'prop.setExpression', 'params': {'layer': 'dano', 'path': 'timeRemap', 'expression':
             f'var d = {json.dumps(DESENHOS)}; '
@@ -88,14 +96,17 @@ def passos(anel=False):
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#3/colorB', 'value': '#c2280c'}},
         # Erosão de borda dura no fim (o ruído fica parado: os buracos só crescem).
         {'command': 'effect.apply', 'params': {'effect': 'Fractal Noise', 'layers': ['dano']}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/contrast', 'value': 400}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/contrast', 'value': 500}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/overflow', 'value': 0}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/scale', 'value': 70}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/uniformScaling', 'value': False}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/scaleWidth', 'value': EROSAO_GRAO[0]}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/scaleHeight', 'value': EROSAO_GRAO[1]}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/complexity', 'value': 3}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/evolutionOptions/seed', 'value': 9}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/blendingMode', 'value': 19}},
     ]
     s += chaves('dano', 'effects/#4/brightness', EROSAO)
+    s += chaves('dano', 'transform/scale', [[e, e, 100] for e in ESCALA])
     if anel:
         # A faísca vira um plano 3D em z = 0 (sem câmera, o 3D enquadra igual ao 2D) e o anel a
         # atravessa: a metade da frente passa por cima dela e a de trás por baixo, sozinhas.
@@ -111,7 +122,6 @@ def passos(anel=False):
 # erosão (Fractal Noise em Stencil Luma na própria camada). Medidas em px do vídeo (0,30 px do
 # mundo cada): raio de 100 a 470 (30 a 141 no jogo).
 FOLGA_ANEL = 160                    # px a mais em cima e embaixo para o anel caber
-MIOLO = (427.0, 383.0)              # o miolo branco do vídeo (o contato da folha de hoje)
 ANEL_GIRO = (-10, 66)               # rotação X e Y, em graus (3/4)
 ANEL_RAIOS = [100, 200, 280, 340, 385, 420, 445, 462, 470]
 ANEL_TRACOS = [22, 19, 16, 13, 10, 7, 5, 3, 2]

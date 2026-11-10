@@ -226,6 +226,16 @@ como a faísca do golpe forte e especial (`GameView.efeitoDeGolpe`, antes da `im
 que fica como reserva se a folha nova faltar). Para voltar: apagar
 `android/app/src/main/assets/efeitos/dano_forte_anel_ec` (o jogo cai sozinho na `impacto_ar_forte`).
 
+## Golpe forte: o fim expande e vira lascas (10/11, noite)
+
+Pedido, vendo o Tōkon: "o nosso está diminuindo no final; lá ele se expande dissipando em
+partículas". No `dano_forte_ec.py`: a faísca fica ancorada no contato (427,383 do vídeo) e, do
+desenho 3 em diante, a escala abre de 100 a 202 % enquanto o vídeo segue até o quadro 11 (antes ia
+até o 24, onde já encolheu); a erosão passou a grão esticado na direção do golpe (Fractal Noise
+70 × 16 %, contraste 500, brilho de 420 a −170), que quebra a faísca em lascas compridas que se
+espalham com a escala. O anel 3D ficou igual. Foi para a branch no mesmo nome
+(`dano_forte_anel_ec`). Vídeo: `android/app/build/sprite-review/acerto_forte_final_expandindo_em_lascas.mp4`.
+
 ## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
 
 Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
