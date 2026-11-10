@@ -3,6 +3,25 @@
 Roteiro para continuar o trabalho de efeitos visuais em outra sessão (a que tem o Codex e a rede
 liberada). Escrito em 09/11, na `game-luta-sprite-fable`.
 
+## Antes de mexer em VFX: as skills
+
+Desde 10/11 o repositório tem duas skills em `.claude/skills/`, carregadas pelo Claude Code:
+
+- **`vfx-luta`** (nossa): o que o dono do jogo já aprovou e reprovou em VFX, os erros que já
+  aconteceram, as ferramentas e como gravar e conferir. É o resumo deste documento em forma de
+  regra; quando uma decisão nova sair, ela entra lá também.
+- **`vfx-2d`** (de terceiros, MIT, copiada sem alteração; ver `ORIGEM.md` na pasta): guia geral
+  de VFX 2D, com durações por efeito e os três jeitos de fazer rastro.
+
+**Onde o rastro parou (10/11, fim do dia):** na `game-luta-sprite-fable` está o rastro
+procedural com a textura de riscos brancos grossos (`arco_textura_03.png`). O dono achou o
+movimento bom e o desenho ainda ruim, e mandou uma referência de véu branco meio transparente com
+riscos finos. A troca para esse véu (textura `arco_textura_04.png`, fita desenhada numa malha
+só) foi interrompida antes de ser vista no jogo e está só na branch `ccr-97c05bd0-68tbpv`
+(commit "Em andamento: rastro do golpe como véu de ar..."). Ele parou para procurar ferramenta
+melhor; a ideia em aberto é ele gerar o rastro em vídeo, como fez com os efeitos de dano, e o
+jogo encaixar no caminho que já detecta.
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada
