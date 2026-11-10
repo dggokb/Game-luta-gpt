@@ -80,5 +80,6 @@ Vegas com `channel` 4, `segments` 1, `length` 1.
    `posterizeTime(12)` na evolução.
 5. Para o personagem elétrico: **Advanced Lightning**.
 
-Lembrete da regra 2 da skill `vfx-luta`: tudo isso é desenho feito no programa. O dono decide se
-abre a exceção; a alternativa é usar o EffectCraft só para montar e animar imagens geradas.
+Regra 2 da skill `vfx-luta` (revista em 10/11): desenho feito no programa só vale em nível
+profissional, seguindo técnica documentada e comparado lado a lado com a referência no jogo; o
+dono julga no vídeo. Forma simples com cara de programa volta para imagem ou vídeo gerado.

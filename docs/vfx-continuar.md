@@ -193,6 +193,13 @@ limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, 
 da lista fica na frente (desenhar do miolo para fora), e o segundo grupo se chama
 `contents/group#2`.
 
+## Regra 2 revista (10/11, noite)
+
+Depois de ver a faísca do golpe forte refeita no EffectCraft, o dono revisou a regra do desenho
+por código: **"só aceitar código de ficar nível profissional"**. A skill `vfx-luta` (regra 2) foi
+atualizada: imagem ou vídeo gerado continua o caminho padrão; desenho feito no programa só vale
+seguindo técnica profissional, comparado lado a lado no jogo, e quem julga o nível é ele.
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada

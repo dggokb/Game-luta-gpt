@@ -63,7 +63,7 @@ com anel de pressão de ar em 3/4, faixas chapadas, faíscas das pontas).
 | Sem tela, CPU, PNG RGBA | `render-frame --transparent`; render queue `png` + `rgba` (alfa reto) | a folha |
 | Formas com vértices | `layer.addShapeItem` `group`/`path`/`fill`; `prop.set` em `.../path/path` com `{closed, vertices, in_tangents, out_tangents}` | espinhos, jatos, faíscas |
 | Faixas chapadas de anime | o mesmo contorno em cópias menores, cada uma de uma cor | estrela branca -> amarela -> laranja -> borda escura |
-| Imagem gerada animada | importar PNG, `Unmult` tira o preto, máscaras cortam pedaços | manter a regra "desenho não é código" |
+| Imagem gerada animada | importar PNG, `Unmult` tira o preto, máscaras cortam pedaços | o caminho padrão da regra 2 da vfx-luta (desenho gerado; desenho no programa só em nível profissional) |
 | 3D de verdade | `layer.setSwitch {switch: "threeD"}`, `transform/rotationX`/`rotationY`, `layer.newCamera` | anel de choque em 3/4 que passa na frente e atrás da estrela sozinho (sem duas camadas) |
 | Expressões | `prop.setExpression {layer, path, expression}`: `wiggle`, `posterizeTime(12)`, `seedRandom`/`random`, `ease`/`linear`, `index` funcionam | trocar centenas de quadros-chave por uma linha; degrau de anime na escala/giro |
 | Modelo parametrizado | `essential.addProperty` + `essential.exportTemplate`; `render-frame/render --template T.ectemplate --values V.json` | um efeito-base, uma variante por personagem só trocando cor/tamanho |

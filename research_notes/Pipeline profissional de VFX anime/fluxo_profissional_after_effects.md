@@ -328,17 +328,20 @@ o AE só compõe. Para jogo, a licença dos pacotes é o gargalo.
 
 ### Inferences
 - Os pacotes "2D FX desenhados à mão" de VideoHive e Motion Array são o caminho mais curto para um
-  visual profissional, mas **colocá-los dentro de um jogo é justamente o caso que a Motion Array
-  exclui**, e a Envato não deixa claro. Comprar e usar exige licença empresarial ou consulta por
-  escrito ao vendedor. Pela regra do projeto (referência é inspiração, não cópia), o uso seguro é
-  **estudar o timing e as formas** desses pacotes e refazer.
+  visual profissional. As licenças, porém, se dividem: a **Motion Array exclui jogos** na licença
+  padrão, enquanto a **licença Video Media da Envato Market cita jogos como End Product permitido**
+  (uma licença por jogo, sem deixar o usuário extrair o item). Para este projeto ainda pesa a regra do
+  dono (referência é inspiração, não cópia; o desenho vem de imagem ou vídeo gerado, ou de técnica
+  profissional). O uso mais seguro é **estudar o timing e as formas** desses pacotes e refazer.
+  Comprar um item VideoHive é juridicamente viável, mas é decisão do dono.
 - O caminho portável e sem risco de licença é o (b) mais o (c): procedural nativo no EffectCraft para
   a base, e os quadros-chave desenhados vindos de imagem ou vídeo gerado como "guia desenhada"
   composta no EffectCraft. É o mesmo princípio do Ben Marriott, com o desenho substituído pela geração.
 
 ### Gaps
-- O texto integral do tópico do realtimevfx (o método exato) e a licença oficial da ActionVFX, da
-  ProductionCrate e de cada item da VideoHive para jogo não puderam ser lidos.
+- O método do Malakey não está no tópico do realtimevfx; deve estar nos posts dele no Twitter/X e no
+  LinkedIn, que não abri. A licença oficial da ActionVFX (429 no curl) e a da ProductionCrate não
+  puderam ser lidas. A da Motion Array (403) ficou só pelo trecho da busca.
 - Faltou o preço individual de cada pacote da VideoHive (os trechos não traziam preço).
 
 ---
