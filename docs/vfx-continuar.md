@@ -85,6 +85,51 @@ dele no vídeo `android/app/build/sprite-review/defesa_atual_x_effectcraft.mp4` 
 Não conferido: a defesa de golpe de perto, o celular (a gravação é o desenho do PC), e o tamanho
 contra a `defesa_poder` (ela foi feita com 260; a `defesa_ec` usa a escala da comum, 220).
 
+## Anime VFX do zero no After Effects, refeito no EffectCraft (10/11, noite)
+
+Pedido: "pesquise como fazer anime vfx no Adobe After Effects a partir do zero e faça um
+exemplo". **Nada no jogo foi trocado**: o exemplo espera a aprovação dele no vídeo
+`android/app/build/sprite-review/acerto_forte_atual_x_anime_effectcraft.mp4` (só na sessão).
+
+**A pesquisa.** A rede da sessão bloqueia os sites de tutorial (School of Motion, Lester Banks,
+PremiumBeat, Video Copilot, Medium...); só a busca funcionou, com os resumos das páginas. Os
+tutoriais "sem plugin" repetem cinco técnicas:
+
+| Técnica | Como | Fonte (pela busca) |
+|---|---|---|
+| Tempo em degraus | Posterize Time na camada (12 ou 24 por segundo; o efeito trava a camada num ritmo e só aceita "Hold") | [Adobe, efeitos de tempo](https://helpx.adobe.com/after-effects/desktop/apply-effects-and-animation-presets/list-of-effects/time-effects.html); [Medium, The Inspired Animator](https://medium.com/the-inspired-animator/how-to-apply-a-hand-crafted-look-to-your-animations-in-after-effects-2da1c5dbd282) |
+| Raios e linhas de velocidade | Fractal Noise sem escala uniforme (largura ~1, altura ~1400, contraste 800, brilho −100) e Polar Coordinates "Rect to Polar" a 100 %; máscara no centro; Random Seed `time*5` para tremer | [PremiumBeat](https://www.premiumbeat.com/blog/fractal-noise-adobe-after-effects/); [Woodpunch](https://woodpunchsgraphics.com/blogs/tutorials/speed-lines-after-effects-tutorial); [Riztagar](https://riztagar.com/anime-speed-lines/); [note.com/mogra](https://note.com/mogra/n/n7f34e6bd6e5b?hl=en) |
+| Explosão de anime | só camadas de forma animadas, com Polar Coordinates por cima; brilho e explosão em camadas separadas; composição grande (2500×2500) | [School of Motion, 30 dias de AE dia 22](https://schoolofmotion.com/blog/cartoon-explosion-after-effects); [Lester Banks, explosão cel](https://lesterbanks.com/2014/09/designing-cel-animation-style-explosion-ae-30-days-ae/) |
+| Fumaça e fogo cartoon | Fractal Noise "Turbulent Basic" / "Soft Linear", invertido, contraste 100 -> 125; Turbulent Displace; Levels para borda dura | [Pixflow](https://pixflow.net/blog/how-to-create-a-stunning-cartoon-smoke-effect-in-after-effects/); [AE Juice, fogo](https://aejuice.com/blog/how-to-make-fire-in-after-effects/) |
+| Luz | Glow numa camada e uma segunda passada com raio grande e outras cores; clarão oval com pena grande e opacidade no máximo no contato | [Motion Array, eletricidade](https://motionarray.com/learn/premiere-pro/how-to-create-electricity-and-energy-effects-from-scratch-in-adobe-after-effects/); [Creative Bloq, raio](https://www.creativebloq.com/entertainment/vfx/develop-electric-atmosphere-with-lightning-in-adobe-after-effects) |
+
+Formas com Trim Paths, Repeater e Wiggle Paths aparecem em todos como o jeito de fazer riscos,
+espinhos e anéis. Nenhuma fonte dá a receita de uma faísca de acerto de jogo de luta: os números
+de tempo vêm do nosso relatório.
+
+**O exemplo**: `art/vfx/effectcraft/acerto_anime_ec.py` monta `acerto_anime_ec.ecproj` sem
+imagem nenhuma: faísca de acerto forte de 16 quadros (8 desenhos de 2 em 2), clarão, estouro em
+raios (ruído + polar + Unmult + Tint, com um disco macio de track matte), riscos em leque
+(Repeater, saem rápido e freiam), espinhos em estrela com Wiggle Paths girando 30° por desenho,
+anel e uma mancha laranja atrás que some no quadro 8. Cor do branco ao amarelo e ao laranja
+(Glow com cores A e B). Monta e renderiza em 3,5 s. No jogo: `efeito_video.py <pasta> --nome
+acerto_anime_ec --fps 60 --origem 256,256 --altura 228` (a altura da `impacto_ar_forte`); o
+`efeitoDeGolpe` apontou para ela só na cópia local. Roteiro: `segura:D espera:1.8 solta:D
+grava:55:g tecla:L fim` (dupla padrão); as duas gravações batem quadro a quadro, acerto no 11.
+
+O que se aprendeu do EffectCraft 0.23.1 nisto:
+- **Polar Coordinates com os nomes trocados**: quem faz os raios a partir de listras em pé é a
+  opção 1, que ele chama de "Polar to Rect"; no After Effects os tutoriais usam "Rect to Polar".
+- **Posterize Time não segura a escala, o giro e a posição da própria camada** (no After Effects
+  também não; lá se pré-compõe). O script põe os quadros-chave de dois em dois; toda lista de
+  valores tem de terminar em quadro par, senão o último valor fica preso.
+- Track matte de alfa, Glow com cores A e B, Repeater, Wiggle Paths e Unmult funcionam como no
+  After Effects.
+
+Ficou em aberto para ele julgar: a faísca nova é radial (não aponta a linha do golpe como a
+atual), o clarão branco cobre a cabeça do rival nos 2 primeiros desenhos, e o desenho é todo
+feito no programa, o que esbarra na regra 2 da skill (forma desenhada por código já reprovada).
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada
