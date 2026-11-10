@@ -124,16 +124,22 @@ construir um motor que detecta o movimento e cria a sua linha de ação."
   95 golpes; os outros ficam sem rastro. `--folha <prefixo>` gera as folhas para conferir.
 - **No jogo** (`RastroDoGolpe`, `EfeitosVideo.fita`): a fita nasce junto com o movimento (a
   cabeça dela vai para o ponto do desenho que a tela mostra) e some em 8 a 13 quadros. A textura
-  é uma fita reta do Codex (`art/vfx/arco_textura_02.png` -> `tools/sprites/rastro_fita.py` ->
+  é uma fita reta do Codex (`art/vfx/arco_textura_03.png` -> `tools/sprites/rastro_fita.py` ->
   `assets/efeitos/rastro_fita`), dobrada no caminho em fatias e pintada da cor do membro (matriz
   de cor, o caminho dos filtros dos lutadores). No **balanço** (o membro atravessado no caminho:
   a garra, o chute de lado) a fita é larga, do lado do membro; na **estocada** (o membro na
-  direção do caminho: o soco reto, o chute de frente) são dois riscos finos, um de cada lado.
+  direção do caminho: o soco reto, o chute de frente) é um feixe de riscos em volta dele.
 - **Exagerado de propósito** (pedido de 10/11, vendo o Tōkon: "os rastros de golpe são
   extremamente exagerados, o corte de ar"): a fita tem de 44 a 160 px de largura conforme a
   força, fica cheia na primeira metade dos 8 a 13 quadros de vida e é desenhada **atrás** dos
   lutadores (por cima ela cobria a perna e o rosto de quem bate). A textura passou a ser a
   pincelada seca em vários riscos (`art/vfx/arco_textura_02.png`).
+- **Riscos irregulares e pontudos** (correção do usuário no mesmo dia: "as linhas da ponta são
+  mais irregulares e pontudas; do jeito que você fez está muito reto"): a textura em uso é a
+  `art/vfx/arco_textura_03.png`, com riscos de tamanhos e grossuras diferentes, pontudos nas
+  duas pontas e sem corte reto. O rastro passa de 26 a 56 px da ponta do membro, que é onde as
+  pontas soltas aparecem; na estocada é um feixe só, com o caminho no meio (antes, duas faixas
+  iguais, uma de cada lado, que pareciam trilho); e a textura anda pelo comprimento do caminho.
 - **Para rodar o motor**: `pip install mediapipe` (no Linux, `apt-get install libegl1 libgles2`);
   o modelo é baixado sozinho para `~/.cache/sokon`. Só a ferramenta usa: o build, os testes e a
   CI leem o que ficou gravado no `character.json`.

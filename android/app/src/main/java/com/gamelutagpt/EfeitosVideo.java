@@ -81,6 +81,8 @@ final class EfeitosVideo {
     private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
     private final Map<Integer, android.graphics.ColorFilter> tintas = new HashMap<>();
+    /** O comprimento do caminho até cada ponto da fita (rascunho de {@link #fita}). */
+    private float[] percorrido = new float[80];
     /** O vermelho do corpo de um efeito que se pinta (TINTA_BASE do tools/sprites/efeito_imagem.py). */
     private static final float TINTA_BASE_R = 0.35f;
     /** Inclinação de cada vaga (graus, positivo para cima no sentido do efeito). */
@@ -271,8 +273,17 @@ final class EfeitosVideo {
         Folha f = folhas.get(nome);
         if (f == null || f.quadros.length == 0 || ate - de < 2) return;
         int[] r = f.quadros[0];
+        // A textura anda pelo comprimento do caminho (não pela conta dos pontos): os riscos não
+        // esticam nem encolhem onde os pontos ficam mais juntos ou mais separados.
+        if (percorrido.length < ate) percorrido = new float[ate];
+        percorrido[de] = 0f;
+        for (int i = de + 1; i < ate; i++) {
+            float vx = fx[i] - fx[i - 1], vy = fy[i] - fy[i - 1];
+            percorrido[i] = percorrido[i - 1] + (float) Math.sqrt(vx * vx + vy * vy);
+        }
+        float total = percorrido[ate - 1];
+        if (total < 1f) return;
         paint.setColorFilter(filtroDaCor(rgb));
-        int trechos = ate - de - 1;
         for (int i = de; i < ate - 1; i++) {
             float a = (alfa[i] + alfa[i + 1]) * 0.5f;
             if (a <= 0.01f) continue;
@@ -283,8 +294,8 @@ final class EfeitosVideo {
             float mx = (dx[i] + dx[i + 1]) * 0.5f - (fx[i] + fx[i + 1]) * 0.5f;
             float my = (dy[i] + dy[i + 1]) * 0.5f - (fy[i] + fy[i + 1]) * 0.5f;
             float lado = (vx * my - vy * mx) / comprimento;
-            int u0 = r[0] + Math.round(r[2] * (i - de) / (float) trechos);
-            int u1 = r[0] + Math.round(r[2] * (i - de + 1) / (float) trechos);
+            int u0 = r[0] + Math.round(r[2] * percorrido[i] / total);
+            int u1 = r[0] + Math.round(r[2] * percorrido[i + 1] / total);
             if (u1 <= u0) continue;
             fonte.set(u0, r[1], u1, r[1] + r[3]);
             // Um pouco de sobra no comprimento: as fatias se encostam nas curvas.

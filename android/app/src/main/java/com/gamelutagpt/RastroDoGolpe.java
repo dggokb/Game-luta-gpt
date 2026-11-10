@@ -33,7 +33,9 @@ final class RastroDoGolpe {
 
     private final EfeitosVideo efeitos;
     private final Lado[] lados = {new Lado(), new Lado()};
-    private static final int AMOSTRAS = PONTOS * PASSOS + 1;
+    /** Amostras a mais na frente da ponta: o rastro passa um pouco dela e termina em pontas. */
+    private static final int ALEM = 4;
+    private static final int AMOSTRAS = PONTOS * PASSOS + 1 + ALEM;
     /** O caminho amostrado: a ponta, a junta, a normal do caminho e o quanto a junta fica para o lado dela. */
     private final float[] px = new float[AMOSTRAS], py = new float[AMOSTRAS], jx = new float[AMOSTRAS], jy = new float[AMOSTRAS];
     private final float[] nx = new float[AMOSTRAS], ny = new float[AMOSTRAS], lado = new float[AMOSTRAS];
@@ -44,9 +46,10 @@ final class RastroDoGolpe {
     private static final float FORA = 0.22f;
     /** Menos que isto (px) de membro atravessado no caminho, em média, é estocada. */
     private static final float ESTOCADA = 24f;
-    /** Na estocada: a distância dos riscos ao caminho e a grossura deles (fraco, médio, forte). */
-    private static final float AO_LADO = 6f;
-    private static final float[] RISCO = {26f, 36f, 48f};
+    /** Na estocada: a largura do feixe de riscos em volta do membro (fraco, médio, forte). */
+    private static final float[] FEIXE = {64f, 90f, 120f};
+    /** O quanto o rastro passa da ponta do membro (px; fraco, médio, forte). */
+    private static final float[] PASSA = {26f, 40f, 56f};
 
     /** O rastro do golpe em curso de um lutador. */
     private static final class Lado {
@@ -110,6 +113,7 @@ final class RastroDoGolpe {
             }
             n = amostra(l, a, ordem, l.cabeca - 1, 1f, vida, n);
             float atravessado = normais(n);
+            n = alem(l, n);
             // Só o trecho que ainda se vê, para a textura ir da ponta velha à ponta nova nele.
             int de = 0;
             while (de < n - 1 && alfa[de + 1] <= 0f) de++;
@@ -124,15 +128,33 @@ final class RastroDoGolpe {
                 }
                 efeitos.fita(c, FITA, fx, fy, dx, dy, alfa, de, n, a.caminhoCor);
             } else {
-                // A estocada (o soco reto, o chute de frente): o membro vai na direção do caminho.
-                // Dois riscos finos, um de cada lado dele, com a borda nítida para fora.
-                float risco = RISCO[l.forca];
-                for (int sinal = -1; sinal <= 1; sinal += 2) {
-                    for (int k = 0; k < n; k++) borda(k, sinal * (AO_LADO + risco), sinal * AO_LADO);
-                    efeitos.fita(c, FITA, fx, fy, dx, dy, alfa, de, n, a.caminhoCor);
-                }
+                // A estocada (o soco reto, o chute de frente): o membro vai na direção do caminho. Um
+                // feixe de riscos em volta dele, com o caminho no meio (o membro é desenhado por cima).
+                float meia = FEIXE[l.forca] * 0.5f;
+                for (int k = 0; k < n; k++) borda(k, -meia, meia);
+                efeitos.fita(c, FITA, fx, fy, dx, dy, alfa, de, n, a.caminhoCor);
             }
         }
+    }
+
+    /**
+     * Estica o caminho amostrado para além da ponta do membro, reto, na direção em que ele vinha: é
+     * onde a textura termina em pontas soltas de tamanhos diferentes (o corte de ar passa do punho).
+     */
+    private int alem(Lado l, int n) {
+        int u = n - 1;
+        float tx = ny[u], ty = -nx[u];
+        for (int i = 1; i <= ALEM; i++) {
+            float d = PASSA[l.forca] * i / ALEM;
+            px[n] = px[u] + tx * d;
+            py[n] = py[u] + ty * d;
+            nx[n] = nx[u];
+            ny[n] = ny[u];
+            lado[n] = lado[u];
+            alfa[n] = alfa[u];
+            n++;
+        }
+        return n;
     }
 
     /**

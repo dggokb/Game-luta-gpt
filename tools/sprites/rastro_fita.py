@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """A textura da fita do rastro do golpe (assets/efeitos/rastro_fita).
 
-Entra a fita RETA gerada no GPT/Codex em fundo preto (art/vfx/arco_textura_02.png): nasce fina à
+Entra a fita RETA gerada no GPT/Codex em fundo preto (art/vfx/arco_textura_03.png): nasce fina à
 esquerda (a ponta velha do rastro) e chega à grossura cheia à direita (a ponta nova, onde está o
 punho ou o pé), com a borda de cima nítida. O jogo dobra ela ao longo da linha de ação de cada
 golpe (RastroDoGolpe, EfeitosVideo.fita) e pinta da cor do membro: por isso ela é gravada nas
 cores que o jogo sabe pintar (efeito_imagem.tingivel).
 
-    python3 tools/sprites/rastro_fita.py art/vfx/arco_textura_02.png
+    python3 tools/sprites/rastro_fita.py art/vfx/arco_textura_03.png
 """
 import argparse
 import json
