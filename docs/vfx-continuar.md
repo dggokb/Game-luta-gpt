@@ -56,6 +56,47 @@ git checkout 10cef7e -- tools/sprites/impacto_ar.py android/app/src/main/assets/
 - Na gravação, `tecla:L` é o golpe **forte** (J K L = L M H). Com `espera:1.3` o chute às vezes
   não chega (a caminhada varia); `espera:1.8` encosta no rival e acerta sempre.
 
+## Rodada de 10/11 (noite): as referências e o que está no jogo
+
+O usuário mandou as referências principais: dois vídeos de um jogo de luta de anime em 3D com
+cara de 2D e um de um jogo de quadrinhos em cel shading. O que se tirou delas: a faísca do golpe
+forte cobre o tronco e a cabeça de quem apanha; lanças de luz atravessam na linha do golpe;
+vapor branco em dois tons (branco e sombra azul-acinzentada) nos pés; lascas de terra em
+zigue-zague na corrida; poeira e pedras no chão; um rastro em arco acompanhando o membro no
+balanço.
+
+Estilo escolhido para seguir: a mistura da 01 com a 02 (a estrela recortada com a luz macia).
+
+O que está em cada nome hoje (todas com `tools/sprites/efeito_imagem.py`, imagem e pedido em
+`art/vfx/`):
+
+| Nome no jogo | Imagem | Como foi posto |
+|---|---|---|
+| `impacto_ar` (fraco e médio) | `acerto_04.png` | `--origem 0.29,0.5 --tamanho 160` |
+| `impacto_ar_forte` (novo: forte e especial) | `acerto_forte_01.png` | `--origem 0.25,0.49 --tamanho 240` |
+| `impacto_ar_super` (Super e Ultra) | `acerto_05.png` | `--origem 0.5,0.5 --tamanho 220` |
+| `lanca_luz` (nova: do médio para cima) | `lanca_luz_01.png` | `--origem 0.06,0.5 --tamanho 320` |
+| `defesa`, `defesa_3`, `defesa_poder` | `defesa_01.png` | `--origem 0.40,0.48`, tamanho 220 / 200 / 260 |
+| `defesa_2` | `defesa_02.png` | `--origem 0.50,0.48 --tamanho 220` |
+| `fumaca_pouso` (aterrissagem) | `vapor_pouso_01.png` | `--fundo verde --nuvem --ancora chao --origem 0.505,0.815 --tamanho 240` |
+| `fumaca_pulo` (decolagem, quique) | `vapor_pulo_01.png` | `--fundo verde --nuvem --ancora chao --origem 0.5,0.80 --tamanho 220` |
+| `poeira_corrida` (largada do dash) | `poeira_corrida_01.png` | `--fundo verde --nuvem --ancora chao --origem 0.82,0.815 --tamanho 260` |
+| `impacto_chao` (corpo no chão) | `impacto_chao_01.png` | `--fundo verde --nuvem --ancora chao --origem 0.5,0.815 --tamanho 360` |
+| `super_pulo` | `super_pulo_01.png` | `--ancora chao --origem 0.5,0.85 --tamanho 360` |
+
+No código (`GameView.efeitoDeGolpe`): a faísca por força é 0,8 / 1 / 1,3 / 1,4; o forte e o
+especial usam `impacto_ar_forte` quando ele existe; a `lanca_luz` sai junto do médio para cima
+(0,75 / 1 / 1,2; Super 1,4), por baixo da faísca e girando na mesma inclinação.
+
+Os efeitos de chão vêm em fundo verde (branco some no preto) e com `--nuvem` (nasce do ponto,
+abre e continua crescendo enquanto some). A folha passa de 4096 px em fileiras.
+
+Ficou para o usuário decidir:
+- **Rastro do golpe** (o arco que acompanha o braço ou a perna): as referências têm, mas o
+  `efeitosDeMovimento` tirou de propósito ("as linhas de velocidade atrapalham ler a distância
+  entre os lutadores", direcao.md). Não foi mexido.
+- O tamanho no celular: a gravação é o desenho do PC; conferir no aparelho.
+
 ## O estilo ainda está em aberto
 
 Três direções foram postas na mesa; nenhuma foi escolhida. A decisão é para ser tomada **vendo
