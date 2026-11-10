@@ -110,7 +110,7 @@ Saíram as imagens paradas do Codex que estavam nesses nomes (`acerto_04`, `acer
 Super continua com a `acerto_05` e a lança de luz, que agora só toca no Super e no Ultra (os
 vídeos do forte e do baixo já têm os riscos longos). Cada força tem a folha no tamanho dela
 (escala 1; especial 1,15). **Ordem na tela** (pedido do usuário): lutadores, efeito de dano, e o
-rastro do golpe por cima de tudo, a 90% de opacidade.
+rastro do golpe por cima de tudo, a 75% de opacidade.
 
 ## Próximo: VFX próprio de cada personagem (10/11)
 
@@ -151,7 +151,7 @@ construir um motor que detecta o movimento e cria a sua linha de ação."
 - **Exagerado de propósito** (pedido de 10/11, vendo o Tōkon: "os rastros de golpe são
   extremamente exagerados, o corte de ar"): a fita tem de 44 a 160 px de largura conforme a
   força, fica cheia na primeira metade dos 8 a 13 quadros de vida e é desenhada **na frente**
-  dos lutadores, a 90% de opacidade (decisão do usuário; cheguei a pôr atrás e ele mandou voltar). A textura passou a ser a
+  dos lutadores, a 75% de opacidade (decisão do usuário: cheguei a pôr atrás e ele mandou voltar; começou em 90% e ele pediu menos). A textura passou a ser a
   pincelada seca em vários riscos (`art/vfx/arco_textura_02.png`).
 - **Riscos irregulares e pontudos** (correção do usuário no mesmo dia: "as linhas da ponta são
   mais irregulares e pontudas; do jeito que você fez está muito reto"): a textura em uso é a

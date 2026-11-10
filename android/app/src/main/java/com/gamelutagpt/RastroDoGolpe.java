@@ -34,7 +34,7 @@ final class RastroDoGolpe {
     private final EfeitosVideo efeitos;
     private final Lado[] lados = {new Lado(), new Lado()};
     /** A opacidade da fita cheia: ela passa na frente dos lutadores e o membro ainda se vê por baixo. */
-    private static final float OPACIDADE = 0.9f;
+    private static final float OPACIDADE = 0.75f;
     /** Amostras a mais na frente da ponta: o rastro passa um pouco dela e termina em pontas. */
     private static final int ALEM = 4;
     private static final int AMOSTRAS = PONTOS * PASSOS + 1 + ALEM;

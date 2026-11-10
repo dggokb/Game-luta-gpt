@@ -4501,7 +4501,7 @@ public class GameView extends SurfaceView
             }
             drawBreakerCue(canvas);
             efeitos.desenhar(canvas);
-            // O rastro do golpe na frente dos lutadores (a 90%: o membro ainda se vê por baixo) e por
+            // O rastro do golpe na frente dos lutadores (a 75%: o membro ainda se vê por baixo) e por
             // cima do efeito de dano: o corte de ar fecha a cena.
             if (enfeites) rastros.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
