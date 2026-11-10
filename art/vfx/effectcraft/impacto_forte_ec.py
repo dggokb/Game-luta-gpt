@@ -125,6 +125,72 @@ def halo(camada, raio=34, forca=0.9):
             {'command': 'prop.set', 'params': {'layer': camada, 'path': '@fx/colorB', 'value': VERMELHO}}]
 
 
+# O anel de pressão de ar visto de 3/4: o anel fica de pé, atravessado na linha do golpe, então
+# na tela é uma elipse estreita (ACHATA da altura), um pouco inclinada, que avança na direção do
+# golpe enquanto abre. A metade de trás passa atrás da estrela e a da frente por cima dela.
+ACHATA = 0.45
+INCLINA = -12                   # graus (a mesma inclinação do jato de cima)
+AVANCO = [0, 10, 20, 28, 35, 40, 44, 47, 49]
+RAIOS = [72, 114, 144, 166, 182, 194, 202, 208, 212]
+LARGURAS = [28, 24, 20, 16, 13, 10, 7, 4, 2]
+OPAC = [95, 90, 80, 66, 52, 38, 24, 12, 0]
+
+
+def anel_de_ar(nome, frente):
+    """Branco-azulado meio transparente (é ar, não fogo): nasce no desenho 1, abre rápido e
+    freia, ondula (Turbulent Displace), afina e se desfaz em arcos por erosão: um ruído cinza de
+    borda dura é a máscara de luminância, o brilho dele cai a cada desenho e os buracos crescem.
+    O traço muda no tamanho da elipse, não na escala da camada, para afinar enquanto abre."""
+    antes = [None]
+    s = [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': nome, 'size': [140, 140],
+                                                  'stroke': '#f4fbff', 'strokeWidth': 20}},
+         {'command': 'prop.set', 'params': {'layer': nome, 'path': 'contents/group/contents/fill/opacity', 'value': 0}},
+         {'command': 'prop.set', 'params': {'layer': nome, 'path': 'transform/rotation', 'value': INCLINA}}]
+    s += chaves(nome, 'transform/position', [[CENTRO[0] + d, CENTRO[1], 0] for d in AVANCO])
+    s += chaves(nome, 'contents/group/contents/ellipse/size', antes + [[2 * r * ACHATA, 2 * r] for r in RAIOS])
+    s += chaves(nome, 'contents/group/contents/stroke/width', antes + LARGURAS)
+    s += chaves(nome, 'transform/opacity', [0] + OPAC)
+    if frente:
+        # Só a metade de cá (o lado direito, no espaço da camada: a máscara gira junto). Na camada
+        # de forma a máscara conta a partir do centro do conteúdo (0, 0), não do canto.
+        s += [{'command': 'layer.addMask', 'params': {'layer': nome, 'shape': 'rect',
+                                                      'rect': [0, -ALTO, LARGO, 2 * ALTO]}},
+              {'command': 'layer.mask.set', 'params': {'layer': nome, 'mask': 1, 'field': 'feather', 'value': 8}}]
+    s += [{'command': 'effect.apply', 'params': {'effect': 'Turbulent Displace', 'layers': [nome]}},
+          {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/amount', 'value': 12}},
+          {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/size', 'value': 40}}]
+    s += chaves(nome, '@fx/evolution', antes + [25 * i for i in range(9)])
+    s += [{'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': [nome]}},
+          {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/blurriness', 'value': 2.5}},
+          {'command': 'effect.apply', 'params': {'effect': 'Glow', 'layers': [nome]}},
+          {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/threshold', 'value': 40}},
+          {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/radius', 'value': 12}},
+          {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/intensity', 'value': 0.8}}]
+    # A erosão: a mesma semente nas duas metades, então os buracos batem na emenda.
+    matte = nome + '_erosao'
+    s += [{'command': 'layer.newSolid', 'params': {'name': matte, 'color': '#000000', 'width': LARGO, 'height': ALTO}},
+          {'command': 'effect.apply', 'params': {'effect': 'Fractal Noise', 'layers': [matte]}},
+          {'command': 'prop.set', 'params': {'layer': matte, 'path': 'effects/#1/contrast', 'value': 320}},
+          {'command': 'prop.set', 'params': {'layer': matte, 'path': 'effects/#1/overflow', 'value': 0}},
+          {'command': 'prop.set', 'params': {'layer': matte, 'path': 'effects/#1/transform/scale', 'value': 45}},
+          {'command': 'prop.set', 'params': {'layer': matte, 'path': 'effects/#1/complexity', 'value': 3}},
+          {'command': 'prop.set', 'params': {'layer': matte, 'path': 'effects/#1/evolutionOptions/seed', 'value': 5}}]
+    s += chaves(matte, 'effects/#1/brightness', [100, 100, 90, 60, 35, 12, -10, -30, -50, -75])
+    s += [{'command': 'layer.setTrackMatte', 'params': {'layers': [nome], 'matte': matte, 'kind': 'luma'}}]
+    if not frente:
+        # Dentro, um disco fraco e macio: a pressão (atrás de tudo, na mesma perspectiva).
+        disco = nome + '_disco'
+        s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': disco, 'size': [140, 140], 'fill': '#eaf6ff'}},
+              {'command': 'prop.set', 'params': {'layer': disco, 'path': 'transform/rotation', 'value': INCLINA}},
+              {'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': [disco]}},
+              {'command': 'prop.set', 'params': {'layer': disco, 'path': 'effects/#1/blurriness', 'value': 24}}]
+        s += chaves(disco, 'transform/position', [[CENTRO[0] + d, CENTRO[1], 0] for d in AVANCO[:6]])
+        s += chaves(disco, 'contents/group/contents/ellipse/size',
+                    [None] + [[w * ACHATA, w] for w in (140, 230, 290, 330, 360)])
+        s += chaves(disco, 'transform/opacity', [0, 22, 16, 10, 5, 0])
+    return s
+
+
 def passos():
     sorte = random.Random(7)
     s = [{'command': 'comp.new', 'params': {'name': 'impacto_forte_ec', 'width': LARGO, 'height': ALTO,
@@ -178,50 +244,7 @@ def passos():
     s += chaves('riscos_escuros', 'transform/opacity', [90, 90, 70, 45, 20, 0])
     s += chaves('riscos_escuros', 'transform/scale', [[s_, s_, 100] for s_ in (100, 104, 108, 112, 116, 120)])
 
-    # Anel de pressão de ar em volta do amarelo: branco-azulado meio transparente (é ar, não
-    # fogo), nasce no desenho 1, abre rápido e freia, afina e se desfaz em pedaços (Roughen
-    # Edges com a borda crescendo come o traço). Dentro, um disco fraco e macio (a pressão). O traço muda no tamanho da elipse, não na escala
-    # da camada, para afinar enquanto abre.
-    for nome, comeca, raios, larguras, opac in (
-            ('pressao', 1, [72, 114, 144, 166, 182, 194, 202, 208, 212],
-             [28, 24, 20, 16, 13, 10, 7, 4, 2], [95, 90, 80, 66, 52, 38, 24, 12, 0]),):
-        s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': nome, 'size': [140, 140],
-                                                       'stroke': '#f4fbff', 'strokeWidth': 20}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': 'contents/group/contents/fill/opacity', 'value': 0}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': 'transform/position', 'value': [*CENTRO, 0]}}]
-        antes = [None] * comeca
-        s += chaves(nome, 'contents/group/contents/ellipse/size', antes + [[2 * r, 2 * r] for r in raios])
-        s += chaves(nome, 'contents/group/contents/stroke/width', antes + larguras)
-        s += chaves(nome, 'transform/opacity', [0] * comeca + opac)
-        # O ar ondula: o anel não é um círculo de compasso.
-        s += [{'command': 'effect.apply', 'params': {'effect': 'Turbulent Displace', 'layers': [nome]}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/amount', 'value': 14}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/size', 'value': 45}}]
-        s += chaves(nome, '@fx/evolution', antes + [25 * i for i in range(9)])
-        s += [{'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': [nome]}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/blurriness', 'value': 2.5}},
-              {'command': 'effect.apply', 'params': {'effect': 'Glow', 'layers': [nome]}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/threshold', 'value': 40}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/radius', 'value': 12}},
-              {'command': 'prop.set', 'params': {'layer': nome, 'path': '@fx/intensity', 'value': 0.8}}]
-    # Desfaz em pedaços por erosão (a técnica do relatório): um ruído cinza de borda dura serve de
-    # máscara de luminância; o brilho dele cai a cada desenho, os buracos crescem e o anel se
-    # parte em arcos até sumir. O ruído fica parado, então os buracos só crescem.
-    s += [{'command': 'layer.newSolid', 'params': {'name': 'erosao', 'color': '#000000', 'width': LARGO, 'height': ALTO}},
-          {'command': 'effect.apply', 'params': {'effect': 'Fractal Noise', 'layers': ['erosao']}},
-          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/contrast', 'value': 320}},
-          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/overflow', 'value': 0}},
-          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/transform/scale', 'value': 45}},
-          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/complexity', 'value': 3}},
-          {'command': 'prop.set', 'params': {'layer': 'erosao', 'path': 'effects/#1/evolutionOptions/seed', 'value': 5}}]
-    s += chaves('erosao', 'effects/#1/brightness', [100, 100, 90, 60, 35, 12, -10, -30, -50, -75])
-    s += [{'command': 'layer.setTrackMatte', 'params': {'layers': ['pressao'], 'matte': 'erosao', 'kind': 'luma'}}]
-    s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': 'pressao_disco', 'size': [140, 140], 'fill': '#eaf6ff'}},
-          {'command': 'prop.set', 'params': {'layer': 'pressao_disco', 'path': 'transform/position', 'value': [*CENTRO, 0]}},
-          {'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': ['pressao_disco']}},
-          {'command': 'prop.set', 'params': {'layer': 'pressao_disco', 'path': 'effects/#1/blurriness', 'value': 30}}]
-    s += chaves('pressao_disco', 'contents/group/contents/ellipse/size', [None, [140, 140], [230, 230], [290, 290], [330, 330], [360, 360]])
-    s += chaves('pressao_disco', 'transform/opacity', [0, 22, 16, 10, 5, 0])
+    s += anel_de_ar('pressao', frente=False)
 
     # Jatos: três pontas longas na direção do golpe, nas faixas.
     jatos = [(-14, 410, 40), (0, 425, 34), (20, 270, 32), (-32, 190, 26), (38, 165, 22)]
@@ -251,6 +274,9 @@ def passos():
           {'command': 'effect.apply', 'params': {'effect': 'Gaussian Blur', 'layers': ['nucleo']}},
           {'command': 'prop.set', 'params': {'layer': 'nucleo', 'path': 'effects/#1/blurriness', 'value': 12}}]
     s += chaves('nucleo', 'transform/scale', [[v, v, 100] for v in (110, 100, 85, 68, 50, 35, 20, 8, 0)])
+
+    # A metade da frente do anel passa por cima da estrela (a de trás ficou atrás dos jatos).
+    s += anel_de_ar('pressao_frente', frente=True)
     return resolver(s)
 
 

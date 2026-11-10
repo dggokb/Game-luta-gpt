@@ -156,6 +156,16 @@ contato passou a `--origem 245,231` (mesma escala). No jogo, o anel vai do quadr
 gravação. Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_refeito_com_anel_de_ar.mp4`.
 O Roughen Edges sozinho não partiu o anel (só deixou a borda áspera e depois apagou de uma vez).
 
+**O anel em 3/4 (pedido seguinte, "é isso, só que na visão 3/4"):** o anel fica de pé,
+atravessado na linha do golpe: na tela é uma elipse com 45 % da altura, inclinada −12°, que
+avança 49 px da folha na direção do golpe enquanto abre. A metade de trás (com o disco de pressão)
+fica atrás dos jatos e da estrela; a metade da frente é uma segunda camada com máscara, por cima
+de tudo, e cada metade tem a sua camada de erosão com a mesma semente (os buracos batem na
+emenda). No jogo o efeito gira na linha do chute, então o anel fica atravessado no caminho do
+golpe. Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_anel_de_ar_3_4.mp4`.
+Aprendido: **na camada de forma do EffectCraft a máscara conta a partir do centro do conteúdo
+(0, 0)**, não do canto da camada (a doc de lá fala do contrário para os pontos de efeito).
+
 Ficou parecido na forma, no tempo e na direção; ficou diferente no traço: a de hoje tem borda
 serrilhada e textura de desenho à mão, mais laranja e brasas mais acesas; a refeita é mais
 limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, o primeiro grupo
