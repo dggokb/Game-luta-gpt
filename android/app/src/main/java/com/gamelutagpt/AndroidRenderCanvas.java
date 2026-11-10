@@ -257,8 +257,12 @@ final class AndroidRenderCanvas implements RenderCanvas {
         for (int i = 0; i < linhas - 1; i++) {
             int p = i * 4, q = p + 4;
             if (i > 0) k = cantoFaixa(xy, uv, p, 0f, k);   // emenda: repete o primeiro canto
-            for (int c = 0; c <= STRIP_COLUNAS; c++) {
-                float t = c / (float)STRIP_COLUNAS;
+            // Colunas pela largura, como no OpenGL (GlRenderCanvas): o chão largo fica com todas;
+            // uma faixa estreita (o rastro do golpe) não precisa, e no PC cada triângulo custa.
+            float largura = Math.max(Math.abs(xy[p + 2] - xy[p]), Math.abs(xy[q + 2] - xy[q]));
+            int colunas = Math.max(1, Math.min(STRIP_COLUNAS, Math.round(largura / STRIP_COLUNA_PX)));
+            for (int c = 0; c <= colunas; c++) {
+                float t = c / (float)colunas;
                 k = cantoFaixa(xy, uv, p, t, k);
                 k = cantoFaixa(xy, uv, q, t, k);
             }
@@ -268,7 +272,17 @@ final class AndroidRenderCanvas implements RenderCanvas {
         stripPaint.setShader(null);
     }
 
+    /**
+     * Sem OpenGL, o Canvas do Android (e o do PC) lê o bitmap vivo: a mudança aparece sozinha. No
+     * OpenGL a textura sobe de novo.
+     */
+    @Override
+    public void imagemMudou(RenderImage image) {
+        if (gl != null) gl.imagemMudou(image);
+    }
+
     private static final int STRIP_COLUNAS = 16;
+    private static final float STRIP_COLUNA_PX = 48f;
     private float[] stripXY = new float[0], stripUV = new float[0];
 
     /** Um canto da coluna: o ponto na fração {@code t} da linha que começa em {@code p}. */

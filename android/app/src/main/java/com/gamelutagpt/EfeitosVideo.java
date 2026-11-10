@@ -80,11 +80,6 @@ final class EfeitosVideo {
     /** Efeito que anda (px do mundo por passo) e repete os quadros até {@link #fimMs} (-1: toca uma vez). */
     private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
-    private final Map<Integer, android.graphics.ColorFilter> tintas = new HashMap<>();
-    /** O comprimento do caminho até cada ponto da fita (rascunho de {@link #fita}). */
-    private float[] percorrido = new float[80];
-    /** O vermelho do corpo de um efeito que se pinta (TINTA_BASE do tools/sprites/efeito_imagem.py). */
-    private static final float TINTA_BASE_R = 0.35f;
     /** Inclinação de cada vaga (graus, positivo para cima no sentido do efeito). */
     private final float[] angulo = new float[VAGAS];
     private int proxima;
@@ -190,6 +185,11 @@ final class EfeitosVideo {
         return f == null ? 0f : f.larguraCena;
     }
 
+    /** As folhas já foram lidas ({@link #carregar}). */
+    boolean carregado() {
+        return carregou;
+    }
+
     /** O efeito existe nos assets (depois de {@link #carregar}). */
     boolean tem(String nome) {
         return folhas.containsKey(nome);
@@ -241,76 +241,55 @@ final class EfeitosVideo {
     }
 
     /**
-     * O filtro que pinta de {@code rgb} (0xRRGGBB) uma folha feita para pintar (--tingivel no
-     * tools/sprites/efeito_imagem.py): o corpo dela vai do azul de ar ao branco do miolo, com o
-     * quanto é branco no canal vermelho; aqui o azul vira a cor e o miolo fica branco.
+     * Os pixels ARGB do primeiro quadro do efeito {@code nome}, para quem lê a folha como dados (a
+     * forma, o ruído e a base do rastro do golpe, {@link ErosaoDaFita}); {@code tamanho} recebe a
+     * largura e a altura. Null se o efeito não existe.
      */
-    private android.graphics.ColorFilter filtroDaCor(int rgb) {
-        android.graphics.ColorFilter f = tintas.get(rgb);
-        if (f == null) {
-            float[] m = new float[20];
-            for (int c = 0; c < 3; c++) {
-                float t = ((rgb >> (16 - 8 * c)) & 255) / 255f;
-                // branco = (R - base) / (1 - base); saída = cor + (1 - cor) * branco.
-                m[c * 5] = (1f - t) / (1f - TINTA_BASE_R);
-                m[c * 5 + 4] = 255f * (t - (1f - t) * TINTA_BASE_R / (1f - TINTA_BASE_R));
-            }
-            m[18] = 1f;
-            f = Filtro.matriz(m).canvas;
-            tintas.put(rgb, f);
-        }
-        return f;
+    int[] pixels(String nome, int[] tamanho) {
+        Folha f = folhas.get(nome);
+        if (f == null || f.quadros.length == 0 || f.bitmap.isRecycled()) return null;
+        int[] r = f.quadros[0];
+        int[] px = new int[r[2] * r[3]];
+        f.bitmap.getPixels(px, 0, r[2], r[0], r[1], r[2], r[3]);
+        tamanho[0] = r[2];
+        tamanho[1] = r[3];
+        return px;
     }
 
     /**
-     * Desenha a textura {@code nome} (uma fita reta: a ponta velha à esquerda, a nova à direita, a
-     * borda nítida em cima) dobrada ao longo de um caminho: dos pontos {@code de} a {@code ate} (sem
-     * ele), a borda nítida passa por (fx, fy) e a fita vai até (dx, dy), com a opacidade
-     * {@code alfa} de cada ponto, pintada de {@code rgb}. É o rastro do golpe ({@link RastroDoGolpe}):
-     * cada trecho entre dois pontos é uma fatia da textura, girada na direção do trecho.
+     * Desenha a {@code imagem} ({@code largura} x {@code altura} px; o fundo da fita à esquerda, a
+     * frente à direita) dobrada ao longo de um caminho, numa malha só: dos pontos {@code de} a
+     * {@code ate} (sem ele), a borda de cima da imagem passa por (fx, fy), a de baixo por (dx, dy),
+     * e {@code u} (0 a 1) diz onde cada ponto cai no comprimento da imagem. É o rastro do golpe
+     * ({@link RastroDoGolpe}). Uma malha contínua ({@link com.gamelutagpt.render.RenderCanvas#drawImageStrip},
+     * a do chão e das bandeiras): em fatias soltas, a imagem meio transparente mostrava a emenda de
+     * cada fatia.
      */
-    void fita(Canvas c, String nome, float[] fx, float[] fy, float[] dx, float[] dy, float[] alfa, int de, int ate, int rgb) {
-        Folha f = folhas.get(nome);
-        if (f == null || f.quadros.length == 0 || ate - de < 2) return;
-        int[] r = f.quadros[0];
-        // A textura anda pelo comprimento do caminho (não pela conta dos pontos): os riscos não
-        // esticam nem encolhem onde os pontos ficam mais juntos ou mais separados.
-        if (percorrido.length < ate) percorrido = new float[ate];
-        percorrido[de] = 0f;
-        for (int i = de + 1; i < ate; i++) {
-            float vx = fx[i] - fx[i - 1], vy = fy[i] - fy[i - 1];
-            percorrido[i] = percorrido[i - 1] + (float) Math.sqrt(vx * vx + vy * vy);
+    void fita(com.gamelutagpt.render.RenderCanvas rc, com.gamelutagpt.render.RenderImage imagem, int largura, int altura,
+              float[] fx, float[] fy, float[] dx, float[] dy, float[] u, int de, int ate, int alfa) {
+        int linhas = ate - de;
+        if (linhas < 2 || alfa <= 0) return;
+        if (malhaXY.length < linhas * 4) {
+            malhaXY = new float[linhas * 4];
+            malhaUV = new float[linhas * 4];
         }
-        float total = percorrido[ate - 1];
-        if (total < 1f) return;
-        paint.setColorFilter(filtroDaCor(rgb));
-        for (int i = de; i < ate - 1; i++) {
-            float a = (alfa[i] + alfa[i + 1]) * 0.5f;
-            if (a <= 0.01f) continue;
-            float vx = fx[i + 1] - fx[i], vy = fy[i + 1] - fy[i];
-            float comprimento = (float) Math.sqrt(vx * vx + vy * vy);
-            if (comprimento < 0.5f) continue;
-            // A largura da fatia e para que lado ela vai: para o lado da borda de dentro.
-            float mx = (dx[i] + dx[i + 1]) * 0.5f - (fx[i] + fx[i + 1]) * 0.5f;
-            float my = (dy[i] + dy[i + 1]) * 0.5f - (fy[i] + fy[i + 1]) * 0.5f;
-            float lado = (vx * my - vy * mx) / comprimento;
-            int u0 = r[0] + Math.round(r[2] * percorrido[i] / total);
-            int u1 = r[0] + Math.round(r[2] * percorrido[i + 1] / total);
-            if (u1 <= u0) continue;
-            fonte.set(u0, r[1], u1, r[1] + r[3]);
-            // Um pouco de sobra no comprimento: as fatias se encostam nas curvas.
-            destino.set(0f, 0f, comprimento + 1f, Math.abs(lado));
-            paint.setAlpha(Math.round(255f * a));
-            c.save();
-            c.translate(fx[i], fy[i]);
-            c.rotate((float) Math.toDegrees(Math.atan2(vy, vx)));
-            if (lado < 0f) c.scale(1f, -1f);
-            c.drawBitmap(f.bitmap, fonte, destino, paint);
-            c.restore();
+        // Meio pixel para dentro da imagem: fora dela a malha repete a imagem.
+        float u0 = 0.5f, comprimento = largura - 1f, v0 = 0.5f, v1 = altura - 0.5f;
+        for (int i = de, k = 0; i < ate; i++, k += 4) {
+            float x = u0 + comprimento * Math.max(0f, Math.min(1f, u[i]));
+            malhaXY[k] = fx[i];
+            malhaXY[k + 1] = fy[i];
+            malhaXY[k + 2] = dx[i];
+            malhaXY[k + 3] = dy[i];
+            malhaUV[k] = x;
+            malhaUV[k + 1] = v0;
+            malhaUV[k + 2] = x;
+            malhaUV[k + 3] = v1;
         }
-        paint.setAlpha(255);
-        paint.setColorFilter(null);
+        rc.drawImageStrip(imagem, malhaXY, malhaUV, linhas, alfa);
     }
+
+    private float[] malhaXY = new float[0], malhaUV = new float[0];
 
     /** Tira da tela o efeito da vaga, se ainda for o mesmo ({@code nome}). */
     void parar(int vaga, String nome) {

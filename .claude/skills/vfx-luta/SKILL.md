@@ -83,7 +83,8 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
 | Imagem parada | `tools/sprites/efeito_imagem.py` (`--nuvem` para poeira, `--ancora chao`, `--fundo verde`) |
 | Vídeo em fundo preto | `tools/sprites/efeito_video_preto.py` (`--quadros`, `--origem`, `--escala-mundo`) |
 | Vídeo em fundo verde | `tools/sprites/efeito_video.py` |
-| Textura da fita do rastro | `tools/sprites/rastro_fita.py` |
+| Textura da fita do rastro (antiga, cor pronta) | `tools/sprites/rastro_fita.py` |
+| Textura de forma do rastro pela receita (cinza: forma, ruído, base) | `tools/sprites/rastro_forma.py` |
 | Caminho de cada golpe | `tools/sprites/linha_de_acao.py --write --folha <prefixo>`, depois `build_characters.py --write` |
 
 Os nomes que a luta toca estão em `GameView.efeitoDeGolpe` e nas tabelas do

@@ -1,0 +1,20 @@
+{
+ "nome": "rastro_forma",
+ "origem": "tools/sprites/rastro_forma.py (arco_textura_04.png)",
+ "ancora": "canais",
+ "canais": "R forma, G ruido (repete no comprimento), B base escura",
+ "pixelScale": 1.0,
+ "quadros": [
+  [
+   0,
+   0,
+   512,
+   96,
+   0.0,
+   0.0
+  ]
+ ],
+ "duracoesMs": [
+  1000
+ ]
+}

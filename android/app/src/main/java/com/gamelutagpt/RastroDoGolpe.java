@@ -1,6 +1,8 @@
 package com.gamelutagpt;
 
-import android.graphics.Canvas;
+import android.graphics.Bitmap;
+import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
 
 /**
  * O rastro do golpe normal: uma fita de ar que segue a LINHA DE AÇÃO do golpe, o caminho que a
@@ -17,14 +19,28 @@ import android.graphics.Canvas;
  * desenhos do golpe aos saltos; a fita não: ela anda por quadro de jogo.)
  *
  * Ela é atravessada no caminho, do lado do membro (larga no balanço, que varre uma área; um feixe
- * em volta do membro na estocada), sai da cor do membro e é exagerada de propósito: nas
+ * em volta do membro na estocada). O desenho segue a receita de reports/VFX de luta estilo
+ * anime.md ({@link ErosaoDaFita}): uma forma em cinza gerada no Codex (o véu com riscos finos), um
+ * ruído que corre ao longo da fita e come a forma por erosão (o fundo some primeiro, em bordas
+ * irregulares), a rampa de cor do personagem (sombra, a cor do membro, branco) e uma base escura
+ * sob o corte, como a Arc System Works faz. O tempo da erosão e do ruído anda em passos de
+ * {@link #PASSO} quadros (animação limitada); a frente e o fundo andam por quadro, como antes.
+ * Ela é exagerada de propósito: nas
  * referências (Marvel Tōkon, docs/efeitos-referencia-tokon.md) o corte de ar é do tamanho do
  * membro ou maior. Na pausa do acerto o golpe não anda e a fita fica parada na tela, como o
  * membro. Só apresentação; golpes sem caminho (os com efeito já desenhado na arte, os especiais)
  * ficam sem.
  */
 final class RastroDoGolpe {
-    private static final String FITA = "rastro_fita";
+    private static final String FORMA = "rastro_forma";
+    /** Quadros de jogo por passo da erosão e do ruído (4: 15 desenhos por segundo). */
+    private static final int PASSO = 4;
+    /** Px do mundo que o ruído corre pela fita a cada quadro (para trás, contra o golpe). */
+    private static final float ROLAGEM = 7f;
+    /** A erosão da fita inteira: parada até esta fração da vida, depois sobe até {@link #EROSAO_MAX}. */
+    private static final float EROSAO_INICIO = 0.3f, EROSAO_MAX = 0.55f;
+    /** O quanto a mais o fundo é comido que a frente. */
+    private static final float VIES_FUNDO = 0.4f;
     /** Pontos do caminho (os desenhos do golpe até o membro esticado). */
     private static final int PONTOS = 8;
     /** Pedaços da fita entre dois pontos do caminho. */
@@ -38,10 +54,8 @@ final class RastroDoGolpe {
     private static final float[] LARGURA = {1.1f, 1.5f, 1.9f};
     private static final float[] LARGURA_MAX = {80f, 120f, 160f};
     private static final float LARGURA_MIN = 44f;
-    /** A opacidade da fita: ela passa na frente dos lutadores e o membro ainda se vê por baixo. */
-    private static final float OPACIDADE = 0.75f;
-    /** O trecho do fundo da fita (fração dela) em que a opacidade cai até zero. */
-    private static final float FUNDO = 0.3f;
+    /** A opacidade da fita (0 a 255): ela passa na frente dos lutadores e o membro ainda se vê por baixo. */
+    private static final int OPACIDADE = Math.round(255 * 0.75f);
     /** Amostras a mais na frente da ponta: o rastro passa um pouco dela e termina em pontas. */
     private static final int ALEM = 4;
     private static final int AMOSTRAS = PONTOS * PASSOS + 1 + ALEM;
@@ -59,9 +73,13 @@ final class RastroDoGolpe {
     /** O caminho amostrado: a ponta, a junta, a normal, o quanto a junta fica para o lado dela e o comprimento até ali. */
     private final float[] px = new float[AMOSTRAS], py = new float[AMOSTRAS], jx = new float[AMOSTRAS], jy = new float[AMOSTRAS];
     private final float[] nx = new float[AMOSTRAS], ny = new float[AMOSTRAS], lado = new float[AMOSTRAS], andado = new float[AMOSTRAS];
-    /** A fita: uma borda (fx, fy), a outra (dx, dy) e a opacidade. */
+    /** A fita: uma borda (fx, fy), a outra (dx, dy) e onde cada ponto cai no comprimento da imagem. */
     private final float[] fx = new float[AMOSTRAS], fy = new float[AMOSTRAS], dx = new float[AMOSTRAS], dy = new float[AMOSTRAS];
-    private final float[] alfa = new float[AMOSTRAS];
+    private final float[] u = new float[AMOSTRAS];
+    /** A conta da imagem da fita (null até a textura de forma carregar) e o rascunho dela. */
+    private ErosaoDaFita erosao;
+    private boolean semForma;
+    private final int[] pixels = new int[ErosaoDaFita.LARGURA * ErosaoDaFita.ALTURA];
     /** Rascunho de {@link #comecar}: o quadro do golpe em que a tela mostra cada ponto do caminho. */
     private final int[] chegada = new int[PONTOS];
     /** A fração do caminho que a ponta já andou quando o membro conta como esticado. */
@@ -77,6 +95,10 @@ final class RastroDoGolpe {
         int saida, varrida;
         float x, y;
         int facing, forca;
+        /** A imagem da fita deste lutador e o quadro do golpe que ela mostra (-1: nenhum). */
+        Bitmap bitmap;
+        RenderImage imagem;
+        int assado = -1;
     }
 
     RastroDoGolpe(EfeitosVideo efeitos) {
@@ -95,7 +117,10 @@ final class RastroDoGolpe {
             l.ataque = null;
             return;
         }
-        if (f.attack != l.ataque || a != l.desenho || f.attackFrame < l.quadro) comecar(l, f, a);
+        if (f.attack != l.ataque || a != l.desenho || f.attackFrame < l.quadro) {
+            comecar(l, f, a);
+            l.assado = -1;
+        }
         l.quadro = f.attackFrame;
         l.x = x;
         l.y = f.y;
@@ -145,7 +170,8 @@ final class RastroDoGolpe {
     }
 
     /** Desenha no espaço do mundo (o canvas já com a câmera), na frente dos lutadores. */
-    void desenhar(Canvas c) {
+    void desenhar(RenderCanvas rc) {
+        if (erosao == null && !carregarForma()) return;
         for (Lado l : lados) {
             if (l.ataque == null) continue;
             // Onde estão a ponta da frente e a de trás, de 0 a 1 do caminho.
@@ -176,10 +202,8 @@ final class RastroDoGolpe {
             if (ultima <= primeira) continue;
             mover(primeira, primeira + 1, de);
             mover(ultima, ultima - 1, ate);
-            for (int k = primeira; k <= ultima; k++) {
-                // Cheia na frente; o fundo vai sumindo no último trecho.
-                alfa[k] = OPACIDADE * Math.min(1f, (andado[k] - de) / Math.max(1f, (ate - de) * FUNDO));
-            }
+            // A imagem cobre o caminho inteiro; a malha mostra só o trecho entre as pontas.
+            for (int k = primeira; k <= ultima; k++) u[k] = andado[k] / total;
             if (Math.abs(atravessado) >= ESTOCADA) {
                 // O balanço (o chute em arco, a garra): o membro vai atravessado no caminho e a fita
                 // cobre a área que ele varreu, do lado dele, um pouco para fora da ponta.
@@ -194,8 +218,45 @@ final class RastroDoGolpe {
                 float meia = FEIXE[l.forca] * 0.5f;
                 for (int k = primeira; k <= ultima; k++) borda(k, -meia, meia);
             }
-            efeitos.fita(c, FITA, fx, fy, dx, dy, alfa, primeira, ultima + 1, a.caminhoCor);
+            if (assar(l, a.caminhoCor, de, ate, total)) rc.imagemMudou(l.imagem);
+            efeitos.fita(rc, l.imagem, ErosaoDaFita.LARGURA, ErosaoDaFita.ALTURA, fx, fy, dx, dy, u, primeira, ultima + 1, OPACIDADE);
         }
+    }
+
+    /** Lê a textura de forma (uma vez); false se ela não existe (o rastro não aparece). */
+    private boolean carregarForma() {
+        if (semForma) return false;
+        int[] tamanho = new int[2];
+        int[] px = efeitos.pixels(FORMA, tamanho);
+        if (px == null) {
+            semForma = efeitos.carregado();
+            return false;
+        }
+        erosao = new ErosaoDaFita(px, tamanho[0], tamanho[1]);
+        return true;
+    }
+
+    /**
+     * Refaz a imagem da fita do lutador para o quadro atual do golpe ({@code de} a {@code ate}: o
+     * trecho do caminho, em px, entre o fundo e a frente; {@code total}: o caminho inteiro). A
+     * frente e o fundo andam por quadro; a erosão e o ruído, em passos de {@link #PASSO}. Na pausa
+     * do acerto o quadro não anda e a imagem fica a mesma. True se a imagem mudou.
+     */
+    private boolean assar(Lado l, int cor, float de, float ate, float total) {
+        if (l.assado == l.quadro && l.bitmap != null) return false;
+        if (l.bitmap == null) {
+            l.bitmap = Bitmap.createBitmap(ErosaoDaFita.LARGURA, ErosaoDaFita.ALTURA, Bitmap.Config.ARGB_8888);
+            l.imagem = new AndroidRenderAssets.AndroidRenderImage(l.bitmap);
+        }
+        int idade = Math.max(0, l.quadro - l.saida + 1);
+        int passo = idade / PASSO * PASSO;
+        float vida = l.varrida + ATRASO[l.forca];
+        float t = passo / vida;
+        float comida = t <= EROSAO_INICIO ? 0f : Math.min(1f, (t - EROSAO_INICIO) / (1f - EROSAO_INICIO)) * EROSAO_MAX;
+        erosao.assar(pixels, cor, total, de, ate, -ROLAGEM * passo, comida, VIES_FUNDO);
+        l.bitmap.setPixels(pixels, 0, ErosaoDaFita.LARGURA, 0, 0, ErosaoDaFita.LARGURA, ErosaoDaFita.ALTURA);
+        l.assado = l.quadro;
+        return true;
     }
 
     /** Leva a amostra {@code k} para o ponto a {@code onde} px do começo, entre ela e a vizinha {@code v}. */

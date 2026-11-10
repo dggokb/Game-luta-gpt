@@ -60,6 +60,13 @@ public interface RenderCanvas {
     }
 
     /**
+     * Os pixels da imagem mudaram (uma imagem que se refaz durante a luta, como o rastro do
+     * golpe): quem guarda uma cópia dela (a textura do OpenGL) sobe de novo. Sem cópia, nada.
+     */
+    default void imagemMudou(RenderImage image) {
+    }
+
+    /**
      * A plataforma desenha {@link #drawImageStrip} de uma vez (no celular, uma chamada no lugar
      * de centenas de recortes por quadro). Sem isso o cenário desenha recorte por recorte.
      */

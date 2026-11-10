@@ -4503,7 +4503,7 @@ public class GameView extends SurfaceView
             efeitos.desenhar(canvas);
             // O rastro do golpe na frente dos lutadores (a 75%: o membro ainda se vê por baixo) e por
             // cima do efeito de dano: o corte de ar fecha a cena.
-            if (enfeites) rastros.desenhar(canvas);
+            if (enfeites) rastros.desenhar(renderCanvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());

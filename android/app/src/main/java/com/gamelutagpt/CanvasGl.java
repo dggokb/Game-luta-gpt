@@ -1505,6 +1505,8 @@ final class CanvasGl extends Canvas {
             gl.drawImageStrip(im, xy, uv, linhas, a);
         }
 
+        @Override public void imagemMudou(RenderImage im) { gl.imagemMudou(im); }
+
         @Override public void fillRadialGlow(float cx, float cy, float r, int argb) { prepararGl(); gl.fillRadialGlow(cx, cy, r, argb); }
 
         @Override public void fillVerticalGradient(float l, float t, float r, float b, int cima, int baixo) {

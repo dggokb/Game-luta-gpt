@@ -22,6 +22,51 @@ só) foi interrompida antes de ser vista no jogo e está só na branch `ccr-97c0
 melhor; a ideia em aberto é ele gerar o rastro em vídeo, como fez com os efeitos de dano, e o
 jogo encaixar no caminho que já detecta.
 
+**Teste da receita do relatório (10/11, noite; branch `claude/rastro-erosao`, esperando o dono
+aprovar no vídeo):** a fita deixou de ser a textura única esticada e virou a receita do
+`reports/VFX de luta estilo anime.md`. Ver "Rodada de 10/11 (noite): o rastro pela receita" abaixo.
+
+## Rodada de 10/11 (noite): o rastro pela receita do relatório
+
+Pedido: um teste só do rastro (RastroDoGolpe + EfeitosVideo.fita) pela receita, com a base
+escura da Arc System Works, o rastro na frente a 75% e o tempo procedural e o caminho como
+estavam. Feito, numa branch da sessão (não na `game-luta-sprite-fable`):
+
+- **Textura** (`tools/sprites/rastro_forma.py` -> `assets/efeitos/rastro_forma`): cinza, em três
+  canais. R é a forma, o véu com riscos finos do Codex (`art/vfx/arco_textura_04.png`, o desenho
+  vem dele, não do código); G é o ruído de valor que repete no comprimento, esticado no sentido
+  do golpe e com o histograma igualado; B é a área da base escura (a forma alargada e borrada).
+- **A conta** (`ErosaoDaFita`, Java puro): forma vezes ruído contra um limiar que sobe com o tempo
+  e no fundo (erosão: o fundo some primeiro, em rasgos irregulares); uma faixa clara fina na frente
+  da erosão; a frente da fita mais clara (a borda que corta); rampa em três faixas chapadas
+  (sombra, a cor do membro, branco) a partir do `caminhoCor`, com saturação mínima de 0,3 porque
+  a cor medida quase sempre vem cinza-clara; a base escura (o tom da cor, bem escuro, 35%) por
+  baixo, apagando junto com o corte. A forma tem o comprimento do caminho e desliza com a frente
+  (a "janela que avança") em vez de se espremer no trecho já andado.
+- **Por que na CPU e não em shader:** a conta roda numa imagem pequena (256x56, o caminho inteiro)
+  e os dois desenhos só esticam a imagem na malha única (`drawImageStrip`, a do 156b937f). Assim o
+  PC (Java2D, onde o dono julga) e o celular (OpenGL) mostram os mesmos pixels. O shader GLSL das
+  notas ficou como rascunho, sem uso. No OpenGL a textura sobe de novo quando a imagem muda
+  (`RenderCanvas.imagemMudou` -> `GlRenderCanvas`, `texSubImage2D`).
+- **Tempo:** a frente e o fundo andam por quadro, como antes; a erosão e o ruído (que corre para
+  trás, contra o golpe) andam em passos de 4 quadros (15 por segundo). A erosão fica parada até
+  30% da vida e sobe até 0,55; o fundo é comido 0,4 a mais; o começo do caminho também (15% dele,
+  até 50 px), para a fita não nascer num corte reto. Na pausa do acerto nada se refaz.
+- **Custo:** cada imagem custa cerca de 0,75 ms no PC (era 3,4 ms na primeira versão) e é refeita
+  a cada quadro em que o golpe anda. No PC o `drawImageStrip` sem OpenGL passou a dividir a faixa
+  em colunas pela largura, como o OpenGL já fazia (a fita estreita ia em 16 colunas e derrubava a
+  gravação para 41 FPS; o chão largo continua com 16). No celular não foi medido.
+- **Conferido:** três golpes de três personagens (soco fraco do p11, chute forte em arco do p14,
+  jab fraco do Krüger, que é estocada), quadro a quadro, ao lado da versão de antes. O caminho
+  OpenGL do jogo rodou no PC sob tela virtual (Mesa llvmpipe), com a erosão andando: **não é o
+  celular**, nenhum aparelho foi visto. `testarMotor`: só as 3 falhas antigas.
+- **O que se viu e ficou como estava (é do tempo, que o pedido mandou manter):** no jab do Krüger
+  o acerto chega antes de a fita sair, então ela só aparece depois da pausa; no golpe fraco que
+  termina logo depois da pausa, a fita é cortada de uma vez quando o golpe acaba.
+- **Para o dono decidir no vídeo:** a cor (p11 sai rosa-lilás, p14 lavanda, porque é o tom medido
+  com saturação puxada); o véu agora cobre o membro na pausa do acerto mais que a textura antiga;
+  a base escura quase não aparece no cenário escuro (é para cenário claro).
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

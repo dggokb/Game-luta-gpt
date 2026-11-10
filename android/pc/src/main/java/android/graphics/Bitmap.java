@@ -70,6 +70,10 @@ public final class Bitmap {
         image().getRGB(x, y, width, height, pixels, offset, stride);
     }
 
+    public void setPixels(int[] pixels, int offset, int stride, int x, int y, int width, int height) {
+        image().setRGB(x, y, width, height, pixels, offset, stride);
+    }
+
     public void eraseColor(int color) {
         Graphics2D g = image().createGraphics();
         g.setComposite(java.awt.AlphaComposite.Src);

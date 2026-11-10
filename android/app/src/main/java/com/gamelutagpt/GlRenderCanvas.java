@@ -1840,6 +1840,26 @@ final class GlRenderCanvas implements RenderCanvas {
         }
     }
 
+    /**
+     * A imagem que se refaz na luta (o rastro do golpe, {@link ErosaoDaFita}): os desenhos já
+     * gravados com a textura velha saem antes, e os pixels novos sobem por cima dos velhos (o
+     * tamanho é o mesmo). Se ainda não subiu, sobe inteira no próximo desenho.
+     */
+    @Override public void imagemMudou(RenderImage image) {
+        if (!(image instanceof AndroidRenderAssets.AndroidRenderImage)) return;
+        Bitmap bitmap = ((AndroidRenderAssets.AndroidRenderImage)image).bruto();
+        Textura t = texturas.get(bitmap);
+        if (t == null || t.id == 0 || bitmap.isRecycled()) return;
+        if (bitmap.getWidth() != t.largura || bitmap.getHeight() != t.altura) {
+            soltar(bitmap);
+            return;
+        }
+        descarregar();
+        executar();
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, t.id);
+        GLUtils.texSubImage2D(GLES30.GL_TEXTURE_2D, 0, 0, 0, bitmap);
+    }
+
     /** Colunas das faixas: no máximo tantas, uma a cada tantos pixels da tela virtual. */
     private static final int FAIXA_COLUNAS = 24;
     private static final float FAIXA_COLUNA_PX = 48f;
