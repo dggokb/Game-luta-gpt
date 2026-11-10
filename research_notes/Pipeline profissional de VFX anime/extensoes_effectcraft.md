@@ -4,9 +4,10 @@ Levantamento de 10/11/2026. Fontes: o repositório local do EffectCraft 0.23.1
 (`/home/user/storytold/effectcraft`, só lido, nada alterado), comandos de leitura do binário
 `target/release/effectcraft-cli`, os nossos `docs/effectcraft-guia.md` e
 `.claude/skills/effectcraft/SKILL.md`, buscas na web e leitura direta de páginas do GitHub
-(raw.githubusercontent.com e api.github.com responderam; shadertoy.com, gmic.eu e
-godotshaders.com continuaram sem resolver o nome mesmo depois da rede ser aberta, então o que vem
-desses sites foi visto **só em trechos de busca** e está marcado assim). Nada foi instalado nem
+(raw.githubusercontent.com e api.github.com responderam; o WebFetch seguiu com ENOTFOUND em
+shadertoy.com, gmic.eu e godotshaders.com, mas `curl` pelo proxy abriu gmic.eu e godotshaders.com,
+marcados "[lida via curl]"; shadertoy.com devolveu 403; o resto que vem só de busca está marcado
+"trechos de busca"). Nada foi instalado nem
 compilado.
 
 Estado da máquina conferido com comandos só de leitura:
@@ -87,7 +88,12 @@ a área da camada e receber outra camada como parâmetro (as duas limitações d
 - Dissolve de jogo: ruído → step → alfa; a borda é a faixa onde o ruído fica entre o progresso e
   progresso + largura, pintada com a cor da borda; smoothstep em vez de step para antisserrilhar;
   largura maior = brasa lenta, menor = queima seca; variante com segunda faixa (queimado → cinza)
-  — visto só em trechos de busca de [godotshaders 2D dissolve with burn edge](https://godotshaders.com/shader/2d-dissolve-with-burn-edge/), [gamedev.net shaderlab](https://gamedev.net/shaderlab/14-sprite-dissolve-effect/), [Codrops/three.js](https://tympanus.net/codrops/?p=86603), [Mirza Beig, Unity dissolve parte 2](https://mirzabeig.substack.com/p/unity-tutorial-dissolve-shader-part-2)
+  — trechos de busca de [gamedev.net shaderlab](https://gamedev.net/shaderlab/14-sprite-dissolve-effect/), [Codrops/three.js](https://tympanus.net/codrops/?p=86603), [Mirza Beig, Unity dissolve parte 2](https://mirzabeig.substack.com/p/unity-tutorial-dissolve-shader-part-2)
+- Shader "2D dissolve with burn edge" (mreliptik, 2024) [lida via curl]: uniforms
+  `dissolve_texture` (ruído), `dissolve_value` 0-1, `burn_size` 0-1, `burn_color`; a página diz que
+  "o código do shader e todos os trechos neste post estão sob licença CC0 e podem ser usados
+  livremente" (imagens e vídeos não) — [godotshaders](https://godotshaders.com/shader/2d-dissolve-with-burn-edge/).
+  CC0 = podemos até portar o código para um plug-in nosso MIT.
 - Jump Flooding Algorithm (Rong & Tan): campo de distância aproximado em log2(n) passadas (passo
   começa em metade da resolução e cai pela metade), depois distância até a semente guardada; erros
   pequenos e raros — [Demofox](https://blog.demofox.org/2016/02/29/fast-voronoi-diagrams-and-distance-dield-textures-on-the-gpu-with-the-jump-flooding-algorithm/), [paper i3D 2006](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)
@@ -173,7 +179,8 @@ permissiva; usar os programas como etapa externa é outra coisa.
 - **Natron** é GPL-2.0-or-later; `NatronRenderer` roda projetos e scripts Python sem tela, por ssh,
   ex.: `NatronRenderer -i MyReader ~/pictures.png -w MyWriter rendered###.exr` — [natrongithub.github.io](https://natrongithub.github.io/), [Natron docs: execução](https://natron.readthedocs.io/en/rb-2.5/devel/natronexecution.html), [Wikipedia](https://en.wikipedia.org/wiki/Natron_(software))
 - **G'MIC**: código C++ parte sob CeCILL-C v1.0 (tipo LGPL) e parte CeCILL v2.1 (compatível com
-  GPL); desde a 2.2 o núcleo libgmic (todos os filtros) é CeCILL-C e pode ser integrado em software
+  GPL), e a página inicial repete "CeCILL free software licenses (LGPL-like and/or GPL-compatible)"
+  [gmic.eu lida via curl]; desde a 2.2 o núcleo libgmic (todos os filtros) é CeCILL-C e pode ser integrado em software
   não-GPL; só o G'MIC-Qt fica CeCILL — [README do G'MIC](https://github.com/GreycLab/gmic/blob/master/README) e COPYING (lidos via GitHub), [pixls.us G'MIC 2.2](https://pixls.us/blog/2018/02/g-mic-2-2); gmic.eu não abriu (ENOTFOUND)
 - **ImageMagick**: licença própria quase idêntica à Apache-2.0, uso comercial permitido com
   atribuição — [SPDX ImageMagick](https://spdx.org/licenses/ImageMagick)
@@ -183,7 +190,7 @@ permissiva; usar os programas como etapa externa é outra coisa.
   Streaks (estrias a partir dos claros, número e ângulo), Simple Star, Ghosts; `size` 1 cobre a
   imagem toda — [manual Glare Node](https://docs.blender.org/manual/en/latest/compositing/types/filter/glare.html), [PR Bloom #119128](https://projects.blender.org/blender/blender/pulls/119128)
 - **ShaderToy**: por padrão os shaders são CC BY-NC-SA 3.0 (não comercial, compartilha igual) salvo
-  se o autor disser outra coisa; ports herdam a licença — só trechos de busca ([godotshaders](https://godotshaders.com/shader/seascape-shader/), [gist](https://gist.github.com/djhoese/f4dfa3b423a88739636dc9a95e58e177)); shadertoy.com/terms não abriu (403/ENOTFOUND)
+  se o autor disser outra coisa; ports herdam a licença — só trechos de busca ([godotshaders](https://godotshaders.com/shader/seascape-shader/), [gist](https://gist.github.com/djhoese/f4dfa3b423a88739636dc9a95e58e177)); shadertoy.com/terms não abriu nem por curl (403, página de desafio anti-robô)
 - Brilho multiescala aberto como técnica: dual-Kawase (Bjørge, SIGGRAPH 2015): limiar dos claros,
   desce uma cadeia de mips e sobe somando cada nível ao maior (13 amostras na descida, tenda de 9 na
   subida em uma implementação) — [notas ARM SIGGRAPH 2015](https://community.arm.com:443/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf), [Frost Kiwi](https://blog.frost.kiwi/dual-kawase/), [luma.gl bloom](https://luma.gl/docs/api-reference/shadertools/shader-passes/bloom)
@@ -210,8 +217,7 @@ permissiva; usar os programas como etapa externa é outra coisa.
   `cv2.pyrDown/pyrUp`); ImageMagick 6 (`-morphology`, `-clut` com uma faixa de cores para gradient
   map, `-blur`); ffmpeg (`lut1d`/`pseudocolor` para rampa, `gblur` + `blend=addition` para glow,
   `dilation` para engrossar o alfa). Isso cabe como mais uma opção do nosso script, sem mexer no
-  EffectCraft. O OpenCV é Apache-2.0 nas versões 4.5+ (conhecimento geral, não conferido nesta
-  sessão).
+  EffectCraft. O OpenCV é Apache-2.0 (LICENSE do branch 4.x [lido via curl](https://github.com/opencv/opencv/blob/4.x/LICENSE); o 5.0 instalado não conferido à parte).
 - GPL/CeCILL **como ferramenta externa** (G'MIC CLI, NatronRenderer, Blender `-b`) não contamina
   as imagens que saem nem o jogo: não distribuímos o programa. O que não pode é **copiar código**
   deles (nem de ShaderToy NC) para dentro de um plug-in nosso que queiramos MIT, nem para o
@@ -229,7 +235,6 @@ permissiva; usar os programas como etapa externa é outra coisa.
   exponencial; "inverse-square" do Craft Glow é afirmação do README dele, não verificada.
 - Texto oficial de termos do ShaderToy não abriu; o CC BY-NC-SA 3.0 vem só de trechos de terceiros.
 - Algoritmo interno do Fog Glow/Streaks do Blender não está no manual (só no código-fonte GPL).
-- Licença do OpenCV instalado (5.0.0) não conferida nesta sessão.
 
 ## 3. Importar footage/flipbook pronto no EffectCraft
 

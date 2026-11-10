@@ -201,18 +201,24 @@ cláusula explícita confirmando isso em cada EULA.
 | **Flow** | Curvas de easing | US$ 35 | [aescripts](https://aescripts.com/flow/) |
 | **AutoFill v2** | Preenchimento que "cresce" pela forma (líquido, contorno) | US$ 99,95 | [aescripts](https://aescripts.com/autofill/?aff=60) |
 | **Motion Bro** | Gerenciador de presets/pacotes | Freemium (~1.400 presets grátis e pacotes pagos) | resumo da busca nos resultados de [aescripts](https://aescripts.com/) (não confirmado na página do produto) |
-| **Mister Horse Animation Composer** | Gerenciador de presets e pacotes de animação | **Plano grátis** (plugin e mais de 1.000 itens); pago US$ 16,50/mês anual (US$ 198/ano) ou US$ 19,90/mês | [misterhorse.com/pricing](https://misterhorse.com/pricing) |
+| **Mister Horse Animation Composer** | Gerenciador de presets e pacotes de animação | **Plano grátis** (plugin e mais de 1.000 itens); pago US$ 16,50/mês no anual (US$ 198/ano) ou US$ 19,90/mês | [misterhorse.com/pricing, lida via curl](https://misterhorse.com/pricing) |
 | **OLM Smoother / OLM KiraKira** | Suavizar linha cel / glow e estrelas a partir de realces | **Grátis** (OLM, estúdio de anime) | [Adobe Community](https://community.adobe.com/t5/after-effects-discussions/smoothing-of-hard-lines/m-p/10455447); [OLM](https://www.olm.co.jp/post/olm-kirakira) |
 
 - O Kamehameha do tutorial do WonderHowTo exige **Trapcode Shine** —
   [WonderHowTo](https://after-effects.wonderhowto.com/how-to/create-kamehameha-energy-blast-attack-from-dragon-ball-after-effects-170428)
-- Num fórum do realtimevfx, para levar FX ao jogo citam Particular com um gerador de flipbook e o
-  plugin **Sheetah** para montar a folha de sprites. Visto só pelo trecho, o site está bloqueado —
+- No realtimevfx, um tópico de 08/05/2017 (**antigo**) pergunta se dá para fazer FX de jogo "tipo
+  League of Legends" só no AE **[lida via curl]**. A resposta: dá para fazer flipbooks e texturas no
+  AE, mas para o estilo League "não recomendo". Eles usam texturas pintadas à mão no Photoshop ("95%
+  de tudo") ou flipbooks desenhados à mão no Flash, e deixam o AE para o que é mais realista. Muito se
+  faz com **uma textura bem desenhada com alfa**, mudando escala, achatamento, cor ao longo do tempo e
+  erosão. Para exportar, citam Particular mais um gerador de flipbook. O trecho de busca também citava
+  o plugin **Sheetah** para folha de sprites —
   [realtimevfx](https://realtimevfx.com/t/game-fx-with-after-effect/2327)
 - A Video Copilot fez uma promoção de 40% que acabou em 27/04/2026 —
   [Motion Media](https://www.motionmedia.com/mm-blog/video-copilot-sale-40-off-ends-april-27/)
-- O Mister Horse diz que o plano grátis pode ser usado em "vídeos sob demanda ilimitados em formato
-  fechado, inclusive comercial". **Fala de vídeo**, não de jogo —
+- O FAQ do Mister Horse diz que o plano grátis vale "no mesmo escopo dos pagos": "número ilimitado
+  de vídeos sob demanda em formato fechado, mesmo para fins comerciais". A licença é de usuário único.
+  **Fala de vídeo**, não de jogo [lida via curl] —
   [misterhorse.com/pricing](https://misterhorse.com/pricing)
 
 ### Inferences
@@ -225,10 +231,10 @@ cláusula explícita confirmando isso em cada EULA.
 
 ### Gaps
 - Não achei o EULA do Saber, do Deep Glow nem do Trapcode com cláusula explícita sobre usar o
-  **render** num jogo comercial (a videocopilot.net está bloqueada). Por prática de mercado o render é
-  do usuário, mas sem fonte isso fica como lacuna.
-- O preço oficial do Element 3D em 2026 e o preço atual do Deep Glow 2 na página oficial ficaram sem
-  confirmação.
+  **render** num jogo comercial. A página `videocopilot.net/license/` não trouxe texto de licença no
+  HTML estático. Por prática de mercado o render é do usuário, mas sem fonte isso fica como lacuna.
+- O preço atual do Deep Glow 2, do Plexus 3 e dos outros itens da aescripts.com ficou sem confirmação
+  direta, porque o site dá 403 ao curl. Os números vêm dos trechos da busca.
 
 ---
 
@@ -273,11 +279,18 @@ o AE só compõe. Para jogo, a licença dos pacotes é o gargalo.
   jogos, ou para empresa com mais de 50 funcionários, é preciso uma licença empresarial dedicada
   (vendas) — [Motion Array Help](https://help.motionarray.com/hc/en-us/articles/8995487565981);
   [Motion Array License](https://motionarray.com/license/)
-- **Envato (VideoHive / licença Video Media):** proíbe redistribuir o item "como clipe, como stock,
-  numa ferramenta ou template, ou com arquivos-fonte", e cada produto final pede uma licença. O FAQ
-  da Envato só fala de jogo para **modelos 3D com Extended License**. Não achei regra explícita para
-  vídeo/FX dentro de jogo —
-  [ThemeForest Video Media](https://themeforest.net/licenses/terms/video_media_single);
+- **Envato Market (VideoHive), licença "Video Media – Single Use" [lida via curl]:** a cláusula 2
+  lista **"games"** entre os exemplos de End Product, ao lado de DVDs, sites e filmes, e vale para uso
+  "grátis ou comercial, monetizado ou não, desde que seja um único End Product". Pode modificar,
+  estilizar e combinar o item. As restrições:
+  - uma licença por End Product (cada jogo diferente pede outra);
+  - não pode redistribuir o item como clipe, stock, ferramenta, template ou com arquivos-fonte,
+    "mesmo modificado";
+  - **"não pode permitir que o usuário final extraia o Item e o use separado do End Product"**;
+  - não pode virar merchandising.
+  Para um jogo, isso pede que as folhas de efeito não fiquem soltas e fáceis de copiar no pacote
+  (ponto a avaliar num APK, onde `assets/` pode ser aberto) —
+  [ThemeForest Video Media Single](https://themeforest.net/licenses/terms/video_media_single);
   [FAQ](https://themeforest.net/licenses/faq)
 - **Envato Elements:** o item incorporado a um produto final durante a assinatura fica licenciado
   para sempre naquele produto —
@@ -300,9 +313,11 @@ o AE só compõe. Para jogo, a licença dos pacotes é o gargalo.
 - O blog da Unity descreve o fluxo comum de folhas de textura com ferramentas em série (After Effects
   e Photoshop), que gera muitos dados intermediários —
   [Unity](https://blog.unity.com/technology/experimental-feature-vfx-toolbox-image-sequencer)
-- Um tópico do realtimevfx, "Stylized Flipbooks VFX Using After Effects + Unity", descreve FX com
-  visual "desenhado à mão" feitos no AE **sem desenhar quadro a quadro**. Só vi o trecho da busca e o
-  método ficou cortado. A leitura direta falhou (ENOTFOUND) —
+- Tópico do realtimevfx "Stylized Flipbooks VFX Using After Effects + Unity" (usuário **Malakey**,
+  15/11/2024) **[lida via curl]**. Ele usa o AE para criar efeitos "desenhados à mão" **sem desenhar
+  quadro a quadro**, com tutoriais de fogo, raio, puffs de fumaça e água postados "principalmente no
+  Twitter e no LinkedIn". **O post não descreve o método.** Uma resposta (05/03/2025) sugere renderizar
+  sequência de imagens e montar o flipbook no Slate Editor —
   [realtimevfx](https://realtimevfx.com/t/stylized-flipbooks-vfx-using-after-effects-unity/27915)
 - O artigo da VFX Voice "The Return of Hand-Drawn and Stylized Effects Animation" (Ian Failes,
   27/09/2022, **antigo**) registra a volta do FX desenhado e estilizado (The Mitchells vs. The
