@@ -22,6 +22,35 @@ só) foi interrompida antes de ser vista no jogo e está só na branch `ccr-97c0
 melhor; a ideia em aberto é ele gerar o rastro em vídeo, como fez com os efeitos de dano, e o
 jogo encaixar no caminho que já detecta.
 
+## A pesquisa de como os estúdios fazem (10/11)
+
+O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
+profissional") e pediu a técnica de verdade. O relatório está em
+[`reports/VFX de luta estilo anime.md`](../reports/VFX%20de%20luta%20estilo%20anime.md), com as
+notas em `research_notes/VFX de luta estilo anime/`. O essencial:
+
+- **A Arc System Works desenha o rastro.** No Guilty Gear Strive o corte é uma malha no caminho
+  da lâmina, do tamanho da área de acerto, com uma animação de **6 desenhos à mão** que avança
+  enquanto desaparece e um brilho na borda da frente (aula do chefe de efeitos, Kazuya Ogawa).
+  O nosso era uma textura única esticada: por isso nunca chegava.
+- **O substituto para não desenhar 50 a 60 animações** vem dos artistas de efeito de outros
+  estúdios: uma forma em tons de cinza, um ruído, e um shader que rola a textura, **apaga por
+  erosão** (o fundo some primeiro, em bordas irregulares) e colore por **rampa de cor** do
+  personagem. Cada efeito vira uma linha de tabela (forma, ruído, rampa, tempos).
+- **Faísca**: pilha de camadas curtas (clarão de 2 a 3 quadros, espinhos, detritos); o único
+  número completo é de fã (16 quadros no acerto, 8 na defesa).
+- **Ferramentas**: nenhuma de VFX roda aqui sem tela de forma confirmada; só Python.
+- Quase todo número é ponto de partida, e o shader das notas não foi compilado nem testado em
+  aparelho. Próximo passo proposto: um teste só, a fita atual com erosão no fundo e rampa de
+  cor, em vídeo ao lado da versão de hoje.
+- Três pontos para o dono decidir: a base escura sob o corte (a regra daqui é efeito só de luz),
+  efeito grande atrás do personagem (o rastro daqui passa por cima), e o desenho do PC, que não
+  tem shader (a gravação que ele aprova precisa de um equivalente).
+
+Skills de terceiros olhadas no mesmo dia e descartadas: `vfx-spell-effects` (SwiftUI/Metal),
+`create-game-vfx` (lista genérica para Three.js), `Claude-Code-Game-Studios` (projeto-modelo
+inteiro, sem VFX), `rea` (engenharia reversa de código, não abre arte de jogo).
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada
