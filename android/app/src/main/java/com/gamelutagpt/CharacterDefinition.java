@@ -86,12 +86,16 @@ final class CharacterDefinition {
          */
         float[] anguloGolpe;
         /**
-         * A ponta do golpe, por quadro da folha ({x, y, graus, raio, sentido, cor}: px à frente da raiz
-         * e acima do chão, para onde o membro aponta, o comprimento dele, de onde veio (+1 subiu, -1
-         * desceu, 0 golpe reto) e a cor dele na ponta, 0xRRGGBB), nos golpes normais em que a arte não traz um efeito desenhado: é com
-         * isso que toca o arco do golpe quando o membro estica. Null sem medida (no golpe ou no quadro).
+         * A linha de ação do golpe (tools/sprites/linha_de_acao.py), por quadro da folha: {x, y, jx,
+         * jy}, a ponta do membro que bate e a junta de trás (o cotovelo, o joelho), em px à frente
+         * da raiz e acima do chão, do desenho em que o membro sai ao desenho em que está esticado.
+         * {@link #caminhoOrdem} são esses quadros na ordem do golpe e {@link #caminhoCor} a cor do
+         * membro na ponta (0xRRGGBB). O rastro do golpe ({@link RastroDoGolpe}) segue esta linha.
+         * Null sem linha detectada (ou com o efeito já desenhado na arte).
          */
-        float[][] rastroGolpe;
+        float[][] caminhoGolpe;
+        int[] caminhoOrdem;
+        int caminhoCor;
         /** Onde começa o quadro {@code index} da animação (s); o fim dela além do último. */
         float startOf(int index) {
             float t=0f;for(int i=0;i<Math.min(index,durations.length);i++)t+=durations[i];return t;
@@ -110,10 +114,22 @@ final class CharacterDefinition {
             for(int i=0;i<q.length;i++)if(q[i]!=null)anguloGolpe[i]=q[i][0];
             return this;
         }
-        Animation withSilhueta(String corpo,String golpe,String angulo,String rastro) {
-            withSilhueta(corpo,golpe,angulo);
-            rastroGolpe=quadros(rastro);
-            for(float[] r:rastroGolpe)if(r!=null&&r.length!=6)throw new IllegalArgumentException(id+": rastro {x,y,graus,raio,sentido,cor}");
+        /** Em que posição do clipe o quadro {@code quadro} da folha aparece primeiro; -1 se não aparece. */
+        int ordemDe(int quadro) {
+            for(int i=0;i<frames.length;i++)if(frames[i]==quadro)return i;
+            return -1;
+        }
+        Animation withCaminho(String pontos,int cor) {
+            caminhoGolpe=quadros(pontos);
+            java.util.List<Integer> ordem=new java.util.ArrayList<>();
+            for(int f:frames)if(caminhoGolpe[f]!=null&&!ordem.contains(f)){
+                if(caminhoGolpe[f].length!=4)throw new IllegalArgumentException(id+": caminho {x,y,jx,jy}");
+                ordem.add(f);
+            }
+            if(ordem.size()<2)throw new IllegalArgumentException(id+": caminho com menos de dois quadros");
+            caminhoOrdem=new int[ordem.size()];
+            for(int i=0;i<caminhoOrdem.length;i++)caminhoOrdem[i]=ordem.get(i);
+            caminhoCor=cor;
             return this;
         }
         /**

@@ -3418,19 +3418,6 @@ final class CombatEngine {
         return q < a.silhuetaCorpo.length ? q : -1;
     }
 
-    /**
-     * A ponta do golpe de {@code f} no quadro {@code frame} ({x, y, graus, raio, sentido}: à frente
-     * da raiz, acima do chão, para onde o membro aponta, o comprimento dele e de onde veio), ou
-     * null: golpe sem a medida ou com o efeito já desenhado na arte (tools/sprites/angulo_golpe.py).
-     * É com isso que a tela toca o arco do golpe.
-     */
-    static float[] rastroNoDesenho(CombatFighter f, int frame) {
-        CharacterDefinition.Animation a = desenhoDoGolpe(f);
-        if (a == null || a.rastroGolpe == null) return null;
-        int q = quadroDoDesenho(f, frame);
-        return q < 0 || q >= a.rastroGolpe.length ? null : a.rastroGolpe[q];
-    }
-
     /** A animação do golpe de {@code f}: a do golpe, ou a da S e do Super (sem golpe próprio). */
     static CharacterDefinition.Animation desenhoDoGolpe(CombatFighter f) {
         if (f.attack == null) return null;

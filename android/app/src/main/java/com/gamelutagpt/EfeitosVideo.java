@@ -80,8 +80,6 @@ final class EfeitosVideo {
     /** Efeito que anda (px do mundo por passo) e repete os quadros até {@link #fimMs} (-1: toca uma vez). */
     private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
-    /** A cor de cada vaga (o filtro que troca o azul de ar pela cor; null: como está na folha). */
-    private final android.graphics.ColorFilter[] tinta = new android.graphics.ColorFilter[VAGAS];
     private final Map<Integer, android.graphics.ColorFilter> tintas = new HashMap<>();
     /** O vermelho do corpo de um efeito que se pinta (TINTA_BASE do tools/sprites/efeito_imagem.py). */
     private static final float TINTA_BASE_R = 0.35f;
@@ -211,7 +209,6 @@ final class EfeitosVideo {
         escala[i] = tamanho;
         espelhado[i] = espelhar;
         angulo[i] = 0f;
-        tinta[i] = null;
         idadeMs[i] = 0f;
         vx[i] = 0f;
         fimMs[i] = -1f;
@@ -242,13 +239,11 @@ final class EfeitosVideo {
     }
 
     /**
-     * Pinta o efeito da vaga de {@code rgb} (0xRRGGBB), se ainda for o mesmo ({@code nome}). Só
-     * para as folhas feitas para pintar (--tingivel): o corpo delas vai do azul de ar ao branco
-     * do miolo, com o quanto é branco no canal vermelho; aqui o azul vira a cor e o miolo fica
-     * branco. O rastro do golpe sai assim da cor do braço ou da perna que bate.
+     * O filtro que pinta de {@code rgb} (0xRRGGBB) uma folha feita para pintar (--tingivel no
+     * tools/sprites/efeito_imagem.py): o corpo dela vai do azul de ar ao branco do miolo, com o
+     * quanto é branco no canal vermelho; aqui o azul vira a cor e o miolo fica branco.
      */
-    void tingir(int vaga, String nome, int rgb) {
-        if (vaga < 0 || vaga >= VAGAS || tocando[vaga] == null || !tocando[vaga].nome.equals(nome)) return;
+    private android.graphics.ColorFilter filtroDaCor(int rgb) {
         android.graphics.ColorFilter f = tintas.get(rgb);
         if (f == null) {
             float[] m = new float[20];
@@ -262,15 +257,48 @@ final class EfeitosVideo {
             f = Filtro.matriz(m).canvas;
             tintas.put(rgb, f);
         }
-        tinta[vaga] = f;
+        return f;
     }
 
-    /** Leva o efeito da vaga para (x, y), se ainda for o mesmo ({@code nome}): o efeito preso a quem anda. */
-    void levar(int vaga, String nome, float px, float py) {
-        if (vaga >= 0 && vaga < VAGAS && tocando[vaga] != null && tocando[vaga].nome.equals(nome)) {
-            x[vaga] = px;
-            y[vaga] = py;
+    /**
+     * Desenha a textura {@code nome} (uma fita reta: a ponta velha à esquerda, a nova à direita, a
+     * borda nítida em cima) dobrada ao longo de um caminho: dos pontos {@code de} a {@code ate} (sem
+     * ele), a borda nítida passa por (fx, fy) e a fita vai até (dx, dy), com a opacidade
+     * {@code alfa} de cada ponto, pintada de {@code rgb}. É o rastro do golpe ({@link RastroDoGolpe}):
+     * cada trecho entre dois pontos é uma fatia da textura, girada na direção do trecho.
+     */
+    void fita(Canvas c, String nome, float[] fx, float[] fy, float[] dx, float[] dy, float[] alfa, int de, int ate, int rgb) {
+        Folha f = folhas.get(nome);
+        if (f == null || f.quadros.length == 0 || ate - de < 2) return;
+        int[] r = f.quadros[0];
+        paint.setColorFilter(filtroDaCor(rgb));
+        int trechos = ate - de - 1;
+        for (int i = de; i < ate - 1; i++) {
+            float a = (alfa[i] + alfa[i + 1]) * 0.5f;
+            if (a <= 0.01f) continue;
+            float vx = fx[i + 1] - fx[i], vy = fy[i + 1] - fy[i];
+            float comprimento = (float) Math.sqrt(vx * vx + vy * vy);
+            if (comprimento < 0.5f) continue;
+            // A largura da fatia e para que lado ela vai: para o lado da borda de dentro.
+            float mx = (dx[i] + dx[i + 1]) * 0.5f - (fx[i] + fx[i + 1]) * 0.5f;
+            float my = (dy[i] + dy[i + 1]) * 0.5f - (fy[i] + fy[i + 1]) * 0.5f;
+            float lado = (vx * my - vy * mx) / comprimento;
+            int u0 = r[0] + Math.round(r[2] * (i - de) / (float) trechos);
+            int u1 = r[0] + Math.round(r[2] * (i - de + 1) / (float) trechos);
+            if (u1 <= u0) continue;
+            fonte.set(u0, r[1], u1, r[1] + r[3]);
+            // Um pouco de sobra no comprimento: as fatias se encostam nas curvas.
+            destino.set(0f, 0f, comprimento + 1f, Math.abs(lado));
+            paint.setAlpha(Math.round(255f * a));
+            c.save();
+            c.translate(fx[i], fy[i]);
+            c.rotate((float) Math.toDegrees(Math.atan2(vy, vx)));
+            if (lado < 0f) c.scale(1f, -1f);
+            c.drawBitmap(f.bitmap, fonte, destino, paint);
+            c.restore();
         }
+        paint.setAlpha(255);
+        paint.setColorFilter(null);
     }
 
     /** Tira da tela o efeito da vaga, se ainda for o mesmo ({@code nome}). */
@@ -365,7 +393,6 @@ final class EfeitosVideo {
             float k = escala[i] / f.pixelScale;
             float left = f.desloc[q][0] * k, top = f.desloc[q][1] * k;
             destino.set(x[i] + left, y[i] + top, x[i] + left + r[2] * k, y[i] + top + r[3] * k);
-            paint.setColorFilter(tinta[i]);
             if (espelhado[i] || angulo[i] != 0f) {
                 c.save();
                 // A tela tem y para baixo: para cima é girar ao contrário do relógio (ao contrário,
@@ -378,6 +405,5 @@ final class EfeitosVideo {
                 c.drawBitmap(f.bitmap, fonte, destino, paint);
             }
         }
-        paint.setColorFilter(null);
     }
 }

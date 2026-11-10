@@ -1,0 +1,20 @@
+{
+ "nome": "rastro_fita",
+ "origem": "tools/sprites/rastro_fita.py (arco_textura_01.png)",
+ "ancora": "fita",
+ "pixelScale": 1.0,
+ "altura": 96,
+ "quadros": [
+  [
+   0,
+   0,
+   512,
+   96,
+   0.0,
+   0.0
+  ]
+ ],
+ "duracoesMs": [
+  1000
+ ]
+}

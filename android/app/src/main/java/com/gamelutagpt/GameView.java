@@ -154,6 +154,8 @@ public class GameView extends SurfaceView
      * evento tenta o dele e, se ainda não existe, usa o efeito clássico do ImpactEffects.
      */
     private final EfeitosVideo efeitos;
+    /** O rastro dos golpes normais: a fita que segue a linha de ação de cada um. */
+    private final RastroDoGolpe rastros;
     /** A cena em vídeo da cinemática (os dois lutadores num vídeo só, no lugar deles). */
     private final CenaVideo cenaVideo;
     /** Neste quadro a cena em vídeo está na tela: os lutadores (e as sombras) não são desenhados. */
@@ -707,6 +709,7 @@ public class GameView extends SurfaceView
     public GameView(Context context, boolean emSegundoPlano) {
         super(context);
         efeitos = new EfeitosVideo(context.getAssets());
+        rastros = new RastroDoGolpe(efeitos);
         cenaVideo = new CenaVideo(context.getAssets());
         effects.loadImages(context.getAssets());
         entradaSuper = new EntradaSuper(context.getAssets());
@@ -2298,6 +2301,7 @@ public class GameView extends SurfaceView
         riscos.clear();
         secretoStart = -1;
         efeitos.limpar();
+        rastros.limpar();
         feel.clear();
         finalizacao.limpar();
         koVictim = null;
@@ -4495,6 +4499,8 @@ public class GameView extends SurfaceView
                 }
             }
             drawBreakerCue(canvas);
+            // O rastro do golpe por cima dos lutadores e por baixo da faísca do acerto.
+            if (enfeites) rastros.desenhar(canvas);
             efeitos.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
@@ -5661,100 +5667,9 @@ public class GameView extends SurfaceView
             if (fase > quiqueFase[i]) efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
         }
         quiqueFase[i] = fase;
-        rastroDoGolpe(i, f, x);
+        rastros.passo(i, f, x);
     }
 
-    /**
-     * O rastro do golpe normal, quando o membro estica: o arco de ar que acompanha o balanço do
-     * braço ou da perna (médio e forte) ou, no golpe reto e curto (o fraco, a rasteira), uma onda
-     * de ar na ponta. Só entra nos golpes em que a arte não traz um efeito desenhado
-     * ({@link CombatEngine#rastroNoDesenho}); o arco fica atrás da ponta, por onde o membro passou,
-     * e não estica o alcance que o olho lê (docs/revisao-base/direcao.md).
-     */
-    private void rastroDoGolpe(int i, CombatFighter f, float x) {
-        if (!f.attacking() || f.attack == null || f.attack.hitboxCount() == 0) {
-            rastroAtaque[i] = null;
-            return;
-        }
-        if (f.attack != rastroAtaque[i] || f.attackFrame < rastroQuadro[i]) {
-            rastroAtaque[i] = f.attack;
-            rastroFeito[i] = false;
-            rastroVaga[i] = -1;
-        }
-        rastroQuadro[i] = f.attackFrame;
-        // Tocando: o rastro anda com quem bate (o golpe no pulo, o golpe que avança).
-        if (rastroVaga[i] >= 0) {
-            efeitos.levar(rastroVaga[i], rastroNome[i], x + f.facing * rastroPonta[i][0], f.y - rastroPonta[i][1]);
-        }
-        AttackDefinition.Box ativa = f.attack.hitbox(0);
-        if (rastroFeito[i] || f.attackFrame < ativa.firstFrame) return;
-        // O primeiro quadro em que a tela mostra o membro esticado, na janela ativa (o braço ainda
-        // está indo no primeiro quadro) ou logo depois dela: em alguns golpes o desenho do impacto
-        // não tem a medida e o braço esticado é o quadro seguinte.
-        int fim = ativa.lastFrame + RASTRO_FOLGA, quando = -1;
-        float maior = Float.NEGATIVE_INFINITY;
-        for (int q = ativa.firstFrame; q <= fim; q++) maior = Math.max(maior, esticado(f, q));
-        float[] ponta = null;
-        for (int q = ativa.firstFrame; q <= fim && ponta == null; q++) {
-            if (esticado(f, q) >= maior - RASTRO_QUASE) {
-                ponta = CombatEngine.rastroNoDesenho(f, q);
-                quando = q;
-            }
-        }
-        if (ponta == null || f.attackFrame > fim) {
-            rastroFeito[i] = true;
-            return;
-        }
-        if (f.attackFrame < quando) return;
-        rastroFeito[i] = true;
-        AttackDefinition.Strength forca = f.attack.strength;
-        boolean forte = forca == AttackDefinition.Strength.HEAVY;
-        // Curto: some junto com o membro que recolhe.
-        int quadros = Math.max(6, Math.min(10, fim - f.attackFrame + 4));
-        float escala;
-        if (ponta[4] != 0f) {
-            // O arco do balanço: um arco de círculo com o centro na raiz do membro (o quadril, o
-            // ombro) e a ponta nova na ponta dele, do lado de onde ele veio (subiu ou desceu).
-            rastroNome[i] = (forte ? "rastro_arco_forte" : "rastro_arco") + (ponta[4] < 0f ? "_desce" : "");
-            double g = Math.toRadians(ponta[2]);
-            rastroPonta[i][0] = ponta[0] - ponta[3] * (float) Math.cos(g);
-            rastroPonta[i][1] = ponta[1] - ponta[3] * (float) Math.sin(g);
-            escala = ponta[3] / RASTRO_RAIO;
-        } else {
-            // O golpe reto (o jab, a rasteira): a onda de ar na ponta.
-            forte &= efeitos.tem("rastro_forte");
-            rastroNome[i] = forte ? "rastro_forte" : "rastro_golpe";
-            rastroPonta[i][0] = ponta[0];
-            rastroPonta[i][1] = ponta[1];
-            escala = forte ? 1f : forca == AttackDefinition.Strength.LIGHT ? 0.75f : 1f;
-        }
-        rastroVaga[i] = efeitos.tocarDurando(rastroNome[i], x + f.facing * rastroPonta[i][0], f.y - rastroPonta[i][1],
-            escala, f.facing < 0, quadros * FIXED_STEP * 1000f, ponta[2]);
-        // Da cor de onde sai: a luva, a faixa, o tênis de quem bate.
-        efeitos.tingir(rastroVaga[i], rastroNome[i], (int) ponta[5]);
-    }
-
-    /** Quanto o membro de {@code f} esticou no quadro {@code q} do golpe (px), ou -infinito sem medida. */
-    private static float esticado(CombatFighter f, int q) {
-        float[] r = CombatEngine.rastroNoDesenho(f, q);
-        if (r == null) return Float.NEGATIVE_INFINITY;
-        // Para a frente, ou para cima/baixo no golpe em pé (o gancho, o chute vertical).
-        return Math.abs(r[2]) > 55f ? Math.abs(r[1] - f.body().height(false) * 0.5f) : r[0];
-    }
-
-    /** Quadros depois da janela ativa em que o braço esticado ainda vale para o rastro. */
-    private static final int RASTRO_FOLGA = 3;
-    private final AttackDefinition[] rastroAtaque = new AttackDefinition[2];
-    private final int[] rastroQuadro = new int[2];
-    private final boolean[] rastroFeito = new boolean[2];
-    /** O membro conta como esticado a esta distância (px) do mais esticado da janela. */
-    private static final float RASTRO_QUASE = 12f;
-    private final int[] rastroVaga = {-1, -1};
-    private final String[] rastroNome = {"", ""};
-    /** Onde o rastro fica em relação a quem bate (px à frente da raiz, acima do chão). */
-    private final float[][] rastroPonta = new float[2][2];
-    /** O comprimento de membro para o qual a folha do arco é desenhada (tools/sprites/rastro_arco.py). */
-    private static final float RASTRO_RAIO = 128f;
 
     /**
      * O dragão do Ultra SHINKAI sai do punho de quem acabou de entrar na fase do dragão: o efeito

@@ -93,55 +93,39 @@ abre e continua crescendo enquanto some). A folha passa de 4096 px em fileiras.
 
 Ficou para o usuário conferir: o tamanho e o brilho no celular (a gravação é o desenho do PC).
 
-## Rastro do golpe (10/11)
+## Rastro do golpe: a linha de ação (10/11)
 
-Pedido do usuário. O rastro é uma onda de ar na ponta do braço ou da perna quando o golpe estica,
-virada para onde o membro aponta. É o mesmo desenho que a arte do Ryūga (player_base) já traz em
-9 dos 11 normais (a meia-lua na frente do punho): a imagem foi gerada a partir desses quadros
-(`art/vfx/ref_rastro_ryuga.png`) para os outros 15 lutadores ficarem iguais a ele.
+Pedido do usuário, depois de duas tentativas erradas (uma onda de ar na ponta; um arco escolhido
+por regra): **o rastro tem de mostrar de onde o golpe veio e para onde foi**, como nas
+referências dele (a garra que desce em arco, o chute que sai do chão, o golpe em giro). "Vamos
+construir um motor que detecta o movimento e cria a sua linha de ação."
 
-| Nome no jogo | Imagem | Como foi posto |
-|---|---|---|
-| `rastro_golpe` (golpe reto: fraco, soco, rasteira) | `rastro_02.png` (a onda com riscos de ar) | `--sopro --tingivel --origem 0.84,0.48 --tamanho 170` |
-| `rastro_forte` (soco forte) | `rastro_01.png` (a meia-lua grande) | `--sopro --tingivel --origem 0.52,0.5 --tamanho 170` |
-
-- **Onde sai** (`tools/sprites/angulo_golpe.py`, `silhueta.rastro` de cada animação: x, y e graus
-  da ponta por quadro): só golpe normal, e só onde a arte não tem efeito desenhado
-  (`ARTE_COM_EFEITO`, conferido no olho) nem a medida sai errada (`MEDIDA_ERRADA`). Hoje são
-  cerca de 125 golpes; especiais e Super ficam com os efeitos deles.
-- **A medida é conferida por dois caminhos** (a linha do membro e a ponta mais longe do corpo):
-  quadro em que os dois não batem fica sem ponta e sem inclinação. Isso também limpou a
-  inclinação da faísca, que em alguns golpes pegava o pé de apoio ou a mão aberta.
-- **Quando sai** (`GameView.rastroDoGolpe`): no primeiro quadro em que a tela mostra o membro
-  esticado, dentro da janela ativa ou até 3 quadros depois; dura de 6 a 10 quadros e anda junto
-  com quem bate (o golpe no pulo). Fraco em 0,75.
-- A regra antiga (direcao.md: golpe sem linhas de velocidade, para não atrapalhar a leitura da
-  distância) foi respeitada no que dá: o rastro é curto e colado na ponta, não uma linha atrás
-  do membro. Se atrapalhar no jogo, é tirar as duas pastas de `assets/efeitos`.
-- **O arco do balanço** (o que o usuário queria: a onda na ponta não era o pedido). A textura é
-  uma fita reta gerada no Codex (`art/vfx/arco_textura_01.png`); o
-  `tools/sprites/rastro_arco.py` curva ela num arco de círculo e anima (a ponta nova varre o arco
-  em dois quadros e a fita se desfaz pela ponta velha). Folhas: `rastro_arco` (95°),
-  `rastro_arco_forte` (`--abertura 130 --grossura 0.36`) e as duas `_desce` (`--desce`). O jogo
-  põe o centro do arco na raiz do membro, escala pelo comprimento dele e gira na inclinação.
-- **Cada tipo de movimento tem o seu** (pedido: "o Brucy dá um soco e o arco é igual ao do
-  chute"). O `silhueta.rastro` é `[x, y, graus, raio, sentido, cor]`, e o sentido sai do tipo
-  (`angulo_golpe.sentido`): o **chute** é um balanço (o arco de baixo para cima, ou de cima para
-  baixo se a perna aponta para baixo); o **soco** é reto (a onda com riscos na linha do braço,
-  `rastro_golpe`, e a meia-lua `rastro_forte` no forte), menos o gancho (sobe) e o martelo
-  (desce), a partir de 35°; o fraco e o rasteiro são sempre retos. Braço ou perna: no chão, pelo
-  apoio (um pé só é chute; os dois afastados, `APOIO` px, é soco); no ar, pela lista
-  `SOCO_NO_AR`. É regra pelo desenho do membro esticado: os poucos quadros entre a guarda e ele
-  não dão para medir o caminho.
-- **Da cor de onde sai**: a cor do rastro é a do membro na ponta (a luva vermelha do Krüger, o
-  tênis azul da Yin-lu, a faixa branca do Brucy), medida em `angulo_golpe.cor_da_ponta` (a cor
-  mais comum em 45 px, sem o contorno; o escuro vira cinza e a pele nua fica branca). As folhas
-  de rastro são gravadas "para pintar" (`efeito_imagem.py --tingivel`, e sempre no
-  `rastro_arco.py`): do azul de ar (`TINTA_BASE`) ao branco do miolo; o `EfeitosVideo.tingir`
-  troca o azul pela cor com uma matriz de cor (o mesmo caminho dos filtros dos lutadores, no
-  OpenGL e no PC).
-- Personagem novo ou arte nova: `python3 tools/sprites/angulo_golpe.py <id> --write`, olhar o
-  quadro do impacto de cada golpe e pôr em `ARTE_COM_EFEITO` ou `MEDIDA_ERRADA` o que não servir.
+- **O motor** (`tools/sprites/linha_de_acao.py`): cada desenho do golpe, da guarda ao membro
+  esticado, passa por um modelo de pose (MediaPipe Pose, o `pose_landmarker_heavy`). O membro que
+  bate é o que tem a ponta na caixa do golpe do desenho e mais andou desde a guarda; a ponta dele
+  é seguida para trás, desenho por desenho (o modelo troca esquerda e direita: vale o lado mais
+  perto), até a primeira virada brusca ou até parar. A ponta vai até a borda do desenho (o bico
+  do tênis, os dedos). Grava `silhueta.caminho` = `{cor, pontos: {quadro: [x, y, jx, jy]}}`: a
+  ponta e a junta de trás (cotovelo, joelho) em cada desenho, e a cor do membro na ponta.
+  Tentativas que não serviram: seguir o pedaço da ponta por semelhança de imagem (pulava para o
+  pé de apoio, o cabelo, a outra mão) e medir só o quadro esticado (não diz de onde veio).
+- **Onde tem**: só golpe normal, sem efeito desenhado na arte (`ARTE_COM_EFEITO`, no
+  `angulo_golpe.py`) e sem caminho errado (`CAMINHO_ERRADO`, conferido no olho). Hoje cerca de
+  95 golpes; os outros ficam sem rastro. `--folha <prefixo>` gera as folhas para conferir.
+- **No jogo** (`RastroDoGolpe`, `EfeitosVideo.fita`): a fita nasce junto com o movimento (a
+  cabeça dela vai para o ponto do desenho que a tela mostra) e some em 5 a 8 quadros. A textura
+  é a fita reta do Codex (`art/vfx/arco_textura_01.png` -> `tools/sprites/rastro_fita.py` ->
+  `assets/efeitos/rastro_fita`), dobrada no caminho em fatias e pintada da cor do membro (matriz
+  de cor, o caminho dos filtros dos lutadores). No **balanço** (o membro atravessado no caminho:
+  a garra, o chute de lado) a fita é larga, do lado do membro; na **estocada** (o membro na
+  direção do caminho: o soco reto, o chute de frente) são dois riscos finos, um de cada lado.
+- **Para rodar o motor**: `pip install mediapipe` (no Linux, `apt-get install libegl1 libgles2`);
+  o modelo é baixado sozinho para `~/.cache/sokon`. Só a ferramenta usa: o build, os testes e a
+  CI leem o que ficou gravado no `character.json`.
+- **Em aberto**: o desenho da fita é a primeira versão (os dois riscos da estocada são simples);
+  cerca de 50 golpes normais ficaram sem linha (o modelo não achou o corpo, ou achou errado);
+  personagem novo: `python3 tools/sprites/linha_de_acao.py <id> --write --folha /tmp/x`, olhar
+  e pôr em `CAMINHO_ERRADO` o que estiver errado.
 
 ## O estilo ainda está em aberto
 

@@ -31,33 +31,31 @@ public class AnguloDoGolpeTest {
         assertTrue(angulo("CROUCH_MEDIUM", 9) < -10f);
     }
 
-    @Test public void rastroSoOndeAArteNaoTemEfeito() {
-        // O chute alto não tem efeito desenhado: a ponta do pé, à frente e acima da cintura, subindo.
-        float[] pe = BASE.animation("HEAVY_STRAIGHT").rastroGolpe[5];
-        assertNotNull(pe);
-        assertTrue(pe[0] > 120f && pe[1] > 150f && pe[2] > 15f);
-        // ... com a perna inteira de raio e o arco de quem subiu até ali.
-        assertTrue(pe[3] > 100f);
-        assertEquals(1f, pe[4], 0f);
-        // O jab é curto e reto: sem arco, só a onda na ponta.
-        assertEquals(0f, BASE.animation("LIGHT_JAB").rastroGolpe[6][4], 0f);
-        // O soco agachado já traz a meia-lua de ar na arte: sem rastro por cima.
-        assertEquals(null, BASE.animation("CROUCH_LIGHT").rastroGolpe);
+    @Test public void linhaDeAcaoDoChuteSaiDoChaoESobeAteOPe() {
+        // O chute forte do Ryūga (tools/sprites/linha_de_acao.py): o pé sai de trás, perto do chão,
+        // e chega à frente, no alto. O rastro segue esse caminho, não um arco inventado.
+        CharacterDefinition.Animation chute = BASE.animation("HEAVY_STRAIGHT");
+        assertNotNull(chute.caminhoGolpe);
+        assertTrue(chute.caminhoOrdem.length >= 4);
+        float[] saida = chute.caminhoGolpe[chute.caminhoOrdem[0]];
+        float[] fim = chute.caminhoGolpe[chute.caminhoOrdem[chute.caminhoOrdem.length - 1]];
+        assertTrue(saida[0] < 0f && saida[1] < 60f);
+        assertTrue(fim[0] > 120f && fim[1] > 180f);
     }
 
-    @Test public void socoRetoNaoTemArcoDeChute() {
-        // O Brucy (p04) é boxeador: o soco médio e o forte são retos (a onda na linha do braço),
-        // não o arco de quem sobe a perna do chão.
-        CharacterDefinition brucy = GeneratedCharacters.get("p04");
-        for (String golpe : new String[] {"MEDIUM_KICK", "HEAVY_STRAIGHT"}) {
-            int com = 0;
-            for (float[] r : brucy.animation(golpe).rastroGolpe) {
-                if (r == null || r[1] < 150f) continue;   // só o braço esticado na altura do ombro
-                assertEquals(golpe, 0f, r[4], 0f);
-                com++;
-            }
-            assertTrue(golpe, com > 0);
-        }
+    @Test public void semLinhaOndeAArteJaTemEfeito() {
+        // O soco agachado já traz a meia-lua de ar na arte: sem rastro por cima.
+        assertEquals(null, BASE.animation("CROUCH_LIGHT").caminhoGolpe);
+    }
+
+    @Test public void socoDoBrucySaiDaGuardaParaAFrente() {
+        // O soco reto: o caminho é quase horizontal, na altura do ombro (não o arco de um chute).
+        CharacterDefinition.Animation soco = GeneratedCharacters.get("p04").animation("MEDIUM_KICK");
+        assertNotNull(soco.caminhoGolpe);
+        float[] saida = soco.caminhoGolpe[soco.caminhoOrdem[0]];
+        float[] fim = soco.caminhoGolpe[soco.caminhoOrdem[soco.caminhoOrdem.length - 1]];
+        assertTrue(fim[0] - saida[0] > 60f);
+        assertTrue(Math.abs(fim[1] - saida[1]) < 60f && fim[1] > 150f);
     }
 
     @Test public void quadroSemMedidaFicaReto() {
