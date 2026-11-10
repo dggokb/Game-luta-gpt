@@ -1,11 +1,12 @@
 # Fluxo profissional de VFX 2D/anime no After Effects (técnicas, plugins, pacotes, licenças)
 
-Pesquisa feita em 10/11/2026. **Aviso de método:** quase tudo aqui foi visto **só pelos resumos da
-busca (WebSearch)**. A leitura direta falhou com ENOTFOUND em `www.actionvfx.com` e
-`realtimevfx.com`. Pelo aviso da tarefa, também estão bloqueados schoolofmotion.com,
-lesterbanks.com, pixflow.net, premiumbeat.com, videocopilot.net e medium.com, então não tentei
-abri-los. Os valores e as cláusulas citados abaixo saíram de trechos de busca e de revendedores, e
-precisam ser conferidos na página oficial antes de comprar ou de usar no jogo.
+Pesquisa feita em 10/11/2026. **Aviso de método:** a ferramenta WebFetch deu ENOTFOUND em todos os
+sites (actionvfx, realtimevfx, schoolofmotion, videocopilot). Quando a rede foi aberta, li algumas
+páginas pelo `curl` do Bash; elas estão marcadas **[lida via curl]**. Tudo o que não tem essa marca
+foi visto **só pelo resumo da busca (WebSearch)**. Pelo curl, deram 403 (bloqueio do site)
+motionarray.com, help.motionarray.com e aescripts.com, e a actionvfx.com deu 429 (limite de
+acessos) nas três tentativas. Os preços e as cláusulas sem a marca precisam ser conferidos na página
+oficial antes de comprar ou de usar no jogo.
 
 Legenda de portabilidade para o EffectCraft (o clone de AE que o projeto usa):
 **[nativo]** = efeito embutido no After Effects, que dá para reproduzir no EffectCraft (pela
@@ -32,23 +33,54 @@ passos centrais usam só efeitos nativos.
   (cerca de 44 min), com Joey Korenman. Ele monta uma explosão de forte inspiração anime aplicando
   princípios de animação e um visual cel-shaded no AE. Vi só a ficha do Class Central, não o vídeo —
   [Class Central](https://classcentral.com/course/youtube-how-to-create-an-anime-explosion-in-after-effects-134171)
-- O artigo do School of Motion "Create a Cartoon Explosion in After Effects" usa Polar Coordinates:
-  "desenrola" a imagem, mexe nela e enrola de volta para o visual polar. O instrutor diz que foi
-  "exatamente assim" que fez a explosão. Visto só pelo trecho da busca —
-  [SoM Polar Coordinates](https://www.schoolofmotion.com/polar-coordinates-is-your-friend);
-  [SoM Cartoon Explosion](https://schoolofmotion.com/blog/cartoon-explosion-after-effects)
+- **School of Motion, "Create a Cartoon Explosion in After Effects" (Joey Korenman, dia 22 do "30
+  Days of After Effects"; a página traz a transcrição) [lida via curl].** O objetivo declarado é
+  imitar "uma explosão estilo anime desenhada à mão, feita toda no After Effects". Foi inspirada no
+  animador tradicional Ryan Woodward. A receita, nas palavras da transcrição:
+  - **12 quadros por segundo** em tudo ("para imitar o visual desenhado à mão"), e não 24/30.
+  - **Comp superdimensionada de 2500×2500** onde ficam todas as camadas, para ter margem de
+    enquadramento e de escala.
+  - **Linhas de explosão = linhas retas animadas só no Y, numa comp com adjustment layer de Polar
+    Coordinates**: o movimento vertical vira radial. Ele anima uma linha (dimensões de posição
+    separadas) e duplica, empurrando só no X.
+  - **A espessura do Stroke diminui** em vez de a opacidade cair ("fica mais fina, mais fina, mais
+    fina, em vez de só sumir").
+  - **Turbulent Displace numa adjustment layer** por cima das formas, para que as camadas abaixo
+    "atravessem" a distorção. Usa Displacement Type **Twist**, valor alto, e anima o offset da
+    turbulência. Num uso pesado o efeito "quase cria um traço extra" na borda.
+  - Cor por efeito **Fill**. Dois "puffs" iguais que só mudam a Complexity e a cor (uma mais clara),
+    com **Simple Choker** para comer a borda.
+  - **Camada "borracha" com modo Silhouette Alpha** e máscaras Alpha Inverted, que abrem buracos
+    na massa da explosão ("este é o segredo").
+  - **Brilho caseiro**: cópia da camada com Hue/Saturation, **Fast Blur** e **Levels** para clarear.
+    Camadas de explosão e de glow separadas, com outro elemento (o logo) **entre** o glow e a
+    explosão.
+  - **Sem Particular**: "eu queria fazer tudo com plugins nativos". Fecha dizendo que algo complexo,
+    "olhado quadro a quadro, é feito de pecinhas simples: linhas, círculos e Turbulent Displace".
+  — [SoM Cartoon Explosion](https://www.schoolofmotion.com/blog/cartoon-explosion-after-effects)
+- **School of Motion, "Using Polar Coordinates in After Effects" [lida via curl]:** o efeito tem só
+  dois controles (Type of Conversion e Interpolation). **Rect to Polar** dobra uma linha num círculo
+  e transforma movimento vertical em radial. **Polar to Rect** "desenrola" algo radial, que então
+  recebe outros efeitos (Venetian Blinds, por exemplo) e é enrolado de volta —
+  [SoM Polar](https://www.schoolofmotion.com/blog/polar-coordinates-after-effects)
 - O School of Motion publica também "Hand Animated Effects in Adobe Animate", com FX desenhados
   quadro a quadro no Animate e não no AE —
   [SoM](https://www.schoolofmotion.com/blog/hand-animated-effects-in-adobe-animate)
-- O artigo "Tricks for Creating a Hand-Drawn Look in After Effects" (School of Motion) usa só
-  ferramentas nativas, sem plugins: Roughen Edges, Gaussian Blur e Posterize Time. Visto pelo trecho
-  da busca — [SoM](https://www.schoolofmotion.com/blog/tricks-for-creating-a-hand-drawn-look-in-after-effects)
+- O artigo "Tricks for Creating a Hand-Drawn Look in After Effects" (School of Motion) promete "sem
+  plugins nem scripts" **[lida via curl]**. Pede **Roughen Edges por camada**, e não numa adjustment
+  layer, para controlar cada peça. O Border vai baixo e o Scattering cai de 100 para 10 até ~3.
+  Textura de pincel = círculo com Roughen Edges de Border alto (400) e escala ~10, com **Gaussian
+  Blur acima** e a camada em Multiply. A cintilação de "desenho" vem de **Fractal Noise** com
+  contraste alto ("dezenas de ilhas pretas num mar branco") em Multiply. O resumo da busca cita
+  ainda Posterize Time —
+  [SoM](https://www.schoolofmotion.com/blog/tricks-for-creating-a-hand-drawn-look-in-after-effects)
 - Ben Marriott distribui de graça no Gumroad o projeto do tutorial "2D Cartoon Smoke + Explosions"
   (vídeo em https://youtu.be/w8mHmW6GgHM) — [Gumroad Ben Marriott](https://benmarriott.gumroad.com/l/aesmoke)
 - Ben Marriott também mostra o visual "desenhado à mão" em que **cada quadro é desenhado**: ele monta
-  a animação base no AE, usa como guia e redesenha por cima, quadro a quadro. Num tutorial de líquido
-  usa Rough Animator (tablet), Photoshop e AE —
-  [Lester Banks, só trecho da busca](https://lesterbanks.com/2019/09/working-with-ae-but-still-drawing-every-frame-by-hand/);
+  a animação base no AE, usa como guia e redesenha por cima, quadro a quadro, e "cada desenho volta
+  para o After Effects para fechar o ciclo". Num tutorial de líquido usa Rough Animator (tablet),
+  Photoshop e AE —
+  [Lester Banks, lida via curl](https://lesterbanks.com/2019/09/working-with-ae-but-still-drawing-every-frame-by-hand/);
   [Gumroad "Hand Drawn Look"](https://benmarriott.gumroad.com/l/uPdeI)
 - Jake In Motion tem o vídeo "Fractal Noise + Turbulent Noise | Effects of After Effects" (2022) e um
   script grátis, o "Fractal Noise Generator", que sorteia texturas de ruído. Não achei tutorial dele
@@ -70,8 +102,9 @@ passos centrais usam só efeitos nativos.
   Stroke e Posterize Time para fazer linha de cartoon animada —
   [Motion Design School](https://motiondesign.school/blog/cartoon-effect-stylization-with-turbulent-displace/);
   [Lester Banks, só trecho da busca](https://lesterbanks.com/?p=29198)
-- **Eletricidade anime com Turbulent Displace:** existe tutorial próprio, "Easily create anime-style
-  electricity using Turbulent Displace". Vi só o título e o trecho —
+- **Eletricidade anime com Turbulent Displace (Matt Jylkka, 2014, antigo) [lida via curl]:** a ideia é
+  usar efeitos nativos para chegar a algo com "visual mais artesanal" sem animar à mão ("às vezes
+  ninguém quer animar fogo ou eletricidade à mão"). A página só resume; os passos estão no vídeo —
   [Lester Banks](https://lesterbanks.com/2014/08/easily-create-anime-style-electricity-using-turbulent-displace-effects/)
 - **Borda dura e quebrada:** um tutorial do Skillshare diz que, com o efeito no máximo, a borda fica
   "dura e quebrada", e junta isso a um efeito de borda áspera que muda a cada quadro por expressão de
@@ -124,12 +157,17 @@ passos centrais usam só efeitos nativos.
   **borda dura com forma que se quebra** (erosão, e não fade de opacidade), **paleta chapada** (sem
   degradê suave) e, no topo da qualidade, **quadros desenhados por cima da guia do AE** (o método de
   Ben Marriott). É o que bate com o critério do dono.
-- O tutorial de anime explosion do School of Motion e o de cartoon explosion são os melhores candidatos
-  a receita completa, mas não consegui ler os passos exatos (site bloqueado).
+- A explosão do School of Motion é a receita profissional mais completa que achei, e toda ela é
+  portável para o EffectCraft: **12 quadros por segundo, linhas e círculos simples, Polar Coordinates,
+  Turbulent Displace (Twist) em adjustment layer, Stroke que afina em vez de sumir, Simple Choker,
+  borracha em Silhouette Alpha que abre buracos, glow feito com cópia, Fast Blur e Levels**. A
+  "borracha" que fura a massa e o traço que afina são justamente o que separa a forma que se quebra
+  do fade de opacidade amador.
 
 ### Gaps
-- Não consegui os passos e parâmetros exatos do vídeo "Anime Explosion" do School of Motion, nem os
-  vídeos do ECAbrams, do Sergei Prokhnevskiy e da Video Copilot sobre anime.
+- A página de transcrição do School of Motion não traz os valores numéricos (amount, size,
+  complexity) do Turbulent Displace nem do Simple Choker; eles estão no arquivo de projeto, que pede
+  cadastro. Também não vi os vídeos do ECAbrams, do Sergei Prokhnevskiy e da Video Copilot sobre anime.
 - Não encontrei tutorial em note.com sobre ヒットエフェクト (efeito de golpe) feito no AE. A busca em
   japonês não trouxe nada útil do note.com.
 - Não encontrei fonte confiável que descreva **Threshold/Levels** depois do Colorama para cel-shading
@@ -151,9 +189,10 @@ cláusula explícita confirmando isso em cada EULA.
 ### Cited Findings
 | Plugin | O que faz | Preço/modelo | Fonte |
 |---|---|---|---|
-| **Video Copilot Saber** | Raios de energia, sabres de luz, lasers, portais, neon, eletricidade, névoa | **Grátis** | [toolfarm](https://www.toolfarm.com/?p=16183); [CaptionX, out/2026](https://caption-x.com/blog/after-effects-plugins); [ProVideo Coalition](https://www.provideocoalition.com/saber-new-free-effects-plug-video-copilot/) |
-| **Video Copilot Optical Flares** | Reflexos de lente | US$ 124,95 (perpétua) | [CaptionX, out/2026](https://caption-x.com/blog/after-effects-plugins) |
-| **Video Copilot Element 3D** | Modelos 3D dentro do AE | "Pago". O número antigo, US$ 199, pode estar desatualizado | [CaptionX](https://caption-x.com/blog/after-effects-plugins); [PremiumBeat (antigo)](https://www.premiumbeat.com/blog/5-alternatives-to-popular-video-editing-motion-design-plugins) |
+| **Video Copilot Saber** | Raios de energia, sabres de luz, lasers, portais, neon, eletricidade, névoa | **Grátis** ("100% Free", post da Video Copilot de 2016) | [Video Copilot, lida via curl](https://www.videocopilot.net/blog/2016/03/new-plug-in-saber-now-available-100-free/); [toolfarm](https://www.toolfarm.com/?p=16183) |
+| **Video Copilot Optical Flares** | Reflexos de lente | US$ 124,95 (perpétua); com Pro Presets, US$ 139,95 ou US$ 165 | [Video Copilot, lida via curl](https://www.videocopilot.net/products/opticalflares/) |
+| **Video Copilot Element 3D V2.2** | Modelos 3D e partículas de objeto dentro do AE | US$ 199,95 (bundles de US$ 249,95 a US$ 349,95). Licença única: uma estação mais um laptop | [Video Copilot, lida via curl](https://www.videocopilot.net/products/element2/) |
+| **Video Copilot Shockwave / Riot Gear** (stock, não plugin) | 50 shockwaves de partícula pré-renderizadas (1080p, 24 fps, "PreMatted") / 155 elementos de tinta, tinta nanquim e grunge "royalty free", 90% filmados | US$ 65 / US$ 49 | [Shockwave, lida via curl](https://www.videocopilot.net/products/shockwave/); [Riot Gear, lida via curl](https://www.videocopilot.net/products/riotgear/) |
 | **Deep Glow (Plugin Everything)** | Glow fisicamente mais correto que o nativo | V1 US$ 49,95; o V2 subiu para US$ 99,95 (preços conflitantes nos trechos, com valores de US$ 25/35 que parecem antigos). Há licenças só de render e flutuantes | [aescripts](https://aescripts.com/deep-glow/?aff=50); [fórum aescripts](https://aescripts.com/forums/discussion/1849/deep-glow/p3) |
 | **Maxon Red Giant** (Trapcode Particular/Form/Shine/Starglow, Universe) | Partículas 3D, raios de luz, brilho em estrela, pacote de efeitos estilizados | **Só assinatura** (a perpétua do Trapcode Suite acabou). Red Giant Complete ~US$ 1.299/ano (Capterra); Maxon One ~US$ 2.405/ano em revendedor australiano. Trial de 14 dias | [Digital Production, set/2025](https://digitalproduction.com/2025/09/17/maxon-drops-red-giant-2026-0/); [Capterra](https://www.capterra.com/p/210623/Trapcode-Suite/); [Videocraft](https://videocraft.com.au/products/maxon-one-annual-subscription); [Maxon](https://maxon.net/en/red-giant) |
 | **Boris FX Sapphire 2026** | Grande biblioteca de efeitos (glows, raios, distorções, transições) | US$ 545/ano ou US$ 80/mês; Boris FX Suite US$ 1.295/ano (revendedor); trial gratuito | [Motion Media](https://www.motionmedia.com/sapphire-avid-annual-subscription/); [Boris FX](https://borisfx.com/news/sapphire-2026-an-ode-to-physical-media/) |
