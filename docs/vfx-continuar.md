@@ -93,6 +93,16 @@ abre e continua crescendo enquanto some). A folha passa de 4096 px em fileiras.
 
 Ficou para o usuário conferir: o tamanho e o brilho no celular (a gravação é o desenho do PC).
 
+## Próximo: VFX próprio de cada personagem (10/11)
+
+O usuário testou: os efeitos que estão no jogo "funcionam, mas são modestos e iguais para todos; o
+certo é termos personalizados para cada um", e os que já existem são para arrancar e trocar pelos
+nossos. As referências dele são inspiração, não para copiar. A base é o levantamento dos tipos de
+VFX do Tōkon, com a proposta do kit de cada personagem (rastro, faísca, energia, antecipação e
+tinta no alvo): [efeitos-referencia-tokon.md](efeitos-referencia-tokon.md). A tabela de formas de
+rastro por lutador é palpite para ele corrigir. Falta no motor: uma textura e uma forma de rastro
+por personagem (hoje é uma só) e o rastro em vários riscos.
+
 ## Rastro do golpe: a linha de ação (10/11)
 
 Pedido do usuário, depois de duas tentativas erradas (uma onda de ar na ponta; um arco escolhido
