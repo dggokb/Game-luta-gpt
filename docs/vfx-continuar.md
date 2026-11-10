@@ -141,8 +141,8 @@ construir um motor que detecta o movimento e cria a sua linha de ação."
 - **Onde tem**: só golpe normal, sem efeito desenhado na arte (`ARTE_COM_EFEITO`, no
   `angulo_golpe.py`) e sem caminho errado (`CAMINHO_ERRADO`, conferido no olho). Hoje cerca de
   95 golpes; os outros ficam sem rastro. `--folha <prefixo>` gera as folhas para conferir.
-- **No jogo** (`RastroDoGolpe`, `EfeitosVideo.fita`): a fita nasce junto com o movimento (a
-  cabeça dela vai para o ponto do desenho que a tela mostra) e some em 8 a 13 quadros. A textura
+- **No jogo** (`RastroDoGolpe`, `EfeitosVideo.fita`): a fita nasce no começo do caminho, cresce
+  e se apaga pelo fundo (ver "Procedural" abaixo). A textura
   é uma fita reta do Codex (`art/vfx/arco_textura_03.png` -> `tools/sprites/rastro_fita.py` ->
   `assets/efeitos/rastro_fita`), dobrada no caminho em fatias e pintada da cor do membro (matriz
   de cor, o caminho dos filtros dos lutadores). No **balanço** (o membro atravessado no caminho:
@@ -159,6 +159,13 @@ construir um motor que detecta o movimento e cria a sua linha de ação."
   duas pontas e sem corte reto. O rastro passa de 26 a 56 px da ponta do membro, que é onde as
   pontas soltas aparecem; na estocada é um feixe só, com o caminho no meio (antes, duas faixas
   iguais, uma de cada lado, que pareciam trilho); e a textura anda pelo comprimento do caminho.
+- **Procedural** (correção do usuário: "ele monta e demonstra o risco; tem de ser procedural:
+  iniciou, foi indo e depois vai apagando o fundo"): a fita não aparece montada. A ponta da
+  frente sai do começo do caminho e anda por ele de forma contínua, por quadro de jogo (a tela
+  mostra os desenhos aos saltos; a fita não), em 3 a 9 quadros, chegando ao fim um quadro depois
+  de a ponta do membro ter andado 85% do caminho. A ponta de trás vem atrás com 5, 7 ou 9
+  quadros de diferença (fraco, médio, forte) e apaga o fundo até a fita sumir. Antes, cada trecho
+  aparecia quando o desenho dele entrava na tela e a fita inteira desbotava de uma vez.
 - **Para rodar o motor**: `pip install mediapipe` (no Linux, `apt-get install libegl1 libgles2`);
   o modelo é baixado sozinho para `~/.cache/sokon`. Só a ferramenta usa: o build, os testes e a
   CI leem o que ficou gravado no `character.json`.
