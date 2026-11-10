@@ -583,14 +583,14 @@ def validate_silhueta(key, a):
     """Caixas por quadro da folha: corpo = lista de [x0, x1, y0, y1], golpe = [x0, x1, y0, y1] (o
     membro na diagonal em duas caixas: a de perto do corpo e a da ponta, 8 números em sequência);
     angulo (opcional) = graus inteiros do membro que bate, por quadro; rastro (opcional) = [x, y,
-    graus] da ponta do golpe, por quadro (os dois do tools/sprites/angulo_golpe.py)."""
+    graus, raio, sentido] da ponta do golpe, por quadro (os dois do tools/sprites/angulo_golpe.py)."""
     sil = a['silhueta']
     if not isinstance(sil, dict) or not {'corpo', 'golpe'} <= set(sil) <= {'corpo', 'golpe', 'angulo', 'rastro'}:
         raise ValueError(f'{key}.silhueta: {{corpo, golpe}} (e angulo, rastro)')
     for quadro, ponta in sil.get('rastro', {}).items():
-        if (not quadro.isdigit() or int(quadro) not in a['frames'] or not isinstance(ponta, list) or len(ponta) != 3
-                or any(type(v) is not int for v in ponta) or not -90 <= ponta[2] <= 90):
-            raise ValueError(f'{key}.silhueta.rastro.{quadro}: [x, y, graus] inteiros num quadro da animação')
+        if (not quadro.isdigit() or int(quadro) not in a['frames'] or not isinstance(ponta, list) or len(ponta) != 5
+                or any(type(v) is not int for v in ponta) or not -90 <= ponta[2] <= 90 or ponta[3] <= 0 or ponta[4] not in (-1, 0, 1)):
+            raise ValueError(f'{key}.silhueta.rastro.{quadro}: [x, y, graus, raio, sentido] inteiros num quadro da animação')
     for quadro, graus in sil.get('angulo', {}).items():
         if not quadro.isdigit() or int(quadro) not in a['frames'] or type(graus) is not int or not -90 <= graus <= 90:
             raise ValueError(f'{key}.silhueta.angulo.{quadro}: graus inteiros de -90 a 90 num quadro da animação')

@@ -36,6 +36,11 @@ public class AnguloDoGolpeTest {
         float[] pe = BASE.animation("HEAVY_STRAIGHT").rastroGolpe[5];
         assertNotNull(pe);
         assertTrue(pe[0] > 120f && pe[1] > 150f && pe[2] > 15f);
+        // ... com a perna inteira de raio e o arco de quem subiu até ali.
+        assertTrue(pe[3] > 100f);
+        assertEquals(1f, pe[4], 0f);
+        // O jab é curto e reto: sem arco, só a onda na ponta.
+        assertEquals(0f, BASE.animation("LIGHT_JAB").rastroGolpe[6][4], 0f);
         // O soco agachado já traz a meia-lua de ar na arte: sem rastro por cima.
         assertEquals(null, BASE.animation("CROUCH_LIGHT").rastroGolpe);
     }

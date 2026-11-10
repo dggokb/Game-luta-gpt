@@ -5665,11 +5665,11 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * O rastro de ar do golpe normal: uma onda de ar na ponta do braço ou da perna, no quadro mais
-     * esticado da janela ativa, apontando para onde o membro aponta. É o mesmo efeito que a arte do
-     * Ryūga já traz desenhado em vários golpes (a meia-lua na frente do punho): só entra nos golpes
-     * sem ele ({@link CombatEngine#rastroNoDesenho}). Curto e colado na ponta, para não esticar o
-     * alcance que o olho lê (docs/revisao-base/direcao.md pedia golpe sem linhas de velocidade).
+     * O rastro do golpe normal, quando o membro estica: o arco de ar que acompanha o balanço do
+     * braço ou da perna (médio e forte) ou, no golpe reto e curto (o fraco, a rasteira), uma onda
+     * de ar na ponta. Só entra nos golpes em que a arte não traz um efeito desenhado
+     * ({@link CombatEngine#rastroNoDesenho}); o arco fica atrás da ponta, por onde o membro passou,
+     * e não estica o alcance que o olho lê (docs/revisao-base/direcao.md).
      */
     private void rastroDoGolpe(int i, CombatFighter f, float x) {
         if (!f.attacking() || f.attack == null || f.attack.hitboxCount() == 0) {
@@ -5708,13 +5708,27 @@ public class GameView extends SurfaceView
         if (f.attackFrame < quando) return;
         rastroFeito[i] = true;
         AttackDefinition.Strength forca = f.attack.strength;
-        boolean forte = forca == AttackDefinition.Strength.HEAVY && efeitos.tem("rastro_forte");
-        float escala = forte ? 1f : forca == AttackDefinition.Strength.LIGHT ? 0.75f : 1f;
+        boolean forte = forca == AttackDefinition.Strength.HEAVY;
         // Curto: some junto com o membro que recolhe.
         int quadros = Math.max(6, Math.min(10, fim - f.attackFrame + 4));
-        rastroNome[i] = forte ? "rastro_forte" : "rastro_golpe";
-        rastroPonta[i] = ponta;
-        rastroVaga[i] = efeitos.tocarDurando(rastroNome[i], x + f.facing * ponta[0], f.y - ponta[1],
+        float escala;
+        if (ponta[4] != 0f) {
+            // O arco do balanço: um arco de círculo com o centro na raiz do membro (o quadril, o
+            // ombro) e a ponta nova na ponta dele, do lado de onde ele veio (subiu ou desceu).
+            rastroNome[i] = (forte ? "rastro_arco_forte" : "rastro_arco") + (ponta[4] < 0f ? "_desce" : "");
+            double g = Math.toRadians(ponta[2]);
+            rastroPonta[i][0] = ponta[0] - ponta[3] * (float) Math.cos(g);
+            rastroPonta[i][1] = ponta[1] - ponta[3] * (float) Math.sin(g);
+            escala = ponta[3] / RASTRO_RAIO;
+        } else {
+            // O golpe reto (o jab, a rasteira): a onda de ar na ponta.
+            forte &= efeitos.tem("rastro_forte");
+            rastroNome[i] = forte ? "rastro_forte" : "rastro_golpe";
+            rastroPonta[i][0] = ponta[0];
+            rastroPonta[i][1] = ponta[1];
+            escala = forte ? 1f : forca == AttackDefinition.Strength.LIGHT ? 0.75f : 1f;
+        }
+        rastroVaga[i] = efeitos.tocarDurando(rastroNome[i], x + f.facing * rastroPonta[i][0], f.y - rastroPonta[i][1],
             escala, f.facing < 0, quadros * FIXED_STEP * 1000f, ponta[2]);
     }
 
@@ -5735,7 +5749,10 @@ public class GameView extends SurfaceView
     private static final float RASTRO_QUASE = 12f;
     private final int[] rastroVaga = {-1, -1};
     private final String[] rastroNome = {"", ""};
-    private final float[][] rastroPonta = new float[2][];
+    /** Onde o rastro fica em relação a quem bate (px à frente da raiz, acima do chão). */
+    private final float[][] rastroPonta = new float[2][2];
+    /** O comprimento de membro para o qual a folha do arco é desenhada (tools/sprites/rastro_arco.py). */
+    private static final float RASTRO_RAIO = 128f;
 
     /**
      * O dragão do Ultra SHINKAI sai do punho de quem acabou de entrar na fase do dragão: o efeito

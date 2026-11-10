@@ -3419,9 +3419,10 @@ final class CombatEngine {
     }
 
     /**
-     * A ponta do golpe de {@code f} no quadro {@code frame} ({x, y, graus}: à frente da raiz, acima
-     * do chão, para onde o membro aponta), ou null: golpe sem a medida ou com o efeito já desenhado
-     * na arte (tools/sprites/angulo_golpe.py). É onde a tela toca o rastro de ar.
+     * A ponta do golpe de {@code f} no quadro {@code frame} ({x, y, graus, raio, sentido}: à frente
+     * da raiz, acima do chão, para onde o membro aponta, o comprimento dele e de onde veio), ou
+     * null: golpe sem a medida ou com o efeito já desenhado na arte (tools/sprites/angulo_golpe.py).
+     * É com isso que a tela toca o arco do golpe.
      */
     static float[] rastroNoDesenho(CombatFighter f, int frame) {
         CharacterDefinition.Animation a = desenhoDoGolpe(f);

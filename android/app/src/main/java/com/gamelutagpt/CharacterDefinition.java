@@ -86,9 +86,10 @@ final class CharacterDefinition {
          */
         float[] anguloGolpe;
         /**
-         * A ponta do golpe, por quadro da folha ({x, y, graus}: px à frente da raiz e acima do chão, e
-         * para onde o membro aponta), nos golpes normais em que a arte não traz um efeito desenhado:
-         * é onde toca o rastro de ar quando a janela ativa abre. Null sem medida (no golpe ou no quadro).
+         * A ponta do golpe, por quadro da folha ({x, y, graus, raio, sentido}: px à frente da raiz e
+         * acima do chão, para onde o membro aponta, o comprimento dele e de onde veio: +1 subiu, -1
+         * desceu, 0 golpe reto), nos golpes normais em que a arte não traz um efeito desenhado: é com
+         * isso que toca o arco do golpe quando o membro estica. Null sem medida (no golpe ou no quadro).
          */
         float[][] rastroGolpe;
         /** Onde começa o quadro {@code index} da animação (s); o fim dela além do último. */
@@ -112,7 +113,7 @@ final class CharacterDefinition {
         Animation withSilhueta(String corpo,String golpe,String angulo,String rastro) {
             withSilhueta(corpo,golpe,angulo);
             rastroGolpe=quadros(rastro);
-            for(float[] r:rastroGolpe)if(r!=null&&r.length!=3)throw new IllegalArgumentException(id+": rastro {x,y,graus}");
+            for(float[] r:rastroGolpe)if(r!=null&&r.length!=5)throw new IllegalArgumentException(id+": rastro {x,y,graus,raio,sentido}");
             return this;
         }
         /**

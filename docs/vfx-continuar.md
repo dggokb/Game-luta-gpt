@@ -118,6 +118,17 @@ virada para onde o membro aponta. É o mesmo desenho que a arte do Ryūga (playe
 - A regra antiga (direcao.md: golpe sem linhas de velocidade, para não atrapalhar a leitura da
   distância) foi respeitada no que dá: o rastro é curto e colado na ponta, não uma linha atrás
   do membro. Se atrapalhar no jogo, é tirar as duas pastas de `assets/efeitos`.
+- **O arco do balanço** (o que o usuário queria: a onda na ponta não era o pedido). No médio e
+  no forte o rastro é um arco de ar por onde o membro passou, como nas referências. A textura é
+  uma fita reta gerada no Codex (`art/vfx/arco_textura_01.png`); o
+  `tools/sprites/rastro_arco.py` curva ela num arco de círculo e anima (a ponta nova varre o arco
+  em dois quadros e a fita se desfaz pela ponta velha). Folhas: `rastro_arco` (95°),
+  `rastro_arco_forte` (`--abertura 130 --grossura 0.36`) e as duas `_desce` (`--desce`). O
+  `silhueta.rastro` ganhou o comprimento do membro (o raio) e o sentido (+1 subiu, -1 desceu,
+  0 reto); o jogo põe o centro do arco na raiz do membro, escala pelo raio e gira na inclinação.
+  O sentido é uma regra, não uma medida: o golpe inclinado para baixo desceu, os outros subiram
+  (o desenho tem poucos quadros entre a guarda e o membro esticado para medir o caminho). O
+  fraco e o rasteiro continuam com a onda na ponta.
 - Personagem novo ou arte nova: `python3 tools/sprites/angulo_golpe.py <id> --write`, olhar o
   quadro do impacto de cada golpe e pôr em `ARTE_COM_EFEITO` ou `MEDIDA_ERRADA` o que não servir.
 

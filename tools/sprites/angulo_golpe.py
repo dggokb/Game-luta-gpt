@@ -158,7 +158,9 @@ def direcao_conferida(pack, a, q, nome, lancador, cintura):
     desvio = abs((outra[2] - g + 180) % 360 - 180)
     if desvio > CONFERE_GRAUS or math.hypot(outra[0] - x, outra[1] - y) > CONFERE_PONTA:
         return None
-    return x, y, g
+    # O comprimento do membro: o quanto ele se estende na própria linha, da frente do corpo à ponta.
+    ao_longo = dx * math.cos(math.radians(g)) + h * math.sin(math.radians(g))
+    return x, y, g, float(np.percentile(ao_longo, 99) - np.percentile(ao_longo, 1))
 
 
 def medir(pack):
@@ -213,9 +215,11 @@ RASTRO_GIRO = 80        # graus: o rastro acompanha o membro quase em pé (a fa�
 
 
 def rastros(pack):
-    """{animação: {quadro: [x, y, graus]}}: onde a ponta do golpe está e para onde aponta, nos
-    golpes normais em que a arte NÃO traz um efeito desenhado. É ali que o jogo toca o rastro de
-    ar (`rastro_golpe`) quando a janela ativa abre. Especiais e Super têm os efeitos deles.
+    """{animação: {quadro: [x, y, graus, raio, sentido]}}: onde a ponta do golpe está, para onde
+    aponta, o comprimento do membro e de onde ele veio, nos golpes normais em que a arte NÃO traz
+    um efeito desenhado. É com isso que o jogo toca o rastro quando o membro estica: o arco do
+    balanço (`rastro_arco`: sentido +1, o membro subiu até ali; -1, desceu) ou, no golpe reto
+    (sentido 0), a onda de ar na ponta (`rastro_golpe`). Especiais e Super têm os efeitos deles.
 
     Fica sem rastro o que está em ARTE_COM_EFEITO e, por segurança, o golpe com muitos pixels meio
     transparentes a mais perto do quadro do impacto (um antes, três depois) do que no primeiro
@@ -241,7 +245,7 @@ def rastros(pack):
             i = ordem.index(max(medidos, key=lambda q: max(golpe[str(q)][1::4])))
         perto = ordem[max(0, i - 1):i + 4]
         base = semitransparente(pack, a, ordem[0])
-        pontas, tem_efeito = {}, False
+        pontas, tem_efeito, antes = {}, False, []
         for q in ordem:
             if str(q) not in golpe:
                 continue
@@ -253,10 +257,39 @@ def rastros(pack):
                 break
             d = direcao_conferida(pack, a, q, nome, lancador, cintura)
             if d:
-                pontas[str(q)] = [int(round(d[0])), int(round(d[1])), int(round(max(-RASTRO_GIRO, min(RASTRO_GIRO, d[2]))))]
+                g = max(-RASTRO_GIRO, min(RASTRO_GIRO, d[2]))
+                raio = max(RAIO_MIN, min(RAIO_MAX, d[3]))
+                pontas[str(q)] = [int(round(d[0])), int(round(d[1])), int(round(g)), int(round(raio)),
+                                  0 if golpe_id in FRACOS else sentido(antes, d[1], g, d[3], cintura * 2)]
+                antes.append((g, d[3]))
         if not tem_efeito and pontas:
             saida[nome] = pontas
     return saida
+
+
+RAIO_MIN, RAIO_MAX = 70, 240   # px do mundo: o comprimento de membro que o arco aceita
+BALANCO = 12                   # graus: inclinado para baixo mais que isto, o membro desceu
+VIRADA = 20                    # graus: o membro mudou de inclinação desde um quadro anterior
+JA_FORA = 0.6                  # ... em que ele já estava com esta fração do comprimento para fora
+BAIXO = 0.35                   # da altura em pé: abaixo disto o golpe é rasteiro (o arco entraria no chão)
+
+
+FRACOS = {'L', '2L', 'jL'}      # o golpe fraco é curto e reto: fica com a onda de ar na ponta
+
+
+def sentido(antes, y, graus, comprimento, altura):
+    """De onde o membro veio até a inclinação {@code graus}: +1 subiu, -1 desceu, 0 golpe reto.
+
+    Vale o quadro medido anterior mais próximo ({@code antes}: (graus, comprimento) na ordem da
+    animação) em que o membro já estava para fora e com outra inclinação. Sem ele: o golpe
+    inclinado para baixo desceu e os outros subiram (o chute na horizontal saiu do chão). O golpe
+    rasteiro fica reto: o arco de quem desce até o chão viraria um pisão."""
+    if y < altura * BAIXO:
+        return 0
+    for g, c in reversed(antes):
+        if c >= comprimento * JA_FORA and abs(graus - g) >= VIRADA:
+            return 1 if graus > g else -1
+    return -1 if graus <= -BALANCO else 1
 
 
 def gravar(pack, medidos=None):
