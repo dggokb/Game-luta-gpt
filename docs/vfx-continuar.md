@@ -177,6 +177,16 @@ fundo escuro parecia mancha preta). Vídeo:
 `android/app/build/sprite-review/acerto_forte_atual_x_pressao_de_ar.mp4` (nesta gravação a
 câmera do jogo ficou um pouco mais perto que na de hoje; o acerto é no mesmo quadro).
 
+**Miolo sem contorno à direita e faíscas das pontas (pedidos seguintes):**
+- A estrela virou duas camadas: a borda (vermelho-escuro, laranja e amarelo) com uma máscara em
+  modo Subtract recortando o lado direito perto do miolo, e o miolo (amarelo-claro e branco)
+  inteiro por cima. O miolo branco escorre direto para os jatos, como na referência. Vídeo com
+  zoom: `android/app/build/sprite-review/acerto_forte_miolo_sem_contorno.mp4`.
+- Faíscas saindo das pontas da estrela (entendido como as pontas dos espinhos; se era a cauda
+  dos jatos, é trocar a origem): 2 ou 3 por espinho grande e 1 por pequeno, finas, na direção do
+  espinho, rápidas e freando, encolhem e apagam até o desenho 7 ou 8 (`particulas_das_pontas`).
+  Vídeo: `android/app/build/sprite-review/acerto_forte_faiscas_das_pontas.mp4`.
+
 Ficou parecido na forma, no tempo e na direção; ficou diferente no traço: a de hoje tem borda
 serrilhada e textura de desenho à mão, mais laranja e brasas mais acesas; a refeita é mais
 limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, o primeiro grupo

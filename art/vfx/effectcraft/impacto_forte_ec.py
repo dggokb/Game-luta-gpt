@@ -192,6 +192,42 @@ def anel_de_ar(nome, frente):
     return s
 
 
+def particulas_das_pontas(contorno):
+    sorte = random.Random(11)
+    s = camada_forma('faiscas_pontas')
+    n = 0
+    pontas = contorno[0::2]                 # o contorno alterna ponta e vale
+    for px, py in pontas:
+        comp_espinho = math.hypot(px, py)
+        ang0 = math.degrees(math.atan2(py, px))
+        quantas = 3 if comp_espinho > 120 else 2 if comp_espinho > 80 else 1
+        for _ in range(quantas):
+            ang = ang0 + sorte.uniform(-9, 9)
+            a = math.radians(ang)
+            ux, uy = math.cos(a), math.sin(a)
+            nasce = sorte.choice([0, 0, 1])
+            v = sorte.uniform(20, 34) * (1.15 if comp_espinho > 120 else 1.0)
+            comp = sorte.uniform(20, 36)
+            inicio = comp_espinho * sorte.uniform(0.85, 1.0)
+            n += 1
+            s += grupo('faiscas_pontas', n, losango(comp, max(3.4, comp / 6), ang, atras=comp * 0.6),
+                       '#ffe27a', pos=(inicio * ux, inicio * uy))
+            pos, opac, esc = [], [], []
+            for q in range(QUADROS):
+                k = max(0, q - nasce)
+                d = inicio + v * (1 - 0.72 ** k) / 0.28
+                pos.append([d * ux, d * uy])
+                fim = 6 + nasce + sorte.choice([0, 1])
+                opac.append(0 if q < nasce else 100 if q < fim - 1 else 55 if q < fim else 0)
+                e = max(25, 100 - 13 * k)
+                esc.append([e, e])
+            s += chaves('faiscas_pontas', f'@g{n}/transform/position', pos)
+            s += chaves('faiscas_pontas', f'@g{n}/transform/opacity', opac)
+            s += chaves('faiscas_pontas', f'@g{n}/transform/scale', esc)
+    s += halo('faiscas_pontas', 10, 1.4)
+    return s
+
+
 def passos():
     sorte = random.Random(7)
     s = [{'command': 'comp.new', 'params': {'name': 'impacto_forte_ec', 'width': LARGO, 'height': ALTO,
@@ -260,14 +296,29 @@ def passos():
                                               (100, 92, 80, 64, 46, 30, 16, 6, 0)])
     s += halo('jatos', 30, 1.2)
 
-    # Estrela: o mesmo contorno em faixas, encolhendo até sumir no desenho 8.
+    # Estrela: o mesmo contorno em faixas, encolhendo até sumir no desenho 8. Em duas camadas: a
+    # borda (vermelho-escuro, laranja e amarelo) sem o lado direito perto do miolo, para o miolo
+    # escorrer direto para os jatos (pedido de 10/11: "tirar o contorno da direita da estrela na
+    # parte do miolo"), e o miolo (amarelo-claro e branco) inteiro por cima. A máscara conta a
+    # partir do centro do desenho e gira junto com a estrela.
     contorno = estrela(sorte)
-    s += camada_forma('estrela')
-    for i, (cor, k) in enumerate(reversed(FAIXAS)):
-        s += grupo('estrela', i + 1, contorno, cor, escala=100 * k)
-    s += chaves('estrela', 'transform/scale', [[v, v, 100] for v in (100, 97, 88, 72, 55, 40, 26, 13, 0)])
-    s += chaves('estrela', 'transform/rotation', [0, 3, 6, 9, 12, 15, 18, 21, 24])
-    s += halo('estrela', 45, 1.4)
+    for nome, faixas in (('estrela', FAIXAS[:3]), ('estrela_miolo', FAIXAS[3:])):
+        s += camada_forma(nome)
+        for i, (cor, k) in enumerate(reversed(faixas)):
+            s += grupo(nome, i + 1, contorno, cor, escala=100 * k)
+        s += chaves(nome, 'transform/scale', [[v, v, 100] for v in (100, 97, 88, 72, 55, 40, 26, 13, 0)])
+        s += chaves(nome, 'transform/rotation', [0, 3, 6, 9, 12, 15, 18, 21, 24])
+        if nome == 'estrela':
+            s += [{'command': 'layer.addMask', 'params': {'layer': nome, 'shape': 'rect', 'rect': [-LARGO, -ALTO, 2 * LARGO, 2 * ALTO]}},
+                  {'command': 'layer.addMask', 'params': {'layer': nome, 'shape': 'rect', 'rect': [14, -48, 170, 96]}},
+                  {'command': 'layer.mask.mode', 'params': {'layer': nome, 'mask': 2, 'mode': 'Subtract'}},
+                  {'command': 'layer.mask.set', 'params': {'layer': nome, 'mask': 2, 'field': 'feather', 'value': 16}}]
+            s += halo(nome, 45, 1.4)
+
+    # Faíscas saindo das pontas da estrela (pedido de 10/11: "mais partícula saindo do final da
+    # estrela"): de cada ponta saem faíscas finas na direção do espinho, rápidas e freando
+    # (Ogawa), que encolhem e apagam. Duas ou três por espinho grande, uma por espinho pequeno.
+    s += particulas_das_pontas(contorno)
 
     # Núcleo: luz branca macia no miolo.
     s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': 'nucleo', 'size': [44, 40], 'fill': '#ffffff'}},
