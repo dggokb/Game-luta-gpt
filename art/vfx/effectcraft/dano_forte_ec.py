@@ -37,16 +37,10 @@ MIOLO = (427.0, 383.0)              # o miolo branco do vídeo (o contato da fol
 FPS = 12                                  # um desenho por quadro da composição
 # Quadro do vídeo mostrado em cada desenho: o impacto (0) segurado por dois desenhos, depois o
 # vídeo de dois em dois e, no fim, mais espaçado (a cauda de brasas).
-DESENHOS = [0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-# Escala por desenho, a partir do contato (pedido de 10/11, vendo o Tōkon: "o nosso está diminuindo
-# no final; lá ele se expande dissipando em partículas"). O vídeo encolhe sozinho; a escala o abre.
-ESCALA = [100, 100, 100, 104, 110, 118, 128, 140, 154, 170, 186, 202]
+DESENHOS = [0, 0, 2, 4, 6, 8, 10, 12, 14, 17, 20, 24]
 # Erosão por desenho (brilho do ruído com contraste 400: de 250 para cima não come nada; quanto
 # menor, maiores os buracos).
-EROSAO = [420, 420, 420, 330, 250, 175, 105, 45, -15, -70, -120, -170]
-# Grão esticado na direção do golpe: a erosão quebra a faísca em lascas compridas (não confete)
-# que se espalham com a escala, como no Tōkon.
-EROSAO_GRAO = (70, 16)               # largura e altura do ruído, em %
+EROSAO = [300, 300, 300, 300, 260, 210, 160, 115, 75, 35, -5, -50]
 # Faixas por intensidade (0 a 1), medidas no vídeo: o halo macio vai até ~0,31 e o desenho
 # (jatos, espinhos) fica de 0,4 para cima. Abaixo de 0,36 vira preto (transparente: o Glow refaz
 # um halo limpo); depois, do laranja-avermelhado da borda ao branco do núcleo. Sem interpolar =
@@ -96,22 +90,57 @@ def passos(anel=False):
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#3/colorB', 'value': '#c2280c'}},
         # Erosão de borda dura no fim (o ruído fica parado: os buracos só crescem).
         {'command': 'effect.apply', 'params': {'effect': 'Fractal Noise', 'layers': ['dano']}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/contrast', 'value': 500}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/contrast', 'value': 400}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/overflow', 'value': 0}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/uniformScaling', 'value': False}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/scaleWidth', 'value': EROSAO_GRAO[0]}},
-        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/scaleHeight', 'value': EROSAO_GRAO[1]}},
+        {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/transform/scale', 'value': 70}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/complexity', 'value': 3}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/evolutionOptions/seed', 'value': 9}},
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/blendingMode', 'value': 19}},
     ]
     s += chaves('dano', 'effects/#4/brightness', EROSAO)
-    s += chaves('dano', 'transform/scale', [[e, e, 100] for e in ESCALA])
     if anel:
         # A faísca vira um plano 3D em z = 0 (sem câmera, o 3D enquadra igual ao 2D) e o anel a
         # atravessa: a metade da frente passa por cima dela e a de trás por baixo, sozinhas.
         s += [{'command': 'layer.setSwitch', 'params': {'layers': ['dano'], 'switch': 'threeD', 'value': True}}]
         s += anel_de_ar((MIOLO[0], MIOLO[1] + folga))
+        s += fagulhas((MIOLO[0], MIOLO[1] + folga))
+    return s
+
+
+# A dissipação (pedido de 10/11, vendo o Tōkon: "lá ele se expande dissipando em partículas"):
+# enquanto a faísca do vídeo se apaga, ela solta um estouro de fagulhas que se abre para fora.
+# Técnica de faísca de impacto (Ogawa: partículas esticadas em fio, rápidas e freando): Particle
+# Emitter 2D com partículas tipo linha (já nascem esticadas na direção em que voam), sem gravidade,
+# com resistência, do amarelo-claro ao laranja, em modo Add, e Glow A/B por cima. A área que emite
+# é a do corpo da faísca, deslocada para o lado do golpe; o estouro vai para todos os lados (como na
+# referência do Tōkon). Mistura normal, não Add: em Add as fagulhas somavam numa bola branca.
+FAGULHAS_INICIO, FAGULHAS_FIM = 3, 6          # desenhos em que o emissor solta (o resto só voa)
+
+
+def fagulhas(centro):
+    n = 'fagulhas'
+    P = 'effects/#1/'
+
+    def ps(k, v):
+        return {'command': 'prop.set', 'params': {'layer': n, 'path': P + k, 'value': v}}
+    s = [{'command': 'layer.newSolid', 'params': {'name': n, 'color': '#000000', 'width': LARGO, 'height': ALTO + 2 * FOLGA_ANEL}},
+         {'command': 'effect.apply', 'params': {'effect': 'Particle Emitter 2D', 'layers': [n]}},
+         ps('producer/position', [centro[0] + 90, centro[1]]), ps('producer/radiusX', 110), ps('producer/radiusY', 30),
+         ps('physics/animation', 0), ps('physics/velocity', 6), ps('physics/gravity', 0), ps('physics/resistance', 1.5),
+         ps('particle/particleType', 0), ps('particle/birthSize', 3.0), ps('particle/deathSize', 0.8),
+         ps('particle/birthColor', '#fff2a8'), ps('particle/deathColor', '#ff5a10'), ps('particle/maxOpacity', 90),
+         ps('particle/transferMode', 0), ps('longevity', 0.45), ps('randomSeed', 3)]
+    taxa = [0] * FAGULHAS_INICIO + [12] * (FAGULHAS_FIM - FAGULHAS_INICIO) + [0] * (len(DESENHOS) - FAGULHAS_FIM)
+    s += [{'command': 'prop.addKey', 'params': {'layer': n, 'path': P + 'birthRate', 'time': q / FPS, 'value': v}}
+          for q, v in enumerate(taxa)]
+    s += [{'command': 'keys.select', 'params': {'keys': [{'layer': n, 'path': P + 'birthRate', 'time': q / FPS} for q in range(len(taxa))]}},
+          {'command': 'keys.interpolation', 'params': {'interpolation': 'hold'}},
+          {'command': 'effect.apply', 'params': {'effect': 'Glow', 'layers': [n]}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#2/threshold', 'value': 35}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#2/radius', 'value': 12}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#2/colors', 'value': 1}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#2/colorA', 'value': '#ff8a1f'}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#2/colorB', 'value': '#c2280c'}}]
     return s
 
 

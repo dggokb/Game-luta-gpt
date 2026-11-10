@@ -236,6 +236,16 @@ até o 24, onde já encolheu); a erosão passou a grão esticado na direção do
 espalham com a escala. O anel 3D ficou igual. Foi para a branch no mesmo nome
 (`dano_forte_anel_ec`). Vídeo: `android/app/build/sprite-review/acerto_forte_final_expandindo_em_lascas.mp4`.
 
+**Revisto no mesmo dia: o dono chamou a expansão acima de gambiarra** (o desenho só esticava e
+furava; nada voava). Saiu. A faísca volta a seguir o vídeo com a erosão de antes, e a dissipação
+passou a ser de partículas de verdade: `fagulhas()` no `dano_forte_ec.py`, Particle Emitter 2D
+com partículas tipo linha (nascem esticadas na direção do voo), estouro para todos os lados dos
+desenhos 3 a 5, sem gravidade, freando, amarelo-claro -> laranja, mistura normal (em Add viravam
+uma bola branca) e Glow A/B. Testes que não serviram: explodir a camada da faísca no Particle
+Playground (vira bolinhas em grade, cara de confete; o motion blur da composição não pega em
+partícula de efeito) e o modo Direction Axis (vira um jato estreito). Vídeo:
+`android/app/build/sprite-review/acerto_forte_dissipa_em_fagulhas.mp4`.
+
 ## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
 
 Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
