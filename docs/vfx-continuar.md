@@ -96,6 +96,188 @@ Skills de terceiros olhadas no mesmo dia e descartadas: `vfx-spell-effects` (Swi
 `create-game-vfx` (lista genérica para Three.js), `Claude-Code-Game-Studios` (projeto-modelo
 inteiro, sem VFX), `rea` (engenharia reversa de código, não abre arte de jogo).
 
+## Teste do EffectCraft para fabricar efeitos de ponto (10/11, noite)
+
+O dono pediu para testar se o [EffectCraft](https://github.com/storytold/effectcraft) (clone de
+After Effects em Rust, com linha de comando sem tela) serve para fabricar os efeitos de ponto.
+Feito com **um efeito só**, a faísca de defesa. **Nada no jogo foi trocado:** espera a aprovação
+dele no vídeo `android/app/build/sprite-review/defesa_atual_x_effectcraft.mp4` (fica só na sessão).
+
+- **Onde fica**: clonado fora do repositório (`/home/user/storytold/effectcraft`); o download de
+  releases é bloqueado aqui, então foi compilado: `cargo build --release -p effectcraft-cli`,
+  **14 min 17 s** em 4 núcleos, 2,2 GB em `target/`. Compilou sem erro.
+- **Confirmado**: renderiza na CPU sem tela (sem DISPLAY nem Wayland); `render-frame --transparent`
+  sai PNG RGBA; a render queue (`renderQueue.add` com `format: png, channels: rgba` e
+  `renderQueue.render {"wait": true}`) sai a sequência PNG com alfa reto.
+- **O efeito**: `art/vfx/effectcraft/defesa_ec.py` monta o projeto (`defesa_ec.ecproj`, ao lado)
+  só pela linha de comando (`effectcraft-cli run --commands`) e exporta 8 PNG. Montar e
+  renderizar leva **1,2 s**. A forma vem da imagem gerada que já está no jogo (`defesa_01.png`,
+  regra 2 da skill): o EffectCraft tira o preto (efeito Unmult), corta em pedaços por máscara e
+  anima cada um. Receita do relatório: 8 quadros a 60 por segundo, opaca de 0 a 3 e depois
+  75/50/25/0 %, crescendo sempre; camadas anel (nasce no quadro 1), escudo (cresce 92 -> 113 %),
+  faíscas (recuam rápido e freiam, esticadas no começo), estrela (gira 30° por quadro, começa em
+  0°) e clarão (3 quadros). Só o anel e o clarão são formas do EffectCraft.
+- **No jogo**: `tools/sprites/efeito_video.py <pasta dos PNG> --nome defesa_ec --fps 60 --origem
+  410,492 --escala-mundo 0.2965 --resolucao 2.0` (a mesma escala e o mesmo contato da `defesa`
+  de hoje): folha de 1941×946, 8 quadros. Para gravar, a lista `DEFESAS`/`DEFESA_PODER` do
+  `GameView` apontou para `defesa_ec` **só na cópia local**, e voltou. A folha não foi para o
+  repositório; o script e o comando acima a refazem.
+- **Gravar uma defesa**: `gradle :pc:gravarLuta -Proteiro="tecla:F3 segura:A espera:0.5
+  grava:420:e espera:7.5 fim"` (F3 liga a CPU, o jogador recua defendendo). A CPU não repete as
+  jogadas, então as defesas caem em quadros diferentes a cada gravação. Nas duas gravações as 4
+  defesas foram de **projétil** (`defesa_poder`); a defesa de golpe de perto não apareceu.
+
+Não conferido: a defesa de golpe de perto, o celular (a gravação é o desenho do PC), e o tamanho
+contra a `defesa_poder` (ela foi feita com 260; a `defesa_ec` usa a escala da comum, 220).
+
+## Anime VFX do zero no After Effects, refeito no EffectCraft (10/11, noite)
+
+Pedido: "pesquise como fazer anime vfx no Adobe After Effects a partir do zero e faça um
+exemplo". **Nada no jogo foi trocado**: o exemplo espera a aprovação dele no vídeo
+`android/app/build/sprite-review/acerto_forte_atual_x_anime_effectcraft.mp4` (só na sessão).
+
+**A pesquisa.** A rede da sessão bloqueia os sites de tutorial (School of Motion, Lester Banks,
+PremiumBeat, Video Copilot, Medium...); só a busca funcionou, com os resumos das páginas. Os
+tutoriais "sem plugin" repetem cinco técnicas:
+
+| Técnica | Como | Fonte (pela busca) |
+|---|---|---|
+| Tempo em degraus | Posterize Time na camada (12 ou 24 por segundo; o efeito trava a camada num ritmo e só aceita "Hold") | [Adobe, efeitos de tempo](https://helpx.adobe.com/after-effects/desktop/apply-effects-and-animation-presets/list-of-effects/time-effects.html); [Medium, The Inspired Animator](https://medium.com/the-inspired-animator/how-to-apply-a-hand-crafted-look-to-your-animations-in-after-effects-2da1c5dbd282) |
+| Raios e linhas de velocidade | Fractal Noise sem escala uniforme (largura ~1, altura ~1400, contraste 800, brilho −100) e Polar Coordinates "Rect to Polar" a 100 %; máscara no centro; Random Seed `time*5` para tremer | [PremiumBeat](https://www.premiumbeat.com/blog/fractal-noise-adobe-after-effects/); [Woodpunch](https://woodpunchsgraphics.com/blogs/tutorials/speed-lines-after-effects-tutorial); [Riztagar](https://riztagar.com/anime-speed-lines/); [note.com/mogra](https://note.com/mogra/n/n7f34e6bd6e5b?hl=en) |
+| Explosão de anime | só camadas de forma animadas, com Polar Coordinates por cima; brilho e explosão em camadas separadas; composição grande (2500×2500) | [School of Motion, 30 dias de AE dia 22](https://schoolofmotion.com/blog/cartoon-explosion-after-effects); [Lester Banks, explosão cel](https://lesterbanks.com/2014/09/designing-cel-animation-style-explosion-ae-30-days-ae/) |
+| Fumaça e fogo cartoon | Fractal Noise "Turbulent Basic" / "Soft Linear", invertido, contraste 100 -> 125; Turbulent Displace; Levels para borda dura | [Pixflow](https://pixflow.net/blog/how-to-create-a-stunning-cartoon-smoke-effect-in-after-effects/); [AE Juice, fogo](https://aejuice.com/blog/how-to-make-fire-in-after-effects/) |
+| Luz | Glow numa camada e uma segunda passada com raio grande e outras cores; clarão oval com pena grande e opacidade no máximo no contato | [Motion Array, eletricidade](https://motionarray.com/learn/premiere-pro/how-to-create-electricity-and-energy-effects-from-scratch-in-adobe-after-effects/); [Creative Bloq, raio](https://www.creativebloq.com/entertainment/vfx/develop-electric-atmosphere-with-lightning-in-adobe-after-effects) |
+
+Formas com Trim Paths, Repeater e Wiggle Paths aparecem em todos como o jeito de fazer riscos,
+espinhos e anéis. Nenhuma fonte dá a receita de uma faísca de acerto de jogo de luta: os números
+de tempo vêm do nosso relatório.
+
+**O exemplo**: `art/vfx/effectcraft/acerto_anime_ec.py` monta `acerto_anime_ec.ecproj` sem
+imagem nenhuma: faísca de acerto forte de 16 quadros (8 desenhos de 2 em 2), clarão, estouro em
+raios (ruído + polar + Unmult + Tint, com um disco macio de track matte), riscos em leque
+(Repeater, saem rápido e freiam), espinhos em estrela com Wiggle Paths girando 30° por desenho,
+anel e uma mancha laranja atrás que some no quadro 8. Cor do branco ao amarelo e ao laranja
+(Glow com cores A e B). Monta e renderiza em 3,5 s. No jogo: `efeito_video.py <pasta> --nome
+acerto_anime_ec --fps 60 --origem 256,256 --altura 228` (a altura da `impacto_ar_forte`); o
+`efeitoDeGolpe` apontou para ela só na cópia local. Roteiro: `segura:D espera:1.8 solta:D
+grava:55:g tecla:L fim` (dupla padrão); as duas gravações batem quadro a quadro, acerto no 11.
+
+O que se aprendeu do EffectCraft 0.23.1 nisto:
+- **Polar Coordinates com os nomes trocados**: quem faz os raios a partir de listras em pé é a
+  opção 1, que ele chama de "Polar to Rect"; no After Effects os tutoriais usam "Rect to Polar".
+- **Posterize Time não segura a escala, o giro e a posição da própria camada** (no After Effects
+  também não; lá se pré-compõe). O script põe os quadros-chave de dois em dois; toda lista de
+  valores tem de terminar em quadro par, senão o último valor fica preso.
+- Track matte de alfa, Glow com cores A e B, Repeater, Wiggle Paths e Unmult funcionam como no
+  After Effects.
+
+Ficou em aberto para ele julgar: a faísca nova é radial (não aponta a linha do golpe como a
+atual), o clarão branco cobre a cabeça do rival nos 2 primeiros desenhos, e o desenho é todo
+feito no programa, o que esbarra na regra 2 da skill (forma desenhada por código já reprovada).
+
+## A faísca do golpe forte de hoje refeita no EffectCraft (10/11, noite)
+
+Pedido: "não consegue fazer igual à referência do que está no jogo hoje?". O alvo foi a
+`impacto_ar_forte` (do vídeo `art/vfx/dano/dano_forte.mp4`), medida na própria folha quadro a
+quadro. `art/vfx/effectcraft/impacto_forte_ec.py` desenha tudo no EffectCraft com caminhos de
+vértices (`prop.set` em `contents/group/contents/path/path`):
+- estrela de espinhos irregulares (os 10 medidos e 10 menores sorteados) em 5 faixas chapadas,
+  da borda vermelho-escura ao núcleo branco; encolhe até sumir no desenho 8;
+- cinco jatos pontudos na direção do golpe, nas faixas; pedaços que se soltam da ponta no
+  desenho 2 e brasas que voam para a direita e freiam;
+- halo laranja (Glow com cores A e B) e uma mancha laranja atrás.
+
+Mesmo ponto, tamanho e ritmo da folha de hoje: `efeito_video.py <pasta> --nome impacto_forte_ec
+--fps 8 --origem 175,171 --escala-mundo 0.6667 --resolucao 1.5`. Monta e renderiza em 0,3 s.
+Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_refeito_effectcraft.mp4` (só na
+sessão). **Nada no jogo foi trocado**: o `efeitoDeGolpe` apontou para ela só na cópia local.
+
+**Anel de pressão de ar (pedido seguinte):** um anel branco-azulado meio transparente em volta
+do amarelo, que nasce no desenho 1, abre rápido freando (raio 72 -> 212 px da folha), ondula
+(Turbulent Displace), afina e se desfaz em arcos por erosão: um ruído de borda dura (Fractal
+Noise, contraste 320) como máscara de luminância, com o brilho caindo de 100 a −75; dentro, um
+disco fraco e macio de pressão. A tela cresceu 70 px à esquerda e 60 em cima e embaixo; o
+contato passou a `--origem 245,231` (mesma escala). No jogo, o anel vai do quadro 12 ao 22 da
+gravação. Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_refeito_com_anel_de_ar.mp4`.
+O Roughen Edges sozinho não partiu o anel (só deixou a borda áspera e depois apagou de uma vez).
+
+**O anel em 3/4 (pedido seguinte, "é isso, só que na visão 3/4"):** o anel fica de pé,
+atravessado na linha do golpe: na tela é uma elipse com 45 % da altura, inclinada −12°, que
+avança 49 px da folha na direção do golpe enquanto abre. A metade de trás (com o disco de pressão)
+fica atrás dos jatos e da estrela; a metade da frente é uma segunda camada com máscara, por cima
+de tudo, e cada metade tem a sua camada de erosão com a mesma semente (os buracos batem na
+emenda). No jogo o efeito gira na linha do chute, então o anel fica atravessado no caminho do
+golpe. Vídeo: `android/app/build/sprite-review/acerto_forte_atual_x_anel_de_ar_3_4.mp4`.
+Aprendido: **na camada de forma do EffectCraft a máscara conta a partir do centro do conteúdo
+(0, 0)**, não do canto da camada (a doc de lá fala do contrário para os pontos de efeito).
+
+**Mais pressão de ar que fumaça (pedido seguinte):** o anel grosso, desfocado e ondulando lia
+como fumaça. Agora: traço fino e nítido branco (9 -> 1 px da folha) com uma segunda linha mais
+fraca logo dentro (Repeater, 2 cópias a 86 × 90 %, a de dentro a 40 %), brilho ciano curto
+(Glow com cores A e B), quase sem desfoque e sem ondulação, uma bolha quase transparente só nos
+2 primeiros desenhos, e abre e some mais rápido (some no desenho 7). O disco esfumado saiu.
+A erosão passou para dentro da camada: **Fractal Noise no modo "Stencil Luma"**. Com track matte
+o EffectCraft 0.23.1 abria o buraco também nas camadas de baixo (apagava o brilho laranja, e no
+fundo escuro parecia mancha preta). Vídeo:
+`android/app/build/sprite-review/acerto_forte_atual_x_pressao_de_ar.mp4` (nesta gravação a
+câmera do jogo ficou um pouco mais perto que na de hoje; o acerto é no mesmo quadro).
+
+**Miolo sem contorno à direita e faíscas das pontas (pedidos seguintes):**
+- A estrela virou duas camadas: a borda (vermelho-escuro, laranja e amarelo) com uma máscara em
+  modo Subtract recortando o lado direito perto do miolo, e o miolo (amarelo-claro e branco)
+  inteiro por cima. O miolo branco escorre direto para os jatos, como na referência. Vídeo com
+  zoom: `android/app/build/sprite-review/acerto_forte_miolo_sem_contorno.mp4`.
+- Faíscas saindo das pontas da estrela (entendido como as pontas dos espinhos; se era a cauda
+  dos jatos, é trocar a origem): 2 ou 3 por espinho grande e 1 por pequeno, finas, na direção do
+  espinho, rápidas e freando, encolhem e apagam até o desenho 7 ou 8 (`particulas_das_pontas`).
+  Vídeo: `android/app/build/sprite-review/acerto_forte_faiscas_das_pontas.mp4`.
+
+Ficou parecido na forma, no tempo e na direção; ficou diferente no traço: a de hoje tem borda
+serrilhada e textura de desenho à mão, mais laranja e brasas mais acesas; a refeita é mais
+limpa, mais amarela. Aprendido: na forma do EffectCraft, como no After Effects, o primeiro grupo
+da lista fica na frente (desenhar do miolo para fora), e o segundo grupo se chama
+`contents/group#2`.
+
+## Teste da receita "quadros gerados + acabamento" com o dano_forte (10/11, noite)
+
+Recomendação 1 do relatório `reports/Pipeline profissional de VFX anime.md`, sem desenhar nada no
+programa: `art/vfx/effectcraft/dano_forte_ec.py` importa `art/vfx/dano/dano_forte.mp4` no
+EffectCraft (ele decodifica mp4 sem tela, igual ao ffmpeg a 1/255), remapeia o tempo por expressão
+(12 desenhos: o impacto segurado por dois, depois o vídeo de dois em dois até o quadro 24), troca o
+degradê macio por faixas chapadas (Colorama Custom sem interpolar, cortes medidos no vídeo: halo
+até ~0,31 de intensidade vira transparente, desenho de 0,36 para cima), tira o preto (Unmult),
+refaz o halo limpo (Glow A e B) e come o corpo no fim por erosão (Fractal Noise em Stencil Luma,
+contraste 400, brilho de 300 caindo a −50). Monta e renderiza em 1,9 s.
+
+No jogo: `efeito_video.py <pasta> --nome dano_forte_ec --fps 8 --origem 427,384 --escala-mundo
+0.30 --borda 50` (o mesmo ponto, escala e ritmo da `impacto_ar_forte`); o nome apontou para ela
+só na cópia local. Vídeo: `android/app/build/sprite-review/acerto_forte_hoje_x_receita_dano_forte.mp4`.
+Primeiro passe errado: com o corte em 0,10 o halo virou uma mancha laranja chapada, e com
+contraste 600 a erosão já comia o desenho 0.
+
+**Com o anel de pressão de ar em 3D (pedido seguinte):** `dano_forte_ec.py --anel` gera
+`dano_forte_anel_ec`. A camada do vídeo vira um plano 3D em z = 0 (sem câmera o 3D enquadra igual
+ao 2D: diferença zero, conferido) e o anel é uma forma 3D girada (X −10°, Y 66°) que atravessa a
+faísca: o arco da frente passa por cima dos jatos e o de trás fica atrás da estrela, sem as duas
+camadas com máscara do `impacto_forte_ec`. Fino e nítido, linha dupla (Repeater), bolha só no
+começo, brilho ciano, avança na direção do golpe, se parte em arcos por erosão (Fractal Noise em
+Stencil Luma). A tela cresce 160 px em cima e embaixo: `efeito_video.py <pasta> --nome
+dano_forte_anel_ec --fps 8 --origem 427,543 --escala-mundo 0.30 --borda 50`. No jogo o anel vai
+do quadro 15 ao 23 da gravação (acerto no 11). Vídeo:
+`android/app/build/sprite-review/acerto_forte_hoje_x_receita_com_anel_3d.mp4`.
+
+**No jogo (pedido do dono, 10/11):** `dano_forte_anel_ec` foi para a `game-luta-sprite-fable`
+como a faísca do golpe forte e especial (`GameView.efeitoDeGolpe`, antes da `impacto_ar_forte`,
+que fica como reserva se a folha nova faltar). Para voltar: apagar
+`android/app/src/main/assets/efeitos/dano_forte_anel_ec` (o jogo cai sozinho na `impacto_ar_forte`).
+
+## Regra 2 revista (10/11, noite)
+
+Depois de ver a faísca do golpe forte refeita no EffectCraft, o dono revisou a regra do desenho
+por código: **"só aceitar código de ficar nível profissional"**. A skill `vfx-luta` (regra 2) foi
+atualizada: imagem ou vídeo gerado continua o caminho padrão; desenho feito no programa só vale
+seguindo técnica profissional, comparado lado a lado no jogo, e quem julga o nível é ele.
+
 ## Em uma frase
 
 Efeito desenhado por código foi tentado de novo e reprovado de novo. O caminho é **imagem gerada
