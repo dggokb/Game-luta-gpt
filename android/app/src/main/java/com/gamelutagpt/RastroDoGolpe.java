@@ -33,6 +33,8 @@ final class RastroDoGolpe {
 
     private final EfeitosVideo efeitos;
     private final Lado[] lados = {new Lado(), new Lado()};
+    /** A opacidade da fita cheia: ela passa na frente dos lutadores e o membro ainda se vê por baixo. */
+    private static final float OPACIDADE = 0.9f;
     /** Amostras a mais na frente da ponta: o rastro passa um pouco dela e termina em pontas. */
     private static final int ALEM = 4;
     private static final int AMOSTRAS = PONTOS * PASSOS + 1 + ALEM;
@@ -99,7 +101,7 @@ final class RastroDoGolpe {
         }
     }
 
-    /** Desenha no espaço do mundo (o canvas já com a câmera), atrás dos lutadores. */
+    /** Desenha no espaço do mundo (o canvas já com a câmera), na frente dos lutadores. */
     void desenhar(Canvas c) {
         for (Lado l : lados) {
             if (l.ataque == null || l.cabeca < 1) continue;
@@ -170,7 +172,7 @@ final class RastroDoGolpe {
         jy[n] = l.y - curva(p0[3], p1[3], p2[3], p3[3], t);
         float idade = l.quadro - (l.chegada[j] + (l.chegada[j + 1] - l.chegada[j]) * t);
         // Cheia na primeira metade da vida, depois some: o corte de ar fica na tela, não pisca.
-        alfa[n] = Math.max(0f, Math.min(1f, 2f * (1f - idade / vida)));
+        alfa[n] = Math.max(0f, Math.min(OPACIDADE, 2f * (1f - idade / vida)));
         return n + 1;
     }
 

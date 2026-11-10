@@ -2991,7 +2991,8 @@ public class GameView extends SurfaceView
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
-                event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle)) {
+                event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle,
+                defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -4431,9 +4432,6 @@ public class GameView extends SurfaceView
             canvas.translate(tagOffset(), 0f);
             drawContactShadow(canvas, spriteFighterRenderer, player());
             canvas.restore();
-            // O rastro do golpe atrás dos dois lutadores: o corte de ar aparece em volta do braço ou
-            // da perna, sem cobrir o desenho de quem bate.
-            if (enfeites) rastros.desenhar(canvas);
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
@@ -4503,6 +4501,9 @@ public class GameView extends SurfaceView
             }
             drawBreakerCue(canvas);
             efeitos.desenhar(canvas);
+            // O rastro do golpe na frente dos lutadores (a 90%: o membro ainda se vê por baixo) e por
+            // cima do efeito de dano: o corte de ar fecha a cena.
+            if (enfeites) rastros.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
@@ -5567,7 +5568,7 @@ public class GameView extends SurfaceView
      * (entra o clássico).
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
-                                  boolean poder, int pausa, int atacante, float angulo) {
+                                  boolean poder, int pausa, int atacante, float angulo, boolean baixo) {
         boolean esquerda = direction < 0;
         float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
         int a = atacante & 1;
@@ -5584,15 +5585,23 @@ public class GameView extends SurfaceView
         } else {
             int forca = Math.max(0, Math.min(FAISCA_ESCALA.length - 1, size));
             float px = x + direction * 12f;
-            // A lança de luz atravessa na linha do golpe a partir do contato (do médio para cima),
-            // por baixo da faísca: tocada antes, desenhada antes.
+            // A lança de luz atravessa na linha do golpe no Super e no Ultra, por baixo da faísca.
             efeitos.parar(lancaVaga[a], LANCA);
-            lancaVaga[a] = superGolpe || size >= ImpactEffects.MEDIUM
-                ? efeitos.tocarDurando(LANCA, px, y, superGolpe ? 1.4f : LANCA_ESCALA[forca], esquerda, ms, angulo) : -1;
-            // O forte e o especial têm a explosão própria, se ela existe; senão a faísca maior.
-            boolean forte = !superGolpe && size >= ImpactEffects.HEAVY && efeitos.tem("impacto_ar_forte");
-            nome = superGolpe ? "impacto_ar_super" : forte ? "impacto_ar_forte" : "impacto_ar";
-            float escala = superGolpe ? 1.25f : forte ? FORTE_ESCALA[forca] : FAISCA_ESCALA[forca];
+            lancaVaga[a] = superGolpe ? efeitos.tocarDurando(LANCA, px, y, 1.4f, esquerda, ms, angulo) : -1;
+            // O efeito de dano de cada força (os vídeos de art/vfx/dano): fraco, médio, forte, e o
+            // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
+            if (superGolpe) {
+                nome = "impacto_ar_super";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_ar_forte")) {
+                nome = "impacto_ar_forte";
+            } else if (baixo && efeitos.tem("impacto_ar_baixo")) {
+                nome = "impacto_ar_baixo";
+            } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_ar_fraco")) {
+                nome = "impacto_ar_fraco";
+            } else {
+                nome = "impacto_ar";
+            }
+            float escala = superGolpe ? 1.25f : FAISCA_ESCALA[forca];
             // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
             vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, ms, angulo);
         }
@@ -5638,15 +5647,12 @@ public class GameView extends SurfaceView
     private final int[] reacao = new int[2];
 
     /**
-     * Tamanho da faísca por força (fraco, médio, forte, especial). As referências (FighterZ) cobrem
-     * o tronco e a cabeça de quem apanha num golpe forte: o fraco ainda pequeno, o forte grande.
+     * Tamanho do efeito de dano por força (fraco, médio, forte, especial). Cada força tem a folha
+     * dela, já no tamanho certo: só o especial é um pouco maior que o forte.
      */
-    private static final float[] FAISCA_ESCALA = {0.8f, 1f, 1.3f, 1.4f};
-    /** O forte e o especial com a explosão própria (impacto_ar_forte, já desenhada maior). */
-    private static final float[] FORTE_ESCALA = {1f, 1f, 1f, 1.15f};
-    /** A lança de luz que atravessa na linha do golpe (o fraco não tem). */
+    private static final float[] FAISCA_ESCALA = {1f, 1f, 1f, 1.15f};
+    /** A lança de luz que atravessa na linha do golpe (Super e Ultra). */
     private static final String LANCA = "lanca_luz";
-    private static final float[] LANCA_ESCALA = {0f, 0.75f, 1f, 1.2f};
     private final int[] lancaVaga = {-1, -1};
     private final int[] faiscaVaga = {-1, -1};
     private final String[] faiscaNome = {"", ""};
