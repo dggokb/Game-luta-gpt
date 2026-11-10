@@ -40,7 +40,9 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
    ponta. A última referência dele é um véu branco meio transparente, largo, com muitos riscos
    finos dentro.
 9. **Camadas na tela:** lutadores, depois o efeito de dano, e o rastro por cima de tudo, a 75%
-   de opacidade.
+   de opacidade. As fotos do Tōkon que ele mandou mostram o rastro na frente: a regra de
+   "efeito grande atrás do personagem" que aparece na pesquisa é do Guilty Gear Strive e fala
+   da faísca de acerto, não do rastro. Não levante isso como dúvida de novo.
 10. **Efeito de dano por força:** fraco, médio, forte e baixo, cada um com o vídeo dele
     (`art/vfx/dano`).
 11. **Arte que já traz efeito desenhado:** se o efeito está em cima do membro, a arte fica e o
@@ -48,6 +50,11 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
     cima do outro: golpe com efeito na arte não ganha rastro (`ARTE_COM_EFEITO`).
 12. **Estilo:** efeito é luz, sem contorno preto; é a coisa mais clara da tela; tons chapados,
     do escuro para o branco.
+13. **Técnica profissional, não palpite.** Ele parou as tentativas no olho e pediu a técnica dos
+    estúdios: está em `reports/VFX de luta estilo anime.md`. O rastro segue a receita da Arc
+    System Works (inclusive a **base escura sob o corte**, que ele mandou fazer como eles), com
+    erosão e rampa de cor no lugar dos desenhos à mão. O desenho do PC precisa do equivalente,
+    porque é no vídeo gravado lá que ele julga.
 
 ## Erros que já aconteceram (não repita)
 
