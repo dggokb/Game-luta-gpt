@@ -578,6 +578,7 @@ public final class StageScene {
      */
     public void drawBackground(RenderCanvas c, float z, Runnable between) {
         boolean pending = between != null;
+        pontosAtras = 0;
         c.fillRect(-10f, -10f, VW + 10f, VH + 10f, pack.definition.backgroundColor);
         StageDefinition.Floor floor = pack.definition.floor;
         // O chão vai até "ate" (extent), não só até o fim das lajotas: o que está antes disso
@@ -626,6 +627,7 @@ public final class StageScene {
 
     /** O que fica na frente dos lutadores (profundidade ≤ 0). */
     public void drawForeground(RenderCanvas c) {
+        pontosFrente = 0;
         for (Placed p : placed) {
             if (p.layer.sortDepth() <= 0f) drawLayer(c, p);
         }
@@ -1277,6 +1279,43 @@ public final class StageScene {
         }
     }
 
+    // --------------------------------------------- pontos de luz dos lutadores
+    /**
+     * As luzes e os fogos do cenário marcados com {@code "lutadores"} que estão na tela neste
+     * quadro, onde aparecem: quem desenha os lutadores acende o corpo deles do lado de cada uma
+     * (o normal map). Os de trás dos lutadores são os deste quadro; os da frente (desenhados
+     * depois dos lutadores), os do quadro anterior.
+     */
+    private static final int PONTOS = 24, PONTO_N = 7;
+    private final float[] pontosDeTras = new float[PONTOS * PONTO_N], pontosDaFrente = new float[PONTOS * PONTO_N];
+    private int pontosAtras, pontosFrente;
+
+    private void pontoDeLuz(StageDefinition.Layer layer, float x, float y, float reach, int color, float strength) {
+        boolean frente = layer.sortDepth() <= 0f;
+        int n = frente ? pontosFrente : pontosAtras;
+        if (n >= PONTOS) return;
+        float[] p = frente ? pontosDaFrente : pontosDeTras;
+        int k = n * PONTO_N;
+        p[k] = x; p[k + 1] = y; p[k + 2] = reach * VH;
+        p[k + 3] = ((color >> 16) & 0xFF) / 255f; p[k + 4] = ((color >> 8) & 0xFF) / 255f; p[k + 5] = (color & 0xFF) / 255f;
+        p[k + 6] = strength;
+        if (frente) pontosFrente = n + 1; else pontosAtras = n + 1;
+    }
+
+    /** Quantos pontos de luz dos lutadores há na tela. */
+    public int pontosDeLuz() {
+        return pontosAtras + pontosFrente;
+    }
+
+    /**
+     * O ponto de luz {@code i}: {x, y na tela do cenário (a mesma dos desenhos, 1280x720), alcance
+     * em pixels dela (0 = não cai com a distância), r, g, b, força}.
+     */
+    public void pontoDeLuz(int i, float[] out) {
+        boolean frente = i >= pontosAtras;
+        System.arraycopy(frente ? pontosDaFrente : pontosDeTras, (frente ? i - pontosAtras : i) * PONTO_N, out, 0, PONTO_N);
+    }
+
     private void drawLights(RenderCanvas c, StageDefinition.Layer layer, float l, float t, float r, float b,
                             boolean mirrored, int instance) {
         float h = b - t;
@@ -1285,6 +1324,7 @@ public final class StageScene {
             float lx = l + (mirrored ? 1f - light.x : light.x) * (r - l);
             float ly = t + light.y * h;
             float pulse = 1f + light.pulse * (float)Math.sin(time * 6.5f + instance * 1.7f + i * 2.3f);
+            if (light.fighters > 0f) pontoDeLuz(layer, lx, ly, light.reach, light.color, light.fighters * pulse);
             // O halo largo é o que mais enche a tela; o miolo da luz fica no leve.
             if (detalhe) c.fillRadialGlow(lx, ly, light.radius * h * 2.2f, withAlpha(light.color, Math.round(150 * pulse)));
             c.fillRadialGlow(lx, ly, light.radius * h * 0.8f, withAlpha(light.color, Math.round(235 * pulse)));
@@ -1293,6 +1333,11 @@ public final class StageScene {
             StageDefinition.Fire fire = layer.fires.get(i);
             float fx = l + (mirrored ? 1f - fire.x : fire.x) * (r - l);
             float fy = t + fire.y * h;
+            if (fire.fighters > 0f) {
+                // A luz sai do miolo da chama e treme com ela.
+                float tremor = 1f + 0.10f * (float)Math.sin(time * 11f + instance * 31 + i) + 0.05f * (float)Math.sin(time * 23f + i);
+                pontoDeLuz(layer, fx, fy - fire.size * h * 0.45f, fire.reach, fire.color, fire.fighters * tremor);
+            }
             drawFire(c, fx, fy, fire.size * h, instance * 31 + i);
         }
     }

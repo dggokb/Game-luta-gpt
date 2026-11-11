@@ -83,7 +83,7 @@ final class GlRenderCanvas implements RenderCanvas {
      * vale se a placa de vídeo do aparelho recusar o novo ({@link #criar}).
      */
     private static final String M_UNIFORMS = "//@uniforms\n", M_SEM_MAPA = "//@sem-mapa\n",
-        M_DO_MAPA = "//@do-mapa\n", M_VOLUME = "//@volume\n";
+        M_DO_MAPA = "//@do-mapa\n", M_VOLUME = "//@volume\n", M_CONTA = "//@conta\n";
     private static final String NORMAL_DO_QUADRO =
         "          highp vec2 meio = 0.5 / vec2(textureSize(uNormal, 0));\n" +
         "          highp vec2 xy = texture(uNormal, clamp(vUv, uLuzRet.xy + meio, uLuzRet.zw - meio)).rg * 2.0 - 1.0;\n";
@@ -93,8 +93,16 @@ final class GlRenderCanvas implements RenderCanvas {
         {M_DO_MAPA,
             "        if (uNormalLiga > 0.5) {\n" +
             NORMAL_DO_QUADRO +
-            "          n = vec3(xy, sqrt(max(1.0 - dot(xy, xy), 0.0)));\n" +
+            // A mesma normal exagerada da luz do cenário (uVolume.y), para a luz local dar volume.
+            "          n = normalize(vec3(xy * max(uVolume.y, 1.0), sqrt(max(1.0 - dot(xy, xy), 0.0))));\n" +
             "        }\n"},
+        // Com mapa a luz local entra quase toda multiplicada pela cor do que ilumina (o preto da
+        // roupa não vira laranja ao lado do braseiro); sem mapa, a conta de sempre.
+        {M_CONTA,
+            // Com mapa a luz é mais rasante: acende o lado virado para ela, não o corpo inteiro.
+            "        float lam = max(dot(n, normalize(vec3(dl, uNormalLiga > 0.5 ? 0.12 : 0.35))), 0.0);\n" +
+            "        float soma = uNormalLiga > 0.5 ? 0.07 : 0.35;\n" +
+            "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (soma + (1.0 - soma) * u.rgb), 0.0, 1.0);\n"},
         // A luz do cenário com volume (uVolume: ligada, quanto a inclinação da normal é exagerada,
         // força da sombra, força da luz): a luz do lugar (a direção e a cor da contraluz) acende o
         // que está virado para ela e o lado oposto escurece puxando para a cor do lugar (os pés).
@@ -118,6 +126,9 @@ final class GlRenderCanvas implements RenderCanvas {
     };
     private static final String[][] TRECHOS_ANTIGOS = {
         {M_UNIFORMS, ""}, {M_SEM_MAPA, ""}, {M_DO_MAPA, ""}, {M_VOLUME, ""},
+        {M_CONTA,
+            "        float lam = max(dot(n, normalize(vec3(dl, 0.35))), 0.0);\n" +
+            "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n"},
     };
 
     private static String montar(String modelo, String[][] trechos) {
@@ -233,8 +244,7 @@ final class GlRenderCanvas implements RenderCanvas {
         "        highp vec2 dl = (uLocal.xy - vUv) / uLocal.zw;\n" +
         "        float dist = length(dl);\n" +
         "        float cai = clamp(1.0 - dist, 0.0, 1.0);\n" +
-        "        float lam = max(dot(n, normalize(vec3(dl, 0.35))), 0.0);\n" +
-        "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n" +
+        M_CONTA +
         "      }\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         // Contorno: onde é transparente e um vizinho a uContornoR é corpo, um fio da cor por fora.
@@ -1039,6 +1049,8 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private float localX, localY, localRaio, localR, localG, localB, localForca;
+    /** A luz local de agora só vale para folha com normal map (os pontos de luz do cenário). */
+    static boolean luzLocalSoComMapa;
 
     /**
      * O normal map da folha que vem a seguir (ou null): com a luz local ligada, a normal sai dele
@@ -1111,6 +1123,9 @@ final class GlRenderCanvas implements RenderCanvas {
         // Outro quadro com o mesmo filtro (sem voltar ao original entre os dois): parte do original.
         if (m != null && m.length >= LUZ_QUADRO && filtroComLuz != null) m = filtroComLuz;
         boolean local = localForca > 0f && localRaio > 0f;
+        // Ponto de luz do cenário: só acende folha com normal map (sem ele seriam os 16 vizinhos
+        // da silhueta o tempo todo, e não só no instante de um golpe).
+        if (local && luzLocalSoComMapa && normalDe(t) == 0) local = false;
         if (m == null && local) m = SEM_FILTRO;
         if (m == null || m.length < Filtro.COM_LUZ || m.length >= LUZ_QUADRO) return;
         if (m[Filtro.LUZ] < 0.5f && m[Filtro.CONTORNO + 3] <= 0f && !local) return;

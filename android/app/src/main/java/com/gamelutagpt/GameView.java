@@ -244,7 +244,8 @@ public class GameView extends SurfaceView
     private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
 
     // Cenário com falso 3D (stage-core). Sem ele, o StageRenderer antigo desenha o fundo.
-    private static final String DEFAULT_STAGE = "templo_lua";
+    /** No PC, {@code -Dgameluta.cenario=<pasta>} ({@code -Pcenario=...}) troca o cenário padrão, para gravar os outros. */
+    private static final String DEFAULT_STAGE = System.getProperty("gameluta.cenario", "templo_lua");
     private StageScene stageScene;
     /** Cenário carregado agora (pasta em assets/stages). Cada luta pode pedir o seu. */
     private String stageId;
@@ -4393,6 +4394,8 @@ public class GameView extends SurfaceView
                 perfil.marca(PerfilQuadros.TELA);
                 stageScene.setDetalhe(!qualidade.efeitosLeves() && (storyMode || !TesteDesempenho.cenarioSemEnfeites));
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
+                // A câmera deste quadro, para levar os pontos de luz do cenário (na tela dele) ao mundo.
+                pontoZoom = renderZoom; pontoEsquerda = cameraLeft; pontoTopo = renderCameraTop;
                 stageScene.setTelao(desenhaTelao);
                 telaoCanvas = canvas;
                 graduarCenario(true);
@@ -6098,7 +6101,17 @@ public class GameView extends SurfaceView
         return luzForca[i] * k * k;
     }
 
-    /** Liga no OpenGL a luz local mais forte sobre {@code f}; false se nenhuma chega nele. */
+    /** A câmera do quadro em que o cenário foi desenhado (os pontos de luz dele estão na tela). */
+    private float pontoZoom = 1f, pontoEsquerda, pontoTopo;
+    private final float[] ponto = new float[7];
+    /** Quanto da força de um ponto de luz do cenário chega ao corpo (a luz local do shader). */
+    private static final float FORCA_DO_PONTO = 0.9f;
+
+    /**
+     * Liga no OpenGL a luz local mais forte sobre {@code f}: a de um impacto ou a de um ponto de
+     * luz do cenário (os braseiros e as lanternas marcados com "lutadores" no stage.json), que só
+     * acende quem tem normal map. False se nenhuma chega nele.
+     */
     private boolean luzNoCorpo(CanvasGl c, DesenhoGl gl, CombatFighter f) {
         if (TesteDesempenho.luz == TesteDesempenho.LUZ_OFF) return false;
         float cx = f.x, cy = fighterVisualY(f) - f.character().visualStandHeight * 0.5f;
@@ -6113,9 +6126,33 @@ public class GameView extends SurfaceView
             float chega = k * Math.max(0f, 1f - d / (l[2] * 1.6f));
             if (chega > forte) { forte = chega; melhor = i; }
         }
+        // Os pontos de luz do cenário: na tela dele, levados ao mundo pela câmera do quadro.
+        float px = 0f, py = 0f, praio = 0f, pr = 0f, pg = 0f, pb = 0f, pforca = 0f;
+        boolean doCenario = false;
+        int pontos = stageScene != null ? stageScene.pontosDeLuz() : 0;
+        for (int i = 0; i < pontos; i++) {
+            stageScene.pontoDeLuz(i, ponto);
+            if (ponto[2] <= 0f) continue;   // sem alcance (a lua, o sol): é a luz do lugar, não um ponto
+            float x = pontoEsquerda + ponto[0] / pontoZoom, y = pontoTopo + ponto[1] / pontoZoom;
+            float raio = ponto[2] / pontoZoom;
+            float d = (float)Math.hypot(x - cx, y - cy);
+            float k = ponto[6] * FORCA_DO_PONTO;
+            float chega = k * Math.max(0f, 1f - d / raio);
+            if (chega > forte) {
+                forte = chega; doCenario = true;
+                px = x; py = y; praio = raio; pr = ponto[3]; pg = ponto[4]; pb = ponto[5]; pforca = k;
+            }
+        }
+        if (doCenario) {
+            c.paraJanela(px, py, luzJanela);
+            GlRenderCanvas.luzLocalSoComMapa = true;
+            gl.luzLocal(luzJanela[0], luzJanela[1], praio * luzJanela[2], pr, pg, pb, pforca);
+            return true;
+        }
         if (melhor < 0) return false;
         float[] l = luzLocal[melhor];
         c.paraJanela(l[0], l[1], luzJanela);
+        GlRenderCanvas.luzLocalSoComMapa = false;
         gl.luzLocal(luzJanela[0], luzJanela[1], l[2] * luzJanela[2], l[3], l[4], l[5], luzAgora(melhor));
         return true;
     }
@@ -7109,10 +7146,9 @@ public class GameView extends SurfaceView
                     TesteDesempenho.efeitos = !TesteDesempenho.efeitos;
                     break;
                 case PERF_LUZ:
-                    // O normal map na luz do cenário e do impacto: FORTE → SUAVE → OFF → FORTE.
-                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_FORTE ? TesteDesempenho.LUZ_SUAVE
-                        : TesteDesempenho.luz == TesteDesempenho.LUZ_SUAVE ? TesteDesempenho.LUZ_OFF
-                        : TesteDesempenho.LUZ_FORTE;
+                    // O normal map na luz do cenário, dos pontos de luz e do impacto: liga e desliga.
+                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_OFF ? TesteDesempenho.LUZ_SUAVE
+                        : TesteDesempenho.LUZ_OFF;
                     break;
                 case PERF_CENARIO:
                     // ON → SEM ENFEITES (as camadas, sem brilhos, neblina, reflexos e pétalas) → OFF → ON.
