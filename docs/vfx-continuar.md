@@ -346,6 +346,13 @@ para a direita e a fumaça vai para trás). Folha: `efeito_video.py art/vfx/fuma
 do tamanho da `poeira_corrida`). A folha está nos assets; o `poeiraDoMotor` só toca ela no lugar
 da `poeira_corrida` quando o dono aprovar no vídeo (`fumaca_dash_v04.mp4`). Roteiro do dash:
 `gradle :pc:gravarLuta -Proteiro="espera:0.5 grava:40:d tecla:D tecla:D fim"`.
+
+**Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
+(~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
+vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
+no jogo (os vídeos de 11/11 até a fumaça V04 saíram assim; o dono achou a fumaça "muito rápida").
+Na velocidade do jogo: repetir cada quadro gravado 45 × 60 / 1000 ≈ 2,7 vezes num vídeo a 60.
+Conferido pela fumaça V04: 8 desenhos de 45 ms ocupam 8 quadros gravados.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
