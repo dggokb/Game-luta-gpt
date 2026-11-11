@@ -301,6 +301,8 @@ ms, médio 42, leve 33 por quadro; "tinha uma falha no forte"). Acabamento pedid
   pontas (três voltas de 22/20/18 riscos curtos e finos depois do pedido "mais riscos e
   menores"; traço afinando, Repeater, Trim Paths) (`impacto_v06_medio_ec`);
 - fraco: só o desenho (`impacto_v06_fraco`).
+Depois, "menos pontiagudos e mais finos": riscos de 2,5 a 3 px, ponta redonda, afinando pouco
+(taper 20-30 % até 40-45 % da largura).
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:

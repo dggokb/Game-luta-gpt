@@ -368,7 +368,7 @@
                                   "name": "Stroke Width",
                                   "value": {
                                     "t": "Scalar",
-                                    "v": 5.0
+                                    "v": 3.0
                                   },
                                   "ui": {
                                     "kind": "Pixels"
@@ -556,7 +556,7 @@
                                       "name": "Start Length",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 35.0
+                                        "v": 20.0
                                       },
                                       "ui": {
                                         "kind": "Pixels"
@@ -575,7 +575,7 @@
                                       "name": "End Length",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 60.0
+                                        "v": 30.0
                                       },
                                       "ui": {
                                         "kind": "Pixels"
@@ -594,7 +594,7 @@
                                       "name": "Start Width",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 0.0
+                                        "v": 45.0
                                       },
                                       "ui": {
                                         "kind": "Slider",
@@ -618,7 +618,7 @@
                                       "name": "End Width",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 0.0
+                                        "v": 40.0
                                       },
                                       "ui": {
                                         "kind": "Slider",
@@ -1830,7 +1830,7 @@
                                   "name": "Stroke Width",
                                   "value": {
                                     "t": "Scalar",
-                                    "v": 4.0
+                                    "v": 2.5
                                   },
                                   "ui": {
                                     "kind": "Pixels"
@@ -2018,7 +2018,7 @@
                                       "name": "Start Length",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 35.0
+                                        "v": 20.0
                                       },
                                       "ui": {
                                         "kind": "Pixels"
@@ -2037,7 +2037,7 @@
                                       "name": "End Length",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 60.0
+                                        "v": 30.0
                                       },
                                       "ui": {
                                         "kind": "Pixels"
@@ -2056,7 +2056,7 @@
                                       "name": "Start Width",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 0.0
+                                        "v": 45.0
                                       },
                                       "ui": {
                                         "kind": "Slider",
@@ -2080,7 +2080,7 @@
                                       "name": "End Width",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 0.0
+                                        "v": 40.0
                                       },
                                       "ui": {
                                         "kind": "Slider",
@@ -3292,7 +3292,7 @@
                                   "name": "Stroke Width",
                                   "value": {
                                     "t": "Scalar",
-                                    "v": 4.0
+                                    "v": 2.5
                                   },
                                   "ui": {
                                     "kind": "Pixels"
@@ -3480,7 +3480,7 @@
                                       "name": "Start Length",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 35.0
+                                        "v": 20.0
                                       },
                                       "ui": {
                                         "kind": "Pixels"
@@ -3499,7 +3499,7 @@
                                       "name": "End Length",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 60.0
+                                        "v": 30.0
                                       },
                                       "ui": {
                                         "kind": "Pixels"
@@ -3518,7 +3518,7 @@
                                       "name": "Start Width",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 0.0
+                                        "v": 45.0
                                       },
                                       "ui": {
                                         "kind": "Slider",
@@ -3542,7 +3542,7 @@
                                       "name": "End Width",
                                       "value": {
                                         "t": "Scalar",
-                                        "v": 0.0
+                                        "v": 40.0
                                       },
                                       "ui": {
                                         "kind": "Slider",

@@ -41,10 +41,11 @@ ANEL_EROSAO = [300, 300, 200, 70, -30, -100]
 # fora e o começo vem atrás, então cada risco nasce no contato e some na ponta.
 SPRAY = [
     # (raio de dentro, raio de fora, cópias, giro inicial, largura, atraso em quadros, fim %, começo %)
-    # Pedido de 11/11: "mais riscos e menores" — três voltas de riscos curtos e finos.
-    (40, 150, 22, 0, 5, 0, [0, 60, 90, 100, 100, 100], [0, 0, 35, 70, 92, 100]),
-    (60, 190, 20, 8.2, 4, 1, [0, 0, 55, 88, 100, 100], [0, 0, 0, 40, 75, 100]),
-    (30, 120, 18, 4.1, 4, 1, [0, 0, 65, 95, 100, 100], [0, 0, 10, 55, 85, 100]),
+    # Pedidos de 11/11: "mais riscos e menores", depois "menos pontiagudos e mais finos" —
+    # três voltas de riscos curtos e finos, de ponta redonda, afinando pouco.
+    (40, 150, 22, 0, 3, 0, [0, 60, 90, 100, 100, 100], [0, 0, 35, 70, 92, 100]),
+    (60, 190, 20, 8.2, 2.5, 1, [0, 0, 55, 88, 100, 100], [0, 0, 0, 40, 75, 100]),
+    (30, 120, 18, 4.1, 2.5, 1, [0, 0, 65, 95, 100, 100], [0, 0, 10, 55, 85, 100]),
 ]
 
 
@@ -121,8 +122,8 @@ def medio(item):
               prop(n, f'{g}/contents/stroke/color', '#f4fbff'), prop(n, f'{g}/contents/stroke/width', larg),
               prop(n, f'{g}/contents/stroke/cap', 1),
               prop(n, f'{g}/contents/stroke/taper/units', 1),
-              prop(n, f'{g}/contents/stroke/taper/startLength', 35), prop(n, f'{g}/contents/stroke/taper/startWidth', 0),
-              prop(n, f'{g}/contents/stroke/taper/endLength', 60), prop(n, f'{g}/contents/stroke/taper/endWidth', 0),
+              prop(n, f'{g}/contents/stroke/taper/startLength', 20), prop(n, f'{g}/contents/stroke/taper/startWidth', 45),
+              prop(n, f'{g}/contents/stroke/taper/endLength', 30), prop(n, f'{g}/contents/stroke/taper/endWidth', 40),
               prop(n, f'{g}/contents/repeater/copies', copias),
               prop(n, f'{g}/contents/repeater/transform/position', [0, 0]),
               prop(n, f'{g}/contents/repeater/transform/rotation', 360 / copias),
