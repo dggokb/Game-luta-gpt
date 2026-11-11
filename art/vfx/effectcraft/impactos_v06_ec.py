@@ -20,6 +20,8 @@ meio do desenho, a poucos px do pivô:
     efeito_video.py art/vfx/impactos_v06/leve --nome impacto_v06_fraco --fps 30 --origem 214,250 --escala-mundo 0.60
 O forte do jogo (o desenho do médio sem o spray, com o anel; alfa a 90% antes):
     efeito_video.py PASTA/forte_medio --nome impacto_v06_forte_medio --fps 24 --origem 200,248 --escala-mundo 0.60
+O hit forte novo do dono (art/vfx/impacto_forte_v07) com o anel (alfa a 90% antes):
+    efeito_video.py PASTA/forte_v07 --nome impacto_v07_forte --fps 24 --origem 320,320 --escala-mundo 0.54
 (as três com o alfa a 90% antes, pedido de 11/11)
 """
 import argparse
@@ -33,7 +35,7 @@ ARTE = AQUI.parent / 'impactos_v06'
 CLI_PADRAO = Path('/home/user/storytold/effectcraft/target/release/effectcraft-cli')
 LADO = 512
 PIVO = (210.0, 260.0)
-FPS = {'forte': 20, 'medio': 24, 'forte_medio': 24}
+FPS = {'forte': 20, 'medio': 24, 'forte_medio': 24, 'forte_v07': 24}
 
 # O anel do dano_forte (0,30 px do mundo por px) na escala destes desenhos (0,70); 6 quadros.
 K = 0.30 / 0.70
@@ -69,8 +71,8 @@ def chaves(camada, caminho, valores, fps):
             for q, v in enumerate(valores) if v is not None]
 
 
-def base(nome, item, fps):
-    return [{'command': 'comp.new', 'params': {'name': nome, 'width': LADO, 'height': LADO, 'frameRate': fps,
+def base(nome, item, fps, lado=LADO):
+    return [{'command': 'comp.new', 'params': {'name': nome, 'width': lado, 'height': lado, 'frameRate': fps,
                                                'duration': 6 / fps}},
             {'command': 'engine.batch', 'params': {'steps': [
                 {'command': 'layer.addItem', 'params': {'item': item}},
@@ -88,8 +90,9 @@ def forte(item):
     return s + anel(fps)
 
 
-def anel(fps):
-    """O anel de pressão de ar em 3D atravessando o desenho (o mesmo da V4 no jogo)."""
+def anel(fps, pivo=PIVO, fator=1.0):
+    """O anel de pressão de ar em 3D atravessando o desenho (o mesmo da V4 no jogo). fator: px da
+    folha a mais por px destes desenhos, para o anel ficar do mesmo tamanho no mundo noutra escala."""
     s = []
     n = 'anel'
     s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': n, 'size': [200, 200],
@@ -99,9 +102,10 @@ def anel(fps):
           prop(n, 'contents/repeater/transform/scale', [88, 88]), prop(n, 'contents/repeater/transform/endOpacity', 40),
           {'command': 'layer.setSwitch', 'params': {'layers': [n], 'switch': 'threeD', 'value': True}},
           prop(n, 'transform/rotationX', ANEL_GIRO[0]), prop(n, 'transform/rotationY', ANEL_GIRO[1])]
-    s += chaves(n, 'transform/position', [[PIVO[0] + d, PIVO[1], 0] for d in ANEL_AVANCO], fps)
-    s += chaves(n, 'contents/group/contents/ellipse/size', [None if r is None else [2 * r, 2 * r] for r in ANEL_RAIOS], fps)
-    s += chaves(n, 'contents/group/contents/stroke/width', ANEL_TRACOS, fps)
+    s += chaves(n, 'transform/position', [[pivo[0] + d * fator, pivo[1], 0] for d in ANEL_AVANCO], fps)
+    s += chaves(n, 'contents/group/contents/ellipse/size',
+                [None if r is None else [2 * r * fator, 2 * r * fator] for r in ANEL_RAIOS], fps)
+    s += chaves(n, 'contents/group/contents/stroke/width', [None if v is None else v * fator for v in ANEL_TRACOS], fps)
     s += chaves(n, 'transform/opacity', ANEL_OPAC, fps)
     s += chaves(n, 'contents/group/contents/fill/opacity', [0, 8, 0], fps)
     s += [{'command': 'effect.apply', 'params': {'effect': 'Turbulent Displace', 'layers': [n]}},
@@ -124,6 +128,17 @@ def forte_medio(item):
     s = base('forte_medio', item, fps)
     s += [{'command': 'layer.setSwitch', 'params': {'layers': ['arte'], 'switch': 'threeD', 'value': True}}]
     return s + anel(fps)
+
+
+def forte_v07(item):
+    """O hit forte novo desenhado pelo dono (art/vfx/impacto_forte_v07, 6 quadros de 640 × 640,
+    centro em 320,320) com o anel de pressão de ar em 3D ("não esquece do círculo de pressão").
+    Na folha a 0,54 (o forte_medio está a 0,60), então o anel cresce 0,60/0,54 para ficar do
+    mesmo tamanho no mundo."""
+    fps = FPS['forte_v07']
+    s = base('forte_v07', item, fps, lado=640)
+    s += [{'command': 'layer.setSwitch', 'params': {'layers': ['arte'], 'switch': 'threeD', 'value': True}}]
+    return s + anel(fps, pivo=(320.0, 320.0), fator=0.60 / 0.54)
 
 
 def medio(item):
@@ -196,6 +211,7 @@ def main():
     rodar(a.cli, 'forte', ARTE / 'forte', forte, a.saida / 'forte')
     rodar(a.cli, 'medio', ARTE / 'medio', medio, a.saida / 'medio')
     rodar(a.cli, 'forte_medio', ARTE / 'medio', forte_medio, a.saida / 'forte_medio')
+    rodar(a.cli, 'forte_v07', AQUI.parent / 'impacto_forte_v07' / 'frames', forte_v07, a.saida / 'forte_v07')
 
 
 if __name__ == '__main__':

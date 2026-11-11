@@ -338,6 +338,12 @@ impactos_v06_ec.py, 1,25× o médio). Aprovado ("o forte ficou melhor assim"): �
 por enquanto, e a estrela pontuda (`impacto_v06_forte_ec`) saiu dos assets. O dono vai desenhar
 um hit forte novo.
 
+O hit forte novo chegou (11/11, `art/vfx/impacto_forte_v07`: folha de 3 × 2 quadros de 640 × 640,
+centro em 320,320, fundo transparente), "não esquece do círculo de pressão": forte_v07 no
+impactos_v06_ec.py (o desenho + o anel 3D, que cresce 0,60/0,54 para ficar do tamanho do anel do
+forte_medio no mundo), folha `impacto_v07_forte` a 0,54 (pico do tamanho do forte_medio). Nos
+assets; entra no `efeitoDeGolpe` quando o dono aprovar no vídeo (`hit_forte_v07.mp4`).
+
 ## Fumaça do dash V04, desenhada pelo dono (11/11)
 
 `art/vfx/fumaca_dash_v04` (8 desenhos diferentes de 768 × 448, 45 ms cada, pé em 710,350, corre
