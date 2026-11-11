@@ -291,6 +291,17 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## Defesa em 3D, medida no Tōkon (11/11)
+
+`art/vfx/effectcraft/defesa3d_ec.py`, medida na referência (quadros 77-84, ~250 ms a 24 por
+segundo): clarão pequeno ciano e branco no contato (q0), abre num disco oval de energia em pé, de
+frente para quem bate (q1-q3: sólido com máscara oval, Gradient Ramp radial vezes Fractal Noise
+fervendo, cortado em 4 faixas de azul a branco pelo Colorama, 3D girado 68° em Y), depois só o
+anel fino (elipse 3D com traço) que se abre e apaga (q4-q7), com Glow ciano por cima. Comparação:
+`android/app/build/sprite-review/defesa_tokon_x_nossa_quadro_a_quadro.mp4`. No jogo seria
+`efeito_video.py <pasta> --nome defesa3d_ec --fps 24 --origem 300,300 --escala-mundo 0.55` no
+lugar das `defesa*`. Não testada no jogo.
+
 ## Fumaça de pouso em 3D toon (11/11)
 
 `art/vfx/effectcraft/fumaca3d_pouso_ec.py`, medida na queda do Hulk da referência (quadros
