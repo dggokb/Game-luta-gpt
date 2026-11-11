@@ -117,6 +117,13 @@ que tem a ponta mais longe do tronco dentro da caixa do golpe.
 - Com o caminho novo, a faísca de dano desses golpes nasce na ponta do membro.
 - Correção (pedido do dono, "o M não tô vendo o rastro"): o M do p15 é soco duplo e a preparação
   medida era a mão da frente (47 px); passou para a mão de trás recolhida no desenho 4 (138 px).
+- p16 refeito (dono: "pegou quase nada, e tem efeitos de desenho nela ainda"): a pose erra nesta
+  personagem, então os pontos do caminho foram marcados à mão numa grade (`CAMINHO_MANUAL`). Saíram os
+  efeitos opacos do vídeo trocando os desenhos pelo limpo da mesma pose: 2H (a lâmina branca, 6-12=13),
+  jH (estouro no punho, 5=6), 6M (brilho no tênis, 6,7=8), 2M (pé borrado, 8,9=10), j2H (estouro no
+  joelho, 8,9=10, sem smear: o joelho anda pouco), S2 (mancha vermelha, 5=4, 6=7). Smear novo em 2H,
+  jH, 6M, 2M e jM; M, H e S2 com `--sem-escuro` (a luva preta virava língua escura). Saiu de
+  `ARTE_COM_EFEITO`. S3 e S4 continuam como estavam.
 - "Uma esfera em volta" no 2H do p15 não é do smear: é a aura da esquiva (`drawMechanicAura`,
   `AURA_EVADE`, desde 9/11), que o jogo desenha nos quadros em que o golpe esquiva de ataque aéreo.
 - Visto: o desenho do acerto de cada um (folha). `testarMotor`: só as 3 falhas antigas; build

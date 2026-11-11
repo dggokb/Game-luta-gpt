@@ -2,7 +2,7 @@
   "id": "p16_crouch_heavy",
   "javaName": "P16_CROUCH_HEAVY",
   "profile": "p16.json",
-  "source": "art/sprites/source/p16_crouch_heavy_video_hd.png",
+  "source": "art/sprites/source/p16_crouch_heavy_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p16_crouch_heavy.webp",
   "report": "tools/sprites/reports/p16_crouch_heavy.report.json",
   "preview": "android/app/build/sprite-review/p16_crouch_heavy-import.png",
@@ -45,7 +45,25 @@
   "rootX": 240,
   "rootY": 668,
   "sourceReferences": [
-    "art/sprites/source/p16_crouch_heavy_video_normalized.png"
+    "art/sprites/source/p16_crouch_heavy_video_normalized.png",
+    "art/sprites/source/p16_crouch_heavy_video_hd.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "smear": {
+    "fonte": "art/sprites/source/p16_crouch_heavy_video_hd.png",
+    "quadros": [
+      6,
+      7
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "6=13,7=13,8=13,9=13,10=13,11=13,12=13",
+    "limpar": "todos",
+    "antes": "6=4,7=4",
+    "semEscuro": true
+  }
 }
