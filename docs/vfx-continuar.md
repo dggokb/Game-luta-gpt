@@ -291,6 +291,13 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## No jogo hoje: golpe forte sem fagulhas (11/11)
+
+O dono mandou tirar as fagulhas ("tira esse treco"). A folha `dano_forte_anel_ec` voltou à versão
+do commit `5bf7c27`: o vídeo `dano_forte` com acabamento (faixas, impacto segurado, halo, erosão)
+e o anel de pressão de ar em 3D, sem partículas. O script `dano_forte_ec.py` seguiu com as
+tentativas (lascas); para refazer exatamente a folha do jogo, usar o script desse commit.
+
 ## Golpe forte: dissipa em lascas de raio, medido no Tōkon (11/11)
 
 Na referência (quadros 124-133, ~290 ms) a faísca não encolhe: quando o miolo apaga, os braços
