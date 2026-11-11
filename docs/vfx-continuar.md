@@ -291,6 +291,14 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## V3 da faísca direcional (`acerto_forte_04.png`, 11/11)
+
+Mesma família da `acerto_forte_03`, mais macia: miolo branco maior, braços amarelos meio
+transparentes (alfa mediano 45), lascas do fim que se dissolvem. Mesmo corte e mesmos números
+(`--origem 125,223 --escala-mundo 0.66`). No jogo: mais luz e menos forma; o miolo cobre melhor o
+contato, mas o amarelo some contra o cenário claro e o fim quase não se lê. Vídeo:
+`android/app/build/sprite-review/acerto_forte_v3_tokon_e_jogo.mp4`. Esperando o dono.
+
 ## Faísca do golpe forte direcional (`acerto_forte_03.png`, 11/11)
 
 Segunda folha do dono (4 × 2, células de 443 px, fundo transparente, sem contorno): miolo branco
