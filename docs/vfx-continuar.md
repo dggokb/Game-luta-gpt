@@ -291,6 +291,18 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## Fumaça de pouso em 3D toon (11/11)
+
+`art/vfx/effectcraft/fumaca3d_pouso_ec.py`, medida na queda do Hulk da referência (quadros
+165-177): duas colunas altas (~400 px numa tela de 2400) que nascem como bicos finos nos pés e
+voam para os lados ~700 px em 2 ou 3 quadros, viram volume encaroçado e se rasgam em tufos que
+sobem e ficam ralos (~450 ms). Mesma técnica da fumaça do dash (esferas 3D, luz com sombra,
+Colorama em duas cores). No jogo seria `efeito_video.py <pasta> --nome fumaca3d_pouso_ec --fps
+24 --origem 1200,952 --escala-mundo 0.6` no lugar da `fumaca_pouso`. Comparação:
+`android/app/build/sprite-review/pouso_tokon_x_nossa_quadro_a_quadro.mp4`. Ainda diferente: as
+colunas do Tōkon são mais estreitas e com ganchos que se enrolam embaixo; as nossas são mais
+largas e quadradas. Não testada no jogo.
+
 ## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
 
 Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
