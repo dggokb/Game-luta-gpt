@@ -5622,8 +5622,11 @@ public class GameView extends SurfaceView
             // Os impactos redesenhados (impacto_v06_*) tocam mais rápido que a pausa do golpe
             // (pedido do dono, 11/11: "anima mais rápido").
             float duracao = nome.startsWith("impacto_v06") ? ms * RITMO_IMPACTO_V06 : ms;
-            // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
-            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, duracao, angulo);
+            // A faísca segue a linha do golpe (o chute que sobe joga ela para cima). O forte
+            // redesenhado não: já se abre para a frente e um pouco para cima, e inclinado subia por
+            // cima da cabeça de quem apanha (dono, 11/11).
+            float giro = nome.equals("impacto_v06_forte_ec") ? 0f : angulo;
+            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, duracao, giro);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;

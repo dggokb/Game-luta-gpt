@@ -313,6 +313,9 @@ folha sozinho não mudava nada).
 Depois, "ajusta a posição, principalmente do forte": a origem passou a ser o meio do desenho
 no auge, não o pivô 210,260 da folha (o forte se abre ~75 px à frente dele e no jogo cobria o
 ombro e a cabeça do adversário): forte `--origem 280,250`, médio `200,248`, fraco `214,250`.
+O dono reprovou o forte assim ("agora tá saindo lá no meio da perna; antes pegava a ponta mas
+tava na posição errada"): voltou para a ponta (`--origem 210,260`) e deixou de girar com a
+inclinação do golpe (`efeitoDeGolpe`); inclinado ele subia por cima da cabeça no chute alto.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:

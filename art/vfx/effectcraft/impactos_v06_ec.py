@@ -10,9 +10,10 @@
 
     python3 art/vfx/effectcraft/impactos_v06_ec.py --saida PASTA [--cli CAMINHO]
 
-Sai PASTA/forte e PASTA/medio (sequências PNG). No jogo, a origem é o meio do desenho no auge (não
-o pivô 210,260 da folha: o forte se abre ~75 px para a frente dele e no jogo passava do adversário):
-    efeito_video.py PASTA/forte --nome impacto_v06_forte_ec --fps 20 --origem 280,250 --escala-mundo 0.48
+Sai PASTA/forte e PASTA/medio (sequências PNG). No jogo: o forte no pivô da folha (210,260, a ponta
+do golpe; centrado no meio do desenho ele nascia no meio da perna) e sem a inclinação do golpe
+(GameView.efeitoDeGolpe); médio e fraco no meio do desenho, a poucos px do pivô:
+    efeito_video.py PASTA/forte --nome impacto_v06_forte_ec --fps 20 --origem 210,260 --escala-mundo 0.48
     efeito_video.py PASTA/medio --nome impacto_v06_medio_ec --fps 24 --origem 200,248 --escala-mundo 0.48
     efeito_video.py art/vfx/impactos_v06/leve --nome impacto_v06_fraco --fps 30 --origem 214,250 --escala-mundo 0.60
 (as três com o alfa a 90% antes, pedido de 11/11)
