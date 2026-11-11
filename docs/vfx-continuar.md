@@ -643,8 +643,11 @@ gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar 
 
 **Folha refeita, mapa refeito.** O mapa é do desenho: quem refaz uma folha (vídeo novo, SR HD,
 smear) roda `normal_map.py <folha> --refazer` em seguida. Se a folha mudar de tamanho e o mapa
-ficar o antigo, o jogo ignora o mapa (aviso no log) e usa a silhueta; se só o desenho mudar, o
-jogo não tem como saber. Foi o que houve no mesmo dia com `player_base_idle` e
+ficar o antigo, o jogo ignora o mapa (aviso no log) e o `build_characters.py` o trata como saída
+velha: o `--check` acusa e o `--write` apaga (aí é refazer com `normal_map.py`). Se só o desenho
+mudar, ninguém tem como saber. O `build_characters.py` conhece o `<folha>_n.webp` desde 12/11:
+antes disso o `--check` acusava os 88 mapas como órfãos e o `--write` os apagaria (erro meu ao
+mandar os mapas; avisado por outra sessão). Foi o que houve no mesmo dia com `player_base_idle` e
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o

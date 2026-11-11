@@ -975,13 +975,38 @@ def pack_atlas(stage, cfg, report):
     if cfg.get('pixelScale', 1) != 1:
         report['pixelScale'] = report['packed']['pixelScale'] = cfg['pixelScale']
 
+def normal_map_da_folha(root, rel, results):
+    """`<folha>_n.webp` é o normal map de uma folha (tools/sprites/normal_map.py, o motor 4 de luz):
+    não sai deste gerador, mas acompanha a folha. Vale enquanto a folha existir e ele tiver o
+    tamanho dela (x e y lado a lado, cada metade com 1/4 do lado da folha). Folha removida ou
+    refeita com outro tamanho: o mapa vira órfão como qualquer saída velha (o --check acusa e o
+    --write apaga; refazer com normal_map.py <folha>)."""
+    path = Path(rel)
+    if path.suffix != '.webp' or not path.stem.endswith('_n'): return False
+    folha = path.stem[:-2]
+    for cfg, report in results:
+        if Path(cfg['output']).stem != folha or Path(cfg['output']).parent != path.parent: continue
+        packed = report.get('packed') or {}
+        w, h = packed.get('sheetWidth'), packed.get('sheetHeight')
+        if not w or not h: return False
+        try:
+            with Image.open(root / rel) as mapa: tamanho = mapa.size
+        except OSError:
+            return False
+        return tamanho == (2 * -(-w // 4), -(-h // 4))
+    return False
+
+def orphans_de(root, found, outputs, results):
+    """Dos arquivos achados, os que nenhum clipe produz (o normal map de uma folha viva não conta)."""
+    return [rel for rel in found if rel not in outputs and not normal_map_da_folha(root, rel, results)]
+
 def orphans(root, outputs, results):
     """Files in generated/authored folders that no clip produces or reads."""
     found = []
     for folder,patterns in (('android/app/src/main/res/drawable-nodpi',('*.png','*.webp')),('tools/sprites/reports',('*.json',))):
         for pattern in patterns:
             found += [p.relative_to(root).as_posix() for p in sorted((root/folder).glob(pattern))]
-    stale = [rel for rel in found if rel not in outputs]
+    stale = orphans_de(root, found, outputs, results)
     sources = {cfg['source'] for cfg,_ in results}
     sources |= {source for cfg,_ in results for source in cfg.get('sourceReferences', [])}
     sources |= {read(p).get('anatomyReference',{}).get('source') for p in (root/'tools/sprites/profiles').glob('*.json')}
