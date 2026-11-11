@@ -18,7 +18,7 @@ public class ComandosPorPersonagemTest {
      */
     private static final String[][] TABELA = {
         {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←"},
-        {"p02", "Palma", "↓ ↘ →", "Chute da garça", "[↓] ↑", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "[←] →"},
+        {"p02", "Palma", "↓ ↘ →", "Chute da garça", "[↓] ↑", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "← →"},
         {"p03", "Onda curta", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},
         {"p05", "Kunai", "↓ ↘ →", "Shuriken", "↓ ↙ ←", "Selo e mudança", "↓ ↓", "Corte de mão", "← ↙ ↓ ↘ →"},
@@ -176,10 +176,11 @@ public class ComandosPorPersonagemTest {
     }
 
     @Test public void semCargaOSegurarEUmGolpeNormal() {
-        Luta l = new Luta("p02");
+        // A Cabeçada do p04 ([←] →) é de carga (a da Yin-lu virou toque em 11/11).
+        Luta l = new Luta("p04");
         l.hold("M", 5, 1, l.config().chargeFrames / 3);
         assertEquals("pouco tempo atrás: → + M é o golpe alto, não o especial", GolpeAlto.BINDING, l.started());
-        Luta solto = new Luta("p02");
+        Luta solto = new Luta("p04");
         solto.in.direction = 5;
         solto.steps(solto.config().chargeFrames + 2);
         solto.in.direction = 0;
@@ -188,6 +189,34 @@ public class ComandosPorPersonagemTest {
         solto.press("M");
         solto.step();
         assertEquals("a carga acaba um pouco depois de soltar", GolpeAlto.BINDING, solto.started());
+    }
+
+    /**
+     * O Chute rodopiante da Yin-lu é um toque (← →, 11/11): sem segurar. Conta do ← apertado, não
+     * do solto: defender segurando ← e depois apertar → com o botão é o golpe normal.
+     */
+    @Test public void oToqueParaTrasEFrenteDaYinLu() {
+        for (String b : new String[] {"L", "M", "H"}) {
+            Luta toque = new Luta("p02");
+            toque.motion(b, 5, 1);
+            assertEquals("← → + " + b, "S4", toque.started());
+        }
+        Luta defendendo = new Luta("p02");
+        defendendo.in.direction = 5;
+        defendendo.steps(40);
+        defendendo.in.direction = 1;
+        defendendo.press("M");
+        defendendo.step();
+        assertNotEquals("segurou ← um tempo: → + M não é o toque", "S4", defendendo.started());
+        Luta devagar = new Luta("p02");
+        devagar.in.direction = 5;
+        devagar.steps(2);
+        devagar.in.direction = 0;
+        devagar.steps(devagar.config().motionWindowFrames + 2);
+        devagar.in.direction = 1;
+        devagar.press("M");
+        devagar.step();
+        assertNotEquals("← e, bem depois, → + M não é o toque", "S4", devagar.started());
     }
 
     @Test public void segurarBaixoECimaNaoPula() {

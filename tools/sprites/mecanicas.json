@@ -501,7 +501,7 @@
         },
         "S4": {
           "nome": "Chute rodopiante",
-          "comando": "[←] →"
+          "comando": "←→"
         }
       },
       "s1": {

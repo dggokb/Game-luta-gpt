@@ -11,7 +11,7 @@ o botão escolhe a força da energia.
 | # | S1 | S2 | S3 | S4 |
 |---|---|---|---|---|
 | p01 | Onda ↓↘→ | Punho ascendente →↓↘ | Chute giratório ↓↙← | — |
-| p02 | Palma ↓↘→ | Chute da garça [↓] ↑ | Contra-golpe ←↙↓ | Chute rodopiante [←] → |
+| p02 | Palma ↓↘→ | Chute da garça [↓] ↑ | Contra-golpe ←↙↓ | Chute rodopiante ← → |
 | p03 | Onda curta ↓↘→ | Punho em sequência →↓↘ | Avanço em três ↓↙← | Mergulho, no ar: ↓↘→ |
 | p04 | Soco de impacto ↓↘→ | Cabeçada [←] → | Esquiva ↓↓ | Ombrada ←↙↓↘→ |
 | p05 | Kunai ↓↘→ | Shuriken ↓↙← | Selo e mudança ↓↓ | Corte de mão ←↙↓↘→ |
@@ -36,6 +36,9 @@ Super: botão SUPER. Ultra: ↓ + SUPER. Agarrão: botão de agarrar (ou L + M j
   com o botão. A carga dura 10 quadros depois de soltar. Diagonais contam (↙ carrega trás e baixo).
   Com a carga para baixo pronta, o pulo espera 3 quadros: o botão que chega junto vira o
   especial em vez do pulo.
+- **← → (toque, o S4 da Yin-lu desde 11/11):** sem segurar; o tempo conta de quando o ← foi
+  apertado. Defender segurando ← e depois apertar → com o botão é golpe normal, e segurar ← e
+  soltar ↙↓↘→ é a Palma, não o toque.
 - **↓↓:** solte (ou mude de direção) entre os dois ↓. Para emendar golpes agachados (2L → 2M),
   mantenha o ↓ segurado: soltar e apertar de novo dentro de ¼ s vira o especial de ↓↓.
 - **Quando dois comandos batem:** ganha o de mais passos (um movimento ganha de um segurar);
