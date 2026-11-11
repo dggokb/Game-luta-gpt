@@ -269,6 +269,17 @@ tela em ~0,06 s por quadro. No jogo: `efeito_video.py <pasta> --nome fumaca3d_da
 --origem 600,392 --escala-mundo 0.85`, no lugar da `poeira_corrida` (só na cópia local). Vídeo:
 `android/app/build/sprite-review/dash_fumaca_hoje_x_fumaca_3d_toon.mp4`. Espera aprovação.
 
+**Comparada quadro a quadro com o Tōkon e corrigida (11/11):** o dono apontou "você está fazendo
+desaparecer e não dissipar" (o mesmo erro do golpe forte). Dissipar, na referência: o volume se
+rasga em tufos que se afastam e sobem, cada tufo continua crescendo e se enrola, e só então fica
+ralo e transparente; não encolhe nem afina. No script: do desenho 5 em diante as bolas se afastam
+do centro do cacho (×1 + 0,55 por desenho), as de cima sobem mais rápido, a escala segue
+crescendo, Turbulent Displace em Twist cresce até 90, desfoque leve e opacidade caindo. Tentativa
+descartada no caminho: colunas de elipsoides (cara de colar de contas) com Minimax afinando
+(sumir, não dissipar). Falta: os tufos do Tōkon viram fitas altas com gancho na ponta; os nossos
+ainda são bolas. Vídeos: `fumaca_tokon_x_nossa_quadro_a_quadro.mp4` e
+`fumaca_tokon_x_nossa_dissipando.mp4` (em `android/app/build/sprite-review/`, só na sessão).
+
 ## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
 
 Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
