@@ -5594,11 +5594,13 @@ public class GameView extends SurfaceView
             // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
             if (superGolpe) {
                 nome = "impacto_ar_super";
-            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v06_forte_ec")) {
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v06_forte_medio")) {
                 // Os impactos redesenhados pelo dono (art/vfx/impactos_v06), com o acabamento do
-                // EffectCraft (art/vfx/effectcraft/impactos_v06_ec.py): o forte com halo e o anel de
-                // pressão de ar em 3D, o médio com o spray de ar em círculo, o fraco só o desenho.
-                nome = "impacto_v06_forte_ec";
+                // EffectCraft (art/vfx/effectcraft/impactos_v06_ec.py). O forte é o desenho do
+                // médio um pouco maior, sem o spray e com o anel de pressão de ar em 3D (a estrela
+                // pontuda saiu, 11/11: o dono vai desenhar um forte novo); o médio com o spray de ar
+                // em círculo; o fraco só o desenho.
+                nome = "impacto_v06_forte_medio";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("acerto_forte_05_ec")) {
                 // A faísca desenhada pelo dono (art/vfx/acerto_forte_05.png, a V4) com halo e o anel
                 // de pressão de ar em 3D do EffectCraft: art/vfx/effectcraft/acerto_forte_05_ec.py.

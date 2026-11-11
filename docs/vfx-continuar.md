@@ -328,8 +328,9 @@ agora é a do desenho mais esticado dos quadros seguintes (`PONTA_ADIANTE`), enq
 avança. Recuar a origem (achando que o pé sumia atrás do rival) foi o lado errado.
 Ainda errado para o dono; ele pediu trocar a estrela pontuda por "o médio um pouco maior, sem o
 spray de ar e com o círculo de pressão de ar": `impacto_v06_forte_medio` (forte_medio no
-impactos_v06_ec.py, 1,25× o médio). A folha está nos assets, mas o `efeitoDeGolpe` só passa a
-usá-la quando o dono aprovar no vídeo (forte_medio_com_anel.mp4).
+impactos_v06_ec.py, 1,25× o médio). Aprovado ("o forte ficou melhor assim"): é o forte do jogo
+por enquanto, e a estrela pontuda (`impacto_v06_forte_ec`) saiu dos assets. O dono vai desenhar
+um hit forte novo.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
