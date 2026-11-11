@@ -1,0 +1,16 @@
+SŌKON BLOODLINES — FUMAÇA DE DASH, RECONSTRUÇÃO V05
+
+Referência: vídeo Marvel Tōkon, fumaça branca/cinza-clara do dash.
+Recriada do zero: dez SILHUETAS DESENHADAS e evolutivas, nenhuma
+imagem antiga reaproveitada e nenhum recorte do vídeo.
+1-2: início arredondado; 3-4: massa cheia em crescimento;
+5-7: volumes enrolam em C e abrem buracos; 8-10: fragmentos
+espalham, afinam e perdem opacidade; jamais encolhem para dentro.
+
+10 PNGs RGBA transparentes em frames/, 768×448 por quadro.
+spritesheet.png: atlas RGBA de 5×2, 3840×896.
+animacao_preview.gif: visualização em fundo azul-escuro.
+Pivô do pé (correndo para DIREITA): x=710,y=350.
+Quadros (ms): 40,40,42,42,44,45,48,55,65,75.
+A nuvem permanece no MUNDO após cada passada; ela não segue
+o personagem. Espelhar para corridas na direção oposta.
