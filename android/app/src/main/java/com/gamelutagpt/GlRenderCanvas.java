@@ -1077,6 +1077,9 @@ final class GlRenderCanvas implements RenderCanvas {
                       float u0, float v0, float u1, float v1, int argb, float tipo) {
         float al = (argb >>> 24) / 255f;
         float r = ((argb >> 16) & 0xFF) / 255f * al, g = ((argb >> 8) & 0xFF) / 255f * al, bl = (argb & 0xFF) / 255f * al;
+        // Soma: a cor cheia e o alfa zero; com a mistura de cor pré-multiplicada (ONE,
+        // ONE_MINUS_SRC_ALPHA) o que está embaixo fica inteiro e a cor do efeito soma por cima.
+        if (soma) al = 0f;
         if (nPlanos > 0 && quadRecortado(x0, y0, x1, y1, x2, y2, x3, y3, u0, v0, u1, v1, r, g, bl, al, tipo)) return;
         reservar(6);
         vertice(x0, y0, u0, v0, r, g, bl, al, tipo);
@@ -1224,6 +1227,13 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     // ---- Para o CanvasGl: estado vindo do Canvas e triângulos com uv ----
+
+    /** As imagens que vierem somam com o que está embaixo (luz), em vez de cobrir ({@link Mistura}). */
+    void soma(boolean sim) {
+        soma = sim;
+    }
+
+    private boolean soma;
 
     /** Transparência de tudo o que vier (as camadas com alfa do Canvas), de 0 a 1. */
     void alfa(float a) {

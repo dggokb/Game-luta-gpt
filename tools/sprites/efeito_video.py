@@ -165,7 +165,7 @@ def empacotar(imagens):
 def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=None,
               altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0,
               escala_mundo=None, resolucao=None, velocidade=1.0, apagar=None, borda=0,
-              alfa_corte=0.0, escuro=0, cinza=0.0, segurar=None):
+              alfa_corte=0.0, escuro=0, cinza=0.0, segurar=None, soma=0.0):
     if Path(video).is_dir():
         quadros, fps = ler_pngs(video, inicio, fim, passo), fps_png
     else:
@@ -259,6 +259,9 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
         q, extra = segurar
         dados['marcaMs'] = sum(dados['duracoesMs'][:q])
         dados['duracoesMs'][q] += extra
+    if soma > 0:
+        # Luz: o jogo soma a folha com o que está embaixo (EfeitosVideo, Mistura), de 0 a 1.
+        dados['soma'] = round(min(1.0, soma), 3)
     (destino / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     gif_previa(dados, recortados, Path(previa) / f'{nome}.gif')
     return destino, dados
@@ -315,6 +318,8 @@ def main():
     p.add_argument('--escuro', type=int, default=0, help='véu cinza mais escuro que isso (0-255) e meio transparente some')
     p.add_argument('--cinza', type=float, default=0.0, help='véu meio transparente com saturação abaixo disso (0-1) some')
     p.add_argument('--segurar', type=lambda t: numeros(t, 2), help='quadro,ms: o vídeo para nesse quadro por mais ms (marcaMs no json)')
+    p.add_argument('--soma', type=float, default=0.0,
+                   help='efeito de luz: quanto soma com o que está embaixo no jogo, de 0 (cobre) a 1 (luz pura)')
     p.add_argument('--saida', type=Path, help='pasta onde sai <nome>/ (padrão: assets/efeitos). As cenas da história '
                    '(os dois lutadores num vídeo, motor de cinemáticas) vão em assets/historia/<episódio>')
     a = p.parse_args()
@@ -322,7 +327,7 @@ def main():
                                a.altura, a.recorte, fps_png=a.fps, escala_mundo=a.escala_mundo,
                                resolucao=a.resolucao, velocidade=a.velocidade, apagar=a.apagar,
                                borda=a.borda, alfa_corte=a.alfa_corte, escuro=a.escuro, cinza=a.cinza,
-                               segurar=a.segurar, saida=a.saida or SAIDA)
+                               segurar=a.segurar, soma=a.soma, saida=a.saida or SAIDA)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 

@@ -719,8 +719,13 @@ public class Canvas {
             sy1 = Math.max(sy0 + 1, (int) Math.ceil(sy1 * fy));
         }
         Composite saved = g.getComposite();
-        if (alpha < 255) g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha / 255f));
-        if (drawAxisAligned(source, sx0, sy0, sx1, sy1, dst, alpha)) {
+        // Soma (a luz do efeito: com.gamelutagpt.Mistura): pelo Java2D com o Composite de soma,
+        // sem os caminhos rápidos (eles misturam à mão, por cima).
+        boolean soma = paint != null && paint.xfermode instanceof PorterDuffXfermode
+            && ((PorterDuffXfermode) paint.xfermode).mode == PorterDuff.Mode.ADD;
+        if (soma) g.setComposite(new SomaComposite(alpha / 255f));
+        else if (alpha < 255) g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha / 255f));
+        if (!soma && drawAxisAligned(source, sx0, sy0, sx1, sy1, dst, alpha)) {
             g.setComposite(saved);
             return;
         }

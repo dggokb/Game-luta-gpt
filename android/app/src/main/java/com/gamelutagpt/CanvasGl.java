@@ -950,8 +950,11 @@ final class CanvasGl extends Canvas {
         GlRenderCanvas.Textura tx = gl.textura(b, false);
         if (tx == null) return;
         gl.filtro(p != null ? matrizDoFiltro(p.getColorFilter()) : null);
+        boolean soma = p != null && p.getXfermode() == Mistura.SOMA;
+        if (soma) gl.soma(true);
         // O recorte da fonte é em pixels do bitmap; a textura sabe o tamanho dele.
         gl.desenharTextura(tx, sl, st, sr, sb, l, t, r, bt, p != null ? p.getAlpha() : 255);
+        if (soma) gl.soma(false);
     }
 
     @Override public void drawBitmap(Bitmap b, Rect src, RectF dst, Paint p) {
