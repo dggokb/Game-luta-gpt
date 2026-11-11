@@ -291,6 +291,30 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## Pesquisa "como fazer anime VFX" com a rede aberta (11/11)
+
+Lidos por inteiro:
+- **Estúdio japonês de vídeo de pachinko (Matrix, zenn.dev):** faísca de impacto em 3 fases:
+  発生 (nasce: ponto pequeno e muito claro), メイン (o auge, onde a impressão se decide) e 余韻
+  (o resto, apagando quieto). Peças feitas em branco e preto e coloridas depois, cada uma com a
+  sua cor (a grande na cor principal, as pequenas com o matiz deslocado): fonte de luz, brilho
+  largo, linhas grossas saindo da fonte, linhas finas voando, anel de choque, partículas de luz.
+  Começa pelas peças do meio e grandes. Cada peça com um tempo de vida diferente; "as partículas
+  que perdem velocidade somem por último". Junta em Screen/Add e, por cima, uma névoa colorida
+  fraca (4-Color Gradient + Turbulent Displace em Overlay). Comp quadrada, o dobro da tela.
+  https://zenn.dev/matrixsoftware/articles/da59a47433fec0
+- **Flash FX (energia e impacto desenhados à mão):** o miolo é branco e a cor vem do brilho;
+  desenha primeiro a parte maior; fórmula "acumula, estoura grande, dissipa", a dissipação
+  animada direto, quadro a quadro, como fumaça. http://flashfx.blogspot.com/2014/01/10-energy-strikes.html
+- **ParticleFX Studio:** biblioteca grátis de efeitos anime (soco forte, faísca, defesa, dash,
+  poeira...), folha PNG com fundo transparente, termos permitem jogo comercial sem crédito (não
+  pode redistribuir a biblioteca; pacotes da CodeManu pedem crédito; uso automatizado só pelo
+  servidor MCP deles). Visto: são estouros genéricos de partículas, abaixo do Tōkon e do nosso
+  `dano_forte`. Não adotado.
+
+Conclusão: a fórmula profissional (fases, peças com vidas diferentes, cor por peça, brilho)
+coincide com o relatório; o que separa o Tōkon é o desenho à mão de cada quadro, não a técnica.
+
 ## No jogo hoje: golpe forte sem fagulhas (11/11)
 
 O dono mandou tirar as fagulhas ("tira esse treco"). A folha `dano_forte_anel_ec` voltou à versão
