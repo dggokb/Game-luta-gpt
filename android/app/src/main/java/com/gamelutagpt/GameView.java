@@ -2992,7 +2992,8 @@ public class GameView extends SurfaceView
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle,
-                defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO)) {
+                defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO,
+                event.pontaX, event.pontaY)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -5568,7 +5569,8 @@ public class GameView extends SurfaceView
      * (entra o clássico).
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
-                                  boolean poder, int pausa, int atacante, float angulo, boolean baixo) {
+                                  boolean poder, int pausa, int atacante, float angulo, boolean baixo,
+                                  float pontaX, float pontaY) {
         boolean esquerda = direction < 0;
         float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
         int a = atacante & 1;
@@ -5622,11 +5624,15 @@ public class GameView extends SurfaceView
             // Os impactos redesenhados (impacto_v06_*) tocam mais rápido que a pausa do golpe
             // (pedido do dono, 11/11: "anima mais rápido").
             float duracao = nome.startsWith("impacto_v06") ? ms * RITMO_IMPACTO_V06 : ms;
-            // A faísca segue a linha do golpe (o chute que sobe joga ela para cima). O forte
-            // redesenhado não: já se abre para a frente e um pouco para cima, e inclinado subia por
-            // cima da cabeça de quem apanha (dono, 11/11).
-            float giro = nome.equals("impacto_v06_forte_ec") ? 0f : angulo;
-            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, duracao, giro);
+            // Os redesenhados nascem na ponta do golpe de quem bate (o punho, a ponta do pé), não no
+            // corpo de quem apanha (dono, 11/11); sem a medida do desenho, no ponto de contato.
+            float ox = px, oy = y;
+            if (nome.startsWith("impacto_v06") && !Float.isNaN(pontaX)) {
+                ox = pontaX;
+                oy = pontaY;
+            }
+            // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
+            vaga = efeitos.tocarDurando(nome, ox, oy, escala, esquerda, duracao, angulo);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;

@@ -30,6 +30,12 @@ final class CombatEngine {
         float impactX = Float.NaN, impactY = Float.NaN;
         /** Inclinação do golpe no contato (graus, positivo para cima, no sentido do golpe): a faísca segue o membro. */
         float impactAngle;
+        /**
+         * A ponta desenhada do membro de quem bateu (o punho, a ponta do pé) no contato, no mundo; NaN
+         * sem a medida do desenho (projétil, crossup, golpe coreografado). Diferente do impactX/Y,
+         * não é presa no corpo de quem apanha: é de onde o golpe sai.
+         */
+        float pontaX = Float.NaN, pontaY = Float.NaN;
         /** Button class of the contact, or null when unknown. Presentation only. */
         AttackDefinition.Strength strength;
         /** Última pancada de um golpe com pausa final própria (o chute que fecha o Super da p15). */
@@ -471,6 +477,7 @@ final class CombatEngine {
         for (Contact contact : contacts) {
             // The point is measured before pushback moves the defender.
             float ix = impactX(contact), iy = impactY(contact), angulo = impactAngle(contact);
+            float[] ponta = pontaDoGolpe(contact, angulo);
             int before = events.size();
             applyContact(contact);
             for (int e = before; e < events.size(); e++) {
@@ -478,6 +485,10 @@ final class CombatEngine {
                 event.impactX = ix;
                 event.impactY = iy;
                 event.impactAngle = angulo;
+                if (ponta != null) {
+                    event.pontaX = ponta[0];
+                    event.pontaY = ponta[1];
+                }
                 event.strength = contact.attack.strength;
             }
         }
@@ -4585,6 +4596,25 @@ final class CombatEngine {
         float[] angulos = desenhoDoGolpe(a).anguloGolpe;
         int q = quadroDoDesenho(a, frame);
         return angulos == null || q < 0 || q >= angulos.length ? 0f : angulos[q];
+    }
+
+    /**
+     * A ponta desenhada do golpe no mundo {x, y}, ou null sem a medida. A caixa do desenho mais à
+     * frente dá o alcance; a altura da ponta segue a inclinação do membro dentro dela (o chute que
+     * sobe tem a ponta em cima), um pouco para dentro da borda.
+     */
+    private static float[] pontaDoGolpe(Contact c, float angulo) {
+        if (c.projectile != null || c.cruzou || c.hitbox != 0) return null;
+        CombatFighter a = c.attacker;
+        float[] g = golpeNoDesenho(a, a.attackFrame);
+        if (g == null) return null;
+        int k = 0;
+        for (int j = 4; j + 3 < g.length; j += 4) if (g[j + 1] > g[k + 1]) k = j;
+        float x0 = g[k], x1 = g[k + 1], y0 = g[k + 2], y1 = g[k + 3];
+        float margem = Math.min(10f, (y1 - y0) * .25f);
+        float h = (y0 + y1) * .5f + (x1 - x0) * .5f * (float) Math.tan(Math.toRadians(angulo));
+        h = Math.max(y0 + margem, Math.min(y1 - margem, h));
+        return new float[] {a.x + a.facing * x1, a.y - h};
     }
 
     private static float impactY(Contact c) {

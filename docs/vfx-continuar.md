@@ -316,6 +316,12 @@ ombro e a cabeça do adversário): forte `--origem 280,250`, médio `200,248`, f
 O dono reprovou o forte assim ("agora tá saindo lá no meio da perna; antes pegava a ponta mas
 tava na posição errada"): voltou para a ponta (`--origem 210,260`) e deixou de girar com a
 inclinação do golpe (`efeitoDeGolpe`); inclinado ele subia por cima da cabeça no chute alto.
+O dono: "problema não era a inclinação, era posição; tem que nascer do impacto do personagem,
+não do adversário". A inclinação voltou e os `impacto_v06_*` agora nascem na ponta desenhada do
+golpe de quem bate (`CombatEngine.pontaDoGolpe` → `HitEvent.pontaX/Y`: a caixa do desenho mais à
+frente, altura seguindo o ângulo do membro). O impactX/Y de antes ficava preso no corpo de quem
+apanha, vinha da caixa de acerto (não do pé desenhado) e ainda andava 12 px: no chute forte (H)
+ficava ~9 px à frente e ~19 px abaixo da ponta do pé. Sem a medida do desenho, vale o impactX/Y.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:

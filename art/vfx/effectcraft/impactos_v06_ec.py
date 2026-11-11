@@ -10,9 +10,10 @@
 
     python3 art/vfx/effectcraft/impactos_v06_ec.py --saida PASTA [--cli CAMINHO]
 
-Sai PASTA/forte e PASTA/medio (sequências PNG). No jogo: o forte no pivô da folha (210,260, a ponta
-do golpe; centrado no meio do desenho ele nascia no meio da perna) e sem a inclinação do golpe
-(GameView.efeitoDeGolpe); médio e fraco no meio do desenho, a poucos px do pivô:
+Sai PASTA/forte e PASTA/medio (sequências PNG). No jogo os três nascem na ponta desenhada do golpe
+de quem bate (HitEvent.pontaX/Y, GameView.efeitoDeGolpe) e seguem a inclinação do golpe; o forte no
+pivô da folha (210,260; centrado no meio do desenho ele nascia no meio da perna), médio e fraco no
+meio do desenho, a poucos px do pivô:
     efeito_video.py PASTA/forte --nome impacto_v06_forte_ec --fps 20 --origem 210,260 --escala-mundo 0.48
     efeito_video.py PASTA/medio --nome impacto_v06_medio_ec --fps 24 --origem 200,248 --escala-mundo 0.48
     efeito_video.py art/vfx/impactos_v06/leve --nome impacto_v06_fraco --fps 30 --origem 214,250 --escala-mundo 0.60
