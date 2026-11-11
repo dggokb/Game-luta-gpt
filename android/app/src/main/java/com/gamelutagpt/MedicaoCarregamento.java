@@ -44,7 +44,7 @@ final class MedicaoCarregamento {
         String linha = nome + ": " + partes + "; total " + (System.nanoTime() - inicio) / 1_000_000L + "ms"
             + (atlases == null ? "" : String.format(Locale.ROOT, "; atlas %dMB em %d folhas",
                 atlases.decodedBytes() >> 20, atlases.size()))
-            + (atlases == null || !SpriteAtlasCache.NORMAIS ? "" : String.format(Locale.ROOT, "; normais %.1fMB em %d folhas",
+            + (atlases == null || atlases.folhasComNormal() == 0 ? "" : String.format(Locale.ROOT, "; normais %.1fMB em %d folhas",
                 atlases.bytesNormais() / 1048576f, atlases.folhasComNormal()));
         ultima = linha;
         Log.i(TAG, linha);

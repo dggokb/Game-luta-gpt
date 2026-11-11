@@ -70,13 +70,6 @@ final class SpriteAtlasCache {
     }
 
     /**
-     * Normal map nos lutadores: desligado no jogo. No PC, {@code -Dgameluta.normal=true} (o
-     * {@code -Pnormal=1} do gradle) liga para gravar a comparação; no celular a propriedade não
-     * existe. Ligado, cada folha com um {@code <folha>_n} ao lado carrega o mapa junto.
-     */
-    static final boolean NORMAIS=Boolean.getBoolean("gameluta.normal");
-
-    /**
      * Ampliação máxima (pixels da tela por pixel decodificado) na luta, com o zoom normal da
      * câmera: 1, a folha nunca é esticada fora dos closes. Assim os closes (cinema, ultra,
      * soco de câmera) ficam pelo menos tão definidos quanto a HD inteira numa tela 1080p 16:9,
@@ -702,7 +695,10 @@ final class SpriteAtlasCache {
             BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;o.inSampleSize=AMOSTRA;
             folha.amostra=BitmapFactory.decodeResource(context.getResources(),id,o);
         }
-        if(NORMAIS)folha.normal=normalDe(a.resource);
+        // O normal map só serve à luz local do OpenGL: com o OPENGL desligado no Modo Teste a folha
+        // fica sem ele. (As folhas de quem abre o jogo são decodificadas antes de a luta escolher o
+        // desenho, por isso a chave é a do botão, não a da luta de agora.)
+        if(TesteDesempenho.openGl)folha.normal=normalDe(a.resource);
         return folha;
     }
 
