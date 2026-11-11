@@ -23,6 +23,7 @@ No jogo (mesmo ponto e escala da impacto_ar_forte de hoje):
     efeito_video.py PASTA --nome dano_forte_ec --fps 8 --origem 427,384 --escala-mundo 0.30 --borda 50
 """
 import argparse
+import random
 import json
 import subprocess
 import tempfile
@@ -98,12 +99,14 @@ def passos(anel=False):
         {'command': 'prop.set', 'params': {'layer': 'dano', 'path': 'effects/#4/blendingMode', 'value': 19}},
     ]
     s += chaves('dano', 'effects/#4/brightness', EROSAO)
+    # O miolo apaga quando os braços se soltam em lascas (desenho 4): quem leva o resto são elas.
+    s += chaves('dano', 'transform/opacity', [100, 100, 100, 100, 80, 25, 0, 0, 0, 0, 0, 0])
     if anel:
         # A faísca vira um plano 3D em z = 0 (sem câmera, o 3D enquadra igual ao 2D) e o anel a
         # atravessa: a metade da frente passa por cima dela e a de trás por baixo, sozinhas.
         s += [{'command': 'layer.setSwitch', 'params': {'layers': ['dano'], 'switch': 'threeD', 'value': True}}]
         s += anel_de_ar((MIOLO[0], MIOLO[1] + folga))
-        s += fagulhas((MIOLO[0], MIOLO[1] + folga))
+        s += lascas((MIOLO[0], MIOLO[1] + folga))
     return s
 
 
@@ -115,6 +118,84 @@ def passos(anel=False):
 # é a do corpo da faísca, deslocada para o lado do golpe; o estouro vai para todos os lados (como na
 # referência do Tōkon). Mistura normal, não Add: em Add as fagulhas somavam numa bola branca.
 FAGULHAS_INICIO, FAGULHAS_FIM = 3, 6          # desenhos em que o emissor solta (o resto só voa)
+
+
+def lascas(centro):
+    """A dissipação medida no Tōkon (quadros 127-131 da referência do dono): quando o miolo apaga,
+    os braços pontudos da explosão se soltam e viram raios em zigue-zague (amarelo com a ponta
+    laranja) que continuam voando na direção em que apontavam, afinam e somem em 3 ou 4 quadros.
+    Aqui: um traço reto por braço, quebrado em raio pelo operador Zig Zag, afinando nas duas
+    pontas (taper), nascendo na ponta do braço do vídeo e voando para fora, freando."""
+    import math
+    n = 'lascas'
+    # Os braços do vídeo dano_forte (ângulo, comprimento em px do vídeo), medidos na folha de hoje.
+    bracos = [(-14, 900), (0, 940), (20, 600), (-32, 420), (38, 370),
+              (-78, 380), (-112, 290), (-138, 210), (150, 205), (100, 180), (62, 310), (35, 290), (-45, 220)]
+    sorte = random.Random(13)
+    s = [{'command': 'layer.newShape', 'params': {'kind': 'none', 'name': n}},
+         {'command': 'prop.set', 'params': {'layer': n, 'path': 'transform/position', 'value': [0, 0, 0]}}]
+    for i, (ang, comp) in enumerate(bracos, start=1):
+        g = 'contents/group' if i == 1 else f'contents/group#{i}'
+        a = math.radians(ang)
+        ux, uy = math.cos(a), math.sin(a)
+        tam = min(380, 90 + comp * 0.32) * sorte.uniform(0.85, 1.15)
+        larg = 16 + tam * 0.08
+        x0, y0 = centro[0] + ux * comp * 0.48, centro[1] + uy * comp * 0.48
+        s += [{'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'group'}},
+              {'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'path', 'group': g}},
+              {'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'zigzag', 'group': g}},
+              {'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'stroke', 'group': g}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/path/path', 'value': {
+                  'closed': False, 'vertices': [[-tam / 2 * ux, -tam / 2 * uy], [tam / 2 * ux, tam / 2 * uy]],
+                  'in_tangents': [[0, 0], [0, 0]], 'out_tangents': [[0, 0], [0, 0]]}}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/zigzag/size', 'value': larg * 0.9}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/zigzag/ridges', 'value': sorte.choice([2, 3, 3, 4])}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/zigzag/points', 'value': 0}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/color', 'value': '#ffd43b'}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/width', 'value': larg}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/join', 'value': 0}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/taper/units', 'value': 1}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/taper/startLength', 'value': 45}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/taper/endLength', 'value': 30}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/taper/startWidth', 'value': 0}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke/taper/endWidth', 'value': 0}},
+              # A borda laranja: um segundo traço, mais largo, por baixo (o primeiro da lista fica na frente).
+              {'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'stroke', 'group': g}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/color', 'value': '#ff7a14'}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/width', 'value': larg * 1.55}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/join', 'value': 0}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/taper/units', 'value': 1}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/taper/startLength', 'value': 20}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/taper/endLength', 'value': 55}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/taper/startWidth', 'value': 0}},
+              {'command': 'prop.set', 'params': {'layer': n, 'path': f'{g}/contents/stroke#2/taper/endWidth', 'value': 0}}]
+        voo = comp * 0.30 + 60
+        pos, esc, opac = [], [], []
+        for q in range(len(DESENHOS)):
+            k = q - LASCAS_INICIO
+            d = 0 if k < 0 else voo * (1 - 0.55 ** (k + 1))
+            pos.append([x0 + ux * d, y0 + uy * d])
+            e = 0 if k < 0 else [100, 85, 60, 32, 0][min(k, 4)]
+            esc.append([100, e])                              # afina (a largura cai, o comprimento fica)
+            opac.append(0 if k < 0 or k >= 4 else 100)
+        s += [{'command': 'prop.addKey', 'params': {'layer': n, 'path': f'{g}/transform/position', 'time': q / FPS, 'value': v}}
+              for q, v in enumerate(pos)]
+        s += [{'command': 'prop.addKey', 'params': {'layer': n, 'path': f'{g}/transform/scale', 'time': q / FPS, 'value': v}}
+              for q, v in enumerate(esc)]
+        s += [{'command': 'prop.addKey', 'params': {'layer': n, 'path': f'{g}/transform/opacity', 'time': q / FPS, 'value': v}}
+              for q, v in enumerate(opac)]
+    # Ponta laranja e brilho: Glow com cores A e B.
+    s += [{'command': 'effect.apply', 'params': {'effect': 'Glow', 'layers': [n]}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#1/threshold', 'value': 40}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#1/radius', 'value': 14}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#1/intensity', 'value': 1.1}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#1/colors', 'value': 1}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#1/colorA', 'value': '#ff9a1f'}},
+          {'command': 'prop.set', 'params': {'layer': n, 'path': 'effects/#1/colorB', 'value': '#e0400c'}}]
+    return s
+
+
+LASCAS_INICIO = 4         # desenho em que os braços se soltam (o miolo do vídeo já está apagando)
 
 
 def fagulhas(centro):

@@ -291,6 +291,19 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## Golpe forte: dissipa em lascas de raio, medido no Tōkon (11/11)
+
+Na referência (quadros 124-133, ~290 ms) a faísca não encolhe: quando o miolo apaga, os braços
+pontudos se soltam e viram raios em zigue-zague (amarelo com borda e ponta laranja) que seguem
+voando na direção em que apontavam, afinam e somem. No `dano_forte_ec.py --anel`: `lascas()`
+substitui as fagulhas — um traço por braço do vídeo (13 direções medidas), quebrado em raio pelo
+operador Zig Zag (cantos vivos), taper nas duas pontas, segundo traço laranja mais largo por
+baixo, nascendo na metade do braço no desenho 4 e voando para fora freando, afinando em 4
+desenhos; o vídeo apaga junto (opacidade 80, 25, 0 nos desenhos 4 a 6). Gravado no jogo só na
+cópia local (`dano_forte_lascas_ec`). Comparação no tempo:
+`android/app/build/sprite-review/acerto_forte_tokon_x_nosso_lascas.mp4`. Diferença que sobra: as
+nossas lascas são mais grossas que as dele e somem um quadro antes.
+
 ## Defesa em 3D, medida no Tōkon (11/11)
 
 `art/vfx/effectcraft/defesa3d_ec.py`, medida na referência (quadros 77-84, ~250 ms a 24 por
