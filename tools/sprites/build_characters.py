@@ -192,7 +192,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho'}
+             'chao','rebote','desenho','voo'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -228,6 +228,18 @@ def validate_mechanics(name, mech, m, projectile):
     if 'puxar' in mech: positive(mech['puxar'], f'{name}.mecanica.puxar')
     if 'salto' in mech:   # o desenho sobe em arco no trecho (o S4 do p13)
         frames('salto', mech['salto']); positive(mech['salto'].get('altura'), f'{name}.mecanica.salto.altura')
+    # Voo de verdade (o S2 e o S3 do Ryūga): o corpo sai do chão e cai pela gravidade do pulo.
+    if 'voo' in mech:
+        v = mech['voo']
+        if projectile or not isinstance(v, dict) or set(v) - {'altura', 'frames', 'paira'}:
+            raise ValueError(f'{name}.mecanica.voo: a melee move with altura, frames and paira')
+        frames('voo', v); positive(v.get('altura'), f'{name}.mecanica.voo.altura')
+        if v['frames'][0] >= v['frames'][1]:
+            raise ValueError(f'{name}.mecanica.voo.frames: takeoff before landing')
+        if v.get('paira') not in (None, True):
+            raise ValueError(f'{name}.mecanica.voo.paira: true (or leave it out)')
+        if 'salto' in mech or 'mergulho' in mech:
+            raise ValueError(f'{name}.mecanica.voo: not with salto or mergulho')
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
     if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
         raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
@@ -754,6 +766,9 @@ def compile_packs(root, results):
         if mech.get('chao'): code += '.pound()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
+        if 'voo' in mech:
+            v = mech['voo']
+            code += '.flight('+f(v['altura'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('paira'))).lower()+')'
         if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
         if 'carga' in mech: code += '.charge('+str(mech['carga']['frames'])+','+str(mech['carga']['bonus'])+')'

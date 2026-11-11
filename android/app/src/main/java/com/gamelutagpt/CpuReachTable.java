@@ -10,7 +10,7 @@ final class CpuReachTable {
     private CpuReachTable() {}
 
     static final String DATA =
-        "player_base L 143 -1;player_base M 215 191;player_base H 255 229;player_base 2L 191 155;player_base 2M 241 205;player_base 2H 127 101;player_base 6M 231 195;player_base S2 149 125;player_base S3 415 391;" +
+        "player_base L 143 -1;player_base M 215 191;player_base H 255 229;player_base 2L 191 155;player_base 2M 241 205;player_base 2H 127 101;player_base 6M 231 195;player_base S2 135 107;player_base S3 415 391;" +
         "p02 L 159 -1;p02 M 211 175;p02 H 223 113;p02 2L 143 109;p02 2M 171 137;p02 2H 131 105;p02 6M 223 189;p02 S2 111 87;p02 S3 163 137;p02 S4 335 311;" +
         "p03 L 155 -1;p03 M 185 -1;p03 H 169 -1;p03 2L 181 155;p03 2M 271 237;p03 2H 129 105;p03 6M 161 -1;p03 S2 243 217;p03 S3 411 385;" +
         "p04 L 165 -1;p04 M 199 165;p04 H 211 175;p04 2L 171 145;p04 2M 247 211;p04 2H 139 115;p04 6M 199 165;p04 S2 243 217;p04 S3 149 113;p04 S4 317 291;" +

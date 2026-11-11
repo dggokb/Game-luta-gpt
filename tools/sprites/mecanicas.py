@@ -822,6 +822,16 @@ def apply(cid, spec, base, combos_data):
             at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
             m.setdefault('mecanica', {})['salto'] = {'altura': h['salto']['altura'],
                                                      'frames': [at(h['salto']['de']), min(at(h['salto']['ate']), total - 1)]}
+        if 'voo' in h:
+            # Voo de verdade (o S2 e o S3 do Ryūga): sai do chão no quadro "de" da animação e pousa
+            # no "ate"; o corpo cai pela gravidade do pulo (CombatEngine.takeOff).
+            dd = anim['durationsMs']
+            total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+            at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
+            m.setdefault('mecanica', {})['voo'] = {'altura': h['voo']['altura'],
+                                                   'frames': [at(h['voo']['de']), min(at(h['voo']['ate']), total - 1)]}
+            if h['voo'].get('paira'):
+                m['mecanica']['voo']['paira'] = True
         if isinstance(h.get('avanco'), dict):
             travel(m, anim, h['avanco'])
         elif 'avanco' in h:
