@@ -14,7 +14,12 @@ public class VooDoGolpeTest {
 
     /** O Ryūga solta o especial longe do rival e anda o golpe inteiro; devolve o caminho dele. */
     private static float[][] caminho(String especial) {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(RYUGA, RYUGA, 500f, 1400f);
+        return caminho(RYUGA, especial);
+    }
+
+    /** {@code quem} solta o especial longe do rival; devolve o caminho dele, quadro a quadro. */
+    private static float[][] caminho(CharacterDefinition quem, String especial) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(quem, RYUGA, 500f, 1400f);
         CombatFighter me = s.f(0);
         me.commandButton = "M";
         me.buffer.push(InputBuffer.Button.SPECIAL, especial, false);
@@ -72,6 +77,27 @@ public class VooDoGolpeTest {
         assertEquals("na altura do voo (o passo de 1/60 s perde um pouco no topo)", m.flightHeight, max, m.flightHeight * 0.2f);
         assertTrue("termina no chão", c[c.length - 1][2] == 1f);
         assertTrue("anda para a frente", c[c.length - 1][0] - c[0][0] > 200f);
+    }
+
+    @Test public void oChuteDaGarcaSaiDoChaoSemAndar() {
+        // A Yin-lu (11/11): o S2 sobe numa perna (60 px) e cai onde saiu; o S4 gira no ar.
+        CharacterDefinition yinlu = GeneratedCharacters.get("p02");
+        float[][] c = caminho(yinlu, "S2");
+        float alto = 0f;
+        boolean voou = false;
+        for (float[] q : c) {
+            alto = Math.max(alto, q[1]);
+            voou |= q[2] == 0f;
+            if (q[2] == 0f) assertEquals("no ar, ainda se defende agachado", 0f, q[4], 0f);
+        }
+        assertTrue("o S2 sai do chão", voou);
+        assertEquals("sobe uns 60 px", 60f, alto, 12f);
+        assertEquals("cai onde saiu", c[0][0], c[c.length - 1][0], 4f);
+        float[][] giro = caminho(yinlu, "S4");
+        boolean noAr = false;
+        for (float[] q : giro) noAr |= q[2] == 0f && q[3] >= 0f;
+        assertTrue("o S4 tira o corpo do chão", noAr);
+        assertEquals("e termina no chão", 1f, giro[giro.length - 1][2], 0f);
     }
 
     /**

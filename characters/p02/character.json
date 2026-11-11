@@ -2517,15 +2517,15 @@
       "durationsMs": [
         23,
         36,
-        59,
-        20,
-        4,
+        42,
         16,
-        12,
-        12,
+        4,
         13,
-        12,
-        12
+        10,
+        10,
+        10,
+        10,
+        11
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -2860,16 +2860,16 @@
       ],
       "loop": false,
       "durationsMs": [
-        40,
-        28,
-        40,
+        35,
+        23,
+        34,
         17,
         1,
-        58,
+        59,
         24,
         19,
         19,
-        23,
+        24,
         19,
         24,
         19,
@@ -4966,17 +4966,17 @@
       ],
       "loop": false,
       "durationsMs": [
-        34,
+        26,
+        32,
         41,
-        58,
-        13,
-        19,
-        13,
-        13,
-        18,
-        14,
-        13,
-        13
+        11,
+        16,
+        11,
+        12,
+        16,
+        11,
+        11,
+        12
       ],
       "impactFrame": 2,
       "silhueta": {
@@ -10341,19 +10341,19 @@
       "damage": 270,
       "reach": 135,
       "startupFrames": 4,
-      "activeFrames": 3,
-      "recoveryFrames": 6,
-      "hitstunFrames": 15,
-      "blockstunFrames": 9,
+      "activeFrames": 2,
+      "recoveryFrames": 5,
+      "hitstunFrames": 11,
+      "blockstunFrames": 7,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
           4,
-          10
+          8
         ],
         "block": [
           4,
-          10
+          8
         ],
         "whiff": null
       },
@@ -10386,7 +10386,7 @@
       "animation": "MEDIUM_KICK",
       "damage": 450,
       "reach": 170,
-      "startupFrames": 7,
+      "startupFrames": 6,
       "activeFrames": 4,
       "recoveryFrames": 10,
       "hitstunFrames": 17,
@@ -10394,12 +10394,12 @@
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
-          7,
-          14
+          6,
+          13
         ],
         "block": [
-          7,
-          14
+          6,
+          13
         ],
         "whiff": null
       },
@@ -10472,20 +10472,20 @@
       "damage": 270,
       "reach": 103,
       "low": true,
-      "startupFrames": 5,
-      "activeFrames": 3,
-      "recoveryFrames": 7,
-      "hitstunFrames": 15,
-      "blockstunFrames": 9,
+      "startupFrames": 4,
+      "activeFrames": 2,
+      "recoveryFrames": 6,
+      "hitstunFrames": 14,
+      "blockstunFrames": 7,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
-          5,
-          12
+          4,
+          9
         ],
         "block": [
-          5,
-          12
+          4,
+          9
         ],
         "whiff": null
       },
@@ -10741,7 +10741,16 @@
         "H"
       ],
       "nome": "Chute da garça",
-      "segurar": true
+      "segurar": true,
+      "mecanica": {
+        "voo": {
+          "altura": 60,
+          "frames": [
+            4,
+            23
+          ]
+        }
+      }
     },
     "S3": {
       "command": [
@@ -10836,6 +10845,14 @@
         13
       ],
       "mecanica": {
+        "voo": {
+          "altura": 25,
+          "frames": [
+            11,
+            25
+          ],
+          "paira": true
+        },
         "avanco": {
           "velocidade": 380,
           "frames": [

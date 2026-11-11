@@ -40,7 +40,13 @@
           2,
           4
         ],
-        "avanco": 380
+        "avanco": 380,
+        "voo": {
+          "altura": 25,
+          "de": 3,
+          "ate": 12,
+          "paira": true
+        }
       },
       "SUPER": {
         "pancadas": [
@@ -51,6 +57,13 @@
           18
         ],
         "avanco": 220
+      },
+      "S2": {
+        "voo": {
+          "altura": 60,
+          "de": 4,
+          "ate": 15
+        }
       }
     },
     "p03": {
