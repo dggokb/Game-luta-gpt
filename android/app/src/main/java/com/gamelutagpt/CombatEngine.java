@@ -4599,15 +4599,26 @@ final class CombatEngine {
     }
 
     /**
-     * A ponta desenhada do golpe no mundo {x, y}, ou null sem a medida. A caixa do desenho mais à
-     * frente dá o alcance; a altura da ponta segue a inclinação do membro dentro dela (o chute que
-     * sobe tem a ponta em cima), um pouco para dentro da borda.
+     * A ponta desenhada do golpe no mundo {x, y}, ou null sem a medida. É a ponta do desenho que
+     * fica na tela na pancada: o golpe acerta num desenho e logo pula para o membro todo esticado
+     * (o chute forte da base acerta no desenho 5, pé a 190 px, e segura o 8, pé a 224 px), então
+     * vale o desenho mais esticado dos quadros seguintes, enquanto o membro ainda avança. A caixa
+     * do desenho mais à frente dá o alcance; a altura segue a inclinação do membro dentro dela (o
+     * chute que sobe tem a ponta em cima), um pouco para dentro da borda.
      */
     private static float[] pontaDoGolpe(Contact c, float angulo) {
         if (c.projectile != null || c.cruzou || c.hitbox != 0) return null;
         CombatFighter a = c.attacker;
         float[] g = golpeNoDesenho(a, a.attackFrame);
         if (g == null) return null;
+        for (int f = a.attackFrame + 1; f <= a.attackFrame + PONTA_ADIANTE; f++) {
+            float[] h = golpeNoDesenho(a, f);
+            if (h == null || maxDe(h, 1) < maxDe(g, 1)) break;
+            if (maxDe(h, 1) > maxDe(g, 1)) {
+                g = h;
+                angulo = anguloNoDesenho(a, f);
+            }
+        }
         int k = 0;
         for (int j = 4; j + 3 < g.length; j += 4) if (g[j + 1] > g[k + 1]) k = j;
         float x0 = g[k], x1 = g[k + 1], y0 = g[k + 2], y1 = g[k + 3];
@@ -4616,6 +4627,9 @@ final class CombatEngine {
         h = Math.max(y0 + margem, Math.min(y1 - margem, h));
         return new float[] {a.x + a.facing * x1, a.y - h};
     }
+
+    /** Quantos quadros depois da pancada a ponta do golpe ainda pode avançar (o desenho esticado). */
+    private static final int PONTA_ADIANTE = 6;
 
     private static float impactY(Contact c) {
         CombatFighter a = c.attacker, d = c.defender;

@@ -322,6 +322,10 @@ golpe de quem bate (`CombatEngine.pontaDoGolpe` → `HitEvent.pontaX/Y`: a caixa
 frente, altura seguindo o ângulo do membro). O impactX/Y de antes ficava preso no corpo de quem
 apanha, vinha da caixa de acerto (não do pé desenhado) e ainda andava 12 px: no chute forte (H)
 ficava ~9 px à frente e ~19 px abaixo da ponta do pé. Sem a medida do desenho, vale o impactX/Y.
+Ainda assim "tá ficando no meio da perna": o golpe acerta num desenho (o H da base no 5, pé a
+190 px) e pula para o membro todo esticado, que fica na tela na pausa (o 8, pé a 224 px). A ponta
+agora é a do desenho mais esticado dos quadros seguintes (`PONTA_ADIANTE`), enquanto o membro
+avança. Recuar a origem (achando que o pé sumia atrás do rival) foi o lado errado.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
