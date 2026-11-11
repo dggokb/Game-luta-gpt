@@ -5619,14 +5619,20 @@ public class GameView extends SurfaceView
                 nome = "impacto_ar";
             }
             float escala = superGolpe ? 1.25f : FAISCA_ESCALA[forca];
+            // Os impactos redesenhados (impacto_v06_*) tocam mais rápido que a pausa do golpe
+            // (pedido do dono, 11/11: "anima mais rápido").
+            float duracao = nome.startsWith("impacto_v06") ? ms * RITMO_IMPACTO_V06 : ms;
             // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
-            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, ms, angulo);
+            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, duracao, angulo);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
         faiscaNome[a] = nome;
         return true;
     }
+
+    /** Fração da duração normal (pausa + 8 quadros) em que os impactos impacto_v06_* tocam. */
+    private static final float RITMO_IMPACTO_V06 = 0.7f;
 
     /** As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. */
     private static final String[][] DEFESAS = {

@@ -305,6 +305,11 @@ Depois, "menos pontiagudos e mais finos": riscos de 2,5 a 3 px, ponta redonda, a
 (taper 20-30 % até 40-45 % da largura).
 Depois, "médio e forte um pouco menores": os dois a `--escala-mundo 0.56` (20 % menores; o fraco
 ficou em 0.70).
+Depois, "um pouco menores os 3, anima mais rápido e 90% de opacidade": médio e forte a
+`--escala-mundo 0.48`, fraco a `0.60`; o alfa das folhas multiplicado por 0,9 antes do
+`efeito_video.py`; e no `efeitoDeGolpe` os `impacto_v06_*` tocam em 70% da duração normal
+(`RITMO_IMPACTO_V06`; o jogo estica cada faísca para a pausa + 8 quadros, então o ritmo da
+folha sozinho não mudava nada).
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
