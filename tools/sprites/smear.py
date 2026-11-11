@@ -17,7 +17,11 @@ para ela e guarda no clip os parâmetros (a original fica em `sourceReferences`,
     python3 tools/sprites/smear.py player_base HEAVY_STRAIGHT [--quadros 4,5] [--previa /tmp/s.png]
     python3 tools/sprites/build_characters.py --write
 
-Sem --quadros, estica o desenho em que a ponta mais andou e o anterior a ele. --desfazer volta o clip à fonte
+Sem --quadros, estica o desenho em que a ponta mais andou e o anterior a ele.
+
+Desenho com efeito do vídeo por cima do corpo (clarão, braço borrado, arco): --trocar "4=8,5=8"
+põe no lugar a cópia do desenho limpo da mesma pose (o smear cobre a passagem). Golpe sem caminho:
+--sem-smear (só a troca), linha_de_acao.py --write, e de novo sem --sem-smear. --desfazer volta o clip à fonte
 original.
 """
 import argparse
@@ -36,6 +40,7 @@ COMPRIMENTO = (1.0, 1.0)  # padrão de --comprimento (meio, bordas): fração do
 LARGURA_MEMBRO = 0.42  # meia largura do membro em volta da reta junta -> ponta, fração dela
 PONTA_LIVRE = 0.18    # o trecho da ponta (o pé, o punho) que não estica, fração do membro
 LINGUA_MIN, LINGUA_MAX = 7, 18   # largura de cada língua (px da folha)
+MARGEM = 12           # px da borda do quadro que as línguas não passam (o build exige 8)
 RETO = 0.7            # cosseno entre o movimento da ponta e o membro acima do qual o golpe é reto
 
 
@@ -115,6 +120,15 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
     meio, bordas = comprimento
     fator = bordas + (meio - bordas) * np.sqrt(np.clip(1 - tl * tl, 0, 1))
     alcance = fator * dist * comp
+    # Nada passa da margem do quadro (o build recusa): se a língua mais longa sairia, o feixe todo
+    # encolhe na mesma proporção, e as pontas continuam pontudas (cortar reto na borda, não).
+    with np.errstate(divide='ignore', invalid='ignore'):
+        ux, uy = vx / np.maximum(dist, 1e-6), vy / np.maximum(dist, 1e-6)
+        lim_x = np.where(ux > 0, (w - 1 - MARGEM - bx) / ux, np.where(ux < 0, (MARGEM - bx) / ux, np.inf))
+        lim_y = np.where(uy > 0, (h - 1 - MARGEM - by) / uy, np.where(uy < 0, (MARGEM - by) / uy, np.inf))
+    cabe = np.maximum(np.minimum(lim_x, lim_y), 0.0)
+    if (alcance > cabe).any():
+        alcance = alcance * float(np.min(np.where(alcance > 0, cabe / np.maximum(alcance, 1e-6), np.inf)).clip(0.0, 1.0))
     cores = px[membro]
     camada = np.zeros_like(px)
     # Do mais longe para o mais perto: a parte de perto da perna fica por cima.
@@ -148,6 +162,9 @@ def main():
     p.add_argument('--comprimento', default=','.join(map(str, COMPRIMENTO)),
                    help='o quanto estica, "meio,bordas" do feixe (ou um número para os dois): '
                         '1 = até onde o membro estava no desenho anterior')
+    p.add_argument('--trocar', help='antes de esticar, troca desenhos com efeito do vídeo por cima do corpo '
+                                    'pelo desenho limpo da mesma pose: "4=8,5=8" (o 4 e o 5 viram cópia do 8)')
+    p.add_argument('--sem-smear', action='store_true', help='só a troca (para medir o caminho na folha limpa)')
     p.add_argument('--previa', help='só grava uma prévia dos quadros (não mexe no clip)')
     p.add_argument('--desfazer', action='store_true', help='volta o clip para a fonte original')
     a = p.parse_args()
@@ -166,9 +183,23 @@ def main():
             clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         print('clip na fonte original:', original)
         return
-    cam = anim['silhueta']['caminho']['pontos']
+    if a.trocar is None and smear:
+        a.trocar = smear.get('trocar')
+    trocas = {int(d): int(o) for d, o in (t.split('=') for t in a.trocar.split(','))} if a.trocar else {}
     lay = rep['layout']
     fw, fh, cols = lay['frameWidth'], lay['frameHeight'], lay['columns']
+    folha = Image.open(ROOT / original).convert('RGBA')
+    limpa = folha.copy()
+    for d, o in trocas.items():
+        folha.paste(limpa.crop(((o % cols) * fw, (o // cols) * fh, (o % cols + 1) * fw, (o // cols + 1) * fh)),
+                    ((d % cols) * fw, (d // cols) * fh))
+    caminho = anim.get('silhueta', {}).get('caminho')
+    if a.sem_smear or not caminho:
+        if not a.sem_smear:
+            raise SystemExit('o golpe não tem caminho medido: rode com --sem-smear, meça (linha_de_acao.py) e rode de novo')
+        cam, quadros = {}, []
+    else:
+        cam = caminho['pontos']
     k = rep['worldScale'] / rep.get('pixelScale', 1)          # px do mundo por px da folha
 
     def folha_xy(x, y):
@@ -177,26 +208,40 @@ def main():
     ordem = sorted(int(q) for q in cam)
     andou = {q: math.hypot(cam[str(q)][0] - cam[str(p)][0], cam[str(q)][1] - cam[str(p)][1])
              for p, q in zip(ordem, ordem[1:])}
-    maior = max(andou, key=andou.get)
-    antes_dele = ordem[ordem.index(maior) - 1]
-    quadros = ([int(x) for x in a.quadros.split(',')] if a.quadros
-               else sorted({maior} | ({antes_dele} if antes_dele in andou else set())))
-    folha = Image.open(ROOT / original).convert('RGBA')
+    if cam:
+        maior = max(andou, key=andou.get)
+        antes_dele = ordem[ordem.index(maior) - 1]
+        quadros = ([int(x) for x in a.quadros.split(',')] if a.quadros
+                   else sorted({maior} | ({antes_dele} if antes_dele in andou else set())))
     rng = np.random.default_rng(a.semente)
     feitos = []
+    def ponto(q):
+        """O ponto do caminho no desenho q; num desenho trocado, o de outro com a mesma pose."""
+        if str(q) in cam:
+            return cam[str(q)]
+        fonte = trocas.get(q, q)
+        for d in [fonte] + [d for d, o in trocas.items() if o == fonte]:
+            if str(d) in cam:
+                return cam[str(d)]
+        return None
+
     for q in quadros:
-        if str(q) not in cam or q == ordem[0]:
+        v = ponto(q)
+        # O antes: o último desenho do caminho com a ponta noutro lugar (uma cópia da mesma pose não conta).
+        antes = [int(d) for d in cam if int(d) < q and v is not None
+                 and math.hypot(cam[d][0] - v[0], cam[d][1] - v[1]) > 8]
+        if v is None or not antes:
             raise SystemExit(f'o desenho {q} não tem caminho antes dele (caminho: {ordem})')
-        ant = ordem[ordem.index(q) - 1]
+        ant = max(antes)
+        andou[q] = math.hypot(v[0] - cam[str(ant)][0], v[1] - cam[str(ant)][1])
         x0, y0 = (q % cols) * fw, (q // cols) * fh
         cel = folha.crop((x0, y0, x0 + fw, y0 + fh))
-        v = cam[str(q)]
         u = cam[str(ant)]
         nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento)
         folha.paste(nova, (x0, y0))
         feitos.append((q, round(andou[q])))
     print('esticados (desenho, px do mundo que a ponta andou):', feitos)
-    if a.previa:
+    if a.previa and cam:
         cels = [folha.crop(((q % cols) * fw, (q // cols) * fh, (q % cols + 1) * fw, (q // cols + 1) * fh))
                 for q in range(min(ordem) - 1 if min(ordem) > 0 else 0, max(ordem) + 2)]
         prev = Image.new('RGBA', (fw * len(cels), fh), (70, 70, 80, 255))
@@ -213,6 +258,8 @@ def main():
         clip['sourceReferences'] = refs + [original]
     clip['smear'] = {'fonte': original, 'quadros': quadros, 'semente': a.semente, 'comprimento': list(a.comprimento),
                      'ferramenta': 'tools/sprites/smear.py'}
+    if a.trocar:
+        clip['smear']['trocar'] = a.trocar
     clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('fonte nova:', destino, '| clip:', clip_path.relative_to(ROOT))
     print('agora: python3 tools/sprites/build_characters.py --write')

@@ -57,6 +57,25 @@ em mais coisas (cabelo, roupa, tudo que se mexe).
 - **Para o dono julgar:** o desenho 5 é o do acerto e o jogo o segura na pausa do acerto, então o
   smear fica parado uns 16 quadros (no anime ele dura 1 ou 2); se incomodar, esticar só o 4.
 
+**Todos os M e H do Ryūga adulto (11/11, pedido do dono: "põe direto", sem vídeo):** smear em M,
+6M, 2M, 2H, jH e j2H, com 1,2 no meio e 1,0 nas bordas, nos 2 desenhos depois do salto do golpe. O
+efeito que veio do vídeo (clarão, arco, rastro, fumaça, coluna de luz, membro borrado) saiu:
+- Onde o efeito estava por cima do corpo, o desenho virou cópia do desenho limpo da mesma pose
+  (`smear.py --trocar`, guardado no clip): M 3=2 e 4-7=8; 6M 3-7=8; 2M 9,10=11; jM 7=8; 2H 4-7=8;
+  jH 5-10=11; j2H 9=8 e 10-12=13. O smear cobre a passagem. A limpeza por cor (`limpar.py`) foi
+  tentada antes e apagava o tronco e o braço junto com o clarão.
+- Os caminhos foram medidos de novo na folha limpa (`linha_de_acao.py`; precisa de `pip install
+  mediapipe` e `apt-get install libegl1 libgles2`). O jM ficou sem smear: o modelo pega a mão no
+  lugar do pé (`CAMINHO_ERRADO`); só a troca tirou o arco. O 2L e o jL continuam em
+  `ARTE_COM_EFEITO`.
+- No soco M o smear quase não aparece: o braço anda pouco e na direção dele, as línguas caem sobre
+  ele. Se o dono quiser mais, é aumentar o `--comprimento` só desse golpe.
+- As línguas não passam da margem do quadro (o build exige 8 px): se passariam, o feixe todo
+  encolhe na mesma proporção (o martelo j2H encolheu).
+- As caixas de golpe e de corpo não mudaram (são as medidas antes, com o efeito).
+- Visto: as folhas quadro a quadro dos sete golpes, e no jogo (PC) o M e o 2H. Os do ar só na
+  folha. `testarMotor`: só as 3 falhas antigas; `build_characters --check`: PASS. Celular: não visto.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

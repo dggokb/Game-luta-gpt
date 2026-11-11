@@ -58,6 +58,7 @@ ANDOU = 45.0         # px: a ponta do membro que bate anda pelo menos isto da gu
 # Golpes em que o caminho detectado sai errado (o modelo troca os membros, perde a pose na capa ou
 # no cabelo). Conferido no olho nas folhas (--folha): ficam sem rastro.
 CAMINHO_ERRADO = {
+    'player_base': {'jM'},   # pega a mão no lugar do pé (11/11)
     'p03': {'H', 'j2H'},
     'p04': {'jM', 'jH'},
     'p05': {'H', 'jL'},

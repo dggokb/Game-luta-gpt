@@ -1,7 +1,7 @@
 {
   "id": "player_base_jump_medium",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_medium_video_normalized.png",
+  "source": "art/sprites/source/player_base_jump_medium_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
   "rootMode": "authored",
   "scale": 1,
@@ -95,13 +95,13 @@
     {
       "index": 7,
       "outputBbox": [
-        50,
-        116,
-        661,
+        51,
+        140,
+        633,
         480
       ],
       "minimumMargin": 32,
-      "opaquePixels": 90831
+      "opaquePixels": 81844
     },
     {
       "index": 8,
@@ -260,7 +260,7 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 635,
+    "frameWidth": 632,
     "frameHeight": 414,
     "rootX": 245,
     "rootY": 380,
@@ -270,8 +270,8 @@
       35,
       80
     ],
-    "sheetWidth": 2672,
-    "sheetHeight": 1480,
+    "sheetWidth": 2708,
+    "sheetHeight": 1472,
     "frames": [
       [
         0,
@@ -322,7 +322,7 @@
         32
       ],
       [
-        1068,
+        388,
         392,
         512,
         364,
@@ -330,15 +330,15 @@
         47
       ],
       [
-        2032,
-        0,
-        620,
-        376,
-        11,
-        31
+        1396,
+        392,
+        596,
+        352,
+        10,
+        54
       ],
       [
-        2076,
+        1996,
         392,
         596,
         352,
@@ -347,7 +347,7 @@
       ],
       [
         0,
-        772,
+        764,
         600,
         352,
         10,
@@ -355,7 +355,7 @@
       ],
       [
         628,
-        1128,
+        1120,
         616,
         348,
         4,
@@ -363,7 +363,7 @@
       ],
       [
         604,
-        772,
+        764,
         624,
         352,
         5,
@@ -371,7 +371,7 @@
       ],
       [
         1232,
-        772,
+        764,
         624,
         352,
         5,
@@ -379,7 +379,7 @@
       ],
       [
         1860,
-        772,
+        764,
         624,
         352,
         5,
@@ -387,7 +387,7 @@
       ],
       [
         1876,
-        1128,
+        1120,
         624,
         344,
         4,
@@ -395,7 +395,7 @@
       ],
       [
         1248,
-        1128,
+        1120,
         624,
         348,
         4,
@@ -403,14 +403,14 @@
       ],
       [
         0,
-        1128,
+        1120,
         624,
         352,
         5,
         54
       ],
       [
-        1584,
+        904,
         392,
         488,
         364,
@@ -418,7 +418,7 @@
         42
       ],
       [
-        680,
+        0,
         392,
         384,
         368,
@@ -426,16 +426,16 @@
         37
       ],
       [
-        328,
-        392,
+        2360,
+        0,
         348,
         372,
         73,
         32
       ],
       [
+        2032,
         0,
-        392,
         324,
         376,
         88,
@@ -452,8 +452,8 @@
     ],
     "decodedBytes": {
       "canonical": 36044800,
-      "grid": 26289000,
-      "packed": 15818240
+      "grid": 26164800,
+      "packed": 15944704
     },
     "pixelScale": 2.0
   },
@@ -461,8 +461,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2a8718fa6700b12766c67d065c1b29a692f919531b98dc1b52cad3024df8ee90",
-      "config": "e376ac99eb1d3cba5250419b33eb067275741f596dcc90441a6f62e87a16589a",
+      "source": "dc148944978fa54bf79fb35e1c28bd251546e0c4bfbef2f66a8350aebd966eea",
+      "config": "f6f46b77acd61cb791ecdcad3fa3c0f2f37ae4ee913f296cd1c962a65db3106d",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

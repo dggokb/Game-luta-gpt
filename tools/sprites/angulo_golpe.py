@@ -188,7 +188,8 @@ def medir(pack):
 # borrão): o rastro do jogo não entra por cima. Conferido no olho, quadro por quadro; os outros
 # personagens não têm efeito na arte. Golpe novo com efeito desenhado entra aqui.
 ARTE_COM_EFEITO = {
-    'player_base': {'2L', 'M', '2M', '2H', 'jL', 'jM', 'jH', 'j2H', '6M'},
+    # p01: o efeito do vídeo saiu dos golpes M e H em 11/11 (smear no lugar; tools/sprites/smear.py).
+    'player_base': {'2L', 'jL'},
     'ryuga_8': {'H', '2L', '2M', '2H', 'j2H', '6M'},
     'p10': {'jM'},
     'p13': {'2L'},
