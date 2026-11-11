@@ -3516,8 +3516,10 @@ public class GameView extends SurfaceView
                 float sx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
                 // A fumaça desenhada pelo dono (art/vfx/super_pulo_v01), quando existe.
                 String fumaca = efeitos.tem("super_pulo_v01") ? "super_pulo_v01" : "super_pulo";
-                if (efeitos.tocar(fumaca, sx, GROUND_Y, 1f, f.facing < 0)) {
-                    if (fumaca.equals("super_pulo_v01")) efeitos.atrasDosLutadores();
+                boolean nova = fumaca.equals("super_pulo_v01");
+                if (efeitos.tocar(fumaca, nova ? sx - f.facing * PULO_FUMACA_ATRAS : sx, GROUND_Y,
+                        nova ? SUPER_PULO_ESCALA : 1f, f.facing < 0)) {
+                    if (nova) efeitos.atrasDosLutadores();
                 } else {
                     impacts.spawnSuperJump(sx, GROUND_Y, f.state.profile.color);
                 }
@@ -5709,12 +5711,16 @@ public class GameView extends SurfaceView
      */
     /** O tamanho da fumaça do super pulo quando ela sai no pulo comum. */
     private static final float PULO_COMUM_ESCALA = 0.6f;
+    /** O tamanho dela no super pulo ("ficou muito grande": 70%). */
+    private static final float SUPER_PULO_ESCALA = 0.7f;
+    /** Quanto a fumaça do pulo sai atrás do lutador, px do mundo ("um pouco atrás dele, não embaixo"). */
+    private static final float PULO_FUMACA_ATRAS = 40f;
 
     private void efeitosDeMovimento(int i, CombatFighter f) {
         float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
             // Teste do dono (11/11): a fumaça do super pulo, menor, também no pulo comum.
-            if (efeitos.tocar("super_pulo_v01", x, GROUND_Y, PULO_COMUM_ESCALA, f.facing < 0)) {
+            if (efeitos.tocar("super_pulo_v01", x - f.facing * PULO_FUMACA_ATRAS, GROUND_Y, PULO_COMUM_ESCALA, f.facing < 0)) {
                 efeitos.atrasDosLutadores();
             } else {
                 efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
