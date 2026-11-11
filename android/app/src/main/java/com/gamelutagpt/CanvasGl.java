@@ -240,6 +240,14 @@ final class CanvasGl extends Canvas {
     @Override public void restore() { super.restore(); matrizSuja = true; }
     @Override public void restoreToCount(int n) { super.restoreToCount(n); matrizSuja = true; }
 
+    /** O ponto (x, y) do espaço de agora em pixels da janela; out[2]: quantos pixels vale 1 aqui. */
+    void paraJanela(float x, float y, float[] out) {
+        lerMatriz();
+        out[0] = v[0] * x + v[1] * y + v[2];
+        out[1] = v[3] * x + v[4] * y + v[5];
+        out[2] = (float)Math.sqrt(Math.abs(v[0] * v[4] - v[1] * v[3]));
+    }
+
     /** Leva a transformação, o recorte, a transparência e a inversão de agora para o OpenGL. */
     void prepararGl() {
         desenhos++;

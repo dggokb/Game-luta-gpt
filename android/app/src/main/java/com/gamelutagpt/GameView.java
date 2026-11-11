@@ -5644,12 +5644,22 @@ public class GameView extends SurfaceView
             }
             // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
             vaga = efeitos.tocarDurando(nome, ox, oy, escala, esquerda, duracao, angulo);
+            // A luz do impacto no corpo de quem bate e de quem apanha (motor 3).
+            int f2 = Math.min(LUZ_IMPACTO_RAIO.length - 1, superGolpe ? LUZ_IMPACTO_RAIO.length - 1 : forca);
+            if (LUZ_DO_IMPACTO) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
         faiscaNome[a] = nome;
         return true;
     }
+
+    /** O impacto acende a luz local (motor 3): desligado até o dono aprovar no vídeo (luz_local_impacto.mp4). */
+    private static final boolean LUZ_DO_IMPACTO = false;
+    /** A luz local de cada força de impacto (fraco, médio, forte, especial): raio (px do mundo), cor e força. */
+    private static final float[] LUZ_IMPACTO_RAIO = {170f, 230f, 300f, 340f};
+    private static final int[] LUZ_IMPACTO_COR = {0xFFE2A8, 0xFFC870, 0xFF9A3C, 0xFFB050};
+    private static final float[] LUZ_IMPACTO_FORCA = {0.55f, 0.75f, 1f, 1f};
 
     /** Fração da duração normal (pausa + 8 quadros) em que os impactos impacto_v06_* tocam. */
     private static final float RITMO_IMPACTO_V06 = 0.7f;
@@ -6037,6 +6047,70 @@ public class GameView extends SurfaceView
 
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
+        // A luz local (o impacto acendendo o corpo) só na folha do lutador, não no reflexo nem na sombra.
+        DesenhoGl gl = !drawingReflection && c instanceof CanvasGl ? DesenhoGl.noQuadro() : null;
+        boolean aceso = gl != null && luzNoCorpo((CanvasGl)c, gl, f);
+        drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
+        if (aceso) gl.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
+    }
+
+    /**
+     * Luz local (motor 3, reports/Luz em jogos de luta profissionais.md): cada impacto acende uma
+     * luz no ponto do golpe, na cor dele, que nasce em um instante e apaga junto com o efeito. O
+     * OpenGL acende só o lado do corpo virado para ela (a normal sai da silhueta borrada do quadro).
+     */
+    private static final int LUZES_LOCAIS = 4;
+    private final float[][] luzLocal = new float[LUZES_LOCAIS][6];   // x, y, raio, r, g, b
+    private final float[] luzForca = new float[LUZES_LOCAIS];
+    private final int[] luzInicio = new int[LUZES_LOCAIS], luzFim = new int[LUZES_LOCAIS];
+    private int luzVez;
+    private final float[] luzJanela = new float[3];
+
+    /** Acende uma luz local em (x, y) do mundo por {@code ms}: raio em px do mundo, cor 0xRRGGBB. */
+    private void acenderLuz(float x, float y, float raio, int rgb, float forca, float ms) {
+        int i = luzVez;
+        luzVez = (luzVez + 1) % LUZES_LOCAIS;
+        float[] l = luzLocal[i];
+        l[0] = x; l[1] = y; l[2] = raio;
+        l[3] = ((rgb >> 16) & 0xFF) / 255f; l[4] = ((rgb >> 8) & 0xFF) / 255f; l[5] = (rgb & 0xFF) / 255f;
+        luzForca[i] = forca;
+        luzInicio[i] = engine.frame();
+        luzFim[i] = engine.frame() + Math.max(2, Math.round(ms / (FIXED_STEP * 1000f)));
+    }
+
+    /** A força da luz {@code i} agora: sobe em 15% do tempo e apaga no resto. */
+    private float luzAgora(int i) {
+        int dur = luzFim[i] - luzInicio[i];
+        if (dur <= 0 || luzForca[i] <= 0f) return 0f;
+        float t = (engine.frame() - luzInicio[i]) / (float)dur;
+        if (t < 0f || t >= 1f) return 0f;
+        float k = t < 0.15f ? t / 0.15f : (1f - t) / 0.85f;
+        return luzForca[i] * k * k;
+    }
+
+    /** Liga no OpenGL a luz local mais forte sobre {@code f}; false se nenhuma chega nele. */
+    private boolean luzNoCorpo(CanvasGl c, DesenhoGl gl, CombatFighter f) {
+        float cx = f.x, cy = fighterVisualY(f) - f.character().visualStandHeight * 0.5f;
+        int melhor = -1;
+        float forte = 0f;
+        for (int i = 0; i < LUZES_LOCAIS; i++) {
+            float k = luzAgora(i);
+            if (k <= 0f) continue;
+            float[] l = luzLocal[i];
+            float d = (float)Math.hypot(l[0] - cx, l[1] - cy);
+            // O corpo é grande: mede até um pouco além do raio.
+            float chega = k * Math.max(0f, 1f - d / (l[2] * 1.6f));
+            if (chega > forte) { forte = chega; melhor = i; }
+        }
+        if (melhor < 0) return false;
+        float[] l = luzLocal[melhor];
+        c.paraJanela(l[0], l[1], luzJanela);
+        gl.luzLocal(luzJanela[0], luzJanela[1], l[2] * luzJanela[2], l[3], l[4], l[5], luzAgora(melhor));
+        return true;
+    }
+
+    private void drawFighterCorpo(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
+                                  boolean damageFlash, boolean guardFlash) {
         if (hiddenByUltra(f) || cenaEmVideo) return;
         // A liberação do SHINKAI em vídeo já desenha o lutador (no efeito).
         if (ativacaoEfeito && ativacaoShinkai() && f == engine.fighter(ativacaoLado)) return;

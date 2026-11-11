@@ -78,6 +78,9 @@ final class GlRenderCanvas implements RenderCanvas {
         "uniform highp vec4 uLuz; uniform vec4 uLuzCor; uniform vec4 uLuzPes; uniform highp vec4 uLuzRet;\n" +
         // Contorno do corpo (uContorno: cor e ligado; uContornoR: a largura em uv).
         "uniform vec4 uContorno; uniform highp vec2 uContornoR;\n" +
+        // Luz local (uLocal: a luz em uv da folha e o raio dela em uv, nos dois eixos; uLocalCor: a
+        // cor e a força, 0 desliga): o impacto acende o lado do corpo virado para ele.
+        "uniform highp vec4 uLocal; uniform vec4 uLocalCor;\n" +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
@@ -150,6 +153,27 @@ final class GlRenderCanvas implements RenderCanvas {
         "        highp float y = clamp((vUv.y - uLuzRet.y) / max(uLuzRet.w - uLuzRet.y, 1e-6), 0.0, 1.0);\n" +
         "        u.rgb = clamp(u.rgb * mix(vec3(1.0), uLuzPes.rgb, y) + borda * uLuzCor.rgb * uLuz.y, 0.0, 1.0);\n" +
         "      }\n" +
+        // Luz local, como no Monkey Island Special Edition (reports/Luz em jogos de luta
+        // profissionais.md): o alfa do quadro em volta (16 vizinhos, dois anéis) faz uma silhueta
+        // borrada; o lado para onde ela cai é para onde o corpo aponta ali (a normal). A luz acende
+        // o que está virado para ela (n·l) e cai com a distância até o raio.
+        "      if (uLocalCor.a > 0.0 && u.a > 0.0) {\n" +
+        "        highp vec2 asp = vec2(uLocal.z / uLocal.w, 1.0);\n" +
+        "        highp float R = 0.07 * (uLuzRet.w - uLuzRet.y);\n" +
+        "        highp vec2 g = vec2(0.0);\n" +
+        "        for (int i = 0; i < 8; i++) {\n" +
+        "          highp float an = float(i) * 0.785398;\n" +
+        "          highp vec2 dr = vec2(cos(an), sin(an));\n" +
+        "          g += dr * texture(uTex, clamp(vUv + dr * R * asp, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "          g += dr * 0.5 * texture(uTex, clamp(vUv + dr * R * 0.5 * asp, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        "        }\n" +
+        "        vec3 n = normalize(vec3(-g * 0.9, 1.0));\n" +
+        "        highp vec2 dl = (uLocal.xy - vUv) / uLocal.zw;\n" +
+        "        float dist = length(dl);\n" +
+        "        float cai = clamp(1.0 - dist, 0.0, 1.0);\n" +
+        "        float lam = max(dot(n, normalize(vec3(dl, 0.35))), 0.0);\n" +
+        "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n" +
+        "      }\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         // Contorno: onde é transparente e um vizinho a uContornoR é corpo, um fio da cor por fora.
         "      if (uContorno.w > 0.5) {\n" +
@@ -219,11 +243,11 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Um programa e onde ficam os uniforms dele. */
     private static final class Programa {
         int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
-        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR;
+        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor;
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
-    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR;
+    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
@@ -325,6 +349,8 @@ final class GlRenderCanvas implements RenderCanvas {
         p.uLuzRet = GLES30.glGetUniformLocation(p.id, "uLuzRet");
         p.uContorno = GLES30.glGetUniformLocation(p.id, "uContorno");
         p.uContornoR = GLES30.glGetUniformLocation(p.id, "uContornoR");
+        p.uLocal = GLES30.glGetUniformLocation(p.id, "uLocal");
+        p.uLocalCor = GLES30.glGetUniformLocation(p.id, "uLocalCor");
         p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
         p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
         p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
@@ -342,6 +368,7 @@ final class GlRenderCanvas implements RenderCanvas {
         uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte; uTroca = p.uTroca;
         uLuz = p.uLuz; uLuzCor = p.uLuzCor; uLuzPes = p.uLuzPes; uLuzRet = p.uLuzRet;
         uContorno = p.uContorno; uContornoR = p.uContornoR;
+        uLocal = p.uLocal; uLocalCor = p.uLocalCor;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
         GLES30.glUseProgram(p.id);
     }
@@ -886,10 +913,36 @@ final class GlRenderCanvas implements RenderCanvas {
         } else {
             GLES30.glUniform4f(uContorno, 0f, 0f, 0f, 0f);
         }
+        int K = LOCAL;
+        if (quadro && m[K + 4] > 0f) {
+            GLES30.glUniform4f(uLocal, m[K], m[K + 1], m[K + 2], m[K + 3]);
+            GLES30.glUniform4f(uLocalCor, m[K + 5], m[K + 6], m[K + 7], m[K + 4]);
+        } else {
+            GLES30.glUniform4f(uLocalCor, 0f, 0f, 0f, 0f);
+        }
     }
 
     /** O filtro com a luz já preparado para um quadro: + deslocamento (2), retângulo do quadro (4) e largura do contorno em uv (2). */
-    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 8;
+    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 16;
+    /** A luz local no filtro do quadro: luz em uv (2), raio em uv (2), força, cor (3). */
+    private static final int LOCAL = Filtro.COM_LUZ + 8;
+    /** Filtro sem nada (a matriz identidade), para a luz local num lutador sem filtro. */
+    private static final float[] SEM_FILTRO = new float[Filtro.COM_LUZ];
+
+    static {
+        SEM_FILTRO[0] = SEM_FILTRO[6] = SEM_FILTRO[12] = SEM_FILTRO[18] = 1f;
+    }
+
+    /**
+     * Luz local para as próximas folhas de lutador (DesenhoGl.sprite liga e desliga em volta do
+     * quadro): o ponto e o raio em pixels da janela, a cor (0 a 1) e a força (0 desliga).
+     */
+    void luzLocal(float x, float y, float raio, float r, float g, float b, float forca) {
+        localX = x; localY = y; localRaio = raio;
+        localR = r; localG = g; localB = b; localForca = forca;
+    }
+
+    private float localX, localY, localRaio, localR, localG, localB, localForca;
     /** Largura da contraluz em fração da altura da tela. */
     static final float LARGURA_CONTRALUZ = 0.008f;
     /**
@@ -908,8 +961,10 @@ final class GlRenderCanvas implements RenderCanvas {
         float[] m = filtro;
         // Outro quadro com o mesmo filtro (sem voltar ao original entre os dois): parte do original.
         if (m != null && m.length >= LUZ_QUADRO && filtroComLuz != null) m = filtroComLuz;
+        boolean local = localForca > 0f && localRaio > 0f;
+        if (m == null && local) m = SEM_FILTRO;
         if (m == null || m.length < Filtro.COM_LUZ || m.length >= LUZ_QUADRO) return;
-        if (m[Filtro.LUZ] < 0.5f && m[Filtro.CONTORNO + 3] <= 0f) return;
+        if (m[Filtro.LUZ] < 0.5f && m[Filtro.CONTORNO + 3] <= 0f && !local) return;
         float det = a * d - b * c;
         if (Math.abs(det) < 1e-9f || r == l || bt == top || sr == sl || sb == st) return;
         // A direção da luz na tela, levada para o espaço do desenho (a inversa da parte linear da
@@ -942,6 +997,20 @@ final class GlRenderCanvas implements RenderCanvas {
         q[Filtro.COM_LUZ + 3] = Math.min(st, sb) / t.altura + mv;
         q[Filtro.COM_LUZ + 4] = Math.max(sl, sr) / t.largura - mu;
         q[Filtro.COM_LUZ + 5] = Math.max(st, sb) / t.altura - mv;
+        q[LOCAL + 4] = 0f;
+        if (local) {
+            // A luz da janela para o espaço do desenho (a inversa da matriz: o espelho vira junto)
+            // e daí para uv da folha; o raio pela escala da matriz.
+            float px = localX - e, py = localY - f;
+            float x = (d * px - c * py) / det, y = (-b * px + a * py) / det;
+            float raio = localRaio / (float)Math.sqrt(Math.abs(det));
+            q[LOCAL] = (sl + (x - l) / (r - l) * (sr - sl)) / t.largura;
+            q[LOCAL + 1] = (st + (y - top) / (bt - top) * (sb - st)) / t.altura;
+            q[LOCAL + 2] = raio * Math.abs((sr - sl) / (r - l)) / t.largura;
+            q[LOCAL + 3] = raio * Math.abs((sb - st) / (bt - top)) / t.altura;
+            q[LOCAL + 4] = localForca;
+            q[LOCAL + 5] = localR; q[LOCAL + 6] = localG; q[LOCAL + 7] = localB;
+        }
         filtro(q);
         filtroComLuz = m;
     }

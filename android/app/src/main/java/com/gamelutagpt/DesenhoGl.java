@@ -580,9 +580,23 @@ final class DesenhoGl implements SurfaceHolder.Callback {
             canvas.matriz(valores);
         }
         canvas.filtro(filtro != null ? filtro.matriz : null);
+        if (localForca > 0f) canvas.luzLocal(localX, localY, localRaio, localR, localG, localB, localForca);
         canvas.desenharBitmap(folha, true, fonte.left, fonte.top, fonte.right, fonte.bottom,
             destino.left, destino.top, destino.right, destino.bottom, alpha);
+        if (localForca > 0f) canvas.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
     }
+
+    /**
+     * A luz local das próximas folhas de lutador (o impacto acendendo o corpo): o ponto e o raio em
+     * pixels da janela, a cor (0 a 1) e a força; força 0 desliga. Quem desenha o lutador liga antes
+     * e desliga depois (só a folha dele acende, não o rastro nem a sombra).
+     */
+    void luzLocal(float x, float y, float raio, float r, float g, float b, float forca) {
+        localX = x; localY = y; localRaio = raio;
+        localR = r; localG = g; localB = b; localForca = forca;
+    }
+
+    private float localX, localY, localRaio, localR, localG, localB, localForca;
 
     /** Sobe uma imagem antes de ela aparecer (o pack do Ultra, aos poucos), com o quadro aberto. */
     boolean preSubir(com.gamelutagpt.render.RenderImage imagem) {
