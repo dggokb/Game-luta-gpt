@@ -74,7 +74,7 @@ final class AttackDefinition {
          */
         boolean repel;
         /**
-         * Aparar (o S3 do Ryūga): a postura de contra-golpe só bate quando leu um golpe; no vazio
+         * Aparar (era o S4 do Ryūga até 11/11; nenhum personagem usa hoje): a postura de contra-golpe só bate quando leu um golpe; no vazio
          * não sai golpe nenhum e ele fica aberto até o fim (o risco de errar a leitura).
          */
         boolean parry;

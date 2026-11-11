@@ -6,7 +6,7 @@
 **O que mudou da versão 1 para esta:** a primeira deixou repetições de propósito, para economizar
 vídeo: cinco jabs, dois uppercuts, dois chutes verticais, rasteiras giratórias, o chute lateral do p01
 no ar de quase todos. O pedido é **nenhum golpe igual**, então esta versão não deixa nenhum. O preço:
-**75 vídeos novos** (eram 27). A ordem para gravar, por prioridade, está no fim.
+**74 vídeos novos** (eram 27). A ordem para gravar, por prioridade, está no fim.
 
 ## A regra de "igual"
 
@@ -14,13 +14,14 @@ Cada golpe tem uma **forma**: o que acerta (palma, punho, calcanhar, chicote...)
 (reto, gancho, arco que desce, giro...) e onde acontece (em pé, agachado, no ar, especial).
 
 - **Duas formas iguais não existem**, nem entre personagens, nem dentro do mesmo personagem. Isso foi
-  conferido por script: 168 formas (p01 a p12, os 14 golpes de cada, mais Super e Ultra, que são
-  sequências próprias), nenhuma repetida.
+  conferido por script: 168 formas (os normais, especiais e agarrões do p01 ao p12, com o p01 só
+  até o S3, e o Super opcional do p03; os outros Super e Ultra são sequências próprias), nenhuma
+  repetida.
 - Além do script, revi à mão os pares que teriam forma diferente no papel mas ficariam parecidos na
   tela (dois chutes de dois pés, dois espacates, dois tapas de lado) e troquei um dos dois.
 - **O p01 não muda.** Ele é a referência: ninguém mais tem jab, direto com passo, roundhouse, soco
   agachado reto, rasteira giratória com a mão no chão, uppercut, joelhada no ar, chute lateral no ar,
-  soco reto no ar, empurrão de duas palmas, hélice em pé ou aparar com o antebraço.
+  soco reto no ar, empurrão de duas palmas ou hélice em pé. (Desde 11/11 ele tem só S1 a S3.)
 - **Uma exceção, já decidida:** o S2 do p03 é o uppercut da escola, igual ao do p01 no comando e
   diferente na execução (avança e bate três vezes). Está no README como decisão fechada.
 
@@ -337,7 +338,7 @@ kenpo.
 | jH | Facada de cima | A mão sobe acima da cabeça e os dedos descem em estocada, como uma facada | dedos · facada de cima | Freeman | ✅ |
 | S1 | Bisturi ↓↘→ | Estala a mão na altura do peito | dedos · estalo | — | ✅ |
 | S2 | Seringa ↓↙← | Arremesso em diagonal para o chão | arremesso · seringa ao chão | Faust (os objetos que ele lança) | ✅ |
-| S3 | Bloqueio de nervos →↘↓↙← | Desvia com a mão e responde com dois dedos rígidos no nervo do ombro | dedos · desvia e acerta o nervo | Q | 🎬 B: hoje responde com um soco curto no tronco, a resposta do Aparar do p01 |
+| S3 | Bloqueio de nervos →↘↓↙← | Desvia com a mão e responde com um soco curto nas costelas | punho · desvia e responde nas costelas | Q | ✅ (era igual ao Aparar do p01, que saiu em 11/11) |
 | S4 | Passo cirúrgico [←] → | Desliza para a frente e estoca com os dedos | dedos · passo e estocada | — | ✅ |
 | Agarrão | Chave de articulação | Segura o pulso, trava o braço nas costas e empurra | pulso · chave nas costas | — | ✅ (adversário desenhado: limpeza) |
 | Super | Cirurgia | Golpes exatos e uma estocada final lenta | sequência própria | — | ✅ |
@@ -441,9 +442,9 @@ Os parecidos que sobraram, e o que os separa na tela:
 | p08 | 4 | S2 | 2M, jL | L |
 | p09 | 8 | S4 | L, M, 2M, 2H, jL | 2L, jM |
 | p10 | 8 | M, H | L, 2L, jL | 2M, jM, S1 |
-| p11 | 7 | — | jL, jM, S3 | L, M, H, 2H |
+| p11 | 6 | — | jL, jM | L, M, H, 2H |
 | p12 | 2 | — | — | jL, jM |
-| **Total** | **75** | **9** | **39** | **27** |
+| **Total** | **74** | **9** | **38** | **27** |
 
 **Ordem sugerida:** primeiro os 9 de A (golpe que falta, que quebra regra ou que chuta para o lado
 errado). Depois, personagem por personagem, na ordem do README (p03 logo depois do p01), cada um
@@ -493,11 +494,11 @@ personagem. Além disso:
 
 ## Em dúvida (para o dono decidir)
 
-1. **75 vídeos.** É o custo de nenhum golpe igual. Se precisar cortar, os 27 de C são os mais fáceis
+1. **74 vídeos.** É o custo de nenhum golpe igual. Se precisar cortar, os 27 de C são os mais fáceis
    de adiar: quase todos são "parecido com outro do elenco", não com o p01.
 2. **p03 com Kyo e Iori:** o README e a ficha dele citam Ryu, Robert e Kim como referência; se a
    proposta for aprovada, troco para Kyo e Iori nos dois. O Super ("Rajada de Chutes" no jogo) pode
-   continuar com os chutes de hoje ou virar a rajada de garras do Iori (+1 vídeo, fora da conta de 75).
+   continuar com os chutes de hoje ou virar a rajada de garras do Iori (+1 vídeo, fora da conta de 74).
 3. **S2 do p03:** continua o uppercut da escola (decisão fechada no README). Se quiser que nem esse se
    repita, dá para refazer como joelhada e uppercut em sequência (+1 vídeo).
 4. **p10, M e H para trás:** conferido quadro a quadro (ela virada para a direita e o pé saindo para a

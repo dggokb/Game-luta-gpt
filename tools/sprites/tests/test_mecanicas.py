@@ -47,8 +47,11 @@ class MecanicasTest(unittest.TestCase):
         self.assertEqual(mecanicas.parse_command('[↓] ↑'), ([3, 7], True))
         with self.assertRaises(SystemExit):
             mecanicas.parse_command('↓ x →')
+        # S1 em diante, sem buraco: quase todos têm S1 a S4; o Ryūga, S1 a S3 (11/11); as crianças, S1 e S2.
         for cid, spec in self.data['personagens'].items():
-            self.assertEqual(sorted(spec['comandos']), ['S1', 'S2', 'S3', 'S4'], cid)
+            keys = sorted(spec['comandos'])
+            self.assertEqual(keys, [f'S{i}' for i in range(1, len(keys) + 1)], cid)
+        self.assertEqual(sorted(self.data['personagens']['player_base']['comandos']), ['S1', 'S2', 'S3'])
 
     def test_impact_frame_is_on_screen_when_the_move_hits(self):
         for cid, spec in self.data['personagens'].items():

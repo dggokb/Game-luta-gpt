@@ -183,7 +183,7 @@ bolhas verdes (envenenado), brasas vermelhas (fúria) e as faixas CONTRA-GOLPE!,
 
 | # | Mecânica no jogo |
 |---|---|
-| **p01** | Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. |
+| **p01** | Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. Só três especiais (S1 a S3; o Aparar saiu em 11/11). |
 | **p02** | Contra-golpe alto: o S3 lê golpes em pé e no ar durante a preparação e responde na hora. |
 | **p03** | Rekka: o S3 avança e encadeia até 3 vezes (novo comando a cada investida); o S2 sobe avançando. |
 | **p04** | Esquiva que cancela: o S3 passa por baixo de golpe alto e de projétil e pode virar soco (L, M, H); a cabeçada (S2) avança. |

@@ -1,7 +1,8 @@
 # Comandos por personagem (15/10)
 
 Cada personagem tem os próprios comandos de S1 a S4 (proposta aprovada em
-`auditoria-golpes.md`). No jogo, a lista fica na pausa: **PAUSA → COMANDOS**, com ◀ ▶ para trocar
+`auditoria-golpes.md`). O Ryūga (p01) tem só S1 a S3 desde 11/11: é o lutador clássico.
+No jogo, a lista fica na pausa: **PAUSA → COMANDOS**, com ◀ ▶ para trocar
 de personagem. Ela mostra os botões do que o jogador está usando (toque, teclado ou controle).
 
 Setas com o personagem virado para a direita. Qualquer botão (L, M ou H) solta o especial; no S1
@@ -9,7 +10,7 @@ o botão escolhe a força da energia.
 
 | # | S1 | S2 | S3 | S4 |
 |---|---|---|---|---|
-| p01 | Onda ↓↘→ | Punho ascendente →↓↘ | Aparar ↓↓ | Chute giratório ↓↙← |
+| p01 | Onda ↓↘→ | Punho ascendente →↓↘ | Chute giratório ↓↙← | — |
 | p02 | Palma ↓↘→ | Chute da garça [↓] ↑ | Contra-golpe ←↙↓ | Chute rodopiante [←] → |
 | p03 | Onda curta ↓↘→ | Punho em sequência →↓↘ | Avanço em três ↓↙← | Mergulho, no ar: ↓↘→ |
 | p04 | Soco de impacto ↓↘→ | Cabeçada [←] → | Esquiva ↓↓ | Ombrada ←↙↓↘→ |

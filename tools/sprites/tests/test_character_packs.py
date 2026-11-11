@@ -60,8 +60,9 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['fighter'].update(autoCombo=['H','L']))
         with self.assertRaisesRegex(ValueError,'autoCombo H -> L is not a declared cancel route'):pipeline.build(self.root)
     def test_command_specials_must_not_share_command_and_button(self):
-        self.edit(lambda d:d['specialMoves']['S4'].update(command=d['specialMoves']['S3']['command']))
-        with self.assertRaisesRegex(ValueError,'S3 and S4 share command and button L'):pipeline.build(self.root)
+        # O Ryūga tem S2 e S3 (sem S4 desde 11/11).
+        self.edit(lambda d:d['specialMoves']['S3'].update(command=d['specialMoves']['S2']['command']))
+        with self.assertRaisesRegex(ValueError,'S2 and S3 share command and button L'):pipeline.build(self.root)
     def test_segurar_and_air_only_are_validated(self):
         self.edit(lambda d:d['specialMoves']['S2'].update(segurar=True))
         with self.assertRaisesRegex(ValueError,'S2.segurar'):pipeline.build(self.root)
