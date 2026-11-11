@@ -291,6 +291,17 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## V4 da faísca do golpe forte (`acerto_forte_05.png`, 11/11) — a mais perto do Tōkon
+
+Folha do dono 3120 × 1300, 4 × 2 células de 780 × 650, fundo transparente, opaca: miolo branco
+grande e recortado no contato (255, 333 da célula), braço longo para a frente com ponta laranja,
+respingos, e no fim lascas tortas em zigue-zague que voam e somem. Ordem `0,1,2,2,3,4,5,6,7`,
+`efeito_video.py <pasta> --nome acerto_forte_05 --fps 24 --origem 255,333 --escala-mundo 0.43`.
+Sobreposta ao Tōkon: no auge (127) o miolo e o leque quase se encaixam um no outro, e no 129 as
+lascas têm a mesma forma, cor e direção. Diferença: a nossa já vem inclinada ~15° para cima e o
+jogo ainda gira na linha do chute, então no chute alto ela sobe bastante. Vídeo:
+`android/app/build/sprite-review/acerto_forte_v4_tokon_e_jogo.mp4`.
+
 ## V3 da faísca direcional (`acerto_forte_04.png`, 11/11)
 
 Mesma família da `acerto_forte_03`, mais macia: miolo branco maior, braços amarelos meio
