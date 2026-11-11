@@ -315,6 +315,8 @@ tasks.register('gravarLuta', JavaExec) {
     if (providers.gradleProperty('dupla').isPresent()) systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').get()
     if (providers.gradleProperty('carga').isPresent()) systemProperty 'gameluta.carga', providers.gradleProperty('carga').get()
     if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
+    // -Pgraficos=ALTO|MEDIO|LEVE: fixa o nível gráfico (o AUTO cai no PC lento ou sem placa de vídeo).
+    if (providers.gradleProperty('graficos').isPresent()) systemProperty 'gameluta.graficos', providers.gradleProperty('graficos').get()
     def passos = providers.gradleProperty('roteiro').getOrElse('espera:1 foto:luta').trim().split(/\s+/) as List
     args([layout.buildDirectory.dir('gravar-luta').get().asFile.absolutePath,
           providers.gradleProperty('resolucao').getOrElse('960x540')] + passos)
