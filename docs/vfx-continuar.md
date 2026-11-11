@@ -375,8 +375,8 @@ mesmo comando da V04 (escala 0,60) e os `duracoesMs` trocados à mão no efeito.
 LEIA-ME (o efeito_video.py só faz ritmo fixo). Mais alta e mais cheia que a V04. O dono: "acho que
 você colocou invertido" → "curvas ao contrário": a folha sai de `frames_curvas_viradas/` (cada
 quadro espelhado dentro da própria nuvem: continua nascendo no pé e indo para trás, com as curvas
-viradas para quem corre). Entra no lugar da V04 quando o dono aprovar
-(`fumaca_dash_v05_curvas_viradas.mp4`).
+viradas para quem corre). Aprovado com "deixa 15% menor e põe no jogo": escala 0,51 (era 0,60), e
+o `poeiraDoMotor` toca a V05 (a V04 e a `poeira_corrida` ficam de reserva).
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o

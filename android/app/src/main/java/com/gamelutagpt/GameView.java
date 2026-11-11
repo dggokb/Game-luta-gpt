@@ -5504,7 +5504,7 @@ public class GameView extends SurfaceView
             // Poeira só no arranque (e no pouso e na queda); a freada fica sem.
             boolean largada = f.forwardDashing || f.backdashFrames > 0;
             // A fumaça desenhada pelo dono (art/vfx/fumaca_dash_v04), quando existe; senão a de antes.
-            String fumaca = efeitos.tem("fumaca_dash_v04") ? "fumaca_dash_v04" : "poeira_corrida";
+            String fumaca = efeitos.tem("fumaca_dash_v05") ? "fumaca_dash_v05" : efeitos.tem("fumaca_dash_v04") ? "fumaca_dash_v04" : "poeira_corrida";
             if (largada && efeitos.tocar(fumaca, x, GROUND_Y, 1f, d < 0)) pose.deslize = 0;
         }
         if (pose.poeira >= POEIRA_NUVEM) {
