@@ -291,6 +291,19 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## Faísca do golpe forte desenhada (`acerto_forte_02.png`, 11/11)
+
+O dono mandou uma folha de 8 desenhos (4 × 2, células de 443 px, fundo transparente, borda
+escura opaca): risco do golpe, estrela pequena, explosão grande de miolo branco, anel que se
+quebra e lascas que voam e somem. Guardada em `art/vfx/acerto_forte_02.png`. Para o jogo: cortar
+as 8 células e montar a ordem `0,1,2,2,2,3,4,5,6,7` (segura a explosão grande como o Tōkon nos
+quadros 126-128), sem recorte por preto (a imagem já tem alfa), e
+`efeito_video.py <pasta> --nome acerto_forte_02 --fps 24 --origem 229,227 --escala-mundo 0.55`.
+Sobreposta ao Tōkon quadro a quadro, bate em fase, tamanho e tempo (estrela no 125, explosão
+cheia 126-128, lascas 129-130, some no 131). Diferenças: a nossa é redonda e simétrica (a dele
+estica para o lado do golpe), tem borda escura (a dele não) e as lascas são menores. Vídeo:
+`android/app/build/sprite-review/acerto_forte_02_sobreposto_no_tokon.mp4`. Esperando o dono.
+
 ## Pesquisa "como fazer anime VFX" com a rede aberta (11/11)
 
 Lidos por inteiro:
