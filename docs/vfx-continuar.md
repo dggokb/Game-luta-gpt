@@ -337,6 +337,15 @@ spray de ar e com o círculo de pressão de ar": `impacto_v06_forte_medio` (fort
 impactos_v06_ec.py, 1,25× o médio). Aprovado ("o forte ficou melhor assim"): é o forte do jogo
 por enquanto, e a estrela pontuda (`impacto_v06_forte_ec`) saiu dos assets. O dono vai desenhar
 um hit forte novo.
+
+## Fumaça do dash V04, desenhada pelo dono (11/11)
+
+`art/vfx/fumaca_dash_v04` (8 desenhos diferentes de 768 × 448, 45 ms cada, pé em 710,350, corre
+para a direita e a fumaça vai para trás). Folha: `efeito_video.py art/vfx/fumaca_dash_v04/frames
+--nome fumaca_dash_v04 --fps 22.2 --origem 710,350 --escala-mundo 0.60` (a 0.40 ficava com uns 60%
+do tamanho da `poeira_corrida`). A folha está nos assets; o `poeiraDoMotor` só toca ela no lugar
+da `poeira_corrida` quando o dono aprovar no vídeo (`fumaca_dash_v04.mp4`). Roteiro do dash:
+`gradle :pc:gravarLuta -Proteiro="espera:0.5 grava:40:d tecla:D tecla:D fim"`.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:

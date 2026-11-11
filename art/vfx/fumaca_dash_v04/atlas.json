@@ -1,0 +1,119 @@
+{
+  "name": "SOKON / poeira de corrida - redesenho quadro a quadro",
+  "frames": 8,
+  "frame_size": [
+    768,
+    448
+  ],
+  "atlas_grid": [
+    4,
+    2
+  ],
+  "frame_duration_ms": 45,
+  "facing": "right; smoke trails left",
+  "foot_anchor": {
+    "x": 710,
+    "y": 350
+  },
+  "transparent": true,
+  "provenance": "8 distinct original illustrated shapes, inspired by Tōkon reference; no game-frame pixel crops",
+  "animation": "shape curls, breaks up and unravels over time; drawn shapes are distinct, not scale duplicates",
+  "timeline": [
+    {
+      "frame": 1,
+      "file": "frames/smoke_dash_01.png",
+      "bbox": [
+        615,
+        315,
+        710,
+        355
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 255
+    },
+    {
+      "frame": 2,
+      "file": "frames/smoke_dash_02.png",
+      "bbox": [
+        545,
+        276,
+        710,
+        353
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 253
+    },
+    {
+      "frame": 3,
+      "file": "frames/smoke_dash_03.png",
+      "bbox": [
+        457,
+        272,
+        707,
+        352
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 251
+    },
+    {
+      "frame": 4,
+      "file": "frames/smoke_dash_04.png",
+      "bbox": [
+        360,
+        242,
+        700,
+        350
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 240
+    },
+    {
+      "frame": 5,
+      "file": "frames/smoke_dash_05.png",
+      "bbox": [
+        264,
+        229,
+        689,
+        348
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 215
+    },
+    {
+      "frame": 6,
+      "file": "frames/smoke_dash_06.png",
+      "bbox": [
+        183,
+        239,
+        678,
+        345
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 188
+    },
+    {
+      "frame": 7,
+      "file": "frames/smoke_dash_07.png",
+      "bbox": [
+        120,
+        243,
+        665,
+        342
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 136
+    },
+    {
+      "frame": 8,
+      "file": "frames/smoke_dash_08.png",
+      "bbox": [
+        58,
+        198,
+        648,
+        339
+      ],
+      "drawing": "unique independently drawn silhouette",
+      "opacity": 83
+    }
+  ]
+}
