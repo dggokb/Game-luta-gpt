@@ -291,6 +291,17 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
+
+Pedido do dono: "aplica os effects nele e põe". `art/vfx/effectcraft/acerto_forte_05_ec.py` corta a
+folha V4 (ordem `0,1,2,2,3,4,5,6,7`, folga de 150 px em cima e embaixo), importa como sequência no
+EffectCraft e põe por cima o halo laranja (Glow A e B) e o anel de pressão de ar em 3D do
+`dano_forte` (convertido para a escala da V4, ×0,30/0,43); a faísca vira plano 3D para o anel
+atravessá-la. Sem faixas de cor nem erosão (o desenho já tem as cores e já se dissipa).
+`efeito_video.py <pasta> --nome acerto_forte_05_ec --fps 24 --origem 255,483 --escala-mundo 0.43`.
+No `GameView.efeitoDeGolpe` ela vem antes da `dano_forte_anel_ec` (que fica de reserva). Vídeo:
+`android/app/build/sprite-review/acerto_forte_v4_com_acabamento_no_jogo.mp4`.
+
 ## V4 da faísca do golpe forte (`acerto_forte_05.png`, 11/11) — a mais perto do Tōkon
 
 Folha do dono 3120 × 1300, 4 × 2 células de 780 × 650, fundo transparente, opaca: miolo branco

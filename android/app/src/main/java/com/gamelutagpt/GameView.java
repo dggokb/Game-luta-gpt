@@ -5592,6 +5592,10 @@ public class GameView extends SurfaceView
             // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
             if (superGolpe) {
                 nome = "impacto_ar_super";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("acerto_forte_05_ec")) {
+                // A faísca desenhada pelo dono (art/vfx/acerto_forte_05.png, a V4) com halo e o anel
+                // de pressão de ar em 3D do EffectCraft: art/vfx/effectcraft/acerto_forte_05_ec.py.
+                nome = "acerto_forte_05_ec";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("dano_forte_anel_ec")) {
                 // O vídeo dano_forte com acabamento no EffectCraft (faixas chapadas, impacto
                 // segurado, erosão) e o anel de pressão de ar em 3D: art/vfx/effectcraft/dano_forte_ec.py --anel.
