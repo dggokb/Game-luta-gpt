@@ -246,6 +246,29 @@ Playground (vira bolinhas em grade, cara de confete; o motion blur da composiç�
 partícula de efeito) e o modo Direction Axis (vira um jato estreito). Vídeo:
 `android/app/build/sprite-review/acerto_forte_dissipa_em_fagulhas.mp4`.
 
+## Estudo do vídeo de referência do Tōkon e fumaça 3D toon (11/11)
+
+O dono mandou um vídeo de 10 s do Marvel Tōkon (2400×1080, ~24 por segundo, 243 quadros) para
+estudo quadro a quadro. **Nenhum quadro entra no repositório** (regra 3); ficou só na sessão.
+Medidas:
+
+| Efeito na referência | Quadros | Duração | Como é |
+|---|---|---|---|
+| Fumaça de pouso/dash | 74-84 | ~455 ms | branca (~#f3f3f3) com UMA sombra cinza (~#c8c8c8), sem contorno; nasce como um bico no chão, vira um volume encaroçado em 2-3 quadros, se parte em tufos que sobem e se enrolam, afina e some transparente |
+| Coluna de fumaça | 19-30 | ~500 ms | o mesmo material, subindo em coluna; se abre em arcos ("C") antes de sumir |
+| Faísca de acerto | 125-131 | ~290 ms | miolo branco, faixas amarelo/laranja, espinhos em zigue-zague; no fim o miolo some primeiro e sobram lascas em zigue-zague (raios) voando para fora |
+| Faísca forte / contra-golpe | 203-212 | ~414 ms | a mesma, com riscos de velocidade ciano atrás do golpe |
+| Outros vistos | | | rastro branco meio transparente do chute, escudo de defesa (anel oval ciano), clarão verde de escudo, esfera de gelo, silhueta branca de teletransporte, pedras e arcos de vento no giro do Hulk |
+
+A fumaça é 3D com sombreamento de anime (o jogo é 3D). Refeita pela mesma técnica no EffectCraft:
+`art/vfx/effectcraft/fumaca3d_dash_ec.py` — esferas 3D (`layer.new3dPrimitive`) em cachos tipo
+couve-flor, luz paralela de cima e da frente com sombra projetada (as dobras escurecem), numa
+comp aninhada; na comp final o Colorama corta a luz em duas cores chapadas (luz/sombra, corte em
+0,50), erosão de borda dura e transparência no fim; 12 desenhos a 24 por segundo. O 3D roda sem
+tela em ~0,06 s por quadro. No jogo: `efeito_video.py <pasta> --nome fumaca3d_dash_ec --fps 24
+--origem 600,392 --escala-mundo 0.85`, no lugar da `poeira_corrida` (só na cópia local). Vídeo:
+`android/app/build/sprite-review/dash_fumaca_hoje_x_fumaca_3d_toon.mp4`. Espera aprovação.
+
 ## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
 
 Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
