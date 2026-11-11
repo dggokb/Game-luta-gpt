@@ -18,11 +18,12 @@ meio do desenho, a poucos px do pivô:
      --fps 20 --origem 210,260 --escala-mundo 0.48)
     efeito_video.py PASTA/medio --nome impacto_v06_medio_ec --fps 24 --origem 200,248 --escala-mundo 0.48
     efeito_video.py art/vfx/impactos_v06/leve --nome impacto_v06_fraco --fps 30 --origem 214,250 --escala-mundo 0.60
-O forte do jogo (o desenho do médio sem o spray, com o anel; alfa a 90% antes):
+O forte do jogo (o desenho do médio sem o spray, com o anel):
     efeito_video.py PASTA/forte_medio --nome impacto_v06_forte_medio --fps 24 --origem 200,248 --escala-mundo 0.60
-O hit forte novo do dono (art/vfx/impacto_forte_v07) com o anel (alfa a 90% antes):
-    efeito_video.py PASTA/forte_v07 --nome impacto_v07_forte --fps 24 --origem 320,320 --escala-mundo 0.54
-(as três com o alfa a 90% antes, pedido de 11/11)
+O segundo hit forte do dono (art/vfx/impacto_forte_v08) com o anel:
+    efeito_video.py PASTA/forte_v08 --nome impacto_v08_forte --fps 24 --origem 258,252 --escala-mundo 0.50
+(o v07, art/vfx/impacto_forte_v07, foi reprovado). Desde 11/11 o alfa de todas as folhas é
+multiplicado por 0,8 antes do efeito_video.py (pedido "tira mais 10% de opacidade").
 """
 import argparse
 import json
@@ -35,7 +36,7 @@ ARTE = AQUI.parent / 'impactos_v06'
 CLI_PADRAO = Path('/home/user/storytold/effectcraft/target/release/effectcraft-cli')
 LADO = 512
 PIVO = (210.0, 260.0)
-FPS = {'forte': 20, 'medio': 24, 'forte_medio': 24, 'forte_v07': 24}
+FPS = {'forte': 20, 'medio': 24, 'forte_medio': 24, 'forte_v07': 24, 'forte_v08': 24}
 
 # O anel do dano_forte (0,30 px do mundo por px) na escala destes desenhos (0,70); 6 quadros.
 K = 0.30 / 0.70
@@ -141,6 +142,17 @@ def forte_v07(item):
     return s + anel(fps, pivo=(320.0, 320.0), fator=0.60 / 0.54)
 
 
+def forte_v08(item):
+    """O segundo hit forte novo do dono (11/11, "aquele não tava bom"): art/vfx/impacto_forte_v08,
+    desenhado em fundo preto com brilho; o recorte (o preto e o brilho fraco viram transparência,
+    alfa = brilho de 150 a 235) está nos quadros de frames/. Centro em 258,252, 6 quadros de
+    512 × 512, na folha a 0,50: o anel cresce 0,60/0,50 para ficar do tamanho do de hoje."""
+    fps = FPS['forte_v08']
+    s = base('forte_v08', item, fps)
+    s += [{'command': 'layer.setSwitch', 'params': {'layers': ['arte'], 'switch': 'threeD', 'value': True}}]
+    return s + anel(fps, pivo=(258.0, 252.0), fator=0.60 / 0.50)
+
+
 def medio(item):
     fps = FPS['medio']
     s = base('medio', item, fps)
@@ -212,6 +224,7 @@ def main():
     rodar(a.cli, 'medio', ARTE / 'medio', medio, a.saida / 'medio')
     rodar(a.cli, 'forte_medio', ARTE / 'medio', forte_medio, a.saida / 'forte_medio')
     rodar(a.cli, 'forte_v07', AQUI.parent / 'impacto_forte_v07' / 'frames', forte_v07, a.saida / 'forte_v07')
+    rodar(a.cli, 'forte_v08', AQUI.parent / 'impacto_forte_v08' / 'frames', forte_v08, a.saida / 'forte_v08')
 
 
 if __name__ == '__main__':

@@ -343,6 +343,16 @@ centro em 320,320, fundo transparente), "não esquece do círculo de pressão": 
 impactos_v06_ec.py (o desenho + o anel 3D, que cresce 0,60/0,54 para ficar do tamanho do anel do
 forte_medio no mundo), folha `impacto_v07_forte` a 0,54 (pico do tamanho do forte_medio). Nos
 assets; entra no `efeitoDeGolpe` quando o dono aprovar no vídeo (`hit_forte_v07.mp4`).
+Reprovado ("aquele não tava bom"); a folha `impacto_v07_forte` saiu dos assets. Veio o v08
+(`art/vfx/impacto_forte_v08`: 3 × 2 quadros de 512 × 512 em fundo PRETO com brilho e contorno preto
+fino). Recorte: alfa = brilho (o maior de R, G, B) de 150 a 235 — abaixo de 150 o brilho alaranjado
+que se espalha pelo quadro todo virava um quadrado translúcido; o contorno preto vira uma fresta
+transparente (regra 12). Os quadros recortados estão em `frames/`. forte_v08 no impactos_v06_ec.py
+(centro 258,252, anel 0,60/0,50), folha `impacto_v08_forte` a 0,50. Entra quando o dono aprovar
+(`hit_forte_v08_e_80.mp4`).
+
+"Tira mais 10% de opacidade dos 3": as folhas dos impactos saem agora com o alfa a 0,8 do desenho
+(antes 0,9) — fraco, médio, forte_medio e o v08.
 
 ## Fumaça do dash V04, desenhada pelo dono (11/11)
 
