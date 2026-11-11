@@ -41,6 +41,7 @@ LARGURA_MEMBRO = 0.42  # meia largura do membro em volta da reta junta -> ponta,
 PONTA_LIVRE = 0.18    # o trecho da ponta (o pé, o punho) que não estica, fração do membro
 LINGUA_MIN, LINGUA_MAX = 7, 18   # largura de cada língua (px da folha)
 MARGEM = 12           # px da borda do quadro que as línguas não passam (o build exige 8)
+ESCURO = 90            # --sem-escuro: pixel com o canal mais claro abaixo disto não vira língua
 RETO = 0.7            # cosseno entre o movimento da ponta e o membro acima do qual o golpe é reto
 
 
@@ -92,7 +93,7 @@ def so_corpo(cel, abre=5, borda=3):
     return Image.fromarray(px, 'RGBA')
 
 
-def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO):
+def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO, sem_escuro=False):
     """O quadro com o membro esticado para trás: cada ponto do membro deixa uma língua até onde ele
     estava no desenho anterior (o pé, que andou muito, uma cauda longa; o joelho, quase nada), e o
     rastro vira a área que o membro varreu, em giro (chute em arco) ou reto (soco). Coordenadas em
@@ -111,6 +112,9 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
     perto = np.hypot(rx - tc * seg[0], ry - tc * seg[1]) <= LARGURA_MEMBRO * L
     # Só o desenho opaco vira língua: o halo meio transparente do vídeo daria línguas sujas.
     membro = perto & (px[..., 3] >= 250) & (t > 0.05) & (t < 1.0 - PONTA_LIVRE * 0.5)
+    if sem_escuro:
+        # O membro passa na frente de roupa escura (o braço do S2 diante da regata): o escuro fica.
+        membro &= px[..., :3].max(axis=2) > ESCURO
     if membro.sum() < 50:
         return cel
     # Onde cada ponto do membro estava: o mesmo t e o mesmo o, no membro do desenho anterior.
@@ -186,6 +190,7 @@ def main():
                         '1 = até onde o membro estava no desenho anterior')
     p.add_argument('--trocar', help='antes de esticar, troca desenhos com efeito do vídeo por cima do corpo '
                                     'pelo desenho limpo da mesma pose: "4=8,5=8" (o 4 e o 5 viram cópia do 8)')
+    p.add_argument('--sem-escuro', action='store_true', help='o escuro (roupa preta atrás do membro) não vira língua')
     p.add_argument('--antes', help='de que desenho cada um estica: "7=5" (sem isto, o último do caminho '
                                    'com a ponta noutro lugar)')
     p.add_argument('--limpar', help='desenhos de onde sai o efeito do vídeo (fica só o corpo opaco): '
@@ -212,6 +217,7 @@ def main():
     if a.trocar is None and smear:
         a.trocar = smear.get('trocar')
     trocas = {int(d): int(o) for d, o in (t.split('=') for t in a.trocar.split(','))} if a.trocar else {}
+    a.sem_escuro = a.sem_escuro or bool(smear and smear.get('semEscuro'))
     if a.antes is None and smear:
         a.antes = smear.get('antes')
     antes_de = {int(d): int(o) for d, o in (t.split('=') for t in a.antes.split(','))} if a.antes else {}
@@ -253,7 +259,7 @@ def main():
     feitos = []
     def ponto(q):
         """O ponto do caminho no desenho q; num desenho trocado, o de outro com a mesma pose."""
-        if str(q) in cam:
+        if str(q) in cam and q not in trocas:
             return cam[str(q)]
         fonte = trocas.get(q, q)
         for d in [fonte] + [d for d, o in trocas.items() if o == fonte]:
@@ -273,7 +279,7 @@ def main():
         x0, y0 = (q % cols) * fw, (q // cols) * fh
         cel = folha.crop((x0, y0, x0 + fw, y0 + fh))
         u = cam[str(ant)]
-        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento)
+        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento, a.sem_escuro)
         folha.paste(nova, (x0, y0))
         feitos.append((q, round(andou[q])))
     print('esticados (desenho, px do mundo que a ponta andou):', feitos)
@@ -300,6 +306,8 @@ def main():
         clip['smear']['limpar'] = a.limpar
     if a.antes:
         clip['smear']['antes'] = a.antes
+    if a.sem_escuro:
+        clip['smear']['semEscuro'] = True
     clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('fonte nova:', destino, '| clip:', clip_path.relative_to(ROOT))
     print('agora: python3 tools/sprites/build_characters.py --write')

@@ -3844,7 +3844,7 @@ final class GeneratedSpriteLayouts {
     static final int SHINKAI_ATIVA_ROOT_Y = 580;
     static final int SHINKAI_ATIVA_FRAME_COUNT = 26;
 
-    static final int SPECIAL_S2_SET_FRAME_WIDTH = 375;
+    static final int SPECIAL_S2_SET_FRAME_WIDTH = 350;
     static final int SPECIAL_S2_SET_FRAME_HEIGHT = 652;
     static final int SPECIAL_S2_SET_ROOT_X = 189;
     static final int SPECIAL_S2_SET_ROOT_Y = 615;

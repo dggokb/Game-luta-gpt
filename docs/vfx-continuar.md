@@ -86,6 +86,10 @@ efeito que veio do vídeo (clarão, arco, rastro, fumaça, coluna de luz, membro
   no S3 em cada chute esticado (9, 14, 16, 20, 23, 29). Com o caminho, a faísca de dano dos
   especiais passa a nascer na ponta do punho ou do pé.
 - As línguas pegam cor só do desenho opaco (o halo meio transparente do vídeo sujava de verde).
+- S2 refeito "igual ao 2H" (pedido do dono): os desenhos 6 e 7 viram cópia do 8 (o braço limpo e
+  esticado para cima) e esticam a partir do agachamento (5): `--trocar 6=8,7=8 --antes 6=5,7=5`, mais
+  `--sem-escuro` (o braço passa na frente da regata preta, que virava língua escura). Um desenho
+  trocado passou a usar o ponto do caminho da pose nova, não o do borrão.
 - Visto nas folhas, quadro a quadro. `testarMotor`: só as 3 falhas antigas; build PASS. Celular e
   jogo: não vistos nesta correção.
 - Visto: as folhas quadro a quadro dos sete golpes, e no jogo (PC) o M e o 2H. Os do ar só na
