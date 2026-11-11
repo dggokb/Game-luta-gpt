@@ -22,6 +22,12 @@ só) foi interrompida antes de ser vista no jogo e está só na branch `ccr-97c0
 melhor; a ideia em aberto é ele gerar o rastro em vídeo, como fez com os efeitos de dano, e o
 jogo encaixar no caminho que já detecta.
 
+**Rastro automático desligado (11/11, pedido do dono):** `RastroDoGolpe.LIGADO = false`. O
+dono passou a desenhar o rastro à mão em cima da folha de cada golpe (o primeiro é o chute forte
+do Ryūga, p01, `art/sprites/source/player_base_heavy_straight_video_normalized.png`). O código, a
+textura e o caminho detectado ficam; para voltar, `LIGADO = true`. O teste por erosão continua
+guardado na branch `claude/rastro-erosao` (também desligado lá).
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
