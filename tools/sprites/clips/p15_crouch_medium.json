@@ -2,7 +2,7 @@
   "id": "p15_crouch_medium",
   "javaName": "P15_CROUCH_MEDIUM",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_crouch_medium_video_hd.png",
+  "source": "art/sprites/source/p15_crouch_medium_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_crouch_medium.webp",
   "report": "tools/sprites/reports/p15_crouch_medium.report.json",
   "preview": "android/app/build/sprite-review/p15_crouch_medium-import.png",
@@ -43,8 +43,25 @@
   "rootX": 374,
   "rootY": 440,
   "sourceReferences": [
-    "art/sprites/source/p15_crouch_medium_video_normalized.png"
+    "art/sprites/source/p15_crouch_medium_video_normalized.png",
+    "art/sprites/source/p15_crouch_medium_video_hd.png"
   ],
   "frameHeight": 512,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "smear": {
+    "fonte": "art/sprites/source/p15_crouch_medium_video_hd.png",
+    "quadros": [
+      35,
+      36
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "35=36",
+    "limpar": "todos",
+    "antes": "35=33,36=33"
+  }
 }

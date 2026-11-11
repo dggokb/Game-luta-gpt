@@ -2,7 +2,7 @@
   "id": "p16_medium_kick",
   "javaName": "P16_MEDIUM_KICK",
   "profile": "p16.json",
-  "source": "art/sprites/source/p16_medium_kick_video_hd.png",
+  "source": "art/sprites/source/p16_medium_kick_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p16_medium_kick.webp",
   "report": "tools/sprites/reports/p16_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p16_medium_kick-import.png",
@@ -45,7 +45,24 @@
   "rootX": 300,
   "rootY": 540,
   "sourceReferences": [
-    "art/sprites/source/p16_medium_kick_video_normalized.png"
+    "art/sprites/source/p16_medium_kick_video_normalized.png",
+    "art/sprites/source/p16_medium_kick_video_hd.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "smear": {
+    "fonte": "art/sprites/source/p16_medium_kick_video_hd.png",
+    "quadros": [
+      8,
+      9
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "8=9",
+    "limpar": "todos",
+    "antes": "8=5,9=5"
+  }
 }
