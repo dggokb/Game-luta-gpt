@@ -48,6 +48,11 @@ final class EfeitosVideo {
         boolean cena;
         /** Largura do quadro do vídeo da cena no mundo (px; 0: não tem). */
         float larguraCena;
+        /**
+         * Quanto a folha soma com o que está embaixo, de 0 (cobre, o normal) a 1 (luz pura): o
+         * {@code "soma"} do efeito.json. Os efeitos de luz (impacto, raio, fogo) somam; fumaça não.
+         */
+        float soma;
 
         Folha(String nome, Bitmap bitmap, float pixelScale, int[][] quadros, float[][] desloc, float[] fim) {
             this.nome = nome;
@@ -153,6 +158,7 @@ final class EfeitosVideo {
         f.marcaMs = (float)dados.optDouble("marcaMs", -1.0);
         f.cena = dados.optBoolean("cena", false);
         f.larguraCena = (float)dados.optDouble("larguraCena", 0.0);
+        f.soma = Math.max(0f, Math.min(1f, (float)dados.optDouble("soma", 0.0)));
         return f;
     }
 
@@ -385,10 +391,10 @@ final class EfeitosVideo {
         if (espelhar) {
             c.save();
             c.scale(-1f, 1f, px, 0f);
-            c.drawBitmap(f.bitmap, fonte, destino, paint);
+            pintar(c, f);
             c.restore();
         } else {
-            c.drawBitmap(f.bitmap, fonte, destino, paint);
+            pintar(c, f);
         }
         return true;
     }
@@ -427,11 +433,39 @@ final class EfeitosVideo {
                 // espelhado, porque o efeito aponta para a esquerda).
                 if (angulo[i] != 0f) c.rotate(espelhado[i] ? angulo[i] : -angulo[i], x[i], y[i]);
                 if (espelhado[i]) c.scale(-1f, 1f, x[i], 0f);
-                c.drawBitmap(f.bitmap, fonte, destino, paint);
+                pintar(c, f);
                 c.restore();
             } else {
-                c.drawBitmap(f.bitmap, fonte, destino, paint);
+                pintar(c, f);
             }
         }
+    }
+
+    private final Paint paintSoma = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
+
+    {
+        paintSoma.setXfermode(Mistura.SOMA);
+    }
+
+    /**
+     * O quadro de {@link #fonte} em {@link #destino}, misturado pela {@link Folha#soma}: cobrindo com
+     * alfa (1 − soma) e depois somando com alfa soma. As duas passadas dão o mesmo que a mistura
+     * parcial do OpenGL (embaixo × (1 − alfa × (1 − soma)) + a cor), em qualquer desenho.
+     */
+    private void pintar(Canvas c, Folha f) {
+        float k = f.soma;
+        if (k <= 0f) {
+            c.drawBitmap(f.bitmap, fonte, destino, paint);
+            return;
+        }
+        int a = paint.getAlpha();
+        if (k < 1f) {
+            paint.setAlpha(Math.round(a * (1f - k)));
+            c.drawBitmap(f.bitmap, fonte, destino, paint);
+            paint.setAlpha(a);
+        }
+        paintSoma.setAlpha(Math.round(a * k));
+        paintSoma.setColorFilter(paint.getColorFilter());
+        c.drawBitmap(f.bitmap, fonte, destino, paintSoma);
     }
 }

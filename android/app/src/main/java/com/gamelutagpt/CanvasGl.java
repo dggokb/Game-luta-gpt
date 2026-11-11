@@ -240,6 +240,14 @@ final class CanvasGl extends Canvas {
     @Override public void restore() { super.restore(); matrizSuja = true; }
     @Override public void restoreToCount(int n) { super.restoreToCount(n); matrizSuja = true; }
 
+    /** O ponto (x, y) do espaço de agora em pixels da janela; out[2]: quantos pixels vale 1 aqui. */
+    void paraJanela(float x, float y, float[] out) {
+        lerMatriz();
+        out[0] = v[0] * x + v[1] * y + v[2];
+        out[1] = v[3] * x + v[4] * y + v[5];
+        out[2] = (float)Math.sqrt(Math.abs(v[0] * v[4] - v[1] * v[3]));
+    }
+
     /** Leva a transformação, o recorte, a transparência e a inversão de agora para o OpenGL. */
     void prepararGl() {
         desenhos++;
@@ -950,8 +958,11 @@ final class CanvasGl extends Canvas {
         GlRenderCanvas.Textura tx = gl.textura(b, false);
         if (tx == null) return;
         gl.filtro(p != null ? matrizDoFiltro(p.getColorFilter()) : null);
+        boolean soma = p != null && p.getXfermode() == Mistura.SOMA;
+        if (soma) gl.soma(true);
         // O recorte da fonte é em pixels do bitmap; a textura sabe o tamanho dele.
         gl.desenharTextura(tx, sl, st, sr, sb, l, t, r, bt, p != null ? p.getAlpha() : 255);
+        if (soma) gl.soma(false);
     }
 
     @Override public void drawBitmap(Bitmap b, Rect src, RectF dst, Paint p) {

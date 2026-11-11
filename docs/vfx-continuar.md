@@ -481,6 +481,27 @@ trás (`atrasDosLutadores()` / `desenharAtras`, desenhada antes dos lutadores) e
 nela. Depois: "a do super pulo ficou muito grande, e a fumaça dos dois é um pouco atrás dele, não
 embaixo": `SUPER_PULO_ESCALA` 0,7 e `PULO_FUMACA_ATRAS` 40 px do mundo para as costas.
 
+## Motores de luz 2 e 3 (11/11), pela pesquisa em `reports/Luz em jogos de luta profissionais.md`
+
+- **2, mistura somada:** `"soma"` no efeito.json (0 cobre, 1 luz pura; `efeito_video.py --soma`).
+  O EfeitosVideo pinta cobrindo com alfa (1 − soma) e somando com alfa soma (`Mistura.SOMA`):
+  OpenGL com a cor cheia e alfa zero na mistura pré-multiplicada (sem trocar estado), Canvas do
+  Android com ADD, PC com `SomaComposite`. Nenhum efeito usa ainda; vídeo `impactos_soma.mp4`
+  (normal, 0,5, 1) esperando o dono escolher.
+- **3, luz local** (a técnica do Monkey Island SE, por personagem, sem desenhar fora da tela): o
+  shader da folha do lutador tira a normal da silhueta borrada do próprio quadro (16 vizinhos do
+  alfa, dois anéis de 7% e 3,5% da altura do quadro) e soma a cor da luz onde o corpo está virado
+  para ela (n·l), caindo até o raio. A luz vai por lutador e por quadro no pacote do filtro
+  (`GlRenderCanvas.luzLocal` → `luzDoQuadro`, `LOCAL`), ligada só em volta da folha
+  (`DesenhoGl.luzLocal`; o PC tem a cópia em `pc/src/substituicoes`). O GameView acende uma luz por
+  impacto (`acenderLuz`: raio, cor e força por força do golpe; sobe em 15% do efeito e apaga) e
+  passa a mais forte sobre cada lutador (`luzNoCorpo`). Só OpenGL (como a contraluz). Desligado
+  (`LUZ_DO_IMPACTO`) até o dono aprovar `luz_local_impacto.mp4`.
+- **Gravar em OpenGL** (o que o celular mostra; o desenho do PC não tem contraluz nem luz local):
+  `xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Proteiro="..."`.
+- Os quadros dos vídeos encheram o disco (14 GB) uma vez: apagar a pasta de quadros depois de
+  montar cada vídeo, e `rm -rf pc/build/gravar-luta` antes de cada gravação (ela acumula).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
