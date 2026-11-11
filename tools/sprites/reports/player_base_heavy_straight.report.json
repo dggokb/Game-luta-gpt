@@ -1,7 +1,7 @@
 {
   "id": "player_base_heavy_straight",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_heavy_straight_video_normalized.png",
+  "source": "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -62,13 +62,13 @@
     {
       "index": 4,
       "outputBbox": [
-        151,
+        130,
         124,
         413,
         594
       ],
       "minimumMargin": 46,
-      "opaquePixels": 50599
+      "opaquePixels": 53823
     },
     {
       "index": 5,
@@ -79,7 +79,7 @@
         594
       ],
       "minimumMargin": 46,
-      "opaquePixels": 56342
+      "opaquePixels": 59087
     },
     {
       "index": 6,
@@ -370,7 +370,7 @@
         91
       ],
       [
-        2680,
+        2700,
         0,
         392,
         480,
@@ -396,9 +396,9 @@
       [
         2400,
         0,
-        276,
+        296,
         484,
-        128,
+        108,
         37
       ],
       [
@@ -554,7 +554,7 @@
         47
       ],
       [
-        3076,
+        3096,
         0,
         316,
         480,
@@ -613,12 +613,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "6817aca2106d5a03b0ef2c5a428b3c26fbd34a548e328eb78e3441fcb5b7a8ca",
-      "config": "8a74541ebb0712dd6a72c7257e0169b7ba0439f947498898cb8c1f03595db761",
+      "source": "430f1320e4d9ab6c11ed40ffd5ba765a5bf0bd9c29df6ac52064c262cf5838d5",
+      "config": "fe4b034a20854c4d031db8d7ea4aa7ecf6b94b8f4a373522ab19f9f40ef22542",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_heavy_video_normalized.png": "6c4a8f93fd52fb95bec52052619b2f4d65fd0b3dfc372680e6a4b762821ceaa8"
+      "art/sprites/source/player_base_heavy_video_normalized.png": "6c4a8f93fd52fb95bec52052619b2f4d65fd0b3dfc372680e6a4b762821ceaa8",
+      "art/sprites/source/player_base_heavy_straight_video_normalized.png": "6817aca2106d5a03b0ef2c5a428b3c26fbd34a548e328eb78e3441fcb5b7a8ca"
     }
   }
 }

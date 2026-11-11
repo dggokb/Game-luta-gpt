@@ -2,7 +2,7 @@
   "id": "player_base_heavy_straight",
   "javaName": "HEAVY_STRAIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_heavy_straight_video_normalized.png",
+  "source": "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_heavy_straight.webp",
   "report": "tools/sprites/reports/player_base_heavy_straight.report.json",
   "preview": "android/app/build/sprite-review/heavy_straight-import.png",
@@ -14,7 +14,8 @@
   "rootX": 192,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "sourceReferences": [
-    "art/sprites/source/player_base_heavy_video_normalized.png"
+    "art/sprites/source/player_base_heavy_video_normalized.png",
+    "art/sprites/source/player_base_heavy_straight_video_normalized.png"
   ],
   "frameHeight": 640,
   "rootY": 604,
@@ -109,5 +110,14 @@
         -13.83
       ]
     ]
+  },
+  "smear": {
+    "fonte": "art/sprites/source/player_base_heavy_straight_video_normalized.png",
+    "quadros": [
+      4,
+      5
+    ],
+    "semente": 11,
+    "ferramenta": "tools/sprites/smear.py"
   }
 }

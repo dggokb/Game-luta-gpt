@@ -28,6 +28,32 @@ do Ryūga, p01, `art/sprites/source/player_base_heavy_straight_video_normalized.
 textura e o caminho detectado ficam; para voltar, `LIGADO = true`. O teste por erosão continua
 guardado na branch `claude/rastro-erosao` (também desligado lá).
 
+## Smear: o membro esticado na própria arte (11/11, teste; branch `claude/smear`)
+
+Ideia do dono, depois de desligar o rastro automático: em vez de efeito por cima, **o próprio
+desenho do personagem estica** nos quadros rápidos (o smear do anime; referência dele: a luva e a
+manga que viram línguas nas cores da roupa, o punho intacto na frente). Decidido com ele: uma
+ferramenta própria; começar só pelo membro que bate, em 1 ou 2 desenhos, com as cores do próprio
+personagem, no chute forte (H) do Ryūga adulto (p01); quando a ferramenta estiver pronta, testar
+em mais coisas (cabelo, roupa, tudo que se mexe).
+
+- **Ferramenta:** `tools/sprites/smear.py <personagem> <golpe> [--quadros 4,5] [--previa x.png]`,
+  depois `build_characters.py --write`. Escreve uma fonte nova ao lado da original
+  (`..._smear.png`), aponta o clip para ela e guarda os parâmetros no clip (`smear`); a original
+  fica em `sourceReferences`. `--desfazer` volta.
+- **Como:** o membro é a parte do desenho perto da reta junta -> ponta do caminho detectado
+  (`silhueta.caminho`). Cada ponto do membro deixa uma língua até onde estava no desenho anterior;
+  as línguas são faixas de comprimentos diferentes, pontudas, nas cores do próprio membro, sem
+  desfoque. Golpe em giro: o leque que o membro varreu. Golpe reto (a ponta anda na direção do
+  membro, como este chute que estica do joelho dobrado): arrasto reto, senão as línguas caem dentro
+  do corpo e somem. As línguas tomam o lugar do membro e a ponta (o tênis) volta inteira por cima.
+- **No H do p01:** desenhos 4 e 5 (o maior salto do pé, 193 px do mundo, e o anterior). Só a folha
+  mudou; as caixas de golpe e de corpo são as mesmas.
+- **Visto:** gravado no PC ao lado do de hoje, quadro a quadro. `testarMotor`: só as 3 falhas
+  antigas. Celular: não visto.
+- **Para o dono julgar:** o desenho 5 é o do acerto e o jogo o segura na pausa do acerto, então o
+  smear fica parado uns 16 quadros (no anime ele dura 1 ou 2); se incomodar, esticar só o 4.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
