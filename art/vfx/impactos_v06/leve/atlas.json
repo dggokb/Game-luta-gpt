@@ -1,0 +1,19 @@
+{
+  "name": "SŌKON VFX impacto leve",
+  "frames": 6,
+  "frame_width": 512,
+  "frame_height": 512,
+  "sheet_columns": 3,
+  "sheet_rows": 2,
+  "sheet_width": 1536,
+  "sheet_height": 1024,
+  "pivot_local_px": {
+    "x": 210,
+    "y": 260
+  },
+  "frame_duration_ms": 33,
+  "image_format": "PNG RGBA with actual transparency",
+  "fully_redrawn": true,
+  "source_reference": "Tōkon gameplay supplied by user",
+  "note": "Pequeno e rápido, núcleo branco e algumas pontas douradas e laranja."
+}

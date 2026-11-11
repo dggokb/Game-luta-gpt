@@ -291,6 +291,21 @@ tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
 Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
 de bolotas redondas).
 
+## No jogo: impactos fraco, médio e forte redesenhados (`impactos_v06`, 11/11)
+
+O dono mandou os três redesenhados (zip `sokon_vfx_anime_redesenhado_v01`, guardados em
+`art/vfx/impactos_v06/{forte,medio,leve}`: 6 quadros de 512 px, pivô de contato 210,260, forte 50
+ms, médio 42, leve 33 por quadro; "tinha uma falha no forte"). Acabamento pedido:
+- forte: halo laranja e o anel de pressão de ar em 3D (`impacto_v06_forte_ec`);
+- médio: spray de ar em círculo, riscos brancos que nascem no meio na batida e correm para as
+  pontas (três voltas de 22/20/18 riscos curtos e finos depois do pedido "mais riscos e
+  menores"; traço afinando, Repeater, Trim Paths) (`impacto_v06_medio_ec`);
+- fraco: só o desenho (`impacto_v06_fraco`).
+Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
+0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
+golpe baixo continua com `impacto_ar_baixo`. Vídeo:
+`android/app/build/sprite-review/impactos_v06_fraco_medio_forte_no_jogo.mp4`.
+
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 
 Pedido do dono: "aplica os effects nele e põe". `art/vfx/effectcraft/acerto_forte_05_ec.py` corta a

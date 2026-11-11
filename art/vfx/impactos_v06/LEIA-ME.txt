@@ -1,0 +1,16 @@
+SŌKON BLOODLINES - IMPACTOS FORTE / MÉDIO / LEVE - REDESENHADOS
+
+Os efeitos foram DESENHADOS NOVAMENTE tendo o Tōkon como referência.
+Não são imagens de gameplay recortadas nem sprites oficiais extraídos.
+Cada efeito está COMPLETO, com margem transparente em todos os quadros.
+As imagens geradas foram finalizadas sem bloom/halo e com cores sólidas.
+
+Cada pasta contém: spritesheet.png RGBA 1536x1024 (3 colunas x 2),
+frames/ com seis PNGs 512x512, GIF animado de prévia, atlas.json.
+O GIF tem fundo escuro para visualização; os PNGs são transparentes.
+Pivô de contato local fixo em (210,260) em todos os tipos e quadros.
+Forte: 50 ms/quadro; Médio: 42 ms/quadro; Leve: 33 ms/quadro.
+O fim de cada efeito se espalha em lascas e NÃO encolhe ao centro.
+
+Para o híbrido: use sprite para a forma principal e acrescente apenas
+flash de tela, shake, escala e partículas secundárias em tempo real.
