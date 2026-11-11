@@ -310,6 +310,9 @@ Depois, "um pouco menores os 3, anima mais rápido e 90% de opacidade": médio e
 `efeito_video.py`; e no `efeitoDeGolpe` os `impacto_v06_*` tocam em 70% da duração normal
 (`RITMO_IMPACTO_V06`; o jogo estica cada faísca para a pausa + 8 quadros, então o ritmo da
 folha sozinho não mudava nada).
+Depois, "ajusta a posição, principalmente do forte": a origem passou a ser o meio do desenho
+no auge, não o pivô 210,260 da folha (o forte se abre ~75 px à frente dele e no jogo cobria o
+ombro e a cabeça do adversário): forte `--origem 280,250`, médio `200,248`, fraco `214,250`.
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
