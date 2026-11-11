@@ -76,34 +76,34 @@ verticais e nas asas, sobe em S.
 
 ## p03 — Kōga (escola da família, lado do golpe)
 
-Mesmos comandos e mesma escola do p01, mas onde o irmão solta poder, ele bate com o corpo inteiro.
-Entra andando para dentro, chuta e dá joelhada (Kim e Robert), não deixa o rival respirar. Distância
-curta, ritmo de raiva, tudo amplo, com o colete e as alças voando.
+Raiva sem freio, como Kyo e Iori: corpo curvado para a frente, golpes que emendam um no outro, a mão
+que vira garra quando a raiva sobe e a energia da família estourando colada no punho e no pé. Mesmos
+comandos do p01, execução oposta: onde o irmão espera e solta poder, ele avança a cada golpe e bate
+de perto. Distância curta, ritmo de rajada, sem recuar.
 
-Inspiração: Ryu (base da escola), Kim Kaphwan e Robert Garcia (KOF), Joe Higashi (KOF), Guy (Street
-Fighter).
+Inspiração: Kyo Kusanagi e Iori Yagami (KOF); Ryu (a base da escola).
 
 | Botão | Golpe | Movimento | Forma | Inspiração | Animação |
 |---|---|---|---|---|---|
-| L | Chute na coxa | A perna de trás vem num arco curto e baixo; o peito do pé bate na coxa do rival e volta rápido | peito do pé · arco baixo na coxa | Kim Kaphwan | 🎬 B: o jab de hoje é o jab do p01, duas vezes |
-| M | Joelhada que avança | Pisa para dentro e o joelho de trás sobe no estômago, com os punhos descendo para trás para dar impulso. Termina meio corpo à frente | joelho · avançando | Tiger Kick do Joe Higashi, no chão | 🎬 B: hoje é o direto com passo do p01 |
-| H | Chute giratório de calcanhar | Gira de costas sobre o pé da frente, e a perna de trás vem em arco aberto na altura da cabeça. Acerta com o calcanhar e ele volta de frente | calcanhar · giro de costas | Kim Kaphwan | ✅ |
-| 2L | Martelo baixo | Agachado, o punho de trás sobe curto e desce como martelo no joelho do rival | punho · martelo que desce, agachado | — | 🎬 A: o 2L atual levanta no meio do golpe |
-| 2M | Carrinho | Se joga para a frente deitando de lado; a perna da frente desliza rente ao chão até o tornozelo. Levanta já agachado, meio corpo adiante | perna · carrinho | — | 🎬 B: hoje é a rasteira giratória do p01 |
-| 2H | Coice de bananeira | Da agachada, apoia as duas mãos no chão à frente, o quadril sobe e as duas solas saem juntas para o alto, de frente para o rival. Lançador | duas solas · sobem da bananeira | Eddy Gordo (Tekken) | 🎬 B: hoje é o uppercut do p01 |
-| jL | Dois chutes | No ar, dois chutes curtos e rápidos para a frente, um com cada perna | dois pés · alternados | Kim Kaphwan | 🎬 B: hoje é o chute lateral do p01 |
-| jM | Cotovelada em queda | No ar, o cotovelo da mão de trás desce de cima para baixo na frente do corpo, com o outro punho na guarda | cotovelo · desce | Cotovelada em queda do Guy | 🎬 A: o vídeo não existe (hoje usa a arte do p01) |
+| L | Uraken | O dorso do punho da frente sobe ao lado da cabeça e desce estalando no nariz do rival. Rápido, curto, o corpo já inclinado para a frente | dorso do punho · desce no rosto | Kyo | 🎬 B: o jab de hoje é o jab do p01, duas vezes |
+| M | Joelhada que avança | Pisa para dentro e o joelho de trás sobe no estômago, com os punhos descendo para trás para dar impulso. Termina meio corpo à frente | joelho · avançando | — | 🎬 B: hoje é o direto com passo do p01 |
+| H | Chute giratório de calcanhar | Gira de costas sobre o pé da frente, e a perna de trás vem em arco aberto na altura da cabeça. Acerta com o calcanhar e ele volta de frente, já curvado | calcanhar · giro de costas | — | ✅ |
+| 2L | Canelada baixa | Agachado, a canela da perna de trás varre curta na panturrilha do rival e volta | canela · varre curta, agachado | — | 🎬 A: o 2L atual levanta no meio do golpe |
+| 2M | Carrinho | Se joga para a frente deitando de lado; a perna da frente desliza rente ao chão até o tornozelo. Levanta já agachado, meio corpo adiante | perna · carrinho | 88 Shiki do Kyo | 🎬 B: hoje é a rasteira giratória do p01 |
+| 2H | Garra ascendente | Da agachada, a mão de trás abre em garra e sobe rasgando de baixo para cima, rente ao corpo, até acima da cabeça; a energia acende nas unhas. Lançador | garra · rasga subindo | Iori | 🎬 B: hoje é o uppercut do p01 |
+| jL | Dois chutes | No ar, dois chutes curtos e rápidos para a frente, um com cada perna | dois pés · alternados | — | 🎬 B: hoje é o chute lateral do p01 |
+| jM | Cotovelada em queda | No ar, o cotovelo da mão de trás desce de cima para baixo na frente do corpo, com o outro punho na guarda | cotovelo · desce | Naraku Otoshi do Kyo (o golpe de cima para baixo no ar) | 🎬 A: o vídeo não existe (hoje usa a arte do p01) |
 | jH | Pisão | No ar, recolhe o joelho e pisa curto em diagonal para baixo com a sola. Overhead | sola · pisão em diagonal | — | ✅ |
-| S1 | Onda curta ↓↘→ | Soco reto de uma mão só, e a bola pequena sai colada no punho (o p01 empurra as duas palmas) | punho · bola curta | Ryu | ✅ |
-| S2 | Punho em sequência →↓↘ | Uppercut que avança subindo, três pancadas | punho · uppercut que avança | Ryu e Ken (a escola da família, decisão fechada) | ✅ |
-| S3 | Avanço em três ↓↙← | Três investidas de soco, uma por comando | punho · rekka | Rekka do Fei Long | ✅ |
-| S4 | Mergulho (no ar ↓↘→) | Para no alto e desce em diagonal com o chute esticado até o chão | pé · mergulho | Hishōkyaku do Kim | ✅ |
-| Agarrão | Chute de despedida | Segura a gola com as duas mãos, puxa, solta e chuta o peito com a sola à queima-roupa. O rival voa | sola · puxa e chuta | — | 🎬 A: o vídeo não existe (hoje usa a arte do p01) |
-| Super | Rajada de Chutes | Chutes avançando; o último, alto, lança | sequência própria | Hien Shippukyaku do Robert | ✅ |
-| Ultra | Fúria da Casa | Investida que vira sequência de socos e chutes e termina com o soco de energia à queima-roupa | sequência própria | Ryuuko Ranbu | ✅ |
+| S1 | Onda curta ↓↘→ | Soco reto de uma mão só, e a bola pequena sai colada no punho (o p01 empurra as duas palmas) | punho · bola curta | Yami Barai (Kyo e Iori), curto e colado na mão | ✅ |
+| S2 | Punho em sequência →↓↘ | Uppercut que avança subindo, três pancadas, com a energia girando em volta do punho | punho · uppercut que avança | Oniyaki (Kyo e Iori) | ✅ |
+| S3 | Avanço em três ↓↙← | Três investidas de soco, uma por comando, cada uma mais perto | punho · rekka | Aragami do Kyo, Aoi Hana do Iori | ✅ |
+| S4 | Mergulho (no ar ↓↘→) | Para no alto e desce em diagonal com o chute esticado até o chão | pé · mergulho | — | ✅ |
+| Agarrão | Mão na cara | Agarra o rosto do rival com a mão em garra, a energia explode na palma e o rival voa para trás | garra · agarra o rosto e explode | Kototsuki In do Iori | 🎬 A: o vídeo não existe (hoje usa a arte do p01) |
+| Super | Rajada | Hoje: chutes avançando, e o último, alto, lança. Proposta: avança curvado e rasga três vezes com a mão em garra (baixo, meio, alto); o terceiro lança | sequência própria | Yaotome do Iori | ✅ hoje; 🎬 opcional (os chutes de hoje são o lado Kim/Robert que saiu) |
+| Ultra | Fúria da Casa | Investida que vira sequência de socos e chutes e termina com o soco de energia à queima-roupa | sequência própria | Kyo (os supers de sequência) | ✅ |
 
-**Rastro:** arco de energia rasgado, com fagulhas, na cor da família (a mesma do p01; o do p01 é o arco
-limpo).
+**Rastro:** chama curta e rasgada, colada no punho, na garra e no pé, na cor da família (a mesma do
+p01; no p01 é o arco de energia limpo). Nas garras, três riscos com fagulhas.
 
 ## p04 — Brucy (boxeador de rua)
 
@@ -388,7 +388,7 @@ mesma coluna nem entre colunas.
 |---|---|---|---|---|---|---|
 | p01 | Jab | Direto com passo | Roundhouse | Soco agachado | Rasteira giratória | Uppercut |
 | p02 | Palma da garça | Bico de garça | Chute crescente | Palma na base de cavalo | Varrida do louva-a-deus 🎬 | Asas da garça 🎬 |
-| p03 | Chute na coxa 🎬 | Joelhada que avança 🎬 | Giro de calcanhar | Martelo baixo 🎬 | Carrinho 🎬 | Coice de bananeira 🎬 |
+| p03 | Uraken 🎬 | Joelhada que avança 🎬 | Giro de calcanhar | Canelada baixa 🎬 | Carrinho 🎬 | Garra ascendente 🎬 |
 | p04 | Jab de pisca 🎬 | Gancho 🎬 | Cruzado de bote | Ombrada baixa 🎬 | Bicuda | Gancho de pá 🎬 |
 | p05 | Shutō 🎬 | Cotovelada correndo 🎬 | Chute saltado 🎬 | Corte rente 🎬 | Tesoura no tornozelo 🎬 | Corte em X 🎬 |
 | p06 | Abre a cortina 🎬 | Palma longa | Chute de empurrão | Palma no pé 🎬 | Rasteira de sombra 🎬 | Palma que puxa o fio |
@@ -418,8 +418,10 @@ mesma coluna nem entre colunas.
 
 Os parecidos que sobraram, e o que os separa na tela:
 
-- **Martelos:** o martelo do p09 (H, um punho até o chão), o martelo baixo do p03 (2L, agachado, curto)
-  e o martelo duplo do p09 no ar (dois punhos juntos).
+- **Martelos:** o martelo do p09 (H, um punho até o chão) e o martelo duplo dele no ar (dois punhos
+  juntos).
+- **Garras:** as do p03 (2H, agarrão) são uma mão só, curta, com a energia nas unhas; as do Necro são
+  longas, lentas, de corpo inteiro.
 - **Coices:** o do p07 é no ar e pega por trás; o do p11 é em pé, frio, no plexo.
 - **Giros:** o H do p03 é no chão, de costas, com o calcanhar na cabeça; o tornado da p10 sai do chão e
   acerta com o peito do pé; o S2 do p07 é o calcanhar subindo por trás, contra quem pula.
@@ -470,8 +472,9 @@ personagem. Além disso:
 - **p02:** mão aberta e chutes verticais em tudo. O S1 vira a palma de uma mão só (o p01 empurra as
   duas), e o S4 vira o giro de cabeça para baixo (a hélice em pé é do p01). O 2H deixa de ser o mesmo
   chute do S2.
-- **p03:** vira o irmão dos chutes e das joelhadas; os socos ficam só nos especiais da escola. O jM e o
-  agarrão ganham o vídeo que nunca tiveram.
+- **p03:** vira a raiva de Kyo e Iori: uraken, joelhada que avança, garra que sobe e o agarrão que
+  explode na cara; os especiais da escola ficam e ganham leitura de Oniyaki e Aoi Hana. O jM e o agarrão
+  ganham o vídeo que nunca tiveram. Opcional: o Super trocar os chutes pela rajada de garras (+1).
 - **p04:** só punho, cabeça e ombro, com jab de pisca, gancho, gancho de pá e overhand. O S1 vira o
   saca-rolha (era o mesmo soco reto do S1 do p03).
 - **p05:** "a mão é a lâmina": shutō, cotovelada correndo, tesoura e joelhos. O S4 perde a lâmina na
@@ -492,14 +495,17 @@ personagem. Além disso:
 
 1. **75 vídeos.** É o custo de nenhum golpe igual. Se precisar cortar, os 27 de C são os mais fáceis
    de adiar: quase todos são "parecido com outro do elenco", não com o p01.
-2. **S2 do p03:** continua o uppercut da escola (decisão fechada no README). Se quiser que nem esse se
+2. **p03 com Kyo e Iori:** o README e a ficha dele citam Ryu, Robert e Kim como referência; se a
+   proposta for aprovada, troco para Kyo e Iori nos dois. O Super ("Rajada de Chutes" no jogo) pode
+   continuar com os chutes de hoje ou virar a rajada de garras do Iori (+1 vídeo, fora da conta de 75).
+3. **S2 do p03:** continua o uppercut da escola (decisão fechada no README). Se quiser que nem esse se
    repita, dá para refazer como joelhada e uppercut em sequência (+1 vídeo).
-3. **p10, M e H para trás:** conferido quadro a quadro (ela virada para a direita e o pé saindo para a
+4. **p10, M e H para trás:** conferido quadro a quadro (ela virada para a direita e o pé saindo para a
    esquerda). Vale olhar no jogo antes de gerar.
-4. **Inspirações:** onde citei um golpe pelo nome (Spinning Bird Kick, Hōzantō, Leg Tomahawk, Hammer
+5. **Inspirações:** onde citei um golpe pelo nome (Spinning Bird Kick, Hōzantō, Leg Tomahawk, Hammer
    Fall...), é o golpe que serve de base. Nos outros, a referência é o estilo do personagem citado.
-5. **p13 a p16:** as fichas deles também são o molde (jab, uppercut, chute lateral no ar...), e o p13
+6. **p13 a p16:** as fichas deles também são o molde (jab, uppercut, chute lateral no ar...), e o p13
    tem um martelo no H parecido com o do p09. Ficaram fora desta proposta; o mesmo trabalho serve
    para eles depois.
-6. **Fora do escopo, mas achei:** o `comandos.md` lista o S3 do p01 como Aparar ↓↓ e o S4 como Chute
+7. **Fora do escopo, mas achei:** o `comandos.md` lista o S3 do p01 como Aparar ↓↓ e o S4 como Chute
    giratório ↓↙←; no jogo (`mecanicas.json`) é o contrário.
