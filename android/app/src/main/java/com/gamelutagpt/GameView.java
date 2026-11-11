@@ -5596,6 +5596,10 @@ public class GameView extends SurfaceView
             // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
             if (superGolpe) {
                 nome = "impacto_ar_super";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v08_forte")) {
+                // O hit forte novo desenhado pelo dono (art/vfx/impacto_forte_v08, em fundo preto,
+                // recortado) com o anel de pressão de ar em 3D: impactos_v06_ec.py, forte_v08.
+                nome = "impacto_v08_forte";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v06_forte_medio")) {
                 // Os impactos redesenhados pelo dono (art/vfx/impactos_v06), com o acabamento do
                 // EffectCraft (art/vfx/effectcraft/impactos_v06_ec.py). O forte é o desenho do
@@ -5627,11 +5631,11 @@ public class GameView extends SurfaceView
             float escala = superGolpe ? 1.25f : FAISCA_ESCALA[forca];
             // Os impactos redesenhados (impacto_v06_*) tocam mais rápido que a pausa do golpe
             // (pedido do dono, 11/11: "anima mais rápido").
-            float duracao = nome.startsWith("impacto_v06") ? ms * RITMO_IMPACTO_V06 : ms;
+            float duracao = nome.startsWith("impacto_v0") ? ms * RITMO_IMPACTO_V06 : ms;
             // Os redesenhados nascem na ponta do golpe de quem bate (o punho, a ponta do pé), não no
             // corpo de quem apanha (dono, 11/11); sem a medida do desenho, no ponto de contato.
             float ox = px, oy = y;
-            if (nome.startsWith("impacto_v06") && !Float.isNaN(pontaX)) {
+            if (nome.startsWith("impacto_v0") && !Float.isNaN(pontaX)) {
                 ox = pontaX;
                 oy = pontaY;
             }

@@ -348,8 +348,8 @@ Reprovado ("aquele não tava bom"); a folha `impacto_v07_forte` saiu dos assets.
 fino). Recorte: alfa = brilho (o maior de R, G, B) de 150 a 235 — abaixo de 150 o brilho alaranjado
 que se espalha pelo quadro todo virava um quadrado translúcido; o contorno preto vira uma fresta
 transparente (regra 12). Os quadros recortados estão em `frames/`. forte_v08 no impactos_v06_ec.py
-(centro 258,252, anel 0,60/0,50), folha `impacto_v08_forte` a 0,50. Entra quando o dono aprovar
-(`hit_forte_v08_e_80.mp4`).
+(centro 258,252, anel 0,60/0,50), folha `impacto_v08_forte` a 0,50. Aprovado ("o hit põe no
+jogo"): é o forte do jogo; o `impacto_v06_forte_medio` fica de reserva.
 
 "Arruma a posição do forte" (com o rastro desligado o pé aparece): a ponta das caixas do
 desenho mais esticado (224 px no H da base) pega o borrão de movimento e passa uns 55 px do tênis;
