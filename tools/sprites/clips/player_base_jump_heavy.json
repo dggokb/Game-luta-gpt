@@ -139,8 +139,8 @@
   "smear": {
     "fonte": "art/sprites/source/player_base_jump_heavy_video_normalized.png",
     "quadros": [
-      5,
-      6
+      6,
+      7
     ],
     "semente": 11,
     "comprimento": [
