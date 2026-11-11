@@ -457,7 +457,13 @@
             }
           }
         }
-      }
+      },
+      "fimDoClipe": {
+        "S2": 27
+      },
+      "fimAgachado": [
+        "S2"
+      ]
     },
     "p02": {
       "molde": "Rushdown / contra-golpe",

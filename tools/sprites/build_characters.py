@@ -862,6 +862,9 @@ def compile_packs(root, results):
                        (','+por_quadro(angulo, str) if angulo else '')+')')
                 if caminho:
                     sil += '.withCaminho('+por_quadro(caminho['pontos'], lambda v: ','.join(map(str, v)))+',0x%06X)' % caminho['cor']
+            if a.get('fimAgachado'):
+                # O golpe termina agachado: o desenho levanta pelo RISE depois dele (SpriteMotion).
+                sil += '.withFimAgachado()'
             if 'posesChave' in a:
                 # Poses-chave seguradas (anime em 2s e 3s): o quadro mostra a última pose até ele.
                 sil += '.withPoses(new int[]{'+','.join(map(str,a['posesChave']))+'})'

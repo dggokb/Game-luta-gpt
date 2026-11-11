@@ -175,6 +175,12 @@ final class CharacterDefinition {
          * como vídeo. O tempo e as caixas seguem o clipe; só o desenho fica parado. Null: todos.
          */
         private int[] pose;
+        /**
+         * O golpe termina agachado (o pouso do shoryuken do Ryūga): depois dele o desenho levanta pelo
+         * RISE, como quem solta o ↓, em vez de pular para a guarda (SpriteMotion).
+         */
+        boolean fimAgachado;
+        Animation withFimAgachado() { fimAgachado=true; return this; }
         Animation withPoses(int[] chaves) {
             pose=new int[frames.length];
             int atual=0;

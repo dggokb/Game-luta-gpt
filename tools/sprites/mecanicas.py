@@ -20,6 +20,9 @@ da base vezes o ritmo (especial de vídeo longo: a rajada e a voadora do p15).
 Com "fimDoClipe" ({"H": 53}) os quadros do clipe dali em diante passam num instante: o vídeo que
 termina parado na guarda (o H da p15) não prende o lutador depois do movimento.
 
+Com "fimAgachado" (["S2"]) a animação do golpe termina agachada e o desenho levanta pelo RISE
+depois dele (o pouso do shoryuken do Ryūga, junto com "fimDoClipe" tirando o quadro em pé).
+
 Normais com identidade (docs/balanco/normais-fable.md), tudo opcional e por personagem:
 
   * "framesGolpe" também nos normais (vale mesmo com "manterTempo"): o tempo que a função do
@@ -801,6 +804,14 @@ def apply(cid, spec, base, combos_data):
             fit_impact(anim, m, hold)
             if hold:
                 cadence += ', impacto segurado'
+        if anim is not None:
+            # fimAgachado: o golpe termina agachado (o pouso do shoryuken do Ryūga) e o desenho
+            # levanta pelo RISE depois dele, em vez de pular para a guarda (SpriteMotion).
+            if key in spec.get('fimAgachado', []):
+                anim['fimAgachado'] = True
+                cadence += ', termina agachado'
+            else:
+                anim.pop('fimAgachado', None)
         h = hits.get(key, {})
         if 'pancadas' in h:
             strike(m, anim, h['pancadas'])
