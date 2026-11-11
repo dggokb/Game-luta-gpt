@@ -4611,6 +4611,13 @@ final class CombatEngine {
         CombatFighter a = c.attacker;
         float[] g = golpeNoDesenho(a, a.attackFrame);
         if (g == null) return null;
+        // A ponta do membro achada pela pose (o punho, o pé: linha_de_acao.py), quando existe no
+        // desenho da pancada: as caixas do desenho pegam também o borrão de movimento e passam do pé.
+        int q = quadroDoDesenho(a, a.attackFrame);
+        float[][] caminho = desenhoDoGolpe(a).caminhoGolpe;
+        if (caminho != null && q >= 0 && q < caminho.length && caminho[q] != null) {
+            return new float[] {a.x + a.facing * caminho[q][0], a.y - caminho[q][1]};
+        }
         for (int f = a.attackFrame + 1; f <= a.attackFrame + PONTA_ADIANTE; f++) {
             float[] h = golpeNoDesenho(a, f);
             if (h == null || maxDe(h, 1) < maxDe(g, 1)) break;

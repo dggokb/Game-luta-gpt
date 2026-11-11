@@ -351,6 +351,12 @@ transparente (regra 12). Os quadros recortados estão em `frames/`. forte_v08 no
 (centro 258,252, anel 0,60/0,50), folha `impacto_v08_forte` a 0,50. Entra quando o dono aprovar
 (`hit_forte_v08_e_80.mp4`).
 
+"Arruma a posição do forte" (com o rastro desligado o pé aparece): a ponta das caixas do
+desenho mais esticado (224 px no H da base) pega o borrão de movimento e passa uns 55 px do tênis;
+o efeito nascia no ar. Agora a ponta é a da pose (`caminhoGolpe`, o pé achado pelo
+linha_de_acao.py: 187 px) quando o desenho da pancada tem ela; sem ela, as caixas como antes (os
+socos M e L da base não têm, e não mudaram).
+
 "Tira mais 10% de opacidade dos 3": as folhas dos impactos saem agora com o alfa a 0,8 do desenho
 (antes 0,9) — fraco, médio, forte_medio e o v08.
 
