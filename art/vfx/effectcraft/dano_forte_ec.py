@@ -38,7 +38,7 @@ MIOLO = (427.0, 383.0)              # o miolo branco do vídeo (o contato da fol
 FPS = 12                                  # um desenho por quadro da composição
 # Quadro do vídeo mostrado em cada desenho: o impacto (0) segurado por dois desenhos, depois o
 # vídeo de dois em dois e, no fim, mais espaçado (a cauda de brasas).
-DESENHOS = [0, 0, 2, 4, 6, 8, 10, 12, 14, 17, 20, 24]
+DESENHOS = [0, 0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10]   # segura o auge até a metade
 # Erosão por desenho (brilho do ruído com contraste 400: de 250 para cima não come nada; quanto
 # menor, maiores os buracos).
 EROSAO = [300, 300, 300, 300, 260, 210, 160, 115, 75, 35, -5, -50]
@@ -100,7 +100,9 @@ def passos(anel=False):
     ]
     s += chaves('dano', 'effects/#4/brightness', EROSAO)
     # O miolo apaga quando os braços se soltam em lascas (desenho 4): quem leva o resto são elas.
-    s += chaves('dano', 'transform/opacity', [100, 100, 100, 100, 80, 25, 0, 0, 0, 0, 0, 0])
+    s += chaves('dano', 'transform/opacity', [100, 100, 100, 100, 100, 100, 70, 20, 0, 0, 0, 0])
+    # Cresce em 2 desenhos a partir do contato (no Tōkon nasce pequena no 125 e enche no 127).
+    s += chaves('dano', 'transform/scale', [[e, e, 100] for e in (45, 75, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)])
     if anel:
         # A faísca vira um plano 3D em z = 0 (sem câmera, o 3D enquadra igual ao 2D) e o anel a
         # atravessa: a metade da frente passa por cima dela e a de trás por baixo, sozinhas.
@@ -129,8 +131,8 @@ def lascas(centro):
     import math
     n = 'lascas'
     # Os braços do vídeo dano_forte (ângulo, comprimento em px do vídeo), medidos na folha de hoje.
-    bracos = [(-14, 900), (0, 940), (20, 600), (-32, 420), (38, 370),
-              (-78, 380), (-112, 290), (-138, 210), (150, 205), (100, 180), (62, 310), (35, 290), (-45, 220)]
+    # Só os braços principais (no Tōkon são 6 ou 7 lascas grandes, onde estavam as pontas).
+    bracos = [(-14, 900), (0, 940), (20, 600), (-32, 420), (38, 370), (-78, 380), (62, 310)]
     sorte = random.Random(13)
     s = [{'command': 'layer.newShape', 'params': {'kind': 'none', 'name': n}},
          {'command': 'prop.set', 'params': {'layer': n, 'path': 'transform/position', 'value': [0, 0, 0]}}]
@@ -140,7 +142,7 @@ def lascas(centro):
         ux, uy = math.cos(a), math.sin(a)
         tam = min(380, 90 + comp * 0.32) * sorte.uniform(0.85, 1.15)
         larg = 16 + tam * 0.08
-        x0, y0 = centro[0] + ux * comp * 0.48, centro[1] + uy * comp * 0.48
+        x0, y0 = centro[0] + ux * comp * 0.72, centro[1] + uy * comp * 0.72
         s += [{'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'group'}},
               {'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'path', 'group': g}},
               {'command': 'layer.addShapeItem', 'params': {'layer': n, 'kind': 'zigzag', 'group': g}},
@@ -195,7 +197,7 @@ def lascas(centro):
     return s
 
 
-LASCAS_INICIO = 4         # desenho em que os braços se soltam (o miolo do vídeo já está apagando)
+LASCAS_INICIO = 6         # metade do efeito, como no Tōkon (quadro 129 de 125-132)
 
 
 def fagulhas(centro):
