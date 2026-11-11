@@ -520,10 +520,15 @@ golpe baixo continua com `impacto_ar_baixo`. Vídeo:
 ## Motor de luz 4 (11/11): normal map nos lutadores, tirado do próprio desenho
 
 Pedido (`docs/prompt-fable-normal-map.md`): a luz local do motor 3 só sabe a borda do corpo; dar
-aos lutadores uma normal de verdade por quadro, sem dobrar a memória. **Desligado no jogo; os
-mapas não estão na branch.** Falta o dono aprovar nos vídeos
-(`android/app/build/sprite-review/normal_map_antes_depois.mp4` e
-`normal_map_luz_macia_x_faixas.mp4`).
+aos lutadores uma normal de verdade por quadro, sem dobrar a memória. Vídeos:
+`android/app/build/sprite-review/normal_map_antes_depois.mp4` e `normal_map_luz_macia_x_faixas.mp4`.
+
+**No jogo desde 11/11 à noite** (o dono, vendo os vídeos: "coloca tudo na branch fable"): os
+mapas do Ryūga e do Kōga (88 folhas) e a luz do impacto ligada. No Modo Teste, o botão **LUZ** (ao
+lado de EFEITOS) troca na hora: **NORMAL** (normal map; quem não tem mapa usa a silhueta) →
+**FAIXAS** (normal map com a luz em dois tons chapados) → **OFF** (sem luz do impacto, como era) →
+**SILHUETA** (o motor 3). Começa em NORMAL. `TesteDesempenho.luz`; no PC, `-Pluz=off|silhueta|normal|faixas`.
+Falta ele dizer no aparelho qual fica (e se fica).
 
 **1. De onde vem a normal.** Sete jeitos nos mesmos quadros (Ryūga, Kōga, p08, p12, p13, p15):
 
@@ -571,12 +576,15 @@ perto de +22 MB sobre 352). Sem perda seriam 17%.
 **3. No shader** (`GlRenderCanvas`): com mapa, a luz local lê a normal dele (uma leitura, meio
 ponto do mapa para dentro do retângulo do quadro, para não misturar com o quadro vizinho) no
 lugar dos 16 vizinhos da silhueta; sem mapa, vale a silhueta como antes. O mesmo programa e o
-mesmo lote: o número da textura do mapa vai no pacote do filtro do quadro, que já existia. Tudo
-atrás de `SpriteAtlasCache.NORMAIS` (`-Dgameluta.normal=true`, que no celular não existe):
-desligado, o texto do shader é idêntico ao de antes (comparado byte a byte) e nenhum mapa é
-carregado. Os três textos (desligado, ligado, faixas) passam no `glslangValidator` como GLSL ES 3.00.
+mesmo lote: o número da textura do mapa vai no pacote do filtro do quadro, que já existia. O
+texto do shader é montado duas vezes do mesmo modelo: o novo (`FRAGMENTOS`) e o de antes do motor
+4 (`FRAGMENTOS_ANTIGO`, idêntico byte a byte ao que estava no jogo). **Se a placa do aparelho
+recusar o novo, o jogo fica com o antigo** (aviso no log "shader com normal map recusado") e a
+luz usa a silhueta em todos. Os dois passam no `glslangValidator` como GLSL ES 3.00. O mapa de uma
+folha carrega junto com ela quando o OPENGL do Modo Teste está ligado (medido no PC: +32,5 MB em
+87 folhas para Ryūga e Kōga, na linha "normais ... MB" do log de carregamento).
 
-**Luz em faixas** (`-PluzFaixas=1`, só para o dono comparar): com a conta de luz do motor 3 o
+**Luz em faixas** (o modo FAIXAS do botão): com a conta de luz do motor 3 o
 ganho do mapa é discreto (a luz deixa de lavar o braço por igual e passa a seguir o músculo e o
 rosto). Uma conta mais rasante, em dois tons chapados de borda curta (a sombra de anime), mostra
 mais a forma. É escolha de visual, dele.
@@ -586,19 +594,24 @@ mais a forma. É escolha de visual, dele.
 ```
 python3 tools/sprites/normal_map.py player_base p03      # ~0,8 s por quadro; o elenco (12.174 quadros) ~2,7 h
 cd android && rm -rf pc/build/gravar-luta
-xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=1 -PluzDura=6 -Pnormal=1 \
+xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=normal -PluzDura=6 \
     -Pgraficos=ALTO -Presolucao=1920x1080 -Proteiro="segura:D espera:1.8 solta:D grava:44:g tecla:L fim"
 ```
 
-`-Pluz=1` liga a luz do impacto (motor 3), `-PluzDura=N` a estica, `-PluzFixa=1` a deixa na força
-cheia, `-Pnormal=1` usa os mapas, `-PnormalAlterna=1` alterna silhueta e mapa a cada quadro (dois
-quadros seguidos com a mesma pose, para comparar parado) e `-Pgraficos=ALTO` impede o nível
-gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar a 17,5 por segundo
+`-Pluz=off|silhueta|normal|faixas` escolhe o modo (sem nada, normal), `-PluzDura=N` estica a luz,
+`-PluzFixa=1` a deixa na força cheia, `-PnormalAlterna=1` alterna silhueta e mapa a cada quadro
+(dois quadros seguidos com a mesma pose, para comparar parado), `-Pbotoes=1` mostra os botões do
+Modo Teste e `-Pgraficos=ALTO` impede o nível gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar a 17,5 por segundo
 (não a 22). Com o processador ocupado o jogo anda lento e o golpe erra.
 
+**Folha refeita, mapa refeito.** O mapa é do desenho: quem refaz uma folha (vídeo novo, SR HD,
+smear) roda `normal_map.py <folha> --refazer` em seguida. Se a folha mudar de tamanho e o mapa
+ficar o antigo, o jogo ignora o mapa (aviso no log) e usa a silhueta; se só o desenho mudar, o
+jogo não tem como saber. Foi o que houve no mesmo dia com `player_base_idle` e
+`player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
+
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
-custo); só Ryūga e Kōga têm mapa (88 folhas, guardadas na branch da sessão
-`ccr-97c05bd0-68tbpv`); a luz do cenário (tom, degradê, contraluz) continua sem usar a normal; a
+custo); só Ryūga e Kōga têm mapa (88 folhas); a luz do cenário (tom, degradê, contraluz) continua sem usar a normal; a
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 

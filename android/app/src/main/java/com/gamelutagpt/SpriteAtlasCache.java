@@ -698,7 +698,7 @@ final class SpriteAtlasCache {
         // O normal map só serve à luz local do OpenGL: com o OPENGL desligado no Modo Teste a folha
         // fica sem ele. (As folhas de quem abre o jogo são decodificadas antes de a luta escolher o
         // desenho, por isso a chave é a do botão, não a da luta de agora.)
-        if(TesteDesempenho.openGl)folha.normal=normalDe(a.resource);
+        if(TesteDesempenho.openGl)folha.normal=normalDe(a);
         return folha;
     }
 
@@ -706,13 +706,20 @@ final class SpriteAtlasCache {
      * O normal map gravado ao lado da folha ({@code <folha>_n}: cinza, o x na metade esquerda e o
      * y na direita), ou null se ela não tem.
      */
-    private Normal normalDe(String resource) {
-        int id=context.getResources().getIdentifier(resource+"_n","drawable",context.getPackageName());
+    private Normal normalDe(CharacterDefinition.Atlas a) {
+        int id=context.getResources().getIdentifier(a.resource+"_n","drawable",context.getPackageName());
         if(id==0)return null;
         BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;
         Bitmap b=BitmapFactory.decodeResource(context.getResources(),id,o);
         if(b==null)return null;
         int w=b.getWidth()/2,h=b.getHeight();
+        // A folha foi refeita com outro tamanho e o mapa ficou o antigo: melhor sem mapa (a
+        // silhueta) do que a normal de outro desenho. Refazer com tools/sprites/normal_map.py.
+        if(w!=(a.sheetWidth+3)/4||h!=(a.sheetHeight+3)/4) {
+            android.util.Log.w(MedicaoCarregamento.TAG,"normal map de "+a.resource+" não é desta folha ("+w+"x"+h+"); ignorado");
+            b.recycle();
+            return null;
+        }
         int[] linha=new int[w*2];
         byte[] xy=new byte[w*h*2];
         for(int y=0;y<h;y++) {
