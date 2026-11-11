@@ -95,6 +95,29 @@ efeito que veio do vídeo (clarão, arco, rastro, fumaça, coluna de luz, membro
 - Visto: as folhas quadro a quadro dos sete golpes, e no jogo (PC) o M e o 2H. Os do ar só na
   folha. `testarMotor`: só as 3 falhas antigas; `build_characters --check`: PASS. Celular: não visto.
 
+## Smear no p14, p15 e p16 (11/11, pedido do dono: "vamos testar agora no p14 ao p16")
+
+M, H e especiais, direto na `game-luta-sprite-fable`, pela receita do Ryūga: `--limpar todos`, o
+desenho antes do acerto vira cópia do desenho do acerto (`--trocar`), os dois esticam a partir da
+preparação (`--antes`), 1,2 no meio e 1,0 nas bordas. O smear fica no desenho do acerto (o que o jogo
+segura na pausa), mesmo quando o membro chega antes: os desenhos entre a chegada e o acerto duram 5
+a 11 ms. A preparação é o desenho, antes da chegada, em que a ponta estava mais longe (pose()
+quadro a quadro); os pontos ficam em `CAMINHO_MANUAL` (`linha_de_acao.py`), e o membro do acerto é o
+que tem a ponta mais longe do tronco dentro da caixa do golpe.
+
+- **Com smear:** p14 M, H, 2M, 2H, jM, jH, j2H, 6M; p15 M, 6M, H, 2M, 2H (com `--sem-escuro`: o
+  rabo de cavalo preto passava atrás do braço), jM, jH, j2H, S3; p16 M, H, jM, S2.
+- **Quase não aparece** (o membro anda pouco da preparação ao acerto): p15 jH, j2H, S3 e p16 jM. O
+  p14 é todo de preto: as línguas saem escuras como a roupa.
+- **Ficaram como estavam:** p14 S2 e S3 (o efeito de gelo é o próprio golpe; a limpeza apagava o
+  personagem) e S4 (faísca branca opaca grudada no pé); p15 S2 e S4 (o modelo não acha o corpo); p16
+  2H (a lâmina branca), jH e j2H (faíscas opacas), 6M (brilho no tênis), 2M e S3 (sem pose) e S4 (os
+  desenhos tocam de trás para a frente; a ferramenta ainda não aceita). A limpeza só tira efeito meio
+  transparente ou solto: efeito branco opaco grudado no membro precisa de outro jeito.
+- Com o caminho novo, a faísca de dano desses golpes nasce na ponta do membro.
+- Visto: o desenho do acerto de cada um (folha). `testarMotor`: só as 3 falhas antigas; build
+  PASS. Jogo e celular: não vistos.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

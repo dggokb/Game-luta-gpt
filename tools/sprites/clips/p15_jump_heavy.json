@@ -2,7 +2,7 @@
   "id": "p15_jump_heavy",
   "javaName": "P15_JUMP_HEAVY",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_jump_heavy_video_hd.png",
+  "source": "art/sprites/source/p15_jump_heavy_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_jump_heavy.webp",
   "report": "tools/sprites/reports/p15_jump_heavy.report.json",
   "preview": "android/app/build/sprite-review/p15_jump_heavy-import.png",
@@ -46,6 +46,23 @@
   "rootY": 530,
   "pixelScale": 2.0,
   "sourceReferences": [
-    "art/sprites/source/p15_jump_heavy_video_normalized.png"
-  ]
+    "art/sprites/source/p15_jump_heavy_video_normalized.png",
+    "art/sprites/source/p15_jump_heavy_video_hd.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p15_jump_heavy_video_hd.png",
+    "quadros": [
+      4,
+      5
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "4=5",
+    "limpar": "todos",
+    "antes": "4=3,5=3"
+  }
 }
