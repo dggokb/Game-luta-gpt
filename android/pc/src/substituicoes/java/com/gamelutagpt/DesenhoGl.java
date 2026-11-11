@@ -287,6 +287,11 @@ final class DesenhoGl {
     // ---- O que o quadro desenha (igual ao do celular) ----
 
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro) {
+        sprite(c, folha, fonte, destino, alpha, filtro, null);
+    }
+
+    /** O mesmo, com o normal map da folha (ou null): a luz local usa ele no lugar da silhueta. */
+    void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro, SpriteAtlasCache.Normal normal) {
         if (c instanceof CanvasGl) {
             ((CanvasGl)c).prepararGl();
         } else {
@@ -295,10 +300,13 @@ final class DesenhoGl {
             canvas.matriz(valores);
         }
         canvas.filtro(filtro != null ? filtro.matriz : null);
+        // O normal map vai sempre: serve à luz do cenário (o tempo todo) e à luz local.
+        canvas.normal(normal);
         if (localForca > 0f) canvas.luzLocal(localX, localY, localRaio, localR, localG, localB, localForca);
         canvas.desenharBitmap(folha, true, fonte.left, fonte.top, fonte.right, fonte.bottom,
             destino.left, destino.top, destino.right, destino.bottom, alpha);
         if (localForca > 0f) canvas.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
+        canvas.normal(null);
     }
 
     /** A luz local das próximas folhas de lutador (igual à do jogo: app/.../DesenhoGl.java). */

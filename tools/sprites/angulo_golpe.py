@@ -194,7 +194,6 @@ ARTE_COM_EFEITO = {
     'p10': {'jM'},
     'p13': {'2L'},
     'p15': {'jL'},
-    'p16': {'2H', 'jH', 'j2H', '6M'},
 }
 # Golpes em que a medida sai errada mesmo com as duas contas batendo (o pé de apoio no lugar do
 # punho, a barra do jaleco, o efeito desenhado puxando a linha): ficam retos e sem rastro.

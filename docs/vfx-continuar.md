@@ -115,6 +115,17 @@ que tem a ponta mais longe do tronco dentro da caixa do golpe.
   desenhos tocam de trás para a frente; a ferramenta ainda não aceita). A limpeza só tira efeito meio
   transparente ou solto: efeito branco opaco grudado no membro precisa de outro jeito.
 - Com o caminho novo, a faísca de dano desses golpes nasce na ponta do membro.
+- Correção (pedido do dono, "o M não tô vendo o rastro"): o M do p15 é soco duplo e a preparação
+  medida era a mão da frente (47 px); passou para a mão de trás recolhida no desenho 4 (138 px).
+- p16 refeito (dono: "pegou quase nada, e tem efeitos de desenho nela ainda"): a pose erra nesta
+  personagem, então os pontos do caminho foram marcados à mão numa grade (`CAMINHO_MANUAL`). Saíram os
+  efeitos opacos do vídeo trocando os desenhos pelo limpo da mesma pose: 2H (a lâmina branca, 6-12=13),
+  jH (estouro no punho, 5=6), 6M (brilho no tênis, 6,7=8), 2M (pé borrado, 8,9=10), j2H (estouro no
+  joelho, 8,9=10, sem smear: o joelho anda pouco), S2 (mancha vermelha, 5=4, 6=7). Smear novo em 2H,
+  jH, 6M, 2M e jM; M, H e S2 com `--sem-escuro` (a luva preta virava língua escura). Saiu de
+  `ARTE_COM_EFEITO`. S3 e S4 continuam como estavam.
+- "Uma esfera em volta" no 2H do p15 não é do smear: é a aura da esquiva (`drawMechanicAura`,
+  `AURA_EVADE`, desde 9/11), que o jogo desenha nos quadros em que o golpe esquiva de ataque aéreo.
 - Visto: o desenho do acerto de cada um (folha). `testarMotor`: só as 3 falhas antigas; build
   PASS. Jogo e celular: não vistos.
 
@@ -512,6 +523,134 @@ Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 -
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
 `android/app/build/sprite-review/impactos_v06_fraco_medio_forte_no_jogo.mp4`.
+
+## Motor de luz 4 (11/11): normal map nos lutadores, tirado do próprio desenho
+
+Pedido (`docs/prompt-fable-normal-map.md`): a luz local do motor 3 só sabe a borda do corpo; dar
+aos lutadores uma normal de verdade por quadro, sem dobrar a memória. Vídeos:
+`android/app/build/sprite-review/normal_map_antes_depois.mp4` e `normal_map_luz_macia_x_faixas.mp4`.
+
+**No jogo desde 11/11 à noite** (o dono, vendo os vídeos: "coloca tudo na branch fable"): os
+mapas do Ryūga e do Kōga (88 folhas). No Modo Teste, o botão **LUZ** (ao lado de EFEITOS) troca na
+hora: **FORTE** (começa aqui) → **SUAVE** → **OFF** (como era antes do motor 4). `TesteDesempenho.luz`;
+no PC, `-Pluz=off|suave|forte`. Lutador sem mapa fica como era. Falta o dono dizer no aparelho
+qual nível fica (e se fica).
+
+**O que o botão liga, e por quê (12/11).** A primeira versão só usava o mapa na luz do impacto
+(motor 3), e o dono testou no aparelho: "não vi diferença nenhuma". Ele tinha razão: gravado com
+a duração real, LUZ OFF e LUZ ligada são indistinguíveis, porque a luz do impacto dura o tempo da
+faísca (280 ms no golpe forte) e fica embaixo dela. Os vídeos de antes tinham a luz esticada 6
+vezes (`normal_map_antes_depois.mp4`): não valem como prova do que se vê no jogo. Ele escolheu
+então usar o mapa na **luz do cenário**, que vale o tempo todo:
+
+- A luz do lugar (a direção e a cor da "contraluz" do `luzLutadores`, a mesma que já fazia o fio
+  na borda; com focos de luz ela segue o foco mais forte) acende o que está virado para ela, e o
+  lado oposto escurece puxando para a cor do lugar (metade do fator dos pés). O que olha de frente
+  para a tela fica como estava.
+- **A inclinação da normal é exagerada** (2,3× no SUAVE, 3,2× no FORTE). O mapa guarda formas
+  grandes, quase de frente (18° de inclinação média no miolo): sem exagero a mudança sobre a
+  arte, que já tem a própria sombra pintada, não se vê. Foi o que aconteceu no primeiro ensaio.
+- A luz entra quase toda multiplicada pela cor do que ilumina (10% somados, 90% multiplicados):
+  somando mais, a roupa preta virava cinza.
+- Níveis em `TesteDesempenho`: {exagero, sombra, luz} = SUAVE {2,3; 0,5; 0,55}, FORTE {3,2; 0,75;
+  0,85}. No PC, `-Pvolume=exagero,sombra,luz` afina sem recompilar.
+- Luz em dois tons chapados (faixas) foi testada e descartada: com a normal exagerada vira mancha.
+- Cintilação: no idle do Ryūga, a mudança média entre quadros seguidos é a mesma com e sem volume
+  (5,4 contra 5,7 em 255).
+- O mapa agora vai para a placa de vídeo quando a folha é desenhada (não só quando uma luz
+  acende), e a cópia da memória comum é solta nessa hora, como o bitmap da folha.
+
+Vídeo com as configurações reais do jogo, sem nada esticado:
+`android/app/build/sprite-review/luz_cenario_off_x_forte.mp4`; a mesma pose com e sem, nos dois
+níveis: `luz_cenario_mesma_pose.png`. Por fazer, se ele quiser: os braseiros e lanternas do
+cenário como luz de ponto no lutador que passa perto (as posições já estão no `stage.json`, em
+`luzes` e `fogos` das camadas).
+
+**1. De onde vem a normal.** Sete jeitos nos mesmos quadros (Ryūga, Kōga, p08, p12, p13, p15):
+
+| Jeito | O que deu |
+|---|---|
+| Silhueta borrada (o motor 3) | só a borda; o miolo é chapado |
+| Luminância como relevo (Laigter / SpriteIlluminator) | não serve em arte pintada: o traço vira sulco e a cor da roupa vira degrau (a "cara de metal" do Sandfox) |
+| Silhueta estufada (Lumo) | um travesseiro: braço na frente do tronco não aparece |
+| Estufada por regiões de tinta | cada linha vira vinco; treme mais e não acerta o que está na frente |
+| Depth Anything V2 (profundidade → normal) | degraus duros entre as partes e inclinação exagerada |
+| **Metric3D v2 ViT-small** (estima a normal direto; ONNX, na CPU) | **volume de verdade**: perna na frente do tronco, braço, peito, rosto, dobra da calça, em formas grandes |
+| Sapiens 0.3b (só corpo humano) | mais detalhe (rosto, tecido), porém ruidoso, 14 s por quadro (20× mais lento) e precisa do PyTorch |
+
+Ficou o Metric3D, com três arrumações na ferramenta (`tools/sprites/normal_map.py`):
+
+- **No tempo.** O modelo olha um quadro por vez e a normal treme de um para o outro: no idle do
+  Ryūga, 5,2° onde o desenho não mudou (a silhueta treme 1,5°). Misturando cada quadro com os
+  dois vizinhos de cada lado só onde a cor é a mesma, o mapa final fica em 2,5° (Kōga: 3,3° contra
+  2,2° da silhueta).
+- **Só as formas grandes**: borrão de 1,2% da altura.
+- **A borda vem da silhueta** (até 3% da altura do contorno). Numa medida de 0 a 1 (1 = a borda
+  inteira aponta para fora do corpo), o modelo sozinho dá 0,65 e o mapa final 0,99.
+
+**2. Memória** (medido: a dupla da gravação tem 1.359 MB em 125 folhas, sem compressão):
+
+| Mapa | Erro contra a normal inteira | Diferença na luz (níveis de 255) | Memória |
+|---|---|---|---|
+| 1/2 do lado, 2 canais de 8 bits | 0,6° | 0,35 média, 2,9 no pior 1% | 1/8 da folha |
+| **1/4, 2 canais de 8 bits** | 1,7° | 1,0 média, 7 no pior 1% | **1/32: +42 MB na luta (3,1% de 1.359, pela conta)** |
+| 1/8, 2 canais de 8 bits | 4,1° | 2,5 média, 15 no pior 1% | 1/128: +11 MB |
+| 1/16 | 8,8° | 5,2 média, 30 no pior 1% | não vale |
+
+Ficou 1/4 com x e y em 8 bits (`GL_RG8`; o z o shader refaz). As caixas da folha são múltiplas de
+4, então o mapa tem o mesmo desenho de caixas dividido por 4 e usa o mesmo uv. Ryūga: 689 MB de
+folhas, 21,5 MB de mapas. 4 ou 5 bits por canal economizariam pouco e pioram; compressão de
+textura (EAC RG11) cortaria pela metade de novo, mas pede um codificador a mais: não fiz.
+O mapa fica na memória comum (2 bytes por ponto) e só sobe para a placa quando uma luz acende
+um quadro daquela folha.
+
+**No APK**: o arquivo é um WebP cinza com o x na metade esquerda e o y na direita. Com x e y em
+vermelho e verde o WebP com perda errava 28° (ele guarda mal a cor); em cinza, qualidade 90, erra
+1,4° e pesa 6,2% do arquivo da folha (Ryūga: 2,7 MB sobre 43,6; para o elenco inteiro a conta dá
+perto de +22 MB sobre 352). Sem perda seriam 17%.
+
+**3. No shader** (`GlRenderCanvas`): com mapa, a luz local lê a normal dele (uma leitura, meio
+ponto do mapa para dentro do retângulo do quadro, para não misturar com o quadro vizinho) no
+lugar dos 16 vizinhos da silhueta; sem mapa, vale a silhueta como antes. O mesmo programa e o
+mesmo lote: o número da textura do mapa vai no pacote do filtro do quadro, que já existia. O
+texto do shader é montado duas vezes do mesmo modelo: o novo (`FRAGMENTOS`) e o de antes do motor
+4 (`FRAGMENTOS_ANTIGO`, idêntico byte a byte ao que estava no jogo). **Se a placa do aparelho
+recusar o novo, o jogo fica com o antigo** (aviso no log "shader com normal map recusado") e a
+luz usa a silhueta em todos. Os dois passam no `glslangValidator` como GLSL ES 3.00. O mapa de uma
+folha carrega junto com ela quando o OPENGL do Modo Teste está ligado (medido no PC: +32,5 MB em
+87 folhas para Ryūga e Kōga, na linha "normais ... MB" do log de carregamento).
+
+**Luz em faixas na luz do impacto** (testada nos vídeos de 11/11, fora do jogo desde 12/11): com a conta de luz do motor 3 o
+ganho do mapa é discreto (a luz deixa de lavar o braço por igual e passa a seguir o músculo e o
+rosto). Uma conta mais rasante, em dois tons chapados de borda curta (a sombra de anime), mostra
+mais a forma. É escolha de visual, dele.
+
+**Gravar** (os mapas têm de estar ao lado das folhas, em `res/drawable-nodpi`):
+
+```
+python3 tools/sprites/normal_map.py player_base p03      # ~0,8 s por quadro; o elenco (12.174 quadros) ~2,7 h
+cd android && rm -rf pc/build/gravar-luta
+xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=forte \
+    -Pgraficos=ALTO -Presolucao=1920x1080 -Proteiro="segura:D espera:1.8 solta:D grava:44:g tecla:L fim"
+```
+
+`-Pluz=off|suave|forte` escolhe o nível (sem nada, forte), `-Pvolume=exagero,sombra,luz` afina o
+volume, `-PluzDura=N` estica a luz do impacto e `-PluzFixa=1` a deixa na força cheia,
+`-PnormalAlterna=1` liga e desliga o mapa a cada quadro (dois quadros seguidos com a mesma pose,
+com e sem), `-Pbotoes=1` mostra os botões do Modo Teste e `-Pgraficos=ALTO` impede o nível
+gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar a 17,5 por segundo
+(não a 22). Com o processador ocupado o jogo anda lento e o golpe erra.
+
+**Folha refeita, mapa refeito.** O mapa é do desenho: quem refaz uma folha (vídeo novo, SR HD,
+smear) roda `normal_map.py <folha> --refazer` em seguida. Se a folha mudar de tamanho e o mapa
+ficar o antigo, o jogo ignora o mapa (aviso no log) e usa a silhueta; se só o desenho mudar, o
+jogo não tem como saber. Foi o que houve no mesmo dia com `player_base_idle` e
+`player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
+
+**O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
+custo); só Ryūga e Kōga têm mapa (88 folhas); só o Templo da Lua foi visto com o volume (os outros 11 cenários, não); a
+licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
+ser conferida antes de um lançamento comercial.
 
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 

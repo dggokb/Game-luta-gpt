@@ -280,7 +280,7 @@ final class SpriteFighterRenderer {
         // Desenho novo: o quadro vai para o OpenGL, com a transformação de agora do Canvas.
         DesenhoGl gl=DesenhoGl.noQuadro();
         if(gl!=null) {
-            gl.sprite(canvas,folha.bitmap,source,destination,alfa,filtro);
+            gl.sprite(canvas,folha.bitmap,source,destination,alfa,filtro,folha.normal);
             return;
         }
         spritePaint.setAlpha(alfa);
