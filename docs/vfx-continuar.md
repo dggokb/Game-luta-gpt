@@ -49,6 +49,8 @@ em mais coisas (cabelo, roupa, tudo que se mexe).
   do corpo e somem. As línguas tomam o lugar do membro e a ponta (o tênis) volta inteira por cima.
 - **No H do p01:** desenhos 4 e 5 (o maior salto do pé, 193 px do mundo, e o anterior). Só a folha
   mudou; as caixas de golpe e de corpo são as mesmas.
+- **Comprimento:** o dono pediu "estica levemente mais um pouco": `--comprimento 1.3` (as línguas
+  vão 30% além de onde o membro estava; antes 1,0). Fica guardado no clip.
 - **Visto:** gravado no PC ao lado do de hoje, quadro a quadro. `testarMotor`: só as 3 falhas
   antigas. Celular: não visto.
 - **Para o dono julgar:** o desenho 5 é o do acerto e o jogo o segura na pausa do acerto, então o

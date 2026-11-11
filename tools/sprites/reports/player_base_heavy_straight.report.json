@@ -62,24 +62,24 @@
     {
       "index": 4,
       "outputBbox": [
-        130,
+        98,
         124,
         413,
         594
       ],
       "minimumMargin": 46,
-      "opaquePixels": 53823
+      "opaquePixels": 55428
     },
     {
       "index": 5,
       "outputBbox": [
-        123,
+        88,
         142,
         548,
         594
       ],
       "minimumMargin": 46,
-      "opaquePixels": 59087
+      "opaquePixels": 62011
     },
     {
       "index": 6,
@@ -358,7 +358,7 @@
       18,
       80
     ],
-    "sheetWidth": 3764,
+    "sheetWidth": 3784,
     "sheetHeight": 1460,
     "frames": [
       [
@@ -370,7 +370,7 @@
         91
       ],
       [
-        2700,
+        2732,
         0,
         392,
         480,
@@ -396,21 +396,21 @@
       [
         2400,
         0,
-        296,
+        328,
         484,
-        108,
+        76,
         37
       ],
       [
         2276,
         516,
-        440,
+        472,
         464,
-        98,
+        66,
         56
       ],
       [
-        2720,
+        2752,
         516,
         504,
         464,
@@ -418,7 +418,7 @@
         58
       ],
       [
-        3228,
+        3260,
         516,
         524,
         464,
@@ -554,7 +554,7 @@
         47
       ],
       [
-        3096,
+        3128,
         0,
         316,
         480,
@@ -605,7 +605,7 @@
     "decodedBytes": {
       "canonical": 49152000,
       "grid": 38921760,
-      "packed": 21981760
+      "packed": 22098560
     },
     "pixelScale": 2.0
   },
@@ -613,8 +613,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "430f1320e4d9ab6c11ed40ffd5ba765a5bf0bd9c29df6ac52064c262cf5838d5",
-      "config": "fe4b034a20854c4d031db8d7ea4aa7ecf6b94b8f4a373522ab19f9f40ef22542",
+      "source": "83f704459fd19b72fe488627e37c31381d8fefa399090dcb6757178a12d49ed3",
+      "config": "d9f4391ef32493a1d5986438c5f425e8ff1be94be867e95829990d131ea4e2a9",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

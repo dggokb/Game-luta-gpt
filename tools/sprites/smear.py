@@ -32,7 +32,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 
 # Parâmetros de partida (px da folha; a folha do p01 tem 2 px por px do mundo).
-COMPRIMENTO = 1.0     # o arrasto cobre esta fração do quanto a ponta andou
+COMPRIMENTO = 1.0     # padrão de --comprimento: o arrasto cobre esta fração do quanto a ponta andou
 LARGURA_MEMBRO = 0.42  # meia largura do membro em volta da reta junta -> ponta, fração dela
 PONTA_LIVRE = 0.18    # o trecho da ponta (o pé, o punho) que não estica, fração do membro
 LINGUA_MIN, LINGUA_MAX = 7, 18   # largura de cada língua (px da folha)
@@ -66,7 +66,7 @@ def linguas(n, rng):
     return comp * (0.35 + 0.65 * np.sqrt(np.clip(1 - t * t, 0, 1)))
 
 
-def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng):
+def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO):
     """O quadro com o membro esticado para trás: cada ponto do membro deixa uma língua até onde ele
     estava no desenho anterior (o pé, que andou muito, uma cauda longa; o joelho, quase nada), e o
     rastro vira a área que o membro varreu, em giro (chute em arco) ou reto (soco). Coordenadas em
@@ -109,11 +109,12 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng):
     lane = np.round(bx * -md[1] + by * md[0]).astype(int)
     l0 = lane.min()
     comp = linguas(int(lane.max() - l0 + 1), rng)[lane - l0]
-    alcance = COMPRIMENTO * dist * comp
+    alcance = comprimento * dist * comp
     cores = px[membro]
     camada = np.zeros_like(px)
     # Do mais longe para o mais perto: a parte de perto da perna fica por cima.
-    passos = np.linspace(1.0, 0.0, int(dist.max() * 2) + 2)
+    topo = max(1.0, comprimento)
+    passos = np.linspace(topo, 0.0, int(dist.max() * topo * 2) + 2)
     for f in passos:
         vivo = f * dist <= alcance
         if not vivo.any():
@@ -139,6 +140,8 @@ def main():
     p.add_argument('golpe')
     p.add_argument('--quadros', help='desenhos a esticar (ex.: 4,5); sem isto, o de maior salto e o anterior')
     p.add_argument('--semente', type=int, default=11)
+    p.add_argument('--comprimento', type=float, default=COMPRIMENTO,
+                   help='o quanto estica: 1 = até onde o membro estava no desenho anterior')
     p.add_argument('--previa', help='só grava uma prévia dos quadros (não mexe no clip)')
     p.add_argument('--desfazer', action='store_true', help='volta o clip para a fonte original')
     a = p.parse_args()
@@ -181,7 +184,7 @@ def main():
         cel = folha.crop((x0, y0, x0 + fw, y0 + fh))
         v = cam[str(q)]
         u = cam[str(ant)]
-        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng)
+        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento)
         folha.paste(nova, (x0, y0))
         feitos.append((q, round(andou[q])))
     print('esticados (desenho, px do mundo que a ponta andou):', feitos)
@@ -200,7 +203,7 @@ def main():
     refs = clip.get('sourceReferences', [])
     if original not in refs:
         clip['sourceReferences'] = refs + [original]
-    clip['smear'] = {'fonte': original, 'quadros': quadros, 'semente': a.semente,
+    clip['smear'] = {'fonte': original, 'quadros': quadros, 'semente': a.semente, 'comprimento': a.comprimento,
                      'ferramenta': 'tools/sprites/smear.py'}
     clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('fonte nova:', destino, '| clip:', clip_path.relative_to(ROOT))

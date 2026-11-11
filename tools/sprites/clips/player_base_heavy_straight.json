@@ -118,6 +118,7 @@
       5
     ],
     "semente": 11,
+    "comprimento": 1.3,
     "ferramenta": "tools/sprites/smear.py"
   }
 }
