@@ -478,7 +478,8 @@ virado"). Folha: `efeito_video.py art/vfx/super_pulo_v01/frames --nome super_pul
 em teste, no pulo comum a 60% (`PULO_COMUM_ESCALA`, no lugar da `fumaca_pulo`); espelha quando o
 lutador olha para a esquerda. "Ele fica atrás do personagem": o EfeitosVideo ganhou a camada de
 trás (`atrasDosLutadores()` / `desenharAtras`, desenhada antes dos lutadores) e a fumaça do pulo vai
-nela.
+nela. Depois: "a do super pulo ficou muito grande, e a fumaça dos dois é um pouco atrás dele, não
+embaixo": `SUPER_PULO_ESCALA` 0,7 e `PULO_FUMACA_ATRAS` 40 px do mundo para as costas.
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
