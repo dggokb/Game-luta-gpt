@@ -17,6 +17,8 @@ meio do desenho, a poucos px do pivô:
     efeito_video.py PASTA/forte --nome impacto_v06_forte_ec --fps 20 --origem 210,260 --escala-mundo 0.48
     efeito_video.py PASTA/medio --nome impacto_v06_medio_ec --fps 24 --origem 200,248 --escala-mundo 0.48
     efeito_video.py art/vfx/impactos_v06/leve --nome impacto_v06_fraco --fps 30 --origem 214,250 --escala-mundo 0.60
+O forte novo, em teste (o desenho do médio sem o spray, com o anel; alfa a 90% antes):
+    efeito_video.py PASTA/forte_medio --nome impacto_v06_forte_medio --fps 24 --origem 200,248 --escala-mundo 0.60
 (as três com o alfa a 90% antes, pedido de 11/11)
 """
 import argparse
@@ -30,7 +32,7 @@ ARTE = AQUI.parent / 'impactos_v06'
 CLI_PADRAO = Path('/home/user/storytold/effectcraft/target/release/effectcraft-cli')
 LADO = 512
 PIVO = (210.0, 260.0)
-FPS = {'forte': 20, 'medio': 24}
+FPS = {'forte': 20, 'medio': 24, 'forte_medio': 24}
 
 # O anel do dano_forte (0,30 px do mundo por px) na escala destes desenhos (0,70); 6 quadros.
 K = 0.30 / 0.70
@@ -82,6 +84,12 @@ def forte(item):
           prop('arte', 'effects/#1/intensity', 0.8), prop('arte', 'effects/#1/colors', 1),
           prop('arte', 'effects/#1/colorA', '#ff8a1f'), prop('arte', 'effects/#1/colorB', '#c2280c'),
           {'command': 'layer.setSwitch', 'params': {'layers': ['arte'], 'switch': 'threeD', 'value': True}}]
+    return s + anel(fps)
+
+
+def anel(fps):
+    """O anel de pressão de ar em 3D atravessando o desenho (o mesmo da V4 no jogo)."""
+    s = []
     n = 'anel'
     s += [{'command': 'layer.newShape', 'params': {'kind': 'ellipse', 'name': n, 'size': [200, 200],
                                                    'stroke': '#ffffff', 'strokeWidth': 20, 'fill': '#dff6ff'}},
@@ -106,6 +114,15 @@ def forte(item):
           prop(n, 'effects/#3/colors', 1), prop(n, 'effects/#3/colorA', '#bff0ff'), prop(n, 'effects/#3/colorB', '#5cc8ff')]
     s += chaves(n, 'effects/#2/brightness', ANEL_EROSAO, fps)
     return s
+
+
+def forte_medio(item):
+    """Pedido de 11/11: o forte como o desenho do médio, um pouco maior (na escala da folha), sem
+    o spray de ar e com o anel de pressão de ar em 3D do forte."""
+    fps = FPS['forte_medio']
+    s = base('forte_medio', item, fps)
+    s += [{'command': 'layer.setSwitch', 'params': {'layers': ['arte'], 'switch': 'threeD', 'value': True}}]
+    return s + anel(fps)
 
 
 def medio(item):
@@ -177,6 +194,7 @@ def main():
     a = p.parse_args()
     rodar(a.cli, 'forte', ARTE / 'forte', forte, a.saida / 'forte')
     rodar(a.cli, 'medio', ARTE / 'medio', medio, a.saida / 'medio')
+    rodar(a.cli, 'forte_medio', ARTE / 'medio', forte_medio, a.saida / 'forte_medio')
 
 
 if __name__ == '__main__':
