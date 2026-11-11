@@ -115,6 +115,10 @@ que tem a ponta mais longe do tronco dentro da caixa do golpe.
   desenhos tocam de trás para a frente; a ferramenta ainda não aceita). A limpeza só tira efeito meio
   transparente ou solto: efeito branco opaco grudado no membro precisa de outro jeito.
 - Com o caminho novo, a faísca de dano desses golpes nasce na ponta do membro.
+- Correção (pedido do dono, "o M não tô vendo o rastro"): o M do p15 é soco duplo e a preparação
+  medida era a mão da frente (47 px); passou para a mão de trás recolhida no desenho 4 (138 px).
+- "Uma esfera em volta" no 2H do p15 não é do smear: é a aura da esquiva (`drawMechanicAura`,
+  `AURA_EVADE`, desde 9/11), que o jogo desenha nos quadros em que o golpe esquiva de ataque aéreo.
 - Visto: o desenho do acerto de cada um (folha). `testarMotor`: só as 3 falhas antigas; build
   PASS. Jogo e celular: não vistos.
 
