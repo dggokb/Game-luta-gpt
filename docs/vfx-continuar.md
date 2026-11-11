@@ -343,8 +343,8 @@ um hit forte novo.
 `art/vfx/fumaca_dash_v04` (8 desenhos diferentes de 768 × 448, 45 ms cada, pé em 710,350, corre
 para a direita e a fumaça vai para trás). Folha: `efeito_video.py art/vfx/fumaca_dash_v04/frames
 --nome fumaca_dash_v04 --fps 22.2 --origem 710,350 --escala-mundo 0.60` (a 0.40 ficava com uns 60%
-do tamanho da `poeira_corrida`). A folha está nos assets; o `poeiraDoMotor` só toca ela no lugar
-da `poeira_corrida` quando o dono aprovar no vídeo (`fumaca_dash_v04.mp4`). Roteiro do dash:
+do tamanho da `poeira_corrida`). O dono mandou pôr no jogo ("põe no jogo vamos ver"): o
+`poeiraDoMotor` toca ela no lugar da `poeira_corrida` (que fica de reserva). Roteiro do dash:
 `gradle :pc:gravarLuta -Proteiro="espera:0.5 grava:40:d tecla:D tecla:D fim"`.
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
