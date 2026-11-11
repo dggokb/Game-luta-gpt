@@ -57,7 +57,7 @@
         527
       ],
       "minimumMargin": 49,
-      "opaquePixels": 82524
+      "opaquePixels": 82309
     },
     {
       "index": 4,
@@ -68,7 +68,7 @@
         527
       ],
       "minimumMargin": 49,
-      "opaquePixels": 81093
+      "opaquePixels": 80940
     },
     {
       "index": 5,
@@ -385,7 +385,7 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ce3d8e699e7092183862a05ce88b01f371e87f18af416ebf87c0ce0a09c6a8c0",
+      "source": "c359dd7bf69239140ce45200116f98c892d0bbad0ee822cb67b6d8051efa0c43",
       "config": "288021471ead794c6ad650695690dd43738dd0734e66844bfacf2d87300fbef8",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },

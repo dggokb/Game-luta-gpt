@@ -113,13 +113,17 @@
   },
   "smear": {
     "fonte": "art/sprites/source/player_base_jump_medium_video_normalized.png",
-    "quadros": [],
+    "quadros": [
+      6,
+      7
+    ],
     "semente": 11,
     "comprimento": [
-      1.0,
+      1.2,
       1.0
     ],
     "ferramenta": "tools/sprites/smear.py",
-    "trocar": "7=8"
+    "trocar": "7=8",
+    "antes": "7=5"
   }
 }

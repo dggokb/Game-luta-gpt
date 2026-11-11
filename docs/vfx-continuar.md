@@ -73,6 +73,21 @@ efeito que veio do vídeo (clarão, arco, rastro, fumaça, coluna de luz, membro
 - As línguas não passam da margem do quadro (o build exige 8 px): se passariam, o feixe todo
   encolhe na mesma proporção (o martelo j2H encolheu).
 - As caixas de golpe e de corpo não mudaram (são as medidas antes, com o efeito).
+
+**Correção e especiais (11/11, depois do dono: "não vi no jM e jH, e nem no S2 e S3"):**
+- jH: os desenhos esticados (5 e 6) duravam 9 a 10 ms, menos de um quadro de jogo. Regra que vale
+  para todo golpe: **o smear tem de estar no desenho do acerto** (o que o jogo segura na pausa) e
+  no anterior. jH passou para 6 e 7.
+- jM: o modelo de pose não acha a perna esticada; caminho medido no desenho (`CAMINHO_MANUAL` no
+  `linha_de_acao.py`), smear em 6 e 7, o 7 esticando a partir da perna recolhida (`--antes 7=5`).
+- S2 (punho ascendente) e S3 (seis chutes): `smear.py --limpar todos` tira o efeito do vídeo
+  (faísca, anel, poeira, brilho) guardando só o corpo opaco; caminhos medidos com a pose quadro a
+  quadro e guardados em `CAMINHO_MANUAL` (o detector só vê golpes normais). Smear no S2 em 6 e 7;
+  no S3 em cada chute esticado (9, 14, 16, 20, 23, 29). Com o caminho, a faísca de dano dos
+  especiais passa a nascer na ponta do punho ou do pé.
+- As línguas pegam cor só do desenho opaco (o halo meio transparente do vídeo sujava de verde).
+- Visto nas folhas, quadro a quadro. `testarMotor`: só as 3 falhas antigas; build PASS. Celular e
+  jogo: não vistos nesta correção.
 - Visto: as folhas quadro a quadro dos sete golpes, e no jogo (PC) o M e o 2H. Os do ar só na
   folha. `testarMotor`: só as 3 falhas antigas; `build_characters --check`: PASS. Celular: não visto.
 

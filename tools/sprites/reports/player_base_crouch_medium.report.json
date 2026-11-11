@@ -117,24 +117,24 @@
     {
       "index": 9,
       "outputBbox": [
-        245,
+        244,
         193,
         809,
         524
       ],
       "minimumMargin": 52,
-      "opaquePixels": 71694
+      "opaquePixels": 71178
     },
     {
       "index": 10,
       "outputBbox": [
-        249,
+        248,
         193,
         809,
         524
       ],
       "minimumMargin": 52,
-      "opaquePixels": 73187
+      "opaquePixels": 72430
     },
     {
       "index": 11,
@@ -394,7 +394,7 @@
         856,
         576,
         344,
-        161,
+        160,
         120
       ],
       [
@@ -402,7 +402,7 @@
         1240,
         572,
         344,
-        165,
+        164,
         120
       ],
       [
@@ -537,7 +537,7 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "b98beab6b41c033554372c1a78bef105dab0e695bed7b7ee587bb9e9122ff1a5",
+      "source": "617b32cf873b22a4459430300eac0b457b9d990a2c6091c1cc1034bf10465199",
       "config": "88dce5462f7010a234bb442470168b34aafc4c1de14abb239557e1510ac60e78",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },

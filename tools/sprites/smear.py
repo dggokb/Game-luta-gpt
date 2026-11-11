@@ -71,6 +71,27 @@ def linguas(n, rng):
     return comp * (0.35 + 0.65 * np.sqrt(np.clip(1 - t * t, 0, 1)))
 
 
+def so_corpo(cel, abre=5, borda=3):
+    """O desenho sem o efeito do vídeo (faísca, anel, poeira, brilho): o corpo é opaco e o efeito,
+    quase todo, meio transparente ou fino. Fica o maior pedaço opaco (aberto para soltar os
+    espinhos finos da faísca), com o opaco grudado nele de volta (dedos, bico do tênis) e uma
+    borda de {@code borda} px para o contorno suave."""
+    import cv2
+    px = np.asarray(cel).copy()
+    a = px[..., 3]
+    opaco = (a >= 250).astype(np.uint8)
+    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * abre + 1,) * 2)
+    aberto = cv2.morphologyEx(opaco, cv2.MORPH_OPEN, k)
+    n, lab, st, _ = cv2.connectedComponentsWithStats(aberto, connectivity=8)
+    if n < 2:
+        return cel
+    corpo = (lab == 1 + int(np.argmax(st[1:, cv2.CC_STAT_AREA]))).astype(np.uint8)
+    corpo = (cv2.dilate(corpo, k) & opaco) | corpo
+    m = cv2.dilate(corpo, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * borda + 1,) * 2)) > 0
+    px[~m] = 0
+    return Image.fromarray(px, 'RGBA')
+
+
 def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO):
     """O quadro com o membro esticado para trás: cada ponto do membro deixa uma língua até onde ele
     estava no desenho anterior (o pé, que andou muito, uma cauda longa; o joelho, quase nada), e o
@@ -88,7 +109,8 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
     o = rx * n[0] + ry * n[1]                          # px para o lado da reta
     tc = np.clip(t, 0.0, 1.08)
     perto = np.hypot(rx - tc * seg[0], ry - tc * seg[1]) <= LARGURA_MEMBRO * L
-    membro = perto & (px[..., 3] > 128) & (t > 0.05) & (t < 1.0 - PONTA_LIVRE * 0.5)
+    # Só o desenho opaco vira língua: o halo meio transparente do vídeo daria línguas sujas.
+    membro = perto & (px[..., 3] >= 250) & (t > 0.05) & (t < 1.0 - PONTA_LIVRE * 0.5)
     if membro.sum() < 50:
         return cel
     # Onde cada ponto do membro estava: o mesmo t e o mesmo o, no membro do desenho anterior.
@@ -164,6 +186,10 @@ def main():
                         '1 = até onde o membro estava no desenho anterior')
     p.add_argument('--trocar', help='antes de esticar, troca desenhos com efeito do vídeo por cima do corpo '
                                     'pelo desenho limpo da mesma pose: "4=8,5=8" (o 4 e o 5 viram cópia do 8)')
+    p.add_argument('--antes', help='de que desenho cada um estica: "7=5" (sem isto, o último do caminho '
+                                   'com a ponta noutro lugar)')
+    p.add_argument('--limpar', help='desenhos de onde sai o efeito do vídeo (fica só o corpo opaco): '
+                                    '"5,6,9" ou "todos"')
     p.add_argument('--sem-smear', action='store_true', help='só a troca (para medir o caminho na folha limpa)')
     p.add_argument('--previa', help='só grava uma prévia dos quadros (não mexe no clip)')
     p.add_argument('--desfazer', action='store_true', help='volta o clip para a fonte original')
@@ -186,9 +212,19 @@ def main():
     if a.trocar is None and smear:
         a.trocar = smear.get('trocar')
     trocas = {int(d): int(o) for d, o in (t.split('=') for t in a.trocar.split(','))} if a.trocar else {}
+    if a.antes is None and smear:
+        a.antes = smear.get('antes')
+    antes_de = {int(d): int(o) for d, o in (t.split('=') for t in a.antes.split(','))} if a.antes else {}
+    if a.limpar is None and smear:
+        a.limpar = smear.get('limpar')
     lay = rep['layout']
     fw, fh, cols = lay['frameWidth'], lay['frameHeight'], lay['columns']
     folha = Image.open(ROOT / original).convert('RGBA')
+    if a.limpar:
+        n = lay['frameCount']
+        for q in (range(n) if a.limpar == 'todos' else [int(x) for x in a.limpar.split(',')]):
+            caixa = ((q % cols) * fw, (q // cols) * fh, (q % cols + 1) * fw, (q // cols + 1) * fh)
+            folha.paste(so_corpo(folha.crop(caixa)), caixa[:2])
     limpa = folha.copy()
     for d, o in trocas.items():
         folha.paste(limpa.crop(((o % cols) * fw, (o // cols) * fh, (o % cols + 1) * fw, (o // cols + 1) * fh)),
@@ -232,7 +268,7 @@ def main():
                  and math.hypot(cam[d][0] - v[0], cam[d][1] - v[1]) > 8]
         if v is None or not antes:
             raise SystemExit(f'o desenho {q} não tem caminho antes dele (caminho: {ordem})')
-        ant = max(antes)
+        ant = antes_de.get(q, max(antes))
         andou[q] = math.hypot(v[0] - cam[str(ant)][0], v[1] - cam[str(ant)][1])
         x0, y0 = (q % cols) * fw, (q // cols) * fh
         cel = folha.crop((x0, y0, x0 + fw, y0 + fh))
@@ -260,6 +296,10 @@ def main():
                      'ferramenta': 'tools/sprites/smear.py'}
     if a.trocar:
         clip['smear']['trocar'] = a.trocar
+    if a.limpar:
+        clip['smear']['limpar'] = a.limpar
+    if a.antes:
+        clip['smear']['antes'] = a.antes
     clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('fonte nova:', destino, '| clip:', clip_path.relative_to(ROOT))
     print('agora: python3 tools/sprites/build_characters.py --write')
