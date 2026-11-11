@@ -372,8 +372,11 @@ do tamanho da `poeira_corrida`). O dono mandou pôr no jogo ("põe no jogo vamos
 **V05 (11/11):** `art/vfx/fumaca_dash_v05`, 10 desenhos de 768 × 448, mesmo pé (710,350), tempos
 próprios por quadro (40, 40, 42, 42, 44, 45, 48, 55, 65, 75 ms). Folha `fumaca_dash_v05` com o
 mesmo comando da V04 (escala 0,60) e os `duracoesMs` trocados à mão no efeito.json pelos do
-LEIA-ME (o efeito_video.py só faz ritmo fixo). Mais alta e mais cheia que a V04. Entra no lugar da
-V04 quando o dono aprovar no vídeo (`fumaca_dash_v05.mp4`).
+LEIA-ME (o efeito_video.py só faz ritmo fixo). Mais alta e mais cheia que a V04. O dono: "acho que
+você colocou invertido" → "curvas ao contrário": a folha sai de `frames_curvas_viradas/` (cada
+quadro espelhado dentro da própria nuvem: continua nascendo no pé e indo para trás, com as curvas
+viradas para quem corre). Entra no lugar da V04 quando o dono aprovar
+(`fumaca_dash_v05_curvas_viradas.mp4`).
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
