@@ -11,8 +11,8 @@
     python3 art/vfx/effectcraft/impactos_v06_ec.py --saida PASTA [--cli CAMINHO]
 
 Sai PASTA/forte e PASTA/medio (sequências PNG). No jogo (pivô = contato, mesma escala para os três):
-    efeito_video.py PASTA/forte --nome impacto_v06_forte_ec --fps 20 --origem 210,260 --escala-mundo 0.70
-    efeito_video.py PASTA/medio --nome impacto_v06_medio_ec --fps 24 --origem 210,260 --escala-mundo 0.70
+    efeito_video.py PASTA/forte --nome impacto_v06_forte_ec --fps 20 --origem 210,260 --escala-mundo 0.56
+    efeito_video.py PASTA/medio --nome impacto_v06_medio_ec --fps 24 --origem 210,260 --escala-mundo 0.56
     efeito_video.py art/vfx/impactos_v06/leve --nome impacto_v06_fraco --fps 30 --origem 210,260 --escala-mundo 0.70
 """
 import argparse

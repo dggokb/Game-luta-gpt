@@ -303,6 +303,8 @@ ms, médio 42, leve 33 por quadro; "tinha uma falha no forte"). Acabamento pedid
 - fraco: só o desenho (`impacto_v06_fraco`).
 Depois, "menos pontiagudos e mais finos": riscos de 2,5 a 3 px, ponta redonda, afinando pouco
 (taper 20-30 % até 40-45 % da largura).
+Depois, "médio e forte um pouco menores": os dois a `--escala-mundo 0.56` (20 % menores; o fraco
+ficou em 0.70).
 Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 --escala-mundo
 0.70` (fps 20 / 24 / 30). No `efeitoDeGolpe` vêm antes das anteriores, que ficam de reserva; o
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
