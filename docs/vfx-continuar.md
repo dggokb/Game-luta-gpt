@@ -28,6 +28,69 @@ do Ryūga, p01, `art/sprites/source/player_base_heavy_straight_video_normalized.
 textura e o caminho detectado ficam; para voltar, `LIGADO = true`. O teste por erosão continua
 guardado na branch `claude/rastro-erosao` (também desligado lá).
 
+## Smear: o membro esticado na própria arte (11/11, teste; branch `claude/smear`)
+
+Ideia do dono, depois de desligar o rastro automático: em vez de efeito por cima, **o próprio
+desenho do personagem estica** nos quadros rápidos (o smear do anime; referência dele: a luva e a
+manga que viram línguas nas cores da roupa, o punho intacto na frente). Decidido com ele: uma
+ferramenta própria; começar só pelo membro que bate, em 1 ou 2 desenhos, com as cores do próprio
+personagem, no chute forte (H) do Ryūga adulto (p01); quando a ferramenta estiver pronta, testar
+em mais coisas (cabelo, roupa, tudo que se mexe).
+
+- **Ferramenta:** `tools/sprites/smear.py <personagem> <golpe> [--quadros 4,5] [--previa x.png]`,
+  depois `build_characters.py --write`. Escreve uma fonte nova ao lado da original
+  (`..._smear.png`), aponta o clip para ela e guarda os parâmetros no clip (`smear`); a original
+  fica em `sourceReferences`. `--desfazer` volta.
+- **Como:** o membro é a parte do desenho perto da reta junta -> ponta do caminho detectado
+  (`silhueta.caminho`). Cada ponto do membro deixa uma língua até onde estava no desenho anterior;
+  as línguas são faixas de comprimentos diferentes, pontudas, nas cores do próprio membro, sem
+  desfoque. Golpe em giro: o leque que o membro varreu. Golpe reto (a ponta anda na direção do
+  membro, como este chute que estica do joelho dobrado): arrasto reto, senão as línguas caem dentro
+  do corpo e somem. As línguas tomam o lugar do membro e a ponta (o tênis) volta inteira por cima.
+- **No H do p01:** desenhos 4 e 5 (o maior salto do pé, 193 px do mundo, e o anterior). Só a folha
+  mudou; as caixas de golpe e de corpo são as mesmas.
+- **Comprimento:** `--comprimento meio,bordas` (fração de até onde o membro estava; guardado no
+  clip). O dono foi de 1,0 a 1,3 ("estica levemente mais um pouco") e fechou em **1,2 no meio do
+  feixe e 1,0 nas bordas**, em curva entre os dois.
+- **Visto:** gravado no PC ao lado do de hoje, quadro a quadro. `testarMotor`: só as 3 falhas
+  antigas. Celular: não visto.
+- **Para o dono julgar:** o desenho 5 é o do acerto e o jogo o segura na pausa do acerto, então o
+  smear fica parado uns 16 quadros (no anime ele dura 1 ou 2); se incomodar, esticar só o 4.
+
+**Todos os M e H do Ryūga adulto (11/11, pedido do dono: "põe direto", sem vídeo):** smear em M,
+6M, 2M, 2H, jH e j2H, com 1,2 no meio e 1,0 nas bordas, nos 2 desenhos depois do salto do golpe. O
+efeito que veio do vídeo (clarão, arco, rastro, fumaça, coluna de luz, membro borrado) saiu:
+- Onde o efeito estava por cima do corpo, o desenho virou cópia do desenho limpo da mesma pose
+  (`smear.py --trocar`, guardado no clip): M 3=2 e 4-7=8; 6M 3-7=8; 2M 9,10=11; jM 7=8; 2H 4-7=8;
+  jH 5-10=11; j2H 9=8 e 10-12=13. O smear cobre a passagem. A limpeza por cor (`limpar.py`) foi
+  tentada antes e apagava o tronco e o braço junto com o clarão.
+- Os caminhos foram medidos de novo na folha limpa (`linha_de_acao.py`; precisa de `pip install
+  mediapipe` e `apt-get install libegl1 libgles2`). O jM ficou sem smear: o modelo pega a mão no
+  lugar do pé (`CAMINHO_ERRADO`); só a troca tirou o arco. O 2L e o jL continuam em
+  `ARTE_COM_EFEITO`.
+- No soco M o smear quase não aparece: o braço anda pouco e na direção dele, as línguas caem sobre
+  ele. Se o dono quiser mais, é aumentar o `--comprimento` só desse golpe.
+- As línguas não passam da margem do quadro (o build exige 8 px): se passariam, o feixe todo
+  encolhe na mesma proporção (o martelo j2H encolheu).
+- As caixas de golpe e de corpo não mudaram (são as medidas antes, com o efeito).
+
+**Correção e especiais (11/11, depois do dono: "não vi no jM e jH, e nem no S2 e S3"):**
+- jH: os desenhos esticados (5 e 6) duravam 9 a 10 ms, menos de um quadro de jogo. Regra que vale
+  para todo golpe: **o smear tem de estar no desenho do acerto** (o que o jogo segura na pausa) e
+  no anterior. jH passou para 6 e 7.
+- jM: o modelo de pose não acha a perna esticada; caminho medido no desenho (`CAMINHO_MANUAL` no
+  `linha_de_acao.py`), smear em 6 e 7, o 7 esticando a partir da perna recolhida (`--antes 7=5`).
+- S2 (punho ascendente) e S3 (seis chutes): `smear.py --limpar todos` tira o efeito do vídeo
+  (faísca, anel, poeira, brilho) guardando só o corpo opaco; caminhos medidos com a pose quadro a
+  quadro e guardados em `CAMINHO_MANUAL` (o detector só vê golpes normais). Smear no S2 em 6 e 7;
+  no S3 em cada chute esticado (9, 14, 16, 20, 23, 29). Com o caminho, a faísca de dano dos
+  especiais passa a nascer na ponta do punho ou do pé.
+- As línguas pegam cor só do desenho opaco (o halo meio transparente do vídeo sujava de verde).
+- Visto nas folhas, quadro a quadro. `testarMotor`: só as 3 falhas antigas; build PASS. Celular e
+  jogo: não vistos nesta correção.
+- Visto: as folhas quadro a quadro dos sete golpes, e no jogo (PC) o M e o 2H. Os do ar só na
+  folha. `testarMotor`: só as 3 falhas antigas; `build_characters --check`: PASS. Celular: não visto.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

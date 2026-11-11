@@ -3616,9 +3616,9 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_SET_ROOT_Y = 459;
     static final int CROUCH_SET_FRAME_COUNT = 9;
 
-    static final int CROUCH_HEAVY_FRAME_WIDTH = 530;
-    static final int CROUCH_HEAVY_FRAME_HEIGHT = 647;
-    static final int CROUCH_HEAVY_ROOT_X = 275;
+    static final int CROUCH_HEAVY_FRAME_WIDTH = 338;
+    static final int CROUCH_HEAVY_FRAME_HEIGHT = 643;
+    static final int CROUCH_HEAVY_ROOT_X = 181;
     static final int CROUCH_HEAVY_ROOT_Y = 616;
     static final int CROUCH_HEAVY_FRAME_COUNT = 20;
 
@@ -3634,9 +3634,9 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_LIGHT_ROOT_Y = 440;
     static final int CROUCH_LIGHT_FRAME_COUNT = 20;
 
-    static final int CROUCH_MEDIUM_FRAME_WIDTH = 817;
-    static final int CROUCH_MEDIUM_FRAME_HEIGHT = 490;
-    static final int CROUCH_MEDIUM_ROOT_X = 362;
+    static final int CROUCH_MEDIUM_FRAME_WIDTH = 739;
+    static final int CROUCH_MEDIUM_FRAME_HEIGHT = 469;
+    static final int CROUCH_MEDIUM_ROOT_X = 322;
     static final int CROUCH_MEDIUM_ROOT_Y = 454;
     static final int CROUCH_MEDIUM_FRAME_COUNT = 26;
 
@@ -3718,7 +3718,7 @@ final class GeneratedSpriteLayouts {
     static final int GETUP_SET_ROOT_Y = 462;
     static final int GETUP_SET_FRAME_COUNT = 12;
 
-    static final int PLAYER_BASE_GOLPE_ALTO_FRAME_WIDTH = 614;
+    static final int PLAYER_BASE_GOLPE_ALTO_FRAME_WIDTH = 543;
     static final int PLAYER_BASE_GOLPE_ALTO_FRAME_HEIGHT = 492;
     static final int PLAYER_BASE_GOLPE_ALTO_ROOT_X = 176;
     static final int PLAYER_BASE_GOLPE_ALTO_ROOT_Y = 476;
@@ -3796,16 +3796,16 @@ final class GeneratedSpriteLayouts {
     static final int JUMP_SET_ROOT_Y = 531;
     static final int JUMP_SET_FRAME_COUNT = 10;
 
-    static final int JUMP_HEAVY_FRAME_WIDTH = 506;
+    static final int JUMP_HEAVY_FRAME_WIDTH = 493;
     static final int JUMP_HEAVY_FRAME_HEIGHT = 548;
     static final int JUMP_HEAVY_ROOT_X = 168;
     static final int JUMP_HEAVY_ROOT_Y = 380;
     static final int JUMP_HEAVY_FRAME_COUNT = 22;
 
-    static final int JUMP_HEAVY_DOWN_FRAME_WIDTH = 338;
-    static final int JUMP_HEAVY_DOWN_FRAME_HEIGHT = 652;
-    static final int JUMP_HEAVY_DOWN_ROOT_X = 162;
-    static final int JUMP_HEAVY_DOWN_ROOT_Y = 418;
+    static final int JUMP_HEAVY_DOWN_FRAME_WIDTH = 302;
+    static final int JUMP_HEAVY_DOWN_FRAME_HEIGHT = 672;
+    static final int JUMP_HEAVY_DOWN_ROOT_X = 161;
+    static final int JUMP_HEAVY_DOWN_ROOT_Y = 448;
     static final int JUMP_HEAVY_DOWN_FRAME_COUNT = 25;
 
     static final int JUMP_LIGHT_FRAME_WIDTH = 597;
@@ -3814,8 +3814,8 @@ final class GeneratedSpriteLayouts {
     static final int JUMP_LIGHT_ROOT_Y = 399;
     static final int JUMP_LIGHT_FRAME_COUNT = 20;
 
-    static final int JUMP_MEDIUM_FRAME_WIDTH = 635;
-    static final int JUMP_MEDIUM_FRAME_HEIGHT = 414;
+    static final int JUMP_MEDIUM_FRAME_WIDTH = 632;
+    static final int JUMP_MEDIUM_FRAME_HEIGHT = 415;
     static final int JUMP_MEDIUM_ROOT_X = 245;
     static final int JUMP_MEDIUM_ROOT_Y = 380;
     static final int JUMP_MEDIUM_FRAME_COUNT = 22;
@@ -3826,10 +3826,10 @@ final class GeneratedSpriteLayouts {
     static final int LAND_SET_ROOT_Y = 457;
     static final int LAND_SET_FRAME_COUNT = 9;
 
-    static final int MEDIUM_KICK_FRAME_WIDTH = 605;
-    static final int MEDIUM_KICK_FRAME_HEIGHT = 540;
+    static final int MEDIUM_KICK_FRAME_WIDTH = 466;
+    static final int MEDIUM_KICK_FRAME_HEIGHT = 475;
     static final int MEDIUM_KICK_ROOT_X = 177;
-    static final int MEDIUM_KICK_ROOT_Y = 524;
+    static final int MEDIUM_KICK_ROOT_Y = 459;
     static final int MEDIUM_KICK_FRAME_COUNT = 18;
 
     static final int RISE_SET_FRAME_WIDTH = 335;
@@ -3844,16 +3844,16 @@ final class GeneratedSpriteLayouts {
     static final int SHINKAI_ATIVA_ROOT_Y = 580;
     static final int SHINKAI_ATIVA_FRAME_COUNT = 26;
 
-    static final int SPECIAL_S2_SET_FRAME_WIDTH = 658;
+    static final int SPECIAL_S2_SET_FRAME_WIDTH = 375;
     static final int SPECIAL_S2_SET_FRAME_HEIGHT = 652;
-    static final int SPECIAL_S2_SET_ROOT_X = 330;
+    static final int SPECIAL_S2_SET_ROOT_X = 189;
     static final int SPECIAL_S2_SET_ROOT_Y = 615;
     static final int SPECIAL_S2_SET_FRAME_COUNT = 28;
 
-    static final int SPECIAL_S3_SET_FRAME_WIDTH = 998;
-    static final int SPECIAL_S3_SET_FRAME_HEIGHT = 650;
-    static final int SPECIAL_S3_SET_ROOT_X = 233;
-    static final int SPECIAL_S3_SET_ROOT_Y = 613;
+    static final int SPECIAL_S3_SET_FRAME_WIDTH = 662;
+    static final int SPECIAL_S3_SET_FRAME_HEIGHT = 602;
+    static final int SPECIAL_S3_SET_ROOT_X = 274;
+    static final int SPECIAL_S3_SET_ROOT_Y = 591;
     static final int SPECIAL_S3_SET_FRAME_COUNT = 44;
 
     static final int SPECIAL_S4_SET_FRAME_WIDTH = 499;

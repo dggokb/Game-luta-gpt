@@ -2,7 +2,7 @@
   "id": "player_base_jump_heavy_down",
   "javaName": "JUMP_HEAVY_DOWN",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized.png",
+  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_heavy_down.webp",
   "report": "tools/sprites/reports/player_base_jump_heavy_down.report.json",
   "preview": "android/app/build/sprite-review/jump_heavy_down-import.png",
@@ -114,5 +114,19 @@
         -13.83
       ]
     ]
+  },
+  "smear": {
+    "fonte": "art/sprites/source/player_base_jump_heavy_down_video_normalized.png",
+    "quadros": [
+      10,
+      11
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "9=8,10=13,11=13,12=13"
   }
 }
