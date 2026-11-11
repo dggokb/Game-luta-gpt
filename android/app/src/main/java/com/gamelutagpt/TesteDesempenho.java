@@ -28,5 +28,34 @@ final class TesteDesempenho {
      */
     static boolean openGl = true;
 
+    /**
+     * A luz do impacto no corpo dos lutadores (motores de luz 3 e 4, só no OpenGL), para o dono
+     * comparar no aparelho (botão LUZ do Modo Teste): desligada (como era antes); com a normal da
+     * silhueta (só a borda do corpo sabe para onde aponta); com o normal map da folha (o miolo
+     * ganha volume; lutador sem mapa usa a silhueta); e o normal map com a luz em dois tons
+     * chapados. No PC, {@code -Dgameluta.luz=off|silhueta|normal|faixas} ({@code -Pluz=...}).
+     */
+    static final int LUZ_OFF = 0, LUZ_SILHUETA = 1, LUZ_NORMAL = 2, LUZ_FAIXAS = 3;
+    static volatile int luz = luzInicial();
+
+    private static int luzInicial() {
+        String v = System.getProperty("gameluta.luz", "normal");
+        switch (v) {
+            case "off": return LUZ_OFF;
+            case "silhueta": return LUZ_SILHUETA;
+            case "faixas": return LUZ_FAIXAS;
+            default: return LUZ_NORMAL;
+        }
+    }
+
+    static String luzRotulo() {
+        switch (luz) {
+            case LUZ_OFF: return "LUZ OFF";
+            case LUZ_SILHUETA: return "LUZ SILH.";
+            case LUZ_FAIXAS: return "LUZ FAIXAS";
+            default: return "LUZ NORMAL";
+        }
+    }
+
     private TesteDesempenho() {}
 }

@@ -1,7 +1,7 @@
 {
   "id": "player_base_heavy_straight",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_heavy_straight_video_normalized_smear_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -613,11 +613,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "fecf22c54e8465dd4fe13527f25f61ac6dc1b10f9bb048f9c1679758124a2f60",
-      "config": "20a15672cc8caf3a3c466bdeb33ec8097d2bea4f4a549bae5d0695f2f987c9e6",
+      "source": "8b57424d2f30d9e4a6d10f7f5cac683ff6ff1bdaa1fe30a22be50b62b3a23987",
+      "config": "0834dbfa2f35a8ee6029f2a69902bf7b128ede0c71bee4f514ab8ba418bc96bd",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png": "fecf22c54e8465dd4fe13527f25f61ac6dc1b10f9bb048f9c1679758124a2f60",
       "art/sprites/source/player_base_heavy_video_normalized.png": "6c4a8f93fd52fb95bec52052619b2f4d65fd0b3dfc372680e6a4b762821ceaa8",
       "art/sprites/source/player_base_heavy_straight_video_normalized.png": "6817aca2106d5a03b0ef2c5a428b3c26fbd34a548e328eb78e3441fcb5b7a8ca"
     }

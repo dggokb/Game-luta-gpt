@@ -45,6 +45,8 @@ final class SpriteAtlasCache {
          * comum (1/{@link #AMOSTRA} do lado) para medir a cor da roupa. Null nas outras.
          */
         Bitmap amostra;
+        /** O normal map da folha ({@link Normal}), ou null: a luz local usa a silhueta. */
+        Normal normal;
         Folha(Bitmap bitmap,float escalaX,float escalaY) {
             this.bitmap=bitmap;this.escalaX=escalaX;this.escalaY=escalaY;
             bytes=bitmap.getByteCount();naPlaca=naPlacaDeVideo(bitmap);
@@ -52,6 +54,19 @@ final class SpriteAtlasCache {
         /** Só está no OpenGL: o bitmap foi solto depois de subir ({@link DesenhoGl}). */
         boolean soNoOpenGl() {return bitmap.isRecycled();}
         boolean inteira() {return escalaX==1f&&escalaY==1f;}
+    }
+
+    /**
+     * O normal map de uma folha (motor 4 de luz, tools/sprites/normal_map.py): para onde cada
+     * ponto do corpo aponta, a 1/4 do lado da folha, com o mesmo desenho de caixas. Dois bytes por
+     * ponto (x para a direita e y para baixo da imagem; 128 é zero; o z o shader refaz): 1/32 da
+     * memória da folha. Fica na memória comum e sobe para a placa de vídeo quando uma luz acende
+     * um quadro da folha ({@link GlRenderCanvas}).
+     */
+    static final class Normal {
+        final byte[] xy;
+        final int largura,altura;
+        Normal(byte[] xy,int largura,int altura) {this.xy=xy;this.largura=largura;this.altura=altura;}
     }
 
     /**
@@ -446,6 +461,24 @@ final class SpriteAtlasCache {
         synchronized(trava) { return bytesProntos; }
     }
 
+    /** Bytes dos normal maps das folhas prontas (na memória comum). */
+    long bytesNormais() {
+        long n=0;
+        synchronized(trava) {
+            for(Entrada e:folhas.values()) if(e.folha!=null&&e.folha.normal!=null)n+=e.folha.normal.xy.length;
+        }
+        return n;
+    }
+
+    /** Quantas folhas prontas têm normal map. */
+    int folhasComNormal() {
+        int n=0;
+        synchronized(trava) {
+            for(Entrada e:folhas.values()) if(e.folha!=null&&e.folha.normal!=null)n++;
+        }
+        return n;
+    }
+
     /** Folhas prontas: {na placa de vídeo, na memória comum} (o diagnóstico do contador de FPS). */
     int[] ondeEstao() {
         int[] n=new int[2];
@@ -662,7 +695,42 @@ final class SpriteAtlasCache {
             BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;o.inSampleSize=AMOSTRA;
             folha.amostra=BitmapFactory.decodeResource(context.getResources(),id,o);
         }
+        // O normal map só serve à luz local do OpenGL: com o OPENGL desligado no Modo Teste a folha
+        // fica sem ele. (As folhas de quem abre o jogo são decodificadas antes de a luta escolher o
+        // desenho, por isso a chave é a do botão, não a da luta de agora.)
+        if(TesteDesempenho.openGl)folha.normal=normalDe(a);
         return folha;
+    }
+
+    /**
+     * O normal map gravado ao lado da folha ({@code <folha>_n}: cinza, o x na metade esquerda e o
+     * y na direita), ou null se ela não tem.
+     */
+    private Normal normalDe(CharacterDefinition.Atlas a) {
+        int id=context.getResources().getIdentifier(a.resource+"_n","drawable",context.getPackageName());
+        if(id==0)return null;
+        BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;
+        Bitmap b=BitmapFactory.decodeResource(context.getResources(),id,o);
+        if(b==null)return null;
+        int w=b.getWidth()/2,h=b.getHeight();
+        // A folha foi refeita com outro tamanho e o mapa ficou o antigo: melhor sem mapa (a
+        // silhueta) do que a normal de outro desenho. Refazer com tools/sprites/normal_map.py.
+        if(w!=(a.sheetWidth+3)/4||h!=(a.sheetHeight+3)/4) {
+            android.util.Log.w(MedicaoCarregamento.TAG,"normal map de "+a.resource+" não é desta folha ("+w+"x"+h+"); ignorado");
+            b.recycle();
+            return null;
+        }
+        int[] linha=new int[w*2];
+        byte[] xy=new byte[w*h*2];
+        for(int y=0;y<h;y++) {
+            b.getPixels(linha,0,w*2,0,y,w*2,1);
+            for(int x=0;x<w;x++) {
+                xy[(y*w+x)*2]=(byte)(linha[x]>>8);
+                xy[(y*w+x)*2+1]=(byte)(linha[w+x]>>8);
+            }
+        }
+        b.recycle();
+        return new Normal(xy,w,h);
     }
 
     /**

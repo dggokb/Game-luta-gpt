@@ -2395,6 +2395,7 @@ public class GameView extends SurfaceView
                 case PERF_GRAFICOS: return "GRÁF " + qualidade.rotulo(t -> t);
                 case PERF_FOLHAS: return SpriteAtlasCache.placaPermitida ? "FOLHAS GPU" : "FOLHAS RAM";
                 case PERF_EFEITOS: return TesteDesempenho.efeitos ? "EFEITOS ON" : "EFEITOS OFF";
+                case PERF_LUZ: return TesteDesempenho.luzRotulo();
                 case PERF_CENARIO:
                     return !TesteDesempenho.cenario ? "CENÁRIO OFF"
                         : TesteDesempenho.cenarioSemEnfeites ? "CENÁRIO SEM ENF." : "CENÁRIO ON";
@@ -2413,6 +2414,7 @@ public class GameView extends SurfaceView
                 case PERF_GRAFICOS: return qualidade.nivel() == QualidadeGrafica.ALTO;
                 case PERF_FOLHAS: return SpriteAtlasCache.placaPermitida;
                 case PERF_EFEITOS: return TesteDesempenho.efeitos;
+                case PERF_LUZ: return TesteDesempenho.luz != TesteDesempenho.LUZ_OFF;
                 case PERF_CENARIO: return TesteDesempenho.cenario && !TesteDesempenho.cenarioSemEnfeites;
                 case PERF_HUD: return TesteDesempenho.hud;
                 case PERF_MSGS: return TesteDesempenho.mensagens;
@@ -5646,7 +5648,7 @@ public class GameView extends SurfaceView
             vaga = efeitos.tocarDurando(nome, ox, oy, escala, esquerda, duracao, angulo);
             // A luz do impacto no corpo de quem bate e de quem apanha (motor 3).
             int f2 = Math.min(LUZ_IMPACTO_RAIO.length - 1, superGolpe ? LUZ_IMPACTO_RAIO.length - 1 : forca);
-            if (LUZ_DO_IMPACTO) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao);
+            if (TesteDesempenho.luz != TesteDesempenho.LUZ_OFF) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao * LUZ_DURA);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
@@ -5654,8 +5656,15 @@ public class GameView extends SurfaceView
         return true;
     }
 
-    /** O impacto acende a luz local (motor 3): desligado até o dono aprovar no vídeo (luz_local_impacto.mp4). */
-    private static final boolean LUZ_DO_IMPACTO = false;
+    /**
+     * O impacto acende a luz local (motores 3 e 4): o modo é o do botão LUZ do Modo Teste
+     * ({@link TesteDesempenho#luz}). Só para gravar no PC: {@code -Dgameluta.luzDura=N}
+     * ({@code -PluzDura=N}) estica a duração N vezes, para ver a luz depois que o efeito some, e
+     * {@code -Dgameluta.luzFixa=true} ({@code -PluzFixa=1}) a deixa na força cheia enquanto dura
+     * (sem subir nem apagar), para comparar dois quadros com a mesma luz.
+     */
+    private static final float LUZ_DURA = Math.max(1f, Float.parseFloat(System.getProperty("gameluta.luzDura", "1")));
+    private static final boolean LUZ_FIXA = Boolean.getBoolean("gameluta.luzFixa");
     /** A luz local de cada força de impacto (fraco, médio, forte, especial): raio (px do mundo), cor e força. */
     private static final float[] LUZ_IMPACTO_RAIO = {170f, 230f, 300f, 340f};
     private static final int[] LUZ_IMPACTO_COR = {0xFFE2A8, 0xFFC870, 0xFF9A3C, 0xFFB050};
@@ -6084,12 +6093,14 @@ public class GameView extends SurfaceView
         if (dur <= 0 || luzForca[i] <= 0f) return 0f;
         float t = (engine.frame() - luzInicio[i]) / (float)dur;
         if (t < 0f || t >= 1f) return 0f;
+        if (LUZ_FIXA) return luzForca[i];
         float k = t < 0.15f ? t / 0.15f : (1f - t) / 0.85f;
         return luzForca[i] * k * k;
     }
 
     /** Liga no OpenGL a luz local mais forte sobre {@code f}; false se nenhuma chega nele. */
     private boolean luzNoCorpo(CanvasGl c, DesenhoGl gl, CombatFighter f) {
+        if (TesteDesempenho.luz == TesteDesempenho.LUZ_OFF) return false;
         float cx = f.x, cy = fighterVisualY(f) - f.character().visualStandHeight * 0.5f;
         int melhor = -1;
         float forte = 0f;
@@ -7096,6 +7107,13 @@ public class GameView extends SurfaceView
                     break;
                 case PERF_EFEITOS:
                     TesteDesempenho.efeitos = !TesteDesempenho.efeitos;
+                    break;
+                case PERF_LUZ:
+                    // A luz do impacto no corpo: NORMAL (normal map) → FAIXAS → OFF → SILHUETA → NORMAL.
+                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_NORMAL ? TesteDesempenho.LUZ_FAIXAS
+                        : TesteDesempenho.luz == TesteDesempenho.LUZ_FAIXAS ? TesteDesempenho.LUZ_OFF
+                        : TesteDesempenho.luz == TesteDesempenho.LUZ_OFF ? TesteDesempenho.LUZ_SILHUETA
+                        : TesteDesempenho.LUZ_NORMAL;
                     break;
                 case PERF_CENARIO:
                     // ON → SEM ENFEITES (as camadas, sem brilhos, neblina, reflexos e pétalas) → OFF → ON.
