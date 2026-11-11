@@ -32,6 +32,11 @@ import com.gamelutagpt.render.RenderImage;
  * ficam sem.
  */
 final class RastroDoGolpe {
+    /**
+     * Desligado pelo dono (11/11): os rastros passam a ser desenhados à mão na arte de cada golpe
+     * (o primeiro é o chute forte do Ryūga, p01). O código e a textura ficam; para voltar, true.
+     */
+    static final boolean LIGADO = false;
     private static final String FORMA = "rastro_forma";
     /** Quadros de jogo por passo da erosão e do ruído (5: 12 desenhos por segundo, o degrau do anime). */
     private static final int PASSO = 5;
@@ -115,6 +120,7 @@ final class RastroDoGolpe {
 
     /** Um passo da luta: {@code x} é onde o lutador {@code i} está desenhado (com a troca de dupla). */
     void passo(int i, CombatFighter f, float x) {
+        if (!LIGADO) return;
         Lado l = lados[i];
         CharacterDefinition.Animation a = f.attacking() && f.attack != null ? CombatEngine.desenhoDoGolpe(f) : null;
         if (a == null || a.caminhoGolpe == null) {
