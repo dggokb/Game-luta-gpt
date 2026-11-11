@@ -4434,11 +4434,8 @@ public class GameView extends SurfaceView
             confronto.desenharFundo(canvas);
             // A cena em vídeo da cinemática: os dois lutadores num vídeo só, no lugar deles.
             cenaEmVideo = cenaVideo.pronta(cinematica.video());
-            // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
-            canvas.save();
-            canvas.translate(tagOffset(), 0f);
-            drawContactShadow(canvas, spriteFighterRenderer, player());
-            canvas.restore();
+            // Sem a sombra de contato (a elipse escura nos pés): o dono quer só a sombra do motor
+            // (drawCastShadows, a silhueta deitada do stage.json "sombraLutadores"), 11/11.
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
@@ -4686,7 +4683,7 @@ public class GameView extends SurfaceView
     private void drawCastShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX,
                                 com.gamelutagpt.stage.StageDefinition.FighterShadow sombra) {
         if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || renderer.override() != null) return;
-        // No alto do pulo a sombra clareia (como a de contato).
+        // No alto do pulo a sombra clareia.
         float altura = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - altura / SHADOW_FADE_HEIGHT, 0.25f, 1f);
         if (sombra.focos.isEmpty()) {
@@ -4919,8 +4916,6 @@ public class GameView extends SurfaceView
         // No 2x2 o parceiro do CPU entra correndo depois do KO, como na troca.
         c.save();
         c.translate(engine.teams.tagOffset(OPPONENT), 0f);
-        drawContactShadow(c, opponentSpriteRenderer, npc);
-
         drawFighter(c, opponentSpriteRenderer, npc, false, false);
         c.restore();
 
@@ -6808,22 +6803,6 @@ public class GameView extends SurfaceView
 
     /** Altura (pixels do mundo) em que a sombra de contato chega ao menor e mais clara. */
     private static final float SHADOW_FADE_HEIGHT = 420f;
-
-    /**
-     * Sombra de contato no chão: encolhe e clareia com a altura (lê o pulo e o pouso) e abre
-     * junto com o achatar da aterrissagem. Dura (borda seca, sem degradê) e escura puxada para o
-     * roxo, como a mancha chapada embaixo do lutador nas referências: prende o
-     * corpo no chão.
-     */
-    private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
-        if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || cenaEmVideo) return;
-        float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
-        float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
-        float half = 60f * k * renderer.animacao.pose().escalaX;
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(Math.round(190 * k), 22, 14, 38));
-        c.drawOval(f.x - half, GROUND_Y - 12f * k, f.x + half, GROUND_Y + 12f * k, paint);
-    }
 
     private void drawControls(Canvas c) {
         hud.drawControls(c, hudState);
