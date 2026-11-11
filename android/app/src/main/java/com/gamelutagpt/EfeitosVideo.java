@@ -80,6 +80,8 @@ final class EfeitosVideo {
     /** Efeito que anda (px do mundo por passo) e repete os quadros até {@link #fimMs} (-1: toca uma vez). */
     private final float[] vx = new float[VAGAS], fimMs = new float[VAGAS];
     private final boolean[] espelhado = new boolean[VAGAS];
+    /** O efeito vai atrás dos lutadores (a fumaça do pulo), não na frente. */
+    private final boolean[] atras = new boolean[VAGAS];
     private final Map<Integer, android.graphics.ColorFilter> tintas = new HashMap<>();
     /** O comprimento do caminho até cada ponto da fita (rascunho de {@link #fita}). */
     private float[] percorrido = new float[80];
@@ -210,6 +212,7 @@ final class EfeitosVideo {
         y[i] = py;
         escala[i] = tamanho;
         espelhado[i] = espelhar;
+        atras[i] = false;
         angulo[i] = 0f;
         idadeMs[i] = 0f;
         vx[i] = 0f;
@@ -390,12 +393,26 @@ final class EfeitosVideo {
         return true;
     }
 
+    /** O último efeito tocado vai atrás dos lutadores ({@link #desenharAtras}). */
+    void atrasDosLutadores() {
+        atras[ultima] = true;
+    }
+
     /** Desenha no espaço do mundo (o canvas já com a câmera), do mais velho para o mais novo. */
     void desenhar(Canvas c) {
+        desenhar(c, false);
+    }
+
+    /** Os efeitos que vão atrás dos lutadores: chamado antes de desenhar os lutadores. */
+    void desenharAtras(Canvas c) {
+        desenhar(c, true);
+    }
+
+    private void desenhar(Canvas c, boolean camadaAtras) {
         for (int j = 0; j < VAGAS; j++) {
             int i = (proxima + j) % VAGAS;
             Folha f = tocando[i];
-            if (f == null) continue;
+            if (f == null || atras[i] != camadaAtras) continue;
             float idade = fimMs[i] >= 0f && f.duracaoMs() > 0f ? idadeMs[i] % f.duracaoMs() : idadeMs[i];
             int q = f.quadroEm(idade);
             if (q < 0) continue;

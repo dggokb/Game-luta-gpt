@@ -378,6 +378,18 @@ quadro espelhado dentro da própria nuvem: continua nascendo no pé e indo para 
 viradas para quem corre). Aprovado com "deixa 15% menor e põe no jogo": escala 0,51 (era 0,60), e
 o `poeiraDoMotor` toca a V05 (a V04 e a `poeira_corrida` ficam de reserva).
 
+## Fumaça do pulo e do super pulo, desenhada pelo dono (11/11)
+
+`art/vfx/super_pulo_v01`: duas imagens de 2 × 2 quadros (`folha_1.png`, `folha_2.png`; o recorte
+deixou resíduo de alfa 1 em volta, zerado abaixo de 20). Os 8 quadros em `frames/` estão alinhados
+pela base da nuvem (o meio da faixa de baixo em x = 380, o chão em y = 720) e espelhados ("tá
+virado"). Folha: `efeito_video.py art/vfx/super_pulo_v01/frames --nome super_pulo_v01 --fps 20
+--origem 380,720 --escala-mundo 0.55`. Toca na saída do super pulo (no lugar da `super_pulo`) e,
+em teste, no pulo comum a 60% (`PULO_COMUM_ESCALA`, no lugar da `fumaca_pulo`); espelha quando o
+lutador olha para a esquerda. "Ele fica atrás do personagem": o EfeitosVideo ganhou a camada de
+trás (`atrasDosLutadores()` / `desenharAtras`, desenhada antes dos lutadores) e a fumaça do pulo vai
+nela.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
