@@ -95,6 +95,7 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
 | Vídeo em fundo verde | `tools/sprites/efeito_video.py` |
 | Textura da fita do rastro | `tools/sprites/rastro_fita.py` |
 | Caminho de cada golpe | `tools/sprites/linha_de_acao.py --write --folha <prefixo>`, depois `build_characters.py --write` |
+| Normal map de uma folha de lutador (motor 4 de luz, desligado) | `tools/sprites/normal_map.py <id ou folha>`; ver "Motor de luz 4" no `docs/vfx-continuar.md` |
 | Smear (o membro esticado na arte; troca de desenho com efeito do vídeo) | `tools/sprites/smear.py <id> <GOLPE> [--trocar 4=8] [--comprimento 1.2,1.0]`, depois `build_characters.py --write` |
 
 Os nomes que a luta toca estão em `GameView.efeitoDeGolpe` e nas tabelas do

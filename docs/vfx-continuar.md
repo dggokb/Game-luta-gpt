@@ -517,6 +517,91 @@ Script: `art/vfx/effectcraft/impactos_v06_ec.py`; folhas com `--origem 210,260 -
 golpe baixo continua com `impacto_ar_baixo`. Vídeo:
 `android/app/build/sprite-review/impactos_v06_fraco_medio_forte_no_jogo.mp4`.
 
+## Motor de luz 4 (11/11): normal map nos lutadores, tirado do próprio desenho
+
+Pedido (`docs/prompt-fable-normal-map.md`): a luz local do motor 3 só sabe a borda do corpo; dar
+aos lutadores uma normal de verdade por quadro, sem dobrar a memória. **Desligado no jogo; os
+mapas não estão na branch.** Falta o dono aprovar nos vídeos
+(`android/app/build/sprite-review/normal_map_antes_depois.mp4` e
+`normal_map_luz_macia_x_faixas.mp4`).
+
+**1. De onde vem a normal.** Sete jeitos nos mesmos quadros (Ryūga, Kōga, p08, p12, p13, p15):
+
+| Jeito | O que deu |
+|---|---|
+| Silhueta borrada (o motor 3) | só a borda; o miolo é chapado |
+| Luminância como relevo (Laigter / SpriteIlluminator) | não serve em arte pintada: o traço vira sulco e a cor da roupa vira degrau (a "cara de metal" do Sandfox) |
+| Silhueta estufada (Lumo) | um travesseiro: braço na frente do tronco não aparece |
+| Estufada por regiões de tinta | cada linha vira vinco; treme mais e não acerta o que está na frente |
+| Depth Anything V2 (profundidade → normal) | degraus duros entre as partes e inclinação exagerada |
+| **Metric3D v2 ViT-small** (estima a normal direto; ONNX, na CPU) | **volume de verdade**: perna na frente do tronco, braço, peito, rosto, dobra da calça, em formas grandes |
+| Sapiens 0.3b (só corpo humano) | mais detalhe (rosto, tecido), porém ruidoso, 14 s por quadro (20× mais lento) e precisa do PyTorch |
+
+Ficou o Metric3D, com três arrumações na ferramenta (`tools/sprites/normal_map.py`):
+
+- **No tempo.** O modelo olha um quadro por vez e a normal treme de um para o outro: no idle do
+  Ryūga, 5,2° onde o desenho não mudou (a silhueta treme 1,5°). Misturando cada quadro com os
+  dois vizinhos de cada lado só onde a cor é a mesma, o mapa final fica em 2,5° (Kōga: 3,3° contra
+  2,2° da silhueta).
+- **Só as formas grandes**: borrão de 1,2% da altura.
+- **A borda vem da silhueta** (até 3% da altura do contorno). Numa medida de 0 a 1 (1 = a borda
+  inteira aponta para fora do corpo), o modelo sozinho dá 0,65 e o mapa final 0,99.
+
+**2. Memória** (medido: a dupla da gravação tem 1.359 MB em 125 folhas, sem compressão):
+
+| Mapa | Erro contra a normal inteira | Diferença na luz (níveis de 255) | Memória |
+|---|---|---|---|
+| 1/2 do lado, 2 canais de 8 bits | 0,6° | 0,35 média, 2,9 no pior 1% | 1/8 da folha |
+| **1/4, 2 canais de 8 bits** | 1,7° | 1,0 média, 7 no pior 1% | **1/32: +42 MB na luta (3,1% de 1.359, pela conta)** |
+| 1/8, 2 canais de 8 bits | 4,1° | 2,5 média, 15 no pior 1% | 1/128: +11 MB |
+| 1/16 | 8,8° | 5,2 média, 30 no pior 1% | não vale |
+
+Ficou 1/4 com x e y em 8 bits (`GL_RG8`; o z o shader refaz). As caixas da folha são múltiplas de
+4, então o mapa tem o mesmo desenho de caixas dividido por 4 e usa o mesmo uv. Ryūga: 689 MB de
+folhas, 21,5 MB de mapas. 4 ou 5 bits por canal economizariam pouco e pioram; compressão de
+textura (EAC RG11) cortaria pela metade de novo, mas pede um codificador a mais: não fiz.
+O mapa fica na memória comum (2 bytes por ponto) e só sobe para a placa quando uma luz acende
+um quadro daquela folha.
+
+**No APK**: o arquivo é um WebP cinza com o x na metade esquerda e o y na direita. Com x e y em
+vermelho e verde o WebP com perda errava 28° (ele guarda mal a cor); em cinza, qualidade 90, erra
+1,4° e pesa 6,2% do arquivo da folha (Ryūga: 2,7 MB sobre 43,6; para o elenco inteiro a conta dá
+perto de +22 MB sobre 352). Sem perda seriam 17%.
+
+**3. No shader** (`GlRenderCanvas`): com mapa, a luz local lê a normal dele (uma leitura, meio
+ponto do mapa para dentro do retângulo do quadro, para não misturar com o quadro vizinho) no
+lugar dos 16 vizinhos da silhueta; sem mapa, vale a silhueta como antes. O mesmo programa e o
+mesmo lote: o número da textura do mapa vai no pacote do filtro do quadro, que já existia. Tudo
+atrás de `SpriteAtlasCache.NORMAIS` (`-Dgameluta.normal=true`, que no celular não existe):
+desligado, o texto do shader é idêntico ao de antes (comparado byte a byte) e nenhum mapa é
+carregado. Os três textos (desligado, ligado, faixas) passam no `glslangValidator` como GLSL ES 3.00.
+
+**Luz em faixas** (`-PluzFaixas=1`, só para o dono comparar): com a conta de luz do motor 3 o
+ganho do mapa é discreto (a luz deixa de lavar o braço por igual e passa a seguir o músculo e o
+rosto). Uma conta mais rasante, em dois tons chapados de borda curta (a sombra de anime), mostra
+mais a forma. É escolha de visual, dele.
+
+**Gravar** (os mapas têm de estar ao lado das folhas, em `res/drawable-nodpi`):
+
+```
+python3 tools/sprites/normal_map.py player_base p03      # ~0,8 s por quadro; o elenco (12.174 quadros) ~2,7 h
+cd android && rm -rf pc/build/gravar-luta
+xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=1 -PluzDura=6 -Pnormal=1 \
+    -Pgraficos=ALTO -Presolucao=1920x1080 -Proteiro="segura:D espera:1.8 solta:D grava:44:g tecla:L fim"
+```
+
+`-Pluz=1` liga a luz do impacto (motor 3), `-PluzDura=N` a estica, `-PluzFixa=1` a deixa na força
+cheia, `-Pnormal=1` usa os mapas, `-PnormalAlterna=1` alterna silhueta e mapa a cada quadro (dois
+quadros seguidos com a mesma pose, para comparar parado) e `-Pgraficos=ALTO` impede o nível
+gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar a 17,5 por segundo
+(não a 22). Com o processador ocupado o jogo anda lento e o golpe erra.
+
+**O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
+custo); só Ryūga e Kōga têm mapa (88 folhas, guardadas na branch da sessão
+`ccr-97c05bd0-68tbpv`); a luz do cenário (tom, degradê, contraluz) continua sem usar a normal; a
+licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
+ser conferida antes de um lançamento comercial.
+
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 
 Pedido do dono: "aplica os effects nele e põe". `art/vfx/effectcraft/acerto_forte_05_ec.py` corta a

@@ -36,6 +36,9 @@ final class GlRenderCanvas implements RenderCanvas {
         final int largura, altura;
         final long bytes;
         boolean repetir;
+        /** A textura do normal map desta folha (0: não tem ou ainda não subiu) e os bytes dela. */
+        int normal;
+        long bytesNormal;
 
         Textura(Bitmap bitmap, ReferenceQueue<Bitmap> fila, int id, int largura, int altura, long bytes) {
             super(bitmap, fila);
@@ -67,6 +70,38 @@ final class GlRenderCanvas implements RenderCanvas {
     // mesmo com a forma numa textura própria (uTex: o texto grande, fora da textura dos textos). Cores já multiplicadas pelo
     // alfa. O filtro vale só para imagem e trabalha na cor sem o alfa multiplicado, como o
     // ColorMatrix do Android. O recorte são semiplanos em pixels da janela (y para cima).
+    /**
+     * Motor 4 de luz: a normal da luz local vem do normal map da folha (tools/sprites/normal_map.py,
+     * {@link SpriteAtlasCache.Normal}) quando ela tem um, e o miolo do corpo ganha volume. O mapa
+     * tem 1/4 do lado da folha com as mesmas caixas: a leitura fica meio ponto do mapa para dentro
+     * do retângulo do quadro, para não misturar com o quadro vizinho. Sem mapa (uNormalLiga 0)
+     * vale a silhueta borrada. Só entra no shader com {@link SpriteAtlasCache#NORMAIS} ligado: desligado, o
+     * texto do shader é o mesmo de antes.
+     */
+    private static final String NORMAL_UNIFORMS = !SpriteAtlasCache.NORMAIS ? ""
+        : "uniform sampler2D uNormal; uniform float uNormalLiga;\n";
+    /**
+     * A conta da luz local. A de sempre: luz macia (n·l, caindo com a distância). Com
+     * {@code -Dgameluta.luzFaixas=true} ({@code -PluzFaixas=1}, só no PC, para o dono comparar no
+     * vídeo): luz mais rasante e em dois tons chapados de borda curta, como a sombra de anime; com
+     * o normal map ela desenha a forma do músculo, e some encolhendo quando a luz apaga.
+     */
+    private static final String LUZ_LOCAL_CONTA = !Boolean.getBoolean("gameluta.luzFaixas")
+        ? "        float lam = max(dot(n, normalize(vec3(dl, 0.35))), 0.0);\n" +
+          "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n"
+        : "        float lam = max(dot(n, normalize(vec3(dl, 0.15))), 0.0);\n" +
+          "        float kk = lam * cai * cai * uLocalCor.a * 1.3;\n" +
+          "        kk = uLocalCor.a * (0.45 * clamp((kk - 0.18) / 0.04, 0.0, 1.0) + 0.55 * clamp((kk - 0.42) / 0.04, 0.0, 1.0));\n" +
+          "        u.rgb = clamp(u.rgb + uLocalCor.rgb * kk * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n";
+    /** Com o mapa, os 16 vizinhos da silhueta não são lidos (uma leitura no lugar de 16). */
+    private static final String NORMAL_SEM_MAPA = !SpriteAtlasCache.NORMAIS ? ""
+        : "        if (uNormalLiga < 0.5)\n";
+    private static final String NORMAL_DO_MAPA = !SpriteAtlasCache.NORMAIS ? ""
+        : "        if (uNormalLiga > 0.5) {\n" +
+          "          highp vec2 meio = 0.5 / vec2(textureSize(uNormal, 0));\n" +
+          "          highp vec2 xy = texture(uNormal, clamp(vUv, uLuzRet.xy + meio, uLuzRet.zw - meio)).rg * 2.0 - 1.0;\n" +
+          "          n = vec3(xy, sqrt(max(1.0 - dot(xy, xy), 0.0)));\n" +
+          "        }\n";
     private static final String FRAGMENTOS =
         "#version 300 es\n" +
         "precision mediump float;\n" +
@@ -81,6 +116,7 @@ final class GlRenderCanvas implements RenderCanvas {
         // Luz local (uLocal: a luz em uv da folha e o raio dela em uv, nos dois eixos; uLocalCor: a
         // cor e a força, 0 desliga): o impacto acende o lado do corpo virado para ele.
         "uniform highp vec4 uLocal; uniform vec4 uLocalCor;\n" +
+        NORMAL_UNIFORMS +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
@@ -161,6 +197,7 @@ final class GlRenderCanvas implements RenderCanvas {
         "        highp vec2 asp = vec2(uLocal.z / uLocal.w, 1.0);\n" +
         "        highp float R = 0.07 * (uLuzRet.w - uLuzRet.y);\n" +
         "        highp vec2 g = vec2(0.0);\n" +
+        NORMAL_SEM_MAPA +
         "        for (int i = 0; i < 8; i++) {\n" +
         "          highp float an = float(i) * 0.785398;\n" +
         "          highp vec2 dr = vec2(cos(an), sin(an));\n" +
@@ -168,11 +205,11 @@ final class GlRenderCanvas implements RenderCanvas {
         "          g += dr * 0.5 * texture(uTex, clamp(vUv + dr * R * 0.5 * asp, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         "        }\n" +
         "        vec3 n = normalize(vec3(-g * 0.9, 1.0));\n" +
+        NORMAL_DO_MAPA +
         "        highp vec2 dl = (uLocal.xy - vUv) / uLocal.zw;\n" +
         "        float dist = length(dl);\n" +
         "        float cai = clamp(1.0 - dist, 0.0, 1.0);\n" +
-        "        float lam = max(dot(n, normalize(vec3(dl, 0.35))), 0.0);\n" +
-        "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n" +
+        LUZ_LOCAL_CONTA +
         "      }\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
         // Contorno: onde é transparente e um vizinho a uContornoR é corpo, um fio da cor por fora.
@@ -243,11 +280,11 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Um programa e onde ficam os uniforms dele. */
     private static final class Programa {
         int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
-        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor;
+        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor, uNormalLiga;
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
-    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor;
+    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor, uNormalLiga;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
@@ -324,6 +361,7 @@ final class GlRenderCanvas implements RenderCanvas {
         comandos = 0;
         vertices = posicao = inicioLote = 0;
         bytesTexturas = 0;
+        bytesNormais = 0;
     }
 
     private Programa programa(String fragmentos) {
@@ -351,6 +389,7 @@ final class GlRenderCanvas implements RenderCanvas {
         p.uContornoR = GLES30.glGetUniformLocation(p.id, "uContornoR");
         p.uLocal = GLES30.glGetUniformLocation(p.id, "uLocal");
         p.uLocalCor = GLES30.glGetUniformLocation(p.id, "uLocalCor");
+        p.uNormalLiga = SpriteAtlasCache.NORMAIS ? GLES30.glGetUniformLocation(p.id, "uNormalLiga") : -1;
         p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
         p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
         p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
@@ -358,6 +397,7 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glUniform1i(p.uTex, 0);
         GLES30.glUniform1i(p.uTexto, 1);
         GLES30.glUniform1i(p.uDegrade, 2);
+        if (SpriteAtlasCache.NORMAIS) GLES30.glUniform1i(GLES30.glGetUniformLocation(p.id, "uNormal"), 3);
         return p;
     }
 
@@ -368,7 +408,7 @@ final class GlRenderCanvas implements RenderCanvas {
         uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte; uTroca = p.uTroca;
         uLuz = p.uLuz; uLuzCor = p.uLuzCor; uLuzPes = p.uLuzPes; uLuzRet = p.uLuzRet;
         uContorno = p.uContorno; uContornoR = p.uContornoR;
-        uLocal = p.uLocal; uLocalCor = p.uLocalCor;
+        uLocal = p.uLocal; uLocalCor = p.uLocalCor; uNormalLiga = p.uNormalLiga;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
         GLES30.glUseProgram(p.id);
     }
@@ -385,6 +425,7 @@ final class GlRenderCanvas implements RenderCanvas {
 
     /** Começa o quadro numa tela de {@code largura}x{@code altura} pixels, preta, na tela virtual. */
     void comecar(int largura, int altura) {
+        quadroDaNormal++;
         textosNovosRc = 0;
         subidasDeTexto = 0;
         areaPintada = 0;
@@ -917,15 +958,27 @@ final class GlRenderCanvas implements RenderCanvas {
         if (quadro && m[K + 4] > 0f) {
             GLES30.glUniform4f(uLocal, m[K], m[K + 1], m[K + 2], m[K + 3]);
             GLES30.glUniform4f(uLocalCor, m[K + 5], m[K + 6], m[K + 7], m[K + 4]);
+            if (uNormalLiga >= 0) {
+                // O normal map da folha deste quadro (o número da textura veio no pacote).
+                int normal = (int)m[NORMAL];
+                GLES30.glUniform1f(uNormalLiga, normal != 0 ? 1f : 0f);
+                if (normal != 0) {
+                    GLES30.glActiveTexture(GLES30.GL_TEXTURE3);
+                    GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, normal);
+                    GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+                }
+            }
         } else {
             GLES30.glUniform4f(uLocalCor, 0f, 0f, 0f, 0f);
         }
     }
 
     /** O filtro com a luz já preparado para um quadro: + deslocamento (2), retângulo do quadro (4) e largura do contorno em uv (2). */
-    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 16;
+    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 17;
     /** A luz local no filtro do quadro: luz em uv (2), raio em uv (2), força, cor (3). */
     private static final int LOCAL = Filtro.COM_LUZ + 8;
+    /** Depois da luz local: a textura do normal map da folha do quadro (0: usa a silhueta). */
+    private static final int NORMAL = Filtro.COM_LUZ + 16;
     /** Filtro sem nada (a matriz identidade), para a luz local num lutador sem filtro. */
     private static final float[] SEM_FILTRO = new float[Filtro.COM_LUZ];
 
@@ -943,6 +996,55 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private float localX, localY, localRaio, localR, localG, localB, localForca;
+
+    /**
+     * O normal map da folha que vem a seguir (ou null): com a luz local ligada, a normal sai dele
+     * no lugar da silhueta. Sobe para a placa de vídeo na primeira vez que uma luz acende a folha.
+     */
+    void normal(SpriteAtlasCache.Normal n) {
+        normalAtual = n;
+    }
+
+    private SpriteAtlasCache.Normal normalAtual;
+    /**
+     * Para comparar no PC ({@code -Dgameluta.normalAlterna=true}, {@code -PnormalAlterna=1}): um
+     * quadro com a silhueta, o seguinte com o normal map. Na pausa do golpe os lutadores estão
+     * parados e dois quadros seguidos mostram a mesma pose dos dois jeitos.
+     */
+    private static final boolean NORMAL_ALTERNA = Boolean.getBoolean("gameluta.normalAlterna");
+    private int quadroDaNormal;
+
+    /** A textura do normal map da folha {@code t}, subindo agora se ainda não subiu; 0 sem mapa. */
+    private int normalDe(Textura t) {
+        SpriteAtlasCache.Normal n = normalAtual;
+        if (n == null || uNormalLiga < 0) return 0;
+        if (NORMAL_ALTERNA && (quadroDaNormal & 1) == 0) return 0;
+        if (t.normal != 0) return t.normal;
+        int[] id = new int[1];
+        GLES30.glGenTextures(1, id, 0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+        // Dois bytes por ponto: a linha não fecha em múltiplo de 4 quando a largura é ímpar.
+        GLES30.glPixelStorei(GLES30.GL_UNPACK_ALIGNMENT, 1);
+        java.nio.ByteBuffer pontos = java.nio.ByteBuffer.allocateDirect(n.xy.length);
+        pontos.put(n.xy).position(0);
+        GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RG8, n.largura, n.altura, 0, GLES30.GL_RG,
+            GLES30.GL_UNSIGNED_BYTE, pontos);
+        GLES30.glPixelStorei(GLES30.GL_UNPACK_ALIGNMENT, 4);
+        // O lote ainda não foi desenhado: quem descarrega liga a textura dele de novo.
+        if (texturaAtual != 0) GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texturaAtual);
+        t.normal = id[0];
+        t.bytesNormal = (long)n.xy.length;
+        bytesTexturas += t.bytesNormal;
+        bytesNormais += t.bytesNormal;
+        return t.normal;
+    }
+
+    /** Bytes dos normal maps na placa de vídeo agora (para a medida de memória). */
+    long bytesNormais;
     /** Largura da contraluz em fração da altura da tela. */
     static final float LARGURA_CONTRALUZ = 0.008f;
     /**
@@ -998,7 +1100,9 @@ final class GlRenderCanvas implements RenderCanvas {
         q[Filtro.COM_LUZ + 4] = Math.max(sl, sr) / t.largura - mu;
         q[Filtro.COM_LUZ + 5] = Math.max(st, sb) / t.altura - mv;
         q[LOCAL + 4] = 0f;
+        q[NORMAL] = 0f;
         if (local) {
+            q[NORMAL] = normalDe(t);
             // A luz da janela para o espaço do desenho (a inversa da matriz: o espelho vira junto)
             // e daí para uv da folha; o raio pela escala da matriz.
             float px = localX - e, py = localY - f;
@@ -1709,6 +1813,12 @@ final class GlRenderCanvas implements RenderCanvas {
         TesteAutomatico.gravacoesPerdidas(3);
         t.id = 0;
         bytesTexturas -= t.bytes;
+        if (t.normal != 0) {
+            GLES30.glDeleteTextures(1, new int[] {t.normal}, 0);
+            t.normal = 0;
+            bytesTexturas -= t.bytesNormal;
+            bytesNormais -= t.bytesNormal;
+        }
     }
 
     /** Sobe a imagem agora (antes de ela aparecer); false se ela já estava na placa. */
