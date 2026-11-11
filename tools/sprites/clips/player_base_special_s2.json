@@ -46,6 +46,9 @@
       1.0
     ],
     "ferramenta": "tools/sprites/smear.py",
-    "limpar": "todos"
+    "trocar": "6=8,7=8",
+    "limpar": "todos",
+    "antes": "6=5,7=5",
+    "semEscuro": true
   }
 }

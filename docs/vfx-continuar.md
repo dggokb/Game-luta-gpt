@@ -86,6 +86,10 @@ efeito que veio do vídeo (clarão, arco, rastro, fumaça, coluna de luz, membro
   no S3 em cada chute esticado (9, 14, 16, 20, 23, 29). Com o caminho, a faísca de dano dos
   especiais passa a nascer na ponta do punho ou do pé.
 - As línguas pegam cor só do desenho opaco (o halo meio transparente do vídeo sujava de verde).
+- S2 refeito "igual ao 2H" (pedido do dono): os desenhos 6 e 7 viram cópia do 8 (o braço limpo e
+  esticado para cima) e esticam a partir do agachamento (5): `--trocar 6=8,7=8 --antes 6=5,7=5`, mais
+  `--sem-escuro` (o braço passa na frente da regata preta, que virava língua escura). Um desenho
+  trocado passou a usar o ponto do caminho da pose nova, não o do borrão.
 - Visto nas folhas, quadro a quadro. `testarMotor`: só as 3 falhas antigas; build PASS. Celular e
   jogo: não vistos nesta correção.
 - Visto: as folhas quadro a quadro dos sete golpes, e no jogo (PC) o M e o 2H. Os do ar só na
@@ -440,6 +444,18 @@ você colocou invertido" → "curvas ao contrário": a folha sai de `frames_curv
 quadro espelhado dentro da própria nuvem: continua nascendo no pé e indo para trás, com as curvas
 viradas para quem corre). Aprovado com "deixa 15% menor e põe no jogo": escala 0,51 (era 0,60), e
 o `poeiraDoMotor` toca a V05 (a V04 e a `poeira_corrida` ficam de reserva).
+
+## Fumaça do pulo e do super pulo, desenhada pelo dono (11/11)
+
+`art/vfx/super_pulo_v01`: duas imagens de 2 × 2 quadros (`folha_1.png`, `folha_2.png`; o recorte
+deixou resíduo de alfa 1 em volta, zerado abaixo de 20). Os 8 quadros em `frames/` estão alinhados
+pela base da nuvem (o meio da faixa de baixo em x = 380, o chão em y = 720) e espelhados ("tá
+virado"). Folha: `efeito_video.py art/vfx/super_pulo_v01/frames --nome super_pulo_v01 --fps 20
+--origem 380,720 --escala-mundo 0.55`. Toca na saída do super pulo (no lugar da `super_pulo`) e,
+em teste, no pulo comum a 60% (`PULO_COMUM_ESCALA`, no lugar da `fumaca_pulo`); espelha quando o
+lutador olha para a esquerda. "Ele fica atrás do personagem": o EfeitosVideo ganhou a camada de
+trás (`atrasDosLutadores()` / `desenharAtras`, desenhada antes dos lutadores) e a fumaça do pulo vai
+nela.
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o

@@ -3514,7 +3514,11 @@ public class GameView extends SurfaceView
             if (f.superJumping && !superJumpSeen[i]) {
                 // Saída do super pulo: anel de choque e poeira nos pés, na cor do lutador.
                 float sx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
-                if (!efeitos.tocar("super_pulo", sx, GROUND_Y, 1f, false)) {
+                // A fumaça desenhada pelo dono (art/vfx/super_pulo_v01), quando existe.
+                String fumaca = efeitos.tem("super_pulo_v01") ? "super_pulo_v01" : "super_pulo";
+                if (efeitos.tocar(fumaca, sx, GROUND_Y, 1f, f.facing < 0)) {
+                    if (fumaca.equals("super_pulo_v01")) efeitos.atrasDosLutadores();
+                } else {
                     impacts.spawnSuperJump(sx, GROUND_Y, f.state.profile.color);
                 }
             }
@@ -4465,6 +4469,8 @@ public class GameView extends SurfaceView
                 drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
                 drawMechanicAura(canvas, player(), tagOffset());
             }
+            // A fumaça do pulo e do super pulo fica atrás dos lutadores (pedido do dono, 11/11).
+            efeitos.desenharAtras(canvas);
             drawEchoes(canvas);
             drawHenchmen(canvas);
             drawPartner(canvas);
@@ -5701,10 +5707,18 @@ public class GameView extends SurfaceView
      * Efeitos de vídeo do movimento (só quando o efeito existe): fumaça na decolagem e o arco do
      * golpe forte quando a janela ativa abre.
      */
+    /** O tamanho da fumaça do super pulo quando ela sai no pulo comum. */
+    private static final float PULO_COMUM_ESCALA = 0.6f;
+
     private void efeitosDeMovimento(int i, CombatFighter f) {
         float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
-            efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
+            // Teste do dono (11/11): a fumaça do super pulo, menor, também no pulo comum.
+            if (efeitos.tocar("super_pulo_v01", x, GROUND_Y, PULO_COMUM_ESCALA, f.facing < 0)) {
+                efeitos.atrasDosLutadores();
+            } else {
+                efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
+            }
         }
         // A queda: poeira quando o corpo bate no chão e quando assenta depois do quique.
         int fase = 0;
