@@ -1,7 +1,7 @@
 {
   "id": "player_base_crouch_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized.png",
+  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2H com o braco esquerdo, a partir de inicio_agachado: guarda agachada, sobe, topo do uppercut, volta a guarda. Escala pelo corpo agachado (0.535, igual ao 2M); quadros com borrao pulados.",
   "rootMode": "authored",
   "scale": 1,
@@ -62,46 +62,46 @@
     {
       "index": 4,
       "outputBbox": [
-        126,
-        196,
-        463,
+        140,
+        46,
+        433,
         670
       ],
       "minimumMargin": 34,
-      "opaquePixels": 81574
+      "opaquePixels": 76994
     },
     {
       "index": 5,
       "outputBbox": [
-        34,
+        140,
         46,
-        543,
-        674
+        433,
+        670
       ],
-      "minimumMargin": 30,
-      "opaquePixels": 105896
+      "minimumMargin": 34,
+      "opaquePixels": 76821
     },
     {
       "index": 6,
       "outputBbox": [
-        32,
+        140,
         46,
-        545,
-        677
+        433,
+        670
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 105434
+      "minimumMargin": 34,
+      "opaquePixels": 75797
     },
     {
       "index": 7,
       "outputBbox": [
-        134,
+        140,
         46,
-        437,
+        433,
         670
       ],
       "minimumMargin": 34,
-      "opaquePixels": 78591
+      "opaquePixels": 75797
     },
     {
       "index": 8,
@@ -238,184 +238,184 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 530,
-    "frameHeight": 647,
-    "rootX": 275,
+    "frameWidth": 338,
+    "frameHeight": 643,
+    "rootX": 181,
     "rootY": 616,
     "columns": 7,
     "frameCount": 20,
     "cropOffset": [
-      23,
+      117,
       38
     ],
-    "sheetWidth": 2344,
-    "sheetHeight": 1680,
+    "sheetWidth": 1340,
+    "sheetHeight": 2684,
     "frames": [
       [
-        672,
-        1284,
+        1008,
+        1920,
         328,
         360,
-        98,
+        4,
         269
       ],
       [
-        1676,
-        1284,
+        672,
+        2324,
         332,
         340,
-        98,
+        4,
         289
       ],
       [
-        2012,
-        1284,
+        1008,
+        2324,
         332,
         320,
-        98,
+        4,
         306
       ],
       [
-        1912,
-        644,
+        0,
+        1920,
         332,
         400,
-        98,
+        4,
         229
       ],
       [
-        1560,
-        644,
-        348,
-        488,
-        98,
-        152
+        0,
+        0,
+        304,
+        636,
+        18,
+        4
+      ],
+      [
+        308,
+        0,
+        304,
+        636,
+        18,
+        4
+      ],
+      [
+        616,
+        0,
+        304,
+        636,
+        18,
+        4
+      ],
+      [
+        924,
+        0,
+        304,
+        636,
+        18,
+        4
       ],
       [
         0,
-        0,
-        520,
         640,
-        6,
+        304,
+        636,
+        18,
         4
       ],
       [
-        524,
-        0,
-        524,
+        308,
         640,
-        4,
-        4
-      ],
-      [
-        1052,
-        0,
-        316,
-        636,
-        106,
-        4
-      ],
-      [
-        1372,
-        0,
         304,
         636,
-        112,
+        18,
         4
       ],
       [
-        1680,
-        0,
+        616,
+        640,
         304,
         636,
-        112,
+        18,
         4
       ],
       [
-        1988,
-        0,
-        304,
-        636,
-        112,
-        4
-      ],
-      [
-        0,
-        644,
+        924,
+        640,
         300,
         636,
-        112,
+        18,
         4
       ],
       [
-        304,
-        644,
+        0,
+        1280,
         300,
         636,
-        112,
+        18,
         4
       ],
       [
-        608,
-        644,
+        304,
+        1280,
         304,
         636,
-        112,
+        18,
         4
       ],
       [
-        916,
-        644,
+        612,
+        1280,
         312,
         616,
-        108,
+        14,
         25
       ],
       [
-        1232,
-        644,
+        928,
+        1280,
         324,
         552,
-        102,
+        8,
         85
       ],
       [
-        0,
-        1284,
+        336,
+        1920,
         332,
         396,
-        98,
+        4,
         234
       ],
       [
-        336,
-        1284,
+        672,
+        1920,
         332,
         372,
-        98,
+        4,
         258
       ],
       [
-        1004,
-        1284,
+        0,
+        2324,
         332,
         360,
-        98,
+        4,
         269
       ],
       [
-        1340,
-        1284,
+        336,
+        2324,
         332,
         360,
-        98,
+        4,
         269
       ]
     ],
     "decodedBytes": {
       "canonical": 34062336,
-      "grid": 28804440,
-      "packed": 15751680
+      "grid": 18256056,
+      "packed": 14386240
     },
     "pixelScale": 2.0
   },
@@ -423,8 +423,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "e638da4c12080ca9337199c89ffc994371f61310ac64222e24017c7c09bce9a8",
-      "config": "ef174dc26cfff2d8eee6287378d212f5e751ad6da654aa718ad0a34c8e4cb375",
+      "source": "660d4cb9a084c857a3ee54b76858d3713592f63c920b5e89d3a457216c13dbf5",
+      "config": "bd5e8c2cc1f217755cc82cd3093c034adeebc72985f72d8a3845b1b5f877a377",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

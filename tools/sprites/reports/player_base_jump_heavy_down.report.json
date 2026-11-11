@@ -1,7 +1,7 @@
 {
   "id": "player_base_jump_heavy_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized.png",
+  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador. Soco de cima para baixo (o 1o jH de video), usado no baixo + H no ar.",
   "rootMode": "authored",
   "scale": 1,
@@ -117,46 +117,46 @@
     {
       "index": 9,
       "outputBbox": [
-        81,
-        42,
-        320,
-        661
+        88,
+        72,
+        312,
+        648
       ],
-      "minimumMargin": 42,
-      "opaquePixels": 74568
+      "minimumMargin": 56,
+      "opaquePixels": 66980
     },
     {
       "index": 10,
       "outputBbox": [
-        70,
-        42,
-        353,
-        672
+        39,
+        12,
+        302,
+        667
       ],
-      "minimumMargin": 31,
-      "opaquePixels": 91760
+      "minimumMargin": 12,
+      "opaquePixels": 64280
     },
     {
       "index": 11,
       "outputBbox": [
-        36,
-        135,
-        349,
-        676
+        39,
+        12,
+        302,
+        667
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 86589
+      "minimumMargin": 12,
+      "opaquePixels": 66522
     },
     {
       "index": 12,
       "outputBbox": [
-        33,
-        188,
-        301,
-        671
+        39,
+        198,
+        302,
+        667
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 66498
+      "minimumMargin": 37,
+      "opaquePixels": 60677
     },
     {
       "index": 13,
@@ -293,224 +293,224 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 338,
-    "frameHeight": 652,
-    "rootX": 162,
-    "rootY": 418,
+    "frameWidth": 302,
+    "frameHeight": 672,
+    "rootX": 161,
+    "rootY": 448,
     "columns": 10,
     "frameCount": 25,
     "cropOffset": [
-      24,
-      34
+      25,
+      4
     ],
-    "sheetWidth": 1408,
-    "sheetHeight": 2620,
+    "sheetWidth": 1404,
+    "sheetHeight": 2636,
     "frames": [
       [
         260,
-        2216,
+        2232,
         280,
         388,
-        12,
-        42
+        11,
+        72
       ],
       [
         544,
-        2216,
+        2232,
         280,
         388,
-        12,
-        42
+        11,
+        72
       ],
       [
         1120,
-        1732,
+        1748,
         260,
         448,
-        28,
-        63
+        27,
+        93
       ],
       [
-        464,
-        644,
+        704,
+        668,
         264,
         560,
-        38,
-        4
+        37,
+        34
       ],
       [
-        236,
-        644,
+        476,
+        668,
         224,
         580,
-        71,
-        4
+        70,
+        34
       ],
       [
-        556,
+        560,
         0,
         240,
         588,
-        54,
-        9
+        53,
+        39
       ],
       [
-        0,
-        644,
+        240,
+        668,
         232,
         584,
-        65,
-        22
+        64,
+        52
       ],
       [
-        800,
+        804,
         0,
         232,
         588,
-        64,
-        32
-      ],
-      [
-        1036,
-        0,
-        236,
-        588,
-        59,
-        32
-      ],
-      [
-        300,
-        0,
-        252,
-        632,
-        53,
-        4
-      ],
-      [
-        0,
-        0,
-        296,
-        640,
-        41,
-        4
-      ],
-      [
-        732,
-        644,
-        324,
-        552,
-        7,
-        96
-      ],
-      [
-        0,
-        1232,
-        280,
-        496,
-        4,
-        147
-      ],
-      [
-        284,
-        1232,
-        276,
-        484,
-        10,
-        157
-      ],
-      [
-        844,
-        1232,
-        280,
-        480,
-        9,
-        146
-      ],
-      [
-        1128,
-        1232,
-        280,
-        480,
-        8,
-        135
-      ],
-      [
-        0,
-        1732,
-        280,
-        480,
-        9,
-        133
-      ],
-      [
-        564,
-        1232,
-        276,
-        484,
-        12,
-        133
-      ],
-      [
-        284,
-        1732,
-        284,
-        480,
-        6,
-        140
-      ],
-      [
-        572,
-        1732,
-        284,
-        480,
-        5,
-        148
-      ],
-      [
-        1060,
-        644,
-        276,
-        508,
-        13,
-        105
-      ],
-      [
-        860,
-        1732,
-        256,
-        468,
-        39,
-        80
-      ],
-      [
-        0,
-        2216,
-        256,
-        404,
-        38,
+        63,
         62
       ],
       [
+        1040,
+        0,
+        236,
+        588,
+        58,
+        62
+      ],
+      [
+        0,
+        668,
+        236,
+        588,
+        58,
+        62
+      ],
+      [
+        0,
+        0,
+        276,
+        664,
+        9,
+        4
+      ],
+      [
+        280,
+        0,
+        276,
+        664,
+        9,
+        4
+      ],
+      [
+        0,
+        1260,
+        276,
+        484,
+        9,
+        187
+      ],
+      [
+        280,
+        1260,
+        276,
+        484,
+        9,
+        187
+      ],
+      [
+        840,
+        1260,
+        280,
+        480,
+        8,
+        176
+      ],
+      [
+        1124,
+        1260,
+        280,
+        480,
+        7,
+        165
+      ],
+      [
+        0,
+        1748,
+        280,
+        480,
+        8,
+        163
+      ],
+      [
+        560,
+        1260,
+        276,
+        484,
+        11,
+        163
+      ],
+      [
+        284,
+        1748,
+        284,
+        480,
+        5,
+        170
+      ],
+      [
+        572,
+        1748,
+        284,
+        480,
+        4,
+        178
+      ],
+      [
+        972,
+        668,
+        276,
+        508,
+        12,
+        135
+      ],
+      [
+        860,
+        1748,
+        256,
+        468,
+        38,
+        110
+      ],
+      [
+        0,
+        2232,
+        256,
+        404,
+        37,
+        92
+      ],
+      [
         828,
-        2216,
+        2232,
         256,
         388,
-        36,
-        56
+        35,
+        86
       ],
       [
         1088,
-        2216,
+        2232,
         276,
         388,
-        18,
-        52
+        17,
+        82
       ]
     ],
     "decodedBytes": {
       "canonical": 32440320,
-      "grid": 26445120,
-      "packed": 14755840
+      "grid": 24353280,
+      "packed": 14803776
     },
     "pixelScale": 2.0
   },
@@ -518,8 +518,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "53ffd8cf3de3a1b2676641a995b2b102193049fe80bbcb9284e2b345ac4c2caa",
-      "config": "a22dbce1247187ac278b6d0e1393fd605803cb19cb9039c3f5f34a250edc07f6",
+      "source": "08a8750e3f05f56aea333921d9343b9976b2aefbcca9c9f518251409ad5abcee",
+      "config": "6fa7502ff5697533fea5d4edbaa4f37f80104845b67c4679cd1ce228284efc53",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

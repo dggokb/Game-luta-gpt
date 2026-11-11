@@ -1,7 +1,7 @@
 {
   "id": "player_base_heavy_straight",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_heavy_straight_video_normalized.png",
+  "source": "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -62,24 +62,24 @@
     {
       "index": 4,
       "outputBbox": [
-        151,
+        110,
         124,
         413,
         594
       ],
       "minimumMargin": 46,
-      "opaquePixels": 50599
+      "opaquePixels": 54767
     },
     {
       "index": 5,
       "outputBbox": [
-        123,
+        111,
         142,
         548,
         594
       ],
       "minimumMargin": 46,
-      "opaquePixels": 56342
+      "opaquePixels": 60626
     },
     {
       "index": 6,
@@ -370,7 +370,7 @@
         91
       ],
       [
-        2680,
+        2720,
         0,
         392,
         480,
@@ -396,21 +396,21 @@
       [
         2400,
         0,
-        276,
+        316,
         484,
-        128,
+        88,
         37
       ],
       [
         2276,
         516,
-        440,
+        448,
         464,
-        98,
+        89,
         56
       ],
       [
-        2720,
+        2728,
         516,
         504,
         464,
@@ -418,7 +418,7 @@
         58
       ],
       [
-        3228,
+        3236,
         516,
         524,
         464,
@@ -554,7 +554,7 @@
         47
       ],
       [
-        3076,
+        3116,
         0,
         316,
         480,
@@ -613,12 +613,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "6817aca2106d5a03b0ef2c5a428b3c26fbd34a548e328eb78e3441fcb5b7a8ca",
-      "config": "8a74541ebb0712dd6a72c7257e0169b7ba0439f947498898cb8c1f03595db761",
+      "source": "9e72ce5d4567d2174f7f14f3601427063955822691ce1c20af1206c62e7cb8e7",
+      "config": "20a15672cc8caf3a3c466bdeb33ec8097d2bea4f4a549bae5d0695f2f987c9e6",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_heavy_video_normalized.png": "6c4a8f93fd52fb95bec52052619b2f4d65fd0b3dfc372680e6a4b762821ceaa8"
+      "art/sprites/source/player_base_heavy_video_normalized.png": "6c4a8f93fd52fb95bec52052619b2f4d65fd0b3dfc372680e6a4b762821ceaa8",
+      "art/sprites/source/player_base_heavy_straight_video_normalized.png": "6817aca2106d5a03b0ef2c5a428b3c26fbd34a548e328eb78e3441fcb5b7a8ca"
     }
   }
 }
