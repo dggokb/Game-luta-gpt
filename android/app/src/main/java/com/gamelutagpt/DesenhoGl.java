@@ -585,16 +585,13 @@ final class DesenhoGl implements SurfaceHolder.Callback {
             canvas.matriz(valores);
         }
         canvas.filtro(filtro != null ? filtro.matriz : null);
-        if (localForca > 0f) {
-            canvas.luzLocal(localX, localY, localRaio, localR, localG, localB, localForca);
-            canvas.normal(normal);
-        }
+        // O normal map vai sempre: serve à luz do cenário (o tempo todo) e à luz local.
+        canvas.normal(normal);
+        if (localForca > 0f) canvas.luzLocal(localX, localY, localRaio, localR, localG, localB, localForca);
         canvas.desenharBitmap(folha, true, fonte.left, fonte.top, fonte.right, fonte.bottom,
             destino.left, destino.top, destino.right, destino.bottom, alpha);
-        if (localForca > 0f) {
-            canvas.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
-            canvas.normal(null);
-        }
+        if (localForca > 0f) canvas.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
+        canvas.normal(null);
     }
 
     /**

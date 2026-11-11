@@ -531,11 +531,40 @@ aos lutadores uma normal de verdade por quadro, sem dobrar a memória. Vídeos:
 `android/app/build/sprite-review/normal_map_antes_depois.mp4` e `normal_map_luz_macia_x_faixas.mp4`.
 
 **No jogo desde 11/11 à noite** (o dono, vendo os vídeos: "coloca tudo na branch fable"): os
-mapas do Ryūga e do Kōga (88 folhas) e a luz do impacto ligada. No Modo Teste, o botão **LUZ** (ao
-lado de EFEITOS) troca na hora: **NORMAL** (normal map; quem não tem mapa usa a silhueta) →
-**FAIXAS** (normal map com a luz em dois tons chapados) → **OFF** (sem luz do impacto, como era) →
-**SILHUETA** (o motor 3). Começa em NORMAL. `TesteDesempenho.luz`; no PC, `-Pluz=off|silhueta|normal|faixas`.
-Falta ele dizer no aparelho qual fica (e se fica).
+mapas do Ryūga e do Kōga (88 folhas). No Modo Teste, o botão **LUZ** (ao lado de EFEITOS) troca na
+hora: **FORTE** (começa aqui) → **SUAVE** → **OFF** (como era antes do motor 4). `TesteDesempenho.luz`;
+no PC, `-Pluz=off|suave|forte`. Lutador sem mapa fica como era. Falta o dono dizer no aparelho
+qual nível fica (e se fica).
+
+**O que o botão liga, e por quê (12/11).** A primeira versão só usava o mapa na luz do impacto
+(motor 3), e o dono testou no aparelho: "não vi diferença nenhuma". Ele tinha razão: gravado com
+a duração real, LUZ OFF e LUZ ligada são indistinguíveis, porque a luz do impacto dura o tempo da
+faísca (280 ms no golpe forte) e fica embaixo dela. Os vídeos de antes tinham a luz esticada 6
+vezes (`normal_map_antes_depois.mp4`): não valem como prova do que se vê no jogo. Ele escolheu
+então usar o mapa na **luz do cenário**, que vale o tempo todo:
+
+- A luz do lugar (a direção e a cor da "contraluz" do `luzLutadores`, a mesma que já fazia o fio
+  na borda; com focos de luz ela segue o foco mais forte) acende o que está virado para ela, e o
+  lado oposto escurece puxando para a cor do lugar (metade do fator dos pés). O que olha de frente
+  para a tela fica como estava.
+- **A inclinação da normal é exagerada** (2,3× no SUAVE, 3,2× no FORTE). O mapa guarda formas
+  grandes, quase de frente (18° de inclinação média no miolo): sem exagero a mudança sobre a
+  arte, que já tem a própria sombra pintada, não se vê. Foi o que aconteceu no primeiro ensaio.
+- A luz entra quase toda multiplicada pela cor do que ilumina (10% somados, 90% multiplicados):
+  somando mais, a roupa preta virava cinza.
+- Níveis em `TesteDesempenho`: {exagero, sombra, luz} = SUAVE {2,3; 0,5; 0,55}, FORTE {3,2; 0,75;
+  0,85}. No PC, `-Pvolume=exagero,sombra,luz` afina sem recompilar.
+- Luz em dois tons chapados (faixas) foi testada e descartada: com a normal exagerada vira mancha.
+- Cintilação: no idle do Ryūga, a mudança média entre quadros seguidos é a mesma com e sem volume
+  (5,4 contra 5,7 em 255).
+- O mapa agora vai para a placa de vídeo quando a folha é desenhada (não só quando uma luz
+  acende), e a cópia da memória comum é solta nessa hora, como o bitmap da folha.
+
+Vídeo com as configurações reais do jogo, sem nada esticado:
+`android/app/build/sprite-review/luz_cenario_off_x_forte.mp4`; a mesma pose com e sem, nos dois
+níveis: `luz_cenario_mesma_pose.png`. Por fazer, se ele quiser: os braseiros e lanternas do
+cenário como luz de ponto no lutador que passa perto (as posições já estão no `stage.json`, em
+`luzes` e `fogos` das camadas).
 
 **1. De onde vem a normal.** Sete jeitos nos mesmos quadros (Ryūga, Kōga, p08, p12, p13, p15):
 
@@ -591,7 +620,7 @@ luz usa a silhueta em todos. Os dois passam no `glslangValidator` como GLSL ES 3
 folha carrega junto com ela quando o OPENGL do Modo Teste está ligado (medido no PC: +32,5 MB em
 87 folhas para Ryūga e Kōga, na linha "normais ... MB" do log de carregamento).
 
-**Luz em faixas** (o modo FAIXAS do botão): com a conta de luz do motor 3 o
+**Luz em faixas na luz do impacto** (testada nos vídeos de 11/11, fora do jogo desde 12/11): com a conta de luz do motor 3 o
 ganho do mapa é discreto (a luz deixa de lavar o braço por igual e passa a seguir o músculo e o
 rosto). Uma conta mais rasante, em dois tons chapados de borda curta (a sombra de anime), mostra
 mais a forma. É escolha de visual, dele.
@@ -601,14 +630,15 @@ mais a forma. É escolha de visual, dele.
 ```
 python3 tools/sprites/normal_map.py player_base p03      # ~0,8 s por quadro; o elenco (12.174 quadros) ~2,7 h
 cd android && rm -rf pc/build/gravar-luta
-xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=normal -PluzDura=6 \
+xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=forte \
     -Pgraficos=ALTO -Presolucao=1920x1080 -Proteiro="segura:D espera:1.8 solta:D grava:44:g tecla:L fim"
 ```
 
-`-Pluz=off|silhueta|normal|faixas` escolhe o modo (sem nada, normal), `-PluzDura=N` estica a luz,
-`-PluzFixa=1` a deixa na força cheia, `-PnormalAlterna=1` alterna silhueta e mapa a cada quadro
-(dois quadros seguidos com a mesma pose, para comparar parado), `-Pbotoes=1` mostra os botões do
-Modo Teste e `-Pgraficos=ALTO` impede o nível gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar a 17,5 por segundo
+`-Pluz=off|suave|forte` escolhe o nível (sem nada, forte), `-Pvolume=exagero,sombra,luz` afina o
+volume, `-PluzDura=N` estica a luz do impacto e `-PluzFixa=1` a deixa na força cheia,
+`-PnormalAlterna=1` liga e desliga o mapa a cada quadro (dois quadros seguidos com a mesma pose,
+com e sem), `-Pbotoes=1` mostra os botões do Modo Teste e `-Pgraficos=ALTO` impede o nível
+gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar a 17,5 por segundo
 (não a 22). Com o processador ocupado o jogo anda lento e o golpe erra.
 
 **Folha refeita, mapa refeito.** O mapa é do desenho: quem refaz uma folha (vídeo novo, SR HD,
@@ -618,7 +648,7 @@ jogo não tem como saber. Foi o que houve no mesmo dia com `player_base_idle` e
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
-custo); só Ryūga e Kōga têm mapa (88 folhas); a luz do cenário (tom, degradê, contraluz) continua sem usar a normal; a
+custo); só Ryūga e Kōga têm mapa (88 folhas); só o Templo da Lua foi visto com o volume (os outros 11 cenários, não); a
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 

@@ -7109,11 +7109,10 @@ public class GameView extends SurfaceView
                     TesteDesempenho.efeitos = !TesteDesempenho.efeitos;
                     break;
                 case PERF_LUZ:
-                    // A luz do impacto no corpo: NORMAL (normal map) → FAIXAS → OFF → SILHUETA → NORMAL.
-                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_NORMAL ? TesteDesempenho.LUZ_FAIXAS
-                        : TesteDesempenho.luz == TesteDesempenho.LUZ_FAIXAS ? TesteDesempenho.LUZ_OFF
-                        : TesteDesempenho.luz == TesteDesempenho.LUZ_OFF ? TesteDesempenho.LUZ_SILHUETA
-                        : TesteDesempenho.LUZ_NORMAL;
+                    // O normal map na luz do cenário e do impacto: FORTE → SUAVE → OFF → FORTE.
+                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_FORTE ? TesteDesempenho.LUZ_SUAVE
+                        : TesteDesempenho.luz == TesteDesempenho.LUZ_SUAVE ? TesteDesempenho.LUZ_OFF
+                        : TesteDesempenho.LUZ_FORTE;
                     break;
                 case PERF_CENARIO:
                     // ON → SEM ENFEITES (as camadas, sem brilhos, neblina, reflexos e pétalas) → OFF → ON.

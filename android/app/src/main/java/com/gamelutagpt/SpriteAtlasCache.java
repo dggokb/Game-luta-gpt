@@ -60,11 +60,12 @@ final class SpriteAtlasCache {
      * O normal map de uma folha (motor 4 de luz, tools/sprites/normal_map.py): para onde cada
      * ponto do corpo aponta, a 1/4 do lado da folha, com o mesmo desenho de caixas. Dois bytes por
      * ponto (x para a direita e y para baixo da imagem; 128 é zero; o z o shader refaz): 1/32 da
-     * memória da folha. Fica na memória comum e sobe para a placa de vídeo quando uma luz acende
-     * um quadro da folha ({@link GlRenderCanvas}).
+     * memória da folha. Fica na memória comum até a folha ser desenhada: aí sobe para a placa de
+     * vídeo ({@link GlRenderCanvas}) e a cópia daqui é solta ({@code xy} null), como o bitmap da
+     * própria folha. Contexto novo do OpenGL: a folha é recarregada e o mapa vem junto.
      */
     static final class Normal {
-        final byte[] xy;
+        volatile byte[] xy;
         final int largura,altura;
         Normal(byte[] xy,int largura,int altura) {this.xy=xy;this.largura=largura;this.altura=altura;}
     }
@@ -465,7 +466,7 @@ final class SpriteAtlasCache {
     long bytesNormais() {
         long n=0;
         synchronized(trava) {
-            for(Entrada e:folhas.values()) if(e.folha!=null&&e.folha.normal!=null)n+=e.folha.normal.xy.length;
+            for(Entrada e:folhas.values()) if(e.folha!=null&&e.folha.normal!=null) { byte[] xy=e.folha.normal.xy;if(xy!=null)n+=xy.length; }
         }
         return n;
     }

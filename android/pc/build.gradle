@@ -315,10 +315,11 @@ tasks.register('gravarLuta', JavaExec) {
     if (providers.gradleProperty('dupla').isPresent()) systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').get()
     if (providers.gradleProperty('carga').isPresent()) systemProperty 'gameluta.carga', providers.gradleProperty('carga').get()
     if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
-    // A luz do impacto no corpo (motores 3 e 4): -Pluz=off|silhueta|normal|faixas (o botão LUZ do Modo
-    // Teste; sem nada, normal); -PluzDura=N estica a luz e -PluzFixa=1 a deixa na força cheia;
-    // -PnormalAlterna=1 alterna silhueta e normal map a cada quadro (para comparar a mesma pose).
+    // O normal map na luz (motor 4): -Pluz=off|suave|forte (o botão LUZ do Modo Teste; sem nada, forte);
+    // -PluzDura=N estica a luz do impacto e -PluzFixa=1 a deixa na força cheia; -PnormalAlterna=1 liga
+    // e desliga o mapa a cada quadro (dois quadros seguidos com a mesma pose, com e sem).
     if (providers.gradleProperty('luz').isPresent()) systemProperty 'gameluta.luz', providers.gradleProperty('luz').get()
+    if (providers.gradleProperty('volume').isPresent()) systemProperty 'gameluta.volume', providers.gradleProperty('volume').get()
     if (providers.gradleProperty('luzDura').isPresent()) systemProperty 'gameluta.luzDura', providers.gradleProperty('luzDura').get()
     if (providers.gradleProperty('luzFixa').isPresent()) systemProperty 'gameluta.luzFixa', 'true'
     if (providers.gradleProperty('normalAlterna').isPresent()) systemProperty 'gameluta.normalAlterna', 'true'
