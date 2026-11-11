@@ -720,10 +720,11 @@ public class CombatEngineTest {
 
     @Test public void commandSpecialsStartTheirOwnMoves() {
         assertEquals("→↓↘ + button", "S2", command("M", 1, 3, 2).attackId(0));
-        // Comandos do P01 (mecanicas.json): Chute giratório ↓↙← (S3) e Aparar ↓↓ (S4), com qualquer botão.
+        // Comandos do P01 (mecanicas.json): Chute giratório ↓↙← (S3), com qualquer botão. Ele não tem
+        // S4 (o Aparar saiu em 11/11): ↓↓ + botão é o golpe agachado.
         for (String button : new String[] {"L", "M", "H"}) {
             assertEquals("↓↙← + " + button, "S3", command(button, 3, 4, 5).attackId(0));
-            assertEquals("↓↓ + " + button, "S4", command(button, 3, 0, 3).attackId(0));
+            assertEquals("↓↓ + " + button, "2" + button, command(button, 3, 0, 3).attackId(0));
         }
         assertEquals("a diagonal do meio é opcional: ↓← vale como ↓↙←", "S3", command("M", 3, 5).attackId(0));
         assertEquals("↓↘→ is still the energy", "S", command("M", 3, 2, 1).attackId(0));

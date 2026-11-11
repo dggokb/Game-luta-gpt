@@ -57,6 +57,45 @@ NA_CAIXA = 30.0      # px: a ponta do membro que bate fica a no máximo isto da 
 ANDOU = 45.0         # px: a ponta do membro que bate anda pelo menos isto da guarda ao impacto
 # Golpes em que o caminho detectado sai errado (o modelo troca os membros, perde a pose na capa ou
 # no cabelo). Conferido no olho nas folhas (--folha): ficam sem rastro.
+# Golpes em que o modelo não acha o membro (a perna esticada some para ele): o caminho medido no
+# desenho (a ponta mais à frente da perna e um ponto da canela atrás dela), {quadro: [x, y, jx, jy]}.
+CAMINHO_MANUAL = {
+    # p14 a p16 (11/11): o membro no acerto e na preparação, medidos com pose() para o smear.
+    'p14': {
+        'MEDIUM_KICK': {"8": [8, 81, 18, 175], "20": [182, 169, 82, 161]},
+        'HEAVY_STRAIGHT': {"4": [-72, 9, -15, 83], "10": [241, 194, 127, 171]},
+        'CROUCH_MEDIUM': {"12": [-18, 6, 38, 40], "14": [218, 40, 112, 64]},
+        'CROUCH_HEAVY': {"6": [90, 18, 71, 97], "14": [101, 245, 59, 209]},
+        'JUMP_MEDIUM': {"0": [8, 97, 54, 172], "2": [167, 248, 35, 207]},
+        'JUMP_HEAVY': {"0": [162, 151, 68, 198], "2": [210, 204, 97, 182]},
+        'JUMP_HEAVY_DOWN': {"3": [13, 89, 15, 162], "5": [63, 1, -2, 139]},
+        'GOLPE_ALTO': {"6": [45, 18, 54, 89], "9": [159, 79, 75, 165]},
+    },
+    'p15': {
+        'MEDIUM_KICK': {"4": [-13, 199, -45, 177], "6": [123, 224, 68, 213]},   # a mão de trás (o soco é duplo)
+        'GOLPE_ALTO': {"6": [56, 73, 87, 154], "9": [232, 70, 119, 130]},
+        'HEAVY_STRAIGHT': {"10": [-62, 19, -27, 96], "21": [225, 252, 106, 211]},
+        'CROUCH_MEDIUM': {"33": [25, 40, 12, 95], "36": [249, 12, 140, 51]},
+        'CROUCH_HEAVY': {"0": [51, 130, 58, 90], "5": [128, 295, 86, 253]},
+        'JUMP_MEDIUM': {"6": [-3, 65, 9, 141], "10": [166, 219, 52, 168]},
+        'JUMP_HEAVY': {"3": [16, 36, 39, 120], "5": [46, 65, 62, 115]},
+        'JUMP_HEAVY_DOWN': {"4": [14, 28, 59, 112], "6": [51, 74, 62, 115]},
+        'SPECIAL_S3': {"0": [81, 206, 45, 180], "4": [146, 217, 85, 210]},
+    },
+    'p16': {
+        'JUMP_MEDIUM': {"3": [105, 128, 31, 164], "5": [40, 140, 26, 165]},
+        'MEDIUM_KICK': {"5": [8, 158, 28, 154], "9": [150, 195, 99, 173]},
+        'HEAVY_STRAIGHT': {"6": [35, 134, 66, 144], "9": [187, 173, 119, 162]},
+        'SPECIAL_S2': {"6": [1, 146, -19, 138], "9": [117, 255, 57, 211]},
+    },
+    'player_base': {
+        'JUMP_MEDIUM': {'5': [39, 30, 64, 105], '6': [159, 81, 99, 85], '8': [189, 118, 128, 92]},
+        # Especiais (o detector só vê os normais): medidos com pose() quadro a quadro em 11/11. O
+        # S3 tem seis chutes: cada par é a perna recolhida e a esticada.
+        'SPECIAL_S2': {"4": [7, 180, 66, 105], "5": [49, 167, 75, 136], "6": [94, 215, 64, 209], "7": [83, 312, 51, 267], "8": [76, 323, 47, 274]},
+        'SPECIAL_S3': {"8": [7, 75, 58, 144], "9": [191, 238, 87, 210], "13": [8, 65, 43, 146], "14": [164, 208, 86, 207], "15": [12, 97, 71, 167], "16": [194, 222, 81, 210], "19": [-52, 65, 18, 144], "20": [206, 238, 85, 212], "22": [21, 105, 62, 184], "23": [185, 243, 79, 209], "28": [7, 71, 39, 154], "29": [178, 240, 74, 211]},
+    },
+}
 CAMINHO_ERRADO = {
     'p03': {'H', 'j2H'},
     'p04': {'jM', 'jH'},
@@ -283,6 +322,12 @@ def caminhos(pack):
     """{animação: {"cor": cor, "pontos": {quadro: [x, y, jx, jy]}}} dos golpes com linha de ação."""
     saida = {}
     for _, nome in golpes(pack):
+        manual = CAMINHO_MANUAL.get(pack['id'], {}).get(nome)
+        if manual:
+            a = pack['animations'][nome]
+            q = max(manual, key=int)
+            saida[nome] = {'cor': cor_da_ponta(pack, a, int(q), *manual[q][:2]), 'pontos': manual}
+            continue
         linha = linha_de_acao(detectar(pack, nome))
         if not linha:
             continue
@@ -290,6 +335,15 @@ def caminhos(pack):
         q, (x, y), _ = linha[-1]
         saida[nome] = {'cor': cor_da_ponta(pack, a, q, x, y),
                        'pontos': {str(q): [int(round(v)) for v in (*ponta, *junta)] for q, ponta, junta in linha}}
+    return saida
+
+
+def manuais(pack, saida):
+    """Os caminhos de CAMINHO_MANUAL das animações que não são golpe normal (os especiais)."""
+    for nome, pontos in CAMINHO_MANUAL.get(pack['id'], {}).items():
+        if nome not in saida and nome in pack['animations']:
+            q = max(pontos, key=int)
+            saida[nome] = {'cor': cor_da_ponta(pack, pack['animations'][nome], int(q), *pontos[q][:2]), 'pontos': pontos}
     return saida
 
 
@@ -359,7 +413,7 @@ def main():
         pack = json.loads(path.read_text(encoding='utf-8'))
         if pack['id'] in cx.FORA or (a.personagens and pack['id'] not in a.personagens):
             continue
-        medidos = caminhos(pack)
+        medidos = manuais(pack, caminhos(pack))
         tudo.append((pack, medidos))
         nomes = dict((nome, golpe) for golpe, nome in golpes(pack))
         print(pack['id'], ' '.join(f"{nomes[n]}:{len(c['pontos'])}" for n, c in medidos.items()),

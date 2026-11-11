@@ -1,0 +1,17 @@
+SOKON BLOODLINES - FUMACA DA CORRIDA / DASH V04
+
+CORRECAO: CADA UM DOS OITO QUADROS TEM UM DESENHO DIFERENTE.
+Quadros 1-2: contato do pe e primeira curva de poeira.
+Quadros 3-5: formacao, enrolamento e pico da nuvem.
+Quadros 6-8: separacao das curvas e dissipacao no ar.
+Nao e o mesmo sprite ampliado ou desbotado quadro a quadro.
+Desenhos originais inspirados no video de referencia Tōkon;
+nao sao recortes de frames do jogo.
+
+8 PNGs RGBA transparentes com 768x448 por quadro.
+spritesheet.png: 4 colunas x 2 linhas (3072x896).
+animacao_preview.gif: fundo escuro apenas para visualizar.
+Duracao: 45ms por quadro (aprox. 360ms ao todo).
+Ancora aproximada: x=710, y=350; espelhe para a esquerda.
+A fumaça deve nascer no ponto de contato no chao e ficar no mundo,
+enquanto o corredor avanca (nao prender o puff ao sprite).

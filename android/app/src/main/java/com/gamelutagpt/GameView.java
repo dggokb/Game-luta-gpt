@@ -2992,7 +2992,8 @@ public class GameView extends SurfaceView
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle,
-                defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO)) {
+                defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO,
+                event.pontaX, event.pontaY)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -3513,7 +3514,13 @@ public class GameView extends SurfaceView
             if (f.superJumping && !superJumpSeen[i]) {
                 // Saída do super pulo: anel de choque e poeira nos pés, na cor do lutador.
                 float sx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
-                if (!efeitos.tocar("super_pulo", sx, GROUND_Y, 1f, false)) {
+                // A fumaça desenhada pelo dono (art/vfx/super_pulo_v01), quando existe.
+                String fumaca = efeitos.tem("super_pulo_v01") ? "super_pulo_v01" : "super_pulo";
+                boolean nova = fumaca.equals("super_pulo_v01");
+                if (efeitos.tocar(fumaca, nova ? sx - f.facing * PULO_FUMACA_ATRAS : sx, GROUND_Y,
+                        nova ? SUPER_PULO_ESCALA : 1f, f.facing < 0)) {
+                    if (nova) efeitos.atrasDosLutadores();
+                } else {
                     impacts.spawnSuperJump(sx, GROUND_Y, f.state.profile.color);
                 }
             }
@@ -4427,11 +4434,8 @@ public class GameView extends SurfaceView
             confronto.desenharFundo(canvas);
             // A cena em vídeo da cinemática: os dois lutadores num vídeo só, no lugar deles.
             cenaEmVideo = cenaVideo.pronta(cinematica.video());
-            // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
-            canvas.save();
-            canvas.translate(tagOffset(), 0f);
-            drawContactShadow(canvas, spriteFighterRenderer, player());
-            canvas.restore();
+            // Sem a sombra de contato (a elipse escura nos pés): o dono quer só a sombra do motor
+            // (drawCastShadows, a silhueta deitada do stage.json "sombraLutadores"), 11/11.
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
@@ -4464,6 +4468,8 @@ public class GameView extends SurfaceView
                 drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
                 drawMechanicAura(canvas, player(), tagOffset());
             }
+            // A fumaça do pulo e do super pulo fica atrás dos lutadores (pedido do dono, 11/11).
+            efeitos.desenharAtras(canvas);
             drawEchoes(canvas);
             drawHenchmen(canvas);
             drawPartner(canvas);
@@ -4503,7 +4509,7 @@ public class GameView extends SurfaceView
             efeitos.desenhar(canvas);
             // O rastro do golpe na frente dos lutadores (a 75%: o membro ainda se vê por baixo) e por
             // cima do efeito de dano: o corte de ar fecha a cena.
-            if (enfeites) rastros.desenhar(renderCanvas);
+            if (enfeites) rastros.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
@@ -4677,7 +4683,7 @@ public class GameView extends SurfaceView
     private void drawCastShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX,
                                 com.gamelutagpt.stage.StageDefinition.FighterShadow sombra) {
         if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || renderer.override() != null) return;
-        // No alto do pulo a sombra clareia (como a de contato).
+        // No alto do pulo a sombra clareia.
         float altura = Math.max(0f, GROUND_Y - fighterVisualY(f));
         float k = clamp(1f - altura / SHADOW_FADE_HEIGHT, 0.25f, 1f);
         if (sombra.focos.isEmpty()) {
@@ -4910,8 +4916,6 @@ public class GameView extends SurfaceView
         // No 2x2 o parceiro do CPU entra correndo depois do KO, como na troca.
         c.save();
         c.translate(engine.teams.tagOffset(OPPONENT), 0f);
-        drawContactShadow(c, opponentSpriteRenderer, npc);
-
         drawFighter(c, opponentSpriteRenderer, npc, false, false);
         c.restore();
 
@@ -5502,7 +5506,9 @@ public class GameView extends SurfaceView
             // O vídeo é de quem olha (e corre) para a direita: a poeira sai para trás, à esquerda.
             // Poeira só no arranque (e no pouso e na queda); a freada fica sem.
             boolean largada = f.forwardDashing || f.backdashFrames > 0;
-            if (largada && efeitos.tocar("poeira_corrida", x, GROUND_Y, 1f, d < 0)) pose.deslize = 0;
+            // A fumaça desenhada pelo dono (art/vfx/fumaca_dash_v04), quando existe; senão a de antes.
+            String fumaca = efeitos.tem("fumaca_dash_v05") ? "fumaca_dash_v05" : efeitos.tem("fumaca_dash_v04") ? "fumaca_dash_v04" : "poeira_corrida";
+            if (largada && efeitos.tocar(fumaca, x, GROUND_Y, 1f, d < 0)) pose.deslize = 0;
         }
         if (pose.poeira >= POEIRA_NUVEM) {
             impacts.spawnDust(x, GROUND_Y, pose.poeira);
@@ -5568,7 +5574,8 @@ public class GameView extends SurfaceView
      * (entra o clássico).
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
-                                  boolean poder, int pausa, int atacante, float angulo, boolean baixo) {
+                                  boolean poder, int pausa, int atacante, float angulo, boolean baixo,
+                                  float pontaX, float pontaY) {
         boolean esquerda = direction < 0;
         float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
         int a = atacante & 1;
@@ -5592,24 +5599,79 @@ public class GameView extends SurfaceView
             // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
             if (superGolpe) {
                 nome = "impacto_ar_super";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v08_forte")) {
+                // O hit forte novo desenhado pelo dono (art/vfx/impacto_forte_v08, em fundo preto,
+                // recortado) com o anel de pressão de ar em 3D: impactos_v06_ec.py, forte_v08.
+                nome = "impacto_v08_forte";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v06_forte_medio")) {
+                // Os impactos redesenhados pelo dono (art/vfx/impactos_v06), com o acabamento do
+                // EffectCraft (art/vfx/effectcraft/impactos_v06_ec.py). O forte é o desenho do
+                // médio um pouco maior, sem o spray e com o anel de pressão de ar em 3D (a estrela
+                // pontuda saiu, 11/11: o dono vai desenhar um forte novo); o médio com o spray de ar
+                // em círculo; o fraco só o desenho.
+                nome = "impacto_v06_forte_medio";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("acerto_forte_05_ec")) {
+                // A faísca desenhada pelo dono (art/vfx/acerto_forte_05.png, a V4) com halo e o anel
+                // de pressão de ar em 3D do EffectCraft: art/vfx/effectcraft/acerto_forte_05_ec.py.
+                nome = "acerto_forte_05_ec";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("dano_forte_anel_ec")) {
+                // O vídeo dano_forte com acabamento no EffectCraft (faixas chapadas, impacto
+                // segurado, erosão) e o anel de pressão de ar em 3D: art/vfx/effectcraft/dano_forte_ec.py --anel.
+                nome = "dano_forte_anel_ec";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_ar_forte")) {
                 nome = "impacto_ar_forte";
             } else if (baixo && efeitos.tem("impacto_ar_baixo")) {
                 nome = "impacto_ar_baixo";
+            } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_v06_fraco")) {
+                nome = "impacto_v06_fraco";
             } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_ar_fraco")) {
                 nome = "impacto_ar_fraco";
+            } else if (efeitos.tem("impacto_v06_medio_ec")) {
+                nome = "impacto_v06_medio_ec";
             } else {
                 nome = "impacto_ar";
             }
             float escala = superGolpe ? 1.25f : FAISCA_ESCALA[forca];
+            // Os impactos redesenhados (impacto_v06_*) tocam mais rápido que a pausa do golpe
+            // (pedido do dono, 11/11: "anima mais rápido").
+            float duracao = nome.startsWith("impacto_v0") ? ms * RITMO_IMPACTO_V06 : ms;
+            // Os redesenhados nascem na ponta do golpe de quem bate (o punho, a ponta do pé), não no
+            // corpo de quem apanha (dono, 11/11); sem a medida do desenho, no ponto de contato.
+            float ox = px, oy = y;
+            if (nome.startsWith("impacto_v0") && !Float.isNaN(pontaX)) {
+                ox = pontaX;
+                oy = pontaY;
+            }
             // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
-            vaga = efeitos.tocarDurando(nome, px, y, escala, esquerda, ms, angulo);
+            vaga = efeitos.tocarDurando(nome, ox, oy, escala, esquerda, duracao, angulo);
+            // A luz do impacto no corpo de quem bate e de quem apanha (motor 3).
+            int f2 = Math.min(LUZ_IMPACTO_RAIO.length - 1, superGolpe ? LUZ_IMPACTO_RAIO.length - 1 : forca);
+            if (LUZ_DO_IMPACTO) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao * LUZ_DURA);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
         faiscaNome[a] = nome;
         return true;
     }
+
+    /**
+     * O impacto acende a luz local (motor 3): desligado até o dono aprovar no vídeo
+     * (luz_local_impacto.mp4). No PC, {@code -Dgameluta.luzImpacto=true} ({@code -Pluz=1} no
+     * gradle) liga para gravar, {@code -Dgameluta.luzDura=N} ({@code -PluzDura=N}) estica a
+     * duração N vezes, para ver a luz depois que o efeito some, e {@code -Dgameluta.luzFixa=true}
+     * ({@code -PluzFixa=1}) a deixa na força cheia enquanto dura (sem subir nem apagar), para
+     * comparar dois quadros com a mesma luz. No celular as propriedades não existem.
+     */
+    private static final boolean LUZ_DO_IMPACTO = Boolean.getBoolean("gameluta.luzImpacto");
+    private static final float LUZ_DURA = Math.max(1f, Float.parseFloat(System.getProperty("gameluta.luzDura", "1")));
+    private static final boolean LUZ_FIXA = Boolean.getBoolean("gameluta.luzFixa");
+    /** A luz local de cada força de impacto (fraco, médio, forte, especial): raio (px do mundo), cor e força. */
+    private static final float[] LUZ_IMPACTO_RAIO = {170f, 230f, 300f, 340f};
+    private static final int[] LUZ_IMPACTO_COR = {0xFFE2A8, 0xFFC870, 0xFF9A3C, 0xFFB050};
+    private static final float[] LUZ_IMPACTO_FORCA = {0.55f, 0.75f, 1f, 1f};
+
+    /** Fração da duração normal (pausa + 8 quadros) em que os impactos impacto_v06_* tocam. */
+    private static final float RITMO_IMPACTO_V06 = 0.7f;
 
     /** As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. */
     private static final String[][] DEFESAS = {
@@ -5661,10 +5723,22 @@ public class GameView extends SurfaceView
      * Efeitos de vídeo do movimento (só quando o efeito existe): fumaça na decolagem e o arco do
      * golpe forte quando a janela ativa abre.
      */
+    /** O tamanho da fumaça do super pulo quando ela sai no pulo comum. */
+    private static final float PULO_COMUM_ESCALA = 0.6f;
+    /** O tamanho dela no super pulo ("ficou muito grande": 70%). */
+    private static final float SUPER_PULO_ESCALA = 0.7f;
+    /** Quanto a fumaça do pulo sai atrás do lutador, px do mundo ("um pouco atrás dele, não embaixo"). */
+    private static final float PULO_FUMACA_ATRAS = 40f;
+
     private void efeitosDeMovimento(int i, CombatFighter f) {
         float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
-            efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
+            // Teste do dono (11/11): a fumaça do super pulo, menor, também no pulo comum.
+            if (efeitos.tocar("super_pulo_v01", x - f.facing * PULO_FUMACA_ATRAS, GROUND_Y, PULO_COMUM_ESCALA, f.facing < 0)) {
+                efeitos.atrasDosLutadores();
+            } else {
+                efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
+            }
         }
         // A queda: poeira quando o corpo bate no chão e quando assenta depois do quique.
         int fase = 0;
@@ -5982,6 +6056,71 @@ public class GameView extends SurfaceView
 
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
+        // A luz local (o impacto acendendo o corpo) só na folha do lutador, não no reflexo nem na sombra.
+        DesenhoGl gl = !drawingReflection && c instanceof CanvasGl ? DesenhoGl.noQuadro() : null;
+        boolean aceso = gl != null && luzNoCorpo((CanvasGl)c, gl, f);
+        drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
+        if (aceso) gl.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
+    }
+
+    /**
+     * Luz local (motor 3, reports/Luz em jogos de luta profissionais.md): cada impacto acende uma
+     * luz no ponto do golpe, na cor dele, que nasce em um instante e apaga junto com o efeito. O
+     * OpenGL acende só o lado do corpo virado para ela (a normal sai da silhueta borrada do quadro).
+     */
+    private static final int LUZES_LOCAIS = 4;
+    private final float[][] luzLocal = new float[LUZES_LOCAIS][6];   // x, y, raio, r, g, b
+    private final float[] luzForca = new float[LUZES_LOCAIS];
+    private final int[] luzInicio = new int[LUZES_LOCAIS], luzFim = new int[LUZES_LOCAIS];
+    private int luzVez;
+    private final float[] luzJanela = new float[3];
+
+    /** Acende uma luz local em (x, y) do mundo por {@code ms}: raio em px do mundo, cor 0xRRGGBB. */
+    private void acenderLuz(float x, float y, float raio, int rgb, float forca, float ms) {
+        int i = luzVez;
+        luzVez = (luzVez + 1) % LUZES_LOCAIS;
+        float[] l = luzLocal[i];
+        l[0] = x; l[1] = y; l[2] = raio;
+        l[3] = ((rgb >> 16) & 0xFF) / 255f; l[4] = ((rgb >> 8) & 0xFF) / 255f; l[5] = (rgb & 0xFF) / 255f;
+        luzForca[i] = forca;
+        luzInicio[i] = engine.frame();
+        luzFim[i] = engine.frame() + Math.max(2, Math.round(ms / (FIXED_STEP * 1000f)));
+    }
+
+    /** A força da luz {@code i} agora: sobe em 15% do tempo e apaga no resto. */
+    private float luzAgora(int i) {
+        int dur = luzFim[i] - luzInicio[i];
+        if (dur <= 0 || luzForca[i] <= 0f) return 0f;
+        float t = (engine.frame() - luzInicio[i]) / (float)dur;
+        if (t < 0f || t >= 1f) return 0f;
+        if (LUZ_FIXA) return luzForca[i];
+        float k = t < 0.15f ? t / 0.15f : (1f - t) / 0.85f;
+        return luzForca[i] * k * k;
+    }
+
+    /** Liga no OpenGL a luz local mais forte sobre {@code f}; false se nenhuma chega nele. */
+    private boolean luzNoCorpo(CanvasGl c, DesenhoGl gl, CombatFighter f) {
+        float cx = f.x, cy = fighterVisualY(f) - f.character().visualStandHeight * 0.5f;
+        int melhor = -1;
+        float forte = 0f;
+        for (int i = 0; i < LUZES_LOCAIS; i++) {
+            float k = luzAgora(i);
+            if (k <= 0f) continue;
+            float[] l = luzLocal[i];
+            float d = (float)Math.hypot(l[0] - cx, l[1] - cy);
+            // O corpo é grande: mede até um pouco além do raio.
+            float chega = k * Math.max(0f, 1f - d / (l[2] * 1.6f));
+            if (chega > forte) { forte = chega; melhor = i; }
+        }
+        if (melhor < 0) return false;
+        float[] l = luzLocal[melhor];
+        c.paraJanela(l[0], l[1], luzJanela);
+        gl.luzLocal(luzJanela[0], luzJanela[1], l[2] * luzJanela[2], l[3], l[4], l[5], luzAgora(melhor));
+        return true;
+    }
+
+    private void drawFighterCorpo(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
+                                  boolean damageFlash, boolean guardFlash) {
         if (hiddenByUltra(f) || cenaEmVideo) return;
         // A liberação do SHINKAI em vídeo já desenha o lutador (no efeito).
         if (ativacaoEfeito && ativacaoShinkai() && f == engine.fighter(ativacaoLado)) return;
@@ -6748,22 +6887,6 @@ public class GameView extends SurfaceView
 
     /** Altura (pixels do mundo) em que a sombra de contato chega ao menor e mais clara. */
     private static final float SHADOW_FADE_HEIGHT = 420f;
-
-    /**
-     * Sombra de contato no chão: encolhe e clareia com a altura (lê o pulo e o pouso) e abre
-     * junto com o achatar da aterrissagem. Dura (borda seca, sem degradê) e escura puxada para o
-     * roxo, como a mancha chapada embaixo do lutador nas referências: prende o
-     * corpo no chão.
-     */
-    private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
-        if (hiddenByUltra(f) || zanzokenAlpha(f) < 1f || cenaEmVideo) return;
-        float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
-        float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
-        float half = 60f * k * renderer.animacao.pose().escalaX;
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(Math.round(190 * k), 22, 14, 38));
-        c.drawOval(f.x - half, GROUND_Y - 12f * k, f.x + half, GROUND_Y + 12f * k, paint);
-    }
 
     private void drawControls(Canvas c) {
         hud.drawControls(c, hudState);

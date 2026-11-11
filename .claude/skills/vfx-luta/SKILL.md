@@ -23,9 +23,19 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
 
 1. **Julga-se no jogo rodando, em vídeo.** Não por descrição nem pela imagem solta. Grave o
    golpe e mande o vídeo, normal e em câmera lenta. Quem aprova é ele.
-2. **O desenho do efeito não é feito por código.** Formas desenhadas em código foram reprovadas
-   três vezes ("muito amador"). O desenho vem de imagem ou vídeo gerado (Codex, ou os vídeos que
-   ele mesmo gera). O código posiciona, dobra, anima e dá o tempo.
+2. **Desenho por código só em nível profissional** (regra revista pelo dono em 10/11: "só
+   aceitar código de ficar nível profissional"). Formas simples desenhadas em código foram
+   reprovadas três vezes ("muito amador") e continuam reprovadas. O caminho padrão segue sendo
+   imagem ou vídeo gerado (Codex, ou os vídeos que ele mesmo gera), com o código posicionando,
+   dobrando, animando e dando o tempo. Desenho feito no programa (EffectCraft: formas, ruído,
+   partículas, raio) só vale se seguir técnica profissional e chegar ao nível da referência:
+   - medido numa referência aprovada ou em técnica documentada (faixas chapadas, erosão,
+     brilho em duas cores, tempo de dois em dois, faísca em camadas; ver
+     `reports/VFX de luta estilo anime.md` e a skill `effectcraft`);
+   - comparado lado a lado, no jogo, com o que está lá hoje ou com a referência dele;
+   - se ficar com cara de forma geométrica simples, de confete ou de "programa", não serve:
+     volta para imagem ou vídeo gerado.
+   Quem diz se chegou ao nível é ele, no vídeo; até lá nada disso vai para a branch.
 3. **Referência é inspiração, não cópia.** Os jogos de referência mostram o que ele quer dizer;
    a arte é nossa. Quadros de outros jogos não entram no repositório.
 4. **Cada personagem tem o VFX dele.** A forma vem do que bate (garra, punho pesado, energia),
@@ -85,6 +95,8 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
 | Vídeo em fundo verde | `tools/sprites/efeito_video.py` |
 | Textura da fita do rastro | `tools/sprites/rastro_fita.py` |
 | Caminho de cada golpe | `tools/sprites/linha_de_acao.py --write --folha <prefixo>`, depois `build_characters.py --write` |
+| Normal map de uma folha de lutador (motor 4 de luz, desligado) | `tools/sprites/normal_map.py <id ou folha>`; ver "Motor de luz 4" no `docs/vfx-continuar.md` |
+| Smear (o membro esticado na arte; troca de desenho com efeito do vídeo) | `tools/sprites/smear.py <id> <GOLPE> [--trocar 4=8] [--comprimento 1.2,1.0]`, depois `build_characters.py --write` |
 
 Os nomes que a luta toca estão em `GameView.efeitoDeGolpe` e nas tabelas do
 `docs/vfx-continuar.md`. Folha de efeito com no máximo 4096 px de lado.

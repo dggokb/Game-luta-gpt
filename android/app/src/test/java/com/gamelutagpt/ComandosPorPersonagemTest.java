@@ -12,9 +12,12 @@ import org.junit.Test;
  * o golpe certo.
  */
 public class ComandosPorPersonagemTest {
-    /** Personagem, e de S1 a S4: nome e comando (como a lista mostra, sem os botões). */
+    /**
+     * Personagem, e de S1 a S4: nome e comando (como a lista mostra, sem os botões). O Ryūga tem só
+     * S1 a S3 (o lutador clássico; o S4, Aparar, saiu em 11/11).
+     */
     private static final String[][] TABELA = {
-        {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←", "Aparar", "↓ ↓"},
+        {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←"},
         {"p02", "Palma", "↓ ↘ →", "Chute da garça", "[↓] ↑", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "[←] →"},
         {"p03", "Onda curta", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},
@@ -32,7 +35,8 @@ public class ComandosPorPersonagemTest {
         for (String[] row : TABELA) {
             CharacterDefinition c = GeneratedCharacters.get(row[0]);
             List<TelaComandos.Linha> linhas = ListaComandos.ficha(c, Comandos.Esquema.TOQUE).linhas;
-            for (int i = 0; i < 4; i++) {
+            int especiais = (row.length - 1) / 2;
+            for (int i = 0; i < especiais; i++) {
                 TelaComandos.Linha l = linhas.get(i);
                 String esperado = row[2 + i * 2];
                 boolean noAr = esperado.startsWith("No ar: ");
@@ -40,10 +44,10 @@ public class ComandosPorPersonagemTest {
                 assertEquals(row[0] + " S" + (i + 1), (noAr ? esperado.substring(7) : esperado) + " + L/M/H", l.comando);
                 assertEquals(row[0] + " S" + (i + 1) + " no ar", noAr, l.noAr);
             }
-            assertEquals(TelaComandos.SUPER, linhas.get(4).nome);
-            assertEquals(TelaComandos.ULTRA, linhas.get(5).nome);
-            assertEquals("↓ + SUPER", linhas.get(5).comando);
-            assertEquals(TelaComandos.AGARRAO, linhas.get(6).nome);
+            assertEquals(TelaComandos.SUPER, linhas.get(especiais).nome);
+            assertEquals(TelaComandos.ULTRA, linhas.get(especiais + 1).nome);
+            assertEquals("↓ + SUPER", linhas.get(especiais + 1).comando);
+            assertEquals(TelaComandos.AGARRAO, linhas.get(especiais + 2).nome);
         }
         // No teclado os botões viram as teclas.
         TelaComandos.Linha onda = ListaComandos.ficha(GeneratedCharacters.get("player_base"), Comandos.Esquema.TECLADO).linhas.get(0);
@@ -154,7 +158,7 @@ public class ComandosPorPersonagemTest {
 
     @Test public void cadaComandoSoltaOProprioGolpe() {
         for (String[] row : TABELA) {
-            for (int i = 1; i <= 4; i++) {
+            for (int i = 1; i <= (row.length - 1) / 2; i++) {
                 String key = "S" + i;
                 String esperado = i == 1 ? "S" : key;
                 for (String button : new String[] {"L", "M", "H"}) {
@@ -162,6 +166,13 @@ public class ComandosPorPersonagemTest {
                 }
             }
         }
+    }
+
+    @Test public void oRyugaNaoTemS4() {
+        assertNull("sem S4", GeneratedCharacters.get("player_base").specials.get("S4"));
+        Luta l = new Luta("player_base");
+        l.motion("L", 2, 2);
+        assertNotEquals("↓↓ + L não solta especial nenhum", "S4", l.started());
     }
 
     @Test public void semCargaOSegurarEUmGolpeNormal() {

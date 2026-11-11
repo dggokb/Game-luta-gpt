@@ -20,7 +20,8 @@ import org.lwjgl.system.MemoryUtil;
 public final class GLES30 {
     private GLES30() {}
 
-    public static final int GL_TEXTURE_2D = 0x0DE1, GL_TEXTURE0 = 0x84C0, GL_TEXTURE1 = 0x84C1, GL_TEXTURE2 = 0x84C2;
+    public static final int GL_TEXTURE_2D = 0x0DE1, GL_TEXTURE0 = 0x84C0, GL_TEXTURE1 = 0x84C1, GL_TEXTURE2 = 0x84C2, GL_TEXTURE3 = 0x84C3;
+    public static final int GL_RG = 0x8227, GL_RG8 = 0x822B, GL_UNPACK_ALIGNMENT = 0x0CF5;
     public static final int GL_TEXTURE_MIN_FILTER = 0x2801, GL_TEXTURE_MAG_FILTER = 0x2800;
     public static final int GL_TEXTURE_WRAP_S = 0x2802, GL_TEXTURE_WRAP_T = 0x2803;
     public static final int GL_LINEAR = 0x2601, GL_CLAMP_TO_EDGE = 0x812F, GL_REPEAT = 0x2901;
@@ -52,6 +53,8 @@ public final class GLES30 {
     public static void glActiveTexture(int unidade) { GL13.glActiveTexture(unidade); }
 
     public static void glTexParameteri(int target, int pname, int param) { GL11.glTexParameteri(target, pname, param); }
+
+    public static void glPixelStorei(int pname, int param) { GL11.glPixelStorei(pname, param); }
 
     public static void glTexImage2D(int target, int level, int internalformat, int width, int height, int border,
                                     int format, int type, Buffer pixels) {
@@ -147,6 +150,8 @@ public final class GLES30 {
     public static int glGetUniformLocation(int programa, String nome) { return GL20.glGetUniformLocation(programa, nome); }
 
     public static void glUniform1i(int local, int v) { GL20.glUniform1i(local, v); }
+
+    public static void glUniform1f(int local, float v) { GL20.glUniform1f(local, v); }
 
     public static void glUniform2f(int local, float x, float y) { GL20.glUniform2f(local, x, y); }
 

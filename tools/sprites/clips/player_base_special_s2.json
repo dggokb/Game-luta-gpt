@@ -2,7 +2,7 @@
   "id": "player_base_special_s2",
   "javaName": "SPECIAL_S2_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_special_s2_video_normalized.png",
+  "source": "art/sprites/source/player_base_special_s2_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_special_s2.webp",
   "report": "tools/sprites/reports/player_base_special_s2.report.json",
   "preview": "android/app/build/sprite-review/special_s2-import.png",
@@ -33,5 +33,22 @@
     "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2
+  },
+  "smear": {
+    "fonte": "art/sprites/source/player_base_special_s2_video_normalized.png",
+    "quadros": [
+      6,
+      7
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "6=8,7=8",
+    "limpar": "todos",
+    "antes": "6=5,7=5",
+    "semEscuro": true
   }
 }

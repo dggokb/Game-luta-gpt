@@ -2,7 +2,7 @@
   "id": "player_base_crouch_medium",
   "javaName": "CROUCH_MEDIUM",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_crouch_medium_video_normalized.png",
+  "source": "art/sprites/source/player_base_crouch_medium_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_medium.webp",
   "report": "tools/sprites/reports/player_base_crouch_medium.report.json",
   "preview": "android/app/build/sprite-review/crouch_medium-import.png",
@@ -111,5 +111,19 @@
         -13.83
       ]
     ]
+  },
+  "smear": {
+    "fonte": "art/sprites/source/player_base_crouch_medium_video_normalized.png",
+    "quadros": [
+      9,
+      10
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "9=11,10=11"
   }
 }

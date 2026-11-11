@@ -13,7 +13,7 @@ public class P01CrouchMovementTest {
         String[] moves={"2L","2M","2H"};
         String[] clips={"CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY"};
         // 2L de 6 e 2H de 8 (o anti-aéreo): docs/balanco/normais-fable.md.
-        int[][] expected={{6,3,8},{12,4,18},{8,6,18}};
+        int[][] expected={{4,2,7},{9,4,20},{8,6,18}};   // revistos em 11/11
         int[] impact={7,9,5};
         for(int i=0;i<moves.length;i++){
             AttackDefinition a=P01.attack(moves[i]);
@@ -43,7 +43,7 @@ public class P01CrouchMovementTest {
     @Test public void crouchMediumShowsItsPosesInOrderAtThirtyFpsWithEitherRenderPhase() {
         CharacterDefinition.Move move=P01.moves.get("2M");
         CharacterDefinition.Animation art=move.animation;
-        assertEquals(34,move.attack.totalFrames);
+        assertEquals(33,move.attack.totalFrames);   // 9/4/20 (11/11)
         for(int phase=0;phase<2;phase++){
             List<Integer> shown=new ArrayList<>();
             for(int frame=phase;frame<move.attack.totalFrames;frame+=2){

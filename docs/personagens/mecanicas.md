@@ -175,7 +175,8 @@ fazer: **armadura** (aguenta N golpes sem atordoar), **contra-golpe** (lê golpe
 qualquer um na preparação e responde na hora), **esquiva** (passa por baixo de golpe alto e de
 projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival; com velocidade negativa recua, como a estrela da p16),
 **teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata), **armadilha** (o projétil cai e espera um pavio por botão, L/M/H; depois um golpe sai dele, como a luva da caixa da p16),
-**custo de vida**, **fúria** (dano cresce com a vida perdida), **air dashes extras** e
+**custo de vida**, **fúria** (dano cresce com a vida perdida), **voo** (o golpe tira o corpo do chão e
+ele cai pela gravidade do pulo: o S2 e o S3 do Ryūga, 11/11; `voo` no `pancadas.json`), **air dashes extras** e
 **agarrão próprio** (dano e alcance). Testes: `MechanicsTest`.
 
 Na tela: aura dourada (armadura), anel ciano (postura de contra-golpe), véu branco (esquiva),
@@ -183,7 +184,7 @@ bolhas verdes (envenenado), brasas vermelhas (fúria) e as faixas CONTRA-GOLPE!,
 
 | # | Mecânica no jogo |
 |---|---|
-| **p01** | Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. |
+| **p01** | Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. Só três especiais (S1 a S3; o Aparar saiu em 11/11). |
 | **p02** | Contra-golpe alto: o S3 lê golpes em pé e no ar durante a preparação e responde na hora. |
 | **p03** | Rekka: o S3 avança e encadeia até 3 vezes (novo comando a cada investida); o S2 sobe avançando. |
 | **p04** | Esquiva que cancela: o S3 passa por baixo de golpe alto e de projétil e pode virar soco (L, M, H); a cabeçada (S2) avança. |

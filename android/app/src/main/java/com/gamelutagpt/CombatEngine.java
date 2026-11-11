@@ -30,6 +30,12 @@ final class CombatEngine {
         float impactX = Float.NaN, impactY = Float.NaN;
         /** Inclinação do golpe no contato (graus, positivo para cima, no sentido do golpe): a faísca segue o membro. */
         float impactAngle;
+        /**
+         * A ponta desenhada do membro de quem bateu (o punho, a ponta do pé) no contato, no mundo; NaN
+         * sem a medida do desenho (projétil, crossup, golpe coreografado). Diferente do impactX/Y,
+         * não é presa no corpo de quem apanha: é de onde o golpe sai.
+         */
+        float pontaX = Float.NaN, pontaY = Float.NaN;
         /** Button class of the contact, or null when unknown. Presentation only. */
         AttackDefinition.Strength strength;
         /** Última pancada de um golpe com pausa final própria (o chute que fecha o Super da p15). */
@@ -471,6 +477,7 @@ final class CombatEngine {
         for (Contact contact : contacts) {
             // The point is measured before pushback moves the defender.
             float ix = impactX(contact), iy = impactY(contact), angulo = impactAngle(contact);
+            float[] ponta = pontaDoGolpe(contact, angulo);
             int before = events.size();
             applyContact(contact);
             for (int e = before; e < events.size(); e++) {
@@ -478,6 +485,10 @@ final class CombatEngine {
                 event.impactX = ix;
                 event.impactY = iy;
                 event.impactAngle = angulo;
+                if (ponta != null) {
+                    event.pontaX = ponta[0];
+                    event.pontaY = ponta[1];
+                }
                 event.strength = contact.attack.strength;
             }
         }
@@ -2164,7 +2175,10 @@ final class CombatEngine {
                     sequenciaDragonRush(f);
                     break;
                 }
+                // Voo (o S2 e o S3 do Ryūga): ainda no ar, o golpe espera o pouso no quadro do pouso.
+                if (moveMechanics.flies() && !f.grounded && f.attackFrame >= moveMechanics.flightEnd - 1) break;
                 f.attackFrame++;
+                if (moveMechanics.flies() && f.grounded && f.attackFrame == moveMechanics.flightStart) takeOff(f);
                 if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
                     // No SHINKAI do Ryūga, o primeiro sai da palma esquerda e o segundo da direita.
                     spawnProjectile(f, doisDisparos(f, config) ? 0 : -1);
@@ -2553,6 +2567,21 @@ final class CombatEngine {
         f.jumpFrames++;
     }
 
+    /** O corpo sai do chão no voo do golpe: o impulso da altura do voo, com a gravidade de subida do pulo. */
+    private void takeOff(CombatFighter f) {
+        float g = config.gravity * config.normalJumpRisingGravityScale;
+        f.grounded = false;
+        f.vy = -(float)Math.sqrt(2f * g * f.attack.mechanics.flightHeight);
+    }
+
+    /**
+     * Quem ataca do ar para a defesa, o contra-golpe e a esquiva: o corpo fora do chão, menos no voo
+     * de um golpe de chão (o shoryuken do Ryūga se defende agachado, como em todo jogo de luta).
+     */
+    static boolean atacaDoAr(CombatFighter a) {
+        return !a.grounded && !(a.attacking() && a.attack != null && a.attack.mechanics.flies());
+    }
+
     private void moveVertically(CombatFighter f) {
         if (f.grounded) return;
         if (f.airDashFrames > 0 && f.status == CombatFighter.Status.NEUTRAL) {
@@ -2586,6 +2615,20 @@ final class CombatEngine {
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
             scale = 0f;
             f.vy = 0f;
+        }
+        if (f.attacking() && f.attack.mechanics.flies()) {
+            // Voo: a gravidade do pulo (a mesma do jogo todo). Pairando (o tatsumaki), fica no alto
+            // e só cai a tempo de pousar no quadro do pouso.
+            AttackDefinition.Mechanics m = f.attack.mechanics;
+            if (m.flightHover && f.vy >= 0f) {
+                float altura = Math.max(0f, Arena.GROUND_Y - f.y);
+                float queda = (float)Math.sqrt(2f * altura / (config.gravity * config.normalJumpFallingGravityScale)) * CombatConfig.FPS;
+                if (f.attackFrame + queda < m.flightEnd) {
+                    f.vy = 0f;
+                    return;
+                }
+            }
+            scale = f.vy < 0f ? config.normalJumpRisingGravityScale : config.normalJumpFallingGravityScale;
         }
         if (f.attacking() && f.attack.mechanics.dives()) {
             if (f.attack.mechanics.rebound && f.strikeLanded && reboundHovering(f)) {
@@ -2638,6 +2681,9 @@ final class CombatEngine {
         } else if (f.attacking() && f.attack.mechanics.dives()) {
             // O mergulho para no chão: sobra só um pouco da recuperação.
             f.attackFrame = Math.max(f.attackFrame, f.attack.totalFrames - config.diveLandingFrames);
+        } else if (f.attacking() && f.attack.mechanics.flies()) {
+            // Voo: o pouso de verdade leva a animação ao pouso do desenho.
+            f.attackFrame = Math.max(f.attackFrame, f.attack.mechanics.flightEnd);
         }
         f.vx = 0f;
         f.freeFallFrames = 0;
@@ -2949,7 +2995,7 @@ final class CombatEngine {
         CombatFighter other = fighters[1 - f.index];
         if (other.attacking() && other.attack.melee() &&
             other.attack.threatening(Math.max(0, other.attackFrame)) &&
-            guardStops(guard, other.attack, !other.grounded, false)) {
+            guardStops(guard, other.attack, atacaDoAr(other), false)) {
             float horizontal = (f.x - other.x) * other.facing;
             if (horizontal >= 0f && horizontal - f.body().halfWidth <= other.attack.reach + 34f) return guard;
         }
@@ -3374,7 +3420,7 @@ final class CombatEngine {
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel e o aparar só batem no que leram: sem golpe na janela, a resposta não sai.
         if ((a.attack.mechanics.repel || a.attack.mechanics.parry) && !a.countered) return;
-        if (evades(d, a.attack, !a.grounded, false)) return;
+        if (evades(d, a.attack, atacaDoAr(a), false)) return;
         // O 2H dele vence o voo do Dragon Rush: o voo não acerta, o 2H pega quem chega.
         if (a.attack == dragonRushAttack && antiAereoContraRush(d)) return;
         if (a.attack.mechanics.grab) {
@@ -4587,6 +4633,46 @@ final class CombatEngine {
         return angulos == null || q < 0 || q >= angulos.length ? 0f : angulos[q];
     }
 
+    /**
+     * A ponta desenhada do golpe no mundo {x, y}, ou null sem a medida. É a ponta do desenho que
+     * fica na tela na pancada: o golpe acerta num desenho e logo pula para o membro todo esticado
+     * (o chute forte da base acerta no desenho 5, pé a 190 px, e segura o 8, pé a 224 px), então
+     * vale o desenho mais esticado dos quadros seguintes, enquanto o membro ainda avança. A caixa
+     * do desenho mais à frente dá o alcance; a altura segue a inclinação do membro dentro dela (o
+     * chute que sobe tem a ponta em cima), um pouco para dentro da borda.
+     */
+    private static float[] pontaDoGolpe(Contact c, float angulo) {
+        if (c.projectile != null || c.cruzou || c.hitbox != 0) return null;
+        CombatFighter a = c.attacker;
+        float[] g = golpeNoDesenho(a, a.attackFrame);
+        if (g == null) return null;
+        // A ponta do membro achada pela pose (o punho, o pé: linha_de_acao.py), quando existe no
+        // desenho da pancada: as caixas do desenho pegam também o borrão de movimento e passam do pé.
+        int q = quadroDoDesenho(a, a.attackFrame);
+        float[][] caminho = desenhoDoGolpe(a).caminhoGolpe;
+        if (caminho != null && q >= 0 && q < caminho.length && caminho[q] != null) {
+            return new float[] {a.x + a.facing * caminho[q][0], a.y - caminho[q][1]};
+        }
+        for (int f = a.attackFrame + 1; f <= a.attackFrame + PONTA_ADIANTE; f++) {
+            float[] h = golpeNoDesenho(a, f);
+            if (h == null || maxDe(h, 1) < maxDe(g, 1)) break;
+            if (maxDe(h, 1) > maxDe(g, 1)) {
+                g = h;
+                angulo = anguloNoDesenho(a, f);
+            }
+        }
+        int k = 0;
+        for (int j = 4; j + 3 < g.length; j += 4) if (g[j + 1] > g[k + 1]) k = j;
+        float x0 = g[k], x1 = g[k + 1], y0 = g[k + 2], y1 = g[k + 3];
+        float margem = Math.min(10f, (y1 - y0) * .25f);
+        float h = (y0 + y1) * .5f + (x1 - x0) * .5f * (float) Math.tan(Math.toRadians(angulo));
+        h = Math.max(y0 + margem, Math.min(y1 - margem, h));
+        return new float[] {a.x + a.facing * x1, a.y - h};
+    }
+
+    /** Quantos quadros depois da pancada a ponta do golpe ainda pode avançar (o desenho esticado). */
+    private static final int PONTA_ADIANTE = 6;
+
     private static float impactY(Contact c) {
         CombatFighter a = c.attacker, d = c.defender;
         float top = d.y - d.body().height(d.crouchingBody()), bottom = d.y;
@@ -4667,7 +4753,7 @@ final class CombatEngine {
 
         AttackDefinition.Mechanics stance = d.mechanics();
         // O contra-golpe lê só o golpe do titular: o assist não apanha (a resposta não tem em quem bater).
-        if (!projectile && a == fighters[a.index] && stance.counterAt(d.attackFrame) && reads(stance.counter, attack, !a.grounded)) {
+        if (!projectile && a == fighters[a.index] && stance.counterAt(d.attackFrame) && reads(stance.counter, attack, atacaDoAr(a))) {
             counter(d, a);
             return;
         }
@@ -4701,7 +4787,7 @@ final class CombatEngine {
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
             return;
         }
-        if (guardStops(guard, attack, !a.grounded, projectile)) {
+        if (guardStops(guard, attack, atacaDoAr(a), projectile)) {
             block(a, d, attack, guard, direction, projectile, !lastStrike,
                 multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(a, attack, base));
             if (multi) a.strikeBlocked = true;

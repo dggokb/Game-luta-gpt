@@ -1,5 +1,7 @@
 package com.gamelutagpt;
 
+import android.graphics.Canvas;
+
 /**
  * O rastro do golpe normal: uma fita de ar que segue a LINHA DE AÇÃO do golpe, o caminho que a
  * ponta do braço ou da perna fez de verdade, de onde saiu até onde chegou (a garra que desce em
@@ -15,14 +17,18 @@ package com.gamelutagpt;
  * desenhos do golpe aos saltos; a fita não: ela anda por quadro de jogo.)
  *
  * Ela é atravessada no caminho, do lado do membro (larga no balanço, que varre uma área; um feixe
- * em volta do membro na estocada): um véu de ar meio transparente com riscos finos, que afina
- * no fundo. É exagerada de propósito: nas
+ * em volta do membro na estocada), sai da cor do membro e é exagerada de propósito: nas
  * referências (Marvel Tōkon, docs/efeitos-referencia-tokon.md) o corte de ar é do tamanho do
  * membro ou maior. Na pausa do acerto o golpe não anda e a fita fica parada na tela, como o
  * membro. Só apresentação; golpes sem caminho (os com efeito já desenhado na arte, os especiais)
  * ficam sem.
  */
 final class RastroDoGolpe {
+    /**
+     * Desligado pelo dono (11/11): os rastros passam a ser desenhados à mão na arte de cada golpe
+     * (o primeiro é o chute forte do Ryūga, p01). O código e a textura ficam; para voltar, true.
+     */
+    static final boolean LIGADO = false;
     private static final String FITA = "rastro_fita";
     /** Pontos do caminho (os desenhos do golpe até o membro esticado). */
     private static final int PONTOS = 8;
@@ -39,6 +45,8 @@ final class RastroDoGolpe {
     private static final float LARGURA_MIN = 44f;
     /** A opacidade da fita: ela passa na frente dos lutadores e o membro ainda se vê por baixo. */
     private static final float OPACIDADE = 0.75f;
+    /** O trecho do fundo da fita (fração dela) em que a opacidade cai até zero. */
+    private static final float FUNDO = 0.3f;
     /** Amostras a mais na frente da ponta: o rastro passa um pouco dela e termina em pontas. */
     private static final int ALEM = 4;
     private static final int AMOSTRAS = PONTOS * PASSOS + 1 + ALEM;
@@ -56,8 +64,9 @@ final class RastroDoGolpe {
     /** O caminho amostrado: a ponta, a junta, a normal, o quanto a junta fica para o lado dela e o comprimento até ali. */
     private final float[] px = new float[AMOSTRAS], py = new float[AMOSTRAS], jx = new float[AMOSTRAS], jy = new float[AMOSTRAS];
     private final float[] nx = new float[AMOSTRAS], ny = new float[AMOSTRAS], lado = new float[AMOSTRAS], andado = new float[AMOSTRAS];
-    /** A fita: uma borda (fx, fy) e a outra (dx, dy). */
+    /** A fita: uma borda (fx, fy), a outra (dx, dy) e a opacidade. */
     private final float[] fx = new float[AMOSTRAS], fy = new float[AMOSTRAS], dx = new float[AMOSTRAS], dy = new float[AMOSTRAS];
+    private final float[] alfa = new float[AMOSTRAS];
     /** Rascunho de {@link #comecar}: o quadro do golpe em que a tela mostra cada ponto do caminho. */
     private final int[] chegada = new int[PONTOS];
     /** A fração do caminho que a ponta já andou quando o membro conta como esticado. */
@@ -85,6 +94,7 @@ final class RastroDoGolpe {
 
     /** Um passo da luta: {@code x} é onde o lutador {@code i} está desenhado (com a troca de dupla). */
     void passo(int i, CombatFighter f, float x) {
+        if (!LIGADO) return;
         Lado l = lados[i];
         CharacterDefinition.Animation a = f.attacking() && f.attack != null ? CombatEngine.desenhoDoGolpe(f) : null;
         if (a == null || a.caminhoGolpe == null) {
@@ -141,7 +151,7 @@ final class RastroDoGolpe {
     }
 
     /** Desenha no espaço do mundo (o canvas já com a câmera), na frente dos lutadores. */
-    void desenhar(com.gamelutagpt.render.RenderCanvas rc) {
+    void desenhar(Canvas c) {
         for (Lado l : lados) {
             if (l.ataque == null) continue;
             // Onde estão a ponta da frente e a de trás, de 0 a 1 do caminho.
@@ -172,6 +182,10 @@ final class RastroDoGolpe {
             if (ultima <= primeira) continue;
             mover(primeira, primeira + 1, de);
             mover(ultima, ultima - 1, ate);
+            for (int k = primeira; k <= ultima; k++) {
+                // Cheia na frente; o fundo vai sumindo no último trecho.
+                alfa[k] = OPACIDADE * Math.min(1f, (andado[k] - de) / Math.max(1f, (ate - de) * FUNDO));
+            }
             if (Math.abs(atravessado) >= ESTOCADA) {
                 // O balanço (o chute em arco, a garra): o membro vai atravessado no caminho e a fita
                 // cobre a área que ele varreu, do lado dele, um pouco para fora da ponta.
@@ -186,7 +200,7 @@ final class RastroDoGolpe {
                 float meia = FEIXE[l.forca] * 0.5f;
                 for (int k = primeira; k <= ultima; k++) borda(k, -meia, meia);
             }
-            efeitos.fita(rc, FITA, fx, fy, dx, dy, primeira, ultima + 1, OPACIDADE);
+            efeitos.fita(c, FITA, fx, fy, dx, dy, alfa, primeira, ultima + 1, a.caminhoCor);
         }
     }
 

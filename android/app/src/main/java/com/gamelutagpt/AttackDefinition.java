@@ -74,7 +74,7 @@ final class AttackDefinition {
          */
         boolean repel;
         /**
-         * Aparar (o S3 do Ryūga): a postura de contra-golpe só bate quando leu um golpe; no vazio
+         * Aparar (era o S4 do Ryūga até 11/11; nenhum personagem usa hoje): a postura de contra-golpe só bate quando leu um golpe; no vazio
          * não sai golpe nenhum e ele fica aberto até o fim (o risco de errar a leitura).
          */
         boolean parry;
@@ -104,6 +104,18 @@ final class AttackDefinition {
          */
         float hopHeight;
         int hopStart, hopEnd;
+        /**
+         * Voo de verdade (o S2 e o S3 do Ryūga, 11/11): no quadro {@link #flightStart} o corpo sai do
+         * chão com o impulso que leva até {@link #flightHeight} e cai pela gravidade do pulo; o
+         * golpe espera o pouso em {@link #flightEnd} (a animação do pouso só toca no chão) e, se
+         * pousar antes, pula para lá. Com {@link #flightHover} ele fica no alto (o tatsumaki) e só
+         * cai a tempo de pousar em {@link #flightEnd}. Para a defesa, o contra-golpe e a esquiva o
+         * golpe continua sendo de chão (não vira golpe alto); o corpo é que está no ar: a rasteira
+         * passa por baixo e quem acerta lá em cima joga ele como no pulo.
+         */
+        float flightHeight;
+        int flightStart, flightEnd;
+        boolean flightHover;
         /**
          * Evasion: HIGH slips standing/air strikes and projectiles, ANY everything, AIR only the
          * strikes of an airborne attacker (anti-air: projectiles and grounded strikes still hit).
@@ -150,6 +162,10 @@ final class AttackDefinition {
         Mechanics pound() { pound = true; return this; }
         Mechanics rebound() { rebound = true; return this; }
         Mechanics hop(float height, int start, int end) { hopHeight = height; hopStart = start; hopEnd = end; return this; }
+        Mechanics flight(float height, int start, int end, boolean hover) {
+            flightHeight = height; flightStart = start; flightEnd = end; flightHover = hover; return this;
+        }
+        boolean flies() { return flightHeight > 0f; }
         /** Altura do desenho no quadro {@code frame} do golpe (arco: sobe e desce no trecho). */
         float hopLift(int frame) {
             if (hopHeight <= 0f || frame <= hopStart || frame >= hopEnd) return 0f;

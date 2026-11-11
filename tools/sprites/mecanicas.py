@@ -20,6 +20,9 @@ da base vezes o ritmo (especial de vídeo longo: a rajada e a voadora do p15).
 Com "fimDoClipe" ({"H": 53}) os quadros do clipe dali em diante passam num instante: o vídeo que
 termina parado na guarda (o H da p15) não prende o lutador depois do movimento.
 
+Com "fimAgachado" (["S2"]) a animação do golpe termina agachada e o desenho levanta pelo RISE
+depois dele (o pouso do shoryuken do Ryūga, junto com "fimDoClipe" tirando o quadro em pé).
+
 Normais com identidade (docs/balanco/normais-fable.md), tudo opcional e por personagem:
 
   * "framesGolpe" também nos normais (vale mesmo com "manterTempo"): o tempo que a função do
@@ -801,6 +804,14 @@ def apply(cid, spec, base, combos_data):
             fit_impact(anim, m, hold)
             if hold:
                 cadence += ', impacto segurado'
+        if anim is not None:
+            # fimAgachado: o golpe termina agachado (o pouso do shoryuken do Ryūga) e o desenho
+            # levanta pelo RISE depois dele, em vez de pular para a guarda (SpriteMotion).
+            if key in spec.get('fimAgachado', []):
+                anim['fimAgachado'] = True
+                cadence += ', termina agachado'
+            else:
+                anim.pop('fimAgachado', None)
         h = hits.get(key, {})
         if 'pancadas' in h:
             strike(m, anim, h['pancadas'])
@@ -822,6 +833,16 @@ def apply(cid, spec, base, combos_data):
             at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
             m.setdefault('mecanica', {})['salto'] = {'altura': h['salto']['altura'],
                                                      'frames': [at(h['salto']['de']), min(at(h['salto']['ate']), total - 1)]}
+        if 'voo' in h:
+            # Voo de verdade (o S2 e o S3 do Ryūga): sai do chão no quadro "de" da animação e pousa
+            # no "ate"; o corpo cai pela gravidade do pulo (CombatEngine.takeOff).
+            dd = anim['durationsMs']
+            total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+            at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
+            m.setdefault('mecanica', {})['voo'] = {'altura': h['voo']['altura'],
+                                                   'frames': [at(h['voo']['de']), min(at(h['voo']['ate']), total - 1)]}
+            if h['voo'].get('paira'):
+                m['mecanica']['voo']['paira'] = True
         if isinstance(h.get('avanco'), dict):
             travel(m, anim, h['avanco'])
         elif 'avanco' in h:

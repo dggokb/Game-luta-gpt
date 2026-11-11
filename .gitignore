@@ -9,3 +9,6 @@ __pycache__/
 # Imagens brutas geradas pela IA antes do preparar_ultra.py
 tools/ultra/geradas/
 tools/stage/provisorio/
+
+# Trava que o effectcraft-cli deixa ao salvar um projeto (.<nome>.lock)
+art/vfx/effectcraft/.*.lock

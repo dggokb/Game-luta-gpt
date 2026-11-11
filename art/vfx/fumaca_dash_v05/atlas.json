@@ -1,0 +1,164 @@
+{
+  "name": "SŌKON: BLOODLINES — dash smoke reconstructed from Tōkon footage",
+  "frame_count": 10,
+  "size_per_frame": [
+    768,
+    448
+  ],
+  "atlas_grid": [
+    5,
+    2
+  ],
+  "foot_anchor": {
+    "x": 710,
+    "y": 350
+  },
+  "character_facing": "RIGHT",
+  "smoke_direction": "behind fighter toward LEFT",
+  "source": "10 original newly generated hand-drawn frames, visually referenced from Tōkon 1000169125.mp4 around 3.15–3.40 seconds; no gameplay cutouts",
+  "alpha": "true RGBA PNG, atmospheric background removed",
+  "timing_ms": [
+    40,
+    40,
+    42,
+    42,
+    44,
+    45,
+    48,
+    55,
+    65,
+    75
+  ],
+  "timeline": [
+    {
+      "frame": 1,
+      "file": "frames/smoke_dash_01.png",
+      "bbox": [
+        610,
+        294,
+        710,
+        352
+      ],
+      "opacity": 255,
+      "duration_ms": 40,
+      "kind": "rolling puff"
+    },
+    {
+      "frame": 2,
+      "file": "frames/smoke_dash_02.png",
+      "bbox": [
+        517,
+        244,
+        707,
+        350
+      ],
+      "opacity": 255,
+      "duration_ms": 40,
+      "kind": "rolling puff"
+    },
+    {
+      "frame": 3,
+      "file": "frames/smoke_dash_03.png",
+      "bbox": [
+        362,
+        178,
+        702,
+        348
+      ],
+      "opacity": 255,
+      "duration_ms": 42,
+      "kind": "rolling puff"
+    },
+    {
+      "frame": 4,
+      "file": "frames/smoke_dash_04.png",
+      "bbox": [
+        268,
+        152,
+        698,
+        347
+      ],
+      "opacity": 252,
+      "duration_ms": 42,
+      "kind": "rolling puff"
+    },
+    {
+      "frame": 5,
+      "file": "frames/smoke_dash_05.png",
+      "bbox": [
+        205,
+        135,
+        695,
+        345
+      ],
+      "opacity": 242,
+      "duration_ms": 44,
+      "kind": "opening curls"
+    },
+    {
+      "frame": 6,
+      "file": "frames/smoke_dash_06.png",
+      "bbox": [
+        160,
+        126,
+        690,
+        342
+      ],
+      "opacity": 221,
+      "duration_ms": 45,
+      "kind": "opening curls"
+    },
+    {
+      "frame": 7,
+      "file": "frames/smoke_dash_07.png",
+      "bbox": [
+        135,
+        118,
+        685,
+        340
+      ],
+      "opacity": 190,
+      "duration_ms": 48,
+      "kind": "opening curls"
+    },
+    {
+      "frame": 8,
+      "file": "frames/smoke_dash_08.png",
+      "bbox": [
+        108,
+        110,
+        678,
+        338
+      ],
+      "opacity": 140,
+      "duration_ms": 55,
+      "kind": "outward dissipation"
+    },
+    {
+      "frame": 9,
+      "file": "frames/smoke_dash_09.png",
+      "bbox": [
+        84,
+        99,
+        674,
+        334
+      ],
+      "opacity": 85,
+      "duration_ms": 65,
+      "kind": "outward dissipation"
+    },
+    {
+      "frame": 10,
+      "file": "frames/smoke_dash_10.png",
+      "bbox": [
+        61,
+        92,
+        669,
+        332
+      ],
+      "opacity": 39,
+      "duration_ms": 75,
+      "kind": "outward dissipation"
+    }
+  ]
+}

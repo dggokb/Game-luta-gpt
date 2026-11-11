@@ -337,22 +337,12 @@
         "alcance": 720
       },
       "unica": {
-        "descricao": "Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. Chute giratório (S3): salta para cima e para a frente dando quatro chutes no ar e pousa adiante; o último derruba. Aparar (S4): postura que lê qualquer golpe corpo a corpo do 4º ao 13º quadro e responde na hora; no vazio não bate e fica aberto até o fim.",
+        "descricao": "Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. Chute giratório (S3): sai do chão e anda para a frente dando quatro chutes no ar e pousa adiante; o último derruba. Sem S4: o Ryūga é o lutador clássico, com três especiais (S1, S2 e S3).",
         "golpes": {
           "S": {
             "carga": {
               "frames": 60,
               "bonus": 800
-            }
-          },
-          "S4": {
-            "contra": {
-              "le": "tudo",
-              "janela": [
-                4,
-                13
-              ],
-              "apara": true
             }
           }
         }
@@ -369,10 +359,6 @@
         "S3": {
           "nome": "Chute giratório",
           "comando": "↓↙←"
-        },
-        "S4": {
-          "nome": "Aparar",
-          "comando": "↓↓"
         }
       },
       "s1": {
@@ -396,24 +382,49 @@
       ],
       "framesGolpe": {
         "L": [
-          5,
-          3,
-          7
+          4,
+          2,
+          6
         ],
         "2L": [
-          6,
-          3,
-          8
+          4,
+          2,
+          7
         ],
         "M": [
-          7,
-          5,
+          6,
+          4,
           11
+        ],
+        "2M": [
+          9,
+          4,
+          20
+        ],
+        "H": [
+          10,
+          5,
+          17
         ],
         "2H": [
           8,
           6,
           18
+        ],
+        "jL": [
+          4,
+          3,
+          5
+        ],
+        "jM": [
+          6,
+          4,
+          8
+        ],
+        "jH": [
+          9,
+          6,
+          12
         ]
       },
       "vantagemGolpe": {
@@ -446,7 +457,13 @@
             }
           }
         }
-      }
+      },
+      "fimDoClipe": {
+        "S2": 27
+      },
+      "fimAgachado": [
+        "S2"
+      ]
     },
     "p02": {
       "molde": "Rushdown / contra-golpe",

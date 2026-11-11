@@ -34,7 +34,7 @@ final class SpriteMotion {
         else if(!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) next=Clip.LAND;
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
         else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
-        else if(clip.equals(Clip.CROUCH) || clip.equals(Clip.CROUCH_IDLE) ||
+        else if(clip.equals(Clip.CROUCH) || clip.equals(Clip.CROUCH_IDLE) || fimAgachado(clip) ||
                 (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
         else next=idle();
         wasGrounded=grounded;
@@ -46,7 +46,7 @@ final class SpriteMotion {
             if(next.equals(Clip.JUMP) && estavaNoAr && !antes.equals(Clip.JUMP)) time=character.animation(Clip.JUMP).duration;
             // Still holding down after a crouching attack (or block): stay crouched instead
             // of standing up and crouching again.
-            if(next.equals(Clip.CROUCH) && wasCrouching) time=character.animation(Clip.CROUCH).duration;
+            if(next.equals(Clip.CROUCH) && (wasCrouching || fimAgachado(antes))) time=character.animation(Clip.CROUCH).duration;
         }
         wasCrouching=crouching;
         // Attacks use the combat clock, including a repeated attack of the same type.
@@ -61,8 +61,9 @@ final class SpriteMotion {
         if(!character.animations.containsKey(Clip.CROUCH_IDLE)) return Clip.CROUCH;
         if(clip.equals(Clip.CROUCH_IDLE)) return Clip.CROUCH_IDLE;
         if(clip.equals(Clip.CROUCH) && time>=character.animation(Clip.CROUCH).duration) return Clip.CROUCH_IDLE;
-        // Ainda segurando ↓ depois de um golpe agachado (ou da defesa): já agachada, sem descer de novo.
-        if(!clip.equals(Clip.CROUCH) && wasCrouching) return Clip.CROUCH_IDLE;
+        // Ainda segurando ↓ depois de um golpe agachado (ou da defesa), ou golpe que termina agachado
+        // (o pouso do shoryuken): já agachado, sem descer de novo.
+        if(!clip.equals(Clip.CROUCH) && (wasCrouching || fimAgachado(clip))) return Clip.CROUCH_IDLE;
         return Clip.CROUCH;
     }
 
@@ -75,6 +76,11 @@ final class SpriteMotion {
         if(clip.equals(Clip.IDLE_2)) return time<character.animation(Clip.IDLE_2).duration ? Clip.IDLE_2 : Clip.IDLE;
         if(clip.equals(Clip.IDLE) && time>=IDLE_LOOPS_BEFORE_IDLE_2*character.animation(Clip.IDLE).duration) return Clip.IDLE_2;
         return Clip.IDLE;
+    }
+    /** O golpe que acabou de tocar termina agachado: o desenho segue do agachado (levanta ou fica). */
+    private boolean fimAgachado(String c) {
+        CharacterDefinition.Animation a=character.animations.get(c);
+        return a!=null && a.fimAgachado;
     }
     int frame(){return character.animation(clip).frame(time,distance);}
 }

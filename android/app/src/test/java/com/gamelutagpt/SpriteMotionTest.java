@@ -55,6 +55,28 @@ public class SpriteMotionTest {
         for(int i=0;i<10;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
+    /** O Ryūga solta {@code golpe} (a animação inteira) e depois fica parado, em pé ou segurando ↓. */
+    private static SpriteMotion depoisDo(String golpe,boolean segurandoBaixo) {
+        CharacterDefinition ryuga=GeneratedCharacters.get("player_base");
+        SpriteMotion m=new SpriteMotion(ryuga);
+        float total=ryuga.animation(golpe).duration;
+        for(float t=0;t<total;t+=.016f)m.update(.016f,true,false,0,0,true,false,false,golpe,t,false,false);
+        m.update(.016f,true,segurandoBaixo,0,0,true,false,false,null,0,false,false);
+        return m;
+    }
+    @Test public void oShoryukenTerminaAgachadoELevantaPeloRise() {
+        // O pouso do S2 termina agachado: o desenho levanta pelo RISE em vez de pular para a guarda.
+        assertTrue(GeneratedCharacters.get("player_base").animation("SPECIAL_S2").fimAgachado);
+        SpriteMotion m=depoisDo("SPECIAL_S2",false);
+        assertEquals(SpriteMotion.Clip.RISE,m.clip);
+        assertEquals("do começo do levantar",0,m.time,.02f);
+        for(int i=0;i<30;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertNotEquals(SpriteMotion.Clip.RISE,m.clip);
+        // Segurando ↓, ele fica agachado (sem descer de novo).
+        assertEquals(SpriteMotion.Clip.CROUCH_IDLE,depoisDo("SPECIAL_S2",true).clip);
+        // Golpe que termina em pé (o jab) volta direto para a guarda.
+        assertNotEquals(SpriteMotion.Clip.RISE,depoisDo("LIGHT_JAB",false).clip);
+    }
     @Test public void holdingDownAfterACrouchingAttackStaysCrouched() {
         // Quem não tem a respiração agachada (CROUCH_IDLE): o p02.
         CharacterDefinition sem=GeneratedCharacters.get("p02");
