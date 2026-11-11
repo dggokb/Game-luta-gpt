@@ -280,6 +280,17 @@ descartada no caminho: colunas de elipsoides (cara de colar de contas) com Minim
 ainda são bolas. Vídeos: `fumaca_tokon_x_nossa_quadro_a_quadro.mp4` e
 `fumaca_tokon_x_nossa_dissipando.mp4` (em `android/app/build/sprite-review/`, só na sessão).
 
+**Formato de corrida (11/11):** o dono achou o formato estranho para corrida. Na referência, a
+fumaça alta que eu copiei (quadros 74-84, 101-110, 166-175) é de impacto e batida na parede; a
+poeira de corrida é outra (quadros 159-167, o Loki arrancando, e os passos do Hulk): uma cunha
+baixa rente ao chão, fina e pontuda no pé, cada vez mais alta para trás, onde rola por cima, com
+a borda de cima serrilhada. Refeito: 20 bolas 3D enfileiradas do pé para trás, raio crescendo com
+a distância, achatadas, nascendo em sequência, com a crista e o rolo por cima; o fim dissipa em
+tufos que vão cada um para um lado e sobem no seu ritmo. Comparação:
+`android/app/build/sprite-review/corrida_tokon_x_nossa_quadro_a_quadro.mp4`.
+Ainda diferente: a parte de trás do Tōkon é mais alta e a borda de cima é serrilhada (a nossa é
+de bolotas redondas).
+
 ## Fumaça do dash (10/11, noite): tentativa no programa não aprovada
 
 Pedido: "fazer um novo efeito de fumaça do pé no dash"; o dono acha a `poeira_corrida` de hoje
