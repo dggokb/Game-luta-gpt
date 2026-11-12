@@ -315,6 +315,12 @@ def main():
         prev.save(a.previa)
         print('prévia:', a.previa)
         return
+    if clip['source'].endswith('_sr_hd.png'):
+        # O clipe passou pela melhoria de nitidez (tools/sprites/sr_hd.py) depois do smear: refazer o
+        # smear volta para a fonte sem nitidez. Não roda sem querer: a outra fonte ficaria solta.
+        raise SystemExit(f"{clip['source']} é a versão com nitidez (sr_hd.py). Refaça o smear e depois "
+                         'rode sr_hd.py de novo neste clipe; para seguir assim mesmo, volte o clipe '
+                         'para a fonte _smear.png primeiro.')
     destino = Path(original).with_name(Path(original).stem + '_smear.png')
     folha.save(ROOT / destino, optimize=True)
     clip['source'] = destino.as_posix()
