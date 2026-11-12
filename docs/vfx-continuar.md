@@ -143,6 +143,12 @@ que tem a ponta mais longe do tronco dentro da caixa do golpe.
   smear no chute (pontos à mão).
 - Visto nas folhas; `testarMotor`: só as 3 falhas antigas; build PASS. Jogo e celular: não vistos.
 
+**Smear: o segundo desenho a 50% (12/11, pedido do dono).** O smear fica em 2 desenhos: o anterior
+ao acerto, que passa rápido, e o do acerto, que o jogo segura na pausa. As línguas do segundo agora
+ficam a 50% (`smear.py --opacidade`, padrão "1,0.5" com 2 desenhos; o corpo continua opaco).
+Refeito em todos os golpes com smear (p01, p13 a p16), com a configuração guardada em cada clip.
+Golpes com 1 desenho (p15 S4, p16 jH) e o S3 do p01 (um desenho por chute) ficam a 100%.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

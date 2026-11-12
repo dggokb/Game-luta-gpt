@@ -50,6 +50,14 @@
       1.0
     ],
     "ferramenta": "tools/sprites/smear.py",
-    "limpar": "todos"
+    "limpar": "todos",
+    "opacidade": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
   }
 }

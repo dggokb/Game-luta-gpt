@@ -60,6 +60,9 @@
     ],
     "ferramenta": "tools/sprites/smear.py",
     "limpar": "todos",
-    "antes": "8=7"
+    "antes": "8=7",
+    "opacidade": [
+      1.0
+    ]
   }
 }

@@ -123,6 +123,10 @@
       1.0
     ],
     "ferramenta": "tools/sprites/smear.py",
-    "trocar": "3=8,4=8,5=8,6=8,7=8"
+    "trocar": "3=8,4=8,5=8,6=8,7=8",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }

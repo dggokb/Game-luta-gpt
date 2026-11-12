@@ -62,6 +62,10 @@
     "trocar": "19=20",
     "limpar": "todos",
     "antes": "19=8,20=8",
-    "clarear": 0.6
+    "clarear": 0.6,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }

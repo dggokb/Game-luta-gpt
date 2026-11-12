@@ -64,6 +64,10 @@
     "trocar": "4=5",
     "limpar": "todos",
     "antes": "4=2,5=2",
-    "clarear": 0.6
+    "clarear": 0.6,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }

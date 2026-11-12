@@ -65,6 +65,10 @@
     "trocar": "9=12,10=12,11=12",
     "limpar": "todos",
     "antes": "10=7,11=7",
-    "semEscuro": true
+    "semEscuro": true,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }

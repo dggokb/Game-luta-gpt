@@ -63,6 +63,10 @@
     "trocar": "13=14",
     "limpar": "todos",
     "antes": "13=6,14=6",
-    "clarear": 0.6
+    "clarear": 0.6,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }
