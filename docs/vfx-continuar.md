@@ -513,6 +513,17 @@ embaixo": `SUPER_PULO_ESCALA` 0,7 e `PULO_FUMACA_ATRAS` 40 px do mundo para as c
 - Os quadros dos vídeos encheram o disco (14 GB) uma vez: apagar a pasta de quadros depois de
   montar cada vídeo, e `rm -rf pc/build/gravar-luta` antes de cada gravação (ela acumula).
 
+## Fumaça de queda, desenhada pelo dono (12/11)
+
+`art/vfx/fumaca_queda_v01` (a folha original em fundo transparente com um véu meio transparente
+em volta, removido pelo alfa: de 90 a 230 vira de 0 a 1). Cada quadro tem uma nuvem de cada lado;
+"adapta o meio para não ficar em cima do personagem": os 8 pares foram achados pelos vãos entre as
+nuvens, cortados no meio, e cada metade afastada 92 px do centro (o vão dos pés), com a base no
+chão. Folha: `efeito_video.py art/vfx/fumaca_queda_v01/frames --nome fumaca_queda_v01 --fps 20
+--origem 292,182 --escala-mundo 0.6`. Toca no pouso do pulo (no lugar da `fumaca_pouso`, tamanho
+0,75 + 0,35 × a força da poeira) e quando o corpo bate no chão e quando assenta depois do quique
+(no lugar da `fumaca_pulo`, 1,1 e 0,8).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que

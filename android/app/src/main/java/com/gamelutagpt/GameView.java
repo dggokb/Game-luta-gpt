@@ -5489,6 +5489,9 @@ public class GameView extends SurfaceView
         renderer.animacao.passo(f, renderer.motion, engine, fighterVisualY(f));
     }
 
+    /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
+    private static final String FUMACA_QUEDA = "fumaca_queda_v01";
+
     /** Força da poeira do motor a partir da qual a aterrissagem levanta a nuvem inteira (personagem pesado). */
     private static final float POEIRA_NUVEM = 0.5f;
 
@@ -5500,7 +5503,11 @@ public class GameView extends SurfaceView
         Pose pose = renderer.animacao.pose();
         float x = f.x + offset;
         // Efeitos de vídeo do pouso e do pé no chão, quando existem.
-        if (pose.poeira > 0f && efeitos.tocar("fumaca_pouso", x, GROUND_Y, 0.6f + 0.6f * pose.poeira, false)) {
+        // A fumaça de queda desenhada pelo dono (art/vfx/fumaca_queda_v01: uma nuvem de cada lado
+        // dos pés, com o meio aberto para não cobrir o lutador), quando existe.
+        boolean queda = efeitos.tem(FUMACA_QUEDA);
+        if (pose.poeira > 0f && efeitos.tocar(queda ? FUMACA_QUEDA : "fumaca_pouso", x, GROUND_Y,
+                queda ? 0.75f + 0.35f * pose.poeira : 0.6f + 0.6f * pose.poeira, false)) {
             pose.poeira = 0f;
         }
         if (pose.deslize != 0) {
@@ -5745,7 +5752,9 @@ public class GameView extends SurfaceView
         if (f.status == CombatFighter.Status.KNOCKDOWN) {
             int t = f.knockdownFrame - engine.config.knockdownFallFrames;
             fase = t < 0 ? 0 : t < engine.config.knockdownBounceFrames ? 1 : 2;
-            if (fase > quiqueFase[i]) efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
+            if (fase > quiqueFase[i] && !efeitos.tocar(FUMACA_QUEDA, x, GROUND_Y, fase == 1 ? 1.1f : 0.8f, false)) {
+                efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
+            }
         }
         quiqueFase[i] = fase;
         rastros.passo(i, f, x);
