@@ -784,7 +784,23 @@ normal map, 2D com luz pintada, contas de shader, e a medida no nosso jogo).
 - Medir de novo: `gravarLuta` com `-Proteiro="espera:1.5 grava:8:g espera:0.6 fim"`, com e sem
   `-Pluz=off`, e contar na caixa do lutador os pontos com algum canal ≥ 250.
 
-Fases 2 (proposta) e 3 (protótipo): por fazer, esperando o dono ler o estudo.
+**Fase 2, proposta (12/11): `docs/motor-luz-proposta.md`**, uma página, esperando o dono escolher.
+
+- **A ideia: a arte é o teto.** O cenário não soma luz: declara a cor que o branco vira no lado
+  aceso (`luz`, no máximo #FFFFFF = a arte) e no lado de sombra (`sombra`), mais `chao` (pés),
+  `direcao` e `borda`. O motor multiplica a arte por isso; estourar deixa de ser possível.
+- **Uma luz por lutador.** Os pontos de luz do cenário não somam: puxam a direção e a cor dessa
+  luz para si, com peso que cai suave até zero no alcance, e vários pontos se misturam pelo peso.
+  O formato `lutadores`/`alcance` fica e as marcações dos 7 cenários continuam valendo.
+- **Sai:** o volume do motor 4 (a soma no lado aceso e o exagero 2,3), a luz do impacto no corpo
+  (motor 3, 16 leituras) e os campos `cor`, `forca`, `brilho`, `pes`, `contraluz`.
+- **Fica:** a sombra no chão e o reflexo; a contraluz vira `borda`, sem somar.
+- **Sem normal map:** a rampa entre `sombra` e `luz` é um degradê liso pelo corpo na direção da
+  luz; com mapa, segue o volume. Mapa para o resto do elenco: decidir no vídeo da fase 3.
+- **A escolher:** o motor (só lugar e borda / uma luz por lutador, recomendado / várias luzes por
+  ponto), quanto escurece à noite (dois níveis no vídeo), pontos, luz do impacto, mapas.
+
+Fase 3 (protótipo): por fazer, esperando a escolha.
 
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 
