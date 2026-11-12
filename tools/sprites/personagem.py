@@ -288,6 +288,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     args.append(f"--balanco={opts.get('balanco', 1.0)}")
     if opts.get('sem_efeitos'):
         args.append('--sem-efeitos')  # rastro e brilho desenhados pelo vídeo (machado do p15)
+    if opts.get('sem_poeira'):
+        args.append('--sem-poeira')  # a poeirinha do chão (o mergulho do S4 da p02)
     if opts.get('manter_efeitos') or MANTER_EFEITOS:
         args.append('--manter-efeitos')  # bola de energia e raio desenhados pelo vídeo (S1 do p15)
     if opts.get('cor_efeito'):

@@ -1,0 +1,42 @@
+{
+  "_doc": "Yin-lu (p02), vídeos H3 de 12/11. Receita de clipes montados de vários vídeos (montagem.py).",
+  "_opcoes": {
+    "escala": 0.4331,
+    "motivo": "imagens _h3 da p02 (471 px de guarda = 0,4331, tamanho.json); a medida no ar não acha a guarda"
+  },
+  "special_s4": {
+    "_doc": "S4, Chute rodopiante (12/11): três vídeos do dono. s4_1 sai da guarda à esquerda e mergulha até ficar de ponta-cabeça nas mãos; s4_2 gira de ponta-cabeça no ar com as pernas abertas (os chutes); s4_3 ainda gira, desvira, pousa e volta à guarda no centro. O s4_2 e o s4_3 foram descidos no começo e sobem aos poucos (o 2 começava 180 px acima do fim do 1, o 3 55 px acima do fim do 2): ela toma impulso das mãos para o giro no ar. fixo: o deslizar do vídeo para a direita sai (quem anda é o avanço do golpe); emenda: cada trecho começa com o corpo onde o anterior parou. Chutes que acertam: 2:001 e 2:009 (pernas abertas, uma para a frente).",
+    "trechos": [
+      [
+        "s4_1",
+        0,
+        48,
+        "fixo"
+      ],
+      [
+        "s4_2",
+        0,
+        28,
+        "fixo",
+        "emenda"
+      ],
+      [
+        "s4_3",
+        0,
+        40,
+        "fixo",
+        "emenda"
+      ]
+    ],
+    "quadros": "3,9,12,15,18,21,24,48,51,56,61,66,71,80,88,92,96,100,104,108",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "SPECIAL_S4": {
+        "impacto": 7
+      }
+    }
+  }
+}
