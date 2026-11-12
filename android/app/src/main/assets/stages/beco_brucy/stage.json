@@ -5,7 +5,7 @@
     "horizonte": 0.4
   },
   "corFundo": "#120A20",
-  "luzLutadores": { "cor": "#9CA8D8", "forca": 0.35, "brilho": 0.86, "pes": "#B8B8D0", "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } },
+  "luzLutadores": { "luz": "#C4D4FF", "sombra": "#7C7CA8", "chao": "#70709A", "direcao": [1, -1], "borda": 0.6, "cor": "#9CA8D8", "forca": 0.35, "brilho": 0.86, "pes": "#B8B8D0", "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } },
   "camadas": [
     {
       "id": "ceu",

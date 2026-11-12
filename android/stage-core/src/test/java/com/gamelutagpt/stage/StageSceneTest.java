@@ -901,4 +901,35 @@ public class StageSceneTest {
             }
         }
     }
+
+    @Test
+    public void motorDeLuzNovoALuzNaoPassaDaArteNemASombraDaLuz() {
+        StageDefinition def = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"luzLutadores\": "
+            + "{\"luz\": \"#E0D0FF\", \"sombra\": \"#8080B0\", \"chao\": \"#706080\", \"direcao\": [3, -4], \"borda\": 0.4}}");
+        StageDefinition.FighterLight luz = def.fighterLight;
+        org.junit.Assert.assertTrue(luz.declared);
+        org.junit.Assert.assertEquals(0xFFE0D0FF, luz.lit);
+        org.junit.Assert.assertEquals(0xFF8080B0, luz.shade);
+        org.junit.Assert.assertEquals(0xFF706080, luz.ground);
+        org.junit.Assert.assertEquals(0.4f, luz.edge, 1e-6f);
+        org.junit.Assert.assertEquals(0.6f, luz.rimDirX, 1e-5f);
+        org.junit.Assert.assertEquals(-0.8f, luz.rimDirY, 1e-5f);
+        // Sombra mais clara que a luz, em qualquer canal, não vale.
+        try {
+            StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], \"luzLutadores\": "
+                + "{\"luz\": \"#C0C0C0\", \"sombra\": \"#8080D0\"}}");
+            org.junit.Assert.fail("sombra mais clara que a luz");
+        } catch (IllegalArgumentException esperado) {
+            // a luz é o teto
+        }
+        // Cenário que ainda não declara os campos novos: saem dos antigos, sem passar da arte.
+        StageDefinition antigo = StageDefinition.fromJson("{\"nome\": \"T\", \"camadas\": [], "
+            + "\"luzLutadores\": {\"cor\": \"#FFFFFF\", \"brilho\": 1.2, \"pes\": \"#808080\"}}");
+        org.junit.Assert.assertFalse(antigo.fighterLight.declared);
+        org.junit.Assert.assertEquals(0xFFFFFFFF, antigo.fighterLight.lit);
+        float[] sombra = StageDefinition.FighterLight.rgb(antigo.fighterLight.shade);
+        float[] chao = StageDefinition.FighterLight.rgb(antigo.fighterLight.ground);
+        org.junit.Assert.assertEquals(0.78f, sombra[0], 0.01f);
+        org.junit.Assert.assertEquals(0.78f * 128f / 255f, chao[1], 0.01f);
+    }
 }

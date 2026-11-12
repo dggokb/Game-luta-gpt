@@ -317,6 +317,11 @@ final class DesenhoGl {
 
     private float localX, localY, localRaio, localR, localG, localB, localForca;
 
+    /** O motor de luz e sombra novo para as próximas folhas de lutador ({@link GlRenderCanvas#luzNova}); null desliga. */
+    void luzNova(float[] v) {
+        canvas.luzNova(v);
+    }
+
     boolean preSubir(com.gamelutagpt.render.RenderImage imagem) {
         return quadroAberto && canvas.subirImagem(imagem);
     }

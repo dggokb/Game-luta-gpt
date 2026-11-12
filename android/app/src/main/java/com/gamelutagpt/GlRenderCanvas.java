@@ -83,12 +83,38 @@ final class GlRenderCanvas implements RenderCanvas {
      * vale se a placa de vídeo do aparelho recusar o novo ({@link #criar}).
      */
     private static final String M_UNIFORMS = "//@uniforms\n", M_SEM_MAPA = "//@sem-mapa\n",
-        M_DO_MAPA = "//@do-mapa\n", M_VOLUME = "//@volume\n", M_CONTA = "//@conta\n";
+        M_DO_MAPA = "//@do-mapa\n", M_VOLUME = "//@volume\n", M_CONTA = "//@conta\n",
+        M_NOVA = "//@nova\n", M_NOVA_FIM = "//@nova-fim\n";
     private static final String NORMAL_DO_QUADRO =
         "          highp vec2 meio = 0.5 / vec2(textureSize(uNormal, 0));\n" +
         "          highp vec2 xy = texture(uNormal, clamp(vUv, uLuzRet.xy + meio, uLuzRet.zw - meio)).rg * 2.0 - 1.0;\n";
     private static final String[][] TRECHOS_NOVOS = {
-        {M_UNIFORMS, "uniform sampler2D uNormal; uniform float uNormalLiga; uniform vec4 uVolume;\n"},
+        {M_UNIFORMS, "uniform sampler2D uNormal; uniform float uNormalLiga; uniform vec4 uVolume;\n" +
+            "uniform vec4 uNova; uniform vec4 uNovaLuz; uniform vec4 uNovaSombra; uniform vec4 uNovaChao;\n"},
+        // Motor de luz e sombra novo (docs/motor-luz-proposta.md): a arte é o teto. O corpo é
+        // multiplicado por uma cor que vai da sombra do lugar (com a cor do chão nos pés) até a cor
+        // da luz, que no máximo é 1 (a arte como foi pintada): nada soma, nada passa da arte. Quanto
+        // cada ponto está na luz (kk) vem de um degradê que atravessa o quadro na direção da luz e,
+        // com normal map, de para onde aquele ponto do corpo aponta; a passagem é macia. O fio da
+        // contraluz entra em "screen" (1 − (1 − a)(1 − b)), que não passa do branco. uNova: ligado,
+        // peso do degradê, peso do mapa, meia largura da passagem.
+        {M_NOVA,
+            "        if (uNova.x > 0.5) {\n" +
+            "          highp vec2 dpx = uLuz.zw * vec2(textureSize(uTex, 0));\n" +
+            "          highp float dlen = length(dpx);\n" +
+            "          highp vec2 dn = dlen > 1e-6 ? dpx / dlen : vec2(0.0, -1.0);\n" +
+            "          highp vec2 pq = (vUv - 0.5 * (uLuzRet.xy + uLuzRet.zw)) / max(0.5 * (uLuzRet.zw - uLuzRet.xy), vec2(1e-6));\n" +
+            "          float kk = 0.5 + 0.5 * uNova.y * dot(pq, dn);\n" +
+            "          if (uNormalLiga > 0.5) {\n" +
+            NORMAL_DO_QUADRO +
+            "            kk += uNova.z * dot(xy, dn);\n" +
+            "          }\n" +
+            "          kk = smoothstep(0.5 - uNova.w, 0.5 + uNova.w, kk);\n" +
+            "          vec3 lugar = mix(uNovaSombra.rgb, uNovaChao.rgb, y * y);\n" +
+            "          u.rgb *= mix(lugar, uNovaLuz.rgb, kk) * mix(vec3(1.0), uLuzPes.rgb, y);\n" +
+            "          u.rgb = vec3(1.0) - (vec3(1.0) - u.rgb) * (vec3(1.0) - clamp(borda * uLuzCor.rgb * uLuz.y, 0.0, 1.0));\n" +
+            "        } else {\n"},
+        {M_NOVA_FIM, "        }\n"},
         {M_SEM_MAPA, "        if (uNormalLiga < 0.5)\n"},
         {M_DO_MAPA,
             "        if (uNormalLiga > 0.5) {\n" +
@@ -125,7 +151,7 @@ final class GlRenderCanvas implements RenderCanvas {
             "        }\n"},
     };
     private static final String[][] TRECHOS_ANTIGOS = {
-        {M_UNIFORMS, ""}, {M_SEM_MAPA, ""}, {M_DO_MAPA, ""}, {M_VOLUME, ""},
+        {M_UNIFORMS, ""}, {M_SEM_MAPA, ""}, {M_DO_MAPA, ""}, {M_VOLUME, ""}, {M_NOVA, ""}, {M_NOVA_FIM, ""},
         {M_CONTA,
             "        float lam = max(dot(n, normalize(vec3(dl, 0.35))), 0.0);\n" +
             "        u.rgb = clamp(u.rgb + uLocalCor.rgb * (lam * cai * cai * uLocalCor.a) * (0.35 + 0.65 * u.rgb), 0.0, 1.0);\n"},
@@ -221,8 +247,10 @@ final class GlRenderCanvas implements RenderCanvas {
         "        float v2 = texture(uTex, clamp(vUv + uLuz.zw * 0.5, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         "        float borda = clamp(t.a - 0.5 * (v1 + v2), 0.0, 1.0);\n" +
         "        highp float y = clamp((vUv.y - uLuzRet.y) / max(uLuzRet.w - uLuzRet.y, 1e-6), 0.0, 1.0);\n" +
+        M_NOVA +
         "        u.rgb = clamp(u.rgb * mix(vec3(1.0), uLuzPes.rgb, y) + borda * uLuzCor.rgb * uLuz.y, 0.0, 1.0);\n" +
         M_VOLUME +
+        M_NOVA_FIM +
         "      }\n" +
         // Luz local, como no Monkey Island Special Edition (reports/Luz em jogos de luta
         // profissionais.md): o alfa do quadro em volta (16 vizinhos, dois anéis) faz uma silhueta
@@ -320,10 +348,12 @@ final class GlRenderCanvas implements RenderCanvas {
     private static final class Programa {
         int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
         int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor, uNormalLiga, uVolume;
+        int uNova, uNovaLuz, uNovaSombra, uNovaChao;
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
     private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uLocal, uLocalCor, uNormalLiga, uVolume;
+    private int uNova = -1, uNovaLuz, uNovaSombra, uNovaChao;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
     private int atlasTexto, atlasDegrade;
@@ -439,6 +469,10 @@ final class GlRenderCanvas implements RenderCanvas {
         // -1 no shader de antes do motor 4 (o que vale quando a placa recusa o novo).
         p.uNormalLiga = GLES30.glGetUniformLocation(p.id, "uNormalLiga");
         p.uVolume = GLES30.glGetUniformLocation(p.id, "uVolume");
+        p.uNova = GLES30.glGetUniformLocation(p.id, "uNova");
+        p.uNovaLuz = GLES30.glGetUniformLocation(p.id, "uNovaLuz");
+        p.uNovaSombra = GLES30.glGetUniformLocation(p.id, "uNovaSombra");
+        p.uNovaChao = GLES30.glGetUniformLocation(p.id, "uNovaChao");
         p.uInverte = GLES30.glGetUniformLocation(p.id, "uInverte");
         p.uRecorte = GLES30.glGetUniformLocation(p.id, "uRecorte");
         p.uNRecorte = GLES30.glGetUniformLocation(p.id, "uNRecorte");
@@ -458,6 +492,7 @@ final class GlRenderCanvas implements RenderCanvas {
         uLuz = p.uLuz; uLuzCor = p.uLuzCor; uLuzPes = p.uLuzPes; uLuzRet = p.uLuzRet;
         uContorno = p.uContorno; uContornoR = p.uContornoR;
         uLocal = p.uLocal; uLocalCor = p.uLocalCor; uNormalLiga = p.uNormalLiga; uVolume = p.uVolume;
+        uNova = p.uNova; uNovaLuz = p.uNovaLuz; uNovaSombra = p.uNovaSombra; uNovaChao = p.uNovaChao;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
         GLES30.glUseProgram(p.id);
     }
@@ -1024,10 +1059,23 @@ final class GlRenderCanvas implements RenderCanvas {
             if (normal != 0 && v != null) GLES30.glUniform4f(uVolume, 1f, v[0], v[1], v[2]);
             else GLES30.glUniform4f(uVolume, 0f, 0f, 0f, 0f);
         }
+        if (uNova >= 0) {
+            int N = NOVA;
+            if (quadro && m[N] > 0.5f) {
+                GLES30.glUniform4f(uNova, 1f, m[N + 1], m[N + 2], m[N + 3]);
+                GLES30.glUniform4f(uNovaLuz, m[N + 4], m[N + 5], m[N + 6], 1f);
+                GLES30.glUniform4f(uNovaSombra, m[N + 7], m[N + 8], m[N + 9], 1f);
+                GLES30.glUniform4f(uNovaChao, m[N + 10], m[N + 11], m[N + 12], 1f);
+            } else {
+                GLES30.glUniform4f(uNova, 0f, 0f, 0f, 0f);
+            }
+        }
     }
 
     /** O filtro com a luz já preparado para um quadro: + deslocamento (2), retângulo do quadro (4) e largura do contorno em uv (2). */
-    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 17;
+    private static final int LUZ_QUADRO = Filtro.COM_LUZ + 30;
+    /** O motor de luz novo no filtro do quadro: ligado, pesos da rampa (3), luz (3), sombra (3), chão (3). */
+    private static final int NOVA = Filtro.COM_LUZ + 17;
     /** A luz local no filtro do quadro: luz em uv (2), raio em uv (2), força, cor (3). */
     private static final int LOCAL = Filtro.COM_LUZ + 8;
     /** Depois da luz local: a textura do normal map da folha do quadro (0: usa a silhueta). */
@@ -1049,6 +1097,25 @@ final class GlRenderCanvas implements RenderCanvas {
     }
 
     private float localX, localY, localRaio, localR, localG, localB, localForca;
+
+    /** O que {@link #luzNova} recebe: direção (2), o quanto ela é direcional, luz (3), sombra (3), chão (3), borda. */
+    static final int LUZ_NOVA_N = 13;
+    private final float[] novaLuz = new float[LUZ_NOVA_N];
+    private boolean novaLigada;
+
+    /**
+     * Motor de luz e sombra novo, para as próximas folhas de lutador (null desliga): para onde fica
+     * a luz na tela (x para a direita, y para baixo), o quanto ela tem direção (0: luz de todo
+     * lado, a rampa some; 1: uma direção só), a cor que o branco vira no lado aceso, no lado de
+     * sombra e nos pés, e a força do fio de contraluz. Só o OpenGL, e só no shader com normal map.
+     */
+    void luzNova(float[] v) {
+        novaLigada = v != null && uNova >= 0;
+        if (novaLigada) System.arraycopy(v, 0, novaLuz, 0, LUZ_NOVA_N);
+    }
+
+    /** Só para comparar no PC ({@code -Dgameluta.semMapa=true}): ninguém usa o normal map. */
+    private static final boolean SEM_MAPA = Boolean.getBoolean("gameluta.semMapa");
     /** A luz local de agora só vale para folha com normal map (os pontos de luz do cenário). */
     static boolean luzLocalSoComMapa;
 
@@ -1072,7 +1139,7 @@ final class GlRenderCanvas implements RenderCanvas {
     /** A textura do normal map da folha {@code t}, subindo agora se ainda não subiu; 0 sem mapa. */
     private int normalDe(Textura t) {
         SpriteAtlasCache.Normal n = normalAtual;
-        if (n == null || uNormalLiga < 0 || TesteDesempenho.luz == TesteDesempenho.LUZ_OFF) return 0;
+        if (n == null || uNormalLiga < 0 || SEM_MAPA || TesteDesempenho.luz == TesteDesempenho.LUZ_OFF) return 0;
         if (NORMAL_ALTERNA && (quadroDaNormal & 1) == 0) return 0;
         if (t.normal != 0) return t.normal;
         byte[] xy = n.xy;
@@ -1137,6 +1204,7 @@ final class GlRenderCanvas implements RenderCanvas {
         vezLuz = (vezLuz + 1) % rodaLuz.length;
         System.arraycopy(m, 0, q, 0, Filtro.COM_LUZ);
         q[Filtro.COM_LUZ] = q[Filtro.COM_LUZ + 1] = 0f;
+        q[NOVA] = 0f;
         // O contorno: a largura na tela levada para texels do quadro (a escala da matriz, igual nos dois eixos).
         float contorno = m[Filtro.CONTORNO + 3] * alturaTela / (float)Math.sqrt(Math.abs(det));
         q[Filtro.COM_LUZ + 6] = contorno * Math.abs((sr - sl) / (r - l)) / t.largura;
@@ -1151,6 +1219,17 @@ final class GlRenderCanvas implements RenderCanvas {
         } else {
             float largura = alturaTela * LARGURA_CONTRALUZ;
             float dx = m[Filtro.LUZ + 5] * largura, dy = m[Filtro.LUZ + 6] * largura;
+            if (novaLigada) {
+                // Motor novo: a direção, a cor e a força da borda são as da luz deste lutador.
+                float[] v = novaLuz, p = TesteDesempenho.nova();
+                dx = v[0] * largura; dy = v[1] * largura;
+                float maior = Math.max(1e-3f, Math.max(v[3], Math.max(v[4], v[5])));
+                q[Filtro.LUZ + 1] = v[3] / maior; q[Filtro.LUZ + 2] = v[4] / maior; q[Filtro.LUZ + 3] = v[5] / maior;
+                q[Filtro.LUZ + 4] = v[12];
+                q[NOVA] = 1f;
+                q[NOVA + 1] = p[0] * v[2]; q[NOVA + 2] = p[1] * v[2]; q[NOVA + 3] = Math.max(0.02f, Math.min(0.5f, p[2]));
+                System.arraycopy(v, 3, q, NOVA + 4, 9);
+            }
             float qx = (d * dx - c * dy) / det, qy = (-b * dx + a * dy) / det;
             q[Filtro.COM_LUZ] = qx * (sr - sl) / (r - l) / t.largura;
             q[Filtro.COM_LUZ + 1] = qy * (sb - st) / (bt - top) / t.altura;

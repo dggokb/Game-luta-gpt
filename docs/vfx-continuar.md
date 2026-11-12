@@ -754,6 +754,146 @@ custo); só Ryūga e Kōga têm mapa (88 folhas); no PC, os 12 cenários foram v
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 
+## Motor de luz e sombra definitivo (12/11, branch `claude/motor-luz-definitivo`)
+
+Pedido do dono, depois dos vídeos de 12/11 ("a luz tá muito estourada"): parar de ajustar em cima
+do que existe e fazer um motor de luz e sombra definitivo, mesmo removendo o de hoje. Em três
+fases, parando no fim de cada uma: estudo, proposta de uma página, protótipo em vídeo (Ryūga e
+Kōga em templo_lua, dojo_yinlu e beco_brucy, motor de hoje x motor novo). **Nada vai para a
+`game-luta-sprite-fable` até ele aprovar pelo vídeo.**
+
+**Fase 1, estudo (feita em 12/11).** Relatório: `reports/Motor de luz e sombra.md`; notas por
+frente em `research_notes/Motor de luz e sombra/` (princípios da pintura, jogos de luta, 2D com
+normal map, 2D com luz pintada, contas de shader, e a medida no nosso jogo).
+
+- **O que as fontes dizem, em uma linha:** personagem desenhado não é "aceso" com luz somada; a
+  cor pintada é multiplicada por uma luz perto de 1, a tinta do cenário é pouca e ajustada à mão,
+  e o branco puro fica para brilho e efeito. A regra mais direta é do Guilty Gear Xrd REVELATOR:
+  luz de golpe e de cenário **substitui** a luz ambiente pela distância, não soma, porque somar
+  "would make them too bright and reduce visibility".
+- **Medido no nosso jogo** (PC, OpenGL, 1080p, parados, caixa em volta do lutador): ligar a luz
+  leva a área cortada em branco do Ryūga de 1,4% para 11,8% da caixa no Templo da Lua (perto de um
+  terço do corpo), 1,7% → 10,5% no Dojo Liánwǔguǎn, 1,2% → 5,9% no Beco.
+- **Por que estoura (duas causas):** (1) o lutador já chega claro demais antes de qualquer luz: à
+  noite o fundo tem luma mediana 36 a 55 e o Ryūga, com a luz desligada, p90 de 146 a 164; o
+  `brilho` dos 12 cenários vai de 0,86 a 1,03, inclusive nos de noite. (2) contraluz, volume e luz
+  local **somam** por cima, com corte em 1 a cada passo; a roupa branca só pode cortar.
+- **O que não tem fonte:** o rig de luz da luta no SF6 (site oficial bloqueado), qualquer dado
+  técnico do DBFZ, tinta por cenário no BlazBlue, o método do Streets of Rage 4, normal map no
+  Children of Morta, números de sombra no chão e de contraluz, custo por conta em GPU de celular.
+- Medir de novo: `gravarLuta` com `-Proteiro="espera:1.5 grava:8:g espera:0.6 fim"`, com e sem
+  `-Pluz=off`, e contar na caixa do lutador os pontos com algum canal ≥ 250.
+
+**Fase 2, proposta (12/11): `docs/motor-luz-proposta.md`**, uma página, esperando o dono escolher.
+
+- **A ideia: a arte é o teto.** O cenário não soma luz: declara a cor que o branco vira no lado
+  aceso (`luz`, no máximo #FFFFFF = a arte) e no lado de sombra (`sombra`), mais `chao` (pés),
+  `direcao` e `borda`. O motor multiplica a arte por isso; estourar deixa de ser possível.
+- **Uma luz por lutador.** Os pontos de luz do cenário não somam: puxam a direção e a cor dessa
+  luz para si, com peso que cai suave até zero no alcance, e vários pontos se misturam pelo peso.
+  O formato `lutadores`/`alcance` fica e as marcações dos 7 cenários continuam valendo.
+- **Sai:** o volume do motor 4 (a soma no lado aceso e o exagero 2,3), a luz do impacto no corpo
+  (motor 3, 16 leituras) e os campos `cor`, `forca`, `brilho`, `pes`, `contraluz`.
+- **Fica:** a sombra no chão e o reflexo; a contraluz vira `borda`, sem somar.
+- **Sem normal map:** a rampa entre `sombra` e `luz` é um degradê liso pelo corpo na direção da
+  luz; com mapa, segue o volume. Mapa para o resto do elenco: decidir no vídeo da fase 3.
+- **A escolher:** o motor (só lugar e borda / uma luz por lutador, recomendado / várias luzes por
+  ponto), quanto escurece à noite (dois níveis no vídeo), pontos, luz do impacto, mapas.
+
+**O dono, sobre as escolhas (12/11):** "não sou eu que defino o que deve ser feito; o que conta é
+conceito de luz e sombra, que já existe, então temos que seguir isso". As escolhas da proposta
+ficaram então pelos princípios do estudo: uma luz que manda por lutador; pontos de luz ficam e
+substituem em vez de somar; a luz do impacto no corpo sai; o nível da noite sai do cenário (a
+sombra com a cor do lugar, o lutador ainda acima do fundo); normal map para o resto do elenco não
+se gera agora (o motor não depende dele).
+
+**Fase 3, protótipo (12/11): no jogo, ao lado do motor de hoje, só nesta branch.**
+
+- **Como liga:** terceiro estado do botão LUZ do Modo Teste (ON = motor de hoje, NOVA, OFF);
+  no PC, `-Pluz=nova`. O padrão continua o motor de hoje.
+- **`stage.json`:** `luzLutadores` ganhou `luz`, `sombra`, `chao`, `direcao` e `borda`, ao lado dos
+  campos antigos (que o motor de hoje ainda lê). Declarados à mão em três cenários:
+
+  | Cenário | `luz` | `sombra` | `chao` | `borda` |
+  |---|---|---|---|---|
+  | templo_lua (noite, lua) | #D9D2F5 | #8A84B8 | #86789C | 0,5 |
+  | dojo_yinlu (dia) | #FFFBF0 | #D2D8EA | #DCD2C4 | 0,35 |
+  | beco_brucy (noite, neon, chuva) | #C4D4FF | #7C7CA8 | #70709A | 0,6 |
+
+  Nos outros 9 os campos novos saem por conta dos antigos (`FighterLight.converter`: a luz é a
+  tinta de hoje sem passar da arte, a sombra 22% abaixo). **Não foram vistos nem acertados.**
+- **Shader** (`GlRenderCanvas`, trecho `M_NOVA`): `arte × mix(lugar, luz, k)`, com `lugar` indo da
+  `sombra` ao `chao` nos pés; `k` vem de um degradê pelo quadro do lutador na direção da luz e,
+  com normal map, da inclinação do mapa nessa direção, em passagem macia (`smoothstep`). A borda
+  entra em "screen" (não passa do branco). Nenhuma soma, nenhum `clamp` de estouro. Os pesos
+  estão em `TesteDesempenho.NOVA` {degradê 0,55; mapa 1,1; meia largura 0,5; lavagem da cor do
+  ponto 0,35}; no PC, `-Pnova=a,b,c,d`. `-PsemMapa=1` grava sem normal map.
+- **Uma luz por lutador** (`GameView.luzDoLutador`): parte da direção e da cor do cenário; cada
+  ponto de luz perto toma o lugar dela pelo peso `lutadores × (1 − (d/alcance)²)²`; os pesos
+  juntos não passam de 1; pontos de lados opostos tiram a direção (a rampa some). Vale também no
+  reflexo. O relâmpago leva o corpo à cor da arte (o teto), sem somar.
+- **Fora do motor novo:** a luz do impacto (`luzNoCorpo` só no motor de hoje) e o volume.
+
+**Medido** (PC, OpenGL, 1080p, os 20 últimos quadros de cada gravação, caixa em volta dos dois
+lutadores; parte da caixa com algum canal ≥ 250):
+
+| Cenário | Motor de hoje | Motor novo | Luma p99 hoje → novo |
+|---|---|---|---|
+| Templo da Lua | 6,34% | 0,04% | 255 → 203 |
+| Dojo Liánwǔguǎn | 4,59% | 1,16% | 255 → 242 |
+| Beco do Brucy | 5,59% | 0,26% | 255 → 216 |
+
+O que sobra no dojo é o branco da própria arte e do cenário de dia dentro da caixa.
+
+**Vídeos** (`android/app/build/sprite-review/motor_luz_novo/`, 60 quadros a 17,5 por segundo e
+depois 4× mais lento): `templo_lua_hoje_x_novo.mp4`, `dojo_yinlu_hoje_x_novo.mp4`,
+`beco_brucy_hoje_x_novo.mp4`; `templo_lua_hoje_x_novo_sem_mapa_x_com_mapa.mp4` (três colunas);
+`templo_lua_golpes_novo_sem_mapa_x_com_mapa.mp4` (chute e soco). As colunas são rodadas
+diferentes: câmera e passo não batem quadro a quadro.
+
+**Visto:** nada estoura; o lutador pega a cor do lugar (violeta no templo, laranja das lâmpadas no
+beco); chute e soco sem mancha, com e sem mapa; com mapa o volume na calça e no braço é um pouco
+maior, e a diferença é pequena. No dojo o motor novo fica um pouco mais escuro que o de hoje.
+
+**Testes:** `:stage-core:test` passa; `:pc:testarMotor` 687 testes, só as 3 falhas antigas. Os
+quatro textos do shader passam no `glslangValidator` e o de reserva continua igual ao original.
+
+**Não feito / não visto:** nada no celular; só Ryūga e Kōga; os outros 9 cenários; os cenários com
+focos de sombra (a Arena Central) ainda não levam a direção do foco para a luz nova; a direção da
+sombra do chão ainda não vem de `direcao`; pulo e queda; o modo sem OpenGL (recebe a média de
+`luz` e `sombra`, não visto). Se aprovado: tirar o motor de hoje e os campos antigos, acertar os
+9 cenários (Opus, com esta receita) e só então mandar para a `game-luta-sprite-fable`.
+
+**Aprovado pelo dono em 12/11, pelos vídeos** ("Aprovado"). Na mesma mensagem ele corrigiu uma
+das escolhas: "um poder luminoso, assim como luzes, também incide em ambiente e personagens pelos
+princípios de luz e sombra". Ou seja, tirar a luz do efeito do corpo foi erro de princípio: o que
+estava errado na luz do impacto era somar, não existir.
+
+**Poder luminoso é fonte de luz (decidido em 12/11, por fazer).**
+
+- Todo efeito que emite luz (poder, projétil, aura, explosão, faísca de acerto) é um **ponto de
+  luz temporário**: fica onde o efeito está e anda com ele, tem a cor dele, um alcance e uma força
+  de 0 a 1, e nasce e apaga junto com o efeito.
+- **Nos lutadores** entra na mesma mistura dos pontos do cenário (`GameView.luzDoLutador`): toma o
+  lugar da luz do cenário pelo peso, os pesos juntos não passam de 1 e o lado aceso no máximo
+  mostra a arte. Vale para os dois lutadores, inclusive quem solta o poder. De noite aparece
+  bastante (o lado virado para o poder sobe da sombra do lugar até a cor do poder); de dia quase
+  nada, que é o certo.
+- **No ambiente** a luz cai no que está perto: uma poça de luz no chão embaixo do efeito e o
+  reflexo dela onde o cenário tem chão que reflete (`reflexoLuzes`), do jeito que as `luzes` do
+  cenário já são desenhadas (`fillRadialGlow`). Misturada em "screen", para não passar do branco.
+  O fundo distante não recebe (a luz cai com a distância).
+- **Onde se declara:** no `efeito.json` do efeito, `"luz": { "cor": "#RRGGBB", "alcance": 1.2,
+  "forca": 0.8 }`; efeito sem isso não ilumina. A lista de luzes do impacto que já existe
+  (`acenderLuz`, `luzLocal`, `LUZES_LOCAIS`) vira esse registro.
+- **Não conferido:** como os poderes e projéteis são desenhados hoje (se todos passam por
+  `efeito.json`) e quanto custa a poça no chão no celular.
+
+**O que falta para o motor novo ir para a `game-luta-sprite-fable`** (trabalho com receita, para
+uma sessão Opus): o poder como luz (acima); tirar o motor de hoje e os campos antigos do
+`stage.json`; a sombra do chão seguir `direcao`; os cenários com focos levarem a direção do foco
+para a luz; acertar os outros 9 cenários; gravar os 12 e um poder de noite e de dia.
+
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 
 Pedido do dono: "aplica os effects nele e põe". `art/vfx/effectcraft/acerto_forte_05_ec.py` corta a
