@@ -754,6 +754,38 @@ custo); só Ryūga e Kōga têm mapa (88 folhas); no PC, os 12 cenários foram v
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 
+## Motor de luz e sombra definitivo (12/11, branch `claude/motor-luz-definitivo`)
+
+Pedido do dono, depois dos vídeos de 12/11 ("a luz tá muito estourada"): parar de ajustar em cima
+do que existe e fazer um motor de luz e sombra definitivo, mesmo removendo o de hoje. Em três
+fases, parando no fim de cada uma: estudo, proposta de uma página, protótipo em vídeo (Ryūga e
+Kōga em templo_lua, dojo_yinlu e beco_brucy, motor de hoje x motor novo). **Nada vai para a
+`game-luta-sprite-fable` até ele aprovar pelo vídeo.**
+
+**Fase 1, estudo (feita em 12/11).** Relatório: `reports/Motor de luz e sombra.md`; notas por
+frente em `research_notes/Motor de luz e sombra/` (princípios da pintura, jogos de luta, 2D com
+normal map, 2D com luz pintada, contas de shader, e a medida no nosso jogo).
+
+- **O que as fontes dizem, em uma linha:** personagem desenhado não é "aceso" com luz somada; a
+  cor pintada é multiplicada por uma luz perto de 1, a tinta do cenário é pouca e ajustada à mão,
+  e o branco puro fica para brilho e efeito. A regra mais direta é do Guilty Gear Xrd REVELATOR:
+  luz de golpe e de cenário **substitui** a luz ambiente pela distância, não soma, porque somar
+  "would make them too bright and reduce visibility".
+- **Medido no nosso jogo** (PC, OpenGL, 1080p, parados, caixa em volta do lutador): ligar a luz
+  leva a área cortada em branco do Ryūga de 1,4% para 11,8% da caixa no Templo da Lua (perto de um
+  terço do corpo), 1,7% → 10,5% no Dojo Liánwǔguǎn, 1,2% → 5,9% no Beco.
+- **Por que estoura (duas causas):** (1) o lutador já chega claro demais antes de qualquer luz: à
+  noite o fundo tem luma mediana 36 a 55 e o Ryūga, com a luz desligada, p90 de 146 a 164; o
+  `brilho` dos 12 cenários vai de 0,86 a 1,03, inclusive nos de noite. (2) contraluz, volume e luz
+  local **somam** por cima, com corte em 1 a cada passo; a roupa branca só pode cortar.
+- **O que não tem fonte:** o rig de luz da luta no SF6 (site oficial bloqueado), qualquer dado
+  técnico do DBFZ, tinta por cenário no BlazBlue, o método do Streets of Rage 4, normal map no
+  Children of Morta, números de sombra no chão e de contraluz, custo por conta em GPU de celular.
+- Medir de novo: `gravarLuta` com `-Proteiro="espera:1.5 grava:8:g espera:0.6 fim"`, com e sem
+  `-Pluz=off`, e contar na caixa do lutador os pontos com algum canal ≥ 250.
+
+Fases 2 (proposta) e 3 (protótipo): por fazer, esperando o dono ler o estudo.
+
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 
 Pedido do dono: "aplica os effects nele e põe". `art/vfx/effectcraft/acerto_forte_05_ec.py` corta a
