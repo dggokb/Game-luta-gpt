@@ -129,6 +129,20 @@ que tem a ponta mais longe do tronco dentro da caixa do golpe.
 - Visto: o desenho do acerto de cada um (folha). `testarMotor`: só as 3 falhas antigas; build
   PASS. Jogo e celular: não vistos.
 
+## Revisão do smear no p13, p14 e p15 (12/11, pedido do dono: "revê do p13 14 15")
+
+- **p14 (roupa preta):** as línguas viravam blocos pretos sólidos. `smear.py --clarear 0.6` puxa as
+  línguas escuras para um cinza-azulado e, nesse modo, a perna desenhada fica por cima e as línguas
+  atrás (com a roupa clara elas tomam o lugar do membro, como antes). Aplicado aos 8 golpes do p14.
+- **p13 (primeira vez):** pontos marcados à mão na grade. Smear em M, H, 2M, 2H, 6M, jH, j2H e S4; as
+  pernas com `--clarear`, os braços (pele) com `--sem-escuro`. Os arcos brancos do j2H e do S4 e o
+  borrão do 2M saíram trocando pelo desenho limpo. jM (o corpo que cai), S2 (a pedra é o golpe) e S3
+  (agarrão) ficam como estavam. Saiu de `ARTE_COM_EFEITO`.
+- **p15:** S3 sem o fantasma amarelado do vídeo (5-15 alternam os desenhos limpos 4 e 16; o smear do
+  jab é curto); j2H sem o rastro laranja embaixo do pé (5-7=8) e com smear da perna recolhida; S4 com
+  smear no chute (pontos à mão).
+- Visto nas folhas; `testarMotor`: só as 3 falhas antigas; build PASS. Jogo e celular: não vistos.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

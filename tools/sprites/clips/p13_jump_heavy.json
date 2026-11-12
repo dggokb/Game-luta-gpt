@@ -2,7 +2,7 @@
   "id": "p13_jump_heavy",
   "javaName": "P13_JUMP_HEAVY",
   "profile": "p13.json",
-  "source": "art/sprites/source/p13_jump_heavy_video_hd.png",
+  "source": "art/sprites/source/p13_jump_heavy_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p13_jump_heavy.webp",
   "report": "tools/sprites/reports/p13_jump_heavy.report.json",
   "preview": "android/app/build/sprite-review/p13_jump_heavy-import.png",
@@ -47,6 +47,24 @@
   "rootY": 668,
   "pixelScale": 2.0,
   "sourceReferences": [
-    "art/sprites/source/p13_jump_heavy_video_normalized.png"
-  ]
+    "art/sprites/source/p13_jump_heavy_video_normalized.png",
+    "art/sprites/source/p13_jump_heavy_video_hd.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p13_jump_heavy_video_hd.png",
+    "quadros": [
+      7,
+      8
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "7=8",
+    "limpar": "todos",
+    "antes": "7=6,8=6",
+    "clarear": 0.6
+  }
 }
