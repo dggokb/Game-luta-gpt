@@ -3510,14 +3510,9 @@ public class GameView extends SurfaceView
                 swingAttack[i] = null;
             }
             boolean down = f.status == CombatFighter.Status.KNOCKDOWN;
-            if (down && !downSeen[i]) {
-                // Bateu no chão: poeira e pedrinhas, mais forte quando vem do alto.
-                float dx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
-                float forca = wasAirborne[i] ? 1f : 0.45f;
-                if (!efeitos.tocar("impacto_chao", dx, GROUND_Y, 0.7f + 0.3f * forca, false)) {
-                    impacts.spawnDust(dx, GROUND_Y, forca);
-                }
-            }
+            // A poeira da queda sai quando o corpo bate no chão e quando assenta (a fumaça de queda,
+            // efeitosDeMovimento). A do começo da queda (impacto_chao) saía antes, no meio do
+            // arremesso: tirada a pedido do dono (12/11).
             downSeen[i] = down;
             efeitosDeMovimento(i, f);
             wasAirborne[i] = !f.grounded;
