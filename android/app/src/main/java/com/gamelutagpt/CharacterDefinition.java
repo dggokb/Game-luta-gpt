@@ -735,10 +735,9 @@ final class CharacterDefinition {
         this.visualStandHeight=visualStandHeight;this.visualCrouchHeight=visualCrouchHeight;this.fighter=fighter;
         this.animations=Collections.unmodifiableMap(new LinkedHashMap<>(animations));
         Map<String,Move> allMoves=new LinkedHashMap<>(moves);
-        // Golpe alto de chão (→ + M) de todos: o do pack, ou montado do M até ter animação própria.
-        if(!allMoves.containsKey(GolpeAlto.BINDING)&&allMoves.containsKey("M")) {
-            allMoves.put(GolpeAlto.BINDING,GolpeAlto.from(allMoves.get("M"),allMoves.get("H")));
-        }
+        // Golpe alto de chão (→ + M): só quem tem o seu no pack (o vídeo próprio). O montado do M
+        // (a pose do M congelada até o 20º quadro) saiu em 12/11: parecia atraso, e andar para a
+        // frente apertando M dava esse golpe lento em vez do M. Sem o seu, → + M é o M.
         this.moves=Collections.unmodifiableMap(allMoves);
         this.specialAnimations=Collections.unmodifiableMap(new LinkedHashMap<>(specialAnimations));
         // Longest command first, so →↓↘ wins over a shorter motion it contains.

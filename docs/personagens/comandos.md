@@ -26,6 +26,10 @@ o botão escolhe a força da energia.
 
 Super: botão SUPER. Ultra: ↓ + SUPER. Agarrão: botão de agarrar (ou L + M juntos).
 
+Golpe alto (→ + M, pega quem defende agachado): só quem tem o próprio, com vídeo (hoje o Ryūga e
+p13 a p16). Nos outros, → + M é o M (12/11: o golpe alto montado do M congelava a pose do M até o
+20º quadro e parecia atraso). Cada um ganha o seu junto com os vídeos novos.
+
 ## Como o jogo lê
 
 - **Diagonal do meio é opcional:** ↓↘→ vale como ↓→, e a meia-lua ←↙↓↘→ vale como ←↓→. A

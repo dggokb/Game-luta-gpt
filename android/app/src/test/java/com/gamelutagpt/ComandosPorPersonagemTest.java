@@ -179,7 +179,8 @@ public class ComandosPorPersonagemTest {
         // A Cabeçada do p04 ([←] →) é de carga (a da Yin-lu virou toque em 11/11).
         Luta l = new Luta("p04");
         l.hold("M", 5, 1, l.config().chargeFrames / 3);
-        assertEquals("pouco tempo atrás: → + M é o golpe alto, não o especial", GolpeAlto.BINDING, l.started());
+        // O p04 não tem golpe alto próprio (12/11): → + M é o M.
+        assertEquals("pouco tempo atrás: → + M é o M, não o especial", "M", l.started());
         Luta solto = new Luta("p04");
         solto.in.direction = 5;
         solto.steps(solto.config().chargeFrames + 2);
@@ -188,7 +189,7 @@ public class ComandosPorPersonagemTest {
         solto.in.direction = 1;
         solto.press("M");
         solto.step();
-        assertEquals("a carga acaba um pouco depois de soltar", GolpeAlto.BINDING, solto.started());
+        assertEquals("a carga acaba um pouco depois de soltar", "M", solto.started());
     }
 
     /**
