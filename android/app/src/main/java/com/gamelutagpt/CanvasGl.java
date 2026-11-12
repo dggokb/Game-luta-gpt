@@ -1539,5 +1539,9 @@ final class CanvasGl extends Canvas {
         }
 
         @Override public void endInvert() { CanvasGl.this.restore(); }
+
+        @Override public void beginScreen() { prepararGl(); gl.beginScreen(); }
+
+        @Override public void endScreen() { prepararGl(); gl.endScreen(); }
     }
 }

@@ -32,7 +32,7 @@ public final class GLES30 {
     public static final int GL_MAX_TEXTURE_SIZE = 0x0D33;
     public static final int GL_COLOR_BUFFER_BIT = 0x4000, GL_STENCIL_BUFFER_BIT = 0x0400;
     public static final int GL_BLEND = 0x0BE2, GL_STENCIL_TEST = 0x0B90;
-    public static final int GL_ZERO = 0, GL_ONE = 1, GL_ONE_MINUS_SRC_ALPHA = 0x0303;
+    public static final int GL_ZERO = 0, GL_ONE = 1, GL_ONE_MINUS_SRC_ALPHA = 0x0303, GL_ONE_MINUS_DST_COLOR = 0x0307;
     public static final int GL_TRIANGLES = 0x0004;
     public static final int GL_KEEP = 0x1E00, GL_INVERT = 0x150A, GL_INCR_WRAP = 0x8507, GL_DECR_WRAP = 0x8508;
     public static final int GL_ALWAYS = 0x0207, GL_NOTEQUAL = 0x0205;
