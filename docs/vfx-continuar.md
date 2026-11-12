@@ -864,6 +864,36 @@ sombra do chão ainda não vem de `direcao`; pulo e queda; o modo sem OpenGL (re
 `luz` e `sombra`, não visto). Se aprovado: tirar o motor de hoje e os campos antigos, acertar os
 9 cenários (Opus, com esta receita) e só então mandar para a `game-luta-sprite-fable`.
 
+**Aprovado pelo dono em 12/11, pelos vídeos** ("Aprovado"). Na mesma mensagem ele corrigiu uma
+das escolhas: "um poder luminoso, assim como luzes, também incide em ambiente e personagens pelos
+princípios de luz e sombra". Ou seja, tirar a luz do efeito do corpo foi erro de princípio: o que
+estava errado na luz do impacto era somar, não existir.
+
+**Poder luminoso é fonte de luz (decidido em 12/11, por fazer).**
+
+- Todo efeito que emite luz (poder, projétil, aura, explosão, faísca de acerto) é um **ponto de
+  luz temporário**: fica onde o efeito está e anda com ele, tem a cor dele, um alcance e uma força
+  de 0 a 1, e nasce e apaga junto com o efeito.
+- **Nos lutadores** entra na mesma mistura dos pontos do cenário (`GameView.luzDoLutador`): toma o
+  lugar da luz do cenário pelo peso, os pesos juntos não passam de 1 e o lado aceso no máximo
+  mostra a arte. Vale para os dois lutadores, inclusive quem solta o poder. De noite aparece
+  bastante (o lado virado para o poder sobe da sombra do lugar até a cor do poder); de dia quase
+  nada, que é o certo.
+- **No ambiente** a luz cai no que está perto: uma poça de luz no chão embaixo do efeito e o
+  reflexo dela onde o cenário tem chão que reflete (`reflexoLuzes`), do jeito que as `luzes` do
+  cenário já são desenhadas (`fillRadialGlow`). Misturada em "screen", para não passar do branco.
+  O fundo distante não recebe (a luz cai com a distância).
+- **Onde se declara:** no `efeito.json` do efeito, `"luz": { "cor": "#RRGGBB", "alcance": 1.2,
+  "forca": 0.8 }`; efeito sem isso não ilumina. A lista de luzes do impacto que já existe
+  (`acenderLuz`, `luzLocal`, `LUZES_LOCAIS`) vira esse registro.
+- **Não conferido:** como os poderes e projéteis são desenhados hoje (se todos passam por
+  `efeito.json`) e quanto custa a poça no chão no celular.
+
+**O que falta para o motor novo ir para a `game-luta-sprite-fable`** (trabalho com receita, para
+uma sessão Opus): o poder como luz (acima); tirar o motor de hoje e os campos antigos do
+`stage.json`; a sombra do chão seguir `direcao`; os cenários com focos levarem a direção do foco
+para a luz; acertar os outros 9 cenários; gravar os 12 e um poder de noite e de dia.
+
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 
 Pedido do dono: "aplica os effects nele e põe". `art/vfx/effectcraft/acerto_forte_05_ec.py` corta a
