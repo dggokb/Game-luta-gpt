@@ -190,7 +190,9 @@
           "y": 0.531,
           "raio": 0.06,
           "cor": "#FFA040",
-          "pulsar": 0.08
+          "pulsar": 0.08,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.711,
@@ -239,14 +241,18 @@
           "y": 0.694,
           "raio": 0.05,
           "cor": "#FFC060",
-          "pulsar": 0.06
+          "pulsar": 0.06,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.259,
           "y": 0.651,
           "raio": 0.04,
           "cor": "#FFA040",
-          "pulsar": 0.05
+          "pulsar": 0.05,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.576,

@@ -579,13 +579,61 @@ luz, então tem que definir nos cenários os pontos de luz".
   mesma luz local do impacto. Só acende quem tem normal map. O fogo treme junto com a chama.
 - Com mapa, a luz local usa a normal exagerada, é mais rasante (acende o lado virado para o ponto,
   não o corpo inteiro) e entra multiplicada pela cor do que ilumina.
-- **Feito só no Templo da Lua** (os braseiros: `lutadores` 0,5, `alcance` 1,2). Os outros 11
-  cenários ainda não têm ponto marcado: ali vale só a luz do lugar (`luzLutadores`). No PC,
-  `-Pcenario=<pasta>` grava em outro cenário.
+- **Primeiro no Templo da Lua** (os braseiros: `lutadores` 0,5, `alcance` 1,2); em 12/11 mais 6
+  cenários (ver "Pontos de luz nos outros 11 cenários" logo abaixo). No PC, `-Pcenario=<pasta>`
+  grava em outro cenário.
 - A direção geral da luz do lugar continua sendo a `contraluz.direcao` do `luzLutadores` (no
   Templo da Lua, `[1, -1]`: de cima, pela direita, o lado da lua).
 
 Vídeo: `android/app/build/sprite-review/pontos_de_luz_off_x_on.mp4` (o Ryūga anda até o braseiro).
+
+**Pontos de luz nos outros 11 cenários (12/11, rodada no Opus).** Pedido: marcar nos 11 cenários
+que faltavam as fontes de luz perto de onde os lutadores andam (só camadas até ~600 de
+profundidade), começando em `lutadores` 0,5 e `alcance` 1,0; conferir a direção da luz geral.
+Só o `stage.json` mudou: nas luzes que já existiam entraram `lutadores` e `alcance`; a única luz
+nova (o segundo tubo do andaime) tem `"raio": 0, "reflexo": false`, para acender o lutador sem
+desenhar nada a mais no cenário (com raio 0 o `fillRadialGlow` não desenha, nos três desenhos).
+
+| Cenário | Camada (profundidade) | Pontos marcados | `lutadores` / `alcance` |
+|---|---|---|---|
+| Arena Imperial | `parede` (570) | 6 lanternas de pedra do pé do muro (luzes 0, 12, 21, 29, 37, 49) | 0,5 / 1,0 |
+| Beco do Brucy | `predio-grafite` (380) | a luminária de parede (luz 0) | 0,5 / 1,0 |
+| | `predio-porta` (380) | a lâmpada da porta e a da esquerda da porta de aço (luzes 1 e 2) | 0,5 / 1,0 |
+| Caminho dos Penhascos | `guarda-corpo` (520) | as 2 luminárias da emenda (luzes 0 e 3) | 0,4 / 1,0 |
+| | `andaimes` (330) | o tubo aceso (luz 0) e o segundo tubo, novo (x 0,668, y 0,37) | 0,4 / 1,0 |
+| Dojo Shūshinkan | `lanternas` (560) | a lanterna do poste | 0,5 / 1,0 |
+| | `pilares` (230) | a lanterna de papel do pilar | 0,5 / 1,0 |
+| Porto Secreto | `postes` (300) | a luminária do poste | 0,5 / 1,0 |
+| Terraço da Lua | `parede` (556) | as 6 lanternas penduradas (luzes 5, 15, 27, 34, 47, 56) | 0,5 / 1,0 |
+| Arena Central, Arena Coberta, Arena Costeira, Arena Central (pintura) | — | nenhum: as luzes delas ficam a 1100 ou mais (os braseiros do muro da arena, holofotes, a parede iluminada) | — |
+| Dojo Liánwǔguǎn | — | nenhum: é dia (sombra de folhas no chão); as lanternas de pedra do muro (641) não acenderiam ninguém | — |
+
+- **Por que poucas, e não todas as lanternas.** O jogo usa só o ponto mais forte sobre cada
+  lutador, sem misturar. Numa fileira de lanternas a 150–220 px uma da outra (o guarda-corpo do
+  Caminho, as 16 do pé do muro da Imperial), o lado aceso trocaria toda vez que o lutador
+  passasse do meio entre duas, e o `pulsar` de cada uma faria a troca piscar se ele parasse ali.
+  Ficou uma fonte a cada trecho (≈ 0,3 a 0,5 de largura de tela), como os braseiros do Templo.
+  Se o dono quiser todas, o certo é o motor misturar os dois pontos mais fortes (não feito).
+- **Caminho em 0,4**: no ensaio com 0,5 a coxa branca do Ryūga perdeu a sombra do lado aceso.
+- **Direção da luz geral**: bate com a arte em todos. Sol à esquerda na Arena Central, na pintura
+  e na Imperial (`[-1,-1]`); no Porto o céu do jogo mostra o pôr do sol à esquerda (`[-1,-1]`);
+  na Costeira o sol fica um pouco à direita (`[1,-1]`); lua no alto, no meio, no Terraço
+  (`[0,-1]`); teto nos dojos e na Arena Coberta (`[0,-1]`). No Caminho dos Penhascos o
+  céu tem lua à direita e sol à esquerda, mas quase não aparece no jogo; a contraluz quente
+  (`#FFF0D8`, `[-1,-1]`) segue o sol. No Beco não há sol nem lua; fica `[1,-1]`. Nada mudado.
+- **O que mais muda entre LUZ OFF e ON é a luz geral do motor 4** (o Kōga, sem ponto perto,
+  clareia igual). Por isso, nos 6 cenários com ponto, há também o vídeo de três colunas: OFF,
+  ON sem pontos (o `stage.json` de antes) e ON com pontos.
+
+Vídeos (Ryūga x Kōga, o Ryūga andando para a direita; 60 quadros a 17,5 por segundo, a
+velocidade do jogo): `android/app/build/sprite-review/pontos_de_luz/<cenário>_luz_off_x_on.mp4`
+(os 11) e `<cenário>_off_sem_com_pontos.mp4` (os 6 com ponto). As gravações de cada coluna são
+rodadas diferentes: a câmera e o passo não batem quadro a quadro.
+
+Testes: `:stage-core:test` passa; `:pc:testarMotor` 687 testes, só as 3 falhas antigas.
+
+**Não visto:** nada no celular; só Ryūga e Kōga (os únicos com normal map); só andando (sem
+golpe, pulo nem queda); o roteiro não leva o Ryūga a todos os pontos de cada cenário.
 
 **O que o botão liga, e por quê (12/11).** A primeira versão só usava o mapa na luz do impacto
 (motor 3), e o dono testou no aparelho: "não vi diferença nenhuma". Ele tinha razão: gravado com
@@ -702,7 +750,7 @@ mandar os mapas; avisado por outra sessão). Foi o que houve no mesmo dia com `p
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
-custo); só Ryūga e Kōga têm mapa (88 folhas); só o Templo da Lua foi visto com o volume (os outros 11 cenários, não); a
+custo); só Ryūga e Kōga têm mapa (88 folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 

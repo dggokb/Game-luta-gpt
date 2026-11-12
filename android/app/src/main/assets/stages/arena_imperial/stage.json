@@ -913,7 +913,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.0357,
@@ -1009,7 +1011,9 @@
           "raio": 0.0095,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.2629,
@@ -1081,7 +1085,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.4636,
@@ -1145,7 +1151,9 @@
           "raio": 0.0086,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.6092,
@@ -1209,7 +1217,9 @@
           "raio": 0.0099,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 1
         },
         {
           "x": 0.7671,
@@ -1305,7 +1315,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 1
         }
       ]
     },
