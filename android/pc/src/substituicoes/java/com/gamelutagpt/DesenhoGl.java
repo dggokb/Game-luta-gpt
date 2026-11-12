@@ -290,7 +290,7 @@ final class DesenhoGl {
         sprite(c, folha, fonte, destino, alpha, filtro, null);
     }
 
-    /** O mesmo, com o normal map da folha (ou null): a luz local usa ele no lugar da silhueta. */
+    /** O mesmo, com o normal map da folha (ou null): a rampa do motor de luz segue o volume dele. */
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro, SpriteAtlasCache.Normal normal) {
         if (c instanceof CanvasGl) {
             ((CanvasGl)c).prepararGl();
@@ -300,24 +300,14 @@ final class DesenhoGl {
             canvas.matriz(valores);
         }
         canvas.filtro(filtro != null ? filtro.matriz : null);
-        // O normal map vai sempre: serve à luz do cenário (o tempo todo) e à luz local.
+        // O normal map vai sempre: a rampa do motor de luz segue ele (o tempo todo).
         canvas.normal(normal);
-        if (localForca > 0f) canvas.luzLocal(localX, localY, localRaio, localR, localG, localB, localForca);
         canvas.desenharBitmap(folha, true, fonte.left, fonte.top, fonte.right, fonte.bottom,
             destino.left, destino.top, destino.right, destino.bottom, alpha);
-        if (localForca > 0f) canvas.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
         canvas.normal(null);
     }
 
-    /** A luz local das próximas folhas de lutador (igual à do jogo: app/.../DesenhoGl.java). */
-    void luzLocal(float x, float y, float raio, float r, float g, float b, float forca) {
-        localX = x; localY = y; localRaio = raio;
-        localR = r; localG = g; localB = b; localForca = forca;
-    }
-
-    private float localX, localY, localRaio, localR, localG, localB, localForca;
-
-    /** O motor de luz e sombra novo para as próximas folhas de lutador ({@link GlRenderCanvas#luzNova}); null desliga. */
+    /** O motor de luz e sombra para as próximas folhas de lutador ({@link GlRenderCanvas#luzNova}); null desliga. */
     void luzNova(float[] v) {
         canvas.luzNova(v);
     }

@@ -262,6 +262,13 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
     if soma > 0:
         # Luz: o jogo soma a folha com o que está embaixo (EfeitosVideo, Mistura), de 0 a 1.
         dados['soma'] = round(min(1.0, soma), 3)
+    # A luz que o efeito emite ("luz": cor, alcance, forca) é posta à mão no efeito.json:
+    # refazer a folha não a apaga.
+    antigo = destino / 'efeito.json'
+    if antigo.exists() and 'luz' not in dados:
+        luz = json.loads(antigo.read_text(encoding='utf-8')).get('luz')
+        if luz is not None:
+            dados['luz'] = luz
     (destino / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     gif_previa(dados, recortados, Path(previa) / f'{nome}.gif')
     return destino, dados

@@ -70,6 +70,15 @@ public interface RenderCanvas {
     /** Brilho circular: a cor no centro some até ficar transparente na borda. */
     void fillRadialGlow(float cx, float cy, float radius, int argbCenter);
 
+    /**
+     * Os brilhos até {@link #endScreen} misturam em "screen" (1 − (1 − a)(1 − b)): clareiam o que
+     * está embaixo sem passar do branco (a luz de um poder caindo no chão). Quem não sabe fazer
+     * desenha na mistura normal, que também não passa do branco.
+     */
+    default void beginScreen() {}
+
+    default void endScreen() {}
+
     void fillVerticalGradient(float left, float top, float right, float bottom, int argbTop, int argbBottom);
 
     void fillOval(float left, float top, float right, float bottom, int argb);

@@ -364,5 +364,10 @@
   83,
   83
  ],
- "marcaMs": 1162
+ "marcaMs": 1162,
+ "luz": {
+  "cor": "#55A9CD",
+  "alcance": 1.2,
+  "forca": 0.8
+ }
 }
