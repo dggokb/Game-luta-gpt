@@ -97,8 +97,8 @@ public class ComboRyugaTest {
         s.in[0].direction = 0;
         s.until(me::attacking, 10);
         assertEquals("6H", me.attack.id);
-        // Sem o golpe no pacote (a Yin-lu), → + H continua sendo o H.
-        CombatEngineTest.Sim y = new CombatEngineTest.Sim(GeneratedCharacters.get(YINLU), GeneratedCharacters.get(RYUGA), 600f, 1400f);
+        // Sem o golpe no pacote (o Kōga, por enquanto), → + H continua sendo o H.
+        CombatEngineTest.Sim y = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), GeneratedCharacters.get(RYUGA), 600f, 1400f);
         y.in[0].direction = 1;
         y.in[0].heavy = true;
         y.step();
@@ -123,7 +123,8 @@ public class ComboRyugaTest {
         // assist no meio e a troca no Super (DHC) recomeçam; e, depois do ↓jH que quica no chão,
         // quem cravou desce rápido e pega o rival ainda quicando (relança ou recomeça no chão).
         emenda("parede do S3 → combo novo", perto("L M M S3 W90 C200 L M M 6H S2", 100f), 12);
-        emenda("assist no meio", perto("L M M A W20 C140 L M M 6H S2", 100f), 10);
+        // O assist da Yin-lu é o chute que lança (12/11): ele sobe atrás e continua no ar.
+        emenda("assist no meio", perto("L M M A W25 SJ jL jM J jL jM j2H", 100f), 9);
         emenda("Super → DHC", perto("2L 6H S2 SUPER DHC", 100f), 14);
         emenda("↓jH → relança", perto("2L M 2H SJ jL jM j2H 2H SJ jL jM j2H", 100f), 10);
         emenda("↓jH → recomeça no chão", perto("2L M 2H SJ jL jM j2H C140 L M", 100f), 8);

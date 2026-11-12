@@ -214,7 +214,7 @@ public final class BateriaCombos {
                         default: apertaEspecial(acao, me, in0); break;
                     }
                 }
-                boolean noChao = me.grounded;
+                boolean noChao = me.grounded, puloNoArAntes = me.airJumpUsed;
                 boolean assistAntes = e.team(0).assistOut();
                 int titular = e.team(0).point;
                 e.step(in0, in1);
@@ -232,7 +232,8 @@ public final class BateriaCombos {
                 boolean novo = me.attacking() && me.attack != null && (me.attack != antes || me.attackFrame < antesQuadro ||
                     me.chain.size() > antesCorrente || me.golpesIniciados > antesIniciados);
                 switch (acao) {
-                    case "J": case "SJ": feito = noChao && !me.grounded; break;
+                    // No ar, o J é o pulo no ar (o cancelamento de pulo ou o pulo duplo da Yin-lu).
+                    case "J": case "SJ": feito = noChao && !me.grounded || !noChao && !puloNoArAntes && me.airJumpUsed; break;
                     case "D": feito = me.forwardDashing; break;
                     case "C": feito = Math.abs(dummy.x - me.x) <= 260f; break;
                     case "C100": case "C120": case "C140": case "C160": case "C180": case "C200": case "C220": case "C240":

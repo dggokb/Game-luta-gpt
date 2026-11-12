@@ -30,8 +30,12 @@ final class CancelSystem {
     /** Whether the current attack may become {@code target} on this frame. */
     static boolean canCancel(CombatFighter f, String target, ComboSession session) {
         if (!f.attacking() || !windowOpen(f) || !f.attack.cancelsInto(target)) return false;
-        // No chão é o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo).
-        if (AttackDefinition.JUMP.equals(target)) return f.grounded || !f.airJumpUsed;
+        // No chão é o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo). Golpe de
+        // várias pancadas só pula depois da última (12/11: o S4 da Yin-lu lança no segundo chute).
+        if (AttackDefinition.JUMP.equals(target)) {
+            if (f.attack.maxHits > 1 && f.hitsOnTarget < f.attack.maxHits) return false;
+            return f.grounded || !f.airJumpUsed;
+        }
         AttackDefinition next = f.character().attack(target);
         return next != null && chainAllows(f, next) && (session == null || session.allows(next));
     }

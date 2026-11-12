@@ -2103,6 +2103,15 @@ final class CombatEngine {
      * uma vez por voo, e a corrente aérea recomeça (jL → jM → pulo → jL → jM → j2H).
      */
     private void airJump(CombatFighter f) {
+        if (f.launcherChase > 0) {
+            // Acabou de lançar com o corpo no ar (o S4 da Yin-lu voa): o pulo é o super pulo que
+            // persegue o rival, como o do 2H no chão, e não gasta o pulo no ar (12/11).
+            f.status = CombatFighter.Status.NEUTRAL;
+            f.clearAttack();
+            f.airRecovering = false;
+            jump(f, true);
+            return;
+        }
         f.pendingJumpAge = -1;
         f.status = CombatFighter.Status.NEUTRAL;
         f.clearAttack();
@@ -5084,6 +5093,9 @@ final class CombatEngine {
             d.launched = true;
             d.slammed = false;
             d.superJumping = false;
+            // Lançar é para continuar (12/11): no mínimo o atordoamento de um lançamento, senão o
+            // rival de um especial que lança (o S4 da Yin-lu) se recupera no ar antes do super pulo.
+            d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.launchHitstunFrames);
             a.launcherChase = config.launcherChaseFrames;
             push(d, a, direction * attack.knockback);
         } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() && !a.grounded) {

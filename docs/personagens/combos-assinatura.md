@@ -3,8 +3,8 @@
 > **Ryūga: no jogo (12/11)**, com os combos conferidos no motor (`ComboRyugaTest`) e gravados no PC.
 > Decisões do dono: manter a base de todos e somar sequência própria depois do começo do combo,
 > especial como ponte, golpe de comando e parceiro no combo; M → M como sequência; o → + H entra já,
-> com a animação do H, porque ele é que vai ditar a animação nova. **Yin-lu: ainda proposta**
-> (entra quando for a vez dela); os outros, quando cada um for refeito.
+> com a animação do H, porque ele é que vai ditar a animação nova. **Yin-lu: no jogo (12/11)**,
+> conferida no motor (`ComboYinluTest`). Os outros, quando cada um for refeito.
 
 Pedido: "todo mundo comba igual". Hoje a corrente é a mesma para os 16 (L → M → H subindo de força,
 o 2H que lança para o super pulo e, no ar, jL → jM → pulo → jL → jM → j2H; `mecanicas.md` 4b). O
@@ -67,7 +67,7 @@ emendar, conferidos no motor (`ComboRyugaTest.comboCurtoEmendaEmOutroCombo`):
 | Como emenda | Exemplo | Acertos |
 |---|---|---|
 | Parede do S3 | L, M, M → S3 (parede) → corre → L, M, M, → + H, S2 | 12 |
-| Assist no meio | L, M, M → TAG → corre → L, M, M, → + H, S2 | 10 |
+| Assist no meio | L, M, M → TAG (o chute da Yin-lu lança) → super pulo → jL, jM → pulo → jL, jM, ↓jH | 9 |
 | Troca no Super (DHC) | 2L, → + H, S2, Super → DHC (Super da parceira) | 14 |
 | Depois do ↓jH, relançando | 2L, M, 2H → super pulo → jL, jM, ↓jH → 2H → super pulo → jL, jM, ↓jH | 10 |
 | Depois do ↓jH, no chão | 2L, M, 2H → super pulo → jL, jM, ↓jH → corre → L, M | 8 |
@@ -111,26 +111,32 @@ R5b o Super entra porque o S2 pega o rival ainda no chão.
 vezes**: ela lança, termina no ar quicando o rival no chão e lança de novo. É o contrário do Ryūga:
 longo, leve e aéreo.
 
-### O que muda no jogo
+### O que está no jogo (12/11)
 
-| Camada | Mudança | Como |
+O dono: "faz e descobrimos". Tudo entrou, conferido no motor (`ComboYinluTest`) e gravado no PC.
+
+| Camada | O que é | Onde |
 |---|---|---|
-| 1. Sequência | **Fluxo da garça: L, L, M, M, H** (palma, palma, bico, bico, crescente), cada um emendando sem pausa. Ela já tem M → M; o que muda é a corrente aceitar o fluxo inteiro sem apertar no tempo exato | estilo de combo próprio ("garça", hoje "chutes"): mais folga no cancelamento entre L e M |
-| 3. Ponte | **S4 (Chute rodopiante): lança** em vez de derrubar; ela pula atrás e continua no ar | `especiais.S4.lancar`: knockdown → launch |
-| 3. Ponte | **O 2H pode lançar duas vezes no combo** (a segunda depois do quique no chão) | `maxUsosCorrente` do 2H: 1 → 2, só nela |
-| 4. Corpo | **O pulo duplo estende o combo aéreo** (já está no jogo), mais os dois jM seguidos que ela já tem | já existe |
-| 2. Comando | **`→ + H`: Joelho da garça.** Sobe numa perna com o joelho no queixo e, sem descer, estica o pé no rosto: dois golpes, o segundo lança. Abre o combo aéreo sem precisar do 2H | **precisa de vídeo** |
+| 1. Sequência | **Fluxo da garça: L, L, M, M, H** (palma, palma, bico, bico, crescente na parede). Já emendava com o estilo dela (M > M); ficou conferido | estilo `chutes` |
+| 2. Comando | **→ + H: Joelho da garça.** Dois golpes (quadros 8 e 15), o segundo lança; cancela em pulo (o super pulo atrás), especial ou Super. Abre o combo no ar sem o 2H. Por enquanto com a animação do H | `mecanicas.json` p02.golpeComando |
+| 3. Ponte | **S4 (Chute rodopiante) lança** em vez de derrubar e cancela em pulo depois do segundo chute; o pulo é o super pulo que persegue (mesmo saindo do ar, onde o S4 termina) | `especiais.S4.lancar`: launch; `unica.rotas.S4` |
+| 4. Corpo | **Pulo duplo no meio do combo no ar** (jM, jM → pulo → jL, jM, jM) | já existia |
+| 5. Sobe duas vezes | Termina no ar com o ↓jH, pousa (desce rápido) e lança de novo no 2H | regra da base (12/11) |
+| 6. Parceiro | **O assist dela é o chute que lança (2H):** entra até o rival e o joga para o alto; quem está em campo dá o super pulo e continua no ar. O contrário do Ryūga, que segura no chão | `fighter.assist.move`: 2H |
 
-### Os combos
+### Os combos (conferidos no motor, contra o Ryūga parado)
 
-| # | Nome | Sequência | O que acontece | Agora? |
-|---|---|---|---|---|
-| Y1 | Fluxo da garça | L, L, M, M, H (parede) | cinco pancadas leves e o crescente que joga na parede | com a folga nova |
-| Y2 | Garça no ar | 2L, M, M → **S4 (Chute rodopiante)** → pula → jL, jM, jM → pulo duplo → jM, jH | o rodopiante lança, ela sobe atrás e usa o pulo duplo no meio do combo aéreo | com o S4 lançando |
-| Y3 | Sobe duas vezes | 2H → super pulo → jL, jM, jM, **j2H** (quica no chão) → **2H** (lança de novo) → super pulo → jL, jM, jH | o combo mais longo do elenco: termina no ar, o rival quica e ela lança de novo | com o 2H duas vezes |
-| Y4 | Joelho (com vídeo) | L, L, **`→ + H`** → pula → jL, jM, jM → pulo duplo → jM, jH | abre o ar direto do fluxo, sem o 2H | quando vier o vídeo |
+| # | Nome | Sequência | Acertos |
+|---|---|---|---|
+| Y1 | Fluxo da garça | L, L, M, M, H (parede) | 5 |
+| Y2 | Garça no ar | L, L, M, M, S4 (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jM, ↓jH | 13 |
+| Y3 | Joelho | L, L, M, M, → + H (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jM, ↓jH | 13 |
+| Y4 | Sobe duas vezes | L, L, M, M, S4 → super pulo → jL, jM, jM, ↓jH → 2H → super pulo → jL, jM, jM → pulo → jL, jM, jH | 17 |
+| Y5 | Assist | (Ryūga em campo) L, M, M → TAG (o chute dela lança) → super pulo → jL, jM → pulo → jL, jM, ↓jH | 9 |
 
----
+Regras da base que vieram com ela (valem para todos): todo golpe que lança deixa pelo menos 44
+quadros de atordoamento (`launchHitstunFrames`); golpe de várias pancadas só cancela em pulo depois
+da última; e o pulo logo depois de lançar, saindo do ar, é o super pulo que persegue.
 
 ## Lado a lado
 
@@ -153,5 +159,3 @@ Os números finais saem dos testes do motor e do celular.
 
 1. **Y3 (dois 2H):** um combo de 12 pancadas pode passar do ponto. O escalonamento de dano do jogo
    (cada pancada a mais tira menos) segura o total, mas vale sentir no celular.
-2. **O assist da Yin-lu** (a Palma) hoje quase não pega no meio do combo do Ryūga: ela entra atrás
-   dele e a Palma é curta. Entra no trabalho dela.

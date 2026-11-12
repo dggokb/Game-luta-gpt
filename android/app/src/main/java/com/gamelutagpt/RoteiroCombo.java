@@ -15,7 +15,7 @@ final class RoteiroCombo {
     private int k = 0, t = 0;
     private AttackDefinition antes;
     private int antesQuadro, antesCorrente, antesIniciados;
-    private boolean noChao, assistFora;
+    private boolean noChao, assistFora, puloNoAr;
     private int titular;
 
     RoteiroCombo(String rota) { passos = rota.trim().split("[ ,]+"); }
@@ -39,6 +39,7 @@ final class RoteiroCombo {
             antesCorrente = me.chain.size();
             antesIniciados = me.golpesIniciados;
             noChao = me.grounded;
+            puloNoAr = me.airJumpUsed;
             assistFora = e.team(0).assistOut();
             titular = e.team(0).point;
         }
@@ -86,7 +87,7 @@ final class RoteiroCombo {
             (me.attack != antes || me.attackFrame < antesQuadro || me.chain.size() > antesCorrente ||
              me.golpesIniciados > antesIniciados);
         switch (passo) {
-            case "J": case "SJ": return noChao && !me.grounded;
+            case "J": case "SJ": return noChao && !me.grounded || !noChao && !puloNoAr && me.airJumpUsed;
             case "D": return me.forwardDashing;
             case "A": return !assistFora && e.team(0).assistOut();
             case "DHC": return e.cues().contains("DHC") || e.team(0).point != titular;

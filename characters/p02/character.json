@@ -111,7 +111,7 @@
       }
     },
     "assist": {
-      "move": "S"
+      "move": "2H"
     },
     "wakeupFrames": 37,
     "ultra": {
@@ -10377,7 +10377,8 @@
         "2L",
         "2M",
         "H",
-        "2H"
+        "2H",
+        "6H"
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 24,
@@ -10425,6 +10426,7 @@
         "S3",
         "S4",
         "2H",
+        "6H",
         "M"
       ],
       "pushbackOnHit": 32,
@@ -10509,7 +10511,8 @@
         "L",
         "2L",
         "H",
-        "2H"
+        "2H",
+        "6H"
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 22,
@@ -10711,6 +10714,54 @@
       "hitHeight": 215,
       "hitFloor": 174,
       "maxUsesPerChain": 1
+    },
+    "6H": {
+      "animation": "HEAVY_STRAIGHT",
+      "nome": "Joelho da garça",
+      "damage": 760,
+      "reach": 150,
+      "startupFrames": 8,
+      "activeFrames": 10,
+      "recoveryFrames": 16,
+      "hitstunFrames": 40,
+      "blockstunFrames": 12,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          15,
+          30
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "JUMP",
+        "S",
+        "SUPER",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "launchType": "launch",
+      "knockback": 0,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 40,
+      "hitHeight": 260,
+      "hitFloor": 60,
+      "golpes": [
+        8,
+        15
+      ],
+      "mecanica": {
+        "avanco": {
+          "velocidade": 360,
+          "frames": [
+            1,
+            8
+          ]
+        }
+      },
+      "maxUsesPerChain": 1
     }
   },
   "specialAnimations": {
@@ -10846,15 +10897,19 @@
       "cancelWindows": {
         "hit": [
           9,
-          27
+          34
         ],
-        "block": null,
+        "block": [
+          9,
+          34
+        ],
         "whiff": null
       },
       "cancelInto": [
-        "SUPER"
+        "SUPER",
+        "JUMP"
       ],
-      "launchType": "knockdown",
+      "launchType": "launch",
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
@@ -10864,6 +10919,9 @@
         "H"
       ],
       "nome": "Chute rodopiante",
+      "especialBase": {
+        "launchType": "knockdown"
+      },
       "golpesBase": {
         "startupFrames": 9,
         "activeFrames": 13,

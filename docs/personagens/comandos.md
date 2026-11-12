@@ -33,7 +33,8 @@ p13 a p16). Nos outros, → + M é o M (12/11: o golpe alto montado do M congela
 Chute no caído (OTG, ↓ + M, 12/11, todos): dentro de um combo, a rasteira pega o rival que acabou
 de cair e o levanta para continuar; um por combo.
 
-Golpe de comando (→ + H, 12/11): só quem tem o próprio (hoje o Ryūga, o Soco no plexo). Sai do
+Golpe de comando (→ + H, 12/11): só quem tem o próprio (hoje o Ryūga, o Soco no plexo, e a Yin-lu,
+o Joelho da garça). Sai do
 neutro e emendado no combo (depois do L, do 2L e do M); dentro de um golpe que não emenda nele,
 → + H continua sendo o H. Nos outros, → + H é o H.
 

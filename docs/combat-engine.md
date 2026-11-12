@@ -601,6 +601,14 @@ e vão para `cues()`.
 
 Testes em `BounceTest`.
 
+### Lançar para continuar (12/11)
+
+- Todo `launch` deixa pelo menos `launchHitstunFrames` (44) de atordoamento: um especial que lança
+  (o S4 da Yin-lu) não solta o rival no ar antes do super pulo.
+- Golpe de várias pancadas só cancela em pulo depois da última (`CancelSystem.canCancel`).
+- Logo depois de lançar (`launcherChase`), o pulo que sai do ar (o golpe terminou no ar, como o S4
+  dela) é o super pulo que persegue, sem gastar o pulo no ar.
+
 ### OTG: o chute no caído (12/11)
 
 Como no Marvel vs. Capcom: dentro de um combo (2 acertos ou mais), o **↓ + M** (`otgMove`, a
