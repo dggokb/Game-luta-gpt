@@ -17424,7 +17424,7 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
+      "launchType": "arc",
       "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
@@ -17434,7 +17434,12 @@
         "H"
       ],
       "nome": "Punho ascendente",
+      "arcoBase": "knockdown",
       "mecanica": {
+        "arco": {
+          "altura": 160,
+          "distancia": 340
+        },
         "voo": {
           "altura": 170,
           "frames": [

@@ -4995,6 +4995,27 @@ final class CombatEngine {
         } else if (launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
             knockDown(d);
             push(d, a, direction * attack.knockback);
+        } else if (launch == AttackDefinition.Launch.ARC) {
+            // Arco (o shoryuken do Ryūga, o chute da garça da Yin-lu): o rival sobe a altura do arco
+            // e cai a distância dele, pela gravidade de quem apanha no ar, e termina derrubado.
+            float g = config.gravity * d.character().fighter.weightScale();
+            float altura = Math.max(10f, attack.mechanics.arcHeight);
+            float sobe = (float) Math.sqrt(2f * g * altura);
+            float queda = altura + Math.max(0f, Arena.GROUND_Y - d.y);
+            float tempo = sobe / g + (float) Math.sqrt(2f * queda / g);
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+            d.vy = -sobe;
+            d.vx = direction * attack.mechanics.arcDistance / tempo;
+            d.bounce = CombatFighter.BOUNCE_NONE;
+            d.launched = false;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, Math.round(tempo * CombatConfig.FPS) + 2);
+            d.pushRemaining = 0f;
+            d.pushFramesLeft = 0;
         } else if (launch == AttackDefinition.Launch.LAUNCH) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             // Pego no ar (ex.: voltando da parede), sobe só até a altura de um lançamento do
@@ -5009,6 +5030,14 @@ final class CombatEngine {
             d.superJumping = false;
             a.launcherChase = config.launcherChaseFrames;
             push(d, a, direction * attack.knockback);
+        } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() && !a.grounded) {
+            // Golpe que voa e bate várias vezes (o chute da garça da Yin-lu): as pancadas do meio
+            // levam o rival junto, subindo com quem bate, para a próxima pegar; a última joga.
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+            d.vy = Math.min(a.vy, -config.strikeHoldLift);
+            push(d, a, direction * airPush);
         } else if (!d.grounded) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             push(d, a, direction * airPush);

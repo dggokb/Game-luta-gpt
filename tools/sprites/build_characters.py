@@ -78,7 +78,7 @@ COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imp
 # Estilo só da CPU (fighter.cpuStyle), quando difere do de combo.
 CPU_STYLES = COMBO_STYLES + ('agarrador', 'onda', 'contra', 'rekka', 'esquiva', 'ninja', 'acrobata')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
-            'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
+            'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE','arc':'ARC'}
 STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
 REQUIRED_ATTACK = ('startupFrames','activeFrames','recoveryFrames','hitstunFrames','blockstunFrames','hitstopFrames',
                    'cancelWindows','cancelInto','pushbackOnHit','pushbackOnBlock')
@@ -192,7 +192,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo'}
+             'chao','rebote','desenho','voo','arco'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -240,6 +240,14 @@ def validate_mechanics(name, mech, m, projectile):
             raise ValueError(f'{name}.mecanica.voo.paira: true (or leave it out)')
         if 'salto' in mech or 'mergulho' in mech:
             raise ValueError(f'{name}.mecanica.voo: not with salto or mergulho')
+    # Arco (launchType arc): o rival voa em arco, com altura e distância (o shoryuken do Ryūga).
+    if 'arco' in mech:
+        v = mech['arco']
+        if not (isinstance(v, dict) and set(v) == {'altura', 'distancia'}):
+            raise ValueError(f'{name}.mecanica.arco: {{altura, distancia}}')
+        positive(v['altura'], f'{name}.mecanica.arco.altura'); positive(v['distancia'], f'{name}.mecanica.arco.distancia')
+    if ('arco' in mech) != (m.get('launchType') == 'arc'):
+        raise ValueError(f'{name}.mecanica.arco: goes with launchType arc, and arc needs it')
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
     if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
         raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
@@ -780,6 +788,7 @@ def compile_packs(root, results):
         if mech.get('chao'): code += '.pound()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
+        if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+')'
         if 'voo' in mech:
             v = mech['voo']
             code += '.flight('+f(v['altura'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('paira'))).lower()+')'

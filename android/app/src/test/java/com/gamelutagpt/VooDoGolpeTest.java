@@ -80,7 +80,7 @@ public class VooDoGolpeTest {
     }
 
     @Test public void oChuteDaGarcaSaiDoChaoSemAndar() {
-        // A Yin-lu (11/11): o S2 sobe numa perna (60 px) e cai onde saiu; o S4 gira no ar.
+        // A Yin-lu: o S2 sobe numa perna (o voo dela, 110 px desde 12/11) e cai onde saiu; o S4 gira no ar.
         CharacterDefinition yinlu = GeneratedCharacters.get("p02");
         float[][] c = caminho(yinlu, "S2");
         float alto = 0f;
@@ -91,7 +91,8 @@ public class VooDoGolpeTest {
             if (q[2] == 0f) assertEquals("no ar, ainda se defende agachado", 0f, q[4], 0f);
         }
         assertTrue("o S2 sai do chão", voou);
-        assertEquals("sobe uns 60 px", 60f, alto, 12f);
+        float voo = yinlu.attack("S2").mechanics.flightHeight;
+        assertEquals("sobe a altura do voo dela", voo, alto, voo * 0.15f);
         assertEquals("cai onde saiu", c[0][0], c[c.length - 1][0], 4f);
         float[][] giro = caminho(yinlu, "S4");
         boolean noAr = false;

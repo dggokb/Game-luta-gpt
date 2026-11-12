@@ -3464,6 +3464,8 @@ public class GameView extends SurfaceView
         if (!attacker.attacking() || attacker.attack == null) return false;
         AttackDefinition.Launch launch = attacker.attack.launch;
         if (launch == AttackDefinition.Launch.LAUNCH) return !defender.grounded && !defender.spinning;
+        // O arco (o shoryuken): o rival voando para longe.
+        if (launch == AttackDefinition.Launch.ARC) return !defender.grounded;
         boolean smash = launch == AttackDefinition.Launch.WALL_BOUNCE || launch == AttackDefinition.Launch.GROUND_BOUNCE ||
             launch == AttackDefinition.Launch.SLAM;
         return smash && (defender.bounce != CombatFighter.BOUNCE_NONE || defender.slammed);

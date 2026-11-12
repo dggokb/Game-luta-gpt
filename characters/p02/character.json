@@ -10729,10 +10729,10 @@
       "reach": 98,
       "hitHeight": 127,
       "startupFrames": 5,
-      "activeFrames": 7,
-      "recoveryFrames": 20,
-      "hitstunFrames": 36,
-      "blockstunFrames": 14,
+      "activeFrames": 16,
+      "recoveryFrames": 11,
+      "hitstunFrames": 23,
+      "blockstunFrames": 4,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
@@ -10745,7 +10745,7 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
+      "launchType": "arc",
       "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
@@ -10756,9 +10756,26 @@
       ],
       "nome": "Chute da garça",
       "segurar": true,
+      "golpesBase": {
+        "startupFrames": 5,
+        "activeFrames": 7,
+        "recoveryFrames": 20,
+        "hitstunFrames": 36,
+        "blockstunFrames": 14
+      },
+      "golpes": [
+        5,
+        10,
+        18
+      ],
+      "arcoBase": "knockdown",
       "mecanica": {
+        "arco": {
+          "altura": 150,
+          "distancia": 300
+        },
         "voo": {
-          "altura": 60,
+          "altura": 110,
           "frames": [
             4,
             23
@@ -10868,10 +10885,10 @@
           "paira": true
         },
         "avanco": {
-          "velocidade": 380,
+          "velocidade": 1280,
           "frames": [
-            0,
-            15
+            11,
+            25
           ]
         }
       }
