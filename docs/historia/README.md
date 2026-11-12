@@ -139,8 +139,10 @@ escolheu o Ryūga, e uma com `"irmao": "koga"`, só para quem escolheu o Kōga. 
 `irmao` é comum aos dois. A versão do Kōga leva o sufixo `_koga` no arquivo e fica logo
 depois da versão do Ryūga no `episodio.json`.
 
-Numeração da temporada: as páginas são contadas em sequência desde o Prólogo (ep00 = 1 a 11,
-ep01 = 12 a 22).
+Numeração da temporada (a mesma dos arquivos do Drive, pasta `history`; a subpasta `Koga` tem só
+as páginas que mudam para o Kōga, e o número que falta lá é o mesmo do Ryūga): ep00 = 1 a 11,
+ep01 = 12 a 22, ep02 = 23 a 27 (26_1 e 26_2 são as lembranças), ep03 = 28 a 37 (32_1 a 32_6 são o
+desafio de cada dupla), ep04 = 38 a 51.
 
 | ep01 | Global | Ryūga | Kōga |
 |---|---|---|---|
@@ -158,6 +160,8 @@ dupla que o porto pode sortear:
 | a viagem e a ilha | `pag3` (comum) | `pag3` (comum) |
 | a chegada | `pag4_ryuga` (no meio da multidão) | `pag4_koga` (o "cheiro de briga" do Brucy) |
 | o desafio no cais | `pag5_ryuga_pNN` | `pag5_koga_pNN` |
+| depois do desafio | `pag6_ryuga_1`, `pag6_ryuga_2` (Drive 33, 34) | `pag6_koga_1`, `pag6_koga_2` (Drive 33, 34) |
+| a central de sorteios | `pag6_2` a `pag6_4` (comuns, Drive 35 a 37) | iguais |
 
 `pNN` é a dupla do adversário (`p05`, `p07`, `p09`, `p11`, `p13`, `p15`); só a página da dupla sorteada
 aparece (`"adversario"` no passo).
