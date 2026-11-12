@@ -315,7 +315,7 @@ tasks.register('gravarLuta', JavaExec) {
     if (providers.gradleProperty('dupla').isPresent()) systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').get()
     if (providers.gradleProperty('carga').isPresent()) systemProperty 'gameluta.carga', providers.gradleProperty('carga').get()
     if (providers.gradleProperty('gl').isPresent()) systemProperty 'gameluta.opengl', 'true'
-    // O normal map na luz (motor 4): -Pluz=off|suave|forte (o botão LUZ do Modo Teste; sem nada, forte);
+    // O normal map na luz (motor 4): -Pluz=off começa com o botão LUZ do Modo Teste desligado;
     // -PluzDura=N estica a luz do impacto e -PluzFixa=1 a deixa na força cheia; -PnormalAlterna=1 liga
     // e desliga o mapa a cada quadro (dois quadros seguidos com a mesma pose, com e sem).
     if (providers.gradleProperty('luz').isPresent()) systemProperty 'gameluta.luz', providers.gradleProperty('luz').get()
@@ -323,6 +323,8 @@ tasks.register('gravarLuta', JavaExec) {
     if (providers.gradleProperty('luzDura').isPresent()) systemProperty 'gameluta.luzDura', providers.gradleProperty('luzDura').get()
     if (providers.gradleProperty('luzFixa').isPresent()) systemProperty 'gameluta.luzFixa', 'true'
     if (providers.gradleProperty('normalAlterna').isPresent()) systemProperty 'gameluta.normalAlterna', 'true'
+    // -Pcenario=<pasta em assets/stages>: o cenário da luta (sem nada, templo_lua).
+    if (providers.gradleProperty('cenario').isPresent()) systemProperty 'gameluta.cenario', providers.gradleProperty('cenario').get()
     // -Pbotoes=1: os botões do Modo Teste aparecem na gravação.
     if (providers.gradleProperty('botoes').isPresent()) systemProperty 'gameluta.botoes', 'true'
     // -Pgraficos=ALTO: fixa o nível gráfico (a gravação lenta do PC faz o automático baixar no meio).

@@ -22,7 +22,8 @@ import java.util.Map;
  *     { "imagem": "ceu.jpg", "profundidade": 100000, "topo": -0.2, "base": 0.62, "repetir": "espelhar" },
  *     { "imagem": "pilares.png", "profundidade": 300, "noChao": true, "altura": 0.9,
  *       "x": 0.06, "repetir": "espelhar", "periodo": 0.88,
- *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ],
+ *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true,
+ *                    "lutadores": 0.8, "alcance": 0.9 } ],   // ponto de luz dos lutadores (veja Light)
  *       "bandeiras": [ { "imagem": "bandeira.png", "x": 0.3, "y": 0.29, "largura": 0.31, "altura": 0.53 } ] },
  *     { "tipo": "neblina", "profundidade": 2600, "topo": 0.45, "base": 0.62, "cor": "#3A2A66", "alfa": 0.5 }
  *   ],
@@ -56,25 +57,48 @@ public final class StageDefinition {
         public final float pulse;
         /** Desenha o reflexo da luz no chão molhado. */
         public final boolean reflect;
+        /**
+         * Ponto de luz dos lutadores ({@code "lutadores"}): a força com que esta luz ilumina o
+         * corpo de quem está perto, do lado dela (0 = só enfeita o cenário). {@code reach}
+         * ({@code "alcance"}): até onde chega, em alturas de tela; 0 = não cai com a distância
+         * (a lua, o sol).
+         */
+        public final float fighters, reach;
 
         Light(float x, float y, float radius, int color, float pulse, boolean reflect) {
+            this(x, y, radius, color, pulse, reflect, 0f, 0f);
+        }
+
+        Light(float x, float y, float radius, int color, float pulse, boolean reflect, float fighters, float reach) {
             this.x = x;
             this.y = y;
             this.radius = radius;
             this.color = color;
             this.pulse = pulse;
             this.reflect = reflect;
+            this.fighters = fighters;
+            this.reach = reach;
         }
     }
 
     /** Fogo animado preso num ponto da imagem; tamanho em fração da altura da imagem. */
     public static final class Fire {
         public final float x, y, size;
+        /** Ponto de luz dos lutadores, como em {@link Light}: força, alcance e a cor da luz do fogo. */
+        public final float fighters, reach;
+        public final int color;
 
         Fire(float x, float y, float size) {
+            this(x, y, size, 0f, 0f, 0xFFFF9A3C);
+        }
+
+        Fire(float x, float y, float size, float fighters, float reach, int color) {
             this.x = x;
             this.y = y;
             this.size = size;
+            this.fighters = fighters;
+            this.reach = reach;
+            this.color = color;
         }
     }
 
@@ -1141,7 +1165,8 @@ public final class StageDefinition {
                 if (!(item instanceof Map)) continue;
                 Map<String, Object> l = (Map<String, Object>)item;
                 b.lights.add(new Light(number(l, "x", 0.5f), number(l, "y", 0.5f), number(l, "raio", 0.05f),
-                    color(l, "cor", 0xFFFFB45A), number(l, "pulsar", 0.12f), bool(l, "reflexo", true)));
+                    color(l, "cor", 0xFFFFB45A), number(l, "pulsar", 0.12f), bool(l, "reflexo", true),
+                    pontoDeLuz(l, where), number(l, "alcance", ALCANCE_PADRAO)));
             }
         }
         Object fires = map.get("fogos");
@@ -1149,7 +1174,8 @@ public final class StageDefinition {
             for (Object item : (List<Object>)fires) {
                 if (!(item instanceof Map)) continue;
                 Map<String, Object> f = (Map<String, Object>)item;
-                b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f)));
+                b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f),
+                    pontoDeLuz(f, where), number(f, "alcance", ALCANCE_PADRAO), color(f, "cor", 0xFFFF9A3C)));
             }
         }
         Object telao = map.get("telao");
@@ -1306,6 +1332,16 @@ public final class StageDefinition {
     private static String string(Map<String, Object> map, String key, String fallback) {
         Object value = map == null ? null : map.get(key);
         return value instanceof String ? (String)value : fallback;
+    }
+
+    /** Alcance de um ponto de luz dos lutadores sem {@code "alcance"}: 0,9 altura de tela. */
+    static final float ALCANCE_PADRAO = 0.9f;
+
+    /** {@code "lutadores"} de uma luz ou fogo: a força do ponto de luz no corpo dos lutadores (0 a 2). */
+    private static float pontoDeLuz(Map<String, Object> map, String where) {
+        float v = number(map, "lutadores", 0f);
+        if (v < 0f || v > 2f) throw new IllegalArgumentException(where + ": \"lutadores\" entre 0 e 2");
+        return v;
     }
 
     private static float number(Map<String, Object> map, String key, float fallback) {

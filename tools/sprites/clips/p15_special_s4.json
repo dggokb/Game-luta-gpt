@@ -2,7 +2,7 @@
   "id": "p15_special_s4",
   "javaName": "P15_SPECIAL_S4",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_special_s4_video_hd.png",
+  "source": "art/sprites/source/p15_special_s4_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_special_s4.webp",
   "report": "tools/sprites/reports/p15_special_s4.report.json",
   "preview": "android/app/build/sprite-review/p15_special_s4-import.png",
@@ -44,7 +44,22 @@
   "rootX": 542,
   "rootY": 846,
   "sourceReferences": [
-    "art/sprites/source/p15_special_s4_video_normalized.png"
+    "art/sprites/source/p15_special_s4_video_normalized.png",
+    "art/sprites/source/p15_special_s4_video_hd.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "smear": {
+    "fonte": "art/sprites/source/p15_special_s4_video_hd.png",
+    "quadros": [
+      8
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "limpar": "todos",
+    "antes": "8=7"
+  }
 }

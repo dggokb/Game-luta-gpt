@@ -129,6 +129,20 @@ que tem a ponta mais longe do tronco dentro da caixa do golpe.
 - Visto: o desenho do acerto de cada um (folha). `testarMotor`: só as 3 falhas antigas; build
   PASS. Jogo e celular: não vistos.
 
+## Revisão do smear no p13, p14 e p15 (12/11, pedido do dono: "revê do p13 14 15")
+
+- **p14 (roupa preta):** as línguas viravam blocos pretos sólidos. `smear.py --clarear 0.6` puxa as
+  línguas escuras para um cinza-azulado e, nesse modo, a perna desenhada fica por cima e as línguas
+  atrás (com a roupa clara elas tomam o lugar do membro, como antes). Aplicado aos 8 golpes do p14.
+- **p13 (primeira vez):** pontos marcados à mão na grade. Smear em M, H, 2M, 2H, 6M, jH, j2H e S4; as
+  pernas com `--clarear`, os braços (pele) com `--sem-escuro`. Os arcos brancos do j2H e do S4 e o
+  borrão do 2M saíram trocando pelo desenho limpo. jM (o corpo que cai), S2 (a pedra é o golpe) e S3
+  (agarrão) ficam como estavam. Saiu de `ARTE_COM_EFEITO`.
+- **p15:** S3 sem o fantasma amarelado do vídeo (5-15 alternam os desenhos limpos 4 e 16; o smear do
+  jab é curto); j2H sem o rastro laranja embaixo do pé (5-7=8) e com smear da perna recolhida; S4 com
+  smear no chute (pontos à mão).
+- Visto nas folhas; `testarMotor`: só as 3 falhas antigas; build PASS. Jogo e celular: não vistos.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
@@ -531,10 +545,37 @@ aos lutadores uma normal de verdade por quadro, sem dobrar a memória. Vídeos:
 `android/app/build/sprite-review/normal_map_antes_depois.mp4` e `normal_map_luz_macia_x_faixas.mp4`.
 
 **No jogo desde 11/11 à noite** (o dono, vendo os vídeos: "coloca tudo na branch fable"): os
-mapas do Ryūga e do Kōga (88 folhas). No Modo Teste, o botão **LUZ** (ao lado de EFEITOS) troca na
-hora: **FORTE** (começa aqui) → **SUAVE** → **OFF** (como era antes do motor 4). `TesteDesempenho.luz`;
-no PC, `-Pluz=off|suave|forte`. Lutador sem mapa fica como era. Falta o dono dizer no aparelho
-qual nível fica (e se fica).
+mapas do Ryūga e do Kōga (88 folhas). No Modo Teste, o botão **LUZ** (ao lado de EFEITOS) liga e
+desliga na hora (`TesteDesempenho.luz`; no PC, `-Pluz=off`). Lutador sem mapa fica como era.
+
+**Decidido pelo dono no aparelho (12/11):** "alto ficou ruim, o leve ficou bom". O nível FORTE
+saiu; ficou o SUAVE ({exagero 2,3; sombra 0,5; luz 0,55}). E pediu: "não faço ideia do foco de
+luz, então tem que definir nos cenários os pontos de luz".
+
+**Pontos de luz nos cenários (12/11).** As luzes e os fogos que o cenário já desenha (`luzes` e
+`fogos` de cada camada do `stage.json`) viram ponto de luz dos lutadores com dois números a mais:
+
+```
+"fogos": [ { "x": 0.5, "y": 0.1, "tamanho": 0.42, "lutadores": 0.5, "alcance": 1.2 } ]
+"luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "lutadores": 0.5, "alcance": 1.0 } ]
+```
+
+- `lutadores` (0 a 2): a força da luz no corpo de quem está perto, do lado dela. Sem ele (ou 0),
+  a luz só enfeita o cenário, como antes.
+- `alcance`: até onde chega, em alturas de tela (padrão 0,9). O fogo aceita `cor` (padrão laranja);
+  a luz usa a `cor` dela.
+- O `StageScene` guarda onde cada ponto apareceu na tela no quadro (`pontosDeLuz()`), o `GameView`
+  leva ao mundo pela câmera e passa ao shader o mais forte sobre cada lutador (`luzNoCorpo`), pela
+  mesma luz local do impacto. Só acende quem tem normal map. O fogo treme junto com a chama.
+- Com mapa, a luz local usa a normal exagerada, é mais rasante (acende o lado virado para o ponto,
+  não o corpo inteiro) e entra multiplicada pela cor do que ilumina.
+- **Feito só no Templo da Lua** (os braseiros: `lutadores` 0,5, `alcance` 1,2). Os outros 11
+  cenários ainda não têm ponto marcado: ali vale só a luz do lugar (`luzLutadores`). No PC,
+  `-Pcenario=<pasta>` grava em outro cenário.
+- A direção geral da luz do lugar continua sendo a `contraluz.direcao` do `luzLutadores` (no
+  Templo da Lua, `[1, -1]`: de cima, pela direita, o lado da lua).
+
+Vídeo: `android/app/build/sprite-review/pontos_de_luz_off_x_on.mp4` (o Ryūga anda até o braseiro).
 
 **O que o botão liga, e por quê (12/11).** A primeira versão só usava o mapa na luz do impacto
 (motor 3), e o dono testou no aparelho: "não vi diferença nenhuma". Ele tinha razão: gravado com
@@ -552,7 +593,7 @@ então usar o mapa na **luz do cenário**, que vale o tempo todo:
   arte, que já tem a própria sombra pintada, não se vê. Foi o que aconteceu no primeiro ensaio.
 - A luz entra quase toda multiplicada pela cor do que ilumina (10% somados, 90% multiplicados):
   somando mais, a roupa preta virava cinza.
-- Níveis em `TesteDesempenho`: {exagero, sombra, luz} = SUAVE {2,3; 0,5; 0,55}, FORTE {3,2; 0,75;
+- Os dois níveis testados: {exagero, sombra, luz} = SUAVE {2,3; 0,5; 0,55} e FORTE {3,2; 0,75;
   0,85}. No PC, `-Pvolume=exagero,sombra,luz` afina sem recompilar.
 - Luz em dois tons chapados (faixas) foi testada e descartada: com a normal exagerada vira mancha.
 - Cintilação: no idle do Ryūga, a mudança média entre quadros seguidos é a mesma com e sem volume
@@ -630,11 +671,11 @@ mais a forma. É escolha de visual, dele.
 ```
 python3 tools/sprites/normal_map.py player_base p03      # ~0,8 s por quadro; o elenco (12.174 quadros) ~2,7 h
 cd android && rm -rf pc/build/gravar-luta
-xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 -Pluz=forte \
+xvfb-run -a -s "-screen 0 1920x1080x24" gradle :pc:gravarLuta -Pgl=1 \
     -Pgraficos=ALTO -Presolucao=1920x1080 -Proteiro="segura:D espera:1.8 solta:D grava:44:g tecla:L fim"
 ```
 
-`-Pluz=off|suave|forte` escolhe o nível (sem nada, forte), `-Pvolume=exagero,sombra,luz` afina o
+`-Pluz=off` começa desligado, `-Pcenario=<pasta>` troca o cenário, `-Pvolume=exagero,sombra,luz` afina o
 volume, `-PluzDura=N` estica a luz do impacto e `-PluzFixa=1` a deixa na força cheia,
 `-PnormalAlterna=1` liga e desliga o mapa a cada quadro (dois quadros seguidos com a mesma pose,
 com e sem), `-Pbotoes=1` mostra os botões do Modo Teste e `-Pgraficos=ALTO` impede o nível
@@ -643,8 +684,11 @@ gráfico de baixar no meio. Em 1080p o PC grava um quadro a cada ~57 ms: montar 
 
 **Folha refeita, mapa refeito.** O mapa é do desenho: quem refaz uma folha (vídeo novo, SR HD,
 smear) roda `normal_map.py <folha> --refazer` em seguida. Se a folha mudar de tamanho e o mapa
-ficar o antigo, o jogo ignora o mapa (aviso no log) e usa a silhueta; se só o desenho mudar, o
-jogo não tem como saber. Foi o que houve no mesmo dia com `player_base_idle` e
+ficar o antigo, o jogo ignora o mapa (aviso no log) e o `build_characters.py` o trata como saída
+velha: o `--check` acusa e o `--write` apaga (aí é refazer com `normal_map.py`). Se só o desenho
+mudar, ninguém tem como saber. O `build_characters.py` conhece o `<folha>_n.webp` desde 12/11:
+antes disso o `--check` acusava os 88 mapas como órfãos e o `--write` os apagaria (erro meu ao
+mandar os mapas; avisado por outra sessão). Foi o que houve no mesmo dia com `player_base_idle` e
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o

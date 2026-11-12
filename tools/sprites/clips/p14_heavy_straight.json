@@ -61,6 +61,7 @@
     "ferramenta": "tools/sprites/smear.py",
     "trocar": "9=10",
     "limpar": "todos",
-    "antes": "9=4,10=4"
+    "antes": "9=4,10=4",
+    "clarear": 0.6
   }
 }

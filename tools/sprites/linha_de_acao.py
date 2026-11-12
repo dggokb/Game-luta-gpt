@@ -60,6 +60,16 @@ ANDOU = 45.0         # px: a ponta do membro que bate anda pelo menos isto da gu
 # Golpes em que o modelo não acha o membro (a perna esticada some para ele): o caminho medido no
 # desenho (a ponta mais à frente da perna e um ponto da canela atrás dela), {quadro: [x, y, jx, jy]}.
 CAMINHO_MANUAL = {
+    'p13': {   # pontos marcados à mão na grade, 12/11
+        'MEDIUM_KICK': {"1": [-15, 210, -45, 185], "4": [135, 245, 70, 245]},
+        'HEAVY_STRAIGHT': {"11": [45, 100, 55, 165], "13": [175, 215, 95, 195]},
+        'CROUCH_MEDIUM': {"2": [60, 10, 55, 60], "5": [205, 20, 120, 60]},
+        'CROUCH_HEAVY': {"4": [30, 100, 40, 160], "7": [65, 320, 55, 250]},
+        'GOLPE_ALTO': {"1": [35, 80, 40, 130], "3": [165, 110, 70, 145]},
+        'JUMP_HEAVY': {"6": [40, 140, 20, 215], "8": [195, 250, 60, 215]},
+        'JUMP_HEAVY_DOWN': {"7": [40, 330, 30, 270], "11": [60, 130, 45, 200]},
+        'SPECIAL_S4': {"17": [20, 320, 30, 270], "21": [40, 35, 50, 100]},
+    },
     # p14 a p16 (11/11): o membro no acerto e na preparação, medidos com pose() para o smear.
     'p14': {
         'MEDIUM_KICK': {"8": [8, 81, 18, 175], "20": [182, 169, 82, 161]},
@@ -79,8 +89,9 @@ CAMINHO_MANUAL = {
         'CROUCH_HEAVY': {"0": [51, 130, 58, 90], "5": [128, 295, 86, 253]},
         'JUMP_MEDIUM': {"6": [-3, 65, 9, 141], "10": [166, 219, 52, 168]},
         'JUMP_HEAVY': {"3": [16, 36, 39, 120], "5": [46, 65, 62, 115]},
-        'JUMP_HEAVY_DOWN': {"4": [14, 28, 59, 112], "6": [51, 74, 62, 115]},
-        'SPECIAL_S3': {"0": [81, 206, 45, 180], "4": [146, 217, 85, 210]},
+        'SPECIAL_S3': {"1": [95, 200, 60, 185], "4": [150, 205, 85, 210]},   # à mão na grade (11/11)
+        'SPECIAL_S4': {"7": [145, 130, 150, 205], "8": [275, 195, 180, 200]},   # à mão na grade (11/11)
+        'JUMP_HEAVY_DOWN': {"4": [60, 80, 45, 150], "6": [75, -50, 40, 60]},   # à mão na grade (11/11)
     },
     'p16': {   # pontos marcados à mão na grade (a pose erra nesta personagem), 11/11
         'JUMP_MEDIUM': {"1": [50, 110, 20, 155], "5": [190, 150, 95, 160]},
