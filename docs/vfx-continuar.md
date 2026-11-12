@@ -800,7 +800,69 @@ normal map, 2D com luz pintada, contas de shader, e a medida no nosso jogo).
 - **A escolher:** o motor (só lugar e borda / uma luz por lutador, recomendado / várias luzes por
   ponto), quanto escurece à noite (dois níveis no vídeo), pontos, luz do impacto, mapas.
 
-Fase 3 (protótipo): por fazer, esperando a escolha.
+**O dono, sobre as escolhas (12/11):** "não sou eu que defino o que deve ser feito; o que conta é
+conceito de luz e sombra, que já existe, então temos que seguir isso". As escolhas da proposta
+ficaram então pelos princípios do estudo: uma luz que manda por lutador; pontos de luz ficam e
+substituem em vez de somar; a luz do impacto no corpo sai; o nível da noite sai do cenário (a
+sombra com a cor do lugar, o lutador ainda acima do fundo); normal map para o resto do elenco não
+se gera agora (o motor não depende dele).
+
+**Fase 3, protótipo (12/11): no jogo, ao lado do motor de hoje, só nesta branch.**
+
+- **Como liga:** terceiro estado do botão LUZ do Modo Teste (ON = motor de hoje, NOVA, OFF);
+  no PC, `-Pluz=nova`. O padrão continua o motor de hoje.
+- **`stage.json`:** `luzLutadores` ganhou `luz`, `sombra`, `chao`, `direcao` e `borda`, ao lado dos
+  campos antigos (que o motor de hoje ainda lê). Declarados à mão em três cenários:
+
+  | Cenário | `luz` | `sombra` | `chao` | `borda` |
+  |---|---|---|---|---|
+  | templo_lua (noite, lua) | #D9D2F5 | #8A84B8 | #86789C | 0,5 |
+  | dojo_yinlu (dia) | #FFFBF0 | #D2D8EA | #DCD2C4 | 0,35 |
+  | beco_brucy (noite, neon, chuva) | #C4D4FF | #7C7CA8 | #70709A | 0,6 |
+
+  Nos outros 9 os campos novos saem por conta dos antigos (`FighterLight.converter`: a luz é a
+  tinta de hoje sem passar da arte, a sombra 22% abaixo). **Não foram vistos nem acertados.**
+- **Shader** (`GlRenderCanvas`, trecho `M_NOVA`): `arte × mix(lugar, luz, k)`, com `lugar` indo da
+  `sombra` ao `chao` nos pés; `k` vem de um degradê pelo quadro do lutador na direção da luz e,
+  com normal map, da inclinação do mapa nessa direção, em passagem macia (`smoothstep`). A borda
+  entra em "screen" (não passa do branco). Nenhuma soma, nenhum `clamp` de estouro. Os pesos
+  estão em `TesteDesempenho.NOVA` {degradê 0,55; mapa 1,1; meia largura 0,5; lavagem da cor do
+  ponto 0,35}; no PC, `-Pnova=a,b,c,d`. `-PsemMapa=1` grava sem normal map.
+- **Uma luz por lutador** (`GameView.luzDoLutador`): parte da direção e da cor do cenário; cada
+  ponto de luz perto toma o lugar dela pelo peso `lutadores × (1 − (d/alcance)²)²`; os pesos
+  juntos não passam de 1; pontos de lados opostos tiram a direção (a rampa some). Vale também no
+  reflexo. O relâmpago leva o corpo à cor da arte (o teto), sem somar.
+- **Fora do motor novo:** a luz do impacto (`luzNoCorpo` só no motor de hoje) e o volume.
+
+**Medido** (PC, OpenGL, 1080p, os 20 últimos quadros de cada gravação, caixa em volta dos dois
+lutadores; parte da caixa com algum canal ≥ 250):
+
+| Cenário | Motor de hoje | Motor novo | Luma p99 hoje → novo |
+|---|---|---|---|
+| Templo da Lua | 6,34% | 0,04% | 255 → 203 |
+| Dojo Liánwǔguǎn | 4,59% | 1,16% | 255 → 242 |
+| Beco do Brucy | 5,59% | 0,26% | 255 → 216 |
+
+O que sobra no dojo é o branco da própria arte e do cenário de dia dentro da caixa.
+
+**Vídeos** (`android/app/build/sprite-review/motor_luz_novo/`, 60 quadros a 17,5 por segundo e
+depois 4× mais lento): `templo_lua_hoje_x_novo.mp4`, `dojo_yinlu_hoje_x_novo.mp4`,
+`beco_brucy_hoje_x_novo.mp4`; `templo_lua_hoje_x_novo_sem_mapa_x_com_mapa.mp4` (três colunas);
+`templo_lua_golpes_novo_sem_mapa_x_com_mapa.mp4` (chute e soco). As colunas são rodadas
+diferentes: câmera e passo não batem quadro a quadro.
+
+**Visto:** nada estoura; o lutador pega a cor do lugar (violeta no templo, laranja das lâmpadas no
+beco); chute e soco sem mancha, com e sem mapa; com mapa o volume na calça e no braço é um pouco
+maior, e a diferença é pequena. No dojo o motor novo fica um pouco mais escuro que o de hoje.
+
+**Testes:** `:stage-core:test` passa; `:pc:testarMotor` 687 testes, só as 3 falhas antigas. Os
+quatro textos do shader passam no `glslangValidator` e o de reserva continua igual ao original.
+
+**Não feito / não visto:** nada no celular; só Ryūga e Kōga; os outros 9 cenários; os cenários com
+focos de sombra (a Arena Central) ainda não levam a direção do foco para a luz nova; a direção da
+sombra do chão ainda não vem de `direcao`; pulo e queda; o modo sem OpenGL (recebe a média de
+`luz` e `sombra`, não visto). Se aprovado: tirar o motor de hoje e os campos antigos, acertar os
+9 cenários (Opus, com esta receita) e só então mandar para a `game-luta-sprite-fable`.
 
 ## No jogo: golpe forte = V4 com acabamento (`acerto_forte_05_ec`, 11/11)
 

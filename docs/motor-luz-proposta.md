@@ -76,7 +76,14 @@ Ryūga e o Kōga com e sem mapa lado a lado: se a diferença for pouca, os mapas
 - Processador: misturar até 24 pontos por lutador por quadro; desprezível.
 - Com o OPENGL desligado no Modo Teste, o lutador recebe só a cor média entre `luz` e `sombra`.
 
-## Para você escolher
+## Escolhas (resolvidas pelos princípios em 12/11)
+
+O dono: "o que conta é conceito de luz e sombra, que já existe, então temos que seguir isso".
+Ficou: (1) o motor (b), uma luz que manda por lutador; (2) o nível da noite tirado de cada
+cenário; (3) os pontos ficam e misturam; (4) a luz do impacto no corpo sai; (5) normal map para o
+resto do elenco não se gera agora. O protótipo e as medidas estão no `docs/vfx-continuar.md`.
+A lista abaixo é a que foi apresentada.
+
 
 1. **O motor.** (a) Só o lugar e a borda, sem lado aceso (o mais simples; é o que KOF XIII e
    Hollow Knight fazem); (b) **o modelo acima, com uma luz por lutador (recomendo)**; (c) várias

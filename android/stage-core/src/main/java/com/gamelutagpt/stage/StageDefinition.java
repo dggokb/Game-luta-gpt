@@ -790,6 +790,44 @@ public final class StageDefinition {
             this(color, strength, brightness, 0xFFFFFFFF, 0xFFFFFFFF, 0f, 0f, -1f);
         }
 
+        /**
+         * Motor de luz e sombra novo (docs/motor-luz-proposta.md): a cor que o branco vira no lado
+         * aceso ({@code "luz"}, no máximo a própria arte) e no lado de sombra ({@code "sombra"}, a
+         * cor do lugar), a cor que sobe do chão nos pés ({@code "chao"}) e a força do fio de
+         * contraluz ({@code "borda"}). A direção de onde vem a luz que manda é
+         * {@link #rimDirX}, {@link #rimDirY} ({@code "direcao"}). Sem esses campos no stage.json,
+         * saem por conta dos antigos ({@link #declared} falso).
+         */
+        public int lit, shade, ground;
+        public float edge;
+        public boolean declared;
+
+        /** Uma cor (0xRRGGBB) em três fatores de 0 a 1. */
+        public static float[] rgb(int cor) {
+            return new float[] {((cor >> 16) & 0xFF) / 255f, ((cor >> 8) & 0xFF) / 255f, (cor & 0xFF) / 255f};
+        }
+
+        private static int cor(float r, float g, float b) {
+            return 0xFF000000 | (Math.round(255f * Math.max(0f, Math.min(1f, r))) << 16)
+                | (Math.round(255f * Math.max(0f, Math.min(1f, g))) << 8)
+                | Math.round(255f * Math.max(0f, Math.min(1f, b)));
+        }
+
+        /**
+         * Os campos novos tirados dos antigos, para o cenário que ainda não os declara: o lado
+         * aceso é a tinta de hoje sem passar da arte, a sombra 22% abaixo dela e o chão a sombra
+         * vezes o fator dos pés.
+         */
+        void converter() {
+            float[] k = factors(), p = feetFactors();
+            float maior = Math.max(1f, Math.max(k[0], Math.max(k[1], k[2])));
+            lit = cor(k[0] / maior, k[1] / maior, k[2] / maior);
+            shade = cor(0.78f * k[0] / maior, 0.78f * k[1] / maior, 0.78f * k[2] / maior);
+            ground = cor(0.78f * k[0] / maior * p[0], 0.78f * k[1] / maior * p[1], 0.78f * k[2] / maior * p[2]);
+            edge = Math.min(1f, rimStrength * 0.6f);
+            declared = false;
+        }
+
         FighterLight(int color, float strength, float brightness, int feet,
                      int rimColor, float rimStrength, float rimDirX, float rimDirY) {
             this.color = color;
@@ -801,6 +839,7 @@ public final class StageDefinition {
             float n = (float)Math.sqrt(rimDirX * rimDirX + rimDirY * rimDirY);
             this.rimDirX = n > 0f ? rimDirX / n : 0f;
             this.rimDirY = n > 0f ? rimDirY / n : -1f;
+            converter();
         }
 
         /** O fator dos pés em cada canal (vermelho, verde, azul). */
@@ -959,8 +998,30 @@ public final class StageDefinition {
                     if (rimX == 0f && rimY == 0f) throw new IllegalArgumentException("contraluz: \"direcao\" não pode ser [0, 0]");
                 }
             }
+            Object direcao = lightMap.get("direcao");
+            if (direcao != null) {
+                if (!(direcao instanceof List) || ((List<?>)direcao).size() != 2) {
+                    throw new IllegalArgumentException("luzLutadores: \"direcao\" é [x, y]");
+                }
+                rimX = ((Number)((List<?>)direcao).get(0)).floatValue();
+                rimY = ((Number)((List<?>)direcao).get(1)).floatValue();
+                if (rimX == 0f && rimY == 0f) throw new IllegalArgumentException("luzLutadores: \"direcao\" não pode ser [0, 0]");
+            }
             light = new FighterLight(color(lightMap, "cor", 0xFFFFFFFF), clamp01(number(lightMap, "forca", 0.3f)), brilho,
                 pes, rimCor, rimForca, rimX, rimY);
+            if (lightMap.containsKey("luz") || lightMap.containsKey("sombra")) {
+                // Motor novo: a luz não passa da arte (#FFFFFF) e a sombra não passa da luz.
+                light.lit = color(lightMap, "luz", 0xFFFFFFFF);
+                light.shade = color(lightMap, "sombra", light.lit);
+                float[] l = FighterLight.rgb(light.lit), s = FighterLight.rgb(light.shade);
+                for (int i = 0; i < 3; i++) {
+                    if (s[i] > l[i] + 1e-4f) throw new IllegalArgumentException("luzLutadores: \"sombra\" não pode ser mais clara que \"luz\"");
+                }
+                light.ground = color(lightMap, "chao", light.shade);
+                light.edge = number(lightMap, "borda", 0.5f);
+                if (light.edge < 0f || light.edge > 1f) throw new IllegalArgumentException("luzLutadores: \"borda\" entre 0 e 1");
+                light.declared = true;
+            }
         }
 
         FighterShadow shadow = null;

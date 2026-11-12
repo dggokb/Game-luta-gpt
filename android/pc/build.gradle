@@ -319,6 +319,8 @@ tasks.register('gravarLuta', JavaExec) {
     // -PluzDura=N estica a luz do impacto e -PluzFixa=1 a deixa na força cheia; -PnormalAlterna=1 liga
     // e desliga o mapa a cada quadro (dois quadros seguidos com a mesma pose, com e sem).
     if (providers.gradleProperty('luz').isPresent()) systemProperty 'gameluta.luz', providers.gradleProperty('luz').get()
+    if (providers.gradleProperty('nova').isPresent()) systemProperty 'gameluta.nova', providers.gradleProperty('nova').get()
+    if (providers.gradleProperty('semMapa').isPresent()) systemProperty 'gameluta.semMapa', 'true'
     if (providers.gradleProperty('volume').isPresent()) systemProperty 'gameluta.volume', providers.gradleProperty('volume').get()
     if (providers.gradleProperty('luzDura').isPresent()) systemProperty 'gameluta.luzDura', providers.gradleProperty('luzDura').get()
     if (providers.gradleProperty('luzFixa').isPresent()) systemProperty 'gameluta.luzFixa', 'true'

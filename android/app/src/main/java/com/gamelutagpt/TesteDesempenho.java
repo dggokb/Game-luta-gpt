@@ -34,8 +34,32 @@ final class TesteDesempenho {
      * Modo Teste liga e desliga, para comparar no aparelho. Lutador sem mapa fica como era. No PC,
      * {@code -Dgameluta.luz=off} ({@code -Pluz=off}) começa desligado.
      */
-    static final int LUZ_OFF = 0, LUZ_SUAVE = 1;
-    static volatile int luz = "off".equals(System.getProperty("gameluta.luz")) ? LUZ_OFF : LUZ_SUAVE;
+    static final int LUZ_OFF = 0, LUZ_SUAVE = 1, LUZ_NOVA = 2;
+    static volatile int luz = "off".equals(System.getProperty("gameluta.luz")) ? LUZ_OFF
+        : "nova".equals(System.getProperty("gameluta.luz")) ? LUZ_NOVA : LUZ_SUAVE;
+
+    /**
+     * Motor de luz e sombra novo (docs/motor-luz-proposta.md, protótipo de 12/11): a arte é o
+     * teto. O cenário diz a cor que o branco vira no lado aceso e no lado de sombra, e o shader
+     * multiplica a arte por isso; nada soma. Os números da rampa entre sombra e luz: o peso do
+     * degradê que atravessa o quadro do lutador na direção da luz, o peso da inclinação do normal
+     * map (só quem tem mapa), a largura macia da passagem (0 a 0,5) e o quanto a cor de um ponto
+     * de luz do cenário é lavada para o branco. No PC, {@code -Dgameluta.nova=a,b,c,d}.
+     */
+    private static final float[] NOVA = {0.55f, 1.1f, 0.5f, 0.35f};
+    private static final float[] NOVA_DO_PC = numeros(System.getProperty("gameluta.nova"), 4);
+
+    static float[] nova() {
+        return NOVA_DO_PC != null ? NOVA_DO_PC : NOVA;
+    }
+
+    private static float[] numeros(String v, int n) {
+        if (v == null) return null;
+        String[] p = v.split(",");
+        float[] f = new float[n];
+        for (int i = 0; i < n; i++) f[i] = Float.parseFloat(p[i]);
+        return f;
+    }
 
     /**
      * A luz do cenário com volume: quanto a inclinação da normal é exagerada (o mapa guarda só as
@@ -47,7 +71,7 @@ final class TesteDesempenho {
 
     /** {exagero da normal, sombra, luz}, ou null com a luz desligada. */
     static float[] volume() {
-        if (luz == LUZ_OFF) return null;
+        if (luz != LUZ_SUAVE) return null;
         return VOLUME_DO_PC != null ? VOLUME_DO_PC : VOLUME;
     }
 
@@ -62,7 +86,7 @@ final class TesteDesempenho {
     }
 
     static String luzRotulo() {
-        return luz == LUZ_OFF ? "LUZ OFF" : "LUZ ON";
+        return luz == LUZ_OFF ? "LUZ OFF" : luz == LUZ_NOVA ? "LUZ NOVA" : "LUZ ON";
     }
 
     private TesteDesempenho() {}
