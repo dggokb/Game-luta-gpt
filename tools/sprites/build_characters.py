@@ -61,8 +61,10 @@ BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 AIR_DOWN_BINDINGS = ('j2L','j2M','j2H')
 # Golpe alto de chão (→ + M) com animação própria; sem ele o motor monta o 6M do M (GolpeAlto.java).
 OVERHEAD = '6M'
+# Golpe de comando (→ + H, 12/11): emenda no combo (as rotas da base o põem depois do L, do 2L e do M).
+COMMAND_HEAVY = '6H'
 # Inputs que o pacote pode ter ou não.
-OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD,)
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')
@@ -74,7 +76,7 @@ ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
-COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
+COMBO_STYLES = ('equilibrado','shoto','pressao','chutes','aereo','alcance','tanque','imprevisivel')
 # Estilo só da CPU (fighter.cpuStyle), quando difere do de combo.
 CPU_STYLES = COMBO_STYLES + ('agarrador', 'onda', 'contra', 'rekka', 'esquiva', 'ninja', 'acrobata')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
@@ -183,6 +185,10 @@ def validate_fighter(pack):
             raise ValueError(f'{name}.assist.move must be one of {", ".join(ASSIST_MOVES)}')
         if move == 'S' and 'energy' not in f:
             raise ValueError(f'{name}.assist: S needs fighter.energy')
+        if 'segura' in f['assist']:
+            # A Onda do assist segura o rival em pé esse tanto de quadros (o parceiro recomeça a corrente).
+            positive_int(f['assist']['segura'], f'{name}.assist.segura')
+            if move != 'S': raise ValueError(f'{name}.assist.segura: only the S assist holds')
 
 READS = {'alto':'HIGH','baixo':'LOW','tudo':'ANY','aereo':'AIR'}   # aereo: só a esquiva (anti-aéreo)
 
@@ -939,6 +945,8 @@ def compile_packs(root, results):
                    +(f".withWalk({f(fi.get('walkSpeed', 0))},{f(fi.get('walkBackSpeed', 0))})"
                      if 'walkSpeed' in fi or 'walkBackSpeed' in fi else '')
                    +('.withAnimationWeight('+f(fi['pesoAnimacao'])+')' if 'pesoAnimacao' in fi else '')
+                   +('.withAssistShot('+attack('S',{**energy['attack'],'hitstunFrames':fi['assist']['segura']},'PROJECTILE',energy['damage'],energy['attack'].get('reach'),energy['attack'].get('hitHeight'))+')'
+                     if 'segura' in fi.get('assist', {}) else '')
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withCpuStyle('+q(fi['cpuStyle'])+')' if 'cpuStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'

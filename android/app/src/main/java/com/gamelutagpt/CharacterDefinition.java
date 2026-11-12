@@ -634,6 +634,13 @@ final class CharacterDefinition {
          */
         float animationWeight=1f;
         Fighter withAnimationWeight(float weight) { animationWeight=weight; return this; }
+        /**
+         * O S que o lutador solta como assist, quando difere do S dele (fighter.assist.segura no
+         * pack, 12/11): a Onda do Ryūga segura o rival em pé mais tempo, para o parceiro em campo
+         * recomeçar a corrente. Null: o assist solta o S de sempre.
+         */
+        AttackDefinition assistShot;
+        Fighter withAssistShot(AttackDefinition shot) { assistShot=shot; return this; }
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }

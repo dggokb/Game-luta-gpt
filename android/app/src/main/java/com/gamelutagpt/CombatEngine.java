@@ -580,7 +580,7 @@ final class CombatEngine {
             } else {
                 if (in.light) f.buffer.push(InputBuffer.Button.LIGHT, null, crouch);
                 if (in.medium) f.buffer.push(InputBuffer.Button.MEDIUM, null, crouch, relative == 1);
-                if (heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+                if (heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch, in.heavy && relative == 1);
                 // A última direção do comando pode chegar logo depois do botão (o polegar ainda
                 // no caminho): ele fica guardado uns quadros (comandoAtrasado).
                 f.botaoSemComando = button;
@@ -3030,7 +3030,7 @@ final class CombatEngine {
         a.clearAttack();
         a.status = CombatFighter.Status.ATTACK;
         if ("S".equals(move) && profile.energy != null) {
-            a.attack = profile.energy.attack;
+            a.attack = profile.assistShot != null ? profile.assistShot : profile.energy.attack;
             a.specialStrength = "M";
             return;
         }
@@ -3043,7 +3043,9 @@ final class CombatEngine {
     /** O golpe que o assist de {@code a} faz (o S do pacote ou o normal declarado). */
     static AttackDefinition assistAttack(CombatFighter a) {
         CharacterDefinition.Fighter profile = a.state.profile;
-        if ("S".equals(profile.assistMove) && profile.energy != null) return profile.energy.attack;
+        if ("S".equals(profile.assistMove) && profile.energy != null) {
+            return profile.assistShot != null ? profile.assistShot : profile.energy.attack;
+        }
         return assistNormal(a).attack;
     }
 

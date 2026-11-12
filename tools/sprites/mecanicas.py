@@ -713,6 +713,11 @@ def apply(cid, spec, base, combos_data):
         restore_normal(m)
     for m in pack.get('specialMoves', {}).values():
         restore_special(m)
+    # Golpe de comando (→ + H, 12/11): vem inteiro do "golpeComando" (refazer dá o mesmo); o
+    # avanço dele vai na "unica.golpes.6H", como as outras mecânicas.
+    pack['moves'].pop('6H', None)
+    if spec.get('golpeComando'):
+        pack['moves']['6H'] = json.loads(json.dumps(spec['golpeComando']))
     # Sem Super (as crianças da história): só o resto.
     sup = fighter['super']['attack'] if 'super' in fighter else None
     if sup is not None:
