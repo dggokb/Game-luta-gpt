@@ -50,10 +50,9 @@
           "ate": 14
         },
         "voo": {
-          "altura": 25,
+          "altura": 90,
           "de": 7,
-          "ate": 14,
-          "paira": true
+          "ate": 15
         }
       },
       "SUPER": {
