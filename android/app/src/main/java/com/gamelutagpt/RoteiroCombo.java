@@ -8,7 +8,7 @@ package com.gamelutagpt;
  *
  * <p>Passos: L M H 2L 2M 2H 6H (→ + H) jL jM jH j2H, S (Onda), S2 S3 S4, SUPER, A (assist),
  * J (pulo), SJ (super pulo), D (corrida), C ou C160 (corre segurando → até ficar a 260 ou 160 px
- * do rival), W30 (espera 30 quadros).
+ * do rival), W30 (espera 30 quadros), DHC (TAG no Super: a troca no Super).
  */
 final class RoteiroCombo {
     private final String[] passos;
@@ -16,6 +16,7 @@ final class RoteiroCombo {
     private AttackDefinition antes;
     private int antesQuadro, antesCorrente;
     private boolean noChao, assistFora;
+    private int titular;
 
     RoteiroCombo(String rota) { passos = rota.trim().split("[ ,]+"); }
 
@@ -38,6 +39,7 @@ final class RoteiroCombo {
             antesCorrente = me.chain.size();
             noChao = me.grounded;
             assistFora = e.team(0).assistOut();
+            titular = e.team(0).point;
         }
         t++;
         int limite = passo.startsWith("W") ? Integer.parseInt(passo.substring(1)) + 1 : passo.startsWith("C") ? 90 : 45;
@@ -61,7 +63,7 @@ final class RoteiroCombo {
             case "j2H": in.direction = 3; in.heavy = true; break;
             case "S": in.special = "M"; break;
             case "SUPER": in.superAttack = true; break;
-            case "A": in.assist = true; break;
+            case "A": case "DHC": in.assist = true; break;
             case "J": in.jump = true; in.direction = me.facing > 0 ? 8 : 6; break;
             case "SJ": in.superJump = true; in.direction = me.facing > 0 ? 8 : 6; break;
             case "D": in.dash = true; in.direction = frente; break;
@@ -85,6 +87,7 @@ final class RoteiroCombo {
             case "J": case "SJ": return noChao && !me.grounded;
             case "D": return me.forwardDashing;
             case "A": return !assistFora && e.team(0).assistOut();
+            case "DHC": return e.cues().contains("DHC") || e.team(0).point != titular;
             case "S": return novo && me.attack.id.startsWith("S") && me.attack.kind != AttackDefinition.Kind.SUPER;
             case "SUPER": return novo && me.attack.kind == AttackDefinition.Kind.SUPER;
             default:

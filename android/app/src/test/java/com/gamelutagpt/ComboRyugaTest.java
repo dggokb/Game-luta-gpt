@@ -110,6 +110,25 @@ public class ComboRyugaTest {
         assertTrue(rasteira.cancelsInto("H") && !rasteira.cancelsInto("6H"));
     }
 
+    /** O executor começando a {@code gap} px do rival. */
+    private static BateriaCombos.Exec perto(String rota, float gap) {
+        BateriaCombos.Cenario cn = new BateriaCombos.Cenario();
+        cn.barras = 3;
+        cn.gap = gap;
+        return BateriaCombos.executar(RYUGA, YINLU, Arrays.asList(rota.split(" ")), cn);
+    }
+
+    @Test public void comboCurtoEmendaEmOutroCombo() {
+        // O pedido de 12/11: combo curto, mas dá para emendar outro depois. A parede do S3, o
+        // assist no meio e a troca no Super (DHC) recomeçam; e, depois do ↓jH que quica no chão,
+        // quem cravou desce rápido e pega o rival ainda quicando (relança ou recomeça no chão).
+        emenda("parede do S3 → combo novo", perto("L M M S3 W90 C200 L M M 6H S2", 100f), 12);
+        emenda("assist no meio", perto("L M M A W20 C140 L M M 6H S2", 100f), 10);
+        emenda("Super → DHC", perto("2L 6H S2 SUPER DHC", 100f), 14);
+        emenda("↓jH → relança", perto("2L M 2H SJ jL jM j2H 2H SJ jL jM j2H", 100f), 10);
+        emenda("↓jH → recomeça no chão", perto("2L M 2H SJ jL jM j2H C140 L M", 100f), 8);
+    }
+
     @Test public void aOndaDoAssistSeguraParaOParceiroRecomecar() {
         // A Yin-lu em campo chama o Ryūga: a Onda dele segura o rival em pé, ela corre e recomeça.
         String rota = "L M A W20 C140 L M M S4";

@@ -4986,6 +4986,9 @@ final class CombatEngine {
             d.slammed = false;
             d.hardFall = true;
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
+            // Quem cravou desce rápido (12/11): pousa enquanto o rival ainda quica e emenda outro
+            // combo (antes ele seguia subindo no super pulo e pousava junto com o rival, já caído).
+            if (!projectile && !a.grounded) a.vy = Math.max(a.vy, config.groundBounceAttackerDrop);
         } else if ((launch == AttackDefinition.Launch.SLAM ||
                     launch == AttackDefinition.Launch.GROUND_BOUNCE) && !d.grounded && a.superJumping) {
             // Slam (also a ground bounce already used): from a super jump, a forced dive.

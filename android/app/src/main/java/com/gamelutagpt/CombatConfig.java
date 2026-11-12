@@ -416,6 +416,8 @@ final class CombatConfig {
     /** Ground bounce: driven into the floor, then it pops back up. */
     float groundBounceDown = 1500f;
     float groundBounceUp = 920f;
+    /** Quem acerta o quique no chão no ar desce a esta velocidade (px/s), para emendar outro combo. */
+    float groundBounceAttackerDrop = 1200f;
     /** Hitstun after either bounce; landing afterwards is a knockdown (no air recovery). */
     int bounceHitstunFrames = 48;
 

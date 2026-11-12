@@ -576,6 +576,11 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 
 - Depois de um bounce o defensor tem `bounceHitstunFrames` (48) de hitstun, pode ser
   juggleado e **cai derrubado** (não se recupera no ar: `hardFall`).
+- **Quem crava desce rápido (12/11):** quem acerta o ground bounce no ar desce a
+  `groundBounceAttackerDrop` (1200 px/s) em vez de seguir subindo no super pulo. Pousa com o rival
+  ainda quicando e emenda outro combo: o 2H relança (outro combo no ar, que termina no slam,
+  porque o quique é um por combo) ou corre e recomeça no chão (L, M). Antes ele pousava junto com
+  o rival, já caído. Vale para todos; o p09, lento, não alcança.
 - Qualquer golpe novo cancela o voo em andamento.
 - O motor avisa `WALL_BOUNCE` e `GROUND_BOUNCE` em `cues()` e a tela treme.
 - Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH

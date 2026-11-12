@@ -59,6 +59,24 @@ canto**: o Chute giratório carrega o rival até a parede, e da parede ele termi
 | R5b | Plexo com barra | 2L, → + H → S2 → SUPER | 9 | 4209 |
 | R6 | Parceiro | (Yin-lu em campo) L, M → TAG (Onda do Ryūga segura) → corre → L, M, M → S4 | 8 | 2526 |
 
+### Combo curto que emenda em outro (12/11)
+
+O dono: "não tem problema ter combo curto se eu conseguir emendar outros combos depois". Jeitos de
+emendar, conferidos no motor (`ComboRyugaTest.comboCurtoEmendaEmOutroCombo`):
+
+| Como emenda | Exemplo | Acertos |
+|---|---|---|
+| Parede do S3 | L, M, M → S3 (parede) → corre → L, M, M, → + H, S2 | 12 |
+| Assist no meio | L, M, M → TAG → corre → L, M, M, → + H, S2 | 10 |
+| Troca no Super (DHC) | 2L, → + H, S2, Super → DHC (Super da parceira) | 14 |
+| Depois do ↓jH, relançando | 2L, M, 2H → super pulo → jL, jM, ↓jH → 2H → super pulo → jL, jM, ↓jH | 10 |
+| Depois do ↓jH, no chão | 2L, M, 2H → super pulo → jL, jM, ↓jH → corre → L, M | 8 |
+
+Os dois últimos são novos: quem crava o ↓jH agora desce rápido e pousa com o rival ainda quicando
+(regra da base, vale para todos; `docs/combat-engine.md`). Depois da parede do H continua dando S2,
+2H com o combo no ar ou Super; recomeçar no chão ali não ficou bom: mexer na volta da parede ganhava
+esse recomeço e perdia o S3 → combo novo e parte do combo no ar, então a parede ficou como estava.
+
 Mudou da proposta: o R2 da proposta (S3 → corre → 2H → combo no ar) não emenda: depois da parede do
 S3 o rival volta alto e longe demais para o 2H; o que pega é o S2. O 2H com o combo no ar ficou no R4,
 depois da parede do H. O S2 que joga em arco (pedido de 12/11) também deixa o Super fora do R3; no
