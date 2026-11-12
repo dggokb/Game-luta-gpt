@@ -61,8 +61,10 @@ BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 AIR_DOWN_BINDINGS = ('j2L','j2M','j2H')
 # Golpe alto de chão (→ + M) com animação própria; sem ele o motor monta o 6M do M (GolpeAlto.java).
 OVERHEAD = '6M'
+# Golpe de comando (→ + H, 12/11): emenda no combo (as rotas da base o põem depois do L, do 2L e do M).
+COMMAND_HEAVY = '6H'
 # Inputs que o pacote pode ter ou não.
-OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD,)
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')
@@ -74,11 +76,11 @@ ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
-COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
+COMBO_STYLES = ('equilibrado','shoto','pressao','chutes','aereo','alcance','tanque','imprevisivel')
 # Estilo só da CPU (fighter.cpuStyle), quando difere do de combo.
 CPU_STYLES = COMBO_STYLES + ('agarrador', 'onda', 'contra', 'rekka', 'esquiva', 'ninja', 'acrobata')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
-            'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
+            'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE','arc':'ARC'}
 STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
 REQUIRED_ATTACK = ('startupFrames','activeFrames','recoveryFrames','hitstunFrames','blockstunFrames','hitstopFrames',
                    'cancelWindows','cancelInto','pushbackOnHit','pushbackOnBlock')
@@ -183,6 +185,10 @@ def validate_fighter(pack):
             raise ValueError(f'{name}.assist.move must be one of {", ".join(ASSIST_MOVES)}')
         if move == 'S' and 'energy' not in f:
             raise ValueError(f'{name}.assist: S needs fighter.energy')
+        if 'segura' in f['assist']:
+            # A Onda do assist segura o rival em pé esse tanto de quadros (o parceiro recomeça a corrente).
+            positive_int(f['assist']['segura'], f'{name}.assist.segura')
+            if move != 'S': raise ValueError(f'{name}.assist.segura: only the S assist holds')
 
 READS = {'alto':'HIGH','baixo':'LOW','tudo':'ANY','aereo':'AIR'}   # aereo: só a esquiva (anti-aéreo)
 
@@ -192,7 +198,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo'}
+             'chao','rebote','desenho','voo','arco'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -240,6 +246,14 @@ def validate_mechanics(name, mech, m, projectile):
             raise ValueError(f'{name}.mecanica.voo.paira: true (or leave it out)')
         if 'salto' in mech or 'mergulho' in mech:
             raise ValueError(f'{name}.mecanica.voo: not with salto or mergulho')
+    # Arco (launchType arc): o rival voa em arco, com altura e distância (o shoryuken do Ryūga).
+    if 'arco' in mech:
+        v = mech['arco']
+        if not (isinstance(v, dict) and set(v) == {'altura', 'distancia'}):
+            raise ValueError(f'{name}.mecanica.arco: {{altura, distancia}}')
+        positive(v['altura'], f'{name}.mecanica.arco.altura'); positive(v['distancia'], f'{name}.mecanica.arco.distancia')
+    if ('arco' in mech) != (m.get('launchType') == 'arc'):
+        raise ValueError(f'{name}.mecanica.arco: goes with launchType arc, and arc needs it')
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
     if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
         raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
@@ -340,7 +354,7 @@ def validate_ultra(name, u, animations):
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
 def validate_fighter_mechanics(name, mech):
-    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca','corrida'}
+    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca','corrida','corpo'}
     if not isinstance(mech, dict) or set(mech) - known:
         raise ValueError(f'{name}.mecanica: expected some of {sorted(known)}')
     if 'couraca' in mech:   # o p13: golpe fraco só atrasa; forte ou o segundo logo depois acerta
@@ -358,6 +372,20 @@ def validate_fighter_mechanics(name, mech):
             raise ValueError(name+'.mecanica.corrida.dash: fraction of the engine run, 0..2')
         if 'backdashQuadros' in c: positive_int(c['backdashQuadros'], name+'.mecanica.corrida.backdashQuadros')
         if 'backdashVelocidade' in c: positive(c['backdashVelocidade'], name+'.mecanica.corrida.backdashVelocidade')
+    if 'corpo' in mech:   # o corpo do lutador (11/11): pulo, peso e pulos no ar
+        c = mech['corpo']
+        if not (isinstance(c, dict) and c and set(c) <= {'pulo', 'peso', 'pulosNoAr'}):
+            raise ValueError(name+'.mecanica.corpo: {pulo, peso, pulosNoAr}')
+        def fator(v, onde):
+            if not (type(v) in (int, float) and 0.5 <= v <= 2):
+                raise ValueError(name+'.mecanica.corpo.'+onde+': fraction of the engine value, 0.5..2')
+        p = c.get('pulo', {})
+        if not (isinstance(p, dict) and set(p) <= {'altura', 'tempo', 'frente'}):
+            raise ValueError(name+'.mecanica.corpo.pulo: {altura, tempo, frente}')
+        for k, v in p.items(): fator(v, 'pulo.'+k)
+        if 'peso' in c: fator(c['peso'], 'peso')
+        if 'pulosNoAr' in c and not (type(c['pulosNoAr']) is int and 0 <= c['pulosNoAr'] <= 1):
+            raise ValueError(name+'.mecanica.corpo.pulosNoAr: 0 or 1')
     if 'furia' in mech: positive_int(mech['furia'], name+'.mecanica.furia')
     if 'wallJump' in mech and type(mech['wallJump']) is not bool: raise ValueError(name+'.mecanica.wallJump: true or false')
     if 'capangas' in mech: positive_int(mech['capangas'], name+'.mecanica.capangas')
@@ -766,6 +794,7 @@ def compile_packs(root, results):
         if mech.get('chao'): code += '.pound()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
+        if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+')'
         if 'voo' in mech:
             v = mech['voo']
             code += '.flight('+f(v['altura'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('paira'))).lower()+')'
@@ -775,6 +804,11 @@ def compile_packs(root, results):
         if 'eco' in mech: code += '.echo('+','.join(str(mech['eco'][k]) for k in ('frames','atraso','dano'))+')'
         if 'mergulho' in mech: code += '.dive('+f(mech['mergulho']['frente'])+','+f(mech['mergulho']['descida'])+')'
         return code
+    def corpo_lutador(c):
+        # O corpo do lutador (11/11): pulo (altura, tempo, frente), peso e pulos no ar, em milésimos.
+        p = c.get('pulo', {})
+        return (f".withBody({round(p.get('altura', 1) * 1000)},{round(p.get('tempo', 1) * 1000)},"
+                f"{round(p.get('frente', 1) * 1000)},{round(c.get('peso', 1) * 1000)},{c.get('pulosNoAr', 0)})")
     def fighter_mechanics(mech):
         grab = mech.get('agarrao', {})
         return ('.withMechanics('+str(mech.get('furia',0))+','+str(mech.get('airDashes',1))+','
@@ -784,7 +818,8 @@ def compile_packs(root, results):
                 +(f".withNaturalArmor({mech['couraca']['janela']},{round(mech['couraca']['dano'] * 1000)})"
                   if mech.get('couraca') else '')
                 +(f".withRun({round(mech['corrida'].get('dash', 1) * 1000)},{mech['corrida'].get('backdashQuadros', 0)},"
-                  f"{f(mech['corrida'].get('backdashVelocidade', 0))})" if mech.get('corrida') else ''))
+                  f"{f(mech['corrida'].get('backdashVelocidade', 0))})" if mech.get('corrida') else '')
+                +(corpo_lutador(mech['corpo']) if mech.get('corpo') else ''))
     def ultra_sequence(u):
         hold = ','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('rival', []))
         scene = ''
@@ -910,6 +945,8 @@ def compile_packs(root, results):
                    +(f".withWalk({f(fi.get('walkSpeed', 0))},{f(fi.get('walkBackSpeed', 0))})"
                      if 'walkSpeed' in fi or 'walkBackSpeed' in fi else '')
                    +('.withAnimationWeight('+f(fi['pesoAnimacao'])+')' if 'pesoAnimacao' in fi else '')
+                   +('.withAssistShot('+attack('S',{**energy['attack'],'hitstunFrames':fi['assist']['segura']},'PROJECTILE',energy['damage'],energy['attack'].get('reach'),energy['attack'].get('hitHeight'))+')'
+                     if 'segura' in fi.get('assist', {}) else '')
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withCpuStyle('+q(fi['cpuStyle'])+')' if 'cpuStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
@@ -975,13 +1012,38 @@ def pack_atlas(stage, cfg, report):
     if cfg.get('pixelScale', 1) != 1:
         report['pixelScale'] = report['packed']['pixelScale'] = cfg['pixelScale']
 
+def normal_map_da_folha(root, rel, results):
+    """`<folha>_n.webp` é o normal map de uma folha (tools/sprites/normal_map.py, o motor 4 de luz):
+    não sai deste gerador, mas acompanha a folha. Vale enquanto a folha existir e ele tiver o
+    tamanho dela (x e y lado a lado, cada metade com 1/4 do lado da folha). Folha removida ou
+    refeita com outro tamanho: o mapa vira órfão como qualquer saída velha (o --check acusa e o
+    --write apaga; refazer com normal_map.py <folha>)."""
+    path = Path(rel)
+    if path.suffix != '.webp' or not path.stem.endswith('_n'): return False
+    folha = path.stem[:-2]
+    for cfg, report in results:
+        if Path(cfg['output']).stem != folha or Path(cfg['output']).parent != path.parent: continue
+        packed = report.get('packed') or {}
+        w, h = packed.get('sheetWidth'), packed.get('sheetHeight')
+        if not w or not h: return False
+        try:
+            with Image.open(root / rel) as mapa: tamanho = mapa.size
+        except OSError:
+            return False
+        return tamanho == (2 * -(-w // 4), -(-h // 4))
+    return False
+
+def orphans_de(root, found, outputs, results):
+    """Dos arquivos achados, os que nenhum clipe produz (o normal map de uma folha viva não conta)."""
+    return [rel for rel in found if rel not in outputs and not normal_map_da_folha(root, rel, results)]
+
 def orphans(root, outputs, results):
     """Files in generated/authored folders that no clip produces or reads."""
     found = []
     for folder,patterns in (('android/app/src/main/res/drawable-nodpi',('*.png','*.webp')),('tools/sprites/reports',('*.json',))):
         for pattern in patterns:
             found += [p.relative_to(root).as_posix() for p in sorted((root/folder).glob(pattern))]
-    stale = [rel for rel in found if rel not in outputs]
+    stale = orphans_de(root, found, outputs, results)
     sources = {cfg['source'] for cfg,_ in results}
     sources |= {source for cfg,_ in results for source in cfg.get('sourceReferences', [])}
     sources |= {read(p).get('anatomyReference',{}).get('source') for p in (root/'tools/sprites/profiles').glob('*.json')}

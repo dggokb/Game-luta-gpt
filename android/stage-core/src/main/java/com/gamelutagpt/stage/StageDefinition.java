@@ -22,7 +22,8 @@ import java.util.Map;
  *     { "imagem": "ceu.jpg", "profundidade": 100000, "topo": -0.2, "base": 0.62, "repetir": "espelhar" },
  *     { "imagem": "pilares.png", "profundidade": 300, "noChao": true, "altura": 0.9,
  *       "x": 0.06, "repetir": "espelhar", "periodo": 0.88,
- *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ],
+ *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true,
+ *                    "lutadores": 0.5, "alcance": 0.9 } ],   // ponto de luz dos lutadores (veja Light)
  *       "bandeiras": [ { "imagem": "bandeira.png", "x": 0.3, "y": 0.29, "largura": 0.31, "altura": 0.53 } ] },
  *     { "tipo": "neblina", "profundidade": 2600, "topo": 0.45, "base": 0.62, "cor": "#3A2A66", "alfa": 0.5 }
  *   ],
@@ -32,9 +33,10 @@ import java.util.Map;
  *   "poeira": { "quantidade": 140, "cor": "#FFD8A0", "alfa": 0.5, "tamanho": 2.2, "vento": 25 },
  *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
  *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 },
- *   "luzLutadores": { "cor": "#A8B8F0", "forca": 0.35, "brilho": 0.9, "pes": "#C0C4DC",
- *                     "contraluz": { "cor": "#60A8FF", "forca": 0.9, "direcao": [1, -1] } },
- *   "sombraLutadores": { "alfa": 0.42, "x": 0.6, "y": 0.22 }
+ *   // o motor de luz e sombra (FighterLight): a cor que o branco vira no lado aceso e no de sombra
+ *   "luzLutadores": { "luz": "#D9D2F5", "sombra": "#8A84B8", "chao": "#86789C",
+ *                     "direcao": [1, -1], "borda": 0.5 },
+ *   "sombraLutadores": { "alfa": 0.42, "x": 0.6, "y": 0.22 }   // sem "x": para o lado contrário de "direcao"
  *   // ou, com focos de luz (a sombra segue cada um):
  *   // "sombraLutadores": { "alfa": 0.6, "cor": "#1A0A18", "suave": 0.5,
  *   //                     "focos": [ { "x": -145, "altura": 1080, "profundidade": 2008 } ] }
@@ -56,25 +58,48 @@ public final class StageDefinition {
         public final float pulse;
         /** Desenha o reflexo da luz no chão molhado. */
         public final boolean reflect;
+        /**
+         * Ponto de luz dos lutadores ({@code "lutadores"}, 0 a 1): o quanto esta luz toma o lugar
+         * da luz do cenário no corpo de quem está nela, do lado dela (0 = só enfeita o cenário; o
+         * motor mistura os pontos pelo peso, nada soma). {@code reach} ({@code "alcance"}): até
+         * onde chega, em alturas de tela; 0 = não cai com a distância (a lua, o sol).
+         */
+        public final float fighters, reach;
 
         Light(float x, float y, float radius, int color, float pulse, boolean reflect) {
+            this(x, y, radius, color, pulse, reflect, 0f, 0f);
+        }
+
+        Light(float x, float y, float radius, int color, float pulse, boolean reflect, float fighters, float reach) {
             this.x = x;
             this.y = y;
             this.radius = radius;
             this.color = color;
             this.pulse = pulse;
             this.reflect = reflect;
+            this.fighters = fighters;
+            this.reach = reach;
         }
     }
 
     /** Fogo animado preso num ponto da imagem; tamanho em fração da altura da imagem. */
     public static final class Fire {
         public final float x, y, size;
+        /** Ponto de luz dos lutadores, como em {@link Light}: força, alcance e a cor da luz do fogo. */
+        public final float fighters, reach;
+        public final int color;
 
         Fire(float x, float y, float size) {
+            this(x, y, size, 0f, 0f, 0xFFFF9A3C);
+        }
+
+        Fire(float x, float y, float size, float fighters, float reach, int color) {
             this.x = x;
             this.y = y;
             this.size = size;
+            this.fighters = fighters;
+            this.reach = reach;
+            this.color = color;
         }
     }
 
@@ -742,56 +767,35 @@ public final class StageDefinition {
     }
 
     /**
-     * A luz do lugar sobre os lutadores: cada canal da cor multiplicado por
-     * {@code brilho × ((1 − forca) + forca × cor)}. Uma matriz de cor só, somada ao filtro que o
-     * lutador já usa (o desgaste): não custa um desenho a mais.
+     * A luz do lugar sobre os lutadores ({@code "luzLutadores"}), no motor de luz e sombra
+     * (docs/motor-luz-proposta.md): a arte é o teto. O cenário diz a cor que o branco da arte vira
+     * no lado aceso ({@code "luz"}, no máximo #FFFFFF, a própria arte) e no lado de sombra
+     * ({@code "sombra"}, a cor do lugar, nunca mais clara que a luz), a cor que sobe do chão nos
+     * pés ({@code "chao"}, padrão a sombra), de onde vem a luz que manda ({@code "direcao"}: o
+     * sol, a lua, o teto) e a força do fio de contraluz ({@code "borda"}, 0 a 1). O shader
+     * multiplica a arte por isso; nada soma.
      */
     public static final class FighterLight {
-        public final int color;
-        public final float strength, brightness;
-        /**
-         * Degradê de cima para baixo: a cabeça fica como está e os pés multiplicados por esta cor
-         * ({@code "pes"}; branco = sem degradê).
-         */
-        public final int feet;
-        /**
-         * Contraluz ({@code "contraluz"}): um fio de luz na borda do corpo do lado de onde a luz vem.
-         * {@code rimDirX/Y}: para onde fica a luz na tela (x para a direita, y para baixo), já
-         * normalizado; força 0 = sem contraluz.
-         */
-        public final int rimColor;
-        public final float rimStrength, rimDirX, rimDirY;
+        /** As cores (0xFFRRGGBB): o lado aceso, o lado de sombra e os pés. */
+        public final int lit, shade, ground;
+        /** Para onde fica a luz na tela (x para a direita, y para baixo), já normalizado. */
+        public final float dirX, dirY;
+        /** Força do fio de contraluz, de 0 a 1. */
+        public final float edge;
 
-        FighterLight(int color, float strength, float brightness) {
-            this(color, strength, brightness, 0xFFFFFFFF, 0xFFFFFFFF, 0f, 0f, -1f);
+        FighterLight(int lit, int shade, int ground, float dirX, float dirY, float edge) {
+            this.lit = lit;
+            this.shade = shade;
+            this.ground = ground;
+            float n = (float)Math.sqrt(dirX * dirX + dirY * dirY);
+            this.dirX = n > 0f ? dirX / n : 0f;
+            this.dirY = n > 0f ? dirY / n : -1f;
+            this.edge = edge;
         }
 
-        FighterLight(int color, float strength, float brightness, int feet,
-                     int rimColor, float rimStrength, float rimDirX, float rimDirY) {
-            this.color = color;
-            this.strength = strength;
-            this.brightness = brightness;
-            this.feet = feet;
-            this.rimColor = rimColor;
-            this.rimStrength = rimStrength;
-            float n = (float)Math.sqrt(rimDirX * rimDirX + rimDirY * rimDirY);
-            this.rimDirX = n > 0f ? rimDirX / n : 0f;
-            this.rimDirY = n > 0f ? rimDirY / n : -1f;
-        }
-
-        /** O fator dos pés em cada canal (vermelho, verde, azul). */
-        public float[] feetFactors() {
-            return new float[] {((feet >> 16) & 0xFF) / 255f, ((feet >> 8) & 0xFF) / 255f, (feet & 0xFF) / 255f};
-        }
-
-        /** O fator de cada canal (vermelho, verde, azul). */
-        public float[] factors() {
-            float[] f = new float[3];
-            for (int i = 0; i < 3; i++) {
-                float c = ((color >> (16 - 8 * i)) & 0xFF) / 255f;
-                f[i] = brightness * ((1f - strength) + strength * c);
-            }
-            return f;
+        /** Uma cor (0xRRGGBB) em três fatores de 0 a 1. */
+        public static float[] rgb(int cor) {
+            return new float[] {((cor >> 16) & 0xFF) / 255f, ((cor >> 8) & 0xFF) / 255f, (cor & 0xFF) / 255f};
         }
     }
 
@@ -915,28 +919,34 @@ public final class StageDefinition {
         FighterLight light = null;
         Map<String, Object> lightMap = object(map, "luzLutadores");
         if (lightMap != null) {
-            float brilho = number(lightMap, "brilho", 1f);
-            if (brilho <= 0f || brilho > 2f) throw new IllegalArgumentException("luzLutadores: \"brilho\" entre 0 e 2");
-            int pes = color(lightMap, "pes", 0xFFFFFFFF);
-            int rimCor = 0xFFFFFFFF;
-            float rimForca = 0f, rimX = 0f, rimY = -1f;
-            Map<String, Object> rim = object(lightMap, "contraluz");
-            if (rim != null) {
-                rimCor = color(rim, "cor", 0xFFFFFFFF);
-                rimForca = number(rim, "forca", 0.8f);
-                if (rimForca < 0f || rimForca > 2f) throw new IllegalArgumentException("contraluz: \"forca\" entre 0 e 2");
-                Object dir = rim.get("direcao");
-                if (dir != null) {
-                    if (!(dir instanceof List) || ((List<?>)dir).size() != 2) {
-                        throw new IllegalArgumentException("contraluz: \"direcao\" é [x, y]");
-                    }
-                    rimX = ((Number)((List<?>)dir).get(0)).floatValue();
-                    rimY = ((Number)((List<?>)dir).get(1)).floatValue();
-                    if (rimX == 0f && rimY == 0f) throw new IllegalArgumentException("contraluz: \"direcao\" não pode ser [0, 0]");
+            for (String antigo : new String[] {"cor", "forca", "brilho", "pes", "contraluz"}) {
+                if (lightMap.containsKey(antigo)) {
+                    throw new IllegalArgumentException("luzLutadores: \"" + antigo + "\" é do motor de luz antigo (saiu);"
+                        + " use luz, sombra, chao, direcao e borda");
                 }
             }
-            light = new FighterLight(color(lightMap, "cor", 0xFFFFFFFF), clamp01(number(lightMap, "forca", 0.3f)), brilho,
-                pes, rimCor, rimForca, rimX, rimY);
+            if (!lightMap.containsKey("luz") || !lightMap.containsKey("sombra")) {
+                throw new IllegalArgumentException("luzLutadores: precisa de \"luz\" e \"sombra\"");
+            }
+            // A luz não passa da arte (#FFFFFF) e a sombra não passa da luz.
+            int lit = color(lightMap, "luz", 0xFFFFFFFF), shade = color(lightMap, "sombra", lit);
+            float[] l = FighterLight.rgb(lit), s = FighterLight.rgb(shade);
+            for (int i = 0; i < 3; i++) {
+                if (s[i] > l[i] + 1e-4f) throw new IllegalArgumentException("luzLutadores: \"sombra\" não pode ser mais clara que \"luz\"");
+            }
+            float dirX = 0f, dirY = -1f;
+            Object direcao = lightMap.get("direcao");
+            if (direcao != null) {
+                if (!(direcao instanceof List) || ((List<?>)direcao).size() != 2) {
+                    throw new IllegalArgumentException("luzLutadores: \"direcao\" é [x, y]");
+                }
+                dirX = ((Number)((List<?>)direcao).get(0)).floatValue();
+                dirY = ((Number)((List<?>)direcao).get(1)).floatValue();
+                if (dirX == 0f && dirY == 0f) throw new IllegalArgumentException("luzLutadores: \"direcao\" não pode ser [0, 0]");
+            }
+            float borda = number(lightMap, "borda", 0.5f);
+            if (borda < 0f || borda > 1f) throw new IllegalArgumentException("luzLutadores: \"borda\" entre 0 e 1");
+            light = new FighterLight(lit, shade, color(lightMap, "chao", shade), dirX, dirY, borda);
         }
 
         FighterShadow shadow = null;
@@ -967,8 +977,9 @@ public final class StageDefinition {
             }
             float suave = number(shadowMap, "suave", 0.5f);
             if (suave < 0f || suave > 1f) throw new IllegalArgumentException("sombraLutadores: \"suave\" entre 0 e 1");
-            shadow = new FighterShadow(alfa, number(shadowMap, "x", 0.5f), y, focos,
-                color(shadowMap, "cor", 0xFF000000), suave);
+            // Sem "x": a sombra cai para o lado contrário de onde vem a luz ("direcao" de luzLutadores).
+            float x = number(shadowMap, "x", light != null ? -SOMBRA_LADO * light.dirX : SOMBRA_LADO);
+            shadow = new FighterShadow(alfa, x, y, focos, color(shadowMap, "cor", 0xFF000000), suave);
         }
 
         StageDefinition def = new StageDefinition(name.trim(), distance, horizon,
@@ -1141,7 +1152,8 @@ public final class StageDefinition {
                 if (!(item instanceof Map)) continue;
                 Map<String, Object> l = (Map<String, Object>)item;
                 b.lights.add(new Light(number(l, "x", 0.5f), number(l, "y", 0.5f), number(l, "raio", 0.05f),
-                    color(l, "cor", 0xFFFFB45A), number(l, "pulsar", 0.12f), bool(l, "reflexo", true)));
+                    color(l, "cor", 0xFFFFB45A), number(l, "pulsar", 0.12f), bool(l, "reflexo", true),
+                    pontoDeLuz(l, where), number(l, "alcance", ALCANCE_PADRAO)));
             }
         }
         Object fires = map.get("fogos");
@@ -1149,7 +1161,8 @@ public final class StageDefinition {
             for (Object item : (List<Object>)fires) {
                 if (!(item instanceof Map)) continue;
                 Map<String, Object> f = (Map<String, Object>)item;
-                b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f)));
+                b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f),
+                    pontoDeLuz(f, where), number(f, "alcance", ALCANCE_PADRAO), color(f, "cor", 0xFFFF9A3C)));
             }
         }
         Object telao = map.get("telao");
@@ -1306,6 +1319,25 @@ public final class StageDefinition {
     private static String string(Map<String, Object> map, String key, String fallback) {
         Object value = map == null ? null : map.get(key);
         return value instanceof String ? (String)value : fallback;
+    }
+
+    /**
+     * Quanto a sombra do sol vai para o lado por unidade de altura quando o cenário não diz
+     * ({@code "x"} em {@code "sombraLutadores"}): luz vinda de lado puro dá isto, para o lado de lá.
+     */
+    static final float SOMBRA_LADO = 0.5f;
+
+    /** Alcance de um ponto de luz dos lutadores sem {@code "alcance"}: 0,9 altura de tela. */
+    static final float ALCANCE_PADRAO = 0.9f;
+
+    /**
+     * {@code "lutadores"} de uma luz ou fogo, de 0 a 1: o quanto este ponto toma o lugar da luz do
+     * cenário no lutador que está nele (o motor de luz mistura os pontos pelo peso; nada soma).
+     */
+    private static float pontoDeLuz(Map<String, Object> map, String where) {
+        float v = number(map, "lutadores", 0f);
+        if (v < 0f || v > 1f) throw new IllegalArgumentException(where + ": \"lutadores\" entre 0 e 1");
+        return v;
     }
 
     private static float number(Map<String, Object> map, String key, float fallback) {

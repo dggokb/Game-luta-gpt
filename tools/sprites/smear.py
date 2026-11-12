@@ -93,7 +93,7 @@ def so_corpo(cel, abre=5, borda=3):
     return Image.fromarray(px, 'RGBA')
 
 
-def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO, sem_escuro=False):
+def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO, sem_escuro=False, clarear=0.0, alfa=1.0):
     """O quadro com o membro esticado para trás: cada ponto do membro deixa uma língua até onde ele
     estava no desenho anterior (o pé, que andou muito, uma cauda longa; o joelho, quase nada), e o
     rastro vira a área que o membro varreu, em giro (chute em arco) ou reto (soco). Coordenadas em
@@ -155,7 +155,12 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
     cabe = np.maximum(np.minimum(lim_x, lim_y), 0.0)
     if (alcance > cabe).any():
         alcance = alcance * float(np.min(np.where(alcance > 0, cabe / np.maximum(alcance, 1e-6), np.inf)).clip(0.0, 1.0))
-    cores = px[membro]
+    cores = px[membro].copy()
+    if clarear > 0:
+        # Roupa preta: a língua escura vira um bloco sólido. Puxa o escuro para um cinza-azulado de
+        # ar, tanto mais quanto mais escuro; o que já é claro (pele, faixa vermelha) quase não muda.
+        escuro = 1.0 - cores[:, :3].max(axis=1, keepdims=True) / 255.0
+        cores[:, :3] += (np.array([150.0, 156.0, 175.0]) - cores[:, :3]) * clarear * escuro
     camada = np.zeros_like(px)
     # Do mais longe para o mais perto: a parte de perto da perna fica por cima.
     topo = max(1.0, *comprimento)
@@ -168,9 +173,14 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
         qy = np.round(by[vivo] + vy[vivo] * f).astype(int)
         ok = (qx >= 0) & (qx < w) & (qy >= 0) & (qy < h)
         camada[qy[ok], qx[ok], :3] = cores[vivo][ok, :3]
-        camada[qy[ok], qx[ok], 3] = 255
+        camada[qy[ok], qx[ok], 3] = 255 * alfa
     # As línguas tomam o lugar do membro (como no smear desenhado: o braço vira as línguas) e a
     # ponta (o pé, o punho) volta inteira por cima.
+    if clarear > 0:
+        # Roupa escura: as línguas claras ficam atrás e o membro desenhado continua por cima.
+        out = Image.fromarray(camada.astype(np.uint8), 'RGBA')
+        out.alpha_composite(cel)
+        return out
     out = cel.copy()
     out.alpha_composite(Image.fromarray(camada.astype(np.uint8), 'RGBA'))
     ponta_m = perto & (px[..., 3] > 0) & (t >= 1.0 - PONTA_LIVRE)
@@ -190,6 +200,9 @@ def main():
                         '1 = até onde o membro estava no desenho anterior')
     p.add_argument('--trocar', help='antes de esticar, troca desenhos com efeito do vídeo por cima do corpo '
                                     'pelo desenho limpo da mesma pose: "4=8,5=8" (o 4 e o 5 viram cópia do 8)')
+    p.add_argument('--opacidade', help='opacidade das línguas em cada desenho de --quadros, na ordem: "1,0.5" '
+                                       '(sem isto: com 2 desenhos, o segundo, o do acerto, a 50%%)')
+    p.add_argument('--clarear', type=float, help='0 a 1: puxa as línguas escuras (roupa preta) para um cinza-azulado')
     p.add_argument('--sem-escuro', action='store_true', help='o escuro (roupa preta atrás do membro) não vira língua')
     p.add_argument('--antes', help='de que desenho cada um estica: "7=5" (sem isto, o último do caminho '
                                    'com a ponta noutro lugar)')
@@ -218,6 +231,10 @@ def main():
         a.trocar = smear.get('trocar')
     trocas = {int(d): int(o) for d, o in (t.split('=') for t in a.trocar.split(','))} if a.trocar else {}
     a.sem_escuro = a.sem_escuro or bool(smear and smear.get('semEscuro'))
+    if a.opacidade is None and smear and 'opacidade' in smear:
+        a.opacidade = ','.join(map(str, smear['opacidade']))
+    if a.clarear is None:
+        a.clarear = float(smear.get('clarear', 0.0)) if smear else 0.0
     if a.antes is None and smear:
         a.antes = smear.get('antes')
     antes_de = {int(d): int(o) for d, o in (t.split('=') for t in a.antes.split(','))} if a.antes else {}
@@ -267,7 +284,13 @@ def main():
                 return cam[str(d)]
         return None
 
-    for q in quadros:
+    if a.opacidade:
+        opac = [float(x) for x in a.opacidade.split(',')]
+    else:
+        # O desenho do acerto fica parado na pausa: as línguas dele a meio caminho de sumir.
+        opac = [1.0, 0.5] if len(quadros) == 2 else [1.0] * len(quadros)
+    opac = (opac + [opac[-1]] * len(quadros))[:len(quadros)]
+    for q, alfa in zip(quadros, opac):
         v = ponto(q)
         # O antes: o último desenho do caminho com a ponta noutro lugar (uma cópia da mesma pose não conta).
         antes = [int(d) for d in cam if int(d) < q and v is not None
@@ -279,7 +302,7 @@ def main():
         x0, y0 = (q % cols) * fw, (q // cols) * fh
         cel = folha.crop((x0, y0, x0 + fw, y0 + fh))
         u = cam[str(ant)]
-        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento, a.sem_escuro)
+        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento, a.sem_escuro, a.clarear, alfa)
         folha.paste(nova, (x0, y0))
         feitos.append((q, round(andou[q])))
     print('esticados (desenho, px do mundo que a ponta andou):', feitos)
@@ -292,6 +315,12 @@ def main():
         prev.save(a.previa)
         print('prévia:', a.previa)
         return
+    if clip['source'].endswith('_sr_hd.png'):
+        # O clipe passou pela melhoria de nitidez (tools/sprites/sr_hd.py) depois do smear: refazer o
+        # smear volta para a fonte sem nitidez. Não roda sem querer: a outra fonte ficaria solta.
+        raise SystemExit(f"{clip['source']} é a versão com nitidez (sr_hd.py). Refaça o smear e depois "
+                         'rode sr_hd.py de novo neste clipe; para seguir assim mesmo, volte o clipe '
+                         'para a fonte _smear.png primeiro.')
     destino = Path(original).with_name(Path(original).stem + '_smear.png')
     folha.save(ROOT / destino, optimize=True)
     clip['source'] = destino.as_posix()
@@ -308,6 +337,9 @@ def main():
         clip['smear']['antes'] = a.antes
     if a.sem_escuro:
         clip['smear']['semEscuro'] = True
+    if a.clarear:
+        clip['smear']['clarear'] = a.clarear
+    clip['smear']['opacidade'] = opac
     clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('fonte nova:', destino, '| clip:', clip_path.relative_to(ROOT))
     print('agora: python3 tools/sprites/build_characters.py --write')

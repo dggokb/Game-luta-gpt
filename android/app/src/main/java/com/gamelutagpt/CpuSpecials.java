@@ -131,7 +131,7 @@ final class CpuSpecials {
         else if (m.pull > 0f) role = Role.PULL;
         else if (m.echoFrames > 0) role = Role.ECHO;
         else if (m.armorHits > 0) role = Role.ARMOR;
-        else if (a.launch == AttackDefinition.Launch.LAUNCH ||
+        else if (a.launch == AttackDefinition.Launch.LAUNCH || a.launch == AttackDefinition.Launch.ARC ||
             a.startupFrames <= 8 && a.activeFrames >= 7 && travel(a) < 120f && a.hitHeight >= 120f) role = Role.ANTI_AIR;
         else if (a.low) role = Role.LOW;
         else if (travel(a) >= 120f || m.teleportFrame >= 0) role = Role.RUSH;

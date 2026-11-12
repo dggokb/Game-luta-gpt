@@ -92,9 +92,10 @@
       "hitInterval": 8
     },
     "assist": {
-      "move": "S"
+      "move": "S",
+      "segura": 45
     },
-    "comboStyle": "equilibrado",
+    "comboStyle": "shoto",
     "cpuStyle": "onda",
     "walkSpeed": 280,
     "walkBackSpeed": 210
@@ -17028,7 +17029,8 @@
         "2L",
         "2M",
         "H",
-        "2H"
+        "2H",
+        "6H"
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 24,
@@ -17070,7 +17072,9 @@
         "S",
         "S2",
         "S3",
-        "2H"
+        "2H",
+        "6H",
+        "M"
       ],
       "pushbackOnHit": 32,
       "pushbackOnBlock": 38,
@@ -17084,7 +17088,7 @@
         "S2",
         "S3"
       ],
-      "maxUsesPerChain": 1
+      "maxUsesPerChain": 2
     },
     "H": {
       "animation": "HEAVY_STRAIGHT",
@@ -17148,7 +17152,8 @@
         "L",
         "2L",
         "H",
-        "2H"
+        "2H",
+        "6H"
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 22,
@@ -17389,6 +17394,50 @@
       "hitHeight": 124,
       "hitFloor": 9,
       "alcanceMaximo": 190
+    },
+    "6H": {
+      "animation": "HEAVY_STRAIGHT",
+      "nome": "Soco no plexo",
+      "damage": 900,
+      "reach": 170,
+      "startupFrames": 9,
+      "activeFrames": 10,
+      "recoveryFrames": 15,
+      "hitstunFrames": 24,
+      "blockstunFrames": 14,
+      "hitstopFrames": 10,
+      "cancelWindows": {
+        "hit": [
+          16,
+          27
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "S",
+        "SUPER",
+        "S2",
+        "S3"
+      ],
+      "pushbackOnHit": 26,
+      "pushbackOnBlock": 44,
+      "hitHeight": 200,
+      "hitFloor": 60,
+      "golpes": [
+        9,
+        16
+      ],
+      "mecanica": {
+        "avanco": {
+          "velocidade": 420,
+          "frames": [
+            1,
+            9
+          ]
+        }
+      },
+      "maxUsesPerChain": 1
     }
   },
   "specialAnimations": {
@@ -17424,7 +17473,7 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
+      "launchType": "arc",
       "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
@@ -17434,7 +17483,12 @@
         "H"
       ],
       "nome": "Punho ascendente",
+      "arcoBase": "knockdown",
       "mecanica": {
+        "arco": {
+          "altura": 160,
+          "distancia": 340
+        },
         "voo": {
           "altura": 170,
           "frames": [
@@ -17480,7 +17534,7 @@
       ],
       "pushbackOnHit": 40,
       "pushbackOnBlock": 50,
-      "launchType": "knockdown",
+      "launchType": "wallBounce",
       "knockback": 70,
       "buttons": [
         "L",

@@ -580,7 +580,7 @@ final class CombatEngine {
             } else {
                 if (in.light) f.buffer.push(InputBuffer.Button.LIGHT, null, crouch);
                 if (in.medium) f.buffer.push(InputBuffer.Button.MEDIUM, null, crouch, relative == 1);
-                if (heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+                if (heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch, in.heavy && relative == 1);
                 // A última direção do comando pode chegar logo depois do botão (o polegar ainda
                 // no caminho): ele fica guardado uns quadros (comandoAtrasado).
                 f.botaoSemComando = button;
@@ -715,6 +715,11 @@ final class CombatEngine {
         if (f.pendingJumpAge >= 0 && !f.grounded && canWallJump(f)) wallJump(f);
         else if (f.pendingJumpAge >= 0 && !f.grounded && f.attacking() &&
             CancelSystem.canCancel(f, AttackDefinition.JUMP, null)) airJump(f);
+        else if (f.pendingJumpAge >= 0 && !f.grounded && f.status == CombatFighter.Status.NEUTRAL &&
+            f.character().fighter.airJumps > 0 && !f.airJumpUsed && f.airDashFrames == 0) {
+            // Pulo duplo (o corpo da Yin-lu): ↑ de novo no ar, livre, uma vez por voo.
+            airJump(f);
+        }
         if (f.jumpGrace > 0) f.jumpGrace--;
         else if (f.pendingJumpAge >= 0 && f.grounded) {
             boolean superJump = f.pendingSuperJump || f.launcherChase > 0;
@@ -1695,8 +1700,10 @@ final class CombatEngine {
             case KNOCKDOWN: {
                 // Defeated: stays down (the KO is the defeat pose).
                 if (f.ko() || pinnedDown(f)) break;
+                // Enquanto o OTG do combo ainda pode vir, ele não escolhe rolar nem levantar rápido.
+                boolean otgPendente = sessions[f.index] != null && otgOpen(f, sessions[f.index]);
                 if (f.knockdownFrame >= config.knockdownFallFrames && f.wakeup == CombatFighter.WAKE_NORMAL &&
-                    !f.hardKnockdown) {
+                    !f.hardKnockdown && !otgPendente) {
                     chooseWakeup(f);
                 }
                 int down = config.knockdownDownFrames;
@@ -1765,6 +1772,7 @@ final class CombatEngine {
         // Golpe que sai de outro golpe continua a corrente; saindo do neutro, começa outra.
         if (!f.attacking()) f.chain.clear();
         f.chain.add(attack.id);
+        f.golpesIniciados++;
         f.status = CombatFighter.Status.ATTACK;
         f.airRecovering = false;
         f.clearAttack();
@@ -2083,7 +2091,8 @@ final class CombatEngine {
         f.grounded = false;
         f.crouching = false;
         f.superJumping = superJump;
-        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed);
+        // O pulo do corpo do lutador (altura e tempo próprios); o super pulo é o mesmo para todos.
+        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed * f.character().fighter.jumpSpeedScale());
         f.y -= 2f;
         f.backdashFrames = 0;
         if (superJump) f.launcherChase = 0;
@@ -2099,7 +2108,7 @@ final class CombatEngine {
         f.clearAttack();
         f.airJumpUsed = true;
         f.airRecovering = false;
-        f.vy = -config.airJumpSpeed;
+        f.vy = -config.airJumpSpeed * f.character().fighter.jumpSpeedScale();
         if (f.jumpMode != CombatFighter.PULO_SUPER) {
             // O pulo no ar escolhe a direção de novo (comprometido).
             f.jumpMode = CombatFighter.PULO_COMPROMETIDO;
@@ -2536,7 +2545,8 @@ final class CombatEngine {
     /** Velocidade de lado do pulo normal: mais que a de andar (o pulo vai longe com o mesmo tempo no ar). */
     private float jumpSpeedX(CombatFighter f, int horizontal) {
         if (horizontal == 0) return 0f;
-        return horizontal == f.facing ? config.jumpForwardSpeed : config.jumpBackSpeed;
+        return (horizontal == f.facing ? config.jumpForwardSpeed : config.jumpBackSpeed) *
+            f.character().fighter.jumpForwardScale();
     }
 
     /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
@@ -2601,7 +2611,11 @@ final class CombatEngine {
             (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
             scale = f.vy < 0f ? config.normalJumpRisingGravityScale
                               : config.normalJumpFallingGravityScale;
+            // O pulo do corpo do lutador: a gravidade acompanha a altura e o tempo dele.
+            scale *= f.character().fighter.jumpGravityScale();
         }
+        // O peso: quem apanha no ar cai conforme o corpo (leve demora a cair, pesado despenca).
+        if (f.status == CombatFighter.Status.AIR_HITSTUN) scale *= f.character().fighter.weightScale();
         if (dragonRush(f)) {
             // Preparo e voo: parado no ar (o voo já andou em moveHorizontally). Encostou ou acabou
             // o voo: cai devagar na recuperação (dá tempo de emendar no ar).
@@ -3019,7 +3033,7 @@ final class CombatEngine {
         a.clearAttack();
         a.status = CombatFighter.Status.ATTACK;
         if ("S".equals(move) && profile.energy != null) {
-            a.attack = profile.energy.attack;
+            a.attack = profile.assistShot != null ? profile.assistShot : profile.energy.attack;
             a.specialStrength = "M";
             return;
         }
@@ -3032,7 +3046,9 @@ final class CombatEngine {
     /** O golpe que o assist de {@code a} faz (o S do pacote ou o normal declarado). */
     static AttackDefinition assistAttack(CombatFighter a) {
         CharacterDefinition.Fighter profile = a.state.profile;
-        if ("S".equals(profile.assistMove) && profile.energy != null) return profile.energy.attack;
+        if ("S".equals(profile.assistMove) && profile.energy != null) {
+            return profile.assistShot != null ? profile.assistShot : profile.energy.attack;
+        }
         return assistNormal(a).attack;
     }
 
@@ -3417,6 +3433,19 @@ final class CombatEngine {
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
         if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d, frame) : reboundMissed(a, frame))) return;
+        if (otgTarget(a, d, a.attack, false)) {
+            // OTG: o ↓ + M pega o rival deitado (12/11). O corpo deitado é baixo: conta como agachado.
+            if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits) return;
+            for (int i = 0; i < a.attack.hitboxCount(); i++) {
+                AttackDefinition.Box box = a.attack.hitbox(i);
+                if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
+                if (golpeToca(a, box, frame, d, d.body(), true)) {
+                    addContact(a, d, a.attack, i, null);
+                    return;
+                }
+            }
+            return;
+        }
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel e o aparar só batem no que leram: sem golpe na janela, a resposta não sai.
         if ((a.attack.mechanics.repel || a.attack.mechanics.parry) && !a.countered) return;
@@ -4025,6 +4054,22 @@ final class CombatEngine {
     }
 
     /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */
+    /**
+     * OTG (12/11): o ↓ + M ({@link CombatConfig#otgMove}) de quem está no chão pega o rival que caiu
+     * dentro do combo, nos primeiros quadros deitado, uma vez por combo, e o levanta para continuar.
+     */
+    private boolean otgTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
+        if (projectile || d.status != CombatFighter.Status.KNOCKDOWN || d.ko() || !a.grounded ||
+            !config.otgMove.equals(attack.id)) return false;
+        ComboSession s = sessions[d.index];
+        return s != null && s.active && s.attacker == a.index && otgOpen(d, s);
+    }
+
+    /** O rival caído ainda pode levar o OTG deste combo (o combo não acaba enquanto isso). */
+    private boolean otgOpen(CombatFighter d, ComboSession s) {
+        return s.otgs == 0 && s.hitCount >= 2 && !d.hardKnockdown && d.knockdownFrame <= config.otgWindowFrames;
+    }
+
     private static boolean poundTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
         return !projectile && attack.mechanics.pound && a.strikeLanded && a.attacking() && a.attack == attack &&
             d.status == CombatFighter.Status.KNOCKDOWN;
@@ -4702,7 +4747,8 @@ final class CombatEngine {
             a.hitsOnTarget++;
         }
         boolean pounding = poundTarget(a, d, attack, projectile);
-        if (!d.hittable() && !pounding) return;
+        boolean otg = otgTarget(a, d, attack, projectile);
+        if (!d.hittable() && !pounding && !otg) return;
         // Crossup: o rival é empurrado para o lado de onde ele está (atrás de quem bateu).
         int direction = projectile ? c.projectile.direction : c.cruzou ? -a.facing : a.facing;
         // The owner's S/SUPER learns about its projectile while it still runs.
@@ -4767,7 +4813,7 @@ final class CombatEngine {
         }
 
         // O agarrão de especial não se defende (como o agarrão), nem quem está deitado.
-        int guard = !projectile && attack.mechanics.grab || pounding ? CombatFighter.GUARD_NONE
+        int guard = !projectile && attack.mechanics.grab || pounding || otg ? CombatFighter.GUARD_NONE
             : projectile ? effectiveGuard(d) : guardContra(d, a);
         if (energyChain(c, d)) {
             // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
@@ -4816,7 +4862,7 @@ final class CombatEngine {
             events.add(new HitEvent(a.index, d.index, raw, false, projectile, attack.id));
             return;
         }
-        if (shinkaiArmor(d, attack, projectile, pounding)) {
+        if (shinkaiArmor(d, attack, projectile, pounding || otg)) {
             // SHINKAI POWER, corpo de aço: aguenta o golpe sem perder a ação, com menos dano.
             int soft = raw * (porReserva(d.state) ? config.shinkaiPowerArmorReservaPermille : config.shinkaiPowerArmorPermille) / 1000;
             d.state.takeDamage(soft, config.recoverableLifePermille);
@@ -4858,7 +4904,8 @@ final class CombatEngine {
             a.state.precisos++;
             cues.add("PRECISO");
         }
-        session = sessionFor(a, d);
+        // O OTG continua o combo do rival caído (deitado não conta como atordoado).
+        session = otg ? sessions[d.index] : sessionFor(a, d);
         // The move's first strike that hits pays meter and sets the combo scale; the later
         // strikes keep that scale (a new combo starts over as a first strike).
         boolean firstStrike = multiProjectile ? c.strike == 0 || newSession : !multi || !a.strikeLanded || newSession;
@@ -4919,7 +4966,24 @@ final class CombatEngine {
             session.groundBounces < config.maxGroundBounces;
 
         boolean spinHit = attack.spin && lastStrike && !projectile;
-        if (pounding) {
+        if (otg) {
+            // OTG: o rival deitado sobe um pouco, aberto para continuar; caindo de novo, acaba.
+            session.otgs++;
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Arena.GROUND_Y - 2f;
+            d.vy = -config.otgLift;
+            d.vx = 0f;
+            d.knockdownFrame = 0;
+            d.bounce = CombatFighter.BOUNCE_NONE;
+            d.launched = true;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, config.otgHitstunFrames);
+            push(d, a, direction * config.otgPush);
+            cues.add("OTG");
+        } else if (pounding) {
             // Socado deitado: continua no chão, no lugar; a última pancada recomeça o tempo
             // deitado (levanta depois do Super, não no meio dele).
             d.vx = 0f;
@@ -4973,6 +5037,9 @@ final class CombatEngine {
             d.slammed = false;
             d.hardFall = true;
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
+            // Quem cravou desce rápido (12/11): pousa enquanto o rival ainda quica e emenda outro
+            // combo (antes ele seguia subindo no super pulo e pousava junto com o rival, já caído).
+            if (!projectile && !a.grounded) a.vy = Math.max(a.vy, config.groundBounceAttackerDrop);
         } else if ((launch == AttackDefinition.Launch.SLAM ||
                     launch == AttackDefinition.Launch.GROUND_BOUNCE) && !d.grounded && a.superJumping) {
             // Slam (also a ground bounce already used): from a super jump, a forced dive.
@@ -4984,6 +5051,27 @@ final class CombatEngine {
         } else if (launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
             knockDown(d);
             push(d, a, direction * attack.knockback);
+        } else if (launch == AttackDefinition.Launch.ARC) {
+            // Arco (o shoryuken do Ryūga, o chute da garça da Yin-lu): o rival sobe a altura do arco
+            // e cai a distância dele, pela gravidade de quem apanha no ar, e termina derrubado.
+            float g = config.gravity * d.character().fighter.weightScale();
+            float altura = Math.max(10f, attack.mechanics.arcHeight);
+            float sobe = (float) Math.sqrt(2f * g * altura);
+            float queda = altura + Math.max(0f, Arena.GROUND_Y - d.y);
+            float tempo = sobe / g + (float) Math.sqrt(2f * queda / g);
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+            d.vy = -sobe;
+            d.vx = direction * attack.mechanics.arcDistance / tempo;
+            d.bounce = CombatFighter.BOUNCE_NONE;
+            d.launched = false;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, Math.round(tempo * CombatConfig.FPS) + 2);
+            d.pushRemaining = 0f;
+            d.pushFramesLeft = 0;
         } else if (launch == AttackDefinition.Launch.LAUNCH) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             // Pego no ar (ex.: voltando da parede), sobe só até a altura de um lançamento do
@@ -4998,6 +5086,14 @@ final class CombatEngine {
             d.superJumping = false;
             a.launcherChase = config.launcherChaseFrames;
             push(d, a, direction * attack.knockback);
+        } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() && !a.grounded) {
+            // Golpe que voa e bate várias vezes (o chute da garça da Yin-lu): as pancadas do meio
+            // levam o rival junto, subindo com quem bate, para a próxima pegar; a última joga.
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+            d.vy = Math.min(a.vy, -config.strikeHoldLift);
+            push(d, a, direction * airPush);
         } else if (!d.grounded) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             push(d, a, direction * airPush);
@@ -5294,7 +5390,7 @@ final class CombatEngine {
             boolean over = d.ko() ||
                 d.status == CombatFighter.Status.NEUTRAL ||
                 d.status == CombatFighter.Status.BLOCKSTUN ||
-                d.status == CombatFighter.Status.KNOCKDOWN ||
+                d.status == CombatFighter.Status.KNOCKDOWN && !otgOpen(d, session) ||
                 d.status == CombatFighter.Status.WAKEUP;
             if (over) endSession(i);
         }

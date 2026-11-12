@@ -576,6 +576,11 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 
 - Depois de um bounce o defensor tem `bounceHitstunFrames` (48) de hitstun, pode ser
   juggleado e **cai derrubado** (não se recupera no ar: `hardFall`).
+- **Quem crava desce rápido (12/11):** quem acerta o ground bounce no ar desce a
+  `groundBounceAttackerDrop` (1200 px/s) em vez de seguir subindo no super pulo. Pousa com o rival
+  ainda quicando e emenda outro combo: o 2H relança (outro combo no ar, que termina no slam,
+  porque o quique é um por combo) ou corre e recomeça no chão (L, M). Antes ele pousava junto com
+  o rival, já caído. Vale para todos; o p09, lento, não alcança.
 - Qualquer golpe novo cancela o voo em andamento.
 - O motor avisa `WALL_BOUNCE` e `GROUND_BOUNCE` em `cues()` e a tela treme.
 - Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH
@@ -595,6 +600,17 @@ Avisos do motor (v0.83): os avisos que não são dano (`TECH`, `PUSHBLOCK`, `GUA
 e vão para `cues()`.
 
 Testes em `BounceTest`.
+
+### OTG: o chute no caído (12/11)
+
+Como no Marvel vs. Capcom: dentro de um combo (2 acertos ou mais), o **↓ + M** (`otgMove`, a
+rasteira de cada um) pega o rival que acabou de cair, nos primeiros `otgWindowFrames` (34) quadros
+deitado, e o levanta (`otgLift` 620 px/s, `otgHitstunFrames` 34, `hardFall`) para continuar.
+**Um por combo** (`ComboSession.otgs`). Enquanto ele ainda pode vir, o combo não acaba no chão
+(`updateSessions`) e o caído não escolhe rolar nem levantar rápido; o OTG continua o mesmo combo
+(mesma escala de dano). Uma rasteira solta não abre OTG. Rotas: 2L, M, rasteira → ↓ + M → L, M, M,
+S2; depois do S2 em arco do Ryūga, corre → ↓ + M → S2. Quem tem rasteira curta (Yin-lu, p05) precisa
+de um passo à frente. Cue `OTG`. Testes em `OtgTest`.
 
 ## Air dash — v0.82
 

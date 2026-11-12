@@ -64,19 +64,24 @@ public class DefesaEGolpeAltoTest {
 
     // ------------------------------------------------------------ golpe alto
 
-    @Test public void everyFighterGetsTheOverheadFromItsMedium() {
-        for (String id : new String[] {"player_base", "monster_npc", "p02", "p06", "p10", "p12"}) {
+    @Test public void soQuemTemOProprioGolpeAltoOTem() {
+        // 12/11: o golpe alto montado do M (a pose do M congelada) saiu. Quem tem o seu (vídeo
+        // próprio) continua com ele; nos outros, → + M é o M.
+        for (String id : new String[] {"player_base", "p13", "p14", "p15", "p16"}) {
             CharacterDefinition c = GeneratedCharacters.get(id);
             AttackDefinition overhead = c.attack(GolpeAlto.BINDING);
-            assertNotNull(id + " tem o 6M", overhead);
+            assertNotNull(id + " tem o 6M próprio", overhead);
+            assertNotSame(id + ": com desenho próprio", c.moves.get("M").animation, c.moves.get(GolpeAlto.BINDING).animation);
             assertTrue(overhead.overhead);
             assertFalse(overhead.low);
-            assertEquals(GolpeAlto.STARTUP, overhead.startupFrames);
             assertEquals("só uma vez por combo", 1, overhead.maxUsesPerCombo);
             for (String t : overhead.cancelInto()) {
                 assertTrue(id + ": o 6M só cancela em especial/Super, não em " + t,
                     t.equals("SUPER") || t.startsWith("S"));
             }
+        }
+        for (String id : new String[] {"monster_npc", "p02", "p06", "p10", "p12"}) {
+            assertNull(id + " sem golpe alto próprio: → + M é o M", GeneratedCharacters.get(id).attack(GolpeAlto.BINDING));
         }
     }
 

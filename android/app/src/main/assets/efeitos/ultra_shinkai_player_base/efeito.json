@@ -393,5 +393,10 @@
  ],
  "cena": true,
  "larguraCena": 1277,
- "_doc": "O dragão do Ultra SHINKAI do Ryūga: o vídeo dragao_ultra (pasta p01 do Drive, 11/2026) inteiro, de 3 em 3 quadros, com o roxo e o rosa trocados por azul e as bordas do quadro esfumadas. Ele entra de um lado da tela, atravessa e sai do outro: o jogo toca a cena uma vez no meio da tela (cena: true), na altura do peito do Ryūga, no tamanho que cobre a tela (larguraCena: a largura do vídeo no mundo)."
+ "_doc": "O dragão do Ultra SHINKAI do Ryūga: o vídeo dragao_ultra (pasta p01 do Drive, 11/2026) inteiro, de 3 em 3 quadros, com o roxo e o rosa trocados por azul e as bordas do quadro esfumadas. Ele entra de um lado da tela, atravessa e sai do outro: o jogo toca a cena uma vez no meio da tela (cena: true), na altura do peito do Ryūga, no tamanho que cobre a tela (larguraCena: a largura do vídeo no mundo).",
+ "luz": {
+  "cor": "#4D75A3",
+  "alcance": 1.5,
+  "forca": 0.7
+ }
 }

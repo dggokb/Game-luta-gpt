@@ -61,6 +61,11 @@
     "ferramenta": "tools/sprites/smear.py",
     "trocar": "4=5",
     "limpar": "todos",
-    "antes": "4=3,5=3"
+    "antes": "4=3,5=3",
+    "clarear": 0.6,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }

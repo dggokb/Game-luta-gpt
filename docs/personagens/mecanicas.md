@@ -175,7 +175,9 @@ fazer: **armadura** (aguenta N golpes sem atordoar), **contra-golpe** (lê golpe
 qualquer um na preparação e responde na hora), **esquiva** (passa por baixo de golpe alto e de
 projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival; com velocidade negativa recua, como a estrela da p16),
 **teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata), **armadilha** (o projétil cai e espera um pavio por botão, L/M/H; depois um golpe sai dele, como a luva da caixa da p16),
-**custo de vida**, **fúria** (dano cresce com a vida perdida), **voo** (o golpe tira o corpo do chão e
+**custo de vida**, **fúria** (dano cresce com a vida perdida), **arco** (o último golpe joga o rival em
+arco para longe e ele cai derrubado: o S2 do Ryūga e o da Yin-lu, 12/11; `arco` no `pancadas.json`;
+no golpe que voa, as pancadas do meio levam o rival junto para cima), **voo** (o golpe tira o corpo do chão e
 ele cai pela gravidade do pulo: o S2 e o S3 do Ryūga, 11/11; `voo` no `pancadas.json`), **air dashes extras** e
 **agarrão próprio** (dano e alcance). Testes: `MechanicsTest`.
 
@@ -226,8 +228,9 @@ resultado. Cada personagem escolhe o estilo em `estiloCombo`; o lutador de teste
 
 | Golpe | Cancela em | Usos na corrente |
 |---|---|---|
-| L, 2L | L, 2L, M, 2M, H, 2H | L 3, 2L 2 |
-| M | 2M, H, 2H | 1 |
+| L, 2L | L, 2L, M, 2M, H, 2H, → + H (6H, quem tiver) | L 3, 2L 2 |
+| M | 2M, H, 2H, → + H (6H, quem tiver) | 1 |
+| → + H (6H) | só especial e Super, depois da última pancada | 1 |
 | 2M | H (é rasteira: derruba) | 1 |
 | H | só especial e Super (joga na parede) | 1 |
 | 2H | pulo (lançador → super pulo) | 1 |
@@ -238,7 +241,8 @@ Rota de exemplo: L > M > 2H > super pulo > jL > jM > pulo no ar > jL > jM > j2H 
 
 | Estilo | Quem | Soma à base |
 |---|---|---|
-| equilibrado | p01 | nada |
+| equilibrado | p15, p16 | nada |
+| shoto | p01 (12/11) | M > M (o soco duplo da casa) |
 | pressao | p03, p04, p10 | M > M; M cancela em pulo (no acerto e na defesa) |
 | chutes | p02 | M > M (três chutes: M > M > H); jM > jM |
 | aereo | p05 | jL > jL; jL cancela em pulo no ar; M cancela em pulo (sobe sem lançador) |
@@ -249,8 +253,43 @@ Rota de exemplo: L > M > 2H > super pulo > jL > jM > pulo no ar > jL > jM > j2H 
 O estilo também guia a CPU (`CpuStyle`): distância, agressão, projétil, agarrão e paciência,
 e o caderno de combos dela sai destas mesmas rotas (`docs/combat-engine.md`, seção CPU).
 
+**Golpe de comando e assist (12/11, `combos-assinatura.md`):** o `golpeComando` do personagem
+no `mecanicas.json` é o → + H dele inteiro (o 6H, no formato do `character.json`; o avanço vai em
+`unica.golpes.6H`); quem não tem, → + H é o H. No pacote, `fighter.assist.segura` faz a Onda do
+assist segurar o rival em pé esse tanto de quadros (o Ryūga: 45), para o parceiro recomeçar.
+
 Trocar o estilo de alguém: mudar `estiloCombo`, rodar `mecanicas.py --write` e
 `build_characters.py --write`. Testes: `CorrentesComboTest` e `test_mecanicas.py`.
+
+## 4c. O corpo de cada lutador (11/11)
+
+Pedido do jogador: "tirando os golpes, não noto como se fosse um personagem diferente". Fora os
+golpes, todos tinham o mesmo pulo, o mesmo peso e quase a mesma corrida. Agora cada um pode ter o
+próprio corpo, no bloco `unica.lutador.corpo` do `mecanicas.json` (`Fighter.withBody`):
+
+| Chave | O que faz |
+|---|---|
+| `pulo.altura`, `pulo.tempo`, `pulo.frente` | o pulo dele em vezes o do motor: altura, tempo no ar e distância. Altura e tempo mudam o impulso e a gravidade juntos (impulso × altura/tempo, gravidade × altura/tempo²), então a física fecha exata |
+| `peso` | gravidade de quem apanha no ar: abaixo de 1 é leve (sobe e demora a cair), acima é pesado |
+| `pulosNoAr` | 1 = pulo duplo (↑ de novo no ar, livre, uma vez por voo; divide a vez com o cancelamento do jM) |
+
+A corrida e o backdash já eram por personagem (`corrida`). O super pulo continua o mesmo para todos.
+Teste: `CorpoDoLutadorTest`.
+
+| # | Corpo | Pulo | Peso | Corrida | Ar | No jogo |
+|---|---|---|---|---|---|---|
+| p01 Ryūga | referência | padrão | médio | padrão | — | ✅ (é o padrão) |
+| p02 Yin-lu | leve e aérea | 1,15 alto, 1,2 tempo, 1,1 longe | 0,85 | 1,15 | pulo duplo | ✅ 11/11 |
+| p03 Kōga | explosivo | baixo e rápido | médio | longa e rápida | — | proposta |
+| p04 Brucy | boxeador | baixo e curto | médio-pesado | passos curtos | — | proposta |
+| p05 ninja | rápido e baixo | rápido e longo | leve | baixa e rápida | parede (já tem) | proposta |
+| p06 sombra | lento e estranho | lento, cai devagar | médio | desliza devagar | — | proposta |
+| p07 cavalheiro | pesado | curto e pesado | pesado | não corre: anda | — | proposta |
+| p08 chicote | dama longe | alto e lento | leve | lenta | — | proposta |
+| p09 bombeiro | tanque | baixo, cai rápido | muito pesado | lenta | — | proposta |
+| p10 acrobata | quica | alto e rápido | leve | a mais rápida | dois air dashes (já tem) | proposta |
+| p11 cirurgião | frio | padrão | médio | curta | — | proposta |
+| p12 Necro | bicho | baixo, em bote | médio, cai rápido | de quatro, rápida | — | proposta |
 
 ## 5. Perguntas em aberto
 

@@ -29,56 +29,38 @@ final class TesteDesempenho {
     static boolean openGl = true;
 
     /**
-     * O normal map dos lutadores na luz (motor de luz 4, só no OpenGL), para o dono comparar no
-     * aparelho (botão LUZ do Modo Teste): desligado (como era antes do motor 4); a luz do cenário
-     * com volume, suave; e forte. Ligado, a luz do impacto também acende o corpo pelo mapa.
-     * Lutador sem mapa fica como era. No PC, {@code -Dgameluta.luz=off|suave|forte} ({@code -Pluz=...}; sem nada, forte).
+     * O motor de luz e sombra (docs/motor-luz-proposta.md): ligado (ON) ou desligado (OFF, a arte
+     * como foi pintada). O botão LUZ do Modo Teste troca, para comparar no aparelho. No PC,
+     * {@code -Dgameluta.luz=off} ({@code -Pluz=off}) começa desligado.
      */
-    static final int LUZ_OFF = 0, LUZ_SUAVE = 1, LUZ_FORTE = 2;
-    static volatile int luz = luzInicial();
+    static final int LUZ_OFF = 0, LUZ_ON = 1;
+    static volatile int luz = "off".equals(System.getProperty("gameluta.luz")) ? LUZ_OFF : LUZ_ON;
 
     /**
-     * A luz do cenário com volume em cada nível: quanto a inclinação da normal é exagerada (o
-     * mapa guarda só as formas grandes, quase de frente: sem exagero a luz mal muda), a força da
-     * sombra do lado oposto à luz e a força da luz do lado dela.
+     * O motor de luz e sombra: a arte é o teto. O cenário diz a cor que o branco vira no lado aceso
+     * e no lado de sombra, e o shader multiplica a arte por isso; nada soma. Os números da rampa
+     * entre sombra e luz: o peso do degradê que atravessa o quadro do lutador na direção da luz, o
+     * peso da inclinação do normal map (só quem tem mapa), a largura macia da passagem (0 a 0,5)
+     * e o quanto a cor de um ponto de luz (do cenário ou de um efeito) é lavada para o branco. No
+     * PC, {@code -Dgameluta.nova=a,b,c,d}.
      */
-    private static final float[] VOLUME_SUAVE = {2.3f, 0.5f, 0.55f}, VOLUME_FORTE = {3.2f, 0.75f, 0.85f};
+    private static final float[] NOVA = {0.55f, 1.1f, 0.5f, 0.35f};
+    private static final float[] NOVA_DO_PC = numeros(System.getProperty("gameluta.nova"), 4);
 
-    /** {exagero da normal, sombra, luz} do nível de agora, ou null com a luz desligada. */
-    static float[] volume() {
-        int l = luz;
-        if (l == LUZ_OFF) return null;
-        if (VOLUME_DO_PC != null) return VOLUME_DO_PC;
-        return l == LUZ_SUAVE ? VOLUME_SUAVE : VOLUME_FORTE;
+    static float[] nova() {
+        return NOVA_DO_PC != null ? NOVA_DO_PC : NOVA;
     }
 
-    /** Só para afinar no PC: {@code -Dgameluta.volume=exagero,sombra,luz} ({@code -Pvolume=...}). */
-    private static final float[] VOLUME_DO_PC = volumeDoPc();
-
-    private static float[] volumeDoPc() {
-        String v = System.getProperty("gameluta.volume");
+    private static float[] numeros(String v, int n) {
         if (v == null) return null;
         String[] p = v.split(",");
-        return new float[] {Float.parseFloat(p[0]), Float.parseFloat(p[1]), Float.parseFloat(p[2])};
-    }
-
-    private static int luzInicial() {
-        // Começa em FORTE: é onde a diferença se vê de primeira (o dono não viu nenhuma com a luz
-        // só no impacto); o botão desce para SUAVE e OFF.
-        String v = System.getProperty("gameluta.luz", "forte");
-        switch (v) {
-            case "off": return LUZ_OFF;
-            case "suave": return LUZ_SUAVE;
-            default: return LUZ_FORTE;
-        }
+        float[] f = new float[n];
+        for (int i = 0; i < n; i++) f[i] = Float.parseFloat(p[i]);
+        return f;
     }
 
     static String luzRotulo() {
-        switch (luz) {
-            case LUZ_OFF: return "LUZ OFF";
-            case LUZ_FORTE: return "LUZ FORTE";
-            default: return "LUZ SUAVE";
-        }
+        return luz == LUZ_OFF ? "LUZ OFF" : "LUZ ON";
     }
 
     private TesteDesempenho() {}

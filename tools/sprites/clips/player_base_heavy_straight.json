@@ -123,6 +123,10 @@
       1.2,
       1.0
     ],
-    "ferramenta": "tools/sprites/smear.py"
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
   }
 }

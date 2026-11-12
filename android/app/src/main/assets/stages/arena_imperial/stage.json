@@ -9,18 +9,11 @@
   },
   "corFundo": "#2A1430",
   "luzLutadores": {
-    "cor": "#FFA070",
-    "forca": 0.22,
-    "brilho": 0.98,
-    "pes": "#E8D0C0",
-    "contraluz": {
-      "cor": "#FF9A40",
-      "forca": 0.9,
-      "direcao": [
-        -1,
-        -1
-      ]
-    }
+    "luz": "#FFDCC0",
+    "sombra": "#BCA0B0",
+    "chao": "#B09098",
+    "direcao": [-1, -1],
+    "borda": 0.45
   },
   "sombraLutadores": {
     "alfa": 0.45,
@@ -913,7 +906,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.0357,
@@ -929,7 +924,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.1265,
@@ -969,7 +966,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.169,
@@ -993,7 +992,9 @@
           "raio": 0.008,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.2203,
@@ -1009,7 +1010,9 @@
           "raio": 0.0095,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.2629,
@@ -1033,7 +1036,9 @@
           "raio": 0.0076,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.304,
@@ -1065,7 +1070,9 @@
           "raio": 0.0067,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.3715,
@@ -1073,7 +1080,9 @@
           "raio": 0.0076,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.3989,
@@ -1081,7 +1090,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.4636,
@@ -1145,7 +1156,9 @@
           "raio": 0.0086,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.6092,
@@ -1161,7 +1174,9 @@
           "raio": 0.0083,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.6541,
@@ -1169,7 +1184,9 @@
           "raio": 0.0067,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.6713,
@@ -1209,7 +1226,9 @@
           "raio": 0.0099,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.7671,
@@ -1241,7 +1260,9 @@
           "raio": 0.0083,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.8525,
@@ -1273,7 +1294,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         },
         {
           "x": 0.9411,
@@ -1305,7 +1328,9 @@
           "raio": 0.0102,
           "cor": "#FFC060",
           "pulsar": 0.05,
-          "reflexo": true
+          "reflexo": true,
+          "lutadores": 0.5,
+          "alcance": 0.4
         }
       ]
     },
