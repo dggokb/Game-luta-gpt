@@ -77,6 +77,10 @@ Os dois últimos são novos: quem crava o ↓jH agora desce rápido e pousa com 
 2H com o combo no ar ou Super; recomeçar no chão ali não ficou bom: mexer na volta da parede ganhava
 esse recomeço e perdia o S3 → combo novo e parte do combo no ar, então a parede ficou como estava.
 
+**OTG (12/11, todos):** dentro de um combo, ↓ + M no rival que acabou de cair o levanta para
+continuar (um por combo; `docs/combat-engine.md`). No Ryūga: 2L, M, rasteira → ↓ + M → L, M, M, S2
+(7 acertos); e depois do S2 em arco, corre → ↓ + M → S2 (6). Assim nem o S2 fecha o combo de vez.
+
 Mudou da proposta: o R2 da proposta (S3 → corre → 2H → combo no ar) não emenda: depois da parede do
 S3 o rival volta alto e longe demais para o 2H; o que pega é o S2. O 2H com o combo no ar ficou no R4,
 depois da parede do H. O S2 que joga em arco (pedido de 12/11) também deixa o Super fora do R3; no

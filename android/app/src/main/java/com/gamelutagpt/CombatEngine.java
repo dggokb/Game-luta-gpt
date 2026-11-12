@@ -1700,8 +1700,10 @@ final class CombatEngine {
             case KNOCKDOWN: {
                 // Defeated: stays down (the KO is the defeat pose).
                 if (f.ko() || pinnedDown(f)) break;
+                // Enquanto o OTG do combo ainda pode vir, ele não escolhe rolar nem levantar rápido.
+                boolean otgPendente = sessions[f.index] != null && otgOpen(f, sessions[f.index]);
                 if (f.knockdownFrame >= config.knockdownFallFrames && f.wakeup == CombatFighter.WAKE_NORMAL &&
-                    !f.hardKnockdown) {
+                    !f.hardKnockdown && !otgPendente) {
                     chooseWakeup(f);
                 }
                 int down = config.knockdownDownFrames;
@@ -1770,6 +1772,7 @@ final class CombatEngine {
         // Golpe que sai de outro golpe continua a corrente; saindo do neutro, começa outra.
         if (!f.attacking()) f.chain.clear();
         f.chain.add(attack.id);
+        f.golpesIniciados++;
         f.status = CombatFighter.Status.ATTACK;
         f.airRecovering = false;
         f.clearAttack();
@@ -3430,6 +3433,19 @@ final class CombatEngine {
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
         if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d, frame) : reboundMissed(a, frame))) return;
+        if (otgTarget(a, d, a.attack, false)) {
+            // OTG: o ↓ + M pega o rival deitado (12/11). O corpo deitado é baixo: conta como agachado.
+            if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits) return;
+            for (int i = 0; i < a.attack.hitboxCount(); i++) {
+                AttackDefinition.Box box = a.attack.hitbox(i);
+                if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
+                if (golpeToca(a, box, frame, d, d.body(), true)) {
+                    addContact(a, d, a.attack, i, null);
+                    return;
+                }
+            }
+            return;
+        }
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         // O repel e o aparar só batem no que leram: sem golpe na janela, a resposta não sai.
         if ((a.attack.mechanics.repel || a.attack.mechanics.parry) && !a.countered) return;
@@ -4038,6 +4054,22 @@ final class CombatEngine {
     }
 
     /** O rival deitado que as pancadas no chão (o Super do p13) ainda acertam. */
+    /**
+     * OTG (12/11): o ↓ + M ({@link CombatConfig#otgMove}) de quem está no chão pega o rival que caiu
+     * dentro do combo, nos primeiros quadros deitado, uma vez por combo, e o levanta para continuar.
+     */
+    private boolean otgTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
+        if (projectile || d.status != CombatFighter.Status.KNOCKDOWN || d.ko() || !a.grounded ||
+            !config.otgMove.equals(attack.id)) return false;
+        ComboSession s = sessions[d.index];
+        return s != null && s.active && s.attacker == a.index && otgOpen(d, s);
+    }
+
+    /** O rival caído ainda pode levar o OTG deste combo (o combo não acaba enquanto isso). */
+    private boolean otgOpen(CombatFighter d, ComboSession s) {
+        return s.otgs == 0 && s.hitCount >= 2 && !d.hardKnockdown && d.knockdownFrame <= config.otgWindowFrames;
+    }
+
     private static boolean poundTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
         return !projectile && attack.mechanics.pound && a.strikeLanded && a.attacking() && a.attack == attack &&
             d.status == CombatFighter.Status.KNOCKDOWN;
@@ -4715,7 +4747,8 @@ final class CombatEngine {
             a.hitsOnTarget++;
         }
         boolean pounding = poundTarget(a, d, attack, projectile);
-        if (!d.hittable() && !pounding) return;
+        boolean otg = otgTarget(a, d, attack, projectile);
+        if (!d.hittable() && !pounding && !otg) return;
         // Crossup: o rival é empurrado para o lado de onde ele está (atrás de quem bateu).
         int direction = projectile ? c.projectile.direction : c.cruzou ? -a.facing : a.facing;
         // The owner's S/SUPER learns about its projectile while it still runs.
@@ -4780,7 +4813,7 @@ final class CombatEngine {
         }
 
         // O agarrão de especial não se defende (como o agarrão), nem quem está deitado.
-        int guard = !projectile && attack.mechanics.grab || pounding ? CombatFighter.GUARD_NONE
+        int guard = !projectile && attack.mechanics.grab || pounding || otg ? CombatFighter.GUARD_NONE
             : projectile ? effectiveGuard(d) : guardContra(d, a);
         if (energyChain(c, d)) {
             // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
@@ -4829,7 +4862,7 @@ final class CombatEngine {
             events.add(new HitEvent(a.index, d.index, raw, false, projectile, attack.id));
             return;
         }
-        if (shinkaiArmor(d, attack, projectile, pounding)) {
+        if (shinkaiArmor(d, attack, projectile, pounding || otg)) {
             // SHINKAI POWER, corpo de aço: aguenta o golpe sem perder a ação, com menos dano.
             int soft = raw * (porReserva(d.state) ? config.shinkaiPowerArmorReservaPermille : config.shinkaiPowerArmorPermille) / 1000;
             d.state.takeDamage(soft, config.recoverableLifePermille);
@@ -4871,7 +4904,8 @@ final class CombatEngine {
             a.state.precisos++;
             cues.add("PRECISO");
         }
-        session = sessionFor(a, d);
+        // O OTG continua o combo do rival caído (deitado não conta como atordoado).
+        session = otg ? sessions[d.index] : sessionFor(a, d);
         // The move's first strike that hits pays meter and sets the combo scale; the later
         // strikes keep that scale (a new combo starts over as a first strike).
         boolean firstStrike = multiProjectile ? c.strike == 0 || newSession : !multi || !a.strikeLanded || newSession;
@@ -4932,7 +4966,24 @@ final class CombatEngine {
             session.groundBounces < config.maxGroundBounces;
 
         boolean spinHit = attack.spin && lastStrike && !projectile;
-        if (pounding) {
+        if (otg) {
+            // OTG: o rival deitado sobe um pouco, aberto para continuar; caindo de novo, acaba.
+            session.otgs++;
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Arena.GROUND_Y - 2f;
+            d.vy = -config.otgLift;
+            d.vx = 0f;
+            d.knockdownFrame = 0;
+            d.bounce = CombatFighter.BOUNCE_NONE;
+            d.launched = true;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, config.otgHitstunFrames);
+            push(d, a, direction * config.otgPush);
+            cues.add("OTG");
+        } else if (pounding) {
             // Socado deitado: continua no chão, no lugar; a última pancada recomeça o tempo
             // deitado (levanta depois do Super, não no meio dele).
             d.vx = 0f;
@@ -5339,7 +5390,7 @@ final class CombatEngine {
             boolean over = d.ko() ||
                 d.status == CombatFighter.Status.NEUTRAL ||
                 d.status == CombatFighter.Status.BLOCKSTUN ||
-                d.status == CombatFighter.Status.KNOCKDOWN ||
+                d.status == CombatFighter.Status.KNOCKDOWN && !otgOpen(d, session) ||
                 d.status == CombatFighter.Status.WAKEUP;
             if (over) endSession(i);
         }

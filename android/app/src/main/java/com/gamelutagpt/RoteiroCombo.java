@@ -14,7 +14,7 @@ final class RoteiroCombo {
     private final String[] passos;
     private int k = 0, t = 0;
     private AttackDefinition antes;
-    private int antesQuadro, antesCorrente;
+    private int antesQuadro, antesCorrente, antesIniciados;
     private boolean noChao, assistFora;
     private int titular;
 
@@ -37,6 +37,7 @@ final class RoteiroCombo {
             antes = me.attack;
             antesQuadro = me.attackFrame;
             antesCorrente = me.chain.size();
+            antesIniciados = me.golpesIniciados;
             noChao = me.grounded;
             assistFora = e.team(0).assistOut();
             titular = e.team(0).point;
@@ -82,7 +83,8 @@ final class RoteiroCombo {
     private boolean feito(String passo, CombatEngine e, CombatFighter me, CombatFighter rival) {
         if (passo.startsWith("W")) return t >= Integer.parseInt(passo.substring(1));
         boolean novo = me.attacking() && me.attack != null &&
-            (me.attack != antes || me.attackFrame < antesQuadro || me.chain.size() > antesCorrente);
+            (me.attack != antes || me.attackFrame < antesQuadro || me.chain.size() > antesCorrente ||
+             me.golpesIniciados > antesIniciados);
         switch (passo) {
             case "J": case "SJ": return noChao && !me.grounded;
             case "D": return me.forwardDashing;

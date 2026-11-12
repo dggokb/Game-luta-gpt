@@ -174,7 +174,7 @@ public final class BateriaCombos {
             AttackDefinition antes = me.attack;
             int antesQuadro = me.attackFrame;
             // O mesmo golpe de novo na corrente (o M > M do Ryūga) é o mesmo objeto: conta pela corrente.
-            int antesCorrente = me.chain.size();
+            int antesCorrente = me.chain.size(), antesIniciados = me.golpesIniciados;
             boolean feito = false;
             for (int t = 0; t < (acao.matches("C[0-9]*") ? 90 : Math.max(45, espera + 1)) && !feito; t++) {
                 in0.clear();
@@ -230,7 +230,7 @@ public final class BateriaCombos {
                     continue;
                 }
                 boolean novo = me.attacking() && me.attack != null && (me.attack != antes || me.attackFrame < antesQuadro ||
-                    me.chain.size() > antesCorrente);
+                    me.chain.size() > antesCorrente || me.golpesIniciados > antesIniciados);
                 switch (acao) {
                     case "J": case "SJ": feito = noChao && !me.grounded; break;
                     case "D": feito = me.forwardDashing; break;
@@ -253,6 +253,7 @@ public final class BateriaCombos {
                     antes = me.attack;
                     antesQuadro = me.attackFrame;
                     antesCorrente = me.chain.size();
+                    antesIniciados = me.golpesIniciados;
                 }
             }
             if (!feito) {
