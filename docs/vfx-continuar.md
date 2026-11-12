@@ -148,10 +148,10 @@ ao acerto, que passa rápido, e o do acerto, que o jogo segura na pausa. As lín
 ficam a 50% (`smear.py --opacidade`, padrão "1,0.5" com 2 desenhos; o corpo continua opaco).
 Refeito em todos os golpes com smear (p01, p13 a p16), com a configuração guardada em cada clip.
 Golpes com 1 desenho (p15 S4, p16 jH) e o S3 do p01 (um desenho por chute) ficam a 100%.
-Exceção: o H do p01 continua a 100% nos dois desenhos. Ele passou pela melhoria de nitidez por IA
-(`sr_hd.py`, outra sessão, 11/11) em cima do smear antigo; refazer pede rodar o `sr_hd.py` de novo, e
-o modelo foi bloqueado pela permissão desta sessão. O `smear.py` agora para com um aviso quando o
-clipe está na versão com nitidez, em vez de deixar a fonte `_sr_hd.png` solta (que quebra o build).
+O H do p01 (que estava na versão com nitidez por IA) foi refeito com o pedido do dono: o clipe volta
+para a fonte `_smear.png`, `smear.py --opacidade 1,0.5`, e o `sr_hd.py` de novo em cima (pesos
+`realesr-animevideov3.pth` conferidos pelo SHA-256; `pip install torch scipy`, CPU, 31 s). O
+`smear.py` para com aviso quando o clipe está na versão com nitidez: refazer pede essa sequência.
 
 ## A pesquisa de como os estúdios fazem (10/11)
 
