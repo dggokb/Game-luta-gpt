@@ -290,6 +290,13 @@ def main():
         "quadros": [[px, py, q.width, q.height, dx, dy] for q, (px, py), (dx, dy) in zip(imgs, pos, desloc)],
         "duracoesMs": [round(1000.0 * PASSO / 60.0, 3)] * QUADROS,
     }
+    # A luz que o efeito emite ("luz") é posta à mão no efeito.json: refazer não a apaga.
+    antigo = os.path.join(SAIDA, "efeito.json")
+    if os.path.exists(antigo):
+        with open(antigo) as f:
+            luz = json.load(f).get("luz")
+        if luz is not None:
+            dados["luz"] = luz
     with open(os.path.join(SAIDA, "efeito.json"), "w") as f:
         json.dump(dados, f, indent=1)
     print("folha", folha.size, "quadros", len(imgs))

@@ -53,6 +53,14 @@ final class EfeitosVideo {
          * {@code "soma"} do efeito.json. Os efeitos de luz (impacto, raio, fogo) somam; fumaça não.
          */
         float soma;
+        /**
+         * A luz que o efeito emite ({@code "luz": {"cor", "alcance", "forca"}} do efeito.json): cor
+         * 0xRRGGBB, alcance em alturas de tela e força de 0 a 1. Sem {@code "luz"} o efeito não
+         * ilumina ({@link #luzForca} 0). É um ponto de luz que nasce e apaga com o efeito
+         * (GameView.luzDoLutador e a poça de luz no chão).
+         */
+        int luzCor;
+        float luzAlcance, luzForca;
 
         Folha(String nome, Bitmap bitmap, float pixelScale, int[][] quadros, float[][] desloc, float[] fim) {
             this.nome = nome;
@@ -159,7 +167,21 @@ final class EfeitosVideo {
         f.cena = dados.optBoolean("cena", false);
         f.larguraCena = (float)dados.optDouble("larguraCena", 0.0);
         f.soma = Math.max(0f, Math.min(1f, (float)dados.optDouble("soma", 0.0)));
+        JSONObject luz = dados.optJSONObject("luz");
+        if (luz != null) lerLuz(f, luz, nome);
         return f;
+    }
+
+    /** O {@code "luz"} do efeito.json: cor obrigatória, alcance acima de 0, força de 0 a 1. */
+    static void lerLuz(Folha f, JSONObject luz, String nome) {
+        String cor = luz.optString("cor", "");
+        if (!cor.matches("#[0-9A-Fa-f]{6}")) throw new IllegalArgumentException(nome + ": \"luz\" precisa de \"cor\" #RRGGBB");
+        float alcance = (float)luz.optDouble("alcance", 0.0), forca = (float)luz.optDouble("forca", 0.0);
+        if (!(alcance > 0f)) throw new IllegalArgumentException(nome + ": \"luz\" precisa de \"alcance\" acima de 0");
+        if (!(forca >= 0f && forca <= 1f)) throw new IllegalArgumentException(nome + ": \"forca\" da luz entre 0 e 1");
+        f.luzCor = Integer.parseInt(cor.substring(1), 16);
+        f.luzAlcance = alcance;
+        f.luzForca = forca;
     }
 
     private static String texto(InputStream in) throws IOException {
@@ -365,6 +387,52 @@ final class EfeitosVideo {
 
     void limpar() {
         java.util.Arrays.fill(tocando, null);
+    }
+
+    /** Números por luz em {@link #luzes}: x, y (mundo), alcance (alturas de tela), r, g, b, força agora. */
+    static final int LUZ_N = 7;
+
+    /**
+     * As luzes dos efeitos que estão tocando e emitem luz ({@code "luz"} no efeito.json), a partir
+     * de {@code out[de]}: x e y da origem no mundo, alcance, cor (0 a 1) e a força vezes a vida do
+     * efeito ({@link #vida}). Devolve até onde escreveu (no máximo {@code out.length}).
+     */
+    int luzes(float[][] out, int de) {
+        int n = de;
+        for (int j = 0; j < VAGAS && n < out.length; j++) {
+            int i = (proxima + j) % VAGAS;
+            Folha f = tocando[i];
+            if (f == null || f.luzForca <= 0f) continue;
+            float fim = fimMs[i] >= 0f ? fimMs[i] : f.duracaoMs();
+            float k = f.luzForca * vida(fim > 0f ? idadeMs[i] / fim : 1f);
+            if (k <= 0f) continue;
+            escreverLuz(out[n++], f, x[i], y[i], k);
+        }
+        return n;
+    }
+
+    /** A luz do projétil que é uma folha ({@link #desenharEm}) em (x, y): a força cheia enquanto ele existe. */
+    boolean luzEm(String nome, float px, float py, float[] out) {
+        Folha f = folhas.get(nome);
+        if (f == null || f.luzForca <= 0f) return false;
+        escreverLuz(out, f, px, py, f.luzForca);
+        return true;
+    }
+
+    private static void escreverLuz(float[] o, Folha f, float px, float py, float forca) {
+        o[0] = px; o[1] = py; o[2] = f.luzAlcance;
+        o[3] = ((f.luzCor >> 16) & 0xFF) / 255f; o[4] = ((f.luzCor >> 8) & 0xFF) / 255f; o[5] = (f.luzCor & 0xFF) / 255f;
+        o[6] = forca;
+    }
+
+    /**
+     * A vida da luz de um efeito em {@code t} (0 a 1 do tempo dele): acende em 15% do tempo e apaga
+     * no resto, mais depressa no fim (a curva da luz do impacto de antes).
+     */
+    static float vida(float t) {
+        if (t < 0f || t >= 1f) return 0f;
+        float k = t < 0.15f ? t / 0.15f : (1f - t) / 0.85f;
+        return k * k;
     }
 
     /** Quantos estão tocando (testes). */

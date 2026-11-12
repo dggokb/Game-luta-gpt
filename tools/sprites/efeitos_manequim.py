@@ -169,6 +169,13 @@ def converter(video, nome, quadros, placa, ponto='cabeca', altura=225.0, espelha
                     for (lx, ly), im, (dx, dy) in zip(lugares, recortados, desloc)],
         'duracoesMs': [ms] * len(recortados),
     }
+    # A luz que o efeito emite ("luz": cor, alcance, forca) é posta à mão no efeito.json:
+    # refazer a folha não a apaga.
+    antigo = destino / 'efeito.json'
+    if antigo.exists() and 'luz' not in dados:
+        luz = json.loads(antigo.read_text(encoding='utf-8')).get('luz')
+        if luz is not None:
+            dados['luz'] = luz
     (destino / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     EV.gif_previa(dados, recortados, Path(previa) / f'{nome}.gif')
     return destino, dados
