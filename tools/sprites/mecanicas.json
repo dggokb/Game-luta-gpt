@@ -401,10 +401,10 @@
       "estiloCpu": "onda",
       "papelNormais": "Fundamento calmo: jab honesto de 5 quadros, o soco de energia que cutuca de longe e o 2H que tira do ar de verdade.",
       "golpeComando": {
-        "animation": "HEAVY_STRAIGHT",
+        "animation": "SOCO_PLEXO",
         "nome": "Soco no plexo",
         "damage": 900,
-        "reach": 170,
+        "reach": 138,
         "startupFrames": 9,
         "activeFrames": 10,
         "recoveryFrames": 15,
@@ -428,7 +428,7 @@
         "pushbackOnHit": 26,
         "pushbackOnBlock": 44,
         "hitHeight": 200,
-        "hitFloor": 60,
+        "hitFloor": 100,
         "golpes": [
           9,
           16

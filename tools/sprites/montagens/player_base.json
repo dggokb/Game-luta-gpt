@@ -720,5 +720,26 @@
         "impacto": 9
       }
     }
+  },
+  "plexo": {
+    "_doc": "→ + H (12/11): Soco no plexo, o um-dois do vídeo Martial_Artist_-_One-Two_Punch (H3, 124 quadros). Soco baixo da mão da frente (estica no 29) e direto da mão de trás (estica no 63); as esperas de braço esticado ficam de fora. O tempo de cada desenho é posto à mão no character.json (os dois socos nos quadros 9 e 16 do golpe).",
+    "trechos": [
+      [
+        "um2",
+        0,
+        124,
+        "alinha"
+      ]
+    ],
+    "quadros": "24,26,27,28,29,31,44,60,61,63,66,79,81,83,85,90",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "SOCO_PLEXO": {
+        "frames": "0-15",
+        "impacto": 4
+      }
+    }
   }
 }

@@ -3832,6 +3832,12 @@ final class GeneratedSpriteLayouts {
     static final int MEDIUM_KICK_ROOT_Y = 459;
     static final int MEDIUM_KICK_FRAME_COUNT = 18;
 
+    static final int PLAYER_BASE_PLEXO_FRAME_WIDTH = 442;
+    static final int PLAYER_BASE_PLEXO_FRAME_HEIGHT = 474;
+    static final int PLAYER_BASE_PLEXO_ROOT_X = 172;
+    static final int PLAYER_BASE_PLEXO_ROOT_Y = 460;
+    static final int PLAYER_BASE_PLEXO_FRAME_COUNT = 16;
+
     static final int RISE_SET_FRAME_WIDTH = 335;
     static final int RISE_SET_FRAME_HEIGHT = 483;
     static final int RISE_SET_ROOT_X = 176;
