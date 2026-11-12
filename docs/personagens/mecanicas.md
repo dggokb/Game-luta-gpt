@@ -252,6 +252,36 @@ e o caderno de combos dela sai destas mesmas rotas (`docs/combat-engine.md`, se�
 Trocar o estilo de alguém: mudar `estiloCombo`, rodar `mecanicas.py --write` e
 `build_characters.py --write`. Testes: `CorrentesComboTest` e `test_mecanicas.py`.
 
+## 4c. O corpo de cada lutador (11/11)
+
+Pedido do jogador: "tirando os golpes, não noto como se fosse um personagem diferente". Fora os
+golpes, todos tinham o mesmo pulo, o mesmo peso e quase a mesma corrida. Agora cada um pode ter o
+próprio corpo, no bloco `unica.lutador.corpo` do `mecanicas.json` (`Fighter.withBody`):
+
+| Chave | O que faz |
+|---|---|
+| `pulo.altura`, `pulo.tempo`, `pulo.frente` | o pulo dele em vezes o do motor: altura, tempo no ar e distância. Altura e tempo mudam o impulso e a gravidade juntos (impulso × altura/tempo, gravidade × altura/tempo²), então a física fecha exata |
+| `peso` | gravidade de quem apanha no ar: abaixo de 1 é leve (sobe e demora a cair), acima é pesado |
+| `pulosNoAr` | 1 = pulo duplo (↑ de novo no ar, livre, uma vez por voo; divide a vez com o cancelamento do jM) |
+
+A corrida e o backdash já eram por personagem (`corrida`). O super pulo continua o mesmo para todos.
+Teste: `CorpoDoLutadorTest`.
+
+| # | Corpo | Pulo | Peso | Corrida | Ar | No jogo |
+|---|---|---|---|---|---|---|
+| p01 Ryūga | referência | padrão | médio | padrão | — | ✅ (é o padrão) |
+| p02 Yin-lu | leve e aérea | 1,15 alto, 1,2 tempo, 1,1 longe | 0,85 | 1,15 | pulo duplo | ✅ 11/11 |
+| p03 Kōga | explosivo | baixo e rápido | médio | longa e rápida | — | proposta |
+| p04 Brucy | boxeador | baixo e curto | médio-pesado | passos curtos | — | proposta |
+| p05 ninja | rápido e baixo | rápido e longo | leve | baixa e rápida | parede (já tem) | proposta |
+| p06 sombra | lento e estranho | lento, cai devagar | médio | desliza devagar | — | proposta |
+| p07 cavalheiro | pesado | curto e pesado | pesado | não corre: anda | — | proposta |
+| p08 chicote | dama longe | alto e lento | leve | lenta | — | proposta |
+| p09 bombeiro | tanque | baixo, cai rápido | muito pesado | lenta | — | proposta |
+| p10 acrobata | quica | alto e rápido | leve | a mais rápida | dois air dashes (já tem) | proposta |
+| p11 cirurgião | frio | padrão | médio | curta | — | proposta |
+| p12 Necro | bicho | baixo, em bote | médio, cai rápido | de quatro, rápida | — | proposta |
+
 ## 5. Perguntas em aberto
 
 1. **Os moldes fazem sentido?** Algum personagem está no molde errado? (ex.: p02 é mais

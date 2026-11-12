@@ -168,7 +168,21 @@
     "comboStyle": "chutes",
     "cpuStyle": "contra",
     "walkSpeed": 310,
-    "walkBackSpeed": 250
+    "walkBackSpeed": 250,
+    "mecanica": {
+      "corpo": {
+        "pulo": {
+          "altura": 1.15,
+          "tempo": 1.2,
+          "frente": 1.1
+        },
+        "peso": 0.85,
+        "pulosNoAr": 1
+      },
+      "corrida": {
+        "dash": 1.15
+      }
+    }
   },
   "animations": {
     "IDLE": {

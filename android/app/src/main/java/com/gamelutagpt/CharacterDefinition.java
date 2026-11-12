@@ -684,6 +684,24 @@ final class CharacterDefinition {
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }
+        /**
+         * O corpo do lutador (11/11): o pulo dele em altura, tempo no ar e distância para a frente
+         * (em milésimos do pulo do motor), o peso quando apanha no ar (milésimos da gravidade: abaixo
+         * de 1000 é leve, sobe e demora a cair) e quantos pulos ele dá no ar (o pulo duplo da Yin-lu).
+         * Altura e tempo mudam o impulso e a gravidade juntos, então a física do pulo fecha exata.
+         */
+        int jumpHeightPermille=1000, jumpTimePermille=1000, jumpForwardPermille=1000, weightPermille=1000, airJumps;
+        Fighter withBody(int height,int time,int forward,int weight,int jumps) {
+            jumpHeightPermille=height; jumpTimePermille=time; jumpForwardPermille=forward;
+            weightPermille=weight; airJumps=jumps; return this;
+        }
+        /** Impulso do pulo: altura / tempo. */
+        float jumpSpeedScale() { return (jumpHeightPermille/1000f)/(jumpTimePermille/1000f); }
+        /** Gravidade do pulo: altura / tempo². */
+        float jumpGravityScale() { float t=jumpTimePermille/1000f; return (jumpHeightPermille/1000f)/(t*t); }
+        /** Velocidade de lado do pulo: distância / tempo. */
+        float jumpForwardScale() { return (jumpForwardPermille/1000f)/(jumpTimePermille/1000f); }
+        float weightScale() { return weightPermille/1000f; }
         /** Henchmen the Super calls in instead of its wave (0 = the wave). */
         int henchmen;
         Fighter withHenchmen(int count) { henchmen=count; return this; }

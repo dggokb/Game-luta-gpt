@@ -715,6 +715,11 @@ final class CombatEngine {
         if (f.pendingJumpAge >= 0 && !f.grounded && canWallJump(f)) wallJump(f);
         else if (f.pendingJumpAge >= 0 && !f.grounded && f.attacking() &&
             CancelSystem.canCancel(f, AttackDefinition.JUMP, null)) airJump(f);
+        else if (f.pendingJumpAge >= 0 && !f.grounded && f.status == CombatFighter.Status.NEUTRAL &&
+            f.character().fighter.airJumps > 0 && !f.airJumpUsed && f.airDashFrames == 0) {
+            // Pulo duplo (o corpo da Yin-lu): ↑ de novo no ar, livre, uma vez por voo.
+            airJump(f);
+        }
         if (f.jumpGrace > 0) f.jumpGrace--;
         else if (f.pendingJumpAge >= 0 && f.grounded) {
             boolean superJump = f.pendingSuperJump || f.launcherChase > 0;
@@ -2083,7 +2088,8 @@ final class CombatEngine {
         f.grounded = false;
         f.crouching = false;
         f.superJumping = superJump;
-        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed);
+        // O pulo do corpo do lutador (altura e tempo próprios); o super pulo é o mesmo para todos.
+        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed * f.character().fighter.jumpSpeedScale());
         f.y -= 2f;
         f.backdashFrames = 0;
         if (superJump) f.launcherChase = 0;
@@ -2099,7 +2105,7 @@ final class CombatEngine {
         f.clearAttack();
         f.airJumpUsed = true;
         f.airRecovering = false;
-        f.vy = -config.airJumpSpeed;
+        f.vy = -config.airJumpSpeed * f.character().fighter.jumpSpeedScale();
         if (f.jumpMode != CombatFighter.PULO_SUPER) {
             // O pulo no ar escolhe a direção de novo (comprometido).
             f.jumpMode = CombatFighter.PULO_COMPROMETIDO;
@@ -2536,7 +2542,8 @@ final class CombatEngine {
     /** Velocidade de lado do pulo normal: mais que a de andar (o pulo vai longe com o mesmo tempo no ar). */
     private float jumpSpeedX(CombatFighter f, int horizontal) {
         if (horizontal == 0) return 0f;
-        return horizontal == f.facing ? config.jumpForwardSpeed : config.jumpBackSpeed;
+        return (horizontal == f.facing ? config.jumpForwardSpeed : config.jumpBackSpeed) *
+            f.character().fighter.jumpForwardScale();
     }
 
     /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
@@ -2601,7 +2608,11 @@ final class CombatEngine {
             (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
             scale = f.vy < 0f ? config.normalJumpRisingGravityScale
                               : config.normalJumpFallingGravityScale;
+            // O pulo do corpo do lutador: a gravidade acompanha a altura e o tempo dele.
+            scale *= f.character().fighter.jumpGravityScale();
         }
+        // O peso: quem apanha no ar cai conforme o corpo (leve demora a cair, pesado despenca).
+        if (f.status == CombatFighter.Status.AIR_HITSTUN) scale *= f.character().fighter.weightScale();
         if (dragonRush(f)) {
             // Preparo e voo: parado no ar (o voo já andou em moveHorizontally). Encostou ou acabou
             // o voo: cai devagar na recuperação (dá tempo de emendar no ar).

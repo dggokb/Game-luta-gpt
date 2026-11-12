@@ -340,7 +340,7 @@ def validate_ultra(name, u, animations):
         raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
 def validate_fighter_mechanics(name, mech):
-    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca','corrida'}
+    known = {'furia','airDashes','agarrao','wallJump','capangas','couraca','corrida','corpo'}
     if not isinstance(mech, dict) or set(mech) - known:
         raise ValueError(f'{name}.mecanica: expected some of {sorted(known)}')
     if 'couraca' in mech:   # o p13: golpe fraco só atrasa; forte ou o segundo logo depois acerta
@@ -358,6 +358,20 @@ def validate_fighter_mechanics(name, mech):
             raise ValueError(name+'.mecanica.corrida.dash: fraction of the engine run, 0..2')
         if 'backdashQuadros' in c: positive_int(c['backdashQuadros'], name+'.mecanica.corrida.backdashQuadros')
         if 'backdashVelocidade' in c: positive(c['backdashVelocidade'], name+'.mecanica.corrida.backdashVelocidade')
+    if 'corpo' in mech:   # o corpo do lutador (11/11): pulo, peso e pulos no ar
+        c = mech['corpo']
+        if not (isinstance(c, dict) and c and set(c) <= {'pulo', 'peso', 'pulosNoAr'}):
+            raise ValueError(name+'.mecanica.corpo: {pulo, peso, pulosNoAr}')
+        def fator(v, onde):
+            if not (type(v) in (int, float) and 0.5 <= v <= 2):
+                raise ValueError(name+'.mecanica.corpo.'+onde+': fraction of the engine value, 0.5..2')
+        p = c.get('pulo', {})
+        if not (isinstance(p, dict) and set(p) <= {'altura', 'tempo', 'frente'}):
+            raise ValueError(name+'.mecanica.corpo.pulo: {altura, tempo, frente}')
+        for k, v in p.items(): fator(v, 'pulo.'+k)
+        if 'peso' in c: fator(c['peso'], 'peso')
+        if 'pulosNoAr' in c and not (type(c['pulosNoAr']) is int and 0 <= c['pulosNoAr'] <= 1):
+            raise ValueError(name+'.mecanica.corpo.pulosNoAr: 0 or 1')
     if 'furia' in mech: positive_int(mech['furia'], name+'.mecanica.furia')
     if 'wallJump' in mech and type(mech['wallJump']) is not bool: raise ValueError(name+'.mecanica.wallJump: true or false')
     if 'capangas' in mech: positive_int(mech['capangas'], name+'.mecanica.capangas')
@@ -775,6 +789,11 @@ def compile_packs(root, results):
         if 'eco' in mech: code += '.echo('+','.join(str(mech['eco'][k]) for k in ('frames','atraso','dano'))+')'
         if 'mergulho' in mech: code += '.dive('+f(mech['mergulho']['frente'])+','+f(mech['mergulho']['descida'])+')'
         return code
+    def corpo_lutador(c):
+        # O corpo do lutador (11/11): pulo (altura, tempo, frente), peso e pulos no ar, em milésimos.
+        p = c.get('pulo', {})
+        return (f".withBody({round(p.get('altura', 1) * 1000)},{round(p.get('tempo', 1) * 1000)},"
+                f"{round(p.get('frente', 1) * 1000)},{round(c.get('peso', 1) * 1000)},{c.get('pulosNoAr', 0)})")
     def fighter_mechanics(mech):
         grab = mech.get('agarrao', {})
         return ('.withMechanics('+str(mech.get('furia',0))+','+str(mech.get('airDashes',1))+','
@@ -784,7 +803,8 @@ def compile_packs(root, results):
                 +(f".withNaturalArmor({mech['couraca']['janela']},{round(mech['couraca']['dano'] * 1000)})"
                   if mech.get('couraca') else '')
                 +(f".withRun({round(mech['corrida'].get('dash', 1) * 1000)},{mech['corrida'].get('backdashQuadros', 0)},"
-                  f"{f(mech['corrida'].get('backdashVelocidade', 0))})" if mech.get('corrida') else ''))
+                  f"{f(mech['corrida'].get('backdashVelocidade', 0))})" if mech.get('corrida') else '')
+                +(corpo_lutador(mech['corpo']) if mech.get('corpo') else ''))
     def ultra_sequence(u):
         hold = ','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('rival', []))
         scene = ''
