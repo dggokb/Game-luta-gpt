@@ -276,7 +276,9 @@
           "y": 0.22,
           "raio": 0.08,
           "cor": "#FFB45A",
-          "pulsar": 0.1
+          "pulsar": 0.1,
+          "lutadores": 0.5,
+          "alcance": 1
         }
       ]
     },
@@ -295,7 +297,9 @@
           "y": 0.387,
           "raio": 0.1,
           "cor": "#FFB45A",
-          "pulsar": 0.1
+          "pulsar": 0.1,
+          "lutadores": 0.5,
+          "alcance": 1
         }
       ]
     },

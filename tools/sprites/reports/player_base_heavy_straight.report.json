@@ -613,12 +613,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8b57424d2f30d9e4a6d10f7f5cac683ff6ff1bdaa1fe30a22be50b62b3a23987",
-      "config": "0834dbfa2f35a8ee6029f2a69902bf7b128ede0c71bee4f514ab8ba418bc96bd",
+      "source": "c58a14bac7f394d66fea21f67f0c7b8a0e1e85bb1d616755de60378a9d1e4b88",
+      "config": "9e228b99d8c0d8371cce7e1f65c248429764500d7a2dada6e4255e94b1cd333b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png": "fecf22c54e8465dd4fe13527f25f61ac6dc1b10f9bb048f9c1679758124a2f60",
+      "art/sprites/source/player_base_heavy_straight_video_normalized_smear.png": "0885225382773cad7d7e2bec12a7f5b561e701aadaf6bd8c5c2fca2bef875bf0",
       "art/sprites/source/player_base_heavy_video_normalized.png": "6c4a8f93fd52fb95bec52052619b2f4d65fd0b3dfc372680e6a4b762821ceaa8",
       "art/sprites/source/player_base_heavy_straight_video_normalized.png": "6817aca2106d5a03b0ef2c5a428b3c26fbd34a548e328eb78e3441fcb5b7a8ca"
     }

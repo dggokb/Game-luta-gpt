@@ -5671,7 +5671,7 @@ public class GameView extends SurfaceView
             vaga = efeitos.tocarDurando(nome, ox, oy, escala, esquerda, duracao, angulo);
             // A luz do impacto no corpo de quem bate e de quem apanha (motor 3).
             int f2 = Math.min(LUZ_IMPACTO_RAIO.length - 1, superGolpe ? LUZ_IMPACTO_RAIO.length - 1 : forca);
-            if (TesteDesempenho.luz != TesteDesempenho.LUZ_OFF) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao * LUZ_DURA);
+            if (TesteDesempenho.luz == TesteDesempenho.LUZ_SUAVE) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao * LUZ_DURA);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
@@ -6081,9 +6081,81 @@ public class GameView extends SurfaceView
                              boolean damageFlash, boolean guardFlash) {
         // A luz local (o impacto acendendo o corpo) só na folha do lutador, não no reflexo nem na sombra.
         DesenhoGl gl = !drawingReflection && c instanceof CanvasGl ? DesenhoGl.noQuadro() : null;
+        // O motor novo vale também no reflexo (a mesma luz, espelhada).
+        DesenhoGl nova = TesteDesempenho.luz == TesteDesempenho.LUZ_NOVA && c instanceof CanvasGl ? DesenhoGl.noQuadro() : null;
+        if (nova != null) nova.luzNova(luzDoLutador(f, drawingReflection));
         boolean aceso = gl != null && luzNoCorpo((CanvasGl)c, gl, f);
         drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
         if (aceso) gl.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
+        if (nova != null) nova.luzNova(null);
+    }
+
+    private final float[] luzNova = new float[GlRenderCanvas.LUZ_NOVA_N];
+
+    /**
+     * Motor de luz e sombra novo (docs/motor-luz-proposta.md): a única luz deste lutador. Parte da
+     * luz do cenário (a direção e a cor de "luz" do stage.json) e cada ponto de luz perto (braseiro,
+     * lanterna: "lutadores" e "alcance") toma o lugar dela na medida do peso dele, que cai suave até
+     * zero no alcance. Substitui, não soma: os pesos juntos não passam de 1, e a cor nunca passa
+     * da arte. Vários pontos se misturam pelo peso; quando puxam para lados opostos a luz perde a
+     * direção e a rampa some (luz de todo lado). {@code reflexo}: a imagem deitada no chão.
+     */
+    private float[] luzDoLutador(CombatFighter f, boolean reflexo) {
+        com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
+        com.gamelutagpt.stage.StageDefinition.FighterLight luz = def != null ? def.fighterLight : null;
+        float[] v = luzNova;
+        if (luz == null) {
+            v[0] = 0f; v[1] = -1f; v[2] = 0f;
+            for (int i = 3; i < 12; i++) v[i] = 1f;
+            v[12] = 0f;
+            return v;
+        }
+        float[] lit = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.lit);
+        float[] shade = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.shade);
+        float[] ground = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.ground);
+        float altura = f.character().visualStandHeight;
+        float cx = f.x, cy = fighterVisualY(f) - altura * 0.5f;
+        float lavada = TesteDesempenho.nova()[3];
+        float dx = 0f, dy = 0f, total = 0f, r = 0f, g = 0f, b = 0f;
+        int pontos = stageScene.pontosDeLuz();
+        for (int i = 0; i < pontos; i++) {
+            stageScene.pontoDeLuz(i, ponto);
+            if (ponto[2] <= 0f || ponto[6] <= 0f) continue;
+            float x = pontoEsquerda + ponto[0] / pontoZoom, y = pontoTopo + ponto[1] / pontoZoom;
+            float raio = ponto[2] / pontoZoom;
+            float ex = x - cx, ey = y - cy;
+            float d2 = (ex * ex + ey * ey) / (raio * raio);
+            if (d2 >= 1f) continue;
+            float w = Math.min(1f, ponto[6]) * (1f - d2) * (1f - d2);
+            // Um ponto em cima do corpo não tem lado: a direção encolhe perto dele.
+            float longe = (float)Math.sqrt(ex * ex + ey * ey + 0.0625f * altura * altura);
+            dx += w * ex / longe; dy += w * ey / longe;
+            float maior = Math.max(1e-3f, Math.max(ponto[3], Math.max(ponto[4], ponto[5])));
+            r += w * (lavada + (1f - lavada) * ponto[3] / maior);
+            g += w * (lavada + (1f - lavada) * ponto[4] / maior);
+            b += w * (lavada + (1f - lavada) * ponto[5] / maior);
+            total += w;
+        }
+        float escala = total > 1f ? 1f / total : 1f, resto = Math.max(0f, 1f - total);
+        dx = dx * escala + resto * luz.rimDirX;
+        dy = dy * escala + resto * luz.rimDirY;
+        float m = (float)Math.sqrt(dx * dx + dy * dy);
+        if (m > 1e-3f) { v[0] = dx / m; v[1] = dy / m; } else { v[0] = luz.rimDirX; v[1] = luz.rimDirY; m = 0f; }
+        v[2] = Math.min(1f, m);
+        if (reflexo) v[1] = -v[1];
+        v[3] = Math.min(1f, r * escala + resto * lit[0]);
+        v[4] = Math.min(1f, g * escala + resto * lit[1]);
+        v[5] = Math.min(1f, b * escala + resto * lit[2]);
+        // O relâmpago: por um instante a luz do lugar some e o corpo fica na cor da arte.
+        float clarao = def.lightning != null ? Math.max(0f, Math.min(1f, stageScene.lightningFlash())) : 0f;
+        for (int i = 0; i < 3; i++) {
+            v[3 + i] += (1f - v[3 + i]) * clarao;
+            // A sombra não passa da luz (um braseiro laranja não deixa a sombra mais azul que a luz).
+            v[6 + i] = Math.min(v[3 + i], shade[i] + (1f - shade[i]) * clarao);
+            v[9 + i] = Math.min(v[3 + i], ground[i] + (1f - ground[i]) * clarao);
+        }
+        v[12] = Math.min(1f, luz.edge + clarao);
+        return v;
     }
 
     /**
@@ -6133,7 +6205,7 @@ public class GameView extends SurfaceView
      * acende quem tem normal map. False se nenhuma chega nele.
      */
     private boolean luzNoCorpo(CanvasGl c, DesenhoGl gl, CombatFighter f) {
-        if (TesteDesempenho.luz == TesteDesempenho.LUZ_OFF) return false;
+        if (TesteDesempenho.luz != TesteDesempenho.LUZ_SUAVE) return false;
         float cx = f.x, cy = fighterVisualY(f) - f.character().visualStandHeight * 0.5f;
         int melhor = -1;
         float forte = 0f;
@@ -6290,10 +6362,13 @@ public class GameView extends SurfaceView
             clarao = Math.max(0, Math.min(LUZ_CLARAO_NIVEIS, Math.round(stageScene.lightningFlash() * LUZ_CLARAO_NIVEIS)));
         }
         if (def == null || (luz == null && clarao == 0 && poeira == null)) return tinta;
-        if (def != luzDoCenario) {
+        // Motor novo: a cor do lugar sai da matriz (quem a aplica é o shader, por ponto do corpo).
+        boolean nova = luz != null && TesteDesempenho.luz == TesteDesempenho.LUZ_NOVA;
+        if (def != luzDoCenario || nova != luzEraNova) {
             luzes.clear();
             luzSemTinta = new Filtro[LUZ_PASSOS];
             luzDoCenario = def;
+            luzEraNova = nova;
         }
         // Com focos de luz a contraluz vem do foco mais forte sobre este lutador, na direção dele
         // na tela (em LUZ_DIRECOES passos, para guardar os filtros): vira de lado quando o
@@ -6332,8 +6407,16 @@ public class GameView extends SurfaceView
         int chave = clarao * (LUZ_DIRECOES + 1) + passo;
         if (niveis[chave] == null) {
             float[] k = luz != null ? luz.factors() : new float[] {1f, 1f, 1f};
+            if (nova) {
+                // No OpenGL o shader multiplica pela luz e pela sombra; no Canvas, a média das duas.
+                float[] lit = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.lit);
+                float[] shade = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.shade);
+                for (int i = 0; i < 3; i++) k[i] = TesteDesempenho.openGl ? 1f : 0.5f * (lit[i] + shade[i]);
+            }
             // O relâmpago: a luz do lugar some e o corpo clareia (até +60% e um pouco de azul).
-            float c = clarao / (float)LUZ_CLARAO_NIVEIS;
+            // No motor novo o relâmpago não soma: a luz do lugar some e o corpo volta à cor da arte
+            // (luzDoLutador), que é o teto.
+            float c = nova ? 0f : clarao / (float)LUZ_CLARAO_NIVEIS;
             int cor = def.lightning != null ? def.lightning.color : 0xFFFFFFFF;
             float[] m = new float[20];
             for (int i = 0; i < 3; i++) {
@@ -6348,7 +6431,11 @@ public class GameView extends SurfaceView
                 junto = new ColorMatrix(java.util.Arrays.copyOf(tinta.matriz, 20));
                 junto.postConcat(luzMatriz);
             }
-            if (poeira != null || (luz != null && (luz.rimStrength > 0f || (luz.feet & 0xFFFFFF) != 0xFFFFFF))) {
+            if (nova) {
+                // A borda, a direção e as cores vêm por lutador (luzDoLutador); aqui só o desgaste nos pés.
+                float[] pes = poeira != null ? poeira.clone() : new float[] {1f, 1f, 1f};
+                niveis[chave] = Filtro.comLuz(junto.getArray(), new float[] {1f, 1f, 1f}, 0f, rimX, rimY, pes);
+            } else if (poeira != null || (luz != null && (luz.rimStrength > 0f || (luz.feet & 0xFFFFFF) != 0xFFFFFF))) {
                 // Contraluz e degradê dos pés (só no OpenGL). No relâmpago a borda acende na cor dele.
                 float[] rim = new float[3];
                 float[] pes = luz != null ? luz.feetFactors() : new float[] {1f, 1f, 1f};
@@ -6375,6 +6462,7 @@ public class GameView extends SurfaceView
     /** O meio da câmera no quadro (a contraluz do foco é vista dele). */
     private float luzCameraX = Arena.WORLD_WIDTH * 0.5f;
     private com.gamelutagpt.stage.StageDefinition luzDoCenario;
+    private boolean luzEraNova;
     private Filtro[] luzSemTinta = new Filtro[LUZ_PASSOS];
     private final java.util.Map<Filtro, Filtro[]> luzes = new java.util.IdentityHashMap<>();
 
@@ -7167,8 +7255,9 @@ public class GameView extends SurfaceView
                     break;
                 case PERF_LUZ:
                     // O normal map na luz do cenário, dos pontos de luz e do impacto: liga e desliga.
-                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_OFF ? TesteDesempenho.LUZ_SUAVE
-                        : TesteDesempenho.LUZ_OFF;
+                    // ON (o motor de hoje) → NOVA (o motor de luz e sombra novo) → OFF.
+                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_SUAVE ? TesteDesempenho.LUZ_NOVA
+                        : TesteDesempenho.luz == TesteDesempenho.LUZ_NOVA ? TesteDesempenho.LUZ_OFF : TesteDesempenho.LUZ_SUAVE;
                     break;
                 case PERF_CENARIO:
                     // ON → SEM ENFEITES (as camadas, sem brilhos, neblina, reflexos e pétalas) → OFF → ON.

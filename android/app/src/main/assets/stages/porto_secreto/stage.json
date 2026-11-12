@@ -166,7 +166,7 @@
       "repetir": "repetir",
       "periodo": 0.95,
       "luzes": [
-        { "x": 0.34, "y": 0.15, "raio": 0.05, "cor": "#FFC878", "pulsar": 0.05 }
+        { "x": 0.34, "y": 0.15, "raio": 0.05, "cor": "#FFC878", "pulsar": 0.05, "lutadores": 0.5, "alcance": 1 }
       ],
       "bandeiras": [
         { "imagem": "bandeira_poste.png", "x": 0.4793, "y": 0.2999, "largura": 0.4275, "altura": 0.41 }

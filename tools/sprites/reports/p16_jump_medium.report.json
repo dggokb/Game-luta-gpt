@@ -271,8 +271,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "824cdfb14b68b25726cd6b0c22dd10f03663ec9a52a3df55f5c981cb696f89b4",
-      "config": "d9afa31bca864ece5dc387445f50b1bf1c30bef2dd16966e02d9fbbf0666342c",
+      "source": "54bbb5f5bca057f822177520e824f8e2a4aaedc4ef225466da0657c17a66ae0c",
+      "config": "551ed69653fc89aa8f57117874d90fb133ec32bbedea56c89e2d1f2cf929f745",
       "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
     },
     "referenceSources": {
