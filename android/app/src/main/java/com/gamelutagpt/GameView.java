@@ -2025,6 +2025,11 @@ public class GameView extends SurfaceView
             pad.drainInto(ignoredInput);
             playerInput.clear();
             opponentInput.clear();
+        } else if (roteiro != null && !roteiro.acabou()) {
+            // PC (GravarLuta, passo rota:): o combo do teste apertado quadro a quadro; o rival parado.
+            pad.drainInto(ignoredInput);
+            roteiro.preencher(engine, playerInput);
+            opponentInput.clear();
         } else if (demo.active()) {
             // Touches never reach the fight during a demo.
             pad.drainInto(ignoredInput);
@@ -4018,6 +4023,19 @@ public class GameView extends SurfaceView
      * PC ({@code gradle :pc:gravarLuta}): a barra de Super dos dois times no valor pedido (1000 por
      * barra), aplicada na thread do jogo, para gravar Super e Ultra sem esperar a barra encher.
      */
+    /** PC ({@code gradle :pc:gravarLuta}, passo {@code rota:}): aperta um combo quadro a quadro (RoteiroCombo). */
+    public void apertarRoteiro(String rota) {
+        roteiro = new RoteiroCombo(rota);
+    }
+
+    /** O roteiro ainda está apertando. */
+    public boolean roteiroRodando() {
+        RoteiroCombo r = roteiro;
+        return r != null && !r.acabou();
+    }
+
+    private volatile RoteiroCombo roteiro;
+
     public void encherSuper(int valor) {
         superPedido = Math.max(0, Math.min(CombatConfig.MAX_METER, valor));
     }

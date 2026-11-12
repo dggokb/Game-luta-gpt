@@ -1,6 +1,10 @@
-# Combos de assinatura — PROPOSTA (12/11): Ryūga e Yin-lu
+# Combos de assinatura (12/11): Ryūga e Yin-lu
 
-> **Proposta para o dono aprovar.** Nada disto está no jogo ainda.
+> **Ryūga: no jogo (12/11)**, com os combos conferidos no motor (`ComboRyugaTest`) e gravados no PC.
+> Decisões do dono: manter a base de todos e somar sequência própria depois do começo do combo,
+> especial como ponte, golpe de comando e parceiro no combo; M → M como sequência; o → + H entra já,
+> com a animação do H, porque ele é que vai ditar a animação nova. **Yin-lu: ainda proposta**
+> (entra quando for a vez dela); os outros, quando cada um for refeito.
 
 Pedido: "todo mundo comba igual". Hoje a corrente é a mesma para os 16 (L → M → H subindo de força,
 o 2H que lança para o super pulo e, no ar, jL → jM → pulo → jL → jM → j2H; `mecanicas.md` 4b). O
@@ -32,10 +36,35 @@ golpe e entrega o combo a um especial (a Onda, o Punho ascendente, o Chute girat
 fundamento do Ryu: o combo é curto e quem erra perto dele paga caro. A identidade é **levar para o
 canto**: o Chute giratório carrega o rival até a parede, e da parede ele termina no alto.
 
-### O que muda no jogo
+### O que está no jogo (12/11)
 
-| Camada | Mudança | Como |
+| Camada | O que é | Onde |
 |---|---|---|
+| 1. Sequência | **Soco duplo da casa: M → M**, só nele (o estilo de combo dele virou `shoto`: a base mais o M que repete uma vez). O segundo M entrega para o especial ou para o → + H | `mecanicas.json` combos.estilos.shoto |
+| 2. Comando | **→ + H: Soco no plexo.** Um passo curto e dois socos (quadros 9 e 16), 900 de dano. Sai do neutro e emendado depois do L, do 2L e do M (rota da base para quem tiver um 6H). Só cancela depois do segundo soco, em S1, S2, S3 ou Super. Por enquanto com a animação do H; o vídeo dele vem depois. Fora dessas rotas (depois do 2M, por exemplo), → + H continua sendo o H | `mecanicas.json` player_base.golpeComando; `CancelSystem.COMMAND_HEAVY` |
+| 3. Ponte | **S3 (Chute giratório): o último chute joga na parede** em vez de derrubar. Ele corre atrás (segurando →) e pega a volta no S2 | `especiais.S3.lancar`: wallBounce |
+| 3. Ponte | **S2 (Punho ascendente) pega quem volta da parede** (do H ou do S3) e joga em arco | já cancelava; conferido |
+| 4. Parceiro | **A Onda do assist segura o rival em pé** 45 quadros (a Onda dele segura 20). Quem chama o Ryūga corre e recomeça a corrente inteira. Sem isso o rival se solta antes (o teste confere as duas coisas) | `fighter.assist.segura` no pacote; `Fighter.assistShot` |
+
+### Os combos (conferidos no motor, contra o Ryūga parado)
+
+| # | Nome | Sequência | Acertos | Dano |
+|---|---|---|---|---|
+| R1 | Fundamento | 2L, 2L, M → S1 (Onda) | 4 | 1560 |
+| R2 | Soco duplo | L, M, M → S2 (ou → S1), de perto: o S2 é curto e pega de 90 a 135 px | 4 | 1892 |
+| R3 | Leva à parede | L, M, M → S3 (quatro chutes, parede) → corre → S2 | 8 | 2382 |
+| R4 | Punição na parede | L, M, H (parede) → corre → 2H → super pulo → jL, jM, j2H | 7 | 3044 |
+| R4b | Punição com barra | L, M, H (parede) → corre → SUPER | 8 | 3820 |
+| R5 | Plexo | 2L, → + H (dois socos) → S2 | 4 | 1909 |
+| R5b | Plexo com barra | 2L, → + H → S2 → SUPER | 9 | 4209 |
+| R6 | Parceiro | (Yin-lu em campo) L, M → TAG (Onda do Ryūga segura) → corre → L, M, M → S4 | 8 | 2526 |
+
+Mudou da proposta: o R2 da proposta (S3 → corre → 2H → combo no ar) não emenda: depois da parede do
+S3 o rival volta alto e longe demais para o 2H; o que pega é o S2. O 2H com o combo no ar ficou no R4,
+depois da parede do H. O S2 que joga em arco (pedido de 12/11) também deixa o Super fora do R3; no
+R5b o Super entra porque o S2 pega o rival ainda no chão.
+
+---|---|---|
 | 1. Sequência | **Soco duplo da casa: M → M**, o segundo M mais curto (só no fim de uma corrente que começou no L ou no 2L) | rota nova no estilo de combo dele (hoje "equilibrado", que é a base pura) |
 | 3. Ponte | **S3 (Chute giratório): o último chute joga na parede** em vez de derrubar. Ele corre atrás e continua | `especiais.S3.lancar`: knockdown → wallBounce |
 | 3. Ponte | **S2 (Punho ascendente) pega quem volta da parede** e pode virar Super (já cancela) | conferir no motor: hoje o S2 sai do H na parede? |
@@ -100,10 +129,7 @@ Os números finais saem dos testes do motor e do celular.
 
 ## Em dúvida
 
-1. **R3 (H → S2 na volta da parede):** não sei se o Punho ascendente pega o rival voltando da parede
-   no tempo atual do cancelamento. O teste do motor diz; se não pegar, o R3 vira H → S1 (Onda).
-2. **Y3 (dois 2H):** um combo de 12 pancadas pode passar do ponto. O escalonamento de dano do jogo
+1. **Y3 (dois 2H):** um combo de 12 pancadas pode passar do ponto. O escalonamento de dano do jogo
    (cada pancada a mais tira menos) segura o total, mas vale sentir no celular.
-3. **M → M do Ryūga** é a mesma rota que a Yin-lu já tem (M → M). A diferença é o que vem depois:
-   nele, o segundo M leva ao especial; nela, ao H do fluxo. Se quiser algo mais diferente, a
-   alternativa é o Ryūga ter **2L → M → 2M** (baixo, médio, baixo) como sequência própria.
+2. **O assist da Yin-lu** (a Palma) hoje quase não pega no meio do combo do Ryūga: ela entra atrás
+   dele e a Palma é curta. Entra no trabalho dela.

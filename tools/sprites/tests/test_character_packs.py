@@ -67,7 +67,8 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['specialMoves']['S2'].update(segurar=True))
         with self.assertRaisesRegex(ValueError,'S2.segurar'):pipeline.build(self.root)
     def test_dive_needs_an_air_special(self):
-        self.edit(lambda d:d['specialMoves']['S2'].update(mecanica={'mergulho':{'frente':300,'descida':800}}))
+        # O S2 do Ryūga joga em arco (12/11): sem o arco na mecânica, o lançamento volta a derrubar.
+        self.edit(lambda d:d['specialMoves']['S2'].update(mecanica={'mergulho':{'frente':300,'descida':800}},launchType='knockdown'))
         with self.assertRaisesRegex(ValueError,'S2.mecanica.mergulho'):pipeline.build(self.root)
     def test_command_special_needs_a_valid_command(self):
         self.edit(lambda d:d['specialMoves']['S2'].update(command=[1,9]))

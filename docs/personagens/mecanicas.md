@@ -228,8 +228,9 @@ resultado. Cada personagem escolhe o estilo em `estiloCombo`; o lutador de teste
 
 | Golpe | Cancela em | Usos na corrente |
 |---|---|---|
-| L, 2L | L, 2L, M, 2M, H, 2H | L 3, 2L 2 |
-| M | 2M, H, 2H | 1 |
+| L, 2L | L, 2L, M, 2M, H, 2H, → + H (6H, quem tiver) | L 3, 2L 2 |
+| M | 2M, H, 2H, → + H (6H, quem tiver) | 1 |
+| → + H (6H) | só especial e Super, depois da última pancada | 1 |
 | 2M | H (é rasteira: derruba) | 1 |
 | H | só especial e Super (joga na parede) | 1 |
 | 2H | pulo (lançador → super pulo) | 1 |
@@ -240,7 +241,8 @@ Rota de exemplo: L > M > 2H > super pulo > jL > jM > pulo no ar > jL > jM > j2H 
 
 | Estilo | Quem | Soma à base |
 |---|---|---|
-| equilibrado | p01 | nada |
+| equilibrado | p15, p16 | nada |
+| shoto | p01 (12/11) | M > M (o soco duplo da casa) |
 | pressao | p03, p04, p10 | M > M; M cancela em pulo (no acerto e na defesa) |
 | chutes | p02 | M > M (três chutes: M > M > H); jM > jM |
 | aereo | p05 | jL > jL; jL cancela em pulo no ar; M cancela em pulo (sobe sem lançador) |
@@ -250,6 +252,11 @@ Rota de exemplo: L > M > 2H > super pulo > jL > jM > pulo no ar > jL > jM > j2H 
 
 O estilo também guia a CPU (`CpuStyle`): distância, agressão, projétil, agarrão e paciência,
 e o caderno de combos dela sai destas mesmas rotas (`docs/combat-engine.md`, seção CPU).
+
+**Golpe de comando e assist (12/11, `combos-assinatura.md`):** o `golpeComando` do personagem
+no `mecanicas.json` é o → + H dele inteiro (o 6H, no formato do `character.json`; o avanço vai em
+`unica.golpes.6H`); quem não tem, → + H é o H. No pacote, `fighter.assist.segura` faz a Onda do
+assist segurar o rival em pé esse tanto de quadros (o Ryūga: 45), para o parceiro recomeçar.
 
 Trocar o estilo de alguém: mudar `estiloCombo`, rodar `mecanicas.py --write` e
 `build_characters.py --write`. Testes: `CorrentesComboTest` e `test_mecanicas.py`.

@@ -49,10 +49,14 @@ public class CorrentesComboTest {
         assertTrue("tanque: H > H", route("p09", "H", "H"));
         assertTrue("imprevisível: H > L", route("p12", "H", "L"));
         assertTrue("imprevisível: M > L", route("p12", "M", "L"));
-        // O equilibrado é só a base: nada repete nem volta.
-        assertFalse(route("player_base", "M", "M"));
+        // O shoto (Ryūga, 12/11): a base mais o soco duplo da casa (M > M), nada mais repete nem volta.
+        assertTrue("shoto: M > M", route("player_base", "M", "M"));
         assertFalse(route("player_base", "H", "H"));
         assertFalse(route("player_base", "H", "L"));
+        // O equilibrado é só a base: nada repete nem volta.
+        assertFalse(route("p15", "M", "M"));
+        assertFalse(route("p15", "H", "H"));
+        assertFalse(route("p15", "H", "L"));
         assertFalse("só o imprevisível volta", route("p04", "H", "L"));
     }
 
@@ -61,7 +65,9 @@ public class CorrentesComboTest {
         AttackDefinition m = BASE.attack("M");
         assertTrue(CancelSystem.chainAllows(f, m));
         f.chain.add("M");
-        assertFalse("M uma vez por corrente", CancelSystem.chainAllows(f, m));
+        assertTrue("o soco duplo do Ryūga: M duas vezes por corrente", CancelSystem.chainAllows(f, m));
+        f.chain.add("M");
+        assertFalse("M no máximo duas vezes por corrente", CancelSystem.chainAllows(f, m));
         f.chain.clear();
         assertTrue("outra corrente, depois de uma ligação", CancelSystem.chainAllows(f, m));
     }

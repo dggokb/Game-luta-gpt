@@ -70,6 +70,9 @@ public final class BateriaCombos {
         String estadoFinal = "";
     }
 
+    /** -Dcombos.debug=true: diz em que passo a rota parou. */
+    static final boolean ROTA_DEBUG = Boolean.getBoolean("combos.debug");
+
     static final String[] BASE = {"L", "M", "H", "2L", "2M", "2H", "S", "SUPER", "A", "J", "SJ", "D", "jL", "jM", "jH", "j2H", "W6", "W14"};
 
     // ------------------------------------------------------------------ S1 L/H e S2–S4 na busca
@@ -167,11 +170,13 @@ public final class BateriaCombos {
         boolean rivalPulou = false;
         for (int k = 0; k < rota.size(); k++) {
             String acao = rota.get(k);
-            int espera = acao.equals("W6") ? 6 : acao.equals("W14") ? 14 : acao.equals("W3") ? 3 : 0;
+            int espera = acao.matches("W[0-9]+") ? Integer.parseInt(acao.substring(1)) : 0;
             AttackDefinition antes = me.attack;
             int antesQuadro = me.attackFrame;
+            // O mesmo golpe de novo na corrente (o M > M do Ryūga) é o mesmo objeto: conta pela corrente.
+            int antesCorrente = me.chain.size();
             boolean feito = false;
-            for (int t = 0; t < 45 && !feito; t++) {
+            for (int t = 0; t < (acao.matches("C[0-9]*") ? 90 : Math.max(45, espera + 1)) && !feito; t++) {
                 in0.clear();
                 in1.clear();
                 if (dummy.status == CombatFighter.Status.AIR_HITSTUN && dummy.stunLeft == 0) in1.light = true;
@@ -189,6 +194,8 @@ public final class BateriaCombos {
                         case "2L": in0.direction = me.facing > 0 ? 2 : 4; in0.light = true; break;
                         case "2M": in0.direction = me.facing > 0 ? 2 : 4; in0.medium = true; break;
                         case "2H": in0.direction = me.facing > 0 ? 2 : 4; in0.heavy = true; break;
+                        case "6H": in0.direction = frente; in0.heavy = true; break;
+                        case "6M": in0.direction = frente; in0.medium = true; break;
                         case "S": in0.special = "M"; break;
                         case "SUPER": in0.superAttack = true; break;
                         case "ULTRA": in0.ultra = true; in0.direction = 3; break;
@@ -196,6 +203,10 @@ public final class BateriaCombos {
                         case "J": in0.jump = true; in0.direction = me.facing > 0 ? 8 : 6; break;
                         case "SJ": in0.superJump = true; in0.direction = me.facing > 0 ? 8 : 6; break;
                         case "D": in0.dash = true; in0.direction = frente; break;
+                        // Corre atrás (segura → correndo) até chegar perto do rival (a perseguição da parede).
+                        case "C": in0.dash = !me.forwardDashing; in0.direction = frente; break;
+                        case "C100": case "C120": case "C140": case "C160": case "C180": case "C200": case "C220": case "C240":
+                            in0.dash = !me.forwardDashing; in0.direction = frente; break;
                         case "jL": in0.light = true; break;
                         case "jM": in0.medium = true; break;
                         case "jH": in0.heavy = true; break;
@@ -210,15 +221,24 @@ public final class BateriaCombos {
                 if (e.ultraConnected() >= 0) BateriaBalanco.ultraSemPagina(e, e.ultraConnected());
                 ComboSession s = e.session(1);
                 if (sess == null && s != null && s.active) sess = s;
-                if (sess != null && s != sess && k > 0) return x;   // o combo caiu antes do passo
+                if (sess != null && s != sess && k > 0) {   // o combo caiu antes do passo
+                    if (ROTA_DEBUG) System.out.println("  caiu antes de " + k + " " + acao + " (quadro " + t + ")");
+                    return x;
+                }
                 if (espera > 0) {
                     feito = t + 1 >= espera;
                     continue;
                 }
-                boolean novo = me.attacking() && me.attack != null && (me.attack != antes || me.attackFrame < antesQuadro);
+                boolean novo = me.attacking() && me.attack != null && (me.attack != antes || me.attackFrame < antesQuadro ||
+                    me.chain.size() > antesCorrente);
                 switch (acao) {
                     case "J": case "SJ": feito = noChao && !me.grounded; break;
                     case "D": feito = me.forwardDashing; break;
+                    case "C": feito = Math.abs(dummy.x - me.x) <= 260f; break;
+                    case "C100": case "C120": case "C140": case "C160": case "C180": case "C200": case "C220": case "C240":
+                        // corre até ficar a essa distância do rival
+                        feito = Math.abs(dummy.x - me.x) <= Integer.parseInt(acao.substring(1));
+                        break;
                     case "A": feito = !assistAntes && e.team(0).assistOut(); break;
                     case "DHC": feito = e.cues().contains("DHC") || e.team(0).point != titular; break;
                     case "ULTRA": feito = me.status == CombatFighter.Status.ULTRA || me.inUltraSequence() || e.ultraConnected() >= 0; break;
@@ -232,9 +252,13 @@ public final class BateriaCombos {
                 if (feito) {
                     antes = me.attack;
                     antesQuadro = me.attackFrame;
+                    antesCorrente = me.chain.size();
                 }
             }
-            if (!feito) return x;
+            if (!feito) {
+                if (ROTA_DEBUG) System.out.println("  não saiu " + k + " " + acao + ": " + me.status + " gap " + Math.abs(dummy.x - me.x));
+                return x;
+            }
             x.assist |= acao.equals("A");
             x.dhc |= acao.equals("DHC");
             if (sess == null && k >= cn.primeiroAcertoAte - 1) {
