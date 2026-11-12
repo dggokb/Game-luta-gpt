@@ -1432,6 +1432,25 @@ Quando uma imagem de acerto agradar no jogo, ela vira a **âncora** (regra E1): 
 são geradas anexando ela ("mesmo estilo de traço e de brilho desta imagem") e só então vale gerar
 os lotes seguintes do efeitos-gpt.md.
 
+## Rodada de 12/11: o L do Ryūga trocado, sem a faísca do vídeo
+
+- **Pedido:** trocar o jab do Ryūga pelo vídeo `Anime_Punch_Single_Strike` (124 quadros, 24 qps)
+  e "não esquecer de remover o efeito" (uma faísca pequena na frente do punho, quadros 22 a 26).
+- **Feito:** receita `jab` em `tools/sprites/montagens/player_base.json`: o soco do 17 ao 26 e a
+  volta do 65 ao 89 (a espera de braço esticado ficou de fora), `sem_efeitos` (a faísca saiu),
+  `alinha` no fim (no vídeo ele dá um passo e não volta inteiro: a guarda do fim agora cai na
+  guarda parada). Poses-chave à mão (0, 3, 5, 7, 9, 11, 13, 15), impacto no 5, o mesmo tempo
+  (4/2/6). Silhueta e caixas medidas só no jab (o desenho chega a 149 px; o L segue limitado a
+  135 pelo `alcanceMaximo`), caminho do rastro refeito (sai da guarda e segue o braço) e normal map
+  refeito. Sem efeito desenhado, o L continua com o rastro do jogo.
+- **Ficou:** na volta para a guarda o fundido de 8 quadros do motor (`quadrosVoltaGolpe`) mostra um
+  pouco de dupla exposição na cabeça: a guarda do fim do vídeo é uns 8 px mais baixa que a guarda
+  parada. É o mesmo fundido de todos os golpes. Visto só no PC.
+- **Pegadinhas:** o `montagem.py` apaga as `posesChave` e a `silhueta` da animação (refazer à mão);
+  o `caixas_sprites.py --write` refaria as caixas de todos os golpes (vários foram acertados à mão),
+  então aplicar só no golpe trocado; o `linha_de_acao.py --write` quebra num print do
+  `CAMINHO_MANUAL` do S2 (antigo): chamar `caminhos()` e gravar só o do golpe.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a

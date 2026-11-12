@@ -236,22 +236,29 @@
     }
   },
   "jab": {
-    "_doc": "L: jab da mão da frente (4-14). O vídeo fica com o braço esticado até o fim: volta pelo inverso, de 2 em 2.",
+    "_doc": "L (12/11): jab do vídeo novo do dono (Anime_Punch_Single_Strike, 124 quadros). O soco do 17 ao 26 (estica no 22) e a volta do 65 ao 89; a espera de braço esticado (27-61) fica de fora. sem_efeitos: a faísca do vídeo na frente do punho (22-26) sai, como ele pediu. \"alinha\" no fim: no vídeo ele dá um passo e não volta inteiro; a guarda do fim volta para onde começou (sem dois corpos ao trocar para a guarda).",
     "trechos": [
       [
-        "L",
-        0,
-        86
+        "L_novo",
+        14,
+        27
+      ],
+      [
+        "L_novo",
+        62,
+        90,
+        "alinha"
       ]
     ],
-    "quadros": "4-14",
+    "quadros": "3,4,5,6,7,8,10,12,16,17,19,21,24,28,33,40",
     "opcoes": {
-      "fixar": "video"
+      "fixar": "video",
+      "sem_efeitos": true
     },
     "animacoes": {
       "LIGHT_JAB": {
-        "frames": "0-10,8,6,4,2,0",
-        "impacto": 6
+        "frames": "0-15",
+        "impacto": 5
       }
     }
   },

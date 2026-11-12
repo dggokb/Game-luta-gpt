@@ -12,8 +12,11 @@ public class P01AttackPacingTest {
         // Tempos revistos em 11/11 (o jogador achou o L lento): jab de 4, soco de 6, jL ativo 3.
         {4,2,6}, {6,4,11}, {4,3,5}, {6,4,8}, {9,6,12}
     };
-    /** O quadro do impacto de cada clipe (os vídeos novos de 11/2026, montagens/player_base.json). */
-    private static final int[] IMPACT_FRAMES={6,5,5,7,7};
+    /**
+     * O quadro do impacto de cada clipe (os vídeos novos de 11/2026, montagens/player_base.json; o L
+     * trocou pelo vídeo do jab de 12/11, que estica no quadro 5 do clipe).
+     */
+    private static final int[] IMPACT_FRAMES={5,5,5,7,7};
 
     @Test public void slowerArtLeavesHitFramesAndComboWindowsUnchanged() {
         for(int i=0;i<MOVES.length;i++) {
