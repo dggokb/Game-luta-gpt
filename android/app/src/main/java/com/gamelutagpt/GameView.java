@@ -1737,10 +1737,11 @@ public class GameView extends SurfaceView
             if (glQuadro) desenhoGl.relatarTrabalho(System.nanoTime() - frameStart);
             if (teste.ativo()) registrarQuadroDoTeste();
             // No teste a qualidade fica parada: trocar no meio misturava as medidas.
+            // No AUTO a medida só recomenda: o nível muda na próxima abertura do jogo (13/11).
             if (janela && !teste.ativo() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
-                Log.i(PerfilQuadros.TAG, "gráficos mudaram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
+                Log.i(PerfilQuadros.TAG, "gráficos: próxima abertura em "
+                    + QualidadeGrafica.NOMES[qualidade.nivelDaProximaAbertura()]
                     + " (luta a " + Math.round(perfil.fps()) + " fps)");
-                aplicarQualidade();
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
             if (glQuadro && desenhoGl.trocaEsperaTela()) {

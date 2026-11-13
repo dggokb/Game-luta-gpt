@@ -9,8 +9,10 @@ import android.content.SharedPreferences;
  * LEVE ainda tira os efeitos que só enfeitam (reflexos, neblina, pétalas, brilhos das luzes).
  *
  * <p>No AUTO o jogo mede a luta: se ela não sustenta {@link #FPS_MINIMO} quadros por segundo
- * por {@link #JANELAS_RUINS} janelas seguidas, desce um nível. O nível aprendido fica salvo, e o
- * próximo uso já começa nele. Escolher AUTO de novo na pausa recomeça do ALTO.
+ * por {@link #JANELAS_RUINS} janelas seguidas, recomenda um nível abaixo. <b>O nível só muda ao
+ * abrir o jogo</b> (13/11, pedido do dono): trocar a resolução no meio da luta fazia a imagem
+ * inteira pular. Durante o jogo a medida só guarda a recomendação, e a próxima abertura já começa
+ * nela; a primeira abertura começa no ALTO. Escolher AUTO de novo na pausa recomeça do ALTO.
  */
 final class QualidadeGrafica {
     /** AUTO decide sozinho; os outros fixam o nível. A ordem é a do ciclo na pausa. */
@@ -35,8 +37,10 @@ final class QualidadeGrafica {
 
     private final SharedPreferences prefs;
     private Modo modo = Modo.AUTO;
-    /** O nível que o AUTO aprendeu para este aparelho. */
+    /** O nível que o AUTO aprendeu para este aparelho (vale na próxima abertura). */
     private int nivelAuto = ALTO;
+    /** O nível do AUTO em uso nesta abertura do jogo: o aprendido até a abertura, parado até fechar. */
+    private int nivelSessao = ALTO;
     private int ruins, boas, janelas, subiuNaJanela = -1;
     private boolean subidaFalhou;
 
@@ -50,12 +54,13 @@ final class QualidadeGrafica {
             }
             nivelAuto = Math.max(ALTO, Math.min(LEVE, prefs.getInt(CHAVE_NIVEL_AUTO, ALTO)));
         }
+        nivelSessao = nivelAuto;
         // PC: -Dgameluta.graficos=ALTO|MEDIO|LEVE|AUTO fixa o modo (para medir e comparar).
         String fixo = System.getProperty("gameluta.graficos");
         if (fixo != null) {
             try {
                 modo = Modo.valueOf(fixo.toUpperCase(java.util.Locale.ROOT));
-                if (modo == Modo.AUTO) nivelAuto = ALTO;
+                if (modo == Modo.AUTO) nivelAuto = nivelSessao = ALTO;
             } catch (IllegalArgumentException e) {
                 // valor desconhecido: fica o salvo
             }
@@ -70,9 +75,12 @@ final class QualidadeGrafica {
             case ALTO: return ALTO;
             case MEDIO: return MEDIO;
             case LEVE: return LEVE;
-            default: return nivelAuto;
+            default: return nivelSessao;
         }
     }
+
+    /** O nível em que o AUTO vai abrir da próxima vez (o que a medida da luta recomenda). */
+    int nivelDaProximaAbertura() { return nivelAuto; }
 
     float escala() { return ESCALA[nivel()]; }
 
@@ -96,7 +104,8 @@ final class QualidadeGrafica {
     void proximoModo(int direcao) {
         int n = Modo.values().length;
         modo = Modo.values()[((modo.ordinal() + (direcao >= 0 ? 1 : -1)) % n + n) % n];
-        if (modo == Modo.AUTO) nivelAuto = ALTO;
+        // Escolha do jogador na pausa: vale na hora (não é troca no meio da luta sem ele pedir).
+        if (modo == Modo.AUTO) nivelAuto = nivelSessao = ALTO;
         ruins = boas = 0;
         subiuNaJanela = -1;
         subidaFalhou = false;
@@ -111,8 +120,10 @@ final class QualidadeGrafica {
 
     /**
      * Uma janela de medida fechou ({@link PerfilQuadros}). No AUTO, luta abaixo de
-     * {@link #FPS_MINIMO} por {@link #JANELAS_RUINS} janelas seguidas desce um nível.
-     * @return true se o nível mudou
+     * {@link #FPS_MINIMO} por {@link #JANELAS_RUINS} janelas seguidas recomenda um nível abaixo
+     * (folgada por um tempo, um acima). A recomendação fica salva para a próxima abertura; o
+     * nível em uso não muda.
+     * @return true se a recomendação mudou
      */
     boolean janela(float fps, float fracaoLuta) {
         if (modo != Modo.AUTO || fracaoLuta < FRACAO_LUTA) return false;
