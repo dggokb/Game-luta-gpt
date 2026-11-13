@@ -1,0 +1,20 @@
+{
+ "imagem": "p13.png",
+ "alturaTela": 1.25,
+ "quadroMs": 3600.0,
+ "segurarMs": 0,
+ "frases": [
+  "Quem cai com a gente, cai feio.",
+  "Você bateu num muro.",
+  "Fraco. Próximo."
+ ],
+ "quadros": [
+  {
+   "imagem": "q000.webp",
+   "x": 0.0,
+   "y": -706.0,
+   "largura": 638.9,
+   "altura": 900.0
+  }
+ ]
+}
