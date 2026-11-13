@@ -117,7 +117,24 @@
         7
       ],
       "loop": true,
-      "distancePerFrame": 34
+      "distancePerFrame": 34,
+      "apoio": {
+        "folha": "069ade8578f7",
+        "avanco": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "semApoio": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "duvida": [],
+        "inseguro": "quadros sem medida"
+      }
     },
     "WALK_BACK": {
       "atlas": "monster_npc_pack",
@@ -128,7 +145,24 @@
         4
       ],
       "loop": true,
-      "distancePerFrame": 32
+      "distancePerFrame": 32,
+      "apoio": {
+        "folha": "8b712ab15d35",
+        "avanco": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "semApoio": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "duvida": [],
+        "inseguro": "quadros sem medida"
+      }
     },
     "CROUCH": {
       "atlas": "monster_npc_pack",

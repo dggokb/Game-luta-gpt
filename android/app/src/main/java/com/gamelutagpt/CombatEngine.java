@@ -2415,7 +2415,10 @@ final class CombatEngine {
 
     private void applyPush(CombatFighter f) {
         if (f.pushFramesLeft <= 0) return;
-        float step = f.pushRemaining / f.pushFramesLeft;
+        int n = f.pushFramesLeft;
+        // Deslizando no chão: a velocidade cai o mesmo tanto por quadro até zero (atrito); no ar
+        // (ou sem o atrito), a distância dividida por igual.
+        float step = f.pushAtrito && f.grounded ? f.pushRemaining * (2 * n - 1) / (float) (n * n) : f.pushRemaining / n;
         f.pushRemaining -= step;
         f.pushFramesLeft--;
         float target = f.x + step;
@@ -2428,6 +2431,8 @@ final class CombatEngine {
         }
     }
 
+    /** O empurrão de golpe e de defesa freado pelo atrito do chão (teste: -Dgameluta.empurrao=atrito liga). */
+    static final boolean EMPURRAO_POR_ATRITO = "atrito".equals(System.getProperty("gameluta.empurrao"));
     /** O atrito do pé no chão (o corpo anda o que o pé de apoio empurra); "off" volta ao andar de velocidade fixa. */
     static final boolean ATRITO_DO_PE = !"off".equals(System.getProperty("gameluta.atrito"));
 
@@ -5429,6 +5434,14 @@ final class CombatEngine {
         d.pushRemaining = distance;
         d.pushFramesLeft = distance == 0f ? 0 : config.pushbackFrames;
         d.pushSource = source;
+        d.pushAtrito = false;
+        if (ATRITO_DO_PE && EMPURRAO_POR_ATRITO && distance != 0f && d.grounded) {
+            // No chão o empurrão é um deslize: sai rápido e o atrito do pé freia até parar na
+            // mesma distância do golpe. O tempo vem do atrito (v0 = √(2·a·d), t = v0 / a).
+            float freio = config.atritoDoChao * config.gravity;
+            d.pushFramesLeft = Math.max(1, Math.round((float) Math.sqrt(2f * Math.abs(distance) / freio) / CombatConfig.DT));
+            d.pushAtrito = true;
+        }
     }
 
     /**

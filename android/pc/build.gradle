@@ -72,6 +72,10 @@ tasks.register('testarMotor', Test) {
     classpath = sourceSets.motorTest.runtimeClasspath
     systemProperty 'java.awt.headless', 'true'
     maxHeapSize = '2g'
+    // Testes do atrito: -Patrito=off (o andar de antes), -Pempurrao=atrito (o empurrão freado pelo chão)
+    ['atrito', 'empurrao'].each { p ->
+        if (providers.gradleProperty(p).isPresent()) systemProperty "gameluta.${p}", providers.gradleProperty(p).get()
+    }
 }
 
 dependencies {
@@ -322,6 +326,7 @@ tasks.register('gravarLuta', JavaExec) {
     if (providers.gradleProperty('luz').isPresent()) systemProperty 'gameluta.luz', providers.gradleProperty('luz').get()
     // -Patrito=off: o andar de velocidade fixa de antes do atrito do pé (para comparar)
     if (providers.gradleProperty('atrito').isPresent()) systemProperty 'gameluta.atrito', providers.gradleProperty('atrito').get()
+    if (providers.gradleProperty('empurrao').isPresent()) systemProperty 'gameluta.empurrao', providers.gradleProperty('empurrao').get()
     if (providers.gradleProperty('nova').isPresent()) systemProperty 'gameluta.nova', providers.gradleProperty('nova').get()
     if (providers.gradleProperty('semMapa').isPresent()) systemProperty 'gameluta.semMapa', 'true'
     if (providers.gradleProperty('luzEfeito').isPresent()) systemProperty 'gameluta.luzEfeito', providers.gradleProperty('luzEfeito').get()

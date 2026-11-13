@@ -162,6 +162,8 @@ final class CombatFighter {
     int hitstopTotal;
     float pushRemaining;
     int pushFramesLeft;
+    /** O empurrão em curso desliza e freia pelo atrito do chão (CombatEngine.push), em vez de andar por igual. */
+    boolean pushAtrito;
     CombatFighter pushSource;
     int launcherChase;
     /** Frames left in which holding → after a wall bounce starts the run (see wallChaseFrames). */
