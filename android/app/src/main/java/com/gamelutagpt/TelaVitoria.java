@@ -60,15 +60,19 @@ final class TelaVitoria {
      * Em dupla, como no versus: o parceiro atrás, do lado de fora (à esquerda), menor e na
      * sombra, entrando logo depois; quem venceu vai um pouco para a direita.
      */
-    private static final float PARCEIRO_X = -10f, PARCEIRO_ESCALA = 0.92f, PARCEIRO_ATRASO_MS = 70f,
-        TITULAR_X = 230f;
-    /** Em dupla, o quadro da frase fica menor e mais à direita, para os dois aparecerem. */
-    private static final float QUADRO_DUPLA_X = 1068f, QUADRO_DUPLA_Y = 580f, QUADRO_DUPLA_ESCALA = 0.8f;
+    private static final float PARCEIRO_X = -20f, PARCEIRO_ESCALA = 0.96f, PARCEIRO_ATRASO_MS = 70f,
+        TITULAR_X = 340f, TITULAR_ESCALA = 0.96f;
+    /**
+     * Em dupla, o quadro da frase fica menor e no canto de baixo, e o título menor, preso na borda
+     * direita: os dois lutadores aparecem quase inteiros, lado a lado.
+     */
+    private static final float QUADRO_DUPLA_X = 1100f, QUADRO_DUPLA_Y = 600f, QUADRO_DUPLA_ESCALA = 0.72f,
+        TITULO_DUPLA_ESCALA = 0.8f;
     /** O parceiro na sombra: um pouco mais escuro, puxado para o azul da noite. */
     private static final ColorMatrixColorFilter SOMBRA = new ColorMatrixColorFilter(new ColorMatrix(new float[] {
-        0.84f, 0f, 0f, 0f, 0f,
-        0f, 0.84f, 0f, 0f, 0f,
-        0f, 0f, 0.9f, 0f, 0f,
+        0.93f, 0f, 0f, 0f, 0f,
+        0f, 0.93f, 0f, 0f, 0f,
+        0f, 0f, 0.96f, 0f, 0f,
         0f, 0f, 0f, 1f, 0f}));
     /** "VITÓRIA" bate (cai grande e assenta), pisca a tela e treme. */
     private static final float TITULO_MS = 340f, BATIDA_MS = 130f, CLARAO_MS = 120f, TREME_MS = 220f;
@@ -379,7 +383,14 @@ final class TelaVitoria {
         tinta.setShader(null);
         c.drawRect(0f, 0f, Arena.VW, Arena.VH, tinta);
         desenharRetrato(c, p, ms);
-        desenharTitulo(c, ms);
+        if (parceiro != null) {
+            c.save();
+            c.scale(TITULO_DUPLA_ESCALA, TITULO_DUPLA_ESCALA, Arena.VW, TITULO_Y);
+            desenharTitulo(c, ms);
+            c.restore();
+        } else {
+            desenharTitulo(c, ms);
+        }
         desenharQuadro(c, ms);
         if (ms >= TITULO_MS + BATIDA_MS && ms < TITULO_MS + BATIDA_MS + CLARAO_MS) {
             // Clarão quando o título assenta.
@@ -410,7 +421,7 @@ final class TelaVitoria {
         float k = clamp((ms - ENTRA_MS) / DESLIZA_MS);
         float dx = -DESLIZA_PX * (1f - k) * (1f - k) * (1f - k);
         float alfa = 255f * clamp(k * 2.5f);
-        float lado = 0f;
+        float lado = 0f, escala = 1f;
         if (parceiro != null) {
             // O parceiro primeiro (fica atrás), entrando um pouco depois.
             float kp = clamp((ms - ENTRA_MS - PARCEIRO_ATRASO_MS) / DESLIZA_MS);
@@ -422,12 +433,13 @@ final class TelaVitoria {
                 paint.setColorFilter(null);
             }
             lado = TITULAR_X;
+            escala = TITULAR_ESCALA;
         }
-        desenharQuadroDoVideo(c, p, mostrado, mostradoIndice, lado + dx, 1f, Math.round(alfa));
+        desenharQuadroDoVideo(c, p, mostrado, mostradoIndice, lado + dx, escala, Math.round(alfa));
         float entre = (ms - ENTRA_MS) / p.quadroMs - i;
         Bitmap proximo = mostradoIndice == i && i + 1 < p.imagens.length ? lidos.get(i + 1) : null;
         if (proximo != null && entre > 0f) {
-            desenharQuadroDoVideo(c, p, proximo, i + 1, lado + dx, 1f, Math.round(alfa * clamp(entre)));
+            desenharQuadroDoVideo(c, p, proximo, i + 1, lado + dx, escala, Math.round(alfa * clamp(entre)));
         }
     }
 
