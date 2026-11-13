@@ -1786,6 +1786,10 @@ final class CombatEngine {
         f.move = attack.kind == AttackDefinition.Kind.SUPER ? null : f.character().moveFor(attack.id);
         f.specialStrength = strength;
         f.autoStep = step;
+        // Golpe normal dado na corrida: o corpo não para na hora, leva o embalo e o atrito freia.
+        if (ATRITO_DO_PE && f.forwardDashing && f.grounded && attack.kind == AttackDefinition.Kind.NORMAL) {
+            f.embalo = f.facing * dashSpeed(f) * impulso(f);
+        }
         f.forwardDashing = false;
         f.backdashFrames = 0;
         if (f.move != null) f.crouching = attack.id.startsWith("2");
@@ -2446,10 +2450,39 @@ final class CombatEngine {
         return true;
     }
 
+    /** Quanto o lutador anda e corre mais rápido ou mais devagar agora (SHINKAI SPEED, exaustão). */
+    private float impulso(CombatFighter f) {
+        float boost = f.state.inShinkai(Shinkai.Type.SPEED) ? config.shinkaiSpeed : 1f;
+        if (f.state.exaustaoQuadros > 0) boost *= config.ryugaExaustoVelocidade;
+        return boost;
+    }
+
+    /**
+     * O embalo no chão: o corpo desliza na velocidade que tinha e o atrito do pé freia, o mesmo
+     * tanto por quadro para qualquer golpe (atrito cinético). Acaba ao sair do chão, ao apanhar,
+     * ao encostar no rival (não empurra ele pela arena) ou quando ele volta a dar passo.
+     */
+    private void deslizar(CombatFighter f, boolean daPasso) {
+        boolean segue = f.grounded && !f.ko() && !fighters[1 - f.index].ko() && f.vanishFrames == 0 && !daPasso &&
+            (f.attacking() || f.status == CombatFighter.Status.NEUTRAL);
+        if (!segue || f.embalo * f.facing > 0f && touchingAhead(f)) {
+            f.embalo = 0f;
+            return;
+        }
+        f.x += f.embalo * CombatConfig.DT;
+        float freio = config.atritoDoChao * config.gravity * CombatConfig.DT;
+        f.embalo = Math.abs(f.embalo) <= freio ? 0f : f.embalo - Math.signum(f.embalo) * freio;
+    }
+
     private void moveHorizontally(CombatFighter f) {
         // A passada só continua se ele andar neste quadro também.
         float passadaAntes = f.passada;
         f.passada = -1f;
+        if (f.embalo != 0f) {
+            // Dar passo de novo (andar, correr, recuar, preparar o pulo) crava o pé: o deslize acaba.
+            boolean livre = f.status == CombatFighter.Status.NEUTRAL && !f.locked;
+            deslizar(f, livre && (horizontal(f.input.direction) != 0 || f.backdashFrames > 0 || f.jumpSquat > 0));
+        }
         if (f.vanishFrames > 0) return;
         // The winner has already won: no stale held direction, dash or air
         // momentum may translate the victory animation around the arena.

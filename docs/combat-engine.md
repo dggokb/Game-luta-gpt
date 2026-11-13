@@ -1144,6 +1144,16 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
   (`SpriteMotion.passada`). `-Dgameluta.atrito=off` (PC: `-Patrito=off`) volta ao andar de
   velocidade fixa. Teste: `AtritoDoPeTest`. Fora do teste: corrida, backdash, pouso, golpes que
   andam e o resto do elenco.
+- **Impulso da corrida (pedido do dono em 13/11; teste, ainda não aprovado):** o golpe normal
+  dado na corrida (L, M, H e os agachados) não para mais na hora. O corpo leva a velocidade da
+  corrida (`CombatFighter.embalo`) e o atrito do pé no chão freia o mesmo tanto por quadro, para
+  qualquer golpe: `CombatConfig.atritoDoChao` (0,8) × a gravidade (`CombatEngine.deslizar`). O
+  deslize acaba ao encostar no rival (não empurra ele pela arena), ao sair do chão, ao apanhar
+  ou quando ele volta a dar passo. Vale para todo o elenco (não depende de medida na arte).
+  Deslize até parar, sem rival na frente: Ryūga 151 px (corrida de 620 px/s), Yin-lu 199 px (713).
+  Alcance a mais no primeiro quadro que bate: Yin-lu L +45, M +66, H +85 px; Ryūga L +39, M +57,
+  H +86 px. As rotas de combo com corrida (C120) passaram sem mudar; a CPU não conta com esse
+  alcance a mais (ataca pela régua do golpe parado). Especiais, Super e agarrão não levam o embalo.
 - O comando de especial ficou mais estrito (antes ~420 ms por passo e 550 ms para
   confirmar; agora 15 + 15 frames). Ajustável em `CombatConfig`.
 

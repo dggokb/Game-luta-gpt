@@ -68,4 +68,55 @@ public class AtritoDoPeTest {
         s.steps(5);
         assertEquals("parado não escorrega", x, s.f(0).x, 0f);
     }
+
+    /** Corre até o embalo valer e aperta o golpe; devolve o quanto andou do aperto até parar. */
+    private static float golpeNaCorrida(CharacterDefinition quem, boolean medio) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(quem, NPC, 300f, 1800f);
+        s.in[0].direction = FRENTE;
+        s.in[0].dash = true;
+        s.steps(12);
+        assertTrue("correndo", s.f(0).forwardDashing);
+        float x = s.f(0).x;
+        s.in[0].direction = 0;
+        if (medio) s.in[0].medium = true; else s.in[0].light = true;
+        s.step();
+        assertTrue("o golpe saiu", s.f(0).attacking());
+        s.until(() -> s.f(0).embalo == 0f && !s.f(0).attacking(), 90);
+        return s.f(0).x - x;
+    }
+
+    @Test public void oGolpeDadoNaCorridaLevaOEmbaloEOAtritoFreia() {
+        CombatConfig c = new CombatConfig();
+        for (CharacterDefinition quem : new CharacterDefinition[]{YINLU, GeneratedCharacters.get("player_base")}) {
+            // v² / (2 × atrito × gravidade): o quanto desliza até parar, igual para qualquer golpe.
+            float corrida = c.dashSpeed * quem.fighter.dashPermille / 1000f;
+            float desliza = corrida * corrida / (2f * c.atritoDoChao * c.gravity);
+            float leve = golpeNaCorrida(quem, false), medio = golpeNaCorrida(quem, true);
+            assertEquals(quem.id + " L", desliza, leve, 12f);
+            assertEquals(quem.id + " M: o mesmo deslize, sem número por golpe", leve, medio, 1f);
+        }
+    }
+
+    @Test public void oGolpeDadoParadoNaoDesliza() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(YINLU, NPC, 300f, 1800f);
+        s.in[0].medium = true;
+        s.step();
+        assertTrue(s.f(0).attacking());
+        s.until(() -> !s.f(0).attacking(), 60);
+        assertEquals(300f, s.f(0).x, 0.01f);
+    }
+
+    @Test public void oEmbaloParaAoEncostarNoRival() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(YINLU, NPC, 300f, 620f);
+        s.in[0].direction = FRENTE;
+        s.in[0].dash = true;
+        s.until(() -> s.f(1).x - s.f(0).x <= 200f, 60);
+        s.in[0].direction = 0;
+        s.in[0].light = true;
+        s.step();
+        float rival = s.f(1).x;
+        s.until(() -> s.f(0).embalo == 0f, 60);
+        assertTrue("não atravessa nem empurra o rival pela arena: " + (s.f(1).x - rival), s.f(1).x - rival < 60f);
+        assertTrue("fica na frente dele", s.f(0).x < s.f(1).x);
+    }
 }

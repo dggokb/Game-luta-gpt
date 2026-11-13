@@ -5514,7 +5514,8 @@ public class GameView extends SurfaceView
             // Na preparação do pulo ele agacha (o começo do clipe de agachar).
             f.crouchingBody() || guard == CombatFighter.GUARD_LOW || f.jumpSquat > 0,
             f.vy,
-            f.travel,
+            // Deslizando no embalo (golpe dado na corrida) ele não dá passo: a guarda, não o andar.
+            f.embalo != 0f ? 0f : f.travel,
             f.travel * f.facing > 0,
             f.forwardDashing,
             f.backdashFrames > 0,

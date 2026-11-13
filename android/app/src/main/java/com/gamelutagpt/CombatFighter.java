@@ -89,6 +89,11 @@ final class CombatFighter {
      */
     float passada = -1f;
     boolean passadaFrente;
+    /**
+     * Embalo no chão (px/s, no eixo do mundo): o corpo que vinha correndo e golpeou segue
+     * deslizando, e o atrito do pé no chão freia (CombatConfig.atritoDoChao). 0 parado.
+     */
+    float embalo;
     /** Entrada do DHC deslizando de dhcFromX a dhcToX (quadro atual e total; 0 = parado). */
     float dhcFromX, dhcToX;
     int dhcEnterFrame, dhcEnterFrames;
