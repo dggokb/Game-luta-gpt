@@ -51,10 +51,22 @@ def ler(p):
 
 
 def escalas_h3(cid):
-    t = ROOT / 'art/keys' / CHAVES.get(cid, cid) / 'tamanho.json'
+    """Escalas das imagens iniciais no tamanho do H3 (1344×768; com ou sem o sufixo _h3)."""
+    pasta = ROOT / 'art/keys' / CHAVES.get(cid, cid)
+    t = pasta / 'tamanho.json'
     if not t.exists():
         return set()
-    return {round(v, 4) for k, v in ler(t).get('chaves', {}).items() if k.endswith('_h3')}
+    from PIL import Image
+    out = set()
+    for k, v in ler(t).get('chaves', {}).items():
+        img = pasta / f'{k}.png'
+        if k.endswith('_h3') or (img.exists() and Image.open(img).size == (1344, 768)):
+            out.add(round(v, 4))
+    return out
+
+
+def e_h3(escala, h3):
+    return escala is not None and any(abs(escala - x) <= 0.002 for x in h3)
 
 
 def montagens(cid):
@@ -117,7 +129,7 @@ def arte(cid, nome, pack, clips_h3, monta, fora):
         trechos = ', '.join(sorted({t[0] for t in rec.get('trechos', [])}))
         origem = f'vídeo H3 `{trechos}` (montagem `{k}`)'
         nova = True
-    elif v.get('escala') is not None and round(v['escala'], 4) in clips_h3:
+    elif e_h3(v.get('escala'), clips_h3):
         origem = f"vídeo H3 `{v.get('arquivo', '?')}`"
         nova = True
     elif v:
@@ -158,7 +170,10 @@ def gerar(cid):
     if energia:
         en = energia.get('attack', {})
         s1 = cmd.get('S1', {})
-        tipo = 'corpo a corpo' if not energia.get('range') else f"projétil ({energia.get('range')} px)"
+        corpo = 'corpoACorpo' in mec.get('s1', {})
+        tipo = 'corpo a corpo' if corpo or not energia.get('range') else f"projétil ({energia.get('range')} px)"
+        if energia.get('noAr'):
+            tipo += ', só no ar' 
         linhas.append(f"| {s1.get('comando', 'S1')} + golpe | S1 {s1.get('nome') or energia.get('nome', '')} | {tempo(en)} "
                       f"| {energia.get('damage', en.get('damage', '?'))} | {tipo} |")
     for sid, m in sorted(pack.get('specialMoves', {}).items()):
@@ -169,7 +184,10 @@ def gerar(cid):
                       f"| {tempo(m)} | {m.get('damage', '?')} | {efeito(m)} |")
     sup = pack['fighter'].get('super')
     if sup:
-        linhas.append(f"| SUPER | Super | — | {sup.get('damage', '?')} | {sup.get('hits', 1)} acertos |")
+        golpes_super = sup.get('attack', {}).get('golpes')
+        acertos = len(golpes_super) if golpes_super else sup.get('hits', 1)
+        jeito = 'corpo a corpo' if golpes_super else 'projétil'
+        linhas.append(f"| SUPER | Super | — | {sup.get('damage', '?')} | {jeito}, {acertos} acerto{'s' if acertos != 1 else ''} |")
     if pack.get('specialAnimations', {}).get('ULTRA'):
         linhas.append('| ↓ + SUPER | Ultra | — | — | — |')
     linhas += ['', '### Arte', '', '✅ arte nova (vídeo H3) · ⬜ arte antiga, falta refazer · ⚠️ fora da regra da emenda no idle · — não usado', '',
