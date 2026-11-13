@@ -1,7 +1,7 @@
 {
   "id": "p02_special_s4",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_special_s4_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 S4 de 12/11: tr\u00eas v\u00eddeos H3 do dono montados (tools/sprites/montagens/p02.json), convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -96,89 +96,89 @@
       "index": 7,
       "outputBbox": [
         19,
-        59,
+        50,
         318,
         218
       ],
       "minimumMargin": 19,
-      "opaquePixels": 16209
+      "opaquePixels": 19249
     },
     {
       "index": 8,
       "outputBbox": [
-        109,
-        61,
-        215,
+        22,
+        44,
+        328,
         214
       ],
-      "minimumMargin": 61,
-      "opaquePixels": 7143
+      "minimumMargin": 22,
+      "opaquePixels": 14111
     },
     {
       "index": 9,
       "outputBbox": [
-        30,
-        68,
-        324,
+        15,
+        49,
+        332,
         212
       ],
-      "minimumMargin": 30,
-      "opaquePixels": 15020
+      "minimumMargin": 15,
+      "opaquePixels": 18743
     },
     {
       "index": 10,
       "outputBbox": [
-        123,
-        56,
-        235,
+        29,
+        43,
+        333,
         211
       ],
-      "minimumMargin": 56,
-      "opaquePixels": 8312
+      "minimumMargin": 29,
+      "opaquePixels": 14961
     },
     {
       "index": 11,
       "outputBbox": [
         20,
-        65,
+        47,
         307,
         210
       ],
       "minimumMargin": 20,
-      "opaquePixels": 15685
+      "opaquePixels": 19059
     },
     {
       "index": 12,
       "outputBbox": [
-        63,
-        59,
-        284,
+        18,
+        44,
+        328,
         213
       ],
-      "minimumMargin": 59,
-      "opaquePixels": 12398
+      "minimumMargin": 18,
+      "opaquePixels": 16559
     },
     {
       "index": 13,
       "outputBbox": [
-        69,
-        37,
-        204,
+        16,
+        26,
+        273,
         199
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 9330
+      "minimumMargin": 16,
+      "opaquePixels": 15412
     },
     {
       "index": 14,
       "outputBbox": [
+        24,
         34,
-        51,
-        311,
+        330,
         195
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 13747
+      "minimumMargin": 24,
+      "opaquePixels": 17330
     },
     {
       "index": 15,
@@ -238,65 +238,65 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 364,
+    "frameWidth": 369,
     "frameHeight": 310,
-    "rootX": 139,
+    "rootX": 144,
     "rootY": 292,
     "columns": 11,
     "frameCount": 20,
     "cropOffset": [
-      10,
+      5,
       6
     ],
-    "sheetWidth": 960,
-    "sheetHeight": 988,
+    "sheetWidth": 1120,
+    "sheetHeight": 1024,
     "frames": [
       [
         804,
         0,
         156,
         208,
-        61,
+        66,
         92
       ],
       [
-        716,
-        292,
+        0,
+        852,
         176,
         172,
-        59,
+        64,
         125
       ],
       [
-        312,
-        832,
+        460,
+        852,
         276,
         152,
-        56,
+        61,
         144
       ],
       [
-        0,
-        668,
+        180,
+        852,
         276,
         160,
-        86,
+        91,
         134
       ],
       [
-        592,
-        832,
+        740,
+        852,
         268,
         148,
-        87,
+        92,
         146
       ],
       [
-        160,
+        276,
         292,
         240,
         184,
-        96,
+        101,
         106
       ],
       [
@@ -304,79 +304,79 @@
         0,
         208,
         284,
-        84,
+        89,
         17
       ],
       [
-        0,
-        492,
+        328,
+        484,
         312,
-        172,
-        5,
-        47
+        180,
+        10,
+        38
       ],
       [
-        316,
-        492,
-        120,
-        168,
-        93,
-        48
+        520,
+        292,
+        320,
+        184,
+        11,
+        32
       ],
       [
         0,
-        832,
-        308,
-        156,
-        13,
-        56
-      ],
-      [
-        440,
-        492,
-        124,
-        168,
-        107,
-        44
-      ],
-      [
-        280,
-        668,
-        300,
-        160,
-        4,
-        53
-      ],
-      [
-        568,
-        492,
-        236,
-        168,
-        47,
-        47
-      ],
-      [
-        404,
-        292,
-        148,
+        672,
+        332,
         176,
-        53,
-        25
+        4,
+        37
       ],
       [
-        584,
-        668,
+        644,
+        484,
+        316,
+        180,
+        19,
+        31
+      ],
+      [
+        336,
+        672,
+        300,
+        176,
+        9,
+        35
+      ],
+      [
+        0,
+        484,
+        324,
+        184,
+        7,
+        32
+      ],
+      [
+        0,
         292,
-        160,
-        18,
-        38
+        272,
+        188,
+        5,
+        14
+      ],
+      [
+        640,
+        672,
+        320,
+        176,
+        12,
+        22
       ],
       [
         404,
         0,
         236,
         224,
-        59,
+        64,
         6
       ],
       [
@@ -384,23 +384,23 @@
         0,
         188,
         288,
-        44,
+        49,
         4
       ],
       [
+        964,
         0,
-        292,
         156,
         196,
-        68,
+        73,
         111
       ],
       [
-        556,
-        292,
+        964,
+        672,
         156,
         176,
-        66,
+        71,
         123
       ],
       [
@@ -408,24 +408,25 @@
         0,
         156,
         212,
-        62,
+        67,
         87
       ]
     ],
     "decodedBytes": {
       "canonical": 10813440,
-      "grid": 9929920,
-      "packed": 3793920
+      "grid": 10066320,
+      "packed": 4587520
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a4e9e9c9bbe7fc766a24b236df93cf41333bc1139970a78d39e68d72e350fa94",
-      "config": "2417a1f40b45444f2ebb9e6fb28faac6ef03e836f2f30bfa09ab774220794ebd",
+      "source": "a9bb32431cbd6fc47203b9ebfb034ecfaddd24ad115d530660125b549d015c11",
+      "config": "4f95907faca0e1a91796369644306e78a7106d3192b55d80d70315570e274fde",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_special_s4_video_normalized_smear.png": "1b5c60ebfe4aeeaa5be8616660240b9265023d919be807a23ebb0013d3c78df7",
       "art/sprites/source/p02_special_s4_video_normalized.png": "946d2356d7d74a0ee0aadabaec306d005e98c144702c532f5d2760e8c4096a21"
     }
   }

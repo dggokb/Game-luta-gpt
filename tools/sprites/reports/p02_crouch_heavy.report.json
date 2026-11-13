@@ -1,7 +1,7 @@
 {
   "id": "p02_crouch_heavy",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_crouch_heavy_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_crouch_heavy_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 de 13/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -68,7 +68,7 @@
         330
       ],
       "minimumMargin": 22,
-      "opaquePixels": 12619
+      "opaquePixels": 12817
     },
     {
       "index": 5,
@@ -79,7 +79,7 @@
         332
       ],
       "minimumMargin": 20,
-      "opaquePixels": 13202
+      "opaquePixels": 13438
     },
     {
       "index": 6,
@@ -326,11 +326,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a1a3a0689af544a70eef166efa25e70a05c40d9ccedcf3c313e5da53e6f3532a",
-      "config": "e6b0241d153e8a8d53789a53400e36fa18b97e0bbc235c47f1857866640e9937",
+      "source": "0b592ce6c4e18628ba053b53cc41f8e3c3b58c0a87e89bef2dd3ccf626d42159",
+      "config": "bd32d5a1a89d6948e06c2f44c25661ea973d73cfdff04bb3b47f6c1d65eb2a97",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_crouch_heavy_video_normalized_smear.png": "6d476b50d10f513b5723c8798930d34026ea9c664c8f8bb6ce082e83773f4134",
       "art/sprites/source/p02_crouch_heavy_video_normalized.png": "a51bce5f55048c84f752650a2c1d6789a36241e8bfc43844038e012081e5876e"
     }
   }

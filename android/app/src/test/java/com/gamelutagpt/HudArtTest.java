@@ -29,24 +29,31 @@ public class HudArtTest {
             (CharacterSelectRenderer)field(game,"characterSelectRenderer"),10.0);
         return bitmap;
     }
+    // Pontos da barra com raios na tela de 1280x720 (medidas da arte, ver HudRenderer.RAIOS_P1/P2).
+    private static final int ANEL_X=Math.round(704*HudRenderer.RAIOS_ESCALA),ANEL_Y=Math.round(HudRenderer.raiosTela(278));
+    private static final int CELULA_Y=Math.round(HudRenderer.raiosTela(233));
+    /** Centro do quadradinho {@code i} do Super (o do CPU começa em x=1084 da arte). */
+    private static int celula(boolean cpu,int i){return Math.round(((cpu?1084:594.5f)+i*29.9f)*HudRenderer.RAIOS_ESCALA);}
+
     @Test public void upperMeterTracksAssistCooldownIndependentlyFromSuper() throws Exception {
         GameView game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
         FighterState active=((FighterState[])field(game,"team"))[0];
         active.superMeter=0;
-        Bitmap ready=hud(game);int charged=ready.getPixel(350,103);
+        // Barra com raios: o assist é o anel ao lado do MENU; o Super, os quadradinhos do topo.
+        Bitmap ready=hud(game);int charged=ready.getPixel(ANEL_X,ANEL_Y);
         active.superMeter=5*CombatConfig.METER_PER_BAR;
         Bitmap superCharged=hud(game);
-        assertEquals("Super must not change the assist meter",charged,superCharged.getPixel(350,103));
+        assertEquals("Super must not change the assist meter",charged,superCharged.getPixel(ANEL_X,ANEL_Y));
         game.engine.team(0).assistCooldown=game.engine.config.assistCooldownFrames;
         Bitmap cooling=hud(game);
-        assertNotEquals("Assist cooldown must empty the upper meter",charged,cooling.getPixel(350,103));
-        assertEquals("Assist must not spend the lower Super meter",superCharged.getPixel(290,687),cooling.getPixel(290,687));
+        assertNotEquals("Assist cooldown must empty the upper meter",charged,cooling.getPixel(ANEL_X,ANEL_Y));
+        assertEquals("Assist must not spend the Super meter",superCharged.getPixel(celula(false,0),CELULA_Y),cooling.getPixel(celula(false,0),CELULA_Y));
         game.engine.team(0).assistCooldown=game.engine.config.assistCooldownFrames/2;
         HudRenderer.State state=(HudRenderer.State)field(game,"hudState");
         assertEquals(.5f,state.tagReadyRatio(),.001f);
         game.engine.team(0).assistCooldown=0;
         Bitmap restored=hud(game);
-        assertEquals("Upper meter refills when assist becomes ready",charged,restored.getPixel(350,103));
+        assertEquals("Upper meter refills when assist becomes ready",charged,restored.getPixel(ANEL_X,ANEL_Y));
         ready.recycle();superCharged.recycle();cooling.recycle();restored.recycle();
     }
     @Test public void superHasFiveRealLevelCellsOnBothSides() throws Exception {
@@ -57,15 +64,14 @@ public class HudArtTest {
         cpu.superMeter=CombatConfig.MAX_METER;
         Bitmap one=hud(game);
         for(int i=0;i<5;i++) {
-            int x=114+i*45;
-            int left=one.getPixel(x,687);
+            int left=one.getPixel(celula(false,i),CELULA_Y);
             assertEquals("One real bar fills only the first cell",i==0,Color.blue(left)>Color.red(left)+40);
-            int right=one.getPixel(1280-x,687);
-            assertTrue("CPU max fills all five mirrored cells",Color.red(right)>Color.blue(right)+40);
+            int right=one.getPixel(celula(true,i),CELULA_Y);
+            assertTrue("CPU max fills all five cells",Color.red(right)>Color.blue(right)+40);
         }
         active.superMeter=CombatConfig.MAX_METER;
         Bitmap max=hud(game);
-        for(int i=0;i<5;i++)assertTrue(Color.blue(max.getPixel(114+i*45,687))>180);
+        for(int i=0;i<5;i++)assertTrue(Color.blue(max.getPixel(celula(false,i),CELULA_Y))>180);
         one.recycle();max.recycle();
     }
 

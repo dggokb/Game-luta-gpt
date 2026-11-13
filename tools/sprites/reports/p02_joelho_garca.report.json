@@ -1,7 +1,7 @@
 {
   "id": "p02_joelho_garca",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_joelho_garca_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -51,24 +51,24 @@
     {
       "index": 3,
       "outputBbox": [
-        77,
+        43,
         39,
         184,
         268
       ],
       "minimumMargin": 20,
-      "opaquePixels": 12006
+      "opaquePixels": 13337
     },
     {
       "index": 4,
       "outputBbox": [
-        79,
+        63,
         40,
         182,
         269
       ],
       "minimumMargin": 19,
-      "opaquePixels": 11862
+      "opaquePixels": 13433
     },
     {
       "index": 5,
@@ -215,11 +215,11 @@
       5,
       29
     ],
-    "sheetWidth": 1332,
+    "sheetWidth": 1372,
     "sheetHeight": 484,
     "frames": [
       [
-        1040,
+        1216,
         248,
         156,
         212,
@@ -227,7 +227,7 @@
         37
       ],
       [
-        720,
+        896,
         248,
         160,
         224,
@@ -235,7 +235,7 @@
         21
       ],
       [
-        472,
+        520,
         0,
         116,
         240,
@@ -245,21 +245,21 @@
       [
         0,
         0,
-        120,
+        152,
         244,
-        66,
+        34,
         4
       ],
       [
-        124,
+        156,
         0,
-        116,
+        132,
         244,
-        68,
+        54,
         5
       ],
       [
-        244,
+        292,
         0,
         112,
         244,
@@ -267,7 +267,7 @@
         5
       ],
       [
-        360,
+        408,
         0,
         108,
         244,
@@ -275,15 +275,15 @@
         5
       ],
       [
-        1160,
         0,
+        248,
         172,
         236,
         78,
         7
       ],
       [
-        592,
+        640,
         0,
         208,
         240,
@@ -291,7 +291,7 @@
         8
       ],
       [
-        0,
+        176,
         248,
         208,
         236,
@@ -299,7 +299,7 @@
         10
       ],
       [
-        212,
+        388,
         248,
         208,
         236,
@@ -307,7 +307,7 @@
         10
       ],
       [
-        804,
+        852,
         0,
         128,
         240,
@@ -315,7 +315,7 @@
         7
       ],
       [
-        936,
+        984,
         0,
         108,
         240,
@@ -323,7 +323,7 @@
         5
       ],
       [
-        1048,
+        1096,
         0,
         108,
         240,
@@ -331,7 +331,7 @@
         5
       ],
       [
-        424,
+        600,
         248,
         132,
         236,
@@ -339,7 +339,7 @@
         8
       ],
       [
-        560,
+        736,
         248,
         156,
         228,
@@ -347,7 +347,7 @@
         21
       ],
       [
-        884,
+        1060,
         248,
         152,
         216,
@@ -358,17 +358,18 @@
     "decodedBytes": {
       "canonical": 7299072,
       "grid": 6142752,
-      "packed": 2578752
+      "packed": 2656192
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "aba4c9408cc212599e63b602c495e6688f78c96f33117d8a1b6be91305b8bc94",
-      "config": "f343366adad11a9f4e398cc03388fd7974f80794e9143302bf2b0d9b697616dd",
+      "source": "331b4ebc9b1de0fae747c90d0f9764a693fbad55f93208df3ada26de0dd44f42",
+      "config": "6a4881f70b783013435fa25b1ed28a9a596975352d1638faaf35f2fb90dba998",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_joelho_garca_video_normalized_smear.png": "70b17b277b5a8609352471004143446883a9dc7dfde4d92b685ff0d056622710",
       "art/sprites/source/p02_joelho_garca_video_normalized.png": "be56a92b9b4671250be29772771101f75d9fe088d6b83d935ff8352befc2d6aa"
     }
   }

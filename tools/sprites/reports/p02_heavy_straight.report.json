@@ -1,7 +1,7 @@
 {
   "id": "p02_heavy_straight",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_heavy_straight_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_heavy_straight_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -90,7 +90,7 @@
         297
       ],
       "minimumMargin": 23,
-      "opaquePixels": 14925
+      "opaquePixels": 15099
     },
     {
       "index": 7,
@@ -101,7 +101,7 @@
         298
       ],
       "minimumMargin": 22,
-      "opaquePixels": 15075
+      "opaquePixels": 15261
     },
     {
       "index": 8,
@@ -364,11 +364,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d9d1b4fe6353dfcce10c9ecb718be98db880a7847582697175b3fd15aee2e158",
-      "config": "188c0da5c033d66cf3fd6cb796b383d72ba39295fb71960b5ddd0a90fae30f1a",
+      "source": "8412fd21e31e851ffcc392a95a524eebb7dd98fe0d5d06e47d2f3bfb59159761",
+      "config": "03b322c93722924b9c8e2a1b22f852da66e3ae377ec8aa1c214c9a8af4df7df6",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_heavy_straight_video_normalized_smear.png": "75ea27791e87f93de59bfc12c0991e83a12afcde3fbe38e61c3407e1882f7cf8",
       "art/sprites/source/p02_heavy_straight_video_normalized.png": "5ea6a7f12b5a886c62d36f51543de5084b2b903cb27fe1cdf87be5f268f881a5"
     }
   }

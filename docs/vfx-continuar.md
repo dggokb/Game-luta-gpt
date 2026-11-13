@@ -153,6 +153,25 @@ para a fonte `_smear.png`, `smear.py --opacidade 1,0.5`, e o `sr_hd.py` de novo 
 `realesr-animevideov3.pth` conferidos pelo SHA-256; `pip install torch scipy`, CPU, 31 s). O
 `smear.py` para com aviso quando o clipe está na versão com nitidez: refazer pede essa sequência.
 
+## Smear e nitidez HD na Yin-lu (p02, 13/11, pedido do dono: "aplica os rastros na yinlu e o hd")
+
+Em cima da arte nova dela (vídeos do Drive convertidos por outra sessão, que já tinha passado o
+`sr_hd.py`). Smear em M, H, 2M, 2H, jM, jH, ↓ + jH, → + M, → + H, S1 e S4, com o segundo desenho a
+50%; depois o `sr_hd.py` de novo nesses 11. Detalhes e escolhas em
+[personagens/p02.md](personagens/p02.md). Duas lições:
+
+- `--limpar todos` apaga o tênis em folha 1x (o tornozelo fino some na abertura de 5 px). Conferir os
+  pés na prévia; sem efeito do vídeo sobrando, não usar.
+- O `caixas_sprites.py` mede no `source` do clipe: rodado com o smear lá, as línguas opacas entram
+  na caixa do golpe. Medir com a fonte sem smear (`smear.fonte`).
+
+**S4: o arco do giro.** Golpe que gira as pernas em volta do corpo pede outro smear: `smear.py
+--giro 7-14` mede os pés no próprio desenho (sem o caminho do golpe) e põe a lua crescente do ar,
+branca para cinza, na elipse dos pés, côncava para o corpo, metade atrás e metade na frente, a
+força alternando 100%/50%. Gravado no jogo com o arco intercalado e em todos; ficou em todos.
+
+Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
@@ -765,7 +784,8 @@ mandar os mapas; avisado por outra sessão). Foi o que houve no mesmo dia com `p
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
-custo); só Ryūga e Kōga têm mapa (88 folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
+custo); têm mapa Ryūga, Kōga e, desde 13/11, a Yin-lu (p02, 44 folhas: "aplica normal map na p02
+que está com nova animação"; 785 quadros em 10 min, 1,3 MB, 8,2% das folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 

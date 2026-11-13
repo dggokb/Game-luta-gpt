@@ -2,7 +2,7 @@
   "id": "p02_jump_medium",
   "javaName": "P02_JUMP_MEDIUM",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_jump_medium_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_jump_medium_video_normalized_smear_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_jump_medium.webp",
   "report": "tools/sprites/reports/p02_jump_medium.report.json",
   "preview": "android/app/build/sprite-review/p02_jump_medium-import.png",
@@ -30,6 +30,24 @@
   "rootX": 135,
   "rootY": 195,
   "sourceReferences": [
+    "art/sprites/source/p02_jump_medium_video_normalized_smear.png",
     "art/sprites/source/p02_jump_medium_video_normalized.png"
-  ]
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p02_jump_medium_video_normalized.png",
+    "quadros": [
+      4,
+      5
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }

@@ -1,7 +1,7 @@
 {
   "id": "p02_crouch_medium",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_crouch_medium_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_crouch_medium_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 de 13/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -95,24 +95,24 @@
     {
       "index": 7,
       "outputBbox": [
-        155,
+        14,
         65,
         388,
         189
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 12119
+      "minimumMargin": 14,
+      "opaquePixels": 14736
     },
     {
       "index": 8,
       "outputBbox": [
-        155,
+        89,
         66,
         383,
         189
       ],
       "minimumMargin": 33,
-      "opaquePixels": 12019
+      "opaquePixels": 14215
     },
     {
       "index": 9,
@@ -172,17 +172,17 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 380,
+    "frameWidth": 392,
     "frameHeight": 185,
-    "rootX": 165,
+    "rootX": 177,
     "rootY": 157,
     "columns": 11,
     "frameCount": 14,
     "cropOffset": [
-      18,
+      6,
       33
     ],
-    "sheetWidth": 992,
+    "sheetWidth": 1056,
     "sheetHeight": 444,
     "frames": [
       [
@@ -190,7 +190,7 @@
         160,
         156,
         144,
-        85,
+        97,
         27
       ],
       [
@@ -198,7 +198,7 @@
         0,
         176,
         148,
-        82,
+        94,
         16
       ],
       [
@@ -206,7 +206,7 @@
         0,
         192,
         156,
-        79,
+        91,
         8
       ],
       [
@@ -214,7 +214,7 @@
         0,
         192,
         148,
-        48,
+        60,
         15
       ],
       [
@@ -222,7 +222,7 @@
         160,
         220,
         140,
-        11,
+        23,
         20
       ],
       [
@@ -230,7 +230,7 @@
         160,
         228,
         144,
-        4,
+        16,
         24
       ],
       [
@@ -238,23 +238,23 @@
         0,
         228,
         156,
-        31,
+        43,
         28
       ],
       [
         0,
         308,
-        248,
+        384,
         136,
-        131,
+        4,
         26
       ],
       [
-        252,
+        388,
         308,
-        240,
+        304,
         136,
-        131,
+        79,
         26
       ],
       [
@@ -262,23 +262,23 @@
         160,
         200,
         140,
-        123,
+        135,
         23
       ],
       [
-        496,
+        696,
         308,
         180,
         132,
-        79,
+        91,
         30
       ],
       [
-        680,
+        880,
         308,
         176,
         132,
-        75,
+        87,
         29
       ],
       [
@@ -286,7 +286,7 @@
         160,
         172,
         144,
-        78,
+        90,
         19
       ],
       [
@@ -294,24 +294,25 @@
         0,
         164,
         156,
-        81,
+        93,
         4
       ]
     ],
     "decodedBytes": {
       "canonical": 8200192,
-      "grid": 6186400,
-      "packed": 1761792
+      "grid": 6381760,
+      "packed": 1875456
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "123e284b47c41bd1b3e68d51934e4206e088d8f6084c7157915c2db64044ad9d",
-      "config": "298cb82895f302b881661c5bd00febc8351d47fa64fcc7cc9a228f2ef88b73b4",
+      "source": "d31d37dd5f96427be488f67619cf335fbf99a7df4329f29ec714f9a36a27ea43",
+      "config": "5da604a9bcb03e96918f706e63b44ae756a87dae19b2aafd29b9b28662644de8",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_crouch_medium_video_normalized_smear.png": "75c860008dfa5daaffdb042352edd342b4b165d00f987367099a5680703119eb",
       "art/sprites/source/p02_crouch_medium_video_normalized.png": "0f2f061a74ec3b88849653fa14f5e15dfd536136e16f1c6f29674614134ff975"
     }
   }
