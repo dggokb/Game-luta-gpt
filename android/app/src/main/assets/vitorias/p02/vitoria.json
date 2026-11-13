@@ -1,0 +1,20 @@
+{
+ "imagem": "p02.png",
+ "alturaTela": 1.25,
+ "quadroMs": 3600.0,
+ "segurarMs": 0,
+ "frases": [
+  "Respire. A luta já acabou.",
+  "Força sem calma é só barulho.",
+  "Obrigada pela luta. Volte quando estiver pronto."
+ ],
+ "quadros": [
+  {
+   "imagem": "q000.webp",
+   "x": 0.0,
+   "y": -706.0,
+   "largura": 575.5,
+   "altura": 900.0
+  }
+ ]
+}

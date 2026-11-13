@@ -17,7 +17,7 @@ import org.robolectric.RuntimeEnvironment;
 public class TelaVitoriaTest {
     private static TelaVitoria tela() {
         TelaVitoria t = new TelaVitoria(RuntimeEnvironment.getApplication().getAssets());
-        t.manter("cenario_sem_fundo", "player_base", "p03");
+        t.manter("cenario_sem_fundo", "player_base", "p03", "koga_8");
         return t;
     }
 
@@ -36,9 +36,19 @@ public class TelaVitoriaTest {
     @Test public void soQuemTemACenaTemATela() {
         TelaVitoria t = tela();
         assertTrue(t.tem("player_base"));
-        assertFalse(t.tem("p03"));
-        t.comecar("p03", 0xFF000000, "KŌGA", s -> s);
+        assertTrue(t.tem("p03"));
+        assertFalse(t.tem("koga_8"));
+        t.comecar("koga_8", 0xFF000000, "KŌGA", s -> s);
         assertFalse(t.ativa());
+    }
+
+    @Test public void imagemParadaFicaNaTelaEAcaba() {
+        TelaVitoria t = tela();
+        t.comecar("p03", 0xFFC62F2F, "KŌGA", s -> s);
+        assertTrue(t.ativa());
+        int passos = tocarAteOFim(t, -1);
+        // 80 ms de entrada + 3,6 s parada + 280 ms de saída, a 60 Hz.
+        assertTrue("passos " + passos, passos > 220 && passos < 260);
     }
 
     @Test public void tocaOVideoInteiroEAcaba() {
