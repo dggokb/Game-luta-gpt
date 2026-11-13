@@ -777,6 +777,8 @@ final class CombatEngine {
                 f.backdashArmed = false;
                 f.forwardDashing = false;
             } else if ((f.dashRequest || wallChaseRun(f)) && f.backdashFrames == 0) {
+                // A corrida da perseguição da parede (segurar →) não abre o golpe de corrida.
+                f.chaseRunning = !f.dashRequest;
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
                 f.wallChase = 0;
@@ -4977,8 +4979,10 @@ final class CombatEngine {
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.bounceFromArc = false;
         d.spinning = false;
-        // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
-        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce) &&
+        // The wall bounce is a combo tool: a lone hit in neutral is a plain hit. O golpe de corrida
+        // que joga na parede (a Ombrada do Ryūga, 13/11) joga mesmo sozinho: correu, acertou, combo.
+        boolean runBounce = attack.id.equals(CancelSystem.RUN_HEAVY);
+        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce || runBounce) &&
             session.wallBounces < config.maxWallBounces;
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;

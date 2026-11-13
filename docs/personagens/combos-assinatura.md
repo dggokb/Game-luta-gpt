@@ -135,6 +135,21 @@ O dono: "faz e descobrimos". Tudo entrou, conferido no motor (`ComboYinluTest`) 
 | Y4 | Sobe duas vezes | L, L, M, M, → + H → super pulo → jL, jM, jM, ↓jH → 2H → super pulo → jL, jM, jM → pulo → jL, jM, jH | 17 |
 | Y5 | Assist | (Ryūga em campo) L, M, M → TAG (o chute dela lança) → super pulo → jL, jM → pulo → jL, jM, ↓jH | 9 |
 
+### Golpe de corrida (13/11): corre + H
+
+Um vídeo por personagem (`dash_golpe` do dono, H3, início na pose da corrida e fim na guarda),
+montado em `montagens/<id>.json` com o trecho fixo (quem anda é o motor) e o golpe "DH" no
+`mecanicas.json` (`golpeCorrida`, avanço em `unica.golpes.DH`). Sai da corrida sem parar; quem não
+tem o golpe dá o H. Teste: `GolpeDeCorridaTest`.
+
+| Quem | Golpe | O que faz | Combo conferido | Acertos |
+|---|---|---|---|---|
+| Ryūga | **Ombrada** | 850 de dano, 12 quadros até o ombro; **joga na parede mesmo sozinha** (correu, acertou, combo) | Ombrada → parede → corre → 2H → super pulo → jL, jM → pulo → jL, jM, ↓jH (ou → corre → Super: 6) | 7 |
+| Yin-lu | **Carrinho da garça** | baixo (defende agachado), dois acertos (o 2.º derruba), desliza ~200 px | Carrinho → corre → ↓ + M no caído → L, M, M, S4 | 11 |
+
+Os dois são arriscados na defesa (ficam uns 9 e 13 quadros em desvantagem), como golpe de corrida
+costuma ser: a Ombrada empurra para longe e o Carrinho é baixo.
+
 Regras da base que vieram com ela (valem para todos): todo golpe que lança deixa pelo menos 44
 quadros de atordoamento (`launchHitstunFrames`); golpe de várias pancadas só cancela em pulo depois
 da última; e o pulo logo depois de lançar, saindo do ar, é o super pulo que persegue.

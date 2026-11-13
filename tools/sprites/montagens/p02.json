@@ -534,5 +534,26 @@
         "impacto": 6
       }
     }
+  },
+  "carrinho_garca": {
+    "_doc": "Golpe de corrida (13/11, corre + H): Carrinho da garça, do vídeo dash_golpe do dono (H3, 124 quadros, início na corrida e fim na guarda). Da corrida (2-6) senta no chão (8-16), estica a perna rente ao chão (18-26, segura 32-58), recolhe e levanta (64-80) e volta à guarda (84-90). Quem desliza é o motor (avanço do golpe): o trecho é fixo; a poeira do vídeo sai.",
+    "trechos": [
+      [
+        "golpe_corrida",
+        0,
+        124,
+        "fixo"
+      ]
+    ],
+    "quadros": "2,4,6,8,12,16,18,20,22,26,32,44,58,64,68,70,72,74,76,80,84,90",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "CARRINHO_GARCA": {
+        "impacto": 7
+      }
+    }
   }
 }

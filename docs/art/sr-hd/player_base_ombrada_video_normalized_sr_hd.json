@@ -1,0 +1,22 @@
+{
+ "clipe": "player_base_ombrada",
+ "quadros": 21,
+ "colunas": 5,
+ "celula": [
+  704,
+  576
+ ],
+ "raiz": [
+  274,
+  540
+ ],
+ "pixelScale": 2.0,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/player_base_ombrada_video_normalized.png",
+ "fonte_sha256": "7477a9b42f16a7fb41c13a7d2c738c8f2971120e50c002f514d83ba6f5fb636e",
+ "saida": "art/sprites/source/player_base_ombrada_video_normalized_sr_hd.png",
+ "saida_sha256": "1a4d344413dcbd0511bd722124fdc4962bb8428ace593655322d18b8501bb63b",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

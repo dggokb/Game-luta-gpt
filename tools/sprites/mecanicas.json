@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais. golpeComando: o → + H do personagem (6H) inteiro, no formato do character.json (a animação é a do H até chegar a própria); o avanço dele vai em unica.golpes.6H.",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais. golpeComando: o → + H do personagem (6H) inteiro, no formato do character.json (a animação é a do H até chegar a própria); o avanço dele vai em unica.golpes.6H. golpeCorrida: o mesmo para o golpe de corrida (H apertado correndo, DH); o avanço em unica.golpes.DH.",
   "base": {
     "frames": {
       "L": [
@@ -368,6 +368,15 @@
                 9
               ]
             }
+          },
+          "DH": {
+            "avanco": {
+              "velocidade": 640,
+              "frames": [
+                1,
+                14
+              ]
+            }
           }
         }
       },
@@ -433,6 +442,38 @@
           9,
           16
         ]
+      },
+      "golpeCorrida": {
+        "animation": "OMBRADA",
+        "nome": "Ombrada",
+        "damage": 850,
+        "reach": 169,
+        "startupFrames": 12,
+        "activeFrames": 4,
+        "recoveryFrames": 22,
+        "hitstunFrames": 28,
+        "blockstunFrames": 16,
+        "hitstopFrames": 12,
+        "cancelWindows": {
+          "hit": [
+            12,
+            24
+          ],
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [
+          "S",
+          "SUPER",
+          "S2",
+          "S3"
+        ],
+        "launchType": "wallBounce",
+        "pushbackOnHit": 44,
+        "pushbackOnBlock": 60,
+        "hitHeight": 132,
+        "hitFloor": 81,
+        "maxUsesPerChain": 1
       },
       "andar": [
         280,
@@ -550,6 +591,15 @@
                 8
               ]
             }
+          },
+          "DH": {
+            "avanco": {
+              "velocidade": 780,
+              "frames": [
+                2,
+                18
+              ]
+            }
           }
         },
         "lutador": {
@@ -627,6 +677,36 @@
           8,
           15
         ]
+      },
+      "golpeCorrida": {
+        "animation": "CARRINHO_GARCA",
+        "nome": "Carrinho da garça",
+        "damage": 700,
+        "reach": 131,
+        "low": true,
+        "startupFrames": 10,
+        "activeFrames": 8,
+        "recoveryFrames": 22,
+        "hitstunFrames": 30,
+        "blockstunFrames": 12,
+        "hitstopFrames": 9,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "launchType": "knockdown",
+        "knockback": 30,
+        "pushbackOnHit": 0,
+        "pushbackOnBlock": 50,
+        "hitHeight": 28,
+        "hitFloor": 3,
+        "golpes": [
+          10,
+          15
+        ],
+        "maxUsesPerChain": 1
       },
       "andar": [
         310,

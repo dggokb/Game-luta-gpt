@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_carrinho_garca",
+ "quadros": 22,
+ "colunas": 11,
+ "celula": [
+  320,
+  288
+ ],
+ "raiz": [
+  171,
+  263
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_carrinho_garca_video_normalized.png",
+ "fonte_sha256": "43fcd1ec0490dd7e01a56379308d379e1abb32a6c98adb40bb424f67dd5dea5c",
+ "saida": "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png",
+ "saida_sha256": "c75ca93f84711b009a879c51a4ca76f1b7ae8aebc71b2e2a6cb2e43c6be15ef1",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

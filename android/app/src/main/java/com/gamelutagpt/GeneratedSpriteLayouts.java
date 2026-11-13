@@ -202,6 +202,12 @@ final class GeneratedSpriteLayouts {
     static final int P02_BACKDASH_ROOT_Y = 257;
     static final int P02_BACKDASH_FRAME_COUNT = 13;
 
+    static final int P02_CARRINHO_GARCA_FRAME_WIDTH = 292;
+    static final int P02_CARRINHO_GARCA_FRAME_HEIGHT = 258;
+    static final int P02_CARRINHO_GARCA_ROOT_X = 158;
+    static final int P02_CARRINHO_GARCA_ROOT_Y = 237;
+    static final int P02_CARRINHO_GARCA_FRAME_COUNT = 22;
+
     static final int P02_CROUCH_FRAME_WIDTH = 164;
     static final int P02_CROUCH_FRAME_HEIGHT = 218;
     static final int P02_CROUCH_ROOT_X = 83;
@@ -3867,6 +3873,12 @@ final class GeneratedSpriteLayouts {
     static final int MEDIUM_KICK_ROOT_X = 177;
     static final int MEDIUM_KICK_ROOT_Y = 459;
     static final int MEDIUM_KICK_FRAME_COUNT = 18;
+
+    static final int PLAYER_BASE_OMBRADA_FRAME_WIDTH = 614;
+    static final int PLAYER_BASE_OMBRADA_FRAME_HEIGHT = 475;
+    static final int PLAYER_BASE_OMBRADA_ROOT_X = 229;
+    static final int PLAYER_BASE_OMBRADA_ROOT_Y = 461;
+    static final int PLAYER_BASE_OMBRADA_FRAME_COUNT = 21;
 
     static final int PLAYER_BASE_PLEXO_FRAME_WIDTH = 442;
     static final int PLAYER_BASE_PLEXO_FRAME_HEIGHT = 474;

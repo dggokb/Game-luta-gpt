@@ -63,8 +63,10 @@ AIR_DOWN_BINDINGS = ('j2L','j2M','j2H')
 OVERHEAD = '6M'
 # Golpe de comando (→ + H, 12/11): emenda no combo (as rotas da base o põem depois do L, do 2L e do M).
 COMMAND_HEAVY = '6H'
+# Golpe de corrida (13/11): o H apertado correndo (CancelSystem.RUN_HEAVY).
+RUN_HEAVY = 'DH'
 # Inputs que o pacote pode ter ou não.
-OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY)
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY, RUN_HEAVY)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')
