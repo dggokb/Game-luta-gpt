@@ -6530,6 +6530,11 @@ public class GameView extends SurfaceView
     private static final int IMPACT_VOID = 0xFF060608, IMPACT_VOID_LINES = 0xFFEBEBF0;
     private final Filtro inkSilhouette = Filtro.silhueta(0xFF08080A);
     private final Filtro whiteSilhouette = Filtro.silhueta(0xFFFAFAFC);
+    /** O lutador no impact frame em tinta de mangá ({@link Filtro#tinta}) em vez da silhueta branca: desligado até o dono aprovar (impact_frame_tinta.png). */
+    private static final boolean IMPACTO_TINTA = false;
+    private final Filtro tintaImpacto = Filtro.tinta(IMPACTO_TINTA_LIMIAR, IMPACTO_TINTA_GANHO, false);
+    static float IMPACTO_TINTA_LIMIAR = Float.parseFloat(System.getProperty("gameluta.tintaLimiar", "0.33"));
+    static float IMPACTO_TINTA_GANHO = Float.parseFloat(System.getProperty("gameluta.tintaGanho", "7"));
     private final Paint negativePaint = new Paint();
     {
         negativePaint.setColorFilter(new ColorMatrixColorFilter(new ColorMatrix(new float[] {
@@ -6738,8 +6743,9 @@ public class GameView extends SurfaceView
         for (int i = 0; i < 2; i++) {
             canvas.save();
             canvas.translate(offsets[i], 0f);
-            if (red) {
-                // Contorno: a silhueta branca deslocada em volta, a preta por cima.
+            if (red || IMPACTO_TINTA) {
+                // Contorno: a silhueta branca deslocada em volta, a preta (ou a tinta) por cima. Na
+                // tinta ele separa as partes escuras do desenho do fundo preto.
                 renderers[i].setOverride(whiteSilhouette);
                 for (int k = 0; k < 8; k++) {
                     double a = k * Math.PI / 4;
@@ -6749,7 +6755,8 @@ public class GameView extends SurfaceView
                     canvas.translate(-dx, -dy);
                 }
             }
-            renderers[i].setOverride(red ? inkSilhouette : whiteSilhouette);
+            // VOID: o desenho em tinta (traço e sombras pretos, o resto papel); RED: a silhueta preta.
+            renderers[i].setOverride(red ? inkSilhouette : IMPACTO_TINTA ? tintaImpacto : whiteSilhouette);
             drawFighter(canvas, renderers[i], fighters[i], false, false);
             renderers[i].setOverride(null);
             canvas.restore();

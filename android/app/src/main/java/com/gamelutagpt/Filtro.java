@@ -52,6 +52,25 @@ final class Filtro {
             0f, 0f, 0f, a, 0f});
     }
 
+    /**
+     * Tinta de mangá (o impact frame dos animes): o próprio desenho em preto e branco duro, pela
+     * claridade de cada ponto, para o traço e as sombras dele aparecerem (em vez da silhueta
+     * chapada). Claridade abaixo de {@code limiar} (0 a 1) vira tinta, acima vira papel; {@code
+     * ganho} é o quão dura é a passagem (8: uma faixa de 1/8 da escala). Uma matriz de cor só,
+     * igual no OpenGL, no Canvas e no PC; o alfa fica o do desenho. {@code invertido}: o claro vira
+     * tinta e o escuro, papel.
+     */
+    static Filtro tinta(float limiar, float ganho, boolean invertido) {
+        float k = invertido ? -ganho : ganho;
+        float soma = (0.5f - k * limiar) * 255f;
+        float r = 0.299f * k, g = 0.587f * k, b = 0.114f * k;
+        return matriz(new float[] {
+            r, g, b, 0f, soma,
+            r, g, b, 0f, soma,
+            r, g, b, 0f, soma,
+            0f, 0f, 0f, 1f, 0f});
+    }
+
     /** SRC_ATOP: a cor por cima do desenho, na força do alfa dela (clarões). */
     static Filtro porCima(int argb) {
         float a = (argb >>> 24) / 255f, k = 1f - a;
