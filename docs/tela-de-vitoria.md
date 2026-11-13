@@ -6,8 +6,9 @@ vitória dele:
 1. o fundo borrado cobre a luta (~0,2 s);
 2. quem venceu entra deslizando pela esquerda (arte da cabeça ao quadril) e vai chegando devagar
    para perto (5% até a saída). **Em dupla**, como no versus, o parceiro entra 70 ms depois, atrás,
-   do lado de fora (à esquerda), um pouco menor (92%) e na sombra leve, e quem venceu fica 230 px
-   mais à direita; o quadro da frase fica 20% menor e mais à direita;
+   do lado de fora (à esquerda), menor (86%) e na sombra; quem venceu fica 340 px à direita, para o
+   parceiro aparecer sem ser coberto (ele só precisa aparecer, não ser destaque). O "VITÓRIA"
+   fica 20% menor, preso na borda direita, e o quadro da frase 28% menor, no canto de baixo;
 3. **"VITÓRIA"** bate à direita, numa faixa de tinta com o traço na cor dele (clarão e tremida ao assentar);
 4. um **quadro de mangá** entra com uma frase dele e a etiqueta com o nome;
 5. a arte fica 3,6 s e a tela escurece até o preto (~4 s no total).
