@@ -29,6 +29,7 @@ import com.gamelutagpt.historia.NivelCpu;
 import com.gamelutagpt.historia.PaginaHistoria;
 import com.gamelutagpt.historia.ProgressoHistoria;
 import com.gamelutagpt.historia.Torneio;
+import com.gamelutagpt.historia.AnimacaoManual;
 import com.gamelutagpt.historia.CinematicaLuta;
 import com.gamelutagpt.historia.ConversaLuta;
 import com.gamelutagpt.historia.Temporada;
@@ -6092,9 +6093,70 @@ public class GameView extends SurfaceView
         lutadorNoGl = c instanceof CanvasGl;
         DesenhoGl gl = TesteDesempenho.luz == TesteDesempenho.LUZ_ON && lutadorNoGl ? DesenhoGl.noQuadro() : null;
         if (gl != null) gl.luzNova(luzDoLutador(f, drawingReflection));
-        drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
+        if (!desenharAnimado(c, renderer, f)) drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
         if (gl != null) gl.luzNova(null);
     }
+
+    /** O rastro da animação manual: as últimas poses de cada lado (x, altura, olhar, quadro, sx, sy, graus). */
+    private final float[][] animRastro = new float[2][ANIM_RASTRO * 7];
+    private final String[][] animRastroClip = new String[2][ANIM_RASTRO];
+    private final int[] animRastroN = new int[2];
+    private static final int ANIM_RASTRO = 8;
+
+    /** Põe os dois onde a animação manual manda (a câmera segue) e guarda o rastro. */
+    private void aplicarAnimacao() {
+        for (int lado = 0; lado < 2; lado++) {
+            AnimacaoManual.Pose p = cinematica.poseAnimada(lado);
+            if (p == null) continue;
+            CombatFighter f = engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT);
+            f.x = cinematica.xDaPose(p);
+            f.facing = cinematica.olharDaPose(lado);
+            float[] r = animRastro[lado];
+            System.arraycopy(r, 0, r, 7, r.length - 7);
+            System.arraycopy(animRastroClip[lado], 0, animRastroClip[lado], 1, ANIM_RASTRO - 1);
+            r[0] = f.x;
+            r[1] = p.altura;
+            r[2] = f.facing;
+            r[3] = p.quadro;
+            r[4] = p.sx;
+            r[5] = p.sy;
+            r[6] = p.graus;
+            animRastroClip[lado][0] = p.clip;
+            animRastroN[lado] = Math.min(ANIM_RASTRO, animRastroN[lado] + 1);
+        }
+    }
+
+    /**
+     * O lutador na pose da animação manual (no lugar do desenho normal), com o rastro: cópias
+     * esbranquiçadas e cada vez mais transparentes das poses de antes. Falso: não está animado.
+     */
+    private boolean desenharAnimado(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
+        int side = f == engine.fighter(PLAYER) ? PLAYER : f == engine.fighter(OPPONENT) ? OPPONENT : -1;
+        if (side < 0) return false;
+        int lado = side == PLAYER ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL;
+        AnimacaoManual.Pose p = cinematica.poseAnimada(lado);
+        if (p == null) {
+            animRastroN[lado] = 0;
+            return false;
+        }
+        float[] r = animRastro[lado];
+        int n = Math.min(p.rastro, animRastroN[lado] - 1);
+        for (int k = n; k >= 1; k--) {
+            int a = Math.max(0, 150 - k * 150 / (n + 1));
+            renderer.drawQuadroAnim(c, animRastroClip[lado][k], (int)r[k * 7 + 3], r[k * 7], GROUND_Y - r[k * 7 + 1],
+                (int)r[k * 7 + 2], r[k * 7 + 4], r[k * 7 + 5], r[k * 7 + 6], a, ANIM_RASTRO_COR);
+        }
+        renderer.drawQuadroAnim(c, p.clip, p.quadro, f.x, GROUND_Y - p.altura, f.facing, p.sx, p.sy, p.graus,
+            Math.round(255f * Math.max(0f, Math.min(1f, p.alfa))), null);
+        return true;
+    }
+
+    /** O rastro da animação manual: a cópia clareada e azulada, como o borrão do anime. */
+    private static final Filtro ANIM_RASTRO_COR = Filtro.matriz(new float[] {
+        0.5f, 0f, 0f, 0f, 120f,
+        0f, 0.5f, 0f, 0f, 125f,
+        0f, 0f, 0.5f, 0f, 140f,
+        0f, 0f, 0f, 1f, 0f});
 
     private final float[] luzNova = new float[GlRenderCanvas.LUZ_NOVA_N];
 
@@ -8317,6 +8379,22 @@ public class GameView extends SurfaceView
      * andam. Verdadeiro se este quadro não tem passo da luta.
      */
     private boolean cinematicaLenta() {
+        if (cinematica.animando()) {
+            // Animação manual: a luta parada, os dois na pose da cena; os efeitos, o tremor da
+            // tela e a câmera continuam (menos na congelada de um impacto).
+            boolean congelada = cinematica.congelada();
+            cinematica.update(FIXED_STEP);
+            conversa.update(FIXED_STEP);
+            if (!congelada) {
+                impacts.update(FIXED_STEP);
+                efeitos.passo();
+                feel.step();
+            }
+            aplicarAnimacao();
+            updateFightCamera(FIXED_STEP);
+            updateStoryFight();
+            return true;
+        }
         float velocidade = cinematica.velocidade();
         if (velocidade >= 1f) {
             cinematicaPassada = 0f;
@@ -8475,6 +8553,10 @@ public class GameView extends SurfaceView
 
         @Override public int quadrosDoGolpeDaTroca() {
             return cinematicaDirector.quadrosDoGolpe();
+        }
+
+        @Override public float xDoLutador(int lado) {
+            return engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).x;
         }
 
         @Override public void impacto(int forca, int lado) {

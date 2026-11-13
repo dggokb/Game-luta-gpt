@@ -123,6 +123,11 @@ public final class CinematicaLuta {
          */
         default void impacto(int forca, int lado) {}
 
+        /** Onde o lutador desse lado está agora (x do mundo), para a animação manual começar dali. */
+        default float xDoLutador(int lado) {
+            return lado == JOGADOR ? -150f : 150f;
+        }
+
         /** O golpe pedido para esse lado já pegou (o dano do roteiro entrou no alvo). */
         default boolean golpeEntrou(int lado) {
             return false;
@@ -216,7 +221,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -264,6 +269,8 @@ public final class CinematicaLuta {
         String lance;
         float lenta = 0.05f;
         int quadroDoGolpe = 5;
+        /** ANIMAR: a animação manual (os quadros-chave dos dois e os eventos). */
+        AnimacaoManual animacao;
         /** IMPACTO: a força (1 médio, 2 forte, 3 o mais forte, com impact frame). */
         int forca = 2;
         /** LINHAS: "concentracao" (de mangá, das bordas para o meio) ou "velocidade" (riscos de lado a lado). */
@@ -530,6 +537,12 @@ public final class CinematicaLuta {
     private final Transicao tranco = new Transicao(1f);
     /** Linhas de ação: as do roteiro ({@code linhas}) e as que o QTE liga sozinho enquanto pede. */
     private final Transicao linhas = new Transicao(0f);
+    /** A animação manual tocando: a ação, o quadro dela (fracionário), o próximo evento e o eixo. */
+    private Acao animando;
+    private float animQuadro;
+    private int animEvento;
+    private float animMeio, animSentido = 1f;
+    private final AnimacaoManual.Pose[] animPose = {new AnimacaoManual.Pose(), new AnimacaoManual.Pose()};
     private final Transicao linhasQte = new Transicao(0f);
     private String linhasEstilo = "concentracao";
     private static final int LINHAS_VELOCIDADE = 18, LINHAS_CONCENTRACAO = 56;
@@ -901,6 +914,24 @@ public final class CinematicaLuta {
                 a.escuro = numero(m, "escuro", 0.35f, 0f, 1f);
                 a.segundos = numero(m, "segundos", 0.12f, 0f, 3f);
                 break;
+            case "animar":
+                // Animação feita à mão: o motor de luta para e os dois seguem os quadros-chave.
+                a = new Acao(Acao.Tipo.ANIMAR);
+                int total = Math.round(numero(m, "quadros", -1f, 1f, 3600f));
+                if (total < 1) throw new IllegalArgumentException("animar sem \"quadros\"");
+                a.animacao = new AnimacaoManual(total, AnimacaoManual.chaves(Episodio.list(m, "jogador"), "jogador"),
+                    AnimacaoManual.chaves(Episodio.list(m, "rival"), "rival"));
+                for (Object o : Episodio.list(m, "eventos")) {
+                    Map<String, Object> em = Episodio.asMap(o);
+                    AnimacaoManual.Evento ev = new AnimacaoManual.Evento();
+                    ev.q = Math.round(numero(em, "q", 0f, 0f, 3600f));
+                    ev.acao = acao(temporada, Episodio.asMap(em.get("acao")));
+                    if (ev.acao.tipo == Acao.Tipo.QTE || ev.acao.tipo == Acao.Tipo.ANIMAR || ev.acao.tipo == Acao.Tipo.GOLPE) {
+                        throw new IllegalArgumentException("animar: evento " + ev.acao.tipo + " não pode ir dentro da animação");
+                    }
+                    a.animacao.eventos.add(ev);
+                }
+                break;
             case "impacto":
                 // Impacto de anime no contato: congela, tranco, estouro de ar, chão e close.
                 a = new Acao(Acao.Tipo.IMPACTO);
@@ -953,7 +984,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto, animar)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -1249,7 +1280,52 @@ public final class CinematicaLuta {
             trancoVolta = -1f;
         }
         atualizarCameraViva();
+        if (animando != null && estado == Estado.RODANDO && time >= congelaAte) animar(dt * 60f);
         if (estado == Estado.RODANDO) avancar();
+    }
+
+    /** Anda a animação manual {@code quadros} e solta os eventos que chegaram. */
+    private void animar(float quadros) {
+        AnimacaoManual an = animando.animacao;
+        animQuadro = Math.min(an.quadros, animQuadro + quadros);
+        while (animEvento < an.eventos.size() && an.eventos.get(animEvento).q <= animQuadro) {
+            executar(an.eventos.get(animEvento++).acao);
+            // Um impacto congela: a animação para ali até a luta voltar.
+            if (time < congelaAte) break;
+        }
+        AnimacaoManual.amostra(an.jogador, animQuadro, animPose[JOGADOR]);
+        AnimacaoManual.amostra(an.rival, animQuadro, animPose[RIVAL]);
+    }
+
+    /** Um impacto congelou a cena agora (a pausa do golpe). */
+    public boolean congelada() {
+        return estado == Estado.RODANDO && time < congelaAte;
+    }
+
+    /** Uma animação manual está tocando: o motor de luta fica parado e o jogo desenha as poses dela. */
+    public boolean animando() {
+        return animando != null && estado == Estado.RODANDO;
+    }
+
+    /**
+     * A pose desse lado ({@link #JOGADOR}, {@link #RIVAL}) na animação manual, ou null. O x já é
+     * do mundo; {@code vira} já diz para que lado olhar (true: para a direita da tela).
+     */
+    public AnimacaoManual.Pose poseAnimada(int lado) {
+        if (!animando()) return null;
+        return animPose[lado];
+    }
+
+    /** O x do mundo dessa pose (o eixo começa no meio entre os dois e vai do jogador para o rival). */
+    public float xDaPose(AnimacaoManual.Pose p) {
+        return animMeio + animSentido * p.x;
+    }
+
+    /** Para que lado da tela essa pose olha: +1 direita, -1 esquerda (para o outro, ou ao contrário com "vira"). */
+    public int olharDaPose(int lado) {
+        AnimacaoManual.Pose eu = animPose[lado], outro = animPose[1 - lado];
+        int olha = xDaPose(outro) >= xDaPose(eu) ? 1 : -1;
+        return eu.vira ? -olha : olha;
     }
 
     /** Executa as ações até uma que precise esperar. */
@@ -1325,6 +1401,15 @@ public final class CinematicaLuta {
                 qteTentativas = 0;
                 iniciarQte();
                 break;
+            case ANIMAR:
+                animando = a;
+                animQuadro = 0f;
+                animEvento = 0;
+                float xj = palco.xDoLutador(JOGADOR), xr = palco.xDoLutador(RIVAL);
+                animMeio = (xj + xr) * 0.5f;
+                animSentido = xr >= xj ? 1f : -1f;
+                animar(0f);
+                break;
             case IMPACTO:
                 impactar(a);
                 palco.impacto(a.forca, lado(a.quemMove));
@@ -1387,6 +1472,10 @@ public final class CinematicaLuta {
             case TINTA:
             case LINHAS:
                 return idade >= a.segundos;
+            case ANIMAR:
+                if (animQuadro < a.animacao.quadros) return false;
+                animando = null;
+                return true;
             case PAGINA:
                 // Lida quadro a quadro, no toque, como as páginas da história.
                 return !paginaNaTela || guiada.finished();
@@ -1731,6 +1820,7 @@ public final class CinematicaLuta {
         estado = Estado.ACABOU;
         acao = null;
         qte = null;
+        animando = null;
         video = null;
         videoProximo = null;
         // A tinta que ficou na tela sai sozinha.
@@ -1825,6 +1915,8 @@ public final class CinematicaLuta {
      */
     public float velocidade() {
         if (estado != Estado.RODANDO) return 1f;
+        // Na animação manual a luta fica parada (quem anda é a animação).
+        if (animando != null) return 0f;
         // O impacto de um golpe congela a luta um instante.
         return time < congelaAte ? 0f : velocidade.valor();
     }

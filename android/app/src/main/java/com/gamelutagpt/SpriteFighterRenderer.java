@@ -363,6 +363,29 @@ final class SpriteFighterRenderer {
         canvas.restore();
         character=antes;
     }
+    /**
+     * Um quadro de um clipe numa pose da animação manual das cenas: olhando para {@code facing},
+     * esticado ({@code sx}, {@code sy}, presos nos pés), girado {@code graus} em volta do meio do
+     * corpo e com {@code alpha} (o rastro), com o {@code filtro} de cor (null, o normal).
+     */
+    void drawQuadroAnim(Canvas canvas,String clip,int frame,float x,float baseY,int facing,
+                        float sx,float sy,float graus,int alpha,Filtro filtro) {
+        CharacterDefinition.Animation anim=character.animations.get(clip);
+        if(anim==null||anim.atlas==null||!atlases.pronta(anim.atlas.resource))return;
+        int n=anim.frameCount();
+        if(n<=0)return;
+        frame=((frame%n)+n)%n;
+        usarFiltro(filtro);
+        canvas.save();
+        if(graus!=0f)canvas.rotate(graus*facing,x,baseY-90f);
+        canvas.scale(sx,sy,x,baseY);
+        if(facing*character.artFacing<0) canvas.scale(-1f,1f,x,0f);
+        drawClip(canvas,clip,frame,x,baseY,alpha);
+        spritePaint.setAlpha(255);
+        canvas.restore();
+        usarFiltro(null);
+    }
+
     /** Sombra roxa e translúcida do próprio lutador (o eco de sombra da p06). */
     static Filtro shadowEcho() {
         return Filtro.matriz(new float[]{
