@@ -47,6 +47,9 @@ COMPRIMENTO = (1.0, 1.0)  # padrão de --comprimento (meio, bordas): fração do
 LARGURA_MEMBRO = 0.42  # meia largura do membro em volta da reta junta -> ponta, fração dela
 PONTA_LIVRE = 0.18    # o trecho da ponta (o pé, o punho) que não estica, fração do membro
 LINGUA_MIN, LINGUA_MAX = 7, 18   # largura de cada língua (px da folha)
+# --linguas MIN,MAX troca: línguas mais largas = menos riscos no membro (o giro do Ryūga ficava
+# "muito riscado", 13/11).
+LARGURA_LINGUA = [LINGUA_MIN, LINGUA_MAX]
 MARGEM = 12           # px da borda do quadro que as línguas não passam (o build exige 8)
 ESCURO = 90            # --sem-escuro: pixel com o canal mais claro abaixo disto não vira língua
 RETO = 0.7            # cosseno entre o movimento da ponta e o membro acima do qual o golpe é reto
@@ -68,7 +71,7 @@ def linguas(n, rng):
     comp = np.zeros(n, np.float32)
     i = 0
     while i < n:
-        w = int(rng.integers(LINGUA_MIN, LINGUA_MAX + 1))
+        w = int(rng.integers(LARGURA_LINGUA[0], LARGURA_LINGUA[1] + 1))
         topo = float(rng.uniform(0.45, 1.0))
         s = np.arange(w, dtype=np.float32)
         perfil = 1.0 - np.abs((s - (w - 1) / 2) / max(1.0, w / 2)) ** 1.3
@@ -317,6 +320,8 @@ def main():
     p.add_argument('golpe')
     p.add_argument('--quadros', help='desenhos a esticar (ex.: 4,5); sem isto, o de maior salto e o anterior')
     p.add_argument('--semente', type=int, default=11)
+    p.add_argument('--linguas', help='largura das línguas em px da folha, "MIN,MAX" (padrão 7,18): '
+                   'mais largas = menos riscos')
     p.add_argument('--comprimento', default=','.join(map(str, COMPRIMENTO)),
                    help='o quanto estica, "meio,bordas" do feixe (ou um número para os dois): '
                         '1 = até onde o membro estava no desenho anterior')
@@ -337,6 +342,8 @@ def main():
     p.add_argument('--previa', help='só grava uma prévia dos quadros (não mexe no clip)')
     p.add_argument('--desfazer', action='store_true', help='volta o clip para a fonte original')
     a = p.parse_args()
+    if a.linguas:
+        LARGURA_LINGUA[:] = [int(x) for x in a.linguas.split(',')]
     v_ = [float(x) for x in str(a.comprimento).split(',')]
     a.comprimento = (v_[0], v_[-1])
     anim, clip_path, clip, rep, lado = ler(a.personagem, a.golpe)
@@ -494,6 +501,8 @@ def gravar(a, clip, clip_path, folha, original, quadros, opac):
         clip['smear']['semEscuro'] = True
     if a.clarear:
         clip['smear']['clarear'] = a.clarear
+    if a.linguas:
+        clip['smear']['linguas'] = a.linguas
     clip['smear']['opacidade'] = opac
     if a.giro:
         clip['smear']['giro'] = a.giro
