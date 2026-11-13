@@ -65,6 +65,16 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
     System Works (inclusive a **base escura sob o corte**, que ele mandou fazer como eles), com
     erosão e rampa de cor no lugar dos desenhos à mão. O desenho do PC precisa do equivalente,
     porque é no vídeo gravado lá que ele julga.
+14. **Luz e sombra: a arte é o teto; nada soma** (motor de luz e sombra, aprovado em vídeo em
+    12/11; `docs/motor-luz-proposta.md` e "Motor de luz e sombra definitivo" no
+    `docs/vfx-continuar.md`). O cenário declara em `luzLutadores` a cor que o branco vira no lado
+    aceso (`luz`, no máximo #FFFFFF) e no de sombra (`sombra`), mais `chao`, `direcao` e `borda`;
+    o shader multiplica a arte por isso. Cada lutador tem uma luz só: os pontos de luz do
+    cenário e dos efeitos tomam o lugar dela pelo peso (`GameView.luzDoLutador`), os pesos juntos
+    não passam de 1. **Efeito que emite luz declara `"luz"` no efeito.json** (poder, projétil,
+    aura, explosão, faísca): sem isso ele não ilumina. Quem manda nas escolhas são os princípios
+    de luz e sombra (`reports/Motor de luz e sombra.md`), não o gosto. Os campos antigos
+    (`cor`, `forca`, `brilho`, `pes`, `contraluz`) e o volume do motor 4 saíram: o leitor recusa.
 
 ## Erros que já aconteceram (não repita)
 
@@ -95,7 +105,8 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
 | Vídeo em fundo verde | `tools/sprites/efeito_video.py` |
 | Textura da fita do rastro | `tools/sprites/rastro_fita.py` |
 | Caminho de cada golpe | `tools/sprites/linha_de_acao.py --write --folha <prefixo>`, depois `build_characters.py --write` |
-| Normal map de uma folha de lutador (motor 4 de luz, desligado) | `tools/sprites/normal_map.py <id ou folha>`; ver "Motor de luz 4" no `docs/vfx-continuar.md` |
+| Normal map de uma folha de lutador (a rampa do motor de luz e sombra segue o volume dele; só Ryūga e Kōga têm; botão LUZ do Modo Teste). **Refez a folha, refaça o mapa** (`--refazer`) | `tools/sprites/normal_map.py <id ou folha>`; ver "Motor de luz 4" e "Motor de luz e sombra definitivo" no `docs/vfx-continuar.md` |
+| Luz que o efeito emite (no corpo dos dois lutadores e uma poça no chão) | `"luz": {"cor": "#RRGGBB", "alcance": 1.0, "forca": 0.7}` no efeito.json (alcance em alturas de tela, força de 0 a 1); as ferramentas que refazem a folha guardam o `"luz"` que já estava |
 | Smear (o membro esticado na arte; troca de desenho com efeito do vídeo) | `tools/sprites/smear.py <id> <GOLPE> [--trocar 4=8] [--comprimento 1.2,1.0]`, depois `build_characters.py --write` |
 
 Os nomes que a luta toca estão em `GameView.efeitoDeGolpe` e nas tabelas do

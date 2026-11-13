@@ -60,21 +60,15 @@ final class SpriteAtlasCache {
      * O normal map de uma folha (motor 4 de luz, tools/sprites/normal_map.py): para onde cada
      * ponto do corpo aponta, a 1/4 do lado da folha, com o mesmo desenho de caixas. Dois bytes por
      * ponto (x para a direita e y para baixo da imagem; 128 é zero; o z o shader refaz): 1/32 da
-     * memória da folha. Fica na memória comum e sobe para a placa de vídeo quando uma luz acende
-     * um quadro da folha ({@link GlRenderCanvas}).
+     * memória da folha. Fica na memória comum até a folha ser desenhada: aí sobe para a placa de
+     * vídeo ({@link GlRenderCanvas}) e a cópia daqui é solta ({@code xy} null), como o bitmap da
+     * própria folha. Contexto novo do OpenGL: a folha é recarregada e o mapa vem junto.
      */
     static final class Normal {
-        final byte[] xy;
+        volatile byte[] xy;
         final int largura,altura;
         Normal(byte[] xy,int largura,int altura) {this.xy=xy;this.largura=largura;this.altura=altura;}
     }
-
-    /**
-     * Normal map nos lutadores: desligado no jogo. No PC, {@code -Dgameluta.normal=true} (o
-     * {@code -Pnormal=1} do gradle) liga para gravar a comparação; no celular a propriedade não
-     * existe. Ligado, cada folha com um {@code <folha>_n} ao lado carrega o mapa junto.
-     */
-    static final boolean NORMAIS=Boolean.getBoolean("gameluta.normal");
 
     /**
      * Ampliação máxima (pixels da tela por pixel decodificado) na luta, com o zoom normal da
@@ -472,7 +466,7 @@ final class SpriteAtlasCache {
     long bytesNormais() {
         long n=0;
         synchronized(trava) {
-            for(Entrada e:folhas.values()) if(e.folha!=null&&e.folha.normal!=null)n+=e.folha.normal.xy.length;
+            for(Entrada e:folhas.values()) if(e.folha!=null&&e.folha.normal!=null) { byte[] xy=e.folha.normal.xy;if(xy!=null)n+=xy.length; }
         }
         return n;
     }
@@ -702,7 +696,10 @@ final class SpriteAtlasCache {
             BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;o.inSampleSize=AMOSTRA;
             folha.amostra=BitmapFactory.decodeResource(context.getResources(),id,o);
         }
-        if(NORMAIS)folha.normal=normalDe(a.resource);
+        // O normal map só serve à luz local do OpenGL: com o OPENGL desligado no Modo Teste a folha
+        // fica sem ele. (As folhas de quem abre o jogo são decodificadas antes de a luta escolher o
+        // desenho, por isso a chave é a do botão, não a da luta de agora.)
+        if(TesteDesempenho.openGl)folha.normal=normalDe(a);
         return folha;
     }
 
@@ -710,13 +707,20 @@ final class SpriteAtlasCache {
      * O normal map gravado ao lado da folha ({@code <folha>_n}: cinza, o x na metade esquerda e o
      * y na direita), ou null se ela não tem.
      */
-    private Normal normalDe(String resource) {
-        int id=context.getResources().getIdentifier(resource+"_n","drawable",context.getPackageName());
+    private Normal normalDe(CharacterDefinition.Atlas a) {
+        int id=context.getResources().getIdentifier(a.resource+"_n","drawable",context.getPackageName());
         if(id==0)return null;
         BitmapFactory.Options o=new BitmapFactory.Options();o.inScaled=false;
         Bitmap b=BitmapFactory.decodeResource(context.getResources(),id,o);
         if(b==null)return null;
         int w=b.getWidth()/2,h=b.getHeight();
+        // A folha foi refeita com outro tamanho e o mapa ficou o antigo: melhor sem mapa (a
+        // silhueta) do que a normal de outro desenho. Refazer com tools/sprites/normal_map.py.
+        if(w!=(a.sheetWidth+3)/4||h!=(a.sheetHeight+3)/4) {
+            android.util.Log.w(MedicaoCarregamento.TAG,"normal map de "+a.resource+" não é desta folha ("+w+"x"+h+"); ignorado");
+            b.recycle();
+            return null;
+        }
         int[] linha=new int[w*2];
         byte[] xy=new byte[w*h*2];
         for(int y=0;y<h;y++) {

@@ -26,21 +26,26 @@ public class StagesDoJogoTest {
                 for (StageDefinition.Banner b : layer.banners) existe(pasta, b.image);
                 for (StageDefinition.Crowd cr : layer.crowds) if (cr.mask != null) existe(pasta, cr.mask);
             }
-            // A luz do lugar nos lutadores: todo cenário tem a sua, sem apagar nem estourar o corpo.
-            assertTrue(pasta.getName() + " sem luzLutadores", def.fighterLight != null);
-            for (float k : def.fighterLight.factors()) {
-                assertTrue(pasta.getName() + " luz " + k, k > 0.55f && k < 1.15f);
-            }
-            // E a contraluz na borda, com os pés um pouco mais escuros (sem apagar).
-            assertTrue(pasta.getName() + " sem contraluz", def.fighterLight.rimStrength > 0.3f);
-            for (float k : def.fighterLight.feetFactors()) {
-                assertTrue(pasta.getName() + " pés " + k, k > 0.6f && k <= 1f);
-            }
+            // O motor de luz e sombra: todo cenário declara a sua. O lado aceso perto da arte (de
+            // noite perto de 0,85 de valor), a sombra com a cor do lugar sem apagar o lutador (de
+            // noite perto de 0,5 a 0,6), os pés não mais escuros que isso e a borda de 0,35 a 0,6.
+            StageDefinition.FighterLight luz = def.fighterLight;
+            assertTrue(pasta.getName() + " sem luzLutadores", luz != null);
+            float luzV = valor(luz.lit), sombraV = valor(luz.shade), chaoV = valor(luz.ground);
+            assertTrue(pasta.getName() + " luz " + luzV, luzV >= 0.75f);
+            assertTrue(pasta.getName() + " sombra " + sombraV, sombraV >= 0.45f && sombraV <= 0.95f);
+            assertTrue(pasta.getName() + " chão " + chaoV, chaoV >= 0.4f && chaoV <= sombraV + 0.06f);
+            assertTrue(pasta.getName() + " borda " + luz.edge, luz.edge >= 0.3f && luz.edge <= 0.65f);
             if (def.floor != null) {
                 existe(pasta, def.floor.image);
                 if (def.floor.plainImage != null) existe(pasta, def.floor.plainImage);
             }
         }
+    }
+
+    /** O valor (HSV) de uma cor 0xRRGGBB: o maior canal, de 0 a 1. */
+    private static float valor(int cor) {
+        return Math.max(((cor >> 16) & 0xFF), Math.max((cor >> 8) & 0xFF, cor & 0xFF)) / 255f;
     }
 
     @Test

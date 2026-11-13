@@ -8,18 +8,11 @@
   },
   "corFundo": "#2A1438",
   "luzLutadores": {
-    "cor": "#FF9A70",
-    "forca": 0.34,
-    "brilho": 0.95,
-    "pes": "#D8B8A8",
-    "contraluz": {
-      "cor": "#FFB060",
-      "forca": 1.0,
-      "direcao": [
-        -1,
-        -1
-      ]
-    }
+    "luz": "#FFE0C8",
+    "sombra": "#C8AEB8",
+    "chao": "#BCA098",
+    "direcao": [-1, -1],
+    "borda": 0.45
   },
   "sombraLutadores": {
     "alfa": 0.62,

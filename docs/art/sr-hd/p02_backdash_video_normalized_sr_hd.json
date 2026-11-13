@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_backdash",
+ "quadros": 13,
+ "colunas": 11,
+ "celula": [
+  192,
+  288
+ ],
+ "raiz": [
+  95,
+  270
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_backdash_video_normalized.png",
+ "fonte_sha256": "04af1122c8ffb2f0662e033d0904edf128b4cb8db51e457937b29fb337f3fbd8",
+ "saida": "art/sprites/source/p02_backdash_video_normalized_sr_hd.png",
+ "saida_sha256": "1d651176a8eeac1e92d4d2b186febc507575380da3f33b9ebaf6fbb00c847de5",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

@@ -1,0 +1,376 @@
+{
+  "id": "p02_joelho_garca",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd.png",
+  "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 288,
+    "frameHeight": 288,
+    "rootX": 97,
+    "rootY": 270,
+    "columns": 11,
+    "frameCount": 17
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        27,
+        73,
+        170,
+        269
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 11769
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        28,
+        56,
+        173,
+        268
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 12009
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        73,
+        42,
+        177,
+        268
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 11771
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        43,
+        39,
+        184,
+        268
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 13337
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        63,
+        40,
+        182,
+        269
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 13433
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        82,
+        40,
+        182,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 11722
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        87,
+        40,
+        182,
+        269
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 11674
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        89,
+        42,
+        246,
+        266
+      ],
+      "minimumMargin": 22,
+      "opaquePixels": 13263
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        77,
+        43,
+        272,
+        269
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14891
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        76,
+        45,
+        271,
+        269
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15025
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        76,
+        45,
+        271,
+        269
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14885
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        82,
+        42,
+        198,
+        268
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 11975
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        82,
+        40,
+        176,
+        268
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 11789
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        76,
+        40,
+        172,
+        267
+      ],
+      "minimumMargin": 21,
+      "opaquePixels": 11440
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        40,
+        43,
+        158,
+        267
+      ],
+      "minimumMargin": 21,
+      "opaquePixels": 12148
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        15,
+        56,
+        156,
+        270
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12453
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        24,
+        68,
+        163,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 11993
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 277,
+    "frameHeight": 252,
+    "rootX": 92,
+    "rootY": 241,
+    "columns": 11,
+    "frameCount": 17,
+    "cropOffset": [
+      5,
+      29
+    ],
+    "sheetWidth": 1372,
+    "sheetHeight": 484,
+    "frames": [
+      [
+        1216,
+        248,
+        156,
+        212,
+        15,
+        37
+      ],
+      [
+        896,
+        248,
+        160,
+        224,
+        17,
+        21
+      ],
+      [
+        520,
+        0,
+        116,
+        240,
+        62,
+        7
+      ],
+      [
+        0,
+        0,
+        152,
+        244,
+        34,
+        4
+      ],
+      [
+        156,
+        0,
+        132,
+        244,
+        54,
+        5
+      ],
+      [
+        292,
+        0,
+        112,
+        244,
+        71,
+        5
+      ],
+      [
+        408,
+        0,
+        108,
+        244,
+        76,
+        5
+      ],
+      [
+        0,
+        248,
+        172,
+        236,
+        78,
+        7
+      ],
+      [
+        640,
+        0,
+        208,
+        240,
+        66,
+        8
+      ],
+      [
+        176,
+        248,
+        208,
+        236,
+        65,
+        10
+      ],
+      [
+        388,
+        248,
+        208,
+        236,
+        65,
+        10
+      ],
+      [
+        852,
+        0,
+        128,
+        240,
+        71,
+        7
+      ],
+      [
+        984,
+        0,
+        108,
+        240,
+        71,
+        5
+      ],
+      [
+        1096,
+        0,
+        108,
+        240,
+        65,
+        5
+      ],
+      [
+        600,
+        248,
+        132,
+        236,
+        29,
+        8
+      ],
+      [
+        736,
+        248,
+        156,
+        228,
+        4,
+        21
+      ],
+      [
+        1060,
+        248,
+        152,
+        216,
+        13,
+        32
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 7299072,
+      "grid": 6142752,
+      "packed": 2656192
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "331b4ebc9b1de0fae747c90d0f9764a693fbad55f93208df3ada26de0dd44f42",
+      "config": "6a4881f70b783013435fa25b1ed28a9a596975352d1638faaf35f2fb90dba998",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_joelho_garca_video_normalized_smear.png": "70b17b277b5a8609352471004143446883a9dc7dfde4d92b685ff0d056622710",
+      "art/sprites/source/p02_joelho_garca_video_normalized.png": "be56a92b9b4671250be29772771101f75d9fe088d6b83d935ff8352befc2d6aa"
+    }
+  }
+}

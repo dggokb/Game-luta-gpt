@@ -5,7 +5,7 @@
     "horizonte": 0.4
   },
   "corFundo": "#1A0E06",
-  "luzLutadores": { "cor": "#FFC890", "forca": 0.25, "brilho": 0.95, "pes": "#E0D0C0", "contraluz": { "cor": "#FFC070", "forca": 0.75, "direcao": [0, -1] } },
+  "luzLutadores": { "luz": "#FFE8CC", "sombra": "#C0A488", "chao": "#A88C74", "direcao": [0, -1], "borda": 0.4 },
   "camadas": [
     {
       "id": "parede",
@@ -276,7 +276,9 @@
           "y": 0.22,
           "raio": 0.08,
           "cor": "#FFB45A",
-          "pulsar": 0.1
+          "pulsar": 0.1,
+          "lutadores": 0.5,
+          "alcance": 1
         }
       ]
     },
@@ -295,7 +297,9 @@
           "y": 0.387,
           "raio": 0.1,
           "cor": "#FFB45A",
-          "pulsar": 0.1
+          "pulsar": 0.1,
+          "lutadores": 0.5,
+          "alcance": 1
         }
       ]
     },

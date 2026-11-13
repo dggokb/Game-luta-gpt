@@ -60,6 +60,16 @@ ANDOU = 45.0         # px: a ponta do membro que bate anda pelo menos isto da gu
 # Golpes em que o modelo não acha o membro (a perna esticada some para ele): o caminho medido no
 # desenho (a ponta mais à frente da perna e um ponto da canela atrás dela), {quadro: [x, y, jx, jy]}.
 CAMINHO_MANUAL = {
+    'p13': {   # pontos marcados à mão na grade, 12/11
+        'MEDIUM_KICK': {"1": [-15, 210, -45, 185], "4": [135, 245, 70, 245]},
+        'HEAVY_STRAIGHT': {"11": [45, 100, 55, 165], "13": [175, 215, 95, 195]},
+        'CROUCH_MEDIUM': {"2": [60, 10, 55, 60], "5": [205, 20, 120, 60]},
+        'CROUCH_HEAVY': {"4": [30, 100, 40, 160], "7": [65, 320, 55, 250]},
+        'GOLPE_ALTO': {"1": [35, 80, 40, 130], "3": [165, 110, 70, 145]},
+        'JUMP_HEAVY': {"6": [40, 140, 20, 215], "8": [195, 250, 60, 215]},
+        'JUMP_HEAVY_DOWN': {"7": [40, 330, 30, 270], "11": [60, 130, 45, 200]},
+        'SPECIAL_S4': {"17": [20, 320, 30, 270], "21": [40, 35, 50, 100]},
+    },
     # p14 a p16 (11/11): o membro no acerto e na preparação, medidos com pose() para o smear.
     'p14': {
         'MEDIUM_KICK': {"8": [8, 81, 18, 175], "20": [182, 169, 82, 161]},
@@ -79,14 +89,32 @@ CAMINHO_MANUAL = {
         'CROUCH_HEAVY': {"0": [51, 130, 58, 90], "5": [128, 295, 86, 253]},
         'JUMP_MEDIUM': {"6": [-3, 65, 9, 141], "10": [166, 219, 52, 168]},
         'JUMP_HEAVY': {"3": [16, 36, 39, 120], "5": [46, 65, 62, 115]},
-        'JUMP_HEAVY_DOWN': {"4": [14, 28, 59, 112], "6": [51, 74, 62, 115]},
-        'SPECIAL_S3': {"0": [81, 206, 45, 180], "4": [146, 217, 85, 210]},
+        'SPECIAL_S3': {"1": [95, 200, 60, 185], "4": [150, 205, 85, 210]},   # à mão na grade (11/11)
+        'SPECIAL_S4': {"7": [145, 130, 150, 205], "8": [275, 195, 180, 200]},   # à mão na grade (11/11)
+        'JUMP_HEAVY_DOWN': {"4": [60, 80, 45, 150], "6": [75, -50, 40, 60]},   # à mão na grade (11/11)
     },
-    'p16': {
-        'JUMP_MEDIUM': {"3": [105, 128, 31, 164], "5": [40, 140, 26, 165]},
+    'p02': {   # pontos marcados à mão na grade (vídeos novos do Flick, 13/11)
+        'MEDIUM_KICK': {"3": [-26, 138, -14, 119], "4": [154, 160, 101, 155], "5": [149, 155, 101, 150]},
+        'HEAVY_STRAIGHT': {"4": [8, 104, 78, 169], "5": [121, 239, 78, 223], "6": [164, 285, 137, 245], "7": [167, 280, 142, 245]},
+        'CROUCH_MEDIUM': {"5": [-155, 8, -110, 25], "6": [-124, 8, -85, 29], "7": [215, 19, 152, 36], "8": [215, 19, 152, 36]},
+        'CROUCH_HEAVY': {"3": [36, 210, 20, 180], "4": [36, 260, 30, 230], "5": [39, 278, 42, 240]},
+        'JUMP_MEDIUM': {"3": [165, 123, 106, 104], "4": [217, 126, 152, 114], "5": [210, 126, 158, 117]},
+        'JUMP_HEAVY': {"2": [56, 52, 4, 122], "3": [110, 86, 76, 100], "4": [173, 103, 110, 105], "5": [173, 103, 110, 105]},
+        'JUMP_HEAVY_DOWN': {"8": [40, 193, 33, 164], "9": [18, 28, 23, 77], "10": [18, 28, 23, 77]},
+        'GOLPE_ALTO': {"4": [-5, 217, 30, 190], "5": [12, 202, 35, 180], "6": [64, 37, 55, 75], "7": [67, 4, 52, 74]},
+        'JOELHO_GARCA': {"2": [0, 68, 21, 107], "3": [87, 172, 32, 131], "4": [90, 187, 32, 131]},
+        'SPECIAL_ENERGY': {"5": [37, 159, -10, 160], "6": [118, 185, 84, 164], "7": [118, 185, 84, 164]},
+        'SPECIAL_S4': {"5": [-21, 180, 1, 168], "6": [43, 276, 59, 235], "7": [168, 225, 110, 222]},
+    },
+    'p16': {   # pontos marcados à mão na grade (a pose erra nesta personagem), 11/11
+        'JUMP_MEDIUM': {"1": [50, 110, 20, 155], "5": [190, 150, 95, 160]},
         'MEDIUM_KICK': {"5": [8, 158, 28, 154], "9": [150, 195, 99, 173]},
         'HEAVY_STRAIGHT': {"6": [35, 134, 66, 144], "9": [187, 173, 119, 162]},
         'SPECIAL_S2': {"6": [1, 146, -19, 138], "9": [117, 255, 57, 211]},
+        'CROUCH_HEAVY': {"4": [60, 120, 20, 110], "7": [155, 300, 110, 250]},
+        'JUMP_HEAVY': {"4": [-10, 220, -40, 230], "5": [125, 200, 60, 195]},
+        'GOLPE_ALTO': {"4": [-15, 65, 55, 115], "7": [195, 75, 90, 105]},
+        'CROUCH_MEDIUM': {"7": [0, 15, 30, 70], "10": [165, 20, 95, 60]},
     },
     'player_base': {
         'JUMP_MEDIUM': {'5': [39, 30, 64, 105], '6': [159, 81, 99, 85], '8': [189, 118, 128, 92]},
@@ -416,7 +444,7 @@ def main():
         medidos = manuais(pack, caminhos(pack))
         tudo.append((pack, medidos))
         nomes = dict((nome, golpe) for golpe, nome in golpes(pack))
-        print(pack['id'], ' '.join(f"{nomes[n]}:{len(c['pontos'])}" for n, c in medidos.items()),
+        print(pack['id'], ' '.join(f"{nomes.get(n, n)}:{len(c['pontos'])}" for n, c in medidos.items()),
               '| sem:', ' '.join(g for g, n in golpes(pack) if n not in medidos))
         if a.write:
             gravar(pack, medidos)

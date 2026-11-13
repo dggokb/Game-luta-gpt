@@ -13,6 +13,13 @@ que não pode mudar e o golpe H e o 2M da ficha.
 | 2M | rasteira girando com a mão no chão, agachado nas duas pontas | girando onde a ficha pede giro; rasteira baixa sem giro nos outros (p04, p07, p09, p11, p12) |
 | idle | aprovado, mas o texto não ficou registrado | pela fórmula: dois ciclos de respiração, mesma imagem nas duas pontas |
 
+## Regra do dono (12/11): sempre dois idles
+
+Todo personagem tem **duas animações de idle**: o idle (a guarda respirando, em loop) e o segundo
+idle (um gesto que toca uma vez a cada 3 voltas do idle e volta à guarda: o Ryūga cruza os braços,
+a Yin-lu dá pulinhos e ajeita as luvas). O motor já toca o `IDLE_2` de quem tem
+(`SpriteMotion.IDLE_LOOPS_BEFORE_IDLE_2`); pedir os dois vídeos junto com os outros.
+
 ## Configuração
 
 - **MiniMax H3 Fast** (20 créditos); **H3 Max** (40) só se o Fast errar o golpe.

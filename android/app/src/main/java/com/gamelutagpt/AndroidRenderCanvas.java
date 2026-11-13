@@ -391,6 +391,21 @@ final class AndroidRenderCanvas implements RenderCanvas {
         return width;
     }
 
+    private static final android.graphics.PorterDuffXfermode TELA =
+        new android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SCREEN);
+
+    @Override
+    public void beginScreen() {
+        if (gl != null) gl.beginScreen();
+        else gradientPaint.setXfermode(TELA);
+    }
+
+    @Override
+    public void endScreen() {
+        if (gl != null) gl.endScreen();
+        else gradientPaint.setXfermode(null);
+    }
+
     @Override
     public void beginInvert() {
         if (gl != null) {

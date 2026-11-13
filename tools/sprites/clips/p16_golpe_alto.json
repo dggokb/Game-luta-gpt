@@ -2,7 +2,7 @@
   "id": "p16_golpe_alto",
   "javaName": "P16_GOLPE_ALTO",
   "profile": "p16.json",
-  "source": "art/sprites/source/p16_golpe_alto_video_hd.png",
+  "source": "art/sprites/source/p16_golpe_alto_video_hd_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p16_golpe_alto.webp",
   "report": "tools/sprites/reports/p16_golpe_alto.report.json",
   "preview": "android/app/build/sprite-review/p16_golpe_alto-import.png",
@@ -45,7 +45,28 @@
   "rootX": 174,
   "rootY": 528,
   "sourceReferences": [
-    "art/sprites/source/p16_golpe_alto_video_normalized.png"
+    "art/sprites/source/p16_golpe_alto_video_normalized.png",
+    "art/sprites/source/p16_golpe_alto_video_hd.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "smear": {
+    "fonte": "art/sprites/source/p16_golpe_alto_video_hd.png",
+    "quadros": [
+      6,
+      7
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "trocar": "6=8,7=8",
+    "limpar": "todos",
+    "antes": "6=4,7=4",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }

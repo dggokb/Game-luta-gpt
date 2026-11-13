@@ -248,7 +248,7 @@ def unique(pack, spec):
 
 NORMAL_KEYS = ('launchType', 'knockback', 'pushbackOnHit', 'pushbackOnBlock', 'hitstopFrames', 'reach',
                'alcanceMaximo')
-LAUNCHES = ('none', 'knockdown', 'launch', 'slam', 'wallBounce', 'groundBounce')
+LAUNCHES = ('none', 'knockdown', 'launch', 'slam', 'wallBounce', 'groundBounce', 'arc')
 
 
 def restore_normal(m):
@@ -592,6 +592,8 @@ BASE_KEYS = ('startupFrames', 'activeFrames', 'recoveryFrames', 'hitstunFrames',
 def restore(m):
     """Desfaz as pancadas gravadas antes (refazer dá sempre o mesmo resultado)."""
     m.update(m.pop('golpesBase', {}))
+    if 'arcoBase' in m:   # o arco gravado antes: volta ao tipo de antes (refazer dá o mesmo)
+        m['launchType'] = m.pop('arcoBase')
     m.pop('golpes', None)
     m.pop('pausaGolpes', None)
     m.pop('pausaFinal', None)
@@ -711,6 +713,11 @@ def apply(cid, spec, base, combos_data):
         restore_normal(m)
     for m in pack.get('specialMoves', {}).values():
         restore_special(m)
+    # Golpe de comando (→ + H, 12/11): vem inteiro do "golpeComando" (refazer dá o mesmo); o
+    # avanço dele vai na "unica.golpes.6H", como as outras mecânicas.
+    pack['moves'].pop('6H', None)
+    if spec.get('golpeComando'):
+        pack['moves']['6H'] = json.loads(json.dumps(spec['golpeComando']))
     # Sem Super (as crianças da história): só o resto.
     sup = fighter['super']['attack'] if 'super' in fighter else None
     if sup is not None:
@@ -833,6 +840,14 @@ def apply(cid, spec, base, combos_data):
             at = lambda i: round(sum(dd[:i]) / sum(dd) * total)
             m.setdefault('mecanica', {})['salto'] = {'altura': h['salto']['altura'],
                                                      'frames': [at(h['salto']['de']), min(at(h['salto']['ate']), total - 1)]}
+        if 'arco' in h:
+            # Arco (o shoryuken do Ryūga, o chute da garça da Yin-lu): o último golpe joga o rival em
+            # arco, com altura e distância (CombatEngine, Launch.ARC), e ele cai derrubado.
+            m.setdefault('arcoBase', m.get('launchType', 'none'))
+            m['launchType'] = 'arc'
+            m.setdefault('mecanica', {})['arco'] = {'altura': h['arco']['altura'], 'distancia': h['arco']['distancia']}
+            if h['arco'].get('parede'):   # bate na borda e volta quicando (o S4 da Yin-lu)
+                m['mecanica']['arco']['parede'] = True
         if 'voo' in h:
             # Voo de verdade (o S2 e o S3 do Ryūga): sai do chão no quadro "de" da animação e pousa
             # no "ate"; o corpo cai pela gravidade do pulo (CombatEngine.takeOff).

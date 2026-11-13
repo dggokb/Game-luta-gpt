@@ -28,6 +28,8 @@ import javax.imageio.ImageIO;
  *   <li>{@code super:3000} — a barra de Super dos dois times (1000 por barra);</li>
  *   <li>{@code grava:90:nome} — começa a gravar 90 quadros seguidos enquanto o roteiro continua;
  *       {@code fim} espera a gravação acabar;</li>
+ *   <li>{@code rota:L,M,M,S3,W90,C200,S2} — aperta o combo quadro a quadro, como o executor dos
+ *       testes (RoteiroCombo); o rival fica parado;</li>
  *   <li>{@code foto:nome} — um quadro só.</li>
  * </ul>
  * Os botões de teste do canto ficam fora da gravação ({@code -Dgameluta.botoes=true} mostra). A
@@ -103,6 +105,15 @@ public final class GravarLuta {
                     c.soltar(KeyEvent.KEYCODE_D);
                     break;
                 }
+                case "rota":
+                    // O combo do teste, quadro a quadro (RoteiroCombo): rota:L,M,M,S3,W90,C200,S2
+                    c.jogo().apertarRoteiro(p[1]);
+                    break;
+                case "canto":
+                    // O rival encostado na borda da direita e nós a tantos px: canto:100
+                    c.jogo().irParaOCanto(Float.parseFloat(p[1]));
+                    c.esperar(0.2);
+                    break;
                 case "super":
                     c.jogo().encherSuper(Integer.parseInt(p[1]));
                     c.esperar(0.1);

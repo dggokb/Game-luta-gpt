@@ -106,6 +106,11 @@ final class MotionParser {
         return java.util.Arrays.copyOf(out, n);
     }
 
+    /** Direções opostas (← e →, ↓ e ↑). */
+    private static boolean opostos(int a, int b) {
+        return a != 0 && b != 0 && Math.abs(a - b) == 4;
+    }
+
     private static boolean neighbours(int a, int b) {
         int diff = Math.abs(a - b);
         return diff == 1 || diff == 7;
@@ -134,9 +139,12 @@ final class MotionParser {
             if (step >= 0) continue;
             // O primeiro passo conta de quando foi SOLTO: agachado (ou andando) um tempo e depois
             // ↘ → ainda é o comando. No ↓ ↓ (o mesmo passo duas vezes) conta de quando entrou,
-            // senão ficar agachado e tocar ↓ de novo virava o especial.
+            // senão ficar agachado e tocar ↓ de novo virava o especial. No toque para lados opostos
+            // (← →, o S4 da Yin-lu) também: defender segurando ← e depois soltar ↙ ↓ ↘ → é a Palma,
+            // não o toque.
             boolean repetido = steps.length >= 2 && steps[0] == steps[1];
-            int firstFrame = repetido || firstIdx >= end ? frames[firstIdx] : frames[firstIdx + 1];
+            boolean toque = steps.length == 2 && opostos(steps[0], steps[1]);
+            int firstFrame = repetido || toque || firstIdx >= end ? frames[firstIdx] : frames[firstIdx + 1];
             if (frames[end] - firstFrame <= motionWindow) return count - 1 - end;
         }
         return -1;

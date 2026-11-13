@@ -67,7 +67,8 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['specialMoves']['S2'].update(segurar=True))
         with self.assertRaisesRegex(ValueError,'S2.segurar'):pipeline.build(self.root)
     def test_dive_needs_an_air_special(self):
-        self.edit(lambda d:d['specialMoves']['S2'].update(mecanica={'mergulho':{'frente':300,'descida':800}}))
+        # O S2 do Ryūga joga em arco (12/11): sem o arco na mecânica, o lançamento volta a derrubar.
+        self.edit(lambda d:d['specialMoves']['S2'].update(mecanica={'mergulho':{'frente':300,'descida':800}},launchType='knockdown'))
         with self.assertRaisesRegex(ValueError,'S2.mecanica.mergulho'):pipeline.build(self.root)
     def test_command_special_needs_a_valid_command(self):
         self.edit(lambda d:d['specialMoves']['S2'].update(command=[1,9]))
@@ -174,6 +175,22 @@ class CharacterPackTests(unittest.TestCase):
         pipeline.build(self.root)
         self.assertFalse(orphan.exists())
         pipeline.build(self.root,check=True)
+
+    def test_normal_map_stays_with_its_sheet_and_goes_when_it_no_longer_fits(self):
+        from PIL import Image
+        pasta='android/app/src/main/res/drawable-nodpi';(self.root/pasta).mkdir(parents=True)
+        results=[({'output':pasta+'/golpe.webp'},{'packed':{'sheetWidth':402,'sheetHeight':200}})]
+        def mapa(nome,tamanho):
+            Image.new('RGB',tamanho,(128,128,128)).save(self.root/pasta/nome,'WEBP',lossless=True)
+            return pasta+'/'+nome
+        # O normal map da folha (x e y lado a lado, cada metade a 1/4 do lado): acompanha a folha.
+        certo=mapa('golpe_n.webp',(2*101,50))
+        self.assertTrue(pipeline.normal_map_da_folha(self.root,certo,results))
+        self.assertEqual([],[r for r in pipeline.orphans_de(self.root,[certo,pasta+'/golpe.webp'],{pasta+'/golpe.webp'},results)])
+        # De outro tamanho (a folha foi refeita) ou sem a folha dele: órfão, como qualquer saída velha.
+        self.assertFalse(pipeline.normal_map_da_folha(self.root,mapa('golpe_n.webp',(8,8)),results))
+        self.assertFalse(pipeline.normal_map_da_folha(self.root,mapa('sumiu_n.webp',(2*101,50)),results))
+        self.assertFalse(pipeline.normal_map_da_folha(self.root,pasta+'/golpe.webp',results))
 
     def test_packing_crops_empty_border_without_moving_pixels(self):
         from PIL import Image

@@ -92,7 +92,8 @@ public class AssistCorpoACorpoTest {
     }
 
     @Test public void projectileAssistsStillStandBehindThePoint() {
-        Match m = new Match("p02", 300f);
+        // O Ryūga (a Onda); a Yin-lu virou assist de chute que lança (12/11).
+        Match m = new Match("player_base", 300f);
         float pointX = m.f(0).x;
         m.in[0].assist = true;
         m.step();

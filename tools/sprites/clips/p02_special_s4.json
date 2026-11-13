@@ -2,33 +2,66 @@
   "id": "p02_special_s4",
   "javaName": "P02_SPECIAL_S4",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_special_s4_sr_hd.png",
+  "source": "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_special_s4.webp",
   "report": "tools/sprites/reports/p02_special_s4.report.json",
   "preview": "android/app/build/sprite-review/p02_special_s4-import.png",
   "expectedFrames": 20,
   "segmentation": "prepared-grid",
-  "columns": 5,
+  "columns": 11,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 S4 de 12/11: três vídeos H3 do dono montados (tools/sprites/montagens/p02.json), convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "video": {
-    "arquivo": "s4.mp4",
+    "arquivo": "p02_special_s4.mp4",
     "personagem": "p02",
-    "escala": 0.5267,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "17,26,34,43,52,53,55,56,57,59,60,61,63,64,65,67,68,69,71,72",
-    "celula": 352,
-    "largura": 416,
-    "raiz": "165,334",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "3,9,12,15,18,21,24,48,51,56,61,66,71,80,88,92,96,100,104,108",
+    "celula": 320,
+    "largura": 384,
+    "raiz": "149,298",
     "colunas": 11,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
     "ancorar_pe": true
   },
-  "frameWidth": 832,
-  "frameHeight": 704,
-  "rootX": 330,
-  "rootY": 668,
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "rootX": 149,
+  "rootY": 298,
   "sourceReferences": [
+    "art/sprites/source/p02_special_s4_video_normalized_smear.png",
     "art/sprites/source/p02_special_s4_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "smear": {
+    "fonte": "art/sprites/source/p02_special_s4_video_normalized.png",
+    "quadros": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.0,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5,
+      1.0,
+      0.5,
+      1.0,
+      0.5,
+      1.0,
+      0.5
+    ],
+    "giro": "7-14"
+  }
 }

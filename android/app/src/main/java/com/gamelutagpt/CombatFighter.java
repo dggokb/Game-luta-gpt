@@ -217,6 +217,8 @@ final class CombatFighter {
     float vx;
     /** World x of the wall the defender is flying to. */
     float bounceWallX;
+    /** O quique na parede veio de um arco (o S4 da Yin-lu): bate já no alto e sobe só até a altura de sempre. */
+    boolean bounceFromArc;
     /** Bounced: lands knocked down instead of recovering in the air. */
     boolean hardFall;
     /** Punish counter: flying away spinning in the air (lands knocked down). */
@@ -266,6 +268,8 @@ final class CombatFighter {
      * (H → L do p12) ou repete um golpe (M → M) sempre acaba.
      */
     final java.util.ArrayList<String> chain = new java.util.ArrayList<>();
+    /** Golpes começados desde o início da luta (o executor dos testes e a gravação contam por ele). */
+    int golpesIniciados;
     /** Air dashes done in this jump (a fighter may have more than one). */
     int airDashCount;
 

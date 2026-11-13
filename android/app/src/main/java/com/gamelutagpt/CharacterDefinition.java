@@ -634,6 +634,13 @@ final class CharacterDefinition {
          */
         float animationWeight=1f;
         Fighter withAnimationWeight(float weight) { animationWeight=weight; return this; }
+        /**
+         * O S que o lutador solta como assist, quando difere do S dele (fighter.assist.segura no
+         * pack, 12/11): a Onda do Ryūga segura o rival em pé mais tempo, para o parceiro em campo
+         * recomeçar a corrente. Null: o assist solta o S de sempre.
+         */
+        AttackDefinition assistShot;
+        Fighter withAssistShot(AttackDefinition shot) { assistShot=shot; return this; }
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }
@@ -684,6 +691,24 @@ final class CharacterDefinition {
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }
+        /**
+         * O corpo do lutador (11/11): o pulo dele em altura, tempo no ar e distância para a frente
+         * (em milésimos do pulo do motor), o peso quando apanha no ar (milésimos da gravidade: abaixo
+         * de 1000 é leve, sobe e demora a cair) e quantos pulos ele dá no ar (o pulo duplo da Yin-lu).
+         * Altura e tempo mudam o impulso e a gravidade juntos, então a física do pulo fecha exata.
+         */
+        int jumpHeightPermille=1000, jumpTimePermille=1000, jumpForwardPermille=1000, weightPermille=1000, airJumps;
+        Fighter withBody(int height,int time,int forward,int weight,int jumps) {
+            jumpHeightPermille=height; jumpTimePermille=time; jumpForwardPermille=forward;
+            weightPermille=weight; airJumps=jumps; return this;
+        }
+        /** Impulso do pulo: altura / tempo. */
+        float jumpSpeedScale() { return (jumpHeightPermille/1000f)/(jumpTimePermille/1000f); }
+        /** Gravidade do pulo: altura / tempo². */
+        float jumpGravityScale() { float t=jumpTimePermille/1000f; return (jumpHeightPermille/1000f)/(t*t); }
+        /** Velocidade de lado do pulo: distância / tempo. */
+        float jumpForwardScale() { return (jumpForwardPermille/1000f)/(jumpTimePermille/1000f); }
+        float weightScale() { return weightPermille/1000f; }
         /** Henchmen the Super calls in instead of its wave (0 = the wave). */
         int henchmen;
         Fighter withHenchmen(int count) { henchmen=count; return this; }
@@ -717,10 +742,9 @@ final class CharacterDefinition {
         this.visualStandHeight=visualStandHeight;this.visualCrouchHeight=visualCrouchHeight;this.fighter=fighter;
         this.animations=Collections.unmodifiableMap(new LinkedHashMap<>(animations));
         Map<String,Move> allMoves=new LinkedHashMap<>(moves);
-        // Golpe alto de chão (→ + M) de todos: o do pack, ou montado do M até ter animação própria.
-        if(!allMoves.containsKey(GolpeAlto.BINDING)&&allMoves.containsKey("M")) {
-            allMoves.put(GolpeAlto.BINDING,GolpeAlto.from(allMoves.get("M"),allMoves.get("H")));
-        }
+        // Golpe alto de chão (→ + M): só quem tem o seu no pack (o vídeo próprio). O montado do M
+        // (a pose do M congelada até o 20º quadro) saiu em 12/11: parecia atraso, e andar para a
+        // frente apertando M dava esse golpe lento em vez do M. Sem o seu, → + M é o M.
         this.moves=Collections.unmodifiableMap(allMoves);
         this.specialAnimations=Collections.unmodifiableMap(new LinkedHashMap<>(specialAnimations));
         // Longest command first, so →↓↘ wins over a shorter motion it contains.

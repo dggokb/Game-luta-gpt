@@ -115,6 +115,16 @@ Cole o passo onde a página entra no episódio e complete:
 | `quadros[].baloes[].area` | contorno do miolo branco que o jogo pinta |
 | `quadros[].baloes[].moldura` | `true` desenha um contorno preto em volta da área branca: um quadro de legenda novo por cima de um texto pintado na arte (ex.: "10 anos se passaram" na página 1 do ep01), para traduzir texto que não está num balão |
 
+### 3b. Conferir o texto nos balões
+
+O jogo escreve cada fala com a maior letra que cabe na `caixa`. Em balão espetado a caixa pega as
+pontas, e o texto pode vazar do branco. Depois de preencher os textos e as traduções, rode:
+
+```bash
+python3 tools/historia/conferir_baloes.py             # lista os balões em que a letra encosta na borda
+python3 tools/historia/conferir_baloes.py --corrigir  # encolhe a caixa deles (em pt, en e es)
+```
+
 ### 4. Traduzir
 
 Acrescente cada texto novo (falas, legendas, títulos) em `historia/idiomas/en.json` e

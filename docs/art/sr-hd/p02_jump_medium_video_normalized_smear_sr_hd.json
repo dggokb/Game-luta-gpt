@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_jump_medium",
+ "quadros": 14,
+ "colunas": 11,
+ "celula": [
+  384,
+  224
+ ],
+ "raiz": [
+  135,
+  195
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_jump_medium_video_normalized_smear.png",
+ "fonte_sha256": "8525dbb0f039addde9b48883e16af456c82cb00374ea08b0845b5beb9eb1dc9d",
+ "saida": "art/sprites/source/p02_jump_medium_video_normalized_smear_sr_hd.png",
+ "saida_sha256": "f607d5cc80afc9c4d02f72faf82c9327323842e59f36601a0a60ac54287473ef",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

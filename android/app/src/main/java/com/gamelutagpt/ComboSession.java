@@ -25,6 +25,8 @@ final class ComboSession {
     /** Bounces already used in this combo (each is limited by CombatConfig). */
     int wallBounces;
     int groundBounces;
+    /** OTG já usado neste combo (o ↓ + M no rival caído; um por combo). */
+    int otgs;
     /** Proration declared by the move that started the combo. */
     int prorationPermille = 1000;
 

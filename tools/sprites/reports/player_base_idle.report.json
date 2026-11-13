@@ -1,7 +1,7 @@
 {
   "id": "player_base_idle",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_idle_video_normalized.png",
+  "source": "art/sprites/source/player_base_idle_video_normalized_sr_hd.png",
   "sourceNote": "P01 idle: Real-ESRGAN AnimeVideo-v3 4x master, uniformly reduced to 2x for runtime memory. 76 frames, authored root, 42 ms; originals preserved. No per-frame alignment or temporal smoothing.",
   "rootMode": "authored",
   "scale": 1,
@@ -613,8 +613,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2a24cb3fe398b98de2d59a58dbe258dab80f85a3577963f8badeeb860544514d",
-      "config": "0fb7882d093de681049ab919cd111d54c4e3cadf01a4d1ed0de4aea13a8d0fe0",
+      "source": "85f0cc28645c110e8adafe9fbfb0fdead6397e6d2588b1a693d0b94af297cd66",
+      "config": "978cf6b9a7fb3fc17dfcc494b28e059efa7d3444cb27198a3404c655f26b6c6b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

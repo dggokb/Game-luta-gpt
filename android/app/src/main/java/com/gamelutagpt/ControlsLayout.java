@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, PERF_GRAFICOS, PERF_FOLHAS, PERF_TESTE, PERF_EFEITOS, PERF_CENARIO, PERF_HUD, PERF_MSGS, PERF_GL, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, PERF_GRAFICOS, PERF_FOLHAS, PERF_TESTE, PERF_EFEITOS, PERF_LUZ, PERF_CENARIO, PERF_HUD, PERF_MSGS, PERF_GL, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, SHINKAI, NONE }
 
     static final float DPAD_X = 185f;
     static final float DPAD_Y = 545f;
@@ -103,19 +103,19 @@ final class ControlsLayout {
     static final float ANIM_BUTTON_BOTTOM = TUTORIAL_BUTTON_BOTTOM;
 
     /**
-     * Coluna de DESEMPENHO, à esquerda dos botões de teste: GRÁFICOS, FOLHAS, EFEITOS, CENÁRIO,
-     * HUD | MSGS (meia linha cada) e OPENGL, uma por linha (as mesmas alturas de IA, DEBUG, VIDA,
+     * Coluna de DESEMPENHO, à esquerda dos botões de teste: GRÁFICOS, FOLHAS | TESTE, EFEITOS | LUZ,
+     * CENÁRIO, HUD | MSGS (meia linha cada) e OPENGL, uma por linha (as mesmas alturas de IA, DEBUG, VIDA,
      * DUPLA, HISTÓRIA e TUTORIAL).
      */
     static final float PERF_LEFT = 910f;
     static final float PERF_RIGHT = 1074f;
     private static final float PERF_MEIO = 990f;
-    static final float[] PERF_LEFTS = {PERF_LEFT, PERF_LEFT, PERF_MEIO + 4f, PERF_LEFT, PERF_LEFT, PERF_LEFT, PERF_MEIO + 4f, PERF_LEFT};
-    static final float[] PERF_RIGHTS = {PERF_RIGHT, PERF_MEIO, PERF_RIGHT, PERF_RIGHT, PERF_RIGHT, PERF_MEIO, PERF_RIGHT, PERF_RIGHT};
-    static final float[] PERF_TOP = {AI_BUTTON_TOP, DEBUG_BUTTON_TOP, DEBUG_BUTTON_TOP, HEAL_BUTTON_TOP, TEAM_BUTTON_TOP, STORY_BUTTON_TOP, STORY_BUTTON_TOP, TUTORIAL_BUTTON_TOP};
+    static final float[] PERF_LEFTS = {PERF_LEFT, PERF_LEFT, PERF_MEIO + 4f, PERF_LEFT, PERF_MEIO + 4f, PERF_LEFT, PERF_LEFT, PERF_MEIO + 4f, PERF_LEFT};
+    static final float[] PERF_RIGHTS = {PERF_RIGHT, PERF_MEIO, PERF_RIGHT, PERF_MEIO, PERF_RIGHT, PERF_RIGHT, PERF_MEIO, PERF_RIGHT, PERF_RIGHT};
+    static final float[] PERF_TOP = {AI_BUTTON_TOP, DEBUG_BUTTON_TOP, DEBUG_BUTTON_TOP, HEAL_BUTTON_TOP, HEAL_BUTTON_TOP, TEAM_BUTTON_TOP, STORY_BUTTON_TOP, STORY_BUTTON_TOP, TUTORIAL_BUTTON_TOP};
     /** Altura de cada botão (o último, OPENGL, na linha mais baixa do TUTORIAL). */
-    static final float[] PERF_HEIGHTS = {40f, 40f, 40f, 40f, 40f, 40f, 40f, TUTORIAL_BUTTON_BOTTOM - TUTORIAL_BUTTON_TOP};
-    static final Control[] PERF_CONTROLS = {Control.PERF_GRAFICOS, Control.PERF_FOLHAS, Control.PERF_TESTE, Control.PERF_EFEITOS, Control.PERF_CENARIO, Control.PERF_HUD, Control.PERF_MSGS, Control.PERF_GL};
+    static final float[] PERF_HEIGHTS = {40f, 40f, 40f, 40f, 40f, 40f, 40f, 40f, TUTORIAL_BUTTON_BOTTOM - TUTORIAL_BUTTON_TOP};
+    static final Control[] PERF_CONTROLS = {Control.PERF_GRAFICOS, Control.PERF_FOLHAS, Control.PERF_TESTE, Control.PERF_EFEITOS, Control.PERF_LUZ, Control.PERF_CENARIO, Control.PERF_HUD, Control.PERF_MSGS, Control.PERF_GL};
 
     // Painel da lição do tutorial (abaixo das barras de vida) e o PULAR dentro dele.
     static final float TUTORIAL_PANEL_LEFT = 330f;
@@ -128,10 +128,11 @@ final class ControlsLayout {
     static final float TUTORIAL_SKIP_BOTTOM = 236f;
 
     // MENU (top center): opens the pause in every mode (the test's team select is DUPLA).
-    static final float SELECT_BUTTON_LEFT = 565f;
-    static final float SELECT_BUTTON_TOP = 112f;
-    static final float SELECT_BUTTON_RIGHT = 715f;
-    static final float SELECT_BUTTON_BOTTOM = 154f;
+    // Com a barra com raios, o toque é a placa do MENU desenhada na arte (abaixo do relógio).
+    static final float SELECT_BUTTON_LEFT = HudRenderer.BARRA_RAIOS ? 557f : 565f;
+    static final float SELECT_BUTTON_TOP = HudRenderer.BARRA_RAIOS ? 132f : 112f;
+    static final float SELECT_BUTTON_RIGHT = HudRenderer.BARRA_RAIOS ? 723f : 715f;
+    static final float SELECT_BUTTON_BOTTOM = HudRenderer.BARRA_RAIOS ? 170f : 154f;
 
     /** First control under the point, in the priority order the input handler uses. */
     static Control controlAt(float x, float y) {
@@ -196,6 +197,7 @@ final class ControlsLayout {
             case PERF_FOLHAS:
             case PERF_TESTE:
             case PERF_EFEITOS:
+            case PERF_LUZ:
             case PERF_CENARIO:
             case PERF_HUD:
             case PERF_MSGS:

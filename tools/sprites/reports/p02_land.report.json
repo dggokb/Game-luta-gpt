@@ -1,130 +1,280 @@
 {
   "id": "p02_land",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_land_sr_hd.png",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "source": "art/sprites/source/p02_land_video_normalized_sr_hd.png",
+  "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 448,
-    "frameHeight": 576,
-    "rootX": 206,
-    "rootY": 540,
-    "columns": 4,
-    "frameCount": 4
+    "frameWidth": 192,
+    "frameHeight": 256,
+    "rootX": 95,
+    "rootY": 232,
+    "columns": 11,
+    "frameCount": 12
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        79,
-        43,
-        369,
-        540
+        52,
+        30,
+        159,
+        242
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 62384
+      "minimumMargin": 14,
+      "opaquePixels": 12350
     },
     {
       "index": 1,
       "outputBbox": [
-        45,
-        133,
-        401,
-        542
+        47,
+        65,
+        160,
+        231
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 59051
+      "minimumMargin": 25,
+      "opaquePixels": 11181
     },
     {
       "index": 2,
       "outputBbox": [
-        67,
-        139,
-        365,
-        542
+        47,
+        75,
+        159,
+        230
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 55157
+      "minimumMargin": 26,
+      "opaquePixels": 9926
     },
     {
       "index": 3,
       "outputBbox": [
-        65,
-        137,
-        363,
-        542
+        43,
+        78,
+        159,
+        229
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 54674
+      "minimumMargin": 27,
+      "opaquePixels": 9213
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        45,
+        75,
+        159,
+        228
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 9535
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        48,
+        72,
+        159,
+        228
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 9745
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        50,
+        58,
+        159,
+        228
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 10145
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        49,
+        32,
+        158,
+        228
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 10798
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        31,
+        21,
+        157,
+        229
+      ],
+      "minimumMargin": 21,
+      "opaquePixels": 11358
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        26,
+        21,
+        157,
+        230
+      ],
+      "minimumMargin": 21,
+      "opaquePixels": 11720
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        26,
+        30,
+        166,
+        232
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 11988
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        26,
+        35,
+        166,
+        232
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 11812
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 380,
-    "frameHeight": 525,
-    "rootX": 173,
-    "rootY": 510,
-    "columns": 4,
-    "frameCount": 4,
+    "frameWidth": 161,
+    "frameHeight": 241,
+    "rootX": 80,
+    "rootY": 221,
+    "columns": 11,
+    "frameCount": 12,
     "cropOffset": [
-      33,
-      30
+      15,
+      11
     ],
-    "sheetWidth": 684,
-    "sheetHeight": 944,
+    "sheetWidth": 572,
+    "sheetHeight": 616,
     "frames": [
       [
         0,
         0,
-        308,
-        516,
-        37,
+        120,
+        228,
+        31,
+        12
+      ],
+      [
+        412,
+        232,
+        128,
+        180,
+        26,
+        48
+      ],
+      [
+        0,
+        448,
+        124,
+        168,
+        26,
+        58
+      ],
+      [
+        388,
+        448,
+        128,
+        164,
+        22,
+        61
+      ],
+      [
+        128,
+        448,
+        128,
+        168,
+        24,
+        58
+      ],
+      [
+        260,
+        448,
+        124,
+        168,
+        27,
+        55
+      ],
+      [
+        284,
+        232,
+        124,
+        184,
+        29,
+        41
+      ],
+      [
+        156,
+        232,
+        124,
+        208,
+        28,
+        15
+      ],
+      [
+        272,
+        0,
+        140,
+        220,
+        10,
         4
       ],
       [
-        312,
+        124,
         0,
-        372,
-        428,
+        144,
+        224,
         4,
-        95
+        4
       ],
       [
-        320,
-        520,
-        316,
-        420,
-        25,
-        101
+        416,
+        0,
+        156,
+        216,
+        4,
+        13
       ],
       [
         0,
-        520,
-        316,
-        424,
-        23,
-        97
+        232,
+        152,
+        212,
+        5,
+        17
       ]
     ],
     "decodedBytes": {
-      "canonical": 4128768,
-      "grid": 3192000,
-      "packed": 2582784
-    },
-    "pixelScale": 2.0
+      "canonical": 4325376,
+      "grid": 3414488,
+      "packed": 1409408
+    }
   },
-  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a8709518b2ec69eac0b14538281f5033f7e3ccd2fdee5a613ec9fc065b7fb8fb",
-      "config": "1c3d08645c93d08d9df1538f239a36dd7a63250b132eb657e114f63d58088b29",
+      "source": "76c9c3fa75aba5d741cca2f2b013b618a7972a2bb3e26e02a6c58a9f89610ff0",
+      "config": "2f91a7e04a2cea80bf0e8a99c898fe37b0fa3e6da97ecca5332f6947532aefb1",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_land_video_normalized.png": "bad1937c83d1cd7ac5ac4eb328f3eab237c26b2af522f4e429ae1f826cbd0c5f"
+      "art/sprites/source/p02_land_video_normalized.png": "d73d9084a9f3207a25fd50a206303b948ad1ed542180938a6ab3f0902fc90cec"
     }
   }
 }

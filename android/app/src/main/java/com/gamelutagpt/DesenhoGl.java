@@ -575,7 +575,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
         sprite(c, folha, fonte, destino, alpha, filtro, null);
     }
 
-    /** O mesmo, com o normal map da folha (ou null): a luz local usa ele no lugar da silhueta. */
+    /** O mesmo, com o normal map da folha (ou null): a rampa do motor de luz segue o volume dele. */
     void sprite(Canvas c, Bitmap folha, Rect fonte, RectF destino, int alpha, Filtro filtro, SpriteAtlasCache.Normal normal) {
         if (c instanceof CanvasGl) {
             ((CanvasGl)c).prepararGl();
@@ -585,29 +585,17 @@ final class DesenhoGl implements SurfaceHolder.Callback {
             canvas.matriz(valores);
         }
         canvas.filtro(filtro != null ? filtro.matriz : null);
-        if (localForca > 0f) {
-            canvas.luzLocal(localX, localY, localRaio, localR, localG, localB, localForca);
-            canvas.normal(normal);
-        }
+        // O normal map vai sempre: a rampa do motor de luz segue ele (o tempo todo).
+        canvas.normal(normal);
         canvas.desenharBitmap(folha, true, fonte.left, fonte.top, fonte.right, fonte.bottom,
             destino.left, destino.top, destino.right, destino.bottom, alpha);
-        if (localForca > 0f) {
-            canvas.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
-            canvas.normal(null);
-        }
+        canvas.normal(null);
     }
 
-    /**
-     * A luz local das próximas folhas de lutador (o impacto acendendo o corpo): o ponto e o raio em
-     * pixels da janela, a cor (0 a 1) e a força; força 0 desliga. Quem desenha o lutador liga antes
-     * e desliga depois (só a folha dele acende, não o rastro nem a sombra).
-     */
-    void luzLocal(float x, float y, float raio, float r, float g, float b, float forca) {
-        localX = x; localY = y; localRaio = raio;
-        localR = r; localG = g; localB = b; localForca = forca;
+    /** O motor de luz e sombra para as próximas folhas de lutador ({@link GlRenderCanvas#luzNova}); null desliga. */
+    void luzNova(float[] v) {
+        canvas.luzNova(v);
     }
-
-    private float localX, localY, localRaio, localR, localG, localB, localForca;
 
     /** Sobe uma imagem antes de ela aparecer (o pack do Ultra, aos poucos), com o quadro aberto. */
     boolean preSubir(com.gamelutagpt.render.RenderImage imagem) {
