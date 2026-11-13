@@ -5507,6 +5507,7 @@ public class GameView extends SurfaceView
         if (animation == null && f.grounded && f.status == CombatFighter.Status.NEUTRAL && Math.abs(f.travel) < 0.001f) {
             clipStep *= renderer.animacao.pose().ritmo;
         }
+        renderer.motion.passada(f.passada, f.passadaFrente);
         renderer.update(
             clipStep,
             f.grounded,

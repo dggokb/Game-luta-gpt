@@ -696,6 +696,13 @@ def compile_packs(root, results):
                 raise ValueError(f'{key}: loop must be boolean')
             if 'silhueta' in a:
                 validate_silhueta(key, a)
+            if 'apoio' in a:
+                # Pé de apoio medido no desenho (tools/sprites/apoio.py): o avanço do corpo por quadro.
+                ap = a['apoio']
+                esperado = len(frames) if a['loop'] else len(frames) - 1
+                if set(ap) != {'avanco', 'semApoio', 'duvida'} or len(ap['avanco']) != esperado or \
+                        any(v is not None and (type(v) not in (int, float) or abs(v) > 200) for v in ap['avanco']):
+                    raise ValueError(f'{key}.apoio: {{avanco: [{esperado} px ou null], semApoio, duvida}}')
             if 'distancePerFrame' in a:
                 positive(a['distancePerFrame'], key)
                 if not a['loop'] or 'durationsMs' in a:
@@ -899,6 +906,9 @@ def compile_packs(root, results):
                        (','+por_quadro(angulo, str) if angulo else '')+')')
                 if caminho:
                     sil += '.withCaminho('+por_quadro(caminho['pontos'], lambda v: ','.join(map(str, v)))+',0x%06X)' % caminho['cor']
+            if a['loop'] and 'apoio' in a and None not in a['apoio']['avanco'] and abs(sum(a['apoio']['avanco'])) >= 1:
+                # Andar com o pé de apoio cravado no chão: o corpo anda o que o pé empurra (CombatEngine).
+                sil += '.withApoio(new float[]{'+','.join(f(v) for v in a['apoio']['avanco'])+'})'
             if a.get('fimAgachado'):
                 # O golpe termina agachado: o desenho levanta pelo RISE depois dele (SpriteMotion).
                 sil += '.withFimAgachado()'

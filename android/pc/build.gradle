@@ -320,6 +320,8 @@ tasks.register('gravarLuta', JavaExec) {
     // tira a luz dos efeitos (o poder no corpo e a poça no chão), para comparar com e sem;
     // -PnormalAlterna=1 liga e desliga o mapa a cada quadro (a mesma pose, com e sem).
     if (providers.gradleProperty('luz').isPresent()) systemProperty 'gameluta.luz', providers.gradleProperty('luz').get()
+    // -Patrito=off: o andar de velocidade fixa de antes do atrito do pé (para comparar)
+    if (providers.gradleProperty('atrito').isPresent()) systemProperty 'gameluta.atrito', providers.gradleProperty('atrito').get()
     if (providers.gradleProperty('nova').isPresent()) systemProperty 'gameluta.nova', providers.gradleProperty('nova').get()
     if (providers.gradleProperty('semMapa').isPresent()) systemProperty 'gameluta.semMapa', 'true'
     if (providers.gradleProperty('luzEfeito').isPresent()) systemProperty 'gameluta.luzEfeito', providers.gradleProperty('luzEfeito').get()

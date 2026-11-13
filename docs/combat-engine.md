@@ -1132,6 +1132,18 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 - Andar próprio: `fighter.walkSpeed` / `walkBackSpeed` no character.json trocam a velocidade
   de andar no chão daquele lutador (no ritmo da arte de andar dele, pé plantado); no ar
   continua a do motor. Nenhum lutador usa hoje.
+- **Atrito do pé no chão (teste de 13/11, só o andar da p02; ainda não aprovado pelo dono):**
+  `tools/sprites/apoio.py` mede na folha, quadro a quadro, qual pé está apoiado e quanto ele anda
+  para trás no desenho (`animations.<X>.apoio.avanco` no character.json). No andar que tem essa
+  medida (`CombatEngine.andarPeloPe`), a passada corre no tempo, no ritmo que dá a velocidade de
+  andar do lutador, e a cada quadro o corpo anda o que o pé de apoio empurrou: o pé fica cravado
+  no chão e o corpo anda aos passos, não em velocidade constante. A velocidade média não muda
+  (Yin-lu 310 / 250 px/s); muda o ritmo das pernas (frente: volta de 0,27 s → 0,36 s; trás:
+  0,34 s → 0,32 s), porque o passo desenhado dá 111 px para a frente e 81 para trás, e o motor
+  contava 84 e 85. `CombatFighter.passada` diz ao desenho em que quadro da passada o corpo está
+  (`SpriteMotion.passada`). `-Dgameluta.atrito=off` (PC: `-Patrito=off`) volta ao andar de
+  velocidade fixa. Teste: `AtritoDoPeTest`. Fora do teste: corrida, backdash, pouso, golpes que
+  andam e o resto do elenco.
 - O comando de especial ficou mais estrito (antes ~420 ms por passo e 550 ms para
   confirmar; agora 15 + 15 frames). Ajustável em `CombatConfig`.
 

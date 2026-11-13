@@ -2424,7 +2424,32 @@ final class CombatEngine {
         }
     }
 
+    /** O atrito do pé no chão (o corpo anda o que o pé de apoio empurra); "off" volta ao andar de velocidade fixa. */
+    static final boolean ATRITO_DO_PE = !"off".equals(System.getProperty("gameluta.atrito"));
+
+    /**
+     * Um quadro de andar com o pé de apoio cravado no chão: a passada avança no tempo, no ritmo
+     * que dá a velocidade de andar do lutador, e o corpo anda o que o pé no chão empurra no
+     * desenho (CharacterDefinition.Animation.apoio). False sem a medida do pé: anda como antes.
+     */
+    private boolean andarPeloPe(CombatFighter f, boolean frente, float velocidade, float passadaAntes, boolean eraFrente) {
+        CharacterDefinition c = f.character();
+        if (!ATRITO_DO_PE || c == null) return false;
+        CharacterDefinition.Animation a = c.animations.get(frente ? SpriteStates.WALK_FORWARD : SpriteStates.WALK_BACK);
+        if (a == null || a.apoio == null) return false;
+        float passada = passadaAntes >= 0f && eraFrente == frente ? passadaAntes : 0f;
+        int n = a.apoio.length;
+        float depois = passada + n * velocidade * CombatConfig.DT / Math.abs(a.passo);
+        f.x += f.facing * a.avanco((int) passada, (int) depois);
+        f.passada = depois >= n ? depois - n : depois;
+        f.passadaFrente = frente;
+        return true;
+    }
+
     private void moveHorizontally(CombatFighter f) {
+        // A passada só continua se ele andar neste quadro também.
+        float passadaAntes = f.passada;
+        f.passada = -1f;
         if (f.vanishFrames > 0) return;
         // The winner has already won: no stale held direction, dash or air
         // momentum may translate the victory animation around the arena.
@@ -2514,9 +2539,12 @@ final class CombatEngine {
                     f.x += f.facing * dashSpeed(f) * boost * CombatConfig.DT;
                 } else {
                     if (f.energyRunFrames > 0) boost *= config.energyRunSpeedPermille / 1000f;
-                    float speed = f.forwardDashing && holdingForward ? dashSpeed(f) * boost
-                        : walkSpeed(f, holdingForward) * boost;
-                    f.x += horizontal * speed * CombatConfig.DT;
+                    boolean correndo = f.forwardDashing && holdingForward;
+                    float speed = correndo ? dashSpeed(f) * boost : walkSpeed(f, holdingForward) * boost;
+                    if (correndo || horizontal == 0 ||
+                        !andarPeloPe(f, holdingForward, speed, passadaAntes, f.passadaFrente)) {
+                        f.x += horizontal * speed * CombatConfig.DT;
+                    }
                 }
             }
         } else if (dragonRush(f)) {

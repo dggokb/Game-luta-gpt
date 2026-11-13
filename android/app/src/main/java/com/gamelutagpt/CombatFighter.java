@@ -82,6 +82,13 @@ final class CombatFighter {
     boolean backdashArmed = true;
     /** Horizontal distance moved during the last frame (animation). */
     float travel;
+    /**
+     * Andando com o pé de apoio cravado no chão (o atrito do pé): em que ponto da passada está,
+     * em quadros da animação de andar (o desenho mostra esse quadro); -1 fora disso.
+     * {@link #passadaFrente}: para a frente ou para trás.
+     */
+    float passada = -1f;
+    boolean passadaFrente;
     /** Entrada do DHC deslizando de dhcFromX a dhcToX (quadro atual e total; 0 = parado). */
     float dhcFromX, dhcToX;
     int dhcEnterFrame, dhcEnterFrames;

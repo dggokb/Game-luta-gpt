@@ -124,6 +124,7 @@ public final class GravarLuta {
                     esperarGravacao();
                     gravando = new Thread(() -> {
                         try {
+                            long inicio = System.nanoTime();
                             for (int k = 0; k < n; k++) {
                                 BufferedImage q = c.quadro();
                                 synchronized (quadros) {
@@ -131,6 +132,9 @@ public final class GravarLuta {
                                     nomes.add(String.format(Locale.ROOT, "%s-%03d", nome, k));
                                 }
                             }
+                            // Para montar o vídeo na velocidade do jogo: quadros por segundo da gravação.
+                            double s = (System.nanoTime() - inicio) / 1e9;
+                            System.out.println(String.format(Locale.ROOT, "%s: %d quadros em %.2f s (%.1f por segundo)", nome, n, s, n / s));
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
