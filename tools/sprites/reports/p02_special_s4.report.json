@@ -1,7 +1,7 @@
 {
   "id": "p02_special_s4",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_special_s4_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 S4 de 12/11: tr\u00eas v\u00eddeos H3 do dono montados (tools/sprites/montagens/p02.json), convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -90,18 +90,18 @@
         298
       ],
       "minimumMargin": 22,
-      "opaquePixels": 14143
+      "opaquePixels": 15489
     },
     {
       "index": 7,
       "outputBbox": [
         19,
-        59,
+        42,
         318,
         218
       ],
       "minimumMargin": 19,
-      "opaquePixels": 16209
+      "opaquePixels": 17902
     },
     {
       "index": 8,
@@ -249,7 +249,7 @@
       6
     ],
     "sheetWidth": 960,
-    "sheetHeight": 988,
+    "sheetHeight": 992,
     "frames": [
       [
         804,
@@ -260,8 +260,8 @@
         92
       ],
       [
-        716,
-        292,
+        160,
+        492,
         176,
         172,
         59,
@@ -269,7 +269,7 @@
       ],
       [
         312,
-        832,
+        836,
         276,
         152,
         56,
@@ -277,7 +277,7 @@
       ],
       [
         0,
-        668,
+        672,
         276,
         160,
         86,
@@ -285,14 +285,14 @@
       ],
       [
         592,
-        832,
+        836,
         268,
         148,
         87,
         146
       ],
       [
-        160,
+        476,
         292,
         240,
         184,
@@ -308,15 +308,15 @@
         17
       ],
       [
-        0,
-        492,
+        160,
+        292,
         312,
-        172,
+        188,
         5,
-        47
+        32
       ],
       [
-        316,
+        340,
         492,
         120,
         168,
@@ -325,14 +325,14 @@
       ],
       [
         0,
-        832,
+        836,
         308,
         156,
         13,
         56
       ],
       [
-        440,
+        464,
         492,
         124,
         168,
@@ -341,14 +341,14 @@
       ],
       [
         280,
-        668,
+        672,
         300,
         160,
         4,
         53
       ],
       [
-        568,
+        592,
         492,
         236,
         168,
@@ -356,7 +356,7 @@
         47
       ],
       [
-        404,
+        720,
         292,
         148,
         176,
@@ -365,7 +365,7 @@
       ],
       [
         584,
-        668,
+        672,
         292,
         160,
         18,
@@ -396,8 +396,8 @@
         111
       ],
       [
-        556,
-        292,
+        0,
+        492,
         156,
         176,
         66,
@@ -415,17 +415,18 @@
     "decodedBytes": {
       "canonical": 10813440,
       "grid": 9929920,
-      "packed": 3793920
+      "packed": 3809280
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a4e9e9c9bbe7fc766a24b236df93cf41333bc1139970a78d39e68d72e350fa94",
-      "config": "2417a1f40b45444f2ebb9e6fb28faac6ef03e836f2f30bfa09ab774220794ebd",
+      "source": "ac9d1e8391ee4a1f569180723638bb1e1fe100cf481f4f0a16dd7343fab67320",
+      "config": "2fc897debf7fb251771b908f550cdc43837b3c3d329728cce04ed49d5e8f7d8d",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_special_s4_video_normalized_smear.png": "2070a1fe11edde575cc34650d06bea7f2949b4f5b99deafd81bb8d7bb3fdfc87",
       "art/sprites/source/p02_special_s4_video_normalized.png": "946d2356d7d74a0ee0aadabaec306d005e98c144702c532f5d2760e8c4096a21"
     }
   }

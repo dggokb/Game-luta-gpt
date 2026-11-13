@@ -93,6 +93,19 @@ CAMINHO_MANUAL = {
         'SPECIAL_S4': {"7": [145, 130, 150, 205], "8": [275, 195, 180, 200]},   # à mão na grade (11/11)
         'JUMP_HEAVY_DOWN': {"4": [60, 80, 45, 150], "6": [75, -50, 40, 60]},   # à mão na grade (11/11)
     },
+    'p02': {   # pontos marcados à mão na grade (vídeos novos do Flick, 13/11)
+        'MEDIUM_KICK': {"3": [-26, 138, -14, 119], "4": [154, 160, 101, 155], "5": [149, 155, 101, 150]},
+        'HEAVY_STRAIGHT': {"4": [8, 104, 78, 169], "5": [121, 239, 78, 223], "6": [164, 285, 137, 245], "7": [167, 280, 142, 245]},
+        'CROUCH_MEDIUM': {"5": [-155, 8, -110, 25], "6": [-124, 8, -85, 29], "7": [215, 19, 152, 36], "8": [215, 19, 152, 36]},
+        'CROUCH_HEAVY': {"3": [36, 210, 20, 180], "4": [36, 260, 30, 230], "5": [39, 278, 42, 240]},
+        'JUMP_MEDIUM': {"3": [165, 123, 106, 104], "4": [217, 126, 152, 114], "5": [210, 126, 158, 117]},
+        'JUMP_HEAVY': {"2": [56, 52, 4, 122], "3": [110, 86, 76, 100], "4": [173, 103, 110, 105], "5": [173, 103, 110, 105]},
+        'JUMP_HEAVY_DOWN': {"8": [40, 193, 33, 164], "9": [18, 28, 23, 77], "10": [18, 28, 23, 77]},
+        'GOLPE_ALTO': {"4": [-5, 217, 30, 190], "5": [12, 202, 35, 180], "6": [64, 37, 55, 75], "7": [67, 4, 52, 74]},
+        'JOELHO_GARCA': {"2": [0, 68, 21, 107], "3": [87, 172, 32, 131], "4": [90, 187, 32, 131]},
+        'SPECIAL_ENERGY': {"5": [37, 159, -10, 160], "6": [118, 185, 84, 164], "7": [118, 185, 84, 164]},
+        'SPECIAL_S4': {"5": [-21, 180, 1, 168], "6": [43, 276, 59, 235], "7": [168, 225, 110, 222]},
+    },
     'p16': {   # pontos marcados à mão na grade (a pose erra nesta personagem), 11/11
         'JUMP_MEDIUM': {"1": [50, 110, 20, 155], "5": [190, 150, 95, 160]},
         'MEDIUM_KICK': {"5": [8, 158, 28, 154], "9": [150, 195, 99, 173]},
@@ -431,7 +444,7 @@ def main():
         medidos = manuais(pack, caminhos(pack))
         tudo.append((pack, medidos))
         nomes = dict((nome, golpe) for golpe, nome in golpes(pack))
-        print(pack['id'], ' '.join(f"{nomes[n]}:{len(c['pontos'])}" for n, c in medidos.items()),
+        print(pack['id'], ' '.join(f"{nomes.get(n, n)}:{len(c['pontos'])}" for n, c in medidos.items()),
               '| sem:', ' '.join(g for g, n in golpes(pack) if n not in medidos))
         if a.write:
             gravar(pack, medidos)

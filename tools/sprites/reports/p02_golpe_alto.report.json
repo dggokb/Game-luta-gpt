@@ -1,7 +1,7 @@
 {
   "id": "p02_golpe_alto",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_golpe_alto_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_golpe_alto_video_normalized_smear_sr_hd.png",
   "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -85,12 +85,12 @@
       "index": 6,
       "outputBbox": [
         17,
-        77,
+        38,
         177,
         235
       ],
       "minimumMargin": 15,
-      "opaquePixels": 12636
+      "opaquePixels": 12967
     },
     {
       "index": 7,
@@ -101,7 +101,7 @@
         238
       ],
       "minimumMargin": 15,
-      "opaquePixels": 12746
+      "opaquePixels": 12829
     },
     {
       "index": 8,
@@ -204,8 +204,8 @@
       5,
       16
     ],
-    "sheetWidth": 352,
-    "sheetHeight": 1632,
+    "sheetWidth": 348,
+    "sheetHeight": 1648,
     "frames": [
       [
         0,
@@ -256,63 +256,63 @@
         19
       ],
       [
-        176,
-        1456,
-        176,
-        172,
-        5,
-        55
-      ],
-      [
         0,
-        1096,
-        172,
-        176,
-        6,
-        54
-      ],
-      [
-        176,
-        1096,
-        172,
-        176,
-        6,
-        53
-      ],
-      [
-        0,
-        1276,
-        172,
-        176,
-        6,
-        53
-      ],
-      [
-        176,
-        1276,
-        172,
-        176,
-        6,
-        53
-      ],
-      [
-        0,
-        1456,
-        172,
-        176,
-        6,
-        54
-      ],
-      [
-        172,
         892,
+        176,
+        208,
+        5,
+        18
+      ],
+      [
+        176,
+        1104,
+        172,
+        176,
+        6,
+        54
+      ],
+      [
+        0,
+        1292,
+        172,
+        176,
+        6,
+        53
+      ],
+      [
+        176,
+        1292,
+        172,
+        176,
+        6,
+        53
+      ],
+      [
+        0,
+        1472,
+        172,
+        176,
+        6,
+        53
+      ],
+      [
+        176,
+        1472,
+        172,
+        176,
+        6,
+        54
+      ],
+      [
+        0,
+        1104,
         172,
         184,
         7,
         46
       ],
       [
-        0,
+        180,
         892,
         168,
         200,
@@ -339,17 +339,18 @@
     "decodedBytes": {
       "canonical": 4325376,
       "grid": 3715712,
-      "packed": 2297856
+      "packed": 2294016
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "fcbd7f00735cfe4d09d34c38f5a33d0bdd67cead96f8d58bebd20eaa33d82f25",
-      "config": "e4fd6ff27aed8737fc86606c2f1cab9c2f32050eccbb4f546e6138ce7c15f396",
+      "source": "55f5ae931b46bb82a889c5ef19b56d0bd7eaf437f354f9ab4c7c98013d7fbaf8",
+      "config": "c555f6507bef4dd6a38e9f1cd33411f88e75e6ce0e9907f422b351056bae4610",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
+      "art/sprites/source/p02_golpe_alto_video_normalized_smear.png": "b377eadcbcc6c66ccf22dd4e203f6c343499c2255238462d29da623666be1432",
       "art/sprites/source/p02_golpe_alto_video_normalized.png": "0d2ffc27b44619d544735c32ee5b5af1100f7afea284449d63860f786d112bd7"
     }
   }

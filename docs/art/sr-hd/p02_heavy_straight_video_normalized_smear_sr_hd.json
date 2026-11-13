@@ -1,22 +1,22 @@
 {
- "clipe": "p02_joelho_garca",
+ "clipe": "p02_heavy_straight",
  "quadros": 17,
  "colunas": 11,
  "celula": [
   288,
-  288
+  320
  ],
  "raiz": [
   97,
-  270
+  302
  ],
  "pixelScale": null,
  "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
  "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
- "fonte": "art/sprites/source/p02_joelho_garca_video_normalized.png",
- "fonte_sha256": "be56a92b9b4671250be29772771101f75d9fe088d6b83d935ff8352befc2d6aa",
- "saida": "art/sprites/source/p02_joelho_garca_video_normalized_sr_hd.png",
- "saida_sha256": "aba4c9408cc212599e63b602c495e6688f78c96f33117d8a1b6be91305b8bc94",
+ "fonte": "art/sprites/source/p02_heavy_straight_video_normalized_smear.png",
+ "fonte_sha256": "75ea27791e87f93de59bfc12c0991e83a12afcde3fbe38e61c3407e1882f7cf8",
+ "saida": "art/sprites/source/p02_heavy_straight_video_normalized_smear_sr_hd.png",
+ "saida_sha256": "8412fd21e31e851ffcc392a95a524eebb7dd98fe0d5d06e47d2f3bfb59159761",
  "alfa": "idêntico à fonte (conferido byte a byte)",
  "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
 }

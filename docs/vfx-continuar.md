@@ -153,6 +153,20 @@ para a fonte `_smear.png`, `smear.py --opacidade 1,0.5`, e o `sr_hd.py` de novo 
 `realesr-animevideov3.pth` conferidos pelo SHA-256; `pip install torch scipy`, CPU, 31 s). O
 `smear.py` para com aviso quando o clipe está na versão com nitidez: refazer pede essa sequência.
 
+## Smear e nitidez HD na Yin-lu (p02, 13/11, pedido do dono: "aplica os rastros na yinlu e o hd")
+
+Em cima da arte nova dela (vídeos do Drive convertidos por outra sessão, que já tinha passado o
+`sr_hd.py`). Smear em M, H, 2M, 2H, jM, jH, ↓ + jH, → + M, → + H, S1 e S4, com o segundo desenho a
+50%; depois o `sr_hd.py` de novo nesses 11. Detalhes e escolhas em
+[personagens/p02.md](personagens/p02.md). Duas lições:
+
+- `--limpar todos` apaga o tênis em folha 1x (o tornozelo fino some na abertura de 5 px). Conferir os
+  pés na prévia; sem efeito do vídeo sobrando, não usar.
+- O `caixas_sprites.py` mede no `source` do clipe: rodado com o smear lá, as línguas opacas entram
+  na caixa do golpe. Medir com a fonte sem smear (`smear.fonte`).
+
+Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
