@@ -1859,13 +1859,13 @@ public final class CinematicaLuta {
             }
             return;
         }
-        float raioX = VW * 0.40f, raioY = VH * 0.36f;
+        float raioX = VW * 0.30f, raioY = VH * 0.30f;
         float longe = (float)Math.hypot(VW, VH);
         for (int i = 0; i < 90; i++) {
             double ang = Math.PI * 2 * (i + r.nextFloat() * 0.8f) / 90;
             float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
             // Cada linha começa num ponto da borda de uma elipse em volta do meio (variando) e vai até fora da tela.
-            float dentro = 1f + r.nextFloat() * 0.45f;
+            float dentro = 0.85f + r.nextFloat() * 0.45f;
             float x0 = cx + cos * raioX * dentro, y0 = cy + sin * raioY * dentro;
             float base = 3f + r.nextFloat() * 9f;
             float x1 = cx + cos * longe, y1 = cy + sin * longe;

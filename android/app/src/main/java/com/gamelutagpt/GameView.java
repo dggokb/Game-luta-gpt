@@ -8369,7 +8369,7 @@ public class GameView extends SurfaceView
      * nada) nem a guarda (tanta defesa não vira guard break). Quando ela acaba, solta.
      */
     private void protegerTroca() {
-        boolean trocando = cinematicaDirector.trocando();
+        boolean trocando = cinematicaDirector.protegendo();
         if (!trocando && !trocaProtegendo) return;
         for (int side = 0; side < 2; side++) {
             for (FighterState member : engine.team(side).members) {

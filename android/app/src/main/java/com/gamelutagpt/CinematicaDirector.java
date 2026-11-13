@@ -110,6 +110,8 @@ final class CinematicaDirector {
         /** Os golpes do lance em andamento (do roteiro), ou null (sorteados). */
         String[] botoes;
         int botao;
+        /** A troca acabou para o roteiro (no contato) e só segura a guarda de quem defendeu. */
+        boolean soltou;
         /** O quadro da troca em que o último golpe saiu (o botão apertado), ou -1 neste lance. */
         int golpeEm = -1;
         int frame;
@@ -199,8 +201,13 @@ final class CinematicaDirector {
         return t == null || t.golpeEm < 0 ? -1 : t.frame - t.golpeEm;
     }
 
-    /** A troca de golpes ainda não acabou (a vez em andamento termina antes). */
+    /** A troca de golpes ainda não acabou para o roteiro (a vez em andamento termina antes). */
     boolean trocando() {
+        return troca != null && !troca.soltou;
+    }
+
+    /** A troca ainda segura os dois (inclusive a guarda depois do contato): a vida fica protegida. */
+    boolean protegendo() {
         return troca != null;
     }
 
@@ -238,11 +245,20 @@ final class CinematicaDirector {
         }
         boolean livres = atk.canAct() && def.canAct() && atk.grounded && def.grounded;
         float vao = vao(atk, def);
+        if (t.soltou) {
+            // A cena já seguiu; quem defendeu segura a guarda até o golpe acabar (as outras
+            // batidas do mesmo golpe não pegam ele desprotegido).
+            in[d].direction = guarda(atk, def);
+            if (!atk.attacking() && def.status != CombatFighter.Status.BLOCKSTUN || t.faseFrame++ > 90) troca = null;
+            return;
+        }
         if (acabaNoContato(t, def)) {
-            // O último golpe do roteiro bateu na defesa e depois vem o "fim": a troca acaba no
-            // contato (o roteiro solta o impacto e o clarão nessa hora, sem esperar o pouso).
+            // O último golpe do roteiro bateu na defesa e depois vem o "fim": para o roteiro a
+            // troca acaba no contato (o impacto e o clarão saem nessa hora, sem esperar o pouso).
             t.roteiro.poll();
-            troca = null;
+            t.soltou = true;
+            t.faseFrame = 0;
+            in[d].direction = guarda(atk, def);
             return;
         }
         switch (t.fase) {
@@ -298,7 +314,7 @@ final class CinematicaDirector {
                     // Longe, corre; perto, anda. Quem vai defender já levanta a guarda.
                     if (atk.canAct() || atk.forwardDashing) in[a].direction = DemoDirector.Ctx.forward(atk);
                     if (vao > t.alvoVao + 140f && atk.canAct() && !atk.forwardDashing) in[a].dash = true;
-                    if (vao < 70f) in[d].direction = DemoDirector.Ctx.back(def);
+                    if (vao < 70f) in[d].direction = guarda(atk, def);
                     return;
                 }
                 if (t.lance == Lance.SALTO) {
@@ -306,7 +322,7 @@ final class CinematicaDirector {
                     // Pulo para frente (↗ ou ↖) por cima da distância.
                     in[a].jump = true;
                     in[a].direction = atk.facing > 0 ? 8 : 6;
-                    in[d].direction = DemoDirector.Ctx.back(def);
+                    in[d].direction = guarda(atk, def);
                     t.fase = 5;
                     t.faseFrame = 0;
                     return;
@@ -328,13 +344,13 @@ final class CinematicaDirector {
                     } else if (t.golpes == 0 && t.faseFrame > t.proximoGolpe && atk.canAct() && def.grounded) {
                         separar(t, -1);
                     } else if (t.golpes == 0) {
-                        in[d].direction = DemoDirector.Ctx.back(def);
+                        in[d].direction = guarda(atk, def);
                     }
                     if (t.faseFrame > 120) separar(t, -1);
                     return;
                 }
                 // Quem defende segura para trás (defesa em pé) a vez inteira.
-                in[d].direction = DemoDirector.Ctx.back(def);
+                in[d].direction = guarda(atk, def);
                 // A defesa empurrou longe demais: o resto do combo não sai do outro lado da tela.
                 // Com os golpes do roteiro, quem ataca anda de volta e solta o que falta.
                 if (t.golpes > 0 && t.faseFrame > 0 && vao > t.alvoVao + 60f) {
@@ -357,7 +373,7 @@ final class CinematicaDirector {
                 return;
             case 5:
                 // No ar: segura para frente, solta o forte descendo; quem está embaixo defende.
-                in[d].direction = DemoDirector.Ctx.back(def);
+                in[d].direction = guarda(atk, def);
                 if (!atk.grounded) {
                     t.noAr = true;
                     in[a].direction = DemoDirector.Ctx.forward(atk);
@@ -379,7 +395,7 @@ final class CinematicaDirector {
                 return;
             case 3:
                 // Separa: um dos dois recua (ou nenhum); quem defendeu segura a defesa um pouco mais.
-                if (t.faseFrame < 12 && t.lance != Lance.CHOQUE) in[d].direction = DemoDirector.Ctx.back(def);
+                if (t.faseFrame < 12 && t.lance != Lance.CHOQUE) in[d].direction = guarda(atk, def);
                 if (t.faseFrame == 12 && t.recua >= 0 && engine.fighter(t.recua).canAct()) in[t.recua].backdash = true;
                 if (t.faseFrame >= (t.recua >= 0 ? 30 : 14) && (livres || t.faseFrame > 90)) {
                     t.fase = 0;
@@ -401,6 +417,17 @@ final class CinematicaDirector {
         if (t.fase != 2 && t.fase != 5) return false;
         Passo proximo = t.roteiro.peek();
         return proximo != null && proximo.fim && def.status == CombatFighter.Status.BLOCKSTUN;
+    }
+
+    /**
+     * A defesa de quem leva: para trás (em pé) ou, contra golpe baixo (a rasteira, o chute
+     * giratório baixo), para trás e para baixo (agachado).
+     */
+    static int guarda(CombatFighter atk, CombatFighter def) {
+        int tras = DemoDirector.Ctx.back(def);
+        boolean baixo = atk.attacking() && atk.attack != null && atk.attack.low;
+        // 5 (←) vira 4 (↙); 1 (→) vira 2 (↘).
+        return baixo ? (tras == 5 ? 4 : 2) : tras;
     }
 
     private static void separar(Troca t, int recua) {
