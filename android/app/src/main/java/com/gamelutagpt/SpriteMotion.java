@@ -21,10 +21,19 @@ final class SpriteMotion {
     void setCharacter(CharacterDefinition next) {
         character=next;clip=Clip.IDLE;time=distance=0;wasGrounded=true;wasCrouching=false;
     }
+    /**
+     * Andando com o pé de apoio cravado no chão (CombatFighter.passada): o ponto da passada, em
+     * quadros da animação de andar, e o lado; -1 fora disso. Quem manda é o motor: o desenho
+     * mostra o quadro em que o corpo está, e não troca de animação pelo sinal do deslocamento.
+     */
+    float passada=-1f;
+    boolean passadaFrente;
+    void passada(float ponto,boolean frente) { passada=ponto;passadaFrente=frente; }
     void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
                 float attackElapsed,boolean combat,boolean locked) {
         dt=Math.max(0,Math.min(.1f,dt));
+        boolean peloPe=passada>=0f&&!dash;
         boolean estavaNoAr=!wasGrounded;
         String next;
         if(attackAnimation!=null) next=attackAnimation;
@@ -33,6 +42,7 @@ final class SpriteMotion {
         else if(combat || locked) next=Clip.COMBAT;
         else if(!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) next=Clip.LAND;
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
+        else if(peloPe) next=passadaFrente ? Clip.WALK_FORWARD : Clip.WALK_BACK;
         else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
         else if(clip.equals(Clip.CROUCH) || clip.equals(Clip.CROUCH_IDLE) || fimAgachado(clip) ||
                 (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
@@ -82,5 +92,9 @@ final class SpriteMotion {
         CharacterDefinition.Animation a=character.animations.get(c);
         return a!=null && a.fimAgachado;
     }
-    int frame(){return character.animation(clip).frame(time,distance);}
+    int frame(){
+        CharacterDefinition.Animation a=character.animation(clip);
+        if(passada>=0f&&a.apoio!=null&&(clip.equals(Clip.WALK_FORWARD)||clip.equals(Clip.WALK_BACK)))return a.quadroDaPassada(passada);
+        return a.frame(time,distance);
+    }
 }

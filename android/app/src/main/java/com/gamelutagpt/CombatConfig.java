@@ -112,6 +112,13 @@ final class CombatConfig {
     float walkBackSpeed = 220f;
     float dashSpeed = 620f;
     /**
+     * Atrito do pé deslizando no chão (coeficiente, vezes a gravidade = quanto freia, px/s²): o
+     * corpo que vinha embalado e não dá mais passo (o golpe dado na corrida) desliza e para por
+     * ele. Um número só, para todo deslize de pé no chão. 0,8 com a gravidade de 1650: a corrida
+     * (620 px/s) para em 0,47 s, depois de 146 px.
+     */
+    float atritoDoChao = 0.8f;
+    /**
      * Pulo normal: velocidade de lado no ar, para frente e para trás. Mais que a de andar: com o
      * mesmo tempo no ar (~42 quadros) vai ~280 para frente (passa do alcance dos golpes de chão
      * e cruza por cima de perto) e ~205 para trás. (O pulo mais rápido do KOF '97, 03/11, foi

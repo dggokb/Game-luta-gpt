@@ -1132,6 +1132,50 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 - Andar próprio: `fighter.walkSpeed` / `walkBackSpeed` no character.json trocam a velocidade
   de andar no chão daquele lutador (no ritmo da arte de andar dele, pé plantado); no ar
   continua a do motor. Nenhum lutador usa hoje.
+- **Atrito do pé no chão (13/11; o dono viu o MVP da p02 em vídeo e gostou; o elenco ainda não
+  foi visto por ele):** `tools/sprites/apoio.py` mede na folha, quadro a quadro, qual pé está
+  apoiado e quanto ele anda para trás no desenho (`animations.<X>.apoio` no character.json; as
+  regras estão no começo do arquivo). No andar com medida segura (`CombatEngine.andarPeloPe`), a
+  passada corre no tempo, no ritmo que dá a velocidade de andar do lutador, e a cada quadro o
+  corpo anda o que o pé de apoio empurrou: o pé fica cravado no chão e o corpo anda aos passos,
+  não em velocidade constante. **A velocidade média de andar não muda; muda o ritmo das pernas**
+  (volta = passo medido ÷ velocidade). `CombatFighter.passada` diz ao desenho em que quadro da
+  passada o corpo está (`SpriteMotion.passada`). `-Dgameluta.atrito=off` (PC: `-Patrito=off`)
+  volta ao andar de velocidade fixa. Teste: `AtritoDoPeTest`.
+  - **Quem mede é o build** (`build_characters.py --write`): andar novo ou trocado sai medido
+    sozinho; com `--check`, medida de animação que mudou é erro. Medir precisa de OpenCV e numpy
+    (o CI só confere a marca, não mede).
+  - **28 dos 36 andares do elenco estão ligados.** Ficaram no andar de velocidade fixa, com o
+    motivo gravado em `apoio.inseguro` / `apoio.aoContrario`: p03 para a frente (o desenho marca
+    passo, não anda), p08 para a frente (o chicote no chão confunde a medida), p10 para a frente
+    (muitos quadros no ar ou em dúvida) e o andar para trás de p03, p07, p08, p09 e p11, que é
+    desenhado com o passo de quem anda para a frente.
+  - **Onde o passo do desenho é curto para a velocidade, as pernas ficam rápidas** (antes o pé
+    escorregava a diferença). Volta da passada, antes → depois: Kōga `koga_8` frente 0,55 → 0,19 s;
+    p15 trás 1,00 → 0,31 s; p12 frente 2,14 → 0,82 s; p05 frente 1,13 → 0,47 s; p10 trás 0,77 →
+    0,31 s. Remédio: velocidade de andar menor para o lutador (`fighter.walkSpeed`) ou arte com
+    passo mais comprido.
+  - Fora: a corrida (não dá para medir: o pé fica dois quadros no chão por passada), backdash,
+    pouso, levantar e golpes que andam.
+- **Impulso da corrida (pedido do dono em 13/11; teste, ainda não aprovado):** o golpe normal
+  dado na corrida (L, M, H e os agachados) não para mais na hora. O corpo leva a velocidade da
+  corrida (`CombatFighter.embalo`) e o atrito do pé no chão freia o mesmo tanto por quadro, para
+  qualquer golpe: `CombatConfig.atritoDoChao` (0,8) × a gravidade (`CombatEngine.deslizar`). O
+  deslize acaba ao encostar no rival (não empurra ele pela arena), ao sair do chão, ao apanhar
+  ou quando ele volta a dar passo. Vale para todo o elenco (não depende de medida na arte).
+  Deslize até parar, sem rival na frente: Ryūga 151 px (corrida de 620 px/s), Yin-lu 199 px (713).
+  Alcance a mais no primeiro quadro que bate: Yin-lu L +45, M +66, H +85 px; Ryūga L +39, M +57,
+  H +86 px. As rotas de combo com corrida (C120) passaram sem mudar; a CPU não conta com esse
+  alcance a mais (ataca pela régua do golpe parado). Especiais, Super e agarrão não levam o embalo,
+  nem o golpe que já anda por conta própria (o golpe de corrida `DH`, o `→ + H`): esse anda só o dele.
+- **Empurrão de golpe freado pelo atrito (experimento desligado, 13/11):** com
+  `-Dgameluta.empurrao=atrito` (PC: `-Pempurrao=atrito`) o empurrão no chão de quem apanha ou
+  defende deixa de andar por igual em 8 quadros (`pushbackFrames`) e vira deslize: sai rápido e
+  freia pelo mesmo atrito (`CombatEngine.push`), parando na mesma distância do golpe. Demora mais
+  (40 px: 15 quadros; 120 px: 26), então o rival fica perto por mais tempo no meio do combo. Com
+  ele ligado dois testes quebram: `ComboRyugaTest.aOndaDoAssistSeguraParaOParceiroRecomecar` (a
+  corrente emenda sem precisar segurar) e `CombatEngineTest.cpuOnlyAttacksThroughTheEngineAndWithinReach`.
+  Mexe no balanço dos combos: só liga com o dono vendo.
 - O comando de especial ficou mais estrito (antes ~420 ms por passo e 550 ms para
   confirmar; agora 15 + 15 frames). Ajustável em `CombatConfig`.
 

@@ -217,17 +217,20 @@ public class ShinkaiTest {
     // ------------------------------------------------------------------ SPEED
 
     @Test public void speedWalksFaster() {
-        Match normal = new Match("p16", "p15", 600f, 1500f);
-        Match boosted = new Match("p16", "p15", 600f, 1500f);
+        Match normal = new Match("p16", "p15", 200f, 1700f);
+        Match boosted = new Match("p16", "p15", 200f, 1700f);
         boosted.shinkai();
         for (Match m : new Match[]{normal, boosted}) {
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < 150; i++) {
                 m.in[0].direction = 1;
                 m.step();
             }
         }
-        float walked = normal.f(0).x - 600f, fast = boosted.f(0).x - 600f;
-        assertEquals(walked * boosted.config().shinkaiSpeed, fast, 2f);
+        float walked = normal.f(0).x - 200f, fast = boosted.f(0).x - 200f;
+        // O corpo anda aos passos (o pé de apoio cravado no chão): a conta vale com a folga de um passo.
+        float passo = Math.abs(GeneratedCharacters.get("p16").animation(SpriteStates.WALK_FORWARD).passo);
+        assertTrue("anda mais com o SHINKAI SPEED: " + walked + " x " + fast, fast > walked + passo);
+        assertEquals(walked * boosted.config().shinkaiSpeed, fast, passo);
     }
 
     @Test public void speedVanishesAndAppearsBehindTheRival() {
