@@ -66,6 +66,8 @@ final class CombatConfig {
     float projectileHitPushback = 120f;
     /** After a LAUNCH hit, a jump becomes a super jump for this many frames. */
     int launcherChaseFrames = 54;
+    /** Atordoamento mínimo de quem foi lançado (o do 2H, 47 no Ryūga): dá tempo do super pulo. */
+    int launchHitstunFrames = 44;
     /**
      * After an H that wall-bounces in a combo, holding → starts the run (dash) for this many
      * frames, without the → → (like the launcher turns the jump into a super jump).
@@ -416,6 +418,19 @@ final class CombatConfig {
     /** Ground bounce: driven into the floor, then it pops back up. */
     float groundBounceDown = 1500f;
     float groundBounceUp = 920f;
+    /** Quem acerta o quique no chão no ar desce a esta velocidade (px/s), para emendar outro combo. */
+    float groundBounceAttackerDrop = 1200f;
+    /**
+     * OTG (12/11, como o Marvel vs. Capcom): o golpe {@code otgMove} pega o rival que caiu dentro de
+     * um combo (2 acertos ou mais) nos primeiros {@code otgWindowFrames} quadros deitado, uma vez
+     * por combo, e o levanta {@code otgLift} (px/s) com {@code otgHitstunFrames} para continuar.
+     * Enquanto ele ainda pode vir, o combo não acaba e o caído não rola nem levanta rápido.
+     */
+    String otgMove = "2M";
+    int otgWindowFrames = 34;
+    float otgLift = 620f;
+    int otgHitstunFrames = 34;
+    float otgPush = 30f;
     /** Hitstun after either bounce; landing afterwards is a knockdown (no air recovery). */
     int bounceHitstunFrames = 48;
 

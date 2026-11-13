@@ -5,7 +5,7 @@
     "horizonte": 0.4
   },
   "corFundo": "#0E1236",
-  "luzLutadores": { "cor": "#A8B4E6", "forca": 0.25, "brilho": 0.94, "pes": "#D4DAEA", "contraluz": { "cor": "#BFE0FF", "forca": 0.75, "direcao": [1, -1] } },
+  "luzLutadores": { "luz": "#FFE6D6", "sombra": "#B4B4D0", "chao": "#A8A8BC", "direcao": [1, -1], "borda": 0.45 },
   "camadas": [
     {
       "id": "ceu",

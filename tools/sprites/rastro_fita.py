@@ -48,6 +48,13 @@ def main():
     fita.save(pasta / 'folha.webp', lossless=True, quality=100, method=6)
     dados = {'nome': a.nome, 'origem': f'tools/sprites/rastro_fita.py ({Path(a.textura).name})', 'ancora': 'fita',
              'pixelScale': 1.0, 'altura': ALTURA, 'quadros': [[0, 0, LARGURA, ALTURA, 0.0, 0.0]], 'duracoesMs': [1000]}
+    # A luz que o efeito emite ("luz": cor, alcance, forca) é posta à mão no efeito.json:
+    # refazer a folha não a apaga.
+    antigo = pasta / 'efeito.json'
+    if antigo.exists() and 'luz' not in dados:
+        luz = json.loads(antigo.read_text(encoding='utf-8')).get('luz')
+        if luz is not None:
+            dados['luz'] = luz
     (pasta / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print(a.nome, '->', pasta.relative_to(ei.ROOT), fita.size)
 

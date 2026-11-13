@@ -1,0 +1,34 @@
+{
+  "id": "p02_crouch_idle",
+  "javaName": "P02_CROUCH_IDLE",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_crouch_idle_video_normalized_sr_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_crouch_idle.webp",
+  "report": "tools/sprites/reports/p02_crouch_idle.report.json",
+  "preview": "android/app/build/sprite-review/p02_crouch_idle-import.png",
+  "expectedFrames": 26,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 de 12/11: vídeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p02",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71",
+    "celula": 192,
+    "largura": 192,
+    "raiz": "96,174",
+    "colunas": 11,
+    "fixar": "video",
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "rootX": 96,
+  "rootY": 174,
+  "sourceReferences": [
+    "art/sprites/source/p02_crouch_idle_video_normalized.png"
+  ]
+}

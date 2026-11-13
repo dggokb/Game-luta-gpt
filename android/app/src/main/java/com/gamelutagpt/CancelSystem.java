@@ -9,6 +9,9 @@ package com.gamelutagpt;
 final class CancelSystem {
     private CancelSystem() {}
 
+    /** Golpe de comando de chão (→ + H), quando o pacote tem um (o Soco no plexo do Ryūga). */
+    static final String COMMAND_HEAVY = "6H";
+
     /** Cancel window of the attack for what it has done so far; null when closed for that outcome. */
     static AttackDefinition.Window windowFor(CombatFighter f) {
         if (f.attack == null) return null;
@@ -27,8 +30,12 @@ final class CancelSystem {
     /** Whether the current attack may become {@code target} on this frame. */
     static boolean canCancel(CombatFighter f, String target, ComboSession session) {
         if (!f.attacking() || !windowOpen(f) || !f.attack.cancelsInto(target)) return false;
-        // No chão é o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo).
-        if (AttackDefinition.JUMP.equals(target)) return f.grounded || !f.airJumpUsed;
+        // No chão é o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo). Golpe de
+        // várias pancadas só pula depois da última (12/11: o S4 da Yin-lu lança no segundo chute).
+        if (AttackDefinition.JUMP.equals(target)) {
+            if (f.attack.maxHits > 1 && f.hitsOnTarget < f.attack.maxHits) return false;
+            return f.grounded || !f.airJumpUsed;
+        }
         AttackDefinition next = f.character().attack(target);
         return next != null && chainAllows(f, next) && (session == null || session.allows(next));
     }
@@ -60,7 +67,14 @@ final class CancelSystem {
                     return c.attack(GolpeAlto.BINDING);
                 }
                 return c.attack(binding(f, "M", entry.crouch));
-            case HEAVY: return c.attack(binding(f, "H", entry.crouch));
+            case HEAVY:
+                // → + H no chão: o golpe de comando (12/11), do neutro ou emendado no combo. Dentro
+                // de um golpe que não emenda nele (a rota não tem o 6H), continua sendo o H.
+                if (entry.forward && !entry.crouch && f.grounded && c.moves.containsKey(COMMAND_HEAVY) &&
+                    (!f.attacking() || f.attack.cancelsInto(COMMAND_HEAVY))) {
+                    return c.attack(COMMAND_HEAVY);
+                }
+                return c.attack(binding(f, "H", entry.crouch));
             case SPECIAL:
                 // Command specials (S2, S3...): ground moves, or air-only ones; the strength names them.
                 CharacterDefinition.Special special = c.specials.get(entry.strength);

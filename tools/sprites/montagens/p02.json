@@ -1,0 +1,274 @@
+{
+  "_doc": "Yin-lu (p02), vídeos H3 de 12/11. Receita de clipes montados de vários vídeos (montagem.py).",
+  "_opcoes": {
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)"
+  },
+  "special_s4": {
+    "_doc": "S4, Chute rodopiante (12/11): três vídeos do dono. s4_1 sai da guarda à esquerda e mergulha até ficar de ponta-cabeça nas mãos; s4_2 gira de ponta-cabeça no ar com as pernas abertas (os chutes); s4_3 ainda gira, desvira, pousa e volta à guarda no centro. O s4_2 fica na altura do vídeo: das mãos ela se projeta para cima e o giro começa no alto (o dono, 12/11: descer o começo do giro até o chão ficou errado). O s4_3 começava 55 px acima do fim do s4_2: foi descido no começo e sobe aos poucos. fixo: o deslizar do vídeo para a direita sai (quem anda é o avanço do golpe); emenda: cada trecho começa com o corpo onde o anterior parou. Chutes que acertam: 2:001 e 2:009 (pernas abertas, uma para a frente).",
+    "trechos": [
+      [
+        "s4_1",
+        0,
+        48,
+        "fixo"
+      ],
+      [
+        "s4_2",
+        0,
+        28,
+        "fixo",
+        "emenda"
+      ],
+      [
+        "s4_3",
+        0,
+        40,
+        "fixo",
+        "emenda"
+      ]
+    ],
+    "quadros": "3,9,12,15,18,21,24,48,51,56,61,66,71,80,88,92,96,100,104,108",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "SPECIAL_S4": {
+        "impacto": 7
+      }
+    }
+  },
+  "idle": {
+    "_doc": "Idle (12/11, vídeo H3 do dono): uma respirada (58-94; o 95 volta ao 58), em loop: o segundo idle entra a cada 3 voltas.",
+    "trechos": [
+      [
+        "idle",
+        0,
+        124
+      ]
+    ],
+    "quadros": "58-94/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "IDLE": {
+        "loop": true
+      },
+      "COMBAT": {
+        "frames": "0"
+      }
+    }
+  },
+  "idle_2": {
+    "_doc": "Segundo idle (12/11): pulinhos no lugar, para, ajeita as luvas e volta à guarda (idle2 1-121); toca uma vez a cada 3 voltas do idle. A poeira dos pulinhos sai.",
+    "trechos": [
+      [
+        "idle2",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0-120/2",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "IDLE_2": {}
+    }
+  },
+  "walk_forward": {
+    "_doc": "Andar para frente: um ciclo (44-83; a largura dos pés repete a cada 40 quadros), com o pé plantado.",
+    "trechos": [
+      [
+        "frente",
+        0,
+        124
+      ]
+    ],
+    "quadros": "44-83",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "WALK_FORWARD": {
+        "distancia": "video",
+        "velocidade": 310,
+        "acelerar": 2.45,
+        "loop": true
+      }
+    }
+  },
+  "walk_back": {
+    "_doc": "Andar para trás: um ciclo (40-79), com o pé plantado.",
+    "trechos": [
+      [
+        "tras",
+        0,
+        124
+      ]
+    ],
+    "quadros": "40-79",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "WALK_BACK": {
+        "distancia": "video",
+        "velocidade": 250,
+        "acelerar": 1.96,
+        "loop": true
+      }
+    }
+  },
+  "dash": {
+    "_doc": "Corrida: um ciclo da passada (51-62, período de 12 quadros), cada quadro fixo pelo corpo, em loop pela distância. A poeira sai.",
+    "trechos": [
+      [
+        "dash",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "50-61",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false,
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "DASH": {
+        "distancia": 30,
+        "loop": true
+      }
+    }
+  },
+  "backdash": {
+    "_doc": "Backdash: agacha, pulinho para trás, pousa e volta à guarda (20-56 de 3 em 3). O corpo fica na raiz (registro): quem anda é o motor.",
+    "trechos": [
+      [
+        "backdash",
+        0,
+        124
+      ]
+    ],
+    "quadros": "19-55/3",
+    "opcoes": {
+      "fixar": "registro",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "BACKDASH": {}
+    }
+  },
+  "crouch": {
+    "_doc": "Agachar: a descida (16-31).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "15-31/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH": {}
+    }
+  },
+  "crouch_idle": {
+    "_doc": "Agachada parada, respirando (47-72; o 73 é o 47).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "46-71",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH_IDLE": {
+        "loop": true
+      }
+    }
+  },
+  "rise": {
+    "_doc": "Levantar (86-97).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "85-96",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "RISE": {}
+    }
+  },
+  "jump": {
+    "_doc": "Subida do pulo: sai do chão esticada (27) e encolhe no ar até o alto (47). O agachar antes do impulso fica de fora: o motor já sai do chão. Pés na raiz: o motor é quem sobe.",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "26,27,28,29,30,32,34,36,39,42,46",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "JUMP": {}
+    }
+  },
+  "fall_air": {
+    "_doc": "Descida do pulo: encolhida (48-52) e esticando as pernas para o chão (53-56). Pés na raiz.",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "47,49,51,52,53,54,55",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "FALL": {}
+    }
+  },
+  "land": {
+    "_doc": "Aterrissagem: toca o chão (58), agachada (60-70) e de volta à guarda (73-85). A poeira do vídeo sai (o jogo põe a dele).",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "57,59,61,64,67,70,72,74,76,78,81,84",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "LAND": {}
+    }
+  }
+}

@@ -167,6 +167,13 @@ def gravar(nome, quadros, tempos, lado, origem_do_arquivo, ancora='centro'):
     folha.save(pasta / 'folha.webp', lossless=True, quality=100, method=6)
     dados = {'nome': nome, 'origem': f'tools/sprites/efeito_imagem.py ({origem_do_arquivo})', 'ancora': ancora,
              'pixelScale': PIXEL_SCALE, 'altura': lado / PIXEL_SCALE, 'quadros': lista, 'duracoesMs': tempos}
+    # A luz que o efeito emite ("luz": cor, alcance, forca) é posta à mão no efeito.json:
+    # refazer a folha não a apaga.
+    antigo = pasta / 'efeito.json'
+    if antigo.exists() and 'luz' not in dados:
+        luz = json.loads(antigo.read_text(encoding='utf-8')).get('luz')
+        if luz is not None:
+            dados['luz'] = luz
     (pasta / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print(nome, '->', pasta.relative_to(ROOT), folha.size)
 

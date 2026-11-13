@@ -266,6 +266,8 @@ final class CombatFighter {
      * (H → L do p12) ou repete um golpe (M → M) sempre acaba.
      */
     final java.util.ArrayList<String> chain = new java.util.ArrayList<>();
+    /** Golpes começados desde o início da luta (o executor dos testes e a gravação contam por ele). */
+    int golpesIniciados;
     /** Air dashes done in this jump (a fighter may have more than one). */
     int airDashCount;
 

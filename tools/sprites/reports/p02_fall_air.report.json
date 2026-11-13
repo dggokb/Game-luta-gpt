@@ -1,0 +1,185 @@
+{
+  "id": "p02_fall_air",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_fall_air_video_normalized_sr_hd.png",
+  "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 160,
+    "frameHeight": 288,
+    "rootX": 80,
+    "rootY": 270,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        20,
+        102,
+        140,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11027
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        20,
+        100,
+        140,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11103
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        20,
+        96,
+        140,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11294
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        24,
+        89,
+        140,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11381
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        27,
+        75,
+        140,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11646
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        34,
+        55,
+        140,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 12041
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        35,
+        36,
+        140,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 12669
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 141,
+    "frameHeight": 255,
+    "rootX": 71,
+    "rootY": 244,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      9,
+      26
+    ],
+    "sheetWidth": 508,
+    "sheetHeight": 440,
+    "frames": [
+      [
+        140,
+        252,
+        132,
+        184,
+        5,
+        69
+      ],
+      [
+        276,
+        252,
+        132,
+        184,
+        5,
+        67
+      ],
+      [
+        0,
+        252,
+        136,
+        188,
+        4,
+        64
+      ],
+      [
+        380,
+        0,
+        128,
+        196,
+        9,
+        57
+      ],
+      [
+        248,
+        0,
+        128,
+        208,
+        12,
+        43
+      ],
+      [
+        124,
+        0,
+        120,
+        228,
+        19,
+        23
+      ],
+      [
+        0,
+        0,
+        120,
+        248,
+        19,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 1290240,
+      "grid": 1006740,
+      "packed": 894080
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "b42818a94178b1f61a9e213eeaebbfe425f28f94d996842471485ed45b61381f",
+      "config": "a892d30266d1c55768149b4e491d90f14b8e882af55068a1b1bfb1cae46f22c9",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_fall_air_video_normalized.png": "3ab59e4968bffcd88dd4e4b2783ac1dab409f4f33d18aae30259f9015b6e856f"
+    }
+  }
+}

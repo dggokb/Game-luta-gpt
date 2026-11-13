@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais.",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais. golpeComando: o → + H do personagem (6H) inteiro, no formato do character.json (a animação é a do H até chegar a própria); o avanço dele vai em unica.golpes.6H.",
   "base": {
     "frames": {
       "L": [
@@ -177,7 +177,8 @@
           "M",
           "2M",
           "H",
-          "2H"
+          "2H",
+          "6H"
         ],
         "2L": [
           "L",
@@ -185,12 +186,14 @@
           "M",
           "2M",
           "H",
-          "2H"
+          "2H",
+          "6H"
         ],
         "M": [
           "2M",
           "H",
-          "2H"
+          "2H",
+          "6H"
         ],
         "2M": [
           "H"
@@ -219,7 +222,8 @@
         "jL": 1,
         "jM": 1,
         "jH": 1,
-        "j2H": 1
+        "j2H": 1,
+        "6H": 1
       }
     },
     "soCombos": {
@@ -232,6 +236,17 @@
         "descricao": "Shoto: exatamente a base. Combo médio que termina em onda ou no punho ascendente.",
         "rotas": {},
         "maxUsosCorrente": {}
+      },
+      "shoto": {
+        "descricao": "Ryūga (12/11): a base mais o soco duplo da casa (M > M); o segundo M entrega para o especial ou para o → + H.",
+        "rotas": {
+          "M": [
+            "M"
+          ]
+        },
+        "maxUsosCorrente": {
+          "M": 2
+        }
       },
       "pressao": {
         "descricao": "Rushdown: o M repete (M > M) e cancela em pulo mesmo na defesa, para continuar a pressão no ar.",
@@ -326,7 +341,7 @@
   "personagens": {
     "player_base": {
       "molde": "Equilibrado",
-      "estiloCombo": "equilibrado",
+      "estiloCombo": "shoto",
       "vida": 10000,
       "dano": 1.0,
       "ritmo": 1.0,
@@ -343,6 +358,15 @@
             "carga": {
               "frames": 60,
               "bonus": 800
+            }
+          },
+          "6H": {
+            "avanco": {
+              "velocidade": 420,
+              "frames": [
+                1,
+                9
+              ]
             }
           }
         }
@@ -370,12 +394,46 @@
       },
       "especiais": {
         "S3": {
-          "lancar": "knockdown",
+          "lancar": "wallBounce",
           "empurrao": 70
         }
       },
       "estiloCpu": "onda",
       "papelNormais": "Fundamento calmo: jab honesto de 5 quadros, o soco de energia que cutuca de longe e o 2H que tira do ar de verdade.",
+      "golpeComando": {
+        "animation": "SOCO_PLEXO",
+        "nome": "Soco no plexo",
+        "damage": 900,
+        "reach": 138,
+        "startupFrames": 9,
+        "activeFrames": 10,
+        "recoveryFrames": 15,
+        "hitstunFrames": 24,
+        "blockstunFrames": 14,
+        "hitstopFrames": 10,
+        "cancelWindows": {
+          "hit": [
+            16,
+            27
+          ],
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [
+          "S",
+          "SUPER",
+          "S2",
+          "S3"
+        ],
+        "pushbackOnHit": 26,
+        "pushbackOnBlock": 44,
+        "hitHeight": 200,
+        "hitFloor": 100,
+        "golpes": [
+          9,
+          16
+        ]
+      },
       "andar": [
         280,
         210
@@ -483,6 +541,15 @@
               "le": "alto",
               "janela": "startup"
             }
+          },
+          "6H": {
+            "avanco": {
+              "velocidade": 360,
+              "frames": [
+                1,
+                8
+              ]
+            }
           }
         },
         "lutador": {
@@ -497,6 +564,13 @@
           },
           "corrida": {
             "dash": 1.15
+          }
+        },
+        "rotas": {
+          "S4": {
+            "cancelaEm": [
+              "JUMP"
+            ]
           }
         }
       },
@@ -523,6 +597,44 @@
       },
       "estiloCpu": "contra",
       "papelNormais": "Garça: palma rápida e curta de perto, rasteira ligeira e o chute alto que tira do ar.",
+      "golpeComando": {
+        "animation": "HEAVY_STRAIGHT",
+        "nome": "Joelho da garça",
+        "damage": 760,
+        "reach": 150,
+        "startupFrames": 8,
+        "activeFrames": 10,
+        "recoveryFrames": 16,
+        "hitstunFrames": 40,
+        "blockstunFrames": 12,
+        "hitstopFrames": 9,
+        "cancelWindows": {
+          "hit": [
+            15,
+            30
+          ],
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [
+          "JUMP",
+          "S",
+          "SUPER",
+          "S2",
+          "S3",
+          "S4"
+        ],
+        "launchType": "launch",
+        "knockback": 0,
+        "pushbackOnHit": 0,
+        "pushbackOnBlock": 40,
+        "hitHeight": 260,
+        "hitFloor": 60,
+        "golpes": [
+          8,
+          15
+        ]
+      },
       "andar": [
         310,
         250
@@ -599,6 +711,11 @@
               "janela": "antiaereo"
             }
           }
+        }
+      },
+      "especiais": {
+        "S4": {
+          "lancar": "launch"
         }
       }
     },

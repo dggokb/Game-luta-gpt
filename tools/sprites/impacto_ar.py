@@ -194,6 +194,13 @@ def gravar(nome, quadros):
     folha.save(pasta / 'folha.webp', lossless=True, quality=100, method=6)
     dados = {'nome': nome, 'origem': 'tools/sprites/impacto_ar.py (desenhado em código)', 'ancora': 'centro',
              'pixelScale': PIXEL_SCALE, 'altura': LADO / PIXEL_SCALE, 'quadros': lista, 'duracoesMs': TEMPOS}
+    # A luz que o efeito emite ("luz": cor, alcance, forca) é posta à mão no efeito.json:
+    # refazer a folha não a apaga.
+    antigo = pasta / 'efeito.json'
+    if antigo.exists() and 'luz' not in dados:
+        luz = json.loads(antigo.read_text(encoding='utf-8')).get('luz')
+        if luz is not None:
+            dados['luz'] = luz
     (pasta / 'efeito.json').write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print(nome, '->', pasta.relative_to(ROOT), folha.size)
 

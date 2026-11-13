@@ -41,19 +41,18 @@
     "p02": {
       "S4": {
         "pancadas": [
-          2,
-          4
+          7,
+          9
         ],
         "avanco": {
-          "distancia": 320,
-          "de": 3,
-          "ate": 12
+          "distancia": 265,
+          "de": 2,
+          "ate": 16
         },
         "voo": {
-          "altura": 25,
-          "de": 3,
-          "ate": 12,
-          "paira": true
+          "altura": 90,
+          "de": 7,
+          "ate": 15
         }
       },
       "SUPER": {

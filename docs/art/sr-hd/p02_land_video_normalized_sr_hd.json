@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_land",
+ "quadros": 12,
+ "colunas": 11,
+ "celula": [
+  192,
+  256
+ ],
+ "raiz": [
+  95,
+  232
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_land_video_normalized.png",
+ "fonte_sha256": "d73d9084a9f3207a25fd50a206303b948ad1ed542180938a6ab3f0902fc90cec",
+ "saida": "art/sprites/source/p02_land_video_normalized_sr_hd.png",
+ "saida_sha256": "76c9c3fa75aba5d741cca2f2b013b618a7972a2bb3e26e02a6c58a9f89610ff0",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

@@ -30,6 +30,14 @@ Golpe alto (→ + M, pega quem defende agachado): só quem tem o próprio, com v
 p13 a p16). Nos outros, → + M é o M (12/11: o golpe alto montado do M congelava a pose do M até o
 20º quadro e parecia atraso). Cada um ganha o seu junto com os vídeos novos.
 
+Chute no caído (OTG, ↓ + M, 12/11, todos): dentro de um combo, a rasteira pega o rival que acabou
+de cair e o levanta para continuar; um por combo.
+
+Golpe de comando (→ + H, 12/11): só quem tem o próprio (hoje o Ryūga, o Soco no plexo, e a Yin-lu,
+o Joelho da garça). Sai do
+neutro e emendado no combo (depois do L, do 2L e do M); dentro de um golpe que não emenda nele,
+→ + H continua sendo o H. Nos outros, → + H é o H.
+
 ## Como o jogo lê
 
 - **Diagonal do meio é opcional:** ↓↘→ vale como ↓→, e a meia-lua ←↙↓↘→ vale como ←↓→. A

@@ -2,50 +2,32 @@
   "id": "p02_rise",
   "javaName": "P02_RISE",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_rise_sr_hd.png",
+  "source": "art/sprites/source/p02_rise_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_rise.webp",
   "report": "tools/sprites/reports/p02_rise.report.json",
   "preview": "android/app/build/sprite-review/p02_rise-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 11,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 de 12/11: vídeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
   "video": {
     "arquivo": "agachar.mp4",
     "personagem": "p02",
-    "escala": 0.3347,
-    "medida": "quadros 0, 96, 90 = guarda do IDLE (nota 0.74)",
-    "quadros": "69,73,77,81,85,89",
-    "largura": 224,
-    "raiz": "115,238",
-    "colunas": 6,
-    "reescala": [
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101
-    ],
-    "reguaFatores": [
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 99% (RISE)"
-    ]
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "85,86,87,88,89,90,91,92,93,94,95,96",
+    "largura": 192,
+    "raiz": "97,238",
+    "colunas": 11,
+    "fixar": "video",
+    "limpar_chao": true
   },
-  "frameWidth": 448,
-  "rootX": 230,
+  "frameWidth": 192,
+  "rootX": 97,
   "sourceReferences": [
     "art/sprites/source/p02_rise_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "frameHeight": 256,
+  "rootY": 238
 }

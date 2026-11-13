@@ -2025,6 +2025,11 @@ public class GameView extends SurfaceView
             pad.drainInto(ignoredInput);
             playerInput.clear();
             opponentInput.clear();
+        } else if (roteiro != null && !roteiro.acabou()) {
+            // PC (GravarLuta, passo rota:): o combo do teste apertado quadro a quadro; o rival parado.
+            pad.drainInto(ignoredInput);
+            roteiro.preencher(engine, playerInput);
+            opponentInput.clear();
         } else if (demo.active()) {
             // Touches never reach the fight during a demo.
             pad.drainInto(ignoredInput);
@@ -3505,14 +3510,9 @@ public class GameView extends SurfaceView
                 swingAttack[i] = null;
             }
             boolean down = f.status == CombatFighter.Status.KNOCKDOWN;
-            if (down && !downSeen[i]) {
-                // Bateu no chão: poeira e pedrinhas, mais forte quando vem do alto.
-                float dx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
-                float forca = wasAirborne[i] ? 1f : 0.45f;
-                if (!efeitos.tocar("impacto_chao", dx, GROUND_Y, 0.7f + 0.3f * forca, false)) {
-                    impacts.spawnDust(dx, GROUND_Y, forca);
-                }
-            }
+            // A poeira da queda sai quando o corpo bate no chão e quando assenta (a fumaça de queda,
+            // efeitosDeMovimento). A do começo da queda (impacto_chao) saía antes, no meio do
+            // arremesso: tirada a pedido do dono (12/11).
             downSeen[i] = down;
             efeitosDeMovimento(i, f);
             wasAirborne[i] = !f.grounded;
@@ -4018,6 +4018,19 @@ public class GameView extends SurfaceView
      * PC ({@code gradle :pc:gravarLuta}): a barra de Super dos dois times no valor pedido (1000 por
      * barra), aplicada na thread do jogo, para gravar Super e Ultra sem esperar a barra encher.
      */
+    /** PC ({@code gradle :pc:gravarLuta}, passo {@code rota:}): aperta um combo quadro a quadro (RoteiroCombo). */
+    public void apertarRoteiro(String rota) {
+        roteiro = new RoteiroCombo(rota);
+    }
+
+    /** O roteiro ainda está apertando. */
+    public boolean roteiroRodando() {
+        RoteiroCombo r = roteiro;
+        return r != null && !r.acabou();
+    }
+
+    private volatile RoteiroCombo roteiro;
+
     public void encherSuper(int valor) {
         superPedido = Math.max(0, Math.min(CombatConfig.MAX_METER, valor));
     }
@@ -4424,8 +4437,12 @@ public class GameView extends SurfaceView
                     narradorPalco.render(renderCanvas, narradorPalco.x(), GROUND_Y - 28f, 0.75f);
                 }
             }
+            // As luzes dos efeitos deste quadro: antes do reflexo, da sombra e dos lutadores.
+            registrarLuzesDeEfeito();
             if (cenario) drawFloorReflections(canvas);
             if (cenario) drawCastShadows(canvas);
+            // A luz dos poderes e das faíscas caindo no chão, por cima da sombra.
+            if (cenario) desenharLuzDosEfeitosNoChao();
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, Math.max(feel.darkAlpha(), ativacaoAlfa()), 0, 0, 8);
@@ -5494,6 +5511,9 @@ public class GameView extends SurfaceView
         renderer.animacao.passo(f, renderer.motion, engine, fighterVisualY(f));
     }
 
+    /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
+    private static final String FUMACA_QUEDA = "fumaca_queda_v01";
+
     /** Força da poeira do motor a partir da qual a aterrissagem levanta a nuvem inteira (personagem pesado). */
     private static final float POEIRA_NUVEM = 0.5f;
 
@@ -5505,7 +5525,11 @@ public class GameView extends SurfaceView
         Pose pose = renderer.animacao.pose();
         float x = f.x + offset;
         // Efeitos de vídeo do pouso e do pé no chão, quando existem.
-        if (pose.poeira > 0f && efeitos.tocar("fumaca_pouso", x, GROUND_Y, 0.6f + 0.6f * pose.poeira, false)) {
+        // A fumaça de queda desenhada pelo dono (art/vfx/fumaca_queda_v01: uma nuvem de cada lado
+        // dos pés, com o meio aberto para não cobrir o lutador), quando existe.
+        boolean queda = efeitos.tem(FUMACA_QUEDA);
+        if (pose.poeira > 0f && efeitos.tocar(queda ? FUMACA_QUEDA : "fumaca_pouso", x, GROUND_Y,
+                queda ? 0.75f + 0.35f * pose.poeira : 0.6f + 0.6f * pose.poeira, false)) {
             pose.poeira = 0f;
         }
         if (pose.deslize != 0) {
@@ -5650,30 +5674,14 @@ public class GameView extends SurfaceView
                 oy = pontaY;
             }
             // A faísca segue a linha do golpe (o chute que sobe joga ela para cima).
+            // A luz da faísca (no corpo dos dois e no chão) vem do "luz" do efeito.json dela.
             vaga = efeitos.tocarDurando(nome, ox, oy, escala, esquerda, duracao, angulo);
-            // A luz do impacto no corpo de quem bate e de quem apanha (motor 3).
-            int f2 = Math.min(LUZ_IMPACTO_RAIO.length - 1, superGolpe ? LUZ_IMPACTO_RAIO.length - 1 : forca);
-            if (TesteDesempenho.luz != TesteDesempenho.LUZ_OFF) acenderLuz(ox, oy, LUZ_IMPACTO_RAIO[f2], LUZ_IMPACTO_COR[f2], LUZ_IMPACTO_FORCA[f2], duracao * LUZ_DURA);
         }
         if (vaga < 0) return false;
         faiscaVaga[a] = vaga;
         faiscaNome[a] = nome;
         return true;
     }
-
-    /**
-     * O impacto acende a luz local (motores 3 e 4): o modo é o do botão LUZ do Modo Teste
-     * ({@link TesteDesempenho#luz}). Só para gravar no PC: {@code -Dgameluta.luzDura=N}
-     * ({@code -PluzDura=N}) estica a duração N vezes, para ver a luz depois que o efeito some, e
-     * {@code -Dgameluta.luzFixa=true} ({@code -PluzFixa=1}) a deixa na força cheia enquanto dura
-     * (sem subir nem apagar), para comparar dois quadros com a mesma luz.
-     */
-    private static final float LUZ_DURA = Math.max(1f, Float.parseFloat(System.getProperty("gameluta.luzDura", "1")));
-    private static final boolean LUZ_FIXA = Boolean.getBoolean("gameluta.luzFixa");
-    /** A luz local de cada força de impacto (fraco, médio, forte, especial): raio (px do mundo), cor e força. */
-    private static final float[] LUZ_IMPACTO_RAIO = {170f, 230f, 300f, 340f};
-    private static final int[] LUZ_IMPACTO_COR = {0xFFE2A8, 0xFFC870, 0xFF9A3C, 0xFFB050};
-    private static final float[] LUZ_IMPACTO_FORCA = {0.55f, 0.75f, 1f, 1f};
 
     /** Fração da duração normal (pausa + 8 quadros) em que os impactos impacto_v06_* tocam. */
     private static final float RITMO_IMPACTO_V06 = 0.7f;
@@ -5750,7 +5758,9 @@ public class GameView extends SurfaceView
         if (f.status == CombatFighter.Status.KNOCKDOWN) {
             int t = f.knockdownFrame - engine.config.knockdownFallFrames;
             fase = t < 0 ? 0 : t < engine.config.knockdownBounceFrames ? 1 : 2;
-            if (fase > quiqueFase[i]) efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
+            if (fase > quiqueFase[i] && !efeitos.tocar(FUMACA_QUEDA, x, GROUND_Y, fase == 1 ? 1.1f : 0.8f, false)) {
+                efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
+            }
         }
         quiqueFase[i] = fase;
         rastros.passo(i, f, x);
@@ -6061,103 +6071,209 @@ public class GameView extends SurfaceView
 
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
-        // A luz local (o impacto acendendo o corpo) só na folha do lutador, não no reflexo nem na sombra.
-        DesenhoGl gl = !drawingReflection && c instanceof CanvasGl ? DesenhoGl.noQuadro() : null;
-        boolean aceso = gl != null && luzNoCorpo((CanvasGl)c, gl, f);
+        // O motor de luz e sombra (só no OpenGL; vale também no reflexo, a mesma luz espelhada).
+        lutadorNoGl = c instanceof CanvasGl;
+        DesenhoGl gl = TesteDesempenho.luz == TesteDesempenho.LUZ_ON && lutadorNoGl ? DesenhoGl.noQuadro() : null;
+        if (gl != null) gl.luzNova(luzDoLutador(f, drawingReflection));
         drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
-        if (aceso) gl.luzLocal(0f, 0f, 0f, 0f, 0f, 0f, 0f);
+        if (gl != null) gl.luzNova(null);
+    }
+
+    private final float[] luzNova = new float[GlRenderCanvas.LUZ_NOVA_N];
+
+    /**
+     * Motor de luz e sombra (docs/motor-luz-proposta.md): a única luz deste lutador. Parte da luz
+     * do cenário (a direção e a cor de "luz" do stage.json; com focos de sombra, a direção do foco
+     * mais forte sobre ele) e cada ponto de luz perto toma o lugar dela na medida do peso dele, que
+     * cai suave até zero no alcance. Os pontos são os do cenário (braseiro, lanterna:
+     * "lutadores" e "alcance") e os dos efeitos que emitem luz (poder, projétil, faísca: "luz" no
+     * efeito.json; {@link #luzesDeEfeito}). Substitui, não soma: os pesos juntos não passam de 1,
+     * e a cor nunca passa da arte. Vários pontos se misturam pelo peso; quando puxam para lados
+     * opostos a luz perde a direção e a rampa some (luz de todo lado). {@code reflexo}: a imagem
+     * deitada no chão.
+     */
+    private float[] luzDoLutador(CombatFighter f, boolean reflexo) {
+        com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
+        com.gamelutagpt.stage.StageDefinition.FighterLight luz = def != null ? def.fighterLight : null;
+        float[] v = luzNova;
+        if (luz == null) {
+            // Sem luz declarada: a arte como foi pintada (luz e sombra brancas, sem borda).
+            v[0] = 0f; v[1] = -1f; v[2] = 0f;
+            for (int i = 3; i < 12; i++) v[i] = 1f;
+            v[12] = 0f;
+            return v;
+        }
+        float[] lit = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.lit);
+        float[] shade = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.shade);
+        float[] ground = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.ground);
+        float altura = f.character().visualStandHeight;
+        float cx = f.x, cy = fighterVisualY(f) - altura * 0.5f;
+        // A luz do lugar: a "direcao" do cenário, ou, com focos de sombra (holofotes), a do foco
+        // mais forte sobre este lutador, que vira de lado quando ele passa por baixo dele.
+        float baseX = luz.dirX, baseY = luz.dirY, bordaK = 1f;
+        com.gamelutagpt.stage.StageDefinition.FighterShadow sombra = def.fighterShadow;
+        if (sombra != null && !sombra.focos.isEmpty()) {
+            com.gamelutagpt.stage.StageDefinition.Focus melhor = null;
+            float forte = -1f;
+            for (int i = 0; i < sombra.focos.size(); i++) {
+                sombra.fromFocus(sombra.focos.get(i), f.x, 1f, luzFoco);
+                if (luzFoco[2] > forte) { forte = luzFoco[2]; melhor = sombra.focos.get(i); }
+            }
+            float olho = GROUND_Y - (CameraRig.CAMERA_GROUND_SCREEN_Y - def.horizon * Arena.VH) / CameraRig.CAMERA_REST_ZOOM;
+            com.gamelutagpt.stage.StageDefinition.FighterShadow.rimFromFocus(melhor, f.x, luzCameraX, olho, GROUND_Y,
+                def.cameraDistance / CameraRig.CAMERA_REST_ZOOM, luzFoco);
+            baseX = luzFoco[0];
+            baseY = luzFoco[1];
+            // Foco na frente dos lutadores (acendendo de frente): a borda de contraluz fica fraca.
+            bordaK = luzFoco[2];
+        }
+        float lavada = TesteDesempenho.nova()[3];
+        float dx = 0f, dy = 0f, total = 0f, r = 0f, g = 0f, b = 0f;
+        int pontos = stageScene.pontosDeLuz();
+        for (int i = 0; i < pontos + luzesEfeito; i++) {
+            float x, y, raio;
+            float[] o;
+            if (i < pontos) {
+                // Do cenário: na tela dele, levado ao mundo pela câmera do quadro.
+                stageScene.pontoDeLuz(i, ponto);
+                o = ponto;
+                if (o[2] <= 0f || o[6] <= 0f) continue;
+                x = pontoEsquerda + o[0] / pontoZoom;
+                y = pontoTopo + o[1] / pontoZoom;
+                raio = o[2] / pontoZoom;
+            } else {
+                // De um efeito: já no mundo, alcance em alturas de tela.
+                o = luzesDeEfeito[i - pontos];
+                if (o[6] <= 0f) continue;
+                x = o[0];
+                y = o[1];
+                raio = o[2] * Arena.VH / pontoZoom;
+            }
+            float ex = x - cx, ey = y - cy;
+            float d2 = (ex * ex + ey * ey) / (raio * raio);
+            if (d2 >= 1f) continue;
+            float w = Math.min(1f, o[6]) * (1f - d2) * (1f - d2);
+            // Um ponto em cima do corpo não tem lado: a direção encolhe perto dele.
+            float longe = (float)Math.sqrt(ex * ex + ey * ey + 0.0625f * altura * altura);
+            dx += w * ex / longe; dy += w * ey / longe;
+            float maior = Math.max(1e-3f, Math.max(o[3], Math.max(o[4], o[5])));
+            r += w * (lavada + (1f - lavada) * o[3] / maior);
+            g += w * (lavada + (1f - lavada) * o[4] / maior);
+            b += w * (lavada + (1f - lavada) * o[5] / maior);
+            total += w;
+        }
+        float escala = total > 1f ? 1f / total : 1f, resto = Math.max(0f, 1f - total);
+        dx = dx * escala + resto * baseX;
+        dy = dy * escala + resto * baseY;
+        float m = (float)Math.sqrt(dx * dx + dy * dy);
+        if (m > 1e-3f) { v[0] = dx / m; v[1] = dy / m; } else { v[0] = baseX; v[1] = baseY; m = 0f; }
+        v[2] = Math.min(1f, m);
+        if (reflexo) v[1] = -v[1];
+        v[3] = Math.min(1f, r * escala + resto * lit[0]);
+        v[4] = Math.min(1f, g * escala + resto * lit[1]);
+        v[5] = Math.min(1f, b * escala + resto * lit[2]);
+        // O relâmpago: por um instante a luz do lugar some e o corpo fica na cor da arte.
+        float clarao = def.lightning != null ? Math.max(0f, Math.min(1f, stageScene.lightningFlash())) : 0f;
+        for (int i = 0; i < 3; i++) {
+            v[3 + i] += (1f - v[3 + i]) * clarao;
+            // A sombra não passa da luz (um braseiro laranja não deixa a sombra mais azul que a luz).
+            v[6 + i] = Math.min(v[3 + i], shade[i] + (1f - shade[i]) * clarao);
+            v[9 + i] = Math.min(v[3 + i], ground[i] + (1f - ground[i]) * clarao);
+        }
+        v[12] = Math.min(1f, luz.edge * bordaK + clarao);
+        return v;
     }
 
     /**
-     * Luz local (motor 3, reports/Luz em jogos de luta profissionais.md): cada impacto acende uma
-     * luz no ponto do golpe, na cor dele, que nasce em um instante e apaga junto com o efeito. O
-     * OpenGL acende só o lado do corpo virado para ela (a normal sai da silhueta borrada do quadro).
+     * As luzes dos efeitos deste quadro (poder, projétil, faísca, aura: os que têm "luz" no
+     * efeito.json): x, y no mundo, alcance em alturas de tela, cor (0 a 1) e a força agora (a do
+     * efeito vezes a vida dele: nasce e apaga com ele). Montadas a cada quadro antes do chão e dos
+     * lutadores ({@link #registrarLuzesDeEfeito}); entram na luz dos dois lutadores
+     * ({@link #luzDoLutador}) e caem no chão ({@link #desenharLuzDosEfeitosNoChao}).
      */
-    private static final int LUZES_LOCAIS = 4;
-    private final float[][] luzLocal = new float[LUZES_LOCAIS][6];   // x, y, raio, r, g, b
-    private final float[] luzForca = new float[LUZES_LOCAIS];
-    private final int[] luzInicio = new int[LUZES_LOCAIS], luzFim = new int[LUZES_LOCAIS];
-    private int luzVez;
-    private final float[] luzJanela = new float[3];
+    private static final int LUZES_DE_EFEITO = 12;
+    private final float[][] luzesDeEfeito = new float[LUZES_DE_EFEITO][EfeitosVideo.LUZ_N];
+    private int luzesEfeito;
+    /** Só para comparar no PC ({@code -Dgameluta.luzEfeito=off}, {@code -PluzEfeito=off}): os efeitos não iluminam. */
+    private static final boolean LUZ_DE_EFEITO = !"off".equals(System.getProperty("gameluta.luzEfeito"));
 
-    /** Acende uma luz local em (x, y) do mundo por {@code ms}: raio em px do mundo, cor 0xRRGGBB. */
-    private void acenderLuz(float x, float y, float raio, int rgb, float forca, float ms) {
-        int i = luzVez;
-        luzVez = (luzVez + 1) % LUZES_LOCAIS;
-        float[] l = luzLocal[i];
-        l[0] = x; l[1] = y; l[2] = raio;
-        l[3] = ((rgb >> 16) & 0xFF) / 255f; l[4] = ((rgb >> 8) & 0xFF) / 255f; l[5] = (rgb & 0xFF) / 255f;
-        luzForca[i] = forca;
-        luzInicio[i] = engine.frame();
-        luzFim[i] = engine.frame() + Math.max(2, Math.round(ms / (FIXED_STEP * 1000f)));
+    private void registrarLuzesDeEfeito() {
+        luzesEfeito = 0;
+        if (!LUZ_DE_EFEITO || TesteDesempenho.luz != TesteDesempenho.LUZ_ON) return;
+        luzesEfeito = efeitos.luzes(luzesDeEfeito, 0);
+        // Os projéteis que são uma folha de vídeo (o S1 e o Super do Ryūga): a luz fica no centro
+        // da bola, onde quer que o motor a leve, enquanto ela existe.
+        for (int lista = 0; lista < 2 && luzesEfeito < LUZES_DE_EFEITO; lista++) {
+            java.util.List<Projectile> ps = lista == 0 ? engine.energyProjectiles : engine.superProjectiles;
+            for (int i = 0; i < ps.size() && luzesEfeito < LUZES_DE_EFEITO; i++) {
+                Projectile p = ps.get(i);
+                if (!projetilDoPersonagem(p)) continue;
+                String nome = (lista == 0 ? "onda_" : "super_") + engine.fighter(p.ownerIndex).character().id;
+                if (efeitos.luzEm(nome, p.x, p.y, luzesDeEfeito[luzesEfeito])) luzesEfeito++;
+            }
+        }
     }
 
-    /** A força da luz {@code i} agora: sobe em 15% do tempo e apaga no resto. */
-    private float luzAgora(int i) {
-        int dur = luzFim[i] - luzInicio[i];
-        if (dur <= 0 || luzForca[i] <= 0f) return 0f;
-        float t = (engine.frame() - luzInicio[i]) / (float)dur;
-        if (t < 0f || t >= 1f) return 0f;
-        if (LUZ_FIXA) return luzForca[i];
-        float k = t < 0.15f ? t / 0.15f : (1f - t) / 0.85f;
-        return luzForca[i] * k * k;
+    /**
+     * A luz dos efeitos cai no chão perto deles: uma poça de luz embaixo de cada um e, onde o chão
+     * do cenário reflete luz ({@code reflexoLuzes}), o reflexo dela, do jeito que as luzes do
+     * cenário são desenhadas. Em "screen": clareia o chão e não passa do branco. A luz cai com a
+     * distância: um efeito alto, perto do alcance, quase não chega ao chão, e o fundo longe não
+     * recebe nada. E conta contra a luz do lugar: a mesma luz que marca o chão à noite quase não
+     * se vê ao sol (pesa pelo escuro da "sombra" do cenário).
+     */
+    private void desenharLuzDosEfeitosNoChao() {
+        if (luzesEfeito == 0 || qualidade.efeitosLeves()) return;
+        com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
+        float reflexo = def != null && def.floor != null ? def.floor.lightReflection : 0f;
+        float escuro = 1f;
+        if (def != null && def.fighterLight != null) {
+            float[] s = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(def.fighterLight.shade);
+            float valor = Math.max(s[0], Math.max(s[1], s[2]));
+            escuro = clamp((1f - valor) * POCA_ESCURO, POCA_DIA, 1f);
+        }
+        renderCanvas.beginScreen();
+        for (int i = 0; i < luzesEfeito; i++) {
+            float[] o = luzesDeEfeito[i];
+            float raio = o[2] * Arena.VH / pontoZoom;
+            float h = Math.max(0f, GROUND_Y - o[1]);
+            float d = h / raio;
+            if (d >= 1f || o[6] <= 0f) continue;
+            float k = o[6] * escuro * (1f - d * d) * (1f - d * d);
+            int cor = Color.rgb(Math.round(255f * o[3]), Math.round(255f * o[4]), Math.round(255f * o[5]));
+            // A poça: deitada no chão (achatada pela perspectiva), do tamanho da parte do alcance
+            // que chega ao chão.
+            float poca = raio * (float)Math.sqrt(1f - d * d) * POCA_LARGURA;
+            renderCanvas.save();
+            renderCanvas.scale(1f, POCA_ACHATADA, o[0], GROUND_Y);
+            renderCanvas.fillRadialGlow(o[0], GROUND_Y, poca, (Math.round(255f * POCA_FORCA * k) << 24) | cor);
+            renderCanvas.restore();
+            if (reflexo > 0f) {
+                // O reflexo: a luz espelhada no chão molhado, esticada para baixo como a das luzes
+                // do cenário.
+                float ry = GROUND_Y + h;
+                float rr = Math.max(8f, raio * 0.12f);
+                renderCanvas.save();
+                renderCanvas.scale(0.55f, 2.6f, o[0], ry);
+                renderCanvas.fillRadialGlow(o[0], ry, rr, (Math.round(255f * Math.min(1f, reflexo * k)) << 24) | cor);
+                renderCanvas.restore();
+            }
+        }
+        renderCanvas.endScreen();
     }
+
+    /** A poça de luz de um efeito no chão: largura (fração do alcance que chega ao chão), achatamento e força. */
+    private static final float POCA_LARGURA = 0.45f, POCA_ACHATADA = 0.22f, POCA_FORCA = 0.55f;
+    /**
+     * O peso da poça pelo escuro do lugar: (1 − valor da sombra) × isto, de {@link #POCA_DIA} (sol:
+     * sombra perto de 0,9, quase nada) até 1 (noite: sombra perto de 0,6 ou menos).
+     */
+    private static final float POCA_ESCURO = 2.5f, POCA_DIA = 0.2f;
 
     /** A câmera do quadro em que o cenário foi desenhado (os pontos de luz dele estão na tela). */
     private float pontoZoom = 1f, pontoEsquerda, pontoTopo;
     private final float[] ponto = new float[7];
-    /** Quanto da força de um ponto de luz do cenário chega ao corpo (a luz local do shader). */
-    private static final float FORCA_DO_PONTO = 0.9f;
-
-    /**
-     * Liga no OpenGL a luz local mais forte sobre {@code f}: a de um impacto ou a de um ponto de
-     * luz do cenário (os braseiros e as lanternas marcados com "lutadores" no stage.json), que só
-     * acende quem tem normal map. False se nenhuma chega nele.
-     */
-    private boolean luzNoCorpo(CanvasGl c, DesenhoGl gl, CombatFighter f) {
-        if (TesteDesempenho.luz == TesteDesempenho.LUZ_OFF) return false;
-        float cx = f.x, cy = fighterVisualY(f) - f.character().visualStandHeight * 0.5f;
-        int melhor = -1;
-        float forte = 0f;
-        for (int i = 0; i < LUZES_LOCAIS; i++) {
-            float k = luzAgora(i);
-            if (k <= 0f) continue;
-            float[] l = luzLocal[i];
-            float d = (float)Math.hypot(l[0] - cx, l[1] - cy);
-            // O corpo é grande: mede até um pouco além do raio.
-            float chega = k * Math.max(0f, 1f - d / (l[2] * 1.6f));
-            if (chega > forte) { forte = chega; melhor = i; }
-        }
-        // Os pontos de luz do cenário: na tela dele, levados ao mundo pela câmera do quadro.
-        float px = 0f, py = 0f, praio = 0f, pr = 0f, pg = 0f, pb = 0f, pforca = 0f;
-        boolean doCenario = false;
-        int pontos = stageScene != null ? stageScene.pontosDeLuz() : 0;
-        for (int i = 0; i < pontos; i++) {
-            stageScene.pontoDeLuz(i, ponto);
-            if (ponto[2] <= 0f) continue;   // sem alcance (a lua, o sol): é a luz do lugar, não um ponto
-            float x = pontoEsquerda + ponto[0] / pontoZoom, y = pontoTopo + ponto[1] / pontoZoom;
-            float raio = ponto[2] / pontoZoom;
-            float d = (float)Math.hypot(x - cx, y - cy);
-            float k = ponto[6] * FORCA_DO_PONTO;
-            float chega = k * Math.max(0f, 1f - d / raio);
-            if (chega > forte) {
-                forte = chega; doCenario = true;
-                px = x; py = y; praio = raio; pr = ponto[3]; pg = ponto[4]; pb = ponto[5]; pforca = k;
-            }
-        }
-        if (doCenario) {
-            c.paraJanela(px, py, luzJanela);
-            GlRenderCanvas.luzLocalSoComMapa = true;
-            gl.luzLocal(luzJanela[0], luzJanela[1], praio * luzJanela[2], pr, pg, pb, pforca);
-            return true;
-        }
-        if (melhor < 0) return false;
-        float[] l = luzLocal[melhor];
-        c.paraJanela(l[0], l[1], luzJanela);
-        GlRenderCanvas.luzLocalSoComMapa = false;
-        gl.luzLocal(luzJanela[0], luzJanela[1], l[2] * luzJanela[2], l[3], l[4], l[5], luzAgora(melhor));
-        return true;
-    }
+    private final float[] luzFoco = new float[3];
 
     private void drawFighterCorpo(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                                   boolean damageFlash, boolean guardFlash) {
@@ -6258,107 +6374,59 @@ public class GameView extends SurfaceView
      * time 1, em campo ou na reserva.
      */
     /**
-     * A luz do cenário no lutador (stage.json "luzLutadores": sol, noite, chuva, lanternas) por
-     * cima do desgaste, e o clarão do relâmpago quando cai um. É a mesma matriz de cor que o
-     * lutador já usava: não custa desenho a mais. Guardada por tinta e nível do clarão.
-     * {@code poeira} (o desgaste) entra no degradê dos pés: a mesma passada, sem corte e por
-     * baixo da luz do lugar (a tinta do desgaste é por estágio, então a chave já a separa).
+     * O filtro do lutador para o motor de luz e sombra: o desgaste (tinta) e a poeira nos pés, mais
+     * o pedido da luz do cenário para o shader ({@link Filtro#comLuz}). A cor, a direção e a borda
+     * de cada lutador vão à parte, por {@link #luzDoLutador}; o shader multiplica a arte por elas.
+     * Sem OpenGL (o Canvas) não há rampa: o lutador recebe a média entre "luz" e "sombra" do
+     * cenário. Com o botão LUZ desligado, a arte como foi pintada (só o desgaste). Guardado por
+     * tinta (a tinta do desgaste é por estágio, então a chave já separa a poeira).
      */
     private Filtro luzNoLutador(Filtro tinta, float[] poeira, CombatFighter f) {
         com.gamelutagpt.stage.StageDefinition def = stageScene != null ? stageScene.definition() : null;
         com.gamelutagpt.stage.StageDefinition.FighterLight luz = def != null ? def.fighterLight : null;
-        int clarao = 0;
-        if (stageScene != null && def != null && def.lightning != null) {
-            clarao = Math.max(0, Math.min(LUZ_CLARAO_NIVEIS, Math.round(stageScene.lightningFlash() * LUZ_CLARAO_NIVEIS)));
-        }
-        if (def == null || (luz == null && clarao == 0 && poeira == null)) return tinta;
-        if (def != luzDoCenario) {
+        boolean ligado = luz != null && TesteDesempenho.luz == TesteDesempenho.LUZ_ON;
+        if (def == null || (!ligado && poeira == null)) return tinta;
+        if (def != luzDoCenario || ligado != luzEraLigada || lutadorNoGl != luzEraGl) {
             luzes.clear();
-            luzSemTinta = new Filtro[LUZ_PASSOS];
+            luzSemTinta = null;
             luzDoCenario = def;
+            luzEraLigada = ligado;
+            luzEraGl = lutadorNoGl;
         }
-        // Com focos de luz a contraluz vem do foco mais forte sobre este lutador, na direção dele
-        // na tela (em LUZ_DIRECOES passos, para guardar os filtros): vira de lado quando o
-        // lutador passa por baixo do foco.
-        int passo = 0;
-        float rimX = luz != null ? luz.rimDirX : 0f, rimY = luz != null ? luz.rimDirY : -1f, rimK = 1f;
-        com.gamelutagpt.stage.StageDefinition.FighterShadow sombra = def.fighterShadow;
-        if (luz != null && luz.rimStrength > 0f && sombra != null && !sombra.focos.isEmpty() && f != null) {
-            com.gamelutagpt.stage.StageDefinition.Focus melhor = null;
-            float forte = -1f;
-            for (int i = 0; i < sombra.focos.size(); i++) {
-                sombra.fromFocus(sombra.focos.get(i), f.x, 1f, luzFoco);
-                if (luzFoco[2] > forte) { forte = luzFoco[2]; melhor = sombra.focos.get(i); }
-            }
-            float olho = GROUND_Y - (CameraRig.CAMERA_GROUND_SCREEN_Y - def.horizon * Arena.VH) / CameraRig.CAMERA_REST_ZOOM;
-            com.gamelutagpt.stage.StageDefinition.FighterShadow.rimFromFocus(melhor, f.x, luzCameraX, olho, GROUND_Y,
-                def.cameraDistance / CameraRig.CAMERA_REST_ZOOM, luzFoco);
-            int d = Math.round((float)(Math.atan2(luzFoco[1], luzFoco[0]) / (2 * Math.PI) * LUZ_DIRECOES));
-            d = ((d % LUZ_DIRECOES) + LUZ_DIRECOES) % LUZ_DIRECOES;
-            double ang = d * 2 * Math.PI / LUZ_DIRECOES;
-            rimX = (float)Math.cos(ang);
-            rimY = (float)Math.sin(ang);
-            rimK = luzFoco[2];
-            passo = 1 + d;
+        Filtro pronto = tinta == null ? luzSemTinta : luzes.get(tinta);
+        if (pronto != null) return pronto;
+        float[] k = {1f, 1f, 1f};
+        if (ligado && !lutadorNoGl) {
+            // No Canvas, sem a rampa do shader: a média entre o lado aceso e o de sombra.
+            float[] lit = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.lit);
+            float[] shade = com.gamelutagpt.stage.StageDefinition.FighterLight.rgb(luz.shade);
+            for (int i = 0; i < 3; i++) k[i] = 0.5f * (lit[i] + shade[i]);
         }
-        Filtro[] niveis;
-        if (tinta == null) {
-            niveis = luzSemTinta;
-        } else {
-            niveis = luzes.get(tinta);
-            if (niveis == null) {
-                niveis = new Filtro[LUZ_PASSOS];
-                luzes.put(tinta, niveis);
-            }
+        float[] m = new float[20];
+        for (int i = 0; i < 3; i++) m[i * 6] = k[i];
+        m[18] = 1f;
+        ColorMatrix junto = new ColorMatrix(m);
+        if (tinta != null && tinta.matriz != null) {
+            junto = new ColorMatrix(java.util.Arrays.copyOf(tinta.matriz, 20));
+            junto.postConcat(new ColorMatrix(m));
         }
-        int chave = clarao * (LUZ_DIRECOES + 1) + passo;
-        if (niveis[chave] == null) {
-            float[] k = luz != null ? luz.factors() : new float[] {1f, 1f, 1f};
-            // O relâmpago: a luz do lugar some e o corpo clareia (até +60% e um pouco de azul).
-            float c = clarao / (float)LUZ_CLARAO_NIVEIS;
-            int cor = def.lightning != null ? def.lightning.color : 0xFFFFFFFF;
-            float[] m = new float[20];
-            for (int i = 0; i < 3; i++) {
-                float relampago = 1f + 0.6f * (((cor >> (16 - 8 * i)) & 0xFF) / 255f);
-                m[i * 6] = k[i] + (relampago - k[i]) * c;
-                m[i * 5 + 4] = 40f * c * (((cor >> (16 - 8 * i)) & 0xFF) / 255f);
-            }
-            m[18] = 1f;
-            ColorMatrix luzMatriz = new ColorMatrix(m);
-            ColorMatrix junto = luzMatriz;
-            if (tinta != null && tinta.matriz != null) {
-                junto = new ColorMatrix(java.util.Arrays.copyOf(tinta.matriz, 20));
-                junto.postConcat(luzMatriz);
-            }
-            if (poeira != null || (luz != null && (luz.rimStrength > 0f || (luz.feet & 0xFFFFFF) != 0xFFFFFF))) {
-                // Contraluz e degradê dos pés (só no OpenGL). No relâmpago a borda acende na cor dele.
-                float[] rim = new float[3];
-                float[] pes = luz != null ? luz.feetFactors() : new float[] {1f, 1f, 1f};
-                for (int i = 0; i < 3; i++) {
-                    float base = luz != null ? ((luz.rimColor >> (16 - 8 * i)) & 0xFF) / 255f : 1f;
-                    float raio = ((cor >> (16 - 8 * i)) & 0xFF) / 255f;
-                    rim[i] = base + (raio - base) * c;
-                    if (poeira != null) pes[i] *= poeira[i];
-                }
-                float forca = (luz != null ? luz.rimStrength * rimK : 0f) + 1.2f * c;
-                niveis[chave] = Filtro.comLuz(junto.getArray(), rim, forca, rimX, rimY, pes);
-            } else {
-                niveis[chave] = Filtro.matriz(junto);
-            }
-        }
-        return niveis[chave];
+        float[] pes = poeira != null ? poeira.clone() : new float[] {1f, 1f, 1f};
+        // A borda, a direção e as cores vêm por lutador (luzDoLutador); aqui só o desgaste nos pés.
+        if (ligado) pronto = Filtro.comLuz(junto.getArray(), new float[] {1f, 1f, 1f}, 0f, luz.dirX, luz.dirY, pes);
+        else pronto = Filtro.comLuz(junto.getArray(), new float[] {1f, 1f, 1f}, 0f, 0f, -1f, pes);
+        if (tinta == null) luzSemTinta = pronto;
+        else luzes.put(tinta, pronto);
+        return pronto;
     }
 
-    private static final int LUZ_CLARAO_NIVEIS = 4;
-    /** Direções da contraluz guardadas com foco de luz (a cada 15 graus). */
-    private static final int LUZ_DIRECOES = 24;
-    private static final int LUZ_PASSOS = (LUZ_CLARAO_NIVEIS + 1) * (LUZ_DIRECOES + 1);
-    private final float[] luzFoco = new float[3];
-    /** O meio da câmera no quadro (a contraluz do foco é vista dele). */
+    /** O meio da câmera no quadro (a direção da luz de um foco é vista dele). */
     private float luzCameraX = Arena.WORLD_WIDTH * 0.5f;
     private com.gamelutagpt.stage.StageDefinition luzDoCenario;
-    private Filtro[] luzSemTinta = new Filtro[LUZ_PASSOS];
-    private final java.util.Map<Filtro, Filtro[]> luzes = new java.util.IdentityHashMap<>();
+    private boolean luzEraLigada, luzEraGl;
+    /** O lutador de agora é desenhado no OpenGL (o shader faz a rampa) ou no Canvas (a média). */
+    private boolean lutadorNoGl;
+    private Filtro luzSemTinta;
+    private final java.util.Map<Filtro, Filtro> luzes = new java.util.IdentityHashMap<>();
 
     private Filtro corDoLado(CombatFighter f, Filtro tinta) {
         if (f.index != 1 || f.character() == null || !noTimeDoLado1(f.character().id)) return tinta;
@@ -7148,9 +7216,8 @@ public class GameView extends SurfaceView
                     TesteDesempenho.efeitos = !TesteDesempenho.efeitos;
                     break;
                 case PERF_LUZ:
-                    // O normal map na luz do cenário, dos pontos de luz e do impacto: liga e desliga.
-                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_OFF ? TesteDesempenho.LUZ_SUAVE
-                        : TesteDesempenho.LUZ_OFF;
+                    // O motor de luz e sombra: ON ↔ OFF (a arte como foi pintada).
+                    TesteDesempenho.luz = TesteDesempenho.luz == TesteDesempenho.LUZ_ON ? TesteDesempenho.LUZ_OFF : TesteDesempenho.LUZ_ON;
                     break;
                 case PERF_CENARIO:
                     // ON → SEM ENFEITES (as camadas, sem brilhos, neblina, reflexos e pétalas) → OFF → ON.
