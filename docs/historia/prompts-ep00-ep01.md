@@ -27,7 +27,7 @@ roupas.
 `art/keys/koga_8/idle_base.png`) virou as imagens iniciais do Flick sobre verde puro, 1344×768, corpo com 72% da
 altura (como o p14; o tamanho de criança no jogo sai do `tamanho.json` depois):
 `inicio_da_base.py ryuga_8 <base> --altura 0.72` e o mesmo para `koga_8` (`inicio_centro`, `inicio_esquerda`,
-`inicio_direita`). Prompts e regras dos vídeos: [flick-h3.md](../personagens/flick-h3.md).
+`inicio_direita`). Prompts e regras dos vídeos: [video.md](../personagens/video.md).
 | Dafu | `dafu.png` | os dois | corpulento e forte, coque no alto da cabeça, bigode fino e comprido caído, olhos sempre fechados de tanto sorrir, colete mostarda com nuvens douradas, camisa branca, faixa vermelha, cabaça pendurada na cintura, calça escura larga, faixas nos tornozelos |
 | Takatoshi (55 anos) | `takatoshi_55.png` | **não aparece agora**: é o Campeão do fim da temporada (cabelo longo e barba, quimono preto rasgado, geta). Não usar no Prólogo |
 

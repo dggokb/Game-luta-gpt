@@ -12,6 +12,8 @@
     "mensageiro":{ "nome": "???",       "cor": "#4A4A55" },
     "p02":       { "nome": "Yin-lu",    "cor": "#1F8A8A", "lutador": "p02" },
     "p04":       { "nome": "Brucy",     "cor": "#D9B12E", "lutador": "p04" },
+    "p07":       { "nome": "Vittorio Moretti", "cor": "#7A1E2C", "lutador": "p07" },
+    "p08":       { "nome": "Francesca", "cor": "#E0607E", "lutador": "p08" },
     "p09":       { "nome": "Lars",      "cor": "#E0531F", "lutador": "p09" },
     "p10":       { "nome": "Fenna",     "cor": "#E8B33A", "lutador": "p10" },
     "p11":       { "nome": "Edmund Blackwood", "cor": "#8F9BB3", "lutador": "p11" },
