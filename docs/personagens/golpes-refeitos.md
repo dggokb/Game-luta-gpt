@@ -1,8 +1,9 @@
 # Golpes refeitos p02–p12 — PROPOSTA, versão 2 (11/11)
 
-> **Proposta para o dono aprovar.** Nada disto está no jogo. **12/11:** os prompts do H3 dos golpes
-> marcados com 🎬 estão nas fichas (`pNN.md`, seção "Golpes novos (12/11)", no fim da parte do Flick). As fichas `pNN.md`, os
-> prompts de vídeo e a `auditoria-golpes.md` só mudam depois da aprovação.
+> **Proposta dos golpes de cada um (p02 a p12), para nenhum golpe ser igual ao de outro.** A Yin-lu
+> (p02) já tem os golpes novos no jogo, feitos dos vídeos do dono. Para os outros é a proposta: os
+> prompts do H3 dos golpes marcados com 🎬 estão na ficha de cada um (`pNN.md`, "Prompts do que
+> falta").
 
 **O que mudou da versão 1 para esta:** a primeira deixou repetições de propósito, para economizar
 vídeo: cinco jabs, dois uppercuts, dois chutes verticais, rasteiras giratórias, o chute lateral do p01

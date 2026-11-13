@@ -181,6 +181,10 @@ Os 6 chutes tinham cada um a língua longa a 100%. Agora `--comprimento 0.6,0.45
 `--opacidade 0.5,0.5,0.5,0.5,0.5,1`: os cinco primeiros curtos e a 50%, o último chute inteiro.
 Gravado no jogo do PC, antes e depois lado a lado.
 
+Mesmo dia, outra sessão: o giro do S3 desceu 28 px no desenho (passava por cima da Yin-lu;
+`docs/personagens/p01.md`). O smear foi refeito com os mesmos parâmetros acima sobre a folha
+baixada (sem mudar o tipo), e o normal map da folha refeito (`normal_map.py --refazer`).
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

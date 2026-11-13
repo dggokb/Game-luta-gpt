@@ -7845,7 +7845,11 @@ public class GameView extends SurfaceView
         if (!telaVitoria.tem(id)) return false;
         String nome = temporada != null ? temporada.nomeDoLutador(id) : null;
         if (nome == null) nome = winner.character.displayName;
-        telaVitoria.comecar(id, winner.profile.color, nome.toUpperCase(Locale.ROOT),
+        // Em dupla, o outro do time aparece atrás (como no versus).
+        FighterState point = engine.team(PLAYER).pointState(), partner = engine.team(PLAYER).partner();
+        FighterState outro = winner == point ? partner : point;
+        String parceiro = outro != null ? outro.character.id : null;
+        telaVitoria.comecar(id, parceiro, winner.profile.color, nome.toUpperCase(Locale.ROOT),
             texto -> temporada != null ? temporada.t(texto) : texto);
         return true;
     }
