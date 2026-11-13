@@ -60,8 +60,8 @@ final class TelaVitoria {
      * Em dupla, como no versus: o parceiro atrás, do lado de fora (à esquerda), menor e na
      * sombra, entrando logo depois; quem venceu vai um pouco para a direita.
      */
-    private static final float PARCEIRO_X = -20f, PARCEIRO_ESCALA = 0.96f, PARCEIRO_ATRASO_MS = 70f,
-        TITULAR_X = 340f, TITULAR_ESCALA = 0.96f;
+    private static final float PARCEIRO_X = 10f, PARCEIRO_ESCALA = 0.86f, PARCEIRO_ATRASO_MS = 70f,
+        TITULAR_X = 340f, TITULAR_ESCALA = 1f;
     /**
      * Em dupla, o quadro da frase fica menor e no canto de baixo, e o título menor, preso na borda
      * direita: os dois lutadores aparecem quase inteiros, lado a lado.
@@ -70,9 +70,9 @@ final class TelaVitoria {
         TITULO_DUPLA_ESCALA = 0.8f;
     /** O parceiro na sombra: um pouco mais escuro, puxado para o azul da noite. */
     private static final ColorMatrixColorFilter SOMBRA = new ColorMatrixColorFilter(new ColorMatrix(new float[] {
-        0.93f, 0f, 0f, 0f, 0f,
-        0f, 0.93f, 0f, 0f, 0f,
-        0f, 0f, 0.96f, 0f, 0f,
+        0.62f, 0f, 0f, 0f, 0f,
+        0f, 0.62f, 0f, 0f, 0f,
+        0f, 0f, 0.67f, 0f, 0f,
         0f, 0f, 0f, 1f, 0f}));
     /** "VITÓRIA" bate (cai grande e assenta), pisca a tela e treme. */
     private static final float TITULO_MS = 340f, BATIDA_MS = 130f, CLARAO_MS = 120f, TREME_MS = 220f;
