@@ -60,13 +60,15 @@ final class TelaVitoria {
      * Em dupla, como no versus: o parceiro atrás, do lado de fora (à esquerda), menor e na
      * sombra, entrando logo depois; quem venceu vai um pouco para a direita.
      */
-    private static final float PARCEIRO_X = -50f, PARCEIRO_ESCALA = 0.86f, PARCEIRO_ATRASO_MS = 70f,
-        TITULAR_X = 150f;
+    private static final float PARCEIRO_X = -10f, PARCEIRO_ESCALA = 0.92f, PARCEIRO_ATRASO_MS = 70f,
+        TITULAR_X = 230f;
+    /** Em dupla, o quadro da frase fica menor e mais à direita, para os dois aparecerem. */
+    private static final float QUADRO_DUPLA_X = 1068f, QUADRO_DUPLA_Y = 580f, QUADRO_DUPLA_ESCALA = 0.8f;
     /** O parceiro na sombra: um pouco mais escuro, puxado para o azul da noite. */
     private static final ColorMatrixColorFilter SOMBRA = new ColorMatrixColorFilter(new ColorMatrix(new float[] {
-        0.61f, 0f, 0f, 0f, 0f,
-        0f, 0.61f, 0f, 0f, 0f,
-        0f, 0f, 0.66f, 0f, 0f,
+        0.84f, 0f, 0f, 0f, 0f,
+        0f, 0.84f, 0f, 0f, 0f,
+        0f, 0f, 0.9f, 0f, 0f,
         0f, 0f, 0f, 1f, 0f}));
     /** "VITÓRIA" bate (cai grande e assenta), pisca a tela e treme. */
     private static final float TITULO_MS = 340f, BATIDA_MS = 130f, CLARAO_MS = 120f, TREME_MS = 220f;
@@ -511,7 +513,12 @@ final class TelaVitoria {
         float s = 0.7f + 0.3f * (1f + 2.2f * (float)Math.pow(k - 1f, 3) + 1.2f * (float)Math.pow(k - 1f, 2));
         int alfa = Math.round(255f * clamp(k * 2f));
         c.save();
-        c.translate(QUADRO_X, QUADRO_Y);
+        if (parceiro != null) {
+            c.translate(QUADRO_DUPLA_X, QUADRO_DUPLA_Y);
+            s *= QUADRO_DUPLA_ESCALA;
+        } else {
+            c.translate(QUADRO_X, QUADRO_Y);
+        }
         c.rotate(-2f);
         c.scale(s, s);
         forma.rewind();
