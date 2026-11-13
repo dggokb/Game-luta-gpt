@@ -116,6 +116,13 @@ public final class CinematicaLuta {
             return 99;
         }
 
+        /**
+         * Um impacto de anime no contato entre os dois ({@code lado} é quem bateu): o tranco da
+         * tela, o estouro de ar no ponto do contato e, mais forte, o chão marcado, o close com a
+         * câmera inclinada e (força 3) o impact frame em negativo.
+         */
+        default void impacto(int forca, int lado) {}
+
         /** O golpe pedido para esse lado já pegou (o dano do roteiro entrou no alvo). */
         default boolean golpeEntrou(int lado) {
             return false;
@@ -209,7 +216,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -257,6 +264,8 @@ public final class CinematicaLuta {
         String lance;
         float lenta = 0.05f;
         int quadroDoGolpe = 5;
+        /** IMPACTO: a força (1 médio, 2 forte, 3 o mais forte, com impact frame). */
+        int forca = 2;
         /** LINHAS: "concentracao" (de mangá, das bordas para o meio) ou "velocidade" (riscos de lado a lado). */
         String estilo = "concentracao";
         /** LINHAS: quanto a luta escurece por trás das linhas (0 a 1). */
@@ -892,6 +901,24 @@ public final class CinematicaLuta {
                 a.escuro = numero(m, "escuro", 0.35f, 0f, 1f);
                 a.segundos = numero(m, "segundos", 0.12f, 0f, 3f);
                 break;
+            case "impacto":
+                // Impacto de anime no contato: congela, tranco, estouro de ar, chão e close.
+                a = new Acao(Acao.Tipo.IMPACTO);
+                a.forca = Math.round(numero(m, "forca", 2f, 1f, 3f));
+                a.quemMove = Episodio.string(m, "quem", "jogador");
+                if (!time(a.quemMove)) throw new IllegalArgumentException("quem bateu: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
+                a.congela = numero(m, "congela", a.forca == 1 ? 0.12f : a.forca == 2 ? 0.2f : 0.32f, 0f, 2f);
+                a.tranco = numero(m, "zoom", a.forca == 1 ? 1.08f : a.forca == 2 ? 1.15f : 1.25f, 1f, 1.8f);
+                Object letreiro = m.get("letreiro");
+                if (letreiro != null) {
+                    Acao l = new Acao(Acao.Tipo.ONOMATOPEIA);
+                    l.texto = String.valueOf(letreiro);
+                    l.tamanho = a.forca == 3 ? 170f : 130f;
+                    l.tremor = a.forca == 3 ? 16f : 10f;
+                    l.segundos = 0.9f;
+                    a.impacto = l;
+                }
+                break;
             case "clarao":
                 // Clarão de impacto: a tela fica da cor e volta à luta em "segundos" (um corte
                 // escondido no branco, como o golpe que pega no anime).
@@ -926,7 +953,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -1297,6 +1324,10 @@ public final class CinematicaLuta {
                 qte = a;
                 qteTentativas = 0;
                 iniciarQte();
+                break;
+            case IMPACTO:
+                impactar(a);
+                palco.impacto(a.forca, lado(a.quemMove));
                 break;
             case LINHAS:
                 if (a.ligar) {

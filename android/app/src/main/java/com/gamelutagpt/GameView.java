@@ -8477,6 +8477,20 @@ public class GameView extends SurfaceView
             return cinematicaDirector.quadrosDoGolpe();
         }
 
+        @Override public void impacto(int forca, int lado) {
+            CombatFighter a = engine.fighter(lado), d = engine.fighter(1 - lado);
+            float x = (a.x + d.x) * 0.5f, y = chestY(d);
+            int direcao = d.x >= a.x ? 1 : -1;
+            feel.kick(direcao, forca >= 2 ? ImpactEffects.SPECIAL : ImpactEffects.HEAVY);
+            efeitos.tocar(forca >= 2 ? "impacto_ar_super" : "impacto_ar_forte", x, y, forca >= 3 ? 1.5f : 1.1f, direcao < 0);
+            if (forca >= 2) {
+                // O chão marcado debaixo de quem segurou e o close inclinado no contato.
+                efeitos.tocar("impacto_chao", d.x, GROUND_Y, 1f, direcao < 0);
+                feel.cinema(x, y, direcao, false);
+            }
+            if (forca >= 3) feel.impactFrame(ImpactFeel.VOID, x, y, true, true);
+        }
+
         @Override public boolean golpeEntrou(int lado) {
             return golpeDoRoteiro[lado] && engine.fighter(1 - lado).state.cenaSemDano;
         }

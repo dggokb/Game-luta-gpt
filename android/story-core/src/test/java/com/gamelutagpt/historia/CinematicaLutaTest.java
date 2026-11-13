@@ -24,7 +24,7 @@ public class CinematicaLutaTest {
     private static final File ASSETS = new File("../app/src/main/assets");
     private static final float DT = 1f / 60f;
     private static final String TREINO_EP01 = "ep01/cinematica_treino.json";
-    private static final String CONVITE_EP02 = "ep02/cinematica_convite_ryuga.json";
+    private static final String CONVITE_EP02 = "ep02/cinematica_convite_ryuga_qte.json";
 
     private static final RenderAssets FILES = new RenderAssets() {
         @Override public String readText(String path) throws IOException {
