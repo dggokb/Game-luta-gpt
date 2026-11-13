@@ -169,6 +169,9 @@ Em cima da arte nova dela (vídeos do Drive convertidos por outra sessão, que j
 --giro 7-14` mede os pés no próprio desenho (sem o caminho do golpe) e põe a lua crescente do ar,
 branca para cinza, na elipse dos pés, côncava para o corpo, metade atrás e metade na frente, a
 força alternando 100%/50%. Gravado no jogo com o arco intercalado e em todos; ficou em todos.
+`--giro-corpo` soma a roupa do tronco em espiral: faixas da cor da calça e da faixa laranja em
+hélice em volta do eixo do corpo (a primeira tentativa, arrastando os pixels da roupa no giro,
+ficava escondida dentro da silhueta e não aparecia).
 
 Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
 

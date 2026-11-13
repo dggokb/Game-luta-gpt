@@ -101,7 +101,7 @@
         218
       ],
       "minimumMargin": 19,
-      "opaquePixels": 19249
+      "opaquePixels": 20441
     },
     {
       "index": 8,
@@ -112,7 +112,7 @@
         214
       ],
       "minimumMargin": 22,
-      "opaquePixels": 14111
+      "opaquePixels": 14447
     },
     {
       "index": 9,
@@ -123,7 +123,7 @@
         212
       ],
       "minimumMargin": 15,
-      "opaquePixels": 18743
+      "opaquePixels": 19507
     },
     {
       "index": 10,
@@ -134,7 +134,7 @@
         211
       ],
       "minimumMargin": 29,
-      "opaquePixels": 14961
+      "opaquePixels": 15288
     },
     {
       "index": 11,
@@ -145,7 +145,7 @@
         210
       ],
       "minimumMargin": 20,
-      "opaquePixels": 19059
+      "opaquePixels": 20286
     },
     {
       "index": 12,
@@ -156,18 +156,18 @@
         213
       ],
       "minimumMargin": 18,
-      "opaquePixels": 16559
+      "opaquePixels": 16977
     },
     {
       "index": 13,
       "outputBbox": [
         16,
         26,
-        273,
+        285,
         199
       ],
       "minimumMargin": 16,
-      "opaquePixels": 15412
+      "opaquePixels": 16643
     },
     {
       "index": 14,
@@ -178,7 +178,7 @@
         195
       ],
       "minimumMargin": 24,
-      "opaquePixels": 17330
+      "opaquePixels": 18350
     },
     {
       "index": 15,
@@ -292,7 +292,7 @@
         146
       ],
       [
-        276,
+        288,
         292,
         240,
         184,
@@ -316,7 +316,7 @@
         38
       ],
       [
-        520,
+        532,
         292,
         320,
         184,
@@ -358,7 +358,7 @@
       [
         0,
         292,
-        272,
+        284,
         188,
         5,
         14
@@ -421,12 +421,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a9bb32431cbd6fc47203b9ebfb034ecfaddd24ad115d530660125b549d015c11",
-      "config": "4f95907faca0e1a91796369644306e78a7106d3192b55d80d70315570e274fde",
+      "source": "7f625f33f9b071764818f8cc8b2a78cdcb1d2defd5022b5ef48ae6e504907f80",
+      "config": "5cf4ca37dbc95b35a9e5bef026b5a63a7d0d701b149007240d09161b40526b80",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_special_s4_video_normalized_smear.png": "1b5c60ebfe4aeeaa5be8616660240b9265023d919be807a23ebb0013d3c78df7",
+      "art/sprites/source/p02_special_s4_video_normalized_smear.png": "989ef94a5571a9ac018ac09fdca565f9aa61b1b0c217c59b94ed9310c4162365",
       "art/sprites/source/p02_special_s4_video_normalized.png": "946d2356d7d74a0ee0aadabaec306d005e98c144702c532f5d2760e8c4096a21"
     }
   }
