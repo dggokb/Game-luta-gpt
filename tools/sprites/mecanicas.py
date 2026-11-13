@@ -846,6 +846,8 @@ def apply(cid, spec, base, combos_data):
             m.setdefault('arcoBase', m.get('launchType', 'none'))
             m['launchType'] = 'arc'
             m.setdefault('mecanica', {})['arco'] = {'altura': h['arco']['altura'], 'distancia': h['arco']['distancia']}
+            if h['arco'].get('parede'):   # bate na borda e volta quicando (o S4 da Yin-lu)
+                m['mecanica']['arco']['parede'] = True
         if 'voo' in h:
             # Voo de verdade (o S2 e o S3 do Ryūga): sai do chão no quadro "de" da animação e pousa
             # no "ate"; o corpo cai pela gravidade do pulo (CombatEngine.takeOff).

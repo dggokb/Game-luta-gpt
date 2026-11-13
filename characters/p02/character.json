@@ -14300,10 +14300,9 @@
         "whiff": null
       },
       "cancelInto": [
-        "SUPER",
-        "JUMP"
+        "SUPER"
       ],
-      "launchType": "launch",
+      "launchType": "arc",
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
@@ -14313,9 +14312,6 @@
         "H"
       ],
       "nome": "Chute rodopiante",
-      "especialBase": {
-        "launchType": "knockdown"
-      },
       "golpesBase": {
         "startupFrames": 9,
         "activeFrames": 13,
@@ -14341,8 +14337,14 @@
             3,
             28
           ]
+        },
+        "arco": {
+          "altura": 130,
+          "distancia": 380,
+          "parede": true
         }
-      }
+      },
+      "arcoBase": "knockdown"
     }
   }
 }

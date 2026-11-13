@@ -119,7 +119,7 @@ O dono: "faz e descobrimos". Tudo entrou, conferido no motor (`ComboYinluTest`) 
 |---|---|---|
 | 1. Sequência | **Fluxo da garça: L, L, M, M, H** (palma, palma, bico, bico, crescente na parede). Já emendava com o estilo dela (M > M); ficou conferido | estilo `chutes` |
 | 2. Comando | **→ + H: Joelho da garça.** Dois golpes (quadros 8 e 15), o segundo lança; cancela em pulo (o super pulo atrás), especial ou Super. Abre o combo no ar sem o 2H. Por enquanto com a animação do H | `mecanicas.json` p02.golpeComando |
-| 3. Ponte | **S4 (Chute rodopiante) lança** em vez de derrubar e cancela em pulo depois do segundo chute; o pulo é o super pulo que persegue (mesmo saindo do ar, onde o S4 termina) | `especiais.S4.lancar`: launch; `unica.rotas.S4` |
+| 3. Ponte | **S4 (Chute rodopiante) joga em arco para a frente** (13/11; antes lançava para cima, e o dono achou estranho no giro de ponta-cabeça). No meio da arena o rival cai derrubado longe: ela corre e pega no chão com o ↓ + M (OTG) ou alcança no ar com o → + H. **Perto da borda, quica na parede** e volta numa altura alcançável (Joelho e combo no ar, ou S2) | `pancadas.json` p02.S4.arco: altura 130, distância 380, parede |
 | 4. Corpo | **Pulo duplo no meio do combo no ar** (jM, jM → pulo → jL, jM, jM) | já existia |
 | 5. Sobe duas vezes | Termina no ar com o ↓jH, pousa (desce rápido) e lança de novo no 2H | regra da base (12/11) |
 | 6. Parceiro | **O assist dela é o chute que lança (2H):** entra até o rival e o joga para o alto; quem está em campo dá o super pulo e continua no ar. O contrário do Ryūga, que segura no chão | `fighter.assist.move`: 2H |
@@ -129,9 +129,10 @@ O dono: "faz e descobrimos". Tudo entrou, conferido no motor (`ComboYinluTest`) 
 | # | Nome | Sequência | Acertos |
 |---|---|---|---|
 | Y1 | Fluxo da garça | L, L, M, M, H (parede) | 5 |
-| Y2 | Garça no ar | L, L, M, M, S4 (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jH (13/11: o ↓jH novo só pega colado) | 12 |
+| Y2 | Arco da garça | L, L, M, M, S4 (arco para a frente) → corre → ↓ + M no caído → L, M, M, S4 (ou → 2H → super pulo → jL, jM, jM → pulo duplo → jL, jM, jH: 14) | 12 |
+| Y2b | Arco na parede | (no canto) L, L, M, M, S4 (quica na parede) → → + H → super pulo → jL, jM, jM → pulo duplo → jL, jM, jH (ou S4 → S2: 9) | 13 |
 | Y3 | Joelho | L, L, M, M, → + H (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jM, ↓jH | 13 |
-| Y4 | Sobe duas vezes | L, L, M, M, → + H → super pulo → jL, jM, jM, ↓jH → 2H → super pulo → jL, jM, jM → pulo → jL, jM, jH (com o S4: S4 → super pulo → jL, ↓jH → 2H …, 15) | 17 |
+| Y4 | Sobe duas vezes | L, L, M, M, → + H → super pulo → jL, jM, jM, ↓jH → 2H → super pulo → jL, jM, jM → pulo → jL, jM, jH | 17 |
 | Y5 | Assist | (Ryūga em campo) L, M, M → TAG (o chute dela lança) → super pulo → jL, jM → pulo → jL, jM, ↓jH | 9 |
 
 Regras da base que vieram com ela (valem para todos): todo golpe que lança deixa pelo menos 44

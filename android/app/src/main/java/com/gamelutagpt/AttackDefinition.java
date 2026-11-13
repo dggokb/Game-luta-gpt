@@ -119,9 +119,12 @@ final class AttackDefinition {
         boolean flightHover;
         /**
          * Arco (Launch.ARC): o rival sobe {@link #arcHeight} e cai {@link #arcDistance} à frente, pela
-         * gravidade de quem apanha no ar (o peso dele muda o voo), e termina derrubado.
+         * gravidade de quem apanha no ar (o peso dele muda o voo), e termina derrubado. Com
+         * {@link #arcWall}, se a borda da arena estiver no caminho do arco, ele bate nela e volta
+         * quicando, aberto para o combo (o S4 da Yin-lu).
          */
         float arcHeight, arcDistance;
+        boolean arcWall;
         /**
          * Evasion: HIGH slips standing/air strikes and projectiles, ANY everything, AIR only the
          * strikes of an airborne attacker (anti-air: projectiles and grounded strikes still hit).
@@ -173,6 +176,7 @@ final class AttackDefinition {
         }
         boolean flies() { return flightHeight > 0f; }
         Mechanics arc(float height, float distance) { arcHeight = height; arcDistance = distance; return this; }
+        Mechanics arc(float height, float distance, boolean wall) { arc(height, distance); arcWall = wall; return this; }
         /** Altura do desenho no quadro {@code frame} do golpe (arco: sobe e desce no trecho). */
         float hopLift(int frame) {
             if (hopHeight <= 0f || frame <= hopStart || frame >= hopEnd) return 0f;

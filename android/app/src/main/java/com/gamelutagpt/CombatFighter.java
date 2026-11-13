@@ -217,6 +217,8 @@ final class CombatFighter {
     float vx;
     /** World x of the wall the defender is flying to. */
     float bounceWallX;
+    /** O quique na parede veio de um arco (o S4 da Yin-lu): bate já no alto e sobe só até a altura de sempre. */
+    boolean bounceFromArc;
     /** Bounced: lands knocked down instead of recovering in the air. */
     boolean hardFall;
     /** Punish counter: flying away spinning in the air (lands knocked down). */

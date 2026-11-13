@@ -109,6 +109,11 @@ public final class GravarLuta {
                     // O combo do teste, quadro a quadro (RoteiroCombo): rota:L,M,M,S3,W90,C200,S2
                     c.jogo().apertarRoteiro(p[1]);
                     break;
+                case "canto":
+                    // O rival encostado na borda da direita e nós a tantos px: canto:100
+                    c.jogo().irParaOCanto(Float.parseFloat(p[1]));
+                    c.esperar(0.2);
+                    break;
                 case "super":
                     c.jogo().encherSuper(Integer.parseInt(p[1]));
                     c.esperar(0.1);
