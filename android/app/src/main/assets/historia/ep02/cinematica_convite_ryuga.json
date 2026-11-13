@@ -27,7 +27,7 @@
     { "acao": "tinta", "cobrir": false, "segundos": 0.9 },
 
     {"acao": "faixas", "entrar": true, "segundos": 0.5, "semEsperar": true},
-    {"acao": "mover", "quem": "rival", "movimento": "andar", "distancia": 260, "segundos": 1.2, "semEsperar": true},
+    {"acao": "mover", "quem": "rival", "movimento": "andar", "distancia": 60, "segundos": 2.0, "semEsperar": true},
     {"acao": "camera", "zoom": 1.6, "foco": "rival", "segundos": 0.5},
     {"acao": "fala", "quem": "p02", "texto": "Vamos ver o quanto você melhorou!", "segura": 0.7, "lado": "rival"},
     {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.4, "semEsperar": true},
@@ -37,7 +37,6 @@
     {"acao": "qte", "tipo": "deslizar", "direcao": "cima", "texto": "ESQUIVA!", "golpe": "nenhum", "erro": {"golpe": "2H", "dano": 0.04}},
     {"acao": "velocidade", "valor": 1.0, "segundos": 0.2, "semEsperar": true},
     {"acao": "trocar", "segundos": 6, "lances": ["esquiva:rival:2H", "salto:jogador:H", "fim"]},
-    {"acao": "onomatopeia", "texto": "DOOOM!", "semEsperar": true, "pos": [0.5, 0.42], "tamanho": 150, "tremor": 12, "segundos": 0.9},
 
     {"acao": "trocar", "segundos": 5, "lances": ["bloqueio:jogador:L,M", "bloqueio:rival:L,M", "choque", "bloqueio:jogador:M,H"], "semEsperar": true},
     {"acao": "camera", "zoom": 1.35, "foco": "ryuga", "segundos": 0.3, "semEsperar": true},
