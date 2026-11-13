@@ -14,22 +14,22 @@
   "video": {
     "arquivo": "p02_special_s4.mp4",
     "personagem": "p02",
-    "escala": 0.4331,
-    "motivo": "imagens _h3 da p02 (471 px de guarda = 0,4331, tamanho.json); a medida no ar não acha a guarda",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
     "quadros": "3,9,12,15,18,21,24,48,51,56,61,66,71,80,88,92,96,100,104,108",
-    "celula": 352,
-    "largura": 416,
-    "raiz": "183,329",
+    "celula": 320,
+    "largura": 384,
+    "raiz": "149,298",
     "colunas": 11,
     "fixar": "video",
     "sem_poeira": true,
     "limpar_chao": true,
     "ancorar_pe": true
   },
-  "frameWidth": 416,
-  "frameHeight": 352,
-  "rootX": 183,
-  "rootY": 329,
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "rootX": 149,
+  "rootY": 298,
   "sourceReferences": [
     "art/sprites/source/p02_special_s4_video_normalized.png"
   ]

@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_rise",
+ "quadros": 12,
+ "colunas": 11,
+ "celula": [
+  192,
+  256
+ ],
+ "raiz": [
+  97,
+  238
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_rise_video_normalized.png",
+ "fonte_sha256": "0a961992030009a3807c4804de78efe5da82dfcf3e51830088722acfae359ec6",
+ "saida": "art/sprites/source/p02_rise_video_normalized_sr_hd.png",
+ "saida_sha256": "9633cf6c3f0a1432e557dcf6f94a007f700e1c48f0291c3e57bde484faeab27e",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

@@ -1,0 +1,34 @@
+{
+  "id": "p02_fall_air",
+  "javaName": "P02_FALL_AIR",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_fall_air_video_normalized_sr_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_fall_air.webp",
+  "report": "tools/sprites/reports/p02_fall_air.report.json",
+  "preview": "android/app/build/sprite-review/p02_fall_air-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p02 de 12/11: vídeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p02",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "47,49,51,52,53,54,55",
+    "celula": 288,
+    "largura": 160,
+    "raiz": "80,270",
+    "colunas": 7,
+    "fixar": "video",
+    "pe_no_chao": true
+  },
+  "frameWidth": 160,
+  "frameHeight": 288,
+  "rootX": 80,
+  "rootY": 270,
+  "sourceReferences": [
+    "art/sprites/source/p02_fall_air_video_normalized.png"
+  ]
+}
