@@ -86,7 +86,7 @@
     {"acao": "velocidade", "valor": 1.0, "segundos": 0.2, "semEsperar": true},
     {"acao": "trocar", "segundos": 4, "lances": ["esquiva:jogador:S2", "fim"]},
     {"acao": "velocidade", "valor": 0.3, "segundos": 0.15, "semEsperar": true},
-    {"acao": "camera", "zoom": 1.4, "foco": "centro", "segundos": 0.3, "semEsperar": true},
+    {"acao": "camera", "zoom": 1.15, "foco": "centro", "segundos": 0.3, "semEsperar": true},
     {"acao": "qte", "tipo": "tempo", "texto": "GOLPE FINAL!", "segundos": 1.2, "golpe": "nenhum", "erro": {"golpe": "H", "dano": 0.04}},
     {"acao": "velocidade", "valor": 0.55, "segundos": 0.2, "semEsperar": true},
     {"acao": "trocar", "segundos": 4, "lances": ["salto:jogador:H", "fim"]},
