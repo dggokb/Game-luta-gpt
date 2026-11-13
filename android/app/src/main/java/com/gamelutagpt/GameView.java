@@ -8466,6 +8466,10 @@ public class GameView extends SurfaceView
             return cinematicaDirector.trocando();
         }
 
+        @Override public int quadrosDoGolpeDaTroca() {
+            return cinematicaDirector.quadrosDoGolpe();
+        }
+
         @Override public boolean golpeEntrou(int lado) {
             return golpeDoRoteiro[lado] && engine.fighter(1 - lado).state.cenaSemDano;
         }

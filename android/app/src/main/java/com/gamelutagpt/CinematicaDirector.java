@@ -110,6 +110,8 @@ final class CinematicaDirector {
         /** Os golpes do lance em andamento (do roteiro), ou null (sorteados). */
         String[] botoes;
         int botao;
+        /** O quadro da troca em que o último golpe saiu (o botão apertado), ou -1 neste lance. */
+        int golpeEm = -1;
         int frame;
         int atacante;
         Lance lance = Lance.BLOQUEIO;
@@ -191,6 +193,12 @@ final class CinematicaDirector {
         return t.fase == 1 || t.fase == 2 || t.fase == 5 ? t.atacante : -1;
     }
 
+    /** Há quantos quadros o último golpe da troca saiu, ou -1 (nenhum neste lance). */
+    int quadrosDoGolpe() {
+        Troca t = troca;
+        return t == null || t.golpeEm < 0 ? -1 : t.frame - t.golpeEm;
+    }
+
     /** A troca de golpes ainda não acabou (a vez em andamento termina antes). */
     boolean trocando() {
         return troca != null;
@@ -264,6 +272,7 @@ final class CinematicaDirector {
                 t.lance = passo != null ? passo.lance : t.sortear();
                 t.botoes = passo != null ? passo.botoes : null;
                 t.botao = 0;
+                t.golpeEm = -1;
                 // O salto precisa de espaço para pular: colados, vira defesa.
                 if (t.lance == Lance.SALTO && vao(engine.fighter(t.atacante), engine.fighter(1 - t.atacante)) < 90f) {
                     t.lance = Lance.BLOQUEIO;
@@ -310,6 +319,7 @@ final class CinematicaDirector {
                 if (t.lance == Lance.ESQUIVA) {
                     // O forte sai e quem ia levar pula para trás no mesmo instante: passa no vento.
                     if (t.golpes > 0 && atk.canAct() && def.canAct() && def.grounded) {
+                        t.golpeEm = t.frame;
                         CinematicaDirector.apertar(t.proximo("H"), in[a]);
                         in[d].jump = true;
                         in[d].direction = def.facing > 0 ? 6 : 8;
@@ -336,6 +346,7 @@ final class CinematicaDirector {
                     }
                 }
                 if (t.golpes > 0 && t.faseFrame >= t.proximoGolpe && atk.canAct()) {
+                    t.golpeEm = t.frame;
                     CinematicaDirector.apertar(t.proximo(BOTOES[t.sorteio.nextInt(BOTOES.length)]), in[a]);
                     t.golpes--;
                     t.proximoGolpe = t.faseFrame + 10 + t.sorteio.nextInt(8);
@@ -351,6 +362,7 @@ final class CinematicaDirector {
                     t.noAr = true;
                     in[a].direction = DemoDirector.Ctx.forward(atk);
                     if (!t.bateuNoAr && (atk.vy > 0f || vao < 70f)) {
+                        t.golpeEm = t.frame;
                         CinematicaDirector.apertar(t.proximo("H"), in[a]);
                         t.bateuNoAr = true;
                     }

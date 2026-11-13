@@ -107,6 +107,15 @@ public final class CinematicaLuta {
             return false;
         }
 
+        /**
+         * Há quantos quadros o golpe de quem ataca na troca saiu (o botão foi apertado), ou -1
+         * (ninguém golpeando agora). O QTE com {@code lance} espera esse número para pedir no
+         * meio do golpe.
+         */
+        default int quadrosDoGolpeDaTroca() {
+            return 99;
+        }
+
         /** O golpe pedido para esse lado já pegou (o dano do roteiro entrou no alvo). */
         default boolean golpeEntrou(int lado) {
             return false;
@@ -200,7 +209,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -240,6 +249,18 @@ public final class CinematicaLuta {
         Episodio.Passo propria;
         /** QTE: o tipo, quantos toques (MARTELAR) e a direção (DESLIZAR: frente, tras, cima, baixo). */
         TipoQte qte;
+        /**
+         * QTE no meio do golpe: o lance que começa antes ("esquiva:rival:2H"). Quando o golpe dele
+         * sai há {@link #quadroDoGolpe} quadros, a luta quase para ({@link #lenta}) e o QTE pede;
+         * o acerto deixa o lance terminar como o roteiro manda.
+         */
+        String lance;
+        float lenta = 0.05f;
+        int quadroDoGolpe = 5;
+        /** LINHAS: "concentracao" (de mangá, das bordas para o meio) ou "velocidade" (riscos de lado a lado). */
+        String estilo = "concentracao";
+        /** LINHAS: quanto a luta escurece por trás das linhas (0 a 1). */
+        float escuro = 0.35f;
         int vezes = 8;
         String direcao = "frente";
         /** QTE: o golpe de quem acerta ({@link #quemMove} bate) e o contra-ataque de quem erra. */
@@ -472,7 +493,7 @@ public final class CinematicaLuta {
     private boolean paginaNaTela;
 
     /** O QTE da ação atual: em que fase está, o que o jogador já fez e o resultado. */
-    private enum FaseQte { PEDINDO, RESULTADO, GOLPE }
+    private enum FaseQte { PREPARANDO, PEDINDO, RESULTADO, GOLPE }
     private Acao qte;
     private FaseQte qteFase;
     private float qteDesde;
@@ -498,6 +519,11 @@ public final class CinematicaLuta {
     private float congelaAte = -1f;
     private float trancoVolta = -1f;
     private final Transicao tranco = new Transicao(1f);
+    /** Linhas de ação: as do roteiro ({@code linhas}) e as que o QTE liga sozinho enquanto pede. */
+    private final Transicao linhas = new Transicao(0f);
+    private final Transicao linhasQte = new Transicao(0f);
+    private String linhasEstilo = "concentracao";
+    private float linhasEscuro = 0.35f;
     /**
      * Câmera viva na troca de golpes: chega mais perto e puxa para quem ataca (somada à câmera
      * do roteiro); cada defesa dá um tranquinho e cada choque, um tranco.
@@ -853,6 +879,18 @@ public final class CinematicaLuta {
                     a.lances.add(lance);
                 }
                 break;
+            case "linhas":
+                // Linhas de ação por cima da luta: as de concentração do mangá (das bordas para o
+                // meio) ou as de velocidade (riscos de lado a lado), com a luta escurecendo atrás.
+                a = new Acao(Acao.Tipo.LINHAS);
+                a.ligar = !Boolean.FALSE.equals(m.get("ligar"));
+                a.estilo = Episodio.string(m, "estilo", "concentracao");
+                if (!a.estilo.matches("concentracao|velocidade")) {
+                    throw new IllegalArgumentException("estilo " + a.estilo + " (use concentracao ou velocidade)");
+                }
+                a.escuro = numero(m, "escuro", 0.35f, 0f, 1f);
+                a.segundos = numero(m, "segundos", 0.12f, 0f, 3f);
+                break;
             case "clarao":
                 // Clarão de impacto: a tela fica da cor e volta à luta em "segundos" (um corte
                 // escondido no branco, como o golpe que pega no anime).
@@ -887,7 +925,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -959,6 +997,12 @@ public final class CinematicaLuta {
         a.acerto = "nenhum".equals(m.get("golpe")) ? null : golpe(m, "golpe", "H", finaliza);
         Object erro = m.get("erro");
         if (erro != null) a.erro = golpe(Episodio.asMap(erro), "golpe", "M", false);
+        a.lance = Episodio.string(m, "lance", null);
+        if (a.lance != null && (!a.lance.matches(LANCE) || a.lance.equals("fim"))) {
+            throw new IllegalArgumentException("lance do QTE " + a.lance + " (ex.: esquiva:rival:2H)");
+        }
+        a.lenta = numero(m, "lenta", 0.05f, 0.01f, 1f);
+        a.quadroDoGolpe = Math.round(numero(m, "quadro", 5f, 0f, 60f));
         return a;
     }
 
@@ -1251,7 +1295,14 @@ public final class CinematicaLuta {
             case QTE:
                 qte = a;
                 qteTentativas = 0;
-                pedirQte();
+                iniciarQte();
+                break;
+            case LINHAS:
+                if (a.ligar) {
+                    linhasEstilo = a.estilo;
+                    linhasEscuro = a.escuro;
+                }
+                linhas.ir(a.ligar ? 1f : 0f, a.segundos);
                 break;
             case TROCAR:
                 palco.trocar(a.segundos, a.lances);
@@ -1302,6 +1353,7 @@ public final class CinematicaLuta {
             case CAMERA:
             case VELOCIDADE:
             case TINTA:
+            case LINHAS:
                 return idade >= a.segundos;
             case PAGINA:
                 // Lida quadro a quadro, no toque, como as páginas da história.
@@ -1385,8 +1437,23 @@ public final class CinematicaLuta {
 
     // ------------------------------------------------------------ QTE
 
+    /**
+     * Começa o QTE: com {@code lance}, primeiro o golpe sai na troca e o QTE pede no meio dele
+     * ({@link FaseQte#PREPARANDO}); sem, pede já.
+     */
+    private void iniciarQte() {
+        if (qte.lance == null) {
+            pedirQte();
+            return;
+        }
+        palco.trocar(8f, Arrays.asList(qte.lance, "fim"));
+        qteFase = FaseQte.PREPARANDO;
+        qteDesde = time;
+    }
+
     /** O QTE pede de novo (o primeiro pedido ou depois de um erro). */
     private void pedirQte() {
+        linhasQte.ir(1f, 0.1f);
         qteFase = FaseQte.PEDINDO;
         qteDesde = time;
         qteToques = 0;
@@ -1417,6 +1484,14 @@ public final class CinematicaLuta {
     private boolean qtePronto() {
         float idade = time - qteDesde;
         switch (qteFase) {
+            case PREPARANDO:
+                // O golpe do lance saiu há uns quadros: a luta quase para e o QTE pede no meio dele.
+                int quadros = palco.quadrosDoGolpeDaTroca();
+                if (quadros >= qte.quadroDoGolpe || !palco.trocando() || idade >= LIMITE_ESPERA) {
+                    velocidade.ir(qte.lenta, 0.06f);
+                    pedirQte();
+                }
+                return false;
             case PEDINDO:
                 if (idade >= limiteQte(qte)) resolverQte(false);
                 return false;
@@ -1427,15 +1502,20 @@ public final class CinematicaLuta {
                 Golpe g = qteAcertou ? qte.acerto : qte.erro;
                 qteFase = FaseQte.GOLPE;
                 qteDesde = time;
+                linhasQte.ir(0f, 0.3f);
+                // O lance que estava quase parado volta à velocidade normal e termina.
+                if (qte.lance != null) velocidade.ir(1f, 0.15f);
                 // O impacto é só do acerto (o contra-ataque do rival entra sem letreiro).
                 impactou = !qteAcertou;
                 if (g != null) palco.golpear(qteBatedor, g);
                 return false;
             default:
                 if (!golpeAcabou(qte, qteBatedor, idade)) return false;
+                // O lance termina como o roteiro manda (a esquiva, a defesa) antes de a cena seguir.
+                if (qte.lance != null && palco.trocando() && idade < LIMITE_ESPERA) return false;
                 if (qteAcertou) return true;
                 qteTentativas++;
-                pedirQte();
+                iniciarQte();
                 return false;
         }
     }
@@ -1628,6 +1708,8 @@ public final class CinematicaLuta {
             palco.travarControle(false);
         }
         if (faixas.alvo() > 0f) faixas.ir(0f, FAIXA_DURACAO);
+        linhas.ir(0f, 0.3f);
+        linhasQte.ir(0f, 0.3f);
         if (zoom.alvo() != 1f) zoom.ir(1f, 0.4f);
         focoJogador.ir(0f, 0.4f);
         focoRival.ir(0f, 0.4f);
@@ -1735,6 +1817,7 @@ public final class CinematicaLuta {
 
     /** As faixas pretas: por cima da luta e do HUD, por baixo dos quadros da conversa. */
     public void renderFaixas(RenderCanvas c) {
+        desenharLinhas(c);
         if (clarao != null) {
             // Começa cheio e some aos poucos (mais rápido no começo).
             float k = 1f - Tinta.clamp01((time - claraoDesde) / clarao.segundos);
@@ -1746,6 +1829,51 @@ public final class CinematicaLuta {
         float h = faixaAltura * k;
         c.fillRect(-40f, -40f, VW + 40f, h, 0xFF000000);
         c.fillRect(-40f, VH - h, VW + 40f, VH + 40f, 0xFF000000);
+    }
+
+    /**
+     * As linhas de ação: a luta escurece um pouco e riscos finos (pretos com um fio branco)
+     * entram pelas bordas em direção ao meio (concentração, do mangá) ou atravessam a tela de
+     * lado a lado (velocidade). Mudam a cada dois quadros, como as linhas desenhadas à mão do anime.
+     */
+    private void desenharLinhas(RenderCanvas c) {
+        float k = Math.max(linhas.valor(), linhasQte.valor());
+        if (k <= 0.01f) return;
+        boolean doRoteiro = linhas.valor() >= linhasQte.valor();
+        String estilo = doRoteiro ? linhasEstilo : "concentracao";
+        float escuro = doRoteiro ? linhasEscuro : 0.35f;
+        if (escuro > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(255f * escuro * k)));
+        Random r = new Random(7919L * (long)(time * 30f));
+        int preto = Tinta.withAlpha(INK, (int)(235f * k)), branco = Tinta.withAlpha(WHITE, (int)(200f * k));
+        float cx = VW * 0.5f, cy = VH * 0.47f;
+        if (estilo.equals("velocidade")) {
+            for (int i = 0; i < 46; i++) {
+                float y = r.nextFloat() * VH;
+                float x0 = -60f + r.nextFloat() * VW * 0.6f;
+                float largo = VW * (0.25f + 0.6f * r.nextFloat());
+                float grosso = 1.5f + r.nextFloat() * 4f;
+                // O meio (onde estão os dois) fica mais limpo.
+                if (Math.abs(y - cy) < VH * 0.18f && r.nextFloat() < 0.7f) continue;
+                c.drawLine(x0, y, x0 + largo, y, grosso + 2f, preto);
+                c.drawLine(x0 + 8f, y, x0 + largo - 8f, y, grosso * 0.4f, branco);
+            }
+            return;
+        }
+        float raioX = VW * 0.40f, raioY = VH * 0.36f;
+        float longe = (float)Math.hypot(VW, VH);
+        for (int i = 0; i < 90; i++) {
+            double ang = Math.PI * 2 * (i + r.nextFloat() * 0.8f) / 90;
+            float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+            // Cada linha começa num ponto da borda de uma elipse em volta do meio (variando) e vai até fora da tela.
+            float dentro = 1f + r.nextFloat() * 0.45f;
+            float x0 = cx + cos * raioX * dentro, y0 = cy + sin * raioY * dentro;
+            float base = 3f + r.nextFloat() * 9f;
+            float x1 = cx + cos * longe, y1 = cy + sin * longe;
+            // Triângulo fino: a ponta para o meio, a base larga fora da tela.
+            float nx = -sin * base, ny = cos * base;
+            c.fillPolygon(new float[] {x0, y0, x1 + nx, y1 + ny, x1 - nx, y1 - ny}, preto);
+            if (i % 3 == 0) c.drawLine(x0 + cos * 30f, y0 + sin * 30f, x1, y1, 1.5f, branco);
+        }
     }
 
     /** As onomatopeias, por cima de tudo. */
@@ -1822,7 +1950,7 @@ public final class CinematicaLuta {
      * página de mangá. Com a tela coberta, um fundo liso da cor da tinta esconde a luta.
      */
     public void renderTela(RenderCanvas c) {
-        if (qte != null && acao == qte) desenharQte(c);
+        if (qte != null && acao == qte && qteFase != FaseQte.PREPARANDO) desenharQte(c);
         if (coberta) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, tintaCor);
         if (paginaNaTela) guiada.render(c);
         if (tintaModo == ModoTinta.NADA) return;

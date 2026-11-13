@@ -137,6 +137,7 @@ novo).
 | `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 | `clarao` | `segundos` (padrão 0,3), `cor` (padrão `#FFFFFF`) | clarão de impacto: a tela fica da cor e volta à luta (some mais rápido no começo). Esconde um corte, como o golpe que pega no anime | `segundos` |
+| `linhas` | `ligar` (padrão true), `estilo` (`concentracao` ou `velocidade`), `escuro` (0 a 1, padrão 0,35), `segundos` (padrão 0,12) | linhas de ação por cima da luta: as de concentração do mangá (riscos pretos das bordas para o meio, deixando os dois limpos) ou as de velocidade (riscos de lado a lado), com a luta escurecendo atrás. Mudam a cada dois quadros, como desenhadas à mão. Todo QTE já liga as de concentração enquanto pede | `segundos` |
 | `video` | `clipe` (`<episódio>/<nome>`), `repetir`, `esquerda`, `emendar`, ou `parar` ([abaixo](#cena-em-vídeo)) | os dois lutadores num vídeo só, no chão da luta e no lugar deles | `repetir`: nada; senão o vídeo acabar (com `emendar` + `semEsperar`: o vídeo começar) |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
@@ -264,6 +265,9 @@ mesmo QTE pede de novo. O HUD fica na tela (sem faixas), então a barra de vida 
 | `erro` | nenhum | `{"golpe": "M", "dano": 0.05}`: o contra-ataque de quem errou. Sem ele, o erro só pede de novo |
 | `pos` | `[0.5, 0.6]` | centro do botão na tela |
 | `impacto` | nenhum | o que acontece quando o golpe do acerto pega (abaixo) |
+| `lance` | nenhum | **QTE no meio do golpe**: o lance que começa antes (`"esquiva:rival:2H"`, como na troca). Quando o golpe dele sai há `quadro` quadros, a luta quase para (`lenta`) e o QTE pede com o golpe a caminho; o acerto devolve a velocidade e o lance termina como o roteiro manda (a esquiva, a defesa). O erro solta o contra-ataque e o lance começa de novo |
+| `quadro` | 5 | quantos quadros depois do botão do golpe o QTE pede |
+| `lenta` | 0,05 | a velocidade da luta enquanto o QTE pede no meio do golpe |
 
 **Impacto** (no `qte` e no `golpe`): `{"texto": "POW!", "congela": 0.2, "zoom": 1.2}` mais os campos
 de uma onomatopeia (`pos`, `tamanho`, `tremor`, `rotacao`, `cor`, `segundos`, padrão 1,2). Quando o
@@ -362,6 +366,12 @@ Yin-lu, no dojo dela):
 4. A **coreografia do dono (13/11)**, em quatro sequências, só com os movimentos que os dois já têm
    (o que não existe foi adaptado). Os QTE não batem por conta própria (`"golpe": "nenhum"`): o
    acerto libera a troca de golpes do roteiro, com quem ataca e os golpes em ordem.
+
+A cena tem a linguagem de anime (13/11, o dono achou a primeira versão engessada: "parece alguém
+controlando o jogo"): as faixas de cinema ficam a cena inteira (sem HUD), a câmera corta seco entre
+os closes (`segundos` 0), as linhas de velocidade correm nas trocas e nas corridas, as de
+concentração nos closes das falas, e **todo QTE pede no meio de um golpe** (`lance`), com a luta
+quase parada e as linhas em volta, nunca com os dois parados em guarda.
 
 | Sequência | O que acontece | QTE |
 |---|---|---|
