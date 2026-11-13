@@ -128,17 +128,6 @@
     {
       "index": 10,
       "outputBbox": [
-        35,
-        50,
-        186,
-        237
-      ],
-      "minimumMargin": 19,
-      "opaquePixels": 11371
-    },
-    {
-      "index": 11,
-      "outputBbox": [
         37,
         44,
         181,
@@ -146,6 +135,17 @@
       ],
       "minimumMargin": 18,
       "opaquePixels": 11266
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        38,
+        41,
+        178,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 11177
     },
     {
       "index": 12,
@@ -156,18 +156,18 @@
         238
       ],
       "minimumMargin": 18,
-      "opaquePixels": 11032
+      "opaquePixels": 11796
     },
     {
       "index": 13,
       "outputBbox": [
         38,
-        41,
+        42,
         178,
         238
       ],
       "minimumMargin": 18,
-      "opaquePixels": 11177
+      "opaquePixels": 11780
     }
   ],
   "passed": true,
@@ -182,11 +182,11 @@
       19,
       31
     ],
-    "sheetWidth": 1000,
+    "sheetWidth": 992,
     "sheetHeight": 596,
     "frames": [
       [
-        824,
+        816,
         0,
         176,
         188,
@@ -258,7 +258,7 @@
         24
       ],
       [
-        648,
+        640,
         0,
         172,
         192,
@@ -267,14 +267,6 @@
       ],
       [
         480,
-        0,
-        164,
-        200,
-        10,
-        13
-      ],
-      [
-        320,
         0,
         156,
         208,
@@ -296,24 +288,32 @@
         212,
         12,
         4
+      ],
+      [
+        320,
+        0,
+        156,
+        212,
+        12,
+        5
       ]
     ],
     "decodedBytes": {
       "canonical": 6488064,
       "grid": 4796000,
-      "packed": 2384000
+      "packed": 2364928
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "290f8e58a0183c6ca0eea3c6548a497d35f9c42163057d8b845bbce13d6861ea",
-      "config": "dab6e1abe52d4a9273afada81b881cabd55ab88e64c09529745d609480e9d507",
+      "source": "cfba4c9d4a07681e15387e71e6907d5e8ae4c9963baf7517c4173663f139e443",
+      "config": "b3af804cdd86295cb6c5c8e080014b28dff7649376af24dc806c17f41d89d919",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_medium_kick_video_normalized_smear.png": "2a7a978c1c871fc424a7852988c2a1c17baa038cc5a4c121b3cc5292bf7366b3",
-      "art/sprites/source/p02_medium_kick_video_normalized.png": "f76c6a0ac7a5f6c740e5628c1c869a6cede0e176f59695efa15c3050e1cffcc6"
+      "art/sprites/source/p02_medium_kick_video_normalized_smear.png": "f78e2a894b092c15cbce801ea8873a3c40e90fb43d640a30aa1b72a6bcab26bd",
+      "art/sprites/source/p02_medium_kick_video_normalized.png": "6921cd301134cb3abfdd5a0777225b375795ebe7ef2c185f8237abfa20e8ece5"
     }
   }
 }

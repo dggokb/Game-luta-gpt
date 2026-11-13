@@ -718,6 +718,10 @@ def apply(cid, spec, base, combos_data):
     pack['moves'].pop('6H', None)
     if spec.get('golpeComando'):
         pack['moves']['6H'] = json.loads(json.dumps(spec['golpeComando']))
+    # Golpe de corrida (corre + H, 13/11): o mesmo, do "golpeCorrida"; o avanço vai na "unica.golpes.DH".
+    pack['moves'].pop('DH', None)
+    if spec.get('golpeCorrida'):
+        pack['moves']['DH'] = json.loads(json.dumps(spec['golpeCorrida']))
     # Sem Super (as crianças da história): só o resto.
     sup = fighter['super']['attack'] if 'super' in fighter else None
     if sup is not None:

@@ -203,6 +203,8 @@ public final class BateriaCombos {
                         case "J": in0.jump = true; in0.direction = me.facing > 0 ? 8 : 6; break;
                         case "SJ": in0.superJump = true; in0.direction = me.facing > 0 ? 8 : 6; break;
                         case "D": in0.dash = true; in0.direction = frente; break;
+                        // O golpe de corrida: H correndo (segura → para continuar correndo até apertar).
+                        case "DH": in0.heavy = true; in0.direction = frente; break;
                         // Corre atrás (segura → correndo) até chegar perto do rival (a perseguição da parede).
                         case "C": in0.dash = !me.forwardDashing; in0.direction = frente; break;
                         case "C100": case "C120": case "C140": case "C160": case "C180": case "C200": case "C220": case "C240":

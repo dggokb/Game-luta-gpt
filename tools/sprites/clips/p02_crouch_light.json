@@ -16,10 +16,10 @@
     "personagem": "p02",
     "escala": 0.4173,
     "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
-    "quadros": "11,12,13,20,22,23,25,26,27,29",
+    "quadros": "11,12,13,20,22,23,25,27,33,41",
     "celula": 192,
     "largura": 256,
-    "raiz": "99,174",
+    "raiz": "95,174",
     "colunas": 10,
     "fixar": "video",
     "sem_poeira": true,
@@ -27,10 +27,10 @@
     "ancorar_pe": true
   },
   "frameHeight": 192,
-  "rootX": 99,
+  "rootX": 95,
   "rootY": 174,
+  "frameWidth": 256,
   "sourceReferences": [
     "art/sprites/source/p02_crouch_light_video_normalized.png"
-  ],
-  "frameWidth": 256
+  ]
 }

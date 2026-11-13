@@ -1,0 +1,201 @@
+{
+  "_doc": "Golpes que ainda não emendam no idle (tools/sprites/emendar_idle.py, regra do dono de 13/11: todo golpe termina no lugar da postura parada). Arte antiga, de antes da regra. Ao corrigir um (emendar_idle.py <id> --write --golpes ...), tire daqui: o teste test_emenda_idle.py falha se um golpe fora da regra não estiver na lista ou se um da lista já estiver certo. \"pose\": os que terminam numa pose diferente da postura (menos de 80% das silhuetas batem): escolher quadros que voltam à guarda ou refazer o vídeo.",
+  "koga_8": [
+    "2H",
+    "2M",
+    "H",
+    "L",
+    "S2"
+  ],
+  "monster_npc": [
+    "H"
+  ],
+  "p03": [
+    "2M",
+    "L",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p04": [
+    "2H",
+    "H",
+    "M",
+    "S2"
+  ],
+  "p05": [
+    "2L",
+    "2M",
+    "H",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p06": [
+    "2L",
+    "2M",
+    "H",
+    "M",
+    "S3",
+    "S4"
+  ],
+  "p07": [
+    "2H",
+    "2L",
+    "2M",
+    "L",
+    "S2",
+    "S4"
+  ],
+  "p08": [
+    "2H",
+    "2L",
+    "2M",
+    "H",
+    "M",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p09": [
+    "2H",
+    "2M",
+    "L",
+    "M",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p10": [
+    "2M",
+    "L",
+    "S3"
+  ],
+  "p11": [
+    "2H",
+    "2L",
+    "2M",
+    "S2",
+    "S4"
+  ],
+  "p12": [
+    "2H",
+    "2M",
+    "L",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p13": [
+    "6M",
+    "H"
+  ],
+  "p15": [
+    "2H",
+    "S4"
+  ],
+  "p16": [
+    "S2",
+    "S3"
+  ],
+  "pose": {
+    "koga_8": [
+      "L"
+    ],
+    "monster_npc": [
+      "2M",
+      "H",
+      "L",
+      "M"
+    ],
+    "p02": [
+      "S3"
+    ],
+    "p03": [
+      "2L",
+      "2M",
+      "S3"
+    ],
+    "p05": [
+      "2H",
+      "2L",
+      "2M",
+      "H",
+      "L",
+      "M",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "p06": [
+      "H",
+      "L",
+      "M",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "p07": [
+      "2H",
+      "2L",
+      "2M",
+      "S2",
+      "S4"
+    ],
+    "p08": [
+      "2H",
+      "2L",
+      "2M",
+      "S2",
+      "S3"
+    ],
+    "p09": [
+      "L",
+      "S3"
+    ],
+    "p10": [
+      "2H",
+      "2L",
+      "2M",
+      "S2",
+      "S4"
+    ],
+    "p11": [
+      "2H",
+      "2L",
+      "2M",
+      "L",
+      "S2"
+    ],
+    "p12": [
+      "2H",
+      "H",
+      "L",
+      "M",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "p13": [
+      "6M",
+      "H",
+      "S4"
+    ],
+    "p14": [
+      "H",
+      "S3"
+    ],
+    "p15": [
+      "L",
+      "S4"
+    ],
+    "p16": [
+      "2H",
+      "2L",
+      "2M",
+      "S2",
+      "S3",
+      "S4"
+    ]
+  }
+}

@@ -82,6 +82,18 @@ final class CombatFighter {
     boolean backdashArmed = true;
     /** Horizontal distance moved during the last frame (animation). */
     float travel;
+    /**
+     * Andando com o pé de apoio cravado no chão (o atrito do pé): em que ponto da passada está,
+     * em quadros da animação de andar (o desenho mostra esse quadro); -1 fora disso.
+     * {@link #passadaFrente}: para a frente ou para trás.
+     */
+    float passada = -1f;
+    boolean passadaFrente;
+    /**
+     * Embalo no chão (px/s, no eixo do mundo): o corpo que vinha correndo e golpeou segue
+     * deslizando, e o atrito do pé no chão freia (CombatConfig.atritoDoChao). 0 parado.
+     */
+    float embalo;
     /** Entrada do DHC deslizando de dhcFromX a dhcToX (quadro atual e total; 0 = parado). */
     float dhcFromX, dhcToX;
     int dhcEnterFrame, dhcEnterFrames;
@@ -150,6 +162,8 @@ final class CombatFighter {
     int hitstopTotal;
     float pushRemaining;
     int pushFramesLeft;
+    /** O empurrão em curso desliza e freia pelo atrito do chão (CombatEngine.push), em vez de andar por igual. */
+    boolean pushAtrito;
     CombatFighter pushSource;
     int launcherChase;
     /** Frames left in which holding → after a wall bounce starts the run (see wallChaseFrames). */
@@ -219,6 +233,8 @@ final class CombatFighter {
     float bounceWallX;
     /** O quique na parede veio de um arco (o S4 da Yin-lu): bate já no alto e sobe só até a altura de sempre. */
     boolean bounceFromArc;
+    /** A corrida de agora é a perseguição da parede (segurar → depois do quique), não um → →. */
+    boolean chaseRunning;
     /** Bounced: lands knocked down instead of recovering in the air. */
     boolean hardFall;
     /** Punish counter: flying away spinning in the air (lands knocked down). */

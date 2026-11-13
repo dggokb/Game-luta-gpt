@@ -72,6 +72,10 @@ tasks.register('testarMotor', Test) {
     classpath = sourceSets.motorTest.runtimeClasspath
     systemProperty 'java.awt.headless', 'true'
     maxHeapSize = '2g'
+    // Testes do atrito: -Patrito=off (o andar de antes), -Pempurrao=atrito (o empurrão freado pelo chão)
+    ['atrito', 'empurrao'].each { p ->
+        if (providers.gradleProperty(p).isPresent()) systemProperty "gameluta.${p}", providers.gradleProperty(p).get()
+    }
 }
 
 dependencies {
@@ -320,6 +324,9 @@ tasks.register('gravarLuta', JavaExec) {
     // tira a luz dos efeitos (o poder no corpo e a poça no chão), para comparar com e sem;
     // -PnormalAlterna=1 liga e desliga o mapa a cada quadro (a mesma pose, com e sem).
     if (providers.gradleProperty('luz').isPresent()) systemProperty 'gameluta.luz', providers.gradleProperty('luz').get()
+    // -Patrito=off: o andar de velocidade fixa de antes do atrito do pé (para comparar)
+    if (providers.gradleProperty('atrito').isPresent()) systemProperty 'gameluta.atrito', providers.gradleProperty('atrito').get()
+    if (providers.gradleProperty('empurrao').isPresent()) systemProperty 'gameluta.empurrao', providers.gradleProperty('empurrao').get()
     if (providers.gradleProperty('nova').isPresent()) systemProperty 'gameluta.nova', providers.gradleProperty('nova').get()
     if (providers.gradleProperty('semMapa').isPresent()) systemProperty 'gameluta.semMapa', 'true'
     if (providers.gradleProperty('luzEfeito').isPresent()) systemProperty 'gameluta.luzEfeito', providers.gradleProperty('luzEfeito').get()
@@ -474,6 +481,23 @@ tasks.register('testeCena', JavaExec) {
         providers.gradleProperty('episodio').getOrElse('ep00'),
         providers.gradleProperty('marca').getOrElse('briga-irmaos'),
         providers.gradleProperty('vida').getOrElse('0.49')
+}
+
+// gradle :pc:testeHistoriaDupla -Pdupla=p09 [-Pirmao=koga] [-Psaida=pasta]
+// A história de uma dupla adversária no torneio (o último de pé com pouca vida), com as páginas e os QTE.
+tasks.register('testeHistoriaDupla', JavaExec) {
+    group = 'verification'
+    description = 'Joga a história da dupla adversária numa luta do torneio e grava os quadros.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.gamelutagpt.TesteHistoriaDupla'
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
+    args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('historia-dupla').get().asFile.absolutePath),
+        providers.gradleProperty('irmao').getOrElse('ryuga'),
+        providers.gradleProperty('dupla').getOrElse('p09')
 }
 
 // gradle :pc:testeQte [-Psaida=pasta] [-Pirmao=koga] (Kōga × Brucy, a cena da campanha do Kōga)

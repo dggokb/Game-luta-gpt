@@ -777,6 +777,8 @@ final class CombatEngine {
                 f.backdashArmed = false;
                 f.forwardDashing = false;
             } else if ((f.dashRequest || wallChaseRun(f)) && f.backdashFrames == 0) {
+                // A corrida da perseguição da parede (segurar →) não abre o golpe de corrida.
+                f.chaseRunning = !f.dashRequest;
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
                 f.wallChase = 0;
@@ -1786,6 +1788,12 @@ final class CombatEngine {
         f.move = attack.kind == AttackDefinition.Kind.SUPER ? null : f.character().moveFor(attack.id);
         f.specialStrength = strength;
         f.autoStep = step;
+        // Golpe normal dado na corrida: o corpo não para na hora, leva o embalo e o atrito freia.
+        // O golpe que já anda por conta própria (o golpe de corrida, o → + H) anda só o dele.
+        if (ATRITO_DO_PE && f.forwardDashing && f.grounded && attack.kind == AttackDefinition.Kind.NORMAL &&
+            attack.mechanics.advanceSpeed == 0f) {
+            f.embalo = f.facing * dashSpeed(f) * impulso(f);
+        }
         f.forwardDashing = false;
         f.backdashFrames = 0;
         if (f.move != null) f.crouching = attack.id.startsWith("2");
@@ -2411,7 +2419,10 @@ final class CombatEngine {
 
     private void applyPush(CombatFighter f) {
         if (f.pushFramesLeft <= 0) return;
-        float step = f.pushRemaining / f.pushFramesLeft;
+        int n = f.pushFramesLeft;
+        // Deslizando no chão: a velocidade cai o mesmo tanto por quadro até zero (atrito); no ar
+        // (ou sem o atrito), a distância dividida por igual.
+        float step = f.pushAtrito && f.grounded ? f.pushRemaining * (2 * n - 1) / (float) (n * n) : f.pushRemaining / n;
         f.pushRemaining -= step;
         f.pushFramesLeft--;
         float target = f.x + step;
@@ -2424,7 +2435,63 @@ final class CombatEngine {
         }
     }
 
+    /** O empurrão de golpe e de defesa freado pelo atrito do chão (teste: -Dgameluta.empurrao=atrito liga). */
+    static final boolean EMPURRAO_POR_ATRITO = "atrito".equals(System.getProperty("gameluta.empurrao"));
+    /** O atrito do pé no chão (o corpo anda o que o pé de apoio empurra); "off" volta ao andar de velocidade fixa. */
+    static final boolean ATRITO_DO_PE = !"off".equals(System.getProperty("gameluta.atrito"));
+
+    /**
+     * Um quadro de andar com o pé de apoio cravado no chão: a passada avança no tempo, no ritmo
+     * que dá a velocidade de andar do lutador, e o corpo anda o que o pé no chão empurra no
+     * desenho (CharacterDefinition.Animation.apoio). False sem a medida do pé: anda como antes.
+     */
+    private boolean andarPeloPe(CombatFighter f, boolean frente, float velocidade, float passadaAntes, boolean eraFrente) {
+        CharacterDefinition c = f.character();
+        if (!ATRITO_DO_PE || c == null) return false;
+        CharacterDefinition.Animation a = c.animations.get(frente ? SpriteStates.WALK_FORWARD : SpriteStates.WALK_BACK);
+        if (a == null || a.apoio == null) return false;
+        float passada = passadaAntes >= 0f && eraFrente == frente ? passadaAntes : 0f;
+        int n = a.apoio.length;
+        float depois = passada + n * velocidade * CombatConfig.DT / Math.abs(a.passo);
+        f.x += f.facing * a.avanco((int) passada, (int) depois);
+        f.passada = depois >= n ? depois - n : depois;
+        f.passadaFrente = frente;
+        return true;
+    }
+
+    /** Quanto o lutador anda e corre mais rápido ou mais devagar agora (SHINKAI SPEED, exaustão). */
+    private float impulso(CombatFighter f) {
+        float boost = f.state.inShinkai(Shinkai.Type.SPEED) ? config.shinkaiSpeed : 1f;
+        if (f.state.exaustaoQuadros > 0) boost *= config.ryugaExaustoVelocidade;
+        return boost;
+    }
+
+    /**
+     * O embalo no chão: o corpo desliza na velocidade que tinha e o atrito do pé freia, o mesmo
+     * tanto por quadro para qualquer golpe (atrito cinético). Acaba ao sair do chão, ao apanhar,
+     * ao encostar no rival (não empurra ele pela arena) ou quando ele volta a dar passo.
+     */
+    private void deslizar(CombatFighter f, boolean daPasso) {
+        boolean segue = f.grounded && !f.ko() && !fighters[1 - f.index].ko() && f.vanishFrames == 0 && !daPasso &&
+            (f.attacking() || f.status == CombatFighter.Status.NEUTRAL);
+        if (!segue || f.embalo * f.facing > 0f && touchingAhead(f)) {
+            f.embalo = 0f;
+            return;
+        }
+        f.x += f.embalo * CombatConfig.DT;
+        float freio = config.atritoDoChao * config.gravity * CombatConfig.DT;
+        f.embalo = Math.abs(f.embalo) <= freio ? 0f : f.embalo - Math.signum(f.embalo) * freio;
+    }
+
     private void moveHorizontally(CombatFighter f) {
+        // A passada só continua se ele andar neste quadro também.
+        float passadaAntes = f.passada;
+        f.passada = -1f;
+        if (f.embalo != 0f) {
+            // Dar passo de novo (andar, correr, recuar, preparar o pulo) crava o pé: o deslize acaba.
+            boolean livre = f.status == CombatFighter.Status.NEUTRAL && !f.locked;
+            deslizar(f, livre && (horizontal(f.input.direction) != 0 || f.backdashFrames > 0 || f.jumpSquat > 0));
+        }
         if (f.vanishFrames > 0) return;
         // The winner has already won: no stale held direction, dash or air
         // momentum may translate the victory animation around the arena.
@@ -2514,9 +2581,12 @@ final class CombatEngine {
                     f.x += f.facing * dashSpeed(f) * boost * CombatConfig.DT;
                 } else {
                     if (f.energyRunFrames > 0) boost *= config.energyRunSpeedPermille / 1000f;
-                    float speed = f.forwardDashing && holdingForward ? dashSpeed(f) * boost
-                        : walkSpeed(f, holdingForward) * boost;
-                    f.x += horizontal * speed * CombatConfig.DT;
+                    boolean correndo = f.forwardDashing && holdingForward;
+                    float speed = correndo ? dashSpeed(f) * boost : walkSpeed(f, holdingForward) * boost;
+                    if (correndo || horizontal == 0 ||
+                        !andarPeloPe(f, holdingForward, speed, passadaAntes, f.passadaFrente)) {
+                        f.x += horizontal * speed * CombatConfig.DT;
+                    }
                 }
             }
         } else if (dragonRush(f)) {
@@ -4977,8 +5047,10 @@ final class CombatEngine {
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.bounceFromArc = false;
         d.spinning = false;
-        // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
-        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce) &&
+        // The wall bounce is a combo tool: a lone hit in neutral is a plain hit. O golpe de corrida
+        // que joga na parede (a Ombrada do Ryūga, 13/11) joga mesmo sozinho: correu, acertou, combo.
+        boolean runBounce = attack.id.equals(CancelSystem.RUN_HEAVY);
+        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce || runBounce) &&
             session.wallBounces < config.maxWallBounces;
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
@@ -5368,6 +5440,16 @@ final class CombatEngine {
         d.pushRemaining = distance;
         d.pushFramesLeft = distance == 0f ? 0 : config.pushbackFrames;
         d.pushSource = source;
+        d.pushAtrito = false;
+        // Só o que afasta de quem bateu desliza; o puxão (que traz para perto) é força, não deslize.
+        boolean afasta = source == null || distance * (d.x - source.x) >= 0f;
+        if (ATRITO_DO_PE && EMPURRAO_POR_ATRITO && distance != 0f && d.grounded && afasta) {
+            // No chão o empurrão é um deslize: sai rápido e o atrito do pé freia até parar na
+            // mesma distância do golpe. O tempo vem do atrito (v0 = √(2·a·d), t = v0 / a).
+            float freio = config.atritoDoChao * config.gravity;
+            d.pushFramesLeft = Math.max(1, Math.round((float) Math.sqrt(2f * Math.abs(distance) / freio) / CombatConfig.DT));
+            d.pushAtrito = true;
+        }
     }
 
     /**

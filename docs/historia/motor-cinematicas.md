@@ -109,6 +109,7 @@ juntas). O treino do Episódio 1, pronto, é `historia/ep01/cinematica_treino.js
 | `gatilho` | Quando a cena começa |
 |---|---|
 | `{"vida": 0.25}` | o lutador da vez de qualquer lado chega a 25% da vida. `"lado": "jogador"` ou `"rival"` olha só um lado. Enquanto espera, o lado que o gatilho olha não cai (os dois, sem `lado`); o outro pode perder normalmente |
+| `{"vida": 0.25, "lado": "rival", "ultimo": true}` | igual, mas só para o **último de pé** do lado: no 2x2, o titular cai normalmente e a cena espera o parceiro entrar e chegar a 25%. É o gatilho das histórias das duplas do torneio ([torneio.md](torneio.md#a-história-da-dupla-adversária)) |
 | `"inicio"` | logo depois do "LUTEM!" (a intro e o READY/GO tocam normalmente) |
 | `{"tempo": 20}` | 20 segundos de luta depois do "LUTEM!" |
 | `"ko"` | a luta acabou (KO): a cena toca antes do resultado, e o resultado espera ela |
@@ -165,6 +166,9 @@ Usam os quadros laterais da conversa, com a mesma legenda digitada, os mesmos ro
 mesmas expressões (`historia/retratos/<quem>_<expressao>.png`). A luta não precisa ter arquivo
 de conversa.
 
+- **Quem está em campo**: `"quem": "rival"` (ou `"jogador"`) fala por quem estiver lutando
+  desse lado na hora, com o rosto da seleção. Serve para a dupla em que qualquer um dos dois
+  pode ser o último de pé (Lars ou Fenna).
 - **Lado**: os irmãos (`ryuga`, `koga`) não dizem o lado: cada um fala no quadro do **lado da
   tela onde o lutador do time dele está** na hora da fala (se os dois trocaram de lado na luta,
   os quadros trocam junto), nas duas campanhas. Qualquer outro personagem diz o lado:

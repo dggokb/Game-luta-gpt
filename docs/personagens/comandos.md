@@ -38,6 +38,11 @@ o Joelho da garça). Sai do
 neutro e emendado no combo (depois do L, do 2L e do M); dentro de um golpe que não emenda nele,
 → + H continua sendo o H. Nos outros, → + H é o H.
 
+Golpe de corrida (→ → e H correndo, 13/11): só quem tem o próprio (hoje o Ryūga, a Ombrada, e a
+Yin-lu, o Carrinho da garça). Sai da corrida sem parar (`CancelSystem.RUN_HEAVY`, o golpe "DH").
+↓ + H correndo continua sendo o 2H, e a corrida da perseguição da parede (segurar → depois do
+quique) não abre o golpe de corrida: ali o → + H é o de sempre. Nos outros, H correndo é o H.
+
 ## Como o jogo lê
 
 - **Diagonal do meio é opcional:** ↓↘→ vale como ↓→, e a meia-lua ←↙↓↘→ vale como ←↓→. A
