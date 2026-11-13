@@ -1789,7 +1789,9 @@ final class CombatEngine {
         f.specialStrength = strength;
         f.autoStep = step;
         // Golpe normal dado na corrida: o corpo não para na hora, leva o embalo e o atrito freia.
-        if (ATRITO_DO_PE && f.forwardDashing && f.grounded && attack.kind == AttackDefinition.Kind.NORMAL) {
+        // O golpe que já anda por conta própria (o golpe de corrida, o → + H) anda só o dele.
+        if (ATRITO_DO_PE && f.forwardDashing && f.grounded && attack.kind == AttackDefinition.Kind.NORMAL &&
+            attack.mechanics.advanceSpeed == 0f) {
             f.embalo = f.facing * dashSpeed(f) * impulso(f);
         }
         f.forwardDashing = false;

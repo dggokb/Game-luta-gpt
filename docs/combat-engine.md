@@ -1166,7 +1166,8 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
   Deslize até parar, sem rival na frente: Ryūga 151 px (corrida de 620 px/s), Yin-lu 199 px (713).
   Alcance a mais no primeiro quadro que bate: Yin-lu L +45, M +66, H +85 px; Ryūga L +39, M +57,
   H +86 px. As rotas de combo com corrida (C120) passaram sem mudar; a CPU não conta com esse
-  alcance a mais (ataca pela régua do golpe parado). Especiais, Super e agarrão não levam o embalo.
+  alcance a mais (ataca pela régua do golpe parado). Especiais, Super e agarrão não levam o embalo,
+  nem o golpe que já anda por conta própria (o golpe de corrida `DH`, o `→ + H`): esse anda só o dele.
 - **Empurrão de golpe freado pelo atrito (experimento desligado, 13/11):** com
   `-Dgameluta.empurrao=atrito` (PC: `-Pempurrao=atrito`) o empurrão no chão de quem apanha ou
   defende deixa de andar por igual em 8 quadros (`pushbackFrames`) e vira deslize: sai rápido e
