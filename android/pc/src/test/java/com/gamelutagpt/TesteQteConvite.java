@@ -76,7 +76,7 @@ public final class TesteQteConvite {
         limite = 60 * 60;
         boolean bateu = false;
         while (!cena.rodando() && limite-- > 0) {
-            passo(quadro % 20 == 0);
+            passo(quadro % 20 == 0 && !SO_ANIMACAO);
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
                 FighterState rival = jogo.engine.fighter(GameView.OPPONENT).state;
                 FighterState jogador = jogo.engine.fighter(GameView.PLAYER).state;
@@ -131,7 +131,7 @@ public final class TesteQteConvite {
                 toque(MotionEvent.ACTION_DOWN, 640f, 360f);
                 toque(MotionEvent.ACTION_UP, 640f, 360f);
             }
-            passo(quadro % CADENCIA == 0 || pede && noQte == 12);
+            passo((quadro % CADENCIA == 0 || pede && noQte == 12) && (!SO_ANIMACAO || cena.animando()));
         }
         System.out.printf(Locale.ROOT, "cena acabou no quadro %d: rival %.0f%% (KO %b), jogador %.0f%%%n", quadro,
             vida(jogo.engine.fighter(GameView.OPPONENT)), jogo.engine.fighter(GameView.OPPONENT).ko(), vida(jogo.engine.fighter(GameView.PLAYER)));
@@ -143,6 +143,8 @@ public final class TesteQteConvite {
 
     /** De quantos em quantos quadros a cena é gravada (-Dgameluta.cadencia; 2 = vídeo a 30 qps). */
     static final int CADENCIA = Integer.getInteger("gameluta.cadencia", 6);
+    /** Grava só a animação manual da cena (-Dgameluta.soAnimacao=true): o vídeo de conferência dela. */
+    static final boolean SO_ANIMACAO = Boolean.getBoolean("gameluta.soAnimacao");
     /** Grava em JPG (-Dgameluta.jpg=true). */
     static final boolean JPG = Boolean.getBoolean("gameluta.jpg");
 

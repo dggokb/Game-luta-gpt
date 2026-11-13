@@ -137,8 +137,10 @@ novo).
 | `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 | `clarao` | `segundos` (padrão 0,3), `cor` (padrão `#FFFFFF`) | clarão de impacto: a tela fica da cor e volta à luta (some mais rápido no começo). Esconde um corte, como o golpe que pega no anime | `segundos` |
-| `impacto` | `forca` (1 a 3, padrão 2), `quem` (quem bateu, padrão `jogador`), `congela`, `zoom`, `letreiro` | impacto de anime no contato entre os dois: a luta congela (0,12/0,2/0,32 s pela força), a câmera dá o tranco e é empurrada, o estouro de ar sai no ponto do contato; forte (2) também marca o chão debaixo de quem segurou e faz o close inclinado; o mais forte (3) ainda tem o impact frame em negativo. Vai logo depois de uma troca que acaba no contato | — |
+| `impacto` | `forca` (1 a 3, padrão 2), `quem` (quem bateu, padrão `jogador`), `congela`, `zoom`, `letreiro` | impacto de anime no contato entre os dois: a luta congela (0,12/0,2/0,32 s pela força), a câmera dá o tranco e é empurrada; o golpe defendido (1) solta a faísca de defesa da luta, o forte (2 e 3) o estouro de ar no ponto do contato; forte (2) também marca o chão debaixo de quem segurou e faz o close inclinado; o mais forte (3) ainda tem o impact frame em negativo. Vai logo depois de uma troca que acaba no contato | — |
 | `linhas` | `ligar` (padrão true), `estilo` (`concentracao` ou `velocidade`), `escuro` (0 a 1, padrão 0,35), `segundos` (padrão 0,12) | linhas de ação por cima da luta: as de concentração do mangá (riscos pretos das bordas para o meio, deixando os dois limpos) ou as de velocidade (riscos de lado a lado), com a luta escurecendo atrás. Mudam a cada dois quadros, como desenhadas à mão. Todo QTE já liga as de concentração enquanto pede | `segundos` |
+| `animar` | `quadros`, `jogador`, `rival`, `eventos` ([abaixo](#animação-feita-à-mão)) | animação feita à mão: o motor de luta para e os dois seguem quadros-chave (pose, posição, esticamento, rotação, rastro) | os `quadros` acabarem |
+| `efeito` | `nome` (a pasta em `assets/efeitos`), `quem` (padrão `jogador`), `onde` (`pe` ou `peito`), `dx`, `escala`, `atras` | um efeito de vídeo no lutador: a poeira do arranque (`fumaca_dash_v05`), do pulo e do pouso, a fumaça da queda... `dx` à frente de onde ele olha; `atras` espelha (a poeira de quem escorrega para trás) | — |
 | `video` | `clipe` (`<episódio>/<nome>`), `repetir`, `esquerda`, `emendar`, ou `parar` ([abaixo](#cena-em-vídeo)) | os dois lutadores num vídeo só, no chão da luta e no lugar deles | `repetir`: nada; senão o vídeo acabar (com `emendar` + `semEsperar`: o vídeo começar) |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
@@ -354,6 +356,41 @@ O `testeCena` abre só aquela luta da história, tira a vida até o gatilho, ace
 e grava um PNG a cada 6 quadros em `android/pc/build/cena/`. Serve para qualquer luta da
 história com cinemática (`-Pvida` muda a vida do gatilho).
 
+### Animação feita à mão
+
+O motor de luta não sabe fazer cena de anime: o golpe dele tem o tempo do jogo, e o anime vive de
+antecipação segurando, arrancada em poucos quadros, contato parado e pausa de quem se estuda. Na
+ação `animar` o motor para e cada lutador segue os **quadros-chave** do roteiro (60 por segundo),
+como num programa de animação:
+
+```json
+{"acao": "animar", "quadros": 120,
+ "rival":   [{"q": 0, "x": 160, "pose": "IDLE:0", "ciclo": 12},
+             {"q": 30, "x": 40, "pose": "DASH:5", "sx": 1.4, "sy": 0.8, "rastro": 4, "curva": "sai"}],
+ "jogador": [{"q": 0, "x": -160, "pose": "IDLE:0"}],
+ "eventos": [{"q": 30, "acao": {"acao": "impacto", "forca": 3, "quem": "rival"}}]}
+```
+
+| Campo da chave | O que é |
+|---|---|
+| `q` | o quadro da cena (60 por segundo) |
+| `pose` | `CLIPE:quadro`, qualquer quadro de qualquer animação do lutador (`DASH:6`, `JOELHO_GARCA:9`) |
+| `x`, `y` | distância do meio entre os dois no começo, no eixo de quem joga para o rival (negativo: o lado do jogador); altura acima do chão |
+| `sx`, `sy`, `rot`, `alfa` | esticamento (a arrancada estica na horizontal e achata), rotação em graus (um giro no ar: 0 → -360 e uma chave `corte` volta a 0), transparência (sumir no dash) |
+| `rastro` | quantas cópias azuladas das poses de antes ficam atrás (a velocidade) |
+| `ciclo`, `ate` | a pose anda sozinha: em laço, nesse ritmo (quadros do clipe por segundo); ou do quadro da chave até `ate` no tempo até a próxima chave |
+| `curva` | como chega nesta chave: `linear`, `sai` (rápido e freando: a arrancada), `entra` (acelerando: a queda), `suave`, `corte` (pula) |
+| `vira` | olha para o lado contrário (cada um olha para o outro) |
+
+Entre duas chaves os números são interpolados com a curva da chave seguinte; a pose fica a da chave
+de antes. Os `eventos` são ações quaisquer do roteiro no quadro (`camera`, `impacto`, `efeito`,
+`linhas`, `fala`, `onomatopeia`, `clarao`), menos `qte`, `golpe` e `animar`. Um `impacto` congela a
+animação no contato. As falas não esperam: a animação reserva o tempo delas.
+
+A luta do convite do Ryūga é escrita por um gerador (`tools/cenas/convite_ryuga.py`): ajuste os
+números lá e rode `python3 tools/cenas/convite_ryuga.py`. Para ver as poses de um lutador, as
+folhas de cada clipe com o número do quadro ajudam a escolher.
+
 ### O teste dos QTE (convite do Episódio 2)
 
 `historia/ep02/cinematica_convite_ryuga.json`, na luta CONVITE da campanha do Ryūga (Ryūga ×
@@ -364,9 +401,20 @@ Yin-lu, no dojo dela):
 2. As **duas páginas da lembrança** (Ryūga, Kōga e Yin-lu crianças no dojo) são lidas quadro a
    quadro, no toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
 3. A tinta pinta de novo por cima da segunda página, os dois recuam atrás dela e a tinta sai: a luta volta.
-4. A **coreografia do dono (13/11)**, em quatro sequências, só com os movimentos que os dois já têm
-   (o que não existe foi adaptado). Os QTE não batem por conta própria (`"golpe": "nenhum"`): o
+4. A **coreografia do dono (13/11)**, em quatro sequências, **animada à mão** (ação `animar`, uns
+   21 s): a tabela abaixo. A versão anterior, com os QTE e o motor de luta fazendo os golpes, está em
+   `historia/ep02/cinematica_convite_ryuga_qte.json` (os QTE voltam para a cena animada depois que o
+   ritmo dela for aprovado). Nela os QTE não batem por conta própria (`"golpe": "nenhum"`): o
    acerto libera a troca de golpes do roteiro, com quem ataca e os golpes em ordem.
+
+| Sequência | Animada à mão (a cena de agora) |
+|---|---|
+| 1. Retomada | close na Yin-lu: "Vamos ver o quanto você melhorou!"; ela agacha e arranca; o soco passa no vento (ele joga o corpo para trás), o chute alto ele defende, a rasteira ele pula; no alto ele gira e desce com o chute nos braços cruzados dela: DOOOM!, poeira; ele volta no ar e ela escorrega |
+| 2. Alta velocidade | os dois arrancam juntos; jab dele e palma dela defendidos (a câmera corta nele, nela), os punhos se chocam e os dois deslizam, o chute alto dela ele passa por baixo; o combo dele (soco no abdômen, gancho, chute giratório) a faz escorregar pelo chão; agachada: "Nada mal!" |
+| 3. A superioridade dela | ele corre; SHUN!: ela some no dash e surge às costas dele, a palma pega (PAH!); ele defende o chute alto, gira e tenta pegar o braço dela; ela o projeta, ele gira no ar e escorrega com a mão no chão; "Você continua sendo um monstro!" / "E você continua falando demais!" |
+| 4. O último confronto | ofegantes (HAH... HAH...); close nele tremendo de punhos fechados: "Eu não vim até aqui pra perder!"; os dois disparam: o soco dele (ela se abaixa), o chute alto dela (ele se abaixa), ele gira e sobe no gancho, ela salta para trás; ele salta atrás e desce com o golpe nos braços cruzados dela: IMPACTO!, impact frame, clarão, a câmera volta devagar; os dois jogados para longe, ofegantes |
+
+Com os QTE (o arquivo `_qte`):
 
 A cena tem a linguagem de anime (13/11, o dono achou a primeira versão engessada: "parece alguém
 controlando o jogo"): as faixas de cinema ficam a cena inteira (sem HUD), a câmera corta seco entre
@@ -402,7 +450,7 @@ chega e os dois derrubam todo mundo) e um final diferente, de briga de rua:
 | GOLPE FINAL! (tempo) | trocam golpes durante "Para de se exibir!" / "Eu dava conta... lembra?"; pulam para trás, faixas, correm um para o outro em câmera lenta; DOOOOM! | S4 (mergulho) | KO |
 | Depois | o Brucy caído: "Eu sei, eu sei..." (como no beco); "Heh... com essa dupla, ninguém segura a gente." | — | — |
 
-Para ver no PC sem jogar: `gradle :pc:testeQte` (a do Kōga: `-Pirmao=koga`) joga a luta inteira de verdade (passa as páginas,
+Para ver no PC sem jogar: `gradle :pc:testeQte` (a do Kōga: `-Pirmao=koga`; só a animação à mão, quadro a quadro: `-Pcadencia=1 -Pjpg=true -PsoAnimacao=true`) joga a luta inteira de verdade (passa as páginas,
 deixa a Yin-lu com 19%, lê as duas páginas, erra o primeiro QTE de propósito e acerta os outros, pelo toque e pelo
 teclado) e grava os quadros em `android/pc/build/qte/`.
 

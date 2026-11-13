@@ -1484,6 +1484,18 @@ os lotes seguintes do efeitos-gpt.md.
   então aplicar só no golpe trocado; o `linha_de_acao.py --write` quebra num print do
   `CAMINHO_MANUAL` do S2 (antigo): chamar `caminhos()` e gravar só o do golpe.
 
+## Rodada de 13/11: efeitos da luta animada à mão do convite
+
+- **Pedido:** a luta do convite (Ryūga × Yin-lu) inteira animada à mão, depois de aprovar o teste
+  ("eh isso porra! faz a cena inteira").
+- **Feito:** nenhum efeito novo; a cena usa os que a luta já tem. A ação `efeito` do roteiro toca
+  uma pasta de `assets/efeitos` num lutador (pés ou peito): `fumaca_dash_v05` no arranque e em
+  quem escorrega para trás (`atras`), `fumaca_pulo`, `fumaca_pouso`, `fumaca_queda_v01` no golpe
+  que afunda. O `impacto` de força 1 (golpe defendido) trocou o estouro de ar, que cobria os dois,
+  pela faísca de defesa da luta (`defesa`, `defesa_2`, `defesa_3`, uma de cada vez, 0,7 do
+  tamanho); os fortes seguem com o `impacto_ar_super`.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a

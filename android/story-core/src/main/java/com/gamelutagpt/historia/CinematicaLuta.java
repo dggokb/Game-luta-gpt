@@ -123,6 +123,12 @@ public final class CinematicaLuta {
          */
         default void impacto(int forca, int lado) {}
 
+        /**
+         * Toca o efeito {@code nome} (assets/efeitos) no lutador desse lado: nos pés ou no peito,
+         * {@code dx} à frente de onde ele olha, no tamanho {@code escala}; {@code atras} espelha.
+         */
+        default void efeito(String nome, int lado, boolean noPeito, float dx, float escala, boolean atras) {}
+
         /** Onde o lutador desse lado está agora (x do mundo), para a animação manual começar dali. */
         default float xDoLutador(int lado) {
             return lado == JOGADOR ? -150f : 150f;
@@ -221,7 +227,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR, EFEITO }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -271,6 +277,16 @@ public final class CinematicaLuta {
         int quadroDoGolpe = 5;
         /** ANIMAR: a animação manual (os quadros-chave dos dois e os eventos). */
         AnimacaoManual animacao;
+        /**
+         * EFEITO: o efeito (uma pasta de assets/efeitos: fumaca_dash_v05, fumaca_pouso, defesa...)
+         * no lutador {@link #quemMove}, nos pés ({@code "pe"}) ou no peito ({@code "peito"}),
+         * {@link #dx} à frente de onde ele olha (negativo: atrás), no tamanho {@link #escala};
+         * {@link #atras} espelha (a poeira do arranque sai para trás).
+         */
+        String efeito;
+        boolean noPeito;
+        float dx, escala = 1f;
+        boolean atras;
         /** IMPACTO: a força (1 médio, 2 forte, 3 o mais forte, com impact frame). */
         int forca = 2;
         /** LINHAS: "concentracao" (de mangá, das bordas para o meio) ou "velocidade" (riscos de lado a lado). */
@@ -932,6 +948,21 @@ public final class CinematicaLuta {
                     a.animacao.eventos.add(ev);
                 }
                 break;
+            case "efeito":
+                // Um efeito de vídeo (poeira, fumaça, faísca) num lutador: a animação manual não
+                // passa pelo motor de luta, então a poeira do arranque e do pouso vem daqui.
+                a = new Acao(Acao.Tipo.EFEITO);
+                a.efeito = Episodio.string(m, "nome", null);
+                if (a.efeito == null) throw new IllegalArgumentException("efeito sem \"nome\" (a pasta em assets/efeitos)");
+                a.quemMove = Episodio.string(m, "quem", "jogador");
+                if (!time(a.quemMove)) throw new IllegalArgumentException("efeito em quem: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
+                String onde = Episodio.string(m, "onde", "pe");
+                if (!onde.matches("pe|peito")) throw new IllegalArgumentException("efeito onde: " + onde + " (use pe ou peito)");
+                a.noPeito = onde.equals("peito");
+                a.dx = numero(m, "dx", 0f, -600f, 600f);
+                a.escala = numero(m, "escala", 1f, 0.1f, 4f);
+                a.atras = Boolean.TRUE.equals(m.get("atras"));
+                break;
             case "impacto":
                 // Impacto de anime no contato: congela, tranco, estouro de ar, chão e close.
                 a = new Acao(Acao.Tipo.IMPACTO);
@@ -1146,6 +1177,21 @@ public final class CinematicaLuta {
     /** Há uma cinemática carregada nesta luta (esperando, rodando ou já tocada). */
     public boolean ativa() {
         return estado != Estado.NENHUMA;
+    }
+
+    /**
+     * Os clipes que a animação feita à mão do roteiro usa nesse lado ({@link #JOGADOR},
+     * {@link #RIVAL}): o jogo começa a carregar as folhas deles antes da cena (são poses raras,
+     * fora das que a luta deixa prontas). Vazio sem roteiro ou sem animação.
+     */
+    public String[] clipesAnimados(int lado) {
+        if (roteiro == null) return new String[0];
+        java.util.Set<String> clipes = new java.util.LinkedHashSet<>();
+        for (Acao a : roteiro.acoes) {
+            if (a.tipo != Acao.Tipo.ANIMAR) continue;
+            for (AnimacaoManual.Chave c : lado == JOGADOR ? a.animacao.jogador : a.animacao.rival) clipes.add(c.clip);
+        }
+        return clipes.toArray(new String[0]);
     }
 
     /** Carregada e esperando o gatilho. */
@@ -1413,6 +1459,9 @@ public final class CinematicaLuta {
             case IMPACTO:
                 impactar(a);
                 palco.impacto(a.forca, lado(a.quemMove));
+                break;
+            case EFEITO:
+                palco.efeito(a.efeito, lado(a.quemMove), a.noPeito, a.dx, a.escala, a.atras);
                 break;
             case LINHAS:
                 if (a.ligar) {

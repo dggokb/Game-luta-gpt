@@ -233,6 +233,14 @@ final class CharacterDefinition {
             float hold=durations[0];
             return hold+Math.max(0f,Math.min(1f,progress))*(duration-hold-0.0001f);
         }
+        /** Quantos quadros o clipe mostra (também o que anda pela distância, sem durações). */
+        int quadros() {
+            return frames.length;
+        }
+        /** O quadro da folha que o clipe mostra na posição {@code i} (0 até {@link #quadros}). */
+        int quadroDaFolha(int i) {
+            return frames[((i%frames.length)+frames.length)%frames.length];
+        }
         /** Quantos quadros o clipe tem. */
         int frameCount() {
             return durations.length;

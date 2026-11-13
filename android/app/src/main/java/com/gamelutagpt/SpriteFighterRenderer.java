@@ -371,10 +371,14 @@ final class SpriteFighterRenderer {
     void drawQuadroAnim(Canvas canvas,String clip,int frame,float x,float baseY,int facing,
                         float sx,float sy,float graus,int alpha,Filtro filtro) {
         CharacterDefinition.Animation anim=character.animations.get(clip);
-        if(anim==null||anim.atlas==null||!atlases.pronta(anim.atlas.resource))return;
-        int n=anim.frameCount();
-        if(n<=0)return;
-        frame=((frame%n)+n)%n;
+        // A folha que não está na memória é decodificada na hora (como no desenho da luta): a
+        // animação à mão usa poses de qualquer clipe, e sem isso o lutador sumia no quadro.
+        if(anim==null||anim.atlas==null)return;
+        // Pelos quadros do clipe, não pelas durações: a corrida anda pela distância e não tem tempo.
+        if(anim.quadros()<=0)return;
+        // A pose é a posição no clipe (DASH:6 = o 7º quadro da corrida); a folha pode guardar os
+        // quadros noutra ordem (e repetidos), então vale o quadro da folha que o clipe mostra ali.
+        frame=anim.quadroDaFolha(frame);
         usarFiltro(filtro);
         canvas.save();
         if(graus!=0f)canvas.rotate(graus*facing,x,baseY-90f);

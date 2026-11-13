@@ -1049,6 +1049,11 @@ public class GameView extends SurfaceView
      */
     private void anteciparOcasionais() {
         if (tutorial.active()) atlases.pedir(engine.fighter(1).character(), SpriteStates.TAUNT);
+        // As poses da animação feita à mão da cena da luta (clipes raros): prontas antes dela.
+        if (cinematica.armada() || cinematica.rodando()) {
+            atlases.pedir(player().character(), cinematica.clipesAnimados(CinematicaLuta.JOGADOR));
+            atlases.pedir(opponent().character(), cinematica.clipesAnimados(CinematicaLuta.RIVAL));
+        }
         boolean fimDoRelogio = flow.timed() && flow.clockSeconds() <= 20;
         for (int side = 0; side < 2; side++) {
             FighterState quem = engine.fighter(side).state;
@@ -8561,12 +8566,30 @@ public class GameView extends SurfaceView
             return engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).x;
         }
 
+        @Override public void efeito(String nome, int lado, boolean noPeito, float dx, float escala, boolean atras) {
+            CombatFighter f = engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT);
+            AnimacaoManual.Pose p = cinematica.poseAnimada(lado);
+            // Na animação manual a altura é a da pose (o motor de luta não sabe dela).
+            float altura = p != null ? p.altura : GROUND_Y - f.y;
+            float y = noPeito ? chestY(f) - (p != null ? p.altura : 0f) : GROUND_Y - altura;
+            // O vídeo do efeito é feito para quem olha para a direita.
+            efeitos.tocar(nome, f.x + f.facing * dx, y, escala, (f.facing < 0) != atras);
+        }
+
         @Override public void impacto(int forca, int lado) {
             CombatFighter a = engine.fighter(lado), d = engine.fighter(1 - lado);
             float x = (a.x + d.x) * 0.5f, y = chestY(d);
             int direcao = d.x >= a.x ? 1 : -1;
             feel.kick(direcao, forca >= 2 ? ImpactEffects.SPECIAL : ImpactEffects.HEAVY);
-            efeitos.tocar(forca >= 2 ? "impacto_ar_super" : "impacto_ar_forte", x, y, forca >= 3 ? 1.05f : 0.8f, direcao < 0);
+            if (forca == 1) {
+                // O golpe defendido da cena: a faísca de defesa da luta (a mesma do jogo, uma de
+                // cada vez), não o estouro de ar, que cobria os dois.
+                for (String n : DEFESAS[defesaVez = (defesaVez + 1) % DEFESAS.length]) {
+                    if (efeitos.tocarDurando(n, x, y, 0.7f, direcao < 0, (11 + 4) * FIXED_STEP * 1000f) >= 0) break;
+                }
+            } else {
+                efeitos.tocar("impacto_ar_super", x, y, forca >= 3 ? 1.05f : 0.8f, direcao < 0);
+            }
             if (forca >= 2) {
                 // O chão marcado debaixo de quem segurou e o close inclinado no contato.
                 efeitos.tocar("impacto_chao", d.x, GROUND_Y, 1f, direcao < 0);
