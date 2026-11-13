@@ -1175,7 +1175,8 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
   (40 px: 15 quadros; 120 px: 26), então o rival fica perto por mais tempo no meio do combo. Com
   ele ligado dois testes quebram: `ComboRyugaTest.aOndaDoAssistSeguraParaOParceiroRecomecar` (a
   corrente emenda sem precisar segurar) e `CombatEngineTest.cpuOnlyAttacksThroughTheEngineAndWithinReach`.
-  Mexe no balanço dos combos: só liga com o dono vendo.
+  **Decisão do dono (13/11): o empurrão fica como está** ("os combos ficaram bons"); o experimento
+  continua desligado e a ideia de dividir o impulso entre quem bate e quem apanha não foi feita.
 - O comando de especial ficou mais estrito (antes ~420 ms por passo e 550 ms para
   confirmar; agora 15 + 15 frames). Ajustável em `CombatConfig`.
 
