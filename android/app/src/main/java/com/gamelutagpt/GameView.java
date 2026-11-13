@@ -8385,10 +8385,12 @@ public class GameView extends SurfaceView
             boolean congelada = cinematica.congelada();
             cinematica.update(FIXED_STEP);
             conversa.update(FIXED_STEP);
+            // O impact frame e o tranco da tela andam mesmo na congelada (o negativo dura os
+            // quadros dele, não a pausa inteira); os efeitos esperam a pausa acabar.
+            feel.step();
             if (!congelada) {
                 impacts.update(FIXED_STEP);
                 efeitos.passo();
-                feel.step();
             }
             aplicarAnimacao();
             updateFightCamera(FIXED_STEP);
@@ -8564,7 +8566,7 @@ public class GameView extends SurfaceView
             float x = (a.x + d.x) * 0.5f, y = chestY(d);
             int direcao = d.x >= a.x ? 1 : -1;
             feel.kick(direcao, forca >= 2 ? ImpactEffects.SPECIAL : ImpactEffects.HEAVY);
-            efeitos.tocar(forca >= 2 ? "impacto_ar_super" : "impacto_ar_forte", x, y, forca >= 3 ? 1.5f : 1.1f, direcao < 0);
+            efeitos.tocar(forca >= 2 ? "impacto_ar_super" : "impacto_ar_forte", x, y, forca >= 3 ? 1.05f : 0.8f, direcao < 0);
             if (forca >= 2) {
                 // O chão marcado debaixo de quem segurou e o close inclinado no contato.
                 efeitos.tocar("impacto_chao", d.x, GROUND_Y, 1f, direcao < 0);
