@@ -12,7 +12,9 @@ vitória:
 Depois disso a história segue com o resultado ou, fora dela, a revanche começa. Um toque ou um botão
 leva direto para a saída (só depois de 0,6 s, para o toque que acabou a luta não pular a cena).
 
-Primeiro teste: **Ryūga** (`player_base`, vídeo `Max_Ajusta_Gola_5_Segundos.mp4`). Por enquanto
+O **Ryūga** (`player_base`) tem a cena em vídeo (`Max_Ajusta_Gola_5_Segundos.mp4`). Os outros 15
+(p02–p16) têm uma **arte de vitória parada**, gerada no Codex no estilo das artes do versus: ela entra
+deslizando como o vídeo e chega devagar para perto (5% até a saída), 3,6 s na tela. Por enquanto
 **todo cenário usa o fundo do porto** (`vitorias/fundos/padrao.webp`).
 
 ## Como funciona
@@ -54,6 +56,43 @@ python3 tools/sprites/vitoria_video.py Max_Ajusta_Gola_5_Segundos.mp4 --personag
 - `--resolucao`: pixels guardados por pixel da tela (0,6).
 
 A prévia (quadros sobre a tela escura) sai em `android/app/build/sprite-review/vitorias/<id>.png`.
+
+## Arte de vitória parada (Codex)
+
+Os originais e o prompt de cada um ficam em `art/vitorias/` (`pNN.webp`, `prompt_pNN.txt`). Cada
+pedido anexa o concept (`art/concepts/pNN.png`) e a arte do versus do mesmo lutador
+(`art/versus/pNN.webp`, como `versus.png`), para sair com o mesmo rosto, roupa e traço:
+
+```bash
+codex exec --skip-git-repo-check --sandbox workspace-write -i concept.png -i versus.png - < prompt_pNN.txt
+python3 tools/sprites/vitoria_video.py pNN.png --personagem pNN \
+    --frase "..." --frase "..." --frase "..."
+```
+
+O prompt pede: da cabeça ao quadril, virado para a direita, uma pose de **vitória** diferente da do
+versus, fundo #00FF00, 1024×1536, mãos e braços certos. Com uma imagem no lugar do vídeo, o
+`vitoria_video.py` tira o verde, recorta e grava um quadro só (`q000.webp`): o desenho com 1,25 da
+altura da tela, a cabeça 14 px abaixo do alto e o quadril passando da borda de baixo, o mesmo
+enquadramento do vídeo do Ryūga. As frases precisam da tradução em `historia/idiomas/en.json` e
+`es.json`.
+
+| Lutador | Pose de vitória |
+|---|---|
+| p02 Yin-lu | punho na palma, cabeça baixa, sorriso calmo |
+| p03 Kōga | braços cruzados, olhando de cima por cima do ombro |
+| p04 Brucy | punho para o alto e polegar para cima |
+| p05 | guardando a katana nas costas, a outra mão num selo ninja |
+| p06 | braços cruzados, dois dedos na máscara numa continência de deboche |
+| p07 | abaixa a aba do chapéu, leve reverência |
+| p08 | chicote enrolado no ombro, mandando um beijo |
+| p09 Lars | os dois punhos para o alto, gargalhando |
+| p10 Fenna | mão na cintura, polegar para cima e piscadela |
+| p11 Blackwood | ajeitando a luva, sorriso sinistro |
+| p12 Necro | uivando para o céu, garras abertas |
+| p13 Krüger | braços cruzados, desprezo de cima |
+| p14 | mão no cabelo, olhos fechados, sorriso torto |
+| p15 Natisuko | apertando a faixa preta com as duas mãos |
+| p16 Bonnie | sinal de paz no olho piscando, língua de fora |
 
 ## O fundo de um cenário
 

@@ -115,6 +115,13 @@ Cole o passo onde a página entra no episódio e complete:
 | `quadros[].baloes[].area` | contorno do miolo branco que o jogo pinta |
 | `quadros[].baloes[].moldura` | `true` desenha um contorno preto em volta da área branca: um quadro de legenda novo por cima de um texto pintado na arte (ex.: "10 anos se passaram" na página 1 do ep01), para traduzir texto que não está num balão |
 
+### 3a. Uma palavra em outra cor
+
+Quando a arte tem um nome gritado em cor (o NECRO vermelho do Blackwood), o balão digitado pode
+manter: `"destaque": "NECROOOOO!"` e `"corDestaque": "#D2101C"` (padrão vermelho). Onde esse
+pedaço aparece numa linha do texto (em qualquer idioma), ele sai nessa cor; o resto, em preto.
+Use um pedaço que não muda na tradução, como um nome.
+
 ### 3b. Conferir o texto nos balões
 
 O jogo escreve cada fala com a maior letra que cabe na `caixa`. Em balão espetado a caixa pega as

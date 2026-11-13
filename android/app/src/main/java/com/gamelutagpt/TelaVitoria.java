@@ -52,6 +52,8 @@ final class TelaVitoria {
     private static final float FUNDO_MS = 200f;
     /** O lutador entra deslizando da esquerda, já tocando o vídeo. */
     private static final float ENTRA_MS = 80f, DESLIZA_MS = 260f, DESLIZA_PX = 180f;
+    /** A arte parada (um quadro só) cresce isto até a saída, para a tela não ficar morta. */
+    private static final float APROXIMA = 0.05f, PEITO = 0.3f;
     /** "VITÓRIA" bate (cai grande e assenta), pisca a tela e treme. */
     private static final float TITULO_MS = 340f, BATIDA_MS = 130f, CLARAO_MS = 120f, TREME_MS = 220f;
     private static final float TITULO_X = 985f, TITULO_Y = 222f, TITULO_TAM = 132f, TITULO_LARGURA = 540f;
@@ -389,6 +391,14 @@ final class TelaVitoria {
         float[] r = p.caixas[i];
         float x = r[0] - p.esquerda + dx, y = Arena.VH + r[1];
         destino.set(x, y, x + r[2], y + r[3]);
+        if (p.imagens.length == 1) {
+            // Imagem parada: chega devagar para perto, presa na borda esquerda e na altura do
+            // peito (a cabeça não sai pelo alto; o quadril já passa da borda de baixo).
+            float k = clamp((ms() - ENTRA_MS) / (p.duracaoMs() - ENTRA_MS));
+            float cresce = 1f + APROXIMA * (1f - (1f - k) * (1f - k));
+            float peito = y + r[3] * PEITO;
+            destino.set(x, peito - r[3] * PEITO * cresce, x + r[2] * cresce, peito + r[3] * (1f - PEITO) * cresce);
+        }
         paint.setAlpha(alfa);
         c.drawBitmap(b, null, destino, paint);
     }

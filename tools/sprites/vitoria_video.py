@@ -11,13 +11,14 @@ desenho encostado na borda esquerda.
     python3 tools/sprites/vitoria_video.py Max_Ajusta_Gola_5_Segundos.mp4 --personagem player_base \\
         --marca 8,8,150,50 --frase "Ainda tô só aquecendo."
     python3 tools/sprites/vitoria_video.py --fundo porto.webp --cenario padrao
+    python3 tools/sprites/vitoria_video.py art/p03.png --personagem p03 --frase "..."   # imagem parada
 
     --inicio/--fim    trecho do vídeo (quadros, inclusive)
     --passo N         um quadro a cada N do vídeo
     --fps F           velocidade no jogo (sem isso, a do vídeo)
     --segurar MS      o último quadro parado antes da tela sair
     --marca x0,y0,x1,y1   apaga a marca d'água clara nesse retângulo do vídeo
-    --altura A        o quadro do vídeo com A da altura da tela
+    --altura A        o quadro do vídeo com A da altura da tela (1; a imagem parada: 1,25)
     --resolucao R     pixels guardados por pixel da tela (o jogo lê os quadros aos poucos,
                       enquanto toca: o tamanho pesa no APK, não na memória)
     --frase TEXTO     frase do quadro de mangá (repita para várias; o jogo sorteia uma). Sem
@@ -105,6 +106,51 @@ def converter(video, personagem, inicio=0, fim=None, passo=1, fps=None, segurar_
     return destino, dados
 
 
+def converter_imagem(imagem, personagem, segurar_ms=3600, resolucao=1.0, altura=1.25, topo=14.0, frases=None,
+                     saida=SAIDA, previa=PREVIA):
+    """Uma imagem parada (a arte de vitória do Codex, no verde) no lugar do vídeo: um quadro só.
+
+    O jogo dá vida a ela (desliza ao entrar e chega devagar para perto). A arte vai da cabeça ao
+    quadril; para ficar tão perto quanto a cena em vídeo do Ryūga, o desenho tem `altura` da tela
+    (mais que a tela: o quadril passa da borda de baixo) e a cabeça fica `topo` px abaixo do alto."""
+    rgb = np.array(Image.open(imagem).convert('RGB'))
+    q = chave(rgb, cor_do_fundo([rgb]))
+    tirar_manchas(q)
+    q[..., 3][q[..., 3] < 12] = 0
+    x0, y0, x1, y1 = caixa(q[..., 3])
+    # O corte no quadril encosta embaixo: o desenho vai até a borda de baixo da imagem.
+    y1 = q.shape[0]
+    tela_por_px = altura * TELA_A / (y1 - y0)
+    destino = Path(saida) / personagem
+    destino.mkdir(parents=True, exist_ok=True)
+    antigo = destino / 'vitoria.json'
+    if not frases and antigo.is_file():
+        frases = json.loads(antigo.read_text(encoding='utf-8')).get('frases')
+    for velho in destino.glob('q*.webp'):
+        velho.unlink()
+    parte = q[y0:y1, x0:x1].astype(np.float32)
+    largura, alto = (x1 - x0) * tela_por_px, (y1 - y0) * tela_por_px
+    w, h = max(1, round(largura * resolucao)), max(1, round(alto * resolucao))
+    parte[..., :3] *= parte[..., 3:4] / 255.0
+    parte = cv2.resize(parte, (w, h), interpolation=cv2.INTER_AREA)
+    a = parte[..., 3:4] / 255.0
+    parte[..., :3] = np.where(a > 1e-3, parte[..., :3] / np.maximum(a, 1e-3), 0)
+    im = np.clip(parte, 0, 255).astype(np.uint8)
+    Image.fromarray(im, 'RGBA').save(destino / 'q000.webp', quality=88, method=6)
+    dados = {
+        'imagem': Path(imagem).name,
+        'alturaTela': altura,
+        'quadroMs': float(segurar_ms),
+        'segurarMs': 0,
+        'frases': frases or [],
+        'quadros': [{'imagem': 'q000.webp', 'x': 0.0, 'y': round(topo - TELA_A, 1),
+                     'largura': round(largura, 1), 'altura': round(alto, 1)}],
+    }
+    antigo.write_text(json.dumps(dados, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    previa_png(dados, [im], Path(previa) / f'{personagem}.png')
+    return destino, dados
+
+
 def previa_png(dados, imagens, caminho):
     """Alguns quadros na tela do jogo (escura), lado a lado, para conferir corte e marca d'água."""
     caminho.parent.mkdir(parents=True, exist_ok=True)
@@ -150,7 +196,7 @@ def main():
     p.add_argument('--segurar', type=int, default=1000)
     p.add_argument('--marca', type=numeros)
     p.add_argument('--resolucao', type=float, default=0.6)
-    p.add_argument('--altura', type=float, default=1.0)
+    p.add_argument('--altura', type=float)
     p.add_argument('--frase', action='append')
     p.add_argument('--fundo')
     p.add_argument('--cenario', default='padrao')
@@ -160,8 +206,13 @@ def main():
         return
     if not a.video or not a.personagem:
         p.error('o vídeo e --personagem (ou --fundo)')
+    if Path(a.video).suffix.lower() in ('.png', '.webp', '.jpg', '.jpeg'):
+        destino, dados = converter_imagem(a.video, a.personagem, a.segurar if a.segurar != 1000 else 3600,
+                                          altura=a.altura or 1.25, frases=a.frase)
+        print(f'{destino}: imagem parada, {dados["quadroMs"]:.0f} ms de cena')
+        return
     destino, dados = converter(a.video, a.personagem, a.inicio, a.fim, a.passo, a.fps, a.segurar, a.marca,
-                               a.resolucao, a.altura, a.frase)
+                               a.resolucao, a.altura or 1.0, a.frase)
     total = len(dados['quadros']) * dados['quadroMs'] + dados['segurarMs']
     print(f'{destino}: {len(dados["quadros"])} quadros, {total:.0f} ms de cena')
 
