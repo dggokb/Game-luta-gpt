@@ -56,14 +56,15 @@ public class ComboYinluTest {
         assertTrue("quica na parede perto da borda", s4.mechanics.arcWall);
         assertFalse("sem pulo depois: o rival vai para longe", s4.cancelsInto(AttackDefinition.JUMP));
         // No meio da arena cai derrubado longe; ela corre, pega no chão (↓ + M) e recomeça.
-        BateriaCombos.Exec meio = yinlu("L L M M S4", 6);
+        assertEquals("cinco pancadas, uma a cada passada da perna no giro", 5, s4.maxHits);
+        BateriaCombos.Exec meio = yinlu("L L M M S4", 9);
         assertEquals("no meio não tem parede", 0, meio.parede);
         assertTrue("caiu longe: " + meio.gapFinal, meio.gapFinal > 250f);
-        yinlu("L L M M S4 W60 C140 2M L M M S4", 12);
-        yinlu("L L M M S4 W60 C120 2M 2H SJ jL jM jM J jL jM jH", 14);
+        yinlu("L L M M S4 W80 C120 2M L M M", 13);
+        yinlu("L L M M S4 W80 C120 2M 2H SJ jL jM jM J jL jM jH", 17);
         // No canto quica na parede e volta: o Joelho lança para o combo no ar, ou o S2.
-        assertEquals("quicou na parede", 1, noCanto("L L M M S4 W10 6H SJ jL jM jM J jL jM jH", 13).parede);
-        noCanto("L L M M S4 W10 S2", 9);
+        assertEquals("quicou na parede", 1, noCanto("L L M M S4 W25 6H SJ jL jM jM J jL jM jH", 16).parede);
+        noCanto("L L M M S4 W30 S2", 12);
     }
 
     /** O S4 da Yin-lu com o rival a {@code daParede} px da borda da direita: quicou e a maior altura depois. */
@@ -85,7 +86,7 @@ public class ComboYinluTest {
 
     @Test public void oArcoQuicaNaParedeSoSeChegarNela() {
         CombatConfig c = new CombatConfig();
-        float teto = c.wallBounceUp * c.wallBounceUp / (2f * c.gravity) + 10f;
+        float teto = c.wallBounceUp * c.wallBounceUp / (2f * c.gravity) + 15f;   // + o corpo nos quadros
         for (float perto : new float[] {0f, 150f, 250f, 330f}) {
             float[] x = arcoAteAParede(perto);
             assertEquals("a " + perto + " px da parede quica", 1f, x[0], 0f);

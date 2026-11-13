@@ -133,7 +133,7 @@ public class ComboRyugaTest {
     @Test public void aOndaDoAssistSeguraParaOParceiroRecomecar() {
         // A Yin-lu em campo chama o Ryūga: a Onda dele segura o rival em pé, ela corre e recomeça.
         String rota = "L M A W20 C140 L M M S4";
-        emenda(rota, combo(YINLU, RYUGA, rota), 8);
+        emenda(rota, combo(YINLU, RYUGA, rota), 11);   // o S4 são cinco chutes (13/11)
         CharacterDefinition.Fighter f = GeneratedCharacters.get(RYUGA).fighter;
         AttackDefinition segura = f.assistShot;
         assertNotNull("o assist do Ryūga tem a Onda que segura", segura);
@@ -142,7 +142,7 @@ public class ComboRyugaTest {
         f.assistShot = null;
         try {
             BateriaCombos.Exec sem = combo(YINLU, RYUGA, rota);
-            assertTrue("sem segurar, a corrente nova não emenda: " + sem.acertos, !sem.valida || sem.acertos < 8);
+            assertTrue("sem segurar, a corrente nova não emenda: " + sem.acertos, !sem.valida || sem.acertos < 11);
         } finally {
             f.assistShot = segura;
         }
