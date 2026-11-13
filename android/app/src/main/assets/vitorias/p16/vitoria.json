@@ -1,0 +1,20 @@
+{
+ "imagem": "p16.png",
+ "alturaTela": 1.25,
+ "quadroMs": 3600.0,
+ "segurarMs": 0,
+ "frases": [
+  "TADAAA! A Bonnie venceu!",
+  "Bonnie se comportou... mais ou menos!",
+  "Hihi! Quer ver o truque de novo?"
+ ],
+ "quadros": [
+  {
+   "imagem": "q000.webp",
+   "x": 0.0,
+   "y": -706.0,
+   "largura": 598.2,
+   "altura": 900.0
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "imagem": "p06.png",
+ "alturaTela": 1.25,
+ "quadroMs": 3600.0,
+ "segurarMs": 0,
+ "frases": [
+  "Shh... ninguém escapa da gente.",
+  "Por trás da máscara eu estou rindo.",
+  "Você foi previsível."
+ ],
+ "quadros": [
+  {
+   "imagem": "q000.webp",
+   "x": 0.0,
+   "y": -706.0,
+   "largura": 569.7,
+   "altura": 900.0
+  }
+ ]
+}
