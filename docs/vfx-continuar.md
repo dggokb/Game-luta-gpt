@@ -787,7 +787,8 @@ mandar os mapas; avisado por outra sessão). Foi o que houve no mesmo dia com `p
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
-custo); só Ryūga e Kōga têm mapa (88 folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
+custo); têm mapa Ryūga, Kōga e, desde 13/11, a Yin-lu (p02, 44 folhas: "aplica normal map na p02
+que está com nova animação"; 785 quadros em 10 min, 1,3 MB, 8,2% das folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 

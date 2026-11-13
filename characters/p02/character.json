@@ -14398,10 +14398,10 @@
       "reach": 216,
       "hitHeight": 207,
       "startupFrames": 9,
-      "activeFrames": 6,
-      "recoveryFrames": 20,
-      "hitstunFrames": 32,
-      "blockstunFrames": 16,
+      "activeFrames": 19,
+      "recoveryFrames": 7,
+      "hitstunFrames": 19,
+      "blockstunFrames": 4,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -14415,10 +14415,9 @@
         "whiff": null
       },
       "cancelInto": [
-        "SUPER",
-        "JUMP"
+        "SUPER"
       ],
-      "launchType": "launch",
+      "launchType": "arc",
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
@@ -14428,19 +14427,12 @@
         "H"
       ],
       "nome": "Chute rodopiante",
-      "especialBase": {
-        "launchType": "knockdown"
-      },
-      "golpesBase": {
-        "startupFrames": 9,
-        "activeFrames": 13,
-        "recoveryFrames": 13,
-        "hitstunFrames": 35,
-        "blockstunFrames": 19
-      },
       "golpes": [
         9,
-        12
+        12,
+        16,
+        18,
+        25
       ],
       "mecanica": {
         "voo": {
@@ -14456,7 +14448,20 @@
             3,
             28
           ]
+        },
+        "arco": {
+          "altura": 130,
+          "distancia": 380,
+          "parede": true
         }
+      },
+      "arcoBase": "knockdown",
+      "golpesBase": {
+        "startupFrames": 9,
+        "activeFrames": 13,
+        "recoveryFrames": 13,
+        "hitstunFrames": 35,
+        "blockstunFrames": 19
       }
     }
   }

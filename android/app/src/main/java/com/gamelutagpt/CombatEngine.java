@@ -2457,6 +2457,14 @@ final class CombatEngine {
                 f.x = f.bounceWallX;
                 f.vx = -Math.signum(f.vx) * config.wallBounceReturnSpeed;
                 f.vy = -config.wallBounceUp;
+                if (f.bounceFromArc) {
+                    // Do arco, bate já no alto: sobe só até onde subiria quicando de perto do chão.
+                    float altura = Math.max(0f, Arena.GROUND_Y - f.y);
+                    f.vy = -(float) Math.sqrt(Math.max(0f, config.wallBounceUp * config.wallBounceUp -
+                        2f * config.gravity * altura));
+                    f.bounceFromArc = false;
+                    if (sessions[f.index] != null) sessions[f.index].wallBounces++;
+                }
                 bounced(f);
                 cues.add("WALL_BOUNCE");
             }
@@ -4967,6 +4975,7 @@ final class CombatEngine {
         d.freeFallFrames = 0;
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
+        d.bounceFromArc = false;
         d.spinning = false;
         // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
         boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce) &&
@@ -5081,6 +5090,17 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(hitstun, Math.round(tempo * CombatConfig.FPS) + 2);
             d.pushRemaining = 0f;
             d.pushFramesLeft = 0;
+            // Arco que quica na parede (o S4 da Yin-lu): perto da borda, o rival bate nela antes de
+            // cair e volta quicando, aberto para continuar (moveHorizontally); longe, cai derrubado.
+            float borda = direction > 0 ? Arena.RIGHT_BOUND : Arena.LEFT_BOUND;
+            // (Conta o quique só quando ele bate: se cair antes da borda, o combo não gastou.)
+            if (attack.mechanics.arcWall && session.wallBounces < config.maxWallBounces &&
+                Math.abs(borda - d.x) <= attack.mechanics.arcDistance) {
+                d.bounce = CombatFighter.BOUNCE_WALL;
+                d.bounceWallX = borda;
+                d.bounceFromArc = true;
+                a.wallChase = config.wallChaseFrames;
+            }
         } else if (launch == AttackDefinition.Launch.LAUNCH) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             // Pego no ar (ex.: voltando da parede), sobe só até a altura de um lançamento do

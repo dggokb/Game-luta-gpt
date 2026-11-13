@@ -249,8 +249,10 @@ def validate_mechanics(name, mech, m, projectile):
     # Arco (launchType arc): o rival voa em arco, com altura e distância (o shoryuken do Ryūga).
     if 'arco' in mech:
         v = mech['arco']
-        if not (isinstance(v, dict) and set(v) == {'altura', 'distancia'}):
-            raise ValueError(f'{name}.mecanica.arco: {{altura, distancia}}')
+        if not (isinstance(v, dict) and {'altura', 'distancia'} <= set(v) <= {'altura', 'distancia', 'parede'}):
+            raise ValueError(f'{name}.mecanica.arco: {{altura, distancia, parede?}}')
+        if v.get('parede') not in (None, True):
+            raise ValueError(f'{name}.mecanica.arco.parede: true (or leave it out)')
         positive(v['altura'], f'{name}.mecanica.arco.altura'); positive(v['distancia'], f'{name}.mecanica.arco.distancia')
     if ('arco' in mech) != (m.get('launchType') == 'arc'):
         raise ValueError(f'{name}.mecanica.arco: goes with launchType arc, and arc needs it')
@@ -794,7 +796,7 @@ def compile_packs(root, results):
         if mech.get('chao'): code += '.pound()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
-        if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+')'
+        if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+(',true' if mech['arco'].get('parede') else '')+')'
         if 'voo' in mech:
             v = mech['voo']
             code += '.flight('+f(v['altura'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('paira'))).lower()+')'

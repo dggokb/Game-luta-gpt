@@ -1715,6 +1715,13 @@ public class GameView extends SurfaceView
                     for (FighterState m : engine.team(side).members) if (m != null) m.superMeter = barra;
                 }
             }
+            float canto = cantoPedido;
+            if (canto > 0f) {
+                // PC (GravarLuta, passo canto:GAP): o rival encostado na borda da direita, nós a GAP px.
+                cantoPedido = -1f;
+                engine.fighter(1).x = Arena.RIGHT_BOUND;
+                engine.fighter(0).x = Arena.RIGHT_BOUND - canto;
+            }
             String[] dupla = duplaPedida;
             if (dupla != null) {
                 duplaPedida = null;
@@ -4036,6 +4043,13 @@ public class GameView extends SurfaceView
     }
 
     private volatile int superPedido = -1;
+
+    /** PC ({@code gradle :pc:gravarLuta}): o rival no canto da direita e nós a {@code gap} px dele. */
+    public void irParaOCanto(float gap) {
+        cantoPedido = gap;
+    }
+
+    private volatile float cantoPedido = -1f;
 
     /** PC ({@code gradle :pc:gravarLuta}): a luta carregou, a entrada acabou e os comandos já valem. */
     public boolean lutaPronta() {

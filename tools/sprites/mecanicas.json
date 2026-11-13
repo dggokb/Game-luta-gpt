@@ -565,13 +565,6 @@
           "corrida": {
             "dash": 1.15
           }
-        },
-        "rotas": {
-          "S4": {
-            "cancelaEm": [
-              "JUMP"
-            ]
-          }
         }
       },
       "comandos": {
@@ -711,11 +704,6 @@
               "janela": "antiaereo"
             }
           }
-        }
-      },
-      "especiais": {
-        "S4": {
-          "lancar": "launch"
         }
       }
     },
