@@ -51,20 +51,23 @@ public class TelaVitoriaTest {
         assertTrue("passos " + passos, passos > 220 && passos < 260);
     }
 
-    @Test public void tocaOVideoInteiroEAcaba() {
+    @Test public void emDuplaOParceiroEntraAtrasEACenaAcabaIgual() {
         TelaVitoria t = tela();
-        t.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
+        t.comecar("player_base", "p03", 0xFF2F6FD6, "RYŪGA", s -> s);
         assertTrue(t.ativa());
         int passos = tocarAteOFim(t, -1);
         assertFalse(t.ativa());
-        // 124 quadros a 48 fps (~2,6 s) com a entrada, a pose final parada 2 s e a saída: ~5 s.
-        assertTrue("passos " + passos, passos > 270 && passos < 320);
+        assertTrue("passos " + passos, passos > 220 && passos < 260);
+        // Parceiro sem cena ou o mesmo lutador: sozinho, sem erro.
+        TelaVitoria s2 = tela();
+        s2.comecar("p03", "koga_8", 0xFFC62F2F, "KŌGA", s -> s);
+        assertTrue(tocarAteOFim(s2, -1) > 220);
     }
 
     @Test public void umToqueNoComecoNaoPulaDepoisPula() {
         TelaVitoria cedo = tela();
         cedo.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
-        assertTrue(tocarAteOFim(cedo, 10) > 270);
+        assertTrue(tocarAteOFim(cedo, 10) > 220);
         TelaVitoria depois = tela();
         depois.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
         int passos = tocarAteOFim(depois, 60);

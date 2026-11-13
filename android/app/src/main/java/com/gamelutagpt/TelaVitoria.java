@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -54,6 +56,18 @@ final class TelaVitoria {
     private static final float ENTRA_MS = 80f, DESLIZA_MS = 260f, DESLIZA_PX = 180f;
     /** A arte parada (um quadro só) cresce isto até a saída, para a tela não ficar morta. */
     private static final float APROXIMA = 0.05f, PEITO = 0.3f;
+    /**
+     * Em dupla, como no versus: o parceiro atrás, do lado de fora (à esquerda), menor e na
+     * sombra, entrando logo depois; quem venceu vai um pouco para a direita.
+     */
+    private static final float PARCEIRO_X = -50f, PARCEIRO_ESCALA = 0.86f, PARCEIRO_ATRASO_MS = 70f,
+        TITULAR_X = 150f;
+    /** O parceiro na sombra: um pouco mais escuro, puxado para o azul da noite. */
+    private static final ColorMatrixColorFilter SOMBRA = new ColorMatrixColorFilter(new ColorMatrix(new float[] {
+        0.61f, 0f, 0f, 0f, 0f,
+        0f, 0.61f, 0f, 0f, 0f,
+        0f, 0f, 0.66f, 0f, 0f,
+        0f, 0f, 0f, 1f, 0f}));
     /** "VITÓRIA" bate (cai grande e assenta), pisca a tela e treme. */
     private static final float TITULO_MS = 340f, BATIDA_MS = 130f, CLARAO_MS = 120f, TREME_MS = 220f;
     private static final float TITULO_X = 985f, TITULO_Y = 222f, TITULO_TAM = 132f, TITULO_LARGURA = 540f;
@@ -114,6 +128,8 @@ final class TelaVitoria {
 
     // A cena tocando agora (só na thread do jogo, menos os quadros que o leitor entrega).
     private Pacote atual;
+    /** O parceiro da dupla (só arte parada), ou null. */
+    private Pacote parceiro;
     private AtomicReferenceArray<Bitmap> lidos;
     private boolean[] pedidos;
     /** Troca a cada cena: um quadro lido para uma cena que já acabou é jogado fora. */
@@ -243,9 +259,19 @@ final class TelaVitoria {
      * idioma do jogo.
      */
     void comecar(String id, int cor, String nome, UnaryOperator<String> traduzir) {
+        comecar(id, null, cor, nome, traduzir);
+    }
+
+    /**
+     * Como {@link #comecar(String, int, String, UnaryOperator)}, com o {@code parceiroId} da dupla
+     * atrás (null, ou sem arte parada carregada: sozinho).
+     */
+    void comecar(String id, String parceiroId, int cor, String nome, UnaryOperator<String> traduzir) {
         Pacote p = pacotes.get(id);
         if (p == null) return;
         atual = p;
+        Pacote q = parceiroId != null && !parceiroId.equals(id) ? pacotes.get(parceiroId) : null;
+        parceiro = q != null && q.imagens.length == 1 ? q : null;
         geracao++;
         lidos = new AtomicReferenceArray<>(p.imagens.length);
         pedidos = new boolean[p.imagens.length];
@@ -280,6 +306,7 @@ final class TelaVitoria {
 
     void parar() {
         atual = null;
+        parceiro = null;
         lidos = null;
         pedidos = null;
         mostrado = null;
@@ -381,23 +408,41 @@ final class TelaVitoria {
         float k = clamp((ms - ENTRA_MS) / DESLIZA_MS);
         float dx = -DESLIZA_PX * (1f - k) * (1f - k) * (1f - k);
         float alfa = 255f * clamp(k * 2.5f);
-        desenharQuadroDoVideo(c, p, mostrado, mostradoIndice, dx, Math.round(alfa));
+        float lado = 0f;
+        if (parceiro != null) {
+            // O parceiro primeiro (fica atrás), entrando um pouco depois.
+            float kp = clamp((ms - ENTRA_MS - PARCEIRO_ATRASO_MS) / DESLIZA_MS);
+            if (kp > 0f) {
+                float dxp = -DESLIZA_PX * (1f - kp) * (1f - kp) * (1f - kp);
+                paint.setColorFilter(SOMBRA);
+                desenharQuadroDoVideo(c, parceiro, parceiro.inicio[0], 0, PARCEIRO_X + dxp, PARCEIRO_ESCALA,
+                    Math.round(255f * clamp(kp * 2.5f)));
+                paint.setColorFilter(null);
+            }
+            lado = TITULAR_X;
+        }
+        desenharQuadroDoVideo(c, p, mostrado, mostradoIndice, lado + dx, 1f, Math.round(alfa));
         float entre = (ms - ENTRA_MS) / p.quadroMs - i;
         Bitmap proximo = mostradoIndice == i && i + 1 < p.imagens.length ? lidos.get(i + 1) : null;
-        if (proximo != null && entre > 0f) desenharQuadroDoVideo(c, p, proximo, i + 1, dx, Math.round(alfa * clamp(entre)));
+        if (proximo != null && entre > 0f) {
+            desenharQuadroDoVideo(c, p, proximo, i + 1, lado + dx, 1f, Math.round(alfa * clamp(entre)));
+        }
     }
 
-    private void desenharQuadroDoVideo(Canvas c, Pacote p, Bitmap b, int i, float dx, int alfa) {
+    /** O quadro {@code i} de {@code p}, deslocado {@code dx} e na {@code escala} (presa embaixo). */
+    private void desenharQuadroDoVideo(Canvas c, Pacote p, Bitmap b, int i, float dx, float escala, int alfa) {
         float[] r = p.caixas[i];
-        float x = r[0] - p.esquerda + dx, y = Arena.VH + r[1];
-        destino.set(x, y, x + r[2], y + r[3]);
+        float w = r[2] * escala, h = r[3] * escala;
+        // Menor, desce: o corte de baixo continua no mesmo lugar.
+        float x = (r[0] - p.esquerda) * escala + dx, y = Arena.VH + r[1] + r[3] - h;
+        destino.set(x, y, x + w, y + h);
         if (p.imagens.length == 1) {
             // Imagem parada: chega devagar para perto, presa na borda esquerda e na altura do
             // peito (a cabeça não sai pelo alto; o quadril já passa da borda de baixo).
-            float k = clamp((ms() - ENTRA_MS) / (p.duracaoMs() - ENTRA_MS));
+            float k = clamp((ms() - ENTRA_MS) / (atual.duracaoMs() - ENTRA_MS));
             float cresce = 1f + APROXIMA * (1f - (1f - k) * (1f - k));
-            float peito = y + r[3] * PEITO;
-            destino.set(x, peito - r[3] * PEITO * cresce, x + r[2] * cresce, peito + r[3] * (1f - PEITO) * cresce);
+            float peito = y + h * PEITO;
+            destino.set(x, peito - h * PEITO * cresce, x + w * cresce, peito + h * (1f - PEITO) * cresce);
         }
         paint.setAlpha(alfa);
         c.drawBitmap(b, null, destino, paint);
