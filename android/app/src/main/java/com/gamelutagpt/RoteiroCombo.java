@@ -62,6 +62,7 @@ final class RoteiroCombo {
             case "2M": in.direction = me.facing > 0 ? 2 : 4; in.medium = true; break;
             case "2H": in.direction = me.facing > 0 ? 2 : 4; in.heavy = true; break;
             case "6H": in.direction = frente; in.heavy = true; break;
+            case "6M": in.direction = frente; in.medium = true; break;
             case "j2H": in.direction = 3; in.heavy = true; break;
             case "S": in.special = "M"; break;
             case "SUPER": in.superAttack = true; break;

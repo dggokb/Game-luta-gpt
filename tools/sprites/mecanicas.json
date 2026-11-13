@@ -598,7 +598,7 @@
       "estiloCpu": "contra",
       "papelNormais": "Garça: palma rápida e curta de perto, rasteira ligeira e o chute alto que tira do ar.",
       "golpeComando": {
-        "animation": "HEAVY_STRAIGHT",
+        "animation": "JOELHO_GARCA",
         "nome": "Joelho da garça",
         "damage": 760,
         "reach": 150,

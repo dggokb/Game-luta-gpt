@@ -67,7 +67,7 @@ public class DefesaEGolpeAltoTest {
     @Test public void soQuemTemOProprioGolpeAltoOTem() {
         // 12/11: o golpe alto montado do M (a pose do M congelada) saiu. Quem tem o seu (vídeo
         // próprio) continua com ele; nos outros, → + M é o M.
-        for (String id : new String[] {"player_base", "p13", "p14", "p15", "p16"}) {
+        for (String id : new String[] {"player_base", "p02", "p13", "p14", "p15", "p16"}) {
             CharacterDefinition c = GeneratedCharacters.get(id);
             AttackDefinition overhead = c.attack(GolpeAlto.BINDING);
             assertNotNull(id + " tem o 6M próprio", overhead);
@@ -80,7 +80,7 @@ public class DefesaEGolpeAltoTest {
                     t.equals("SUPER") || t.startsWith("S"));
             }
         }
-        for (String id : new String[] {"monster_npc", "p02", "p06", "p10", "p12"}) {
+        for (String id : new String[] {"monster_npc", "p06", "p10", "p12"}) {
             assertNull(id + " sem golpe alto próprio: → + M é o M", GeneratedCharacters.get(id).attack(GolpeAlto.BINDING));
         }
     }

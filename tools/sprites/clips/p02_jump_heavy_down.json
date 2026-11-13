@@ -1,0 +1,35 @@
+{
+  "id": "p02_jump_heavy_down",
+  "javaName": "P02_JUMP_HEAVY_DOWN",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_jump_heavy_down_video_normalized_sr_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_jump_heavy_down.webp",
+  "report": "tools/sprites/reports/p02_jump_heavy_down.report.json",
+  "preview": "android/app/build/sprite-review/p02_jump_heavy_down-import.png",
+  "expectedFrames": 17,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 de 12/11: vídeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
+  "video": {
+    "arquivo": "jH_BAIXO.mp4",
+    "personagem": "p02",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "9,13,17,21,25,29,33,36,37,40,41,43,45,85,89,93,97",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "82,220",
+    "colunas": 11,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "frameHeight": 288,
+  "rootX": 82,
+  "rootY": 220,
+  "sourceReferences": [
+    "art/sprites/source/p02_jump_heavy_down_video_normalized.png"
+  ]
+}

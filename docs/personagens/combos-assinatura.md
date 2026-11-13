@@ -129,9 +129,9 @@ O dono: "faz e descobrimos". Tudo entrou, conferido no motor (`ComboYinluTest`) 
 | # | Nome | Sequência | Acertos |
 |---|---|---|---|
 | Y1 | Fluxo da garça | L, L, M, M, H (parede) | 5 |
-| Y2 | Garça no ar | L, L, M, M, S4 (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jM, ↓jH | 13 |
+| Y2 | Garça no ar | L, L, M, M, S4 (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jH (13/11: o ↓jH novo só pega colado) | 12 |
 | Y3 | Joelho | L, L, M, M, → + H (lança) → super pulo → jL, jM, jM → pulo duplo → jL, jM, jM, ↓jH | 13 |
-| Y4 | Sobe duas vezes | L, L, M, M, S4 → super pulo → jL, jM, jM, ↓jH → 2H → super pulo → jL, jM, jM → pulo → jL, jM, jH | 17 |
+| Y4 | Sobe duas vezes | L, L, M, M, → + H → super pulo → jL, jM, jM, ↓jH → 2H → super pulo → jL, jM, jM → pulo → jL, jM, jH (com o S4: S4 → super pulo → jL, ↓jH → 2H …, 15) | 17 |
 | Y5 | Assist | (Ryūga em campo) L, M, M → TAG (o chute dela lança) → super pulo → jL, jM → pulo → jL, jM, ↓jH | 9 |
 
 Regras da base que vieram com ela (valem para todos): todo golpe que lança deixa pelo menos 44

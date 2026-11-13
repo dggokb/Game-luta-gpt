@@ -38,8 +38,9 @@ public class ComboYinluTest {
 
     @Test public void chuteRodopianteLancaEElaSobeAtras() {
         assertEquals(AttackDefinition.Launch.LAUNCH, GeneratedCharacters.get(YINLU).attack("S4").launch);
-        // O S4 lança com o corpo no ar: o pulo depois dele é o super pulo que persegue o rival.
-        yinlu("L L M M S4 SJ jL jM jM J jL jM jM j2H", 13);
+        // O S4 lança com o corpo no ar: o pulo depois dele é o super pulo que persegue o rival. Com
+        // a arte nova (12/11) o ↓ + jH bate embaixo, colado: no fim do combo longo entra o jH.
+        yinlu("L L M M S4 SJ jL jM jM J jL jM jH", 12);
     }
 
     @Test public void joelhoDaGarcaAbreOArSemO2H() {
@@ -52,7 +53,7 @@ public class ComboYinluTest {
 
     @Test public void sobeDuasVezes() {
         // Termina no ar quicando o rival no chão (↓jH), pousa e lança de novo.
-        BateriaCombos.Exec x = yinlu("L L M M S4 SJ jL jM jM j2H W15 2H SJ jL jM jM J jL jM jH", 17);
+        BateriaCombos.Exec x = yinlu("L L M M S4 SJ jL j2H W15 2H SJ jL jM jM J jL jM jH", 15);
         assertEquals("quicou no chão", 1, x.chao);
         yinlu("L L M M 6H SJ jL jM jM j2H W15 2H SJ jL jM jM J jL jM jH", 17);
     }

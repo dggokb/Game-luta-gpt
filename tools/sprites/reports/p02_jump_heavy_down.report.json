@@ -1,0 +1,375 @@
+{
+  "id": "p02_jump_heavy_down",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_jump_heavy_down_video_normalized_sr_hd.png",
+  "sourceNote": "p02 de 12/11: v\u00eddeos H3 do dono (pasta p02 do Drive), receita em tools/sprites/montagens/p02.json, convertidos por tools/sprites/video_para_sprite.py; nitidez por tools/sprites/sr_hd.py.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 288,
+    "rootX": 82,
+    "rootY": 220,
+    "columns": 11,
+    "frameCount": 17
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        23,
+        41,
+        137,
+        222
+      ],
+      "minimumMargin": 23,
+      "opaquePixels": 9998
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        25,
+        43,
+        136,
+        226
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 10002
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        32,
+        17,
+        141,
+        261
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11979
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        26,
+        17,
+        161,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12047
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        23,
+        17,
+        170,
+        274
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 12483
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        27,
+        17,
+        170,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12480
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        22,
+        17,
+        159,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12076
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        29,
+        17,
+        130,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 11614
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        28,
+        36,
+        133,
+        265
+      ],
+      "minimumMargin": 23,
+      "opaquePixels": 11231
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        31,
+        81,
+        143,
+        243
+      ],
+      "minimumMargin": 31,
+      "opaquePixels": 10294
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        31,
+        83,
+        144,
+        243
+      ],
+      "minimumMargin": 31,
+      "opaquePixels": 10439
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        30,
+        86,
+        145,
+        244
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 10460
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        30,
+        86,
+        145,
+        245
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 10449
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        28,
+        75,
+        141,
+        244
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 10403
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        28,
+        65,
+        138,
+        241
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 10630
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        33,
+        56,
+        135,
+        238
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 10805
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        30,
+        50,
+        133,
+        234
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 10586
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 168,
+    "frameHeight": 275,
+    "rootX": 70,
+    "rootY": 211,
+    "columns": 11,
+    "frameCount": 17,
+    "cropOffset": [
+      12,
+      9
+    ],
+    "sheetWidth": 1148,
+    "sheetHeight": 468,
+    "frames": [
+      [
+        1004,
+        0,
+        128,
+        196,
+        4,
+        26
+      ],
+      [
+        0,
+        272,
+        124,
+        196,
+        7,
+        28
+      ],
+      [
+        752,
+        0,
+        124,
+        256,
+        14,
+        4
+      ],
+      [
+        0,
+        0,
+        148,
+        268,
+        7,
+        4
+      ],
+      [
+        152,
+        0,
+        160,
+        268,
+        5,
+        4
+      ],
+      [
+        316,
+        0,
+        156,
+        268,
+        9,
+        4
+      ],
+      [
+        476,
+        0,
+        152,
+        268,
+        4,
+        4
+      ],
+      [
+        632,
+        0,
+        116,
+        268,
+        11,
+        4
+      ],
+      [
+        880,
+        0,
+        120,
+        244,
+        10,
+        21
+      ],
+      [
+        628,
+        272,
+        124,
+        176,
+        13,
+        66
+      ],
+      [
+        756,
+        272,
+        128,
+        176,
+        12,
+        68
+      ],
+      [
+        888,
+        272,
+        128,
+        172,
+        12,
+        70
+      ],
+      [
+        1020,
+        272,
+        128,
+        172,
+        12,
+        71
+      ],
+      [
+        496,
+        272,
+        128,
+        184,
+        10,
+        60
+      ],
+      [
+        368,
+        272,
+        124,
+        192,
+        10,
+        50
+      ],
+      [
+        128,
+        272,
+        116,
+        196,
+        14,
+        41
+      ],
+      [
+        248,
+        272,
+        116,
+        196,
+        12,
+        35
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4866048,
+      "grid": 4065600,
+      "packed": 2149056
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "b15eacd456176dae4c2c305bbb3f7abaefc84a426ff132cf17f5af308dfab5e7",
+      "config": "5e50be7d77e0635630dba119d1fa5a0dcfafb9c1d4d8652a0394033a66c5f312",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_jump_heavy_down_video_normalized.png": "c9a09cea0c4327012fd563acd3c1e7d75826051e0820670034571f9afa3ecccc"
+    }
+  }
+}
