@@ -165,6 +165,11 @@ Em cima da arte nova dela (vídeos do Drive convertidos por outra sessão, que j
 - O `caixas_sprites.py` mede no `source` do clipe: rodado com o smear lá, as línguas opacas entram
   na caixa do golpe. Medir com a fonte sem smear (`smear.fonte`).
 
+**S4: o arco do giro.** Golpe que gira as pernas em volta do corpo pede outro smear: `smear.py
+--giro 7-14` mede os pés no próprio desenho (sem o caminho do golpe) e põe a lua crescente do ar,
+branca para cinza, na elipse dos pés, côncava para o corpo, metade atrás e metade na frente, a
+força alternando 100%/50%. Gravado no jogo com o arco intercalado e em todos; ficou em todos.
+
 Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
 
 ## A pesquisa de como os estúdios fazem (10/11)

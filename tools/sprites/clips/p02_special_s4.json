@@ -37,18 +37,31 @@
   "smear": {
     "fonte": "art/sprites/source/p02_special_s4_video_normalized.png",
     "quadros": [
-      6,
-      7
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
     ],
     "semente": 11,
     "comprimento": [
-      1.2,
+      1.0,
       1.0
     ],
     "ferramenta": "tools/sprites/smear.py",
     "opacidade": [
       1.0,
+      0.5,
+      1.0,
+      0.5,
+      1.0,
+      0.5,
+      1.0,
       0.5
-    ]
+    ],
+    "giro": "7-14"
   }
 }
