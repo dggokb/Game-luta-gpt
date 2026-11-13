@@ -175,6 +175,12 @@ ficava escondida dentro da silhueta e não aparecia).
 
 Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
 
+## S3 do Ryūga com menos risco (13/11, pedido do dono: "tô achando que tá com muito risco")
+
+Os 6 chutes tinham cada um a língua longa a 100%. Agora `--comprimento 0.6,0.45` e
+`--opacidade 0.5,0.5,0.5,0.5,0.5,1`: os cinco primeiros curtos e a 50%, o último chute inteiro.
+Gravado no jogo do PC, antes e depois lado a lado.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
