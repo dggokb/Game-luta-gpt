@@ -8,7 +8,9 @@
 pasta="$1"; shift
 case "$1" in [0-9]*x[0-9]*) tela="$1"; shift;; *) tela=960x540;; esac
 rm -rf "$pasta"; mkdir -p "$pasta"
+# Qualidade gráfica travada (GRAFICOS, padrão ALTO): no AUTO o PC pesado da gravação troca a
+# resolução no meio da luta e a imagem inteira dá um pulo no vídeo (13/11), que não é do jogo.
 # Sem o plugin de WEBP as folhas passam pelo Pillow na primeira vez (lento); depois ficam em $B/webp.
-cd "$A/pc" && timeout ${TMO:-600} java -Xmx4g $JAVA_OPCOES ${DUPLA:+-Dgameluta.dupla=$DUPLA} ${CARGA:+-Dgameluta.carga=$CARGA} \
+cd "$A/pc" && timeout ${TMO:-600} java -Xmx4g $JAVA_OPCOES -Dgameluta.graficos=${GRAFICOS:-ALTO} ${DUPLA:+-Dgameluta.dupla=$DUPLA} ${CARGA:+-Dgameluta.carga=$CARGA} \
   -cp "$OUT" com.gamelutagpt.pc.GravarLuta "$pasta" "$tela" "$@" 2>&1 \
   | grep -v "JAVA_TOOL_OPTIONS\|Missing selection art\|I/Quadros\|não carregou" | tail -6

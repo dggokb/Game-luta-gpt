@@ -718,6 +718,10 @@ def apply(cid, spec, base, combos_data):
     pack['moves'].pop('6H', None)
     if spec.get('golpeComando'):
         pack['moves']['6H'] = json.loads(json.dumps(spec['golpeComando']))
+    # Golpe de corrida (corre + H, 13/11): o mesmo, do "golpeCorrida"; o avanço vai na "unica.golpes.DH".
+    pack['moves'].pop('DH', None)
+    if spec.get('golpeCorrida'):
+        pack['moves']['DH'] = json.loads(json.dumps(spec['golpeCorrida']))
     # Sem Super (as crianças da história): só o resto.
     sup = fighter['super']['attack'] if 'super' in fighter else None
     if sup is not None:
@@ -846,6 +850,8 @@ def apply(cid, spec, base, combos_data):
             m.setdefault('arcoBase', m.get('launchType', 'none'))
             m['launchType'] = 'arc'
             m.setdefault('mecanica', {})['arco'] = {'altura': h['arco']['altura'], 'distancia': h['arco']['distancia']}
+            if h['arco'].get('parede'):   # bate na borda e volta quicando (o S4 da Yin-lu)
+                m['mecanica']['arco']['parede'] = True
         if 'voo' in h:
             # Voo de verdade (o S2 e o S3 do Ryūga): sai do chão no quadro "de" da animação e pousa
             # no "ate"; o corpo cai pela gravidade do pulo (CombatEngine.takeOff).

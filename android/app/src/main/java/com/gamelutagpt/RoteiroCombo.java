@@ -7,7 +7,7 @@ package com.gamelutagpt;
  * Assim o vídeo mostra exatamente o combo que o teste do motor conferiu. O rival fica parado.
  *
  * <p>Passos: L M H 2L 2M 2H 6H (→ + H) jL jM jH j2H, S (Onda), S2 S3 S4, SUPER, A (assist),
- * J (pulo), SJ (super pulo), D (corrida), C ou C160 (corre segurando → até ficar a 260 ou 160 px
+ * J (pulo), SJ (super pulo), D (corrida), DH (golpe de corrida: H correndo), C ou C160 (corre segurando → até ficar a 260 ou 160 px
  * do rival), W30 (espera 30 quadros), DHC (TAG no Super: a troca no Super).
  */
 final class RoteiroCombo {
@@ -62,6 +62,7 @@ final class RoteiroCombo {
             case "2M": in.direction = me.facing > 0 ? 2 : 4; in.medium = true; break;
             case "2H": in.direction = me.facing > 0 ? 2 : 4; in.heavy = true; break;
             case "6H": in.direction = frente; in.heavy = true; break;
+            case "DH": in.direction = frente; in.heavy = true; break;
             case "6M": in.direction = frente; in.medium = true; break;
             case "j2H": in.direction = 3; in.heavy = true; break;
             case "S": in.special = "M"; break;

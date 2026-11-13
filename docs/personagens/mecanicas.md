@@ -176,7 +176,7 @@ qualquer um na preparação e responde na hora), **esquiva** (passa por baixo de
 projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival; com velocidade negativa recua, como a estrela da p16),
 **teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata), **armadilha** (o projétil cai e espera um pavio por botão, L/M/H; depois um golpe sai dele, como a luva da caixa da p16),
 **custo de vida**, **fúria** (dano cresce com a vida perdida), **arco** (o último golpe joga o rival em
-arco para longe e ele cai derrubado: o S2 do Ryūga e o da Yin-lu, 12/11; `arco` no `pancadas.json`;
+arco para longe e ele cai derrubado: o S2 do Ryūga e o da Yin-lu, 12/11; `arco` no `pancadas.json`; com `"parede": true`, se a borda estiver no caminho ele quica nela e volta aberto para o combo, o S4 da Yin-lu, 13/11;
 no golpe que voa, as pancadas do meio levam o rival junto para cima), **voo** (o golpe tira o corpo do chão e
 ele cai pela gravidade do pulo: o S2 e o S3 do Ryūga, 11/11; `voo` no `pancadas.json`), **air dashes extras** e
 **agarrão próprio** (dano e alcance). Testes: `MechanicsTest`.

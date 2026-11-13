@@ -109,6 +109,11 @@ public final class GravarLuta {
                     // O combo do teste, quadro a quadro (RoteiroCombo): rota:L,M,M,S3,W90,C200,S2
                     c.jogo().apertarRoteiro(p[1]);
                     break;
+                case "canto":
+                    // O rival encostado na borda da direita e nós a tantos px: canto:100
+                    c.jogo().irParaOCanto(Float.parseFloat(p[1]));
+                    c.esperar(0.2);
+                    break;
                 case "super":
                     c.jogo().encherSuper(Integer.parseInt(p[1]));
                     c.esperar(0.1);
@@ -119,6 +124,7 @@ public final class GravarLuta {
                     esperarGravacao();
                     gravando = new Thread(() -> {
                         try {
+                            long inicio = System.nanoTime();
                             for (int k = 0; k < n; k++) {
                                 BufferedImage q = c.quadro();
                                 synchronized (quadros) {
@@ -126,6 +132,9 @@ public final class GravarLuta {
                                     nomes.add(String.format(Locale.ROOT, "%s-%03d", nome, k));
                                 }
                             }
+                            // Para montar o vídeo na velocidade do jogo: quadros por segundo da gravação.
+                            double s = (System.nanoTime() - inicio) / 1e9;
+                            System.out.println(String.format(Locale.ROOT, "%s: %d quadros em %.2f s (%.1f por segundo)", nome, n, s, n / s));
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }

@@ -1,0 +1,470 @@
+{
+  "id": "p02_carrinho_garca",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png",
+  "sourceNote": "p02 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 288,
+    "rootX": 171,
+    "rootY": 263,
+    "columns": 11,
+    "frameCount": 22
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        66,
+        125,
+        262,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 11829
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        94,
+        118,
+        251,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 10190
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        97,
+        121,
+        243,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 10004
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        81,
+        129,
+        212,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 10430
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        47,
+        133,
+        204,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 10008
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        41,
+        133,
+        199,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 9677
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        38,
+        134,
+        236,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 11062
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        33,
+        137,
+        269,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 12364
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        61,
+        137,
+        292,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 12367
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        72,
+        137,
+        295,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 12058
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        62,
+        137,
+        286,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 11679
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        46,
+        136,
+        271,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 11740
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        35,
+        137,
+        260,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 11737
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        36,
+        143,
+        253,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 10848
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        50,
+        150,
+        213,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 9304
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        83,
+        113,
+        217,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 10150
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        109,
+        74,
+        234,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 11199
+    },
+    {
+      "index": 17,
+      "outputBbox": [
+        141,
+        35,
+        246,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 12200
+    },
+    {
+      "index": 18,
+      "outputBbox": [
+        162,
+        30,
+        261,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 12729
+    },
+    {
+      "index": 19,
+      "outputBbox": [
+        138,
+        66,
+        278,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 11541
+    },
+    {
+      "index": 20,
+      "outputBbox": [
+        125,
+        67,
+        266,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 11737
+    },
+    {
+      "index": 21,
+      "outputBbox": [
+        101,
+        67,
+        242,
+        263
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 11723
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 282,
+    "frameHeight": 254,
+    "rootX": 148,
+    "rootY": 243,
+    "columns": 11,
+    "frameCount": 22,
+    "cropOffset": [
+      23,
+      20
+    ],
+    "sheetWidth": 720,
+    "sheetHeight": 1048,
+    "frames": [
+      [
+        0,
+        460,
+        208,
+        152,
+        37,
+        99
+      ],
+      [
+        296,
+        252,
+        172,
+        160,
+        65,
+        92
+      ],
+      [
+        472,
+        252,
+        160,
+        156,
+        67,
+        95
+      ],
+      [
+        212,
+        460,
+        144,
+        148,
+        52,
+        103
+      ],
+      [
+        360,
+        460,
+        172,
+        144,
+        18,
+        107
+      ],
+      [
+        536,
+        460,
+        172,
+        144,
+        12,
+        107
+      ],
+      [
+        0,
+        616,
+        212,
+        144,
+        9,
+        108
+      ],
+      [
+        216,
+        616,
+        248,
+        140,
+        4,
+        110
+      ],
+      [
+        468,
+        616,
+        244,
+        140,
+        32,
+        111
+      ],
+      [
+        0,
+        764,
+        236,
+        140,
+        42,
+        111
+      ],
+      [
+        240,
+        764,
+        236,
+        140,
+        33,
+        111
+      ],
+      [
+        480,
+        764,
+        240,
+        140,
+        17,
+        110
+      ],
+      [
+        0,
+        908,
+        240,
+        140,
+        6,
+        111
+      ],
+      [
+        244,
+        908,
+        232,
+        132,
+        6,
+        117
+      ],
+      [
+        480,
+        908,
+        176,
+        128,
+        21,
+        124
+      ],
+      [
+        144,
+        252,
+        148,
+        164,
+        53,
+        87
+      ],
+      [
+        0,
+        252,
+        140,
+        204,
+        80,
+        48
+      ],
+      [
+        116,
+        0,
+        120,
+        240,
+        112,
+        9
+      ],
+      [
+        0,
+        0,
+        112,
+        248,
+        133,
+        4
+      ],
+      [
+        240,
+        0,
+        152,
+        212,
+        109,
+        40
+      ],
+      [
+        396,
+        0,
+        156,
+        212,
+        96,
+        41
+      ],
+      [
+        556,
+        0,
+        156,
+        212,
+        72,
+        41
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 8110080,
+      "grid": 6303264,
+      "packed": 3018240
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f041c41dfcc3cdcfba008d87e34bdb913df1f19b1813e353050245f0ebd4654d",
+      "config": "727822926a1ae2ff68a0234278efbf8712417127edb59ccbe039904fe7181363",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_carrinho_garca_video_normalized.png": "90aa74c78d95aaf699bcfa512e4175a99a2fbe145ddc5010ed587b8c1c01bee4"
+    }
+  }
+}

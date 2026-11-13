@@ -19,6 +19,13 @@ para ela e guarda no clip os parâmetros (a original fica em `sourceReferences`,
 
 Sem --quadros, estica o desenho em que a ponta mais andou e o anterior a ele.
 
+Giro (o golpe que gira as pernas em volta do corpo, como a hélice de ponta-cabeça do S4 da Yin-lu):
+--giro 7-14 põe em cada desenho uma lua crescente branca para cinza atrás de cada pé, seguindo a
+elipse que os pés fazem em volta do corpo (a barriga côncava para o corpo, a metade de trás atrás
+do desenho e a da frente por cima), alternando a força (--opacidade, padrão "1,0.5"). Não usa o
+caminho do golpe: mede os pés no próprio desenho. Com --giro-corpo, a roupa do tronco também
+enrola em espiral (faixas da cor da calça e da faixa).
+
 Desenho com efeito do vídeo por cima do corpo (clarão, braço borrado, arco): --trocar "4=8,5=8"
 põe no lugar a cópia do desenho limpo da mesma pose (o smear cobre a passagem). Golpe sem caminho:
 --sem-smear (só a troca), linha_de_acao.py --write, e de novo sem --sem-smear. --desfazer volta o clip à fonte
@@ -189,6 +196,121 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
     return Image.fromarray(final, 'RGBA')
 
 
+# Giro: o rastro do ar em volta do corpo (lua crescente branca para cinza), medido no desenho.
+GIRO_BRANCO, GIRO_CINZA = np.array([255.0, 255.0, 255.0]), np.array([150.0, 158.0, 180.0])
+GIRO_ACHATADO = 0.29     # raio vertical da elipse / raio horizontal (a vista de lado)
+GIRO_ABERTA = (0.29, 115)   # pernas abertas de lado: grossura (fração do raio) e arco (graus)
+GIRO_FRENTE = (0.35, 150)   # pernas de frente para a câmera (passando na frente e atrás)
+
+
+def giro_pes(cel):
+    """(x do eixo, y dos pés, pernas abertas?) no desenho: a faixa de cima do corpo (de ponta-cabeça,
+    as pernas ficam em cima)."""
+    a = np.asarray(cel)[..., 3] > 200
+    ys, xs = np.nonzero(a)
+    top = ys.min()
+    by, bx = np.nonzero(a[top:top + int((ys.max() - top) * 0.35)])
+    return bx.min(), bx.max(), top + by.mean()
+
+
+def girar(cel, raio, alfa, lado, rng):
+    """O desenho com as duas luas: uma atrás dele (metade de cima da elipse), outra na frente."""
+    from PIL import ImageDraw
+    w_, h_ = cel.size
+    x0, x1, cy = giro_pes(cel)
+    aberta = x1 - x0 > raio * 1.3
+    cx = (x0 + x1) / 2
+    rx = min(raio, (cx - MARGEM - 4) / 1.08, (w_ - MARGEM - 4 - cx) / 1.08)
+    ry = raio * GIRO_ACHATADO
+    grossa, arco = GIRO_ABERTA if aberta else GIRO_FRENTE
+    W = grossa * raio
+    ss = 4
+    atras = Image.new('RGBA', (w_ * ss, h_ * ss))
+    frente = Image.new('RGBA', (w_ * ss, h_ * ss))
+    for pe in ((0, 180) if aberta else (90, 270)):
+        for i in range(160):
+            t = i / 159
+            th = math.radians(pe - lado * arco * t)
+            w = W * math.sin(math.pi * (0.03 + 0.97 * t)) ** 0.6 * (1 - t) ** 0.35
+            cor = GIRO_BRANCO + (GIRO_CINZA - GIRO_BRANCO) * min(1.0, t * 1.3)
+            a8 = int(255 * alfa * (1 - t) ** 0.55)
+            ext = 1 + (0.04 * rng.standard_normal() if i % 7 == 0 else 0)   # a beirada em línguas
+            pts = [((cx + rx * (1 - (w / rx) * k / 5) * (ext if k == 0 else 1) * math.cos(th)) * ss,
+                    (cy + ry * (1 - (w / rx) * k / 5) * (ext if k == 0 else 1) * math.sin(th)) * ss) for k in range(6)]
+            d = ImageDraw.Draw(frente if math.sin(th) > 0 else atras)
+            for p0, p1 in zip(pts, pts[1:]):
+                d.line([p0, p1], fill=tuple(int(v) for v in cor) + (a8,), width=ss * 3)
+    out = atras.resize((w_, h_), Image.LANCZOS)
+    out.alpha_composite(cel)
+    out.alpha_composite(frente.resize((w_, h_), Image.LANCZOS))
+    return out
+
+
+# Giro, o corpo: faixas da cor da roupa (a calça, a faixa laranja) enrolando o tronco em hélice, a
+# parte da frente por cima do desenho (meio transparente onde cobre o corpo) e a de trás atrás.
+def tronco(im):
+    px = np.asarray(im); a = px[..., 3] > 200
+    ys, xs = np.nonzero(a)
+    x0, x1, cy = giro_pes(im)
+    top = int(cy + 0.12 * (ys.max() - ys.min()))          # abaixo das pernas
+    rgb = px[..., :3].astype(int)
+    cabelo = (rgb.min(2) > 185) & (rgb.max(2) - rgb.min(2) < 45) & a                          # cabelo prateado: onde o tronco acaba
+    meio = int(np.median(xs[ys > top]))
+    faixa = cabelo[:, max(0, meio - 45):meio + 45]
+    linhas = np.nonzero(faixa.sum(1) > 6)[0]
+    linhas = linhas[linhas > top + 0.35 * (ys.max() - top)]   # o cabelo fica embaixo (de ponta-cabeça)
+    bot = int(linhas.min()) if len(linhas) else int(ys.max() - 0.25 * (ys.max() - top))
+    rows = [y for y in range(top, bot) if a[y].any()]
+    hw = np.median([(np.nonzero(a[y])[0].max() - np.nonzero(a[y])[0].min()) / 2 for y in rows])
+    cx = np.median([np.nonzero(a[y])[0].mean() for y in rows])
+    return top, bot, cx, hw, px
+
+def cor_da_roupa(px, y, cx, hw):
+    seg = px[max(0, y - 2):y + 3, int(cx - hw * 0.6):int(cx + hw * 0.6)]
+    seg = seg[seg[..., 3] > 220][:, :3].astype(int)
+    if not len(seg): return (40, 50, 80)
+    lar = seg[(seg[:, 0] > 170) & (seg[:, 2] < 90)]
+    if len(lar) > len(seg) * 0.25: return tuple(np.median(lar, 0).astype(int))
+    esc = seg[seg.max(1) < 120]
+    return tuple(np.median(esc if len(esc) else seg, 0).astype(int))
+
+def espiral_corpo(im, forca, lado, n=2, abre=1.45, volta=230, grossa=0.22, frente_alfa=0.55):
+    top, bot, cx, hw, px = tronco(im)
+    bot = bot - 6
+    H = bot - top
+    if H < 20: return im
+    from PIL import ImageDraw
+    ss = 4; w_, h_ = im.size
+    atras = Image.new('RGBA', (w_ * ss, h_ * ss)); frente = Image.new('RGBA', (w_ * ss, h_ * ss))
+    R = hw * abre; W = hw * grossa * 2
+    for i in range(n):
+        y0 = top + H * (i + 0.5) / n
+        cor = np.array(cor_da_roupa(px, int(y0), cx, hw), float)
+        clara = cor + (255 - cor) * 0.25                    # a beirada da faixa um pouco mais clara
+        for j in range(140):
+            t = j / 139                                       # 0 = ponta da frente (onde a roupa está), 1 = cauda
+            th = math.radians(60 * lado - lado * volta * t)   # anda contra o giro
+            y = y0 + (t - 0.5) * H / n * 1.6                  # a hélice desce para a cabeça
+            w = W * math.sin(math.pi * (0.04 + 0.96 * t)) ** 0.6 * (1 - t) ** 0.3
+            x = cx + R * math.sin(th)
+            al = int(255 * forca * (1 - t) ** 0.5 * (frente_alfa if math.cos(th) > 0 and abs(x - cx) < hw else 1))
+            d = ImageDraw.Draw(frente if math.cos(th) > 0 else atras)
+            d.line([(x * ss, (y - w / 2) * ss), (x * ss, (y + w / 2) * ss)], fill=tuple(cor.astype(int)) + (al,), width=ss * 2)
+            d.line([(x * ss, (y - w / 2) * ss), (x * ss, (y - w / 2 + 1) * ss)], fill=tuple(clara.astype(int)) + (al,), width=ss * 2)
+    out = atras.resize((w_, h_), Image.LANCZOS); out.alpha_composite(im)
+    out.alpha_composite(frente.resize((w_, h_), Image.LANCZOS))
+    return out
+
+
+def faixa(texto):
+    """"7-14" ou "7,9,11" -> lista de desenhos."""
+    out = []
+    for parte in str(texto).split(','):
+        lo, _, hi = parte.partition('-')
+        out += list(range(int(lo), int(hi or lo) + 1))
+    return out
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('personagem')
@@ -208,6 +330,9 @@ def main():
                                    'com a ponta noutro lugar)')
     p.add_argument('--limpar', help='desenhos de onde sai o efeito do vídeo (fica só o corpo opaco): '
                                     '"5,6,9" ou "todos"')
+    p.add_argument('--giro', help='desenhos do giro (ex.: 7-14): a lua crescente do ar em volta do corpo, '
+                                  'no lugar do smear do membro')
+    p.add_argument('--giro-corpo', action='store_true', help='com --giro: a roupa do tronco enrolada em espiral')
     p.add_argument('--sem-smear', action='store_true', help='só a troca (para medir o caminho na folha limpa)')
     p.add_argument('--previa', help='só grava uma prévia dos quadros (não mexe no clip)')
     p.add_argument('--desfazer', action='store_true', help='volta o clip para a fonte original')
@@ -252,6 +377,31 @@ def main():
     for d, o in trocas.items():
         folha.paste(limpa.crop(((o % cols) * fw, (o // cols) * fh, (o % cols + 1) * fw, (o // cols + 1) * fh)),
                     ((d % cols) * fw, (d // cols) * fh))
+    if a.giro is None and smear:
+        a.giro = smear.get('giro')
+    a.giro_corpo = a.giro_corpo or bool(smear and smear.get('giroCorpo'))
+    if a.giro and not a.sem_smear:
+        quadros = faixa(a.giro)
+        padrao = [float(x) for x in a.opacidade.split(',')] if a.opacidade else [1.0, 0.5]
+        opac = [padrao[i % len(padrao)] for i in range(len(quadros))]
+        caixas = {q: ((q % cols) * fw, (q // cols) * fh, (q % cols + 1) * fw, (q // cols + 1) * fh) for q in quadros}
+        # O raio do giro: metade da maior abertura das pernas entre os desenhos.
+        raio = max((lambda b: (b[1] - b[0]) / 2)(giro_pes(folha.crop(c))) for c in caixas.values())
+        rng = np.random.default_rng(a.semente)
+        for q, alfa in zip(quadros, opac):
+            cel = folha.crop(caixas[q])
+            if a.giro_corpo:
+                cel = espiral_corpo(cel, alfa, lado)
+            folha.paste(girar(cel, raio, alfa, lado, rng), caixas[q][:2])
+        print('giro (desenho, força):', list(zip(quadros, opac)), '| raio', round(raio))
+        if a.previa:
+            prev = Image.new('RGBA', (fw * len(quadros), fh), (70, 70, 80, 255))
+            for i, q in enumerate(quadros):
+                prev.alpha_composite(folha.crop(caixas[q]), (i * fw, 0))
+            prev.save(a.previa)
+            print('prévia:', a.previa)
+            return
+        return gravar(a, clip, clip_path, folha, original, quadros, opac)
     caminho = anim.get('silhueta', {}).get('caminho')
     if a.sem_smear or not caminho:
         if not a.sem_smear:
@@ -315,6 +465,11 @@ def main():
         prev.save(a.previa)
         print('prévia:', a.previa)
         return
+    gravar(a, clip, clip_path, folha, original, quadros, opac)
+
+
+def gravar(a, clip, clip_path, folha, original, quadros, opac):
+    """Grava a folha nova ao lado da original e a receita no clip."""
     if clip['source'].endswith('_sr_hd.png'):
         # O clipe passou pela melhoria de nitidez (tools/sprites/sr_hd.py) depois do smear: refazer o
         # smear volta para a fonte sem nitidez. Não roda sem querer: a outra fonte ficaria solta.
@@ -340,6 +495,10 @@ def main():
     if a.clarear:
         clip['smear']['clarear'] = a.clarear
     clip['smear']['opacidade'] = opac
+    if a.giro:
+        clip['smear']['giro'] = a.giro
+        if a.giro_corpo:
+            clip['smear']['giroCorpo'] = True
     clip_path.write_text(json.dumps(clip, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('fonte nova:', destino, '| clip:', clip_path.relative_to(ROOT))
     print('agora: python3 tools/sprites/build_characters.py --write')

@@ -1,0 +1,36 @@
+{
+  "id": "p02_carrinho_garca",
+  "javaName": "P02_CARRINHO_GARCA",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_carrinho_garca.webp",
+  "report": "tools/sprites/reports/p02_carrinho_garca.report.json",
+  "preview": "android/app/build/sprite-review/p02_carrinho_garca-import.png",
+  "expectedFrames": 22,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "p02_carrinho_garca.mp4",
+    "personagem": "p02",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "2,4,6,8,12,16,18,20,22,26,32,44,58,64,68,70,72,74,76,84,99,123",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "171,263",
+    "colunas": 11,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "emendar_idle": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 288,
+  "rootX": 171,
+  "rootY": 263,
+  "sourceReferences": [
+    "art/sprites/source/p02_carrinho_garca_video_normalized.png"
+  ]
+}

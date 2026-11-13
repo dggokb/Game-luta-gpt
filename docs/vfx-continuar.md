@@ -165,6 +165,14 @@ Em cima da arte nova dela (vídeos do Drive convertidos por outra sessão, que j
 - O `caixas_sprites.py` mede no `source` do clipe: rodado com o smear lá, as línguas opacas entram
   na caixa do golpe. Medir com a fonte sem smear (`smear.fonte`).
 
+**S4: o arco do giro.** Golpe que gira as pernas em volta do corpo pede outro smear: `smear.py
+--giro 7-14` mede os pés no próprio desenho (sem o caminho do golpe) e põe a lua crescente do ar,
+branca para cinza, na elipse dos pés, côncava para o corpo, metade atrás e metade na frente, a
+força alternando 100%/50%. Gravado no jogo com o arco intercalado e em todos; ficou em todos.
+`--giro-corpo` soma a roupa do tronco em espiral: faixas da cor da calça e da faixa laranja em
+hélice em volta do eixo do corpo (a primeira tentativa, arrastando os pixels da roupa no giro,
+ficava escondida dentro da silhueta e não aparecia).
+
 Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
 
 ## A pesquisa de como os estúdios fazem (10/11)
@@ -779,7 +787,8 @@ mandar os mapas; avisado por outra sessão). Foi o que houve no mesmo dia com `p
 `player_base_heavy_straight` (refeitas em SR HD): os dois mapas foram refeitos.
 
 **O que não foi feito ou visto:** nada rodou no celular (nem o shader, nem a memória, nem o
-custo); só Ryūga e Kōga têm mapa (88 folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
+custo); têm mapa Ryūga, Kōga e, desde 13/11, a Yin-lu (p02, 44 folhas: "aplica normal map na p02
+que está com nova animação"; 785 quadros em 10 min, 1,3 MB, 8,2% das folhas); no PC, os 12 cenários foram vistos com o volume (os outros 11 só em 12/11, andando, sem golpe); a
 licença dos pesos do Metric3D (código BSD de 2 cláusulas; a conversão ONNX está como CC0) precisa
 ser conferida antes de um lançamento comercial.
 

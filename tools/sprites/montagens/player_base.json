@@ -741,5 +741,25 @@
         "impacto": 4
       }
     }
+  },
+  "ombrada": {
+    "_doc": "Golpe de corrida (13/11, corre + H): Ombrada, do vídeo dash_golpe do dono (H3, 124 quadros, início na corrida e fim na guarda). Da corrida (8-12) firma o pé (14-30), estica o ombro (32-38, segura 44-70) e volta à guarda (72-88). Quem anda é o motor (avanço do golpe): o trecho é fixo.",
+    "trechos": [
+      [
+        "golpe_corrida",
+        0,
+        124,
+        "fixo"
+      ]
+    ],
+    "quadros": "8,10,12,14,18,30,32,33,34,35,36,38,44,60,70,72,74,76,78,82,88",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "OMBRADA": {
+        "impacto": 10
+      }
+    }
   }
 }

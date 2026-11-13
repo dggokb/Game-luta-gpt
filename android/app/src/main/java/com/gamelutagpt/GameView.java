@@ -1715,6 +1715,13 @@ public class GameView extends SurfaceView
                     for (FighterState m : engine.team(side).members) if (m != null) m.superMeter = barra;
                 }
             }
+            float canto = cantoPedido;
+            if (canto > 0f) {
+                // PC (GravarLuta, passo canto:GAP): o rival encostado na borda da direita, nós a GAP px.
+                cantoPedido = -1f;
+                engine.fighter(1).x = Arena.RIGHT_BOUND;
+                engine.fighter(0).x = Arena.RIGHT_BOUND - canto;
+            }
             String[] dupla = duplaPedida;
             if (dupla != null) {
                 duplaPedida = null;
@@ -4037,6 +4044,13 @@ public class GameView extends SurfaceView
 
     private volatile int superPedido = -1;
 
+    /** PC ({@code gradle :pc:gravarLuta}): o rival no canto da direita e nós a {@code gap} px dele. */
+    public void irParaOCanto(float gap) {
+        cantoPedido = gap;
+    }
+
+    private volatile float cantoPedido = -1f;
+
     /** PC ({@code gradle :pc:gravarLuta}): a luta carregou, a entrada acabou e os comandos já valem. */
     public boolean lutaPronta() {
         return telaDaLuta() && introFrame < 0 && duplaPedida == null && !demo.active() && !tutorial.active()
@@ -5493,13 +5507,15 @@ public class GameView extends SurfaceView
         if (animation == null && f.grounded && f.status == CombatFighter.Status.NEUTRAL && Math.abs(f.travel) < 0.001f) {
             clipStep *= renderer.animacao.pose().ritmo;
         }
+        renderer.motion.passada(f.passada, f.passadaFrente);
         renderer.update(
             clipStep,
             f.grounded,
             // Na preparação do pulo ele agacha (o começo do clipe de agachar).
             f.crouchingBody() || guard == CombatFighter.GUARD_LOW || f.jumpSquat > 0,
             f.vy,
-            f.travel,
+            // Deslizando no embalo (golpe dado na corrida) ele não dá passo: a guarda, não o andar.
+            f.embalo != 0f ? 0f : f.travel,
             f.travel * f.facing > 0,
             f.forwardDashing,
             f.backdashFrames > 0,

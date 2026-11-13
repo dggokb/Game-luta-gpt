@@ -14,9 +14,9 @@
  "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
  "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
  "fonte": "art/sprites/source/p02_special_s4_video_normalized_smear.png",
- "fonte_sha256": "2070a1fe11edde575cc34650d06bea7f2949b4f5b99deafd81bb8d7bb3fdfc87",
+ "fonte_sha256": "989ef94a5571a9ac018ac09fdca565f9aa61b1b0c217c59b94ed9310c4162365",
  "saida": "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd.png",
- "saida_sha256": "ac9d1e8391ee4a1f569180723638bb1e1fe100cf481f4f0a16dd7343fab67320",
+ "saida_sha256": "7f625f33f9b071764818f8cc8b2a78cdcb1d2defd5022b5ef48ae6e504907f80",
  "alfa": "idêntico à fonte (conferido byte a byte)",
  "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
 }
