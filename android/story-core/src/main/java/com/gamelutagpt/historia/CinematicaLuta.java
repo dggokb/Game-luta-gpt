@@ -844,8 +844,11 @@ public final class CinematicaLuta {
                 a.lances = new ArrayList<>();
                 for (Object l : Episodio.list(m, "lances")) {
                     String lance = String.valueOf(l);
-                    if (!lance.matches("bloqueio|vento|esquiva|salto|choque")) {
-                        throw new IllegalArgumentException("lance " + lance + " (use bloqueio, vento, esquiva, salto ou choque)");
+                    // "tipo", "tipo:quem" ou "tipo:quem:botões" (quem ataca e os golpes em ordem,
+                    // ex.: "bloqueio:rival:L,H,2H"); "fim" encerra a troca ali.
+                    if (!lance.matches(LANCE)) {
+                        throw new IllegalArgumentException("lance " + lance + " (use bloqueio, vento, esquiva, salto, choque"
+                            + " ou fim; com quem ataca e os golpes: bloqueio:rival:L,H,2H)");
                     }
                     a.lances.add(lance);
                 }
@@ -959,10 +962,13 @@ public final class CinematicaLuta {
         return a;
     }
 
+    /** Um lance da troca: o tipo, e opcionalmente quem ataca e os golpes dele, em ordem. */
+    static final String LANCE = "fim|(bloqueio|vento|esquiva|salto|choque)(:(jogador|rival)(:(2?[LMH]|S[1-9]?)(,(2?[LMH]|S[1-9]?))*)?)?";
+
     private static Golpe golpe(Map<String, Object> m, String chave, String padrao, boolean finaliza) {
         String g = Episodio.string(m, chave, padrao);
-        if (!g.matches("2?[LMH]|S[1-9]?")) {
-            throw new IllegalArgumentException("golpe " + g + " (use L, M, H, 2L, 2M, 2H ou um especial: S, S2, S3...)");
+        if (!g.matches("2?[LMH]|S[1-9]?|A")) {
+            throw new IllegalArgumentException("golpe " + g + " (use L, M, H, 2L, 2M, 2H, A (agarrão) ou um especial: S, S2, S3...)");
         }
         return new Golpe(g, numero(m, "dano", 0.15f, 0f, 1f), finaliza);
     }

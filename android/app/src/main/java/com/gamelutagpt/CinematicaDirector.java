@@ -71,6 +71,33 @@ final class CinematicaDirector {
     }
 
     /**
+     * Um lance do roteiro: o tipo, quem ataca (0 jogador, 1 rival; -1 a vez segue a regra) e os
+     * golpes em ordem (null: sorteados). {@code fim}: a troca acaba ali.
+     */
+    static final class Passo {
+        final Lance lance;
+        final int quem;
+        final String[] botoes;
+        final boolean fim;
+
+        Passo(Lance lance, int quem, String[] botoes, boolean fim) {
+            this.lance = lance;
+            this.quem = quem;
+            this.botoes = botoes;
+            this.fim = fim;
+        }
+
+        /** "bloqueio", "bloqueio:rival" ou "bloqueio:rival:L,H,2H"; "fim". */
+        static Passo de(String texto) {
+            if ("fim".equals(texto)) return new Passo(null, -1, null, true);
+            String[] partes = texto.split(":");
+            int quem = partes.length > 1 ? ("jogador".equals(partes[1]) ? 0 : 1) : -1;
+            String[] botoes = partes.length > 2 ? partes[2].split(",") : null;
+            return new Passo(Lance.de(partes[0]), quem, botoes, false);
+        }
+    }
+
+    /**
      * A troca de golpes sem acertar (entre os QTE): em cada vez sai um lance (os do roteiro em
      * ordem, depois sorteados): defesa, golpe no vento, esquiva, salto ou choque. Depois um dos
      * dois recua (ou nenhum) e a vez quase sempre passa para o outro. O jogo segura a vida e a
@@ -79,7 +106,10 @@ final class CinematicaDirector {
     private static final class Troca {
         final int limite;
         final Random sorteio;
-        final Deque<Lance> roteiro = new ArrayDeque<>();
+        final Deque<Passo> roteiro = new ArrayDeque<>();
+        /** Os golpes do lance em andamento (do roteiro), ou null (sorteados). */
+        String[] botoes;
+        int botao;
         int frame;
         int atacante;
         Lance lance = Lance.BLOQUEIO;
@@ -104,11 +134,15 @@ final class CinematicaDirector {
             limite = Math.max(1, Math.round(segundos * FPS));
             sorteio = new Random(semente);
             atacante = sorteio.nextInt(2);
-            if (lances != null) for (String l : lances) roteiro.add(Lance.de(l));
+            if (lances != null) for (String l : lances) roteiro.add(Passo.de(l));
+        }
+
+        /** O próximo golpe do roteiro deste lance, ou {@code sorteado}. */
+        String proximo(String sorteado) {
+            return botoes != null && botao < botoes.length ? botoes[botao++] : sorteado;
         }
 
         Lance sortear() {
-            if (!roteiro.isEmpty()) return roteiro.poll();
             int r = sorteio.nextInt(100);
             return r < 30 ? Lance.BLOQUEIO : r < 45 ? Lance.VENTO : r < 60 ? Lance.ESQUIVA : r < 77 ? Lance.SALTO : Lance.CHOQUE;
         }
@@ -205,12 +239,24 @@ final class CinematicaDirector {
                 }
                 if (!livres) return;
                 // Quase sempre a vez passa para o outro (nunca três seguidas do mesmo).
-                if (t.frame > 1) {
+                Passo passo = t.roteiro.poll();
+                if (passo != null && passo.fim) {
+                    // O roteiro disse que a troca acaba aqui.
+                    t.fase = 4;
+                    t.faseFrame = 0;
+                    return;
+                }
+                if (passo != null && passo.quem >= 0) {
+                    t.repetiu = passo.quem == t.atacante && t.frame > 1;
+                    t.atacante = passo.quem;
+                } else if (t.frame > 1) {
                     boolean passa = t.repetiu || t.sorteio.nextInt(10) < 7;
                     if (passa) t.atacante = 1 - t.atacante;
                     t.repetiu = !passa;
                 }
-                t.lance = t.sortear();
+                t.lance = passo != null ? passo.lance : t.sortear();
+                t.botoes = passo != null ? passo.botoes : null;
+                t.botao = 0;
                 // O salto precisa de espaço para pular: colados, vira defesa.
                 if (t.lance == Lance.SALTO && vao(engine.fighter(t.atacante), engine.fighter(1 - t.atacante)) < 90f) {
                     t.lance = Lance.BLOQUEIO;
@@ -218,7 +264,7 @@ final class CinematicaDirector {
                 t.alvoVao = t.lance == Lance.VENTO ? 45f + t.sorteio.nextInt(35)
                     : t.lance == Lance.SALTO ? 230f : t.lance == Lance.CHOQUE ? 60f : ALCANCE;
                 t.vaoAntes = Float.MAX_VALUE;
-                t.golpes = t.lance == Lance.ESQUIVA ? 1 : 1 + t.sorteio.nextInt(3);
+                t.golpes = t.lance == Lance.ESQUIVA ? 1 : t.botoes != null ? t.botoes.length : 1 + t.sorteio.nextInt(3);
                 t.proximoGolpe = 0;
                 t.noAr = t.bateuNoAr = false;
                 t.apertaEm[0] = t.apertaEm[1] = -1;
@@ -257,7 +303,7 @@ final class CinematicaDirector {
                 if (t.lance == Lance.ESQUIVA) {
                     // O forte sai e quem ia levar pula para trás no mesmo instante: passa no vento.
                     if (t.golpes > 0 && atk.canAct() && def.canAct() && def.grounded) {
-                        CinematicaDirector.apertar("H", in[a]);
+                        CinematicaDirector.apertar(t.proximo("H"), in[a]);
                         in[d].jump = true;
                         in[d].direction = def.facing > 0 ? 6 : 8;
                         t.golpes = 0;
@@ -275,7 +321,7 @@ final class CinematicaDirector {
                 // A defesa empurrou longe demais: o resto do combo não sai do outro lado da tela.
                 if (t.golpes > 0 && t.faseFrame > 0 && vao > t.alvoVao + 60f) t.golpes = 0;
                 if (t.golpes > 0 && t.faseFrame >= t.proximoGolpe && atk.canAct()) {
-                    CinematicaDirector.apertar(BOTOES[t.sorteio.nextInt(BOTOES.length)], in[a]);
+                    CinematicaDirector.apertar(t.proximo(BOTOES[t.sorteio.nextInt(BOTOES.length)]), in[a]);
                     t.golpes--;
                     t.proximoGolpe = t.faseFrame + 10 + t.sorteio.nextInt(8);
                 } else if ((t.golpes == 0 && atk.canAct() && t.faseFrame > t.proximoGolpe) || t.faseFrame > 150) {
@@ -290,7 +336,7 @@ final class CinematicaDirector {
                     t.noAr = true;
                     in[a].direction = DemoDirector.Ctx.forward(atk);
                     if (!t.bateuNoAr && (atk.vy > 0f || vao < 70f)) {
-                        CinematicaDirector.apertar("H", in[a]);
+                        CinematicaDirector.apertar(t.proximo("H"), in[a]);
                         t.bateuNoAr = true;
                     }
                 } else if (t.noAr && atk.canAct()) {
@@ -298,7 +344,8 @@ final class CinematicaDirector {
                     t.fase = 2;
                     t.faseFrame = 0;
                     t.alvoVao = ALCANCE;
-                    t.golpes = 1 + t.sorteio.nextInt(2);
+                    // Com os golpes do roteiro, o combo no chão são os que sobraram depois do do ar.
+                    t.golpes = t.botoes != null ? t.botoes.length - t.botao : 1 + t.sorteio.nextInt(2);
                     t.proximoGolpe = 4;
                 }
                 if (t.faseFrame > 120) separar(t, -1);
@@ -455,6 +502,11 @@ final class CinematicaDirector {
 
     /** O botão do golpe: L/M/H, agachado (2L...: ↓ junto) ou um especial já resolvido (S, S2...). */
     static void apertar(String golpe, FighterInput in) {
+        if (golpe.equals("A")) {
+            // Agarrão (L + M).
+            in.grab = true;
+            return;
+        }
         if (golpe.startsWith("S")) {
             // "S" é a energia (o forte); S2, S3... o especial com esse id.
             in.special = golpe.equals("S") || golpe.equals("S1") ? "H" : golpe;

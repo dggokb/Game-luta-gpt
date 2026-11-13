@@ -510,6 +510,7 @@ tasks.register('testeQte', JavaExec) {
     systemProperty 'gameluta.repo', repoRoot.absolutePath
     systemProperty 'java.awt.headless', 'true'
     systemProperty 'gameluta.semSom', 'true'
+    systemProperty 'gameluta.cadencia', providers.gradleProperty('cadencia').getOrElse('6')
     maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
     args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('qte').get().asFile.absolutePath),
         providers.gradleProperty('irmao').getOrElse('ryuga')
