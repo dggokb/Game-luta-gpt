@@ -14,7 +14,7 @@ por inundação a partir da borda; a sombra cinza embaixo dos pés sai junto. Fu
 do desenho (entre mechas de cabelo) não é alcançado pela borda: --bolso X0,Y0,X1,Y1 (em px da
 Base) apaga a cor do fundo dentro do retângulo. Conferir a prévia antes de gerar vídeo.
 
-Padrão do Flick/H3 (flick-h3.md): 1344×768, corpo com 77% da altura, pés em y 733, laterais a
+Padrão do Flick/H3 (docs/personagens/video.md): 1344×768, corpo com 77% da altura, pés em y 733, laterais a
 20,3% da largura do centro (a mesma proporção do p01 em 1280×720).
 """
 import argparse
