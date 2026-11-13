@@ -105,37 +105,75 @@ public class CinematicaLutaTest {
                 if (passo.cinematica == null) continue;
                 cinematicas++;
                 assertEquals(passo.cinematica + " fora de um passo de luta", Episodio.TipoPasso.LUTA, passo.tipo);
-                CinematicaLuta.Roteiro r = CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + passo.cinematica));
-                for (String quem : r.quemFala()) {
-                    // Sem retrato da história, quem luta fala com o rosto da seleção.
-                    String lutador = temporada.elenco.get(quem).lutador;
-                    String codigo = "player_base".equals(lutador) ? "p01" : lutador;
-                    assertTrue(passo.cinematica + ": sem o rosto normal de " + quem,
-                        new File(ASSETS, ConversaLuta.RETRATOS + "/" + quem + "_normal.png").isFile() ||
-                        lutador != null && new File(ASSETS, "selection/rostos/" + codigo + ".webp").isFile());
-                }
-                for (String pagina : r.paginas()) {
-                    assertTrue(passo.cinematica + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
-                }
-                for (String pagina : r.paginasDosEpisodios()) {
-                    // A página é lida com os quadros e balões do passo dela no episódio.
-                    String epId = pagina.substring(0, pagina.indexOf('/'));
-                    Episodio epDaPagina = Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json"));
-                    assertNotNull(passo.cinematica + ": " + pagina + " não é uma página pronta (com quadros) do " + epId,
-                        CinematicaLuta.paginaDoEpisodio(epDaPagina, pagina.substring(pagina.indexOf('/') + 1)));
-                }
-                List<String> textos = new ArrayList<>(r.textos());
-                textos.addAll(CinematicaLuta.TEXTOS_QTE);
-                for (File arquivo : idiomas) {
-                    Map<String, String> traducao = Temporada.traducaoFromJson(
-                        FILES.readText(Temporada.PASTA + "/idiomas/" + arquivo.getName()));
-                    for (String texto : textos) {
-                        assertTrue(arquivo.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
-                    }
-                }
+                conferirCinematica(temporada, passo.cinematica, idiomas);
             }
         }
         assertTrue("o treino do Episódio 1 tem cinemática", cinematicas > 0);
+    }
+
+    /** As histórias das duplas do torneio (Torneio.Dupla.cinematica) abrem como as dos episódios. */
+    @Test
+    public void cinematicasDasDuplasValem() throws IOException {
+        Temporada temporada = Temporada.load(FILES);
+        File[] idiomas = new File(ASSETS, Temporada.PASTA + "/idiomas").listFiles();
+        int com = 0;
+        for (Torneio.Dupla d : Torneio.duplasFromJson(FILES.readText(Torneio.ARQUIVO))) {
+            if (d.cinematica == null) continue;
+            com++;
+            assertNull(d.id + ": dupla de irmão não tem história de adversário", d.irmao);
+            conferirCinematica(temporada, d.cinematica, idiomas);
+        }
+        assertTrue("p09 e p11 têm história", com >= 2);
+    }
+
+    /** O gatilho "ultimo": no 2x2 a cena espera o parceiro cair; até lá o rival perde normalmente. */
+    @Test
+    public void gatilhoDoUltimoDePe() throws IOException {
+        Temporada temporada = Temporada.load(FILES);
+        Palco palco = new Palco();
+        CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, new ConversaLuta(FILES), palco);
+        assertTrue(cena.carregar(temporada, "torneio/cinematica_p09.json", Torneio.RYUGA));
+        cena.sozinhos(true, false);
+        assertFalse("com o parceiro de pé, o rival da vez pode cair", cena.protegeVida(CinematicaLuta.RIVAL));
+        assertFalse("o parceiro ainda está de pé", cena.gatilho(1f, 0.1f, 10f, false));
+        cena.sozinhos(true, true);
+        assertTrue("o último de pé fica com o último ponto até a cena", cena.protegeVida(CinematicaLuta.RIVAL));
+        assertFalse(cena.gatilho(1f, 0.3f, 12f, false));
+        assertTrue(cena.gatilho(1f, 0.25f, 12f, false));
+    }
+
+    /** A cinemática abre, quem fala tem rosto, as páginas existem e todo texto tem tradução. */
+    private static void conferirCinematica(Temporada temporada, String arquivo, File[] idiomas) throws IOException {
+        CinematicaLuta.Roteiro r = CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + arquivo));
+        for (String quem : r.quemFala()) {
+            // "jogador"/"rival": quem estiver em campo, com o rosto da seleção.
+            if (quem.equals("jogador") || quem.equals("rival")) continue;
+            // Sem retrato da história, quem luta fala com o rosto da seleção.
+            String lutador = temporada.elenco.get(quem).lutador;
+            String codigo = "player_base".equals(lutador) ? "p01" : lutador;
+            assertTrue(arquivo + ": sem o rosto normal de " + quem,
+                new File(ASSETS, ConversaLuta.RETRATOS + "/" + quem + "_normal.png").isFile() ||
+                lutador != null && new File(ASSETS, "selection/rostos/" + codigo + ".webp").isFile());
+        }
+        for (String pagina : r.paginas()) {
+            assertTrue(arquivo + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
+        }
+        for (String pagina : r.paginasDosEpisodios()) {
+            // A página é lida com os quadros e balões do passo dela no episódio.
+            String epId = pagina.substring(0, pagina.indexOf('/'));
+            Episodio epDaPagina = Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json"));
+            assertNotNull(arquivo + ": " + pagina + " não é uma página pronta (com quadros) do " + epId,
+                CinematicaLuta.paginaDoEpisodio(epDaPagina, pagina.substring(pagina.indexOf('/') + 1)));
+        }
+        List<String> textos = new ArrayList<>(r.textos());
+        textos.addAll(CinematicaLuta.TEXTOS_QTE);
+        for (File idioma : idiomas) {
+            Map<String, String> traducao = Temporada.traducaoFromJson(
+                FILES.readText(Temporada.PASTA + "/idiomas/" + idioma.getName()));
+            for (String texto : textos) {
+                assertTrue(idioma.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
+            }
+        }
     }
 
     /** Os rostos do olhar.json existem (o quadro espelha quem olharia para fora da tela). */

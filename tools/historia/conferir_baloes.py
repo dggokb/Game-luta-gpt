@@ -137,14 +137,19 @@ def corrige(b, W, Hh, m, dist):
 def main():
     corrigir = "--corrigir" in sys.argv
     total = 0
-    for ep in sorted(glob.glob(os.path.join(H, "ep*", "episodio.json"))):
-        epn = os.path.basename(os.path.dirname(ep))
+    # Os episódios e as páginas das cinemáticas (a "imagem" delas já traz a pasta).
+    arquivos = sorted(glob.glob(os.path.join(H, "ep*", "episodio.json"))) + \
+        sorted(glob.glob(os.path.join(H, "**", "cinematica*.json"), recursive=True))
+    for ep in arquivos:
+        epn = os.path.relpath(os.path.dirname(ep), H)
         src = open(ep, encoding="utf-8").read()
         out = src
-        for p in json.loads(src)["passos"]:
+        dados = json.loads(src)
+        cena = "acoes" in dados
+        for p in dados["acoes"] if cena else dados["passos"]:
             if "quadros" not in p or "imagem" not in p:
                 continue
-            W, Hh = Image.open(os.path.join(H, epn, p["imagem"])).size
+            W, Hh = Image.open(os.path.join(H, p["imagem"] if cena else os.path.join(epn, p["imagem"]))).size
             for qi, q in enumerate(p["quadros"]):
                 for b in q.get("baloes", []):
                     m, dist = distancia(b, W, Hh)

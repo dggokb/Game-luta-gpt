@@ -236,6 +236,25 @@ public final class Campanha {
         return new String[][] {jogador.clone(), cpu.clone()};
     }
 
+    /**
+     * A cinemática da luta: a do passo ({@code "cinematica"}); sem ela, no torneio da história
+     * (não no Arcade), a história da dupla adversária ({@link Torneio.Dupla#cinematica}) nas
+     * lutas antes da final: quartas, emboscada e semifinal. Null: a luta não tem cena.
+     */
+    public String cinematica(Episodio.Passo luta) {
+        if (luta.cinematica != null || arcade()) return luta.cinematica;
+        Torneio.Dupla d = null;
+        if (luta.emboscada) {
+            Torneio t = torneioSorteado();
+            d = t != null ? t.emboscada() : null;
+        } else if (luta.torneio) {
+            Torneio t = torneio();
+            d = t != null ? t.adversario() : null;
+        }
+        // A dupla de um irmão (a final) não tem história de adversário.
+        return d != null && d.irmao == null ? d.cinematica : null;
+    }
+
     private String[] resolver(String ref, String[] fixo) {
         if (ref == null) return fixo;
         if (Episodio.IRMAOS.equals(ref)) {

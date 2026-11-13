@@ -5,8 +5,10 @@
     { "id": "koga", "irmao": "koga", "lutadores": ["p03", "p04"], "fala": "Tanto faz a chave. No final, vai ser eu e você, Ryūga.", "quemFala": 0 },
     { "id": "p05", "lutadores": ["p05", "p06"], "fala": "Hum... a chave é só um detalhe. Ninguém escapa da gente...", "quemFala": 1 },
     { "id": "p07", "lutadores": ["p07", "p08"], "fala": "Parece que temos um bom negócio pela frente...", "quemFala": 0 },
-    { "id": "p09", "lutadores": ["p09", "p10"], "fala": "HEYYY! Quem vai ser o primeiro a pegar fogo?!", "quemFala": 0 },
-    { "id": "p11", "lutadores": ["p11", "p12"], "fala": "Hu hu hu... mais cobaias para a minha criação...", "quemFala": 0 },
+    { "id": "p09", "lutadores": ["p09", "p10"], "fala": "HEYYY! Quem vai ser o primeiro a pegar fogo?!", "quemFala": 0,
+      "cinematica": "torneio/cinematica_p09.json" },
+    { "id": "p11", "lutadores": ["p11", "p12"], "fala": "Hu hu hu... mais cobaias para a minha criação...", "quemFala": 0,
+      "cinematica": "torneio/cinematica_p11.json" },
     { "id": "p13", "lutadores": ["p13", "p14"], "fala": "Algum problema? Quem cair com a gente, cai feio.", "quemFala": 0, "pronta": false },
     { "id": "p15", "lutadores": ["p15", "p16"], "fala": "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!", "quemFala": 1, "pronta": false }
   ]
