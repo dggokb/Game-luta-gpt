@@ -128,10 +128,11 @@ final class ControlsLayout {
     static final float TUTORIAL_SKIP_BOTTOM = 236f;
 
     // MENU (top center): opens the pause in every mode (the test's team select is DUPLA).
-    static final float SELECT_BUTTON_LEFT = 565f;
-    static final float SELECT_BUTTON_TOP = 112f;
-    static final float SELECT_BUTTON_RIGHT = 715f;
-    static final float SELECT_BUTTON_BOTTOM = 154f;
+    // Com a barra com raios, o toque é a placa do MENU desenhada na arte (abaixo do relógio).
+    static final float SELECT_BUTTON_LEFT = HudRenderer.BARRA_RAIOS ? 557f : 565f;
+    static final float SELECT_BUTTON_TOP = HudRenderer.BARRA_RAIOS ? 132f : 112f;
+    static final float SELECT_BUTTON_RIGHT = HudRenderer.BARRA_RAIOS ? 723f : 715f;
+    static final float SELECT_BUTTON_BOTTOM = HudRenderer.BARRA_RAIOS ? 170f : 154f;
 
     /** First control under the point, in the priority order the input handler uses. */
     static Control controlAt(float x, float y) {
