@@ -230,6 +230,13 @@ final class CinematicaDirector {
         }
         boolean livres = atk.canAct() && def.canAct() && atk.grounded && def.grounded;
         float vao = vao(atk, def);
+        if (acabaNoContato(t, def)) {
+            // O último golpe do roteiro bateu na defesa e depois vem o "fim": a troca acaba no
+            // contato (o roteiro solta o impacto e o clarão nessa hora, sem esperar o pouso).
+            t.roteiro.poll();
+            troca = null;
+            return;
+        }
         switch (t.fase) {
             case 0:
                 if (t.frame >= t.limite) {
@@ -371,6 +378,17 @@ final class CinematicaDirector {
                 // Acabando: espera os dois livres (ou um instante) para o roteiro seguir.
                 if (livres || t.faseFrame > 60) troca = null;
         }
+    }
+
+    /**
+     * Os golpes do roteiro deste lance já saíram todos, o último está na defesa do outro agora e o
+     * próximo lance é o "fim".
+     */
+    private static boolean acabaNoContato(Troca t, CombatFighter def) {
+        if (t.botoes == null || t.botao < t.botoes.length || t.golpes > 0) return false;
+        if (t.fase != 2 && t.fase != 5) return false;
+        Passo proximo = t.roteiro.peek();
+        return proximo != null && proximo.fim && def.status == CombatFighter.Status.BLOCKSTUN;
     }
 
     private static void separar(Troca t, int recua) {

@@ -143,6 +143,8 @@ public final class TesteQteConvite {
 
     /** De quantos em quantos quadros a cena é gravada (-Dgameluta.cadencia; 2 = vídeo a 30 qps). */
     static final int CADENCIA = Integer.getInteger("gameluta.cadencia", 6);
+    /** Grava em JPG (-Dgameluta.jpg=true). */
+    static final boolean JPG = Boolean.getBoolean("gameluta.jpg");
 
     static float vida(CombatFighter f) {
         return 100f * f.state.life / f.state.profile.maxLife;
@@ -156,7 +158,15 @@ public final class TesteQteConvite {
         canvas = new Canvas(tela);
         canvas.drawColor(0xFF000000);
         desenhar.invoke(jogo, canvas);
-        ImageIO.write(tela.image(), "png", new File(saida, String.format(Locale.ROOT, "q%05d.png", quadro)));
+        if (JPG) {
+            // JPG ocupa um décimo do PNG: a cena inteira a 30 qps cabe no disco.
+            java.awt.image.BufferedImage rgb = new java.awt.image.BufferedImage(tela.image().getWidth(),
+                tela.image().getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+            rgb.getGraphics().drawImage(tela.image(), 0, 0, null);
+            ImageIO.write(rgb, "jpg", new File(saida, String.format(Locale.ROOT, "q%05d.jpg", quadro)));
+        } else {
+            ImageIO.write(tela.image(), "png", new File(saida, String.format(Locale.ROOT, "q%05d.png", quadro)));
+        }
     }
 
     @SuppressWarnings("unchecked")
