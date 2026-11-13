@@ -523,6 +523,7 @@ public final class CinematicaLuta {
     private final Transicao linhas = new Transicao(0f);
     private final Transicao linhasQte = new Transicao(0f);
     private String linhasEstilo = "concentracao";
+    private static final int LINHAS_VELOCIDADE = 18, LINHAS_CONCENTRACAO = 56;
     private float linhasEscuro = 0.35f;
     /**
      * Câmera viva na troca de golpes: chega mais perto e puxa para quem ataca (somada à câmera
@@ -1832,9 +1833,10 @@ public final class CinematicaLuta {
     }
 
     /**
-     * As linhas de ação: a luta escurece um pouco e riscos finos (pretos com um fio branco)
-     * entram pelas bordas em direção ao meio (concentração, do mangá) ou atravessam a tela de
-     * lado a lado (velocidade). Mudam a cada dois quadros, como as linhas desenhadas à mão do anime.
+     * As linhas de ação, como o anime desenha: poucos riscos afinando nas pontas, que deslizam
+     * numa direção só (velocidade, nas faixas de cima e de baixo, sem cruzar os dois no meio)
+     * ou que apontam para o meio da tela a partir das bordas (concentração, do mangá), mudando
+     * só a cada 4 quadros (a "tremida" do traço à mão, não um chiado). A luta escurece um pouco atrás.
      */
     private void desenharLinhas(RenderCanvas c) {
         float k = Math.max(linhas.valor(), linhasQte.valor());
@@ -1843,36 +1845,40 @@ public final class CinematicaLuta {
         String estilo = doRoteiro ? linhasEstilo : "concentracao";
         float escuro = doRoteiro ? linhasEscuro : 0.35f;
         if (escuro > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(255f * escuro * k)));
-        Random r = new Random(7919L * (long)(time * 30f));
-        int preto = Tinta.withAlpha(INK, (int)(235f * k)), branco = Tinta.withAlpha(WHITE, (int)(200f * k));
-        float cx = VW * 0.5f, cy = VH * 0.47f;
         if (estilo.equals("velocidade")) {
-            for (int i = 0; i < 46; i++) {
-                float y = r.nextFloat() * VH;
-                float x0 = -60f + r.nextFloat() * VW * 0.6f;
-                float largo = VW * (0.25f + 0.6f * r.nextFloat());
-                float grosso = 1.5f + r.nextFloat() * 4f;
-                // O meio (onde estão os dois) fica mais limpo.
-                if (Math.abs(y - cy) < VH * 0.18f && r.nextFloat() < 0.7f) continue;
-                c.drawLine(x0, y, x0 + largo, y, grosso + 2f, preto);
-                c.drawLine(x0 + 8f, y, x0 + largo - 8f, y, grosso * 0.4f, branco);
+            int cor = Tinta.withAlpha(WHITE, (int)(150f * k));
+            for (int i = 0; i < LINHAS_VELOCIDADE; i++) {
+                Random r = new Random(4241L + i * 977L);
+                // Metade em cima, metade embaixo; o meio (onde estão os dois) fica livre.
+                boolean cima = i % 2 == 0;
+                float y = cima ? VH * (0.06f + 0.24f * r.nextFloat()) : VH * (0.72f + 0.24f * r.nextFloat());
+                float largo = VW * (0.18f + 0.22f * r.nextFloat());
+                float grosso = 2f + r.nextFloat() * 3.5f;
+                float veloc = VW * (1.6f + 1.4f * r.nextFloat());
+                float faixa = VW + largo * 2f;
+                // Deslizam da direita para a esquerda, cada um no seu ritmo.
+                float x = faixa - ((r.nextFloat() * faixa + time * veloc) % faixa) - largo;
+                c.fillPolygon(new float[] {x, y, x + largo * 0.35f, y - grosso, x + largo, y, x + largo * 0.35f, y + grosso}, cor);
             }
             return;
         }
-        float raioX = VW * 0.30f, raioY = VH * 0.30f;
+        int preto = Tinta.withAlpha(INK, (int)(215f * k));
+        float cx = VW * 0.5f, cy = VH * 0.47f;
+        float raioX = VW * 0.33f, raioY = VH * 0.33f;
         float longe = (float)Math.hypot(VW, VH);
-        for (int i = 0; i < 90; i++) {
-            double ang = Math.PI * 2 * (i + r.nextFloat() * 0.8f) / 90;
+        int quadro = (int)(time * 15f);
+        for (int i = 0; i < LINHAS_CONCENTRACAO; i++) {
+            Random fixo = new Random(9157L + i * 331L);
+            Random treme = new Random(quadro * 7919L + i);
+            double ang = Math.PI * 2 * (i + fixo.nextFloat() * 0.6f) / LINHAS_CONCENTRACAO + treme.nextFloat() * 0.015f;
             float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
-            // Cada linha começa num ponto da borda de uma elipse em volta do meio (variando) e vai até fora da tela.
-            float dentro = 0.85f + r.nextFloat() * 0.45f;
+            float dentro = 0.9f + fixo.nextFloat() * 0.35f + treme.nextFloat() * 0.06f;
             float x0 = cx + cos * raioX * dentro, y0 = cy + sin * raioY * dentro;
-            float base = 3f + r.nextFloat() * 9f;
+            float base = 4f + fixo.nextFloat() * 10f;
             float x1 = cx + cos * longe, y1 = cy + sin * longe;
-            // Triângulo fino: a ponta para o meio, a base larga fora da tela.
             float nx = -sin * base, ny = cos * base;
+            // Triângulo fino: a ponta para o meio, a base larga fora da tela.
             c.fillPolygon(new float[] {x0, y0, x1 + nx, y1 + ny, x1 - nx, y1 - ny}, preto);
-            if (i % 3 == 0) c.drawLine(x0 + cos * 30f, y0 + sin * 30f, x1, y1, 1.5f, branco);
         }
     }
 
