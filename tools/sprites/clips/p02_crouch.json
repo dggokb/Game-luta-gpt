@@ -21,7 +21,8 @@
     "raiz": "97,238",
     "colunas": 9,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "emendar_idle": true
   },
   "frameWidth": 192,
   "rootX": 97,

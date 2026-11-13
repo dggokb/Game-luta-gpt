@@ -8,9 +8,13 @@ prende o corpo pelo começo do vídeo (a corrida inclinada, o passo), e a guarda
 lugar.
 
 Medida (px lógicos, da raiz): o eixo do tronco (centralizar.eixo, a coluna com mais desenho) do
-último quadro contra o do 1º quadro da postura. Correção: na volta para a guarda (do fim da janela
-ativa ao último quadro) o desenho anda aos poucos até o lugar da postura, sem tranco. Só na
-horizontal: os pés continuam no chão. Mede também quanto as duas poses batem depois de alinhadas
+último quadro contra o do 1º quadro da postura, e a altura dos pés (o pixel mais baixo): o fim do
+Carrinho da Yin-lu terminava 4 px afundado no chão e subia na troca. Correção: na volta para a
+guarda (do fim da janela ativa ao último quadro) o desenho anda aos poucos até o lugar da
+postura, sem tranco.
+
+`assentar` (--assentar CROUCH CROUCH_IDLE RISE): posturas que são sempre no chão ficam com os pés
+na altura do IDLE em todos os quadros (a Yin-lu agachada flutuava 7 px). Mede também quanto as duas poses batem depois de alinhadas
 (IoU das silhuetas): pose diferente (outra base, outro braço na frente) não se resolve andando, e
 a conferência acusa para escolher quadros ou refazer o vídeo.
 
@@ -36,7 +40,8 @@ from ancorar import MARGIN, clip_path  # noqa: E402
 from centralizar import eixo  # noqa: E402
 
 LIMITE = 6          # px lógicos de diferença tolerada entre o fim do golpe e a postura
-POSE_MINIMA = 0.55  # IoU mínimo das silhuetas alinhadas (abaixo: pose diferente)
+LIMITE_PE = 2       # px de diferença tolerada na altura dos pés
+POSE_MINIMA = 0.80  # IoU mínimo das silhuetas alinhadas (abaixo: pose diferente da postura)
 EM_PE = ('L', 'M', 'H', '6M', '6H', 'DH')
 AGACHADO = ('2L', '2M', '2H')
 
@@ -75,6 +80,13 @@ def silhueta(sheet, i):
     return tela
 
 
+def pes(sheet, i):
+    """Linha do pixel mais baixo do quadro, da raiz (positivo: abaixo do chão)."""
+    f = sheet.frame(i)[..., 3] > 128
+    ys = np.nonzero(f.any(1))[0]
+    return int(ys.max()) - sheet.ry if len(ys) else None
+
+
 def iou(a, b, dx):
     b = np.roll(b, int(round(dx)), axis=1)
     u = (a | b).sum()
@@ -93,8 +105,9 @@ def medir(pack, clips, golpe):
     if e is None or er is None:
         return None
     dx = er[0] - e[0]
+    dy = pes(rsheet, ri) - pes(sheet, fim)
     pose = iou(silhueta(rsheet, ri), silhueta(sheet, fim), dx)
-    return {'golpe': gid, 'anim': anim, 'ref': ref, 'atlas': a['atlas'], 'dx': dx, 'pose': pose}
+    return {'golpe': gid, 'anim': anim, 'ref': ref, 'atlas': a['atlas'], 'dx': dx, 'dy': dy, 'pose': pose}
 
 
 def rampa(pack, anim, m, dx):
@@ -119,9 +132,10 @@ def rampa(pack, anim, m, dx):
     return por_celula
 
 
-def deslocar_folhas(atlas, clips, dxs):
-    """Desloca as células (px lógicos, na horizontal) na fonte do clipe e nas referências do mesmo
-    tamanho, alargando a célula se o desenho encostar na borda."""
+def deslocar_folhas(atlas, clips, dxs, dys=None):
+    """Desloca as células (px lógicos) na fonte do clipe e nas referências do mesmo tamanho,
+    alargando a célula se o desenho encostar na borda dos lados."""
+    dys = np.zeros(len(dxs), int) if dys is None else dys
     cfg = clips[atlas]
     sheet = A.Sheet(cfg)
     n = cfg['expectedFrames']
@@ -147,10 +161,11 @@ def deslocar_folhas(atlas, clips, dxs):
         for i in range(n):
             x, y = i % sheet.cols * sheet.pw, i // sheet.cols * sheet.ph
             cell = img.crop((x, y, x + sheet.pw, y + sheet.ph))
-            ox = d * (pad_l + int(dxs[i]))
+            ox, oy = d * (pad_l + int(dxs[i])), d * int(dys[i])
             sx0, sx1 = max(0, -ox), min(sheet.pw, w - ox)
-            if sx1 > sx0:
-                out.alpha_composite(cell.crop((sx0, 0, sx1, sheet.ph)), (i % sheet.cols * w + ox + sx0, y))
+            sy0, sy1 = max(0, -oy), min(sheet.ph, sheet.ph - oy)
+            if sx1 > sx0 and sy1 > sy0:
+                out.alpha_composite(cell.crop((sx0, sy0, sx1, sy1)), (i % sheet.cols * w + ox + sx0, y + oy + sy0))
         out.save(A.ROOT / fonte)
         A.Sheet.cache.pop(fonte, None)
     path = clip_path(atlas)
@@ -184,18 +199,43 @@ def emendar(cid, atlas=None, so=None, limite=LIMITE, write=True):
         if r is None or (atlas and r['atlas'] != atlas):
             continue
         feitos.append(r)
-        if not write or abs(r['dx']) <= limite:
+        if not write or (abs(r['dx']) <= limite and abs(r['dy']) <= LIMITE_PE):
             continue
         if usos[r['atlas']] > 1:
             r['aviso'] = 'folha usada por outra animação: não mexi'
             continue
         cfg = clips[r['atlas']]
-        dxs = np.zeros(cfg['expectedFrames'])
+        dxs, dys = np.zeros(cfg['expectedFrames']), np.zeros(cfg['expectedFrames'])
         for c, v in rampa(pack, g[1], g[3], r['dx']).items():
             dxs[c] = v
-        deslocar_folhas(r['atlas'], clips, np.round(dxs).astype(int))
+        for c, v in rampa(pack, g[1], g[3], r['dy']).items():
+            dys[c] = v
+        deslocar_folhas(r['atlas'], clips, np.round(dxs).astype(int), np.round(dys).astype(int))
         r['feito'] = True
     return feitos
+
+
+def assentar(cid, estados, write=True):
+    """Posturas sempre no chão (agachar, agachado parado, levantar): cada quadro com os pés na
+    altura dos pés do 1º quadro do IDLE. Devolve {estado: [dy por quadro]}."""
+    pack, clips = A.load_pack(cid)
+    ra = pack['animations']['IDLE']
+    alvo = pes(A.Sheet(clips[ra['atlas']]), ra['frames'][0])
+    out = {}
+    for estado in estados:
+        a = pack['animations'][estado]
+        cfg = clips[a['atlas']]
+        sheet = A.Sheet(cfg)
+        dys = np.zeros(cfg['expectedFrames'], int)
+        for i in sorted(set(a['frames'])):
+            p = pes(sheet, i)
+            if p is not None:
+                dys[i] = alvo - p
+        out[estado] = list(dys)
+        if write and np.abs(dys).max() > 0:
+            deslocar_folhas(a['atlas'], clips, np.zeros(len(dys), int), dys)
+            clips = A.load_pack(cid)[1]
+    return out
 
 
 def main():
@@ -204,7 +244,13 @@ def main():
     p.add_argument('--golpes', nargs='*', help='só estes golpes (L, DH, S2...)')
     p.add_argument('--limite', type=float, default=LIMITE)
     p.add_argument('--write', action='store_true')
+    p.add_argument('--assentar', nargs='*', help='posturas sempre no chão: os pés na altura do IDLE em todo quadro')
     a = p.parse_args()
+    if a.assentar:
+        for cid in a.personagens:
+            for estado, dys in assentar(cid, a.assentar, write=a.write).items():
+                print(f'{cid} {estado}: dy ' + ' '.join(f'{v:+d}' for v in dys))
+        return
     ids = a.personagens or sorted(x.parent.name for x in (A.ROOT / 'characters').glob('*/character.json'))
     ruins = 0
     for cid in ids:
@@ -214,11 +260,11 @@ def main():
             print(f'{cid}: sem folhas ({e})')
             continue
         for r in rs:
-            fora = abs(r['dx']) > a.limite
+            fora = abs(r['dx']) > a.limite or abs(r['dy']) > LIMITE_PE
             pose = r['pose'] < POSE_MINIMA
             ruins += fora or pose
             marca = ('corrigido' if r.get('feito') else 'FORA') if fora else 'ok'
-            print(f"{cid:12s} {r['golpe']:5s} {r['anim']:22s} → {r['ref']:11s} dx {r['dx']:+6.1f}  pose {r['pose']:.2f}"
+            print(f"{cid:12s} {r['golpe']:5s} {r['anim']:22s} → {r['ref']:11s} dx {r['dx']:+6.1f} dy {r['dy']:+3d}  pose {r['pose']:.2f}"
                   f"  {marca}{'  POSE DIFERENTE' if pose else ''}{'  ' + r['aviso'] if r.get('aviso') else ''}")
     if not a.write:
         print(f'{ruins} golpe(s) fora da regra')

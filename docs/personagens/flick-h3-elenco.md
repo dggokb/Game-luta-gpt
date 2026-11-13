@@ -33,10 +33,22 @@ sair fora do lugar (a Ombrada do Ryūga terminava 61 px à frente do idle).
   do vídeo, e a reconversão repete. Depois: caixas por quadro, `normal_map.py --refazer` das
   folhas mexidas e `build_characters.py --write`.
 - **Conferência:** `tools/sprites/tests/test_emenda_idle.py` (roda no build do APK) falha se um golpe
-  terminar a mais de 6 px do idle. Os antigos que ainda estão fora ficam em
+  terminar a mais de 6 px do idle, com os pés a mais de 2 px ou noutra pose. Os antigos que ainda estão fora ficam em
   `tools/sprites/emenda_idle_excecoes.json` até serem corrigidos (62 em 13/11, todos da arte antiga).
-- **Pose diferente** (outra base, outro braço na frente no fim do vídeo) não se resolve andando: a
-  ferramenta mostra "POSE DIFERENTE" e aí é escolher quadros ou refazer o vídeo.
+- **Pés no chão:** a emenda também acerta a altura dos pés (o Carrinho da Yin-lu terminava 4 px
+  afundado e subia na troca); `emendar_idle.py <id> --assentar CROUCH CROUCH_IDLE RISE --write`
+  põe no chão as posturas que nunca saem dele (a Yin-lu agachada flutuava 7 px).
+- **A mesma pose:** o último quadro do golpe tem de ser **a guarda do idle**, não só estar no lugar
+  dela (a conferência pede 80% das silhuetas batendo). Duas coisas garantem isso:
+  1. **o idle começa na imagem inicial** (a guarda da `inicio_centro_h3`): o loop do idle sai de
+     um trecho do vídeo que começa e termina nela. O da Yin-lu saía do meio da respiração (58-94) e
+     nenhum golpe batia com ele; agora é 40-74 (o 40 bate 97% com a imagem inicial);
+  2. **na montagem, o último quadro escolhido é o do vídeo que mais parece o idle**: os vídeos H3
+     voltam à imagem inicial no fim, mas a montagem costumava parar antes (o → + M da Yin-lu parava
+     no quadro 93, e a guarda estava no 123). Troque os últimos quadros, mantendo a quantidade e o
+     tempo feito à mão.
+- **Pose diferente que sobra** (vídeo que não volta à guarda) aparece como "POSE DIFERENTE": escolher
+  quadros ou refazer o vídeo.
 
 ## Configuração
 

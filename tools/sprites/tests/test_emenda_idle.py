@@ -1,6 +1,7 @@
 """Regra do dono (13/11): todo golpe de chão termina no lugar da postura parada (IDLE ou
 CROUCH_IDLE), sem pulo na troca. Golpe novo fora da regra falha aqui; os antigos que ainda
-estão fora ficam em tools/sprites/emenda_idle_excecoes.json até serem corrigidos."""
+estão fora ficam em tools/sprites/emenda_idle_excecoes.json até serem corrigidos. Além do lugar
+(tronco e pés), a pose do último quadro tem de bater com a da postura (80% das silhuetas)."""
 import json
 import sys
 import unittest
@@ -19,7 +20,8 @@ except ImportError:
 class EmendaNoIdleTest(unittest.TestCase):
     def test_todo_golpe_termina_no_lugar_da_postura(self):
         excecoes = json.loads((ROOT / 'tools/sprites/emenda_idle_excecoes.json').read_text(encoding='utf-8'))
-        fora, ja_certos = [], []
+        fora, ja_certos, pose_ruim, pose_ja_certa = [], [], [], []
+        poses = excecoes.get('pose', {})
         for path in sorted((ROOT / 'characters').glob('*/character.json')):
             cid = path.parent.name
             try:
@@ -28,13 +30,20 @@ class EmendaNoIdleTest(unittest.TestCase):
                 continue   # pacote sem folhas de vídeo (player_two)
             lista = set(excecoes.get(cid, []))
             for r in medidas:
-                ruim = abs(r['dx']) > emendar_idle.LIMITE
+                ruim = abs(r['dx']) > emendar_idle.LIMITE or abs(r['dy']) > emendar_idle.LIMITE_PE
                 if ruim and r['golpe'] not in lista:
-                    fora.append(f"{cid} {r['golpe']} ({r['anim']}): {r['dx']:+.0f} px da postura")
+                    fora.append(f"{cid} {r['golpe']} ({r['anim']}): {r['dx']:+.0f} px da postura, pés {r['dy']:+d}")
                 if not ruim and r['golpe'] in lista:
                     ja_certos.append(f"{cid} {r['golpe']}")
+                diferente = r['pose'] < emendar_idle.POSE_MINIMA
+                if diferente and r['golpe'] not in poses.get(cid, []):
+                    pose_ruim.append(f"{cid} {r['golpe']} ({r['anim']}): só {r['pose']:.0%} da pose bate com a postura")
+                if not diferente and r['golpe'] in poses.get(cid, []):
+                    pose_ja_certa.append(f"{cid} {r['golpe']}")
         self.assertEqual([], fora, 'golpe novo sem emendar no idle: rode emendar_idle.py <id> --write')
         self.assertEqual([], ja_certos, 'já emendam: tire de emenda_idle_excecoes.json')
+        self.assertEqual([], pose_ruim, 'o golpe termina noutra pose: escolha quadros que voltam à guarda')
+        self.assertEqual([], pose_ja_certa, 'a pose já bate: tire de "pose" em emenda_idle_excecoes.json')
 
 
 if __name__ == '__main__':

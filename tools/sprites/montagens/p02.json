@@ -40,7 +40,7 @@
     }
   },
   "idle": {
-    "_doc": "Idle (12/11, vídeo H3 do dono): uma respirada (58-94; o 95 volta ao 58), em loop: o segundo idle entra a cada 3 voltas.",
+    "_doc": "Idle (12/11, vídeo H3 do dono): uma respirada em loop, do 40 ao 74 (o 76 volta ao 40). Começa na guarda da imagem inicial (o 40 bate 97% com a inicio_centro_h3), a mesma em que os golpes terminam: a troca do golpe para o idle fica sem pulo de pose (13/11; antes era 58-94, que começava no meio da respiração). O segundo idle entra a cada 3 voltas.",
     "trechos": [
       [
         "idle",
@@ -48,7 +48,7 @@
         124
       ]
     ],
-    "quadros": "58-94/2",
+    "quadros": "40-74/2",
     "opcoes": {
       "fixar": "video"
     },
@@ -272,7 +272,7 @@
     }
   },
   "light_jab": {
-    "_doc": "L (12/11): palma da mão da frente; estica no 31, segura até o 61 (fica de fora) e volta à guarda (61-73).",
+    "_doc": "L (12/11): palma da mão da frente; estica no 31, segura até o 61 (fica de fora) e volta à guarda (61-73). O fim vai até a guarda do idle (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do idle).",
     "trechos": [
       [
         "L",
@@ -280,7 +280,7 @@
         124
       ]
     ],
-    "quadros": "22,25,27,28,29,31,34,61,63,65,67,70,73",
+    "quadros": "22,25,27,28,29,31,34,61,63,65,70,79,86",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -292,7 +292,7 @@
     }
   },
   "medium_kick": {
-    "_doc": "M (12/11): golpe de mão aberta na horizontal; estica no 37 (o arco branco do vídeo sai), segura até o 76 e volta (79-88).",
+    "_doc": "M (12/11): golpe de mão aberta na horizontal; estica no 37 (o arco branco do vídeo sai), segura até o 76 e volta (79-88). O fim vai até a guarda do idle (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do idle).",
     "trechos": [
       [
         "M",
@@ -300,7 +300,7 @@
         124
       ]
     ],
-    "quadros": "25,28,31,33,36,37,39,76,78,80,82,84,86,88",
+    "quadros": "25,28,31,33,36,37,39,76,78,80,84,88,94,100",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -312,7 +312,7 @@
     }
   },
   "heavy_straight": {
-    "_doc": "H (12/11): chute alto; sobe do 25 ao 37 (estica), segura até o 52 e recolhe (55-73). A poeira do vídeo sai.",
+    "_doc": "H (12/11): chute alto; sobe do 25 ao 37 (estica), segura até o 52 e recolhe (55-73). A poeira do vídeo sai. O fim vai até a guarda do idle (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do idle).",
     "trechos": [
       [
         "H",
@@ -320,7 +320,7 @@
         124
       ]
     ],
-    "quadros": "22,25,27,29,31,33,35,37,40,52,55,58,61,64,67,70,73",
+    "quadros": "22,25,27,29,31,33,35,37,40,52,55,58,61,67,76,86,97",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -332,7 +332,7 @@
     }
   },
   "golpe_alto": {
-    "_doc": "→ + M (12/11, M_BAIXO): golpe alto; ergue o braço (43-45) e aparece já embaixo, depois do golpe (52): os desenhos do meio têm o arco branco do vídeo em cima do braço e ficam de fora. Fica baixa e levanta (81-93).",
+    "_doc": "→ + M (12/11, M_BAIXO): golpe alto; ergue o braço (43-45) e aparece já embaixo, depois do golpe (52): os desenhos do meio têm o arco branco do vídeo em cima do braço e ficam de fora. Fica baixa e levanta (81-93). O fim vai até a guarda do idle (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do idle).",
     "trechos": [
       [
         "M_BAIXO",
@@ -340,7 +340,7 @@
         124
       ]
     ],
-    "quadros": "36,39,41,43,44,45,52,53,54,56,58,81,84,87,90,93",
+    "quadros": "36,39,41,43,44,45,52,53,54,56,58,87,96,105,114,123",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -352,7 +352,7 @@
     }
   },
   "joelho_garca": {
-    "_doc": "→ + H (12/11, H_FRENTE): Joelho da garça; sobe o joelho (43-46, o primeiro golpe), segura e estica o chute (64, o segundo), recolhe e volta (73-88). O tempo de cada desenho é posto à mão (os golpes nos quadros 8 e 15 do golpe).",
+    "_doc": "→ + H (12/11, H_FRENTE): Joelho da garça; sobe o joelho (43-46, o primeiro golpe), segura e estica o chute (64, o segundo), recolhe e volta (73-88). O tempo de cada desenho é posto à mão (os golpes nos quadros 8 e 15 do golpe). O fim vai até a guarda do idle (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do idle).",
     "trechos": [
       [
         "H_FRENTE",
@@ -360,7 +360,7 @@
         124
       ]
     ],
-    "quadros": "37,40,42,44,46,52,58,61,63,64,67,73,76,79,82,85,88",
+    "quadros": "37,40,42,44,46,52,58,61,63,64,67,73,82,88,100,112,123",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -456,7 +456,7 @@
     }
   },
   "crouch_light": {
-    "_doc": "2L (13/11): agachada, soco baixo; os desenhos com o clarão e os riscos do vídeo (14-19) ficam de fora: ela aparece já esticada (20), segura e volta (26-29).",
+    "_doc": "2L (13/11): agachada, soco baixo; os desenhos com o clarão e os riscos do vídeo (14-19) ficam de fora: ela aparece já esticada (20), segura e volta (26-29). O fim vai até a guarda do agachado parado (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do agachado parado).",
     "trechos": [
       [
         "2L",
@@ -464,7 +464,7 @@
         124
       ]
     ],
-    "quadros": "11,12,13,20,22,23,25,26,27,29",
+    "quadros": "11,12,13,20,22,23,25,27,33,41",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -476,7 +476,7 @@
     }
   },
   "crouch_medium": {
-    "_doc": "2M (13/11): varrida girando baixa; a perna estica no 39, a poeira do vídeo (40-45) fica de fora, segura deitada e volta à agachada (67-76).",
+    "_doc": "2M (13/11): varrida girando baixa; a perna estica no 39, a poeira do vídeo (40-45) fica de fora, segura deitada e volta à agachada (67-76). O fim vai até a guarda do agachado parado (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do agachado parado).",
     "trechos": [
       [
         "2M",
@@ -484,7 +484,7 @@
         124
       ]
     ],
-    "quadros": "25,28,31,33,35,37,39,46,55,61,67,70,73,76",
+    "quadros": "25,28,31,33,35,37,39,46,55,61,70,79,92,104",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -536,7 +536,7 @@
     }
   },
   "carrinho_garca": {
-    "_doc": "Golpe de corrida (13/11, corre + H): Carrinho da garça, do vídeo dash_golpe do dono (H3, 124 quadros, início na corrida e fim na guarda). Da corrida (2-6) senta no chão (8-16), estica a perna rente ao chão (18-26, segura 32-58), recolhe e levanta (64-80) e volta à guarda (84-90). Quem desliza é o motor (avanço do golpe): o trecho é fixo; a poeira do vídeo sai.",
+    "_doc": "Golpe de corrida (13/11, corre + H): Carrinho da garça, do vídeo dash_golpe do dono (H3, 124 quadros, início na corrida e fim na guarda). Da corrida (2-6) senta no chão (8-16), estica a perna rente ao chão (18-26, segura 32-58), recolhe e levanta (64-80) e volta à guarda (84-90). Quem desliza é o motor (avanço do golpe): o trecho é fixo; a poeira do vídeo sai. O fim vai até a guarda do idle (13/11, regra do dono: o último desenho é o quadro do vídeo mais parecido com o 1º do idle).",
     "trechos": [
       [
         "golpe_corrida",
@@ -545,7 +545,7 @@
         "fixo"
       ]
     ],
-    "quadros": "2,4,6,8,12,16,18,20,22,26,32,44,58,64,68,70,72,74,76,80,84,90",
+    "quadros": "2,4,6,8,12,16,18,20,22,26,32,44,58,64,68,70,72,74,76,84,99,123",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true

@@ -1,6 +1,6 @@
 {
  "clipe": "p02_idle",
- "quadros": 19,
+ "quadros": 18,
  "colunas": 11,
  "celula": [
   192,
@@ -14,9 +14,9 @@
  "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
  "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
  "fonte": "art/sprites/source/p02_idle_video_normalized.png",
- "fonte_sha256": "2ba075a1085cd6c7eb1d1822d0955596a7e6bbb8498fa687ef9734dced42d184",
+ "fonte_sha256": "61225d9937143ee007b0d36d2682f41c4793ab01f79fec026cf2f478c0332d4b",
  "saida": "art/sprites/source/p02_idle_video_normalized_sr_hd.png",
- "saida_sha256": "60a997001e6c93a17895ce32f9bafbc25813eddd6317fa830a164738bbe2d95e",
+ "saida_sha256": "949e3dcc926bba6f4a9489ce038b17aaaab5636cb2cd7d41c1b62e34c8111032",
  "alfa": "idêntico à fonte (conferido byte a byte)",
  "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
 }

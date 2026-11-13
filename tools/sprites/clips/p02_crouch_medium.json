@@ -16,7 +16,7 @@
     "personagem": "p02",
     "escala": 0.4173,
     "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
-    "quadros": "25,28,31,33,35,37,39,46,55,61,67,70,73,76",
+    "quadros": "25,28,31,33,35,37,39,46,55,61,70,79,92,104",
     "celula": 224,
     "largura": 416,
     "raiz": "183,190",
@@ -30,10 +30,6 @@
   "rootX": 183,
   "rootY": 190,
   "frameHeight": 224,
-  "sourceReferences": [
-    "art/sprites/source/p02_crouch_medium_video_normalized_smear.png",
-    "art/sprites/source/p02_crouch_medium_video_normalized.png"
-  ],
   "smear": {
     "fonte": "art/sprites/source/p02_crouch_medium_video_normalized.png",
     "quadros": [
@@ -50,5 +46,9 @@
       1.0,
       0.5
     ]
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p02_crouch_medium_video_normalized_smear.png",
+    "art/sprites/source/p02_crouch_medium_video_normalized.png"
+  ]
 }

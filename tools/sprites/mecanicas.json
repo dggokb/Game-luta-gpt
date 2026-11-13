@@ -700,8 +700,8 @@
         "knockback": 30,
         "pushbackOnHit": 0,
         "pushbackOnBlock": 50,
-        "hitHeight": 28,
-        "hitFloor": 3,
+        "hitHeight": 36,
+        "hitFloor": 12,
         "golpes": [
           10,
           15
