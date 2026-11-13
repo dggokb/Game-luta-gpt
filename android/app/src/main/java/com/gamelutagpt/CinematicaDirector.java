@@ -377,7 +377,9 @@ final class CinematicaDirector {
                 if (!atk.grounded) {
                     t.noAr = true;
                     in[a].direction = DemoDirector.Ctx.forward(atk);
-                    if (!t.bateuNoAr && (atk.vy > 0f || vao < 70f)) {
+                    // Desce o golpe já perto (descendo e a menos de 130 px, ou colado): de longe ele
+                    // passava no vazio e o roteiro seguia sem o contato.
+                    if (!t.bateuNoAr && ((atk.vy > 0f && vao < 130f) || vao < 70f)) {
                         t.golpeEm = t.frame;
                         CinematicaDirector.apertar(t.proximo("H"), in[a]);
                         t.bateuNoAr = true;
