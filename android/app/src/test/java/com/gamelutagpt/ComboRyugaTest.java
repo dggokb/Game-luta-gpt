@@ -63,6 +63,23 @@ public class ComboRyugaTest {
         assertEquals("quicou na parede", 1, x.parede);
     }
 
+    @Test public void chuteGiratorioPegaTodoMundoEmPe() {
+        // 13/11 (o dono): o giro passava por cima da Yin-lu. Os chutes desceram (desenho 28 px mais
+        // baixo, sem o voo de 30 px, caixa de 140 a 210 px): pega em pé até o mais baixo do elenco.
+        for (String alvo : new String[] {"p02", "p05", "p06", "p12", "p13", "koga_8", "ryuga_8"}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(RYUGA), GeneratedCharacters.get(alvo), 600f, 720f);
+            CombatFighter me = s.f(0);
+            me.commandButton = "M";
+            me.buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+            int acertos = 0;
+            for (int i = 0; i < 110; i++) {
+                s.step();
+                for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && !h.blocked) acertos++;
+            }
+            assertEquals("os 4 chutes em " + alvo, 4, acertos);
+        }
+    }
+
     @Test public void puniçãoNaVoltaDaParede() {
         // O H joga na parede: correndo atrás, o S2, o lançador com o combo no ar, ou o Super.
         BateriaCombos.Exec s2 = ryuga("L M H C160 S2");
