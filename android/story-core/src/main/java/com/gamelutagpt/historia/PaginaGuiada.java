@@ -311,7 +311,23 @@ final class PaginaGuiada {
         float cy = sy((b.caixa[1] + b.caixa[3]) * 0.5f * pageH);
         float y = cy - lines.size() * lineH * k * 0.5f + size * k * 0.86f;
         for (String line : lines) {
-            c.drawText(line, cx, y, size * k, Baloes.INK, 0, 0f, false);
+            int at = b.destaque != null ? line.indexOf(b.destaque) : -1;
+            if (at < 0) {
+                c.drawText(line, cx, y, size * k, Baloes.INK, 0, 0f, false);
+            } else {
+                // A linha em três pedaços (antes, o destaque, depois), centrada como se fosse uma só.
+                String[] partes = {line.substring(0, at), b.destaque, line.substring(at + b.destaque.length())};
+                float[] largura = new float[3];
+                float total = 0f;
+                for (int p = 0; p < 3; p++) total += largura[p] = c.measureText(partes[p], size * k, false);
+                float x = cx - total * 0.5f;
+                for (int p = 0; p < 3; p++) {
+                    if (!partes[p].isEmpty()) {
+                        c.drawText(partes[p], x + largura[p] * 0.5f, y, size * k, p == 1 ? b.corDestaque : Baloes.INK, 0, 0f, false);
+                    }
+                    x += largura[p];
+                }
+            }
             y += lineH * k;
         }
     }
