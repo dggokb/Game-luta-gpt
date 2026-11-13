@@ -73,7 +73,8 @@ história: o Arcade não tem.
 |---|---|---|
 | p09 + p10 (Lars e Fenna, bombeiros) | 01–06: a escola em chamas, as 15 crianças, a explosão, o luto, o convite do mensageiro | páginas 1–3, troca e 2 QTE, páginas 4–6, mais 2 QTE e o golpe final. Fala quem estiver em campo |
 | p11 + p12 (Dr. Edmund Blackwood e Necro) | 01–06: o médico admirado, os pacientes perdidos, a loucura, a demissão, o convite, o Necro | igual. Fala sempre o Blackwood (também com o Necro em campo) |
-| p05, p07, p13, p15 | ainda sem páginas | a luta segue normal |
+| p07 + p08 (Vittorio Moretti e Francesca) | 01–07: o Vittorio perde a "entidade" para a facção de Tokyo, a caixa de Pandora, a Francesca infiltrada pela associação, a aposta, a dupla formada | páginas 1–3, troca e 2 QTE, páginas 4–7, mais 2 QTE e o golpe final. Fala quem estiver em campo |
+| p05, p13, p15 | ainda sem páginas | a luta segue normal |
 
 O texto da arte da P11 dizia "P11 era um médico..." (marcador): no balão foi o nome dele, Edmund
 Blackwood. As falas da luta e os golpes dos QTE são provisórios, para o dono polir.
