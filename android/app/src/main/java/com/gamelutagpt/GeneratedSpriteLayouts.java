@@ -208,11 +208,11 @@ final class GeneratedSpriteLayouts {
     static final int P02_CROUCH_ROOT_Y = 207;
     static final int P02_CROUCH_FRAME_COUNT = 9;
 
-    static final int P02_CROUCH_HEAVY_FRAME_WIDTH = 389;
-    static final int P02_CROUCH_HEAVY_FRAME_HEIGHT = 601;
-    static final int P02_CROUCH_HEAVY_ROOT_X = 225;
-    static final int P02_CROUCH_HEAVY_ROOT_Y = 585;
-    static final int P02_CROUCH_HEAVY_FRAME_COUNT = 12;
+    static final int P02_CROUCH_HEAVY_FRAME_WIDTH = 164;
+    static final int P02_CROUCH_HEAVY_FRAME_HEIGHT = 326;
+    static final int P02_CROUCH_HEAVY_ROOT_X = 84;
+    static final int P02_CROUCH_HEAVY_ROOT_Y = 306;
+    static final int P02_CROUCH_HEAVY_FRAME_COUNT = 15;
 
     static final int P02_CROUCH_IDLE_FRAME_WIDTH = 165;
     static final int P02_CROUCH_IDLE_FRAME_HEIGHT = 173;
@@ -220,17 +220,17 @@ final class GeneratedSpriteLayouts {
     static final int P02_CROUCH_IDLE_ROOT_Y = 168;
     static final int P02_CROUCH_IDLE_FRAME_COUNT = 26;
 
-    static final int P02_CROUCH_LIGHT_FRAME_WIDTH = 401;
-    static final int P02_CROUCH_LIGHT_FRAME_HEIGHT = 313;
-    static final int P02_CROUCH_LIGHT_ROOT_X = 194;
-    static final int P02_CROUCH_LIGHT_ROOT_Y = 299;
-    static final int P02_CROUCH_LIGHT_FRAME_COUNT = 11;
+    static final int P02_CROUCH_LIGHT_FRAME_WIDTH = 238;
+    static final int P02_CROUCH_LIGHT_FRAME_HEIGHT = 177;
+    static final int P02_CROUCH_LIGHT_ROOT_X = 91;
+    static final int P02_CROUCH_LIGHT_ROOT_Y = 166;
+    static final int P02_CROUCH_LIGHT_FRAME_COUNT = 10;
 
-    static final int P02_CROUCH_MEDIUM_FRAME_WIDTH = 640;
-    static final int P02_CROUCH_MEDIUM_FRAME_HEIGHT = 410;
-    static final int P02_CROUCH_MEDIUM_ROOT_X = 370;
-    static final int P02_CROUCH_MEDIUM_ROOT_Y = 367;
-    static final int P02_CROUCH_MEDIUM_FRAME_COUNT = 16;
+    static final int P02_CROUCH_MEDIUM_FRAME_WIDTH = 380;
+    static final int P02_CROUCH_MEDIUM_FRAME_HEIGHT = 185;
+    static final int P02_CROUCH_MEDIUM_ROOT_X = 165;
+    static final int P02_CROUCH_MEDIUM_ROOT_Y = 157;
+    static final int P02_CROUCH_MEDIUM_FRAME_COUNT = 14;
 
     static final int P02_DASH_FRAME_WIDTH = 280;
     static final int P02_DASH_FRAME_HEIGHT = 171;
@@ -394,11 +394,11 @@ final class GeneratedSpriteLayouts {
     static final int P02_RISE_ROOT_Y = 207;
     static final int P02_RISE_FRAME_COUNT = 12;
 
-    static final int P02_SPECIAL_ENERGY_FRAME_WIDTH = 474;
-    static final int P02_SPECIAL_ENERGY_FRAME_HEIGHT = 490;
-    static final int P02_SPECIAL_ENERGY_ROOT_X = 239;
-    static final int P02_SPECIAL_ENERGY_ROOT_Y = 475;
-    static final int P02_SPECIAL_ENERGY_FRAME_COUNT = 11;
+    static final int P02_SPECIAL_ENERGY_FRAME_WIDTH = 219;
+    static final int P02_SPECIAL_ENERGY_FRAME_HEIGHT = 219;
+    static final int P02_SPECIAL_ENERGY_ROOT_X = 96;
+    static final int P02_SPECIAL_ENERGY_ROOT_Y = 208;
+    static final int P02_SPECIAL_ENERGY_FRAME_COUNT = 15;
 
     static final int P02_SPECIAL_S2_FRAME_WIDTH = 362;
     static final int P02_SPECIAL_S2_FRAME_HEIGHT = 623;

@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_crouch_medium",
+ "quadros": 14,
+ "colunas": 11,
+ "celula": [
+  416,
+  224
+ ],
+ "raiz": [
+  183,
+  190
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_crouch_medium_video_normalized.png",
+ "fonte_sha256": "0f2f061a74ec3b88849653fa14f5e15dfd536136e16f1c6f29674614134ff975",
+ "saida": "art/sprites/source/p02_crouch_medium_video_normalized_sr_hd.png",
+ "saida_sha256": "123e284b47c41bd1b3e68d51934e4206e088d8f6084c7157915c2db64044ad9d",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}
