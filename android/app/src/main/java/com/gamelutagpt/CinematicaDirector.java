@@ -22,6 +22,8 @@ final class CinematicaDirector {
     static final float ALCANCE = 30f;
     /** Golpe do QTE: o tempo máximo para chegar perto e bater. */
     static final float GOLPE_SEGUNDOS = 5f;
+    /** Salto da troca: pula com esse vão entre os corpos e solta o golpe descendo a menos disso. */
+    static final float SALTO_DE = 230f, SALTO_GOLPE = 130f;
 
     /** Um movimento em andamento. */
     private static final class Ordem {
@@ -294,7 +296,7 @@ final class CinematicaDirector {
                     t.lance = Lance.BLOQUEIO;
                 }
                 t.alvoVao = t.lance == Lance.VENTO ? 45f + t.sorteio.nextInt(35)
-                    : t.lance == Lance.SALTO ? 230f : t.lance == Lance.CHOQUE ? 60f : ALCANCE;
+                    : t.lance == Lance.SALTO ? SALTO_DE : t.lance == Lance.CHOQUE ? 60f : ALCANCE;
                 t.vaoAntes = Float.MAX_VALUE;
                 t.golpes = t.lance == Lance.ESQUIVA ? 1 : t.botoes != null ? t.botoes.length : 1 + t.sorteio.nextInt(3);
                 t.proximoGolpe = 0;
@@ -379,7 +381,7 @@ final class CinematicaDirector {
                     in[a].direction = DemoDirector.Ctx.forward(atk);
                     // Desce o golpe já perto (descendo e a menos de 130 px, ou colado): de longe ele
                     // passava no vazio e o roteiro seguia sem o contato.
-                    if (!t.bateuNoAr && ((atk.vy > 0f && vao < 130f) || vao < 70f)) {
+                    if (!t.bateuNoAr && ((atk.vy > 0f && vao < SALTO_GOLPE) || vao < 60f)) {
                         t.golpeEm = t.frame;
                         CinematicaDirector.apertar(t.proximo("H"), in[a]);
                         t.bateuNoAr = true;
