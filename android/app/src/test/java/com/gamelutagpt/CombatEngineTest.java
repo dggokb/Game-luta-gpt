@@ -664,14 +664,18 @@ public class CombatEngineTest {
         float forwardBefore = p15.fighter.walkSpeed, backBefore = p15.fighter.walkBackSpeed;
         p15.fighter.withWalk(90f, 70f);
         try {
-            Sim forward = new Sim(p15, NPC, 500f, 1500f);
+            // Com o pé de apoio cravado no chão (AtritoDoPeTest) o corpo anda aos passos: a
+            // velocidade vale na média, com a folga de meio passo do desenho.
+            float passo = Math.abs(p15.animation(SpriteStates.WALK_FORWARD).passo) * 0.5f + 0.5f;
+            float passoAtras = Math.abs(p15.animation(SpriteStates.WALK_BACK).passo) * 0.5f + 0.5f;
+            Sim forward = new Sim(p15, NPC, 300f, 1700f);
             forward.in[0].direction = 1;
-            forward.steps(30);
-            assertEquals(90f * 30 * CombatConfig.DT, forward.f(0).x - 500f, 0.5f);
+            forward.steps(300);
+            assertEquals(90f * 300 * CombatConfig.DT, forward.f(0).x - 300f, passo);
             Sim back = new Sim(p15, NPC, 1000f, 1500f);
             back.in[0].direction = 5;
-            back.steps(30);
-            assertEquals(70f * 30 * CombatConfig.DT, 1000f - back.f(0).x, 0.5f);
+            back.steps(300);
+            assertEquals(70f * 300 * CombatConfig.DT, 1000f - back.f(0).x, passoAtras);
         } finally {
             p15.fighter.withWalk(forwardBefore, backBefore);
         }

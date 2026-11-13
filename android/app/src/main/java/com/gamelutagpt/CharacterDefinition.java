@@ -181,6 +181,30 @@ final class CharacterDefinition {
          */
         boolean fimAgachado;
         Animation withFimAgachado() { fimAgachado=true; return this; }
+        /**
+         * Pé de apoio medido no desenho (tools/sprites/apoio.py): px do mundo que o corpo anda,
+         * para a frente (negativo: para trás), do quadro i da animação para o seguinte (o último,
+         * para o primeiro), com o pé que está no chão cravado no mundo. {@link #passo} é a volta
+         * inteira. Null sem medida: o motor anda em velocidade fixa e a arte troca pela distância.
+         */
+        float[] apoio;
+        float passo;
+        Animation withApoio(float[] avanco) {
+            if(avanco.length!=frames.length)throw new IllegalArgumentException(id+": apoio com um avanço por quadro");
+            apoio=avanco.clone();passo=0f;
+            for(float v:avanco)passo+=v;
+            return this;
+        }
+        /** Quanto o corpo anda do quadro {@code de} ao quadro {@code ate} da passada (contados sem dar a volta). */
+        float avanco(int de,int ate) {
+            float soma=0f;
+            for(int k=de;k<ate;k++)soma+=apoio[k%apoio.length];
+            return soma;
+        }
+        /** O quadro da folha na passada (em quadros da animação, contados sem dar a volta). */
+        int quadroDaPassada(float passada) {
+            return shown((int)Math.max(0f,passada)%frames.length);
+        }
         Animation withPoses(int[] chaves) {
             pose=new int[frames.length];
             int atual=0;
