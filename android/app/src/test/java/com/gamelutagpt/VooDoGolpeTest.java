@@ -74,7 +74,8 @@ public class VooDoGolpeTest {
         }
         assertTrue("fica no ar enquanto chuta", noAr > 20);
         assertEquals("anda reto: a altura não muda no meio do giro", 0f, max - min, 2f);
-        assertEquals("na altura do voo (o passo de 1/60 s perde um pouco no topo)", m.flightHeight, max, m.flightHeight * 0.2f);
+        // O passo de 1/60 s perde uns 3 a 4 px no topo (absoluto: no voo baixo de 10 px do S3, 13/11).
+        assertEquals("na altura do voo", m.flightHeight, max, Math.max(m.flightHeight * 0.2f, 4f));
         assertTrue("termina no chão", c[c.length - 1][2] == 1f);
         assertTrue("anda para a frente", c[c.length - 1][0] - c[0][0] > 200f);
     }

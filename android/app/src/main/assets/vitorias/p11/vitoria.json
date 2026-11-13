@@ -1,0 +1,20 @@
+{
+ "imagem": "p11.png",
+ "alturaTela": 1.25,
+ "quadroMs": 3600.0,
+ "segurarMs": 0,
+ "frases": [
+  "Hu hu hu... diagnóstico: derrota.",
+  "Uma cobaia excelente.",
+  "Não se preocupe. Eu sou médico."
+ ],
+ "quadros": [
+  {
+   "imagem": "q000.webp",
+   "x": 0.0,
+   "y": -706.0,
+   "largura": 594.7,
+   "altura": 900.0
+  }
+ ]
+}

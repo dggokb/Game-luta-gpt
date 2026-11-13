@@ -63,6 +63,23 @@ public class ComboRyugaTest {
         assertEquals("quicou na parede", 1, x.parede);
     }
 
+    @Test public void chuteGiratorioPegaTodoMundoEmPe() {
+        // 13/11 (o dono): o giro passava por cima da Yin-lu. Os chutes desceram (desenho 28 px mais
+        // baixo, sem o voo de 30 px, caixa de 140 a 210 px): pega em pé até o mais baixo do elenco.
+        for (String alvo : new String[] {"p02", "p05", "p06", "p12", "p13", "koga_8", "ryuga_8"}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(RYUGA), GeneratedCharacters.get(alvo), 600f, 720f);
+            CombatFighter me = s.f(0);
+            me.commandButton = "M";
+            me.buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+            int acertos = 0;
+            for (int i = 0; i < 110; i++) {
+                s.step();
+                for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && !h.blocked) acertos++;
+            }
+            assertEquals("os 4 chutes em " + alvo, 4, acertos);
+        }
+    }
+
     @Test public void puniçãoNaVoltaDaParede() {
         // O H joga na parede: correndo atrás, o S2, o lançador com o combo no ar, ou o Super.
         BateriaCombos.Exec s2 = ryuga("L M H C160 S2");
@@ -133,7 +150,7 @@ public class ComboRyugaTest {
     @Test public void aOndaDoAssistSeguraParaOParceiroRecomecar() {
         // A Yin-lu em campo chama o Ryūga: a Onda dele segura o rival em pé, ela corre e recomeça.
         String rota = "L M A W20 C140 L M M S4";
-        emenda(rota, combo(YINLU, RYUGA, rota), 8);
+        emenda(rota, combo(YINLU, RYUGA, rota), 11);   // o S4 são cinco chutes (13/11)
         CharacterDefinition.Fighter f = GeneratedCharacters.get(RYUGA).fighter;
         AttackDefinition segura = f.assistShot;
         assertNotNull("o assist do Ryūga tem a Onda que segura", segura);
@@ -142,7 +159,7 @@ public class ComboRyugaTest {
         f.assistShot = null;
         try {
             BateriaCombos.Exec sem = combo(YINLU, RYUGA, rota);
-            assertTrue("sem segurar, a corrente nova não emenda: " + sem.acertos, !sem.valida || sem.acertos < 8);
+            assertTrue("sem segurar, a corrente nova não emenda: " + sem.acertos, !sem.valida || sem.acertos < 11);
         } finally {
             f.assistShot = segura;
         }

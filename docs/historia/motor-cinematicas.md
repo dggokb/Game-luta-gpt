@@ -109,6 +109,7 @@ juntas). O treino do Episódio 1, pronto, é `historia/ep01/cinematica_treino.js
 | `gatilho` | Quando a cena começa |
 |---|---|
 | `{"vida": 0.25}` | o lutador da vez de qualquer lado chega a 25% da vida. `"lado": "jogador"` ou `"rival"` olha só um lado. Enquanto espera, o lado que o gatilho olha não cai (os dois, sem `lado`); o outro pode perder normalmente |
+| `{"vida": 0.25, "lado": "rival", "ultimo": true}` | igual, mas só para o **último de pé** do lado: no 2x2, o titular cai normalmente e a cena espera o parceiro entrar e chegar a 25%. É o gatilho das histórias das duplas do torneio ([torneio.md](torneio.md#a-história-da-dupla-adversária)) |
 | `"inicio"` | logo depois do "LUTEM!" (a intro e o READY/GO tocam normalmente) |
 | `{"tempo": 20}` | 20 segundos de luta depois do "LUTEM!" |
 | `"ko"` | a luta acabou (KO): a cena toca antes do resultado, e o resultado espera ela |
@@ -165,6 +166,9 @@ Usam os quadros laterais da conversa, com a mesma legenda digitada, os mesmos ro
 mesmas expressões (`historia/retratos/<quem>_<expressao>.png`). A luta não precisa ter arquivo
 de conversa.
 
+- **Quem está em campo**: `"quem": "rival"` (ou `"jogador"`) fala por quem estiver lutando
+  desse lado na hora, com o rosto da seleção. Serve para a dupla em que qualquer um dos dois
+  pode ser o último de pé (Lars ou Fenna).
 - **Lado**: os irmãos (`ryuga`, `koga`) não dizem o lado: cada um fala no quadro do **lado da
   tela onde o lutador do time dele está** na hora da fala (se os dois trocaram de lado na luta,
   os quadros trocam junto), nas duas campanhas. Qualquer outro personagem diz o lado:
@@ -197,6 +201,13 @@ escada: "DING" em cima, "DONG!" embaixo à direita), treme forte no começo e so
 
 Cada vez da troca é um **lance**. `"lances": ["choque", "salto"]` diz os primeiros, em ordem; o
 resto é sorteado. A vez quase sempre passa para o outro (nunca três seguidas do mesmo).
+
+Para coreografar, o lance diz também **quem ataca** e **os golpes**, em ordem:
+`"bloqueio:rival:L,H"` (a Yin-lu solta o fraco e o forte e o outro defende), `"esquiva:rival:2H"`
+(a rasteira, e o outro pula para trás), `"salto:jogador:H"` (ele pula e desce com o forte; o que
+sobrar da lista é o combo no chão). Os golpes são os do QTE (`L`, `M`, `H`, `2L`..., `S2`...).
+O lance `"fim"` encerra a troca ali, sem sortear mais nada: `["vento:rival:L", "bloqueio:rival:H", "fim"]`
+é exatamente um soco que passa no vento e um chute defendido.
 
 | Lance | O que acontece |
 |---|---|
@@ -247,7 +258,7 @@ mesmo QTE pede de novo. O HUD fica na tela (sem faixas), então a barra de vida 
 |---|---|---|
 | `texto` | — | o nome do golpe em cima do botão ("SOCO!"); precisa de tradução |
 | `quem` | `jogador` | quem bate no acerto (`jogador`, `rival`, `ryuga`, `koga`); no erro bate o outro |
-| `golpe` | `H` | o botão do golpe: `L`, `M`, `H`, agachado (`2L`, `2M`, `2H`) ou um especial (`S` = a energia, `S2`, `S3`...) |
+| `golpe` | `H` | o botão do golpe: `L`, `M`, `H`, agachado (`2L`, `2M`, `2H`), `A` (o agarrão) ou um especial (`S` = a energia, `S2`, `S3`...) |
 | `dano` | 0,15 | quanto da vida **máxima** do alvo o golpe tira (no lugar do dano do golpe; nunca o último ponto) |
 | `final` | false | o golpe derruba de vez: o alvo cai (KO) com a vida que tiver |
 | `erro` | nenhum | `{"golpe": "M", "dano": 0.05}`: o contra-ataque de quem errou. Sem ele, o erro só pede de novo |
@@ -345,22 +356,24 @@ Yin-lu, no dojo dela):
 
 1. A Yin-lu já perdeu **80%** da vida, ficando com **20%** (`{"vida": 0.20, "lado": "rival"}`): o
    controle trava, o golpe termina em câmera lenta e a **tinta branca** cobre a tela.
-2. As **duas páginas da lembrança** (Ryūga, Kōga e Yin-lu crianças no dojo: os irmãos querem
-   brincar, a Yin-lu manda treinar, eles fogem e ela corre atrás) são lidas quadro a quadro, no
-   toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
+2. As **duas páginas da lembrança** (Ryūga, Kōga e Yin-lu crianças no dojo) são lidas quadro a
+   quadro, no toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
 3. A tinta pinta de novo por cima da segunda página, os dois recuam atrás dela e a tinta sai: a luta volta.
-4. O **final coreografado**, com falas nos quadros laterais e um impacto em cada acerto:
+4. A **coreografia do dono (13/11)**, em quatro sequências, só com os movimentos que os dois já têm
+   (o que não existe foi adaptado). Os QTE não batem por conta própria (`"golpe": "nenhum"`): o
+   acerto libera a troca de golpes do roteiro, com quem ataca e os golpes em ordem.
 
-| Momento | O que acontece | Golpe do Ryūga | Vida da Yin-lu |
-|---|---|---|---|
-| A lembrança | faixas e closes: "Você fugia de todo treino, lembra?" / "Hoje eu vim treinar de verdade!" | — | 20% |
-| CHOQUE! (toque) | trocam golpes defendidos, pulam para trás e correm um para o outro; o QTE pede em câmera lenta; PAH! | M | −5% |
-| REVIDA! (deslizar para frente) | trocam golpes enquanto ela provoca ("Rápido... mas previsível!"); ela quebra a troca com o chute rodopiante (golpe do roteiro, VUSH!); ele revida, TCHAAK! | S4 (chute giratório) | −5% |
-| SEQUÊNCIA! (martelar 10) | trocam golpes ("Você melhorou... mas eu também!"); a câmera perto dele; DOOM DOOM! | H | −5% |
-| GOLPE FINAL! (tempo) | trocam golpes durante "Ainda... não acabou!" / "Acabou sim, Yin-lu!"; pulam para trás, faixas, câmera lenta; KRAAAK! e a luta congela | S2 (punho ascendente) | KO |
-| Depois | "Treinei muito... igual você mandou." | — | — |
+| Sequência | O que acontece | QTE |
+|---|---|---|
+| 1. Retomada | ela avança: "Vamos ver o quanto você melhorou!"; o soco dela passa no vento, o chute ele defende; a rasteira ele pula, desce com o chute e ela defende; DOOOM! | ESQUIVA! (deslizar para cima) |
+| 2. Alta velocidade | troca de golpes com a câmera alternando nele, nela e no meio (inclui um choque punho contra punho); o soco baixo, o gancho e o chute giratório (S3) dele ela defende, mas o chute a empurra e ela recua deslizando: "Nada mal!"; ele corre para cima | COMBO! (martelar 8) |
+| 3. A superioridade dela | SHUN!: ela vem no dash e acerta a palma (S1); ele defende o golpe seguinte e ela o projeta com o agarrão; "Você continua sendo um monstro!" / "E você continua falando demais!", trocando golpes no vento | DEFESA! (tempo) |
+| 4. O último confronto | recuam ofegantes (HAH... HAH...); "Eu não vim até aqui pra perder!"; correm um para o outro: o soco dele ela desvia e o chute alto dela passa no vento; o uppercut (S2) ela pula para trás; ele pula e desce com o golpe e ela defende: IMPACTO!, clarão de dois quadros, a câmera volta devagar e os dois recuam ofegantes | SOCO! (toque), CONTRA-ATAQUE! (deslizar para cima), GOLPE FINAL! (tempo) |
 
-Errar qualquer QTE faz a Yin-lu contra-atacar (−5% do Ryūga) e o QTE pede de novo. A Yin-lu
+Ninguém cai: a luta acaba **interrompida** (`terminarLuta`) e a história segue. Pegam só a palma
+e o agarrão dela (−5% cada dele); os golpes dele ela defende todos.
+
+Errar qualquer QTE faz a Yin-lu contra-atacar (−4% do Ryūga) e o QTE pede de novo. A Yin-lu
 fala com o rosto da seleção (não tem retrato da história): quem luta ganha sempre esse rosto de
 reserva na cena.
 

@@ -15,6 +15,7 @@ from pathlib import Path
 import PIL
 from PIL import Image, features
 import import_sprites as importer
+import apoio
 import folhas
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,8 +64,10 @@ AIR_DOWN_BINDINGS = ('j2L','j2M','j2H')
 OVERHEAD = '6M'
 # Golpe de comando (→ + H, 12/11): emenda no combo (as rotas da base o põem depois do L, do 2L e do M).
 COMMAND_HEAVY = '6H'
+# Golpe de corrida (13/11): o H apertado correndo (CancelSystem.RUN_HEAVY).
+RUN_HEAVY = 'DH'
 # Inputs que o pacote pode ter ou não.
-OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY)
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY, RUN_HEAVY)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')
@@ -249,8 +252,10 @@ def validate_mechanics(name, mech, m, projectile):
     # Arco (launchType arc): o rival voa em arco, com altura e distância (o shoryuken do Ryūga).
     if 'arco' in mech:
         v = mech['arco']
-        if not (isinstance(v, dict) and set(v) == {'altura', 'distancia'}):
-            raise ValueError(f'{name}.mecanica.arco: {{altura, distancia}}')
+        if not (isinstance(v, dict) and {'altura', 'distancia'} <= set(v) <= {'altura', 'distancia', 'parede'}):
+            raise ValueError(f'{name}.mecanica.arco: {{altura, distancia, parede?}}')
+        if v.get('parede') not in (None, True):
+            raise ValueError(f'{name}.mecanica.arco.parede: true (or leave it out)')
         positive(v['altura'], f'{name}.mecanica.arco.altura'); positive(v['distancia'], f'{name}.mecanica.arco.distancia')
     if ('arco' in mech) != (m.get('launchType') == 'arc'):
         raise ValueError(f'{name}.mecanica.arco: goes with launchType arc, and arc needs it')
@@ -657,11 +662,19 @@ def visual_heights(pack, atlases):
         return (report['layout']['rootY'] - top) * pack['_profile']['worldScale'] / cfg.get('pixelScale', 1)
     return height('IDLE'), height('CROUCH')
 
-def compile_packs(root, results):
+def compile_packs(root, results, alterados=None, medir=False):
     atlases = {cfg['id']:(cfg,report) for cfg,report in results}
     packs = []
+    apoio.usar_raiz(root)
     for path in sorted((root / 'characters').glob('*/character.json')):
         pack = read(path)
+        # O pé de apoio do andar (tools/sprites/apoio.py): animação nova ou trocada é medida aqui,
+        # e o character.json sai com a medida (com --check, fica como arquivo desatualizado).
+        # Com --check só confere (medida de animação que mudou é erro, mais abaixo).
+        if medir and isinstance(pack.get('animations'), dict) and isinstance(pack.get('fighter'), dict) \
+                and apoio.atualizar(pack) and alterados is not None:
+            path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+            alterados.append(path.relative_to(root).as_posix())
         if pack.get('schemaVersion') != 3 or not re.fullmatch('[a-z][a-z0-9_]*', pack['id']):
             raise ValueError(f'{path}: unsupported version (expected schemaVersion 3) or invalid id')
         if pack['id'] != path.parent.name or any(p['id'] == pack['id'] for p in packs):
@@ -694,6 +707,17 @@ def compile_packs(root, results):
                 raise ValueError(f'{key}: loop must be boolean')
             if 'silhueta' in a:
                 validate_silhueta(key, a)
+            if 'apoio' in a:
+                # Pé de apoio medido no desenho (tools/sprites/apoio.py): o avanço do corpo por quadro.
+                ap = a['apoio']
+                esperado = len(frames) if a['loop'] else len(frames) - 1
+                if not {'folha', 'avanco', 'semApoio', 'duvida'} <= set(ap) <= {'folha', 'avanco', 'semApoio', 'duvida', 'aoContrario', 'inseguro'} \
+                        or len(ap['avanco']) != esperado or \
+                        any(v is not None and (type(v) not in (int, float) or abs(v) > 200) for v in ap['avanco']):
+                    raise ValueError(f'{key}.apoio: {{folha, avanco: [{esperado} px ou null], semApoio, duvida, aoContrario?, inseguro?}}')
+                if ap['folha'] != apoio.marca_da_folha(a, root):
+                    raise ValueError(f'{key}.apoio: a animação mudou depois da medida do pé de apoio; rode '
+                                     f'python3 tools/sprites/apoio.py {pack["id"]} --write')
             if 'distancePerFrame' in a:
                 positive(a['distancePerFrame'], key)
                 if not a['loop'] or 'durationsMs' in a:
@@ -794,7 +818,7 @@ def compile_packs(root, results):
         if mech.get('chao'): code += '.pound()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
-        if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+')'
+        if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+(',true' if mech['arco'].get('parede') else '')+')'
         if 'voo' in mech:
             v = mech['voo']
             code += '.flight('+f(v['altura'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('paira'))).lower()+')'
@@ -897,6 +921,10 @@ def compile_packs(root, results):
                        (','+por_quadro(angulo, str) if angulo else '')+')')
                 if caminho:
                     sil += '.withCaminho('+por_quadro(caminho['pontos'], lambda v: ','.join(map(str, v)))+',0x%06X)' % caminho['cor']
+            if a['loop'] and 'apoio' in a and None not in a['apoio']['avanco'] \
+                    and not a['apoio'].get('inseguro') and not a['apoio'].get('aoContrario'):
+                # Andar com o pé de apoio cravado no chão: o corpo anda o que o pé empurra (CombatEngine).
+                sil += '.withApoio(new float[]{'+','.join(f(v) for v in a['apoio']['avanco'])+'})'
             if a.get('fimAgachado'):
                 # O golpe termina agachado: o desenho levanta pelo RISE depois dele (SpriteMotion).
                 sil += '.withFimAgachado()'
@@ -1197,7 +1225,9 @@ def build(root=ROOT, check=False):
                 (stage/cfg['report']).write_text(json.dumps(report,indent=2)+'\n', encoding='utf-8')
                 results.append((cfg,report))
             importer.write_generated_java(results)
-            packs=compile_packs(stage,results)
+            medidos=[]
+            packs=compile_packs(stage,results,medidos,medir=not check)
+            outputs.update(medidos)
             outputs.update((JAVA+'GeneratedSpriteLayouts.java',JAVA+'GeneratedCharacters.java',JAVA+'SpriteStates.java'))
             # Preview embeds atlases; it works offline and never gets packaged in APK.
             payload={'characters':packs,'atlases':{c['id']:{**r['packed'],'image':'data:image/'+Path(c['output']).suffix[1:]+';base64,'+base64.b64encode((stage/c['output']).read_bytes()).decode()} for c,r in results}}

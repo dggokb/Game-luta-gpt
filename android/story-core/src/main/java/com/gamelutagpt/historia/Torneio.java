@@ -57,12 +57,21 @@ public final class Torneio {
         public final String fala;
         /** Quem diz a fala: 0 = o titular (lado esquerdo do card), 1 = o parceiro. */
         public final int quemFala;
+        /**
+         * A história da dupla, contada na luta contra ela no torneio da história (antes da final):
+         * uma cinemática em {@code historia/} (ex.: {@code torneio/cinematica_p09.json}), ou null.
+         */
+        public final String cinematica;
 
         public Dupla(String id, String[] lutadores, String irmao, boolean pronta) {
             this(id, lutadores, irmao, pronta, null, 0);
         }
 
         public Dupla(String id, String[] lutadores, String irmao, boolean pronta, String fala, int quemFala) {
+            this(id, lutadores, irmao, pronta, fala, quemFala, null);
+        }
+
+        public Dupla(String id, String[] lutadores, String irmao, boolean pronta, String fala, int quemFala, String cinematica) {
             if (lutadores == null || lutadores.length != 2) throw new IllegalArgumentException(id + ": dupla precisa de 2 lutadores");
             this.id = id;
             this.lutadores = lutadores.clone();
@@ -70,6 +79,7 @@ public final class Torneio {
             this.pronta = pronta;
             this.fala = fala;
             this.quemFala = quemFala == 1 ? 1 : 0;
+            this.cinematica = cinematica;
         }
 
         /** Código do retrato (historia/torneio/rostos/pNN.jpg) de cada lutador. */
@@ -90,7 +100,8 @@ public final class Torneio {
             Object quem = d.get("quemFala");
             out.add(new Dupla(id, new String[] {String.valueOf(lutadores.get(0)), String.valueOf(lutadores.get(1))},
                 Episodio.string(d, "irmao", null), !Boolean.FALSE.equals(d.get("pronta")),
-                Episodio.string(d, "fala", null), quem instanceof Number ? ((Number) quem).intValue() : 0));
+                Episodio.string(d, "fala", null), quem instanceof Number ? ((Number) quem).intValue() : 0,
+                Episodio.string(d, "cinematica", null)));
         }
         return out;
     }

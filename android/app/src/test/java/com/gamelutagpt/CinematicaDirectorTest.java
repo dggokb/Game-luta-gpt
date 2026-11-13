@@ -136,6 +136,33 @@ public class CinematicaDirectorTest {
     }
 
     /**
+     * O lance do roteiro diz quem ataca e os golpes em ordem ("bloqueio:rival:L,H"), e o "fim"
+     * encerra a troca logo depois, sem sortear mais nada (bem antes do tempo da troca).
+     */
+    @Test public void lanceDoRoteiroComQuemEGolpes() {
+        Match m = new Match(900f, 1300f);
+        m.director.trocar(8f, 5L, java.util.Arrays.asList("bloqueio:rival:L,H", "fim"));
+        java.util.List<String> golpesDoRival = new java.util.ArrayList<>();
+        boolean jogadorAtacou = false, defendeu = false;
+        String antes = null;
+        int q = 0;
+        for (; m.director.trocando() && q < 60 * 8; q++) {
+            for (int i = 0; i < 2; i++) m.f(i).state.cenaSemDano = true;
+            m.director.fill(m.engine, m.in[0], m.in[1]);
+            if (m.in[1].light) golpesDoRival.add("L");
+            if (m.in[1].heavy) golpesDoRival.add("H");
+            m.engine.step(m.in[0], m.in[1]);
+            jogadorAtacou |= m.f(0).attacking();
+            defendeu |= m.f(0).status == CombatFighter.Status.BLOCKSTUN;
+        }
+        assertFalse("acaba no fim", m.director.trocando());
+        assertTrue("acaba antes do tempo da troca: " + q, q < 60 * 5);
+        assertEquals("o rival solta o fraco e o forte, nessa ordem", java.util.Arrays.asList("L", "H"), golpesDoRival);
+        assertFalse("o jogador só defende", jogadorAtacou);
+        assertTrue("o jogador defende", defendeu);
+    }
+
+    /**
      * O choque: os dois soltam o forte e os golpes ficam ativos juntos, então os dois "apanham"
      * no mesmo instante (punho contra punho). Com a proteção do jogo, a vida não muda.
      */

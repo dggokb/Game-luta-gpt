@@ -449,7 +449,7 @@ e Akuma (SF), Takuma (Art of Fighting), Geese (Fatal Fury) no contra-golpe.
 
 ### Vídeos no Flick (MiniMax H3 Fast)
 
-Mesma configuração do elenco ([flick-h3-elenco.md](../personagens/flick-h3-elenco.md)):
+Mesma configuração do elenco ([video.md](../personagens/video.md)):
 - H3 Fast, 5 s, 768p;
 - a mesma imagem no início e no fim, menos no andar;
 - membro do golpe nomeado pelo lado do quadro;

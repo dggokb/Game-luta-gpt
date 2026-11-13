@@ -105,37 +105,75 @@ public class CinematicaLutaTest {
                 if (passo.cinematica == null) continue;
                 cinematicas++;
                 assertEquals(passo.cinematica + " fora de um passo de luta", Episodio.TipoPasso.LUTA, passo.tipo);
-                CinematicaLuta.Roteiro r = CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + passo.cinematica));
-                for (String quem : r.quemFala()) {
-                    // Sem retrato da história, quem luta fala com o rosto da seleção.
-                    String lutador = temporada.elenco.get(quem).lutador;
-                    String codigo = "player_base".equals(lutador) ? "p01" : lutador;
-                    assertTrue(passo.cinematica + ": sem o rosto normal de " + quem,
-                        new File(ASSETS, ConversaLuta.RETRATOS + "/" + quem + "_normal.png").isFile() ||
-                        lutador != null && new File(ASSETS, "selection/rostos/" + codigo + ".webp").isFile());
-                }
-                for (String pagina : r.paginas()) {
-                    assertTrue(passo.cinematica + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
-                }
-                for (String pagina : r.paginasDosEpisodios()) {
-                    // A página é lida com os quadros e balões do passo dela no episódio.
-                    String epId = pagina.substring(0, pagina.indexOf('/'));
-                    Episodio epDaPagina = Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json"));
-                    assertNotNull(passo.cinematica + ": " + pagina + " não é uma página pronta (com quadros) do " + epId,
-                        CinematicaLuta.paginaDoEpisodio(epDaPagina, pagina.substring(pagina.indexOf('/') + 1)));
-                }
-                List<String> textos = new ArrayList<>(r.textos());
-                textos.addAll(CinematicaLuta.TEXTOS_QTE);
-                for (File arquivo : idiomas) {
-                    Map<String, String> traducao = Temporada.traducaoFromJson(
-                        FILES.readText(Temporada.PASTA + "/idiomas/" + arquivo.getName()));
-                    for (String texto : textos) {
-                        assertTrue(arquivo.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
-                    }
-                }
+                conferirCinematica(temporada, passo.cinematica, idiomas);
             }
         }
         assertTrue("o treino do Episódio 1 tem cinemática", cinematicas > 0);
+    }
+
+    /** As histórias das duplas do torneio (Torneio.Dupla.cinematica) abrem como as dos episódios. */
+    @Test
+    public void cinematicasDasDuplasValem() throws IOException {
+        Temporada temporada = Temporada.load(FILES);
+        File[] idiomas = new File(ASSETS, Temporada.PASTA + "/idiomas").listFiles();
+        int com = 0;
+        for (Torneio.Dupla d : Torneio.duplasFromJson(FILES.readText(Torneio.ARQUIVO))) {
+            if (d.cinematica == null) continue;
+            com++;
+            assertNull(d.id + ": dupla de irmão não tem história de adversário", d.irmao);
+            conferirCinematica(temporada, d.cinematica, idiomas);
+        }
+        assertTrue("p09 e p11 têm história", com >= 2);
+    }
+
+    /** O gatilho "ultimo": no 2x2 a cena espera o parceiro cair; até lá o rival perde normalmente. */
+    @Test
+    public void gatilhoDoUltimoDePe() throws IOException {
+        Temporada temporada = Temporada.load(FILES);
+        Palco palco = new Palco();
+        CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, new ConversaLuta(FILES), palco);
+        assertTrue(cena.carregar(temporada, "torneio/cinematica_p09.json", Torneio.RYUGA));
+        cena.sozinhos(true, false);
+        assertFalse("com o parceiro de pé, o rival da vez pode cair", cena.protegeVida(CinematicaLuta.RIVAL));
+        assertFalse("o parceiro ainda está de pé", cena.gatilho(1f, 0.1f, 10f, false));
+        cena.sozinhos(true, true);
+        assertTrue("o último de pé fica com o último ponto até a cena", cena.protegeVida(CinematicaLuta.RIVAL));
+        assertFalse(cena.gatilho(1f, 0.3f, 12f, false));
+        assertTrue(cena.gatilho(1f, 0.25f, 12f, false));
+    }
+
+    /** A cinemática abre, quem fala tem rosto, as páginas existem e todo texto tem tradução. */
+    private static void conferirCinematica(Temporada temporada, String arquivo, File[] idiomas) throws IOException {
+        CinematicaLuta.Roteiro r = CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + arquivo));
+        for (String quem : r.quemFala()) {
+            // "jogador"/"rival": quem estiver em campo, com o rosto da seleção.
+            if (quem.equals("jogador") || quem.equals("rival")) continue;
+            // Sem retrato da história, quem luta fala com o rosto da seleção.
+            String lutador = temporada.elenco.get(quem).lutador;
+            String codigo = "player_base".equals(lutador) ? "p01" : lutador;
+            assertTrue(arquivo + ": sem o rosto normal de " + quem,
+                new File(ASSETS, ConversaLuta.RETRATOS + "/" + quem + "_normal.png").isFile() ||
+                lutador != null && new File(ASSETS, "selection/rostos/" + codigo + ".webp").isFile());
+        }
+        for (String pagina : r.paginas()) {
+            assertTrue(arquivo + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
+        }
+        for (String pagina : r.paginasDosEpisodios()) {
+            // A página é lida com os quadros e balões do passo dela no episódio.
+            String epId = pagina.substring(0, pagina.indexOf('/'));
+            Episodio epDaPagina = Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json"));
+            assertNotNull(arquivo + ": " + pagina + " não é uma página pronta (com quadros) do " + epId,
+                CinematicaLuta.paginaDoEpisodio(epDaPagina, pagina.substring(pagina.indexOf('/') + 1)));
+        }
+        List<String> textos = new ArrayList<>(r.textos());
+        textos.addAll(CinematicaLuta.TEXTOS_QTE);
+        for (File idioma : idiomas) {
+            Map<String, String> traducao = Temporada.traducaoFromJson(
+                FILES.readText(Temporada.PASTA + "/idiomas/" + idioma.getName()));
+            for (String texto : textos) {
+                assertTrue(idioma.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
+            }
+        }
     }
 
     /** Os rostos do olhar.json existem (o quadro espelha quem olharia para fora da tela). */
@@ -244,39 +282,42 @@ public class CinematicaLutaTest {
     }
 
     /**
-     * O convite do Episódio 2 do Ryūga: a Yin-lu fica com 20% da vida, a tinta cobre, as páginas
-     * são lidas quadro a quadro no toque, a tinta cobre de novo (a página some) e sai; o final
-     * coreografado pede 4 QTE e o roteiro tem um golpe dela sem QTE. Deixar o tempo acabar e
-     * deslizar para o lado errado são erros: o rival bate e o QTE pede de novo. O último golpe é
-     * o final, com a luta congelando no impacto, e a cena acaba com a tela limpa.
+     * O convite do Episódio 2 do Ryūga (a coreografia de 13/11): a Yin-lu fica com 20% da vida, a
+     * tinta cobre, as páginas são lidas quadro a quadro no toque, a tinta cobre de novo e sai; o
+     * final pede 6 QTE (esquiva, combo, defesa e a sequência de precisão), todos sem golpe próprio
+     * (o que acontece no acerto é a troca de golpes do roteiro). Os golpes que pegam são do
+     * roteiro: a palma e o agarrão dela (o chute giratório dele ela defende). Deixar o tempo acabar e deslizar
+     * para o lado errado são erros: o rival bate e o QTE pede de novo. Ninguém cai: a Yin-lu
+     * defende o último golpe e a luta acaba interrompida, com a tela limpa.
      */
     @Test
     public void qteDoConviteDoRyuga() throws IOException {
-        Palco palco = jogarConvite(CONVITE_EP02, Torneio.RYUGA);
-        assertEquals("cada acerto um golpe do jogador; cada erro e o golpe roteirizado, do rival",
-            "[rival M, jogador M, rival S4, rival H, jogador S3, jogador H, jogador S2 final]", golpes(palco).toString());
+        Palco palco = jogarConvite(CONVITE_EP02, Torneio.RYUGA, 6);
+        assertEquals("cada erro um golpe do rival; os golpes do roteiro",
+            "[rival 2H, rival S1, rival A, rival M]", golpes(palco).toString());
+        assertTrue("a luta acaba sem vencedor", palco.pedidos.contains("fim interrompida"));
     }
 
     /** O convite do Kōga: o Brucy bate primeiro (sem QTE) e o mergulho é o golpe final. */
     @Test
     public void qteDoConviteDoKoga() throws IOException {
-        Palco palco = jogarConvite("ep02/cinematica_convite_koga.json", Torneio.KOGA);
+        Palco palco = jogarConvite("ep02/cinematica_convite_koga.json", Torneio.KOGA, 4);
         assertEquals("[rival S2, rival M, jogador H, rival S4, jogador S3, jogador S2, jogador S4 final]", golpes(palco).toString());
     }
 
     private static List<String> golpes(Palco palco) {
         List<String> golpes = new ArrayList<>();
         for (String p : palco.pedidos) {
-            if (p.matches("(jogador|rival) (2?[LMH]|S\\d?)( final)?")) golpes.add(p);
+            if (p.matches("(jogador|rival) (2?[LMH]|S\\d?|A)( final)?")) golpes.add(p);
         }
         return golpes;
     }
 
     /**
      * Joga a cena de um convite: o rival com 20% dispara, as páginas no toque e cada QTE pelo
-     * tipo dele (o primeiro e o primeiro deslize erram de propósito).
+     * tipo dele (o primeiro toque e o primeiro deslize erram de propósito).
      */
-    private static Palco jogarConvite(String arquivo, String irmao) throws IOException {
+    private static Palco jogarConvite(String arquivo, String irmao, int qtesEsperados) throws IOException {
         Temporada temporada = Temporada.load(FILES);
         ConversaLuta conversa = new ConversaLuta(FILES);
         Palco palco = new Palco();
@@ -294,7 +335,7 @@ public class CinematicaLutaTest {
         PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
         boolean cobriu = false, pedia = false, paginaSumiu = false, congelou = false;
         boolean errouToque = false, errouDeslize = false;
-        int toquesNaPagina = 0, qtes = 0, quadrosNoQte = 0, toques = 0;
+        int toquesNaPagina = 0, qtes = 0, quadrosNoQte = 0, toques = 0, qteQueErra = -1;
         for (int i = 0; i < 60 * 120 && !cena.acabou(); i++) {
             palco.quadro();
             cena.update(DT);
@@ -321,8 +362,9 @@ public class CinematicaLutaTest {
             quadrosNoQte++;
             switch (cena.qteTipo()) {
                 case TOQUE:
-                    // O primeiro QTE deixa o tempo acabar (erro), depois toca.
-                    if (qtes == 1 && cena.qteErros() == 0) errouToque = true;
+                    // O primeiro QTE de toque deixa o tempo acabar (erro), depois toca.
+                    if (qteQueErra < 0 && cena.qteErros() == 0) qteQueErra = qtes;
+                    if (qtes == qteQueErra && cena.qteErros() == 0) errouToque = true;
                     else if (quadrosNoQte == 10) cena.toque(CinematicaLuta.TOQUE_DESCE, 300f, 300f);
                     break;
                 case MARTELAR:
@@ -335,12 +377,13 @@ public class CinematicaLutaTest {
                 case DESLIZAR:
                     if (quadrosNoQte == 6) {
                         // Primeiro para o lado contrário (erro), depois para o pedido.
-                        int dx = cena.qteDirecao()[0] * (cena.qteErros() == 0 ? -1 : 1);
-                        errouDeslize |= cena.qteErros() == 0;
+                        int sinal = !errouDeslize && cena.qteErros() == 0 ? -1 : 1;
+                        int dx = cena.qteDirecao()[0] * sinal, dy = cena.qteDirecao()[1] * sinal;
+                        errouDeslize |= sinal < 0;
                         cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 420f);
-                        cena.toque(CinematicaLuta.TOQUE_MOVE, 640f + dx * 60f, 425f);
-                        cena.toque(CinematicaLuta.TOQUE_MOVE, 640f + dx * 130f, 430f);
-                        cena.toque(CinematicaLuta.TOQUE_SOBE, 640f + dx * 130f, 430f);
+                        cena.toque(CinematicaLuta.TOQUE_MOVE, 640f + dx * 60f, 420f + dy * 60f);
+                        cena.toque(CinematicaLuta.TOQUE_MOVE, 640f + dx * 130f, 420f + dy * 130f);
+                        cena.toque(CinematicaLuta.TOQUE_SOBE, 640f + dx * 130f, 420f + dy * 130f);
                     }
                     break;
                 default:
@@ -356,7 +399,7 @@ public class CinematicaLutaTest {
         assertTrue(errouToque);
         assertTrue(errouDeslize);
         assertTrue("o impacto congela a luta", congelou);
-        assertEquals(4, qtes);
+        assertEquals(qtesEsperados, qtes);
         assertTrue("a recuada antes da tinta sair", palco.pedidos.contains("jogador RECUAR"));
         assertFalse("a tela limpa no fim", cena.telaCoberta());
         assertFalse(cena.controleTravado());

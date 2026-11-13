@@ -7,16 +7,16 @@
   288
  ],
  "raiz": [
-  97,
+  93,
   270
  ],
  "pixelScale": null,
  "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
  "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
  "fonte": "art/sprites/source/p02_joelho_garca_video_normalized_smear.png",
- "fonte_sha256": "70b17b277b5a8609352471004143446883a9dc7dfde4d92b685ff0d056622710",
+ "fonte_sha256": "5c8f85f136d927e47af18986ad13231ba557156d267aff414e568ad4255cb57a",
  "saida": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd.png",
- "saida_sha256": "331b4ebc9b1de0fae747c90d0f9764a693fbad55f93208df3ada26de0dd44f42",
+ "saida_sha256": "1e6547beb102133fd266a74ff0e4636870b3ffd7e7e0884fa32f3e5a7820b777",
  "alfa": "idêntico à fonte (conferido byte a byte)",
  "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
 }

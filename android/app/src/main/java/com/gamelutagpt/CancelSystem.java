@@ -11,6 +11,8 @@ final class CancelSystem {
 
     /** Golpe de comando de chão (→ + H), quando o pacote tem um (o Soco no plexo do Ryūga). */
     static final String COMMAND_HEAVY = "6H";
+    /** Golpe de corrida (13/11): o H apertado correndo (a Ombrada do Ryūga, o Carrinho da Yin-lu). */
+    static final String RUN_HEAVY = "DH";
 
     /** Cancel window of the attack for what it has done so far; null when closed for that outcome. */
     static AttackDefinition.Window windowFor(CombatFighter f) {
@@ -68,6 +70,13 @@ final class CancelSystem {
                 }
                 return c.attack(binding(f, "M", entry.crouch));
             case HEAVY:
+                // Correndo no chão: o golpe de corrida do personagem (sai da corrida, sem parar). Na
+                // perseguição da parede (segurar → depois do quique já corre) o → + H continua o de
+                // sempre: ali a corrida é o combo, não a abertura.
+                if (f.forwardDashing && !f.chaseRunning && f.wallChase == 0 && !entry.crouch && f.grounded && !f.attacking() &&
+                    c.moves.containsKey(RUN_HEAVY)) {
+                    return c.attack(RUN_HEAVY);
+                }
                 // → + H no chão: o golpe de comando (12/11), do neutro ou emendado no combo. Dentro
                 // de um golpe que não emenda nele (a rota não tem o 6H), continua sendo o H.
                 if (entry.forward && !entry.crouch && f.grounded && c.moves.containsKey(COMMAND_HEAVY) &&

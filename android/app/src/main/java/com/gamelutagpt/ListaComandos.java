@@ -40,6 +40,9 @@ final class ListaComandos {
         if (c.moves.containsKey(CancelSystem.COMMAND_HEAVY)) {
             linhas.add(new TelaComandos.Linha(TelaComandos.GOLPE_COMANDO, Comandos.texto("→ + {H}", esquema), false));
         }
+        if (c.moves.containsKey(CancelSystem.RUN_HEAVY)) {
+            linhas.add(new TelaComandos.Linha(TelaComandos.GOLPE_CORRIDA, Comandos.texto("→ → + {H}", esquema), false));
+        }
         linhas.add(new TelaComandos.Linha(TelaComandos.OTG, Comandos.texto("↓ + {M}", esquema), false));
         linhas.add(new TelaComandos.Linha(TelaComandos.DEFESA_PERFEITA, "←", false));
         linhas.add(new TelaComandos.Linha(TelaComandos.COMBO_BREAKER, Comandos.texto("{L} / {M} / {H}", esquema), false));

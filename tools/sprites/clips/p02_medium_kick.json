@@ -16,7 +16,7 @@
     "personagem": "p02",
     "escala": 0.4173,
     "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
-    "quadros": "25,28,31,33,36,37,39,76,78,80,82,84,86,88",
+    "quadros": "25,28,31,33,36,37,39,76,78,80,84,88,94,100",
     "largura": 288,
     "raiz": "108,238",
     "colunas": 11,
@@ -25,13 +25,7 @@
     "limpar_chao": true
   },
   "rootX": 108,
-  "sourceReferences": [
-    "art/sprites/source/p02_medium_kick_video_normalized_smear.png",
-    "art/sprites/source/p02_medium_kick_video_normalized.png"
-  ],
   "frameWidth": 288,
-  "frameHeight": 256,
-  "rootY": 238,
   "smear": {
     "fonte": "art/sprites/source/p02_medium_kick_video_normalized.png",
     "quadros": [
@@ -49,5 +43,11 @@
       1.0,
       0.5
     ]
-  }
+  },
+  "frameHeight": 256,
+  "rootY": 238,
+  "sourceReferences": [
+    "art/sprites/source/p02_medium_kick_video_normalized_smear.png",
+    "art/sprites/source/p02_medium_kick_video_normalized.png"
+  ]
 }

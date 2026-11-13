@@ -114,6 +114,11 @@ public final class PaginaHistoria {
         return new String[][] {luta.dupla.clone(), luta.cpu.clone()};
     }
 
+    /** O arquivo da cinemática da luta (veja {@link Campanha#cinematica}), ou null. */
+    public String cinematica(Episodio.Passo luta) {
+        return campanha != null ? campanha.cinematica(luta) : luta.cinematica;
+    }
+
     /**
      * A próxima luta do episódio a partir do passo atual (ele incluído), para o jogo ir
      * preparando as duplas enquanto o jogador lê. Null se não há luta à frente ou se antes dela

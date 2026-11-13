@@ -169,8 +169,21 @@ Em cima da arte nova dela (vídeos do Drive convertidos por outra sessão, que j
 --giro 7-14` mede os pés no próprio desenho (sem o caminho do golpe) e põe a lua crescente do ar,
 branca para cinza, na elipse dos pés, côncava para o corpo, metade atrás e metade na frente, a
 força alternando 100%/50%. Gravado no jogo com o arco intercalado e em todos; ficou em todos.
+`--giro-corpo` soma a roupa do tronco em espiral: faixas da cor da calça e da faixa laranja em
+hélice em volta do eixo do corpo (a primeira tentativa, arrastando os pixels da roupa no giro,
+ficava escondida dentro da silhueta e não aparecia).
 
 Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
+
+## S3 do Ryūga com menos risco (13/11, pedido do dono: "tô achando que tá com muito risco")
+
+Os 6 chutes tinham cada um a língua longa a 100%. Agora `--comprimento 0.6,0.45` e
+`--opacidade 0.5,0.5,0.5,0.5,0.5,1`: os cinco primeiros curtos e a 50%, o último chute inteiro.
+Gravado no jogo do PC, antes e depois lado a lado.
+
+Mesmo dia, outra sessão: o giro do S3 desceu 28 px no desenho (passava por cima da Yin-lu;
+`docs/personagens/p01.md`). O smear foi refeito com os mesmos parâmetros acima sobre a folha
+baixada (sem mudar o tipo), e o normal map da folha refeito (`normal_map.py --refazer`).
 
 ## A pesquisa de como os estúdios fazem (10/11)
 

@@ -117,11 +117,11 @@ public final class TesteQteConvite {
                     tecla(KeyEvent.KEYCODE_J);
                     toques++;
                 } else if (tipo == CinematicaLuta.TipoQte.DESLIZAR && noQte == 25) {
-                    float dx = cena.qteDirecao()[0];
+                    float dx = cena.qteDirecao()[0], dy = cena.qteDirecao()[1];
                     toque(MotionEvent.ACTION_DOWN, 640f, 420f);
-                    toque(MotionEvent.ACTION_MOVE, 640f + dx * 60f, 422f);
-                    toque(MotionEvent.ACTION_MOVE, 640f + dx * 140f, 425f);
-                    toque(MotionEvent.ACTION_UP, 640f + dx * 140f, 425f);
+                    toque(MotionEvent.ACTION_MOVE, 640f + dx * 60f, 422f + dy * 60f);
+                    toque(MotionEvent.ACTION_MOVE, 640f + dx * 140f, 425f + dy * 140f);
+                    toque(MotionEvent.ACTION_UP, 640f + dx * 140f, 425f + dy * 140f);
                 } else if (tipo == CinematicaLuta.TipoQte.TEMPO && noQte == Math.round(cena.qteSegundos() * 60f)) {
                     toque(MotionEvent.ACTION_DOWN, 640f, 420f);
                     toque(MotionEvent.ACTION_UP, 640f, 420f);
@@ -131,7 +131,7 @@ public final class TesteQteConvite {
                 toque(MotionEvent.ACTION_DOWN, 640f, 360f);
                 toque(MotionEvent.ACTION_UP, 640f, 360f);
             }
-            passo(quadro % 6 == 0 || pede && noQte == 12);
+            passo(quadro % CADENCIA == 0 || pede && noQte == 12);
         }
         System.out.printf(Locale.ROOT, "cena acabou no quadro %d: rival %.0f%% (KO %b), jogador %.0f%%%n", quadro,
             vida(jogo.engine.fighter(GameView.OPPONENT)), jogo.engine.fighter(GameView.OPPONENT).ko(), vida(jogo.engine.fighter(GameView.PLAYER)));
@@ -140,6 +140,11 @@ public final class TesteQteConvite {
         System.out.println("história esperando a luta: " + historia.waitingFight());
         System.exit(0);
     }
+
+    /** De quantos em quantos quadros a cena é gravada (-Dgameluta.cadencia; 2 = vídeo a 30 qps). */
+    static final int CADENCIA = Integer.getInteger("gameluta.cadencia", 6);
+    /** Grava em JPG (-Dgameluta.jpg=true). */
+    static final boolean JPG = Boolean.getBoolean("gameluta.jpg");
 
     static float vida(CombatFighter f) {
         return 100f * f.state.life / f.state.profile.maxLife;
@@ -153,7 +158,15 @@ public final class TesteQteConvite {
         canvas = new Canvas(tela);
         canvas.drawColor(0xFF000000);
         desenhar.invoke(jogo, canvas);
-        ImageIO.write(tela.image(), "png", new File(saida, String.format(Locale.ROOT, "q%05d.png", quadro)));
+        if (JPG) {
+            // JPG ocupa um décimo do PNG: a cena inteira a 30 qps cabe no disco.
+            java.awt.image.BufferedImage rgb = new java.awt.image.BufferedImage(tela.image().getWidth(),
+                tela.image().getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+            rgb.getGraphics().drawImage(tela.image(), 0, 0, null);
+            ImageIO.write(rgb, "jpg", new File(saida, String.format(Locale.ROOT, "q%05d.jpg", quadro)));
+        } else {
+            ImageIO.write(tela.image(), "png", new File(saida, String.format(Locale.ROOT, "q%05d.png", quadro)));
+        }
     }
 
     @SuppressWarnings("unchecked")

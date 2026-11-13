@@ -155,6 +155,31 @@ public class TorneioTest {
         assertSame(adversario, t.participante(1, 0));
     }
 
+    /**
+     * A luta do torneio (antes da final) toca a história da dupla adversária, se ela tiver; a
+     * final (o outro irmão) e um passo com a cinemática dele ficam como estão.
+     */
+    @Test
+    public void cinematicaDaDuplaAdversariaNoTorneio() throws IOException {
+        Episodio ep = Episodio.fromJson("{\"id\":\"e\",\"passos\":[{\"tipo\":\"luta\",\"torneio\":true}," +
+            "{\"tipo\":\"luta\",\"torneio\":true,\"cinematica\":\"ep02/x.json\"}]}");
+        boolean viuHistoria = false;
+        for (long semente = 1; semente <= 40; semente++) {
+            Campanha c = new Campanha(duplas(), semente);
+            Torneio t = c.torneio();
+            Torneio.Dupla quartas = t.adversario();
+            assertEquals(quartas.cinematica, c.cinematica(ep.passos.get(0)));
+            assertEquals("a do passo vale sempre", "ep02/x.json", c.cinematica(ep.passos.get(1)));
+            viuHistoria |= quartas.cinematica != null;
+            t.registrar(true);
+            assertEquals(t.adversario().cinematica, c.cinematica(ep.passos.get(0)));
+            t.registrar(true);
+            assertNotNull("final", t.adversario().irmao);
+            assertNull("na final (o outro irmão) não há história de adversário", c.cinematica(ep.passos.get(0)));
+        }
+        assertTrue("p09 ou p11 nas quartas em alguma chave", viuHistoria);
+    }
+
     @Test
     public void campanhaResolveJogadorRivalETorneio() throws IOException {
         Campanha c = new Campanha(duplas(), 3L);

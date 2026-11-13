@@ -134,7 +134,7 @@
         238
       ],
       "minimumMargin": 18,
-      "opaquePixels": 10921
+      "opaquePixels": 11660
     },
     {
       "index": 11,
@@ -145,18 +145,18 @@
         238
       ],
       "minimumMargin": 18,
-      "opaquePixels": 11660
+      "opaquePixels": 11699
     },
     {
       "index": 12,
       "outputBbox": [
-        32,
+        31,
         41,
         172,
         238
       ],
       "minimumMargin": 18,
-      "opaquePixels": 11635
+      "opaquePixels": 11848
     }
   ],
   "passed": true,
@@ -171,11 +171,11 @@
       14,
       31
     ],
-    "sheetWidth": 1188,
+    "sheetWidth": 1192,
     "sheetHeight": 420,
     "frames": [
       [
-        472,
+        476,
         0,
         156,
         208,
@@ -183,7 +183,7 @@
         6
       ],
       [
-        632,
+        636,
         0,
         156,
         204,
@@ -207,7 +207,7 @@
         8
       ],
       [
-        792,
+        796,
         0,
         172,
         204,
@@ -215,7 +215,7 @@
         6
       ],
       [
-        968,
+        972,
         0,
         220,
         204,
@@ -257,43 +257,43 @@
       [
         0,
         0,
+        152,
+        212,
+        12,
+        4
+      ],
+      [
+        156,
+        0,
         156,
         212,
         11,
         4
       ],
       [
-        160,
-        0,
-        152,
-        212,
-        12,
-        4
-      ],
-      [
         316,
         0,
-        152,
+        156,
         212,
-        12,
+        11,
         4
       ]
     ],
     "decodedBytes": {
       "canonical": 5767168,
       "grid": 4393136,
-      "packed": 1995840
+      "packed": 2002560
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "56043c91cdaa187b7b28134d4e9f4b2231e290a93be8bd0e03ee12ad874f2ef1",
-      "config": "88ecb0aa26f3464c2b2e2e9686be793c2a1ff3b9384f019d43debf90ef67d57b",
+      "source": "e4be7be0aeb3f4ce63ce5e92cd1443241289f925fe52099e18f276453784914a",
+      "config": "d6d372834f09977ef3e8e28041d293d12e917a89d5784693066141066f21eb5f",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_light_jab_video_normalized.png": "0f7686a8008af6de10f1bf5129dda0274bcd0a7ec2cc43def0f8b74cdc182516"
+      "art/sprites/source/p02_light_jab_video_normalized.png": "f87b6ef43ad7c636262b4933e21f739244c61d2b99f6b8e58e39b3a4921b08ff"
     }
   }
 }

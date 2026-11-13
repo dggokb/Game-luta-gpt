@@ -17,7 +17,7 @@ import org.robolectric.RuntimeEnvironment;
 public class TelaVitoriaTest {
     private static TelaVitoria tela() {
         TelaVitoria t = new TelaVitoria(RuntimeEnvironment.getApplication().getAssets());
-        t.manter("cenario_sem_fundo", "player_base", "p03");
+        t.manter("cenario_sem_fundo", "player_base", "p03", "koga_8");
         return t;
     }
 
@@ -36,25 +36,38 @@ public class TelaVitoriaTest {
     @Test public void soQuemTemACenaTemATela() {
         TelaVitoria t = tela();
         assertTrue(t.tem("player_base"));
-        assertFalse(t.tem("p03"));
-        t.comecar("p03", 0xFF000000, "KŌGA", s -> s);
+        assertTrue(t.tem("p03"));
+        assertFalse(t.tem("koga_8"));
+        t.comecar("koga_8", 0xFF000000, "KŌGA", s -> s);
         assertFalse(t.ativa());
     }
 
-    @Test public void tocaOVideoInteiroEAcaba() {
+    @Test public void imagemParadaFicaNaTelaEAcaba() {
         TelaVitoria t = tela();
-        t.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
+        t.comecar("p03", 0xFFC62F2F, "KŌGA", s -> s);
+        assertTrue(t.ativa());
+        int passos = tocarAteOFim(t, -1);
+        // 80 ms de entrada + 3,6 s parada + 280 ms de saída, a 60 Hz.
+        assertTrue("passos " + passos, passos > 220 && passos < 260);
+    }
+
+    @Test public void emDuplaOParceiroEntraAtrasEACenaAcabaIgual() {
+        TelaVitoria t = tela();
+        t.comecar("player_base", "p03", 0xFF2F6FD6, "RYŪGA", s -> s);
         assertTrue(t.ativa());
         int passos = tocarAteOFim(t, -1);
         assertFalse(t.ativa());
-        // 124 quadros a 48 fps (~2,6 s) com a entrada, a pose final parada 2 s e a saída: ~5 s.
-        assertTrue("passos " + passos, passos > 270 && passos < 320);
+        assertTrue("passos " + passos, passos > 220 && passos < 260);
+        // Parceiro sem cena ou o mesmo lutador: sozinho, sem erro.
+        TelaVitoria s2 = tela();
+        s2.comecar("p03", "koga_8", 0xFFC62F2F, "KŌGA", s -> s);
+        assertTrue(tocarAteOFim(s2, -1) > 220);
     }
 
     @Test public void umToqueNoComecoNaoPulaDepoisPula() {
         TelaVitoria cedo = tela();
         cedo.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
-        assertTrue(tocarAteOFim(cedo, 10) > 270);
+        assertTrue(tocarAteOFim(cedo, 10) > 220);
         TelaVitoria depois = tela();
         depois.comecar("player_base", 0xFF2F6FD6, "RYŪGA", s -> s);
         int passos = tocarAteOFim(depois, 60);

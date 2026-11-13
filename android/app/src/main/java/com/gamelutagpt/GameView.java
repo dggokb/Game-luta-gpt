@@ -1715,6 +1715,13 @@ public class GameView extends SurfaceView
                     for (FighterState m : engine.team(side).members) if (m != null) m.superMeter = barra;
                 }
             }
+            float canto = cantoPedido;
+            if (canto > 0f) {
+                // PC (GravarLuta, passo canto:GAP): o rival encostado na borda da direita, nós a GAP px.
+                cantoPedido = -1f;
+                engine.fighter(1).x = Arena.RIGHT_BOUND;
+                engine.fighter(0).x = Arena.RIGHT_BOUND - canto;
+            }
             String[] dupla = duplaPedida;
             if (dupla != null) {
                 duplaPedida = null;
@@ -1730,10 +1737,11 @@ public class GameView extends SurfaceView
             if (glQuadro) desenhoGl.relatarTrabalho(System.nanoTime() - frameStart);
             if (teste.ativo()) registrarQuadroDoTeste();
             // No teste a qualidade fica parada: trocar no meio misturava as medidas.
+            // No AUTO a medida só recomenda: o nível muda na próxima abertura do jogo (13/11).
             if (janela && !teste.ativo() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
-                Log.i(PerfilQuadros.TAG, "gráficos mudaram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
+                Log.i(PerfilQuadros.TAG, "gráficos: próxima abertura em "
+                    + QualidadeGrafica.NOMES[qualidade.nivelDaProximaAbertura()]
                     + " (luta a " + Math.round(perfil.fps()) + " fps)");
-                aplicarQualidade();
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
             if (glQuadro && desenhoGl.trocaEsperaTela()) {
@@ -4037,6 +4045,13 @@ public class GameView extends SurfaceView
 
     private volatile int superPedido = -1;
 
+    /** PC ({@code gradle :pc:gravarLuta}): o rival no canto da direita e nós a {@code gap} px dele. */
+    public void irParaOCanto(float gap) {
+        cantoPedido = gap;
+    }
+
+    private volatile float cantoPedido = -1f;
+
     /** PC ({@code gradle :pc:gravarLuta}): a luta carregou, a entrada acabou e os comandos já valem. */
     public boolean lutaPronta() {
         return telaDaLuta() && introFrame < 0 && duplaPedida == null && !demo.active() && !tutorial.active()
@@ -5493,13 +5508,15 @@ public class GameView extends SurfaceView
         if (animation == null && f.grounded && f.status == CombatFighter.Status.NEUTRAL && Math.abs(f.travel) < 0.001f) {
             clipStep *= renderer.animacao.pose().ritmo;
         }
+        renderer.motion.passada(f.passada, f.passadaFrente);
         renderer.update(
             clipStep,
             f.grounded,
             // Na preparação do pulo ele agacha (o começo do clipe de agachar).
             f.crouchingBody() || guard == CombatFighter.GUARD_LOW || f.jumpSquat > 0,
             f.vy,
-            f.travel,
+            // Deslizando no embalo (golpe dado na corrida) ele não dá passo: a guarda, não o andar.
+            f.embalo != 0f ? 0f : f.travel,
             f.travel * f.facing > 0,
             f.forwardDashing,
             f.backdashFrames > 0,
@@ -7835,7 +7852,11 @@ public class GameView extends SurfaceView
         if (!telaVitoria.tem(id)) return false;
         String nome = temporada != null ? temporada.nomeDoLutador(id) : null;
         if (nome == null) nome = winner.character.displayName;
-        telaVitoria.comecar(id, winner.profile.color, nome.toUpperCase(Locale.ROOT),
+        // Em dupla, o outro do time aparece atrás (como no versus).
+        FighterState point = engine.team(PLAYER).pointState(), partner = engine.team(PLAYER).partner();
+        FighterState outro = winner == point ? partner : point;
+        String parceiro = outro != null ? outro.character.id : null;
+        telaVitoria.comecar(id, parceiro, winner.profile.color, nome.toUpperCase(Locale.ROOT),
             texto -> temporada != null ? temporada.t(texto) : texto);
         return true;
     }
@@ -7970,8 +7991,10 @@ public class GameView extends SurfaceView
         conversa.momento("inicio");
         storyFightFrames = 0;
         String irmao = historia.campanha() != null ? historia.campanha().irmao() : null;
-        if (luta.cinematica != null && temporada != null && !cinematica.carregar(temporada, luta.cinematica, irmao)) {
-            Log.w(LOG_TAG, "cinemática " + luta.cinematica + " não abriu");
+        // A do passo, ou a história da dupla adversária no torneio (Campanha.cinematica).
+        String arquivoCena = historia.cinematica(luta);
+        if (arquivoCena != null && temporada != null && !cinematica.carregar(temporada, arquivoCena, irmao)) {
+            Log.w(LOG_TAG, "cinemática " + arquivoCena + " não abriu");
         }
         // As cenas em vídeo da cinemática (folhas grandes): lidas agora, numa thread à parte.
         cenaVideo.carregar(cinematica.videos());
@@ -8281,6 +8304,7 @@ public class GameView extends SurfaceView
         // Não começa por cima de um Super, de um Ultra, de uma troca ou da Página Final.
         boolean livre = lutando && historia.waitingFight() && ultraAttacker < 0 && !engine.ultraSequenceRunning() &&
             !isSuperCinematicActive() && !isTagAnimationActive() && !paginaFinal.isActive();
+        cinematica.sozinhos(sozinho(PLAYER), sozinho(OPPONENT));
         if (cinematica.armada() && livre) {
             cinematica.gatilho(vida(player()), vida(opponent()), storyFightFrames * FIXED_STEP, ko);
         }
@@ -8309,6 +8333,17 @@ public class GameView extends SurfaceView
         conversa.update(FIXED_STEP);
         impacts.update(FIXED_STEP * velocidade);
         updateStoryFight();
+        return true;
+    }
+
+    /**
+     * Quem está em campo neste lado é o último de pé (o parceiro caiu, ou é 1x1). O titular que
+     * acabou de cair ainda é "o da vez" até o parceiro entrar: aí não conta.
+     */
+    private boolean sozinho(int side) {
+        FighterState vez = engine.team(side).pointState();
+        if (vez.life <= 0) return false;
+        for (FighterState m : engine.team(side).members) if (m != vez && m.life > 0) return false;
         return true;
     }
 
@@ -8404,6 +8439,10 @@ public class GameView extends SurfaceView
 
         @Override public boolean aDireita(int lado) {
             return engine.fighter(lado).x > engine.fighter(1 - lado).x;
+        }
+
+        @Override public String emCampo(int lado) {
+            return avulsoDoLutador(engine.team(lado).pointState());
         }
 
         @Override public void golpear(int lado, CinematicaLuta.Golpe golpe) {

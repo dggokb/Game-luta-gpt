@@ -16,10 +16,10 @@
     "personagem": "p02",
     "escala": 0.4173,
     "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
-    "quadros": "37,40,42,44,46,52,58,61,63,64,67,73,76,79,82,85,88",
+    "quadros": "37,40,42,44,46,52,58,61,63,64,67,73,82,88,100,112,123",
     "celula": 288,
     "largura": 288,
-    "raiz": "97,270",
+    "raiz": "93,270",
     "colunas": 11,
     "fixar": "video",
     "sem_poeira": true,
@@ -27,12 +27,8 @@
   },
   "frameWidth": 288,
   "frameHeight": 288,
-  "rootX": 97,
+  "rootX": 93,
   "rootY": 270,
-  "sourceReferences": [
-    "art/sprites/source/p02_joelho_garca_video_normalized_smear.png",
-    "art/sprites/source/p02_joelho_garca_video_normalized.png"
-  ],
   "smear": {
     "fonte": "art/sprites/source/p02_joelho_garca_video_normalized.png",
     "quadros": [
@@ -50,5 +46,9 @@
       1.0,
       0.5
     ]
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p02_joelho_garca_video_normalized_smear.png",
+    "art/sprites/source/p02_joelho_garca_video_normalized.png"
+  ]
 }

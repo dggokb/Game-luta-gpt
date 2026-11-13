@@ -114,6 +114,15 @@ public final class CinematicaLuta {
 
         /** Um som da história ("pagina", "painel", "impacto"), o mesmo das páginas entre as lutas. */
         default void som(String id) {}
+
+        /**
+         * Quem fala por esse lado numa fala com {@code "quem": "jogador"} ou {@code "rival"}: o
+         * lutador em campo agora (na dupla, qualquer um dos dois pode ser o último de pé). Null
+         * cala a fala.
+         */
+        default String emCampo(int lado) {
+            return null;
+        }
     }
 
     /** Um golpe roteirizado pedido ao {@link Palco}: o acerto (ou o erro) de um QTE. */
@@ -154,11 +163,21 @@ public final class CinematicaLuta {
         public final float valor;
         /** VIDA: de quem ({@link #JOGADOR}, {@link #RIVAL}) ou -1 para qualquer um. */
         public final int lado;
+        /**
+         * VIDA com {@code "ultimo": true}: só vale para o último lutador de pé do lado (no 2x2,
+         * depois que o parceiro dele caiu). Até lá o lado perde normalmente.
+         */
+        public final boolean ultimo;
 
         Gatilho(Tipo tipo, float valor, int lado) {
+            this(tipo, valor, lado, false);
+        }
+
+        Gatilho(Tipo tipo, float valor, int lado, boolean ultimo) {
             this.tipo = tipo;
             this.valor = valor;
             this.lado = lado;
+            this.ultimo = ultimo;
         }
     }
 
@@ -679,7 +698,7 @@ public final class CinematicaLuta {
             else if (lado.equals("jogador")) quem = JOGADOR;
             else if (lado.equals("rival")) quem = RIVAL;
             else throw new IllegalArgumentException("lado do gatilho " + lado + " (use qualquer, jogador ou rival)");
-            return new Gatilho(Gatilho.Tipo.VIDA, vida, quem);
+            return new Gatilho(Gatilho.Tipo.VIDA, vida, quem, Boolean.TRUE.equals(m.get("ultimo")));
         }
         if (m.get("tempo") instanceof Number) {
             float tempo = ((Number)m.get("tempo")).floatValue();
@@ -716,7 +735,9 @@ public final class CinematicaLuta {
                 a = new Acao(Acao.Tipo.FALA);
                 a.quem = Episodio.string(m, "quem", null);
                 if (a.quem == null) throw new IllegalArgumentException("fala sem \"quem\"");
-                if (temporada != null && !temporada.elenco.containsKey(a.quem)) {
+                // "jogador"/"rival": quem estiver em campo nesse lado na hora (Palco.emCampo).
+                boolean emCampo = a.quem.equals("jogador") || a.quem.equals("rival");
+                if (temporada != null && !emCampo && !temporada.elenco.containsKey(a.quem)) {
                     throw new IllegalArgumentException("fora do elenco da temporada: " + a.quem);
                 }
                 a.texto = texto(m);
@@ -823,8 +844,11 @@ public final class CinematicaLuta {
                 a.lances = new ArrayList<>();
                 for (Object l : Episodio.list(m, "lances")) {
                     String lance = String.valueOf(l);
-                    if (!lance.matches("bloqueio|vento|esquiva|salto|choque")) {
-                        throw new IllegalArgumentException("lance " + lance + " (use bloqueio, vento, esquiva, salto ou choque)");
+                    // "tipo", "tipo:quem" ou "tipo:quem:botões" (quem ataca e os golpes em ordem,
+                    // ex.: "bloqueio:rival:L,H,2H"); "fim" encerra a troca ali.
+                    if (!lance.matches(LANCE)) {
+                        throw new IllegalArgumentException("lance " + lance + " (use bloqueio, vento, esquiva, salto, choque"
+                            + " ou fim; com quem ataca e os golpes: bloqueio:rival:L,H,2H)");
                     }
                     a.lances.add(lance);
                 }
@@ -938,10 +962,13 @@ public final class CinematicaLuta {
         return a;
     }
 
+    /** Um lance da troca: o tipo, e opcionalmente quem ataca e os golpes dele, em ordem. */
+    static final String LANCE = "fim|(bloqueio|vento|esquiva|salto|choque)(:(jogador|rival)(:(2?[LMH]|S[1-9]?)(,(2?[LMH]|S[1-9]?))*)?)?";
+
     private static Golpe golpe(Map<String, Object> m, String chave, String padrao, boolean finaliza) {
         String g = Episodio.string(m, chave, padrao);
-        if (!g.matches("2?[LMH]|S[1-9]?")) {
-            throw new IllegalArgumentException("golpe " + g + " (use L, M, H, 2L, 2M, 2H ou um especial: S, S2, S3...)");
+        if (!g.matches("2?[LMH]|S[1-9]?|A")) {
+            throw new IllegalArgumentException("golpe " + g + " (use L, M, H, 2L, 2M, 2H, A (agarrão) ou um especial: S, S2, S3...)");
         }
         return new Golpe(g, numero(m, "dano", 0.15f, 0f, 1f), finaliza);
     }
@@ -1052,7 +1079,21 @@ public final class CinematicaLuta {
         if (roteiro == null || roteiro.gatilho.tipo == Gatilho.Tipo.KO) return false;
         if (estado == Estado.RODANDO) return true;
         Gatilho g = roteiro.gatilho;
-        return estado == Estado.ARMADA && g.tipo == Gatilho.Tipo.VIDA && (g.lado < 0 || g.lado == lado);
+        return estado == Estado.ARMADA && g.tipo == Gatilho.Tipo.VIDA && (g.lado < 0 || g.lado == lado)
+            && (!g.ultimo || sozinho(lado));
+    }
+
+    /** Quem ainda tem parceiro de pé em cada lado (o gatilho {@code "ultimo"} espera ficar só um). */
+    private boolean sozinhoJogador = true, sozinhoRival = true;
+
+    /** A cada quadro: em cada lado, só resta um lutador de pé (ou é 1x1)? */
+    public void sozinhos(boolean jogador, boolean rival) {
+        sozinhoJogador = jogador;
+        sozinhoRival = rival;
+    }
+
+    private boolean sozinho(int lado) {
+        return lado == JOGADOR ? sozinhoJogador : sozinhoRival;
     }
 
     /** O fim da luta espera: a cena está rodando ou é a do KO e ainda não começou. */
@@ -1082,7 +1123,8 @@ public final class CinematicaLuta {
                 dispara = !ko && segundos >= g.valor;
                 break;
             case VIDA:
-                dispara = !ko && ((g.lado != RIVAL && vidaJogador <= g.valor) || (g.lado != JOGADOR && vidaRival <= g.valor));
+                dispara = !ko && ((g.lado != RIVAL && vidaJogador <= g.valor && (!g.ultimo || sozinhoJogador))
+                    || (g.lado != JOGADOR && vidaRival <= g.valor && (!g.ultimo || sozinhoRival)));
                 break;
             default:
                 dispara = ko;
@@ -1171,7 +1213,10 @@ public final class CinematicaLuta {
                 for (int lado : lados(a.quemMove)) palco.mover(lado, a.movimento);
                 break;
             case FALA:
-                if (conversa != null) conversa.dizer(temporada, a.quem, naDireita(a), a.expressao, a.texto, a.segura);
+                if (conversa != null) {
+                    String quem = a.quem.equals("jogador") || a.quem.equals("rival") ? palco.emCampo(lado(a.quem)) : a.quem;
+                    if (quem != null) conversa.dizer(temporada, quem, naDireita(a), a.expressao, a.texto, a.segura);
+                }
                 break;
             case ONOMATOPEIA:
                 estouros.add(new Estouro(a, time));

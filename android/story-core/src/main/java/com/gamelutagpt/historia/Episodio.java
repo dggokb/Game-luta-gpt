@@ -247,12 +247,24 @@ public final class Episodio {
          * texto pintado na arte (a arte não tem balão para apagar).
          */
         public final boolean moldura;
+        /**
+         * Um pedaço do texto em outra cor (o grito com o nome, como o NECRO vermelho da arte):
+         * onde ele aparece numa linha, sai em {@link #corDestaque}. Null: tudo em preto.
+         */
+        public final String destaque;
+        public final int corDestaque;
 
         BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura) {
+            this(area, caixa, texto, moldura, null, 0);
+        }
+
+        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura, String destaque, int corDestaque) {
             this.area = area;
             this.caixa = caixa;
             this.texto = texto;
             this.moldura = moldura;
+            this.destaque = destaque;
+            this.corDestaque = corDestaque;
         }
     }
 
@@ -436,8 +448,10 @@ public final class Episodio {
             if (texto.isEmpty()) throw new IllegalArgumentException("balão da página pronta sem texto");
             float[] caixa = fractions(b, "caixa", 4, "caixa do balão");
             if (caixa.length != 4) throw new IllegalArgumentException("caixa do balão precisa ser [esquerda, topo, direita, base]");
+            String destaque = string(b, "destaque", null);
             baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto,
-                Boolean.TRUE.equals(b.get("moldura"))));
+                Boolean.TRUE.equals(b.get("moldura")), destaque,
+                Temporada.parseColor(string(b, "corDestaque", "#D8262E"))));
         }
         boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
         return new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),

@@ -7,16 +7,16 @@
   320
  ],
  "raiz": [
-  97,
+  98,
   302
  ],
  "pixelScale": null,
  "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
  "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
  "fonte": "art/sprites/source/p02_heavy_straight_video_normalized_smear.png",
- "fonte_sha256": "75ea27791e87f93de59bfc12c0991e83a12afcde3fbe38e61c3407e1882f7cf8",
+ "fonte_sha256": "330b9ebf5ad99ac5455a1c9ba274e0f2f1c778e1685f02ffc22d1cc0aaac8f3b",
  "saida": "art/sprites/source/p02_heavy_straight_video_normalized_smear_sr_hd.png",
- "saida_sha256": "8412fd21e31e851ffcc392a95a524eebb7dd98fe0d5d06e47d2f3bfb59159761",
+ "saida_sha256": "2b5e3a93448b5eaf338c21c48f2df823e7ea0016a34b853eed71308beb2d8212",
  "alfa": "idêntico à fonte (conferido byte a byte)",
  "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
 }

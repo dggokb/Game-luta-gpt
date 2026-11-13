@@ -16,7 +16,7 @@
     "personagem": "p02",
     "escala": 0.4173,
     "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
-    "quadros": "22,25,27,28,29,31,34,61,63,65,67,70,73",
+    "quadros": "22,25,27,28,29,31,34,61,63,65,70,79,86",
     "largura": 256,
     "raiz": "102,238",
     "colunas": 11,
@@ -25,10 +25,10 @@
     "limpar_chao": true
   },
   "rootX": 102,
+  "frameHeight": 256,
+  "rootY": 238,
+  "frameWidth": 256,
   "sourceReferences": [
     "art/sprites/source/p02_light_jab_video_normalized.png"
-  ],
-  "frameWidth": 256,
-  "frameHeight": 256,
-  "rootY": 238
+  ]
 }
