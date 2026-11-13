@@ -1326,7 +1326,8 @@ public final class CinematicaLuta {
             trancoVolta = -1f;
         }
         atualizarCameraViva();
-        if (animando != null && estado == Estado.RODANDO && time >= congelaAte) animar(dt * 60f);
+        // A "velocidade" do roteiro vale também na animação feita à mão: a câmera lenta no contato.
+        if (animando != null && estado == Estado.RODANDO && time >= congelaAte) animar(dt * 60f * velocidade.valor());
         if (estado == Estado.RODANDO) avancar();
     }
 

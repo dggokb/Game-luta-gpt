@@ -53,8 +53,20 @@ def linhas(q, estilo=None, escuro=0.0, segundos=0.08):
         ev(q, 'linhas', ligar=False, segundos=segundos)
 
 
+# A pausa no contato por força (s): o golpe defendido, o forte e o IMPACTO final. Mais longas que as
+# do motor (13/11, o dono: "tá tudo muito acelerado, os golpes perdem o impacto").
+CONGELA = {1: 0.18, 2: 0.3, 3: 0.6}
+
+
 def impacto(q, quem, forca, **kw):
+    kw.setdefault('congela', CONGELA[forca])
     ev(q, 'impacto', quem=quem, forca=forca, **kw)
+
+
+def lenta(q, antes=4, depois=18, valor=0.35):
+    """Câmera lenta em volta do contato do quadro q (a animação anda a `valor` e volta ao normal)."""
+    ev(q - antes, 'velocidade', valor=valor, segundos=0.05, semEsperar=True)
+    ev(q + depois, 'velocidade', valor=1.0, segundos=0.2, semEsperar=True)
 
 
 def efeito(q, quem, nome, **kw):
@@ -129,6 +141,7 @@ R.k(211, 'JUMP_HEAVY:8', -188, y=70, rot=28, curva='entra', rastro=5)
 Y.k(203, 'DEFENSE_CROUCH:1', -62)
 Y.k(209, 'DEFENSE_CROUCH:2', -62)
 impacto(211, 'jogador', 2, letreiro='DOOOM!')
+lenta(211)
 efeito(212, 'rival', 'fumaca_queda_v01', escala=1.2)
 linhas(212)
 # O ricochete: ele volta no ar e pousa longe; ela afunda e escorrega.
@@ -165,7 +178,6 @@ impacto(292, 'jogador', 1)
 R.k(299, 'LIGHT_JAB:9', -206)
 Y.k(298, 'DEFENSE_STAND:5', -76)
 # b2: a palma dela, ele defende.
-camera(300, 1.65, 'rival')
 Y.k(301, 'SPECIAL_S3:9', -76)
 Y.k(304, 'SPECIAL_S3:12', -86, curva='sai', rastro=2)
 R.k(301, 'DEFENSE_STAND:2', -208)
@@ -185,7 +197,6 @@ Y.k(321, 'LIGHT_JAB:8', -52)
 R.k(333, 'MEDIUM_KICK:15', -255, curva='sai')
 Y.k(333, 'LIGHT_JAB:10', -15, curva='sai')
 # b4: o chute alto dela, ele se abaixa.
-camera(336, 1.45, 'rival')
 Y.k(337, 'HEAVY_STRAIGHT:4', -50)
 Y.k(341, 'HEAVY_STRAIGHT:7', -70, curva='sai', rastro=4)
 R.k(335, 'CROUCH:3', -232)
@@ -198,7 +209,6 @@ R.k(353, 'SOCO_PLEXO:4', -215, curva='sai', rastro=3)
 Y.k(350, 'DEFENSE_STAND:2', -70)
 Y.k(353, 'DEFENSE_STAND:4', -70)
 impacto(353, 'jogador', 1)
-camera(358, 1.75, 'rival')
 R.k(358, 'CROUCH_HEAVY:2', -220)
 R.k(361, 'CROUCH_HEAVY:6', -205, y=12, curva='sai', rastro=3)
 Y.k(358, 'DEFENSE_STAND:3', -70)
@@ -251,6 +261,7 @@ Y.k(507, 'SPECIAL_S3:10', -105, alfa=1.0)
 R.k(508, 'IDLE:0', 30)
 Y.k(510, 'SPECIAL_S3:12', -95, curva='sai', rastro=2)
 impacto(510, 'rival', 2, letreiro='PAH!')
+lenta(510)
 R.k(510, 'HIT_BODY:1', 30, rastro=2)
 R.k(524, 'HIT_BODY:3', 100, curva='sai')
 camera(514, 1.25, 'centro', 0.2)
@@ -355,7 +366,8 @@ Y.k(1066, 'DEFENSE_CROUCH:2', 128)
 camera(1060, 1.25)
 linhas(1062, 'concentracao', escuro=0.45, segundos=0.05)
 # Os golpes se cruzam: IMPACTO!, o clarão de dois quadros e a câmera volta devagar.
-impacto(1068, 'jogador', 3, congela=0.42)
+impacto(1068, 'jogador', 3)
+lenta(1068, antes=8, depois=24, valor=0.3)
 ev(1068, 'clarao', segundos=0.05)
 letreiro(1068, 'IMPACTO!', [0.5, 0.4], 190, tremor=18, cor='#FF5A3C', segundos=0.9)
 efeito(1069, 'rival', 'fumaca_queda_v01', escala=1.5)
@@ -370,10 +382,101 @@ Y.k(1070, 'DEFENSE_CROUCH:3', 128, rastro=3)
 Y.k(1090, 'DEFENSE_CROUCH:4', 210, curva='sai')
 efeito(1071, 'rival', 'fumaca_dash_v05', atras=True)
 Y.k(1104, 'DEFENSE_CROUCH:6', 212)
-respirar(R, 1110, 1240, 'LAND:5', -150)
-respirar(Y, 1116, 1240, 'LAND:6', 212)
+respirar(R, 1110, 1290, 'LAND:5', -150)
+respirar(Y, 1116, 1290, 'LAND:6', 212)
 letreiro(1128, 'HAH... HAH...', [0.5, 0.3], 80, segundos=2.0)
-QUADROS = 1250
+QUADROS = 1290
+
+# As pausas (quadro da coreografia: quadros a mais): os dois seguram a pose daquele quadro e o
+# resto anda para a frente. É onde a cena respira: a antecipação, o golpe esticado depois do
+# contato, a pausa de quem se estuda. Só em quadros onde os dois têm chave ou estão parados.
+PAUSAS = {
+    140: 10,   # ela agachada antes de arrancar
+    162: 6,    # o soco esticado no vento
+    173: 10,   # o chute alto na defesa dele
+    189: 4,    # a rasteira esticada
+    194: 6,    # ele parado no alto antes de girar
+    252: 22,   # os dois se estudam depois do DOOOM
+    272: 10,   # a antecipação dos dois antes de arrancar
+    292: 8,    # o jab na defesa dela
+    304: 8,    # a palma na defesa dele
+    319: 12,   # os punhos se chocando
+    341: 6,    # o chute alto passando por cima
+    353: 6,    # o soco no abdômen
+    361: 6,    # o gancho
+    375: 12,   # o chute giratório na defesa dela
+    396: 12,   # ela agachada depois de escorregar
+    470: 10,   # ele agachado antes de correr
+    506: 14,   # ele parado, procurando por ela (ela invisível atrás)
+    535: 8,    # o chute dela na defesa dele
+    547: 6,    # a mão dele no braço dela
+    620: 12,   # ele de pé depois de escorregar
+    1002: 12,  # a antecipação dos dois antes do último confronto
+    1020: 6,   # o soco dele no vento
+    1029: 6,   # o chute dela no vento
+    1058: 10,  # ele no alto, ela pousando
+}
+
+
+def curva(nome, t):
+    """A mesma curva de chegada do jogo (AnimacaoManual.curva)."""
+    t = max(0.0, min(1.0, t))
+    if nome == 'sai':
+        return 1 - (1 - t) ** 3
+    if nome == 'entra':
+        return t ** 3
+    if nome == 'suave':
+        return t * t * (3 - 2 * t)
+    if nome == 'corte':
+        return 1.0 if t >= 1 else 0.0
+    return t
+
+
+def pausar(jogador, rival, eventos, quadros, pausas):
+    """Insere as pausas: depois do quadro p, n quadros com os dois segurando a pose de p."""
+    def novo(q):
+        return q + sum(n for p, n in pausas.items() if q > p)
+
+    def um(chaves):
+        out = []
+        for c in chaves:
+            c2 = dict(c)
+            c2['q'] = novo(c['q'])
+            out.append(c2)
+        for p, n in sorted(pausas.items()):
+            antes = [c for c in chaves if c['q'] <= p]
+            depois = [c for c in chaves if c['q'] > p]
+            a = antes[-1]
+            if 'ate' in a:
+                raise ValueError(f'pausa no quadro {p}: a chave {a["q"]} anima com "ate"')
+            parada = {k: v for k, v in a.items() if k not in ('curva', 'rastro')}
+            if a['q'] != p and depois:
+                # No meio de um movimento: a pose de p (os números interpolados como no jogo) ganha
+                # uma chave em p, e a pausa segura nela.
+                b = depois[0]
+                t = curva(b.get('curva', 'linear'), (p - a['q']) / (b['q'] - a['q']))
+                for k, padrao in (('x', 0), ('y', 0), ('sx', 1), ('sy', 1), ('rot', 0), ('alfa', 1)):
+                    va, vb = a.get(k, padrao), b.get(k, padrao)
+                    if va != vb or k in a:
+                        parada[k] = round(va + (vb - va) * t, 2)
+                chave_p = dict(parada)
+                chave_p['q'] = novo(p)
+                chave_p['curva'] = b.get('curva', 'linear')
+                if a.get('rastro'):
+                    chave_p['rastro'] = a['rastro']
+                out.append(chave_p)
+            copia = dict(parada)
+            copia['q'] = novo(p) + n
+            out.append(copia)
+        out.sort(key=lambda c: c['q'])
+        return out
+
+    evs = []
+    for e in eventos:
+        e2 = dict(e)
+        e2['q'] = novo(e['q'])
+        evs.append(e2)
+    return um(jogador), um(rival), evs, novo(quadros) + 0
 
 
 def _linha(o):
@@ -407,7 +510,8 @@ def main():
     # No mesmo quadro o impacto vai por último: ele congela a animação, e o que vem depois
     # dele (o clarão, o letreiro) esperaria a pausa acabar.
     eventos.sort(key=lambda e: (e['q'], e['acao']['acao'] == 'impacto'))
-    anim = {'acao': 'animar', 'quadros': QUADROS, 'jogador': R.chaves, 'rival': Y.chaves, 'eventos': eventos}
+    jogador, rival, evs, total = pausar(R.chaves, Y.chaves, eventos, QUADROS, PAUSAS)
+    anim = {'acao': 'animar', 'quadros': total, 'jogador': jogador, 'rival': rival, 'eventos': evs}
     cena = json.loads(CENA.read_text(encoding='utf-8'))
     acoes = cena['acoes']
     i = next(n for n, a in enumerate(acoes) if a.get('acao') == 'animar')
@@ -426,8 +530,8 @@ def main():
         'devagar e os dois ofegantes. A coreografia com QTE do motor de luta está em '
         'cinematica_convite_ryuga_qte.json.')
     CENA.write_text(escrever(cena), encoding='utf-8')
-    print(f'{CENA.relative_to(ROOT)}: {QUADROS} quadros ({QUADROS / 60:.1f} s), '
-          f'{len(R.chaves)} chaves do Ryūga, {len(Y.chaves)} da Yin-lu, {len(eventos)} eventos')
+    print(f'{CENA.relative_to(ROOT)}: {total} quadros ({total / 60:.1f} s, sem as pausas de contato e a '
+          f'câmera lenta), {len(jogador)} chaves do Ryūga, {len(rival)} da Yin-lu, {len(evs)} eventos')
 
 
 if __name__ == '__main__':

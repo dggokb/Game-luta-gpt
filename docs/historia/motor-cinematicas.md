@@ -385,7 +385,9 @@ como num programa de animação:
 Entre duas chaves os números são interpolados com a curva da chave seguinte; a pose fica a da chave
 de antes. Os `eventos` são ações quaisquer do roteiro no quadro (`camera`, `impacto`, `efeito`,
 `linhas`, `fala`, `onomatopeia`, `clarao`), menos `qte`, `golpe` e `animar`. Um `impacto` congela a
-animação no contato. As falas não esperam: a animação reserva o tempo delas.
+animação no contato. A `velocidade` dentro da animação muda o ritmo dela (0,35 = câmera lenta em volta de um golpe; volte a 1 depois). As falas não esperam: a animação reserva o tempo delas.
+
+No gerador, as `PAUSAS` (quadro: quadros a mais) seguram a pose dos dois naquele quadro e empurram o resto para a frente (a antecipação, o golpe esticado depois do contato, a pausa de quem se estuda), sem refazer a coreografia; `CONGELA` dá a pausa do contato por força e `lenta()` a câmera lenta em volta de um golpe. O ritmo vem do dono (13/11): o movimento rápido, as pausas longas; a cena corrida cansa e o golpe perde o peso.
 
 A luta do convite do Ryūga é escrita por um gerador (`tools/cenas/convite_ryuga.py`): ajuste os
 números lá e rode `python3 tools/cenas/convite_ryuga.py`. Para ver as poses de um lutador, as
@@ -402,7 +404,7 @@ Yin-lu, no dojo dela):
    quadro, no toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
 3. A tinta pinta de novo por cima da segunda página, os dois recuam atrás dela e a tinta sai: a luta volta.
 4. A **coreografia do dono (13/11)**, em quatro sequências, **animada à mão** (ação `animar`, uns
-   21 s): a tabela abaixo. A versão anterior, com os QTE e o motor de luta fazendo os golpes, está em
+   33 s): a tabela abaixo. A versão anterior, com os QTE e o motor de luta fazendo os golpes, está em
    `historia/ep02/cinematica_convite_ryuga_qte.json` (os QTE voltam para a cena animada depois que o
    ritmo dela for aprovado). Nela os QTE não batem por conta própria (`"golpe": "nenhum"`): o
    acerto libera a troca de golpes do roteiro, com quem ataca e os golpes em ordem.
