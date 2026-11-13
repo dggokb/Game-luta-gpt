@@ -286,7 +286,7 @@ public class CinematicaLutaTest {
      * tinta cobre, as páginas são lidas quadro a quadro no toque, a tinta cobre de novo e sai; o
      * final pede 6 QTE (esquiva, combo, defesa e a sequência de precisão), todos sem golpe próprio
      * (o que acontece no acerto é a troca de golpes do roteiro). Os golpes que pegam são do
-     * roteiro: o chute giratório dele, a palma e o agarrão dela. Deixar o tempo acabar e deslizar
+     * roteiro: a palma e o agarrão dela (o chute giratório dele ela defende). Deixar o tempo acabar e deslizar
      * para o lado errado são erros: o rival bate e o QTE pede de novo. Ninguém cai: a Yin-lu
      * defende o último golpe e a luta acaba interrompida, com a tela limpa.
      */
@@ -294,7 +294,7 @@ public class CinematicaLutaTest {
     public void qteDoConviteDoRyuga() throws IOException {
         Palco palco = jogarConvite(CONVITE_EP02, Torneio.RYUGA, 6);
         assertEquals("cada erro um golpe do rival; os golpes do roteiro",
-            "[rival 2H, jogador S3, rival S1, rival A, rival M]", golpes(palco).toString());
+            "[rival 2H, rival S1, rival A, rival M]", golpes(palco).toString());
         assertTrue("a luta acaba sem vencedor", palco.pedidos.contains("fim interrompida"));
     }
 

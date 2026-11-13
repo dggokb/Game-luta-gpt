@@ -366,12 +366,12 @@ Yin-lu, no dojo dela):
 | Sequência | O que acontece | QTE |
 |---|---|---|
 | 1. Retomada | ela avança: "Vamos ver o quanto você melhorou!"; o soco dela passa no vento, o chute ele defende; a rasteira ele pula, desce com o chute e ela defende; DOOOM! | ESQUIVA! (deslizar para cima) |
-| 2. Alta velocidade | troca de golpes com a câmera alternando nele, nela e no meio (inclui um choque punho contra punho); o soco baixo e o gancho dele ela defende, o chute giratório (S3) pega e ela recua deslizando: "Nada mal!"; ele corre para cima | COMBO! (martelar 8) |
+| 2. Alta velocidade | troca de golpes com a câmera alternando nele, nela e no meio (inclui um choque punho contra punho); o soco baixo, o gancho e o chute giratório (S3) dele ela defende, mas o chute a empurra e ela recua deslizando: "Nada mal!"; ele corre para cima | COMBO! (martelar 8) |
 | 3. A superioridade dela | SHUN!: ela vem no dash e acerta a palma (S1); ele defende o golpe seguinte e ela o projeta com o agarrão; "Você continua sendo um monstro!" / "E você continua falando demais!", trocando golpes no vento | DEFESA! (tempo) |
 | 4. O último confronto | recuam ofegantes (HAH... HAH...); "Eu não vim até aqui pra perder!"; correm um para o outro: o soco dele ela desvia e o chute alto dela passa no vento; o uppercut (S2) ela pula para trás; ele pula e desce com o golpe e ela defende: IMPACTO!, clarão de dois quadros, a câmera volta devagar e os dois recuam ofegantes | SOCO! (toque), CONTRA-ATAQUE! (deslizar para cima), GOLPE FINAL! (tempo) |
 
-Ninguém cai: a luta acaba **interrompida** (`terminarLuta`) e a história segue. Pegam só o chute
-giratório dele (−4% dela), a palma e o agarrão dela (−5% cada dele).
+Ninguém cai: a luta acaba **interrompida** (`terminarLuta`) e a história segue. Pegam só a palma
+e o agarrão dela (−5% cada dele); os golpes dele ela defende todos.
 
 Errar qualquer QTE faz a Yin-lu contra-atacar (−4% do Ryūga) e o QTE pede de novo. A Yin-lu
 fala com o rosto da seleção (não tem retrato da história): quem luta ganha sempre esse rosto de

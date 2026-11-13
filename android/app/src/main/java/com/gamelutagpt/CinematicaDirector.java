@@ -319,7 +319,15 @@ final class CinematicaDirector {
                 // Quem defende segura para trás (defesa em pé) a vez inteira.
                 in[d].direction = DemoDirector.Ctx.back(def);
                 // A defesa empurrou longe demais: o resto do combo não sai do outro lado da tela.
-                if (t.golpes > 0 && t.faseFrame > 0 && vao > t.alvoVao + 60f) t.golpes = 0;
+                // Com os golpes do roteiro, quem ataca anda de volta e solta o que falta.
+                if (t.golpes > 0 && t.faseFrame > 0 && vao > t.alvoVao + 60f) {
+                    if (t.botoes == null || t.faseFrame > 150) {
+                        t.golpes = 0;
+                    } else {
+                        if (atk.canAct()) in[a].direction = DemoDirector.Ctx.forward(atk);
+                        return;
+                    }
+                }
                 if (t.golpes > 0 && t.faseFrame >= t.proximoGolpe && atk.canAct()) {
                     CinematicaDirector.apertar(t.proximo(BOTOES[t.sorteio.nextInt(BOTOES.length)]), in[a]);
                     t.golpes--;
