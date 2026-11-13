@@ -5435,7 +5435,9 @@ final class CombatEngine {
         d.pushFramesLeft = distance == 0f ? 0 : config.pushbackFrames;
         d.pushSource = source;
         d.pushAtrito = false;
-        if (ATRITO_DO_PE && EMPURRAO_POR_ATRITO && distance != 0f && d.grounded) {
+        // Só o que afasta de quem bateu desliza; o puxão (que traz para perto) é força, não deslize.
+        boolean afasta = source == null || distance * (d.x - source.x) >= 0f;
+        if (ATRITO_DO_PE && EMPURRAO_POR_ATRITO && distance != 0f && d.grounded && afasta) {
             // No chão o empurrão é um deslize: sai rápido e o atrito do pé freia até parar na
             // mesma distância do golpe. O tempo vem do atrito (v0 = √(2·a·d), t = v0 / a).
             float freio = config.atritoDoChao * config.gravity;

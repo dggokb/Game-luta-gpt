@@ -6,31 +6,47 @@ do chão), segue cada um de um quadro para o seguinte e decide qual está apoiad
 fica cravado no mundo: o quanto ele anda para trás no desenho, de um quadro para o outro, é o
 quanto o corpo anda para a frente no jogo (o "avanço" do quadro).
 
-Regras (valem para todo quadro, sem número por personagem):
-    pé          trecho de colunas com desenho na faixa de FAIXA × altura em pé acima do chão. Cada
-                pé é seguido inteiro e em duas metades (calcanhar e ponta, ou dois pés juntos num
-                trecho só), pelo desenho dele, do quadro para o seguinte
-    de apoio    em cada quadro, a parte de pé que deixa a velocidade do corpo mudar menos de um
-                quadro para o outro, na animação inteira (o corpo tem peso e não dá tranco; o pé
-                que dá o passo corre e para). Subir, descer e casar mal pesam contra a parte
-    sem apoio   nem o pé mais baixo chega perto da linha do chão (NO_AR × altura: corrida, pulo):
-                o quadro fica sem avanço medido e o corpo segue como vinha (o motor)
+Regras (valem para todo quadro, sem número por personagem; as medidas são frações da altura
+em pé do lutador):
+    pé          trecho de colunas com desenho na faixa de FAIXA × altura acima do chão, com
+                perna em cima (o que está largado no chão não é pé). Cada pé é seguido inteiro e
+                em duas metades (calcanhar e ponta, ou dois pés juntos num trecho só), pelo
+                desenho dele, do quadro para o seguinte
+    sentido     na locomoção (andar para a frente e para trás), para que lado o corpo anda no
+                desenho: cada pé fica mais tempo apoiado (andando devagar para trás em relação ao
+                corpo) do que no ar, então o lado para onde os pés andam na maior parte dos
+                quadros é o contrário do lado do corpo
+    de apoio    do que toca o chão, o que mais anda contra o sentido do corpo (o pé que dá o
+                passo vai a favor; o que o corpo carrega anda com ele), no caminho em que a
+                velocidade do corpo menos muda de um quadro para o outro (o corpo tem peso e não
+                dá tranco). Casar mal, subir, descer e estar acima do chão pesam contra a parte
+    sem apoio   nem o pé mais baixo chega perto do chão (NO_AR × altura): o corpo segue como
+                vinha (o avanço dos quadros medidos em volta)
 
 Saída, por animação (character.json, "apoio"):
+    folha       a marca da folha e dos quadros medidos (se a animação mudar, a medida não vale)
     avanco      px do mundo que o corpo anda, para a frente (negativo: para trás), do quadro i
-                para o seguinte (o último, para o primeiro, nas que dão a volta); null sem apoio
+                para o seguinte (o último, para o primeiro, nas que dão a volta)
     semApoio    quadros sem pé no chão
     duvida      quadros em que o pé de apoio casou mal com o quadro seguinte (medida fraca)
+    aoContrario a locomoção é desenhada para o lado contrário (andar para trás com o passo de
+                quem anda para a frente): o motor não usa
+    inseguro    por que o motor não deve usar a medida: o desenho quase não anda (marca passo), o
+                corpo anda para o lado errado em quadros demais, quadros demais em dúvida, ou o
+                apoio "volta para trás" (o apoio seguinte tem de pisar à frente do anterior)
 
-O motor usa o avanço das animações de andar que dão a volta com todos os quadros medidos
-(CombatEngine.andarPeloPe): a passada corre no tempo, no ritmo que dá a velocidade de andar do
-lutador, e o corpo anda o que o pé de apoio empurra. Só o andar da p02 está gravado (teste de
-13/11); a corrida não é medida (o pé passa de BUSCA entre dois quadros) e as animações no ar saem
-com medida falsa, porque a folha encosta o pé na linha do chão (quem sabe que é ar é o motor).
+Quem mede é o build (build_characters.py --write): animação de andar nova ou trocada sai medida
+sozinha, e com --check a medida de uma animação que mudou é erro. O motor usa o avanço do andar
+medido com segurança (CombatEngine.andarPeloPe): a passada corre no tempo, no ritmo que dá a
+velocidade de andar do lutador, e o corpo anda o que o pé de apoio empurra. Sem medida segura,
+fica o andar de velocidade fixa. A corrida não é medida (o pé fica dois quadros no chão por
+passada e anda mais do que dá para seguir); as animações no ar saem com medida falsa, porque a
+folha encosta o pé na linha do chão (quem sabe que é ar é o motor).
 
     python3 tools/sprites/apoio.py p02                    # mostra a medida de cada animação
     python3 tools/sprites/apoio.py p02 WALK_FORWARD -v    # quadro a quadro
-    python3 tools/sprites/apoio.py p02 --write WALK_FORWARD WALK_BACK
+    python3 tools/sprites/apoio.py todos                  # o andar do elenco
+    python3 tools/sprites/apoio.py p02 --write            # grava a do andar (o build também grava)
 """
 import argparse
 import hashlib
