@@ -161,9 +161,9 @@
     {
       "index": 13,
       "outputBbox": [
-        145,
+        129,
         185,
-        587,
+        571,
         543
       ],
       "minimumMargin": 33,
@@ -172,9 +172,9 @@
     {
       "index": 14,
       "outputBbox": [
-        200,
+        170,
         171,
-        575,
+        545,
         541
       ],
       "minimumMargin": 35,
@@ -183,9 +183,9 @@
     {
       "index": 15,
       "outputBbox": [
-        242,
+        196,
         147,
-        560,
+        514,
         541
       ],
       "minimumMargin": 35,
@@ -194,9 +194,9 @@
     {
       "index": 16,
       "outputBbox": [
-        240,
+        180,
         110,
-        542,
+        482,
         543
       ],
       "minimumMargin": 33,
@@ -205,9 +205,9 @@
     {
       "index": 17,
       "outputBbox": [
-        238,
+        162,
         97,
-        541,
+        465,
         543
       ],
       "minimumMargin": 33,
@@ -216,9 +216,9 @@
     {
       "index": 18,
       "outputBbox": [
-        238,
+        146,
         90,
-        540,
+        448,
         543
       ],
       "minimumMargin": 33,
@@ -227,9 +227,9 @@
     {
       "index": 19,
       "outputBbox": [
-        237,
+        131,
         90,
-        539,
+        433,
         543
       ],
       "minimumMargin": 33,
@@ -238,9 +238,9 @@
     {
       "index": 20,
       "outputBbox": [
-        236,
+        114,
         94,
-        539,
+        417,
         543
       ],
       "minimumMargin": 33,
@@ -371,7 +371,7 @@
         1236,
         456,
         372,
-        96,
+        80,
         100
       ],
       [
@@ -379,7 +379,7 @@
         472,
         388,
         384,
-        148,
+        118,
         86
       ],
       [
@@ -387,7 +387,7 @@
         0,
         328,
         404,
-        192,
+        146,
         63
       ],
       [
@@ -395,7 +395,7 @@
         0,
         316,
         448,
-        189,
+        129,
         25
       ],
       [
@@ -403,7 +403,7 @@
         0,
         316,
         460,
-        187,
+        111,
         12
       ],
       [
@@ -411,7 +411,7 @@
         0,
         312,
         468,
-        187,
+        95,
         4
       ],
       [
@@ -419,7 +419,7 @@
         0,
         316,
         468,
-        188,
+        82,
         5
       ],
       [
@@ -427,7 +427,7 @@
         0,
         316,
         460,
-        185,
+        63,
         10
       ]
     ],
@@ -442,12 +442,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1a4d344413dcbd0511bd722124fdc4962bb8428ace593655322d18b8501bb63b",
-      "config": "23463d121656cf36a04d35bc70ad5c66a511232a1aa2ff7c2732e44fcb555249",
+      "source": "25f3d5537a58ee3ca1fff5bf2464ebc5e2ec0eeee8fdc3f5903050b0821d03bf",
+      "config": "3a7da871b907966b887e54ccf97b64b0ed10e7b5fbdfd85ac87872add9aa6578",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_ombrada_video_normalized.png": "7477a9b42f16a7fb41c13a7d2c738c8f2971120e50c002f514d83ba6f5fb636e"
+      "art/sprites/source/player_base_ombrada_video_normalized.png": "1d27356d1ebeea4695241e82b11ce151f31b91a628e9a44beed298a91511c76b"
     }
   }
 }

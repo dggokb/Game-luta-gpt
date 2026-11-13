@@ -128,9 +128,9 @@
     {
       "index": 10,
       "outputBbox": [
-        103,
+        99,
         69,
-        269,
+        265,
         187
       ],
       "minimumMargin": 37,
@@ -139,9 +139,9 @@
     {
       "index": 11,
       "outputBbox": [
-        99,
+        90,
         69,
-        261,
+        252,
         188
       ],
       "minimumMargin": 36,
@@ -150,9 +150,9 @@
     {
       "index": 12,
       "outputBbox": [
-        102,
+        88,
         59,
-        260,
+        246,
         187
       ],
       "minimumMargin": 37,
@@ -161,9 +161,9 @@
     {
       "index": 13,
       "outputBbox": [
-        105,
+        87,
         43,
-        255,
+        237,
         187
       ],
       "minimumMargin": 37,
@@ -270,7 +270,7 @@
         308,
         180,
         132,
-        91,
+        87,
         30
       ],
       [
@@ -278,7 +278,7 @@
         308,
         176,
         132,
-        87,
+        78,
         29
       ],
       [
@@ -286,7 +286,7 @@
         160,
         172,
         144,
-        90,
+        76,
         19
       ],
       [
@@ -294,7 +294,7 @@
         0,
         164,
         156,
-        93,
+        75,
         4
       ]
     ],
@@ -307,13 +307,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d31d37dd5f96427be488f67619cf335fbf99a7df4329f29ec714f9a36a27ea43",
-      "config": "5da604a9bcb03e96918f706e63b44ae756a87dae19b2aafd29b9b28662644de8",
+      "source": "dde4c0175904ecb02285c38ed3ae8af330e16345d246231d845159c2c7d10378",
+      "config": "04f3c1371c037cb3c6c49b99d547035a92959fac5d60d058f171f69ee12506e4",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_crouch_medium_video_normalized_smear.png": "75c860008dfa5daaffdb042352edd342b4b165d00f987367099a5680703119eb",
-      "art/sprites/source/p02_crouch_medium_video_normalized.png": "0f2f061a74ec3b88849653fa14f5e15dfd536136e16f1c6f29674614134ff975"
+      "art/sprites/source/p02_crouch_medium_video_normalized_smear.png": "6ab82307e86c2169867939b3d6bfb54fbdeb10ec9a73f70cc775cbdba3033563",
+      "art/sprites/source/p02_crouch_medium_video_normalized.png": "f32ecabb48449f9bd2094b6d9eb385764b2b3f14d152dfdb551cef0fc5401bcb"
     }
   }
 }

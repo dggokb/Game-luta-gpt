@@ -202,9 +202,9 @@ final class GeneratedSpriteLayouts {
     static final int P02_BACKDASH_ROOT_Y = 257;
     static final int P02_BACKDASH_FRAME_COUNT = 13;
 
-    static final int P02_CARRINHO_GARCA_FRAME_WIDTH = 292;
+    static final int P02_CARRINHO_GARCA_FRAME_WIDTH = 289;
     static final int P02_CARRINHO_GARCA_FRAME_HEIGHT = 258;
-    static final int P02_CARRINHO_GARCA_ROOT_X = 158;
+    static final int P02_CARRINHO_GARCA_ROOT_X = 155;
     static final int P02_CARRINHO_GARCA_ROOT_Y = 237;
     static final int P02_CARRINHO_GARCA_FRAME_COUNT = 22;
 
@@ -292,9 +292,9 @@ final class GeneratedSpriteLayouts {
     static final int P02_GETUP_ROOT_Y = 365;
     static final int P02_GETUP_FRAME_COUNT = 12;
 
-    static final int P02_GOLPE_ALTO_FRAME_WIDTH = 182;
+    static final int P02_GOLPE_ALTO_FRAME_WIDTH = 187;
     static final int P02_GOLPE_ALTO_FRAME_HEIGHT = 232;
-    static final int P02_GOLPE_ALTO_ROOT_X = 87;
+    static final int P02_GOLPE_ALTO_ROOT_X = 92;
     static final int P02_GOLPE_ALTO_ROOT_Y = 222;
     static final int P02_GOLPE_ALTO_FRAME_COUNT = 16;
 

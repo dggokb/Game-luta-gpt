@@ -1,0 +1,95 @@
+{
+  "_doc": "Golpes que ainda não emendam no idle (tools/sprites/emendar_idle.py, regra do dono de 13/11: todo golpe termina no lugar da postura parada). Arte antiga, de antes da regra. Ao corrigir um (emendar_idle.py <id> --write --golpes ...), tire daqui: o teste test_emenda_idle.py falha se um golpe fora da regra não estiver na lista ou se um da lista já estiver certo.",
+  "koga_8": [
+    "2H",
+    "2M",
+    "H",
+    "S2"
+  ],
+  "monster_npc": [
+    "H"
+  ],
+  "p03": [
+    "2M",
+    "L",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p04": [
+    "2H",
+    "M",
+    "S2"
+  ],
+  "p05": [
+    "2L",
+    "2M",
+    "H",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p06": [
+    "2L",
+    "2M",
+    "H",
+    "M",
+    "S3",
+    "S4"
+  ],
+  "p07": [
+    "2H",
+    "2L",
+    "2M",
+    "L",
+    "S2",
+    "S4"
+  ],
+  "p08": [
+    "2H",
+    "2L",
+    "2M",
+    "H",
+    "M",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p09": [
+    "2H",
+    "2M",
+    "L",
+    "M",
+    "S2",
+    "S3",
+    "S4"
+  ],
+  "p10": [
+    "2M",
+    "L",
+    "S3"
+  ],
+  "p11": [
+    "2L",
+    "2M",
+    "S2",
+    "S4"
+  ],
+  "p12": [
+    "2M",
+    "L",
+    "S3",
+    "S4"
+  ],
+  "p13": [
+    "6M",
+    "H"
+  ],
+  "p15": [
+    "2H",
+    "S4"
+  ],
+  "p16": [
+    "S2"
+  ]
+}

@@ -17,15 +17,16 @@
     "escala": 0.4173,
     "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
     "quadros": "36,39,41,43,44,45,52,53,54,56,58,81,84,87,90,93",
-    "largura": 192,
-    "raiz": "92,238",
+    "largura": 194,
+    "raiz": "94,238",
     "colunas": 11,
     "fixar": "video",
     "sem_poeira": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "emendar_idle": true
   },
-  "frameWidth": 192,
-  "rootX": 92,
+  "frameWidth": 194,
+  "rootX": 94,
   "sourceReferences": [
     "art/sprites/source/p02_golpe_alto_video_normalized_smear.png",
     "art/sprites/source/p02_golpe_alto_video_normalized.png"

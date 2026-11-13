@@ -20,6 +20,24 @@ idle (um gesto que toca uma vez a cada 3 voltas do idle e volta à guarda: o Ry�
 a Yin-lu dá pulinhos e ajeita as luvas). O motor já toca o `IDLE_2` de quem tem
 (`SpriteMotion.IDLE_LOOPS_BEFORE_IDLE_2`); pedir os dois vídeos junto com os outros.
 
+## Regra do dono (13/11): todo golpe emenda no idle
+
+O último quadro de todo golpe de chão cai **no lugar do primeiro quadro do idle** (o agachado
+parado, nos golpes agachados): sem pulo de imagem na troca. O vídeo começa e termina na guarda,
+mas a montagem prende o corpo pelo começo (a corrida inclinada, um passo) e a guarda do fim pode
+sair fora do lugar (a Ombrada do Ryūga terminava 61 px à frente do idle).
+
+- **Na montagem:** depois de converter (e da nitidez HD), rode
+  `python3 tools/sprites/emendar_idle.py <id> --write`: na volta para a guarda o desenho anda aos
+  poucos até o lugar do idle (só na horizontal, os pés no chão). Grava `emendar_idle` na receita
+  do vídeo, e a reconversão repete. Depois: caixas por quadro, `normal_map.py --refazer` das
+  folhas mexidas e `build_characters.py --write`.
+- **Conferência:** `tools/sprites/tests/test_emenda_idle.py` (roda no build do APK) falha se um golpe
+  terminar a mais de 6 px do idle. Os antigos que ainda estão fora ficam em
+  `tools/sprites/emenda_idle_excecoes.json` até serem corrigidos (62 em 13/11, todos da arte antiga).
+- **Pose diferente** (outra base, outro braço na frente no fim do vídeo) não se resolve andando: a
+  ferramenta mostra "POSE DIFERENTE" e aí é escolher quadros ou refazer o vídeo.
+
 ## Configuração
 
 - **MiniMax H3 Fast** (20 créditos); **H3 Max** (40) só se o Fast errar o golpe.
