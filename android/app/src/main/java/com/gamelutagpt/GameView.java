@@ -3025,8 +3025,6 @@ public class GameView extends SurfaceView
         // lascas. Na frente da bola, no lugar do estouro de defesa e do efeito de dano.
         boolean podeDefendido = event.projectile && event.strength != AttackDefinition.Strength.SUPER &&
             efeitoPoderDefendido(attacker, event, x, y, direction);
-        // Para comparar (dono, 14/11): o efeito de defesa de sempre junto com o do poder.
-        if (podeDefendido && event.blocked && PODER_COM_DEFESA) podeDefendido = false;
         if (!podeDefendido && !(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
@@ -5620,9 +5618,6 @@ public class GameView extends SurfaceView
         if (Float.isNaN(frente)) frente = maior;
         return d.x + d.facing * frente;
     }
-
-    /** Comparação: na defesa, o efeito do poder e o de defesa de sempre juntos (-Dgameluta.poderComDefesa=true). */
-    private static final boolean PODER_COM_DEFESA = Boolean.getBoolean("gameluta.poderComDefesa");
 
     /** O impacto do poder na defesa dura esta fração da pausa mais a guarda (some antes dela acabar). */
     private static final float PODER_DEFESA_FRACAO = 0.75f;
