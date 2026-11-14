@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_backdash",
+  "oldSource": "art/sprites/source/player_base_backdash_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_backdash_video_normalized_sr_hd.png",
+  "sourceSha256": "f87a8dad526a3629f7875c848ff310b4e988f0d8a3e41589c5f7a02784e2f10c",
+  "outputSha256": "7698dd00b211033507b90372e166a56ba1145ee898654936fe804415c979aabb",
+  "frames": 28,
+  "columns": 9,
+  "originalCell": [
+    448,
+    704
+  ],
+  "outputCell": [
+    448,
+    704
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

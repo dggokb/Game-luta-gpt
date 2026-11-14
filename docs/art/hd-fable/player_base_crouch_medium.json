@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_crouch_medium",
+  "oldSource": "art/sprites/source/player_base_crouch_medium_video_normalized_smear.png",
+  "newSource": "art/sprites/source/player_base_crouch_medium_video_normalized_smear_sr_hd.png",
+  "sourceSha256": "2fa765d47f31aacc034ea27fafea04fa2701546fd32652ae67cee6d8340bbf3d",
+  "outputSha256": "a0880c22274e67fa29f71e9a1e0c580a5f26d9abb573c13f5c8ea4373e84f5a7",
+  "frames": 26,
+  "columns": 4,
+  "originalCell": [
+    896,
+    576
+  ],
+  "outputCell": [
+    896,
+    576
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

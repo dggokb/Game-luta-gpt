@@ -1,7 +1,7 @@
 {
   "id": "player_base_jump_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_heavy_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_jump_heavy_video_normalized_smear_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
   "rootMode": "authored",
   "scale": 1,
@@ -461,11 +461,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d45d73f243d36a05b6cbd02991b143ca67517c048ba210226d4bf973a2fb7532",
-      "config": "234fa05d661e82b025da5e8989b331cfc367a38beb136d1e1564778889bc2910",
+      "source": "9ae0c2fafd58dc25f10ec0b6715b8b2c61df8de2393bf39a958f8d7738f76e2b",
+      "config": "1c1cf76e395abbe57e204505eeeac3cd99b572a5390503b84f5cb1213de9b5c6",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_jump_heavy_video_normalized_smear.png": "d45d73f243d36a05b6cbd02991b143ca67517c048ba210226d4bf973a2fb7532",
       "art/sprites/source/player_base_jump_heavy_video_normalized.png": "c8e39a2ad555e1ba2b2bbee5b652802f345d76968b9c757a3e5bb955323d80b3"
     }
   }

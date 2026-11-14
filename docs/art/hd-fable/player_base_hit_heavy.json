@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_hit_heavy",
+  "oldSource": "art/sprites/source/player_base_hit_heavy_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_hit_heavy_video_normalized_sr_hd.png",
+  "sourceSha256": "a60dc47bb4536d2136566c8b7c992436310ecd692867be149a8964e16a53b809",
+  "outputSha256": "a009f3b8b36adffd716d3304de3d600d37e772aef1f6da4fec7a3e4bfe14d3e2",
+  "frames": 9,
+  "columns": 5,
+  "originalCell": [
+    768,
+    576
+  ],
+  "outputCell": [
+    768,
+    576
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

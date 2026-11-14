@@ -2,7 +2,7 @@
   "id": "p02_special_s4",
   "javaName": "P02_SPECIAL_S4",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd.png",
+  "source": "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_special_s4.webp",
   "report": "tools/sprites/reports/p02_special_s4.report.json",
   "preview": "android/app/build/sprite-review/p02_special_s4-import.png",
@@ -26,11 +26,12 @@
     "limpar_chao": true,
     "ancorar_pe": true
   },
-  "frameWidth": 384,
-  "frameHeight": 320,
-  "rootX": 149,
-  "rootY": 298,
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 298,
+  "rootY": 596,
   "sourceReferences": [
+    "art/sprites/source/p02_special_s4_video_normalized_smear_sr_hd.png",
     "art/sprites/source/p02_special_s4_video_normalized_smear.png",
     "art/sprites/source/p02_special_s4_video_normalized.png"
   ],
@@ -64,5 +65,6 @@
     ],
     "giro": "7-14",
     "giroCorpo": true
-  }
+  },
+  "pixelScale": 2
 }

@@ -1,0 +1,23 @@
+{
+  "clip": "p02_golpe_alto",
+  "oldSource": "art/sprites/source/p02_golpe_alto_video_normalized_smear_sr_hd.png",
+  "newSource": "art/sprites/source/p02_golpe_alto_video_normalized_smear_sr_hd_2x.png",
+  "sourceSha256": "ff611aed00e516236b1f962115e8b2c21562319274100687fb429d469abe48bc",
+  "outputSha256": "9bd2517c4a000fdd18a07ff5a1c7c760b04b04d0f50893f90248bba3c9c52253",
+  "frames": 16,
+  "columns": 11,
+  "originalCell": [
+    192,
+    256
+  ],
+  "outputCell": [
+    384,
+    512
+  ],
+  "pixelScaleBefore": 1.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

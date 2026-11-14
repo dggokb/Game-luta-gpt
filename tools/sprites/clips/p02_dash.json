@@ -2,7 +2,7 @@
   "id": "p02_dash",
   "javaName": "P02_DASH",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_dash_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_dash_video_normalized_sr_hd_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_dash.webp",
   "report": "tools/sprites/reports/p02_dash.report.json",
   "preview": "android/app/build/sprite-review/p02_dash-import.png",
@@ -25,11 +25,13 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "frameWidth": 288,
-  "rootX": 85,
+  "frameWidth": 576,
+  "rootX": 170,
   "sourceReferences": [
+    "art/sprites/source/p02_dash_video_normalized_sr_hd.png",
     "art/sprites/source/p02_dash_video_normalized.png"
   ],
-  "frameHeight": 192,
-  "rootY": 174
+  "frameHeight": 384,
+  "rootY": 348,
+  "pixelScale": 2
 }

@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_super",
+  "oldSource": "art/sprites/source/player_base_super_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_super_video_normalized_sr_hd.png",
+  "sourceSha256": "75ad0dbbb1fe4cfacec4d6dc068822401bd85c6569c6e236542d5e4478bb8a42",
+  "outputSha256": "747e11fca0f93780f974d61ebe2f7b22061c36efe577c3f0c420028d262aa4c9",
+  "frames": 24,
+  "columns": 4,
+  "originalCell": [
+    1024,
+    704
+  ],
+  "outputCell": [
+    1024,
+    704
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

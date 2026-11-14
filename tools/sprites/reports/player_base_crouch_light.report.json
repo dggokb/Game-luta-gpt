@@ -1,7 +1,7 @@
 {
   "id": "player_base_crouch_light",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_light_video_normalized.png",
+  "source": "art/sprites/source/player_base_crouch_light_video_normalized_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -423,8 +423,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "9b7a9aa3c068bbf4af57908d4c41ce12238d53735dd1aa8a794670b421e7c1d7",
-      "config": "0641adf227fd2eae936bdb8cddf9d92fdfedcb476bd84732d52f65fb8db23bc5",
+      "source": "837246296b94bf939162e0fe4b086efa9467ec7cc87371dced905f410ee9a866",
+      "config": "aa5d9438cfc485c64f23ede621a827ca0813444619811abecfc18a9ebbb5fed0",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

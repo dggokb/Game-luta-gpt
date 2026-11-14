@@ -1,0 +1,23 @@
+{
+  "clip": "p02_crouch_light",
+  "oldSource": "art/sprites/source/p02_crouch_light_video_normalized_sr_hd.png",
+  "newSource": "art/sprites/source/p02_crouch_light_video_normalized_sr_hd_2x.png",
+  "sourceSha256": "66830b6ef5c50d5de1292216a553d2a8d1cbc85363e43c48429e3285ad838332",
+  "outputSha256": "1e3aa87e81ae420ba887e415f58ae847283c0a51ca7a8e1eadf813693a265d43",
+  "frames": 10,
+  "columns": 10,
+  "originalCell": [
+    256,
+    192
+  ],
+  "outputCell": [
+    512,
+    384
+  ],
+  "pixelScaleBefore": 1.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

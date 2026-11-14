@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_energy_charge",
+  "oldSource": "art/sprites/source/player_base_energy_charge_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_energy_charge_video_normalized_sr_hd.png",
+  "sourceSha256": "a4cd6a519974153250c7b1d9369f4abd33645d4dc360a9b359f05699392b9aa5",
+  "outputSha256": "6730a50f3b7d15531915f10682e9e162b52004e34f573b5ec3afcd6588355b05",
+  "frames": 12,
+  "columns": 2,
+  "originalCell": [
+    1536,
+    704
+  ],
+  "outputCell": [
+    1536,
+    704
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

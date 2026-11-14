@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_jump_heavy",
+  "oldSource": "art/sprites/source/player_base_jump_heavy_video_normalized_smear.png",
+  "newSource": "art/sprites/source/player_base_jump_heavy_video_normalized_smear_sr_hd.png",
+  "sourceSha256": "d45d73f243d36a05b6cbd02991b143ca67517c048ba210226d4bf973a2fb7532",
+  "outputSha256": "9ae0c2fafd58dc25f10ec0b6715b8b2c61df8de2393bf39a958f8d7738f76e2b",
+  "frames": 22,
+  "columns": 7,
+  "originalCell": [
+    576,
+    640
+  ],
+  "outputCell": [
+    576,
+    640
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

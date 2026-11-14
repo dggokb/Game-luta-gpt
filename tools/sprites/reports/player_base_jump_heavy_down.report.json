@@ -1,7 +1,7 @@
 {
   "id": "player_base_jump_heavy_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador. Soco de cima para baixo (o 1o jH de video), usado no baixo + H no ar.",
   "rootMode": "authored",
   "scale": 1,
@@ -518,11 +518,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c5d74eef00155a74f5b1e2b6ee1d83be271bd98bacc3d88a046e33d210af3776",
-      "config": "06747a8a867339e6038ed6c3a4c35009b1870be1ef703ab0723abc20df0f158b",
+      "source": "6083c789866227520e7192387d34d4fa7c09cebce6c537efa14f2cb039a7ae11",
+      "config": "76efc83cc5b3f7f50e35d6a2d4bc09a809ce8759f404f0c7403039378251e1db",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear.png": "c5d74eef00155a74f5b1e2b6ee1d83be271bd98bacc3d88a046e33d210af3776",
       "art/sprites/source/player_base_jump_heavy_down_video_normalized.png": "53ffd8cf3de3a1b2676641a995b2b102193049fe80bbcb9284e2b345ac4c2caa"
     }
   }

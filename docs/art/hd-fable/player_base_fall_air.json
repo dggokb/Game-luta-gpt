@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_fall_air",
+  "oldSource": "art/sprites/source/player_base_fall_air_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_fall_air_video_normalized_sr_hd.png",
+  "sourceSha256": "dcea6a64065bd508e8bc52e305c161ca0bd26e4e5bb98be5e989bfeb5a2af009",
+  "outputSha256": "719ecac1e04086e9431d98244a8fa959caa89da9558b32fd4ecd380fecc4a9e7",
+  "frames": 14,
+  "columns": 11,
+  "originalCell": [
+    320,
+    448
+  ],
+  "outputCell": [
+    320,
+    448
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

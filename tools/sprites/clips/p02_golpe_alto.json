@@ -2,7 +2,7 @@
   "id": "p02_golpe_alto",
   "javaName": "P02_GOLPE_ALTO",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_golpe_alto_video_normalized_smear_sr_hd.png",
+  "source": "art/sprites/source/p02_golpe_alto_video_normalized_smear_sr_hd_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_golpe_alto.webp",
   "report": "tools/sprites/reports/p02_golpe_alto.report.json",
   "preview": "android/app/build/sprite-review/p02_golpe_alto-import.png",
@@ -25,8 +25,8 @@
     "limpar_chao": true,
     "emendar_idle": true
   },
-  "frameWidth": 192,
-  "rootX": 92,
+  "frameWidth": 384,
+  "rootX": 184,
   "smear": {
     "fonte": "art/sprites/source/p02_golpe_alto_video_normalized.png",
     "quadros": [
@@ -44,10 +44,12 @@
       0.5
     ]
   },
-  "frameHeight": 256,
-  "rootY": 238,
+  "frameHeight": 512,
+  "rootY": 476,
   "sourceReferences": [
+    "art/sprites/source/p02_golpe_alto_video_normalized_smear_sr_hd.png",
     "art/sprites/source/p02_golpe_alto_video_normalized_smear.png",
     "art/sprites/source/p02_golpe_alto_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2
 }

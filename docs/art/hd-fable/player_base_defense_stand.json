@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_defense_stand",
+  "oldSource": "art/sprites/source/player_base_defense_stand_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_defense_stand_video_normalized_sr_hd.png",
+  "sourceSha256": "4c237b21dfe756e0587cc7da1ceefced1b40b8840fb1cea008f6c06c93a42738",
+  "outputSha256": "773813fb3887c36826935b672120f3d329f0ae2f27a9f9a4cff59b5d20b186df",
+  "frames": 13,
+  "columns": 10,
+  "originalCell": [
+    384,
+    576
+  ],
+  "outputCell": [
+    384,
+    576
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

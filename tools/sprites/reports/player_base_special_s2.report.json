@@ -1,7 +1,7 @@
 {
   "id": "player_base_special_s2",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_special_s2_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_special_s2_video_normalized_smear_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Sobe no proprio desenho (sem pe-no-chao): o lutador fica no chao no jogo.",
   "rootMode": "authored",
   "scale": 1,
@@ -575,11 +575,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d42a6b5b9db50485771d3f8b9dc5d0810bf1f1e7cf2253f80a9def044766cc6e",
-      "config": "36300b5eaf242dc4bbcd4a566060c2c3a08dbc2263b37d31aa58a48b8de7912b",
+      "source": "32ad1f4b5ff7a0e6e88d64d3b5543bef6728696b4dc4040ec4eec4b25b04b621",
+      "config": "3e953f005c3c4d9cfcb83ea4caa67a4238b6653847ace8c2c140b39f45a2a8d1",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_special_s2_video_normalized_smear.png": "d42a6b5b9db50485771d3f8b9dc5d0810bf1f1e7cf2253f80a9def044766cc6e",
       "art/sprites/source/player_base_special_s2_video_normalized.png": "58aec736228ab33126b98ab93d3f6319a761abea2a5baaf12b0ff7eb57a029e4"
     }
   }

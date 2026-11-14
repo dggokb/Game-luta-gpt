@@ -1,0 +1,23 @@
+{
+  "clip": "p02_idle",
+  "oldSource": "art/sprites/source/p02_idle_video_normalized_sr_hd.png",
+  "newSource": "art/sprites/source/p02_idle_video_normalized_sr_hd_2x.png",
+  "sourceSha256": "949e3dcc926bba6f4a9489ce038b17aaaab5636cb2cd7d41c1b62e34c8111032",
+  "outputSha256": "07ddb1ccc26d7ae7381f0c18787ed812a82855ed38a8e066eb0c783501e35f95",
+  "frames": 18,
+  "columns": 11,
+  "originalCell": [
+    192,
+    256
+  ],
+  "outputCell": [
+    384,
+    512
+  ],
+  "pixelScaleBefore": 1.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

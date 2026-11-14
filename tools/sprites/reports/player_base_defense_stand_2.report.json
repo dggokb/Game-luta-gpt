@@ -1,7 +1,7 @@
 {
   "id": "player_base_defense_stand_2",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_defense_stand_2_video_normalized.png",
+  "source": "art/sprites/source/player_base_defense_stand_2_video_normalized_sr_hd.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -309,9 +309,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0f61bd414f5af62ec30995646aaf1060211f854c6a5cfd18788cfa424d624b14",
-      "config": "77c8d24c6d984737cb18530bf562932d6c649bc06d93478032e2e15616f2b19c",
+      "source": "5a386c18cde63221785dfc21f0aa3eedb4c495a5596ff58fd1005941278ef8af",
+      "config": "1699a05e005dc13dd62cf29a67108c325b9f66f1cfd7b46e4aab67ad711460f2",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_defense_stand_2_video_normalized.png": "0f61bd414f5af62ec30995646aaf1060211f854c6a5cfd18788cfa424d624b14"
     }
   }
 }

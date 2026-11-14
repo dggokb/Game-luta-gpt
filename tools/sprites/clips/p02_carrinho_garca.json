@@ -2,7 +2,7 @@
   "id": "p02_carrinho_garca",
   "javaName": "P02_CARRINHO_GARCA",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_carrinho_garca.webp",
   "report": "tools/sprites/reports/p02_carrinho_garca.report.json",
   "preview": "android/app/build/sprite-review/p02_carrinho_garca-import.png",
@@ -26,11 +26,13 @@
     "limpar_chao": true,
     "emendar_idle": true
   },
-  "frameWidth": 320,
-  "frameHeight": 288,
-  "rootX": 171,
-  "rootY": 263,
+  "frameWidth": 640,
+  "frameHeight": 576,
+  "rootX": 342,
+  "rootY": 526,
   "sourceReferences": [
+    "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png",
     "art/sprites/source/p02_carrinho_garca_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2
 }

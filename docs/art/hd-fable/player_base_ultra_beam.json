@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_ultra_beam",
+  "oldSource": "art/sprites/source/player_base_ultra_beam_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_ultra_beam_video_normalized_sr_hd.png",
+  "sourceSha256": "1faa14d5ec0b7b9ddf49d206b05d19a026b49a1a3fccf98a7a75c290369fa81c",
+  "outputSha256": "989e9592114f1547586dd78d4dee41365ecfc1f395f16270e0090b4836cc9709",
+  "frames": 9,
+  "columns": 4,
+  "originalCell": [
+    1024,
+    704
+  ],
+  "outputCell": [
+    1024,
+    704
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

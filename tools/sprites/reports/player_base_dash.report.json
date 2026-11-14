@@ -1,7 +1,7 @@
 {
   "id": "player_base_dash",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_dash_video_normalized.png",
+  "source": "art/sprites/source/player_base_dash_video_normalized_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -271,8 +271,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "af219f7956b7b176f7171c441080e44f3fb9c530a7c3dfb6c61256fdf0f12bad",
-      "config": "dde56a8143966c1b9eb7b0780c0637c477aec84e4585aa8b327cdcf5f5591c39",
+      "source": "2a8278d3a8d75b18bb092a96ee3ce54b279faa43228f2542be7097a9b47f2bae",
+      "config": "13b4ed8bc6a9d595bbe1eda6a63f9886f35479573c0bedb1adbe415da7b36e37",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

@@ -2,7 +2,7 @@
   "id": "p02_fall_air",
   "javaName": "P02_FALL_AIR",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_fall_air_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_fall_air_video_normalized_sr_hd_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_fall_air.webp",
   "report": "tools/sprites/reports/p02_fall_air.report.json",
   "preview": "android/app/build/sprite-review/p02_fall_air-import.png",
@@ -24,11 +24,13 @@
     "fixar": "video",
     "pe_no_chao": true
   },
-  "frameWidth": 160,
-  "frameHeight": 288,
-  "rootX": 80,
-  "rootY": 270,
+  "frameWidth": 320,
+  "frameHeight": 576,
+  "rootX": 160,
+  "rootY": 540,
   "sourceReferences": [
+    "art/sprites/source/p02_fall_air_video_normalized_sr_hd.png",
     "art/sprites/source/p02_fall_air_video_normalized.png"
-  ]
+  ],
+  "pixelScale": 2
 }

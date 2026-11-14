@@ -1,7 +1,7 @@
 {
   "id": "player_base_ultra_beam",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/player_base_ultra_beam_video_normalized_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 9 poses do raio final: 0-2 carga (video do Super), 3 disparo, 4-6 sustentacao, 7 recuperacao, 8 guarda (video do Ultra).",
   "rootMode": "authored",
   "scale": 1,
@@ -214,8 +214,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1faa14d5ec0b7b9ddf49d206b05d19a026b49a1a3fccf98a7a75c290369fa81c",
-      "config": "9aabbc4801bfcf0a53579a61bb7af3c29499de8af4489890bb0ca84569beb943",
+      "source": "989e9592114f1547586dd78d4dee41365ecfc1f395f16270e0090b4836cc9709",
+      "config": "2bc5b31d53c739b5a6cd2542fb07ee92e23d3b266e03e3be3cace231f7536007",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

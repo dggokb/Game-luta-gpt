@@ -1,0 +1,23 @@
+{
+  "clip": "player_base_walk_back",
+  "oldSource": "art/sprites/source/player_base_walk_back_video_normalized.png",
+  "newSource": "art/sprites/source/player_base_walk_back_video_normalized_sr_hd.png",
+  "sourceSha256": "cf02a9d0319eaf77cccf6f9aeafe78402e2248110621492b8bf4aaab2198c868",
+  "outputSha256": "f5e543112d74ab0e8f87be3ed659f25414246134c3094e35ea6181a44422a585",
+  "frames": 37,
+  "columns": 9,
+  "originalCell": [
+    448,
+    576
+  ],
+  "outputCell": [
+    448,
+    576
+  ],
+  "pixelScaleBefore": 2.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

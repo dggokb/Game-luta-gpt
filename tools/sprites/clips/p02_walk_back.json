@@ -2,7 +2,7 @@
   "id": "p02_walk_back",
   "javaName": "P02_WALK_BACK",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_walk_back_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_walk_back_video_normalized_sr_hd_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_walk_back.webp",
   "report": "tools/sprites/reports/p02_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p02_walk_back-import.png",
@@ -22,11 +22,13 @@
     "colunas": 11,
     "pe_no_chao": true
   },
-  "frameWidth": 192,
-  "rootX": 97,
+  "frameWidth": 384,
+  "rootX": 194,
   "sourceReferences": [
+    "art/sprites/source/p02_walk_back_video_normalized_sr_hd.png",
     "art/sprites/source/p02_walk_back_video_normalized.png"
   ],
-  "frameHeight": 256,
-  "rootY": 238
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2
 }

@@ -1,7 +1,7 @@
 {
   "id": "player_base_special_energy_shinkai",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_special_energy_shinkai_video_normalized.png",
+  "source": "art/sprites/source/player_base_special_energy_shinkai_video_normalized_sr_hd.png",
   "sourceNote": "p01, rajada do SHINKAI (v\u00eddeo s1_shinkai do dono, 14/11): quatro disparos, um bra\u00e7o por vez (tr\u00e1s, frente, tr\u00e1s, frente), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -480,8 +480,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a20bf909583ac719d019bf9033e1be7e51204d8060b8aa89e2c181502808e589",
-      "config": "ccbde381f7709b5d3c0b57bd5c69a93f440f73ef4b02d5bd5f092db3740ff3ba",
+      "source": "755337393a75290c9ca37849f7a135c5982b6dea8108f3ae349c7a901ce160b1",
+      "config": "45d0bfbf299d4a8f9f4b0a9a15f0daf77534662e29916b8aface49781c86b1de",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

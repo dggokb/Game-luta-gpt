@@ -1,0 +1,23 @@
+{
+  "clip": "p02_joelho_garca",
+  "oldSource": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd.png",
+  "newSource": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd_2x.png",
+  "sourceSha256": "1e6547beb102133fd266a74ff0e4636870b3ffd7e7e0884fa32f3e5a7820b777",
+  "outputSha256": "084466884ed06e758afd864dcc53142771bca0e557cc96c71e28f4ba36c70966",
+  "frames": 17,
+  "columns": 11,
+  "originalCell": [
+    288,
+    288
+  ],
+  "outputCell": [
+    576,
+    576
+  ],
+  "pixelScaleBefore": 1.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

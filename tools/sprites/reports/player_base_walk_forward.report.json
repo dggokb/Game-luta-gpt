@@ -1,7 +1,7 @@
 {
   "id": "player_base_walk_forward",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_walk_forward_video_normalized.png",
+  "source": "art/sprites/source/player_base_walk_forward_video_normalized_sr_hd.png",
   "sourceNote": "P01 WALK_FORWARD test: same approved idle Real-ESRGAN AnimeVideo-v3 method; 4x masters uniformly reduced to 2x runtime, 20 frames, authored root and distancePerFrame 12.5 unchanged. Visual approval pending.",
   "rootMode": "authored",
   "scale": 1,
@@ -917,8 +917,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "52268dd457274ce11801e81753728a00087377d7969be4c32e47547059f8fc39",
-      "config": "baedf30bb108761156ac72f228c1375cc806d754473c5a2d84b5d7ebcc11d744",
+      "source": "714248e0451b66def51662d54260fd6032959c3fe23cf8ab3a4cdfd35fc7a87d",
+      "config": "5f6379a53bd4c71580770952cfb0331c72c9d6e62fca814127d4602b1070700b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

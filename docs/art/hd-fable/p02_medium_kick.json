@@ -1,0 +1,23 @@
+{
+  "clip": "p02_medium_kick",
+  "oldSource": "art/sprites/source/p02_medium_kick_video_normalized_smear_sr_hd.png",
+  "newSource": "art/sprites/source/p02_medium_kick_video_normalized_smear_sr_hd_2x.png",
+  "sourceSha256": "cfba4c9d4a07681e15387e71e6907d5e8ae4c9963baf7517c4173663f139e443",
+  "outputSha256": "2e9e3393ad9cfcef0f90cb1e86b9ea95b4ea3bef8b4a224fa9b2c259aaee544e",
+  "frames": 14,
+  "columns": 11,
+  "originalCell": [
+    288,
+    256
+  ],
+  "outputCell": [
+    576,
+    512
+  ],
+  "pixelScaleBefore": 1.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}

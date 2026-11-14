@@ -1,0 +1,23 @@
+{
+  "clip": "p02_ultra_seq",
+  "oldSource": "art/sprites/source/p02_ultra_seq_video_normalized.png",
+  "newSource": "art/sprites/source/p02_ultra_seq_video_normalized_2x.png",
+  "sourceSha256": "b0d1c7b7bbadb738ddac145fbf1da20a1f1f305cef2aa15be929334b9de683b8",
+  "outputSha256": "f57c89ee361d21adbf652c2165e8455e95f897948c9bdc50b5a1297d06751dfd",
+  "frames": 35,
+  "columns": 8,
+  "originalCell": [
+    576,
+    352
+  ],
+  "outputCell": [
+    1152,
+    704
+  ],
+  "pixelScaleBefore": 1.0,
+  "pixelScaleAfter": 2,
+  "rgb": "Real-ESRGAN AnimeVideo-v3, 4x, premultiplied downsample",
+  "weightsSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "alpha": "P01 original; P02 Lanczos 2x; verified frame by frame",
+  "preserved": "pose, frame count/order, durations, root logical position, game scale"
+}
