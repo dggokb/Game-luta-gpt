@@ -187,7 +187,7 @@ final class CharacterSelectRenderer {
         }
     }
 
-    /** Fighter code and style on a slanted plate above the TEAM panel; slides with the hero. */
+    /** Official name and style on a slanted plate above the TEAM panel; slides with the hero. */
     private void namePlate(Canvas c,String id,int side) {
         if(id==null)return;
         float in=Math.min(1f,(now-heroChangedAt[side])/(float)HERO_IN_MS);
@@ -204,9 +204,26 @@ final class CharacterSelectRenderer {
         stroke(c,alphaColor(color,Math.round(255*ease)),2.5f);
         p.setColor(alphaColor(color,Math.round(255*ease)));
         c.drawRect(side==0?l-12:l+w+6,top+4,side==0?l-6:l+w+12,top+h-4,p);
-        String code="player_base".equals(id)?"P01":id.toUpperCase(java.util.Locale.ROOT);
-        textAt(c,code,cx+shift-w/2+18,top+34,30,alphaColor(WHITE,Math.round(255*ease)),true,Paint.Align.LEFT);
-        textAt(c,style(id),cx+shift+w/2-20,top+30,15,alphaColor(side==0?0xFFA9DDFF:0xFFFFB3BE,Math.round(255*ease)),true,Paint.Align.RIGHT);
+        // O nome oficial (o displayName do personagem) em cima, encolhido para caber; o estilo embaixo.
+        String nome=nomePlaca(id);
+        float x0=cx+shift-w/2+18, largura=w-36;
+        p.setTypeface(bold);p.setTextSize(24f);
+        float tam=Math.min(24f,24f*largura/Math.max(1f,p.measureText(nome)));
+        textAt(c,nome,x0,top+25,tam,alphaColor(WHITE,Math.round(255*ease)),true,Paint.Align.LEFT);
+        textAt(c,style(id),cx+shift+w/2-20,top+41,12,alphaColor(side==0?0xFFA9DDFF:0xFFFFB3BE,Math.round(255*ease)),true,Paint.Align.RIGHT);
+    }
+
+    private final java.util.Map<String,String> nomesPlaca=new java.util.HashMap<>();
+    /** "RENJI SHIRANUI": o nome oficial em maiúsculas, guardado (a placa é desenhada todo quadro). */
+    private String nomePlaca(String id) {
+        String n=nomesPlaca.get(id);
+        if(n==null){
+            String nome;
+            try{nome=GeneratedCharacters.get(id).displayName;}catch(IllegalArgumentException e){nome=id;}
+            n=nome.toUpperCase(java.util.Locale.ROOT);
+            nomesPlaca.put(id,n);
+        }
+        return n;
     }
 
     /** Both teams locked: diagonal PRONTO stamps over the TEAM panels. */

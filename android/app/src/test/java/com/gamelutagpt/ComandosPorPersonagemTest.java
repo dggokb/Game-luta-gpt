@@ -63,7 +63,7 @@ public class ComandosPorPersonagemTest {
         fichas = ListaComandos.fichas(roster, GeneratedCharacters.get("p07"), Comandos.Esquema.TOQUE, atual);
         assertEquals("fora da seleção entra na frente", 4, fichas.size());
         assertEquals(0, atual[0]);
-        assertEquals("p07", fichas.get(0).personagem);
+        assertEquals(GeneratedCharacters.get("p07").displayName, fichas.get(0).personagem);
     }
 
     // ------------------------------------------------------------ no motor
