@@ -1,0 +1,60 @@
+name: Recuperar integracao HD P01 P02 Fable
+
+on:
+  push:
+    branches: [game-luta-sprite-fable]
+    paths:
+      - '.github/workflows/hd-fable-recover.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hd-p01-p02-fable-recovery
+  cancel-in-progress: false
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout atual da Fable
+        uses: actions/checkout@v4
+        with:
+          ref: game-luta-sprite-fable
+      - name: Reaproveitar render HD concluido (run 43638378462)
+        uses: actions/download-artifact@v4
+        with:
+          name: ''
+          pattern: hd-fable-*
+          merge-multiple: true
+          run-id: 43638378462
+          github-token: ${{ github.token }}
+          path: .
+      - name: Instalar dependencias de geracao e pe de apoio
+        run: |
+          python3 -m pip install --disable-pip-version-check \
+            -r tools/sprites/requirements.txt \
+            numpy opencv-python-headless
+      - name: Regerar e verificar atlases
+        run: |
+          python3 tools/sprites/build_characters.py --write
+          python3 tools/sprites/build_characters.py --check
+          git diff --check
+      - name: Registrar na mesma branch sem sobrescrever trabalho novo
+        run: |
+          git fetch origin game-luta-sprite-fable
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/game-luta-sprite-fable)" || {
+            echo 'Fable mudou enquanto o HD estava integrando: abortado.' >&2
+            exit 1
+          }
+          git config user.name 'Sokon HD Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add art/sprites/source/ tools/sprites/clips/ docs/art/hd-fable/ \
+            android/app/src/main/res/drawable-nodpi/ \
+            tools/sprites/reports/ android/app/src/main/java/
+          git diff --cached --stat
+          git diff --cached --quiet && { echo 'Nenhum arquivo alterado para comitar'; exit 1; }
+          git commit -m 'art: integrar HD Ryuga P01 e Yin-lu P02 na Fable'
+          git push origin HEAD:game-luta-sprite-fable
