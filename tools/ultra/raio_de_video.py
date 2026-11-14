@@ -6,7 +6,8 @@ outro (ultra.json: "quadros", "qps"). Daqui saem as tiras do corpo e da ponta: e
 escolhido do vídeo, a frente do feixe é achada sozinha e o quadro é alinhado por ela (o feixe do
 vídeo anda e o do jogo não); a janela fica centrada no núcleo. A ponta é a cabeça do feixe (a
 borda esquerda some para nascer de dentro do corpo); o corpo é uma fatia da cauda, atrás da
-ponta, que o jogo estica das mãos até a ponta (sem repetir: a cauda afina para trás). A esfera (inicio) e o impacto ficam.
+ponta, que o jogo estica das mãos até a ponta (sem repetir: a cauda afina para trás). Com
+--inicio, a esfera nas mãos também sai do vídeo (a cabeça, espelhada); sem, ela fica. A esfera (inicio) e o impacto ficam.
 
     python3 tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
 
@@ -71,6 +72,10 @@ def main():
     p.add_argument('--corpo', type=int, default=490)
     p.add_argument('--atras', type=int, default=1050)
     p.add_argument('--qps', type=float, default=12.0)
+    p.add_argument('--inicio', help='quadros do vídeo para a esfera nas mãos (a cabeça do feixe, '
+                   'espelhada: a parte redonda nas mãos e as chamas correndo para dentro do raio); '
+                   'o mesmo número de quadros do corpo')
+    p.add_argument('--lado-inicio', type=int, default=560, help='lado da janela da esfera em px do vídeo')
     a = p.parse_args()
 
     cap = cv2.VideoCapture(a.video)
@@ -103,7 +108,30 @@ def main():
         pontas.append(ponta.resize((round(ponta.width * k), a.altura_tira), Image.LANCZOS))
         corpos.append(corpo.resize((round(corpo.width * k), a.altura_tira), Image.LANCZOS))
 
+    esferas = []
+    if a.inicio:
+        for i in lista(a.inicio):
+            q = todos[i]
+            luz = q.max(axis=2)
+            frente = int(np.nonzero((luz > 60).any(axis=0))[0].max())
+            cy = int(round(np.nonzero((luz > 240).any(axis=1))[0].mean()))
+            L = a.lado_inicio
+            im = para_alfa_fogo(Image.fromarray(q))
+            tela = Image.new('RGBA', (q.shape[1] + 2 * L, q.shape[0] + 2 * L), (0, 0, 0, 0))
+            tela.paste(im, (L, L))
+            x1 = frente + L + 40
+            esfera = tela.crop((x1 - L, cy + L - L // 2, x1, cy + L + L // 2)).transpose(Image.FLIP_LEFT_RIGHT)
+            esfera = pr.apagar_direita(esfera, 0.62)
+            esferas.append(esfera.resize((a.altura_tira, a.altura_tira), Image.LANCZOS))
+        if len(esferas) != len(escolhidos):
+            raise SystemExit('--inicio precisa do mesmo número de quadros que --quadros')
+
     destino = ULTRAS / a.id
+    if esferas:
+        tira = Image.new('RGBA', (a.altura_tira, a.altura_tira * len(esferas)), (0, 0, 0, 0))
+        for i, e in enumerate(esferas):
+            tira.paste(e, (0, i * a.altura_tira))
+        tira.save(destino / 'raio_inicio.png', optimize=True)
     for nome, partes in (('raio_ponta.png', pontas), ('raio_corpo.png', corpos)):
         w = max(p_.width for p_ in partes)
         tira = Image.new('RGBA', (w, a.altura_tira * len(partes)), (0, 0, 0, 0))
@@ -115,7 +143,10 @@ def main():
     dados = json.loads(cfg.read_text(encoding='utf-8'))
     raio = dados.setdefault('raio', {})
     antes = int(raio.get('quadros', 1))
-    if antes != len(escolhidos):
+    if esferas:
+        # O centro da parte redonda: 40 px à frente da frente do feixe, espelhado; ~200 px atrás dela.
+        raio['centroInicio'] = [round(240.0 / a.lado_inicio, 3), 0.5]
+    elif antes != len(escolhidos):
         inicio = destino / raio.get('inicio', 'raio_inicio.png')
         if inicio.exists():
             img = Image.open(inicio)
