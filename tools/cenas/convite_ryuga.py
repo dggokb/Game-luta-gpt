@@ -385,7 +385,7 @@ ev(1068, 'clarao', segundos=0.05)
 letreiro(1068, 'IMPACTO!', [0.5, 0.4], 190, tremor=18, cor='#FF5A3C', segundos=0.9)
 efeito(1069, 'rival', 'fumaca_queda_v01', escala=1.5)
 linhas(1070, segundos=0.4)
-camera(1070, 1.1, 'centro', 2.2)
+camera(1070, 1.0, 'centro', 2.2)
 # Os dois são jogados para longe um do outro e ficam ofegantes.
 R.k(1070, 'BACKDASH:5', 5, y=90, rastro=4)
 R.k(1092, 'BACKDASH:19', -140, y=0, curva='sai')
@@ -496,6 +496,20 @@ def pausar(jogador, rival, eventos, quadros, pausas):
     return um(jogador), um(rival), evs, novo(quadros) + 0
 
 
+# Os QTE (quadro da coreografia, antes das pausas): a animação para na pose desse quadro, no meio
+# do golpe, e pede; o acerto segue a coreografia, o erro toca o contra-ataque da Yin-lu (o golpe
+# dela pegando nele) e pede de novo. O mesmo roteiro do dono e os mesmos textos dos QTE antigos.
+QTES = [
+    # (quadro, QTE, o golpe dela no erro: (clipe, quadro de preparo, quadro esticado), reação dele)
+    (186, {'tipo': 'deslizar', 'texto': 'ESQUIVA!', 'direcao': 'cima'}, ('CROUCH_MEDIUM', 5, 7), 'HIT_STAND'),
+    (350, {'tipo': 'martelar', 'texto': 'COMBO!', 'vezes': 8, 'segundos': 2.6}, ('SPECIAL_S3', 9, 12), 'HIT_BODY'),
+    (533, {'tipo': 'tempo', 'texto': 'DEFESA!', 'segundos': 1.2}, ('JOELHO_GARCA', 6, 9), 'HIT_HEAVY'),
+    (1017, {'tipo': 'toque', 'texto': 'SOCO!'}, ('LIGHT_JAB', 3, 6), 'HIT_STAND'),
+    (1036, {'tipo': 'deslizar', 'texto': 'CONTRA-ATAQUE!', 'direcao': 'cima'}, ('JOELHO_GARCA', 6, 9), 'HIT_HEAVY'),
+    (1060, {'tipo': 'tempo', 'texto': 'GOLPE FINAL!', 'segundos': 1.2}, ('SPECIAL_S2', 4, 7), 'HIT_AIR'),
+]
+
+
 def _linha(o):
     return json.dumps(o, ensure_ascii=False)
 
@@ -523,16 +537,115 @@ def escrever(cena):
     return '\n'.join(linhas) + '\n'
 
 
+def amostra(chaves, q):
+    """O estado de um lutador no quadro q, como chave (os números interpolados como no jogo)."""
+    a, b = chaves[0], None
+    for i, c in enumerate(chaves):
+        if c['q'] <= q:
+            a, b = c, (chaves[i + 1] if i + 1 < len(chaves) else None)
+    t = curva(b.get('curva', 'linear'), (q - a['q']) / (b['q'] - a['q'])) if b and b['q'] > a['q'] else 0.0
+    out = {}
+    for k, padrao in (('x', 0), ('y', 0), ('sx', 1), ('sy', 1), ('rot', 0), ('alfa', 1)):
+        va = a.get(k, padrao)
+        vb = b.get(k, padrao) if b else va
+        v = round(va + (vb - va) * t, 2)
+        if v != padrao or k == 'x':
+            out[k] = v
+    clip, quadro = a['pose'].split(':')
+    quadro = int(quadro)
+    desde = q - a['q']
+    if 'ciclo' in a:
+        quadro += int(desde * a['ciclo'] / 60)
+        out['ciclo'] = a['ciclo']
+    elif 'ate' in a and b and b['q'] > a['q']:
+        quadro = round(quadro + (a['ate'] - quadro) * min(1.0, desde / (b['q'] - a['q'])))
+        out['ate'] = a['ate']
+    out['pose'] = f'{clip}:{quadro}'
+    for k in ('rastro', 'vira'):
+        if k in a:
+            out[k] = a[k]
+    return out
+
+
+def cortar(chaves, ini, fim):
+    """As chaves do trecho [ini, fim] da animação, contadas do começo dele."""
+    out = []
+    primeira = amostra(chaves, ini)
+    primeira['q'] = 0
+    out.append(primeira)
+    for c in chaves:
+        if ini < c['q'] < fim:
+            c2 = dict(c)
+            c2['q'] = c['q'] - ini
+            out.append(c2)
+    depois = [c for c in chaves if c['q'] >= fim]
+    ultima = amostra(chaves, fim)
+    ultima['q'] = fim - ini
+    if depois:
+        ultima['curva'] = depois[0].get('curva', 'linear')
+    if out[-1]['q'] < ultima['q']:
+        out.append(ultima)
+    return out
+
+
+def erro_qte(r, y, golpe, reacao):
+    """O contra-ataque dela quando o jogador erra: ela bate, ele é jogado para trás, clarão."""
+    clip, prepara, estica = golpe
+    lado = 1 if y['x'] > r['x'] else -1
+    xy = r['x'] + lado * 125
+    atras = -lado
+    rk = [dict(r, q=0), {'q': 8, 'x': r['x'], 'pose': f'{reacao}:0'},
+          {'q': 10, 'x': r['x'], 'pose': f'{reacao}:1', 'rastro': 2},
+          {'q': 26, 'x': r['x'] + atras * 55, 'pose': f'{reacao}:3', 'curva': 'sai'},
+          {'q': 40, 'x': r['x'] + atras * 55, 'pose': f'{reacao}:3'}]
+    if reacao == 'HIT_AIR':
+        for k in rk[1:]:
+            k['y'] = r.get('y', 0)
+    yk = [dict(y, q=0), {'q': 6, 'x': xy - lado * 10, 'y': 0, 'pose': f'{clip}:{prepara}', 'curva': 'sai',
+                         'rastro': 4, 'sx': 1.15, 'sy': 0.92},
+          {'q': 10, 'x': xy, 'y': 0, 'pose': f'{clip}:{estica}', 'curva': 'sai', 'rastro': 3},
+          {'q': 40, 'x': xy, 'y': 0, 'pose': f'{clip}:{estica}'}]
+    for k in rk + yk:
+        k.pop('ciclo', None)
+        k.pop('ate', None)
+    eventos = [{'q': 10, 'acao': {'acao': 'impacto', 'quem': 'rival', 'forca': 2, 'congela': 0.2}},
+               {'q': 36, 'acao': {'acao': 'clarao', 'segundos': 0.15}}]
+    return {'quadros': 40, 'jogador': rk, 'rival': yk, 'eventos': eventos}
+
+
 def main():
     # No mesmo quadro o impacto vai por último: ele congela a animação, e o que vem depois
     # dele (o clarão, o letreiro) esperaria a pausa acabar.
     eventos.sort(key=lambda e: (e['q'], e['acao']['acao'] == 'impacto'))
     jogador, rival, evs, total = pausar(R.chaves, Y.chaves, eventos, QUADROS, PAUSAS)
-    anim = {'acao': 'animar', 'quadros': total, 'jogador': jogador, 'rival': rival, 'eventos': evs}
+
+    def novo(q):
+        return q + sum(n for p, n in PAUSAS.items() if q > p)
+
+    # A animação em trechos, cortada nos QTE; cada trecho continua o eixo do anterior.
+    cortes = [novo(q) for q, *_ in QTES]
+    limites = [0] + cortes + [total]
+    trechos = []
+    for k in range(len(limites) - 1):
+        ini, fim = limites[k], limites[k + 1]
+        anim = {'acao': 'animar', 'quadros': fim - ini}
+        if k:
+            anim['continua'] = True
+        anim['jogador'] = cortar(jogador, ini, fim)
+        anim['rival'] = cortar(rival, ini, fim)
+        anim['eventos'] = [dict(e, q=e['q'] - ini) for e in evs if ini <= e['q'] < fim]
+        trechos.append(anim)
+        if k < len(QTES):
+            _, pedido, golpe, reacao = QTES[k]
+            # O botão à direita, perto do polegar, sem cobrir o golpe no meio da tela.
+            qte = {'acao': 'qte', 'golpe': 'nenhum', 'pos': [0.82, 0.6], **pedido}
+            qte['erroAnimar'] = erro_qte(amostra(jogador, fim), amostra(rival, fim), golpe, reacao)
+            trechos.append(qte)
     cena = json.loads(CENA.read_text(encoding='utf-8'))
     acoes = cena['acoes']
     i = next(n for n, a in enumerate(acoes) if a.get('acao') == 'animar')
-    acoes[i] = anim
+    j = next(n for n in range(i, len(acoes)) if acoes[n].get('acao') == 'esperar')
+    acoes[i:j] = trechos
     cena['_comentario'] = (
         'Cena da luta do convite do Ryūga, animada à mão (ação animar, motor de luta parado), gerada por '
         'tools/cenas/convite_ryuga.py: a coreografia do dono (13/11) em quatro sequências, na gramática do '
@@ -544,8 +657,9 @@ def main():
         'escorrega com a mão no chão, as falas do monstro; 4) ofegantes, "Eu não vim até aqui pra perder!", os '
         'dois disparam: o soco (ela se abaixa), o chute alto (ele se abaixa), o gancho (ela salta para trás), '
         'o salto com o golpe descendo nos braços cruzados dela: IMPACTO, clarão de dois quadros, a câmera volta '
-        'devagar e os dois ofegantes. A coreografia com QTE do motor de luta está em '
-        'cinematica_convite_ryuga_qte.json.')
+        'devagar e os dois ofegantes. Seis QTE no meio dos golpes (ESQUIVA, COMBO, DEFESA, SOCO, '
+        'CONTRA-ATAQUE, GOLPE FINAL): a animação para na pose e pede; errar toca o contra-ataque dela e pede '
+        'de novo. A coreografia antiga, com QTE do motor de luta, está em cinematica_convite_ryuga_qte.json.')
     CENA.write_text(escrever(cena), encoding='utf-8')
     print(f'{CENA.relative_to(ROOT)}: {total} quadros ({total / 60:.1f} s, sem as pausas de contato e a '
           f'câmera lenta), {len(jogador)} chaves do Ryūga, {len(rival)} da Yin-lu, {len(evs)} eventos')

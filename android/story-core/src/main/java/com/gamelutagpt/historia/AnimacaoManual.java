@@ -32,6 +32,20 @@ public final class AnimacaoManual {
         public float x, altura, sx = 1f, sy = 1f, graus, alfa = 1f;
         public int rastro;
         public boolean vira;
+
+        /** Fica igual a {@code de} (a pose do QTE guardada enquanto o erro toca). */
+        public void copiar(Pose de) {
+            clip = de.clip;
+            quadro = de.quadro;
+            x = de.x;
+            altura = de.altura;
+            sx = de.sx;
+            sy = de.sy;
+            graus = de.graus;
+            alfa = de.alfa;
+            rastro = de.rastro;
+            vira = de.vira;
+        }
     }
 
     /** Uma chave da pose. */

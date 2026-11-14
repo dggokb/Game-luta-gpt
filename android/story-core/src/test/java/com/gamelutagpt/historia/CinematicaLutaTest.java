@@ -298,6 +298,18 @@ public class CinematicaLutaTest {
         assertTrue("a luta acaba sem vencedor", palco.pedidos.contains("fim interrompida"));
     }
 
+    /**
+     * O convite do Ryūga animado à mão: a animação para na pose do golpe e cada um dos 6 QTE
+     * pede ali; errar toca o contra-ataque dela (na animação, sem golpe do motor de luta) e pede
+     * de novo. Ninguém bate pelo motor e a luta acaba interrompida.
+     */
+    @Test
+    public void qteDoConviteAnimadoDoRyuga() throws IOException {
+        Palco palco = jogarConvite("ep02/cinematica_convite_ryuga.json", Torneio.RYUGA, 6);
+        assertEquals("os golpes são da animação, não do motor de luta", "[]", golpes(palco).toString());
+        assertTrue("a luta acaba sem vencedor", palco.pedidos.contains("fim interrompida"));
+    }
+
     /** O convite do Kōga: o Brucy bate primeiro (sem QTE) e o mergulho é o golpe final. */
     @Test
     public void qteDoConviteDoKoga() throws IOException {

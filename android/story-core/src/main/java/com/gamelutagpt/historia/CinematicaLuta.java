@@ -278,6 +278,17 @@ public final class CinematicaLuta {
         /** ANIMAR: a animação manual (os quadros-chave dos dois e os eventos). */
         AnimacaoManual animacao;
         /**
+         * ANIMAR com {@code "continua": true}: o x das chaves segue o eixo da animação de antes (o
+         * mesmo meio), em vez de recomeçar no meio entre os dois agora. É a animação cortada em
+         * trechos pelos QTE.
+         */
+        boolean continua;
+        /**
+         * QTE numa animação feita à mão: o trecho que toca quando o jogador erra (o contra-ataque
+         * do rival); depois os dois voltam à pose do QTE e ele pede de novo. Sem, o erro só pede de novo.
+         */
+        Acao erroAnimar;
+        /**
          * EFEITO: o efeito (uma pasta de assets/efeitos: fumaca_dash_v05, fumaca_pouso, defesa...)
          * no lutador {@link #quemMove}, nos pés ({@code "pe"}) ou no peito ({@code "peito"}),
          * {@link #dx} à frente de onde ele olha (negativo: atrás), no tamanho {@link #escala};
@@ -555,6 +566,14 @@ public final class CinematicaLuta {
     private final Transicao linhas = new Transicao(0f);
     /** A animação manual tocando: a ação, o quadro dela (fracionário), o próximo evento e o eixo. */
     private Acao animando;
+    /**
+     * A animação acabou e os dois seguram a última pose dela (o QTE pedindo no meio do golpe, a
+     * pausa antes de a cena acabar): o motor de luta continua parado.
+     */
+    private boolean animSegura;
+    /** O QTE errado está tocando o trecho do erro; as poses do QTE ficam guardadas para voltar. */
+    private boolean qteErroAnimando;
+    private final AnimacaoManual.Pose[] poseDoQte = {new AnimacaoManual.Pose(), new AnimacaoManual.Pose()};
     private float animQuadro;
     private int animEvento;
     private float animMeio, animSentido = 1f;
@@ -712,6 +731,9 @@ public final class CinematicaLuta {
         paginas.clear();
         paginaNaTela = false;
         qte = null;
+        animando = null;
+        animSegura = false;
+        qteErroAnimando = false;
         dedoNaTela = false;
         video = null;
         videoProximo = null;
@@ -901,6 +923,10 @@ public final class CinematicaLuta {
             case "qte":
                 a = qte(m);
                 impacto(a, m);
+                if (m.get("erroAnimar") != null) {
+                    a.erroAnimar = animar(temporada, Episodio.asMap(m.get("erroAnimar")));
+                    a.erroAnimar.continua = true;
+                }
                 break;
             case "trocar":
                 a = new Acao(Acao.Tipo.TROCAR);
@@ -932,21 +958,7 @@ public final class CinematicaLuta {
                 break;
             case "animar":
                 // Animação feita à mão: o motor de luta para e os dois seguem os quadros-chave.
-                a = new Acao(Acao.Tipo.ANIMAR);
-                int total = Math.round(numero(m, "quadros", -1f, 1f, 3600f));
-                if (total < 1) throw new IllegalArgumentException("animar sem \"quadros\"");
-                a.animacao = new AnimacaoManual(total, AnimacaoManual.chaves(Episodio.list(m, "jogador"), "jogador"),
-                    AnimacaoManual.chaves(Episodio.list(m, "rival"), "rival"));
-                for (Object o : Episodio.list(m, "eventos")) {
-                    Map<String, Object> em = Episodio.asMap(o);
-                    AnimacaoManual.Evento ev = new AnimacaoManual.Evento();
-                    ev.q = Math.round(numero(em, "q", 0f, 0f, 3600f));
-                    ev.acao = acao(temporada, Episodio.asMap(em.get("acao")));
-                    if (ev.acao.tipo == Acao.Tipo.QTE || ev.acao.tipo == Acao.Tipo.ANIMAR || ev.acao.tipo == Acao.Tipo.GOLPE) {
-                        throw new IllegalArgumentException("animar: evento " + ev.acao.tipo + " não pode ir dentro da animação");
-                    }
-                    a.animacao.eventos.add(ev);
-                }
+                a = animar(temporada, m);
                 break;
             case "efeito":
                 // Um efeito de vídeo (poeira, fumaça, faísca) num lutador: a animação manual não
@@ -1048,6 +1060,27 @@ public final class CinematicaLuta {
         }
         a.congela = numero(im, "congela", 0.15f, 0f, 2f);
         a.tranco = numero(im, "zoom", 1.15f, 1f, 1.8f);
+    }
+
+    /** A ação ANIMAR lida de {@code m} (também o trecho do erro de um QTE, que sempre continua). */
+    private static Acao animar(Temporada temporada, Map<String, Object> m) {
+        Acao a = new Acao(Acao.Tipo.ANIMAR);
+        int total = Math.round(numero(m, "quadros", -1f, 1f, 3600f));
+        if (total < 1) throw new IllegalArgumentException("animar sem \"quadros\"");
+        a.animacao = new AnimacaoManual(total, AnimacaoManual.chaves(Episodio.list(m, "jogador"), "jogador"),
+            AnimacaoManual.chaves(Episodio.list(m, "rival"), "rival"));
+        a.continua = Boolean.TRUE.equals(m.get("continua"));
+        for (Object o : Episodio.list(m, "eventos")) {
+            Map<String, Object> em = Episodio.asMap(o);
+            AnimacaoManual.Evento ev = new AnimacaoManual.Evento();
+            ev.q = Math.round(numero(em, "q", 0f, 0f, 3600f));
+            ev.acao = acao(temporada, Episodio.asMap(em.get("acao")));
+            if (ev.acao.tipo == Acao.Tipo.QTE || ev.acao.tipo == Acao.Tipo.ANIMAR || ev.acao.tipo == Acao.Tipo.GOLPE) {
+                throw new IllegalArgumentException("animar: evento " + ev.acao.tipo + " não pode ir dentro da animação");
+            }
+            a.animacao.eventos.add(ev);
+        }
+        return a;
     }
 
     private static Acao qte(Map<String, Object> m) {
@@ -1351,7 +1384,7 @@ public final class CinematicaLuta {
 
     /** Uma animação manual está tocando: o motor de luta fica parado e o jogo desenha as poses dela. */
     public boolean animando() {
-        return animando != null && estado == Estado.RODANDO;
+        return (animando != null || animSegura) && estado == Estado.RODANDO;
     }
 
     /**
@@ -1450,11 +1483,14 @@ public final class CinematicaLuta {
                 break;
             case ANIMAR:
                 animando = a;
+                animSegura = false;
                 animQuadro = 0f;
                 animEvento = 0;
-                float xj = palco.xDoLutador(JOGADOR), xr = palco.xDoLutador(RIVAL);
-                animMeio = (xj + xr) * 0.5f;
-                animSentido = xr >= xj ? 1f : -1f;
+                if (!a.continua) {
+                    float xj = palco.xDoLutador(JOGADOR), xr = palco.xDoLutador(RIVAL);
+                    animMeio = (xj + xr) * 0.5f;
+                    animSentido = xr >= xj ? 1f : -1f;
+                }
                 animar(0f);
                 break;
             case IMPACTO:
@@ -1525,6 +1561,7 @@ public final class CinematicaLuta {
             case ANIMAR:
                 if (animQuadro < a.animacao.quadros) return false;
                 animando = null;
+                animSegura = true;
                 return true;
             case PAGINA:
                 // Lida quadro a quadro, no toque, como as páginas da história.
@@ -1668,6 +1705,23 @@ public final class CinematicaLuta {
                 return false;
             case RESULTADO:
                 if (idade < RESULTADO_QTE) return false;
+                if (!qteAcertou && qte.erroAnimar != null) {
+                    // O erro numa animação feita à mão: toca o contra-ataque do rival e, no fim,
+                    // os dois voltam à pose do QTE para ele pedir de novo.
+                    qteFase = FaseQte.GOLPE;
+                    qteDesde = time;
+                    linhasQte.ir(0f, 0.3f);
+                    impactou = true;
+                    for (int lado = 0; lado < 2; lado++) poseDoQte[lado].copiar(animPose[lado]);
+                    animando = qte.erroAnimar;
+                    animSegura = false;
+                    animQuadro = 0f;
+                    animEvento = 0;
+                    velocidade.ir(1f, 0f);
+                    qteErroAnimando = true;
+                    animar(0f);
+                    return false;
+                }
                 int quemBate = lado(qte.quemMove);
                 qteBatedor = qteAcertou ? quemBate : 1 - quemBate;
                 Golpe g = qteAcertou ? qte.acerto : qte.erro;
@@ -1681,6 +1735,16 @@ public final class CinematicaLuta {
                 if (g != null) palco.golpear(qteBatedor, g);
                 return false;
             default:
+                if (qteErroAnimando) {
+                    if (animando != null && animQuadro < animando.animacao.quadros) return false;
+                    animando = null;
+                    animSegura = true;
+                    for (int lado = 0; lado < 2; lado++) animPose[lado].copiar(poseDoQte[lado]);
+                    qteErroAnimando = false;
+                    qteTentativas++;
+                    iniciarQte();
+                    return false;
+                }
                 if (!golpeAcabou(qte, qteBatedor, idade)) return false;
                 // O lance termina como o roteiro manda (a esquiva, a defesa) antes de a cena seguir.
                 if (qte.lance != null && palco.trocando() && idade < LIMITE_ESPERA) return false;
@@ -1871,6 +1935,8 @@ public final class CinematicaLuta {
         acao = null;
         qte = null;
         animando = null;
+        animSegura = false;
+        qteErroAnimando = false;
         video = null;
         videoProximo = null;
         // A tinta que ficou na tela sai sozinha.
@@ -1966,7 +2032,7 @@ public final class CinematicaLuta {
     public float velocidade() {
         if (estado != Estado.RODANDO) return 1f;
         // Na animação manual a luta fica parada (quem anda é a animação).
-        if (animando != null) return 0f;
+        if (animando != null || animSegura) return 0f;
         // O impacto de um golpe congela a luta um instante.
         return time < congelaAte ? 0f : velocidade.valor();
     }

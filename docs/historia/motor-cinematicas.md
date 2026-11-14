@@ -389,6 +389,8 @@ animação no contato. A `velocidade` dentro da animação muda o ritmo dela (0,
 
 No gerador, as `PAUSAS` (quadro: quadros a mais) seguram a pose dos dois naquele quadro e empurram o resto para a frente (a antecipação, o golpe esticado depois do contato, a pausa de quem se estuda), sem refazer a coreografia; `CONGELA` dá a pausa do contato por força e `lenta()` a câmera lenta em volta de um golpe. O ritmo vem do dono (13/11): o movimento rápido, as pausas longas; a cena corrida cansa e o golpe perde o peso.
 
+**QTE na animação.** A animação é cortada em trechos (`animar` com `"continua": true` segue o eixo do trecho de antes). Entre dois trechos, um `qte` sem `lance` pede com os dois parados na última pose (o golpe no meio): o acerto segue para o trecho seguinte; com `"erroAnimar"` (um `animar` curto, o contra-ataque do rival), o erro toca esse trecho, os dois voltam à pose do QTE e ele pede de novo. Depois do último trecho os dois seguram a pose até a cena acabar (o motor de luta não volta no meio).
+
 A luta do convite do Ryūga é escrita por um gerador (`tools/cenas/convite_ryuga.py`): ajuste os
 números lá e rode `python3 tools/cenas/convite_ryuga.py`. Para ver as poses de um lutador, as
 folhas de cada clipe com o número do quadro ajudam a escolher.
@@ -404,9 +406,10 @@ Yin-lu, no dojo dela):
    quadro, no toque (`ep02/lembranca1.jpg` e `lembranca2.jpg`).
 3. A tinta pinta de novo por cima da segunda página, os dois recuam atrás dela e a tinta sai: a luta volta.
 4. A **coreografia do dono (13/11)**, em quatro sequências, **animada à mão** (ação `animar`, uns
-   33 s): a tabela abaixo. A versão anterior, com os QTE e o motor de luta fazendo os golpes, está em
-   `historia/ep02/cinematica_convite_ryuga_qte.json` (os QTE voltam para a cena animada depois que o
-   ritmo dela for aprovado). Nela os QTE não batem por conta própria (`"golpe": "nenhum"`): o
+   33 s sem os QTE), com seis QTE no meio dos golpes: ESQUIVA! (a rasteira), COMBO! (o combo dele),
+   DEFESA! (o chute dela depois da palma), SOCO!, CONTRA-ATAQUE! (o gancho) e GOLPE FINAL!. Errar
+   toca o contra-ataque dela (o golpe pegando nele, clarão) e pede de novo. A versão anterior, com os
+   QTE e o motor de luta fazendo os golpes, está em `historia/ep02/cinematica_convite_ryuga_qte.json`. Nela os QTE não batem por conta própria (`"golpe": "nenhum"`): o
    acerto libera a troca de golpes do roteiro, com quem ataca e os golpes em ordem.
 
 | Sequência | Animada à mão (a cena de agora) |
