@@ -1721,6 +1721,13 @@ public class GameView extends SurfaceView
                     for (FighterState m : engine.team(side).members) if (m != null) m.superMeter = barra;
                 }
             }
+            if (shinkaiPedido) {
+                shinkaiPedido = false;
+                for (int side = 0; side < 2; side++) {
+                    for (FighterState m : engine.team(side).members) if (m != null) m.shinkai = CombatConfig.SHINKAI_MAX;
+                    engine.refreshShinkai(side);
+                }
+            }
             float canto = cantoPedido;
             if (canto > 0f) {
                 // PC (GravarLuta, passo canto:GAP): o rival encostado na borda da direita, nós a GAP px.
@@ -2162,7 +2169,7 @@ public class GameView extends SurfaceView
             }
             if (!event.blocked && event.damage > 0 && batedor.inShinkai(Shinkai.Type.POWER)) {
                 // SHINKAI POWER: o golpe trinca o chão e a tela sente.
-                shinkaiDetalhes.trinca(hitFighter.x, batedor.shinkaiType.color);
+                shinkaiDetalhes.trinca(hitFighter.x, batedor.shinkaiCor);
                 beamShake = Math.max(beamShake, 9f);
             }
             // Zerado no meio do Ultra: o K.O. (câmera lenta, close, finalização) fica para o golpe final.
@@ -3100,7 +3107,7 @@ public class GameView extends SurfaceView
         for (int side = 0; side < 2; side++) {
             CombatFighter f = engine.fighter(side);
             if (f.state.shinkaiFrames != engine.config.shinkaiFrames) continue;
-            int color = f.state.shinkaiType.color;
+            int color = f.state.shinkaiCor;
             float x = f.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
             impacts.spawnSuperJump(x, GROUND_Y, color);
             impacts.spawnSuperGlint(x, chestY(f), color);
@@ -3117,6 +3124,10 @@ public class GameView extends SurfaceView
                 // Com o vídeo da liberação de poder (efeito shinkai_<id>: ele, a aura, os raios e o
                 // dragão), o efeito toca nos pés dele e o sprite some enquanto isso.
                 ativacaoEfeito = efeitos.tocar(efeito, x, fighterVisualY(f), 1f, f.facing < 0);
+                // As faixas pretas vão até onde o vídeo corta em cima e embaixo (pedido do dono).
+                float[] lim = ativacaoEfeito ? efeitos.limitesY(efeito) : null;
+                ativacaoVideoTopo = lim == null ? Float.NaN : fighterVisualY(f) + lim[0];
+                ativacaoVideoBase = lim == null ? Float.NaN : fighterVisualY(f) + lim[1];
                 // A cena (pedido do jogador): a câmera fecha, ele levanta as mãos, o vídeo para e
                 // aí entra o corte com o nome; o corte sai e ele termina com o dragão.
                 float marca = ativacaoEfeito ? efeitos.marcaMs(efeito) : -1f;
@@ -3138,13 +3149,15 @@ public class GameView extends SurfaceView
     private void comecarCorte() {
         corteAtraso = -1;
         CombatFighter f = engine.fighter(corteLado);
-        corteShinkai.comecar(corteLado == OPPONENT, characterSelectRenderer.hudPortrait(f.state.character), f.state.shinkaiType);
+        corteShinkai.comecar(corteLado == OPPONENT, characterSelectRenderer.hudPortrait(f.state.character), f.state.shinkaiType, f.state.shinkaiCor);
     }
 
     /** Lado que está tocando a animação de ativação do SHINKAI (-1: nenhum), desde que quadro e por quantos. */
     private int ativacaoLado = -1, ativacaoInicio, ativacaoQuadros;
     /** A ativação está tocando o vídeo dela (efeito): o sprite do lutador fica escondido. */
     private boolean ativacaoEfeito;
+    /** Topo e base do vídeo da ativação no mundo (NaN: sem vídeo; as faixas ficam no tamanho normal). */
+    private float ativacaoVideoTopo = Float.NaN, ativacaoVideoBase = Float.NaN;
     /** A cena é a do Ultra SHINKAI do dragão (a mesma câmera da ativação, sem a pose dela). */
     private boolean ativacaoUltra;
 
@@ -3164,7 +3177,7 @@ public class GameView extends SurfaceView
             corteLado = p.index;
             corteAtraso = 10;
             shinkaiFlash = SHINKAI_FLASH_FRAMES;
-            shinkaiFlashColor = p.state.shinkaiType.color;
+            shinkaiFlashColor = p.state.shinkaiCor;
         }
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
     }
@@ -3321,7 +3334,7 @@ public class GameView extends SurfaceView
             CombatFighter f = engine.fighter(side);
             if (f.hitstop != engine.config.shinkaiParryFreeze || !f.state.inShinkai(Shinkai.Type.TECHNIQUE)) continue;
             impacts.spawnSuperGlint(f.x, chestY(f), 0xFFFFFFFF);
-            impacts.spawn(ImpactEffects.GUARD, f.x + f.facing * 30f, chestY(f), f.facing, ImpactEffects.SPECIAL, Shinkai.Type.TECHNIQUE.color);
+            impacts.spawn(ImpactEffects.GUARD, f.x + f.facing * 30f, chestY(f), f.facing, ImpactEffects.SPECIAL, f.state.corShinkai());
         }
         ultraSounds.playFight("defesa", 1f, 1.7f);
     }
@@ -4051,6 +4064,13 @@ public class GameView extends SurfaceView
 
     private volatile int superPedido = -1;
 
+    /** PC ({@code gradle :pc:gravarLuta}, passo {@code shinkai}): a barra do SHINKAI cheia nos dois times. */
+    public void encherShinkai() {
+        shinkaiPedido = true;
+    }
+
+    private volatile boolean shinkaiPedido;
+
     /** PC ({@code gradle :pc:gravarLuta}): o rival no canto da direita e nós a {@code gap} px dele. */
     public void irParaOCanto(float gap) {
         cantoPedido = gap;
@@ -4601,10 +4621,19 @@ public class GameView extends SurfaceView
             if (barras > 0.001f) {
                 // Faixas pretas de cinema durante o Ultra e a liberação do SHINKAI.
                 float bar = AberturaUltra.BAR * barras;
+                float barTopo = bar, barBase = bar;
+                if (ativacaoEfeito && ativacaoCinema() > 0.001f && ultraBars < 0.001f && !Float.isNaN(ativacaoVideoTopo)) {
+                    // Liberação com vídeo: a faixa cobre da borda da tela até onde o vídeo corta
+                    // (nunca menos que a faixa normal, nunca mais que meia tela).
+                    float topoTela = (ativacaoVideoTopo - renderCameraTop) * renderZoom;
+                    float baseTela = (ativacaoVideoBase - renderCameraTop) * renderZoom;
+                    barTopo = Math.min(VH * 0.5f, Math.max(AberturaUltra.BAR, topoTela)) * barras;
+                    barBase = Math.min(VH * 0.5f, Math.max(AberturaUltra.BAR, VH - baseTela)) * barras;
+                }
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(0xFF0B0E16);
-                canvas.drawRect(-40f, -40f, VW + 40f, bar, paint);
-                canvas.drawRect(-40f, VH - bar, VW + 40f, VH + 40f, paint);
+                canvas.drawRect(-40f, -40f, VW + 40f, barTopo, paint);
+                canvas.drawRect(-40f, VH - barBase, VW + 40f, VH + 40f, paint);
             }
 
             TesteAutomatico.hud(TesteAutomatico.HUD_TELA);
@@ -5859,7 +5888,14 @@ public class GameView extends SurfaceView
             if (!projetilDoPersonagem(p)) continue;
             float k = p.radius / 24f;
             String nome = "onda_" + engine.fighter(p.ownerIndex).character().id;
-            if (efeitos.desenharEm(c, nome, ms, p.x + p.direction * ONDA_FOLHA_PONTA * k, p.y, k, p.direction < 0)) projeteisEmFolha.add(p);
+            // A cauda nasce na mão: nada da folha atrás do ponto de onde a Onda saiu (sem isso ela
+            // atravessa o corpo de quem soltou).
+            c.save();
+            if (p.direction > 0) c.clipRect(p.startX, -100000f, 100000f, 100000f);
+            else c.clipRect(-100000f, -100000f, p.startX, 100000f);
+            boolean desenhou = efeitos.desenharEm(c, nome, ms, p.x + p.direction * ONDA_FOLHA_PONTA * k, p.y, k, p.direction < 0);
+            c.restore();
+            if (desenhou) projeteisEmFolha.add(p);
         }
         for (Projectile p : engine.superProjectiles) {
             if (!projetilDoPersonagem(p)) continue;
@@ -5896,7 +5932,7 @@ public class GameView extends SurfaceView
         boolean ativos = a.state.inShinkai() && b.state.inShinkai() && !a.ko() && !b.ko();
         float metade = VW / (2f * camera.zoom);
         float xa = a.x + tagOffset(), xb = b.x + engine.teams.tagOffset(OPPONENT);
-        raiosShinkai.passo(ativos, a.state.shinkaiType.color, b.state.shinkaiType.color,
+        raiosShinkai.passo(ativos, a.state.shinkaiCor, b.state.shinkaiCor,
             xa, chestY(a), xb, chestY(b), camera.x - metade, camera.x + metade, camera.top, GROUND_Y,
             qualidade.efeitosLeves());
     }

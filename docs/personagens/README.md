@@ -46,6 +46,8 @@ e como luta, o que está no jogo hoje (gerado dos dados), combos, o que falta e 
 
 - [video.md](video.md): **como fazer uma animação hoje** (imagens iniciais, H3, prompt, regras do
   dono, conversão, montagem e o que rodar depois).
+- [poderes.md](poderes.md): **os prompts dos poderes, projéteis e objetos lançados** de cada um
+  (vídeo em fundo preto ou verde, imagem para objeto) e a cor da energia de cada personagem.
 - [mecanicas.md](mecanicas.md): vida, movimento, dano e a mecânica única de cada um.
 - [comandos.md](comandos.md): os comandos dos especiais e dos golpes de comando e de corrida.
 - [combos-assinatura.md](combos-assinatura.md): o jeito de combar de cada um e os combos de

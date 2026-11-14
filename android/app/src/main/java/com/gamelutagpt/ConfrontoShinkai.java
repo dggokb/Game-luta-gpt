@@ -66,7 +66,7 @@ final class ConfrontoShinkai {
             for (int i = 0; i < 2; i++) {
                 CombatFighter f = engine.fighter(i);
                 x[i] = f.x;
-                cor[i] = c.tipo[i].color;
+                cor[i] = f.state.corShinkai();
                 mao[i] = f.x + f.facing * 58f;
                 maoY[i] = f.y - f.character().visualStandHeight * 0.6f;
             }

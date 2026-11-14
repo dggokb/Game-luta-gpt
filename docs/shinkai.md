@@ -144,8 +144,13 @@ Nada disso precisa de comando novo: são os mesmos botões, com o resultado na t
 ## Animação de ativação
 
 Quem tem a animação `SHINKAI_ATIVA` a toca no corte da ativação, com a luta parada (o rival e o
-relógio esperam o tempo dela; `CombatEngine.shinkaiAtivacaoQuadros`). Hoje só o Ryūga tem, do vídeo
-antigo. Os outros ficam na guarda durante o corte.
+relógio esperam o tempo dela; `CombatEngine.shinkaiAtivacaoQuadros`). Com o vídeo da liberação
+(efeito `shinkai_<id>`: o lutador e o que nasce em volta dele), o efeito toca nos pés e o sprite
+some; a `marcaMs` do efeito diz quando entra o corte com o nome. Têm: o Ryūga (aura azul e dragão)
+e a Yin-lu (a garça branca, 14/11). Os outros ficam na guarda durante o corte.
+
+**Cor do SHINKAI por lutador:** a do tipo, ou a própria (`Shinkai.corDe`): a Yin-lu é TECHNIQUE
+com a aura branca.
 
 O prompt de cada um está na ficha (`docs/personagens/pNN.md`, em "Prompts do que falta"): guarda →
 um gesto de liberação no jeito dele e do tipo → pico segurado → guarda. O vídeo não tem aura nem
