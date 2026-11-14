@@ -198,7 +198,7 @@ final class SpriteFighterRenderer {
         } else if(p01 && SpriteStates.IDLE.equals(clip)) {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,
                 P01_IDLE_SCALE,P01_IDLE_SCALE,alpha);
-        } else if(p01 && SpriteStates.DASH.equals(clip)) {
+        } else if(p01 && (SpriteStates.DASH.equals(clip) || SpriteStates.DASH_VOO.equals(clip))) {
             // The running pose can extend its limbs, but never enlarges
             // the fighter relative to the canonical idle body.
             drawP01Calibrated(canvas,anim,frame,x,baseY,alpha);

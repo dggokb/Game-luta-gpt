@@ -18341,6 +18341,17 @@
           }
         }
       }
+    },
+    "DASH_VOO": {
+      "_doc": "Temporário (14/11, o dono escolheu): o quadro 6 do dash, segurado no voo do Dragon Rush e na investida do Ultra, no lugar da voadora.",
+      "atlas": "player_base_dash",
+      "frames": [
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
     }
   },
   "moves": {

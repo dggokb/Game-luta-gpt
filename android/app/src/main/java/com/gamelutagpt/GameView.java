@@ -5286,9 +5286,15 @@ public class GameView extends SurfaceView
                 soco = character.moves.get(f.grounded ? (medio ? "M" : "L") : (medio ? "jM" : "jL"));
                 if (soco == null || soco.animation == null) soco = character.moves.get(medio ? "M" : "L");
             }
+            CharacterDefinition.Animation vooArte = character.animations.get(SpriteStates.DASH_VOO);
             if (soco != null && soco.animation != null) {
                 animation = soco.animation.id;
                 animationElapsed = soco.animationTime((soco.attack.startupFrames + 0.5f) * FIXED_STEP);
+            } else if (vooArte != null) {
+                // Temporário (pedido do dono): a pose do dash mais deitada (DASH_VOO) no preparo,
+                // no voo e na recuperação, no lugar da voadora do jH.
+                animation = vooArte.id;
+                animationElapsed = 0.001f;
             } else if (voo != null && voo.animation != null) {
                 AttackDefinition rush = f.attack, pose = voo.attack;
                 float frames;
@@ -5499,6 +5505,14 @@ public class GameView extends SurfaceView
             }
             animation = clip.id;
             animationElapsed = clip.timeOfFrame(quadro);
+        }
+        CharacterDefinition.Animation vooUltra = character.animations.get(SpriteStates.DASH_VOO);
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && vooUltra != null &&
+            (f.ultraPhase == CombatFighter.ULTRA_RUSH || f.ultraPhase == CombatFighter.ULTRA_CINEMATIC)) {
+            // A investida do Ultra na pose do dash, também no acerto que abre a cena (temporário,
+            // pedido do dono: era o golpe forte).
+            animation = vooUltra.id;
+            animationElapsed = 0.001f;
         }
         if (animation == null && f.status == CombatFighter.Status.ULTRA) {
             // Activation uses the Super charge clip; rush and recovery reuse the heavy strike.

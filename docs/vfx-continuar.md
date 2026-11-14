@@ -1615,6 +1615,13 @@ os lotes seguintes do efeitos-gpt.md.
   alternando). Agora sai do mesmo vídeo (`--inicio 41-63:2`): a cabeça do cometa espelhada, a parte
   redonda nas mãos e as chamas correndo para dentro do raio, 12 quadros diferentes, a mesma chama
   laranja do raio. A aura em volta dele continua a amarela do Ultra antigo.
+- **Depois, "esse que você colocou agora ficou muito ruim, dá pra ver que foi gambiarra":** a esfera
+  voltou a ser a do `poder_ultra` (a de antes); falta uma de verdade (vídeo próprio).
+- **Junto, "quando vai dar o Ultra põe o dash do Shinkai também, porque ele também tá indo com
+  voadora":** a investida do Ultra (e o acerto que abre a cena) e o voo do Dragon Rush usam a
+  `DASH_VOO`, o quadro 6 do dash que o dono escolheu, segurado; era o H (Ultra) e o jH (Dragon
+  Rush). As pancadas do Dragon Rush continuam o L e o M. Temporário até ter arte própria. (O dash
+  troca de quadro pela distância, não pelo tempo: por isso a pose é uma animação de um quadro.)
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
