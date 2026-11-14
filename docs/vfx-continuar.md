@@ -1580,6 +1580,16 @@ os lotes seguintes do efeitos-gpt.md.
   --resolucao 0.9 --segurar 15,800 --alfa-corte 0.45`.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Rodada de 14/11: a Onda nova do Ryūga (S1)
+
+- **Pedido:** o vídeo `s1_poder` do dono (o cometa dourado com anéis girando, do prompt de
+  `docs/personagens/poderes.md`) no lugar da gota de 08/11: "troca".
+- **Feito:** `efeito_video_preto.py s1_poder.mp4 --nome onda_player_base --quadros 89-100 --borda 120
+  --origem 800,367 --escala-mundo 0.3 --fps 24`: 12 quadros em loop (o trecho de 12 que mais se
+  repete), uns 300 × 190 px no mundo, a origem no miolo, a cauda apagando na borda esquerda do
+  vídeo. A luz (`#F8E86E`) ficou a de antes.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a

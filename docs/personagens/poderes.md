@@ -80,6 +80,9 @@ Tem arte em tudo, mas a Onda (S1) e a esfera do Super são de 08/11, de antes de
 é uma gota dourada simples de 4 quadros, e o Super é a mesma ideia maior. Os dois precisam ser
 diferentes um do outro (o dono, 14/11). O raio do Ultra, o Shinkai e o Ultra Shinkai ficam.
 
+**S1 Onda: feita (14/11)** com o vídeo `s1_poder` do dono (o cometa com anéis da primeira
+versão do prompt), na folha `onda_player_base`. O prompt abaixo (sem anéis) fica só de referência.
+
 **S1 Onda (o voo, LUZ, loop): rápida e afiada, um cometa.** Voa 720 px a 760 px/s; carregada,
 cresce. Troca a folha `onda_player_base` sem mexer em código.
 ```
