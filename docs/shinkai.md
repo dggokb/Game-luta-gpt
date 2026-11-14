@@ -141,6 +141,16 @@ A divisão abaixo é o ponto de partida. Para mudar, basta editar `Shinkai.typeO
 
 Nada disso precisa de comando novo: são os mesmos botões, com o resultado na tela.
 
+## Animação de ativação
+
+Quem tem a animação `SHINKAI_ATIVA` a toca no corte da ativação, com a luta parada (o rival e o
+relógio esperam o tempo dela; `CombatEngine.shinkaiAtivacaoQuadros`). Hoje só o Ryūga tem, do vídeo
+antigo. Os outros ficam na guarda durante o corte.
+
+O prompt de cada um está na ficha (`docs/personagens/pNN.md`, em "Prompts do que falta"): guarda →
+um gesto de liberação no jeito dele e do tipo → pico segurado → guarda. O vídeo não tem aura nem
+energia: o contorno, a aura e o detalhe do tipo são do jogo.
+
 ## SHINKAI Clash
 
 Ligar o SHINKAI **com o rival já no dele** (a qualquer momento dos 8 s dele) vira o **SHINKAI
