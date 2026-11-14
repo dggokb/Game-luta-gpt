@@ -5770,9 +5770,9 @@ public class GameView extends SurfaceView
     private static final boolean DEFESA_NA_PONTA = true;
     /**
      * Projétil defendido: a defesa nasce no miolo da bola (HitEvent.frenteX/frenteY), não no corpo de
-     * quem defende, que fica atrás dela. Desligado até o dono aprovar o vídeo defesa_projetil_posicao.mp4.
+     * quem defende, que fica atrás dela. Ligado pelo dono depois do vídeo defesa_projetil_posicao.mp4 (14/11).
      */
-    private static final boolean DEFESA_PROJETIL_NA_FRENTE = false;
+    private static final boolean DEFESA_PROJETIL_NA_FRENTE = true;
     /**
      * Defesa espelhada: o arco do desenho anda para o lado de quem bate e o spray voa por cima de quem
      * defende; espelhada, o spray volta para quem bate (dono, 14/11: "estão expandindo para frente em
