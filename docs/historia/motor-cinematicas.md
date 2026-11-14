@@ -347,7 +347,7 @@ primeiro; o soco final é do Ryūga, como na página 5). São crianças: quase t
 | Um dos dois com 50% | câmera lenta, faixas, a tinta cobre; os dois aparecem no meio do cenário (`"meio": "palco"`), o Dafu: "Ei, ei! Devagar, meninos!" |
 | A troca desajeitada | tudo erra: o soco do Kōga passa por cima do Ryūga, que se abaixa atrasado, e o Kōga quase cai para a frente; o gancho do Ryūga passa no vento e ele gira junto; o soco do Ryūga sai curto e ele tropeça; o chute do Kōga passa a um palmo do Ryūga, que fecha os olhos, e o Kōga perde o equilíbrio num pé só (VUSH!); os dois ofegantes |
 | CHOQUE! (toque) | os dois arrancam com o punho armado; os punhos se chocam (PAH!) e eles quicam para trás sacudindo a mão |
-| TROCA DE GOLPES! (martelar) | o vídeo dos dois trocando golpes e errando (`ep00/qt1`, a 1,2x) entra no lugar dos meninos (PÁ!, VUSH!); no fim dele os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
+| TROCA DE GOLPES! (martelar) | o vídeo dos dois trocando golpes e errando (`ep00/qt1`, a 1,2x, até o último chute: o fim dele, só a guarda, fica de fora) entra no lugar dos meninos (PÁ!, VUSH!); no fim dele os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
 | O susto | o Kōga levanta primeiro e avança num soco esticado; o Ryūga, ainda se erguendo, salta para trás e o soco para a um palmo (VUSH!, câmera lenta) |
 | GOLPE FINAL! (tempo) | o Ryūga arranca; o soco dele pega o Kōga na cara antes do dele: POW! (o quadro de impacto), a cabeça do Kōga vai para trás, a pose segura e a tinta cobre (a pag5 começa nesse soco) |
 
@@ -357,7 +357,8 @@ vídeos antigos da briga só o `qt1` é usado; `qt2`, `qt3` e `levanta` continua
 
 **Vídeo dentro da animação.** Um `video` pode ser evento de um `animar`: ele toca no lugar dos dois
 (os sprites somem) com a origem no meio deles, e um `video` com `parar` o tira. Para a emenda não
-pular, os dois seguram a pose escondidos enquanto ele toca (no gerador, uma pausa do tamanho do
+pular, os dois seguram a pose escondidos enquanto ele toca (o vídeo anda no ritmo da animação: a
+câmera lenta e a congelada do impacto valem para ele) (no gerador, uma pausa do tamanho do
 vídeo) e ficam onde os meninos do vídeo estão no primeiro e no último quadro (no `qt1`, a 80 do
 meio: 97 px da folha com `pixelScale` 1,2). Os letreiros dentro da pausa vão com `apos` (quadros
 depois do evento).

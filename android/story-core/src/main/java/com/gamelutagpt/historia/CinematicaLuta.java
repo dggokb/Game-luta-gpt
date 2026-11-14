@@ -1366,7 +1366,8 @@ public final class CinematicaLuta {
 
     public void update(float dt) {
         // O vídeo anda no ritmo da luta: para na congelada do impacto e fica lento na câmera lenta.
-        if (video != null) videoDesde += dt * (1f - velocidade());
+        // Dentro de uma animação feita à mão a luta fica parada, e ele anda no ritmo da animação.
+        if (video != null) videoDesde += dt * (1f - ritmoDoVideo());
         time += dt;
         if (videoProximo != null && msDoVideo() >= videoTrocaMs) {
             // A volta acabou: o vídeo emendado começa de onde a volta passou.
@@ -2069,6 +2070,14 @@ public final class CinematicaLuta {
      * Velocidade da luta pedida pela cena: 1 = normal, menos que 1 = câmera lenta, 0 = a luta
      * congela. A cena, as falas e as onomatopeias andam no tempo normal.
      */
+    /** O ritmo do vídeo: o da luta, ou o da animação feita à mão quando ela está tocando. */
+    private float ritmoDoVideo() {
+        if (estado == Estado.RODANDO && (animando != null || animSegura)) {
+            return time < congelaAte ? 0f : velocidade.valor();
+        }
+        return velocidade();
+    }
+
     public float velocidade() {
         if (estado != Estado.RODANDO) return 1f;
         // Na animação manual a luta fica parada (quem anda é a animação).

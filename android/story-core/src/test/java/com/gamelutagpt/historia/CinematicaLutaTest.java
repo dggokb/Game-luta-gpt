@@ -441,6 +441,7 @@ public class CinematicaLutaTest {
             assertFalse("o Kōga não se abaixa no começo", Arrays.asList(cena.clipesAnimados(koga)).contains("CROUCH_HEAVY"));
             assertTrue(cena.gatilho(1f, 0.5f, 12f, false));
             int qtes = 0, quadrosNoQte = 0, quadrosDeVideo = 0;
+            float videoMsMax = 0f;
             boolean pedia = false, errou = false, ladoCerto = true;
             String finalRyuga = null, finalKoga = null;
             PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
@@ -451,6 +452,7 @@ public class CinematicaLutaTest {
                 cena.render(canvas);
                 if ("ep00/qt1".equals(cena.video())) {
                     quadrosDeVideo++;
+                    videoMsMax = Math.max(videoMsMax, cena.videoMs());
                     assertEquals("o Kōga é quem está à esquerda no vídeo", koga, cena.videoEsquerda());
                 }
                 if (cena.animando()) {
@@ -483,7 +485,8 @@ public class CinematicaLutaTest {
             assertTrue(irmao + ": a cena termina", cena.acabou());
             assertEquals(3, qtes);
             assertTrue(errou);
-            assertTrue("o vídeo toca uma vez inteiro (4,3 s): " + quadrosDeVideo, quadrosDeVideo > 230 && quadrosDeVideo < 300);
+            assertTrue("o vídeo toca até o último chute (3,3 s): " + quadrosDeVideo, quadrosDeVideo > 180 && quadrosDeVideo < 240);
+            assertTrue("o vídeo anda dentro da animação (até o último chute): " + videoMsMax, videoMsMax > 3700f);
             assertTrue(irmao + ": cada um do seu lado", ladoCerto);
             assertEquals(irmao + ": o soco final é do Ryūga", "CROUCH_LIGHT", finalRyuga);
             assertEquals(irmao + ": o Kōga leva na cara", "HIT_STAND", finalKoga);

@@ -78,7 +78,9 @@ DASH = dict(sx=1.25, sy=0.88, rastro=5)
 # O vídeo da troca de golpes (ep00/qt1: 62 quadros a 12 por segundo, 5146 ms) e quantos quadros
 # da cena ele dura no ritmo escolhido.
 VIDEO_RITMO = 1.2
-VIDEO_QUADROS = round(5146 / VIDEO_RITMO * 60 / 1000)
+# O vídeo sai no quadro 47 (3,9 s do vídeo): depois os dois só ficam em guarda.
+VIDEO_FIM_MS = 3900
+VIDEO_QUADROS = round(VIDEO_FIM_MS / VIDEO_RITMO * 60 / 1000)
 
 # ------------------------------------------------------------------ 1: a troca desajeitada
 # Os dois em guarda; o Dafu manda irem devagar e eles nem ouvem: andam um para o outro.
