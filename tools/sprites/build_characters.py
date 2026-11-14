@@ -50,6 +50,9 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # direita: dois disparos). Ainda sem arte (vêm dos vídeos): sem eles, as poses de antes
             # (jH, M/L e o SPECIAL_ENERGY).
             'DRAGON_RUSH', 'SPECIAL_ENERGY_SHINKAI',
+            # Uma pose do dash (a mais deitada), temporária: o voo do Dragon Rush e a investida do
+            # Ultra (pedido do dono, 14/11: no lugar da voadora).
+            'DASH_VOO',
             # Defesa em pé variada: o jogo alterna entre DEFENSE_STAND e estas a cada golpe defendido.
             'DEFENSE_STAND_2', 'DEFENSE_STAND_3',
             # Ultra SHINKAI do dragão com desenho próprio: a carga (0-18), o empurrão que solta o

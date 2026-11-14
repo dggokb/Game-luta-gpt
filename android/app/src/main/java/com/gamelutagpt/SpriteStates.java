@@ -47,6 +47,7 @@ final class SpriteStates {
  static final String SUPER_WAVE_ERRO = "SUPER_WAVE_ERRO";
  static final String DRAGON_RUSH = "DRAGON_RUSH";
  static final String SPECIAL_ENERGY_SHINKAI = "SPECIAL_ENERGY_SHINKAI";
+ static final String DASH_VOO = "DASH_VOO";
  static final String DEFENSE_STAND_2 = "DEFENSE_STAND_2";
  static final String DEFENSE_STAND_3 = "DEFENSE_STAND_3";
  static final String ULTRA_DRAGAO = "ULTRA_DRAGAO";
