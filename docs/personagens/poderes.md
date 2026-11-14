@@ -75,8 +75,22 @@ Object for a 2D anime fighting game, same line art as Guilty Gear Strive and Dra
 
 ## p01 Ryūga
 
-Tudo com arte: S1 Onda (`onda_player_base`), Super (`super_player_base`), raio do Ultra
-(`assets/ultras/player_base/`), Shinkai e Ultra Shinkai. Nada a gerar.
+Tem arte em tudo, mas a Onda (S1) e a esfera do Super são de 08/11, de antes destas regras: a Onda
+é uma gota dourada simples de 4 quadros, e o Super é a mesma ideia maior. Os dois precisam ser
+diferentes um do outro (o dono, 14/11). O raio do Ultra, o Shinkai e o Ultra Shinkai ficam.
+
+**S1 Onda (o voo, LUZ, loop): rápida e afiada, um cometa.** Voa 720 px a 760 px/s; carregada,
+cresce. Troca a folha `onda_player_base` sem mexer em código.
+```
+[LUZ] A comet of solar energy flying fast to the RIGHT, gold and orange like the sun: a small round white-hot head at the front, wrapped in thin yellow and orange layers, and a long tail to the left that is wide at the head and tapers to a sharp point, torn into a few thin flame-like strands with tiny sparks breaking off. Sleek and fast, calm and concentrated. No rings, no lightning, no fist, no hand. [0-5s] The head flickers and the tail strands ripple backward, in a seamless loop; the first and last frames are identical.
+```
+
+**Super (o voo e o alvo, LUZ, loop): um sol pequeno, pesado, sem cauda.** Atravessa a tela (1.450
+px), para no rival e bate 5 vezes pulsando. A mesma folha toca no voo e parada, então ela pulsa e
+não tem cauda. Troca a folha `super_player_base`.
+```
+[LUZ] A miniature sun of raw, concentrated energy, much bigger and heavier than a normal energy ball, about half of the frame height, in the middle of the frame: a perfectly round white-hot core, layered bands of gold, orange and deep red-orange around it, solar flares erupting from its surface and arching back down, a shimmering corona of thin orange rays all around it, and a few small embers drifting off. No tail, no lightning, no rings, no fist, no hand. [0-5s] It throbs in five strong pulses, the core flaring brighter and the corona expanding on each pulse, while the flares loop around the surface, in a seamless loop; the first and last frames are identical.
+```
 
 ## p02 Yin-lu
 
