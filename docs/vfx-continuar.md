@@ -1553,6 +1553,11 @@ os lotes seguintes do efeitos-gpt.md.
 - **A aura branca:** `Shinkai.corDe` dá a cor do SHINKAI por lutador (a do tipo, ou a própria). A
   Yin-lu continua TECHNIQUE, mas o contorno, a barra, o corte, o clarão, o parry e os raios dela
   saem brancos (`COR_BRANCA`).
+- **Depois, "as imagens cortam em cima e embaixo, então as listras pretas de cinemática têm que
+  ficar no limite de onde corta" (nela e no Ryūga):** na liberação com vídeo, as faixas pretas vão
+  da borda da tela até o topo e a base do vídeo do efeito (`EfeitosVideo.limitesY`, a união dos
+  quadros, posta na tela com o zoom da cena; nunca menos que a faixa normal de 72 px, nunca mais
+  que meia tela). No Ultra continuam as de 72 px.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
