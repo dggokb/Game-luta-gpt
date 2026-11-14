@@ -80,9 +80,12 @@ def pausar(jogador, rival, eventos, quadros, pausas):
 
     evs = []
     for e in eventos:
-        e2 = dict(e)
-        e2['q'] = novo(e['q'])
+        # "apos": tantos quadros depois do quadro do evento, já com as pausas (o letreiro no meio
+        # de uma pausa longa, como a de um vídeo tocando).
+        e2 = {k: v for k, v in e.items() if k != 'apos'}
+        e2['q'] = novo(e['q']) + e.get('apos', 0)
         evs.append(e2)
+    evs.sort(key=lambda e: (e['q'], e['acao']['acao'] == 'impacto'))
     return um(jogador), um(rival), evs, novo(quadros) + 0
 
 

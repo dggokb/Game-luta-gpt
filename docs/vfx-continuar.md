@@ -1507,6 +1507,9 @@ os lotes seguintes do efeitos-gpt.md.
   final com força 3 (o quadro de impacto preto e branco). Letreiros: VUSH!, PAH!, BAM!, PÁ!, POW!,
   TUM! e TOC! (o erro do QTE).
 - **Ficou:** ele julgar no vídeo. Visto só no PC, nas duas campanhas.
+- **Depois (14/11), "são crianças, a ideia é errar bastante" e "usa também os frames do vídeo
+  deles errando":** quase todo golpe vira VUSH! no vento (menos faíscas de defesa); a troca de
+  golpes toca o vídeo `ep00/qt1` no lugar dos meninos, com PÁ! e VUSH! nos golpes dele.
 
 ## Fora do VFX, o que ficou pendente
 

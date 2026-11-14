@@ -418,6 +418,13 @@ public final class CinematicaLuta {
             List<String> out = new ArrayList<>();
             for (Acao a : acoes) {
                 if (a.clipe != null && !out.contains(a.clipe)) out.add(a.clipe);
+                // Os vídeos tocados de dentro de uma animação feita à mão (e do erro de um QTE nela).
+                for (Acao anim : new Acao[] {a.tipo == Acao.Tipo.ANIMAR ? a : null, a.erroAnimar}) {
+                    if (anim == null) continue;
+                    for (AnimacaoManual.Evento ev : anim.animacao.eventos) {
+                        if (ev.acao.clipe != null && !out.contains(ev.acao.clipe)) out.add(ev.acao.clipe);
+                    }
+                }
             }
             return out;
         }

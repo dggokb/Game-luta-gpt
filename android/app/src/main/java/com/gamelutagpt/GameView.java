@@ -6098,6 +6098,11 @@ public class GameView extends SurfaceView
         lutadorNoGl = c instanceof CanvasGl;
         DesenhoGl gl = TesteDesempenho.luz == TesteDesempenho.LUZ_ON && lutadorNoGl ? DesenhoGl.noQuadro() : null;
         if (gl != null) gl.luzNova(luzDoLutador(f, drawingReflection));
+        // A cena em vídeo mostra os dois no lugar deles (também quando a animação feita à mão o toca).
+        if (cenaEmVideo) {
+            if (gl != null) gl.luzNova(null);
+            return;
+        }
         if (!desenharAnimado(c, renderer, f)) drawFighterCorpo(c, renderer, f, damageFlash, guardFlash);
         if (gl != null) gl.luzNova(null);
     }

@@ -339,21 +339,28 @@ carrega a cinemática e soltas no fim dela.
 **animada à mão** (ação `animar`, [abaixo](#animação-feita-à-mão)) pelo gerador
 `tools/cenas/briga_irmaos.py`. As chaves são por irmão (`"ryuga"` e `"koga"`): a mesma cena vale
 nas duas campanhas, cada menino do seu lado da tela e com o seu papel (o Kōga, esquentado, ataca
-primeiro; o soco final é do Ryūga, como na página 5). Uns 26 s com os três QTE:
+primeiro; o soco final é do Ryūga, como na página 5). São crianças: quase todo golpe erra (o dono,
+14/11). Uns 30 s com os três QTE:
 
 | Momento | O que acontece |
 |---|---|
 | Um dos dois com 50% | câmera lenta, faixas, a tinta cobre; os dois aparecem no meio do cenário (`"meio": "palco"`), o Dafu: "Ei, ei! Devagar, meninos!" |
-| A troca desajeitada | o Kōga arranca com o soco esticado e o Ryūga se abaixa (VUSH!); o gancho do Ryūga passa no vento (o Kōga pula para trás); o soco do Ryūga é defendido (PAH!); a voadora de lado do Kōga o empurra longe (BAM!); os dois ofegantes |
+| A troca desajeitada | tudo erra: o soco do Kōga passa por cima do Ryūga, que se abaixa atrasado, e o Kōga quase cai para a frente; o gancho do Ryūga passa no vento e ele gira junto; o soco do Ryūga sai curto e ele tropeça; o chute do Kōga passa a um palmo do Ryūga, que fecha os olhos, e o Kōga perde o equilíbrio num pé só (VUSH!); os dois ofegantes |
 | CHOQUE! (toque) | os dois arrancam com o punho armado; os punhos se chocam (PAH!) e eles quicam para trás sacudindo a mão |
-| TROCA DE GOLPES! (martelar) | quatro golpes defendidos (PÁ!), os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
+| TROCA DE GOLPES! (martelar) | o vídeo dos dois trocando golpes e errando (`ep00/qt1`, a 1,2x) entra no lugar dos meninos (PÁ!, VUSH!); no fim dele os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
 | O susto | o Kōga levanta primeiro e avança num soco esticado; o Ryūga, ainda se erguendo, salta para trás e o soco para a um palmo (VUSH!, câmera lenta) |
 | GOLPE FINAL! (tempo) | o Ryūga arranca; o soco dele pega o Kōga na cara antes do dele: POW! (o quadro de impacto), a cabeça do Kōga vai para trás, a pose segura e a tinta cobre (a pag5 começa nesse soco) |
 
 Os QTE são neutros (a cena é das duas campanhas): errar faz os dois avançarem juntos e baterem a
-cabeça (TOC!), um clarão, e o QTE pede de novo. Ninguém bate de verdade (`"golpe": "nenhum"`). Os
-vídeos antigos da briga (`ep00/qt1`, `qt2`, `qt3`, `levanta`) continuam na pasta, mas a cena não usa
-mais.
+cabeça (TOC!), um clarão, e o QTE pede de novo. Ninguém bate de verdade (`"golpe": "nenhum"`). Dos
+vídeos antigos da briga só o `qt1` é usado; `qt2`, `qt3` e `levanta` continuam na pasta.
+
+**Vídeo dentro da animação.** Um `video` pode ser evento de um `animar`: ele toca no lugar dos dois
+(os sprites somem) com a origem no meio deles, e um `video` com `parar` o tira. Para a emenda não
+pular, os dois seguram a pose escondidos enquanto ele toca (no gerador, uma pausa do tamanho do
+vídeo) e ficam onde os meninos do vídeo estão no primeiro e no último quadro (no `qt1`, a 80 do
+meio: 97 px da folha com `pixelScale` 1,2). Os letreiros dentro da pausa vão com `apos` (quadros
+depois do evento).
 
 Para ver no PC (`-PsoAnimacao=true` grava só a animação, `-Pcadencia=1` todo quadro, `-Pjpg=true`
 em JPG, `-PerraPrimeiro=true` deixa o primeiro QTE sem resposta):
