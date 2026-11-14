@@ -650,7 +650,9 @@ parte o anel em estilhaços); o segundo nasce dois quadros depois e menor. Folha
 pra trás, é pra fora: tá fechado e vai abrindo reto"; uma tentativa que trocava o desenho dele por um
 traço esticado foi reprovada na hora ("não falei pra mudar o que já temos, falei pra adicionar os
 anéis"): o desenho dele fica como está. O `DEFESA_ESPELHADA` perdeu o motivo (segue desligado). **Os anéis entraram na luta** ("põe no jogo pra eu testar", 14/11): `DEFESAS` toca
-`defesa_brilho_aneis*`, com as de brilho sem anel e as de ar de reserva.
+`defesa_brilho_aneis*`, com as de brilho sem anel e as de ar de reserva. Logo depois, "era pra pôr
+o spray a mais sim": a luta toca `defesa_brilho_spray_aneis*` (os anéis sobre os quadros do
+`mais_spray.py`: `defesa_aneis_ec.py --arte spray`); vídeo `defesas_spray_aneis_no_jogo.mp4`.
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
