@@ -6,6 +6,8 @@ final class FighterState {
     final CharacterDefinition.Fighter profile;
     /** HUD title: team slot plus the character's single display name. */
     final String hudTitle;
+    /** O nome oficial em maiúsculas, na plaquinha em cima da vida (barra com raios). */
+    final String hudNome;
     final String reserveHudLabel;
     int life;
     /**
@@ -47,6 +49,7 @@ final class FighterState {
         this.character = character;
         this.profile = character.fighter;
         this.hudTitle = slotLabel + " · " + character.displayName;
+        this.hudNome = character.displayName.toUpperCase(java.util.Locale.ROOT);
         this.reserveHudLabel = "RESERVA: " + character.displayName;
         this.life = profile.maxLife;
         this.superMeter = 0;

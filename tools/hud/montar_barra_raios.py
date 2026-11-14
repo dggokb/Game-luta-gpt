@@ -3,7 +3,7 @@
 
 A arte vem pronta (1672x941, fundo transparente, com rostos, barras cheias e textos pintados).
 Aqui se abrem buracos onde o jogo desenha ao vivo (rostos, vida, TAG, SHINKAI e os quadradinhos
-do Super) e se apagam os textos que mudam (o número do Super, ∞/TREINO, ◀ MENU e TAG). Fica só
+do Super) e se apagam os textos que mudam (o número do Super, ∞/TREINO, ◀ MENU, TAG e PLAYER 1/2). Fica só
 a faixa de cima (linhas 76 a 324). As mesmas medidas estão no HudRenderer (RAIOS_P1/RAIOS_P2):
 se a arte mudar de lugar, mude os dois.
 
@@ -35,9 +35,11 @@ POR_COR = [
     ("vida", (1200, 185), (930, 165, 1480, 210)), ("vida", (1200, 280), (1010, 266, 1360, 294)),
 ] + [("azul", (int(594 + i * 29.8), 233), (int(594 + i * 29.8) - 16, 220, int(594 + i * 29.8) + 16, 248)) for i in range(5)] \
   + [("vermelho", (int(1084 + i * 29.8), 233), (int(1084 + i * 29.8) - 16, 220, int(1084 + i * 29.8) + 16, 248)) for i in range(5)]
-# Textos que o jogo escreve ao vivo: número do Super (2), ∞/TREINO, ◀ MENU e TAG (2).
+# Textos que o jogo escreve ao vivo: número do Super (2), ∞/TREINO, ◀ MENU, TAG (2) e
+# PLAYER 1 / PLAYER 2 (no lugar deles vai o nome oficial de quem está em campo).
 TEXTOS = [(543, 218, 571, 249), (1029, 218, 1058, 249), (780, 132, 890, 226),
-          (770, 262, 905, 300), (252, 264, 314, 293), (1362, 264, 1414, 293)]
+          (770, 262, 905, 300), (252, 264, 314, 293), (1362, 264, 1414, 293),
+          (240, 126, 368, 164), (1304, 126, 1432, 164)]
 
 
 def main():

@@ -484,6 +484,8 @@ final class HudRenderer {
         new float[]{1236, 225, 1393, 225, 1406, 244, 1239, 244},
         new float[]{1071, 1097, 1102, 1127, 1132, 1157, 1162, 1187, 1192, 1217}, 224f, 241f,
         1043f, 247f, 1388f, 290f, 970f, 279f);
+    /** Plaquinha do nome em cima da vida (onde a arte do dono tinha PLAYER 1/2), em coordenadas da arte. */
+    private static final float RAIOS_NOME_X_P1 = 304f, RAIOS_NOME_X_P2 = 1368f, RAIOS_NOME_Y = 158f, RAIOS_NOME_LARGURA = 158f;
     /** Placa do relógio e do MENU, no centro. */
     private static final float RAIOS_CENTRO_X = 836f, RAIOS_MENU_Y = 281f;
 
@@ -514,6 +516,9 @@ final class HudRenderer {
         TesteAutomatico.hud(TesteAutomatico.HUD_MOLDURA);
         topoRaios(c, RAIOS_P1, active, reserve, s.tagReadyRatio(), effects.point);
         topoRaios(c, RAIOS_P2, s.opponent(), s.opponentReserve(), s.opponentTagReadyRatio(), effects.cpu);
+        // O nome oficial de quem está em campo na plaquinha de cima (a arte dizia PLAYER 1/2).
+        textoCabe(c, active.hudNome, RAIOS_NOME_X_P1, RAIOS_NOME_Y, 36f, RAIOS_NOME_LARGURA, Color.WHITE);
+        textoCabe(c, s.opponent().hudNome, RAIOS_NOME_X_P2, RAIOS_NOME_Y, 36f, RAIOS_NOME_LARGURA, Color.WHITE);
         TesteAutomatico.hud(TesteAutomatico.HUD_BARRAS);
         efeitosRaios(c);
         TesteAutomatico.hud(TesteAutomatico.HUD_EFEITOS);
@@ -813,6 +818,15 @@ final class HudRenderer {
         paint.setColor(stroke);
         c.drawPath(shape, paint);
         paint.setStyle(Paint.Style.FILL);
+    }
+
+    /** Como {@link #text}, mas encolhe a letra até o texto caber na largura. */
+    private void textoCabe(Canvas c, String value, float x, float y, float size, float largura, int color) {
+        paint.setFakeBoldText(true);
+        paint.setTextSize(size);
+        float w = paint.measureText(value);
+        paint.setFakeBoldText(false);
+        text(c, value, x, y, w > largura ? size * largura / w : size, color);
     }
 
     private void text(Canvas c, String value, float x, float y, float size, int color) {
