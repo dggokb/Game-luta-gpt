@@ -603,6 +603,14 @@ até o dono escolher. Vídeo lado a lado: `android/app/build/sprite-review/defes
 Para trocar: pôr `defesa_brilho*` no lugar de `defesa*` nas `DEFESAS` (e no `DEFESA_PODER`, se ele
 quiser a de poder caindo nelas).
 
+**Depois, "o novo é melhor, só a posição que eles tão nascendo que tô achando estranha":** as
+defesas nasciam no ponto de contato (`impactX/impactY`), que cai uns 40 px dentro de quem defende,
+em cima do rosto e dos braços. Agora nascem na ponta do golpe de quem bate (`HitEvent.pontaX/
+pontaY`: o punho, a ponta do pé), como os hits desde 11/11; a de poder continua no contato.
+`DEFESA_BRILHO` e `DEFESA_NA_PONTA` no `GameView`, **ligadas** ("ficou boa, põe", 14/11) depois do
+vídeo `android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
+brilho; viu-se o soco fraco e o chute forte defendidos). As de ar ficam de reserva nas `DEFESAS`.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
@@ -1570,6 +1578,31 @@ os lotes seguintes do efeitos-gpt.md.
   --ancora 670,733 --folga 210,230,210,12 --borda 120 --chao-y 733`, depois `efeito_video.py
   fixo.mp4 --nome shinkai_p02 --passo 3 --velocidade 1.5 --escala-mundo 0.4173 --origem 880,963
   --resolucao 0.9 --segurar 15,800 --alfa-corte 0.45`.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 14/11: a Onda nova do Ryūga (S1)
+
+- **Pedido:** o vídeo `s1_poder` do dono (o cometa dourado com anéis girando, do prompt de
+  `docs/personagens/poderes.md`) no lugar da gota de 08/11: "troca".
+- **Feito:** `efeito_video_preto.py s1_poder.mp4 --nome onda_player_base --quadros 89-100 --borda 120
+  --origem 800,367 --escala-mundo 0.3 --fps 24`: 12 quadros em loop (o trecho de 12 que mais se
+  repete), uns 300 × 190 px no mundo, a origem no miolo, a cauda apagando na borda esquerda do
+  vídeo. A luz (`#F8E86E`) ficou a de antes.
+- **Depois, "deixa menor, tá muito grande, e ele tá saindo de dentro do Ryūga":** escala 0,2 (uns 200 ×
+  125 px) e a Onda é recortada a partir do ponto de onde saiu (`Projectile.startX`): a cauda nasce na
+  mão em vez de atravessar o corpo (`GameView.desenharProjeteisEmFolha`).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 14/11: o raio do Ultra do Ryūga com o vídeo SUPER_PODER
+
+- **Pedido:** o vídeo `SUPER_PODER` do dono (um cometa grosso de fogo; no fim ele afina numa linha)
+  no lugar do raio de hoje, "que é bem feio", usando a animação ("ficou muito boa os frames").
+- **Feito:** `tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
+  --atras 660 --corpo 320`: 12 quadros do trecho firme (antes de afinar), cada um alinhado pela
+  frente do cometa e centrado no núcleo; a ponta é a cabeça (a borda esquerda some para nascer do
+  corpo) e o corpo é a fatia da cauda logo atrás dela, fundida para repetir sem emenda. Tiras de 12
+  quadros a 12 por segundo, como antes. A esfera nas mãos e o impacto ficaram os do `poder_ultra`.
+  Primeira tentativa com a fatia longe na cauda (`--atras 1050`): o feixe saiu fino.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
