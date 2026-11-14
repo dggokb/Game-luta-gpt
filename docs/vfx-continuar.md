@@ -1622,6 +1622,15 @@ os lotes seguintes do efeitos-gpt.md.
   comum (não o Super) de quem tem o efeito toca o dele na frente da bola, no lugar do estouro de
   defesa ou do efeito de dano; os outros personagens continuam como estavam. O `GravarLuta` ganhou
   o passo `defende` (o rival em guarda).
+- **Depois, "muito lerdo e muito para fora; tem que ser no contato e sumir antes do contato sair na
+  defesa; no dano tem que ir no corpo e dissipar lá; a frente do dano do Ryūga está com uma
+  silhueta":** os quatro começam no quadro em que o poder encosta (sem a bola chegando) e tocam no
+  ponto de contato do motor (`impactX/Y`), não na frente da bola. Duração presa ao golpe
+  (`tocarDurando`): na defesa 75% da pausa mais a guarda (some antes de quem defende sair dela), no
+  acerto a pausa mais 14 quadros. O vídeo do acerto do Ryūga tinha a silhueta escura do corpo
+  recortando o estouro: cortado antes dela, em degradê (x 845 a 905), origem no corte.
+  Depende dos colisores: se o contato do motor está fora do corpo desenhado, o efeito vai junto
+  (o dono está vendo os colisores em outra sessão).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente

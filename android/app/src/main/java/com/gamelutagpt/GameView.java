@@ -5596,10 +5596,21 @@ public class GameView extends SurfaceView
     private boolean efeitoPoderDefendido(CombatFighter attacker, CombatEngine.HitEvent event, float x, float y, int direction) {
         String nome = (event.blocked ? "onda_defesa_" : "onda_acerto_") + attacker.character().id;
         if (!efeitos.tem(nome)) return false;
-        float px = Float.isNaN(event.frenteX) ? x : event.frenteX;
-        float py = Float.isNaN(event.frenteY) ? y : event.frenteY;
-        return efeitos.tocar(nome, px, py, 1f, direction < 0);
+        // No contato (onde pegou: a guarda ou o corpo), não na frente da bola (dono, 14/11: "muito
+        // para fora, tem que ser no contato").
+        CombatFighter defender = engine.fighter(event.defender);
+        int pausa = Math.max(6, defender.hitstopTotal);
+        // Na defesa some antes de quem defendeu sair da guarda; no acerto dissipa logo depois da pausa.
+        int quadros = event.blocked
+            ? Math.max(pausa + 4, Math.round((pausa + defender.stunTotal) * PODER_DEFESA_FRACAO))
+            : pausa + PODER_ACERTO_DEPOIS;
+        return efeitos.tocarDurando(nome, x, y, 1f, direction < 0, quadros * FIXED_STEP * 1000f) >= 0;
     }
+
+    /** O impacto do poder na defesa dura esta fração da pausa mais a guarda (some antes dela acabar). */
+    private static final float PODER_DEFESA_FRACAO = 0.75f;
+    /** Quadros que o impacto do poder acertando continua depois da pausa (se desfazendo no corpo). */
+    private static final int PODER_ACERTO_DEPOIS = 14;
 
     /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
     private static final String FUMACA_QUEDA = "fumaca_queda_v01";
