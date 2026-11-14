@@ -1,0 +1,64 @@
+{
+  "clip": "p02_jump_medium",
+  "frames": 14,
+  "columns": 11,
+  "source_original": "art/sprites/source/p02_jump_medium_video_normalized_smear.png",
+  "source_original_sha256": "8525dbb0f039addde9b48883e16af456c82cb00374ea08b0845b5beb9eb1dc9d",
+  "source_anterior": "art/sprites/source/p02_jump_medium_video_normalized_smear_sr_hd.png",
+  "output": "art/sprites/source/p02_jump_medium_video_normalized_smear_hd_aprovado_2x.png",
+  "output_sha256": "d04509e9e524f7ff48ce23ea95b09117664e796c5757efbbec61a05dcd9dc08c",
+  "input_cell": [
+    384,
+    224
+  ],
+  "output_cell": [
+    768,
+    448
+  ],
+  "pixelScale_original": 1,
+  "pixelScale_final": 2,
+  "root_input": [
+    135,
+    195
+  ],
+  "root_output": [
+    270,
+    390
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "559ad028bba0fad46ab9b6971d4e0f183bd311724a10312d5aa4ba0cceb28b57",
+    "5465c43c19edf39a78e3fcdb7fce7e08b9c14cab6e9a80079918e39de3808a24",
+    "26ca57cae8fe4a11079edbacfb206ae6df5be304b166946e842afa4942d18581",
+    "133af351ec963bf8808558e83eaf86c3ba2b606e5b90e9db7b5b69aa6eeaae76",
+    "c178e51c2500285a3837780266a53f2d1e36e9c21f4dabcd8d27c9dac43b1a17",
+    "342cdd802c3b8c546f9d8b1285486a7b2842dc2f01c58a3ec98da6964b25cf37",
+    "3db61f9d11527bd9c0b9c19508fe1edc3c58c779167479ceb85d67e1440a484e",
+    "7cced9b68be5fb06e6108872c87ac265adfc3d2eee50e52d5be551d20e329845",
+    "f9da40cfdaaf07e2076bda54e45e9ffff621a2e31223cd7feb6f11113b6d4797",
+    "769992a12e3a3693c718c2bf00b5baca9e8db066547534edcd4127444d1e8b47",
+    "e1dc7a9cba9c844ba0368db0a37210c6a2cb9493bf1b15ba0f8cde1ed7f8fd85",
+    "e01fe47980174459599d2f147f32bb737740ffbb388051536e71fff824f871fc",
+    "318d9bec4e23d9be1f8caa49dfbc6c2f7302547912d3affedc84541a2284a243",
+    "8cc1aaa370ab70cfb635692c68374096a17ef3a02837cdf97101fcd81fa3c6b1"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    5.3332,
+    4.7814,
+    4.9036,
+    5.568,
+    5.286,
+    5.3683,
+    5.1476,
+    5.0929,
+    5.1917,
+    5.3447,
+    5.7972,
+    5.6734,
+    5.6925,
+    5.7355
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

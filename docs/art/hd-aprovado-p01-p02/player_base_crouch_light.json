@@ -1,0 +1,76 @@
+{
+  "clip": "player_base_crouch_light",
+  "frames": 20,
+  "columns": 4,
+  "source_original": "art/sprites/source/player_base_crouch_light_video_normalized.png",
+  "source_original_sha256": "9b7a9aa3c068bbf4af57908d4c41ce12238d53735dd1aa8a794670b421e7c1d7",
+  "source_anterior": "art/sprites/source/player_base_crouch_light_video_normalized.png",
+  "output": "art/sprites/source/player_base_crouch_light_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "e39cf793477257ab3f75b1d4aabd89d4df19b57427bf197d9396b2330546905a",
+  "input_cell": [
+    832,
+    512
+  ],
+  "output_cell": [
+    832,
+    512
+  ],
+  "pixelScale_original": 2,
+  "pixelScale_final": 2,
+  "root_input": [
+    298,
+    468
+  ],
+  "root_output": [
+    298,
+    468
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "a46e1ea108652a216112fe72e43f2469da22eb72f4a6a441d6251c0c7124ab9d",
+    "8c10bb115411eef7b8259826ae9204ecb436c053b53ca245032079596845398e",
+    "67b2951455aa31d89ca1e992cd0f20dbf7c25c300b9a9faa56a20943f2a2d86a",
+    "33d153e6ea863d9fa3c554fb402d72ee83202399b794900f2f75b8da2d90f507",
+    "d26565573bb96366bfd0df3c50553eef35a83c441665bbd3ff5198fb00b3eb7c",
+    "c96e3000713e823517fc0c36638d58d8447b2a7b263f13f0ec5829648421f153",
+    "8c9dbd78bfcd8d1ffec6db73fab99ea40849ea71ba0a7f9c7e7d1840d72de3ec",
+    "7c1b24bfcf2d046721469beed068d23749fcfe4d418129c28b68e39e181fab7c",
+    "45395b09ac4c9827796c7034e12b4af0e7f93db0e2f50326d99e8d30ab0d633e",
+    "28e73bd36c152613ecc5d9c6345c787364e2115c99dacb48def5629ad5cb012e",
+    "f48f7ec3035e5a5835c089b7f8fc3584dab7bfe51bd34574f23b2604d1b5839f",
+    "e9cb8dd870f4971fb6e47b30c268ad2b4ed36faf25c3fd79e2c3c41d230caf80",
+    "613037e887b6e4d5c16daa7b1044900b11a21ba116f1e9145cee4cf8c8942531",
+    "d3a2fbbd4a98e27110423fdee5d26f8574dd656131d339067b7bd49da4cb8d46",
+    "6d252dbe3b301c27232baba94c2dd16c3a6a58ff62902465d8a4de8d35a3bb13",
+    "b3701177d25bf0ac76aa5d8917f4206bf2b64e4b6b7612dd0a9305d483f56898",
+    "49910b1ea603c4d15f71ebb1330beeb6d1b1df0c1eb0e9a291e1133d71e13da0",
+    "c09abb8d64d050aa3bda011f95e82d9a1690de33719dacc235fa10bd1ac1bd7b",
+    "3eb7dedd73b0c23607c9723a1de3a8d9d3a2f0e2562ad43bb579b471e1d21efb",
+    "23358a726eae73cdf8cd2ec282db38ddcfe33e2363409d641d4a2793830b3397"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    5.8791,
+    5.8646,
+    5.7331,
+    5.7415,
+    5.7617,
+    5.4103,
+    5.2996,
+    5.4685,
+    5.6115,
+    5.6598,
+    5.5166,
+    5.5204,
+    5.4303,
+    5.7244,
+    5.7635,
+    5.8719,
+    5.805,
+    5.7526,
+    5.5227,
+    5.4778
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

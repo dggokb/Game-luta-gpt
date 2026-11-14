@@ -1,7 +1,7 @@
 {
   "id": "player_base_super",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_super_video_normalized.png",
+  "source": "art/sprites/source/player_base_super_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Carga com as maos na cintura e empurrao no fim do startup do Super.",
   "rootMode": "authored",
   "scale": 1,
@@ -499,8 +499,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "75ad0dbbb1fe4cfacec4d6dc068822401bd85c6569c6e236542d5e4478bb8a42",
-      "config": "2035859f54e2a5e3c15f4c40b6ea3dae18b13a00f1f184cfba11728e01f3383f",
+      "source": "6957665c52a3ad175dbc36e4897623125a155a61bd69676d9f68554d9299fcbe",
+      "config": "2c3fb7e07adddc7f59c7bba544d2454fa2903cc719ce59ec27c019f5babf0ba2",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

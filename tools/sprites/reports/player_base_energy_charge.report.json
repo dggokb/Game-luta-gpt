@@ -1,7 +1,7 @@
 {
   "id": "player_base_energy_charge",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_energy_charge_video_normalized.png",
+  "source": "art/sprites/source/player_base_energy_charge_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01: carga da Onda (loop), v\u00eddeo Seedance carga.mp4, convertido por video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -271,8 +271,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a4cd6a519974153250c7b1d9369f4abd33645d4dc360a9b359f05699392b9aa5",
-      "config": "462ba9cb0b2e0c1037d51c2e48db8c10a84cba0a114d8c296af5d893c91ff501",
+      "source": "b91dd8406fb2f825e144653d8914eb0bb0341bee1dac4640fccfc3bb489fba00",
+      "config": "77231c34806e17441186fb2765afcccefe3c3474f9414e8d4549cc281634f14b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

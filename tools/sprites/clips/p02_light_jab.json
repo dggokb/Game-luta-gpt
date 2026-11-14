@@ -2,7 +2,7 @@
   "id": "p02_light_jab",
   "javaName": "P02_LIGHT_JAB",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_light_jab_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_light_jab_video_normalized_hd_aprovado_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_light_jab.webp",
   "report": "tools/sprites/reports/p02_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p02_light_jab-import.png",
@@ -24,11 +24,13 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "rootX": 102,
-  "frameHeight": 256,
-  "rootY": 238,
-  "frameWidth": 256,
+  "rootX": 204,
+  "frameHeight": 512,
+  "rootY": 476,
+  "frameWidth": 512,
   "sourceReferences": [
-    "art/sprites/source/p02_light_jab_video_normalized.png"
-  ]
+    "art/sprites/source/p02_light_jab_video_normalized.png",
+    "art/sprites/source/p02_light_jab_video_normalized_sr_hd.png"
+  ],
+  "pixelScale": 2
 }

@@ -1,7 +1,7 @@
 {
   "id": "player_base_fall_air",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_fall_air_video_normalized.png",
+  "source": "art/sprites/source/player_base_fall_air_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -309,12 +309,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "dcea6a64065bd508e8bc52e305c161ca0bd26e4e5bb98be5e989bfeb5a2af009",
-      "config": "24b643daa3de37c2dfca51c652d063394738518adb29c17ff7fba63dd6d904e3",
+      "source": "4352faf7875f2742ee22a441d34cfb63159effe49b40b2611447adb840c61b58",
+      "config": "cdcfa845aafa5d1106512948b42830e019a1891642471f8a32519481b679f13a",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_fall_video_normalized.png": "91a478dcbfba747983b57296ccfe97c0c70f306e5ab291aede80a1754c82d97e"
+      "art/sprites/source/player_base_fall_video_normalized.png": "91a478dcbfba747983b57296ccfe97c0c70f306e5ab291aede80a1754c82d97e",
+      "art/sprites/source/player_base_fall_air_video_normalized.png": "dcea6a64065bd508e8bc52e305c161ca0bd26e4e5bb98be5e989bfeb5a2af009"
     }
   }
 }

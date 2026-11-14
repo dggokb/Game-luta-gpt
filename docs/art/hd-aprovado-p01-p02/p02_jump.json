@@ -1,0 +1,58 @@
+{
+  "clip": "p02_jump",
+  "frames": 11,
+  "columns": 11,
+  "source_original": "art/sprites/source/p02_jump_video_normalized.png",
+  "source_original_sha256": "7d983ed2d7768fd4170b1d06746c259dce941d3e0d01dc8fc6af3457c74d5ce0",
+  "source_anterior": "art/sprites/source/p02_jump_video_normalized_sr_hd.png",
+  "output": "art/sprites/source/p02_jump_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "5bd437a70b5688579fec794f205acccfdfa3e5981904d09c663394fe2473f927",
+  "input_cell": [
+    192,
+    288
+  ],
+  "output_cell": [
+    384,
+    576
+  ],
+  "pixelScale_original": 1,
+  "pixelScale_final": 2,
+  "root_input": [
+    97,
+    270
+  ],
+  "root_output": [
+    194,
+    540
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "d82cb6704f5e98c666ec78208e59bb8abc7d6a623e57f600331cc74f4d8836f8",
+    "86d868bdb193a570b25aa79ce365d3c78a877f56b3b8ec7485d220180abab6d3",
+    "62348cf8be9a39d8d1d6eab70ca313912507d705e9850b0ff02e8fa3ea5981d5",
+    "116661618596535a4ded986d2ceb4d6402a47557e78b0b9c9c9474e5ddd0a933",
+    "b6236b6c7ae657a6b84f301d4758e16cbd878084dd6183c55b080854610eb180",
+    "398557742da9c170f86a7dc25eab433ded3b739a4f2cd4dd7387b87b6adb5d34",
+    "71b07d918a90ca1c901bc3e8928bd1cea42306bd315478fa880464dca049523d",
+    "b774e35e7bd47cbac7e57394ef35d6deb87dbe1807c86d7ba515c17f00d826af",
+    "9dbed17ef4b9927c46289165678f6d32fafa8a980bc4d0db53e26777680baa63",
+    "4b42822fdb4b36e431c44684bcb51f6cff128e0dc44611b2115cc712f589b6a3",
+    "95d8ba4ba55fc6a7d69dbb502b7a28b06af35e6726b19597c8d8f7f2d10fc250"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    5.2053,
+    5.4271,
+    5.3872,
+    5.9531,
+    6.3345,
+    6.5168,
+    6.4968,
+    6.5806,
+    6.6199,
+    6.6188,
+    6.4736
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

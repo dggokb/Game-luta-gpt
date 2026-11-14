@@ -2,7 +2,7 @@
   "id": "player_base_jump_heavy_down",
   "javaName": "JUMP_HEAVY_DOWN",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear_hd_aprovado_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_heavy_down.webp",
   "report": "tools/sprites/reports/player_base_jump_heavy_down.report.json",
   "preview": "android/app/build/sprite-review/jump_heavy_down-import.png",
@@ -14,7 +14,8 @@
   "rootX": 186,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador. Soco de cima para baixo (o 1o jH de video), usado no baixo + H no ar.",
   "sourceReferences": [
-    "art/sprites/source/player_base_jump_heavy_down_video_normalized.png"
+    "art/sprites/source/player_base_jump_heavy_down_video_normalized.png",
+    "art/sprites/source/player_base_jump_heavy_down_video_normalized_smear.png"
   ],
   "frameHeight": 704,
   "rootY": 452,

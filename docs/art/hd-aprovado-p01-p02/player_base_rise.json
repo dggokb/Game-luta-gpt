@@ -1,0 +1,58 @@
+{
+  "clip": "player_base_rise",
+  "frames": 11,
+  "columns": 10,
+  "source_original": "art/sprites/source/player_base_rise_video_normalized.png",
+  "source_original_sha256": "1d093a67b3a81e068d1fb56bd4a9b7c18f38823850e24a741c2376c22eeebff0",
+  "source_anterior": "art/sprites/source/player_base_rise_video_normalized.png",
+  "output": "art/sprites/source/player_base_rise_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "0a37cb59ab016a663724a7e4bc4d0fe73f16d282a34e8cb4a1af0c8c7dfc2a60",
+  "input_cell": [
+    384,
+    576
+  ],
+  "output_cell": [
+    384,
+    576
+  ],
+  "pixelScale_original": 2,
+  "pixelScale_final": 2,
+  "root_input": [
+    200,
+    540
+  ],
+  "root_output": [
+    200,
+    540
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "65c8204d350831770014f69948b71d63ae1880e4deaf83c8b9dc5fd8ea915495",
+    "553af243340cfbb420ead7ebc4af207cc461b9b527d95649637fafb6b4fa4e5f",
+    "4b4ea0c80cac4a4e3d6761968f8c9e279c4634cb6794c2034e0c2f588965a812",
+    "807dfe86730f3011f1333c6c63c3c95918c0dd527142382635df6daf92b3274a",
+    "6a12eddc1b241ac63c98454df38ba187de8bdad321fca1a60480b26424bc1b95",
+    "eba5cdc817ff61f8fdfb7be45a5477e23176f18dcad2884841a90a256408d1f6",
+    "900d38c64909bfa258899c5ffaf02071d7109d3443f8a333b83836cce1678f24",
+    "3e724f83997a3562dcc21996d233c69a4e9f0ca0787988105ba13fb4c440aef6",
+    "893971a235c2966935637dc2149ed6c71abdefa25823d3ded1e484668f1f181b",
+    "861ce0ba121837737ff12233897221f67296b9b34b2d45ddf9854a827749198d",
+    "25b1625e61c67c360d7515246312f9f019217d46c47d1117041895218530d35b"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    5.6465,
+    5.5169,
+    5.7344,
+    5.7468,
+    5.9647,
+    5.8897,
+    5.7165,
+    5.6942,
+    5.7171,
+    5.6215,
+    5.5851
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

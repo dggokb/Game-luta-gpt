@@ -2,7 +2,7 @@
   "id": "p02_throw",
   "javaName": "P02_THROW",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_throw_video_hd.png",
+  "source": "art/sprites/source/p02_throw_video_hd_hd_aprovado_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_throw.webp",
   "report": "tools/sprites/reports/p02_throw.report.json",
   "preview": "android/app/build/sprite-review/p02_throw-import.png",
@@ -87,7 +87,8 @@
   "rootX": 220,
   "rootY": 540,
   "sourceReferences": [
-    "art/sprites/source/p02_throw_video_normalized.png"
+    "art/sprites/source/p02_throw_video_normalized.png",
+    "art/sprites/source/p02_throw_video_hd.png"
   ],
   "pixelScale": 2.0
 }

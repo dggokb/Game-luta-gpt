@@ -1,0 +1,54 @@
+{
+  "clip": "p02_crouch",
+  "frames": 9,
+  "columns": 9,
+  "source_original": "art/sprites/source/p02_crouch_video_normalized.png",
+  "source_original_sha256": "269b8da932ac0424cef269aae5011d454da9d1015c8ff8b5e30637efc68e13ff",
+  "source_anterior": "art/sprites/source/p02_crouch_video_normalized_sr_hd.png",
+  "output": "art/sprites/source/p02_crouch_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "db3c2d51e64f5036347aacaa2d7ce5329ce3e69634d3ccb99723081382668788",
+  "input_cell": [
+    192,
+    256
+  ],
+  "output_cell": [
+    384,
+    512
+  ],
+  "pixelScale_original": 1,
+  "pixelScale_final": 2,
+  "root_input": [
+    97,
+    238
+  ],
+  "root_output": [
+    194,
+    476
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "f767298e51620dd6bfa041a9010bdd6cc23aa7124e727a0afedf80704644cd19",
+    "2ce8c3297856ed8ec5a78205a15f3dfecad78bc889a9105da228b735fb42ddf9",
+    "f4758e6c4a01e219d859eb1cdaa739166834225c4afe81eb631402d22313fb02",
+    "6d1b01f05334c50fea204e9e8604efc92a9a66375aa0180e07a93f1366b45f15",
+    "59c71a1327bc17594f6adb4eb13f59eefad2ebed91526af762afcb9ce451c8f7",
+    "6646b67e9b3fd3fce2c948cfc6b06c5eac42557fe1b8d271c42c7f2b93b802b5",
+    "54c4e9e7e78939a751e467b2d254751d8dbb9ba377f06648776cdd4829d7a205",
+    "329c0e8cda553fba62f4f194fc9b00055767469cff8fffeccd8161da1575bbbb",
+    "78a803d34deaa85ee2440ac461e4b0336a47d555d7dd30db6b0239bf769d8d6b"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    6.4629,
+    6.2813,
+    5.928,
+    5.9003,
+    6.0354,
+    6.0212,
+    6.2511,
+    6.2386,
+    6.1292
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

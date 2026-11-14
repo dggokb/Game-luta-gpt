@@ -1,0 +1,60 @@
+{
+  "clip": "p02_dash",
+  "frames": 12,
+  "columns": 11,
+  "source_original": "art/sprites/source/p02_dash_video_normalized.png",
+  "source_original_sha256": "1394683583d83806a2c718e2b029eeadb268b9e78747634380e91adf06d2347f",
+  "source_anterior": "art/sprites/source/p02_dash_video_normalized_sr_hd.png",
+  "output": "art/sprites/source/p02_dash_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "7316d3642c7667f6b449f2864ad43c0c9bf26fb59ae1faf55d5404422e227a57",
+  "input_cell": [
+    288,
+    192
+  ],
+  "output_cell": [
+    576,
+    384
+  ],
+  "pixelScale_original": 1,
+  "pixelScale_final": 2,
+  "root_input": [
+    85,
+    174
+  ],
+  "root_output": [
+    170,
+    348
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "4c14c1c5b7f7f8aaed644cd59360ca161ed29165141051ee0e992b60c293046d",
+    "bd5274506ee913bb245653ee9f62008e6b67a49d70a63347629881246472d430",
+    "da29776804eac35015d9aa7e65d394e5aedd8afd7f41976202421951f70d4e4e",
+    "51a11d276b60285ad8f0997101428c258d39c1bea9998188e1bdb2570f2e1d19",
+    "58869237e87fc323e10390a5f5a7814f4458ac791813f4e6aaadbe76c8c7587b",
+    "45e6a3023603cc61027af54473029bef068fe21cd6006c6eee1088bee6de98fc",
+    "41db9cdb55ba11d4e32c5abc34a8c19d7f6dce815ee6e3a71fcf4fa6a503dd32",
+    "1d9b42bdc6eece3324110e3cf0f2deb6162113acb9a34d709c7cbebb7c5f657d",
+    "5dfe66b24b327a15913b36c0b1124b8da40c67b5ec54a800f0df04af1117bab4",
+    "40c9cc971f2d4df148b72566ca9d9a3051619f8c263e257f9ce8cd818e33676c",
+    "a4533659e3c5750ffc36c03f45bd350b4cd9760515639bc0c2997bc62289ef89",
+    "f77d7977cef2bfe91b30faa7944cc5f4da795a64e901941a768eaf9d22b380f4"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    5.846,
+    5.9398,
+    5.9406,
+    6.2017,
+    5.8582,
+    5.8887,
+    5.9931,
+    6.0346,
+    6.0386,
+    6.0154,
+    5.6218,
+    5.828
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}
