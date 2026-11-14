@@ -5753,13 +5753,14 @@ public class GameView extends SurfaceView
 
     /**
      * As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. DEFESA_BRILHO:
-     * as de brilho do dono (art/vfx/defesa_brilho_v01, 14/11) no lugar das de ar, que ficam de reserva.
+     * as de brilho do dono (art/vfx/defesa_brilho_v01, 14/11) no lugar das de ar, que ficam de reserva,
+     * com os dois anéis de pressão de ar (art/vfx/effectcraft/defesa_aneis_ec.py; "põe no jogo", 14/11).
      */
     private static final boolean DEFESA_BRILHO = true;
     private static final String[][] DEFESAS = DEFESA_BRILHO ? new String[][] {
-        {"defesa_brilho", "defesa_brilho_2", "defesa_brilho_3", "defesa", "defesa_poder"},
-        {"defesa_brilho_2", "defesa_brilho_3", "defesa_brilho", "defesa_2", "defesa_poder"},
-        {"defesa_brilho_3", "defesa_brilho", "defesa_brilho_2", "defesa_3", "defesa_poder"}} : new String[][] {
+        {"defesa_brilho_aneis", "defesa_brilho_aneis_2", "defesa_brilho_aneis_3", "defesa_brilho", "defesa", "defesa_poder"},
+        {"defesa_brilho_aneis_2", "defesa_brilho_aneis_3", "defesa_brilho_aneis", "defesa_brilho_2", "defesa_2", "defesa_poder"},
+        {"defesa_brilho_aneis_3", "defesa_brilho_aneis", "defesa_brilho_aneis_2", "defesa_brilho_3", "defesa_3", "defesa_poder"}} : new String[][] {
         {"defesa", "defesa_2", "defesa_3"}, {"defesa_2", "defesa_3", "defesa"}, {"defesa_3", "defesa", "defesa_2"}};
     /**
      * As defesas comuns nascem na ponta do golpe (HitEvent.pontaX/pontaY) em vez do ponto de contato.
