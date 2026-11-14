@@ -1588,6 +1588,9 @@ os lotes seguintes do efeitos-gpt.md.
   --origem 800,367 --escala-mundo 0.3 --fps 24`: 12 quadros em loop (o trecho de 12 que mais se
   repete), uns 300 × 190 px no mundo, a origem no miolo, a cauda apagando na borda esquerda do
   vídeo. A luz (`#F8E86E`) ficou a de antes.
+- **Depois, "deixa menor, tá muito grande, e ele tá saindo de dentro do Ryūga":** escala 0,2 (uns 200 ×
+  125 px) e a Onda é recortada a partir do ponto de onde saiu (`Projectile.startX`): a cauda nasce na
+  mão em vez de atravessar o corpo (`GameView.desenharProjeteisEmFolha`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente

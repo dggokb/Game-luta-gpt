@@ -5888,7 +5888,14 @@ public class GameView extends SurfaceView
             if (!projetilDoPersonagem(p)) continue;
             float k = p.radius / 24f;
             String nome = "onda_" + engine.fighter(p.ownerIndex).character().id;
-            if (efeitos.desenharEm(c, nome, ms, p.x + p.direction * ONDA_FOLHA_PONTA * k, p.y, k, p.direction < 0)) projeteisEmFolha.add(p);
+            // A cauda nasce na mão: nada da folha atrás do ponto de onde a Onda saiu (sem isso ela
+            // atravessa o corpo de quem soltou).
+            c.save();
+            if (p.direction > 0) c.clipRect(p.startX, -100000f, 100000f, 100000f);
+            else c.clipRect(-100000f, -100000f, p.startX, 100000f);
+            boolean desenhou = efeitos.desenharEm(c, nome, ms, p.x + p.direction * ONDA_FOLHA_PONTA * k, p.y, k, p.direction < 0);
+            c.restore();
+            if (desenhou) projeteisEmFolha.add(p);
         }
         for (Projectile p : engine.superProjectiles) {
             if (!projetilDoPersonagem(p)) continue;
