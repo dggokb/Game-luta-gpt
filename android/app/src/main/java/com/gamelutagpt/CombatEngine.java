@@ -2216,11 +2216,13 @@ final class CombatEngine {
                 if (moveMechanics.flies() && !f.grounded && f.attackFrame >= moveMechanics.flightEnd - 1) break;
                 f.attackFrame++;
                 if (moveMechanics.flies() && f.grounded && f.attackFrame == moveMechanics.flightStart) takeOff(f);
-                if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
-                    // No SHINKAI do Ryūga, o primeiro sai da palma esquerda e o segundo da direita.
+                int depois = f.attackFrame - f.attack.startupFrames;
+                if (!f.attack.melee() && depois == 0) {
+                    // No SHINKAI do Ryūga, a rajada: o primeiro sai do braço de trás, depois alterna.
                     spawnProjectile(f, doisDisparos(f, config) ? 0 : -1);
-                } else if (f.attackFrame == f.attack.startupFrames + config.ryugaDisparoDireita && doisDisparos(f, config)) {
-                    spawnProjectile(f, 1);
+                } else if (depois > 0 && config.ryugaDisparoDireita > 0 && depois % config.ryugaDisparoDireita == 0 &&
+                    depois / config.ryugaDisparoDireita < config.ryugaDisparos && doisDisparos(f, config)) {
+                    spawnProjectile(f, (depois / config.ryugaDisparoDireita) % 2);
                 } else if (f.attackFrame == f.attack.startupFrames && energyShot(f)) {
                     spawnEnergyShot(f);
                 }
@@ -3308,6 +3310,7 @@ final class CombatEngine {
             f.x + f.facing * data.spawnX, base - height, range, speed,
             radius, damage, profile.color, f.index, f.facing, f.attack,
             energy ? profile.energyVisual : data.visual);
+        p.rajada = mao >= 0;
         p.vy = data.vertical;
         p.gravity = data.gravity;
         p.totalHits = data.hits;

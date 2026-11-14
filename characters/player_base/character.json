@@ -18352,6 +18352,61 @@
       "durationsMs": [
         100
       ]
+    },
+    "SPECIAL_ENERGY_SHINKAI": {
+      "_doc": "Rajada do SHINKAI (vídeo s1_shinkai do dono, 14/11): preparo (0-2), quatro disparos alternando o braço de trás e o da frente, com o pico nos quadros 3, 8, 12 e 16, e a volta à guarda (20-22). O GameView casa os picos com os disparos do motor (ryugaDisparos).",
+      "atlas": "player_base_special_energy_shinkai",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "loop": false,
+      "durationsMs": [
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42
+      ]
     }
   },
   "moves": {

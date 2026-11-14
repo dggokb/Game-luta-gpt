@@ -1,0 +1,491 @@
+{
+  "id": "player_base_special_energy_shinkai",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_special_energy_shinkai_video_normalized.png",
+  "sourceNote": "p01, rajada do SHINKAI (v\u00eddeo s1_shinkai do dono, 14/11): quatro disparos, um bra\u00e7o por vez (tr\u00e1s, frente, tr\u00e1s, frente), convertido por tools/sprites/video_para_sprite.py.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 832,
+    "frameHeight": 704,
+    "rootX": 308,
+    "rootY": 648,
+    "columns": 4,
+    "frameCount": 23
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        147,
+        188,
+        449,
+        650
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 62869
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        108,
+        214,
+        451,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 61404
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        106,
+        211,
+        451,
+        647
+      ],
+      "minimumMargin": 57,
+      "opaquePixels": 60817
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        134,
+        216,
+        537,
+        649
+      ],
+      "minimumMargin": 55,
+      "opaquePixels": 62301
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        135,
+        217,
+        534,
+        650
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 62611
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        135,
+        218,
+        530,
+        650
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 61173
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        138,
+        211,
+        452,
+        648
+      ],
+      "minimumMargin": 56,
+      "opaquePixels": 55693
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        134,
+        202,
+        454,
+        647
+      ],
+      "minimumMargin": 57,
+      "opaquePixels": 59732
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        116,
+        206,
+        537,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 64382
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        116,
+        206,
+        527,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 65407
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        116,
+        205,
+        524,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 65649
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        116,
+        202,
+        515,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 65517
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        139,
+        217,
+        542,
+        651
+      ],
+      "minimumMargin": 53,
+      "opaquePixels": 61376
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        140,
+        219,
+        535,
+        651
+      ],
+      "minimumMargin": 53,
+      "opaquePixels": 62393
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        140,
+        218,
+        534,
+        651
+      ],
+      "minimumMargin": 53,
+      "opaquePixels": 61597
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        138,
+        212,
+        453,
+        648
+      ],
+      "minimumMargin": 56,
+      "opaquePixels": 55308
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        121,
+        209,
+        550,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 65034
+    },
+    {
+      "index": 17,
+      "outputBbox": [
+        121,
+        207,
+        544,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 65544
+    },
+    {
+      "index": 18,
+      "outputBbox": [
+        121,
+        206,
+        539,
+        646
+      ],
+      "minimumMargin": 58,
+      "opaquePixels": 66167
+    },
+    {
+      "index": 19,
+      "outputBbox": [
+        124,
+        202,
+        529,
+        647
+      ],
+      "minimumMargin": 57,
+      "opaquePixels": 65270
+    },
+    {
+      "index": 20,
+      "outputBbox": [
+        139,
+        193,
+        471,
+        648
+      ],
+      "minimumMargin": 56,
+      "opaquePixels": 63986
+    },
+    {
+      "index": 21,
+      "outputBbox": [
+        146,
+        187,
+        449,
+        650
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 63093
+    },
+    {
+      "index": 22,
+      "outputBbox": [
+        147,
+        199,
+        449,
+        650
+      ],
+      "minimumMargin": 54,
+      "opaquePixels": 62653
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 463,
+    "frameHeight": 484,
+    "rootX": 212,
+    "rootY": 471,
+    "columns": 4,
+    "frameCount": 23,
+    "cropOffset": [
+      96,
+      177
+    ],
+    "sheetWidth": 3092,
+    "sheetHeight": 1388,
+    "frames": [
+      [
+        0,
+        0,
+        316,
+        476,
+        44,
+        5
+      ],
+      [
+        1912,
+        940,
+        356,
+        444,
+        6,
+        31
+      ],
+      [
+        852,
+        480,
+        360,
+        452,
+        4,
+        27
+      ],
+      [
+        2536,
+        480,
+        416,
+        448,
+        32,
+        32
+      ],
+      [
+        0,
+        940,
+        412,
+        448,
+        33,
+        34
+      ],
+      [
+        2272,
+        940,
+        408,
+        444,
+        33,
+        35
+      ],
+      [
+        416,
+        940,
+        328,
+        448,
+        35,
+        28
+      ],
+      [
+        1304,
+        0,
+        332,
+        460,
+        32,
+        19
+      ],
+      [
+        2480,
+        0,
+        436,
+        456,
+        14,
+        22
+      ],
+      [
+        0,
+        480,
+        424,
+        456,
+        14,
+        22
+      ],
+      [
+        428,
+        480,
+        420,
+        456,
+        14,
+        22
+      ],
+      [
+        1640,
+        0,
+        412,
+        460,
+        14,
+        18
+      ],
+      [
+        748,
+        940,
+        416,
+        448,
+        37,
+        34
+      ],
+      [
+        2684,
+        940,
+        408,
+        444,
+        38,
+        37
+      ],
+      [
+        1168,
+        940,
+        408,
+        448,
+        38,
+        35
+      ],
+      [
+        1580,
+        940,
+        328,
+        448,
+        36,
+        29
+      ],
+      [
+        1216,
+        480,
+        440,
+        452,
+        19,
+        26
+      ],
+      [
+        1660,
+        480,
+        436,
+        452,
+        19,
+        24
+      ],
+      [
+        2100,
+        480,
+        432,
+        452,
+        19,
+        23
+      ],
+      [
+        2056,
+        0,
+        420,
+        460,
+        22,
+        18
+      ],
+      [
+        636,
+        0,
+        344,
+        468,
+        37,
+        10
+      ],
+      [
+        320,
+        0,
+        312,
+        476,
+        46,
+        4
+      ],
+      [
+        984,
+        0,
+        316,
+        464,
+        44,
+        16
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 56229888,
+      "grid": 21512832,
+      "packed": 17166784
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "a20bf909583ac719d019bf9033e1be7e51204d8060b8aa89e2c181502808e589",
+      "config": "ccbde381f7709b5d3c0b57bd5c69a93f440f73ef4b02d5bd5f092db3740ff3ba",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_special_energy_shinkai_video_normalized.png": "a20bf909583ac719d019bf9033e1be7e51204d8060b8aa89e2c181502808e589"
+    }
+  }
+}

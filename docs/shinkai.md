@@ -113,14 +113,13 @@ SPEED continua).
 
 ## Protótipo: o SHINKAI individual do Ryūga
 
-**O poder (S) em dois disparos:** no SHINKAI, o Ryūga não junta as mãos: solta o primeiro com a
-**palma esquerda**, no tempo de sempre, e o segundo com a **direita**, `ryugaDisparoDireita` (9)
-quadros depois. Cada um tem `ryugaDisparoPermille` (60%) do dano: juntos, 120% (um a mais, cada
-um mais fraco). A esquerda sai um pouco mais baixa. A carga vale para os dois. Só o poder de
-energia, não os especiais que lançam nem o Super (`CombatEngine.doisDisparos`). Desenho: a
-animação `SPECIAL_ENERGY_SHINKAI` (preparo, palma esquerda, palma direita), quando existir (vem
-dos vídeos); até lá, o desenho do poder de sempre. Teste:
-`ShinkaiRyugaTest.noShinkaiOPoderSaiEmDoisDisparosUmDeCadaMao`.
+**O poder (S) em rajada:** no SHINKAI, o Ryūga não junta as mãos: solta `ryugaDisparos` (4)
+disparos, um braço por vez (o de trás no tempo de sempre, o da frente `ryugaDisparoDireita` (8)
+quadros depois, e assim alternando), como a rajada de poder do Vegeta. Cada um tem
+`ryugaDisparoPermille` (33%) do dano: juntos, 132%. A carga vale para todos. Só o poder de energia,
+não os especiais que lançam nem o Super (`CombatEngine.doisDisparos`). Desenho: a
+`SPECIAL_ENERGY_SHINKAI` do vídeo `s1_shinkai` do dono, com cada braço esticado no quadro do disparo
+dele, e cada disparo é o cometa fino `onda_shinkai_player_base` (14/11).
 
 O documento do Drive `SOKON_SHINKAI_REVISAO_CONCEITUAL_2026-11-01.md` propõe 17 SHINKAIs
 individuais, com duração pelo desgaste do corpo e a Ruptura. O primeiro protótipo é o do

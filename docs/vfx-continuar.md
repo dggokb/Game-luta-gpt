@@ -1706,6 +1706,18 @@ Ultra. O raio do Ultra ficou de fora (o dono: "o Ultra do Ryūga deixa para depo
 como vamos fazer"): os assets dele e o `RaioFinal` ficaram como estavam; a tentativa (corpo e ponta
 do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personagens-p02-p12-jxg5xd`.
 
+## Rodada de 14/11: a rajada do SHINKAI do Ryūga
+
+- **Pedido:** "faz o S1 Shinkai": o vídeo `s1_shinkai` do dono (um braço por vez, trás, frente, trás,
+  frente, como a rajada do Vegeta) com o poder `s1_shinkai_poder` (o cometa fino).
+- **Feito:** a `SPECIAL_ENERGY_SHINKAI` (clipe `player_base_special_energy_shinkai`, 23 quadros do
+  vídeo, escala 0,4139 das H3 dele): preparo, os quatro picos nos quadros 3, 8, 12 e 16 e a volta à
+  guarda. O motor solta `ryugaDisparos` (4) disparos, um a cada `ryugaDisparoDireita` (8) quadros,
+  alternando o braço, cada um com 33% do dano (132% juntos; antes eram 2 de 60%). O GameView casa
+  cada pico com o quadro do disparo dele. Cada disparo é a folha `onda_shinkai_player_base`
+  (`Projectile.rajada`); acerto e defesa usam os da Onda.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a

@@ -5144,15 +5144,25 @@ public class GameView extends SurfaceView
         return f.attackFrame <= rush.lastActiveFrame() || !f.grounded ? 1 : 0;
     }
 
+    /** Picos dos disparos na SPECIAL_ENERGY_SHINKAI (o braço todo esticado) e o último quadro. */
+    private static final int[] RAJADA_PICOS = {3, 8, 12, 16};
+    private static final int RAJADA_FIM = 22;
+
     /**
-     * O quadro do poder em dois disparos (SpriteStates.SPECIAL_ENERGY_SHINKAI): 0 preparo, 1 a
-     * palma esquerda (do primeiro disparo até o segundo), 2 a direita; -1 na volta à guarda.
+     * O quadro da rajada (SpriteStates.SPECIAL_ENERGY_SHINKAI) no quadro do golpe: o preparo até o
+     * primeiro disparo, cada pico no quadro do disparo dele e a volta à guarda até o fim do golpe.
      */
-    private int quadroDoisDisparos(CombatFighter f) {
-        int primeiro = f.attack.startupFrames, segundo = primeiro + engine.config.ryugaDisparoDireita;
-        if (f.attackFrame < primeiro) return 0;
-        if (f.attackFrame < segundo) return 1;
-        return f.attackFrame < segundo + 12 ? 2 : -1;
+    private float quadroDoisDisparos(CombatFighter f) {
+        int s = f.attack.startupFrames, i = engine.config.ryugaDisparoDireita;
+        int n = Math.min(RAJADA_PICOS.length, Math.max(1, engine.config.ryugaDisparos));
+        float t = f.attackFrame + 0.5f;
+        if (t <= s) return RAJADA_PICOS[0] * t / s;
+        for (int k = 1; k < n; k++) {
+            float a = s + (k - 1) * i, b = s + k * i;
+            if (t <= b) return RAJADA_PICOS[k - 1] + (RAJADA_PICOS[k] - RAJADA_PICOS[k - 1]) * (t - a) / i;
+        }
+        float ultimo = s + (n - 1) * i, fim = Math.max(ultimo + 1, f.attack.totalFrames);
+        return Math.min(RAJADA_FIM, RAJADA_PICOS[n - 1] + (RAJADA_FIM - RAJADA_PICOS[n - 1]) * (t - ultimo) / (fim - ultimo));
     }
 
     private float reboundTime(CombatFighter f, CharacterDefinition.Animation art) {
@@ -5377,13 +5387,12 @@ public class GameView extends SurfaceView
                     }
                 }
                 CharacterDefinition.Animation doisDisparos = character.animations.get(SpriteStates.SPECIAL_ENERGY_SHINKAI);
-                int pose = animation == null && doisDisparos != null && CombatEngine.doisDisparos(f, engine.config)
-                    ? quadroDoisDisparos(f) : -1;
-                if (pose >= 0) {
-                    // SHINKAI do Ryūga: o preparo, a palma esquerda e a palma direita (dois disparos);
-                    // a volta à guarda é a do poder de sempre.
+                float pose = animation == null && doisDisparos != null && CombatEngine.doisDisparos(f, engine.config)
+                    ? quadroDoisDisparos(f) : -1f;
+                if (pose >= 0f) {
+                    // SHINKAI do Ryūga: a rajada, cada braço esticado no quadro do disparo dele.
                     animation = doisDisparos.id;
-                    animationElapsed = doisDisparos.startOf(pose) + 0.001f;
+                    animationElapsed = doisDisparos.startOf(Math.min(doisDisparos.frameCount() - 1, Math.round(pose))) + 0.001f;
                 } else if (animation == null && special != null) {
                     animation = special.id;
                     animationElapsed = special.timeFor(elapsed, total);
@@ -5981,7 +5990,8 @@ public class GameView extends SurfaceView
         for (Projectile p : engine.energyProjectiles) {
             if (!projetilDoPersonagem(p)) continue;
             float k = p.radius / 24f;
-            String nome = "onda_" + engine.fighter(p.ownerIndex).character().id;
+            String id = engine.fighter(p.ownerIndex).character().id;
+            String nome = p.rajada && efeitos.tem("onda_shinkai_" + id) ? "onda_shinkai_" + id : "onda_" + id;
             // A cauda nasce na mão: nada da folha atrás do ponto de onde a Onda saiu (sem isso ela
             // atravessa o corpo de quem soltou).
             c.save();
