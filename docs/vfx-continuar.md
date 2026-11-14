@@ -1657,7 +1657,8 @@ os lotes seguintes do efeitos-gpt.md.
   do motor é a caixa de colisão (`halfWidth`), que não bate com o desenho de cada um (na Yin-lu caía
   dentro da guarda). Agora o impacto vai na frente do corpo desenhado de quem recebe, na altura do
   golpe (`GameView.frenteDoDesenho`, pelas faixas medidas no desenho, `CombatEngine.corpoAtual`).
-  Para comparar, `-Dgameluta.poderComDefesa=true` toca também a defesa de sempre (a de brilho).
+  Testado também com a defesa de brilho (e os anéis de pressão de ar) junto; o dono: "tudo que é
+  relacionado ao poder é do poder, não de outra coisa, não se sobrepõem efeitos". Fica só o do poder.
 - **Junto, "você não trocou o poder da Yin-lu?":** o vídeo `s1_poder` dela aprovado ("agora ficou
   bom") virou a folha `onda_p02` (quadros 85-96, origem 820,377, escala 0,13, luz `#BFF3FF`); o
   projétil de quem tem `onda_<id>` usa a folha mesmo com outro desenho (`projetilDoPersonagem`).

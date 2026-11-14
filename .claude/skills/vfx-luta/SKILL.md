@@ -65,7 +65,11 @@ Cada linha custou pelo menos uma rodada errada. Não reabra sem ele pedir.
     System Works (inclusive a **base escura sob o corte**, que ele mandou fazer como eles), com
     erosão e rampa de cor no lugar dos desenhos à mão. O desenho do PC precisa do equivalente,
     porque é no vídeo gravado lá que ele julga.
-14. **Luz e sombra: a arte é o teto; nada soma** (motor de luz e sombra, aprovado em vídeo em
+14. **O que é do poder é do poder** (dono, 14/11): o projétil acertando ou defendido toca o efeito
+    do próprio poder (`onda_acerto_<id>`, `onda_defesa_<id>`), no lugar da faísca de acerto e da
+    defesa de brilho com os anéis; nunca os dois juntos. Nasce em quem recebe, na frente do corpo
+    desenhado (não na caixa de colisão).
+15. **Luz e sombra: a arte é o teto; nada soma** (motor de luz e sombra, aprovado em vídeo em
     12/11; `docs/motor-luz-proposta.md` e "Motor de luz e sombra definitivo" no
     `docs/vfx-continuar.md`). O cenário declara em `luzLutadores` a cor que o branco vira no lado
     aceso (`luz`, no máximo #FFFFFF) e no de sombra (`sombra`), mais `chao`, `direcao` e `borda`;
