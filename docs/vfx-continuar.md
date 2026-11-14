@@ -630,6 +630,28 @@ do fogo a ~3 (a folha da Onda tem a origem 22 px à frente do centro e se estend
 projétil nasce aí, em cima da guarda. A 1,7 caía em cima da cabeça. `DEFESA_PROJETIL_NA_FRENTE`
 desligado até ele aprovar `android/app/build/sprite-review/defesa_projetil_posicao.mp4`.
 
+**Depois, "põe mais partícula de spray" (na defesa) e "descobri o que tô achando estranho: eles
+estão expandindo pra frente em vez de pra trás":** no desenho o arco anda para o lado de quem bate e
+o spray voa por cima de quem defende. `DEFESA_ESPELHADA` no `GameView` espelha a defesa (o spray volta
+para quem bateu, o arco abre para o lado de quem defende), desligado até ele aprovar. Mais spray sem
+desenhar nada: `art/vfx/defesa_brilho_v01/mais_spray.py` copia os riscos soltos na frente do clarão
+(pedaços com menos de 1500 px; os do arco ficam de fora, girados viravam anéis), gira em volta do
+clarão (±15–34°, escala 0,85–1,1, 85–100%) e põe por baixo do desenho; folhas `defesa_brilho_spray*`
+(mesma origem e escala), sem uso. Vídeo com as três (hoje, espelhada, espelhada + spray):
+`android/app/build/sprite-review/defesas_espelhada_spray.mp4`.
+
+**Depois, "consegue fazer uns 2 anéis da mesma cor que abrem em momento separado na ponta,
+expandindo e dissipando em estilhaços?":** `art/vfx/effectcraft/defesa_aneis_ec.py` põe sobre o
+desenho do dono, sem mudar nada nele, dois anéis de pressão de ar em 3D (a receita do anel aprovado
+nos hits fortes: elipse virada para o golpe, linha dupla, brilho frio, erosão em Stencil Luma que
+parte o anel em estilhaços); o segundo nasce dois quadros depois e menor. Folhas
+`defesa_brilho_aneis*` (12 quadros a 2× o ritmo do desenho), sem uso. Vídeo:
+`android/app/build/sprite-review/defesas_com_aneis.mp4`. Ele explicou que a defesa "não é expandir
+pra trás, é pra fora: tá fechado e vai abrindo reto"; uma tentativa que trocava o desenho dele por um
+traço esticado foi reprovada na hora ("não falei pra mudar o que já temos, falei pra adicionar os
+anéis"): o desenho dele fica como está. O `DEFESA_ESPELHADA` perdeu o motivo (segue desligado). **Os anéis entraram na luta** ("põe no jogo pra eu testar", 14/11): `DEFESAS` toca
+`defesa_brilho_aneis*`, com as de brilho sem anel e as de ar de reserva.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
