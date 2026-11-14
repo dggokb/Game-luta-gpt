@@ -33,8 +33,9 @@ dados do jogo.
   "punho", "canhão"): o gerador desenha a coisa. O primeiro vídeo da palma (14/11) saiu uma mão
   gigante pegando fogo. Descreva a forma (crescente, anel, estrela, faixa, chama) e diga o que não
   quer ("no hand, no fingers").
-- **Diga o tamanho no quadro** ("small, about one third of the frame height, lots of empty black
-  around it"): sem isso o efeito enche a tela e não dá para recortar.
+- **Diga o tamanho no quadro** ("about one third of the frame height, lots of empty black around
+  it"): sem isso o efeito enche a tela e não dá para recortar. Pequeno demais também não serve:
+  o jogo amplia e borra. Projétil grande no jogo (a Onda, o Super) pede metade da altura do quadro.
 - **Sem imagem inicial nem final**: o vídeo de poder é só texto. Com imagem, o gerador abre e
   fecha nela (o primeiro da palma começou e terminou num quadro verde).
 
@@ -82,7 +83,7 @@ diferentes um do outro (o dono, 14/11). O raio do Ultra, o Shinkai e o Ultra Shi
 **S1 Onda (o voo, LUZ, loop): rápida e afiada, um cometa.** Voa 720 px a 760 px/s; carregada,
 cresce. Troca a folha `onda_player_base` sem mexer em código.
 ```
-[LUZ] A comet of solar energy flying fast to the RIGHT, gold and orange like the sun: a small round white-hot head at the front, wrapped in thin yellow and orange layers, and a long tail to the left that is wide at the head and tapers to a sharp point, torn into a few thin flame-like strands with tiny sparks breaking off. Sleek and fast, calm and concentrated. No rings, no lightning, no fist, no hand. [0-5s] The head flickers and the tail strands ripple backward, in a seamless loop; the first and last frames are identical.
+[LUZ] A comet of solar energy flying fast to the RIGHT, gold and orange like the sun, big in the frame: the whole comet is about half of the frame height and two thirds of the frame width, centered. A round white-hot head at the front, wrapped in thin yellow and orange layers, and a long tail to the left that is wide at the head and tapers to a sharp point, torn into a few thin flame-like strands with tiny sparks breaking off. Sleek and fast, calm and concentrated. No rings, no lightning, no fist, no hand. [0-5s] The head flickers and the tail strands ripple backward, in a seamless loop; the first and last frames are identical.
 ```
 
 **Super (o voo e o alvo, LUZ, loop): um sol pequeno, pesado, sem cauda.** Atravessa a tela (1.450
