@@ -37,6 +37,8 @@ final class FighterState {
     boolean shinkaiUsed;
     /** O tipo do SHINKAI dele (POWER, SPEED, ENERGY ou TECHNIQUE). */
     final Shinkai.Type shinkaiType;
+    /** A cor do SHINKAI dele (a do tipo, ou a própria: Shinkai.corDe). */
+    final int shinkaiCor;
     String lifeHudLabel;
     String superHudLabel;
     String superLevelHudLabel;
@@ -49,6 +51,7 @@ final class FighterState {
         this.life = profile.maxLife;
         this.superMeter = 0;
         this.shinkaiType = Shinkai.typeOf(character);
+        this.shinkaiCor = Shinkai.corDe(character.id, shinkaiType);
         refreshHudLabels();
     }
 
@@ -206,7 +209,7 @@ final class FighterState {
     boolean emRuptura() { return rupturaQuadros > 0 && shinkaiFrames > 0; }
 
     /** A cor da aura e da barra agora (a Ruptura esquenta). */
-    int corShinkai() { return emRuptura() ? Shinkai.COR_RUPTURA : shinkaiType.color; }
+    int corShinkai() { return emRuptura() ? Shinkai.COR_RUPTURA : shinkaiCor; }
 
     /** Dá para pagar o Super agora: uma barra, ou o Super grátis do SHINKAI. */
     boolean canPaySuper() {

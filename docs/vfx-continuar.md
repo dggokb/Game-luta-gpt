@@ -1545,6 +1545,41 @@ os lotes seguintes do efeitos-gpt.md.
   `CENA_BRIGA` de cada menino (os efeitos do vídeo apagados no recorte: o jogo desenha os dele) e
   a troca de golpes é animada à mão, só com VUSH! (tudo erra).
 
+## Rodada de 14/11: a ativação do SHINKAI da Yin-lu (a garça branca)
+
+- **Pedido:** o vídeo `shinkai` dela (ela vira de frente, abre os braços, a garça branca de luz
+  nasce atrás, abre as asas e se desfaz em penas; volta à guarda), "igual fazemos hoje com o
+  shinkai do Ryūga, e a aura em volta dela vai ser branca".
+- **Feito:** o vídeo inteiro virou o efeito `shinkai_p02` (`efeito_video.py --passo 3
+  --velocidade 1.5 --escala-mundo 0.4173 --origem 670,733 --resolucao 0.95 --segurar 15,800
+  --alfa-corte 0.45 --borda 120 --chao-y 733`): no tamanho dela no jogo (a escala das montagens
+  H3 dela), parado 0,8 s com as asas abertas para o corte com o nome, o véu verde-claro cortado e a
+  beira do vídeo apagando aos poucos. `--chao-y` é novo: a borda não apaga os pés (que ficam a
+  35 px do fundo do vídeo), só o que passa do chão. Luz branca (`#E6F2FF`). A `SHINKAI_ATIVA`
+  dela é a guarda do idle com o tempo do efeito (4,3 s); o sprite some enquanto o efeito toca,
+  como no Ryūga.
+- **A aura branca:** `Shinkai.corDe` dá a cor do SHINKAI por lutador (a do tipo, ou a própria). A
+  Yin-lu continua TECHNIQUE, mas o contorno, a barra, o corte, o clarão, o parry e os raios dela
+  saem brancos (`COR_BRANCA`).
+- **Depois, "as imagens cortam em cima e embaixo, então as listras pretas de cinemática têm que
+  ficar no limite de onde corta" (nela e no Ryūga):** na liberação com vídeo, as faixas pretas vão
+  da borda da tela até o topo e a base do vídeo do efeito (`EfeitosVideo.limitesY`, a união dos
+  quadros, posta na tela com o zoom da cena; nunca menos que a faixa normal de 72 px, nunca mais
+  que meia tela). No Ultra continuam as de 72 px.
+- **Depois, "no vídeo ela diminuiu um pouco":** a câmera do vídeo aproxima ao erguer os braços e
+  afasta para caber a garça (ela fica com 76% do tamanho). `tools/sprites/corrigir_zoom_video.py`
+  desfaz isso quadro a quadro em volta dos pés, numa tela maior, antes do `efeito_video.py`. A
+  escala de cada quadro (`art/vfx/shinkai/p02_escala.txt`) é o tronco dela (faixa do cabelo à faixa
+  da cintura) contra o da guarda: medida dos quadros 12 a 22 (ela encolhe num ritmo constante, de
+  96% a 80%) e 102 a 124; onde o brilho esconde o corpo, a escala desacelera até 76% no quadro 38
+  (quando a cintura para de descer) e fica assim até o 101. Primeira versão errada: encolher de
+  uma vez no quadro 20. Depois: tronco em 174 px em todos os quadros medidos (a guarda tem 174).
+  Comando: `corrigir_zoom_video.py shinkai.mp4 fixo.mp4 --escala "$(cat art/vfx/shinkai/p02_escala.txt)"
+  --ancora 670,733 --folga 210,230,210,12 --borda 120 --chao-y 733`, depois `efeito_video.py
+  fixo.mp4 --nome shinkai_p02 --passo 3 --velocidade 1.5 --escala-mundo 0.4173 --origem 880,963
+  --resolucao 0.9 --segurar 15,800 --alfa-corte 0.45`.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
