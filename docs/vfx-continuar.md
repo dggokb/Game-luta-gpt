@@ -1617,6 +1617,10 @@ os lotes seguintes do efeitos-gpt.md.
   laranja do raio. A aura em volta dele continua a amarela do Ultra antigo.
 - **Depois, "esse que você colocou agora ficou muito ruim, dá pra ver que foi gambiarra":** a esfera
   voltou a ser a do `poder_ultra` (a de antes); falta uma de verdade (vídeo próprio).
+- **Depois, a esfera de verdade:** o vídeo `concentra` do dono (luz de sol concentrada, do prompt
+  sem fogo; o primeiro, com "fire energy" no prompt, saiu fogo). Quadros 21-32 (o trecho que melhor
+  fecha o loop), recorte 700 × 520 em volta do centro (674, 386), bordas apagando em 40 px, a
+  conversão de luz (`preparar_raio.para_alfa`), `centroInicio` [0,4; 0,5].
 - **Junto, "quando vai dar o Ultra põe o dash do Shinkai também, porque ele também tá indo com
   voadora":** a investida do Ultra (e o acerto que abre a cena) e o voo do Dragon Rush usam a
   `DASH_VOO`, o quadro 6 do dash que o dono escolheu, segurado; era o H (Ultra) e o jH (Dragon

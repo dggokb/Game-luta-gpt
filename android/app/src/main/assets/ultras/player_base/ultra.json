@@ -40,7 +40,7 @@
     "ponta": "raio_ponta.png",
     "inicio": "raio_inicio.png",
     "centroInicio": [
-      0.381,
+      0.4,
       0.5
     ],
     "impacto": "raio_impacto.png",
@@ -68,7 +68,7 @@
         179
       ]
     },
-    "_doc": "Corpo e ponta do vídeo SUPER_PODER do dono (14/11; quadros 40-62 de 2 em 2, alinhados pela frente do cometa: tools/ultra/raio_de_video.py --atras 1000 --corpo 640): tiras de 12 quadros trocados a 12 por segundo. O corpo é uma fatia longa da cauda que o jogo estica das mãos até a ponta (não repete). A esfera (inicio) e o impacto continuam os do poder_ultra.",
+    "_doc": "Corpo e ponta do vídeo SUPER_PODER do dono (14/11; tools/ultra/raio_de_video.py --quadros 40-62:2 --atras 1000 --corpo 640): tiras de 12 quadros alinhados pela frente do cometa, a 12 por segundo; o corpo é uma fatia longa da cauda que o jogo estica das mãos até a ponta. A esfera nas mãos é do vídeo concentra do dono (a luz de sol concentrada; quadros 21-32, recorte 700x520 em volta do centro 674,386, bordas apagando). O impacto continua o do poder_ultra.",
     "quadros": 12,
     "qps": 12.0
   },
