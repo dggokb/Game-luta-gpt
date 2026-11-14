@@ -640,6 +640,17 @@ clarão (±15–34°, escala 0,85–1,1, 85–100%) e põe por baixo do desenho;
 (mesma origem e escala), sem uso. Vídeo com as três (hoje, espelhada, espelhada + spray):
 `android/app/build/sprite-review/defesas_espelhada_spray.mp4`.
 
+**Depois, "consegue fazer uns 2 anéis da mesma cor que abrem em momento separado na ponta,
+expandindo e dissipando em estilhaços?":** `art/vfx/effectcraft/defesa_aneis_ec.py` põe sobre o
+desenho do dono, sem mudar nada nele, dois anéis de pressão de ar em 3D (a receita do anel aprovado
+nos hits fortes: elipse virada para o golpe, linha dupla, brilho frio, erosão em Stencil Luma que
+parte o anel em estilhaços); o segundo nasce dois quadros depois e menor. Folhas
+`defesa_brilho_aneis*` (12 quadros a 2× o ritmo do desenho), sem uso. Vídeo:
+`android/app/build/sprite-review/defesas_com_aneis.mp4`. Ele explicou que a defesa "não é expandir
+pra trás, é pra fora: tá fechado e vai abrindo reto"; uma tentativa que trocava o desenho dele por um
+traço esticado foi reprovada na hora ("não falei pra mudar o que já temos, falei pra adicionar os
+anéis"): o desenho dele fica como está. O `DEFESA_ESPELHADA` perdeu o motivo (segue desligado).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
