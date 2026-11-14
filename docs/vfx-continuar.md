@@ -1537,6 +1537,24 @@ os lotes seguintes do efeitos-gpt.md.
   `CENA_BRIGA` de cada menino (os efeitos do vídeo apagados no recorte: o jogo desenha os dele) e
   a troca de golpes é animada à mão, só com VUSH! (tudo erra).
 
+## Rodada de 14/11: a ativação do SHINKAI da Yin-lu (a garça branca)
+
+- **Pedido:** o vídeo `shinkai` dela (ela vira de frente, abre os braços, a garça branca de luz
+  nasce atrás, abre as asas e se desfaz em penas; volta à guarda), "igual fazemos hoje com o
+  shinkai do Ryūga, e a aura em volta dela vai ser branca".
+- **Feito:** o vídeo inteiro virou o efeito `shinkai_p02` (`efeito_video.py --passo 3
+  --velocidade 1.5 --escala-mundo 0.4173 --origem 670,733 --resolucao 0.95 --segurar 15,800
+  --alfa-corte 0.45 --borda 120 --chao-y 733`): no tamanho dela no jogo (a escala das montagens
+  H3 dela), parado 0,8 s com as asas abertas para o corte com o nome, o véu verde-claro cortado e a
+  beira do vídeo apagando aos poucos. `--chao-y` é novo: a borda não apaga os pés (que ficam a
+  35 px do fundo do vídeo), só o que passa do chão. Luz branca (`#E6F2FF`). A `SHINKAI_ATIVA`
+  dela é a guarda do idle com o tempo do efeito (4,3 s); o sprite some enquanto o efeito toca,
+  como no Ryūga.
+- **A aura branca:** `Shinkai.corDe` dá a cor do SHINKAI por lutador (a do tipo, ou a própria). A
+  Yin-lu continua TECHNIQUE, mas o contorno, a barra, o corte, o clarão, o parry e os raios dela
+  saem brancos (`COR_BRANCA`).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
