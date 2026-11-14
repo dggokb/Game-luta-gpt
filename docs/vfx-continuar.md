@@ -607,9 +607,9 @@ quiser a de poder caindo nelas).
 defesas nasciam no ponto de contato (`impactX/impactY`), que cai uns 40 px dentro de quem defende,
 em cima do rosto e dos braços. Agora nascem na ponta do golpe de quem bate (`HitEvent.pontaX/
 pontaY`: o punho, a ponta do pé), como os hits desde 11/11; a de poder continua no contato.
-`DEFESA_BRILHO` e `DEFESA_NA_PONTA` no `GameView`, **as duas desligadas** até ele aprovar o vídeo
-`android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
-brilho; viu-se o soco fraco e o chute forte defendidos).
+`DEFESA_BRILHO` e `DEFESA_NA_PONTA` no `GameView`, **ligadas** ("ficou boa, põe", 14/11) depois do
+vídeo `android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
+brilho; viu-se o soco fraco e o chute forte defendidos). As de ar ficam de reserva nas `DEFESAS`.
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o

@@ -5720,7 +5720,7 @@ public class GameView extends SurfaceView
      * As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. DEFESA_BRILHO:
      * as de brilho do dono (art/vfx/defesa_brilho_v01, 14/11) no lugar das de ar, que ficam de reserva.
      */
-    private static final boolean DEFESA_BRILHO = false;
+    private static final boolean DEFESA_BRILHO = true;
     private static final String[][] DEFESAS = DEFESA_BRILHO ? new String[][] {
         {"defesa_brilho", "defesa_brilho_2", "defesa_brilho_3", "defesa"},
         {"defesa_brilho_2", "defesa_brilho_3", "defesa_brilho", "defesa_2"},
@@ -5728,9 +5728,9 @@ public class GameView extends SurfaceView
         {"defesa", "defesa_2", "defesa_3"}, {"defesa_2", "defesa_3", "defesa"}, {"defesa_3", "defesa", "defesa_2"}};
     /**
      * As defesas comuns nascem na ponta do golpe (HitEvent.pontaX/pontaY) em vez do ponto de contato.
-     * Desligado até o dono aprovar no vídeo (defesas_brilho_posicao.mp4), junto com DEFESA_BRILHO.
+     * Aprovado pelo dono no vídeo defesas_brilho_posicao.mp4 (14/11), junto com DEFESA_BRILHO.
      */
-    private static final boolean DEFESA_NA_PONTA = false;
+    private static final boolean DEFESA_NA_PONTA = true;
     private static final String[] DEFESA_PODER = {"defesa_poder", "defesa", "defesa_2", "defesa_3"};
     private int defesaVez;
 
