@@ -1558,6 +1558,18 @@ os lotes seguintes do efeitos-gpt.md.
   da borda da tela até o topo e a base do vídeo do efeito (`EfeitosVideo.limitesY`, a união dos
   quadros, posta na tela com o zoom da cena; nunca menos que a faixa normal de 72 px, nunca mais
   que meia tela). No Ultra continuam as de 72 px.
+- **Depois, "no vídeo ela diminuiu um pouco":** a câmera do vídeo aproxima ao erguer os braços e
+  afasta para caber a garça (ela fica com 76% do tamanho). `tools/sprites/corrigir_zoom_video.py`
+  desfaz isso quadro a quadro em volta dos pés, numa tela maior, antes do `efeito_video.py`. A
+  escala de cada quadro (`art/vfx/shinkai/p02_escala.txt`) é o tronco dela (faixa do cabelo à faixa
+  da cintura) contra o da guarda: medida dos quadros 12 a 22 (ela encolhe num ritmo constante, de
+  96% a 80%) e 102 a 124; onde o brilho esconde o corpo, a escala desacelera até 76% no quadro 38
+  (quando a cintura para de descer) e fica assim até o 101. Primeira versão errada: encolher de
+  uma vez no quadro 20. Depois: tronco em 174 px em todos os quadros medidos (a guarda tem 174).
+  Comando: `corrigir_zoom_video.py shinkai.mp4 fixo.mp4 --escala "$(cat art/vfx/shinkai/p02_escala.txt)"
+  --ancora 670,733 --folga 210,230,210,12 --borda 120 --chao-y 733`, depois `efeito_video.py
+  fixo.mp4 --nome shinkai_p02 --passo 3 --velocidade 1.5 --escala-mundo 0.4173 --origem 880,963
+  --resolucao 0.9 --segurar 15,800 --alfa-corte 0.45`.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
