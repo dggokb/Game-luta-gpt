@@ -1610,6 +1610,11 @@ os lotes seguintes do efeitos-gpt.md.
   em fatias de 6 px só para abrir perto das mãos (`RaioFinal.drawWavyTiles`). As cores: o
   `para_alfa` tratava tudo como luz (a borda escura das chamas virava laranja transparente); o
   `para_alfa_fogo` deixa o escuro opaco a partir de 110 de brilho, como no vídeo.
+- **Depois, "melhorar a cor, e a base do poder tem que ter mais frames, está muito 1 2 1 2":** a
+  esfera nas mãos ainda era a do `poder_ultra` (amarela, e na prática duas ou três formas
+  alternando). Agora sai do mesmo vídeo (`--inicio 41-63:2`): a cabeça do cometa espelhada, a parte
+  redonda nas mãos e as chamas correndo para dentro do raio, 12 quadros diferentes, a mesma chama
+  laranja do raio. A aura em volta dele continua a amarela do Ultra antigo.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
