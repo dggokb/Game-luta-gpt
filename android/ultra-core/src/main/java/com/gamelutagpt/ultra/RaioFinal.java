@@ -310,15 +310,27 @@ public final class RaioFinal {
         float tileW = body.width() * scale;
         if (end <= from || tileW <= 0f) return;
         float offset = (f.time * SCROLL_SPEED) % tileW;
-        float slice = 24f;
+        // O corpo animado (tira do vídeo do poder) já se mexe sozinho: sem a ondulação, que em
+        // fatias de alturas diferentes vira degrau no fogo recortado; fatias finas só para abrir
+        // o feixe perto das mãos sem degrau.
+        boolean video = body.height() > fh * 1.5f;
+        float slice = video ? 6f : 24f;
         for (float left = from; left < end; left += slice) {
             float right = Math.min(left + slice, end);
             float mid = (left + right) * 0.5f;
-            float wave = 1f + 0.08f * (float)Math.sin(mid * 0.03f - f.time * 28f)
+            float wave = video ? 1f : 1f + 0.08f * (float)Math.sin(mid * 0.03f - f.time * 28f)
                 + 0.04f * (float)Math.sin(mid * 0.071f + f.time * 17f);
             // Perto das mãos o feixe ainda está se abrindo.
             float open = Math.min(1f, 0.55f + (mid - from) / (thickness * 1.5f));
             float half = thickness * 0.5f * wave * open;
+            if (video) {
+                // A fatia longa da cauda do vídeo, esticada uma vez das mãos até a ponta (sem
+                // repetir: a cauda afina para trás e a repetição mostraria o degrau).
+                float t0 = (left - from) / (end - from), t1 = (right - from) / (end - from);
+                c.drawImageRegion(body, t0 * body.width(), v0, t1 * body.width(), v0 + fh,
+                    left, f.originY - half, right, f.originY + half, alpha);
+                continue;
+            }
             // Recorte da textura (que se repete) para esta fatia.
             float u0 = ((left - from - offset) % tileW + tileW) % tileW;
             float u1 = u0 + (right - left);

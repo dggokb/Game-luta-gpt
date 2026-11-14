@@ -6,7 +6,7 @@ outro (ultra.json: "quadros", "qps"). Daqui saem as tiras do corpo e da ponta: e
 escolhido do vídeo, a frente do feixe é achada sozinha e o quadro é alinhado por ela (o feixe do
 vídeo anda e o do jogo não); a janela fica centrada no núcleo. A ponta é a cabeça do feixe (a
 borda esquerda some para nascer de dentro do corpo); o corpo é uma fatia da cauda, atrás da
-ponta, com o fim fundido no começo (repete sem emenda). A esfera (inicio) e o impacto ficam.
+ponta, que o jogo estica das mãos até a ponta (sem repetir: a cauda afina para trás). A esfera (inicio) e o impacto ficam.
 
     python3 tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
 
@@ -33,6 +33,18 @@ import preparar_raio as pr  # noqa: E402
 
 RAIZ = AQUI.parents[1]
 ULTRAS = RAIZ / 'android/app/src/main/assets/ultras'
+
+
+def para_alfa_fogo(im, cheio=110):
+    """Fundo preto vira transparente, mas o escuro das chamas (vermelho e marrom das bordas) fica
+    opaco e escuro como no vídeo: o alfa chega a 1 já em {cheio} de brilho. (O para_alfa do
+    preparar_raio trata tudo como luz pura: a borda escura vira laranja transparente e o fogo fica
+    mais claro que no vídeo.)"""
+    rgb = np.asarray(im.convert('RGB')).astype(np.float32)
+    luz = rgb.max(axis=2)
+    alfa = np.clip((luz - pr.PRETO) / float(cheio - pr.PRETO), 0.0, 1.0)
+    cor = np.clip(rgb / np.maximum(alfa, 1e-3)[..., None], 0, 255)
+    return Image.fromarray(np.dstack([cor, alfa * 255.0]).astype(np.uint8), 'RGBA')
 
 
 def lista(texto):
@@ -78,7 +90,7 @@ def main():
         quente = np.nonzero((luz > 240).any(axis=1))[0]
         cy = int(round(quente.mean()))
         y0, y1 = cy - a.janela // 2, cy + a.janela // 2
-        im = pr.para_alfa(Image.fromarray(q))
+        im = para_alfa_fogo(Image.fromarray(q))
         # Fora do vídeo é transparente (a janela pode passar da borda).
         tela = Image.new('RGBA', (q.shape[1] + 2 * a.atras, a.janela), (0, 0, 0, 0))
         tela.paste(im.crop((0, max(0, y0), q.shape[1], min(q.shape[0], y1))), (a.atras, max(0, -y0)))
@@ -86,7 +98,8 @@ def main():
         ponta = tela.crop((fx + a.folga - a.ponta, 0, fx + a.folga, a.janela))
         ponta = pr.apagar_esquerda(ponta, 0.30)
         corpo = tela.crop((fx - a.atras, 0, fx - a.atras + a.corpo, a.janela))
-        corpo = pr.sem_emenda(corpo)
+        # O jogo estica o corpo animado das mãos até a ponta (RaioFinal.drawWavyTiles): sem
+        # repetir, então sem fundir as pontas.
         pontas.append(ponta.resize((round(ponta.width * k), a.altura_tira), Image.LANCZOS))
         corpos.append(corpo.resize((round(corpo.width * k), a.altura_tira), Image.LANCZOS))
 

@@ -1603,6 +1603,13 @@ os lotes seguintes do efeitos-gpt.md.
   corpo) e o corpo é a fatia da cauda logo atrás dela, fundida para repetir sem emenda. Tiras de 12
   quadros a 12 por segundo, como antes. A esfera nas mãos e o impacto ficaram os do `poder_ultra`.
   Primeira tentativa com a fatia longe na cauda (`--atras 1050`): o feixe saiu fino.
+- **Depois, "dá para ver os recortes e as cores ficaram diferentes":** o corpo era desenhado em fatias
+  de 24 px com alturas diferentes (a ondulação feita para o raio antigo, liso) e repetido a cada
+  ~110 px, e a cauda afina para trás: degraus. Agora o corpo animado (tira de vídeo) é uma fatia
+  longa da cauda (`--atras 1000 --corpo 640`) esticada uma vez das mãos até a ponta, sem ondulação,
+  em fatias de 6 px só para abrir perto das mãos (`RaioFinal.drawWavyTiles`). As cores: o
+  `para_alfa` tratava tudo como luz (a borda escura das chamas virava laranja transparente); o
+  `para_alfa_fogo` deixa o escuro opaco a partir de 110 de brilho, como no vídeo.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente

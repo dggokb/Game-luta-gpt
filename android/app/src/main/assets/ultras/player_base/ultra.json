@@ -68,7 +68,7 @@
         179
       ]
     },
-    "_doc": "Corpo e ponta do vídeo SUPER_PODER do dono (14/11; quadros 40-62 de 2 em 2, alinhados pela frente do cometa: tools/ultra/raio_de_video.py --atras 660 --corpo 320: a fatia do corpo logo atrás da cabeça, onde a cauda é grossa): tiras de 12 quadros trocados a 12 por segundo; o jogo estica o corpo até o adversário. A esfera (inicio) e o impacto continuam os do poder_ultra.",
+    "_doc": "Corpo e ponta do vídeo SUPER_PODER do dono (14/11; quadros 40-62 de 2 em 2, alinhados pela frente do cometa: tools/ultra/raio_de_video.py --atras 1000 --corpo 640): tiras de 12 quadros trocados a 12 por segundo. O corpo é uma fatia longa da cauda que o jogo estica das mãos até a ponta (não repete). A esfera (inicio) e o impacto continuam os do poder_ultra.",
     "quadros": 12,
     "qps": 12.0
   },
