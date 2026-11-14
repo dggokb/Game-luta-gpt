@@ -580,6 +580,18 @@ chão. Folha: `efeito_video.py art/vfx/fumaca_queda_v01/frames --nome fumaca_que
 0,75 + 0,35 × a força da poeira) e quando o corpo bate no chão e quando assenta depois do quique
 (no lugar da `fumaca_pulo`, 1,1 e 0,8).
 
+## Defesas de ar desenhadas pelo dono (14/11)
+
+"Vamos trocar os efeitos de defesa para esses três": três GIFs de 6 quadros (512 × 512, alfa de
+1 bit, 80 e 90 ms), em `art/vfx/defesa_ar_v01` (os GIFs e os quadros em PNG). Saem no lugar de
+`defesa`, `defesa_2` e `defesa_3` (o escudo azul de `defesa_01.png`/`defesa_02.png`); a de poder
+(`defesa_poder`) não mudou. O arco abre para o lado contrário de quem bate, como o escudo de antes.
+Origem no clarão do primeiro quadro (248,262; 245,257; 243,252); tamanho igual ao das antigas
+(~245 px do mundo de altura: escala 1,05, 0,65 e 0,78). A luz que a defesa joga (`"luz"`) ficou,
+na cor branca fria (#E6F0FF) em vez do azul. As de pressão de ar de 09/11 (outras, tiradas de
+vídeo) estão no histórico, commit ba600bcf. Para gravar uma defesa comum, o boneco tem de estar
+defendendo antes do golpe (segurar para trás na hora vira DEFESA PERFEITA, outro efeito).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
