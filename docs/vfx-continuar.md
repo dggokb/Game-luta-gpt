@@ -1593,6 +1593,18 @@ os lotes seguintes do efeitos-gpt.md.
   mão em vez de atravessar o corpo (`GameView.desenharProjeteisEmFolha`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Rodada de 14/11: o raio do Ultra do Ryūga com o vídeo SUPER_PODER
+
+- **Pedido:** o vídeo `SUPER_PODER` do dono (um cometa grosso de fogo; no fim ele afina numa linha)
+  no lugar do raio de hoje, "que é bem feio", usando a animação ("ficou muito boa os frames").
+- **Feito:** `tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
+  --atras 660 --corpo 320`: 12 quadros do trecho firme (antes de afinar), cada um alinhado pela
+  frente do cometa e centrado no núcleo; a ponta é a cabeça (a borda esquerda some para nascer do
+  corpo) e o corpo é a fatia da cauda logo atrás dela, fundida para repetir sem emenda. Tiras de 12
+  quadros a 12 por segundo, como antes. A esfera nas mãos e o impacto ficaram os do `poder_ultra`.
+  Primeira tentativa com a fatia longe na cauda (`--atras 1050`): o feixe saiu fino.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
