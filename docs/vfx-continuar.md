@@ -1665,7 +1665,46 @@ os lotes seguintes do efeitos-gpt.md.
 - **Junto, "você não trocou o poder da Yin-lu?":** o vídeo `s1_poder` dela aprovado ("agora ficou
   bom") virou a folha `onda_p02` (quadros 85-96, origem 820,377, escala 0,13, luz `#BFF3FF`); o
   projétil de quem tem `onda_<id>` usa a folha mesmo com outro desenho (`projetilDoPersonagem`).
+## Rodada de 14/11: o raio do Ultra do Ryūga com o vídeo SUPER_PODER
+
+- **Pedido:** o vídeo `SUPER_PODER` do dono (um cometa grosso de fogo; no fim ele afina numa linha)
+  no lugar do raio de hoje, "que é bem feio", usando a animação ("ficou muito boa os frames").
+- **Feito:** `tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
+  --atras 660 --corpo 320`: 12 quadros do trecho firme (antes de afinar), cada um alinhado pela
+  frente do cometa e centrado no núcleo; a ponta é a cabeça (a borda esquerda some para nascer do
+  corpo) e o corpo é a fatia da cauda logo atrás dela, fundida para repetir sem emenda. Tiras de 12
+  quadros a 12 por segundo, como antes. A esfera nas mãos e o impacto ficaram os do `poder_ultra`.
+  Primeira tentativa com a fatia longe na cauda (`--atras 1050`): o feixe saiu fino.
+- **Depois, "dá para ver os recortes e as cores ficaram diferentes":** o corpo era desenhado em fatias
+  de 24 px com alturas diferentes (a ondulação feita para o raio antigo, liso) e repetido a cada
+  ~110 px, e a cauda afina para trás: degraus. Agora o corpo animado (tira de vídeo) é uma fatia
+  longa da cauda (`--atras 1000 --corpo 640`) esticada uma vez das mãos até a ponta, sem ondulação,
+  em fatias de 6 px só para abrir perto das mãos (`RaioFinal.drawWavyTiles`). As cores: o
+  `para_alfa` tratava tudo como luz (a borda escura das chamas virava laranja transparente); o
+  `para_alfa_fogo` deixa o escuro opaco a partir de 110 de brilho, como no vídeo.
+- **Depois, "melhorar a cor, e a base do poder tem que ter mais frames, está muito 1 2 1 2":** a
+  esfera nas mãos ainda era a do `poder_ultra` (amarela, e na prática duas ou três formas
+  alternando). Agora sai do mesmo vídeo (`--inicio 41-63:2`): a cabeça do cometa espelhada, a parte
+  redonda nas mãos e as chamas correndo para dentro do raio, 12 quadros diferentes, a mesma chama
+  laranja do raio. A aura em volta dele continua a amarela do Ultra antigo.
+- **Depois, "esse que você colocou agora ficou muito ruim, dá pra ver que foi gambiarra":** a esfera
+  voltou a ser a do `poder_ultra` (a de antes); falta uma de verdade (vídeo próprio).
+- **Depois, a esfera de verdade:** o vídeo `concentra` do dono (luz de sol concentrada, do prompt
+  sem fogo; o primeiro, com "fire energy" no prompt, saiu fogo). Quadros 21-32 (o trecho que melhor
+  fecha o loop), recorte 700 × 520 em volta do centro (674, 386), bordas apagando em 40 px, a
+  conversão de luz (`preparar_raio.para_alfa`), `centroInicio` [0,4; 0,5].
+- **Junto, "quando vai dar o Ultra põe o dash do Shinkai também, porque ele também tá indo com
+  voadora":** a investida do Ultra (e o acerto que abre a cena) e o voo do Dragon Rush usam a
+  `DASH_VOO`, o quadro 6 do dash que o dono escolheu, segurado; era o H (Ultra) e o jH (Dragon
+  Rush). As pancadas do Dragon Rush continuam o L e o M. Temporário até ter arte própria. (O dash
+  troca de quadro pela distância, não pelo tempo: por isso a pose é uma animação de um quadro.)
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+**Mandado para a game-luta-sprite-fable (14/11, "manda tudo para eu testar"):** o S1 do Ryūga e da
+Yin-lu (Onda e palma novas, acerto e defesa) e a pose do dash no Dragon Rush e na investida do
+Ultra. O raio do Ultra ficou de fora (o dono: "o Ultra do Ryūga deixa para depois, tenho que pensar
+como vamos fazer"): os assets dele e o `RaioFinal` ficaram como estavam; a tentativa (corpo e ponta
+do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personagens-p02-p12-jxg5xd`.
 
 ## Fora do VFX, o que ficou pendente
 

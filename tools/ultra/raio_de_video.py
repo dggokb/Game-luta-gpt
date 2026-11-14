@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Corpo e ponta do raio do Ultra, animados, a partir de um vídeo de feixe em fundo preto.
+
+O raio do Ultra (RaioFinal) aceita corpo, ponta e esfera em tiras de N quadros, um embaixo do
+outro (ultra.json: "quadros", "qps"). Daqui saem as tiras do corpo e da ponta: em cada quadro
+escolhido do vídeo, a frente do feixe é achada sozinha e o quadro é alinhado por ela (o feixe do
+vídeo anda e o do jogo não); a janela fica centrada no núcleo. A ponta é a cabeça do feixe (a
+borda esquerda some para nascer de dentro do corpo); o corpo é uma fatia da cauda, atrás da
+ponta, que o jogo estica das mãos até a ponta (sem repetir: a cauda afina para trás). Com
+--inicio, a esfera nas mãos também sai do vídeo (a cabeça, espelhada); sem, ela fica. A esfera (inicio) e o impacto ficam.
+
+    python3 tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
+
+    --quadros      quadros do vídeo (contados de 0): "40-62:2" ou soltos "40,42,44"
+    --janela       altura da janela em px do vídeo (o feixe com as chamas; padrão 520)
+    --altura-tira  altura de cada quadro na tira (padrão 340, a do raio de antes)
+    --ponta        largura da ponta em px do vídeo, contada da frente para trás (padrão 520)
+    --folga        px do vídeo à frente da frente do feixe, dentro da ponta (padrão 90)
+    --corpo        largura da fatia do corpo em px do vídeo (padrão 490)
+    --atras        onde a fatia do corpo começa, em px do vídeo atrás da frente (padrão 1050)
+"""
+import argparse
+import json
+import sys
+from pathlib import Path
+
+import cv2
+import numpy as np
+from PIL import Image
+
+AQUI = Path(__file__).resolve().parent
+sys.path.insert(0, str(AQUI))
+import preparar_raio as pr  # noqa: E402
+
+RAIZ = AQUI.parents[1]
+ULTRAS = RAIZ / 'android/app/src/main/assets/ultras'
+
+
+def para_alfa_fogo(im, cheio=110):
+    """Fundo preto vira transparente, mas o escuro das chamas (vermelho e marrom das bordas) fica
+    opaco e escuro como no vídeo: o alfa chega a 1 já em {cheio} de brilho. (O para_alfa do
+    preparar_raio trata tudo como luz pura: a borda escura vira laranja transparente e o fogo fica
+    mais claro que no vídeo.)"""
+    rgb = np.asarray(im.convert('RGB')).astype(np.float32)
+    luz = rgb.max(axis=2)
+    alfa = np.clip((luz - pr.PRETO) / float(cheio - pr.PRETO), 0.0, 1.0)
+    cor = np.clip(rgb / np.maximum(alfa, 1e-3)[..., None], 0, 255)
+    return Image.fromarray(np.dstack([cor, alfa * 255.0]).astype(np.uint8), 'RGBA')
+
+
+def lista(texto):
+    saida = []
+    for parte in texto.split(','):
+        if '-' in parte:
+            faixa, _, passo = parte.partition(':')
+            a, b = (int(v) for v in faixa.split('-'))
+            saida.extend(range(a, b + 1, int(passo or 1)))
+        else:
+            saida.append(int(parte))
+    return saida
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('video')
+    p.add_argument('--id', required=True)
+    p.add_argument('--quadros', required=True)
+    p.add_argument('--janela', type=int, default=520)
+    p.add_argument('--altura-tira', type=int, default=340)
+    p.add_argument('--ponta', type=int, default=520)
+    p.add_argument('--folga', type=int, default=90)
+    p.add_argument('--corpo', type=int, default=490)
+    p.add_argument('--atras', type=int, default=1050)
+    p.add_argument('--qps', type=float, default=12.0)
+    p.add_argument('--inicio', help='quadros do vídeo para a esfera nas mãos (a cabeça do feixe, '
+                   'espelhada: a parte redonda nas mãos e as chamas correndo para dentro do raio); '
+                   'o mesmo número de quadros do corpo')
+    p.add_argument('--lado-inicio', type=int, default=560, help='lado da janela da esfera em px do vídeo')
+    a = p.parse_args()
+
+    cap = cv2.VideoCapture(a.video)
+    todos = []
+    while True:
+        ok, q = cap.read()
+        if not ok:
+            break
+        todos.append(cv2.cvtColor(q, cv2.COLOR_BGR2RGB))
+    escolhidos = [todos[i] for i in lista(a.quadros)]
+    k = a.altura_tira / float(a.janela)
+    pontas, corpos = [], []
+    for q in escolhidos:
+        luz = q.max(axis=2)
+        xs = np.nonzero((luz > 60).any(axis=0))[0]
+        frente = int(xs.max())
+        quente = np.nonzero((luz > 240).any(axis=1))[0]
+        cy = int(round(quente.mean()))
+        y0, y1 = cy - a.janela // 2, cy + a.janela // 2
+        im = para_alfa_fogo(Image.fromarray(q))
+        # Fora do vídeo é transparente (a janela pode passar da borda).
+        tela = Image.new('RGBA', (q.shape[1] + 2 * a.atras, a.janela), (0, 0, 0, 0))
+        tela.paste(im.crop((0, max(0, y0), q.shape[1], min(q.shape[0], y1))), (a.atras, max(0, -y0)))
+        fx = frente + a.atras
+        ponta = tela.crop((fx + a.folga - a.ponta, 0, fx + a.folga, a.janela))
+        ponta = pr.apagar_esquerda(ponta, 0.30)
+        corpo = tela.crop((fx - a.atras, 0, fx - a.atras + a.corpo, a.janela))
+        # O jogo estica o corpo animado das mãos até a ponta (RaioFinal.drawWavyTiles): sem
+        # repetir, então sem fundir as pontas.
+        pontas.append(ponta.resize((round(ponta.width * k), a.altura_tira), Image.LANCZOS))
+        corpos.append(corpo.resize((round(corpo.width * k), a.altura_tira), Image.LANCZOS))
+
+    esferas = []
+    if a.inicio:
+        for i in lista(a.inicio):
+            q = todos[i]
+            luz = q.max(axis=2)
+            frente = int(np.nonzero((luz > 60).any(axis=0))[0].max())
+            cy = int(round(np.nonzero((luz > 240).any(axis=1))[0].mean()))
+            L = a.lado_inicio
+            im = para_alfa_fogo(Image.fromarray(q))
+            tela = Image.new('RGBA', (q.shape[1] + 2 * L, q.shape[0] + 2 * L), (0, 0, 0, 0))
+            tela.paste(im, (L, L))
+            x1 = frente + L + 40
+            esfera = tela.crop((x1 - L, cy + L - L // 2, x1, cy + L + L // 2)).transpose(Image.FLIP_LEFT_RIGHT)
+            esfera = pr.apagar_direita(esfera, 0.62)
+            esferas.append(esfera.resize((a.altura_tira, a.altura_tira), Image.LANCZOS))
+        if len(esferas) != len(escolhidos):
+            raise SystemExit('--inicio precisa do mesmo número de quadros que --quadros')
+
+    destino = ULTRAS / a.id
+    if esferas:
+        tira = Image.new('RGBA', (a.altura_tira, a.altura_tira * len(esferas)), (0, 0, 0, 0))
+        for i, e in enumerate(esferas):
+            tira.paste(e, (0, i * a.altura_tira))
+        tira.save(destino / 'raio_inicio.png', optimize=True)
+    for nome, partes in (('raio_ponta.png', pontas), ('raio_corpo.png', corpos)):
+        w = max(p_.width for p_ in partes)
+        tira = Image.new('RGBA', (w, a.altura_tira * len(partes)), (0, 0, 0, 0))
+        for i, p_ in enumerate(partes):
+            tira.paste(p_, (0, i * a.altura_tira))
+        tira.save(destino / nome, optimize=True)
+    # A esfera (inicio) precisa do mesmo número de quadros: se o número mudou, ela repete os dela.
+    cfg = destino / 'ultra.json'
+    dados = json.loads(cfg.read_text(encoding='utf-8'))
+    raio = dados.setdefault('raio', {})
+    antes = int(raio.get('quadros', 1))
+    if esferas:
+        # O centro da parte redonda: 40 px à frente da frente do feixe, espelhado; ~200 px atrás dela.
+        raio['centroInicio'] = [round(240.0 / a.lado_inicio, 3), 0.5]
+    elif antes != len(escolhidos):
+        inicio = destino / raio.get('inicio', 'raio_inicio.png')
+        if inicio.exists():
+            img = Image.open(inicio)
+            fh = img.height // antes
+            nova = Image.new('RGBA', (img.width, fh * len(escolhidos)), (0, 0, 0, 0))
+            for i in range(len(escolhidos)):
+                j = i % antes
+                nova.paste(img.crop((0, j * fh, img.width, (j + 1) * fh)), (0, i * fh))
+            nova.save(inicio, optimize=True)
+    raio['quadros'] = len(escolhidos)
+    raio['qps'] = a.qps
+    cfg.write_text(json.dumps(dados, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    print(f'{len(escolhidos)} quadros: ponta {pontas[0].size}, corpo {corpos[0].size} cada')
+
+
+if __name__ == '__main__':
+    main()
