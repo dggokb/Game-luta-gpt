@@ -1,0 +1,100 @@
+name: HD Ryuga P01 e Yin-lu P02 (Fable)
+
+on:
+  push:
+    branches: [game-luta-sprite-fable]
+    paths:
+      - 'tools/sprites/hd_p01_p02_fable.py'
+      - '.github/workflows/hd-p01-p02-fable.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: hd-p01-p02-fable
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    name: Render HD shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar dependencias CPU
+        run: |
+          python3 -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
+          python3 -m pip install --disable-pip-version-check numpy scipy -r tools/sprites/requirements.txt
+      - name: Baixar pesos oficiais Real-ESRGAN
+        run: |
+          curl --fail --location --retry 4 --retry-delay 5 \
+            https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth \
+            --output "$RUNNER_TEMP/realesr-animevideov3.pth"
+      - name: Renderizar clipes HD da shard
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python3 tools/sprites/hd_p01_p02_fable.py \
+            --weights "$RUNNER_TEMP/realesr-animevideov3.pth" --shard "$SHARD" --shards 12
+      - name: Coletar somente os arquivos gerados pela shard
+        run: |
+          python3 - <<'PY'
+          import json, os, shutil
+          from pathlib import Path
+          dest = Path(os.environ['RUNNER_TEMP']) / 'hd-payload'
+          for manifest in Path('docs/art/hd-fable').glob('*.json'):
+              record = json.loads(manifest.read_text(encoding='utf-8'))
+              paths = [manifest, Path(record['newSource']), Path('tools/sprites/clips') / (record['clip'] + '.json')]
+              for source in paths:
+                  target = dest / source
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(source, target)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hd-fable-${{ matrix.shard }}
+          path: ${{ runner.temp }}/hd-payload/
+          if-no-files-found: error
+          retention-days: 1
+
+  integrate:
+    name: Integrar HD, validar e enviar para Fable
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: game-luta-sprite-fable
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hd-fable-*
+          merge-multiple: true
+          path: .
+      - name: Preparar gerador de atlas
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Regenerar atlas e metadados do jogo
+        run: |
+          python3 tools/sprites/build_characters.py --write
+          python3 tools/sprites/build_characters.py --check
+          git diff --check
+      - name: Commit apenas se a Fable nao mudou durante o render
+        run: |
+          git fetch origin game-luta-sprite-fable
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/game-luta-sprite-fable)" || {
+            echo 'A branch mudou durante o render: integracao cancelada para nao sobrescrever trabalho novo.' >&2
+            exit 1
+          }
+          git config user.name 'Sokon HD Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && { echo 'Nenhuma alteracao produzida'; exit 1; }
+          git commit -m 'art: aplicar super-resolucao HD no Ryuga P01 e Yin-lu P02'
+          git push origin HEAD:game-luta-sprite-fable
