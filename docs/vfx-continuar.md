@@ -1653,6 +1653,14 @@ os lotes seguintes do efeitos-gpt.md.
   recortando o estouro: cortado antes dela, em degradê (x 845 a 905), origem no corte.
   Depende dos colisores: se o contato do motor está fora do corpo desenhado, o efeito vai junto
   (o dono está vendo os colisores em outra sessão).
+- **Depois, "tá muito errado"** (o Kōga defendendo: a parede no ar na frente dos punhos): o contato
+  do motor é a caixa de colisão (`halfWidth`), que não bate com o desenho de cada um (na Yin-lu caía
+  dentro da guarda). Agora o impacto vai na frente do corpo desenhado de quem recebe, na altura do
+  golpe (`GameView.frenteDoDesenho`, pelas faixas medidas no desenho, `CombatEngine.corpoAtual`).
+  Para comparar, `-Dgameluta.poderComDefesa=true` toca também a defesa de sempre (a de brilho).
+- **Junto, "você não trocou o poder da Yin-lu?":** o vídeo `s1_poder` dela aprovado ("agora ficou
+  bom") virou a folha `onda_p02` (quadros 85-96, origem 820,377, escala 0,13, luz `#BFF3FF`); o
+  projétil de quem tem `onda_<id>` usa a folha mesmo com outro desenho (`projetilDoPersonagem`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
