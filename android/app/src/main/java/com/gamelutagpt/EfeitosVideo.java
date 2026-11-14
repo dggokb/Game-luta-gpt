@@ -206,6 +206,22 @@ final class EfeitosVideo {
     }
 
     /**
+     * Até onde o vídeo do efeito vai em cima e embaixo, em px do mundo a partir da origem (no
+     * tamanho 1): {topo, base}, a união de todos os quadros. O vídeo que encosta na beira corta
+     * ali (a ativação do SHINKAI põe as faixas pretas nesse limite). Null se não existe.
+     */
+    float[] limitesY(String nome) {
+        Folha f = folhas.get(nome);
+        if (f == null || f.quadros.length == 0) return null;
+        float topo = Float.MAX_VALUE, base = -Float.MAX_VALUE;
+        for (int i = 0; i < f.quadros.length; i++) {
+            topo = Math.min(topo, f.desloc[i][1] / f.pixelScale);
+            base = Math.max(base, (f.desloc[i][1] + f.quadros[i][3]) / f.pixelScale);
+        }
+        return new float[]{topo, base};
+    }
+
+    /**
      * O efeito é uma cena inteira (o vídeo já tem o movimento, como o dragão do Ultra SHINKAI que
      * atravessa a tela): o efeito.json marca "cena": true.
      */
