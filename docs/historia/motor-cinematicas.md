@@ -347,15 +347,29 @@ primeiro; o soco final é do Ryūga, como na página 5). São crianças: quase t
 | Um dos dois com 50% | câmera lenta, faixas, a tinta cobre; os dois aparecem no meio do cenário (`"meio": "palco"`), o Dafu: "Ei, ei! Devagar, meninos!" |
 | A troca desajeitada | tudo erra: o soco do Kōga passa por cima do Ryūga, que se abaixa atrasado, e o Kōga quase cai para a frente; o gancho do Ryūga passa no vento e ele gira junto; o soco do Ryūga sai curto e ele tropeça; o chute do Kōga passa a um palmo do Ryūga, que fecha os olhos, e o Kōga perde o equilíbrio num pé só (VUSH!); os dois ofegantes |
 | CHOQUE! (toque) | os dois arrancam com o punho armado; os punhos se chocam (PAH!) e eles quicam para trás sacudindo a mão |
-| TROCA DE GOLPES! (martelar) | o vídeo dos dois trocando golpes e errando (`ep00/qt1`, a 1,2x, até o último chute: o fim dele, só a guarda, fica de fora) entra no lugar dos meninos (PÁ!, VUSH!); no fim dele os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
+| TROCA DE GOLPES! (martelar) | os golpes do vídeo deles (`ep00/qt1`), animados à mão com as poses tiradas dele (`CENA_BRIGA`, abaixo), todos no vento (VUSH!): o soco do Kōga (o Ryūga encolhe), o soco do Ryūga (o Kōga joga a cabeça para trás), a rasteira do Kōga (o Ryūga levanta o pé), o chute de frente do Ryūga (o Kōga pula para trás), o chute alto do Kōga (o Ryūga se abaixa, o Kōga quase cai); os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
 | O susto | o Kōga levanta primeiro e avança num soco esticado; o Ryūga, ainda se erguendo, salta para trás e o soco para a um palmo (VUSH!, câmera lenta) |
 | GOLPE FINAL! (tempo) | o Ryūga arranca; o soco dele pega o Kōga na cara antes do dele: POW! (o quadro de impacto), a cabeça do Kōga vai para trás, a pose segura e a tinta cobre (a pag5 começa nesse soco) |
 
 Os QTE são neutros (a cena é das duas campanhas): errar faz os dois avançarem juntos e baterem a
-cabeça (TOC!), um clarão, e o QTE pede de novo. Ninguém bate de verdade (`"golpe": "nenhum"`). Dos
-vídeos antigos da briga só o `qt1` é usado; `qt2`, `qt3` e `levanta` continuam na pasta.
+cabeça (TOC!), um clarão, e o QTE pede de novo. Ninguém bate de verdade (`"golpe": "nenhum"`). Os
+vídeos antigos da briga (`qt1`, `qt2`, `qt3`, `levanta`) continuam na pasta, mas a cena não toca
+nenhum.
 
-**Vídeo dentro da animação.** Um `video` pode ser evento de um `animar`: ele toca no lugar dos dois
+**Poses tiradas de um vídeo com os dois juntos.** O `qt1` (os dois no verde, no Drive `ryuga_8`)
+virou um clipe de poses de cada menino, `CENA_BRIGA` (47 quadros, um a cada 2 do vídeo), pelo
+`tools/sprites/dupla_video.py`: tira o verde, separa os dois maiores pedaços (quem encosta no
+outro é cortado na coluna mais vazia entre os dois), espelha quem está à direita e grava a folha no
+registro do `fixar: video` (o tronco do 1º quadro na raiz, na escala 0,30 das crianças): a pose sai
+no lugar do idle. Os quadros em que os chutes se batem (36 a 39) não separam limpo e ficam fora da
+cena. `CENA_BRIGA` é um estado de cena (`build_characters.py`): só a animação feita à mão toca.
+
+```bash
+python3 tools/sprites/dupla_video.py qt1.mp4 --esquerda koga_8 --direita ryuga_8 --clipe cena_briga --quadros 4-96:2
+python3 tools/sprites/build_characters.py --write
+```
+
+**Vídeo dentro da animação** (a briga usou e trocou pelas poses; o motor continua aceitando). Um `video` pode ser evento de um `animar`: ele toca no lugar dos dois
 (os sprites somem) com a origem no meio deles, e um `video` com `parar` o tira. Para a emenda não
 pular, os dois seguram a pose escondidos enquanto ele toca (o vídeo anda no ritmo da animação: a
 câmera lenta e a congelada do impacto valem para ele) (no gerador, uma pausa do tamanho do

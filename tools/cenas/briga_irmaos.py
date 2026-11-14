@@ -20,12 +20,22 @@ from animacao import Lutador, amostra, cortar, escrever, pausar
 ROOT = Path(__file__).resolve().parents[2]
 CENA = ROOT / 'android/app/src/main/assets/historia/ep00/cinematica_briga.json'
 
-R, K = Lutador(), Lutador()
+# Os números de quadro do roteiro são escritos em ordem; DESLOCA[0] soma a todos os escritos depois
+# (a troca de golpes cresceu no meio sem renumerar o resto da cena).
+DESLOCA = [0]
+
+
+class Menino(Lutador):
+    def k(self, q, pose, x=None, **kw):
+        super().k(q + DESLOCA[0], pose, x, **kw)
+
+
+R, K = Menino(), Menino()
 eventos = []
 
 
 def ev(q, acao, apos=0, **kw):
-    e = {'q': q, 'acao': dict(acao=acao, **kw)}
+    e = {'q': q + DESLOCA[0], 'acao': dict(acao=acao, **kw)}
     if apos:
         e['apos'] = apos
     eventos.append(e)
@@ -75,12 +85,6 @@ def respirar(lut, q0, q1, pose, x, passo=14):
 
 
 DASH = dict(sx=1.25, sy=0.88, rastro=5)
-# O vídeo da troca de golpes (ep00/qt1: 62 quadros a 12 por segundo, 5146 ms) e quantos quadros
-# da cena ele dura no ritmo escolhido.
-VIDEO_RITMO = 1.2
-# O vídeo sai no quadro 47 (3,9 s do vídeo): depois os dois só ficam em guarda.
-VIDEO_FIM_MS = 3900
-VIDEO_QUADROS = round(VIDEO_FIM_MS / VIDEO_RITMO * 60 / 1000)
 
 # ------------------------------------------------------------------ 1: a troca desajeitada
 # Os dois em guarda; o Dafu manda irem devagar e eles nem ouvem: andam um para o outro.
@@ -198,25 +202,85 @@ K.k(296, 'IDLE:0', 100, ciclo=14)
 # ------------------------------------------------------------------ 3: a troca de golpes (QTE)
 R.k(306, 'WALK_FORWARD:0', -150, ciclo=30)
 K.k(304, 'WALK_FORWARD:0', 100, ciclo=24)
-R.k(326, 'IDLE:0', -80, ciclo=15)
-K.k(326, 'IDLE:0', 80, ciclo=14)
+R.k(326, 'IDLE:0', -105, ciclo=15)
+K.k(326, 'IDLE:0', 105, ciclo=14)
 camera(318, 1.3, 'centro', 0.3)
-# QTE TROCA DE GOLPES! no quadro 331. Depois, o vídeo dos dois trocando golpes e errando (o qt1,
-# o mesmo da briga em vídeo de antes): ele entra no lugar dos meninos, que seguram a pose escondidos
-# (uma pausa do tamanho do vídeo, PAUSAS[332]). No vídeo os dois estão a 80 do meio, como aqui
-# (97 px da folha com pixelScale 1,2).
-ev(332, 'video', clipe='ep00/qt1', esquerda='koga', ritmo=VIDEO_RITMO, semEsperar=True)
-for ms, txt, pos, rot in ((415, 'PÁ!', [0.55, 0.3], 8), (1079, 'PÁ!', [0.45, 0.32], -8),
-                          (1743, 'VUSH!', [0.5, 0.6], 4), (2573, 'VUSH!', [0.55, 0.36], 6),
-                          (3154, 'PÁ!', [0.5, 0.3], -6)):
-    ev(332, 'onomatopeia', texto=txt, pos=pos, tamanho=90, rotacao=rot, segundos=0.45, semEsperar=True,
-       apos=round(ms / VIDEO_RITMO * 60 / 1000))
-ev(332, 'video', parar=True, apos=VIDEO_QUADROS)
+# O Kōga arma o soco: o QTE TROCA DE GOLPES! pede no quadro 331.
+K.k(328, 'CENA_BRIGA:1', 105)
+K.k(331, 'CENA_BRIGA:2', 105)
+# Depois, a troca de golpes com as poses do vídeo deles (CENA_BRIGA, tiradas do qt1 por
+# tools/sprites/dupla_video.py: um quadro a cada 5 da cena, o ritmo do vídeo). No vídeo os golpes
+# pegam com os dois a 162 um do outro; aqui eles estão a 210 e se esquivam: tudo pega no vento.
+B = 332
+# 1) O soco do Kōga; o Ryūga fecha os olhos e encolhe.
+K.k(B, 'CENA_BRIGA:2', 105, ate=6)
+K.k(B + 10, 'CENA_BRIGA:6', 103, rastro=2)
+R.k(B + 4, 'HIT_STAND:1', -105)
+R.k(B + 10, 'HIT_STAND:2', -112, curva='sai')
+letreiro(B + 8, 'VUSH!', [0.55, 0.3], 85, rotacao=8, segundos=0.45)
+K.k(B + 20, 'CENA_BRIGA:6', 103, ate=10)
+K.k(B + 38, 'CENA_BRIGA:10', 105)
+R.k(B + 20, 'HIT_STAND:3', -110)
+R.k(B + 28, 'IDLE:0', -105, ciclo=15)
+# 2) O soco do Ryūga; o Kōga joga a cabeça para trás.
+B1 = B + 34
+R.k(B1, 'CENA_BRIGA:9', -105, ate=13)
+R.k(B1 + 18, 'CENA_BRIGA:13', -103, rastro=2)
+K.k(B1 + 8, 'HIT_STAND:1', 105)
+K.k(B1 + 16, 'HIT_STAND:2', 114, curva='sai')
+letreiro(B1 + 16, 'VUSH!', [0.45, 0.32], 85, rotacao=-8, segundos=0.45)
+R.k(B1 + 26, 'CENA_BRIGA:13', -103, ate=17)
+R.k(B1 + 44, 'CENA_BRIGA:17', -105)
+K.k(B1 + 26, 'HIT_STAND:3', 110)
+K.k(B1 + 34, 'IDLE:0', 105, ciclo=14)
+# 3) A rasteira do Kōga; o Ryūga levanta o pé e ela passa por baixo.
+B2 = B1 + 44
+K.k(B2, 'CENA_BRIGA:16', 105, ate=19)
+K.k(B2 + 15, 'CENA_BRIGA:19', 104, ate=22, rastro=2)
+K.k(B2 + 30, 'CENA_BRIGA:22', 104, ate=24)
+K.k(B2 + 40, 'CENA_BRIGA:24', 105)
+R.k(B2, 'CENA_BRIGA:17', -105)
+R.k(B2 + 12, 'CENA_BRIGA:20', -108, ate=22)
+R.k(B2 + 26, 'CENA_BRIGA:22', -110, ate=24)
+R.k(B2 + 38, 'CENA_BRIGA:24', -108)
+letreiro(B2 + 20, 'VUSH!', [0.5, 0.62], 85, rotacao=4, segundos=0.45)
+# 4) O chute de frente do Ryūga; o Kōga dá um pulinho para trás e o chute fica curto.
+B3 = B2 + 44
+R.k(B3, 'CENA_BRIGA:24', -108, ate=29)
+R.k(B3 + 25, 'CENA_BRIGA:29', -106, rastro=3)
+R.k(B3 + 33, 'CENA_BRIGA:30', -106, ate=32)
+R.k(B3 + 48, 'CENA_BRIGA:32', -106)
+R.k(B3 + 56, 'IDLE:0', -105, ciclo=15)
+K.k(B3 + 16, 'BACKDASH:1', 105)
+K.k(B3 + 24, 'BACKDASH:4', 122, y=14, curva='sai')
+K.k(B3 + 32, 'BACKDASH:27', 128, y=0, curva='entra')
+K.k(B3 + 40, 'IDLE:0', 120, ciclo=14)
+letreiro(B3 + 25, 'VUSH!', [0.55, 0.36], 85, rotacao=6, segundos=0.45)
+# 5) O chute alto do Kōga; o Ryūga se abaixa e o chute passa por cima. O Kōga gira junto com o
+# chute e quase cai.
+B4 = B3 + 58
+K.k(B4, 'CENA_BRIGA:32', 118, ate=35)
+K.k(B4 + 15, 'CENA_BRIGA:35', 116)
+K.k(B4 + 19, 'CENA_BRIGA:39', 112, rastro=4)
+R.k(B4 + 10, 'CROUCH:2', -105)
+R.k(B4 + 16, 'CROUCH:6', -105, curva='sai')
+letreiro(B4 + 19, 'VUSH!', [0.5, 0.26], 95, rotacao=-6, segundos=0.5)
+lenta(B4 + 19, antes=3, depois=10, valor=0.4)
+K.k(B4 + 27, 'CENA_BRIGA:40', 108, rot=-10, curva='sai')
+K.k(B4 + 35, 'CENA_BRIGA:42', 104, rot=8, curva='suave')
+K.k(B4 + 45, 'CENA_BRIGA:45', 106, rot=0, curva='suave')
+K.k(B4 + 54, 'IDLE:0', 105, ciclo=14)
+R.k(B4 + 34, 'CROUCH:6', -105)
+R.k(B4 + 42, 'RISE:3', -105, ate=8)
+R.k(B4 + 52, 'IDLE:0', -105, ciclo=15)
+FIM_TROCA = B4 + 58
+# O resto da cena foi escrito para a troca acabando no quadro 366: anda junto.
+DESLOCA[0] = FIM_TROCA - 366
 # Os dois soltam o soco juntos e se acertam na cara: caem os dois.
-R.k(366, 'IDLE:0', -80, ciclo=15)
-K.k(366, 'IDLE:0', 80, ciclo=14)
-R.k(372, 'CROUCH:2', -88, curva='corte')
-K.k(372, 'CROUCH:2', 88, curva='corte')
+R.k(366, 'IDLE:0', -105, ciclo=15)
+K.k(366, 'IDLE:0', 105, ciclo=14)
+R.k(372, 'CROUCH:2', -98, curva='corte')
+K.k(372, 'CROUCH:2', 98, curva='corte')
 R.k(379, 'MEDIUM_KICK:4', -55, curva='sai')
 K.k(379, 'LIGHT_JAB:2', 45, curva='sai')
 R.k(383, 'MEDIUM_KICK:6', -48, curva='sai', rastro=3)
@@ -295,13 +359,15 @@ K.k(620, 'HIT_STAND:2', 6, rot=-10)
 R.k(596, 'CROUCH_LIGHT:5', -133)
 R.k(620, 'CROUCH_LIGHT:5', -133)
 
-QUADROS = 620
+D = DESLOCA[0]
+QUADROS = 620 + D
 
 # As pausas (quadro: quadros a mais): a antecipação segurando, o golpe esticado depois do
 # contato, a pausa de quem se estuda.
 PAUSAS = {
     60: 10, 76: 10, 98: 8, 114: 6, 142: 6, 159: 8, 188: 8, 200: 8,
-    250: 8, 290: 10, 326: 6, 332: VIDEO_QUADROS, 404: 24, 470: 10, 490: 10, 566: 8,
+    250: 8, 290: 10, 326: 6, B + 10: 8, B1 + 18: 8, B3 + 25: 8, B4 + 19: 8,
+    404 + D: 24, 470 + D: 10, 490 + D: 10, 566 + D: 8,
 }
 
 # Os QTE (quadro da coreografia, antes das pausas): a animação para na pose desse quadro e pede.
@@ -310,7 +376,7 @@ PAUSAS = {
 QTES = [
     (264, {'tipo': 'toque', 'texto': 'CHOQUE!'}),
     (331, {'tipo': 'martelar', 'texto': 'TROCA DE GOLPES!', 'vezes': 10, 'segundos': 3.0}),
-    (582, {'tipo': 'tempo', 'texto': 'GOLPE FINAL!', 'segundos': 1.3}),
+    (582 + D, {'tipo': 'tempo', 'texto': 'GOLPE FINAL!', 'segundos': 1.3}),
 ]
 
 

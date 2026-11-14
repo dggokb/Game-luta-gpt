@@ -41,3 +41,6 @@ o Kōga joga com o Kōga 8 anos contra ele (`historia/ep00/episodio.json`, passo
 - Caixas (corpo, golpes, posturas) medidas no desenho dele (`caixas_sprites.py`).
 - No treino (tutorial) não há SUPER, ULTRA nem SHINKAI: os botões somem, o botão apertado não
   chega ao motor e as barras ficam vazias (`TutorialDirector.semPoderes`).
+- **Poses de cena** (`CENA_BRIGA`, 14/11): os golpes do vídeo da briga dos irmãos (o `qt1`, os dois
+  juntos no verde), separados por `tools/sprites/dupla_video.py`. Só a animação feita à mão da
+  briga (`historia/ep00/cinematica_briga.json`) toca; nenhum golpe da luta usa.

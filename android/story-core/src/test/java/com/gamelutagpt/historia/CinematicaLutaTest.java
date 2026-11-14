@@ -424,7 +424,7 @@ public class CinematicaLutaTest {
      * A briga dos irmãos (Prólogo) animada à mão, nas duas campanhas: as chaves são por irmão, então
      * cada menino faz o seu papel dos dois lados da tela (o Ryūga fica do lado dele e o soco final é
      * dele, como na página 5). Três QTE (o primeiro erra: os dois batem a cabeça e ele pede de
-     * novo), o vídeo da troca de golpes no meio, ninguém bate de verdade e a tinta cobre o soco.
+     * novo), a troca de golpes com as poses tiradas do vídeo deles, ninguém bate de verdade e a tinta cobre o soco.
      */
     @Test
     public void brigaDosIrmaosAnimada() throws IOException {
@@ -434,14 +434,15 @@ public class CinematicaLutaTest {
             Palco palco = new Palco();
             CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, conversa, palco);
             assertTrue(cena.carregar(temporada, "ep00/cinematica_briga.json", irmao));
-            assertEquals("o vídeo da troca de golpes, tocado de dentro da animação", Arrays.asList("ep00/qt1"), cena.videos());
+            assertTrue("sem vídeo: a troca de golpes usa as poses tiradas dele", cena.videos().isEmpty());
             int ryuga = Torneio.RYUGA.equals(irmao) ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL, koga = 1 - ryuga;
             assertTrue("as folhas do soco final do Ryūga carregam antes",
                 Arrays.asList(cena.clipesAnimados(ryuga)).contains("CROUCH_LIGHT"));
             assertFalse("o Kōga não se abaixa no começo", Arrays.asList(cena.clipesAnimados(koga)).contains("CROUCH_HEAVY"));
+            assertTrue("as poses do vídeo carregam antes", Arrays.asList(cena.clipesAnimados(koga)).contains("CENA_BRIGA"));
+
             assertTrue(cena.gatilho(1f, 0.5f, 12f, false));
-            int qtes = 0, quadrosNoQte = 0, quadrosDeVideo = 0;
-            float videoMsMax = 0f;
+            int qtes = 0, quadrosNoQte = 0;
             boolean pedia = false, errou = false, ladoCerto = true;
             String finalRyuga = null, finalKoga = null;
             PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
@@ -450,11 +451,6 @@ public class CinematicaLutaTest {
                 cena.update(DT);
                 conversa.update(DT);
                 cena.render(canvas);
-                if ("ep00/qt1".equals(cena.video())) {
-                    quadrosDeVideo++;
-                    videoMsMax = Math.max(videoMsMax, cena.videoMs());
-                    assertEquals("o Kōga é quem está à esquerda no vídeo", koga, cena.videoEsquerda());
-                }
                 if (cena.animando()) {
                     // O Ryūga fica do lado dele (na campanha do Kōga, à direita).
                     float xr = cena.xDaPose(cena.poseAnimada(ryuga)), xk = cena.xDaPose(cena.poseAnimada(koga));
@@ -485,8 +481,6 @@ public class CinematicaLutaTest {
             assertTrue(irmao + ": a cena termina", cena.acabou());
             assertEquals(3, qtes);
             assertTrue(errou);
-            assertTrue("o vídeo toca até o último chute (3,3 s): " + quadrosDeVideo, quadrosDeVideo > 180 && quadrosDeVideo < 240);
-            assertTrue("o vídeo anda dentro da animação (até o último chute): " + videoMsMax, videoMsMax > 3700f);
             assertTrue(irmao + ": cada um do seu lado", ladoCerto);
             assertEquals(irmao + ": o soco final é do Ryūga", "CROUCH_LIGHT", finalRyuga);
             assertEquals(irmao + ": o Kōga leva na cara", "HIT_STAND", finalKoga);

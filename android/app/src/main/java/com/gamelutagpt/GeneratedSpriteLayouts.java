@@ -10,6 +10,12 @@ final class GeneratedSpriteLayouts {
     static final int KOGA_8_BACKDASH_ROOT_Y = 430;
     static final int KOGA_8_BACKDASH_FRAME_COUNT = 31;
 
+    static final int KOGA_8_CENA_BRIGA_FRAME_WIDTH = 383;
+    static final int KOGA_8_CENA_BRIGA_FRAME_HEIGHT = 405;
+    static final int KOGA_8_CENA_BRIGA_ROOT_X = 150;
+    static final int KOGA_8_CENA_BRIGA_ROOT_Y = 392;
+    static final int KOGA_8_CENA_BRIGA_FRAME_COUNT = 47;
+
     static final int KOGA_8_CROUCH_FRAME_WIDTH = 278;
     static final int KOGA_8_CROUCH_FRAME_HEIGHT = 348;
     static final int KOGA_8_CROUCH_ROOT_X = 140;
@@ -3999,6 +4005,12 @@ final class GeneratedSpriteLayouts {
     static final int RYUGA_8_BACKDASH_ROOT_X = 144;
     static final int RYUGA_8_BACKDASH_ROOT_Y = 386;
     static final int RYUGA_8_BACKDASH_FRAME_COUNT = 31;
+
+    static final int RYUGA_8_CENA_BRIGA_FRAME_WIDTH = 426;
+    static final int RYUGA_8_CENA_BRIGA_FRAME_HEIGHT = 391;
+    static final int RYUGA_8_CENA_BRIGA_ROOT_X = 155;
+    static final int RYUGA_8_CENA_BRIGA_ROOT_Y = 378;
+    static final int RYUGA_8_CENA_BRIGA_FRAME_COUNT = 47;
 
     static final int RYUGA_8_CROUCH_FRAME_WIDTH = 255;
     static final int RYUGA_8_CROUCH_FRAME_HEIGHT = 351;

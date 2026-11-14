@@ -22,3 +22,6 @@ anos existir.
   pés plantados, a folha HD cabe nos 4096 px), dash (um ciclo da corrida, quadros 16–39, em loop),
   backdash (o pulinho inteiro, 31 quadros, 30 quadros no motor a 400 px/s), S1 e S2.
 - Mecânicas em `tools/sprites/mecanicas.json` (vida 8000, dano 0,6).
+- **Poses de cena** (`CENA_BRIGA`, 14/11): os golpes do vídeo da briga dos irmãos (o `qt1`, os dois
+  juntos no verde), separados por `tools/sprites/dupla_video.py`. Só a animação feita à mão da
+  briga (`historia/ep00/cinematica_briga.json`) toca; nenhum golpe da luta usa.

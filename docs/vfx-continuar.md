@@ -1510,6 +1510,9 @@ os lotes seguintes do efeitos-gpt.md.
 - **Depois (14/11), "são crianças, a ideia é errar bastante" e "usa também os frames do vídeo
   deles errando":** quase todo golpe vira VUSH! no vento (menos faíscas de defesa); a troca de
   golpes toca o vídeo `ep00/qt1` no lugar dos meninos, com PÁ! e VUSH! nos golpes dele.
+- **Depois, "ficou praticamente igual o antigo":** o vídeo saiu; as poses dele viraram o clipe
+  `CENA_BRIGA` de cada menino (os efeitos do vídeo apagados no recorte: o jogo desenha os dele) e
+  a troca de golpes é animada à mão, só com VUSH! (tudo erra).
 
 ## Fora do VFX, o que ficou pendente
 

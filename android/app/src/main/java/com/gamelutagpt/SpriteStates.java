@@ -50,6 +50,7 @@ final class SpriteStates {
  static final String DEFENSE_STAND_2 = "DEFENSE_STAND_2";
  static final String DEFENSE_STAND_3 = "DEFENSE_STAND_3";
  static final String ULTRA_DRAGAO = "ULTRA_DRAGAO";
+ static final String CENA_BRIGA = "CENA_BRIGA";
  static final String POSE_CROUCH = "CROUCH";
  static final String POSE_AIR = "AIR";
 }
