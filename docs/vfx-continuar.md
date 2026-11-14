@@ -580,6 +580,37 @@ chão. Folha: `efeito_video.py art/vfx/fumaca_queda_v01/frames --nome fumaca_que
 0,75 + 0,35 × a força da poeira) e quando o corpo bate no chão e quando assenta depois do quique
 (no lugar da `fumaca_pulo`, 1,1 e 0,8).
 
+## Defesas de ar desenhadas pelo dono (14/11)
+
+"Vamos trocar os efeitos de defesa para esses três": três GIFs de 6 quadros (512 × 512, alfa de
+1 bit, 80 e 90 ms), em `art/vfx/defesa_ar_v01` (os GIFs e os quadros em PNG). Saem no lugar de
+`defesa`, `defesa_2` e `defesa_3` (o escudo azul de `defesa_01.png`/`defesa_02.png`); a de poder
+(`defesa_poder`) não mudou. O arco abre para o lado contrário de quem bate, como o escudo de antes.
+Origem no clarão do primeiro quadro (248,262; 245,257; 243,252); tamanho igual ao das antigas
+(~245 px do mundo de altura: escala 1,05, 0,65 e 0,78). A luz que a defesa joga (`"luz"`) ficou,
+na cor branca fria (#E6F0FF) em vez do azul. As de pressão de ar de 09/11 (outras, tiradas de
+vídeo) estão no histórico, commit ba600bcf. Para gravar uma defesa comum, o boneco tem de estar
+defendendo antes do golpe (segurar para trás na hora vira DEFESA PERFEITA, outro efeito).
+
+**Depois (14/11), "compara com esses e vê se não fica melhor":** mais três GIFs do dono, o mesmo
+arco em versão de brilho (luz em fundo preto, com halo; 506 × 506, 6 quadros de 120, 120 e 80 ms),
+em `art/vfx/defesa_brilho_v01` (GIFs e quadros já recortados do preto pelo `efeito_imagem`).
+Folhas `defesa_brilho`, `defesa_brilho_2` e `defesa_brilho_3`, do mesmo tamanho das de ar
+(~250 px; origem 254,247 / 257,250 / 256,252; escala 0,56 / 0,72 / 0,85; fps 8,33 / 8,33 / 12,5),
+com a mesma `"luz"`. **Ainda não tocam na luta:** as `DEFESAS` do `GameView` seguem com as de ar
+até o dono escolher. Vídeo lado a lado: `android/app/build/sprite-review/defesas_ar_vs_brilho.mp4`
+(gravado com o boneco agachado defendendo por um ajuste de teste que não foi para o repositório).
+Para trocar: pôr `defesa_brilho*` no lugar de `defesa*` nas `DEFESAS` (e no `DEFESA_PODER`, se ele
+quiser a de poder caindo nelas).
+
+**Depois, "o novo é melhor, só a posição que eles tão nascendo que tô achando estranha":** as
+defesas nasciam no ponto de contato (`impactX/impactY`), que cai uns 40 px dentro de quem defende,
+em cima do rosto e dos braços. Agora nascem na ponta do golpe de quem bate (`HitEvent.pontaX/
+pontaY`: o punho, a ponta do pé), como os hits desde 11/11; a de poder continua no contato.
+`DEFESA_BRILHO` e `DEFESA_NA_PONTA` no `GameView`, **as duas desligadas** até ele aprovar o vídeo
+`android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
+brilho; viu-se o soco fraco e o chute forte defendidos).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
