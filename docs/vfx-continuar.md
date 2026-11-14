@@ -611,6 +611,16 @@ pontaY`: o punho, a ponta do pé), como os hits desde 11/11; a de poder continua
 vídeo `android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
 brilho; viu-se o soco fraco e o chute forte defendidos). As de ar ficam de reserva nas `DEFESAS`.
 
+**Depois, "tem que ser para tudo":** com `DEFESA_BRILHO`, a defesa de poder (especial, Super, Ultra,
+projétil) também usa as de brilho, na mesma vez das comuns, e nasce na ponta do golpe quando há
+ponta medida (o projétil não tem: nasce no contato). A `defesa_poder` ficou no fim da lista, de
+reserva. Conferido em vídeo com a Onda do Ryūga defendida (`defesa_brilho_projetil.mp4`); a
+DEFESA PERFEITA continua com o efeito dela. Pedido junto: "ainda acho que o posicionamento não tá
+legal, não sei se é porque ela tá ovalada na ponta e deveria ser reta". Endireitar o arco por
+código (andar cada linha do desenho na horizontal, por curva medida ou ajustada) foi testado em
+três jeitos e entorta os riscos do desenho (ondulados, viram "X" e ">"): não serve; a versão reta
+tem de vir desenhada.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que

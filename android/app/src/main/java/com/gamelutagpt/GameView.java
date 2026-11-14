@@ -5667,11 +5667,13 @@ public class GameView extends SurfaceView
         String nome = null;
         if (defendido) {
             float escala = size >= ImpactEffects.HEAVY ? 0.8f : size == ImpactEffects.MEDIUM ? 0.7f : 0.6f;
-            String[] ordem = poder ? DEFESA_PODER : DEFESAS[defesaVez = (defesaVez + 1) % DEFESAS.length];
+            // Com as de brilho, poder (especial, Super, Ultra, projétil) usa as mesmas (dono, 14/11: "tem que
+            // ser para tudo"); a defesa_poder fica de reserva no fim da lista.
+            String[] ordem = poder && !DEFESA_BRILHO ? DEFESA_PODER : DEFESAS[defesaVez = (defesaVez + 1) % DEFESAS.length];
             // Nascem na ponta do golpe de quem bate (o punho, a ponta do pé), como os hits, e não no
             // ponto de contato, que cai dentro de quem defende, em cima do rosto e dos braços (dono, 14/11).
             float dx = x, dy = y;
-            if (DEFESA_NA_PONTA && !poder && !Float.isNaN(pontaX)) {
+            if (DEFESA_NA_PONTA && !Float.isNaN(pontaX)) {
                 dx = pontaX;
                 dy = pontaY;
             }
@@ -5751,9 +5753,9 @@ public class GameView extends SurfaceView
      */
     private static final boolean DEFESA_BRILHO = true;
     private static final String[][] DEFESAS = DEFESA_BRILHO ? new String[][] {
-        {"defesa_brilho", "defesa_brilho_2", "defesa_brilho_3", "defesa"},
-        {"defesa_brilho_2", "defesa_brilho_3", "defesa_brilho", "defesa_2"},
-        {"defesa_brilho_3", "defesa_brilho", "defesa_brilho_2", "defesa_3"}} : new String[][] {
+        {"defesa_brilho", "defesa_brilho_2", "defesa_brilho_3", "defesa", "defesa_poder"},
+        {"defesa_brilho_2", "defesa_brilho_3", "defesa_brilho", "defesa_2", "defesa_poder"},
+        {"defesa_brilho_3", "defesa_brilho", "defesa_brilho_2", "defesa_3", "defesa_poder"}} : new String[][] {
         {"defesa", "defesa_2", "defesa_3"}, {"defesa_2", "defesa_3", "defesa"}, {"defesa_3", "defesa", "defesa_2"}};
     /**
      * As defesas comuns nascem na ponta do golpe (HitEvent.pontaX/pontaY) em vez do ponto de contato.
