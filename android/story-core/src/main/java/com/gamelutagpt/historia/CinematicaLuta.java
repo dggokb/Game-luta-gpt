@@ -134,6 +134,11 @@ public final class CinematicaLuta {
             return lado == JOGADOR ? -150f : 150f;
         }
 
+        /** O meio do cenário (x do mundo), para a animação manual com {@code "meio": "palco"}. */
+        default float meioDoPalco() {
+            return 0f;
+        }
+
         /** O golpe pedido para esse lado já pegou (o dano do roteiro entrou no alvo). */
         default boolean golpeEntrou(int lado) {
             return false;
@@ -283,6 +288,17 @@ public final class CinematicaLuta {
          * trechos pelos QTE.
          */
         boolean continua;
+        /**
+         * ANIMAR com as chaves por irmão ({@code "ryuga"} e {@code "koga"} no lugar de
+         * {@code "jogador"} e {@code "rival"}): a cena serve às duas campanhas e cada um faz o seu
+         * papel (o x vai do Ryūga para o Kōga). Na campanha do Kōga as duas trilhas trocam de lado.
+         */
+        boolean porIrmao;
+        /**
+         * ANIMAR com {@code "meio": "palco"}: o eixo começa no meio do cenário, não no meio entre os
+         * dois (a cena longa não sai pela parede; a troca fica escondida atrás de uma tinta).
+         */
+        boolean noMeioDoPalco;
         /**
          * QTE numa animação feita à mão: o trecho que toca quando o jogador erra (o contra-ataque
          * do rival); depois os dois voltam à pose do QTE e ele pede de novo. Sem, o erro só pede de novo.
@@ -1067,9 +1083,17 @@ public final class CinematicaLuta {
         Acao a = new Acao(Acao.Tipo.ANIMAR);
         int total = Math.round(numero(m, "quadros", -1f, 1f, 3600f));
         if (total < 1) throw new IllegalArgumentException("animar sem \"quadros\"");
-        a.animacao = new AnimacaoManual(total, AnimacaoManual.chaves(Episodio.list(m, "jogador"), "jogador"),
-            AnimacaoManual.chaves(Episodio.list(m, "rival"), "rival"));
+        a.porIrmao = m.containsKey("ryuga") || m.containsKey("koga");
+        String um = a.porIrmao ? Torneio.RYUGA : "jogador", outro = a.porIrmao ? Torneio.KOGA : "rival";
+        if (a.porIrmao && (m.containsKey("jogador") || m.containsKey("rival"))) {
+            throw new IllegalArgumentException("animar: use \"ryuga\" e \"koga\" ou \"jogador\" e \"rival\", não os dois");
+        }
+        a.animacao = new AnimacaoManual(total, AnimacaoManual.chaves(Episodio.list(m, um), um),
+            AnimacaoManual.chaves(Episodio.list(m, outro), outro));
         a.continua = Boolean.TRUE.equals(m.get("continua"));
+        String meio = Episodio.string(m, "meio", "lutadores");
+        if (!meio.matches("lutadores|palco")) throw new IllegalArgumentException("animar meio: " + meio + " (use lutadores ou palco)");
+        a.noMeioDoPalco = meio.equals("palco");
         for (Object o : Episodio.list(m, "eventos")) {
             Map<String, Object> em = Episodio.asMap(o);
             AnimacaoManual.Evento ev = new AnimacaoManual.Evento();
@@ -1222,9 +1246,15 @@ public final class CinematicaLuta {
         java.util.Set<String> clipes = new java.util.LinkedHashSet<>();
         for (Acao a : roteiro.acoes) {
             if (a.tipo != Acao.Tipo.ANIMAR) continue;
-            for (AnimacaoManual.Chave c : lado == JOGADOR ? a.animacao.jogador : a.animacao.rival) clipes.add(c.clip);
+            for (AnimacaoManual.Chave c : trilha(a, lado)) clipes.add(c.clip);
         }
         return clipes.toArray(new String[0]);
+    }
+
+    /** As chaves desse lado ({@link #JOGADOR}, {@link #RIVAL}) numa ANIMAR (por irmão, o lado de cada um). */
+    private java.util.List<AnimacaoManual.Chave> trilha(Acao a, int lado) {
+        boolean primeira = a.porIrmao ? lado(Torneio.RYUGA) == lado : lado == JOGADOR;
+        return primeira ? a.animacao.jogador : a.animacao.rival;
     }
 
     /** Carregada e esperando o gatilho. */
@@ -1373,8 +1403,8 @@ public final class CinematicaLuta {
             // Um impacto congela: a animação para ali até a luta voltar.
             if (time < congelaAte) break;
         }
-        AnimacaoManual.amostra(an.jogador, animQuadro, animPose[JOGADOR]);
-        AnimacaoManual.amostra(an.rival, animQuadro, animPose[RIVAL]);
+        AnimacaoManual.amostra(trilha(animando, JOGADOR), animQuadro, animPose[JOGADOR]);
+        AnimacaoManual.amostra(trilha(animando, RIVAL), animQuadro, animPose[RIVAL]);
     }
 
     /** Um impacto congelou a cena agora (a pausa do golpe). */
@@ -1488,8 +1518,11 @@ public final class CinematicaLuta {
                 animEvento = 0;
                 if (!a.continua) {
                     float xj = palco.xDoLutador(JOGADOR), xr = palco.xDoLutador(RIVAL);
-                    animMeio = (xj + xr) * 0.5f;
-                    animSentido = xr >= xj ? 1f : -1f;
+                    animMeio = a.noMeioDoPalco ? palco.meioDoPalco() : (xj + xr) * 0.5f;
+                    // O eixo vai da primeira trilha para a segunda (do Ryūga para o Kōga, por irmão).
+                    int de = a.porIrmao ? lado(Torneio.RYUGA) : JOGADOR;
+                    float xa = de == JOGADOR ? xj : xr, xb = de == JOGADOR ? xr : xj;
+                    animSentido = xb >= xa ? 1f : -1f;
                 }
                 animar(0f);
                 break;

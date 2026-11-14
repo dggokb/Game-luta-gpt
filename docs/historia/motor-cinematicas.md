@@ -308,7 +308,7 @@ as faixas, a tinta, os letreiros e o QTE continuam por cima.
 | `repetir` | em loop (a ação não espera: o QTE seguinte pede por cima do vídeo) |
 | `esquerda` | quem está à esquerda no vídeo (`ryuga`, `koga`, `jogador`, `rival`): o vídeo espelha quando esse lutador está à direita na luta, então a mesma cena vale para as duas campanhas |
 | `emendar` | com um loop na tela, o vídeo novo espera a volta do loop acabar (os vídeos começam e acabam na mesma pose: a troca não pula). Com `semEsperar`, a cena segue quando ele começa (os letreiros marcam os golpes pelo tempo do vídeo) |
-| `ritmo` | quantas vezes mais rápido que o vídeo ele toca (padrão 1; na briga dos irmãos a troca de golpes toca a 1,8 e a queda a 1,7) |
+| `ritmo` | quantas vezes mais rápido que o vídeo ele toca (padrão 1; a briga dos irmãos em vídeo, antes de ser animada à mão, tocava a troca de golpes a 1,8) |
 | `parar` | tira o vídeo (os lutadores voltam) |
 
 O vídeo anda no ritmo da luta: para na congelada de um impacto, fica lento na câmera lenta e
@@ -333,27 +333,38 @@ A folha precisa caber em 4096 px (GPUs antigas): `--passo 2` (12 por segundo) e 
 1,2 deixam os 5 s de vídeo em ~2000×3800. As folhas são lidas numa thread à parte quando a luta
 carrega a cinemática e soltas no fim dela.
 
-### A briga dos irmãos (Prólogo): o teste da cena em vídeo
+### A briga dos irmãos (Prólogo): a luta animada à mão
 
 `historia/ep00/cinematica_briga.json`, na luta IRMÃOS das duas campanhas (depois do treino),
-com os vídeos dos meninos do Drive (`ryuga_8/qt1`, `qt2`, `qt3`) e o do Kōga se levantando (`levanta`, que emenda o qt2 no qt3):
+**animada à mão** (ação `animar`, [abaixo](#animação-feita-à-mão)) pelo gerador
+`tools/cenas/briga_irmaos.py`. As chaves são por irmão (`"ryuga"` e `"koga"`): a mesma cena vale
+nas duas campanhas, cada menino do seu lado da tela e com o seu papel (o Kōga, esquentado, ataca
+primeiro; o soco final é do Ryūga, como na página 5). Uns 26 s com os três QTE:
 
 | Momento | O que acontece |
 |---|---|
-| Um dos dois com 50% | câmera lenta, faixas; a tinta cobre e sai com o **qt1** em loop (os dois trocando golpes e errando); o Dafu: "Ei, ei! Devagar, meninos!" |
-| TROCA DE GOLPES! (martelar 14, em 4,2 s; o qt1 toca a 1,8x e repete enquanto o QTE espera; o qt2 a 1,7x) | PÁ! PÁ! PÁ!; no fim da volta do loop entra o **qt2** (se acertam e caem), com PAH!, POW!, BAM!, TUM! nos golpes do vídeo |
-| GOLPE FINAL! (tempo) | o Kōga se levanta e avança num soco que assusta o Ryūga (**levanta**, que começa no último quadro do qt2 e acaba no primeiro do qt3: sem corte), PAH!; com os dois em guarda o QTE pede, e o acerto vira o **qt3**: o Ryūga avança, câmera lenta, e o soco pega o Kōga na cara: a luta congela, POW! grande, e a tinta cobre. A pag5 começa nesse soco |
+| Um dos dois com 50% | câmera lenta, faixas, a tinta cobre; os dois aparecem no meio do cenário (`"meio": "palco"`), o Dafu: "Ei, ei! Devagar, meninos!" |
+| A troca desajeitada | o Kōga arranca com o soco esticado e o Ryūga se abaixa (VUSH!); o gancho do Ryūga passa no vento (o Kōga pula para trás); o soco do Ryūga é defendido (PAH!); a voadora de lado do Kōga o empurra longe (BAM!); os dois ofegantes |
+| CHOQUE! (toque) | os dois arrancam com o punho armado; os punhos se chocam (PAH!) e eles quicam para trás sacudindo a mão |
+| TROCA DE GOLPES! (martelar) | quatro golpes defendidos (PÁ!), os dois soltam o soco juntos e se acertam na cara (POW!, câmera lenta), caem os dois (TUM!) |
+| O susto | o Kōga levanta primeiro e avança num soco esticado; o Ryūga, ainda se erguendo, salta para trás e o soco para a um palmo (VUSH!, câmera lenta) |
+| GOLPE FINAL! (tempo) | o Ryūga arranca; o soco dele pega o Kōga na cara antes do dele: POW! (o quadro de impacto), a cabeça do Kōga vai para trás, a pose segura e a tinta cobre (a pag5 começa nesse soco) |
 
-A cena é a mesma nas duas campanhas: o Kōga é quem está à esquerda nos vídeos, e o vídeo
-espelha quando ele está à direita (campanha do Ryūga). Para ver no PC:
+Os QTE são neutros (a cena é das duas campanhas): errar faz os dois avançarem juntos e baterem a
+cabeça (TOC!), um clarão, e o QTE pede de novo. Ninguém bate de verdade (`"golpe": "nenhum"`). Os
+vídeos antigos da briga (`ep00/qt1`, `qt2`, `qt3`, `levanta`) continuam na pasta, mas a cena não usa
+mais.
+
+Para ver no PC (`-PsoAnimacao=true` grava só a animação, `-Pcadencia=1` todo quadro, `-Pjpg=true`
+em JPG, `-PerraPrimeiro=true` deixa o primeiro QTE sem resposta):
 
 ```bash
 cd android
-gradle :pc:testeCena -Pepisodio=ep00 -Pmarca=briga-irmaos [-Pirmao=koga]
+gradle :pc:testeCena -Pepisodio=ep00 -Pmarca=briga-irmaos [-Pirmao=koga] -Pcadencia=1 -Pjpg=true -PsoAnimacao=true
 ```
 
-O `testeCena` abre só aquela luta da história, tira a vida até o gatilho, acerta todos os QTE
-e grava um PNG a cada 6 quadros em `android/pc/build/cena/`. Serve para qualquer luta da
+O `testeCena` abre só aquela luta da história, tira a vida até o gatilho, acerta os QTE e grava
+em `android/pc/build/cena/` (um quadro a cada 6, sem as opções). Serve para qualquer luta da
 história com cinemática (`-Pvida` muda a vida do gatilho).
 
 ### Animação feita à mão
@@ -382,6 +393,12 @@ como num programa de animação:
 | `curva` | como chega nesta chave: `linear`, `sai` (rápido e freando: a arrancada), `entra` (acelerando: a queda), `suave`, `corte` (pula) |
 | `vira` | olha para o lado contrário (cada um olha para o outro) |
 
+**Por irmão.** Com `"ryuga"` e `"koga"` no lugar de `"jogador"` e `"rival"`, a mesma animação serve
+às duas campanhas: cada trilha vai para o lado de quem ela é, e o `x` vai do Ryūga para o Kōga (o
+Ryūga no negativo). Os eventos aceitam `"quem": "ryuga"` e `"koga"` (e a `camera`, o `foco`).
+**`"meio": "palco"`** (só no primeiro trecho) começa o eixo no meio do cenário, não no meio entre
+os dois: uma cena longa não sai pela parede; a troca fica escondida atrás de uma tinta.
+
 Entre duas chaves os números são interpolados com a curva da chave seguinte; a pose fica a da chave
 de antes. Os `eventos` são ações quaisquer do roteiro no quadro (`camera`, `impacto`, `efeito`,
 `linhas`, `fala`, `onomatopeia`, `clarao`), menos `qte`, `golpe` e `animar`. Um `impacto` congela a
@@ -391,8 +408,11 @@ No gerador, as `PAUSAS` (quadro: quadros a mais) seguram a pose dos dois naquele
 
 **QTE na animação.** A animação é cortada em trechos (`animar` com `"continua": true` segue o eixo do trecho de antes). Entre dois trechos, um `qte` sem `lance` pede com os dois parados na última pose (o golpe no meio): o acerto segue para o trecho seguinte; com `"erroAnimar"` (um `animar` curto, o contra-ataque do rival), o erro toca esse trecho, os dois voltam à pose do QTE e ele pede de novo. Depois do último trecho os dois seguram a pose até a cena acabar (o motor de luta não volta no meio).
 
-A luta do convite do Ryūga é escrita por um gerador (`tools/cenas/convite_ryuga.py`): ajuste os
-números lá e rode `python3 tools/cenas/convite_ryuga.py`. Para ver as poses de um lutador, as
+A luta do convite do Ryūga e a briga dos irmãos são escritas por geradores
+(`tools/cenas/convite_ryuga.py`, `tools/cenas/briga_irmaos.py`, com o comum em
+`tools/cenas/animacao.py`): ajuste os números lá e rode o gerador. Nas crianças os closes num
+menino só (`foco`) cortam o corpo (a câmera segura o peito na altura da tela, que nelas fica
+baixa): feche no `centro`, que segura o chão. Para ver as poses de um lutador, as
 folhas de cada clipe com o número do quadro ajudam a escolher.
 
 ### O teste dos QTE (convite do Episódio 2)
@@ -508,6 +528,6 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | HUD e controle de toque somem, faixas, quadros e onomatopeias (nessa ordem) | `GameView.renderFrame` |
 | Fim da luta pela cena | `GameView.updateStoryFight` (`cinematicaFim`) |
 | Cena em vídeo (as folhas, esconder os lutadores, espelhar) | `android/app/.../CenaVideo.java`, `GameView.drawCenaVideo` |
-| Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite, a briga em vídeo), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
+| Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite, a briga dos irmãos animada nas duas campanhas), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
 | A luta do teste de QTE jogada no PC | `android/pc/src/test/.../TesteQteConvite.java` (`gradle :pc:testeQte`) |
 | Prévia no PC | `android/pc-preview/.../CinematicaPreview.java` (`gradle :pc-preview:runCinematica`) |

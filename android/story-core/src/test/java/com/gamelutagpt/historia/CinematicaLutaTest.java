@@ -421,58 +421,67 @@ public class CinematicaLutaTest {
     }
 
     /**
-     * A briga dos irmãos (Prólogo) em vídeo, nas duas campanhas: o qt1 em loop enquanto o QTE
-     * pede, o qt2 emendado no fim da volta, o Kōga se levantando (levanta, sem corte) e o soco
-     * final do qt3, que congela.
-     * Ninguém bate de verdade (os QTE são "golpe": "nenhum") e o vídeo espelha pelo lado do Kōga.
+     * A briga dos irmãos (Prólogo) animada à mão, nas duas campanhas: as chaves são por irmão, então
+     * cada menino faz o seu papel dos dois lados da tela (o Ryūga fica do lado dele e o soco final é
+     * dele, como na página 5). Três QTE (o primeiro erra: os dois batem a cabeça e ele pede de
+     * novo), ninguém bate de verdade e a tinta cobre o soco.
      */
     @Test
-    public void brigaDosIrmaosEmVideo() throws IOException {
+    public void brigaDosIrmaosAnimada() throws IOException {
         for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
             Temporada temporada = Temporada.load(FILES);
             ConversaLuta conversa = new ConversaLuta(FILES);
             Palco palco = new Palco();
             CinematicaLuta cena = new CinematicaLuta(COM_IMAGENS, conversa, palco);
             assertTrue(cena.carregar(temporada, "ep00/cinematica_briga.json", irmao));
-            assertEquals(new java.util.HashSet<>(java.util.Arrays.asList("ep00/qt1", "ep00/qt2", "ep00/levanta", "ep00/qt3")),
-                new java.util.HashSet<>(cena.videos()));
-            for (String v : cena.videos()) {
-                assertTrue("sem a folha de " + v, new File(ASSETS, "historia/" + v + "/folha.webp").isFile());
-            }
-            assertNull("sem vídeo antes da cena", cena.video());
+            assertTrue("sem vídeo", cena.videos().isEmpty());
+            int ryuga = Torneio.RYUGA.equals(irmao) ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL, koga = 1 - ryuga;
+            assertTrue("as folhas do soco final do Ryūga carregam antes",
+                Arrays.asList(cena.clipesAnimados(ryuga)).contains("CROUCH_LIGHT"));
+            assertFalse("o Kōga não se abaixa no começo", Arrays.asList(cena.clipesAnimados(koga)).contains("CROUCH_HEAVY"));
             assertTrue(cena.gatilho(1f, 0.5f, 12f, false));
-            int lado = Torneio.KOGA.equals(irmao) ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL;
-            List<String> sequencia = new ArrayList<>();
-            boolean congelouNoSoco = false;
-            int quadrosNoQte = 0;
+            int qtes = 0, quadrosNoQte = 0;
+            boolean pedia = false, errou = false, ladoCerto = true;
+            String finalRyuga = null, finalKoga = null;
             PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
             for (int i = 0; i < 60 * 90 && !cena.acabou(); i++) {
                 palco.quadro();
                 cena.update(DT);
                 conversa.update(DT);
                 cena.render(canvas);
-                String v = cena.video();
-                if (v != null && (sequencia.isEmpty() || !v.equals(sequencia.get(sequencia.size() - 1)))) {
-                    sequencia.add(v);
-                    assertTrue(v + " começa do começo (emendado na pose da guarda): " + cena.videoMs(), cena.videoMs() < 120f);
+                if (cena.animando()) {
+                    // O Ryūga fica do lado dele (na campanha do Kōga, à direita).
+                    float xr = cena.xDaPose(cena.poseAnimada(ryuga)), xk = cena.xDaPose(cena.poseAnimada(koga));
+                    ladoCerto &= (xr < xk) == (palco.xDoLutador(ryuga) < palco.xDoLutador(koga));
+                    finalRyuga = cena.poseAnimada(ryuga).clip;
+                    finalKoga = cena.poseAnimada(koga).clip;
                 }
-                if (v != null) assertEquals("o Kōga é quem está à esquerda no vídeo", lado, cena.videoEsquerda());
-                congelouNoSoco |= "ep00/qt3".equals(v) && cena.velocidade() == 0f && cena.videoMs() > 1300f;
-                if (!cena.qtePedindo()) {
+                boolean pede = cena.qtePedindo();
+                if (pede && !pedia && cena.qteErros() == 0) qtes++;
+                pedia = pede;
+                if (!pede) {
                     quadrosNoQte = 0;
                     continue;
                 }
                 quadrosNoQte++;
-                if (cena.qteTipo() == CinematicaLuta.TipoQte.MARTELAR && quadrosNoQte % 4 == 0) {
+                if (qtes == 1 && cena.qteErros() == 0) {
+                    errou = true;
+                } else if (cena.qteTipo() == CinematicaLuta.TipoQte.MARTELAR && quadrosNoQte % 4 == 0) {
                     cena.toque(CinematicaLuta.TOQUE_DESCE, 640f, 400f);
                     cena.toque(CinematicaLuta.TOQUE_SOBE, 640f, 400f);
                 } else if (cena.qteTipo() == CinematicaLuta.TipoQte.TEMPO && quadrosNoQte == Math.round(cena.qteSegundos() * 60f)) {
                     cena.botao();
+                } else if (cena.qteTipo() == CinematicaLuta.TipoQte.TOQUE && quadrosNoQte == 20) {
+                    cena.toque(CinematicaLuta.TOQUE_DESCE, 300f, 300f);
+                    cena.toque(CinematicaLuta.TOQUE_SOBE, 300f, 300f);
                 }
             }
             assertTrue(irmao + ": a cena termina", cena.acabou());
-            assertEquals(Arrays.asList("ep00/qt1", "ep00/qt2", "ep00/levanta", "ep00/qt3"), sequencia);
-            assertTrue("o soco do qt3 congela", congelouNoSoco);
+            assertEquals(3, qtes);
+            assertTrue(errou);
+            assertTrue(irmao + ": cada um do seu lado", ladoCerto);
+            assertEquals(irmao + ": o soco final é do Ryūga", "CROUCH_LIGHT", finalRyuga);
+            assertEquals(irmao + ": o Kōga leva na cara", "HIT_STAND", finalKoga);
             assertEquals("interrompida", palco.vencedor);
             for (String pedido : palco.pedidos) {
                 assertFalse("ninguém bate de verdade: " + pedido, pedido.matches("(jogador|rival) (2?[LMH]|S\\d?)( final)?"));

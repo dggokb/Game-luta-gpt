@@ -8566,6 +8566,10 @@ public class GameView extends SurfaceView
             return engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).x;
         }
 
+        @Override public float meioDoPalco() {
+            return WORLD_WIDTH * 0.5f;
+        }
+
         @Override public void efeito(String nome, int lado, boolean noPeito, float dx, float escala, boolean atras) {
             CombatFighter f = engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT);
             AnimacaoManual.Pose p = cinematica.poseAnimada(lado);

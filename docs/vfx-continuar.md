@@ -1496,6 +1496,18 @@ os lotes seguintes do efeitos-gpt.md.
   tamanho); os fortes seguem com o `impacto_ar_super`.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Rodada de 14/11: a briga dos irmãos crianças animada à mão
+
+- **Pedido:** refazer a briga dos irmãos (Prólogo) no motor novo de animação à mão, no lugar
+  dos vídeos.
+- **Feito:** nenhum efeito novo, os mesmos do convite em tamanho de criança (`efeito` com 0,75 por
+  padrão no gerador, 0,6 em quem escorrega): `fumaca_dash_v05`, `fumaca_pouso`,
+  `fumaca_queda_v01` nos dois caindo. Golpes defendidos com a faísca de defesa (`impacto` força 1),
+  os punhos que se chocam e os dois se acertando com o `impacto_ar_super` (força 2), o soco
+  final com força 3 (o quadro de impacto preto e branco). Letreiros: VUSH!, PAH!, BAM!, PÁ!, POW!,
+  TUM! e TOC! (o erro do QTE).
+- **Ficou:** ele julgar no vídeo. Visto só no PC, nas duas campanhas.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a

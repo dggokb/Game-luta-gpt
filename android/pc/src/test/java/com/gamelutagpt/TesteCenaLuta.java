@@ -84,7 +84,7 @@ public final class TesteCenaLuta {
         int limite = 60 * 60;
         boolean bateu = false;
         while (!cena.rodando() && limite-- > 0) {
-            passo(quadro % 30 == 0);
+            passo(quadro % 30 == 0 && !SO_ANIMACAO);
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
                 FighterState f = jogo.engine.fighter(GameView.PLAYER).state;
                 f.takeDamage(f.life - Math.round(f.profile.maxLife * vida), 0);
@@ -94,14 +94,15 @@ public final class TesteCenaLuta {
         System.out.println("cena começou no quadro " + quadro);
 
         String video = null;
-        int noQte = 0;
+        int noQte = 0, qtes = 0;
         boolean pedia = false;
         limite = 60 * 120;
         while (!cena.acabou() && limite-- > 0) {
             boolean pede = cena.qtePedindo();
             if (pede && !pedia) {
                 noQte = 0;
-                System.out.println("QTE " + cena.qteTipo() + " no quadro " + quadro);
+                if (cena.qteErros() == 0) qtes++;
+                System.out.println("QTE " + cena.qteTipo() + " no quadro " + quadro + (cena.qteErros() > 0 ? " (de novo)" : ""));
             }
             pedia = pede;
             if (pede) {
@@ -109,6 +110,8 @@ public final class TesteCenaLuta {
                 CinematicaLuta.TipoQte tipo = cena.qteTipo();
                 boolean toca = tipo == CinematicaLuta.TipoQte.MARTELAR ? noQte % 5 == 0
                     : tipo == CinematicaLuta.TipoQte.TEMPO ? noQte == Math.round(cena.qteSegundos() * 60f) : noQte == 20;
+                // -PerraPrimeiro: o primeiro QTE fica sem resposta (o erro e o pedido de novo).
+                if (ERRA_PRIMEIRO && qtes == 1 && cena.qteErros() == 0) toca = false;
                 if (toca) {
                     toque(MotionEvent.ACTION_DOWN, 640f, 420f);
                     toque(MotionEvent.ACTION_UP, 640f, 420f);
@@ -117,12 +120,20 @@ public final class TesteCenaLuta {
             String agora = cena.video();
             if (agora != null && !agora.equals(video)) System.out.println("vídeo " + agora + " no quadro " + quadro);
             video = agora;
-            passo(quadro % 6 == 0);
+            passo((quadro % CADENCIA == 0 || pede && noQte == 12) && (!SO_ANIMACAO || cena.animando()));
         }
         System.out.println("cena acabou no quadro " + quadro);
-        for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0);
+        for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
         System.exit(0);
     }
+
+    /** Grava um quadro a cada tantos (-Pcadencia, padrão 6). */
+    static final int CADENCIA = Integer.getInteger("gameluta.cadencia", 6);
+    /** Grava só a animação manual da cena (-PsoAnimacao=true): o vídeo de conferência dela. */
+    static final boolean SO_ANIMACAO = Boolean.getBoolean("gameluta.soAnimacao");
+    /** Grava em JPG (-Pjpg=true): um décimo do PNG. */
+    static final boolean JPG = Boolean.getBoolean("gameluta.jpg");
+    static final boolean ERRA_PRIMEIRO = Boolean.getBoolean("gameluta.erraPrimeiro");
 
     static void passo(boolean gravar) throws Exception {
         avancar.invoke(jogo, CombatConfig.DT);
@@ -131,7 +142,14 @@ public final class TesteCenaLuta {
         Canvas canvas = new Canvas(tela);
         canvas.drawColor(0xFF000000);
         desenhar.invoke(jogo, canvas);
-        ImageIO.write(tela.image(), "png", new File(saida, String.format(Locale.ROOT, "q%05d.png", quadro)));
+        if (JPG) {
+            java.awt.image.BufferedImage rgb = new java.awt.image.BufferedImage(tela.image().getWidth(),
+                tela.image().getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+            rgb.getGraphics().drawImage(tela.image(), 0, 0, null);
+            ImageIO.write(rgb, "jpg", new File(saida, String.format(Locale.ROOT, "q%05d.jpg", quadro)));
+        } else {
+            ImageIO.write(tela.image(), "png", new File(saida, String.format(Locale.ROOT, "q%05d.png", quadro)));
+        }
     }
 
     @SuppressWarnings("unchecked")
