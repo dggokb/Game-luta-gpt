@@ -611,6 +611,25 @@ pontaY`: o punho, a ponta do pé), como os hits desde 11/11; a de poder continua
 vídeo `android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
 brilho; viu-se o soco fraco e o chute forte defendidos). As de ar ficam de reserva nas `DEFESAS`.
 
+**Depois, "tem que ser para tudo":** com `DEFESA_BRILHO`, a defesa de poder (especial, Super, Ultra,
+projétil) também usa as de brilho, na mesma vez das comuns, e nasce na ponta do golpe quando há
+ponta medida (o projétil não tem: nasce no contato). A `defesa_poder` ficou no fim da lista, de
+reserva. Conferido em vídeo com a Onda do Ryūga defendida (`defesa_brilho_projetil.mp4`); a
+DEFESA PERFEITA continua com o efeito dela. Pedido junto: "ainda acho que o posicionamento não tá
+legal, não sei se é porque ela tá ovalada na ponta e deveria ser reta". Endireitar o arco por
+código (andar cada linha do desenho na horizontal, por curva medida ou ajustada) foi testado em
+três jeitos e entorta os riscos do desenho (ondulados, viram "X" e ">"): não serve; a versão reta
+tem de vir desenhada.
+
+**Depois, "olha onde fica a ponta do poder e onde fica a pressão de ar"** (fotos da Onda defendida):
+o projétil acerta quando o centro de colisão já passou da frente de quem defende (o desenho da bola
+entra na cara dele), e a defesa nascia na superfície do corpo (`impactX`), uns 30 px atrás do miolo
+da bola. Medido: a Onda desenhada tem o miolo claro a 1 raio na frente do centro de colisão e a borda
+do fogo a ~3 (a folha da Onda tem a origem 22 px à frente do centro e se estende até +55). Agora o
+`HitEvent` traz `frenteX/frenteY` (centro + direção × raio × `FRENTE_DO_PROJETIL`, 1,0) e a defesa do
+projétil nasce aí, em cima da guarda. A 1,7 caía em cima da cabeça. `DEFESA_PROJETIL_NA_FRENTE`
+desligado até ele aprovar `android/app/build/sprite-review/defesa_projetil_posicao.mp4`.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
@@ -1593,39 +1612,16 @@ os lotes seguintes do efeitos-gpt.md.
   mão em vez de atravessar o corpo (`GameView.desenharProjeteisEmFolha`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
-## Rodada de 14/11: o raio do Ultra do Ryūga com o vídeo SUPER_PODER
+## Rodada de 14/11: o S1 acertando e defendido (Ryūga e Yin-lu)
 
-- **Pedido:** o vídeo `SUPER_PODER` do dono (um cometa grosso de fogo; no fim ele afina numa linha)
-  no lugar do raio de hoje, "que é bem feio", usando a animação ("ficou muito boa os frames").
-- **Feito:** `tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
-  --atras 660 --corpo 320`: 12 quadros do trecho firme (antes de afinar), cada um alinhado pela
-  frente do cometa e centrado no núcleo; a ponta é a cabeça (a borda esquerda some para nascer do
-  corpo) e o corpo é a fatia da cauda logo atrás dela, fundida para repetir sem emenda. Tiras de 12
-  quadros a 12 por segundo, como antes. A esfera nas mãos e o impacto ficaram os do `poder_ultra`.
-  Primeira tentativa com a fatia longe na cauda (`--atras 1050`): o feixe saiu fino.
-- **Depois, "dá para ver os recortes e as cores ficaram diferentes":** o corpo era desenhado em fatias
-  de 24 px com alturas diferentes (a ondulação feita para o raio antigo, liso) e repetido a cada
-  ~110 px, e a cauda afina para trás: degraus. Agora o corpo animado (tira de vídeo) é uma fatia
-  longa da cauda (`--atras 1000 --corpo 640`) esticada uma vez das mãos até a ponta, sem ondulação,
-  em fatias de 6 px só para abrir perto das mãos (`RaioFinal.drawWavyTiles`). As cores: o
-  `para_alfa` tratava tudo como luz (a borda escura das chamas virava laranja transparente); o
-  `para_alfa_fogo` deixa o escuro opaco a partir de 110 de brilho, como no vídeo.
-- **Depois, "melhorar a cor, e a base do poder tem que ter mais frames, está muito 1 2 1 2":** a
-  esfera nas mãos ainda era a do `poder_ultra` (amarela, e na prática duas ou três formas
-  alternando). Agora sai do mesmo vídeo (`--inicio 41-63:2`): a cabeça do cometa espelhada, a parte
-  redonda nas mãos e as chamas correndo para dentro do raio, 12 quadros diferentes, a mesma chama
-  laranja do raio. A aura em volta dele continua a amarela do Ultra antigo.
-- **Depois, "esse que você colocou agora ficou muito ruim, dá pra ver que foi gambiarra":** a esfera
-  voltou a ser a do `poder_ultra` (a de antes); falta uma de verdade (vídeo próprio).
-- **Depois, a esfera de verdade:** o vídeo `concentra` do dono (luz de sol concentrada, do prompt
-  sem fogo; o primeiro, com "fire energy" no prompt, saiu fogo). Quadros 21-32 (o trecho que melhor
-  fecha o loop), recorte 700 × 520 em volta do centro (674, 386), bordas apagando em 40 px, a
-  conversão de luz (`preparar_raio.para_alfa`), `centroInicio` [0,4; 0,5].
-- **Junto, "quando vai dar o Ultra põe o dash do Shinkai também, porque ele também tá indo com
-  voadora":** a investida do Ultra (e o acerto que abre a cena) e o voo do Dragon Rush usam a
-  `DASH_VOO`, o quadro 6 do dash que o dono escolheu, segurado; era o H (Ultra) e o jH (Dragon
-  Rush). As pancadas do Dragon Rush continuam o L e o M. Temporário até ter arte própria. (O dash
-  troca de quadro pela distância, não pelo tempo: por isso a pose é uma animação de um quadro.)
+- **Pedido:** os vídeos do dono do S1 batendo na defesa (`s1_defesa`: a bola se achata contra a guarda
+  e se desfaz) e acertando (`s1_acerto`: estoura em lascas), do Ryūga e da Yin-lu.
+- **Feito:** quatro efeitos em fundo preto (`efeito_video_preto.py`, a origem na frente da bola no
+  vídeo, a escala da Onda 0,2 e da palma 0,15): `onda_defesa_<id>` e `onda_acerto_<id>` de
+  `player_base` e `p02`, com a luz na cor do poder. `GameView.efeitoPoderDefendido`: o projétil
+  comum (não o Super) de quem tem o efeito toca o dele na frente da bola, no lugar do estouro de
+  defesa ou do efeito de dano; os outros personagens continuam como estavam. O `GravarLuta` ganhou
+  o passo `defende` (o rival em guarda).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente

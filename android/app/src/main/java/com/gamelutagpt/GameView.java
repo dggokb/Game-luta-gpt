@@ -2080,6 +2080,11 @@ public class GameView extends SurfaceView
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }
+        if (rivalDefende) {
+            // PC (GravarLuta, passo defende): o rival só segura para trás, em guarda.
+            opponentInput.clear();
+            opponentInput.direction = engine.fighter(OPPONENT).facing < 0 ? 1 : 5;
+        }
         boolean semPoderes = semPoderesNaLuta();
         if (semPoderes || semShinkaiNaLuta()) {
             // O treino e a briga das crianças: SUPER, ULTRA e SHINKAI não saem, de nenhum lado.
@@ -3009,7 +3014,12 @@ public class GameView extends SurfaceView
         if (!event.blocked && (event.counterHit || punish)) {
             contraPiscaAte[event.defender & 1] = engine.frame() + CONTRA_PISCA_QUADROS;
         }
-        if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
+        // O poder dele batendo na defesa ou acertando (vídeos do dono: a Onda do Ryūga, a palma da
+        // Yin-lu, 14/11): na defesa a bola se achata na guarda e se desfaz; no acerto estoura em
+        // lascas. Na frente da bola, no lugar do estouro de defesa e do efeito de dano.
+        boolean podeDefendido = event.projectile && event.strength != AttackDefinition.Strength.SUPER &&
+            efeitoPoderDefendido(attacker, event, x, y, direction);
+        if (!podeDefendido && !(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
@@ -4057,6 +4067,13 @@ public class GameView extends SurfaceView
     }
 
     private volatile int superPedido = -1;
+
+    /** PC ({@code gradle :pc:gravarLuta}, passo {@code defende}): o rival fica em guarda. */
+    public void rivalDefende(boolean sim) {
+        rivalDefende = sim;
+    }
+
+    private volatile boolean rivalDefende;
 
     /** PC ({@code gradle :pc:gravarLuta}, passo {@code shinkai}): a barra do SHINKAI cheia nos dois times. */
     public void encherShinkai() {
@@ -5569,6 +5586,19 @@ public class GameView extends SurfaceView
             locked
         );
         renderer.animacao.passo(f, renderer.motion, engine, fighterVisualY(f));
+    }
+
+    /**
+     * O projétil comum (o S1) defendido ou acertando, com o efeito próprio do personagem
+     * ({@code efeitos/onda_defesa_<id>} e {@code onda_acerto_<id>}): toca na frente da bola (o plano
+     * da guarda ou do corpo), virado para o lado da bola. False: não tem (entram os de sempre).
+     */
+    private boolean efeitoPoderDefendido(CombatFighter attacker, CombatEngine.HitEvent event, float x, float y, int direction) {
+        String nome = (event.blocked ? "onda_defesa_" : "onda_acerto_") + attacker.character().id;
+        if (!efeitos.tem(nome)) return false;
+        float px = Float.isNaN(event.frenteX) ? x : event.frenteX;
+        float py = Float.isNaN(event.frenteY) ? y : event.frenteY;
+        return efeitos.tocar(nome, px, py, 1f, direction < 0);
     }
 
     /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
