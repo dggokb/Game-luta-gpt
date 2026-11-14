@@ -1,7 +1,7 @@
 {
   "id": "player_base_hit_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_hit_heavy_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/player_base_hit_heavy_video_normalized.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Reacao em pe da mecanica de ataque (docs/revisao-base/mecanica-ataque.md): comeca na pose de dor (o 1o quadro da pausa), segura e volta a guarda; pe de tras no lugar da guarda (--fixar pe), o empurrao vem do jogo.",
   "rootMode": "authored",
   "scale": 1,
@@ -214,8 +214,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a009f3b8b36adffd716d3304de3d600d37e772aef1f6da4fec7a3e4bfe14d3e2",
-      "config": "2a5b2b38fe2c237fda9a0d87d5e14368610f69395f6c0bd370b565c90e300df9",
+      "source": "a60dc47bb4536d2136566c8b7c992436310ecd692867be149a8964e16a53b809",
+      "config": "f63f6abdd1c1a1b24786769aafd1b029fd595d45c32e7625eadc1b4f59dd28d9",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

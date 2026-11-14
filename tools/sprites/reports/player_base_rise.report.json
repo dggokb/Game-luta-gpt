@@ -1,7 +1,7 @@
 {
   "id": "player_base_rise",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_rise_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/player_base_rise_video_normalized.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -252,8 +252,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "b581971e83d3f0c37912b54dad1032f99d566747c36db506b4dc113efcc9924c",
-      "config": "745f963ef0df60f9025446837641811324dff0b1411d271dd77d80226cad7f92",
+      "source": "1d093a67b3a81e068d1fb56bd4a9b7c18f38823850e24a741c2376c22eeebff0",
+      "config": "414df59392c2b87efd3a1016d1f609d6e5157c0470a73c0d08627c88a47f70f0",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

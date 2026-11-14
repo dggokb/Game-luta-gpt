@@ -2,7 +2,7 @@
   "id": "p02_medium_kick",
   "javaName": "P02_MEDIUM_KICK",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_medium_kick_video_normalized_smear_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_medium_kick_video_normalized_smear_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_medium_kick.webp",
   "report": "tools/sprites/reports/p02_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p02_medium_kick-import.png",
@@ -24,8 +24,8 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "rootX": 216,
-  "frameWidth": 576,
+  "rootX": 108,
+  "frameWidth": 288,
   "smear": {
     "fonte": "art/sprites/source/p02_medium_kick_video_normalized.png",
     "quadros": [
@@ -44,12 +44,10 @@
       0.5
     ]
   },
-  "frameHeight": 512,
-  "rootY": 476,
+  "frameHeight": 256,
+  "rootY": 238,
   "sourceReferences": [
-    "art/sprites/source/p02_medium_kick_video_normalized_smear_sr_hd.png",
     "art/sprites/source/p02_medium_kick_video_normalized_smear.png",
     "art/sprites/source/p02_medium_kick_video_normalized.png"
-  ],
-  "pixelScale": 2
+  ]
 }

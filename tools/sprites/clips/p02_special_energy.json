@@ -2,7 +2,7 @@
   "id": "p02_special_energy",
   "javaName": "P02_SPECIAL_ENERGY",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_special_energy_video_normalized_smear_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_special_energy_video_normalized_smear_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_special_energy.webp",
   "report": "tools/sprites/reports/p02_special_energy.report.json",
   "preview": "android/app/build/sprite-review/p02_special_energy-import.png",
@@ -25,15 +25,14 @@
     "limpar_chao": true,
     "ancorar_pe": true
   },
-  "rootX": 228,
+  "rootX": 114,
   "sourceReferences": [
-    "art/sprites/source/p02_special_energy_video_normalized_smear_sr_hd.png",
     "art/sprites/source/p02_special_energy_video_normalized_smear.png",
     "art/sprites/source/p02_special_energy_video_normalized.png"
   ],
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootY": 476,
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "rootY": 238,
   "smear": {
     "fonte": "art/sprites/source/p02_special_energy_video_normalized.png",
     "quadros": [
@@ -51,6 +50,5 @@
       1.0,
       0.5
     ]
-  },
-  "pixelScale": 2
+  }
 }

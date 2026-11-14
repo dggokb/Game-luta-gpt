@@ -1,7 +1,7 @@
 {
   "id": "player_base_crouch_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized_smear_sr_hd.png",
+  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2H com o braco esquerdo, a partir de inicio_agachado: guarda agachada, sobe, topo do uppercut, volta a guarda. Escala pelo corpo agachado (0.535, igual ao 2M); quadros com borrao pulados.",
   "rootMode": "authored",
   "scale": 1,
@@ -423,12 +423,11 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "59c8dfa02245eaeae049e984e0ad18c553afd380d09b8c0b8512bb49df0787f1",
-      "config": "7441a95ef0a8518b64b37cf5760d3df56e3642357650d614233478af08d39293",
+      "source": "c191dfd1d5932db0cd1c37357347b67ed10da8bf941071d49bc2046136ec4d67",
+      "config": "ec44d7e0415326ff3626427e3d98f3a2692cfa8cdfc4a4389b7620c5cb038aba",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_crouch_heavy_video_normalized_smear.png": "c191dfd1d5932db0cd1c37357347b67ed10da8bf941071d49bc2046136ec4d67",
       "art/sprites/source/player_base_crouch_heavy_video_normalized.png": "e638da4c12080ca9337199c89ffc994371f61310ac64222e24017c7c09bce9a8"
     }
   }

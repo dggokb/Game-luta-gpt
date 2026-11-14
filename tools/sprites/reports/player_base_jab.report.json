@@ -1,7 +1,7 @@
 {
   "id": "player_base_jab",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jab_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/player_base_jab_video_normalized.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -347,8 +347,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8fdf1460ccd7655b5ce9adbf2ac0a05b4c5ce9f753405f60039f173e166db3d4",
-      "config": "fc8626825c674e0c224874bc9234cbee6e6f810b266d7b4297fbeeb455f4d306",
+      "source": "e43a814618ca060653c27740cc639f3242ee67aa2565c69903470089a69092cc",
+      "config": "7ba3537a3970ac9c50fd63f5a1506e74098c2f0736e783a0b87c78e6f3b09d0f",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

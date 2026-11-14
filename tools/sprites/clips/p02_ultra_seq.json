@@ -2,7 +2,7 @@
   "id": "p02_ultra_seq",
   "javaName": "P02_ULTRA_SEQ",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_ultra_seq_video_normalized_2x.png",
+  "source": "art/sprites/source/p02_ultra_seq_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_ultra_seq.webp",
   "report": "tools/sprites/reports/p02_ultra_seq.report.json",
   "preview": "android/app/build/sprite-review/p02_ultra_seq-import.png",
@@ -11,10 +11,10 @@
   "rootMode": "authored",
   "sourceNote": "p02: Ultra em sequência, vídeo Seedance ultra.mp4 (pasta animations/p02 do Drive), quadros e golpes em tools/sprites/ultras.json.",
   "columns": 8,
-  "frameWidth": 1152,
-  "frameHeight": 704,
-  "rootX": 420,
-  "rootY": 660,
+  "frameWidth": 576,
+  "frameHeight": 352,
+  "rootX": 210,
+  "rootY": 330,
   "video": {
     "arquivo": "ultra.mp4",
     "personagem": "p02",
@@ -64,9 +64,5 @@
       1.0
     ],
     "aparar_borda": 10
-  },
-  "sourceReferences": [
-    "art/sprites/source/p02_ultra_seq_video_normalized.png"
-  ],
-  "pixelScale": 2
+  }
 }

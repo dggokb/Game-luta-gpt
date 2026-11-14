@@ -2,7 +2,7 @@
   "id": "p02_joelho_garca",
   "javaName": "P02_JOELHO_GARCA",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_joelho_garca.webp",
   "report": "tools/sprites/reports/p02_joelho_garca.report.json",
   "preview": "android/app/build/sprite-review/p02_joelho_garca-import.png",
@@ -25,10 +25,10 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "frameWidth": 576,
-  "frameHeight": 576,
-  "rootX": 186,
-  "rootY": 540,
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 93,
+  "rootY": 270,
   "smear": {
     "fonte": "art/sprites/source/p02_joelho_garca_video_normalized.png",
     "quadros": [
@@ -48,9 +48,7 @@
     ]
   },
   "sourceReferences": [
-    "art/sprites/source/p02_joelho_garca_video_normalized_smear_sr_hd.png",
     "art/sprites/source/p02_joelho_garca_video_normalized_smear.png",
     "art/sprites/source/p02_joelho_garca_video_normalized.png"
-  ],
-  "pixelScale": 2
+  ]
 }

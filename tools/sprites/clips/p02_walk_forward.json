@@ -2,7 +2,7 @@
   "id": "p02_walk_forward",
   "javaName": "P02_WALK_FORWARD",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_walk_forward_video_normalized_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_walk_forward_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_walk_forward.webp",
   "report": "tools/sprites/reports/p02_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p02_walk_forward-import.png",
@@ -22,13 +22,11 @@
     "colunas": 11,
     "pe_no_chao": true
   },
-  "frameWidth": 448,
-  "rootX": 204,
+  "frameWidth": 224,
+  "rootX": 102,
   "sourceReferences": [
-    "art/sprites/source/p02_walk_forward_video_normalized_sr_hd.png",
     "art/sprites/source/p02_walk_forward_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2
+  "frameHeight": 256,
+  "rootY": 238
 }

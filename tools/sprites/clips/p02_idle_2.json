@@ -2,7 +2,7 @@
   "id": "p02_idle_2",
   "javaName": "P02_IDLE_2",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_idle_2_video_normalized_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_idle_2_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_idle_2.webp",
   "report": "tools/sprites/reports/p02_idle_2.report.json",
   "preview": "android/app/build/sprite-review/p02_idle_2-import.png",
@@ -25,13 +25,11 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "frameWidth": 384,
-  "frameHeight": 640,
-  "rootX": 192,
-  "rootY": 604,
+  "frameWidth": 192,
+  "frameHeight": 320,
+  "rootX": 96,
+  "rootY": 302,
   "sourceReferences": [
-    "art/sprites/source/p02_idle_2_video_normalized_sr_hd.png",
     "art/sprites/source/p02_idle_2_video_normalized.png"
-  ],
-  "pixelScale": 2
+  ]
 }

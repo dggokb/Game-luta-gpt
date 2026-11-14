@@ -1,7 +1,7 @@
 {
   "id": "player_base_special_s3",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_special_s3_video_normalized_smear_sr_hd.png",
+  "source": "art/sprites/source/player_base_special_s3_video_normalized_smear.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Salto e giro no proprio desenho; anel de energia removido (--sem-efeitos).",
   "rootMode": "authored",
   "scale": 1,
@@ -879,12 +879,11 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "cf6864225ea10fdd77283d7183eaaba5ca78632e3aab6b2b4b77fa6f8e80dca2",
-      "config": "6fcf10a00359c856fd154dedede0fcd70be1e3adb878f855599d773e1ce1af37",
+      "source": "82bdd6c0803e7304f99ea5dad5b94c8fcd6fb355a7c30880d821ddab489277b1",
+      "config": "b6b54fcad3cac1993c9a36b4c8c8ac5fc4d6984d3712e6e8f6c2f6d65fb4b8a1",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_special_s3_video_normalized_smear.png": "82bdd6c0803e7304f99ea5dad5b94c8fcd6fb355a7c30880d821ddab489277b1",
       "art/sprites/source/player_base_special_s3_video_normalized.png": "d3da4de8aa92eab17a5c325b1b004608567c7ff88c84c0079433cbbbfd1ec748"
     }
   }

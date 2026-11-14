@@ -2,7 +2,7 @@
   "id": "p02_crouch",
   "javaName": "P02_CROUCH",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_crouch_video_normalized_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_crouch_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_crouch.webp",
   "report": "tools/sprites/reports/p02_crouch.report.json",
   "preview": "android/app/build/sprite-review/p02_crouch-import.png",
@@ -24,13 +24,11 @@
     "limpar_chao": true,
     "emendar_idle": true
   },
-  "frameWidth": 384,
-  "rootX": 194,
+  "frameWidth": 192,
+  "rootX": 97,
   "sourceReferences": [
-    "art/sprites/source/p02_crouch_video_normalized_sr_hd.png",
     "art/sprites/source/p02_crouch_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2
+  "frameHeight": 256,
+  "rootY": 238
 }

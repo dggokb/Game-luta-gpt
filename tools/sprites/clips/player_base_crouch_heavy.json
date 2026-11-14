@@ -2,7 +2,7 @@
   "id": "player_base_crouch_heavy",
   "javaName": "CROUCH_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized_smear_sr_hd.png",
+  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_heavy.webp",
   "report": "tools/sprites/reports/player_base_crouch_heavy.report.json",
   "preview": "android/app/build/sprite-review/crouch_heavy-import.png",
@@ -16,7 +16,6 @@
   "rootY": 654,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2H com o braco esquerdo, a partir de inicio_agachado: guarda agachada, sobe, topo do uppercut, volta a guarda. Escala pelo corpo agachado (0.535, igual ao 2M); quadros com borrao pulados.",
   "sourceReferences": [
-    "art/sprites/source/player_base_crouch_heavy_video_normalized_smear.png",
     "art/sprites/source/player_base_crouch_heavy_video_normalized.png"
   ],
   "pixelScale": 2.0,

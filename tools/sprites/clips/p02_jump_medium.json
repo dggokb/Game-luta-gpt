@@ -2,7 +2,7 @@
   "id": "p02_jump_medium",
   "javaName": "P02_JUMP_MEDIUM",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_jump_medium_video_normalized_smear_sr_hd_2x.png",
+  "source": "art/sprites/source/p02_jump_medium_video_normalized_smear_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_jump_medium.webp",
   "report": "tools/sprites/reports/p02_jump_medium.report.json",
   "preview": "android/app/build/sprite-review/p02_jump_medium-import.png",
@@ -25,12 +25,11 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "frameWidth": 768,
-  "frameHeight": 448,
-  "rootX": 270,
-  "rootY": 390,
+  "frameWidth": 384,
+  "frameHeight": 224,
+  "rootX": 135,
+  "rootY": 195,
   "sourceReferences": [
-    "art/sprites/source/p02_jump_medium_video_normalized_smear_sr_hd.png",
     "art/sprites/source/p02_jump_medium_video_normalized_smear.png",
     "art/sprites/source/p02_jump_medium_video_normalized.png"
   ],
@@ -50,6 +49,5 @@
       1.0,
       0.5
     ]
-  },
-  "pixelScale": 2
+  }
 }

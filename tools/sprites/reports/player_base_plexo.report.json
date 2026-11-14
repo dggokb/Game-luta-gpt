@@ -1,7 +1,7 @@
 {
   "id": "player_base_plexo",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_plexo_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/player_base_plexo_video_normalized.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -347,12 +347,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5bc8695e3edad994f7a5c8d16f9756ce4841709edd97a7ddcda9462c23f95a03",
-      "config": "87deca75c06eee7c3efdf52ccf2d930f13e30ca80221d43e910668381a62f6df",
+      "source": "27bbfad22669a5330f9fdde957a7103f58ee080bd29d67e3f3ef072bc48561ed",
+      "config": "20c01fa2cda25ab5455e9486d9fe254d1f9cfd9bdbfa79a8deae3cb96112a5c7",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
-    },
-    "referenceSources": {
-      "art/sprites/source/player_base_plexo_video_normalized.png": "27bbfad22669a5330f9fdde957a7103f58ee080bd29d67e3f3ef072bc48561ed"
     }
   }
 }
