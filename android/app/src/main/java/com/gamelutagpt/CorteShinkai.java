@@ -52,10 +52,15 @@ final class CorteShinkai {
 
     /** Começa o corte de quem ativou: o lado da tela dele, o rosto (pode ser null) e o tipo. */
     void comecar(boolean ladoDireito, Bitmap retrato, Shinkai.Type type) {
+        comecar(ladoDireito, retrato, type, type.color);
+    }
+
+    /** O mesmo, com a cor do SHINKAI do lutador (Shinkai.corDe). */
+    void comecar(boolean ladoDireito, Bitmap retrato, Shinkai.Type type, int corDoLutador) {
         quadro = 0;
         direita = ladoDireito;
         rosto = retrato;
-        cor = type.color;
+        cor = corDoLutador;
         tipo = type.label;
     }
 

@@ -3331,7 +3331,7 @@ final class CombatEngine {
         Projectile p = new Projectile(
             f.x + f.facing * (data.spawnX + 20f), f.y - height, Math.max(420f, data.range * 0.7f),
             data.speed * config.shinkaiEnergyProjectileSpeed * 1.15f, 15f,
-            data.damage * config.shinkaiEnergyShotDamagePermille / 1000, f.state.shinkaiType.color,
+            data.damage * config.shinkaiEnergyShotDamagePermille / 1000, f.state.corShinkai(),
             f.index, f.facing, f.character().attack("S"), profile.energyVisual);
         p.mini = true;
         energyProjectiles.add(p);

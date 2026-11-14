@@ -104,7 +104,7 @@ def chave(quadro, fundo):
     return np.dstack([cor, a * 255.0]).astype(np.uint8)
 
 
-def mascara_bordas(w, h, borda, apagar):
+def mascara_bordas(w, h, borda, apagar, chao_y=None):
     """Multiplicador do alfa: some aos poucos nos últimos `borda` px do quadro do vídeo (o
     brilho que encosta na beira não vira uma linha reta no jogo) e no retângulo `apagar` (a
     marca d'água), com a beira dele borrada para não deixar um dente no efeito."""
@@ -114,10 +114,17 @@ def mascara_bordas(w, h, borda, apagar):
         ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
         nx = np.abs(xs - (w - 1) / 2.0) / ((w - 1) / 2.0)
         ny = np.abs(ys - (h - 1) / 2.0) / ((h - 1) / 2.0)
+        if chao_y is not None:
+            # Com o personagem dentro do efeito (a ativação do SHINKAI), os pés ficam perto da
+            # beira de baixo: ela não apaga; o que passa do chão some até a beira.
+            ny = np.where(ys > (h - 1) / 2.0, 0.0, ny)
         r = (nx ** 4 + ny ** 4) ** 0.25
         dentro = 1.0 - 2.0 * borda / float(min(w, h))
         t = np.clip((1.0 - r) / max(1e-3, 1.0 - dentro), 0.0, 1.0)
         m *= t * t * (3.0 - 2.0 * t)
+    if chao_y is not None and chao_y < h - 1:
+        ys = np.arange(h, dtype=np.float32)[:, None]
+        m *= np.clip((h - 1 - ys) / float(h - 1 - chao_y), 0.0, 1.0)
     if apagar:
         r = np.ones((h, w), np.float32)
         r[apagar[1]:apagar[3], apagar[0]:apagar[2]] = 0.0
@@ -165,7 +172,7 @@ def empacotar(imagens):
 def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=None,
               altura=200.0, recorte=None, saida=SAIDA, previa=PREVIA, fps_png=24.0,
               escala_mundo=None, resolucao=None, velocidade=1.0, apagar=None, borda=0,
-              alfa_corte=0.0, escuro=0, cinza=0.0, segurar=None, soma=0.0):
+              alfa_corte=0.0, escuro=0, cinza=0.0, segurar=None, soma=0.0, chao_y=None):
     if Path(video).is_dir():
         quadros, fps = ler_pngs(video, inicio, fim, passo), fps_png
     else:
@@ -178,9 +185,10 @@ def converter(video, nome, inicio=0, fim=None, passo=1, ancora='centro', origem=
     else:
         fundo = cor_do_fundo(quadros)
         rgba = [chave(q, fundo) for q in quadros]
-    if apagar or borda or alfa_corte or escuro or cinza:
+    if apagar or borda or alfa_corte or escuro or cinza or chao_y is not None:
         h, w = rgba[0].shape[:2]
-        mascara = mascara_bordas(w, h, borda, apagar)
+        mascara = mascara_bordas(w, h, borda, apagar,
+                                 None if chao_y is None else chao_y - (recorte[1] if recorte else 0))
         for q in rgba:
             a = q[..., 3].astype(np.float32) / 255.0
             if alfa_corte:
@@ -324,6 +332,7 @@ def main():
     p.add_argument('--alfa-corte', type=float, default=0.0, help='alfa abaixo disso some (véu do fundo); o resto é reesticado')
     p.add_argument('--escuro', type=int, default=0, help='véu cinza mais escuro que isso (0-255) e meio transparente some')
     p.add_argument('--cinza', type=float, default=0.0, help='véu meio transparente com saturação abaixo disso (0-1) some')
+    p.add_argument('--chao-y', type=int, help='y do chão no vídeo: a --borda não apaga embaixo (os pés), e abaixo do chão o efeito some até a beira')
     p.add_argument('--segurar', type=lambda t: numeros(t, 2), help='quadro,ms: o vídeo para nesse quadro por mais ms (marcaMs no json)')
     p.add_argument('--soma', type=float, default=0.0,
                    help='efeito de luz: quanto soma com o que está embaixo no jogo, de 0 (cobre) a 1 (luz pura)')
@@ -334,7 +343,7 @@ def main():
                                a.altura, a.recorte, fps_png=a.fps, escala_mundo=a.escala_mundo,
                                resolucao=a.resolucao, velocidade=a.velocidade, apagar=a.apagar,
                                borda=a.borda, alfa_corte=a.alfa_corte, escuro=a.escuro, cinza=a.cinza,
-                               segurar=a.segurar, soma=a.soma, saida=a.saida or SAIDA)
+                               segurar=a.segurar, soma=a.soma, saida=a.saida or SAIDA, chao_y=a.chao_y)
     print(f"{len(dados['quadros'])} quadros em {destino} (prévia em {PREVIA / (a.nome + '.gif')})")
 
 

@@ -36,6 +36,18 @@ final class Shinkai {
         }
     }
 
+    /** A aura branca da Yin-lu (pedido do dono, 14/11: a garça do vídeo da ativação é branca). */
+    static final int COR_BRANCA = 0xFFF2F7FF;
+
+    /**
+     * A cor do SHINKAI do lutador (contorno, barra, corte, clarão): a do tipo, ou a própria dele
+     * quando a ativação tem cor (a Yin-lu é TECHNIQUE com a aura branca).
+     */
+    static int corDe(String id, Type type) {
+        if ("p02".equals(id)) return COR_BRANCA;
+        return type.color;
+    }
+
     /** A cor da Ruptura do protótipo PERCEPCAO (a aura mais quente). */
     static final int COR_RUPTURA = 0xFFFF5A2A;
 

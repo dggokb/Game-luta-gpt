@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
  *   <li>{@code segura:D} / {@code solta:D} — andar, agachar, defender;</li>
  *   <li>{@code especial:J} — ↓ ↘ → e o botão (o especial de comando, olhando para a direita);</li>
  *   <li>{@code super:3000} — a barra de Super dos dois times (1000 por barra);</li>
+ *   <li>{@code shinkai} — a barra do SHINKAI cheia nos dois times ({@code tecla:P} ativa);</li>
  *   <li>{@code grava:90:nome} — começa a gravar 90 quadros seguidos enquanto o roteiro continua;
  *       {@code fim} espera a gravação acabar;</li>
  *   <li>{@code rota:L,M,M,S3,W90,C200,S2} — aperta o combo quadro a quadro, como o executor dos
@@ -113,6 +114,11 @@ public final class GravarLuta {
                     // O rival encostado na borda da direita e nós a tantos px: canto:100
                     c.jogo().irParaOCanto(Float.parseFloat(p[1]));
                     c.esperar(0.2);
+                    break;
+                case "shinkai":
+                    // A barra do SHINKAI cheia nos dois times (depois, tecla:P ativa).
+                    c.jogo().encherShinkai();
+                    c.esperar(0.1);
                     break;
                 case "super":
                     c.jogo().encherSuper(Integer.parseInt(p[1]));

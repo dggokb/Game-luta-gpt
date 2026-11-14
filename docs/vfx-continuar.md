@@ -175,6 +175,16 @@ ficava escondida dentro da silhueta e não aparecia).
 
 Build PASS; `testarMotor` só com as 3 falhas antigas. Jogo e celular: não vistos.
 
+## S3 do Ryūga com menos risco (13/11, pedido do dono: "tô achando que tá com muito risco")
+
+Os 6 chutes tinham cada um a língua longa a 100%. Agora `--comprimento 0.6,0.45` e
+`--opacidade 0.5,0.5,0.5,0.5,0.5,1`: os cinco primeiros curtos e a 50%, o último chute inteiro.
+Gravado no jogo do PC, antes e depois lado a lado.
+
+Mesmo dia, outra sessão: o giro do S3 desceu 28 px no desenho (passava por cima da Yin-lu;
+`docs/personagens/p01.md`). O smear foi refeito com os mesmos parâmetros acima sobre a folha
+baixada (sem mudar o tipo), e o normal map da folha refeito (`normal_map.py --refazer`).
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma
@@ -569,6 +579,29 @@ chão. Folha: `efeito_video.py art/vfx/fumaca_queda_v01/frames --nome fumaca_que
 --origem 292,182 --escala-mundo 0.6`. Toca no pouso do pulo (no lugar da `fumaca_pouso`, tamanho
 0,75 + 0,35 × a força da poeira) e quando o corpo bate no chão e quando assenta depois do quique
 (no lugar da `fumaca_pulo`, 1,1 e 0,8).
+
+## Defesas de ar desenhadas pelo dono (14/11)
+
+"Vamos trocar os efeitos de defesa para esses três": três GIFs de 6 quadros (512 × 512, alfa de
+1 bit, 80 e 90 ms), em `art/vfx/defesa_ar_v01` (os GIFs e os quadros em PNG). Saem no lugar de
+`defesa`, `defesa_2` e `defesa_3` (o escudo azul de `defesa_01.png`/`defesa_02.png`); a de poder
+(`defesa_poder`) não mudou. O arco abre para o lado contrário de quem bate, como o escudo de antes.
+Origem no clarão do primeiro quadro (248,262; 245,257; 243,252); tamanho igual ao das antigas
+(~245 px do mundo de altura: escala 1,05, 0,65 e 0,78). A luz que a defesa joga (`"luz"`) ficou,
+na cor branca fria (#E6F0FF) em vez do azul. As de pressão de ar de 09/11 (outras, tiradas de
+vídeo) estão no histórico, commit ba600bcf. Para gravar uma defesa comum, o boneco tem de estar
+defendendo antes do golpe (segurar para trás na hora vira DEFESA PERFEITA, outro efeito).
+
+**Depois (14/11), "compara com esses e vê se não fica melhor":** mais três GIFs do dono, o mesmo
+arco em versão de brilho (luz em fundo preto, com halo; 506 × 506, 6 quadros de 120, 120 e 80 ms),
+em `art/vfx/defesa_brilho_v01` (GIFs e quadros já recortados do preto pelo `efeito_imagem`).
+Folhas `defesa_brilho`, `defesa_brilho_2` e `defesa_brilho_3`, do mesmo tamanho das de ar
+(~250 px; origem 254,247 / 257,250 / 256,252; escala 0,56 / 0,72 / 0,85; fps 8,33 / 8,33 / 12,5),
+com a mesma `"luz"`. **Ainda não tocam na luta:** as `DEFESAS` do `GameView` seguem com as de ar
+até o dono escolher. Vídeo lado a lado: `android/app/build/sprite-review/defesas_ar_vs_brilho.mp4`
+(gravado com o boneco agachado defendendo por um ajuste de teste que não foi para o repositório).
+Para trocar: pôr `defesa_brilho*` no lugar de `defesa*` nas `DEFESAS` (e no `DEFESA_PODER`, se ele
+quiser a de poder caindo nelas).
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
@@ -1473,6 +1506,54 @@ os lotes seguintes do efeitos-gpt.md.
   o `caixas_sprites.py --write` refaria as caixas de todos os golpes (vários foram acertados à mão),
   então aplicar só no golpe trocado; o `linha_de_acao.py --write` quebra num print do
   `CAMINHO_MANUAL` do S2 (antigo): chamar `caminhos()` e gravar só o do golpe.
+
+## Rodada de 13/11: efeitos da luta animada à mão do convite
+
+- **Pedido:** a luta do convite (Ryūga × Yin-lu) inteira animada à mão, depois de aprovar o teste
+  ("eh isso porra! faz a cena inteira").
+- **Feito:** nenhum efeito novo; a cena usa os que a luta já tem. A ação `efeito` do roteiro toca
+  uma pasta de `assets/efeitos` num lutador (pés ou peito): `fumaca_dash_v05` no arranque e em
+  quem escorrega para trás (`atras`), `fumaca_pulo`, `fumaca_pouso`, `fumaca_queda_v01` no golpe
+  que afunda. O `impacto` de força 1 (golpe defendido) trocou o estouro de ar, que cobria os dois,
+  pela faísca de defesa da luta (`defesa`, `defesa_2`, `defesa_3`, uma de cada vez, 0,7 do
+  tamanho); os fortes seguem com o `impacto_ar_super`.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 14/11: a briga dos irmãos crianças animada à mão
+
+- **Pedido:** refazer a briga dos irmãos (Prólogo) no motor novo de animação à mão, no lugar
+  dos vídeos.
+- **Feito:** nenhum efeito novo, os mesmos do convite em tamanho de criança (`efeito` com 0,75 por
+  padrão no gerador, 0,6 em quem escorrega): `fumaca_dash_v05`, `fumaca_pouso`,
+  `fumaca_queda_v01` nos dois caindo. Golpes defendidos com a faísca de defesa (`impacto` força 1),
+  os punhos que se chocam e os dois se acertando com o `impacto_ar_super` (força 2), o soco
+  final com força 3 (o quadro de impacto preto e branco). Letreiros: VUSH!, PAH!, BAM!, PÁ!, POW!,
+  TUM! e TOC! (o erro do QTE).
+- **Ficou:** ele julgar no vídeo. Visto só no PC, nas duas campanhas.
+- **Depois (14/11), "são crianças, a ideia é errar bastante" e "usa também os frames do vídeo
+  deles errando":** quase todo golpe vira VUSH! no vento (menos faíscas de defesa); a troca de
+  golpes toca o vídeo `ep00/qt1` no lugar dos meninos, com PÁ! e VUSH! nos golpes dele.
+- **Depois, "ficou praticamente igual o antigo":** o vídeo saiu; as poses dele viraram o clipe
+  `CENA_BRIGA` de cada menino (os efeitos do vídeo apagados no recorte: o jogo desenha os dele) e
+  a troca de golpes é animada à mão, só com VUSH! (tudo erra).
+
+## Rodada de 14/11: a ativação do SHINKAI da Yin-lu (a garça branca)
+
+- **Pedido:** o vídeo `shinkai` dela (ela vira de frente, abre os braços, a garça branca de luz
+  nasce atrás, abre as asas e se desfaz em penas; volta à guarda), "igual fazemos hoje com o
+  shinkai do Ryūga, e a aura em volta dela vai ser branca".
+- **Feito:** o vídeo inteiro virou o efeito `shinkai_p02` (`efeito_video.py --passo 3
+  --velocidade 1.5 --escala-mundo 0.4173 --origem 670,733 --resolucao 0.95 --segurar 15,800
+  --alfa-corte 0.45 --borda 120 --chao-y 733`): no tamanho dela no jogo (a escala das montagens
+  H3 dela), parado 0,8 s com as asas abertas para o corte com o nome, o véu verde-claro cortado e a
+  beira do vídeo apagando aos poucos. `--chao-y` é novo: a borda não apaga os pés (que ficam a
+  35 px do fundo do vídeo), só o que passa do chão. Luz branca (`#E6F2FF`). A `SHINKAI_ATIVA`
+  dela é a guarda do idle com o tempo do efeito (4,3 s); o sprite some enquanto o efeito toca,
+  como no Ryūga.
+- **A aura branca:** `Shinkai.corDe` dá a cor do SHINKAI por lutador (a do tipo, ou a própria). A
+  Yin-lu continua TECHNIQUE, mas o contorno, a barra, o corte, o clarão, o parry e os raios dela
+  saem brancos (`COR_BRANCA`).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
 
 ## Fora do VFX, o que ficou pendente
 

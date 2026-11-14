@@ -40,7 +40,8 @@ public class ShinkaiClashTest {
         /** P1 liga, o brilho passa, o CPU responde: começa o confronto; espera a entrada. */
         ShinkaiClash clash() {
             shinkai(0);
-            steps(engine.config.shinkaiFlashFrames + 2);
+            // A ativação de quem ligou (a cena da Yin-lu, 14/11, é mais longa que o clarão).
+            steps(engine.shinkaiAtivacaoQuadros(f(0)) + 2);
             shinkai(1);
             assertTrue(engine.cues().contains("SHINKAI_CLASH"));
             ShinkaiClash c = engine.shinkaiClash();
