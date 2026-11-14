@@ -1612,6 +1612,18 @@ os lotes seguintes do efeitos-gpt.md.
   mão em vez de atravessar o corpo (`GameView.desenharProjeteisEmFolha`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Rodada de 14/11: o S1 acertando e defendido (Ryūga e Yin-lu)
+
+- **Pedido:** os vídeos do dono do S1 batendo na defesa (`s1_defesa`: a bola se achata contra a guarda
+  e se desfaz) e acertando (`s1_acerto`: estoura em lascas), do Ryūga e da Yin-lu.
+- **Feito:** quatro efeitos em fundo preto (`efeito_video_preto.py`, a origem na frente da bola no
+  vídeo, a escala da Onda 0,2 e da palma 0,15): `onda_defesa_<id>` e `onda_acerto_<id>` de
+  `player_base` e `p02`, com a luz na cor do poder. `GameView.efeitoPoderDefendido`: o projétil
+  comum (não o Super) de quem tem o efeito toca o dele na frente da bola, no lugar do estouro de
+  defesa ou do efeito de dano; os outros personagens continuam como estavam. O `GravarLuta` ganhou
+  o passo `defende` (o rival em guarda).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
