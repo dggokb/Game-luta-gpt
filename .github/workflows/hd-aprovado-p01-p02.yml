@@ -1,0 +1,140 @@
+name: SOKON HD aprovado P01 P02 (Fable)
+
+on:
+  push:
+    branches: [game-luta-sprite-fable]
+    paths:
+      - 'tools/sprites/hd_aprovado_p01_p02.py'
+      - '.github/workflows/hd-aprovado-p01-p02.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sokon-hd-aprovado-fable
+  cancel-in-progress: false
+
+jobs:
+  render:
+    name: Original para master 4x e runtime 2x [${{ matrix.shard }}]
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ambiente Real-ESRGAN em CPU
+        run: |
+          python3 -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
+          python3 -m pip install --disable-pip-version-check numpy scipy -r tools/sprites/requirements.txt
+      - name: Pesos oficiais e SHA validado pelo script
+        run: |
+          curl --fail --location --retry 4 --retry-delay 5 \
+            https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth \
+            -o "$RUNNER_TEMP/realesr-animevideov3.pth"
+      - name: Real-ESRGAN 4x original, master, alfa e sprite 2x
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python3 tools/sprites/hd_aprovado_p01_p02.py \
+            --weights "$RUNNER_TEMP/realesr-animevideov3.pth" \
+            --shard "$SHARD" --shards 12
+      - name: Selecionar somente arquivos do lote
+        run: |
+          python3 - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          dest=Path(os.environ['RUNNER_TEMP'])/'hd-files'
+          manifests=sorted(Path('docs/art/hd-aprovado-p01-p02').glob('*.json'))
+          if not manifests:
+              raise SystemExit('Sem arquivos de renderização: lote inesperadamente vazio')
+          for manifest in manifests:
+              rec=json.loads(manifest.read_text(encoding='utf8'))
+              items=(manifest,Path(rec['output']),Path('tools/sprites/clips')/(rec['clip']+'.json'))
+              for file in items:
+                  out=dest/file
+                  out.parent.mkdir(parents=True,exist_ok=True)
+                  shutil.copy2(file,out)
+          print('Entregas do lote:',len(manifests))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hd-aprovado-${{ matrix.shard }}
+          path: ${{ runner.temp }}/hd-files/
+          if-no-files-found: error
+          retention-days: 3
+
+  integrate:
+    name: Verificar 2x, reconstruir WebP e integrar na Fable
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Checkout exato da execução
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Reunir sprites originais processados em 12 lotes
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hd-aprovado-*
+          merge-multiple: true
+          path: .
+      - name: Dependências do atlas e conferência de pés
+        run: |
+          python3 -m pip install --disable-pip-version-check \
+            -r tools/sprites/requirements.txt numpy opencv-python-headless
+      - name: Validar hashes das fontes e densidade final
+        run: |
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          items=sorted(Path('docs/art/hd-aprovado-p01-p02').glob('*.json'))
+          if not items:
+              raise SystemExit('Nenhuma fonte nova HD foi enviada')
+          total=0
+          for f in items:
+              m=json.loads(f.read_text(encoding='utf8'))
+              source=Path(m['source_original'])
+              output=Path(m['output'])
+              clip=json.loads((Path('tools/sprites/clips')/(m['clip']+'.json')).read_text(encoding='utf8'))
+              assert clip['source']==m['output'],m['clip']
+              assert float(clip['pixelScale'])==2,m['clip']
+              assert hashlib.sha256(source.read_bytes()).hexdigest()==m['source_original_sha256'],m['clip']
+              assert hashlib.sha256(output.read_bytes()).hexdigest()==m['output_sha256'],m['clip']
+              assert len(m['master_4x_sha256_by_frame'])==m['frames'],m['clip']
+              total+=m['frames']
+          print('Fontes HD verificadas:',len(items),'clipes,',total,'frames')
+          PY
+      - name: Compilar todos os atlas e validar metadados
+        run: |
+          python3 tools/sprites/build_characters.py --write
+          python3 tools/sprites/build_characters.py --check
+          git diff --check
+      - name: Commit seguro apenas na branch solicitada
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin game-luta-sprite-fable
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/game-luta-sprite-fable)" || {
+            echo 'A branch mudou durante a renderização; não sobrescrever trabalho de ninguém.' >&2
+            exit 1
+          }
+          git config user.name 'Sokon HD Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --stat
+          git diff --cached --quiet && {
+            echo 'Sem arquivos para integrar' >&2
+            exit 1
+          }
+          git commit -m 'art: HD aprovado P01 Ryuga e P02 Yin-lu, original 4x para runtime 2x'
+          git push origin HEAD:game-luta-sprite-fable
+          gh workflow run build-apk.yml --ref game-luta-sprite-fable
+          echo 'HD integrado; APK novo solicitado.'
