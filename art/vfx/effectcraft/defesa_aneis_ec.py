@@ -16,6 +16,7 @@ liso: 12 quadros a 16,7 (as defesas 1 e 2) e 25 por segundo (a 3), o mesmo tempo
     efeito_video.py PASTA/defesa_1 --nome defesa_brilho_aneis   --fps 16.67 --origem 254,247 --escala-mundo 0.56
     efeito_video.py PASTA/defesa_2 --nome defesa_brilho_aneis_2 --fps 16.67 --origem 257,250 --escala-mundo 0.72
     efeito_video.py PASTA/defesa_3 --nome defesa_brilho_aneis_3 --fps 25    --origem 256,252 --escala-mundo 0.85
+Com mais spray (o que está na luta desde 14/11): --arte spray e os nomes defesa_brilho_spray_aneis*.
 """
 import argparse
 import json
@@ -86,7 +87,7 @@ def montar(nome, item, centro, escala, fps):
     return s
 
 
-def rodar(cli, k, saida):
+def rodar(cli, k, saida, arte='defesa'):
     centro, escala, fps_arte = DEFESAS[k]
     fps = fps_arte * 2
     nome = f'defesa_{k}'
@@ -95,7 +96,7 @@ def rodar(cli, k, saida):
     for velho in destino.glob('*.png'):
         velho.unlink()
     projeto = Path(tempfile.gettempdir()) / f'defesa_aneis_{k}.ecproj'
-    primeiro = sorted((ARTE / nome).glob('*.png'))[0]
+    primeiro = sorted((ARTE / f'{arte}_{k}').glob('*.png'))[0]
     with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as f:
         json.dump([{'command': 'file.import', 'params': {'paths': [str(primeiro)], 'sequence': True,
                                                          'frameRate': fps_arte}}], f)
@@ -121,9 +122,11 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--cli', type=Path, default=CLI_PADRAO)
     p.add_argument('--saida', type=Path, required=True)
+    p.add_argument('--arte', default='defesa',
+                   help='os quadros de baixo: defesa (o desenho) ou spray (com mais spray, mais_spray.py)')
     a = p.parse_args()
     for k in DEFESAS:
-        rodar(a.cli, k, a.saida)
+        rodar(a.cli, k, a.saida, a.arte)
 
 
 if __name__ == '__main__':

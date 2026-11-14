@@ -5815,13 +5815,14 @@ public class GameView extends SurfaceView
     /**
      * As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. DEFESA_BRILHO:
      * as de brilho do dono (art/vfx/defesa_brilho_v01, 14/11) no lugar das de ar, que ficam de reserva,
-     * com os dois anéis de pressão de ar (art/vfx/effectcraft/defesa_aneis_ec.py; "põe no jogo", 14/11).
+     * com mais spray (art/vfx/defesa_brilho_v01/mais_spray.py) e os dois anéis de pressão de ar
+     * (art/vfx/effectcraft/defesa_aneis_ec.py --arte spray; "põe no jogo", 14/11).
      */
     private static final boolean DEFESA_BRILHO = true;
     private static final String[][] DEFESAS = DEFESA_BRILHO ? new String[][] {
-        {"defesa_brilho_aneis", "defesa_brilho_aneis_2", "defesa_brilho_aneis_3", "defesa_brilho", "defesa", "defesa_poder"},
-        {"defesa_brilho_aneis_2", "defesa_brilho_aneis_3", "defesa_brilho_aneis", "defesa_brilho_2", "defesa_2", "defesa_poder"},
-        {"defesa_brilho_aneis_3", "defesa_brilho_aneis", "defesa_brilho_aneis_2", "defesa_brilho_3", "defesa_3", "defesa_poder"}} : new String[][] {
+        {"defesa_brilho_spray_aneis", "defesa_brilho_spray_aneis_2", "defesa_brilho_spray_aneis_3", "defesa_brilho_aneis", "defesa", "defesa_poder"},
+        {"defesa_brilho_spray_aneis_2", "defesa_brilho_spray_aneis_3", "defesa_brilho_spray_aneis", "defesa_brilho_aneis_2", "defesa_2", "defesa_poder"},
+        {"defesa_brilho_spray_aneis_3", "defesa_brilho_spray_aneis", "defesa_brilho_spray_aneis_2", "defesa_brilho_aneis_3", "defesa_3", "defesa_poder"}} : new String[][] {
         {"defesa", "defesa_2", "defesa_3"}, {"defesa_2", "defesa_3", "defesa"}, {"defesa_3", "defesa", "defesa_2"}};
     /**
      * As defesas comuns nascem na ponta do golpe (HitEvent.pontaX/pontaY) em vez do ponto de contato.
@@ -5830,9 +5831,9 @@ public class GameView extends SurfaceView
     private static final boolean DEFESA_NA_PONTA = true;
     /**
      * Projétil defendido: a defesa nasce no miolo da bola (HitEvent.frenteX/frenteY), não no corpo de
-     * quem defende, que fica atrás dela. Desligado até o dono aprovar o vídeo defesa_projetil_posicao.mp4.
+     * quem defende, que fica atrás dela. Ligado pelo dono depois do vídeo defesa_projetil_posicao.mp4 (14/11).
      */
-    private static final boolean DEFESA_PROJETIL_NA_FRENTE = false;
+    private static final boolean DEFESA_PROJETIL_NA_FRENTE = true;
     /**
      * Defesa espelhada: o arco do desenho anda para o lado de quem bate e o spray voa por cima de quem
      * defende; espelhada, o spray volta para quem bate (dono, 14/11: "estão expandindo para frente em

@@ -628,7 +628,8 @@ da bola. Medido: a Onda desenhada tem o miolo claro a 1 raio na frente do centro
 do fogo a ~3 (a folha da Onda tem a origem 22 px à frente do centro e se estende até +55). Agora o
 `HitEvent` traz `frenteX/frenteY` (centro + direção × raio × `FRENTE_DO_PROJETIL`, 1,0) e a defesa do
 projétil nasce aí, em cima da guarda. A 1,7 caía em cima da cabeça. `DEFESA_PROJETIL_NA_FRENTE`
-desligado até ele aprovar `android/app/build/sprite-review/defesa_projetil_posicao.mp4`.
+ligado ("põe no jogo pra eu testar", 14/11) depois do vídeo
+`android/app/build/sprite-review/defesa_projetil_posicao.mp4`.
 
 **Depois, "põe mais partícula de spray" (na defesa) e "descobri o que tô achando estranho: eles
 estão expandindo pra frente em vez de pra trás":** no desenho o arco anda para o lado de quem bate e
@@ -650,7 +651,9 @@ parte o anel em estilhaços); o segundo nasce dois quadros depois e menor. Folha
 pra trás, é pra fora: tá fechado e vai abrindo reto"; uma tentativa que trocava o desenho dele por um
 traço esticado foi reprovada na hora ("não falei pra mudar o que já temos, falei pra adicionar os
 anéis"): o desenho dele fica como está. O `DEFESA_ESPELHADA` perdeu o motivo (segue desligado). **Os anéis entraram na luta** ("põe no jogo pra eu testar", 14/11): `DEFESAS` toca
-`defesa_brilho_aneis*`, com as de brilho sem anel e as de ar de reserva.
+`defesa_brilho_aneis*`, com as de brilho sem anel e as de ar de reserva. Logo depois, "era pra pôr
+o spray a mais sim": a luta toca `defesa_brilho_spray_aneis*` (os anéis sobre os quadros do
+`mais_spray.py`: `defesa_aneis_ec.py --arte spray`); vídeo `defesas_spray_aneis_no_jogo.mp4`.
 
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
