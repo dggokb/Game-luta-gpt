@@ -5639,8 +5639,15 @@ public class GameView extends SurfaceView
         if (defendido) {
             float escala = size >= ImpactEffects.HEAVY ? 0.8f : size == ImpactEffects.MEDIUM ? 0.7f : 0.6f;
             String[] ordem = poder ? DEFESA_PODER : DEFESAS[defesaVez = (defesaVez + 1) % DEFESAS.length];
+            // Nascem na ponta do golpe de quem bate (o punho, a ponta do pé), como os hits, e não no
+            // ponto de contato, que cai dentro de quem defende, em cima do rosto e dos braços (dono, 14/11).
+            float dx = x, dy = y;
+            if (DEFESA_NA_PONTA && !poder && !Float.isNaN(pontaX)) {
+                dx = pontaX;
+                dy = pontaY;
+            }
             for (String n : ordem) {
-                vaga = efeitos.tocarDurando(n, x, y, escala, esquerda, ms);
+                vaga = efeitos.tocarDurando(n, dx, dy, escala, esquerda, ms);
                 if (vaga >= 0) { nome = n; break; }
             }
         } else {
@@ -5709,9 +5716,21 @@ public class GameView extends SurfaceView
     /** Fração da duração normal (pausa + 8 quadros) em que os impactos impacto_v06_* tocam. */
     private static final float RITMO_IMPACTO_V06 = 0.7f;
 
-    /** As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. */
-    private static final String[][] DEFESAS = {
+    /**
+     * As defesas comuns, uma de cada vez (sem a pedida, cai na seguinte), e a de poder. DEFESA_BRILHO:
+     * as de brilho do dono (art/vfx/defesa_brilho_v01, 14/11) no lugar das de ar, que ficam de reserva.
+     */
+    private static final boolean DEFESA_BRILHO = false;
+    private static final String[][] DEFESAS = DEFESA_BRILHO ? new String[][] {
+        {"defesa_brilho", "defesa_brilho_2", "defesa_brilho_3", "defesa"},
+        {"defesa_brilho_2", "defesa_brilho_3", "defesa_brilho", "defesa_2"},
+        {"defesa_brilho_3", "defesa_brilho", "defesa_brilho_2", "defesa_3"}} : new String[][] {
         {"defesa", "defesa_2", "defesa_3"}, {"defesa_2", "defesa_3", "defesa"}, {"defesa_3", "defesa", "defesa_2"}};
+    /**
+     * As defesas comuns nascem na ponta do golpe (HitEvent.pontaX/pontaY) em vez do ponto de contato.
+     * Desligado até o dono aprovar no vídeo (defesas_brilho_posicao.mp4), junto com DEFESA_BRILHO.
+     */
+    private static final boolean DEFESA_NA_PONTA = false;
     private static final String[] DEFESA_PODER = {"defesa_poder", "defesa", "defesa_2", "defesa_3"};
     private int defesaVez;
 

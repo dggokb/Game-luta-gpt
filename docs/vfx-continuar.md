@@ -603,6 +603,14 @@ até o dono escolher. Vídeo lado a lado: `android/app/build/sprite-review/defes
 Para trocar: pôr `defesa_brilho*` no lugar de `defesa*` nas `DEFESAS` (e no `DEFESA_PODER`, se ele
 quiser a de poder caindo nelas).
 
+**Depois, "o novo é melhor, só a posição que eles tão nascendo que tô achando estranha":** as
+defesas nasciam no ponto de contato (`impactX/impactY`), que cai uns 40 px dentro de quem defende,
+em cima do rosto e dos braços. Agora nascem na ponta do golpe de quem bate (`HitEvent.pontaX/
+pontaY`: o punho, a ponta do pé), como os hits desde 11/11; a de poder continua no contato.
+`DEFESA_BRILHO` e `DEFESA_NA_PONTA` no `GameView`, **as duas desligadas** até ele aprovar o vídeo
+`android/app/build/sprite-review/defesas_brilho_posicao.mp4` (antes e agora, ambos com as de
+brilho; viu-se o soco fraco e o chute forte defendidos).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
