@@ -3025,6 +3025,8 @@ public class GameView extends SurfaceView
         // lascas. Na frente da bola, no lugar do estouro de defesa e do efeito de dano.
         boolean podeDefendido = event.projectile && event.strength != AttackDefinition.Strength.SUPER &&
             efeitoPoderDefendido(attacker, event, x, y, direction);
+        // Para comparar (dono, 14/11): o efeito de defesa de sempre junto com o do poder.
+        if (podeDefendido && event.blocked && PODER_COM_DEFESA) podeDefendido = false;
         if (!podeDefendido && !(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
@@ -5596,8 +5598,31 @@ public class GameView extends SurfaceView
         int quadros = event.blocked
             ? Math.max(pausa + 4, Math.round((pausa + defender.stunTotal) * PODER_DEFESA_FRACAO))
             : pausa + PODER_ACERTO_DEPOIS;
-        return efeitos.tocarDurando(nome, x, y, 1f, direction < 0, quadros * FIXED_STEP * 1000f) >= 0;
+        // A frente do corpo desenhado de quem recebe, na altura do golpe (as faixas medidas no
+        // desenho): o contato do motor é a caixa de colisão, que não bate com o desenho de cada um
+        // (dono, 14/11: no Kōga ficava no ar na frente dos punhos; na Yin-lu, dentro da guarda).
+        float px = frenteDoDesenho(defender, y, x);
+        return efeitos.tocarDurando(nome, px, y, 1f, direction < 0, quadros * FIXED_STEP * 1000f) >= 0;
     }
+
+    /**
+     * A frente do corpo desenhado de {@code d} (o lado para onde ele olha) na altura {@code y} do
+     * mundo, pelas faixas medidas no desenho (CombatEngine.corpoAtual); sem faixas, {@code senao}.
+     */
+    private static float frenteDoDesenho(CombatFighter d, float y, float senao) {
+        float[] corpo = CombatEngine.corpoAtual(d);
+        if (corpo == null || corpo.length < 4) return senao;
+        float altura = d.y - y, frente = Float.NaN, maior = -Float.MAX_VALUE;
+        for (int i = 0; i + 3 < corpo.length; i += 4) {
+            maior = Math.max(maior, corpo[i + 1]);
+            if (altura >= corpo[i + 2] && altura <= corpo[i + 3]) frente = corpo[i + 1];
+        }
+        if (Float.isNaN(frente)) frente = maior;
+        return d.x + d.facing * frente;
+    }
+
+    /** Comparação: na defesa, o efeito do poder e o de defesa de sempre juntos (-Dgameluta.poderComDefesa=true). */
+    private static final boolean PODER_COM_DEFESA = Boolean.getBoolean("gameluta.poderComDefesa");
 
     /** O impacto do poder na defesa dura esta fração da pausa mais a guarda (some antes dela acabar). */
     private static final float PODER_DEFESA_FRACAO = 0.75f;
@@ -5957,8 +5982,11 @@ public class GameView extends SurfaceView
     }
 
     /** A bola padrão do personagem (não o mini do SHINKAI nem um desenho próprio). */
-    private static boolean projetilDoPersonagem(Projectile p) {
-        return !p.mini && (p.visual == null || "ONDA".equals(p.visual)) && p.ownerIndex >= 0 && p.ownerIndex < 2;
+    private boolean projetilDoPersonagem(Projectile p) {
+        if (p.mini || p.ownerIndex < 0 || p.ownerIndex > 1) return false;
+        if (p.visual == null || "ONDA".equals(p.visual)) return true;
+        // Outro desenho (a palma da Yin-lu) com a folha do vídeo do dono: a folha no lugar dele.
+        return !p.superKind() && efeitos.tem("onda_" + engine.fighter(p.ownerIndex).character().id);
     }
 
     /** Altura do meio da tela que a câmera mostra, um pouco acima (o dragão passa por cima dos dois). */
