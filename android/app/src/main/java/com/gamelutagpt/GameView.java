@@ -5682,7 +5682,7 @@ public class GameView extends SurfaceView
                 dy = frenteY;
             }
             for (String n : ordem) {
-                vaga = efeitos.tocarDurando(n, dx, dy, escala, esquerda, ms);
+                vaga = efeitos.tocarDurando(n, dx, dy, escala, esquerda != DEFESA_ESPELHADA, ms);
                 if (vaga >= 0) { nome = n; break; }
             }
         } else {
@@ -5771,6 +5771,12 @@ public class GameView extends SurfaceView
      * quem defende, que fica atrás dela. Desligado até o dono aprovar o vídeo defesa_projetil_posicao.mp4.
      */
     private static final boolean DEFESA_PROJETIL_NA_FRENTE = false;
+    /**
+     * Defesa espelhada: o arco do desenho anda para o lado de quem bate e o spray voa por cima de quem
+     * defende; espelhada, o spray volta para quem bate (dono, 14/11: "estão expandindo para frente em
+     * vez de para trás"). Desligado até ele aprovar no vídeo.
+     */
+    private static final boolean DEFESA_ESPELHADA = false;
     private static final String[] DEFESA_PODER = {"defesa_poder", "defesa", "defesa_2", "defesa_3"};
     private int defesaVez;
 

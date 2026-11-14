@@ -630,6 +630,16 @@ do fogo a ~3 (a folha da Onda tem a origem 22 px à frente do centro e se estend
 projétil nasce aí, em cima da guarda. A 1,7 caía em cima da cabeça. `DEFESA_PROJETIL_NA_FRENTE`
 desligado até ele aprovar `android/app/build/sprite-review/defesa_projetil_posicao.mp4`.
 
+**Depois, "põe mais partícula de spray" (na defesa) e "descobri o que tô achando estranho: eles
+estão expandindo pra frente em vez de pra trás":** no desenho o arco anda para o lado de quem bate e
+o spray voa por cima de quem defende. `DEFESA_ESPELHADA` no `GameView` espelha a defesa (o spray volta
+para quem bateu, o arco abre para o lado de quem defende), desligado até ele aprovar. Mais spray sem
+desenhar nada: `art/vfx/defesa_brilho_v01/mais_spray.py` copia os riscos soltos na frente do clarão
+(pedaços com menos de 1500 px; os do arco ficam de fora, girados viravam anéis), gira em volta do
+clarão (±15–34°, escala 0,85–1,1, 85–100%) e põe por baixo do desenho; folhas `defesa_brilho_spray*`
+(mesma origem e escala), sem uso. Vídeo com as três (hoje, espelhada, espelhada + spray):
+`android/app/build/sprite-review/defesas_espelhada_spray.mp4`.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
