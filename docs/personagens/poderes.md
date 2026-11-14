@@ -29,11 +29,19 @@ dados do jogo.
   resto do vídeo fica vazio (a ferramenta corta).
 - Cada um na cor dele (tabela abaixo) e com a forma do estilo dele: a palma da garça não é a bola
   do Ryūga pintada de azul.
+- **Nunca nomeie uma parte do corpo ou um objeto que não deve aparecer** ("mão de energia",
+  "punho", "canhão"): o gerador desenha a coisa. O primeiro vídeo da palma (14/11) saiu uma mão
+  gigante pegando fogo. Descreva a forma (crescente, anel, estrela, faixa, chama) e diga o que não
+  quer ("no hand, no fingers").
+- **Diga o tamanho no quadro** ("small, about one third of the frame height, lots of empty black
+  around it"): sem isso o efeito enche a tela e não dá para recortar.
+- **Sem imagem inicial nem final**: o vídeo de poder é só texto. Com imagem, o gerador abre e
+  fecha nela (o primeiro da palma começou e terminou num quadro verde).
 
 **O começo de todo prompt de LUZ** (cole antes da descrição):
 
 ```
-2D anime fighting-game visual effect, hand-drawn cel style like Guilty Gear Strive and Dragon Ball FighterZ: sharp cut shapes, clean energy edges, flat color bands from dark to white, saturated colors and a white-hot core. Pure black background (#000000) and nothing else: no character, no hands, no body, no ground, no text, no watermark. Static locked-off camera that never zooms; the effect stays in the center of the frame and points to the RIGHT.
+2D anime fighting-game visual effect, hand-drawn cel style like Guilty Gear Strive and Dragon Ball FighterZ: sharp cut shapes, clean energy edges, flat color bands from dark to white, saturated colors and a white-hot core. Pure black background (#000000) and nothing else: no character, no hands, no body, no ground, no text, no watermark. Static locked-off camera that never zooms; the effect stays in the center of the frame and points to the RIGHT. Unless said otherwise, the effect is small, about one third of the frame height, with lots of empty space around it.
 ```
 
 **O começo de todo prompt de FUMAÇA:** o mesmo, trocando o fundo por *"Flat solid green
@@ -72,14 +80,16 @@ Tudo com arte: S1 Onda (`onda_player_base`), Super (`super_player_base`), raio d
 
 ## p02 Yin-lu
 
-**S1 Palma (o voo, LUZ, loop).** Alcance curto (260 px): ela cresce e some no caminho.
+**S1 Palma (o voo, LUZ, loop).** Alcance curto (260 px): ela cresce e some no caminho. A forma é
+de ar comprimido empurrado pela palma (crescentes), não uma mão (14/11: a primeira versão, que
+pedia "uma mão de energia", saiu uma mão gigante pegando fogo).
 ```
-[LUZ] A translucent open hand made of sky-blue and white energy, fingers pointing up and the palm facing RIGHT, with three curved arcs of compressed air behind it and a bright white rim. Light and elegant, like a crane's wing more than a fist. [0-5s] It pulses softly and the air arcs ripple outward and are reborn, in a seamless loop; the first and last frames are identical.
+[LUZ] A palm-strike blast of compressed air and sky-blue ki, seen from the side, flying to the RIGHT. It is small, in the middle of the frame, about one third of the frame height, with lots of empty black around it. Its front is a tall, thin crescent of bright white light, curved like a parenthesis bulging to the RIGHT; behind it, three thinner sky-blue crescents trail to the left, each one smaller and fainter, like ripples pushed through the air, with a few long thin white streaks like feathers trailing behind them. Light and elegant, not heavy. No hand, no fingers, no fire, no sphere. [0-5s] The crescents ripple and slide backward and fade while new ones form at the front, in a seamless loop; the first and last frames are identical.
 ```
 
 **S1 Palma (o estouro no acerto, LUZ).**
 ```
-[LUZ] A burst of sky-blue and white air pressure, as if an open palm struck the air: [0-0.3s] a flat oval shockwave appears, [0.3-0.6s] it opens into thin curved air blades spreading RIGHT like feathers, [0.6-1.2s] it fades into soft white specks. [1.2-5s] Empty black.
+[LUZ] A burst of sky-blue and white air pressure, small in the middle of the frame (about one third of the frame height), no hand and no fingers: [0-0.3s] a flat oval shockwave appears, [0.3-0.6s] it opens into thin curved air blades spreading RIGHT like feathers, [0.6-1.2s] it fades into soft white specks. [1.2-5s] Empty black.
 ```
 
 ## p03 Kōga
@@ -101,7 +111,7 @@ girando no punho do S2 e o soco de energia que fecha o Ultra. Esses ficam na art
 
 **S1 Soco de impacto (o estouro na frente do punho, LUZ).**
 ```
-[LUZ] An energy burst right in front of a boxing punch, orange-gold: [0-0.15s] a white flash at the left of the frame where the fist is, [0.15-0.5s] a short explosion shaped like a 12-point star with a white core opens to the RIGHT, straight impact lines shoot RIGHT and a flat shockwave ring expands, [0.5-1s] it breaks apart and fades. Short and heavy, like a street fighter's punch charged with energy. [1-5s] Empty black.
+[LUZ] A short orange-gold energy burst, like the impact of a boxing punch charged with energy, small in the middle of the frame (about half of the frame height), no fist and no arm: [0-0.15s] a white flash at the center, [0.15-0.5s] a short explosion shaped like a 12-point star with a white core opens to the RIGHT, straight impact lines shoot RIGHT and a flat shockwave ring expands, [0.5-1s] it breaks apart and fades. Short and heavy. [1-5s] Empty black.
 ```
 
 ## p05
@@ -222,7 +232,7 @@ por código).
 
 **Ultra, o tiro do canhão de circo (LUZ).**
 ```
-[LUZ] A circus cannon blast seen from the side, the muzzle at the left of the frame and the blast going RIGHT: [0-0.2s] a big white muzzle flash, [0.2-0.8s] layered red, orange and yellow flames with a round shockwave ring, colorful confetti and streamers bursting out, [0.8-1.8s] grey smoke puffs and the confetti flutter and fall. [1.8-5s] Empty black.
+[LUZ] The blast of a circus cannon seen from the side, starting at the left of the frame and going RIGHT; only the blast, no cannon visible: [0-0.2s] a big white muzzle flash, [0.2-0.8s] layered red, orange and yellow flames with a round shockwave ring, colorful confetti and streamers bursting out, [0.8-1.8s] grey smoke puffs and the confetti flutter and fall. [1.8-5s] Empty black.
 ```
 
 ---
