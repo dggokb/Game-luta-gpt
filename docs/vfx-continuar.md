@@ -621,6 +621,15 @@ código (andar cada linha do desenho na horizontal, por curva medida ou ajustada
 três jeitos e entorta os riscos do desenho (ondulados, viram "X" e ">"): não serve; a versão reta
 tem de vir desenhada.
 
+**Depois, "olha onde fica a ponta do poder e onde fica a pressão de ar"** (fotos da Onda defendida):
+o projétil acerta quando o centro de colisão já passou da frente de quem defende (o desenho da bola
+entra na cara dele), e a defesa nascia na superfície do corpo (`impactX`), uns 30 px atrás do miolo
+da bola. Medido: a Onda desenhada tem o miolo claro a 1 raio na frente do centro de colisão e a borda
+do fogo a ~3 (a folha da Onda tem a origem 22 px à frente do centro e se estende até +55). Agora o
+`HitEvent` traz `frenteX/frenteY` (centro + direção × raio × `FRENTE_DO_PROJETIL`, 1,0) e a defesa do
+projétil nasce aí, em cima da guarda. A 1,7 caía em cima da cabeça. `DEFESA_PROJETIL_NA_FRENTE`
+desligado até ele aprovar `android/app/build/sprite-review/defesa_projetil_posicao.mp4`.
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que

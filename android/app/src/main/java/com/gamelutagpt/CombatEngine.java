@@ -36,6 +36,12 @@ final class CombatEngine {
          * não é presa no corpo de quem apanha: é de onde o golpe sai.
          */
         float pontaX = Float.NaN, pontaY = Float.NaN;
+        /**
+         * Projétil: a frente da bola no contato (o miolo claro, não o centro de colisão), no mundo; NaN
+         * nos golpes de corpo. A defesa nasce aí (dono, 14/11: "olha onde fica a ponta do poder e onde
+         * fica a pressão de ar").
+         */
+        float frenteX = Float.NaN, frenteY = Float.NaN;
         /** Button class of the contact, or null when unknown. Presentation only. */
         AttackDefinition.Strength strength;
         /** Última pancada de um golpe com pausa final própria (o chute que fecha o Super da p15). */
@@ -488,6 +494,11 @@ final class CombatEngine {
                 if (ponta != null) {
                     event.pontaX = ponta[0];
                     event.pontaY = ponta[1];
+                }
+                if (contact.projectile != null) {
+                    Projectile p = contact.projectile;
+                    event.frenteX = p.x + p.direction * p.radius * FRENTE_DO_PROJETIL;
+                    event.frenteY = p.y;
                 }
                 event.strength = contact.attack.strength;
             }
@@ -4801,6 +4812,13 @@ final class CombatEngine {
         h = Math.max(y0 + margem, Math.min(y1 - margem, h));
         return new float[] {a.x + a.facing * x1, a.y - h};
     }
+
+    /**
+     * Onde a bola bate, em raios do centro de colisão: o miolo claro da Onda desenhada fica a 1 raio na
+     * frente do centro e a borda do fogo a ~3 (medido na gravação, 14/11). No miolo a defesa cai na
+     * guarda de quem defende; a 1,7 já ficava em cima da cabeça dele.
+     */
+    static final float FRENTE_DO_PROJETIL = 1.0f;
 
     /** Quantos quadros depois da pancada a ponta do golpe ainda pode avançar (o desenho esticado). */
     private static final int PONTA_ADIANTE = 6;

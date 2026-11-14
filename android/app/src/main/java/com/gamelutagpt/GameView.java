@@ -3022,7 +3022,7 @@ public class GameView extends SurfaceView
                 event.strength == AttackDefinition.Strength.SUPER || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle,
                 defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO,
-                event.pontaX, event.pontaY)) {
+                event.pontaX, event.pontaY, event.frenteX, event.frenteY)) {
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // No escuro do Ultra (o sumiço do Mugen Rendan da p15): cada golpe é um clarão, como o secreto do Akuma.
@@ -5658,7 +5658,7 @@ public class GameView extends SurfaceView
      */
     private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size, boolean superGolpe,
                                   boolean poder, int pausa, int atacante, float angulo, boolean baixo,
-                                  float pontaX, float pontaY) {
+                                  float pontaX, float pontaY, float frenteX, float frenteY) {
         boolean esquerda = direction < 0;
         float ms = (Math.max(6, pausa) + (defendido ? 4 : 8)) * FIXED_STEP * 1000f;
         int a = atacante & 1;
@@ -5676,6 +5676,10 @@ public class GameView extends SurfaceView
             if (DEFESA_NA_PONTA && !Float.isNaN(pontaX)) {
                 dx = pontaX;
                 dy = pontaY;
+            } else if (DEFESA_PROJETIL_NA_FRENTE && !Float.isNaN(frenteX)) {
+                // Projétil: na frente da bola, não no corpo de quem defende (que fica atrás dela).
+                dx = frenteX;
+                dy = frenteY;
             }
             for (String n : ordem) {
                 vaga = efeitos.tocarDurando(n, dx, dy, escala, esquerda, ms);
@@ -5762,6 +5766,11 @@ public class GameView extends SurfaceView
      * Aprovado pelo dono no vídeo defesas_brilho_posicao.mp4 (14/11), junto com DEFESA_BRILHO.
      */
     private static final boolean DEFESA_NA_PONTA = true;
+    /**
+     * Projétil defendido: a defesa nasce no miolo da bola (HitEvent.frenteX/frenteY), não no corpo de
+     * quem defende, que fica atrás dela. Desligado até o dono aprovar o vídeo defesa_projetil_posicao.mp4.
+     */
+    private static final boolean DEFESA_PROJETIL_NA_FRENTE = false;
     private static final String[] DEFESA_PODER = {"defesa_poder", "defesa", "defesa_2", "defesa_3"};
     private int defesaVez;
 
