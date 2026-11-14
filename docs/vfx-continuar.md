@@ -592,6 +592,17 @@ na cor branca fria (#E6F0FF) em vez do azul. As de pressão de ar de 09/11 (outr
 vídeo) estão no histórico, commit ba600bcf. Para gravar uma defesa comum, o boneco tem de estar
 defendendo antes do golpe (segurar para trás na hora vira DEFESA PERFEITA, outro efeito).
 
+**Depois (14/11), "compara com esses e vê se não fica melhor":** mais três GIFs do dono, o mesmo
+arco em versão de brilho (luz em fundo preto, com halo; 506 × 506, 6 quadros de 120, 120 e 80 ms),
+em `art/vfx/defesa_brilho_v01` (GIFs e quadros já recortados do preto pelo `efeito_imagem`).
+Folhas `defesa_brilho`, `defesa_brilho_2` e `defesa_brilho_3`, do mesmo tamanho das de ar
+(~250 px; origem 254,247 / 257,250 / 256,252; escala 0,56 / 0,72 / 0,85; fps 8,33 / 8,33 / 12,5),
+com a mesma `"luz"`. **Ainda não tocam na luta:** as `DEFESAS` do `GameView` seguem com as de ar
+até o dono escolher. Vídeo lado a lado: `android/app/build/sprite-review/defesas_ar_vs_brilho.mp4`
+(gravado com o boneco agachado defendendo por um ajuste de teste que não foi para o repositório).
+Para trocar: pôr `defesa_brilho*` no lugar de `defesa*` nas `DEFESAS` (e no `DEFESA_PODER`, se ele
+quiser a de poder caindo nelas).
+
 **Velocidade dos vídeos de conferência:** o `gravarLuta` grava ~1 quadro a cada 45 ms de jogo
 (~22 por segundo: o jogo anda no passo fixo enquanto o desenho do PC é lento), não a 60. Montar o
 vídeo a 60 por segundo, um quadro gravado por quadro de vídeo, mostra tudo ~2,7× mais rápido que
