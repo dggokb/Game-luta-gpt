@@ -23,12 +23,12 @@ final class CharacterSelect {
     static final float STAGE_LEFT = 294f, STAGE_TOP = 547f, STAGE_RIGHT = 986f, STAGE_BOTTOM = 682f;
     static final float STAGE_PREV_RIGHT = 540f, STAGE_NEXT_LEFT = 740f;
     /**
-     * Grid order: the story pairs side by side (p01+p02, p03+p04 … p15+p16, p13+p14), so each
+     * Grid order: the story pairs side by side (p01+p02, p03+p04 … p16+p15, p13+p14: a Bonnie antes da Natisuko), so each
      * pair sits on the same row. Playable ones come first; the rest are locked concept slots.
      */
     static final String[] PAIR_ORDER = {
         "player_base","p02","p03","p04","p05","p06","p07","p08",
-        "p09","p10","p11","p12","p15","p16","p13","p14"};
+        "p09","p10","p11","p12","p16","p15","p13","p14"};
     final String[] ids;
     private final String[][] picks = new String[2][2];
     private final Random random = new Random();

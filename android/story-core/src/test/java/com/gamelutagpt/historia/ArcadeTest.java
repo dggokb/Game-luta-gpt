@@ -31,7 +31,7 @@ public class ArcadeTest {
     private static final File ASSETS = new File("../app/src/main/assets");
     /** Os lutadores com golpes hoje (os da seleção). */
     private static final List<String> LUTADORES = Arrays.asList("player_base", "p02", "p03", "p04", "p05", "p06",
-        "p07", "p08", "p09", "p10", "p11", "p12", "p13", "p14");
+        "p07", "p08", "p09", "p10", "p11", "p12", "p13", "p14", "p15", "p16");
 
     private static final class GameAssets implements RenderAssets {
         @Override public String readText(String path) throws IOException {
@@ -61,7 +61,7 @@ public class ArcadeTest {
     @Test
     public void oficiaisSaoAsDuplasQueJaLutam() throws IOException {
         List<Torneio.Dupla> oficiais = oficiais();
-        assertEquals("as 7 prontas (p15 e p16 ainda sem golpes)", 7, oficiais.size());
+        assertEquals("as 8 duplas, todas prontas", 8, oficiais.size());
         for (Torneio.Dupla d : oficiais) {
             assertTrue(d.pronta);
             assertTrue(LUTADORES.containsAll(Arrays.asList(d.lutadores)));
@@ -90,7 +90,7 @@ public class ArcadeTest {
             }
             // As outras oficiais estão na chave.
             for (Torneio.Dupla o : oficiais) assertTrue(o.id, vistas.contains(o));
-            // 32 lugares para 14 lutadores, espalhados por igual (2 ou 3 duplas cada).
+            // 32 lugares para 16 lutadores, espalhados por igual (2 ou 3 duplas cada).
             java.util.Map<String, Integer> vezes = new java.util.HashMap<>();
             for (Torneio.Dupla d : vistas) for (String l : d.lutadores) vezes.merge(l, 1, Integer::sum);
             assertEquals(LUTADORES.size(), vezes.size());

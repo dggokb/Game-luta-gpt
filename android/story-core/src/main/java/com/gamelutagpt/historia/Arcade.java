@@ -61,26 +61,42 @@ public final class Arcade {
             outras.add(d);
             contar(vezes, d);
         }
-        int livres = 0;
-        while (outras.size() < Torneio.VAGAS_ARCADE - 1) {
-            // Embaralha e ordena pelo número de vezes: os menos usados primeiro, empate sorteado.
-            List<String> ordem = new ArrayList<>(lutadores);
-            Collections.shuffle(ordem, random);
-            Collections.sort(ordem, (a, b) -> Integer.compare(vezes.get(a), vezes.get(b)));
-            Torneio.Dupla escolhida = null;
-            for (int i = 0; i < ordem.size() && escolhida == null; i++) {
-                for (int j = i + 1; j < ordem.size() && escolhida == null; j++) {
-                    Torneio.Dupla d = livre(ordem.get(i), ordem.get(j));
-                    if (!pares.contains(par(d))) escolhida = d;
+        // As duplas livres saem pelos menos usados; o guloso às vezes fecha num beco (os dois que
+        // sobram já são dupla oficial) e um lutador fica com uma dupla a mais. Tenta de novo e
+        // fica com a tentativa mais equilibrada.
+        List<Torneio.Dupla> melhor = null;
+        int melhorDiferenca = Integer.MAX_VALUE;
+        for (int tentativa = 0; tentativa < 40 && melhorDiferenca > 1; tentativa++) {
+            List<Torneio.Dupla> livresDaVez = new ArrayList<>();
+            Set<String> paresDaVez = new HashSet<>(pares);
+            Map<String, Integer> vezesDaVez = new HashMap<>(vezes);
+            int livres = 0;
+            while (outras.size() + livresDaVez.size() < Torneio.VAGAS_ARCADE - 1) {
+                // Embaralha e ordena pelo número de vezes: os menos usados primeiro, empate sorteado.
+                List<String> ordem = new ArrayList<>(lutadores);
+                Collections.shuffle(ordem, random);
+                Collections.sort(ordem, (x, y) -> Integer.compare(vezesDaVez.get(x), vezesDaVez.get(y)));
+                Torneio.Dupla escolhida = null;
+                for (int i = 0; i < ordem.size() && escolhida == null; i++) {
+                    for (int j = i + 1; j < ordem.size() && escolhida == null; j++) {
+                        Torneio.Dupla d = livre(ordem.get(i), ordem.get(j));
+                        if (!paresDaVez.contains(par(d))) escolhida = d;
+                    }
                 }
+                // Todas as duplas possíveis já estão na chave: repete a dos menos usados.
+                if (escolhida == null) escolhida = livre(ordem.get(0), ordem.get(1));
+                paresDaVez.add(par(escolhida));
+                contar(vezesDaVez, escolhida);
+                livresDaVez.add(new Torneio.Dupla("cpu" + (++livres) + ":" + escolhida.lutadores[0] + "+" + escolhida.lutadores[1],
+                    escolhida.lutadores, null, true));
             }
-            // Todas as duplas possíveis já estão na chave: repete a dos menos usados.
-            if (escolhida == null) escolhida = livre(ordem.get(0), ordem.get(1));
-            pares.add(par(escolhida));
-            contar(vezes, escolhida);
-            outras.add(new Torneio.Dupla("cpu" + (++livres) + ":" + escolhida.lutadores[0] + "+" + escolhida.lutadores[1],
-                escolhida.lutadores, null, true));
+            int diferenca = Collections.max(vezesDaVez.values()) - Collections.min(vezesDaVez.values());
+            if (diferenca < melhorDiferenca) {
+                melhorDiferenca = diferenca;
+                melhor = livresDaVez;
+            }
         }
+        outras.addAll(melhor);
         return Torneio.arcade(jogador, outras, random);
     }
 

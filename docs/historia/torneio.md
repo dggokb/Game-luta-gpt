@@ -28,9 +28,9 @@ Ficam em `android/app/src/main/assets/historia/torneio/torneio.json`:
 | p09 | p09 + p10 | sorteada |
 | p11 | p11 + p12 (Necro) | sorteada |
 | p13 | p13 (Krüger Stahl) + p14 (Felix Adler) | sorteada |
-| p15 | p15 (Natisuko) + p16 (Bonnie Scarlet) | sorteada, `"pronta": false` |
+| p15 | p16 (Bonnie Scarlet) + p15 (Natisuko) | sorteada. A Bonnie é a titular (a história é dela): vem antes da Natisuko na seleção, na chave, no card, no versus, no HUD e na luta. O id da dupla continua "p15" (páginas do porto e card) |
 
-`"pronta": false` = dupla que ainda não tem golpes (hoje p15 e p16; p13+p14 ficou pronta em 15/11). O sorteio põe essas duplas no
+`"pronta": false` = dupla que ainda não tem golpes (hoje nenhuma: p13+p14 ficou pronta em 15/11 e p16+p15 em 16/11). O sorteio põe essas duplas no
 **lado do rival**, então elas só aparecem nas lutas CPU × CPU da chave e nunca cruzam com o
 jogador. Quando ganharem golpes, é só tirar o `"pronta": false`.
 
@@ -76,7 +76,7 @@ história: o Arcade não tem.
 | p07 + p08 (Vittorio Moretti e Francesca Bellini) | 01–07: o Vittorio perde a "entidade" para a facção de Tokyo, a caixa de Pandora, a Francesca infiltrada pela associação, a aposta, a dupla formada | páginas 1–3, troca e 2 QTE, páginas 4–7, mais 2 QTE e o golpe final. Fala quem estiver em campo |
 | p05 + p06 (Renji Shiranui e Mizuki Tsukishiro, ninjas) | 01–06: o clã submisso, o Renji enfrenta o líder ("Dane-se as tradições!"), o convite do mensageiro, a Mizuki (filha do líder) vai junto | páginas 1–3, troca e 2 QTE, páginas 4–6, mais 2 QTE e o golpe final. Fala quem estiver em campo |
 | p13 + p14 (Krüger Stahl e Felix Adler, Monsters Riders) | 01–06: a gangue que domina a Alemanha, os dois líderes, a dúvida de quem manda, a mulher do convite ("o convite é para um... o outro é o acompanhante") | páginas 1–3, troca e 2 QTE, páginas 4–6, mais 2 QTE e o golpe final. Fala quem estiver em campo |
-| p15 | ainda sem páginas (e sem golpes) | — |
+| p16 + p15 (Bonnie Scarlet e Natisuko, irmãs de criação) | 01–06: o dojo, o sonho do circo, o estilo da comédia, o circo doente, o convite, a Bonnie volta e a Natisuko vai junto | páginas 1–3, troca e 2 QTE, páginas 4–6, mais 2 QTE e o golpe final. Fala quem estiver em campo |
 
 O texto da arte da P11 dizia "P11 era um médico..." (marcador): no balão foi o nome dele, Edmund
 Blackwood. As falas da luta e os golpes dos QTE são provisórios, para o dono polir.
@@ -103,8 +103,7 @@ semifinal) e o porto aumenta o número de duplas diferentes que ele enfrenta.
 
 - `Campanha.adversarioPorto()`: refaz a chave da semente sem mostrá-la (o sorteio do ep04 dá a
   mesma) e escolhe, pela semente, uma das duplas com golpes (`pronta`) da metade do rival
-  (`Torneio.prontasDoLadoDoRival`). Hoje, com p15 sem golpes no lado do rival, sobra uma:
-  p05, p07, p09, p11 ou p13, cada uma em ~1/5 das partidas. O save não muda: a semente refaz tudo.
+  (`Torneio.prontasDoLadoDoRival`). Hoje todas as 6 têm golpes, e a metade do rival tem 3 delas: sai uma dessas 3 (cada dupla em ~1/6 das partidas). O save não muda: a semente refaz tudo.
 - Jogar de novo o "O Sorteio" pela tela de capítulos sorteia outra chave, mas com o mesmo
   adversário do porto (`ProgressoHistoria.novoSorteio`); de um capítulo antes, tudo muda.
 - A luta tem `"porto": true` (o `"cpu"` do passo só vale sem campanha).
@@ -119,7 +118,7 @@ semifinal) e o porto aumenta o número de duplas diferentes que ele enfrenta.
 | p09 + p10 | `pag5_ryuga_p09` (os irmãos bombeiros no cais: ele grita por alguém forte para se aquecer, o Ryūga topa, e as duas parceiras: "Meninos....") | provisória |
 | p11 + p12 (Necro) | `pag5_ryuga_p11` (o cais foge do "zumbi", a Yin-lu grita, o cirurgião: "não é somente um simples zumbi..." e solta o Necro: "Necro... PEGA!") | provisória |
 | p13 + p14 | `pag5_ryuga_p13` (o grandalhão careca no cais, o p14 abraça o Ryūga: "Mas é claro que somos", e o p13 barra a Yin-lu: "Onde vai, mocinha..."). Entra no sorteio desde que a dupla ficou pronta (15/11) | `pag5_koga_p13` |
-| p15 (Natisuko) + p16 (Bonnie Scarlet) | `pag5_ryuga_p15` (a Natisuko, velha conhecida do Ryūga, acena no cais, a Yin-lu fica com ciúme e a Bonnie parte para a briga: "Bonnie se comporta sempre... mas agora ela luta!"). Só aparece quando a dupla tiver golpes | provisória |
+| p16 (Bonnie Scarlet) + p15 (Natisuko) | `pag5_ryuga_p15` (a Natisuko, velha conhecida do Ryūga, acena no cais, a Yin-lu fica com ciúme e a Bonnie parte para a briga: "Bonnie se comporta sempre... mas agora ela luta!"). Entra no sorteio desde que a dupla ficou pronta (16/11) | `pag5_koga_p15` |
 
 No Ryūga toda dupla tem a página dela; o desafio provisório (`pag3_q*`) ficou só para o Kōga.
 
@@ -162,7 +161,7 @@ irmãos ficam em lados opostos". O Arcade continua com o sorteio rápido.
 | p09 + p10 | (p09) "HEYYY! Quem vai ser o primeiro a pegar fogo?!" |
 | p11 + p12 (Necro) | (p11) "Hu hu hu... mais cobaias para a minha criação..." |
 | p13 (Krüger Stahl) + p14 | (p13) "Algum problema? Quem cair com a gente, cai feio." |
-| p15 (Natisuko) + p16 (Bonnie Scarlet) | (p16) "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!" |
+| p16 (Bonnie Scarlet) + p15 (Natisuko) | (p16) "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!" |
 
 ### A tela de versus
 
