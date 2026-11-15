@@ -273,10 +273,11 @@
           39
         ],
         "avanco": {
-          "distancia": 188,
+          "distancia": 250,
           "de": 5,
           "ate": 56
-        }
+        },
+        "pausa": 4
       },
       "SUPER": {
         "pancadas": [

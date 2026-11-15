@@ -142,6 +142,7 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 | B2b | Esquete no canto | (no canto) L, M, L, M, H (quica) → 2H → super pulo → jL, jM, jH → Balão | 10 |
 | B3 | Estrelinha | L, M, S4 (4 passadas, a última lança) → super pulo → jL, jM, jH → Balão | 10 |
 | B3b | Estrelinha com pulo no ar | L, M, S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
+| B3c | Esquete na Estrelinha | L, M, L, M, S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão (desde a Estrelinha rápida, 16/11) | 14 |
 | B4 | Caixa no combo | Caixa (L, perto) → L, M, L, M (o rival é empurrado até a luva, que o devolve) → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 11 |
 | B5 | Armadilha no meio | (rival a ~330 px) Caixa (M) → a mina abre com ele em cima → L, M, S4 → super pulo → jL, jM, jH → Balão | 8 |
 | B5b | Armadilha longe | (rival a ~450 px) Caixa (H) → a luva devolve → corre → 2H → super pulo → jL, jM, jH → Balão | 6 |

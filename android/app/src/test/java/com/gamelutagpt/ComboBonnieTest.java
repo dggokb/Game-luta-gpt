@@ -54,8 +54,12 @@ public class ComboBonnieTest {
         assertEquals("a última passada lança", AttackDefinition.Launch.LAUNCH, s4.launch);
         assertTrue("cancela em pulo", s4.cancelsInto(AttackDefinition.JUMP));
         assertEquals("quatro passadas", 4, s4.maxHits);
-        bonnie("L M S4 W40 SJ jL jM jH S", 10);
-        bonnie("L M S4 W40 SJ jL jM J jL jM jH S", 12);
+        // 16/11: rápida (1.º acerto no quadro 10, 45 no total) e anda ~245 px: pega depois do esquete.
+        assertEquals(10, s4.startupFrames);
+        assertTrue("dura no máximo 45 quadros: " + s4.totalFrames, s4.totalFrames <= 45);
+        bonnie("L M S4 W20 SJ jL jM jH S", 10);
+        bonnie("L M S4 W20 SJ jL jM J jL jM jH S", 12);
+        bonnie("L M L M S4 W20 SJ jL jM J jL jM jH S", 14);
     }
 
     @Test public void caixaNoMeioDoCombo() {
