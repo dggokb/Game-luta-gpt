@@ -1,7 +1,7 @@
 {
   "id": "player_base_ultra_dragao",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_ultra_dragao_video_normalized.png",
+  "source": "art/sprites/source/player_base_ultra_dragao_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -727,9 +727,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "eb77dd9903dc6a3c77c19574233d7523d898d627f8864ffa4c243fec9f9f3b42",
-      "config": "11835ed5d6bb4e722642d2a7be48e8d73c259598d9913b4ada3619598251e72f",
+      "source": "b627ee043d37ab1e2750f7e280ced67debd6679185cc7b0b0d3f3d01ea98f30b",
+      "config": "549c496dd28f6e2a9481a93af461ba8c33981faf8644bb89b4589c064b1012a6",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_ultra_dragao_video_normalized.png": "eb77dd9903dc6a3c77c19574233d7523d898d627f8864ffa4c243fec9f9f3b42"
     }
   }
 }

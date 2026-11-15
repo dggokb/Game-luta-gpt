@@ -2086,6 +2086,11 @@ public class GameView extends SurfaceView
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }
+        if (rivalDefende) {
+            // PC (GravarLuta, passo defende): o rival só segura para trás, em guarda.
+            opponentInput.clear();
+            opponentInput.direction = engine.fighter(OPPONENT).facing < 0 ? 1 : 5;
+        }
         boolean semPoderes = semPoderesNaLuta();
         if (semPoderes || semShinkaiNaLuta()) {
             // O treino e a briga das crianças: SUPER, ULTRA e SHINKAI não saem, de nenhum lado.
@@ -3015,7 +3020,12 @@ public class GameView extends SurfaceView
         if (!event.blocked && (event.counterHit || punish)) {
             contraPiscaAte[event.defender & 1] = engine.frame() + CONTRA_PISCA_QUADROS;
         }
-        if (!(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
+        // O poder dele batendo na defesa ou acertando (vídeos do dono: a Onda do Ryūga, a palma da
+        // Yin-lu, 14/11): na defesa a bola se achata na guarda e se desfaz; no acerto estoura em
+        // lascas. Na frente da bola, no lugar do estouro de defesa e do efeito de dano.
+        boolean podeDefendido = event.projectile && event.strength != AttackDefinition.Strength.SUPER &&
+            efeitoPoderDefendido(attacker, event, x, y, direction);
+        if (!podeDefendido && !(!event.blocked && efeitoDeDano(defender, y, direction, size)) &&
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
@@ -4063,6 +4073,13 @@ public class GameView extends SurfaceView
     }
 
     private volatile int superPedido = -1;
+
+    /** PC ({@code gradle :pc:gravarLuta}, passo {@code defende}): o rival fica em guarda. */
+    public void rivalDefende(boolean sim) {
+        rivalDefende = sim;
+    }
+
+    private volatile boolean rivalDefende;
 
     /** PC ({@code gradle :pc:gravarLuta}, passo {@code shinkai}): a barra do SHINKAI cheia nos dois times. */
     public void encherShinkai() {
@@ -5127,15 +5144,25 @@ public class GameView extends SurfaceView
         return f.attackFrame <= rush.lastActiveFrame() || !f.grounded ? 1 : 0;
     }
 
+    /** Picos dos disparos na SPECIAL_ENERGY_SHINKAI (o braço todo esticado) e o último quadro. */
+    private static final int[] RAJADA_PICOS = {3, 8, 12, 16};
+    private static final int RAJADA_FIM = 22;
+
     /**
-     * O quadro do poder em dois disparos (SpriteStates.SPECIAL_ENERGY_SHINKAI): 0 preparo, 1 a
-     * palma esquerda (do primeiro disparo até o segundo), 2 a direita; -1 na volta à guarda.
+     * O quadro da rajada (SpriteStates.SPECIAL_ENERGY_SHINKAI) no quadro do golpe: o preparo até o
+     * primeiro disparo, cada pico no quadro do disparo dele e a volta à guarda até o fim do golpe.
      */
-    private int quadroDoisDisparos(CombatFighter f) {
-        int primeiro = f.attack.startupFrames, segundo = primeiro + engine.config.ryugaDisparoDireita;
-        if (f.attackFrame < primeiro) return 0;
-        if (f.attackFrame < segundo) return 1;
-        return f.attackFrame < segundo + 12 ? 2 : -1;
+    private float quadroDoisDisparos(CombatFighter f) {
+        int s = f.attack.startupFrames, i = engine.config.ryugaDisparoDireita;
+        int n = Math.min(RAJADA_PICOS.length, Math.max(1, engine.config.ryugaDisparos));
+        float t = f.attackFrame + 0.5f;
+        if (t <= s) return RAJADA_PICOS[0] * t / s;
+        for (int k = 1; k < n; k++) {
+            float a = s + (k - 1) * i, b = s + k * i;
+            if (t <= b) return RAJADA_PICOS[k - 1] + (RAJADA_PICOS[k] - RAJADA_PICOS[k - 1]) * (t - a) / i;
+        }
+        float ultimo = s + (n - 1) * i, fim = Math.max(ultimo + 1, f.attack.totalFrames);
+        return Math.min(RAJADA_FIM, RAJADA_PICOS[n - 1] + (RAJADA_FIM - RAJADA_PICOS[n - 1]) * (t - ultimo) / (fim - ultimo));
     }
 
     private float reboundTime(CombatFighter f, CharacterDefinition.Animation art) {
@@ -5286,9 +5313,15 @@ public class GameView extends SurfaceView
                 soco = character.moves.get(f.grounded ? (medio ? "M" : "L") : (medio ? "jM" : "jL"));
                 if (soco == null || soco.animation == null) soco = character.moves.get(medio ? "M" : "L");
             }
+            CharacterDefinition.Animation vooArte = character.animations.get(SpriteStates.DASH_VOO);
             if (soco != null && soco.animation != null) {
                 animation = soco.animation.id;
                 animationElapsed = soco.animationTime((soco.attack.startupFrames + 0.5f) * FIXED_STEP);
+            } else if (vooArte != null) {
+                // Temporário (pedido do dono): a pose do dash mais deitada (DASH_VOO) no preparo,
+                // no voo e na recuperação, no lugar da voadora do jH.
+                animation = vooArte.id;
+                animationElapsed = 0.001f;
             } else if (voo != null && voo.animation != null) {
                 AttackDefinition rush = f.attack, pose = voo.attack;
                 float frames;
@@ -5354,13 +5387,12 @@ public class GameView extends SurfaceView
                     }
                 }
                 CharacterDefinition.Animation doisDisparos = character.animations.get(SpriteStates.SPECIAL_ENERGY_SHINKAI);
-                int pose = animation == null && doisDisparos != null && CombatEngine.doisDisparos(f, engine.config)
-                    ? quadroDoisDisparos(f) : -1;
-                if (pose >= 0) {
-                    // SHINKAI do Ryūga: o preparo, a palma esquerda e a palma direita (dois disparos);
-                    // a volta à guarda é a do poder de sempre.
+                float pose = animation == null && doisDisparos != null && CombatEngine.doisDisparos(f, engine.config)
+                    ? quadroDoisDisparos(f) : -1f;
+                if (pose >= 0f) {
+                    // SHINKAI do Ryūga: a rajada, cada braço esticado no quadro do disparo dele.
                     animation = doisDisparos.id;
-                    animationElapsed = doisDisparos.startOf(pose) + 0.001f;
+                    animationElapsed = doisDisparos.startOf(Math.min(doisDisparos.frameCount() - 1, Math.round(pose))) + 0.001f;
                 } else if (animation == null && special != null) {
                     animation = special.id;
                     animationElapsed = special.timeFor(elapsed, total);
@@ -5500,6 +5532,14 @@ public class GameView extends SurfaceView
             animation = clip.id;
             animationElapsed = clip.timeOfFrame(quadro);
         }
+        CharacterDefinition.Animation vooUltra = character.animations.get(SpriteStates.DASH_VOO);
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && vooUltra != null &&
+            (f.ultraPhase == CombatFighter.ULTRA_RUSH || f.ultraPhase == CombatFighter.ULTRA_CINEMATIC)) {
+            // A investida do Ultra na pose do dash, também no acerto que abre a cena (temporário,
+            // pedido do dono: era o golpe forte).
+            animation = vooUltra.id;
+            animationElapsed = 0.001f;
+        }
         if (animation == null && f.status == CombatFighter.Status.ULTRA) {
             // Activation uses the Super charge clip; rush and recovery reuse the heavy strike.
             CharacterDefinition.Animation charge = character.specialAnimations.get("SUPER");
@@ -5562,6 +5602,50 @@ public class GameView extends SurfaceView
         );
         renderer.animacao.passo(f, renderer.motion, engine, fighterVisualY(f));
     }
+
+    /**
+     * O projétil comum (o S1) defendido ou acertando, com o efeito próprio do personagem
+     * ({@code efeitos/onda_defesa_<id>} e {@code onda_acerto_<id>}): toca na frente da bola (o plano
+     * da guarda ou do corpo), virado para o lado da bola. False: não tem (entram os de sempre).
+     */
+    private boolean efeitoPoderDefendido(CombatFighter attacker, CombatEngine.HitEvent event, float x, float y, int direction) {
+        String nome = (event.blocked ? "onda_defesa_" : "onda_acerto_") + attacker.character().id;
+        if (!efeitos.tem(nome)) return false;
+        // No contato (onde pegou: a guarda ou o corpo), não na frente da bola (dono, 14/11: "muito
+        // para fora, tem que ser no contato").
+        CombatFighter defender = engine.fighter(event.defender);
+        int pausa = Math.max(6, defender.hitstopTotal);
+        // Na defesa some antes de quem defendeu sair da guarda; no acerto dissipa logo depois da pausa.
+        int quadros = event.blocked
+            ? Math.max(pausa + 4, Math.round((pausa + defender.stunTotal) * PODER_DEFESA_FRACAO))
+            : pausa + PODER_ACERTO_DEPOIS;
+        // A frente do corpo desenhado de quem recebe, na altura do golpe (as faixas medidas no
+        // desenho): o contato do motor é a caixa de colisão, que não bate com o desenho de cada um
+        // (dono, 14/11: no Kōga ficava no ar na frente dos punhos; na Yin-lu, dentro da guarda).
+        float px = frenteDoDesenho(defender, y, x);
+        return efeitos.tocarDurando(nome, px, y, 1f, direction < 0, quadros * FIXED_STEP * 1000f) >= 0;
+    }
+
+    /**
+     * A frente do corpo desenhado de {@code d} (o lado para onde ele olha) na altura {@code y} do
+     * mundo, pelas faixas medidas no desenho (CombatEngine.corpoAtual); sem faixas, {@code senao}.
+     */
+    private static float frenteDoDesenho(CombatFighter d, float y, float senao) {
+        float[] corpo = CombatEngine.corpoAtual(d);
+        if (corpo == null || corpo.length < 4) return senao;
+        float altura = d.y - y, frente = Float.NaN, maior = -Float.MAX_VALUE;
+        for (int i = 0; i + 3 < corpo.length; i += 4) {
+            maior = Math.max(maior, corpo[i + 1]);
+            if (altura >= corpo[i + 2] && altura <= corpo[i + 3]) frente = corpo[i + 1];
+        }
+        if (Float.isNaN(frente)) frente = maior;
+        return d.x + d.facing * frente;
+    }
+
+    /** O impacto do poder na defesa dura esta fração da pausa mais a guarda (some antes dela acabar). */
+    private static final float PODER_DEFESA_FRACAO = 0.75f;
+    /** Quadros que o impacto do poder acertando continua depois da pausa (se desfazendo no corpo). */
+    private static final int PODER_ACERTO_DEPOIS = 14;
 
     /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
     private static final String FUMACA_QUEDA = "fumaca_queda_v01";
@@ -5906,7 +5990,8 @@ public class GameView extends SurfaceView
         for (Projectile p : engine.energyProjectiles) {
             if (!projetilDoPersonagem(p)) continue;
             float k = p.radius / 24f;
-            String nome = "onda_" + engine.fighter(p.ownerIndex).character().id;
+            String id = engine.fighter(p.ownerIndex).character().id;
+            String nome = p.rajada && efeitos.tem("onda_shinkai_" + id) ? "onda_shinkai_" + id : "onda_" + id;
             // A cauda nasce na mão: nada da folha atrás do ponto de onde a Onda saiu (sem isso ela
             // atravessa o corpo de quem soltou).
             c.save();
@@ -5924,8 +6009,11 @@ public class GameView extends SurfaceView
     }
 
     /** A bola padrão do personagem (não o mini do SHINKAI nem um desenho próprio). */
-    private static boolean projetilDoPersonagem(Projectile p) {
-        return !p.mini && (p.visual == null || "ONDA".equals(p.visual)) && p.ownerIndex >= 0 && p.ownerIndex < 2;
+    private boolean projetilDoPersonagem(Projectile p) {
+        if (p.mini || p.ownerIndex < 0 || p.ownerIndex > 1) return false;
+        if (p.visual == null || "ONDA".equals(p.visual)) return true;
+        // Outro desenho (a palma da Yin-lu) com a folha do vídeo do dono: a folha no lugar dele.
+        return !p.superKind() && efeitos.tem("onda_" + engine.fighter(p.ownerIndex).character().id);
     }
 
     /** Altura do meio da tela que a câmera mostra, um pouco acima (o dragão passa por cima dos dois). */

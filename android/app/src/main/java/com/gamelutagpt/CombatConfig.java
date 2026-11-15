@@ -218,6 +218,11 @@ final class CombatConfig {
     int comboMeterAfterSuperPermille = 500;
     static final int MAX_METER = 5 * METER_PER_BAR;
     static final int SUPER_COST = METER_PER_BAR;
+    /**
+     * Especiais de chão (S1, S2..S9, Super) que saem num mesmo pulo, parados no ar enquanto duram
+     * (o pouso zera). O especial só de ar (o mergulho) não conta.
+     */
+    static final int ESPECIAIS_NO_AR_POR_PULO = 2;
     /** Ultra (↓ + SUPER): three bars. */
     static final int ULTRA_COST = 3 * METER_PER_BAR;
     /** Ultra SHINKAI: o mesmo botão do Ultra, só no SHINKAI e com as cinco barras (a barra cheia). */
@@ -719,12 +724,14 @@ final class CombatConfig {
     int ryugaRupturaDor = 4;
     int ryugaRupturaDanoPermille = 1400;
     /**
-     * O poder (S) do Ryūga no SHINKAI: dois disparos, a palma esquerda no tempo de sempre e a
-     * direita {@link #ryugaDisparoDireita} quadros depois, cada um com {@link #ryugaDisparoPermille}
-     * do dano (juntos, 120%: um a mais, mas cada um mais fraco). Desligado (0), um disparo só.
+     * O poder (S) do Ryūga no SHINKAI: a rajada, {@link #ryugaDisparos} disparos alternando o braço
+     * (o de trás no tempo de sempre, o da frente {@link #ryugaDisparoDireita} quadros depois, e assim
+     * por diante), cada um com {@link #ryugaDisparoPermille} do dano (os quatro juntos, 132%).
+     * Desligado ({@code ryugaDisparoDireita} 0), um disparo só. Vídeo s1_shinkai do dono (14/11).
      */
-    int ryugaDisparoDireita = 9;
-    int ryugaDisparoPermille = 600;
+    int ryugaDisparoDireita = 8;
+    int ryugaDisparos = 4;
+    int ryugaDisparoPermille = 330;
     /**
      * Venceu o SHINKAI Clash: o corpo recupera esta parte (por mil) do fôlego total. 1000 zera o
      * desgaste (como o relógio dos outros, que volta cheio).

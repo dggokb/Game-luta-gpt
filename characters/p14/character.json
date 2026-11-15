@@ -17080,7 +17080,12 @@
         "jH",
         "j2H",
         "JUMP",
-        "jM"
+        "jM",
+        "S",
+        "S2",
+        "S3",
+        "S4",
+        "SUPER"
       ],
       "pushbackOnHit": 20,
       "pushbackOnBlock": 26,
@@ -17103,11 +17108,23 @@
       "blockstunFrames": 19,
       "hitstopFrames": 12,
       "cancelWindows": {
-        "hit": null,
-        "block": null,
+        "hit": [
+          10,
+          18
+        ],
+        "block": [
+          10,
+          18
+        ],
         "whiff": null
       },
-      "cancelInto": [],
+      "cancelInto": [
+        "S",
+        "S2",
+        "S3",
+        "S4",
+        "SUPER"
+      ],
       "launchType": "wallBounce",
       "knockback": 30,
       "pushbackOnHit": 28,

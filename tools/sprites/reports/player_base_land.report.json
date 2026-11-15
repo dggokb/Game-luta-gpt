@@ -1,7 +1,7 @@
 {
   "id": "player_base_land",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_land_video_normalized.png",
+  "source": "art/sprites/source/player_base_land_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -214,8 +214,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ff98c81f8f97c29040a38eec52481144f23b8adf9035035bd2d8facc6ca7fc1e",
-      "config": "0a61604a168a60a531be47a071b3bda0efe3f1a047ce5145ce50dfd409a4d3b6",
+      "source": "71af8a678da1998bdb5d7ee7e9f0396e089d66375bcdc3f94d876fa71ff1602c",
+      "config": "09e0d24a74f11ba1cf4923b425fe33242c0812a430f813f4077d330662e589c7",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

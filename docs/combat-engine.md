@@ -212,10 +212,26 @@ fica soltando bola"):
   levando a maioria. Teste: `CpuTest.aHighLevelCpuBeatsAFireballSpammer`.
 
 **Caderno de combos** (`ComboBook`): a rota principal de cada lutador sai do próprio pacote
-(`cancelInto`, `maxUsesPerChain`) e do estilo, sem combo escrito à mão. Ex.: p01
-`L M 2H super-pulo jL jM pulo-no-ar jL jM j2H`; p04 `L M M 2H ...`; p09 `L M H H SUPER`;
-p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas (no acerto ou na defesa, como um jogador
-encadeia); lançador, especial, Super e super pulo só depois de ver que acertou.
+(`cancelInto`, `maxUsesPerChain`) e do estilo; só o fecho no ar é uma tabela
+(`ComboBook.FECHO_NO_AR`, a mesma do `ComboNoArTest`). Ex.: p01 `L M M 2H super-pulo jL jM S3`;
+p04 `L M M 2H ...`; p09 `L M H H SUPER`; p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas
+(no acerto ou na defesa, como um jogador encadeia); lançador, especial, Super e super pulo só
+depois de ver que acertou.
+
+- **Combo aéreo (15/11)**, o dono: "a CPU já tentou fazer combo aéreo mas sempre se perde".
+  Medido (nível 8 contra o boneco parado, 4 × 90 s por personagem): de quem lança com o 2H,
+  **nenhum** passava do pulo no ar. Três causas, três correções:
+  1. ela esperava o 2H acabar para o super pulo e subia atrasada (o rival já no alto): agora o
+     super pulo **cancela o lançador** (`superPuloNoCancelamento`);
+  2. o próprio acerto contava do fim da pausa do impacto, e com a reação a janela do
+     cancelamento já tinha fechado: agora conta **do quadro do acerto**, que ela vê durante a
+     pausa como uma pessoa (`acertoNaPausa`);
+  3. depois do jM ela dava o pulo no ar: subia enquanto o rival caía e o jL passava no vazio.
+     Agora a rota **fecha com o especial no ar** do personagem (`FECHO_NO_AR`; sem fecho, a rota
+     antiga com o pulo no ar).
+  Depois: fecham no especial, por exemplo, p01 5 de 5, p03 35 de 44, p05 21 de 23, p10 45 de 53,
+  p12 27 de 30, p14 26 de 33 (`CpuComboNoArTest`). Quem não lança com o 2H (p06, p07, p08, p09,
+  p11, p13: estilos de parede) não faz combo aéreo.
 
 - **Alcance com o empurrão**: o próximo golpe só sai se alcança o rival *depois* do empurrão que
   ainda vai acontecer (`projectedGap`). Um 2L na ponta empurra o rival para fora do M, e antes o
@@ -664,6 +680,28 @@ Na tela (`GameView`), o super pulo tem dois efeitos:
 - **Quem ficou no chão:** a câmera sobe com quem pulou e o outro some por baixo; quando o
   peito dele sai da tela, uma seta na cor dele aparece na borda de baixo, acima das barras de
   super, na posição dele (`drawGroundMarkers`). Some no Ultra, no Super e nas cinemáticas.
+
+## Especiais no ar, parado no ar (15/11)
+
+Todo especial de chão sai também no ar: S1, S2 a S9 e o Super (antes, só o S1 e o Super de
+projétil). `CharacterDefinition.Special.saiEm(grounded)` decide: no chão os de chão; no ar os de
+ar e os de chão, menos o agarrão (`mechanics.grab`) e o marcado `soChao`. No ar, o só de ar
+ganha o empate do de chão de mesmo comando (`matchCommand`).
+
+- **Parado no ar:** `CombatEngine.pairaNoAr` marca `CombatFighter.pairando` no começo do golpe
+  (vy e vx zeram); `moveVertically` segura a altura até o golpe acabar (`clearAttack` desliga) e
+  daí a gravidade do pulo volta. O especial que voa (`flies`) segura até `flightEnd - 1`, cai, e o
+  pouso leva o desenho ao pouso dele. Golpes de ar (jX), o só de ar e o mergulho seguem a física
+  deles.
+- **Limite:** `ESPECIAIS_NO_AR_POR_PULO` (2) especiais de chão por pulo
+  (`CancelSystem.especialNoArLiberado`, contador `especiaisNoAr`, zerado no pouso e no começo do
+  round). O só de ar não conta.
+- **Combos:** jM e jH cancelam em S1, S2 a S4 e Super em todos os pacotes (rota base em
+  `mecanicas.json` combos.base.rotas; janela do jH no acerto e na defesa, do começo da pancada a
+  2 quadros depois dela). Tabela em `docs/personagens/combos-assinatura.md`, "No ar".
+
+Testes: `EspeciaisNoArTest` (os 16, cada especial: sai, fica parado, cai; agarrão no chão; limite
+por pulo; os mergulhos) e `ComboNoArTest` (um combo aéreo com especial por personagem).
 
 ## Pulo da corrida (dash jump)
 

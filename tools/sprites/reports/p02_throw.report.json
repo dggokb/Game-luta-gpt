@@ -1,7 +1,7 @@
 {
   "id": "p02_throw",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_throw_video_hd.png",
+  "source": "art/sprites/source/p02_throw_video_hd_hd_aprovado_2x.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -366,12 +366,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "004834c10b72fb6a04db42e985d9e5f51928772d704accb0017b451128d3686b",
-      "config": "cddc5329dbcc750fa32baf02c2f3e34a5564d252b5bbfa45bc21dd42d22dfce2",
+      "source": "0bee2c110c32a087ead51922f41ad2eed06af58d263d3702b1dbc329b49b5af6",
+      "config": "a0c79f54443ea1888086da9f28428462faf1027c84575a22a5b3305bffcbdea2",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_throw_video_normalized.png": "aa5ba40fcc922d8589ba2782051b1d0718e30e3838e9a260085d0be75930ff32"
+      "art/sprites/source/p02_throw_video_normalized.png": "aa5ba40fcc922d8589ba2782051b1d0718e30e3838e9a260085d0be75930ff32",
+      "art/sprites/source/p02_throw_video_hd.png": "004834c10b72fb6a04db42e985d9e5f51928772d704accb0017b451128d3686b"
     }
   }
 }

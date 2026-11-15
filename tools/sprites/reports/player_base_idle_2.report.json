@@ -1,7 +1,7 @@
 {
   "id": "player_base_idle_2",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_idle_2_video_normalized.png",
+  "source": "art/sprites/source/player_base_idle_2_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -1012,9 +1012,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8593f7c90e8ea7d2337f221947063c078ac7ca9d3c952958534ef3c9098b0670",
-      "config": "b087879271c420da4419b082e5bb0f6638c98db4e659be7c157b7451c76a7060",
+      "source": "946e8fa4aeab1171ad19cef92e291c12dd8c577a23cdc784c086bff286c849c0",
+      "config": "c9251dc9a0fbb3f6dae7c44467b4f47663d66ba66d3537601212a5ba11bcd13e",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_idle_2_video_normalized.png": "8593f7c90e8ea7d2337f221947063c078ac7ca9d3c952958534ef3c9098b0670"
     }
   }
 }

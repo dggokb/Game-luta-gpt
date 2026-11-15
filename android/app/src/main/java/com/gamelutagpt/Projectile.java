@@ -39,6 +39,8 @@ final class Projectile {
     boolean holding;
     /** O mini projétil do H no SHINKAI ENERGY (desenhado menor). */
     boolean mini;
+    /** Um disparo da rajada do SHINKAI do Ryūga (o desenho é a folha onda_shinkai_<id>). */
+    boolean rajada;
 
     Projectile(
         float x,

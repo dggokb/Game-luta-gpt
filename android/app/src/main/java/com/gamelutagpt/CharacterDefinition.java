@@ -328,6 +328,11 @@ final class CharacterDefinition {
         final boolean hold;
         /** Só sai no ar (e não no chão). */
         final boolean air;
+        /**
+         * Só sai no chão. Os outros especiais de chão saem também no ar (parado no ar enquanto o
+         * golpe dura); o agarrão é sempre só de chão.
+         */
+        boolean soChao;
         Special(Move move,int[] command,String buttons) {
             this(move,command,buttons,null,false,false);
         }
@@ -373,6 +378,12 @@ final class CharacterDefinition {
             return this;
         }
         Special withEffect(String name) { effect=name; return this; }
+        Special withGroundOnly() { soChao=true; return this; }
+        /** Sai agora: no chão os de chão; no ar os de ar e os de chão que não são só de chão. */
+        boolean saiEm(boolean grounded) {
+            if(grounded)return !air;
+            return air||!(soChao||move.attack.mechanics.grab);
+        }
         int commandLength() { return command.length; }
         /** The motion, in relative directions (tutorial text and examples). */
         int[] command() { return command.clone(); }
@@ -817,7 +828,8 @@ final class CharacterDefinition {
 
     /**
      * O especial que o botão solta agora: "S2".."S9", "S" (a energia, S1) ou null (golpe normal).
-     * No chão só os especiais de chão, no ar só os de ar (e a energia, que sai nos dois). Se mais
+     * No chão só os especiais de chão; no ar os de ar e também os de chão (menos os só de chão e
+     * o agarrão), e a energia sai nos dois. No ar, o só de ar ganha o empate. Se mais
      * de um comando bate, ganha o de mais passos (um movimento ganha de um segurar); empatado, o
      * que terminou por último; e então os especiais antes da energia, na ordem da ficha. O comando
      * escolhido consome a história e as cargas.
@@ -827,9 +839,10 @@ final class CharacterDefinition {
         int bestLength=-1,bestEnd=Integer.MAX_VALUE;
         for(Map.Entry<String,Special> e:specials.entrySet()) {
             Special s=e.getValue();
-            if(!s.acceptsButton(button)||s.air==grounded)continue;
+            if(!s.acceptsButton(button)||!s.saiEm(grounded))continue;
             int end=commandEnd(motion,s.command,s.steps,s.hold,clock,config);
-            int length=weight(s.steps,s.hold);
+            // No ar, o especial que é só de ar ganha o empate do especial de chão de mesmo comando.
+            int length=weight(s.steps,s.hold)+(s.air&&!grounded?1:0);
             if(end>=0&&(length>bestLength||(length==bestLength&&end<bestEnd))) {
                 best=e.getKey();bestLength=length;bestEnd=end;
             }
@@ -837,7 +850,7 @@ final class CharacterDefinition {
         if(fighter.energy!=null&&fighter.energyCommand.length>0&&!(fighter.energyAir&&grounded)) {
             int[] steps=MotionParser.requiredSteps(fighter.energyCommand);
             int end=commandEnd(motion,fighter.energyCommand,steps,fighter.energyHold,clock,config);
-            int length=weight(steps,fighter.energyHold);
+            int length=weight(steps,fighter.energyHold)+(fighter.energyAir&&!grounded?1:0);
             if(end>=0&&(length>bestLength||(length==bestLength&&end<bestEnd)))best="S";
         }
         if(best!=null)motion.consume(clock);

@@ -576,7 +576,9 @@
       },
       "cancelInto": [
         "jH",
-        "JUMP"
+        "JUMP",
+        "S",
+        "SUPER"
       ],
       "pushbackOnHit": 20,
       "pushbackOnBlock": 26,
@@ -596,11 +598,20 @@
       "blockstunFrames": 14,
       "hitstopFrames": 12,
       "cancelWindows": {
-        "hit": null,
-        "block": null,
+        "hit": [
+          9,
+          17
+        ],
+        "block": [
+          9,
+          17
+        ],
         "whiff": null
       },
-      "cancelInto": [],
+      "cancelInto": [
+        "S",
+        "SUPER"
+      ],
       "launchType": "groundBounce",
       "knockback": 30,
       "pushbackOnHit": 28,

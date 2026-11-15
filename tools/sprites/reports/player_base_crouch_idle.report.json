@@ -1,7 +1,7 @@
 {
   "id": "player_base_crouch_idle",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_idle_video_normalized.png",
+  "source": "art/sprites/source/player_base_crouch_idle_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -708,9 +708,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "7404eda4c8eb672cb4191c1cb63a768c057aecb4ac3ed6d0700d564ecade4b39",
-      "config": "c34623325f4726360aad3d37697c1a4f5cbf24075d0a593ec7807129ba0cef68",
+      "source": "4591feb27f87d89400ee1707a8f40f56f2263510b3d068a79da6083a25078b8b",
+      "config": "9ee22732ab471678a9c47f3df46e87279d1e4ce61e53c06bda5fc9a4a5d29487",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_crouch_idle_video_normalized.png": "7404eda4c8eb672cb4191c1cb63a768c057aecb4ac3ed6d0700d564ecade4b39"
     }
   }
 }

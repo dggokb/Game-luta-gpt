@@ -2,7 +2,7 @@
   "id": "player_base_ultra_beam",
   "javaName": "ULTRA_BEAM",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/player_base_ultra_beam_video_normalized_hd_aprovado_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_ultra_beam.webp",
   "report": "tools/sprites/reports/player_base_ultra_beam.report.json",
   "preview": "android/app/build/sprite-review/ultra_beam-import.png",

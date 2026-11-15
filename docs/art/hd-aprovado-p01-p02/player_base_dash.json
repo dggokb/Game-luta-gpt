@@ -1,0 +1,60 @@
+{
+  "clip": "player_base_dash",
+  "frames": 12,
+  "columns": 6,
+  "source_original": "art/sprites/source/player_base_dash_video_normalized.png",
+  "source_original_sha256": "af219f7956b7b176f7171c441080e44f3fb9c530a7c3dfb6c61256fdf0f12bad",
+  "source_anterior": "art/sprites/source/player_base_dash_video_normalized.png",
+  "output": "art/sprites/source/player_base_dash_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "d545d10269105192a33f7db6af4283afc6867bd3b4406f33f812b8fe2ac83317",
+  "input_cell": [
+    640,
+    448
+  ],
+  "output_cell": [
+    640,
+    448
+  ],
+  "pixelScale_original": 2,
+  "pixelScale_final": 2,
+  "root_input": [
+    348,
+    412
+  ],
+  "root_output": [
+    348,
+    412
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "5245078e1c578fc375acefa2c8359836721252641ebda09cafee8d1186ed7abf",
+    "7d817a2206178349242b1b289ecd8d3cda7bf8492c96f1998de7da2ed75ad821",
+    "91393f6455ba731784297c82b9ded933264c2214bed9eafc5f3af47176a3fcf1",
+    "6bd770f2c8c5a65e7e335433682769128d1e9039fa82ac88118556e7e03df589",
+    "cc301ca3ef375911d6e5831e15116f861ef2f954b6a2cf2cda8c829478ba50fb",
+    "86d7f2eb8a02d06e70e988290d10710ca7d68622523a55014b54a16f3314eaa9",
+    "e8fd2454eb00d627751de7d5d882885a2edff6817f4a6cfae3976e2db5f77b9b",
+    "752a3a84a1296ce91147fb04c3ecc4fdd3bac2c25437ef0c40fb4427311dc2aa",
+    "6dadf8f5d58d4da8d51698bf337782d9824c02c7807202f8915fec5c0347b36a",
+    "7e91d16ca9bfde15757feb0ed2522a5b4f664fcf64495be1faf951d9098a0711",
+    "1425574b14e4e2fbeea47823f7746c42ec435c965ae11c7a5a83001409ac517c",
+    "5c3ca9fece99b23156ce0670e476adedfd0d5a233462076a6e994d52b8a73400"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    6.1478,
+    5.957,
+    6.2659,
+    5.8427,
+    6.1425,
+    5.9468,
+    6.1291,
+    5.9889,
+    6.1019,
+    5.947,
+    6.4854,
+    6.5881
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

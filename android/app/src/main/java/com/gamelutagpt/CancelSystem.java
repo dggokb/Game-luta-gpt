@@ -90,16 +90,18 @@ final class CancelSystem {
                 if (special != null) {
                     // Especial que lança: um projétil por vez, como a energia.
                     if (special.projectile != null && projectileAlive) return null;
-                    return special.air != f.grounded ? c.attack(entry.strength) : null;
+                    if (!special.saiEm(f.grounded) || !especialNoArLiberado(f, special.air)) return null;
+                    return c.attack(entry.strength);
                 }
                 if (projectileAlive || f.state.profile.energy == null) return null;
                 if (c.fighter.energyAir && f.grounded) return null;   // S1 só no ar (o p14)
+                if (!especialNoArLiberado(f, c.fighter.energyAir)) return null;
                 return c.attack("S");
             case SUPER:
                 if (f.state.profile.superAttack == null || !f.state.canPaySuper()) return null;
-                // A Super that strikes is a ground move (its strikes reach a standing opponent).
-                AttackDefinition sup = c.attack("SUPER");
-                return sup != null && sup.melee() && !f.grounded ? null : sup;
+                // No ar o Super também sai (parado no ar enquanto dura), dentro do limite por pulo.
+                if (!especialNoArLiberado(f, false)) return null;
+                return c.attack("SUPER");
             case AUTO: {
                 String[] route = f.state.profile.autoCombo;
                 if (route.length == 0) return null;
@@ -110,6 +112,14 @@ final class CancelSystem {
             default:
                 return null;
         }
+    }
+
+    /**
+     * No ar, cada pulo solta até {@link CombatConfig#ESPECIAIS_NO_AR_POR_PULO} especiais de chão (S1,
+     * S2..S9, Super), para ninguém ficar parado no ar para sempre. O especial só de ar não conta.
+     */
+    static boolean especialNoArLiberado(CombatFighter f, boolean soDeAr) {
+        return f.grounded || soDeAr || f.especiaisNoAr < CombatConfig.ESPECIAIS_NO_AR_POR_PULO;
     }
 
     /**

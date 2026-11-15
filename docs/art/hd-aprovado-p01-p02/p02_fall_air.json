@@ -1,0 +1,50 @@
+{
+  "clip": "p02_fall_air",
+  "frames": 7,
+  "columns": 7,
+  "source_original": "art/sprites/source/p02_fall_air_video_normalized.png",
+  "source_original_sha256": "3ab59e4968bffcd88dd4e4b2783ac1dab409f4f33d18aae30259f9015b6e856f",
+  "source_anterior": "art/sprites/source/p02_fall_air_video_normalized_sr_hd.png",
+  "output": "art/sprites/source/p02_fall_air_video_normalized_hd_aprovado_2x.png",
+  "output_sha256": "f114adee67754f3c1f82bb52385362a3ce1ae2e37aacc20b083e66e7b653786e",
+  "input_cell": [
+    160,
+    288
+  ],
+  "output_cell": [
+    320,
+    576
+  ],
+  "pixelScale_original": 1,
+  "pixelScale_final": 2,
+  "root_input": [
+    80,
+    270
+  ],
+  "root_output": [
+    160,
+    540
+  ],
+  "model": "Real-ESRGAN AnimeVideo-v3",
+  "model_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "master_4x_sha256_by_frame": [
+    "a394066aefb8cf3aa343336e3f245073c5810b5928439ff3364f5ee5f2b5002c",
+    "cb9988010b99d10803cc4fa0ee891519e500e5fcc9f4329bfe57b0d37b3803d4",
+    "1dabb8ac0a95a2929c090fbc6d989851cab4f118f3beab4f3559c6186e9ad39a",
+    "73052dcc30cc0a9a44e6f2905d66c06e24df9e2b5984dde98a8ba5f8b50e18a0",
+    "be10f15429efe645172fd091e543a6f8debde619b87cbaa16e13e6a23e89990b",
+    "f5cf33bd3b75b3ca480c61303b05f11b92e385b6e239d33373812e5751132f2e",
+    "b06d568b0c149d1285e165928e21ff073c87fdd4072304d0731b613c9804e65c"
+  ],
+  "rgb_delta_vs_basic_resize_by_frame": [
+    6.5041,
+    6.403,
+    6.4254,
+    6.3579,
+    6.2274,
+    5.852,
+    5.5991
+  ],
+  "alpha": "EXATAMENTE ORIGINAL em 2x Lanczos; todos frames verificados",
+  "unchanged": "pose, ordem, quantidade, tempo, root lógico, hitboxes, gameplay"
+}

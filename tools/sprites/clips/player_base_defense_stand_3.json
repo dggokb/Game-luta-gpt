@@ -2,7 +2,7 @@
   "id": "player_base_defense_stand_3",
   "javaName": "PLAYER_BASE_DEFENSE_STAND_3",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_defense_stand_3_video_normalized.png",
+  "source": "art/sprites/source/player_base_defense_stand_3_video_normalized_hd_aprovado_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_defense_stand_3.webp",
   "report": "tools/sprites/reports/player_base_defense_stand_3.report.json",
   "preview": "android/app/build/sprite-review/player_base_defense_stand_3-import.png",
@@ -107,5 +107,8 @@
         -13.83
       ]
     ]
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/player_base_defense_stand_3_video_normalized.png"
+  ]
 }

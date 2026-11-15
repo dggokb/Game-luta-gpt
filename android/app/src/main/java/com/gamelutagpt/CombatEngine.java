@@ -1828,7 +1828,13 @@ final class CombatEngine {
             f.state.payLife(attack.mechanics.lifeCost);
             cues.add("LIFE_COST");
         }
-        if (attack.kind == AttackDefinition.Kind.PROJECTILE && !f.grounded) {
+        if (!f.grounded && pairaNoAr(f, attack)) {
+            // Especial de chão solto no ar: parado no ar enquanto o golpe dura (cai no fim).
+            f.pairando = true;
+            f.especiaisNoAr++;
+            f.vy = 0f;
+            f.vx = 0f;
+        } else if (attack.kind == AttackDefinition.Kind.PROJECTILE && !f.grounded) {
             f.vy *= config.projectileAirVelocityScale;
         }
         if (attack.mechanics.dives()) f.vy = 0f;
@@ -2216,11 +2222,13 @@ final class CombatEngine {
                 if (moveMechanics.flies() && !f.grounded && f.attackFrame >= moveMechanics.flightEnd - 1) break;
                 f.attackFrame++;
                 if (moveMechanics.flies() && f.grounded && f.attackFrame == moveMechanics.flightStart) takeOff(f);
-                if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
-                    // No SHINKAI do Ryūga, o primeiro sai da palma esquerda e o segundo da direita.
+                int depois = f.attackFrame - f.attack.startupFrames;
+                if (!f.attack.melee() && depois == 0) {
+                    // No SHINKAI do Ryūga, a rajada: o primeiro sai do braço de trás, depois alterna.
                     spawnProjectile(f, doisDisparos(f, config) ? 0 : -1);
-                } else if (f.attackFrame == f.attack.startupFrames + config.ryugaDisparoDireita && doisDisparos(f, config)) {
-                    spawnProjectile(f, 1);
+                } else if (depois > 0 && config.ryugaDisparoDireita > 0 && depois % config.ryugaDisparoDireita == 0 &&
+                    depois / config.ryugaDisparoDireita < config.ryugaDisparos && doisDisparos(f, config)) {
+                    spawnProjectile(f, (depois / config.ryugaDisparoDireita) % 2);
                 } else if (f.attackFrame == f.attack.startupFrames && energyShot(f)) {
                     spawnEnergyShot(f);
                 }
@@ -2723,7 +2731,16 @@ final class CombatEngine {
             }
             scale = 0.45f;
         }
-        if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
+        if (f.attacking() && f.pairando) {
+            // Especial de chão solto no ar: parado no ar. O que voa (o tatsumaki) segura até o
+            // quadro do pouso do desenho (ali o golpe espera o chão) e daí cai com a gravidade do pulo.
+            AttackDefinition.Mechanics m = f.attack.mechanics;
+            if (!m.flies() || f.attackFrame < m.flightEnd - 1) {
+                f.vy = 0f;
+                return;
+            }
+            scale = config.normalJumpFallingGravityScale;
+        } else if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
             scale = 0f;
             f.vy = 0f;
@@ -2764,6 +2781,18 @@ final class CombatEngine {
         if (f.y >= Arena.GROUND_Y) land(f);
     }
 
+    /**
+     * O golpe é um especial de chão (S1, S2..S9 ou Super) solto no ar: os golpes de ar (jX), o
+     * especial só de ar e o mergulho seguem a física deles.
+     */
+    private static boolean pairaNoAr(CombatFighter f, AttackDefinition attack) {
+        if (attack.mechanics.dives()) return false;
+        if (attack.kind == AttackDefinition.Kind.SUPER) return true;
+        if ("S".equals(attack.id)) return !f.character().fighter.energyAir;
+        CharacterDefinition.Special special = f.character().specials.get(attack.id);
+        return special != null && !special.air;
+    }
+
     private void land(CombatFighter f) {
         // Pulo vazio: aterrissou em neutro, sem golpe no ar.
         boolean emptyJump = f.status == CombatFighter.Status.NEUTRAL && !f.grounded;
@@ -2786,6 +2815,7 @@ final class CombatEngine {
         f.wallJumpUsed = false;
         f.wallJumpFrames = 0;
         f.superJumping = false;
+        f.especiaisNoAr = 0;
         if (f.attacking() && f.move != null && f.attack.id.startsWith("j")) {
             // Landing ends an air normal.
             f.status = CombatFighter.Status.NEUTRAL;
@@ -2836,6 +2866,7 @@ final class CombatEngine {
         f.airDashUsed = false;
         f.airJumpUsed = false;
         f.airDashCount = 0;
+        f.especiaisNoAr = 0;
         f.wallJumpUsed = false;
         f.wallJumpFrames = 0;
         f.y = Arena.GROUND_Y;
@@ -3308,6 +3339,7 @@ final class CombatEngine {
             f.x + f.facing * data.spawnX, base - height, range, speed,
             radius, damage, profile.color, f.index, f.facing, f.attack,
             energy ? profile.energyVisual : data.visual);
+        p.rajada = mao >= 0;
         p.vy = data.vertical;
         p.gravity = data.gravity;
         p.totalHits = data.hits;

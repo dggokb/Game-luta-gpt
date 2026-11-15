@@ -1,7 +1,7 @@
 {
   "id": "player_base_jump",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_video_normalized.png",
+  "source": "art/sprites/source/player_base_jump_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -233,8 +233,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d58e7618bf323eb6655978efdf69a18b1c67e3aa3af5d45b9ece4bd2ddd7b100",
-      "config": "85ca5213a0797e49bbc4793c77c4ae313fbc40a0b4112d714fc19c39ec0be53a",
+      "source": "8914b49200711857f84683abbb78041196aee889337470cd9121d18e0cd71608",
+      "config": "3854510aead8ace24961117b7d9ed65e034310319a3875aac085c63270b76de2",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

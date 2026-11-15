@@ -1,7 +1,7 @@
 {
   "id": "player_base_energy_charged",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_energy_charged_video_normalized.png",
+  "source": "art/sprites/source/player_base_energy_charged_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01: disparo da Onda carregada, v\u00eddeo Seedance disparoCarregado.mp4 (quadros com clar\u00e3o e poeira pulados).",
   "rootMode": "authored",
   "scale": 1,
@@ -727,8 +727,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "dd081f2f46760cab69b5a025e36d4ed9a39f45ebf3a1379df1e37a297c297497",
-      "config": "c989e25146ab4ae6e45e8114ab9dcd85b62bfc6c263265dccb09ba05ee135a1e",
+      "source": "be1d122231b92f0ebd1e32ff227b0aea4e510a94d0fb9288205e5df5a365f023",
+      "config": "9b82565f3735cc2f27d1f709b3fba3f5390c04d7a55d0da5cd771626864b757b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

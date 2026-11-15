@@ -1,0 +1,35 @@
+{
+  "id": "player_base_special_energy_shinkai",
+  "javaName": "SPECIAL_ENERGY_SHINKAI_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_special_energy_shinkai_video_normalized_hd_aprovado_2x.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_special_energy_shinkai.webp",
+  "report": "tools/sprites/reports/player_base_special_energy_shinkai.report.json",
+  "preview": "android/app/build/sprite-review/special_energy_shinkai-import.png",
+  "expectedFrames": 23,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "frameWidth": 832,
+  "rootX": 308,
+  "frameHeight": 704,
+  "rootY": 648,
+  "pixelScale": 2.0,
+  "sourceNote": "p01, rajada do SHINKAI (vídeo s1_shinkai do dono, 14/11): quatro disparos, um braço por vez (trás, frente, trás, frente), convertido por tools/sprites/video_para_sprite.py.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_special_energy_shinkai_video_normalized.png"
+  ],
+  "video": {
+    "arquivo": "2ae6ccd2-s1_shinkai.mp4",
+    "escala": 0.4139,
+    "motivo": "guarda de 541 px nos vídeos novos do p01 (H3) = 224 px do p01",
+    "quadros": "10,18,22,24,27,31,35,37,39,43,47,50,52,55,58,61,64,68,72,75,76,80,90",
+    "celula": 352,
+    "largura": 416,
+    "raiz": "154,324",
+    "colunas": 4,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2
+  }
+}

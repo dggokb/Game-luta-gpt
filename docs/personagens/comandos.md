@@ -60,14 +60,20 @@ quique) não abre o golpe de corrida: ali o → + H é o de sempre. Nos outros, 
   mantenha o ↓ segurado: soltar e apertar de novo dentro de ¼ s vira o especial de ↓↓.
 - **Quando dois comandos batem:** ganha o de mais passos (um movimento ganha de um segurar);
   empatado, o que terminou por último; e então S2 a S4 antes do S1.
-- **No chão / no ar:** os especiais saem no chão, menos o Mergulho do p03, que só sai no ar
-  (parado na preparação, desce na diagonal até o chão e sobra pouca recuperação no pouso). O S1
-  sai nos dois.
+- **No chão / no ar (15/11):** todo especial sai também no ar: S1, S2 a S4 e o Super. No ar o
+  lutador fica **parado no ar enquanto o golpe dura** e cai quando ele acaba; o que voa (o Punho
+  ascendente do Ryūga) segura até o pouso do desenho e daí cai. São até **dois especiais por
+  pulo** (`CombatConfig.ESPECIAIS_NO_AR_POR_PULO`; o pouso zera). Ficam só no chão o agarrão de
+  comando (o S3 do p13) e o especial marcado `"soChao": true` no pacote (nenhum hoje). O
+  Mergulho do p03 e o S1 do p14 continuam só no ar, com a física deles (parado na preparação,
+  desce na diagonal até o chão); no ar eles ganham do especial de chão de mesmo comando.
+  O Ultra e o agarrão (L + M) seguem só no chão.
 
 ## Onde mudar
 
 `tools/sprites/mecanicas.json`, bloco `comandos` de cada personagem (nome e comando em setas,
-`"[←] →"` para segurar, `"noAr": true` para só no ar). Depois:
+`"[←] →"` para segurar, `"noAr": true` para só no ar; `"soChao": true` no especial do
+character.json o deixa só no chão). Depois:
 
     python3 tools/sprites/mecanicas.py --write
     python3 tools/sprites/build_characters.py --write

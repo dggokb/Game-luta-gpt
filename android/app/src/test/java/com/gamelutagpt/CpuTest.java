@@ -448,7 +448,7 @@ public class CpuTest {
         List<String> p01 = ComboBook.route(GeneratedCharacters.get("player_base"));
         assertEquals("L", p01.get(0));
         assertTrue("lançador e super pulo: " + p01, p01.contains("2H") && p01.contains(ComboBook.JUMP));
-        assertTrue("pulo no ar: " + p01, p01.contains(ComboBook.AIR_JUMP));
+        assertEquals("fecha no ar com o especial (15/11): " + p01, "S3", p01.get(p01.size() - 1));
         List<String> p04 = ComboBook.route(GeneratedCharacters.get("p04"));
         assertEquals("pressão: M > M: " + p04, 2, p04.stream().filter("M"::equals).count());
         List<String> p09 = ComboBook.route(GeneratedCharacters.get("p09"));

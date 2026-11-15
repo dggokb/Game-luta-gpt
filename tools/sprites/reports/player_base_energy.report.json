@@ -1,7 +1,7 @@
 {
   "id": "player_base_energy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_energy_video_normalized.png",
+  "source": "art/sprites/source/player_base_energy_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -670,8 +670,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a7ca700b4b213253924ca798950a590ecdc96c9c37e4f071e19806985fa76ed4",
-      "config": "584d9171c798e8b25c7c6459e8b3fc104a98e6f3d74b7b488fef907f88030b9e",
+      "source": "8030f62df55a12ae25a0bce3c2e93cc283058e15e6026c9205090f5275bc3304",
+      "config": "9f9da9f88404aafa38819d0f37a561f390c050bdb1c740a8bdff94b4e7f8c106",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

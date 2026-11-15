@@ -1,7 +1,7 @@
 {
   "id": "player_base_crouch_medium",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_medium_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_crouch_medium_video_normalized_smear_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -537,12 +537,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2fa765d47f31aacc034ea27fafea04fa2701546fd32652ae67cee6d8340bbf3d",
-      "config": "1cf12368ea1b2935764d4135c0b4c0fdb16e5ffd38c6941ec74af19ba5193ecf",
+      "source": "689f59ebe56ee5c36f4e63eec383682ee85fac615c1ff44d48513b34e33462ac",
+      "config": "2bdae9dd22d4179f367179c5eced9afade15585fe92fefdb0c7a6cbe8807fb9d",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_crouch_medium_video_normalized.png": "0235608d1c6df2e22d23bf15ad0a3e42b71d3fd945ef6e91717101af4cbe02bb"
+      "art/sprites/source/player_base_crouch_medium_video_normalized.png": "0235608d1c6df2e22d23bf15ad0a3e42b71d3fd945ef6e91717101af4cbe02bb",
+      "art/sprites/source/player_base_crouch_medium_video_normalized_smear.png": "2fa765d47f31aacc034ea27fafea04fa2701546fd32652ae67cee6d8340bbf3d"
     }
   }
 }

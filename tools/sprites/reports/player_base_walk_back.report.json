@@ -1,7 +1,7 @@
 {
   "id": "player_base_walk_back",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_walk_back_video_normalized.png",
+  "source": "art/sprites/source/player_base_walk_back_video_normalized_hd_aprovado_2x.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
@@ -746,8 +746,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "cf02a9d0319eaf77cccf6f9aeafe78402e2248110621492b8bf4aaab2198c868",
-      "config": "f0cef218bc037026ea6615bbc1e43fea1776e884e8ccb45e31763b49f577ef70",
+      "source": "1d9c314a5ba7929f1655fa13eed636fce5d4f312c3398850bdf20b0763a9ab67",
+      "config": "cf5dedeb9a135539046535fc476fac0bff0145164ed14b1751ed027fe64c540d",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

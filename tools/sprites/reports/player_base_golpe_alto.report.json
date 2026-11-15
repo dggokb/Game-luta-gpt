@@ -1,7 +1,7 @@
 {
   "id": "player_base_golpe_alto",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_golpe_alto_video_normalized_smear.png",
+  "source": "art/sprites/source/player_base_golpe_alto_video_normalized_smear_hd_aprovado_2x.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -385,12 +385,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "e834ae3d6a22e29cd48d304e03124de797e4419a298a436e9c2ed6b762989dd9",
-      "config": "007a0a130735ebe4717cd096fa5e8487246e789f1030f0384c76e89c28903a7a",
+      "source": "6848791863cb80d57ddddd847318d1151bbce12024934ebb2211d513c599ae62",
+      "config": "97fb112a267a8fcf0b2fb26d231cf92b6b58848bde1f46ccf6e1f74979941ecb",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_golpe_alto_video_normalized.png": "d091408e6c07d5a307f4bc106171d5c9147496c96849bd72e35a566019a5d792"
+      "art/sprites/source/player_base_golpe_alto_video_normalized.png": "d091408e6c07d5a307f4bc106171d5c9147496c96849bd72e35a566019a5d792",
+      "art/sprites/source/player_base_golpe_alto_video_normalized_smear.png": "e834ae3d6a22e29cd48d304e03124de797e4419a298a436e9c2ed6b762989dd9"
     }
   }
 }

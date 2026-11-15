@@ -1130,6 +1130,12 @@ final class AiController {
         for (CombatEngine.HitEvent ev : engine.events()) {
             // O próprio atordoamento ela sente na hora (não é reação ao rival).
             if (ev.defender == self && ev.projectile) projectileStunGuard = true;
+            // O próprio acerto ela vê no quadro dele, durante a pausa do impacto (é para isso que a
+            // pausa existe): a reação conta dali. Antes contava do fim da pausa, e o super pulo no
+            // cancelamento do lançador chegava com a janela fechada (15/11).
+            if (acertoNaPausa && ev.attacker == self && !ev.blocked && !ev.projectile && me.attacking() && ownHitFrame < 0) {
+                ownHitFrame = engine.frame();
+            }
         }
         if (me.frozen()) return;
         if (me.inHitstun()) betOnComboBreaker(engine, me, seen, out);
@@ -2023,6 +2029,12 @@ final class AiController {
         AttackDefinition a = c.attack("S");
         return a != null && a.kind == AttackDefinition.Kind.PROJECTILE;
     }
+
+    /** Baterias: o próprio acerto conta da pausa do impacto, não do fim dela (antes × depois). */
+    static boolean acertoNaPausa = true;
+
+    /** Baterias: o super pulo cancela o lançador (antes × depois). */
+    static boolean superPuloNoCancelamento = true;
 
     /** Baterias: desliga o cancelamento na bola no contato (antes × depois). */
     static boolean contatoLigado = true;
@@ -3041,7 +3053,16 @@ final class AiController {
                 return;
             }
         }
-        if (ComboBook.JUMP.equals(next)) return;   // o super pulo sai do neutro, depois do lançador
+        if (ComboBook.JUMP.equals(next)) {
+            // O super pulo cancela o lançador assim que ela vê que acertou, como quem joga (15/11).
+            // Esperando o lançador terminar, ela subia atrasada: só alcançava o rival já caindo e o
+            // fecho no ar passava por cima dele.
+            if (superPuloNoCancelamento && CancelSystem.canCancel(me, AttackDefinition.JUMP, null)) {
+                out.superJump = true;
+                out.direction = me.facing > 0 ? 8 : 6;
+            }
+            return;
+        }
         if (me.grounded && !next.startsWith("j") && !"S".equals(next) && !"SUPER".equals(next) &&
             !alcanca(me.character(), next, projectedGap(me, target), target)) {
             // O empurrão do golpe tirou o próximo do alcance: fecha com o que ainda alcança.
@@ -3221,6 +3242,10 @@ final class AiController {
         }
         if ("S".equals(step)) {
             out.special = "M";
+            return;
+        }
+        if (ComboBook.special(step)) {
+            out.special = step;   // S2..S9 (o fecho no ar)
             return;
         }
         // Agachado com ↘ (para baixo e para frente): conta como agachado e não fecha comando de

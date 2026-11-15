@@ -149,6 +149,35 @@ costuma ser: a Ombrada empurra para longe e o Carrinho é baixo.
 tira mais em menos pancadas, mas o combo dele depende de estar perto e de acertar o primeiro golpe.
 Os números finais saem dos testes do motor e do celular.
 
+## No ar: o combo aéreo fecha num especial (15/11)
+
+Desde 15/11 todo especial sai também no ar, com o lutador **parado no ar enquanto o golpe dura**
+(`docs/personagens/comandos.md`, "No chão / no ar"), e jM e jH cancelam em S1, S2 a S4 e Super
+em todos. Com isso a corrente aérea da base (jL → jM → jH) ganha um fim: o especial no alto. Um
+por personagem, conferido no motor (`ComboNoArTest`, contra o Ryūga parado, 3 barras):
+
+| Personagem | Combo | Acertos | Dano |
+|---|---|---|---|
+| Ryūga (p01) | L, M, 2H, super pulo, jL, jM → S3 Chute giratório | 9 | 2568 |
+| Yin-lu (p02) | L, M, 2H, super pulo, jL, jM, jH → S4 Chute rodopiante | 11 | 2818 |
+| p03 | L, M, 2H, super pulo, jL, jM → S2 Punho em sequência | 7 | 2458 |
+| p04 | L, M, 2H, super pulo, jL, jM → S2 Cabeçada | 6 | 2845 |
+| p05 | L, M, 2H, super pulo, jL, jM, jH → S2 Shuriken | 7 | 2876 |
+| p06 | L, M, 2H, super pulo, jL, jM → S2 Eco de sombra | 6 | 2303 |
+| p07 | L, M, 2H, super pulo, jL, jM, jH → S4 Chute giratório baixo | 7 | 3761 |
+| p08 | L, M, 2H, super pulo, jL, jM, jH → S2 Giro ascendente | 8 | 3031 |
+| p09 | L, M, 2H, super pulo, jL, jM, jH → S1 Machado | 7 | 3798 |
+| p10 | L, M, 2H, super pulo, jL, jM, jH → S1 Machadinho | 7 | 2581 |
+| p11 | L, M, 2H, super pulo, jL, jM, jH → S1 Bisturi | 7 | 2431 |
+| p12 | L, M, 2H, super pulo, jL, jM, jH → S2 Salto de garras | 7 | 3521 |
+| p13 | L, M, 2H, super pulo, jL, jM → S1 Investida do colosso | 9 | 3059 |
+| p14 | L, M, 2H, super pulo, jL, jM, jH → S2 Chute tornado | 11 | 3032 |
+| p15 | L, M, 2H, super pulo, jL, jM, jH → S4 Voadora e chute girando | 7 | 2819 |
+| p16 | L, M, 2H, super pulo, jL, jM, jH → S1 Balão | 6 | 2906 |
+
+O Super também fecha no ar em quem tem barra (o do Ryūga: L, M, 2H, super pulo, jL, jM, jH →
+Super, 11 acertos). Gravado no PC (Ryūga e Yin-lu); não visto no celular.
+
 ## Em dúvida
 
 1. **Y5 (sobe duas vezes):** um combo de 17 pancadas pode passar do ponto. O escalonamento de dano do jogo

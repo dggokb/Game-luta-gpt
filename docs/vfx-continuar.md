@@ -1637,6 +1637,87 @@ os lotes seguintes do efeitos-gpt.md.
   mão em vez de atravessar o corpo (`GameView.desenharProjeteisEmFolha`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Rodada de 14/11: o S1 acertando e defendido (Ryūga e Yin-lu)
+
+- **Pedido:** os vídeos do dono do S1 batendo na defesa (`s1_defesa`: a bola se achata contra a guarda
+  e se desfaz) e acertando (`s1_acerto`: estoura em lascas), do Ryūga e da Yin-lu.
+- **Feito:** quatro efeitos em fundo preto (`efeito_video_preto.py`, a origem na frente da bola no
+  vídeo, a escala da Onda 0,2 e da palma 0,15): `onda_defesa_<id>` e `onda_acerto_<id>` de
+  `player_base` e `p02`, com a luz na cor do poder. `GameView.efeitoPoderDefendido`: o projétil
+  comum (não o Super) de quem tem o efeito toca o dele na frente da bola, no lugar do estouro de
+  defesa ou do efeito de dano; os outros personagens continuam como estavam. O `GravarLuta` ganhou
+  o passo `defende` (o rival em guarda).
+- **Depois, "muito lerdo e muito para fora; tem que ser no contato e sumir antes do contato sair na
+  defesa; no dano tem que ir no corpo e dissipar lá; a frente do dano do Ryūga está com uma
+  silhueta":** os quatro começam no quadro em que o poder encosta (sem a bola chegando) e tocam no
+  ponto de contato do motor (`impactX/Y`), não na frente da bola. Duração presa ao golpe
+  (`tocarDurando`): na defesa 75% da pausa mais a guarda (some antes de quem defende sair dela), no
+  acerto a pausa mais 14 quadros. O vídeo do acerto do Ryūga tinha a silhueta escura do corpo
+  recortando o estouro: cortado antes dela, em degradê (x 845 a 905), origem no corte.
+  Depende dos colisores: se o contato do motor está fora do corpo desenhado, o efeito vai junto
+  (o dono está vendo os colisores em outra sessão).
+- **Depois, "tá muito errado"** (o Kōga defendendo: a parede no ar na frente dos punhos): o contato
+  do motor é a caixa de colisão (`halfWidth`), que não bate com o desenho de cada um (na Yin-lu caía
+  dentro da guarda). Agora o impacto vai na frente do corpo desenhado de quem recebe, na altura do
+  golpe (`GameView.frenteDoDesenho`, pelas faixas medidas no desenho, `CombatEngine.corpoAtual`).
+  Testado também com a defesa de brilho (e os anéis de pressão de ar) junto; o dono: "tudo que é
+  relacionado ao poder é do poder, não de outra coisa, não se sobrepõem efeitos". Fica só o do poder.
+- **Junto, "você não trocou o poder da Yin-lu?":** o vídeo `s1_poder` dela aprovado ("agora ficou
+  bom") virou a folha `onda_p02` (quadros 85-96, origem 820,377, escala 0,13, luz `#BFF3FF`); o
+  projétil de quem tem `onda_<id>` usa a folha mesmo com outro desenho (`projetilDoPersonagem`).
+## Rodada de 14/11: o raio do Ultra do Ryūga com o vídeo SUPER_PODER
+
+- **Pedido:** o vídeo `SUPER_PODER` do dono (um cometa grosso de fogo; no fim ele afina numa linha)
+  no lugar do raio de hoje, "que é bem feio", usando a animação ("ficou muito boa os frames").
+- **Feito:** `tools/ultra/raio_de_video.py SUPER_PODER.mp4 --id player_base --quadros 40-62:2
+  --atras 660 --corpo 320`: 12 quadros do trecho firme (antes de afinar), cada um alinhado pela
+  frente do cometa e centrado no núcleo; a ponta é a cabeça (a borda esquerda some para nascer do
+  corpo) e o corpo é a fatia da cauda logo atrás dela, fundida para repetir sem emenda. Tiras de 12
+  quadros a 12 por segundo, como antes. A esfera nas mãos e o impacto ficaram os do `poder_ultra`.
+  Primeira tentativa com a fatia longe na cauda (`--atras 1050`): o feixe saiu fino.
+- **Depois, "dá para ver os recortes e as cores ficaram diferentes":** o corpo era desenhado em fatias
+  de 24 px com alturas diferentes (a ondulação feita para o raio antigo, liso) e repetido a cada
+  ~110 px, e a cauda afina para trás: degraus. Agora o corpo animado (tira de vídeo) é uma fatia
+  longa da cauda (`--atras 1000 --corpo 640`) esticada uma vez das mãos até a ponta, sem ondulação,
+  em fatias de 6 px só para abrir perto das mãos (`RaioFinal.drawWavyTiles`). As cores: o
+  `para_alfa` tratava tudo como luz (a borda escura das chamas virava laranja transparente); o
+  `para_alfa_fogo` deixa o escuro opaco a partir de 110 de brilho, como no vídeo.
+- **Depois, "melhorar a cor, e a base do poder tem que ter mais frames, está muito 1 2 1 2":** a
+  esfera nas mãos ainda era a do `poder_ultra` (amarela, e na prática duas ou três formas
+  alternando). Agora sai do mesmo vídeo (`--inicio 41-63:2`): a cabeça do cometa espelhada, a parte
+  redonda nas mãos e as chamas correndo para dentro do raio, 12 quadros diferentes, a mesma chama
+  laranja do raio. A aura em volta dele continua a amarela do Ultra antigo.
+- **Depois, "esse que você colocou agora ficou muito ruim, dá pra ver que foi gambiarra":** a esfera
+  voltou a ser a do `poder_ultra` (a de antes); falta uma de verdade (vídeo próprio).
+- **Depois, a esfera de verdade:** o vídeo `concentra` do dono (luz de sol concentrada, do prompt
+  sem fogo; o primeiro, com "fire energy" no prompt, saiu fogo). Quadros 21-32 (o trecho que melhor
+  fecha o loop), recorte 700 × 520 em volta do centro (674, 386), bordas apagando em 40 px, a
+  conversão de luz (`preparar_raio.para_alfa`), `centroInicio` [0,4; 0,5].
+- **Junto, "quando vai dar o Ultra põe o dash do Shinkai também, porque ele também tá indo com
+  voadora":** a investida do Ultra (e o acerto que abre a cena) e o voo do Dragon Rush usam a
+  `DASH_VOO`, o quadro 6 do dash que o dono escolheu, segurado; era o H (Ultra) e o jH (Dragon
+  Rush). As pancadas do Dragon Rush continuam o L e o M. Temporário até ter arte própria. (O dash
+  troca de quadro pela distância, não pelo tempo: por isso a pose é uma animação de um quadro.)
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+**Mandado para a game-luta-sprite-fable (14/11, "manda tudo para eu testar"):** o S1 do Ryūga e da
+Yin-lu (Onda e palma novas, acerto e defesa) e a pose do dash no Dragon Rush e na investida do
+Ultra. O raio do Ultra ficou de fora (o dono: "o Ultra do Ryūga deixa para depois, tenho que pensar
+como vamos fazer"): os assets dele e o `RaioFinal` ficaram como estavam; a tentativa (corpo e ponta
+do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personagens-p02-p12-jxg5xd`.
+
+## Rodada de 14/11: a rajada do SHINKAI do Ryūga
+
+- **Pedido:** "faz o S1 Shinkai": o vídeo `s1_shinkai` do dono (um braço por vez, trás, frente, trás,
+  frente, como a rajada do Vegeta) com o poder `s1_shinkai_poder` (o cometa fino).
+- **Feito:** a `SPECIAL_ENERGY_SHINKAI` (clipe `player_base_special_energy_shinkai`, 23 quadros do
+  vídeo, escala 0,4139 das H3 dele): preparo, os quatro picos nos quadros 3, 8, 12 e 16 e a volta à
+  guarda. O motor solta `ryugaDisparos` (4) disparos, um a cada `ryugaDisparoDireita` (8) quadros,
+  alternando o braço, cada um com 33% do dano (132% juntos; antes eram 2 de 60%). O GameView casa
+  cada pico com o quadro do disparo dele. Cada disparo é a folha `onda_shinkai_player_base`
+  (`Projectile.rajada`); acerto e defesa usam os da Onda.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
@@ -1653,3 +1734,18 @@ os lotes seguintes do efeitos-gpt.md.
 - Não abrir PR sem pedir. Não mexer na `apk-export-sprite-7659823`.
 - Nunca commitar `art/keys/<id>/tamanho.json` sem o pacote do personagem.
 - APK e build de PC saem por release do GitHub, não por artefato do Actions.
+
+## Rodada de 15/11: o S1 da Yin-lu inteiro e maior
+
+- **Pedido:** "o poder da Yin-lu do S1 acho que está errado: está pequeno e sem o efeito todo da
+  animação".
+- **Causa:** a folha `onda_p02` (de 14/11) saiu com `--borda 60` e escala 0,13 a 1,5 px por px do
+  mundo: quadros de ~100 px, as pontas da meia-lua apagadas (ela vai de cima a baixo do vídeo) e
+  as linhas de velocidade de cima e de baixo quase sumidas. No jogo ela tinha ~98 px de altura.
+- **Feito:** a mesma receita do vídeo `s1_poder` aprovado (quadros 85-96, origem 820,377, luz
+  `#BFF3FF`), com `--borda 20`, `--escala-mundo 0.21` e `--resolucao 2.0`: 160 px de altura no
+  mundo (60% maior), o dobro de resolução, as linhas de velocidade, os três anéis e as pontas da
+  meia-lua como no vídeo. Gravado no PC no chão (acerta o Kōga a meia distância, com o
+  `onda_acerto_p02`) e no ar (ela parada no alto, a palma sai de lá). Não visto no celular.
+- **Junto:** os especiais saem também no ar (`docs/combat-engine.md`, "Especiais no ar").
+
