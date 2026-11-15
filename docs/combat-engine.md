@@ -665,6 +665,28 @@ Na tela (`GameView`), o super pulo tem dois efeitos:
   peito dele sai da tela, uma seta na cor dele aparece na borda de baixo, acima das barras de
   super, na posição dele (`drawGroundMarkers`). Some no Ultra, no Super e nas cinemáticas.
 
+## Especiais no ar, parado no ar (15/11)
+
+Todo especial de chão sai também no ar: S1, S2 a S9 e o Super (antes, só o S1 e o Super de
+projétil). `CharacterDefinition.Special.saiEm(grounded)` decide: no chão os de chão; no ar os de
+ar e os de chão, menos o agarrão (`mechanics.grab`) e o marcado `soChao`. No ar, o só de ar
+ganha o empate do de chão de mesmo comando (`matchCommand`).
+
+- **Parado no ar:** `CombatEngine.pairaNoAr` marca `CombatFighter.pairando` no começo do golpe
+  (vy e vx zeram); `moveVertically` segura a altura até o golpe acabar (`clearAttack` desliga) e
+  daí a gravidade do pulo volta. O especial que voa (`flies`) segura até `flightEnd - 1`, cai, e o
+  pouso leva o desenho ao pouso dele. Golpes de ar (jX), o só de ar e o mergulho seguem a física
+  deles.
+- **Limite:** `ESPECIAIS_NO_AR_POR_PULO` (2) especiais de chão por pulo
+  (`CancelSystem.especialNoArLiberado`, contador `especiaisNoAr`, zerado no pouso e no começo do
+  round). O só de ar não conta.
+- **Combos:** jM e jH cancelam em S1, S2 a S4 e Super em todos os pacotes (rota base em
+  `mecanicas.json` combos.base.rotas; janela do jH no acerto e na defesa, do começo da pancada a
+  2 quadros depois dela). Tabela em `docs/personagens/combos-assinatura.md`, "No ar".
+
+Testes: `EspeciaisNoArTest` (os 16, cada especial: sai, fica parado, cai; agarrão no chão; limite
+por pulo; os mergulhos) e `ComboNoArTest` (um combo aéreo com especial por personagem).
+
 ## Pulo da corrida (dash jump)
 
 Como no KOF: pular **durante o dash para frente** leva o embalo da corrida. Valor em

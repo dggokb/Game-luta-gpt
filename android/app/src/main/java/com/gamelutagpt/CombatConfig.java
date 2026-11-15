@@ -218,6 +218,11 @@ final class CombatConfig {
     int comboMeterAfterSuperPermille = 500;
     static final int MAX_METER = 5 * METER_PER_BAR;
     static final int SUPER_COST = METER_PER_BAR;
+    /**
+     * Especiais de chão (S1, S2..S9, Super) que saem num mesmo pulo, parados no ar enquanto duram
+     * (o pouso zera). O especial só de ar (o mergulho) não conta.
+     */
+    static final int ESPECIAIS_NO_AR_POR_PULO = 2;
     /** Ultra (↓ + SUPER): three bars. */
     static final int ULTRA_COST = 3 * METER_PER_BAR;
     /** Ultra SHINKAI: o mesmo botão do Ultra, só no SHINKAI e com as cinco barras (a barra cheia). */

@@ -288,14 +288,19 @@ def validate_mechanics(name, mech, m, projectile):
         for key in ('frente','descida'): positive((mech['mergulho'] or {}).get(key), f'{name}.mecanica.mergulho.{key}')
 
 def validate_command_extras(name, m, special):
-    """Nome do golpe (lista de comandos), segurar ([←] → / [↓] ↑) e noAr (só no ar)."""
+    """Nome do golpe (lista de comandos), segurar ([←] → / [↓] ↑), noAr (só no ar) e soChao (o
+    especial de chão que não sai no ar; os outros saem também no ar, parados enquanto o golpe dura)."""
     if 'nome' in m and (not isinstance(m['nome'], str) or not m['nome'].strip()):
         raise ValueError(f'{name}.nome: expected the move name')
-    for key in ('segurar', 'noAr'):
+    for key in ('segurar', 'noAr', 'soChao'):
         if key in m and m[key] is not True:
             raise ValueError(f'{name}.{key}: true or absent')
     if m.get('noAr') and not special and not name.endswith('.energy'):
         raise ValueError(f'{name}.noAr: only S1 (the energy) and S2..S9 are air-only')
+    if m.get('soChao') and m.get('noAr'):
+        raise ValueError(f'{name}: soChao and noAr together')
+    if m.get('soChao') and not special:
+        raise ValueError(f'{name}.soChao: only S2..S9 (the energy and the Super go in the air)')
     if m.get('segurar'):
         c = m['command']
         if len(c) != 2 or c not in ([5, 1], [3, 7]):
@@ -592,7 +597,7 @@ def validate_special_moves(pack):
             validate_special_projectile(f'{pack["id"]}/{key}', m['projectile'], pack['fighter']['body'])
         if 'efeito' in m and m['efeito'] not in SPECIAL_EFFECTS:
             raise ValueError(f'{pack["id"]}/{key}.efeito: expected one of {list(SPECIAL_EFFECTS)}')
-        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons','nome','segurar','noAr','projectile','efeito','especialBase')},
+        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons','nome','segurar','noAr','soChao','projectile','efeito','especialBase')},
                       'projectile' in m)
         if 'mergulho' in m.get('mecanica', {}) and not m.get('noAr'):
             raise ValueError(f'{pack["id"]}/{key}.mecanica.mergulho: only an air special (noAr) dives')
@@ -963,6 +968,7 @@ def compile_packs(root, results, alterados=None, medir=False):
                     pd = proj['puddle']
                     extra += '.withPuddle('+str(pd['frames'])+','+f(pd['halfWidth'])+','+str(pd['damage'])+','+str(pd['poisonFrames'])+')'
             if 'efeito' in m: extra += '.withEffect('+q(m['efeito'])+')'
+            if m.get('soChao'): extra += '.withGroundOnly()'
             lines += [' sm.put('+q(key)+',new CharacterDefinition.Special('+move+',new int[]{'+','.join(map(str,m['command']))+'},'+q(''.join(m.get('buttons',BUTTONS)))+','+(q(m['nome']) if 'nome' in m else 'null')+','+str(bool(m.get('segurar'))).lower()+','+str(bool(m.get('noAr'))).lower()+')'+extra+');']
         for key,animation in pack.get('specialAnimations',{}).items():
             lines += [' s.put('+q(key)+',a.get('+q(animation)+'));']

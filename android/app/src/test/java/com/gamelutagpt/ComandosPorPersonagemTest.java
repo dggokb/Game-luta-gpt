@@ -275,7 +275,7 @@ public class ComandosPorPersonagemTest {
         outro.in.direction = 0;
         outro.steps(6);
         outro.motion("M", 1, 3, 2);
-        assertNotEquals("no ar o especial de chão não sai", "S2", outro.started());
+        assertEquals("no ar o especial de chão também sai (parado no ar)", "S2", outro.started());
     }
 
     @Test public void oComandoMaisLongoGanha() {

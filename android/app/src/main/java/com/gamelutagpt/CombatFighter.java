@@ -453,7 +453,13 @@ final class CombatFighter {
         return status.name();
     }
 
+    /** O golpe em curso é um especial de chão solto no ar: fica parado no ar enquanto dura. */
+    boolean pairando;
+    /** Especiais de chão soltos no ar neste pulo (o pouso zera; CancelSystem.especialNoArLiberado). */
+    int especiaisNoAr;
+
     void clearAttack() {
+        pairando = false;
         attack = null;
         move = null;
         attackFrame = -1;

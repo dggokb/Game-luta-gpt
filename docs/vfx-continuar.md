@@ -1734,3 +1734,18 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - Não abrir PR sem pedir. Não mexer na `apk-export-sprite-7659823`.
 - Nunca commitar `art/keys/<id>/tamanho.json` sem o pacote do personagem.
 - APK e build de PC saem por release do GitHub, não por artefato do Actions.
+
+## Rodada de 15/11: o S1 da Yin-lu inteiro e maior
+
+- **Pedido:** "o poder da Yin-lu do S1 acho que está errado: está pequeno e sem o efeito todo da
+  animação".
+- **Causa:** a folha `onda_p02` (de 14/11) saiu com `--borda 60` e escala 0,13 a 1,5 px por px do
+  mundo: quadros de ~100 px, as pontas da meia-lua apagadas (ela vai de cima a baixo do vídeo) e
+  as linhas de velocidade de cima e de baixo quase sumidas. No jogo ela tinha ~98 px de altura.
+- **Feito:** a mesma receita do vídeo `s1_poder` aprovado (quadros 85-96, origem 820,377, luz
+  `#BFF3FF`), com `--borda 20`, `--escala-mundo 0.21` e `--resolucao 2.0`: 160 px de altura no
+  mundo (60% maior), o dobro de resolução, as linhas de velocidade, os três anéis e as pontas da
+  meia-lua como no vídeo. Gravado no PC no chão (acerta o Kōga a meia distância, com o
+  `onda_acerto_p02`) e no ar (ela parada no alto, a palma sai de lá). Não visto no celular.
+- **Junto:** os especiais saem também no ar (`docs/combat-engine.md`, "Especiais no ar").
+

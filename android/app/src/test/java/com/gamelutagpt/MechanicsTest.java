@@ -1452,7 +1452,7 @@ public class MechanicsTest {
         assertEquals("the rest of the sequence does not hit the partner", partnerLife, cpu[1].life);
     }
 
-    @Test public void aStrikingSuperIsAGroundMove() {
+    @Test public void aStrikingSuperAlsoGoesInTheAirHoveringUntilItEnds() {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 700f);
         s.f(0).state.superMeter = CombatConfig.MAX_METER;
         s.in[0].jump = true;
@@ -1460,8 +1460,8 @@ public class MechanicsTest {
         assertFalse(s.f(0).grounded);
         s.in[0].superAttack = true;
         s.step();
-        assertNotEquals("no striking Super in the air", "SUPER", s.attackId(0));
-        assertEquals(CombatConfig.MAX_METER, s.f(0).state.superMeter);
+        assertEquals("the striking Super also goes in the air", "SUPER", s.attackId(0));
+        assertTrue(s.f(0).state.superMeter < CombatConfig.MAX_METER);
     }
 
     @Test public void aTradeOfSeveralStrikeMovesTreatsBothSidesAlike() throws Exception {

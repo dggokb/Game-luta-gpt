@@ -209,7 +209,19 @@
         "jM": [
           "jH",
           "j2H",
-          "JUMP"
+          "JUMP",
+          "S",
+          "S2",
+          "S3",
+          "S4",
+          "SUPER"
+        ],
+        "jH": [
+          "S",
+          "S2",
+          "S3",
+          "S4",
+          "SUPER"
         ]
       },
       "maxUsosCorrente": {
