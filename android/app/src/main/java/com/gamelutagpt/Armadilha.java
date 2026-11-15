@@ -14,9 +14,12 @@ final class Armadilha {
     final int damage;
     final AttackDefinition attack;
     final CharacterDefinition.Projectile data;
-    /** Quadros até abrir; depois, quadros desde que abriu. */
+    /** Quadros até abrir (na mina, até armar); depois, quadros desde que abriu. */
     int fuse;
     int opened;
+    /** Mina: quadros armada esperando o rival, e se ele já a disparou. */
+    int waited;
+    boolean triggered;
 
     Armadilha(float x, int ownerIndex, int direction, int color, int damage, AttackDefinition attack,
               CharacterDefinition.Projectile data, int fuse) {
@@ -30,7 +33,10 @@ final class Armadilha {
         this.fuse = fuse;
     }
 
-    boolean open() { return fuse <= 0; }
+    boolean open() { return data.trapMine > 0 ? triggered : fuse <= 0; }
+
+    /** Mina armada e fechada, esperando o rival. */
+    boolean armed() { return data.trapMine > 0 && fuse <= 0 && !triggered; }
 
     /** Quanto da abertura já passou (0 fechada, 1 terminou). */
     float progress() { return open() ? opened / (float)Math.max(1, data.trapDuration) : 0f; }

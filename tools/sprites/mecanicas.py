@@ -518,6 +518,8 @@ def especiais(pack, spec):
                 proj['trap'] = {'fuse': a['pavio'], 'duration': a['aberta'], 'activeFrom': a['acertaDe'],
                                 'active': a['acerta'], 'height': a['altura'], 'reach': a['avanco'],
                                 'radius': a['raio']}
+                if 'mina' in a:   # armada, abre quando o rival chega na luva (ou no fim da mina, em quadros)
+                    proj['trap']['mine'] = a['mina']
             if 'gravidade' in p:
                 # Voo em arco (a pedra do p13): gravidade e quanto cada botão (L, M, H) multiplica
                 # a velocidade para a frente (a distância muda, o tempo de voo não).

@@ -531,8 +531,8 @@ def validate_special_projectile(name, p, body):
         raise ValueError(f'{name}.projectile.vertical: expected a number (negative goes up)')
     if 'trap' in p:
         t = p['trap']
-        if p['vertical'] <= 0:
-            raise ValueError(f'{name}.projectile.trap: only a falling projectile lands')
+        if p['vertical'] <= 0 and not p.get('gravity'):
+            raise ValueError(f'{name}.projectile.trap: only a falling projectile lands (vertical > 0 or gravity)')
         if not (isinstance(t.get('fuse'),list) and len(t['fuse']) == 3):
             raise ValueError(f'{name}.projectile.trap.fuse: expected the L, M and H fuses')
         for v in t['fuse']: positive_int(v, f'{name}.projectile.trap.fuse')
@@ -540,6 +540,8 @@ def validate_special_projectile(name, p, body):
         if not (type(t.get('activeFrom')) is int and 0 <= t['activeFrom'] and t['activeFrom'] + t['active'] <= t['duration']):
             raise ValueError(f'{name}.projectile.trap: the active window must fit in the open frames')
         for key in ('height','reach','radius'): positive(t.get(key), f'{name}.projectile.trap.{key}')
+        # Mina (a caixa da p16 desde 16/11): armada, espera o rival chegar na luva até esse tanto de quadros.
+        if 'mine' in t: positive_int(t['mine'], f'{name}.projectile.trap.mine')
     if 'gravity' in p:   # voo em arco: gravidade e o multiplicador da velocidade de L, M e H
         positive(p['gravity'], f'{name}.projectile.gravity')
         if not (isinstance(p.get('strengthSpeed'), list) and len(p['strengthSpeed']) == 3):
@@ -968,6 +970,7 @@ def compile_packs(root, results, alterados=None, medir=False):
                     t = proj['trap']
                     extra += ('.withTrap(new int[]{'+','.join(map(str,t['fuse']))+'},'+str(t['duration'])+','+str(t['activeFrom'])+','
                               +str(t['active'])+','+','.join(f(t[k]) for k in ('height','reach','radius'))+')')
+                    if 'mine' in t: extra += '.withMine('+str(t['mine'])+')'
                 if 'gravity' in proj:
                     extra += '.withArc('+f(proj['gravity'])+','+','.join(f(v) for v in proj['strengthSpeed'])+')'
                 if 'puddle' in proj:

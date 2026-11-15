@@ -8330,15 +8330,15 @@
       ],
       "loop": false,
       "durationsMs": [
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
-        33,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
         17,
         13,
         38,
@@ -18746,7 +18746,7 @@
       ],
       "animation": "SPECIAL_S2",
       "damage": 1100,
-      "startupFrames": 18,
+      "startupFrames": 12,
       "activeFrames": 1,
       "recoveryFrames": 22,
       "hitstunFrames": 32,
@@ -18754,8 +18754,8 @@
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
-          18,
-          24
+          12,
+          18
         ],
         "block": null,
         "whiff": null
@@ -18774,23 +18774,30 @@
       "projectile": {
         "visual": "CAIXA",
         "range": 600,
-        "speed": 115,
+        "speed": 100,
         "spawnX": 166,
         "spawnY": 215,
-        "vertical": 321,
+        "vertical": -250,
         "trap": {
           "fuse": [
-            10,
-            40,
-            75
+            8,
+            8,
+            8
           ],
           "duration": 48,
           "activeFrom": 13,
           "active": 25,
           "height": 197,
           "reach": 91,
-          "radius": 70
-        }
+          "radius": 70,
+          "mine": 240
+        },
+        "gravity": 3400,
+        "strengthSpeed": [
+          0.2,
+          3,
+          5.8
+        ]
       },
       "especialBase": {
         "activeFrames": 1,

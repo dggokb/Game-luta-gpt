@@ -554,10 +554,13 @@ public class MechanicsTest {
         assertTrue("backed away from the opponent", start - s.f(0).x > 60f);
     }
 
-    /** Caixa surpresa da p16 (→↓↘): cai e vira armadilha; o botão escolhe o pavio da luva. */
-    private static int boxGloveHitFrame(boolean light, boolean heavy) {
+    /**
+     * Caixa surpresa da p16 (→↓↘): cai e vira mina; o botão escolhe onde ela cai (16/11: L perto,
+     * M no meio, H longe) e a luva pega quem está na frente dela. {@code gap}: onde o rival está.
+     */
+    private static int boxGloveHitFrame(boolean light, boolean heavy, float gap) {
         CharacterDefinition c = GeneratedCharacters.get("p16");
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(c, BASE, 500f, 750f);
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(c, BASE, 500f, 500f + gap);
         for (int d : new int[]{1, 1, 3, 3, 2}) { s.in[0].direction = d; s.step(); }
         s.in[0].direction = 2;
         if (light) s.in[0].light = true; else if (heavy) s.in[0].heavy = true; else s.in[0].medium = true;
@@ -572,10 +575,12 @@ public class MechanicsTest {
         return -1;
     }
 
-    @Test public void boxTrapOpensByButtonAndTheGloveHits() {
-        int l = boxGloveHitFrame(true, false), m = boxGloveHitFrame(false, false), h = boxGloveHitFrame(false, true);
-        assertTrue("the glove hits whoever stands on the box: " + l + " " + m + " " + h, l > 0 && m > 0 && h > 0);
-        assertTrue("L opens first, H last", l < m && m < h);
+    @Test public void boxTrapLandsWhereTheButtonSaysAndTheGloveHits() {
+        // A luva sai ~90 px à frente da caixa: perto (L) ~265 px, meio (M) ~385, longe (H) ~510.
+        int l = boxGloveHitFrame(true, false, 265f), m = boxGloveHitFrame(false, false, 385f), h = boxGloveHitFrame(false, true, 505f);
+        assertTrue("the glove hits whoever stands in front of the box: " + l + " " + m + " " + h, l > 0 && m > 0 && h > 0);
+        assertTrue("a mina abre logo: " + l + " " + m + " " + h, Math.max(l, Math.max(m, h)) < 80);
+        assertEquals("L perto não alcança longe", -1, boxGloveHitFrame(true, false, 505f));
     }
 
     /** Hitstop of each strike of a several-strike H, by contact; {@code stop}: strikeStop (0 = default). */

@@ -372,6 +372,15 @@ final class CharacterDefinition {
             projectile.trapActive=active;projectile.trapHeight=height;projectile.trapReach=reach;projectile.trapRadius=radius;
             return this;
         }
+        /**
+         * A armadilha vira mina: depois do pavio (armar) fica fechada até o rival chegar onde a
+         * luva salta, ou até {@code frames} quadros, e só então abre.
+         */
+        Special withMine(int frames) {
+            if(projectile.trapFuse==null||frames<1)throw new IllegalArgumentException("mine needs a trap and frames > 0");
+            projectile.trapMine=frames;
+            return this;
+        }
         Special withArc(float gravity,float light,float medium,float heavy) {
             if(gravity<=0f||light<=0f||medium<=0f||heavy<=0f)throw new IllegalArgumentException("arc: gravity and the L, M, H speeds > 0");
             projectile.gravity=gravity;projectile.strengthSpeed=new float[]{light,medium,heavy};
@@ -428,6 +437,8 @@ final class CharacterDefinition {
         /** Armadilha onde cai (caixa da p16); trapFuse null: não é armadilha. */
         int[] trapFuse;
         int trapDuration,trapActiveFrom,trapActive;
+        /** Mina: quadros que a caixa armada espera o rival (0: abre no fim do pavio). */
+        int trapMine;
         float trapHeight,trapReach,trapRadius;
         float puddleHalfWidth;
         float spawnHeight(boolean crouching,boolean airborne) {

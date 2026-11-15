@@ -3416,11 +3416,17 @@ final class CombatEngine {
         Iterator<Armadilha> it = traps.iterator();
         while (it.hasNext()) {
             Armadilha t = it.next();
-            if (!t.open()) {
+            CharacterDefinition.Projectile d = t.data;
+            if (t.armed()) {
+                // Mina: abre quando o rival chega onde a luva salta, ou no fim do tempo dela.
+                if (++t.waited >= d.trapMine || minaPisada(t)) {
+                    t.triggered = true;
+                    cues.add("TRAP_OPEN");
+                } else continue;
+            } else if (!t.open()) {
                 t.fuse--;
                 continue;
             }
-            CharacterDefinition.Projectile d = t.data;
             if (t.opened == d.trapActiveFrom) {
                 float speed = 60f;   // 1 px por quadro: dura os quadros ativos e some
                 energyProjectiles.add(new Projectile(t.x + t.direction * d.trapReach, Arena.GROUND_Y - d.trapHeight,
@@ -3429,6 +3435,19 @@ final class CombatEngine {
             }
             if (++t.opened >= d.trapDuration) it.remove();
         }
+    }
+
+    /** Margem da mina além do raio da luva: abre um pouco antes, para o rival andar para dentro dela. */
+    private static final float MINA_MARGEM = 40f;
+
+    /** O rival está onde a luva da mina salta (perto do chão, na frente da caixa). */
+    private boolean minaPisada(Armadilha t) {
+        CombatFighter d = fighters[1 - t.ownerIndex];
+        if (!d.hittable() || d.ko()) return false;
+        CharacterDefinition.Projectile data = t.data;
+        float luva = t.x + t.direction * data.trapReach;
+        boolean baixo = Arena.GROUND_Y - d.y <= data.trapHeight + data.trapRadius;
+        return baixo && Math.abs(d.x - luva) <= data.trapRadius + d.body().halfWidth + MINA_MARGEM;
     }
 
     /**
