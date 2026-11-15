@@ -129,7 +129,7 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 |---|---|---|
 | 1. Sequência | **Esquete do palhaço: L, M, L, M, H.** O M cancela de volta no L (até 2 M na corrente); o H joga na parede | estilo `circo` (`mecanicas.json` combos) |
 | 2. Comando | ainda não tem (→ + H sai como o H): espera vídeo | — |
-| 3. Ponte | **S4 Estrelinha:** a última passada lança e cancela em pulo (o super pulo persegue). **S2 Caixa surpresa:** o botão escolhe onde cai (L perto, M meio, H longe), vira mina que abre com o rival em cima, e a luva devolve o rival em arco para trás (`arco` com distância negativa: sobe 170, volta 200) | `mecanicas.json` p16.especiais (`lancar`, `cancelaEm`, `distancias`, `armadilha.mina`), `pancadas.json` p16.S2.arco |
+| 3. Ponte | **S4 Estrelinha:** a última passada lança e cancela em pulo (o super pulo persegue). **S2 Caixa surpresa:** o botão escolhe onde cai (L perto, M meio, H longe), vira mina que abre com o rival em cima, a luva crava o rival no chão e ele quica no lugar; o H, ↓ + M ou → + M dela chuta a caixa no rival | `mecanicas.json` p16.especiais (`lancar` groundBounce, `cancelaEm`, `distancias`, `armadilha.mina`), `CombatEngine.chutarCaixas` |
 | 4. Corpo | **Pulo de circo:** 10% mais alto e 10% mais tempo no ar | `mecanicas.json` p16.unica.lutador |
 | 5. Parceiro | **O assist é a Caixa surpresa** (pavio curto): ela entra, joga a caixa e a luva devolve o rival para quem está em campo | `character.json` p16.fighter.assist.move: S2 |
 
@@ -143,9 +143,11 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 | B3 | Estrelinha | L, M, S4 (4 passadas, a última lança) → super pulo → jL, jM, jH → Balão | 10 |
 | B3b | Estrelinha com pulo no ar | L, M, S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
 | B3c | Esquete na Estrelinha | L, M, L, M, S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão (desde a Estrelinha rápida, 16/11) | 14 |
-| B4 | Caixa no combo | Caixa (L, perto) → L, M, L, M (o rival é empurrado até a luva, que o devolve) → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 11 |
-| B5 | Armadilha no meio | (rival a ~330 px) Caixa (M) → a mina abre com ele em cima → L, M, S4 → super pulo → jL, jM, jH → Balão | 8 |
-| B5b | Armadilha longe | (rival a ~450 px) Caixa (H) → a luva devolve → corre → 2H → super pulo → jL, jM, jH → Balão | 6 |
+| B4 | Caixa e 2H | Caixa (L, perto) → L, M (o rival chega na luva, quica) → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 10 |
+| B4b | Caixa e Estrelinha | Caixa (L) → L, M (quica) → S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
+| B4c | Esquete chuta a caixa | Caixa (M) → L, M, L, M, H (parede; o H chuta a caixa, que volta no rival) → corre → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 13 |
+| B5 | Armadilha | (rival a ~265 px) Caixa (L) → a mina abre, ele quica → corre → 2H → super pulo → jL, jM, jH → Balão | 5 |
+| B5b | Chute de longe | (rival a ~600 px) Caixa (L) → ↓ + M chuta a caixa, que voa até ele → corre → 2H → super pulo → jL, jM, jH → Balão | 5 |
 | B6 | Assist | (Natisuko em campo) L, assist (a caixa da Bonnie) → L, M, H → S4 | 7 |
 
 ### Combos da dupla, com a Natisuko (16/11)
@@ -156,8 +158,8 @@ PC com o mesmo número de acertos do teste (`ComboBonnieTest.duplaDoCirco`).
 | # | Nome | Sequência | Acertos |
 |---|---|---|---|
 | D1 | Dupla do circo | (Bonnie) L, M, L, M, H (parede) → corre → assist da Natisuko (lança) → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
-| D2 | Caixa e Natisuko | (Bonnie) Caixa (L) → L, M, L, M (a luva devolve) → assist da Natisuko → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 11 |
-| D3 | Natisuko e a caixa | (Natisuko) L, M → assist da Bonnie (a caixa) → L, M, L, M, H | 8 |
+| D2 | Caixa e Natisuko | (Bonnie) Caixa (M) → L, M, L, M, H (chuta a caixa) → corre → assist da Natisuko → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 13 |
+| D3 | Natisuko e a caixa | (Natisuko) L, M → assist da Bonnie (a caixa) → L, M, L, M, H | 6 |
 
 A troca no Super (DHC) entre as duas não saiu no motor: fica para quando a dupla for refeita
 junto.

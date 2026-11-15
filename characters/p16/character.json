@@ -18771,6 +18771,7 @@
         "H"
       ],
       "nome": "Caixa surpresa",
+      "launchType": "groundBounce",
       "projectile": {
         "visual": "CAIXA",
         "range": 600,
@@ -18800,21 +18801,13 @@
         ]
       },
       "especialBase": {
+        "launchType": "knockdown",
         "activeFrames": 1,
         "recoveryFrames": 22,
         "reach": 81,
         "hitHeight": 138,
         "hitFloor": null,
-        "launchType": "knockdown",
         "knockback": 60
-      },
-      "arcoBase": "none",
-      "launchType": "arc",
-      "mecanica": {
-        "arco": {
-          "altura": 170,
-          "distancia": -200
-        }
       }
     },
     "S3": {

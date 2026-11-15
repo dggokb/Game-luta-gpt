@@ -2432,7 +2432,8 @@
               3,
               5.8
             ]
-          }
+          },
+          "lancar": "groundBounce"
         },
         "S3": {
           "baixo": true,

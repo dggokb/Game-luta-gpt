@@ -501,7 +501,7 @@ def especiais(pack, spec):
             if p['visual'] not in VISUALS:
                 raise SystemExit(f"especiais.{key}.projetil.visual {p['visual']}: um de {VISUALS}")
             for k in ('activeFrames', 'recoveryFrames') + SPECIAL_MELEE:
-                base[k] = m.get(k)
+                base.setdefault(k, m.get(k))   # o "lancar" acima já guardou o launchType de antes
             # Lança num quadro só (como o S1); o resto do tempo ativo vira recuperação.
             m['recoveryFrames'] += m['activeFrames'] - 1
             m['activeFrames'] = 1

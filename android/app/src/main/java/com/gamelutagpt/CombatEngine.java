@@ -3435,6 +3435,38 @@ final class CombatEngine {
             }
             if (++t.opened >= d.trapDuration) it.remove();
         }
+        chutarCaixas();
+    }
+
+    /** Golpes da dona que chutam a caixa no chão (o médio de cima não: é a palmada). */
+    private static final java.util.Set<String> CHUTAM_A_CAIXA = new java.util.HashSet<>(java.util.Arrays.asList("H", "2M", "6M"));
+    /** A caixa chutada: velocidade, alcance, raio e altura do voo rente ao chão. */
+    private static final float CAIXA_CHUTADA_VELOCIDADE = 1100f, CAIXA_CHUTADA_ALCANCE = 900f,
+        CAIXA_CHUTADA_RAIO = 50f, CAIXA_CHUTADA_ALTURA = 70f;
+
+    /**
+     * A caixa da Bonnie no chão, ainda fechada, chutada por ela (H, ↓ + M ou → + M ativo e a caixa
+     * ao alcance na frente): sai voando rente ao chão na direção do rival e, se pega, acerta como a
+     * luva (o rival quica no chão).
+     */
+    private void chutarCaixas() {
+        Iterator<Armadilha> it = traps.iterator();
+        while (it.hasNext()) {
+            Armadilha t = it.next();
+            if (t.open()) continue;
+            CombatFighter f = fighters[t.ownerIndex];
+            if (!f.attacking() || !f.grounded || f.attack == null || !CHUTAM_A_CAIXA.contains(f.attack.id) ||
+                !f.attack.isActive(f.attackFrame)) continue;
+            float frente = (t.x - f.x) * f.facing;
+            if (frente < -20f || frente > f.attack.reach + 40f) continue;
+            it.remove();
+            CombatFighter rival = fighters[1 - t.ownerIndex];
+            int dir = rival.x >= t.x ? 1 : -1;
+            Projectile p = new Projectile(t.x, Arena.GROUND_Y - CAIXA_CHUTADA_ALTURA, CAIXA_CHUTADA_ALCANCE,
+                CAIXA_CHUTADA_VELOCIDADE, CAIXA_CHUTADA_RAIO, t.damage, t.color, t.ownerIndex, dir, t.attack, "CAIXA");
+            energyProjectiles.add(p);
+            cues.add("CAIXA_CHUTADA");
+        }
     }
 
     /** Margem da mina além do raio da luva: abre um pouco antes, para o rival andar para dentro dela. */
@@ -5136,7 +5168,9 @@ final class CombatEngine {
         boolean runBounce = attack.id.equals(CancelSystem.RUN_HEAVY);
         boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && (session.hitCount >= 2 || powerBounce || runBounce) &&
             session.wallBounces < config.maxWallBounces;
-        boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
+        // Quica no chão quem está no ar; em pé, só um projétil (a luva e a caixa chutada da Bonnie,
+        // 16/11) crava o rival no chão e ele quica no lugar, aberto para o combo.
+        boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && (!d.grounded || projectile) &&
             session.groundBounces < config.maxGroundBounces;
 
         boolean spinHit = attack.spin && lastStrike && !projectile;
@@ -5204,6 +5238,13 @@ final class CombatEngine {
         } else if (groundBounce) {
             // Driven into the floor; it pops back up in land().
             session.groundBounces++;
+            if (d.grounded) {
+                // Em pé (a luva da caixa): sai do chão só para bater nele e quicar no lugar.
+                d.grounded = false;
+                d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+                d.pushRemaining = 0f;
+                d.pushFramesLeft = 0;
+            }
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.vy = config.groundBounceDown;
             d.bounce = CombatFighter.BOUNCE_GROUND;

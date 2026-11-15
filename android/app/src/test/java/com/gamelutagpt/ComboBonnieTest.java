@@ -63,19 +63,45 @@ public class ComboBonnieTest {
     }
 
     @Test public void caixaNoMeioDoCombo() {
-        // Arma a caixa (pavio médio) e começa o combo: a luva pega no meio e devolve o rival em
-        // arco; ela lança no 2H e fecha no ar.
+        // 16/11: a luva crava o rival no chão e ele quica no lugar, aberto para o combo.
         AttackDefinition s2 = GeneratedCharacters.get(BONNIE).attack("S2");
-        assertEquals(AttackDefinition.Launch.ARC, s2.launch);
-        assertTrue("o arco volta para ela", s2.mechanics.arcDistance < 0f);
-        // Caixa perto (L): cai logo à frente; no L, M, L, M o rival é empurrado até a luva.
-        emenda(combo(BONNIE, NATISUKO, "S2L L M L M W5 2H SJ jL jM J jL jM jH S", 100f, false, 2), "caixa no combo", 11);
+        assertEquals(AttackDefinition.Launch.GROUND_BOUNCE, s2.launch);
+        // Caixa perto (L), L, M: o rival é empurrado até a luva, quica, e ela lança no 2H.
+        BateriaCombos.Exec x = emenda(combo(BONNIE, NATISUKO, "S2L L M W10 2H SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e 2H", 10);
+        assertEquals("quicou no chão", 1, x.chao);
+        // Ou pega o quique com a Estrelinha.
+        emenda(combo(BONNIE, NATISUKO, "S2L L M S4 W20 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Estrelinha", 12);
+        // Caixa no meio (M): o esquete, e o H chuta a caixa de volta no rival.
+        emenda(combo(BONNIE, NATISUKO, "S2M L M L M H W10 C120 2H SJ jL jM J jL jM jH S", 100f, false, 2), "esquete chuta a caixa", 13);
     }
 
     @Test public void armadilhaDeLonge() {
-        // O botão escolhe onde ela cai: M no meio, H longe. A mina abre com o rival em cima.
-        emenda(combo(BONNIE, NATISUKO, "S2M W30 W10 L M S4 W40 SJ jL jM jH S", 330f, false, 3), "armadilha (M)", 8);
-        emenda(combo(BONNIE, NATISUKO, "S2H W30 W10 C 2H SJ jL jM jH S", 450f, false, 3), "armadilha (H)", 6);
+        // A mina abre com o rival em cima, ele quica e ela corre para lançar.
+        emenda(combo(BONNIE, NATISUKO, "S2L W20 C140 2H SJ jL jM jH S", 265f, false, 2), "armadilha", 5);
+    }
+
+    @Test public void chutaACaixa() {
+        // De longe: a caixa cai perto dela (L), o ↓ + M chuta e ela voa rente ao chão até o rival.
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(BONNIE), GeneratedCharacters.get("player_base"), 500f, 1100f);
+        CombatFighter me = s.f(0), r = s.f(1);
+        me.commandButton = "L";
+        me.buffer.push(InputBuffer.Button.SPECIAL, "S2", false);
+        s.steps(50);
+        assertEquals(1, s.engine.traps.size());
+        boolean chutou = false;
+        for (int i = 0; i < 20 && !chutou; i++) {
+            s.in[0].direction = 2;
+            s.in[0].medium = i == 0;
+            s.step();
+            chutou = s.engine.cues().contains("CAIXA_CHUTADA");
+        }
+        s.in[0].direction = 0;
+        assertTrue("chutou a caixa", chutou);
+        assertTrue("a caixa saiu do chão", s.engine.traps.isEmpty());
+        s.until(() -> r.status != CombatFighter.Status.NEUTRAL, 60);
+        assertEquals("a caixa pegou e ele quica", CombatFighter.Status.AIR_HITSTUN, r.status);
+        // No combo: a caixa chutada abre o caminho para correr e lançar.
+        emenda(combo(BONNIE, NATISUKO, "S2L 2M W10 C140 2H SJ jL jM jH S", 600f, false, 3), "chute de longe", 5);
     }
 
     /** Onde a caixa cai com L, M e H, quando cai e quando a Bonnie fica livre. */
@@ -115,8 +141,8 @@ public class ComboBonnieTest {
             if (abriu < 0 && s.engine.cues().contains("TRAP_OPEN")) abriu = i;
         }
         assertTrue("abriu pelo rival, antes do fim da mina", abriu >= 0 && abriu < 120);
-        assertEquals("a luva o devolve em arco", CombatFighter.Status.AIR_HITSTUN, r.status);
-        assertTrue("voltando para a Bonnie", r.vx * (me.x - r.x) > 0f);
+        assertEquals("a luva o pega", CombatFighter.Status.AIR_HITSTUN, r.status);
+        assertEquals("cravado no chão: vai quicar", CombatFighter.BOUNCE_GROUND, r.bounce);
         // Ninguém chega: abre sozinha no fim (4 s) e some.
         CombatEngineTest.Sim so = new CombatEngineTest.Sim(GeneratedCharacters.get(BONNIE), GeneratedCharacters.get("player_base"), 500f, 1500f);
         so.f(0).commandButton = "M";
@@ -138,9 +164,9 @@ public class ComboBonnieTest {
         assertEquals("2H", GeneratedCharacters.get(NATISUKO).fighter.assistMove);
         emenda(combo(BONNIE, NATISUKO, "L M L M H W5 C120 A W25 SJ jL jM J jL jM jH S", 100f, false, 1), "dupla do circo", 12);
         // A caixa armada, a luva devolve o rival e a Natisuko o lança para o combo no ar.
-        emenda(combo(BONNIE, NATISUKO, "S2L L M L M A W30 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Natisuko", 11);
+        emenda(combo(BONNIE, NATISUKO, "S2M L M L M H W10 C120 A W25 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Natisuko", 13);
         // Natisuko em campo: chama a caixa da Bonnie no meio; a luva pega e ela continua.
-        emenda(combo(NATISUKO, BONNIE, "L M A L M L M H", 100f, false, 1), "Natisuko e a caixa", 8);
+        emenda(combo(NATISUKO, BONNIE, "L M A L M L M H", 100f, false, 1), "Natisuko e a caixa", 6);
     }
 
     @Test public void puloDeCirco() {
