@@ -212,10 +212,26 @@ fica soltando bola"):
   levando a maioria. Teste: `CpuTest.aHighLevelCpuBeatsAFireballSpammer`.
 
 **Caderno de combos** (`ComboBook`): a rota principal de cada lutador sai do próprio pacote
-(`cancelInto`, `maxUsesPerChain`) e do estilo, sem combo escrito à mão. Ex.: p01
-`L M 2H super-pulo jL jM pulo-no-ar jL jM j2H`; p04 `L M M 2H ...`; p09 `L M H H SUPER`;
-p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas (no acerto ou na defesa, como um jogador
-encadeia); lançador, especial, Super e super pulo só depois de ver que acertou.
+(`cancelInto`, `maxUsesPerChain`) e do estilo; só o fecho no ar é uma tabela
+(`ComboBook.FECHO_NO_AR`, a mesma do `ComboNoArTest`). Ex.: p01 `L M M 2H super-pulo jL jM S3`;
+p04 `L M M 2H ...`; p09 `L M H H SUPER`; p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas
+(no acerto ou na defesa, como um jogador encadeia); lançador, especial, Super e super pulo só
+depois de ver que acertou.
+
+- **Combo aéreo (15/11)**, o dono: "a CPU já tentou fazer combo aéreo mas sempre se perde".
+  Medido (nível 8 contra o boneco parado, 4 × 90 s por personagem): de quem lança com o 2H,
+  **nenhum** passava do pulo no ar. Três causas, três correções:
+  1. ela esperava o 2H acabar para o super pulo e subia atrasada (o rival já no alto): agora o
+     super pulo **cancela o lançador** (`superPuloNoCancelamento`);
+  2. o próprio acerto contava do fim da pausa do impacto, e com a reação a janela do
+     cancelamento já tinha fechado: agora conta **do quadro do acerto**, que ela vê durante a
+     pausa como uma pessoa (`acertoNaPausa`);
+  3. depois do jM ela dava o pulo no ar: subia enquanto o rival caía e o jL passava no vazio.
+     Agora a rota **fecha com o especial no ar** do personagem (`FECHO_NO_AR`; sem fecho, a rota
+     antiga com o pulo no ar).
+  Depois: fecham no especial, por exemplo, p01 5 de 5, p03 35 de 44, p05 21 de 23, p10 45 de 53,
+  p12 27 de 30, p14 26 de 33 (`CpuComboNoArTest`). Quem não lança com o 2H (p06, p07, p08, p09,
+  p11, p13: estilos de parede) não faz combo aéreo.
 
 - **Alcance com o empurrão**: o próximo golpe só sai se alcança o rival *depois* do empurrão que
   ainda vai acontecer (`projectedGap`). Um 2L na ponta empurra o rival para fora do M, e antes o

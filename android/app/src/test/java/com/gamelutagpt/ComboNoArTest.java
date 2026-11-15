@@ -54,6 +54,21 @@ public class ComboNoArTest {
         }
     }
 
+    @Test public void aCpuFechaComOMesmoEspecial() {
+        // O caderno da CPU (ComboBook.FECHO_NO_AR) usa a mesma tabela.
+        for (String[] c : COMBOS) {
+            String[] fecho = ComboBook.FECHO_NO_AR.get(c[0]);
+            String[] passos = c[1].split(" ");
+            assertEquals(c[0] + ": golpe de ar que cancela", passos[passos.length - 1], fecho[0]);
+            assertEquals(c[0] + ": especial", c[2], fecho[1]);
+            java.util.List<String> rota = ComboBook.route(GeneratedCharacters.get(c[0]));
+            if (rota.contains(ComboBook.JUMP)) {
+                assertEquals(c[0] + ": a rota da CPU fecha no especial no ar: " + rota, c[2], rota.get(rota.size() - 1));
+                assertTrue(c[0] + ": sem pulo no ar: " + rota, !rota.contains(ComboBook.AIR_JUMP));
+            }
+        }
+    }
+
     @Test public void oGolpeDeArCancelaEmEspecial() {
         for (String id : GeneratedCharacters.SELECTABLE) {
             CharacterDefinition c = GeneratedCharacters.get(id);

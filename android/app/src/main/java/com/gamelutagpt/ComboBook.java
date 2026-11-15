@@ -18,7 +18,29 @@ final class ComboBook {
     static final String JUMP = "JUMP", AIR_JUMP = "AIR_JUMP";
     /** Passos que comprometem (inseguros na defesa): só depois de ver que acertou. */
     static boolean commits(String step) {
-        return "2H".equals(step) || "S".equals(step) || "SUPER".equals(step) || JUMP.equals(step);
+        return "2H".equals(step) || special(step) || "SUPER".equals(step) || JUMP.equals(step);
+    }
+
+    /** Passo que é especial: S (a energia) ou S2..S9. */
+    static boolean special(String step) {
+        return "S".equals(step) || step.length() == 2 && step.charAt(0) == 'S' && Character.isDigit(step.charAt(1));
+    }
+
+    /**
+     * O fecho do combo aéreo de cada um (15/11): depois do super pulo e de jL, jM, o golpe de ar que
+     * cancela (jM ou jH) e o especial solto no ar, parado (docs/personagens/combos-assinatura.md,
+     * "No ar"; {@code ComboNoArTest} confere cada um no motor). O pulo no ar no meio da corrente
+     * aérea saiu da rota da CPU: depois dele ela subia e o rival caía, e o combo se perdia.
+     */
+    static final Map<String, String[]> FECHO_NO_AR = new HashMap<>();
+    static {
+        String[][] t = {
+            {"player_base", "jM", "S3"}, {"p02", "jH", "S4"}, {"p03", "jM", "S2"}, {"p04", "jM", "S2"},
+            {"p05", "jH", "S2"}, {"p06", "jM", "S2"}, {"p07", "jH", "S4"}, {"p08", "jH", "S2"},
+            {"p09", "jH", "S"}, {"p10", "jH", "S"}, {"p11", "jH", "S"}, {"p12", "jH", "S2"},
+            {"p13", "jM", "S"}, {"p14", "jH", "S2"}, {"p15", "jH", "S4"}, {"p16", "jH", "S"},
+        };
+        for (String[] f : t) FECHO_NO_AR.put(f[0], new String[] {f[1], f[2]});
     }
 
     private static final Map<String, List<String>> CACHE = new HashMap<>();
@@ -82,9 +104,20 @@ final class ComboBook {
         return route;
     }
 
-    /** Corrente aérea depois do super pulo: jL > jM (> pulo no ar > jL > jM) > j2H ou jH. */
+    /**
+     * Corrente aérea depois do super pulo: jL > jM e o fecho no ar do personagem
+     * ({@link #FECHO_NO_AR}); sem fecho, jL > jM (> pulo no ar > jL > jM) > j2H ou jH.
+     */
     private static void air(CharacterDefinition c, List<String> route) {
         if (c.attack("jL") == null || c.attack("jM") == null) return;
+        String[] fecho = FECHO_NO_AR.get(c.id);
+        if (fecho != null && c.attack(fecho[1]) != null) {
+            route.add("jL");
+            route.add("jM");
+            if ("jH".equals(fecho[0])) route.add("jH");
+            route.add(fecho[1]);
+            return;
+        }
         Map<String, Integer> uses = new HashMap<>();
         String current = "jL";
         add(route, uses, current);
