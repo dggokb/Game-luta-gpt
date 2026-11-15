@@ -365,7 +365,7 @@ public class TorneioTest {
             }
         }
         // Todas as duplas com golpes podem aparecer no porto.
-        assertEquals(new HashSet<>(java.util.Arrays.asList("p05", "p07", "p09", "p11")), vistos);
+        assertEquals(new HashSet<>(java.util.Arrays.asList("p05", "p07", "p09", "p11", "p13")), vistos);
     }
 
     /** As páginas prontas (e "LUTA") do episódio {@code id}, com o irmão já escolhido. */

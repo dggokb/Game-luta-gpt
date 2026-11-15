@@ -31,7 +31,7 @@ public class ArcadeTest {
     private static final File ASSETS = new File("../app/src/main/assets");
     /** Os lutadores com golpes hoje (os da seleção). */
     private static final List<String> LUTADORES = Arrays.asList("player_base", "p02", "p03", "p04", "p05", "p06",
-        "p07", "p08", "p09", "p10", "p11", "p12");
+        "p07", "p08", "p09", "p10", "p11", "p12", "p13", "p14");
 
     private static final class GameAssets implements RenderAssets {
         @Override public String readText(String path) throws IOException {
@@ -61,7 +61,7 @@ public class ArcadeTest {
     @Test
     public void oficiaisSaoAsDuplasQueJaLutam() throws IOException {
         List<Torneio.Dupla> oficiais = oficiais();
-        assertEquals("as 6 prontas (p13–p16 ainda sem golpes)", 6, oficiais.size());
+        assertEquals("as 7 prontas (p15 e p16 ainda sem golpes)", 7, oficiais.size());
         for (Torneio.Dupla d : oficiais) {
             assertTrue(d.pronta);
             assertTrue(LUTADORES.containsAll(Arrays.asList(d.lutadores)));
@@ -88,9 +88,9 @@ public class ArcadeTest {
                 assertFalse("o mesmo lutador duas vezes na dupla", d.lutadores[0].equals(d.lutadores[1]));
                 assertTrue("lutador sem golpes: " + d.id, LUTADORES.containsAll(Arrays.asList(d.lutadores)));
             }
-            // As outras 5 oficiais estão na chave.
+            // As outras oficiais estão na chave.
             for (Torneio.Dupla o : oficiais) assertTrue(o.id, vistas.contains(o));
-            // 32 lugares para 12 lutadores, espalhados por igual (2 ou 3 duplas cada).
+            // 32 lugares para 14 lutadores, espalhados por igual (2 ou 3 duplas cada).
             java.util.Map<String, Integer> vezes = new java.util.HashMap<>();
             for (Torneio.Dupla d : vistas) for (String l : d.lutadores) vezes.merge(l, 1, Integer::sum);
             assertEquals(LUTADORES.size(), vezes.size());
@@ -109,7 +109,7 @@ public class ArcadeTest {
         assertSame(livre, t.jogador());
         int oficiaisNaChave = 0;
         for (int v = 0; v < 16; v++) if (oficiais.contains(t.participante(0, v))) oficiaisNaChave++;
-        assertEquals(6, oficiaisNaChave);
+        assertEquals(oficiais.size(), oficiaisNaChave);
         // A dupla livre de quem joga igual a uma oficial: a oficial não entra de novo.
         Torneio.Dupla igual = Arcade.livre("p02", "player_base");
         Torneio u = Arcade.chave(igual, oficiais, LUTADORES, new Random(7));

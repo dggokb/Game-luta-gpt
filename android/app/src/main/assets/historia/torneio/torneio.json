@@ -11,7 +11,8 @@
       "cinematica": "torneio/cinematica_p09.json" },
     { "id": "p11", "lutadores": ["p11", "p12"], "fala": "Hu hu hu... mais cobaias para a minha criação...", "quemFala": 0,
       "cinematica": "torneio/cinematica_p11.json" },
-    { "id": "p13", "lutadores": ["p13", "p14"], "fala": "Algum problema? Quem cair com a gente, cai feio.", "quemFala": 0, "pronta": false },
+    { "id": "p13", "lutadores": ["p13", "p14"], "fala": "Algum problema? Quem cair com a gente, cai feio.", "quemFala": 0,
+      "cinematica": "torneio/cinematica_p13.json" },
     { "id": "p15", "lutadores": ["p15", "p16"], "fala": "Bonnie se comporta sempre... mas agora ela luta! Hi hi hi!", "quemFala": 1, "pronta": false }
   ]
 }

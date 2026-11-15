@@ -214,11 +214,12 @@ public class ConversaLutaTest {
         };
         Temporada temporada = Temporada.load(FILES);
         ConversaLuta c = new ConversaLuta(assets);
-        c.avulso("p05", "P05", 0xFF112233, "selection/rostos/p05.webp");
-        c.dizer(temporada, "p05", true, "bravo", "Troca comigo!", 1f);
-        assertEquals("P05", c.nome("p05"));
-        assertEquals(0xFF112233, c.cor("p05"));
-        assertTrue("tenta o retrato e cai no de reserva", pedidos.contains("selection/rostos/p05.webp"));
+        // Um lutador fora do elenco da história (hoje todos têm nome nele: um código inventado).
+        c.avulso("p99", "P99", 0xFF112233, "selection/rostos/p99.webp");
+        c.dizer(temporada, "p99", true, "bravo", "Troca comigo!", 1f);
+        assertEquals("P99", c.nome("p99"));
+        assertEquals(0xFF112233, c.cor("p99"));
+        assertTrue("tenta o retrato e cai no de reserva", pedidos.contains("selection/rostos/p99.webp"));
         c.avulso("ryuga", "P01", 0xFF000000, "selection/rostos/p01.webp");
         assertEquals("Ryūga", c.nome("ryuga"));
         assertEquals(temporada.personagem("ryuga").cor, c.cor("ryuga"));
