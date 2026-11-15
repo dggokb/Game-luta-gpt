@@ -78,6 +78,18 @@ public class ComboBonnieTest {
         emenda(combo(NATISUKO, BONNIE, "L M A L M H", 100f, false, 1), "assist", 6);
     }
 
+    /** Combos da dupla (16/11): a Bonnie e a Natisuko juntas, uma chamando a outra no meio. */
+    @Test public void duplaDoCirco() {
+        // Bonnie em campo: o esquete joga na parede, ela corre e chama a Natisuko, cujo 2H lança; a
+        // Bonnie sobe atrás e fecha no ar com o Balão.
+        assertEquals("2H", GeneratedCharacters.get(NATISUKO).fighter.assistMove);
+        emenda(combo(BONNIE, NATISUKO, "L M L M H W5 C120 A W25 SJ jL jM J jL jM jH S", 100f, false, 1), "dupla do circo", 12);
+        // A caixa armada, a luva devolve o rival e a Natisuko o lança para o combo no ar.
+        emenda(combo(BONNIE, NATISUKO, "S2M L M A W30 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Natisuko", 9);
+        // Natisuko em campo: chama a caixa da Bonnie no meio e fecha com a voadora (S4).
+        emenda(combo(NATISUKO, BONNIE, "L M A L M H S4", 100f, false, 1), "Natisuko e a caixa", 8);
+    }
+
     @Test public void puloDeCirco() {
         CharacterDefinition b = GeneratedCharacters.get(BONNIE), base = GeneratedCharacters.get("player_base");
         // 10% mais alto e 10% mais tempo no ar: a gravidade do pulo dela é menor.

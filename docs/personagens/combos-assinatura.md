@@ -146,6 +146,20 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 | B5 | Armadilha | (de longe) Caixa (L) → a luva devolve o rival → L, M, S4 → super pulo → jL, jM, jH → Balão | 9 |
 | B6 | Assist | (Natisuko em campo) L, M, assist (a caixa da Bonnie) → L, M, H | 6 |
 
+### Combos da dupla, com a Natisuko (16/11)
+
+O assist da Natisuko é o 2H, que lança: a Bonnie chama no meio do combo e sobe atrás. Gravados no
+PC com o mesmo número de acertos do teste (`ComboBonnieTest.duplaDoCirco`).
+
+| # | Nome | Sequência | Acertos |
+|---|---|---|---|
+| D1 | Dupla do circo | (Bonnie) L, M, L, M, H (parede) → corre → assist da Natisuko (lança) → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
+| D2 | Caixa e Natisuko | (Bonnie) Caixa (M) → L, M (a luva devolve) → assist da Natisuko → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 9 |
+| D3 | Natisuko e a caixa | (Natisuko) L, M → assist da Bonnie (a caixa) → L, M, H → S4 Voadora | 8 |
+
+A troca no Super (DHC) entre as duas não saiu no motor: fica para quando a dupla for refeita
+junto.
+
 Gravados no PC (B1, B3, B4, B6). Nas gravações o começo é andando até o rival, então a distância e
 os acertos mudam um pouco em relação ao teste; o que vale é o teste.
 
