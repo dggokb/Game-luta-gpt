@@ -98,8 +98,13 @@ public class ComboBonnieTest {
         s.in[0].direction = 0;
         assertTrue("chutou a caixa", chutou);
         assertTrue("a caixa saiu do chão", s.engine.traps.isEmpty());
-        s.until(() -> r.status != CombatFighter.Status.NEUTRAL, 60);
-        assertEquals("a caixa pegou e ele quica", CombatFighter.Status.AIR_HITSTUN, r.status);
+        // Em voo não acerta: para na frente dele, abre e a luva soca.
+        s.until(() -> !s.engine.traps.isEmpty(), 60);
+        Armadilha aberta = s.engine.traps.get(0);
+        assertTrue("abriu", aberta.open());
+        assertEquals("parou com a luva no rival", r.x, aberta.x + aberta.direction * aberta.data.trapReach, 30f);
+        s.until(() -> r.status != CombatFighter.Status.NEUTRAL, 30);
+        assertEquals("a luva pegou e ele quica", CombatFighter.Status.AIR_HITSTUN, r.status);
         // No combo: a caixa chutada abre o caminho para correr e lançar.
         emenda(combo(BONNIE, NATISUKO, "S2L 2M W10 C140 2H SJ jL jM jH S", 600f, false, 3), "chute de longe", 5);
     }

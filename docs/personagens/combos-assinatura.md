@@ -129,7 +129,7 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 |---|---|---|
 | 1. Sequência | **Esquete do palhaço: L, M, L, M, H.** O M cancela de volta no L (até 2 M na corrente); o H joga na parede | estilo `circo` (`mecanicas.json` combos) |
 | 2. Comando | ainda não tem (→ + H sai como o H): espera vídeo | — |
-| 3. Ponte | **S4 Estrelinha:** a última passada lança e cancela em pulo (o super pulo persegue). **S2 Caixa surpresa:** o botão escolhe onde cai (L perto, M meio, H longe), vira mina que abre com o rival em cima, a luva crava o rival no chão e ele quica no lugar; o H, ↓ + M ou → + M dela chuta a caixa no rival | `mecanicas.json` p16.especiais (`lancar` groundBounce, `cancelaEm`, `distancias`, `armadilha.mina`), `CombatEngine.chutarCaixas` |
+| 3. Ponte | **S4 Estrelinha:** a última passada lança e cancela em pulo (o super pulo persegue). **S2 Caixa surpresa:** o botão escolhe onde cai (L perto, M meio, H longe), vira mina que abre com o rival em cima, a luva crava o rival no chão e ele quica no lugar; o H, ↓ + M ou → + M dela chuta a caixa, que voa, para na frente do rival e abre (a luva soca) | `mecanicas.json` p16.especiais (`lancar` groundBounce, `cancelaEm`, `distancias`, `armadilha.mina`), `CombatEngine.chutarCaixas` |
 | 4. Corpo | **Pulo de circo:** 10% mais alto e 10% mais tempo no ar | `mecanicas.json` p16.unica.lutador |
 | 5. Parceiro | **O assist é a Caixa surpresa** (pavio curto): ela entra, joga a caixa e a luva devolve o rival para quem está em campo | `character.json` p16.fighter.assist.move: S2 |
 

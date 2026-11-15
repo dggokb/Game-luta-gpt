@@ -15,6 +15,8 @@ final class Projectile {
     /** Armadilha que fica onde ele cai (caixa da p16) e o pavio dela; a caixa em voo não acerta. */
     CharacterDefinition.Projectile trap;
     int fuse;
+    /** A caixa chutada pela Bonnie: voa até a frente do rival, para e abre (a luva soca). */
+    boolean chutada;
     final float startX;
     final float startY;
     final float range;

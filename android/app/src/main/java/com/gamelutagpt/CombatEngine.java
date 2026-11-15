@@ -3438,6 +3438,34 @@ final class CombatEngine {
         chutarCaixas();
     }
 
+    /**
+     * A caixa chutada voa rente ao chão; ao chegar onde a luva alcança o rival (ou no fim do
+     * alcance) ela para, abre e a luva soca. True: virou a caixa aberta (sai da lista de projéteis).
+     */
+    private boolean caixaChutadaChegou(Projectile p) {
+        CharacterDefinition.Projectile d = p.trap;
+        CombatFighter rival = fighters[1 - p.ownerIndex];
+        float alvo = rival.x - p.direction * d.trapReach;   // onde a caixa para: a luva bate nele
+        float passo = p.speed * CombatConfig.DT;
+        float falta = (alvo - p.x) * p.direction;
+        boolean chegou = falta <= passo || Math.abs(p.x - p.startX) + passo >= p.range;
+        p.x += p.direction * Math.min(passo, Math.max(0f, falta));
+        if (!chegou) return false;
+        for (Iterator<Armadilha> it = traps.iterator(); it.hasNext();) {
+            if (it.next().ownerIndex == p.ownerIndex) it.remove();
+        }
+        Armadilha t = new Armadilha(p.x, p.ownerIndex, p.direction, p.color, p.damage, p.attack, d, 0);
+        t.triggered = true;
+        // Abre já perto do pico: a luva sai em poucos quadros (a caixa chegou abrindo).
+        t.opened = Math.max(0, d.trapActiveFrom - CAIXA_CHUTADA_ABRE);
+        traps.add(t);
+        cues.add("TRAP_OPEN");
+        return true;
+    }
+
+    /** Quadros entre a caixa chutada parar e a luva sair. */
+    private static final int CAIXA_CHUTADA_ABRE = 4;
+
     /** Golpes da dona que chutam a caixa no chão (o médio de cima não: é a palmada). */
     private static final java.util.Set<String> CHUTAM_A_CAIXA = new java.util.HashSet<>(java.util.Arrays.asList("H", "2M", "6M"));
     /** A caixa chutada: velocidade, alcance, raio e altura do voo rente ao chão. */
@@ -3446,8 +3474,8 @@ final class CombatEngine {
 
     /**
      * A caixa da Bonnie no chão, ainda fechada, chutada por ela (H, ↓ + M ou → + M ativo e a caixa
-     * ao alcance na frente): sai voando rente ao chão na direção do rival e, se pega, acerta como a
-     * luva (o rival quica no chão).
+     * ao alcance na frente): sai voando rente ao chão na direção do rival, para na frente dele e
+     * abre: a luva soca (o rival quica no chão).
      */
     private void chutarCaixas() {
         Iterator<Armadilha> it = traps.iterator();
@@ -3464,6 +3492,9 @@ final class CombatEngine {
             int dir = rival.x >= t.x ? 1 : -1;
             Projectile p = new Projectile(t.x, Arena.GROUND_Y - CAIXA_CHUTADA_ALTURA, CAIXA_CHUTADA_ALCANCE,
                 CAIXA_CHUTADA_VELOCIDADE, CAIXA_CHUTADA_RAIO, t.damage, t.color, t.ownerIndex, dir, t.attack, "CAIXA");
+            // Em voo ela não acerta (como a caixa jogada): chega na frente do rival e abre.
+            p.trap = t.data;
+            p.chutada = true;
             energyProjectiles.add(p);
             cues.add("CAIXA_CHUTADA");
         }
@@ -3570,6 +3601,10 @@ final class CombatEngine {
             Projectile p = it.next();
             p.previousX = p.x;
             if (p.holding) continue;   // parado no rival entre um acerto e o próximo
+            if (p.chutada) {
+                if (caixaChutadaChegou(p)) it.remove();
+                continue;
+            }
             if (p.returning) {
                 // O chicote recolhe mais rápido do que estica e some ao chegar na mão.
                 p.x -= RETRACT_SPEED * p.speed * p.direction * CombatConfig.DT;
