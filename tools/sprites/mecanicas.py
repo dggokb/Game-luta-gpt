@@ -493,6 +493,9 @@ def especiais(pack, spec):
         if 'empurrao' in e:
             base['knockback'] = m.get('knockback')
             m['knockback'] = e['empurrao']
+        if 'cancelaEm' in e:   # para onde o especial cancela no acerto (JUMP: a Estrelinha da p16 lança e pula atrás)
+            base['cancelInto'] = list(m.get('cancelInto', []))
+            m['cancelInto'] = list(dict.fromkeys(m.get('cancelInto', []) + e['cancelaEm']))
         p = e.get('projetil')
         if p:
             if p['visual'] not in VISUALS:
@@ -504,6 +507,8 @@ def especiais(pack, spec):
             m['activeFrames'] = 1
             for k in SPECIAL_MELEE:
                 m.pop(k, None)
+            if 'lancar' in e:   # o projétil lança (o que estava antes já ficou no especialBase)
+                m['launchType'] = e['lancar']
             proj = {'visual': p['visual'], 'range': p['alcance'], 'speed': p['velocidade'],
                     'spawnX': p['saidaX'], 'spawnY': p['saidaY'], 'vertical': p.get('vertical', 0)}
             if 'armadilha' in p:

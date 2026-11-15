@@ -3166,6 +3166,14 @@ final class CombatEngine {
             a.specialStrength = "M";
             return;
         }
+        CharacterDefinition.Special special = assistSpecial(a);
+        if (special != null) {
+            // Especial de comando (a Caixa surpresa da Bonnie): sai com o botão fraco (o pavio curto).
+            a.move = special.move;
+            a.attack = special.move.attack;
+            a.commandButton = "L";
+            return;
+        }
         CharacterDefinition.Move m = assistNormal(a);
         a.move = m;
         a.attack = m.attack;
@@ -3178,7 +3186,14 @@ final class CombatEngine {
         if ("S".equals(profile.assistMove) && profile.energy != null) {
             return profile.assistShot != null ? profile.assistShot : profile.energy.attack;
         }
-        return assistNormal(a).attack;
+        CharacterDefinition.Special special = assistSpecial(a);
+        return special != null ? special.move.attack : assistNormal(a).attack;
+    }
+
+    /** O especial de comando (S2 a S4) que o assist de {@code a} faz, ou null se é um normal ou o S. */
+    private static CharacterDefinition.Special assistSpecial(CombatFighter a) {
+        String move = a.state.profile.assistMove;
+        return move.matches("S[2-4]") ? a.character().specials.get(move) : null;
     }
 
     private static CharacterDefinition.Move assistNormal(CombatFighter a) {

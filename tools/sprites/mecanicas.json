@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais. golpeComando: o → + H do personagem (6H) inteiro, no formato do character.json (a animação é a do H até chegar a própria); o avanço dele vai em unica.golpes.6H. golpeCorrida: o mesmo para o golpe de corrida (H apertado correndo, DH); o avanço em unica.golpes.DH.",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; lancar = o que o último golpe faz, vale também no projétil (a luva da caixa da p16); cancelaEm = para onde cancela no acerto (JUMP: a Estrelinha da p16 pula atrás); projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR). super: acertos e intervalo da onda do Super, visual (FOGO), velocidade, rente = altura da saída perto do chão, clones de sombra (só desenho). Normais com identidade (docs/balanco/normais-fable.md): papelNormais (a frase do básico de cada um), framesGolpe e vantagemGolpe ([acerto, defesa]) também nos normais, normais (alcance, lancar, empurrao, recuo, pausa, mecanica), andar ([frente, trás] em px/s); base.impacto.segurar (quadros do impacto segurado) e base.corrente (folga, teto e rotas que o atordoamento garante). mecanicas.py --so-normais --write grava só os normais. golpeComando: o → + H do personagem (6H) inteiro, no formato do character.json (a animação é a do H até chegar a própria); o avanço dele vai em unica.golpes.6H. golpeCorrida: o mesmo para o golpe de corrida (H apertado correndo, DH); o avanço em unica.golpes.DH.",
   "base": {
     "frames": {
       "L": [
@@ -346,6 +346,17 @@
           "2L": 2,
           "M": 2,
           "H": 2
+        }
+      },
+      "circo": {
+        "descricao": "Bonnie (16/11): o esquete do palhaço. O M volta para o L (L, M, L, M) antes do H que joga na parede ou da Estrelinha, que lança e cancela em pulo para o combo no ar.",
+        "rotas": {
+          "M": [
+            "L"
+          ]
+        },
+        "maxUsosCorrente": {
+          "M": 2
         }
       }
     }
@@ -2336,7 +2347,7 @@
     },
     "p16": {
       "molde": "Rushdown caótico (provisório)",
-      "estiloCombo": "equilibrado",
+      "estiloCombo": "circo",
       "vida": 10000,
       "dano": 1.0,
       "ritmo": 1.0,
@@ -2419,6 +2430,12 @@
         "S3": {
           "baixo": true,
           "altura": 70
+        },
+        "S4": {
+          "lancar": "launch",
+          "cancelaEm": [
+            "JUMP"
+          ]
         }
       },
       "projetil": {
@@ -2426,7 +2443,15 @@
         "alcance": 900
       },
       "unica": {
-        "descricao": "Estrelinha (S4): a estrela para a frente, um acerto a cada toque das pernas no rival. Especiais ainda com os dados do p01 e a guarda parada (sem vídeo)."
+        "descricao": "Palhaça acrobata: a Estrelinha (S4) lança e cancela em pulo para o combo no ar; a luva da Caixa surpresa (S2) joga o rival para o alto; pulo de circo (10% mais alto e mais tempo no ar).",
+        "lutador": {
+          "corpo": {
+            "pulo": {
+              "altura": 1.1,
+              "tempo": 1.1
+            }
+          }
+        }
       },
       "comandos": {
         "S1": {

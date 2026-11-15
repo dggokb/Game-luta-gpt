@@ -106,9 +106,9 @@
       "hitInterval": 8
     },
     "assist": {
-      "move": "S"
+      "move": "S2"
     },
-    "comboStyle": "equilibrado",
+    "comboStyle": "circo",
     "ultra": {
       "preparo": 24,
       "golpes": [
@@ -248,7 +248,15 @@
       ]
     },
     "walkSpeed": 330,
-    "walkBackSpeed": 250
+    "walkBackSpeed": 250,
+    "mecanica": {
+      "corpo": {
+        "pulo": {
+          "altura": 1.1,
+          "tempo": 1.1
+        }
+      }
+    }
   },
   "animations": {
     "IDLE": {
@@ -18606,7 +18614,8 @@
         "S2",
         "S3",
         "S4",
-        "2H"
+        "2H",
+        "L"
       ],
       "pushbackOnHit": 32,
       "pushbackOnBlock": 38,
@@ -18620,7 +18629,7 @@
         "S3",
         "S4"
       ],
-      "maxUsesPerChain": 1
+      "maxUsesPerChain": 2
     },
     "6M": {
       "animation": "GOLPE_ALTO",
@@ -18791,6 +18800,14 @@
         "hitFloor": null,
         "launchType": "knockdown",
         "knockback": 60
+      },
+      "arcoBase": "none",
+      "launchType": "arc",
+      "mecanica": {
+        "arco": {
+          "altura": 170,
+          "distancia": -200
+        }
       }
     },
     "S3": {
@@ -18868,9 +18885,10 @@
         "whiff": null
       },
       "cancelInto": [
-        "SUPER"
+        "SUPER",
+        "JUMP"
       ],
-      "launchType": "knockdown",
+      "launchType": "launch",
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
@@ -18880,6 +18898,12 @@
         "H"
       ],
       "nome": "Estrelinha",
+      "especialBase": {
+        "launchType": "knockdown",
+        "cancelInto": [
+          "SUPER"
+        ]
+      },
       "golpesBase": {
         "startupFrames": 17,
         "activeFrames": 26,

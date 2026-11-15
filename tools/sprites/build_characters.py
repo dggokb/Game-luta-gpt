@@ -81,11 +81,11 @@ SPECIALS = ('S','SUPER','ULTRA')
 SPECIAL_MOVE = re.compile('S[2-9]')
 BUTTONS = ('L','M','H')
 # Moves a partner can perform as an assist (ground normals or the energy projectile).
-ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
+ASSIST_MOVES = ('L','M','H','2L','2M','2H','S','S2','S3','S4')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
-COMBO_STYLES = ('equilibrado','shoto','pressao','chutes','aereo','alcance','tanque','imprevisivel')
+COMBO_STYLES = ('equilibrado','shoto','pressao','chutes','aereo','alcance','tanque','imprevisivel','circo')
 # Estilo só da CPU (fighter.cpuStyle), quando difere do de combo.
 CPU_STYLES = COMBO_STYLES + ('agarrador', 'onda', 'contra', 'rekka', 'esquiva', 'ninja', 'acrobata')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
@@ -194,6 +194,8 @@ def validate_fighter(pack):
             raise ValueError(f'{name}.assist.move must be one of {", ".join(ASSIST_MOVES)}')
         if move == 'S' and 'energy' not in f:
             raise ValueError(f'{name}.assist: S needs fighter.energy')
+        if move in ('S2', 'S3', 'S4') and move not in pack.get('specialMoves', {}):
+            raise ValueError(f'{name}.assist: {move} needs specialMoves.{move}')
         if 'segura' in f['assist']:
             # A Onda do assist segura o rival em pé esse tanto de quadros (o parceiro recomeça a corrente).
             positive_int(f['assist']['segura'], f'{name}.assist.segura')
@@ -262,7 +264,11 @@ def validate_mechanics(name, mech, m, projectile):
             raise ValueError(f'{name}.mecanica.arco: {{altura, distancia, parede?}}')
         if v.get('parede') not in (None, True):
             raise ValueError(f'{name}.mecanica.arco.parede: true (or leave it out)')
-        positive(v['altura'], f'{name}.mecanica.arco.altura'); positive(v['distancia'], f'{name}.mecanica.arco.distancia')
+        positive(v['altura'], f'{name}.mecanica.arco.altura')
+        # Distância negativa: o arco volta para quem bateu (a luva da caixa da p16 devolve o rival).
+        positive(abs(v['distancia']), f'{name}.mecanica.arco.distancia')
+        if v['distancia'] < 0 and v.get('parede'):
+            raise ValueError(f'{name}.mecanica.arco: parede só com distância positiva')
     if ('arco' in mech) != (m.get('launchType') == 'arc'):
         raise ValueError(f'{name}.mecanica.arco: goes with launchType arc, and arc needs it')
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.

@@ -56,6 +56,7 @@ final class CpuStyle {
         new CpuStyle("esquiva", 130f, 0.90, 0.4, 1.4, 0.8, 0.6, 2.2, 1.5),     // p04: esquiva o que vem e entra
         new CpuStyle("ninja", 240f, 0.80, 1.2, 1.0, 1.6, 0.6, 1.0, 2.5),       // p05: kunai, shuriken e teleporte
         new CpuStyle("acrobata", 200f, 0.90, 0.6, 1.0, 2.4, 0.5, 1.6, 1.5),    // p10: pula, air dash e voadora
+        new CpuStyle("circo", 190f, 0.85, 0.9, 1.0, 1.4, 0.6, 1.2, 2.2),       // Bonnie: arma a caixa e os truques
     };
 
     static CpuStyle of(String name) {

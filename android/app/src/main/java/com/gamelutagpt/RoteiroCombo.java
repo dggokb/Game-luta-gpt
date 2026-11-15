@@ -75,10 +75,10 @@ final class RoteiroCombo {
                 if (passo.startsWith("C")) {
                     in.dash = !me.forwardDashing;
                     in.direction = frente;
-                } else if (passo.matches("S[2-4]")) {
-                    // O especial de comando já resolvido, como o comando completo faria.
-                    me.commandButton = "M";
-                    me.buffer.push(InputBuffer.Button.SPECIAL, passo, false);
+                } else if (passo.matches("S[2-4][LMH]?")) {
+                    // O especial de comando já resolvido, como o comando completo faria ("S2L": com o L).
+                    me.commandButton = passo.length() > 2 ? passo.substring(2) : "M";
+                    me.buffer.push(InputBuffer.Button.SPECIAL, passo.substring(0, 2), false);
                 }
         }
     }
@@ -100,6 +100,7 @@ final class RoteiroCombo {
                     float perto = passo.length() > 1 ? Float.parseFloat(passo.substring(1)) : 260f;
                     return Math.abs(rival.x - me.x) <= perto;
                 }
+                if (passo.matches("S[2-4][LMH]")) return novo && me.attack.id.equals(passo.substring(0, 2));
                 return novo && me.attack.id.equals(passo);
         }
     }
