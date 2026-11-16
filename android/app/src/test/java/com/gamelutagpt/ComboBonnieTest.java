@@ -66,8 +66,9 @@ public class ComboBonnieTest {
         // 16/11: a luva crava o rival no chão e ele quica no lugar, aberto para o combo.
         AttackDefinition s2 = GeneratedCharacters.get(BONNIE).attack("S2");
         assertEquals(AttackDefinition.Launch.GROUND_BOUNCE, s2.launch);
-        // Caixa perto (L), L, M: o rival é empurrado até a luva, quica, e ela lança no 2H.
-        BateriaCombos.Exec x = emenda(combo(BONNIE, NATISUKO, "S2L L M W10 2H SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e 2H", 10);
+        // Caixa perto (L), L, M, L: o rival é empurrado até a luva, quica, e ela lança no 2H (16/11,
+        // com os normais mais rápidos o esquete cabe antes do 2H).
+        BateriaCombos.Exec x = emenda(combo(BONNIE, NATISUKO, "S2L L M L 2H SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e 2H", 11);
         assertEquals("quicou no chão", 1, x.chao);
         // Ou pega o quique com a Estrelinha.
         emenda(combo(BONNIE, NATISUKO, "S2L L M S4 W20 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Estrelinha", 12);
@@ -77,7 +78,7 @@ public class ComboBonnieTest {
 
     @Test public void armadilhaDeLonge() {
         // A mina abre com o rival em cima, ele quica e ela corre para lançar.
-        emenda(combo(BONNIE, NATISUKO, "S2L W20 C140 2H SJ jL jM jH S", 265f, false, 2), "armadilha", 5);
+        emenda(combo(BONNIE, NATISUKO, "S2L W20 C140 2H SJ jL jM jH S", 265f, false, 2), "armadilha", 6);
     }
 
     @Test public void chutaACaixa() {
@@ -106,7 +107,7 @@ public class ComboBonnieTest {
         s.until(() -> r.status != CombatFighter.Status.NEUTRAL, 30);
         assertEquals("a luva pegou e ele quica", CombatFighter.Status.AIR_HITSTUN, r.status);
         // No combo: a caixa chutada abre o caminho para correr e lançar.
-        emenda(combo(BONNIE, NATISUKO, "S2L 2M W10 C140 2H SJ jL jM jH S", 600f, false, 3), "chute de longe", 5);
+        emenda(combo(BONNIE, NATISUKO, "S2L 2M W10 C120 2H SJ jL jM jH S", 600f, false, 3), "chute de longe", 5);
     }
 
     /** Onde a caixa cai com L, M e H, quando cai e quando a Bonnie fica livre. */
@@ -171,7 +172,7 @@ public class ComboBonnieTest {
         // A caixa armada, a luva devolve o rival e a Natisuko o lança para o combo no ar.
         emenda(combo(BONNIE, NATISUKO, "S2M L M L M H W10 C120 A W25 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Natisuko", 13);
         // Natisuko em campo: chama a caixa da Bonnie no meio; a luva pega e ela continua.
-        emenda(combo(NATISUKO, BONNIE, "L M A L M L M H", 100f, false, 1), "Natisuko e a caixa", 6);
+        emenda(combo(NATISUKO, BONNIE, "L M A L M L M H", 100f, false, 1), "Natisuko e a caixa", 8);
     }
 
     @Test public void cascaFicaNoChaoEElaEscorregaNaRasteira() {

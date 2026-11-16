@@ -37,7 +37,8 @@
       ],
       "colunas": 6
     },
-    "recorte_suave": true
+    "recorte_suave": true,
+    "emendar_idle": true
   },
   "frameHeight": 640,
   "rootX": 210,

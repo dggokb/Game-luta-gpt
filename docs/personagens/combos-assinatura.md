@@ -143,11 +143,11 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 | B3 | Estrelinha | L, M, S4 (4 passadas, a última lança) → super pulo → jL, jM, jH → Balão | 10 |
 | B3b | Estrelinha com pulo no ar | L, M, S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
 | B3c | Esquete na Estrelinha | L, M, L, M, S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão (desde a Estrelinha rápida, 16/11) | 14 |
-| B4 | Caixa e 2H | Caixa (L, perto) → L, M (o rival chega na luva, quica) → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 10 |
+| B4 | Caixa e 2H | Caixa (L, perto) → L, M, L (o rival chega na luva, quica) → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão (16/11: com os normais mais rápidos, o L do esquete cabe antes do 2H) | 11 |
 | B4b | Caixa e Estrelinha | Caixa (L) → L, M (quica) → S4 → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
 | B4c | Esquete chuta a caixa | Caixa (M) → L, M, L, M, H (parede; o H chuta a caixa, que volta no rival) → corre → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 13 |
-| B5 | Armadilha | (rival a ~265 px) Caixa (L) → a mina abre, ele quica → corre → 2H → super pulo → jL, jM, jH → Balão | 5 |
-| B5b | Chute de longe | (rival a ~600 px) Caixa (L) → ↓ + M chuta a caixa, que voa até ele → corre → 2H → super pulo → jL, jM, jH → Balão | 5 |
+| B5 | Armadilha | (rival a ~265 px) Caixa (L) → a mina abre, ele quica → corre → 2H → super pulo → jL, jM, jH → Balão | 6 |
+| B5b | Chute de longe | (rival a ~600 px) Caixa (L) → ↓ + M chuta a caixa, que voa até ele → corre até bem perto → 2H → super pulo → jL, jM, jH → Balão | 5 |
 | B7 | Casca e Super | (rival a ~350 px) Casca → corre em cima, escorrega, a rasteira o faz quicar → Super | 3 |
 | B6 | Assist | (Natisuko em campo) L, assist (a caixa da Bonnie) → L, M, H → S4 | 7 |
 
@@ -160,7 +160,7 @@ PC com o mesmo número de acertos do teste (`ComboBonnieTest.duplaDoCirco`).
 |---|---|---|---|
 | D1 | Dupla do circo | (Bonnie) L, M, L, M, H (parede) → corre → assist da Natisuko (lança) → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 12 |
 | D2 | Caixa e Natisuko | (Bonnie) Caixa (M) → L, M, L, M, H (chuta a caixa) → corre → assist da Natisuko → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 13 |
-| D3 | Natisuko e a caixa | (Natisuko) L, M → assist da Bonnie (a caixa) → L, M, L, M, H | 6 |
+| D3 | Natisuko e a caixa | (Natisuko) L, M → assist da Bonnie (a caixa) → L, M, L, M, H | 8 |
 
 A troca no Super (DHC) entre as duas não saiu no motor: fica para quando a dupla for refeita
 junto.
