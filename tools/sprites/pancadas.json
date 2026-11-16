@@ -247,24 +247,16 @@
       },
       "S4": {
         "pancadas": [
-          8,
-          21
+          8
         ],
         "avanco": {
-          "distancia": 115,
+          "distancia": 230,
           "de": 3,
-          "ate": 16
+          "ate": 12
         }
       }
     },
     "p16": {
-      "S3": {
-        "avanco": {
-          "distancia": 120,
-          "de": 34,
-          "ate": 58
-        }
-      },
       "S4": {
         "pancadas": [
           20,

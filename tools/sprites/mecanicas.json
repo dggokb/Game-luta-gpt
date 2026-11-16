@@ -2237,8 +2237,8 @@
         ],
         "S4": [
           16,
-          10,
-          46
+          8,
+          12
         ],
         "L": [
           5,
@@ -2260,6 +2260,9 @@
         "S3": {
           "lancar": "wallBounce",
           "efeito": "FANTASMAS"
+        },
+        "S4": {
+          "lancar": "none"
         }
       },
       "projetil": {
@@ -2267,7 +2270,7 @@
         "alcance": 320
       },
       "unica": {
-        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; o S2 é o repel (a aura vermelha repele socos, chutes e golpes aéreos, altos e baixos, e desfaz projéteis; sem nada para repelir, fica aberta na recuperação); a rajada (S3) soca duas vezes com braços fantasmas e o chute joga na parede (9 acertos); a voadora (S4) cruza a distância no voo e o chute girando derruba.",
+        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; o S2 é o repel (a aura vermelha repele socos, chutes e golpes aéreos, altos e baixos, e desfaz projéteis; sem nada para repelir, fica aberta na recuperação); a rajada (S3) soca duas vezes com braços fantasmas e o chute joga na parede (9 acertos); a voadora (S4) cruza a distância no voo; apertando um golpe logo depois sai o chute girando, que joga em arco e quica na parede perto da borda.",
         "golpes": {
           "S2": {
             "contra": {
@@ -2292,7 +2295,7 @@
           "comando": "↓↓"
         },
         "S4": {
-          "nome": "Voadora e chute girando",
+          "nome": "Voadora (+ golpe: chute girando)",
           "comando": "↓↙←"
         }
       },
@@ -2343,6 +2346,44 @@
             }
           }
         }
+      },
+      "golpeSeguimento": {
+        "de": "S4",
+        "janela": [
+          18,
+          36
+        ],
+        "golpe": {
+          "animation": "CHUTE_GIRANDO",
+          "nome": "Chute girando",
+          "damage": 900,
+          "reach": 180,
+          "startupFrames": 14,
+          "activeFrames": 4,
+          "recoveryFrames": 17,
+          "hitstunFrames": 40,
+          "blockstunFrames": 14,
+          "hitstopFrames": 10,
+          "cancelWindows": {
+            "hit": null,
+            "block": null,
+            "whiff": null
+          },
+          "cancelInto": [],
+          "launchType": "arc",
+          "mecanica": {
+            "arco": {
+              "altura": 150,
+              "distancia": 320,
+              "parede": true
+            }
+          },
+          "knockback": 0,
+          "pushbackOnHit": 0,
+          "pushbackOnBlock": 50,
+          "hitHeight": 214,
+          "maxUsesPerChain": 1
+        }
       }
     },
     "p16": {
@@ -2363,9 +2404,9 @@
           22
         ],
         "S3": [
-          44,
-          16,
-          36
+          20,
+          1,
+          6
         ],
         "S4": [
           10,
@@ -2435,10 +2476,6 @@
           },
           "lancar": "groundBounce"
         },
-        "S3": {
-          "baixo": true,
-          "altura": 70
-        },
         "S4": {
           "lancar": "launch",
           "cancelaEm": [
@@ -2451,12 +2488,21 @@
         "alcance": 900
       },
       "unica": {
-        "descricao": "Palhaça acrobata: a Estrelinha (S4) lança e cancela em pulo para o combo no ar; a luva da Caixa surpresa (S2) joga o rival para o alto; pulo de circo (10% mais alto e mais tempo no ar).",
+        "descricao": "Palhaça acrobata: a Estrelinha (S4) lança e cancela em pulo para o combo no ar; a luva da Caixa surpresa (S2) joga o rival para o alto; pulo de circo (10% mais alto e mais tempo no ar). A Casca de banana (S3) fica no chão: a Bonnie que passa por cima escorrega e desliza na rasteira (o rival quica no chão); o rival que pisa escorrega e cai.",
         "lutador": {
           "corpo": {
             "pulo": {
               "altura": 1.1,
               "tempo": 1.1
+            }
+          }
+        },
+        "golpes": {
+          "S3": {
+            "casca": {
+              "quadro": 20,
+              "x": 100,
+              "duracao": 360
             }
           }
         }
@@ -2526,6 +2572,46 @@
             }
           }
         }
+      },
+      "golpeCasca": {
+        "animation": "CASCA_RASTEIRA",
+        "nome": "Rasteira da casca",
+        "damage": 1000,
+        "reach": 200,
+        "low": true,
+        "startupFrames": 12,
+        "activeFrames": 24,
+        "recoveryFrames": 41,
+        "hitstunFrames": 40,
+        "blockstunFrames": 16,
+        "hitstopFrames": 10,
+        "cancelWindows": {
+          "hit": [
+            20,
+            76
+          ],
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [
+          "SUPER"
+        ],
+        "launchType": "groundBounce",
+        "mecanica": {
+          "avanco": {
+            "velocidade": 560,
+            "frames": [
+              8,
+              40
+            ]
+          },
+          "quicaEmPe": true
+        },
+        "knockback": 0,
+        "pushbackOnHit": 0,
+        "pushbackOnBlock": 60,
+        "hitHeight": 70,
+        "maxUsesPerChain": 1
       }
     },
     "p13": {

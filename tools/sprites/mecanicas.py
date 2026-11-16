@@ -729,6 +729,21 @@ def apply(cid, spec, base, combos_data):
     pack['moves'].pop('DH', None)
     if spec.get('golpeCorrida'):
         pack['moves']['DH'] = json.loads(json.dumps(spec['golpeCorrida']))
+    # Continuação (16/11): um golpe que só sai apertando L, M ou H durante o especial "de", na
+    # "janela" (quadros do especial; acertando, defendido ou no vazio). A voadora da p15 vira
+    # voadora + chute girando, cada parte no tempo do vídeo.
+    pack['moves'].pop('SG', None)
+    # A rasteira da casca (16/11, a p16): o golpe que sai quando a dona escorrega na casca dela.
+    pack['moves'].pop('SC', None)
+    if spec.get('golpeCasca'):
+        pack['moves']['SC'] = json.loads(json.dumps(spec['golpeCasca']))
+    for m in pack.get('specialMoves', {}).values():
+        if 'seguimentoBase' in m:
+            m['cancelInto'], m['cancelWindows'] = m['seguimentoBase']['cancelInto'], m['seguimentoBase']['cancelWindows']
+            del m['seguimentoBase']
+    seg = spec.get('golpeSeguimento')
+    if seg:
+        pack['moves']['SG'] = json.loads(json.dumps(seg['golpe']))
     # Sem Super (as crianças da história): só o resto.
     sup = fighter['super']['attack'] if 'super' in fighter else None
     if sup is not None:
@@ -877,6 +892,28 @@ def apply(cid, spec, base, combos_data):
         report.append(f"  {key:4} {dmg:5}  {m['startupFrames']:2}/{m['activeFrames']:2}/{m['recoveryFrames']:2}"
                       f"  {total / 60:.2f}s  cadência {cadence}")
     prune_routes(pack)
+    seg = spec.get('golpeSeguimento')
+    if seg:
+        # O especial "de" abre a janela da continuação em qualquer resultado (o golpe é dele).
+        # O que os normais refazem (a mecânica, o lançamento) volta como está na receita.
+        sg = pack['moves']['SG']
+        for k in ('mecanica', 'launchType', 'knockback', 'hitstunFrames', 'maxUsesPerChain'):
+            if k in seg['golpe']:
+                sg[k] = json.loads(json.dumps(seg['golpe'][k]))
+        m = pack['specialMoves'][seg['de']]
+        m['seguimentoBase'] = {'cancelInto': list(m['cancelInto']), 'cancelWindows': dict(m['cancelWindows'])}
+        m['cancelInto'] = list(dict.fromkeys(m['cancelInto'] + ['SG']))
+        de, ate = seg['janela']
+        ate = min(ate, m['startupFrames'] + m['activeFrames'] + m['recoveryFrames'] - 1)   # dentro do golpe
+        w = m['cancelWindows']
+        m['cancelWindows'] = {k: [min(de, w[k][0]) if w.get(k) else de, max(ate, w[k][1]) if w.get(k) else ate]
+                              for k in ('hit', 'block', 'whiff')}
+        report.append(f"  {seg['de']} continua no SG ({m.get('nome', '')} -> {seg['golpe'].get('nome', '')}) nos quadros {de}-{ate}")
+    if spec.get('golpeCasca'):
+        sc = pack['moves']['SC']
+        for k in ('mecanica', 'launchType', 'knockback', 'hitstunFrames', 'low', 'maxUsesPerChain'):
+            if k in spec['golpeCasca']:
+                sc[k] = json.loads(json.dumps(spec['golpeCasca'][k]))
     if 'SUPER' in hits and 'super' in fighter:
         striking_super(pack, hits['SUPER'], clips)
         a = fighter['super']['attack']

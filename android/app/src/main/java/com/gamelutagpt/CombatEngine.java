@@ -115,6 +115,8 @@ final class CombatEngine {
     final List<Puddle> puddles = new ArrayList<>();
     /** Caixas surpresa da p16 no chão, esperando o pavio para soltar a luva. */
     final List<Armadilha> traps = new ArrayList<>();
+    /** Cascas de banana no chão (o S3 da p16). */
+    final List<Casca> cascas = new ArrayList<>();
     /** Shadow copies of moves (p06's echo) waiting or playing. */
     final List<Echo> echoes = new ArrayList<>();
     /** Henchmen called by a Super (p07): they run in, strike once and run off. */
@@ -350,6 +352,7 @@ final class CombatEngine {
         superProjectiles.clear();
         puddles.clear();
         traps.clear();
+        cascas.clear();
         echoes.clear();
         henchmen.clear();
         events.clear();
@@ -806,6 +809,14 @@ final class CombatEngine {
             if (!breakerChasing(f) && !f.busyOnGround()) startFromBuffer(f, false);
         } else if (f.attacking() && (CancelSystem.windowOpen(f) || shinkaiCancelOpen(f))) {
             startFromBuffer(f, true);
+        } else if (f.attacking() && f.attack.cancelsInto(CancelSystem.FOLLOW_UP)) {
+            // A continuação (o chute girando da p15) apertada antes da janela: fica guardada.
+            for (InputBuffer.Entry e : new java.util.ArrayList<>(f.buffer.entries())) {
+                if (e.button == InputBuffer.Button.LIGHT || e.button == InputBuffer.Button.MEDIUM || e.button == InputBuffer.Button.HEAVY) {
+                    f.followUpQueued = true;
+                    f.buffer.consume(e);
+                }
+            }
         }
     }
 
@@ -3436,6 +3447,75 @@ final class CombatEngine {
             if (++t.opened >= d.trapDuration) it.remove();
         }
         chutarCaixas();
+        avancarCascas();
+        seguirContinuacoes();
+    }
+
+    /** A continuação pedida durante o golpe (o chute girando da p15) sai quando a janela abre. */
+    private void seguirContinuacoes() {
+        for (CombatFighter f : fighters) {
+            if (!f.followUpQueued) continue;
+            if (!f.attacking() || f.attack == null || !f.attack.cancelsInto(CancelSystem.FOLLOW_UP)) {
+                f.followUpQueued = false;
+            } else if (!f.frozen() && CancelSystem.canCancel(f, CancelSystem.FOLLOW_UP, null)) {
+                startAttack(f, f.character().attack(CancelSystem.FOLLOW_UP), null, -1);
+            }
+        }
+    }
+
+    /**
+     * A casca: a dona joga no quadro do golpe; no chão, conta o tempo. A dona que pisa nela
+     * (andando, correndo ou parada em cima, fora de golpe) escorrega e desliza na rasteira; o rival
+     * que pisa escorrega e cai.
+     */
+    private void avancarCascas() {
+        for (CombatFighter f : fighters) {
+            AttackDefinition.Mechanics m = f.attacking() && f.attack != null ? f.attack.mechanics : null;
+            if (m != null && m.peelFrames > 0 && f.attackFrame == m.peelFrame && !f.cascaJogada) {
+                f.cascaJogada = true;
+                for (Iterator<Casca> it = cascas.iterator(); it.hasNext();) {
+                    if (it.next().ownerIndex == f.index) it.remove();   // uma por vez
+                }
+                float x = Arena.clamp(f.x + f.facing * m.peelX, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+                Casca nova = new Casca(x, f.index, f.facing, m.peelFrames);
+                nova.rivalEmCima = pisou(fighters[1 - f.index], nova);
+                cascas.add(nova);
+                cues.add("CASCA");
+            }
+        }
+        Iterator<Casca> it = cascas.iterator();
+        while (it.hasNext()) {
+            Casca c = it.next();
+            if (--c.framesLeft <= 0) {
+                it.remove();
+                continue;
+            }
+            CombatFighter dona = fighters[c.ownerIndex], rival = fighters[1 - c.ownerIndex];
+            // Cair em cima do rival não derruba: ele precisa sair e pisar nela (senão era um tombo garantido).
+            if (c.rivalEmCima && !pisou(rival, c)) c.rivalEmCima = false;
+            if (pisou(dona, c) && dona.status == CombatFighter.Status.NEUTRAL && dona.character().moves.containsKey(Casca.SLIDE)) {
+                it.remove();
+                // Escorrega para onde está indo (ou para o rival, parada em cima).
+                int dir = dona.forwardDashing ? dona.facing : rival.x >= dona.x ? 1 : -1;
+                dona.facing = dir;
+                startAttack(dona, dona.character().attack(Casca.SLIDE), null, -1);
+                cues.add("ESCORREGOU");
+            } else if (!c.rivalEmCima && pisou(rival, c) && rival.hittable() && !rival.attacking() &&
+                (rival.status == CombatFighter.Status.NEUTRAL || rival.status == CombatFighter.Status.BLOCKSTUN)) {
+                it.remove();
+                // O rival escorrega e cai (sem combo: é um tombo).
+                rival.state.takeDamage(Math.min(CASCA_TOMBO_DANO, Math.max(0, rival.state.life - 1)), 0);
+                knockDown(rival);
+                cues.add("ESCORREGOU");
+            }
+        }
+    }
+
+    /** Dano do tombo de quem pisa na casca da Bonnie. */
+    private static final int CASCA_TOMBO_DANO = 300;
+
+    private static boolean pisou(CombatFighter f, Casca c) {
+        return f.grounded && !f.ko() && Math.abs(f.x - c.x) <= Casca.PISADA;
     }
 
     /**
@@ -3661,6 +3741,7 @@ final class CombatEngine {
 
     private void detectMelee(CombatFighter a, CombatFighter d) {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
+        if (a.attack.mechanics.peelFrames > 0) return;   // jogar a casca não bate
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
         if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d, frame) : reboundMissed(a, frame))) return;
@@ -5205,7 +5286,8 @@ final class CombatEngine {
             session.wallBounces < config.maxWallBounces;
         // Quica no chão quem está no ar; em pé, só um projétil (a luva e a caixa chutada da Bonnie,
         // 16/11) crava o rival no chão e ele quica no lugar, aberto para o combo.
-        boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && (!d.grounded || projectile) &&
+        boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE &&
+            (!d.grounded || projectile || attack.mechanics.standBounce) &&
             session.groundBounces < config.maxGroundBounces;
 
         boolean spinHit = attack.spin && lastStrike && !projectile;

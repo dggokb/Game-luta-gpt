@@ -148,6 +148,7 @@ rival para ela**. Sem vídeo novo: tudo com os golpes que ela já tinha.
 | B4c | Esquete chuta a caixa | Caixa (M) → L, M, L, M, H (parede; o H chuta a caixa, que volta no rival) → corre → 2H → super pulo → jL, jM → pulo → jL, jM, jH → Balão | 13 |
 | B5 | Armadilha | (rival a ~265 px) Caixa (L) → a mina abre, ele quica → corre → 2H → super pulo → jL, jM, jH → Balão | 5 |
 | B5b | Chute de longe | (rival a ~600 px) Caixa (L) → ↓ + M chuta a caixa, que voa até ele → corre → 2H → super pulo → jL, jM, jH → Balão | 5 |
+| B7 | Casca e Super | (rival a ~350 px) Casca → corre em cima, escorrega, a rasteira o faz quicar → Super | 3 |
 | B6 | Assist | (Natisuko em campo) L, assist (a caixa da Bonnie) → L, M, H → S4 | 7 |
 
 ### Combos da dupla, com a Natisuko (16/11)
@@ -223,7 +224,7 @@ por personagem, conferido no motor (`ComboNoArTest`, contra o Ryūga parado, 3 b
 | p12 | L, M, 2H, super pulo, jL, jM, jH → S2 Salto de garras | 7 | 3521 |
 | p13 | L, M, 2H, super pulo, jL, jM → S1 Investida do colosso | 9 | 3059 |
 | p14 | L, M, 2H, super pulo, jL, jM, jH → S2 Chute tornado | 11 | 3032 |
-| p15 | L, M, 2H, super pulo, jL, jM, jH → S4 Voadora e chute girando | 7 | 2819 |
+| p15 | L, M, 2H, super pulo, jL, jM, jH → S3 Rajada de punhos (desde 16/11; a voadora sozinha não pega no ar, voadora + chute girando sim: 7) | 7 | 2567 |
 | p16 | L, M, 2H, super pulo, jL, jM, jH → S1 Balão | 6 | 2906 |
 
 O Super também fecha no ar em quem tem barra (o do Ryūga: L, M, 2H, super pulo, jL, jM, jH →

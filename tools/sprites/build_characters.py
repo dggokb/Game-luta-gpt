@@ -72,8 +72,13 @@ OVERHEAD = '6M'
 COMMAND_HEAVY = '6H'
 # Golpe de corrida (13/11): o H apertado correndo (CancelSystem.RUN_HEAVY).
 RUN_HEAVY = 'DH'
+# Continuação (16/11): o golpe que sai apertando L, M ou H durante um especial que emenda nele
+# (CancelSystem.FOLLOW_UP; o chute girando depois da voadora da p15).
+FOLLOW_UP = 'SG'
+# A rasteira de quem escorrega na própria casca (Casca.SLIDE; a p16): sai sozinha, sem botão.
+PEEL_SLIDE = 'SC'
 # Inputs que o pacote pode ter ou não.
-OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY, RUN_HEAVY)
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY, RUN_HEAVY, FOLLOW_UP, PEEL_SLIDE)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')
@@ -209,7 +214,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo','arco'}
+             'chao','rebote','desenho','voo','arco','casca','quicaEmPe'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -257,6 +262,16 @@ def validate_mechanics(name, mech, m, projectile):
             raise ValueError(f'{name}.mecanica.voo.paira: true (or leave it out)')
         if 'salto' in mech or 'mergulho' in mech:
             raise ValueError(f'{name}.mecanica.voo: not with salto or mergulho')
+    # Casca de banana (o S3 da p16): no "quadro" deixa a casca "x" px à frente por "duracao" quadros.
+    if 'casca' in mech:
+        c = mech['casca']
+        if not (isinstance(c, dict) and set(c) == {'quadro', 'x', 'duracao'}):
+            raise ValueError(f'{name}.mecanica.casca: {{quadro, x, duracao}}')
+        if not (type(c['quadro']) is int and 0 <= c['quadro'] < total):
+            raise ValueError(f'{name}.mecanica.casca.quadro: um quadro do golpe')
+        positive(c['x'], f'{name}.mecanica.casca.x'); positive_int(c['duracao'], f'{name}.mecanica.casca.duracao')
+    if 'quicaEmPe' in mech and mech['quicaEmPe'] is not True:
+        raise ValueError(f'{name}.mecanica.quicaEmPe: true (or leave it out)')
     # Arco (launchType arc): o rival voa em arco, com altura e distância (o shoryuken do Ryūga).
     if 'arco' in mech:
         v = mech['arco']
@@ -831,6 +846,8 @@ def compile_packs(root, results, alterados=None, medir=False):
             v = mech['avanco']
             code += '.advance('+f(v['velocidade'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('atravessa'))).lower()+')'
         if mech.get('desenho'): code += '.drawnStrike()'
+        if 'casca' in mech: code += '.peel('+str(mech['casca']['quadro'])+','+f(mech['casca']['x'])+','+str(mech['casca']['duracao'])+')'
+        if mech.get('quicaEmPe'): code += '.standBounce()'
         if 'teleporte' in mech: code += '.teleport('+str(mech['teleporte'])+')'
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
         if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'

@@ -4522,6 +4522,7 @@ public class GameView extends SurfaceView
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawTraps(canvas, engine.traps);
+            effects.drawCascas(canvas, engine.cascas);
             desenharProjeteisEmFolha(canvas);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles, projeteisEmFolha);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);

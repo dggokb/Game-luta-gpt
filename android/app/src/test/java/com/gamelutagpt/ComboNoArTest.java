@@ -30,7 +30,7 @@ public class ComboNoArTest {
         {"p12", "L M 2H SJ jL jM jH", "S2"},
         {"p13", "L M 2H SJ jL jM", "S"},
         {"p14", "L M 2H SJ jL jM jH", "S2"},
-        {"p15", "L M 2H SJ jL jM jH", "S4"},
+        {"p15", "L M 2H SJ jL jM jH", "S3"},
         {"p16", "L M 2H SJ jL jM jH", "S"},
     };
 

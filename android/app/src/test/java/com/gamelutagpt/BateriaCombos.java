@@ -209,6 +209,7 @@ public final class BateriaCombos {
                         case "C": in0.dash = !me.forwardDashing; in0.direction = frente; break;
                         case "C100": case "C120": case "C140": case "C160": case "C180": case "C200": case "C220": case "C240":
                             in0.dash = !me.forwardDashing; in0.direction = frente; break;
+                        case "SG": in0.light = true; break;   // a continuação: o botão durante o especial
                         case "jL": in0.light = true; break;
                         case "jM": in0.medium = true; break;
                         case "jH": in0.heavy = true; break;

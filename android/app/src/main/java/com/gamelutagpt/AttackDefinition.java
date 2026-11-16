@@ -141,6 +141,14 @@ final class AttackDefinition {
          * é a ponta desenhada, não a caixa do golpe.
          */
         boolean drawnStrike;
+        /**
+         * Casca de banana (a p16, 16/11): o golpe não bate; no quadro {@link #peelFrame} deixa uma
+         * casca no chão {@link #peelX} px à frente, que fica {@link #peelFrames} quadros.
+         */
+        int peelFrame, peelFrames;
+        float peelX;
+        /** Quem leva o golpe em pé também quica no chão (a rasteira da casca; o projétil já quica). */
+        boolean standBounce;
         /** Frame on which the fighter reappears behind the opponent, or -1. */
         int teleportFrame = -1;
         /** On hit the defender is pulled this far toward the attacker instead of pushed. */
@@ -188,6 +196,8 @@ final class AttackDefinition {
             advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;
         }
         Mechanics drawnStrike() { drawnStrike = true; return this; }
+        Mechanics peel(int frame, float x, int frames) { peelFrame = frame; peelX = x; peelFrames = frames; return this; }
+        Mechanics standBounce() { standBounce = true; return this; }
         Mechanics teleport(int frame) { teleportFrame = frame; return this; }
         Mechanics pull(float distance) { pull = distance; return this; }
         Mechanics poison(int damage, int frames) { poisonDamage = damage; poisonFrames = frames; return this; }
@@ -378,7 +388,9 @@ final class AttackDefinition {
     static Strength strengthOf(String binding) {
         if ("SUPER".equals(binding) || "ULTRA".equals(binding)) return Strength.SUPER;
         if ("S".equals(binding) || binding.matches("S[2-9]")) return Strength.SPECIAL;
-        if ("THROW".equals(binding) || VoadoraTroca.ID.equals(binding)) return Strength.HEAVY;
+        // A continuação de um especial (CancelSystem.FOLLOW_UP) pesa como o forte.
+        if ("THROW".equals(binding) || VoadoraTroca.ID.equals(binding) || CancelSystem.FOLLOW_UP.equals(binding) ||
+            Casca.SLIDE.equals(binding)) return Strength.HEAVY;
         char button = binding.charAt(binding.length() - 1);
         if (button == 'L') return Strength.LIGHT;
         if (button == 'M') return Strength.MEDIUM;

@@ -38,7 +38,7 @@ final class ComboBook {
             {"player_base", "jM", "S3"}, {"p02", "jH", "S4"}, {"p03", "jM", "S2"}, {"p04", "jM", "S2"},
             {"p05", "jH", "S2"}, {"p06", "jM", "S2"}, {"p07", "jH", "S4"}, {"p08", "jH", "S2"},
             {"p09", "jH", "S"}, {"p10", "jH", "S"}, {"p11", "jH", "S"}, {"p12", "jH", "S2"},
-            {"p13", "jM", "S"}, {"p14", "jH", "S2"}, {"p15", "jH", "S4"}, {"p16", "jH", "S"},
+            {"p13", "jM", "S"}, {"p14", "jH", "S2"}, {"p15", "jH", "S3"}, {"p16", "jH", "S"},
         };
         for (String[] f : t) FECHO_NO_AR.put(f[0], new String[] {f[1], f[2]});
     }

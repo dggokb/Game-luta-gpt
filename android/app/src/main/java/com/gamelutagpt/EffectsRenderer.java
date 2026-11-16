@@ -56,6 +56,27 @@ final class EffectsRenderer {
         for (int i = 0; i < TRAP_IMAGES; i++) {
             trapImages[i] = image(assets, String.format(java.util.Locale.ROOT, "efeitos/caixa_p16_%02d.webp", i));
         }
+        cascaImage = image(assets, "efeitos/casca_p16.webp");
+    }
+
+    /** A casca de banana da p16 (recorte do vídeo do S3, em HD 2x), pé no chão. */
+    private Bitmap cascaImage;
+    /** Quanto a base da casca fica abaixo da linha do chão (px da imagem HD). */
+    private static final float CASCA_BASE = 20f;
+
+    /** Cascas de banana no chão: piscam no último segundo antes de sumir. */
+    void drawCascas(Canvas c, List<Casca> cascas) {
+        Bitmap b = cascaImage;
+        if (b == null) return;
+        for (Casca k : cascas) {
+            if (k.framesLeft < 60 && (k.framesLeft / 6) % 2 == 0) continue;
+            c.save();
+            c.translate(k.x, Arena.GROUND_Y);
+            if (k.direction < 0) c.scale(-1f, 1f);
+            imageBox.set(-b.getWidth() / 4f, -(b.getHeight() - CASCA_BASE) / 2f, b.getWidth() / 4f, CASCA_BASE / 2f);
+            c.drawBitmap(b, null, imageBox, imagePaint);
+            c.restore();
+        }
     }
 
     /** Sem a imagem o desenho não aparece, mas o golpe continua valendo. */

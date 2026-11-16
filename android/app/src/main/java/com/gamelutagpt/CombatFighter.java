@@ -286,6 +286,10 @@ final class CombatFighter {
     final java.util.ArrayList<String> chain = new java.util.ArrayList<>();
     /** Golpes começados desde o início da luta (o executor dos testes e a gravação contam por ele). */
     int golpesIniciados;
+    /** A casca de banana deste golpe já foi para o chão (o S3 da p16). */
+    boolean cascaJogada;
+    /** A continuação (CancelSystem.FOLLOW_UP) foi pedida antes da janela abrir: sai quando ela abre. */
+    boolean followUpQueued;
     /** Air dashes done in this jump (a fighter may have more than one). */
     int airDashCount;
 
@@ -460,6 +464,8 @@ final class CombatFighter {
 
     void clearAttack() {
         pairando = false;
+        cascaJogada = false;
+        followUpQueued = false;
         attack = null;
         move = null;
         attackFrame = -1;

@@ -55,7 +55,7 @@ final class RoteiroCombo {
     private static void apertar(String passo, CombatFighter me, FighterInput in) {
         int frente = me.facing > 0 ? 1 : 5;
         switch (passo) {
-            case "L": case "jL": in.light = true; break;
+            case "L": case "jL": case "SG": in.light = true; break;
             case "M": case "jM": in.medium = true; break;
             case "H": case "jH": in.heavy = true; break;
             case "2L": in.direction = me.facing > 0 ? 2 : 4; in.light = true; break;

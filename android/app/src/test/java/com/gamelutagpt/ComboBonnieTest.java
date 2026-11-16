@@ -159,7 +159,7 @@ public class ComboBonnieTest {
     @Test public void oAssistDelaEAArmadilha() {
         assertEquals("S2", GeneratedCharacters.get(BONNIE).fighter.assistMove);
         // A Natisuko em campo chama a Bonnie: a caixa cai e a luva pega no meio do combo dela.
-        emenda(combo(NATISUKO, BONNIE, "L A L M H S4", 100f, false, 1), "assist", 7);
+        emenda(combo(NATISUKO, BONNIE, "L A L M H S4", 100f, false, 1), "assist", 6);
     }
 
     /** Combos da dupla (16/11): a Bonnie e a Natisuko juntas, uma chamando a outra no meio. */
@@ -172,6 +172,52 @@ public class ComboBonnieTest {
         emenda(combo(BONNIE, NATISUKO, "S2M L M L M H W10 C120 A W25 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Natisuko", 13);
         // Natisuko em campo: chama a caixa da Bonnie no meio; a luva pega e ela continua.
         emenda(combo(NATISUKO, BONNIE, "L M A L M L M H", 100f, false, 1), "Natisuko e a caixa", 6);
+    }
+
+    @Test public void cascaFicaNoChaoEElaEscorregaNaRasteira() {
+        // ↓↓ só joga a casca (não bate); ela fica no chão ~100 px à frente.
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(BONNIE), GeneratedCharacters.get("player_base"), 500f, 850f);
+        CombatFighter me = s.f(0), r = s.f(1);
+        me.commandButton = "M";
+        me.buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+        s.steps(30);
+        assertEquals(1, s.engine.cascas.size());
+        assertEquals(100f, s.engine.cascas.get(0).x - me.x, 2f);
+        assertEquals("jogar não bate", CombatFighter.Status.NEUTRAL, r.status);
+        // Andando para a frente, pisa, escorrega e desliza; quem leva quica no chão.
+        float x0 = me.x;
+        for (int i = 0; i < 120 && r.status == CombatFighter.Status.NEUTRAL; i++) {
+            if (!me.attacking()) s.in[0].direction = 1;
+            s.step();
+        }
+        assertEquals(Casca.SLIDE, me.attack.id);
+        assertTrue("desliza para perto dele", me.x - x0 > 120f);
+        assertEquals(CombatFighter.Status.AIR_HITSTUN, r.status);
+        assertEquals("vai quicar", CombatFighter.BOUNCE_GROUND, r.bounce);
+        assertTrue(s.engine.cascas.isEmpty());
+        // A rasteira e o Super (de ~350 px: joga, corre em cima e desliza).
+        emenda(combo(BONNIE, NATISUKO, "S3 W5 C W20 SUPER", 350f, false, 3), "casca e Super", 3);
+    }
+
+    @Test public void oRivalQuePisaNaCascaCai() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(BONNIE), GeneratedCharacters.get("player_base"), 500f, 900f);
+        s.f(0).commandButton = "M";
+        s.f(0).buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+        boolean caiu = false;
+        for (int i = 0; i < 200 && !caiu; i++) {
+            if (i > 30) s.in[1].direction = 5;   // o rival anda para a Bonnie
+            s.step();
+            caiu = s.engine.cues().contains("ESCORREGOU");
+        }
+        assertTrue(caiu);
+        assertEquals(CombatFighter.Status.KNOCKDOWN, s.f(1).status);
+        // A casca que cai em cima dele não derruba: só depois de sair e pisar de novo.
+        CombatEngineTest.Sim t = new CombatEngineTest.Sim(GeneratedCharacters.get(BONNIE), GeneratedCharacters.get("player_base"), 500f, 600f);
+        t.f(0).commandButton = "M";
+        t.f(0).buffer.push(InputBuffer.Button.SPECIAL, "S3", false);
+        t.steps(60);
+        assertEquals(CombatFighter.Status.NEUTRAL, t.f(1).status);
+        assertTrue(t.engine.cascas.get(0).rivalEmCima);
     }
 
     @Test public void puloDeCirco() {

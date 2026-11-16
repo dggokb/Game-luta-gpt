@@ -13,6 +13,18 @@ final class CancelSystem {
     static final String COMMAND_HEAVY = "6H";
     /** Golpe de corrida (13/11): o H apertado correndo (a Ombrada do Ryūga, o Carrinho da Yin-lu). */
     static final String RUN_HEAVY = "DH";
+    /**
+     * Continuação (16/11): o golpe que sai apertando L, M ou H durante um especial que emenda
+     * nele (o chute girando depois da voadora da p15). Do neutro não sai.
+     */
+    static final String FOLLOW_UP = "SG";
+
+    /** A continuação do golpe atual, se ele emenda nela e o botão foi apertado agora. */
+    private static AttackDefinition followUp(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        if (!f.attacking() || f.attack == null || !c.moves.containsKey(FOLLOW_UP) || !f.attack.cancelsInto(FOLLOW_UP)) return null;
+        return c.attack(FOLLOW_UP);
+    }
 
     /** Cancel window of the attack for what it has done so far; null when closed for that outcome. */
     static AttackDefinition.Window windowFor(CombatFighter f) {
@@ -60,8 +72,11 @@ final class CancelSystem {
         CharacterDefinition c = f.character();
         if (autoStepOut != null) autoStepOut[0] = -1;
         switch (entry.button) {
-            case LIGHT: return c.attack(binding(f, "L", entry.crouch));
+            case LIGHT:
+                if (followUp(f) != null) return followUp(f);
+                return c.attack(binding(f, "L", entry.crouch));
             case MEDIUM:
+                if (followUp(f) != null) return followUp(f);
                 // → + M do neutro, no chão: o golpe alto. Dentro de um combo continua sendo o M
                 // (quem segura → durante L > M não perde a ligação).
                 if (entry.forward && !entry.crouch && f.grounded && !f.attacking() &&
@@ -70,6 +85,7 @@ final class CancelSystem {
                 }
                 return c.attack(binding(f, "M", entry.crouch));
             case HEAVY:
+                if (followUp(f) != null) return followUp(f);
                 // Correndo no chão: o golpe de corrida do personagem (sai da corrida, sem parar). Na
                 // perseguição da parede (segurar → depois do quique já corre) o → + H continua o de
                 // sempre: ali a corrida é o combo, não a abertura.
