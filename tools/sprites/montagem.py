@@ -3,6 +3,11 @@
 
     python3 tools/sprites/montagem.py p15 <pasta com os vídeos>                  # todos
     python3 tools/sprites/montagem.py p15 <pasta> special_s3 special_s4          # só esses
+    python3 tools/sprites/montagem.py p16 --so-animacoes                         # só o corte
+
+--so-animacoes não converte nada: só grava no character.json as animações da receita (quadros,
+impacto) sobre a folha que já existe. É o passo depois de refazer a folha HD direto do vídeo
+(video_para_sprite.py --clipe), quando um clipe vira mais de uma animação (o ↓↓ da p16).
 
 A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
 
@@ -37,7 +42,8 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
   "acelerar" vezes mais rápido que o vídeo (vídeo que quase marca passo: o p13); "tempo": "video" deixa o andar
   do motor e acerta a distância por quadro para o ciclo tocar no tempo do vídeo (o pé escorrega
   se o passo do vídeo for curto; "acelerar": 2 toca o ciclo 2x mais rápido). A mesma folha
-  pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1).
+  pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1); "tempos" (lista de ms,
+  um por frame) fixa o tempo de cada quadro, para refazer sem mudar o ritmo de um golpe fechado.
 
 Um vídeo só, sem "fixo", é convertido direto do arquivo. O vídeo colado vai para
 android/app/build/video-cache/montagem/<id>_<clipe>.mp4 (sem perda) e a receita do clipe grava esse
@@ -206,6 +212,14 @@ def update_pack(char, name, spec, distance=None):
             raise SystemExit(f'{name}/{state}: quadro {max(frames)} além dos {len(quadros)} do clipe')
         old = pack['animations'].get(state, {})
         anim = {'atlas': f'{char}_{name}', 'frames': frames, 'loop': bool(a.get('loop', False))}
+        # A silhueta já medida (caixas_sprites.py) continua, só com os quadros desta animação: um
+        # clipe cortado em duas (o ↓↓ da p16) leva a de cada parte. Folha refeita mede de novo.
+        sil = old.get('silhueta') if old.get('atlas') == anim['atlas'] else None
+        if sil:
+            keep = {str(i) for i in frames}
+            por_quadro = lambda part: isinstance(part, dict) and all(q.isdigit() for q in part)
+            sil = {k: ({q: v for q, v in part.items() if q in keep} if por_quadro(part) else part)
+                   for k, part in sil.items()}
         if 'distancia' in a:   # andar: o quadro troca pela distância andada, não pelo tempo
             anim['loop'] = True
             anim['distancePerFrame'] = distance if a['distancia'] in ('video', 'pe') else a['distancia']
@@ -227,17 +241,25 @@ def update_pack(char, name, spec, distance=None):
                 pack['fighter'].pop(key, None)
                 # "acelerar": 2 toca o ciclo 2x mais rápido que o vídeo (o pé escorrega menos).
                 anim['distancePerFrame'] = round(ENGINE_WALK[key] * step / FPS / a.get('acelerar', 1), 2)
+            if sil:
+                anim['silhueta'] = sil
             pack['animations'][state] = anim
             continue
         same = old.get('atlas') == anim['atlas'] and old.get('frames') == frames \
             and len(old.get('durationsMs', [])) == len(frames)
         anim['durationsMs'] = old['durationsMs'] if same and 'durationsMs' in old else durations(quadros, frames)
+        if 'tempos' in a:   # ms de cada quadro já encaixados na janela do golpe: refazer não muda o ritmo
+            if len(a['tempos']) != len(frames):
+                raise SystemExit(f'{name}/{state}: {len(a["tempos"])} tempos para {len(frames)} quadros')
+            anim['durationsMs'] = list(a['tempos'])
         if 'impacto' in a:
             anim['impactFrame'] = a['impacto']
         if a.get('golpe') == 'SUPER':
             # O Super não passa pelo mecanicas.py (mantém o tempo do p01): o impacto vai para
             # o começo da janela ativa dele aqui.
             fit_impact(anim, pack['fighter']['super']['attack'])
+        if sil:
+            anim['silhueta'] = sil
         pack['animations'][state] = anim
     path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 
@@ -245,11 +267,25 @@ def update_pack(char, name, spec, distance=None):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('personagem')
-    p.add_argument('pasta', help='pasta com os vídeos .mp4')
+    p.add_argument('pasta', nargs='?', help='pasta com os vídeos .mp4')
     p.add_argument('clipes', nargs='*', help='clipes a refazer (padrão: todos da receita)')
+    p.add_argument('--so-animacoes', action='store_true',
+                   help='não converte: só grava as animações da receita no character.json')
     args = p.parse_args()
     char = args.personagem
     recipe = json.loads((HERE / f'montagens/{char}.json').read_text(encoding='utf-8'))
+    if args.so_animacoes:
+        # Sem vídeo: o "pasta" da linha de comando, se vier, é o primeiro clipe.
+        names = ([args.pasta] if args.pasta else []) + args.clipes or [k for k in recipe if not k.startswith('_')]
+        for name in names:
+            andar = [s for s, a in recipe[name].get('animacoes', {}).items() if a.get('distancia') in ('video', 'pe')]
+            if andar:
+                raise SystemExit(f'{name}: {andar} medem a distância no vídeo; rode com a pasta dos vídeos')
+            update_pack(char, name, recipe[name])
+        print(f'characters/{char}/character.json: animações de {names} gravadas')
+        return
+    if not args.pasta:
+        p.error('informe a pasta com os vídeos (ou --so-animacoes)')
     names = args.clipes or [k for k in recipe if not k.startswith('_')]
     distances = {}
     for name in names:

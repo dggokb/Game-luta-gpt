@@ -1,0 +1,106 @@
+{
+  "_doc": "Bonnie (p16). A folha HD de cada clipe sai direto do vídeo, pela receita gravada no próprio clipe (tools/sprites/clips/p16_*.json, em \"video\"; video_para_sprite.py <vídeo> --clipe <clipe>). Aqui ficam só os clipes que viram mais de uma animação: o corte não cabe na receita do clipe. Vídeos no Drive em game-luta-gpt/animations/p16.",
+  "special_s3": {
+    "_doc": "↓↓ Casca de banana (16/11): um vídeo só (s3.mp4, 73 quadros) com duas animações. SPECIAL_S3 (0-25) ela joga a casca; CASCA_RASTEIRA (26-72) é a rasteira deslizando quando ela escorrega na casca (o golpe SC, que o motor procura por esse nome). Golpes fechados (16/11): os tempos de cada quadro ficam gravados aqui. Para refazer a folha HD como está: video_para_sprite.py s3.mp4 --clipe tools/sprites/clips/p16_special_s3.json e depois montagem.py p16 --so-animacoes (grava o corte no character.json sem refazer a folha). montagem.py p16 <pasta> special_s3 refaz tudo pela célula medida da montagem. Depois: caixas_sprites (silhuetas dos quadros de cada animação) e build_characters.py --write.",
+    "trechos": [
+      [
+        "s3",
+        0,
+        101
+      ]
+    ],
+    "quadros": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,63,66,69,72,75,78,81,84,87,90,93,96,99,100",
+    "opcoes": {
+      "fixar": "video",
+      "densidade": 2,
+      "recorte_suave": true
+    },
+    "animacoes": {
+      "SPECIAL_S3": {
+        "frames": "0-25",
+        "impacto": 20,
+        "tempos": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          17,
+          21,
+          21,
+          21,
+          21,
+          21
+        ]
+      },
+      "CASCA_RASTEIRA": {
+        "frames": "26-72",
+        "impacto": 14,
+        "tempos": [
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          19,
+          29,
+          29,
+          29,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          29,
+          29
+        ]
+      }
+    }
+  }
+}

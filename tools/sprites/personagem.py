@@ -491,6 +491,13 @@ def main():
     for s in states:
         for name, (quadros, opts) in plan(paths[s], s).items():
             jobs[name] = (paths[s], quadros, opts)
+    # Clipe com receita na montagem (quadros à mão, corte em mais de uma animação: o ↓↓ da p16) não
+    # é refeito daqui: a escolha de quadros pela contagem do p01 desfaria o corte.
+    recipe = HERE / f'montagens/{char}.json'
+    montados = set(json.loads(recipe.read_text(encoding='utf-8'))) & set(jobs) if recipe.exists() else set()
+    for name in sorted(montados):
+        print(f'{name:16} pulado: receita em tools/sprites/montagens/{char}.json (montagem.py)', flush=True)
+        del jobs[name]
     order = sorted(jobs, key=lambda n: n != 'idle')
     done = []
 
