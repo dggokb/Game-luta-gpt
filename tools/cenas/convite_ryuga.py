@@ -49,6 +49,19 @@ def impacto(q, quem, forca, **kw):
     ev(q, 'impacto', quem=quem, forca=forca, **kw)
 
 
+# Os STAMP: nos golpes fortes, o quadro de mangá do golpe bate na tela no contato, com a cena
+# congelada embaixo, e sai; a cena continua. As imagens são a arte do golpe em mangá
+# (stamp_ryugaN.jpg em ep02/); a referência de poses de cada uma sai do testeQte do PC.
+def stamp(n, **kw):
+    return dict(imagem=f'ep02/stamp_ryuga{n}.jpg', **kw)
+
+
+# O último STAMP é o primeiro quadro da página que vem depois da luta (os dois ofegantes,
+# "HAA... HAA..."): ele vai para o lugar dele na página, a luta acaba e a história lê dali.
+STAMP_FINAL = {'acao': 'stamp', 'imagem': 'ep02/pag5_ryuga.jpg', 'quadro': 0, 'segundos': 1.1,
+               'viraPagina': True, 'vencedor': 'interrompida'}
+
+
 def lenta(q, antes=4, depois=18, valor=0.35):
     """Câmera lenta em volta do contato do quadro q (a animação anda a `valor` e volta ao normal)."""
     ev(q - antes, 'velocidade', valor=valor, segundos=0.05, semEsperar=True)
@@ -127,7 +140,7 @@ R.k(203, 'JUMP_HEAVY:7', -245, y=170, rot=28, curva='corte', rastro=5)
 R.k(211, 'JUMP_HEAVY:8', -188, y=70, rot=28, curva='entra', rastro=5)
 Y.k(203, 'DEFENSE_CROUCH:1', -62)
 Y.k(209, 'DEFENSE_CROUCH:2', -62)
-impacto(211, 'jogador', 2, letreiro='DOOOM!')
+impacto(211, 'jogador', 2, letreiro='DOOOM!', stamp=stamp(1))
 lenta(211)
 efeito(212, 'rival', 'fumaca_queda_v01', escala=1.2)
 linhas(212)
@@ -178,7 +191,7 @@ R.k(315, 'MEDIUM_KICK:3', -235)
 Y.k(315, 'LIGHT_JAB:3', -42)
 R.k(319, 'MEDIUM_KICK:6', -222, curva='sai', rastro=3)
 Y.k(319, 'LIGHT_JAB:6', -52, curva='sai', rastro=3)
-impacto(319, 'jogador', 2)
+impacto(319, 'jogador', 2, stamp=stamp(2, rotacao=3))
 R.k(321, 'MEDIUM_KICK:12', -222)
 Y.k(321, 'LIGHT_JAB:8', -52)
 R.k(333, 'MEDIUM_KICK:15', -290, curva='sai')
@@ -209,7 +222,7 @@ R.k(368, 'HEAVY_STRAIGHT:2', -218, y=0)
 R.k(371, 'HEAVY_STRAIGHT:4', -222)
 R.k(375, 'HEAVY_STRAIGHT:7', -225, curva='sai', rastro=4)
 Y.k(371, 'DEFENSE_STAND:4', -70)
-impacto(375, 'jogador', 2)
+impacto(375, 'jogador', 2, stamp=stamp(3))
 # Ela é empurrada e escorrega pelo chão; agachada, sorri.
 Y.k(377, 'DEFENSE_STAND:5', -70, rastro=3)
 Y.k(396, 'LAND:2', 170, curva='sai')
@@ -257,7 +270,7 @@ Y.k(514, 'SPECIAL_S3:10', -68, alfa=1.0)
 # Ele se vira e leva a palma.
 R.k(514, 'IDLE:0', 52)
 Y.k(516, 'SPECIAL_S3:12', -58, curva='sai', rastro=2)
-impacto(516, 'rival', 2, letreiro='PAH!')
+impacto(516, 'rival', 2, letreiro='PAH!', stamp=stamp(4))
 lenta(516)
 R.k(516, 'HIT_BODY:1', 52, rastro=2)
 R.k(528, 'HIT_BODY:3', 185, curva='sai')
@@ -365,7 +378,7 @@ Y.k(1066, 'DEFENSE_CROUCH:2', 128)
 camera(1060, 1.25)
 linhas(1062, 'concentracao', escuro=0.45, segundos=0.05)
 # Os golpes se cruzam: IMPACTO!, o clarão de dois quadros e a câmera volta devagar.
-impacto(1068, 'jogador', 3)
+impacto(1068, 'jogador', 3, stamp=stamp(5, segundos=1.1, rotacao=-3))
 lenta(1068, antes=8, depois=6, valor=0.3)
 ev(1068, 'clarao', segundos=0.05)
 letreiro(1068, 'IMPACTO!', [0.5, 0.4], 190, tremor=18, cor='#FF5A3C', segundos=0.9)
@@ -381,10 +394,10 @@ Y.k(1070, 'DEFENSE_CROUCH:3', 128, rastro=3)
 Y.k(1090, 'DEFENSE_CROUCH:4', 210, curva='sai')
 efeito(1071, 'rival', 'fumaca_dash_v05', atras=True)
 Y.k(1104, 'DEFENSE_CROUCH:6', 212)
-respirar(R, 1110, 1290, 'LAND:5', -150)
-respirar(Y, 1116, 1290, 'LAND:6', 212)
+respirar(R, 1110, 1200, 'LAND:5', -150)
+respirar(Y, 1116, 1200, 'LAND:6', 212)
 letreiro(1128, 'HAH... HAH...', [0.5, 0.3], 80, segundos=2.0)
-QUADROS = 1290
+QUADROS = 1200
 
 # As pausas (quadro da coreografia: quadros a mais): os dois seguram a pose daquele quadro e o
 # resto anda para a frente. É onde a cena respira: a antecipação, o golpe esticado depois do
@@ -491,8 +504,8 @@ def main():
     cena = json.loads(CENA.read_text(encoding='utf-8'))
     acoes = cena['acoes']
     i = next(n for n, a in enumerate(acoes) if a.get('acao') == 'animar')
-    j = next(n for n in range(i, len(acoes)) if acoes[n].get('acao') == 'esperar')
-    acoes[i:j] = trechos
+    # A animação vai até o fim da cena: o STAMP final vira a página (a luta acaba nele).
+    acoes[i:] = trechos + [STAMP_FINAL]
     cena['_comentario'] = (
         'Cena da luta do convite do Ryūga, animada à mão (ação animar, motor de luta parado), gerada por '
         'tools/cenas/convite_ryuga.py: a coreografia do dono (13/11) em quatro sequências, na gramática do '
@@ -504,7 +517,10 @@ def main():
         'escorrega com a mão no chão, as falas do monstro; 4) ofegantes, "Eu não vim até aqui pra perder!", os '
         'dois disparam: o soco (ela se abaixa), o chute alto (ele se abaixa), o gancho (ela salta para trás), '
         'o salto com o golpe descendo nos braços cruzados dela: IMPACTO, clarão de dois quadros, a câmera volta '
-        'devagar e os dois ofegantes. Seis QTE no meio dos golpes (ESQUIVA, COMBO, DEFESA, SOCO, '
+        'devagar e os dois ofegantes. Nos golpes fortes (o chute que desce no DOOOM, os punhos se chocando, o '
+        'chute giratório, a palma do PAH e o IMPACTO) um STAMP: o quadro de mangá do golpe bate na tela com a '
+        'cena congelada e sai. O último STAMP é o primeiro quadro da página 5 (os dois ofegantes): ele vai '
+        'para o lugar dele na página, a luta acaba e a história segue lendo dali. Seis QTE no meio dos golpes (ESQUIVA, COMBO, DEFESA, SOCO, '
         'CONTRA-ATAQUE, GOLPE FINAL): a animação para na pose e pede; errar toca o contra-ataque dela e pede '
         'de novo. A coreografia antiga, com QTE do motor de luta, está em cinematica_convite_ryuga_qte.json.')
     CENA.write_text(escrever(cena), encoding='utf-8')

@@ -8690,6 +8690,11 @@ public class GameView extends SurfaceView
             cinematicaFim = vencedor;
         }
 
+        @Override public void continuarNaPagina(String imagem, int quadro) {
+            // A página que vem depois da luta abre no quadro do STAMP final, no mesmo lugar.
+            historia.continuarNoQuadro(imagem, quadro);
+        }
+
         @Override public boolean aDireita(int lado) {
             return engine.fighter(lado).x > engine.fighter(1 - lado).x;
         }

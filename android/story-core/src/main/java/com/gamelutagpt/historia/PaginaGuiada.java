@@ -63,6 +63,8 @@ final class PaginaGuiada {
     private float moveDuration = MOVE;
     private float dimFrom, dim;
     private float flash;
+    /** A página veio de um STAMP: o quadro já chegou (sem o tranco de chegada do impacto). */
+    private boolean semTranco;
     private String sound;
     /** Tamanho do texto de cada balão no idioma atual, medido no primeiro desenho. */
     private final Map<Episodio.BalaoPronto, Object[]> fitted = new IdentityHashMap<>();
@@ -80,6 +82,7 @@ final class PaginaGuiada {
         stateTime = 0f;
         time = 0f;
         flash = 0f;
+        semTranco = false;
         sound = null;
         fitted.clear();
         // Já no primeiro quadro, parado; ele "chega" (efeitos) quando a virada da página clareia.
@@ -90,6 +93,32 @@ final class PaginaGuiada {
         moveTime = -1f;
         dim = 1f;
         dimFrom = 1f;
+    }
+
+    /**
+     * Começa já com o quadro {@code index} em foco e chegado, parado: a página continua de um
+     * STAMP da cinemática, que acabou de pousar exatamente nesse lugar da tela.
+     */
+    void beginNoQuadro(Temporada temporada, Episodio.Passo passo, RenderImage image, float width, float height, int index) {
+        begin(temporada, passo, image, width, height);
+        panel = index;
+        arrived = true;
+        arrivedAt = time;
+        semTranco = true;
+        float[] goal = target(index, 0f);
+        camX = goal[0];
+        camY = goal[1];
+        camS = goal[2];
+    }
+
+    /** Onde o ponto (x, y) da imagem da página está na tela agora. */
+    float[] naTela(float x, float y) {
+        return new float[] {sx(x), sy(y)};
+    }
+
+    /** Px de tela por px da imagem da página agora. */
+    float escala() {
+        return camS;
     }
 
     void update(float dt) {
@@ -202,7 +231,7 @@ final class PaginaGuiada {
             float k = Tinta.clamp01(since / duration);
             s *= 1f + amount * (q.zoom ? 1f - (1f - k) * (1f - k) : k);
         }
-        s *= 1f + punch(q, since) + heartbeat(q, since);
+        s *= 1f + (semTranco ? 0f : punch(q, since)) + heartbeat(q, since);
         return new float[] {cx, cy, s};
     }
 
@@ -261,11 +290,20 @@ final class PaginaGuiada {
     // ------------------------------------------------------------ desenho
 
     void render(RenderCanvas c) {
+        render(c, 1f);
+    }
+
+    /**
+     * {@code fundo}: quanto aparece da página escurecida em volta do quadro em foco (0 = só o
+     * preto; a página acende em volta do quadro que veio de um STAMP).
+     */
+    void render(RenderCanvas c, float fundo) {
         c.fillRect(-40f, -40f, VW + 40f, VH + 40f, 0xFF000000);
         c.save();
         drawLayer(c, false);
         if (dim > 0f) {
             c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(0xFF000000, (int)(DIM_ALPHA * dim)));
+            if (fundo < 1f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(0xFF000000, (int)(255f * (1f - fundo))));
             float[] poly = screen(current().area);
             c.save();
             c.clipPolygon(poly);

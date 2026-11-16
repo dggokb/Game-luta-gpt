@@ -76,6 +76,14 @@ public class CinematicaLutaTest {
             pedidos.add((lado == CinematicaLuta.JOGADOR ? "jogador " : "rival ") + g.golpe + (g.finaliza ? " final" : ""));
         }
         @Override public boolean golpeando(int lado) { return restante[lado] > 0; }
+        /** A página em que a história continua depois do STAMP final ("ep02/pag5_ryuga.jpg 0"). */
+        String pagina;
+        /** Quantos STAMP bateram na tela. */
+        int stamps;
+        @Override public void continuarNaPagina(String imagem, int quadro) {
+            pagina = imagem + " " + quadro;
+            pedidos.add("pagina " + pagina);
+        }
         void quadro() {
             for (int i = 0; i < 2; i++) if (restante[i] > 0) restante[i]--;
         }
@@ -106,6 +114,18 @@ public class CinematicaLutaTest {
                 cinematicas++;
                 assertEquals(passo.cinematica + " fora de um passo de luta", Episodio.TipoPasso.LUTA, passo.tipo);
                 conferirCinematica(temporada, passo.cinematica, idiomas);
+                Object[] vira = CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + passo.cinematica)).viraPagina();
+                if (vira == null) continue;
+                // O STAMP final vira a página que vem logo depois da luta, na mesma campanha.
+                Episodio.Passo depois = null;
+                for (int i = ep.passos.indexOf(passo) + 1; i < ep.passos.size() && depois == null; i++) {
+                    Episodio.Passo p = ep.passos.get(i);
+                    if (p.irmao == null || p.irmao.equals(passo.irmao)) depois = p;
+                }
+                assertNotNull(passo.cinematica + ": nada depois da luta", depois);
+                assertEquals(passo.cinematica + ": o STAMP final vira a página de depois da luta",
+                    ep.id + "/" + depois.imagem, vira[0]);
+                assertEquals(Episodio.TipoPasso.PAGINA, depois.tipo);
             }
         }
         assertTrue("o treino do Episódio 1 tem cinemática", cinematicas > 0);
@@ -157,6 +177,17 @@ public class CinematicaLutaTest {
         }
         for (String pagina : r.paginas()) {
             assertTrue(arquivo + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
+        }
+        for (String stamp : r.stamps()) {
+            assertTrue(arquivo + ": sem a imagem do STAMP " + stamp, new File(ASSETS, Temporada.PASTA + "/" + stamp).isFile());
+        }
+        for (Object[] q : r.quadrosDosStamps()) {
+            String pagina = (String)q[0];
+            String epId = pagina.substring(0, pagina.indexOf('/'));
+            Episodio.Passo p = CinematicaLuta.paginaDoEpisodio(Episodio.fromJson(FILES.readText(Temporada.pasta(epId) + "/episodio.json")),
+                pagina.substring(pagina.indexOf('/') + 1));
+            assertNotNull(arquivo + ": o STAMP " + pagina + " não é uma página pronta do " + epId, p);
+            assertTrue(arquivo + ": a página " + pagina + " não tem o quadro " + q[1], (Integer)q[1] < p.quadros.size());
         }
         for (String pagina : r.paginasDosEpisodios()) {
             // A página é lida com os quadros e balões do passo dela no episódio.
@@ -308,6 +339,38 @@ public class CinematicaLutaTest {
         Palco palco = jogarConvite("ep02/cinematica_convite_ryuga.json", Torneio.RYUGA, 6);
         assertEquals("os golpes são da animação, não do motor de luta", "[]", golpes(palco).toString());
         assertTrue("a luta acaba sem vencedor", palco.pedidos.contains("fim interrompida"));
+        // Os golpes fortes batem um STAMP cada; o último vira o primeiro quadro da página 5,
+        // e a história é avisada antes de a luta acabar.
+        assertEquals("5 STAMP de golpe + o que vira a página", 6, palco.stamps);
+        assertEquals("ep02/pag5_ryuga.jpg 0", palco.pagina);
+        int pagina = palco.pedidos.indexOf("pagina ep02/pag5_ryuga.jpg 0");
+        assertTrue(pagina >= 0 && pagina < palco.pedidos.indexOf("fim interrompida"));
+    }
+
+    /** O STAMP lido do roteiro: o que vira página precisa do quadro e não vai num impacto nem numa animação. */
+    @Test
+    public void stampValida() {
+        String antes = "{\"gatilho\": \"inicio\", \"acoes\": [";
+        CinematicaLuta.Roteiro r = CinematicaLuta.ler(null, antes +
+            "{\"acao\": \"impacto\", \"stamp\": {\"imagem\": \"ep02/s.jpg\"}}," +
+            "{\"acao\": \"stamp\", \"imagem\": \"ep02/pag5_ryuga.jpg\", \"quadro\": 0, \"viraPagina\": true}]}");
+        assertEquals("[ep02/s.jpg, ep02/pag5_ryuga.jpg]", r.stamps().toString());
+        assertTrue("o STAMP que vira a página acaba a luta", r.terminaLuta());
+        String[] ruins = {
+            "{\"acao\": \"stamp\", \"imagem\": \"ep02/p.jpg\", \"viraPagina\": true}",
+            "{\"acao\": \"impacto\", \"stamp\": {\"imagem\": \"ep02/p.jpg\", \"quadro\": 0, \"viraPagina\": true}}",
+            "{\"acao\": \"animar\", \"quadros\": 10, \"eventos\": [{\"q\": 2, \"acao\": {\"acao\": \"stamp\", " +
+                "\"imagem\": \"ep02/p.jpg\", \"quadro\": 0, \"viraPagina\": true}}]}",
+            "{\"acao\": \"stamp\", \"imagem\": \"p.jpg\"}",
+        };
+        for (String ruim : ruins) {
+            try {
+                CinematicaLuta.ler(null, antes + ruim + "]}");
+                fail("devia recusar: " + ruim);
+            } catch (IllegalArgumentException esperado) {
+                // ok
+            }
+        }
     }
 
     /** O convite do Kōga: o Brucy bate primeiro (sem QTE) e o mergulho é o golpe final. */
@@ -348,12 +411,16 @@ public class CinematicaLutaTest {
         boolean cobriu = false, pedia = false, paginaSumiu = false, congelou = false;
         boolean errouToque = false, errouDeslize = false;
         int toquesNaPagina = 0, qtes = 0, quadrosNoQte = 0, toques = 0, qteQueErra = -1;
+        boolean stampAntes = false;
         for (int i = 0; i < 60 * 120 && !cena.acabou(); i++) {
             palco.quadro();
             cena.update(DT);
             conversa.update(DT);
             cena.render(canvas);
             conversa.render(canvas);
+            boolean stamp = cena.stampNaTela();
+            if (stamp && !stampAntes) palco.stamps++;
+            stampAntes = stamp;
             cobriu |= cena.telaCoberta();
             congelou |= cena.velocidade() == 0f;
             if (cena.paginaNaTela() && cena.pegaToque() && i % 20 == 0) {

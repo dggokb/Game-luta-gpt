@@ -137,10 +137,11 @@ novo).
 | `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 | `clarao` | `segundos` (padrão 0,3), `cor` (padrão `#FFFFFF`) | clarão de impacto: a tela fica da cor e volta à luta (some mais rápido no começo). Esconde um corte, como o golpe que pega no anime | `segundos` |
-| `impacto` | `forca` (1 a 3, padrão 2), `quem` (quem bateu, padrão `jogador`), `congela`, `zoom`, `letreiro` | impacto de anime no contato entre os dois: a luta congela (0,12/0,2/0,32 s pela força), a câmera dá o tranco e é empurrada; o golpe defendido (1) solta a faísca de defesa da luta, o forte (2 e 3) o estouro de ar no ponto do contato; forte (2) também marca o chão debaixo de quem segurou e faz o close inclinado; o mais forte (3) ainda tem o impact frame em negativo. Vai logo depois de uma troca que acaba no contato | — |
+| `impacto` | `forca` (1 a 3, padrão 2), `quem` (quem bateu, padrão `jogador`), `congela`, `zoom`, `letreiro`, `stamp` | impacto de anime no contato entre os dois: a luta congela (0,12/0,2/0,32 s pela força), a câmera dá o tranco e é empurrada; o golpe defendido (1) solta a faísca de defesa da luta, o forte (2 e 3) o estouro de ar no ponto do contato; forte (2) também marca o chão debaixo de quem segurou e faz o close inclinado; o mais forte (3) ainda tem o impact frame em negativo. Vai logo depois de uma troca que acaba no contato | — |
 | `linhas` | `ligar` (padrão true), `estilo` (`concentracao` ou `velocidade`), `escuro` (0 a 1, padrão 0,35), `segundos` (padrão 0,12) | linhas de ação por cima da luta: as de concentração do mangá (riscos pretos das bordas para o meio, deixando os dois limpos) ou as de velocidade (riscos de lado a lado), com a luta escurecendo atrás. Mudam a cada dois quadros, como desenhadas à mão. Todo QTE já liga as de concentração enquanto pede | `segundos` |
 | `animar` | `quadros`, `jogador`, `rival`, `eventos` ([abaixo](#animação-feita-à-mão)) | animação feita à mão: o motor de luta para e os dois seguem quadros-chave (pose, posição, esticamento, rotação, rastro) | os `quadros` acabarem |
 | `efeito` | `nome` (a pasta em `assets/efeitos`), `quem` (padrão `jogador`), `onde` (`pe` ou `peito`), `dx`, `escala`, `atras` | um efeito de vídeo no lutador: a poeira do arranque (`fumaca_dash_v05`), do pulo e do pouso, a fumaça da queda... `dx` à frente de onde ele olha; `atras` espelha (a poeira de quem escorrega para trás) | — |
+| `stamp` | `imagem`, `quadro`, `segundos`, `rotacao`, `viraPagina`, `vencedor` ([abaixo](#stamp-o-golpe-vira-mangá)) | um quadro de mangá batido na tela, com a cena congelada embaixo; com `viraPagina`, o quadro vira a página da história e a luta acaba | `segundos` (com `viraPagina`: a página assumir) |
 | `video` | `clipe` (`<episódio>/<nome>`), `repetir`, `esquerda`, `emendar`, ou `parar` ([abaixo](#cena-em-vídeo)) | os dois lutadores num vídeo só, no chão da luta e no lugar deles | `repetir`: nada; senão o vídeo acabar (com `emendar` + `semEsperar`: o vídeo começar) |
 
 Toda ação aceita `"semEsperar": true` (menos o `qte` e o `golpe`, que sempre esperam). Um movimento ou uma fala nunca seguram a cena mais de
@@ -423,7 +424,7 @@ os dois: uma cena longa não sai pela parede; a troca fica escondida atrás de u
 
 Entre duas chaves os números são interpolados com a curva da chave seguinte; a pose fica a da chave
 de antes. Os `eventos` são ações quaisquer do roteiro no quadro (`camera`, `impacto`, `efeito`,
-`linhas`, `fala`, `onomatopeia`, `clarao`), menos `qte`, `golpe` e `animar`. Um `impacto` congela a
+`linhas`, `fala`, `onomatopeia`, `clarao`, `stamp`), menos `qte`, `golpe`, `animar` e o `stamp` que vira página. Um `impacto` (e um STAMP) congela a
 animação no contato. A `velocidade` dentro da animação muda o ritmo dela (0,35 = câmera lenta em volta de um golpe; volte a 1 depois). As falas não esperam: a animação reserva o tempo delas.
 
 No gerador, as `PAUSAS` (quadro: quadros a mais) seguram a pose dos dois naquele quadro e empurram o resto para a frente (a antecipação, o golpe esticado depois do contato, a pausa de quem se estuda), sem refazer a coreografia; `CONGELA` dá a pausa do contato por força e `lenta()` a câmera lenta em volta de um golpe. O ritmo vem do dono (13/11): o movimento rápido, as pausas longas; a cena corrida cansa e o golpe perde o peso.
@@ -436,6 +437,43 @@ A luta do convite do Ryūga e a briga dos irmãos são escritas por geradores
 menino só (`foco`) cortam o corpo (a câmera segura o peito na altura da tela, que nelas fica
 baixa): feche no `centro`, que segura o chão. Para ver as poses de um lutador, as
 folhas de cada clipe com o número do quadro ajudam a escolher.
+
+### STAMP: o golpe vira mangá
+
+No contato de um golpe forte, um **quadro de mangá** bate na tela por cima da luta: chega de perto
+e assenta inclinado, com moldura branca, raios de impacto em volta e um tranco; a luta escurece
+um pouco e fica **congelada** embaixo (a animação feita à mão também para). O letreiro do impacto
+bate por cima do quadro. Depois de `segundos` (padrão 0,8) ele sai e a cena continua.
+
+O jeito comum é o `stamp` dentro de um `impacto` (ou do `impacto` de um `qte`/`golpe`):
+
+```json
+{"acao": "impacto", "quem": "jogador", "forca": 2, "letreiro": "DOOOM!",
+ "stamp": {"imagem": "ep02/stamp_ryuga1.jpg"}}
+```
+
+| Campo | Padrão | O que faz |
+|---|---|---|
+| `imagem` | — | `<episódio>/<imagem>`: a arte do quadro (a imagem inteira é o quadro) |
+| `quadro` | — | com uma página de episódio em `imagem`, o número do quadro dela (0 = o primeiro): o recorte é o `area` do quadro no `episodio.json` |
+| `segundos` | 0,8 | quanto o quadro fica batido (a cena fica congelada esse tempo) |
+| `rotacao` | alterna -5 / 4 | a inclinação, em graus |
+| `viraPagina` | false | só na ação `stamp` solta, com `quadro`: o STAMP vira a página (abaixo) |
+| `vencedor` | `jogador` | com `viraPagina`: como a luta acaba (`jogador`, `rival`, `interrompida`) |
+
+**O último STAMP vira a página.** A ação solta
+`{"acao": "stamp", "imagem": "ep02/pag5_ryuga.jpg", "quadro": 0, "viraPagina": true}` é o fim da
+cena: o quadro bate como os outros e, depois de `segundos`, **endireita e vai para o lugar exato
+dele na página** (a luta some no preto atrás); a página acende em volta, já como a leitura das
+páginas a mostra, a luta acaba e a história abre essa página **já nesse quadro, no mesmo lugar da
+tela**, sem escurecer na entrada, e o próximo toque segue para o quadro seguinte. Para a emenda
+valer, a página tem que ser o passo logo depois da luta na campanha (o teste confere). Se a
+imagem não abre, a luta acaba do mesmo jeito.
+
+A arte de cada STAMP é desenhada com o enquadramento e as poses da luta naquele instante: o
+`gradle :pc:testeQte` grava `impacto_N_1.png` (o quadro logo antes do STAMP N) na pasta de
+saída, a referência para desenhar. No convite do Ryūga os `stamp_ryuga1..5.jpg` são provisórios:
+esse mesmo quadro passado para preto e branco com retícula.
 
 ### O teste dos QTE (convite do Episódio 2)
 
@@ -549,6 +587,7 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | Último ponto de vida seguro | `FighterState.lifeFloor`, `GameView.protegerVida` |
 | HUD e controle de toque somem, faixas, quadros e onomatopeias (nessa ordem) | `GameView.renderFrame` |
 | Fim da luta pela cena | `GameView.updateStoryFight` (`cinematicaFim`) |
+| STAMP (o quadro batido, a virada para a página) | `CinematicaLuta.bater`, `desenharStamp`, `desenharVirada`; a página que continua: `PaginaGuiada.beginNoQuadro`, `PaginaHistoria.continuarNoQuadro`, `GameView.palcoCinematica` (`continuarNaPagina`) |
 | Cena em vídeo (as folhas, esconder os lutadores, espelhar) | `android/app/.../CenaVideo.java`, `GameView.drawCenaVideo` |
 | Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite, a briga dos irmãos animada nas duas campanhas), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
 | A luta do teste de QTE jogada no PC | `android/pc/src/test/.../TesteQteConvite.java` (`gradle :pc:testeQte`) |

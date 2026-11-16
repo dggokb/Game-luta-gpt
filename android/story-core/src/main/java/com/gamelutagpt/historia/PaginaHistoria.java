@@ -76,6 +76,14 @@ public final class PaginaHistoria {
     private float shake;
     private long frame;
     private boolean botaoMenu;
+    /**
+     * A luta acabou num STAMP que virou o quadro {@link #continuaQuadro} desta página
+     * ({@code ep02/pag5_ryuga.jpg}): se ela é o próximo passo, abre já nesse quadro, sem
+     * escurecer na entrada (a tela já é ela). {@link #continuou}: a página atual abriu assim.
+     */
+    private String continuaPagina;
+    private int continuaQuadro;
+    private boolean continuou;
 
     // Página atual: quando cada painel e cada balão apareceu (-1 = ainda não).
     private float[] panelAt = new float[0];
@@ -234,6 +242,21 @@ public final class PaginaHistoria {
         return warnings;
     }
 
+    /**
+     * A cinemática da luta acabou num STAMP que virou o quadro {@code quadro} da página
+     * {@code caminho} ({@code ep02/pag5_ryuga.jpg}); chame antes de {@link #resultadoLuta}. Se
+     * essa página for o próximo passo, ela começa nesse quadro, no mesmo lugar da tela.
+     */
+    public void continuarNoQuadro(String caminho, int quadro) {
+        continuaPagina = caminho;
+        continuaQuadro = quadro;
+    }
+
+    /** A página na tela começou no quadro de um STAMP (sem escurecer na entrada). */
+    public boolean continuouDoStamp() {
+        return continuou && coversScreen();
+    }
+
     /** O jogo terminou a luta pedida pelo passo atual. */
     public void resultadoLuta(boolean venceu) {
         if (!waitingFight()) return;
@@ -359,6 +382,10 @@ public final class PaginaHistoria {
     private void nextStep() {
         exitAt = -1f;
         time = 0f;
+        // A continuação do STAMP vale só para o passo logo depois da luta.
+        String continua = continuaPagina;
+        continuaPagina = null;
+        continuou = false;
         stepIndex++;
         while (stepIndex < episodio.passos.size() && !toca(episodio.passos.get(stepIndex))) stepIndex++;
         if (stepIndex >= episodio.passos.size()) {
@@ -379,7 +406,7 @@ public final class PaginaHistoria {
                 listener.onHistoriaSom("pagina");
                 break;
             case PAGINA:
-                beginPage(p);
+                beginPage(p, continua);
                 break;
             case LUTA:
                 releaseImages();
@@ -473,7 +500,7 @@ public final class PaginaHistoria {
         exitAt = time;
     }
 
-    private void beginPage(Episodio.Passo p) {
+    private void beginPage(Episodio.Passo p, String continua) {
         releaseImages();
         String folder = Temporada.pasta(episodio.id);
         if (p.paginaPronta()) {
@@ -485,7 +512,14 @@ public final class PaginaHistoria {
             }
             images.put(p.imagem, page);
             // Sem a imagem, a página vira um papel do tamanho de uma página do GPT (2:3).
-            guiada.begin(temporada, p, page, page != null ? page.width() : 1024f, page != null ? page.height() : 1536f);
+            float w = page != null ? page.width() : 1024f, h = page != null ? page.height() : 1536f;
+            if (page != null && (episodio.id + "/" + p.imagem).equals(continua) && continuaQuadro < p.quadros.size()) {
+                // Veio do STAMP final da luta: o quadro já está na tela; a leitura segue dele.
+                guiada.beginNoQuadro(temporada, p, page, w, h, continuaQuadro);
+                continuou = true;
+                return;
+            }
+            guiada.begin(temporada, p, page, w, h);
             listener.onHistoriaSom("pagina");
             return;
         }
@@ -637,7 +671,7 @@ public final class PaginaHistoria {
         if (botaoMenu) drawMenu(c);
         if (waitingTap()) drawTapArrow(c);
 
-        float fadeIn = 1f - Tinta.clamp01(time / PAGE_FADE);
+        float fadeIn = continuou ? 0f : 1f - Tinta.clamp01(time / PAGE_FADE);
         float fadeOut = exitAt >= 0f ? Tinta.clamp01((time - exitAt) / EXIT_DURATION) : 0f;
         float fade = Math.max(fadeIn * 0.85f, fadeOut);
         if (fade > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(0xFF000000, (int)(255f * fade)));

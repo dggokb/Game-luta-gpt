@@ -1,5 +1,5 @@
 {
- "_comentario": "Cena da luta do convite do Ryūga, animada à mão (ação animar, motor de luta parado), gerada por tools/cenas/convite_ryuga.py: a coreografia do dono (13/11) em quatro sequências, na gramática do vídeo de palitinho de referência. 1) a Yín-lù chama, arranca e solta soco (no vento), chute alto (defendido) e rasteira (ele pula), ele gira no ar e desce com o chute nos braços cruzados dela; 2) os dois arrancam, trocam golpes com a câmera cortando, os punhos se chocam, o combo dele (soco no abdômen, gancho, chute giratório) a faz escorregar, \"Nada mal!\"; 3) ele corre, ela some e surge às costas dele com a palma, ele defende o chute, tenta pegar o braço e é projetado, gira no ar e escorrega com a mão no chão, as falas do monstro; 4) ofegantes, \"Eu não vim até aqui pra perder!\", os dois disparam: o soco (ela se abaixa), o chute alto (ele se abaixa), o gancho (ela salta para trás), o salto com o golpe descendo nos braços cruzados dela: IMPACTO, clarão de dois quadros, a câmera volta devagar e os dois ofegantes. Seis QTE no meio dos golpes (ESQUIVA, COMBO, DEFESA, SOCO, CONTRA-ATAQUE, GOLPE FINAL): a animação para na pose e pede; errar toca o contra-ataque dela e pede de novo. A coreografia antiga, com QTE do motor de luta, está em cinematica_convite_ryuga_qte.json.",
+ "_comentario": "Cena da luta do convite do Ryūga, animada à mão (ação animar, motor de luta parado), gerada por tools/cenas/convite_ryuga.py: a coreografia do dono (13/11) em quatro sequências, na gramática do vídeo de palitinho de referência. 1) a Yin-lu chama, arranca e solta soco (no vento), chute alto (defendido) e rasteira (ele pula), ele gira no ar e desce com o chute nos braços cruzados dela; 2) os dois arrancam, trocam golpes com a câmera cortando, os punhos se chocam, o combo dele (soco no abdômen, gancho, chute giratório) a faz escorregar, \"Nada mal!\"; 3) ele corre, ela some e surge às costas dele com a palma, ele defende o chute, tenta pegar o braço e é projetado, gira no ar e escorrega com a mão no chão, as falas do monstro; 4) ofegantes, \"Eu não vim até aqui pra perder!\", os dois disparam: o soco (ela se abaixa), o chute alto (ele se abaixa), o gancho (ela salta para trás), o salto com o golpe descendo nos braços cruzados dela: IMPACTO, clarão de dois quadros, a câmera volta devagar e os dois ofegantes. Nos golpes fortes (o chute que desce no DOOOM, os punhos se chocando, o chute giratório, a palma do PAH e o IMPACTO) um STAMP: o quadro de mangá do golpe bate na tela com a cena congelada e sai. O último STAMP é o primeiro quadro da página 5 (os dois ofegantes): ele vai para o lugar dele na página, a luta acaba e a história segue lendo dali. Seis QTE no meio dos golpes (ESQUIVA, COMBO, DEFESA, SOCO, CONTRA-ATAQUE, GOLPE FINAL): a animação para na pose e pede; errar toca o contra-ataque dela e pede de novo. A coreografia antiga, com QTE do motor de luta, está em cinematica_convite_ryuga_qte.json.",
  "gatilho": {"vida": 0.2, "lado": "rival"},
  "acoes": [
   {"acao": "controle", "travar": true},
@@ -157,7 +157,7 @@
     {"q": 2, "acao": {"acao": "efeito", "quem": "jogador", "nome": "fumaca_pulo"}},
     {"q": 12, "acao": {"acao": "camera", "zoom": 1.3, "foco": "centro", "segundos": 0.12}},
     {"q": 31, "acao": {"acao": "velocidade", "valor": 0.35, "segundos": 0.05, "semEsperar": true}},
-    {"q": 35, "acao": {"acao": "impacto", "quem": "jogador", "forca": 2, "letreiro": "DOOOM!", "congela": 0.3}},
+    {"q": 35, "acao": {"acao": "impacto", "quem": "jogador", "forca": 2, "letreiro": "DOOOM!", "stamp": {"imagem": "ep02/stamp_ryuga1.jpg"}, "congela": 0.3}},
     {"q": 36, "acao": {"acao": "efeito", "quem": "rival", "nome": "fumaca_queda_v01", "escala": 1.2}},
     {"q": 36, "acao": {"acao": "linhas", "ligar": false, "segundos": 0.08}},
     {"q": 38, "acao": {"acao": "efeito", "quem": "rival", "nome": "fumaca_dash_v05", "atras": true, "escala": 0.8}},
@@ -172,7 +172,7 @@
     {"q": 148, "acao": {"acao": "impacto", "quem": "jogador", "forca": 1, "congela": 0.18}},
     {"q": 168, "acao": {"acao": "impacto", "quem": "rival", "forca": 1, "congela": 0.18}},
     {"q": 186, "acao": {"acao": "camera", "zoom": 1.3, "foco": "centro", "segundos": 0.0}},
-    {"q": 191, "acao": {"acao": "impacto", "quem": "jogador", "forca": 2, "congela": 0.3}},
+    {"q": 191, "acao": {"acao": "impacto", "quem": "jogador", "forca": 2, "stamp": {"imagem": "ep02/stamp_ryuga2.jpg", "rotacao": 3}, "congela": 0.3}},
     {"q": 205, "acao": {"acao": "efeito", "quem": "jogador", "nome": "fumaca_dash_v05", "atras": true, "escala": 0.8}},
     {"q": 205, "acao": {"acao": "efeito", "quem": "rival", "nome": "fumaca_dash_v05", "atras": true, "escala": 0.8}}]
   },
@@ -253,7 +253,7 @@
     {"q": 21, "acao": {"acao": "impacto", "quem": "jogador", "forca": 1, "congela": 0.18}},
     {"q": 34, "acao": {"acao": "camera", "zoom": 1.25, "foco": "centro", "segundos": 0.0}},
     {"q": 35, "acao": {"acao": "velocidade", "valor": 1.0, "segundos": 0.2, "semEsperar": true}},
-    {"q": 41, "acao": {"acao": "impacto", "quem": "jogador", "forca": 2, "congela": 0.3}},
+    {"q": 41, "acao": {"acao": "impacto", "quem": "jogador", "forca": 2, "stamp": {"imagem": "ep02/stamp_ryuga3.jpg"}, "congela": 0.3}},
     {"q": 55, "acao": {"acao": "efeito", "quem": "rival", "nome": "fumaca_dash_v05", "atras": true}},
     {"q": 61, "acao": {"acao": "efeito", "quem": "jogador", "nome": "fumaca_dash_v05", "atras": true, "escala": 0.7}},
     {"q": 88, "acao": {"acao": "linhas", "ligar": false, "segundos": 0.08}},
@@ -269,7 +269,7 @@
     {"q": 198, "acao": {"acao": "camera", "zoom": 1.45, "foco": "ryuga", "segundos": 0.0}},
     {"q": 215, "acao": {"acao": "onomatopeia", "texto": "?", "pos": [0.5, 0.2], "tamanho": 150, "semEsperar": true, "rotacao": 6, "tremor": 2, "segundos": 0.55}},
     {"q": 240, "acao": {"acao": "velocidade", "valor": 0.35, "segundos": 0.05, "semEsperar": true}},
-    {"q": 244, "acao": {"acao": "impacto", "quem": "rival", "forca": 2, "letreiro": "PAH!", "congela": 0.3}},
+    {"q": 244, "acao": {"acao": "impacto", "quem": "rival", "forca": 2, "letreiro": "PAH!", "stamp": {"imagem": "ep02/stamp_ryuga4.jpg"}, "congela": 0.3}},
     {"q": 251, "acao": {"acao": "efeito", "quem": "jogador", "nome": "fumaca_dash_v05", "atras": true}},
     {"q": 254, "acao": {"acao": "camera", "zoom": 1.2, "foco": "centro", "segundos": 0.2}}]
   },
@@ -441,7 +441,7 @@
     {"q": 28, "acao": {"acao": "efeito", "quem": "rival", "nome": "fumaca_pouso"}}]
   },
   {"acao": "qte", "golpe": "nenhum", "pos": [0.82, 0.6], "tipo": "tempo", "texto": "GOLPE FINAL!", "segundos": 1.2, "erroAnimar": {"quadros": 40, "jogador": [{"x": -37.5, "y": 135.0, "pose": "JUMP_HEAVY_DOWN:6", "q": 0}, {"q": 8, "x": -37.5, "pose": "HIT_AIR:0", "y": 135.0}, {"q": 10, "x": -37.5, "pose": "HIT_AIR:1", "rastro": 2, "y": 135.0}, {"q": 26, "x": -92.5, "pose": "HIT_AIR:3", "curva": "sai", "y": 135.0}, {"q": 40, "x": -92.5, "pose": "HIT_AIR:3", "y": 135.0}], "rival": [{"x": 126.5, "pose": "LAND:1", "q": 0}, {"q": 6, "x": 77.5, "y": 0, "pose": "SPECIAL_S2:4", "curva": "sai", "rastro": 4, "sx": 1.15, "sy": 0.92}, {"q": 10, "x": 87.5, "y": 0, "pose": "SPECIAL_S2:7", "curva": "sai", "rastro": 3}, {"q": 40, "x": 87.5, "y": 0, "pose": "SPECIAL_S2:7"}], "eventos": [{"q": 10, "acao": {"acao": "impacto", "quem": "rival", "forca": 2, "congela": 0.2}}, {"q": 36, "acao": {"acao": "clarao", "segundos": 0.15}}]}},
-  {"acao": "animar", "quadros": 230, "continua": true,
+  {"acao": "animar", "quadros": 140, "continua": true,
    "jogador": [
     {"x": -37.5, "y": 135.0, "pose": "JUMP_HEAVY_DOWN:6", "q": 0},
     {"q": 2, "x": -25, "pose": "JUMP_HEAVY_DOWN:10", "y": 130, "rastro": 6},
@@ -455,13 +455,7 @@
     {"q": 98, "x": -150, "pose": "LAND:5", "sy": 0.965, "sx": 1.02, "curva": "suave"},
     {"q": 114, "x": -150, "pose": "LAND:5", "sy": 1.0, "sx": 1.0, "curva": "suave"},
     {"q": 130, "x": -150, "pose": "LAND:5", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"q": 146, "x": -150, "pose": "LAND:5", "sy": 1.0, "sx": 1.0, "curva": "suave"},
-    {"q": 162, "x": -150, "pose": "LAND:5", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"q": 178, "x": -150, "pose": "LAND:5", "sy": 1.0, "sx": 1.0, "curva": "suave"},
-    {"q": 194, "x": -150, "pose": "LAND:5", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"q": 210, "x": -150, "pose": "LAND:5", "sy": 1.0, "sx": 1.0, "curva": "suave"},
-    {"q": 226, "x": -150, "pose": "LAND:5", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"x": -150.0, "sx": 1.02, "sy": 0.96, "pose": "LAND:5", "q": 230}],
+    {"x": -150.0, "sx": 1.02, "sy": 0.96, "pose": "LAND:5", "q": 140}],
    "rival": [
     {"x": 126.5, "pose": "LAND:1", "q": 0},
     {"q": 2, "x": 128, "pose": "DEFENSE_CROUCH:1"},
@@ -475,19 +469,14 @@
     {"q": 104, "x": 212, "pose": "LAND:6", "sy": 0.965, "sx": 1.02, "curva": "suave"},
     {"q": 120, "x": 212, "pose": "LAND:6", "sy": 1.0, "sx": 1.0, "curva": "suave"},
     {"q": 136, "x": 212, "pose": "LAND:6", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"q": 152, "x": 212, "pose": "LAND:6", "sy": 1.0, "sx": 1.0, "curva": "suave"},
-    {"q": 168, "x": 212, "pose": "LAND:6", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"q": 184, "x": 212, "pose": "LAND:6", "sy": 1.0, "sx": 1.0, "curva": "suave"},
-    {"q": 200, "x": 212, "pose": "LAND:6", "sy": 0.965, "sx": 1.02, "curva": "suave"},
-    {"q": 216, "x": 212, "pose": "LAND:6", "sy": 1.0, "sx": 1.0, "curva": "suave"},
-    {"x": 212.0, "pose": "LAND:6", "q": 230}],
+    {"x": 212.0, "sx": 1.02, "sy": 0.96, "pose": "LAND:6", "q": 140}],
    "eventos": [
     {"q": 0, "acao": {"acao": "camera", "zoom": 1.25, "foco": "centro", "segundos": 0.0}},
     {"q": 0, "acao": {"acao": "velocidade", "valor": 0.3, "segundos": 0.05, "semEsperar": true}},
     {"q": 2, "acao": {"acao": "linhas", "estilo": "concentracao", "escuro": 0.45, "segundos": 0.05}},
     {"q": 8, "acao": {"acao": "clarao", "segundos": 0.05}},
     {"q": 8, "acao": {"acao": "onomatopeia", "texto": "IMPACTO!", "pos": [0.5, 0.4], "tamanho": 190, "semEsperar": true, "tremor": 18, "cor": "#FF5A3C", "segundos": 0.9}},
-    {"q": 8, "acao": {"acao": "impacto", "quem": "jogador", "forca": 3, "congela": 0.6}},
+    {"q": 8, "acao": {"acao": "impacto", "quem": "jogador", "forca": 3, "stamp": {"imagem": "ep02/stamp_ryuga5.jpg", "segundos": 1.1, "rotacao": -3}, "congela": 0.6}},
     {"q": 9, "acao": {"acao": "efeito", "quem": "rival", "nome": "fumaca_queda_v01", "escala": 1.5}},
     {"q": 10, "acao": {"acao": "linhas", "ligar": false, "segundos": 0.4}},
     {"q": 10, "acao": {"acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 2.2}},
@@ -496,8 +485,6 @@
     {"q": 36, "acao": {"acao": "efeito", "quem": "jogador", "nome": "fumaca_pouso"}},
     {"q": 68, "acao": {"acao": "onomatopeia", "texto": "HAH... HAH...", "pos": [0.5, 0.3], "tamanho": 80, "semEsperar": true, "segundos": 2.0}}]
   },
-  {"acao": "esperar", "segundos": 0.3},
-  {"acao": "faixas", "entrar": false, "segundos": 0.5},
-  {"acao": "terminarLuta", "vencedor": "interrompida"}
+  {"acao": "stamp", "imagem": "ep02/pag5_ryuga.jpg", "quadro": 0, "segundos": 1.1, "viraPagina": true, "vencedor": "interrompida"}
  ]
 }

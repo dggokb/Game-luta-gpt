@@ -1,6 +1,7 @@
 package com.gamelutagpt.historia;
 
 import com.gamelutagpt.render.MiniJson;
+import com.gamelutagpt.render.Rand;
 import com.gamelutagpt.render.RenderAssets;
 import com.gamelutagpt.render.RenderCanvas;
 import com.gamelutagpt.render.RenderImage;
@@ -55,6 +56,13 @@ public final class CinematicaLuta {
     /** QTE de deslizar: quanto o dedo anda (px da tela 1280x720) para valer. */
     static final float DESLIZE = 90f;
     static final float BOTAO_RAIO = 62f;
+    /** STAMP: quanto o quadro de mangá fica batido na tela (com a cena congelada embaixo). */
+    static final float STAMP_SEGURA = 0.8f;
+    static final float STAMP_ENTRA = 0.09f;
+    static final float STAMP_SAI = 0.16f;
+    /** STAMP que vira página: o quadro vai para o lugar dele na página, e a página acende em volta. */
+    static final float VIRA_MOVE = 0.5f;
+    static final float VIRA_FUNDO = 0.45f;
     private static final int INK = Baloes.INK;
     private static final int WHITE = Baloes.WHITE;
 
@@ -148,6 +156,13 @@ public final class CinematicaLuta {
         default void som(String id) {}
 
         /**
+         * O STAMP final virou o quadro {@code quadro} da página {@code imagem}
+         * ({@code ep02/pag5_ryuga.jpg}): a história, ao abrir essa página logo depois da luta,
+         * começa nesse quadro, no mesmo lugar da tela (chamado logo antes de {@link #terminarLuta}).
+         */
+        default void continuarNaPagina(String imagem, int quadro) {}
+
+        /**
          * Quem fala por esse lado numa fala com {@code "quem": "jogador"} ou {@code "rival"}: o
          * lutador em campo agora (na dupla, qualquer um dos dois pode ser o último de pé). Null
          * cala a fala.
@@ -232,7 +247,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR, EFEITO }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR, EFEITO, STAMP }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -335,6 +350,16 @@ public final class CinematicaLuta {
         /** TROCAR: os primeiros lances, em ordem (o resto é sorteado). */
         List<String> lances;
         /**
+         * STAMP: a imagem do quadro de mangá ({@code ep02/stamp1.jpg}) e, numa página de um
+         * episódio, qual quadro dela (-1 = a imagem inteira é o quadro).
+         */
+        String imagem;
+        int quadro = -1;
+        /** STAMP: o quadro vira a página dele: a cena acaba e a história segue lendo dali. */
+        boolean viraPagina;
+        /** IMPACTO, QTE e GOLPE: o STAMP que bate no contato (com a cena congelada embaixo). */
+        Acao stamp;
+        /**
          * VIDEO: a cena dos dois lutadores num vídeo ({@code historia/<clipe>/}: folha.webp e
          * efeito.json, do efeito_video.py), no chão da luta e no lugar deles; null com
          * {@link #parar}. {@link #repetir}: em loop (não espera); senão espera acabar e fica no
@@ -432,9 +457,53 @@ public final class CinematicaLuta {
         /** O roteiro termina a luta (senão, ela continua depois da cena). */
         public boolean terminaLuta() {
             for (Acao a : acoes) {
-                if (a.tipo == Acao.Tipo.TERMINAR_LUTA) return true;
+                if (a.tipo == Acao.Tipo.TERMINAR_LUTA || a.viraPagina) return true;
             }
             return false;
+        }
+
+        /** Os STAMP da cena: os soltos e os dos impactos, também os de dentro das animações. */
+        List<Acao> stampsDaCena() {
+            List<Acao> out = new ArrayList<>();
+            for (Acao a : acoes) {
+                List<Acao> todas = new ArrayList<>();
+                todas.add(a);
+                for (Acao anim : new Acao[] {a.tipo == Acao.Tipo.ANIMAR ? a : null, a.erroAnimar}) {
+                    if (anim == null) continue;
+                    for (AnimacaoManual.Evento ev : anim.animacao.eventos) todas.add(ev.acao);
+                }
+                for (Acao t : todas) {
+                    Acao st = t.tipo == Acao.Tipo.STAMP ? t : t.stamp;
+                    if (st != null) out.add(st);
+                }
+            }
+            return out;
+        }
+
+        /** As imagens dos STAMP, para conferir os arquivos. */
+        public List<String> stamps() {
+            List<String> out = new ArrayList<>();
+            for (Acao st : stampsDaCena()) {
+                if (!out.contains(st.imagem)) out.add(st.imagem);
+            }
+            return out;
+        }
+
+        /** Os STAMP que pegam um quadro de uma página de episódio: {imagem, quadro}. */
+        public List<Object[]> quadrosDosStamps() {
+            List<Object[]> out = new ArrayList<>();
+            for (Acao st : stampsDaCena()) {
+                if (st.quadro >= 0) out.add(new Object[] {st.imagem, st.quadro});
+            }
+            return out;
+        }
+
+        /** O STAMP que vira página ({imagem, quadro}), ou null: a página com que a história continua. */
+        public Object[] viraPagina() {
+            for (Acao a : acoes) {
+                if (a.viraPagina) return new Object[] {a.imagem, a.quadro};
+            }
+            return null;
         }
     }
 
@@ -631,6 +700,21 @@ public final class CinematicaLuta {
     private float videoTrocaMs;
     private final Map<String, Float> duracaoVideo = new HashMap<>();
 
+    /** As imagens dos STAMP (abertas ao carregar) e o quadro de cada um ({x, y...} de 0 a 1 na imagem). */
+    private final Map<String, RenderImage> imagensStamp = new HashMap<>();
+    private final Map<Acao, float[]> areaStamp = new HashMap<>();
+    /** O passo da página de cada STAMP que vira página. */
+    private final Map<Acao, Episodio.Passo> paginaStamp = new HashMap<>();
+    /** O STAMP na tela (ou saindo), desde quando, e quantos já bateram (a inclinação alterna). */
+    private Acao stamp;
+    private float stampDesde;
+    private int stamps;
+    /** O STAMP que vira página já está indo para o lugar dele (a página dele já abriu em {@link #guiada}). */
+    private boolean virando;
+    /** A página já é a da história (a luta acabou): fica na tela até a história assumir. */
+    private boolean virou;
+    private final Rand raio = new Rand(41);
+
     /** O jogador está no toque (as dicas dizem TOQUE) ou no teclado/controle (APERTE). */
     private boolean dicasDeToque = true;
 
@@ -687,8 +771,31 @@ public final class CinematicaLuta {
                 // Sem o vídeo: a ação passa direto e os lutadores continuam na tela.
             }
         }
+        for (Acao st : roteiro.stampsDaCena()) carregarStamp(st, episodios);
         estado = Estado.ARMADA;
         return true;
+    }
+
+    /** Abre a imagem do STAMP e acha o quadro dele; se não abre, o STAMP não aparece. */
+    private void carregarStamp(Acao st, Map<String, Episodio> episodios) {
+        try {
+            RenderImage img = imagensStamp.get(st.imagem);
+            if (img == null) {
+                img = assets.loadImage(Temporada.PASTA + "/" + st.imagem);
+                if (img == null) return;
+                imagensStamp.put(st.imagem, img);
+            }
+            if (st.quadro < 0) {
+                areaStamp.put(st, new float[] {0f, 0f, 1f, 0f, 1f, 1f, 0f, 1f});
+                return;
+            }
+            Episodio.Passo passo = passoDaPagina(st.imagem, episodios);
+            if (passo == null || st.quadro >= passo.quadros.size()) return;
+            areaStamp.put(st, passo.quadros.get(st.quadro).area);
+            if (st.viraPagina) paginaStamp.put(st, passo);
+        } catch (IOException | RuntimeException ex) {
+            // Sem a imagem: a cena segue sem o STAMP.
+        }
     }
 
     /** A soma das durações de um efeito.json (os quadros curtos repetem a última). */
@@ -753,6 +860,12 @@ public final class CinematicaLuta {
         pinceladas = Collections.emptyList();
         paginas.clear();
         paginaNaTela = false;
+        imagensStamp.clear();
+        areaStamp.clear();
+        paginaStamp.clear();
+        stamp = null;
+        stamps = 0;
+        virando = virou = false;
         qte = null;
         animando = null;
         animSegura = false;
@@ -1015,6 +1128,7 @@ public final class CinematicaLuta {
                     l.segundos = 0.9f;
                     a.impacto = l;
                 }
+                stampDoImpacto(a, m.get("stamp"));
                 break;
             case "clarao":
                 // Clarão de impacto: a tela fica da cor e volta à luta em "segundos" (um corte
@@ -1041,6 +1155,9 @@ public final class CinematicaLuta {
                     throw new IllegalArgumentException("esquerda " + a.esquerda + " (use jogador, rival, ryuga ou koga)");
                 }
                 break;
+            case "stamp":
+                a = stamp(m, true);
+                break;
             case "golpe":
                 a = new Acao(Acao.Tipo.GOLPE);
                 a.quemMove = Episodio.string(m, "quem", "jogador");
@@ -1050,7 +1167,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto, animar)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto, animar, efeito, stamp)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -1074,6 +1191,7 @@ public final class CinematicaLuta {
         Object json = m.get("impacto");
         if (json == null) return;
         Map<String, Object> im = new java.util.LinkedHashMap<>(Episodio.asMap(json));
+        stampDoImpacto(a, im.remove("stamp"));
         im.put("acao", "onomatopeia");
         if (!im.containsKey("segundos")) im.put("segundos", 1.2);
         try {
@@ -1106,10 +1224,49 @@ public final class CinematicaLuta {
             AnimacaoManual.Evento ev = new AnimacaoManual.Evento();
             ev.q = Math.round(numero(em, "q", 0f, 0f, 3600f));
             ev.acao = acao(temporada, Episodio.asMap(em.get("acao")));
-            if (ev.acao.tipo == Acao.Tipo.QTE || ev.acao.tipo == Acao.Tipo.ANIMAR || ev.acao.tipo == Acao.Tipo.GOLPE) {
-                throw new IllegalArgumentException("animar: evento " + ev.acao.tipo + " não pode ir dentro da animação");
+            if (ev.acao.tipo == Acao.Tipo.QTE || ev.acao.tipo == Acao.Tipo.ANIMAR || ev.acao.tipo == Acao.Tipo.GOLPE || ev.acao.viraPagina) {
+                throw new IllegalArgumentException("animar: evento " + ev.acao.tipo + (ev.acao.viraPagina ? " com viraPagina" : "") +
+                    " não pode ir dentro da animação");
             }
             a.animacao.eventos.add(ev);
+        }
+        return a;
+    }
+
+    /** O {@code "stamp"} de um impacto: o quadro de mangá que bate no contato. */
+    private static void stampDoImpacto(Acao a, Object json) {
+        if (json == null) return;
+        try {
+            a.stamp = stamp(Episodio.asMap(json), false);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("stamp do impacto: " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Um STAMP: {@code {"imagem": "ep02/stamp1.jpg"}} (a imagem inteira é o quadro) ou
+     * {@code {"imagem": "ep02/pag5_ryuga.jpg", "quadro": 0}} (o quadro de uma página de
+     * episódio), mais {@code segundos} (quanto fica batido na tela), {@code rotacao} e, só na
+     * ação solta, {@code viraPagina} (com {@code vencedor}).
+     */
+    private static Acao stamp(Map<String, Object> m, boolean solto) {
+        Acao a = new Acao(Acao.Tipo.STAMP);
+        a.imagem = Episodio.string(m, "imagem", null);
+        if (a.imagem == null) throw new IllegalArgumentException("stamp sem \"imagem\"");
+        if (!a.imagem.matches("[a-z0-9_]+/[^/]+")) {
+            throw new IllegalArgumentException("stamp " + a.imagem + " (use \"<episódio>/<imagem>\", ex.: ep02/stamp1.jpg)");
+        }
+        if (m.get("quadro") != null) a.quadro = Math.round(numero(m, "quadro", 0f, 0f, 40f));
+        a.segundos = numero(m, "segundos", STAMP_SEGURA, 0.15f, 5f);
+        a.rotacao = numero(m, "rotacao", Float.NaN, -30f, 30f);
+        a.viraPagina = Boolean.TRUE.equals(m.get("viraPagina"));
+        if (a.viraPagina) {
+            if (!solto) throw new IllegalArgumentException("viraPagina só na ação stamp (depois do golpe)");
+            if (a.quadro < 0) throw new IllegalArgumentException("viraPagina precisa do \"quadro\" da página");
+            a.vencedor = Episodio.string(m, "vencedor", "jogador");
+            if (!a.vencedor.equals("jogador") && !a.vencedor.equals("rival") && !a.vencedor.equals("interrompida")) {
+                throw new IllegalArgumentException("vencedor " + a.vencedor + " (use jogador, rival ou interrompida)");
+            }
         }
         return a;
     }
@@ -1396,6 +1553,7 @@ public final class CinematicaLuta {
             tranco.ir(1f, 0.35f);
             trancoVolta = -1f;
         }
+        atualizarStamp();
         atualizarCameraViva();
         // A "velocidade" do roteiro vale também na animação feita à mão: a câmera lenta no contato.
         if (animando != null && estado == Estado.RODANDO && time >= congelaAte) animar(dt * 60f * velocidade.valor());
@@ -1538,6 +1696,9 @@ public final class CinematicaLuta {
                 impactar(a);
                 palco.impacto(a.forca, lado(a.quemMove));
                 break;
+            case STAMP:
+                bater(a);
+                break;
             case EFEITO:
                 palco.efeito(a.efeito, lado(a.quemMove), a.noPeito, a.dx, a.escala, a.atras);
                 break;
@@ -1614,6 +1775,12 @@ public final class CinematicaLuta {
             case TROCAR:
                 // A vez em andamento termina antes (no tempo da luta: a câmera lenta estica).
                 return !palco.trocando() || idade >= a.segundos + LIMITE_ESPERA;
+            case STAMP:
+                if (!a.viraPagina) return stamp != a || idade >= a.segundos;
+                // Sem a página (não abriu), a luta acaba do mesmo jeito.
+                if (stamp == a && idade < a.segundos + VIRA_MOVE + VIRA_FUNDO) return false;
+                virarPagina(a, stamp == a && virando);
+                return true;
             case VIDEO:
                 if (videoProximo == a) return false;
                 if (a.soComecar) return true;
@@ -1812,6 +1979,7 @@ public final class CinematicaLuta {
     private void impactar(Acao a) {
         if (a.impacto != null) estouros.add(new Estouro(a.impacto, time));
         if (a.congela > 0f) congelaAte = time + a.congela;
+        if (a.stamp != null) bater(a.stamp);
         if (a.tranco > 1f) {
             tranco.ir(a.tranco, 0.06f);
             trancoVolta = time + Math.max(0.12f, a.congela);
@@ -1971,6 +2139,58 @@ public final class CinematicaLuta {
     }
 
     /** Fim do roteiro sem terminar a luta: o controle volta, as faixas saem e a câmera volta. */
+    // ------------------------------------------------------------ STAMP
+
+    /** O STAMP bate na tela: a luta congela embaixo dele enquanto ele fica. */
+    private void bater(Acao a) {
+        if (areaStamp.get(a) == null) return;
+        stamp = a;
+        stampDesde = time;
+        stamps++;
+        virando = false;
+        congelaAte = Math.max(congelaAte, time + a.segundos);
+        palco.som("impacto");
+    }
+
+    private void atualizarStamp() {
+        if (stamp == null) return;
+        float idade = time - stampDesde;
+        if (stamp.viraPagina) {
+            Episodio.Passo passo = paginaStamp.get(stamp);
+            if (!virando && idade >= stamp.segundos && passo != null && temporada != null) {
+                // A página abre já no quadro do STAMP; o quadro vai para o lugar dele nela.
+                RenderImage img = imagensStamp.get(stamp.imagem);
+                guiada.beginNoQuadro(temporada, passo, img, img.width(), img.height(), stamp.quadro);
+                virando = true;
+                estouros.clear();
+                paginaNaTela = false;
+            }
+            return;
+        }
+        if (idade >= stamp.segundos + STAMP_SAI) stamp = null;
+    }
+
+    /** O STAMP virou a página: a cena acaba, a luta também, e a história lê dali em diante. */
+    private void virarPagina(Acao a, boolean comPagina) {
+        if (comPagina) {
+            virou = true;
+            palco.continuarNaPagina(a.imagem, a.quadro);
+        }
+        // O que a cena ligou volta ao normal (tudo por baixo da página, que já cobre a tela).
+        acabar();
+        palco.terminarLuta(a.vencedor);
+    }
+
+    /** Um STAMP está na tela agora (para os testes e o jogo). */
+    public boolean stampNaTela() {
+        return stamp != null || virou;
+    }
+
+    /** O STAMP final está virando a página (ou já virou): a tela é a página. */
+    public boolean virandoPagina() {
+        return virando || virou;
+    }
+
     private void acabar() {
         estado = Estado.ACABOU;
         acao = null;
@@ -2170,10 +2390,146 @@ public final class CinematicaLuta {
         }
     }
 
-    /** As onomatopeias, por cima de tudo. */
+    /** O STAMP e as onomatopeias (o letreiro do impacto bate por cima do quadro). */
     public void renderEfeitos(RenderCanvas c) {
+        if (stamp != null && !virando && !virou) desenharStamp(c, time - stampDesde);
         for (Estouro e : estouros) drawOnomatopeia(c, e);
     }
+
+    /**
+     * O STAMP batido: a luta escurece um pouco, o quadro de mangá chega de perto e bate
+     * inclinado, com a moldura branca e os raios de impacto em volta, treme e, no fim, sai.
+     */
+    private void desenharStamp(RenderCanvas c, float idade) {
+        RenderImage img = imagensStamp.get(stamp.imagem);
+        float[] area = areaStamp.get(stamp);
+        if (img == null || area == null) return;
+        float entra = Tinta.clamp01(idade / STAMP_ENTRA);
+        float sai = stamp.viraPagina ? 0f : Tinta.clamp01((idade - stamp.segundos) / STAMP_SAI);
+        float alpha = Math.min(Tinta.clamp01(entra * 2.5f), 1f - sai);
+        if (alpha <= 0f) return;
+        float[] pose = poseDoStamp(img, area, idade);
+        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(95f * alpha)));
+        if (idade < 0.07f) {
+            // O estalo: um clarão branco no instante em que o quadro bate.
+            c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(WHITE, (int)(150f * (1f - idade / 0.07f))));
+        }
+        float raios = Tinta.easeOutCubic(Tinta.clamp01(idade / 0.18f)) * (1f - sai);
+        quadroDoStamp(c, img, area, pose[0], pose[1], pose[2], pose[3], (int)(255f * alpha), 1f, raios, idade);
+    }
+
+    /** Onde o STAMP está na tela agora: {centro x, centro y, escala (px de tela por px da imagem), graus}. */
+    private float[] poseDoStamp(RenderImage img, float[] area, float idade) {
+        float[] bb = Layouts.caixa(area);
+        float bw = (bb[2] - bb[0]) * img.width();
+        float bh = (bb[3] - bb[1]) * img.height();
+        float s = Math.min(VW * 0.62f / bw, VH * 0.62f / bh);
+        float entra = Tinta.clamp01(idade / STAMP_ENTRA);
+        // Vem de perto e bate; depois cresce devagar enquanto segura (e um pouco mais ao sair).
+        float escala = 1.45f - 0.45f * Tinta.easeOutCubic(entra);
+        escala *= 1f + 0.03f * Tinta.clamp01((idade - STAMP_ENTRA) / Math.max(0.2f, stamp.segundos));
+        if (!stamp.viraPagina) escala *= 1f + 0.1f * Tinta.clamp01((idade - stamp.segundos) / STAMP_SAI);
+        float rot = Float.isNaN(stamp.rotacao) ? (stamps % 2 == 1 ? -5f : 4f) : stamp.rotacao;
+        // O tranco da batida: treme forte e assenta.
+        float treme = 13f * (1f - Tinta.clamp01((idade - STAMP_ENTRA) / 0.3f)) * (idade >= STAMP_ENTRA ? 1f : 0f);
+        float dx = (float)Math.sin(time * 71f) * treme;
+        float dy = (float)Math.cos(time * 59f) * treme;
+        return new float[] {VW * 0.5f + dx, VH * 0.48f + dy, s * escala, rot};
+    }
+
+    /**
+     * O quadro {@code area} da imagem com centro em (cx, cy), {@code s} px de tela por px da
+     * imagem e inclinado {@code rot} graus; {@code borda} (0 a 1) a moldura branca e
+     * {@code raios} (0 a 1) os raios de impacto em volta.
+     */
+    private void quadroDoStamp(RenderCanvas c, RenderImage img, float[] area, float cx, float cy, float s, float rot,
+                               int alpha, float borda, float raios, float idade) {
+        float iw = img.width();
+        float ih = img.height();
+        float[] bb = Layouts.caixa(area);
+        float bx0 = bb[0] * iw, by0 = bb[1] * ih, bx1 = bb[2] * iw, by1 = bb[3] * ih;
+        float bcx = (bx0 + bx1) * 0.5f, bcy = (by0 + by1) * 0.5f;
+        float hw = (bx1 - bx0) * s * 0.5f, hh = (by1 - by0) * s * 0.5f;
+        float[] quad = new float[area.length];
+        for (int i = 0; i + 1 < area.length; i += 2) {
+            quad[i] = (area[i] * iw - bcx) * s;
+            quad[i + 1] = (area[i + 1] * ih - bcy) * s;
+        }
+        c.save();
+        c.translate(cx, cy);
+        c.rotate(rot, 0f, 0f);
+        if (raios > 0.01f) raiosDoStamp(c, hw, hh, raios, alpha);
+        if (borda > 0.01f) {
+            float e = 15f * borda;
+            float[] fora = new float[quad.length];
+            for (int i = 0; i < quad.length; i++) fora[i] = quad[i] + Math.signum(quad[i]) * e;
+            c.fillPolygon(fora, Tinta.withAlpha(WHITE, alpha));
+            c.strokePolygon(fora, 4f * borda, Tinta.withAlpha(INK, alpha));
+        }
+        c.save();
+        c.clipPolygon(quad);
+        c.drawImageRegion(img, bx0, by0, bx1, by1, -hw, -hh, hw, hh, alpha);
+        c.restore();
+        if (borda > 0.01f) c.strokePolygon(quad, 3.5f * borda, Tinta.withAlpha(INK, alpha));
+        c.restore();
+    }
+
+    /** Raios brancos de contorno preto saindo de trás do quadro (tremeluzem como no anime). */
+    private void raiosDoStamp(RenderCanvas c, float hw, float hh, float k, int alpha) {
+        raio.reset(stamps * 977L + (long)(time * 24f));
+        int n = 34;
+        int branco = Tinta.withAlpha(WHITE, (int)(alpha * Math.min(1f, k * 1.4f)));
+        int preto = Tinta.withAlpha(INK, (int)(alpha * 0.85f * Math.min(1f, k * 1.4f)));
+        for (int i = 0; i < n; i++) {
+            double ang = Math.PI * 2 * (i + raio.range(-0.3f, 0.3f)) / n;
+            float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+            float r0x = hw * 0.85f, r0y = hh * 0.85f;
+            float alcance = raio.range(1.25f, 1.95f) * (0.55f + 0.45f * k);
+            float bx = cos * r0x, by = sin * r0y;
+            float tx = cos * (hw + (hw + hh) * 0.5f * (alcance - 1f)) , ty = sin * (hh + (hw + hh) * 0.5f * (alcance - 1f));
+            float meia = raio.range(9f, 26f);
+            // Base perpendicular ao raio.
+            float px = -sin * meia, py = cos * meia;
+            float[] tri = {bx + px, by + py, tx, ty, bx - px, by - py};
+            c.fillPolygon(tri, branco);
+            c.strokePolygon(tri, 2.5f, preto);
+        }
+        // Linhas de velocidade pretas e finas entre os raios.
+        for (int i = 0; i < 26; i++) {
+            double ang = Math.PI * 2 * (i + raio.next()) / 26;
+            float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+            float de = raio.range(1.05f, 1.3f), ate = de + raio.range(0.25f, 0.6f) * k;
+            c.drawLine(cos * hw * de, sin * hh * de, cos * hw * ate, sin * hh * ate, raio.range(2f, 4.5f), preto);
+        }
+    }
+
+    /**
+     * O STAMP que vira página: o quadro endireita e vai para o lugar exato dele na página
+     * (a luta some no preto atrás); depois a página acende em volta, já como a história a
+     * mostra (o mesmo quadro em foco, o resto escurecido).
+     */
+    private void desenharVirada(RenderCanvas c) {
+        if (virou) {
+            guiada.render(c, 1f);
+            return;
+        }
+        float idade = time - stampDesde;
+        float k = suave(Tinta.clamp01((idade - stamp.segundos) / VIRA_MOVE));
+        if (k >= 1f) {
+            guiada.render(c, Tinta.clamp01((idade - stamp.segundos - VIRA_MOVE) / VIRA_FUNDO));
+            return;
+        }
+        RenderImage img = imagensStamp.get(stamp.imagem);
+        float[] area = areaStamp.get(stamp);
+        float[] de = poseDoStamp(img, area, stamp.segundos);
+        float[] bb = Layouts.caixa(area);
+        float[] para = guiada.naTela((bb[0] + bb[2]) * 0.5f * img.width(), (bb[1] + bb[3]) * 0.5f * img.height());
+        float s = de[2] + (guiada.escala() - de[2]) * k;
+        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(95f + 160f * Tinta.clamp01(k * 1.6f))));
+        quadroDoStamp(c, img, area, de[0] + (para[0] - de[0]) * k, de[1] + (para[1] - de[1]) * k, s, de[3] * (1f - k), 255,
+            1f - k, 1f - Tinta.clamp01(k * 2f), idade);
+    }
+
 
     private void drawOnomatopeia(RenderCanvas c, Estouro e) {
         Acao a = e.acao;
@@ -2247,6 +2603,10 @@ public final class CinematicaLuta {
         if (qte != null && acao == qte && qteFase != FaseQte.PREPARANDO) desenharQte(c);
         if (coberta) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, tintaCor);
         if (paginaNaTela) guiada.render(c);
+        if (virando || virou) {
+            desenharVirada(c);
+            return;
+        }
         if (tintaModo == ModoTinta.NADA) return;
         float k = Tinta.clamp01((time - tintaDesde) / tintaDuracao);
         float ultimo = 0f;

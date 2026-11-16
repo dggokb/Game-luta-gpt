@@ -10,6 +10,7 @@ import com.gamelutagpt.historia.CinematicaLuta;
 import com.gamelutagpt.historia.PaginaHistoria;
 import com.gamelutagpt.pc.DadosDoJogo;
 import com.gamelutagpt.render.RenderAssets;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,6 +36,12 @@ public final class TesteQteConvite {
     static Canvas canvas;
     static File saida;
     static int quadro;
+    /**
+     * Os últimos quadros desenhados da cena: os de logo antes de cada STAMP (o golpe chegando no
+     * contato) ficam como referência de poses e enquadramento para a arte dele (impacto_N_k.png).
+     */
+    static final BufferedImage[] anteriores = new BufferedImage[8];
+    static boolean naCena;
 
     public static void main(String[] args) throws Exception {
         saida = new File(args.length > 0 ? args[0] : "build/qte");
@@ -91,10 +98,12 @@ public final class TesteQteConvite {
         System.out.println("cena começou no quadro " + quadro);
 
         // A cena: tinta, página (pula com um toque), tinta, QTE.
-        int qtes = 0, noQte = 0, toques = 0;
-        boolean pedia = false;
+        int qtes = 0, noQte = 0, toques = 0, stamps = 0;
+        boolean pedia = false, stampVisto = false;
         limite = 60 * 150;
-        while (!cena.acabou() && limite-- > 0) {
+        naCena = true;
+        // O STAMP final vira a página da história: a cena acaba com a história na tela.
+        while (!cena.acabou() && !historia.coversScreen() && limite-- > 0) {
             boolean pede = cena.qtePedindo();
             if (pede && !pedia) {
                 if (cena.qteErros() == 0) qtes++;
@@ -132,11 +141,24 @@ public final class TesteQteConvite {
                 toque(MotionEvent.ACTION_UP, 640f, 360f);
             }
             passo((quadro % CADENCIA == 0 || pede && noQte == 12) && (!SO_ANIMACAO || cena.animando()));
+            boolean stamp = cena.stampNaTela();
+            if (stamp && !stampVisto) {
+                stamps++;
+                System.out.println("STAMP " + stamps + " no quadro " + quadro);
+                for (int antes : new int[] {1, 4}) {
+                    BufferedImage img = anteriores[(quadro - antes + anteriores.length * 10000) % anteriores.length];
+                    if (img != null) ImageIO.write(img, "png", new File(saida, "impacto_" + stamps + "_" + antes + ".png"));
+                }
+            }
+            stampVisto = stamp;
         }
+        naCena = false;
         System.out.printf(Locale.ROOT, "cena acabou no quadro %d: rival %.0f%% (KO %b), jogador %.0f%%%n", quadro,
             vida(jogo.engine.fighter(GameView.OPPONENT)), jogo.engine.fighter(GameView.OPPONENT).ko(), vida(jogo.engine.fighter(GameView.PLAYER)));
-        // O resultado da luta.
-        for (int i = 0; i < 60 * 6; i++) passo(i % 30 == 0);
+        System.out.println("depois da cena: história na tela " + historia.coversScreen() + ", continuou do STAMP " +
+            historia.continuouDoStamp());
+        // O resultado da luta (ou a página que veio do STAMP final: o primeiro segundo quadro a quadro).
+        for (int i = 0; i < 60 * 6; i++) passo(i < 60 ? i % 3 == 0 : i % 30 == 0);
         System.out.println("história esperando a luta: " + historia.waitingFight());
         System.exit(0);
     }
@@ -155,11 +177,17 @@ public final class TesteQteConvite {
     static void passo(boolean gravar) throws Exception {
         avancar.invoke(jogo, CombatConfig.DT);
         quadro++;
-        if (!gravar) return;
+        if (!gravar && !naCena) return;
         // Um Canvas novo a cada quadro: nada do quadro anterior fica no estado dele.
         canvas = new Canvas(tela);
         canvas.drawColor(0xFF000000);
         desenhar.invoke(jogo, canvas);
+        if (naCena) {
+            int i = quadro % anteriores.length;
+            if (anteriores[i] == null) anteriores[i] = new BufferedImage(1280, 720, BufferedImage.TYPE_INT_RGB);
+            anteriores[i].getGraphics().drawImage(tela.image(), 0, 0, null);
+        }
+        if (!gravar) return;
         if (JPG) {
             // JPG ocupa um décimo do PNG: a cena inteira a 30 qps cabe no disco.
             java.awt.image.BufferedImage rgb = new java.awt.image.BufferedImage(tela.image().getWidth(),
