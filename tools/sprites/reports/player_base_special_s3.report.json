@@ -370,9 +370,9 @@
     {
       "index": 32,
       "outputBbox": [
-        191,
+        193,
         117,
-        447,
+        449,
         490
       ],
       "minimumMargin": 117,
@@ -381,9 +381,9 @@
     {
       "index": 33,
       "outputBbox": [
-        239,
+        243,
         141,
-        491,
+        495,
         509
       ],
       "minimumMargin": 141,
@@ -392,9 +392,9 @@
     {
       "index": 34,
       "outputBbox": [
-        218,
+        224,
         308,
-        538,
+        544,
         649
       ],
       "minimumMargin": 55,
@@ -403,9 +403,9 @@
     {
       "index": 35,
       "outputBbox": [
-        198,
+        206,
         319,
-        513,
+        521,
         649
       ],
       "minimumMargin": 55,
@@ -414,9 +414,9 @@
     {
       "index": 36,
       "outputBbox": [
-        216,
+        226,
         320,
-        527,
+        537,
         650
       ],
       "minimumMargin": 54,
@@ -425,9 +425,9 @@
     {
       "index": 37,
       "outputBbox": [
-        186,
+        198,
         301,
-        502,
+        514,
         651
       ],
       "minimumMargin": 53,
@@ -436,9 +436,9 @@
     {
       "index": 38,
       "outputBbox": [
-        165,
+        181,
         222,
-        469,
+        485,
         651
       ],
       "minimumMargin": 53,
@@ -447,9 +447,9 @@
     {
       "index": 39,
       "outputBbox": [
-        181,
+        199,
         194,
-        484,
+        502,
         650
       ],
       "minimumMargin": 54,
@@ -458,9 +458,9 @@
     {
       "index": 40,
       "outputBbox": [
-        160,
+        180,
         197,
-        464,
+        484,
         650
       ],
       "minimumMargin": 54,
@@ -469,9 +469,9 @@
     {
       "index": 41,
       "outputBbox": [
-        136,
+        158,
         202,
-        439,
+        461,
         650
       ],
       "minimumMargin": 54,
@@ -480,9 +480,9 @@
     {
       "index": 42,
       "outputBbox": [
-        148,
+        172,
         201,
-        452,
+        476,
         650
       ],
       "minimumMargin": 54,
@@ -491,9 +491,9 @@
     {
       "index": 43,
       "outputBbox": [
-        124,
+        150,
         199,
-        427,
+        453,
         650
       ],
       "minimumMargin": 54,
@@ -776,7 +776,7 @@
         1008,
         264,
         384,
-        83,
+        85,
         4
       ],
       [
@@ -784,7 +784,7 @@
         1464,
         264,
         376,
-        131,
+        135,
         28
       ],
       [
@@ -792,7 +792,7 @@
         1464,
         328,
         352,
-        110,
+        116,
         195
       ],
       [
@@ -800,7 +800,7 @@
         1464,
         324,
         340,
-        90,
+        98,
         206
       ],
       [
@@ -808,7 +808,7 @@
         1464,
         320,
         340,
-        108,
+        118,
         207
       ],
       [
@@ -816,7 +816,7 @@
         1464,
         324,
         360,
-        78,
+        90,
         188
       ],
       [
@@ -824,7 +824,7 @@
         1008,
         312,
         440,
-        57,
+        73,
         109
       ],
       [
@@ -832,7 +832,7 @@
         520,
         312,
         464,
-        73,
+        91,
         81
       ],
       [
@@ -840,7 +840,7 @@
         520,
         312,
         464,
-        52,
+        72,
         84
       ],
       [
@@ -848,7 +848,7 @@
         520,
         312,
         456,
-        28,
+        50,
         89
       ],
       [
@@ -856,7 +856,7 @@
         520,
         312,
         460,
-        40,
+        64,
         87
       ],
       [
@@ -864,7 +864,7 @@
         520,
         312,
         460,
-        16,
+        42,
         86
       ]
     ],
@@ -879,13 +879,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "389d1c64f0058a824e521298ecb8cc41444226bf2040e1d21297a1699337660c",
-      "config": "acde613b21f655840e567ce9779500ca4981272b047060572a477965f3dd5ce1",
+      "source": "9d71ff0802d4c98d3730ab57b7288e591e0bb41fb0a349f32fe6b128be31d504",
+      "config": "49cbcb05816c992a400b43dc7b6e228ffc4ddf54871ef693d577723d6efb961b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_special_s3_video_normalized.png": "d3da4de8aa92eab17a5c325b1b004608567c7ff88c84c0079433cbbbfd1ec748",
-      "art/sprites/source/player_base_special_s3_video_normalized_smear.png": "82bdd6c0803e7304f99ea5dad5b94c8fcd6fb355a7c30880d821ddab489277b1"
+      "art/sprites/source/player_base_special_s3_video_normalized.png": "65b8c44d236cfdbdc9ca7fc4305c4fba38aabd3b0f694276ca90bcae5761d33b",
+      "art/sprites/source/player_base_special_s3_video_normalized_smear.png": "fbfd83b00e77d688eee0f486b092c9a15d3f8853cbe6d6c64a6a2317fd0c0436"
     }
   }
 }

@@ -33,7 +33,8 @@
     "fixar": "video",
     "manter_efeitos": true,
     "limpar_chao": true,
-    "densidade": 2
+    "densidade": 2,
+    "emendar_idle": true
   },
   "smear": {
     "fonte": "art/sprites/source/player_base_special_s3_video_normalized.png",
