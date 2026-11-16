@@ -214,7 +214,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo','arco','casca','quicaEmPe'}
+             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -289,6 +289,9 @@ def validate_mechanics(name, mech, m, projectile):
     # Pancadas no chão (o Super do p13): a primeira derruba, as outras acertam o rival deitado.
     if 'chao' in mech and (mech['chao'] is not True or len(m.get('golpes', [])) < 2):
         raise ValueError(f'{name}.mecanica.chao: true, on a move with golpes')
+    # OTG próprio (o Carrinho da Yin-lu): pega o rival caído no combo, como o ↓ + M.
+    if 'otg' in mech and (mech['otg'] is not True or projectile or 'reach' not in m):
+        raise ValueError(f'{name}.mecanica.otg: true, on a striking move')
     # Rebote (o S1 do p14): o chute do mergulho; acertou, ele pula para trás.
     if 'rebote' in mech and (mech['rebote'] is not True or not m.get('golpes') or 'reach' not in m):
         raise ValueError(f'{name}.mecanica.rebote: true, on a striking move with golpes')
@@ -852,6 +855,7 @@ def compile_packs(root, results, alterados=None, medir=False):
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
         if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'
         if mech.get('chao'): code += '.pound()'
+        if mech.get('otg'): code += '.otg()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
         if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+(',true' if mech['arco'].get('parede') else '')+')'

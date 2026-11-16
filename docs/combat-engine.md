@@ -636,6 +636,12 @@ deitado, e o levanta (`otgLift` 620 px/s, `otgHitstunFrames` 34, `hardFall`) par
 S2; depois do S2 em arco do Ryūga, corre → ↓ + M → S2. Quem tem rasteira curta (Yin-lu, p05) precisa
 de um passo à frente. Cue `OTG`. Testes em `OtgTest`.
 
+Golpe com OTG próprio (16/11): `mecanica.otg` no golpe (`AttackDefinition.Mechanics.otg`) faz ele
+pegar o caído do mesmo jeito, além do ↓ + M. O primeiro acerto que encosta no corpo deitado
+levanta e os acertos seguintes do golpe não saem (o último derrubaria de novo). Hoje só o Carrinho
+da garça da Yin-lu (→ → + H): 2L, M, 2M → corre → Carrinho → L, 2H → super pulo → jL, jM, jH, S4,
+14 acertos. Teste em `GolpeDeCorridaTest`.
+
 ## Air dash — v0.82
 
 **→ →** no ar faz o **air dash** e **← ←** o **back air dash** (o mesmo toque duplo do dash

@@ -179,6 +179,7 @@ tem o golpe dá o H. Teste: `GolpeDeCorridaTest`.
 |---|---|---|---|---|
 | Ryūga | **Ombrada** | 850 de dano, 12 quadros até o ombro; **joga na parede mesmo sozinha** (correu, acertou, combo) | Ombrada → parede → corre → 2H → super pulo → jL, jM → pulo → jL, jM, ↓jH (ou → corre → Super: 6) | 7 |
 | Yin-lu | **Carrinho da garça** | baixo (defende agachado), dois acertos (o 2.º derruba), desliza ~200 px | Carrinho → corre → ↓ + M no caído → L, M, M, S4 | 11 |
+| Yin-lu | **Carrinho no caído** (16/11) | no rival caído no combo, o 1.º chute levanta (o OTG dela) | 2L, M, 2M → corre → Carrinho → L, 2H → super pulo → jL, jM, jH, S4 | 14 |
 
 Os dois são arriscados na defesa (ficam uns 9 e 13 quadros em desvantagem), como golpe de corrida
 costuma ser: a Ombrada empurra para longe e o Carrinho é baixo.

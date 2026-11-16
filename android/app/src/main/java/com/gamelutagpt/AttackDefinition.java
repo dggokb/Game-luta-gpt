@@ -93,6 +93,12 @@ final class AttackDefinition {
          */
         boolean pound;
         /**
+         * OTG próprio (16/11, o Carrinho da garça da Yin-lu): além do ↓ + M
+         * ({@link CombatConfig#otgMove}), este golpe pega o rival caído no combo e o levanta. Com
+         * vários acertos, o primeiro que encosta no caído levanta e os outros não saem.
+         */
+        boolean otg;
+        /**
          * Rebote (o S1 do p14, chute que mergulha do pulo): o primeiro chute é um golpe comum;
          * acertou, ele quica e as pancadas seguintes saem; errou ou defenderam, ele cai e o
          * golpe acaba logo (a animação _ERRO).
@@ -177,6 +183,7 @@ final class AttackDefinition {
         Mechanics parry() { parry = true; return this; }
         Mechanics grab(float range) { grab = true; grabRange = range; return this; }
         Mechanics pound() { pound = true; return this; }
+        Mechanics otg() { otg = true; return this; }
         Mechanics rebound() { rebound = true; return this; }
         Mechanics hop(float height, int start, int end) { hopHeight = height; hopStart = start; hopEnd = end; return this; }
         Mechanics flight(float height, int start, int end, boolean hover) {

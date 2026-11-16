@@ -8,7 +8,8 @@ import org.junit.Test;
 /**
  * Golpe de corrida (13/11): o H apertado correndo sai da corrida, sem parar, com a função de
  * cada um. O Ryūga dá a Ombrada, que joga na parede mesmo sozinha (correu, acertou, combo); a
- * Yin-lu dá o Carrinho da garça, baixo, dois acertos, derruba e o ↓ + M no caído continua.
+ * Yin-lu dá o Carrinho da garça, baixo, dois acertos, derruba e o ↓ + M no caído continua; e o
+ * Carrinho também pega quem já está caído no combo (16/11): o chute levanta e o combo continua.
  * Quem não tem o golpe (o Kōga, por enquanto) dá o H de sempre.
  */
 public class GolpeDeCorridaTest {
@@ -67,5 +68,28 @@ public class GolpeDeCorridaTest {
         assertEquals(AttackDefinition.Launch.KNOCKDOWN, carrinho.launch);
         correndo(YINLU, RYUGA, "C DH", 2);
         correndo(YINLU, RYUGA, "C DH C120 2M L M M S4", 11);
+    }
+
+    /** Do lado do rival, como no OtgTest: o combo começa no primeiro golpe. */
+    private static BateriaCombos.Exec perto(String rota) {
+        BateriaCombos.Cenario cn = new BateriaCombos.Cenario();
+        cn.barras = 3;
+        cn.gap = 100f;
+        return BateriaCombos.executar(YINLU, RYUGA, Arrays.asList(rota.split(" ")), cn);
+    }
+
+    @Test public void oCarrinhoPegaQuemEstaCaidoELevanta() {
+        // O dono (16/11): "o dash com H da Yin-lu era para levantar o cara do chão com um kick para
+        // emendar combo". O Carrinho no rival caído no combo é o OTG dela (como o ↓ + M): o
+        // primeiro chute que encosta levanta, o segundo não sai (derrubaria de novo).
+        assertTrue(GeneratedCharacters.get(YINLU).attack(CancelSystem.RUN_HEAVY).mechanics.otg);
+        assertFalse("a Ombrada do Ryūga não", GeneratedCharacters.get(RYUGA).attack(CancelSystem.RUN_HEAVY).mechanics.otg);
+        BateriaCombos.Exec so = perto("2L M 2M C120 DH");
+        assertTrue(so.valida);
+        assertEquals("2L, M, a rasteira e um chute do Carrinho no caído", 4, so.acertos);
+        assertEquals("levanta: o L seguinte acerta", 6, perto("2L M 2M C120 DH W8 L M").acertos);
+        BateriaCombos.Exec ar = perto("2L M 2M C120 DH W8 L 2H SJ jL jM jH S4");
+        assertTrue("o combo aéreo depois do Carrinho no caído emenda", ar.valida);
+        assertEquals(14, ar.acertos);
     }
 }

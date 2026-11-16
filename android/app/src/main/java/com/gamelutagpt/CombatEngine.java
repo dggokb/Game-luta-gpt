@@ -4369,10 +4369,11 @@ final class CombatEngine {
     /**
      * OTG (12/11): o ↓ + M ({@link CombatConfig#otgMove}) de quem está no chão pega o rival que caiu
      * dentro do combo, nos primeiros quadros deitado, uma vez por combo, e o levanta para continuar.
+     * O golpe com {@code mecanica.otg} (o Carrinho da Yin-lu, 16/11) também.
      */
     private boolean otgTarget(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile) {
         if (projectile || d.status != CombatFighter.Status.KNOCKDOWN || d.ko() || !a.grounded ||
-            !config.otgMove.equals(attack.id)) return false;
+            !(config.otgMove.equals(attack.id) || attack.mechanics.otg)) return false;
         ComboSession s = sessions[d.index];
         return s != null && s.active && s.attacker == a.index && otgOpen(d, s);
     }
@@ -5307,6 +5308,9 @@ final class CombatEngine {
             d.hardFall = true;
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.otgHitstunFrames);
             push(d, a, direction * config.otgPush);
+            // O golpe de OTG próprio (o Carrinho) levanta no primeiro chute que encosta no caído:
+            // os acertos seguintes não saem (o último derrubaria de novo quem acabou de subir).
+            if (attack.mechanics.otg && !projectile) a.hitsOnTarget = attack.maxHits;
             cues.add("OTG");
         } else if (pounding) {
             // Socado deitado: continua no chão, no lugar; a última pancada recomeça o tempo
