@@ -102,5 +102,130 @@
         ]
       }
     }
+  },
+  "salto_mortal": {
+    "_doc": "→ + H (16/11, vídeo 6H do dono): Salto mortal. Agacha (14-22), salta (24-25), encolhe e gira a cambalhota para a frente (32-51), sai do giro com a perna de machado (62-65, o golpe no 63-64) e pousa (66-68) e volta à guarda (70-99; o 99 é o quadro do fim do vídeo que mais bate com a guarda, 97%). Os quadros 26-31 e 52-61 saem do topo do vídeo (cabeça ou pés cortados) e ficam de fora. Quem passa por cima do rival é o motor (avanço que atravessa). Com sem_poeira, sem_efeitos e a limpeza do chão juntos, a meia listrada (vermelha e branca) some do joelho para baixo nos quadros da guarda do fim: aqui sai o sem_efeitos (o vídeo não tem efeito, só a poeira do pouso).",
+    "trechos": [
+      [
+        "6H",
+        0,
+        124
+      ]
+    ],
+    "quadros": "14,16,18,20,22,24,25,32,34,36,38,40,42,44,46,48,50,51,62,63,64,65,66,68,70,72,74,76,80,86,90,94,99",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true,
+      "densidade": 2,
+      "recorte_suave": true,
+      "escala": 0.411,
+      "motivo": "mesma câmera dos vídeos H3 dela (no ar a medida não acha a guarda)",
+      "nitidez": true
+    },
+    "animacoes": {
+      "SALTO_MORTAL": {
+        "impacto": 19,
+        "tempos": [
+          82,
+          81,
+          82,
+          82,
+          82,
+          41,
+          288,
+          81,
+          82,
+          82,
+          82,
+          81,
+          82,
+          82,
+          82,
+          81,
+          42,
+          451,
+          41,
+          354,
+          34,
+          35,
+          67,
+          68,
+          68,
+          68,
+          68,
+          136,
+          205,
+          136,
+          137,
+          170,
+          67
+        ]
+      }
+    }
+  },
+  "bundada": {
+    "_doc": "H correndo (16/11, vídeo dash_golpe do dono): Bundada do trampolim. Da corrida (0-10) agacha (12-14), sobe sentada no ar (23-46; 16-22 saem do topo do vídeo e ficam de fora), cai de bunda no chão (48-50, o golpe), quica sentada (52-56), levanta (58-66) e volta à guarda (70-92; o 92 é o quadro do fim do vídeo que mais bate com a guarda, 94%). O clarão e a poeira do vídeo saem. Quem anda é o motor: o trecho é fixo. Deslocado 20 px: o corpo do vídeo fica ~20 px atrás da raiz da corrida e da guarda (sem pulo ao sair da corrida e ao voltar à guarda). Com sem_poeira, sem_efeitos e a limpeza do chão juntos, a meia listrada (vermelha e branca) some do joelho para baixo nos quadros da guarda do fim: aqui sai a limpeza do chão (sem_chao; o clarão e a poeira do vídeo precisam dos outros dois).",
+    "trechos": [
+      [
+        "dash_golpe",
+        0,
+        124,
+        "fixo"
+      ]
+    ],
+    "quadros": "0,2,4,6,8,10,12,14,23,24,28,32,36,40,44,46,47,48,49,50,52,54,56,58,60,62,64,66,70,74,78,84,88,92",
+    "opcoes": {
+      "fixar": "video",
+      "sem_efeitos": true,
+      "sem_poeira": true,
+      "densidade": 2,
+      "recorte_suave": true,
+      "escala": 0.411,
+      "motivo": "o vídeo começa na corrida (a medida da guarda não acha): a escala dos vídeos H3 dela",
+      "nitidez": true,
+      "deslocar": "20,0",
+      "sem_chao": true
+    },
+    "animacoes": {
+      "BUNDADA": {
+        "impacto": 19,
+        "tempos": [
+          70,
+          70,
+          70,
+          69,
+          70,
+          70,
+          70,
+          316,
+          35,
+          141,
+          140,
+          141,
+          140,
+          141,
+          70,
+          35,
+          35,
+          36,
+          35,
+          367,
+          85,
+          85,
+          86,
+          85,
+          85,
+          85,
+          85,
+          172,
+          171,
+          171,
+          257,
+          171,
+          172,
+          85
+        ]
+      }
+    }
   }
 }

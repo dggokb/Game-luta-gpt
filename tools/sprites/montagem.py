@@ -29,7 +29,8 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
   a raiz, sem pulo ao trocar para o IDLE).
 - quadros: os quadros do vídeo colado que viram o clipe ("A-B/N" = de A a B de N em N).
 - opcoes: as de conversão do personagem.py (fixar, pe_no_chao, sem_efeitos, recorte_suave,
-  deslocar, "densidade" 2 para a folha HD, e "escala" com "motivo" para a escala manual); "_opcoes" no topo da receita vale para
+  deslocar, "densidade" 2 para a folha HD, "nitidez" para o acabamento da folha HD (p15 e p16), "sem_chao" para
+  não limpar a faixa do chão, e "escala" com "motivo" para a escala manual); "_opcoes" no topo da receita vale para
   todos os clipes.
 - animacoes: as animações do pacote que usam o clipe. frames são índices do clipe ("9-0" =
   de trás para a frente: a volta pelo inverso do vídeo que só vai até a pose); impacto é a

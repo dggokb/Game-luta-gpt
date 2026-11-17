@@ -99,6 +99,12 @@ final class AttackDefinition {
          */
         boolean otg;
         /**
+         * Pega por trás no chão (o Salto mortal da p16, 16/11): passou por cima do rival com o
+         * avanço que atravessa, a pancada pega atrás da raiz como o crossup do pulo; o rival
+         * defende para o outro lado.
+         */
+        boolean crossUp;
+        /**
          * Rebote (o S1 do p14, chute que mergulha do pulo): o primeiro chute é um golpe comum;
          * acertou, ele quica e as pancadas seguintes saem; errou ou defenderam, ele cai e o
          * golpe acaba logo (a animação _ERRO).
@@ -184,6 +190,7 @@ final class AttackDefinition {
         Mechanics grab(float range) { grab = true; grabRange = range; return this; }
         Mechanics pound() { pound = true; return this; }
         Mechanics otg() { otg = true; return this; }
+        Mechanics crossUp() { crossUp = true; return this; }
         Mechanics rebound() { rebound = true; return this; }
         Mechanics hop(float height, int start, int end) { hopHeight = height; hopStart = start; hopEnd = end; return this; }
         Mechanics flight(float height, int start, int end, boolean hover) {
