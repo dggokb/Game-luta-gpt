@@ -222,6 +222,7 @@ public final class CinematicaPreview {
         scene.drawForeground(canvas);
         // A mesma ordem do jogo: faixas, quadros da conversa e onomatopeias por cima.
         cena.renderFaixas(canvas);
+        cena.renderStamp(canvas);
         conversa.render(canvas);
         cena.renderEfeitos(canvas);
         g.dispose();

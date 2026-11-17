@@ -148,6 +148,11 @@ relógio esperam o tempo dela; `CombatEngine.shinkaiAtivacaoQuadros`). Com o ví
 some; a `marcaMs` do efeito diz quando entra o corte com o nome. Têm: o Ryūga (aura azul e dragão)
 e a Yin-lu (a garça branca, 14/11). Os outros ficam na guarda durante o corte.
 
+**O que nasce na ativação (17/11, o dono):** **bicho só na família Komyo** (a escola dos irmãos): o
+dragão do Ryūga, a garça da Yin-lu e o tigre do Kōga. Quem é de fora mostra o próprio jeito: a
+Natisuko, o círculo de pincel (ensō) e os mil socos num só, em dourado; a Bonnie, a lebre de luz
+ciano que sai da cartola (um truque de mágica, não um bicho espiritual). Os prompts estão nas fichas.
+
 **Cor do SHINKAI por lutador:** a do tipo, ou a própria (`Shinkai.corDe`): a Yin-lu é TECHNIQUE
 com a aura branca.
 

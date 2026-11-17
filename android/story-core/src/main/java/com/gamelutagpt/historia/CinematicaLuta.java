@@ -1,7 +1,6 @@
 package com.gamelutagpt.historia;
 
 import com.gamelutagpt.render.MiniJson;
-import com.gamelutagpt.render.Rand;
 import com.gamelutagpt.render.RenderAssets;
 import com.gamelutagpt.render.RenderCanvas;
 import com.gamelutagpt.render.RenderImage;
@@ -724,7 +723,14 @@ public final class CinematicaLuta {
     private boolean virando;
     /** A página já é a da história (a luta acabou): fica na tela até a história assumir. */
     private boolean virou;
-    private final Rand raio = new Rand(41);
+    /**
+     * O estouro de luz atrás do STAMP (historia/stamp/estouro.json): as imagens geradas, que
+     * alternam de dois em dois quadros, e o buraco do meio de cada uma ({x0, y0, x1, y1} de 0 a 1),
+     * onde o quadro encaixa. Vazio: o STAMP bate sem estouro.
+     */
+    private final List<RenderImage> luzStamp = new ArrayList<>();
+    private final List<float[]> buracoStamp = new ArrayList<>();
+    static final String ESTOURO = Temporada.PASTA + "/stamp/estouro.json";
 
     /** O jogador está no toque (as dicas dizem TOQUE) ou no teclado/controle (APERTE). */
     private boolean dicasDeToque = true;
@@ -783,8 +789,33 @@ public final class CinematicaLuta {
             }
         }
         for (Acao st : roteiro.stampsDaCena()) carregarStamp(st, episodios);
+        if (!roteiro.stampsDaCena().isEmpty()) carregarLuzDoStamp();
         estado = Estado.ARMADA;
         return true;
+    }
+
+    /** O estouro de luz atrás do STAMP; se não abre, o STAMP bate sem ele. */
+    private void carregarLuzDoStamp() {
+        luzStamp.clear();
+        buracoStamp.clear();
+        try {
+            Map<String, Object> m = Episodio.asMap(MiniJson.parse(assets.readText(ESTOURO)));
+            List<Object> imagens = Episodio.list(m, "imagens");
+            List<Object> buracos = Episodio.list(m, "buracos");
+            for (int i = 0; i < imagens.size() && i < buracos.size(); i++) {
+                List<Object> b = Episodio.list(Collections.singletonMap("b", buracos.get(i)), "b");
+                if (b.size() != 4) continue;
+                RenderImage img = assets.loadImage(Temporada.PASTA + "/stamp/" + imagens.get(i));
+                if (img == null) continue;
+                float[] r = new float[4];
+                for (int j = 0; j < 4; j++) r[j] = ((Number)b.get(j)).floatValue();
+                luzStamp.add(img);
+                buracoStamp.add(r);
+            }
+        } catch (IOException | RuntimeException ex) {
+            luzStamp.clear();
+            buracoStamp.clear();
+        }
     }
 
     /** Abre a imagem do STAMP e acha o quadro dele; se não abre, o STAMP não aparece. */
@@ -875,6 +906,8 @@ public final class CinematicaLuta {
         imagensStamp.clear();
         areaStamp.clear();
         paginaStamp.clear();
+        luzStamp.clear();
+        buracoStamp.clear();
         stamp = null;
         stamps = 0;
         virando = virou = false;
@@ -2380,6 +2413,7 @@ public final class CinematicaLuta {
     /** Faixas, onomatopeias, QTE, tinta e página (sem quadros de conversa entre eles). */
     public void render(RenderCanvas c) {
         renderFaixas(c);
+        renderStamp(c);
         renderEfeitos(c);
         renderTela(c);
     }
@@ -2450,9 +2484,16 @@ public final class CinematicaLuta {
         }
     }
 
-    /** O STAMP e as onomatopeias (o letreiro do impacto bate por cima do quadro). */
-    public void renderEfeitos(RenderCanvas c) {
+    /**
+     * O STAMP batido: por cima da luta, do HUD e das faixas, por baixo dos quadros da conversa (a
+     * fala de quem grita não some atrás do quadro de mangá) e das onomatopeias.
+     */
+    public void renderStamp(RenderCanvas c) {
         if (stamp != null && !virando && !virou) desenharStamp(c, time - stampDesde);
+    }
+
+    /** As onomatopeias, por cima de tudo (o letreiro do impacto bate por cima do quadro). */
+    public void renderEfeitos(RenderCanvas c) {
         for (Estouro e : estouros) drawOnomatopeia(c, e);
     }
 
@@ -2547,7 +2588,7 @@ public final class CinematicaLuta {
             c.fillPolygon(fora, Tinta.withAlpha(INK, (int)(alpha * 0.45f * sombra)));
             c.restore();
         }
-        if (raios > 0.01f) raiosDoStamp(c, hw, hh, raios, alpha);
+        if (raios > 0.01f) luzDoStamp(c, hw, hh, raios, alpha);
         if (borda > 0.01f) {
             c.fillPolygon(fora, Tinta.withAlpha(WHITE, alpha));
             c.strokePolygon(fora, 4f * borda, Tinta.withAlpha(INK, alpha));
@@ -2560,33 +2601,23 @@ public final class CinematicaLuta {
         c.restore();
     }
 
-    /** Raios brancos de contorno preto saindo de trás do quadro (tremeluzem como no anime). */
-    private void raiosDoStamp(RenderCanvas c, float hw, float hh, float k, int alpha) {
-        raio.reset(stamps * 977L + (long)(time * 24f));
-        int n = 34;
-        int branco = Tinta.withAlpha(WHITE, (int)(alpha * Math.min(1f, k * 1.4f)));
-        int preto = Tinta.withAlpha(INK, (int)(alpha * 0.85f * Math.min(1f, k * 1.4f)));
-        for (int i = 0; i < n; i++) {
-            double ang = Math.PI * 2 * (i + raio.range(-0.3f, 0.3f)) / n;
-            float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
-            float r0x = hw * 0.85f, r0y = hh * 0.85f;
-            float alcance = raio.range(1.25f, 1.95f) * (0.55f + 0.45f * k);
-            float bx = cos * r0x, by = sin * r0y;
-            float tx = cos * (hw + (hw + hh) * 0.5f * (alcance - 1f)) , ty = sin * (hh + (hw + hh) * 0.5f * (alcance - 1f));
-            float meia = raio.range(9f, 26f);
-            // Base perpendicular ao raio.
-            float px = -sin * meia, py = cos * meia;
-            float[] tri = {bx + px, by + py, tx, ty, bx - px, by - py};
-            c.fillPolygon(tri, branco);
-            c.strokePolygon(tri, 2.5f, preto);
-        }
-        // Linhas de velocidade pretas e finas entre os raios.
-        for (int i = 0; i < 26; i++) {
-            double ang = Math.PI * 2 * (i + raio.next()) / 26;
-            float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
-            float de = raio.range(1.05f, 1.3f), ate = de + raio.range(0.25f, 0.6f) * k;
-            c.drawLine(cos * hw * de, sin * hh * de, cos * hw * ate, sin * hh * ate, raio.range(2f, 4.5f), preto);
-        }
+    /**
+     * O estouro de luz atrás do quadro (a imagem gerada, o buraco dela encaixado no quadro de
+     * {@code hw} x {@code hh} de meia largura e meia altura): estoura no contato ({@code k} de 0
+     * a 1) e alterna entre as variações de dois em dois quadros, como desenho animado.
+     */
+    private void luzDoStamp(RenderCanvas c, float hw, float hh, float k, int alpha) {
+        if (luzStamp.isEmpty()) return;
+        int n = (int)(time * 30f) % luzStamp.size();
+        RenderImage img = luzStamp.get(n);
+        float[] b = buracoStamp.get(n);
+        float iw = img.width(), ih = img.height();
+        // O buraco da imagem cai em cima do quadro; ela nasce um pouco menor e abre de vez.
+        float cresce = 0.82f + 0.18f * k;
+        float sx = 2f * hw / Math.max(1f, (b[2] - b[0]) * iw) * cresce;
+        float sy = 2f * hh / Math.max(1f, (b[3] - b[1]) * ih) * cresce;
+        float cx = (b[0] + b[2]) * 0.5f * iw, cy = (b[1] + b[3]) * 0.5f * ih;
+        c.drawImage(img, -cx * sx, -cy * sy, (iw - cx) * sx, (ih - cy) * sy, (int)(alpha * Math.min(1f, k * 1.4f)));
     }
 
     /**

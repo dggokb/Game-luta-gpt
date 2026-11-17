@@ -20,7 +20,7 @@ do chão; 60 quadros por segundo.
 """
 from pathlib import Path
 
-from animacao import Lutador, escrever, pausar
+from animacao import Lutador, amostra, cortar, escrever, pausar
 
 ROOT = Path(__file__).resolve().parents[2]
 CENA = ROOT / 'android/app/src/main/assets/historia/ep01/cinematica_treino.json'
@@ -232,19 +232,19 @@ camera(780, 1.15, 'centro', 0.3)
 # A voadora do Kōga na defesa do Ryūga.
 K.k(790, 'JUMP:1', 300, curva='corte')
 efeito(794, 'koga', 'fumaca_pulo')
-K.k(796, 'SPECIAL_S4:5', 250, y=90, curva='sai')
-K.k(804, 'SPECIAL_S4:6', 160, y=110, curva='sai', rastro=4)
-K.k(812, 'SPECIAL_S4:7', 75, y=60, curva='entra', rastro=6)
+K.k(796, 'SPECIAL_S4:5', 250, y=35, curva='sai')
+K.k(804, 'SPECIAL_S4:6', 160, y=35, curva='sai', rastro=4)
+K.k(812, 'SPECIAL_S4:7', 75, y=25, curva='entra', rastro=6)
 R.k(800, 'DEFENSE_STAND:1', 20)
 R.k(810, 'DEFENSE_STAND:3', 20)
 linhas(804, 'concentracao', escuro=0.3)
-camera(806, 1.45, 'centro', 0.1)
+camera(798, 1.1, 'centro', 0.1)
 impacto(812, 'koga', 2, letreiro='DOOM!', stamp=stamp(3))
 R.k(814, 'DEFENSE_STAND:5', 5, rastro=2)
 R.k(824, 'DEFENSE_STAND:5', -30, curva='sai')
 efeito(815, 'ryuga', 'fumaca_dash_v05', atras=True, escala=0.7)
 # Ele cai na frente do Ryūga, que aproveita a abertura com o chute.
-K.k(814, 'JUMP:4', 110, y=60)
+K.k(814, 'JUMP:4', 110, y=25)
 K.k(826, 'LAND:1', 115, y=0, curva='entra')
 efeito(826, 'koga', 'fumaca_pouso')
 linhas(816)
@@ -371,6 +371,53 @@ QUADROS = q + 40
 # As pausas (quadro: quadros a mais): a antecipação antes de cada arrancada.
 PAUSAS = {360: 10, 540: 8, 720: 8, 980: 10}
 
+# Os QTE (quadro da coreografia, antes das pausas): a animação para na pose desse quadro, no meio do
+# golpe, e pede; o acerto segue a coreografia, o erro faz os dois baterem a cabeça (TOC!, como na
+# briga dos irmãos: a cena é a mesma nas duas campanhas) e o QTE pede de novo.
+QTES = [
+    (380, {'tipo': 'toque', 'texto': 'SOCO!'}),
+    (557, {'tipo': 'deslizar', 'texto': 'ESQUIVA!', 'direcao': 'baixo'}),
+    (658, {'tipo': 'tempo', 'texto': 'CHUTE!', 'segundos': 1.2}),
+    (806, {'tipo': 'tempo', 'texto': 'DEFESA!', 'segundos': 1.2}),
+    (837, {'tipo': 'deslizar', 'texto': 'CONTRA-ATAQUE!', 'direcao': 'frente'}),
+    (1000, {'tipo': 'martelar', 'texto': 'SEQUÊNCIA!', 'vezes': 10, 'segundos': 3.0}),
+]
+
+
+def erro_qte(r, k):
+    """Os dois avançam juntos e batem a cabeça um no outro, quicam e voltam à pose do QTE."""
+    meio = (r['x'] + k['x']) / 2
+    trilhas = []
+    for c0, lado in ((r, -1), (k, 1)):
+        trilha = [dict(c0, q=0),
+                  {'q': 7, 'x': meio + lado * 32, 'y': 0, 'pose': 'DASH:6' if lado < 0 else 'DASH:2', 'curva': 'sai',
+                   'rastro': 3, 'sx': 1.15, 'sy': 0.92},
+                  {'q': 9, 'x': meio + lado * 30, 'y': 0, 'pose': 'HIT_STAND:1'},
+                  {'q': 24, 'x': meio + lado * 80, 'y': 0, 'pose': 'HIT_STAND:3', 'curva': 'sai'},
+                  {'q': 40, 'x': meio + lado * 80, 'y': 0, 'pose': 'HIT_STAND:3'}]
+        for c in trilha:
+            c.pop('ciclo', None)
+            c.pop('ate', None)
+        trilhas.append(trilha)
+    eventos = [{'q': 9, 'acao': {'acao': 'impacto', 'quem': 'ryuga', 'forca': 1, 'congela': 0.2}},
+               {'q': 9, 'acao': {'acao': 'onomatopeia', 'texto': 'TOC!', 'pos': [0.5, 0.3], 'tamanho': 100,
+                                 'segundos': 0.5, 'semEsperar': True}},
+               {'q': 36, 'acao': {'acao': 'clarao', 'segundos': 0.15}}]
+    eventos.sort(key=lambda e: e['acao']['acao'] == 'impacto')
+    return {'quadros': 40, 'ryuga': trilhas[0], 'koga': trilhas[1], 'eventos': eventos}
+
+
+def cortar_comeco(chaves, fim):
+    """O primeiro trecho: as chaves como estão (as do começo têm "x": "atual") até o corte."""
+    out = [dict(c) for c in chaves if c['q'] < fim]
+    ultima = amostra(chaves, fim)
+    ultima['q'] = fim
+    depois = [c for c in chaves if c['q'] >= fim]
+    if depois:
+        ultima['curva'] = depois[0].get('curva', 'linear')
+    out.append(ultima)
+    return out
+
 # O último STAMP: o primeiro quadro da página 7 (os dois correndo um para o outro) vira a página.
 STAMP_FINAL = {'acao': 'stamp', 'imagem': 'ep01/pag7.jpg', 'quadro': 0, 'segundos': 1.2,
                'viraPagina': True, 'vencedor': 'interrompida'}
@@ -379,16 +426,38 @@ STAMP_FINAL = {'acao': 'stamp', 'imagem': 'ep01/pag7.jpg', 'quadro': 0, 'segundo
 def main():
     eventos.sort(key=lambda e: (e['q'], e['acao']['acao'] == 'impacto'))
     ryuga, koga, evs, total = pausar(R.chaves, K.chaves, eventos, QUADROS, PAUSAS)
-    anim = {'acao': 'animar', 'quadros': total, 'meio': 'palco', 'ryuga': ryuga, 'koga': koga, 'eventos': evs}
+
+    def novo(q):
+        return q + sum(n for p, n in PAUSAS.items() if q > p)
+
+    # A animação em trechos, cortada nos QTE; cada trecho continua o eixo do anterior.
+    cortes = [novo(q) for q, _ in QTES]
+    limites = [0] + cortes + [total]
+    trechos = []
+    for n in range(len(limites) - 1):
+        ini, fim = limites[n], limites[n + 1]
+        anim = {'acao': 'animar', 'quadros': fim - ini}
+        if n:
+            anim['continua'] = True
+            anim['ryuga'] = cortar(ryuga, ini, fim)
+            anim['koga'] = cortar(koga, ini, fim)
+        else:
+            anim['meio'] = 'palco'
+            anim['ryuga'] = cortar_comeco(ryuga, fim)
+            anim['koga'] = cortar_comeco(koga, fim)
+        anim['eventos'] = [dict(e, q=e['q'] - ini) for e in evs if ini <= e['q'] < fim]
+        trechos.append(anim)
+        if n < len(QTES):
+            qte = {'acao': 'qte', 'golpe': 'nenhum', 'pos': [0.82, 0.6], **QTES[n][1]}
+            qte['erroAnimar'] = erro_qte(amostra(ryuga, fim), amostra(koga, fim))
+            trechos.append(qte)
     acoes = [
         {'acao': 'controle', 'travar': True},
         {'acao': 'velocidade', 'valor': 0.3, 'segundos': 0.2, 'semEsperar': True},
         {'acao': 'faixas', 'entrar': True, 'segundos': 0.8, 'semEsperar': True},
         {'acao': 'esperar', 'segundos': 0.6},
         {'acao': 'velocidade', 'valor': 1.0, 'segundos': 0.2, 'semEsperar': True},
-        anim,
-        STAMP_FINAL,
-    ]
+    ] + trechos + [STAMP_FINAL]
     cena = {
         '_comentario': (
             'O treino do Episódio 1 (Ryūga × Kōga no dojo), animado à mão (ação animar, motor de luta parado) '
@@ -398,7 +467,9 @@ def main():
             'recua e encaixa um soco, a voadora dele na defesa do Ryūga (STAMP), ele cai na frente e leva o '
             'chute (STAMP); os socos em alta velocidade, um STAMP a cada aceleração; o grito, os nomes, a '
             'corrida, e o primeiro quadro da página 7 (os dois correndo) bate como STAMP e vira a página (o DING DONG vem no toque seguinte). As chaves '
-            'são por irmão: a mesma cena nas duas campanhas. A cena antiga (a corrida com a campainha, no '
+            'são por irmão: a mesma cena nas duas campanhas. Seis QTE no meio dos golpes (SOCO, ESQUIVA, CHUTE, DEFESA, '
+            'CONTRA-ATAQUE, SEQUÊNCIA): a animação para na pose e pede; errar faz os dois baterem a cabeça (TOC!) '
+            'e o QTE pede de novo. A cena antiga (a corrida com a campainha, no '
             'motor de luta) está em cinematica_treino_corrida.json.'),
         'gatilho': {'vida': 0.25},
         'acoes': acoes,

@@ -4674,6 +4674,8 @@ public class GameView extends SurfaceView
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
                 TesteAutomatico.hud(TesteAutomatico.HUD_TOQUE);
                 cinematica.renderFaixas(renderCanvas);
+                // O STAMP fica embaixo dos quadros da conversa: quem grita continua aparecendo.
+                cinematica.renderStamp(renderCanvas);
                 if (TesteDesempenho.mensagens) conversa.render(renderCanvas);
                 if (narracao != null && faixas < 0.5f && TesteDesempenho.mensagens) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
