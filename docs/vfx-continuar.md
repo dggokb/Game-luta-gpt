@@ -1842,3 +1842,19 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   efeito (4,3 s).
 - **Ficou:** ele julgar no vídeo. O círculo da Natisuko e o salto da lebre passam do topo do vídeo
   por alguns quadros (cortados lá; as faixas pretas da cena vão até esse limite). Visto só no PC.
+
+## Rodada de 17/11: o Ultra Mil Penas da Yin-lu
+
+- **Pedido:** Ultra mais cinematográfico (como os do p13 ao p16): ela some em penas e reaparece
+  batendo de todos os lados. Vídeos do dono: as palmas (`ultra_2`), o final (`ultra3`), o estouro
+  de penas (`ultra_efeito_1`) e o redemoinho (`ultra_efeito_2`); a entrada não veio.
+- **Feito:** a folha `p02_ultra_seq` de `ultra_2` 0-104 + `ultra3` 21-123 colados. Os sumiços são o
+  zanzoken da p15 sem a imagem que fica: em cada borda sai o efeito `penas_estouro_p02`
+  (`efeito_video.py --inicio 12 --fim 74 --passo 2 --escala-mundo 0.35 --origem 665,380
+  --resolucao 0.6 --borda 330 --velocidade 1.3`), no tamanho 0,4. O desenho dela muda de lugar pelo
+  voo (só o desenho) e, atrás do rival, vira para ele (`espelho`, novo). O redemoinho
+  `penas_redemoinho_p02` (`--inicio 18 --fim 98 --passo 2 --escala-mundo 0.5 --resolucao 0.5
+  --borda 330`) gira em volta do rival, atrás dos lutadores, no tamanho 0,4, até o golpe final.
+- **Primeiras versões:** no tamanho 1 e na frente dos lutadores, com a câmera fechada do Ultra, as
+  penas cobriam a luta inteira; com a borda de 100 px o estouro aparecia como um bloco retangular.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.

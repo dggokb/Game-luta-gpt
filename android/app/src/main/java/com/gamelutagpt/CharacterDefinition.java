@@ -504,6 +504,24 @@ final class CharacterDefinition {
             this.vanish=vanish.clone();this.retreat=retreat;
             return this;
         }
+        /**
+         * Mil Penas da Yin-lu (17/11): trechos {de, até} em que o desenho dela vira para o outro lado
+         * (ela reaparece atrás do rival), e os efeitos de penas: o estouro onde ela some e onde
+         * reaparece (no lugar da imagem que fica do zanzoken) e o redemoinho em volta do rival.
+         */
+        int[][] mirror=new int[0][];
+        String featherBurst, featherSwirl;
+        UltraSequence withFeathers(int[][] mirror,String burst,String swirl) {
+            for(int[] w:mirror)if(w.length!=2||w[0]>=w[1]||w[1]>length)throw new IllegalArgumentException("ultra sequence: mirror {from, to}");
+            if(burst==null||burst.isEmpty())throw new IllegalArgumentException("ultra sequence: feather burst effect");
+            this.mirror=mirror.clone();featherBurst=burst;featherSwirl=swirl;
+            return this;
+        }
+        /** O desenho de quem bate está virado para o outro lado neste quadro (Mil Penas). */
+        boolean mirrorsAttacker(float frame) {
+            for(int[] w:mirror)if(frame>=w[0]&&frame<w[1])return true;
+            return false;
+        }
         /** Sem os closes do Ultra: a câmera da luta segue os dois (o Mugen Rendan da p15). */
         boolean fightCamera;
         UltraSequence withFightCamera() {

@@ -4,18 +4,107 @@
   "dano": 4200,
   "personagens": {
     "p02": {
-      "nome": "Dança da Garça",
+      "nome": "Mil Penas",
+      "_doc": "Mil Penas (17/11): ultra.mp4 = ultra_2 0-104 (as quatro palmas) + ultra3 21-123 (o salto e as duas palmas descendo), colados sem perda. Ela some num estouro de penas e reaparece em outro lugar a cada palma (zanzoken + voo, só o desenho): de frente (16), no alto (46, o tapa de cima), atrás do rival virada (60, espelho), de frente girando (90) e no alto sobre ele (136, as duas palmas descendo, o golpe final); some de novo na garça e reaparece em casa para voltar à guarda. O redemoinho de penas gira em volta do rival até o golpe final.",
       "inicio": 0,
-      "preparo": 6,
+      "preparo": 9,
       "golpes": [
-        8,
-        18,
-        26,
-        36,
-        43,
-        63
+        16,
+        46,
+        60,
+        90,
+        136
       ],
-      "fim": 92,
+      "fim": 180,
+      "zanzoken": [
+        [
+          34,
+          41
+        ],
+        [
+          52,
+          57
+        ],
+        [
+          74,
+          81
+        ],
+        [
+          100,
+          108
+        ],
+        [
+          158,
+          166
+        ]
+      ],
+      "voo": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          34,
+          0,
+          0
+        ],
+        [
+          41,
+          40,
+          110
+        ],
+        [
+          52,
+          40,
+          110
+        ],
+        [
+          57,
+          330,
+          0
+        ],
+        [
+          74,
+          330,
+          0
+        ],
+        [
+          81,
+          0,
+          0
+        ],
+        [
+          100,
+          0,
+          0
+        ],
+        [
+          108,
+          110,
+          0
+        ],
+        [
+          158,
+          110,
+          0
+        ],
+        [
+          166,
+          0,
+          0
+        ]
+      ],
+      "espelho": [
+        [
+          57,
+          74
+        ]
+      ],
+      "penas": {
+        "estouro": "penas_estouro_p02",
+        "redemoinho": "penas_redemoinho_p02"
+      },
       "alcance": 185
     },
     "p03": {

@@ -2565,6 +2565,7 @@ public class GameView extends SurfaceView
             // Sequência do vídeo: um plano de câmera por golpe (UltraDirector), corte seco a cada
             // acerto, fundo escuro; depois do golpe final a câmera da luta volta.
             CharacterDefinition.UltraSequence seq = p.state.profile.ultraSequence;
+            if (seq != null && seq.featherBurst != null) penasDoUltra(p, seq);
             if (seq != null) {
                 CombatFighter v = engine.fighter(1 - p.index);
                 UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing,
@@ -6228,6 +6229,39 @@ public class GameView extends SurfaceView
         return false;
     }
 
+    /** Tamanho do redemoinho e do estouro de penas (o vídeo enche a tela e cobria a luta inteira). */
+    private static final float PENAS_REDEMOINHO = 0.4f, PENAS_ESTOURO = 0.4f;
+
+    /** Último quadro da sequência do Ultra com penas já visto (o estouro sai uma vez em cada borda). */
+    private float penasQuadro = -1f;
+
+    /**
+     * Mil Penas da Yin-lu: onde ela some e onde reaparece sai o estouro de penas (no lugar do
+     * desenho, com o voo), e o redemoinho gira em volta do rival do começo ao golpe final.
+     */
+    private void penasDoUltra(CombatFighter p, CharacterDefinition.UltraSequence seq) {
+        float agora = p.ultraFrame, antes = penasQuadro;
+        if (antes > agora) antes = -1f;
+        if (antes < 0f && seq.featherSwirl != null) {
+            CombatFighter v = engine.fighter(1 - p.index);
+            float ms = Math.max(1, seq.hits[seq.hits.length - 1] - agora) * FIXED_STEP * 1000f;
+            // Atrás dos lutadores: na frente, com a câmera fechada, cobria a luta inteira.
+            if (efeitos.tocarAndando(seq.featherSwirl, v.x, chestY(v), PENAS_REDEMOINHO, p.facing < 0, 0f, ms)) efeitos.atrasDosLutadores();
+        }
+        for (int[] w : seq.vanish) {
+            if (antes < w[0] && agora >= w[0]) estouroDePenas(p, seq, w[0] - 1);
+            if (antes < w[1] && agora >= w[1]) estouroDePenas(p, seq, w[1]);
+        }
+        penasQuadro = agora;
+    }
+
+    private void estouroDePenas(CombatFighter p, CharacterDefinition.UltraSequence seq, float quadro) {
+        float[] at = seq.flightAt(Math.max(0f, quadro));
+        float x = p.x + p.facing * at[0];
+        float y = fighterVisualY(p) - at[1] - p.body().height(false) * 0.5f;
+        efeitos.tocar(seq.featherBurst, x, y, PENAS_ESTOURO, p.facing < 0);
+    }
+
     /** Quadros do zanzoken: a imagem que fica some nesse tanto; o reaparecer pisca nesse tanto. */
     private static final int ZANZOKEN_FADE = 16, ZANZOKEN_ARRIVE = 8;
 
@@ -6248,6 +6282,8 @@ public class GameView extends SurfaceView
         CharacterDefinition.UltraSequence seq = f.state.profile.ultraSequence;
         if (seq == null || seq.vanish.length == 0) return 1f;
         float frame = f.ultraFrame;
+        // Mil Penas: some e aparece de uma vez (o estouro de penas cobre a troca), sem a imagem que fica.
+        if (seq.featherBurst != null) return seq.hidesAttacker(frame) ? 0f : 1f;
         boolean blink = (engine.frame() / 2) % 2 == 0;
         if (seq.hidesAttacker(frame)) {
             float since = seq.sinceVanish(frame);
@@ -6611,7 +6647,10 @@ public class GameView extends SurfaceView
         }
         Filtro tinta = corDoLado(f, luzNoLutador(desgaste.tinta(f.state), desgaste.poeiraNosPes(f.state), f));
         renderer.setTint(tinta);
-        renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
+        // Mil Penas da Yin-lu: atrás do rival ela aparece virada para o outro lado.
+        CharacterDefinition.UltraSequence espelho = f.inUltraSequence() ? f.state.profile.ultraSequence : null;
+        int lado = espelho != null && espelho.mirrorsAttacker(f.ultraFrame) ? -f.facing : f.facing;
+        renderer.draw(c, f.x, visualY, lado, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look != null) renderer.setOverride(null);
         c.restore();
