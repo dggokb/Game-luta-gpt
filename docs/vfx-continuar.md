@@ -1761,3 +1761,24 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   `onda_acerto_p02`) e no ar (ela parada no alto, a palma sai de lá). Não visto no celular.
 - **Junto:** os especiais saem também no ar (`docs/combat-engine.md`, "Especiais no ar").
 
+
+## Rodada de 17/11: a ativação do SHINKAI da Natisuko e da Bonnie
+
+- **Pedido:** os vídeos `netsuko_shinkai` e `Bonnite_shinkai` do dono, dos prompts das fichas
+  (`p15.md` e `p16.md`, "Ativação do Shinkai"): a Natisuko vira de frente, o círculo de pincel
+  dourado se desenha atrás e, no kiai, o leque de punhos de luz (os mil socos num só) se abre e se
+  desfaz em fagulhas; a Bonnie vira de frente, tira a cartola de luz ciano, a lebre pula de dentro,
+  corre em volta dela e para no alto no "TA-DA!", estoura num clarão e chove cartas. Regra do dono:
+  bicho só na família Komyo ([shinkai.md](shinkai.md#animação-de-ativação)).
+- **Feito:** como a garça da Yin-lu, o vídeo inteiro virou o efeito `shinkai_p15` e `shinkai_p16`
+  (`efeito_video.py --passo 3 --velocidade 1.5 --escala-mundo E --origem X,733 --resolucao 0.95
+  --segurar Q,800 --alfa-corte 0.45 --borda 120 --chao-y 733`). A escala é medida: a guarda do 1º
+  quadro do vídeo com a altura do idle dela no jogo (p15 0,4417, 589 px no vídeo = 260 no mundo;
+  p16 0,4408, 539 = 238), sem pulo de tamanho na troca do sprite para o vídeo. O vídeo para 0,8 s
+  no pico, onde entra o corte com o nome: o leque de punhos aberto (Q 16, o quadro 48 do vídeo) e
+  o "TA-DA!" com a lebre no alto (Q 21, o 63). Luz na cor do tipo: dourado `#FFE04A` e ciano
+  `#35E0FF`. A câmera dos dois vídeos fica parada (os pés na linha 733 do começo ao fim): sem a
+  correção de zoom da Yin-lu. A `SHINKAI_ATIVA` de cada uma é a guarda do idle com o tempo do
+  efeito (4,3 s).
+- **Ficou:** ele julgar no vídeo. O círculo da Natisuko e o salto da lebre passam do topo do vídeo
+  por alguns quadros (cortados lá; as faixas pretas da cena vão até esse limite). Visto só no PC.
