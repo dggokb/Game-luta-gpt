@@ -3118,7 +3118,18 @@ public class GameView extends SurfaceView
         String banner = "SHINKAI!";
         for (int side = 0; side < 2; side++) {
             CombatFighter f = engine.fighter(side);
-            if (f.state.shinkaiFrames != engine.config.shinkaiFrames) continue;
+            // Só quem acabou de ativar (mais uma ativação desde a última vez). A barra cheia não
+            // basta: a do PERCEPÇÃO fica cheia enquanto o corpo não cansa, e a ativação do outro
+            // lado tocava de novo a animação dele (o dono, 17/11: "quem soltou o shinkai foi o
+            // Kōga, mas apareceu a animação do Ryūga do nada").
+            // Outro lutador no lado (TAG) ou o round recomeçou (as ativações voltam a zero): conta de novo.
+            if (f.state != shinkaiEstadoVisto[side] || f.state.ativacoes < shinkaiAtivacoesVistas[side]) {
+                shinkaiEstadoVisto[side] = f.state;
+                shinkaiAtivacoesVistas[side] = 0;
+            }
+            boolean nova = f.state.ativacoes > shinkaiAtivacoesVistas[side];
+            shinkaiAtivacoesVistas[side] = f.state.ativacoes;
+            if (!nova || f.state.shinkaiFrames != engine.config.shinkaiFrames) continue;
             int color = f.state.shinkaiCor;
             float x = f.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
             impacts.spawnSuperJump(x, GROUND_Y, color);
@@ -3154,6 +3165,10 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
         return banner;
     }
+
+    /** Quantas ativações de SHINKAI de cada lado o spawnShinkai já mostrou. */
+    private final int[] shinkaiAtivacoesVistas = new int[2];
+    private final FighterState[] shinkaiEstadoVisto = new FighterState[2];
 
     /** Quadros (desde o começo da ativação) até o corte de ativação entrar; -1: já entrou. */
     private int corteAtraso = -1, corteLado;

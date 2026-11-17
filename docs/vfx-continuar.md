@@ -1782,7 +1782,13 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   ponta). Andando, ela varia 35% a 2,8 passadas por segundo; parada, tremula 2,5% da altura do corpo.
   Vídeo `aura_shinkai_chama_v4.mp4`.
 - **Depois, numa luta ("mostra em uma luta"): "deixa com menos opacidade, ficou muito forte":** as
-  camadas foram de 65/100/100% para 45/70/70%. Vídeo `aura_shinkai_luta_v2.mp4`.
+  camadas foram de 65/100/100% para 45/70/70%.
+- **Bug achado nesse vídeo (corrigido, fora da aura):** "quem soltou o shinkai foi o Kōga, mas
+  apareceu a animação do Ryūga do nada". O `spawnShinkai` achava quem ativou pela barra cheia
+  (`shinkaiFrames == config.shinkaiFrames`), e a do PERCEPÇÃO fica cheia enquanto o corpo não cansa:
+  a ativação do outro lado tocava de novo o vídeo e a `SHINKAI_ATIVA` do Ryūga. Agora conta as
+  ativações de cada lado (`FighterState.ativacoes`; recomeça no TAG e no round novo). Vídeo
+  `aura_shinkai_luta_v3.mp4`.
 
 ## Fora do VFX, o que ficou pendente
 
