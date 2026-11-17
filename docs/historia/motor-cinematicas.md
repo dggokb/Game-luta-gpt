@@ -484,7 +484,8 @@ esse mesmo quadro passado para preto e branco com retícula.
 **O treino do Episódio 1** (`historia/ep01/cinematica_treino.json`, gerado por
 `tools/cenas/treino_ep01.py`) é a cena de STAMP do dono: animada à mão, sem QTE, com dez STAMP
 (os punhos se chocando, os chutes cruzando, a voadora defendida, o chute do Ryūga, cinco closes
-dos socos em alta velocidade) e o DING DONG, o segundo quadro da página 7, virando a página. As
+dos socos em alta velocidade) e o primeiro quadro da página 7 (os dois correndo) virando a
+página; o DING DONG é o quadro seguinte da leitura. As
 chaves são por irmão e começam com `"x": "atual"` (onde cada um está na luta, sem pular). A cena
 antiga, no motor de luta, ficou em `cinematica_treino_corrida.json` (é ela que o teste do motor usa).
 

@@ -10,8 +10,8 @@ Ryūga desvia, o Ryūga responde com soco e chute e o Kōga desvia, soco por soc
 cruzam (STAMP); troca 3, o Ryūga pressiona, o Kōga recua e encaixa um soco, a voadora do Kōga na
 defesa do Ryūga (STAMP), ele cai na frente e leva o chute (STAMP), "Maldito..."; troca 4, os socos
 em alta velocidade, cada vez mais rápidos, um STAMP a cada aceleração; o grito, os dois pulam para
-trás, gritam o nome do outro e correm: o último STAMP é o DING DONG, o segundo quadro da página 7,
-e a história segue lendo a página dali.
+trás, gritam o nome do outro e correm: o último STAMP é o primeiro quadro da página 7 (os dois
+correndo um para o outro), e a história segue lendo a página dali (o DING DONG é o quadro seguinte).
 
 As chaves são por irmão ("ryuga" e "koga"): a mesma cena nas duas campanhas (na do Kōga os lados
 trocam e os STAMP batem espelhados). x: distância do meio do cenário ao longo do eixo do Ryūga para
@@ -346,7 +346,7 @@ camera(q, 1.1, 'centro', 0.2)
 R.k(q, 'LAND:3', -320, curva='corte')
 K.k(q, 'LAND:2', 320, curva='corte')
 q += 10
-# Os dois correm um para o outro, em câmera lenta no fim; o DING DONG bate antes do choque.
+# Os dois correm um para o outro, em câmera lenta no fim; o primeiro quadro da página bate antes do choque.
 linhas(q, 'velocidade', escuro=0.25)
 efeito(q, 'ryuga', 'fumaca_dash_v05')
 efeito(q, 'koga', 'fumaca_dash_v05')
@@ -361,8 +361,8 @@ QUADROS = q + 40
 # As pausas (quadro: quadros a mais): a antecipação antes de cada arrancada.
 PAUSAS = {360: 10, 540: 8, 720: 8, 980: 10}
 
-# O último STAMP: o DING DONG (o segundo quadro da página 7) vira a página.
-STAMP_FINAL = {'acao': 'stamp', 'imagem': 'ep01/pag7.jpg', 'quadro': 1, 'segundos': 1.2,
+# O último STAMP: o primeiro quadro da página 7 (os dois correndo um para o outro) vira a página.
+STAMP_FINAL = {'acao': 'stamp', 'imagem': 'ep01/pag7.jpg', 'quadro': 0, 'segundos': 1.2,
                'viraPagina': True, 'vencedor': 'interrompida'}
 
 
@@ -387,7 +387,7 @@ def main():
             'o Ryūga desvia, o Ryūga ataca e o Kōga desvia, soco por soco e os chutes se cruzam (STAMP); o Kōga '
             'recua e encaixa um soco, a voadora dele na defesa do Ryūga (STAMP), ele cai na frente e leva o '
             'chute (STAMP); os socos em alta velocidade, um STAMP a cada aceleração; o grito, os nomes, a '
-            'corrida, e o DING DONG (o segundo quadro da página 7) bate como STAMP e vira a página. As chaves '
+            'corrida, e o primeiro quadro da página 7 (os dois correndo) bate como STAMP e vira a página (o DING DONG vem no toque seguinte). As chaves '
             'são por irmão: a mesma cena nas duas campanhas. A cena antiga (a corrida com a campainha, no '
             'motor de luta) está em cinematica_treino_corrida.json.'),
         'gatilho': {'vida': 0.25},
