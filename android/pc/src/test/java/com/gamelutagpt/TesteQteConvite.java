@@ -46,6 +46,8 @@ public final class TesteQteConvite {
     public static void main(String[] args) throws Exception {
         saida = new File(args.length > 0 ? args[0] : "build/qte");
         String irmao = args.length > 1 ? args[1] : "ryuga";
+        // O episódio (padrão 2, o convite; 1 é o treino do Ryūga × Kōga).
+        int ep = args.length > 2 ? Integer.parseInt(args[2]) : 2;
         saida.mkdirs();
         Context ctx = DadosDoJogo.localizar().contexto(null);
         jogo = new GameView(ctx);
@@ -65,9 +67,9 @@ public final class TesteQteConvite {
         PaginaHistoria historia = (PaginaHistoria)campo("historia").get(jogo);
         campo("storyMode").set(jogo, true);
         historia.setBotaoMenu(true);
-        metodo("startStoryAt", int.class).invoke(jogo, 2);
+        metodo("startStoryAt", int.class).invoke(jogo, ep);
         historia.setCampanha(campanha);
-        metodo("playStoryEpisode", int.class).invoke(jogo, 2);
+        metodo("playStoryEpisode", int.class).invoke(jogo, ep);
 
         // As páginas antes da luta: um toque a cada meio segundo.
         int limite = 60 * 120;

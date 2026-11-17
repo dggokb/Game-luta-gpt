@@ -28,6 +28,18 @@ do Ryūga, p01, `art/sprites/source/player_base_heavy_straight_video_normalized.
 textura e o caminho detectado ficam; para voltar, `LIGADO = true`. O teste por erosão continua
 guardado na branch `claude/rastro-erosao` (também desligado lá).
 
+## STAMP com cara de carimbo (16/11, pedido do dono: "faltou o impacto de carimbo, tá muito PA APARECI")
+
+O STAMP da cinemática (o quadro de mangá que bate no impacto) aparecia num "pop": surgia grande e
+transparente e encolhia. Agora é um carimbo: desce já opaco, de perto da câmera e de cima,
+acelerando, com a sombra encolhendo (0,075 s); no contato amassa (5% largo, 7% baixo, volta em
+0,08 s), a tela treme forte (17 px, assenta em 0,32 s), estalo branco de dois quadros, os raios
+estouram e o letreiro bate junto, no canto de cima do quadro; fica parado e sai seco (0,1 s). O
+STAMP anda no tempo da tela (a câmera lenta do impacto embaixo dele deixava a descida lenta).
+Só movimento e tempo sobre a arte do dono (as imagens do STAMP são dele). Conferido no PC, na cena
+nova do treino do Episódio 1 (`android/pc/build/treino_ep01_stamp.mp4` e
+`treino_ep01_stamp_lenta.mp4`); não visto no celular. Esperando o dono julgar no vídeo.
+
 ## Smear: o membro esticado na própria arte (11/11, teste; branch `claude/smear`)
 
 Ideia do dono, depois de desligar o rastro automático: em vez de efeito por cima, **o próprio

@@ -423,7 +423,8 @@ Ryūga no negativo). Os eventos aceitam `"quem": "ryuga"` e `"koga"` (e a `camer
 os dois: uma cena longa não sai pela parede; a troca fica escondida atrás de uma tinta.
 
 Entre duas chaves os números são interpolados com a curva da chave seguinte; a pose fica a da chave
-de antes. Os `eventos` são ações quaisquer do roteiro no quadro (`camera`, `impacto`, `efeito`,
+de antes. Numa animação que não continua outra, `"x": "atual"` numa chave é onde aquele lutador
+está quando a cena começa (a luta vira cena sem os dois pularem de lugar). Os `eventos` são ações quaisquer do roteiro no quadro (`camera`, `impacto`, `efeito`,
 `linhas`, `fala`, `onomatopeia`, `clarao`, `stamp`), menos `qte`, `golpe`, `animar` e o `stamp` que vira página. Um `impacto` (e um STAMP) congela a
 animação no contato. A `velocidade` dentro da animação muda o ritmo dela (0,35 = câmera lenta em volta de um golpe; volte a 1 depois). As falas não esperam: a animação reserva o tempo delas.
 
@@ -440,10 +441,13 @@ folhas de cada clipe com o número do quadro ajudam a escolher.
 
 ### STAMP: o golpe vira mangá
 
-No contato de um golpe forte, um **quadro de mangá** bate na tela por cima da luta: chega de perto
-e assenta inclinado, com moldura branca, raios de impacto em volta e um tranco; a luta escurece
-um pouco e fica **congelada** embaixo (a animação feita à mão também para). O letreiro do impacto
-bate por cima do quadro. Depois de `segundos` (padrão 0,8) ele sai e a cena continua.
+No contato de um golpe forte, um **quadro de mangá** bate na tela como um **carimbo**: desce de
+uma vez, já inteiro, de perto da câmera e de cima, com a sombra encolhendo (0,075 s); no contato
+amassa, a tela treme forte, dá um estalo branco de dois quadros, os raios estouram em volta e o
+letreiro do impacto bate junto, no canto de cima do quadro. Fica **grudado e parado** `segundos`
+(padrão 0,8), com a luta escurecida e **congelada** embaixo (a animação feita à mão também para),
+e sai seco (0,1 s). O STAMP anda no tempo da tela: a câmera lenta do impacto embaixo dele não o
+deixa lento (dono, 16/11: "tem que ser o efeito de carimbo, a página vem e PAH, gruda na tela").
 
 O jeito comum é o `stamp` dentro de um `impacto` (ou do `impacto` de um `qte`/`golpe`):
 
@@ -457,6 +461,8 @@ O jeito comum é o `stamp` dentro de um `impacto` (ou do `impacto` de um `qte`/`
 | `imagem` | — | `<episódio>/<imagem>`: a arte do quadro (a imagem inteira é o quadro) |
 | `quadro` | — | com uma página de episódio em `imagem`, o número do quadro dela (0 = o primeiro): o recorte é o `area` do quadro no `episodio.json` |
 | `segundos` | 0,8 | quanto o quadro fica batido (a cena fica congelada esse tempo) |
+| `recorte` | — | sem `quadro`: o pedaço da imagem que é o quadro, `[x0, y0, x1, y1]` de 0 a 1 (a mesma arte em closes cada vez mais fechados) |
+| `ryugaNaArte` | — | `esquerda` ou `direita`: onde o Ryūga está na arte. Se na luta ele está do outro lado (a campanha do Kōga), o quadro bate espelhado |
 | `rotacao` | alterna -5 / 4 | a inclinação, em graus |
 | `viraPagina` | false | só na ação `stamp` solta, com `quadro`: o STAMP vira a página (abaixo) |
 | `vencedor` | `jogador` | com `viraPagina`: como a luta acaba (`jogador`, `rival`, `interrompida`) |
@@ -474,6 +480,13 @@ A arte de cada STAMP é desenhada com o enquadramento e as poses da luta naquele
 `gradle :pc:testeQte` grava `impacto_N_1.png` (o quadro logo antes do STAMP N) na pasta de
 saída, a referência para desenhar. No convite do Ryūga os `stamp_ryuga1..5.jpg` são provisórios:
 esse mesmo quadro passado para preto e branco com retícula.
+
+**O treino do Episódio 1** (`historia/ep01/cinematica_treino.json`, gerado por
+`tools/cenas/treino_ep01.py`) é a cena de STAMP do dono: animada à mão, sem QTE, com dez STAMP
+(os punhos se chocando, os chutes cruzando, a voadora defendida, o chute do Ryūga, cinco closes
+dos socos em alta velocidade) e o DING DONG, o segundo quadro da página 7, virando a página. As
+chaves são por irmão e começam com `"x": "atual"` (onde cada um está na luta, sem pular). A cena
+antiga, no motor de luta, ficou em `cinematica_treino_corrida.json` (é ela que o teste do motor usa).
 
 ### O teste dos QTE (convite do Episódio 2)
 

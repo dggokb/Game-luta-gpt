@@ -58,8 +58,10 @@ public final class CinematicaLuta {
     static final float BOTAO_RAIO = 62f;
     /** STAMP: quanto o quadro de mangá fica batido na tela (com a cena congelada embaixo). */
     static final float STAMP_SEGURA = 0.8f;
-    static final float STAMP_ENTRA = 0.09f;
-    static final float STAMP_SAI = 0.16f;
+    /** O carimbo descendo até bater (já opaco, acelerando), o amassado do contato e a saída seca. */
+    static final float STAMP_DESCE = 0.075f;
+    static final float STAMP_AMASSA = 0.08f;
+    static final float STAMP_SAI = 0.1f;
     /** STAMP que vira página: o quadro vai para o lugar dele na página, e a página acende em volta. */
     static final float VIRA_MOVE = 0.5f;
     static final float VIRA_FUNDO = 0.45f;
@@ -357,6 +359,13 @@ public final class CinematicaLuta {
         int quadro = -1;
         /** STAMP: o quadro vira a página dele: a cena acaba e a história segue lendo dali. */
         boolean viraPagina;
+        /** STAMP sem {@link #quadro}: o recorte da imagem que é o quadro ({x0, y0, x1, y1} de 0 a 1), ou null (ela toda). */
+        float[] recorte;
+        /**
+         * STAMP: de que lado o Ryūga está na arte ("esquerda", "direita") ou null. Se na luta ele
+         * está do outro lado (a campanha do Kōga), o quadro bate espelhado.
+         */
+        String ryugaNaArte;
         /** IMPACTO, QTE e GOLPE: o STAMP que bate no contato (com a cena congelada embaixo). */
         Acao stamp;
         /**
@@ -709,6 +718,8 @@ public final class CinematicaLuta {
     private Acao stamp;
     private float stampDesde;
     private int stamps;
+    /** O STAMP na tela bate espelhado (o Ryūga está do outro lado da arte). */
+    private boolean stampEspelhado;
     /** O STAMP que vira página já está indo para o lugar dele (a página dele já abriu em {@link #guiada}). */
     private boolean virando;
     /** A página já é a da história (a luta acabou): fica na tela até a história assumir. */
@@ -786,7 +797,8 @@ public final class CinematicaLuta {
                 imagensStamp.put(st.imagem, img);
             }
             if (st.quadro < 0) {
-                areaStamp.put(st, new float[] {0f, 0f, 1f, 0f, 1f, 1f, 0f, 1f});
+                float[] r = st.recorte != null ? st.recorte : new float[] {0f, 0f, 1f, 1f};
+                areaStamp.put(st, new float[] {r[0], r[1], r[2], r[1], r[2], r[3], r[0], r[3]});
                 return;
             }
             Episodio.Passo passo = passoDaPagina(st.imagem, episodios);
@@ -1129,6 +1141,13 @@ public final class CinematicaLuta {
                     a.impacto = l;
                 }
                 stampDoImpacto(a, m.get("stamp"));
+                if (a.stamp != null && a.impacto != null) {
+                    // Com STAMP, o letreiro bate no canto de cima do quadro, sem cobrir a arte.
+                    a.impacto.x = 0.29f;
+                    a.impacto.y = 0.21f;
+                    a.impacto.tamanho = 112f;
+                    a.impacto.rotacao = -10f;
+                }
                 break;
             case "clarao":
                 // Clarão de impacto: a tela fica da cor e volta à luta em "segundos" (um corte
@@ -1259,6 +1278,25 @@ public final class CinematicaLuta {
         if (m.get("quadro") != null) a.quadro = Math.round(numero(m, "quadro", 0f, 0f, 40f));
         a.segundos = numero(m, "segundos", STAMP_SEGURA, 0.15f, 5f);
         a.rotacao = numero(m, "rotacao", Float.NaN, -30f, 30f);
+        List<Object> recorte = Episodio.list(m, "recorte");
+        if (!recorte.isEmpty()) {
+            if (a.quadro >= 0) throw new IllegalArgumentException("stamp com \"quadro\" e \"recorte\": use um dos dois");
+            if (recorte.size() != 4) throw new IllegalArgumentException("recorte precisa ser [x0, y0, x1, y1] (de 0 a 1)");
+            a.recorte = new float[4];
+            for (int i = 0; i < 4; i++) {
+                Object v = recorte.get(i);
+                if (!(v instanceof Number)) throw new IllegalArgumentException("recorte precisa ser [x0, y0, x1, y1] (de 0 a 1)");
+                a.recorte[i] = ((Number)v).floatValue();
+            }
+            if (a.recorte[0] < 0f || a.recorte[1] < 0f || a.recorte[2] > 1f || a.recorte[3] > 1f ||
+                a.recorte[2] <= a.recorte[0] || a.recorte[3] <= a.recorte[1]) {
+                throw new IllegalArgumentException("recorte fora da imagem: [x0, y0, x1, y1] de 0 a 1, x0 < x1, y0 < y1");
+            }
+        }
+        a.ryugaNaArte = Episodio.string(m, "ryugaNaArte", null);
+        if (a.ryugaNaArte != null && !a.ryugaNaArte.matches("esquerda|direita")) {
+            throw new IllegalArgumentException("ryugaNaArte " + a.ryugaNaArte + " (use esquerda ou direita)");
+        }
         a.viraPagina = Boolean.TRUE.equals(m.get("viraPagina"));
         if (a.viraPagina) {
             if (!solto) throw new IllegalArgumentException("viraPagina só na ação stamp (depois do golpe)");
@@ -1689,6 +1727,13 @@ public final class CinematicaLuta {
                     int de = a.porIrmao ? lado(Torneio.RYUGA) : JOGADOR;
                     float xa = de == JOGADOR ? xj : xr, xb = de == JOGADOR ? xr : xj;
                     animSentido = xb >= xa ? 1f : -1f;
+                    // As chaves com "x": "atual" começam onde cada um está agora.
+                    for (int lado = 0; lado < 2; lado++) {
+                        float x = (palco.xDoLutador(lado) - animMeio) * animSentido;
+                        for (AnimacaoManual.Chave ch : trilha(a, lado)) {
+                            if (ch.xAtual) ch.x = x;
+                        }
+                    }
                 }
                 animar(0f);
                 break;
@@ -1776,9 +1821,9 @@ public final class CinematicaLuta {
                 // A vez em andamento termina antes (no tempo da luta: a câmera lenta estica).
                 return !palco.trocando() || idade >= a.segundos + LIMITE_ESPERA;
             case STAMP:
-                if (!a.viraPagina) return stamp != a || idade >= a.segundos;
+                if (!a.viraPagina) return stamp != a || idade >= fimDoStamp(a);
                 // Sem a página (não abriu), a luta acaba do mesmo jeito.
-                if (stamp == a && idade < a.segundos + VIRA_MOVE + VIRA_FUNDO) return false;
+                if (stamp == a && idade < fimDoStamp(a) + VIRA_MOVE + VIRA_FUNDO) return false;
                 virarPagina(a, stamp == a && virando);
                 return true;
             case VIDEO:
@@ -1977,7 +2022,9 @@ public final class CinematicaLuta {
     }
 
     private void impactar(Acao a) {
-        if (a.impacto != null) estouros.add(new Estouro(a.impacto, time));
+        // Com STAMP, o letreiro estoura quando o carimbo bate (no fim da descida).
+        boolean carimbo = a.stamp != null && areaStamp.get(a.stamp) != null;
+        if (a.impacto != null) estouros.add(new Estouro(a.impacto, carimbo ? time + STAMP_DESCE : time));
         if (a.congela > 0f) congelaAte = time + a.congela;
         if (a.stamp != null) bater(a.stamp);
         if (a.tranco > 1f) {
@@ -2148,8 +2195,21 @@ public final class CinematicaLuta {
         stampDesde = time;
         stamps++;
         virando = false;
-        congelaAte = Math.max(congelaAte, time + a.segundos);
+        stampEspelhado = !a.viraPagina && a.ryugaNaArte != null && ryugaADireita() != a.ryugaNaArte.equals("direita");
+        congelaAte = Math.max(congelaAte, time + fimDoStamp(a));
         palco.som("impacto");
+    }
+
+    /** Quando o STAMP {@code a} acaba de ficar batido (a descida e o tempo dele), desde que bateu. */
+    private static float fimDoStamp(Acao a) {
+        return STAMP_DESCE + a.segundos;
+    }
+
+    /** O Ryūga está à direita do Kōga agora (na animação feita à mão, pelas poses). */
+    private boolean ryugaADireita() {
+        int r = lado(Torneio.RYUGA);
+        if (animando()) return xDaPose(animPose[r]) > xDaPose(animPose[1 - r]);
+        return palco.aDireita(r);
     }
 
     private void atualizarStamp() {
@@ -2157,7 +2217,7 @@ public final class CinematicaLuta {
         float idade = time - stampDesde;
         if (stamp.viraPagina) {
             Episodio.Passo passo = paginaStamp.get(stamp);
-            if (!virando && idade >= stamp.segundos && passo != null && temporada != null) {
+            if (!virando && idade >= fimDoStamp(stamp) && passo != null && temporada != null) {
                 // A página abre já no quadro do STAMP; o quadro vai para o lugar dele nela.
                 RenderImage img = imagensStamp.get(stamp.imagem);
                 guiada.beginNoQuadro(temporada, passo, img, img.width(), img.height(), stamp.quadro);
@@ -2167,7 +2227,7 @@ public final class CinematicaLuta {
             }
             return;
         }
-        if (idade >= stamp.segundos + STAMP_SAI) stamp = null;
+        if (idade >= fimDoStamp(stamp) + STAMP_SAI) stamp = null;
     }
 
     /** O STAMP virou a página: a cena acaba, a luta também, e a história lê dali em diante. */
@@ -2397,55 +2457,73 @@ public final class CinematicaLuta {
     }
 
     /**
-     * O STAMP batido: a luta escurece um pouco, o quadro de mangá chega de perto e bate
-     * inclinado, com a moldura branca e os raios de impacto em volta, treme e, no fim, sai.
+     * O STAMP batido como um carimbo: o quadro de mangá desce de uma vez, já inteiro, com a
+     * sombra dele encolhendo até bater; no contato amassa, a tela treme e dá um estalo branco, os
+     * raios estouram em volta e o letreiro bate junto. Fica grudado, parado, e sai seco.
      */
     private void desenharStamp(RenderCanvas c, float idade) {
         RenderImage img = imagensStamp.get(stamp.imagem);
         float[] area = areaStamp.get(stamp);
         if (img == null || area == null) return;
-        float entra = Tinta.clamp01(idade / STAMP_ENTRA);
-        float sai = stamp.viraPagina ? 0f : Tinta.clamp01((idade - stamp.segundos) / STAMP_SAI);
-        float alpha = Math.min(Tinta.clamp01(entra * 2.5f), 1f - sai);
-        if (alpha <= 0f) return;
+        float depois = idade - STAMP_DESCE;
+        float sai = stamp.viraPagina ? 0f : Tinta.clamp01((idade - fimDoStamp(stamp)) / STAMP_SAI);
+        if (sai >= 1f) return;
+        float desce = Tinta.clamp01(idade / STAMP_DESCE);
         float[] pose = poseDoStamp(img, area, idade);
-        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(95f * alpha)));
-        if (idade < 0.07f) {
-            // O estalo: um clarão branco no instante em que o quadro bate.
-            c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(WHITE, (int)(150f * (1f - idade / 0.07f))));
+        // A luta escurece um pouco na descida e de vez no contato.
+        float escuro = depois < 0f ? 45f * desce : 115f;
+        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(escuro * (1f - sai))));
+        float raios = depois < 0f ? 0f : Tinta.easeOutCubic(Tinta.clamp01(depois / 0.06f)) * (1f - sai);
+        float sombra = depois < 0f ? 1f - desce * desce : 0f;
+        quadroDoStamp(c, img, area, pose, (int)(255f * (1f - sai)), 1f, raios, sombra, stampEspelhado);
+        if (depois >= 0f && depois < 0.04f) {
+            // O estalo do contato: dois quadros de branco.
+            c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(WHITE, (int)(165f * (1f - depois / 0.04f))));
         }
-        float raios = Tinta.easeOutCubic(Tinta.clamp01(idade / 0.18f)) * (1f - sai);
-        quadroDoStamp(c, img, area, pose[0], pose[1], pose[2], pose[3], (int)(255f * alpha), 1f, raios, idade);
     }
 
-    /** Onde o STAMP está na tela agora: {centro x, centro y, escala (px de tela por px da imagem), graus}. */
+    /**
+     * Onde o STAMP está na tela agora: {centro x, centro y, escala (px de tela por px da imagem),
+     * graus, amassado em x, amassado em y}.
+     */
     private float[] poseDoStamp(RenderImage img, float[] area, float idade) {
         float[] bb = Layouts.caixa(area);
         float bw = (bb[2] - bb[0]) * img.width();
         float bh = (bb[3] - bb[1]) * img.height();
-        float s = Math.min(VW * 0.62f / bw, VH * 0.62f / bh);
-        float entra = Tinta.clamp01(idade / STAMP_ENTRA);
-        // Vem de perto e bate; depois cresce devagar enquanto segura (e um pouco mais ao sair).
-        float escala = 1.45f - 0.45f * Tinta.easeOutCubic(entra);
-        escala *= 1f + 0.03f * Tinta.clamp01((idade - STAMP_ENTRA) / Math.max(0.2f, stamp.segundos));
-        if (!stamp.viraPagina) escala *= 1f + 0.1f * Tinta.clamp01((idade - stamp.segundos) / STAMP_SAI);
+        // Quadro muito largo (uma tira, como o DING DONG) ocupa mais a largura da tela.
+        float s = bw / bh > 2.2f ? Math.min(VW * 0.88f / bw, VH * 0.62f / bh) : Math.min(VW * 0.68f / bw, VH * 0.66f / bh);
+        float desce = Tinta.clamp01(idade / STAMP_DESCE);
+        float k = desce * desce;
+        // Desce de perto da câmera e de cima, acelerando até bater.
+        float escala = 1.34f - 0.34f * k;
+        float sobe = -48f * (1f - k);
         float rot = Float.isNaN(stamp.rotacao) ? (stamps % 2 == 1 ? -5f : 4f) : stamp.rotacao;
-        // O tranco da batida: treme forte e assenta.
-        float treme = 13f * (1f - Tinta.clamp01((idade - STAMP_ENTRA) / 0.3f)) * (idade >= STAMP_ENTRA ? 1f : 0f);
-        float dx = (float)Math.sin(time * 71f) * treme;
-        float dy = (float)Math.cos(time * 59f) * treme;
-        return new float[] {VW * 0.5f + dx, VH * 0.48f + dy, s * escala, rot};
+        rot *= 1f + 0.5f * (1f - k);
+        float depois = idade - STAMP_DESCE;
+        float ax = 1f, ay = 1f, dx = 0f, dy = 0f;
+        if (depois >= 0f) {
+            // O amassado do contato (volta no lugar) e o tremor forte que assenta.
+            float u = 1f - Tinta.clamp01(depois / STAMP_AMASSA);
+            ax = 1f + 0.05f * u * u;
+            ay = 1f - 0.07f * u * u;
+            float treme = 17f * (float)Math.pow(1f - Tinta.clamp01(depois / 0.32f), 2);
+            dx = (float)Math.sin(depois * 95f) * treme;
+            dy = (float)Math.cos(depois * 81f) * treme * 0.8f;
+        }
+        if (!stamp.viraPagina) escala *= 1f + 0.05f * Tinta.clamp01((idade - fimDoStamp(stamp)) / STAMP_SAI);
+        return new float[] {VW * 0.5f + dx, VH * 0.48f + dy + sobe, s * escala, rot, ax, ay};
     }
 
     /**
-     * O quadro {@code area} da imagem com centro em (cx, cy), {@code s} px de tela por px da
-     * imagem e inclinado {@code rot} graus; {@code borda} (0 a 1) a moldura branca e
-     * {@code raios} (0 a 1) os raios de impacto em volta.
+     * O quadro {@code area} da imagem na {@code pose} ({@link #poseDoStamp}); {@code borda} (0 a
+     * 1) a moldura branca, {@code raios} (0 a 1) os raios de impacto em volta e {@code sombra}
+     * (0 a 1) a sombra do carimbo ainda no ar (deslocada, some ao bater).
      */
-    private void quadroDoStamp(RenderCanvas c, RenderImage img, float[] area, float cx, float cy, float s, float rot,
-                               int alpha, float borda, float raios, float idade) {
+    private void quadroDoStamp(RenderCanvas c, RenderImage img, float[] area, float[] pose, int alpha, float borda,
+                               float raios, float sombra, boolean espelha) {
         float iw = img.width();
         float ih = img.height();
+        float s = pose[2];
         float[] bb = Layouts.caixa(area);
         float bx0 = bb[0] * iw, by0 = bb[1] * ih, bx1 = bb[2] * iw, by1 = bb[3] * ih;
         float bcx = (bx0 + bx1) * 0.5f, bcy = (by0 + by1) * 0.5f;
@@ -2455,14 +2533,22 @@ public final class CinematicaLuta {
             quad[i] = (area[i] * iw - bcx) * s;
             quad[i + 1] = (area[i + 1] * ih - bcy) * s;
         }
+        float e = 15f * borda;
+        float[] fora = new float[quad.length];
+        for (int i = 0; i < quad.length; i++) fora[i] = quad[i] + Math.signum(quad[i]) * e;
         c.save();
-        c.translate(cx, cy);
-        c.rotate(rot, 0f, 0f);
+        c.translate(pose[0], pose[1]);
+        c.rotate(pose[3], 0f, 0f);
+        c.scale(pose[4] * (espelha ? -1f : 1f), pose[5], 0f, 0f);
+        if (sombra > 0.01f) {
+            // A sombra no chão da tela, longe enquanto o carimbo está alto.
+            c.save();
+            c.translate(26f * sombra, 40f * sombra);
+            c.fillPolygon(fora, Tinta.withAlpha(INK, (int)(alpha * 0.45f * sombra)));
+            c.restore();
+        }
         if (raios > 0.01f) raiosDoStamp(c, hw, hh, raios, alpha);
         if (borda > 0.01f) {
-            float e = 15f * borda;
-            float[] fora = new float[quad.length];
-            for (int i = 0; i < quad.length; i++) fora[i] = quad[i] + Math.signum(quad[i]) * e;
             c.fillPolygon(fora, Tinta.withAlpha(WHITE, alpha));
             c.strokePolygon(fora, 4f * borda, Tinta.withAlpha(INK, alpha));
         }
@@ -2514,26 +2600,28 @@ public final class CinematicaLuta {
             return;
         }
         float idade = time - stampDesde;
-        float k = suave(Tinta.clamp01((idade - stamp.segundos) / VIRA_MOVE));
+        float fim = fimDoStamp(stamp);
+        float k = suave(Tinta.clamp01((idade - fim) / VIRA_MOVE));
         if (k >= 1f) {
-            guiada.render(c, Tinta.clamp01((idade - stamp.segundos - VIRA_MOVE) / VIRA_FUNDO));
+            guiada.render(c, Tinta.clamp01((idade - fim - VIRA_MOVE) / VIRA_FUNDO));
             return;
         }
         RenderImage img = imagensStamp.get(stamp.imagem);
         float[] area = areaStamp.get(stamp);
-        float[] de = poseDoStamp(img, area, stamp.segundos);
+        float[] de = poseDoStamp(img, area, fim);
         float[] bb = Layouts.caixa(area);
         float[] para = guiada.naTela((bb[0] + bb[2]) * 0.5f * img.width(), (bb[1] + bb[3]) * 0.5f * img.height());
         float s = de[2] + (guiada.escala() - de[2]) * k;
-        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(95f + 160f * Tinta.clamp01(k * 1.6f))));
-        quadroDoStamp(c, img, area, de[0] + (para[0] - de[0]) * k, de[1] + (para[1] - de[1]) * k, s, de[3] * (1f - k), 255,
-            1f - k, 1f - Tinta.clamp01(k * 2f), idade);
+        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(115f + 140f * Tinta.clamp01(k * 1.6f))));
+        float[] pose = {de[0] + (para[0] - de[0]) * k, de[1] + (para[1] - de[1]) * k, s, de[3] * (1f - k), 1f, 1f};
+        quadroDoStamp(c, img, area, pose, 255, 1f - k, 1f - Tinta.clamp01(k * 2f), 0f, false);
     }
 
 
     private void drawOnomatopeia(RenderCanvas c, Estouro e) {
         Acao a = e.acao;
         float idade = time - e.desde;
+        if (idade < 0f) return;
         float resta = a.segundos - idade;
         float alpha = resta < SAIDA_ONOMATOPEIA ? Tinta.clamp01(resta / SAIDA_ONOMATOPEIA) : 1f;
         if (alpha <= 0f) return;

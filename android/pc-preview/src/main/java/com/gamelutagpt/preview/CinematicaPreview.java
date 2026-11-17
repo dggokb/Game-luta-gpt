@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
  * onomatopeias. A cena começa meio segundo depois, sem esperar o gatilho. Serve para revisar o
  * ritmo e o desenho; o movimento de verdade sai do motor de luta (gradle :pc:run).
  *
- * <pre>gradle :pc-preview:runCinematica -Pcinematica=ep01/cinematica_treino.json</pre>
+ * <pre>gradle :pc-preview:runCinematica -Pcinematica=ep01/cinematica_treino_corrida.json</pre>
  * Saída: build/cinematica/quadro_NNN.png (10 por segundo) e folha.png (resumo em grade).
  * {@code -Pirmao=koga} toca a campanha do Kōga; {@code -Pidioma=en}, outro idioma.
  */
@@ -151,7 +151,7 @@ public final class CinematicaPreview {
 
     public static void main(String[] args) throws IOException {
         File assetsDir = new File(args.length > 0 ? args[0] : "app/src/main/assets");
-        String arquivo = args.length > 1 ? args[1] : "ep01/cinematica_treino.json";
+        String arquivo = args.length > 1 ? args[1] : "ep01/cinematica_treino_corrida.json";
         File outDir = new File(args.length > 2 ? args[2] : "build/cinematica");
         String cenario = args.length > 3 ? args[3] : "dojo_shinshinkan";
         if (!outDir.isDirectory() && !outDir.mkdirs()) throw new IOException("não consegui criar " + outDir);

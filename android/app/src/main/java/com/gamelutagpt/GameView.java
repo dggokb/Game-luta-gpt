@@ -1817,7 +1817,9 @@ public class GameView extends SurfaceView
             finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade() *
                 (finalizacao.ativo() ? ImpactFeel.LENTA_ACELERA : RITMO_BASE));
         }
-        float speed = fightClockRunning() ? ImpactFeel.relogio(pausa.velocidade(), RITMO_BASE, feel.timeScale()) : 1f;
+        // O STAMP da cinemática bate no tempo da tela, não na câmera lenta do impacto embaixo dele.
+        float sentir = cinematica.stampNaTela() ? 1f : feel.timeScale();
+        float speed = fightClockRunning() ? ImpactFeel.relogio(pausa.velocidade(), RITMO_BASE, sentir) : 1f;
         // No máximo 3 passos por quadro: depois de um engasgo, 6 passos de uma vez (motor, IA e
         // visual) faziam o quadro seguinte engasgar também. O jogo atrasa um pouco em vez disso.
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.05f) * speed;

@@ -20,7 +20,7 @@ import java.util.Map;
  *  "eventos": [{"q": 30, "acao": {"acao": "impacto", "forca": 3, "quem": "rival"}}]}
  * </pre>
  *
- * x: distância do meio entre os dois no começo, ao longo do eixo do jogador para o rival
+ * x: distância do meio entre os dois no começo (ou {@code "atual"}: onde o lutador está), ao longo do eixo do jogador para o rival
  * (negativo, para o lado do jogador); y: altura acima do chão. Cada um olha para o outro (ou
  * para o lado contrário com {@code "vira": true}).
  */
@@ -60,6 +60,11 @@ public final class AnimacaoManual {
         float ciclo;
         int rastro;
         boolean vira;
+        /**
+         * {@code "x": "atual"}: o x é onde o lutador está quando a animação começa (a cena sai da
+         * luta sem pular; só na animação que não continua outra).
+         */
+        boolean xAtual;
         /** Como chega nesta chave: linear, sai (rápido no começo), entra (rápido no fim), corte (pula). */
         String curva = "linear";
     }
@@ -89,6 +94,7 @@ public final class AnimacaoManual {
             c.q = (int)num(m, "q", 0f);
             if (c.q < antes) throw new IllegalArgumentException("animar: as chaves de " + quem + " fora de ordem (q " + c.q + ")");
             antes = c.q;
+            c.xAtual = "atual".equals(m.get("x"));
             c.x = num(m, "x", 0f);
             c.y = num(m, "y", 0f);
             c.sx = num(m, "sx", 1f);

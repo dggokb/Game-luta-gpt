@@ -13,7 +13,14 @@ class Lutador:
         self.x = 0.0
 
     def k(self, q, pose, x=None, **kw):
-        """Uma chave no quadro q; x sem valor repete o último."""
+        """Uma chave no quadro q; x sem valor repete o último; x "atual": onde o lutador está
+        quando a animação começa (só nas primeiras chaves, antes de um x de número)."""
+        if x == 'atual':
+            c = {'q': q, 'x': 'atual', 'pose': pose}
+            for nome, v in kw.items():
+                c[nome] = v
+            self.chaves.append(c)
+            return
         if x is not None:
             self.x = x
         c = {'q': q, 'x': round(self.x, 1), 'pose': pose}
