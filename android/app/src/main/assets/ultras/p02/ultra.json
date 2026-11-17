@@ -1,5 +1,5 @@
 {
-  "nome": "Dança da Garça",
+  "nome": "Mil Penas",
   "cor": "#3FA7D6",
   "corSecundaria": "#BFF3FF",
   "estilo": {
@@ -12,7 +12,7 @@
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",
-    "grito": "Você não vai me alcançar!",
+    "grito": "Você nem vai me ver!",
     "focoPalco": 0.5
   },
   "paineis": {
@@ -22,7 +22,7 @@
     },
     "carga": {
       "imagem": "carga.jpg",
-      "onomatopeia": "FUUUSH",
+      "onomatopeia": "FWSSSH",
       "foco": 0.5
     },
     "golpe": {

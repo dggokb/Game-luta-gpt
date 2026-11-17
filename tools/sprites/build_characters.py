@@ -228,7 +228,9 @@ def validate_mechanics(name, mech, m, projectile):
             frames(key, mech[key])
             if mech[key].get(field) not in allowed:
                 raise ValueError(f'{name}.mecanica.{key}.{field}: one of {allowed}')
-    if 'contra' in mech and (projectile or mech['contra']['frames'][1] >= m['startupFrames']):
+    # O Super de contra-golpe (o Espelho do Lago da Yin-lu, 17/11) bate corpo a corpo: golpes e alcance.
+    melee_super = projectile and 'golpes' in m and 'reach' in m
+    if 'contra' in mech and ((projectile and not melee_super) or mech['contra']['frames'][1] >= m['startupFrames']):
         raise ValueError(f'{name}.mecanica.contra: a melee move that reads before its strike')
     # repele: o repel do S2 da p15 (só bate no que repeliu; projétil na janela se desfaz).
     # apara: o aparar do S3 do Ryūga (só bate no que leu; no vazio não sai golpe).
@@ -337,7 +339,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance'}
+             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance','espelho','penas'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -392,6 +394,12 @@ def validate_ultra(name, u, animations):
     # Até onde as pancadas desenhadas encostam no rival (tools/sprites/caixas_sprites.py).
     if 'alcance' in u and not (number(u['alcance']) and u['alcance'] > 0 and not u.get('rival')):
         raise ValueError(f'{name}.ultra.alcance: distância > 0, sem rival (o rival já diz onde fica)')
+    # Mil Penas da Yin-lu: desenho virado (ela atrás do rival) e os efeitos de penas do sumiço.
+    if not all(window(w) and w[1] <= u['duracao'] for w in u.get('espelho', [])):
+        raise ValueError(f'{name}.ultra.espelho: [de, até] frames inside the sequence')
+    if 'penas' in u and not (isinstance(u['penas'], dict) and set(u['penas']) <= {'estouro', 'redemoinho'}
+                             and isinstance(u['penas'].get('estouro'), str)):
+        raise ValueError(f'{name}.ultra.penas: {{estouro, redemoinho?}} (nomes de efeito)')
     if 'cameraDaLuta' in u and u['cameraDaLuta'] is not True:
         raise ValueError(f'{name}.ultra.cameraDaLuta: true (or leave it out)')
     if 'ULTRA_SEQ' not in animations:
@@ -912,6 +920,9 @@ def compile_packs(root, results, alterados=None, medir=False):
             scene += ('.withFlight(new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('voo', []))+'},'
                       +ints('deCabeca')+','+ints('bracos')+','
                       +('new float[]{'+','.join(f(v) for v in u['quedaFinal'])+'}' if 'quedaFinal' in u else 'null')+')')
+        if 'penas' in u:
+            scene += ('.withFeathers(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('espelho', []))+'},'
+                      +q(u['penas']['estouro'])+','+(q(u['penas']['redemoinho']) if 'redemoinho' in u['penas'] else 'null')+')')
         if 'alem' in u:
             scene += '.withCross('+f(u['alem'])+')'
         if 'alcance' in u:

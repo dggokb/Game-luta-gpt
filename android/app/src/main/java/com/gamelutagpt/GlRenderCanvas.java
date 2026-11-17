@@ -120,6 +120,9 @@ final class GlRenderCanvas implements RenderCanvas {
         // passagem; a cor que o branco vira no lado aceso, no lado de sombra e nos pés).
         "uniform vec4 uNova; uniform vec4 uNovaLuz; uniform vec4 uNovaSombra; uniform vec4 uNovaChao;\n" +
         M_UNIFORMS +
+        // A aura do SHINKAI (Filtro.aura; uAura: ligada, corte, tempo, célula do ruído em pixels;
+        // uAuraO: os pés em pixels da janela, y para cima, e a altura do corpo em pixels).
+        "uniform vec4 uAura; uniform highp vec4 uAuraO;\n" +
         "uniform highp vec3 uRecorte[32]; uniform int uNRecorte;\n" +
         "in highp vec2 vUv; in vec4 vCor; in highp float vTipo;\n" +
         "out vec4 cor;\n" +
@@ -135,6 +138,18 @@ final class GlRenderCanvas implements RenderCanvas {
         "vec3 rgb(vec3 c) {\n" +
         "  vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0);\n" +
         "  return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);\n" +
+        "}\n" +
+        // Ruído de valor liso (o da aura): bolhas de borda redonda depois do corte.
+        "highp float auraHash(highp vec2 p) {\n" +
+        "  p = fract(p * vec2(0.1031, 0.1030));\n" +
+        "  p += dot(p, p.yx + 33.33);\n" +
+        "  return fract((p.x + p.y) * p.x);\n" +
+        "}\n" +
+        "highp float auraRuido(highp vec2 p) {\n" +
+        "  highp vec2 i = floor(p), f = fract(p);\n" +
+        "  f = f * f * (3.0 - 2.0 * f);\n" +
+        "  return mix(mix(auraHash(i), auraHash(i + vec2(1.0, 0.0)), f.x),\n" +
+        "             mix(auraHash(i + vec2(0.0, 1.0)), auraHash(i + vec2(1.0, 1.0)), f.x), f.y);\n" +
         "}\n" +
         "vec3 troca(vec3 s) {\n" +
         "  vec3 h = hsv(s);\n" +
@@ -207,6 +222,51 @@ final class GlRenderCanvas implements RenderCanvas {
         "        }\n" +
         "      }\n" +
         "      t = vec4(u.rgb * u.a, u.a);\n" +
+        // Aura (uLuz.zw: o balanço para os lados e a subida, em uv). O quadro vem desenhado uma
+        // subida acima (GameView.drawShinkaiAura) e o desenho é lido no lugar dele. Cada ponto mede
+        // a que distância o corpo está embaixo dele (d, em frações da subida, balançando pelo
+        // ruído); colado no corpo a chama é cheia, e quanto mais longe mais o ruído que sobe come:
+        // sobram línguas de ponta redonda (onde o ruído é alto) e gotas soltas acima delas.
+        "      if (uAura.x > 0.5) {\n" +
+        "        highp vec2 r = (gl_FragCoord.xy - uAuraO.xy) / uAura.w;\n" +
+        "        highp vec2 pp = vec2(r.x * 1.6, r.y * 0.45 - uAura.z);\n" +
+        "        highp float n = 0.65 * auraRuido(pp) + 0.35 * auraRuido(pp * 2.3 + vec2(5.2, 1.3));\n" +
+        "        n = smoothstep(0.22, 0.78, n);\n" +
+        "        highp float n2 = auraRuido(vec2(r.x * 0.7 + 3.1, r.y * 0.35 - uAura.z * 0.8));\n" +
+        "        float d = 2.0;\n" +
+        "        for (int i = 0; i <= 11; i++) {\n" +
+        "          float fi = float(i) / 11.0;\n" +
+        // O rastro (uLuz.y) inclina a chama inteira para trás de quem anda, como a de uma vela que
+        // se move, e entorta mais na ponta.
+        "          highp vec2 uv = vUv + vec2((n2 - 0.5) * 2.0 * uLuz.z * fi + uLuz.y * (0.4 * fi + 0.6 * fi * fi), uLuz.w * (fi - 1.0));\n" +
+        "          float dentro = step(uLuzRet.y, uv.y) * step(uv.y, uLuzRet.w) * step(uLuzRet.x, uv.x) * step(uv.x, uLuzRet.z);\n" +
+        "          float ai = dentro * texture(uTex, clamp(uv, uLuzRet.xy, uLuzRet.zw)).a;\n" +
+        // Entre dois pontos a borda do corpo cai pelo alfa: a distância sai lisa, sem degraus.
+        "          d = min(d, mix(2.0, fi + (1.0 - ai) / 11.0, step(0.04, ai)));\n" +
+        "        }\n" +
+        "        highp float h = (gl_FragCoord.y - uAuraO.y) / max(uAuraO.z, 1.0);\n" +
+        "        float lim = uAura.y + 1.0 * d + 0.3 * clamp(h - 0.85, 0.0, 1.0);\n" +
+        // uAuraO.w: a maciez da borda (o halo de fora some aos poucos; as de dentro, lisas). Perto da
+        // borda a chama clareia (o brilho da beirada), e os pontinhos brancos (uLuzCor.x: a fração
+        // das células com um) sobem junto com o ruído.
+        "        float mac = max(uAuraO.w, 0.04);\n" +
+        "        float e = n - lim;\n" +
+        // Longe do corpo (perto do fim da subida) tudo some aos poucos: o halo macio não acaba reto.
+        "        float aa = uCor[3][3] * (1.0 - smoothstep(0.6, 0.98, d)) * smoothstep(-mac, mac, e);\n" +
+        // Perto das beiradas do quadro a aura some aos poucos (inclinada pelo rastro, ela chegava
+        // até a beirada e acabava numa linha reta).
+        "        highp vec2 bq = (vUv - uLuzRet.xy) / max(uLuzRet.zw - uLuzRet.xy, vec2(1e-6));\n" +
+        "        aa *= smoothstep(0.0, 0.14, min(bq.x, 1.0 - bq.x)) * smoothstep(0.0, 0.08, bq.y);\n" +
+        "        vec3 cc = mix(u.rgb, min(u.rgb * 1.35 + 0.12, vec3(1.0)), (1.0 - smoothstep(0.0, 0.22, e)) * 0.55);\n" +
+        "        if (uLuzCor.x > 0.0) {\n" +
+        "          highp vec2 g = pp * vec2(2.6, 4.2);\n" +
+        "          highp vec2 cel = floor(g);\n" +
+        "          highp vec2 fr = fract(g) - 0.5 - (vec2(auraHash(cel + 7.0), auraHash(cel + 13.0)) - 0.5) * 0.5;\n" +
+        "          float pt = step(1.0 - uLuzCor.x, auraHash(cel + 31.0)) * smoothstep(0.16, 0.07, length(fr * vec2(1.0, 0.7)));\n" +
+        "          cc = mix(cc, vec3(1.0), pt * smoothstep(0.0, 0.1, e));\n" +
+        "        }\n" +
+        "        t = vec4(cc * aa, aa);\n" +
+        "      }\n" +
         // Contorno: onde é transparente e um vizinho a uContornoR é corpo, um fio da cor por fora.
         "      if (uContorno.w > 0.5) {\n" +
         "        highp vec2 rc = uContornoR, dc = rc * 0.7071;\n" +
@@ -279,12 +339,12 @@ final class GlRenderCanvas implements RenderCanvas {
     /** Um programa e onde ficam os uniforms dele. */
     private static final class Programa {
         int id, uTela, uTex, uTexto, uDegrade, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca;
-        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uNormalLiga;
+        int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uNormalLiga, uAura, uAuraO;
         int uNova, uNovaLuz, uNovaSombra, uNovaChao;
     }
     private Programa completo, enxuto, prog;
     private int programa, uTela, uCor, uCorSoma, uFiltro, uInverte, uRecorte, uNRecorte, uTroca, vbo, vao;
-    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uNormalLiga;
+    private int uLuz, uLuzCor, uLuzPes, uLuzRet, uContorno, uContornoR, uNormalLiga, uAura, uAuraO;
     private int uNova, uNovaLuz, uNovaSombra, uNovaChao;
 
     /** Textura de todos os textos (2048x2048) e de todos os degradês (uma linha cada). */
@@ -396,6 +456,8 @@ final class GlRenderCanvas implements RenderCanvas {
         p.uLuzRet = GLES30.glGetUniformLocation(p.id, "uLuzRet");
         p.uContorno = GLES30.glGetUniformLocation(p.id, "uContorno");
         p.uContornoR = GLES30.glGetUniformLocation(p.id, "uContornoR");
+        p.uAura = GLES30.glGetUniformLocation(p.id, "uAura");
+        p.uAuraO = GLES30.glGetUniformLocation(p.id, "uAuraO");
         // -1 no shader sem o normal map (o que vale quando a placa recusa o com mapa).
         p.uNormalLiga = GLES30.glGetUniformLocation(p.id, "uNormalLiga");
         p.uNova = GLES30.glGetUniformLocation(p.id, "uNova");
@@ -419,7 +481,7 @@ final class GlRenderCanvas implements RenderCanvas {
         programa = p.id;
         uTela = p.uTela; uCor = p.uCor; uCorSoma = p.uCorSoma; uFiltro = p.uFiltro; uInverte = p.uInverte; uTroca = p.uTroca;
         uLuz = p.uLuz; uLuzCor = p.uLuzCor; uLuzPes = p.uLuzPes; uLuzRet = p.uLuzRet;
-        uContorno = p.uContorno; uContornoR = p.uContornoR;
+        uContorno = p.uContorno; uContornoR = p.uContornoR; uAura = p.uAura; uAuraO = p.uAuraO;
         uNormalLiga = p.uNormalLiga;
         uNova = p.uNova; uNovaLuz = p.uNovaLuz; uNovaSombra = p.uNovaSombra; uNovaChao = p.uNovaChao;
         uRecorte = p.uRecorte; uNRecorte = p.uNRecorte;
@@ -973,10 +1035,23 @@ final class GlRenderCanvas implements RenderCanvas {
         // A cor alternativa (Filtro.corAlternativa) vem nos 4 números depois da matriz.
         if (m.length >= 24) GLES30.glUniform4f(uTroca, m[20], m[21], m[22], m[23]);
         else GLES30.glUniform4f(uTroca, 0f, 0f, 0f, 0f);
+
         // A luz do cenário: só no filtro já preparado para um quadro da folha (luzDoQuadro).
         int L = Filtro.LUZ;
         boolean quadro = m.length >= LUZ_QUADRO;
-        if (quadro && m[L] > 0.5f) {
+        boolean aura = quadro && m[L] > 2.5f;
+        if (aura) {
+            // A aura (Filtro.aura): sem luz do cenário; o balanço e a subida em uv vão no uLuz.zw.
+            GLES30.glUniform4f(uLuz, 0f, m[Filtro.COM_LUZ + 6], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
+            GLES30.glUniform4f(uLuzCor, m[Filtro.CONTORNO], 0f, 0f, 0f);
+            GLES30.glUniform4f(uAura, 1f, m[L + 1], m[L + 2], m[L + 3]);
+            GLES30.glUniform4f(uAuraO, m[L + 4], alturaTela - m[L + 5], m[L + 6], m[L + 8]);
+        } else {
+            GLES30.glUniform4f(uAura, 0f, 0f, 0f, 0f);
+        }
+        if (aura) {
+            // já foi
+        } else if (quadro && m[L] > 0.5f) {
             GLES30.glUniform4f(uLuz, m[L] > 1.5f ? 2f : 1f, m[L + 4], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
             GLES30.glUniform4f(uLuzCor, m[L + 1], m[L + 2], m[L + 3], 1f);
             GLES30.glUniform4f(uLuzPes, m[L + 7], m[L + 8], m[L + 9], 1f);
@@ -1128,6 +1203,15 @@ final class GlRenderCanvas implements RenderCanvas {
         q[Filtro.COM_LUZ + 7] = contorno * Math.abs((sb - st) / (bt - top)) / t.altura;
         if (m[Filtro.LUZ] < 0.5f) {
             // Sem luz do cenário: só o contorno.
+        } else if (m[Filtro.LUZ] > 2.5f) {
+            // A aura: a subida (px da janela) em uv do quadro, e o balanço para os lados (30% dela).
+            float esc = (float)Math.sqrt(Math.abs(det));
+            float sobe = m[Filtro.LUZ + 7] / esc;
+            q[Filtro.COM_LUZ] = 0.3f * sobe * Math.abs((sr - sl) / (r - l)) / t.largura;
+            q[Filtro.COM_LUZ + 1] = sobe * Math.abs((sb - st) / (bt - top)) / t.altura;
+            // O rastro (px da janela, no sentido do movimento) em uv do quadro, com o sinal: o
+            // quadro espelhado anda ao contrário na folha.
+            q[Filtro.COM_LUZ + 6] = Math.abs(a) > 1e-6f ? m[Filtro.LUZ + 9] / a * ((sr - sl) / (r - l)) / t.largura : 0f;
         } else if (m[Filtro.LUZ] > 1.5f) {
             // Sombra: o raio da penumbra na ponta, em uv, igual nos dois eixos (em texels).
             float raio = m[Filtro.LUZ + 4] * Math.abs(sb - st);

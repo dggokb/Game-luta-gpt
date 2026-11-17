@@ -570,7 +570,9 @@ final class AttackDefinition {
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
             if (m.poisonDamage > 0 && m.poisonFrames < 1) throw new IllegalArgumentException(name + "poison needs frames");
             if (m.repel && m.counter == Reads.NONE) throw new IllegalArgumentException(name + "a repel is a counter stance");
-            if (m.counter != Reads.NONE && (kind != Kind.NORMAL || m.counterEnd >= startup)) {
+            // O Super de contra-golpe (o Espelho do Lago da Yin-lu) bate corpo a corpo, com golpes.
+            boolean meleeSuper = kind == Kind.SUPER && strikes != null && strikes.length > 0;
+            if (m.counter != Reads.NONE && ((kind != Kind.NORMAL && !meleeSuper) || m.counterEnd >= startup)) {
                 throw new IllegalArgumentException(name + "a counter stance is a melee move that reads before its strike");
             }
             return new AttackDefinition(this);

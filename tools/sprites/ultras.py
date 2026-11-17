@@ -13,6 +13,10 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     explosao  [quadro, frente, altura, ângulo] da explosão desenhada pelo jogo
     camera    planos fixos [quadro, frente, altura, zoom] da sequência (corte seco de um para o outro)
     zanzoken  [de, até] em que ela some (deixa a imagem para trás) e reaparece
+    espelho   [de, até] em que o desenho de quem bate vira para o outro lado (atrás do rival)
+    penas     {"estouro": efeito, "redemoinho": efeito}: o sumiço é um estouro de penas (onde some
+              e onde reaparece, sem a imagem que fica) e o redemoinho gira em volta do rival
+              (o Mil Penas da Yin-lu)
     recuo     [quadro, distância] em que ela reaparece longe do rival (px do jogo para trás)
     cameraDaLuta  sem os closes do Ultra: a câmera da luta segue os dois
     voo       [quadro, frente, altura(, giro em graus)] do desenho de quem bate (o p13 sobe, gira e
@@ -57,7 +61,10 @@ MAX_GAP = 6          # quadros do vídeo: pose parada ainda ganha um quadro a ca
 # Folha: altura e largura da célula, raiz e densidade (1: a folha do Ultra é longa e fica na memória
 # a luta inteira; HD custaria ~60 MB por personagem).
 SHEET = {
-    'p02': dict(celula=352, largura=576, raiz='210,330', densidade=1, peNoChao=True),
+    # p02 (Mil Penas, 17/11): o final salta (célula alta, sem pé no chão) e a palma girando abre os
+    # braços; a escala dos vídeos H3 dela.
+    'p02': dict(celula=416, largura=640, raiz='250,394', densidade=1, fixar='video',
+                escala=(0.4173, 'mesma escala dos vídeos H3 da p02')),
     'p03': dict(celula=352, largura=576, raiz='210,330', densidade=1, peNoChao=True),
     'p04': dict(celula=352, largura=576, raiz='210,330', densidade=1, peNoChao=True),
     # p05: o sumiço (rastro borrado) é a pose da investida e tem poucos pixels.
@@ -175,6 +182,11 @@ def timeline(spec, picked, speed):
         ultra['quedaFinal'] = spec['quedaFinal']
     if spec.get('alem'):
         ultra['alem'] = spec['alem']
+    # Mil Penas da Yin-lu: o desenho virado (ela atrás do rival) e os efeitos de penas.
+    if spec.get('espelho'):
+        ultra['espelho'] = [[at(a), at(b)] for a, b in spec['espelho']]
+    if spec.get('penas'):
+        ultra['penas'] = spec['penas']
     if spec.get('alcance'):
         ultra['alcance'] = spec['alcance']
     return durations, ultra

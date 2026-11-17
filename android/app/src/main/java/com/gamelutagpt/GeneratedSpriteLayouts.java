@@ -430,6 +430,12 @@ final class GeneratedSpriteLayouts {
     static final int P02_SPECIAL_S4_ROOT_Y = 577;
     static final int P02_SPECIAL_S4_FRAME_COUNT = 20;
 
+    static final int P02_SUPER_ESPELHO_FRAME_WIDTH = 454;
+    static final int P02_SUPER_ESPELHO_FRAME_HEIGHT = 519;
+    static final int P02_SUPER_ESPELHO_ROOT_X = 226;
+    static final int P02_SUPER_ESPELHO_ROOT_Y = 505;
+    static final int P02_SUPER_ESPELHO_FRAME_COUNT = 36;
+
     static final int P02_SUPER_WAVE_FRAME_WIDTH = 738;
     static final int P02_SUPER_WAVE_FRAME_HEIGHT = 519;
     static final int P02_SUPER_WAVE_ROOT_X = 211;
@@ -448,11 +454,11 @@ final class GeneratedSpriteLayouts {
     static final int P02_THROW_ROOT_Y = 470;
     static final int P02_THROW_FRAME_COUNT = 17;
 
-    static final int P02_ULTRA_SEQ_FRAME_WIDTH = 569;
-    static final int P02_ULTRA_SEQ_FRAME_HEIGHT = 468;
-    static final int P02_ULTRA_SEQ_ROOT_X = 181;
-    static final int P02_ULTRA_SEQ_ROOT_Y = 451;
-    static final int P02_ULTRA_SEQ_FRAME_COUNT = 35;
+    static final int P02_ULTRA_SEQ_FRAME_WIDTH = 223;
+    static final int P02_ULTRA_SEQ_FRAME_HEIGHT = 333;
+    static final int P02_ULTRA_SEQ_ROOT_X = 94;
+    static final int P02_ULTRA_SEQ_ROOT_Y = 311;
+    static final int P02_ULTRA_SEQ_FRAME_COUNT = 59;
 
     static final int P02_VICTORY_FRAME_WIDTH = 370;
     static final int P02_VICTORY_FRAME_HEIGHT = 457;

@@ -71,6 +71,8 @@ final class CombatEngine {
         int strike;
         /** Crossup: o golpe pegou atrás de quem bate (ele passou por cima do rival). */
         boolean cruzou;
+        /** A resposta do contra-golpe: não é troca (o golpe lido não chegou), as pancadas seguem. */
+        boolean resposta;
     }
 
     /**
@@ -1671,9 +1673,20 @@ final class CombatEngine {
         f.state.addSuperMeter(amount);
     }
 
+    /**
+     * O Super de contra-golpe que passou da janela sem ler nada: pula para o fim do desenho (ela sai da
+     * postura) em vez de soltar as palmas no vazio. A barra já foi gasta.
+     */
+    private boolean superParryMissed(CombatFighter f) {
+        AttackDefinition a = f.attack;
+        return a != null && a.kind == AttackDefinition.Kind.SUPER && a.mechanics.parry && !f.countered &&
+            f.attackFrame > a.mechanics.counterEnd && f.attackFrame < a.totalFrames - config.superParryMissFrames;
+    }
+
     private void endFinishedStates(CombatFighter f) {
         switch (f.status) {
             case ATTACK:
+                if (superParryMissed(f)) f.attackFrame = f.attack.totalFrames - config.superParryMissFrames;
                 if (f.hitCutFrame >= 0 && f.attackFrame >= f.hitCutFrame && f.attackFrame < f.attack.totalFrames - 1) {
                     // Corte da recuperação: o rival atordoado (acerto ou defesa) perde o mesmo tanto.
                     CombatFighter rival = fighters[1 - f.index];
@@ -5524,6 +5537,7 @@ final class CombatEngine {
         answer.defender = a;
         answer.attack = d.attack;
         answer.hitbox = 0;
+        answer.resposta = true;
         applyContact(answer);
     }
 
@@ -5552,6 +5566,7 @@ final class CombatEngine {
 
     /** The defender's own melee strike reaches the attacker in this same step (a trade). */
     private boolean trades(Contact c) {
+        if (c.resposta) return false;
         for (Contact other : contacts) {
             if (other != c && other.projectile == null && other.attacker == c.defender && other.defender == c.attacker) {
                 return true;

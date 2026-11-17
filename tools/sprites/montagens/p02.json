@@ -555,5 +555,27 @@
         "impacto": 7
       }
     }
+  },
+  "super_espelho": {
+    "_doc": "Super Espelho do Lago (17/11, vídeo super do dono): Super de contra-golpe. Da guarda (0-12) sobe na postura da garça (15-18) e espera numa perna, de asas abertas (18-39: a janela que lê o golpe do rival); desvia com a mão em círculo (42-45, com o arco branco do vídeo), desce na base larga (48) e solta as palmas (51-75), recolhe (78-84) e empurra com as duas palmas (87-108, com a faísca do vídeo no 87), volta à guarda (111-123). Sem sem_efeitos (come o cabelo prateado dela). O motor pula para o desvio quando lê o golpe; sem nada para ler, ela sai da postura (fim do vídeo).",
+    "trechos": [
+      [
+        "super",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0,4,8,12,15,18,24,30,36,39,42,44,45,47,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,96,102,108,111,114,117,123",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true,
+      "densidade": 2,
+      "nitidez": true
+    },
+    "animacoes": {
+      "SUPER_WAVE": {
+        "impacto": 11
+      }
+    }
   }
 }

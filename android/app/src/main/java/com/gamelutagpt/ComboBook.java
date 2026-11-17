@@ -98,7 +98,7 @@ final class ComboBook {
             }
         } else if ("H".equals(current)) {
             AttackDefinition h = c.attack("H");
-            if (h.cancelsInto("SUPER") && c.fighter.hasSuperAttack()) route.add("SUPER");
+            if (h.cancelsInto("SUPER") && c.fighter.hasSuperAttack() && !counterSuper(c)) route.add("SUPER");
             else if (h.cancelsInto("S") && c.fighter.energy != null) route.add("S");
         }
         return route;
@@ -173,5 +173,11 @@ final class ComboBook {
 
     static char button(String step) {
         return step.charAt(step.length() - 1);
+    }
+
+    /** O Super é contra-golpe (o Espelho do Lago da Yin-lu): só sai se o rival bater, não fecha combo. */
+    static boolean counterSuper(CharacterDefinition c) {
+        AttackDefinition sup = c.attack("SUPER");
+        return sup != null && sup.mechanics.counter != AttackDefinition.Reads.NONE;
     }
 }
