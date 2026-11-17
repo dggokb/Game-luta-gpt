@@ -11,6 +11,8 @@ vira transparência, como no efeito_imagem.py) e daí seguem para o efeito_video
     --quadros   quais quadros do vídeo, na ordem: "0-32:3" (de 0 a 32, um a cada 3) e/ou soltos,
                 separados por vírgula: "0,1,2,6,48-84:6"
     --borda N   o efeito some aos poucos nos N px da beira do quadro (brilho cortado pelo vídeo)
+    --chama     com --opaco: o fogo colorido (o pavio da bomba) fica pelo brilho, sem a borda escura
+    --borda-lados N  só dos lados (o anel de choque e as penas da garça que o vídeo corta)
     --borda-cima N  só em cima (a coluna de luz da garça que o vídeo corta no topo; o chão fica)
     --opaco     desenho opaco no preto (a bomba, os tomates, a luva da Bonnie): só o preto puro do
                 fundo some, ligado por conectividade à borda (o preto dentro do contorno fica), e a
@@ -44,21 +46,38 @@ def lista(texto):
     return quadros
 
 
-def opaco(quadro, rgba):
+def opaco(quadro, rgba, chama=False):
     """Desenho opaco: o fundo é o quase-preto ligado à borda do quadro; o resto fica inteiro, na cor
-    do vídeo. O que é só brilho (fora do desenho) mantém o alfa do brilho."""
+    do vídeo. O que é só brilho (fora do desenho) mantém o alfa do brilho. Com chama, o colorido
+    (o fogo do pavio da bomba e o brilho escuro em volta) fica no brilho e só o cinza é opaco."""
     escuro = (quadro.max(2) < 22).astype(np.uint8)
     n, rotulos = cv2.connectedComponents(escuro, connectivity=4)
     borda = set(np.unique(np.concatenate([rotulos[0], rotulos[-1], rotulos[:, 0], rotulos[:, -1]])))
     fundo = np.isin(rotulos, [r for r in borda]) & (escuro > 0)
     corpo = ~fundo
     # Sólido: contorno e cor saturada, ou bem visível; o meio-escuro difuso (fumaça do holofote) fica no brilho.
-    solido = corpo & ((quadro.max(2) - quadro.min(2) > 40) | (quadro.max(2) < 60) | (quadro.max(2) > 140))
+    satura = quadro.max(2).astype(int) - quadro.min(2)
+    if chama:
+        # Cinza de verdade (saturação baixa também em relação ao brilho): o vermelho bem escuro em
+        # volta da chama, (30, 0, 0), não entra.
+        solido = corpo & (satura <= 40) & (satura <= 0.45 * quadro.max(2) + 6)
+        # Só o que é grosso (o corpo da bomba): o anel fino e escuro em volta da chama fica no brilho.
+        grosso = cv2.morphologyEx(solido.astype(np.uint8), cv2.MORPH_OPEN, np.ones((13, 13), np.uint8))
+        grosso = cv2.dilate(grosso, np.ones((5, 5), np.uint8)) > 0
+        solido = solido & grosso
+    else:
+        solido = corpo & ((satura > 40) | (quadro.max(2) < 60) | (quadro.max(2) > 140))
     solido = cv2.morphologyEx(solido.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
     out = rgba.copy()
     out[solido, :3] = quadro[solido] / 255.0
     out[solido, 3] = 1.0
     out[fundo, 3] = 0.0
+    if chama:
+        # O brilho escuro em volta da chama some (sobre o holofote branco ele virava um contorno
+        # escuro serrilhado, o "fogo estourado" do dono, 17/11): só o fogo claro fica.
+        brilho = ~solido & ~fundo
+        claro = np.clip((quadro.max(2).astype(np.float32) - 70.0) / 110.0, 0.0, 1.0)
+        out[brilho, 3] = np.minimum(out[brilho, 3], claro[brilho])
     return out
 
 
@@ -69,6 +88,8 @@ def main():
     p.add_argument('--quadros', required=True)
     p.add_argument('--borda', type=int, default=0)
     p.add_argument('--borda-cima', type=int, default=0)
+    p.add_argument('--borda-lados', type=int, default=0)
+    p.add_argument('--chama', action='store_true')
     p.add_argument('--opaco', action='store_true')
     a, resto = p.parse_known_args()
     cap = cv2.VideoCapture(a.video)
@@ -83,12 +104,16 @@ def main():
             quadro = todos[min(i, len(todos) - 1)]
             rgba = ei.recortar_fundo(Image.fromarray(quadro), 'preto')
             if a.opaco:
-                rgba = opaco(quadro, rgba)
+                rgba = opaco(quadro, rgba, a.chama)
             if a.borda:
                 alto, largo = rgba.shape[:2]
                 yy, xx = np.mgrid[0:alto, 0:largo]
                 beira = np.minimum.reduce([xx, yy, largo - 1 - xx, alto - 1 - yy]) / float(a.borda)
                 rgba[..., 3] *= np.clip(beira, 0.0, 1.0)
+            if a.borda_lados:
+                largo = rgba.shape[1]
+                xx = np.arange(largo)[None, :]
+                rgba[..., 3] *= np.clip(np.minimum(xx, largo - 1 - xx) / float(a.borda_lados), 0.0, 1.0) ** 1.5
             if a.borda_cima:
                 yy = np.arange(rgba.shape[0])[:, None] / float(a.borda_cima)
                 rgba[..., 3] *= np.clip(yy, 0.0, 1.0) ** 1.5

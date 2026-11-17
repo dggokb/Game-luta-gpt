@@ -338,11 +338,11 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         up = min(up, h - down)
     out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
     if opts.get('sem_verde'):
-        sem_verde(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
+        sem_verde(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png', opts.get('fogo'))
     return out.strip().splitlines()[0]
 
 
-def sem_verde(caminho):
+def sem_verde(caminho, fogo=None):
     """Tira o verde do fundo que fica no fogo meio transparente (a aura do Ultra SHINKAI do p15):
     o verde de cada pixel não passa do maior entre vermelho e azul (o amarelo do fogo fica, o
     amarelo-esverdeado da borda vira amarelo; branco, pele e cabelo não mudam)."""
@@ -351,8 +351,14 @@ def sem_verde(caminho):
     g = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]))
     # O amarelo puro do fogo meio transparente lê como verde-limão sobre o cenário: puxa para o
     # laranja onde o azul é pouco (fogo); pele, branco e cabelo têm azul e não mudam.
-    fogo = rgb[..., 2] < g * 0.6
-    a[..., 1] = np.where(fogo, np.minimum(g, rgb[..., 0] * 0.86), g).astype(np.uint8)
+    fogo_px = rgb[..., 2] < g * 0.6
+    a[..., 1] = np.where(fogo_px, np.minimum(g, rgb[..., 0] * 0.86), g).astype(np.uint8)
+    if fogo is not None:
+        # "fogo": o quanto do fogo fica (o dono, 17/11: a aura da p15 estourada): o fogo amarelo
+        # (não o corpo, que tem azul) fica meio transparente e mais laranja.
+        chama = fogo_px & (rgb[..., 0] > 150)
+        a[..., 3] = np.where(chama, a[..., 3] * float(fogo), a[..., 3]).astype(np.uint8)
+        a[..., 1] = np.where(chama, a[..., 1] * 0.74, a[..., 1]).astype(np.uint8)
     Image.fromarray(a, 'RGBA').save(caminho)
 
 

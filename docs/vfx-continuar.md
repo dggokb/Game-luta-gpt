@@ -1958,3 +1958,19 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   3x). "Fica uma mancha branca no chão": a luz dos dois efeitos saiu e a cauda de penas do
   mergulho encurtou (`--quadros 10-76:2`).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 17/11: fogo da Natisuko, corte lateral da garça, fogo da bomba
+
+- **"A Natisuko não está fazendo a animação de Ultra Shinkai":** a aura estourada tinha virado
+  "sem fogo" (só a guarda). O fogo voltou: a opção nova `fogo` do `personagem.py` (com
+  `sem_verde`) deixa o fogo amarelo a 88% e puxa para o laranja (verde x0,74); o corpo, que tem
+  azul, não muda. A 55% o fogo virava barro marrom sobre o fundo escuro. Cuidado: a receita gravada
+  do clipe (`tools/sprites/clips/p15_ultra_dragao.json`) guardava o `sem_efeitos` da tentativa
+  anterior; tirei de lá.
+- **"A garça no final aparece recorte lateral":** o anel de choque e as penas do fim ocupam a
+  largura inteira do vídeo; `--borda-lados 260` (novo no `efeito_video_preto.py`) esfuma só os lados.
+- **"O fogo da bomba está estourado":** com `--opaco` o brilho vermelho-escuro em volta da chama
+  ficava opaco (ou meio escuro) e, sobre o holofote branco, virava um contorno preto serrilhado.
+  `--chama` (novo, com `--opaco`): opaco só o cinza de verdade e grosso (o corpo da bomba); o fogo
+  colorido vem pelo brilho e o brilho escuro (máximo < 70) some.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
