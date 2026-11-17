@@ -269,16 +269,18 @@ camera(972, 1.15, 'centro', 0.2)
 
 # ------------------------------------------------------------------ Troca 4: alta velocidade
 # Socos fracos e médios trocados cada vez mais rápido; a cada aceleração os dois socam juntos e
-# um STAMP (os socos cruzando, cada vez mais de perto) bate.
+# um STAMP bate: as três artes de velocidade do dono (06, 07 e 08 da pasta STAMP/RYUGA_VS_KOGA_2,
+# cada uma mais rápida) e, nas duas últimas acelerações, a 08 cada vez mais de perto.
 R.k(980, 'LAND:3', -20, curva='corte')
 K.k(980, 'LAND:2', 310, curva='corte')
 arrancar(990, 998, -20, -70, 310, 70)
-RECORTES = [
-    [0.0, 0.0, 1.0, 1.0],
-    [0.02, 0.08, 0.66, 0.72],
-    [0.38, 0.05, 1.0, 0.67],
-    [0.22, 0.28, 0.78, 0.84],
-    [0.3, 0.36, 0.7, 0.76],
+# (a arte, o recorte): stamp_treino6 é a 06, stamp_treino7 a 07 e stamp_treino5 a 08.
+SOCOS = [
+    (6, None),
+    (7, None),
+    (5, None),
+    (5, [0.12, 0.05, 0.88, 0.81]),
+    (5, [0.28, 0.22, 0.72, 0.66]),
 ]
 SEGURA = [0.55, 0.45, 0.38, 0.32, 0.3]
 q = 1000
@@ -303,7 +305,9 @@ for bloco, periodo in enumerate([14, 11, 8, 6, 5]):
     K.k(q, 'MEDIUM_KICK:3', 70)
     R.k(q + 3, 'MEDIUM_KICK:6', -58, curva='sai', rastro=3)
     K.k(q + 3, 'MEDIUM_KICK:6', 58, curva='sai', rastro=3)
-    impacto(q + 3, 'ryuga', 1, stamp=stamp(5, recorte=RECORTES[bloco], segundos=SEGURA[bloco]))
+    arte, recorte = SOCOS[bloco]
+    extra = {'recorte': recorte} if recorte else {}
+    impacto(q + 3, 'ryuga', 1, stamp=stamp(arte, segundos=SEGURA[bloco], **extra))
     q += 8
 
 # ------------------------------------------------------------------ O grito
@@ -312,12 +316,18 @@ camera(q, 1.5, 'centro', 0.15)
 linhas(q, 'concentracao', escuro=0.35)
 fala(q + 4, 'ryuga', 'AHHHHHHHHHHHHHH!', segura=0.2)
 fala(q + 44, 'koga', 'AHHHHHHHHHHHHHH!', segura=0.2)
+# No grito a troca não para de bater STAMP (dono, 17/11: "tem uma parte que ficou sem stamp"):
+# o Ryūga gritando, o Kōga gritando e os punhos, closes das artes de velocidade.
+GRITO = {3: (5, [0.06, 0.18, 0.58, 0.7]), 9: (5, [0.44, 0.18, 0.96, 0.7]), 15: (7, [0.25, 0.22, 0.75, 0.72])}
 for i in range(18):
     golpe, prepara, estica = ('LIGHT_JAB', 2, 5) if i % 2 == 0 else ('MEDIUM_KICK', 3, 6)
     R.k(q, f'{golpe}:{prepara}', -70)
     K.k(q, f'{golpe}:{prepara}', 70)
     R.k(q + 2, f'{golpe}:{estica}', -60, curva='sai', rastro=2)
     K.k(q + 2, f'{golpe}:{estica}', 60, curva='sai', rastro=2)
+    if i in GRITO:
+        arte, recorte = GRITO[i]
+        impacto(q + 2, 'ryuga', 1, stamp=stamp(arte, recorte=recorte, segundos=0.3))
     q += 5
 linhas(q)
 camera(q, 1.1, 'centro', 0.3)
