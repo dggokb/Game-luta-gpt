@@ -159,11 +159,13 @@ São imagens largas (1774×887), cada uma uma página de um quadro só. O
 - **ep04, depois da 53:** `pag17_ryuga` / `pag17_koga` (Drive 54 de cada irmão: os irmãos se
   encontram depois das quartas) e `pag18` (Drive 55, comum: os magnatas e "a aposta vai ser alta").
 - **ep05, Ryūga:** `pag1_ryuga` a `pag4_ryuga` (Drive 56 a 59: a lembrança do dojo e do túmulo, o
-  "Ryuga... Ryuga..." e a Yín-lù acordando o Ryūga). O Kōga ainda não tem as páginas dele.
+  "Ryuga... Ryuga..." e a Yín-lù acordando o Ryūga).
+- **ep05, Kōga:** `pag1_koga` a `pag4_koga` (Drive 56 a 59 da pasta Koga: o Kōga criança chorando
+  pelo pai no dojo, o Ryūga chamando para brincar, "homem não chora!" e o Brucy no cais).
 - **ep05, comuns:** `pag5` a `pag7` (Drive 60 a 62: o patriarca nos corredores, a sala dele e a
   promessa "derrotem RYŪGA e vocês entram no lugar da dupla dele"). Na 62, o nome em vermelho é
   o do irmão escolhido: a página tem um passo para cada irmão (`"destaque"` aceita uma lista de pedaços).
-- **ep05, a ponte:** `pag8_p05`, `pag8_p11` e `pag8_p13` (Drive 63_1, 63_2 e 62_3): `"ponte": "p05"`
+- **ep05, a ponte:** `pag8_p05`, `pag8_p11` e `pag8_p13` (Drive 63_1, 63_2 e 63_3): `"ponte": "p05"`
   faz o passo tocar só quando essa dupla embosca na ponte (`Campanha.vale`). O
   `TorneioTest.ep05MostraQuemEmboscaNaPonte` confere.
 - Depois delas segue o rascunho de antes (a noite, a fala do irmão e a luta da emboscada), até
