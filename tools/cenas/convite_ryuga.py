@@ -50,10 +50,14 @@ def impacto(q, quem, forca, **kw):
 
 
 # Os STAMP: nos golpes fortes, o quadro de mangá do golpe bate na tela no contato, com a cena
-# congelada embaixo, e sai; a cena continua. As imagens são a arte do golpe em mangá
-# (stamp_ryugaN.jpg em ep02/); a referência de poses de cada uma sai do testeQte do PC.
+# congelada embaixo, e sai; a cena continua. As imagens são a arte do dono (17/11,
+# stamp_ryugaN.jpg em ep02/); RYUGA_NA_ARTE diz de que lado o Ryūga está em cada uma: se na luta
+# ele está do outro lado, o quadro bate espelhado.
+RYUGA_NA_ARTE = {1: 'esquerda', 2: 'esquerda', 3: 'esquerda', 4: 'direita', 5: 'direita'}
+
+
 def stamp(n, **kw):
-    return dict(imagem=f'ep02/stamp_ryuga{n}.jpg', **kw)
+    return dict(imagem=f'ep02/stamp_ryuga{n}.jpg', ryugaNaArte=RYUGA_NA_ARTE[n], **kw)
 
 
 # O último STAMP é o primeiro quadro da página que vem depois da luta (os dois ofegantes,
@@ -381,7 +385,7 @@ linhas(1062, 'concentracao', escuro=0.45, segundos=0.05)
 impacto(1068, 'jogador', 3, stamp=stamp(5, segundos=1.1, rotacao=-3))
 lenta(1068, antes=8, depois=6, valor=0.3)
 ev(1068, 'clarao', segundos=0.05)
-letreiro(1068, 'IMPACTO!', [0.5, 0.4], 190, tremor=18, cor='#FF5A3C', segundos=0.9)
+letreiro(1068, 'IMPACTO!', [0.3, 0.2], 125, tremor=14, rotacao=-10, cor='#FF5A3C', segundos=0.9)
 efeito(1069, 'rival', 'fumaca_queda_v01', escala=1.5)
 linhas(1070, segundos=0.4)
 camera(1070, 1.0, 'centro', 2.2)
