@@ -194,6 +194,41 @@ final class Filtro {
             0, 0, 0, 1, 0};
     }
 
+    /** O modo da aura no lugar da luz do cenário ({@code m[LUZ]}: 1 contraluz, 2 sombra, 3 aura). */
+    static final float MODO_AURA = 3f;
+
+    /**
+     * Uma camada da aura do SHINKAI (só no OpenGL; o dono, 17/11: a referência do Jujutsu Kaisen):
+     * labaredas na cor {@code argb} que sobem do próprio desenho do quadro. Cada ponto pega o
+     * desenho que está até {@code subida} pixels embaixo dele (balançando para os lados pelo
+     * ruído), e um ruído que sobe ({@code tempo}, em células) come o resultado; o que vem de mais
+     * longe do corpo some antes, e as labaredas afinam até a ponta. {@code corte}: quanto some (mais
+     * alto, labaredas mais finas). O ruído fica preso ao lutador: {@code ox, oy} são os pés em
+     * pixels da janela (y para baixo), {@code celula} o tamanho de uma célula e {@code altura} a do
+     * corpo, em pixels; acima da cabeça o corte sobe. {@code maciez}: a borda passa de cheia a
+     * transparente nessa faixa do ruído (0,02 chapada; 0,25 um halo que some aos poucos). No
+     * Canvas é a silhueta lisa.
+     */
+    static Filtro aura(int argb, float corte, float tempo, float ox, float oy, float celula, float altura, float subida,
+                       float maciez) {
+        float a = (argb >>> 24) / 255f;
+        float[] m = new float[COM_LUZ];
+        m[4] = (argb >> 16) & 0xFF;
+        m[9] = (argb >> 8) & 0xFF;
+        m[14] = argb & 0xFF;
+        m[18] = a;
+        m[LUZ] = MODO_AURA;
+        m[LUZ + 1] = corte;
+        m[LUZ + 2] = tempo;
+        m[LUZ + 3] = celula;
+        m[LUZ + 4] = ox;
+        m[LUZ + 5] = oy;
+        m[LUZ + 6] = altura;
+        m[LUZ + 7] = subida;
+        m[LUZ + 8] = maciez;
+        return new Filtro(new PorterDuffColorFilter(argb, PorterDuff.Mode.SRC_IN), m);
+    }
+
     /** MULTIPLY com uma cor opaca: o desenho tingido por ela. */
     static Filtro multiplica(int rgb) {
         return new Filtro(new PorterDuffColorFilter(0xFF000000 | rgb, PorterDuff.Mode.MULTIPLY), new float[] {

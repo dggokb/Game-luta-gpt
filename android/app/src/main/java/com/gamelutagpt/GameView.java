@@ -6565,7 +6565,10 @@ public class GameView extends SurfaceView
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
         // No reflexo do chão não: eram mais 10 cópias do lutador por quadro, quase invisíveis ali.
-        if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) drawShinkaiOutline(c, renderer, f, visualY);
+        if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) {
+            if (AURA_CHAMA && c instanceof CanvasGl) drawShinkaiAura((CanvasGl)c, renderer, f, visualY);
+            else drawShinkaiOutline(c, renderer, f, visualY);
+        }
         Filtro look = renderer.override() == null ? superLook(f) : null;
         // Contra-golpe: quem apanhou pisca em vermelho (como no FighterZ), sem efeito a mais.
         if (look == null && renderer.override() == null && engine.frame() < contraPiscaAte[f.index & 1] &&
@@ -7064,6 +7067,65 @@ public class GameView extends SurfaceView
             r.draw(c, f.x + (float)Math.cos(a) * rad, visualY + (float)Math.sin(a) * rad, f.facing, false, false);
         }
         r.setOverride(null);
+    }
+
+    /**
+     * A aura do SHINKAI em labaredas (o dono, 17/11: "as auras do Shinkai baseadas nas do Jujutsu
+     * Kaisen", com a foto da energia ciano de borda redonda, halo azul-escuro e gotas soltas). Só no
+     * OpenGL; no Canvas fica o contorno de antes. Desligada até o dono aprovar no vídeo
+     * ({@code -Dgameluta.auraChama=true} liga para gravar).
+     */
+    static final boolean AURA_CHAMA = Boolean.getBoolean("gameluta.auraChama");
+    /**
+     * As camadas da aura, de fora para dentro: escala da silhueta em volta dos pés (largura,
+     * altura), quanto da cor do tipo vai para o escuro (−) ou para o branco (+), opacidade, corte do
+     * ruído, um desvio no tempo (cada camada com o seu desenho de labaredas), a subida das
+     * labaredas (fração da altura do corpo) e a maciez da borda (o halo de fora some aos poucos).
+     */
+    private static final float[][] AURA_CAMADAS = {
+        {1.08f, 1.045f, -0.45f, 0.65f, 0.05f, 0.0f, 0.34f, 0.30f},
+        {1.035f, 1.02f, 0.00f, 1.00f, 0.25f, 3.7f, 0.20f, 0.02f},
+        {1.012f, 1.008f, 0.55f, 1.00f, 0.42f, 7.1f, 0.10f, 0.02f},
+    };
+    /** O azul-marinho do halo de fora (o escuro da referência). */
+    private static final int AURA_ESCURO = 0x061430;
+    /** Tamanho de uma célula do ruído e a altura do corpo, em px do mundo; a subida, em células por segundo. */
+    private static final float AURA_CELULA = 24f, AURA_SUBIDA = 2.4f;
+    private final float[] auraJanela = new float[3];
+
+    private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+        float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        int frame = engine.frame();
+        if (left < 0.2f && (frame / 3) % 3 == 0) return;
+        int cor = f.state.corShinkai() & 0xFFFFFF;
+        c.paraJanela(f.x, visualY, auraJanela);
+        float px = auraJanela[2];
+        float altura = f.character().visualStandHeight * px;
+        // O desenho anda de dois em dois (12 por segundo), como a animação de anime.
+        float tempo = (frame / 5) * (5f / 60f) * AURA_SUBIDA;
+        for (int i = 0; i < AURA_CAMADAS.length; i++) {
+            float[] k = AURA_CAMADAS[i];
+            int rgb = k[2] < 0f ? misturar(cor, AURA_ESCURO, -k[2]) : misturar(cor, 0xFFFFFF, k[2]);
+            int argb = (Math.round(k[3] * 255f) << 24) | rgb;
+            r.setOverride(Filtro.aura(argb, k[4], tempo + k[5], auraJanela[0], auraJanela[1], AURA_CELULA * px, altura,
+                k[6] * altura, k[7]));
+            c.save();
+            c.scale(k[0], k[1], f.x, visualY);
+            // Uma subida acima: o shader lê o desenho no lugar dele e as labaredas ganham espaço
+            // acima do quadro (sem isso elas batiam no topo do quadro e saíam cortadas retas).
+            c.translate(0f, -k[6] * f.character().visualStandHeight);
+            r.draw(c, f.x, visualY, f.facing, false, false);
+            c.restore();
+        }
+        r.setOverride(null);
+    }
+
+    /** A cor {@code de} levada {@code k} (0 a 1) em direção a {@code para}. */
+    private static int misturar(int de, int para, float k) {
+        int r = Math.round(((de >> 16) & 0xFF) + (((para >> 16) & 0xFF) - ((de >> 16) & 0xFF)) * k);
+        int g = Math.round(((de >> 8) & 0xFF) + (((para >> 8) & 0xFF) - ((de >> 8) & 0xFF)) * k);
+        int b = Math.round((de & 0xFF) + ((para & 0xFF) - (de & 0xFF)) * k);
+        return (r << 16) | (g << 8) | b;
     }
 
     /** SPEED no SHINKAI: imagens residuais na cor do tipo onde ele esteve (só andando ou correndo). */

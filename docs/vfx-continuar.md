@@ -1730,6 +1730,26 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   (`Projectile.rajada`); acerto e defesa usam os da Onda.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Aura do SHINKAI em labaredas (17/11)
+
+- **Pedido:** "as auras do Shinkai queria fazer baseadas nas auras do Jujutsu Kaisen", com a foto da
+  energia ciano (corpo chapado, pontas redondas que pingam, halo azul-escuro, pontinhos brancos),
+  "todos que já têm a cor definida do shinkai". Escolheu o caminho que acompanha o desenho ("não dá
+  pra ser vídeo porque ele tem que se adaptar ao movimento") e "faz sua versão". Na primeira versão
+  (a silhueta aumentada e comida pelo ruído): "parece muito silhueta ainda".
+- **Feito:** `GameView.drawShinkaiAura`, só no OpenGL (no Canvas fica o contorno de antes): três
+  camadas do próprio quadro (o halo escuro de borda macia, a cor do tipo, a cor clareada) com o
+  `Filtro.aura` (modo 3 no lugar da luz do cenário). No shader (`uAura`, `uAuraO`), cada ponto mede
+  a que distância o corpo está embaixo dele (12 leituras, balançando pelo ruído) e o ruído que sobe,
+  preso aos pés do lutador e andando de dois em dois quadros, come mais quanto mais longe do corpo:
+  sobram labaredas que saem do corpo e afinam. Cada camada é desenhada uma subida acima e lida no
+  lugar (sem isso as labaredas batiam no topo do quadro da folha e saíam cortadas retas). A cor é a
+  do SHINKAI de cada um (`corShinkai`).
+- **Desligada** (`AURA_CHAMA`; `-Dgameluta.auraChama=true` liga para gravar) até ele aprovar
+  `android/app/build/sprite-review/aura_shinkai_chama.mp4` (o Ryūga parado, andando e batendo).
+  Falta: os pontinhos brancos da referência, ver em outros personagens e medir no celular (são três
+  desenhos a mais por lutador com 12 leituras cada).
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
