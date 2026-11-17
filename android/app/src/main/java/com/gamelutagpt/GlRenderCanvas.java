@@ -236,7 +236,7 @@ final class GlRenderCanvas implements RenderCanvas {
         "        float d = 2.0;\n" +
         "        for (int i = 0; i <= 11; i++) {\n" +
         "          float fi = float(i) / 11.0;\n" +
-        "          highp vec2 uv = vUv + vec2((n2 - 0.5) * 2.0 * uLuz.z * fi, uLuz.w * (fi - 1.0));\n" +
+        "          highp vec2 uv = vUv + vec2(((n2 - 0.5) * 2.0 * uLuz.z + uLuz.y) * fi, uLuz.w * (fi - 1.0));\n" +
         "          float dentro = step(uLuzRet.y, uv.y) * step(uv.y, uLuzRet.w) * step(uLuzRet.x, uv.x) * step(uv.x, uLuzRet.z);\n" +
         "          float ai = dentro * texture(uTex, clamp(uv, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         // Entre dois pontos a borda do corpo cai pelo alfa: a distância sai lisa, sem degraus.
@@ -244,10 +244,21 @@ final class GlRenderCanvas implements RenderCanvas {
         "        }\n" +
         "        highp float h = (gl_FragCoord.y - uAuraO.y) / max(uAuraO.z, 1.0);\n" +
         "        float lim = uAura.y + 1.0 * d + 0.3 * clamp(h - 0.85, 0.0, 1.0);\n" +
-        // uAuraO.w: a maciez da borda (o halo de fora some aos poucos; as de dentro são chapadas).
-        "        float mac = max(uAuraO.w, 0.02);\n" +
-        "        float aa = uCor[3][3] * step(d, 1.5) * smoothstep(lim - mac, lim + mac, n);\n" +
-        "        t = vec4(u.rgb * aa, aa);\n" +
+        // uAuraO.w: a maciez da borda (o halo de fora some aos poucos; as de dentro, lisas). Perto da
+        // borda a chama clareia (o brilho da beirada), e os pontinhos brancos (uLuzCor.x: a fração
+        // das células com um) sobem junto com o ruído.
+        "        float mac = max(uAuraO.w, 0.04);\n" +
+        "        float e = n - lim;\n" +
+        "        float aa = uCor[3][3] * step(d, 1.5) * smoothstep(-mac, mac, e);\n" +
+        "        vec3 cc = mix(u.rgb, min(u.rgb * 1.35 + 0.12, vec3(1.0)), (1.0 - smoothstep(0.0, 0.22, e)) * 0.55);\n" +
+        "        if (uLuzCor.x > 0.0) {\n" +
+        "          highp vec2 g = pp * vec2(2.6, 4.2);\n" +
+        "          highp vec2 cel = floor(g);\n" +
+        "          highp vec2 fr = fract(g) - 0.5 - (vec2(auraHash(cel + 7.0), auraHash(cel + 13.0)) - 0.5) * 0.5;\n" +
+        "          float pt = step(1.0 - uLuzCor.x, auraHash(cel + 31.0)) * smoothstep(0.16, 0.07, length(fr * vec2(1.0, 0.7)));\n" +
+        "          cc = mix(cc, vec3(1.0), pt * smoothstep(0.0, 0.1, e));\n" +
+        "        }\n" +
+        "        t = vec4(cc * aa, aa);\n" +
         "      }\n" +
         // Contorno: onde é transparente e um vizinho a uContornoR é corpo, um fio da cor por fora.
         "      if (uContorno.w > 0.5) {\n" +
@@ -1024,7 +1035,8 @@ final class GlRenderCanvas implements RenderCanvas {
         boolean aura = quadro && m[L] > 2.5f;
         if (aura) {
             // A aura (Filtro.aura): sem luz do cenário; o balanço e a subida em uv vão no uLuz.zw.
-            GLES30.glUniform4f(uLuz, 0f, 0f, m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
+            GLES30.glUniform4f(uLuz, 0f, m[Filtro.COM_LUZ + 6], m[Filtro.COM_LUZ], m[Filtro.COM_LUZ + 1]);
+            GLES30.glUniform4f(uLuzCor, m[Filtro.CONTORNO], 0f, 0f, 0f);
             GLES30.glUniform4f(uAura, 1f, m[L + 1], m[L + 2], m[L + 3]);
             GLES30.glUniform4f(uAuraO, m[L + 4], alturaTela - m[L + 5], m[L + 6], m[L + 8]);
         } else {
@@ -1190,6 +1202,9 @@ final class GlRenderCanvas implements RenderCanvas {
             float sobe = m[Filtro.LUZ + 7] / esc;
             q[Filtro.COM_LUZ] = 0.3f * sobe * Math.abs((sr - sl) / (r - l)) / t.largura;
             q[Filtro.COM_LUZ + 1] = sobe * Math.abs((sb - st) / (bt - top)) / t.altura;
+            // O rastro (px da janela, no sentido do movimento) em uv do quadro, com o sinal: o
+            // quadro espelhado anda ao contrário na folha.
+            q[Filtro.COM_LUZ + 6] = Math.abs(a) > 1e-6f ? m[Filtro.LUZ + 9] / a * ((sr - sl) / (r - l)) / t.largura : 0f;
         } else if (m[Filtro.LUZ] > 1.5f) {
             // Sombra: o raio da penumbra na ponta, em uv, igual nos dois eixos (em texels).
             float raio = m[Filtro.LUZ + 4] * Math.abs(sb - st);

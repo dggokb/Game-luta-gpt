@@ -7080,18 +7080,28 @@ public class GameView extends SurfaceView
      * As camadas da aura, de fora para dentro: escala da silhueta em volta dos pés (largura,
      * altura), quanto da cor do tipo vai para o escuro (−) ou para o branco (+), opacidade, corte do
      * ruído, um desvio no tempo (cada camada com o seu desenho de labaredas), a subida das
-     * labaredas (fração da altura do corpo) e a maciez da borda (o halo de fora some aos poucos).
+     * labaredas (fração da altura do corpo), a maciez da borda (o halo de fora some aos poucos),
+     * quanto o rastro do movimento pesa nela (a de fora fica mais para trás) e os pontinhos brancos.
      */
     private static final float[][] AURA_CAMADAS = {
-        {1.08f, 1.045f, -0.45f, 0.65f, 0.05f, 0.0f, 0.34f, 0.30f},
-        {1.035f, 1.02f, 0.00f, 1.00f, 0.25f, 3.7f, 0.20f, 0.02f},
-        {1.012f, 1.008f, 0.55f, 1.00f, 0.42f, 7.1f, 0.10f, 0.02f},
+        {1.08f, 1.045f, -0.45f, 0.65f, 0.05f, 0.0f, 0.34f, 0.35f, 1.0f, 0.0f},
+        {1.035f, 1.02f, 0.00f, 1.00f, 0.25f, 3.7f, 0.20f, 0.06f, 0.8f, 0.10f},
+        {1.012f, 1.008f, 0.55f, 1.00f, 0.42f, 7.1f, 0.10f, 0.05f, 0.5f, 0.0f},
     };
     /** O azul-marinho do halo de fora (o escuro da referência). */
     private static final int AURA_ESCURO = 0x061430;
     /** Tamanho de uma célula do ruído e a altura do corpo, em px do mundo; a subida, em células por segundo. */
     private static final float AURA_CELULA = 24f, AURA_SUBIDA = 2.4f;
     private final float[] auraJanela = new float[3];
+    /**
+     * O rastro da aura (o dono, 17/11: "ela é dura, não segue uma fluidez nos movimentos"): a
+     * velocidade de cada lado, suavizada, em px do mundo por quadro da luta. As labaredas ficam para
+     * trás de quem anda e voltam a subir em pé aos poucos quando ele para.
+     */
+    private final float[] auraVel = new float[2], auraUltimoX = new float[2];
+    private final int[] auraUltimoQuadro = {-1, -1};
+    /** Quadros de movimento que o rastro guarda, e o teto dele (fração da altura do corpo). */
+    private static final float AURA_RASTRO_QUADROS = 9f, AURA_RASTRO_MAX = 0.35f;
 
     private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
@@ -7101,14 +7111,26 @@ public class GameView extends SurfaceView
         c.paraJanela(f.x, visualY, auraJanela);
         float px = auraJanela[2];
         float altura = f.character().visualStandHeight * px;
-        // O desenho anda de dois em dois (12 por segundo), como a animação de anime.
-        float tempo = (frame / 5) * (5f / 60f) * AURA_SUBIDA;
+        float tempo = frame / 60f * AURA_SUBIDA;
+        int lado = f.index & 1;
+        int passou = auraUltimoQuadro[lado] < 0 ? 0 : frame - auraUltimoQuadro[lado];
+        if (passou > 0 && passou < 30) {
+            float alvo = (f.x - auraUltimoX[lado]) / passou;
+            float k = 1f - (float)Math.pow(0.88, passou);
+            auraVel[lado] += (alvo - auraVel[lado]) * k;
+        } else if (passou != 0) {
+            auraVel[lado] = 0f;
+        }
+        auraUltimoX[lado] = f.x;
+        auraUltimoQuadro[lado] = frame;
+        float teto = AURA_RASTRO_MAX * f.character().visualStandHeight;
+        float rastro = Math.max(-teto, Math.min(teto, auraVel[lado] * AURA_RASTRO_QUADROS)) * px;
         for (int i = 0; i < AURA_CAMADAS.length; i++) {
             float[] k = AURA_CAMADAS[i];
             int rgb = k[2] < 0f ? misturar(cor, AURA_ESCURO, -k[2]) : misturar(cor, 0xFFFFFF, k[2]);
             int argb = (Math.round(k[3] * 255f) << 24) | rgb;
             r.setOverride(Filtro.aura(argb, k[4], tempo + k[5], auraJanela[0], auraJanela[1], AURA_CELULA * px, altura,
-                k[6] * altura, k[7]));
+                k[6] * altura, k[7], rastro * k[8], k[9]));
             c.save();
             c.scale(k[0], k[1], f.x, visualY);
             // Uma subida acima: o shader lê o desenho no lugar dele e as labaredas ganham espaço

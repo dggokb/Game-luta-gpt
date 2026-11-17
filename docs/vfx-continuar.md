@@ -1759,9 +1759,16 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   lugar (sem isso as labaredas batiam no topo do quadro da folha e saíam cortadas retas). A cor é a
   do SHINKAI de cada um (`corShinkai`).
 - **Desligada** (`AURA_CHAMA`; `-Dgameluta.auraChama=true` liga para gravar) até ele aprovar
-  `android/app/build/sprite-review/aura_shinkai_chama.mp4` (o Ryūga parado, andando e batendo).
+  o vídeo (o Ryūga parado, andando e batendo).
   Falta: os pontinhos brancos da referência, ver em outros personagens e medir no celular (são três
   desenhos a mais por lutador com 12 leituras cada).
+- **Depois, "ficou bem chapada, meio pixel arte" e "ela é dura, não segue uma fluidez nos movimentos,
+  tipo um rastro leve":** a borda passou a ser lisa (maciez mínima 0,04 do ruído, o halo de fora
+  0,35), a chama clareia perto da beirada, o tempo deixou de andar de dois em dois (corre liso) e
+  entraram os pontinhos brancos (10% das células da camada do meio, subindo com o ruído). O rastro:
+  a velocidade de cada lado suavizada (0,88 por quadro) vezes 9 quadros, no máximo 35% da altura do
+  corpo, entorta as labaredas para trás de quem anda (o halo de fora pesa 1, o meio 0,8, a de dentro
+  0,5); parado, elas voltam a subir em pé aos poucos. Vídeo `aura_shinkai_chama_v2.mp4`.
 
 ## Fora do VFX, o que ficou pendente
 

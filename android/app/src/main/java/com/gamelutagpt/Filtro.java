@@ -206,11 +206,14 @@ final class Filtro {
      * alto, labaredas mais finas). O ruído fica preso ao lutador: {@code ox, oy} são os pés em
      * pixels da janela (y para baixo), {@code celula} o tamanho de uma célula e {@code altura} a do
      * corpo, em pixels; acima da cabeça o corte sobe. {@code maciez}: a borda passa de cheia a
-     * transparente nessa faixa do ruído (0,02 chapada; 0,25 um halo que some aos poucos). No
-     * Canvas é a silhueta lisa.
+     * transparente nessa faixa do ruído (0,05 lisa; 0,35 um halo que some aos poucos). {@code
+     * rastro}: quanto as labaredas ficam para trás do movimento, em pixels da janela, no sentido em
+     * que ele anda (as pontas pegam o corpo desse lado: ficam para trás). {@code brilhos}: a
+     * fração das células com um pontinho branco subindo dentro da chama (0: nenhum). No Canvas é a
+     * silhueta lisa.
      */
     static Filtro aura(int argb, float corte, float tempo, float ox, float oy, float celula, float altura, float subida,
-                       float maciez) {
+                       float maciez, float rastro, float brilhos) {
         float a = (argb >>> 24) / 255f;
         float[] m = new float[COM_LUZ];
         m[4] = (argb >> 16) & 0xFF;
@@ -226,6 +229,9 @@ final class Filtro {
         m[LUZ + 6] = altura;
         m[LUZ + 7] = subida;
         m[LUZ + 8] = maciez;
+        m[LUZ + 9] = rastro;
+        // Nos números da cor do contorno (o contorno fica desligado: a largura, CONTORNO + 3, é 0).
+        m[CONTORNO] = brilhos;
         return new Filtro(new PorterDuffColorFilter(argb, PorterDuff.Mode.SRC_IN), m);
     }
 
