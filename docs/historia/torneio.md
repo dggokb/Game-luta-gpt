@@ -89,6 +89,16 @@ emboscam o jogador à noite, longe da arena. Não é regra do torneio, mas os or
 (os magnatas) assistem e adoram o espetáculo; a chave não muda.
 
 - É sempre uma dupla com golpes: só as duplas prontas ficam no lado do jogador.
+- **Só p05+p06, p11+p12 e p13+p14 emboscam na ponte** (decisão da história, 17/11). As outras
+  não podem voltar a enfrentar o jogador ali. No `torneio.json` elas têm `"ponte": true`, e o
+  sorteio garante a regra em dois passos:
+  - se nenhuma dessas duplas caiu na outra quarta do lado do jogador (vagas 2 e 3 do Ryūga,
+    4 e 5 do Kōga), uma delas, sorteada, troca de vaga com uma das duas (`Torneio.garantirPonte`);
+  - nessa quarta, se só uma das duas é "de ponte", ela perde, e a outra vai para a semifinal.
+    Se as duas são, o vencedor é sorteado, como antes.
+  O porto, as quartas e a semifinal continuam podendo ser qualquer dupla. O
+  `TorneioTest.emboscadaEhQuemPerdeuAOutraQuartaDoLadoDoJogador` confere.
+- A página 63 (ep05) vai depender de quem embosca na ponte (ainda não chegou).
 - O rótulo da luta é **EMBOSCADA**; perder repete a luta, como as outras da história.
 - **Cenário**: o **Caminho dos Penhascos** (`caminho_penhascos`): uma passarela de metal
   sobre um abismo da ilha, à noite, com pontes suspensas, ruínas e andaimes
@@ -125,6 +135,23 @@ No Ryūga toda dupla tem a página dela; o desafio provisório (`pag3_q*`) ficou
 Quando chegar a página de um adversário: grave como `pagN_<irmao>_<dupla>.jpg`, ponha o passo
 com `"irmao"` e `"adversario"` antes da luta (no Kōga, tire também o desafio provisório dele quando
 todas as duplas tiverem página). O `TorneioTest.ep03TemAsPaginasDoAdversarioDoPorto` confere a ordem.
+
+### A dupla do porto no salão (ep04)
+
+Logo depois da página do salão (`pag1`, Drive 38), a dupla que desafiou o jogador no porto
+aparece de perto e o Ryūga e a Yín-lù a reconhecem:
+
+| Porto | Imagem (Drive) | Arquivo |
+|---|---|---|
+| p05 + p06 | 38_01 | `ep04/pag1_porto_p05.jpg` |
+| p07 + p08 | 38_02 | `ep04/pag1_porto_p07.jpg` |
+| p09 + p10 | 38_03 | `ep04/pag1_porto_p09.jpg` |
+| p11 + p12 | 38_04 | `ep04/pag1_porto_p11.jpg` |
+| o Ryūga e a Yín-lù reconhecendo | 38_00 | `ep04/pag1_ryuga_reconhece.jpg` (só no Ryūga) |
+
+São imagens largas (1774×887), cada uma uma página de um quadro só. Ainda faltam a do p13 + p14 e
+a do p16 + p15 (com eles no porto, o salão segue direto) e a do Kōga e do Brucy reconhecendo (no
+Kōga, aparece só a da dupla). O `TorneioTest.ep04MostraADuplaDoPortoNoSalao` confere a ordem.
 
 ### O sorteio em cena (ep04)
 
