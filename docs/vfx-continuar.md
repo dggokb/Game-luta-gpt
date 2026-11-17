@@ -28,6 +28,19 @@ do Ryūga, p01, `art/sprites/source/player_base_heavy_straight_video_normalized.
 textura e o caminho detectado ficam; para voltar, `LIGADO = true`. O teste por erosão continua
 guardado na branch `claude/rastro-erosao` (também desligado lá).
 
+## O estouro de luz atrás do STAMP (17/11, pedido do dono: "mudar esses triângulos do fundo p ficar igual o concept")
+
+Os raios atrás do quadro eram triângulos brancos de contorno preto desenhados por código (contra as
+regras 2 e 12). Agora são imagens geradas no Codex (`art/vfx/stamp_estouro_01..03.png`, pedidos ao
+lado): estilhaços de luz branca com brilho azulado, pontudos e irregulares, saindo de um retângulo
+vazio no meio, como no concept. `tools/cenas/stamp_estouro.py` tira o fundo preto (o brilho vira
+transparência, `recortar_fundo` do `efeito_imagem.py`), acha o buraco do meio de cada uma e grava
+`historia/stamp/estouro_N.webp` e `estouro.json`. No jogo o buraco cai em cima do quadro, a luz
+estoura no contato (nasce 18% menor e abre em 0,06 s) e alterna entre as três de dois em dois
+quadros. O escurecimento da luta atrás do quadro ficou (o dono pediu). Conferido no PC no treino do
+Episódio 1 (`android/pc/build/treino_ep01_estouro.mp4` e `_lenta.mp4`); não visto no celular.
+Esperando o dono julgar no vídeo.
+
 ## STAMP com cara de carimbo (16/11, pedido do dono: "faltou o impacto de carimbo, tá muito PA APARECI")
 
 O STAMP da cinemática (o quadro de mangá que bate no impacto) aparecia num "pop": surgia grande e
