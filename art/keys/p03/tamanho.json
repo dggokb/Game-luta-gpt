@@ -3,6 +3,9 @@
   "altura": 224,
   "chaves": {
     "inicio_centro": 0.5385,
-    "inicio_agachado": 0.5274
+    "inicio_agachado": 0.5274,
+    "inicio_centro_h3": 0.4139,
+    "inicio_esquerda_h3": 0.4139,
+    "inicio_direita_h3": 0.4139
   }
 }

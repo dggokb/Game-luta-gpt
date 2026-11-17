@@ -335,6 +335,11 @@ final class PaginaGuiada {
                 if (b.moldura) c.strokePolygon(screen(b.area), 3f * camS, Baloes.INK);
                 drawBalloonText(c, b);
             }
+            Episodio.Quadro q = quadros.get(i);
+            if (mostraNota(q)) {
+                c.drawText("*", sx(q.notaPos[0] * pageW), sy(q.notaPos[1] * pageH), 44f * camS, 0xFFFFD84A, Baloes.INK,
+                    5f * camS, false);
+            }
         }
     }
 
@@ -452,9 +457,18 @@ final class PaginaGuiada {
         }
     }
 
+    /** A nota (placa pintada na arte) só aparece fora do português: em português a arte já se lê. */
+    private boolean mostraNota(Episodio.Quadro q) {
+        return q.nota != null && !"pt".equals(temporada.idioma());
+    }
+
     private void drawCaption(RenderCanvas c) {
         if (done || !arrived) return;
         String text = temporada.t(current().legenda);
+        if (mostraNota(current())) {
+            String nota = "* " + temporada.t(current().nota);
+            text = text == null ? nota : text + "  " + nota;
+        }
         if (text == null) return;
         float alpha = Tinta.clamp01((time - arrivedAt) / 0.25f);
         if (alpha <= 0f) return;
