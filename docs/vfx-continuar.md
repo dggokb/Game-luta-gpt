@@ -1743,6 +1743,53 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   (`Projectile.rajada`); acerto e defesa usam os da Onda.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
 
+## Aura do SHINKAI em labaredas (17/11)
+
+- **Pedido:** "as auras do Shinkai queria fazer baseadas nas auras do Jujutsu Kaisen", com a foto da
+  energia ciano (corpo chapado, pontas redondas que pingam, halo azul-escuro, pontinhos brancos),
+  "todos que já têm a cor definida do shinkai". Escolheu o caminho que acompanha o desenho ("não dá
+  pra ser vídeo porque ele tem que se adaptar ao movimento") e "faz sua versão". Na primeira versão
+  (a silhueta aumentada e comida pelo ruído): "parece muito silhueta ainda".
+- **Feito:** `GameView.drawShinkaiAura`, só no OpenGL (no Canvas fica o contorno de antes): três
+  camadas do próprio quadro (o halo escuro de borda macia, a cor do tipo, a cor clareada) com o
+  `Filtro.aura` (modo 3 no lugar da luz do cenário). No shader (`uAura`, `uAuraO`), cada ponto mede
+  a que distância o corpo está embaixo dele (12 leituras, balançando pelo ruído) e o ruído que sobe,
+  preso aos pés do lutador e andando de dois em dois quadros, come mais quanto mais longe do corpo:
+  sobram labaredas que saem do corpo e afinam. Cada camada é desenhada uma subida acima e lida no
+  lugar (sem isso as labaredas batiam no topo do quadro da folha e saíam cortadas retas). A cor é a
+  do SHINKAI de cada um (`corShinkai`).
+- **Desligada** (`AURA_CHAMA`; `-Dgameluta.auraChama=true` liga para gravar) até ele aprovar
+  o vídeo (o Ryūga parado, andando e batendo).
+  Falta: os pontinhos brancos da referência, ver em outros personagens e medir no celular (são três
+  desenhos a mais por lutador com 12 leituras cada).
+- **Depois, "ficou bem chapada, meio pixel arte" e "ela é dura, não segue uma fluidez nos movimentos,
+  tipo um rastro leve":** a borda passou a ser lisa (maciez mínima 0,04 do ruído, o halo de fora
+  0,35), a chama clareia perto da beirada, o tempo deixou de andar de dois em dois (corre liso) e
+  entraram os pontinhos brancos (10% das células da camada do meio, subindo com o ruído). O rastro:
+  a velocidade de cada lado suavizada (0,88 por quadro) vezes 9 quadros, no máximo 35% da altura do
+  corpo, entorta as labaredas para trás de quem anda (o halo de fora pesa 1, o meio 0,8, a de dentro
+  0,5); parado, elas voltam a subir em pé aos poucos.
+- **Depois, "ficou bom, mas o rastro ainda não tá legal: tem que ser tipo chama de uma vela quando a
+  gente movimenta a vela":** o rastro virou uma mola amortecida (força 0,07 e freio 0,2 por quadro:
+  ao parar, a chama passa ~15% do ponto, volta e assenta em meio segundo), entorta em curva (a base
+  no corpo, a ponta mais para trás: o deslocamento cresce com o quadrado da distância do corpo) e
+  estica as labaredas até 60% no rastro cheio (teto 40% da altura do corpo). Para o halo não acabar
+  reto, a aura some aos poucos perto do fim da subida e das beiradas do quadro.
+- **Depois, "ainda não", com o conceito:** a chama de uma vela carregada inclina para trás pelo
+  vento contrário e balança a cada passada, sem perder a inclinação. A inclinação ficou bem maior (a
+  velocidade vezes 28 quadros, teto 45% da altura do corpo; antes, andando, mal passava de um terço
+  do teto) e passou a pegar a chama inteira (0,4 da distância do corpo mais 0,6 do quadrado: não só a
+  ponta). Andando, ela varia 35% a 2,8 passadas por segundo; parada, tremula 2,5% da altura do corpo.
+  Vídeo `aura_shinkai_chama_v4.mp4`.
+- **Depois, numa luta ("mostra em uma luta"): "deixa com menos opacidade, ficou muito forte":** as
+  camadas foram de 65/100/100% para 45/70/70%.
+- **Bug achado nesse vídeo (corrigido, fora da aura):** "quem soltou o shinkai foi o Kōga, mas
+  apareceu a animação do Ryūga do nada". O `spawnShinkai` achava quem ativou pela barra cheia
+  (`shinkaiFrames == config.shinkaiFrames`), e a do PERCEPÇÃO fica cheia enquanto o corpo não cansa:
+  a ativação do outro lado tocava de novo o vídeo e a `SHINKAI_ATIVA` do Ryūga. Agora conta as
+  ativações de cada lado (`FighterState.ativacoes`; recomeça no TAG e no round novo). Vídeo
+  `aura_shinkai_luta_v3.mp4`.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
@@ -1774,3 +1821,24 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   `onda_acerto_p02`) e no ar (ela parada no alto, a palma sai de lá). Não visto no celular.
 - **Junto:** os especiais saem também no ar (`docs/combat-engine.md`, "Especiais no ar").
 
+
+## Rodada de 17/11: a ativação do SHINKAI da Natisuko e da Bonnie
+
+- **Pedido:** os vídeos `netsuko_shinkai` e `Bonnite_shinkai` do dono, dos prompts das fichas
+  (`p15.md` e `p16.md`, "Ativação do Shinkai"): a Natisuko vira de frente, o círculo de pincel
+  dourado se desenha atrás e, no kiai, o leque de punhos de luz (os mil socos num só) se abre e se
+  desfaz em fagulhas; a Bonnie vira de frente, tira a cartola de luz ciano, a lebre pula de dentro,
+  corre em volta dela e para no alto no "TA-DA!", estoura num clarão e chove cartas. Regra do dono:
+  bicho só na família Komyo ([shinkai.md](shinkai.md#animação-de-ativação)).
+- **Feito:** como a garça da Yin-lu, o vídeo inteiro virou o efeito `shinkai_p15` e `shinkai_p16`
+  (`efeito_video.py --passo 3 --velocidade 1.5 --escala-mundo E --origem X,733 --resolucao 0.95
+  --segurar Q,800 --alfa-corte 0.45 --borda 120 --chao-y 733`). A escala é medida: a guarda do 1º
+  quadro do vídeo com a altura do idle dela no jogo (p15 0,4417, 589 px no vídeo = 260 no mundo;
+  p16 0,4408, 539 = 238), sem pulo de tamanho na troca do sprite para o vídeo. O vídeo para 0,8 s
+  no pico, onde entra o corte com o nome: o leque de punhos aberto (Q 16, o quadro 48 do vídeo) e
+  o "TA-DA!" com a lebre no alto (Q 21, o 63). Luz na cor do tipo: dourado `#FFE04A` e ciano
+  `#35E0FF`. A câmera dos dois vídeos fica parada (os pés na linha 733 do começo ao fim): sem a
+  correção de zoom da Yin-lu. A `SHINKAI_ATIVA` de cada uma é a guarda do idle com o tempo do
+  efeito (4,3 s).
+- **Ficou:** ele julgar no vídeo. O círculo da Natisuko e o salto da lebre passam do topo do vídeo
+  por alguns quadros (cortados lá; as faixas pretas da cena vão até esse limite). Visto só no PC.

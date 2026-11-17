@@ -60,7 +60,7 @@ emendar, conferidos no motor (`ComboRyugaTest.comboCurtoEmendaEmOutroCombo`):
 |---|---|---|
 | Parede do S3 | L, M, M → S3 (parede) → corre → L, M, M, → + H, S2 | 12 |
 | Assist no meio | L, M, M → TAG (o chute da Yin-lu lança) → super pulo → jL, jM → pulo → jL, jM, ↓jH | 9 |
-| Troca no Super (DHC) | 2L, → + H, S2, Super → DHC (Super da parceira) | 14 |
+| Troca no Super (DHC) | saiu em 17/11: o Super da Yin-lu virou contra-golpe (só sai se o rival bater) | — |
 | Depois do ↓jH, relançando | 2L, M, 2H → super pulo → jL, jM, ↓jH → 2H → super pulo → jL, jM, ↓jH | 10 |
 | Depois do ↓jH, no chão | 2L, M, 2H → super pulo → jL, jM, ↓jH → corre → L, M | 8 |
 

@@ -228,7 +228,9 @@ def validate_mechanics(name, mech, m, projectile):
             frames(key, mech[key])
             if mech[key].get(field) not in allowed:
                 raise ValueError(f'{name}.mecanica.{key}.{field}: one of {allowed}')
-    if 'contra' in mech and (projectile or mech['contra']['frames'][1] >= m['startupFrames']):
+    # O Super de contra-golpe (o Espelho do Lago da Yin-lu, 17/11) bate corpo a corpo: golpes e alcance.
+    melee_super = projectile and 'golpes' in m and 'reach' in m
+    if 'contra' in mech and ((projectile and not melee_super) or mech['contra']['frames'][1] >= m['startupFrames']):
         raise ValueError(f'{name}.mecanica.contra: a melee move that reads before its strike')
     # repele: o repel do S2 da p15 (só bate no que repeliu; projétil na janela se desfaz).
     # apara: o aparar do S3 do Ryūga (só bate no que leu; no vazio não sai golpe).

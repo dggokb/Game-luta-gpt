@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
  *   <li>{@code super:3000} — a barra de Super dos dois times (1000 por barra);</li>
  *   <li>{@code shinkai} — a barra do SHINKAI cheia nos dois times ({@code tecla:P} ativa);</li>
  *   <li>{@code defende} — o rival fica em guarda (segura para trás);</li>
+ *   <li>{@code rivalbate:20} — o rival dá um L daqui a 20 quadros (o contra-golpe);</li>
  *   <li>{@code grava:90:nome} — começa a gravar 90 quadros seguidos enquanto o roteiro continua;
  *       {@code fim} espera a gravação acabar;</li>
  *   <li>{@code rota:L,M,M,S3,W90,C200,S2} — aperta o combo quadro a quadro, como o executor dos
@@ -115,6 +116,10 @@ public final class GravarLuta {
                     // O rival encostado na borda da direita e nós a tantos px: canto:100
                     c.jogo().irParaOCanto(Float.parseFloat(p[1]));
                     c.esperar(0.2);
+                    break;
+                case "rivalbate":
+                    // O rival dá um L daqui a N quadros (o Super de contra-golpe da Yin-lu): rivalbate:20
+                    c.jogo().rivalBate(Integer.parseInt(p[1]));
                     break;
                 case "defende":
                     // O rival segura para trás (em guarda) até o fim do roteiro.

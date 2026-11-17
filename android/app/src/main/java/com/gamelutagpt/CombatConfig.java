@@ -254,6 +254,11 @@ final class CombatConfig {
     /** O rebote (S1 do p14) que errou o primeiro chute: quadros até cair em guarda. */
     int reboundMissFrames = 20;
     /**
+     * O Super de contra-golpe (o Espelho do Lago da Yin-lu) que não leu nada: depois da janela ela
+     * sai da postura em tantos quadros (o fim do desenho, a volta à guarda), sem soltar as palmas.
+     */
+    int superParryMissFrames = 14;
+    /**
      * Repel (S2 da p15) que desfez um projétil: quadros até a aura apagar e ela ficar livre. Sem
      * isso, desfazer a bola custava o golpe inteiro (64 quadros), mais do que defender.
      */

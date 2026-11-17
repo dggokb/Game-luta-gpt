@@ -2093,6 +2093,11 @@ public class GameView extends SurfaceView
             opponentInput.clear();
             opponentInput.direction = engine.fighter(OPPONENT).facing < 0 ? 1 : 5;
         }
+        if (rivalBateEm >= 0) {
+            // PC (GravarLuta, passo rivalbate): o rival parado dá um L depois desse tanto de quadros.
+            opponentInput.clear();
+            if (rivalBateEm-- == 0) opponentInput.light = true;
+        }
         boolean semPoderes = semPoderesNaLuta();
         if (semPoderes || semShinkaiNaLuta()) {
             // O treino e a briga das crianças: SUPER, ULTRA e SHINKAI não saem, de nenhum lado.
@@ -3118,7 +3123,18 @@ public class GameView extends SurfaceView
         String banner = "SHINKAI!";
         for (int side = 0; side < 2; side++) {
             CombatFighter f = engine.fighter(side);
-            if (f.state.shinkaiFrames != engine.config.shinkaiFrames) continue;
+            // Só quem acabou de ativar (mais uma ativação desde a última vez). A barra cheia não
+            // basta: a do PERCEPÇÃO fica cheia enquanto o corpo não cansa, e a ativação do outro
+            // lado tocava de novo a animação dele (o dono, 17/11: "quem soltou o shinkai foi o
+            // Kōga, mas apareceu a animação do Ryūga do nada").
+            // Outro lutador no lado (TAG) ou o round recomeçou (as ativações voltam a zero): conta de novo.
+            if (f.state != shinkaiEstadoVisto[side] || f.state.ativacoes < shinkaiAtivacoesVistas[side]) {
+                shinkaiEstadoVisto[side] = f.state;
+                shinkaiAtivacoesVistas[side] = 0;
+            }
+            boolean nova = f.state.ativacoes > shinkaiAtivacoesVistas[side];
+            shinkaiAtivacoesVistas[side] = f.state.ativacoes;
+            if (!nova || f.state.shinkaiFrames != engine.config.shinkaiFrames) continue;
             int color = f.state.shinkaiCor;
             float x = f.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
             impacts.spawnSuperJump(x, GROUND_Y, color);
@@ -3154,6 +3170,10 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("acerto_s", 1f, 0.7f);
         return banner;
     }
+
+    /** Quantas ativações de SHINKAI de cada lado o spawnShinkai já mostrou. */
+    private final int[] shinkaiAtivacoesVistas = new int[2];
+    private final FighterState[] shinkaiEstadoVisto = new FighterState[2];
 
     /** Quadros (desde o começo da ativação) até o corte de ativação entrar; -1: já entrou. */
     private int corteAtraso = -1, corteLado;
@@ -4082,6 +4102,13 @@ public class GameView extends SurfaceView
     }
 
     private volatile boolean rivalDefende;
+
+    /** PC (passo {@code rivalbate:N}): o rival dá um L daqui a N quadros (o contra-golpe gravado). */
+    public void rivalBate(int quadros) {
+        rivalBateEm = quadros;
+    }
+
+    private volatile int rivalBateEm = -1;
 
     /** PC ({@code gradle :pc:gravarLuta}, passo {@code shinkai}): a barra do SHINKAI cheia nos dois times. */
     public void encherShinkai() {
@@ -6565,7 +6592,10 @@ public class GameView extends SurfaceView
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
         // No reflexo do chão não: eram mais 10 cópias do lutador por quadro, quase invisíveis ali.
-        if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) drawShinkaiOutline(c, renderer, f, visualY);
+        if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) {
+            if (AURA_CHAMA && c instanceof CanvasGl) drawShinkaiAura((CanvasGl)c, renderer, f, visualY);
+            else drawShinkaiOutline(c, renderer, f, visualY);
+        }
         Filtro look = renderer.override() == null ? superLook(f) : null;
         // Contra-golpe: quem apanhou pisca em vermelho (como no FighterZ), sem efeito a mais.
         if (look == null && renderer.override() == null && engine.frame() < contraPiscaAte[f.index & 1] &&
@@ -7064,6 +7094,110 @@ public class GameView extends SurfaceView
             r.draw(c, f.x + (float)Math.cos(a) * rad, visualY + (float)Math.sin(a) * rad, f.facing, false, false);
         }
         r.setOverride(null);
+    }
+
+    /**
+     * A aura do SHINKAI em labaredas (o dono, 17/11: "as auras do Shinkai baseadas nas do Jujutsu
+     * Kaisen", com a foto da energia ciano de borda redonda, halo azul-escuro e gotas soltas). Só no
+     * OpenGL; no Canvas fica o contorno de antes. Desligada até o dono aprovar no vídeo
+     * ({@code -Dgameluta.auraChama=true} liga para gravar).
+     */
+    static final boolean AURA_CHAMA = Boolean.getBoolean("gameluta.auraChama");
+    /**
+     * As camadas da aura, de fora para dentro: escala da silhueta em volta dos pés (largura,
+     * altura), quanto da cor do tipo vai para o escuro (−) ou para o branco (+), opacidade, corte do
+     * ruído, um desvio no tempo (cada camada com o seu desenho de labaredas), a subida das
+     * labaredas (fração da altura do corpo), a maciez da borda (o halo de fora some aos poucos),
+     * quanto o rastro do movimento pesa nela (a de fora fica mais para trás) e os pontinhos brancos.
+     */
+    private static final float[][] AURA_CAMADAS = {
+        {1.08f, 1.045f, -0.45f, 0.45f, 0.05f, 0.0f, 0.34f, 0.22f, 1.0f, 0.0f},
+        {1.035f, 1.02f, 0.00f, 0.70f, 0.25f, 3.7f, 0.20f, 0.06f, 0.8f, 0.10f},
+        {1.012f, 1.008f, 0.55f, 0.70f, 0.42f, 7.1f, 0.10f, 0.05f, 0.5f, 0.0f},
+    };
+    /** O azul-marinho do halo de fora (o escuro da referência). */
+    private static final int AURA_ESCURO = 0x061430;
+    /** Tamanho de uma célula do ruído e a altura do corpo, em px do mundo; a subida, em células por segundo. */
+    private static final float AURA_CELULA = 24f, AURA_SUBIDA = 2.4f;
+    private final float[] auraJanela = new float[3];
+    /**
+     * O rastro da aura (o dono, 17/11: "ela é dura, não segue uma fluidez nos movimentos"): a
+     * velocidade de cada lado, suavizada, em px do mundo por quadro da luta. As labaredas ficam para
+     * trás de quem anda e voltam a subir em pé aos poucos quando ele para.
+     */
+    private final float[] auraRastro = new float[2], auraRastroVel = new float[2], auraUltimoX = new float[2];
+    private final int[] auraUltimoQuadro = {-1, -1};
+    /**
+     * O rastro é uma mola amortecida (a chama de uma vela que se move, o dono, 17/11): puxada para
+     * a velocidade vezes {@link #AURA_RASTRO_QUADROS}, com a força e o freio por quadro da luta.
+     * Andando, a chama fica para trás; parando, ela passa do ponto (~15%), volta e assenta em meio
+     * segundo. O teto é uma fração da altura do corpo; a chama estica até {@link #AURA_ESTICA} a mais
+     * no rastro cheio.
+     */
+    private static final float AURA_RASTRO_QUADROS = 28f, AURA_RASTRO_MAX = 0.45f,
+        AURA_MOLA = 0.07f, AURA_FREIO = 0.2f, AURA_ESTICA = 0.5f;
+    /**
+     * O balanço dos passos (o dono, 17/11: "conforme você dá passos, a velocidade muda a cada
+     * passada e a chama balança, mantendo a inclinação para trás"): andando, a inclinação varia
+     * esta fração dela, nesta frequência (passadas por segundo). Parada, a chama tremula esta
+     * fração da altura do corpo.
+     */
+    private static final float AURA_PASSO = 0.35f, AURA_PASSOS_POR_SEGUNDO = 2.8f, AURA_TREMOR = 0.025f;
+
+    private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+        float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        int frame = engine.frame();
+        if (left < 0.2f && (frame / 3) % 3 == 0) return;
+        int cor = f.state.corShinkai() & 0xFFFFFF;
+        c.paraJanela(f.x, visualY, auraJanela);
+        float px = auraJanela[2];
+        float altura = f.character().visualStandHeight * px;
+        float tempo = frame / 60f * AURA_SUBIDA;
+        int lado = f.index & 1;
+        int passou = auraUltimoQuadro[lado] < 0 ? 0 : frame - auraUltimoQuadro[lado];
+        float teto = AURA_RASTRO_MAX * f.character().visualStandHeight;
+        if (passou > 0 && passou < 30) {
+            float alvo = Math.max(-teto, Math.min(teto, (f.x - auraUltimoX[lado]) / passou * AURA_RASTRO_QUADROS));
+            for (int q = 0; q < passou; q++) {
+                int qq = frame - passou + 1 + q;
+                // O balanço de cada passada, sem tirar a inclinação para trás; e o tremor da chama.
+                float passo = (float)Math.sin(qq * (Math.PI * 2.0 * AURA_PASSOS_POR_SEGUNDO / 60.0));
+                float tremor = (float)(Math.sin(qq * 0.23) * Math.sin(qq * 0.071 + lado)) * AURA_TREMOR
+                    * f.character().visualStandHeight;
+                float alvoQ = alvo * (1f + AURA_PASSO * passo) + tremor;
+                auraRastroVel[lado] += AURA_MOLA * (alvoQ - auraRastro[lado]) - AURA_FREIO * auraRastroVel[lado];
+                auraRastro[lado] += auraRastroVel[lado];
+            }
+        } else if (passou != 0) {
+            auraRastro[lado] = auraRastroVel[lado] = 0f;
+        }
+        auraUltimoX[lado] = f.x;
+        auraUltimoQuadro[lado] = frame;
+        float rastro = auraRastro[lado] * px;
+        float estica = 1f + AURA_ESTICA * Math.min(1f, Math.abs(auraRastro[lado]) / Math.max(1f, teto));
+        for (int i = 0; i < AURA_CAMADAS.length; i++) {
+            float[] k = AURA_CAMADAS[i];
+            int rgb = k[2] < 0f ? misturar(cor, AURA_ESCURO, -k[2]) : misturar(cor, 0xFFFFFF, k[2]);
+            int argb = (Math.round(k[3] * 255f) << 24) | rgb;
+            r.setOverride(Filtro.aura(argb, k[4], tempo + k[5], auraJanela[0], auraJanela[1], AURA_CELULA * px, altura,
+                k[6] * estica * altura, k[7], rastro * k[8], k[9]));
+            c.save();
+            c.scale(k[0], k[1], f.x, visualY);
+            // Uma subida acima: o shader lê o desenho no lugar dele e as labaredas ganham espaço
+            // acima do quadro (sem isso elas batiam no topo do quadro e saíam cortadas retas).
+            c.translate(0f, -k[6] * estica * f.character().visualStandHeight);
+            r.draw(c, f.x, visualY, f.facing, false, false);
+            c.restore();
+        }
+        r.setOverride(null);
+    }
+
+    /** A cor {@code de} levada {@code k} (0 a 1) em direção a {@code para}. */
+    private static int misturar(int de, int para, float k) {
+        int r = Math.round(((de >> 16) & 0xFF) + (((para >> 16) & 0xFF) - ((de >> 16) & 0xFF)) * k);
+        int g = Math.round(((de >> 8) & 0xFF) + (((para >> 8) & 0xFF) - ((de >> 8) & 0xFF)) * k);
+        int b = Math.round((de & 0xFF) + ((para & 0xFF) - (de & 0xFF)) * k);
+        return (r << 16) | (g << 8) | b;
     }
 
     /** SPEED no SHINKAI: imagens residuais na cor do tipo onde ele esteve (só andando ou correndo). */

@@ -430,6 +430,12 @@ final class GeneratedSpriteLayouts {
     static final int P02_SPECIAL_S4_ROOT_Y = 577;
     static final int P02_SPECIAL_S4_FRAME_COUNT = 20;
 
+    static final int P02_SUPER_ESPELHO_FRAME_WIDTH = 454;
+    static final int P02_SUPER_ESPELHO_FRAME_HEIGHT = 519;
+    static final int P02_SUPER_ESPELHO_ROOT_X = 226;
+    static final int P02_SUPER_ESPELHO_ROOT_Y = 505;
+    static final int P02_SUPER_ESPELHO_FRAME_COUNT = 36;
+
     static final int P02_SUPER_WAVE_FRAME_WIDTH = 738;
     static final int P02_SUPER_WAVE_FRAME_HEIGHT = 519;
     static final int P02_SUPER_WAVE_ROOT_X = 211;
