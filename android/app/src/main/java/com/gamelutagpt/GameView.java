@@ -7299,10 +7299,10 @@ public class GameView extends SurfaceView
     /**
      * A aura do SHINKAI em labaredas (o dono, 17/11: "as auras do Shinkai baseadas nas do Jujutsu
      * Kaisen", com a foto da energia ciano de borda redonda, halo azul-escuro e gotas soltas). Só no
-     * OpenGL; no Canvas fica o contorno de antes. Desligada até o dono aprovar no vídeo
-     * ({@code -Dgameluta.auraChama=true} liga para gravar).
+     * OpenGL; no Canvas fica o contorno de antes. Ligada para o dono testar no celular (17/11);
+     * {@code -Dgameluta.auraChama=false} volta ao contorno de antes para comparar.
      */
-    static final boolean AURA_CHAMA = Boolean.getBoolean("gameluta.auraChama");
+    static final boolean AURA_CHAMA = !"false".equals(System.getProperty("gameluta.auraChama"));
     /**
      * As camadas da aura, de fora para dentro: escala da silhueta em volta dos pés (largura,
      * altura), quanto da cor do tipo vai para o escuro (−) ou para o branco (+), opacidade, corte do
