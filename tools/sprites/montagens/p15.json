@@ -648,5 +648,25 @@
         ]
       }
     }
+  },
+  "ultra_dragao": {
+    "_doc": "Ultra SHINKAI, Ichigeki (17/11, vídeo ultra_shinkai do dono): os 36 quadros na ordem da ULTRA_DRAGAO (GameView.DRAGAO_*): a guarda pegando fogo (0-18), o soco (19), o soco esticado com a aura (20-26) e a volta à guarda sem o fogo (27-35). Ela some na cena preta e reaparece com o punho gigante.",
+    "trechos": [
+      [
+        "ultra_shinkai",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0,3,6,9,12,14,16,18,20,22,24,26,28,30,32,34,36,38,41,45,50,54,58,62,66,70,74,78,81,84,87,90,92,94,97,104",
+    "opcoes": {
+      "fixar": "video",
+      "densidade": 2,
+      "nitidez": true,
+      "sem_verde": true
+    },
+    "animacoes": {
+      "ULTRA_DRAGAO": {}
+    }
   }
 }

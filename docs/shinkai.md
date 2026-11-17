@@ -153,7 +153,9 @@ e a Yin-lu (a garça branca, 14/11). Os outros ficam na guarda durante o corte.
 some dentro e leva os golpes), o casulo sobe, a garça mergulha e o crava no chão, e ele quica e cai
 longe (`CombatConfig.ultraGarca`). A Bonnie tem a **Chuva de Tomates** (tudo preto, o rival num
 picadeiro, a plateia joga tomates, a tela fica vermelha e é limpa, a bomba nos pés dele explode:
-`CombatConfig.ultraPalhaco`). A Natisuko (Ichigeki) está na ficha.
+`CombatConfig.ultraPalhaco`). A Natisuko tem o **Ichigeki** (o círculo de pincel fecha no rival,
+punhos de luz de todos os lados, o preto só com as porradas, e o punho gigante desce de cima nele
+deitado e some estourando em partículas: `CombatConfig.ultraIchigeki`).
 
 **O que nasce na ativação (17/11, o dono):** **bicho só na família Komyo** (a escola dos irmãos): o
 dragão do Ryūga, a garça da Yin-lu e o tigre do Kōga. Quem é de fora mostra o próprio jeito: a

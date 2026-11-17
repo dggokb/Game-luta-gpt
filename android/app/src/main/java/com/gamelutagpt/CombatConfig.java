@@ -793,7 +793,7 @@ final class CombatConfig {
      * tamanho da tela sai do punho e atravessa a arena; quem ele pega leva o combo enquanto o corpo
      * passa e voa no último golpe. Os lutadores com esse Ultra SHINKAI (ids, separados por vírgula).
      */
-    String ultraDragao = "player_base,p02,p16";
+    String ultraDragao = "player_base,p02,p15,p16";
     /**
      * Ultra SHINKAI da garça (a Yin-lu, 17/11, o Voo da Garça): no lugar do dragão que atravessa, a
      * garça desce no rival, fecha as asas num casulo (ele some dentro) e leva os golpes; o casulo
@@ -814,6 +814,20 @@ final class CombatConfig {
         palhacoTela = 120, palhacoBomba = 200, palhacoBoom = 241, palhacoQuadros = 320;
     /** Altura do tampo do picadeiro (px): o rival fica em cima. */
     float palhacoAltura = 42f;
+    /**
+     * Ultra SHINKAI da Natisuko (17/11, o Ichigeki, ideia do dono): o círculo de tinta dourado
+     * fecha em volta do rival, os punhos vêm de todos os lados, tudo fica preto só com os golpes,
+     * o rival aparece deitado e o punho gigante desce de cima nele (POFT!) e some estourando em
+     * partículas. Quem tem (ids); também em {@link #ultraDragao}.
+     */
+    String ultraIchigeki = "p15";
+    /**
+     * Quadros da cena: os punhos chegam, o primeiro golpe e o intervalo, o preto (entra), o rival
+     * deitado, o preto sai, o punho gigante começa a descer, o impacto, o fim.
+     */
+    int ichigekiSocos = 24, ichigekiAcerto = 40, ichigekiIntervalo = 14, ichigekiEscuro = 92,
+        ichigekiDeitado = 140, ichigekiClareia = 148, ichigekiPunho = 160, ichigekiImpacto = 193,
+        ichigekiQuadros = 228;
     /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
     float garcaAltura = 260f, garcaEmpurra = 420f;
     /** De onde o dragão parte: à frente do lutador (px), menos {@link #dragaoAtras}. */

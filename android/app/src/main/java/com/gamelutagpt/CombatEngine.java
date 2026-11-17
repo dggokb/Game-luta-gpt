@@ -4772,6 +4772,19 @@ final class CombatEngine {
         return false;
     }
 
+    /** O Ultra SHINKAI do lutador é o Ichigeki da Natisuko ({@link CombatConfig#ultraIchigeki}). */
+    boolean temIchigeki(CharacterDefinition c) {
+        if (c == null || config.ultraIchigeki == null) return false;
+        for (String id : config.ultraIchigeki.split(",")) if (id.trim().equals(c.id)) return true;
+        return false;
+    }
+
+    /** A cena do Ichigeki (com o rival preso): quadro dela (0 em diante), ou -1 fora dela. */
+    int ichigekiCena(CombatFighter a) {
+        if (!a.inUltraDragao() || !temIchigeki(a.character()) || a.dragaoEstado == 2) return -1;
+        return a.ultraFrame < config.ichigekiQuadros ? a.ultraFrame : -1;
+    }
+
     /** A cena preta da Chuva de Tomates: quadro dela (0 em diante), ou -1 fora dela. */
     int palhacoCena(CombatFighter a) {
         if (!a.inUltraDragao() || !temPalhaco(a.character()) || a.dragaoEstado == 2) return -1;
@@ -4803,6 +4816,10 @@ final class CombatEngine {
             superFreeze = Math.max(superFreeze, config.palhacoQuadros);
             return;
         }
+        if (temIchigeki(a.character())) {
+            superFreeze = Math.max(superFreeze, config.ichigekiQuadros);
+            return;
+        }
         if (temGarca(a.character())) {
             // A garça: a luta para a cena inteira e o rival espera ela descer nele.
             superFreeze = Math.max(superFreeze, config.garcaQuadros);
@@ -4829,6 +4846,10 @@ final class CombatEngine {
         }
         if (temPalhaco(a.character())) {
             updatePalhaco(a, d);
+            return;
+        }
+        if (temIchigeki(a.character())) {
+            updateIchigeki(a, d);
             return;
         }
         float origem = a.x + a.facing * config.dragaoOrigem;
@@ -5025,6 +5046,87 @@ final class CombatEngine {
             a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
             a.ultraFrame = 0;
         }
+    }
+
+    /**
+     * O Ichigeki (a Natisuko): o círculo fecha no rival (defendeu ou estava alto: sem a cena); preso
+     * nele, leva os socos de todos os lados, os últimos já no preto; no preto ele cai deitado e,
+     * quando clareia, o punho gigante desce de cima e crava (o golpe final). Ele fica no chão.
+     */
+    private void updateIchigeki(CombatFighter a, CombatFighter d) {
+        if (a.dragaoEstado == 0) {
+            int guard = effectiveGuard(d);
+            if (!d.hittable() || d.ko() || Arena.GROUND_Y - d.y > config.dragaoAltura) {
+                a.dragaoEstado = 2;
+            } else if (guardStops(guard, ultraAttack, false, false)) {
+                block(a, d, ultraAttack, guard, a.facing, false);
+                a.dragaoEstado = 2;
+            } else {
+                ComboSession session = sessionFor(a, d);
+                a.ultraScale = session.scaleFor(ultraAttack, config);
+                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
+                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
+                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
+                a.dragaoEstado = 1;
+                a.dragaoInicio = a.ultraFrame;
+                a.ultraVictim = d;
+                a.ultraVictimState = d.state;
+                cues.add("ULTRA_ICHIGEKI");
+            }
+        }
+        if (a.dragaoEstado == 1) {
+            if (d != a.ultraVictim || d.state != a.ultraVictimState) {
+                a.dragaoEstado = 3;
+            } else if (a.ultraFrame >= config.ichigekiImpacto) {
+                // POFT: o punho crava o rival deitado; ele fica no chão (sem levantar rápido).
+                golpeDoDragao(a, d, a.dragaoDanoFinal, true);
+                deitadoNoIchigeki(d);
+                d.knockdownFrame = config.knockdownFallFrames;
+                a.dragaoEstado = 3;
+                cues.add("ULTRA_FINISH_DRAGAO");
+            } else {
+                int t = a.ultraFrame - config.ichigekiAcerto;
+                int devidos = t < 0 ? 0 : Math.min(config.dragaoAcertos, 1 + t / Math.max(1, config.ichigekiIntervalo));
+                while (a.dragaoAcertos < devidos) {
+                    a.dragaoAcertos++;
+                    golpeDoDragao(a, d, a.dragaoDanoPequeno, false);
+                }
+                d.clearAttack();
+                d.vx = 0f;
+                d.vy = 0f;
+                d.bounce = CombatFighter.BOUNCE_NONE;
+                d.stunProjectile = null;
+                if (a.ultraFrame >= config.ichigekiDeitado) {
+                    // Depois do preto: deitado no chão esperando o punho.
+                    deitadoNoIchigeki(d);
+                } else {
+                    // No círculo: em pé (ou no ar onde estava), parado, levando os socos.
+                    d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+                    d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.ichigekiDeitado - a.ultraFrame + 20);
+                    d.stunElapsed = 0;
+                }
+            }
+        }
+        if (a.dragaoEstado == 1 || a.dragaoEstado == 3) {
+            if (a.ultraFrame == config.ichigekiSocos) cues.add("ULTRA_ICHIGEKI_SOCOS");
+            if (a.ultraFrame == config.ichigekiEscuro) cues.add("ULTRA_ICHIGEKI_ESCURO");
+            if (a.ultraFrame == config.ichigekiPunho) cues.add("ULTRA_ICHIGEKI_PUNHO");
+        }
+        if (a.ultraFrame >= config.ichigekiQuadros || (a.dragaoEstado == 2 && a.ultraFrame >= 30)) {
+            a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+            a.ultraFrame = 0;
+        }
+    }
+
+    /** O rival do Ichigeki deitado no chão (derrubado, sem rolar nem levantar rápido). */
+    private void deitadoNoIchigeki(CombatFighter d) {
+        if (d.status != CombatFighter.Status.KNOCKDOWN) {
+            d.ultraFall = true;
+            knockDown(d);
+        }
+        d.y = Arena.GROUND_Y;
+        d.grounded = true;
+        d.knockdownFrame = config.knockdownFallFrames;
     }
 
     private void golpeDoDragao(CombatFighter a, CombatFighter d, int dano, boolean ultimo) {
