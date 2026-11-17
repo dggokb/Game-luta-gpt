@@ -7107,8 +7107,15 @@ public class GameView extends SurfaceView
      * segundo. O teto é uma fração da altura do corpo; a chama estica até {@link #AURA_ESTICA} a mais
      * no rastro cheio.
      */
-    private static final float AURA_RASTRO_QUADROS = 10f, AURA_RASTRO_MAX = 0.4f,
-        AURA_MOLA = 0.07f, AURA_FREIO = 0.2f, AURA_ESTICA = 0.6f;
+    private static final float AURA_RASTRO_QUADROS = 28f, AURA_RASTRO_MAX = 0.45f,
+        AURA_MOLA = 0.07f, AURA_FREIO = 0.2f, AURA_ESTICA = 0.5f;
+    /**
+     * O balanço dos passos (o dono, 17/11: "conforme você dá passos, a velocidade muda a cada
+     * passada e a chama balança, mantendo a inclinação para trás"): andando, a inclinação varia
+     * esta fração dela, nesta frequência (passadas por segundo). Parada, a chama tremula esta
+     * fração da altura do corpo.
+     */
+    private static final float AURA_PASSO = 0.35f, AURA_PASSOS_POR_SEGUNDO = 2.8f, AURA_TREMOR = 0.025f;
 
     private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
@@ -7125,7 +7132,13 @@ public class GameView extends SurfaceView
         if (passou > 0 && passou < 30) {
             float alvo = Math.max(-teto, Math.min(teto, (f.x - auraUltimoX[lado]) / passou * AURA_RASTRO_QUADROS));
             for (int q = 0; q < passou; q++) {
-                auraRastroVel[lado] += AURA_MOLA * (alvo - auraRastro[lado]) - AURA_FREIO * auraRastroVel[lado];
+                int qq = frame - passou + 1 + q;
+                // O balanço de cada passada, sem tirar a inclinação para trás; e o tremor da chama.
+                float passo = (float)Math.sin(qq * (Math.PI * 2.0 * AURA_PASSOS_POR_SEGUNDO / 60.0));
+                float tremor = (float)(Math.sin(qq * 0.23) * Math.sin(qq * 0.071 + lado)) * AURA_TREMOR
+                    * f.character().visualStandHeight;
+                float alvoQ = alvo * (1f + AURA_PASSO * passo) + tremor;
+                auraRastroVel[lado] += AURA_MOLA * (alvoQ - auraRastro[lado]) - AURA_FREIO * auraRastroVel[lado];
                 auraRastro[lado] += auraRastroVel[lado];
             }
         } else if (passou != 0) {

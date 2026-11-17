@@ -236,9 +236,9 @@ final class GlRenderCanvas implements RenderCanvas {
         "        float d = 2.0;\n" +
         "        for (int i = 0; i <= 11; i++) {\n" +
         "          float fi = float(i) / 11.0;\n" +
-        // O rastro (uLuz.y) entorta em curva, como a chama de uma vela que se move: a base fica no
-        // corpo e a ponta vai mais para trás.
-        "          highp vec2 uv = vUv + vec2((n2 - 0.5) * 2.0 * uLuz.z * fi + uLuz.y * fi * fi, uLuz.w * (fi - 1.0));\n" +
+        // O rastro (uLuz.y) inclina a chama inteira para trás de quem anda, como a de uma vela que
+        // se move, e entorta mais na ponta.
+        "          highp vec2 uv = vUv + vec2((n2 - 0.5) * 2.0 * uLuz.z * fi + uLuz.y * (0.4 * fi + 0.6 * fi * fi), uLuz.w * (fi - 1.0));\n" +
         "          float dentro = step(uLuzRet.y, uv.y) * step(uv.y, uLuzRet.w) * step(uLuzRet.x, uv.x) * step(uv.x, uLuzRet.z);\n" +
         "          float ai = dentro * texture(uTex, clamp(uv, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         // Entre dois pontos a borda do corpo cai pelo alfa: a distância sai lisa, sem degraus.

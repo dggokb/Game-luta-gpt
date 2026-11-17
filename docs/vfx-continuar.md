@@ -1774,8 +1774,13 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   ao parar, a chama passa ~15% do ponto, volta e assenta em meio segundo), entorta em curva (a base
   no corpo, a ponta mais para trás: o deslocamento cresce com o quadrado da distância do corpo) e
   estica as labaredas até 60% no rastro cheio (teto 40% da altura do corpo). Para o halo não acabar
-  reto, a aura some aos poucos perto do fim da subida e das beiradas do quadro. Vídeo
-  `aura_shinkai_chama_v3.mp4`.
+  reto, a aura some aos poucos perto do fim da subida e das beiradas do quadro.
+- **Depois, "ainda não", com o conceito:** a chama de uma vela carregada inclina para trás pelo
+  vento contrário e balança a cada passada, sem perder a inclinação. A inclinação ficou bem maior (a
+  velocidade vezes 28 quadros, teto 45% da altura do corpo; antes, andando, mal passava de um terço
+  do teto) e passou a pegar a chama inteira (0,4 da distância do corpo mais 0,6 do quadrado: não só a
+  ponta). Andando, ela varia 35% a 2,8 passadas por segundo; parada, tremula 2,5% da altura do corpo.
+  Vídeo `aura_shinkai_chama_v4.mp4`.
 
 ## Fora do VFX, o que ficou pendente
 
