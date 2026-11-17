@@ -7084,9 +7084,9 @@ public class GameView extends SurfaceView
      * quanto o rastro do movimento pesa nela (a de fora fica mais para trás) e os pontinhos brancos.
      */
     private static final float[][] AURA_CAMADAS = {
-        {1.08f, 1.045f, -0.45f, 0.65f, 0.05f, 0.0f, 0.34f, 0.22f, 1.0f, 0.0f},
-        {1.035f, 1.02f, 0.00f, 1.00f, 0.25f, 3.7f, 0.20f, 0.06f, 0.8f, 0.10f},
-        {1.012f, 1.008f, 0.55f, 1.00f, 0.42f, 7.1f, 0.10f, 0.05f, 0.5f, 0.0f},
+        {1.08f, 1.045f, -0.45f, 0.45f, 0.05f, 0.0f, 0.34f, 0.22f, 1.0f, 0.0f},
+        {1.035f, 1.02f, 0.00f, 0.70f, 0.25f, 3.7f, 0.20f, 0.06f, 0.8f, 0.10f},
+        {1.012f, 1.008f, 0.55f, 0.70f, 0.42f, 7.1f, 0.10f, 0.05f, 0.5f, 0.0f},
     };
     /** O azul-marinho do halo de fora (o escuro da referência). */
     private static final int AURA_ESCURO = 0x061430;

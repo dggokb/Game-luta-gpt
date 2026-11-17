@@ -1781,6 +1781,8 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   do teto) e passou a pegar a chama inteira (0,4 da distância do corpo mais 0,6 do quadrado: não só a
   ponta). Andando, ela varia 35% a 2,8 passadas por segundo; parada, tremula 2,5% da altura do corpo.
   Vídeo `aura_shinkai_chama_v4.mp4`.
+- **Depois, numa luta ("mostra em uma luta"): "deixa com menos opacidade, ficou muito forte":** as
+  camadas foram de 65/100/100% para 45/70/70%. Vídeo `aura_shinkai_luta_v2.mp4`.
 
 ## Fora do VFX, o que ficou pendente
 
