@@ -1907,3 +1907,29 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   escurece, a Bonnie some, o rival fica no tampo do picadeiro (42 px), sete tomates acertam, a tela
   vermelha cobre o que a câmera mostra, a bomba e no BOOM (quadro 241) o rival voa e o escuro sai.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 17/11: o Ultra SHINKAI da Natisuko (Ichigeki)
+
+- **Pedido (ideia do dono):** o círculo de tinta em volta do rival; mãos socando de todos os lados;
+  tudo preto com os efeitos de porrada (`ultra_shinkai_danos`); o rival caído no chão e o punho
+  gigante vindo de cima para baixo, "POFT!", e o punho some estourando em partículas (corrigido por
+  ele: quem estoura é o punho, não o rival).
+- **Feito:** a animação `ULTRA_DRAGAO` dela (montagem `ultra_dragao`: a aura de fogo e o soco do
+  vídeo `ultra_shinkai`; a opção nova `sem_verde` do `personagem.py` tira o verde do fundo do fogo
+  meio transparente e puxa o amarelo-limão para o laranja). Os efeitos em fundo preto, pelo brilho:
+  `ichigeki_circulo_p15` (`--quadros 4-36:2 --origem 682,391 --escala-mundo 0.55 --fps 36
+  --resolucao 0.6 --segurar 16,1500`), `ichigeki_punhos_p15` (`--quadros 16-100:2 --origem 672,384
+  --escala-mundo 0.5 --resolucao 0.5 --borda 160`), `ichigeki_danos_p15` (`--quadros 8-58:2
+  --escala-mundo 0.5 --fps 30 --borda 60`), `ichigeki_particulas_p15` (o estouro e as partículas do
+  mesmo vídeo, `--quadros 60-94:2 --escala-mundo 0.55 --fps 30 --borda 60`) e `ichigeki_punho_p15`
+  (a entrada do punho, `--quadros 10-30:1 --origem 895,400` nos nós dos dedos, `--escala-mundo 0.5
+  --fps 36 --segurar 20,1000`), tocado girado -90° para descer de cima. A cena (`updateIchigeki`):
+  o círculo fecha no rival no quadro 0 (defendeu: sem a cena), os punhos no 24, sete socos de 40 em
+  diante a cada 14, o preto no 92 (os dois lutadores somem; os danos no preto), o rival deitado no
+  140, o preto sai do 148, o punho desce no 160 e crava no 193: "POFT!", o punho sai da tela e as
+  partículas estouram no lugar dele; o rival fica no chão (queda dura); a cena acaba no 228.
+- **Na primeira gravação o "POFT!" não aparecia** (nem o "BOOOOOM!" da Bonnie): o HUD some na cena
+  do Ultra e a faixa de aviso ia junto. Agora a faixa do meio aparece por cima com o HUD escondido.
+- **Ficou:** ele julgar no vídeo. Visto só no PC. O fogo dela fica como um bloco amarelo meio
+  chapado em volta do corpo (é o fogo do vídeo, sem o verde); se não agradar, o caminho é o vídeo
+  sem o fogo e o fogo como efeito separado.

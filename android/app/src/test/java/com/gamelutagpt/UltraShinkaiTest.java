@@ -192,4 +192,42 @@ public class UltraShinkaiTest {
         assertTrue("o BOOM joga longe", voou);
         assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
     }
+
+    @Test public void oIchigekiDaNatisukoDerrubaORivalEOPunhoCravaDeitado() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p15"), GeneratedCharacters.get("p03"), 400f, 700f);
+        s.f(1).state.life = 1_000_000;
+        transformar(s);
+        assertTrue(s.engine.temIchigeki(s.f(0).character()));
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        CombatConfig c = s.engine.config;
+        int golpes = 0, deitadoAntes = 0, golpesDeitado = 0;
+        boolean punho = false, socos = false, voou = false, deitadoNoFim = false;
+        for (int i = 0; i < 600 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            int q = s.engine.ichigekiCena(s.f(0));
+            boolean deitado = s.f(1).status == CombatFighter.Status.KNOCKDOWN && s.f(1).grounded;
+            if (q >= c.ichigekiClareia && q < c.ichigekiImpacto && deitado) deitadoAntes++;
+            if (s.engine.cues().contains("ULTRA_ICHIGEKI_SOCOS")) socos = true;
+            if (s.engine.cues().contains("ULTRA_ICHIGEKI_PUNHO")) punho = true;
+            if (s.f(1).launched) voou = true;
+            for (CombatEngine.HitEvent h : s.engine.events()) {
+                if (h.attacker != 0 || !"ULTRA".equals(h.moveId) || h.blocked) continue;
+                golpes++;
+                if (deitado) golpesDeitado++;
+            }
+            if (s.engine.cues().contains("ULTRA_FINISH_DRAGAO")) deitadoNoFim = deitado;
+        }
+        assertTrue("os punhos de todos os lados", socos);
+        assertTrue("o punho gigante desceu", punho);
+        assertTrue("deitado esperando o punho: " + deitadoAntes, deitadoAntes > 30);
+        assertEquals("os socos e o punho gigante", c.dragaoAcertos + 1, golpes);
+        assertEquals("o punho crava deitado", 1, golpesDeitado);
+        assertTrue("fica no chão no impacto", deitadoNoFim);
+        assertFalse("o rival não voa", voou);
+        assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
+    }
 }
