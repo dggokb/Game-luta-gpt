@@ -236,7 +236,9 @@ final class GlRenderCanvas implements RenderCanvas {
         "        float d = 2.0;\n" +
         "        for (int i = 0; i <= 11; i++) {\n" +
         "          float fi = float(i) / 11.0;\n" +
-        "          highp vec2 uv = vUv + vec2(((n2 - 0.5) * 2.0 * uLuz.z + uLuz.y) * fi, uLuz.w * (fi - 1.0));\n" +
+        // O rastro (uLuz.y) entorta em curva, como a chama de uma vela que se move: a base fica no
+        // corpo e a ponta vai mais para trás.
+        "          highp vec2 uv = vUv + vec2((n2 - 0.5) * 2.0 * uLuz.z * fi + uLuz.y * fi * fi, uLuz.w * (fi - 1.0));\n" +
         "          float dentro = step(uLuzRet.y, uv.y) * step(uv.y, uLuzRet.w) * step(uLuzRet.x, uv.x) * step(uv.x, uLuzRet.z);\n" +
         "          float ai = dentro * texture(uTex, clamp(uv, uLuzRet.xy, uLuzRet.zw)).a;\n" +
         // Entre dois pontos a borda do corpo cai pelo alfa: a distância sai lisa, sem degraus.
@@ -249,7 +251,12 @@ final class GlRenderCanvas implements RenderCanvas {
         // das células com um) sobem junto com o ruído.
         "        float mac = max(uAuraO.w, 0.04);\n" +
         "        float e = n - lim;\n" +
-        "        float aa = uCor[3][3] * step(d, 1.5) * smoothstep(-mac, mac, e);\n" +
+        // Longe do corpo (perto do fim da subida) tudo some aos poucos: o halo macio não acaba reto.
+        "        float aa = uCor[3][3] * (1.0 - smoothstep(0.6, 0.98, d)) * smoothstep(-mac, mac, e);\n" +
+        // Perto das beiradas do quadro a aura some aos poucos (inclinada pelo rastro, ela chegava
+        // até a beirada e acabava numa linha reta).
+        "        highp vec2 bq = (vUv - uLuzRet.xy) / max(uLuzRet.zw - uLuzRet.xy, vec2(1e-6));\n" +
+        "        aa *= smoothstep(0.0, 0.14, min(bq.x, 1.0 - bq.x)) * smoothstep(0.0, 0.08, bq.y);\n" +
         "        vec3 cc = mix(u.rgb, min(u.rgb * 1.35 + 0.12, vec3(1.0)), (1.0 - smoothstep(0.0, 0.22, e)) * 0.55);\n" +
         "        if (uLuzCor.x > 0.0) {\n" +
         "          highp vec2 g = pp * vec2(2.6, 4.2);\n" +

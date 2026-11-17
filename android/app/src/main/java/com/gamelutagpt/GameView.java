@@ -7084,7 +7084,7 @@ public class GameView extends SurfaceView
      * quanto o rastro do movimento pesa nela (a de fora fica mais para trás) e os pontinhos brancos.
      */
     private static final float[][] AURA_CAMADAS = {
-        {1.08f, 1.045f, -0.45f, 0.65f, 0.05f, 0.0f, 0.34f, 0.35f, 1.0f, 0.0f},
+        {1.08f, 1.045f, -0.45f, 0.65f, 0.05f, 0.0f, 0.34f, 0.22f, 1.0f, 0.0f},
         {1.035f, 1.02f, 0.00f, 1.00f, 0.25f, 3.7f, 0.20f, 0.06f, 0.8f, 0.10f},
         {1.012f, 1.008f, 0.55f, 1.00f, 0.42f, 7.1f, 0.10f, 0.05f, 0.5f, 0.0f},
     };
@@ -7098,10 +7098,17 @@ public class GameView extends SurfaceView
      * velocidade de cada lado, suavizada, em px do mundo por quadro da luta. As labaredas ficam para
      * trás de quem anda e voltam a subir em pé aos poucos quando ele para.
      */
-    private final float[] auraVel = new float[2], auraUltimoX = new float[2];
+    private final float[] auraRastro = new float[2], auraRastroVel = new float[2], auraUltimoX = new float[2];
     private final int[] auraUltimoQuadro = {-1, -1};
-    /** Quadros de movimento que o rastro guarda, e o teto dele (fração da altura do corpo). */
-    private static final float AURA_RASTRO_QUADROS = 9f, AURA_RASTRO_MAX = 0.35f;
+    /**
+     * O rastro é uma mola amortecida (a chama de uma vela que se move, o dono, 17/11): puxada para
+     * a velocidade vezes {@link #AURA_RASTRO_QUADROS}, com a força e o freio por quadro da luta.
+     * Andando, a chama fica para trás; parando, ela passa do ponto (~15%), volta e assenta em meio
+     * segundo. O teto é uma fração da altura do corpo; a chama estica até {@link #AURA_ESTICA} a mais
+     * no rastro cheio.
+     */
+    private static final float AURA_RASTRO_QUADROS = 10f, AURA_RASTRO_MAX = 0.4f,
+        AURA_MOLA = 0.07f, AURA_FREIO = 0.2f, AURA_ESTICA = 0.6f;
 
     private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
@@ -7114,28 +7121,31 @@ public class GameView extends SurfaceView
         float tempo = frame / 60f * AURA_SUBIDA;
         int lado = f.index & 1;
         int passou = auraUltimoQuadro[lado] < 0 ? 0 : frame - auraUltimoQuadro[lado];
+        float teto = AURA_RASTRO_MAX * f.character().visualStandHeight;
         if (passou > 0 && passou < 30) {
-            float alvo = (f.x - auraUltimoX[lado]) / passou;
-            float k = 1f - (float)Math.pow(0.88, passou);
-            auraVel[lado] += (alvo - auraVel[lado]) * k;
+            float alvo = Math.max(-teto, Math.min(teto, (f.x - auraUltimoX[lado]) / passou * AURA_RASTRO_QUADROS));
+            for (int q = 0; q < passou; q++) {
+                auraRastroVel[lado] += AURA_MOLA * (alvo - auraRastro[lado]) - AURA_FREIO * auraRastroVel[lado];
+                auraRastro[lado] += auraRastroVel[lado];
+            }
         } else if (passou != 0) {
-            auraVel[lado] = 0f;
+            auraRastro[lado] = auraRastroVel[lado] = 0f;
         }
         auraUltimoX[lado] = f.x;
         auraUltimoQuadro[lado] = frame;
-        float teto = AURA_RASTRO_MAX * f.character().visualStandHeight;
-        float rastro = Math.max(-teto, Math.min(teto, auraVel[lado] * AURA_RASTRO_QUADROS)) * px;
+        float rastro = auraRastro[lado] * px;
+        float estica = 1f + AURA_ESTICA * Math.min(1f, Math.abs(auraRastro[lado]) / Math.max(1f, teto));
         for (int i = 0; i < AURA_CAMADAS.length; i++) {
             float[] k = AURA_CAMADAS[i];
             int rgb = k[2] < 0f ? misturar(cor, AURA_ESCURO, -k[2]) : misturar(cor, 0xFFFFFF, k[2]);
             int argb = (Math.round(k[3] * 255f) << 24) | rgb;
             r.setOverride(Filtro.aura(argb, k[4], tempo + k[5], auraJanela[0], auraJanela[1], AURA_CELULA * px, altura,
-                k[6] * altura, k[7], rastro * k[8], k[9]));
+                k[6] * estica * altura, k[7], rastro * k[8], k[9]));
             c.save();
             c.scale(k[0], k[1], f.x, visualY);
             // Uma subida acima: o shader lê o desenho no lugar dele e as labaredas ganham espaço
             // acima do quadro (sem isso elas batiam no topo do quadro e saíam cortadas retas).
-            c.translate(0f, -k[6] * f.character().visualStandHeight);
+            c.translate(0f, -k[6] * estica * f.character().visualStandHeight);
             r.draw(c, f.x, visualY, f.facing, false, false);
             c.restore();
         }

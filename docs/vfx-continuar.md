@@ -1768,7 +1768,14 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   entraram os pontinhos brancos (10% das células da camada do meio, subindo com o ruído). O rastro:
   a velocidade de cada lado suavizada (0,88 por quadro) vezes 9 quadros, no máximo 35% da altura do
   corpo, entorta as labaredas para trás de quem anda (o halo de fora pesa 1, o meio 0,8, a de dentro
-  0,5); parado, elas voltam a subir em pé aos poucos. Vídeo `aura_shinkai_chama_v2.mp4`.
+  0,5); parado, elas voltam a subir em pé aos poucos.
+- **Depois, "ficou bom, mas o rastro ainda não tá legal: tem que ser tipo chama de uma vela quando a
+  gente movimenta a vela":** o rastro virou uma mola amortecida (força 0,07 e freio 0,2 por quadro:
+  ao parar, a chama passa ~15% do ponto, volta e assenta em meio segundo), entorta em curva (a base
+  no corpo, a ponta mais para trás: o deslocamento cresce com o quadrado da distância do corpo) e
+  estica as labaredas até 60% no rastro cheio (teto 40% da altura do corpo). Para o halo não acabar
+  reto, a aura some aos poucos perto do fim da subida e das beiradas do quadro. Vídeo
+  `aura_shinkai_chama_v3.mp4`.
 
 ## Fora do VFX, o que ficou pendente
 
