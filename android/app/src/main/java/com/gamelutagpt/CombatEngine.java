@@ -5049,9 +5049,9 @@ final class CombatEngine {
     }
 
     /**
-     * O Ichigeki (a Natisuko): o círculo fecha no rival (defendeu ou estava alto: sem a cena); preso
-     * nele, leva os socos de todos os lados, os últimos já no preto; no preto ele cai deitado e,
-     * quando clareia, o punho gigante desce de cima e crava (o golpe final). Ele fica no chão.
+     * O Ichigeki (a Natisuko): no preto, o rival preso no meio (defendeu ou estava alto: sem a
+     * cena) leva os punhos de todos os lados e os golpes invisíveis do círculo; o círculo some, ele
+     * cai deitado e o punho gigante desce de cima e crava (o golpe final). Ele fica no chão.
      */
     private void updateIchigeki(CombatFighter a, CombatFighter d) {
         if (a.dragaoEstado == 0) {
@@ -5096,20 +5096,21 @@ final class CombatEngine {
                 d.vy = 0f;
                 d.bounce = CombatFighter.BOUNCE_NONE;
                 d.stunProjectile = null;
-                if (a.ultraFrame >= config.ichigekiDeitado) {
-                    // Depois do preto: deitado no chão esperando o punho.
+                if (a.ultraFrame >= config.ichigekiSome) {
+                    // O círculo sumiu: deitado no chão esperando o punho.
                     deitadoNoIchigeki(d);
                 } else {
                     // No círculo: em pé (ou no ar onde estava), parado, levando os socos.
                     d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
-                    d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.ichigekiDeitado - a.ultraFrame + 20);
+                    d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.ichigekiSome - a.ultraFrame + 20);
                     d.stunElapsed = 0;
                 }
             }
         }
         if (a.dragaoEstado == 1 || a.dragaoEstado == 3) {
-            if (a.ultraFrame == config.ichigekiSocos) cues.add("ULTRA_ICHIGEKI_SOCOS");
-            if (a.ultraFrame == config.ichigekiEscuro) cues.add("ULTRA_ICHIGEKI_ESCURO");
+            if (a.ultraFrame == config.ichigekiSocos || a.ultraFrame == config.ichigekiSocos2) cues.add("ULTRA_ICHIGEKI_SOCOS");
+            if (a.ultraFrame == config.ichigekiCirculo) cues.add("ULTRA_ICHIGEKI_CIRCULO");
+            if (a.ultraFrame == config.ichigekiSome) cues.add("ULTRA_ICHIGEKI_SOME");
             if (a.ultraFrame == config.ichigekiPunho) cues.add("ULTRA_ICHIGEKI_PUNHO");
         }
         if (a.ultraFrame >= config.ichigekiQuadros || (a.dragaoEstado == 2 && a.ultraFrame >= 30)) {

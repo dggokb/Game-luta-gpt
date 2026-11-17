@@ -801,8 +801,13 @@ final class CombatConfig {
      * estar também em {@link #ultraDragao} (a cena e a animação ULTRA_DRAGAO são as mesmas).
      */
     String ultraGarca = "p02";
-    /** Quadros da cena da garça: as asas fecham, os golpes, o mergulho começa, o impacto, o fim. */
-    int garcaPega = 28, garcaIntervalo = 6, garcaMergulho = 95, garcaImpacto = 119, garcaQuadros = 185;
+    /**
+     * Quadros da cena da garça: as asas fecham, os golpes, o mergulho começa, o impacto, o fim. Os
+     * efeitos tocam a 1,25x do vídeo (o dono, 17/11: "muito acelerada"): 2 quadros do jogo por
+     * quadro do vídeo; o casulo fecha no 36 do vídeo e se desfaz no 96, e o mergulho (do 10 do
+     * vídeo dele) bate no chão no 26.
+     */
+    int garcaPega = 64, garcaIntervalo = 16, garcaMergulho = 185, garcaImpacto = 217, garcaQuadros = 287;
     /**
      * Ultra SHINKAI da palhaça (a Bonnie, 17/11, a Chuva de Tomates, ideia do dono): tudo fica preto,
      * um picadeiro pequeno aparece com o rival em cima, a plateia joga tomates nele, a tela inteira
@@ -811,23 +816,25 @@ final class CombatConfig {
     String ultraPalhaco = "p16";
     /** Quadros da cena: o picadeiro chega, os tomates (do primeiro ao último), a tela, a bomba, o BOOM, o fim. */
     int palhacoPicadeiro = 20, palhacoTomates = 34, palhacoTomateAcerto = 46, palhacoTomateIntervalo = 8,
-        palhacoTela = 120, palhacoBomba = 200, palhacoBoom = 241, palhacoQuadros = 320;
+        palhacoTela = 120, palhacoBomba = 275, palhacoBoom = 316, palhacoQuadros = 395;
     /** Altura do tampo do picadeiro (px): o rival fica em cima. */
     float palhacoAltura = 42f;
     /**
-     * Ultra SHINKAI da Natisuko (17/11, o Ichigeki, ideia do dono): o círculo de tinta dourado
-     * fecha em volta do rival, os punhos vêm de todos os lados, tudo fica preto só com os golpes,
-     * o rival aparece deitado e o punho gigante desce de cima nele (POFT!) e some estourando em
-     * partículas. Quem tem (ids); também em {@link #ultraDragao}.
+     * Ultra SHINKAI da Natisuko (17/11, o Ichigeki, ideia do dono): tudo preto, sem ela, e o rival
+     * no meio da tela; os punhos de luz vêm de todos os lados duas vezes; o círculo de tinta
+     * dourado fecha nele com os golpes invisíveis e some de repente; ainda no preto ele cai
+     * deitado e o punho gigante desce de cima (POFT!) e some estourando em partículas. Quem tem
+     * (ids); também em {@link #ultraDragao}.
      */
     String ultraIchigeki = "p15";
     /**
-     * Quadros da cena: os punhos chegam, o primeiro golpe e o intervalo, o preto (entra), o rival
-     * deitado, o preto sai, o punho gigante começa a descer, o impacto, o fim.
+     * Quadros da cena: as duas levas de punhos, o primeiro golpe e o intervalo, o círculo, o
+     * círculo some (o rival cai deitado), o punho gigante começa a descer, o impacto, o preto
+     * começa a sair, o fim.
      */
-    int ichigekiSocos = 24, ichigekiAcerto = 40, ichigekiIntervalo = 14, ichigekiEscuro = 92,
-        ichigekiDeitado = 140, ichigekiClareia = 148, ichigekiPunho = 160, ichigekiImpacto = 193,
-        ichigekiQuadros = 228;
+    int ichigekiSocos = 6, ichigekiSocos2 = 78, ichigekiAcerto = 12, ichigekiIntervalo = 27,
+        ichigekiCirculo = 150, ichigekiSome = 210, ichigekiPunho = 222, ichigekiImpacto = 255,
+        ichigekiClareia = 262, ichigekiQuadros = 300;
     /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
     float garcaAltura = 260f, garcaEmpurra = 420f;
     /** De onde o dragão parte: à frente do lutador (px), menos {@link #dragaoAtras}. */

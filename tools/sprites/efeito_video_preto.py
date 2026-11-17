@@ -11,6 +11,7 @@ vira transparência, como no efeito_imagem.py) e daí seguem para o efeito_video
     --quadros   quais quadros do vídeo, na ordem: "0-32:3" (de 0 a 32, um a cada 3) e/ou soltos,
                 separados por vírgula: "0,1,2,6,48-84:6"
     --borda N   o efeito some aos poucos nos N px da beira do quadro (brilho cortado pelo vídeo)
+    --borda-cima N  só em cima (a coluna de luz da garça que o vídeo corta no topo; o chão fica)
     --opaco     desenho opaco no preto (a bomba, os tomates, a luva da Bonnie): só o preto puro do
                 fundo some, ligado por conectividade à borda (o preto dentro do contorno fica), e a
                 cor não clareia; o brilho meio transparente (o holofote) ainda vem do brilho
@@ -67,6 +68,7 @@ def main():
     p.add_argument('--nome', required=True)
     p.add_argument('--quadros', required=True)
     p.add_argument('--borda', type=int, default=0)
+    p.add_argument('--borda-cima', type=int, default=0)
     p.add_argument('--opaco', action='store_true')
     a, resto = p.parse_known_args()
     cap = cv2.VideoCapture(a.video)
@@ -87,6 +89,9 @@ def main():
                 yy, xx = np.mgrid[0:alto, 0:largo]
                 beira = np.minimum.reduce([xx, yy, largo - 1 - xx, alto - 1 - yy]) / float(a.borda)
                 rgba[..., 3] *= np.clip(beira, 0.0, 1.0)
+            if a.borda_cima:
+                yy = np.arange(rgba.shape[0])[:, None] / float(a.borda_cima)
+                rgba[..., 3] *= np.clip(yy, 0.0, 1.0) ** 1.5
             Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), 'RGBA').save(Path(pasta) / f'q{n:03d}.png')
         subprocess.run([sys.executable, str(HERE / 'efeito_video.py'), pasta, '--nome', a.nome, *resto], check=True)
 

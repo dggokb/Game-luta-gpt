@@ -3772,6 +3772,15 @@ public class GameView extends SurfaceView
     private void updateFightCamera(float dt) {
         // Frame what is actually drawn: opaque sprite height measured at import time.
         float highestFighterTop = Math.min(visualTop(player()), visualTop(opponent()));
+        CombatFighter meio = rivalNoMeio();
+        if (meio != null) {
+            // A cena preta do Ultra SHINKAI (Bonnie, Natisuko): o rival no meio da tela.
+            float mx = meio == player() ? meio.x + tagOffset() : meio.x + engine.teams.tagOffset(OPPONENT);
+            camera.updateForRound(dt, mx, mx, visualTop(meio), false, false);
+            acompanharCenas();
+            return;
+        }
+        cenasNaTela.clear();
         // KO leaves the winner's world X fixed, so its screen X must also
         // be fixed. Continue to update the camera only while BOTH fight.
         camera.updateForRound(dt, player().x, opponent().x, highestFighterTop,
@@ -4622,8 +4631,8 @@ public class GameView extends SurfaceView
             if (escuroCena > 0) effects.drawWorldOverlay(canvas, paint, escuroCena, 0, 0, 0);
             // A fumaça do pulo e do super pulo fica atrás dos lutadores (pedido do dono, 11/11).
             efeitos.desenharAtras(canvas);
-            if (escuroPalhaco > 0) {
-                // O rival do lado do CPU foi desenhado antes do escuro: de novo, em cima do picadeiro.
+            if (escuroCena > 0 && rivalNoMeio() == opponent()) {
+                // O rival do lado do CPU foi desenhado antes do escuro: de novo, por cima dele.
                 CombatFighter npc = opponent();
                 canvas.save();
                 canvas.translate(engine.teams.tagOffset(OPPONENT), 0f);
@@ -6308,16 +6317,12 @@ public class GameView extends SurfaceView
                     ultraSounds.playFight("ar_h", 0.8f, 1.2f);
                     break;
                 case "ULTRA_PALHACO_TOMATES":
-                    efeitos.tocar("palhaco_tomates_" + id, v.x, chestY(v), 1f, esq);
+                    // Na tela inteira (o dono, 17/11: as mãos da borda do vídeo apareciam cortadas).
+                    tocarNaTela("palhaco_tomates_" + id, esq);
                     break;
-                case "ULTRA_PALHACO_TELA": {
-                    // Na tela inteira: do tamanho do que a câmera mostra.
-                    String nome = "palhaco_tela_" + id;
-                    float largura = efeitos.larguraCena(nome);
-                    float tamanho = largura > 0f ? Math.max(1f, VW / Math.max(0.01f, camera.zoom) / largura * 1.1f) : 1f;
-                    efeitos.tocar(nome, camera.x, meioDaTelaY(), tamanho, false);
+                case "ULTRA_PALHACO_TELA":
+                    tocarNaTela("palhaco_tela_" + id, false);
                     break;
-                }
                 case "ULTRA_PALHACO_BOMBA":
                     efeitos.tocar("palhaco_bomba_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, 1f, esq);
                     break;
@@ -6349,27 +6354,35 @@ public class GameView extends SurfaceView
             boolean esq = u.facing < 0;
             switch (cue) {
                 case "ULTRA_ICHIGEKI":
-                    efeitos.tocar("ichigeki_circulo_" + id, v.x, chestY(v), 1f, esq);
                     ultraSounds.playFight("ar_h", 0.8f, 1.1f);
                     break;
                 case "ULTRA_ICHIGEKI_SOCOS":
-                    efeitos.tocar("ichigeki_punhos_" + id, v.x, chestY(v), 1f, esq);
+                    // Os punhos de todos os lados, na tela inteira (duas levas).
+                    tocarNaTela("ichigeki_punhos_" + id, esq);
                     break;
-                case "ULTRA_ICHIGEKI_ESCURO":
-                    efeitos.tocar("ichigeki_danos_" + id, v.x, chestY(v), 1f, esq);
-                    beamShake = Math.max(beamShake, 8f);
+                case "ULTRA_ICHIGEKI_CIRCULO":
+                    // O círculo fecha nele e os golpes invisíveis estouram dentro.
+                    ichigekiCirculoVaga = efeitos.tocarDurando("ichigeki_circulo_" + id, v.x, chestY(v), ICHIGEKI_CIRCULO,
+                        esq, 0f, 0f);
+                    efeitos.tocar("ichigeki_danos_" + id, v.x, chestY(v), ICHIGEKI_CIRCULO, esq);
+                    break;
+                case "ULTRA_ICHIGEKI_SOME":
+                    // Some do nada.
+                    efeitos.parar(ichigekiCirculoVaga, "ichigeki_circulo_" + id);
+                    ichigekiCirculoVaga = -1;
+                    beamShake = Math.max(beamShake, 10f);
                     break;
                 case "ULTRA_ICHIGEKI_PUNHO":
                     // De cima para baixo: o punho do vídeo (que vem da esquerda) girado 90°, com os
                     // nós dos dedos chegando no rival deitado.
                     ichigekiPunhoVaga = efeitos.tocarDurando("ichigeki_punho_" + id, v.x, GROUND_Y - ICHIGEKI_PUNHO_Y,
-                        1f, esq, 0f, -90f);
+                        ICHIGEKI_PUNHO, esq, 0f, -90f);
                     ultraSounds.playFight("ar_h", 1f, 0.7f);
                     break;
                 case "ULTRA_FINISH_DRAGAO":
                     efeitos.parar(ichigekiPunhoVaga, "ichigeki_punho_" + id);
                     ichigekiPunhoVaga = -1;
-                    efeitos.tocar("ichigeki_particulas_" + id, v.x, GROUND_Y - ICHIGEKI_PUNHO_Y, 1f, esq);
+                    efeitos.tocar("ichigeki_particulas_" + id, v.x, GROUND_Y - ICHIGEKI_PUNHO_Y, ICHIGEKI_PUNHO, esq);
                     showBanner("POFT!", -1);
                     break;
                 default:
@@ -6380,34 +6393,80 @@ public class GameView extends SurfaceView
 
     /** Altura (acima do chão) onde o punho gigante bate no rival deitado. */
     private static final float ICHIGEKI_PUNHO_Y = 28f;
+    /** Tamanho do punho gigante e do estouro (o dono: "bem exagerado") e do círculo. */
+    private static final float ICHIGEKI_PUNHO = 2.2f, ICHIGEKI_CIRCULO = 1.15f;
+    /** A vaga do círculo do Ichigeki (some de repente). */
+    private int ichigekiCirculoVaga = -1;
 
-    /** Escuro da cena do Ichigeki (0 a 255): entra no fim dos socos e sai com o rival já deitado. */
+    /** Escuro da cena do Ichigeki (0 a 255): de uma vez no começo, sai depois do POFT. */
     private int escuroDoIchigeki() {
         for (int i = 0; i < 2; i++) {
             int q = engine.ichigekiCena(engine.fighter(i));
             if (q < 0) continue;
-            CombatConfig c = engine.config;
-            if (q < c.ichigekiEscuro) return 0;
-            if (q < c.ichigekiEscuro + 4) return (q - c.ichigekiEscuro + 1) * 60;
-            if (q < c.ichigekiClareia) return 255;
-            return Math.max(0, 255 - (q - c.ichigekiClareia) * 17);
+            int c = engine.config.ichigekiClareia;
+            return q < c ? 255 : Math.max(0, 255 - (q - c) * 14);
         }
         return 0;
     }
 
-    /** No preto do Ichigeki os dois lutadores somem (só os golpes aparecem). */
+    /** A Natisuko fica fora da cena preta do Ichigeki (só o rival aparece). */
     private boolean escondidoNoIchigeki(CombatFighter f) {
-        return escuroDoIchigeki() >= 255;
+        int q = engine.ichigekiCena(f);
+        return q >= 0 && q < engine.config.ichigekiClareia;
     }
 
-    /** Escuro da cena da Chuva de Tomates (0 a 255): entra no começo e sai no BOOM. */
+    /** Folga do efeito de tela inteira além da tela (a borda do vídeo nunca aparece). */
+    private static final float TELA_FOLGA = 1.22f;
+
+    /**
+     * O efeito de cena na tela inteira: no meio do que a câmera mostra, maior que a tela (cobre a
+     * largura e a altura), e segue a câmera ({@link #acompanharCenas}).
+     */
+    private void tocarNaTela(String nome, boolean espelhar) {
+        float largura = efeitos.larguraCena(nome);
+        float telaL = VW / Math.max(0.01f, camera.zoom), telaA = VH / Math.max(0.01f, camera.zoom);
+        float tamanho = 1f;
+        if (largura > 0f) {
+            // Os vídeos são de 1344x768: a altura também tem que cobrir.
+            float altura = largura * 768f / 1344f;
+            tamanho = Math.max(telaL / largura, telaA / altura) * TELA_FOLGA;
+        }
+        efeitos.tocar(nome, camera.x, meioDaTelaCheia(), tamanho, espelhar);
+        if (!cenasNaTela.contains(nome)) cenasNaTela.add(nome);
+    }
+
+    /** Os efeitos de cena tocando na tela inteira (seguem a câmera). */
+    private final java.util.ArrayList<String> cenasNaTela = new java.util.ArrayList<>();
+
+    /** O meio exato do que a câmera mostra (altura). */
+    private float meioDaTelaCheia() {
+        return camera.top + VH / Math.max(0.01f, camera.zoom) * 0.5f;
+    }
+
+    /** Os efeitos de tela inteira acompanham a câmera (ela anda até o rival no começo da cena). */
+    private void acompanharCenas() {
+        for (String nome : cenasNaTela) efeitos.mover(nome, camera.x, meioDaTelaCheia());
+    }
+
+    /**
+     * O rival que a cena do Ultra SHINKAI põe no meio da tela (a Chuva de Tomates e o Ichigeki),
+     * ou null: a câmera centra nele.
+     */
+    private CombatFighter rivalNoMeio() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (engine.palhacoCena(u) >= 0 || engine.ichigekiCena(u) >= 0) return engine.fighter(1 - i);
+        }
+        return null;
+    }
+
+    /** Escuro da cena da Chuva de Tomates (0 a 255): entra de uma vez no começo e sai no BOOM. */
     private int escuroDoPalhaco() {
         for (int i = 0; i < 2; i++) {
             CombatFighter u = engine.fighter(i);
             int q = engine.palhacoCena(u);
             if (q < 0) continue;
             CombatConfig c = engine.config;
-            if (q < 10) return q * 25;
             if (q < c.palhacoBoom) return 255;
             return Math.max(0, 255 - (q - c.palhacoBoom) * 12);
         }
