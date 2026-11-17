@@ -1758,7 +1758,8 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   sobram labaredas que saem do corpo e afinam. Cada camada é desenhada uma subida acima e lida no
   lugar (sem isso as labaredas batiam no topo do quadro da folha e saíam cortadas retas). A cor é a
   do SHINKAI de cada um (`corShinkai`).
-- **Desligada** (`AURA_CHAMA`; `-Dgameluta.auraChama=true` liga para gravar) até ele aprovar
+- **Ligada no jogo para o dono testar no celular** (17/11; `-Dgameluta.auraChama=false` volta ao
+  contorno de antes). Antes ficou desligada (`AURA_CHAMA`) até ele aprovar
   o vídeo (o Ryūga parado, andando e batendo).
   Falta: os pontinhos brancos da referência, ver em outros personagens e medir no celular (são três
   desenhos a mais por lutador com 12 leituras cada).
