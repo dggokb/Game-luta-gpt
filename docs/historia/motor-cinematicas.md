@@ -443,7 +443,8 @@ folhas de cada clipe com o número do quadro ajudam a escolher.
 
 No contato de um golpe forte, um **quadro de mangá** bate na tela como um **carimbo**: desce de
 uma vez, já inteiro, de perto da câmera e de cima, com a sombra encolhendo (0,075 s); no contato
-amassa, a tela treme forte, dá um estalo branco de dois quadros, os raios estouram em volta e o
+amassa, a tela treme forte, dá um estalo branco de dois quadros, o estouro de luz estoura em volta
+(as imagens de `historia/stamp/`, feitas por `tools/cenas/stamp_estouro.py`, alternando) e o
 letreiro do impacto bate junto, no canto de cima do quadro. Fica **grudado e parado** `segundos`
 (padrão 0,8), com a luta escurecida e **congelada** embaixo (a animação feita à mão também para),
 e sai seco (0,1 s). O STAMP anda no tempo da tela: a câmera lenta do impacto embaixo dele não o
