@@ -447,8 +447,12 @@ public class TorneioTest {
                 for (String id : new String[] {"p05", "p11", "p13"}) {
                     if (!id.equals(t.emboscada().id)) assertFalse(paginas.contains("pag8_" + id + ".jpg"));
                 }
-                // 56 a 59 só do Ryūga; 60 a 62 dos dois, antes da página da ponte.
+                // 56 a 59 de cada irmão; 60 a 62 dos dois, antes da página da ponte.
                 assertEquals(Torneio.RYUGA.equals(irmao), paginas.contains("pag1_ryuga.jpg"));
+                assertEquals(Torneio.KOGA.equals(irmao), paginas.contains("pag1_koga.jpg"));
+                assertEquals(java.util.Arrays.asList("pag1_" + irmao + ".jpg", "pag2_" + irmao + ".jpg", "pag3_" + irmao + ".jpg",
+                    "pag4_" + irmao + ".jpg", "pag5.jpg"), paginas.subList(paginas.indexOf("pag1_" + irmao + ".jpg"),
+                    paginas.indexOf("pag1_" + irmao + ".jpg") + 5));
                 int i = paginas.indexOf("pag5.jpg");
                 assertEquals(java.util.Arrays.asList("pag5.jpg", "pag6.jpg", "pag7.jpg", ponte), paginas.subList(i, i + 4));
                 assertTrue(paginas.indexOf("LUTA") > paginas.indexOf(ponte));

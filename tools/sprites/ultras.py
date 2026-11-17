@@ -17,6 +17,7 @@ a animação e o "ultra" do lutador, já em quadros do jogo (60 fps):
     penas     {"estouro": efeito, "redemoinho": efeito}: o sumiço é um estouro de penas (onde some
               e onde reaparece, sem a imagem que fica) e o redemoinho gira em volta do rival
               (o Mil Penas da Yin-lu)
+    quique    px: o golpe final crava o rival, ele quica no chão e cai essa distância à frente
     recuo     [quadro, distância] em que ela reaparece longe do rival (px do jogo para trás)
     cameraDaLuta  sem os closes do Ultra: a câmera da luta segue os dois
     voo       [quadro, frente, altura(, giro em graus)] do desenho de quem bate (o p13 sobe, gira e
@@ -187,6 +188,8 @@ def timeline(spec, picked, speed):
         ultra['espelho'] = [[at(a), at(b)] for a, b in spec['espelho']]
     if spec.get('penas'):
         ultra['penas'] = spec['penas']
+    if spec.get('quique'):
+        ultra['quique'] = spec['quique']
     if spec.get('alcance'):
         ultra['alcance'] = spec['alcance']
     return durations, ultra

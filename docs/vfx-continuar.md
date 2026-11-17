@@ -1863,3 +1863,11 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - **Primeiras versões:** no tamanho 1 e na frente dos lutadores, com a câmera fechada do Ultra, as
   penas cobriam a luta inteira; com a borda de 100 px o estouro aparecia como um bloco retangular.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+- **Depois, "mais uns 3 golpes de penas, e no último ela bater mais alto, o cara quica no chão e cai
+  longe":** três aparições a mais (a palma reta, o tapa de cima e a palma girando do `ultra_2` de
+  novo, atrás no ar, bem no alto e atrás girando); no golpe final ela fica 60 px mais alta e desce
+  logo depois; o golpe final crava o rival (`quique` no ultras.json: ele desce, quica e cai 420 px
+  à frente).
+- **O Super Espelho do Lago, "faltou alguma coisa":** no contra, o `penas_estouro_p02` sai da mão
+  que desvia (tamanho 0,55), a cena desacelera (20 quadros a 35%) e a tela treme; o empurrão das
+  duas palmas solta penas no rival (0,45) e o joga na parede (quica, dá para continuar).
