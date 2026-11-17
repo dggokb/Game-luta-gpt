@@ -1917,7 +1917,7 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   vídeo `ultra_shinkai`; a opção nova `sem_verde` do `personagem.py` tira o verde do fundo do fogo
   meio transparente e puxa o amarelo-limão para o laranja). Os efeitos em fundo preto, pelo brilho:
   `ichigeki_circulo_p15` (`--quadros 4-36:2 --origem 682,391 --escala-mundo 0.55 --fps 36
-  --resolucao 0.6 --segurar 16,1500`), `ichigeki_punhos_p15` (`--quadros 16-100:2 --origem 672,384
+  --resolucao 0.6 --segurar 16,1500`; saiu depois, ver a rodada seguinte), `ichigeki_punhos_p15` (`--quadros 16-100:2 --origem 672,384
   --escala-mundo 0.5 --resolucao 0.5 --borda 160`), `ichigeki_danos_p15` (`--quadros 8-58:2
   --escala-mundo 0.5 --fps 30 --borda 60`), `ichigeki_particulas_p15` (o estouro e as partículas do
   mesmo vídeo, `--quadros 60-94:2 --escala-mundo 0.55 --fps 30 --borda 60`) e `ichigeki_punho_p15`
@@ -1932,3 +1932,28 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - **Ficou:** ele julgar no vídeo. Visto só no PC. O fogo dela fica como um bloco amarelo meio
   chapado em volta do corpo (é o fogo do vídeo, sem o verde); se não agradar, o caminho é o vídeo
   sem o fogo e o fogo como efeito separado.
+
+## Rodada de 17/11: os ajustes do dono nos três Ultra SHINKAI
+
+- **Bonnie:** "os tomates estão cortados na tela": o preto entra de uma vez, a câmera centra no
+  rival e os tomates e a tela vermelha tocam na tela inteira (`tocarNaTela`, 1,22x além da tela,
+  seguindo a câmera; `"cena"` e `"larguraCena"` no efeito.json). "Deixar tudo vermelho, aí sim
+  passa a mão, a mão tá passando muito rápido": a tela vermelha foi remontada por código
+  (scratch `tela/compor.py`: os quadros 4-36 do `Tomato_Splat_Effect_1`, o 36 sem os buracos
+  pretos (inpaint) segurado 620 ms e a luva recortada do quadro 90 andando da esquerda para a
+  direita em 41 quadros, limpando o vermelho atrás dela), virou `palhaco_tela_p16` (`--opaco
+  --quadros 0-77:1 --fps 36 --resolucao 0.32 --segurar 33,620`; tocava a 3x antes). "Quando a mão
+  passa a bomba já está lá, um pouco maior": a bomba (1,15x, ao lado dos pés, atrás dos
+  lutadores = embaixo da tela vermelha) chega no vermelho e o quadro do pavio aceso segura +1350 ms;
+  o picadeiro segura até o BOOM.
+- **Natisuko:** "aura muito estourada" e os punhos cortados como os tomates: a animação sem o
+  fogo (só os quadros sem fogo do vídeo), a cena toda preta sem ela, o rival no meio, os punhos 2x
+  na tela inteira (sem `--borda`), depois só os danos no preto sem o rival (1,5x); o círculo saiu.
+  "A câmera vem de cima com o soco, o personagem no chão, ele bate fixando a câmera, dissipa e
+  fim": a câmera começa 520 px acima e desce (curva quadrática) até o impacto, parando nele.
+- **Yin-lu:** a garça maior (casulo `--escala-mundo 0.62`, mergulho 0.85), o topo cortado esfumado
+  (`--borda-cima 110`, novo no `efeito_video_preto.py`), o mergulho no chão (origem no anel do
+  chão do vídeo, y 705, não no pé do quadro) e a 1,25x do vídeo (`--fps 15` com passo 2; era 36,
+  3x). "Fica uma mancha branca no chão": a luz dos dois efeitos saiu e a cauda de penas do
+  mergulho encurtou (`--quadros 10-76:2`).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.

@@ -814,27 +814,31 @@ final class CombatConfig {
      * fica vermelha e é limpa, e a bomba nos pés dele explode. Quem tem (ids); também em {@link #ultraDragao}.
      */
     String ultraPalhaco = "p16";
-    /** Quadros da cena: o picadeiro chega, os tomates (do primeiro ao último), a tela, a bomba, o BOOM, o fim. */
+    /**
+     * Quadros da cena: o picadeiro chega, os tomates (do primeiro ao último), a tela, a bomba, o BOOM,
+     * o fim. A bomba chega embaixo da tela vermelha (o dono, 17/11: quando a luva passa ela já está
+     * lá) e o pavio queima até a luva sair.
+     */
     int palhacoPicadeiro = 20, palhacoTomates = 34, palhacoTomateAcerto = 46, palhacoTomateIntervalo = 8,
-        palhacoTela = 120, palhacoBomba = 275, palhacoBoom = 316, palhacoQuadros = 395;
+        palhacoTela = 120, palhacoBomba = 170, palhacoBoom = 292, palhacoQuadros = 371;
     /** Altura do tampo do picadeiro (px): o rival fica em cima. */
     float palhacoAltura = 42f;
     /**
      * Ultra SHINKAI da Natisuko (17/11, o Ichigeki, ideia do dono): tudo preto, sem ela, e o rival
-     * no meio da tela; os punhos de luz vêm de todos os lados duas vezes; o círculo de tinta
-     * dourado fecha nele com os golpes invisíveis e some de repente; ainda no preto ele cai
-     * deitado e o punho gigante desce de cima (POFT!) e some estourando em partículas. Quem tem
-     * (ids); também em {@link #ultraDragao}.
+     * no meio da tela; os punhos de luz vêm de todos os lados duas vezes; depois só os danos no
+     * preto, sem o rival; a câmera desce de cima com o punho gigante até ele deitado, o punho bate
+     * (POFT!) com a câmera parada e some estourando em partículas. Quem tem (ids); também em
+     * {@link #ultraDragao}.
      */
     String ultraIchigeki = "p15";
     /**
-     * Quadros da cena: as duas levas de punhos, o primeiro golpe e o intervalo, o círculo, o
-     * círculo some (o rival cai deitado), o punho gigante começa a descer, o impacto, o preto
-     * começa a sair, o fim.
+     * Quadros da cena: as duas levas de punhos, o primeiro golpe e o intervalo, os danos no preto
+     * (sem o rival), o rival deitado (a câmera começa a descer de cima com o punho), o punho, o
+     * impacto, o preto começa a sair, o fim.
      */
     int ichigekiSocos = 6, ichigekiSocos2 = 78, ichigekiAcerto = 12, ichigekiIntervalo = 27,
-        ichigekiCirculo = 150, ichigekiSome = 210, ichigekiPunho = 222, ichigekiImpacto = 255,
-        ichigekiClareia = 262, ichigekiQuadros = 300;
+        ichigekiDanos = 150, ichigekiSome = 205, ichigekiPunho = 208, ichigekiImpacto = 241,
+        ichigekiClareia = 272, ichigekiQuadros = 300;
     /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
     float garcaAltura = 260f, garcaEmpurra = 420f;
     /** De onde o dragão parte: à frente do lutador (px), menos {@link #dragaoAtras}. */

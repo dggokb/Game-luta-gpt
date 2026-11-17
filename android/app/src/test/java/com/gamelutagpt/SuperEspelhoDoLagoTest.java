@@ -85,4 +85,26 @@ public class SuperEspelhoDoLagoTest {
         assertTrue("investiu até o Ryūga: " + (s.f(0).x - antes), s.f(0).x - antes > 250f);
         assertEquals("as palmas acertam depois de chegar", 6, acertos);
     }
+
+    /** O Ryūga bate de mais longe que o alcance das palmas: o desvio a leva até ele e as seis acertam. */
+    @Test public void oGolpeDeLongeTambemLevaAsSeisPalmas() {
+        for (float gap : new float[]{140f, 170f, 200f}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), GeneratedCharacters.get("player_base"), 500f, 500f + gap);
+            s.f(0).state.superMeter = 3 * CombatConfig.METER_PER_BAR;
+            soltaSuper(s);
+            s.until(() -> s.f(0).attackFrame >= 14, 60);
+            s.in[1].light = true;
+            int acertos = 0;
+            boolean contra = false;
+            for (int t = 0; t < 240; t++) {
+                s.step();
+                s.in[1].light = false;
+                if (s.engine.cues().contains("COUNTER")) contra = true;
+                for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) acertos++;
+                if (!s.f(0).attacking() && t > 20) break;
+            }
+            assertTrue("leu o golpe a " + gap, contra);
+            assertEquals("as seis palmas a " + gap, 6, acertos);
+        }
+    }
 }

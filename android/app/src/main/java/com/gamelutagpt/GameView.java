@@ -3776,9 +3776,16 @@ public class GameView extends SurfaceView
         if (meio != null) {
             // A cena preta do Ultra SHINKAI (Bonnie, Natisuko): o rival no meio da tela.
             float mx = meio == player() ? meio.x + tagOffset() : meio.x + engine.teams.tagOffset(OPPONENT);
+            camera.top += ichigekiCameraAcima;
             camera.updateForRound(dt, mx, mx, visualTop(meio), false, false);
+            ichigekiCameraAcima = ichigekiCameraAcima();
+            camera.top -= ichigekiCameraAcima;
             acompanharCenas();
             return;
+        }
+        if (ichigekiCameraAcima != 0f) {
+            camera.top += ichigekiCameraAcima;
+            ichigekiCameraAcima = 0f;
         }
         cenasNaTela.clear();
         // KO leaves the winner's world X fixed, so its screen X must also
@@ -6324,11 +6331,16 @@ public class GameView extends SurfaceView
                     tocarNaTela("palhaco_tela_" + id, false);
                     break;
                 case "ULTRA_PALHACO_BOMBA":
-                    efeitos.tocar("palhaco_bomba_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, 1f, esq);
+                    // Embaixo da tela vermelha (atrás dos lutadores): a luva passa e ela já está lá.
+                    // Ao lado dos pés dele (atrás do corpo ela some).
+                    if (efeitos.tocar("palhaco_bomba_" + id, v.x - u.facing * PALHACO_BOMBA_LADO, GROUND_Y - engine.config.palhacoAltura,
+                        PALHACO_BOMBA, esq)) {
+                        efeitos.atrasDosLutadores();
+                    }
                     break;
                 case "ULTRA_FINISH_DRAGAO":
                     // O BOOM nos pés de onde ele estava (a explosão do mesmo vídeo da bomba).
-                    efeitos.tocar("palhaco_boom_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, 1f, esq);
+                    efeitos.tocar("palhaco_boom_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, PALHACO_BOOM, esq);
                     showBanner("BOOOOOM!", -1);
                     break;
                 default:
@@ -6360,17 +6372,10 @@ public class GameView extends SurfaceView
                     // Os punhos de todos os lados, na tela inteira (duas levas).
                     tocarNaTela("ichigeki_punhos_" + id, esq);
                     break;
-                case "ULTRA_ICHIGEKI_CIRCULO":
-                    // O círculo fecha nele e os golpes invisíveis estouram dentro.
-                    ichigekiCirculoVaga = efeitos.tocarDurando("ichigeki_circulo_" + id, v.x, chestY(v), ICHIGEKI_CIRCULO,
-                        esq, 0f, 0f);
-                    efeitos.tocar("ichigeki_danos_" + id, v.x, chestY(v), ICHIGEKI_CIRCULO, esq);
-                    break;
-                case "ULTRA_ICHIGEKI_SOME":
-                    // Some do nada.
-                    efeitos.parar(ichigekiCirculoVaga, "ichigeki_circulo_" + id);
-                    ichigekiCirculoVaga = -1;
-                    beamShake = Math.max(beamShake, 10f);
+                case "ULTRA_ICHIGEKI_DANOS":
+                    // Só os golpes no preto (o rival some).
+                    efeitos.tocar("ichigeki_danos_" + id, v.x, chestY(v), ICHIGEKI_DANOS, esq);
+                    beamShake = Math.max(beamShake, 8f);
                     break;
                 case "ULTRA_ICHIGEKI_PUNHO":
                     // De cima para baixo: o punho do vídeo (que vem da esquerda) girado 90°, com os
@@ -6393,10 +6398,25 @@ public class GameView extends SurfaceView
 
     /** Altura (acima do chão) onde o punho gigante bate no rival deitado. */
     private static final float ICHIGEKI_PUNHO_Y = 28f;
-    /** Tamanho do punho gigante e do estouro (o dono: "bem exagerado") e do círculo. */
-    private static final float ICHIGEKI_PUNHO = 2.2f, ICHIGEKI_CIRCULO = 1.15f;
-    /** A vaga do círculo do Ichigeki (some de repente). */
-    private int ichigekiCirculoVaga = -1;
+    /** Tamanho do punho gigante e do estouro (o dono: "bem exagerado") e dos danos no preto. */
+    private static final float ICHIGEKI_PUNHO = 2.2f, ICHIGEKI_DANOS = 1.5f;
+    /** Quanto a câmera começa acima (px do mundo) quando desce com o punho gigante. */
+    private static final float ICHIGEKI_CAMERA = 520f;
+    /** O quanto a câmera está levantada agora pela descida do punho (desfeito a cada passo). */
+    private float ichigekiCameraAcima;
+
+    /** A câmera desce de cima com o punho gigante e para no impacto (0 fora da descida). */
+    private float ichigekiCameraAcima() {
+        for (int i = 0; i < 2; i++) {
+            int q = engine.ichigekiCena(engine.fighter(i));
+            if (q < 0) continue;
+            CombatConfig c = engine.config;
+            if (q < c.ichigekiSome || q >= c.ichigekiImpacto) return 0f;
+            float t = (q - c.ichigekiSome) / (float)Math.max(1, c.ichigekiImpacto - c.ichigekiSome);
+            return (1f - t) * (1f - t) * ICHIGEKI_CAMERA;
+        }
+        return 0f;
+    }
 
     /** Escuro da cena do Ichigeki (0 a 255): de uma vez no começo, sai depois do POFT. */
     private int escuroDoIchigeki() {
@@ -6409,11 +6429,26 @@ public class GameView extends SurfaceView
         return 0;
     }
 
-    /** A Natisuko fica fora da cena preta do Ichigeki (só o rival aparece). */
+    /**
+     * A Natisuko fica fora da cena preta do Ichigeki; o rival some nos danos (só os golpes no preto)
+     * e volta deitado quando a câmera desce com o punho.
+     */
     private boolean escondidoNoIchigeki(CombatFighter f) {
+        CombatConfig c = engine.config;
         int q = engine.ichigekiCena(f);
-        return q >= 0 && q < engine.config.ichigekiClareia;
+        if (q >= 0) return q < c.ichigekiClareia;
+        for (int i = 0; i < 2; i++) {
+            if (engine.fighter(1 - i) != f) continue;
+            int r = engine.ichigekiCena(engine.fighter(i));
+            if (r >= c.ichigekiDanos && r < c.ichigekiSome) return true;
+        }
+        return false;
     }
+
+    /** Tamanho da bomba e do BOOM da Chuva de Tomates (o dono, 17/11: a bomba um pouco maior). */
+    private static final float PALHACO_BOMBA = 1.15f, PALHACO_BOOM = 1.15f;
+    /** A bomba fica de lado nos pés do rival (px), do lado de onde a Bonnie estava. */
+    private static final float PALHACO_BOMBA_LADO = 90f;
 
     /** Folga do efeito de tela inteira além da tela (a borda do vídeo nunca aparece). */
     private static final float TELA_FOLGA = 1.22f;

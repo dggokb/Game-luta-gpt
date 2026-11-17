@@ -5050,8 +5050,8 @@ final class CombatEngine {
 
     /**
      * O Ichigeki (a Natisuko): no preto, o rival preso no meio (defendeu ou estava alto: sem a
-     * cena) leva os punhos de todos os lados e os golpes invisíveis do círculo; o círculo some, ele
-     * cai deitado e o punho gigante desce de cima e crava (o golpe final). Ele fica no chão.
+     * cena) leva os punhos de todos os lados e os danos; ele cai deitado e o punho gigante desce de
+     * cima e crava (o golpe final). Ele fica no chão.
      */
     private void updateIchigeki(CombatFighter a, CombatFighter d) {
         if (a.dragaoEstado == 0) {
@@ -5097,7 +5097,7 @@ final class CombatEngine {
                 d.bounce = CombatFighter.BOUNCE_NONE;
                 d.stunProjectile = null;
                 if (a.ultraFrame >= config.ichigekiSome) {
-                    // O círculo sumiu: deitado no chão esperando o punho.
+                    // Depois dos danos: deitado no chão esperando o punho.
                     deitadoNoIchigeki(d);
                 } else {
                     // No círculo: em pé (ou no ar onde estava), parado, levando os socos.
@@ -5109,8 +5109,7 @@ final class CombatEngine {
         }
         if (a.dragaoEstado == 1 || a.dragaoEstado == 3) {
             if (a.ultraFrame == config.ichigekiSocos || a.ultraFrame == config.ichigekiSocos2) cues.add("ULTRA_ICHIGEKI_SOCOS");
-            if (a.ultraFrame == config.ichigekiCirculo) cues.add("ULTRA_ICHIGEKI_CIRCULO");
-            if (a.ultraFrame == config.ichigekiSome) cues.add("ULTRA_ICHIGEKI_SOME");
+            if (a.ultraFrame == config.ichigekiDanos) cues.add("ULTRA_ICHIGEKI_DANOS");
             if (a.ultraFrame == config.ichigekiPunho) cues.add("ULTRA_ICHIGEKI_PUNHO");
         }
         if (a.ultraFrame >= config.ichigekiQuadros || (a.dragaoEstado == 2 && a.ultraFrame >= 30)) {
@@ -5880,6 +5879,13 @@ final class CombatEngine {
     private void counter(CombatFighter d, CombatFighter a) {
         cues.add(d.attack.mechanics.repel ? "REPEL" : "COUNTER");
         d.countered = true;
+        if (d.attack.kind == AttackDefinition.Kind.SUPER && d.attack.mechanics.parry && d.attack.melee()) {
+            // O Espelho do Lago (a Yin-lu): o desvio já a leva até quem bateu, senão as primeiras
+            // palmas não alcançam quem bateu de longe (o dono, 17/11: "golpe que não conectou").
+            d.facing = a.x >= d.x ? 1 : -1;
+            float falta = Math.abs(a.x - d.x) - (d.body().halfWidth + a.body().halfWidth + 30f);
+            if (falta > 0f) d.x = Arena.clamp(d.x + d.facing * falta, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        }
         d.attackFrame = d.attack.startupFrames;
         d.hitCutFrame = -1;   // um repel que já desfez uma bola ainda responde ao golpe inteiro
         Contact answer = new Contact();

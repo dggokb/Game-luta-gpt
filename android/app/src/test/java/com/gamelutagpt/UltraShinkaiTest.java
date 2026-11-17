@@ -204,7 +204,7 @@ public class UltraShinkaiTest {
         s.in[0].ultra = true;
         CombatConfig c = s.engine.config;
         int golpes = 0, deitadoAntes = 0, golpesDeitado = 0;
-        boolean punho = false, socos = false, circulo = false, voou = false, deitadoNoFim = false;
+        boolean punho = false, socos = false, danos = false, voou = false, deitadoNoFim = false;
         for (int i = 0; i < 600 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
             s.step();
             s.in[0].direction = 0;
@@ -213,7 +213,7 @@ public class UltraShinkaiTest {
             if (q >= c.ichigekiSome && q < c.ichigekiImpacto && deitado) deitadoAntes++;
             if (s.engine.cues().contains("ULTRA_ICHIGEKI_SOCOS")) socos = true;
             if (s.engine.cues().contains("ULTRA_ICHIGEKI_PUNHO")) punho = true;
-            if (s.engine.cues().contains("ULTRA_ICHIGEKI_CIRCULO")) circulo = true;
+            if (s.engine.cues().contains("ULTRA_ICHIGEKI_DANOS")) danos = true;
             if (s.f(1).launched) voou = true;
             for (CombatEngine.HitEvent h : s.engine.events()) {
                 if (h.attacker != 0 || !"ULTRA".equals(h.moveId) || h.blocked) continue;
@@ -225,7 +225,7 @@ public class UltraShinkaiTest {
         assertTrue("os punhos de todos os lados", socos);
         assertTrue("o punho gigante desceu", punho);
         assertTrue("deitado esperando o punho: " + deitadoAntes, deitadoAntes > 30);
-        assertTrue("o círculo", circulo);
+        assertTrue("os danos no preto", danos);
         assertEquals("os socos e o punho gigante", c.dragaoAcertos + 1, golpes);
         assertEquals("o punho crava deitado", 1, golpesDeitado);
         assertTrue("fica no chão no impacto", deitadoNoFim);
