@@ -4765,6 +4765,19 @@ final class CombatEngine {
         return false;
     }
 
+    /** O Ultra SHINKAI do lutador é o da palhaça ({@link CombatConfig#ultraPalhaco}). */
+    boolean temPalhaco(CharacterDefinition c) {
+        if (c == null || config.ultraPalhaco == null) return false;
+        for (String id : config.ultraPalhaco.split(",")) if (id.trim().equals(c.id)) return true;
+        return false;
+    }
+
+    /** A cena preta da Chuva de Tomates: quadro dela (0 em diante), ou -1 fora dela. */
+    int palhacoCena(CombatFighter a) {
+        if (!a.inUltraDragao() || !temPalhaco(a.character()) || a.dragaoEstado == 2) return -1;
+        return a.ultraFrame < config.palhacoQuadros ? a.ultraFrame : -1;
+    }
+
     /** O rival está dentro do casulo da garça agora (o desenho dele some). */
     boolean garcaEscondeRival(CombatFighter a) {
         return a.inUltraDragao() && temGarca(a.character()) && a.dragaoEstado == 1 &&
@@ -4786,6 +4799,10 @@ final class CombatEngine {
      * na frente fica parado até a cabeça chegar nele, como numa cena.
      */
     private void comecarDragao(CombatFighter a, CombatFighter d) {
+        if (temPalhaco(a.character())) {
+            superFreeze = Math.max(superFreeze, config.palhacoQuadros);
+            return;
+        }
         if (temGarca(a.character())) {
             // A garça: a luta para a cena inteira e o rival espera ela descer nele.
             superFreeze = Math.max(superFreeze, config.garcaQuadros);
@@ -4808,6 +4825,10 @@ final class CombatEngine {
         if (!a.inUltraDragao()) return;
         if (temGarca(a.character())) {
             updateGarca(a, d);
+            return;
+        }
+        if (temPalhaco(a.character())) {
+            updatePalhaco(a, d);
             return;
         }
         float origem = a.x + a.facing * config.dragaoOrigem;
@@ -4936,6 +4957,71 @@ final class CombatEngine {
         }
         if (a.ultraFrame == config.garcaMergulho) cues.add("ULTRA_GARCA_MERGULHO");
         if (a.ultraFrame >= config.garcaQuadros) {
+            a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+            a.ultraFrame = 0;
+        }
+    }
+
+    /**
+     * A Chuva de Tomates (a Bonnie): o rival no picadeiro, preso, leva um tomate a cada tanto; a
+     * bomba nos pés dele explode e o joga alto e longe. Defendeu (ou estava alto): sem a cena.
+     */
+    private void updatePalhaco(CombatFighter a, CombatFighter d) {
+        if (a.dragaoEstado == 0) {
+            int guard = effectiveGuard(d);
+            if (!d.hittable() || d.ko() || Arena.GROUND_Y - d.y > config.dragaoAltura) {
+                a.dragaoEstado = 2;
+            } else if (guardStops(guard, ultraAttack, false, false)) {
+                block(a, d, ultraAttack, guard, a.facing, false);
+                a.dragaoEstado = 2;
+            } else {
+                ComboSession session = sessionFor(a, d);
+                a.ultraScale = session.scaleFor(ultraAttack, config);
+                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
+                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
+                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
+                a.dragaoEstado = 1;
+                a.dragaoInicio = a.ultraFrame;
+                a.ultraVictim = d;
+                a.ultraVictimState = d.state;
+                cues.add("ULTRA_PALHACO");
+            }
+        }
+        if (a.dragaoEstado == 1) {
+            if (d != a.ultraVictim || d.state != a.ultraVictimState) {
+                a.dragaoEstado = 3;
+            } else if (a.ultraFrame >= config.palhacoBoom) {
+                // BOOOOM: a bomba joga o rival alto e longe; ele cai derrubado.
+                golpeDoDragao(a, d, a.dragaoDanoFinal, true);
+                d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+                d.grounded = false;
+                launchUltraVictim(a, d);
+                a.dragaoEstado = 3;
+                cues.add("ULTRA_FINISH_DRAGAO");
+            } else {
+                int t = a.ultraFrame - config.palhacoTomateAcerto;
+                int devidos = t < 0 ? 0 : Math.min(config.dragaoAcertos, 1 + t / Math.max(1, config.palhacoTomateIntervalo));
+                while (a.dragaoAcertos < devidos) {
+                    a.dragaoAcertos++;
+                    golpeDoDragao(a, d, a.dragaoDanoPequeno, false);
+                }
+                // No picadeiro: em pé no tampo, parado, levando os tomates.
+                d.clearAttack();
+                d.vx = 0f;
+                d.vy = 0f;
+                d.bounce = CombatFighter.BOUNCE_NONE;
+                d.grounded = false;
+                d.y = Arena.GROUND_Y - (a.ultraFrame >= config.palhacoPicadeiro ? config.palhacoAltura : 0f);
+                d.status = CombatFighter.Status.HITSTUN;
+                d.stunProjectile = null;
+                d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.palhacoBoom - a.ultraFrame + 20);
+                d.stunElapsed = 0;
+            }
+        }
+        if (a.ultraFrame == config.palhacoTomates && a.dragaoEstado == 1) cues.add("ULTRA_PALHACO_TOMATES");
+        if (a.ultraFrame == config.palhacoTela && a.dragaoEstado != 2) cues.add("ULTRA_PALHACO_TELA");
+        if (a.ultraFrame == config.palhacoBomba && a.dragaoEstado != 2) cues.add("ULTRA_PALHACO_BOMBA");
+        if (a.ultraFrame >= config.palhacoQuadros || (a.dragaoEstado == 2 && a.ultraFrame >= 30)) {
             a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
             a.ultraFrame = 0;
         }

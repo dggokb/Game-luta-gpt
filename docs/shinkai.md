@@ -151,8 +151,9 @@ e a Yin-lu (a garça branca, 14/11). Os outros ficam na guarda durante o corte.
 **Ultra SHINKAI de cada um (17/11):** o do Ryūga é o dragão que atravessa a tela; o da Yin-lu, o
 **Voo da Garça**: ela manda a garça ao céu, a garça desce no rival e fecha as asas num casulo (ele
 some dentro e leva os golpes), o casulo sobe, a garça mergulha e o crava no chão, e ele quica e cai
-longe (`CombatConfig.ultraGarca`). A Natisuko (Ichigeki) e a Bonnie (Chuva de Tomates) estão nas
-fichas, esperando vídeos.
+longe (`CombatConfig.ultraGarca`). A Bonnie tem a **Chuva de Tomates** (tudo preto, o rival num
+picadeiro, a plateia joga tomates, a tela fica vermelha e é limpa, a bomba nos pés dele explode:
+`CombatConfig.ultraPalhaco`). A Natisuko (Ichigeki) está na ficha.
 
 **O que nasce na ativação (17/11, o dono):** **bicho só na família Komyo** (a escola dos irmãos): o
 dragão do Ryūga, a garça da Yin-lu e o tigre do Kōga. Quem é de fora mostra o próprio jeito: a

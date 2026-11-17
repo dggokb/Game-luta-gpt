@@ -1890,3 +1890,19 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - **Primeira gravação:** na invocação ela ficava na guarda (o desenho do Ultra comum entrava antes):
   o Ultra SHINKAI com animação própria não usa mais o do Ultra comum.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+- **Depois, "o efeito em volta dela ficou estranho, pega aquele do redemoinho":** o brilho e as penas
+  do vídeo da invocação saíram da folha (sem `manter_efeitos`) e o `penas_redemoinho_p02` gira em
+  volta dela (na frente, 0,6) na invocação.
+
+## Rodada de 17/11: o Ultra SHINKAI da Bonnie (Chuva de Tomates)
+
+- **Pedido (ideia do dono):** tudo fica preto; um picadeiro pequeno aparece com o rival em cima; um
+  monte de mãos joga tomates nele; a tela fica vermelha de tomate e é limpa; uma bomba nos pés dele,
+  BOOOOM.
+- **Feito:** os vídeos do dono (em fundo preto) viraram `palhaco_picadeiro_p16` (pelo brilho; o
+  último quadro segura 2,6 s), `palhaco_tomates_p16` e `palhaco_tela_p16` (com `--opaco`, novo no
+  `efeito_video_preto.py`: só o preto ligado à borda some), `palhaco_bomba_p16` (opaco, até o
+  pavio) e `palhaco_boom_p16` (pelo brilho, `--borda 160`). A cena (`updatePalhaco`): o mundo
+  escurece, a Bonnie some, o rival fica no tampo do picadeiro (42 px), sete tomates acertam, a tela
+  vermelha cobre o que a câmera mostra, a bomba e no BOOM (quadro 241) o rival voa e o escuro sai.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.

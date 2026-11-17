@@ -166,4 +166,30 @@ public class UltraShinkaiTest {
         assertTrue("caiu longe: " + (s.f(1).x - rivalX), s.f(1).x - rivalX > 200f);
         assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
     }
+
+    @Test public void aChuvaDeTomatesDaBonnieExplodeORivalNoPicadeiro() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p16"), GeneratedCharacters.get("p03"), 400f, 700f);
+        s.f(1).state.life = 1_000_000;
+        transformar(s);
+        assertTrue(s.engine.temPalhaco(s.f(0).character()));
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        int golpes = 0, noPicadeiro = 0;
+        boolean bomba = false, voou = false;
+        for (int i = 0; i < 600 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA || !s.f(1).grounded); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            if (s.engine.palhacoCena(s.f(0)) >= 0 && Arena.GROUND_Y - s.f(1).y > 30f) noPicadeiro++;
+            if (s.engine.cues().contains("ULTRA_PALHACO_BOMBA")) bomba = true;
+            if (s.f(1).launched) voou = true;
+            for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && "ULTRA".equals(h.moveId) && !h.blocked) golpes++;
+        }
+        assertTrue("o rival ficou no picadeiro", noPicadeiro > 100);
+        assertTrue("a bomba", bomba);
+        assertEquals("os tomates e o BOOM", s.engine.config.dragaoAcertos + 1, golpes);
+        assertTrue("o BOOM joga longe", voou);
+        assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
+    }
 }

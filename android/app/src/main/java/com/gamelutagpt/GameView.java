@@ -2239,6 +2239,8 @@ public class GameView extends SurfaceView
             if ("ULTRA_SHINKAI".equals(cue)) beamShake = Math.max(beamShake, 26f);
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
             if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
+            if (cue.startsWith("ULTRA_PALHACO")) chuvaDeTomates(cue);
+            if ("ULTRA_FINISH_DRAGAO".equals(cue)) chuvaDeTomates(cue);
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) {
                 // O último golpe do dragão: tela tremendo, câmera lenta e impact frame em quem voou.
                 beamShake = Math.max(beamShake, 24f);
@@ -3217,6 +3219,12 @@ public class GameView extends SurfaceView
      * transformação: o Ultra é outra cena.
      */
     private void cenaDoDragao(CombatFighter p) {
+        if (engine.temGarca(p.character())) {
+            // O Voo da Garça: o redemoinho de penas gira em volta dela na invocação (o dono, 17/11).
+            float ms = (engine.config.dragaoPreparo + engine.config.garcaPega) * FIXED_STEP * 1000f;
+            // Na frente (atrás o escurecido do Ultra apagava as penas); o miolo do redemoinho é vazio.
+            efeitos.tocarAndando("penas_redemoinho_" + p.character().id, p.x, chestY(p), 0.6f, p.facing < 0, 0f, ms);
+        }
         ativacaoLado = p.index;
         ativacaoInicio = engine.frame();
         ativacaoQuadros = engine.config.dragaoPreparo;
@@ -4606,8 +4614,19 @@ public class GameView extends SurfaceView
                 drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
                 drawMechanicAura(canvas, player(), tagOffset());
             }
+            // A Chuva de Tomates da Bonnie: tudo preto, só o picadeiro e o rival.
+            int escuroPalhaco = escuroDoPalhaco();
+            if (escuroPalhaco > 0) effects.drawWorldOverlay(canvas, paint, escuroPalhaco, 0, 0, 0);
             // A fumaça do pulo e do super pulo fica atrás dos lutadores (pedido do dono, 11/11).
             efeitos.desenharAtras(canvas);
+            if (escuroPalhaco > 0) {
+                // O rival do lado do CPU foi desenhado antes do escuro: de novo, em cima do picadeiro.
+                CombatFighter npc = opponent();
+                canvas.save();
+                canvas.translate(engine.teams.tagOffset(OPPONENT), 0f);
+                drawFighter(canvas, opponentSpriteRenderer, npc, false, false);
+                canvas.restore();
+            }
             drawEchoes(canvas);
             drawHenchmen(canvas);
             drawPartner(canvas);
@@ -4660,7 +4679,7 @@ public class GameView extends SurfaceView
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
             // Na finalização a frente do cenário some junto com o resto dele.
-            if (cenario && stageScene != null && finalizacao.forca() <= 0f) {
+            if (cenario && stageScene != null && finalizacao.forca() <= 0f && escuroDoPalhaco() < 255) {
                 graduarCenario(true);
                 stageScene.drawForeground(renderCanvas);
                 graduarCenario(false);
@@ -5421,18 +5440,13 @@ public class GameView extends SurfaceView
             } else if (miss != null) {
                 animation = miss.id;
                 animationElapsed = miss.timeFor(elapsed, total);
-            } else if (f.desvioInicio >= 0 && character.animations.containsKey(DESVIO)) {
-                // O Espelho do Lago que leu um poder: gira (quadros 0-8 do desenho), corre na base
-                // longa enquanto investe (9-14) e empurra as palmas no tempo do resto do golpe (15-26).
+            } else if (f.desvioInicio >= 0 && f.investeAlvo != null && character.animations.containsKey(DESVIO)) {
+                // O Espelho do Lago que leu um poder: o desvio é só a aproximação (o dono, 17/11): gira
+                // (quadros 0-8 do desenho) e corre na base longa até quem atirou (9-14); chegando, as
+                // palmas são as do Super de sempre.
                 CharacterDefinition.Animation dv = character.animations.get(DESVIO);
                 int desde = engine.frame() - f.desvioInicio;
-                int quadro;
-                if (f.investeAlvo != null) {
-                    quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
-                } else {
-                    float t = (f.attackFrame - f.attack.startupFrames) / (float)Math.max(1, f.attack.totalFrames - f.attack.startupFrames);
-                    quadro = 15 + Math.round(clamp(t, 0f, 1f) * (dv.frameCount() - 16));
-                }
+                int quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
                 animation = dv.id;
                 animationElapsed = dv.timeOfFrame(Math.min(dv.frameCount() - 1, quadro)) + 0.001f;
             } else if (f.move != null) {
@@ -6267,6 +6281,67 @@ public class GameView extends SurfaceView
         }
     }
 
+    /**
+     * A Chuva de Tomates da Bonnie: o picadeiro aparece com o rival em cima (atrás dele), a plateia
+     * joga os tomates, a tela inteira fica vermelha e é limpa, e a bomba explode nos pés dele.
+     */
+    private void chuvaDeTomates(String cue) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temPalhaco(u.character())) continue;
+            CombatFighter v = engine.fighter(1 - i);
+            String id = u.character().id;
+            boolean esq = u.facing < 0;
+            switch (cue) {
+                case "ULTRA_PALHACO":
+                    if (efeitos.tocar("palhaco_picadeiro_" + id, v.x, GROUND_Y, 1f, esq)) efeitos.atrasDosLutadores();
+                    ultraSounds.playFight("ar_h", 0.8f, 1.2f);
+                    break;
+                case "ULTRA_PALHACO_TOMATES":
+                    efeitos.tocar("palhaco_tomates_" + id, v.x, chestY(v), 1f, esq);
+                    break;
+                case "ULTRA_PALHACO_TELA": {
+                    // Na tela inteira: do tamanho do que a câmera mostra.
+                    String nome = "palhaco_tela_" + id;
+                    float largura = efeitos.larguraCena(nome);
+                    float tamanho = largura > 0f ? Math.max(1f, VW / Math.max(0.01f, camera.zoom) / largura * 1.1f) : 1f;
+                    efeitos.tocar(nome, camera.x, meioDaTelaY(), tamanho, false);
+                    break;
+                }
+                case "ULTRA_PALHACO_BOMBA":
+                    efeitos.tocar("palhaco_bomba_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, 1f, esq);
+                    break;
+                case "ULTRA_FINISH_DRAGAO":
+                    // O BOOM nos pés de onde ele estava (a explosão do mesmo vídeo da bomba).
+                    efeitos.tocar("palhaco_boom_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, 1f, esq);
+                    showBanner("BOOOOOM!", -1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /** Escuro da cena da Chuva de Tomates (0 a 255): entra no começo e sai no BOOM. */
+    private int escuroDoPalhaco() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            int q = engine.palhacoCena(u);
+            if (q < 0) continue;
+            CombatConfig c = engine.config;
+            if (q < 10) return q * 25;
+            if (q < c.palhacoBoom) return 255;
+            return Math.max(0, 255 - (q - c.palhacoBoom) * 12);
+        }
+        return 0;
+    }
+
+    /** A Bonnie fica fora da cena preta do picadeiro (reaparece no BOOM). */
+    private boolean escondidaNoPicadeiro(CombatFighter f) {
+        int q = engine.palhacoCena(f);
+        return q >= 0 && q < engine.config.palhacoBoom;
+    }
+
     /** O mergulho do Voo da Garça: a garça desce de cabeça sobre o rival (nos pés dele). */
     private void mergulhoDaGarca() {
         for (int i = 0; i < 2; i++) {
@@ -6681,7 +6756,7 @@ public class GameView extends SurfaceView
 
     private void drawFighterCorpo(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                                   boolean damageFlash, boolean guardFlash) {
-        if (hiddenByUltra(f) || cenaEmVideo) return;
+        if (hiddenByUltra(f) || cenaEmVideo || escondidaNoPicadeiro(f)) return;
         // A liberação do SHINKAI em vídeo já desenha o lutador (no efeito).
         if (ativacaoEfeito && ativacaoShinkai() && f == engine.fighter(ativacaoLado)) return;
         float zanzoken = zanzokenAlpha(f);
