@@ -214,7 +214,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg'}
+             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg','cruza'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -292,6 +292,10 @@ def validate_mechanics(name, mech, m, projectile):
     # OTG próprio (o Carrinho da Yin-lu): pega o rival caído no combo, como o ↓ + M.
     if 'otg' in mech and (mech['otg'] is not True or projectile or 'reach' not in m):
         raise ValueError(f'{name}.mecanica.otg: true, on a striking move')
+    # Cruza (o salto mortal da p16): passa por cima e pega atrás da raiz, como o jM do crossup.
+    if 'cruza' in mech and (mech['cruza'] is not True or projectile or 'reach' not in m
+                            or not mech.get('avanco', {}).get('atravessa')):
+        raise ValueError(f'{name}.mecanica.cruza: true, on a striking move whose avanco atravessa')
     # Rebote (o S1 do p14): o chute do mergulho; acertou, ele pula para trás.
     if 'rebote' in mech and (mech['rebote'] is not True or not m.get('golpes') or 'reach' not in m):
         raise ValueError(f'{name}.mecanica.rebote: true, on a striking move with golpes')
@@ -469,6 +473,9 @@ def validate_attack(name, m, projectile):
         if key in m: non_negative_int(m[key], f'{name}.{key}')
     if 'low' in m and type(m['low']) is not bool:
         raise ValueError(f'{name}.low: expected true or false')
+    # Golpe alto fora do → + M (a bundada da p16): agachado não defende.
+    if 'overhead' in m and (m['overhead'] is not True or m.get('low')):
+        raise ValueError(f'{name}.overhead: true (or leave it out), not on a low move')
     for key,first,last in (('hitboxes',m['startupFrames'],last_active),('hurtboxes',0,total-1)):
         for box in m.get(key, []):
             frames,x,y = box.get('frames'),box.get('x'),box.get('y')
@@ -830,7 +837,7 @@ def compile_packs(root, results, alterados=None, medir=False):
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
         if 'maxUsesPerChain' in m: code += '.maxUsesPerChain('+str(m['maxUsesPerChain'])+')'
         if m.get('low'): code += '.low(true)'
-        if binding == OVERHEAD: code += '.overhead(true)'
+        if binding == OVERHEAD or m.get('overhead'): code += '.overhead(true)'
         if reach is not None: code += '.reach('+f(reach)+','+f(height)+(','+f(m['hitFloor']) if 'hitFloor' in m else '')+')'
         if 'alcanceMaximo' in m: code += '.reachCap('+f(m['alcanceMaximo'])+')'
         for key in ('hitboxes','hurtboxes'):
@@ -856,6 +863,7 @@ def compile_packs(root, results, alterados=None, medir=False):
         if 'agarra' in mech: code += '.grab('+f(mech['agarra']['alcance'])+')'
         if mech.get('chao'): code += '.pound()'
         if mech.get('otg'): code += '.otg()'
+        if mech.get('cruza'): code += '.crossUp()'
         if mech.get('rebote'): code += '.rebound()'
         if 'salto' in mech: code += '.hop('+f(mech['salto']['altura'])+','+','.join(map(str,mech['salto']['frames']))+')'
         if 'arco' in mech: code += '.arc('+f(mech['arco']['altura'])+','+f(mech['arco']['distancia'])+(',true' if mech['arco'].get('parede') else '')+')'

@@ -809,6 +809,9 @@ SF6/FighterZ, no chip de especial de todos e no Just Defense do Garou).
 - **COMANDOS** (pausa): "Golpe alto → + M" e "Defesa perfeita ←" em todas as fichas; com muitas
   linhas elas ficam mais baixas para caber acima do rodapé.
 
+Outro golpe de chão pode ser alto com `"overhead": true` no golpe (a Bundada do trampolim da p16,
+H correndo, 17/11).
+
 Testes em `DefesaEGolpeAltoTest`.
 
 ### Crossup (jM)
@@ -829,6 +832,12 @@ apertando M na descida, o golpe acerta pelas costas. Os outros aéreos só pegam
   uma vez por queda) pula para cair por cima dele e desce com o jM; num pulo em que o rival já
   ficou atrás dela, também usa o jM.
 - Testes: `CrossUpTest`.
+- **No chão (17/11):** o golpe com a mecânica `cruza` (o Salto mortal da p16, → + H) também pega
+  atrás: passa por cima com o avanço que atravessa (`avanco.atravessa`) e a faixa atrás vai até o
+  alcance do golpe (`max(crossUpBehind, reach)`), porque ele cai mais longe que o jM.
+- **Virar ao acabar o golpe (17/11):** quem termina um golpe do outro lado do rival vira para ele
+  no mesmo quadro, antes de o golpe seguinte sair (`resolve`); antes o L apertado na recuperação
+  saía de costas. Testes: `ComandoECorridaDaDuplaTest`.
 
 ### Combo breaker
 

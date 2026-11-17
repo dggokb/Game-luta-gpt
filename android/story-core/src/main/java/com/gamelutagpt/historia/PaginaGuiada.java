@@ -4,6 +4,7 @@ import com.gamelutagpt.render.Rand;
 import com.gamelutagpt.render.RenderCanvas;
 import com.gamelutagpt.render.RenderImage;
 import java.util.IdentityHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -349,24 +350,56 @@ final class PaginaGuiada {
         float cy = sy((b.caixa[1] + b.caixa[3]) * 0.5f * pageH);
         float y = cy - lines.size() * lineH * k * 0.5f + size * k * 0.86f;
         for (String line : lines) {
-            int at = b.destaque != null ? line.indexOf(b.destaque) : -1;
-            if (at < 0) {
+            List<String> partes = new ArrayList<>();
+            List<Boolean> cor = new ArrayList<>();
+            dividir(line, b.destaque, partes, cor);
+            if (partes.size() == 1 && !cor.get(0)) {
                 c.drawText(line, cx, y, size * k, Baloes.INK, 0, 0f, false);
             } else {
-                // A linha em três pedaços (antes, o destaque, depois), centrada como se fosse uma só.
-                String[] partes = {line.substring(0, at), b.destaque, line.substring(at + b.destaque.length())};
-                float[] largura = new float[3];
+                // A linha em pedaços (o destaque em cor), centrada como se fosse uma só.
+                float[] largura = new float[partes.size()];
                 float total = 0f;
-                for (int p = 0; p < 3; p++) total += largura[p] = c.measureText(partes[p], size * k, false);
+                for (int p = 0; p < partes.size(); p++) total += largura[p] = c.measureText(partes.get(p), size * k, false);
                 float x = cx - total * 0.5f;
-                for (int p = 0; p < 3; p++) {
-                    if (!partes[p].isEmpty()) {
-                        c.drawText(partes[p], x + largura[p] * 0.5f, y, size * k, p == 1 ? b.corDestaque : Baloes.INK, 0, 0f, false);
-                    }
+                for (int p = 0; p < partes.size(); p++) {
+                    c.drawText(partes.get(p), x + largura[p] * 0.5f, y, size * k, cor.get(p) ? b.corDestaque : Baloes.INK, 0, 0f, false);
                     x += largura[p];
                 }
             }
             y += lineH * k;
+        }
+    }
+
+    /** Divide {@code line} nos pedaços em preto e nos {@code destaques} (em cor), na ordem. */
+    static void dividir(String line, String[] destaques, List<String> partes, List<Boolean> cor) {
+        int i = 0;
+        while (i < line.length()) {
+            int at = -1;
+            String achado = null;
+            for (String d : destaques) {
+                if (d.isEmpty()) continue;
+                int j = line.indexOf(d, i);
+                if (j >= 0 && (at < 0 || j < at)) {
+                    at = j;
+                    achado = d;
+                }
+            }
+            if (at < 0) {
+                partes.add(line.substring(i));
+                cor.add(false);
+                break;
+            }
+            if (at > i) {
+                partes.add(line.substring(i, at));
+                cor.add(false);
+            }
+            partes.add(achado);
+            cor.add(true);
+            i = at + achado.length();
+        }
+        if (partes.isEmpty()) {
+            partes.add(line);
+            cor.add(false);
         }
     }
 

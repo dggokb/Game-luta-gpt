@@ -120,7 +120,7 @@ Cole o passo onde a página entra no episódio e complete:
 Quando a arte tem um nome gritado em cor (o NECRO vermelho do Blackwood), o balão digitado pode
 manter: `"destaque": "NECROOOOO!"` e `"corDestaque": "#D2101C"` (padrão vermelho). Onde esse
 pedaço aparece numa linha do texto (em qualquer idioma), ele sai nessa cor; o resto, em preto.
-Use um pedaço que não muda na tradução, como um nome.
+Use um pedaço que não muda na tradução, como um nome. Mais de um pedaço: `"destaque": ["RYŪGA", "KŌGA"]`.
 
 ### 3b. Conferir o texto nos balões
 

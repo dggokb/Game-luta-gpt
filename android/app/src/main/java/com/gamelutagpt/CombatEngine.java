@@ -680,7 +680,11 @@ final class CombatEngine {
             f.dashRequest = f.backdashRequest = false;
             return;
         }
+        boolean atacava = f.status == CombatFighter.Status.ATTACK;
         endFinishedStates(f);
+        // O golpe que acabou do outro lado do rival (o Salto mortal da p16 cruza): vira antes de o
+        // próximo golpe sair, senão o golpe apertado na recuperação sai de costas para ele.
+        if (atacava && f.status == CombatFighter.Status.NEUTRAL && f.grounded) updateFacing(f);
         if (f.locked || f.ko()) {
             f.dashRequest = f.backdashRequest = false;
             return;
@@ -3937,9 +3941,13 @@ final class CombatEngine {
         return v;
     }
 
-    /** O golpe de {@code a} pega por trás (crossup): no ar, o golpe do crossup e o rival atrás dele. */
+    /**
+     * O golpe de {@code a} pega por trás (crossup): no ar, o golpe do crossup; no chão, o golpe que
+     * passa por cima (mecânica cruza, o Salto mortal da p16).
+     */
     boolean podeCruzar(CombatFighter a) {
-        return !a.grounded && a.attacking() && a.attack != null && config.crossUpMove.equals(a.attack.id);
+        if (!a.attacking() || a.attack == null) return false;
+        return a.attack.mechanics.crossUp || !a.grounded && config.crossUpMove.equals(a.attack.id);
     }
 
     /**
@@ -3952,7 +3960,10 @@ final class CombatEngine {
         if (!podeCruzar(a) || (d.x - a.x) * a.facing >= CombatRules.MIN_MELEE_DISTANCE) return false;
         float[] g = golpeNoDesenho(a, frame);
         float y0 = g != null ? minDe(g, 2) - FOLGA_DESENHO : box.y0, y1 = g != null ? maxDe(g, 3) + FOLGA_DESENHO : box.y1;
-        float x0 = -config.crossUpBehind, x1 = 0f;
+        // O golpe que cruza no chão (o Salto mortal) cai mais longe que o jM: a faixa atrás vai até o
+        // alcance dele.
+        float behind = a.attack.mechanics.crossUp ? Math.max(config.crossUpBehind, a.attack.reach) : config.crossUpBehind;
+        float x0 = -behind, x1 = 0f;
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
         if (corpo == null) {
             return CombatRules.overlaps(a.x, a.y, a.facing, x0, x1, y0, y1,

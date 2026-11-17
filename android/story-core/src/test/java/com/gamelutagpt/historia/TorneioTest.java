@@ -411,21 +411,51 @@ public class TorneioTest {
 
     @Test
     public void ep04MostraADuplaDoPortoNoSalao() throws IOException {
-        // Depois da página do salão (Drive 38), a dupla do porto aparece (38_01 a 38_04) e o
-        // Ryūga e a Yín-lù a reconhecem (38_00).
-        for (String adversario : new String[] {"p05", "p07", "p09", "p11"}) {
-            List<String> ryuga = paginas("ep04", campanhaComPorto(Torneio.RYUGA, adversario));
-            assertEquals(java.util.Arrays.asList("pag1.jpg", "pag1_porto_" + adversario + ".jpg", "pag1_ryuga_reconhece.jpg",
-                "pag2.jpg"), ryuga.subList(0, 4));
-            // O Kōga ainda não tem a página dele reconhecendo: só a da dupla.
-            List<String> koga = paginas("ep04", campanhaComPorto(Torneio.KOGA, adversario));
-            assertEquals(java.util.Arrays.asList("pag1.jpg", "pag1_porto_" + adversario + ".jpg", "pag2.jpg"), koga.subList(0, 3));
+        // Depois da página do salão (Drive 38), a dupla do porto aparece (38_01 a 38_06) e o
+        // irmão escolhido e o parceiro a reconhecem (38_00 de cada irmão).
+        for (String adversario : new String[] {"p05", "p07", "p09", "p11", "p13", "p15"}) {
+            for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+                List<String> paginas = paginas("ep04", campanhaComPorto(irmao, adversario));
+                assertEquals(java.util.Arrays.asList("pag1.jpg", "pag1_porto_" + adversario + ".jpg",
+                    "pag1_" + irmao + "_reconhece.jpg", "pag2.jpg"), paginas.subList(0, 4));
+            }
         }
-        // p13 e p15 ainda não têm a imagem: o salão segue direto.
-        for (String adversario : new String[] {"p13", "p15"}) {
-            List<String> ryuga = paginas("ep04", campanhaComPorto(Torneio.RYUGA, adversario));
-            assertEquals(java.util.Arrays.asList("pag1.jpg", "pag2.jpg"), ryuga.subList(0, 2));
+    }
+
+    @Test
+    public void ep04FechaComAPaginaDoIrmaoEOsMagnatas() throws IOException {
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            List<String> paginas = paginas("ep04", campanhaComPorto(irmao, "p05"));
+            int i = paginas.indexOf("pag16_" + irmao + ".jpg");
+            assertEquals(java.util.Arrays.asList("pag17_" + irmao + ".jpg", "pag18.jpg"), paginas.subList(i + 1, i + 3));
         }
+    }
+
+    @Test
+    public void ep05MostraQuemEmboscaNaPonte() throws IOException {
+        // A página 63 depende de quem embosca na ponte: p05 (63_1), p11 (63_2) ou p13 (63_3).
+        Set<String> vistas = new HashSet<>();
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            for (long semente = 0; semente < 40; semente++) {
+                Campanha c = Campanha.load(new GameAssets(), semente);
+                c.escolher(irmao);
+                Torneio t = c.torneio();
+                t.registrar(true);
+                List<String> paginas = paginas("ep05", c);
+                String ponte = "pag8_" + t.emboscada().id + ".jpg";
+                assertTrue(irmao + " " + semente + ": " + paginas, paginas.contains(ponte));
+                for (String id : new String[] {"p05", "p11", "p13"}) {
+                    if (!id.equals(t.emboscada().id)) assertFalse(paginas.contains("pag8_" + id + ".jpg"));
+                }
+                // 56 a 59 só do Ryūga; 60 a 62 dos dois, antes da página da ponte.
+                assertEquals(Torneio.RYUGA.equals(irmao), paginas.contains("pag1_ryuga.jpg"));
+                int i = paginas.indexOf("pag5.jpg");
+                assertEquals(java.util.Arrays.asList("pag5.jpg", "pag6.jpg", "pag7.jpg", ponte), paginas.subList(i, i + 4));
+                assertTrue(paginas.indexOf("LUTA") > paginas.indexOf(ponte));
+                vistas.add(ponte);
+            }
+        }
+        assertEquals(3, vistas.size());
     }
 
     @Test
