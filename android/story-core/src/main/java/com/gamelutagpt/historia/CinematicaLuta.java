@@ -2380,6 +2380,7 @@ public final class CinematicaLuta {
     /** Faixas, onomatopeias, QTE, tinta e página (sem quadros de conversa entre eles). */
     public void render(RenderCanvas c) {
         renderFaixas(c);
+        renderStamp(c);
         renderEfeitos(c);
         renderTela(c);
     }
@@ -2450,9 +2451,16 @@ public final class CinematicaLuta {
         }
     }
 
-    /** O STAMP e as onomatopeias (o letreiro do impacto bate por cima do quadro). */
-    public void renderEfeitos(RenderCanvas c) {
+    /**
+     * O STAMP batido: por cima da luta, do HUD e das faixas, por baixo dos quadros da conversa (a
+     * fala de quem grita não some atrás do quadro de mangá) e das onomatopeias.
+     */
+    public void renderStamp(RenderCanvas c) {
         if (stamp != null && !virando && !virou) desenharStamp(c, time - stampDesde);
+    }
+
+    /** As onomatopeias, por cima de tudo (o letreiro do impacto bate por cima do quadro). */
+    public void renderEfeitos(RenderCanvas c) {
         for (Estouro e : estouros) drawOnomatopeia(c, e);
     }
 
