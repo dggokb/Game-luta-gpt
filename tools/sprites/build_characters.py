@@ -339,7 +339,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance','espelho','penas'}
+             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance','espelho','penas','quique'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -400,6 +400,9 @@ def validate_ultra(name, u, animations):
     if 'penas' in u and not (isinstance(u['penas'], dict) and set(u['penas']) <= {'estouro', 'redemoinho'}
                              and isinstance(u['penas'].get('estouro'), str)):
         raise ValueError(f'{name}.ultra.penas: {{estouro, redemoinho?}} (nomes de efeito)')
+    # Golpe final que crava o rival, ele quica no chão e cai longe (o Mil Penas da Yin-lu).
+    if 'quique' in u and not (number(u['quique']) and u['quique'] > 0 and 'quedaFinal' not in u):
+        raise ValueError(f'{name}.ultra.quique: distância > 0 (sem quedaFinal)')
     if 'cameraDaLuta' in u and u['cameraDaLuta'] is not True:
         raise ValueError(f'{name}.ultra.cameraDaLuta: true (or leave it out)')
     if 'ULTRA_SEQ' not in animations:
@@ -923,6 +926,8 @@ def compile_packs(root, results, alterados=None, medir=False):
         if 'penas' in u:
             scene += ('.withFeathers(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('espelho', []))+'},'
                       +q(u['penas']['estouro'])+','+(q(u['penas']['redemoinho']) if 'redemoinho' in u['penas'] else 'null')+')')
+        if 'quique' in u:
+            scene += '.withSlam('+f(u['quique'])+')'
         if 'alem' in u:
             scene += '.withCross('+f(u['alem'])+')'
         if 'alcance' in u:

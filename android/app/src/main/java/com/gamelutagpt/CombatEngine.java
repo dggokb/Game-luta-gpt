@@ -4930,6 +4930,19 @@ final class CombatEngine {
         CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
         float[] low = seq != null && a.inUltraSequence() ? seq.finalLaunch : null;
         d.vy = low != null ? -low[0] : -config.ultraLaunchSpeed;
+        if (seq != null && a.inUltraSequence() && seq.slamPush > 0f) {
+            // O Mil Penas da Yin-lu: as palmas de cima cravam o rival, ele quica no chão e cai longe.
+            d.vy = config.groundBounceDown;
+            d.bounce = CombatFighter.BOUNCE_GROUND;
+            d.launched = false;
+            d.ultraFall = true;
+            d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
+            d.stunElapsed = 0;
+            push(d, a, a.facing * seq.slamPush);
+            ComboSession s = sessions[d.index];
+            if (s != null) s.airCombo = true;
+            return;
+        }
         d.launched = true;
         d.slammed = false;
         d.superJumping = false;

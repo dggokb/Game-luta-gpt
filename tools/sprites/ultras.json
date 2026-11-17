@@ -5,7 +5,7 @@
   "personagens": {
     "p02": {
       "nome": "Mil Penas",
-      "_doc": "Mil Penas (17/11): ultra.mp4 = ultra_2 0-104 (as quatro palmas) + ultra3 21-123 (o salto e as duas palmas descendo), colados sem perda. Ela some num estouro de penas e reaparece em outro lugar a cada palma (zanzoken + voo, só o desenho): de frente (16), no alto (46, o tapa de cima), atrás do rival virada (60, espelho), de frente girando (90) e no alto sobre ele (136, as duas palmas descendo, o golpe final); some de novo na garça e reaparece em casa para voltar à guarda. O redemoinho de penas gira em volta do rival até o golpe final.",
+      "_doc": "Mil Penas (17/11): ultra.mp4 = ultra_2 0-104 (as quatro palmas) + ultra_2 10-34 (a palma reta), 38-56 (o tapa de cima) e 80-102 (a palma girando) de novo + ultra3 21-123 (o salto e as duas palmas descendo), colados sem perda. Ela some num estouro de penas e reaparece batendo em outro lugar a cada palma (zanzoken + voo, só o desenho): de frente (16), no alto (46), atrás do rival virada (60, espelho), de frente girando (90), atrás dele no ar (111), bem no alto (138), atrás girando (159) e, no golpe final (203), no alto sobre ele com as duas palmas descendo, 60 px mais alta (o pedido do dono: os braços vão para baixo); desce até o chão logo depois. O golpe final crava o rival: ele quica no chão e cai longe (quique). Some de novo na garça e reaparece em casa para voltar à guarda. O redemoinho de penas gira em volta do rival até o golpe final.",
       "inicio": 0,
       "preparo": 9,
       "golpes": [
@@ -13,9 +13,12 @@
         46,
         60,
         90,
-        136
+        111,
+        138,
+        159,
+        203
       ],
-      "fim": 180,
+      "fim": 247,
       "zanzoken": [
         [
           34,
@@ -34,8 +37,20 @@
           108
         ],
         [
-          158,
-          166
+          126,
+          133
+        ],
+        [
+          146,
+          152
+        ],
+        [
+          168,
+          178
+        ],
+        [
+          225,
+          233
         ]
       ],
       "voo": [
@@ -81,16 +96,56 @@
         ],
         [
           108,
-          110,
+          330,
+          90
+        ],
+        [
+          126,
+          330,
+          90
+        ],
+        [
+          133,
+          20,
+          160
+        ],
+        [
+          146,
+          20,
+          160
+        ],
+        [
+          152,
+          330,
           0
         ],
         [
-          158,
-          110,
+          168,
+          330,
           0
         ],
         [
-          166,
+          178,
+          150,
+          60
+        ],
+        [
+          203,
+          150,
+          60
+        ],
+        [
+          209,
+          150,
+          0
+        ],
+        [
+          225,
+          150,
+          0
+        ],
+        [
+          233,
           0,
           0
         ]
@@ -99,13 +154,22 @@
         [
           57,
           74
+        ],
+        [
+          108,
+          126
+        ],
+        [
+          152,
+          168
         ]
       ],
       "penas": {
         "estouro": "penas_estouro_p02",
         "redemoinho": "penas_redemoinho_p02"
       },
-      "alcance": 185
+      "alcance": 185,
+      "quique": 420
     },
     "p03": {
       "nome": "Fúria da Casa",

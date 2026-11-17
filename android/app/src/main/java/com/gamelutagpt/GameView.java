@@ -2191,6 +2191,13 @@ public class GameView extends SurfaceView
             if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
                 event.attacker, event.defender);
             spawnImpact(event, ultraHit, punishNow, knockout);
+            CombatFighter batendo = engine.fighter(event.attacker);
+            if (!event.blocked && superDeContra(batendo) && batendo.attack.lastActiveFrame() - batendo.attackFrame < 8) {
+                // O empurrão das duas palmas do Espelho do Lago: penas no rival e a tela treme.
+                float nx = Float.isNaN(event.impactX) ? hitFighter.x : event.impactX;
+                efeitos.tocar("penas_estouro_" + batendo.character().id, nx, chestY(hitFighter), 0.45f, batendo.facing < 0);
+                beamShake = Math.max(beamShake, 14f);
+            }
             desgaste.golpe(event, hitFighter, corRoupa[event.defender]);
             CombatFighter hitter = engine.fighter(event.attacker);
             if (!event.blocked && hitter.attacking() && hitter.attack.mechanics.pound) {
@@ -2221,6 +2228,7 @@ public class GameView extends SurfaceView
             boolean doAtacante = "COUNTER".equals(cue) || "PUNISH".equals(cue);
             if (banner != null) showBanner(banner, doAtacante ? ultimoAtacante : -1);
             if ("PARRY".equals(cue)) spawnParry();
+            if ("COUNTER".equals(cue)) espelhoDoLago();
             if ("LEITURA".equals(cue) || "ESQUIVA".equals(cue)) spawnLeitura();
             if ("PRECISO".equals(cue) || "RUPTURA".equals(cue)) beamShake = Math.max(beamShake, 14f);
             if ("SHINKAI_QUEBRA".equals(cue)) beamShake = Math.max(beamShake, 22f);
@@ -6227,6 +6235,26 @@ public class GameView extends SurfaceView
             if (seq != null && seq.hidesVictim(u.ultraFrame)) return true;
         }
         return false;
+    }
+
+    /** O Super de contra-golpe com o efeito de penas da dona (o Espelho do Lago da Yin-lu). */
+    private boolean superDeContra(CombatFighter f) {
+        return f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER && f.attack.mechanics.parry &&
+            efeitos.tem("penas_estouro_" + f.character().id);
+    }
+
+    /**
+     * O Espelho do Lago leu o golpe: estoura penas da mão que desvia, a cena desacelera um instante
+     * e a tela treme (o momento do contra, antes das palmas).
+     */
+    private void espelhoDoLago() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            if (!superDeContra(f) || !f.countered) continue;
+            efeitos.tocar("penas_estouro_" + f.character().id, f.x + f.facing * 60f, chestY(f), 0.55f, f.facing < 0);
+            feel.slow(20, 0.35f);
+            beamShake = Math.max(beamShake, 16f);
+        }
     }
 
     /** Tamanho do redemoinho e do estouro de penas (o vídeo enche a tela e cobria a luta inteira). */
