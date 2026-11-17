@@ -60,4 +60,29 @@ public class SuperEspelhoDoLagoTest {
         assertTrue("sai antes do fim inteiro do golpe: " + t, t < sup.totalFrames - 20);
         assertTrue("gastou a barra", s.f(0).state.superMeter < 3 * CombatConfig.METER_PER_BAR);
     }
+
+    @Test public void oPoderDoRivalElaDesviaEInveste() {
+        // O dono (17/11): "se for poder ela desvia e investe".
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), GeneratedCharacters.get("player_base"), 400f, 900f);
+        s.f(0).state.superMeter = 3 * CombatConfig.METER_PER_BAR;
+        s.in[1].special = "M";   // o Ryūga solta a Onda; ela solta o Super vendo a bola chegar
+        s.step();
+        s.until(() -> !s.engine.energyProjectiles.isEmpty(), 90);
+        soltaSuper(s);
+        float antes = s.f(0).x;
+        int acertos = 0;
+        boolean contra = false;
+        for (int t = 0; t < 300; t++) {
+            s.step();
+            if (s.engine.cues().contains("COUNTER")) contra = true;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker == 0 && !e.blocked) acertos++;
+                assertFalse("a Onda não acerta ela", e.attacker == 1 && !e.blocked);
+            }
+            if (!s.f(0).attacking() && t > 20) break;
+        }
+        assertTrue("leu a Onda", contra);
+        assertTrue("investiu até o Ryūga: " + (s.f(0).x - antes), s.f(0).x - antes > 250f);
+        assertEquals("as palmas acertam depois de chegar", 6, acertos);
+    }
 }

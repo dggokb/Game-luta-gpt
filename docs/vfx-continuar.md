@@ -1866,3 +1866,6 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - **O Super Espelho do Lago, "faltou alguma coisa":** no contra, o `penas_estouro_p02` sai da mão
   que desvia (tamanho 0,55), a cena desacelera (20 quadros a 35%) e a tela treme; o empurrão das
   duas palmas solta penas no rival (0,45) e o joga na parede (quica, dá para continuar).
+- **Depois, "a câmera tá muito próxima no Ultra" e "o efeito de dano do Super tá muito forte e
+  grande":** o Mil Penas usa a câmera da luta (`cameraDaLuta`); as palmas do Super usam o efeito de
+  golpe médio e o empurrão final o forte, sem o do Super (e os riscos de mangá só no empurrão).

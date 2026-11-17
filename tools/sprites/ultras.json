@@ -169,7 +169,8 @@
         "redemoinho": "penas_redemoinho_p02"
       },
       "alcance": 185,
-      "quique": 420
+      "quique": 420,
+      "cameraDaLuta": true
     },
     "p03": {
       "nome": "Fúria da Casa",

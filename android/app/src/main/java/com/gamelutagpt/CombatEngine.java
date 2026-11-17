@@ -1673,6 +1673,43 @@ final class CombatEngine {
         f.state.addSuperMeter(amount);
     }
 
+    /** O Super de contra-golpe (o Espelho do Lago) na janela em que lê: o poder que chega também vale. */
+    private boolean superDeContraLe(CombatFighter d) {
+        return d.attacking() && d.attack.kind == AttackDefinition.Kind.SUPER && d.attack.mechanics.parry &&
+            !d.countered && d.attack.mechanics.counterAt(d.attackFrame) && d.attack.mechanics.counter == AttackDefinition.Reads.ANY;
+    }
+
+    /**
+     * Um passo da investida do Espelho do Lago até quem atirou: true enquanto ainda corre. Chegando
+     * (a distância das palmas), as palmas saem nele como no contra-golpe de perto.
+     */
+    private boolean avancaInvestida(CombatFighter f) {
+        CombatFighter alvo = f.investeAlvo;
+        if (alvo == null || alvo.ko()) {
+            f.investida = 0f;
+            return false;
+        }
+        f.facing = alvo.x >= f.x ? 1 : -1;
+        float perto = f.body().halfWidth + alvo.body().halfWidth + 30f;
+        float falta = Math.abs(alvo.x - f.x) - perto;
+        if (falta > 0f) {
+            f.x = Arena.clamp(f.x + f.facing * Math.min(f.investida, falta), Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            if (falta > f.investida) return true;
+        }
+        f.investida = 0f;
+        f.investeAlvo = null;
+        f.attackFrame = f.attack.startupFrames - 1;
+        Contact answer = new Contact();
+        answer.attacker = f;
+        answer.defender = alvo;
+        answer.attack = f.attack;
+        answer.hitbox = 0;
+        answer.resposta = true;
+        f.attackFrame = f.attack.startupFrames;
+        applyContact(answer);
+        return true;
+    }
+
     /**
      * O Super de contra-golpe que passou da janela sem ler nada: pula para o fim do desenho (ela sai da
      * postura) em vez de soltar as palmas no vazio. A barra já foi gasta.
@@ -1881,6 +1918,8 @@ final class CombatEngine {
             // strikes leaves a few frames to react after the flash (holding guard still blocks).
             int freeze = attack.melee() ? Math.max(0, attack.startupFrames - config.strikingSuperReactFrames)
                                         : attack.startupFrames;
+            // O Super de contra-golpe (o Espelho do Lago) espera o rival bater: a postura não congela ninguém.
+            if (attack.mechanics.parry && attack.mechanics.counter != AttackDefinition.Reads.NONE) freeze = 0;
             // Entrada do Super (o retrato ao fundo): quem ativou segura a carga até ela passar,
             // e o rival e os projéteis esperam a entrada mais o congelamento de sempre.
             int intro = superIntro(f);
@@ -2248,6 +2287,8 @@ final class CombatEngine {
                 }
                 // Voo (o S2 e o S3 do Ryūga): ainda no ar, o golpe espera o pouso no quadro do pouso.
                 if (moveMechanics.flies() && !f.grounded && f.attackFrame >= moveMechanics.flightEnd - 1) break;
+                // O Espelho do Lago investindo até quem atirou: o golpe espera ela chegar.
+                if (f.investida > 0f && avancaInvestida(f)) break;
                 f.attackFrame++;
                 if (moveMechanics.flies() && f.grounded && f.attackFrame == moveMechanics.flightStart) takeOff(f);
                 int depois = f.attackFrame - f.attack.startupFrames;
@@ -4103,6 +4144,18 @@ final class CombatEngine {
                 continue;
             }
             AttackDefinition.Mechanics stance = d.mechanics();
+            if (superDeContraLe(d) && p.attack.kind != AttackDefinition.Kind.SUPER) {
+                // O Espelho do Lago da Yin-lu leu o poder: ela desvia (a bola se desfaz) e investe até
+                // quem atirou; as palmas saem quando ela chega (avancaInvestida).
+                CombatFighter dono = fighters[p.ownerIndex];
+                cues.add("COUNTER");
+                d.countered = true;
+                d.investeAlvo = dono;
+                d.investida = config.superParryRushSpeed;
+                d.attackFrame = d.attack.mechanics.counterEnd;
+                it.remove();
+                continue;
+            }
             if (stance.repel && stance.counterAt(d.attackFrame)) {
                 // Repel: a bola bate na aura e volta contra quem soltou, agora dela (sem dano nem
                 // atordoamento em quem repeliu), e a aura apaga logo depois (quem repeliu fica

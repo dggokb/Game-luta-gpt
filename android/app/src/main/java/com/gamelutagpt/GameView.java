@@ -2096,7 +2096,10 @@ public class GameView extends SurfaceView
         if (rivalBateEm >= 0) {
             // PC (GravarLuta, passo rivalbate): o rival parado dá um L depois desse tanto de quadros.
             opponentInput.clear();
-            if (rivalBateEm-- == 0) opponentInput.light = true;
+            if (rivalBateEm-- == 0) {
+                if (rivalBatePoder) opponentInput.special = "M";
+                else opponentInput.light = true;
+            }
         }
         boolean semPoderes = semPoderesNaLuta();
         if (semPoderes || semShinkaiNaLuta()) {
@@ -3030,6 +3033,10 @@ public class GameView extends SurfaceView
         int direction = defender.x >= attacker.x ? 1 : -1;
         int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
+        // As palmas do Super de contra-golpe (o Espelho do Lago) são palmas: o efeito de golpe médio, e o
+        // empurrão final o forte (o do Super era grande demais perto dos outros, o dono em 17/11).
+        boolean palmas = !event.projectile && superDeContra(attacker);
+        if (palmas) size = event.midStrike ? ImpactEffects.MEDIUM : ImpactEffects.HEAVY;
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         ultimoAtacante = event.attacker & 1;
         if (!event.blocked) reacao[event.defender & 1] = reacaoDoGolpe(event, defender, y);
@@ -3045,7 +3052,7 @@ public class GameView extends SurfaceView
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
-                event.strength == AttackDefinition.Strength.SUPER || ultraHit,
+                (event.strength == AttackDefinition.Strength.SUPER && !palmas) || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle,
                 defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO,
                 event.pontaX, event.pontaY, event.frenteX, event.frenteY)) {
@@ -3060,7 +3067,7 @@ public class GameView extends SurfaceView
             secretoSeed++;
         }
         // Golpe forte (H, especiais, Super, Ultra): os riscos de mangá no corpo e no rastro do golpe.
-        if (!event.blocked && (ultraHit || event.strength == AttackDefinition.Strength.SUPER)) {
+        if (!event.blocked && (ultraHit || event.strength == AttackDefinition.Strength.SUPER) && !(palmas && event.midStrike)) {
             riscos.spawn(engine.frame(), event.defender, x, y, direction, size == ImpactEffects.HEAVY ? 1f : 1.25f,
                 defender.y);
         }
@@ -4115,7 +4122,16 @@ public class GameView extends SurfaceView
     /** PC (passo {@code rivalbate:N}): o rival dá um L daqui a N quadros (o contra-golpe gravado). */
     public void rivalBate(int quadros) {
         rivalBateEm = quadros;
+        rivalBatePoder = false;
     }
+
+    /** PC (passo {@code rivalpoder:N}): o rival solta o especial (S1) daqui a N quadros. */
+    public void rivalPoder(int quadros) {
+        rivalBateEm = quadros;
+        rivalBatePoder = true;
+    }
+
+    private volatile boolean rivalBatePoder;
 
     private volatile int rivalBateEm = -1;
 
