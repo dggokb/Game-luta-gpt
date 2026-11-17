@@ -62,6 +62,11 @@ public final class Torneio {
          * uma cinemática em {@code historia/} (ex.: {@code torneio/cinematica_p09.json}), ou null.
          */
         public final String cinematica;
+        /**
+         * {@code "ponte": true}: pela história, a dupla pode emboscar o jogador na ponte (ep05). O
+         * sorteio garante que quem perde a outra quarta do lado do jogador seja uma dessas.
+         */
+        public final boolean ponte;
 
         public Dupla(String id, String[] lutadores, String irmao, boolean pronta) {
             this(id, lutadores, irmao, pronta, null, 0);
@@ -72,6 +77,11 @@ public final class Torneio {
         }
 
         public Dupla(String id, String[] lutadores, String irmao, boolean pronta, String fala, int quemFala, String cinematica) {
+            this(id, lutadores, irmao, pronta, fala, quemFala, cinematica, false);
+        }
+
+        public Dupla(String id, String[] lutadores, String irmao, boolean pronta, String fala, int quemFala, String cinematica,
+                     boolean ponte) {
             if (lutadores == null || lutadores.length != 2) throw new IllegalArgumentException(id + ": dupla precisa de 2 lutadores");
             this.id = id;
             this.lutadores = lutadores.clone();
@@ -80,6 +90,7 @@ public final class Torneio {
             this.fala = fala;
             this.quemFala = quemFala == 1 ? 1 : 0;
             this.cinematica = cinematica;
+            this.ponte = ponte;
         }
 
         /** Código do retrato (historia/torneio/rostos/pNN.jpg) de cada lutador. */
@@ -101,7 +112,7 @@ public final class Torneio {
             out.add(new Dupla(id, new String[] {String.valueOf(lutadores.get(0)), String.valueOf(lutadores.get(1))},
                 Episodio.string(d, "irmao", null), !Boolean.FALSE.equals(d.get("pronta")),
                 Episodio.string(d, "fala", null), quem instanceof Number ? ((Number) quem).intValue() : 0,
-                Episodio.string(d, "cinematica", null)));
+                Episodio.string(d, "cinematica", null), Boolean.TRUE.equals(d.get("ponte"))));
         }
         return out;
     }
@@ -175,6 +186,7 @@ public final class Torneio {
         Collections.shuffle(livres, random);
         Collections.shuffle(prontas, random);
         for (int i = 0; i < prontas.size(); i++) vagas[livres.get(i)] = prontas.get(i);
+        garantirPonte(vagas, jogaRyuga, random);
 
         List<Integer> ordem = new ArrayList<>();
         for (int v = 1; v < VAGAS - 1; v++) ordem.add(v);
@@ -182,6 +194,27 @@ public final class Torneio {
         int[] ordemSorteio = new int[ordem.size()];
         for (int i = 0; i < ordemSorteio.length; i++) ordemSorteio[i] = ordem.get(i);
         return new Torneio(vagas, jogaRyuga ? ryuga : koga, jogaRyuga ? koga : ryuga, ordemSorteio, random);
+    }
+
+    /**
+     * A emboscada da ponte (ep05) é de quem perde a outra quarta do lado do jogador; pela
+     * história, só as duplas com {@link Dupla#ponte} podem fazê-la. Se nenhuma delas caiu
+     * nessa quarta, troca uma delas (sorteada, de qualquer outra vaga) com uma das duas vagas
+     * dessa quarta (também sorteada). Sem dupla de ponte no torneio, não muda nada.
+     */
+    private static void garantirPonte(Dupla[] vagas, boolean jogaRyuga, Random random) {
+        int[] quarta = jogaRyuga ? new int[] {2, 3} : new int[] {4, 5};
+        if (vagas[quarta[0]].ponte || vagas[quarta[1]].ponte) return;
+        List<Integer> dePonte = new ArrayList<>();
+        for (int v = 1; v < VAGAS - 1; v++) {
+            if (vagas[v].ponte && vagas[v].pronta) dePonte.add(v);
+        }
+        if (dePonte.isEmpty()) return;
+        int de = dePonte.get(random.nextInt(dePonte.size()));
+        int para = quarta[random.nextInt(2)];
+        Dupla d = vagas[de];
+        vagas[de] = vagas[para];
+        vagas[para] = d;
     }
 
     /**
@@ -282,12 +315,17 @@ public final class Torneio {
      */
     public Dupla emboscada() {
         if (disputadas != 1 || eliminado || rival == null) return null;
-        int lado = posicaoInicial(jogador) < vagas / 2 ? 0 : 1;
-        int minha = posicaoInicial(jogador) / 2;
-        int outra = lado * 2 + (minha % 2 == 0 ? 1 : 0);
+        int outra = outraQuarta();
         Dupla vencedor = rodadas[1][outra];
         Dupla a = rodadas[0][2 * outra], b = rodadas[0][2 * outra + 1];
         return vencedor == a ? b : a;
+    }
+
+    /** A luta das quartas (índice em {@code rodadas[1]}) do outro par de vagas do lado do jogador. */
+    private int outraQuarta() {
+        int lado = posicaoInicial(jogador) < vagas / 2 ? 0 : 1;
+        int minha = posicaoInicial(jogador) / 2;
+        return lado * 2 + (minha % 2 == 0 ? 1 : 0);
     }
 
     private int posicaoInicial(Dupla d) {
@@ -338,6 +376,8 @@ public final class Torneio {
                 vencedor = rival;
             } else {
                 vencedor = random.nextBoolean() ? a : b;
+                // A outra quarta do lado do jogador: perde quem pode emboscar na ponte.
+                if (disputadas == 0 && rival != null && a.ponte != b.ponte && m == outraQuarta()) vencedor = a.ponte ? b : a;
             }
             proxima[m] = vencedor;
         }
