@@ -3292,6 +3292,12 @@ final class GeneratedSpriteLayouts {
     static final int P15_GOLPE_ALTO_ROOT_Y = 496;
     static final int P15_GOLPE_ALTO_FRAME_COUNT = 20;
 
+    static final int P15_GYAKU_ZUKI_FRAME_WIDTH = 504;
+    static final int P15_GYAKU_ZUKI_FRAME_HEIGHT = 504;
+    static final int P15_GYAKU_ZUKI_ROOT_X = 281;
+    static final int P15_GYAKU_ZUKI_ROOT_Y = 493;
+    static final int P15_GYAKU_ZUKI_FRAME_COUNT = 22;
+
     static final int P15_HEAVY_STRAIGHT_FRAME_WIDTH = 603;
     static final int P15_HEAVY_STRAIGHT_FRAME_HEIGHT = 546;
     static final int P15_HEAVY_STRAIGHT_ROOT_X = 170;
@@ -3376,6 +3382,12 @@ final class GeneratedSpriteLayouts {
     static final int P15_MEDIUM_KICK_ROOT_Y = 498;
     static final int P15_MEDIUM_KICK_FRAME_COUNT = 14;
 
+    static final int P15_OI_ZUKI_FRAME_WIDTH = 558;
+    static final int P15_OI_ZUKI_FRAME_HEIGHT = 503;
+    static final int P15_OI_ZUKI_ROOT_X = 240;
+    static final int P15_OI_ZUKI_ROOT_Y = 494;
+    static final int P15_OI_ZUKI_FRAME_COUNT = 19;
+
     static final int P15_RISE_FRAME_WIDTH = 327;
     static final int P15_RISE_FRAME_HEIGHT = 504;
     static final int P15_RISE_ROOT_X = 144;
@@ -3435,6 +3447,12 @@ final class GeneratedSpriteLayouts {
     static final int P16_BACKDASH_ROOT_X = 220;
     static final int P16_BACKDASH_ROOT_Y = 587;
     static final int P16_BACKDASH_FRAME_COUNT = 12;
+
+    static final int P16_BUNDADA_FRAME_WIDTH = 555;
+    static final int P16_BUNDADA_FRAME_HEIGHT = 622;
+    static final int P16_BUNDADA_ROOT_X = 311;
+    static final int P16_BUNDADA_ROOT_Y = 592;
+    static final int P16_BUNDADA_FRAME_COUNT = 34;
 
     static final int P16_CROUCH_FRAME_WIDTH = 330;
     static final int P16_CROUCH_FRAME_HEIGHT = 433;
@@ -3597,6 +3615,12 @@ final class GeneratedSpriteLayouts {
     static final int P16_RISE_ROOT_X = 154;
     static final int P16_RISE_ROOT_Y = 456;
     static final int P16_RISE_FRAME_COUNT = 13;
+
+    static final int P16_SALTO_MORTAL_FRAME_WIDTH = 438;
+    static final int P16_SALTO_MORTAL_FRAME_HEIGHT = 636;
+    static final int P16_SALTO_MORTAL_ROOT_X = 191;
+    static final int P16_SALTO_MORTAL_ROOT_Y = 600;
+    static final int P16_SALTO_MORTAL_FRAME_COUNT = 33;
 
     static final int P16_SPECIAL_ENERGY_FRAME_WIDTH = 590;
     static final int P16_SPECIAL_ENERGY_FRAME_HEIGHT = 509;

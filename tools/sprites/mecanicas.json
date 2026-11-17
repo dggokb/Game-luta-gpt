@@ -2279,6 +2279,35 @@
               "janela": "startup",
               "repele": true
             }
+          },
+          "6H": {
+            "avanco": {
+              "velocidade": 780,
+              "frames": [
+                2,
+                13
+              ]
+            }
+          },
+          "DH": {
+            "armadura": {
+              "golpes": 1,
+              "frames": [
+                3,
+                15
+              ]
+            },
+            "avanco": {
+              "velocidade": 700,
+              "frames": [
+                0,
+                14
+              ]
+            },
+            "arco": {
+              "altura": 140,
+              "distancia": 30
+            }
           }
         }
       },
@@ -2385,6 +2414,60 @@
           "hitHeight": 214,
           "maxUsesPerChain": 1
         }
+      },
+      "golpeComando": {
+        "animation": "OI_ZUKI",
+        "nome": "Oi-zuki",
+        "damage": 800,
+        "reach": 150,
+        "startupFrames": 14,
+        "activeFrames": 4,
+        "recoveryFrames": 20,
+        "hitstunFrames": 25,
+        "blockstunFrames": 17,
+        "hitstopFrames": 11,
+        "cancelWindows": {
+          "hit": [
+            14,
+            26
+          ],
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [
+          "S",
+          "SUPER",
+          "S2",
+          "S3",
+          "S4"
+        ],
+        "pushbackOnHit": 30,
+        "pushbackOnBlock": 44,
+        "hitHeight": 205,
+        "hitFloor": 110
+      },
+      "golpeCorrida": {
+        "animation": "GYAKU_ZUKI",
+        "nome": "Gyaku-zuki firme",
+        "damage": 900,
+        "reach": 104,
+        "startupFrames": 16,
+        "activeFrames": 4,
+        "recoveryFrames": 22,
+        "hitstunFrames": 30,
+        "blockstunFrames": 21,
+        "hitstopFrames": 13,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "launchType": "arc",
+        "pushbackOnHit": 0,
+        "pushbackOnBlock": 50,
+        "hitHeight": 200,
+        "hitFloor": 110
       }
     },
     "p16": {
@@ -2505,6 +2588,27 @@
               "x": 100,
               "duracao": 360
             }
+          },
+          "6H": {
+            "avanco": {
+              "velocidade": 540,
+              "frames": [
+                6,
+                25
+              ],
+              "atravessa": true
+            },
+            "cruza": true
+          },
+          "DH": {
+            "avanco": {
+              "velocidade": 600,
+              "frames": [
+                0,
+                20
+              ]
+            },
+            "quicaEmPe": true
           }
         }
       },
@@ -2613,6 +2717,52 @@
         "pushbackOnBlock": 60,
         "hitHeight": 70,
         "maxUsesPerChain": 1
+      },
+      "golpeComando": {
+        "animation": "SALTO_MORTAL",
+        "nome": "Salto mortal",
+        "damage": 750,
+        "reach": 127,
+        "startupFrames": 26,
+        "activeFrames": 4,
+        "recoveryFrames": 16,
+        "hitstunFrames": 28,
+        "blockstunFrames": 15,
+        "hitstopFrames": 11,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "pushbackOnHit": 0,
+        "pushbackOnBlock": 30,
+        "hitHeight": 225,
+        "hitFloor": 100
+      },
+      "golpeCorrida": {
+        "animation": "BUNDADA",
+        "nome": "Bundada do trampolim",
+        "damage": 850,
+        "reach": 100,
+        "overhead": true,
+        "startupFrames": 22,
+        "activeFrames": 4,
+        "recoveryFrames": 22,
+        "hitstunFrames": 28,
+        "blockstunFrames": 20,
+        "hitstopFrames": 13,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "launchType": "groundBounce",
+        "pushbackOnHit": 0,
+        "pushbackOnBlock": 40,
+        "hitHeight": 170,
+        "hitFloor": 10
       }
     },
     "p13": {

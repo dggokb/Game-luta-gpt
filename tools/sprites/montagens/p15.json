@@ -553,5 +553,100 @@
     "animacoes": {
       "GETUP": {}
     }
+  },
+  "oi_zuki": {
+    "_doc": "→ + H (16/11, vídeo 6H do dono): Oi-zuki. Da guarda desliza o pé da frente num passo longo (22-31) e estica o soco da mão da frente no 32-33, segura (a espera de braço esticado, 36-84, fica de fora) e volta à guarda (86-99). Quem anda é o motor (avanço do golpe).",
+    "trechos": [
+      [
+        "6H",
+        0,
+        124
+      ]
+    ],
+    "quadros": "18,22,24,26,28,30,31,32,33,35,84,86,88,90,92,94,96,99,104",
+    "opcoes": {
+      "fixar": "video",
+      "sem_efeitos": true,
+      "densidade": 2,
+      "escala": 0.411,
+      "motivo": "mesma câmera dos vídeos H3 dela",
+      "nitidez": true
+    },
+    "animacoes": {
+      "OI_ZUKI": {
+        "impacto": 7,
+        "tempos": [
+          373,
+          185,
+          186,
+          185,
+          185,
+          94,
+          94,
+          434,
+          53,
+          1295,
+          53,
+          53,
+          52,
+          53,
+          53,
+          52,
+          80,
+          132,
+          52
+        ]
+      }
+    }
+  },
+  "gyaku_zuki": {
+    "_doc": "H correndo (16/11, vídeo dash_golpe do dono): Gyaku-zuki firme. Da corrida (0-8) planta os pés com os punhos no quadril (10-21), estica o soco da mão de trás (22-24), segura (27-57 fica de fora) e volta à guarda (60-78). Quem anda é o motor: o trecho é fixo. Deslocado 30 px: o corpo do vídeo fica ~30 px atrás da raiz da corrida e da guarda (sem pulo ao sair da corrida e ao voltar à guarda).",
+    "trechos": [
+      [
+        "dash_golpe",
+        0,
+        124,
+        "fixo"
+      ]
+    ],
+    "quadros": "0,2,4,6,8,10,13,16,19,21,22,23,24,27,57,60,63,66,69,72,78,90",
+    "opcoes": {
+      "fixar": "video",
+      "sem_efeitos": true,
+      "densidade": 2,
+      "escala": 0.411,
+      "motivo": "o vídeo começa na corrida (a medida da guarda não acha): a escala dos vídeos H3 dela",
+      "nitidez": true,
+      "deslocar": "30,0"
+    },
+    "animacoes": {
+      "GYAKU_ZUKI": {
+        "impacto": 11,
+        "tempos": [
+          124,
+          124,
+          124,
+          124,
+          124,
+          187,
+          186,
+          187,
+          124,
+          63,
+          63,
+          415,
+          88,
+          883,
+          88,
+          88,
+          88,
+          88,
+          89,
+          176,
+          353,
+          88
+        ]
+      }
+    }
   }
 }

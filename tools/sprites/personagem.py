@@ -310,6 +310,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args += ['--escala', str(manual[0]), '--motivo', manual[1]]
     if densidade:
         args += ['--densidade', str(densidade)]
+    if opts.get('nitidez'):
+        args.append('--nitidez')  # unsharp leve e borda sem verde na folha HD (p15 e p16)
     # Célula da medida mais alta que a final (640, raiz a 170 do pé da célula): o golpe no ar que
     # desce a perna abaixo dos pés do 1º quadro do vídeo (o jH do p01) não é cortado na medida.
     run(args + ['--celula', '640', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
