@@ -1,0 +1,28 @@
+{
+ "_sobre": "O estouro de luz atrás do STAMP (tools/cenas/stamp_estouro.py): as imagens, na ordem em que alternam, e o buraco do meio de cada uma ({x0, y0, x1, y1} de 0 a 1), onde o quadro encaixa.",
+ "imagens": [
+  "estouro_1.webp",
+  "estouro_2.webp",
+  "estouro_3.webp"
+ ],
+ "buracos": [
+  [
+   0.1706,
+   0.2111,
+   0.7931,
+   0.7733
+  ],
+  [
+   0.1969,
+   0.2167,
+   0.7781,
+   0.7622
+  ],
+  [
+   0.1875,
+   0.2089,
+   0.7844,
+   0.7778
+  ]
+ ]
+}
