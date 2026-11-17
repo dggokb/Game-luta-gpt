@@ -113,6 +113,7 @@ Cole o passo onde a página entra no episódio e complete:
 | `quadros[].baloes[].texto` | a fala em português (a chave da tradução) |
 | `quadros[].baloes[].caixa` | onde o texto é escrito: `[esquerda, topo, direita, base]` |
 | `quadros[].baloes[].area` | contorno do miolo branco que o jogo pinta |
+| `quadros[].nota` | `{"texto": "Sala do Patriarca", "pos": [x, y]}`: texto pintado na arte que não dá para cobrir (uma placa). Fora do português, o jogo põe um asterisco amarelo em `pos` (frações da página) e `* <tradução>` no rodapé enquanto o quadro está em foco. Em português não aparece nada (a arte já se lê). Ex.: a placa da página 60 (`ep05/pag5`) |
 | `quadros[].baloes[].moldura` | `true` desenha um contorno preto em volta da área branca: um quadro de legenda novo por cima de um texto pintado na arte (ex.: "10 anos se passaram" na página 1 do ep01), para traduzir texto que não está num balão |
 
 ### 3a. Uma palavra em outra cor

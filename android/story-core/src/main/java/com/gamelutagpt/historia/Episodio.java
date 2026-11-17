@@ -224,6 +224,13 @@ public final class Episodio {
         public final String legenda;
         /** Balões de fala desenhados na página, na ordem de leitura. */
         public final List<BalaoPronto> baloes;
+        /**
+         * {@code "nota": {"texto": "Sala do Patriarca", "pos": [x, y]}}: texto pintado na arte que
+         * não dá para trocar (uma placa). Fora do português, o jogo põe um asterisco em
+         * {@link #notaPos} (frações da página) e a tradução no rodapé. Null: sem nota.
+         */
+        public String nota;
+        public float[] notaPos;
 
         Quadro(float[] area, boolean impacto, boolean tremor, boolean velocidade, boolean zoom, String legenda,
                List<BalaoPronto> baloes) {
@@ -469,8 +476,15 @@ public final class Episodio {
                 Temporada.parseColor(string(b, "corDestaque", "#D8262E"))));
         }
         boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
-        return new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),
+        Quadro quadro = new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),
             efeitos.contains("zoom"), string(map, "legenda", null), Collections.unmodifiableList(baloes));
+        if (map.get("nota") != null) {
+            Map<String, Object> nota = asMap(map.get("nota"));
+            quadro.nota = string(nota, "texto", null);
+            quadro.notaPos = fractions(nota, "pos", 2, "pos da nota");
+            if (quadro.nota == null || quadro.notaPos.length != 2) throw new IllegalArgumentException("nota precisa de texto e pos [x, y]");
+        }
+        return quadro;
     }
 
     /** Lista de números entre 0 e 1 (frações da página), com tamanho par. */
