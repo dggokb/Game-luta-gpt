@@ -56,7 +56,8 @@ public class EspeciaisContraAgachadoTest {
         // A energia e o Super passavam por cima dos que agacham mais baixo.
         assertHitsCrouching("player_base", "M", "p12");
         assertHitsCrouching("p08", "M", "p03");
-        assertHitsCrouching("p02", null, "p04");
+        // O Super da Yin-lu (Espelho do Lago, 17/11) é contra-golpe: não bate sozinho, sai do teste.
+        assertHitsCrouching("p05", null, "p04");
         assertHitsCrouching("p08", null, "p11");
     }
 }

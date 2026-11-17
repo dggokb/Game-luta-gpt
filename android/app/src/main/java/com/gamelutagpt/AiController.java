@@ -3477,6 +3477,8 @@ final class AiController {
     private boolean spendSuper(CombatFighter me, CombatFighter target) {
         int meter = me.state.superMeter;
         if (!me.state.canPaySuper() || !me.character().fighter.hasSuperAttack()) return false;
+        // O Super de contra-golpe (o Espelho do Lago da Yin-lu) não bate sozinho: nem punição, nem fim de combo.
+        if (ComboBook.counterSuper(me.character())) return false;
         // O Super grátis do SHINKAI: não gasta a reserva, sai sempre.
         if (meter < CombatConfig.SUPER_COST) return true;
         if (smart() < 0.5 || !fullKit) return true;

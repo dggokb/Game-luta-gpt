@@ -2093,6 +2093,11 @@ public class GameView extends SurfaceView
             opponentInput.clear();
             opponentInput.direction = engine.fighter(OPPONENT).facing < 0 ? 1 : 5;
         }
+        if (rivalBateEm >= 0) {
+            // PC (GravarLuta, passo rivalbate): o rival parado dá um L depois desse tanto de quadros.
+            opponentInput.clear();
+            if (rivalBateEm-- == 0) opponentInput.light = true;
+        }
         boolean semPoderes = semPoderesNaLuta();
         if (semPoderes || semShinkaiNaLuta()) {
             // O treino e a briga das crianças: SUPER, ULTRA e SHINKAI não saem, de nenhum lado.
@@ -4097,6 +4102,13 @@ public class GameView extends SurfaceView
     }
 
     private volatile boolean rivalDefende;
+
+    /** PC (passo {@code rivalbate:N}): o rival dá um L daqui a N quadros (o contra-golpe gravado). */
+    public void rivalBate(int quadros) {
+        rivalBateEm = quadros;
+    }
+
+    private volatile int rivalBateEm = -1;
 
     /** PC ({@code gradle :pc:gravarLuta}, passo {@code shinkai}): a barra do SHINKAI cheia nos dois times. */
     public void encherShinkai() {
