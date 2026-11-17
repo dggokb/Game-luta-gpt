@@ -142,7 +142,9 @@ depois da versão do Ryūga no `episodio.json`.
 Numeração da temporada (a mesma dos arquivos do Drive, pasta `history`; a subpasta `Koga` tem só
 as páginas que mudam para o Kōga, e o número que falta lá é o mesmo do Ryūga): ep00 = 1 a 11,
 ep01 = 12 a 22, ep02 = 23 a 27 (26_1 e 26_2 são as lembranças), ep03 = 28 a 37 (32_1 a 32_6 são o
-desafio de cada dupla), ep04 = 38 a 53 (52 e 53 depois das quartas).
+desafio de cada dupla), ep04 = 38 a 55 (38_00 a 38_06 são a dupla do porto no salão; 52 a 55 depois
+das quartas), ep05 = 56 a 63 (63_1 a 63_3 dependem de quem embosca na ponte; no Drive a 63_3 veio
+como 62_3).
 
 | ep01 | Global | Ryūga | Kōga |
 |---|---|---|---|

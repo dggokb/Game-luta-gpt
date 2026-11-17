@@ -98,7 +98,6 @@ emboscam o jogador à noite, longe da arena. Não é regra do torneio, mas os or
     Se as duas são, o vencedor é sorteado, como antes.
   O porto, as quartas e a semifinal continuam podendo ser qualquer dupla. O
   `TorneioTest.emboscadaEhQuemPerdeuAOutraQuartaDoLadoDoJogador` confere.
-- A página 63 (ep05) vai depender de quem embosca na ponte (ainda não chegou).
 - O rótulo da luta é **EMBOSCADA**; perder repete a luta, como as outras da história.
 - **Cenário**: o **Caminho dos Penhascos** (`caminho_penhascos`): uma passarela de metal
   sobre um abismo da ilha, à noite, com pontes suspensas, ruínas e andaimes
@@ -139,7 +138,7 @@ todas as duplas tiverem página). O `TorneioTest.ep03TemAsPaginasDoAdversarioDoP
 ### A dupla do porto no salão (ep04)
 
 Logo depois da página do salão (`pag1`, Drive 38), a dupla que desafiou o jogador no porto
-aparece de perto e o Ryūga e a Yín-lù a reconhecem:
+aparece de perto e o irmão escolhido e o parceiro a reconhecem:
 
 | Porto | Imagem (Drive) | Arquivo |
 |---|---|---|
@@ -147,11 +146,28 @@ aparece de perto e o Ryūga e a Yín-lù a reconhecem:
 | p07 + p08 | 38_02 | `ep04/pag1_porto_p07.jpg` |
 | p09 + p10 | 38_03 | `ep04/pag1_porto_p09.jpg` |
 | p11 + p12 | 38_04 | `ep04/pag1_porto_p11.jpg` |
-| o Ryūga e a Yín-lù reconhecendo | 38_00 | `ep04/pag1_ryuga_reconhece.jpg` (só no Ryūga) |
+| p13 + p14 | 38_05 | `ep04/pag1_porto_p13.jpg` |
+| p16 + p15 | 38_06 | `ep04/pag1_porto_p15.jpg` |
+| o Ryūga e a Yín-lù reconhecendo | 38_00 | `ep04/pag1_ryuga_reconhece.jpg` |
+| o Kōga e o Brucy reconhecendo | 38_00 da pasta Koga | `ep04/pag1_koga_reconhece.jpg` |
 
-São imagens largas (1774×887), cada uma uma página de um quadro só. Ainda faltam a do p13 + p14 e
-a do p16 + p15 (com eles no porto, o salão segue direto) e a do Kōga e do Brucy reconhecendo (no
-Kōga, aparece só a da dupla). O `TorneioTest.ep04MostraADuplaDoPortoNoSalao` confere a ordem.
+São imagens largas (1774×887), cada uma uma página de um quadro só. O
+`TorneioTest.ep04MostraADuplaDoPortoNoSalao` confere a ordem.
+
+### Fim do ep04 e começo do ep05
+
+- **ep04, depois da 53:** `pag17_ryuga` / `pag17_koga` (Drive 54 de cada irmão: os irmãos se
+  encontram depois das quartas) e `pag18` (Drive 55, comum: os magnatas e "a aposta vai ser alta").
+- **ep05, Ryūga:** `pag1_ryuga` a `pag4_ryuga` (Drive 56 a 59: a lembrança do dojo e do túmulo, o
+  "Ryuga... Ryuga..." e a Yín-lù acordando o Ryūga). O Kōga ainda não tem as páginas dele.
+- **ep05, comuns:** `pag5` a `pag7` (Drive 60 a 62: o patriarca nos corredores, a sala dele e a
+  promessa "derrotem RYŪGA e vocês entram no lugar da dupla dele"). Na 62, o nome em vermelho é
+  o do irmão escolhido: a página tem um passo para cada irmão (`"destaque"` aceita uma lista de pedaços).
+- **ep05, a ponte:** `pag8_p05`, `pag8_p11` e `pag8_p13` (Drive 63_1, 63_2 e 62_3): `"ponte": "p05"`
+  faz o passo tocar só quando essa dupla embosca na ponte (`Campanha.vale`). O
+  `TorneioTest.ep05MostraQuemEmboscaNaPonte` confere.
+- Depois delas segue o rascunho de antes (a noite, a fala do irmão e a luta da emboscada), até
+  chegarem as páginas da ponte.
 
 ### O sorteio em cena (ep04)
 

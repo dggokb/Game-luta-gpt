@@ -313,7 +313,7 @@ public final class Campanha {
 
     /**
      * O passo vale para esta partida: passos com {@code "irmao"} só para quem escolheu esse
-     * irmão; com {@code "adversario"}, só contra essas duplas no porto; a emboscada, só depois que o jogador passou das quartas; o duelo, só para a dupla
+     * irmão; com {@code "adversario"}, só contra essas duplas no porto; com {@code "ponte"}, só com essas duplas na emboscada da ponte; a emboscada, só depois que o jogador passou das quartas; o duelo, só para a dupla
      * campeã.
      */
     public boolean vale(Episodio.Passo passo) {
@@ -325,6 +325,11 @@ public final class Campanha {
         if (passo.emboscada) {
             Torneio t = torneioSorteado();
             if (t == null || t.emboscada() == null) return false;
+        }
+        if (passo.ponte != null) {
+            Torneio t = torneioSorteado();
+            Torneio.Dupla ponte = t != null ? t.emboscada() : null;
+            if (ponte == null || !passo.ponte.contains(ponte.id)) return false;
         }
         if (passo.duelo) {
             Torneio t = torneioSorteado();

@@ -124,6 +124,11 @@ public final class Episodio {
          */
         public final List<String> adversario;
         /**
+         * {@code "ponte": "p05"} (ou uma lista): o passo só toca quando a dupla da emboscada na
+         * ponte (ep05, {@link Torneio#emboscada}) é uma dessas; null = qualquer uma.
+         */
+        public List<String> ponte;
+        /**
          * {@code "ondas": 3}: a luta é uma sequência de lutas seguidas contra duplas novas (os
          * agentes do "Sob a Mesma Lua"), com a vida da dupla do jogador passando de uma para a
          * outra. Conta como uma luta só (nível da CPU, campanha); perder recomeça da primeira.
@@ -248,17 +253,18 @@ public final class Episodio {
          */
         public final boolean moldura;
         /**
-         * Um pedaço do texto em outra cor (o grito com o nome, como o NECRO vermelho da arte):
-         * onde ele aparece numa linha, sai em {@link #corDestaque}. Null: tudo em preto.
+         * Pedaços do texto em outra cor (o grito com o nome, como o NECRO vermelho da arte, ou o
+         * RYŪGA e o KŌGA da página 62): onde aparecem numa linha, saem em {@link #corDestaque}.
+         * Vazio: tudo em preto.
          */
-        public final String destaque;
+        public final String[] destaque;
         public final int corDestaque;
 
         BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura) {
-            this(area, caixa, texto, moldura, null, 0);
+            this(area, caixa, texto, moldura, new String[0], 0);
         }
 
-        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura, String destaque, int corDestaque) {
+        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura, String[] destaque, int corDestaque) {
             this.area = area;
             this.caixa = caixa;
             this.texto = texto;
@@ -397,6 +403,7 @@ public final class Episodio {
             throw new IllegalArgumentException("nivelCpu vai de 1 a " + MenuPausa.NIVEL_MAX);
         }
         passo.nivelCpu = nivelCpu;
+        passo.ponte = ids(map, "ponte");
         passo.semPoderes = Boolean.TRUE.equals(map.get("semPoderes")) || passo.tutorial();
         passo.semShinkai = Boolean.TRUE.equals(map.get("semShinkai")) || passo.semPoderes;
         return passo;
@@ -404,12 +411,17 @@ public final class Episodio {
 
     /** {@code "adversario"}: um id ou uma lista de ids de dupla; null sem o campo. */
     private static List<String> adversario(Map<String, Object> map) {
-        Object value = map.get("adversario");
+        return ids(map, "adversario");
+    }
+
+    /** Um id ou uma lista de ids de dupla em {@code key}; null sem o campo. */
+    private static List<String> ids(Map<String, Object> map, String key) {
+        Object value = map.get(key);
         if (value == null) return null;
         List<String> ids = new ArrayList<>();
         if (value instanceof String) ids.add((String)value);
-        else for (Object item : list(map, "adversario")) ids.add(String.valueOf(item));
-        if (ids.isEmpty()) throw new IllegalArgumentException("\"adversario\" vazio");
+        else for (Object item : list(map, key)) ids.add(String.valueOf(item));
+        if (ids.isEmpty()) throw new IllegalArgumentException("\"" + key + "\" vazio");
         return Collections.unmodifiableList(ids);
     }
 
@@ -448,9 +460,12 @@ public final class Episodio {
             if (texto.isEmpty()) throw new IllegalArgumentException("balão da página pronta sem texto");
             float[] caixa = fractions(b, "caixa", 4, "caixa do balão");
             if (caixa.length != 4) throw new IllegalArgumentException("caixa do balão precisa ser [esquerda, topo, direita, base]");
-            String destaque = string(b, "destaque", null);
+            // "destaque": um pedaço ou uma lista de pedaços.
+            List<String> destaque = new ArrayList<>();
+            if (b.get("destaque") instanceof String) destaque.add((String) b.get("destaque"));
+            else for (Object pedaco : list(b, "destaque")) destaque.add(String.valueOf(pedaco));
             baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto,
-                Boolean.TRUE.equals(b.get("moldura")), destaque,
+                Boolean.TRUE.equals(b.get("moldura")), destaque.toArray(new String[0]),
                 Temporada.parseColor(string(b, "corDestaque", "#D8262E"))));
         }
         boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
