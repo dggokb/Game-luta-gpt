@@ -7112,21 +7112,22 @@ public class GameView extends SurfaceView
     /**
      * O contorno do SHINKAI: a silhueta do próprio quadro, na cor do tipo, tremendo em volta do
      * corpo (uma borda larga e fraca, outra fina e clara). Segue cada quadro da animação. No fim
-     * do SHINKAI ele falha, avisando que vai acabar.
+     * do SHINKAI ele vai enfraquecendo ({@link #intensidadeShinkai}).
      */
     private void drawShinkaiOutline(Canvas c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
-        float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        float forca = intensidadeShinkai(f);
         int frame = engine.frame();
-        if (left < 0.2f && (frame / 3) % 3 == 0) return;
         int color = f.state.corShinkai() & 0xFFFFFF;
         int light = ((Color.red(color) + 255) / 2 << 16) | ((Color.green(color) + 255) / 2 << 8) | (Color.blue(color) + 255) / 2;
-        r.setOverride(shinkaiTint(0x66000000 | color));
+        // Em degraus de 1/16 (cada alfa é um filtro guardado).
+        float k = Math.round(forca * 16f) / 16f;
+        r.setOverride(shinkaiTint((Math.round(0x66 * k) << 24) | color));
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2.0 * i / 4.0 + Math.PI / 4.0 + frame * 0.05;
             float rad = 8f + 3f * (float)Math.sin(frame * 0.7 + i * 1.9);
             r.draw(c, f.x + (float)Math.cos(a) * rad, visualY + (float)Math.sin(a) * rad, f.facing, false, false);
         }
-        r.setOverride(shinkaiTint(0xFF000000 | light));
+        r.setOverride(shinkaiTint((Math.round(0xFF * k) << 24) | light));
         for (int i = 0; i < 6; i++) {
             double a = Math.PI * 2.0 * i / 6.0;
             float rad = 3.2f + 1.3f * (float)Math.sin(frame * 1.3 + i * 2.3);
@@ -7183,10 +7184,23 @@ public class GameView extends SurfaceView
      */
     private static final float AURA_PASSO = 0.35f, AURA_PASSOS_POR_SEGUNDO = 2.8f, AURA_TREMOR = 0.025f;
 
-    private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+    /**
+     * A força da aura do SHINKAI: cheia, e no fim ela vai enfraquecendo até {@link
+     * #SHINKAI_FIM_MINIMO} em vez de piscar (o dono, 17/11: "em vez de ficar piscando, vamos
+     * diminuindo sua intensidade"). Começa a cair quando falta {@link #SHINKAI_FIM_FRACAO} do tempo.
+     */
+    private float intensidadeShinkai(CombatFighter f) {
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        if (left >= SHINKAI_FIM_FRACAO) return 1f;
+        float t = Math.max(0f, left) / SHINKAI_FIM_FRACAO;
+        return SHINKAI_FIM_MINIMO + (1f - SHINKAI_FIM_MINIMO) * t * (2f - t);
+    }
+
+    private static final float SHINKAI_FIM_FRACAO = 0.35f, SHINKAI_FIM_MINIMO = 0.15f;
+
+    private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+        float forca = intensidadeShinkai(f);
         int frame = engine.frame();
-        if (left < 0.2f && (frame / 3) % 3 == 0) return;
         int cor = f.state.corShinkai() & 0xFFFFFF;
         c.paraJanela(f.x, visualY, auraJanela);
         float px = auraJanela[2];
@@ -7217,14 +7231,16 @@ public class GameView extends SurfaceView
         for (int i = 0; i < AURA_CAMADAS.length; i++) {
             float[] k = AURA_CAMADAS[i];
             int rgb = k[2] < 0f ? misturar(cor, AURA_ESCURO, -k[2]) : misturar(cor, 0xFFFFFF, k[2]);
-            int argb = (Math.round(k[3] * 255f) << 24) | rgb;
+            int argb = (Math.round(k[3] * forca * 255f) << 24) | rgb;
+            // Mais fraca, a chama também baixa (as labaredas sobem menos).
+            float sobe = k[6] * estica * (0.45f + 0.55f * forca);
             r.setOverride(Filtro.aura(argb, k[4], tempo + k[5], auraJanela[0], auraJanela[1], AURA_CELULA * px, altura,
-                k[6] * estica * altura, k[7], rastro * k[8], k[9]));
+                sobe * altura, k[7], rastro * k[8], k[9]));
             c.save();
             c.scale(k[0], k[1], f.x, visualY);
             // Uma subida acima: o shader lê o desenho no lugar dele e as labaredas ganham espaço
             // acima do quadro (sem isso elas batiam no topo do quadro e saíam cortadas retas).
-            c.translate(0f, -k[6] * estica * f.character().visualStandHeight);
+            c.translate(0f, -sobe * f.character().visualStandHeight);
             r.draw(c, f.x, visualY, f.facing, false, false);
             c.restore();
         }

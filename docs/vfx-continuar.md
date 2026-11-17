@@ -1789,6 +1789,11 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   a ativação do outro lado tocava de novo o vídeo e a `SHINKAI_ATIVA` do Ryūga. Agora conta as
   ativações de cada lado (`FighterState.ativacoes`; recomeça no TAG e no round novo). Vídeo
   `aura_shinkai_luta_v3.mp4`.
+- **Depois, "em vez de ficar piscando quando o shinkai está acabando, vamos diminuindo sua
+  intensidade":** `GameView.intensidadeShinkai` (vale na aura nova e no contorno de antes, que é o
+  que está no jogo): quando falta 35% do tempo, a força cai em curva até 15%; na aura, a opacidade
+  e a altura das labaredas (até 45% da subida) caem juntas. Vídeo `aura_shinkai_fim.mp4` (a força indo
+  e voltando, gravada com uma função de teste que não ficou no código).
 
 ## Fora do VFX, o que ficou pendente
 
