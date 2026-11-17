@@ -460,6 +460,12 @@ final class GeneratedSpriteLayouts {
     static final int P02_THROW_ROOT_Y = 470;
     static final int P02_THROW_FRAME_COUNT = 17;
 
+    static final int P02_ULTRA_DRAGAO_FRAME_WIDTH = 1134;
+    static final int P02_ULTRA_DRAGAO_FRAME_HEIGHT = 655;
+    static final int P02_ULTRA_DRAGAO_ROOT_X = 568;
+    static final int P02_ULTRA_DRAGAO_ROOT_Y = 618;
+    static final int P02_ULTRA_DRAGAO_FRAME_COUNT = 36;
+
     static final int P02_ULTRA_SEQ_FRAME_WIDTH = 223;
     static final int P02_ULTRA_SEQ_FRAME_HEIGHT = 336;
     static final int P02_ULTRA_SEQ_ROOT_X = 94;

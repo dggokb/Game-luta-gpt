@@ -793,7 +793,18 @@ final class CombatConfig {
      * tamanho da tela sai do punho e atravessa a arena; quem ele pega leva o combo enquanto o corpo
      * passa e voa no último golpe. Os lutadores com esse Ultra SHINKAI (ids, separados por vírgula).
      */
-    String ultraDragao = "player_base";
+    String ultraDragao = "player_base,p02";
+    /**
+     * Ultra SHINKAI da garça (a Yin-lu, 17/11, o Voo da Garça): no lugar do dragão que atravessa, a
+     * garça desce no rival, fecha as asas num casulo (ele some dentro) e leva os golpes; o casulo
+     * sobe, a garça mergulha e crava o rival no chão, que quica e cai longe. Quem tem (ids); precisa
+     * estar também em {@link #ultraDragao} (a cena e a animação ULTRA_DRAGAO são as mesmas).
+     */
+    String ultraGarca = "p02";
+    /** Quadros da cena da garça: as asas fecham, os golpes, o mergulho começa, o impacto, o fim. */
+    int garcaPega = 28, garcaIntervalo = 6, garcaMergulho = 95, garcaImpacto = 119, garcaQuadros = 185;
+    /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
+    float garcaAltura = 260f, garcaEmpurra = 420f;
     /** De onde o dragão parte: à frente do lutador (px), menos {@link #dragaoAtras}. */
     float dragaoOrigem = 60f;
     /** O dragão entra de fora da tela: a cabeça começa tanto atrás do punho (px). */

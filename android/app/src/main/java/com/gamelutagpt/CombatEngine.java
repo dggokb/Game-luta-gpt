@@ -4758,6 +4758,19 @@ final class CombatEngine {
         return false;
     }
 
+    /** O Ultra SHINKAI do lutador é o da garça ({@link CombatConfig#ultraGarca}). */
+    boolean temGarca(CharacterDefinition c) {
+        if (c == null || config.ultraGarca == null) return false;
+        for (String id : config.ultraGarca.split(",")) if (id.trim().equals(c.id)) return true;
+        return false;
+    }
+
+    /** O rival está dentro do casulo da garça agora (o desenho dele some). */
+    boolean garcaEscondeRival(CombatFighter a) {
+        return a.inUltraDragao() && temGarca(a.character()) && a.dragaoEstado == 1 &&
+            a.ultraFrame >= config.garcaPega && a.ultraFrame < config.garcaImpacto;
+    }
+
     /** Quadros da ativação do Ultra: a cena do dragão é mais longa que a de sempre. */
     int ultraPreparo(CombatFighter f) {
         return f.ultraShinkai && temDragao(f.character()) ? config.dragaoPreparo : config.ultraStartupFrames;
@@ -4773,6 +4786,12 @@ final class CombatEngine {
      * na frente fica parado até a cabeça chegar nele, como numa cena.
      */
     private void comecarDragao(CombatFighter a, CombatFighter d) {
+        if (temGarca(a.character())) {
+            // A garça: a luta para a cena inteira e o rival espera ela descer nele.
+            superFreeze = Math.max(superFreeze, config.garcaQuadros);
+            d.hitstop = Math.max(d.hitstop, config.garcaPega);
+            return;
+        }
         superFreeze = Math.max(superFreeze, config.dragaoQuadros);
         float origem = a.x + a.facing * config.dragaoOrigem;
         float frente = (d.x - origem) * a.facing - d.body().halfWidth;
@@ -4787,6 +4806,10 @@ final class CombatEngine {
      */
     private void updateDragao(CombatFighter a, CombatFighter d) {
         if (!a.inUltraDragao()) return;
+        if (temGarca(a.character())) {
+            updateGarca(a, d);
+            return;
+        }
         float origem = a.x + a.facing * config.dragaoOrigem;
         float frente = (d.x - origem) * a.facing;
         float cabeca = dragaoCabeca(a);
@@ -4842,6 +4865,77 @@ final class CombatEngine {
         }
         if (a.ultraFrame >= config.dragaoQuadros) {
             // O rabo saiu da arena: o soco volta à guarda (a recuperação do Ultra).
+            a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+            a.ultraFrame = 0;
+        }
+    }
+
+    /**
+     * O Voo da Garça (a Yin-lu): a garça desce e fecha as asas no rival (defendeu = toma a defesa do
+     * Ultra e a garça sobe vazia); preso no casulo ele leva os golpes, sem aparecer; o casulo sobe, a
+     * garça mergulha e, no impacto, ele cai do alto cravado no chão, quica e vai longe.
+     */
+    private void updateGarca(CombatFighter a, CombatFighter d) {
+        if (a.dragaoEstado == 0 && a.ultraFrame >= config.garcaPega) {
+            int guard = effectiveGuard(d);
+            if (!d.hittable() || d.ko() || Arena.GROUND_Y - d.y > config.dragaoAltura) {
+                a.dragaoEstado = 2;
+            } else if (guardStops(guard, ultraAttack, false, false)) {
+                block(a, d, ultraAttack, guard, a.facing, false);
+                a.dragaoEstado = 2;
+            } else {
+                ComboSession session = sessionFor(a, d);
+                a.ultraScale = session.scaleFor(ultraAttack, config);
+                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
+                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
+                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
+                a.dragaoEstado = 1;
+                a.dragaoInicio = a.ultraFrame;
+                a.ultraVictim = d;
+                a.ultraVictimState = d.state;
+            }
+        }
+        if (a.dragaoEstado == 1) {
+            if (d != a.ultraVictim || d.state != a.ultraVictimState) {
+                a.dragaoEstado = 3;
+            } else if (a.ultraFrame >= config.garcaImpacto) {
+                // O mergulho: ele cai do alto, o golpe final crava e ele quica longe.
+                d.y = Arena.GROUND_Y - config.garcaAltura;
+                d.grounded = false;
+                golpeDoDragao(a, d, a.dragaoDanoFinal, true);
+                d.status = CombatFighter.Status.AIR_HITSTUN;
+                d.stunProjectile = null;
+                d.vy = config.groundBounceDown;
+                d.bounce = CombatFighter.BOUNCE_GROUND;
+                d.launched = false;
+                d.slammed = false;
+                d.ultraFall = true;
+                d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
+                d.stunElapsed = 0;
+                push(d, a, a.facing * config.garcaEmpurra);
+                ComboSession s = sessions[d.index];
+                if (s != null) s.airCombo = true;
+                a.dragaoEstado = 3;
+                cues.add("ULTRA_FINISH_DRAGAO");
+            } else {
+                int devidos = Math.min(config.dragaoAcertos, 1 + (a.ultraFrame - a.dragaoInicio) / Math.max(1, config.garcaIntervalo));
+                while (a.dragaoAcertos < devidos) {
+                    a.dragaoAcertos++;
+                    golpeDoDragao(a, d, a.dragaoDanoPequeno, false);
+                }
+                // Preso no casulo: parado onde estava, levando os golpes.
+                d.clearAttack();
+                d.vx = 0f;
+                d.vy = 0f;
+                d.bounce = CombatFighter.BOUNCE_NONE;
+                d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+                d.stunProjectile = null;
+                d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.garcaImpacto - a.ultraFrame + 20);
+                d.stunElapsed = 0;
+            }
+        }
+        if (a.ultraFrame == config.garcaMergulho) cues.add("ULTRA_GARCA_MERGULHO");
+        if (a.ultraFrame >= config.garcaQuadros) {
             a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
             a.ultraFrame = 0;
         }

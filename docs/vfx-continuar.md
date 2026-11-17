@@ -1874,3 +1874,19 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - **Depois, "a câmera tá muito próxima no Ultra" e "o efeito de dano do Super tá muito forte e
   grande":** o Mil Penas usa a câmera da luta (`cameraDaLuta`); as palmas do Super usam o efeito de
   golpe médio e o empurrão final o forte, sem o do Super (e os riscos de mangá só no empurrão).
+
+## Rodada de 17/11: o Ultra SHINKAI da Yin-lu (Voo da Garça)
+
+- **Pedido:** o Ultra SHINKAI dela diferente do dragão do Ryūga (nada atravessando a tela). Vídeos
+  do dono: a invocação (`ultra_shinkai`), a garça que desce e fecha o casulo (`ultra_shinkai_1`) e o
+  mergulho (`ultra_shinkai_2`).
+- **Feito:** a animação `ULTRA_DRAGAO` dela (montagem `ultra_dragao`, 36 quadros na ordem dos do
+  Ryūga, com o brilho e as penas do vídeo) e os efeitos em fundo preto `garca_casulo_p02`
+  (`efeito_video_preto.py --quadros 6-118:2 --origem 672,767 --escala-mundo 0.45 --fps 36
+  --resolucao 0.6`) e `garca_mergulho_p02` (`--quadros 2-98:2 --escala-mundo 0.5 --resolucao 0.55`),
+  os dois nos pés do rival. No motor (`updateGarca`): a garça pega no quadro 28 (defendido, sobe
+  vazia), o rival some no casulo e leva os golpes, o mergulho começa no 95 e no impacto (119) ele cai
+  de 260 px cravado, quica e vai 420 px.
+- **Primeira gravação:** na invocação ela ficava na guarda (o desenho do Ultra comum entrava antes):
+  o Ultra SHINKAI com animação própria não usa mais o do Ultra comum.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.

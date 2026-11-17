@@ -597,5 +597,25 @@
     "animacoes": {
       "SUPER_DESVIO": {}
     }
+  },
+  "ultra_dragao": {
+    "_doc": "Ultra SHINKAI, Voo da Garça (17/11, vídeo ultra_shinkai do dono): os 36 quadros na ordem que o jogo espera da ULTRA_DRAGAO (GameView.DRAGAO_*): a carga (0-18: guarda, garça numa perna, braços ao céu com o brilho e as penas), o empurrão (19: manda a garça para o céu), a pose segurada (20-26, em vai e volta enquanto a garça age) e a volta à guarda (27-35). Brilho e penas do vídeo ficam (manter_efeitos).",
+    "trechos": [
+      [
+        "ultra_shinkai",
+        0,
+        124
+      ]
+    ],
+    "quadros": "6,9,12,15,18,21,24,27,30,33,36,39,42,44,46,48,50,52,54,56,60,64,68,72,76,80,84,88,91,94,96,98,100,104,110,120",
+    "opcoes": {
+      "fixar": "video",
+      "manter_efeitos": true,
+      "densidade": 2,
+      "nitidez": true
+    },
+    "animacoes": {
+      "ULTRA_DRAGAO": {}
+    }
   }
 }

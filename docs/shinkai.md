@@ -148,6 +148,12 @@ relógio esperam o tempo dela; `CombatEngine.shinkaiAtivacaoQuadros`). Com o ví
 some; a `marcaMs` do efeito diz quando entra o corte com o nome. Têm: o Ryūga (aura azul e dragão)
 e a Yin-lu (a garça branca, 14/11). Os outros ficam na guarda durante o corte.
 
+**Ultra SHINKAI de cada um (17/11):** o do Ryūga é o dragão que atravessa a tela; o da Yin-lu, o
+**Voo da Garça**: ela manda a garça ao céu, a garça desce no rival e fecha as asas num casulo (ele
+some dentro e leva os golpes), o casulo sobe, a garça mergulha e o crava no chão, e ele quica e cai
+longe (`CombatConfig.ultraGarca`). A Natisuko (Ichigeki) e a Bonnie (Chuva de Tomates) estão nas
+fichas, esperando vídeos.
+
 **O que nasce na ativação (17/11, o dono):** **bicho só na família Komyo** (a escola dos irmãos): o
 dragão do Ryūga, a garça da Yin-lu e o tigre do Kōga. Quem é de fora mostra o próprio jeito: a
 Natisuko, o círculo de pincel (ensō) e os mil socos num só, em dourado; a Bonnie, a lebre de luz

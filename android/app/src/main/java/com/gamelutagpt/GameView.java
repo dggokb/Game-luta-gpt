@@ -2238,6 +2238,7 @@ public class GameView extends SurfaceView
             if ("SHINKAI_CHOQUE".equals(cue)) beamShake = Math.max(beamShake, 20f);
             if ("ULTRA_SHINKAI".equals(cue)) beamShake = Math.max(beamShake, 26f);
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
+            if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) {
                 // O último golpe do dragão: tela tremendo, câmera lenta e impact frame em quem voou.
                 beamShake = Math.max(beamShake, 24f);
@@ -5548,7 +5549,10 @@ public class GameView extends SurfaceView
         CharacterDefinition.UltraSequence sequence = f.state.profile.ultraSequence;
         CharacterDefinition.Animation sequenceArt =
             sequence != null ? character.animations.get(SpriteStates.ULTRA_SEQ) : null;
-        if (animation == null && f.status == CombatFighter.Status.ULTRA && sequenceArt != null &&
+        // O Ultra SHINKAI com animação própria (a garça da Yin-lu) não usa o desenho do Ultra comum.
+        boolean ultraShinkaiProprio = f.ultraShinkai && engine.temDragao(character) &&
+            character.animations.containsKey(SpriteStates.ULTRA_DRAGAO);
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && sequenceArt != null && !ultraShinkaiProprio &&
             f.ultraPhase != CombatFighter.ULTRA_RECOVERY) {
             // Ultra do vídeo: a ativação toca até a pose da investida, a investida segura essa
             // pose e a sequência anda no relógio do motor (os golpes caem nos quadros dela).
@@ -6022,6 +6026,13 @@ public class GameView extends SurfaceView
             if (!f.inUltraDragao() || f.ultraFrame != 0) continue;
             String nome = "ultra_shinkai_" + f.state.character.id;
             CombatConfig cfg = engine.config;
+            if (engine.temGarca(f.character())) {
+                // O Voo da Garça: a garça desce sobre o rival e fecha o casulo nele (nos pés dele).
+                CombatFighter v = engine.fighter(1 - side);
+                efeitos.tocar("garca_casulo_" + f.state.character.id, v.x, GROUND_Y, 1f, f.facing < 0);
+                ultraSounds.play(ultraFolder(f.state), "investida");
+                continue;
+            }
             float y = f.y - f.character().visualStandHeight * 0.62f;
             if (efeitos.temCena(nome)) {
                 // O vídeo do dragão atravessando a tela (dragao_ultra): ele mesmo entra de um lado e
@@ -6256,10 +6267,22 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** O mergulho do Voo da Garça: a garça desce de cabeça sobre o rival (nos pés dele). */
+    private void mergulhoDaGarca() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temGarca(u.character())) continue;
+            CombatFighter v = engine.fighter(1 - i);
+            efeitos.tocar("garca_mergulho_" + u.character().id, v.x, GROUND_Y, 1f, u.facing < 0);
+            beamShake = Math.max(beamShake, 10f);
+        }
+    }
+
     /** Rival que o Ultra em sequência esconde agora (debaixo da cartola, dentro do canhão da p16). */
     private boolean hiddenByUltra(CombatFighter f) {
         for (int i = 0; i < 2; i++) {
             CombatFighter u = engine.fighter(i);
+            if (engine.fighter(1 - i) == f && engine.garcaEscondeRival(u)) return true;
             if (!u.inUltraSequence() || engine.fighter(1 - i) != f) continue;
             CharacterDefinition.UltraSequence seq = u.state.profile.ultraSequence;
             if (seq != null && seq.hidesVictim(u.ultraFrame)) return true;
