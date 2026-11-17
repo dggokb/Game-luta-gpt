@@ -27,7 +27,7 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # forte que empurra. Sem o clipe, o jogo usa HIT_STAND.
             'HIT_HIGH','HIT_BODY','HIT_HEAVY',
             # Ativação do SHINKAI (a luta para escurecida enquanto ela toca).
-            'SHINKAI_ATIVA',
+            'SHINKAI_ATIVA', 'SUPER_DESVIO',
             'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT',
             # Mecânicas próprias: carga da Onda (loop e disparo carregado) e wall jump.
             'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',

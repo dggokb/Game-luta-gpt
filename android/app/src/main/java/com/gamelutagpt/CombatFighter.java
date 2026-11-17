@@ -260,6 +260,8 @@ final class CombatFighter {
      * essa velocidade (px por quadro, com o lado), e solta as palmas quando chega. 0: parada.
      */
     float investida;
+    /** Quadro (do motor) em que o Espelho do Lago leu o poder, ou -1: o desenho é o do desvio. */
+    int desvioInicio = -1;
     CombatFighter investeAlvo;
     /** O agarrão de especial não pegou ninguém no primeiro quadro ativo: o resto sai no vazio. */
     boolean grabMissed;
@@ -486,6 +488,7 @@ final class CombatFighter {
         countered = false;
         investida = 0f;
         investeAlvo = null;
+        desvioInicio = -1;
         grabMissed = false;
         armorUsed = 0;
         charge = 0;

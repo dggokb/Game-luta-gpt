@@ -26,6 +26,7 @@ final class SpriteStates {
  static final String HIT_BODY = "HIT_BODY";
  static final String HIT_HEAVY = "HIT_HEAVY";
  static final String SHINKAI_ATIVA = "SHINKAI_ATIVA";
+ static final String SUPER_DESVIO = "SUPER_DESVIO";
  static final String THROW_GRAB = "THROW_GRAB";
  static final String THROW_TOSS = "THROW_TOSS";
  static final String INTRO = "INTRO";

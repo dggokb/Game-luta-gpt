@@ -4152,6 +4152,7 @@ final class CombatEngine {
                 d.countered = true;
                 d.investeAlvo = dono;
                 d.investida = config.superParryRushSpeed;
+                d.desvioInicio = frame;
                 d.attackFrame = d.attack.mechanics.counterEnd;
                 it.remove();
                 continue;

@@ -5420,6 +5420,20 @@ public class GameView extends SurfaceView
             } else if (miss != null) {
                 animation = miss.id;
                 animationElapsed = miss.timeFor(elapsed, total);
+            } else if (f.desvioInicio >= 0 && character.animations.containsKey(DESVIO)) {
+                // O Espelho do Lago que leu um poder: gira (quadros 0-8 do desenho), corre na base
+                // longa enquanto investe (9-14) e empurra as palmas no tempo do resto do golpe (15-26).
+                CharacterDefinition.Animation dv = character.animations.get(DESVIO);
+                int desde = engine.frame() - f.desvioInicio;
+                int quadro;
+                if (f.investeAlvo != null) {
+                    quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
+                } else {
+                    float t = (f.attackFrame - f.attack.startupFrames) / (float)Math.max(1, f.attack.totalFrames - f.attack.startupFrames);
+                    quadro = 15 + Math.round(clamp(t, 0f, 1f) * (dv.frameCount() - 16));
+                }
+                animation = dv.id;
+                animationElapsed = dv.timeOfFrame(Math.min(dv.frameCount() - 1, quadro)) + 0.001f;
             } else if (f.move != null) {
                 if (f.move.animation != null) {
                     animation = f.move.animation.id;
@@ -6252,6 +6266,10 @@ public class GameView extends SurfaceView
         }
         return false;
     }
+
+    /** O desenho do desvio do Espelho do Lago (o poder lido) e os quadros do giro dele. */
+    private static final String DESVIO = "SUPER_DESVIO";
+    private static final int DESVIO_GIRO = 18;
 
     /** O Super de contra-golpe com o efeito de penas da dona (o Espelho do Lago da Yin-lu). */
     private boolean superDeContra(CombatFighter f) {
