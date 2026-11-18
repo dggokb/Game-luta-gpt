@@ -2,7 +2,7 @@
   "id": "p16_hit_spin_pouso",
   "characterProfile": "p16",
   "source": "art/sprites/source/p16_hit_spin_pouso.png",
-  "sourceNote": "Giro de nocaute da Bonnie, v\u00eddeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O pouso: quadros 66-90 de 4 em 4 (cai de ombros com as pernas para cima, as pernas descem e ela assenta); depois dele, o GROUNDED; depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco \u00e9 da f\u00edsica do jogo).",
+  "sourceNote": "Giro de nocaute da Bonnie, 2\u00ba v\u00eddeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O pouso: quadros 64-76 de 2 em 2 (cai de ombros com as pernas para cima, as pernas descem e ela assenta); depois dele, o GROUNDED; depois dele, o GROUNDED; depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco \u00e9 da f\u00edsica do jogo).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -18,157 +18,157 @@
     {
       "index": 0,
       "outputBbox": [
-        164,
-        323,
-        637,
-        602
+        152,
+        317,
+        650,
+        601
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 36840
+      "minimumMargin": 39,
+      "opaquePixels": 51345
     },
     {
       "index": 1,
       "outputBbox": [
-        177,
-        290,
-        624,
-        602
+        159,
+        297,
+        642,
+        601
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 45866
+      "minimumMargin": 39,
+      "opaquePixels": 47970
     },
     {
       "index": 2,
       "outputBbox": [
-        192,
-        244,
-        609,
-        601
+        175,
+        271,
+        626,
+        602
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 44609
+      "minimumMargin": 38,
+      "opaquePixels": 48374
     },
     {
       "index": 3,
       "outputBbox": [
-        169,
-        314,
-        632,
+        166,
+        275,
+        635,
         601
       ],
       "minimumMargin": 39,
-      "opaquePixels": 46458
+      "opaquePixels": 46215
     },
     {
       "index": 4,
       "outputBbox": [
-        148,
-        396,
-        652,
-        601
+        166,
+        321,
+        636,
+        602
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 42967
+      "minimumMargin": 38,
+      "opaquePixels": 44091
     },
     {
       "index": 5,
       "outputBbox": [
-        143,
-        416,
-        658,
-        601
+        155,
+        405,
+        645,
+        602
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 37917
+      "minimumMargin": 38,
+      "opaquePixels": 43818
     },
     {
       "index": 6,
       "outputBbox": [
-        140,
-        425,
-        662,
+        149,
+        405,
+        651,
         602
       ],
       "minimumMargin": 38,
-      "opaquePixels": 37498
+      "opaquePixels": 41182
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 539,
-    "frameHeight": 375,
-    "rootX": 269,
-    "rootY": 365,
+    "frameWidth": 518,
+    "frameHeight": 348,
+    "rootX": 259,
+    "rootY": 338,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      131,
-      235
+      141,
+      262
     ],
-    "sheetWidth": 532,
-    "sheetHeight": 1896,
+    "sheetWidth": 512,
+    "sheetHeight": 2020,
     "frames": [
       [
         0,
-        996,
-        484,
-        288,
-        29,
-        84
-      ],
-      [
-        0,
-        372,
-        456,
-        320,
-        41,
+        1004,
+        508,
+        296,
+        6,
         51
       ],
       [
         0,
+        684,
+        492,
+        316,
+        14,
+        30
+      ],
+      [
         0,
-        428,
-        368,
-        56,
+        0,
+        460,
+        340,
+        30,
         4
       ],
       [
         0,
-        696,
-        472,
-        296,
-        33,
-        75
+        344,
+        480,
+        336,
+        20,
+        9
       ],
       [
         0,
-        1288,
-        516,
-        216,
-        12,
-        157
+        1304,
+        480,
+        292,
+        21,
+        54
       ],
       [
         0,
-        1508,
-        528,
-        196,
-        7,
-        177
+        1600,
+        500,
+        208,
+        9,
+        139
       ],
       [
         0,
-        1708,
-        532,
-        188,
+        1812,
+        512,
+        208,
         4,
-        185
+        139
       ]
     ],
     "decodedBytes": {
       "canonical": 13762560,
-      "grid": 5659500,
-      "packed": 4034688
+      "grid": 5047392,
+      "packed": 4136960
     },
     "pixelScale": 2.0
   },
@@ -176,12 +176,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "367f106a5e08e16d5535efafae868b6c75f72d2f1bd0c55aa4218f41cd0d1e4c",
-      "config": "d884c8bd8503c4ed483da87a139eb9bed27f5f71d1f8df50fc4c507c61945293",
+      "source": "850c7eabe32a019b7b211867210bd9c66c5aabb31bfa4c697f01a3f0198d3243",
+      "config": "48689ef9a5237e8f99f66dd5e7b8bf5ccbd59902030e2cd94ca0e42917f25c9b",
       "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
     },
     "referenceSources": {
-      "art/sprites/source/p16_hit_spin_video.mp4": "7dfb9a6abe2bf289556425272cc38f6c55bb55b6b1bdcecec28e5d01902c021a"
+      "art/sprites/source/p16_hit_spin_video.mp4": "10d8ee87a9360e234cb2d4316b78080bcf5769a8cad1e3cc3d98af0dd1aa4af3"
     }
   }
 }

@@ -25,6 +25,9 @@ from video_para_sprite import key  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 FW, FH, RX, RY = 768, 640, 400, 600
 
+# Os quadros do voo da Bonnie: 15-63 sem a cabeça girando errado (39-47).
+BONNIE = [n for n in range(15, 64) if not 39 <= n <= 47]
+
 PACOTES = {
     'player_base': {
         'video': 'art/sprites/source/player_base_hit_spin_video.mp4',
@@ -47,13 +50,15 @@ PACOTES = {
         'pouso': list(range(59, 72, 2)),
     },
     'p16': {
+        # O 2º vídeo do giro dela (18/11). 15-63 depois do clarão do soco (9-13), o voo com o rolo
+        # até ficar deitada no ar, SEM 39-47: ali a cabeça dá meia-volta sozinha, com o corpo de costas
+        # (o dono: "tem uma hora que a cabeça dela gira errada, corta esse erro"); o 38 emenda no 48.
+        # Do 64 ao 72 ela cai de ombros com as pernas para cima: fica no pouso (rápido), não no fim do
+        # voo, que o jogo segura até o chão.
         'video': 'art/sprites/source/p16_hit_spin_video.mp4',
         'escala': 441 / 537,
-        # 12-62: depois do clarão do soco (7-9), o voo com o rolo até ficar deitada no ar. Do 64 ao 76
-        # ela cai de ombros com as pernas para cima: isso fica no pouso (rápido), não no fim do voo,
-        # que o jogo segura até o chão (o dono, 18/11: "da Bonnie ficou estranho").
-        'voo': [round(12 + i * 50 / 23) for i in range(24)],
-        'pouso': [66, 70, 74, 78, 82, 86, 90],
+        'voo': [BONNIE[round(i * (len(BONNIE) - 1) / 23)] for i in range(24)],
+        'pouso': list(range(64, 77, 2)),
     },
 }
 
