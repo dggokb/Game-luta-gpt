@@ -518,13 +518,28 @@ lutador em campo do lado do jogador na hora do golpe (`"imagem": "torneio/stamp_
 quadro quando na luta ele está à direita. Sem a arte de quem está em campo, o STAMP não bate. As
 artes da cena "Já vai desistir?" (BAM no golpe que joga na parede, PAH no chão) foram geradas no
 Codex com a arte da seleção de cada um (o pedido em `art/vfx/prompt_stamp_dano_ryuga.txt`).
+As outras dessa cena, todas por lutador (`player_base`, `p02`, `p03`, `p04`) e no mesmo jeito:
+`stamp_pah_` (de costas, como no jogo) e `stamp_grito_` (`art/vfx/prompt_stamp_pah_grito_ryuga.txt`),
+`stamp_voadora_` (a voadora do parceiro na guarda, de perfil: a primeira leva, com o pé gigante em
+primeiro plano, foi reprovada; `art/vfx/prompt_stamp_voadora_ryuga.txt`). Fora delas,
+`stamp_fora_{outroIrmao}.jpg` (o irmão que não está na dupla gritando da arquibancada;
+`{outroIrmao}` vira `ryuga` ou `koga`; `art/vfx/prompt_stamp_fora.txt`) e `stamp_locutor.jpg` (o
+narrador do torneio no microfone; `art/vfx/prompt_stamp_locutor.txt`). O narrador está no elenco
+da temporada (`"narrador"`), então fala com retrato (`historia/retratos/narrador_<expressao>.png`).
 
 A primeira é a do torneio (`torneio/cena_desistir.json`, gerada por `tools/cenas/torneio_desistir.py`,
-na primeira luta do torneio do Episódio 4): quando os dois da dupla chegam a 50%, o adversário provoca,
-joga quem está em campo na parede, o parceiro entra com a voadora, apanha no ar e cai (PAH!); o outro
-irmão grita de fora, o parceiro levanta, cinco golpes trocados e a luta continua. Para jogar no PC:
+na primeira luta do torneio do Episódio 4): quando os dois da dupla chegam a 50%, o adversário abre
+com um golpe, provoca, investe (um defendido, o GUARD BREAK, dois que pegam) e joga quem está em campo
+na parede (BAM, voo no fundo preto); no meio da investida seguinte o parceiro pede a troca e chega
+antes com a voadora na guarda dele (STAMP); a rasteira o lança para cima, três chutes no ar e o golpe
+que o crava no chão (queda no fundo preto, PAH, quica com ARGH); o outro irmão grita de fora, o
+parceiro levanta, grita (STAMP) e os dois trocam cinco golpes no meio da arena, pulam para trás e
+ficam simétricos ao meio da tela; o locutor fecha ("QUE SEQUÊNCIA FOI ESSA, MEUS AMIGOS!") e a luta
+continua. Para jogar no PC:
 `gradle :pc:testeCena -Pepisodio=ep04 -Pmarca=torneio-1 -Pirmao=ryuga -Pvida=0.49 -Pdupla=true`
-(`-Psemente=N` sorteia outro adversário).
+(`-Psemente=N` sorteia outro adversário; `-Pdepois=12` grava 12 s da luta depois da cena). O teste
+começa a luta já com 49%: a fala de abertura do locutor da luta, o GO! e o relógio cheio que aparecem
+depois da cena são do teste, não da cena (no jogo ela dispara no meio da luta).
 
 ### O teste dos QTE (convite do Episódio 2)
 

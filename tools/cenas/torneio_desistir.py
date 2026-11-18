@@ -5,13 +5,18 @@ android/app/src/main/assets/historia/torneio/cena_desistir.json.
 
     python3 tools/cenas/torneio_desistir.py
 
-O roteiro do dono (18/11): quando os dois da dupla do jogador chegam a 50%, quem está em campo
-reclama ("Droga... tá difícil!"), o adversário provoca ("Já vai desistir, é?"), investe, dois golpes
-defendidos, dois que pegam e o forte que joga o jogador na parede. O parceiro pede a troca, entra
-com a voadora, o adversário defende e responde com a rasteira; a câmera segue o parceiro no ar, o
-adversário aparece na frente dele, três golpes rápidos e o joga no chão (PAH!). No chão: "ARGHHH!",
-"Droga!"; de fora, o outro irmão grita; o parceiro levanta, agradece, os dois trocam cinco golpes,
-pulam para trás e a luta continua. Tira um pouco de vida dos dois da dupla do jogador.
+O roteiro do dono (18/11, com os ajustes das rodadas até a v7): quando os dois da dupla do jogador
+chegam a 50%, o adversário abre com um golpe (o dano tem quem deu), quem está em campo reclama
+("Droga... tá difícil!"), o adversário provoca ("Já vai desistir, é?") e investe: um defendido, o que
+quebra a guarda (GUARD BREAK), dois que pegam e o forte que joga na parede (STAMP BAM, voo no fundo
+preto). Ele vem acabar com quem está no chão; no meio da investida o parceiro pede a troca ("Troca
+comigo!" / "Tá!") e chega antes com a voadora na guarda (STAMP). A rasteira lança o parceiro (linhas
+subindo), o adversário aparece no ar, três chutes e o golpe para baixo: queda no fundo preto, PAH no
+chão (STAMP) e o quique com "ARGHHHH!". "Droga!"; de fora, o outro irmão grita (STAMP); o parceiro
+levanta logo, agradece, grita na investida (STAMP), cinco golpes trocados no meio da arena, os dois
+pulam para trás e ficam simétricos ao meio; o locutor fecha (STAMP) e a luta continua. Tira um pouco
+de vida dos dois da dupla do jogador. O voo e a queda no fundo preto são o lance padrão de
+tools/cenas/lances.py.
 
 Genérica: as poses são as que todo lutador tem (DEFENSE_STAND, HIT_STAND, HIT_AIR, KNOCKDOWN,
 GETUP...) em frações do clipe ("HIT_STAND:0.3"), e os golpes do adversário são os dele ("@H:acerta":
@@ -410,10 +415,11 @@ def main():
         '_comentario': (
             'Cena do meio da luta "Já vai desistir?" (torneio), animada à mão e genérica (qualquer dupla '
             'adversária, as duas campanhas), gerada por tools/cenas/torneio_desistir.py com o roteiro do dono '
-            '(18/11). Quando os dois da dupla do jogador chegam a 50%: o adversário provoca, investe, dois golpes '
-            'defendidos, dois que pegam, o forte na parede; o parceiro entra com a voadora, leva a rasteira, três '
-            'golpes no ar e PAH no chão; o outro irmão grita de fora; o parceiro levanta, cinco golpes trocados, os '
-            'dois pulam para trás e a luta continua. Não encerra a luta (vai em "cenasNaLuta" do passo).'),
+            '(18/11, até a v7). Quando os dois da dupla do jogador chegam a 50%: o adversário abre com um golpe, '
+            'provoca, investe (GUARD BREAK) e joga quem está em campo na parede (voo no fundo preto); na investida '
+            'seguinte o parceiro entra com a voadora; lançado, três chutes no ar e a queda no fundo preto (PAH); o '
+            'outro irmão grita de fora; o parceiro levanta, cinco golpes trocados, os dois se separam simétricos e o '
+            'locutor fecha. Não encerra a luta (vai em "cenasNaLuta" do passo).'),
         'gatilho': {'vidaDupla': 0.5, 'lado': 'jogador'},
         'acoes': acoes,
     }
