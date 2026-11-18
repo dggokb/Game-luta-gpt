@@ -669,5 +669,53 @@
     "animacoes": {
       "ULTRA_DRAGAO": {}
     }
+  },
+  "throw": {
+    "_doc": "Agarrão (18/11, vídeo agarrao do dono): estica a mão e agarra a gola (45-63: THROW_GRAB 0-6), puxa, varre a perna e crava o soco para baixo (66-90) e volta à guarda (96-102: THROW_TOSS 6-16). Sem sem_efeitos nem sem_poeira (os dois comem o quimono branco). Os tempos são os do agarrão da Yin-lu e da Bonnie.",
+    "trechos": [
+      [
+        "agarrao",
+        0,
+        124
+      ]
+    ],
+    "quadros": "45,48,51,54,57,60,63,66,69,72,75,78,82,86,90,96,102",
+    "opcoes": {
+      "fixar": "video",
+      "densidade": 2,
+      "escala": 0.411,
+      "motivo": "mesma câmera dos vídeos H3 dela",
+      "nitidez": true
+    },
+    "animacoes": {
+      "THROW_GRAB": {
+        "frames": "0-6",
+        "tempos": [
+          10,
+          10,
+          12,
+          13,
+          13,
+          12,
+          30
+        ]
+      },
+      "THROW_TOSS": {
+        "frames": "6-16",
+        "tempos": [
+          15,
+          15,
+          30,
+          30,
+          25,
+          25,
+          20,
+          20,
+          20,
+          20,
+          47
+        ]
+      }
+    }
   }
 }

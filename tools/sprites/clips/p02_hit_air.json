@@ -2,51 +2,33 @@
   "id": "p02_hit_air",
   "javaName": "P02_HIT_AIR",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_hit_air_sr_hd.png",
+  "source": "art/sprites/source/p02_hit_air_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_hit_air.webp",
   "report": "tools/sprites/reports/p02_hit_air.report.json",
   "preview": "android/app/build/sprite-review/p02_hit_air-import.png",
-  "expectedFrames": 4,
+  "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 4,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
-    "arquivo": "levarGolpeNoAr.mp4",
+    "arquivo": "danoPulo.mp4",
     "personagem": "p02",
-    "escala": 0.5267,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "10,19,27,36",
-    "celula": 320,
-    "largura": 512,
-    "raiz": "137,302",
-    "colunas": 4,
-    "pe_no_chao": true,
-    "limpar_quadros": [
-      1
-    ],
-    "reescala": [
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364
-    ],
-    "reguaFatores": [
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 88% (HIT_AIR)"
-    ]
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "57,60,62,64,66,69,72,75,78,81",
+    "celula": 352,
+    "largura": 160,
+    "raiz": "82,232",
+    "colunas": 10,
+    "fixar": "video",
+    "limpar_chao": true
   },
-  "frameWidth": 1024,
-  "frameHeight": 640,
-  "rootX": 274,
-  "rootY": 604,
+  "frameWidth": 160,
+  "frameHeight": 352,
+  "rootX": 82,
+  "rootY": 232,
   "sourceReferences": [
     "art/sprites/source/p02_hit_air_video_normalized.png"
-  ],
-  "pixelScale": 2.0
+  ]
 }

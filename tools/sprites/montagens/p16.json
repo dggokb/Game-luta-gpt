@@ -247,5 +247,27 @@
     "animacoes": {
       "ULTRA_DRAGAO": {}
     }
+  },
+  "idle_2": {
+    "_doc": "Segundo idle (18/11, vídeo idle2 do dono): da guarda (24) a língua de fora e as mãos de orelha de coelho (32-80), o pulinho (84-88) e a volta à guarda (92-104); toca uma vez a cada 3 voltas do idle.",
+    "trechos": [
+      [
+        "idle2",
+        0,
+        124
+      ]
+    ],
+    "quadros": "24-104/2",
+    "opcoes": {
+      "fixar": "video",
+      "densidade": 2,
+      "recorte_suave": true,
+      "escala": 0.411,
+      "motivo": "mesma câmera dos vídeos H3 dela",
+      "nitidez": true
+    },
+    "animacoes": {
+      "IDLE_2": {}
+    }
   }
 }
