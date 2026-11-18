@@ -6,19 +6,19 @@
   "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_spin.webp",
   "report": "tools/sprites/reports/player_base_hit_spin.report.json",
   "preview": "android/app/build/sprite-review/hit_spin-import.png",
-  "expectedFrames": 12,
+  "expectedFrames": 16,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 8,
   "rootMode": "authored",
   "frameWidth": 768,
   "frameHeight": 640,
   "rootX": 400,
   "rootY": 600,
-  "sourceNote": "Giro de nocaute (spinning knockdown, 18/11): 12 desenhos do Codex com o vídeo de referência do dono (o corpo deita e rola em parafuso; 0-9 no ar, o meio do corpo 230 px acima da raiz; 10-11 caído de costas na raiz). Sem vídeo: tools e prompts em docs/personagens/prompts-reacoes-cena.md.",
+  "sourceNote": "Giro de nocaute (spinning knockdown, 18/11), montado dos vídeos H3 do dono (o traço do jogo): 0-2 o gancho torcendo o corpo (vídeo 3, 1,6-1,9 s), 3-15 o pião do vídeo 2 (1,0-2,3 s, um quadro sim, outro não), inclinado aos poucos de 28 a 90 graus (cabeça para trás, para a esquerda): o pião deitado vira o rolo em parafuso da referência (Street Fighter). O meio do corpo 230 px acima da raiz; o pouso é o GROUNDED.",
   "sourceReferences": [],
   "pixelScale": 2.0,
-  "ajusteTamanho": 0.87,
+  "ajusteTamanho": 1.0,
   "regua": [
-    "igual ao KNOCKDOWN/GROUNDED (87%): o caído do fim emenda no GROUNDED"
+    "na escala do IDLE (o mesmo H3): a guarda do vídeo do pião = a altura do idle"
   ]
 }

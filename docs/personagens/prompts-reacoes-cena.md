@@ -58,18 +58,17 @@ Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art
 O jogo usa: a batida de costas (0,4-0,8 s), o quique (0,8-1,4 s) e a queda de volta
 (1,4-1,8 s). O caído e o levantar já existem.
 
-## 3. O giro de nocaute: FEITO para o Ryūga (18/11), sem vídeo
+## 3. O giro de nocaute do Ryūga (18/11): montado dos vídeos H3
 
-**Como saiu:** os pedidos de vídeo abaixo (pião, cambalhota, estátua girando) foram todos
-reprovados. O movimento certo é o dos Street Fighter da Capcom, que o dono mandou de referência: o
-corpo sai inclinado, vai deitando e **rola em volta do próprio comprimento, como parafuso**, até cair
-de costas. Ele foi desenhado no Codex: 12 desenhos com as poses do vídeo de referência (só as poses,
-não a personagem) e o Ryūga dos sprites como modelo; os dois últimos refeitos de costas, cara para
-cima (o primeiro caiu de bruços). Ficou em `art/sprites/source/player_base_hit_spin.png`, clipe
-`tools/sprites/clips/player_base_hit_spin.json`, animação `HIT_SPIN` (0-9 no ar, 10-11 o pouso de
-costas, que emenda no GROUNDED). O jogo usa no estado de giro (`CombatFighter.spinning`: contra-golpe
-de punição, voadora da troca, quem perde o choque de SHINKAI) no lugar do estreitar falso; sem o
-clipe, o personagem continua com o falso. Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`.
+**O movimento** é o dos Street Fighter da Capcom (a referência do dono): o corpo sai inclinado, vai
+deitando e rola em volta do próprio comprimento, como parafuso. Os vídeos não sabem fazer isso, e
+desenho de outra ferramenta (Codex) sai com outro traço (reprovado: "muito feio"). **O que funcionou:**
+o pião em pé do H3 (o 2º vídeo do dono, que girou certo mas duro) inclinado aos poucos até a
+horizontal é o rolo em parafuso; e é o traço do jogo. `art/sprites/source/player_base_hit_spin.png`:
+0-2 o gancho torcendo o corpo (3º vídeo, 1,6-1,9 s), 3-15 o pião (2º vídeo, 1,0-2,3 s, um quadro sim,
+outro não) inclinado de 28 a 90 graus, cabeça para trás (para a esquerda, como o GROUNDED), na escala
+do IDLE. O jogo usa no estado de giro (`CombatFighter.spinning`) no lugar do estreitar falso e cai
+direto no GROUNDED. Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`.
 
 **Para os outros (Yin-lu, Kōga, Brucy):** o mesmo caminho, com a mesma referência e os sprites de
 cada um como modelo.

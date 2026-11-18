@@ -5218,14 +5218,11 @@ public class GameView extends SurfaceView
         }
         switch (f.status) {
             case KNOCKDOWN:
-                if (giroAteOChao[f.index & 1] && f.knockdownFrame < config.knockdownFallFrames
-                    && renderer.hasAnimation(SpriteStates.HIT_SPIN)) {
-                    // Caiu do giro de nocaute: o pouso de costas do próprio clipe (os dois últimos
-                    // quadros), não a queda para trás do KNOCKDOWN, que começa em pé.
-                    state = SpriteStates.HIT_SPIN;
-                    CharacterDefinition.Animation giro = f.character().animations.get(state);
-                    reactionElapsed = Math.min(giro.inicioDoQuadro(giro.quadros() - 2) + f.knockdownFrame * FIXED_STEP,
-                        giro.duration - 0.0001f);
+                if (giroAteOChao[f.index & 1] && renderer.hasAnimation(SpriteStates.GROUNDED)) {
+                    // Caiu do giro de nocaute: já deitado (o giro termina na horizontal), direto no
+                    // caído, sem a queda para trás do KNOCKDOWN, que começa em pé.
+                    state = SpriteStates.GROUNDED;
+                    reactionElapsed = f.knockdownFrame * FIXED_STEP;
                 } else if (f.knockdownFrame < config.knockdownFallFrames) {
                     state = SpriteStates.KNOCKDOWN;
                     reactionElapsed = f.knockdownFrame * FIXED_STEP;
@@ -5244,11 +5241,10 @@ public class GameView extends SurfaceView
             case AIR_HITSTUN:
                 if (f.spinning && renderer.hasAnimation(SpriteStates.HIT_SPIN)) {
                     // Giro de nocaute desenhado: o corpo deita e rola no ar; segura o último quadro
-                    // do voo (o 10º) até o chão.
+                    // (deitado) até o chão.
                     state = SpriteStates.HIT_SPIN;
                     CharacterDefinition.Animation giro = f.character().animations.get(state);
-                    float voo = giro.inicioDoQuadro(giro.quadros() - 2);
-                    reactionElapsed = Math.min(f.stunElapsed * FIXED_STEP, voo - 0.0001f);
+                    reactionElapsed = Math.min(f.stunElapsed * FIXED_STEP, giro.duration - 0.0001f);
                     giroAteOChao[f.index & 1] = true;
                     break;
                 }
