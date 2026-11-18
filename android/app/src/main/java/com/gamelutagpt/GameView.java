@@ -8971,6 +8971,16 @@ public class GameView extends SurfaceView
             return WORLD_WIDTH * 0.5f;
         }
 
+        @Override public String lutadorEmCampo(int lado) {
+            return engine.team(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).pointState().character.id;
+        }
+
+        @Override public java.util.List<String> lutadoresDaDupla(int lado) {
+            java.util.List<String> ids = new java.util.ArrayList<>();
+            for (FighterState m : engine.team(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).members) ids.add(m.character.id);
+            return ids;
+        }
+
         @Override public float[] paredes() {
             return new float[] {Arena.LEFT_BOUND, Arena.RIGHT_BOUND};
         }

@@ -508,7 +508,16 @@ Para servirem a qualquer adversário e às duas campanhas:
 | Poses de qualquer lutador | `"HIT_STAND:0.5"` (a fração do clipe dele) e `"@H:acerta"` (o golpe H dele: `inicio`, `prepara`, `acerta` = o primeiro quadro que pega, `fim`, ou uma fração do golpe). Use os clipes que todos têm (IDLE, DASH, BACKDASH, JUMP, LAND, DEFENSE_STAND, HIT_STAND, HIT_AIR, KNOCKDOWN, GROUNDED, GETUP) e os golpes L, M, H, 2L, 2M, 2H, jL, jM, jH |
 | Posições da luta | `"x": "jogador+150"`, `"rival-80"`, `"parede+60"`, `"atual"`: onde aquilo estava quando a animação começou (+N para o lado do rival; `parede` é a parede atrás do jogador). Nada passa das paredes |
 
-A câmera da luta não sobe: no ar, mantenha a altura baixa (até uns 90 px) para ninguém sair do quadro.
+A câmera com foco em alguém (`"foco": "jogador"`) sobe junto com a altura da pose dele: para
+um lançamento alto, foque quem foi lançado; sem foco, a câmera fica no chão.
+
+**STAMP de dano, por lutador.** Contra qualquer adversário o STAMP não mostra quem bate: só o
+nosso lutador apanhando, com fundo de mangá sem cenário. `{jogador}` no nome da arte vira o
+lutador em campo do lado do jogador na hora do golpe (`"imagem": "torneio/stamp_bam_{jogador}.jpg"`:
+`stamp_bam_player_base.jpg`, `_p02`, `_p03`, `_p04`), e `"jogadorNaArte": "esquerda"` espelha o
+quadro quando na luta ele está à direita. Sem a arte de quem está em campo, o STAMP não bate. As
+artes da cena "Já vai desistir?" (BAM no golpe que joga na parede, PAH no chão) foram geradas no
+Codex com a arte da seleção de cada um (o pedido em `art/vfx/prompt_stamp_dano_ryuga.txt`).
 
 A primeira é a do torneio (`torneio/cena_desistir.json`, gerada por `tools/cenas/torneio_desistir.py`,
 na primeira luta do torneio do Episódio 4): quando os dois da dupla chegam a 50%, o adversário provoca,

@@ -186,6 +186,16 @@ public final class CinematicaLuta {
         /** Quem está em campo desse lado perde {@code fracao} da vida máxima (nunca cai por isso). */
         default void danoDaCena(int lado, float fracao) {}
 
+        /** O lutador (id do pack: player_base, p02...) em campo desse lado agora, ou null. */
+        default String lutadorEmCampo(int lado) {
+            return null;
+        }
+
+        /** Os lutadores da dupla desse lado (ids do pack), para abrir as artes por lutador. */
+        default List<String> lutadoresDaDupla(int lado) {
+            return Collections.emptyList();
+        }
+
         /** As paredes do cenário (x do mundo da esquerda e da direita), para a animação com "parede". */
         default float[] paredes() {
             return new float[] {90f, 2510f};
@@ -387,6 +397,8 @@ public final class CinematicaLuta {
          * está do outro lado (a campanha do Kōga), o quadro bate espelhado.
          */
         String ryugaNaArte;
+        /** STAMP: de que lado quem está em campo do lado do jogador está na arte (espelha se na luta está do outro). */
+        String jogadorNaArte;
         /** IMPACTO, QTE e GOLPE: o STAMP que bate no contato (com a cena congelada embaixo). */
         Acao stamp;
         /**
@@ -739,6 +751,10 @@ public final class CinematicaLuta {
     private Acao stamp;
     private float stampDesde;
     private int stamps;
+    /** {@code {jogador}} no nome da arte do STAMP: o id de quem está em campo do lado do jogador. */
+    static final String LUTADOR = "{jogador}";
+    /** A arte do STAMP na tela (o nome já com o lutador em campo). */
+    private String stampImagem;
     /** O STAMP na tela bate espelhado (o Ryūga está do outro lado da arte). */
     private boolean stampEspelhado;
     /** O STAMP que vira página já está indo para o lugar dele (a página dele já abriu em {@link #guiada}). */
@@ -876,6 +892,28 @@ public final class CinematicaLuta {
 
     /** Abre a imagem do STAMP e acha o quadro dele; se não abre, o STAMP não aparece. */
     private void carregarStamp(Acao st, Map<String, Episodio> episodios) {
+        if (st.imagem.contains(LUTADOR)) {
+            // A arte de cada lutador da dupla do jogador ({jogador} no nome): bate a de quem estiver em campo.
+            boolean alguma = false;
+            for (String id : palco.lutadoresDaDupla(JOGADOR)) {
+                String caminho = st.imagem.replace(LUTADOR, id);
+                try {
+                    if (!imagensStamp.containsKey(caminho)) {
+                        RenderImage img = assets.loadImage(Temporada.PASTA + "/" + caminho);
+                        if (img == null) continue;
+                        imagensStamp.put(caminho, img);
+                    }
+                    alguma = true;
+                } catch (IOException | RuntimeException ex) {
+                    // Sem a arte desse lutador: com ele em campo, o STAMP não bate.
+                }
+            }
+            if (alguma) {
+                float[] r = st.recorte != null ? st.recorte : new float[] {0f, 0f, 1f, 1f};
+                areaStamp.put(st, new float[] {r[0], r[1], r[2], r[1], r[2], r[3], r[0], r[3]});
+            }
+            return;
+        }
         try {
             RenderImage img = imagensStamp.get(st.imagem);
             if (img == null) {
@@ -1413,6 +1451,10 @@ public final class CinematicaLuta {
                 a.recorte[2] <= a.recorte[0] || a.recorte[3] <= a.recorte[1]) {
                 throw new IllegalArgumentException("recorte fora da imagem: [x0, y0, x1, y1] de 0 a 1, x0 < x1, y0 < y1");
             }
+        }
+        a.jogadorNaArte = Episodio.string(m, "jogadorNaArte", null);
+        if (a.jogadorNaArte != null && !a.jogadorNaArte.matches("esquerda|direita")) {
+            throw new IllegalArgumentException("jogadorNaArte " + a.jogadorNaArte + " (use esquerda ou direita)");
         }
         a.ryugaNaArte = Episodio.string(m, "ryugaNaArte", null);
         if (a.ryugaNaArte != null && !a.ryugaNaArte.matches("esquerda|direita")) {
@@ -2397,11 +2439,19 @@ public final class CinematicaLuta {
     /** O STAMP bate na tela: a luta congela embaixo dele enquanto ele fica. */
     private void bater(Acao a) {
         if (areaStamp.get(a) == null) return;
+        String caminho = a.imagem;
+        if (caminho.contains(LUTADOR)) {
+            String id = palco.lutadorEmCampo(JOGADOR);
+            caminho = id != null ? caminho.replace(LUTADOR, id) : null;
+            if (caminho == null || !imagensStamp.containsKey(caminho)) return;
+        }
+        stampImagem = caminho;
         stamp = a;
         stampDesde = time;
         stamps++;
         virando = false;
-        stampEspelhado = !a.viraPagina && a.ryugaNaArte != null && ryugaADireita() != a.ryugaNaArte.equals("direita");
+        stampEspelhado = !a.viraPagina && (a.ryugaNaArte != null && ryugaADireita() != a.ryugaNaArte.equals("direita") ||
+            a.jogadorNaArte != null && jogadorADireita() != a.jogadorNaArte.equals("direita"));
         congelaAte = Math.max(congelaAte, time + fimDoStamp(a));
         palco.som("impacto");
     }
@@ -2409,6 +2459,12 @@ public final class CinematicaLuta {
     /** Quando o STAMP {@code a} acaba de ficar batido (a descida e o tempo dele), desde que bateu. */
     private static float fimDoStamp(Acao a) {
         return STAMP_DESCE + a.segundos;
+    }
+
+    /** Quem está em campo do lado do jogador está à direita do rival agora. */
+    private boolean jogadorADireita() {
+        if (animando()) return xDaPose(animPose[JOGADOR]) > xDaPose(animPose[RIVAL]);
+        return palco.aDireita(JOGADOR);
     }
 
     /** O Ryūga está à direita do Kōga agora (na animação feita à mão, pelas poses). */
@@ -2425,7 +2481,7 @@ public final class CinematicaLuta {
             Episodio.Passo passo = paginaStamp.get(stamp);
             if (!virando && idade >= fimDoStamp(stamp) && passo != null && temporada != null) {
                 // A página abre já no quadro do STAMP; o quadro vai para o lugar dele nela.
-                RenderImage img = imagensStamp.get(stamp.imagem);
+                RenderImage img = imagensStamp.get(stampImagem);
                 guiada.beginNoQuadro(temporada, passo, img, img.width(), img.height(), stamp.quadro);
                 virando = true;
                 estouros.clear();
@@ -2682,7 +2738,7 @@ public final class CinematicaLuta {
      * raios estouram em volta e o letreiro bate junto. Fica grudado, parado, e sai seco.
      */
     private void desenharStamp(RenderCanvas c, float idade) {
-        RenderImage img = imagensStamp.get(stamp.imagem);
+        RenderImage img = imagensStamp.get(stampImagem);
         float[] area = areaStamp.get(stamp);
         if (img == null || area == null) return;
         float depois = idade - STAMP_DESCE;
@@ -2816,7 +2872,7 @@ public final class CinematicaLuta {
             guiada.render(c, Tinta.clamp01((idade - fim - VIRA_MOVE) / VIRA_FUNDO));
             return;
         }
-        RenderImage img = imagensStamp.get(stamp.imagem);
+        RenderImage img = imagensStamp.get(stampImagem);
         float[] area = areaStamp.get(stamp);
         float[] de = poseDoStamp(img, area, fim);
         float[] bb = Layouts.caixa(area);

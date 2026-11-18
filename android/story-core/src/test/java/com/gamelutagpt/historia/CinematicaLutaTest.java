@@ -188,6 +188,14 @@ public class CinematicaLutaTest {
             assertTrue(arquivo + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
         }
         for (String stamp : r.stamps()) {
+            if (stamp.contains("{jogador}")) {
+                // A arte por lutador: as duplas dos irmãos (o jogador do modo história).
+                for (String id : new String[] {"player_base", "p02", "p03", "p04"}) {
+                    String um = stamp.replace("{jogador}", id);
+                    assertTrue(arquivo + ": sem a imagem do STAMP " + um, new File(ASSETS, Temporada.PASTA + "/" + um).isFile());
+                }
+                continue;
+            }
             assertTrue(arquivo + ": sem a imagem do STAMP " + stamp, new File(ASSETS, Temporada.PASTA + "/" + stamp).isFile());
         }
         for (Object[] q : r.quadrosDosStamps()) {

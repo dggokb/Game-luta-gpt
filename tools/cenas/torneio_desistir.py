@@ -64,6 +64,13 @@ def efeito(q, quem, nome, **kw):
 DASH = dict(sx=1.25, sy=0.88, rastro=5)
 
 
+def stamp_dano(nome):
+    """O STAMP do dano: só quem apanha, sem o adversário (serve contra qualquer um). A arte é a de
+    quem está em campo do lado do jogador (torneio/stamp_<nome>_<id do lutador>.jpg); nela ele está à
+    esquerda (bate espelhado se na luta está à direita)."""
+    return {'imagem': 'torneio/stamp_' + nome + '_{jogador}.jpg', 'jogadorNaArte': 'esquerda', 'segundos': 1.0}
+
+
 def lenta(q, antes=4, depois=16, valor=0.35):
     """Câmera lenta em volta do contato do quadro q (a animação anda a `valor` e volta ao normal)."""
     ev(q - antes, 'velocidade', valor=valor, segundos=0.05, semEsperar=True)
@@ -147,7 +154,7 @@ q += 24
 linhas(q + 4)
 R.k(q + 6, '@H:acerta', 'jogador+55', curva='sai', rastro=5)
 J.k(q + 6, 'HIT_AIR:0', 'jogador-110', y=30, rastro=4)
-impacto(q + 6, 'rival', 3, letreiro='BAM!', congela=0.5)
+impacto(q + 6, 'rival', 3, letreiro='BAM!', congela=0.5, stamp=stamp_dano('bam'))
 lenta(q + 6, antes=2, depois=10, valor=0.3)
 dano(q + 6, 0.04)
 camera(q + 8, 1.15, 'centro', 0.25)
@@ -236,7 +243,7 @@ lenta(q + 26, antes=3, depois=6, valor=0.3)
 impacto(q + 26, 'rival', 2, congela=0.3)
 linhas(q + 28, 'velocidade', escuro=0.3)
 J.k(q + 44, 'KNOCKDOWN:0.4', 'parede+150', y=0, rot=-85, curva='entra', rastro=8)
-impacto(q + 44, 'rival', 3, letreiro='PAH!', congela=0.55)
+impacto(q + 44, 'rival', 3, letreiro='PAH!', congela=0.55, stamp=stamp_dano('pah'))
 dano(q + 44, 0.03)
 efeito(q + 44, 'jogador', 'fumaca_queda_v01', escala=1.4)
 linhas(q + 48)
