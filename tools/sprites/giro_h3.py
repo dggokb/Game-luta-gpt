@@ -49,9 +49,11 @@ PACOTES = {
     'p16': {
         'video': 'art/sprites/source/p16_hit_spin_video.mp4',
         'escala': 441 / 537,
-        # 10-76: depois do clarão do soco (7-9), o voo com o rolo; bate de costas no 78.
-        'voo': [round(10 + i * 66 / 23) for i in range(24)],
-        'pouso': list(range(78, 91, 2)),
+        # 12-62: depois do clarão do soco (7-9), o voo com o rolo até ficar deitada no ar. Do 64 ao 76
+        # ela cai de ombros com as pernas para cima: isso fica no pouso (rápido), não no fim do voo,
+        # que o jogo segura até o chão (o dono, 18/11: "da Bonnie ficou estranho").
+        'voo': [round(12 + i * 50 / 23) for i in range(24)],
+        'pouso': [66, 70, 74, 78, 82, 86, 90],
     },
 }
 
