@@ -286,17 +286,17 @@ final class GeneratedSpriteLayouts {
     static final int P02_FALL_AIR_ROOT_Y = 481;
     static final int P02_FALL_AIR_FRAME_COUNT = 7;
 
-    static final int P02_FALL_DOWN_FRAME_WIDTH = 642;
-    static final int P02_FALL_DOWN_FRAME_HEIGHT = 293;
-    static final int P02_FALL_DOWN_ROOT_X = 317;
-    static final int P02_FALL_DOWN_ROOT_Y = 278;
+    static final int P02_FALL_DOWN_FRAME_WIDTH = 485;
+    static final int P02_FALL_DOWN_FRAME_HEIGHT = 442;
+    static final int P02_FALL_DOWN_ROOT_X = 236;
+    static final int P02_FALL_DOWN_ROOT_Y = 432;
     static final int P02_FALL_DOWN_FRAME_COUNT = 11;
 
-    static final int P02_GETUP_FRAME_WIDTH = 532;
-    static final int P02_GETUP_FRAME_HEIGHT = 380;
-    static final int P02_GETUP_ROOT_X = 276;
-    static final int P02_GETUP_ROOT_Y = 365;
-    static final int P02_GETUP_FRAME_COUNT = 12;
+    static final int P02_GETUP_FRAME_WIDTH = 468;
+    static final int P02_GETUP_FRAME_HEIGHT = 447;
+    static final int P02_GETUP_ROOT_X = 237;
+    static final int P02_GETUP_ROOT_Y = 437;
+    static final int P02_GETUP_FRAME_COUNT = 10;
 
     static final int P02_GOLPE_ALTO_FRAME_WIDTH = 350;
     static final int P02_GOLPE_ALTO_FRAME_HEIGHT = 445;

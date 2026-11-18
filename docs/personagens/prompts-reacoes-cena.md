@@ -70,7 +70,27 @@ queda, e depois o GROUNDED. A base do corpo na raiz em todos os quadros (o arco 
 Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`. **Para os outros: o mesmo pedido**, com o
 gancho e o caído de cada um.
 
-**Os outros (Yin-lu, Kōga, Brucy): ainda não.** As reações deles (apanhar em pé, cair, caído,
+**Yin-lu (18/11): queda nova feita, falta o vídeo do giro.** O vídeo H3 "Derrubado" dela
+(`art/sprites/source/p02_derrubado_h3_video.mp4`) virou KNOCKDOWN (quadros 10-28: voa e bate de
+costas; o quique é o do jogo), GROUNDED (31-45) e GETUP (81-99), montados por
+`tools/sprites/p02_derrubado_h3.py` (escala 391/469: a guarda do vídeo = o IDLE da folha; a raiz
+fixa nos pés do 1º quadro). Conferido no jogo com
+`gradle :pc:testeCena -Pepisodio=ep04 -Pmarca=torneio-1 -Pcontra=p02 -Pgiro=1 -PgiroAlvo=rival -Pqueda`.
+As imagens do giro: `art/keys/p02/inicio_giro_h3.png` (a guarda nova 300 px à frente) e
+`art/keys/p02/fim_caido_h3.png` (o caído do quadro 45, 370 px atrás, no chão da guarda). O pedido:
+
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the kung fu fighter from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+This is the classic SPINNING KNOCKDOWN of 1990s Street Fighter games: a devastating invisible punch twists her body; she is lifted off the ground and thrown backward through the air to the LEFT, and while flying her body TILTS from diagonal to horizontal and ROLLS around its own head-to-toe axis like a corkscrew, then she crashes flat on her back exactly as in the end frame.
+[0-0.3s] A devastating invisible punch hits her face: her body twists hard to the side, her head snaps back, her hair whips.
+[0.3-1.6s] Her feet leave the ground and she flies backward to the LEFT in a low arc, head first. Her body leans further back with every moment until it is horizontal, and at the same time it ROLLS around its long axis one and a half turns: we see her chest, then her side, then her BACK, then her side, then her chest again. Her legs stay together and stretched, her arms are loose and flung around by the roll, her hair and the ends of her orange sash whip with the spin.
+[1.6-2s] She crashes flat on her back on the ground, face up, head on the LEFT and feet on the right, exactly as in the end frame.
+[2-5s] She lies still on her back exactly as in the end frame, breathing.
+She never stands up again, never lands on her feet, never flips head over heels and never cartwheels. Her whole body stays inside the frame. She never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+Keep her face, silver-lavender hair, headband, top, orange sash, gloves, pants, sneakers, colors, line art and size exactly as in the frames; her size never changes.
+```
+
+**Kōga e Brucy: ainda não.** As reações deles (apanhar em pé, cair, caído,
 levantar) são da arte antiga (o dono, 18/11: "não foi dos novos"), e as imagens do giro têm de sair
 da arte nova. A ordem: (1) o vídeo H3 "Derrubado: cair, caído e levantar" de cada um (o pedido está
 na ficha: `docs/personagens/p02.md`, `p03.md`, `p04.md`, "Prompts do que falta"), que também troca a

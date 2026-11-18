@@ -73,6 +73,13 @@ public final class TesteCenaLuta {
                 passo = linha.trim().replaceAll(",$", "");
             }
         }
+        // -Pcontra=p02: uma luta solta contra esse lutador (sem cena; para o -Pgiro com quem o torneio
+        // não sorteia).
+        String contra = System.getProperty("gameluta.contra", "");
+        if (!contra.isEmpty()) {
+            passo = "{\"tipo\": \"luta\", \"marca\": \"" + marca + "\", \"irmao\": \"" + irmao + "\", \"cenario\": \"dojo_shinshinkan\", " +
+                "\"dupla\": [\"" + ("koga".equals(irmao) ? "p03" : "player_base") + "\"], \"cpu\": [\"" + contra + "\"], \"repetirSeDerrota\": false}";
+        }
         if (passo == null) throw new IllegalStateException("sem a luta " + marca + " em " + episodio);
         Episodio so = Episodio.fromJson("{\"id\": \"" + episodio + "\", \"passos\": [" + passo + ", {\"tipo\": \"proximo\", \"titulo\": \"fim\"}]}");
         historia.start(temporada, so);
@@ -80,11 +87,13 @@ public final class TesteCenaLuta {
         if (!historia.waitingFight()) throw new IllegalStateException("a história não chegou na luta");
         System.out.println("luta: " + jogo.engine.fighter(GameView.PLAYER).state.character.id + " × " +
             jogo.engine.fighter(GameView.OPPONENT).state.character.id);
+        if (Boolean.getBoolean("gameluta.soLuta")) System.exit(0);   // -PsoLuta: só diz quem luta
         CinematicaLuta cena = (CinematicaLuta)campo("cinematica").get(jogo);
-        if (!cena.armada()) throw new IllegalStateException("a cinemática não armou");
+        if (!cena.armada() && contra.isEmpty()) throw new IllegalStateException("a cinemática não armou");
 
         // -Pgiro=N: em vez da cena, o jogador leva o giro de nocaute (o do contra-golpe de punição)
-        // N vezes, gravando; para conferir o clipe HIT_SPIN na luta.
+        // N vezes, gravando; para conferir o clipe HIT_SPIN na luta. -PgiroAlvo=rival: quem cai é o
+        // rival; -Pqueda: uma queda comum (lançado, sem girar), para conferir KNOCKDOWN/GROUNDED/GETUP.
         int giros = Integer.getInteger("gameluta.giro", 0);
         if (giros > 0) {
             int espera = 60 * 60;
@@ -92,7 +101,9 @@ public final class TesteCenaLuta {
             jogo.setTouchControlsVisible(false);
             ((AiController)campo("ai").get(jogo)).setEnabled(false);   // a CPU parada: o giro inteiro
             for (int g = 0; g < giros; g++) {
-                CombatFighter p = jogo.engine.fighter(GameView.PLAYER), o = jogo.engine.fighter(GameView.OPPONENT);
+                boolean noRival = "rival".equals(System.getProperty("gameluta.giroAlvo"));
+                CombatFighter p = jogo.engine.fighter(noRival ? GameView.OPPONENT : GameView.PLAYER);
+                CombatFighter o = jogo.engine.fighter(noRival ? GameView.PLAYER : GameView.OPPONENT);
                 // Os dois no meio da arena, o jogador à esquerda: ele voa para a esquerda girando.
                 for (int i = 0; i < 40; i++) {
                     p.x = Arena.WORLD_WIDTH * 0.5f + 60f; o.x = Arena.WORLD_WIDTH * 0.5f + 260f;
@@ -105,7 +116,7 @@ public final class TesteCenaLuta {
                 p.y -= 2f;
                 p.vx = afasta * cfg.spinSpeed;
                 p.vy = -cfg.spinLift;
-                p.spinning = true;
+                p.spinning = !Boolean.getBoolean("gameluta.queda");
                 p.launched = true;
                 p.hardFall = true;
                 p.stunLeft = p.stunTotal = cfg.spinHitstunFrames;
