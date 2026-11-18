@@ -1,0 +1,9 @@
+Generate ONE new image file and save it in the current folder as koga_base_cabeca.png (PNG with a transparent background, exactly 1024x1536 pixels).
+
+Use the image tool to EDIT the first attached image (koga_base.png: a muscular street fighter in a black hooded vest, white tank top, black cargo pants with red straps, high-top sneakers, in a fighting guard, facing RIGHT, full body, transparent background).
+
+Keep EXACTLY the same pose, the same fighting guard, the same outfit, the same colors, the same line art and shading style, the same full-body framing facing RIGHT and the same transparent background. The total height of the figure and the position of the feet and of both fists stay the same.
+
+The only change: his head is too small for his body. Make his head bigger (face, spiky hair and neck together), in proportion: from the top of the hair to the chin the head must be about 18.5% of the total height of the figure (today it is about 15%). Use the second attached image (ryuga_base_referencia.png) ONLY as a reference for this head-to-body proportion: his head is about 18.5% of his height. Do not copy anything else from the second image: not its clothes, colors, hair or face.
+
+His face stays his own: the same very spiky dark brown hair, the same serious expression, looking to the RIGHT, only bigger and in proportion with the shoulders. No text, no floor shadow, no background, no extra characters.
