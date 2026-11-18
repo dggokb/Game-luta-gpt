@@ -70,6 +70,15 @@ queda, e depois o GROUNDED. A base do corpo na raiz em todos os quadros (o arco 
 Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`. **Para os outros: o mesmo pedido**, com o
 gancho e o caído de cada um.
 
+**Imagens dos outros (prontas, 18/11):** `art/keys/<id>/inicio_gancho_h3.png` e
+`art/keys/<id>/fim_caido_h3.png` para p02 (Yin-lu), p03 (Kōga) e p04 (Brucy), tiradas dos sprites do
+jogo: o quadro mais torcido do HIT_STAND (Yin-lu 3, Kōga 2, Brucy 4) e o caído, na escala da chave H3
+de cada um (o Brucy não tem chave H3: na escala dos outros, quadro de 1344 x 768, chão em 733). O
+Kōga é diferente: o GROUNDED dele fica de costas com as pernas para cima, então a imagem final usa o
+quadro deitado da queda (KNOCKDOWN); o pouso do giro emenda no GROUNDED dele com um salto até ele ter
+um caído esticado. Mesmo pedido de vídeo; para a Yin-lu troque he/his por she/her e a frase do fim
+pela dela (tabela no começo deste arquivo).
+
 **Antes (reprovados):** o pião do H3 inclinado aos poucos (montagem), os 12 desenhos do Codex (outro
 traço) e os vídeos que terminavam em pé.
 
