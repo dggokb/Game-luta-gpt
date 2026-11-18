@@ -11,10 +11,10 @@
   "columns": 7,
   "rootMode": "authored",
   "frameWidth": 768,
-  "frameHeight": 640,
+  "frameHeight": 704,
   "rootX": 400,
   "rootY": 600,
-  "sourceNote": "Giro de nocaute da Bonnie, vídeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O pouso: quadros 78-90 de 2 em 2 (bate de costas no chão e assenta); depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceNote": "Giro de nocaute da Bonnie, 2º vídeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O pouso: quadros 64-76 de 2 em 2 (cai de ombros com as pernas para cima, as pernas descem e ela assenta); depois dele, o GROUNDED; depois dele, o GROUNDED; depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
   "sourceReferences": [
     "art/sprites/source/p16_hit_spin_video.mp4"
   ],

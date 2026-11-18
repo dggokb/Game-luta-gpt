@@ -11,10 +11,10 @@
   "columns": 8,
   "rootMode": "authored",
   "frameWidth": 768,
-  "frameHeight": 640,
+  "frameHeight": 704,
   "rootX": 400,
   "rootY": 600,
-  "sourceNote": "Giro de nocaute da Natisuko, vídeo H3 do dono (art/sprites/source/p15_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p15/inicio_giro_h3.png, final art/keys/p15/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p15. O voo: quadros 5-57 (24 deles: o soco torce, o arremesso e o rolo em parafuso); a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceNote": "Giro de nocaute da Natisuko, vídeo H3 do dono (art/sprites/source/p15_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p15/inicio_giro_h3.png, final art/keys/p15/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p15. O voo: quadros 5-57 (24 deles: o soco torce, o arremesso e o rolo em parafuso); o centro do corpo em rootX, descendo em linha reta da guarda (pés na raiz) ao deitado (base na raiz), para seguir o arco da física sem pular.",
   "sourceReferences": [
     "art/sprites/source/p15_hit_spin_video.mp4"
   ],

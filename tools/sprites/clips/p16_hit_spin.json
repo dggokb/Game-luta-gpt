@@ -11,10 +11,10 @@
   "columns": 8,
   "rootMode": "authored",
   "frameWidth": 768,
-  "frameHeight": 640,
+  "frameHeight": 704,
   "rootX": 400,
   "rootY": 600,
-  "sourceNote": "Giro de nocaute da Bonnie, vídeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O voo: quadros 10-76 (24 deles: o soco torce, o arremesso e o rolo em parafuso); a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceNote": "Giro de nocaute da Bonnie, 2º vídeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O voo: quadros 15-63 sem 39-47 (24 deles; ali a cabeça girava errado), do soco ao rolo até deitada no ar; o centro do corpo em rootX, descendo em linha reta da guarda (pés na raiz) ao deitado (base na raiz), para seguir o arco da física sem pular.",
   "sourceReferences": [
     "art/sprites/source/p16_hit_spin_video.mp4"
   ],
