@@ -454,6 +454,23 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
 
 Testes: `BattleFlowTest`, `AiFullKitTest`.
 
+## O golpe de várias pancadas segura o rival (18/11)
+
+O dono: "tem supers que o adversário fica solto, quicando no ar; parece que o golpe não segura o
+personagem". Medido: entre as pancadas de um golpe de várias, o rival no ar levava um tranco para
+cima (`strikeHoldLift`) a cada pancada e boiava subindo (a rajada da Natisuko o levava de 116 a
+221 px e a 9ª escapava); e o S3 do Ryūga, que só paira rente ao chão, era tratado como golpe que voa
+(o chute da garça) e jogava o rival 132 px para cima em cada chute. Agora:
+
+- no ar, o rival fica **preso na altura em que foi pego** até a próxima pancada (`presoNoAr`, a
+  gravidade para) e a última pancada que derruba também derruba quem está no ar (cai sem air tech);
+- o golpe que **paira** (`voo.paira`) não leva o rival para cima: no chão ele fica em pé, atordoado
+  na frente, até o último chute;
+- os golpes que voam de verdade (o S2 e o S4 da Yin-lu) continuam levando o rival subindo junto.
+
+Teste: `GolpeSeguraORivalTest` (Ryūga S3 e Super, Natisuko S3 e Super, Bonnie S4 e Super, Super da
+Yin-lu, no chão e no ar). Quatro combos ganharam a pancada que antes escapava.
+
 ## Agarrão com personalidade (18/11)
 
 O agarrão genérico (L + M) do motor: pega em 5 quadros, 12 de janela de tech, e na hora de jogar o

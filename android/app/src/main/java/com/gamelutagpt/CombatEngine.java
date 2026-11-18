@@ -2794,6 +2794,14 @@ final class CombatEngine {
             f.vy = 0f;
             return;
         }
+        if (f.presoNoAr > 0) {
+            // Preso entre as pancadas de um golpe de várias: parado no ar até a próxima.
+            f.presoNoAr--;
+            if (f.status == CombatFighter.Status.AIR_HITSTUN) {
+                f.vy = 0f;
+                return;
+            }
+        }
         float scale = 1f;
         // Ordinary neutral jumps now rise/fall briskly; preserve the superjump
         // arc, juggle/launch physics and specialized projectile trajectories.
@@ -5740,6 +5748,7 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
+        d.presoNoAr = 0;
         d.stunProjectile = projectile && attack.kind != AttackDefinition.Kind.SUPER && !c.echo ? c.projectile : null;
         // A new hit takes over any flight in progress (and any free fall after the hitstun).
         d.freeFallFrames = 0;
@@ -5903,9 +5912,12 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.launchHitstunFrames);
             a.launcherChase = config.launcherChaseFrames;
             push(d, a, direction * attack.knockback);
-        } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() && !a.grounded) {
+        } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() &&
+                   !a.attack.mechanics.flightHover && !a.grounded) {
             // Golpe que voa e bate várias vezes (o chute da garça da Yin-lu): as pancadas do meio
-            // levam o rival junto, subindo com quem bate, para a próxima pegar; a última joga.
+            // levam o rival junto, subindo com quem bate, para a próxima pegar; a última joga. O que
+            // só paira rente ao chão (o S3 do Ryūga, 18/11: "o rival fica solto, quicando no ar")
+            // não sobe: o rival fica atordoado em pé na frente até o último chute.
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.grounded = false;
             d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
@@ -5914,8 +5926,17 @@ final class CombatEngine {
         } else if (!d.grounded) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             push(d, a, direction * airPush);
-            // Held in the air between strikes: a small pop keeps it in reach of the next one.
-            if (!lastStrike) d.vy = Math.min(d.vy, -config.strikeHoldLift);
+            // Entre as pancadas de um golpe de várias o rival fica preso no ar, na altura em que foi
+            // pego, até a próxima (o dono, 18/11: "o golpe não segura o personagem, ele fica solto,
+            // quicando no ar"; antes cada pancada dava um tranco para cima e ele boiava subindo).
+            if (!lastStrike) {
+                d.vy = 0f;
+                d.presoNoAr = holdUntil;
+            } else if (multi && launch == AttackDefinition.Launch.KNOCKDOWN) {
+                // A última pancada que derruba pega no ar quem ficou preso: cai e fica no chão.
+                d.hardFall = true;
+                d.launched = true;
+            }
         } else {
             d.status = CombatFighter.Status.HITSTUN;
             d.hitCrouching = wasCrouching;

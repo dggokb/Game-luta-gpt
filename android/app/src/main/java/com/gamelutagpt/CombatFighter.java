@@ -308,6 +308,8 @@ final class CombatFighter {
     int throwFrame;
     /** Distância de quem agarrou até o rival quando pegou (o 1º ponto da cena do agarrão). */
     float throwGap;
+    /** Quadros que ele ainda fica parado no ar entre as pancadas de um golpe de várias. */
+    int presoNoAr;
     /** O dano da cena do agarrão já entrou. */
     boolean throwAcertou;
     /** Frames during which this fighter cannot be thrown (right after stun or wake-up). */

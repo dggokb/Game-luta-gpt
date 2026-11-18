@@ -71,7 +71,7 @@ public class ComboBonnieTest {
         BateriaCombos.Exec x = emenda(combo(BONNIE, NATISUKO, "S2L L M L 2H SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e 2H", 11);
         assertEquals("quicou no chão", 1, x.chao);
         // Ou pega o quique com a Estrelinha.
-        emenda(combo(BONNIE, NATISUKO, "S2L L M S4 W20 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Estrelinha", 12);
+        emenda(combo(BONNIE, NATISUKO, "S2L L M S4 W20 SJ jL jM J jL jM jH S", 100f, false, 2), "caixa e Estrelinha", 13);
         // Caixa no meio (M): o esquete, e o H chuta a caixa de volta no rival.
         emenda(combo(BONNIE, NATISUKO, "S2M L M L M H W10 C120 2H SJ jL jM J jL jM jH S", 100f, false, 2), "esquete chuta a caixa", 13);
     }
