@@ -58,19 +58,30 @@ Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art
 O jogo usa: a batida de costas (0,4-0,8 s), o quique (0,8-1,4 s) e a queda de volta
 (1,4-1,8 s). O caído e o levantar já existem.
 
-## 3. Rodopiar no ar (`HIT_SPIN`)
+## 3. Rodopiar no ar (`HIT_SPIN`): a pose encolhida, o jogo gira
+
+**Primeira tentativa reprovada (18/11, Ryūga):** pedindo "dois giros para trás", o H3 girou de
+corpo aberto em estrela, de frente para a câmera, como um cata-vento; braços e pernas mudam a cada
+quadro e o ritmo do giro muda, então não sai uma volta limpa que repita (e pôs poeira no pulo e
+na queda). Vídeo não gira bem. O jeito dos jogos 2D: **uma pose encolhida, parada no ar, e o jogo
+gira** (o motor já gira a pose: `rot` nas chaves da cena). Encolhido como uma bola, ele fica
+natural em qualquer ângulo, ao contrário da pose de queda girada.
 
 ```
-Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the martial artist from the start frame, on a flat solid green background. He faces RIGHT at the start and at the end; the camera stays fixed and never zooms.
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the martial artist from the start frame, on a flat solid green background. He faces RIGHT the whole time; his chest stays turned toward the camera and he NEVER turns his back to the camera. The camera stays fixed and never zooms.
 [0-0.4s] He holds his fighting guard exactly as in the start frame.
-[0.4-0.8s] A powerful invisible uppercut from below launches him straight UP: his body arches back, arms and legs loose, with a pained shout.
-[0.8-2.4s] In the air, in the middle of the frame, he TUMBLES helplessly head over heels, rotating backward two full turns like a ragdoll: body stretched out, arms and legs flailing loosely, clearly not in control, hair and clothes whipping with the spin. He stays in the middle of the frame while he spins: he does not fly out of it.
-[2.4-3.2s] He comes out of the spin, falls and lands on his feet in a crouch.
-[3.2-5s] He rises into his fighting guard and holds it exactly as in the end frame, breathing heavily.
-Two full backward rotations only, smooth and evenly spaced. His whole body stays inside the frame for the whole video. He never holds any object. Clean animation only: no shadow, floor, dust, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+[0.4-0.8s] A powerful invisible uppercut from below lifts him off the ground: his body arches back for an instant, with a pained shout.
+[0.8-1.2s] Still rising in the middle of the frame, he curls up into a tight ball: knees pulled up hard against his chest, both arms wrapped around his shins, chin tucked down to his knees, eyes squeezed shut in pain.
+[1.2-2.6s] He HOLDS that tight curled ball pose, floating still in the middle of the frame, completely frozen: his body does NOT rotate, does NOT spin and does NOT move; only his hair and the ends of his belt flutter slightly.
+[2.6-3.4s] He uncurls, drops straight down and lands on his feet in a crouch.
+[3.4-5s] He rises into his fighting guard and holds it exactly as in the end frame, breathing heavily.
+The body never spins or rotates at any moment; it stays upright, facing right. His whole body stays inside the frame. He never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
 Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art and size exactly as in the frames; his size never changes.
 ```
 
-O jogo usa só o rodopio (0,8-2,4 s): uma volta inteira em quadros iguais, que repete enquanto ele
-voa (no lançamento para cima e na queda no fundo preto da cena; na luta, no contra-golpe de
-punição).
+O jogo usa: o lançado arqueando (0,4-0,8 s) e **um quadro** da bola encolhida (1,2-2,6 s), que ele
+gira enquanto o lutador voa (no lançamento para cima e na queda no fundo preto da cena; na luta,
+no contra-golpe de punição).
+
+**Do vídeo reprovado dá para aproveitar** o lançado arqueando (0,3-0,8 s) e o pouso agachado
+(2,7-3,3 s); o giro, não.
