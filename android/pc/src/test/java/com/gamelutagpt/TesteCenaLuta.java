@@ -131,7 +131,13 @@ public final class TesteCenaLuta {
         System.out.println("cena acabou no quadro " + quadro + "; vida do jogador " +
             jogo.engine.fighter(GameView.PLAYER).state.life + "/" + jogo.engine.fighter(GameView.PLAYER).state.profile.maxLife +
             " (" + jogo.engine.fighter(GameView.PLAYER).state.character.id + ")");
-        for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
+        // -Pdepois=N: N segundos da luta depois da cena, na cadência do resto (a luta voltando).
+        int depois = Integer.getInteger("gameluta.depois", 0);
+        if (depois > 0) {
+            for (int i = 0; i < 60 * depois; i++) passo(quadro % CADENCIA == 0 && !SO_ANIMACAO);
+        } else {
+            for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
+        }
         System.exit(0);
     }
 

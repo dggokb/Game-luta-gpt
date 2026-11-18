@@ -480,6 +480,7 @@ tasks.register('testeCena', JavaExec) {
     systemProperty 'gameluta.soAnimacao', providers.gradleProperty('soAnimacao').getOrElse('false')
     systemProperty 'gameluta.erraPrimeiro', providers.gradleProperty('erraPrimeiro').getOrElse('false')
     systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').getOrElse('false')
+    systemProperty 'gameluta.depois', providers.gradleProperty('depois').getOrElse('0')
     systemProperty 'gameluta.semente', providers.gradleProperty('semente').getOrElse('7')
     maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
     args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('cena').get().asFile.absolutePath),
