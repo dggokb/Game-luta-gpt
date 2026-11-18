@@ -6,6 +6,9 @@ import com.gamelutagpt.motion.Pose;
 
 /** Generic atlas renderer. No attack IDs, resource IDs or per-clip branches. */
 final class SpriteFighterRenderer {
+    /** O giro das poses da animação à mão é em volta deste ponto, acima dos pés. */
+    static final float CENTRO_DO_GIRO = 90f;
+
     final SpriteMotion motion;
     /** Motor de animação (motion-core): o movimento por cima dos quadros. */
     final AnimacaoLutador animacao = new AnimacaoLutador();
@@ -381,7 +384,7 @@ final class SpriteFighterRenderer {
         frame=anim.quadroDaFolha(frame);
         usarFiltro(filtro);
         canvas.save();
-        if(graus!=0f)canvas.rotate(graus*facing,x,baseY-90f);
+        if(graus!=0f)canvas.rotate(graus*facing,x,baseY-CENTRO_DO_GIRO);
         canvas.scale(sx,sy,x,baseY);
         if(facing*character.artFacing<0) canvas.scale(-1f,1f,x,0f);
         drawClip(canvas,clip,frame,x,baseY,alpha);

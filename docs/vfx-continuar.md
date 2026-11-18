@@ -1861,4 +1861,10 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   adversário some (alfa 0) nos dois trechos de fundo preto, a câmera vai presa no lutador (no fundo
   preto ela não para na borda do mundo), e a troca final acontece mais para o meio da arena.
   Vídeos `torneio_desistir_v5_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 6:** quem cai no fundo preto não estava no meio (de ponta-cabeça o peito fica embaixo):
+  a câmera agora centra o centro do giro da pose. A "tremedeira" que o dono notou: medi os vídeos
+  e a câmera fica parada fora do STAMP, do GUARD BREAK e dos impactos (tremidas de propósito); o que
+  pulava de quadro em quadro eram as linhas do fundo preto, rápidas demais. Ficaram mais lentas e
+  longas. O lançamento virou padrão: `tools/cenas/lances.py` e "Lançamento no fundo preto" em
+  `docs/historia/motor-cinematicas.md`. Vídeos `torneio_desistir_v6_{ryuga,koga}.mp4`. Visto só no PC.
 

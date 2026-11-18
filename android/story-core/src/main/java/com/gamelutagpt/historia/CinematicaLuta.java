@@ -2770,9 +2770,9 @@ public final class CinematicaLuta {
                 for (int i = 0; i < LINHAS_VELOCIDADE * 2; i++) {
                     Random r = new Random(4241L + i * 977L);
                     float y = VH * (0.04f + 0.92f * r.nextFloat());
-                    float largo = VW * (0.18f + 0.3f * r.nextFloat());
+                    float largo = VW * (0.25f + 0.35f * r.nextFloat());
                     float grosso = 1.5f + r.nextFloat() * 4f;
-                    float veloc = VW * (1.8f + 1.6f * r.nextFloat());
+                    float veloc = VW * (0.8f + 0.6f * r.nextFloat());
                     float faixa = VW + largo * 2f;
                     float x = faixa - ((r.nextFloat() * faixa + time * veloc) % faixa) - largo;
                     c.fillPolygon(new float[] {x, y, x + largo * 0.35f, y - grosso, x + largo, y, x + largo * 0.35f, y + grosso}, branco);
@@ -2813,9 +2813,11 @@ public final class CinematicaLuta {
         for (int i = 0; i < n; i++) {
             Random r = new Random(7351L + i * 613L);
             float x = VW * (0.02f + 0.96f * r.nextFloat());
-            float longo = VH * (0.25f + 0.35f * r.nextFloat());
+            float longo = VH * (0.35f + 0.4f * r.nextFloat());
             float grosso = 1.5f + r.nextFloat() * 3.5f;
-            float veloc = VH * (2.2f + 1.6f * r.nextFloat());
+            // Devagar o bastante para o olho seguir cada risco (mais rápido, eles saltavam de lugar
+            // a cada quadro e a tela parecia tremer: o dono, 18/11).
+            float veloc = VH * (0.9f + 0.6f * r.nextFloat());
             float faixa = VH + longo * 2f;
             float andou = (r.nextFloat() * faixa + time * veloc) % faixa;
             float y = subir ? andou - longo : faixa - andou - longo;

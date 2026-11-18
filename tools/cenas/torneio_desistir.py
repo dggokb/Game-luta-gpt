@@ -21,6 +21,7 @@ estava, +150 para o lado do adversário), "parede+40" (a parede atrás do jogado
 from pathlib import Path
 
 from animacao import Lutador, escrever
+from lances import sumir, voo_no_fundo_preto
 
 ROOT = Path(__file__).resolve().parents[2]
 CENA = ROOT / 'android/app/src/main/assets/historia/torneio/cena_desistir.json'
@@ -185,19 +186,15 @@ dano(q + 6, 0.04)
 # O voo até a parede no fundo preto, com as linhas de velocidade (o dono: "mais dramaticidade").
 # Só ele no fundo preto, preso no meio da tela (a câmera vai junto); o adversário some (o dono:
 # "não pode aparecer enquanto está no efeito de lançamento").
-camera(q + 8, 1.3, 'jogador', 0.0)
-linhas(q + 8, 'velocidade', fundo=True, segundos=0.06)
+# (O lance padrão: tools/cenas/lances.py.)
+voo_no_fundo_preto(ev, q + 8, q + 30, 'velocidade')
+sumir(R, q + 8, q + 30, '@H:fim', 'jogador+0')
 lenta(q + 8, antes=0, depois=22, valor=0.45)
 J.k(q + 30, 'HIT_AIR:0.5', 'parede+60', y=110, rot=-25, curva='sai', rastro=7)
-R.k(q + 8, '@H:fim', 'jogador+0', alfa=0.0, curva='corte')
-R.k(q + 30, '@H:fim', 'jogador+0', alfa=0.0)
-R.k(q + 31, '@H:fim', 'jogador+0', alfa=1.0, curva='corte')
 R.k(q + 50, 'IDLE:0', 'jogador+0', ciclo=10)
 # Bate na parede: o cenário volta, a parede treme e o efeito nasce nele (não no meio dos dois).
-linhas(q + 30, segundos=0.05)
 impacto(q + 30, 'rival', 2, onde='alvo', congela=0.25)
 efeito(q + 30, 'jogador', 'fumaca_queda_v01', escala=1.0)
-camera(q + 30, 1.15, 'centro', 0.0)
 J.k(q + 33, 'KNOCKDOWN:0.3', 'parede+70', y=90, rot=-10)
 J.k(q + 54, 'GROUNDED:0', 'parede+80', y=0, rot=0, curva='entra')
 efeito(q + 54, 'jogador', 'fumaca_pouso')
@@ -291,15 +288,12 @@ lenta(q + 24, antes=3, depois=6, valor=0.3)
 impacto(q + 24, 'rival', 2, tipo='acerto', congela=0.3)
 dano(q + 24, 0.01)
 # A queda de verdade: fundo preto, as linhas correndo para cima, a câmera caindo junto.
-linhas(q + 27, 'descer', fundo=True, segundos=0.06)
-camera(q + 27, 1.35, 'jogador', 0.0)
+voo_no_fundo_preto(ev, q + 27, q + 60, 'descer', zoom=1.35, depois_zoom=1.2)
 ev(q + 27, 'velocidade', valor=0.5, segundos=0.1, semEsperar=True)
 J.k(q + 30, 'KNOCKDOWN:0.2', 'parede+150', y=360, rot=-70)
 J.k(q + 60, 'KNOCKDOWN:0.4', 'parede+130', y=0, rot=-85, curva='entra', rastro=8)
 ev(q + 58, 'velocidade', valor=1.0, segundos=0.05, semEsperar=True)
 # PAH no chão da arena (o cenário volta no contato) com o STAMP.
-linhas(q + 60, segundos=0.04)
-camera(q + 60, 1.2, 'centro', 0.0)
 impacto(q + 60, 'rival', 3, letreiro='PAH!', congela=0.55, onde='alvo', stamp=stamp_dano('pah'))
 dano(q + 60, 0.02)
 efeito(q + 60, 'jogador', 'fumaca_queda_v01', escala=1.4)
@@ -310,10 +304,7 @@ J.k(q + 74, 'KNOCKDOWN:0.6', 'parede+115', y=70, rot=-40, curva='sai')
 J.k(q + 88, 'GROUNDED:0', 'parede+110', y=0, rot=0, curva='entra')
 efeito(q + 88, 'jogador', 'fumaca_pouso')
 # O adversário desce longe (o dono: "muito perto da gente quando desceu do combo aéreo").
-R.k(q + 27, '@jH:fim', 'parede+290', y=470, alfa=0.0, curva='corte')
-R.k(q + 36, 'JUMP:0.7', 'parede+300', y=420, alfa=0.0)
-R.k(q + 60, 'JUMP:0.7', 'parede+300', y=420, alfa=0.0)
-R.k(q + 61, 'JUMP:0.8', 'parede+450', y=260, alfa=1.0, curva='corte')
+sumir(R, q + 27, q + 60, '@jH:fim', 'parede+290', y=470, volta=('JUMP:0.8', 'parede+450', 260))
 R.k(q + 80, 'JUMP:0.8', 'parede+560', y=120)
 R.k(q + 92, 'LAND:0.3', 'parede+580', y=0, curva='entra')
 efeito(q + 92, 'rival', 'fumaca_pouso')

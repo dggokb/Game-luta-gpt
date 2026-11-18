@@ -643,3 +643,27 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite, a briga dos irmãos animada nas duas campanhas), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
 | A luta do teste de QTE jogada no PC | `android/pc/src/test/.../TesteQteConvite.java` (`gradle :pc:testeQte`) |
 | Prévia no PC | `android/pc-preview/.../CinematicaPreview.java` (`gradle :pc-preview:runCinematica`) |
+
+## Lançamento no fundo preto (padrão)
+
+Aprovado pelo dono na cena "Já vai desistir?" (18/11: "salva esses lançamentos como padrão, porque
+vai ter bastante"). Quem é lançado (para a parede, para cima) ou cai fica **sozinho no meio da
+tela**: o cenário some num fundo preto, as linhas de ação brancas correm atrás dele no sentido do
+voo, e o outro lutador some. No contato (a parede, o chão) o cenário volta de uma vez e o impacto
+bate ali (`"onde": "alvo"`), muitas vezes com o STAMP.
+
+Nas cenas geradas em Python use `tools/cenas/lances.py`:
+
+```python
+from lances import voo_no_fundo_preto, sumir
+voo_no_fundo_preto(ev, q + 8, q + 30, 'velocidade')      # 'velocidade', 'subir' ou 'descer'
+sumir(R, q + 8, q + 30, '@H:fim', 'jogador+0')            # o outro some e volta em q + 31
+J.k(q + 30, 'HIT_AIR:0.5', 'parede+60', y=110, rot=-25, curva='sai', rastro=7)
+```
+
+Por baixo é a ação `linhas` com `"fundo": true` e a câmera presa em quem voa (`camera` com `foco`
+e `segundos` 0). Com o fundo preto a câmera não para na borda do mundo e põe o centro do giro da
+pose (90 acima dos pés) no meio da tela, então quem está de ponta-cabeça também fica centrado. Uma
+câmera lenta no voo (`velocidade` 0,45 a 0,5) dá o peso. Exemplo completo:
+`tools/cenas/torneio_desistir.py` (o voo até a parede e a queda do combo aéreo).
+

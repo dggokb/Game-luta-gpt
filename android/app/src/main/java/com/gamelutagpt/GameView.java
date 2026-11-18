@@ -4414,6 +4414,12 @@ public class GameView extends SurfaceView
                 // lugar da tela e o chão desce).
                 float sobe = focoJogador * alturaAnimada(CinematicaLuta.JOGADOR) + focoRival * alturaAnimada(CinematicaLuta.RIVAL);
                 renderCameraTop = pivotY - sobe - pivotScreenY / baseZoom;
+                if (cinematica.fundoPreto() > 0.99f && focoJogador + focoRival > 0.99f) {
+                    // Voando no fundo preto (lançado, caindo): o corpo no meio da tela. O meio dele é
+                    // o centro do giro da pose (90 acima dos pés), não o peito: de ponta-cabeça o peito
+                    // fica embaixo e ele saía pela borda de baixo.
+                    renderCameraTop = GROUND_Y - sobe - SpriteFighterRenderer.CENTRO_DO_GIRO - VH * 0.5f / baseZoom;
+                }
                 renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
                     focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
             }
