@@ -8792,6 +8792,9 @@ public class GameView extends SurfaceView
             // O impact frame e o tranco da tela andam mesmo na congelada (o negativo dura os
             // quadros dele, não a pausa inteira); os efeitos esperam a pausa acabar.
             feel.step();
+            // A tremida da tela (o GUARD BREAK da cena) também acaba: ela só diminuía no passo da
+            // luta, parada na animação, e a tela tremia até o fim da cena (o dono, 18/11).
+            beamShake = Math.max(0f, beamShake - FIXED_STEP * 60f);
             if (!congelada) {
                 impacts.update(FIXED_STEP);
                 efeitos.passo();

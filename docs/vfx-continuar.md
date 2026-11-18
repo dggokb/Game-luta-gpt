@@ -1867,4 +1867,8 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   pulava de quadro em quadro eram as linhas do fundo preto, rápidas demais. Ficaram mais lentas e
   longas. O lançamento virou padrão: `tools/cenas/lances.py` e "Lançamento no fundo preto" em
   `docs/historia/motor-cinematicas.md`. Vídeos `torneio_desistir_v6_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 7:** "ainda tem uma tremedeira, constante do 8 até o final". Era a tremida de tela do
+  GUARD BREAK (`beamShake`): ela só diminuía no passo da luta, que fica parado na animação à mão, e
+  a tela tremia 1 a 3 px até o fim da cena. Agora diminui também no passo da cinemática. Medido nos
+  quadros: parada de novo. Vídeos `torneio_desistir_v7_{ryuga,koga}.mp4`. Visto só no PC.
 
