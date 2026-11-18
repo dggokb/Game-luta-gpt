@@ -476,8 +476,8 @@ Yin-lu, no chão e no ar). Quatro combos ganharam a pancada que antes escapava.
 O dono: "toda hora alguém toma dano para cima e fica em pose de pulo". A pose do lançado
 (`GameView.launchPoseTime`) era um tempo fixo do HIT_AIR (0 a 0,19 s), feito para os clipes antigos
 de 4 quadros; nos clipes longos dos vídeos novos ela ficava no começo, que era o pulo antes do golpe.
-Agora é a proporção do clipe (os de 4 quadros ficam como eram). O HIT_AIR da Natisuko usa os quadros
-1-5 da queda (o vídeo `danoPulo` dela não tem reação, o prompt para refazer está na ficha) e o da Yin-lu
+Agora é a proporção do clipe (os de 4 quadros ficam como eram). O HIT_AIR da Natisuko vem do vídeo novo do
+dono (o `danoPulo` antigo dela não tinha reação; o prompt está na ficha) e o da Yin-lu
 começa no tranco (sem o 1º desenho, encolhida no pulo).
 
 ## Agarrão com personalidade (18/11)
