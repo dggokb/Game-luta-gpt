@@ -90,6 +90,13 @@ She never stands up again, never lands on her feet, never flips head over heels 
 Keep her face, silver-lavender hair, headband, top, orange sash, gloves, pants, sneakers, colors, line art and size exactly as in the frames; her size never changes.
 ```
 
+**Natisuko e Bonnie (18/11): imagens prontas, falta o vídeo do giro.** A queda delas já é da arte
+nova (H3), então não precisa do "Derrubado": `art/keys/p15|p16/inicio_giro_h3.png` (a guarda 300 px
+à frente) e `fim_caido_h3.png` (o último GROUNDED da folha HD, de volta à escala do vídeo, ÷0,822, na
+borda esquerda, no chão da guarda). O pedido é o da Yin-lu trocando a primeira frase ("karate
+fighter" / "clown martial artist"), o que esvoaça (o rabo de cavalo e a faixa preta / o rabo de
+cavalo, o laço e os laços da cintura) e a última frase pela do "Keep" da ficha de cada uma.
+
 **Kōga e Brucy: ainda não.** As reações deles (apanhar em pé, cair, caído,
 levantar) são da arte antiga (o dono, 18/11: "não foi dos novos"), e as imagens do giro têm de sair
 da arte nova. A ordem: (1) o vídeo H3 "Derrubado: cair, caído e levantar" de cada um (o pedido está
