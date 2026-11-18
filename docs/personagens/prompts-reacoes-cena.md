@@ -58,17 +58,20 @@ Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art
 O jogo usa: a batida de costas (0,4-0,8 s), o quique (0,8-1,4 s) e a queda de volta
 (1,4-1,8 s). O caído e o levantar já existem.
 
-## 3. O giro de nocaute do Ryūga (18/11): montado dos vídeos H3
+## 3. O giro de nocaute do Ryūga: FEITO (18/11), vídeo H3 com o fim caído
 
-**O movimento** é o dos Street Fighter da Capcom (a referência do dono): o corpo sai inclinado, vai
-deitando e rola em volta do próprio comprimento, como parafuso. Os vídeos não sabem fazer isso, e
-desenho de outra ferramenta (Codex) sai com outro traço (reprovado: "muito feio"). **O que funcionou:**
-o pião em pé do H3 (o 2º vídeo do dono, que girou certo mas duro) inclinado aos poucos até a
-horizontal é o rolo em parafuso; e é o traço do jogo. `art/sprites/source/player_base_hit_spin.png`:
-0-2 o gancho torcendo o corpo (3º vídeo, 1,6-1,9 s), 3-15 o pião (2º vídeo, 1,0-2,3 s, um quadro sim,
-outro não) inclinado de 28 a 90 graus, cabeça para trás (para a esquerda, como o GROUNDED), na escala
-do IDLE. O jogo usa no estado de giro (`CombatFighter.spinning`) no lugar do estreitar falso e cai
-direto no GROUNDED. Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`.
+**O que funcionou** (o dono: "acho que conseguimos"): o pedido abaixo com a imagem inicial
+`inicio_gancho_h3` (o gancho torcendo, mais à frente) e a final `fim_caido_h3` (o GROUNDED na escala
+do H3, mais atrás). O vídeo está em `art/sprites/source/player_base_hit_spin_video.mp4`.
+No jogo: `HIT_SPIN` (0,04-2,0 s, 24 quadros de 40 ms: o soco, o arremesso e o rolo em parafuso) no
+voo do giro (`CombatFighter.spinning`: contra-golpe de punição, voadora da troca, choque de SHINKAI),
+no lugar do estreitar falso; `HIT_SPIN_POUSO` (2,04-2,6 s, 7 quadros: bate de costas e assenta) na
+queda, e depois o GROUNDED. A base do corpo na raiz em todos os quadros (o arco é da física do jogo).
+Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`. **Para os outros: o mesmo pedido**, com o
+gancho e o caído de cada um.
+
+**Antes (reprovados):** o pião do H3 inclinado aos poucos (montagem), os 12 desenhos do Codex (outro
+traço) e os vídeos que terminavam em pé.
 
 **Montado ainda não rola (o dono: "precisamos realmente fazer a animação correta").** O erro comum
 dos pedidos de vídeo: todos terminavam na guarda em pé, o que obriga o gerador a manter o corpo em pé.

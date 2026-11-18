@@ -3862,11 +3862,17 @@ final class GeneratedSpriteLayouts {
     static final int HIT_HIGH_ROOT_Y = 481;
     static final int HIT_HIGH_FRAME_COUNT = 9;
 
-    static final int HIT_SPIN_SET_FRAME_WIDTH = 565;
-    static final int HIT_SPIN_SET_FRAME_HEIGHT = 495;
-    static final int HIT_SPIN_SET_ROOT_X = 282;
-    static final int HIT_SPIN_SET_ROOT_Y = 477;
-    static final int HIT_SPIN_SET_FRAME_COUNT = 16;
+    static final int HIT_SPIN_SET_FRAME_WIDTH = 503;
+    static final int HIT_SPIN_SET_FRAME_HEIGHT = 455;
+    static final int HIT_SPIN_SET_ROOT_X = 251;
+    static final int HIT_SPIN_SET_ROOT_Y = 447;
+    static final int HIT_SPIN_SET_FRAME_COUNT = 24;
+
+    static final int HIT_SPIN_POUSO_SET_FRAME_WIDTH = 518;
+    static final int HIT_SPIN_POUSO_SET_FRAME_HEIGHT = 343;
+    static final int HIT_SPIN_POUSO_SET_ROOT_X = 259;
+    static final int HIT_SPIN_POUSO_SET_ROOT_Y = 335;
+    static final int HIT_SPIN_POUSO_SET_FRAME_COUNT = 7;
 
     static final int HIT_STAND_FRAME_WIDTH = 412;
     static final int HIT_STAND_FRAME_HEIGHT = 523;

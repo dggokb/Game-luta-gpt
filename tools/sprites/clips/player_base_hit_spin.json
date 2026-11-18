@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_spin.webp",
   "report": "tools/sprites/reports/player_base_hit_spin.report.json",
   "preview": "android/app/build/sprite-review/hit_spin-import.png",
-  "expectedFrames": 16,
+  "expectedFrames": 24,
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
@@ -14,11 +14,13 @@
   "frameHeight": 640,
   "rootX": 400,
   "rootY": 600,
-  "sourceNote": "Giro de nocaute (spinning knockdown, 18/11), montado dos vídeos H3 do dono (o traço do jogo): 0-2 o gancho torcendo o corpo (vídeo 3, 1,6-1,9 s), 3-15 o pião do vídeo 2 (1,0-2,3 s, um quadro sim, outro não), inclinado aos poucos de 28 a 90 graus (cabeça para trás, para a esquerda): o pião deitado vira o rolo em parafuso da referência (Street Fighter). O meio do corpo 230 px acima da raiz; o pouso é o GROUNDED.",
-  "sourceReferences": [],
+  "sourceNote": "Giro de nocaute (spinning knockdown), vídeo H3 do dono (art/sprites/source/player_base_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p01/inicio_gancho_h3.png, final art/keys/p01/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. O voo: 0,04-2,0 s, um quadro sim, outro não (o soco, o arremesso e o rolo em parafuso); a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceReferences": [
+    "art/sprites/source/player_base_hit_spin_video.mp4"
+  ],
   "pixelScale": 2.0,
   "ajusteTamanho": 1.0,
   "regua": [
-    "na escala do IDLE (o mesmo H3): a guarda do vídeo do pião = a altura do idle"
+    "na escala do IDLE: a guarda dos vídeos H3 (547 px) = o idle da folha (451 px)"
   ]
 }

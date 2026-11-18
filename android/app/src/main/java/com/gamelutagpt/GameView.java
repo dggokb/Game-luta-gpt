@@ -5219,10 +5219,18 @@ public class GameView extends SurfaceView
         switch (f.status) {
             case KNOCKDOWN:
                 if (giroAteOChao[f.index & 1] && renderer.hasAnimation(SpriteStates.GROUNDED)) {
-                    // Caiu do giro de nocaute: já deitado (o giro termina na horizontal), direto no
+                    // Caiu do giro de nocaute: bate de costas e assenta (HIT_SPIN_POUSO) e fica no
                     // caído, sem a queda para trás do KNOCKDOWN, que começa em pé.
-                    state = SpriteStates.GROUNDED;
-                    reactionElapsed = f.knockdownFrame * FIXED_STEP;
+                    CharacterDefinition.Animation pouso = renderer.hasAnimation(SpriteStates.HIT_SPIN_POUSO)
+                        ? f.character().animations.get(SpriteStates.HIT_SPIN_POUSO) : null;
+                    float t = f.knockdownFrame * FIXED_STEP;
+                    if (pouso != null && t < pouso.duration) {
+                        state = SpriteStates.HIT_SPIN_POUSO;
+                        reactionElapsed = t;
+                    } else {
+                        state = SpriteStates.GROUNDED;
+                        reactionElapsed = pouso != null ? t - pouso.duration : t;
+                    }
                 } else if (f.knockdownFrame < config.knockdownFallFrames) {
                     state = SpriteStates.KNOCKDOWN;
                     reactionElapsed = f.knockdownFrame * FIXED_STEP;
