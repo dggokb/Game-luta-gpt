@@ -266,6 +266,8 @@ q += 250
 # De fora, o outro irmão grita; plano aberto, o adversário de pé esperando.
 camera(q, 1.05, 'centro', 0.6)
 fala(q + 20, 'outroIrmao', 'Heyyy! Vão desistir agora? É tudo que vocês têm?', segura=1.2)
+# O STAMP do outro irmão gritando de fora da arena (a fala fica por cima dele).
+ev(q + 24, 'stamp', imagem='torneio/stamp_fora_{outroIrmao}.jpg', segundos=2.2)
 q += 260
 # O parceiro levanta devagar, sorri e agradece.
 J.k(q, 'GETUP:0.2', 'parede+140')
@@ -285,6 +287,11 @@ q += 40
 J.k(q, 'LAND:0.4', 'parede+140', curva='corte')
 R.k(q, 'LAND:0.4', 'parede+390', curva='corte')
 q += 16
+# O grito da investida: o STAMP de quem está em campo avançando e gritando.
+# O letreiro vai antes do STAMP no mesmo quadro: o STAMP congela a animação, e um evento depois
+# dele esperaria o quadro sair.
+ev(q, 'onomatopeia', texto='HAAAA!', pos=[0.29, 0.21], tamanho=112, rotacao=-10, segundos=1.0, semEsperar=True)
+ev(q, 'stamp', imagem='torneio/stamp_grito_{jogador}.jpg', jogadorNaArte='esquerda', segundos=0.9)
 J.k(q, 'DASH:0.3', 'parede+140', curva='corte', **DASH)
 R.k(q, 'DASH:0.3', 'parede+390', curva='corte', **DASH)
 efeito(q, 'jogador', 'fumaca_dash_v05')

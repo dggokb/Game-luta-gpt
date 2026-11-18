@@ -753,6 +753,8 @@ public final class CinematicaLuta {
     private int stamps;
     /** {@code {jogador}} no nome da arte do STAMP: o id de quem está em campo do lado do jogador. */
     static final String LUTADOR = "{jogador}";
+    /** {@code {outroIrmao}} no nome da arte do STAMP: ryuga ou koga, o irmão que não está na dupla do jogador. */
+    static final String OUTRO_IRMAO = "{outroIrmao}";
     /** A arte do STAMP na tela (o nome já com o lutador em campo). */
     private String stampImagem;
     /** O STAMP na tela bate espelhado (o Ryūga está do outro lado da arte). */
@@ -892,6 +894,10 @@ public final class CinematicaLuta {
 
     /** Abre a imagem do STAMP e acha o quadro dele; se não abre, o STAMP não aparece. */
     private void carregarStamp(Acao st, Map<String, Episodio> episodios) {
+        if (st.imagem.contains(OUTRO_IRMAO)) {
+            // O irmão que não está na dupla do jogador (o que grita de fora): já se sabe qual é.
+            st.imagem = st.imagem.replace(OUTRO_IRMAO, outroIrmao());
+        }
         if (st.imagem.contains(LUTADOR)) {
             // A arte de cada lutador da dupla do jogador ({jogador} no nome): bate a de quem estiver em campo.
             boolean alguma = false;
