@@ -225,7 +225,7 @@ public class UltraShinkaiTest {
         assertTrue("os punhos de todos os lados", socos);
         assertTrue("o punho gigante desceu", punho);
         assertTrue("deitado esperando o punho: " + deitadoAntes, deitadoAntes > 30);
-        assertTrue("os danos no preto", danos);
+        assertTrue("o círculo com os danos", danos);
         assertEquals("os socos e o punho gigante", c.dragaoAcertos + 1, golpes);
         assertEquals("o punho crava deitado", 1, golpesDeitado);
         assertTrue("fica no chão no impacto", deitadoNoFim);

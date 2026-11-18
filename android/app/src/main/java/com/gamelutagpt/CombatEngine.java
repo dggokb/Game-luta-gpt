@@ -1927,6 +1927,17 @@ final class CombatEngine {
             CombatFighter other = fighters[1 - f.index];
             other.hitstop = Math.max(other.hitstop, intro + freeze);
             superFreeze = Math.max(superFreeze, intro + freeze);
+            if (attack.mechanics.parry && attack.mechanics.counter != AttackDefinition.Reads.NONE && attack.melee() &&
+                other.inHitstun() && !other.ko()) {
+                // O Espelho do Lago no combo (o dono, 17/11: "em combo ele se tornou inútil"): com o
+                // rival atordoado não há o que ler; ela já desvia e investe até ele, e as palmas saem
+                // quando chega (avancaInvestida), como quando lê um poder.
+                f.countered = true;
+                f.investeAlvo = other;
+                f.investida = config.superParryRushSpeed;
+                f.desvioInicio = frame;
+                f.attackFrame = attack.mechanics.counterEnd;
+            }
         }
     }
 
@@ -5120,6 +5131,7 @@ final class CombatEngine {
         if (a.dragaoEstado == 1 || a.dragaoEstado == 3) {
             if (a.ultraFrame == config.ichigekiSocos || a.ultraFrame == config.ichigekiSocos2) cues.add("ULTRA_ICHIGEKI_SOCOS");
             if (a.ultraFrame == config.ichigekiDanos) cues.add("ULTRA_ICHIGEKI_DANOS");
+            if (a.ultraFrame == config.ichigekiSomeCirculo) cues.add("ULTRA_ICHIGEKI_SOME");
             if (a.ultraFrame == config.ichigekiPunho) cues.add("ULTRA_ICHIGEKI_PUNHO");
         }
         if (a.ultraFrame >= config.ichigekiQuadros || (a.dragaoEstado == 2 && a.ultraFrame >= 30)) {

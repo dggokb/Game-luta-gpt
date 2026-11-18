@@ -825,19 +825,20 @@ final class CombatConfig {
     float palhacoAltura = 42f;
     /**
      * Ultra SHINKAI da Natisuko (17/11, o Ichigeki, ideia do dono): tudo preto, sem ela, e o rival
-     * no meio da tela; os punhos de luz vêm de todos os lados duas vezes; depois só os danos no
-     * preto, sem o rival; a câmera desce de cima com o punho gigante até ele deitado, o punho bate
+     * no meio da tela; os punhos de luz vêm de todos os lados duas vezes; o círculo de tinta fecha
+     * nele com os danos e some de repente (tudo preto, sem o rival); a câmera desce de cima com o
+     * punho gigante até ele deitado, o punho bate
      * (POFT!) com a câmera parada e some estourando em partículas. Quem tem (ids); também em
      * {@link #ultraDragao}.
      */
     String ultraIchigeki = "p15";
     /**
-     * Quadros da cena: as duas levas de punhos, o primeiro golpe e o intervalo, os danos no preto
-     * (sem o rival), o rival deitado (a câmera começa a descer de cima com o punho), o punho, o
-     * impacto, o preto começa a sair, o fim.
+     * Quadros da cena: as duas levas de punhos, o primeiro golpe e o intervalo, o círculo de tinta
+     * com os danos (o rival dentro), o círculo some (tudo preto, sem o rival), o rival deitado (a
+     * câmera começa a descer de cima com o punho), o punho, o impacto, o preto começa a sair, o fim.
      */
     int ichigekiSocos = 6, ichigekiSocos2 = 78, ichigekiAcerto = 12, ichigekiIntervalo = 27,
-        ichigekiDanos = 150, ichigekiSome = 205, ichigekiPunho = 208, ichigekiImpacto = 241,
+        ichigekiDanos = 150, ichigekiSomeCirculo = 194, ichigekiSome = 205, ichigekiPunho = 208, ichigekiImpacto = 241,
         ichigekiClareia = 272, ichigekiQuadros = 300;
     /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
     float garcaAltura = 260f, garcaEmpurra = 420f;

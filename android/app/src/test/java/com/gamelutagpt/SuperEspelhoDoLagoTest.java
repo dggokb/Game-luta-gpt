@@ -107,4 +107,18 @@ public class SuperEspelhoDoLagoTest {
             assertEquals("as seis palmas a " + gap, 6, acertos);
         }
     }
+
+    /** No combo (o rival atordoado) não há o que ler: o Super já sai e as seis palmas emendam. */
+    @Test public void noComboAsPalmasSaemDireto() {
+        for (String rota : new String[]{"2L M SUPER", "L M H SUPER", "2L M H SUPER"}) {
+            BateriaCombos.Cenario cn = new BateriaCombos.Cenario();
+            cn.barras = 3;
+            cn.gap = 100f;
+            cn.primeiroAcertoAte = 1;
+            BateriaCombos.Exec x = BateriaCombos.executar("p02", "player_base", java.util.Arrays.asList(rota.split(" ")), cn);
+            assertTrue(rota + ": emenda", x.valida);
+            int normais = rota.split(" ").length - 1;
+            assertTrue(rota + ": os normais e as seis palmas (" + x.acertos + ")", x.acertos >= normais + 6);
+        }
+    }
 }

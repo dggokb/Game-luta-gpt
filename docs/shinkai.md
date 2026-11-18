@@ -154,7 +154,8 @@ some dentro e leva os golpes), o casulo sobe, a garça mergulha e o crava no ch�
 longe (`CombatConfig.ultraGarca`). A Bonnie tem a **Chuva de Tomates** (tudo preto, o rival num
 picadeiro, a plateia joga tomates, a tela fica vermelha e é limpa, a bomba nos pés dele explode:
 `CombatConfig.ultraPalhaco`). A Natisuko tem o **Ichigeki** (tudo preto sem ela, o rival no meio
-leva os punhos de luz de todos os lados duas vezes, os danos no preto, e a câmera desce com o punho
+leva os punhos de luz de todos os lados duas vezes, o círculo de pincel com os danos some de
+repente, e a câmera desce com o punho
 gigante até ele deitado: POFT, e o punho some em partículas: `CombatConfig.ultraIchigeki`). Nas
 cenas pretas (Bonnie e Natisuko) a câmera centra no rival e os efeitos de tela inteira
 (`GameView.tocarNaTela`) cobrem o que ela mostra, com folga.

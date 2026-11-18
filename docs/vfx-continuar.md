@@ -1985,3 +1985,11 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   Pegou: ele some (`EfeitosVideo.pararTodos`), a tela treme e a cena de sempre começa (a garça desce
   no rival). Errou: ela volta à guarda.
 - **Ficou:** ele julgar no celular. Visto só no PC.
+
+## Rodada de 18/11: o círculo de tinta da Natisuko volta
+
+- **"Onde foi parar a tinta em círculo da Natisuko?":** o "o círculo tem que sumir" era sumir na
+  cena, não sair do jogo. O `ichigeki_circulo_p15` voltou (do commit d00fdf5): depois dos punhos
+  ele fecha no rival com os danos (1,15x), some de repente no quadro 194 (os danos junto) e fica
+  tudo preto sem o rival até a câmera descer com o punho (205).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.

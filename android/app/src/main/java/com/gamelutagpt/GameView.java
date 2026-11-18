@@ -6377,9 +6377,17 @@ public class GameView extends SurfaceView
                     tocarNaTela("ichigeki_punhos_" + id, esq);
                     break;
                 case "ULTRA_ICHIGEKI_DANOS":
-                    // Só os golpes no preto (o rival some).
+                    // O círculo de tinta fecha nele e os danos estouram dentro.
+                    ichigekiCirculoVaga = efeitos.tocarDurando("ichigeki_circulo_" + id, v.x, chestY(v), ICHIGEKI_CIRCULO,
+                        esq, 0f, 0f);
                     efeitos.tocar("ichigeki_danos_" + id, v.x, chestY(v), ICHIGEKI_DANOS, esq);
                     beamShake = Math.max(beamShake, 8f);
+                    break;
+                case "ULTRA_ICHIGEKI_SOME":
+                    // Some do nada: fica tudo preto, sem ele.
+                    efeitos.parar(ichigekiCirculoVaga, "ichigeki_circulo_" + id);
+                    efeitos.pararTodos("ichigeki_danos_" + id);
+                    ichigekiCirculoVaga = -1;
                     break;
                 case "ULTRA_ICHIGEKI_PUNHO":
                     // De cima para baixo: o punho do vídeo (que vem da esquerda) girado 90°, com os
@@ -6403,7 +6411,9 @@ public class GameView extends SurfaceView
     /** Altura (acima do chão) onde o punho gigante bate no rival deitado. */
     private static final float ICHIGEKI_PUNHO_Y = 28f;
     /** Tamanho do punho gigante e do estouro (o dono: "bem exagerado") e dos danos no preto. */
-    private static final float ICHIGEKI_PUNHO = 2.2f, ICHIGEKI_DANOS = 1.5f;
+    private static final float ICHIGEKI_PUNHO = 2.2f, ICHIGEKI_DANOS = 1.15f, ICHIGEKI_CIRCULO = 1.15f;
+    /** A vaga do círculo de tinta do Ichigeki (some de repente). */
+    private int ichigekiCirculoVaga = -1;
     /** Quanto a câmera começa acima (px do mundo) quando desce com o punho gigante. */
     private static final float ICHIGEKI_CAMERA = 520f;
     /** O quanto a câmera está levantada agora pela descida do punho (desfeito a cada passo). */
@@ -6434,8 +6444,8 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * A Natisuko fica fora da cena preta do Ichigeki; o rival some nos danos (só os golpes no preto)
-     * e volta deitado quando a câmera desce com o punho.
+     * A Natisuko fica fora da cena preta do Ichigeki; o rival some quando o círculo some (tudo
+     * preto) e volta deitado quando a câmera desce com o punho.
      */
     private boolean escondidoNoIchigeki(CombatFighter f) {
         CombatConfig c = engine.config;
@@ -6444,7 +6454,7 @@ public class GameView extends SurfaceView
         for (int i = 0; i < 2; i++) {
             if (engine.fighter(1 - i) != f) continue;
             int r = engine.ichigekiCena(engine.fighter(i));
-            if (r >= c.ichigekiDanos && r < c.ichigekiSome) return true;
+            if (r >= c.ichigekiSomeCirculo && r < c.ichigekiSome) return true;
         }
         return false;
     }
