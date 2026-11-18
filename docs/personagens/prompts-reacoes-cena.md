@@ -87,6 +87,26 @@ He does NOT flip head over heels and does NOT cartwheel: his head stays on top. 
 Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art and size exactly as in the frames; his size never changes.
 ```
 
+**Terceira tentativa (18/11):** de novo em pé e quase sem torção. O motivo: o H3 copia o corpo da
+imagem inicial, e ela era a guarda em pé; o texto não vence isso. **A saída é mudar a imagem
+inicial:** `art/keys/p01/inicio_torcido_h3.png` é o quadro de 1,75 s desse vídeo (o soco acabou de
+torcer o corpo: ombros virados, cabeça jogada, braços soltos), posto no meio da tela e no ar. Com ela
+como imagem inicial E final, o pedido vira uma estátua num prato giratório: a pose fica congelada e
+só gira, coisa que o gerador faz bem, e a volta fecha em loop.
+
+**Pião torcido** (`inicio_torcido_h3` → `inicio_torcido_h3`)
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the martial artist from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+[0-5s] He is frozen in mid-air in EXACTLY the twisted pose of the start frame, like a statue: his shoulders wrenched around by a punch, his head snapped to the side, one arm flung up and the other tucked, his legs apart and bent. He keeps this exact pose the whole time and never moves his arms, legs or head.
+The whole frozen figure ROTATES around its own vertical axis like a statue on a turntable, at a perfectly steady speed: exactly TWO full 360-degree turns in 5 seconds, showing him from the front, the side, the back and the other side. He stays in the same spot in the middle of the frame, floating; he never lands. The video ends exactly on the start frame, so it loops seamlessly.
+He does NOT flip head over heels and does NOT cartwheel: his head stays on top. Only his hair and the ends of his belt flutter slightly with the spin. His whole body stays inside the frame. He never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art and size exactly as in the frames; his size never changes.
+```
+
+O jogo usa uma volta (2,5 s, cortada em 8 quadros iguais), repetida enquanto ele voa. Para os
+outros lutadores: tirar a imagem inicial do mesmo jeito, do quadro em que o gancho torce o corpo
+no vídeo deles (ou do primeiro pedido do pião torcido acima).
+
 **Enquanto isso, o vídeo da segunda tentativa já serve:** uma volta dele (1,0-2,0 s, 8 quadros) é
 um giro de verdade, muito melhor que o estreitar falso. Instalado, o jogo inclina o corpo
 (`SPIN_TILT`) e dá um pouco do arremesso; quando vier o vídeo com torção, troca os quadros.
