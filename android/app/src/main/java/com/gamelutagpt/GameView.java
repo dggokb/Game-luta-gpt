@@ -5193,6 +5193,8 @@ public class GameView extends SurfaceView
     }
 
     private float reactionElapsed;
+    /** Quem está caindo do giro de nocaute desenhado (HIT_SPIN): o pouso usa o fim do clipe. */
+    private final boolean[] giroAteOChao = new boolean[2];
 
     /**
      * Reaction clip of a fighter: knockdown, wake-up, launch and hitstun. Returns null when
@@ -5200,6 +5202,10 @@ public class GameView extends SurfaceView
      */
     private String reactionState(SpriteFighterRenderer renderer, CombatFighter f) {
         String state = null;
+        // O pouso do giro só vale para a queda logo depois dele.
+        if (f.status != CombatFighter.Status.AIR_HITSTUN && f.status != CombatFighter.Status.KNOCKDOWN) {
+            giroAteOChao[f.index & 1] = false;
+        }
         CombatConfig config = engine.config;
         if (upsideDownBy(f) != null) {
             // Preso de cabeça para baixo (o Ultra do p13): a pose deitada, girada no desenho.
@@ -5212,7 +5218,15 @@ public class GameView extends SurfaceView
         }
         switch (f.status) {
             case KNOCKDOWN:
-                if (f.knockdownFrame < config.knockdownFallFrames) {
+                if (giroAteOChao[f.index & 1] && f.knockdownFrame < config.knockdownFallFrames
+                    && renderer.hasAnimation(SpriteStates.HIT_SPIN)) {
+                    // Caiu do giro de nocaute: o pouso de costas do próprio clipe (os dois últimos
+                    // quadros), não a queda para trás do KNOCKDOWN, que começa em pé.
+                    state = SpriteStates.HIT_SPIN;
+                    CharacterDefinition.Animation giro = f.character().animations.get(state);
+                    reactionElapsed = Math.min(giro.inicioDoQuadro(giro.quadros() - 2) + f.knockdownFrame * FIXED_STEP,
+                        giro.duration - 0.0001f);
+                } else if (f.knockdownFrame < config.knockdownFallFrames) {
                     state = SpriteStates.KNOCKDOWN;
                     reactionElapsed = f.knockdownFrame * FIXED_STEP;
                 } else {
@@ -5228,6 +5242,16 @@ public class GameView extends SurfaceView
                     : Math.min(getup.duration - 0.0001f, getup.timeFor(f.knockdownFrame, engine.wakeupFrames(f)));
                 break;
             case AIR_HITSTUN:
+                if (f.spinning && renderer.hasAnimation(SpriteStates.HIT_SPIN)) {
+                    // Giro de nocaute desenhado: o corpo deita e rola no ar; segura o último quadro
+                    // do voo (o 10º) até o chão.
+                    state = SpriteStates.HIT_SPIN;
+                    CharacterDefinition.Animation giro = f.character().animations.get(state);
+                    float voo = giro.inicioDoQuadro(giro.quadros() - 2);
+                    reactionElapsed = Math.min(f.stunElapsed * FIXED_STEP, voo - 0.0001f);
+                    giroAteOChao[f.index & 1] = true;
+                    break;
+                }
                 state = SpriteStates.HIT_AIR;
                 reactionElapsed = f.launched || f.slammed
                     ? launchPoseTime(f.vy, f.slammed)
@@ -7094,7 +7118,8 @@ public class GameView extends SurfaceView
             else c.translate(shake, 0f);
         }
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
-        if (f.spinning && !f.grounded) spinTransform(c, f);
+        // O giro falso (estreita o desenho) só sem o clipe desenhado do giro de nocaute.
+        if (f.spinning && !f.grounded && !renderer.hasAnimation(SpriteStates.HIT_SPIN)) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
         float visualY = fighterVisualY(f);
         // Voo do Ultra (o p13 sobe atrás do rival e desce de meteoro): só o desenho sai do lugar.

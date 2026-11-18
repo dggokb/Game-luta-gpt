@@ -71,6 +71,8 @@ final class CharacterDefinition {
             this.loop=loop;this.distancePerFrame=distancePerFrame;
             float sum=0;for(float d:durations)sum+=d;this.duration=sum;
         }
+        /** O tempo (s) em que o quadro {@code i} do clipe começa. */
+        float inicioDoQuadro(int i) { float t=0;for(int k=0;k<i&&k<durations.length;k++)t+=durations[k];return t; }
         /**
          * Caixas que acompanham o desenho do golpe (tools/sprites/caixas_sprites.py), por quadro
          * da folha: o corpo em faixas (cabeça, tronco, pernas: {x0, x1, y0, y1} em sequência, px

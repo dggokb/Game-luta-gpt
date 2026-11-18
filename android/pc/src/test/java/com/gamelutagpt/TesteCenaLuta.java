@@ -83,6 +83,39 @@ public final class TesteCenaLuta {
         CinematicaLuta cena = (CinematicaLuta)campo("cinematica").get(jogo);
         if (!cena.armada()) throw new IllegalStateException("a cinemática não armou");
 
+        // -Pgiro=N: em vez da cena, o jogador leva o giro de nocaute (o do contra-golpe de punição)
+        // N vezes, gravando; para conferir o clipe HIT_SPIN na luta.
+        int giros = Integer.getInteger("gameluta.giro", 0);
+        if (giros > 0) {
+            int espera = 60 * 60;
+            while (espera-- > 0 && ((int)campo("introFrame").get(jogo) >= 0 || ((BattleFlow)campo("flow").get(jogo)).holdsFighters())) passo(false);
+            jogo.setTouchControlsVisible(false);
+            ((AiController)campo("ai").get(jogo)).setEnabled(false);   // a CPU parada: o giro inteiro
+            for (int g = 0; g < giros; g++) {
+                CombatFighter p = jogo.engine.fighter(GameView.PLAYER), o = jogo.engine.fighter(GameView.OPPONENT);
+                // Os dois no meio da arena, o jogador à esquerda: ele voa para a esquerda girando.
+                for (int i = 0; i < 40; i++) {
+                    p.x = Arena.WORLD_WIDTH * 0.5f + 60f; o.x = Arena.WORLD_WIDTH * 0.5f + 260f;
+                    passo(quadro % CADENCIA == 0);
+                }
+                CombatConfig cfg = jogo.engine.config;
+                int afasta = p.x >= o.x ? 1 : -1;
+                p.status = CombatFighter.Status.AIR_HITSTUN;
+                p.grounded = false;
+                p.y -= 2f;
+                p.vx = afasta * cfg.spinSpeed;
+                p.vy = -cfg.spinLift;
+                p.spinning = true;
+                p.launched = true;
+                p.hardFall = true;
+                p.stunLeft = p.stunTotal = cfg.spinHitstunFrames;
+                p.stunElapsed = 0;
+                System.out.println("giro " + (g + 1) + " no quadro " + quadro);
+                for (int i = 0; i < 150; i++) passo(quadro % CADENCIA == 0);
+            }
+            System.exit(0);
+        }
+
         // Depois da intro, o jogador fica com a vida do gatilho.
         int limite = 60 * 60;
         boolean bateu = false;

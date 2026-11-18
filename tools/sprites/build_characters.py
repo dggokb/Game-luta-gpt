@@ -23,6 +23,9 @@ JAVA = 'android/app/src/main/java/com/gamelutagpt/'
 # Semantic vocabulary. The runtime (generated SpriteStates.java) and this validator share it.
 REQUIRED = ('IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND')
 OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP',
+            # Giro de nocaute (spinning knockdown): o corpo deita e rola em parafuso no ar (o contra-golpe de
+            # punição, a voadora da troca, quem perde o choque de SHINKAI). Sem o clipe, HIT_AIR estreitado.
+            'HIT_SPIN',
             # Reações em pé por golpe (docs/revisao-base/mecanica-ataque.md): no rosto, no tronco e o
             # forte que empurra. Sem o clipe, o jogo usa HIT_STAND.
             'HIT_HIGH','HIT_BODY','HIT_HEAVY',

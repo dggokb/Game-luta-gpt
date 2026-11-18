@@ -1,0 +1,24 @@
+{
+  "id": "player_base_hit_spin",
+  "javaName": "HIT_SPIN_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_hit_spin.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_spin.webp",
+  "report": "tools/sprites/reports/player_base_hit_spin.report.json",
+  "preview": "android/app/build/sprite-review/hit_spin-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 400,
+  "rootY": 600,
+  "sourceNote": "Giro de nocaute (spinning knockdown, 18/11): 12 desenhos do Codex com o vídeo de referência do dono (o corpo deita e rola em parafuso; 0-9 no ar, o meio do corpo 230 px acima da raiz; 10-11 caído de costas na raiz). Sem vídeo: tools e prompts em docs/personagens/prompts-reacoes-cena.md.",
+  "sourceReferences": [],
+  "pixelScale": 2.0,
+  "ajusteTamanho": 0.87,
+  "regua": [
+    "igual ao KNOCKDOWN/GROUNDED (87%): o caído do fim emenda no GROUNDED"
+  ]
+}

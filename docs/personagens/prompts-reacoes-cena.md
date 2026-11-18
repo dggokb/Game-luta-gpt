@@ -58,7 +58,28 @@ Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art
 O jogo usa: a batida de costas (0,4-0,8 s), o quique (0,8-1,4 s) e a queda de volta
 (1,4-1,8 s). O caído e o levantar já existem.
 
-## 3. Girar no ar como pião (`HIT_SPIN`): o giro da luta e da cena
+## 3. O giro de nocaute: FEITO para o Ryūga (18/11), sem vídeo
+
+**Como saiu:** os pedidos de vídeo abaixo (pião, cambalhota, estátua girando) foram todos
+reprovados. O movimento certo é o dos Street Fighter da Capcom, que o dono mandou de referência: o
+corpo sai inclinado, vai deitando e **rola em volta do próprio comprimento, como parafuso**, até cair
+de costas. Ele foi desenhado no Codex: 12 desenhos com as poses do vídeo de referência (só as poses,
+não a personagem) e o Ryūga dos sprites como modelo; os dois últimos refeitos de costas, cara para
+cima (o primeiro caiu de bruços). Ficou em `art/sprites/source/player_base_hit_spin.png`, clipe
+`tools/sprites/clips/player_base_hit_spin.json`, animação `HIT_SPIN` (0-9 no ar, 10-11 o pouso de
+costas, que emenda no GROUNDED). O jogo usa no estado de giro (`CombatFighter.spinning`: contra-golpe
+de punição, voadora da troca, quem perde o choque de SHINKAI) no lugar do estreitar falso; sem o
+clipe, o personagem continua com o falso. Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`.
+
+**Para os outros (Yin-lu, Kōga, Brucy):** o mesmo caminho, com a mesma referência e os sprites de
+cada um como modelo.
+
+**Nomes do movimento** (pesquisados): no SF6 a wiki SuperCombo chama de "tailspin" e a comunidade
+japonesa de きりもみダウン ("kirimomi down"); no Tekken, Screw (7) e Tornado (8).
+
+### Tentativas reprovadas (vídeo)
+
+#### Pião (reprovado)
 
 **O giro que o jogo tem** (o contra-golpe de punição: "sai girando no ar e cai deitado",
 `CombatFighter.spinning`) é um **pião**: o corpo roda em volta do próprio eixo, cabeça em cima e pés

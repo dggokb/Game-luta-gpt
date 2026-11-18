@@ -1,0 +1,279 @@
+{
+  "id": "player_base_hit_spin",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_hit_spin.png",
+  "sourceNote": "Giro de nocaute (spinning knockdown, 18/11): 12 desenhos do Codex com o v\u00eddeo de refer\u00eancia do dono (o corpo deita e rola em parafuso; 0-9 no ar, o meio do corpo 230 px acima da raiz; 10-11 ca\u00eddo de costas na raiz). Sem v\u00eddeo: tools e prompts em docs/personagens/prompts-reacoes-cena.md.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 400,
+    "rootY": 600,
+    "columns": 6,
+    "frameCount": 12
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        235,
+        181,
+        566,
+        559
+      ],
+      "minimumMargin": 81,
+      "opaquePixels": 51448
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        222,
+        181,
+        579,
+        559
+      ],
+      "minimumMargin": 81,
+      "opaquePixels": 55381
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        229,
+        185,
+        571,
+        556
+      ],
+      "minimumMargin": 84,
+      "opaquePixels": 52072
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        189,
+        176,
+        612,
+        565
+      ],
+      "minimumMargin": 75,
+      "opaquePixels": 62979
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        152,
+        218,
+        648,
+        522
+      ],
+      "minimumMargin": 118,
+      "opaquePixels": 63705
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        138,
+        243,
+        662,
+        497
+      ],
+      "minimumMargin": 106,
+      "opaquePixels": 63249
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        129,
+        256,
+        671,
+        485
+      ],
+      "minimumMargin": 97,
+      "opaquePixels": 63500
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        134,
+        250,
+        666,
+        491
+      ],
+      "minimumMargin": 102,
+      "opaquePixels": 61642
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        130,
+        229,
+        670,
+        511
+      ],
+      "minimumMargin": 98,
+      "opaquePixels": 64766
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        125,
+        208,
+        675,
+        532
+      ],
+      "minimumMargin": 93,
+      "opaquePixels": 69635
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        105,
+        483,
+        695,
+        600
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 47099
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        110,
+        481,
+        690,
+        600
+      ],
+      "minimumMargin": 40,
+      "opaquePixels": 46036
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 606,
+    "frameHeight": 440,
+    "rootX": 303,
+    "rootY": 432,
+    "columns": 6,
+    "frameCount": 12,
+    "cropOffset": [
+      97,
+      168
+    ],
+    "sheetWidth": 1632,
+    "sheetHeight": 1136,
+    "frames": [
+      [
+        436,
+        0,
+        340,
+        388,
+        134,
+        9
+      ],
+      [
+        780,
+        0,
+        368,
+        388,
+        121,
+        9
+      ],
+      [
+        1152,
+        0,
+        352,
+        380,
+        128,
+        13
+      ],
+      [
+        0,
+        0,
+        432,
+        400,
+        88,
+        4
+      ],
+      [
+        564,
+        404,
+        504,
+        312,
+        51,
+        46
+      ],
+      [
+        0,
+        740,
+        532,
+        264,
+        37,
+        71
+      ],
+      [
+        1080,
+        740,
+        552,
+        240,
+        28,
+        84
+      ],
+      [
+        536,
+        740,
+        540,
+        252,
+        33,
+        78
+      ],
+      [
+        1072,
+        404,
+        548,
+        292,
+        29,
+        57
+      ],
+      [
+        0,
+        404,
+        560,
+        332,
+        24,
+        36
+      ],
+      [
+        0,
+        1008,
+        600,
+        128,
+        4,
+        311
+      ],
+      [
+        604,
+        1008,
+        588,
+        128,
+        9,
+        309
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 23592960,
+      "grid": 12798720,
+      "packed": 7415808
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "5695a3a045400ab0dba0c3496b21dd669f70295df218cb01f4f70b79bb00edf6",
+      "config": "200e3dafc4424e87465163db1cbbc25fa5a922e1613b0d9c9ea78e3fa81c5034",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}
