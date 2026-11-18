@@ -3858,6 +3858,12 @@ public class GameView extends SurfaceView
     /** Distância da ponta da seta até a borda de baixo: acima das barras de super do HUD. */
     private static final float GROUND_MARKER_BOTTOM = 88f;
 
+    /** A altura da pose da animação feita à mão desse lado (0 fora dela). */
+    private float alturaAnimada(int lado) {
+        AnimacaoManual.Pose p = cinematica.poseAnimada(lado);
+        return p != null ? p.altura : 0f;
+    }
+
     private static float chestY(CombatFighter f) {
         return f.y - 0.6f * (f.y - visualTop(f));
     }
@@ -4403,7 +4409,11 @@ public class GameView extends SurfaceView
                 float pivotY = GROUND_Y + focoJogador * (chestY(player()) - GROUND_Y) +
                     focoRival * (chestY(opponent()) - GROUND_Y);
                 float pivotScreenY = (pivotY - camera.top) * camera.zoom * superFlash.zoom;
-                renderCameraTop = pivotY - pivotScreenY / baseZoom;
+                // Na animação feita à mão a altura é a da pose (o motor de luta não sabe dela): a
+                // câmera sobe junto com quem está em foco (lançado para cima, ele fica no mesmo
+                // lugar da tela e o chão desce).
+                float sobe = focoJogador * alturaAnimada(CinematicaLuta.JOGADOR) + focoRival * alturaAnimada(CinematicaLuta.RIVAL);
+                renderCameraTop = pivotY - sobe - pivotScreenY / baseZoom;
                 renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
                     focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
             }
@@ -9002,7 +9012,8 @@ public class GameView extends SurfaceView
 
         @Override public void impacto(int forca, int lado) {
             CombatFighter a = engine.fighter(lado), d = engine.fighter(1 - lado);
-            float x = (a.x + d.x) * 0.5f, y = chestY(d);
+            // Na animação feita à mão, a altura da pose de quem levou (o contato no ar fica no ar).
+            float x = (a.x + d.x) * 0.5f, y = chestY(d) - alturaAnimada(d == player() ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL);
             int direcao = d.x >= a.x ? 1 : -1;
             feel.kick(direcao, forca >= 2 ? ImpactEffects.SPECIAL : ImpactEffects.HEAVY);
             if (forca == 1) {
@@ -9016,7 +9027,7 @@ public class GameView extends SurfaceView
             }
             if (forca >= 2) {
                 // O chão marcado debaixo de quem segurou e o close inclinado no contato.
-                efeitos.tocar("impacto_chao", d.x, GROUND_Y, 1f, direcao < 0);
+                if (chestY(d) - y < 30f) efeitos.tocar("impacto_chao", d.x, GROUND_Y, 1f, direcao < 0);
                 feel.cinema(x, y, direcao, false);
             }
             if (forca >= 3) feel.impactFrame(ImpactFeel.VOID, x, y, true, true);
