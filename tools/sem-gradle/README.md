@@ -23,6 +23,8 @@ tools/sem-gradle/gravar.sh /tmp/esp espera:1 grava:90:esp especial:J fim
 python3 tools/sem-gradle/folha_quadros.py /tmp/esp esp /tmp/esp.png 30,40,50,60 - 4
 ```
 
+- Idioma do jogo na gravação: o do PC (em inglês aqui). Para gravar em português:
+  `JAVA_EXTRA="-Duser.language=pt -Duser.country=BR" tools/sem-gradle/gravar.sh ...`
 - As classes e os arquivos gerados ficam fora do repositório, em `$SOKON_BUILD` (padrão:
   `/tmp/sokon-sem-gradle`). Depois de mudar código, rode `montar.sh` de novo.
 - A primeira gravação é lenta: cada folha WEBP passa pelo Pillow uma vez (fica em

@@ -121,6 +121,10 @@ public final class GravarLuta {
                     // O rival dá um L daqui a N quadros (o Super de contra-golpe da Yin-lu): rivalbate:20
                     c.jogo().rivalBate(Integer.parseInt(p[1]));
                     break;
+                case "rivalpoder":
+                    // O rival solta o S1 daqui a N quadros (o Super de contra-golpe lendo o poder).
+                    c.jogo().rivalPoder(Integer.parseInt(p[1]));
+                    break;
                 case "defende":
                     // O rival segura para trás (em guarda) até o fim do roteiro.
                     c.jogo().rivalDefende(true);

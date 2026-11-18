@@ -517,6 +517,16 @@ final class CharacterDefinition {
             this.mirror=mirror.clone();featherBurst=burst;featherSwirl=swirl;
             return this;
         }
+        /**
+         * Golpe final que crava o rival no chão (o Mil Penas da Yin-lu): ele desce, quica e cai longe,
+         * a essa distância (px) para a frente. 0: o lançamento alto de sempre.
+         */
+        float slamPush;
+        UltraSequence withSlam(float push) {
+            if(push<=0f)throw new IllegalArgumentException("ultra sequence: slam push > 0");
+            slamPush=push;
+            return this;
+        }
         /** O desenho de quem bate está virado para o outro lado neste quadro (Mil Penas). */
         boolean mirrorsAttacker(float frame) {
             for(int[] w:mirror)if(frame>=w[0]&&frame<w[1])return true;

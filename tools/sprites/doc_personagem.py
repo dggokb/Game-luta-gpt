@@ -66,7 +66,8 @@ def escalas_h3(cid):
 
 
 def e_h3(escala, h3):
-    return escala is not None and any(abs(escala - x) <= 0.002 for x in h3)
+    # 0,95: vídeos H3 convertidos a 95% do tamanho (a corrida e o pulo da Bonnie, do Flick).
+    return escala is not None and any(abs(escala - x * f) <= 0.002 for x in h3 for f in (1, 0.95))
 
 
 def montagens(cid):

@@ -2,56 +2,32 @@
   "id": "p02_defense_stand",
   "javaName": "P02_DEFENSE_STAND",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defense_stand_sr_hd.png",
+  "source": "art/sprites/source/p02_defense_stand_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defense_stand.webp",
   "report": "tools/sprites/reports/p02_defense_stand.report.json",
   "preview": "android/app/build/sprite-review/p02_defense_stand-import.png",
-  "expectedFrames": 8,
+  "expectedFrames": 15,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 11,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
-    "arquivo": "defesaEmPe.mp4",
+    "arquivo": "defesa.mp4",
     "personagem": "p02",
-    "escala": 0.525,
-    "medida": "1º quadro = inicio_centro (nota 0.95)",
-    "quadros": "7,16,28,33,41,50,58,67",
-    "largura": 256,
-    "raiz": "97,238",
-    "fixar": "registro",
-    "pe_no_chao": true,
-    "limpar_chao": true,
-    "reescala": [
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204
-    ],
-    "reguaFatores": [
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 98% (DEFENSE_STAND)"
-    ]
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "30,12,15,17,18,20,22,24,72,74,76,78,81,84,90",
+    "largura": 192,
+    "raiz": "99,238",
+    "colunas": 11,
+    "fixar": "video",
+    "limpar_chao": true
   },
-  "rootX": 194,
+  "rootX": 99,
+  "frameWidth": 192,
+  "frameHeight": 256,
+  "rootY": 238,
   "sourceReferences": [
     "art/sprites/source/p02_defense_stand_video_normalized.png"
-  ],
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0
+  ]
 }

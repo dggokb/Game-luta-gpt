@@ -63,7 +63,7 @@ public class ComboYinluTest {
         yinlu("L L M M S4 W80 C120 2M L M M", 13);
         yinlu("L L M M S4 W80 C120 2M 2H SJ jL jM jM J jL jM jH", 17);
         // No canto quica na parede e volta: o Joelho lança para o combo no ar, ou o S2.
-        assertEquals("quicou na parede", 1, noCanto("L L M M S4 W25 6H SJ jL jM jM J jL jM jH", 16).parede);
+        assertEquals("quicou na parede", 1, noCanto("L L M M S4 W25 6H SJ jL jM jM J jL jM jH", 17).parede);
         noCanto("L L M M S4 W30 S2", 12);
     }
 

@@ -1,250 +1,250 @@
 {
   "id": "p02_fall_down",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_fall_down_sr_hd.png",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "source": "art/sprites/source/p02_fall_down_h3.png",
+  "sourceNote": "Yin-lu: v\u00eddeo H3 \"Derrubado\" do dono (art/sprites/source/p02_derrubado_h3_video.mp4, 18/11), imagem inicial e final art/keys/p02/inicio_centro_h3.png, pedido em docs/personagens/p02.md. Montado por tools/sprites/p02_derrubado_h3.py: escala 391/469 (a guarda do v\u00eddeo = o IDLE da folha), raiz fixa no meio dos p\u00e9s do 1\u00ba quadro (o deslocamento do v\u00eddeo fica). Quadros do v\u00eddeo: 10,13,16,19,22,25,28 (queda: voa e bate de costas; o quique \u00e9 do jogo) e 31,33,36,45 (ca\u00eddo).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 832,
-    "frameHeight": 384,
-    "rootX": 410,
-    "rootY": 348,
-    "columns": 5,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 320,
+    "rootY": 470,
+    "columns": 6,
     "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        274,
-        89,
-        723,
-        350
+        99,
+        58,
+        386,
+        460
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 50179
+      "minimumMargin": 52,
+      "opaquePixels": 45661
     },
     {
       "index": 1,
       "outputBbox": [
-        201,
-        109,
-        639,
-        350
+        105,
+        60,
+        434,
+        446
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 49520
+      "minimumMargin": 60,
+      "opaquePixels": 45013
     },
     {
       "index": 2,
       "outputBbox": [
-        122,
-        83,
-        542,
-        350
+        111,
+        47,
+        468,
+        421
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 48441
+      "minimumMargin": 47,
+      "opaquePixels": 44972
     },
     {
       "index": 3,
       "outputBbox": [
-        105,
-        124,
-        549,
-        349
+        109,
+        52,
+        503,
+        391
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 47456
+      "minimumMargin": 52,
+      "opaquePixels": 45634
     },
     {
       "index": 4,
       "outputBbox": [
-        186,
-        157,
-        647,
-        349
+        108,
+        78,
+        515,
+        367
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 44576
+      "minimumMargin": 78,
+      "opaquePixels": 45702
     },
     {
       "index": 5,
       "outputBbox": [
-        158,
-        174,
-        637,
-        349
+        93,
+        218,
+        488,
+        455
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 42508
+      "minimumMargin": 57,
+      "opaquePixels": 44351
     },
     {
       "index": 6,
       "outputBbox": [
-        160,
-        193,
-        647,
-        349
+        93,
+        217,
+        526,
+        433
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 41139
+      "minimumMargin": 79,
+      "opaquePixels": 43804
     },
     {
       "index": 7,
       "outputBbox": [
-        160,
-        193,
-        647,
-        349
+        93,
+        320,
+        554,
+        458
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 41139
+      "minimumMargin": 54,
+      "opaquePixels": 42290
     },
     {
       "index": 8,
       "outputBbox": [
-        170,
-        238,
-        667,
-        349
+        93,
+        320,
+        556,
+        471
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 38281
+      "minimumMargin": 41,
+      "opaquePixels": 39652
     },
     {
       "index": 9,
       "outputBbox": [
-        172,
-        238,
-        667,
-        349
+        94,
+        323,
+        556,
+        471
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 38396
+      "minimumMargin": 41,
+      "opaquePixels": 39566
     },
     {
       "index": 10,
       "outputBbox": [
-        173,
-        238,
-        669,
-        349
+        94,
+        340,
+        561,
+        472
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 38347
+      "minimumMargin": 40,
+      "opaquePixels": 39833
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 642,
-    "frameHeight": 293,
-    "rootX": 317,
-    "rootY": 278,
-    "columns": 5,
+    "frameWidth": 485,
+    "frameHeight": 442,
+    "rootX": 236,
+    "rootY": 432,
+    "columns": 6,
     "frameCount": 11,
     "cropOffset": [
-      93,
-      70
+      84,
+      38
     ],
-    "sheetWidth": 516,
-    "sheetHeight": 2236,
+    "sheetWidth": 1012,
+    "sheetHeight": 1336,
     "frames": [
       [
         0,
-        292,
-        468,
-        280,
-        173,
-        11
+        0,
+        296,
+        412,
+        11,
+        16
       ],
       [
+        300,
         0,
-        576,
-        456,
-        260,
-        100,
-        30
+        340,
+        396,
+        17,
+        18
       ],
       [
+        644,
         0,
-        0,
-        436,
-        288,
-        21,
+        368,
+        384,
+        23,
         4
       ],
       [
         0,
-        840,
-        460,
-        240,
+        416,
+        404,
+        352,
+        21,
+        9
+      ],
+      [
+        408,
+        416,
+        416,
+        300,
+        19,
+        36
+      ],
+      [
+        0,
+        772,
+        404,
+        248,
         4,
-        47
+        176
+      ],
+      [
+        408,
+        772,
+        444,
+        228,
+        4,
+        174
       ],
       [
         0,
-        1084,
-        480,
-        208,
-        85,
-        79
+        1188,
+        472,
+        148,
+        4,
+        278
       ],
       [
         0,
-        1296,
-        496,
-        192,
-        56,
-        95
+        1024,
+        472,
+        160,
+        4,
+        278
       ],
       [
-        0,
-        1492,
-        504,
-        172,
-        59,
-        115
+        476,
+        1024,
+        472,
+        156,
+        6,
+        281
       ],
       [
-        0,
-        1668,
-        504,
-        172,
-        59,
-        115
-      ],
-      [
-        0,
-        1844,
-        516,
-        128,
-        69,
-        160
-      ],
-      [
-        0,
-        1976,
-        512,
-        128,
-        70,
-        160
-      ],
-      [
-        0,
-        2108,
-        512,
-        128,
-        72,
-        160
+        476,
+        1188,
+        476,
+        144,
+        5,
+        297
       ]
     ],
     "decodedBytes": {
-      "canonical": 19169280,
-      "grid": 11286360,
-      "packed": 4615104
+      "canonical": 15728640,
+      "grid": 10289760,
+      "packed": 5408128
     },
     "pixelScale": 2.0
   },
@@ -252,12 +252,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0fe06ec3ac5f29c838449ef3fb76849ee28e05849f6e738f8048b95c3acb081c",
-      "config": "d341d034b7c21286702f54b544a39c478f7f18623b69f099eae63a38fe2c9d3e",
+      "source": "1b56d4eef10987a61b6e11d8c44ed71abc9d750c1fcd8aec97fa68f04963947a",
+      "config": "fee9a19955a67b0ff115e42d52edb8c30d5ff824d07abb65633b9a2b62248048",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_fall_down_video_normalized.png": "c42a496349de325e41c774352b6d7d23f1356a44b2eedfaf69a166275416817b"
+      "art/sprites/source/p02_derrubado_h3_video.mp4": "91198b24ee56f9b8c97d6ba1b9d6df7f5bc4aba13e5f4fac63e544843581ec6d"
     }
   }
 }

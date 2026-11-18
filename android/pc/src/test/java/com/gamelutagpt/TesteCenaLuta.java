@@ -45,17 +45,20 @@ public final class TesteCenaLuta {
         saida.mkdirs();
         Context ctx = DadosDoJogo.localizar().contexto(null);
         jogo = new GameView(ctx);
-        jogo.setSize(1280, 720);
+        // -Plargura=1600: a tela de um celular 20:9 (720 de altura): a cena enche a largura e corta em cima e embaixo.
+        int largura = Integer.getInteger("gameluta.largura", 1280);
+        jogo.setSize(largura, 720);
         jogo.setTouchControlsVisible(true);
         avancar = metodo("advanceSimulation", float.class);
         desenhar = metodo("renderFrame", Canvas.class);
-        metodo("onSizeChanged", int.class, int.class, int.class, int.class).invoke(jogo, 1280, 720, 0, 0);
+        metodo("onSizeChanged", int.class, int.class, int.class, int.class).invoke(jogo, largura, 720, 0, 0);
         campo("activityActive").set(jogo, true);
-        tela = Bitmap.createBitmap(1280, 720, Bitmap.Config.ARGB_8888);
+        tela = Bitmap.createBitmap(largura, 720, Bitmap.Config.ARGB_8888);
 
         metodo("loadTemporada").invoke(jogo);
         RenderAssets assets = (RenderAssets)campo("ultraAssets").get(jogo);
-        Campanha campanha = Campanha.load(assets, 7L);
+        // -Psemente: o sorteio da chave (no torneio, quem é o adversário).
+        Campanha campanha = Campanha.load(assets, Long.getLong("gameluta.semente", 7L));
         campanha.restaurar(irmao, -1);
         PaginaHistoria historia = (PaginaHistoria)campo("historia").get(jogo);
         campo("storyMode").set(jogo, true);
@@ -70,6 +73,13 @@ public final class TesteCenaLuta {
                 passo = linha.trim().replaceAll(",$", "");
             }
         }
+        // -Pcontra=p02: uma luta solta contra esse lutador (sem cena; para o -Pgiro com quem o torneio
+        // não sorteia).
+        String contra = System.getProperty("gameluta.contra", "");
+        if (!contra.isEmpty()) {
+            passo = "{\"tipo\": \"luta\", \"marca\": \"" + marca + "\", \"irmao\": \"" + irmao + "\", \"cenario\": \"dojo_shinshinkan\", " +
+                "\"dupla\": [\"" + ("koga".equals(irmao) ? "p03" : "player_base") + "\"], \"cpu\": [\"" + contra + "\"], \"repetirSeDerrota\": false}";
+        }
         if (passo == null) throw new IllegalStateException("sem a luta " + marca + " em " + episodio);
         Episodio so = Episodio.fromJson("{\"id\": \"" + episodio + "\", \"passos\": [" + passo + ", {\"tipo\": \"proximo\", \"titulo\": \"fim\"}]}");
         historia.start(temporada, so);
@@ -77,8 +87,45 @@ public final class TesteCenaLuta {
         if (!historia.waitingFight()) throw new IllegalStateException("a história não chegou na luta");
         System.out.println("luta: " + jogo.engine.fighter(GameView.PLAYER).state.character.id + " × " +
             jogo.engine.fighter(GameView.OPPONENT).state.character.id);
+        if (Boolean.getBoolean("gameluta.soLuta")) System.exit(0);   // -PsoLuta: só diz quem luta
         CinematicaLuta cena = (CinematicaLuta)campo("cinematica").get(jogo);
-        if (!cena.armada()) throw new IllegalStateException("a cinemática não armou");
+        if (!cena.armada() && contra.isEmpty()) throw new IllegalStateException("a cinemática não armou");
+
+        // -Pgiro=N: em vez da cena, o jogador leva o giro de nocaute (o do contra-golpe de punição)
+        // N vezes, gravando; para conferir o clipe HIT_SPIN na luta. -PgiroAlvo=rival: quem cai é o
+        // rival; -Pqueda: uma queda comum (lançado, sem girar), para conferir KNOCKDOWN/GROUNDED/GETUP.
+        int giros = Integer.getInteger("gameluta.giro", 0);
+        if (giros > 0) {
+            int espera = 60 * 60;
+            while (espera-- > 0 && ((int)campo("introFrame").get(jogo) >= 0 || ((BattleFlow)campo("flow").get(jogo)).holdsFighters())) passo(false);
+            jogo.setTouchControlsVisible(false);
+            ((AiController)campo("ai").get(jogo)).setEnabled(false);   // a CPU parada: o giro inteiro
+            for (int g = 0; g < giros; g++) {
+                boolean noRival = "rival".equals(System.getProperty("gameluta.giroAlvo"));
+                CombatFighter p = jogo.engine.fighter(noRival ? GameView.OPPONENT : GameView.PLAYER);
+                CombatFighter o = jogo.engine.fighter(noRival ? GameView.PLAYER : GameView.OPPONENT);
+                // Os dois no meio da arena, o jogador à esquerda: ele voa para a esquerda girando.
+                for (int i = 0; i < 40; i++) {
+                    p.x = Arena.WORLD_WIDTH * 0.5f + 60f; o.x = Arena.WORLD_WIDTH * 0.5f + 260f;
+                    passo(quadro % CADENCIA == 0);
+                }
+                CombatConfig cfg = jogo.engine.config;
+                int afasta = p.x >= o.x ? 1 : -1;
+                p.status = CombatFighter.Status.AIR_HITSTUN;
+                p.grounded = false;
+                p.y -= 2f;
+                p.vx = afasta * cfg.spinSpeed;
+                p.vy = -cfg.spinLift;
+                p.spinning = !Boolean.getBoolean("gameluta.queda");
+                p.launched = true;
+                p.hardFall = true;
+                p.stunLeft = p.stunTotal = cfg.spinHitstunFrames;
+                p.stunElapsed = 0;
+                System.out.println("giro " + (g + 1) + " no quadro " + quadro);
+                for (int i = 0; i < 150; i++) passo(quadro % CADENCIA == 0);
+            }
+            System.exit(0);
+        }
 
         // Depois da intro, o jogador fica com a vida do gatilho.
         int limite = 60 * 60;
@@ -88,6 +135,10 @@ public final class TesteCenaLuta {
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
                 FighterState f = jogo.engine.fighter(GameView.PLAYER).state;
                 f.takeDamage(f.life - Math.round(f.profile.maxLife * vida), 0);
+                if (DUPLA) {
+                    // -Pdupla: os dois da dupla do jogador com essa vida (o gatilho vidaDupla).
+                    for (FighterState m : jogo.engine.team(GameView.PLAYER).members) m.life = Math.round(m.profile.maxLife * vida);
+                }
                 bateu = true;
             }
         }
@@ -97,7 +148,8 @@ public final class TesteCenaLuta {
         int noQte = 0, qtes = 0;
         boolean pedia = false;
         limite = 60 * 120;
-        while (!cena.acabou() && limite-- > 0) {
+        // Depois de uma cena do meio da luta a próxima fica armada: acabou quando parou de rodar.
+        while (!cena.acabou() && cena.rodando() && limite-- > 0) {
             boolean pede = cena.qtePedindo();
             if (pede && !pedia) {
                 noQte = 0;
@@ -122,8 +174,16 @@ public final class TesteCenaLuta {
             video = agora;
             passo((quadro % CADENCIA == 0 || pede && noQte == 12) && (!SO_ANIMACAO || cena.animando()));
         }
-        System.out.println("cena acabou no quadro " + quadro);
-        for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
+        System.out.println("cena acabou no quadro " + quadro + "; vida do jogador " +
+            jogo.engine.fighter(GameView.PLAYER).state.life + "/" + jogo.engine.fighter(GameView.PLAYER).state.profile.maxLife +
+            " (" + jogo.engine.fighter(GameView.PLAYER).state.character.id + ")");
+        // -Pdepois=N: N segundos da luta depois da cena, na cadência do resto (a luta voltando).
+        int depois = Integer.getInteger("gameluta.depois", 0);
+        if (depois > 0) {
+            for (int i = 0; i < 60 * depois; i++) passo(quadro % CADENCIA == 0 && !SO_ANIMACAO);
+        } else {
+            for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
+        }
         System.exit(0);
     }
 
@@ -134,6 +194,7 @@ public final class TesteCenaLuta {
     /** Grava em JPG (-Pjpg=true): um décimo do PNG. */
     static final boolean JPG = Boolean.getBoolean("gameluta.jpg");
     static final boolean ERRA_PRIMEIRO = Boolean.getBoolean("gameluta.erraPrimeiro");
+    static final boolean DUPLA = Boolean.getBoolean("gameluta.dupla");
 
     static void passo(boolean gravar) throws Exception {
         avancar.invoke(jogo, CombatConfig.DT);

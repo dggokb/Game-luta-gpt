@@ -1,0 +1,187 @@
+{
+  "id": "p02_hit_spin_pouso",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_hit_spin_pouso.png",
+  "sourceNote": "Giro de nocaute da Yin-lu, v\u00eddeo H3 do dono (art/sprites/source/p02_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p02/inicio_giro_h3.png, final art/keys/p02/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p02. O pouso: quadros 66-78 de 2 em 2 (bate de costas no ch\u00e3o e assenta); depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco \u00e9 da f\u00edsica do jogo).",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 400,
+    "rootY": 600,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        177,
+        320,
+        623,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 49605
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        175,
+        330,
+        626,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 48846
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        178,
+        366,
+        622,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 45935
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        175,
+        410,
+        625,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 42740
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        169,
+        448,
+        631,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 42973
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        168,
+        461,
+        633,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 40639
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        168,
+        474,
+        633,
+        602
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 38644
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 481,
+    "frameHeight": 298,
+    "rootX": 240,
+    "rootY": 288,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      160,
+      312
+    ],
+    "sheetWidth": 476,
+    "sheetHeight": 1492,
+    "frames": [
+      [
+        0,
+        0,
+        456,
+        292,
+        12,
+        4
+      ],
+      [
+        0,
+        296,
+        460,
+        280,
+        10,
+        13
+      ],
+      [
+        0,
+        580,
+        456,
+        244,
+        13,
+        50
+      ],
+      [
+        0,
+        828,
+        460,
+        200,
+        11,
+        94
+      ],
+      [
+        0,
+        1032,
+        472,
+        164,
+        5,
+        132
+      ],
+      [
+        0,
+        1200,
+        476,
+        148,
+        4,
+        145
+      ],
+      [
+        0,
+        1352,
+        476,
+        140,
+        4,
+        157
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 13762560,
+      "grid": 4013464,
+      "packed": 2840768
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d6b7b43f3663d36ebeded4d224e08f64667fd6ae7bf385179cb378d940cc9bb6",
+      "config": "0c4cac985a85f1b3750343e65dfa556dc9cf15d2f0eeec8d5099b3fd92700e9b",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_hit_spin_video.mp4": "57d907621554772414f98cf962c004fe26cedaf500c43fe1594235ec21485448"
+    }
+  }
+}

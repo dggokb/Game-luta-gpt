@@ -479,6 +479,15 @@ tasks.register('testeCena', JavaExec) {
     systemProperty 'gameluta.jpg', providers.gradleProperty('jpg').getOrElse('false')
     systemProperty 'gameluta.soAnimacao', providers.gradleProperty('soAnimacao').getOrElse('false')
     systemProperty 'gameluta.erraPrimeiro', providers.gradleProperty('erraPrimeiro').getOrElse('false')
+    systemProperty 'gameluta.dupla', providers.gradleProperty('dupla').getOrElse('false')
+    systemProperty 'gameluta.depois', providers.gradleProperty('depois').getOrElse('0')
+    systemProperty 'gameluta.largura', providers.gradleProperty('largura').getOrElse('1280')
+    systemProperty 'gameluta.giro', providers.gradleProperty('giro').getOrElse('0')
+    systemProperty 'gameluta.giroAlvo', providers.gradleProperty('giroAlvo').getOrElse('jogador')
+    systemProperty 'gameluta.queda', providers.gradleProperty('queda').isPresent() ? 'true' : 'false'
+    systemProperty 'gameluta.contra', providers.gradleProperty('contra').getOrElse('')
+    systemProperty 'gameluta.soLuta', providers.gradleProperty('soLuta').isPresent() ? 'true' : 'false'
+    systemProperty 'gameluta.semente', providers.gradleProperty('semente').getOrElse('7')
     maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
     args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.dir('cena').get().asFile.absolutePath),
         providers.gradleProperty('irmao').getOrElse('ryuga'),

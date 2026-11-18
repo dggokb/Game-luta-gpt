@@ -139,7 +139,7 @@ public class ComboRyugaTest {
         // O pedido de 12/11: combo curto, mas dá para emendar outro depois. A parede do S3, o
         // assist no meio e a troca no Super (DHC) recomeçam; e, depois do ↓jH que quica no chão,
         // quem cravou desce rápido e pega o rival ainda quicando (relança ou recomeça no chão).
-        emenda("parede do S3 → combo novo", perto("L M M S3 W90 C200 L M M 6H S2", 100f), 12);
+        emenda("parede do S3 → combo novo", perto("L M M S3 W90 C200 L M M 6H S2", 100f), 13);
         // O assist da Yin-lu é o chute que lança (12/11): ele sobe atrás e continua no ar.
         emenda("assist no meio", perto("L M M A W25 SJ jL jM J jL jM j2H", 100f), 9);
         // A troca no Super para a Yin-lu saiu em 17/11: o Super dela (Espelho do Lago) é contra-golpe e

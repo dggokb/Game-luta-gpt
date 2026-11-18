@@ -59,6 +59,13 @@ menos tempo na tela (0,9 s depois de digitada).
 Momentos e reações novos (ex.: `troca` quando o jogador troca de lutador, `vida-baixa`) são
 uma linha no `GameView.updateConversa` cada: o arquivo já aceita qualquer nome.
 
+### Errou o Ultra SHINKAI (toda luta)
+
+Mesmo jeito do grito da troca: quando o Ultra SHINKAI acaba sem encostar no rival, quem soltou
+aparece no quadro do lado dele e diz **"Droga!"**, **"O quê?!"** ou **"Errei!"** (sorteado, 1,2 s
+na tela; não no tutorial nem durante uma cinemática). Textos em `ErrouUltraShinkai.FALAS`,
+traduzidos em `historia/idiomas/`; código em `GameView.reclamarDoUltra`.
+
 ### Grito da troca (toda luta em dupla)
 
 Sem arquivo nenhum, em **qualquer luta com dupla** (batalha, Arcade, torneio, história e

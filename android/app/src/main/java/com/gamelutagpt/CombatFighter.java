@@ -200,6 +200,8 @@ final class CombatFighter {
     int ultraPhase;
     /** O Ultra em andamento é o Ultra SHINKAI (cinco barras, dano maior, encerra o SHINKAI no fim). */
     boolean ultraShinkai;
+    /** O Ultra SHINKAI encostou no rival (acertou ou foi defendido): sem isso, errou. */
+    boolean ultraTocou;
     /** Dragão: 0 vindo, 1 pegou (acertos em {@link #dragaoAcertos}), 2 passou (defendido ou errou), 3 acabou o combo. */
     int dragaoEstado, dragaoAcertos, dragaoInicio, dragaoDanoPequeno, dragaoDanoFinal;
     /** Frames spent in the current ultra phase. */
@@ -255,6 +257,14 @@ final class CombatFighter {
     int armorHitFrame = Integer.MIN_VALUE / 2;
     /** A postura de contra-ataque deste golpe já pegou um golpe (o repel só bate assim). */
     boolean countered;
+    /**
+     * O Super de contra-golpe que leu um poder (o Espelho do Lago): ela investe até quem atirou, a
+     * essa velocidade (px por quadro, com o lado), e solta as palmas quando chega. 0: parada.
+     */
+    float investida;
+    /** Quadro (do motor) em que o Espelho do Lago leu o poder, ou -1: o desenho é o do desvio. */
+    int desvioInicio = -1;
+    CombatFighter investeAlvo;
     /** O agarrão de especial não pegou ninguém no primeiro quadro ativo: o resto sai no vazio. */
     boolean grabMissed;
     /** O recuo do Ultra em sequência já aconteceu (a p15 reaparece longe uma vez só). */
@@ -296,6 +306,12 @@ final class CombatFighter {
     // Throw.
     int throwPhase;
     int throwFrame;
+    /** Distância de quem agarrou até o rival quando pegou (o 1º ponto da cena do agarrão). */
+    float throwGap;
+    /** Quadros que ele ainda fica parado no ar entre as pancadas de um golpe de várias. */
+    int presoNoAr;
+    /** O dano da cena do agarrão já entrou. */
+    boolean throwAcertou;
     /** Frames during which this fighter cannot be thrown (right after stun or wake-up). */
     int throwProtect;
     /** Frames since L + M was pressed, or -1: starts a throw or techs one. */
@@ -478,6 +494,9 @@ final class CombatFighter {
         strikeLanded = strikeBlocked = strikeJuggled = false;
         reboundHopped = false;
         countered = false;
+        investida = 0f;
+        investeAlvo = null;
+        desvioInicio = -1;
         grabMissed = false;
         armorUsed = 0;
         charge = 0;

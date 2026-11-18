@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_defense_stand_2",
+ "quadros": 16,
+ "colunas": 11,
+ "celula": [
+  192,
+  256
+ ],
+ "raiz": [
+  92,
+  238
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_defense_stand_2_video_normalized.png",
+ "fonte_sha256": "3e2d9991b1020ad0c535cc4e11326f279716688351611a8029551737222b60d4",
+ "saida": "art/sprites/source/p02_defense_stand_2_video_normalized_sr_hd.png",
+ "saida_sha256": "e6569ce92db5c249cd86f652f48147c214204304a09b5a603b145cef5e782d69",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

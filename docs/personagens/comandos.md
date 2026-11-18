@@ -11,7 +11,7 @@ o botão escolhe a força da energia.
 | # | S1 | S2 | S3 | S4 |
 |---|---|---|---|---|
 | p01 | Onda ↓↘→ | Punho ascendente →↓↘ | Chute giratório ↓↙← | — |
-| p02 | Palma ↓↘→ | Chute da garça [↓] ↑ | Contra-golpe ←↙↓ | Chute rodopiante ← → |
+| p02 | Palma ↓↘→ | Chute da garça →↓↘ | Contra-golpe ←↙↓ | Chute rodopiante ← → |
 | p03 | Onda curta ↓↘→ | Punho em sequência →↓↘ | Avanço em três ↓↙← | Mergulho, no ar: ↓↘→ |
 | p04 | Soco de impacto ↓↘→ | Cabeçada [←] → | Esquiva ↓↓ | Ombrada ←↙↓↘→ |
 | p05 | Kunai ↓↘→ | Shuriken ↓↙← | Selo e mudança ↓↓ | Corte de mão ←↙↓↘→ |

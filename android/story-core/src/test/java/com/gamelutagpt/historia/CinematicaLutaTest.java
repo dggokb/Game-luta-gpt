@@ -110,6 +110,13 @@ public class CinematicaLutaTest {
         for (String id : temporada.episodios) {
             Episodio ep = Episodio.fromJson(FILES.readText(Temporada.PASTA + "/" + id + "/episodio.json"));
             for (Episodio.Passo passo : ep.passos) {
+                for (String cena : passo.cenasNaLuta) {
+                    // As cenas do meio da luta abrem, não encerram a luta e têm rosto e tradução.
+                    cinematicas++;
+                    conferirCinematica(temporada, cena, idiomas);
+                    assertFalse(cena + " encerra a luta (vai no \"cinematica\" do passo)",
+                        CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + cena)).terminaLuta());
+                }
                 if (passo.cinematica == null) continue;
                 cinematicas++;
                 assertEquals(passo.cinematica + " fora de um passo de luta", Episodio.TipoPasso.LUTA, passo.tipo);
@@ -167,7 +174,9 @@ public class CinematicaLutaTest {
         CinematicaLuta.Roteiro r = CinematicaLuta.ler(temporada, FILES.readText(Temporada.PASTA + "/" + arquivo));
         for (String quem : r.quemFala()) {
             // "jogador"/"rival": quem estiver em campo, com o rosto da seleção.
-            if (quem.equals("jogador") || quem.equals("rival")) continue;
+            if (quem.equals("jogador") || quem.equals("rival") || quem.equals("parceiro")) continue;
+            // O outro irmão: o Ryūga ou o Kōga, que têm retrato.
+            if (quem.equals("outroIrmao")) quem = Torneio.KOGA;
             // Sem retrato da história, quem luta fala com o rosto da seleção.
             String lutador = temporada.elenco.get(quem).lutador;
             String codigo = "player_base".equals(lutador) ? "p01" : lutador;
@@ -179,6 +188,21 @@ public class CinematicaLutaTest {
             assertTrue(arquivo + ": sem a página " + pagina, new File(ASSETS, Temporada.PASTA + "/" + pagina).isFile());
         }
         for (String stamp : r.stamps()) {
+            if (stamp.contains("{outroIrmao}")) {
+                for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+                    String um = stamp.replace("{outroIrmao}", irmao);
+                    assertTrue(arquivo + ": sem a imagem do STAMP " + um, new File(ASSETS, Temporada.PASTA + "/" + um).isFile());
+                }
+                continue;
+            }
+            if (stamp.contains("{jogador}")) {
+                // A arte por lutador: as duplas dos irmãos (o jogador do modo história).
+                for (String id : new String[] {"player_base", "p02", "p03", "p04"}) {
+                    String um = stamp.replace("{jogador}", id);
+                    assertTrue(arquivo + ": sem a imagem do STAMP " + um, new File(ASSETS, Temporada.PASTA + "/" + um).isFile());
+                }
+                continue;
+            }
             assertTrue(arquivo + ": sem a imagem do STAMP " + stamp, new File(ASSETS, Temporada.PASTA + "/" + stamp).isFile());
         }
         for (Object[] q : r.quadrosDosStamps()) {

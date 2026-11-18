@@ -333,6 +333,17 @@ final class TeamSystem {
         return true;
     }
 
+    /**
+     * Cinemática da história: o parceiro entra na hora no lugar de quem está em campo, no mesmo
+     * lugar e sem a corrida da troca (a cena esconde a troca). Falso sem parceiro de pé.
+     */
+    boolean trocarNaHora(CombatEngine engine, int side, CombatFighter point) {
+        Side s = sides[side];
+        if (!s.partnerStanding() || s.tagging() || s.assistOut()) return false;
+        swapPoint(engine, s, point);
+        return true;
+    }
+
     /** O titular da dupla está na vez, sem troca acontecendo nem pedida. */
     boolean starterOnPoint(int side) {
         Side s = sides[side];

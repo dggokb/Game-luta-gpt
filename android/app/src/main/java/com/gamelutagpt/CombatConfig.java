@@ -258,6 +258,8 @@ final class CombatConfig {
      * sai da postura em tantos quadros (o fim do desenho, a volta à guarda), sem soltar as palmas.
      */
     int superParryMissFrames = 14;
+    /** O Super de contra-golpe que leu um poder investe a isto (px por quadro) até quem atirou. */
+    float superParryRushSpeed = 34f;
     /**
      * Repel (S2 da p15) que desfez um projétil: quadros até a aura apagar e ela ficar livre. Sem
      * isso, desfazer a bola custava o golpe inteiro (64 quadros), mais do que defender.
@@ -791,7 +793,64 @@ final class CombatConfig {
      * tamanho da tela sai do punho e atravessa a arena; quem ele pega leva o combo enquanto o corpo
      * passa e voa no último golpe. Os lutadores com esse Ultra SHINKAI (ids, separados por vírgula).
      */
-    String ultraDragao = "player_base";
+    String ultraDragao = "player_base,p02,p15,p16";
+    /**
+     * Ultra SHINKAI da garça (a Yin-lu, 17/11, o Voo da Garça): no lugar do dragão que atravessa, a
+     * garça desce no rival, fecha as asas num casulo (ele some dentro) e leva os golpes; o casulo
+     * sobe, a garça mergulha e crava o rival no chão, que quica e cai longe. Quem tem (ids); precisa
+     * estar também em {@link #ultraDragao} (a cena e a animação ULTRA_DRAGAO são as mesmas).
+     */
+    String ultraGarca = "p02";
+    /**
+     * Quadros da cena da garça: as asas fecham, os golpes, o mergulho começa, o impacto, o fim. Os
+     * efeitos tocam a 1,25x do vídeo (o dono, 17/11: "muito acelerada"): 2 quadros do jogo por
+     * quadro do vídeo; o casulo fecha no 36 do vídeo e se desfaz no 96, e o mergulho (do 10 do
+     * vídeo dele) bate no chão no 26.
+     */
+    int garcaPega = 64, garcaIntervalo = 16, garcaMergulho = 185, garcaImpacto = 217, garcaQuadros = 287;
+    /**
+     * Ultra SHINKAI da palhaça (a Bonnie, 17/11, a Chuva de Tomates, ideia do dono): tudo fica preto,
+     * um picadeiro pequeno aparece com o rival em cima, a plateia joga tomates nele, a tela inteira
+     * fica vermelha e é limpa, e a bomba nos pés dele explode. Quem tem (ids); também em {@link #ultraDragao}.
+     */
+    String ultraPalhaco = "p16";
+    /**
+     * Quadros da cena: o picadeiro chega, os tomates (do primeiro ao último), a tela, a bomba, o BOOM,
+     * o fim. A bomba chega embaixo da tela vermelha (o dono, 17/11: quando a luva passa ela já está
+     * lá) e o pavio queima até a luva sair.
+     */
+    int palhacoPicadeiro = 20, palhacoTomates = 34, palhacoTomateAcerto = 46, palhacoTomateIntervalo = 8,
+        palhacoTela = 120, palhacoBomba = 170, palhacoBoom = 292, palhacoQuadros = 371;
+    /** Altura do tampo do picadeiro (px): o rival fica em cima. */
+    float palhacoAltura = 42f;
+    /**
+     * Ultra SHINKAI da Natisuko (17/11, o Ichigeki, ideia do dono): tudo preto, sem ela, e o rival
+     * no meio da tela; os punhos de luz vêm de todos os lados duas vezes; o círculo de tinta fecha
+     * nele com os danos e some de repente (tudo preto, sem o rival); a câmera desce de cima com o
+     * punho gigante até ele deitado, o punho bate
+     * (POFT!) com a câmera parada e some estourando em partículas. Quem tem (ids); também em
+     * {@link #ultraDragao}.
+     */
+    String ultraIchigeki = "p15";
+    /**
+     * Quadros da cena: as duas levas de punhos, o primeiro golpe e o intervalo, o círculo de tinta
+     * com os danos (o rival dentro), o círculo some (tudo preto, sem o rival), o rival deitado (a
+     * câmera começa a descer de cima com o punho), o punho, o impacto, o preto começa a sair, o fim.
+     */
+    int ichigekiSocos = 6, ichigekiSocos2 = 78, ichigekiAcerto = 12, ichigekiIntervalo = 27,
+        ichigekiDanos = 150, ichigekiSomeCirculo = 194, ichigekiSome = 205, ichigekiPunho = 208, ichigekiImpacto = 241,
+        ichigekiClareia = 272, ichigekiQuadros = 300;
+    /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
+    float garcaAltura = 260f, garcaEmpurra = 420f;
+    /**
+     * O golpe de abertura que viaja (o dono, 17/11: "essas ult à distância têm que entrar só se
+     * acertar o hit inicial"): a garça, os tomates e o Ichigeki saem como um golpe que atravessa na
+     * frente dela (a onda da palma, o tomate, o soco de fogo); pega quem está na frente e no chão,
+     * e só então a cena começa. Errou (pulou por cima, atrás, longe demais): sem a cena. De onde
+     * sai (px à frente), a velocidade (px por quadro), até onde vai (px) e a altura que pega (px
+     * acima do chão; os pés acima disso: passa por baixo).
+     */
+    float viagemOrigem = 60f, viagemVelocidade = 26f, viagemAlcance = 1100f, viagemAltura = 140f;
     /** De onde o dragão parte: à frente do lutador (px), menos {@link #dragaoAtras}. */
     float dragaoOrigem = 60f;
     /** O dragão entra de fora da tela: a cabeça começa tanto atrás do punho (px). */

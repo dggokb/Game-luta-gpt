@@ -1,0 +1,26 @@
+{
+  "id": "p02_hit_spin",
+  "javaName": "P02_HIT_SPIN",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_hit_spin.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_hit_spin.webp",
+  "report": "tools/sprites/reports/p02_hit_spin.report.json",
+  "preview": "android/app/build/sprite-review/p02_hit_spin-import.png",
+  "expectedFrames": 24,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 400,
+  "rootY": 600,
+  "sourceNote": "Giro de nocaute da Yin-lu, vídeo H3 do dono (art/sprites/source/p02_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p02/inicio_giro_h3.png, final art/keys/p02/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p02. O voo: quadros 5-64 (24 deles; o soco já torceu, o arremesso e o rolo em parafuso); a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceReferences": [
+    "art/sprites/source/p02_hit_spin_video.mp4"
+  ],
+  "pixelScale": 2.0,
+  "ajusteTamanho": 1.0,
+  "regua": [
+    "na escala do IDLE: a guarda do vídeo H3 (469 px) = o idle da folha (391 px)"
+  ]
+}

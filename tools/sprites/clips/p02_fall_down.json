@@ -2,63 +2,22 @@
   "id": "p02_fall_down",
   "javaName": "P02_FALL_DOWN",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_fall_down_sr_hd.png",
+  "source": "art/sprites/source/p02_fall_down_h3.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_fall_down.webp",
   "report": "tools/sprites/reports/p02_fall_down.report.json",
   "preview": "android/app/build/sprite-review/p02_fall_down-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 5,
+  "columns": 6,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
-  "video": {
-    "arquivo": "derrubado.mp4",
-    "personagem": "p02",
-    "escala": 0.525,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "17,18,20,22,25,27,29,29,40,50,61",
-    "celula": 192,
-    "largura": 416,
-    "raiz": "205,174",
-    "colunas": 11,
-    "fixar": "quadro",
-    "pe_no_chao": true,
-    "reescala": [
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765
-    ],
-    "reguaFatores": [
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765,
-      1.1765
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 85% (KNOCKDOWN / GROUNDED)"
-    ]
-  },
-  "frameWidth": 832,
-  "rootX": 410,
-  "frameHeight": 384,
-  "rootY": 348,
+  "sourceNote": "Yin-lu: vídeo H3 \"Derrubado\" do dono (art/sprites/source/p02_derrubado_h3_video.mp4, 18/11), imagem inicial e final art/keys/p02/inicio_centro_h3.png, pedido em docs/personagens/p02.md. Montado por tools/sprites/p02_derrubado_h3.py: escala 391/469 (a guarda do vídeo = o IDLE da folha), raiz fixa no meio dos pés do 1º quadro (o deslocamento do vídeo fica). Quadros do vídeo: 10,13,16,19,22,25,28 (queda: voa e bate de costas; o quique é do jogo) e 31,33,36,45 (caído).",
+  "frameWidth": 640,
+  "rootX": 320,
+  "frameHeight": 512,
+  "rootY": 470,
+  "pixelScale": 2.0,
   "sourceReferences": [
-    "art/sprites/source/p02_fall_down_video_normalized.png"
+    "art/sprites/source/p02_derrubado_h3_video.mp4"
   ],
-  "pixelScale": 2.0
+  "ajusteTamanho": 1.0
 }

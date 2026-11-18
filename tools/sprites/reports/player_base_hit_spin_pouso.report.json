@@ -1,0 +1,187 @@
+{
+  "id": "player_base_hit_spin_pouso",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_hit_spin_pouso.png",
+  "sourceNote": "Giro de nocaute (spinning knockdown), v\u00eddeo H3 do dono (art/sprites/source/player_base_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p01/inicio_gancho_h3.png, final art/keys/p01/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. O pouso: 2,04-2,6 s (bate de costas no ch\u00e3o e assenta), a base na raiz; depois dele, o GROUNDED.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 400,
+    "rootY": 600,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        165,
+        385,
+        635,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 47544
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        176,
+        274,
+        624,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 57108
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        160,
+        317,
+        641,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 57431
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        154,
+        368,
+        647,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 56020
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        150,
+        392,
+        650,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 53685
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        153,
+        413,
+        648,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 49768
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        155,
+        443,
+        646,
+        599
+      ],
+      "minimumMargin": 41,
+      "opaquePixels": 42778
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 518,
+    "frameHeight": 343,
+    "rootX": 259,
+    "rootY": 335,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      141,
+      265
+    ],
+    "sheetWidth": 512,
+    "sheetHeight": 1704,
+    "frames": [
+      [
+        0,
+        884,
+        480,
+        224,
+        19,
+        115
+      ],
+      [
+        0,
+        0,
+        460,
+        336,
+        30,
+        4
+      ],
+      [
+        0,
+        340,
+        492,
+        292,
+        14,
+        47
+      ],
+      [
+        0,
+        636,
+        504,
+        244,
+        8,
+        98
+      ],
+      [
+        0,
+        1112,
+        512,
+        220,
+        4,
+        122
+      ],
+      [
+        0,
+        1336,
+        508,
+        196,
+        7,
+        143
+      ],
+      [
+        0,
+        1536,
+        504,
+        168,
+        9,
+        173
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 13762560,
+      "grid": 4974872,
+      "packed": 3489792
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f0e0c8cc5e0723eed03b2b5556efd03701acd1058d8ffe88e1c3d7d14e3ce7a3",
+      "config": "d892ee71b4e535c85f297c4d118bf2d9830d1f748b8d1c70eec4fdc49f41f65f",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_hit_spin_video.mp4": "48b1fbac98b81c6ae50d430826324ab1a70b81a63b5c6b890879557346317ec0"
+    }
+  }
+}

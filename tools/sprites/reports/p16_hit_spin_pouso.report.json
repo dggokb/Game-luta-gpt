@@ -1,0 +1,187 @@
+{
+  "id": "p16_hit_spin_pouso",
+  "characterProfile": "p16",
+  "source": "art/sprites/source/p16_hit_spin_pouso.png",
+  "sourceNote": "Giro de nocaute da Bonnie, v\u00eddeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O pouso: quadros 78-90 de 2 em 2 (bate de costas no ch\u00e3o e assenta); depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco \u00e9 da f\u00edsica do jogo).",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 400,
+    "rootY": 600,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        169,
+        314,
+        632,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 46458
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        159,
+        393,
+        642,
+        602
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 44580
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        148,
+        396,
+        652,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 42967
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        143,
+        403,
+        657,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 38594
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        143,
+        416,
+        658,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 37917
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        140,
+        423,
+        660,
+        601
+      ],
+      "minimumMargin": 39,
+      "opaquePixels": 38454
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        140,
+        425,
+        662,
+        602
+      ],
+      "minimumMargin": 38,
+      "opaquePixels": 37498
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 539,
+    "frameHeight": 304,
+    "rootX": 269,
+    "rootY": 294,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      131,
+      306
+    ],
+    "sheetWidth": 532,
+    "sheetHeight": 1536,
+    "frames": [
+      [
+        0,
+        0,
+        472,
+        296,
+        33,
+        4
+      ],
+      [
+        0,
+        300,
+        492,
+        220,
+        24,
+        83
+      ],
+      [
+        0,
+        524,
+        516,
+        216,
+        12,
+        86
+      ],
+      [
+        0,
+        744,
+        524,
+        208,
+        8,
+        93
+      ],
+      [
+        0,
+        956,
+        528,
+        196,
+        7,
+        106
+      ],
+      [
+        0,
+        1156,
+        528,
+        188,
+        5,
+        112
+      ],
+      [
+        0,
+        1348,
+        532,
+        188,
+        4,
+        114
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 13762560,
+      "grid": 4587968,
+      "packed": 3268608
+    },
+    "pixelScale": 2.0
+  },
+  "pixelScale": 2.0,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c8f98cbffda504f9945157912cf3337e3ddd747b01be9f923e96b1d2a580b8d0",
+      "config": "d4f205ae074c5c5719711c2ff5224989129e4fbaaf65a21117a80ca3d63b25bf",
+      "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_hit_spin_video.mp4": "7dfb9a6abe2bf289556425272cc38f6c55bb55b6b1bdcecec28e5d01902c021a"
+    }
+  }
+}

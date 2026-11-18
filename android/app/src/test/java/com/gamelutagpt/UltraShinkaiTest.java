@@ -13,11 +13,11 @@ import org.junit.Test;
 public class UltraShinkaiTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
 
-    /** p02 (Ultra em sequência, sem a página) colado no boneco base. */
+    /** p14 (Ultra em sequência, sem a página) colado no boneco base (a p02 tem o da garça). */
     private static CombatEngineTest.Sim luta() {
         CombatConfig config = new CombatConfig();
         config.ultraSequencePage = false;
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 610f, config);
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p14"), BASE, 500f, 610f, config);
         s.f(1).state.life = 1_000_000;   // o Ultra inteiro entra (ninguém cai no meio)
         return s;
     }
@@ -137,5 +137,166 @@ public class UltraShinkaiTest {
         int[] r = ultra(s, 5);
         assertEquals(0, r[1]);
         assertTrue(s.f(0).state.inShinkai());
+    }
+
+    @Test public void aGarcaDaYinluFechaOCasuloSobeECravaORival() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), GeneratedCharacters.get("p03"), 400f, 700f);
+        s.f(1).state.life = 1_000_000;
+        transformar(s);
+        assertTrue(s.engine.temGarca(s.f(0).character()));
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        int golpes = 0, escondido = 0;
+        boolean quicou = false, mergulho = false;
+        float rivalX = s.f(1).x;
+        for (int i = 0; i < 900 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA || !s.f(1).grounded); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            if (s.engine.garcaEscondeRival(s.f(0))) escondido++;
+            if (s.engine.cues().contains("GROUND_BOUNCE")) quicou = true;
+            if (s.engine.cues().contains("ULTRA_GARCA_MERGULHO")) mergulho = true;
+            for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && "ULTRA".equals(h.moveId) && !h.blocked) golpes++;
+        }
+        assertTrue("o rival ficou dentro do casulo", escondido > 60);
+        assertTrue("a garça mergulhou", mergulho);
+        assertEquals("os golpes no casulo e o do mergulho", s.engine.config.dragaoAcertos + 1, golpes);
+        assertTrue("cravado, quicou no chão", quicou);
+        assertTrue("caiu longe: " + (s.f(1).x - rivalX), s.f(1).x - rivalX > 200f);
+        assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
+    }
+
+    @Test public void aChuvaDeTomatesDaBonnieExplodeORivalNoPicadeiro() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p16"), GeneratedCharacters.get("p03"), 400f, 700f);
+        s.f(1).state.life = 1_000_000;
+        transformar(s);
+        assertTrue(s.engine.temPalhaco(s.f(0).character()));
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        int golpes = 0, noPicadeiro = 0;
+        boolean bomba = false, voou = false;
+        for (int i = 0; i < 600 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA || !s.f(1).grounded); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            if (s.engine.palhacoCena(s.f(0)) >= 0 && Arena.GROUND_Y - s.f(1).y > 30f) noPicadeiro++;
+            if (s.engine.cues().contains("ULTRA_PALHACO_BOMBA")) bomba = true;
+            if (s.f(1).launched) voou = true;
+            for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && "ULTRA".equals(h.moveId) && !h.blocked) golpes++;
+        }
+        assertTrue("o rival ficou no picadeiro", noPicadeiro > 100);
+        assertTrue("a bomba", bomba);
+        assertEquals("os tomates e o BOOM", s.engine.config.dragaoAcertos + 1, golpes);
+        assertTrue("o BOOM joga longe", voou);
+        assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
+    }
+
+    @Test public void oIchigekiDaNatisukoDerrubaORivalEOPunhoCravaDeitado() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p15"), GeneratedCharacters.get("p03"), 400f, 700f);
+        s.f(1).state.life = 1_000_000;
+        transformar(s);
+        assertTrue(s.engine.temIchigeki(s.f(0).character()));
+        s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        CombatConfig c = s.engine.config;
+        int golpes = 0, deitadoAntes = 0, golpesDeitado = 0;
+        boolean punho = false, socos = false, danos = false, voou = false, deitadoNoFim = false;
+        for (int i = 0; i < 600 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
+            s.step();
+            s.in[0].direction = 0;
+            int q = s.engine.ichigekiCena(s.f(0));
+            boolean deitado = s.f(1).status == CombatFighter.Status.KNOCKDOWN && s.f(1).grounded;
+            if (q >= c.ichigekiSome && q < c.ichigekiImpacto && deitado) deitadoAntes++;
+            if (s.engine.cues().contains("ULTRA_ICHIGEKI_SOCOS")) socos = true;
+            if (s.engine.cues().contains("ULTRA_ICHIGEKI_PUNHO")) punho = true;
+            if (s.engine.cues().contains("ULTRA_ICHIGEKI_DANOS")) danos = true;
+            if (s.f(1).launched) voou = true;
+            for (CombatEngine.HitEvent h : s.engine.events()) {
+                if (h.attacker != 0 || !"ULTRA".equals(h.moveId) || h.blocked) continue;
+                golpes++;
+                if (deitado) golpesDeitado++;
+            }
+            if (s.engine.cues().contains("ULTRA_FINISH_DRAGAO")) deitadoNoFim = deitado;
+        }
+        assertTrue("os punhos de todos os lados", socos);
+        assertTrue("o punho gigante desceu", punho);
+        assertTrue("deitado esperando o punho: " + deitadoAntes, deitadoAntes > 30);
+        assertTrue("o círculo com os danos", danos);
+        assertEquals("os socos e o punho gigante", c.dragaoAcertos + 1, golpes);
+        assertEquals("o punho crava deitado", 1, golpesDeitado);
+        assertTrue("fica no chão no impacto", deitadoNoFim);
+        assertFalse("o rival não voa", voou);
+        assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
+    }
+
+    /**
+     * O golpe de abertura que viaja (o dono, 17/11): com o rival no ar quando ele passa, não pega e
+     * a cena não entra (nenhum golpe do Ultra), para a garça, os tomates e o Ichigeki.
+     */
+    @Test public void oGolpeQueViajaErraQuemEstaNoAr() {
+        for (String id : new String[]{"p02", "p16", "p15"}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(id), GeneratedCharacters.get("p03"), 400f, 700f);
+            s.f(1).state.life = 1_000_000;
+            transformar(s);
+            assertTrue(id, s.engine.temViagem(s.f(0).character()));
+            s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+            s.in[0].direction = 3;
+            s.in[0].superAttack = true;
+            s.in[0].ultra = true;
+            int golpes = 0;
+            boolean pegou = false, errou = false, noAr = false, reclamou = false;
+            for (int i = 0; i < 400 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
+                s.step();
+                s.in[0].direction = 0;
+                if (!noAr && s.engine.viajando(s.f(0))) {
+                    // Pulou bem na hora: alto, subindo.
+                    CombatFighter d = s.f(1);
+                    d.y = Arena.GROUND_Y - 260f;
+                    d.grounded = false;
+                    d.vy = -400f;
+                    noAr = true;
+                }
+                if (s.engine.cues().contains("ULTRA_PEGOU")) pegou = true;
+                if (s.engine.cues().contains("ULTRA_ERROU")) errou = true;
+                if (s.engine.cues().contains("ULTRA_SHINKAI_ERROU_0")) reclamou = true;
+                for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && "ULTRA".equals(h.moveId)) golpes++;
+            }
+            for (int i = 0; i < 10 && !reclamou; i++) {
+                s.step();
+                if (s.engine.cues().contains("ULTRA_SHINKAI_ERROU_0")) reclamou = true;
+            }
+            assertTrue(id + ": viajou", noAr);
+            assertFalse(id + ": não pegou", pegou);
+            assertTrue(id + ": errou", errou);
+            assertEquals(id + ": sem golpes do Ultra", 0, golpes);
+            assertTrue(id + ": o balão \"Droga!\" (o Ultra SHINKAI passou sem encostar)", reclamou);
+        }
+    }
+
+    /** Pegou: nada de balão de quem errou (o dono, 18/11: o balão é só para o Ultra SHINKAI que erra). */
+    @Test public void quemAcertaNaoReclama() {
+        for (String id : new String[]{"player_base", "p02", "p16", "p15"}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(id), GeneratedCharacters.get("p03"), 400f, 650f);
+            s.f(1).state.life = 1_000_000;
+            transformar(s);
+            s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+            s.in[0].direction = 3;
+            s.in[0].superAttack = true;
+            s.in[0].ultra = true;
+            boolean reclamou = false;
+            int golpes = 0;
+            for (int i = 0; i < 1200 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA || i < 30); i++) {
+                s.step();
+                s.in[0].direction = 0;
+                if (s.engine.cues().contains("ULTRA_SHINKAI_ERROU_0")) reclamou = true;
+                for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && !h.blocked) golpes++;
+            }
+            assertTrue(id + ": acertou", golpes > 0);
+            assertFalse(id + ": sem balão", reclamou);
+        }
     }
 }

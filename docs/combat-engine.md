@@ -454,6 +454,45 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
 
 Testes: `BattleFlowTest`, `AiFullKitTest`.
 
+## O golpe de várias pancadas segura o rival (18/11)
+
+O dono: "tem supers que o adversário fica solto, quicando no ar; parece que o golpe não segura o
+personagem". Medido: entre as pancadas de um golpe de várias, o rival no ar levava um tranco para
+cima (`strikeHoldLift`) a cada pancada e boiava subindo (a rajada da Natisuko o levava de 116 a
+221 px e a 9ª escapava); e o S3 do Ryūga, que só paira rente ao chão, era tratado como golpe que voa
+(o chute da garça) e jogava o rival 132 px para cima em cada chute. Agora:
+
+- no ar, o rival fica **preso na altura em que foi pego** até a próxima pancada (`presoNoAr`, a
+  gravidade para) e a última pancada que derruba também derruba quem está no ar (cai sem air tech);
+- o golpe que **paira** (`voo.paira`) não leva o rival para cima: no chão ele fica em pé, atordoado
+  na frente, até o último chute;
+- os golpes que voam de verdade (o S2 e o S4 da Yin-lu) continuam levando o rival subindo junto.
+
+Teste: `GolpeSeguraORivalTest` (Ryūga S3 e Super, Natisuko S3 e Super, Bonnie S4 e Super, Super da
+Yin-lu, no chão e no ar). Quatro combos ganharam a pancada que antes escapava.
+
+## A pose de quem é lançado (18/11)
+
+O dono: "toda hora alguém toma dano para cima e fica em pose de pulo". A pose do lançado
+(`GameView.launchPoseTime`) era um tempo fixo do HIT_AIR (0 a 0,19 s), feito para os clipes antigos
+de 4 quadros; nos clipes longos dos vídeos novos ela ficava no começo, que era o pulo antes do golpe.
+Agora é a proporção do clipe (os de 4 quadros ficam como eram). O HIT_AIR da Natisuko vem do vídeo novo do
+dono (o `danoPulo` antigo dela não tinha reação; o prompt está na ficha) e o da Yin-lu
+começa no tranco (sem o 1º desenho, encolhida no pulo).
+
+## Agarrão com personalidade (18/11)
+
+O agarrão genérico (L + M) do motor: pega em 5 quadros, 12 de janela de tech, e na hora de jogar o
+rival cai derrubado e escorrega para a frente (`landThrow`, 16 quadros de recuperação). Com uma
+**cena** (`CenaDoAgarrao`, o dono: "agarrões também têm que ter personalidade"), a fase de jogar
+dura o tempo do vídeo de quem agarra, o rival continua agarrado e segue o desenho por pontos (preso,
+no ar girando, deitado: quadro, distância à frente, altura, giro), o dano entra no impacto da cena
+(`acerto`) e ele fica deitado onde caiu (`solta`, já no chão, sem a queda de novo). O THROW_TOSS é
+esticado sobre a cena (`throwExecuteFrames(f)`), e o `GameView` escolhe a pose e gira o rival
+(`poseDoAgarrado`). Têm cena: Ryūga (por cima do ombro), Yin-lu (carrega no quadril e crava), Natisuko
+(varre a perna e crava o soco) e Bonnie (levanta acima da cabeça, segura para a plateia e crava). Os
+outros seguem no genérico. Teste: `AgarraoComCenaTest` (o `ThrowTest` confere o genérico no p04).
+
 ## SHINKAI (substitui o Overdrive da v0.87)
 
 Barra própria de cada lutador (entre a vida do titular e a do parceiro), que enche apanhando,
@@ -474,6 +513,13 @@ vermelha. O resto vem do tipo, sempre com os mesmos botões e o resultado na tel
 **SHINKAI Clash** (`ShinkaiClash`, `ConfrontoShinkai`): ligar o SHINKAI com o rival no dele
 para a luta (o `step` só roda o confronto) e vira um cabo de guerra em que cada tipo empurra de um
 jeito; quem vence acerta 2000 e fica com o SHINKAI cheio, quem perde voa e perde o dele.
+
+**Ultra SHINKAI** (no SHINKAI, com as cinco barras): o Ultra com o dobro do dano, e o SHINKAI acaba.
+Quatro têm cena própria (`CombatConfig.ultraDragao`): o dragão do Ryūga atravessa a tela; a garça
+da Yin-lu, os tomates da Bonnie e o Ichigeki da Natisuko (17/11) abrem com um golpe que viaja
+(`CombatEngine.viagem`) e só entram se ele pegar; pegou, o relógio da cena volta a zero e a luta para
+(`ULTRA_PEGOU`); errou, `ULTRA_ERROU` e a recuperação. Cada cena tem o seu `update*` (`updateGarca`,
+`updatePalhaco`, `updateIchigeki`) e os efeitos no `GameView`. Teste: `UltraShinkaiTest`.
 
 Regras, números, a divisão do elenco e o que falta: [shinkai.md](shinkai.md).
 O assist (antes a barra de 5 partes) agora aparece como um anel em volta do círculo do TAG.

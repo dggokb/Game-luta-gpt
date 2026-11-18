@@ -1,0 +1,11 @@
+Use your image generation tool to create TWO separate images (two files) for a 2D anime fighting game: manga-style impact panels ("STAMP") that slam onto the screen when our character takes a heavy hit. Match the art style of ref_estilo.png exactly (thick clean ink lines, saturated cel shading, 90s/2000s anime fighting game key art). The character must look exactly like ref_personagem.png (same face, hair, outfit and colors):
+
+Ryuga: a muscular young man, spiky brown hair, determined brown eyes; sleeveless blue-and-white vest with a red collar over a black tank top, black belt with long red-and-black ends, baggy white pants with blue stripes, black fingerless gloves with red wristbands, white-blue-red sneakers.
+
+IMPORTANT: only this one character in the image. The attacker is NEVER shown: no other person, no arm, no fist, no foot of anyone else. The hit is shown only by a huge white-yellow impact burst and speed lines coming from off-panel. Background: abstract manga action background, NO scenery, NO buildings, NO floor details except where said: radial speed lines, halftone dots and a burst of light in warm orange-red tones.
+
+Image 1, save as stamp_bam.png: the character takes a devastating blow to the stomach from the RIGHT side of the image: body folded forward around the impact, eyes wide in pain, spit and sweat flying, flying backward toward the LEFT side of the image, hair and clothes whipping to the left, a huge white-yellow impact explosion on the stomach coming from the right edge, strong horizontal speed lines. The character is in the left-center of the image and faces RIGHT.
+
+Image 2, save as stamp_pah.png: the character is slammed face-down into the ground from above: lying flat on a shattered stone floor that cracks into a crater, dust and rock debris bursting upward, a huge impact burst on the back, painful expression (teeth clenched, eyes squeezed), seen from a low dramatic angle, vertical speed lines coming down from the top. The head is toward the LEFT side of the image.
+
+Both images 16:9 widescreen, 1672x941. No text, no letters, no sound effects, no speech balloons, no panel border, no watermark. Do not write code files.

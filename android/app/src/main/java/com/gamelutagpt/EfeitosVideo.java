@@ -359,6 +359,11 @@ final class EfeitosVideo {
         paint.setColorFilter(null);
     }
 
+    /** Tira da tela todas as vagas tocando o efeito {@code nome}. */
+    void pararTodos(String nome) {
+        for (int i = 0; i < VAGAS; i++) if (tocando[i] != null && tocando[i].nome.equals(nome)) tocando[i] = null;
+    }
+
     /** Tira da tela o efeito da vaga, se ainda for o mesmo ({@code nome}). */
     void parar(int vaga, String nome) {
         if (vaga >= 0 && vaga < VAGAS && tocando[vaga] != null && tocando[vaga].nome.equals(nome)) tocando[vaga] = null;
