@@ -194,7 +194,7 @@ public class CpuTest {
         double perdeu = 0, acertou = 0;
         int lutas = 0;
         for (String ch : new String[] {"p03", "player_two", "p05"}) {
-            for (long seed = 1; seed <= 3; seed++) {
+            for (long seed = 1; seed <= 6; seed++) {
                 CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"),
                     new FighterState(GeneratedCharacters.get(ch), "CPU"), 250f, 1000f, new CombatConfig());
                 AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));

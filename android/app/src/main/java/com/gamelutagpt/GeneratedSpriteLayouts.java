@@ -616,11 +616,11 @@ final class GeneratedSpriteLayouts {
     static final int P03_HIT_STAND_ROOT_Y = 490;
     static final int P03_HIT_STAND_FRAME_COUNT = 9;
 
-    static final int P03_IDLE_FRAME_WIDTH = 381;
-    static final int P03_IDLE_FRAME_HEIGHT = 494;
-    static final int P03_IDLE_ROOT_X = 148;
-    static final int P03_IDLE_ROOT_Y = 478;
-    static final int P03_IDLE_FRAME_COUNT = 60;
+    static final int P03_IDLE_FRAME_WIDTH = 296;
+    static final int P03_IDLE_FRAME_HEIGHT = 477;
+    static final int P03_IDLE_ROOT_X = 144;
+    static final int P03_IDLE_ROOT_Y = 468;
+    static final int P03_IDLE_FRAME_COUNT = 16;
 
     static final int P03_INTRO_FRAME_WIDTH = 463;
     static final int P03_INTRO_FRAME_HEIGHT = 504;
@@ -628,10 +628,10 @@ final class GeneratedSpriteLayouts {
     static final int P03_INTRO_ROOT_Y = 479;
     static final int P03_INTRO_FRAME_COUNT = 27;
 
-    static final int P03_JAB_FRAME_WIDTH = 196;
-    static final int P03_JAB_FRAME_HEIGHT = 251;
-    static final int P03_JAB_ROOT_X = 78;
-    static final int P03_JAB_ROOT_Y = 239;
+    static final int P03_JAB_FRAME_WIDTH = 367;
+    static final int P03_JAB_FRAME_HEIGHT = 475;
+    static final int P03_JAB_ROOT_X = 144;
+    static final int P03_JAB_ROOT_Y = 466;
     static final int P03_JAB_FRAME_COUNT = 12;
 
     static final int P03_JUMP_FRAME_WIDTH = 310;
