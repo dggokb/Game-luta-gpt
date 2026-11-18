@@ -9,6 +9,7 @@
     "magnata":   { "nome": "???",       "cor": "#8C6A2A" },
     "magnata2":  { "nome": "???",       "cor": "#5A4A6A" },
     "dafu":      { "nome": "Dafu",      "cor": "#D9A42E" },
+    "narrador":  { "nome": "Narrador",  "cor": "#9B2320" },
     "mensageiro":{ "nome": "???",       "cor": "#4A4A55" },
     "p02":       { "nome": "Yín-lù",    "cor": "#1F8A8A", "lutador": "p02" },
     "p04":       { "nome": "Brucy",     "cor": "#D9B12E", "lutador": "p04" },

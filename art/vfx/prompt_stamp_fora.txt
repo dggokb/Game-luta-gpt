@@ -1,0 +1,7 @@
+Use your image generation tool to create TWO separate images (two files) for a 2D anime fighting game: manga-style panels ("STAMP") that slam onto the screen. Match the art style of ref_estilo.png exactly (thick clean ink lines, saturated cel shading, 90s/2000s anime fighting game key art). Both images 16:9 widescreen, 1672x941. No text, no letters, no sound effects, no speech balloons, no panel border, no watermark. Do not write code files.
+
+In each image one character stands OUTSIDE a fighting arena, leaning over the stone railing of the spectator stands, SHOUTING encouragement down toward the fighters (one hand cupped at the mouth, the other fist raised, mouth wide open, intense eyes, a cocky challenging grin), seen from a slightly low angle. Behind: a blurred crowd of spectators in the stands and a warm sunset sky, with orange radial speed lines and halftone dots focusing on the character. The character is in the center-left and shouts toward the RIGHT.
+
+Image 1, save as stamp_fora_ryuga.png: the character is Ryuga, exactly like ref_ryuga.png: a muscular young man, spiky brown hair; sleeveless blue-and-white vest with a red collar over a black tank top, black belt with red ends, black fingerless gloves with red wristbands.
+
+Image 2, save as stamp_fora_koga.png: the character is Koga, exactly like ref_koga.png: a muscular young man, spiky dark brown hair; black sleeveless hooded jacket with red trim over a white tank top, black fingerless gloves with red bands.

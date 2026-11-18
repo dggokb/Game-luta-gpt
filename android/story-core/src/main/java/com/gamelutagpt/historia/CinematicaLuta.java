@@ -133,6 +133,13 @@ public final class CinematicaLuta {
         default void impacto(int forca, int lado) {}
 
         /**
+         * O impacto com o efeito escolhido: {@code tipo} "defesa" (a faísca de defesa), "acerto"
+         * (o estouro de ar) ou "quebra" (a guarda estilhaçando, o GUARD BREAK da luta); com
+         * {@code noAlvo}, o efeito nasce em quem levou, não no meio dos dois (o golpe que joga longe).
+         */
+        default void impacto(int forca, int lado, String tipo, boolean noAlvo) { impacto(forca, lado); }
+
+        /**
          * Toca o efeito {@code nome} (assets/efeitos) no lutador desse lado: nos pés ou no peito,
          * {@code dx} à frente de onde ele olha, no tamanho {@code escala}; {@code atras} espelha.
          */
@@ -171,6 +178,35 @@ public final class CinematicaLuta {
         default String emCampo(int lado) {
             return null;
         }
+
+        /** Quem fala pelo parceiro do lutador em campo desse lado (o que está fora da luta), ou null. */
+        default String parceiro(int lado) {
+            return null;
+        }
+
+        /**
+         * O parceiro desse lado entra na hora no lugar de quem está em campo (no mesmo lugar, sem a
+         * corrida da troca): a cena esconde a troca (quem sai pula para fora, quem entra chega).
+         */
+        default void entrarParceiro(int lado) {}
+
+        /** Quem está em campo desse lado perde {@code fracao} da vida máxima (nunca cai por isso). */
+        default void danoDaCena(int lado, float fracao) {}
+
+        /** O lutador (id do pack: player_base, p02...) em campo desse lado agora, ou null. */
+        default String lutadorEmCampo(int lado) {
+            return null;
+        }
+
+        /** Os lutadores da dupla desse lado (ids do pack), para abrir as artes por lutador. */
+        default List<String> lutadoresDaDupla(int lado) {
+            return Collections.emptyList();
+        }
+
+        /** As paredes do cenário (x do mundo da esquerda e da direita), para a animação com "parede". */
+        default float[] paredes() {
+            return new float[] {90f, 2510f};
+        }
     }
 
     /** Um golpe roteirizado pedido ao {@link Palco}: o acerto (ou o erro) de um QTE. */
@@ -204,10 +240,13 @@ public final class CinematicaLuta {
 
     /** Quando a cinemática começa. */
     public static final class Gatilho {
-        public enum Tipo { INICIO, VIDA, TEMPO, KO }
+        public enum Tipo { INICIO, VIDA, TEMPO, KO, DUPLA }
 
         public final Tipo tipo;
-        /** VIDA: fração da vida (0..1) do lutador da vez; TEMPO: segundos de luta. */
+        /**
+         * VIDA: fração da vida (0..1) do lutador da vez; DUPLA: dos dois da dupla (a cena entra
+         * quando os dois, ainda de pé, estão com isso ou menos); TEMPO: segundos de luta.
+         */
         public final float valor;
         /** VIDA: de quem ({@link #JOGADOR}, {@link #RIVAL}) ou -1 para qualquer um. */
         public final int lado;
@@ -248,7 +287,7 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR, EFEITO, STAMP }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA, TINTA, PAGINA, QTE, GOLPE, TROCAR, VIDEO, CLARAO, LINHAS, IMPACTO, ANIMAR, EFEITO, STAMP, PARCEIRO, DANO }
 
         final Tipo tipo;
         boolean semEsperar;
@@ -332,10 +371,18 @@ public final class CinematicaLuta {
         boolean atras;
         /** IMPACTO: a força (1 médio, 2 forte, 3 o mais forte, com impact frame). */
         int forca = 2;
+        /** IMPACTO: o efeito (defesa, acerto ou quebra) e se nasce em quem levou. */
+        String tipoImpacto;
+        boolean noAlvo;
         /** LINHAS: "concentracao" (de mangá, das bordas para o meio) ou "velocidade" (riscos de lado a lado). */
         String estilo = "concentracao";
         /** LINHAS: quanto a luta escurece por trás das linhas (0 a 1). */
         float escuro = 0.35f;
+        /**
+         * LINHAS: atrás dos lutadores: o cenário some num fundo preto (escuro 1 = todo preto) e as
+         * linhas, brancas, correm por ele; os lutadores ficam na frente.
+         */
+        boolean fundo;
         int vezes = 8;
         String direcao = "frente";
         /** QTE: o golpe de quem acerta ({@link #quemMove} bate) e o contra-ataque de quem erra. */
@@ -365,6 +412,8 @@ public final class CinematicaLuta {
          * está do outro lado (a campanha do Kōga), o quadro bate espelhado.
          */
         String ryugaNaArte;
+        /** STAMP: de que lado quem está em campo do lado do jogador está na arte (espelha se na luta está do outro). */
+        String jogadorNaArte;
         /** IMPACTO, QTE e GOLPE: o STAMP que bate no contato (com a cena congelada embaixo). */
         Acao stamp;
         /**
@@ -682,6 +731,7 @@ public final class CinematicaLuta {
     private String linhasEstilo = "concentracao";
     private static final int LINHAS_VELOCIDADE = 18, LINHAS_CONCENTRACAO = 56;
     private float linhasEscuro = 0.35f;
+    private boolean linhasFundo;
     /**
      * Câmera viva na troca de golpes: chega mais perto e puxa para quem ataca (somada à câmera
      * do roteiro); cada defesa dá um tranquinho e cada choque, um tranco.
@@ -717,6 +767,12 @@ public final class CinematicaLuta {
     private Acao stamp;
     private float stampDesde;
     private int stamps;
+    /** {@code {jogador}} no nome da arte do STAMP: o id de quem está em campo do lado do jogador. */
+    static final String LUTADOR = "{jogador}";
+    /** {@code {outroIrmao}} no nome da arte do STAMP: ryuga ou koga, o irmão que não está na dupla do jogador. */
+    static final String OUTRO_IRMAO = "{outroIrmao}";
+    /** A arte do STAMP na tela (o nome já com o lutador em campo). */
+    private String stampImagem;
     /** O STAMP na tela bate espelhado (o Ryūga está do outro lado da arte). */
     private boolean stampEspelhado;
     /** O STAMP que vira página já está indo para o lugar dele (a página dele já abriu em {@link #guiada}). */
@@ -760,6 +816,42 @@ public final class CinematicaLuta {
         }
         this.temporada = temporada;
         this.irmao = Torneio.KOGA.equals(irmao) ? Torneio.KOGA : Torneio.RYUGA;
+        preparar(roteiro);
+        estado = Estado.ARMADA;
+        return true;
+    }
+
+    /**
+     * Mais uma cena na mesma luta ({@code "cenasNaLuta"} do passo: as do meio da luta, que não a
+     * encerram), armada junto com a de {@link #carregar}: a que tiver o gatilho primeiro toca, e
+     * depois dela (se a luta continua) as outras seguem esperando. Sem nenhuma carregada, é a
+     * primeira. Falso se o arquivo não abre.
+     */
+    public boolean adicionar(Temporada temporada, String arquivo, String irmao) {
+        if (estado == Estado.NENHUMA) return carregar(temporada, arquivo, irmao);
+        Roteiro r;
+        try {
+            r = ler(temporada, assets.readText(Temporada.PASTA + "/" + arquivo));
+        } catch (IOException | RuntimeException ex) {
+            return false;
+        }
+        preparar(r);
+        if (estado == Estado.ACABOU && !lutaEncerrada) {
+            roteiro = r;
+            estado = Estado.ARMADA;
+        } else {
+            espera.add(r);
+        }
+        return true;
+    }
+
+    /** As cenas armadas além da atual (a que toca primeiro troca de lugar com a atual). */
+    private final List<Roteiro> espera = new ArrayList<>();
+    /** Uma cena encerrou a luta: as que esperam não tocam mais. */
+    private boolean lutaEncerrada;
+
+    /** Abre o que a cena vai mostrar (páginas, vídeos, STAMP): agora, não na hora da cena. */
+    private void preparar(Roteiro roteiro) {
         // A página de cada ação já abre agora (não na hora da cena: a imagem é grande).
         Random sorteio = new Random();
         Map<String, Episodio> episodios = new HashMap<>();
@@ -789,9 +881,7 @@ public final class CinematicaLuta {
             }
         }
         for (Acao st : roteiro.stampsDaCena()) carregarStamp(st, episodios);
-        if (!roteiro.stampsDaCena().isEmpty()) carregarLuzDoStamp();
-        estado = Estado.ARMADA;
-        return true;
+        if (!roteiro.stampsDaCena().isEmpty() && luzStamp.isEmpty()) carregarLuzDoStamp();
     }
 
     /** O estouro de luz atrás do STAMP; se não abre, o STAMP bate sem ele. */
@@ -820,6 +910,32 @@ public final class CinematicaLuta {
 
     /** Abre a imagem do STAMP e acha o quadro dele; se não abre, o STAMP não aparece. */
     private void carregarStamp(Acao st, Map<String, Episodio> episodios) {
+        if (st.imagem.contains(OUTRO_IRMAO)) {
+            // O irmão que não está na dupla do jogador (o que grita de fora): já se sabe qual é.
+            st.imagem = st.imagem.replace(OUTRO_IRMAO, outroIrmao());
+        }
+        if (st.imagem.contains(LUTADOR)) {
+            // A arte de cada lutador da dupla do jogador ({jogador} no nome): bate a de quem estiver em campo.
+            boolean alguma = false;
+            for (String id : palco.lutadoresDaDupla(JOGADOR)) {
+                String caminho = st.imagem.replace(LUTADOR, id);
+                try {
+                    if (!imagensStamp.containsKey(caminho)) {
+                        RenderImage img = assets.loadImage(Temporada.PASTA + "/" + caminho);
+                        if (img == null) continue;
+                        imagensStamp.put(caminho, img);
+                    }
+                    alguma = true;
+                } catch (IOException | RuntimeException ex) {
+                    // Sem a arte desse lutador: com ele em campo, o STAMP não bate.
+                }
+            }
+            if (alguma) {
+                float[] r = st.recorte != null ? st.recorte : new float[] {0f, 0f, 1f, 1f};
+                areaStamp.put(st, new float[] {r[0], r[1], r[2], r[1], r[2], r[3], r[0], r[3]});
+            }
+            return;
+        }
         try {
             RenderImage img = imagensStamp.get(st.imagem);
             if (img == null) {
@@ -880,6 +996,8 @@ public final class CinematicaLuta {
     /** Esquece a cinemática e tudo o que ela desenha (fim da luta, luta nova). */
     public void descarregar() {
         roteiro = null;
+        espera.clear();
+        lutaEncerrada = false;
         estado = Estado.NENHUMA;
         acao = null;
         indice = 0;
@@ -968,12 +1086,23 @@ public final class CinematicaLuta {
             else throw new IllegalArgumentException("lado do gatilho " + lado + " (use qualquer, jogador ou rival)");
             return new Gatilho(Gatilho.Tipo.VIDA, vida, quem, Boolean.TRUE.equals(m.get("ultimo")));
         }
+        if (m.get("vidaDupla") instanceof Number) {
+            // Os dois da dupla desse lado, os dois de pé, com essa vida ou menos (a cena no meio
+            // da luta do 2x2: o parceiro entra nela).
+            float vida = ((Number)m.get("vidaDupla")).floatValue();
+            if (vida <= 0f || vida >= 1f) throw new IllegalArgumentException("gatilho vidaDupla precisa ficar entre 0 e 1: " + vida);
+            String lado = Episodio.string(m, "lado", "jogador");
+            if (!lado.equals("jogador") && !lado.equals("rival")) {
+                throw new IllegalArgumentException("lado do gatilho vidaDupla " + lado + " (use jogador ou rival)");
+            }
+            return new Gatilho(Gatilho.Tipo.DUPLA, vida, lado.equals("jogador") ? JOGADOR : RIVAL);
+        }
         if (m.get("tempo") instanceof Number) {
             float tempo = ((Number)m.get("tempo")).floatValue();
             if (tempo < 0f) throw new IllegalArgumentException("gatilho tempo negativo");
             return new Gatilho(Gatilho.Tipo.TEMPO, tempo, -1);
         }
-        throw new IllegalArgumentException("gatilho sem \"vida\" nem \"tempo\"");
+        throw new IllegalArgumentException("gatilho sem \"vida\", \"vidaDupla\" nem \"tempo\"");
     }
 
     private static Acao acao(Temporada temporada, Map<String, Object> m) {
@@ -1004,7 +1133,10 @@ public final class CinematicaLuta {
                 a.quem = Episodio.string(m, "quem", null);
                 if (a.quem == null) throw new IllegalArgumentException("fala sem \"quem\"");
                 // "jogador"/"rival": quem estiver em campo nesse lado na hora (Palco.emCampo).
-                boolean emCampo = a.quem.equals("jogador") || a.quem.equals("rival");
+                // "parceiro": o de fora da luta no lado do jogador; "outroIrmao": o irmão que não
+                // está na dupla do jogador (grita de fora: no torneio ele assiste).
+                boolean emCampo = a.quem.equals("jogador") || a.quem.equals("rival") || a.quem.equals("parceiro") ||
+                    a.quem.equals("outroIrmao");
                 if (temporada != null && !emCampo && !temporada.elenco.containsKey(a.quem)) {
                     throw new IllegalArgumentException("fora do elenco da temporada: " + a.quem);
                 }
@@ -1131,10 +1263,11 @@ public final class CinematicaLuta {
                 a = new Acao(Acao.Tipo.LINHAS);
                 a.ligar = !Boolean.FALSE.equals(m.get("ligar"));
                 a.estilo = Episodio.string(m, "estilo", "concentracao");
-                if (!a.estilo.matches("concentracao|velocidade")) {
-                    throw new IllegalArgumentException("estilo " + a.estilo + " (use concentracao ou velocidade)");
+                if (!a.estilo.matches("concentracao|velocidade|subir|descer")) {
+                    throw new IllegalArgumentException("estilo " + a.estilo + " (use concentracao, velocidade, subir ou descer)");
                 }
-                a.escuro = numero(m, "escuro", 0.35f, 0f, 1f);
+                a.fundo = Boolean.TRUE.equals(m.get("fundo"));
+                a.escuro = numero(m, "escuro", a.fundo ? 1f : 0.35f, 0f, 1f);
                 a.segundos = numero(m, "segundos", 0.12f, 0f, 3f);
                 break;
             case "animar":
@@ -1163,6 +1296,11 @@ public final class CinematicaLuta {
                 a.quemMove = Episodio.string(m, "quem", "jogador");
                 if (!time(a.quemMove)) throw new IllegalArgumentException("quem bateu: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
                 a.congela = numero(m, "congela", a.forca == 1 ? 0.12f : a.forca == 2 ? 0.2f : 0.32f, 0f, 2f);
+                a.tipoImpacto = Episodio.string(m, "tipo", a.forca == 1 ? "defesa" : "acerto");
+                if (!a.tipoImpacto.matches("defesa|acerto|quebra")) {
+                    throw new IllegalArgumentException("impacto tipo " + a.tipoImpacto + " (use defesa, acerto ou quebra)");
+                }
+                a.noAlvo = "alvo".equals(Episodio.string(m, "onde", "meio"));
                 a.tranco = numero(m, "zoom", a.forca == 1 ? 1.08f : a.forca == 2 ? 1.15f : 1.25f, 1f, 1.8f);
                 Object letreiro = m.get("letreiro");
                 if (letreiro != null) {
@@ -1210,6 +1348,22 @@ public final class CinematicaLuta {
             case "stamp":
                 a = stamp(m, true);
                 break;
+            case "parceiro":
+                // O parceiro entra na hora no lugar de quem está em campo (a cena esconde a troca).
+                a = new Acao(Acao.Tipo.PARCEIRO);
+                a.quemMove = Episodio.string(m, "quem", "jogador");
+                if (!a.quemMove.equals("jogador") && !a.quemMove.equals("rival")) {
+                    throw new IllegalArgumentException("parceiro de quem: " + a.quemMove + " (use jogador ou rival)");
+                }
+                break;
+            case "dano":
+                // Um pouco de vida de quem está em campo (a cena pesa sem decidir a luta).
+                a = new Acao(Acao.Tipo.DANO);
+                a.quemMove = Episodio.string(m, "quem", "jogador");
+                if (!time(a.quemMove)) throw new IllegalArgumentException("dano em quem: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
+                a.valor = numero(m, "valor", -1f, 0f, 0.5f);
+                if (a.valor < 0f) throw new IllegalArgumentException("dano sem \"valor\" (fração da vida máxima, ex.: 0.03)");
+                break;
             case "golpe":
                 a = new Acao(Acao.Tipo.GOLPE);
                 a.quemMove = Episodio.string(m, "quem", "jogador");
@@ -1219,7 +1373,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto, animar, efeito, stamp)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta, tinta, pagina, qte, golpe, trocar, video, clarao, linhas, impacto, animar, efeito, stamp, parceiro, dano)");
         }
         // O QTE sempre espera o jogador; o golpe, acabar.
         a.semEsperar = a.tipo != Acao.Tipo.QTE && a.tipo != Acao.Tipo.GOLPE && Boolean.TRUE.equals(m.get("semEsperar"));
@@ -1325,6 +1479,10 @@ public final class CinematicaLuta {
                 a.recorte[2] <= a.recorte[0] || a.recorte[3] <= a.recorte[1]) {
                 throw new IllegalArgumentException("recorte fora da imagem: [x0, y0, x1, y1] de 0 a 1, x0 < x1, y0 < y1");
             }
+        }
+        a.jogadorNaArte = Episodio.string(m, "jogadorNaArte", null);
+        if (a.jogadorNaArte != null && !a.jogadorNaArte.matches("esquerda|direita")) {
+            throw new IllegalArgumentException("jogadorNaArte " + a.jogadorNaArte + " (use esquerda ou direita)");
         }
         a.ryugaNaArte = Episodio.string(m, "ryugaNaArte", null);
         if (a.ryugaNaArte != null && !a.ryugaNaArte.matches("esquerda|direita")) {
@@ -1439,6 +1597,11 @@ public final class CinematicaLuta {
         return time.equals(irmao) ? JOGADOR : RIVAL;
     }
 
+    /** O irmão que não é o do jogador (o Kōga na campanha do Ryūga, e o contrário). */
+    private String outroIrmao() {
+        return Torneio.KOGA.equals(irmao) ? Torneio.RYUGA : Torneio.KOGA;
+    }
+
     private int[] lados(String quem) {
         return quem.equals("ambos") ? new int[] {JOGADOR, RIVAL} : new int[] {lado(quem)};
     }
@@ -1479,9 +1642,13 @@ public final class CinematicaLuta {
     public String[] clipesAnimados(int lado) {
         if (roteiro == null) return new String[0];
         java.util.Set<String> clipes = new java.util.LinkedHashSet<>();
-        for (Acao a : roteiro.acoes) {
-            if (a.tipo != Acao.Tipo.ANIMAR) continue;
-            for (AnimacaoManual.Chave c : trilha(a, lado)) clipes.add(c.clip);
+        List<Roteiro> todos = new ArrayList<>(espera);
+        todos.add(0, roteiro);
+        for (Roteiro r : todos) {
+            for (Acao a : r.acoes) {
+                if (a.tipo != Acao.Tipo.ANIMAR) continue;
+                for (AnimacaoManual.Chave c : trilha(a, lado)) clipes.add(c.clip);
+            }
         }
         return clipes.toArray(new String[0]);
     }
@@ -1523,11 +1690,34 @@ public final class CinematicaLuta {
      * ninguém). O jogo segura o último ponto de vida enquanto isso for verdade.
      */
     public boolean protegeVida(int lado) {
-        if (roteiro == null || roteiro.gatilho.tipo == Gatilho.Tipo.KO) return false;
-        if (estado == Estado.RODANDO) return true;
-        Gatilho g = roteiro.gatilho;
-        return estado == Estado.ARMADA && g.tipo == Gatilho.Tipo.VIDA && (g.lado < 0 || g.lado == lado)
-            && (!g.ultimo || sozinho(lado));
+        if (roteiro == null) return false;
+        if (estado == Estado.RODANDO) return roteiro.gatilho.tipo != Gatilho.Tipo.KO;
+        if (estado != Estado.ARMADA) return false;
+        if (protege(roteiro.gatilho, lado)) return true;
+        for (Roteiro r : espera) {
+            if (protege(r.gatilho, lado)) return true;
+        }
+        return false;
+    }
+
+    /** O gatilho de vida armado olha esse lado: ele não pode cair antes da cena (a da dupla não protege). */
+    private boolean protege(Gatilho g, int lado) {
+        return g.tipo == Gatilho.Tipo.VIDA && (g.lado < 0 || g.lado == lado) && (!g.ultimo || sozinho(lado));
+    }
+
+    /** A vida maior entre os dois da dupla de cada lado, e se os dois estão de pé (o gatilho vidaDupla). */
+    private float duplaJogador = 1f, duplaRival = 1f;
+    private boolean doisJogador, doisRival;
+
+    /**
+     * A cada quadro: a vida (fração) do mais inteiro da dupla de cada lado e se os dois da dupla
+     * estão de pé (no 1x1, falso: o gatilho vidaDupla não dispara).
+     */
+    public void vidasDasDuplas(float maiorJogador, boolean doisDePeJogador, float maiorRival, boolean doisDePeRival) {
+        duplaJogador = maiorJogador;
+        duplaRival = maiorRival;
+        doisJogador = doisDePeJogador;
+        doisRival = doisDePeRival;
     }
 
     /** Quem ainda tem parceiro de pé em cada lado (o gatilho {@code "ultimo"} espera ficar só um). */
@@ -1545,7 +1735,13 @@ public final class CinematicaLuta {
 
     /** O fim da luta espera: a cena está rodando ou é a do KO e ainda não começou. */
     public boolean seguraFimDaLuta() {
-        return estado == Estado.RODANDO || (estado == Estado.ARMADA && roteiro.gatilho.tipo == Gatilho.Tipo.KO);
+        if (estado == Estado.RODANDO) return true;
+        if (estado != Estado.ARMADA) return false;
+        if (roteiro.gatilho.tipo == Gatilho.Tipo.KO) return true;
+        for (Roteiro r : espera) {
+            if (r.gatilho.tipo == Gatilho.Tipo.KO) return true;
+        }
+        return false;
     }
 
     /** O controle está com a cena (o jogador não joga e a IA não pensa). */
@@ -1560,7 +1756,23 @@ public final class CinematicaLuta {
      */
     public boolean gatilho(float vidaJogador, float vidaRival, float segundos, boolean ko) {
         if (estado != Estado.ARMADA) return false;
-        Gatilho g = roteiro.gatilho;
+        if (dispara(roteiro.gatilho, vidaJogador, vidaRival, segundos, ko)) {
+            comecar();
+            return true;
+        }
+        for (int i = 0; i < espera.size(); i++) {
+            Roteiro r = espera.get(i);
+            if (!dispara(r.gatilho, vidaJogador, vidaRival, segundos, ko)) continue;
+            // A cena que esperava toca agora; a atual volta a esperar.
+            espera.set(i, roteiro);
+            roteiro = r;
+            comecar();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean dispara(Gatilho g, float vidaJogador, float vidaRival, float segundos, boolean ko) {
         boolean dispara;
         switch (g.tipo) {
             case INICIO:
@@ -1573,11 +1785,13 @@ public final class CinematicaLuta {
                 dispara = !ko && ((g.lado != RIVAL && vidaJogador <= g.valor && (!g.ultimo || sozinhoJogador))
                     || (g.lado != JOGADOR && vidaRival <= g.valor && (!g.ultimo || sozinhoRival)));
                 break;
+            case DUPLA:
+                dispara = !ko && (g.lado == JOGADOR ? doisJogador && duplaJogador <= g.valor : doisRival && duplaRival <= g.valor);
+                break;
             default:
                 dispara = ko;
                 break;
         }
-        if (dispara) comecar();
         return dispara;
     }
 
@@ -1709,8 +1923,16 @@ public final class CinematicaLuta {
                 break;
             case FALA:
                 if (conversa != null) {
-                    String quem = a.quem.equals("jogador") || a.quem.equals("rival") ? palco.emCampo(lado(a.quem)) : a.quem;
-                    if (quem != null) conversa.dizer(temporada, quem, naDireita(a), a.expressao, a.texto, a.segura);
+                    String quem = a.quem.equals("jogador") || a.quem.equals("rival") ? palco.emCampo(lado(a.quem))
+                        : a.quem.equals("parceiro") ? palco.parceiro(JOGADOR)
+                        : a.quem.equals("outroIrmao") ? outroIrmao() : a.quem;
+                    String texto = a.texto;
+                    if (texto.contains("{irmao}") && temporada != null) {
+                        // O nome do outro irmão no texto já traduzido.
+                        Temporada.Personagem p = temporada.elenco.get(outroIrmao());
+                        texto = temporada.t(texto).replace("{irmao}", p != null ? p.nome : outroIrmao());
+                    }
+                    if (quem != null) conversa.dizer(temporada, quem, naDireita(a), a.expressao, texto, a.segura);
                 }
                 break;
             case ONOMATOPEIA:
@@ -1728,6 +1950,7 @@ public final class CinematicaLuta {
                 velocidade.ir(a.valor, a.segundos);
                 break;
             case TERMINAR_LUTA:
+                lutaEncerrada = true;
                 estado = Estado.ACABOU;
                 travado = false;
                 palco.terminarLuta(a.vencedor);
@@ -1760,11 +1983,25 @@ public final class CinematicaLuta {
                     int de = a.porIrmao ? lado(Torneio.RYUGA) : JOGADOR;
                     float xa = de == JOGADOR ? xj : xr, xb = de == JOGADOR ? xr : xj;
                     animSentido = xb >= xa ? 1f : -1f;
-                    // As chaves com "x": "atual" começam onde cada um está agora.
+                    // As chaves com x da luta ("atual", "parede", "jogador", "rival", +N): onde
+                    // cada coisa está agora, no eixo da animação (+N vai para o lado do rival).
+                    // "parede" é a parede atrás do jogador (para onde a cena empurra); nada passa
+                    // das paredes.
+                    float[] paredes = palco.paredes();
+                    float parede = xj <= xr ? paredes[0] : paredes[1];
                     for (int lado = 0; lado < 2; lado++) {
-                        float x = (palco.xDoLutador(lado) - animMeio) * animSentido;
                         for (AnimacaoManual.Chave ch : trilha(a, lado)) {
-                            if (ch.xAtual) ch.x = x;
+                            if (ch.xRef == null) continue;
+                            float mundo;
+                            switch (ch.xRef) {
+                                case "parede": mundo = parede; break;
+                                case "jogador": mundo = xj; break;
+                                case "rival": mundo = xr; break;
+                                default: mundo = palco.xDoLutador(lado); break;
+                            }
+                            float x = mundo + ch.xRefMais * animSentido;
+                            x = Math.max(paredes[0] + 30f, Math.min(paredes[1] - 30f, x));
+                            ch.x = (x - animMeio) * animSentido;
                         }
                     }
                 }
@@ -1772,10 +2009,16 @@ public final class CinematicaLuta {
                 break;
             case IMPACTO:
                 impactar(a);
-                palco.impacto(a.forca, lado(a.quemMove));
+                palco.impacto(a.forca, lado(a.quemMove), a.tipoImpacto, a.noAlvo);
                 break;
             case STAMP:
                 bater(a);
+                break;
+            case PARCEIRO:
+                palco.entrarParceiro(lado(a.quemMove));
+                break;
+            case DANO:
+                palco.danoDaCena(lado(a.quemMove), a.valor);
                 break;
             case EFEITO:
                 palco.efeito(a.efeito, lado(a.quemMove), a.noPeito, a.dx, a.escala, a.atras);
@@ -1784,6 +2027,7 @@ public final class CinematicaLuta {
                 if (a.ligar) {
                     linhasEstilo = a.estilo;
                     linhasEscuro = a.escuro;
+                    linhasFundo = a.fundo;
                 }
                 linhas.ir(a.ligar ? 1f : 0f, a.segundos);
                 break;
@@ -2224,11 +2468,19 @@ public final class CinematicaLuta {
     /** O STAMP bate na tela: a luta congela embaixo dele enquanto ele fica. */
     private void bater(Acao a) {
         if (areaStamp.get(a) == null) return;
+        String caminho = a.imagem;
+        if (caminho.contains(LUTADOR)) {
+            String id = palco.lutadorEmCampo(JOGADOR);
+            caminho = id != null ? caminho.replace(LUTADOR, id) : null;
+            if (caminho == null || !imagensStamp.containsKey(caminho)) return;
+        }
+        stampImagem = caminho;
         stamp = a;
         stampDesde = time;
         stamps++;
         virando = false;
-        stampEspelhado = !a.viraPagina && a.ryugaNaArte != null && ryugaADireita() != a.ryugaNaArte.equals("direita");
+        stampEspelhado = !a.viraPagina && (a.ryugaNaArte != null && ryugaADireita() != a.ryugaNaArte.equals("direita") ||
+            a.jogadorNaArte != null && jogadorADireita() != a.jogadorNaArte.equals("direita"));
         congelaAte = Math.max(congelaAte, time + fimDoStamp(a));
         palco.som("impacto");
     }
@@ -2236,6 +2488,12 @@ public final class CinematicaLuta {
     /** Quando o STAMP {@code a} acaba de ficar batido (a descida e o tempo dele), desde que bateu. */
     private static float fimDoStamp(Acao a) {
         return STAMP_DESCE + a.segundos;
+    }
+
+    /** Quem está em campo do lado do jogador está à direita do rival agora. */
+    private boolean jogadorADireita() {
+        if (animando()) return xDaPose(animPose[JOGADOR]) > xDaPose(animPose[RIVAL]);
+        return palco.aDireita(JOGADOR);
     }
 
     /** O Ryūga está à direita do Kōga agora (na animação feita à mão, pelas poses). */
@@ -2252,7 +2510,7 @@ public final class CinematicaLuta {
             Episodio.Passo passo = paginaStamp.get(stamp);
             if (!virando && idade >= fimDoStamp(stamp) && passo != null && temporada != null) {
                 // A página abre já no quadro do STAMP; o quadro vai para o lugar dele nela.
-                RenderImage img = imagensStamp.get(stamp.imagem);
+                RenderImage img = imagensStamp.get(stampImagem);
                 guiada.beginNoQuadro(temporada, passo, img, img.width(), img.height(), stamp.quadro);
                 virando = true;
                 estouros.clear();
@@ -2270,6 +2528,7 @@ public final class CinematicaLuta {
             palco.continuarNaPagina(a.imagem, a.quadro);
         }
         // O que a cena ligou volta ao normal (tudo por baixo da página, que já cobre a tela).
+        lutaEncerrada = true;
         acabar();
         palco.terminarLuta(a.vencedor);
     }
@@ -2306,6 +2565,11 @@ public final class CinematicaLuta {
         focoJogador.ir(0f, 0.4f);
         focoRival.ir(0f, 0.4f);
         velocidade.zerar();
+        if (!lutaEncerrada && !espera.isEmpty()) {
+            // A luta segue: a próxima cena da luta fica esperando o gatilho dela.
+            roteiro = espera.remove(0);
+            estado = Estado.ARMADA;
+        }
     }
 
     /** A fala vai para a direita: o lado fixo do arquivo ou o lado da tela do lutador do time. */
@@ -2444,9 +2708,14 @@ public final class CinematicaLuta {
         float k = Math.max(linhas.valor(), linhasQte.valor());
         if (k <= 0.01f) return;
         boolean doRoteiro = linhas.valor() >= linhasQte.valor();
+        if (doRoteiro && linhasFundo) return;   // estas vão atrás dos lutadores (renderFundo)
         String estilo = doRoteiro ? linhasEstilo : "concentracao";
         float escuro = doRoteiro ? linhasEscuro : 0.35f;
         if (escuro > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(255f * escuro * k)));
+        if (estilo.equals("subir") || estilo.equals("descer")) {
+            desenharLinhasVerticais(c, estilo.equals("subir"), Tinta.withAlpha(WHITE, (int)(150f * k)), 1f);
+            return;
+        }
         if (estilo.equals("velocidade")) {
             int cor = Tinta.withAlpha(WHITE, (int)(150f * k));
             for (int i = 0; i < LINHAS_VELOCIDADE; i++) {
@@ -2485,6 +2754,78 @@ public final class CinematicaLuta {
     }
 
     /**
+     * O fundo das linhas "fundo": desenhado pela luta entre o cenário e os lutadores, na tela.
+     * O cenário some no preto e as linhas brancas correm por ele (velocidade de lado, subir e
+     * descer na vertical, concentração das bordas para o meio).
+     */
+    public void renderFundo(RenderCanvas c) {
+        float k = linhas.valor();
+        if (!linhasFundo || k <= 0.01f || linhasQte.valor() > k) return;
+        if (linhasEscuro > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(255f * linhasEscuro * k)));
+        int branco = Tinta.withAlpha(WHITE, (int)(210f * k));
+        switch (linhasEstilo) {
+            case "subir": desenharLinhasVerticais(c, true, branco, 1.6f); break;
+            case "descer": desenharLinhasVerticais(c, false, branco, 1.6f); break;
+            case "velocidade": {
+                for (int i = 0; i < LINHAS_VELOCIDADE * 2; i++) {
+                    Random r = new Random(4241L + i * 977L);
+                    float y = VH * (0.04f + 0.92f * r.nextFloat());
+                    float largo = VW * (0.25f + 0.35f * r.nextFloat());
+                    float grosso = 1.5f + r.nextFloat() * 4f;
+                    float veloc = VW * (0.8f + 0.6f * r.nextFloat());
+                    float faixa = VW + largo * 2f;
+                    float x = faixa - ((r.nextFloat() * faixa + time * veloc) % faixa) - largo;
+                    c.fillPolygon(new float[] {x, y, x + largo * 0.35f, y - grosso, x + largo, y, x + largo * 0.35f, y + grosso}, branco);
+                }
+                break;
+            }
+            default: {
+                float cx = VW * 0.5f, cy = VH * 0.47f;
+                float longe = (float)Math.hypot(VW, VH);
+                int quadro = (int)(time * 15f);
+                for (int i = 0; i < LINHAS_CONCENTRACAO; i++) {
+                    Random fixo = new Random(9157L + i * 331L);
+                    Random treme = new Random(quadro * 7919L + i);
+                    double ang = Math.PI * 2 * (i + fixo.nextFloat() * 0.6f) / LINHAS_CONCENTRACAO + treme.nextFloat() * 0.015f;
+                    float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+                    float dentro = 0.25f + fixo.nextFloat() * 0.25f + treme.nextFloat() * 0.05f;
+                    float x0 = cx + cos * VW * 0.5f * dentro, y0 = cy + sin * VH * 0.5f * dentro;
+                    float base = 2f + fixo.nextFloat() * 6f;
+                    float x1 = cx + cos * longe, y1 = cy + sin * longe;
+                    float nx = -sin * base, ny = cos * base;
+                    c.fillPolygon(new float[] {x0, y0, x1 + nx, y1 + ny, x1 - nx, y1 - ny}, branco);
+                }
+            }
+        }
+    }
+
+    /** O fundo preto das linhas cobre o cenário (a frente do cenário não aparece por cima dos dois). */
+    public float fundoPreto() {
+        return linhasFundo && linhasQte.valor() <= linhas.valor() ? linhas.valor() * linhasEscuro : 0f;
+    }
+
+    /**
+     * Riscos na vertical, afinando nas pontas: quem sobe vê o mundo passar para baixo (subir),
+     * quem cai, para cima (descer). Pelas laterais e pelo meio, mais finos no meio.
+     */
+    private void desenharLinhasVerticais(RenderCanvas c, boolean subir, int cor, float densidade) {
+        int n = Math.round(LINHAS_VELOCIDADE * densidade);
+        for (int i = 0; i < n; i++) {
+            Random r = new Random(7351L + i * 613L);
+            float x = VW * (0.02f + 0.96f * r.nextFloat());
+            float longo = VH * (0.35f + 0.4f * r.nextFloat());
+            float grosso = 1.5f + r.nextFloat() * 3.5f;
+            // Devagar o bastante para o olho seguir cada risco (mais rápido, eles saltavam de lugar
+            // a cada quadro e a tela parecia tremer: o dono, 18/11).
+            float veloc = VH * (0.9f + 0.6f * r.nextFloat());
+            float faixa = VH + longo * 2f;
+            float andou = (r.nextFloat() * faixa + time * veloc) % faixa;
+            float y = subir ? andou - longo : faixa - andou - longo;
+            c.fillPolygon(new float[] {x, y, x - grosso, y + longo * 0.35f, x, y + longo, x + grosso, y + longo * 0.35f}, cor);
+        }
+    }
+
+    /**
      * O STAMP batido: por cima da luta, do HUD e das faixas, por baixo dos quadros da conversa (a
      * fala de quem grita não some atrás do quadro de mangá) e das onomatopeias.
      */
@@ -2503,7 +2844,7 @@ public final class CinematicaLuta {
      * raios estouram em volta e o letreiro bate junto. Fica grudado, parado, e sai seco.
      */
     private void desenharStamp(RenderCanvas c, float idade) {
-        RenderImage img = imagensStamp.get(stamp.imagem);
+        RenderImage img = imagensStamp.get(stampImagem);
         float[] area = areaStamp.get(stamp);
         if (img == null || area == null) return;
         float depois = idade - STAMP_DESCE;
@@ -2637,7 +2978,7 @@ public final class CinematicaLuta {
             guiada.render(c, Tinta.clamp01((idade - fim - VIRA_MOVE) / VIRA_FUNDO));
             return;
         }
-        RenderImage img = imagensStamp.get(stamp.imagem);
+        RenderImage img = imagensStamp.get(stampImagem);
         float[] area = areaStamp.get(stamp);
         float[] de = poseDoStamp(img, area, fim);
         float[] bb = Layouts.caixa(area);

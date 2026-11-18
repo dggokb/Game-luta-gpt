@@ -129,6 +129,12 @@ public final class Episodio {
          */
         public List<String> ponte;
         /**
+         * {@code "cenasNaLuta"}: cenas a mais no meio da luta (caminhos dentro de historia/), que
+         * não a encerram: armadas junto com a {@link #cinematica}, cada uma com o gatilho dela. Vazio
+         * sem o campo.
+         */
+        public List<String> cenasNaLuta = Collections.emptyList();
+        /**
          * {@code "ondas": 3}: a luta é uma sequência de lutas seguidas contra duplas novas (os
          * agentes do "Sob a Mesma Lua"), com a vida da dupla do jogador passando de uma para a
          * outra. Conta como uma luta só (nível da CPU, campanha); perder recomeça da primeira.
@@ -411,6 +417,11 @@ public final class Episodio {
         }
         passo.nivelCpu = nivelCpu;
         passo.ponte = ids(map, "ponte");
+        List<String> cenas = ids(map, "cenasNaLuta");
+        if (cenas != null) {
+            if (tipo != TipoPasso.LUTA) throw new IllegalArgumentException("cenasNaLuta só em passo de luta");
+            passo.cenasNaLuta = cenas;
+        }
         passo.semPoderes = Boolean.TRUE.equals(map.get("semPoderes")) || passo.tutorial();
         passo.semShinkai = Boolean.TRUE.equals(map.get("semShinkai")) || passo.semPoderes;
         return passo;

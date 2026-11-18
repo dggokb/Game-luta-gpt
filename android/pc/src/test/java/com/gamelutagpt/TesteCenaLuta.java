@@ -55,7 +55,8 @@ public final class TesteCenaLuta {
 
         metodo("loadTemporada").invoke(jogo);
         RenderAssets assets = (RenderAssets)campo("ultraAssets").get(jogo);
-        Campanha campanha = Campanha.load(assets, 7L);
+        // -Psemente: o sorteio da chave (no torneio, quem é o adversário).
+        Campanha campanha = Campanha.load(assets, Long.getLong("gameluta.semente", 7L));
         campanha.restaurar(irmao, -1);
         PaginaHistoria historia = (PaginaHistoria)campo("historia").get(jogo);
         campo("storyMode").set(jogo, true);
@@ -88,6 +89,10 @@ public final class TesteCenaLuta {
             if (!bateu && (int)campo("introFrame").get(jogo) < 0 && !((BattleFlow)campo("flow").get(jogo)).holdsFighters() && quadro % 120 == 0) {
                 FighterState f = jogo.engine.fighter(GameView.PLAYER).state;
                 f.takeDamage(f.life - Math.round(f.profile.maxLife * vida), 0);
+                if (DUPLA) {
+                    // -Pdupla: os dois da dupla do jogador com essa vida (o gatilho vidaDupla).
+                    for (FighterState m : jogo.engine.team(GameView.PLAYER).members) m.life = Math.round(m.profile.maxLife * vida);
+                }
                 bateu = true;
             }
         }
@@ -97,7 +102,8 @@ public final class TesteCenaLuta {
         int noQte = 0, qtes = 0;
         boolean pedia = false;
         limite = 60 * 120;
-        while (!cena.acabou() && limite-- > 0) {
+        // Depois de uma cena do meio da luta a próxima fica armada: acabou quando parou de rodar.
+        while (!cena.acabou() && cena.rodando() && limite-- > 0) {
             boolean pede = cena.qtePedindo();
             if (pede && !pedia) {
                 noQte = 0;
@@ -122,8 +128,16 @@ public final class TesteCenaLuta {
             video = agora;
             passo((quadro % CADENCIA == 0 || pede && noQte == 12) && (!SO_ANIMACAO || cena.animando()));
         }
-        System.out.println("cena acabou no quadro " + quadro);
-        for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
+        System.out.println("cena acabou no quadro " + quadro + "; vida do jogador " +
+            jogo.engine.fighter(GameView.PLAYER).state.life + "/" + jogo.engine.fighter(GameView.PLAYER).state.profile.maxLife +
+            " (" + jogo.engine.fighter(GameView.PLAYER).state.character.id + ")");
+        // -Pdepois=N: N segundos da luta depois da cena, na cadência do resto (a luta voltando).
+        int depois = Integer.getInteger("gameluta.depois", 0);
+        if (depois > 0) {
+            for (int i = 0; i < 60 * depois; i++) passo(quadro % CADENCIA == 0 && !SO_ANIMACAO);
+        } else {
+            for (int i = 0; i < 60 * 3; i++) passo(i % 30 == 0 && !SO_ANIMACAO);
+        }
         System.exit(0);
     }
 
@@ -134,6 +148,7 @@ public final class TesteCenaLuta {
     /** Grava em JPG (-Pjpg=true): um décimo do PNG. */
     static final boolean JPG = Boolean.getBoolean("gameluta.jpg");
     static final boolean ERRA_PRIMEIRO = Boolean.getBoolean("gameluta.erraPrimeiro");
+    static final boolean DUPLA = Boolean.getBoolean("gameluta.dupla");
 
     static void passo(boolean gravar) throws Exception {
         avancar.invoke(jogo, CombatConfig.DT);

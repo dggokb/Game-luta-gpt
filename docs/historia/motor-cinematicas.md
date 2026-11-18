@@ -137,8 +137,8 @@ novo).
 | `trocar` | `segundos`, `lances` | os dois trocam golpes sem acertar, lance a lance ([abaixo](#troca-de-golpes)), com a câmera viva. Ninguém perde vida nem guarda. Com `semEsperar`, roda por baixo das falas; um `mover`, `golpe` ou o golpe de um QTE interrompe. Precisa do controle travado | `segundos` (no tempo da luta) e a vez em andamento acabar |
 | `golpe` | `quem` (padrão `jogador`), `golpe`, `dano`, `final`, `impacto` | um golpe do roteiro, sem QTE: quem bate corre até o outro e bate de verdade, com o dano do roteiro (ex.: o rival ataca primeiro e o QTE seguinte é o revide). Precisa do controle travado | o golpe acabar |
 | `clarao` | `segundos` (padrão 0,3), `cor` (padrão `#FFFFFF`) | clarão de impacto: a tela fica da cor e volta à luta (some mais rápido no começo). Esconde um corte, como o golpe que pega no anime | `segundos` |
-| `impacto` | `forca` (1 a 3, padrão 2), `quem` (quem bateu, padrão `jogador`), `congela`, `zoom`, `letreiro`, `stamp` | impacto de anime no contato entre os dois: a luta congela (0,12/0,2/0,32 s pela força), a câmera dá o tranco e é empurrada; o golpe defendido (1) solta a faísca de defesa da luta, o forte (2 e 3) o estouro de ar no ponto do contato; forte (2) também marca o chão debaixo de quem segurou e faz o close inclinado; o mais forte (3) ainda tem o impact frame em negativo. Vai logo depois de uma troca que acaba no contato | — |
-| `linhas` | `ligar` (padrão true), `estilo` (`concentracao` ou `velocidade`), `escuro` (0 a 1, padrão 0,35), `segundos` (padrão 0,12) | linhas de ação por cima da luta: as de concentração do mangá (riscos pretos das bordas para o meio, deixando os dois limpos) ou as de velocidade (riscos de lado a lado), com a luta escurecendo atrás. Mudam a cada dois quadros, como desenhadas à mão. Todo QTE já liga as de concentração enquanto pede | `segundos` |
+| `impacto` | `forca` (1 a 3, padrão 2), `quem` (quem bateu, padrão `jogador`), `congela`, `zoom`, `letreiro`, `stamp`, `tipo` (`defesa`, `acerto` ou `quebra`; padrão `defesa` na força 1, `acerto` nas outras), `onde` (`meio`, padrão, ou `alvo`: o efeito nasce em quem levou, como no golpe que joga na parede) | impacto de anime no contato entre os dois: a luta congela (0,12/0,2/0,32 s pela força), a câmera dá o tranco e é empurrada; o golpe defendido (1) solta a faísca de defesa da luta, o forte (2 e 3) o estouro de ar no ponto do contato; forte (2) também marca o chão debaixo de quem segurou e faz o close inclinado; o mais forte (3) ainda tem o impact frame em negativo. Vai logo depois de uma troca que acaba no contato | — |
+| `linhas` | `ligar` (padrão true), `estilo` (`concentracao`, `velocidade`, `subir` ou `descer`: riscos na vertical para quem é lançado para cima ou cai), `escuro` (0 a 1, padrão 0,35), `fundo` (true: atrás dos lutadores, o cenário some no preto e as linhas são brancas; `escuro` padrão 1), `segundos` (padrão 0,12) | linhas de ação por cima da luta: as de concentração do mangá (riscos pretos das bordas para o meio, deixando os dois limpos) ou as de velocidade (riscos de lado a lado), com a luta escurecendo atrás. Mudam a cada dois quadros, como desenhadas à mão. Todo QTE já liga as de concentração enquanto pede | `segundos` |
 | `animar` | `quadros`, `jogador`, `rival`, `eventos` ([abaixo](#animação-feita-à-mão)) | animação feita à mão: o motor de luta para e os dois seguem quadros-chave (pose, posição, esticamento, rotação, rastro) | os `quadros` acabarem |
 | `efeito` | `nome` (a pasta em `assets/efeitos`), `quem` (padrão `jogador`), `onde` (`pe` ou `peito`), `dx`, `escala`, `atras` | um efeito de vídeo no lutador: a poeira do arranque (`fumaca_dash_v05`), do pulo e do pouso, a fumaça da queda... `dx` à frente de onde ele olha; `atras` espelha (a poeira de quem escorrega para trás) | — |
 | `stamp` | `imagem`, `quadro`, `segundos`, `rotacao`, `viraPagina`, `vencedor` ([abaixo](#stamp-o-golpe-vira-mangá)) | um quadro de mangá batido na tela, com a cena congelada embaixo; com `viraPagina`, o quadro vira a página da história e a luta acaba | `segundos` (com `viraPagina`: a página assumir) |
@@ -490,6 +490,57 @@ página; o DING DONG é o quadro seguinte da leitura. As
 chaves são por irmão e começam com `"x": "atual"` (onde cada um está na luta, sem pular). A cena
 antiga, no motor de luta, ficou em `cinematica_treino_corrida.json` (é ela que o teste do motor usa).
 
+### Cenas no meio da luta (a luta continua)
+
+Além da `cinematica` do passo (a que pode encerrar a luta), o passo de luta aceita
+`"cenasNaLuta": ["torneio/cena_desistir.json"]`: cenas armadas junto, cada uma com o gatilho dela;
+a que disparar primeiro toca, e depois dela (se a luta continua) as outras seguem esperando. Uma
+cena dessas não leva `terminarLuta` (o teste confere): no fim o controle volta e a luta segue.
+
+Para servirem a qualquer adversário e às duas campanhas:
+
+| O quê | Como |
+|---|---|
+| Gatilho dos dois da dupla | `{"vidaDupla": 0.5, "lado": "jogador"}`: os dois da dupla desse lado de pé e com essa vida ou menos (não protege a vida, ao contrário do `vida`) |
+| Quem fala | `"jogador"` (quem está em campo), `"parceiro"` (o de fora, do lado do jogador), `"outroIrmao"` (o irmão que não está na dupla: no torneio ele assiste e grita de fora), além do elenco. `{irmao}` no texto vira o nome do outro irmão |
+| Troca na cena | `{"acao": "parceiro", "quem": "jogador"}`: o parceiro entra na hora no lugar de quem está em campo, no mesmo lugar (a cena esconde a troca: quem sai pula por cima da tela, quem entra chega de lá) |
+| Dano | `{"acao": "dano", "quem": "jogador", "valor": 0.03}`: quem está em campo perde essa fração da vida máxima, sem cair por isso |
+| Poses de qualquer lutador | `"HIT_STAND:0.5"` (a fração do clipe dele) e `"@H:acerta"` (o golpe H dele: `inicio`, `prepara`, `acerta` = o primeiro quadro que pega, `fim`, ou uma fração do golpe). Use os clipes que todos têm (IDLE, DASH, BACKDASH, JUMP, LAND, DEFENSE_STAND, HIT_STAND, HIT_AIR, KNOCKDOWN, GROUNDED, GETUP) e os golpes L, M, H, 2L, 2M, 2H, jL, jM, jH |
+| Posições da luta | `"x": "jogador+150"`, `"rival-80"`, `"parede+60"`, `"atual"`: onde aquilo estava quando a animação começou (+N para o lado do rival; `parede` é a parede atrás do jogador). Nada passa das paredes |
+
+A câmera com foco em alguém (`"foco": "jogador"`) sobe junto com a altura da pose dele: para
+um lançamento alto, foque quem foi lançado; sem foco, a câmera fica no chão.
+
+**STAMP de dano, por lutador.** Contra qualquer adversário o STAMP não mostra quem bate: só o
+nosso lutador apanhando, com fundo de mangá sem cenário. `{jogador}` no nome da arte vira o
+lutador em campo do lado do jogador na hora do golpe (`"imagem": "torneio/stamp_bam_{jogador}.jpg"`:
+`stamp_bam_player_base.jpg`, `_p02`, `_p03`, `_p04`), e `"jogadorNaArte": "esquerda"` espelha o
+quadro quando na luta ele está à direita. Sem a arte de quem está em campo, o STAMP não bate. As
+artes da cena "Já vai desistir?" (BAM no golpe que joga na parede, PAH no chão) foram geradas no
+Codex com a arte da seleção de cada um (o pedido em `art/vfx/prompt_stamp_dano_ryuga.txt`).
+As outras dessa cena, todas por lutador (`player_base`, `p02`, `p03`, `p04`) e no mesmo jeito:
+`stamp_pah_` (de costas, como no jogo) e `stamp_grito_` (`art/vfx/prompt_stamp_pah_grito_ryuga.txt`),
+`stamp_voadora_` (a voadora do parceiro na guarda, de perfil: a primeira leva, com o pé gigante em
+primeiro plano, foi reprovada; `art/vfx/prompt_stamp_voadora_ryuga.txt`). Fora delas,
+`stamp_fora_{outroIrmao}.jpg` (o irmão que não está na dupla gritando da arquibancada;
+`{outroIrmao}` vira `ryuga` ou `koga`; `art/vfx/prompt_stamp_fora.txt`) e `stamp_locutor.jpg` (o
+narrador do torneio no microfone; `art/vfx/prompt_stamp_locutor.txt`). O narrador está no elenco
+da temporada (`"narrador"`), então fala com retrato (`historia/retratos/narrador_<expressao>.png`).
+
+A primeira é a do torneio (`torneio/cena_desistir.json`, gerada por `tools/cenas/torneio_desistir.py`,
+na primeira luta do torneio do Episódio 4): quando os dois da dupla chegam a 50%, o adversário abre
+com um golpe, provoca, investe (um defendido, o GUARD BREAK, dois que pegam) e joga quem está em campo
+na parede (BAM, voo no fundo preto); no meio da investida seguinte o parceiro pede a troca e chega
+antes com a voadora na guarda dele (STAMP); a rasteira o lança para cima, três chutes no ar e o golpe
+que o crava no chão (queda no fundo preto, PAH, quica com ARGH); o outro irmão grita de fora, o
+parceiro levanta, grita (STAMP) e os dois trocam cinco golpes no meio da arena, pulam para trás e
+ficam simétricos ao meio da tela; o locutor fecha ("QUE SEQUÊNCIA FOI ESSA, MEUS AMIGOS!") e a luta
+continua. Para jogar no PC:
+`gradle :pc:testeCena -Pepisodio=ep04 -Pmarca=torneio-1 -Pirmao=ryuga -Pvida=0.49 -Pdupla=true`
+(`-Psemente=N` sorteia outro adversário; `-Pdepois=12` grava 12 s da luta depois da cena). O teste
+começa a luta já com 49%: a fala de abertura do locutor da luta, o GO! e o relógio cheio que aparecem
+depois da cena são do teste, não da cena (no jogo ela dispara no meio da luta).
+
 ### O teste dos QTE (convite do Episódio 2)
 
 `historia/ep02/cinematica_convite_ryuga.json`, na luta CONVITE da campanha do Ryūga (Ryūga ×
@@ -607,3 +658,27 @@ nome de cada QTE também, e os textos fixos do QTE (dicas, BOA!, ERROU!) já est
 | Testes | `story-core/.../CinematicaLutaTest.java` (arquivos, linha do tempo, os QTE do convite, a briga dos irmãos animada nas duas campanhas), `app/src/test/.../CinematicaDirectorTest.java` (movimentos e golpes no motor de luta) |
 | A luta do teste de QTE jogada no PC | `android/pc/src/test/.../TesteQteConvite.java` (`gradle :pc:testeQte`) |
 | Prévia no PC | `android/pc-preview/.../CinematicaPreview.java` (`gradle :pc-preview:runCinematica`) |
+
+## Lançamento no fundo preto (padrão)
+
+Aprovado pelo dono na cena "Já vai desistir?" (18/11: "salva esses lançamentos como padrão, porque
+vai ter bastante"). Quem é lançado (para a parede, para cima) ou cai fica **sozinho no meio da
+tela**: o cenário some num fundo preto, as linhas de ação brancas correm atrás dele no sentido do
+voo, e o outro lutador some. No contato (a parede, o chão) o cenário volta de uma vez e o impacto
+bate ali (`"onde": "alvo"`), muitas vezes com o STAMP.
+
+Nas cenas geradas em Python use `tools/cenas/lances.py`:
+
+```python
+from lances import voo_no_fundo_preto, sumir
+voo_no_fundo_preto(ev, q + 8, q + 30, 'velocidade')      # 'velocidade', 'subir' ou 'descer'
+sumir(R, q + 8, q + 30, '@H:fim', 'jogador+0')            # o outro some e volta em q + 31
+J.k(q + 30, 'HIT_AIR:0.5', 'parede+60', y=110, rot=-25, curva='sai', rastro=7)
+```
+
+Por baixo é a ação `linhas` com `"fundo": true` e a câmera presa em quem voa (`camera` com `foco`
+e `segundos` 0). Com o fundo preto a câmera não para na borda do mundo e põe o centro do giro da
+pose (90 acima dos pés) no meio da tela, então quem está de ponta-cabeça também fica centrado. Uma
+câmera lenta no voo (`velocidade` 0,45 a 0,5) dá o peso. Exemplo completo:
+`tools/cenas/torneio_desistir.py` (o voo até a parede e a queda do combo aéreo).
+

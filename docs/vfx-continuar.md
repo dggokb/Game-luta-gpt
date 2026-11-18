@@ -2005,3 +2005,32 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   que viaja nas fichas da Yin-lu, da Natisuko e da Bonnie; o quadro de quem tem o quê e o foco na
   jogabilidade em `personagens/README.md`; as tabelas "No jogo hoje" geradas de novo.
 - **Ficou:** o Super no combo só conferido no teste, sem vídeo.
+
+## 18/11 — cena "Já vai desistir?" (torneio), rodada 4
+
+- **Pedido do dono (vídeo v3):** a cena abre com um golpe de alguém; os quatro da investida mais
+  rápidos, com quebra de guarda; o efeito da parede no meio da tela; fundo preto com linhas no
+  lançamento e na queda; linhas verticais na subida; o combo aéreo com efeito de acerto (não de
+  defesa); a troca durante a investida dele, com STAMP da voadora; o quique com ARGH depois do PAH;
+  levantar mais rápido; os dois mais longe na troca de golpes e ao se separar; STAMP do locutor.
+- **Feito:** `linhas` com `fundo` (preto atrás dos lutadores, desenhado pela luta entre o cenário e
+  os corpos) e os estilos `subir`/`descer`; `impacto` com `tipo` (`quebra` usa o GUARD BREAK da luta)
+  e `onde: alvo`. STAMPs novos do Codex: `stamp_voadora_<lutador>` (a primeira leva, com o pé gigante
+  em primeiro plano, foi reprovada: "artes saíram bem ruins"; a segunda é de perfil) e
+  `stamp_locutor`. O narrador entrou no elenco da temporada (fala com retrato).
+- **Vídeos:** `android/pc/build/torneio_desistir_v4_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 5 (mesmo dia):** o dono: no lançamento e na queda o adversário não aparece, e quem voa
+  fica no meio da tela; no fim, os dois longe, cada um de um lado, simétricos ao meio. Feito: o
+  adversário some (alfa 0) nos dois trechos de fundo preto, a câmera vai presa no lutador (no fundo
+  preto ela não para na borda do mundo), e a troca final acontece mais para o meio da arena.
+  Vídeos `torneio_desistir_v5_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 6:** quem cai no fundo preto não estava no meio (de ponta-cabeça o peito fica embaixo):
+  a câmera agora centra o centro do giro da pose. A "tremedeira" que o dono notou: medi os vídeos
+  e a câmera fica parada fora do STAMP, do GUARD BREAK e dos impactos (tremidas de propósito); o que
+  pulava de quadro em quadro eram as linhas do fundo preto, rápidas demais. Ficaram mais lentas e
+  longas. O lançamento virou padrão: `tools/cenas/lances.py` e "Lançamento no fundo preto" em
+  `docs/historia/motor-cinematicas.md`. Vídeos `torneio_desistir_v6_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 7:** "ainda tem uma tremedeira, constante do 8 até o final". Era a tremida de tela do
+  GUARD BREAK (`beamShake`): ela só diminuía no passo da luta, que fica parado na animação à mão, e
+  a tela tremia 1 a 3 px até o fim da cena. Agora diminui também no passo da cinemática. Medido nos
+  quadros: parada de novo. Vídeos `torneio_desistir_v7_{ryuga,koga}.mp4`. Visto só no PC.
