@@ -58,64 +58,93 @@ Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art
 O jogo usa: a batida de costas (0,4-0,8 s), o quique (0,8-1,4 s) e a queda de volta
 (1,4-1,8 s). O caído e o levantar já existem.
 
-## 3. O giro de nocaute do Ryūga: FEITO (18/11), vídeo H3 com o fim caído
+## 3. O giro de nocaute (`HIT_SPIN` + `HIT_SPIN_POUSO`): a receita que funcionou
 
-**O que funcionou** (o dono: "acho que conseguimos"): o pedido abaixo com a imagem inicial
-`inicio_gancho_h3` (o gancho torcendo, mais à frente) e a final `fim_caido_h3` (o GROUNDED na escala
-do H3, mais atrás). O vídeo está em `art/sprites/source/player_base_hit_spin_video.mp4`.
-No jogo: `HIT_SPIN` (0,04-2,0 s, 24 quadros de 40 ms: o soco, o arremesso e o rolo em parafuso) no
-voo do giro (`CombatFighter.spinning`: contra-golpe de punição, voadora da troca, choque de SHINKAI),
-no lugar do estreitar falso; `HIT_SPIN_POUSO` (2,04-2,6 s, 7 quadros: bate de costas e assenta) na
-queda, e depois o GROUNDED. A base do corpo na raiz em todos os quadros (o arco é da física do jogo).
-Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`. **Para os outros: o mesmo pedido**, com o
-gancho e o caído de cada um.
+| Lutador | Giro | Vídeo do giro | Imagens (`art/keys/<pacote>/`) |
+|---|---|---|---|
+| Ryūga (`player_base`) | FEITO 18/11 | `player_base_hit_spin_video.mp4` | `p01/inicio_gancho_h3.png` → `p01/fim_caido_h3.png` |
+| Yin-lu (`p02`) | FEITO 18/11 (e a queda nova) | `p02_hit_spin_video.mp4` | `inicio_giro_h3.png` → `fim_caido_h3.png` |
+| Natisuko (`p15`) | FEITO 18/11 | `p15_hit_spin_video.mp4` | `inicio_giro_h3.png` → `fim_caido_h3.png` |
+| Bonnie (`p16`) | FEITO 18/11 | `p16_hit_spin_video.mp4` | `inicio_giro_h3.png` → `fim_caido_h3.png` |
+| Kōga (`p03`), Brucy (`p04`) e os outros | falta | | |
 
-**Yin-lu (18/11): FEITO, a queda nova e o giro.** O giro (`art/sprites/source/p02_hit_spin_video.mp4`, com o pedido abaixo) virou HIT_SPIN (quadros 5-64) e HIT_SPIN_POUSO (66-78) por `tools/sprites/giro_h3.py p02`; conferido no jogo com `... -Pcontra=p02 -Pgiro=1 -PgiroAlvo=rival`. A queda: O vídeo H3 "Derrubado" dela
-(`art/sprites/source/p02_derrubado_h3_video.mp4`) virou KNOCKDOWN (quadros 10-28: voa e bate de
-costas; o quique é o do jogo), GROUNDED (31-45) e GETUP (81-99), montados por
-`tools/sprites/p02_derrubado_h3.py` (escala 391/469: a guarda do vídeo = o IDLE da folha; a raiz
-fixa nos pés do 1º quadro). Conferido no jogo com
-`gradle :pc:testeCena -Pepisodio=ep04 -Pmarca=torneio-1 -Pcontra=p02 -Pgiro=1 -PgiroAlvo=rival -Pqueda`.
-As imagens do giro: `art/keys/p02/inicio_giro_h3.png` (a guarda nova 300 px à frente) e
-`art/keys/p02/fim_caido_h3.png` (o caído do quadro 45, 370 px atrás, no chão da guarda). O pedido:
+(Os vídeos ficam em `art/sprites/source/`.)
+
+**Onde o jogo usa** (sozinho, para quem tiver os clipes; quem não tem fica no giro antigo, o corpo
+estreitando): o voo do giro (`CombatFighter.spinning`: contra-golpe de punição, voadora da troca,
+quem perde o choque de SHINKAI) toca `HIT_SPIN` e segura o último quadro até o chão; ao cair toca
+`HIT_SPIN_POUSO` (bate de costas e assenta) e passa ao `GROUNDED` e ao `GETUP` de sempre
+(`GameView.reactionState`). Na cena "Já vai desistir?" o voo para a parede e a queda no fundo preto
+usam os mesmos clipes, com a pose antiga de reserva (`senao`) para quem não tem.
+
+**O segredo:** o vídeo tem de **terminar deitado de costas** (o caído do jogo como imagem final).
+Todos os pedidos que terminavam em pé saíram com o corpo em pé (pião duro, sem rolo); com o fim
+deitado o H3 é obrigado a deitar o corpo no ar e sai o rolo em parafuso de verdade.
+
+**Passo a passo, para um lutador novo:**
+
+1. **A queda dele tem de ser da arte nova** (o caído de costas, cabeça para a esquerda). Se for da
+   arte antiga, primeiro o vídeo H3 "Derrubado: cair, caído e levantar" (o pedido está na ficha
+   `docs/personagens/<pacote>.md`, imagem inicial e final = `inicio_centro_h3`); ele troca a queda
+   antiga (exemplo: `tools/sprites/p02_derrubado_h3.py`, a Yin-lu) e dá o caído de costas.
+2. **As duas imagens** (1344x768, o fundo verde da chave):
+   - inicial `art/keys/<pacote>/inicio_giro_h3.png`: a guarda `inicio_centro_h3` (ou `inicio_centro`
+     se ela já for 1344x768) 300 px para a direita;
+   - final `art/keys/<pacote>/fim_caido_h3.png`: o caído de costas na escala do vídeo, encostado na
+     borda esquerda (x ≈ 30), a base no chão da guarda (y ≈ 733). Do vídeo "Derrubado" (um quadro
+     já deitado e parado) ou do último quadro do GROUNDED da folha HD (`<pacote>_fall_down_video_hd.png`)
+     aumentado ÷ 0,822 (a folha é 0,822 do vídeo).
+3. **O vídeo:** MiniMax H3 Fast, 5 s, 768p, as duas imagens como início e fim, o pedido abaixo.
+4. **No jogo:** olhe a folha de contato do vídeo e anote o quadro em que o soco já torceu (pule o
+   clarão), o último do voo antes de bater de costas e o da batida. Ponha o pacote em `PACOTES` de
+   `tools/sprites/giro_h3.py` (escala = altura do IDLE da folha ÷ altura da guarda no vídeo, ≈ 0,82;
+   voo = 24 quadros entre o começo e o fim do voo; pouso = 7 quadros de 2 em 2 a partir da batida) e
+   rode `python3 tools/sprites/giro_h3.py <pacote>`. Crie os dois clipes
+   `tools/sprites/clips/<pacote>_hit_spin.json` e `_hit_spin_pouso.json` (copie os da `p15`), ponha
+   `HIT_SPIN` (24 quadros de 40 ms) e `HIT_SPIN_POUSO` (7 de 50 ms) no `characters/<pacote>/character.json`
+   e rode `python3 tools/sprites/build_characters.py --write` e
+   `python3 tools/sprites/normal_map.py <pacote>_hit_spin <pacote>_hit_spin_pouso`.
+5. **Conferir:** `gradle :pc:testeCena -Pepisodio=ep04 -Pmarca=torneio-1 -Pcontra=<pacote> -Pgiro=1
+   -PgiroAlvo=rival -Pcadencia=2 -Pjpg=true -Psaida=<pasta>` (o rival leva o giro uma vez, gravando;
+   `-Pqueda` faz uma queda comum, para conferir KNOCKDOWN/GROUNDED/GETUP). Para o Ryūga ou o Kōga,
+   sem `-Pcontra` e sem `-PgiroAlvo`.
+
+**O pedido** (ela; para ele troque she/her por he/his). Troque três coisas: o lutador na 1ª frase
+("kung fu fighter", "karate fighter", "clown martial artist", "martial artist"), o que esvoaça no
+rolo (`<whip>`) e a última frase pelo "Keep ..." da ficha dele:
 
 ```
-Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the kung fu fighter from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the <fighter> from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
 This is the classic SPINNING KNOCKDOWN of 1990s Street Fighter games: a devastating invisible punch twists her body; she is lifted off the ground and thrown backward through the air to the LEFT, and while flying her body TILTS from diagonal to horizontal and ROLLS around its own head-to-toe axis like a corkscrew, then she crashes flat on her back exactly as in the end frame.
 [0-0.3s] A devastating invisible punch hits her face: her body twists hard to the side, her head snaps back, her hair whips.
-[0.3-1.6s] Her feet leave the ground and she flies backward to the LEFT in a low arc, head first. Her body leans further back with every moment until it is horizontal, and at the same time it ROLLS around its long axis one and a half turns: we see her chest, then her side, then her BACK, then her side, then her chest again. Her legs stay together and stretched, her arms are loose and flung around by the roll, her hair and the ends of her orange sash whip with the spin.
+[0.3-1.6s] Her feet leave the ground and she flies backward to the LEFT in a low arc, head first. Her body leans further back with every moment until it is horizontal, and at the same time it ROLLS around its long axis one and a half turns: we see her chest, then her side, then her BACK, then her side, then her chest again. Her legs stay together and stretched, her arms are loose and flung around by the roll, <whip> with the spin.
 [1.6-2s] She crashes flat on her back on the ground, face up, head on the LEFT and feet on the right, exactly as in the end frame.
 [2-5s] She lies still on her back exactly as in the end frame, breathing.
 She never stands up again, never lands on her feet, never flips head over heels and never cartwheels. Her whole body stays inside the frame. She never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
-Keep her face, silver-lavender hair, headband, top, orange sash, gloves, pants, sneakers, colors, line art and size exactly as in the frames; her size never changes.
+<Keep ... da ficha>
 ```
 
-**Natisuko e Bonnie (18/11): imagens prontas, falta o vídeo do giro.** A queda delas já é da arte
-nova (H3), então não precisa do "Derrubado": `art/keys/p15|p16/inicio_giro_h3.png` (a guarda 300 px
-à frente) e `fim_caido_h3.png` (o último GROUNDED da folha HD, de volta à escala do vídeo, ÷0,822, na
-borda esquerda, no chão da guarda). O pedido é o da Yin-lu trocando a primeira frase ("karate
-fighter" / "clown martial artist"), o que esvoaça (o rabo de cavalo e a faixa preta / o rabo de
-cavalo, o laço e os laços da cintura) e a última frase pela do "Keep" da ficha de cada uma.
+O que já foi usado em `<whip>`: Yin-lu "her hair and the ends of her orange sash whip"; Natisuko "her
+long ponytail and the ends of her black belt whip"; Bonnie "her red ponytail, its bow and her waist
+bows whip". O do Ryūga foi a variação abaixo, com a imagem inicial já torcida pelo gancho (o 1º
+trecho diz "The start frame: his body twisted by the punch, head snapped to the side.").
 
-**Kōga e Brucy: ainda não.** As reações deles (apanhar em pé, cair, caído,
-levantar) são da arte antiga (o dono, 18/11: "não foi dos novos"), e as imagens do giro têm de sair
-da arte nova. A ordem: (1) o vídeo H3 "Derrubado: cair, caído e levantar" de cada um (o pedido está
-na ficha: `docs/personagens/p02.md`, `p03.md`, `p04.md`, "Prompts do que falta"), que também troca a
-queda antiga (e o caído de pernas para cima do Kōga); (2) dele sai a imagem final (o caído de costas)
-e a inicial (a guarda nova mais à frente, ou o quadro torcido do "Apanhar em pé" H3, se feito);
-(3) o vídeo do giro com o mesmo pedido. O Brucy ainda não tem as chaves H3 (`inicio_centro_h3`).
+**A queda nova da Yin-lu (18/11):** o vídeo H3 "Derrubado" (`p02_derrubado_h3_video.mp4`) virou
+KNOCKDOWN (quadros 10-28: voa e bate de costas; o quique é o do jogo, então o do vídeo fica de fora),
+GROUNDED (31-45) e GETUP (81-99) por `tools/sprites/p02_derrubado_h3.py` (escala 391/469; a raiz
+fixa nos pés do 1º quadro, o deslocamento do vídeo fica no desenho).
+
+**Kōga e Brucy:** as reações deles são da arte antiga, então começam pelo passo 1. O Brucy ainda não
+tem as chaves H3 (`inicio_centro_h3`); o caído do Kōga tem as pernas para cima (o "Derrubado" também
+corrige isso).
+
+### Histórico do giro (o que não funcionou)
 
 **Antes (reprovados):** o pião do H3 inclinado aos poucos (montagem), os 12 desenhos do Codex (outro
 traço) e os vídeos que terminavam em pé.
 
-**Montado ainda não rola (o dono: "precisamos realmente fazer a animação correta").** O erro comum
-dos pedidos de vídeo: todos terminavam na guarda em pé, o que obriga o gerador a manter o corpo em pé.
-**O pedido abaixo termina caído de costas**, como o movimento termina de verdade:
-`art/keys/p01/inicio_gancho_h3.png` (o gancho torcendo o corpo, pés no chão, do 3º vídeo) →
-`art/keys/p01/fim_caido_h3.png` (o caído do jogo, GROUNDED, na escala dos vídeos, mais à esquerda).
-
-**Giro de nocaute com fim deitado** (`inicio_gancho_h3` → `fim_caido_h3`; o vídeo de referência
-do dono junto, se a ferramenta aceitar)
+**O pedido do Ryūga** (`inicio_gancho_h3` → `fim_caido_h3`; o gancho torcendo o corpo, pés no chão,
+tirado do 3º vídeo, 300 px à frente; o GROUNDED na escala do vídeo, mais à esquerda):
 ```
 Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the martial artist from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
 This is the classic SPINNING KNOCKDOWN of 1990s Street Fighter games: a devastating punch has just twisted his body (the start frame); he is lifted off the ground and thrown backward through the air to the LEFT, and while flying his body TILTS from diagonal to horizontal and ROLLS around its own head-to-toe axis like a corkscrew, then he crashes flat on his back exactly as in the end frame.
@@ -126,9 +155,6 @@ This is the classic SPINNING KNOCKDOWN of 1990s Street Fighter games: a devastat
 He never stands up again, never lands on his feet, never flips head over heels and never cartwheels. His whole body stays inside the frame. He never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
 Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art and size exactly as in the frames; his size never changes.
 ```
-
-**Para os outros (Yin-lu, Kōga, Brucy):** o mesmo caminho, com a mesma referência e os sprites de
-cada um como modelo.
 
 **Nomes do movimento** (pesquisados): no SF6 a wiki SuperCombo chama de "tailspin" e a comunidade
 japonesa de きりもみダウン ("kirimomi down"); no Tekken, Screw (7) e Tornado (8).

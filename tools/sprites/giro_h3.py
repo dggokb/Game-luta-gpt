@@ -39,6 +39,20 @@ PACOTES = {
         'voo': [round(5 + i * 59 / 23) for i in range(24)],
         'pouso': list(range(66, 79, 2)),
     },
+    'p15': {
+        'video': 'art/sprites/source/p15_hit_spin_video.mp4',
+        'escala': 483 / 586,
+        # 5-57: o soco torce e o voo com o rolo; bate de costas no 59.
+        'voo': [round(5 + i * 52 / 23) for i in range(24)],
+        'pouso': list(range(59, 72, 2)),
+    },
+    'p16': {
+        'video': 'art/sprites/source/p16_hit_spin_video.mp4',
+        'escala': 441 / 537,
+        # 10-76: depois do clarão do soco (7-9), o voo com o rolo; bate de costas no 78.
+        'voo': [round(10 + i * 66 / 23) for i in range(24)],
+        'pouso': list(range(78, 91, 2)),
+    },
 }
 
 
