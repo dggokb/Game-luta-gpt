@@ -15,8 +15,10 @@ class Lutador:
     def k(self, q, pose, x=None, **kw):
         """Uma chave no quadro q; x sem valor repete o último; x "atual": onde o lutador está
         quando a animação começa (só nas primeiras chaves, antes de um x de número)."""
-        if x == 'atual':
-            c = {'q': q, 'x': 'atual', 'pose': pose}
+        if isinstance(x, str):
+            # x da luta, resolvido pelo jogo quando a animação começa ("atual", "parede+40",
+            # "jogador+150", "rival-80"): a cena serve a qualquer posição na arena.
+            c = {'q': q, 'x': x, 'pose': pose}
             for nome, v in kw.items():
                 c[nome] = v
             self.chaves.append(c)

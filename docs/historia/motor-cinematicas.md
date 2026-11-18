@@ -490,6 +490,33 @@ página; o DING DONG é o quadro seguinte da leitura. As
 chaves são por irmão e começam com `"x": "atual"` (onde cada um está na luta, sem pular). A cena
 antiga, no motor de luta, ficou em `cinematica_treino_corrida.json` (é ela que o teste do motor usa).
 
+### Cenas no meio da luta (a luta continua)
+
+Além da `cinematica` do passo (a que pode encerrar a luta), o passo de luta aceita
+`"cenasNaLuta": ["torneio/cena_desistir.json"]`: cenas armadas junto, cada uma com o gatilho dela;
+a que disparar primeiro toca, e depois dela (se a luta continua) as outras seguem esperando. Uma
+cena dessas não leva `terminarLuta` (o teste confere): no fim o controle volta e a luta segue.
+
+Para servirem a qualquer adversário e às duas campanhas:
+
+| O quê | Como |
+|---|---|
+| Gatilho dos dois da dupla | `{"vidaDupla": 0.5, "lado": "jogador"}`: os dois da dupla desse lado de pé e com essa vida ou menos (não protege a vida, ao contrário do `vida`) |
+| Quem fala | `"jogador"` (quem está em campo), `"parceiro"` (o de fora, do lado do jogador), `"outroIrmao"` (o irmão que não está na dupla: no torneio ele assiste e grita de fora), além do elenco. `{irmao}` no texto vira o nome do outro irmão |
+| Troca na cena | `{"acao": "parceiro", "quem": "jogador"}`: o parceiro entra na hora no lugar de quem está em campo, no mesmo lugar (a cena esconde a troca: quem sai pula por cima da tela, quem entra chega de lá) |
+| Dano | `{"acao": "dano", "quem": "jogador", "valor": 0.03}`: quem está em campo perde essa fração da vida máxima, sem cair por isso |
+| Poses de qualquer lutador | `"HIT_STAND:0.5"` (a fração do clipe dele) e `"@H:acerta"` (o golpe H dele: `inicio`, `prepara`, `acerta` = o primeiro quadro que pega, `fim`, ou uma fração do golpe). Use os clipes que todos têm (IDLE, DASH, BACKDASH, JUMP, LAND, DEFENSE_STAND, HIT_STAND, HIT_AIR, KNOCKDOWN, GROUNDED, GETUP) e os golpes L, M, H, 2L, 2M, 2H, jL, jM, jH |
+| Posições da luta | `"x": "jogador+150"`, `"rival-80"`, `"parede+60"`, `"atual"`: onde aquilo estava quando a animação começou (+N para o lado do rival; `parede` é a parede atrás do jogador). Nada passa das paredes |
+
+A câmera da luta não sobe: no ar, mantenha a altura baixa (até uns 90 px) para ninguém sair do quadro.
+
+A primeira é a do torneio (`torneio/cena_desistir.json`, gerada por `tools/cenas/torneio_desistir.py`,
+na primeira luta do torneio do Episódio 4): quando os dois da dupla chegam a 50%, o adversário provoca,
+joga quem está em campo na parede, o parceiro entra com a voadora, apanha no ar e cai (PAH!); o outro
+irmão grita de fora, o parceiro levanta, cinco golpes trocados e a luta continua. Para jogar no PC:
+`gradle :pc:testeCena -Pepisodio=ep04 -Pmarca=torneio-1 -Pirmao=ryuga -Pvida=0.49 -Pdupla=true`
+(`-Psemente=N` sorteia outro adversário).
+
 ### O teste dos QTE (convite do Episódio 2)
 
 `historia/ep02/cinematica_convite_ryuga.json`, na luta CONVITE da campanha do Ryūga (Ryūga ×

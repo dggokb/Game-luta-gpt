@@ -32,6 +32,14 @@ public final class AnimacaoManual {
         public float x, altura, sx = 1f, sy = 1f, graus, alfa = 1f;
         public int rastro;
         public boolean vira;
+        /**
+         * Pose que serve a qualquer lutador (cada um tem os desenhos dele): {@link #fracao} de 0 a 1
+         * do clipe ({@code "HIT_STAND:0.5"}), ou -1; {@link #fase} de um golpe do lutador quando o
+         * clipe é {@code "@H"} (o golpe H dele): inicio, prepara, acerta, fim, ou uma fração do golpe.
+         * O jogo resolve no desenho de quem está em campo.
+         */
+        public float fracao = -1f;
+        public String fase;
 
         /** Fica igual a {@code de} (a pose do QTE guardada enquanto o erro toca). */
         public void copiar(Pose de) {
@@ -45,6 +53,8 @@ public final class AnimacaoManual {
             alfa = de.alfa;
             rastro = de.rastro;
             vira = de.vira;
+            fracao = de.fracao;
+            fase = de.fase;
         }
     }
 
@@ -65,6 +75,16 @@ public final class AnimacaoManual {
          * luta sem pular; só na animação que não continua outra).
          */
         boolean xAtual;
+        float fracao = -1f;
+        String fase;
+        /**
+         * x que depende da luta, resolvido quando a animação começa: {@code "atual"} (onde o
+         * lutador está), {@code "parede"} (a parede atrás dele), {@code "jogador"} ou {@code "rival"}
+         * (onde esse lado está), com um deslocamento: {@code "parede+60"}, {@code "jogador+150"}
+         * (positivo: para o lado do rival). Null: o x é o número.
+         */
+        String xRef;
+        float xRefMais;
         /** Como chega nesta chave: linear, sai (rápido no começo), entra (rápido no fim), corte (pula). */
         String curva = "linear";
     }
@@ -94,7 +114,17 @@ public final class AnimacaoManual {
             c.q = (int)num(m, "q", 0f);
             if (c.q < antes) throw new IllegalArgumentException("animar: as chaves de " + quem + " fora de ordem (q " + c.q + ")");
             antes = c.q;
-            c.xAtual = "atual".equals(m.get("x"));
+            Object xv = m.get("x");
+            if (xv instanceof String) {
+                String ref = ((String)xv).replace(" ", "");
+                java.util.regex.Matcher mx = java.util.regex.Pattern.compile("(atual|parede|jogador|rival)([+-][0-9.]+)?").matcher(ref);
+                if (!mx.matches()) {
+                    throw new IllegalArgumentException("animar: x " + xv + " (um número, ou atual, parede, jogador ou rival, com +N ou -N)");
+                }
+                c.xRef = mx.group(1);
+                c.xRefMais = mx.group(2) != null ? Float.parseFloat(mx.group(2)) : 0f;
+                c.xAtual = c.xRef.equals("atual");
+            }
             c.x = num(m, "x", 0f);
             c.y = num(m, "y", 0f);
             c.sx = num(m, "sx", 1f);
@@ -113,7 +143,17 @@ public final class AnimacaoManual {
             if (pose == null) throw new IllegalArgumentException("animar: chave de " + quem + " sem \"pose\" (ex.: \"DASH:5\")");
             int dois = pose.indexOf(':');
             c.clip = dois < 0 ? pose : pose.substring(0, dois);
-            c.quadro = dois < 0 ? 0 : Integer.parseInt(pose.substring(dois + 1));
+            String depois = dois < 0 ? "0" : pose.substring(dois + 1);
+            if (depois.matches("[0-9]+")) {
+                c.quadro = Integer.parseInt(depois);
+            } else if (depois.matches("[01]?\\.[0-9]+|1|0")) {
+                c.fracao = Float.parseFloat(depois);
+            } else if (c.clip.startsWith("@") && depois.matches("inicio|prepara|acerta|fim")) {
+                c.fase = depois;
+            } else {
+                throw new IllegalArgumentException("animar: pose " + pose + " (CLIPE:quadro, CLIPE:fração como 0.5, ou @GOLPE:inicio|prepara|acerta|fim)");
+            }
+            if (c.clip.startsWith("@") && c.fase == null) c.fase = c.fracao >= 0f ? String.valueOf(c.fracao) : "acerta";
             out.add(c);
         }
         if (out.isEmpty()) throw new IllegalArgumentException("animar: " + quem + " sem chaves");
@@ -146,6 +186,8 @@ public final class AnimacaoManual {
         out.rastro = a.rastro;
         out.vira = a.vira;
         out.clip = a.clip;
+        out.fracao = a.fracao;
+        out.fase = a.fase;
         float desde = Math.max(0f, q - a.q);
         if (a.ciclo > 0f) {
             out.quadro = a.quadro + (int)(desde * a.ciclo / 60f);

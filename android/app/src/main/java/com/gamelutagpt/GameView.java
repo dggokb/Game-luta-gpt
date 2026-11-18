@@ -1051,8 +1051,13 @@ public class GameView extends SurfaceView
         if (tutorial.active()) atlases.pedir(engine.fighter(1).character(), SpriteStates.TAUNT);
         // As poses da animação feita à mão da cena da luta (clipes raros): prontas antes dela.
         if (cinematica.armada() || cinematica.rodando()) {
-            atlases.pedir(player().character(), cinematica.clipesAnimados(CinematicaLuta.JOGADOR));
-            atlases.pedir(opponent().character(), cinematica.clipesAnimados(CinematicaLuta.RIVAL));
+            // Os dois da dupla: o parceiro pode entrar no meio da cena.
+            for (FighterState m : engine.team(PLAYER).members) {
+                atlases.pedir(m.character, clipesDaCena(m.character, CinematicaLuta.JOGADOR));
+            }
+            for (FighterState m : engine.team(OPPONENT).members) {
+                atlases.pedir(m.character, clipesDaCena(m.character, CinematicaLuta.RIVAL));
+            }
         }
         boolean fimDoRelogio = flow.timed() && flow.clockSeconds() <= 20;
         for (int side = 0; side < 2; side++) {
@@ -6321,13 +6326,67 @@ public class GameView extends SurfaceView
             r[0] = f.x;
             r[1] = p.altura;
             r[2] = f.facing;
-            r[3] = p.quadro;
+            Object[] pose = resolverPose(f.character(), p);
+            r[3] = (Integer)pose[1];
             r[4] = p.sx;
             r[5] = p.sy;
             r[6] = p.graus;
-            animRastroClip[lado][0] = p.clip;
+            animRastroClip[lado][0] = (String)pose[0];
             animRastroN[lado] = Math.min(ANIM_RASTRO, animRastroN[lado] + 1);
         }
+    }
+
+    /**
+     * O clipe e o quadro (posição no clipe) de uma pose da animação feita à mão nesse lutador.
+     * A pose que serve a qualquer lutador vira a dele: {@code "@H:acerta"} (o golpe H dele, no
+     * primeiro quadro ativo; inicio, prepara, fim ou uma fração do golpe) e {@code "CLIPE:0.5"}
+     * (a metade do clipe dele). Sem o golpe ("6H" que ele não tem), o golpe base ("H").
+     */
+    static Object[] resolverPose(CharacterDefinition ch, AnimacaoManual.Pose p) {
+        if (p.clip.startsWith("@")) {
+            String golpe = p.clip.substring(1);
+            CharacterDefinition.Move m = ch.moves.get(golpe);
+            if (m == null && golpe.length() > 1) m = ch.moves.get(golpe.substring(golpe.length() - 1));
+            if (m == null || m.animation == null) return new Object[] {"IDLE", 0};
+            float t;
+            switch (p.fase == null ? "acerta" : p.fase) {
+                case "inicio": t = 0f; break;
+                case "prepara": t = m.activeStart * 0.6f; break;
+                case "acerta": t = m.activeStart + 0.5f / CombatConfig.FPS; break;
+                case "fim": t = m.activeEnd + 0.4f * (m.totalTime - m.activeEnd); break;
+                default:
+                    float k;
+                    try { k = Float.parseFloat(p.fase); } catch (NumberFormatException ex) { k = 0.5f; }
+                    t = k * m.totalTime;
+                    break;
+            }
+            CharacterDefinition.Animation a = m.animation;
+            float tempo = m.animationTime(t);
+            int i = 0;
+            while (i + 1 < a.quadros() && a.startOf(i + 1) <= tempo) i++;
+            return new Object[] {a.id, i};
+        }
+        if (p.fracao >= 0f) {
+            CharacterDefinition.Animation a = ch.animations.get(p.clip);
+            int n = a != null ? a.quadros() : 1;
+            return new Object[] {p.clip, Math.round(p.fracao * Math.max(0, n - 1))};
+        }
+        return new Object[] {p.clip, p.quadro};
+    }
+
+    /** Os clipes da animação feita à mão desse lado no lutador (os "@GOLPE" viram o clipe dele). */
+    private String[] clipesDaCena(CharacterDefinition ch, int lado) {
+        java.util.Set<String> out = new java.util.LinkedHashSet<>();
+        for (String clip : cinematica.clipesAnimados(lado)) {
+            if (!clip.startsWith("@")) {
+                out.add(clip);
+                continue;
+            }
+            AnimacaoManual.Pose p = new AnimacaoManual.Pose();
+            p.clip = clip;
+            out.add((String)resolverPose(ch, p)[0]);
+        }
+        return out.toArray(new String[0]);
     }
 
     /**
@@ -6350,7 +6409,8 @@ public class GameView extends SurfaceView
             renderer.drawQuadroAnim(c, animRastroClip[lado][k], (int)r[k * 7 + 3], r[k * 7], GROUND_Y - r[k * 7 + 1],
                 (int)r[k * 7 + 2], r[k * 7 + 4], r[k * 7 + 5], r[k * 7 + 6], a, ANIM_RASTRO_COR);
         }
-        renderer.drawQuadroAnim(c, p.clip, p.quadro, f.x, GROUND_Y - p.altura, f.facing, p.sx, p.sy, p.graus,
+        Object[] pose = resolverPose(f.character(), p);
+        renderer.drawQuadroAnim(c, (String)pose[0], (Integer)pose[1], f.x, GROUND_Y - p.altura, f.facing, p.sx, p.sy, p.graus,
             Math.round(255f * Math.max(0f, Math.min(1f, p.alfa))), null);
         return true;
     }
@@ -8369,6 +8429,10 @@ public class GameView extends SurfaceView
         if (arquivoCena != null && temporada != null && !cinematica.carregar(temporada, arquivoCena, irmao)) {
             Log.w(LOG_TAG, "cinemática " + arquivoCena + " não abriu");
         }
+        // As cenas do meio da luta (não a encerram): armadas junto, cada uma com o gatilho dela.
+        for (String cena : luta.cenasNaLuta) {
+            if (temporada != null && !cinematica.adicionar(temporada, cena, irmao)) Log.w(LOG_TAG, "cena " + cena + " não abriu");
+        }
         // As cenas em vídeo da cinemática (folhas grandes): lidas agora, numa thread à parte.
         cenaVideo.carregar(cinematica.videos());
         if (cinematica.ativa()) {
@@ -8678,6 +8742,7 @@ public class GameView extends SurfaceView
         boolean livre = lutando && historia.waitingFight() && ultraAttacker < 0 && !engine.ultraSequenceRunning() &&
             !isSuperCinematicActive() && !isTagAnimationActive() && !paginaFinal.isActive();
         cinematica.sozinhos(sozinho(PLAYER), sozinho(OPPONENT));
+        cinematica.vidasDasDuplas(maiorVida(PLAYER), doisDePe(PLAYER), maiorVida(OPPONENT), doisDePe(OPPONENT));
         if (cinematica.armada() && livre) {
             cinematica.gatilho(vida(player()), vida(opponent()), storyFightFrames * FIXED_STEP, ko);
         }
@@ -8731,6 +8796,21 @@ public class GameView extends SurfaceView
      * Quem está em campo neste lado é o último de pé (o parceiro caiu, ou é 1x1). O titular que
      * acabou de cair ainda é "o da vez" até o parceiro entrar: aí não conta.
      */
+    /** A vida (fração) do mais inteiro da dupla desse lado (o gatilho vidaDupla da cinemática). */
+    private float maiorVida(int side) {
+        float maior = 0f;
+        for (FighterState m : engine.team(side).members) maior = Math.max(maior, m.life / (float)Math.max(1, m.profile.maxLife));
+        return maior;
+    }
+
+    /** Os dois da dupla desse lado estão de pé (no 1x1, falso). */
+    private boolean doisDePe(int side) {
+        FighterState[] membros = engine.team(side).members;
+        if (membros.length < 2) return false;
+        for (FighterState m : membros) if (m.life <= 0) return false;
+        return true;
+    }
+
     private boolean sozinho(int side) {
         FighterState vez = engine.team(side).pointState();
         if (vez.life <= 0) return false;
@@ -8879,6 +8959,35 @@ public class GameView extends SurfaceView
 
         @Override public float meioDoPalco() {
             return WORLD_WIDTH * 0.5f;
+        }
+
+        @Override public float[] paredes() {
+            return new float[] {Arena.LEFT_BOUND, Arena.RIGHT_BOUND};
+        }
+
+        @Override public String parceiro(int lado) {
+            FighterState p = engine.team(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).partner();
+            return p != null ? avulsoDoLutador(p) : null;
+        }
+
+        @Override public void entrarParceiro(int lado) {
+            int side = lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT;
+            CombatFighter f = engine.fighter(side);
+            if (engine.teams.trocarNaHora(engine, side, f)) {
+                // O desenho troca junto (a luta está parada na cena: o passo do time não roda).
+                if (side == PLAYER) updateTeamVisuals();
+                else updateOpponentVisuals();
+                // Quem entra fala nos quadros e tem as poses da cena prontas.
+                avulsoDoLutador(f.state);
+                atlases.pedir(f.character(), clipesDaCena(f.character(), lado));
+            }
+        }
+
+        @Override public void danoDaCena(int lado, float fracao) {
+            FighterState f = engine.team(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT).pointState();
+            int dano = Math.round(fracao * Math.max(1, f.profile.maxLife));
+            // A cena pesa sem decidir a luta: nunca derruba.
+            f.life = Math.max(1, f.life - dano);
         }
 
         @Override public void efeito(String nome, int lado, boolean noPeito, float dx, float escala, boolean atras) {
