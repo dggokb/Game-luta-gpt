@@ -70,6 +70,25 @@ outro não) inclinado de 28 a 90 graus, cabeça para trás (para a esquerda, com
 do IDLE. O jogo usa no estado de giro (`CombatFighter.spinning`) no lugar do estreitar falso e cai
 direto no GROUNDED. Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`.
 
+**Montado ainda não rola (o dono: "precisamos realmente fazer a animação correta").** O erro comum
+dos pedidos de vídeo: todos terminavam na guarda em pé, o que obriga o gerador a manter o corpo em pé.
+**O pedido abaixo termina caído de costas**, como o movimento termina de verdade:
+`art/keys/p01/inicio_gancho_h3.png` (o gancho torcendo o corpo, pés no chão, do 3º vídeo) →
+`art/keys/p01/fim_caido_h3.png` (o caído do jogo, GROUNDED, na escala dos vídeos, mais à esquerda).
+
+**Giro de nocaute com fim deitado** (`inicio_gancho_h3` → `fim_caido_h3`; o vídeo de referência
+do dono junto, se a ferramenta aceitar)
+```
+Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the martial artist from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
+This is the classic SPINNING KNOCKDOWN of 1990s Street Fighter games: a devastating punch has just twisted his body (the start frame); he is lifted off the ground and thrown backward through the air to the LEFT, and while flying his body TILTS from diagonal to horizontal and ROLLS around its own head-to-toe axis like a corkscrew, then he crashes flat on his back exactly as in the end frame.
+[0-0.3s] The start frame: his body twisted by the punch, head snapped to the side.
+[0.3-1.6s] His feet leave the ground and he flies backward to the LEFT in a low arc, head first. His body leans further back with every moment until it is horizontal, and at the same time it ROLLS around its long axis one and a half turns: we see his chest, then his side, then his BACK, then his side, then his chest again. His legs stay together and stretched, his arms are loose and flung around by the roll, his hair and belt ends whip with the spin.
+[1.6-2s] He crashes flat on his back on the ground, face up, head on the LEFT and feet on the right, exactly as in the end frame.
+[2-5s] He lies still on his back exactly as in the end frame, breathing.
+He never stands up again, never lands on his feet, never flips head over heels and never cartwheels. His whole body stays inside the frame. He never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art and size exactly as in the frames; his size never changes.
+```
+
 **Para os outros (Yin-lu, Kōga, Brucy):** o mesmo caminho, com a mesma referência e os sprites de
 cada um como modelo.
 
