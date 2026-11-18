@@ -4461,7 +4461,10 @@ public class GameView extends SurfaceView
                 renderCameraX = p.x - playerScreenX / renderZoom + visibleWorldWidth / 2f;
                 renderCameraTop = focusY - playerScreenY / renderZoom;
             }
-            float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+            // No fundo preto da cinemática o cenário não aparece: a câmera não para na borda do mundo
+            // e quem está em foco fica no meio da tela, mesmo voando para a parede.
+            float cameraLeft = cinematica.fundoPreto() > 0.99f ? renderCameraX - visibleWorldWidth / 2f
+                : clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
             luzCameraX = cameraLeft + visibleWorldWidth / 2f;
             if (punchZoom != 1f) {
                 // Soco de câmera: aproxima segurando o ponto do impacto no mesmo lugar da tela.

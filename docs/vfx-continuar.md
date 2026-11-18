@@ -1856,4 +1856,9 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   em primeiro plano, foi reprovada: "artes saíram bem ruins"; a segunda é de perfil) e
   `stamp_locutor`. O narrador entrou no elenco da temporada (fala com retrato).
 - **Vídeos:** `android/pc/build/torneio_desistir_v4_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 5 (mesmo dia):** o dono: no lançamento e na queda o adversário não aparece, e quem voa
+  fica no meio da tela; no fim, os dois longe, cada um de um lado, simétricos ao meio. Feito: o
+  adversário some (alfa 0) nos dois trechos de fundo preto, a câmera vai presa no lutador (no fundo
+  preto ela não para na borda do mundo), e a troca final acontece mais para o meio da arena.
+  Vídeos `torneio_desistir_v5_{ryuga,koga}.mp4`. Visto só no PC.
 

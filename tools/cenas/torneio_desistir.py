@@ -183,17 +183,21 @@ J.k(q + 6, 'HIT_AIR:0', 'jogador-140', y=30, rastro=4)
 impacto(q + 6, 'rival', 3, letreiro='BAM!', congela=0.5, stamp=stamp_dano('bam'))
 dano(q + 6, 0.04)
 # O voo até a parede no fundo preto, com as linhas de velocidade (o dono: "mais dramaticidade").
-camera(q + 8, 1.3, 'jogador', 0.15)
+# Só ele no fundo preto, preso no meio da tela (a câmera vai junto); o adversário some (o dono:
+# "não pode aparecer enquanto está no efeito de lançamento").
+camera(q + 8, 1.3, 'jogador', 0.0)
 linhas(q + 8, 'velocidade', fundo=True, segundos=0.06)
 lenta(q + 8, antes=0, depois=22, valor=0.45)
 J.k(q + 30, 'HIT_AIR:0.5', 'parede+60', y=110, rot=-25, curva='sai', rastro=7)
-R.k(q + 30, '@H:fim', 'jogador+0')
+R.k(q + 8, '@H:fim', 'jogador+0', alfa=0.0, curva='corte')
+R.k(q + 30, '@H:fim', 'jogador+0', alfa=0.0)
+R.k(q + 31, '@H:fim', 'jogador+0', alfa=1.0, curva='corte')
 R.k(q + 50, 'IDLE:0', 'jogador+0', ciclo=10)
 # Bate na parede: o cenário volta, a parede treme e o efeito nasce nele (não no meio dos dois).
 linhas(q + 30, segundos=0.05)
 impacto(q + 30, 'rival', 2, onde='alvo', congela=0.25)
 efeito(q + 30, 'jogador', 'fumaca_queda_v01', escala=1.0)
-camera(q + 32, 1.15, 'centro', 0.3)
+camera(q + 30, 1.15, 'centro', 0.0)
 J.k(q + 33, 'KNOCKDOWN:0.3', 'parede+70', y=90, rot=-10)
 J.k(q + 54, 'GROUNDED:0', 'parede+80', y=0, rot=0, curva='entra')
 efeito(q + 54, 'jogador', 'fumaca_pouso')
@@ -288,14 +292,14 @@ impacto(q + 24, 'rival', 2, tipo='acerto', congela=0.3)
 dano(q + 24, 0.01)
 # A queda de verdade: fundo preto, as linhas correndo para cima, a câmera caindo junto.
 linhas(q + 27, 'descer', fundo=True, segundos=0.06)
-camera(q + 27, 1.35, 'jogador', 0.1)
+camera(q + 27, 1.35, 'jogador', 0.0)
 ev(q + 27, 'velocidade', valor=0.5, segundos=0.1, semEsperar=True)
 J.k(q + 30, 'KNOCKDOWN:0.2', 'parede+150', y=360, rot=-70)
 J.k(q + 60, 'KNOCKDOWN:0.4', 'parede+130', y=0, rot=-85, curva='entra', rastro=8)
 ev(q + 58, 'velocidade', valor=1.0, segundos=0.05, semEsperar=True)
 # PAH no chão da arena (o cenário volta no contato) com o STAMP.
 linhas(q + 60, segundos=0.04)
-camera(q + 60, 1.2, 'centro', 0.2)
+camera(q + 60, 1.2, 'centro', 0.0)
 impacto(q + 60, 'rival', 3, letreiro='PAH!', congela=0.55, onde='alvo', stamp=stamp_dano('pah'))
 dano(q + 60, 0.02)
 efeito(q + 60, 'jogador', 'fumaca_queda_v01', escala=1.4)
@@ -306,8 +310,10 @@ J.k(q + 74, 'KNOCKDOWN:0.6', 'parede+115', y=70, rot=-40, curva='sai')
 J.k(q + 88, 'GROUNDED:0', 'parede+110', y=0, rot=0, curva='entra')
 efeito(q + 88, 'jogador', 'fumaca_pouso')
 # O adversário desce longe (o dono: "muito perto da gente quando desceu do combo aéreo").
-R.k(q + 30, '@jH:fim', 'parede+290', y=470)
-R.k(q + 36, 'JUMP:0.7', 'parede+300', y=420)
+R.k(q + 27, '@jH:fim', 'parede+290', y=470, alfa=0.0, curva='corte')
+R.k(q + 36, 'JUMP:0.7', 'parede+300', y=420, alfa=0.0)
+R.k(q + 60, 'JUMP:0.7', 'parede+300', y=420, alfa=0.0)
+R.k(q + 61, 'JUMP:0.8', 'parede+450', y=260, alfa=1.0, curva='corte')
 R.k(q + 80, 'JUMP:0.8', 'parede+560', y=120)
 R.k(q + 92, 'LAND:0.3', 'parede+580', y=0, curva='entra')
 efeito(q + 92, 'rival', 'fumaca_pouso')
@@ -354,12 +360,12 @@ efeito(q, 'jogador', 'fumaca_dash_v05')
 efeito(q, 'rival', 'fumaca_dash_v05')
 linhas(q, 'velocidade', escuro=0.2)
 # Param à distância do golpe (o dono: "muito perto").
-XJ, XR = 'parede+250', 'parede+465'
-J.k(q + 12, 'DASH:0.7', XJ, curva='sai', **DASH)
-R.k(q + 12, 'DASH:0.7', XR, curva='sai', **DASH)
-camera(q + 12, 1.3, 'centro', 0.15)
-linhas(q + 14)
-q += 14
+XJ, XR = 'parede+590', 'parede+805'
+J.k(q + 20, 'DASH:0.7', XJ, curva='sai', **DASH)
+R.k(q + 20, 'DASH:0.7', XR, curva='sai', **DASH)
+camera(q + 20, 1.3, 'centro', 0.2)
+linhas(q + 22)
+q += 22
 # Cinco golpes trocados, rápidos (o dono: "muito lerdo"), cada um defendido.
 for i, golpe in enumerate(('L', 'M', 'L', 'M', 'H')):
     bate, defende = (J, R) if i % 2 == 0 else (R, J)
@@ -378,13 +384,15 @@ for i, golpe in enumerate(('L', 'M', 'L', 'M', 'H')):
 # Os dois pulam para trás, bem longe um do outro (o dono: "ainda estão muito perto").
 J.k(q, 'BACKDASH:0.1', XJ)
 R.k(q, 'BACKDASH:0.1', XR)
-J.k(q + 18, 'BACKDASH:0.4', 'parede+120', y=60, curva='sai', rastro=3)
-R.k(q + 18, 'BACKDASH:0.4', 'parede+600', y=60, curva='sai', rastro=3)
-J.k(q + 30, 'LAND:0.3', 'parede+70', y=0, curva='entra')
-R.k(q + 30, 'LAND:0.3', 'parede+680', y=0, curva='entra')
+# Cada um num lado, à mesma distância do meio (o dono: "simetricamente com o meio"), longe da
+# parede para a câmera não parar na borda.
+J.k(q + 18, 'BACKDASH:0.4', 'parede+440', y=60, curva='sai', rastro=3)
+R.k(q + 18, 'BACKDASH:0.4', 'parede+955', y=60, curva='sai', rastro=3)
+J.k(q + 30, 'LAND:0.3', 'parede+380', y=0, curva='entra')
+R.k(q + 30, 'LAND:0.3', 'parede+1015', y=0, curva='entra')
 camera(q + 18, 1.0, 'centro', 0.5)
-J.k(q + 42, 'IDLE:0', 'parede+70', ciclo=12)
-R.k(q + 42, 'IDLE:0', 'parede+680', ciclo=12)
+J.k(q + 42, 'IDLE:0', 'parede+380', ciclo=12)
+R.k(q + 42, 'IDLE:0', 'parede+1015', ciclo=12)
 q += 50
 # O locutor, antes de a luta continuar.
 fala(q, 'narrador', 'QUE SEQUÊNCIA FOI ESSA, MEUS AMIGOS!', segura=1.4, expressao='empolgado', lado='direita')
