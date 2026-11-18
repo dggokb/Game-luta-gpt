@@ -70,7 +70,7 @@ queda, e depois o GROUNDED. A base do corpo na raiz em todos os quadros (o arco 
 Teste: `gradle :pc:testeCena ... -Pvida=1.0 -Pgiro=2`. **Para os outros: o mesmo pedido**, com o
 gancho e o caído de cada um.
 
-**Yin-lu (18/11): queda nova feita, falta o vídeo do giro.** O vídeo H3 "Derrubado" dela
+**Yin-lu (18/11): FEITO, a queda nova e o giro.** O giro (`art/sprites/source/p02_hit_spin_video.mp4`, com o pedido abaixo) virou HIT_SPIN (quadros 5-64) e HIT_SPIN_POUSO (66-78) por `tools/sprites/giro_h3.py p02`; conferido no jogo com `... -Pcontra=p02 -Pgiro=1 -PgiroAlvo=rival`. A queda: O vídeo H3 "Derrubado" dela
 (`art/sprites/source/p02_derrubado_h3_video.mp4`) virou KNOCKDOWN (quadros 10-28: voa e bate de
 costas; o quique é o do jogo), GROUNDED (31-45) e GETUP (81-99), montados por
 `tools/sprites/p02_derrubado_h3.py` (escala 391/469: a guarda do vídeo = o IDLE da folha; a raiz
