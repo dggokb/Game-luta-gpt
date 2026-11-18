@@ -877,5 +877,51 @@
     "animacoes": {
       "GETUP": {}
     }
+  },
+  "special_s3": {
+    "_doc": "S3 Contra-golpe (18/11, vídeo s3 do dono; ele achou ruim, aproveitado): a postura que lê (a mão da frente erguida, a de trás na cintura: 15-36), uma passada do desvio (39-48), a palma para a frente (66 sobe o braço, 69-72 a palma: o golpe) e a volta à guarda (75-99). Fica de fora a segunda subida do braço (54-63). No contra o motor pula para o fim da janela (o desvio) e a palma sai.",
+    "trechos": [
+      [
+        "s3_contra",
+        0,
+        124
+      ]
+    ],
+    "quadros": "15,18,21,24,27,30,33,36,39,42,45,48,66,69,72,75,78,81,84,87,90,93,96,99",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "SPECIAL_S3": {
+        "impacto": 13,
+        "tempos": [
+          30,
+          30,
+          30,
+          30,
+          30,
+          30,
+          30,
+          30,
+          25,
+          25,
+          25,
+          25,
+          25,
+          40,
+          40,
+          40,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          37
+        ]
+      }
+    }
   }
 }
