@@ -4545,6 +4545,15 @@ public class GameView extends SurfaceView
             if (cenario) drawCastShadows(canvas);
             // A luz dos poderes e das faíscas caindo no chão, por cima da sombra.
             if (cenario) desenharLuzDosEfeitosNoChao();
+            if (cinematica.fundoPreto() > 0.001f) {
+                // As linhas da cinemática no fundo preto: o cenário some, os dois ficam na frente.
+                // Volta para as coordenadas da tela só para elas.
+                int tela = canvas.save();
+                canvas.translate(cameraLeft, renderCameraTop);
+                canvas.scale(1f / renderZoom, 1f / renderZoom);
+                cinematica.renderFundo(renderCanvas);
+                canvas.restoreToCount(tela);
+            }
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, Math.max(feel.darkAlpha(), ativacaoAlfa()), 0, 0, 8);
@@ -4649,7 +4658,7 @@ public class GameView extends SurfaceView
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
             // Na finalização a frente do cenário some junto com o resto dele.
-            if (cenario && stageScene != null && finalizacao.forca() <= 0f) {
+            if (cenario && stageScene != null && finalizacao.forca() <= 0f && cinematica.fundoPreto() < 0.5f) {
                 graduarCenario(true);
                 stageScene.drawForeground(renderCanvas);
                 graduarCenario(false);
@@ -9021,19 +9030,31 @@ public class GameView extends SurfaceView
         }
 
         @Override public void impacto(int forca, int lado) {
+            impacto(forca, lado, forca == 1 ? "defesa" : "acerto", false);
+        }
+
+        @Override public void impacto(int forca, int lado, String tipo, boolean noAlvo) {
             CombatFighter a = engine.fighter(lado), d = engine.fighter(1 - lado);
             // Na animação feita à mão, a altura da pose de quem levou (o contato no ar fica no ar).
-            float x = (a.x + d.x) * 0.5f, y = chestY(d) - alturaAnimada(d == player() ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL);
+            float x = noAlvo ? d.x : (a.x + d.x) * 0.5f;
+            float y = chestY(d) - alturaAnimada(d == player() ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL);
             int direcao = d.x >= a.x ? 1 : -1;
             feel.kick(direcao, forca >= 2 ? ImpactEffects.SPECIAL : ImpactEffects.HEAVY);
-            if (forca == 1) {
+            if ("quebra".equals(tipo)) {
+                // A guarda estilhaça: o mesmo GUARD BREAK da luta (estalo no peito, tremida, cacos).
+                float xq = d.x - direcao * d.body().halfWidth * .4f;
+                impacts.spawn(ImpactEffects.GUARD, xq, y, direcao, ImpactEffects.SPECIAL, 0xFFFFD84A);
+                impacts.spawn(ImpactEffects.HIT, xq, y, direcao, ImpactEffects.HEAVY, a.state.profile.color);
+                beamShake = Math.max(beamShake, 14f);
+                ultraSounds.playFight("guarda_quebrada", 1f, 1f);
+            } else if ("defesa".equals(tipo)) {
                 // O golpe defendido da cena: a faísca de defesa da luta (a mesma do jogo, uma de
                 // cada vez), não o estouro de ar, que cobria os dois.
                 for (String n : DEFESAS[defesaVez = (defesaVez + 1) % DEFESAS.length]) {
                     if (efeitos.tocarDurando(n, x, y, 0.7f, direcao < 0, (11 + 4) * FIXED_STEP * 1000f) >= 0) break;
                 }
             } else {
-                efeitos.tocar("impacto_ar_super", x, y, forca >= 3 ? 1.05f : 0.8f, direcao < 0);
+                efeitos.tocar("impacto_ar_super", x, y, forca >= 3 ? 1.05f : forca == 2 ? 0.8f : 0.55f, direcao < 0);
             }
             if (forca >= 2) {
                 // O chão marcado debaixo de quem segurou e o close inclinado no contato.

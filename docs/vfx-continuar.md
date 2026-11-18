@@ -1842,3 +1842,18 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   efeito (4,3 s).
 - **Ficou:** ele julgar no vídeo. O círculo da Natisuko e o salto da lebre passam do topo do vídeo
   por alguns quadros (cortados lá; as faixas pretas da cena vão até esse limite). Visto só no PC.
+
+## 18/11 — cena "Já vai desistir?" (torneio), rodada 4
+
+- **Pedido do dono (vídeo v3):** a cena abre com um golpe de alguém; os quatro da investida mais
+  rápidos, com quebra de guarda; o efeito da parede no meio da tela; fundo preto com linhas no
+  lançamento e na queda; linhas verticais na subida; o combo aéreo com efeito de acerto (não de
+  defesa); a troca durante a investida dele, com STAMP da voadora; o quique com ARGH depois do PAH;
+  levantar mais rápido; os dois mais longe na troca de golpes e ao se separar; STAMP do locutor.
+- **Feito:** `linhas` com `fundo` (preto atrás dos lutadores, desenhado pela luta entre o cenário e
+  os corpos) e os estilos `subir`/`descer`; `impacto` com `tipo` (`quebra` usa o GUARD BREAK da luta)
+  e `onde: alvo`. STAMPs novos do Codex: `stamp_voadora_<lutador>` (a primeira leva, com o pé gigante
+  em primeiro plano, foi reprovada: "artes saíram bem ruins"; a segunda é de perfil) e
+  `stamp_locutor`. O narrador entrou no elenco da temporada (fala com retrato).
+- **Vídeos:** `android/pc/build/torneio_desistir_v4_{ryuga,koga}.mp4`. Visto só no PC.
+

@@ -133,6 +133,13 @@ public final class CinematicaLuta {
         default void impacto(int forca, int lado) {}
 
         /**
+         * O impacto com o efeito escolhido: {@code tipo} "defesa" (a faísca de defesa), "acerto"
+         * (o estouro de ar) ou "quebra" (a guarda estilhaçando, o GUARD BREAK da luta); com
+         * {@code noAlvo}, o efeito nasce em quem levou, não no meio dos dois (o golpe que joga longe).
+         */
+        default void impacto(int forca, int lado, String tipo, boolean noAlvo) { impacto(forca, lado); }
+
+        /**
          * Toca o efeito {@code nome} (assets/efeitos) no lutador desse lado: nos pés ou no peito,
          * {@code dx} à frente de onde ele olha, no tamanho {@code escala}; {@code atras} espelha.
          */
@@ -364,10 +371,18 @@ public final class CinematicaLuta {
         boolean atras;
         /** IMPACTO: a força (1 médio, 2 forte, 3 o mais forte, com impact frame). */
         int forca = 2;
+        /** IMPACTO: o efeito (defesa, acerto ou quebra) e se nasce em quem levou. */
+        String tipoImpacto;
+        boolean noAlvo;
         /** LINHAS: "concentracao" (de mangá, das bordas para o meio) ou "velocidade" (riscos de lado a lado). */
         String estilo = "concentracao";
         /** LINHAS: quanto a luta escurece por trás das linhas (0 a 1). */
         float escuro = 0.35f;
+        /**
+         * LINHAS: atrás dos lutadores: o cenário some num fundo preto (escuro 1 = todo preto) e as
+         * linhas, brancas, correm por ele; os lutadores ficam na frente.
+         */
+        boolean fundo;
         int vezes = 8;
         String direcao = "frente";
         /** QTE: o golpe de quem acerta ({@link #quemMove} bate) e o contra-ataque de quem erra. */
@@ -716,6 +731,7 @@ public final class CinematicaLuta {
     private String linhasEstilo = "concentracao";
     private static final int LINHAS_VELOCIDADE = 18, LINHAS_CONCENTRACAO = 56;
     private float linhasEscuro = 0.35f;
+    private boolean linhasFundo;
     /**
      * Câmera viva na troca de golpes: chega mais perto e puxa para quem ataca (somada à câmera
      * do roteiro); cada defesa dá um tranquinho e cada choque, um tranco.
@@ -1247,10 +1263,11 @@ public final class CinematicaLuta {
                 a = new Acao(Acao.Tipo.LINHAS);
                 a.ligar = !Boolean.FALSE.equals(m.get("ligar"));
                 a.estilo = Episodio.string(m, "estilo", "concentracao");
-                if (!a.estilo.matches("concentracao|velocidade")) {
-                    throw new IllegalArgumentException("estilo " + a.estilo + " (use concentracao ou velocidade)");
+                if (!a.estilo.matches("concentracao|velocidade|subir|descer")) {
+                    throw new IllegalArgumentException("estilo " + a.estilo + " (use concentracao, velocidade, subir ou descer)");
                 }
-                a.escuro = numero(m, "escuro", 0.35f, 0f, 1f);
+                a.fundo = Boolean.TRUE.equals(m.get("fundo"));
+                a.escuro = numero(m, "escuro", a.fundo ? 1f : 0.35f, 0f, 1f);
                 a.segundos = numero(m, "segundos", 0.12f, 0f, 3f);
                 break;
             case "animar":
@@ -1279,6 +1296,11 @@ public final class CinematicaLuta {
                 a.quemMove = Episodio.string(m, "quem", "jogador");
                 if (!time(a.quemMove)) throw new IllegalArgumentException("quem bateu: " + a.quemMove + " (use jogador, rival, ryuga ou koga)");
                 a.congela = numero(m, "congela", a.forca == 1 ? 0.12f : a.forca == 2 ? 0.2f : 0.32f, 0f, 2f);
+                a.tipoImpacto = Episodio.string(m, "tipo", a.forca == 1 ? "defesa" : "acerto");
+                if (!a.tipoImpacto.matches("defesa|acerto|quebra")) {
+                    throw new IllegalArgumentException("impacto tipo " + a.tipoImpacto + " (use defesa, acerto ou quebra)");
+                }
+                a.noAlvo = "alvo".equals(Episodio.string(m, "onde", "meio"));
                 a.tranco = numero(m, "zoom", a.forca == 1 ? 1.08f : a.forca == 2 ? 1.15f : 1.25f, 1f, 1.8f);
                 Object letreiro = m.get("letreiro");
                 if (letreiro != null) {
@@ -1987,7 +2009,7 @@ public final class CinematicaLuta {
                 break;
             case IMPACTO:
                 impactar(a);
-                palco.impacto(a.forca, lado(a.quemMove));
+                palco.impacto(a.forca, lado(a.quemMove), a.tipoImpacto, a.noAlvo);
                 break;
             case STAMP:
                 bater(a);
@@ -2005,6 +2027,7 @@ public final class CinematicaLuta {
                 if (a.ligar) {
                     linhasEstilo = a.estilo;
                     linhasEscuro = a.escuro;
+                    linhasFundo = a.fundo;
                 }
                 linhas.ir(a.ligar ? 1f : 0f, a.segundos);
                 break;
@@ -2685,9 +2708,14 @@ public final class CinematicaLuta {
         float k = Math.max(linhas.valor(), linhasQte.valor());
         if (k <= 0.01f) return;
         boolean doRoteiro = linhas.valor() >= linhasQte.valor();
+        if (doRoteiro && linhasFundo) return;   // estas vão atrás dos lutadores (renderFundo)
         String estilo = doRoteiro ? linhasEstilo : "concentracao";
         float escuro = doRoteiro ? linhasEscuro : 0.35f;
         if (escuro > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(255f * escuro * k)));
+        if (estilo.equals("subir") || estilo.equals("descer")) {
+            desenharLinhasVerticais(c, estilo.equals("subir"), Tinta.withAlpha(WHITE, (int)(150f * k)), 1f);
+            return;
+        }
         if (estilo.equals("velocidade")) {
             int cor = Tinta.withAlpha(WHITE, (int)(150f * k));
             for (int i = 0; i < LINHAS_VELOCIDADE; i++) {
@@ -2722,6 +2750,76 @@ public final class CinematicaLuta {
             float nx = -sin * base, ny = cos * base;
             // Triângulo fino: a ponta para o meio, a base larga fora da tela.
             c.fillPolygon(new float[] {x0, y0, x1 + nx, y1 + ny, x1 - nx, y1 - ny}, preto);
+        }
+    }
+
+    /**
+     * O fundo das linhas "fundo": desenhado pela luta entre o cenário e os lutadores, na tela.
+     * O cenário some no preto e as linhas brancas correm por ele (velocidade de lado, subir e
+     * descer na vertical, concentração das bordas para o meio).
+     */
+    public void renderFundo(RenderCanvas c) {
+        float k = linhas.valor();
+        if (!linhasFundo || k <= 0.01f || linhasQte.valor() > k) return;
+        if (linhasEscuro > 0f) c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(INK, (int)(255f * linhasEscuro * k)));
+        int branco = Tinta.withAlpha(WHITE, (int)(210f * k));
+        switch (linhasEstilo) {
+            case "subir": desenharLinhasVerticais(c, true, branco, 1.6f); break;
+            case "descer": desenharLinhasVerticais(c, false, branco, 1.6f); break;
+            case "velocidade": {
+                for (int i = 0; i < LINHAS_VELOCIDADE * 2; i++) {
+                    Random r = new Random(4241L + i * 977L);
+                    float y = VH * (0.04f + 0.92f * r.nextFloat());
+                    float largo = VW * (0.18f + 0.3f * r.nextFloat());
+                    float grosso = 1.5f + r.nextFloat() * 4f;
+                    float veloc = VW * (1.8f + 1.6f * r.nextFloat());
+                    float faixa = VW + largo * 2f;
+                    float x = faixa - ((r.nextFloat() * faixa + time * veloc) % faixa) - largo;
+                    c.fillPolygon(new float[] {x, y, x + largo * 0.35f, y - grosso, x + largo, y, x + largo * 0.35f, y + grosso}, branco);
+                }
+                break;
+            }
+            default: {
+                float cx = VW * 0.5f, cy = VH * 0.47f;
+                float longe = (float)Math.hypot(VW, VH);
+                int quadro = (int)(time * 15f);
+                for (int i = 0; i < LINHAS_CONCENTRACAO; i++) {
+                    Random fixo = new Random(9157L + i * 331L);
+                    Random treme = new Random(quadro * 7919L + i);
+                    double ang = Math.PI * 2 * (i + fixo.nextFloat() * 0.6f) / LINHAS_CONCENTRACAO + treme.nextFloat() * 0.015f;
+                    float cos = (float)Math.cos(ang), sin = (float)Math.sin(ang);
+                    float dentro = 0.25f + fixo.nextFloat() * 0.25f + treme.nextFloat() * 0.05f;
+                    float x0 = cx + cos * VW * 0.5f * dentro, y0 = cy + sin * VH * 0.5f * dentro;
+                    float base = 2f + fixo.nextFloat() * 6f;
+                    float x1 = cx + cos * longe, y1 = cy + sin * longe;
+                    float nx = -sin * base, ny = cos * base;
+                    c.fillPolygon(new float[] {x0, y0, x1 + nx, y1 + ny, x1 - nx, y1 - ny}, branco);
+                }
+            }
+        }
+    }
+
+    /** O fundo preto das linhas cobre o cenário (a frente do cenário não aparece por cima dos dois). */
+    public float fundoPreto() {
+        return linhasFundo && linhasQte.valor() <= linhas.valor() ? linhas.valor() * linhasEscuro : 0f;
+    }
+
+    /**
+     * Riscos na vertical, afinando nas pontas: quem sobe vê o mundo passar para baixo (subir),
+     * quem cai, para cima (descer). Pelas laterais e pelo meio, mais finos no meio.
+     */
+    private void desenharLinhasVerticais(RenderCanvas c, boolean subir, int cor, float densidade) {
+        int n = Math.round(LINHAS_VELOCIDADE * densidade);
+        for (int i = 0; i < n; i++) {
+            Random r = new Random(7351L + i * 613L);
+            float x = VW * (0.02f + 0.96f * r.nextFloat());
+            float longo = VH * (0.25f + 0.35f * r.nextFloat());
+            float grosso = 1.5f + r.nextFloat() * 3.5f;
+            float veloc = VH * (2.2f + 1.6f * r.nextFloat());
+            float faixa = VH + longo * 2f;
+            float andou = (r.nextFloat() * faixa + time * veloc) % faixa;
+            float y = subir ? andou - longo : faixa - andou - longo;
+            c.fillPolygon(new float[] {x, y, x - grosso, y + longo * 0.35f, x, y + longo, x + grosso, y + longo * 0.35f}, cor);
         }
     }
 
