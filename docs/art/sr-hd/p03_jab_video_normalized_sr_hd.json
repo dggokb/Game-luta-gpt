@@ -1,0 +1,22 @@
+{
+ "clipe": "p03_jab",
+ "quadros": 12,
+ "colunas": 11,
+ "celula": [
+  224,
+  288
+ ],
+ "raiz": [
+  92,
+  270
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p03_jab_video_normalized.png",
+ "fonte_sha256": "5cbf19a80052dc047d02cacacd883f8d1d32518e6c289fdcf5d15b597472b968",
+ "saida": "art/sprites/source/p03_jab_video_normalized_sr_hd.png",
+ "saida_sha256": "1d929c4d481854da3a222009172670303ad50621ad45c396d62e0cdb4ad5fece",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}
