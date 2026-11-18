@@ -2245,6 +2245,9 @@ public class GameView extends SurfaceView
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
             if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
             if ("ULTRA_PEGOU".equals(cue)) pegouNaViagem();
+            if (cue.startsWith("ULTRA_SHINKAI_ERROU_")) {
+                baloes.falar(cue.charAt(cue.length() - 1) - '0', BalaoDeFala.sortear(BalaoDeFala.ERROU, soundRandom), engine.frame());
+            }
             if (cue.startsWith("ULTRA_PALHACO")) chuvaDeTomates(cue);
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) chuvaDeTomates(cue);
             if (cue.startsWith("ULTRA_ICHIGEKI") || "ULTRA_FINISH_DRAGAO".equals(cue)) ichigeki(cue);
@@ -4706,6 +4709,7 @@ public class GameView extends SurfaceView
                 desgaste.desenhar(canvas);
             }
             confronto.desenharFrente(canvas);
+            baloes.desenhar(canvas, engine);
             if (enfeites) impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
@@ -7560,6 +7564,8 @@ public class GameView extends SurfaceView
 
     /** Os detalhes de cada tipo do SHINKAI (pedrinhas, raios, brilhos, trincas). */
     private final ShinkaiDetalhes shinkaiDetalhes = new ShinkaiDetalhes();
+    /** Os balões de fala dos lutadores ("Droga!" quando o Ultra SHINKAI erra). */
+    private final BalaoDeFala baloes = new BalaoDeFala();
     /** Filtros da silhueta do SHINKAI (cor sólida com o alfa do desenho), por cor. */
     private final java.util.Map<Integer, Filtro> shinkaiTints = new java.util.HashMap<>();
 

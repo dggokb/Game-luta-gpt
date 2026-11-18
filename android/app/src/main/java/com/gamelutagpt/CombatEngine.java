@@ -1983,6 +1983,7 @@ final class CombatEngine {
         f.backdashFrames = 0;
         f.crouching = false;
         f.ultraShinkai = ultraShinkaiPronto(f.state);
+        f.ultraTocou = false;
         f.state.spendSuperMeter(f.ultraShinkai ? CombatConfig.ULTRA_SHINKAI_COST : CombatConfig.ULTRA_COST);
         if (f.ultraShinkai) cues.add("ULTRA_SHINKAI");
         // Like the Super: the opponent and the projectiles wait for the rush (no dragão, a cena
@@ -5167,8 +5168,13 @@ final class CombatEngine {
 
     /** O Ultra SHINKAI acabou (acertou, defendido ou errou): a transformação termina junto. */
     private void fimDoUltraShinkai(CombatFighter f) {
+        if (f.ultraShinkai) {
+            for (HitEvent e : events) if (e.attacker == f.index) f.ultraTocou = true;
+        }
         if (!f.ultraShinkai || f.status == CombatFighter.Status.ULTRA) return;
         f.ultraShinkai = false;
+        // Passou sem encostar (nem acerto nem defesa): o balão "Droga!" do lutador (o dono, 18/11).
+        if (!f.ultraTocou) cues.add("ULTRA_SHINKAI_ERROU_" + f.index);
         if (!f.state.inShinkai()) return;
         encerrar(f.state, 0);
         cues.add("ULTRA_SHINKAI_FIM");

@@ -200,6 +200,8 @@ final class CombatFighter {
     int ultraPhase;
     /** O Ultra em andamento é o Ultra SHINKAI (cinco barras, dano maior, encerra o SHINKAI no fim). */
     boolean ultraShinkai;
+    /** O Ultra SHINKAI encostou no rival (acertou ou foi defendido): sem isso, errou. */
+    boolean ultraTocou;
     /** Dragão: 0 vindo, 1 pegou (acertos em {@link #dragaoAcertos}), 2 passou (defendido ou errou), 3 acabou o combo. */
     int dragaoEstado, dragaoAcertos, dragaoInicio, dragaoDanoPequeno, dragaoDanoFinal;
     /** Frames spent in the current ultra phase. */

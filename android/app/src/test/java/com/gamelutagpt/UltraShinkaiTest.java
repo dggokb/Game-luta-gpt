@@ -248,7 +248,7 @@ public class UltraShinkaiTest {
             s.in[0].superAttack = true;
             s.in[0].ultra = true;
             int golpes = 0;
-            boolean pegou = false, errou = false, noAr = false;
+            boolean pegou = false, errou = false, noAr = false, reclamou = false;
             for (int i = 0; i < 400 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
                 s.step();
                 s.in[0].direction = 0;
@@ -262,12 +262,41 @@ public class UltraShinkaiTest {
                 }
                 if (s.engine.cues().contains("ULTRA_PEGOU")) pegou = true;
                 if (s.engine.cues().contains("ULTRA_ERROU")) errou = true;
+                if (s.engine.cues().contains("ULTRA_SHINKAI_ERROU_0")) reclamou = true;
                 for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && "ULTRA".equals(h.moveId)) golpes++;
+            }
+            for (int i = 0; i < 10 && !reclamou; i++) {
+                s.step();
+                if (s.engine.cues().contains("ULTRA_SHINKAI_ERROU_0")) reclamou = true;
             }
             assertTrue(id + ": viajou", noAr);
             assertFalse(id + ": não pegou", pegou);
             assertTrue(id + ": errou", errou);
             assertEquals(id + ": sem golpes do Ultra", 0, golpes);
+            assertTrue(id + ": o balão \"Droga!\" (o Ultra SHINKAI passou sem encostar)", reclamou);
+        }
+    }
+
+    /** Pegou: nada de balão de quem errou (o dono, 18/11: o balão é só para o Ultra SHINKAI que erra). */
+    @Test public void quemAcertaNaoReclama() {
+        for (String id : new String[]{"player_base", "p02", "p16", "p15"}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(id), GeneratedCharacters.get("p03"), 400f, 650f);
+            s.f(1).state.life = 1_000_000;
+            transformar(s);
+            s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+            s.in[0].direction = 3;
+            s.in[0].superAttack = true;
+            s.in[0].ultra = true;
+            boolean reclamou = false;
+            int golpes = 0;
+            for (int i = 0; i < 1200 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA || i < 30); i++) {
+                s.step();
+                s.in[0].direction = 0;
+                if (s.engine.cues().contains("ULTRA_SHINKAI_ERROU_0")) reclamou = true;
+                for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && !h.blocked) golpes++;
+            }
+            assertTrue(id + ": acertou", golpes > 0);
+            assertFalse(id + ": sem balão", reclamou);
         }
     }
 }
