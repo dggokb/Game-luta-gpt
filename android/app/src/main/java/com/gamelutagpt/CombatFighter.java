@@ -200,6 +200,8 @@ final class CombatFighter {
     int ultraPhase;
     /** O Ultra em andamento é o Ultra SHINKAI (cinco barras, dano maior, encerra o SHINKAI no fim). */
     boolean ultraShinkai;
+    /** O Ultra SHINKAI encostou no rival (acertou ou foi defendido): sem isso, errou. */
+    boolean ultraTocou;
     /** Dragão: 0 vindo, 1 pegou (acertos em {@link #dragaoAcertos}), 2 passou (defendido ou errou), 3 acabou o combo. */
     int dragaoEstado, dragaoAcertos, dragaoInicio, dragaoDanoPequeno, dragaoDanoFinal;
     /** Frames spent in the current ultra phase. */
@@ -304,6 +306,12 @@ final class CombatFighter {
     // Throw.
     int throwPhase;
     int throwFrame;
+    /** Distância de quem agarrou até o rival quando pegou (o 1º ponto da cena do agarrão). */
+    float throwGap;
+    /** Quadros que ele ainda fica parado no ar entre as pancadas de um golpe de várias. */
+    int presoNoAr;
+    /** O dano da cena do agarrão já entrou. */
+    boolean throwAcertou;
     /** Frames during which this fighter cannot be thrown (right after stun or wake-up). */
     int throwProtect;
     /** Frames since L + M was pressed, or -1: starts a throw or techs one. */

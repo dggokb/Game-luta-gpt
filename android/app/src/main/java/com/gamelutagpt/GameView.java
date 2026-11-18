@@ -2245,6 +2245,7 @@ public class GameView extends SurfaceView
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
             if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
             if ("ULTRA_PEGOU".equals(cue)) pegouNaViagem();
+            if (cue.startsWith("ULTRA_SHINKAI_ERROU_")) reclamarDoUltra(cue.charAt(cue.length() - 1) - '0');
             if (cue.startsWith("ULTRA_PALHACO")) chuvaDeTomates(cue);
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) chuvaDeTomates(cue);
             if (cue.startsWith("ULTRA_ICHIGEKI") || "ULTRA_FINISH_DRAGAO".equals(cue)) ichigeki(cue);
@@ -5258,7 +5259,7 @@ public class GameView extends SurfaceView
                 }
                 state = SpriteStates.HIT_AIR;
                 reactionElapsed = f.launched || f.slammed
-                    ? launchPoseTime(f.vy, f.slammed)
+                    ? launchPoseTime(f, f.vy, f.slammed)
                     : f.stunElapsed * FIXED_STEP;
                 break;
             case HITSTUN:
@@ -5277,14 +5278,26 @@ public class GameView extends SurfaceView
                 // dano no ar, não no quadro do pulo.
                 if (!f.grounded && f.airRecovering) {
                     state = SpriteStates.HIT_AIR;
-                    reactionElapsed = launchPoseTime(Math.max(0f, f.vy), false);
+                    reactionElapsed = launchPoseTime(f, Math.max(0f, f.vy), false);
                 }
                 break;
-            case THROWN:
-                // Held by the collar: the first frame of the hit reaction.
-                state = SpriteStates.HIT_STAND;
-                reactionElapsed = 0.02f;
+            case THROWN: {
+                // Na cena do agarrão (CenaDoAgarrao): preso, no ar (girando no desenho) ou deitado.
+                float[] cena = engine.poseDoAgarrado(f);
+                int pose = cena == null ? CenaDoAgarrao.PRESO : (int) cena[3];
+                if (pose == CenaDoAgarrao.DEITADO && renderer.hasAnimation(SpriteStates.GROUNDED)) {
+                    state = SpriteStates.GROUNDED;
+                    reactionElapsed = 0f;
+                } else if (pose == CenaDoAgarrao.NO_AR && renderer.hasAnimation(SpriteStates.HIT_AIR)) {
+                    state = SpriteStates.HIT_AIR;
+                    reactionElapsed = f.character().animation(SpriteStates.HIT_AIR).duration * 0.5f;
+                } else {
+                    // Held by the collar: the first frame of the hit reaction.
+                    state = SpriteStates.HIT_STAND;
+                    reactionElapsed = 0.02f;
+                }
                 break;
+            }
             default:
                 break;
         }
@@ -5402,11 +5415,15 @@ public class GameView extends SurfaceView
      * (ground slam), then the recovery tuck on the way down. The times index a HIT_AIR
      * clip of up to four 55 ms frames; shorter clips clamp.
      */
-    private static float launchPoseTime(float verticalVelocity, boolean slam) {
-        if (slam) return 0.13f;
+    private float launchPoseTime(CombatFighter f, float verticalVelocity, boolean slam) {
+        // Pela proporção do clipe (os de 4 quadros de 55 ms ficam como eram: 0, 0,07, 0,13 e 0,19 s);
+        // nos clipes longos dos vídeos novos a pose não fica presa no começo (18/11).
+        CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.HIT_AIR);
+        float d = clip != null ? clip.duration : 0.22f;
+        if (slam) return d * 0.59f;
         if (verticalVelocity < -500f) return 0f;
-        if (verticalVelocity < 0f) return 0.07f;
-        return 0.19f;
+        if (verticalVelocity < 0f) return d * 0.32f;
+        return d * 0.86f;
     }
 
     /** Vector fallback for packs without KNOCKDOWN/GROUNDED/GETUP: fall backwards. */
@@ -6284,7 +6301,7 @@ public class GameView extends SurfaceView
                 return SpriteStates.THROW_GRAB;
             }
             if (toss) {
-                float k = clamp(f.throwFrame / (float)config.throwExecuteFrames, 0f, 1f);
+                float k = clamp(f.throwFrame / (float)engine.throwExecuteFrames(f), 0f, 1f);
                 throwPoseTime = thrown.duration * k * 0.999f;
                 return SpriteStates.THROW_TOSS;
             }
@@ -6301,7 +6318,7 @@ public class GameView extends SurfaceView
         } else if (f.throwPhase == CombatFighter.THROW_HOLD) {
             frames = a.startupFrames + 0.5f;
         } else {
-            int length = toss ? config.throwExecuteFrames : config.throwWhiffFrames;
+            int length = toss ? engine.throwExecuteFrames(f) : config.throwWhiffFrames;
             float k = clamp(f.throwFrame / (float)length, 0f, 1f);
             frames = a.startupFrames + (a.totalFrames - 0.5f - a.startupFrames) * k;
         }
@@ -7146,6 +7163,11 @@ public class GameView extends SurfaceView
         if (ultraFlight(f)) applyFlight(c, f, visualY);
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
+        // Na cena do agarrão o rival gira no ar (o giro positivo leva a cabeça para longe de quem agarra).
+        float[] agarrado = engine.poseDoAgarrado(f);
+        if (agarrado != null && agarrado[2] != 0f) {
+            c.rotate(agarrado[2] * -f.facing, f.x, visualY - f.body().height(false) * 0.5f);
+        }
         // No reflexo do chão não: eram mais 10 cópias do lutador por quadro, quase invisíveis ali.
         if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) {
             if (AURA_CHAMA && c instanceof CanvasGl) drawShinkaiAura((CanvasGl)c, renderer, f, visualY);
@@ -9151,6 +9173,19 @@ public class GameView extends SurfaceView
         String nome = temporada != null ? temporada.nomeDoLutador(team.pointState().character.id) : null;
         String texto = GritoDaTroca.texto(nome, t -> temporada != null ? temporada.t(t) : t);
         conversa.dizer(temporada, quem, side == OPPONENT, "bravo", texto, GritoDaTroca.SEGURA);
+    }
+
+    /**
+     * O Ultra SHINKAI de {@code side} passou sem encostar: quem soltou reclama ("Droga!", "O quê?!",
+     * "Errei!") no quadro da conversa do lado dele, como o grito da troca (não no tutorial nem na cena).
+     */
+    private void reclamarDoUltra(int side) {
+        if (side < 0 || side > 1 || tutorial.active() || cinematica.rodando() || demo.active()) return;
+        loadTemporada();
+        String[] fala = ErrouUltraShinkai.sortear(soundRandom);
+        String quem = avulsoDoLutador(engine.team(side).pointState());
+        String texto = temporada != null ? temporada.t(fala[0]) : fala[0];
+        conversa.dizer(temporada, quem, side == OPPONENT, fala[1], texto, ErrouUltraShinkai.SEGURA);
     }
 
     /**

@@ -1749,7 +1749,7 @@ final class CombatEngine {
                 break;
             case THROW:
                 if ((f.throwPhase == CombatFighter.THROW_WHIFF && f.throwFrame >= config.throwWhiffFrames) ||
-                    (f.throwPhase == CombatFighter.THROW_EXECUTE && f.throwFrame >= config.throwExecuteFrames) ||
+                    (f.throwPhase == CombatFighter.THROW_EXECUTE && f.throwFrame >= throwExecuteFrames(f)) ||
                     (f.throwPhase == CombatFighter.THROW_TECH && f.throwFrame >= config.throwTechFrames)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                 }
@@ -1757,7 +1757,10 @@ final class CombatEngine {
             case THROWN: {
                 // Only an attacker holding it keeps a fighter thrown.
                 CombatFighter other = fighters[1 - f.index];
-                if (other.status != CombatFighter.Status.THROW || other.throwPhase != CombatFighter.THROW_HOLD) {
+                CenaDoAgarrao cena = CenaDoAgarrao.de(other.character());
+                boolean naCena = other.status == CombatFighter.Status.THROW &&
+                    other.throwPhase == CombatFighter.THROW_EXECUTE && cena != null && other.throwFrame <= cena.solta;
+                if (!naCena && (other.status != CombatFighter.Status.THROW || other.throwPhase != CombatFighter.THROW_HOLD)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                 }
                 break;
@@ -1983,6 +1986,7 @@ final class CombatEngine {
         f.backdashFrames = 0;
         f.crouching = false;
         f.ultraShinkai = ultraShinkaiPronto(f.state);
+        f.ultraTocou = false;
         f.state.spendSuperMeter(f.ultraShinkai ? CombatConfig.ULTRA_SHINKAI_COST : CombatConfig.ULTRA_COST);
         if (f.ultraShinkai) cues.add("ULTRA_SHINKAI");
         // Like the Super: the opponent and the projectiles wait for the rush (no dragão, a cena
@@ -2789,6 +2793,14 @@ final class CombatEngine {
             // Caught in the beam: it stays at the height it was hit.
             f.vy = 0f;
             return;
+        }
+        if (f.presoNoAr > 0) {
+            // Preso entre as pancadas de um golpe de várias: parado no ar até a próxima.
+            f.presoNoAr--;
+            if (f.status == CombatFighter.Status.AIR_HITSTUN) {
+                f.vy = 0f;
+                return;
+            }
         }
         float scale = 1f;
         // Ordinary neutral jumps now rise/fall briskly; preserve the superjump
@@ -4370,7 +4382,51 @@ final class CombatEngine {
             } else if (a.throwFrame >= config.throwTechWindow) {
                 landThrow(a, d);
             }
+        } else if (a.throwPhase == CombatFighter.THROW_EXECUTE && d.status == CombatFighter.Status.THROWN) {
+            cenaDoAgarrao(a, d);
         }
+    }
+
+    /**
+     * O agarrão com personalidade ({@link CenaDoAgarrao}): o rival segue o caminho do desenho, o dano
+     * entra no impacto e ele fica deitado onde caiu.
+     */
+    private void cenaDoAgarrao(CombatFighter a, CombatFighter d) {
+        CenaDoAgarrao cena = CenaDoAgarrao.de(a.character());
+        if (cena == null) return;
+        float[] p = cena.em(a.throwFrame, a.throwGap);
+        float wanted = a.x + a.facing * p[0];
+        d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        d.y = Arena.GROUND_Y - p[1];
+        d.grounded = p[1] <= 0f;
+        d.vx = d.vy = 0f;
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        if (a.throwFrame >= cena.acerto && !a.throwAcertou) {
+            a.throwAcertou = true;
+            jogar(a, d, false);
+        }
+        if (a.throwFrame >= cena.solta) {
+            // Deitado onde caiu (sem a queda de novo): daqui o levantar de sempre.
+            knockDown(d);
+            d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            d.knockdownFrame = config.knockdownFallFrames;
+        }
+    }
+
+    /** Duração da fase de jogar de quem agarrou: a da cena dele, ou a do motor. */
+    int throwExecuteFrames(CombatFighter a) {
+        CenaDoAgarrao cena = CenaDoAgarrao.de(a.character());
+        return cena != null ? cena.quadros : config.throwExecuteFrames;
+    }
+
+    /** O rival agarrado por {@code a} segue a cena do agarrão agora (pose e giro no desenho). */
+    float[] poseDoAgarrado(CombatFighter d) {
+        CombatFighter a = fighters[1 - d.index];
+        if (d.status != CombatFighter.Status.THROWN || a.status != CombatFighter.Status.THROW ||
+            a.throwPhase != CombatFighter.THROW_EXECUTE) return null;
+        CenaDoAgarrao cena = CenaDoAgarrao.de(a.character());
+        return cena == null ? null : cena.em(a.throwFrame, a.throwGap);
     }
 
     /**
@@ -4559,6 +4615,19 @@ final class CombatEngine {
 
     /** No tech in time: damage, knockdown and the attacker's recovery (oki). */
     private void landThrow(CombatFighter a, CombatFighter d) {
+        if (CenaDoAgarrao.de(a.character()) != null) {
+            // Com cena: o rival continua preso e segue o desenho; o dano entra no impacto.
+            a.throwPhase = CombatFighter.THROW_EXECUTE;
+            a.throwFrame = 0;
+            a.throwGap = Math.abs(d.x - a.x);
+            a.throwAcertou = false;
+            return;
+        }
+        jogar(a, d, true);
+    }
+
+    /** O dano do agarrão; {@code derruba}: o genérico (derruba e empurra na hora, e começa a fase de jogar). */
+    private void jogar(CombatFighter a, CombatFighter d, boolean derruba) {
         endSession(d.index);
         ComboSession session = new ComboSession(a.index, d.index);
         sessions[d.index] = session;
@@ -4569,12 +4638,18 @@ final class CombatEngine {
         d.state.takeDamage(damage, config.recoverableLifePermille);
         gainMeter(a, CombatRules.superGainOnHit(throwAttack.strength));
         d.framesSinceHit = 0;
-        knockDown(d);
-        push(d, a, a.facing * throwAttack.knockback);
+        HitEvent ev = new HitEvent(a.index, d.index, damage, false, false, throwAttack.id);
+        if (derruba) {
+            knockDown(d);
+            push(d, a, a.facing * throwAttack.knockback);
+            a.throwPhase = CombatFighter.THROW_EXECUTE;
+            a.throwFrame = 0;
+        } else {
+            ev.impactX = d.x;
+            ev.impactY = d.y - 30f;
+        }
         freeze(a, d, throwAttack.hitstopFrames, false);
-        a.throwPhase = CombatFighter.THROW_EXECUTE;
-        a.throwFrame = 0;
-        events.add(new HitEvent(a.index, d.index, damage, false, false, throwAttack.id));
+        events.add(ev);
     }
 
     /** Guarded: blockstun and recovery. Hit: the attacker waits for the cinematic. */
@@ -5167,8 +5242,13 @@ final class CombatEngine {
 
     /** O Ultra SHINKAI acabou (acertou, defendido ou errou): a transformação termina junto. */
     private void fimDoUltraShinkai(CombatFighter f) {
+        if (f.ultraShinkai) {
+            for (HitEvent e : events) if (e.attacker == f.index) f.ultraTocou = true;
+        }
         if (!f.ultraShinkai || f.status == CombatFighter.Status.ULTRA) return;
         f.ultraShinkai = false;
+        // Passou sem encostar (nem acerto nem defesa): o balão "Droga!" do lutador (o dono, 18/11).
+        if (!f.ultraTocou) cues.add("ULTRA_SHINKAI_ERROU_" + f.index);
         if (!f.state.inShinkai()) return;
         encerrar(f.state, 0);
         cues.add("ULTRA_SHINKAI_FIM");
@@ -5668,6 +5748,7 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
+        d.presoNoAr = 0;
         d.stunProjectile = projectile && attack.kind != AttackDefinition.Kind.SUPER && !c.echo ? c.projectile : null;
         // A new hit takes over any flight in progress (and any free fall after the hitstun).
         d.freeFallFrames = 0;
@@ -5831,9 +5912,12 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(d.stunLeft, config.launchHitstunFrames);
             a.launcherChase = config.launcherChaseFrames;
             push(d, a, direction * attack.knockback);
-        } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() && !a.grounded) {
+        } else if (!lastStrike && !projectile && a.attacking() && a.attack.mechanics.flies() &&
+                   !a.attack.mechanics.flightHover && !a.grounded) {
             // Golpe que voa e bate várias vezes (o chute da garça da Yin-lu): as pancadas do meio
-            // levam o rival junto, subindo com quem bate, para a próxima pegar; a última joga.
+            // levam o rival junto, subindo com quem bate, para a próxima pegar; a última joga. O que
+            // só paira rente ao chão (o S3 do Ryūga, 18/11: "o rival fica solto, quicando no ar")
+            // não sobe: o rival fica atordoado em pé na frente até o último chute.
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.grounded = false;
             d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
@@ -5842,8 +5926,17 @@ final class CombatEngine {
         } else if (!d.grounded) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             push(d, a, direction * airPush);
-            // Held in the air between strikes: a small pop keeps it in reach of the next one.
-            if (!lastStrike) d.vy = Math.min(d.vy, -config.strikeHoldLift);
+            // Entre as pancadas de um golpe de várias o rival fica preso no ar, na altura em que foi
+            // pego, até a próxima (o dono, 18/11: "o golpe não segura o personagem, ele fica solto,
+            // quicando no ar"; antes cada pancada dava um tranco para cima e ele boiava subindo).
+            if (!lastStrike) {
+                d.vy = 0f;
+                d.presoNoAr = holdUntil;
+            } else if (multi && launch == AttackDefinition.Launch.KNOCKDOWN) {
+                // A última pancada que derruba pega no ar quem ficou preso: cai e fica no chão.
+                d.hardFall = true;
+                d.launched = true;
+            }
         } else {
             d.status = CombatFighter.Status.HITSTUN;
             d.hitCrouching = wasCrouching;

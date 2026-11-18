@@ -648,7 +648,7 @@
         },
         "S2": {
           "nome": "Chute da garça",
-          "comando": "[↓] ↑"
+          "comando": "→↓↘"
         },
         "S3": {
           "nome": "Contra-golpe",

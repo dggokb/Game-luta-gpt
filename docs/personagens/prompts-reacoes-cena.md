@@ -132,7 +132,7 @@ trecho diz "The start frame: his body twisted by the punch, head snapped to the 
 **A queda nova da Yin-lu (18/11):** o vídeo H3 "Derrubado" (`p02_derrubado_h3_video.mp4`) virou
 KNOCKDOWN (quadros 10-28: voa e bate de costas; o quique é o do jogo, então o do vídeo fica de fora),
 GROUNDED (31-45) e GETUP (81-99) por `tools/sprites/p02_derrubado_h3.py` (escala 391/469; a raiz
-fixa nos pés do 1º quadro, o deslocamento do vídeo fica no desenho).
+fixa nos pés do 1º quadro, o deslocamento do vídeo fica no desenho). Ela substituiu a do `derrubaLevanta.mp4` (feita na mesma tarde em outra sessão) para o fim do giro bater com o caído.
 
 **Kōga e Brucy:** as reações deles são da arte antiga, então começam pelo passo 1. O Brucy ainda não
 tem as chaves H3 (`inicio_centro_h3`); o caído do Kōga tem as pernas para cima (o "Derrubado" também

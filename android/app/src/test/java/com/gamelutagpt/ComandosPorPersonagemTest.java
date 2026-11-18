@@ -18,7 +18,7 @@ public class ComandosPorPersonagemTest {
      */
     private static final String[][] TABELA = {
         {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←"},
-        {"p02", "Palma", "↓ ↘ →", "Chute da garça", "[↓] ↑", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "← →"},
+        {"p02", "Palma", "↓ ↘ →", "Chute da garça", "→ ↓ ↘", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "← →"},
         {"p03", "Onda curta", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},
         {"p05", "Kunai", "↓ ↘ →", "Shuriken", "↓ ↙ ←", "Selo e mudança", "↓ ↓", "Corte de mão", "← ↙ ↓ ↘ →"},
@@ -220,13 +220,26 @@ public class ComandosPorPersonagemTest {
         assertNotEquals("← e, bem depois, → + M não é o toque", "S4", devagar.started());
     }
 
+    /** O S2 da Yin-lu é o "Shoryuken" desde 18/11 (o [↓] ↑ era ruim de sair, o dono); o S1 continua ↓↘→. */
+    @Test public void oChuteDaGarcaEoShoryuken() {
+        for (String b : new String[] {"L", "M", "H"}) {
+            Luta l = new Luta("p02");
+            l.motion(b, 1, 3, 2);
+            assertEquals("→ ↓ ↘ + " + b, "S2", l.started());
+            Luta palma = new Luta("p02");
+            palma.motion(b, 3, 2, 1);
+            assertEquals("↓ ↘ → + " + b + " ainda é a Palma", "S", palma.started());
+        }
+    }
+
     @Test public void segurarBaixoECimaNaoPula() {
-        Luta l = new Luta("p02");
+        // O p08 (Giro ascendente) ainda é [↓] ↑.
+        Luta l = new Luta("p08");
         l.hold("M", 3, 7, l.config().chargeFrames + 2);
         assertEquals("S2", l.started());
         assertTrue("o ↑ do [↓] ↑ não vira pulo", l.p().grounded);
 
-        Luta pulo = new Luta("p02");
+        Luta pulo = new Luta("p08");
         pulo.in.direction = 3;
         pulo.steps(pulo.config().chargeFrames + 2);
         pulo.in.direction = 7;

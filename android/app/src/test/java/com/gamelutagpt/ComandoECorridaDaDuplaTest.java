@@ -46,7 +46,7 @@ public class ComandoECorridaDaDuplaTest {
         assertTrue("baixo: " + gyaku.mechanics.arcHeight, gyaku.mechanics.arcHeight <= 160f);
         combo(NATISUKO, BONNIE, 500f, "C DH 2H", 2);
         combo(NATISUKO, BONNIE, 500f, "C DH 2H SJ jL jM jH", 5);
-        combo(NATISUKO, BONNIE, 500f, "C DH SUPER", 5);
+        combo(NATISUKO, BONNIE, 500f, "C DH SUPER", 6);   // 18/11: o Super segura o rival no ar e pega as 5
     }
 
     /**

@@ -1,0 +1,22 @@
+{
+ "clipe": "p02_fall_down",
+ "quadros": 12,
+ "colunas": 11,
+ "celula": [
+  288,
+  256
+ ],
+ "raiz": [
+  141,
+  236
+ ],
+ "pixelScale": null,
+ "modelo": "realesr-animevideov3 (SRVGGNetCompact 4x)",
+ "pesos_sha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+ "fonte": "art/sprites/source/p02_fall_down_video_normalized.png",
+ "fonte_sha256": "df8c38b22c40b6d8964350352a3fb8de47f371d822998765b6a1b82c39d8fd0a",
+ "saida": "art/sprites/source/p02_fall_down_video_normalized_sr_hd.png",
+ "saida_sha256": "e0226e72e89f7c35f17994ace74435db8f654abd04c838d7cec20730803a7981",
+ "alfa": "idêntico à fonte (conferido byte a byte)",
+ "processo": "cor 4x pelo modelo sobre a fonte 2x, reduzida de volta à célula com alfa pré-multiplicado"
+}

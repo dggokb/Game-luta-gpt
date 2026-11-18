@@ -173,7 +173,14 @@ inicial"):** a garça, os tomates e o Ichigeki abrem com um golpe que sai dela e
 quadro até 1100 px, com a luta andando (dá para pular). Pega quem está na frente com os pés a até
 140 px do chão: defendeu = toma a defesa e acabou; pegou = a cena começa ali (o relógio dela volta a
 zero e a luta para). Passou por baixo, atrás ou longe demais: errou, ela volta à guarda e a barra foi
-gasta (`CombatConfig.viagem*`, `CombatEngine.viagem`, `UltraShinkaiTest`). O dragão do Ryūga segue
+gasta (`CombatConfig.viagem*`, `CombatEngine.viagem`, `UltraShinkaiTest`).
+
+**Errou, reclama (18/11, o dono):** todo Ultra SHINKAI que acaba sem encostar no rival (nem acerto
+nem defesa: o golpe que viaja passou, o dragão não pegou, o Ultra dobrado foi no vazio) faz quem soltou
+reclamar no quadro de mangá da conversa do lado dele, o padrão de fala do jogo (como o grito da troca:
+rosto, nome e legenda digitada, [motor-conversas.md](historia/motor-conversas.md)): "Droga!", "O quê?!"
+ou "Errei!" sorteado, 1,2 s na tela (`CombatEngine.fimDoUltraShinkai` avisa `ULTRA_SHINKAI_ERROU_<lado>`;
+`ErrouUltraShinkai`, `GameView.reclamarDoUltra`; `UltraShinkaiTest`). O dragão do Ryūga segue
 como era (ele atravessa a tela inteira e prende quem está na frente).
 
 **O que nasce na ativação (17/11, o dono):** **bicho só na família Komyo** (a escola dos irmãos): o

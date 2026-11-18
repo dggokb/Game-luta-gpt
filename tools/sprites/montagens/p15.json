@@ -418,6 +418,7 @@
     }
   },
   "hit_air": {
+    "_doc": "Apanhar no ar (18/11, vídeo Karate_Fighter_Hit_Reaction do dono, com o prompt novo): ela pula (24-33), leva o golpe no 36 e fica arqueada quase deitada no ar (39-69); o HIT_AIR é só a reação (39-69), sem o pulo. O vídeo danoPulo antigo ficava na pose de pulo, sem reação. Sem sem_efeitos (come o quimono branco).",
     "trechos": [
       [
         "danoPulo",
@@ -425,15 +426,30 @@
         124
       ]
     ],
-    "quadros": "6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44",
+    "quadros": "39,42,45,48,51,54,57,60,63,66,69",
     "opcoes": {
       "fixar": "video",
-      "sem_efeitos": true,
+      "densidade": 2,
       "escala": 0.411,
-      "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)"
+      "motivo": "mesma câmera dos vídeos H3 dela",
+      "nitidez": true
     },
     "animacoes": {
-      "HIT_AIR": {}
+      "HIT_AIR": {
+        "tempos": [
+          55,
+          55,
+          55,
+          55,
+          55,
+          55,
+          55,
+          55,
+          55,
+          55,
+          55
+        ]
+      }
     }
   },
   "defense_stand": {
@@ -668,6 +684,54 @@
     },
     "animacoes": {
       "ULTRA_DRAGAO": {}
+    }
+  },
+  "throw": {
+    "_doc": "Agarrão (18/11, vídeo agarrao do dono): estica a mão e agarra a gola (45-63: THROW_GRAB 0-6), puxa, varre a perna e crava o soco para baixo (66-90) e volta à guarda (96-102: THROW_TOSS 6-16). Sem sem_efeitos nem sem_poeira (os dois comem o quimono branco). Os tempos são os do agarrão da Yin-lu e da Bonnie. Os tempos do THROW_TOSS seguem o vídeo a 2x (18/11: a cena do agarrão, CenaDoAgarrao, estica o clipe sobre a fase de jogar dela).",
+    "trechos": [
+      [
+        "agarrao",
+        0,
+        124
+      ]
+    ],
+    "quadros": "45,48,51,54,57,60,63,66,69,72,75,78,82,86,90,96,102",
+    "opcoes": {
+      "fixar": "video",
+      "densidade": 2,
+      "escala": 0.411,
+      "motivo": "mesma câmera dos vídeos H3 dela",
+      "nitidez": true
+    },
+    "animacoes": {
+      "THROW_GRAB": {
+        "frames": "0-6",
+        "tempos": [
+          10,
+          10,
+          12,
+          13,
+          13,
+          12,
+          30
+        ]
+      },
+      "THROW_TOSS": {
+        "frames": "6-16",
+        "tempos": [
+          63,
+          63,
+          63,
+          63,
+          63,
+          83,
+          83,
+          83,
+          125,
+          125,
+          47
+        ]
+      }
     }
   }
 }

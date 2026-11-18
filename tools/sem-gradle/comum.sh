@@ -12,4 +12,4 @@ if [ -z "$JUNIT_CP" ]; then
   JUNIT_CP="$junit:$hamcrest"
 fi
 SP="$GEN:$AQUI/java:$A/pc/src/substituicoes/java:$A/app/src/main/java:$A/pc/src/main/java:$A/render-core/src/main/java:$A/ultra-core/src/main/java:$A/story-core/src/main/java:$A/stage-core/src/main/java:$A/motion-core/src/main/java:$A/app/src/test/java"
-JAVA_OPCOES="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -Dgameluta.repo=$REPO -Dgameluta.semSom=true -Dgameluta.webpcache=$B/webp"
+JAVA_OPCOES="${JAVA_EXTRA:-} -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Dgameluta.repo=$REPO -Dgameluta.semSom=true -Dgameluta.webpcache=$B/webp"

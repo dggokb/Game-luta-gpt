@@ -2,54 +2,33 @@
   "id": "p02_defense_air",
   "javaName": "P02_DEFENSE_AIR",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defense_air_sr_hd.png",
+  "source": "art/sprites/source/p02_defense_air_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defense_air.webp",
   "report": "tools/sprites/reports/p02_defense_air.report.json",
   "preview": "android/app/build/sprite-review/p02_defense_air-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 11,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
-    "arquivo": "defesaNoAr.mp4",
+    "arquivo": "defesaPulo.mp4",
     "personagem": "p02",
-    "escala": 0.5156,
-    "medida": "1º quadro = inicio_centro (nota 0.91)",
-    "quadros": "21,25,30,35,40,44,49",
-    "celula": 320,
-    "largura": 224,
-    "raiz": "99,302",
-    "colunas": 7,
-    "pe_no_chao": true,
-    "reescala": [
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364
-    ],
-    "reguaFatores": [
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 88% (DEFENSE_AIR)"
-    ]
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "36,24,27,30,33,36,39,42,45,48,51,66,69,72",
+    "celula": 288,
+    "largura": 160,
+    "raiz": "83,223",
+    "colunas": 11,
+    "fixar": "video",
+    "limpar_chao": true
   },
-  "frameWidth": 448,
-  "frameHeight": 640,
-  "rootX": 198,
-  "rootY": 604,
+  "frameWidth": 160,
+  "frameHeight": 288,
+  "rootX": 83,
+  "rootY": 223,
   "sourceReferences": [
     "art/sprites/source/p02_defense_air_video_normalized.png"
-  ],
-  "pixelScale": 2.0
+  ]
 }

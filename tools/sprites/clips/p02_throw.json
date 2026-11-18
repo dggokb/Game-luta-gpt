@@ -2,93 +2,33 @@
   "id": "p02_throw",
   "javaName": "P02_THROW",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_throw_video_hd_hd_aprovado_2x.png",
+  "source": "art/sprites/source/p02_throw_video_normalized_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_throw.webp",
   "report": "tools/sprites/reports/p02_throw.report.json",
   "preview": "android/app/build/sprite-review/p02_throw-import.png",
   "expectedFrames": 17,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 11,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
     "arquivo": "agarrao.mp4",
     "personagem": "p02",
-    "escala": 0.5215,
-    "medida": "1º quadro = inicio_centro (nota 0.95)",
-    "quadros": "16,19,22,25,28,31,35,38,41,42,47,50,54,57,60,63,66",
+    "escala": 0.4173,
+    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
+    "quadros": "24,27,30,33,36,39,42,46,50,54,57,59,64,70,78,84,90",
     "celula": 288,
-    "largura": 288,
-    "raiz": "110,270",
-    "colunas": 7,
-    "limpar_chao": true,
-    "reescala": [
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753
-    ],
-    "limpar_quadros": [
-      10,
-      11
-    ],
-    "densidade": 2,
-    "nitidez": true,
-    "referencia": {
-      "folha": "art/sprites/source/p02_throw_video_normalized.png",
-      "celula": [
-        288,
-        288
-      ],
-      "raiz": [
-        110,
-        270
-      ],
-      "colunas": 9
-    },
-    "reguaFatores": [
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753,
-      1.0753
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 93% (THROW_GRAB / THROW_TOSS)"
-    ]
+    "largura": 256,
+    "raiz": "94,270",
+    "colunas": 11,
+    "fixar": "video",
+    "limpar_chao": true
   },
-  "frameWidth": 576,
-  "frameHeight": 576,
-  "rootX": 220,
-  "rootY": 540,
+  "frameHeight": 288,
+  "rootX": 94,
+  "rootY": 270,
+  "frameWidth": 256,
   "sourceReferences": [
-    "art/sprites/source/p02_throw_video_normalized.png",
-    "art/sprites/source/p02_throw_video_hd.png"
-  ],
-  "pixelScale": 2.0
+    "art/sprites/source/p02_throw_video_normalized.png"
+  ]
 }
