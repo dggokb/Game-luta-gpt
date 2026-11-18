@@ -1993,3 +1993,15 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   ele fecha no rival com os danos (1,15x), some de repente no quadro 194 (os danos junto) e fica
   tudo preto sem o rival até a câmera descer com o punho (205).
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 18/11: o Super da Yin-lu no combo e a revisão dos documentos
+
+- **"O super na Yin-lu em combo se tornou inútil":** no combo o rival está atordoado e não bate, e
+  ela ficava esperando na postura. Agora, com o rival em hitstun, o Super sai direto no desvio e na
+  investida até ele, e as 6 palmas emendam (2L M SUPER, L M H SUPER, 2L M H SUPER:
+  `SuperEspelhoDoLagoTest`). No neutro segue o contra-golpe. Depois do 2M não emenda (o 2M derruba).
+- **Documentos revistos** (o dono, 18/11: "revê o que fizemos ontem"): a ativação do SHINKAI da
+  Natisuko e da Bonnie (de 17/11) estava fora do `shinkai.md`; a aura em labaredas ligada; o golpe
+  que viaja nas fichas da Yin-lu, da Natisuko e da Bonnie; o quadro de quem tem o quê e o foco na
+  jogabilidade em `personagens/README.md`; as tabelas "No jogo hoje" geradas de novo.
+- **Ficou:** o Super no combo só conferido no teste, sem vídeo.

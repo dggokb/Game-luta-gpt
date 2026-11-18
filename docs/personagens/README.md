@@ -3,6 +3,23 @@
 Índice dos personagens e das regras de animação. Cada ficha (`pNN.md`) tem o mesmo formato: quem é
 e como luta, o que está no jogo hoje (gerado dos dados), combos, o que falta e os prompts de vídeo.
 
+## Foco agora (18/11)
+
+Fechar a jogabilidade: sprites de movimento e de golpes (com o agarrão), Super, Ultra, SHINKAI e
+Ultra SHINKAI. Intro, vitória, derrota, provocação e as imagens da abertura e da página de mangá do
+Ultra ficam para depois; nas fichas elas estão em "Depois (fora da jogabilidade)".
+
+**Onde está cada um (18/11):**
+
+| Quem | Ativação do SHINKAI (vídeo) | Ultra SHINKAI próprio |
+|---|---|---|
+| Ryūga (p01) | ✅ aura azul e dragão | ✅ o dragão atravessa a tela |
+| Yin-lu (p02) | ✅ a garça branca | ✅ Voo da Garça (17/11) |
+| Kōga (p03) | ⬜ o tigre, depois dos sprites novos | ⬜ o próprio Ultra com o dobro do dano |
+| Natisuko (p15) | ✅ o círculo de pincel e os mil socos (17/11) | ✅ Ichigeki (17/11) |
+| Bonnie (p16) | ✅ a lebre da cartola (17/11) | ✅ Chuva de Tomates (17/11) |
+| p04 a p14 | ⬜ ficam na guarda no corte | ⬜ o próprio Ultra com o dobro do dano |
+
 ## Decisões fechadas
 
 - **Duplas fixas no modo história:** p01+p02, p03+p04, p05+p06, p07+p08, p09+p10, p11+p12. No

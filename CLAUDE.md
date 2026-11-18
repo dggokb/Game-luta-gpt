@@ -20,6 +20,13 @@ que ele mandar fazer ali mesmo.
 
 Nenhum modelo testa no celular daqui, e quem julga o resultado visual é o dono, em vídeo.
 
+## Foco agora: fechar a jogabilidade
+
+Por enquanto só entram **sprites de movimento e de golpes** (normais, especiais, comando, corrida,
+agarrão), **Super, Ultra, SHINKAI e Ultra SHINKAI** (o dono, 18/11: "quero fechar a jogabilidade").
+Intro, vitória, derrota, provocação, abertura e página de mangá do Ultra ficam para depois: não
+liste como pendência do momento nem proponha agora.
+
 ## Git
 
 - Push direto na `game-luta-sprite-fable`, depois de `git fetch` e `git merge` do origin. Sem

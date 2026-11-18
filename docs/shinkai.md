@@ -39,7 +39,10 @@ botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` 
 - **Duração.** Dura `shinkaiFrames` = 480 quadros (**8 s**, como era o OD). A barra esvazia
   mostrando o tempo e o botão mostra os segundos. No último quinto o contorno falha, avisando que
   vai acabar.
-- **Em volta do corpo** (sem aura e sem animação nova): um **contorno de energia** na cor do tipo.
+- **Em volta do corpo:** desde 17/11 a **aura em labaredas** (no OpenGL, ligada para o dono testar
+  no celular: `GameView.AURA_CHAMA`; `-Dgameluta.auraChama=false` volta ao contorno; detalhes em
+  [vfx-continuar.md](vfx-continuar.md)); no fim ela e o contorno enfraquecem em vez de piscar. No
+  Canvas, e antes dela, um **contorno de energia** na cor do tipo.
   É a silhueta do próprio quadro, desenhada atrás dele em várias direções, tremendo: uma borda
   larga e fraca e outra fina e clara (`GameView.drawShinkaiOutline`). Ele acompanha cada quadro
   da animação.
@@ -145,8 +148,10 @@ Nada disso precisa de comando novo: são os mesmos botões, com o resultado na t
 Quem tem a animação `SHINKAI_ATIVA` a toca no corte da ativação, com a luta parada (o rival e o
 relógio esperam o tempo dela; `CombatEngine.shinkaiAtivacaoQuadros`). Com o vídeo da liberação
 (efeito `shinkai_<id>`: o lutador e o que nasce em volta dele), o efeito toca nos pés e o sprite
-some; a `marcaMs` do efeito diz quando entra o corte com o nome. Têm: o Ryūga (aura azul e dragão)
-e a Yin-lu (a garça branca, 14/11). Os outros ficam na guarda durante o corte.
+some; a `marcaMs` do efeito diz quando entra o corte com o nome. Têm: o Ryūga (aura azul e dragão),
+a Yin-lu (a garça branca, 14/11), a Natisuko (o círculo de pincel e os mil socos, `shinkai_p15`) e a
+Bonnie (a lebre da cartola, `shinkai_p16`), as duas com os vídeos do dono de 17/11. Os outros ficam
+na guarda durante o corte.
 
 **Ultra SHINKAI de cada um (17/11):** o do Ryūga é o dragão que atravessa a tela; o da Yin-lu, o
 **Voo da Garça**: ela manda a garça ao céu, a garça desce no rival e fecha as asas num casulo (ele
@@ -158,7 +163,9 @@ leva os punhos de luz de todos os lados duas vezes, o círculo de pincel com os 
 repente, e a câmera desce com o punho
 gigante até ele deitado: POFT, e o punho some em partículas: `CombatConfig.ultraIchigeki`). Nas
 cenas pretas (Bonnie e Natisuko) a câmera centra no rival e os efeitos de tela inteira
-(`GameView.tocarNaTela`) cobrem o que ela mostra, com folga.
+(`GameView.tocarNaTela`) cobrem o que ela mostra, com folga. Quem não tem cena própria (o Kōga e
+p04 a p14) solta o próprio Ultra com o dobro do dano (`ultraShinkaiDanoPermille`); o tigre do
+Kōga fica para quando os sprites dele forem refeitos.
 
 **O golpe que viaja (17/11, o dono: "essas ult à distância têm que entrar só se acertar o hit
 inicial"):** a garça, os tomates e o Ichigeki abrem com um golpe que sai dela e atravessa na frente

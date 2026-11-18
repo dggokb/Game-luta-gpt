@@ -475,6 +475,13 @@ vermelha. O resto vem do tipo, sempre com os mesmos botões e o resultado na tel
 para a luta (o `step` só roda o confronto) e vira um cabo de guerra em que cada tipo empurra de um
 jeito; quem vence acerta 2000 e fica com o SHINKAI cheio, quem perde voa e perde o dele.
 
+**Ultra SHINKAI** (no SHINKAI, com as cinco barras): o Ultra com o dobro do dano, e o SHINKAI acaba.
+Quatro têm cena própria (`CombatConfig.ultraDragao`): o dragão do Ryūga atravessa a tela; a garça
+da Yin-lu, os tomates da Bonnie e o Ichigeki da Natisuko (17/11) abrem com um golpe que viaja
+(`CombatEngine.viagem`) e só entram se ele pegar; pegou, o relógio da cena volta a zero e a luta para
+(`ULTRA_PEGOU`); errou, `ULTRA_ERROU` e a recuperação. Cada cena tem o seu `update*` (`updateGarca`,
+`updatePalhaco`, `updateIchigeki`) e os efeitos no `GameView`. Teste: `UltraShinkaiTest`.
+
 Regras, números, a divisão do elenco e o que falta: [shinkai.md](shinkai.md).
 O assist (antes a barra de 5 partes) agora aparece como um anel em volta do círculo do TAG.
 
