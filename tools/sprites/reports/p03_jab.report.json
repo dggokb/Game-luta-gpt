@@ -106,9 +106,9 @@
     {
       "index": 8,
       "outputBbox": [
-        26,
+        24,
         41,
-        163,
+        161,
         272
       ],
       "minimumMargin": 16,
@@ -117,9 +117,9 @@
     {
       "index": 9,
       "outputBbox": [
-        29,
+        24,
         43,
-        166,
+        161,
         272
       ],
       "minimumMargin": 16,
@@ -128,23 +128,23 @@
     {
       "index": 10,
       "outputBbox": [
-        33,
-        41,
-        169,
-        271
+        25,
+        42,
+        161,
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 14452
     },
     {
       "index": 11,
       "outputBbox": [
-        35,
-        42,
-        171,
-        271
+        25,
+        43,
+        161,
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 14546
     }
   ],
@@ -232,7 +232,7 @@
         0,
         152,
         244,
-        6,
+        4,
         4
       ],
       [
@@ -240,7 +240,7 @@
         0,
         152,
         244,
-        9,
+        4,
         5
       ],
       [
@@ -248,16 +248,16 @@
         248,
         152,
         244,
-        12,
-        4
+        4,
+        5
       ],
       [
         156,
         248,
         152,
         244,
-        14,
-        4
+        4,
+        5
       ]
     ],
     "decodedBytes": {
@@ -269,12 +269,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1d929c4d481854da3a222009172670303ad50621ad45c396d62e0cdb4ad5fece",
-      "config": "f524f5ae75d3cad683bf3425a0cc1c5acb53864398b4cdd68b190b5241e7a45b",
+      "source": "361d4480987d81a093615c68be9575ee63a36d614cb35fca5790fa86b6c0814d",
+      "config": "26c85c3dfacc83c4cf3c1728a933587e5e6a68ac41ee78aa475ad7af3c2304d8",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/p03_jab_video_normalized.png": "5cbf19a80052dc047d02cacacd883f8d1d32518e6c289fdcf5d15b597472b968"
+      "art/sprites/source/p03_jab_video_normalized.png": "ab78b211ce4b4fa24528e6d1554b7344015734931eabbd7f63a803ce1a27cf1e"
     }
   }
 }

@@ -22,14 +22,13 @@
     "raiz": "92,270",
     "colunas": 11,
     "fixar": "video",
-    "limpar_chao": true,
-    "emendar_idle": true
+    "limpar_chao": true
   },
+  "sourceReferences": [
+    "art/sprites/source/p03_jab_video_normalized.png"
+  ],
   "frameWidth": 224,
   "frameHeight": 288,
   "rootX": 92,
-  "rootY": 270,
-  "sourceReferences": [
-    "art/sprites/source/p03_jab_video_normalized.png"
-  ]
+  "rootY": 270
 }

@@ -5,7 +5,7 @@
     "motivo": "vídeos H3 do Kōga novo: a inicio_centro_h3 de 18/11 (556 px de guarda) na mesma escala do Kōga de antes"
   },
   "jab": {
-    "_doc": "L (18/11, vídeo L do dono, H3 do concept novo): o vídeo tem seis estocadas seguidas; fica só a 1ª, da guarda (0, 0,98 da imagem inicial) à guarda (24, 0,95): prepara (4-7), estica (8-12) e volta (14-24). Sem ajuste de emenda (o dono: 'se voltar no idle a gente usa sem ajuste nem nada').",
+    "_doc": "L (18/11, vídeo L do dono, H3 do concept novo): o vídeo tem seis estocadas seguidas; fica só a 1ª, da guarda (0, 0,98 da imagem inicial) à guarda (24, 0,95): prepara (4-7), estica (8-12) e volta (14-24). Sem ajuste de emenda (o dono: 'se voltar no idle a gente usa sem ajuste nem nada'): o emendar_idle mede o eixo do tronco (+10 px), mas a pose nova tem o punho mais recolhido que a do idle antigo; deslocar 10 px deixou as costas 9 px fora e deu um pulo na troca. Sem deslocar, as costas caem 2 px do idle. Fica na lista de exceções.",
     "trechos": [
       [
         "L",
