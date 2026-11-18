@@ -2034,3 +2034,11 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   GUARD BREAK (`beamShake`): ela só diminuía no passo da luta, que fica parado na animação à mão, e
   a tela tremia 1 a 3 px até o fim da cena. Agora diminui também no passo da cinemática. Medido nos
   quadros: parada de novo. Vídeos `torneio_desistir_v7_{ryuga,koga}.mp4`. Visto só no PC.
+- **Rodada 8 (celular):** "no jogo está tudo muito perto" (print do celular, 20:9). Numa tela mais
+  larga que 16:9 a cena enche a largura e corta em cima e embaixo: tudo sai 25% maior que nos vídeos
+  do PC, e quem está caído some atrás da faixa de baixo. Na cinemática o zoom agora recua em volta do
+  meio da tela (proporção 16:9 ÷ a da tela, junto com as faixas): o celular vê o enquadramento do 16:9
+  com mais dos lados. O parceiro que estava entrando ou saindo não é mais desenhado na animação à mão
+  (ficava congelado na beira, aparecia na tela larga). `testeCena -Plargura=1600` grava em 20:9.
+  Vídeo `torneio_desistir_v8_celular_20x9.mp4`. Visto só no PC (em 20:9).
+

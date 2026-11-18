@@ -1,0 +1,26 @@
+{
+  "id": "p16_hit_spin_pouso",
+  "javaName": "P16_HIT_SPIN_POUSO",
+  "profile": "p16.json",
+  "source": "art/sprites/source/p16_hit_spin_pouso.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p16_hit_spin_pouso.webp",
+  "report": "tools/sprites/reports/p16_hit_spin_pouso.report.json",
+  "preview": "android/app/build/sprite-review/p16_hit_spin_pouso-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 400,
+  "rootY": 600,
+  "sourceNote": "Giro de nocaute da Bonnie, vídeo H3 do dono (art/sprites/source/p16_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p16/inicio_giro_h3.png, final art/keys/p16/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p16. O pouso: quadros 78-90 de 2 em 2 (bate de costas no chão e assenta); depois dele, o GROUNDED; a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceReferences": [
+    "art/sprites/source/p16_hit_spin_video.mp4"
+  ],
+  "pixelScale": 2.0,
+  "ajusteTamanho": 1.0,
+  "regua": [
+    "na escala do IDLE: a guarda do vídeo H3 (537 px) = o idle da folha (441 px)"
+  ]
+}

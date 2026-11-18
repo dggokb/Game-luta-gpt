@@ -168,8 +168,10 @@ São imagens largas (1774×887), cada uma uma página de um quadro só. O
 - **ep05, a ponte:** `pag8_p05`, `pag8_p11` e `pag8_p13` (Drive 63_1, 63_2 e 63_3): `"ponte": "p05"`
   faz o passo tocar só quando essa dupla embosca na ponte (`Campanha.vale`). O
   `TorneioTest.ep05MostraQuemEmboscaNaPonte` confere.
-- Depois delas segue o rascunho de antes (a noite, a fala do irmão e a luta da emboscada), até
-  chegarem as páginas da ponte.
+- **ep05, a ponte do Ryūga:** `pag9_ryuga` (64: o Ryūga e a Yín-lù na ponte, "HEY!") e
+  `pag10_ryuga_p05` / `_p11` / `_p13` (65 de cada dupla: a dupla da ponte e o "vocês já tiveram a
+  chance de vocês"), e logo a luta da emboscada. Vieram pelo chat (o Drive estava falhando).
+- No Kōga, depois da 63, ainda segue o rascunho de antes (a noite e a fala dele) até a luta.
 
 ### O sorteio em cena (ep04)
 

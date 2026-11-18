@@ -1,0 +1,26 @@
+{
+  "id": "p15_hit_spin",
+  "javaName": "P15_HIT_SPIN",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_hit_spin.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_hit_spin.webp",
+  "report": "tools/sprites/reports/p15_hit_spin.report.json",
+  "preview": "android/app/build/sprite-review/p15_hit_spin-import.png",
+  "expectedFrames": 24,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 400,
+  "rootY": 600,
+  "sourceNote": "Giro de nocaute da Natisuko, vídeo H3 do dono (art/sprites/source/p15_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p15/inicio_giro_h3.png, final art/keys/p15/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. Montado por tools/sprites/giro_h3.py p15. O voo: quadros 5-57 (24 deles: o soco torce, o arremesso e o rolo em parafuso); a base do corpo na raiz, o meio na raiz (o arco é da física do jogo).",
+  "sourceReferences": [
+    "art/sprites/source/p15_hit_spin_video.mp4"
+  ],
+  "pixelScale": 2.0,
+  "ajusteTamanho": 1.0,
+  "regua": [
+    "na escala do IDLE: a guarda do vídeo H3 (586 px) = o idle da folha (483 px)"
+  ]
+}

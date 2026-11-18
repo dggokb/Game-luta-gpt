@@ -292,17 +292,17 @@ final class GeneratedSpriteLayouts {
     static final int P02_FALL_AIR_ROOT_Y = 481;
     static final int P02_FALL_AIR_FRAME_COUNT = 7;
 
-    static final int P02_FALL_DOWN_FRAME_WIDTH = 265;
-    static final int P02_FALL_DOWN_FRAME_HEIGHT = 236;
-    static final int P02_FALL_DOWN_ROOT_X = 130;
-    static final int P02_FALL_DOWN_ROOT_Y = 220;
-    static final int P02_FALL_DOWN_FRAME_COUNT = 12;
+    static final int P02_FALL_DOWN_FRAME_WIDTH = 485;
+    static final int P02_FALL_DOWN_FRAME_HEIGHT = 442;
+    static final int P02_FALL_DOWN_ROOT_X = 236;
+    static final int P02_FALL_DOWN_ROOT_Y = 432;
+    static final int P02_FALL_DOWN_FRAME_COUNT = 11;
 
-    static final int P02_GETUP_FRAME_WIDTH = 263;
-    static final int P02_GETUP_FRAME_HEIGHT = 239;
-    static final int P02_GETUP_ROOT_X = 124;
-    static final int P02_GETUP_ROOT_Y = 223;
-    static final int P02_GETUP_FRAME_COUNT = 9;
+    static final int P02_GETUP_FRAME_WIDTH = 468;
+    static final int P02_GETUP_FRAME_HEIGHT = 447;
+    static final int P02_GETUP_ROOT_X = 237;
+    static final int P02_GETUP_ROOT_Y = 437;
+    static final int P02_GETUP_FRAME_COUNT = 10;
 
     static final int P02_GOLPE_ALTO_FRAME_WIDTH = 350;
     static final int P02_GOLPE_ALTO_FRAME_HEIGHT = 445;
@@ -327,6 +327,18 @@ final class GeneratedSpriteLayouts {
     static final int P02_HIT_CROUCH_ROOT_X = 90;
     static final int P02_HIT_CROUCH_ROOT_Y = 178;
     static final int P02_HIT_CROUCH_FRAME_COUNT = 12;
+
+    static final int P02_HIT_SPIN_FRAME_WIDTH = 475;
+    static final int P02_HIT_SPIN_FRAME_HEIGHT = 416;
+    static final int P02_HIT_SPIN_ROOT_X = 237;
+    static final int P02_HIT_SPIN_ROOT_Y = 406;
+    static final int P02_HIT_SPIN_FRAME_COUNT = 24;
+
+    static final int P02_HIT_SPIN_POUSO_FRAME_WIDTH = 481;
+    static final int P02_HIT_SPIN_POUSO_FRAME_HEIGHT = 298;
+    static final int P02_HIT_SPIN_POUSO_ROOT_X = 240;
+    static final int P02_HIT_SPIN_POUSO_ROOT_Y = 288;
+    static final int P02_HIT_SPIN_POUSO_FRAME_COUNT = 7;
 
     static final int P02_HIT_STAND_FRAME_WIDTH = 184;
     static final int P02_HIT_STAND_FRAME_HEIGHT = 224;
@@ -3340,6 +3352,18 @@ final class GeneratedSpriteLayouts {
     static final int P15_HIT_CROUCH_ROOT_Y = 363;
     static final int P15_HIT_CROUCH_FRAME_COUNT = 15;
 
+    static final int P15_HIT_SPIN_FRAME_WIDTH = 561;
+    static final int P15_HIT_SPIN_FRAME_HEIGHT = 556;
+    static final int P15_HIT_SPIN_ROOT_X = 280;
+    static final int P15_HIT_SPIN_ROOT_Y = 546;
+    static final int P15_HIT_SPIN_FRAME_COUNT = 24;
+
+    static final int P15_HIT_SPIN_POUSO_FRAME_WIDTH = 541;
+    static final int P15_HIT_SPIN_POUSO_FRAME_HEIGHT = 311;
+    static final int P15_HIT_SPIN_POUSO_ROOT_X = 270;
+    static final int P15_HIT_SPIN_POUSO_ROOT_Y = 301;
+    static final int P15_HIT_SPIN_POUSO_FRAME_COUNT = 7;
+
     static final int P15_HIT_STAND_FRAME_WIDTH = 383;
     static final int P15_HIT_STAND_FRAME_HEIGHT = 502;
     static final int P15_HIT_STAND_ROOT_X = 157;
@@ -3585,6 +3609,18 @@ final class GeneratedSpriteLayouts {
     static final int P16_HIT_CROUCH_ROOT_X = 170;
     static final int P16_HIT_CROUCH_ROOT_Y = 341;
     static final int P16_HIT_CROUCH_FRAME_COUNT = 9;
+
+    static final int P16_HIT_SPIN_FRAME_WIDTH = 530;
+    static final int P16_HIT_SPIN_FRAME_HEIGHT = 537;
+    static final int P16_HIT_SPIN_ROOT_X = 265;
+    static final int P16_HIT_SPIN_ROOT_Y = 526;
+    static final int P16_HIT_SPIN_FRAME_COUNT = 24;
+
+    static final int P16_HIT_SPIN_POUSO_FRAME_WIDTH = 539;
+    static final int P16_HIT_SPIN_POUSO_FRAME_HEIGHT = 304;
+    static final int P16_HIT_SPIN_POUSO_ROOT_X = 269;
+    static final int P16_HIT_SPIN_POUSO_ROOT_Y = 294;
+    static final int P16_HIT_SPIN_POUSO_FRAME_COUNT = 7;
 
     static final int P16_HIT_STAND_FRAME_WIDTH = 408;
     static final int P16_HIT_STAND_FRAME_HEIGHT = 482;
@@ -3879,6 +3915,18 @@ final class GeneratedSpriteLayouts {
     static final int HIT_HIGH_ROOT_X = 173;
     static final int HIT_HIGH_ROOT_Y = 481;
     static final int HIT_HIGH_FRAME_COUNT = 9;
+
+    static final int HIT_SPIN_SET_FRAME_WIDTH = 503;
+    static final int HIT_SPIN_SET_FRAME_HEIGHT = 455;
+    static final int HIT_SPIN_SET_ROOT_X = 251;
+    static final int HIT_SPIN_SET_ROOT_Y = 447;
+    static final int HIT_SPIN_SET_FRAME_COUNT = 24;
+
+    static final int HIT_SPIN_POUSO_SET_FRAME_WIDTH = 518;
+    static final int HIT_SPIN_POUSO_SET_FRAME_HEIGHT = 343;
+    static final int HIT_SPIN_POUSO_SET_ROOT_X = 259;
+    static final int HIT_SPIN_POUSO_SET_ROOT_Y = 335;
+    static final int HIT_SPIN_POUSO_SET_FRAME_COUNT = 7;
 
     static final int HIT_STAND_FRAME_WIDTH = 412;
     static final int HIT_STAND_FRAME_HEIGHT = 523;

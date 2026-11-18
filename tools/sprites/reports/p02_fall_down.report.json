@@ -1,280 +1,263 @@
 {
   "id": "p02_fall_down",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_fall_down_video_normalized_sr_hd.png",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "source": "art/sprites/source/p02_fall_down_h3.png",
+  "sourceNote": "Yin-lu: v\u00eddeo H3 \"Derrubado\" do dono (art/sprites/source/p02_derrubado_h3_video.mp4, 18/11), imagem inicial e final art/keys/p02/inicio_centro_h3.png, pedido em docs/personagens/p02.md. Montado por tools/sprites/p02_derrubado_h3.py: escala 391/469 (a guarda do v\u00eddeo = o IDLE da folha), raiz fixa no meio dos p\u00e9s do 1\u00ba quadro (o deslocamento do v\u00eddeo fica). Quadros do v\u00eddeo: 10,13,16,19,22,25,28 (queda: voa e bate de costas; o quique \u00e9 do jogo) e 31,33,36,45 (ca\u00eddo).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 288,
-    "frameHeight": 256,
-    "rootX": 141,
-    "rootY": 236,
-    "columns": 11,
-    "frameCount": 12
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 320,
+    "rootY": 470,
+    "columns": 6,
+    "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        35,
-        26,
-        230,
-        210
+        99,
+        58,
+        386,
+        460
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 12617
+      "minimumMargin": 52,
+      "opaquePixels": 45661
     },
     {
       "index": 1,
       "outputBbox": [
-        34,
-        26,
-        241,
-        189
+        105,
+        60,
+        434,
+        446
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 12381
+      "minimumMargin": 60,
+      "opaquePixels": 45013
     },
     {
       "index": 2,
       "outputBbox": [
-        32,
-        38,
-        246,
-        169
+        111,
+        47,
+        468,
+        421
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 11637
+      "minimumMargin": 47,
+      "opaquePixels": 44972
     },
     {
       "index": 3,
       "outputBbox": [
-        27,
-        67,
-        246,
-        188
+        109,
+        52,
+        503,
+        391
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 12157
+      "minimumMargin": 52,
+      "opaquePixels": 45634
     },
     {
       "index": 4,
       "outputBbox": [
-        26,
-        71,
-        233,
-        222
+        108,
+        78,
+        515,
+        367
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 12130
+      "minimumMargin": 78,
+      "opaquePixels": 45702
     },
     {
       "index": 5,
       "outputBbox": [
-        29,
-        96,
-        245,
-        226
+        93,
+        218,
+        488,
+        455
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 11968
+      "minimumMargin": 57,
+      "opaquePixels": 44351
     },
     {
       "index": 6,
       "outputBbox": [
-        29,
-        114,
-        254,
-        228
+        93,
+        217,
+        526,
+        433
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 11515
+      "minimumMargin": 79,
+      "opaquePixels": 43804
     },
     {
       "index": 7,
       "outputBbox": [
-        25,
-        171,
-        263,
-        241
+        93,
+        320,
+        554,
+        458
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 10419
+      "minimumMargin": 54,
+      "opaquePixels": 42290
     },
     {
       "index": 8,
       "outputBbox": [
-        22,
-        174,
-        265,
-        241
+        93,
+        320,
+        556,
+        471
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 10308
+      "minimumMargin": 41,
+      "opaquePixels": 39652
     },
     {
       "index": 9,
       "outputBbox": [
-        21,
-        178,
-        266,
-        242
+        94,
+        323,
+        556,
+        471
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 10330
+      "minimumMargin": 41,
+      "opaquePixels": 39566
     },
     {
       "index": 10,
       "outputBbox": [
-        21,
-        178,
-        266,
-        242
+        94,
+        340,
+        561,
+        472
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 10380
-    },
-    {
-      "index": 11,
-      "outputBbox": [
-        21,
-        177,
-        266,
-        242
-      ],
-      "minimumMargin": 14,
-      "opaquePixels": 10484
+      "minimumMargin": 40,
+      "opaquePixels": 39833
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 265,
-    "frameHeight": 236,
-    "rootX": 130,
-    "rootY": 220,
-    "columns": 11,
-    "frameCount": 12,
+    "frameWidth": 485,
+    "frameHeight": 442,
+    "rootX": 236,
+    "rootY": 432,
+    "columns": 6,
+    "frameCount": 11,
     "cropOffset": [
-      11,
-      16
+      84,
+      38
     ],
-    "sheetWidth": 260,
-    "sheetHeight": 1528,
+    "sheetWidth": 1012,
+    "sheetHeight": 1336,
     "frames": [
       [
         0,
         0,
-        208,
-        196,
-        18,
-        4
-      ],
-      [
-        0,
-        200,
-        220,
-        176,
-        17,
-        4
-      ],
-      [
-        0,
-        548,
-        228,
-        144,
-        15,
+        296,
+        412,
+        11,
         16
       ],
       [
+        300,
         0,
-        844,
-        232,
-        136,
-        10,
-        45
+        340,
+        396,
+        17,
+        18
+      ],
+      [
+        644,
+        0,
+        368,
+        384,
+        23,
+        4
       ],
       [
         0,
-        380,
-        220,
-        164,
-        9,
-        49
+        416,
+        404,
+        352,
+        21,
+        9
+      ],
+      [
+        408,
+        416,
+        416,
+        300,
+        19,
+        36
       ],
       [
         0,
-        696,
-        232,
+        772,
+        404,
+        248,
+        4,
+        176
+      ],
+      [
+        408,
+        772,
+        444,
+        228,
+        4,
+        174
+      ],
+      [
+        0,
+        1188,
+        472,
+        148,
+        4,
+        278
+      ],
+      [
+        0,
+        1024,
+        472,
+        160,
+        4,
+        278
+      ],
+      [
+        476,
+        1024,
+        472,
+        156,
+        6,
+        281
+      ],
+      [
+        476,
+        1188,
+        476,
         144,
-        12,
-        73
-      ],
-      [
-        0,
-        984,
-        240,
-        128,
-        12,
-        91
-      ],
-      [
-        0,
-        1116,
-        252,
-        84,
-        8,
-        149
-      ],
-      [
-        0,
-        1204,
-        256,
-        80,
         5,
-        151
-      ],
-      [
-        0,
-        1372,
-        260,
-        76,
-        4,
-        156
-      ],
-      [
-        0,
-        1452,
-        260,
-        76,
-        4,
-        156
-      ],
-      [
-        0,
-        1288,
-        260,
-        80,
-        4,
-        155
+        297
       ]
     ],
     "decodedBytes": {
-      "canonical": 6488064,
-      "grid": 5503520,
-      "packed": 1589120
-    }
+      "canonical": 15728640,
+      "grid": 10289760,
+      "packed": 5408128
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "e0226e72e89f7c35f17994ace74435db8f654abd04c838d7cec20730803a7981",
-      "config": "a23dfbc0f13a882816fc368e93041d24623c66d516d6d0fecc5c7177228f89fc",
+      "source": "1b56d4eef10987a61b6e11d8c44ed71abc9d750c1fcd8aec97fa68f04963947a",
+      "config": "fee9a19955a67b0ff115e42d52edb8c30d5ff824d07abb65633b9a2b62248048",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_fall_down_video_normalized.png": "df8c38b22c40b6d8964350352a3fb8de47f371d822998765b6a1b82c39d8fd0a"
+      "art/sprites/source/p02_derrubado_h3_video.mp4": "91198b24ee56f9b8c97d6ba1b9d6df7f5bc4aba13e5f4fac63e544843581ec6d"
     }
   }
 }

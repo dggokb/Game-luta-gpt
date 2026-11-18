@@ -1,0 +1,26 @@
+{
+  "id": "player_base_hit_spin_pouso",
+  "javaName": "HIT_SPIN_POUSO_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_hit_spin_pouso.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_spin_pouso.webp",
+  "report": "tools/sprites/reports/player_base_hit_spin_pouso.report.json",
+  "preview": "android/app/build/sprite-review/hit_spin_pouso-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 400,
+  "rootY": 600,
+  "sourceNote": "Giro de nocaute (spinning knockdown), vídeo H3 do dono (art/sprites/source/player_base_hit_spin_video.mp4, 18/11): imagem inicial art/keys/p01/inicio_gancho_h3.png, final art/keys/p01/fim_caido_h3.png, pedido em docs/personagens/prompts-reacoes-cena.md. O pouso: 2,04-2,6 s (bate de costas no chão e assenta), a base na raiz; depois dele, o GROUNDED.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_hit_spin_video.mp4"
+  ],
+  "pixelScale": 2.0,
+  "ajusteTamanho": 1.0,
+  "regua": [
+    "na escala do IDLE: a guarda dos vídeos H3 (547 px) = o idle da folha (451 px)"
+  ]
+}

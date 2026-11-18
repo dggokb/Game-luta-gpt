@@ -2,32 +2,22 @@
   "id": "p02_getup",
   "javaName": "P02_GETUP",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_getup_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_getup_h3.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_getup.webp",
   "report": "tools/sprites/reports/p02_getup.report.json",
   "preview": "android/app/build/sprite-review/p02_getup-import.png",
-  "expectedFrames": 9,
+  "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 5,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
-  "video": {
-    "arquivo": "derrubaLevanta.mp4",
-    "personagem": "p02",
-    "escala": 0.4173,
-    "motivo": "vídeos H3 da p02: 0,4331 (imagens _h3, 471 px de guarda) × 212/220, para ela ficar com os 212 px em pé de antes (o ajuste de 97% do dono no app)",
-    "quadros": "84,87,90,93,96,99,102,105,108",
-    "largura": 288,
-    "raiz": "136,237",
-    "colunas": 9,
-    "fixar": "video",
-    "limpar_chao": true
-  },
-  "frameWidth": 288,
-  "rootX": 136,
-  "rootY": 237,
-  "frameHeight": 256,
+  "sourceNote": "Yin-lu: vídeo H3 \"Derrubado\" do dono (art/sprites/source/p02_derrubado_h3_video.mp4, 18/11), imagem inicial e final art/keys/p02/inicio_centro_h3.png, pedido em docs/personagens/p02.md. Montado por tools/sprites/p02_derrubado_h3.py: escala 391/469 (a guarda do vídeo = o IDLE da folha), raiz fixa no meio dos pés do 1º quadro (o deslocamento do vídeo fica). Quadros do vídeo: 81,83,85,87,89,91,93,95,97,99 (rola, senta, levanta na guarda).",
+  "frameWidth": 640,
+  "rootX": 320,
+  "frameHeight": 512,
+  "rootY": 470,
+  "pixelScale": 2.0,
   "sourceReferences": [
-    "art/sprites/source/p02_getup_video_normalized.png"
-  ]
+    "art/sprites/source/p02_derrubado_h3_video.mp4"
+  ],
+  "ajusteTamanho": 1.0
 }

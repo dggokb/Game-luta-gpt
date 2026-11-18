@@ -4520,6 +4520,17 @@ public class GameView extends SurfaceView
                 renderCameraX = p.x - playerScreenX / renderZoom + visibleWorldWidth / 2f;
                 renderCameraTop = focusY - playerScreenY / renderZoom;
             }
+            // Tela mais larga que 16:9 (celular 20:9): a cena enche a largura e corta em cima e embaixo,
+            // e tudo sai maior. Na cinemática (com zoom próprio) isso apertava demais e cortava quem
+            // está no chão (o dono, 18/11: "no jogo está tudo muito perto"): durante ela o zoom recua
+            // em volta do meio da tela, e o celular vê o mesmo enquadramento do 16:9 com mais dos lados.
+            float cinemaLarga = 1f - (1f - Math.min(sx, sy) / Math.max(sx, sy)) * cinematica.faixas();
+            if (cinemaLarga < 0.999f) {
+                float meioY = renderCameraTop + VH * 0.5f / renderZoom;
+                renderZoom *= cinemaLarga;
+                visibleWorldWidth = VW / renderZoom;
+                renderCameraTop = meioY - VH * 0.5f / renderZoom;
+            }
             // No fundo preto da cinemática o cenário não aparece: a câmera não para na borda do mundo
             // e quem está em foco fica no meio da tela, mesmo voando para a parede.
             float cameraLeft = cinematica.fundoPreto() > 0.99f ? renderCameraX - visibleWorldWidth / 2f
@@ -5183,6 +5194,8 @@ public class GameView extends SurfaceView
     }
 
     private float reactionElapsed;
+    /** Quem está caindo do giro de nocaute desenhado (HIT_SPIN): o pouso usa o fim do clipe. */
+    private final boolean[] giroAteOChao = new boolean[2];
 
     /**
      * Reaction clip of a fighter: knockdown, wake-up, launch and hitstun. Returns null when
@@ -5190,6 +5203,10 @@ public class GameView extends SurfaceView
      */
     private String reactionState(SpriteFighterRenderer renderer, CombatFighter f) {
         String state = null;
+        // O pouso do giro só vale para a queda logo depois dele.
+        if (f.status != CombatFighter.Status.AIR_HITSTUN && f.status != CombatFighter.Status.KNOCKDOWN) {
+            giroAteOChao[f.index & 1] = false;
+        }
         CombatConfig config = engine.config;
         if (upsideDownBy(f) != null) {
             // Preso de cabeça para baixo (o Ultra do p13): a pose deitada, girada no desenho.
@@ -5202,7 +5219,20 @@ public class GameView extends SurfaceView
         }
         switch (f.status) {
             case KNOCKDOWN:
-                if (f.knockdownFrame < config.knockdownFallFrames) {
+                if (giroAteOChao[f.index & 1] && renderer.hasAnimation(SpriteStates.GROUNDED)) {
+                    // Caiu do giro de nocaute: bate de costas e assenta (HIT_SPIN_POUSO) e fica no
+                    // caído, sem a queda para trás do KNOCKDOWN, que começa em pé.
+                    CharacterDefinition.Animation pouso = renderer.hasAnimation(SpriteStates.HIT_SPIN_POUSO)
+                        ? f.character().animations.get(SpriteStates.HIT_SPIN_POUSO) : null;
+                    float t = f.knockdownFrame * FIXED_STEP;
+                    if (pouso != null && t < pouso.duration) {
+                        state = SpriteStates.HIT_SPIN_POUSO;
+                        reactionElapsed = t;
+                    } else {
+                        state = SpriteStates.GROUNDED;
+                        reactionElapsed = pouso != null ? t - pouso.duration : t;
+                    }
+                } else if (f.knockdownFrame < config.knockdownFallFrames) {
                     state = SpriteStates.KNOCKDOWN;
                     reactionElapsed = f.knockdownFrame * FIXED_STEP;
                 } else {
@@ -5218,6 +5248,15 @@ public class GameView extends SurfaceView
                     : Math.min(getup.duration - 0.0001f, getup.timeFor(f.knockdownFrame, engine.wakeupFrames(f)));
                 break;
             case AIR_HITSTUN:
+                if (f.spinning && renderer.hasAnimation(SpriteStates.HIT_SPIN)) {
+                    // Giro de nocaute desenhado: o corpo deita e rola no ar; segura o último quadro
+                    // (deitado) até o chão.
+                    state = SpriteStates.HIT_SPIN;
+                    CharacterDefinition.Animation giro = f.character().animations.get(state);
+                    reactionElapsed = Math.min(f.stunElapsed * FIXED_STEP, giro.duration - 0.0001f);
+                    giroAteOChao[f.index & 1] = true;
+                    break;
+                }
                 state = SpriteStates.HIT_AIR;
                 reactionElapsed = f.launched || f.slammed
                     ? launchPoseTime(f, f.vy, f.slammed)
@@ -6774,6 +6813,7 @@ public class GameView extends SurfaceView
             AnimacaoManual.Pose p = cinematica.poseAnimada(lado);
             if (p == null) continue;
             CombatFighter f = engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT);
+            p = poseNaArte(f.character(), p, lado);
             f.x = cinematica.xDaPose(p);
             f.facing = cinematica.olharDaPose(lado);
             float[] r = animRastro[lado];
@@ -6831,6 +6871,20 @@ public class GameView extends SurfaceView
     }
 
     /** Os clipes da animação feita à mão desse lado no lutador (os "@GOLPE" viram o clipe dele). */
+    private final AnimacaoManual.Pose[] poseReserva = {new AnimacaoManual.Pose(), new AnimacaoManual.Pose()};
+
+    /**
+     * A pose da cena que este lutador consegue desenhar: sem o clipe dela (o giro de nocaute que
+     * ainda não tem), a reserva da chave ({@code "senao"}: a pose girada de antes).
+     */
+    private AnimacaoManual.Pose poseNaArte(CharacterDefinition ch, AnimacaoManual.Pose p, int lado) {
+        if (p.clipSenao == null || p.clip.startsWith("@") || ch.animations.containsKey(p.clip)) return p;
+        AnimacaoManual.Pose r = poseReserva[lado & 1];
+        r.copiar(p);
+        r.usarSenao();
+        return r;
+    }
+
     private String[] clipesDaCena(CharacterDefinition ch, int lado) {
         java.util.Set<String> out = new java.util.LinkedHashSet<>();
         for (String clip : cinematica.clipesAnimados(lado)) {
@@ -6865,6 +6919,7 @@ public class GameView extends SurfaceView
             renderer.drawQuadroAnim(c, animRastroClip[lado][k], (int)r[k * 7 + 3], r[k * 7], GROUND_Y - r[k * 7 + 1],
                 (int)r[k * 7 + 2], r[k * 7 + 4], r[k * 7 + 5], r[k * 7 + 6], a, ANIM_RASTRO_COR);
         }
+        p = poseNaArte(f.character(), p, lado);
         Object[] pose = resolverPose(f.character(), p);
         renderer.drawQuadroAnim(c, (String)pose[0], (Integer)pose[1], f.x, GROUND_Y - p.altura, f.facing, p.sx, p.sy, p.graus,
             Math.round(255f * Math.max(0f, Math.min(1f, p.alfa))), null);
@@ -7100,7 +7155,8 @@ public class GameView extends SurfaceView
             else c.translate(shake, 0f);
         }
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
-        if (f.spinning && !f.grounded) spinTransform(c, f);
+        // O giro falso (estreita o desenho) só sem o clipe desenhado do giro de nocaute.
+        if (f.spinning && !f.grounded && !renderer.hasAnimation(SpriteStates.HIT_SPIN)) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
         float visualY = fighterVisualY(f);
         // Voo do Ultra (o p13 sobe atrás do rival e desce de meteoro): só o desenho sai do lugar.
@@ -7904,6 +7960,9 @@ public class GameView extends SurfaceView
 
     /** The partner behind the point: the assist doing its move, or the former point leaving. */
     private void drawPartner(Canvas c) {
+        // Na animação feita à mão a luta para: o parceiro que estava entrando ou saindo ficaria
+        // congelado na beira da arena, assistindo a cena (aparecia na tela larga do celular).
+        if (cinematica.animando()) return;
         CombatFighter partner = partnerBody(engine.team(PLAYER));
         if (partner != null) drawFighter(c, partnerSpriteRenderer, partner, false, false);
         CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
