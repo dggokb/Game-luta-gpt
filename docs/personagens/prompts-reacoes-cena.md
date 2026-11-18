@@ -96,7 +96,7 @@ deitado o H3 é obrigado a deitar o corpo no ar e sai o rolo em parafuso de verd
      aumentado ÷ 0,822 (a folha é 0,822 do vídeo).
 3. **O vídeo:** MiniMax H3 Fast, 5 s, 768p, as duas imagens como início e fim, o pedido abaixo.
 4. **No jogo:** olhe a folha de contato do vídeo (de quadro em quadro, recortada no corpo: um erro de poucos quadros, como a cabeça da Bonnie dando meia-volta sozinha, some cortando esses quadros do voo) e anote o quadro em que o soco já torceu (pule o
-   clarão), o último do voo antes de bater de costas e o da batida. O último quadro do voo o jogo segura até o chão: tem de ser ela deitada no ar, nunca de pernas para cima (isso vai para o pouso). Ponha o pacote em `PACOTES` de
+   clarão), o último do voo antes de bater de costas e o da batida. O último quadro do voo o jogo segura até o chão: tem de ser ela deitada no ar, nunca de pernas para cima (isso vai para o pouso). A ferramenta alinha o voo pelo centro do corpo, descendo em linha reta da guarda (pés na raiz) ao deitado (base na raiz); alinhar pela base fazia o corpo subir e descer no pico, porque a ponta de uma faixa ou de um braço caído virava a base (o dono, 18/11, na Bonnie). Ponha o pacote em `PACOTES` de
    `tools/sprites/giro_h3.py` (escala = altura do IDLE da folha ÷ altura da guarda no vídeo, ≈ 0,82;
    voo = 24 quadros entre o começo e o fim do voo; pouso = 7 quadros de 2 em 2 a partir da batida) e
    rode `python3 tools/sprites/giro_h3.py <pacote>`. Crie os dois clipes
