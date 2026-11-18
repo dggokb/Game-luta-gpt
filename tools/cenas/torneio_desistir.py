@@ -185,7 +185,9 @@ J.k(q, 'HIT_STAND:0.7', 'jogador-130')
 q += 18
 linhas(q + 4)
 R.k(q + 6, '@H:acerta', 'jogador+0', curva='sai', rastro=5)
-J.k(q + 6, 'HIT_AIR:0', 'jogador-140', y=30, rastro=4)
+# O giro de nocaute desenhado (HIT_SPIN, o vídeo do dono) no voo até a parede; quem ainda não tem o
+# clipe usa a pose girada de antes ("senao").
+J.k(q + 6, 'HIT_SPIN:0', 'jogador-140', y=30, rastro=4, ate=23, senao={'pose': 'HIT_AIR:0'})
 impacto(q + 6, 'rival', 3, letreiro='BAM!', congela=0.5, stamp=stamp_dano('bam'))
 dano(q + 6, 0.04)
 # O voo até a parede no fundo preto, com as linhas de velocidade (o dono: "mais dramaticidade").
@@ -195,7 +197,7 @@ dano(q + 6, 0.04)
 voo_no_fundo_preto(ev, q + 8, q + 30, 'velocidade')
 sumir(R, q + 8, q + 30, '@H:fim', 'jogador+0')
 lenta(q + 8, antes=0, depois=22, valor=0.45)
-J.k(q + 30, 'HIT_AIR:0.5', 'parede+60', y=110, rot=-25, curva='sai', rastro=7)
+J.k(q + 30, 'HIT_SPIN:23', 'parede+60', y=110, curva='sai', rastro=7, senao={'pose': 'HIT_AIR:0.5', 'rot': -25})
 R.k(q + 50, 'IDLE:0', 'jogador+0', ciclo=10)
 # Bate na parede: o cenário volta, a parede treme e o efeito nasce nele (não no meio dos dois).
 impacto(q + 30, 'rival', 2, onde='alvo', congela=0.25)
@@ -295,8 +297,8 @@ dano(q + 24, 0.01)
 # A queda de verdade: fundo preto, as linhas correndo para cima, a câmera caindo junto.
 voo_no_fundo_preto(ev, q + 27, q + 60, 'descer', zoom=1.35, depois_zoom=1.2)
 ev(q + 27, 'velocidade', valor=0.5, segundos=0.1, semEsperar=True)
-J.k(q + 30, 'KNOCKDOWN:0.2', 'parede+150', y=360, rot=-70)
-J.k(q + 60, 'KNOCKDOWN:0.4', 'parede+130', y=0, rot=-85, curva='entra', rastro=8)
+J.k(q + 30, 'HIT_SPIN:10', 'parede+150', y=360, ate=23, senao={'pose': 'KNOCKDOWN:0.2', 'rot': -70})
+J.k(q + 60, 'HIT_SPIN:23', 'parede+130', y=0, curva='entra', rastro=8, senao={'pose': 'KNOCKDOWN:0.4', 'rot': -85})
 ev(q + 58, 'velocidade', valor=1.0, segundos=0.05, semEsperar=True)
 # PAH no chão da arena (o cenário volta no contato) com o STAMP.
 impacto(q + 60, 'rival', 3, letreiro='PAH!', congela=0.55, onde='alvo', stamp=stamp_dano('pah'))
@@ -304,8 +306,8 @@ dano(q + 60, 0.02)
 efeito(q + 60, 'jogador', 'fumaca_queda_v01', escala=1.4)
 # Saiu do STAMP: o corpo quica no chão com o grito.
 fala(q + 62, 'jogador', 'ARGHHHH!', segura=0.8)
-J.k(q + 62, 'KNOCKDOWN:0.5', 'parede+125', y=0, rot=-80)
-J.k(q + 74, 'KNOCKDOWN:0.6', 'parede+115', y=70, rot=-40, curva='sai')
+J.k(q + 62, 'HIT_SPIN_POUSO:0', 'parede+125', y=0, ate=3, senao={'pose': 'KNOCKDOWN:0.5', 'rot': -80})
+J.k(q + 74, 'HIT_SPIN_POUSO:3', 'parede+115', y=40, curva='sai', ate=6, senao={'pose': 'KNOCKDOWN:0.6', 'rot': -40})
 J.k(q + 88, 'GROUNDED:0', 'parede+110', y=0, rot=0, curva='entra')
 efeito(q + 88, 'jogador', 'fumaca_pouso')
 # O adversário desce longe (o dono: "muito perto da gente quando desceu do combo aéreo").

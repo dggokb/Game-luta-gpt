@@ -682,3 +682,12 @@ pose (90 acima dos pés) no meio da tela, então quem está de ponta-cabeça tam
 câmera lenta no voo (`velocidade` 0,45 a 0,5) dá o peso. Exemplo completo:
 `tools/cenas/torneio_desistir.py` (o voo até a parede e a queda do combo aéreo).
 
+### Pose de reserva nas chaves (`senao`)
+
+Uma chave da `animar` pode trazer `"senao": {"pose": "HIT_AIR:0.5", "rot": -25}`: se o lutador em campo
+não tem o clipe da pose principal, o jogo desenha a reserva, girada. A cena "Já vai desistir?" usa
+assim o giro de nocaute desenhado (`HIT_SPIN`, `HIT_SPIN_POUSO`) no voo até a parede e na queda no
+fundo preto: quem já tem o clipe gira de verdade (o Ryūga, 18/11), e os outros ficam com a pose girada
+de antes até os vídeos deles entrarem. No gerador Python: `J.k(q, 'HIT_SPIN:0', x, ate=23,
+senao={'pose': 'HIT_AIR:0'})`.
+

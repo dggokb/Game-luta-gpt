@@ -1647,7 +1647,10 @@ public final class CinematicaLuta {
         for (Roteiro r : todos) {
             for (Acao a : r.acoes) {
                 if (a.tipo != Acao.Tipo.ANIMAR) continue;
-                for (AnimacaoManual.Chave c : trilha(a, lado)) clipes.add(c.clip);
+                for (AnimacaoManual.Chave c : trilha(a, lado)) {
+                    clipes.add(c.clip);
+                    if (c.clipSenao != null) clipes.add(c.clipSenao);
+                }
             }
         }
         return clipes.toArray(new String[0]);

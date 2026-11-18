@@ -6796,6 +6796,7 @@ public class GameView extends SurfaceView
             AnimacaoManual.Pose p = cinematica.poseAnimada(lado);
             if (p == null) continue;
             CombatFighter f = engine.fighter(lado == CinematicaLuta.JOGADOR ? PLAYER : OPPONENT);
+            p = poseNaArte(f.character(), p, lado);
             f.x = cinematica.xDaPose(p);
             f.facing = cinematica.olharDaPose(lado);
             float[] r = animRastro[lado];
@@ -6853,6 +6854,20 @@ public class GameView extends SurfaceView
     }
 
     /** Os clipes da animação feita à mão desse lado no lutador (os "@GOLPE" viram o clipe dele). */
+    private final AnimacaoManual.Pose[] poseReserva = {new AnimacaoManual.Pose(), new AnimacaoManual.Pose()};
+
+    /**
+     * A pose da cena que este lutador consegue desenhar: sem o clipe dela (o giro de nocaute que
+     * ainda não tem), a reserva da chave ({@code "senao"}: a pose girada de antes).
+     */
+    private AnimacaoManual.Pose poseNaArte(CharacterDefinition ch, AnimacaoManual.Pose p, int lado) {
+        if (p.clipSenao == null || p.clip.startsWith("@") || ch.animations.containsKey(p.clip)) return p;
+        AnimacaoManual.Pose r = poseReserva[lado & 1];
+        r.copiar(p);
+        r.usarSenao();
+        return r;
+    }
+
     private String[] clipesDaCena(CharacterDefinition ch, int lado) {
         java.util.Set<String> out = new java.util.LinkedHashSet<>();
         for (String clip : cinematica.clipesAnimados(lado)) {
@@ -6887,6 +6902,7 @@ public class GameView extends SurfaceView
             renderer.drawQuadroAnim(c, animRastroClip[lado][k], (int)r[k * 7 + 3], r[k * 7], GROUND_Y - r[k * 7 + 1],
                 (int)r[k * 7 + 2], r[k * 7 + 4], r[k * 7 + 5], r[k * 7 + 6], a, ANIM_RASTRO_COR);
         }
+        p = poseNaArte(f.character(), p, lado);
         Object[] pose = resolverPose(f.character(), p);
         renderer.drawQuadroAnim(c, (String)pose[0], (Integer)pose[1], f.x, GROUND_Y - p.altura, f.facing, p.sx, p.sy, p.graus,
             Math.round(255f * Math.max(0f, Math.min(1f, p.alfa))), null);

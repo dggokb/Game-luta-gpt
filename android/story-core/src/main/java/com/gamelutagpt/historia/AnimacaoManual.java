@@ -40,6 +40,14 @@ public final class AnimacaoManual {
          */
         public float fracao = -1f;
         public String fase;
+        /**
+         * A pose de reserva ({@code "senao"} na chave): quando o lutador em campo não tem o clipe
+         * ({@link #clip}), o jogo desenha {@link #clipSenao} (quadro ou fração) girado
+         * {@link #grausSenao} (o giro de nocaute desenhado, e a pose girada de quem ainda não o tem).
+         */
+        public String clipSenao;
+        public int quadroSenao;
+        public float fracaoSenao = -1f, grausSenao;
 
         /** Fica igual a {@code de} (a pose do QTE guardada enquanto o erro toca). */
         public void copiar(Pose de) {
@@ -55,6 +63,19 @@ public final class AnimacaoManual {
             vira = de.vira;
             fracao = de.fracao;
             fase = de.fase;
+            clipSenao = de.clipSenao;
+            quadroSenao = de.quadroSenao;
+            fracaoSenao = de.fracaoSenao;
+            grausSenao = de.grausSenao;
+        }
+
+        /** Troca a pose pela de reserva (sem o clipe principal no lutador). */
+        public void usarSenao() {
+            clip = clipSenao;
+            quadro = quadroSenao;
+            fracao = fracaoSenao;
+            fase = null;
+            graus = grausSenao;
         }
     }
 
@@ -77,6 +98,9 @@ public final class AnimacaoManual {
         boolean xAtual;
         float fracao = -1f;
         String fase;
+        String clipSenao;
+        int quadroSenao;
+        float fracaoSenao = -1f, grausSenao;
         /**
          * x que depende da luta, resolvido quando a animação começa: {@code "atual"} (onde o
          * lutador está), {@code "parede"} (a parede atrás dele), {@code "jogador"} ou {@code "rival"}
@@ -154,6 +178,20 @@ public final class AnimacaoManual {
                 throw new IllegalArgumentException("animar: pose " + pose + " (CLIPE:quadro, CLIPE:fração como 0.5, ou @GOLPE:inicio|prepara|acerta|fim)");
             }
             if (c.clip.startsWith("@") && c.fase == null) c.fase = c.fracao >= 0f ? String.valueOf(c.fracao) : "acerta";
+            // "senao": {"pose": "HIT_AIR:0.5", "rot": -25}: sem o clipe no lutador, esta pose girada.
+            Object senao = m.get("senao");
+            if (senao instanceof Map) {
+                @SuppressWarnings("unchecked") Map<String, Object> sm = (Map<String, Object>)senao;
+                String sp = Episodio.string(sm, "pose", null);
+                if (sp == null || sp.startsWith("@")) throw new IllegalArgumentException("animar: senao sem \"pose\" de clipe (ex.: HIT_AIR:0.5)");
+                int sd = sp.indexOf(':');
+                c.clipSenao = sd < 0 ? sp : sp.substring(0, sd);
+                String sdep = sd < 0 ? "0" : sp.substring(sd + 1);
+                if (sdep.matches("[0-9]+")) c.quadroSenao = Integer.parseInt(sdep);
+                else if (sdep.matches("[01]?\\.[0-9]+|1|0")) c.fracaoSenao = Float.parseFloat(sdep);
+                else throw new IllegalArgumentException("animar: senao pose " + sp);
+                c.grausSenao = num(sm, "rot", 0f);
+            }
             out.add(c);
         }
         if (out.isEmpty()) throw new IllegalArgumentException("animar: " + quem + " sem chaves");
@@ -188,6 +226,11 @@ public final class AnimacaoManual {
         out.clip = a.clip;
         out.fracao = a.fracao;
         out.fase = a.fase;
+        out.clipSenao = a.clipSenao;
+        out.quadroSenao = a.quadroSenao;
+        out.fracaoSenao = a.fracaoSenao;
+        out.grausSenao = a.clipSenao == null ? 0f
+            : lerp(a.grausSenao, b != null ? (b.clipSenao != null ? b.grausSenao : b.graus) : a.grausSenao, t);
         float desde = Math.max(0f, q - a.q);
         if (a.ciclo > 0f) {
             out.quadro = a.quadro + (int)(desde * a.ciclo / 60f);
