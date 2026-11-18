@@ -71,16 +71,25 @@ cambalhota) e o H3 rodou de corpo aberto em estrela, de frente para a câmera, c
 com braços, pernas e ritmo mudando a cada quadro (e pôs poeira). Por isso este pedido diz o que
 ele encara em cada quarto da volta e proíbe a cambalhota.
 
+**Segunda tentativa (18/11):** o pião saiu certo (uma volta limpa, frente, lado, costas), mas duro:
+em pé, pernas juntas, braços abertos, como bailarina. O dono: "ele gira mas não torce". Falta a
+torção de quem foi arremessado. O pedido abaixo descreve a torção parte por parte (o gerador entende
+melhor ombros, quadril e pernas do que a palavra "torção").
+
 ```
 Static locked-off side view, one continuous shot with no scene cuts. 2D anime fighting-game animation of the martial artist from the start frame, on a flat solid green background. The camera stays fixed and never zooms.
 [0-0.4s] He holds his fighting guard facing RIGHT exactly as in the start frame.
-[0.4-0.8s] A powerful invisible hook from the RIGHT knocks him off his feet: his feet leave the ground, his body tilts back, arms and legs go loose, with a pained shout. He floats in the middle of the frame.
-[0.8-2.8s] Floating in the same spot in the middle of the frame, he SPINS around his own vertical axis like a spinning top: exactly TWO full turns at a steady, even speed. Each turn goes: facing right, then his chest toward the camera, then facing left, then his BACK toward the camera, then facing right again. His body keeps the SAME pose during the whole spin (tilted back, arms loose and a little spread, legs loose and slightly bent, pained face); only the direction he faces changes. He does NOT flip, does NOT tumble head over heels and does NOT cartwheel: his head stays on top and his feet at the bottom the whole time.
-[2.8-3.6s] He stops spinning facing RIGHT, drops and lands on his feet in a crouch.
+[0.4-0.8s] A devastating invisible hook punch hits his jaw from the RIGHT: his head snaps around, his shoulders are wrenched around by the blow and his feet are torn off the ground. He flies up into the middle of the frame.
+[0.8-2.8s] In the air he is SPUN like a wrung towel, the classic spinning knockdown of 1990s anime fighting games, exactly TWO full turns around his own vertical axis at a steady speed. His body is TWISTED the whole time: his head and shoulders lead the turn, his chest is turned about 90 degrees ahead of his hips, and his hips and legs lag behind, dragged around by his upper body. His body is NOT upright: it leans back diagonally about 30 degrees, his head thrown back, his spine arched. His arms are flung out loosely by the spin, one high and one low, trailing behind the turn; his legs are loose and apart, one knee bent and the other leg stretched out, trailing behind the hips. Hair and clothes whip around, trailing the turn. Each turn shows: facing right, his chest toward the camera, facing left, his back toward the camera, facing right again. Never a stiff, upright, ballet-like pirouette with the legs together.
+[2.8-3.6s] The spin ends facing RIGHT; he drops and lands on his feet in a staggering crouch.
 [3.6-5s] He rises into his fighting guard and holds it exactly as in the end frame, breathing heavily.
-His whole body stays inside the frame. He never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
+He does NOT flip head over heels and does NOT cartwheel: his head stays on top. His whole body stays inside the frame. He never holds any object. Clean animation only: no shadow, floor, dust, smoke, speed lines, motion trails, impact flashes, sparks or effects. No opponent. No music, no dialogue.
 Keep his face, brown hair, vest, belt, gloves, pants, sneakers, colors, line art and size exactly as in the frames; his size never changes.
 ```
+
+**Enquanto isso, o vídeo da segunda tentativa já serve:** uma volta dele (1,0-2,0 s, 8 quadros) é
+um giro de verdade, muito melhor que o estreitar falso. Instalado, o jogo inclina o corpo
+(`SPIN_TILT`) e dá um pouco do arremesso; quando vier o vídeo com torção, troca os quadros.
 
 O jogo usa: o tirado do chão (0,4-0,8 s) e **uma volta** do pião (8 quadros iguais, de frente
 para a direita até voltar a ela), repetida enquanto ele voa. Na luta, no lugar do estreitar falso;
