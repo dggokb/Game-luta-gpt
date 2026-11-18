@@ -27,7 +27,7 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # forte que empurra. Sem o clipe, o jogo usa HIT_STAND.
             'HIT_HIGH','HIT_BODY','HIT_HEAVY',
             # Ativação do SHINKAI (a luta para escurecida enquanto ela toca).
-            'SHINKAI_ATIVA',
+            'SHINKAI_ATIVA', 'SUPER_DESVIO',
             'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT',
             # Mecânicas próprias: carga da Onda (loop e disparo carregado) e wall jump.
             'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',
@@ -339,7 +339,7 @@ def validate_command_extras(name, m, special):
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
     known = {'preparo','golpes','duracao','dano','rival','quadrosVideo','some','preto','explosao','camera',
-             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance'}
+             'zanzoken','recuo','cameraDaLuta','voo','deCabeca','bracos','quedaFinal','alem','alcance','espelho','penas','quique'}
     if not isinstance(u, dict) or set(u) - known:
         raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
     non_negative_int(u.get('preparo'), name+'.ultra.preparo')
@@ -394,6 +394,15 @@ def validate_ultra(name, u, animations):
     # Até onde as pancadas desenhadas encostam no rival (tools/sprites/caixas_sprites.py).
     if 'alcance' in u and not (number(u['alcance']) and u['alcance'] > 0 and not u.get('rival')):
         raise ValueError(f'{name}.ultra.alcance: distância > 0, sem rival (o rival já diz onde fica)')
+    # Mil Penas da Yin-lu: desenho virado (ela atrás do rival) e os efeitos de penas do sumiço.
+    if not all(window(w) and w[1] <= u['duracao'] for w in u.get('espelho', [])):
+        raise ValueError(f'{name}.ultra.espelho: [de, até] frames inside the sequence')
+    if 'penas' in u and not (isinstance(u['penas'], dict) and set(u['penas']) <= {'estouro', 'redemoinho'}
+                             and isinstance(u['penas'].get('estouro'), str)):
+        raise ValueError(f'{name}.ultra.penas: {{estouro, redemoinho?}} (nomes de efeito)')
+    # Golpe final que crava o rival, ele quica no chão e cai longe (o Mil Penas da Yin-lu).
+    if 'quique' in u and not (number(u['quique']) and u['quique'] > 0 and 'quedaFinal' not in u):
+        raise ValueError(f'{name}.ultra.quique: distância > 0 (sem quedaFinal)')
     if 'cameraDaLuta' in u and u['cameraDaLuta'] is not True:
         raise ValueError(f'{name}.ultra.cameraDaLuta: true (or leave it out)')
     if 'ULTRA_SEQ' not in animations:
@@ -914,6 +923,11 @@ def compile_packs(root, results, alterados=None, medir=False):
             scene += ('.withFlight(new float[][]{'+','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('voo', []))+'},'
                       +ints('deCabeca')+','+ints('bracos')+','
                       +('new float[]{'+','.join(f(v) for v in u['quedaFinal'])+'}' if 'quedaFinal' in u else 'null')+')')
+        if 'penas' in u:
+            scene += ('.withFeathers(new int[][]{'+','.join('{'+','.join(map(str,w))+'}' for w in u.get('espelho', []))+'},'
+                      +q(u['penas']['estouro'])+','+(q(u['penas']['redemoinho']) if 'redemoinho' in u['penas'] else 'null')+')')
+        if 'quique' in u:
+            scene += '.withSlam('+f(u['quique'])+')'
         if 'alem' in u:
             scene += '.withCross('+f(u['alem'])+')'
         if 'alcance' in u:

@@ -1758,7 +1758,8 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   sobram labaredas que saem do corpo e afinam. Cada camada é desenhada uma subida acima e lida no
   lugar (sem isso as labaredas batiam no topo do quadro da folha e saíam cortadas retas). A cor é a
   do SHINKAI de cada um (`corShinkai`).
-- **Desligada** (`AURA_CHAMA`; `-Dgameluta.auraChama=true` liga para gravar) até ele aprovar
+- **Ligada no jogo para o dono testar no celular** (17/11; `-Dgameluta.auraChama=false` volta ao
+  contorno de antes). Antes ficou desligada (`AURA_CHAMA`) até ele aprovar
   o vídeo (o Ryūga parado, andando e batendo).
   Falta: os pontinhos brancos da referência, ver em outros personagens e medir no celular (são três
   desenhos a mais por lutador com 12 leituras cada).
@@ -1789,6 +1790,11 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   a ativação do outro lado tocava de novo o vídeo e a `SHINKAI_ATIVA` do Ryūga. Agora conta as
   ativações de cada lado (`FighterState.ativacoes`; recomeça no TAG e no round novo). Vídeo
   `aura_shinkai_luta_v3.mp4`.
+- **Depois, "em vez de ficar piscando quando o shinkai está acabando, vamos diminuindo sua
+  intensidade":** `GameView.intensidadeShinkai` (vale na aura nova e no contorno de antes, que é o
+  que está no jogo): quando falta 35% do tempo, a força cai em curva até 15%; na aura, a opacidade
+  e a altura das labaredas (até 45% da subida) caem juntas. Vídeo `aura_shinkai_fim.mp4` (a força indo
+  e voltando, gravada com uma função de teste que não ficou no código).
 
 ## Fora do VFX, o que ficou pendente
 
@@ -1843,6 +1849,163 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
 - **Ficou:** ele julgar no vídeo. O círculo da Natisuko e o salto da lebre passam do topo do vídeo
   por alguns quadros (cortados lá; as faixas pretas da cena vão até esse limite). Visto só no PC.
 
+## Rodada de 17/11: o Ultra Mil Penas da Yin-lu
+
+- **Pedido:** Ultra mais cinematográfico (como os do p13 ao p16): ela some em penas e reaparece
+  batendo de todos os lados. Vídeos do dono: as palmas (`ultra_2`), o final (`ultra3`), o estouro
+  de penas (`ultra_efeito_1`) e o redemoinho (`ultra_efeito_2`); a entrada não veio.
+- **Feito:** a folha `p02_ultra_seq` de `ultra_2` 0-104 + `ultra3` 21-123 colados. Os sumiços são o
+  zanzoken da p15 sem a imagem que fica: em cada borda sai o efeito `penas_estouro_p02`
+  (`efeito_video.py --inicio 12 --fim 74 --passo 2 --escala-mundo 0.35 --origem 665,380
+  --resolucao 0.6 --borda 330 --velocidade 1.3`), no tamanho 0,4. O desenho dela muda de lugar pelo
+  voo (só o desenho) e, atrás do rival, vira para ele (`espelho`, novo). O redemoinho
+  `penas_redemoinho_p02` (`--inicio 18 --fim 98 --passo 2 --escala-mundo 0.5 --resolucao 0.5
+  --borda 330`) gira em volta do rival, atrás dos lutadores, no tamanho 0,4, até o golpe final.
+- **Primeiras versões:** no tamanho 1 e na frente dos lutadores, com a câmera fechada do Ultra, as
+  penas cobriam a luta inteira; com a borda de 100 px o estouro aparecia como um bloco retangular.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+- **Depois, "mais uns 3 golpes de penas, e no último ela bater mais alto, o cara quica no chão e cai
+  longe":** três aparições a mais (a palma reta, o tapa de cima e a palma girando do `ultra_2` de
+  novo, atrás no ar, bem no alto e atrás girando); no golpe final ela fica 60 px mais alta e desce
+  logo depois; o golpe final crava o rival (`quique` no ultras.json: ele desce, quica e cai 420 px
+  à frente).
+- **O Super Espelho do Lago, "faltou alguma coisa":** no contra, o `penas_estouro_p02` sai da mão
+  que desvia (tamanho 0,55), a cena desacelera (20 quadros a 35%) e a tela treme; o empurrão das
+  duas palmas solta penas no rival (0,45) e o joga na parede (quica, dá para continuar).
+- **Depois, "a câmera tá muito próxima no Ultra" e "o efeito de dano do Super tá muito forte e
+  grande":** o Mil Penas usa a câmera da luta (`cameraDaLuta`); as palmas do Super usam o efeito de
+  golpe médio e o empurrão final o forte, sem o do Super (e os riscos de mangá só no empurrão).
+
+## Rodada de 17/11: o Ultra SHINKAI da Yin-lu (Voo da Garça)
+
+- **Pedido:** o Ultra SHINKAI dela diferente do dragão do Ryūga (nada atravessando a tela). Vídeos
+  do dono: a invocação (`ultra_shinkai`), a garça que desce e fecha o casulo (`ultra_shinkai_1`) e o
+  mergulho (`ultra_shinkai_2`).
+- **Feito:** a animação `ULTRA_DRAGAO` dela (montagem `ultra_dragao`, 36 quadros na ordem dos do
+  Ryūga, com o brilho e as penas do vídeo) e os efeitos em fundo preto `garca_casulo_p02`
+  (`efeito_video_preto.py --quadros 6-118:2 --origem 672,767 --escala-mundo 0.45 --fps 36
+  --resolucao 0.6`) e `garca_mergulho_p02` (`--quadros 2-98:2 --escala-mundo 0.5 --resolucao 0.55`),
+  os dois nos pés do rival. No motor (`updateGarca`): a garça pega no quadro 28 (defendido, sobe
+  vazia), o rival some no casulo e leva os golpes, o mergulho começa no 95 e no impacto (119) ele cai
+  de 260 px cravado, quica e vai 420 px.
+- **Primeira gravação:** na invocação ela ficava na guarda (o desenho do Ultra comum entrava antes):
+  o Ultra SHINKAI com animação própria não usa mais o do Ultra comum.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+- **Depois, "o efeito em volta dela ficou estranho, pega aquele do redemoinho":** o brilho e as penas
+  do vídeo da invocação saíram da folha (sem `manter_efeitos`) e o `penas_redemoinho_p02` gira em
+  volta dela (na frente, 0,6) na invocação.
+
+## Rodada de 17/11: o Ultra SHINKAI da Bonnie (Chuva de Tomates)
+
+- **Pedido (ideia do dono):** tudo fica preto; um picadeiro pequeno aparece com o rival em cima; um
+  monte de mãos joga tomates nele; a tela fica vermelha de tomate e é limpa; uma bomba nos pés dele,
+  BOOOOM.
+- **Feito:** os vídeos do dono (em fundo preto) viraram `palhaco_picadeiro_p16` (pelo brilho; o
+  último quadro segura 2,6 s), `palhaco_tomates_p16` e `palhaco_tela_p16` (com `--opaco`, novo no
+  `efeito_video_preto.py`: só o preto ligado à borda some), `palhaco_bomba_p16` (opaco, até o
+  pavio) e `palhaco_boom_p16` (pelo brilho, `--borda 160`). A cena (`updatePalhaco`): o mundo
+  escurece, a Bonnie some, o rival fica no tampo do picadeiro (42 px), sete tomates acertam, a tela
+  vermelha cobre o que a câmera mostra, a bomba e no BOOM (quadro 241) o rival voa e o escuro sai.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 17/11: o Ultra SHINKAI da Natisuko (Ichigeki)
+
+- **Pedido (ideia do dono):** o círculo de tinta em volta do rival; mãos socando de todos os lados;
+  tudo preto com os efeitos de porrada (`ultra_shinkai_danos`); o rival caído no chão e o punho
+  gigante vindo de cima para baixo, "POFT!", e o punho some estourando em partículas (corrigido por
+  ele: quem estoura é o punho, não o rival).
+- **Feito:** a animação `ULTRA_DRAGAO` dela (montagem `ultra_dragao`: a aura de fogo e o soco do
+  vídeo `ultra_shinkai`; a opção nova `sem_verde` do `personagem.py` tira o verde do fundo do fogo
+  meio transparente e puxa o amarelo-limão para o laranja). Os efeitos em fundo preto, pelo brilho:
+  `ichigeki_circulo_p15` (`--quadros 4-36:2 --origem 682,391 --escala-mundo 0.55 --fps 36
+  --resolucao 0.6 --segurar 16,1500`; saiu depois, ver a rodada seguinte), `ichigeki_punhos_p15` (`--quadros 16-100:2 --origem 672,384
+  --escala-mundo 0.5 --resolucao 0.5 --borda 160`), `ichigeki_danos_p15` (`--quadros 8-58:2
+  --escala-mundo 0.5 --fps 30 --borda 60`), `ichigeki_particulas_p15` (o estouro e as partículas do
+  mesmo vídeo, `--quadros 60-94:2 --escala-mundo 0.55 --fps 30 --borda 60`) e `ichigeki_punho_p15`
+  (a entrada do punho, `--quadros 10-30:1 --origem 895,400` nos nós dos dedos, `--escala-mundo 0.5
+  --fps 36 --segurar 20,1000`), tocado girado -90° para descer de cima. A cena (`updateIchigeki`):
+  o círculo fecha no rival no quadro 0 (defendeu: sem a cena), os punhos no 24, sete socos de 40 em
+  diante a cada 14, o preto no 92 (os dois lutadores somem; os danos no preto), o rival deitado no
+  140, o preto sai do 148, o punho desce no 160 e crava no 193: "POFT!", o punho sai da tela e as
+  partículas estouram no lugar dele; o rival fica no chão (queda dura); a cena acaba no 228.
+- **Na primeira gravação o "POFT!" não aparecia** (nem o "BOOOOOM!" da Bonnie): o HUD some na cena
+  do Ultra e a faixa de aviso ia junto. Agora a faixa do meio aparece por cima com o HUD escondido.
+- **Ficou:** ele julgar no vídeo. Visto só no PC. O fogo dela fica como um bloco amarelo meio
+  chapado em volta do corpo (é o fogo do vídeo, sem o verde); se não agradar, o caminho é o vídeo
+  sem o fogo e o fogo como efeito separado.
+
+## Rodada de 17/11: os ajustes do dono nos três Ultra SHINKAI
+
+- **Bonnie:** "os tomates estão cortados na tela": o preto entra de uma vez, a câmera centra no
+  rival e os tomates e a tela vermelha tocam na tela inteira (`tocarNaTela`, 1,22x além da tela,
+  seguindo a câmera; `"cena"` e `"larguraCena"` no efeito.json). "Deixar tudo vermelho, aí sim
+  passa a mão, a mão tá passando muito rápido": a tela vermelha foi remontada por código
+  (scratch `tela/compor.py`: os quadros 4-36 do `Tomato_Splat_Effect_1`, o 36 sem os buracos
+  pretos (inpaint) segurado 620 ms e a luva recortada do quadro 90 andando da esquerda para a
+  direita em 41 quadros, limpando o vermelho atrás dela), virou `palhaco_tela_p16` (`--opaco
+  --quadros 0-77:1 --fps 36 --resolucao 0.32 --segurar 33,620`; tocava a 3x antes). "Quando a mão
+  passa a bomba já está lá, um pouco maior": a bomba (1,15x, ao lado dos pés, atrás dos
+  lutadores = embaixo da tela vermelha) chega no vermelho e o quadro do pavio aceso segura +1350 ms;
+  o picadeiro segura até o BOOM.
+- **Natisuko:** "aura muito estourada" e os punhos cortados como os tomates: a animação sem o
+  fogo (só os quadros sem fogo do vídeo), a cena toda preta sem ela, o rival no meio, os punhos 2x
+  na tela inteira (sem `--borda`), depois só os danos no preto sem o rival (1,5x); o círculo saiu.
+  "A câmera vem de cima com o soco, o personagem no chão, ele bate fixando a câmera, dissipa e
+  fim": a câmera começa 520 px acima e desce (curva quadrática) até o impacto, parando nele.
+- **Yin-lu:** a garça maior (casulo `--escala-mundo 0.62`, mergulho 0.85), o topo cortado esfumado
+  (`--borda-cima 110`, novo no `efeito_video_preto.py`), o mergulho no chão (origem no anel do
+  chão do vídeo, y 705, não no pé do quadro) e a 1,25x do vídeo (`--fps 15` com passo 2; era 36,
+  3x). "Fica uma mancha branca no chão": a luz dos dois efeitos saiu e a cauda de penas do
+  mergulho encurtou (`--quadros 10-76:2`).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 17/11: fogo da Natisuko, corte lateral da garça, fogo da bomba
+
+- **"A Natisuko não está fazendo a animação de Ultra Shinkai":** a aura estourada tinha virado
+  "sem fogo" (só a guarda). O fogo voltou: a opção nova `fogo` do `personagem.py` (com
+  `sem_verde`) deixa o fogo amarelo a 88% e puxa para o laranja (verde x0,74); o corpo, que tem
+  azul, não muda. A 55% o fogo virava barro marrom sobre o fundo escuro. Cuidado: a receita gravada
+  do clipe (`tools/sprites/clips/p15_ultra_dragao.json`) guardava o `sem_efeitos` da tentativa
+  anterior; tirei de lá.
+- **"A garça no final aparece recorte lateral":** o anel de choque e as penas do fim ocupam a
+  largura inteira do vídeo; `--borda-lados 260` (novo no `efeito_video_preto.py`) esfuma só os lados.
+- **"O fogo da bomba está estourado":** com `--opaco` o brilho vermelho-escuro em volta da chama
+  ficava opaco (ou meio escuro) e, sobre o holofote branco, virava um contorno preto serrilhado.
+  `--chama` (novo, com `--opaco`): opaco só o cinza de verdade e grosso (o corpo da bomba); o fogo
+  colorido vem pelo brilho e o brilho escuro (máximo < 70) some.
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 17/11: o golpe de abertura que viaja (garça, tomates, Ichigeki)
+
+- **Pedido:** "essas ult à distância têm que entrar só se acertar o hit inicial; fiz a da Yin-lu,
+  errei, apareceu a garça, fechou e o pau rolando". Ele escolheu o golpe que viaja.
+- **Feito:** na fase do Ultra sai o efeito que viaja (`tocarAndando` a 26 px por quadro): a
+  `onda_p02` (a onda da palma do S1) a 1,3x, o `tomate_voando_p16` (novo: um tomate desenhado por
+  código, 8 quadros girando, `efeito_video.py` de uma pasta de PNG) e o `ichigeki_punho_p15` a 0,55x.
+  Pegou: ele some (`EfeitosVideo.pararTodos`), a tela treme e a cena de sempre começa (a garça desce
+  no rival). Errou: ela volta à guarda.
+- **Ficou:** ele julgar no celular. Visto só no PC.
+
+## Rodada de 18/11: o círculo de tinta da Natisuko volta
+
+- **"Onde foi parar a tinta em círculo da Natisuko?":** o "o círculo tem que sumir" era sumir na
+  cena, não sair do jogo. O `ichigeki_circulo_p15` voltou (do commit d00fdf5): depois dos punhos
+  ele fecha no rival com os danos (1,15x), some de repente no quadro 194 (os danos junto) e fica
+  tudo preto sem o rival até a câmera descer com o punho (205).
+- **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 18/11: o Super da Yin-lu no combo e a revisão dos documentos
+
+- **"O super na Yin-lu em combo se tornou inútil":** no combo o rival está atordoado e não bate, e
+  ela ficava esperando na postura. Agora, com o rival em hitstun, o Super sai direto no desvio e na
+  investida até ele, e as 6 palmas emendam (2L M SUPER, L M H SUPER, 2L M H SUPER:
+  `SuperEspelhoDoLagoTest`). No neutro segue o contra-golpe. Depois do 2M não emenda (o 2M derruba).
+- **Documentos revistos** (o dono, 18/11: "revê o que fizemos ontem"): a ativação do SHINKAI da
+  Natisuko e da Bonnie (de 17/11) estava fora do `shinkai.md`; a aura em labaredas ligada; o golpe
+  que viaja nas fichas da Yin-lu, da Natisuko e da Bonnie; o quadro de quem tem o quê e o foco na
+  jogabilidade em `personagens/README.md`; as tabelas "No jogo hoje" geradas de novo.
+- **Ficou:** o Super no combo só conferido no teste, sem vídeo.
+
 ## 18/11 — cena "Já vai desistir?" (torneio), rodada 4
 
 - **Pedido do dono (vídeo v3):** a cena abre com um golpe de alguém; os quatro da investida mais
@@ -1871,4 +2034,3 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   GUARD BREAK (`beamShake`): ela só diminuía no passo da luta, que fica parado na animação à mão, e
   a tela tremia 1 a 3 px até o fim da cena. Agora diminui também no passo da cinemática. Medido nos
   quadros: parada de novo. Vídeos `torneio_desistir_v7_{ryuga,koga}.mp4`. Visto só no PC.
-

@@ -430,6 +430,12 @@ final class GeneratedSpriteLayouts {
     static final int P02_SPECIAL_S4_ROOT_Y = 577;
     static final int P02_SPECIAL_S4_FRAME_COUNT = 20;
 
+    static final int P02_SUPER_DESVIO_FRAME_WIDTH = 515;
+    static final int P02_SUPER_DESVIO_FRAME_HEIGHT = 569;
+    static final int P02_SUPER_DESVIO_ROOT_X = 236;
+    static final int P02_SUPER_DESVIO_ROOT_Y = 550;
+    static final int P02_SUPER_DESVIO_FRAME_COUNT = 27;
+
     static final int P02_SUPER_ESPELHO_FRAME_WIDTH = 454;
     static final int P02_SUPER_ESPELHO_FRAME_HEIGHT = 519;
     static final int P02_SUPER_ESPELHO_ROOT_X = 226;
@@ -454,11 +460,17 @@ final class GeneratedSpriteLayouts {
     static final int P02_THROW_ROOT_Y = 470;
     static final int P02_THROW_FRAME_COUNT = 17;
 
-    static final int P02_ULTRA_SEQ_FRAME_WIDTH = 569;
-    static final int P02_ULTRA_SEQ_FRAME_HEIGHT = 468;
-    static final int P02_ULTRA_SEQ_ROOT_X = 181;
-    static final int P02_ULTRA_SEQ_ROOT_Y = 451;
-    static final int P02_ULTRA_SEQ_FRAME_COUNT = 35;
+    static final int P02_ULTRA_DRAGAO_FRAME_WIDTH = 384;
+    static final int P02_ULTRA_DRAGAO_FRAME_HEIGHT = 604;
+    static final int P02_ULTRA_DRAGAO_ROOT_X = 192;
+    static final int P02_ULTRA_DRAGAO_ROOT_Y = 581;
+    static final int P02_ULTRA_DRAGAO_FRAME_COUNT = 36;
+
+    static final int P02_ULTRA_SEQ_FRAME_WIDTH = 223;
+    static final int P02_ULTRA_SEQ_FRAME_HEIGHT = 336;
+    static final int P02_ULTRA_SEQ_ROOT_X = 94;
+    static final int P02_ULTRA_SEQ_ROOT_Y = 314;
+    static final int P02_ULTRA_SEQ_FRAME_COUNT = 82;
 
     static final int P02_VICTORY_FRAME_WIDTH = 370;
     static final int P02_VICTORY_FRAME_HEIGHT = 457;
@@ -3430,6 +3442,12 @@ final class GeneratedSpriteLayouts {
     static final int P15_SUPER_WAVE_ROOT_Y = 543;
     static final int P15_SUPER_WAVE_FRAME_COUNT = 45;
 
+    static final int P15_ULTRA_DRAGAO_FRAME_WIDTH = 523;
+    static final int P15_ULTRA_DRAGAO_FRAME_HEIGHT = 598;
+    static final int P15_ULTRA_DRAGAO_ROOT_X = 232;
+    static final int P15_ULTRA_DRAGAO_ROOT_Y = 588;
+    static final int P15_ULTRA_DRAGAO_FRAME_COUNT = 36;
+
     static final int P15_ULTRA_SEQ_FRAME_WIDTH = 460;
     static final int P15_ULTRA_SEQ_FRAME_HEIGHT = 331;
     static final int P15_ULTRA_SEQ_ROOT_X = 168;
@@ -3663,6 +3681,12 @@ final class GeneratedSpriteLayouts {
     static final int P16_THROW_ROOT_X = 178;
     static final int P16_THROW_ROOT_Y = 517;
     static final int P16_THROW_FRAME_COUNT = 17;
+
+    static final int P16_ULTRA_DRAGAO_FRAME_WIDTH = 375;
+    static final int P16_ULTRA_DRAGAO_FRAME_HEIGHT = 626;
+    static final int P16_ULTRA_DRAGAO_ROOT_X = 167;
+    static final int P16_ULTRA_DRAGAO_ROOT_Y = 600;
+    static final int P16_ULTRA_DRAGAO_FRAME_COUNT = 36;
 
     static final int P16_ULTRA_SEQ_FRAME_WIDTH = 552;
     static final int P16_ULTRA_SEQ_FRAME_HEIGHT = 331;

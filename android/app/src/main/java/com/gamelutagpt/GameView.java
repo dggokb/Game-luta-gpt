@@ -2101,7 +2101,10 @@ public class GameView extends SurfaceView
         if (rivalBateEm >= 0) {
             // PC (GravarLuta, passo rivalbate): o rival parado dá um L depois desse tanto de quadros.
             opponentInput.clear();
-            if (rivalBateEm-- == 0) opponentInput.light = true;
+            if (rivalBateEm-- == 0) {
+                if (rivalBatePoder) opponentInput.special = "M";
+                else opponentInput.light = true;
+            }
         }
         boolean semPoderes = semPoderesNaLuta();
         if (semPoderes || semShinkaiNaLuta()) {
@@ -2196,6 +2199,13 @@ public class GameView extends SurfaceView
             if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
                 event.attacker, event.defender);
             spawnImpact(event, ultraHit, punishNow, knockout);
+            CombatFighter batendo = engine.fighter(event.attacker);
+            if (!event.blocked && superDeContra(batendo) && batendo.attack.lastActiveFrame() - batendo.attackFrame < 8) {
+                // O empurrão das duas palmas do Espelho do Lago: penas no rival e a tela treme.
+                float nx = Float.isNaN(event.impactX) ? hitFighter.x : event.impactX;
+                efeitos.tocar("penas_estouro_" + batendo.character().id, nx, chestY(hitFighter), 0.45f, batendo.facing < 0);
+                beamShake = Math.max(beamShake, 14f);
+            }
             desgaste.golpe(event, hitFighter, corRoupa[event.defender]);
             CombatFighter hitter = engine.fighter(event.attacker);
             if (!event.blocked && hitter.attacking() && hitter.attack.mechanics.pound) {
@@ -2226,12 +2236,18 @@ public class GameView extends SurfaceView
             boolean doAtacante = "COUNTER".equals(cue) || "PUNISH".equals(cue);
             if (banner != null) showBanner(banner, doAtacante ? ultimoAtacante : -1);
             if ("PARRY".equals(cue)) spawnParry();
+            if ("COUNTER".equals(cue)) espelhoDoLago();
             if ("LEITURA".equals(cue) || "ESQUIVA".equals(cue)) spawnLeitura();
             if ("PRECISO".equals(cue) || "RUPTURA".equals(cue)) beamShake = Math.max(beamShake, 14f);
             if ("SHINKAI_QUEBRA".equals(cue)) beamShake = Math.max(beamShake, 22f);
             if ("SHINKAI_CHOQUE".equals(cue)) beamShake = Math.max(beamShake, 20f);
             if ("ULTRA_SHINKAI".equals(cue)) beamShake = Math.max(beamShake, 26f);
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
+            if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
+            if ("ULTRA_PEGOU".equals(cue)) pegouNaViagem();
+            if (cue.startsWith("ULTRA_PALHACO")) chuvaDeTomates(cue);
+            if ("ULTRA_FINISH_DRAGAO".equals(cue)) chuvaDeTomates(cue);
+            if (cue.startsWith("ULTRA_ICHIGEKI") || "ULTRA_FINISH_DRAGAO".equals(cue)) ichigeki(cue);
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) {
                 // O último golpe do dragão: tela tremendo, câmera lenta e impact frame em quem voou.
                 beamShake = Math.max(beamShake, 24f);
@@ -2570,6 +2586,7 @@ public class GameView extends SurfaceView
             // Sequência do vídeo: um plano de câmera por golpe (UltraDirector), corte seco a cada
             // acerto, fundo escuro; depois do golpe final a câmera da luta volta.
             CharacterDefinition.UltraSequence seq = p.state.profile.ultraSequence;
+            if (seq != null && seq.featherBurst != null) penasDoUltra(p, seq);
             if (seq != null) {
                 CombatFighter v = engine.fighter(1 - p.index);
                 UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing,
@@ -3026,6 +3043,10 @@ public class GameView extends SurfaceView
         int direction = defender.x >= attacker.x ? 1 : -1;
         int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
+        // As palmas do Super de contra-golpe (o Espelho do Lago) são palmas: o efeito de golpe médio, e o
+        // empurrão final o forte (o do Super era grande demais perto dos outros, o dono em 17/11).
+        boolean palmas = !event.projectile && superDeContra(attacker);
+        if (palmas) size = event.midStrike ? ImpactEffects.MEDIUM : ImpactEffects.HEAVY;
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         ultimoAtacante = event.attacker & 1;
         if (!event.blocked) reacao[event.defender & 1] = reacaoDoGolpe(event, defender, y);
@@ -3041,7 +3062,7 @@ public class GameView extends SurfaceView
             !efeitoDeGolpe(event.blocked, x, y, direction,
                 // Golpe de vários acertos: a faísca grande fica para a última pancada.
                 event.midStrike && size >= ImpactEffects.HEAVY ? ImpactEffects.MEDIUM : size,
-                event.strength == AttackDefinition.Strength.SUPER || ultraHit,
+                (event.strength == AttackDefinition.Strength.SUPER && !palmas) || ultraHit,
                 event.projectile || size >= ImpactEffects.SPECIAL, defender.hitstopTotal, event.attacker, event.impactAngle,
                 defender.y - y < defender.character().visualStandHeight * DANO_BAIXO_ABAIXO,
                 event.pontaX, event.pontaY, event.frenteX, event.frenteY)) {
@@ -3056,7 +3077,7 @@ public class GameView extends SurfaceView
             secretoSeed++;
         }
         // Golpe forte (H, especiais, Super, Ultra): os riscos de mangá no corpo e no rastro do golpe.
-        if (!event.blocked && (ultraHit || event.strength == AttackDefinition.Strength.SUPER)) {
+        if (!event.blocked && (ultraHit || event.strength == AttackDefinition.Strength.SUPER) && !(palmas && event.midStrike)) {
             riscos.spawn(engine.frame(), event.defender, x, y, direction, size == ImpactEffects.HEAVY ? 1f : 1.25f,
                 defender.y);
         }
@@ -3205,6 +3226,12 @@ public class GameView extends SurfaceView
      * transformação: o Ultra é outra cena.
      */
     private void cenaDoDragao(CombatFighter p) {
+        if (engine.temGarca(p.character())) {
+            // O Voo da Garça: o redemoinho de penas gira em volta dela na invocação (o dono, 17/11).
+            float ms = (engine.config.dragaoPreparo + 10) * FIXED_STEP * 1000f;
+            // Na frente (atrás o escurecido do Ultra apagava as penas); o miolo do redemoinho é vazio.
+            efeitos.tocarAndando("penas_redemoinho_" + p.character().id, p.x, chestY(p), 0.6f, p.facing < 0, 0f, ms);
+        }
         ativacaoLado = p.index;
         ativacaoInicio = engine.frame();
         ativacaoQuadros = engine.config.dragaoPreparo;
@@ -3751,6 +3778,22 @@ public class GameView extends SurfaceView
     private void updateFightCamera(float dt) {
         // Frame what is actually drawn: opaque sprite height measured at import time.
         float highestFighterTop = Math.min(visualTop(player()), visualTop(opponent()));
+        CombatFighter meio = rivalNoMeio();
+        if (meio != null) {
+            // A cena preta do Ultra SHINKAI (Bonnie, Natisuko): o rival no meio da tela.
+            float mx = meio == player() ? meio.x + tagOffset() : meio.x + engine.teams.tagOffset(OPPONENT);
+            camera.top += ichigekiCameraAcima;
+            camera.updateForRound(dt, mx, mx, visualTop(meio), false, false);
+            ichigekiCameraAcima = ichigekiCameraAcima();
+            camera.top -= ichigekiCameraAcima;
+            acompanharCenas();
+            return;
+        }
+        if (ichigekiCameraAcima != 0f) {
+            camera.top += ichigekiCameraAcima;
+            ichigekiCameraAcima = 0f;
+        }
+        cenasNaTela.clear();
         // KO leaves the winner's world X fixed, so its screen X must also
         // be fixed. Continue to update the camera only while BOTH fight.
         camera.updateForRound(dt, player().x, opponent().x, highestFighterTop,
@@ -4117,7 +4160,16 @@ public class GameView extends SurfaceView
     /** PC (passo {@code rivalbate:N}): o rival dá um L daqui a N quadros (o contra-golpe gravado). */
     public void rivalBate(int quadros) {
         rivalBateEm = quadros;
+        rivalBatePoder = false;
     }
+
+    /** PC (passo {@code rivalpoder:N}): o rival solta o especial (S1) daqui a N quadros. */
+    public void rivalPoder(int quadros) {
+        rivalBateEm = quadros;
+        rivalBatePoder = true;
+    }
+
+    private volatile boolean rivalBatePoder;
 
     private volatile int rivalBateEm = -1;
 
@@ -4613,8 +4665,21 @@ public class GameView extends SurfaceView
                 drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
                 drawMechanicAura(canvas, player(), tagOffset());
             }
+            // A Chuva de Tomates da Bonnie: tudo preto, só o picadeiro e o rival.
+            int escuroPalhaco = escuroDoPalhaco();
+            // O Ichigeki da Natisuko: o preto em que só os golpes aparecem.
+            int escuroCena = Math.max(escuroPalhaco, escuroDoIchigeki());
+            if (escuroCena > 0) effects.drawWorldOverlay(canvas, paint, escuroCena, 0, 0, 0);
             // A fumaça do pulo e do super pulo fica atrás dos lutadores (pedido do dono, 11/11).
             efeitos.desenharAtras(canvas);
+            if (escuroCena > 0 && rivalNoMeio() == opponent()) {
+                // O rival do lado do CPU foi desenhado antes do escuro: de novo, por cima dele.
+                CombatFighter npc = opponent();
+                canvas.save();
+                canvas.translate(engine.teams.tagOffset(OPPONENT), 0f);
+                drawFighter(canvas, opponentSpriteRenderer, npc, false, false);
+                canvas.restore();
+            }
             drawEchoes(canvas);
             drawHenchmen(canvas);
             drawPartner(canvas);
@@ -4667,7 +4732,8 @@ public class GameView extends SurfaceView
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
             // Na finalização a frente do cenário some junto com o resto dele.
-            if (cenario && stageScene != null && finalizacao.forca() <= 0f && cinematica.fundoPreto() < 0.5f) {
+            if (cenario && stageScene != null && finalizacao.forca() <= 0f && escuroDoPalhaco() < 255 &&
+                escuroDoIchigeki() < 255 && cinematica.fundoPreto() < 0.5f) {
                 graduarCenario(true);
                 stageScene.drawForeground(renderCanvas);
                 graduarCenario(false);
@@ -4731,6 +4797,8 @@ public class GameView extends SurfaceView
                     else hud.drawButtonsOnly(canvas, hudState);
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }
+                // Na cena do Ultra o HUD some: o grito da cena (POFT!, BOOOOOM!) aparece mesmo assim.
+                if (faixas >= 0.5f && throwBannerLado < 0 && TesteDesempenho.mensagens) drawFaixaDeAviso(canvas);
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
                 TesteAutomatico.hud(TesteAutomatico.HUD_TOQUE);
                 cinematica.renderFaixas(renderCanvas);
@@ -4928,13 +4996,17 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** A faixa de aviso (agarrão, contra-golpe, o grito do Ultra SHINKAI), enquanto dura. */
+    private void drawFaixaDeAviso(Canvas c) {
+        if (throwBannerFrames <= 0) return;
+        float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
+        hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.15f * Math.max(0f, 1f - t * 6f),
+            throwBannerLado);
+    }
+
     /** Faixas (agarrão, ROUND, KO) e o contador de combo dos dois lados (MSGS no teste de desempenho). */
     private void drawMensagens(Canvas c) {
-        if (throwBannerFrames > 0) {
-            float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
-            hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.15f * Math.max(0f, 1f - t * 6f),
-                throwBannerLado);
-        }
+        drawFaixaDeAviso(c);
         String call = flow.banner();
         // Com a tela de vitória entrando, o "VITÓRIA" é o dela.
         if (call != null && !telaVitoria.ativa()) {
@@ -5428,6 +5500,15 @@ public class GameView extends SurfaceView
             } else if (miss != null) {
                 animation = miss.id;
                 animationElapsed = miss.timeFor(elapsed, total);
+            } else if (f.desvioInicio >= 0 && f.investeAlvo != null && character.animations.containsKey(DESVIO)) {
+                // O Espelho do Lago que leu um poder: o desvio é só a aproximação (o dono, 17/11): gira
+                // (quadros 0-8 do desenho) e corre na base longa até quem atirou (9-14); chegando, as
+                // palmas são as do Super de sempre.
+                CharacterDefinition.Animation dv = character.animations.get(DESVIO);
+                int desde = engine.frame() - f.desvioInicio;
+                int quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
+                animation = dv.id;
+                animationElapsed = dv.timeOfFrame(Math.min(dv.frameCount() - 1, quadro)) + 0.001f;
             } else if (f.move != null) {
                 if (f.move.animation != null) {
                     animation = f.move.animation.id;
@@ -5542,7 +5623,10 @@ public class GameView extends SurfaceView
         CharacterDefinition.UltraSequence sequence = f.state.profile.ultraSequence;
         CharacterDefinition.Animation sequenceArt =
             sequence != null ? character.animations.get(SpriteStates.ULTRA_SEQ) : null;
-        if (animation == null && f.status == CombatFighter.Status.ULTRA && sequenceArt != null &&
+        // O Ultra SHINKAI com animação própria (a garça da Yin-lu) não usa o desenho do Ultra comum.
+        boolean ultraShinkaiProprio = f.ultraShinkai && engine.temDragao(character) &&
+            character.animations.containsKey(SpriteStates.ULTRA_DRAGAO);
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && sequenceArt != null && !ultraShinkaiProprio &&
             f.ultraPhase != CombatFighter.ULTRA_RECOVERY) {
             // Ultra do vídeo: a ativação toca até a pose da investida, a investida segura essa
             // pose e a sequência anda no relógio do motor (os golpes caem nos quadros dela).
@@ -6016,6 +6100,16 @@ public class GameView extends SurfaceView
             if (!f.inUltraDragao() || f.ultraFrame != 0) continue;
             String nome = "ultra_shinkai_" + f.state.character.id;
             CombatConfig cfg = engine.config;
+            if (engine.temViagem(f.character())) {
+                // A garça, os tomates e o Ichigeki: primeiro o golpe que viaja na frente dela; a
+                // cena só entra se ele pegar (ULTRA_PEGOU, pegouNaViagem).
+                String viagem = efeitoDaViagem(f);
+                float ms = cfg.viagemAlcance / Math.max(1f, cfg.viagemVelocidade) * FIXED_STEP * 1000f;
+                efeitos.tocarAndando(viagem, f.x + f.facing * cfg.viagemOrigem, chestY(f), tamanhoDaViagem(f),
+                    f.facing < 0, cfg.viagemVelocidade, ms);
+                ultraSounds.play(ultraFolder(f.state), "investida");
+                continue;
+            }
             float y = f.y - f.character().visualStandHeight * 0.62f;
             if (efeitos.temCena(nome)) {
                 // O vídeo do dragão atravessando a tela (dragao_ultra): ele mesmo entra de um lado e
@@ -6250,15 +6344,330 @@ public class GameView extends SurfaceView
         }
     }
 
+    /**
+     * A Chuva de Tomates da Bonnie: o picadeiro aparece com o rival em cima (atrás dele), a plateia
+     * joga os tomates, a tela inteira fica vermelha e é limpa, e a bomba explode nos pés dele.
+     */
+    private void chuvaDeTomates(String cue) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temPalhaco(u.character())) continue;
+            CombatFighter v = engine.fighter(1 - i);
+            String id = u.character().id;
+            boolean esq = u.facing < 0;
+            switch (cue) {
+                case "ULTRA_PALHACO":
+                    if (efeitos.tocar("palhaco_picadeiro_" + id, v.x, GROUND_Y, 1f, esq)) efeitos.atrasDosLutadores();
+                    ultraSounds.playFight("ar_h", 0.8f, 1.2f);
+                    break;
+                case "ULTRA_PALHACO_TOMATES":
+                    // Na tela inteira (o dono, 17/11: as mãos da borda do vídeo apareciam cortadas).
+                    tocarNaTela("palhaco_tomates_" + id, esq);
+                    break;
+                case "ULTRA_PALHACO_TELA":
+                    tocarNaTela("palhaco_tela_" + id, false);
+                    break;
+                case "ULTRA_PALHACO_BOMBA":
+                    // Embaixo da tela vermelha (atrás dos lutadores): a luva passa e ela já está lá.
+                    // Ao lado dos pés dele (atrás do corpo ela some).
+                    if (efeitos.tocar("palhaco_bomba_" + id, v.x - u.facing * PALHACO_BOMBA_LADO, GROUND_Y - engine.config.palhacoAltura,
+                        PALHACO_BOMBA, esq)) {
+                        efeitos.atrasDosLutadores();
+                    }
+                    break;
+                case "ULTRA_FINISH_DRAGAO":
+                    // O BOOM nos pés de onde ele estava (a explosão do mesmo vídeo da bomba).
+                    efeitos.tocar("palhaco_boom_" + id, v.x, GROUND_Y - engine.config.palhacoAltura, PALHACO_BOOM, esq);
+                    showBanner("BOOOOOM!", -1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /** A vaga do punho gigante do Ichigeki (para tirá-lo da tela no impacto). */
+    private int ichigekiPunhoVaga = -1;
+
+    /**
+     * O Ichigeki da Natisuko: o círculo de tinta fecha no rival, os punhos de todos os lados, os
+     * golpes no preto, o punho gigante descendo de cima nele deitado e, no impacto (POFT!), o punho
+     * some estourando em partículas (o dono, 17/11: quem estoura é o punho, não o rival).
+     */
+    private void ichigeki(String cue) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temIchigeki(u.character())) continue;
+            CombatFighter v = engine.fighter(1 - i);
+            String id = u.character().id;
+            boolean esq = u.facing < 0;
+            switch (cue) {
+                case "ULTRA_ICHIGEKI":
+                    ultraSounds.playFight("ar_h", 0.8f, 1.1f);
+                    break;
+                case "ULTRA_ICHIGEKI_SOCOS":
+                    // Os punhos de todos os lados, na tela inteira (duas levas).
+                    tocarNaTela("ichigeki_punhos_" + id, esq);
+                    break;
+                case "ULTRA_ICHIGEKI_DANOS":
+                    // O círculo de tinta fecha nele e os danos estouram dentro.
+                    ichigekiCirculoVaga = efeitos.tocarDurando("ichigeki_circulo_" + id, v.x, chestY(v), ICHIGEKI_CIRCULO,
+                        esq, 0f, 0f);
+                    efeitos.tocar("ichigeki_danos_" + id, v.x, chestY(v), ICHIGEKI_DANOS, esq);
+                    beamShake = Math.max(beamShake, 8f);
+                    break;
+                case "ULTRA_ICHIGEKI_SOME":
+                    // Some do nada: fica tudo preto, sem ele.
+                    efeitos.parar(ichigekiCirculoVaga, "ichigeki_circulo_" + id);
+                    efeitos.pararTodos("ichigeki_danos_" + id);
+                    ichigekiCirculoVaga = -1;
+                    break;
+                case "ULTRA_ICHIGEKI_PUNHO":
+                    // De cima para baixo: o punho do vídeo (que vem da esquerda) girado 90°, com os
+                    // nós dos dedos chegando no rival deitado.
+                    ichigekiPunhoVaga = efeitos.tocarDurando("ichigeki_punho_" + id, v.x, GROUND_Y - ICHIGEKI_PUNHO_Y,
+                        ICHIGEKI_PUNHO, esq, 0f, -90f);
+                    ultraSounds.playFight("ar_h", 1f, 0.7f);
+                    break;
+                case "ULTRA_FINISH_DRAGAO":
+                    efeitos.parar(ichigekiPunhoVaga, "ichigeki_punho_" + id);
+                    ichigekiPunhoVaga = -1;
+                    efeitos.tocar("ichigeki_particulas_" + id, v.x, GROUND_Y - ICHIGEKI_PUNHO_Y, ICHIGEKI_PUNHO, esq);
+                    showBanner("POFT!", -1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /** Altura (acima do chão) onde o punho gigante bate no rival deitado. */
+    private static final float ICHIGEKI_PUNHO_Y = 28f;
+    /** Tamanho do punho gigante e do estouro (o dono: "bem exagerado") e dos danos no preto. */
+    private static final float ICHIGEKI_PUNHO = 2.2f, ICHIGEKI_DANOS = 1.15f, ICHIGEKI_CIRCULO = 1.15f;
+    /** A vaga do círculo de tinta do Ichigeki (some de repente). */
+    private int ichigekiCirculoVaga = -1;
+    /** Quanto a câmera começa acima (px do mundo) quando desce com o punho gigante. */
+    private static final float ICHIGEKI_CAMERA = 520f;
+    /** O quanto a câmera está levantada agora pela descida do punho (desfeito a cada passo). */
+    private float ichigekiCameraAcima;
+
+    /** A câmera desce de cima com o punho gigante e para no impacto (0 fora da descida). */
+    private float ichigekiCameraAcima() {
+        for (int i = 0; i < 2; i++) {
+            int q = engine.ichigekiCena(engine.fighter(i));
+            if (q < 0) continue;
+            CombatConfig c = engine.config;
+            if (q < c.ichigekiSome || q >= c.ichigekiImpacto) return 0f;
+            float t = (q - c.ichigekiSome) / (float)Math.max(1, c.ichigekiImpacto - c.ichigekiSome);
+            return (1f - t) * (1f - t) * ICHIGEKI_CAMERA;
+        }
+        return 0f;
+    }
+
+    /** Escuro da cena do Ichigeki (0 a 255): de uma vez no começo, sai depois do POFT. */
+    private int escuroDoIchigeki() {
+        for (int i = 0; i < 2; i++) {
+            int q = engine.ichigekiCena(engine.fighter(i));
+            if (q < 0) continue;
+            int c = engine.config.ichigekiClareia;
+            return q < c ? 255 : Math.max(0, 255 - (q - c) * 14);
+        }
+        return 0;
+    }
+
+    /**
+     * A Natisuko fica fora da cena preta do Ichigeki; o rival some quando o círculo some (tudo
+     * preto) e volta deitado quando a câmera desce com o punho.
+     */
+    private boolean escondidoNoIchigeki(CombatFighter f) {
+        CombatConfig c = engine.config;
+        int q = engine.ichigekiCena(f);
+        if (q >= 0) return q < c.ichigekiClareia;
+        for (int i = 0; i < 2; i++) {
+            if (engine.fighter(1 - i) != f) continue;
+            int r = engine.ichigekiCena(engine.fighter(i));
+            if (r >= c.ichigekiSomeCirculo && r < c.ichigekiSome) return true;
+        }
+        return false;
+    }
+
+    /** Tamanho da bomba e do BOOM da Chuva de Tomates (o dono, 17/11: a bomba um pouco maior). */
+    private static final float PALHACO_BOMBA = 1.15f, PALHACO_BOOM = 1.15f;
+    /** A bomba fica de lado nos pés do rival (px), do lado de onde a Bonnie estava. */
+    private static final float PALHACO_BOMBA_LADO = 90f;
+
+    /** Folga do efeito de tela inteira além da tela (a borda do vídeo nunca aparece). */
+    private static final float TELA_FOLGA = 1.22f;
+
+    /**
+     * O efeito de cena na tela inteira: no meio do que a câmera mostra, maior que a tela (cobre a
+     * largura e a altura), e segue a câmera ({@link #acompanharCenas}).
+     */
+    private void tocarNaTela(String nome, boolean espelhar) {
+        float largura = efeitos.larguraCena(nome);
+        float telaL = VW / Math.max(0.01f, camera.zoom), telaA = VH / Math.max(0.01f, camera.zoom);
+        float tamanho = 1f;
+        if (largura > 0f) {
+            // Os vídeos são de 1344x768: a altura também tem que cobrir.
+            float altura = largura * 768f / 1344f;
+            tamanho = Math.max(telaL / largura, telaA / altura) * TELA_FOLGA;
+        }
+        efeitos.tocar(nome, camera.x, meioDaTelaCheia(), tamanho, espelhar);
+        if (!cenasNaTela.contains(nome)) cenasNaTela.add(nome);
+    }
+
+    /** Os efeitos de cena tocando na tela inteira (seguem a câmera). */
+    private final java.util.ArrayList<String> cenasNaTela = new java.util.ArrayList<>();
+
+    /** O meio exato do que a câmera mostra (altura). */
+    private float meioDaTelaCheia() {
+        return camera.top + VH / Math.max(0.01f, camera.zoom) * 0.5f;
+    }
+
+    /** Os efeitos de tela inteira acompanham a câmera (ela anda até o rival no começo da cena). */
+    private void acompanharCenas() {
+        for (String nome : cenasNaTela) efeitos.mover(nome, camera.x, meioDaTelaCheia());
+    }
+
+    /**
+     * O rival que a cena do Ultra SHINKAI põe no meio da tela (a Chuva de Tomates e o Ichigeki),
+     * ou null: a câmera centra nele.
+     */
+    private CombatFighter rivalNoMeio() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (engine.palhacoCena(u) >= 0 || engine.ichigekiCena(u) >= 0) return engine.fighter(1 - i);
+        }
+        return null;
+    }
+
+    /** Escuro da cena da Chuva de Tomates (0 a 255): entra de uma vez no começo e sai no BOOM. */
+    private int escuroDoPalhaco() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            int q = engine.palhacoCena(u);
+            if (q < 0) continue;
+            CombatConfig c = engine.config;
+            if (q < c.palhacoBoom) return 255;
+            return Math.max(0, 255 - (q - c.palhacoBoom) * 12);
+        }
+        return 0;
+    }
+
+    /** A Bonnie fica fora da cena preta do picadeiro (reaparece no BOOM). */
+    private boolean escondidaNoPicadeiro(CombatFighter f) {
+        int q = engine.palhacoCena(f);
+        return q >= 0 && q < engine.config.palhacoBoom;
+    }
+
+    /** O golpe que viaja de cada uma: a onda da palma (Yin-lu), o tomate (Bonnie), o soco de fogo (Natisuko). */
+    private String efeitoDaViagem(CombatFighter f) {
+        String id = f.character().id;
+        if (engine.temPalhaco(f.character())) return "tomate_voando_" + id;
+        if (engine.temIchigeki(f.character())) return "ichigeki_punho_" + id;
+        return "onda_" + id;
+    }
+
+    private float tamanhoDaViagem(CombatFighter f) {
+        if (engine.temPalhaco(f.character())) return 1f;
+        if (engine.temIchigeki(f.character())) return 0.55f;
+        return 1.3f;
+    }
+
+    /** O golpe que viaja pegou: ele some e a cena começa (a garça desce no rival). */
+    private void pegouNaViagem() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temViagem(u.character())) continue;
+            efeitos.pararTodos(efeitoDaViagem(u));
+            CombatFighter v = engine.fighter(1 - i);
+            beamShake = Math.max(beamShake, 10f);
+            ultraSounds.playFight("acerto_s", 1f, 0.9f);
+            if (engine.temGarca(u.character())) {
+                efeitos.tocar("garca_casulo_" + u.character().id, v.x, GROUND_Y, 1f, u.facing < 0);
+            }
+        }
+    }
+
+    /** O mergulho do Voo da Garça: a garça desce de cabeça sobre o rival (nos pés dele). */
+    private void mergulhoDaGarca() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temGarca(u.character())) continue;
+            CombatFighter v = engine.fighter(1 - i);
+            efeitos.tocar("garca_mergulho_" + u.character().id, v.x, GROUND_Y, 1f, u.facing < 0);
+            beamShake = Math.max(beamShake, 10f);
+        }
+    }
+
     /** Rival que o Ultra em sequência esconde agora (debaixo da cartola, dentro do canhão da p16). */
     private boolean hiddenByUltra(CombatFighter f) {
         for (int i = 0; i < 2; i++) {
             CombatFighter u = engine.fighter(i);
+            if (engine.fighter(1 - i) == f && engine.garcaEscondeRival(u)) return true;
             if (!u.inUltraSequence() || engine.fighter(1 - i) != f) continue;
             CharacterDefinition.UltraSequence seq = u.state.profile.ultraSequence;
             if (seq != null && seq.hidesVictim(u.ultraFrame)) return true;
         }
         return false;
+    }
+
+    /** O desenho do desvio do Espelho do Lago (o poder lido) e os quadros do giro dele. */
+    private static final String DESVIO = "SUPER_DESVIO";
+    private static final int DESVIO_GIRO = 18;
+
+    /** O Super de contra-golpe com o efeito de penas da dona (o Espelho do Lago da Yin-lu). */
+    private boolean superDeContra(CombatFighter f) {
+        return f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER && f.attack.mechanics.parry &&
+            efeitos.tem("penas_estouro_" + f.character().id);
+    }
+
+    /**
+     * O Espelho do Lago leu o golpe: estoura penas da mão que desvia, a cena desacelera um instante
+     * e a tela treme (o momento do contra, antes das palmas).
+     */
+    private void espelhoDoLago() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            if (!superDeContra(f) || !f.countered) continue;
+            efeitos.tocar("penas_estouro_" + f.character().id, f.x + f.facing * 60f, chestY(f), 0.55f, f.facing < 0);
+            feel.slow(20, 0.35f);
+            beamShake = Math.max(beamShake, 16f);
+        }
+    }
+
+    /** Tamanho do redemoinho e do estouro de penas (o vídeo enche a tela e cobria a luta inteira). */
+    private static final float PENAS_REDEMOINHO = 0.4f, PENAS_ESTOURO = 0.4f;
+
+    /** Último quadro da sequência do Ultra com penas já visto (o estouro sai uma vez em cada borda). */
+    private float penasQuadro = -1f;
+
+    /**
+     * Mil Penas da Yin-lu: onde ela some e onde reaparece sai o estouro de penas (no lugar do
+     * desenho, com o voo), e o redemoinho gira em volta do rival do começo ao golpe final.
+     */
+    private void penasDoUltra(CombatFighter p, CharacterDefinition.UltraSequence seq) {
+        float agora = p.ultraFrame, antes = penasQuadro;
+        if (antes > agora) antes = -1f;
+        if (antes < 0f && seq.featherSwirl != null) {
+            CombatFighter v = engine.fighter(1 - p.index);
+            float ms = Math.max(1, seq.hits[seq.hits.length - 1] - agora) * FIXED_STEP * 1000f;
+            // Atrás dos lutadores: na frente, com a câmera fechada, cobria a luta inteira.
+            if (efeitos.tocarAndando(seq.featherSwirl, v.x, chestY(v), PENAS_REDEMOINHO, p.facing < 0, 0f, ms)) efeitos.atrasDosLutadores();
+        }
+        for (int[] w : seq.vanish) {
+            if (antes < w[0] && agora >= w[0]) estouroDePenas(p, seq, w[0] - 1);
+            if (antes < w[1] && agora >= w[1]) estouroDePenas(p, seq, w[1]);
+        }
+        penasQuadro = agora;
+    }
+
+    private void estouroDePenas(CombatFighter p, CharacterDefinition.UltraSequence seq, float quadro) {
+        float[] at = seq.flightAt(Math.max(0f, quadro));
+        float x = p.x + p.facing * at[0];
+        float y = fighterVisualY(p) - at[1] - p.body().height(false) * 0.5f;
+        efeitos.tocar(seq.featherBurst, x, y, PENAS_ESTOURO, p.facing < 0);
     }
 
     /** Quadros do zanzoken: a imagem que fica some nesse tanto; o reaparecer pisca nesse tanto. */
@@ -6281,6 +6690,8 @@ public class GameView extends SurfaceView
         CharacterDefinition.UltraSequence seq = f.state.profile.ultraSequence;
         if (seq == null || seq.vanish.length == 0) return 1f;
         float frame = f.ultraFrame;
+        // Mil Penas: some e aparece de uma vez (o estouro de penas cobre a troca), sem a imagem que fica.
+        if (seq.featherBurst != null) return seq.hidesAttacker(frame) ? 0f : 1f;
         boolean blink = (engine.frame() / 2) % 2 == 0;
         if (seq.hidesAttacker(frame)) {
             float since = seq.sinceVanish(frame);
@@ -6648,7 +7059,7 @@ public class GameView extends SurfaceView
 
     private void drawFighterCorpo(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                                   boolean damageFlash, boolean guardFlash) {
-        if (hiddenByUltra(f) || cenaEmVideo) return;
+        if (hiddenByUltra(f) || cenaEmVideo || escondidaNoPicadeiro(f) || escondidoNoIchigeki(f)) return;
         // A liberação do SHINKAI em vídeo já desenha o lutador (no efeito).
         if (ativacaoEfeito && ativacaoShinkai() && f == engine.fighter(ativacaoLado)) return;
         float zanzoken = zanzokenAlpha(f);
@@ -6699,7 +7110,10 @@ public class GameView extends SurfaceView
         }
         Filtro tinta = corDoLado(f, luzNoLutador(desgaste.tinta(f.state), desgaste.poeiraNosPes(f.state), f));
         renderer.setTint(tinta);
-        renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
+        // Mil Penas da Yin-lu: atrás do rival ela aparece virada para o outro lado.
+        CharacterDefinition.UltraSequence espelho = f.inUltraSequence() ? f.state.profile.ultraSequence : null;
+        int lado = espelho != null && espelho.mirrorsAttacker(f.ultraFrame) ? -f.facing : f.facing;
+        renderer.draw(c, f.x, visualY, lado, damageFlash, guardFlash);
         renderer.setTint(null);
         if (look != null) renderer.setOverride(null);
         c.restore();
@@ -7161,21 +7575,22 @@ public class GameView extends SurfaceView
     /**
      * O contorno do SHINKAI: a silhueta do próprio quadro, na cor do tipo, tremendo em volta do
      * corpo (uma borda larga e fraca, outra fina e clara). Segue cada quadro da animação. No fim
-     * do SHINKAI ele falha, avisando que vai acabar.
+     * do SHINKAI ele vai enfraquecendo ({@link #intensidadeShinkai}).
      */
     private void drawShinkaiOutline(Canvas c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
-        float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        float forca = intensidadeShinkai(f);
         int frame = engine.frame();
-        if (left < 0.2f && (frame / 3) % 3 == 0) return;
         int color = f.state.corShinkai() & 0xFFFFFF;
         int light = ((Color.red(color) + 255) / 2 << 16) | ((Color.green(color) + 255) / 2 << 8) | (Color.blue(color) + 255) / 2;
-        r.setOverride(shinkaiTint(0x66000000 | color));
+        // Em degraus de 1/16 (cada alfa é um filtro guardado).
+        float k = Math.round(forca * 16f) / 16f;
+        r.setOverride(shinkaiTint((Math.round(0x66 * k) << 24) | color));
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2.0 * i / 4.0 + Math.PI / 4.0 + frame * 0.05;
             float rad = 8f + 3f * (float)Math.sin(frame * 0.7 + i * 1.9);
             r.draw(c, f.x + (float)Math.cos(a) * rad, visualY + (float)Math.sin(a) * rad, f.facing, false, false);
         }
-        r.setOverride(shinkaiTint(0xFF000000 | light));
+        r.setOverride(shinkaiTint((Math.round(0xFF * k) << 24) | light));
         for (int i = 0; i < 6; i++) {
             double a = Math.PI * 2.0 * i / 6.0;
             float rad = 3.2f + 1.3f * (float)Math.sin(frame * 1.3 + i * 2.3);
@@ -7187,10 +7602,10 @@ public class GameView extends SurfaceView
     /**
      * A aura do SHINKAI em labaredas (o dono, 17/11: "as auras do Shinkai baseadas nas do Jujutsu
      * Kaisen", com a foto da energia ciano de borda redonda, halo azul-escuro e gotas soltas). Só no
-     * OpenGL; no Canvas fica o contorno de antes. Desligada até o dono aprovar no vídeo
-     * ({@code -Dgameluta.auraChama=true} liga para gravar).
+     * OpenGL; no Canvas fica o contorno de antes. Ligada para o dono testar no celular (17/11);
+     * {@code -Dgameluta.auraChama=false} volta ao contorno de antes para comparar.
      */
-    static final boolean AURA_CHAMA = Boolean.getBoolean("gameluta.auraChama");
+    static final boolean AURA_CHAMA = !"false".equals(System.getProperty("gameluta.auraChama"));
     /**
      * As camadas da aura, de fora para dentro: escala da silhueta em volta dos pés (largura,
      * altura), quanto da cor do tipo vai para o escuro (−) ou para o branco (+), opacidade, corte do
@@ -7232,10 +7647,23 @@ public class GameView extends SurfaceView
      */
     private static final float AURA_PASSO = 0.35f, AURA_PASSOS_POR_SEGUNDO = 2.8f, AURA_TREMOR = 0.025f;
 
-    private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+    /**
+     * A força da aura do SHINKAI: cheia, e no fim ela vai enfraquecendo até {@link
+     * #SHINKAI_FIM_MINIMO} em vez de piscar (o dono, 17/11: "em vez de ficar piscando, vamos
+     * diminuindo sua intensidade"). Começa a cair quando falta {@link #SHINKAI_FIM_FRACAO} do tempo.
+     */
+    private float intensidadeShinkai(CombatFighter f) {
         float left = f.state.shinkaiFrames / (float)engine.config.shinkaiFrames;
+        if (left >= SHINKAI_FIM_FRACAO) return 1f;
+        float t = Math.max(0f, left) / SHINKAI_FIM_FRACAO;
+        return SHINKAI_FIM_MINIMO + (1f - SHINKAI_FIM_MINIMO) * t * (2f - t);
+    }
+
+    private static final float SHINKAI_FIM_FRACAO = 0.35f, SHINKAI_FIM_MINIMO = 0.15f;
+
+    private void drawShinkaiAura(CanvasGl c, SpriteFighterRenderer r, CombatFighter f, float visualY) {
+        float forca = intensidadeShinkai(f);
         int frame = engine.frame();
-        if (left < 0.2f && (frame / 3) % 3 == 0) return;
         int cor = f.state.corShinkai() & 0xFFFFFF;
         c.paraJanela(f.x, visualY, auraJanela);
         float px = auraJanela[2];
@@ -7266,14 +7694,16 @@ public class GameView extends SurfaceView
         for (int i = 0; i < AURA_CAMADAS.length; i++) {
             float[] k = AURA_CAMADAS[i];
             int rgb = k[2] < 0f ? misturar(cor, AURA_ESCURO, -k[2]) : misturar(cor, 0xFFFFFF, k[2]);
-            int argb = (Math.round(k[3] * 255f) << 24) | rgb;
+            int argb = (Math.round(k[3] * forca * 255f) << 24) | rgb;
+            // Mais fraca, a chama também baixa (as labaredas sobem menos).
+            float sobe = k[6] * estica * (0.45f + 0.55f * forca);
             r.setOverride(Filtro.aura(argb, k[4], tempo + k[5], auraJanela[0], auraJanela[1], AURA_CELULA * px, altura,
-                k[6] * estica * altura, k[7], rastro * k[8], k[9]));
+                sobe * altura, k[7], rastro * k[8], k[9]));
             c.save();
             c.scale(k[0], k[1], f.x, visualY);
             // Uma subida acima: o shader lê o desenho no lugar dele e as labaredas ganham espaço
             // acima do quadro (sem isso elas batiam no topo do quadro e saíam cortadas retas).
-            c.translate(0f, -k[6] * estica * f.character().visualStandHeight);
+            c.translate(0f, -sobe * f.character().visualStandHeight);
             r.draw(c, f.x, visualY, f.facing, false, false);
             c.restore();
         }

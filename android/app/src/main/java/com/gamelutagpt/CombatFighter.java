@@ -255,6 +255,14 @@ final class CombatFighter {
     int armorHitFrame = Integer.MIN_VALUE / 2;
     /** A postura de contra-ataque deste golpe já pegou um golpe (o repel só bate assim). */
     boolean countered;
+    /**
+     * O Super de contra-golpe que leu um poder (o Espelho do Lago): ela investe até quem atirou, a
+     * essa velocidade (px por quadro, com o lado), e solta as palmas quando chega. 0: parada.
+     */
+    float investida;
+    /** Quadro (do motor) em que o Espelho do Lago leu o poder, ou -1: o desenho é o do desvio. */
+    int desvioInicio = -1;
+    CombatFighter investeAlvo;
     /** O agarrão de especial não pegou ninguém no primeiro quadro ativo: o resto sai no vazio. */
     boolean grabMissed;
     /** O recuo do Ultra em sequência já aconteceu (a p15 reaparece longe uma vez só). */
@@ -478,6 +486,9 @@ final class CombatFighter {
         strikeLanded = strikeBlocked = strikeJuggled = false;
         reboundHopped = false;
         countered = false;
+        investida = 0f;
+        investeAlvo = null;
+        desvioInicio = -1;
         grabMissed = false;
         armorUsed = 0;
         charge = 0;

@@ -10,6 +10,10 @@ Os custos estão em dias de código de uma pessoa e são ordem de grandeza. A ar
 
 ## Onde estamos
 
+**Foco agora (o dono, 18/11): fechar a jogabilidade.** Sprites de movimento e de golpes, Super,
+Ultra, SHINKAI e Ultra SHINKAI primeiro; intro, vitória, derrota e provocação depois. O estado de
+cada personagem está em [personagens/README.md](personagens/README.md#foco-agora-1811).
+
 | Frente | Pronto | Falta |
 |---|---|---|
 | História ep00–ep03 | páginas, lutas e tutorial | — |

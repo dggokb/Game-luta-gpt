@@ -312,6 +312,7 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args += ['--densidade', str(densidade)]
     if opts.get('nitidez'):
         args.append('--nitidez')  # unsharp leve e borda sem verde na folha HD (p15 e p16)
+    # "sem_verde": o verde que fica no fogo meio transparente sai depois (sem_verde, abaixo).
     # Célula da medida mais alta que a final (640, raiz a 170 do pé da célula): o golpe no ar que
     # desce a perna abaixo dos pés do 1º quadro do vídeo (o jH do p01) não é cortado na medida.
     run(args + ['--celula', '640', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
@@ -336,7 +337,29 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         left, right = min(left, w // 2), min(right, w // 2)
         up = min(up, h - down)
     out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
+    if opts.get('sem_verde'):
+        sem_verde(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png', opts.get('fogo'))
     return out.strip().splitlines()[0]
+
+
+def sem_verde(caminho, fogo=None):
+    """Tira o verde do fundo que fica no fogo meio transparente (a aura do Ultra SHINKAI do p15):
+    o verde de cada pixel não passa do maior entre vermelho e azul (o amarelo do fogo fica, o
+    amarelo-esverdeado da borda vira amarelo; branco, pele e cabelo não mudam)."""
+    a = np.array(Image.open(caminho).convert('RGBA'))
+    rgb = a[..., :3].astype(np.int16)
+    g = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]))
+    # O amarelo puro do fogo meio transparente lê como verde-limão sobre o cenário: puxa para o
+    # laranja onde o azul é pouco (fogo); pele, branco e cabelo têm azul e não mudam.
+    fogo_px = rgb[..., 2] < g * 0.6
+    a[..., 1] = np.where(fogo_px, np.minimum(g, rgb[..., 0] * 0.86), g).astype(np.uint8)
+    if fogo is not None:
+        # "fogo": o quanto do fogo fica (o dono, 17/11: a aura da p15 estourada): o fogo amarelo
+        # (não o corpo, que tem azul) fica meio transparente e mais laranja.
+        chama = fogo_px & (rgb[..., 0] > 150)
+        a[..., 3] = np.where(chama, a[..., 3] * float(fogo), a[..., 3]).astype(np.uint8)
+        a[..., 1] = np.where(chama, a[..., 1] * 0.74, a[..., 1]).astype(np.uint8)
+    Image.fromarray(a, 'RGBA').save(caminho)
 
 
 def body_box(cell):
