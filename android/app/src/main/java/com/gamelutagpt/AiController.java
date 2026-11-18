@@ -2676,6 +2676,11 @@ final class AiController {
                                     CpuPerception.Snapshot seen, FighterInput out) {
         if (!me.canAct()) return false;
         List<CpuSpecials.Option> kit = CpuSpecials.of(me.character());
+        CpuSpecials.Option superContra = superDeContra(me);
+        if (superContra != null) {
+            kit = new java.util.ArrayList<>(kit);
+            kit.add(superContra);
+        }
         if (kit.isEmpty()) return false;
         float gap = Math.abs(seen.x - me.x);
         int elapsed = engine.frame() - seen.frame;
@@ -2718,7 +2723,8 @@ final class AiController {
             especialContraBola = null;
             for (CpuSpecials.Option o : kit) {
                 AttackDefinition.Mechanics m = o.m();
-                boolean repel = o.role == CpuSpecials.Role.REPEL;
+                // O Super de contra-golpe lê o poder na janela dele (desvia e investe até quem atirou).
+                boolean repel = o.role == CpuSpecials.Role.REPEL || o == superContra;
                 boolean evade = m.evade == AttackDefinition.Reads.ANY ||
                     m.evade == AttackDefinition.Reads.HIGH && !seen.projectileLow;
                 if ((repel || evade) && lifeAllows(me, o)) {
@@ -2735,8 +2741,9 @@ final class AiController {
             float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
             float arrival = seen.projectileGapNow(me.x, elapsed) / speed;
             AttackDefinition.Mechanics m = shotPlan.m();
-            int start = shotPlan.role == CpuSpecials.Role.REPEL ? m.counterStart : m.evadeStart;
-            int end = shotPlan.role == CpuSpecials.Role.REPEL ? m.counterEnd : m.evadeEnd;
+            boolean janelaContra = shotPlan.role == CpuSpecials.Role.REPEL || shotPlan.role == CpuSpecials.Role.COUNTER;
+            int start = janelaContra ? m.counterStart : m.evadeStart;
+            int end = janelaContra ? m.counterEnd : m.evadeEnd;
             if (CpuSpecials.covers(start, end, arrival, 2)) {
                 CpuSpecials.Option o = shotPlan;
                 shotPlan = null;
@@ -2910,9 +2917,32 @@ final class AiController {
 
     /** Aperta o especial (o S1 de mergulho vai como a energia, com o M). */
     private static void pressSpecial(CpuSpecials.Option o, FighterInput out) {
-        out.special = o.id.equals("S") ? "M" : o.id;
         out.light = out.medium = out.heavy = false;
+        if (o.id.equals("SUPER")) {
+            out.superAttack = true;
+            return;
+        }
+        out.special = o.id.equals("S") ? "M" : o.id;
     }
+
+    /**
+     * O Super de contra-golpe (o Espelho do Lago da Yin-lu) como resposta ao golpe ou à bola que vem,
+     * com a barra paga e sem quebrar a reserva do Ultra nos níveis altos; null se não tem ou não vale.
+     */
+    private CpuSpecials.Option superDeContra(CombatFighter me) {
+        CharacterDefinition c = me.character();
+        if (!fullKit || !ComboBook.counterSuper(c) || !me.state.canPaySuper()) return null;
+        int meter = me.state.superMeter;
+        if (meter >= CombatConfig.SUPER_COST && smart() >= 0.5 && meter >= CombatConfig.ULTRA_COST &&
+            meter - CombatConfig.SUPER_COST < CombatConfig.ULTRA_COST) return null;
+        if (superContraOpcao == null || superContraOpcao.attack != c.attack("SUPER")) {
+            AttackDefinition sup = c.attack("SUPER");
+            superContraOpcao = new CpuSpecials.Option("SUPER", sup, CpuSpecials.Role.COUNTER, sup.reach, 0f);
+        }
+        return superContraOpcao;
+    }
+
+    private CpuSpecials.Option superContraOpcao;
 
     // ---------------------------------------------------------------- caderno de combos
 
@@ -3477,8 +3507,9 @@ final class AiController {
     private boolean spendSuper(CombatFighter me, CombatFighter target) {
         int meter = me.state.superMeter;
         if (!me.state.canPaySuper() || !me.character().fighter.hasSuperAttack()) return false;
-        // O Super de contra-golpe (o Espelho do Lago da Yin-lu) não bate sozinho: nem punição, nem fim de combo.
-        if (ComboBook.counterSuper(me.character())) return false;
+        // O Super de contra-golpe (o Espelho do Lago da Yin-lu) não bate sozinho na punição; no combo
+        // (o rival atordoado) ele já sai no desvio e na investida e as palmas emendam (18/11).
+        if (ComboBook.counterSuper(me.character()) && !target.inHitstun()) return false;
         // O Super grátis do SHINKAI: não gasta a reserva, sai sempre.
         if (meter < CombatConfig.SUPER_COST) return true;
         if (smart() < 0.5 || !fullKit) return true;

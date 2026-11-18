@@ -27,6 +27,10 @@ agarrão), **Super, Ultra, SHINKAI e Ultra SHINKAI** (o dono, 18/11: "quero fech
 Intro, vitória, derrota, provocação, abertura e página de mangá do Ultra ficam para depois: não
 liste como pendência do momento nem proponha agora.
 
+**A CPU acompanha tudo** (o dono, 18/11): todo golpe, Super, Ultra, mecânica ou mudança nova entra
+também na CPU (`AiController`, `ComboBook`, `CpuSpecials`) no mesmo trabalho, com teste. Não é
+tarefa separada para depois.
+
 ## Git
 
 - Push direto na `game-luta-sprite-fable`, depois de `git fetch` e `git merge` do origin. Sem
