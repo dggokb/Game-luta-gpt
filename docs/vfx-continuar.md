@@ -1974,3 +1974,14 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   `--chama` (novo, com `--opaco`): opaco só o cinza de verdade e grosso (o corpo da bomba); o fogo
   colorido vem pelo brilho e o brilho escuro (máximo < 70) some.
 - **Ficou:** ele julgar no vídeo. Visto só no PC.
+
+## Rodada de 17/11: o golpe de abertura que viaja (garça, tomates, Ichigeki)
+
+- **Pedido:** "essas ult à distância têm que entrar só se acertar o hit inicial; fiz a da Yin-lu,
+  errei, apareceu a garça, fechou e o pau rolando". Ele escolheu o golpe que viaja.
+- **Feito:** na fase do Ultra sai o efeito que viaja (`tocarAndando` a 26 px por quadro): a
+  `onda_p02` (a onda da palma do S1) a 1,3x, o `tomate_voando_p16` (novo: um tomate desenhado por
+  código, 8 quadros girando, `efeito_video.py` de uma pasta de PNG) e o `ichigeki_punho_p15` a 0,55x.
+  Pegou: ele some (`EfeitosVideo.pararTodos`), a tela treme e a cena de sempre começa (a garça desce
+  no rival). Errou: ela volta à guarda.
+- **Ficou:** ele julgar no celular. Visto só no PC.

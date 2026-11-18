@@ -2239,6 +2239,7 @@ public class GameView extends SurfaceView
             if ("ULTRA_SHINKAI".equals(cue)) beamShake = Math.max(beamShake, 26f);
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
             if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
+            if ("ULTRA_PEGOU".equals(cue)) pegouNaViagem();
             if (cue.startsWith("ULTRA_PALHACO")) chuvaDeTomates(cue);
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) chuvaDeTomates(cue);
             if (cue.startsWith("ULTRA_ICHIGEKI") || "ULTRA_FINISH_DRAGAO".equals(cue)) ichigeki(cue);
@@ -3222,7 +3223,7 @@ public class GameView extends SurfaceView
     private void cenaDoDragao(CombatFighter p) {
         if (engine.temGarca(p.character())) {
             // O Voo da Garça: o redemoinho de penas gira em volta dela na invocação (o dono, 17/11).
-            float ms = (engine.config.dragaoPreparo + engine.config.garcaPega) * FIXED_STEP * 1000f;
+            float ms = (engine.config.dragaoPreparo + 10) * FIXED_STEP * 1000f;
             // Na frente (atrás o escurecido do Ultra apagava as penas); o miolo do redemoinho é vazio.
             efeitos.tocarAndando("penas_redemoinho_" + p.character().id, p.x, chestY(p), 0.6f, p.facing < 0, 0f, ms);
         }
@@ -6066,10 +6067,13 @@ public class GameView extends SurfaceView
             if (!f.inUltraDragao() || f.ultraFrame != 0) continue;
             String nome = "ultra_shinkai_" + f.state.character.id;
             CombatConfig cfg = engine.config;
-            if (engine.temGarca(f.character())) {
-                // O Voo da Garça: a garça desce sobre o rival e fecha o casulo nele (nos pés dele).
-                CombatFighter v = engine.fighter(1 - side);
-                efeitos.tocar("garca_casulo_" + f.state.character.id, v.x, GROUND_Y, 1f, f.facing < 0);
+            if (engine.temViagem(f.character())) {
+                // A garça, os tomates e o Ichigeki: primeiro o golpe que viaja na frente dela; a
+                // cena só entra se ele pegar (ULTRA_PEGOU, pegouNaViagem).
+                String viagem = efeitoDaViagem(f);
+                float ms = cfg.viagemAlcance / Math.max(1f, cfg.viagemVelocidade) * FIXED_STEP * 1000f;
+                efeitos.tocarAndando(viagem, f.x + f.facing * cfg.viagemOrigem, chestY(f), tamanhoDaViagem(f),
+                    f.facing < 0, cfg.viagemVelocidade, ms);
                 ultraSounds.play(ultraFolder(f.state), "investida");
                 continue;
             }
@@ -6512,6 +6516,35 @@ public class GameView extends SurfaceView
     private boolean escondidaNoPicadeiro(CombatFighter f) {
         int q = engine.palhacoCena(f);
         return q >= 0 && q < engine.config.palhacoBoom;
+    }
+
+    /** O golpe que viaja de cada uma: a onda da palma (Yin-lu), o tomate (Bonnie), o soco de fogo (Natisuko). */
+    private String efeitoDaViagem(CombatFighter f) {
+        String id = f.character().id;
+        if (engine.temPalhaco(f.character())) return "tomate_voando_" + id;
+        if (engine.temIchigeki(f.character())) return "ichigeki_punho_" + id;
+        return "onda_" + id;
+    }
+
+    private float tamanhoDaViagem(CombatFighter f) {
+        if (engine.temPalhaco(f.character())) return 1f;
+        if (engine.temIchigeki(f.character())) return 0.55f;
+        return 1.3f;
+    }
+
+    /** O golpe que viaja pegou: ele some e a cena começa (a garça desce no rival). */
+    private void pegouNaViagem() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter u = engine.fighter(i);
+            if (!u.inUltraDragao() || !engine.temViagem(u.character())) continue;
+            efeitos.pararTodos(efeitoDaViagem(u));
+            CombatFighter v = engine.fighter(1 - i);
+            beamShake = Math.max(beamShake, 10f);
+            ultraSounds.playFight("acerto_s", 1f, 0.9f);
+            if (engine.temGarca(u.character())) {
+                efeitos.tocar("garca_casulo_" + u.character().id, v.x, GROUND_Y, 1f, u.facing < 0);
+            }
+        }
     }
 
     /** O mergulho do Voo da Garça: a garça desce de cabeça sobre o rival (nos pés dele). */

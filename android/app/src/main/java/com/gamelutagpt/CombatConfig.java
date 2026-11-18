@@ -841,6 +841,15 @@ final class CombatConfig {
         ichigekiClareia = 272, ichigekiQuadros = 300;
     /** Do impacto: a altura de onde o rival cai (px acima do chão) e até onde vai depois de quicar. */
     float garcaAltura = 260f, garcaEmpurra = 420f;
+    /**
+     * O golpe de abertura que viaja (o dono, 17/11: "essas ult à distância têm que entrar só se
+     * acertar o hit inicial"): a garça, os tomates e o Ichigeki saem como um golpe que atravessa na
+     * frente dela (a onda da palma, o tomate, o soco de fogo); pega quem está na frente e no chão,
+     * e só então a cena começa. Errou (pulou por cima, atrás, longe demais): sem a cena. De onde
+     * sai (px à frente), a velocidade (px por quadro), até onde vai (px) e a altura que pega (px
+     * acima do chão; os pés acima disso: passa por baixo).
+     */
+    float viagemOrigem = 60f, viagemVelocidade = 26f, viagemAlcance = 1100f, viagemAltura = 140f;
     /** De onde o dragão parte: à frente do lutador (px), menos {@link #dragaoAtras}. */
     float dragaoOrigem = 60f;
     /** O dragão entra de fora da tela: a cabeça começa tanto atrás do punho (px). */

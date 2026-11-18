@@ -159,6 +159,15 @@ gigante até ele deitado: POFT, e o punho some em partículas: `CombatConfig.ult
 cenas pretas (Bonnie e Natisuko) a câmera centra no rival e os efeitos de tela inteira
 (`GameView.tocarNaTela`) cobrem o que ela mostra, com folga.
 
+**O golpe que viaja (17/11, o dono: "essas ult à distância têm que entrar só se acertar o hit
+inicial"):** a garça, os tomates e o Ichigeki abrem com um golpe que sai dela e atravessa na frente
+(a onda da palma da Yin-lu, um tomate girando da Bonnie, o soco de fogo da Natisuko), a 26 px por
+quadro até 1100 px, com a luta andando (dá para pular). Pega quem está na frente com os pés a até
+140 px do chão: defendeu = toma a defesa e acabou; pegou = a cena começa ali (o relógio dela volta a
+zero e a luta para). Passou por baixo, atrás ou longe demais: errou, ela volta à guarda e a barra foi
+gasta (`CombatConfig.viagem*`, `CombatEngine.viagem`, `UltraShinkaiTest`). O dragão do Ryūga segue
+como era (ele atravessa a tela inteira e prende quem está na frente).
+
 **O que nasce na ativação (17/11, o dono):** **bicho só na família Komyo** (a escola dos irmãos): o
 dragão do Ryūga, a garça da Yin-lu e o tigre do Kōga. Quem é de fora mostra o próprio jeito: a
 Natisuko, o círculo de pincel (ensō) e os mil socos num só, em dourado; a Bonnie, a lebre de luz

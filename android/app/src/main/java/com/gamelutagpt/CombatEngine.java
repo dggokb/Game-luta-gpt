@@ -4772,6 +4772,75 @@ final class CombatEngine {
         return false;
     }
 
+    /** O Ultra SHINKAI do lutador abre com o golpe que viaja (a garça, os tomates, o Ichigeki). */
+    boolean temViagem(CharacterDefinition c) {
+        return temGarca(c) || temPalhaco(c) || temIchigeki(c);
+    }
+
+    /** O golpe de abertura ainda está viajando (a cena não começou): onde está a frente dele (px à frente). */
+    float viagemFrente(CombatFighter a) {
+        return config.viagemOrigem + config.viagemVelocidade * a.ultraFrame;
+    }
+
+    /** O golpe de abertura viajando agora (nem pegou nem errou). */
+    boolean viajando(CombatFighter a) {
+        return a.inUltraDragao() && temViagem(a.character()) && a.dragaoEstado == 0;
+    }
+
+    /**
+     * Um passo do golpe que viaja: chegando em quem está na frente e no chão, defendeu = toma a
+     * defesa do Ultra e acabou; senão pegou: o relógio da cena volta a zero, a luta para a cena
+     * inteira e o dano do Ultra é preparado. Passou do alcance sem pegar: errou.
+     */
+    private void viagem(CombatFighter a, CombatFighter d) {
+        float frente = (d.x - a.x) * a.facing;
+        float meio = d.body().halfWidth;
+        float cabeca = viagemFrente(a);
+        boolean chegou = frente + meio >= 0f && cabeca >= frente - meio;
+        boolean alto = Arena.GROUND_Y - d.y > config.viagemAltura;
+        if (chegou && !alto && cabeca - config.viagemVelocidade < frente + meio && d.hittable() && !d.ko()) {
+            int guard = effectiveGuard(d);
+            if (guardStops(guard, ultraAttack, false, false)) {
+                block(a, d, ultraAttack, guard, a.facing, false);
+                a.dragaoEstado = 2;
+                return;
+            }
+            ComboSession session = sessionFor(a, d);
+            a.ultraScale = session.scaleFor(ultraAttack, config);
+            int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
+            a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
+            a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
+            a.dragaoEstado = 1;
+            a.ultraVictim = d;
+            a.ultraVictimState = d.state;
+            a.ultraFrame = 0;
+            d.clearAttack();
+            d.vx = 0f;
+            d.vy = 0f;
+            cues.add("ULTRA_PEGOU");
+            if (temPalhaco(a.character())) {
+                superFreeze = Math.max(superFreeze, config.palhacoQuadros);
+                a.dragaoInicio = 0;
+                cues.add("ULTRA_PALHACO");
+            } else if (temIchigeki(a.character())) {
+                superFreeze = Math.max(superFreeze, config.ichigekiQuadros);
+                a.dragaoInicio = 0;
+                cues.add("ULTRA_ICHIGEKI");
+            } else {
+                // A garça desce nele: os golpes começam quando as asas fecham.
+                superFreeze = Math.max(superFreeze, config.garcaQuadros);
+                a.dragaoInicio = config.garcaPega;
+                d.hitstop = Math.max(d.hitstop, config.garcaPega);
+            }
+            return;
+        }
+        if (cabeca > config.viagemAlcance || (chegou && cabeca - config.viagemVelocidade >= frente + meio)) {
+            // Passou dele (por baixo, atrás) ou do alcance: errou.
+            a.dragaoEstado = 2;
+            cues.add("ULTRA_ERROU");
+        }
+    }
+
     /** O Ultra SHINKAI do lutador é o Ichigeki da Natisuko ({@link CombatConfig#ultraIchigeki}). */
     boolean temIchigeki(CharacterDefinition c) {
         if (c == null || config.ultraIchigeki == null) return false;
@@ -4781,13 +4850,13 @@ final class CombatEngine {
 
     /** A cena do Ichigeki (com o rival preso): quadro dela (0 em diante), ou -1 fora dela. */
     int ichigekiCena(CombatFighter a) {
-        if (!a.inUltraDragao() || !temIchigeki(a.character()) || a.dragaoEstado == 2) return -1;
+        if (!a.inUltraDragao() || !temIchigeki(a.character()) || a.dragaoEstado == 0 || a.dragaoEstado == 2) return -1;
         return a.ultraFrame < config.ichigekiQuadros ? a.ultraFrame : -1;
     }
 
     /** A cena preta da Chuva de Tomates: quadro dela (0 em diante), ou -1 fora dela. */
     int palhacoCena(CombatFighter a) {
-        if (!a.inUltraDragao() || !temPalhaco(a.character()) || a.dragaoEstado == 2) return -1;
+        if (!a.inUltraDragao() || !temPalhaco(a.character()) || a.dragaoEstado == 0 || a.dragaoEstado == 2) return -1;
         return a.ultraFrame < config.palhacoQuadros ? a.ultraFrame : -1;
     }
 
@@ -4812,20 +4881,9 @@ final class CombatEngine {
      * na frente fica parado até a cabeça chegar nele, como numa cena.
      */
     private void comecarDragao(CombatFighter a, CombatFighter d) {
-        if (temPalhaco(a.character())) {
-            superFreeze = Math.max(superFreeze, config.palhacoQuadros);
-            return;
-        }
-        if (temIchigeki(a.character())) {
-            superFreeze = Math.max(superFreeze, config.ichigekiQuadros);
-            return;
-        }
-        if (temGarca(a.character())) {
-            // A garça: a luta para a cena inteira e o rival espera ela descer nele.
-            superFreeze = Math.max(superFreeze, config.garcaQuadros);
-            d.hitstop = Math.max(d.hitstop, config.garcaPega);
-            return;
-        }
+        // A garça, os tomates e o Ichigeki: primeiro o golpe que viaja, a luta segue (dá para
+        // pular por cima); a cena (e a luta parada) só se ele pegar (pegouNaViagem).
+        if (temViagem(a.character())) return;
         superFreeze = Math.max(superFreeze, config.dragaoQuadros);
         float origem = a.x + a.facing * config.dragaoOrigem;
         float frente = (d.x - origem) * a.facing - d.body().halfWidth;
@@ -4840,6 +4898,16 @@ final class CombatEngine {
      */
     private void updateDragao(CombatFighter a, CombatFighter d) {
         if (!a.inUltraDragao()) return;
+        if (temViagem(a.character())) {
+            if (a.dragaoEstado == 0) viagem(a, d);
+            if (a.dragaoEstado == 2) {
+                // Errou ou defendeu: ela volta à guarda (a recuperação do Ultra), sem a cena.
+                a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+                a.ultraFrame = 0;
+                return;
+            }
+            if (a.dragaoEstado == 0) return;
+        }
         if (temGarca(a.character())) {
             updateGarca(a, d);
             return;
@@ -4918,25 +4986,6 @@ final class CombatEngine {
      * garça mergulha e, no impacto, ele cai do alto cravado no chão, quica e vai longe.
      */
     private void updateGarca(CombatFighter a, CombatFighter d) {
-        if (a.dragaoEstado == 0 && a.ultraFrame >= config.garcaPega) {
-            int guard = effectiveGuard(d);
-            if (!d.hittable() || d.ko() || Arena.GROUND_Y - d.y > config.dragaoAltura) {
-                a.dragaoEstado = 2;
-            } else if (guardStops(guard, ultraAttack, false, false)) {
-                block(a, d, ultraAttack, guard, a.facing, false);
-                a.dragaoEstado = 2;
-            } else {
-                ComboSession session = sessionFor(a, d);
-                a.ultraScale = session.scaleFor(ultraAttack, config);
-                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
-                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
-                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
-                a.dragaoEstado = 1;
-                a.dragaoInicio = a.ultraFrame;
-                a.ultraVictim = d;
-                a.ultraVictimState = d.state;
-            }
-        }
         if (a.dragaoEstado == 1) {
             if (d != a.ultraVictim || d.state != a.ultraVictimState) {
                 a.dragaoEstado = 3;
@@ -4960,7 +5009,8 @@ final class CombatEngine {
                 a.dragaoEstado = 3;
                 cues.add("ULTRA_FINISH_DRAGAO");
             } else {
-                int devidos = Math.min(config.dragaoAcertos, 1 + (a.ultraFrame - a.dragaoInicio) / Math.max(1, config.garcaIntervalo));
+                int t = a.ultraFrame - a.dragaoInicio;
+                int devidos = t < 0 ? 0 : Math.min(config.dragaoAcertos, 1 + t / Math.max(1, config.garcaIntervalo));
                 while (a.dragaoAcertos < devidos) {
                     a.dragaoAcertos++;
                     golpeDoDragao(a, d, a.dragaoDanoPequeno, false);
@@ -4988,26 +5038,6 @@ final class CombatEngine {
      * bomba nos pés dele explode e o joga alto e longe. Defendeu (ou estava alto): sem a cena.
      */
     private void updatePalhaco(CombatFighter a, CombatFighter d) {
-        if (a.dragaoEstado == 0) {
-            int guard = effectiveGuard(d);
-            if (!d.hittable() || d.ko() || Arena.GROUND_Y - d.y > config.dragaoAltura) {
-                a.dragaoEstado = 2;
-            } else if (guardStops(guard, ultraAttack, false, false)) {
-                block(a, d, ultraAttack, guard, a.facing, false);
-                a.dragaoEstado = 2;
-            } else {
-                ComboSession session = sessionFor(a, d);
-                a.ultraScale = session.scaleFor(ultraAttack, config);
-                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
-                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
-                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
-                a.dragaoEstado = 1;
-                a.dragaoInicio = a.ultraFrame;
-                a.ultraVictim = d;
-                a.ultraVictimState = d.state;
-                cues.add("ULTRA_PALHACO");
-            }
-        }
         if (a.dragaoEstado == 1) {
             if (d != a.ultraVictim || d.state != a.ultraVictimState) {
                 a.dragaoEstado = 3;
@@ -5054,26 +5084,6 @@ final class CombatEngine {
      * cima e crava (o golpe final). Ele fica no chão.
      */
     private void updateIchigeki(CombatFighter a, CombatFighter d) {
-        if (a.dragaoEstado == 0) {
-            int guard = effectiveGuard(d);
-            if (!d.hittable() || d.ko() || Arena.GROUND_Y - d.y > config.dragaoAltura) {
-                a.dragaoEstado = 2;
-            } else if (guardStops(guard, ultraAttack, false, false)) {
-                block(a, d, ultraAttack, guard, a.facing, false);
-                a.dragaoEstado = 2;
-            } else {
-                ComboSession session = sessionFor(a, d);
-                a.ultraScale = session.scaleFor(ultraAttack, config);
-                int total = ComboSession.DamageScaling.apply(config.dragaoDano, a.ultraScale);
-                a.dragaoDanoFinal = total * config.dragaoFinalPermille / 1000;
-                a.dragaoDanoPequeno = (total - a.dragaoDanoFinal) / Math.max(1, config.dragaoAcertos);
-                a.dragaoEstado = 1;
-                a.dragaoInicio = a.ultraFrame;
-                a.ultraVictim = d;
-                a.ultraVictimState = d.state;
-                cues.add("ULTRA_ICHIGEKI");
-            }
-        }
         if (a.dragaoEstado == 1) {
             if (d != a.ultraVictim || d.state != a.ultraVictimState) {
                 a.dragaoEstado = 3;

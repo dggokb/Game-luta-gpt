@@ -232,4 +232,42 @@ public class UltraShinkaiTest {
         assertFalse("o rival não voa", voou);
         assertFalse("o SHINKAI acabou", s.f(0).state.inShinkai());
     }
+
+    /**
+     * O golpe de abertura que viaja (o dono, 17/11): com o rival no ar quando ele passa, não pega e
+     * a cena não entra (nenhum golpe do Ultra), para a garça, os tomates e o Ichigeki.
+     */
+    @Test public void oGolpeQueViajaErraQuemEstaNoAr() {
+        for (String id : new String[]{"p02", "p16", "p15"}) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(id), GeneratedCharacters.get("p03"), 400f, 700f);
+            s.f(1).state.life = 1_000_000;
+            transformar(s);
+            assertTrue(id, s.engine.temViagem(s.f(0).character()));
+            s.f(0).state.superMeter = CombatConfig.ULTRA_SHINKAI_COST;
+            s.in[0].direction = 3;
+            s.in[0].superAttack = true;
+            s.in[0].ultra = true;
+            int golpes = 0;
+            boolean pegou = false, errou = false, noAr = false;
+            for (int i = 0; i < 400 && (i < 5 || s.f(0).status == CombatFighter.Status.ULTRA); i++) {
+                s.step();
+                s.in[0].direction = 0;
+                if (!noAr && s.engine.viajando(s.f(0))) {
+                    // Pulou bem na hora: alto, subindo.
+                    CombatFighter d = s.f(1);
+                    d.y = Arena.GROUND_Y - 260f;
+                    d.grounded = false;
+                    d.vy = -400f;
+                    noAr = true;
+                }
+                if (s.engine.cues().contains("ULTRA_PEGOU")) pegou = true;
+                if (s.engine.cues().contains("ULTRA_ERROU")) errou = true;
+                for (CombatEngine.HitEvent h : s.engine.events()) if (h.attacker == 0 && "ULTRA".equals(h.moveId)) golpes++;
+            }
+            assertTrue(id + ": viajou", noAr);
+            assertFalse(id + ": não pegou", pegou);
+            assertTrue(id + ": errou", errou);
+            assertEquals(id + ": sem golpes do Ultra", 0, golpes);
+        }
+    }
 }
