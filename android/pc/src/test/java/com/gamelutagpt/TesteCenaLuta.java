@@ -45,13 +45,15 @@ public final class TesteCenaLuta {
         saida.mkdirs();
         Context ctx = DadosDoJogo.localizar().contexto(null);
         jogo = new GameView(ctx);
-        jogo.setSize(1280, 720);
+        // -Plargura=1600: a tela de um celular 20:9 (720 de altura): a cena enche a largura e corta em cima e embaixo.
+        int largura = Integer.getInteger("gameluta.largura", 1280);
+        jogo.setSize(largura, 720);
         jogo.setTouchControlsVisible(true);
         avancar = metodo("advanceSimulation", float.class);
         desenhar = metodo("renderFrame", Canvas.class);
-        metodo("onSizeChanged", int.class, int.class, int.class, int.class).invoke(jogo, 1280, 720, 0, 0);
+        metodo("onSizeChanged", int.class, int.class, int.class, int.class).invoke(jogo, largura, 720, 0, 0);
         campo("activityActive").set(jogo, true);
-        tela = Bitmap.createBitmap(1280, 720, Bitmap.Config.ARGB_8888);
+        tela = Bitmap.createBitmap(largura, 720, Bitmap.Config.ARGB_8888);
 
         metodo("loadTemporada").invoke(jogo);
         RenderAssets assets = (RenderAssets)campo("ultraAssets").get(jogo);

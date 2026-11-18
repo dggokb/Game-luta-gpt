@@ -4519,6 +4519,17 @@ public class GameView extends SurfaceView
                 renderCameraX = p.x - playerScreenX / renderZoom + visibleWorldWidth / 2f;
                 renderCameraTop = focusY - playerScreenY / renderZoom;
             }
+            // Tela mais larga que 16:9 (celular 20:9): a cena enche a largura e corta em cima e embaixo,
+            // e tudo sai maior. Na cinemática (com zoom próprio) isso apertava demais e cortava quem
+            // está no chão (o dono, 18/11: "no jogo está tudo muito perto"): durante ela o zoom recua
+            // em volta do meio da tela, e o celular vê o mesmo enquadramento do 16:9 com mais dos lados.
+            float cinemaLarga = 1f - (1f - Math.min(sx, sy) / Math.max(sx, sy)) * cinematica.faixas();
+            if (cinemaLarga < 0.999f) {
+                float meioY = renderCameraTop + VH * 0.5f / renderZoom;
+                renderZoom *= cinemaLarga;
+                visibleWorldWidth = VW / renderZoom;
+                renderCameraTop = meioY - VH * 0.5f / renderZoom;
+            }
             // No fundo preto da cinemática o cenário não aparece: a câmera não para na borda do mundo
             // e quem está em foco fica no meio da tela, mesmo voando para a parede.
             float cameraLeft = cinematica.fundoPreto() > 0.99f ? renderCameraX - visibleWorldWidth / 2f
@@ -7882,6 +7893,9 @@ public class GameView extends SurfaceView
 
     /** The partner behind the point: the assist doing its move, or the former point leaving. */
     private void drawPartner(Canvas c) {
+        // Na animação feita à mão a luta para: o parceiro que estava entrando ou saindo ficaria
+        // congelado na beira da arena, assistindo a cena (aparecia na tela larga do celular).
+        if (cinematica.animando()) return;
         CombatFighter partner = partnerBody(engine.team(PLAYER));
         if (partner != null) drawFighter(c, partnerSpriteRenderer, partner, false, false);
         CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
