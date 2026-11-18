@@ -2245,9 +2245,7 @@ public class GameView extends SurfaceView
             if ("ULTRA_DRAGAO".equals(cue)) soltarDragao();
             if ("ULTRA_GARCA_MERGULHO".equals(cue)) mergulhoDaGarca();
             if ("ULTRA_PEGOU".equals(cue)) pegouNaViagem();
-            if (cue.startsWith("ULTRA_SHINKAI_ERROU_")) {
-                baloes.falar(cue.charAt(cue.length() - 1) - '0', BalaoDeFala.sortear(BalaoDeFala.ERROU, soundRandom), engine.frame());
-            }
+            if (cue.startsWith("ULTRA_SHINKAI_ERROU_")) reclamarDoUltra(cue.charAt(cue.length() - 1) - '0');
             if (cue.startsWith("ULTRA_PALHACO")) chuvaDeTomates(cue);
             if ("ULTRA_FINISH_DRAGAO".equals(cue)) chuvaDeTomates(cue);
             if (cue.startsWith("ULTRA_ICHIGEKI") || "ULTRA_FINISH_DRAGAO".equals(cue)) ichigeki(cue);
@@ -4709,7 +4707,6 @@ public class GameView extends SurfaceView
                 desgaste.desenhar(canvas);
             }
             confronto.desenharFrente(canvas);
-            baloes.desenhar(canvas, engine);
             if (enfeites) impacts.draw(canvas);
             if (ultraBlastStart >= 0) {
                 int age = engine.frame() - ultraBlastStart;
@@ -7564,8 +7561,6 @@ public class GameView extends SurfaceView
 
     /** Os detalhes de cada tipo do SHINKAI (pedrinhas, raios, brilhos, trincas). */
     private final ShinkaiDetalhes shinkaiDetalhes = new ShinkaiDetalhes();
-    /** Os balões de fala dos lutadores ("Droga!" quando o Ultra SHINKAI erra). */
-    private final BalaoDeFala baloes = new BalaoDeFala();
     /** Filtros da silhueta do SHINKAI (cor sólida com o alfa do desenho), por cor. */
     private final java.util.Map<Integer, Filtro> shinkaiTints = new java.util.HashMap<>();
 
@@ -9098,6 +9093,19 @@ public class GameView extends SurfaceView
         String nome = temporada != null ? temporada.nomeDoLutador(team.pointState().character.id) : null;
         String texto = GritoDaTroca.texto(nome, t -> temporada != null ? temporada.t(t) : t);
         conversa.dizer(temporada, quem, side == OPPONENT, "bravo", texto, GritoDaTroca.SEGURA);
+    }
+
+    /**
+     * O Ultra SHINKAI de {@code side} passou sem encostar: quem soltou reclama ("Droga!", "O quê?!",
+     * "Errei!") no quadro da conversa do lado dele, como o grito da troca (não no tutorial nem na cena).
+     */
+    private void reclamarDoUltra(int side) {
+        if (side < 0 || side > 1 || tutorial.active() || cinematica.rodando() || demo.active()) return;
+        loadTemporada();
+        String[] fala = ErrouUltraShinkai.sortear(soundRandom);
+        String quem = avulsoDoLutador(engine.team(side).pointState());
+        String texto = temporada != null ? temporada.t(fala[0]) : fala[0];
+        conversa.dizer(temporada, quem, side == OPPONENT, fala[1], texto, ErrouUltraShinkai.SEGURA);
     }
 
     /**
