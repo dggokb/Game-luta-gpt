@@ -5220,7 +5220,7 @@ public class GameView extends SurfaceView
             case AIR_HITSTUN:
                 state = SpriteStates.HIT_AIR;
                 reactionElapsed = f.launched || f.slammed
-                    ? launchPoseTime(f.vy, f.slammed)
+                    ? launchPoseTime(f, f.vy, f.slammed)
                     : f.stunElapsed * FIXED_STEP;
                 break;
             case HITSTUN:
@@ -5239,7 +5239,7 @@ public class GameView extends SurfaceView
                 // dano no ar, não no quadro do pulo.
                 if (!f.grounded && f.airRecovering) {
                     state = SpriteStates.HIT_AIR;
-                    reactionElapsed = launchPoseTime(Math.max(0f, f.vy), false);
+                    reactionElapsed = launchPoseTime(f, Math.max(0f, f.vy), false);
                 }
                 break;
             case THROWN: {
@@ -5376,11 +5376,15 @@ public class GameView extends SurfaceView
      * (ground slam), then the recovery tuck on the way down. The times index a HIT_AIR
      * clip of up to four 55 ms frames; shorter clips clamp.
      */
-    private static float launchPoseTime(float verticalVelocity, boolean slam) {
-        if (slam) return 0.13f;
+    private float launchPoseTime(CombatFighter f, float verticalVelocity, boolean slam) {
+        // Pela proporção do clipe (os de 4 quadros de 55 ms ficam como eram: 0, 0,07, 0,13 e 0,19 s);
+        // nos clipes longos dos vídeos novos a pose não fica presa no começo (18/11).
+        CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.HIT_AIR);
+        float d = clip != null ? clip.duration : 0.22f;
+        if (slam) return d * 0.59f;
         if (verticalVelocity < -500f) return 0f;
-        if (verticalVelocity < 0f) return 0.07f;
-        return 0.19f;
+        if (verticalVelocity < 0f) return d * 0.32f;
+        return d * 0.86f;
     }
 
     /** Vector fallback for packs without KNOCKDOWN/GROUNDED/GETUP: fall backwards. */

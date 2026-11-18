@@ -767,7 +767,7 @@
     }
   },
   "hit_air": {
-    "_doc": "Apanhar no ar (18/11, vídeo danoPulo do dono): encolhida no pulo (57), o tranco arqueando para trás (60-81).",
+    "_doc": "Apanhar no ar (18/11, vídeo danoPulo do dono): encolhida no pulo (57), o tranco arqueando para trás (60-81). O 1º desenho (57, encolhida no pulo) fica fora do HIT_AIR (18/11: parecia pose de pulo).",
     "trechos": [
       [
         "danoPulo",
@@ -780,7 +780,9 @@
       "fixar": "video"
     },
     "animacoes": {
-      "HIT_AIR": {}
+      "HIT_AIR": {
+        "frames": "1-9"
+      }
     }
   },
   "defense_crouch": {

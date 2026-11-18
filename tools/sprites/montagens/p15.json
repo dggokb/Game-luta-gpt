@@ -432,9 +432,8 @@
       "escala": 0.411,
       "motivo": "mesma câmera dos vídeos H3 de 24/10 (a medida no ar não acha a guarda)"
     },
-    "animacoes": {
-      "HIT_AIR": {}
-    }
+    "animacoes": {},
+    "_doc": "Sem uso desde 18/11: o vídeo danoPulo fica na pose de pulo o tempo todo (sem reação). O HIT_AIR usa os quadros 1-5 da queda (fall_down) até um vídeo novo."
   },
   "defense_stand": {
     "trechos": [
@@ -512,7 +511,7 @@
     }
   },
   "fall_down": {
-    "_doc": "Queda de costas (6-46) e deitada (48-60) do vídeo queda, sem o levantar do fim (dali ela já começa a sentar). Deitada 36 px à frente (aos poucos até o quadro 8): no lugar em que o vídeo do levantar começa.",
+    "_doc": "Queda de costas (6-46) e deitada (48-60) do vídeo queda, sem o levantar do fim (dali ela já começa a sentar). Deitada 36 px à frente (aos poucos até o quadro 8): no lugar em que o vídeo do levantar começa. HIT_AIR (18/11): os quadros 1-5, ela arqueando para trás no ar; o vídeo danoPulo dela fica o tempo todo na pose de pulo, sem reação ao golpe (o dono: 'toma dano para cima e fica em pose de pulo').",
     "trechos": [
       [
         "queda",
@@ -532,6 +531,16 @@
       },
       "GROUNDED": {
         "frames": "8-11"
+      },
+      "HIT_AIR": {
+        "frames": "1-5",
+        "tempos": [
+          55,
+          55,
+          55,
+          55,
+          55
+        ]
       }
     }
   },

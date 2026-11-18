@@ -471,6 +471,15 @@ cima (`strikeHoldLift`) a cada pancada e boiava subindo (a rajada da Natisuko o 
 Teste: `GolpeSeguraORivalTest` (Ryūga S3 e Super, Natisuko S3 e Super, Bonnie S4 e Super, Super da
 Yin-lu, no chão e no ar). Quatro combos ganharam a pancada que antes escapava.
 
+## A pose de quem é lançado (18/11)
+
+O dono: "toda hora alguém toma dano para cima e fica em pose de pulo". A pose do lançado
+(`GameView.launchPoseTime`) era um tempo fixo do HIT_AIR (0 a 0,19 s), feito para os clipes antigos
+de 4 quadros; nos clipes longos dos vídeos novos ela ficava no começo, que era o pulo antes do golpe.
+Agora é a proporção do clipe (os de 4 quadros ficam como eram). O HIT_AIR da Natisuko usa os quadros
+1-5 da queda (o vídeo `danoPulo` dela não tem reação, o prompt para refazer está na ficha) e o da Yin-lu
+começa no tranco (sem o 1º desenho, encolhida no pulo).
+
 ## Agarrão com personalidade (18/11)
 
 O agarrão genérico (L + M) do motor: pega em 5 quadros, 12 de janela de tech, e na hora de jogar o
