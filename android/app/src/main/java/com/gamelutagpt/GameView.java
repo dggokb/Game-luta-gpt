@@ -5242,11 +5242,23 @@ public class GameView extends SurfaceView
                     reactionElapsed = launchPoseTime(Math.max(0f, f.vy), false);
                 }
                 break;
-            case THROWN:
-                // Held by the collar: the first frame of the hit reaction.
-                state = SpriteStates.HIT_STAND;
-                reactionElapsed = 0.02f;
+            case THROWN: {
+                // Na cena do agarrão (CenaDoAgarrao): preso, no ar (girando no desenho) ou deitado.
+                float[] cena = engine.poseDoAgarrado(f);
+                int pose = cena == null ? CenaDoAgarrao.PRESO : (int) cena[3];
+                if (pose == CenaDoAgarrao.DEITADO && renderer.hasAnimation(SpriteStates.GROUNDED)) {
+                    state = SpriteStates.GROUNDED;
+                    reactionElapsed = 0f;
+                } else if (pose == CenaDoAgarrao.NO_AR && renderer.hasAnimation(SpriteStates.HIT_AIR)) {
+                    state = SpriteStates.HIT_AIR;
+                    reactionElapsed = f.character().animation(SpriteStates.HIT_AIR).duration * 0.5f;
+                } else {
+                    // Held by the collar: the first frame of the hit reaction.
+                    state = SpriteStates.HIT_STAND;
+                    reactionElapsed = 0.02f;
+                }
                 break;
+            }
             default:
                 break;
         }
@@ -6246,7 +6258,7 @@ public class GameView extends SurfaceView
                 return SpriteStates.THROW_GRAB;
             }
             if (toss) {
-                float k = clamp(f.throwFrame / (float)config.throwExecuteFrames, 0f, 1f);
+                float k = clamp(f.throwFrame / (float)engine.throwExecuteFrames(f), 0f, 1f);
                 throwPoseTime = thrown.duration * k * 0.999f;
                 return SpriteStates.THROW_TOSS;
             }
@@ -6263,7 +6275,7 @@ public class GameView extends SurfaceView
         } else if (f.throwPhase == CombatFighter.THROW_HOLD) {
             frames = a.startupFrames + 0.5f;
         } else {
-            int length = toss ? config.throwExecuteFrames : config.throwWhiffFrames;
+            int length = toss ? engine.throwExecuteFrames(f) : config.throwWhiffFrames;
             float k = clamp(f.throwFrame / (float)length, 0f, 1f);
             frames = a.startupFrames + (a.totalFrames - 0.5f - a.startupFrames) * k;
         }
@@ -7091,6 +7103,11 @@ public class GameView extends SurfaceView
         if (ultraFlight(f)) applyFlight(c, f, visualY);
         // No abraço do Ultra do p13 o rival fica deitado de cabeça para baixo.
         if (upsideDownBy(f) != null) c.rotate(-90f * f.facing, f.x, visualY - UPSIDE_DOWN_PIVOT);
+        // Na cena do agarrão o rival gira no ar (o giro positivo leva a cabeça para longe de quem agarra).
+        float[] agarrado = engine.poseDoAgarrado(f);
+        if (agarrado != null && agarrado[2] != 0f) {
+            c.rotate(agarrado[2] * -f.facing, f.x, visualY - f.body().height(false) * 0.5f);
+        }
         // No reflexo do chão não: eram mais 10 cópias do lutador por quadro, quase invisíveis ali.
         if (f.state.inShinkai() && renderer.override() == null && !drawingReflection) {
             if (AURA_CHAMA && c instanceof CanvasGl) drawShinkaiAura((CanvasGl)c, renderer, f, visualY);

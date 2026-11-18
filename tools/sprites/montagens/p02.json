@@ -818,7 +818,7 @@
     }
   },
   "throw": {
-    "_doc": "Agarrão (18/11, vídeo agarrao do dono): estica os braços e segura (24-42: THROW_GRAB 0-6), torce, carrega no quadril e projeta até o chão (46-78) e volta à guarda (84-90: THROW_TOSS 6-16). Os tempos são os de antes.",
+    "_doc": "Agarrão (18/11, vídeo agarrao do dono): estica os braços e segura (24-42: THROW_GRAB 0-6), torce, carrega no quadril e projeta até o chão (46-78) e volta à guarda (84-90: THROW_TOSS 6-16). Os tempos são os de antes. Os tempos do THROW_TOSS seguem o vídeo a 2x (18/11: a cena do agarrão, CenaDoAgarrao, estica o clipe sobre a fase de jogar dela).",
     "trechos": [
       [
         "agarrao",
@@ -846,16 +846,16 @@
       "THROW_TOSS": {
         "frames": "6-16",
         "tempos": [
-          15,
-          15,
-          30,
-          30,
-          25,
-          25,
-          20,
-          20,
-          20,
-          20,
+          83,
+          83,
+          83,
+          63,
+          42,
+          104,
+          125,
+          167,
+          125,
+          125,
           47
         ]
       }

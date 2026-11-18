@@ -306,6 +306,10 @@ final class CombatFighter {
     // Throw.
     int throwPhase;
     int throwFrame;
+    /** Distância de quem agarrou até o rival quando pegou (o 1º ponto da cena do agarrão). */
+    float throwGap;
+    /** O dano da cena do agarrão já entrou. */
+    boolean throwAcertou;
     /** Frames during which this fighter cannot be thrown (right after stun or wake-up). */
     int throwProtect;
     /** Frames since L + M was pressed, or -1: starts a throw or techs one. */

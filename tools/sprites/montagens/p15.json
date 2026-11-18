@@ -671,7 +671,7 @@
     }
   },
   "throw": {
-    "_doc": "Agarrão (18/11, vídeo agarrao do dono): estica a mão e agarra a gola (45-63: THROW_GRAB 0-6), puxa, varre a perna e crava o soco para baixo (66-90) e volta à guarda (96-102: THROW_TOSS 6-16). Sem sem_efeitos nem sem_poeira (os dois comem o quimono branco). Os tempos são os do agarrão da Yin-lu e da Bonnie.",
+    "_doc": "Agarrão (18/11, vídeo agarrao do dono): estica a mão e agarra a gola (45-63: THROW_GRAB 0-6), puxa, varre a perna e crava o soco para baixo (66-90) e volta à guarda (96-102: THROW_TOSS 6-16). Sem sem_efeitos nem sem_poeira (os dois comem o quimono branco). Os tempos são os do agarrão da Yin-lu e da Bonnie. Os tempos do THROW_TOSS seguem o vídeo a 2x (18/11: a cena do agarrão, CenaDoAgarrao, estica o clipe sobre a fase de jogar dela).",
     "trechos": [
       [
         "agarrao",
@@ -703,16 +703,16 @@
       "THROW_TOSS": {
         "frames": "6-16",
         "tempos": [
-          15,
-          15,
-          30,
-          30,
-          25,
-          25,
-          20,
-          20,
-          20,
-          20,
+          63,
+          63,
+          63,
+          63,
+          63,
+          83,
+          83,
+          83,
+          125,
+          125,
           47
         ]
       }

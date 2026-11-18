@@ -7,7 +7,8 @@ import org.junit.Test;
 
 /** Throw (L + M) and throw tech (v0.80). */
 public class ThrowTest {
-    private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
+    /** O agarrão genérico do motor (o p04 não tem cena própria: CenaDoAgarrao). */
+    private static final CharacterDefinition BASE = GeneratedCharacters.get("p04");
     private static final CharacterDefinition NPC = GeneratedCharacters.opponentCharacter();
 
     private static final class Duel {

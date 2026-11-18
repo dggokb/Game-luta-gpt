@@ -454,6 +454,19 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
 
 Testes: `BattleFlowTest`, `AiFullKitTest`.
 
+## Agarrão com personalidade (18/11)
+
+O agarrão genérico (L + M) do motor: pega em 5 quadros, 12 de janela de tech, e na hora de jogar o
+rival cai derrubado e escorrega para a frente (`landThrow`, 16 quadros de recuperação). Com uma
+**cena** (`CenaDoAgarrao`, o dono: "agarrões também têm que ter personalidade"), a fase de jogar
+dura o tempo do vídeo de quem agarra, o rival continua agarrado e segue o desenho por pontos (preso,
+no ar girando, deitado: quadro, distância à frente, altura, giro), o dano entra no impacto da cena
+(`acerto`) e ele fica deitado onde caiu (`solta`, já no chão, sem a queda de novo). O THROW_TOSS é
+esticado sobre a cena (`throwExecuteFrames(f)`), e o `GameView` escolhe a pose e gira o rival
+(`poseDoAgarrado`). Têm cena: Ryūga (por cima do ombro), Yin-lu (carrega no quadril e crava), Natisuko
+(varre a perna e crava o soco) e Bonnie (levanta acima da cabeça, segura para a plateia e crava). Os
+outros seguem no genérico. Teste: `AgarraoComCenaTest` (o `ThrowTest` confere o genérico no p04).
+
 ## SHINKAI (substitui o Overdrive da v0.87)
 
 Barra própria de cada lutador (entre a vida do titular e a do parceiro), que enche apanhando,

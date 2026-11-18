@@ -1749,7 +1749,7 @@ final class CombatEngine {
                 break;
             case THROW:
                 if ((f.throwPhase == CombatFighter.THROW_WHIFF && f.throwFrame >= config.throwWhiffFrames) ||
-                    (f.throwPhase == CombatFighter.THROW_EXECUTE && f.throwFrame >= config.throwExecuteFrames) ||
+                    (f.throwPhase == CombatFighter.THROW_EXECUTE && f.throwFrame >= throwExecuteFrames(f)) ||
                     (f.throwPhase == CombatFighter.THROW_TECH && f.throwFrame >= config.throwTechFrames)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                 }
@@ -1757,7 +1757,10 @@ final class CombatEngine {
             case THROWN: {
                 // Only an attacker holding it keeps a fighter thrown.
                 CombatFighter other = fighters[1 - f.index];
-                if (other.status != CombatFighter.Status.THROW || other.throwPhase != CombatFighter.THROW_HOLD) {
+                CenaDoAgarrao cena = CenaDoAgarrao.de(other.character());
+                boolean naCena = other.status == CombatFighter.Status.THROW &&
+                    other.throwPhase == CombatFighter.THROW_EXECUTE && cena != null && other.throwFrame <= cena.solta;
+                if (!naCena && (other.status != CombatFighter.Status.THROW || other.throwPhase != CombatFighter.THROW_HOLD)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                 }
                 break;
@@ -4371,7 +4374,51 @@ final class CombatEngine {
             } else if (a.throwFrame >= config.throwTechWindow) {
                 landThrow(a, d);
             }
+        } else if (a.throwPhase == CombatFighter.THROW_EXECUTE && d.status == CombatFighter.Status.THROWN) {
+            cenaDoAgarrao(a, d);
         }
+    }
+
+    /**
+     * O agarrão com personalidade ({@link CenaDoAgarrao}): o rival segue o caminho do desenho, o dano
+     * entra no impacto e ele fica deitado onde caiu.
+     */
+    private void cenaDoAgarrao(CombatFighter a, CombatFighter d) {
+        CenaDoAgarrao cena = CenaDoAgarrao.de(a.character());
+        if (cena == null) return;
+        float[] p = cena.em(a.throwFrame, a.throwGap);
+        float wanted = a.x + a.facing * p[0];
+        d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        d.y = Arena.GROUND_Y - p[1];
+        d.grounded = p[1] <= 0f;
+        d.vx = d.vy = 0f;
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        if (a.throwFrame >= cena.acerto && !a.throwAcertou) {
+            a.throwAcertou = true;
+            jogar(a, d, false);
+        }
+        if (a.throwFrame >= cena.solta) {
+            // Deitado onde caiu (sem a queda de novo): daqui o levantar de sempre.
+            knockDown(d);
+            d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            d.knockdownFrame = config.knockdownFallFrames;
+        }
+    }
+
+    /** Duração da fase de jogar de quem agarrou: a da cena dele, ou a do motor. */
+    int throwExecuteFrames(CombatFighter a) {
+        CenaDoAgarrao cena = CenaDoAgarrao.de(a.character());
+        return cena != null ? cena.quadros : config.throwExecuteFrames;
+    }
+
+    /** O rival agarrado por {@code a} segue a cena do agarrão agora (pose e giro no desenho). */
+    float[] poseDoAgarrado(CombatFighter d) {
+        CombatFighter a = fighters[1 - d.index];
+        if (d.status != CombatFighter.Status.THROWN || a.status != CombatFighter.Status.THROW ||
+            a.throwPhase != CombatFighter.THROW_EXECUTE) return null;
+        CenaDoAgarrao cena = CenaDoAgarrao.de(a.character());
+        return cena == null ? null : cena.em(a.throwFrame, a.throwGap);
     }
 
     /**
@@ -4560,6 +4607,19 @@ final class CombatEngine {
 
     /** No tech in time: damage, knockdown and the attacker's recovery (oki). */
     private void landThrow(CombatFighter a, CombatFighter d) {
+        if (CenaDoAgarrao.de(a.character()) != null) {
+            // Com cena: o rival continua preso e segue o desenho; o dano entra no impacto.
+            a.throwPhase = CombatFighter.THROW_EXECUTE;
+            a.throwFrame = 0;
+            a.throwGap = Math.abs(d.x - a.x);
+            a.throwAcertou = false;
+            return;
+        }
+        jogar(a, d, true);
+    }
+
+    /** O dano do agarrão; {@code derruba}: o genérico (derruba e empurra na hora, e começa a fase de jogar). */
+    private void jogar(CombatFighter a, CombatFighter d, boolean derruba) {
         endSession(d.index);
         ComboSession session = new ComboSession(a.index, d.index);
         sessions[d.index] = session;
@@ -4570,12 +4630,18 @@ final class CombatEngine {
         d.state.takeDamage(damage, config.recoverableLifePermille);
         gainMeter(a, CombatRules.superGainOnHit(throwAttack.strength));
         d.framesSinceHit = 0;
-        knockDown(d);
-        push(d, a, a.facing * throwAttack.knockback);
+        HitEvent ev = new HitEvent(a.index, d.index, damage, false, false, throwAttack.id);
+        if (derruba) {
+            knockDown(d);
+            push(d, a, a.facing * throwAttack.knockback);
+            a.throwPhase = CombatFighter.THROW_EXECUTE;
+            a.throwFrame = 0;
+        } else {
+            ev.impactX = d.x;
+            ev.impactY = d.y - 30f;
+        }
         freeze(a, d, throwAttack.hitstopFrames, false);
-        a.throwPhase = CombatFighter.THROW_EXECUTE;
-        a.throwFrame = 0;
-        events.add(new HitEvent(a.index, d.index, damage, false, false, throwAttack.id));
+        events.add(ev);
     }
 
     /** Guarded: blockstun and recovery. Hit: the attacker waits for the cinematic. */
