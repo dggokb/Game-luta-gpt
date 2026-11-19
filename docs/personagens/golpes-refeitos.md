@@ -109,7 +109,7 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 | S2 →↓↘ | Uppercut da casa | Abaixa e sobe com um uppercut que avança, o corpo inteiro subindo atrás do punho | punho · uppercut que avança | anti-aéreo; o Shoryuken da escola, à moda dele |
 | S3 ↓↙← | Investida bruta | Se joga para a frente com o lariat (L curto, M médio, H longo); apertando de novo, emenda um segundo braço | braço · investida em até 2 | o golpe marca dele (no lugar do rekka de três socos) |
 | S4 no ar ↓↘→ | Queda de punho | No ar, para e desce de cabeça com o punho para baixo até o chão | punho · mergulho | derruba |
-| Agarrão | Cabeçada segurando | Agarra a gola com as duas mãos, puxa e dá a cabeçada; o rival cai de costas | cabeça · segura e bate | o agarrão com personalidade (CenaDoAgarrao) |
+| Agarrão | Arremesso longe | Agarra a gola com as duas mãos, gira o quadril e joga o rival longe por cima do ombro da frente; o rival voa e cai longe | gola · arremesso | o agarrão com personalidade (CenaDoAgarrao): joga longe, como o agarrão tradicional do Ryu (19/11, o dono) |
 | Super | Uppercut carregado | Carrega o punho em energia, avança e sobe com o uppercut; acertando, apertar de novo arremessa a pedra de energia grande no rival no alto | punho · uppercut + arremesso | sobe o rival e emenda no arremesso (o seguimento, como a voadora da Natisuko) |
 | Ultra | Fúria da Casa | Investida, sequência de ganchos, cabeçada e joelho, e termina carregando a pedra de energia gigante à queima-roupa | sequência própria | o fecho |
 
