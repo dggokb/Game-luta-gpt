@@ -2042,3 +2042,12 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   (ficava congelado na beira, aparecia na tela larga). `testeCena -Plargura=1600` grava em 20:9.
   Vídeo `torneio_desistir_v8_celular_20x9.mp4`. Visto só no PC (em 20:9).
 
+
+## Kōga, S1 Garra do tigre (19/11)
+
+Pedido do dono: o S1 do Kōga em três (corte na frente; corte cruzado que forma o X; o X lançado), "claro
+como anime, com os efeitos e o poder já no vídeo". Prompt H3 com os riscos de garra de luz vermelho-alaranjada
+(miolo branco) e o X que voa para a direita até sair do quadro (`docs/personagens/p03.md`). Pelo item 11 da
+skill, o efeito desenhado na arte fica e o nosso combina com ele; o X que voa sai do vídeo como efeito do
+poder (`tools/sprites/efeito_video.py`, fundo verde) quando o vídeo chegar. A 1ª versão do prompt (sem efeito)
+saiu com os braços cruzando o peito em vez de cortar para a frente.
