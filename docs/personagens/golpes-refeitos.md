@@ -93,16 +93,16 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 | Botão | Golpe | Movimento | Forma | Papel |
 |---|---|---|---|---|
 | L | Gancho curto | Gancho curto e largo da mão da frente na altura do rosto, o ombro junto; volta rápido para a guarda | punho · gancho | abre o combo; rápido |
-| M | Gancho de trás | Dá meio passo e solta o gancho largo da mão de trás, o corpo girando junto | punho · gancho com passo | anda para dentro; repete (M → M) e cancela em pulo, como hoje |
-| H | Martelo | Junta as duas mãos acima da cabeça e desce o martelo na frente, curvado | dois punhos · de cima para baixo | o forte de longe; joga na parede |
+| M | Soco reto com passo | Dá um passo curto para dentro e solta o soco reto da mão de trás, o ombro inteiro atrás | punho · reto com passo | anda para dentro; repete (M → M) e cancela em pulo, como hoje |
+| H | Gancho cheio | Gancho bem largo da mão de trás, girando o quadril e o corpo inteiro atrás do braço | punho · gancho de corpo inteiro | o forte; joga na parede (19/11: o martelo de duas mãos saiu, difícil de o H3 fazer e igual ao jH) |
 | ↓ + L | Soco baixo | Agachado, soco curto na canela | punho · baixo | baixo rápido; abre |
 | ↓ + M | Rasteira de pisão | Agachado, estica a perna e pisa no tornozelo do rival, rente ao chão | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui |
 | ↓ + H | Uppercut de baixo | Da agachada, sobe com o uppercut largo da mão de trás, levantando o corpo inteiro | punho · uppercut | lançador para o combo no ar |
 | → + M | Cabeçada | Dá um passo e bate a testa de cima para baixo no rosto do rival | cabeça · desce | golpe alto (pega quem está agachado) |
 | → + H | Ombrada que avança | Abaixa o ombro e se joga contra o rival em dois passos curtos | ombro · investida curta | golpe de comando: anda, empurra para a parede, cancela em especial |
 | → → + H | Lariat | Da corrida, o braço da frente esticado na altura do pescoço, o corpo todo atrás | braço · lariat | golpe de corrida: lança baixo para continuar |
-| L no ar | Joelho | No ar, sobe o joelho de trás | joelho | rápido no ar |
-| M no ar | Cotovelo que desce | No ar, desce o cotovelo de cima para baixo | cotovelo · desce | emenda no ar |
+| L no ar | Soco de cima | No ar, o braço da frente passa por cima e desce largo no rosto, o corpo inclinado para a frente | punho · de cima | rápido, mas com o braço inteiro (19/11: o joelho era curto e pouco agressivo) |
+| M no ar | Voadora de sola | No ar, estica a perna da frente e crava a sola em diagonal para a frente e para baixo, o corpo atrás do pé | sola · voadora curta | emenda no ar (19/11: o cotovelo era curto e pouco agressivo) |
 | H no ar | Martelo no ar | No ar, desce o martelo das duas mãos | dois punhos · de cima | overhead; joga na parede no combo |
 | ↓ + H no ar | Pisão | No ar, pisa em diagonal para baixo com a sola | sola · crava | crava no chão (quica) |
 | S1 ↓↘→ | Pedra de energia | Fecha a mão, a energia da família acende nela, e ele arremessa a bola como uma pedra, com o braço por cima | mão · arremesso | projétil (a onda da escola, à moda dele) |
