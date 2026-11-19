@@ -92,9 +92,9 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 
 | Botão | Golpe | Movimento | Forma | Papel |
 |---|---|---|---|---|
-| L | Gancho curto | Gancho curto e largo da mão da frente na altura do rosto, o ombro junto; volta rápido para a guarda | punho · gancho | abre o combo; rápido |
-| M | Soco reto com passo | Dá um passo curto para dentro e solta o soco reto da mão de trás, o ombro inteiro atrás | punho · reto com passo | anda para dentro; repete (M → M) e cancela em pulo, como hoje |
-| H | Gancho cheio | Gancho bem largo da mão de trás, girando o quadril e o corpo inteiro atrás do braço | punho · gancho de corpo inteiro | o forte; joga na parede (19/11: o martelo de duas mãos saiu, difícil de o H3 fazer e igual ao jH) |
+| L | Gancho curto | Gancho curto da mão da frente na altura do rosto; só o braço mexe, o corpo e os pés ficam parados; volta rápido para a guarda | punho · gancho curto | abre o combo; rápido |
+| M | Chute na coxa | A perna de trás vem num chute baixo e duro de canela na coxa do rival, o quadril girando; as mãos ficam na guarda | canela · chute baixo | anda para dentro; repete (M → M) e cancela em pulo, como hoje (19/11: o soco reto saiu igual ao L e ao H) |
+| H | Soco por cima | Arma a mão de trás lá atrás do ombro e despeja o soco por cima, de cima para baixo no rosto, o corpo inteiro jogado para a frente | punho · de cima com o corpo | o forte; joga na parede (19/11: o martelo de duas mãos era difícil para o H3 e igual ao jH; o gancho cheio saiu igual ao L) |
 | ↓ + L | Soco baixo | Agachado, soco curto na canela | punho · baixo | baixo rápido; abre |
 | ↓ + M | Rasteira de pisão | Agachado, estica a perna e pisa no tornozelo do rival, rente ao chão | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui |
 | ↓ + H | Uppercut de baixo | Da agachada, sobe com o uppercut largo da mão de trás, levantando o corpo inteiro | punho · uppercut | lançador para o combo no ar |
