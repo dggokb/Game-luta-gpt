@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p03_energy.webp",
   "report": "tools/sprites/reports/p03_energy.report.json",
   "preview": "android/app/build/sprite-review/p03_energy-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 20,
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
@@ -48,11 +48,11 @@
     "ajuste no app 20261014-0532: 103% (SPECIAL_ENERGY)"
   ],
   "video": {
-    "arquivo": "s1.mp4",
+    "arquivo": "s1b.mp4",
     "personagem": "p03",
     "escala": 0.4139,
     "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
-    "quadros": "60,76,80,84,86,88,90,92,94,96,112",
+    "quadros": "56,58,60,62,64,66,68,70,72,74,76,80,84,86,88,90,92,94,96,112",
     "celula": 320,
     "largura": 416,
     "raiz": "131,302",

@@ -1,6 +1,6 @@
 {
  "nome": "onda_p03",
- "video": "s1 (Kōga, 19/11): o X dos quadros 44-58, a mão dele pintada por cima (inpaint) antes da chave; o verde do brilho quente puxado para baixo do vermelho; 260 px, o tamanho do X parado na frente dele",
+ "video": "s1 (Kōga, 19/11): o X dos quadros 44-58, a mão dele pintada por cima (inpaint) antes da chave; o verde do brilho quente puxado para baixo do vermelho; na escala do Kōga (0,4139), o mesmo tamanho do X parado na frente dele",
  "trecho": [
   0,
   14
@@ -8,71 +8,71 @@
  "passo": 2,
  "ancora": "centro",
  "pixelScale": 1.5,
- "altura": 260.0,
+ "altura": 291.4,
  "quadros": [
   [
    0,
    0,
-   258,
-   390,
-   -131.8,
-   -203.9
+   289,
+   437,
+   -147.8,
+   -228.5
   ],
   [
-   260,
+   291,
    0,
-   248,
-   386,
-   -131.8,
-   -203.9
+   278,
+   432,
+   -147.8,
+   -228.5
   ],
   [
-   510,
+   571,
    0,
-   248,
-   387,
-   -131.8,
-   -203.3
+   278,
+   434,
+   -147.8,
+   -227.9
   ],
   [
-   760,
+   851,
    0,
-   248,
-   386,
-   -131.8,
-   -203.9
+   278,
+   432,
+   -147.8,
+   -228.5
   ],
   [
-   1010,
+   1131,
    0,
-   248,
-   388,
-   -131.8,
-   -202.8
+   278,
+   435,
+   -147.8,
+   -227.2
   ],
   [
-   1260,
+   1411,
    0,
-   248,
-   387,
-   -131.8,
-   -202.8
+   278,
+   433,
+   -147.8,
+   -227.2
   ],
   [
-   1510,
+   1691,
    0,
-   249,
-   387,
-   -132.4,
-   -203.9
+   279,
+   433,
+   -148.4,
+   -228.5
   ],
   [
-   1761,
    0,
-   248,
-   387,
-   -131.8,
-   -203.9
+   439,
+   278,
+   433,
+   -147.8,
+   -228.5
   ]
  ],
  "duracoesMs": [

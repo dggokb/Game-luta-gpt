@@ -878,34 +878,43 @@
     }
   },
   "energy": {
-    "_doc": "S1 Garra do tigre em três (19/11, ideia do dono; vídeo s1, com o efeito da garra desenhado no vídeo: pelo item 11 da skill vfx-luta, a arte fica). 3º, o X lançado (o S1 de projétil, saindo da continuação): recolhe (60) e empurra as duas mãos (76, o empurrão; os quadros 62-74 têm o X e o clarão saindo e ficam de fora: o X é o projétil do jogo, efeito onda_p03), segura (80-84) e volta à guarda (86-112).",
+    "_doc": "S1 Garra do tigre, 3º: o X lançado (o S1 de projétil, saindo da continuação). Começa com o X ainda parado na frente dele (56-60, o mesmo do fim do 2º corte: sem corte na troca; o dono, 19/11: \"entre o segundo e o terceiro tá cortando\"), empurra as duas mãos (62, o projétil nasce aqui, no lugar do X parado) e segura (64-84), volta à guarda (86-112). Nos quadros 62-74 o X e o clarão saindo foram apagados à direita do corpo (vídeo s1b, montado do s1): o X que voa é o projétil (efeito onda_p03).",
     "trechos": [
       [
-        "s1",
+        "s1b",
         0,
         124
       ]
     ],
-    "quadros": "60,76,80,84,86,88,90,92,94,96,112",
+    "quadros": "56,58,60,62,64,66,68,70,72,74,76,80,84,86,88,90,92,94,96,112",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
     },
     "animacoes": {
       "SPECIAL_ENERGY": {
-        "impacto": 1,
+        "impacto": 3,
         "tempos": [
-          90,
-          120,
-          60,
-          60,
-          27,
-          27,
-          27,
-          27,
-          27,
-          27,
-          27
+          43,
+          43,
+          43,
+          40,
+          39,
+          39,
+          39,
+          39,
+          39,
+          39,
+          39,
+          39,
+          39,
+          29,
+          29,
+          29,
+          29,
+          29,
+          29,
+          29
         ]
       }
     }
