@@ -21,7 +21,9 @@ public class DragonRushTest {
         Match(CharacterDefinition p1, CharacterDefinition p2, float xa, float xb) {
             first = new FighterState(p1, "P1");
             second = new FighterState(p2, "P2");
-            engine = new CombatEngine(first, second, xa, xb, new CombatConfig());
+            CombatConfig cfg = new CombatConfig();
+            cfg.dragonRushLigado = true;   // desligado no jogo para o teste do dono (19/11)
+            engine = new CombatEngine(first, second, xa, xb, cfg);
         }
 
         String attackId(int i) { return f(i).attacking() ? f(i).attack.id : ""; }

@@ -762,7 +762,7 @@ final class CombatEngine {
 
         // SHINKAI: segurar → depois do H que jogou na parede não corre: é o Dragon Rush. Com o
         // Dragon Rush do combo já usado, nada (no SHINKAI ninguém corre).
-        if (f.state.inShinkai() && wallChaseRun(f)) {
+        if (config.dragonRushLigado && f.state.inShinkai() && wallChaseRun(f)) {
             if (podeDragonRush(f)) {
                 startDragonRush(f);
                 f.dashRequest = f.backdashRequest = false;
@@ -788,7 +788,7 @@ final class CombatEngine {
         }
         // No SHINKAI o → → é sempre o Dragon Rush (ou o sumiço do SPEED): sem ele (já usado no
         // combo, ou no meio de um golpe que não cancela), o → → não vira corrida.
-        if (f.dashRequest && f.state.inShinkai() && f.grounded) f.dashRequest = false;
+        if (config.dragonRushLigado && f.dashRequest && f.state.inShinkai() && f.grounded) f.dashRequest = false;
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround()) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
@@ -1063,7 +1063,7 @@ final class CombatEngine {
      * não sai).
      */
     boolean podeDragonRush(CombatFighter f) {
-        if (!f.state.inShinkai() || f.vanishFrames > 0 || f.locked || f.ko()) return false;
+        if (!config.dragonRushLigado || !f.state.inShinkai() || f.vanishFrames > 0 || f.locked || f.ko()) return false;
         CombatFighter other = fighters[1 - f.index];
         if (other.ko()) return false;
         // TECHNIQUE: com golpe do rival vindo, o → tocado é a aparada (dois toques seguidos não

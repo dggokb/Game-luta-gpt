@@ -68,6 +68,10 @@ botão), `CorteShinkai` (o corte de ativação), `ShinkaiDetalhes` e `GameView` 
 
 ## Dragon Rush (todos os tipos)
 
+**Desligado em 19/11 para um teste do dono** (`CombatConfig.dragonRushLigado = false`). Por enquanto,
+no SHINKAI o → → e o segurar → depois da parede são a corrida de sempre. Para voltar, basta pôr `true`.
+O `DragonRushTest` liga a chave e continua conferindo o golpe.
+
 No SHINKAI, o **→ →** não corre: o lutador **voa no rival** (`CombatEngine.DRAGON_RUSH`, o mesmo
 golpe para todos, montado no construtor do motor). Sai do neutro no chão ou no ar (a partir da
 altura mínima do air dash) e também **cancelando um normal que encostou** (acerto ou defesa).

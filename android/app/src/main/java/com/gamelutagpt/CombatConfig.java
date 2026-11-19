@@ -614,6 +614,11 @@ final class CombatConfig {
      * também sai (cancela o normal). No SPEED, com o rival até {@link #shinkaiVanishRange}, → → no
      * chão continua sendo o sumiço.
      */
+    /**
+     * Desligado para o teste do dono (19/11): sem o Dragon Rush, no SHINKAI o → → e o segurar →
+     * depois do H na parede voltam a ser a corrida de sempre. true = como era.
+     */
+    boolean dragonRushLigado = false;
     int dragonRushStartup = 6;
     /** Quadros de voo (o golpe ativo): passou disso sem encostar, recupera no ar. */
     int dragonRushFlight = 26;
