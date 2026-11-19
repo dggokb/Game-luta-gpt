@@ -675,5 +675,85 @@
         ]
       }
     }
+  },
+  "jump_medium": {
+    "_doc": "jM, Voadora de sola (19/11, vídeo jM do dono, da inicio_pulo_h3, de perfil): encolhe (16-20), estica a perna da frente (22, o impacto), segura (26-46) e volta à pose do pulo (48-62).",
+    "trechos": [
+      [
+        "jM",
+        0,
+        124
+      ]
+    ],
+    "quadros": "14,16,18,20,22,26,32,40,46,48,50,52,54,56,62",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false,
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "JUMP_MEDIUM": {
+        "impacto": 4,
+        "tempos": [
+          159,
+          159,
+          159,
+          159,
+          520,
+          146,
+          195,
+          146,
+          49,
+          48,
+          49,
+          48,
+          49,
+          146,
+          48
+        ]
+      }
+    }
+  },
+  "jump_heavy": {
+    "_doc": "jH, Voadora de dois pés (19/11, vídeo jH do dono, da inicio_pulo_h3): encolhe os joelhos (21-33), estica as duas pernas juntas (35, o impacto), segura (39-51) e volta à pose do pulo (53-73).",
+    "trechos": [
+      [
+        "jH",
+        0,
+        124
+      ]
+    ],
+    "quadros": "17,21,25,29,31,33,35,39,45,51,53,55,57,59,61,63,65,69,73",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false,
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "JUMP_HEAVY": {
+        "impacto": 6,
+        "tempos": [
+          183,
+          183,
+          182,
+          91,
+          91,
+          91,
+          628,
+          161,
+          161,
+          54,
+          53,
+          54,
+          54,
+          53,
+          54,
+          53,
+          108,
+          107,
+          54
+        ]
+      }
+    }
   }
 }
