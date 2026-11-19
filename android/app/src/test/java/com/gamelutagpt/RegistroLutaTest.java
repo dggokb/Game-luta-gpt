@@ -29,7 +29,14 @@ public class RegistroLutaTest {
         assertTrue("o fim", t.contains("=== FIM: "));
         ResumoRegistro.Luta[] lutas = ResumoRegistro.ler(t);
         assertEquals(1, lutas.length);
-        assertTrue(lutas[0].pulos[0] + lutas[0].pulos[1] > 0);
+        // Os pulos contados no resumo: numa das sementes alguém pula (a luta da semente 11 acaba
+        // antes, desde a Garra do tigre do Kōga, 19/11).
+        boolean pulou = lutas[0].pulos[0] + lutas[0].pulos[1] > 0;
+        for (long semente = 12; semente <= 14 && !pulou; semente++) {
+            ResumoRegistro.Luta[] outra = ResumoRegistro.ler(lutaGravada("player_base", "p03", 8, semente));
+            pulou = outra[0].pulos[0] + outra[0].pulos[1] > 0;
+        }
+        assertTrue("o resumo conta os pulos", pulou);
     }
 
     /** No arcade o motor segue contando de uma luta para a outra: o registro conta do começo de cada luta. */

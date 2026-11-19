@@ -1,250 +1,250 @@
 {
   "id": "p03_energy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_energy_sr_hd.png",
+  "source": "art/sprites/source/p03_energy_video_normalized.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S1 soco que solta a onda curta; energia e do jogo.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 768,
-    "frameHeight": 512,
-    "rootX": 280,
-    "rootY": 476,
-    "columns": 6,
+    "frameWidth": 832,
+    "frameHeight": 640,
+    "rootX": 262,
+    "rootY": 604,
+    "columns": 4,
     "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        140,
-        15,
-        421,
-        479
+        70,
+        41,
+        773,
+        611
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 60639
+      "minimumMargin": 29,
+      "opaquePixels": 174839
     },
     {
       "index": 1,
       "outputBbox": [
-        120,
-        65,
-        431,
-        483
+        59,
+        176,
+        569,
+        612
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 59197
+      "minimumMargin": 28,
+      "opaquePixels": 69655
     },
     {
       "index": 2,
       "outputBbox": [
-        137,
-        65,
-        429,
-        483
+        59,
+        175,
+        568,
+        612
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 57720
+      "minimumMargin": 28,
+      "opaquePixels": 69572
     },
     {
       "index": 3,
       "outputBbox": [
-        138,
-        61,
-        429,
-        483
+        60,
+        176,
+        568,
+        612
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 58226
+      "minimumMargin": 28,
+      "opaquePixels": 69441
     },
     {
       "index": 4,
       "outputBbox": [
-        139,
-        59,
-        429,
-        483
+        66,
+        179,
+        544,
+        607
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 59216
+      "minimumMargin": 33,
+      "opaquePixels": 68076
     },
     {
       "index": 5,
       "outputBbox": [
-        122,
-        30,
-        438,
-        483
+        73,
+        180,
+        496,
+        604
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 63481
+      "minimumMargin": 36,
+      "opaquePixels": 65435
     },
     {
       "index": 6,
       "outputBbox": [
-        118,
-        26,
-        555,
-        483
+        73,
+        174,
+        475,
+        602
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 67477
+      "minimumMargin": 38,
+      "opaquePixels": 65719
     },
     {
       "index": 7,
       "outputBbox": [
-        120,
-        26,
-        535,
-        483
+        73,
+        165,
+        477,
+        605
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 68278
+      "minimumMargin": 35,
+      "opaquePixels": 66704
     },
     {
       "index": 8,
       "outputBbox": [
-        118,
-        26,
-        535,
-        483
+        73,
+        162,
+        478,
+        605
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 65272
+      "minimumMargin": 35,
+      "opaquePixels": 67135
     },
     {
       "index": 9,
       "outputBbox": [
-        129,
-        24,
-        476,
-        483
+        73,
+        158,
+        478,
+        605
       ],
-      "minimumMargin": 24,
-      "opaquePixels": 60438
+      "minimumMargin": 35,
+      "opaquePixels": 67325
     },
     {
       "index": 10,
       "outputBbox": [
-        142,
-        15,
-        428,
-        481
+        75,
+        156,
+        478,
+        605
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 60603
+      "minimumMargin": 35,
+      "opaquePixels": 67760
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 462,
-    "frameHeight": 493,
-    "rootX": 175,
-    "rootY": 474,
-    "columns": 6,
+    "frameWidth": 730,
+    "frameHeight": 587,
+    "rootX": 211,
+    "rootY": 571,
+    "columns": 4,
     "frameCount": 11,
     "cropOffset": [
-      105,
-      2
+      51,
+      33
     ],
-    "sheetWidth": 1988,
-    "sheetHeight": 964,
+    "sheetWidth": 1880,
+    "sheetHeight": 1484,
     "frames": [
       [
         0,
         0,
-        300,
-        484,
-        26,
-        4
-      ],
-      [
-        1340,
-        488,
-        332,
-        436,
-        6,
-        55
-      ],
-      [
-        1676,
-        488,
-        312,
-        436,
-        23,
-        53
-      ],
-      [
-        1024,
-        488,
-        312,
-        440,
-        24,
-        50
-      ],
-      [
         712,
-        488,
-        308,
-        444,
-        26,
-        48
-      ],
-      [
-        372,
-        488,
-        336,
-        472,
-        8,
-        19
-      ],
-      [
-        612,
-        0,
-        456,
-        476,
-        4,
-        15
-      ],
-      [
-        1072,
-        0,
-        436,
-        476,
-        6,
-        15
-      ],
-      [
-        1512,
-        0,
-        436,
-        476,
-        4,
-        15
-      ],
-      [
-        0,
-        488,
-        368,
-        476,
+        580,
         15,
-        13
+        4
       ],
       [
-        304,
+        1360,
+        584,
+        520,
+        444,
+        4,
+        139
+      ],
+      [
+        420,
+        584,
+        520,
+        448,
+        4,
+        138
+      ],
+      [
         0,
-        304,
-        484,
-        28,
-        4
+        1040,
+        516,
+        444,
+        5,
+        139
+      ],
+      [
+        520,
+        1040,
+        488,
+        436,
+        11,
+        142
+      ],
+      [
+        1428,
+        1040,
+        432,
+        432,
+        18,
+        143
+      ],
+      [
+        1012,
+        1040,
+        412,
+        436,
+        18,
+        137
+      ],
+      [
+        944,
+        584,
+        412,
+        448,
+        18,
+        128
+      ],
+      [
+        0,
+        584,
+        416,
+        452,
+        18,
+        125
+      ],
+      [
+        1132,
+        0,
+        416,
+        456,
+        18,
+        121
+      ],
+      [
+        716,
+        0,
+        412,
+        460,
+        20,
+        119
       ]
     ],
     "decodedBytes": {
-      "canonical": 18874368,
-      "grid": 10932768,
-      "packed": 7665728
+      "canonical": 25559040,
+      "grid": 20568480,
+      "packed": 11159680
     },
     "pixelScale": 2.0
   },
@@ -252,12 +252,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ae3fb9e274441ddb5450cf340ff6b00d93045f9fb57490b747910a6ae1323ee6",
-      "config": "fbe454eb6eb24795b6e8fed636a33abd181a40913c5e1aea0f51d159e5fb8e9d",
+      "source": "06c83d46651e3b51b35ede6c0ec4a2d92d6c16d4a831db9f72f95105c7a0d628",
+      "config": "9f31d3171d89471787b73fac3106139b331c05517f0c7bab2c374949bf098875",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
-    },
-    "referenceSources": {
-      "art/sprites/source/p03_energy_video_normalized.png": "5f35069c6b11f6518ee9309717ea2d65fe96cce9f148a6293b43d7012c69b9a2"
     }
   }
 }

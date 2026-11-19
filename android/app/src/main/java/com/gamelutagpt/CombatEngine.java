@@ -815,7 +815,7 @@ final class CombatEngine {
             if (!breakerChasing(f) && !f.busyOnGround()) startFromBuffer(f, false);
         } else if (f.attacking() && (CancelSystem.windowOpen(f) || shinkaiCancelOpen(f))) {
             startFromBuffer(f, true);
-        } else if (f.attacking() && f.attack.cancelsInto(CancelSystem.FOLLOW_UP)) {
+        } else if (CancelSystem.continuacao(f) != null) {
             // A continuação (o chute girando da p15) apertada antes da janela: fica guardada.
             for (InputBuffer.Entry e : new java.util.ArrayList<>(f.buffer.entries())) {
                 if (e.button == InputBuffer.Button.LIGHT || e.button == InputBuffer.Button.MEDIUM || e.button == InputBuffer.Button.HEAVY) {
@@ -3539,10 +3539,13 @@ final class CombatEngine {
     private void seguirContinuacoes() {
         for (CombatFighter f : fighters) {
             if (!f.followUpQueued) continue;
-            if (!f.attacking() || f.attack == null || !f.attack.cancelsInto(CancelSystem.FOLLOW_UP)) {
+            String id = CancelSystem.continuacao(f);
+            if (id == null || "S".equals(id) && energyProjectileAlive(f.index)) {
+                // Sem continuação (ou o poder com outro dele ainda na tela): o pedido cai.
                 f.followUpQueued = false;
-            } else if (!f.frozen() && CancelSystem.canCancel(f, CancelSystem.FOLLOW_UP, null)) {
-                startAttack(f, f.character().attack(CancelSystem.FOLLOW_UP), null, -1);
+            } else if (!f.frozen() && CancelSystem.canCancel(f, id, null)) {
+                f.followUpQueued = false;
+                startAttack(f, f.character().attack(id), null, -1);
             }
         }
     }

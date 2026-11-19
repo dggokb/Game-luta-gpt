@@ -18,12 +18,30 @@ final class CancelSystem {
      * nele (o chute girando depois da voadora da p15). Do neutro não sai.
      */
     static final String FOLLOW_UP = "SG";
+    /**
+     * Abertura do S1 em três (19/11, a Garra do tigre do Kōga): com ela no pacote, ↓↘→ + botão é este
+     * golpe (o 1º corte); um botão emenda a continuação ({@link #FOLLOW_UP}, o 2º corte, o X) e outro
+     * botão, dentro dela, emenda o S1 de projétil (o X lançado).
+     */
+    static final String ABERTURA = "S1A";
+
+    /**
+     * A continuação do golpe atual (o id do golpe), ou null: a continuação de sempre ({@link #FOLLOW_UP})
+     * de quem emenda nela, e, na sequência do S1 em três, o S1 (o poder) depois da continuação.
+     */
+    static String continuacao(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        if (!f.attacking() || f.attack == null) return null;
+        if (c.moves.containsKey(FOLLOW_UP) && f.attack.cancelsInto(FOLLOW_UP)) return FOLLOW_UP;
+        if (FOLLOW_UP.equals(f.attack.id) && c.moves.containsKey(ABERTURA) && f.attack.cancelsInto("S") &&
+            c.attack("S") != null) return "S";
+        return null;
+    }
 
     /** A continuação do golpe atual, se ele emenda nela e o botão foi apertado agora. */
     private static AttackDefinition followUp(CombatFighter f) {
-        CharacterDefinition c = f.character();
-        if (!f.attacking() || f.attack == null || !c.moves.containsKey(FOLLOW_UP) || !f.attack.cancelsInto(FOLLOW_UP)) return null;
-        return c.attack(FOLLOW_UP);
+        String id = continuacao(f);
+        return id == null ? null : f.character().attack(id);
     }
 
     /** Cancel window of the attack for what it has done so far; null when closed for that outcome. */
@@ -43,7 +61,9 @@ final class CancelSystem {
 
     /** Whether the current attack may become {@code target} on this frame. */
     static boolean canCancel(CombatFighter f, String target, ComboSession session) {
-        if (!f.attacking() || !windowOpen(f) || !f.attack.cancelsInto(target)) return false;
+        // A abertura do S1 em três sai de onde o S1 sairia (quem emenda no S1 emenda nela).
+        boolean emenda = f.attacking() && (f.attack.cancelsInto(target) || ABERTURA.equals(target) && f.attack.cancelsInto("S"));
+        if (!f.attacking() || !windowOpen(f) || !emenda) return false;
         // No chão é o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo). Golpe de
         // várias pancadas só pula depois da última (12/11: o S4 da Yin-lu lança no segundo chute).
         if (AttackDefinition.JUMP.equals(target)) {
@@ -109,6 +129,8 @@ final class CancelSystem {
                     if (!special.saiEm(f.grounded) || !especialNoArLiberado(f, special.air)) return null;
                     return c.attack(entry.strength);
                 }
+                // S1 em três: ↓↘→ + botão é o 1º corte (o poder sai no fim da sequência).
+                if (c.moves.containsKey(ABERTURA) && f.grounded) return c.attack(ABERTURA);
                 if (projectileAlive || f.state.profile.energy == null) return null;
                 if (c.fighter.energyAir && f.grounded) return null;   // S1 só no ar (o p14)
                 if (!especialNoArLiberado(f, c.fighter.energyAir)) return null;

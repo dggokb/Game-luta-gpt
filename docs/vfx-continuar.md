@@ -2051,3 +2051,8 @@ como anime, com os efeitos e o poder já no vídeo". Prompt H3 com os riscos de 
 skill, o efeito desenhado na arte fica e o nosso combina com ele; o X que voa sai do vídeo como efeito do
 poder (`tools/sprites/efeito_video.py`, fundo verde) quando o vídeo chegar. A 1ª versão do prompt (sem efeito)
 saiu com os braços cruzando o peito em vez de cortar para a frente.
+
+Rodada de 19/11 (instalado): o vídeo s1 do dono saiu com os riscos e o X do jeito do prompt. Os riscos e o X
+parado ficam na arte do Kōga (`GARRA_1`, `GARRA_2`); o X que voa é a folha `onda_p03` (quadros 44-58 do vídeo,
+a mão dele pintada por cima com inpaint antes da chave do verde; o brilho amarelado do verde puxado para o
+laranja, G ≤ 0,62·R nos tons quentes; 260 px, o tamanho do X parado; luz `#FF6A2A`). Gravado no PC.

@@ -808,5 +808,106 @@
         ]
       }
     }
+  },
+  "garra_1": {
+    "_doc": "S1 Garra do tigre em três (19/11, ideia do dono; vídeo s1, com o efeito da garra desenhado no vídeo: pelo item 11 da skill vfx-luta, a arte fica). 1º corte (o golpe S1A, ↓↘→ + botão): arma (10-14), corta com a mão da frente (16, o arco do vídeo) e os três riscos ficam na frente (18, o impacto; segura 22-30); sem continuar, volta à guarda (14-4, o armar ao contrário).",
+    "trechos": [
+      [
+        "s1",
+        0,
+        124
+      ]
+    ],
+    "quadros": "10,12,14,16,18,22,26,30,14,12,8,4",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "GARRA_1": {
+        "impacto": 4,
+        "tempos": [
+          130,
+          130,
+          131,
+          130,
+          313,
+          132,
+          131,
+          527,
+          65,
+          132,
+          132,
+          131
+        ]
+      }
+    }
+  },
+  "garra_2": {
+    "_doc": "S1 Garra do tigre em três (19/11, ideia do dono; vídeo s1, com o efeito da garra desenhado no vídeo: pelo item 11 da skill vfx-luta, a arte fica). 2º corte (a continuação SG): arma com a mão de trás (34-36), corta cruzado (38, o arco) e o X fica na frente (40, o impacto; pulsa 44-56); sem continuar, volta à guarda (58-112).",
+    "trechos": [
+      [
+        "s1",
+        0,
+        124
+      ]
+    ],
+    "quadros": "34,36,38,40,44,48,52,56,58,60,94,112",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "GARRA_2": {
+        "impacto": 3,
+        "tempos": [
+          171,
+          171,
+          170,
+          354,
+          158,
+          156,
+          158,
+          78,
+          192,
+          192,
+          320,
+          321
+        ]
+      }
+    }
+  },
+  "energy": {
+    "_doc": "S1 Garra do tigre em três (19/11, ideia do dono; vídeo s1, com o efeito da garra desenhado no vídeo: pelo item 11 da skill vfx-luta, a arte fica). 3º, o X lançado (o S1 de projétil, saindo da continuação): recolhe (60) e empurra as duas mãos (76, o empurrão; os quadros 62-74 têm o X e o clarão saindo e ficam de fora: o X é o projétil do jogo, efeito onda_p03), segura (80-84) e volta à guarda (86-112).",
+    "trechos": [
+      [
+        "s1",
+        0,
+        124
+      ]
+    ],
+    "quadros": "60,76,80,84,86,88,90,92,94,96,112",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "SPECIAL_ENERGY": {
+        "impacto": 1,
+        "tempos": [
+          90,
+          120,
+          60,
+          60,
+          27,
+          27,
+          27,
+          27,
+          27,
+          27,
+          27
+        ]
+      }
+    }
   }
 }

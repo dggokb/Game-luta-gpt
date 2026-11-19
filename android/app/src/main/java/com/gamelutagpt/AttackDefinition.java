@@ -401,7 +401,8 @@ final class AttackDefinition {
 
     static Strength strengthOf(String binding) {
         if ("SUPER".equals(binding) || "ULTRA".equals(binding)) return Strength.SUPER;
-        if ("S".equals(binding) || binding.matches("S[2-9]")) return Strength.SPECIAL;
+        // A abertura do S1 em três (CancelSystem.ABERTURA) é o próprio S1: pesa como especial.
+        if ("S".equals(binding) || binding.matches("S[2-9]") || CancelSystem.ABERTURA.equals(binding)) return Strength.SPECIAL;
         // A continuação de um especial (CancelSystem.FOLLOW_UP) pesa como o forte.
         if ("THROW".equals(binding) || VoadoraTroca.ID.equals(binding) || CancelSystem.FOLLOW_UP.equals(binding) ||
             Casca.SLIDE.equals(binding)) return Strength.HEAVY;

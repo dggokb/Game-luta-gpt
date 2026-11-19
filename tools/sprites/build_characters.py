@@ -78,10 +78,13 @@ RUN_HEAVY = 'DH'
 # Continuação (16/11): o golpe que sai apertando L, M ou H durante um especial que emenda nele
 # (CancelSystem.FOLLOW_UP; o chute girando depois da voadora da p15).
 FOLLOW_UP = 'SG'
+# Abertura do S1 em três (19/11, a Garra do tigre do Kōga; CancelSystem.ABERTURA): ↓↘→ + botão é o
+# 1º corte, a continuação (SG) o 2º e o S1 (projétil) o X lançado.
+S1_ABERTURA = 'S1A'
 # A rasteira de quem escorrega na própria casca (Casca.SLIDE; a p16): sai sozinha, sem botão.
 PEEL_SLIDE = 'SC'
 # Inputs que o pacote pode ter ou não.
-OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY, RUN_HEAVY, FOLLOW_UP, PEEL_SLIDE)
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD, COMMAND_HEAVY, RUN_HEAVY, FOLLOW_UP, PEEL_SLIDE, S1_ABERTURA)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')

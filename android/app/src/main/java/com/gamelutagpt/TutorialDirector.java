@@ -228,11 +228,25 @@ final class TutorialDirector {
             boolean hold = character.fighter.energyHold;
             // O S1 de alguns é corpo a corpo (tapa do p07, investida do p12): treina de perto.
             boolean melee = character.fighter.energy.attack.melee();
-            out.add(new Lesson("ESPECIAL DE ENERGIA", commandText(command, hold, false) + " + {L}, {M} ou {H}: "
-                + (melee ? "golpe especial de perto" : "lança energia"), 1, false,
-                melee ? close : c -> c.placeApart(160f), null,
-                c -> c.doing("S"),
-                (c, p1) -> special(c, p1, command, hold, false, "M")));
+            if (character.moves.containsKey(CancelSystem.ABERTURA)) {
+                // O S1 em três (a Garra do tigre do Kōga): o comando é o 1º corte; mais dois botões,
+                // o X e o X lançado (a lição vale quando o poder sai).
+                out.add(new Lesson("ESPECIAL DE ENERGIA", commandText(command, hold, false)
+                    + " + {L}, {M} ou {H}, e {L} mais duas vezes: o corte, o X e o X lançado", 1, false,
+                    c -> c.placeApart(160f), null,
+                    c -> c.doing("S"),
+                    (c, p1) -> {
+                        CombatFighter f = c.p1();
+                        if (f.attacking() && CancelSystem.continuacao(f) != null) p1.light = c.t % 6 == 0;
+                        else special(c, p1, command, hold, false, "M");
+                    }));
+            } else {
+                out.add(new Lesson("ESPECIAL DE ENERGIA", commandText(command, hold, false) + " + {L}, {M} ou {H}: "
+                    + (melee ? "golpe especial de perto" : "lança energia"), 1, false,
+                    melee ? close : c -> c.placeApart(160f), null,
+                    c -> c.doing("S"),
+                    (c, p1) -> special(c, p1, command, hold, false, "M")));
+            }
         }
         String[] names = {"S2", "S3", "S4"};
         for (String id : names) {

@@ -132,6 +132,15 @@ final class AiController {
      * vez se termina com o H correndo (o lariat do Kōga, o carrinho da Yin-lu...).
      */
     private boolean corridaDecidida, corridaComGolpe;
+    /**
+     * O S1 em três (a Garra do tigre do Kōga, 19/11): em cada etapa ela decide uma vez, depois de o
+     * golpe encostar (ou passar), se emenda a próxima. Sorteio à parte, como o da corrida.
+     */
+    private AttackDefinition garraEtapa;
+    private boolean garraSegue;
+    private final java.util.Random garraRandom = new java.util.Random(0x6A22A);
+    /** A chance de emendar a próxima etapa (acertou, defendido, no vazio), vezes a punição do nível. */
+    static final double GARRA_ACERTOU = 0.95, GARRA_DEFENDIDO = 0.3, GARRA_VAZIO = 0.85;
     /** O sorteio do golpe de corrida, à parte: não mexe na sequência dos outros sorteios da CPU. */
     private final java.util.Random corridaRandom = new java.util.Random(0xC0221DA);
     /** A chance de a corrida terminar no golpe de corrida, vezes a punição do nível. */
@@ -1134,6 +1143,7 @@ final class AiController {
             sequenciaDoRush(me, out);
             return;
         }
+        if (seguirGarra(me, out)) return;
         // O próprio combo breaker ela sente na hora: o troco vem garantido.
         if (me.comboBroke && engine.cues().contains("COMBO_BREAKER")) breakerCombo = true;
         for (CombatEngine.HitEvent ev : engine.events()) {
@@ -1376,6 +1386,31 @@ final class AiController {
         out.heavy = true;
         corridaComGolpe = false;
         lastReason = "golpe de corrida";
+        return true;
+    }
+
+    /**
+     * Dentro do S1 em três: decide (uma vez por etapa, depois da janela ativa) se emenda a próxima e
+     * aperta L até ela sair. Acertou: emenda quase sempre (o X lançado fecha); no vazio também (de
+     * longe é o jeito de soltar o poder); defendido, pouco (a etapa seguinte fica exposta).
+     */
+    private boolean seguirGarra(CombatFighter me, FighterInput out) {
+        if (!me.attacking() || !me.character().moves.containsKey(CancelSystem.ABERTURA)) {
+            garraEtapa = null;
+            return false;
+        }
+        if (CancelSystem.continuacao(me) == null) return false;
+        if (me.attackFrame < me.attack.startupFrames + me.attack.activeFrames) return true;
+        if (garraEtapa != me.attack) {
+            garraEtapa = me.attack;
+            double chance = me.outcome == CombatFighter.Outcome.HIT ? GARRA_ACERTOU
+                : me.outcome == CombatFighter.Outcome.BLOCK ? GARRA_DEFENDIDO : GARRA_VAZIO;
+            garraSegue = garraRandom.nextDouble() < chance * (0.5 + 0.5 * level.punish);
+        }
+        if (garraSegue) {
+            out.light = true;
+            lastReason = "garra em três";
+        }
         return true;
     }
 

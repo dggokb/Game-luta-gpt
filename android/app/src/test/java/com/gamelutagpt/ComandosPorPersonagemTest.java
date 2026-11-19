@@ -19,7 +19,7 @@ public class ComandosPorPersonagemTest {
     private static final String[][] TABELA = {
         {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←"},
         {"p02", "Palma", "↓ ↘ →", "Chute da garça", "→ ↓ ↘", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "← →"},
-        {"p03", "Onda curta", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
+        {"p03", "Garra do tigre", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},
         {"p05", "Kunai", "↓ ↘ →", "Shuriken", "↓ ↙ ←", "Selo e mudança", "↓ ↓", "Corte de mão", "← ↙ ↓ ↘ →"},
         {"p06", "Sombra rastejante", "↓ ↙ ←", "Eco de sombra", "↓ ↓", "Puxar", "→ ↘ ↓ ↙ ←", "Passo-sombra", "↓ ↘ →"},
@@ -160,7 +160,9 @@ public class ComandosPorPersonagemTest {
         for (String[] row : TABELA) {
             for (int i = 1; i <= (row.length - 1) / 2; i++) {
                 String key = "S" + i;
-                String esperado = i == 1 ? "S" : key;
+                // O S1 em três (a Garra do tigre do Kōga, 19/11): o comando solta o 1º corte (S1A).
+                boolean garra = GeneratedCharacters.get(row[0]).moves.containsKey(CancelSystem.ABERTURA);
+                String esperado = i == 1 ? (garra ? CancelSystem.ABERTURA : "S") : key;
                 for (String button : new String[] {"L", "M", "H"}) {
                     assertEquals(row[0] + " " + key + " (" + row[i * 2] + ") + " + button, esperado, fazer(row[0], key, button));
                 }
@@ -261,7 +263,7 @@ public class ComandosPorPersonagemTest {
     @Test public void oMergulhoSoSaiNoArEDesceAteOChao() {
         Luta chao = new Luta("p03");
         chao.motion("M", 3, 2, 1);
-        assertEquals("no chão o ↓↘→ do p03 é a Onda curta", "S", chao.started());
+        assertEquals("no chão o ↓↘→ do p03 é a Garra do tigre (o 1º corte)", CancelSystem.ABERTURA, chao.started());
 
         Luta ar = new Luta("p03");
         ar.in.direction = 7;
