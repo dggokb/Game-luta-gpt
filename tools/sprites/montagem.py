@@ -30,7 +30,9 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
 - quadros: os quadros do vídeo colado que viram o clipe ("A-B/N" = de A a B de N em N).
 - opcoes: as de conversão do personagem.py (fixar, pe_no_chao, sem_efeitos, recorte_suave,
   deslocar, "densidade" 2 para a folha HD, "nitidez" para o acabamento da folha HD (p15 e p16), "sem_verde" para tirar
-  o verde do fogo meio transparente (a aura do Ultra SHINKAI da p15), "sem_chao" para
+  o verde do fogo meio transparente (a aura do Ultra SHINKAI da p15), "preencher_invisivel" para o
+  RGB dos pixels transparentes virar a cor do visível mais próximo (sem a cor do fundo do vídeo, que
+  vaza no celular), "sem_chao" para
   não limpar a faixa do chão, e "escala" com "motivo" para a escala manual); "_opcoes" no topo da receita vale para
   todos os clipes.
 - animacoes: as animações do pacote que usam o clipe. frames são índices do clipe ("9-0" =

@@ -4,7 +4,8 @@
     "escala": 0.4139,
     "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "preencher_invisivel": true
   },
   "idle": {
     "_doc": "Idle (19/11, vídeo idle do dono): sobe e desce com a respiração. Vai e volta na subida da respirada (1-23: de 541 a 573 px); a respirada inteira (até 579 px) passava da altura em pé do perfil (228 px no jogo, 5% de folga) e o build recusa.",

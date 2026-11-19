@@ -339,7 +339,24 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
     if opts.get('sem_verde'):
         sem_verde(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png', opts.get('fogo'))
+    if opts.get('preencher_invisivel'):
+        preencher_invisivel(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
     return out.strip().splitlines()[0]
+
+
+def preencher_invisivel(caminho):
+    """O RGB dos pixels transparentes vira a cor do pixel visível mais próximo (o mesmo do
+    sr_hd.py, sem o modelo). Sem isso fica a cor do fundo do vídeo (verde escuro, marrom), que no
+    celular vaza nos vãos fechados do desenho (a placa de vídeo mistura os vizinhos ao reduzir a
+    folha): a mancha escura entre o braço, o tronco e a perna do Kōga agachado (o dono, 19/11)."""
+    from scipy.ndimage import distance_transform_edt
+    a = np.array(Image.open(caminho).convert('RGBA'))
+    alfa = a[..., 3]
+    if not (alfa > 0).any():
+        return
+    _, (iy, ix) = distance_transform_edt(alfa == 0, return_indices=True)
+    a[..., :3] = a[..., :3][iy, ix]
+    Image.fromarray(a, 'RGBA').save(caminho)
 
 
 def sem_verde(caminho, fogo=None):
