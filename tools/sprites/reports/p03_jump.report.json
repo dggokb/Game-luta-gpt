@@ -1,155 +1,193 @@
 {
   "id": "p03_jump",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_jump_sr_hd.png",
+  "source": "art/sprites/source/p03_jump_video_normalized.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Subida do pulo a partir do impulso (o agachamento antes do pulo fica de fora); pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 640,
-    "frameHeight": 640,
-    "rootX": 256,
-    "rootY": 600,
-    "columns": 6,
-    "frameCount": 6
+    "frameWidth": 384,
+    "frameHeight": 704,
+    "rootX": 186,
+    "rootY": 668,
+    "columns": 8,
+    "frameCount": 8
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        115,
-        146,
-        398,
-        601
+        40,
+        153,
+        343,
+        670
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 59572
+      "minimumMargin": 34,
+      "opaquePixels": 71469
     },
     {
       "index": 1,
       "outputBbox": [
-        121,
-        107,
-        393,
-        601
+        88,
+        91,
+        326,
+        669
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 64620
+      "minimumMargin": 35,
+      "opaquePixels": 72635
     },
     {
       "index": 2,
       "outputBbox": [
-        157,
-        134,
-        360,
-        601
+        90,
+        86,
+        328,
+        669
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 61143
+      "minimumMargin": 35,
+      "opaquePixels": 73436
     },
     {
       "index": 3,
       "outputBbox": [
-        163,
-        206,
-        384,
-        603
+        100,
+        168,
+        333,
+        670
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 51816
+      "minimumMargin": 34,
+      "opaquePixels": 65881
     },
     {
       "index": 4,
       "outputBbox": [
-        156,
-        246,
-        384,
-        603
+        100,
+        167,
+        333,
+        670
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 50654
+      "minimumMargin": 34,
+      "opaquePixels": 66094
     },
     {
       "index": 5,
       "outputBbox": [
-        156,
-        244,
-        386,
-        603
+        86,
+        222,
+        333,
+        670
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 50851
+      "minimumMargin": 34,
+      "opaquePixels": 63812
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        86,
+        222,
+        334,
+        670
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 63826
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        66,
+        283,
+        338,
+        669
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 58849
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 310,
-    "frameHeight": 520,
-    "rootX": 155,
-    "rootY": 505,
-    "columns": 6,
-    "frameCount": 6,
+    "frameWidth": 319,
+    "frameHeight": 600,
+    "rootX": 154,
+    "rootY": 590,
+    "columns": 8,
+    "frameCount": 8,
     "cropOffset": [
-      101,
-      95
+      32,
+      78
     ],
-    "sheetWidth": 548,
-    "sheetHeight": 1372,
+    "sheetWidth": 560,
+    "sheetHeight": 2100,
     "frames": [
       [
         0,
-        516,
-        304,
-        476,
+        596,
+        312,
+        528,
         4,
-        41
-      ],
-      [
-        0,
-        0,
-        292,
-        512,
-        12,
-        4
-      ],
-      [
-        296,
-        0,
-        224,
-        484,
-        47,
-        31
-      ],
-      [
-        308,
-        516,
-        240,
-        416,
-        53,
-        102
-      ],
-      [
-        0,
-        996,
-        248,
-        376,
-        47,
-        142
+        71
       ],
       [
         252,
-        996,
+        0,
         248,
-        376,
-        47,
+        588,
+        52,
+        9
+      ],
+      [
+        0,
+        0,
+        248,
+        592,
+        54,
+        4
+      ],
+      [
+        316,
+        596,
+        244,
+        512,
+        64,
+        86
+      ],
+      [
+        0,
+        1128,
+        244,
+        512,
+        64,
+        85
+      ],
+      [
+        248,
+        1128,
+        256,
+        456,
+        50,
         140
+      ],
+      [
+        0,
+        1644,
+        256,
+        456,
+        50,
+        140
+      ],
+      [
+        260,
+        1644,
+        280,
+        396,
+        30,
+        201
       ]
     ],
     "decodedBytes": {
-      "canonical": 9830400,
-      "grid": 3868800,
-      "packed": 3007424
+      "canonical": 8650752,
+      "grid": 6124800,
+      "packed": 4704000
     },
     "pixelScale": 2.0
   },
@@ -157,12 +195,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "458746c9c249f9fb0662f2865215ccf2e8a8910a2f961a97bff20103e853f6ec",
-      "config": "c3610de84f0f06b338ac76496c52180cb1fd2b3452c04a169c79420797da215b",
+      "source": "c4eb0b952bede8ffaf95bb2f76101bf684006920936a656874b8f0eec331014f",
+      "config": "b3d75bfdf4442686042283495fce21f6d85aa4483f3cb502348f56db8d20d797",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
-    },
-    "referenceSources": {
-      "art/sprites/source/p03_jump_video_normalized.png": "e3c74a5102a2b9e8eb9c24a769a6c4c5b3492ccd3ed2cd40a198de745fe93867"
     }
   }
 }

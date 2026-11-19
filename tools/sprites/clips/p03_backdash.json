@@ -2,7 +2,7 @@
   "id": "p03_backdash",
   "javaName": "P03_BACKDASH",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_backdash_sr_hd.png",
+  "source": "art/sprites/source/p03_backdash_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_backdash.webp",
   "report": "tools/sprites/reports/p03_backdash.report.json",
   "preview": "android/app/build/sprite-review/p03_backdash-import.png",
@@ -13,9 +13,7 @@
   "frameWidth": 512,
   "rootX": 250,
   "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Salto para tras 16-62.",
-  "sourceReferences": [
-    "art/sprites/source/p03_backdash_video_normalized.png"
-  ],
+  "sourceReferences": [],
   "frameHeight": 640,
   "rootY": 604,
   "pixelScale": 2.0,

@@ -2,23 +2,21 @@
   "id": "p03_heavy",
   "javaName": "P03_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_heavy_sr_hd.png",
+  "source": "art/sprites/source/p03_heavy_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_heavy.webp",
   "report": "tools/sprites/reports/p03_heavy.report.json",
   "preview": "android/app/build/sprite-review/p03_heavy-import.png",
-  "expectedFrames": 23,
+  "expectedFrames": 21,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 1024,
-  "frameHeight": 640,
-  "rootX": 440,
-  "rootY": 600,
+  "frameWidth": 576,
+  "frameHeight": 576,
+  "rootX": 226,
+  "rootY": 538,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Chute giratorio alto; quadros com clarao e arco pulados.",
   "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py",
-  "sourceReferences": [
-    "art/sprites/source/p03_heavy_video_normalized.png"
-  ],
+  "sourceReferences": [],
   "pixelScale": 2.0,
   "reescala": [
     0.9804,
@@ -72,5 +70,21 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 102% (HEAVY_STRAIGHT)"
-  ]
+  ],
+  "video": {
+    "arquivo": "H.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "18,20,22,24,26,28,30,32,36,40,44,48,50,52,54,56,58,60,64,68,76",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "113,269",
+    "colunas": 7,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

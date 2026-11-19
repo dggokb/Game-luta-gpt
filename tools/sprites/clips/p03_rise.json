@@ -2,7 +2,7 @@
   "id": "p03_rise",
   "javaName": "P03_RISE",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_rise_sr_hd.png",
+  "source": "art/sprites/source/p03_rise_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_rise.webp",
   "report": "tools/sprites/reports/p03_rise.report.json",
   "preview": "android/app/build/sprite-review/p03_rise-import.png",
@@ -11,9 +11,7 @@
   "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Levantar; quadros com faiscas pulados.",
-  "sourceReferences": [
-    "art/sprites/source/p03_rise_video_normalized.png"
-  ],
+  "sourceReferences": [],
   "frameWidth": 512,
   "frameHeight": 576,
   "rootX": 244,

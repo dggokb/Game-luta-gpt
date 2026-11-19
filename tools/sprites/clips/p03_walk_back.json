@@ -2,7 +2,7 @@
   "id": "p03_walk_back",
   "javaName": "P03_WALK_BACK",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_walk_back_sr_hd.png",
+  "source": "art/sprites/source/p03_walk_back_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_walk_back.webp",
   "report": "tools/sprites/reports/p03_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p03_walk_back-import.png",
@@ -11,9 +11,7 @@
   "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Loop 9-46, 1 a cada 2 quadros.",
-  "sourceReferences": [
-    "art/sprites/source/p03_walk_back_video_normalized.png"
-  ],
+  "sourceReferences": [],
   "frameWidth": 512,
   "frameHeight": 576,
   "rootX": 234,

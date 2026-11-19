@@ -78,8 +78,8 @@ public class SpriteMotionTest {
         assertNotEquals(SpriteMotion.Clip.RISE,depoisDo("LIGHT_JAB",false).clip);
     }
     @Test public void holdingDownAfterACrouchingAttackStaysCrouched() {
-        // Quem não tem a respiração agachada (CROUCH_IDLE): o p03 (a p02 ganhou a dela em 12/11).
-        CharacterDefinition sem=GeneratedCharacters.get("p03");
+        // Quem não tem a respiração agachada (CROUCH_IDLE): o p04 (a p02 ganhou a dela em 12/11, o p03 em 19/11).
+        CharacterDefinition sem=GeneratedCharacters.get("p04");
         SpriteMotion m=new SpriteMotion(sem);
         CharacterDefinition.Animation crouch=sem.animation(SpriteMotion.Clip.CROUCH);
         tick(m,.5f,true,true,0,0,true,false,false,false,false);
@@ -183,16 +183,16 @@ public class SpriteMotionTest {
         m.update(dt,true,true,0,0,true,false,false,"CROUCH_LIGHT",0.05f,false,false);
         tick(m,dt,true,true,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.CROUCH_IDLE,m.clip);
-        // Sem CROUCH_IDLE (p03): o último quadro da descida fica parado, como antes.
-        CharacterDefinition p01=GeneratedCharacters.get("p03");
+        // Sem CROUCH_IDLE (p04; o p03 ganhou o dele em 19/11): o último quadro da descida fica parado, como antes.
+        CharacterDefinition p01=GeneratedCharacters.get("p04");
         assertFalse(p01.animations.containsKey(SpriteMotion.Clip.CROUCH_IDLE));
         SpriteMotion q=new SpriteMotion(p01);
         for(float s=0;s<2;s+=dt) tick(q,dt,true,true,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.CROUCH,q.clip);
     }
     @Test public void withoutSecondIdleTheIdleJustLoops() {
-        // O p03 ainda não tem o segundo idle (a p02 ganhou o dela em 12/11).
-        CharacterDefinition p01=GeneratedCharacters.get("p03");
+        // O p04 ainda não tem o segundo idle (a p02 ganhou o dela em 12/11, o p03 em 19/11).
+        CharacterDefinition p01=GeneratedCharacters.get("p04");
         assertFalse(p01.animations.containsKey(SpriteMotion.Clip.IDLE_2));
         SpriteMotion m=new SpriteMotion(p01);
         float idle=p01.animation(SpriteMotion.Clip.IDLE).duration;

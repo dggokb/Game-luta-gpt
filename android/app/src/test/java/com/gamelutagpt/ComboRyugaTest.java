@@ -114,8 +114,8 @@ public class ComboRyugaTest {
         s.in[0].direction = 0;
         s.until(me::attacking, 10);
         assertEquals("6H", me.attack.id);
-        // Sem o golpe no pacote (o Kōga, por enquanto), → + H continua sendo o H.
-        CombatEngineTest.Sim y = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), GeneratedCharacters.get(RYUGA), 600f, 1400f);
+        // Sem o golpe no pacote (o p04, por enquanto; o Kōga ganhou a ombrada em 19/11), → + H continua sendo o H.
+        CombatEngineTest.Sim y = new CombatEngineTest.Sim(GeneratedCharacters.get("p04"), GeneratedCharacters.get(RYUGA), 600f, 1400f);
         y.in[0].direction = 1;
         y.in[0].heavy = true;
         y.step();

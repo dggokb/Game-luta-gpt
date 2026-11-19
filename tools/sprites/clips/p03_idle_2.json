@@ -1,7 +1,7 @@
 {
   "id": "p03_idle_2",
   "javaName": "P03_IDLE_2",
-  "profile": "p03.json",
+  "profile": "player_base.json",
   "source": "art/sprites/source/p03_idle_2_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_idle_2.webp",
   "report": "tools/sprites/reports/p03_idle_2.report.json",

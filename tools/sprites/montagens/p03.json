@@ -7,7 +7,7 @@
     "nitidez": true
   },
   "idle": {
-    "_doc": "Idle (19/11, vídeo idle do dono): sobe e desce com a respiração; uma respirada do 1 ao 61 (o 63 é o 1, guarda 0,983).",
+    "_doc": "Idle (19/11, vídeo idle do dono): sobe e desce com a respiração. Vai e volta na subida da respirada (1-23: de 541 a 573 px); a respirada inteira (até 579 px) passava da altura em pé do perfil (228 px no jogo, 5% de folga) e o build recusa.",
     "trechos": [
       [
         "idle",
@@ -15,12 +15,13 @@
         124
       ]
     ],
-    "quadros": "1-61/2",
+    "quadros": "1-23/2",
     "opcoes": {
       "fixar": "video"
     },
     "animacoes": {
       "IDLE": {
+        "frames": "0-11,10-1",
         "loop": true
       },
       "COMBAT": {

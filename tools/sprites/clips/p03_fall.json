@@ -2,22 +2,20 @@
   "id": "p03_fall",
   "javaName": "P03_FALL",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_fall_sr_hd.png",
+  "source": "art/sprites/source/p03_fall_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_fall.webp",
   "report": "tools/sprites/reports/p03_fall.report.json",
   "preview": "android/app/build/sprite-review/p03_fall-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 5,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 5,
   "rootMode": "authored",
   "frameHeight": 640,
-  "rootY": 600,
+  "rootY": 604,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Descida do pulo; pes na raiz.",
-  "frameWidth": 640,
-  "rootX": 256,
-  "sourceReferences": [
-    "art/sprites/source/p03_fall_video_normalized.png"
-  ],
+  "frameWidth": 384,
+  "rootX": 166,
+  "sourceReferences": [],
   "pixelScale": 2.0,
   "reescala": [
     1.0417,
@@ -37,5 +35,20 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 96% (FALL)"
-  ]
+  ],
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "87,88,89,90,91",
+    "celula": 320,
+    "largura": 192,
+    "raiz": "83,302",
+    "colunas": 5,
+    "fixar": "video",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

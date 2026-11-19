@@ -92,13 +92,13 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 
 | Botão | Golpe | Movimento | Forma | Papel |
 |---|---|---|---|---|
-| L | Gancho curto | Gancho curto da mão da frente na altura do rosto; só o braço mexe, o corpo e os pés ficam parados; volta rápido para a guarda | punho · gancho curto | abre o combo; rápido |
-| M | Chute na coxa | A perna de trás vem num chute baixo e duro de canela na coxa do rival, o quadril girando; as mãos ficam na guarda | canela · chute baixo | anda para dentro; repete (M → M) e cancela em pulo, como hoje (19/11: o soco reto saiu igual ao L e ao H) |
-| H | Bica na barriga | Sobe o joelho da frente e crava a sola reto na barriga, a perna esticada, como quem arromba uma porta | sola · chute reto que empurra | o forte; joga na parede (19/11: o martelo era difícil para o H3 e igual ao jH, o gancho cheio saiu igual ao L e o soco por cima não ficou claro e é o H do p04) |
+| L | Soco reto com passo | Dá um passo curto e solta o soco reto da mão da frente, o braço esticado | punho · reto | abre o combo; rápido (19/11: o vídeo do dono, no jogo) |
+| M | Gancho que desce | Ergue o braço e desce o gancho curvado, o corpo afundando junto | punho · de cima para baixo | anda para dentro; repete (M → M) e cancela em pulo (19/11: o vídeo do dono, no jogo) |
+| H | Soco reto longo | Arma e solta o soco reto da mão de trás com o corpo inteiro, o pé de trás esticado | punho · reto longo | o forte; joga na parede (19/11: o vídeo do dono, no jogo) |
 | ↓ + L | Soco agachado | Agachado, soco curto e reto para a frente, o braço na linha do chão, na barriga do rival | punho · reto baixo | baixo rápido; abre (19/11: "na canela" fez o H3 socar o chão) |
 | ↓ + M | Chute na canela | Agachado, estica a perna da frente reta para a frente, rente ao chão, e acerta a canela com a sola | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui |
 | ↓ + H | Joelhada que sobe | Da agachada, salta para cima cravando o joelho de trás no alto, puxando o rival para baixo com as duas mãos | joelho · sobe | lançador para o combo no ar (19/11: o uppercut ficava igual ao S2) |
-| → + M | Martelada | Ergue o punho de trás acima da cabeça e desce a base do punho reto no alto da cabeça do rival, como quem bate um prego | base do punho · desce reto | golpe alto (pega quem está agachado) (19/11: a cabeçada ficou ruim no vídeo) |
+| → + M | Bica pulando | Pulinho para a frente e a sola esticada na altura do quadril | sola · pulando | golpe alto (pega quem está agachado) (19/11: o vídeo M_BAIXO do dono, no jogo) |
 | → + H | Ombrada que avança | Abaixa o ombro e se joga contra o rival em dois passos curtos | ombro · investida curta | golpe de comando: anda, empurra para a parede, cancela em especial |
 | → → + H | Lariat | Da corrida, o braço da frente esticado na altura do pescoço, o corpo todo atrás | braço · lariat | golpe de corrida: lança baixo para continuar |
 | L no ar | Soco em diagonal | No ar, soco reto da mão da frente em diagonal para a frente e para baixo, o braço esticado | punho · diagonal para baixo | rápido, com o braço inteiro (19/11: o joelho era curto; o soco de cima não ficou claro) |

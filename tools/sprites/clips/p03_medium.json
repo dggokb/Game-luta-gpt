@@ -2,23 +2,21 @@
   "id": "p03_medium",
   "javaName": "P03_MEDIUM",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_medium_sr_hd.png",
+  "source": "art/sprites/source/p03_medium_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_medium.webp",
   "report": "tools/sprites/reports/p03_medium.report.json",
   "preview": "android/app/build/sprite-review/p03_medium-import.png",
-  "expectedFrames": 14,
+  "expectedFrames": 16,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 768,
-  "rootX": 280,
+  "frameWidth": 512,
+  "rootX": 242,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Soco com avanco; quadro com rastro pulado, cada quadro no proprio tronco.",
   "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py",
-  "sourceReferences": [
-    "art/sprites/source/p03_medium_video_normalized.png"
-  ],
-  "frameHeight": 512,
-  "rootY": 476,
+  "sourceReferences": [],
+  "frameHeight": 576,
+  "rootY": 540,
   "pixelScale": 2.0,
   "reescala": [
     0.9709,
@@ -54,5 +52,20 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 103% (MEDIUM_KICK)"
-  ]
+  ],
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "17,21,27,31,37,41,49,57,59,61,63,65,67,71,77,85",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "121,270",
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

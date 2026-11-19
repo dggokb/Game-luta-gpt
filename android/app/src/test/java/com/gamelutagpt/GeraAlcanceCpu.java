@@ -23,7 +23,8 @@ public final class GeraAlcanceCpu {
 
     /** O alvo da medida (o corpo dele sai da conta: a tabela guarda a ponta, centro a frente). */
     static final String ALVO = "player_base";
-    static final String[] GOLPES = {"L", "M", "H", "2L", "2M", "2H", GolpeAlto.BINDING, "S", "S2", "S3", "S4"};
+    static final String[] GOLPES = {"L", "M", "H", "2L", "2M", "2H", GolpeAlto.BINDING, CancelSystem.COMMAND_HEAVY,
+        "S", "S2", "S3", "S4"};
     static final int PASSO = 2, MAX = 640;
 
     /** Golpes de chão do lutador que a tabela mede (corpo a corpo: projétil não tem ponta). */
@@ -37,7 +38,8 @@ public final class GeraAlcanceCpu {
                 if (s == null || s.air || s.projectile != null) continue;
             }
             if (g.equals("S") && (c.fighter.energyAir || c.fighter.energy == null)) continue;
-            if (g.equals(GolpeAlto.BINDING) && !c.moves.containsKey(g)) continue;
+            // → + M e → + H só de quem tem o golpe (sem ele, o → + M é montado do M e o → + H é o H).
+            if ((g.equals(GolpeAlto.BINDING) || g.equals(CancelSystem.COMMAND_HEAVY)) && !c.moves.containsKey(g)) continue;
             out.add(g);
         }
         return out;
@@ -74,7 +76,7 @@ public final class GeraAlcanceCpu {
             in.special = g.equals("S") ? "M" : g;
             return;
         }
-        if (g.equals(GolpeAlto.BINDING)) in.direction = 1;
+        if (g.equals(GolpeAlto.BINDING) || g.equals(CancelSystem.COMMAND_HEAVY)) in.direction = 1;   // → + M e → + H
         else if (g.startsWith("2")) in.direction = 3;
         char b = g.charAt(g.length() - 1);
         in.light = b == 'L';

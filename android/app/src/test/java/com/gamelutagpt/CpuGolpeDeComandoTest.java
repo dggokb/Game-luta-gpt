@@ -37,32 +37,43 @@ public class CpuGolpeDeComandoTest {
         assertTrue("o L emenda na ombrada", KOGA.attack("L").cancelsInto(CancelSystem.COMMAND_HEAVY));
     }
 
-    /** O jogador erra um golpe lento de longe; conta as vezes em que a CPU pune com o → + H. */
+    /**
+     * O jogador erra um golpe lento de longe (fora do alcance do H dela, dentro do da ombrada), com a
+     * CPU livre e parada; conta as vezes em que ela pune com o → + H.
+     */
     @Test public void aCpuPuneDeLongeComAOmbrada() {
-        int comOmbrada = 0;
-        for (long seed = 1; seed <= 60 && comOmbrada == 0; seed++) {
-            for (float gap : new float[] {170f, 200f, 230f}) {
-                CombatEngine e = new CombatEngine(new FighterState(WHIFFER, "P1"), new FighterState(KOGA, "CPU"),
-                    500f, 500f + gap, new CombatConfig());
-                AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
-                cpu.setEnabled(true);
-                cpu.setLevel(8);
-                FighterInput p = new FighterInput(), out = new FighterInput();
-                for (int i = 0; i < 20; i++) { cpu.fill(e, 1, out); e.step(p, out); p.clearPresses(); }
-                if (e.fighter(1).attacking() || !e.fighter(0).canAct()) continue;
-                p.heavy = true;
-                for (int i = 0; i < 70; i++) {
-                    cpu.fill(e, 1, out);
-                    e.step(p, out);
-                    p.clearPresses();
-                    if (e.fighter(1).attacking() && CancelSystem.COMMAND_HEAVY.equals(e.fighter(1).attack.id) &&
-                        cpu.lastReason != null && cpu.lastReason.startsWith("punir")) {
-                        comOmbrada++;
-                        break;
-                    }
+        int comOmbrada = 0, tentativas = 0;
+        for (long seed = 1; seed <= 200 && comOmbrada == 0; seed++) {
+            CombatEngine e = new CombatEngine(new FighterState(WHIFFER, "P1"), new FighterState(KOGA, "CPU"),
+                500f, 740f, new CombatConfig());
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setLevel(8);
+            FighterInput p = new FighterInput(), out = new FighterInput();
+            boolean livre = false;
+            for (int i = 0; i < 600 && !livre; i++) {
+                cpu.fill(e, 1, out);
+                e.step(p, out);
+                p.clearPresses();
+                CombatFighter a = e.fighter(0), c = e.fighter(1);
+                float gap = Math.abs(a.x - c.x);
+                livre = a.canAct() && c.canAct() && a.grounded && c.grounded && !c.attacking() && gap >= 200f && gap <= 270f;
+            }
+            if (!livre) continue;
+            tentativas++;
+            p.heavy = true;
+            for (int i = 0; i < 70; i++) {
+                cpu.fill(e, 1, out);
+                e.step(p, out);
+                p.clearPresses();
+                if (e.fighter(1).attacking() && CancelSystem.COMMAND_HEAVY.equals(e.fighter(1).attack.id) &&
+                    cpu.lastReason != null && cpu.lastReason.startsWith("punir")) {
+                    comOmbrada++;
+                    break;
                 }
             }
         }
+        assertTrue("tentativas válidas: " + tentativas, tentativas >= 3);
         assertTrue("a CPU puniu com a ombrada", comOmbrada >= 1);
     }
 }

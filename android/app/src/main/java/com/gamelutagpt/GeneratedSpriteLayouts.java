@@ -508,16 +508,16 @@ final class GeneratedSpriteLayouts {
     static final int P02_WALK_FORWARD_ROOT_Y = 453;
     static final int P02_WALK_FORWARD_FRAME_COUNT = 40;
 
-    static final int P03_BACKDASH_FRAME_WIDTH = 368;
-    static final int P03_BACKDASH_FRAME_HEIGHT = 512;
-    static final int P03_BACKDASH_ROOT_X = 195;
-    static final int P03_BACKDASH_ROOT_Y = 490;
-    static final int P03_BACKDASH_FRAME_COUNT = 10;
+    static final int P03_BACKDASH_FRAME_WIDTH = 449;
+    static final int P03_BACKDASH_FRAME_HEIGHT = 577;
+    static final int P03_BACKDASH_ROOT_X = 218;
+    static final int P03_BACKDASH_ROOT_Y = 564;
+    static final int P03_BACKDASH_FRAME_COUNT = 26;
 
-    static final int P03_CROUCH_FRAME_WIDTH = 341;
-    static final int P03_CROUCH_FRAME_HEIGHT = 465;
-    static final int P03_CROUCH_ROOT_X = 183;
-    static final int P03_CROUCH_ROOT_Y = 448;
+    static final int P03_CROUCH_FRAME_WIDTH = 426;
+    static final int P03_CROUCH_FRAME_HEIGHT = 469;
+    static final int P03_CROUCH_ROOT_X = 201;
+    static final int P03_CROUCH_ROOT_Y = 460;
     static final int P03_CROUCH_FRAME_COUNT = 8;
 
     static final int P03_CROUCH_HEAVY_FRAME_WIDTH = 337;
@@ -525,6 +525,12 @@ final class GeneratedSpriteLayouts {
     static final int P03_CROUCH_HEAVY_ROOT_X = 176;
     static final int P03_CROUCH_HEAVY_ROOT_Y = 629;
     static final int P03_CROUCH_HEAVY_FRAME_COUNT = 12;
+
+    static final int P03_CROUCH_IDLE_FRAME_WIDTH = 428;
+    static final int P03_CROUCH_IDLE_FRAME_HEIGHT = 379;
+    static final int P03_CROUCH_IDLE_ROOT_X = 202;
+    static final int P03_CROUCH_IDLE_ROOT_Y = 370;
+    static final int P03_CROUCH_IDLE_FRAME_COUNT = 14;
 
     static final int P03_CROUCH_LIGHT_FRAME_WIDTH = 564;
     static final int P03_CROUCH_LIGHT_FRAME_HEIGHT = 458;
@@ -538,11 +544,11 @@ final class GeneratedSpriteLayouts {
     static final int P03_CROUCH_MEDIUM_ROOT_Y = 339;
     static final int P03_CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int P03_DASH_FRAME_WIDTH = 562;
-    static final int P03_DASH_FRAME_HEIGHT = 370;
-    static final int P03_DASH_ROOT_X = 367;
-    static final int P03_DASH_ROOT_Y = 355;
-    static final int P03_DASH_FRAME_COUNT = 6;
+    static final int P03_DASH_FRAME_WIDTH = 527;
+    static final int P03_DASH_FRAME_HEIGHT = 448;
+    static final int P03_DASH_ROOT_X = 143;
+    static final int P03_DASH_ROOT_Y = 432;
+    static final int P03_DASH_FRAME_COUNT = 12;
 
     static final int P03_DEFEAT_FRAME_WIDTH = 413;
     static final int P03_DEFEAT_FRAME_HEIGHT = 479;
@@ -574,11 +580,11 @@ final class GeneratedSpriteLayouts {
     static final int P03_ENERGY_ROOT_Y = 474;
     static final int P03_ENERGY_FRAME_COUNT = 11;
 
-    static final int P03_FALL_FRAME_WIDTH = 302;
-    static final int P03_FALL_FRAME_HEIGHT = 524;
-    static final int P03_FALL_ROOT_X = 156;
-    static final int P03_FALL_ROOT_Y = 508;
-    static final int P03_FALL_FRAME_COUNT = 6;
+    static final int P03_FALL_FRAME_WIDTH = 307;
+    static final int P03_FALL_FRAME_HEIGHT = 536;
+    static final int P03_FALL_ROOT_X = 128;
+    static final int P03_FALL_ROOT_Y = 526;
+    static final int P03_FALL_FRAME_COUNT = 5;
 
     static final int P03_FALL_DOWN_FRAME_WIDTH = 610;
     static final int P03_FALL_DOWN_FRAME_HEIGHT = 421;
@@ -592,11 +598,17 @@ final class GeneratedSpriteLayouts {
     static final int P03_GETUP_ROOT_Y = 588;
     static final int P03_GETUP_FRAME_COUNT = 12;
 
-    static final int P03_HEAVY_FRAME_WIDTH = 600;
-    static final int P03_HEAVY_FRAME_HEIGHT = 550;
-    static final int P03_HEAVY_ROOT_X = 327;
-    static final int P03_HEAVY_ROOT_Y = 521;
-    static final int P03_HEAVY_FRAME_COUNT = 23;
+    static final int P03_GOLPE_ALTO_FRAME_WIDTH = 529;
+    static final int P03_GOLPE_ALTO_FRAME_HEIGHT = 471;
+    static final int P03_GOLPE_ALTO_ROOT_X = 265;
+    static final int P03_GOLPE_ALTO_ROOT_Y = 462;
+    static final int P03_GOLPE_ALTO_FRAME_COUNT = 18;
+
+    static final int P03_HEAVY_FRAME_WIDTH = 519;
+    static final int P03_HEAVY_FRAME_HEIGHT = 476;
+    static final int P03_HEAVY_ROOT_X = 197;
+    static final int P03_HEAVY_ROOT_Y = 457;
+    static final int P03_HEAVY_FRAME_COUNT = 21;
 
     static final int P03_HIT_AIR_FRAME_WIDTH = 392;
     static final int P03_HIT_AIR_FRAME_HEIGHT = 463;
@@ -616,11 +628,17 @@ final class GeneratedSpriteLayouts {
     static final int P03_HIT_STAND_ROOT_Y = 490;
     static final int P03_HIT_STAND_FRAME_COUNT = 9;
 
-    static final int P03_IDLE_FRAME_WIDTH = 296;
-    static final int P03_IDLE_FRAME_HEIGHT = 477;
-    static final int P03_IDLE_ROOT_X = 144;
-    static final int P03_IDLE_ROOT_Y = 468;
-    static final int P03_IDLE_FRAME_COUNT = 16;
+    static final int P03_IDLE_FRAME_WIDTH = 421;
+    static final int P03_IDLE_FRAME_HEIGHT = 492;
+    static final int P03_IDLE_ROOT_X = 197;
+    static final int P03_IDLE_ROOT_Y = 483;
+    static final int P03_IDLE_FRAME_COUNT = 12;
+
+    static final int P03_IDLE_2_FRAME_WIDTH = 421;
+    static final int P03_IDLE_2_FRAME_HEIGHT = 492;
+    static final int P03_IDLE_2_ROOT_X = 197;
+    static final int P03_IDLE_2_ROOT_Y = 483;
+    static final int P03_IDLE_2_FRAME_COUNT = 54;
 
     static final int P03_INTRO_FRAME_WIDTH = 463;
     static final int P03_INTRO_FRAME_HEIGHT = 504;
@@ -628,17 +646,17 @@ final class GeneratedSpriteLayouts {
     static final int P03_INTRO_ROOT_Y = 479;
     static final int P03_INTRO_FRAME_COUNT = 27;
 
-    static final int P03_JAB_FRAME_WIDTH = 367;
-    static final int P03_JAB_FRAME_HEIGHT = 475;
-    static final int P03_JAB_ROOT_X = 144;
-    static final int P03_JAB_ROOT_Y = 466;
-    static final int P03_JAB_FRAME_COUNT = 12;
+    static final int P03_JAB_FRAME_WIDTH = 450;
+    static final int P03_JAB_FRAME_HEIGHT = 469;
+    static final int P03_JAB_ROOT_X = 197;
+    static final int P03_JAB_ROOT_Y = 460;
+    static final int P03_JAB_FRAME_COUNT = 10;
 
-    static final int P03_JUMP_FRAME_WIDTH = 310;
-    static final int P03_JUMP_FRAME_HEIGHT = 520;
-    static final int P03_JUMP_ROOT_X = 155;
-    static final int P03_JUMP_ROOT_Y = 505;
-    static final int P03_JUMP_FRAME_COUNT = 6;
+    static final int P03_JUMP_FRAME_WIDTH = 319;
+    static final int P03_JUMP_FRAME_HEIGHT = 600;
+    static final int P03_JUMP_ROOT_X = 154;
+    static final int P03_JUMP_ROOT_Y = 590;
+    static final int P03_JUMP_FRAME_COUNT = 8;
 
     static final int P03_JUMP_HEAVY_FRAME_WIDTH = 463;
     static final int P03_JUMP_HEAVY_FRAME_HEIGHT = 541;
@@ -658,23 +676,29 @@ final class GeneratedSpriteLayouts {
     static final int P03_JUMP_LIGHT_ROOT_Y = 468;
     static final int P03_JUMP_LIGHT_FRAME_COUNT = 7;
 
-    static final int P03_LAND_FRAME_WIDTH = 330;
-    static final int P03_LAND_FRAME_HEIGHT = 521;
-    static final int P03_LAND_ROOT_X = 160;
-    static final int P03_LAND_ROOT_Y = 504;
-    static final int P03_LAND_FRAME_COUNT = 4;
+    static final int P03_LAND_FRAME_WIDTH = 421;
+    static final int P03_LAND_FRAME_HEIGHT = 484;
+    static final int P03_LAND_ROOT_X = 197;
+    static final int P03_LAND_ROOT_Y = 455;
+    static final int P03_LAND_FRAME_COUNT = 9;
 
     static final int P03_MEDIUM_FRAME_WIDTH = 427;
-    static final int P03_MEDIUM_FRAME_HEIGHT = 496;
-    static final int P03_MEDIUM_ROOT_X = 166;
-    static final int P03_MEDIUM_ROOT_Y = 475;
-    static final int P03_MEDIUM_FRAME_COUNT = 14;
+    static final int P03_MEDIUM_FRAME_HEIGHT = 481;
+    static final int P03_MEDIUM_ROOT_X = 200;
+    static final int P03_MEDIUM_ROOT_Y = 471;
+    static final int P03_MEDIUM_FRAME_COUNT = 16;
 
-    static final int P03_RISE_FRAME_WIDTH = 360;
-    static final int P03_RISE_FRAME_HEIGHT = 496;
-    static final int P03_RISE_ROOT_X = 188;
-    static final int P03_RISE_ROOT_Y = 478;
-    static final int P03_RISE_FRAME_COUNT = 6;
+    static final int P03_OMBRADA_FRAME_WIDTH = 502;
+    static final int P03_OMBRADA_FRAME_HEIGHT = 471;
+    static final int P03_OMBRADA_ROOT_X = 280;
+    static final int P03_OMBRADA_ROOT_Y = 457;
+    static final int P03_OMBRADA_FRAME_COUNT = 23;
+
+    static final int P03_RISE_FRAME_WIDTH = 425;
+    static final int P03_RISE_FRAME_HEIGHT = 468;
+    static final int P03_RISE_ROOT_X = 200;
+    static final int P03_RISE_ROOT_Y = 459;
+    static final int P03_RISE_FRAME_COUNT = 10;
 
     static final int P03_SPECIAL_S2_FRAME_WIDTH = 493;
     static final int P03_SPECIAL_S2_FRAME_HEIGHT = 736;
@@ -718,17 +742,17 @@ final class GeneratedSpriteLayouts {
     static final int P03_VICTORY_ROOT_Y = 479;
     static final int P03_VICTORY_FRAME_COUNT = 33;
 
-    static final int P03_WALK_BACK_FRAME_WIDTH = 350;
-    static final int P03_WALK_BACK_FRAME_HEIGHT = 494;
-    static final int P03_WALK_BACK_ROOT_X = 175;
-    static final int P03_WALK_BACK_ROOT_Y = 478;
-    static final int P03_WALK_BACK_FRAME_COUNT = 19;
+    static final int P03_WALK_BACK_FRAME_WIDTH = 449;
+    static final int P03_WALK_BACK_FRAME_HEIGHT = 504;
+    static final int P03_WALK_BACK_ROOT_X = 203;
+    static final int P03_WALK_BACK_ROOT_Y = 494;
+    static final int P03_WALK_BACK_FRAME_COUNT = 42;
 
-    static final int P03_WALK_FORWARD_FRAME_WIDTH = 333;
-    static final int P03_WALK_FORWARD_FRAME_HEIGHT = 496;
-    static final int P03_WALK_FORWARD_ROOT_X = 162;
-    static final int P03_WALK_FORWARD_ROOT_Y = 478;
-    static final int P03_WALK_FORWARD_FRAME_COUNT = 36;
+    static final int P03_WALK_FORWARD_FRAME_WIDTH = 482;
+    static final int P03_WALK_FORWARD_FRAME_HEIGHT = 506;
+    static final int P03_WALK_FORWARD_ROOT_X = 222;
+    static final int P03_WALK_FORWARD_ROOT_Y = 496;
+    static final int P03_WALK_FORWARD_FRAME_COUNT = 56;
 
     static final int P04_BACKDASH_FRAME_WIDTH = 384;
     static final int P04_BACKDASH_FRAME_HEIGHT = 544;

@@ -57,7 +57,9 @@ public class CpuReachTest {
         for (int i = 0; i < 50; i++) {
             String pick = CpuReach.pickInRange(OpponentAi.GROUND_ATTACKS_VS_CROUCH, OpponentAi.GROUND_WEIGHTS_VS_CROUCH,
                 koga, false, 150f, body, true, i / 50.0);
-            assertFalse(pick, "L".equals(pick) || "M".equals(pick) || "H".equals(pick) || "6M".equals(pick));
+            assertFalse(pick, "L".equals(pick) || "M".equals(pick) || "H".equals(pick));
+            // O → + M dele (19/11, a bica pulando do vídeo) é golpe alto de verdade: só vale se acerta.
+            if ("6M".equals(pick)) assertTrue("o 6M acerta o agachado", GeraAlcanceCpu.acerta("p03", "6M", 150, true));
         }
     }
 
