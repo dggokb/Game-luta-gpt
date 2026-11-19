@@ -575,9 +575,9 @@ final class GeneratedSpriteLayouts {
     static final int P03_DEFENSE_STAND_FRAME_COUNT = 8;
 
     static final int P03_ENERGY_FRAME_WIDTH = 731;
-    static final int P03_ENERGY_FRAME_HEIGHT = 595;
+    static final int P03_ENERGY_FRAME_HEIGHT = 588;
     static final int P03_ENERGY_ROOT_X = 212;
-    static final int P03_ENERGY_ROOT_Y = 579;
+    static final int P03_ENERGY_ROOT_Y = 572;
     static final int P03_ENERGY_FRAME_COUNT = 20;
 
     static final int P03_FALL_FRAME_WIDTH = 302;

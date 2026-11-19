@@ -6210,7 +6210,12 @@ public class GameView extends SurfaceView
             // A cauda nasce na mão: nada da folha atrás do ponto de onde a Onda saiu (sem isso ela
             // atravessa o corpo de quem soltou).
             c.save();
-            if (p.direction > 0) c.clipRect(p.startX, -100000f, 100000f, 100000f);
+            // O X da Garra do tigre (Kōga, 19/11) nasce inteiro no lugar do X parado na frente dele: sem
+            // o corte na mão (cortava a metade de trás do X).
+            boolean inteiro = engine.fighter(p.ownerIndex).character().moves.containsKey(CancelSystem.ABERTURA);
+            if (inteiro) {
+                // sem recorte
+            } else if (p.direction > 0) c.clipRect(p.startX, -100000f, 100000f, 100000f);
             else c.clipRect(-100000f, -100000f, p.startX, 100000f);
             boolean desenhou = efeitos.desenharEm(c, nome, ms, p.x + p.direction * ONDA_FOLHA_PONTA * k, p.y, k, p.direction < 0);
             c.restore();
