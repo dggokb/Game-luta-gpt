@@ -94,11 +94,11 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 |---|---|---|---|---|
 | L | Gancho curto | Gancho curto da mão da frente na altura do rosto; só o braço mexe, o corpo e os pés ficam parados; volta rápido para a guarda | punho · gancho curto | abre o combo; rápido |
 | M | Chute na coxa | A perna de trás vem num chute baixo e duro de canela na coxa do rival, o quadril girando; as mãos ficam na guarda | canela · chute baixo | anda para dentro; repete (M → M) e cancela em pulo, como hoje (19/11: o soco reto saiu igual ao L e ao H) |
-| H | Soco por cima | Arma a mão de trás lá atrás do ombro e despeja o soco por cima, de cima para baixo no rosto, o corpo inteiro jogado para a frente | punho · de cima com o corpo | o forte; joga na parede (19/11: o martelo de duas mãos era difícil para o H3 e igual ao jH; o gancho cheio saiu igual ao L) |
+| H | Bica na barriga | Sobe o joelho da frente e crava a sola reto na barriga, a perna esticada, como quem arromba uma porta | sola · chute reto que empurra | o forte; joga na parede (19/11: o martelo era difícil para o H3 e igual ao jH, o gancho cheio saiu igual ao L e o soco por cima não ficou claro e é o H do p04) |
 | ↓ + L | Soco baixo | Agachado, soco curto na canela | punho · baixo | baixo rápido; abre |
 | ↓ + M | Rasteira de pisão | Agachado, estica a perna e pisa no tornozelo do rival, rente ao chão | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui |
 | ↓ + H | Uppercut de baixo | Da agachada, sobe com o uppercut largo da mão de trás, levantando o corpo inteiro | punho · uppercut | lançador para o combo no ar |
-| → + M | Cabeçada | Dá um passo e bate a testa de cima para baixo no rosto do rival | cabeça · desce | golpe alto (pega quem está agachado) |
+| → + M | Martelada | Ergue o punho de trás acima da cabeça e desce a base do punho reto no alto da cabeça do rival, como quem bate um prego | base do punho · desce reto | golpe alto (pega quem está agachado) (19/11: a cabeçada ficou ruim no vídeo) |
 | → + H | Ombrada que avança | Abaixa o ombro e se joga contra o rival em dois passos curtos | ombro · investida curta | golpe de comando: anda, empurra para a parede, cancela em especial |
 | → → + H | Lariat | Da corrida, o braço da frente esticado na altura do pescoço, o corpo todo atrás | braço · lariat | golpe de corrida: lança baixo para continuar |
 | L no ar | Soco de cima | No ar, o braço da frente passa por cima e desce largo no rosto, o corpo inclinado para a frente | punho · de cima | rápido, mas com o braço inteiro (19/11: o joelho era curto e pouco agressivo) |
