@@ -6,12 +6,12 @@
   "output": "android/app/src/main/res/drawable-nodpi/p03_dash.webp",
   "report": "tools/sprites/reports/p03_dash.report.json",
   "preview": "android/app/build/sprite-review/p03_dash-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 1024,
-  "rootX": 600,
+  "frameWidth": 576,
+  "rootX": 168,
   "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Corrida 20-35, 1 a cada 3; chao, poeira e linhas de velocidade recortados.",
   "sourceReferences": [
     "art/sprites/source/p03_dash_video_normalized.png"
@@ -37,5 +37,20 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 104% (DASH)"
-  ]
+  ],
+  "video": {
+    "arquivo": "p03_dash.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "42,43,44,45,46,47,48,49,50,51,52,53",
+    "largura": 288,
+    "raiz": "84,238",
+    "colunas": 7,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

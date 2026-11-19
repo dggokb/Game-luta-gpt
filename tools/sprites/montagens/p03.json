@@ -1,13 +1,244 @@
 {
-  "_doc": "Kōga (p03), vídeos H3 do concept novo (18/11). Receita de clipes montados (montagem.py).",
+  "_doc": "Kōga (p03), vídeos H3 de 19/11 (linha brigão, imagens de 19/11). Receita de clipes montados (montagem.py).",
   "_opcoes": {
     "escala": 0.4139,
-    "motivo": "vídeos H3 do Kōga novo: a inicio_centro_h3 de 18/11 (556 px de guarda) na mesma escala do Kōga de antes",
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
     "densidade": 2,
     "nitidez": true
   },
+  "idle": {
+    "_doc": "Idle (19/11, vídeo idle do dono): sobe e desce com a respiração; uma respirada do 1 ao 61 (o 63 é o 1, guarda 0,983).",
+    "trechos": [
+      [
+        "idle",
+        0,
+        124
+      ]
+    ],
+    "quadros": "1-61/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "IDLE": {
+        "loop": true
+      },
+      "COMBAT": {
+        "frames": "0"
+      }
+    }
+  },
+  "idle_2": {
+    "_doc": "Segundo idle (19/11, vídeo idle2): cruza os braços na frente, segura e volta à guarda (0-106).",
+    "trechos": [
+      [
+        "idle2",
+        0,
+        124
+      ]
+    ],
+    "quadros": "0-106/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "IDLE_2": {}
+    }
+  },
+  "walk_forward": {
+    "_doc": "Andar para frente: um ciclo (54-109; o 110 bate 0,97 com o 54), pé plantado. Anda a 350 px/s (o walkSpeed dele) com o ciclo 2,51x o do vídeo (2,32 px por quadro no vídeo).",
+    "trechos": [
+      [
+        "frente",
+        0,
+        124
+      ]
+    ],
+    "quadros": "54-109",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "WALK_FORWARD": {
+        "distancia": "video",
+        "velocidade": 350,
+        "acelerar": 2.51,
+        "loop": true
+      }
+    }
+  },
+  "walk_back": {
+    "_doc": "Andar para trás: um ciclo (36-77; o 78 bate 0,98 com o 36), pé plantado. Anda a 230 px/s com o ciclo 1,72x o do vídeo (2,23 px por quadro no vídeo).",
+    "trechos": [
+      [
+        "tras",
+        0,
+        124
+      ]
+    ],
+    "quadros": "36-77",
+    "opcoes": {
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "WALK_BACK": {
+        "distancia": "video",
+        "velocidade": 230,
+        "acelerar": 1.72,
+        "loop": true
+      }
+    }
+  },
+  "dash": {
+    "_doc": "Corrida: um ciclo da passada (42-53, período de 12 quadros), fixo pelo corpo, em loop. A poeira sai.",
+    "trechos": [
+      [
+        "dash",
+        0,
+        124,
+        "fixo_corpo"
+      ]
+    ],
+    "quadros": "42-53",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false,
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "DASH": {
+        "distancia": 30,
+        "loop": true
+      }
+    }
+  },
+  "backdash": {
+    "_doc": "Backdash: pulo alto para trás (54-67), pousa agachado (68-80) e volta à guarda (82-111). O corpo fica na raiz (registro): quem anda é o motor.",
+    "trechos": [
+      [
+        "backDash",
+        0,
+        124
+      ]
+    ],
+    "quadros": "52-92/2,96,100,104,108,111",
+    "opcoes": {
+      "fixar": "registro",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "BACKDASH": {}
+    }
+  },
+  "crouch": {
+    "_doc": "Agachar: a descida (15-29).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "15-29/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH": {}
+    }
+  },
+  "crouch_idle": {
+    "_doc": "Agachado parado, respirando (29-55; o 57 é o 29).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "29-55/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "CROUCH_IDLE": {
+        "loop": true
+      }
+    }
+  },
+  "rise": {
+    "_doc": "Levantar (81-99).",
+    "trechos": [
+      [
+        "agachar",
+        0,
+        124
+      ]
+    ],
+    "quadros": "81-99/2",
+    "opcoes": {
+      "fixar": "video"
+    },
+    "animacoes": {
+      "RISE": {}
+    }
+  },
+  "jump": {
+    "_doc": "Subida do pulo: sai do chão esticado (71) e encolhe no alto (86). O agachar antes do impulso fica de fora (o motor já sai do chão); 78-85 tocam a borda de cima do vídeo (cabelo cortado) e ficam de fora. Pés na raiz: quem sobe é o motor.",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "71,72,73,74,75,76,77,86",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "JUMP": {}
+    }
+  },
+  "fall": {
+    "_doc": "Descida do pulo: encolhido (87-89) e esticando as pernas para o chão (90-91). Pés na raiz.",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "87,88,89,90,91",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": true
+    },
+    "animacoes": {
+      "FALL": {}
+    }
+  },
+  "land": {
+    "_doc": "Aterrissagem: toca o chão (92), agachado (94-99) e de volta à guarda (100-106). A poeira do vídeo sai.",
+    "trechos": [
+      [
+        "pulo",
+        0,
+        124
+      ]
+    ],
+    "quadros": "92,93,94,96,98,100,102,104,106",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "LAND": {}
+    }
+  },
   "jab": {
-    "_doc": "L (18/11, vídeo L do dono, H3 do concept novo): o vídeo tem seis estocadas seguidas; fica só a 1ª, da guarda (0, 0,98 da imagem inicial) à guarda (24, 0,95): prepara (4-7), estica (8-12) e volta (14-24). Sem ajuste de emenda (o dono: 'se voltar no idle a gente usa sem ajuste nem nada'): o emendar_idle mede o eixo do tronco (+10 px), mas a pose nova tem o punho mais recolhido que a do idle antigo; deslocar 10 px deixou as costas 9 px fora e deu um pulo na troca. Sem deslocar, as costas caem 2 px do idle. Fica na lista de exceções.",
+    "_doc": "L (19/11, vídeo L do dono): soco reto da mão da frente com um passo curto; prepara (16-20), estica (22, o impacto), segura (24-34) e volta à guarda (36-46). Tempos à mão: o impacto no 4º quadro do golpe (83 ms, a janela ativa do L).",
     "trechos": [
       [
         "L",
@@ -15,19 +246,17 @@
         124
       ]
     ],
-    "quadros": "0,4,6,7,8,10,14,16,18,20,22,24",
+    "quadros": "16,18,20,22,24,28,34,38,42,46",
     "opcoes": {
       "fixar": "video"
     },
     "animacoes": {
       "LIGHT_JAB": {
-        "impacto": 4,
+        "impacto": 3,
         "tempos": [
-          17,
-          17,
-          17,
-          17,
-          25,
+          28,
+          28,
+          27,
           25,
           17,
           17,
@@ -39,54 +268,168 @@
       }
     }
   },
-  "idle": {
-    "_doc": "Idle (18/11, teste do dono: o idle tirado do próprio vídeo L, para emendar sem quebra com os golpes do H3): a guarda entre a 4ª e a 5ª estocada (86-101), indo e voltando (o começo e o fim do trecho batem só 0,93; ida e volta fecha sem emenda). O 1º quadro bate 0,935 com a guarda em que o L começa. Substitui o idle do Seedance (o desenho e as proporções do Seedance não batem com as do H3: quebra na troca).",
+  "medium": {
+    "_doc": "M (19/11, vídeo M do dono): sobe o braço (17-31) e desce o gancho baixo (37, o impacto); os quadros 33-35 têm o clarão branco do vídeo e ficam de fora. Segura (41-57) e volta à guarda (59-85).",
     "trechos": [
       [
-        "L",
+        "M",
         0,
         124
       ]
     ],
-    "quadros": "86-101",
+    "quadros": "17,21,27,31,37,41,49,57,59,61,63,65,67,71,77,85",
     "opcoes": {
-      "fixar": "video"
+      "fixar": "video",
+      "sem_poeira": true
     },
     "animacoes": {
-      "IDLE": {
-        "frames": "0-15,14-1",
-        "loop": true,
+      "MEDIUM_KICK": {
+        "impacto": 4,
         "tempos": [
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42,
-          42
+          33,
+          33,
+          33,
+          34,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20
+        ]
+      }
+    }
+  },
+  "heavy": {
+    "_doc": "H (19/11, vídeo H do dono): arma (18-30) e solta o soco reto longo da mão de trás com o corpo todo (32, o impacto); o 34 tem um brilho e fica de fora. Segura (36-48) e volta à guarda (50-76).",
+    "trechos": [
+      [
+        "H",
+        0,
+        124
+      ]
+    ],
+    "quadros": "18,20,22,24,26,28,30,32,36,40,44,48,50,52,54,56,58,60,64,68,76",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "HEAVY_STRAIGHT": {
+        "impacto": 7,
+        "tempos": [
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24
+        ]
+      }
+    }
+  },
+  "golpe_alto": {
+    "_doc": "→ + M (19/11, vídeo M_BAIXO do dono): golpe alto; pulinho (18-26) e o chute de sola esticado (32, o impacto); 28-30 têm as faíscas e a fumaça do vídeo e ficam de fora. Segura (34-40) e volta (42-68). O corpo fica na raiz (registro): o pulinho para a frente e a volta do vídeo saem, quem anda é o motor.",
+    "trechos": [
+      [
+        "M_BAIXO",
+        0,
+        124
+      ]
+    ],
+    "quadros": "18,20,22,24,26,32,36,40,42,44,46,48,50,52,54,58,64,68",
+    "opcoes": {
+      "fixar": "registro",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "GOLPE_ALTO": {
+        "impacto": 5,
+        "tempos": [
+          66,
+          66,
+          67,
+          67,
+          67,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ]
+      }
+    }
+  },
+  "ombrada": {
+    "_doc": "→ + H, Ombrada (19/11, vídeo H_FRENTE do dono): abaixa (9-21) e se joga com o ombro (23-45; o impacto no 39), volta (47-57) e à guarda (61-79). O corpo fica na raiz (registro): a investida e a volta do vídeo saem, quem anda é o motor (avanço do golpe).",
+    "trechos": [
+      [
+        "H_FRENTE",
+        0,
+        124
+      ]
+    ],
+    "quadros": "9,13,21,25,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,61,65,71,79",
+    "opcoes": {
+      "fixar": "registro",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "OMBRADA": {
+        "impacto": 9,
+        "tempos": [
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33
         ]
       }
     }

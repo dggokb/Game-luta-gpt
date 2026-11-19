@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p03_walk_back.webp",
   "report": "tools/sprites/reports/p03_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p03_walk_back-import.png",
-  "expectedFrames": 19,
+  "expectedFrames": 42,
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
@@ -15,9 +15,9 @@
     "art/sprites/source/p03_walk_back_video_normalized.png"
   ],
   "frameWidth": 512,
-  "frameHeight": 514,
-  "rootX": 256,
-  "rootY": 478,
+  "frameHeight": 576,
+  "rootX": 234,
+  "rootY": 540,
   "pixelScale": 2.0,
   "reescala": [
     0.9615,
@@ -63,5 +63,18 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 104% (WALK_BACK)"
-  ]
+  ],
+  "video": {
+    "arquivo": "tras.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "117,270",
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

@@ -15,9 +15,9 @@
     "art/sprites/source/p03_crouch_video_normalized.png"
   ],
   "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 256,
-  "rootY": 476,
+  "frameHeight": 576,
+  "rootX": 244,
+  "rootY": 540,
   "pixelScale": 2.0,
   "reescala": [
     1.0204,
@@ -41,5 +41,19 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 98% (CROUCH)"
-  ]
+  ],
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "15,17,19,21,23,25,27,29",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "122,270",
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

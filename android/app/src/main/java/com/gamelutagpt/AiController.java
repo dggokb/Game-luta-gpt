@@ -2485,7 +2485,11 @@ final class AiController {
         return punirComOMelhor(me, target, left, gap, target.crouchingBody(), out, "punir na defesa");
     }
 
-    static final String[] NORMAIS_PUNICAO = {"H", "2H", "2M", "M", GolpeAlto.BINDING, "L", "2L"};
+    /**
+     * Os golpes de chão da punição, pelo dano. O → + H (golpe de comando, 19/11) entra também: o que
+     * avança (a ombrada do Kōga, o Oi-zuki da Natisuko) pega de mais longe que o H.
+     */
+    static final String[] NORMAIS_PUNICAO = {"H", CancelSystem.COMMAND_HEAVY, "2H", "2M", "M", GolpeAlto.BINDING, "L", "2L"};
     /** Quadros a mais que o especial de avanço precisa caber na brecha para valer a punição. */
     static final int FOLGA_ESPECIAL = 8;
 
@@ -3282,8 +3286,11 @@ final class AiController {
         // especial com a defesa que veio antes (← ↙ ↓ + H vira o S3).
         if (ComboBook.crouching(step)) out.direction = me.facing > 0 ? 2 : 4;
         int forward = me.facing > 0 ? 1 : 5;
-        if (GolpeAlto.BINDING.equals(step)) out.direction = forward;   // → + M: o golpe alto
-        else if (out.direction == forward) out.direction = 0;          // M andando não vira o 6M
+        if (GolpeAlto.BINDING.equals(step) || CancelSystem.COMMAND_HEAVY.equals(step)) {
+            out.direction = forward;   // → + M (o golpe alto) e → + H (o golpe de comando)
+        } else if (out.direction == forward) {
+            out.direction = 0;         // M andando não vira o 6M
+        }
         char button = ComboBook.button(step);
         out.light = button == 'L';
         out.medium = button == 'M';
