@@ -114,7 +114,7 @@
     }
   },
   "backdash": {
-    "_doc": "Backdash: pulo alto para trás (54-67), pousa agachado (68-80) e volta à guarda (82-111). O corpo fica na raiz (registro): quem anda é o motor.",
+    "_doc": "Backdash (19/11, o dono: 'não tá bem animado'): o motor dá 250 ms (15 quadros); a animação de antes tinha 2,5 s e só a preparação aparecia. Agora o salto para trás (54-68), o pouso (70-76) e a volta curta (82-88), em ~400 ms. O corpo fica na raiz (registro): quem anda é o motor.",
     "trechos": [
       [
         "backDash",
@@ -122,13 +122,29 @@
         124
       ]
     ],
-    "quadros": "52-92/2,96,100,104,108,111",
+    "quadros": "54,56,58,60,62,64,66,68,70,72,76,82,88",
     "opcoes": {
       "fixar": "registro",
       "sem_poeira": true
     },
     "animacoes": {
-      "BACKDASH": {}
+      "BACKDASH": {
+        "tempos": [
+          22,
+          22,
+          22,
+          22,
+          22,
+          22,
+          22,
+          22,
+          22,
+          22,
+          50,
+          60,
+          70
+        ]
+      }
     }
   },
   "crouch": {
@@ -168,7 +184,7 @@
     }
   },
   "rise": {
-    "_doc": "Levantar (81-99).",
+    "_doc": "Levantar (81-99). Tempos 33 ms (19/11, o dono: 'levantar pós agachado tá muito lerdo'; o vídeo dava 830 ms).",
     "trechos": [
       [
         "agachar",
@@ -181,7 +197,20 @@
       "fixar": "video"
     },
     "animacoes": {
-      "RISE": {}
+      "RISE": {
+        "tempos": [
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33
+        ]
+      }
     }
   },
   "jump": {
@@ -203,7 +232,7 @@
     }
   },
   "fall": {
-    "_doc": "Descida do pulo: encolhido (87-89) e esticando as pernas para o chão (90-91). Pés na raiz.",
+    "_doc": "Descida do pulo: encolhido (86-89) e esticando as pernas (90). O 91 tem os pés cortados na borda de baixo do vídeo e pulava o desenho (19/11, o dono: 'descida do pulo tá bugada'). Pés na raiz.",
     "trechos": [
       [
         "pulo",
@@ -211,7 +240,7 @@
         124
       ]
     ],
-    "quadros": "87,88,89,90,91",
+    "quadros": "86,87,88,89,90",
     "opcoes": {
       "fixar": "video",
       "pe_no_chao": true
@@ -255,16 +284,16 @@
       "LIGHT_JAB": {
         "impacto": 3,
         "tempos": [
-          28,
-          28,
-          27,
-          25,
+          19,
+          19,
+          19,
+          57,
+          16,
+          16,
+          16,
           17,
-          17,
-          17,
-          17,
-          17,
-          17
+          16,
+          16
         ]
       }
     }
@@ -287,22 +316,22 @@
       "MEDIUM_KICK": {
         "impacto": 4,
         "tempos": [
-          33,
-          33,
-          33,
-          34,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20,
-          20
+          27,
+          27,
+          26,
+          28,
+          88,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          17,
+          16,
+          16
         ]
       }
     }
@@ -325,27 +354,27 @@
       "HEAVY_STRAIGHT": {
         "impacto": 7,
         "tempos": [
-          26,
-          26,
-          26,
-          26,
-          26,
-          26,
-          26,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24,
-          24
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          95,
+          21,
+          22,
+          21,
+          21,
+          21,
+          22,
+          21,
+          21,
+          21,
+          22,
+          21,
+          21,
+          21
         ]
       }
     }
@@ -373,25 +402,25 @@
           67,
           67,
           67,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23
+          60,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          19,
+          20,
+          20,
+          20,
+          20,
+          20
         ]
       }
     }
   },
   "ombrada": {
-    "_doc": "→ + H, Ombrada (19/11, vídeo H_FRENTE do dono): abaixa (9-21) e se joga com o ombro (23-45; o impacto no 39), volta (47-57) e à guarda (61-79). O corpo fica na raiz (registro): a investida e a volta do vídeo saem, quem anda é o motor (avanço do golpe).",
+    "_doc": "→ + H, Ombrada (19/11, vídeo H_FRENTE do dono): abaixa (9-21) e se joga com o ombro (25-41; o impacto no 39) e se endireita na guarda (53-79). Os quadros 43-51 do vídeo (ele volta andando de costas) ficam de fora: com o corpo na raiz pareciam ele correr no lugar e andar de ré (19/11, o dono: 'frente H ficou muito estranho'). O corpo fica na raiz (registro): quem anda é o motor.",
     "trechos": [
       [
         "H_FRENTE",
@@ -399,7 +428,7 @@
         124
       ]
     ],
-    "quadros": "9,13,21,25,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,61,65,71,79",
+    "quadros": "9,13,21,25,29,31,33,35,37,39,41,53,55,57,61,65,71,79",
     "opcoes": {
       "fixar": "registro",
       "sem_poeira": true
@@ -408,29 +437,24 @@
       "OMBRADA": {
         "impacto": 9,
         "tempos": [
-          26,
-          26,
-          26,
-          26,
-          26,
-          26,
-          26,
-          26,
-          26,
+          20,
+          20,
+          20,
+          20,
+          20,
+          19,
+          20,
+          20,
+          20,
+          86,
+          33,
+          33,
+          34,
           33,
           33,
           33,
           33,
-          33,
-          33,
-          33,
-          33,
-          33,
-          33,
-          33,
-          33,
-          33,
-          33
+          34
         ]
       }
     }
@@ -453,18 +477,18 @@
       "CROUCH_LIGHT": {
         "impacto": 3,
         "tempos": [
-          33,
-          33,
-          34,
+          26,
+          26,
+          27,
+          18,
+          44,
+          18,
+          17,
+          17,
           18,
           18,
-          18,
-          18,
-          18,
-          18,
-          18,
-          18,
-          18,
+          17,
+          17,
           18
         ]
       }
@@ -488,21 +512,21 @@
       "CROUCH_MEDIUM": {
         "impacto": 5,
         "tempos": [
+          29,
+          29,
+          30,
+          30,
+          30,
+          17,
+          61,
+          33,
+          32,
+          33,
+          32,
           33,
           33,
-          33,
-          34,
-          34,
           32,
-          32,
-          32,
-          32,
-          32,
-          32,
-          32,
-          32,
-          32,
-          32
+          33
         ]
       }
     }
@@ -525,23 +549,23 @@
       "CROUCH_HEAVY": {
         "impacto": 3,
         "tempos": [
-          61,
-          61,
-          61,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31
+          54,
+          55,
+          54,
+          111,
+          26,
+          27,
+          26,
+          26,
+          27,
+          26,
+          27,
+          26,
+          26,
+          27,
+          26,
+          26,
+          27
         ]
       }
     }
@@ -565,16 +589,16 @@
       "JUMP_LIGHT": {
         "impacto": 2,
         "tempos": [
-          42,
-          41,
-          19,
-          19,
-          19,
-          19,
-          19,
-          19,
-          19,
-          19
+          32,
+          31,
+          63,
+          15,
+          16,
+          15,
+          16,
+          15,
+          16,
+          15
         ]
       }
     }
@@ -598,20 +622,20 @@
       "JUMP_HEAVY_DOWN": {
         "impacto": 6,
         "tempos": [
-          28,
-          28,
-          28,
-          28,
-          28,
-          28,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31,
-          31
+          25,
+          24,
+          25,
+          24,
+          25,
+          24,
+          113,
+          22,
+          23,
+          22,
+          22,
+          22,
+          23,
+          22
         ]
       }
     }
@@ -635,18 +659,18 @@
         "impacto": 5,
         "tempos": [
           33,
-          33,
+          34,
           33,
           34,
+          35,
+          98,
+          51,
+          170,
           34,
-          30,
-          60,
-          200,
-          40,
-          40,
-          40,
-          40,
-          40
+          34,
+          34,
+          34,
+          34
         ]
       }
     }

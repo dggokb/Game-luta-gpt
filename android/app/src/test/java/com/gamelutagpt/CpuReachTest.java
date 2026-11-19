@@ -47,17 +47,20 @@ public class CpuReachTest {
 
     @Test
     public void againstACrouchingRivalTheCpuDoesNotThrowWhatWhiffs() {
-        // O L, o M e o H do Kōga passam por cima de quem está agachado: a CPU não escolhe nenhum deles.
+        // O L e o H do Kōga passam por cima de quem está agachado: a CPU não escolhe nenhum deles. O M
+        // novo (19/11, o gancho que desce) pega o agachado: a régua da CPU concorda com o motor.
         CharacterDefinition koga = GeneratedCharacters.get("p03");
         CharacterDefinition.Body body = GeneratedCharacters.get("player_base").fighter.body;
-        for (String g : new String[] {"L", "M", "H"}) {
+        for (String g : new String[] {"L", "H"}) {
             assertFalse(g, CpuReach.reaches(koga, g, false, 120f, body, true));
             assertFalse(g + " de fato erra", GeraAlcanceCpu.acerta("p03", g, 120, true));
         }
+        assertEquals("M: a régua e o motor", GeraAlcanceCpu.acerta("p03", "M", 120, true),
+            CpuReach.reaches(koga, "M", false, 120f, body, true));
         for (int i = 0; i < 50; i++) {
             String pick = CpuReach.pickInRange(OpponentAi.GROUND_ATTACKS_VS_CROUCH, OpponentAi.GROUND_WEIGHTS_VS_CROUCH,
                 koga, false, 150f, body, true, i / 50.0);
-            assertFalse(pick, "L".equals(pick) || "M".equals(pick) || "H".equals(pick));
+            assertFalse(pick, "L".equals(pick) || "H".equals(pick));
             // O → + M dele (19/11, a bica pulando do vídeo) é golpe alto de verdade: só vale se acerta.
             if ("6M".equals(pick)) assertTrue("o 6M acerta o agachado", GeraAlcanceCpu.acerta("p03", "6M", 150, true));
         }
