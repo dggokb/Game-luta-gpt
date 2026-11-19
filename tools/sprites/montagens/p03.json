@@ -757,15 +757,15 @@
     }
   },
   "throw": {
-    "_doc": "Agarrão, Arremesso longe (19/11, vídeo agarrao do dono; o dono: \"jogar o adversário longe, tipo o agarrão tradicional do Ryu\"): investe e agarra (18-32: THROW_GRAB 0-6), puxa (34-44, o \"abraço\" do vídeo encurtado: era meio segundo curvado de frente) e arremessa com os dois braços para cima e para a frente (56-78), volta (80-86: THROW_TOSS 6-18). O vídeo começa e termina agachado (a imagem inicial era a do agachado): o começo e o fim agachados ficam de fora. O rival voa longe pela cena do agarrão (CenaDoAgarrao).",
+    "_doc": "Agarrão, Arremesso longe (19/11, 2º vídeo agarrao do dono, em pé): dá o passo e agarra (12-24: THROW_GRAB 0-6), segura no peito (30-40), levanta acima da cabeça (42-62), arremessa para a frente e para baixo (64) e segura o fim (66-86), volta à guarda (90-108: THROW_TOSS 6-24). O rival sobe com os punhos e voa longe pela cena do agarrão (CenaDoAgarrao p03).",
     "trechos": [
       [
-        "agarrao",
+        "agarrao2",
         0,
         124
       ]
     ],
-    "quadros": "18,20,22,24,26,30,32,34,36,40,48,54,56,58,62,70,78,82,84,86",
+    "quadros": "10,12,14,16,18,20,24,30,36,40,42,44,50,58,62,64,66,70,78,86,90,94,98,104,108",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true
@@ -784,22 +784,27 @@
         ]
       },
       "THROW_TOSS": {
-        "frames": "6-19",
+        "frames": "6-24",
         "tempos": [
-          60,
-          60,
-          60,
-          60,
-          60,
+          40,
+          40,
+          40,
+          40,
+          50,
+          50,
           50,
           60,
-          80,
-          120,
-          120,
+          60,
+          40,
+          40,
+          60,
           80,
           80,
           60,
-          60
+          50,
+          50,
+          50,
+          50
         ]
       }
     }
