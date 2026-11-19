@@ -26,6 +26,7 @@ public class AgarraoComCenaTest {
             in[0].grab = true;
             int quadroDoDano = -1, inicio = -1, alturaMax = 0;
             boolean deitado = false, presoAteSoltar = true;
+            float xQuemAgarra = Float.NaN, andou = 0f;
             for (int t = 0; t < 400; t++) {
                 e.step(in[0], in[1]);
                 in[0].clearPresses();
@@ -33,6 +34,10 @@ public class AgarraoComCenaTest {
                 if (inicio < 0 && a.status == CombatFighter.Status.THROW && a.throwPhase == CombatFighter.THROW_EXECUTE) inicio = t;
                 if (inicio >= 0 && quadroDoDano < 0 && d.state.life < vida) quadroDoDano = a.throwFrame;
                 if (inicio >= 0) alturaMax = Math.max(alturaMax, Math.round(Arena.GROUND_Y - d.y));
+                if (inicio >= 0 && a.status == CombatFighter.Status.THROW) {
+                    if (Float.isNaN(xQuemAgarra)) xQuemAgarra = a.x;
+                    andou = Math.max(andou, Math.abs(a.x - xQuemAgarra));
+                }
                 if (inicio >= 0 && a.status == CombatFighter.Status.THROW && a.throwFrame < cena.solta &&
                     d.status != CombatFighter.Status.THROWN) presoAteSoltar = false;
                 if (d.status == CombatFighter.Status.KNOCKDOWN && d.knockdownFrame >= e.config.knockdownFallFrames) deitado = true;
@@ -46,6 +51,8 @@ public class AgarraoComCenaTest {
             assertTrue(id + ": o rival fica preso na cena até soltar", presoAteSoltar);
             assertTrue(id + ": ele sai do chão (" + alturaMax + " px)", alturaMax >= 40);
             assertTrue(id + ": deitado onde caiu", deitado);
+            // 19/11 (o Kōga "deslizou para trás"): quem agarra não sai do lugar enquanto joga.
+            assertTrue(id + ": quem agarra ficou parado (andou " + andou + " px)", andou < 2f);
         }
     }
 

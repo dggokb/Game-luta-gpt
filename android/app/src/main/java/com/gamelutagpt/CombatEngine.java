@@ -2987,6 +2987,9 @@ final class CombatEngine {
         CombatFighter a = fighters[0], b = fighters[1];
         // A wake-up roll passes through the other body, and so does a cross-up rush.
         if (a.rolling() || b.rolling() || passingThrough(a) || passingThrough(b)) return;
+        // Na cena do agarrão quem põe o rival no lugar é a cena (19/11, o dono: o Kōga "deslizou para
+        // trás"): o rival preso colado na frente empurrava quem agarrou para trás a cada quadro.
+        if (naCenaDoAgarrao(a) || naCenaDoAgarrao(b)) return;
         // No ar contra quem está no chão: pernas encolhidas e corpo mais estreito (o pulo passa por cima).
         boolean arA = !a.grounded && b.grounded, arB = !b.grounded && a.grounded;
         CharacterDefinition.Body ba = a.body(), bb = b.body();
@@ -4412,6 +4415,12 @@ final class CombatEngine {
             d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
             d.knockdownFrame = config.knockdownFallFrames;
         }
+    }
+
+    /** Quem agarrou e está jogando o rival pela cena do próprio agarrão ({@link CenaDoAgarrao}). */
+    private static boolean naCenaDoAgarrao(CombatFighter f) {
+        return f.status == CombatFighter.Status.THROW && f.throwPhase == CombatFighter.THROW_EXECUTE &&
+            CenaDoAgarrao.de(f.character()) != null;
     }
 
     /** Duração da fase de jogar de quem agarrou: a da cena dele, ou a do motor. */
