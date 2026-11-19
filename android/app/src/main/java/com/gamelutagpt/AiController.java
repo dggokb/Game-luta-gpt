@@ -127,6 +127,15 @@ final class AiController {
     private boolean movingForward;
     private boolean movingBack;
     private boolean dashing;
+    /**
+     * O golpe de corrida (19/11, "a CPU acompanha tudo"): em cada corrida para dentro ela decide uma
+     * vez se termina com o H correndo (o lariat do Kōga, o carrinho da Yin-lu...).
+     */
+    private boolean corridaDecidida, corridaComGolpe;
+    /** O sorteio do golpe de corrida, à parte: não mexe na sequência dos outros sorteios da CPU. */
+    private final java.util.Random corridaRandom = new java.util.Random(0xC0221DA);
+    /** A chance de a corrida terminar no golpe de corrida, vezes a punição do nível. */
+    static final double CHANCE_GOLPE_DE_CORRIDA = 0.6;
     private int cooldown;
     private AttackDefinition lastAttack;
 
@@ -1333,11 +1342,53 @@ final class AiController {
             // Ele costuma pular a bola dela: solta e já fica com o antiaéreo pronto.
             antiAereoLido = 50;
         }
+        if (attack == null && special == null && !superAttack && !grab && golpeDeCorrida(me, target, seen, out)) return;
         if (attack != null) {
             startRoute(me.character(), attack);
             press(attack, me, out);
             lastReason = "neutro";
         }
+    }
+
+    /**
+     * Correndo para dentro, com o rival em pé no chão e no alcance do golpe de corrida (o braço mais
+     * o que o golpe anda até bater), aperta H: sai o golpe de corrida do pacote (CancelSystem.RUN_HEAVY).
+     */
+    private boolean golpeDeCorrida(CombatFighter me, CombatFighter target, CpuPerception.Snapshot seen, FighterInput out) {
+        CharacterDefinition c = me.character();
+        if (!me.forwardDashing) {
+            corridaDecidida = false;
+            return false;
+        }
+        CharacterDefinition.Move m = c.move(CancelSystem.RUN_HEAVY, false);
+        if (m == null || !me.grounded || me.attacking() || !seen.grounded ||
+            seen.status == CombatFighter.Status.KNOCKDOWN) return false;
+        if (!corridaDecidida) {
+            corridaDecidida = true;
+            corridaComGolpe = corridaRandom.nextDouble() < level.punish * CHANCE_GOLPE_DE_CORRIDA;
+        }
+        if (!corridaComGolpe) return false;
+        float gap = Math.abs(target.x - me.x);
+        if (gap > alcanceDeCorrida(c, target.body())) return false;
+        out.direction = me.facing > 0 ? 1 : 5;
+        out.dash = true;
+        out.light = out.medium = false;
+        out.heavy = true;
+        corridaComGolpe = false;
+        lastReason = "golpe de corrida";
+        return true;
+    }
+
+    /** Centro a centro: o alcance do golpe de corrida mais o que ele anda até a janela ativa. */
+    static float alcanceDeCorrida(CharacterDefinition c, CharacterDefinition.Body alvo) {
+        CharacterDefinition.Move m = c.move(CancelSystem.RUN_HEAVY, false);
+        AttackDefinition a = c.attack(CancelSystem.RUN_HEAVY);
+        float anda = 0f;
+        if (a.mechanics != null && a.mechanics.advanceSpeed > 0f) {
+            int fim = Math.min(a.mechanics.advanceEnd, a.startupFrames);
+            anda = a.mechanics.advanceSpeed * Math.max(0, fim - a.mechanics.advanceStart + 1) * CombatConfig.DT;
+        }
+        return CombatRules.maxCenterDistance(m, alvo) + anda;
     }
 
     /**

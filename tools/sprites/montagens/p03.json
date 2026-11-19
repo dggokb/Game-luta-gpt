@@ -434,5 +434,221 @@
         ]
       }
     }
+  },
+  "crouch_light": {
+    "_doc": "2L (19/11, vídeo 2j do dono): agachado, soco reto da mão da frente; prepara (14-22), estica (28, o impacto; 24-26 têm a faísca do vídeo e ficam de fora), segura (32-38) e volta ao agachado (40-58).",
+    "trechos": [
+      [
+        "2L",
+        0,
+        124
+      ]
+    ],
+    "quadros": "14,18,22,28,32,38,40,44,46,48,50,54,58",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "CROUCH_LIGHT": {
+        "impacto": 3,
+        "tempos": [
+          33,
+          33,
+          34,
+          18,
+          18,
+          18,
+          18,
+          18,
+          18,
+          18,
+          18,
+          18,
+          18
+        ]
+      }
+    }
+  },
+  "crouch_medium": {
+    "_doc": "2M (19/11, vídeo 2m do dono): agachado, estica a perna da frente rente ao chão (27, o impacto; o 25 tem o risco do vídeo), segura (31-45) e volta ao agachado (47-59).",
+    "trechos": [
+      [
+        "2M",
+        0,
+        124
+      ]
+    ],
+    "quadros": "13,17,19,21,23,27,31,37,43,45,47,49,51,53,57",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "CROUCH_MEDIUM": {
+        "impacto": 5,
+        "tempos": [
+          33,
+          33,
+          33,
+          34,
+          34,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32
+        ]
+      }
+    }
+  },
+  "crouch_heavy": {
+    "_doc": "2H (19/11, vídeo 2h do dono): afunda (2-10) e sobe com o braço reto para o alto (30, o impacto: o lançador); 12-28 têm o arco, o clarão e a poeira do vídeo e ficam de fora. Segura no alto (36-86) e volta ao agachado (88-120).",
+    "trechos": [
+      [
+        "2H",
+        0,
+        124
+      ]
+    ],
+    "quadros": "2,6,10,30,36,50,70,86,88,90,92,94,96,98,102,108,120",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "CROUCH_HEAVY": {
+        "impacto": 3,
+        "tempos": [
+          61,
+          61,
+          61,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31
+        ]
+      }
+    }
+  },
+  "jump_light": {
+    "_doc": "jL (19/11, vídeo jl do dono, da inicio_pulo_h3): no ar, soco reto da mão da frente (20, o impacto; 16-18 têm a faísca do vídeo), segura (24-38) e volta à pose do pulo (40-46).",
+    "trechos": [
+      [
+        "jL",
+        0,
+        124
+      ]
+    ],
+    "quadros": "12,14,20,24,30,38,40,42,44,46",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false,
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "JUMP_LIGHT": {
+        "impacto": 2,
+        "tempos": [
+          42,
+          41,
+          19,
+          19,
+          19,
+          19,
+          19,
+          19,
+          19,
+          19
+        ]
+      }
+    }
+  },
+  "jump_heavy_down": {
+    "_doc": "↓ + jH (19/11, vídeo jH_BAIXO do dono: a marreta de dois punhos; o dono, 19/11: \"o jH ficou mais parecido com o ↓jH do que o próprio ↓jH\"): ergue os punhos juntos (15-33) e desce a marreta encolhido (41, o impacto; 35-39 têm o arco e o clarão do vídeo), segura (45-53) e volta à pose do pulo (55-61).",
+    "trechos": [
+      [
+        "jH_BAIXO",
+        0,
+        124
+      ]
+    ],
+    "quadros": "15,19,23,25,27,31,41,45,49,53,55,57,59,61",
+    "opcoes": {
+      "fixar": "video",
+      "pe_no_chao": false,
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "JUMP_HEAVY_DOWN": {
+        "impacto": 6,
+        "tempos": [
+          28,
+          28,
+          28,
+          28,
+          28,
+          28,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31
+        ]
+      }
+    }
+  },
+  "lariat": {
+    "_doc": "→ → + H, Lariat (19/11, vídeo dashH do dono, da inicio_corrida_h3): da corrida (1-17) estica o braço da frente duro na altura do ombro (21, o impacto) e avança com ele (25-29); 31-51 têm o braço cortado na borda direita do vídeo e ficam de fora (o 29 segura). Volta à guarda (53-71). O corpo fica na raiz (registro): quem anda é o motor.",
+    "trechos": [
+      [
+        "dashH",
+        0,
+        124
+      ]
+    ],
+    "quadros": "1,5,9,13,17,21,25,29,53,55,57,63,71",
+    "opcoes": {
+      "fixar": "registro",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "LARIAT": {
+        "impacto": 5,
+        "tempos": [
+          33,
+          33,
+          33,
+          34,
+          34,
+          30,
+          60,
+          200,
+          40,
+          40,
+          40,
+          40,
+          40
+        ]
+      }
+    }
   }
 }

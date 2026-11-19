@@ -2,22 +2,20 @@
   "id": "p03_jump_heavy_down",
   "javaName": "P03_JUMP_HEAVY_DOWN",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_jump_heavy_down_sr_hd.png",
+  "source": "art/sprites/source/p03_jump_heavy_down_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_jump_heavy_down.webp",
   "report": "tools/sprites/reports/p03_jump_heavy_down.report.json",
   "preview": "android/app/build/sprite-review/p03_jump_heavy_down-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 10,
   "rootMode": "authored",
-  "frameWidth": 768,
-  "frameHeight": 640,
-  "rootX": 300,
-  "rootY": 600,
+  "frameWidth": 384,
+  "frameHeight": 704,
+  "rootX": 190,
+  "rootY": 668,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Baixo + jH soco forte para baixo no ar; pes na raiz; quadros com clarao pulados.",
-  "sourceReferences": [
-    "art/sprites/source/p03_jump_heavy_down_video_normalized.png"
-  ],
+  "sourceReferences": [],
   "pixelScale": 2.0,
   "reescala": [
     1.0526,
@@ -39,5 +37,21 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 95% (JUMP_HEAVY_DOWN)"
-  ]
+  ],
+  "video": {
+    "arquivo": "jH_BAIXO.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "15,19,23,25,27,31,41,45,49,53,55,57,59,61",
+    "celula": 352,
+    "largura": 192,
+    "raiz": "95,334",
+    "colunas": 10,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

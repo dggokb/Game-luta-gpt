@@ -520,11 +520,11 @@ final class GeneratedSpriteLayouts {
     static final int P03_CROUCH_ROOT_Y = 460;
     static final int P03_CROUCH_FRAME_COUNT = 8;
 
-    static final int P03_CROUCH_HEAVY_FRAME_WIDTH = 337;
-    static final int P03_CROUCH_HEAVY_FRAME_HEIGHT = 646;
-    static final int P03_CROUCH_HEAVY_ROOT_X = 176;
-    static final int P03_CROUCH_HEAVY_ROOT_Y = 629;
-    static final int P03_CROUCH_HEAVY_FRAME_COUNT = 12;
+    static final int P03_CROUCH_HEAVY_FRAME_WIDTH = 428;
+    static final int P03_CROUCH_HEAVY_FRAME_HEIGHT = 605;
+    static final int P03_CROUCH_HEAVY_ROOT_X = 204;
+    static final int P03_CROUCH_HEAVY_ROOT_Y = 589;
+    static final int P03_CROUCH_HEAVY_FRAME_COUNT = 17;
 
     static final int P03_CROUCH_IDLE_FRAME_WIDTH = 428;
     static final int P03_CROUCH_IDLE_FRAME_HEIGHT = 379;
@@ -532,17 +532,17 @@ final class GeneratedSpriteLayouts {
     static final int P03_CROUCH_IDLE_ROOT_Y = 370;
     static final int P03_CROUCH_IDLE_FRAME_COUNT = 14;
 
-    static final int P03_CROUCH_LIGHT_FRAME_WIDTH = 564;
-    static final int P03_CROUCH_LIGHT_FRAME_HEIGHT = 458;
-    static final int P03_CROUCH_LIGHT_ROOT_X = 250;
-    static final int P03_CROUCH_LIGHT_ROOT_Y = 439;
-    static final int P03_CROUCH_LIGHT_FRAME_COUNT = 11;
+    static final int P03_CROUCH_LIGHT_FRAME_WIDTH = 521;
+    static final int P03_CROUCH_LIGHT_FRAME_HEIGHT = 416;
+    static final int P03_CROUCH_LIGHT_ROOT_X = 204;
+    static final int P03_CROUCH_LIGHT_ROOT_Y = 395;
+    static final int P03_CROUCH_LIGHT_FRAME_COUNT = 13;
 
-    static final int P03_CROUCH_MEDIUM_FRAME_WIDTH = 835;
-    static final int P03_CROUCH_MEDIUM_FRAME_HEIGHT = 374;
-    static final int P03_CROUCH_MEDIUM_ROOT_X = 391;
-    static final int P03_CROUCH_MEDIUM_ROOT_Y = 339;
-    static final int P03_CROUCH_MEDIUM_FRAME_COUNT = 16;
+    static final int P03_CROUCH_MEDIUM_FRAME_WIDTH = 607;
+    static final int P03_CROUCH_MEDIUM_FRAME_HEIGHT = 389;
+    static final int P03_CROUCH_MEDIUM_ROOT_X = 203;
+    static final int P03_CROUCH_MEDIUM_ROOT_Y = 380;
+    static final int P03_CROUCH_MEDIUM_FRAME_COUNT = 15;
 
     static final int P03_DASH_FRAME_WIDTH = 527;
     static final int P03_DASH_FRAME_HEIGHT = 448;
@@ -664,23 +664,29 @@ final class GeneratedSpriteLayouts {
     static final int P03_JUMP_HEAVY_ROOT_Y = 525;
     static final int P03_JUMP_HEAVY_FRAME_COUNT = 7;
 
-    static final int P03_JUMP_HEAVY_DOWN_FRAME_WIDTH = 420;
-    static final int P03_JUMP_HEAVY_DOWN_FRAME_HEIGHT = 526;
-    static final int P03_JUMP_HEAVY_DOWN_ROOT_X = 223;
-    static final int P03_JUMP_HEAVY_DOWN_ROOT_Y = 510;
-    static final int P03_JUMP_HEAVY_DOWN_FRAME_COUNT = 7;
+    static final int P03_JUMP_HEAVY_DOWN_FRAME_WIDTH = 294;
+    static final int P03_JUMP_HEAVY_DOWN_FRAME_HEIGHT = 614;
+    static final int P03_JUMP_HEAVY_DOWN_ROOT_X = 145;
+    static final int P03_JUMP_HEAVY_DOWN_ROOT_Y = 602;
+    static final int P03_JUMP_HEAVY_DOWN_FRAME_COUNT = 14;
 
-    static final int P03_JUMP_LIGHT_FRAME_WIDTH = 544;
-    static final int P03_JUMP_LIGHT_FRAME_HEIGHT = 484;
-    static final int P03_JUMP_LIGHT_ROOT_X = 171;
-    static final int P03_JUMP_LIGHT_ROOT_Y = 468;
-    static final int P03_JUMP_LIGHT_FRAME_COUNT = 7;
+    static final int P03_JUMP_LIGHT_FRAME_WIDTH = 421;
+    static final int P03_JUMP_LIGHT_FRAME_HEIGHT = 502;
+    static final int P03_JUMP_LIGHT_ROOT_X = 155;
+    static final int P03_JUMP_LIGHT_ROOT_Y = 491;
+    static final int P03_JUMP_LIGHT_FRAME_COUNT = 10;
 
     static final int P03_LAND_FRAME_WIDTH = 421;
     static final int P03_LAND_FRAME_HEIGHT = 484;
     static final int P03_LAND_ROOT_X = 197;
     static final int P03_LAND_ROOT_Y = 455;
     static final int P03_LAND_FRAME_COUNT = 9;
+
+    static final int P03_LARIAT_FRAME_WIDTH = 595;
+    static final int P03_LARIAT_FRAME_HEIGHT = 471;
+    static final int P03_LARIAT_ROOT_X = 282;
+    static final int P03_LARIAT_ROOT_Y = 462;
+    static final int P03_LARIAT_FRAME_COUNT = 13;
 
     static final int P03_MEDIUM_FRAME_WIDTH = 427;
     static final int P03_MEDIUM_FRAME_HEIGHT = 481;

@@ -8,7 +8,8 @@ import org.junit.Test;
 /**
  * A CPU usa o → + H (o golpe de comando) na punição (19/11, "a CPU acompanha tudo"): a ombrada do
  * Kōga avança e pega o erro de mais longe que o H parado. E o → + M (golpe alto) e o → + H do Kōga
- * existem no pacote, com o golpe alto marcado como alto.
+ * existem no pacote, com o golpe alto marcado como alto. Correndo para dentro, ela termina a corrida
+ * no golpe de corrida (o H correndo: o lariat do Kōga, o carrinho da Yin-lu...).
  */
 public class CpuGolpeDeComandoTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
@@ -75,5 +76,41 @@ public class CpuGolpeDeComandoTest {
         }
         assertTrue("tentativas válidas: " + tentativas, tentativas >= 3);
         assertTrue("a CPU puniu com a ombrada", comOmbrada >= 1);
+    }
+
+    /** Quantos golpes de corrida a CPU {@code id} solta em 25 s contra um jogador parado, de longe. */
+    static int golpesDeCorrida(String id) {
+        int n = 0;
+        for (long seed = 1; seed <= 8; seed++) {
+            CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"), new FighterState(GeneratedCharacters.get(id), "CPU"),
+                300f, 1000f, new CombatConfig());
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setLevel(8);
+            FighterInput p = new FighterInput(), out = new FighterInput();
+            Object ultimo = null;
+            for (int fr = 0; fr < 60 * 25; fr++) {
+                e.fighter(0).state.restoreLife();
+                e.fighter(1).state.restoreLife();
+                cpu.fill(e, 1, out);
+                e.step(p, out);
+                CombatFighter c = e.fighter(1);
+                if (c.attacking() && CancelSystem.RUN_HEAVY.equals(c.attack.id) && c.attack != ultimo) n++;
+                ultimo = c.attacking() ? c.attack : null;
+            }
+        }
+        return n;
+    }
+
+    /**
+     * Os que correm longe (o Ryūga dá corridas curtas, que no neutro acabam fora do alcance da
+     * Ombrada; perto, ela quase sempre está correndo para ficar em cima de quem caiu).
+     */
+    @Test public void aCpuTerminaACorridaNoGolpeDeCorrida() {
+        for (String id : new String[] {"p03", "p02", "p15", "p16"}) {
+            assertNotNull(id + " tem golpe de corrida", GeneratedCharacters.get(id).attack(CancelSystem.RUN_HEAVY));
+            int n = golpesDeCorrida(id);
+            assertTrue(id + ": golpes de corrida da CPU " + n, n >= 1);
+        }
     }
 }

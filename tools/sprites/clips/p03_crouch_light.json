@@ -2,22 +2,20 @@
   "id": "p03_crouch_light",
   "javaName": "P03_CROUCH_LIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_crouch_light_sr_hd.png",
+  "source": "art/sprites/source/p03_crouch_light_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_light.webp",
   "report": "tools/sprites/reports/p03_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch_light-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 13,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 896,
-  "rootX": 340,
+  "frameWidth": 576,
+  "rootX": 232,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2L chute baixo fraco; escala pelo corpo agachado (0.42, personagem maior no video).",
-  "frameHeight": 640,
-  "rootY": 600,
-  "sourceReferences": [
-    "art/sprites/source/p03_crouch_light_video_normalized.png"
-  ],
+  "frameHeight": 512,
+  "rootY": 472,
+  "sourceReferences": [],
   "pixelScale": 2.0,
   "reescala": [
     1.087,
@@ -47,5 +45,20 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 92% (CROUCH_LIGHT)"
-  ]
+  ],
+  "video": {
+    "arquivo": "2L.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "14,18,22,28,32,38,40,44,46,48,50,54,58",
+    "largura": 288,
+    "raiz": "116,236",
+    "colunas": 7,
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

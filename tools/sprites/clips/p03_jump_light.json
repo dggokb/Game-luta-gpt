@@ -2,22 +2,20 @@
   "id": "p03_jump_light",
   "javaName": "P03_JUMP_LIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_jump_light_sr_hd.png",
+  "source": "art/sprites/source/p03_jump_light_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_jump_light.webp",
   "report": "tools/sprites/reports/p03_jump_light.report.json",
   "preview": "android/app/build/sprite-review/p03_jump_light-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 768,
-  "frameHeight": 640,
-  "rootX": 300,
-  "rootY": 600,
+  "frameWidth": 512,
+  "frameHeight": 576,
+  "rootX": 200,
+  "rootY": 540,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. jL chute fraco no ar; pes na raiz.",
-  "sourceReferences": [
-    "art/sprites/source/p03_jump_light_video_normalized.png"
-  ],
+  "sourceReferences": [],
   "pixelScale": 2.0,
   "reescala": [
     1.0417,
@@ -39,5 +37,20 @@
   ],
   "regua": [
     "ajuste no app 20261014-0532: 96% (JUMP_LIGHT)"
-  ]
+  ],
+  "video": {
+    "arquivo": "jL.mp4",
+    "personagem": "p03",
+    "escala": 0.4139,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "quadros": "12,14,20,24,30,38,40,42,44,46",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "100,270",
+    "fixar": "video",
+    "sem_poeira": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

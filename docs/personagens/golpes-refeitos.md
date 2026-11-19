@@ -95,16 +95,16 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 | L | Soco reto com passo | Dá um passo curto e solta o soco reto da mão da frente, o braço esticado | punho · reto | abre o combo; rápido (19/11: o vídeo do dono, no jogo) |
 | M | Gancho que desce | Ergue o braço e desce o gancho curvado, o corpo afundando junto | punho · de cima para baixo | anda para dentro; repete (M → M) e cancela em pulo (19/11: o vídeo do dono, no jogo) |
 | H | Soco reto longo | Arma e solta o soco reto da mão de trás com o corpo inteiro, o pé de trás esticado | punho · reto longo | o forte; joga na parede (19/11: o vídeo do dono, no jogo) |
-| ↓ + L | Soco agachado | Agachado, soco curto e reto para a frente, o braço na linha do chão, na barriga do rival | punho · reto baixo | baixo rápido; abre (19/11: "na canela" fez o H3 socar o chão) |
-| ↓ + M | Chute na canela | Agachado, estica a perna da frente reta para a frente, rente ao chão, e acerta a canela com a sola | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui |
-| ↓ + H | Joelhada que sobe | Da agachada, salta para cima cravando o joelho de trás no alto, puxando o rival para baixo com as duas mãos | joelho · sobe | lançador para o combo no ar (19/11: o uppercut ficava igual ao S2) |
+| ↓ + L | Soco agachado | Agachado, soco reto da mão da frente, o braço esticado na linha do ombro | punho · reto baixo | baixo rápido; abre (19/11: o vídeo do dono, no jogo) |
+| ↓ + M | Chute rente ao chão | Agachado, estica a perna da frente reta rente ao chão | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui (19/11: o vídeo do dono, no jogo) |
+| ↓ + H | Braço ao céu | Da agachada, sobe de uma vez com o braço reto para o alto | punho · sobe | lançador para o combo no ar (19/11: o vídeo do dono, no jogo) |
 | → + M | Bica pulando | Pulinho para a frente e a sola esticada na altura do quadril | sola · pulando | golpe alto (pega quem está agachado) (19/11: o vídeo M_BAIXO do dono, no jogo) |
 | → + H | Ombrada que avança | Abaixa o ombro e se joga contra o rival em dois passos curtos | ombro · investida curta | golpe de comando: anda, empurra para a parede, cancela em especial |
-| → → + H | Lariat | Da corrida, o braço da frente esticado na altura do pescoço, o corpo todo atrás | braço · lariat | golpe de corrida: lança baixo para continuar |
-| L no ar | Soco em diagonal | No ar, soco reto da mão da frente em diagonal para a frente e para baixo, o braço esticado | punho · diagonal para baixo | rápido, com o braço inteiro (19/11: o joelho era curto; o soco de cima não ficou claro) |
+| → → + H | Lariat | Da corrida, o braço da frente duro na altura do ombro, o corpo todo atrás | braço · lariat | golpe de corrida: lança em arco baixo para continuar (19/11: o vídeo do dono, no jogo) |
+| L no ar | Soco reto no ar | No ar, soco reto da mão da frente | punho · reto | rápido (19/11: o vídeo do dono, no jogo) |
 | M no ar | Voadora de sola | No ar, estica a perna da frente e crava a sola em diagonal para a frente e para baixo, o corpo atrás do pé | sola · voadora curta | emenda no ar (19/11: o cotovelo era curto e pouco agressivo) |
 | H no ar | Marreta no ar | No ar, junta os dois punhos acima da cabeça e desce num arco grande na frente do corpo | dois punhos · de cima | overhead; joga na parede no combo |
-| ↓ + H no ar | Pisão de dois pés | No ar, encolhe os joelhos e crava os dois pés juntos para baixo | duas solas · crava | crava no chão (quica) |
+| ↓ + H no ar | Marreta no ar | No ar, ergue os dois punhos juntos e desce a marreta encolhido | dois punhos · de cima | crava no chão (quica) (19/11: o vídeo jH_BAIXO do dono, no jogo; o dono: "o jH ficou mais parecido com o ↓jH do que o próprio ↓jH") |
 | S1 ↓↘→ | Pedra de energia | Fecha a mão, a energia da família acende nela, e ele arremessa a bola como uma pedra, com o braço por cima | mão · arremesso | projétil (a onda da escola, à moda dele) |
 | S2 →↓↘ | Uppercut da casa | Abaixa e sobe com um uppercut que avança, o corpo inteiro subindo atrás do punho | punho · uppercut que avança | anti-aéreo; o Shoryuken da escola, à moda dele |
 | S3 ↓↙← | Investida bruta | Se joga para a frente com o lariat (L curto, M médio, H longo); apertando de novo, emenda um segundo braço | braço · investida em até 2 | o golpe marca dele (no lugar do rekka de três socos) |

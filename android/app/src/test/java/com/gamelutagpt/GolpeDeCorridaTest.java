@@ -10,7 +10,7 @@ import org.junit.Test;
  * cada um. O Ryūga dá a Ombrada, que joga na parede mesmo sozinha (correu, acertou, combo); a
  * Yin-lu dá o Carrinho da garça, baixo, dois acertos, derruba e o ↓ + M no caído continua; e o
  * Carrinho também pega quem já está caído no combo (16/11): o chute levanta e o combo continua.
- * Quem não tem o golpe (o Kōga, por enquanto) dá o H de sempre.
+ * Quem não tem o golpe (o p04, por enquanto; o Kōga ganhou o lariat em 19/11) dá o H de sempre.
  */
 public class GolpeDeCorridaTest {
     private static final String RYUGA = "player_base", YINLU = "p02";
@@ -49,8 +49,8 @@ public class GolpeDeCorridaTest {
         assertEquals(CancelSystem.RUN_HEAVY, hCorrendo(RYUGA, false));
         assertEquals(CancelSystem.RUN_HEAVY, hCorrendo(YINLU, false));
         assertEquals("↓ + H correndo continua sendo o 2H", "2H", hCorrendo(RYUGA, true));
-        assertFalse("o Kōga ainda não tem", GeneratedCharacters.get("p03").moves.containsKey(CancelSystem.RUN_HEAVY));
-        assertNotEquals(CancelSystem.RUN_HEAVY, hCorrendo("p03", false));
+        assertFalse("o p04 ainda não tem", GeneratedCharacters.get("p04").moves.containsKey(CancelSystem.RUN_HEAVY));
+        assertNotEquals(CancelSystem.RUN_HEAVY, hCorrendo("p04", false));
     }
 
     @Test public void ombradaJogaNaParedeMesmoSozinha() {
