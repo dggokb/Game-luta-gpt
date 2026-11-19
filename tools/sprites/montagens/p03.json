@@ -757,7 +757,7 @@
     }
   },
   "throw": {
-    "_doc": "Agarrão, Arremesso longe (19/11, 2º vídeo agarrao do dono, em pé): dá o passo e agarra (12-24: THROW_GRAB 0-6), segura no peito (30-40), levanta acima da cabeça (42-62), arremessa para a frente e para baixo (64) e segura o fim (66-86), volta à guarda (90-108: THROW_TOSS 6-24). O rival sobe com os punhos e voa longe pela cena do agarrão (CenaDoAgarrao p03).",
+    "_doc": "Agarrão, Arremesso longe (19/11, 2º vídeo agarrao do dono, em pé): dá o passo e agarra (12-24: THROW_GRAB 0-6), segura no peito (30-40), levanta acima da cabeça (42-62), arremessa para a frente e para baixo (64) e segura o fim (66-86), volta à guarda (90-108: THROW_TOSS 6-24). O rival sobe com os punhos e voa longe pela cena do agarrão (CenaDoAgarrao p03). 19/11 (o dono: lento e o rival não acompanha): os tempos do THROW_TOSS põem o levantar em 16% e o arremesso em 43% da fase de jogar (44 quadros).",
     "trechos": [
       [
         "agarrao2",
@@ -786,25 +786,25 @@
       "THROW_TOSS": {
         "frames": "6-24",
         "tempos": [
-          40,
-          40,
-          40,
-          40,
-          50,
-          50,
-          50,
-          60,
-          60,
-          40,
-          40,
-          60,
-          80,
-          80,
-          60,
-          50,
-          50,
-          50,
-          50
+          53,
+          53,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          64,
+          64,
+          64,
+          64,
+          64,
+          42,
+          42,
+          42,
+          42,
+          42,
+          40
         ]
       }
     }

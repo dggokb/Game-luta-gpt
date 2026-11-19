@@ -66,9 +66,12 @@ final class CenaDoAgarrao {
         // Kōga (19/11, o dono: "jogar o adversário longe, tipo o agarrão tradicional do Ryu"): agarra a
         // gola, levanta o rival acima da cabeça e o arremessa para a frente; ele voa girando e cai de costas
         // longe.
-        CENAS.put("p03", new CenaDoAgarrao(60, 46, 48, new float[][] {
-            {0, G, 0, 0, P}, {8, 40, 20, 0, P}, {15, 25, 190, -20, A}, {24, 30, 200, -30, A},
-            {29, 120, 170, -120, A}, {38, 260, 110, -240, A}, {46, 340, 0, 0, D}, {60, 340, 0, 0, D}}));
+        // 19/11, o dono: "o adversário não combina o movimento, talvez muito lento": mais rápido (44
+        // quadros), o rival fica na frente pendurado pela gola na altura dos punhos, de pé, e só gira no
+        // arremesso.
+        CENAS.put("p03", new CenaDoAgarrao(44, 34, 36, new float[][] {
+            {0, G, 0, 0, P}, {5, 45, 15, 0, P}, {11, 55, 85, 0, P}, {17, 60, 90, 0, P},
+            {21, 160, 150, -100, A}, {29, 280, 90, -220, A}, {34, 330, 0, 0, D}, {44, 330, 0, 0, D}}));
         // Bonnie: número de circo: levanta o rival acima da cabeça, segura para a plateia e crava na frente.
         CENAS.put("p16", new CenaDoAgarrao(66, 32, 45, new float[][] {
             {0, G, 0, 0, P}, {4, 40, 30, 0, P}, {9, 15, 150, -90, A}, {25, 15, 160, -90, A},
