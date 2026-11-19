@@ -10,7 +10,7 @@ import org.junit.Test;
  * fica deitado onde caiu; quem agarrou volta à guarda no fim da cena, com o rival ainda no chão.
  */
 public class AgarraoComCenaTest {
-    private static final String[] COM_CENA = {"player_base", "p02", "p15", "p16"};
+    private static final String[] COM_CENA = {"player_base", "p02", "p03", "p15", "p16"};
 
     @Test public void cadaUmJogaDoSeuJeito() {
         for (String id : COM_CENA) {
@@ -51,5 +51,21 @@ public class AgarraoComCenaTest {
 
     @Test public void quemNaoTemCenaJogaComoSempre() {
         assertNull(CenaDoAgarrao.de(GeneratedCharacters.get("p04")));
+    }
+
+    /** O Kōga joga longe (19/11): o rival cai a mais de 250 px de quem agarrou. */
+    @Test public void oKogaJogaLonge() {
+        CharacterDefinition c = GeneratedCharacters.get("p03"), rival = GeneratedCharacters.get("p02");
+        CombatEngine e = new CombatEngine(new FighterState(c, "P1"), new FighterState(rival, "CPU"),
+            600f, 600f + c.fighter.body.halfWidth + rival.fighter.body.halfWidth + 10f, new CombatConfig());
+        FighterInput[] in = {new FighterInput(), new FighterInput()};
+        in[0].grab = true;
+        float longe = 0f;
+        for (int t = 0; t < 300; t++) {
+            e.step(in[0], in[1]);
+            in[0].clearPresses();
+            if (e.fighter(1).status == CombatFighter.Status.KNOCKDOWN) longe = Math.max(longe, Math.abs(e.fighter(1).x - e.fighter(0).x));
+        }
+        assertTrue("caiu a " + longe + " px", longe >= 250f);
     }
 }

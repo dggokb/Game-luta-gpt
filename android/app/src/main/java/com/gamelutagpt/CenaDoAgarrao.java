@@ -63,6 +63,12 @@ final class CenaDoAgarrao {
         // Natisuko: agarra a gola, varre a perna (ele cai de costas aos pés dela) e crava o soco para baixo.
         CENAS.put("p15", new CenaDoAgarrao(48, 23, 30, new float[][] {
             {0, G, 0, 0, P}, {8, 55, 0, 15, P}, {13, 70, 50, 60, A}, {18, 85, 0, 0, D}, {48, 85, 0, 0, D}}));
+        // Kōga (19/11, o dono: "jogar o adversário longe, tipo o agarrão tradicional do Ryu"): puxa pela
+        // gola, arremessa com os dois braços para cima e para a frente; o rival voa alto, girando, e cai
+        // de costas longe.
+        CENAS.put("p03", new CenaDoAgarrao(60, 46, 48, new float[][] {
+            {0, G, 0, 0, P}, {12, 35, 20, 0, P}, {19, 60, 90, -40, A}, {28, 170, 190, -150, A},
+            {38, 290, 120, -260, A}, {46, 350, 0, 0, D}, {60, 350, 0, 0, D}}));
         // Bonnie: número de circo: levanta o rival acima da cabeça, segura para a plateia e crava na frente.
         CENAS.put("p16", new CenaDoAgarrao(66, 32, 45, new float[][] {
             {0, G, 0, 0, P}, {4, 40, 30, 0, P}, {9, 15, 150, -90, A}, {25, 15, 160, -90, A},

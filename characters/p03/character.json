@@ -8775,39 +8775,61 @@
       }
     },
     "THROW_GRAB": {
-      "atlas": "player_base_throw",
+      "atlas": "p03_throw",
       "frames": [
         0,
         1,
         2,
-        3
+        3,
+        4,
+        5,
+        6
       ],
       "loop": false,
       "durationsMs": [
-        20,
-        25,
-        25,
+        10,
+        10,
+        12,
+        13,
+        13,
+        12,
         30
       ]
     },
     "THROW_TOSS": {
-      "atlas": "player_base_throw",
+      "atlas": "p03_throw",
       "frames": [
-        3,
-        4,
-        5,
         6,
         7,
-        8
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
       ],
       "loop": false,
       "durationsMs": [
-        30,
+        60,
+        60,
+        60,
+        60,
         60,
         50,
-        40,
-        40,
-        47
+        60,
+        80,
+        120,
+        120,
+        80,
+        80,
+        60,
+        60
       ]
     },
     "SPECIAL_S2": {
