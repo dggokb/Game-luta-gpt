@@ -79,34 +79,48 @@ verticais e nas asas, sobe em S.
 
 ## p03 — Kōga (escola da família, lado do golpe)
 
-Raiva sem freio, como Kyo e Iori: corpo curvado para a frente, golpes que emendam um no outro, a mão
-que vira garra quando a raiva sobe e a energia da família estourando colada no punho e no pé. Mesmos
-comandos do p01, execução oposta: onde o irmão espera e solta poder, ele avança a cada golpe e bate
-de perto. Distância curta, ritmo de rajada, sem recuar.
+**Linha nova (19/11, o dono: "tô achando ele muito parecido com os outros"; aprovada a linha do
+Bardock do FighterZ):** briga de rua com força bruta, sem forma de arte marcial. O Ryūga, a Natisuko
+e a Yin-lu lutam com escola (shoto, karatê, kung fu); o Kōga aprendeu a mesma escola e joga a forma
+fora: avança, bate pesado com o braço inteiro, cabeça, ombro e cotovelo, e a energia da família ele
+não solta em onda: carrega na mão e arremessa como quem atira uma pedra. Continua da família nos
+comandos dos especiais (os mesmos do Ryūga); a execução é a do brigão. A linha Kyo/Iori de antes
+(garra, Uraken, Carrinho) saiu.
 
-Inspiração: Kyo Kusanagi e Iori Yagami (KOF); Ryu (a base da escola).
+Inspiração: Bardock (Dragon Ball FighterZ): o lariat que avança, o uppercut carregado que emenda no
+arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e golpes próprios.
 
-| Botão | Golpe | Movimento | Forma | Inspiração | Animação |
-|---|---|---|---|---|---|
-| L | Uraken | O dorso do punho da frente sobe ao lado da cabeça e desce estalando no nariz do rival. Rápido, curto, o corpo já inclinado para a frente | dorso do punho · desce no rosto | Kyo | 🎬 B: o jab de hoje é o jab do p01, duas vezes |
-| M | Joelhada que avança | Pisa para dentro e o joelho de trás sobe no estômago, com os punhos descendo para trás para dar impulso. Termina meio corpo à frente | joelho · avançando | — | 🎬 B: hoje é o direto com passo do p01 |
-| H | Chute giratório de calcanhar | Gira de costas sobre o pé da frente, e a perna de trás vem em arco aberto na altura da cabeça. Acerta com o calcanhar e ele volta de frente, já curvado | calcanhar · giro de costas | — | ✅ |
-| 2L | Canelada baixa | Agachado, a canela da perna de trás varre curta na panturrilha do rival e volta | canela · varre curta, agachado | — | 🎬 A: o 2L atual levanta no meio do golpe |
-| 2M | Carrinho | Se joga para a frente deitando de lado; a perna da frente desliza rente ao chão até o tornozelo. Levanta já agachado, meio corpo adiante | perna · carrinho | 88 Shiki do Kyo | 🎬 B: hoje é a rasteira giratória do p01 |
-| 2H | Garra ascendente | Da agachada, a mão de trás abre em garra e sobe rasgando de baixo para cima, rente ao corpo, até acima da cabeça; a energia acende nas unhas. Lançador | garra · rasga subindo | Iori | 🎬 B: hoje é o uppercut do p01 |
-| jL | Dois chutes | No ar, dois chutes curtos e rápidos para a frente, um com cada perna | dois pés · alternados | — | 🎬 B: hoje é o chute lateral do p01 |
-| jM | Cotovelada em queda | No ar, o cotovelo da mão de trás desce de cima para baixo na frente do corpo, com o outro punho na guarda | cotovelo · desce | Naraku Otoshi do Kyo (o golpe de cima para baixo no ar) | 🎬 A: o vídeo não existe (hoje usa a arte do p01) |
-| jH | Pisão | No ar, recolhe o joelho e pisa curto em diagonal para baixo com a sola. Overhead | sola · pisão em diagonal | — | ✅ |
-| S1 | Onda curta ↓↘→ | Soco reto de uma mão só, e a bola pequena sai colada no punho (o p01 empurra as duas palmas) | punho · bola curta | Yami Barai (Kyo e Iori), curto e colado na mão | ✅ |
-| S2 | Punho em sequência →↓↘ | Uppercut que avança subindo, três pancadas, com a energia girando em volta do punho | punho · uppercut que avança | Oniyaki (Kyo e Iori) | ✅ |
-| S3 | Avanço em três ↓↙← | Três investidas de soco, uma por comando, cada uma mais perto | punho · rekka | Aragami do Kyo, Aoi Hana do Iori | ✅ |
-| S4 | Mergulho (no ar ↓↘→) | Para no alto e desce em diagonal com o chute esticado até o chão | pé · mergulho | — | ✅ |
-| Agarrão | Mão na cara | Agarra o rosto do rival com a mão em garra, a energia explode na palma e o rival voa para trás | garra · agarra o rosto e explode | Kototsuki In do Iori | 🎬 A: o vídeo não existe (hoje usa a arte do p01) |
-| Super | Rajada | Hoje: chutes avançando, e o último, alto, lança. Proposta: avança curvado e rasga três vezes com a mão em garra (baixo, meio, alto); o terceiro lança | sequência própria | Yaotome do Iori | ✅ hoje; 🎬 opcional (os chutes de hoje são o lado Kim/Robert que saiu) |
-| Ultra | Fúria da Casa | Investida que vira sequência de socos e chutes e termina com o soco de energia à queima-roupa | sequência própria | Kyo (os supers de sequência) | ✅ |
+| Botão | Golpe | Movimento | Forma | Papel |
+|---|---|---|---|---|
+| L | Gancho curto | Gancho curto e largo da mão da frente na altura do rosto, o ombro junto; volta rápido para a guarda | punho · gancho | abre o combo; rápido |
+| M | Gancho de trás | Dá meio passo e solta o gancho largo da mão de trás, o corpo girando junto | punho · gancho com passo | anda para dentro; repete (M → M) e cancela em pulo, como hoje |
+| H | Martelo | Junta as duas mãos acima da cabeça e desce o martelo na frente, curvado | dois punhos · de cima para baixo | o forte de longe; joga na parede |
+| ↓ + L | Soco baixo | Agachado, soco curto na canela | punho · baixo | baixo rápido; abre |
+| ↓ + M | Rasteira de pisão | Agachado, estica a perna e pisa no tornozelo do rival, rente ao chão | sola · baixo | derruba; o OTG de todos (↓ + M no caído) sai daqui |
+| ↓ + H | Uppercut de baixo | Da agachada, sobe com o uppercut largo da mão de trás, levantando o corpo inteiro | punho · uppercut | lançador para o combo no ar |
+| → + M | Cabeçada | Dá um passo e bate a testa de cima para baixo no rosto do rival | cabeça · desce | golpe alto (pega quem está agachado) |
+| → + H | Ombrada que avança | Abaixa o ombro e se joga contra o rival em dois passos curtos | ombro · investida curta | golpe de comando: anda, empurra para a parede, cancela em especial |
+| → → + H | Lariat | Da corrida, o braço da frente esticado na altura do pescoço, o corpo todo atrás | braço · lariat | golpe de corrida: lança baixo para continuar |
+| L no ar | Joelho | No ar, sobe o joelho de trás | joelho | rápido no ar |
+| M no ar | Cotovelo que desce | No ar, desce o cotovelo de cima para baixo | cotovelo · desce | emenda no ar |
+| H no ar | Martelo no ar | No ar, desce o martelo das duas mãos | dois punhos · de cima | overhead; joga na parede no combo |
+| ↓ + H no ar | Pisão | No ar, pisa em diagonal para baixo com a sola | sola · crava | crava no chão (quica) |
+| S1 ↓↘→ | Pedra de energia | Fecha a mão, a energia da família acende nela, e ele arremessa a bola como uma pedra, com o braço por cima | mão · arremesso | projétil (a onda da escola, à moda dele) |
+| S2 →↓↘ | Uppercut da casa | Abaixa e sobe com um uppercut que avança, o corpo inteiro subindo atrás do punho | punho · uppercut que avança | anti-aéreo; o Shoryuken da escola, à moda dele |
+| S3 ↓↙← | Investida bruta | Se joga para a frente com o lariat (L curto, M médio, H longo); apertando de novo, emenda um segundo braço | braço · investida em até 2 | o golpe marca dele (no lugar do rekka de três socos) |
+| S4 no ar ↓↘→ | Queda de punho | No ar, para e desce de cabeça com o punho para baixo até o chão | punho · mergulho | derruba |
+| Agarrão | Cabeçada segurando | Agarra a gola com as duas mãos, puxa e dá a cabeçada; o rival cai de costas | cabeça · segura e bate | o agarrão com personalidade (CenaDoAgarrao) |
+| Super | Uppercut carregado | Carrega o punho em energia, avança e sobe com o uppercut; acertando, apertar de novo arremessa a pedra de energia grande no rival no alto | punho · uppercut + arremesso | sobe o rival e emenda no arremesso (o seguimento, como a voadora da Natisuko) |
+| Ultra | Fúria da Casa | Investida, sequência de ganchos, cabeçada e joelho, e termina carregando a pedra de energia gigante à queima-roupa | sequência própria | o fecho |
 
-**Rastro:** chama curta e rasgada, colada no punho, na garra e no pé, na cor da família (a mesma do
-p01; no p01 é o arco de energia limpo). Nas garras, três riscos com fagulhas.
+**Assist:** a Pedra de energia (S1). **Estilo de combo:** `pressao`, como hoje (o M que repete e
+cancela em pulo). **CPU:** estilo `rekka` vira o da investida (entra com o S3). **Rastro:** braço,
+ombro e punho com o rastro pesado de golpe forte; a energia da família só na pedra, no S2, no Super
+e no Ultra.
+
+**Muda no motor:** o S3 deixa de ser o rekka de três e vira a investida com até dois braços (o
+mesmo mecanismo do seguimento); o Super ganha o seguimento do arremesso; → + M, → + H e → → + H
+entram (hoje saem o H). Tempos e danos seguem os do molde rushdown até ajustar no celular.
 
 ## p04 — Brucy (boxeador de rua)
 
