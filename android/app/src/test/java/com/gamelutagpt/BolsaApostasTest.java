@@ -242,7 +242,7 @@ public class BolsaApostasTest {
         for (int i = 0; i < BolsaApostas.CAI + 120; i++) {
             l.step();
             int antes = imagens[0];
-            l.bolsa.desenhar(c, i / 60f, BolsaApostas.CENTRO_TOQUE);
+            l.bolsa.desenhar(c, i / 60f, BolsaApostas.CENTRO_TELA);
             l.bolsa.desenharVoos(c);
             if (i < BolsaApostas.VOO_QUADROS && imagens[0] - antes > 20) noVoo++;
         }

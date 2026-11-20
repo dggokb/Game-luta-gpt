@@ -387,8 +387,8 @@ final class BolsaApostas {
 
     /** Pasta da arte (montada por tools/hud/montar_apostas.py a partir das imagens do Codex). */
     static final String PASTA = "ui/hud/apostas/";
-    /** O placar na tela: largura e o centro (no celular, o vão entre o direcional e os botões). */
-    static final float LARGURA = 450f, CENTRO_TELA = 640f, CENTRO_TOQUE = 575f;
+    /** O placar na tela: largura e o centro (o meio da tela, com ou sem os controles de toque). */
+    static final float LARGURA = 450f, CENTRO_TELA = 640f;
     /** A faixa da borda de baixo, de ponta a ponta. */
     static final float FAIXA_ALTURA = 32f;
     /** O quanto a caixa do narrador sobe para ficar em cima do placar. */
@@ -545,8 +545,7 @@ final class BolsaApostas {
 
     /**
      * O letreiro do rodapé (o concept M1): a faixa de ponta a ponta e o placar que sobe no meio,
-     * centrado em {@code centro} (o vão entre o direcional e os botões no celular); e as moedas
-     * voando até a barra de Super, com o rastro de luz.
+     * centrado em {@code centro} (o meio da tela).
      */
     void desenhar(RenderCanvas c, float tempo, float centro) {
         if (!temArte()) {

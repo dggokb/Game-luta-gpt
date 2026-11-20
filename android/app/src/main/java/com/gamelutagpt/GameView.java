@@ -4831,8 +4831,7 @@ public class GameView extends SurfaceView
                     if (storyMode || TesteDesempenho.hud) drawHud(canvas);
                     else hud.drawButtonsOnly(canvas, hudState);
                     if (apostaNaLuta() && (storyMode || TesteDesempenho.hud)) {
-                        bolsa.desenhar(renderCanvas, engine.frame() / 60f,
-                            touchControls ? BolsaApostas.CENTRO_TOQUE : BolsaApostas.CENTRO_TELA);
+                        bolsa.desenhar(renderCanvas, engine.frame() / 60f, BolsaApostas.CENTRO_TELA);
                     }
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }

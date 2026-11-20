@@ -58,8 +58,8 @@ M1 escolhido por ele (`art/hud/apostas/concepts/concept_m1.png`):
 
 - **A faixa** de TV na borda de baixo, de ponta a ponta, com `● AO VIVO  APOSTAS` à esquerda do
   placar (o ponto vermelho pisca).
-- **O placar** sobe no meio da faixa, no vão entre o direcional e os botões (centro 575 com os
-  controles de toque na tela, 640 sem): o dinheiro de cada dupla em dígitos grandes da cor do
+- **O placar** sobe no meio da faixa, centrado na tela (o dono, 20/11: no vão entre os controles
+  ficava torto): o dinheiro de cada dupla em dígitos grandes da cor do
   time (o valor sobe contando), a seta verde ▲ logo depois de ganhar e a vermelha ▼ enquanto a
   aposta cai, o **medalhão** com o rosto do Apostador (normal; rindo num ganho grande;
   gargalhando, com raios, no patamar e na virada), a **barra** azul e vermelha com a parte de cada
