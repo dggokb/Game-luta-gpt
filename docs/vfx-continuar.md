@@ -2143,3 +2143,8 @@ no lugar do `impacto_v08_forte` só ali.
   `art/vfx/teste_soco_forte_v09/teste4_amarelo_azul/`. Vídeo lado a lado, normal e câmera lenta,
   fora do jogo. Nos quadros: a estrela forte no punho e o anel abrindo sem tomar a tela. Falta o
   dono dizer. **Tamanho: 2,5x é grande demais; 2x é o que está em teste.**
+- **Teste 3 × teste 4 em 1,5x:** o dono pediu os dois lado a lado em 1,5x (`pixelScale` 1,0; ~470
+  px de altura com o anel aberto). Vídeo lado a lado, normal e câmera lenta, fora do jogo. Nos
+  quadros: o dourado mais fino e discreto; o amarelo com miolo azul mais cheio e claro. Falta o
+  dono escolher (as folhas guardadas estão no tamanho do último teste de cada um: para instalar em
+  1,5x, `pixelScale` 1,0).
