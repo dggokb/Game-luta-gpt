@@ -18880,18 +18880,19 @@
       "mecanica": {
         "rebote": true,
         "avanco": {
-          "velocidade": 620,
+          "velocidade": 560,
           "frames": [
             0,
-            22
+            30
           ]
         },
         "voo": {
-          "altura": 100,
+          "altura": 80,
           "frames": [
             9,
             30
-          ]
+          ],
+          "recuo": 160
         }
       },
       "buttons": [
