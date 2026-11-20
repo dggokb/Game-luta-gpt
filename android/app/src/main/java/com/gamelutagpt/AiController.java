@@ -129,7 +129,7 @@ final class AiController {
     private boolean dashing;
     /**
      * O golpe de corrida (19/11, "a CPU acompanha tudo"): em cada corrida para dentro ela decide uma
-     * vez se termina com o H correndo (o lariat do Kōga, o carrinho da Yin-lu...).
+     * vez se termina com o H correndo (a voadora do Kōga, o carrinho da Yin-lu...).
      */
     private boolean corridaDecidida, corridaComGolpe;
     /**

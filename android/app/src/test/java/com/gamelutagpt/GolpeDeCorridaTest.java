@@ -10,7 +10,7 @@ import org.junit.Test;
  * cada um. O Ryūga dá a Ombrada, que joga na parede mesmo sozinha (correu, acertou, combo); a
  * Yin-lu dá o Carrinho da garça, baixo, dois acertos, derruba e o ↓ + M no caído continua; e o
  * Carrinho também pega quem já está caído no combo (16/11): o chute levanta e o combo continua.
- * Quem não tem o golpe (o p04, por enquanto; o Kōga ganhou o lariat em 19/11) dá o H de sempre.
+ * Quem não tem o golpe (o p04, por enquanto; o Kōga ganhou o golpe em 19/11, a voadora desde 20/11) dá o H de sempre.
  */
 public class GolpeDeCorridaTest {
     private static final String RYUGA = "player_base", YINLU = "p02";

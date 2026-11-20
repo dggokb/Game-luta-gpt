@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p03_garra_2-import.png",
   "expectedFrames": 20,
   "segmentation": "prepared-grid",
-  "columns": 5,
+  "columns": 4,
   "rootMode": "authored",
   "sourceNote": "p03 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -18,18 +18,20 @@
     "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
     "quadros": "35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,58,60,94,112",
     "celula": 352,
-    "largura": 384,
-    "raiz": "114,333",
-    "colunas": 5,
+    "largura": 416,
+    "raiz": "126,324",
+    "colunas": 4,
     "fixar": "video",
     "sem_poeira": true,
+    "manter_efeitos": true,
     "limpar_chao": true,
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "objetos": 1500
   },
-  "frameWidth": 768,
+  "frameWidth": 832,
   "frameHeight": 704,
-  "rootX": 228,
-  "rootY": 666,
+  "rootX": 252,
+  "rootY": 648,
   "pixelScale": 2.0
 }

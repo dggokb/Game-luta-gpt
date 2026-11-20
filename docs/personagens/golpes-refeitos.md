@@ -100,7 +100,7 @@ arremesso de energia, o guerreiro sem técnica de escola. Nada copiado: nomes e 
 | ↓ + H | Braço ao céu | Da agachada, sobe de uma vez com o braço reto para o alto | punho · sobe | lançador para o combo no ar (19/11: o vídeo do dono, no jogo) |
 | → + M | Bica pulando | Pulinho para a frente e a sola esticada na altura do quadril | sola · pulando | golpe alto (pega quem está agachado) (19/11: o vídeo M_BAIXO do dono, no jogo) |
 | → + H | Ombrada que avança | Abaixa o ombro e se joga contra o rival em dois passos curtos | ombro · investida curta | golpe de comando: anda, empurra para a parede, cancela em especial |
-| → → + H | Lariat | Da corrida, o braço da frente duro na altura do ombro, o corpo todo atrás | braço · lariat | golpe de corrida: lança em arco baixo para continuar (19/11: o vídeo do dono, no jogo) |
+| → → + H | Voadora correndo | Da corrida, sai do chão e estica a perna da frente na altura do peito; cai agachado | perna · voadora | golpe de corrida: lança em arco baixo para continuar (20/11: troca o lariat de 19/11, o dono: "quero uma voadora") |
 | L no ar | Soco reto no ar | No ar, soco reto da mão da frente | punho · reto | rápido (19/11: o vídeo do dono, no jogo) |
 | M no ar | Voadora de sola | No ar, estica a perna da frente e crava a sola em diagonal para a frente e para baixo, o corpo atrás do pé | sola · voadora curta | emenda no ar (19/11: o cotovelo era curto e pouco agressivo) |
 | H no ar | Voadora de dois pés | No ar, encolhe os joelhos e estica as duas pernas juntas para a frente, o corpo deitado atrás (o dropkick) | duas solas · reto para a frente | o forte no ar; joga na parede no combo (19/11: a marreta virou o ↓jH; a joelhada ficou parecendo agarrar) |

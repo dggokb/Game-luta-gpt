@@ -61,6 +61,7 @@
     "sem_poeira": true,
     "limpar_chao": true,
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "objetos": 1500
   }
 }

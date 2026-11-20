@@ -294,6 +294,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args.append('--manter-efeitos')  # bola de energia e raio desenhados pelo vídeo (S1 do p15)
     if opts.get('cor_efeito'):
         args.append(f"--cor-efeito={opts['cor_efeito']}")  # a aura vermelha do S2 do p15
+    if opts.get('objetos'):
+        args.append(f"--objetos={opts['objetos']}")  # peça solta do corpo (as marcas da garra do p03)
     if opts.get('reescala'):
         # Fator de tamanho por quadro (divide a escala): o chute no ar do p01 que estica o corpo
         # inteiro e fica maior que a guarda.
@@ -354,8 +356,10 @@ def efeito_leve(caminho):
     a = np.array(Image.open(caminho).convert('RGBA')).astype(np.float32)
     r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
     lum = (0.3 * r + 0.59 * g + 0.11 * b) / 255
-    fogo = (r > 190) & (b < 90)
+    fogo = (r > 150) & (b < 90)
     a[..., 3] = np.where(fogo, al * np.clip(0.25 + (lum - 0.35) * 1.6, 0.25, 1), al)
+    # A borda amarela (o verde do fundo que o sem_verde puxou para amarelo) vira o laranja do brilho.
+    a[..., 1] = np.where(fogo, np.minimum(g, r * 0.5), g)
     Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA').save(caminho)
 
 

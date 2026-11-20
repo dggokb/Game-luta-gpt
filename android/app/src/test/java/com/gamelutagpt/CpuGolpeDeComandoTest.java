@@ -9,7 +9,7 @@ import org.junit.Test;
  * A CPU usa o → + H (o golpe de comando) na punição (19/11, "a CPU acompanha tudo"): a ombrada do
  * Kōga avança e pega o erro de mais longe que o H parado. E o → + M (golpe alto) e o → + H do Kōga
  * existem no pacote, com o golpe alto marcado como alto. Correndo para dentro, ela termina a corrida
- * no golpe de corrida (o H correndo: o lariat do Kōga, o carrinho da Yin-lu...).
+ * no golpe de corrida (o H correndo: a voadora do Kōga, o carrinho da Yin-lu...).
  */
 public class CpuGolpeDeComandoTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");

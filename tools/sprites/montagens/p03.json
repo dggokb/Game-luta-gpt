@@ -641,8 +641,8 @@
       }
     }
   },
-  "lariat": {
-    "_doc": "→ → + H, Lariat (19/11, vídeo dashH do dono, da inicio_corrida_h3): da corrida (1-17) estica o braço da frente duro na altura do ombro (21, o impacto) e avança com ele (25-29); 31-51 têm o braço cortado na borda direita do vídeo e ficam de fora (o 29 segura). Volta à guarda (53-71). O corpo fica na raiz (registro): quem anda é o motor.",
+  "voadora_corrida": {
+    "_doc": "→ → + H, Voadora correndo (20/11, vídeo dashH novo do dono, da inicio_corrida_h3; o dono: \"dash H vamos mudar, não gostei desse, quero uma voadora\", troca o lariat): sai do chão no fim da corrida (21-32), estica a perna da frente (33, o impacto), segura (35-57), recolhe e cai agachado (60-78) e levanta para a guarda (81-90). Sem o deslizamento lateral do vídeo (fixar tronco: quem anda é o motor); a subida e a descida do pulo ficam no desenho.",
     "trechos": [
       [
         "dashH",
@@ -650,28 +650,39 @@
         124
       ]
     ],
-    "quadros": "1,5,9,13,17,21,25,29,53,55,57,63,71",
+    "quadros": "21,24,26,28,30,32,33,35,37,39,45,51,57,60,63,66,69,72,75,78,81,84,87,90",
     "opcoes": {
-      "fixar": "registro",
+      "fixar": "tronco",
       "sem_poeira": true
     },
     "animacoes": {
-      "LARIAT": {
-        "impacto": 5,
+      "VOADORA_CORRIDA": {
+        "impacto": 6,
         "tempos": [
-          33,
-          34,
-          33,
-          34,
-          35,
-          98,
-          51,
-          170,
-          34,
-          34,
-          34,
-          34,
-          34
+          73,
+          48,
+          48,
+          48,
+          48,
+          25,
+          28,
+          24,
+          24,
+          72,
+          72,
+          72,
+          36,
+          36,
+          36,
+          36,
+          36,
+          36,
+          36,
+          36,
+          36,
+          36,
+          36,
+          24
         ]
       }
     }
@@ -824,7 +835,8 @@
       "fixar": "video",
       "sem_poeira": true,
       "sem_verde": true,
-      "efeito_leve": true
+      "efeito_leve": true,
+      "objetos": 1500
     },
     "animacoes": {
       "GARRA_1": {
@@ -868,7 +880,8 @@
       "fixar": "video",
       "sem_poeira": true,
       "sem_verde": true,
-      "efeito_leve": true
+      "efeito_leve": true,
+      "objetos": 1500
     },
     "animacoes": {
       "GARRA_2": {
@@ -912,7 +925,8 @@
       "fixar": "video",
       "sem_poeira": true,
       "sem_verde": true,
-      "efeito_leve": true
+      "efeito_leve": true,
+      "objetos": 1500
     },
     "animacoes": {
       "SPECIAL_ENERGY": {
