@@ -1,14 +1,14 @@
 {
  "nome": "impacto_v09_teste",
- "video": "teste 2 do dono (imagem 4x4 amarela, 20/11)",
+ "video": "teste 2 do dono (imagem 4x4 amarela, 20/11) \u00b7 2x maior",
  "trecho": [
   0,
   14
  ],
  "passo": 1,
  "ancora": "origem",
- "pixelScale": 1.5,
- "altura": 317.3,
+ "pixelScale": 0.75,
+ "altura": 634.7,
  "duracoesMs": [
   33,
   33,

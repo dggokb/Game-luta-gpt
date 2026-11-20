@@ -2126,3 +2126,7 @@ no lugar do `impacto_v08_forte` só ali.
   lenta. Nos quadros: a estrela aparece no punho, mas os 15 quadros correm no tempo curto do
   acerto forte (~0,28 s) e as faíscas abertas são finas e claras; ao lado do v08 parece pequeno.
   Falta o dono dizer.
+- **Teste 2 maior:** o dono pediu "deixa maior". `pixelScale` 0,75 (o dobro: a estrela do tamanho
+  da do v08, ~635 px de altura com as faíscas abertas); o tempo igual. O `efeito.json` guardado em
+  `art/vfx/teste_soco_forte_v09/teste2_amarelo/` já está nesse tamanho. Vídeo lado a lado, normal e
+  câmera lenta, fora do jogo. Falta o dono dizer.
