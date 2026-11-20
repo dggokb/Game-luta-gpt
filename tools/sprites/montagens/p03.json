@@ -1022,5 +1022,107 @@
         ]
       }
     }
+  },
+  "special_s3": {
+    "_doc": "S3 ↓↙←, Investida da voadora (20/11, a ideia do dono: \"ele dá o dash curto e voadora, se acertar o adversário emenda os golpes, se errar... errou\"; vídeos dashH, a voadora, e s3, a rajada de socos). Corre (6-21), sai do chão (24-32) e acerta a voadora (33, o 1º acerto); acertando, pousa (39-84), solta os cinco socos curtos (s3 33, 41, 45, 55, 65) e o soco grande (s3 73) e volta à guarda (s3 76-99). Errou ou defenderam: o SPECIAL_S3_ERRO (cai da voadora). Sem o deslizamento lateral (fixo): quem anda é o motor.",
+    "trechos": [
+      [
+        "dashH",
+        0,
+        90,
+        "fixo"
+      ],
+      [
+        "s3",
+        28,
+        100,
+        "emenda"
+      ]
+    ],
+    "quadros": "6,9,12,15,18,21,24,26,28,30,32,33,35,37,39,48,57,60,63,66,69,72,75,81,84,92,93,94,95,97,99,101,103,105,107,110,113,115,117,120,123,125,127,130,132,135,138,142,146,150,153,156,159,161",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "SPECIAL_S3": {
+        "impacto": 11,
+        "tempos": [
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          28,
+          28,
+          28,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          24,
+          29,
+          29,
+          29,
+          30,
+          50,
+          50,
+          29,
+          29,
+          29,
+          30,
+          29,
+          29,
+          29,
+          30,
+          56,
+          56,
+          55,
+          59,
+          59,
+          59,
+          59,
+          59,
+          59,
+          59,
+          59,
+          61
+        ]
+      }
+    }
+  },
+  "special_s3_erro": {
+    "_doc": "S3 que errou a voadora (ou defenderam): do chute recolhe, cai agachado e levanta (dashH 39-90), sem os socos.",
+    "trechos": [
+      [
+        "dashH",
+        0,
+        124,
+        "fixo"
+      ]
+    ],
+    "quadros": "39,48,57,60,63,66,69,72,75,78,81,84,87,90",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true
+    },
+    "animacoes": {
+      "SPECIAL_S3_ERRO": {}
+    }
   }
 }

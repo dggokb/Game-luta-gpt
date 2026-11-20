@@ -74,9 +74,10 @@ public class CpuComboNoArTest {
     @Test public void antesElaSePerdia() {
         AiController.superPuloNoCancelamento = false;
         AiController.acertoNaPausa = false;
-        int[] antes = medir("p03", 2);
+        // 6 sementes (20/11): com 2, o sorteio do S3 novo do Kōga (a investida da voadora) deixava 0 de 2.
+        int[] antes = medir("p03", 6);
         religa();
-        int[] agora = medir("p03", 2);
+        int[] agora = medir("p03", 6);
         assertTrue("antes " + antes[1] + "/" + antes[0] + ", agora " + agora[1] + "/" + agora[0],
             agora[1] * antes[0] > antes[1] * agora[0] + agora[0] * antes[0] / 3);
     }

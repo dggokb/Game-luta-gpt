@@ -800,7 +800,8 @@ public class MechanicsTest {
     @Test public void everyCharacterCarriesItsOwnMechanic() {
         AttackDefinition.Reads high = AttackDefinition.Reads.HIGH, any = AttackDefinition.Reads.ANY;
         assertEquals(high, mech("p02", "S3").counter);
-        assertEquals("rekka: three thrusts, like its animation", 3, GeneratedCharacters.get("p03").attack("S3").maxHits);
+        assertEquals("the flying-kick rush (20/11): the kick and six punches, like its animation", 7, GeneratedCharacters.get("p03").attack("S3").maxHits);
+        assertTrue("the punches only come when the kick lands", GeneratedCharacters.get("p03").attack("S3").mechanics.rebound);
         assertTrue(mech("p03", "S3").advanceSpeed > 0f);
         assertEquals(high, mech("p04", "S3").evade);
         assertTrue(GeneratedCharacters.get("p04").attack("S3").cancelsInto("L"));
