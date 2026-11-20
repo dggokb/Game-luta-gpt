@@ -175,6 +175,9 @@ São imagens largas (1774×887), cada uma uma página de um quadro só. O
   `pag10_koga_p05` / `_p11` / `_p13` (65 de cada dupla: "cala a boca e vamos..." / "não precisamos de
   motivo pra lutar... vem!"), e logo a luta da emboscada. Também vieram pelo chat; o rascunho antigo do
   Kōga (a noite e o splash `ponte_koga`) saiu.
+- **Fim do ep05:** depois da luta da emboscada, `pag11_ryuga` (66: o Ryūga e a Yín-lù cansados na ponte,
+  "isso é desumano...") ou `pag11_koga` (66: o Kōga e o Brucy, "vamos vencer isso... e então..."), e o
+  cartão "Semifinal". O rascunho do mensageiro depois da luta (`pag3_q1`/`pag3_q2`) saiu.
 
 ### O sorteio em cena (ep04)
 
