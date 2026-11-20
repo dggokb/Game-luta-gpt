@@ -2156,3 +2156,9 @@ no lugar do `impacto_v08_forte` só ali.
   (~315 px de altura com o anel aberto), lado a lado com o `impacto_v08_forte`, normal e câmera
   lenta, fora do jogo. Nos quadros, a estrela fica menor que a do v08 e o anel abre em volta do
   punho. Falta o dono dizer.
+- **Teste 5 (Impacto-cel10, do programa de efeitos do dono):** folha 4×4 de 2048 px (células de
+  512), 15 quadros, 24 fps (42 ms por quadro), com transparência (os brilhos amarelos são quase
+  transparentes; a prévia sem alfa os mostra chapados). Em 1x (`pixelScale` 1,5; ~304 px de
+  altura) ao lado do v08, normal e câmera lenta, fora do jogo. Nos quadros: aparecem a estrela
+  amarela e as faíscas; os brilhos redondos e os anéis do fim quase não se veem no cenário.
+  Guardado em `art/vfx/teste_soco_forte_v09/teste5_impacto_cel10/`. Falta o dono dizer.
