@@ -49,7 +49,11 @@ final class SpriteMotion {
         else if(!grounded) next=velocityY < -35 ? Clip.JUMP : Clip.FALL;
         else if(crouching) next=crouched();
         else if(combat || locked) next=Clip.COMBAT;
-        else if(!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) next=Clip.LAND;
+        // O pouso só toca parado: andando ou correndo logo ao pousar (dois para a frente), o desenho
+        // vai para o passo (20/11, o dono: "o super pulo, quando toca o chão e dá dois para a frente,
+        // ainda desliza": o pouso agachado escorregava na velocidade da corrida).
+        else if((!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) &&
+                Math.abs(travel)<=.001f) next=Clip.LAND;
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
         else if(peloPe) next=passadaFrente ? Clip.WALK_FORWARD : Clip.WALK_BACK;
         else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;

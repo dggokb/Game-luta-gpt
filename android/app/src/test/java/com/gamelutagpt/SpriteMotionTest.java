@@ -96,6 +96,18 @@ public class SpriteMotionTest {
             assertEquals(id+": no chão, o pouso",SpriteMotion.Clip.LAND,m.clip);
         }
     }
+    /** Pousou e já corre (dois para a frente): o desenho é o da corrida, não o pouso escorregando. */
+    @Test public void pousarCorrendoNaoEscorregaNoPouso() {
+        for(String id:new String[]{"p03","p02","player_base"}) {
+            CharacterDefinition c=GeneratedCharacters.get(id);
+            SpriteMotion m=new SpriteMotion(c);
+            for(int i=0;i<10;i++)m.update(.016f,false,false,300,0,true,false,false,null,0,false,false);
+            m.update(.016f,true,false,0,0,true,false,false,null,0,false,false);
+            assertEquals(id+": parado, pousa",SpriteMotion.Clip.LAND,m.clip);
+            m.update(.016f,true,false,0,8f,true,true,false,null,0,false,false);
+            assertEquals(id+": correndo, corre",SpriteMotion.Clip.DASH,m.clip);
+        }
+    }
     @Test public void holdingDownAfterACrouchingAttackStaysCrouched() {
         // Quem não tem a respiração agachada (CROUCH_IDLE): o p04 (a p02 ganhou a dela em 12/11, o p03 em 19/11).
         CharacterDefinition sem=GeneratedCharacters.get("p04");
