@@ -21,7 +21,9 @@ public class NarracaoTest {
     /** Os eventos que a luta pede (NarradorLuta): todos precisam de fala. */
     static final String[] EVENTOS = {"inicio", "primeiro_golpe", "combo", "combo_grande", "super", "ultra",
         "guard_break", "combo_breaker", "defesa_perfeita", "agarrao", "punicao", "troca", "apuros", "dominando",
-        "virada", "tempo", "ko", "ko_ultra", "vitoria", "perfeito", "tempo_esgotado", "empate"};
+        "virada", "tempo", "ko", "ko_ultra", "vitoria", "perfeito", "tempo_esgotado", "empate",
+        // A Bolsa de Apostas da Semifinal (BolsaApostas): fala o Apostador.
+        "aposta_inicio", "aposta_patamar", "aposta_virada", "aposta_esfriando", "aposta_caindo"};
 
     private static final RenderAssets ARQUIVOS = new RenderAssets() {
         @Override public String readText(String path) throws IOException {
@@ -45,6 +47,7 @@ public class NarracaoTest {
             v.put(k, "Ryūga");
         }
         v.put("n", "7");
+        v.put("valor", "¥ 1.250.000");
         return v;
     }
 
@@ -81,6 +84,7 @@ public class NarracaoTest {
             v.put(k, "Takatoshi");
         }
         v.put("n", "12");
+        v.put("valor", "¥ 12.750.000");
         for (String idioma : new String[] {null, "en", "es"}) {
             Narracao n = narrador();
             if (idioma != null) {
@@ -129,8 +133,33 @@ public class NarracaoTest {
     @Test public void everyExpressionHasItsPortrait() {
         Narracao n = narrador();
         for (Map.Entry<String, Narracao.Evento> e : n.eventos().entrySet()) {
-            File retrato = new File(ASSETS, ConversaLuta.RETRATOS + "/" + Narracao.QUEM + "_" + e.getValue().expressao + ".png");
+            File retrato = new File(ASSETS, ConversaLuta.RETRATOS + "/" + e.getValue().quem + "_" + e.getValue().expressao + ".png");
             assertTrue(e.getKey() + ": falta " + retrato, retrato.isFile());
+        }
+    }
+
+    @Test public void theGamblerSpeaksInTheSameBandWithHisOwnFace() {
+        Narracao n = narrador();
+        for (String evento : new String[] {"aposta_inicio", "aposta_patamar", "aposta_virada", "aposta_esfriando", "aposta_caindo"}) {
+            assertEquals(evento + " é do Apostador", "apostador", n.eventos().get(evento).quem);
+        }
+        assertEquals("o narrador continua o dono dos outros", Narracao.QUEM, n.eventos().get("inicio").quem);
+        assertTrue(n.narrar("aposta_patamar", vars()));
+        assertEquals("apostador", n.quemAtual());
+        assertTrue(n.textoAtual().contains("Ryūga") || n.textoAtual().contains("¥"));
+        n.stop();
+        assertNull(n.quemAtual());
+        assertTrue(n.narrar("inicio", vars()));
+        assertEquals(Narracao.QUEM, n.quemAtual());
+    }
+
+    @Test public void aVoiceOutsideTheListIsAnError() {
+        Narracao n = new Narracao(ARQUIVOS);
+        try {
+            n.fromJson("{\"eventos\":{\"x\":{\"quem\":\"fulano\",\"falas\":[\"oi\"]}}}");
+            fail("voz sem estar em vozes");
+        } catch (IllegalArgumentException esperado) {
+            assertTrue(esperado.getMessage().contains("fulano"));
         }
     }
 
@@ -192,7 +221,7 @@ public class NarracaoTest {
                     String t = traducao.get(fala);
                     // As variáveis continuam lá na tradução.
                     for (String var : new String[] {"{p1}", "{p2}", "{atacante}", "{defensor}", "{entra}", "{nome}",
-                        "{vencedor}", "{perdedor}", "{n}"}) {
+                        "{vencedor}", "{perdedor}", "{n}", "{valor}"}) {
                         assertEquals(idioma + ": " + var + " em \"" + fala + "\"", fala.contains(var), t.contains(var));
                     }
                 }

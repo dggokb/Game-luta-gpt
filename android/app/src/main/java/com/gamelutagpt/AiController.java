@@ -353,8 +353,27 @@ final class AiController {
      * ela fica com pressa ({@link OpponentAi#urgency}): ataca mais, recua e espera menos.
      */
     void setSecondsLeft(int seconds) {
-        urgency = OpponentAi.urgency(seconds);
+        urgenciaDoRelogio = OpponentAi.urgency(seconds);
+        urgency = Math.max(urgenciaDoRelogio, pressaDaAposta);
     }
+
+    /**
+     * A Bolsa de Apostas ({@link BolsaApostas}): {@code pressa} (0 a 1) sobe quando ela fica sem
+     * atacar e os apostadores vão tirar dinheiro dela; vira a mesma pressa do relógio no fim (ataca
+     * mais, recua e espera menos). {@code show}: quanto o espetáculo vale para ela (1 com as odds
+     * iguais, mais na zebra); o Ultra e o SHINKAI do neutro saem nessa proporção. Fora da
+     * Semifinal: (0, 1).
+     */
+    void setAposta(float pressa, double show) {
+        pressaDaAposta = Math.max(0f, Math.min(1f, pressa));
+        showDaAposta = Math.max(0.5, Math.min(BolsaApostas.MULT_MAX, show));
+        urgency = Math.max(urgenciaDoRelogio, pressaDaAposta);
+    }
+
+    double showDaAposta() { return showDaAposta; }
+
+    private float urgenciaDoRelogio, pressaDaAposta;
+    private double showDaAposta = 1.0;
 
     float urgency() { return urgency; }
 
@@ -3545,7 +3564,7 @@ final class AiController {
         float life = me.state.life / (float)me.state.profile.maxLife;
         FighterState partner = team.partner();
         if (me.grounded && target.grounded && distance <= ULTRA_REACH &&
-            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE * (1.0 - smart()))) {
+            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE * (1.0 - smart()) * showDaAposta)) {
             out.ultra = true;
             return true;
         }
@@ -3561,7 +3580,7 @@ final class AiController {
             return true;
         }
         if (life < 0.6f && teams.canShinkai(me) &&
-            chance(SHINKAI_LOW_LIFE_CHANCE * (1.0 - 0.7 * smart()))) {
+            chance(SHINKAI_LOW_LIFE_CHANCE * (1.0 - 0.7 * smart()) * showDaAposta)) {
             out.shinkai = true;
             return true;
         }

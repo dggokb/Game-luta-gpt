@@ -102,12 +102,18 @@ final class TelaoLuta {
         void quadro(RenderCanvas rc, CharacterDefinition ch, String clip, int frame, float x, float y, int facing);
     }
 
-    /**
-     * Desenha a tela do telão no retângulo (l, t, r, b). {@code leve}: sem os parceiros e sem as
-     * linhas de TV (modo de efeitos leves).
-     */
     void desenhar(RenderCanvas c, Quadros desenhista, float l, float t, float r, float b,
                   float chaoY, boolean leve, float tempo) {
+        desenhar(c, desenhista, l, t, r, b, chaoY, leve, tempo, null);
+    }
+
+    /**
+     * Desenha a tela do telão no retângulo (l, t, r, b). {@code leve}: sem os parceiros e sem as
+     * linhas de TV (modo de efeitos leves). {@code letreiro}: uma faixa embaixo (as odds da
+     * Bolsa de Apostas na Semifinal), ou null.
+     */
+    void desenhar(RenderCanvas c, Quadros desenhista, float l, float t, float r, float b,
+                  float chaoY, boolean leve, float tempo, String letreiro) {
         float w = r - l, h = b - t;
         if (w < 8f || h < 8f) return;
         c.save();
@@ -149,6 +155,12 @@ final class TelaoLuta {
         } else {
             if (((int)(tempo * 2f)) % 2 == 0) c.fillCircle(l + tam * 0.9f, t + tam * 0.95f, tam * 0.32f, 0xFFE53935);
             esquerda(c, "AO VIVO", l + tam * 1.5f, base, tam, 0xEEFFFFFF);
+        }
+        if (letreiro != null && !replay()) {
+            // O letreiro das apostas: uma faixa escura embaixo, o texto em dourado.
+            float lt = Math.max(7f, h * 0.09f);
+            c.fillRect(l, b - lt * 1.7f, r, b, 0xCC000000);
+            c.drawText(letreiro, (l + r) * 0.5f, b - lt * 0.45f, lt, 0xFFFFD54A, 0, 0f, false);
         }
         c.restore();
     }

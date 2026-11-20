@@ -29,6 +29,10 @@ import java.util.Map;
  * O retrato é {@code historia/retratos/narrador_<expressao>.png} (normal, empolgado, serio),
  * recortado do concept; sem a imagem, o quadro mostra uma silhueta com microfone. Padrão:
  * docs/historia/narrador.md.
+ *
+ * Outras vozes dividem a mesma faixa (o Apostador na Semifinal): o arquivo lista em
+ * {@code "vozes"} o nome e a cor de cada uma, e o evento diz quem fala ({@code "quem"}); o
+ * retrato é {@code historia/retratos/<quem>_<expressao>.png}. Sem {@code "quem"}, fala o narrador.
  */
 public final class Narracao {
     public static final String ARQUIVO = Temporada.PASTA + "/narrador.json";
@@ -65,11 +69,29 @@ public final class Narracao {
         final int prioridade;
         final String expressao;
         final List<String> falas;
+        /** Quem fala ({@link #QUEM} ou uma das {@code "vozes"}). */
+        final String quem;
 
         Evento(int prioridade, String expressao, List<String> falas) {
+            this(prioridade, expressao, falas, QUEM);
+        }
+
+        Evento(int prioridade, String expressao, List<String> falas, String quem) {
             this.prioridade = prioridade;
             this.expressao = expressao;
             this.falas = falas;
+            this.quem = quem;
+        }
+    }
+
+    /** Uma voz a mais na faixa: o nome na plaquinha e a cor. */
+    static final class Voz {
+        final String nome;
+        final int cor;
+
+        Voz(String nome, int cor) {
+            this.nome = nome;
+            this.cor = cor;
         }
     }
 
@@ -79,12 +101,18 @@ public final class Narracao {
         final int prioridade;
         final String expressao;
         final String texto;
+        final String quem;
 
         Fala(String evento, int prioridade, String expressao, String texto) {
+            this(evento, prioridade, expressao, texto, QUEM);
+        }
+
+        Fala(String evento, int prioridade, String expressao, String texto, String quem) {
             this.evento = evento;
             this.prioridade = prioridade;
             this.expressao = expressao;
             this.texto = texto;
+            this.quem = quem;
         }
     }
 
@@ -104,6 +132,9 @@ public final class Narracao {
     /** Faixa na tela: quando entrou e quando começou a sair (-1: não está / não saindo). */
     private float entrou = -1f, saiu = -1f, ultimaFala = -999f;
     private String expressao = "normal";
+    /** Quem está (ou estava, saindo) na faixa. */
+    private String quem = QUEM;
+    private final Map<String, Voz> vozes = new HashMap<>();
     private long frame;
 
     public Narracao(RenderAssets assets) {
@@ -119,7 +150,7 @@ public final class Narracao {
             return false;
         }
         // Os retratos já na carga: a primeira fala da luta não espera a imagem abrir.
-        for (Evento e : eventos.values()) carregarRetrato(e.expressao);
+        for (Evento e : eventos.values()) carregarRetrato(e.quem, e.expressao);
         return true;
     }
 
@@ -130,14 +161,27 @@ public final class Narracao {
         nome = Episodio.string(raiz, "nome", nome);
         String c = Episodio.string(raiz, "cor", null);
         if (c != null) cor = Temporada.parseColor(c);
+        vozes.clear();
+        if (raiz.get("vozes") != null) {
+            for (Map.Entry<String, Object> v : Episodio.asMap(raiz.get("vozes")).entrySet()) {
+                Map<String, Object> m = Episodio.asMap(v.getValue());
+                String vc = Episodio.string(m, "cor", null);
+                vozes.put(v.getKey(), new Voz(Episodio.string(m, "nome", v.getKey().toUpperCase(java.util.Locale.ROOT)),
+                    vc != null ? Temporada.parseColor(vc) : cor));
+            }
+        }
         for (Map.Entry<String, Object> e : Episodio.asMap(raiz.get("eventos")).entrySet()) {
             Map<String, Object> m = Episodio.asMap(e.getValue());
             List<String> falas = new ArrayList<>();
             for (Object f : Episodio.list(m, "falas")) falas.add(String.valueOf(f));
             if (falas.isEmpty()) throw new IllegalArgumentException("evento " + e.getKey() + " sem falas");
             int prioridade = Episodio.number(m, "prioridade", 1).intValue();
+            String quemFala = Episodio.string(m, "quem", QUEM);
+            if (!QUEM.equals(quemFala) && !vozes.containsKey(quemFala)) {
+                throw new IllegalArgumentException("evento " + e.getKey() + ": voz " + quemFala + " fora de \"vozes\"");
+            }
             eventos.put(e.getKey(), new Evento(Math.max(1, Math.min(3, prioridade)),
-                Episodio.string(m, "expressao", "normal"), Collections.unmodifiableList(falas)));
+                Episodio.string(m, "expressao", "normal"), Collections.unmodifiableList(falas), quemFala));
         }
     }
 
@@ -207,7 +251,7 @@ public final class Narracao {
         }
         ultimaEscolha.put(evento, escolha);
         String modelo = temporada != null ? temporada.t(ev.falas.get(escolha)) : ev.falas.get(escolha);
-        return new Fala(evento, ev.prioridade, ev.expressao, preencher(modelo, vars));
+        return new Fala(evento, ev.prioridade, ev.expressao, preencher(modelo, vars), ev.quem);
     }
 
     static String preencher(String modelo, Map<String, String> vars) {
@@ -223,7 +267,8 @@ public final class Narracao {
         atual = f;
         falaDesde = time;
         expressao = f.expressao;
-        carregarRetrato(f.expressao);
+        quem = f.quem;
+        carregarRetrato(f.quem, f.expressao);
         if (entrou < 0f || saiu >= 0f) {
             entrou = time;
             saiu = -1f;
@@ -231,9 +276,9 @@ public final class Narracao {
         ultimaFala = time + duracao(f);
     }
 
-    private void carregarRetrato(String expr) {
+    private void carregarRetrato(String quemFala, String expr) {
         for (String e : new String[] {"normal", expr}) {
-            String chave = QUEM + "_" + e;
+            String chave = quemFala + "_" + e;
             if (retratos.containsKey(chave)) continue;
             RenderImage img = null;
             try {
@@ -285,6 +330,11 @@ public final class Narracao {
         return atual != null ? atual.evento : null;
     }
 
+    /** Quem fala agora ({@link #QUEM} ou uma das vozes); null: calado. */
+    public String quemAtual() {
+        return atual != null ? atual.quem : null;
+    }
+
     /** Expressão da fala na tela (normal, empolgado, serio); null: calado. */
     public String expressaoAtual() {
         return atual != null ? atual.expressao : null;
@@ -330,6 +380,10 @@ public final class Narracao {
     private void drawFaixa(RenderCanvas c, boolean grande) {
         float x0 = FAIXA_ESQ, x1 = FAIXA_DIR, top = FAIXA_TOPO, base = FAIXA_BASE;
         float ponta = PONTA;
+        Voz voz = vozes.get(quem);
+        String nome = voz != null ? voz.nome : this.nome;
+        if (temporada != null) nome = temporada.t(nome);
+        int cor = voz != null ? voz.cor : this.cor;
         float[] faixa = {x0, top, x1 + ponta, top, x1, base, x0, base};
         float[] sombra = {x0 + 5f, top + 6f, x1 + ponta + 5f, top + 6f, x1 + 5f, base + 6f, x0 + 5f, base + 6f};
         c.fillPolygon(sombra, 0x66000000);
@@ -420,10 +474,11 @@ public final class Narracao {
         c.translate(tremor, bob);
         c.save();
         c.clipPolygon(poly);
-        c.fillRect(caixa[0], caixa[1], caixa[2], caixa[3], Tinta.darken(cor, 0.45f));
+        Voz voz = vozes.get(quem);
+        c.fillRect(caixa[0], caixa[1], caixa[2], caixa[3], Tinta.darken(voz != null ? voz.cor : cor, 0.45f));
         drawLinhasDeFoco(c, caixa);
-        RenderImage img = retratos.get(QUEM + "_" + expressao);
-        if (img == null) img = retratos.get(QUEM + "_normal");
+        RenderImage img = retratos.get(quem + "_" + expressao);
+        if (img == null) img = retratos.get(quem + "_normal");
         if (img != null) {
             float w = caixa[2] - caixa[0], h = caixa[3] - caixa[1];
             float s = Math.max(w / img.width(), h / img.height()) * 1.02f;
