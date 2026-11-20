@@ -461,6 +461,9 @@ public class TorneioTest {
                 assertEquals(java.util.Arrays.asList(ponte, "pag9_" + irmao + ".jpg", chegada, "LUTA"), paginas.subList(p, p + 4));
                 String outro = Torneio.RYUGA.equals(irmao) ? Torneio.KOGA : Torneio.RYUGA;
                 assertFalse(paginas.contains("pag9_" + outro + ".jpg"));
+                // Depois da luta, a 66 do irmão fecha o episódio.
+                assertEquals(java.util.Arrays.asList("LUTA", "pag11_" + irmao + ".jpg"),
+                    paginas.subList(paginas.indexOf("LUTA"), paginas.size()));
                 vistas.add(ponte);
             }
         }
