@@ -229,7 +229,7 @@ caminho, os já medidos ficaram como estavam).
 
 **Correção (20/11, o dono: "H e frente estranhos, 2H com a direção errada"):** no 2H o caminho saía
 do punho de trás (o que fica parado); agora sai do punho que estava no joelho e sobe reto, com o
-rastro curto (0,6/0,5) atrás do braço. No H e no → + H as línguas iam até o peito e o rosto: agora
+rastro curto (0,6/0,5) na frente do braço (o dono: atrás dele não aparecia). No H e no → + H as línguas iam até o peito e o rosto: agora
 curtas (0,5/0,4), só no braço. Ficaram discretas.
 
 Build PASS; `testarMotor` só com as 3 falhas antigas. Visto nas folhas; jogo e celular não.
