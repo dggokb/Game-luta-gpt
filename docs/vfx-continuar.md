@@ -2137,3 +2137,9 @@ no lugar do `impacto_v08_forte` só ali.
   o braço; o miolo é vazado (o escuro no meio é o braço do Kōga por trás, não defeito da folha).
   Uma quarta (amarela com miolo azul-claro, "esse tbem") veio só como imagem no chat, sem arquivo:
   falta ele mandar como anexo.
+- **Teste 4 (amarelo com miolo azul-claro, 2x):** o dono, sobre o teste 3: "2.5 ficou mto grande
+  vamos testar 2", com a folha amarela de miolo azul-claro (agora como anexo). `pixelScale` 0,75
+  (2x; ~630 px de altura com o anel aberto), luz `#F2E640`. Guardado em
+  `art/vfx/teste_soco_forte_v09/teste4_amarelo_azul/`. Vídeo lado a lado, normal e câmera lenta,
+  fora do jogo. Nos quadros: a estrela forte no punho e o anel abrindo sem tomar a tela. Falta o
+  dono dizer. **Tamanho: 2,5x é grande demais; 2x é o que está em teste.**
