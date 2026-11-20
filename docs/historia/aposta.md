@@ -94,3 +94,13 @@ gradle :pc:gravarLuta -Paposta -Proteiro="tecla:F3 espera:4 foto:bolsa grava:240
 ```
 
 `-Paposta` liga a Bolsa em qualquer batalha do Modo Teste (`-Dgameluta.aposta=true`).
+
+Vídeo da Semifinal de verdade (o passo de luta do ep06, quartas já vencidas, a CPU jogando dos
+dois lados, em português) direto em MP4:
+
+```
+gradle :pc:gravarSemifinal [-Pirmao=koga] [-Psegundos=80] [-Psaida=arquivo.mp4]
+```
+
+Sai em `android/pc/build/semifinal.mp4`. A CPU joga pelo jogador pelo `GameView.cpuNoJogador`
+(null no jogo). Os QTE da cinemática da luta ficam sem resposta.

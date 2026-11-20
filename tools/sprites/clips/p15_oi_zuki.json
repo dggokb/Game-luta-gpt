@@ -2,7 +2,7 @@
   "id": "p15_oi_zuki",
   "javaName": "P15_OI_ZUKI",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_oi_zuki_video_normalized.png",
+  "source": "art/sprites/source/p15_oi_zuki_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_oi_zuki.webp",
   "report": "tools/sprites/reports/p15_oi_zuki.report.json",
   "preview": "android/app/build/sprite-review/p15_oi_zuki-import.png",
@@ -32,5 +32,25 @@
   "frameHeight": 576,
   "rootX": 280,
   "rootY": 540,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_oi_zuki_video_normalized.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p15_oi_zuki_video_normalized.png",
+    "quadros": [
+      7,
+      8
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }

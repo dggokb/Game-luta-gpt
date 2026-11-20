@@ -2,7 +2,7 @@
   "id": "p15_gyaku_zuki",
   "javaName": "P15_GYAKU_ZUKI",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_gyaku_zuki_video_normalized.png",
+  "source": "art/sprites/source/p15_gyaku_zuki_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_gyaku_zuki.webp",
   "report": "tools/sprites/reports/p15_gyaku_zuki.report.json",
   "preview": "android/app/build/sprite-review/p15_gyaku_zuki-import.png",
@@ -33,5 +33,25 @@
   "frameHeight": 576,
   "rootX": 318,
   "rootY": 540,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p15_gyaku_zuki_video_normalized.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p15_gyaku_zuki_video_normalized.png",
+    "quadros": [
+      10,
+      11
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }

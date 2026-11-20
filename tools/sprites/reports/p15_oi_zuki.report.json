@@ -1,7 +1,7 @@
 {
   "id": "p15_oi_zuki",
   "characterProfile": "p15",
-  "source": "art/sprites/source/p15_oi_zuki_video_normalized.png",
+  "source": "art/sprites/source/p15_oi_zuki_video_normalized_smear.png",
   "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -101,7 +101,7 @@
         529
       ],
       "minimumMargin": 47,
-      "opaquePixels": 62378
+      "opaquePixels": 63053
     },
     {
       "index": 8,
@@ -112,7 +112,7 @@
         529
       ],
       "minimumMargin": 47,
-      "opaquePixels": 61988
+      "opaquePixels": 62601
     },
     {
       "index": 9,
@@ -404,9 +404,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0e49494163096f08b56a42aee64681ac4e01b06f1aaa1665aa5090acc56818c4",
-      "config": "e81b4e0460027f5854e29f4370e5742c32fcb33393914d31b60d364957656519",
+      "source": "83ce1d83229d9160e44dc9ea9ab311d1087ac6e94e6225ce714ec7b3959b4408",
+      "config": "04ae5852b2bbfef8a6e15c3a38b1babf1ea61576d3eb384ea0b6719ceb95b823",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
+    },
+    "referenceSources": {
+      "art/sprites/source/p15_oi_zuki_video_normalized.png": "0e49494163096f08b56a42aee64681ac4e01b06f1aaa1665aa5090acc56818c4"
     }
   }
 }

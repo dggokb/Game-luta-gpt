@@ -1,7 +1,7 @@
 {
   "id": "p15_gyaku_zuki",
   "characterProfile": "p15",
-  "source": "art/sprites/source/p15_gyaku_zuki_video_normalized.png",
+  "source": "art/sprites/source/p15_gyaku_zuki_video_normalized_smear.png",
   "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -134,7 +134,7 @@
         531
       ],
       "minimumMargin": 45,
-      "opaquePixels": 53580
+      "opaquePixels": 54204
     },
     {
       "index": 11,
@@ -145,7 +145,7 @@
         531
       ],
       "minimumMargin": 45,
-      "opaquePixels": 54214
+      "opaquePixels": 54618
     },
     {
       "index": 12,
@@ -461,9 +461,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "551ffb1e9abab593b472a3143fdc42bee4bf462b0f916f33d0231d5977ffdb85",
-      "config": "915ea4f5c2baa4857c65097040251a7b634fc5a2d0f59892f6ad461a8a771b92",
+      "source": "467d07949d6993b0f0ded3e72e5c079ec044c030f39785ab339beb7a8111bfdc",
+      "config": "d07f30bdd8e1a1d60088d879b6adb6bd5e6af11ca7842d2dc549b43a12ce80ed",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
+    },
+    "referenceSources": {
+      "art/sprites/source/p15_gyaku_zuki_video_normalized.png": "551ffb1e9abab593b472a3143fdc42bee4bf462b0f916f33d0231d5977ffdb85"
     }
   }
 }

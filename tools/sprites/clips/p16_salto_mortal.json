@@ -2,7 +2,7 @@
   "id": "p16_salto_mortal",
   "javaName": "P16_SALTO_MORTAL",
   "profile": "p16.json",
-  "source": "art/sprites/source/p16_salto_mortal_video_normalized.png",
+  "source": "art/sprites/source/p16_salto_mortal_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p16_salto_mortal.webp",
   "report": "tools/sprites/reports/p16_salto_mortal.report.json",
   "preview": "android/app/build/sprite-review/p16_salto_mortal-import.png",
@@ -31,5 +31,25 @@
   "frameHeight": 704,
   "rootX": 226,
   "rootY": 648,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p16_salto_mortal_video_normalized.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p16_salto_mortal_video_normalized.png",
+    "quadros": [
+      19,
+      20
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }

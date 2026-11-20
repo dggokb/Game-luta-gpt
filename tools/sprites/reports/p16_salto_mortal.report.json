@@ -1,7 +1,7 @@
 {
   "id": "p16_salto_mortal",
   "characterProfile": "p16",
-  "source": "art/sprites/source/p16_salto_mortal_video_normalized.png",
+  "source": "art/sprites/source/p16_salto_mortal_video_normalized_smear.png",
   "sourceNote": "p16 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -233,7 +233,7 @@
         399
       ],
       "minimumMargin": 47,
-      "opaquePixels": 43916
+      "opaquePixels": 48057
     },
     {
       "index": 20,
@@ -244,7 +244,7 @@
         508
       ],
       "minimumMargin": 86,
-      "opaquePixels": 45189
+      "opaquePixels": 54881
     },
     {
       "index": 21,
@@ -670,9 +670,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "16b9458169d34518a336e056f278d169c7bc02a97763996ccf6148c2b7668c78",
-      "config": "59500f090b5959480ee121f838db93740356e7a98b3074eae7497f1d8eac2ca2",
+      "source": "a274d30c93d354a508910f0f8f560cb28be34775505e2648c2a29cdce7163b50",
+      "config": "89d35f473ca7ddfce9c5f47acea54cf8e8a3ccc4b63a4418258b4b9c098737a2",
       "profile": "955701bf62ecc9b7c96bb9fe1fde4a70db82c6e8cc465310c46111ce4693471b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p16_salto_mortal_video_normalized.png": "16b9458169d34518a336e056f278d169c7bc02a97763996ccf6148c2b7668c78"
     }
   }
 }

@@ -2,7 +2,7 @@
   "id": "p03_voadora_corrida",
   "javaName": "P03_VOADORA_CORRIDA",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_voadora_corrida_video_normalized.png",
+  "source": "art/sprites/source/p03_voadora_corrida_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_voadora_corrida.webp",
   "report": "tools/sprites/reports/p03_voadora_corrida.report.json",
   "preview": "android/app/build/sprite-review/p03_voadora_corrida-import.png",
@@ -32,5 +32,26 @@
   "frameHeight": 640,
   "rootX": 382,
   "rootY": 604,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p03_voadora_corrida_video_normalized.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/p03_voadora_corrida_video_normalized.png",
+    "quadros": [
+      5,
+      6
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "clarear": 0.6,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }
