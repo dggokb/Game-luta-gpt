@@ -2148,3 +2148,7 @@ no lugar do `impacto_v08_forte` só ali.
   quadros: o dourado mais fino e discreto; o amarelo com miolo azul mais cheio e claro. Falta o
   dono escolher (as folhas guardadas estão no tamanho do último teste de cada um: para instalar em
   1,5x, `pixelScale` 1,0).
+- **Teste 3 × teste 4 em 1,2x:** "Deixa 1.2". `pixelScale` 1,25 (~378 px de altura com o anel
+  aberto). Vídeo lado a lado, normal e câmera lenta, fora do jogo. Nos quadros, a estrela fica do
+  tamanho do punho e o anel abre em volta do rival. Falta o dono escolher qual entra (para
+  instalar em 1,2x, `pixelScale` 1,25).
