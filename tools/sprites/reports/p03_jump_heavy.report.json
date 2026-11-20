@@ -1,7 +1,7 @@
 {
   "id": "p03_jump_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_jump_heavy_video_normalized.png",
+  "source": "art/sprites/source/p03_jump_heavy_video_normalized_smear.png",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. jH chute forte para a frente no ar; pes na raiz; quadros com arco pulados.",
   "rootMode": "authored",
   "scale": 1,
@@ -79,7 +79,7 @@
         365
       ],
       "minimumMargin": 78,
-      "opaquePixels": 61040
+      "opaquePixels": 63488
     },
     {
       "index": 6,
@@ -87,10 +87,10 @@
         61,
         68,
         711,
-        344
+        389
       ],
       "minimumMargin": 57,
-      "opaquePixels": 72957
+      "opaquePixels": 75743
     },
     {
       "index": 7,
@@ -281,7 +281,7 @@
         24
       ],
       [
-        1624,
+        2288,
         484,
         496,
         296,
@@ -289,10 +289,10 @@
         21
       ],
       [
-        2124,
+        1084,
         484,
         660,
-        284,
+        332,
         17,
         11
       ],
@@ -329,7 +329,7 @@
         4
       ],
       [
-        1084,
+        1748,
         484,
         536,
         332,
@@ -404,9 +404,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8a154e5ae321ea93005fb819fc8250e2ba9781ae429678dca6bb2c3b8244b883",
-      "config": "c82686f7242342bf4a81f5153802f10f4b386ed52d41d0b7b1f93fede98e3b05",
+      "source": "6ee2e19c88597977acfc4ac8385c7de54004bea6ab70af4c5618894c8483e327",
+      "config": "156bf49900d152d1e6a379a9884c61dab3c3eab44b91db21600b70457102dd7f",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_jump_heavy_video_normalized.png": "8a154e5ae321ea93005fb819fc8250e2ba9781ae429678dca6bb2c3b8244b883"
     }
   }
 }

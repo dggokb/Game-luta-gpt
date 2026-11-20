@@ -1,7 +1,7 @@
 {
   "id": "p03_crouch_medium",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_crouch_medium_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_medium_video_normalized_smear.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). 2M rasteira; arco do pe recortado.",
   "rootMode": "authored",
   "scale": 1,
@@ -68,7 +68,7 @@
         411
       ],
       "minimumMargin": 37,
-      "opaquePixels": 58446
+      "opaquePixels": 61434
     },
     {
       "index": 5,
@@ -79,7 +79,7 @@
         411
       ],
       "minimumMargin": 34,
-      "opaquePixels": 68604
+      "opaquePixels": 75046
     },
     {
       "index": 6,
@@ -328,9 +328,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "fe632ee56232a21b2a40a5185c3828c3778e45f584bd7ce452d740687dfafea4",
-      "config": "575346ade406de1eead92c4c4563394a935b37fdb29dfdad89df31d73b519ed0",
+      "source": "ae2d811fbf526f5b076d7e5af52c8871f2c8c2bd7b7abb938d06e5789c3bfac2",
+      "config": "cd0e89322813e5b522a6d43c72839e03e7687c40e6f7b35a6d29aee4059a3af2",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_crouch_medium_video_normalized.png": "fe632ee56232a21b2a40a5185c3828c3778e45f584bd7ce452d740687dfafea4"
     }
   }
 }

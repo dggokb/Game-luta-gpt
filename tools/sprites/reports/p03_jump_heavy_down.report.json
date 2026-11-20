@@ -1,7 +1,7 @@
 {
   "id": "p03_jump_heavy_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_jump_heavy_down_video_normalized.png",
+  "source": "art/sprites/source/p03_jump_heavy_down_video_normalized_smear.png",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Baixo + jH soco forte para baixo no ar; pes na raiz; quadros com clarao pulados.",
   "rootMode": "authored",
   "scale": 1,
@@ -85,23 +85,23 @@
       "index": 6,
       "outputBbox": [
         83,
-        259,
+        12,
         283,
         672
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 53964
+      "minimumMargin": 12,
+      "opaquePixels": 57902
     },
     {
       "index": 7,
       "outputBbox": [
         84,
-        283,
+        12,
         283,
         672
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 52794
+      "minimumMargin": 12,
+      "opaquePixels": 58528
     },
     {
       "index": 8,
@@ -173,135 +173,135 @@
   "passed": true,
   "packed": {
     "frameWidth": 285,
-    "frameHeight": 597,
+    "frameHeight": 676,
     "rootX": 141,
-    "rootY": 585,
+    "rootY": 664,
     "columns": 10,
     "frameCount": 14,
     "cropOffset": [
       49,
-      83
+      4
     ],
-    "sheetWidth": 752,
-    "sheetHeight": 2396,
+    "sheetWidth": 1164,
+    "sheetHeight": 1628,
     "frames": [
       [
         512,
-        596,
+        672,
         240,
         472,
         28,
-        123
+        202
       ],
       [
         252,
-        596,
+        672,
         256,
         476,
         10,
-        118
+        197
       ],
       [
         0,
-        596,
+        672,
         248,
         484,
         22,
-        109
+        188
       ],
       [
-        476,
+        900,
         0,
         252,
         536,
         20,
-        59
+        138
       ],
       [
-        0,
+        424,
         0,
         236,
         592,
         47,
-        4
+        83
       ],
       [
-        240,
+        664,
         0,
         232,
         584,
         52,
-        10
-      ],
-      [
-        244,
-        1560,
-        208,
-        424,
-        30,
-        172
+        89
       ],
       [
         0,
-        1996,
+        0,
         208,
-        400,
-        31,
-        196
+        668,
+        30,
+        4
       ],
       [
         212,
-        1996,
+        0,
+        208,
+        668,
+        31,
+        4
+      ],
+      [
+        952,
+        1160,
         212,
         396,
         26,
-        200
+        279
       ],
       [
-        456,
-        1560,
+        732,
+        1160,
         216,
         404,
         22,
-        191
+        270
       ],
       [
-        0,
-        1560,
+        488,
+        1160,
         240,
         432,
         4,
-        163
+        242
       ],
       [
-        484,
-        1084,
+        240,
+        1160,
         244,
         456,
         21,
-        139
-      ],
-      [
-        244,
-        1084,
-        236,
-        468,
-        30,
-        125
+        218
       ],
       [
         0,
-        1084,
+        1160,
+        236,
+        468,
+        30,
+        204
+      ],
+      [
+        756,
+        672,
         240,
         472,
         27,
-        118
+        197
       ]
     ],
     "decodedBytes": {
       "canonical": 21626880,
-      "grid": 13611600,
-      "packed": 7207168
+      "grid": 15412800,
+      "packed": 7579968
     },
     "pixelScale": 2.0
   },
@@ -309,9 +309,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1257e9f7a35077259b1dadc63e5ca7c25eaa33192948603f879cc579cb1a00c7",
-      "config": "7a1551765d7cfecd97bb859709c838445a037e964369ab66f78f27d764568d66",
+      "source": "f0ee3dfa7ffa5f6b7f0ea940bdff6534ce7bbbfe7bbeb354e4bef2982f32f40b",
+      "config": "f1ca513a6bf8b81f727497b569408d80f82293dc73ed5df23614e9da59813751",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_jump_heavy_down_video_normalized.png": "1257e9f7a35077259b1dadc63e5ca7c25eaa33192948603f879cc579cb1a00c7"
     }
   }
 }

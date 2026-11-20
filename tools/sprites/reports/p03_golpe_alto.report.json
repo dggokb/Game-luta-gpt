@@ -1,7 +1,7 @@
 {
   "id": "p03_golpe_alto",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_golpe_alto_video_normalized.png",
+  "source": "art/sprites/source/p03_golpe_alto_video_normalized_smear.png",
   "sourceNote": "p03 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -79,7 +79,7 @@
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 68097
+      "opaquePixels": 75329
     },
     {
       "index": 6,
@@ -90,7 +90,7 @@
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 67961
+      "opaquePixels": 76109
     },
     {
       "index": 7,
@@ -385,9 +385,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "673e82442c2f906ca7179b6ce8208c375228a8560ad787c09ea50a07d8f5b3d2",
-      "config": "ca06c22da5a18d65b23a54b8cb3c70da901327274c570431eaeacc512fc83fae",
+      "source": "f500edc62fe6c0956746e2b16207422a60dee8305a5eac04c055c16c77fe1876",
+      "config": "c1c70025d62dea409d3453696284c62b5ce03144e55c6594d076a83daf05e736",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_golpe_alto_video_normalized.png": "673e82442c2f906ca7179b6ce8208c375228a8560ad787c09ea50a07d8f5b3d2"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "id": "p02_special_s2",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_special_s2_video_normalized.png",
+  "source": "art/sprites/source/p02_special_s2_video_normalized_smear.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -90,7 +90,7 @@
         646
       ],
       "minimumMargin": 58,
-      "opaquePixels": 62597
+      "opaquePixels": 71478
     },
     {
       "index": 7,
@@ -423,9 +423,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "74511e2213831c0537790d5345b8bfba5cc250e823301a03918381cd9e24c35e",
-      "config": "299b2a14525ea6eed67df3dea424e5f06db9b1b31676020f87e58069c97a9462",
+      "source": "ff42c88b0b250cb54cf254601052a7e2678eeb673d3fdc9b84bda199babfce58",
+      "config": "a77ae82f5485402ed7a8ae5d834413a28214fa0ef5d95b43c9a3587abe7f0be6",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_special_s2_video_normalized.png": "74511e2213831c0537790d5345b8bfba5cc250e823301a03918381cd9e24c35e"
     }
   }
 }

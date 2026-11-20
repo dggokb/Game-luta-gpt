@@ -1,7 +1,7 @@
 {
   "id": "p03_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_heavy_video_normalized.png",
+  "source": "art/sprites/source/p03_heavy_video_normalized_smear.png",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Chute giratorio alto; quadros com clarao e arco pulados.",
   "rootMode": "authored",
   "scale": 1,
@@ -101,7 +101,7 @@
         485
       ],
       "minimumMargin": 27,
-      "opaquePixels": 68438
+      "opaquePixels": 69556
     },
     {
       "index": 8,
@@ -442,9 +442,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f644c7c32c5d653f03f135c4d2385c640c6af7ca829541afe653f1eb4c2b0d19",
-      "config": "5910a5eefdd1d359fc100d8482f8828b7b6a2e5faa3cabf1bbb0119027c1f812",
+      "source": "e2c6d31097f6c9787a35737695dcba73e18eb8ebaed4530bfc54e200bcf6edfd",
+      "config": "4ea43e551fc7bc36d55292b4144e373665003c6ebc1db760352c5f1e1e2ad8f0",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_heavy_video_normalized.png": "f644c7c32c5d653f03f135c4d2385c640c6af7ca829541afe653f1eb4c2b0d19"
     }
   }
 }
