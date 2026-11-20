@@ -2101,3 +2101,21 @@ na chegada. Anda no tempo da tela (0,6 s). Gravado no PC (`gravarSemifinal -Pcon
 normal e em câmera lenta (4x); não visto no celular. **Aprovado pelo dono no vídeo (20/11:
 "Ótimo")** e mandado para a `game-luta-sprite-fable`.
 
+
+## 20/11: teste de efeito no soco forte (fora do jogo)
+
+O dono mandou uma folha 4×4 (15 quadros, estrela laranja com faíscas que abrem e somem, com
+transparência) e pediu: "testa esse sem por no jogo e faz o video". Nada entrou no jogo nem nos
+assets: o teste rodou numa cópia separada do repositório (no rascunho da sessão), com o efeito
+no lugar do `impacto_v08_forte` só ali.
+
+- Folha montada como os efeitos do jogo: quadros recortados, origem no centro da estrela,
+  `pixelScale` 1,5 (o do v08; 244 px de altura no mundo), 33 ms por quadro esticados no tempo do
+  acerto forte como os `impacto_v0*`, nasce na ponta do golpe, luz `#F5BC3E`.
+- Guardado em `art/vfx/teste_soco_forte_v09/` (a imagem do dono e a folha pronta, a pasta
+  `impacto_v09_teste` com `folha.webp` e `efeito.json`), para instalar se ele aprovar.
+- Vídeo: soco forte (H) do Kōga contra o Ryūga, o v08 de hoje e o teste lado a lado, normal e em
+  câmera lenta (¼). Gravado no PC; não visto no celular.
+- Visto nos quadros: no jogo o teste parece menor que o v08, porque os quadros grandes (as
+  faíscas abertas) são bem transparentes e o que mais aparece é a estrela do começo. Falta o dono
+  dizer se aumenta ou se fica assim.
