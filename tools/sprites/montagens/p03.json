@@ -420,8 +420,8 @@
       }
     }
   },
-  "ombrada": {
-    "_doc": "→ + H, Ombrada (19/11, vídeo H_FRENTE do dono): abaixa (9-21) e se joga com o ombro (25-41; o impacto no 39) e se endireita na guarda (53-79). Os quadros 43-51 do vídeo (ele volta andando de costas) ficam de fora: com o corpo na raiz pareciam ele correr no lugar e andar de ré (19/11, o dono: 'frente H ficou muito estranho'). O corpo fica na raiz (registro): quem anda é o motor.",
+  "dois_socos": {
+    "_doc": "→ + H, Dois socos no estômago (20/11, vídeo H_FRENTE novo do dono; troca a ombrada, o dono: \"a ombrada incomodou\", \"algo agressivo de duplo impacto\"): o soco da mão da frente (38, o 1º acerto) e logo o da mão de trás (60, o 2º acerto), bem rápido como dois acertos (o dono: \"uma animação bem rápida dos dois socos como 2 hits\"); volta à guarda (64-90). O corpo fica na raiz (registro): quem anda é o motor.",
     "trechos": [
       [
         "H_FRENTE",
@@ -429,33 +429,29 @@
         124
       ]
     ],
-    "quadros": "9,13,21,25,29,31,33,35,37,39,41,53,55,57,61,65,71,79",
+    "quadros": "34,36,38,40,50,56,58,60,64,70,74,78,82,90",
     "opcoes": {
       "fixar": "registro",
       "sem_poeira": true
     },
     "animacoes": {
-      "OMBRADA": {
-        "impacto": 9,
+      "DOIS_SOCOS": {
+        "impacto": 2,
         "tempos": [
+          67,
+          66,
+          30,
+          30,
           20,
           20,
-          20,
-          20,
-          20,
-          19,
-          20,
-          20,
-          20,
-          86,
-          33,
-          33,
-          34,
-          33,
-          33,
-          33,
-          33,
-          34
+          17,
+          50,
+          45,
+          40,
+          40,
+          40,
+          40,
+          62
         ]
       }
     }
@@ -642,7 +638,7 @@
     }
   },
   "voadora_corrida": {
-    "_doc": "→ → + H, Voadora correndo (20/11, vídeo dashH novo do dono, da inicio_corrida_h3; o dono: \"dash H vamos mudar, não gostei desse, quero uma voadora\", troca o lariat): sai do chão no fim da corrida (21-32), estica a perna da frente (33, o impacto), segura (35-57), recolhe e cai agachado (60-78) e levanta para a guarda (81-90). Sem o deslizamento lateral do vídeo (fixar tronco: quem anda é o motor); a subida e a descida do pulo ficam no desenho.",
+    "_doc": "→ → + H, Voadora correndo (20/11, vídeo dashH novo do dono, da inicio_corrida_h3; o dono: \"dash H vamos mudar, não gostei desse, quero uma voadora\", troca o lariat): sai do chão no fim da corrida (21-32), estica a perna da frente (33, o impacto), segura (35-57), recolhe e cai agachado (60-78) e levanta para a guarda (81-90). Sem o deslizamento lateral do vídeo (fixar tronco: quem anda é o motor); pés na raiz: quem sobe e desce é o motor (voo de verdade, com recuo no acerto).",
     "trechos": [
       [
         "dashH",
@@ -653,6 +649,7 @@
     "quadros": "21,24,26,28,30,32,33,35,37,39,45,51,57,60,63,66,69,72,75,78,81,84,87,90",
     "opcoes": {
       "fixar": "tronco",
+      "pe_no_chao": true,
       "sem_poeira": true
     },
     "animacoes": {

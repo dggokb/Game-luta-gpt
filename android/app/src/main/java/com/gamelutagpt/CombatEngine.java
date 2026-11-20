@@ -2707,6 +2707,10 @@ final class CombatEngine {
             } else if (f.attackFrame >= f.attack.startupFrames) {
                 f.x += f.facing * f.attack.mechanics.diveForward * CombatConfig.DT;
             }
+        } else if (f.attacking() && !f.grounded && f.attack.mechanics.flightRecoil > 0f &&
+            f.outcome != CombatFighter.Outcome.NONE) {
+            // A voadora que encostou: volta para trás no ar enquanto cai (o impacto empurra quem chutou).
+            f.x -= f.facing * f.attack.mechanics.flightRecoil * CombatConfig.DT;
         } else if (f.attacking() && f.attack.mechanics.advanceAt(f.attackFrame)) {
             // Rushing special (shoulder charge, flying kick, slide): it carries the body forward
             // until it reaches the opponent (it does not shove it across the stage), or through it.

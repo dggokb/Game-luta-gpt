@@ -130,6 +130,12 @@ final class AttackDefinition {
         int flightStart, flightEnd;
         boolean flightHover;
         /**
+         * Recuo do voo (a voadora correndo do Kōga, 20/11): depois que o golpe encosta (acertou ou
+         * defenderam), o corpo ainda no ar volta para trás a esta velocidade (px/s) enquanto cai, em
+         * vez de parar colado no rival e cair reto (o dono: "pela física não deveria ser assim").
+         */
+        float flightRecoil;
+        /**
          * Arco (Launch.ARC): o rival sobe {@link #arcHeight} e cai {@link #arcDistance} à frente, pela
          * gravidade de quem apanha no ar (o peso dele muda o voo), e termina derrubado. Com
          * {@link #arcWall}, se a borda da arena estiver no caminho do arco, ele bate nela e volta
@@ -197,6 +203,7 @@ final class AttackDefinition {
             flightHeight = height; flightStart = start; flightEnd = end; flightHover = hover; return this;
         }
         boolean flies() { return flightHeight > 0f; }
+        Mechanics flightRecoil(float speed) { flightRecoil = speed; return this; }
         Mechanics arc(float height, float distance) { arcHeight = height; arcDistance = distance; return this; }
         Mechanics arc(float height, float distance, boolean wall) { arc(height, distance); arcWall = wall; return this; }
         /** Altura do desenho no quadro {@code frame} do golpe (arco: sobe e desce no trecho). */
