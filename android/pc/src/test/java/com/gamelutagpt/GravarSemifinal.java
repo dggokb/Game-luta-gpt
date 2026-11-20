@@ -21,7 +21,7 @@ import java.util.Random;
  * passo de luta do ep06, com a Bolsa de Apostas), com a CPU jogando dos dois lados: o vídeo
  * mostra a placa, as fichas, o Apostador falando e o castigo de quem esfria.
  *
- * <pre>gradle :pc:gravarSemifinal [-Pirmao=koga] [-Psegundos=75] [-Psaida=arquivo.mp4]</pre>
+ * <pre>gradle :pc:gravarSemifinal [-Pirmao=koga] [-Psegundos=75] [-Psaida=arquivo.mp4] [-PcontroleNaTela]</pre>
  *
  * A campanha começa com as quartas vencidas (o adversário é o da Semifinal na chave). Os quadros
  * vão direto para o ffmpeg (precisa estar no PATH).
@@ -41,7 +41,8 @@ public final class GravarSemifinal {
         Context ctx = DadosDoJogo.localizar().contexto(null);
         jogo = new GameView(ctx);
         jogo.setSize(largura, altura);
-        jogo.setTouchControlsVisible(false);
+        // -PcontroleNaTela: os controles de toque do celular na tela (o espaço de verdade embaixo).
+        jogo.setTouchControlsVisible(Boolean.getBoolean("gameluta.controleNaTela"));
         avancar = metodo("advanceSimulation", float.class);
         desenhar = metodo("renderFrame", Canvas.class);
         metodo("onSizeChanged", int.class, int.class, int.class, int.class).invoke(jogo, largura, altura, 0, 0);
