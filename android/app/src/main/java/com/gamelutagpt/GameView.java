@@ -114,6 +114,11 @@ public class GameView extends SurfaceView
     private final TesteAutomatico teste = new TesteAutomatico();
     private final AiController aiTesteJogador = new AiController(new OpponentAi(new Random(7)));
     private final AiController aiTesteRival = new AiController(new OpponentAi(new Random(11)));
+    /**
+     * Gravação no PC (pc/src/test GravarSemifinal): a CPU joga pelo jogador numa luta normal, no
+     * lugar do pad. Null no jogo.
+     */
+    AiController cpuNoJogador;
     /** READY → GO depois da intro e, com a IA ligada, a batalha de verdade (2x2). */
     private final BattleFlow flow = new BattleFlow();
     /** Demo buttons: while one plays it drives both fighters (pad and CPU brain are ignored). */
@@ -2091,6 +2096,12 @@ public class GameView extends SurfaceView
         } else {
             pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
+            if (cpuNoJogador != null) {
+                playerInput.clear();
+                if (apostaNaLuta()) cpuNoJogador.setAposta(bolsa.pressa(PLAYER), bolsa.show(PLAYER));
+                cpuNoJogador.setSecondsLeft(flow.timed() ? flow.clockSeconds() : -1);
+                cpuNoJogador.fill(engine, PLAYER, playerInput);
+            }
             if (tagging) {
                 opponentInput.clear();
             } else {
