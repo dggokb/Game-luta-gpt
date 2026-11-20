@@ -351,6 +351,13 @@ public final class Narracao {
     }
 
     /** Some com a faixa e esquece a fila (luta nova, saída da luta). */
+    /** O quanto a faixa e o retrato sobem ou descem na tela (a Semifinal põe o placar embaixo). */
+    public void setDeslocamento(float dy) {
+        deslocamento = dy;
+    }
+
+    private float deslocamento;
+
     public void stop() {
         atual = null;
         pendente = null;
@@ -371,7 +378,7 @@ public final class Narracao {
         // A fala grande entra com um tranco.
         float tranco = grande && idade < 0.25f ? (float)Math.sin(idade * 80f) * 3f * (1f - idade / 0.25f) : 0f;
         c.save();
-        c.translate(tranco, dy);
+        c.translate(tranco, dy + deslocamento);
         drawFaixa(c, grande);
         drawQuadro(c);
         c.restore();

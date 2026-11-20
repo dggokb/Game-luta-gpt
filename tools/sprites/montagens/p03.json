@@ -971,5 +971,56 @@
         ]
       }
     }
+  },
+  "special_s2": {
+    "_doc": "S2 →↓↘, Uppercut da casa (20/11, vídeo s2 do dono): abaixa com a energia no punho de trás (12-28), sai do chão com o gancho curvado e o arco de fogo (29-34, o impacto no 30), segura no alto com o fogo apagando (36-52), cai (56-62), pousa agachado (64-74) e levanta (78-86). Pés na raiz: quem sobe e desce é o motor (voo de verdade, como o S2 do Ryūga). Nos quadros 32-34 o cabelo e o fogo encostam na borda de cima do vídeo.",
+    "trechos": [
+      [
+        "s2",
+        0,
+        124
+      ]
+    ],
+    "quadros": "12,20,26,28,29,30,31,32,33,34,36,40,44,48,52,56,58,60,62,64,66,70,74,78,82,86",
+    "opcoes": {
+      "fixar": "tronco",
+      "pe_no_chao": true,
+      "sem_poeira": true,
+      "objetos": 1500,
+      "sem_verde": true
+    },
+    "animacoes": {
+      "SPECIAL_S2": {
+        "impacto": 5,
+        "tempos": [
+          29,
+          29,
+          29,
+          29,
+          26,
+          33,
+          35,
+          35,
+          35,
+          35,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44,
+          44
+        ]
+      }
+    }
   }
 }
