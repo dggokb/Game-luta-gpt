@@ -11,8 +11,8 @@
     "frameHeight": 640,
     "rootX": 188,
     "rootY": 604,
-    "columns": 8,
-    "frameCount": 8
+    "columns": 7,
+    "frameCount": 7
   },
   "frames": [
     {
@@ -91,17 +91,6 @@
       ],
       "minimumMargin": 34,
       "opaquePixels": 60078
-    },
-    {
-      "index": 7,
-      "outputBbox": [
-        71,
-        231,
-        335,
-        606
-      ],
-      "minimumMargin": 34,
-      "opaquePixels": 55356
     }
   ],
   "passed": true,
@@ -110,18 +99,18 @@
     "frameHeight": 583,
     "rootX": 150,
     "rootY": 573,
-    "columns": 8,
-    "frameCount": 8,
+    "columns": 7,
+    "frameCount": 7,
     "cropOffset": [
       38,
       31
     ],
-    "sheetWidth": 544,
-    "sheetHeight": 2040,
+    "sheetWidth": 980,
+    "sheetHeight": 1076,
     "frames": [
       [
+        488,
         0,
-        580,
         304,
         512,
         4,
@@ -144,7 +133,7 @@
         4
       ],
       [
-        308,
+        0,
         580,
         236,
         496,
@@ -152,42 +141,34 @@
         84
       ],
       [
-        0,
-        1096,
+        240,
+        580,
         236,
         496,
         62,
         83
       ],
       [
-        240,
-        1096,
+        480,
+        580,
         248,
         444,
         49,
         136
       ],
       [
-        0,
-        1596,
+        732,
+        580,
         248,
         444,
         49,
         136
-      ],
-      [
-        252,
-        1596,
-        272,
-        384,
-        29,
-        196
       ]
     ],
     "decodedBytes": {
-      "canonical": 7864320,
-      "grid": 5764704,
-      "packed": 4439040
+      "canonical": 6881280,
+      "grid": 5044116,
+      "packed": 4217920
     },
     "pixelScale": 2.0
   },
@@ -195,8 +176,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "3214f19a4b938a137ae9ad9baef401b50f4d5f14990f8f90f190e43afdf98302",
-      "config": "886d8b14f65da664e4705decc363dae466e07d89e5505dfd73e228c14d9afa25",
+      "source": "6e714220436c4dafef28089fdafe593a0e3d16d4bb7ac3e1ae4ccaa5a97ebb57",
+      "config": "03b70f7c9e320bfd1a16563b2dcf9c2870fd30a2b2af94cd412879942faa5129",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

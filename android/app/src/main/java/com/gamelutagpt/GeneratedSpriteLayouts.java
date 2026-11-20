@@ -586,11 +586,11 @@ final class GeneratedSpriteLayouts {
     static final int P03_ENERGY_ROOT_Y = 556;
     static final int P03_ENERGY_FRAME_COUNT = 27;
 
-    static final int P03_FALL_FRAME_WIDTH = 294;
-    static final int P03_FALL_FRAME_HEIGHT = 520;
-    static final int P03_FALL_ROOT_X = 125;
-    static final int P03_FALL_ROOT_Y = 510;
-    static final int P03_FALL_FRAME_COUNT = 5;
+    static final int P03_FALL_FRAME_WIDTH = 256;
+    static final int P03_FALL_FRAME_HEIGHT = 583;
+    static final int P03_FALL_ROOT_X = 105;
+    static final int P03_FALL_ROOT_Y = 573;
+    static final int P03_FALL_FRAME_COUNT = 6;
 
     static final int P03_FALL_DOWN_FRAME_WIDTH = 610;
     static final int P03_FALL_DOWN_FRAME_HEIGHT = 421;
@@ -674,7 +674,7 @@ final class GeneratedSpriteLayouts {
     static final int P03_JUMP_FRAME_HEIGHT = 583;
     static final int P03_JUMP_ROOT_X = 150;
     static final int P03_JUMP_ROOT_Y = 573;
-    static final int P03_JUMP_FRAME_COUNT = 8;
+    static final int P03_JUMP_FRAME_COUNT = 7;
 
     static final int P03_JUMP_HEAVY_FRAME_WIDTH = 688;
     static final int P03_JUMP_HEAVY_FRAME_HEIGHT = 497;

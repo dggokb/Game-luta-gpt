@@ -42,7 +42,8 @@ from centralizar import eixo  # noqa: E402
 LIMITE = 6          # px lógicos de diferença tolerada entre o fim do golpe e a postura
 LIMITE_PE = 2       # px de diferença tolerada na altura dos pés
 POSE_MINIMA = 0.80  # IoU mínimo das silhuetas alinhadas (abaixo: pose diferente da postura)
-EM_PE = ('L', 'M', 'H', '6M', '6H', 'DH')
+# S1A e SG: os cortes da Garra do tigre do p03 (20/11), que voltam à guarda sem a continuação.
+EM_PE = ('L', 'M', 'H', '6M', '6H', 'DH', 'S1A', 'SG')
 AGACHADO = ('2L', '2M', '2H')
 
 

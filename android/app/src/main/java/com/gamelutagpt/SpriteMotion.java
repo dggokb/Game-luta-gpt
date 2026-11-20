@@ -15,11 +15,17 @@ final class SpriteMotion {
     String clip=Clip.IDLE;
     float time,distance;
     private boolean wasGrounded=true,wasCrouching;
+    /**
+     * O golpe no ar (jL, jM, jH, j2H) que acabou ainda no ar: o desenho segura a última pose dele (a
+     * pose de pulo em que o vídeo do golpe termina) até o chão, em vez de trocar para o JUMP ou o
+     * FALL, que são de outro vídeo e outra pose (20/11, o dono: "golpes aéreos quebram o frame").
+     */
+    private String golpeNoAr;
     private CharacterDefinition character;
     SpriteMotion() { this(GeneratedCharacters.defaultCharacter()); }
     SpriteMotion(CharacterDefinition character) { this.character=character; }
     void setCharacter(CharacterDefinition next) {
-        character=next;clip=Clip.IDLE;time=distance=0;wasGrounded=true;wasCrouching=false;
+        character=next;clip=Clip.IDLE;time=distance=0;wasGrounded=true;wasCrouching=false;golpeNoAr=null;
     }
     /**
      * Andando com o pé de apoio cravado no chão (CombatFighter.passada): o ponto da passada, em
@@ -36,7 +42,10 @@ final class SpriteMotion {
         boolean peloPe=passada>=0f&&!dash;
         boolean estavaNoAr=!wasGrounded;
         String next;
+        if(grounded) golpeNoAr=null;
+        else if(attackAnimation!=null) golpeNoAr=golpeNormalNoAr(attackAnimation) ? attackAnimation : null;
         if(attackAnimation!=null) next=attackAnimation;
+        else if(!grounded && golpeNoAr!=null) next=golpeNoAr;
         else if(!grounded) next=velocityY < -35 ? Clip.JUMP : Clip.FALL;
         else if(crouching) next=crouched();
         else if(combat || locked) next=Clip.COMBAT;
@@ -60,7 +69,10 @@ final class SpriteMotion {
         }
         wasCrouching=crouching;
         // Attacks use the combat clock, including a repeated attack of the same type.
-        time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
+        if(attackAnimation==null && golpeNoAr!=null && next.equals(golpeNoAr)) {
+            // O golpe no ar acabou: segura o último quadro até o chão.
+            time=character.animation(golpeNoAr).duration;
+        } else time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
         distance+=Math.abs(travel);
     }
     /**
@@ -86,6 +98,14 @@ final class SpriteMotion {
         if(clip.equals(Clip.IDLE_2)) return time<character.animation(Clip.IDLE_2).duration ? Clip.IDLE_2 : Clip.IDLE;
         if(clip.equals(Clip.IDLE) && time>=IDLE_LOOPS_BEFORE_IDLE_2*character.animation(Clip.IDLE).duration) return Clip.IDLE_2;
         return Clip.IDLE;
+    }
+    /** A animação é a de um golpe normal no ar do lutador (jL, jM, jH, j2H). */
+    private boolean golpeNormalNoAr(String anim) {
+        for(String b:new String[]{"jL","jM","jH","j2H"}) {
+            CharacterDefinition.Move m=character.moves.get(b);
+            if(m!=null && m.animation!=null && anim.equals(m.animation.id)) return true;
+        }
+        return false;
     }
     /** O golpe que acabou de tocar termina agachado: o desenho segue do agachado (levanta ou fica). */
     private boolean fimAgachado(String c) {
