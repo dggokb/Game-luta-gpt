@@ -9273,6 +9273,7 @@ public class GameView extends SurfaceView
     /** A Bolsa anda com a luta; o Apostador fala pelo narrador. */
     private void updateBolsa() {
         if (!apostaNaLuta()) return;
+        bolsa.carregar(ultraAssets);
         bolsa.update(engine, flow, narracao != null && narracaoAtiva() ? narracao::narrar : (e, v) -> {});
     }
 

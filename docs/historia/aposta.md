@@ -44,9 +44,17 @@ Todos os números ficam no começo da `BolsaApostas` para afinar.
 
 ## Na tela
 
-- **Placa embaixo do relógio**: o dinheiro de cada dupla, a odd embaixo e a barra de cabo de
-  guerra (azul o jogador, vermelho a CPU, a moeda dourada no meio). O ganho sobe em dourado
-  (`+¥ ...`) do lado de quem ganhou.
+- **A placa** (embaixo do MENU, 500 de largura): arte gerada pelo Codex no estilo da barra de
+  cima (`art/hud/apostas/placa_original.png`, prompt em `prompt_placa.txt`). No meio, o
+  **medalhão hexagonal dourado com o rosto do Apostador**: sorriso de canto no normal, rindo
+  num ganho grande e gargalhando (tremendo, raios dourados atrás) no patamar e na virada das
+  odds. De cada lado: o dinheiro na placa, a odd na plaquinha de baixo, o **medidor** (enche da
+  ponta de fora com a parte da bolsa, listras de ficha andando) e a **pilha de fichas** (de 2 a 6
+  fichas, pela parte da bolsa).
+- **Ganho**: fichas voam do medalhão para a pilha de quem ganhou, e o `+¥` sobe embaixo.
+- **Patamar**: brilho na pilha, uma moeda de iene voa até a barra de Super do HUD e `+SUPER`.
+- **Esfriando**: gelo na placa do dinheiro, medidor azul-gelo e `ESFRIANDO`; **caindo**: medidor e
+  valor piscando em vermelho, fichas caindo da pilha e `APOSTAS CAINDO ▼`.
 - **Telão da arena**: o letreiro `ODDS x1.6 | x2.4` embaixo da transmissão (some no replay).
 - **O Apostador fala na faixa do narrador**, com o nome, a cor e o retrato dele
   (`historia/retratos/apostador_<normal|empolgado|gargalhada>.png`, recortados por
@@ -54,6 +62,22 @@ Todos os números ficam no começo da `BolsaApostas` para afinar.
   `"quem": "apostador"`: `aposta_inicio`, `aposta_patamar` (`{nome}`, `{valor}`),
   `aposta_virada`, `aposta_esfriando`, `aposta_caindo`. O narrador no palco não mexe a boca
   nas falas do Apostador.
+
+### A arte
+
+As imagens do Codex ficam em `art/hud/apostas/` (`placa_original.png`, `fichas.png` e os
+prompts). A barra de cima vai junto como referência de estilo. Gerar de novo:
+
+```
+cd art/hud/apostas
+cp ../barra-raios-original.png estilo.png
+codex exec --skip-git-repo-check --sandbox workspace-write -i estilo.png - < prompt_placa.txt
+```
+
+(o Codex salva a imagem grande em `~/.codex/generated_images/`: use essa como
+`placa_original.png`). Depois `python3 tools/hud/montar_apostas.py` tira o verde e o magenta,
+recorta as fichas e grava `assets/ui/hud/apostas/` com a `placa.json` (o hexágono, os medidores
+e as placas, medidos pela cor). Sem a arte, a placa sai no desenho simples.
 
 ## A CPU
 

@@ -106,6 +106,8 @@ final class BolsaApostas {
         favorita = -1;
         comecou = primeiroGolpe = acabou = false;
         quadro = 0;
+        rosto = rostoQuadros = quedaTimer = 0;
+        java.util.Arrays.fill(fViva, false);
     }
 
     // ------------------------------------------------------------ leitura
@@ -157,6 +159,7 @@ final class BolsaApostas {
     /** Um quadro, depois do passo do motor e do {@link BattleFlow#update}. */
     void update(CombatEngine engine, BattleFlow flow, NarradorLuta.Voz voz) {
         quadro++;
+        animar();
         for (int s = 0; s < 2; s++) {
             if (ganhoIdade[s] < 999) ganhoIdade[s]++;
             if (patamarIdade[s] < 999) patamarIdade[s]++;
@@ -272,7 +275,10 @@ final class BolsaApostas {
         // A favorita virou?
         int agora = odd[0] + FAVORITA < odd[1] ? 0 : odd[1] + FAVORITA < odd[0] ? 1 : -1;
         if (agora >= 0) {
-            if (favorita >= 0 && agora != favorita) voz.narrar("aposta_virada", vars("nome", nome(engine, agora)));
+            if (favorita >= 0 && agora != favorita) {
+                efeitoDaVirada();
+                voz.narrar("aposta_virada", vars("nome", nome(engine, agora)));
+            }
             favorita = agora;
         }
         lembrar(engine);
@@ -286,16 +292,23 @@ final class BolsaApostas {
         dinheiro[side] += valor;
         ultimoGanho[side] = ganhoIdade[side] < 40 ? ultimoGanho[side] + valor : valor;
         ganhoIdade[side] = 0;
-        if (dinheiro[side] <= recorde[side]) return;
+        boolean patamar = pagarPatamar(engine, side, voz);
+        efeitoDoGanho(side, valor, patamar);
+    }
+
+    /** Passou do maior valor e de um patamar novo: barra de Super para o titular. */
+    private boolean pagarPatamar(CombatEngine engine, int side, NarradorLuta.Voz voz) {
+        if (dinheiro[side] <= recorde[side]) return false;
         recorde[side] = dinheiro[side];
         int devidos = (int)((recorde[side] - INICIAL) / PATAMAR);
-        if (devidos <= patamares[side]) return;
+        if (devidos <= patamares[side]) return false;
         int novos = devidos - patamares[side];
         patamares[side] = devidos;
         patamarIdade[side] = 0;
         FighterState titular = engine.team(side).pointState();
         if (titular != null && titular.life > 0) titular.addSuperMeter(SUPER_DO_PATAMAR * novos);
         voz.narrar("aposta_patamar", vars("nome", nome(engine, side), "valor", formatar(dinheiro[side])));
+        return true;
     }
 
     private void calcularOdds(CombatEngine engine) {
@@ -363,65 +376,363 @@ final class BolsaApostas {
 
     // ------------------------------------------------------------ desenho (1280x720)
 
-    static final float CENTRO = 640f, TOPO = 178f, LARGURA = 330f, ALTURA_BARRA = 12f;
-    private static final int INK = 0xFF0B0E16, OURO = 0xFFFFD54A, OURO_ESCURO = 0xFF8A6A12;
-    private static final int AZUL = 0xFF2F7BE0, VERMELHO = 0xFFD8343C, FRIO = 0xFF7FD3FF, CAI_COR = 0xFFFF5A5A;
+    /** Pasta da arte (montada por tools/hud/montar_apostas.py a partir das imagens do Codex). */
+    static final String PASTA = "ui/hud/apostas/";
+    /** A placa na tela: centro, topo (logo abaixo do MENU) e largura. */
+    static final float CENTRO = 640f, TOPO = 166f, LARGURA = 500f;
+    /** A pilha de fichas de cada lado: de 2 a {@link #FICHAS_MAX} fichas, pela parte da bolsa. */
+    static final int FICHAS_MAX = 6;
+    private static final int INK = 0xFF0B0E16, OURO = 0xFFFFD54A, FRIO = 0xFF8FE3FF, CAI_COR = 0xFFFF5A5A;
+    private static final String[] PECAS = {"placa", "pilha_azul", "pilha_vermelha", "ficha_azul", "ficha_vermelha",
+        "moeda", "voa_azul", "voa_vermelha", "brilho"};
+    private static final String[] ROSTOS = {"normal", "empolgado", "gargalhada"};
 
-    /** A placa da bolsa embaixo do relógio: o dinheiro e a odd de cada dupla e a barra. */
+    private final Map<String, com.gamelutagpt.render.RenderImage> arte = new HashMap<>();
+    private boolean carregada;
+    /** Medidas da placa.png (placa.json): o hexágono, os medidores e as placas, em pixels dela. */
+    private float largura = 1000f, altura = 218f;
+    private float[] hexagono;
+    private final float[][] medidor = new float[2][], dinheiroCaixa = new float[2][], oddCaixa = new float[2][];
+
+    /** O rosto do Apostador no medalhão: qual e por quantos quadros ainda. */
+    private int rosto, rostoQuadros;
+
+    /** Fichas voando (do medalhão para a pilha), caindo (de quem esfriou) e a moeda do patamar. */
+    private static final int MAX_FICHAS = 24;
+    private final float[] fx = new float[MAX_FICHAS], fy = new float[MAX_FICHAS], fvx = new float[MAX_FICHAS],
+        fvy = new float[MAX_FICHAS], fIdade = new float[MAX_FICHAS], fVida = new float[MAX_FICHAS];
+    /** 0 voando para a pilha, 1 caindo, 2 a moeda indo para a barra de Super. */
+    private final int[] fTipo = new int[MAX_FICHAS], fLado = new int[MAX_FICHAS];
+    private final boolean[] fViva = new boolean[MAX_FICHAS];
+    private int quedaTimer;
+
+    /**
+     * Abre a arte (a placa, as fichas e os rostos do Apostador). Sem ela, a placa sai no
+     * desenho simples de antes. Chame uma vez, fora do desenho.
+     */
+    void carregar(com.gamelutagpt.render.RenderAssets assets) {
+        if (carregada) return;
+        carregada = true;
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> m = (Map<String, Object>)com.gamelutagpt.render.MiniJson.parse(
+                assets.readText(PASTA + "placa.json"));
+            largura = ((Number)m.get("largura")).floatValue();
+            altura = ((Number)m.get("altura")).floatValue();
+            hexagono = pontos(m.get("hexagono"));
+            for (int s = 0; s < 2; s++) {
+                medidor[s] = pontos(((java.util.List<?>)m.get("medidor")).get(s));
+                dinheiroCaixa[s] = numeros(((java.util.List<?>)m.get("dinheiro")).get(s));
+                oddCaixa[s] = numeros(((java.util.List<?>)m.get("odd")).get(s));
+            }
+            for (String p : PECAS) arte.put(p, assets.loadImage(PASTA + p + ".png"));
+            for (String r : ROSTOS) {
+                arte.put("rosto_" + r, assets.loadImage("historia/retratos/apostador_" + r + ".png"));
+            }
+        } catch (java.io.IOException | RuntimeException ex) {
+            arte.clear();
+        }
+    }
+
+    /** [[x, y], ...] → {x, y, x, y, ...}. */
+    private static float[] pontos(Object lista) {
+        java.util.List<?> l = (java.util.List<?>)lista;
+        float[] out = new float[l.size() * 2];
+        for (int i = 0; i < l.size(); i++) {
+            java.util.List<?> p = (java.util.List<?>)l.get(i);
+            out[i * 2] = ((Number)p.get(0)).floatValue();
+            out[i * 2 + 1] = ((Number)p.get(1)).floatValue();
+        }
+        return out;
+    }
+
+    private static float[] numeros(Object lista) {
+        java.util.List<?> l = (java.util.List<?>)lista;
+        float[] out = new float[l.size()];
+        for (int i = 0; i < l.size(); i++) out[i] = ((Number)l.get(i)).floatValue();
+        return out;
+    }
+
+    boolean temArte() { return arte.containsKey("placa"); }
+
+    /** A escala da placa.png para a tela virtual. */
+    private float escala() { return LARGURA / largura; }
+
+    /** O centro da pilha de fichas do lado (em pixels da placa.png): na ponta de fora da placa do dinheiro. */
+    private float pilhaX(int s) { return s == 0 ? dinheiroCaixa[0][0] + 40f : dinheiroCaixa[1][2] - 40f; }
+
+    private float pilhaBase(int s) { return dinheiroCaixa[s][3] - 2f; }
+
+    /** Fichas na pilha: de 2 a {@link #FICHAS_MAX}, pela parte da bolsa. */
+    int fichasNaPilha(int s) {
+        return Math.max(2, Math.min(FICHAS_MAX, Math.round(parcela(s) * FICHAS_MAX * 1.2f)));
+    }
+
+    /** Anda as fichas e o rosto (um quadro da luta). */
+    private void animar() {
+        if (rostoQuadros > 0 && --rostoQuadros == 0) rosto = 0;
+        for (int i = 0; i < MAX_FICHAS; i++) {
+            if (!fViva[i]) continue;
+            fIdade[i] += 1f / 60f;
+            if (fIdade[i] >= fVida[i]) {
+                fViva[i] = false;
+                continue;
+            }
+            if (fTipo[i] == 1) fvy[i] += 900f / 60f;
+            fx[i] += fvx[i] / 60f;
+            fy[i] += fvy[i] / 60f;
+        }
+        // Quem está perdendo aposta solta uma ficha da pilha de tempos em tempos.
+        if (++quedaTimer >= 14) {
+            quedaTimer = 0;
+            for (int s = 0; s < 2; s++) {
+                if (!caindo(s) || dinheiroCaixa[s] == null) continue;
+                float dir = s == 0 ? -1f : 1f;
+                soltar(1, s, pilhaX(s), pilhaBase(s) - 30f, dir * (60f + (quadro % 5) * 25f), -180f, 0.9f);
+            }
+        }
+    }
+
+    private void soltar(int tipo, int lado, float x, float y, float vx, float vy, float vida) {
+        for (int i = 0; i < MAX_FICHAS; i++) {
+            if (fViva[i]) continue;
+            fViva[i] = true;
+            fTipo[i] = tipo;
+            fLado[i] = lado;
+            fx[i] = x;
+            fy[i] = y;
+            fvx[i] = vx;
+            fvy[i] = vy;
+            fIdade[i] = 0f;
+            fVida[i] = vida;
+            return;
+        }
+    }
+
+    /** O dinheiro entrou: fichas saem do medalhão para a pilha; o rosto reage. */
+    private void efeitoDoGanho(int side, long valor, boolean patamar) {
+        if (dinheiroCaixa[side] == null) return;
+        float cx = largura * 0.5f, cy = altura * 0.45f;
+        int n = (int)Math.max(1, Math.min(5, valor / 80_000L));
+        float vida = 0.45f;
+        for (int k = 0; k < n; k++) {
+            float tx = pilhaX(side) + (k - n * 0.5f) * 6f, ty = pilhaBase(side) - 40f;
+            // Velocidade para chegar na pilha em "vida" segundos, partindo um pouco atrasada.
+            soltar(0, side, cx, cy - k * 6f, (tx - cx) / vida, (ty - cy) / vida - 40f * k, vida);
+        }
+        if (patamar) {
+            // A moeda vai da pilha até a barra de Super do HUD (em pixels da placa).
+            float s = escala();
+            float alvoX = ((side == 0 ? 490f : 790f) - (CENTRO - LARGURA * 0.5f)) / s;
+            float alvoY = (113f - TOPO) / s;
+            float x0 = pilhaX(side), y0 = pilhaBase(side) - 50f;
+            soltar(2, side, x0, y0, (alvoX - x0) / 0.7f, (alvoY - y0) / 0.7f, 0.7f);
+            rosto = 2;
+            rostoQuadros = 120;
+        } else if (valor >= 150_000L && rostoQuadros < 60) {
+            rosto = 1;
+            rostoQuadros = 60;
+        }
+    }
+
+    /** A virada das odds: o Apostador gargalha. */
+    private void efeitoDaVirada() {
+        rosto = 2;
+        rostoQuadros = 120;
+    }
+
+    /** A placa da bolsa embaixo do MENU: o rosto do Apostador, o dinheiro, as odds e as fichas. */
     void desenhar(RenderCanvas c, float tempo) {
-        float l = CENTRO - LARGURA * 0.5f, r = CENTRO + LARGURA * 0.5f;
-        float t = TOPO, b = TOPO + 50f;
-        float[] placa = {l + 10f, t, r - 10f, t, r, b, l, b};
-        c.fillPolygon(new float[] {l + 14f, t + 4f, r - 6f, t + 4f, r + 4f, b + 4f, l + 4f, b + 4f}, 0x66000000);
-        c.fillPolygon(placa, 0xE0101420);
-        c.strokePolygon(placa, 2f, OURO_ESCURO);
-        // Título no meio, uma moedinha de cada lado.
+        if (!temArte()) {
+            desenharSimples(c, tempo);
+            return;
+        }
+        float s = escala();
+        c.save();
+        c.translate(CENTRO - LARGURA * 0.5f, TOPO);
+        c.scale(s, s, 0f, 0f);
+        desenharMedalhao(c, tempo);
+        for (int lado = 0; lado < 2; lado++) desenharMedidor(c, lado, tempo);
+        c.drawImage(arte.get("placa"), 0f, 0f, largura, altura, 255);
+        for (int lado = 0; lado < 2; lado++) desenharLado(c, lado, tempo);
+        desenharFichas(c);
+        c.restore();
+    }
+
+    private void desenharMedalhao(RenderCanvas c, float tempo) {
+        float[] caixa = caixa(hexagono);
+        c.save();
+        c.clipPolygon(hexagono);
+        c.fillVerticalGradient(caixa[0], caixa[1], caixa[2], caixa[3], 0xFF2A1840, 0xFF0B0E1C);
+        // Raios dourados girando devagar atrás do rosto (mais forte quando ele gargalha).
+        float cx = (caixa[0] + caixa[2]) * 0.5f, cy = (caixa[1] + caixa[3]) * 0.5f;
+        float raio = (caixa[3] - caixa[1]) * 0.9f;
+        int alfa = rosto == 2 ? 0x70 : 0x30;
+        for (int k = 0; k < 12; k++) {
+            double a = Math.toRadians(k * 30 + tempo * 12f), b = a + Math.toRadians(9);
+            c.fillPolygon(new float[] {cx, cy, cx + (float)Math.cos(a) * raio, cy + (float)Math.sin(a) * raio,
+                cx + (float)Math.cos(b) * raio, cy + (float)Math.sin(b) * raio}, (alfa << 24) | 0xFFD54A);
+        }
+        com.gamelutagpt.render.RenderImage img = arte.get("rosto_" + ROSTOS[rosto]);
+        if (img != null) {
+            float w = caixa[2] - caixa[0], h = caixa[3] - caixa[1];
+            float esc = Math.max(w / img.width(), h / img.height()) * 1.04f;
+            float iw = img.width() * esc, ih = img.height() * esc;
+            // Gargalhando ele treme um pouco.
+            float tremor = rosto == 2 ? (float)Math.sin(tempo * 55f) * 2.5f : 0f;
+            float x = caixa[0] + (w - iw) * 0.5f + tremor, y = caixa[1] + (h - ih) * 0.2f;
+            c.drawImage(img, x, y, x + iw, y + ih, 255);
+        }
+        c.restore();
+    }
+
+    private void desenharMedidor(RenderCanvas c, int lado, float tempo) {
+        float[] poly = medidor[lado];
+        float[] caixa = caixa(poly);
+        c.save();
+        c.clipPolygon(poly);
+        c.fillRect(caixa[0], caixa[1], caixa[2], caixa[3], 0xFF070A14);
+        // Enche da ponta de fora para o medalhão, pela parte da bolsa.
+        float w = caixa[2] - caixa[0];
+        float cheio = w * Math.max(0.03f, Math.min(1f, parcela(lado)));
+        float l = lado == 0 ? caixa[0] : caixa[2] - cheio, r = lado == 0 ? caixa[0] + cheio : caixa[2];
+        boolean frio = quieto[lado] >= ESFRIA;
+        int cima, baixo;
+        if (caindo(lado) && ((int)(tempo * 4f)) % 2 == 0) {
+            cima = 0xFFFF8A8A; baixo = 0xFFB0202A;
+        } else if (frio) {
+            cima = 0xFFCFF3FF; baixo = 0xFF4FA8D8;
+        } else if (lado == 0) {
+            cima = 0xFF7FC0FF; baixo = 0xFF1C5BC8;
+        } else {
+            cima = 0xFFFF9090; baixo = 0xFFC4222C;
+        }
+        c.fillVerticalGradient(l, caixa[1], r, caixa[3], cima, baixo);
+        // Listras brancas de ficha andando devagar.
+        float h = caixa[3] - caixa[1];
+        float passo = h * 1.6f, desloca = (tempo * 40f) % passo;
+        for (float x = l - passo + (lado == 0 ? desloca : -desloca); x < r; x += passo) {
+            c.fillPolygon(new float[] {x, caixa[3], x + h * 0.5f, caixa[1], x + h * 0.9f, caixa[1], x + h * 0.4f, caixa[3]},
+                0x38FFFFFF);
+        }
+        // A ponta que avança brilha.
+        float ponta = lado == 0 ? r : l;
+        c.fillRect(ponta - 3f, caixa[1], ponta + 3f, caixa[3], 0xDDFFF4C0);
+        c.fillRect(caixa[0], caixa[1], caixa[2], caixa[1] + h * 0.18f, 0x30FFFFFF);
+        c.restore();
+    }
+
+    private void desenharLado(RenderCanvas c, int lado, float tempo) {
+        float[] d = dinheiroCaixa[lado], o = oddCaixa[lado];
+        boolean frio = quieto[lado] >= ESFRIA;
+        // O gelo de quem esfriou cobre a placa do dinheiro.
+        if (frio) {
+            float k = Math.min(1f, (quieto[lado] - ESFRIA) / 40f);
+            c.fillRect(d[0], d[1], d[2], d[3], ((int)(0x55 * k) << 24) | 0x7FD8FF);
+        }
+        // A pilha de fichas na ponta de fora (cresce com a parte da bolsa).
+        com.gamelutagpt.render.RenderImage pilha = arte.get(lado == 0 ? "pilha_azul" : "pilha_vermelha");
+        float pw = 62f, ph = pw * pilha.height() / pilha.width();
+        float porFicha = ph / 6.6f;
+        int n = fichasNaPilha(lado);
+        float visivel = porFicha * (n + 0.6f);
+        float px = pilhaX(lado), base = pilhaBase(lado);
+        // Recorte de baixo da pilha: as fichas de cima somem quando a parte é pequena.
+        float srcTop = pilha.height() * (1f - visivel / ph);
+        c.drawImageRegion(pilha, 0f, Math.max(0f, srcTop), pilha.width(), pilha.height(),
+            px - pw * 0.5f, base - visivel, px + pw * 0.5f, base, 255);
+        if (patamarIdade[lado] < 60) {
+            com.gamelutagpt.render.RenderImage brilho = arte.get("brilho");
+            float k = patamarIdade[lado] / 60f, tam = 70f * (0.6f + 0.6f * k);
+            int alfa = (int)(255 * (1f - k));
+            c.drawImage(brilho, px - tam * 0.5f, base - visivel - tam * 0.6f, px + tam * 0.5f, base - visivel + tam * 0.4f, alfa);
+        }
+        // O dinheiro, centrado no resto da placa.
+        float tl = lado == 0 ? px + 34f : d[0], tr = lado == 0 ? d[2] : px - 34f;
+        int cor = caindo(lado) ? (((int)(tempo * 4f)) % 2 == 0 ? CAI_COR : 0xFFFFFFFF) : frio ? FRIO : 0xFFFFF4D6;
+        float tam = (d[3] - d[1]) * 0.78f;
+        c.drawText(formatar(dinheiro[lado]), (tl + tr) * 0.5f, d[3] - (d[3] - d[1] - tam * 0.72f) * 0.5f - 1f,
+            tam, cor, INK, 5f, false);
+        // A odd na plaquinha.
+        float ot = (o[3] - o[1]) * 1.05f;
+        c.drawText(formatarOdd(odd[lado]), (o[0] + o[2]) * 0.5f, o[3] - (o[3] - o[1] - ot * 0.72f) * 0.5f, ot,
+            OURO, INK, 4f, false);
+        // Embaixo da placa: o ganho subindo, o +SUPER e os avisos de quem esfria.
+        float lx = (d[0] + d[2]) * 0.5f, baixo = altura + 30f;
+        if (ganhoIdade[lado] < 60 && ultimoGanho[lado] > 0) {
+            float k = ganhoIdade[lado] / 60f;
+            int alfa = (int)(255 * (1f - k * k));
+            c.drawText("+" + formatar(ultimoGanho[lado]), lx, baixo - 24f * k, 30f, (alfa << 24) | (OURO & 0xFFFFFF),
+                (alfa << 24) | (INK & 0xFFFFFF), 6f, false);
+        }
+        if (patamarIdade[lado] < 90) {
+            float k = patamarIdade[lado] / 90f;
+            float pulso = 1f + 0.3f * Math.max(0f, 1f - k * 5f);
+            int alfa = (int)(255 * Math.min(1f, (1f - k) * 2f));
+            c.save();
+            c.scale(pulso, pulso, lx, baixo + 34f);
+            c.drawText("+SUPER", lx, baixo + 34f, 40f, (alfa << 24) | 0xFFE066, (alfa << 24) | (INK & 0xFFFFFF), 7f, true);
+            c.restore();
+        } else if (frio && ganhoIdade[lado] >= 60) {
+            String aviso = caindo(lado) ? "APOSTAS CAINDO ▼" : "ESFRIANDO";
+            c.drawText(aviso, lx, baixo, 28f, caindo(lado) ? CAI_COR : FRIO, INK, 6f, false);
+        }
+    }
+
+    private void desenharFichas(RenderCanvas c) {
+        for (int i = 0; i < MAX_FICHAS; i++) {
+            if (!fViva[i]) continue;
+            float k = fIdade[i] / fVida[i];
+            com.gamelutagpt.render.RenderImage img;
+            float tam;
+            int alfa = 255;
+            if (fTipo[i] == 2) {
+                img = arte.get("moeda");
+                tam = 44f + 20f * (float)Math.sin(k * Math.PI);
+            } else if (fTipo[i] == 1) {
+                img = arte.get(fLado[i] == 0 ? "ficha_azul" : "ficha_vermelha");
+                tam = 30f;
+                alfa = (int)(255 * (1f - k * k));
+            } else {
+                img = arte.get(fLado[i] == 0 ? "voa_azul" : "voa_vermelha");
+                tam = 64f;
+            }
+            float w = tam, h = tam * img.height() / img.width();
+            c.save();
+            // A ficha voando aponta para onde vai (a arte voa para a direita).
+            if (fTipo[i] == 0 && fvx[i] < 0f) c.scale(-1f, 1f, fx[i], fy[i]);
+            if (fTipo[i] == 1) c.rotate(fIdade[i] * 540f * (fLado[i] == 0 ? -1f : 1f), fx[i], fy[i]);
+            c.drawImage(img, fx[i] - w * 0.5f, fy[i] - h * 0.5f, fx[i] + w * 0.5f, fy[i] + h * 0.5f, alfa);
+            c.restore();
+        }
+    }
+
+    private static float[] caixa(float[] poly) {
+        float l = Float.MAX_VALUE, t = Float.MAX_VALUE, r = -Float.MAX_VALUE, b = -Float.MAX_VALUE;
+        for (int i = 0; i < poly.length; i += 2) {
+            l = Math.min(l, poly[i]);
+            r = Math.max(r, poly[i]);
+            t = Math.min(t, poly[i + 1]);
+            b = Math.max(b, poly[i + 1]);
+        }
+        return new float[] {l, t, r, b};
+    }
+
+    /** Sem a arte (testes, arquivo faltando): a placa simples, desenhada. */
+    private void desenharSimples(RenderCanvas c, float tempo) {
+        float l = CENTRO - 165f, r = CENTRO + 165f, t = TOPO + 8f, b = t + 50f;
+        c.fillPolygon(new float[] {l + 10f, t, r - 10f, t, r, b, l, b}, 0xE0101420);
         c.drawText("APOSTAS", CENTRO, t + 14f, 11f, OURO, INK, 2f, false);
-        // Dinheiro de cada lado.
         for (int s = 0; s < 2; s++) {
             String valor = formatar(dinheiro[s]);
-            float size = 15f;
-            float w = c.measureText(valor, size, false);
+            float w = c.measureText(valor, 15f, false);
             float cx = s == 0 ? l + 16f + w * 0.5f : r - 16f - w * 0.5f;
-            int cor = caindo(s) ? (((int)(tempo * 4f)) % 2 == 0 ? CAI_COR : 0xFFFFFFFF)
-                : quieto[s] >= ESFRIA ? FRIO : 0xFFFFFFFF;
-            c.drawText(valor, cx, t + 17f, size, cor, INK, 2.5f, false);
-            String o = formatarOdd(odd[s]);
-            float ow = c.measureText(o, 12f, false);
-            float ox = s == 0 ? l + 16f + ow * 0.5f : r - 16f - ow * 0.5f;
-            c.drawText(o, ox, b - 4f, 12f, OURO, INK, 2f, false);
+            c.drawText(valor, cx, t + 17f, 15f, caindo(s) ? CAI_COR : quieto[s] >= ESFRIA ? FRIO : 0xFFFFFFFF, INK, 2.5f, false);
         }
-        // A barra de cabo de guerra.
-        float bl = l + 60f, br = r - 60f, bt = t + 23f, bb = bt + ALTURA_BARRA;
-        c.fillRect(bl - 2f, bt - 2f, br + 2f, bb + 2f, INK);
+        float bl = l + 60f, br = r - 60f, bt = t + 23f, bb = bt + 12f;
         float meio = bl + (br - bl) * parcela(0);
-        c.fillVerticalGradient(bl, bt, meio, bb, 0xFF6FB0FF, AZUL);
-        c.fillVerticalGradient(meio, bt, br, bb, 0xFFFF8A8A, VERMELHO);
-        c.fillRect(meio - 1.5f, bt - 3f, meio + 1.5f, bb + 3f, OURO);
-        c.fillCircle(meio, (bt + bb) * 0.5f, 5f, OURO);
-        c.strokeCircle(meio, (bt + bb) * 0.5f, 5f, 1.5f, INK);
-        // Ganho recente ("+¥ ...") subindo do lado de quem ganhou; o patamar vira +SUPER.
-        for (int s = 0; s < 2; s++) {
-            float lx = s == 0 ? l + 40f : r - 40f;
-            if (ganhoIdade[s] < 60 && ultimoGanho[s] > 0) {
-                float k = ganhoIdade[s] / 60f;
-                int alfa = (int)(255 * (1f - k * k));
-                c.drawText("+" + formatar(ultimoGanho[s]), lx, b + 18f - 10f * k, 14f, (alfa << 24) | (OURO & 0xFFFFFF),
-                    (alfa << 24) | (INK & 0xFFFFFF), 2.5f, false);
-            }
-            if (patamarIdade[s] < 90) {
-                float k = patamarIdade[s] / 90f;
-                float pulso = 1f + 0.25f * Math.max(0f, 1f - k * 5f);
-                int alfa = (int)(255 * Math.min(1f, (1f - k) * 2f));
-                c.save();
-                c.scale(pulso, pulso, lx, b + 38f);
-                c.drawText("+SUPER", lx, b + 38f, 17f, (alfa << 24) | 0xFFE066, (alfa << 24) | (INK & 0xFFFFFF), 3f, true);
-                c.restore();
-            } else if (quieto[s] >= ESFRIA && ganhoIdade[s] >= 60) {
-                String aviso = caindo(s) ? "APOSTAS CAINDO ▼" : "ESFRIANDO";
-                c.drawText(aviso, lx + (s == 0 ? 30f : -30f), b + 18f, 12f, caindo(s) ? CAI_COR : FRIO, INK, 2f, false);
-            }
-        }
+        c.fillRect(bl, bt, meio, bb, 0xFF2F7BE0);
+        c.fillRect(meio, bt, br, bb, 0xFFD8343C);
     }
 
     /** O letreiro do telão: as odds ao vivo. */

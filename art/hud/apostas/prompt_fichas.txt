@@ -1,0 +1,15 @@
+You have an image generation tool. Use it to GENERATE a new image (do not write code). The attached estilo.png is the HUD of our 2D anime fighting game (dark navy, neon blue and red, gold, clean ink outlines, cel shading). Create a sprite sheet of casino items in EXACTLY that style.
+
+Canvas: 1536x1024, landscape. Background: flat pure chroma green #00FF00 (no shadows, no glow on the green, so it can be keyed out). Items well separated from each other (at least 80 px of green between them), each one complete and not cut by the border:
+Top row, left to right:
+1. a neat vertical STACK of 6 BLUE casino poker chips seen slightly from above (3/4 view), white edge stripes, thin ink outline;
+2. the same STACK of 6 RED poker chips;
+3. a single BLUE poker chip seen straight from the front (flat circle), white edge stripes, a small gold yen symbol (¥) in the middle;
+4. the same single RED poker chip.
+Bottom row, left to right:
+5. a single shiny GOLD yen coin seen from the front with a ¥ symbol;
+6. a single BLUE poker chip tilted, flying (motion blur streak behind it);
+7. the same flying RED poker chip;
+8. a small cluster of gold sparkles / star glints (for a "win" flash).
+
+No other text, no letters except the ¥ symbols. Save the result as fichas.png in the current directory.
