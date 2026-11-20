@@ -2988,7 +2988,10 @@ final class AiController {
                     if (pressed && gap <= 200f) w = 1.5;
                     break;
                 case RUSH:
-                    if (quick && gap >= 140f && CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 1.0;
+                    // Com a bola do rival vindo, a investida corre contra ela (20/11: a do Kōga sai do
+                    // chão até a voadora e levava a bola de quem fica soltando).
+                    if (quick && gap >= 140f && seen.projectileGap == Float.MAX_VALUE &&
+                        CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 1.0;
                     break;
                 case LOW:
                     if (quick && !seen.crouching && CpuSpecials.reaches(o, gap, body, seen.crouching)) w = 1.0;

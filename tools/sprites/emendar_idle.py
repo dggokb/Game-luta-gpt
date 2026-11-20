@@ -61,6 +61,9 @@ def golpes(pack):
     for gid, m in pack.get('specialMoves', {}).items():
         if 'animation' in m and not m.get('air'):
             out.append((gid, m['animation'], 'IDLE', m))
+            # A animação de quando o golpe errou (o S3 do p03, 20/11) também volta à guarda.
+            if m['animation'] + '_ERRO' in pack['animations']:
+                out.append((gid + '_ERRO', m['animation'] + '_ERRO', 'IDLE', m))
     return [g for g in out if g[1] in pack['animations']]
 
 

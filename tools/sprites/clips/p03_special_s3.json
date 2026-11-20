@@ -12,8 +12,8 @@
   "rootMode": "authored",
   "frameWidth": 704,
   "frameHeight": 640,
-  "rootX": 380,
-  "rootY": 600,
+  "rootX": 434,
+  "rootY": 604,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S3 avanco em tres socos e golpe final.",
   "pixelScale": 2.0,
   "video": {
@@ -24,13 +24,13 @@
     "quadros": "6,9,12,15,18,21,24,26,28,30,32,33,35,37,39,48,57,60,63,66,69,72,75,81,84,92,93,94,95,97,99,101,103,105,107,110,113,115,117,120,123,125,127,130,132,135,138,142,146,150,153,156,159,161",
     "celula": 320,
     "largura": 352,
-    "raiz": "190,300",
+    "raiz": "217,302",
     "colunas": 5,
-    "fixar": "video",
+    "pe_no_chao": true,
     "sem_poeira": true,
     "limpar_chao": true,
+    "emendar_idle": true,
     "densidade": 2,
-    "nitidez": true,
-    "emendar_idle": true
+    "nitidez": true
   }
 }
