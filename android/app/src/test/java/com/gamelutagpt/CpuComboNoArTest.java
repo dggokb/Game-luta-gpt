@@ -64,7 +64,8 @@ public class CpuComboNoArTest {
 
     @Test public void depoisDoLancadorElaFechaNoArComOEspecial() {
         for (String id : new String[] {"player_base", "p03", "p05", "p10"}) {
-            int[] agora = medir(id, 4);
+            // 8 sementes (20/11): com 4, o Ryūga lançava uma vez só, conforme o sorteio.
+            int[] agora = medir(id, 8);
             assertTrue(id + " lançou", agora[0] >= 2);
             assertTrue(id + ": fechou no ar " + agora[1] + " de " + agora[0], agora[1] * 10 >= agora[0] * 6);
         }
