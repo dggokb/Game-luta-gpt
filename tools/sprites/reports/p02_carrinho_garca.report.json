@@ -1,7 +1,7 @@
 {
   "id": "p02_carrinho_garca",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_carrinho_garca_video_normalized_hd_aprovado_2x.png",
+  "source": "art/sprites/source/p02_carrinho_garca_video_normalized_smear_hd_aprovado_2x.png",
   "sourceNote": "p02 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -90,7 +90,7 @@
         527
       ],
       "minimumMargin": 49,
-      "opaquePixels": 44671
+      "opaquePixels": 46103
     },
     {
       "index": 7,
@@ -101,7 +101,7 @@
         527
       ],
       "minimumMargin": 49,
-      "opaquePixels": 49816
+      "opaquePixels": 50383
     },
     {
       "index": 8,
@@ -461,13 +461,14 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0be1ef4dbb2c6d7a96624b9ecf7cb97e469a209c81a6e24773fa680d3e724b4a",
-      "config": "f0a77a6ccdc608b15060be8fa6e4d51fcd3923bce8ae928e4b242d00f2e1966d",
+      "source": "794e01ee34404c65c9b1629feab7181233b2f20bba12da1ba41b8410115ff4f9",
+      "config": "82bd9ecbf84327ed0baae1d58a03e12571f05d98ae617deeb426433c0f6d4c3b",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_carrinho_garca_video_normalized.png": "90aa74c78d95aaf699bcfa512e4175a99a2fbe145ddc5010ed587b8c1c01bee4",
-      "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png": "f041c41dfcc3cdcfba008d87e34bdb913df1f19b1813e353050245f0ebd4654d"
+      "art/sprites/source/p02_carrinho_garca_video_normalized_sr_hd.png": "f041c41dfcc3cdcfba008d87e34bdb913df1f19b1813e353050245f0ebd4654d",
+      "art/sprites/source/p02_carrinho_garca_video_normalized_smear.png": "c646e2090ea93f8a2ec591cfc250b0836a8d20a9e3babc32b98255d748e37635"
     }
   }
 }

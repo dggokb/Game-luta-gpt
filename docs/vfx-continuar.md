@@ -210,6 +210,25 @@ Mesmo dia, outra sessão: o giro do S3 desceu 28 px no desenho (passava por cima
 `docs/personagens/p01.md`). O smear foi refeito com os mesmos parâmetros acima sobre a folha
 baixada (sem mudar o tipo), e o normal map da folha refeito (`normal_map.py --refazer`).
 
+## Smear nos golpes novos do Kōga e dos outros (20/11, pedido do dono)
+
+Pontos marcados à mão na grade (`CAMINHO_MANUAL` em `linha_de_acao.py`; só os golpes novos ganham
+caminho, os já medidos ficaram como estavam).
+
+- **Kōga (p03), vídeos de 19/11:** H, 2M, 2H, jM, jH, ↓ + jH, → + M, → + H (os dois socos, um smear
+  por soco) e a voadora correndo. Calça preta com `--clarear 0.6`; nos socos as línguas por cima
+  (atrás do corpo elas sumiam). Ficaram sem: L, 2L, jL (fracos), M (o braço cruza o corpo sem
+  caminho claro) e a Garra do tigre (o efeito do vídeo já é o rastro).
+- **Ryūga:** → + H (soco no plexo). A ombrada fica sem (o corpo é que avança, não um membro).
+- **Yin-lu:** a varrida correndo, o S2 (o chute vertical, um desenho) e o S3 (a palma que desvia; com
+  `--clarear 0.6`, por cima a luva tapava o rosto).
+- **p15:** → + H e o golpe de corrida (os dois socos retos). **p16:** o salto mortal. A bundada e a
+  casca de banana ficam sem.
+- Ryūga e Yin-lu estão na nitidez `hd_aprovado` (teste do dono): o clipe volta à folha original, o
+  smear entra nela e o `hd_aprovado_p01_p02.py` (`process`) roda só nesse clipe.
+
+Build PASS; `testarMotor` só com as 3 falhas antigas. Visto nas folhas; jogo e celular não.
+
 ## A pesquisa de como os estúdios fazem (10/11)
 
 O dono parou as tentativas ("você está fazendo como você acha que é, não de forma

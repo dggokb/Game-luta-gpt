@@ -1,7 +1,7 @@
 {
   "id": "p03_jump_medium",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_jump_medium_video_normalized.png",
+  "source": "art/sprites/source/p03_jump_medium_video_normalized_smear.png",
   "sourceNote": "p03 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -57,7 +57,7 @@
         518
       ],
       "minimumMargin": 56,
-      "opaquePixels": 68084
+      "opaquePixels": 72328
     },
     {
       "index": 4,
@@ -68,7 +68,7 @@
         518
       ],
       "minimumMargin": 32,
-      "opaquePixels": 69348
+      "opaquePixels": 75409
     },
     {
       "index": 5,
@@ -347,9 +347,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "23f4770376831b93d7ddd92162a90809da17ba2129eb938020644355bd22f0e4",
-      "config": "2f2070720f8618ee2b2450011d0003d8006920ef1153ad6c6ebc96a68219fb86",
+      "source": "f850437761452297ce8719b0944725565cc970094a189e586072eece3bf6e9e9",
+      "config": "dc2c1695e676bd35409cd24538946cb804f56c94cd234eb80955fa7ee34ba4b5",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_jump_medium_video_normalized.png": "23f4770376831b93d7ddd92162a90809da17ba2129eb938020644355bd22f0e4"
     }
   }
 }

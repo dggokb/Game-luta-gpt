@@ -683,9 +683,9 @@ final class GeneratedSpriteLayouts {
     static final int P03_JUMP_HEAVY_FRAME_COUNT = 19;
 
     static final int P03_JUMP_HEAVY_DOWN_FRAME_WIDTH = 285;
-    static final int P03_JUMP_HEAVY_DOWN_FRAME_HEIGHT = 597;
+    static final int P03_JUMP_HEAVY_DOWN_FRAME_HEIGHT = 676;
     static final int P03_JUMP_HEAVY_DOWN_ROOT_X = 141;
-    static final int P03_JUMP_HEAVY_DOWN_ROOT_Y = 585;
+    static final int P03_JUMP_HEAVY_DOWN_ROOT_Y = 664;
     static final int P03_JUMP_HEAVY_DOWN_FRAME_COUNT = 14;
 
     static final int P03_JUMP_LIGHT_FRAME_WIDTH = 409;

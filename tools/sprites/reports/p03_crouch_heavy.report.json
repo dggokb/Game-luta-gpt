@@ -1,7 +1,7 @@
 {
   "id": "p03_crouch_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_crouch_heavy_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_heavy_video_normalized_smear.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). 2H uppercut a partir do agachado; quadros com clarao pulados.",
   "rootMode": "authored",
   "scale": 1,
@@ -57,7 +57,7 @@
         612
       ],
       "minimumMargin": 28,
-      "opaquePixels": 72168
+      "opaquePixels": 74468
     },
     {
       "index": 4,
@@ -68,7 +68,7 @@
         612
       ],
       "minimumMargin": 28,
-      "opaquePixels": 72284
+      "opaquePixels": 74640
     },
     {
       "index": 5,
@@ -366,9 +366,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c6a5ca23f99738c8b2007db7776ec9fa6e343ca89f4e6a78904517c997541f48",
-      "config": "fb965d3b9d35978812bc358c08e922a40dbb87d3df0c6760f18cddf3511b07e7",
+      "source": "ddc2c5c23a4a011615be3f70b96eb07376a6e10fdb38249ae8ac0265cddb452b",
+      "config": "0eb98d56165bd7bb4051d774d4a4d6a03922ef8d0dd6a75d759da5f160c677a6",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_crouch_heavy_video_normalized.png": "c6a5ca23f99738c8b2007db7776ec9fa6e343ca89f4e6a78904517c997541f48"
     }
   }
 }

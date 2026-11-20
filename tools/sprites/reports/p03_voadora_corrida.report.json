@@ -1,7 +1,7 @@
 {
   "id": "p03_voadora_corrida",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_voadora_corrida_video_normalized.png",
+  "source": "art/sprites/source/p03_voadora_corrida_video_normalized_smear.png",
   "sourceNote": "p03 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -79,7 +79,7 @@
         606
       ],
       "minimumMargin": 34,
-      "opaquePixels": 72144
+      "opaquePixels": 75191
     },
     {
       "index": 6,
@@ -90,7 +90,7 @@
         606
       ],
       "minimumMargin": 34,
-      "opaquePixels": 72137
+      "opaquePixels": 76186
     },
     {
       "index": 7,
@@ -499,9 +499,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2bfcbb967835baed3dada2b18668f236a83339dc1b6e137f5700bd448385784f",
-      "config": "345c33c6b1d3086d49ea2f7f3a461a973cdfab346cea7f2dc9fc912ba176ee64",
+      "source": "f41f13f48f9cad115933885292d5e43f511caac1ed43d3e8cc18a7e484a99fc3",
+      "config": "0338c47b43fd66b498d5a67fdb366d32f73028582ca0447d7a42ac114d1b39ca",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_voadora_corrida_video_normalized.png": "2bfcbb967835baed3dada2b18668f236a83339dc1b6e137f5700bd448385784f"
     }
   }
 }

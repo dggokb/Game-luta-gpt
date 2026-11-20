@@ -1,7 +1,7 @@
 {
   "id": "p03_dois_socos",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_dois_socos_video_normalized.png",
+  "source": "art/sprites/source/p03_dois_socos_video_normalized_smear.png",
   "sourceNote": "p03 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -46,7 +46,7 @@
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 65315
+      "opaquePixels": 65777
     },
     {
       "index": 3,
@@ -101,7 +101,7 @@
         478
       ],
       "minimumMargin": 34,
-      "opaquePixels": 68536
+      "opaquePixels": 68756
     },
     {
       "index": 8,
@@ -309,9 +309,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "cf566742ca6c6bf3996df2de919e5dc578b2581f5b819bac48ab2f25d6f64257",
-      "config": "adb4e2b86910eeffd433f9ca620942317188cdfc58bb05d95d6b601f59da887b",
+      "source": "453c53a2620cd2e50d876ef70cf33bf9007956a2416188c85738bd33ac46f6c9",
+      "config": "ac6c559071e9e6df25508ca59cd2afffc282d8c4ebfa8e1685f154d33d4284ac",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_dois_socos_video_normalized.png": "cf566742ca6c6bf3996df2de919e5dc578b2581f5b819bac48ab2f25d6f64257"
     }
   }
 }
