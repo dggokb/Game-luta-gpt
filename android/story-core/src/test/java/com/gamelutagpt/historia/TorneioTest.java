@@ -736,4 +736,28 @@ public class TorneioTest {
         assertTrue(campanha.escolheu());
         assertEquals(Episodio.TipoPasso.TITULO, p.passo().tipo);
     }
+
+    /** A Semifinal (ep06) tem a Bolsa de Apostas do Apostador; as outras lutas do torneio, não. */
+    @Test
+    public void soASemifinalTemABolsaDeApostas() throws IOException {
+        GameAssets assets = new GameAssets();
+        Temporada temporada = Temporada.load(assets);
+        int comAposta = 0;
+        for (String id : new String[] {"ep00", "ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07", "ep08", "ep09"}) {
+            for (Episodio.Passo passo : temporada.loadEpisodio(assets, id).passos) {
+                if (!passo.aposta) continue;
+                assertEquals(id + ": a aposta é da Semifinal", "ep06", id);
+                assertEquals(Episodio.TipoPasso.LUTA, passo.tipo);
+                assertTrue("é a luta do torneio", passo.torneio);
+                comAposta++;
+            }
+        }
+        assertEquals("uma luta só, a Semifinal", 1, comAposta);
+        try {
+            Episodio.fromJson("{\"passos\":[{\"tipo\":\"titulo\",\"aposta\":true}]}");
+            org.junit.Assert.fail("aposta fora de uma luta");
+        } catch (IllegalArgumentException esperado) {
+            assertTrue(esperado.getMessage().contains("aposta"));
+        }
+    }
 }

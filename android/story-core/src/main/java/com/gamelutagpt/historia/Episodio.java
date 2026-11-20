@@ -156,6 +156,12 @@ public final class Episodio {
          * luta dos irmãos adultos (o treino do Episódio 1). Toda luta {@link #semPoderes} também.
          */
         public boolean semShinkai;
+        /**
+         * {@code "aposta": true}: a luta tem a Bolsa de Apostas do Apostador (a Semifinal): o
+         * dinheiro dos apostadores entra na dupla que dá show, a cada patamar o titular ganha barra
+         * de Super e quem fica sem atacar perde aposta.
+         */
+        public boolean aposta;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -424,6 +430,8 @@ public final class Episodio {
         }
         passo.semPoderes = Boolean.TRUE.equals(map.get("semPoderes")) || passo.tutorial();
         passo.semShinkai = Boolean.TRUE.equals(map.get("semShinkai")) || passo.semPoderes;
+        passo.aposta = Boolean.TRUE.equals(map.get("aposta"));
+        if (passo.aposta && tipo != TipoPasso.LUTA) throw new IllegalArgumentException("aposta só em passo de luta");
         return passo;
     }
 

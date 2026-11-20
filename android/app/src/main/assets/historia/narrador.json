@@ -2,6 +2,9 @@
   "_comentario": "Narrador do torneio (o apresentador de terno preto e colete vermelho do concept art/concepts/narrador_concept.png; o nome ainda é provisório). Cada evento tem prioridade (3 = grande, interrompe; 2 = importante; 1 = comentário, só no silêncio), a expressão do retrato (historia/retratos/narrador_<expressao>.png: normal, empolgado ou serio) e as falas, sorteadas sem repetir a última. Variáveis entre chaves vêm do jogo. Padrão: docs/historia/narrador.md.",
   "nome": "NARRADOR",
   "cor": "#9B2320",
+  "vozes": {
+    "apostador": {"nome": "O APOSTADOR", "cor": "#C8962A"}
+  },
   "eventos": {
     "inicio": {
       "prioridade": 3,
@@ -184,6 +187,52 @@
       "expressao": "serio",
       "falas": [
         "Empate! Ninguém cede nessa arena!"
+      ]
+    },
+    "aposta_inicio": {
+      "quem": "apostador",
+      "prioridade": 2,
+      "expressao": "empolgado",
+      "falas": [
+        "Ha ha ha! As apostas estão abertas! {p1} ou {p2}... quem vai encher meus bolsos?",
+        "Façam suas apostas! Quero ver sangue e dinheiro voando!"
+      ]
+    },
+    "aposta_patamar": {
+      "quem": "apostador",
+      "prioridade": 2,
+      "expressao": "gargalhada",
+      "falas": [
+        "Ha ha ha! {valor} em {nome}! Toma, isso é pra você brilhar mais!",
+        "Os apostadores enlouqueceram! {nome} já vale {valor}!",
+        "Isso sim é espetáculo! Mais poder para {nome}!"
+      ]
+    },
+    "aposta_virada": {
+      "quem": "apostador",
+      "prioridade": 2,
+      "expressao": "empolgado",
+      "falas": [
+        "A zebra virou favorita! Agora o dinheiro está em {nome}!",
+        "Virada nas apostas! Todo mundo correndo para {nome}! Ha ha ha!"
+      ]
+    },
+    "aposta_esfriando": {
+      "quem": "apostador",
+      "prioridade": 1,
+      "expressao": "normal",
+      "falas": [
+        "Hm... {nome}, eu não paguei para ver ninguém parado.",
+        "Cuidado, {nome}... os apostadores estão ficando entediados."
+      ]
+    },
+    "aposta_caindo": {
+      "quem": "apostador",
+      "prioridade": 2,
+      "expressao": "normal",
+      "falas": [
+        "Ha! O dinheiro está fugindo de {nome}! Ataque ou perca tudo!",
+        "Quem foge não dá lucro! As apostas em {nome} estão caindo!"
       ]
     }
   }
