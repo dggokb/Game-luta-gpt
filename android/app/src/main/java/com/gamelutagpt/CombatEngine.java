@@ -84,6 +84,12 @@ final class CombatEngine {
         final int owner;
         final AttackDefinition attack;
         final CharacterDefinition.Move move;
+        /**
+         * Quem soltou a cópia (20/11): depois de uma troca (TAG) o titular do lado é outro, e o eco
+         * desenhado com a folha do novo titular não achava a animação e derrubava o jogo
+         * ("Unknown animation p02/DOIS_SOCOS", a imagem residual do Kōga depois de entrar a Yin-lu).
+         */
+        CharacterDefinition character;
         final float x, y;
         final int facing;
         final int damagePermille;
@@ -1883,12 +1889,15 @@ final class CombatEngine {
             f.echoDamagePermille = attack.mechanics.echoDamagePermille;
             cues.add("ECHO");
         } else if (f.echoLeft > 0 && attack.kind == AttackDefinition.Kind.NORMAL && f.move != null) {
-            echoes.add(new Echo(f.index, attack, f.move, f.x, f.y, f.facing, f.echoDelay, f.echoDamagePermille));
+            Echo eco = new Echo(f.index, attack, f.move, f.x, f.y, f.facing, f.echoDelay, f.echoDamagePermille);
+            eco.character = f.character();
+            echoes.add(eco);
         } else if (f.state.inShinkai(Shinkai.Type.SPEED) && attack.kind == AttackDefinition.Kind.NORMAL && f.move != null) {
             // SHINKAI SPEED: a imagem residual repete o golpe logo depois (todo golpe bate duas vezes).
             Echo e = new Echo(f.index, attack, f.move, f.x, f.y, f.facing, config.shinkaiSpeedEchoDelay,
                 config.shinkaiSpeedEchoDamagePermille);
             e.shinkai = true;
+            e.character = f.character();
             echoes.add(e);
         }
         if (attack.mechanics.lifeCost > 0) {
@@ -1969,6 +1978,7 @@ final class CombatEngine {
             Echo clone = new Echo(f.index, attack, move, Arena.clamp(behind, Arena.LEFT_BOUND, Arena.RIGHT_BOUND),
                 Arena.GROUND_Y, facing, CLONE_DELAY * (i + 1), 0);
             clone.ghost = true;
+            clone.character = f.character();
             echoes.add(clone);
         }
         cues.add("CLONES");

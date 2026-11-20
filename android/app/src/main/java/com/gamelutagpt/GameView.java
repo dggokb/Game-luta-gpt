@@ -7893,7 +7893,9 @@ public class GameView extends SurfaceView
     private void drawEchoes(Canvas c) {
         for (CombatEngine.Echo e : engine.echoes) {
             if (!e.visible() || e.move.animation == null) continue;
-            CharacterDefinition owner = engine.fighter(e.owner).character();
+            CharacterDefinition owner = e.character != null ? e.character : engine.fighter(e.owner).character();
+            // A cópia é de quem a soltou: com outro titular em campo (a troca), a animação não é dele.
+            if (!owner.animations.containsKey(e.move.animation.id)) continue;
             if (!echoRenderer.character().id.equals(owner.id)) echoRenderer.setCharacter(owner.id);
             echoRenderer.pose(e.move.animation.id, e.move.animationTime((e.frame + 0.5f) * FIXED_STEP), 0f);
             // A imagem residual do SHINKAI SPEED: a silhueta translúcida na cor do tipo.

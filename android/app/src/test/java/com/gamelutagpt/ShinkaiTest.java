@@ -406,6 +406,9 @@ public class ShinkaiTest {
         m.hitWith(0, () -> m.in[0].light = true, "L");
         assertEquals(1, m.engine.echoes.size());
         assertTrue(m.engine.echoes.get(0).shinkai);
+        // A cópia guarda quem a soltou: depois de uma troca o titular do lado é outro, e desenhar o
+        // eco com a folha dele derrubava o jogo (20/11, "Unknown animation p02/DOIS_SOCOS").
+        assertEquals("p16", m.engine.echoes.get(0).character.id);
         int hits = 0, combo = 0;
         for (int i = 0; i < 30; i++) {
             m.step();
