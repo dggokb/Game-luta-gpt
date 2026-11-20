@@ -42,8 +42,8 @@
     ],
     "semente": 11,
     "comprimento": [
-      1.2,
-      1.0
+      0.5,
+      0.4
     ],
     "ferramenta": "tools/sprites/smear.py",
     "opacidade": [

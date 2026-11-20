@@ -227,6 +227,11 @@ caminho, os já medidos ficaram como estavam).
 - Ryūga e Yin-lu estão na nitidez `hd_aprovado` (teste do dono): o clipe volta à folha original, o
   smear entra nela e o `hd_aprovado_p01_p02.py` (`process`) roda só nesse clipe.
 
+**Correção (20/11, o dono: "H e frente estranhos, 2H com a direção errada"):** no 2H o caminho saía
+do punho de trás (o que fica parado); agora sai do punho que estava no joelho e sobe reto, com o
+rastro curto (0,6/0,5) atrás do braço. No H e no → + H as línguas iam até o peito e o rosto: agora
+curtas (0,5/0,4), só no braço. Ficaram discretas.
+
 Build PASS; `testarMotor` só com as 3 falhas antigas. Visto nas folhas; jogo e celular não.
 
 ## A pesquisa de como os estúdios fazem (10/11)
