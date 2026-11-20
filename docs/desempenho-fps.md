@@ -863,6 +863,26 @@ recolhe o bitmap (o `GlRenderCanvas` os guarda por referência fraca). Duas cois
 
 Os Ultras de quem saiu da luta já saíam com o coletor. A confirmação do FPS é no celular.
 
+### 5.21 O que mais ficava de uma luta para a outra (20/11)
+
+**Como achar:** `MedirLuta` com `-Dgameluta.rastrearBitmaps=true`. No começo de cada luta o coletor
+passa e o relatório lista as folhas por personagem, as imagens da luta e todo bitmap ainda vivo,
+por quem o criou (`Bitmap.vivosPorOrigem`, só no PC). Três lutas seguidas, cada uma com quatro
+personagens e um cenário diferentes, mostram o que sobra da anterior.
+
+**O que sobrava e a correção:**
+
+| O quê | Quanto | Quem segurava | Agora |
+|---|---|---|---|
+| Efeitos de vídeo de todos os personagens (SHINKAI, ondas, palhaço, Ichigeki, garça) | ~300 MB, em toda luta | `EfeitosVideo.carregar` lia a pasta inteira | Os de um personagem (nome terminado no id dele) só enquanto ele luta (`EfeitosVideo.manter`); os comuns, 131 MB, continuam sempre |
+| O Ultra do último Ultra feito | 25–39 MB | `PaginaFinal.pack` e `AberturaUltra.pack`/`rival` | `soltar()` das duas no carregamento da luta |
+| O cenário da luta passada | 46–160 MB | `trovaoCena` (5.20) | referência fraca |
+
+Os efeitos de personagem entraram entre 14/11 e 17/11, depois da medição de 5.19.
+
+**O que não sobra:** as folhas (o `retainOnly` solta e apaga a textura), as intros de Super e a
+vitória. Os retratos do HUD guardam no máximo um por personagem (até ~5 MB).
+
 ### Resumo do celular (Xiaomi 24116RACCG, 1080p, OpenGL, p15+p16)
 
 | Medida | Primeiro relatório | Final |

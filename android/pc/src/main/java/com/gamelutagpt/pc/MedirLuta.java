@@ -73,6 +73,16 @@ public final class MedirLuta {
                 c.esperar(0.5);
             }
             String pre = lutas.length > 1 ? "luta" + (n + 1) + "-" : "";
+            if (Boolean.getBoolean("gameluta.rastrearBitmaps")) {
+                // O que ficou vivo depois do carregamento desta luta (o coletor passa antes).
+                System.gc();
+                c.esperar(1.0);
+                System.gc();
+                todas.add("== memória no começo da luta " + (n + 1) + (lutas[n] != null ? ": " + lutas[n] : ""));
+                todas.add(c.jogo().memoriaDaLuta());
+                todas.add("bitmaps vivos (MB, quantos, quem criou):");
+                todas.add(android.graphics.Bitmap.vivosPorOrigem());
+            }
             // Algumas fotos no caminho (SHINKAI aos 3 s, Super aos 10 s, Ultra aos 17 s).
             double[] fotos = {4.0, 10.5, 17.5, 18.5, 19.5, 20.5, 21.5, 24.0};
             String[] nomes = {"shinkai", "super", "ultra", "ultra-2", "ultra-3", "ultra-4", "ultra-5", "shinkai-rival"};

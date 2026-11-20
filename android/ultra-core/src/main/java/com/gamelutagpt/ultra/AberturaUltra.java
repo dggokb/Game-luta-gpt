@@ -95,6 +95,21 @@ public final class AberturaUltra {
         return time >= 0f && time < DURATION;
     }
 
+    /**
+     * Fora da abertura, esquece o pack do último Ultra e a arte do rival: guardados aqui, eles
+     * (e as texturas na placa de vídeo) ficavam vivos na luta seguinte.
+     */
+    public void soltar() {
+        if (isActive()) return;
+        pack = null;
+        rival = null;
+    }
+
+    /** O pack que a abertura segura agora (null depois de {@link #soltar}). */
+    UltraPack pack() {
+        return pack;
+    }
+
     public void update(float dt) {
         if (time < 0f) return;
         time += dt;

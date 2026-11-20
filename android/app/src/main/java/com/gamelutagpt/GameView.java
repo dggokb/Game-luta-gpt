@@ -904,6 +904,7 @@ public class GameView extends SurfaceView
         hud.loadArt(context);
         medicao.parte("hud");
         efeitos.carregar();
+        manterEfeitos(team[0].character, team[1].character, opponentFighter.character);
         medicao.parte("efeitos");
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache. No celular só os renderers: as
@@ -1174,6 +1175,11 @@ public class GameView extends SurfaceView
             atlases.preloadNaEscalaAtual(luta);
         }
         lutadoresAntecipados = "";
+        // Os efeitos próprios (SHINKAI, ondas, palhaço, Ichigeki, garça) só de quem está nesta luta.
+        java.util.List<CharacterDefinition> comEfeitos = new java.util.ArrayList<>(java.util.Arrays.asList(
+            comExtras(team[0].character, team[1].character, opponentFighter.character)));
+        comEfeitos.add(cpuPartnerCharacter);
+        manterEfeitos(comEfeitos.toArray(new CharacterDefinition[0]));
         // Os rostos do HUD saem de folhas de conceito grandes: decodificados aqui, e não no
         // primeiro quadro da luta (que engasgava).
         prepararRostosDoHud(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
@@ -1200,6 +1206,13 @@ public class GameView extends SurfaceView
         startIntro();
     }
 
+    /** Os efeitos de vídeo destes lutadores ficam; os de quem não está na luta saem. */
+    private void manterEfeitos(CharacterDefinition... lutadores) {
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        for (CharacterDefinition c : lutadores) if (c != null) ids.add(c.id);
+        efeitos.manter(ids);
+    }
+
     /**
      * O cenário e o Ultra da luta passada já não são usados, mas a textura deles só sai da placa
      * de vídeo quando o coletor de lixo recolhe o bitmap (o {@code GlRenderCanvas} os segura por
@@ -1208,6 +1221,10 @@ public class GameView extends SurfaceView
      * carregamento, o coletor passa uma vez e o próximo quadro apaga essas texturas.
      */
     private void soltarImagensDeLutasPassadas() {
+        // A página do Ultra guardava o pack do último Ultra feito (25–39 MB), luta após luta.
+        paginaFinal.soltar();
+        abertura.soltar();
+        if (ultraAttacker < 0) ultraPack = null;
         String antes = AndroidRenderAssets.vivasDaLuta();
         System.gc();
         Log.i(MedicaoCarregamento.TAG, "imagens da luta vivas antes do coletor: " + antes);
@@ -4180,6 +4197,11 @@ public class GameView extends SurfaceView
     }
 
     private volatile String[] duplaPedida;
+
+    /** PC (MedirLuta): as folhas na memória por personagem e as imagens da luta vivas. */
+    public String memoriaDaLuta() {
+        return "folhas: " + atlases.resumoPorPersonagem() + "\nimagens da luta: " + AndroidRenderAssets.vivasDaLuta();
+    }
 
     /**
      * PC ({@code gradle :pc:gravarLuta}): a barra de Super dos dois times no valor pedido (1000 por

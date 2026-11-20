@@ -25,7 +25,9 @@ import org.json.JSONObject;
  *
  * Um efeito que não existe nos assets não toca ({@link #tocar} devolve false): quem chama usa
  * o efeito clássico no lugar. Assim cada vídeo novo entra sozinho, sem mexer no código. As
- * folhas são lidas uma vez ({@link #carregar}, junto com a arte da luta).
+ * folhas comuns são lidas uma vez ({@link #carregar}, junto com a arte da luta); as de um
+ * personagem (o nome termina no id dele: {@code shinkai_p02}, {@code onda_p03}) só enquanto ele
+ * está na luta ({@link #manter}).
  */
 final class EfeitosVideo {
     private static final String LOG_TAG = "EfeitosVideo";
@@ -83,6 +85,18 @@ final class EfeitosVideo {
     /** Trocado inteiro ao carregar (a carga pode vir de outra thread que a do desenho). */
     private volatile Map<String, Folha> folhas = new HashMap<>();
     private boolean carregou;
+    /** As pastas dos efeitos de cada personagem (ainda não lidas), pelo id dele. */
+    private final Map<String, java.util.List<String>> doPersonagem = new HashMap<>();
+    private static final java.util.regex.Pattern DONO = java.util.regex.Pattern.compile(".*_(p\\d\\d|player_base|player_two)$");
+
+    /**
+     * O personagem dono do efeito pelo nome ({@code shinkai_p02} → p02), ou null para um efeito
+     * comum (impacto, poeira, defesa), que vale para todos.
+     */
+    static String dono(String nome) {
+        java.util.regex.Matcher m = DONO.matcher(nome);
+        return m.matches() ? m.group(1) : null;
+    }
 
     private final Folha[] tocando = new Folha[VAGAS];
     private final float[] x = new float[VAGAS], y = new float[VAGAS], escala = new float[VAGAS], idadeMs = new float[VAGAS];
@@ -125,6 +139,13 @@ final class EfeitosVideo {
         if (nomes == null) return;
         Map<String, Folha> lidas = new HashMap<>();
         for (String nome : nomes) {
+            String dono = dono(nome);
+            if (dono != null) {
+                // Os de um personagem: só quando ele entrar numa luta (manter). Todos juntos,
+                // sempre na memória e na placa de vídeo, eram ~300 MB de quem nem estava lutando.
+                doPersonagem.computeIfAbsent(dono, k -> new java.util.ArrayList<>()).add(nome);
+                continue;
+            }
             try {
                 Folha f = ler(nome);
                 if (f != null) lidas.put(nome, f);
@@ -190,6 +211,39 @@ final class EfeitosVideo {
         int lidos;
         while ((lidos = in.read(buffer)) != -1) out.write(buffer, 0, lidos);
         return new String(out.toByteArray(), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Deixa na memória os efeitos destes personagens (os da luta) e solta os dos outros: o
+     * bitmap e, no OpenGL, a textura. No carregamento da luta, não no meio dela.
+     */
+    synchronized void manter(java.util.Collection<String> ids) {
+        Map<String, Folha> novas = new HashMap<>();
+        java.util.List<Folha> saem = new java.util.ArrayList<>();
+        for (Map.Entry<String, Folha> e : folhas.entrySet()) {
+            String dono = dono(e.getKey());
+            if (dono == null || ids.contains(dono)) novas.put(e.getKey(), e.getValue());
+            else saem.add(e.getValue());
+        }
+        for (String id : ids) {
+            java.util.List<String> nomes = doPersonagem.get(id);
+            if (nomes == null) continue;
+            for (String nome : nomes) {
+                if (novas.containsKey(nome)) continue;
+                try {
+                    Folha f = ler(nome);
+                    if (f != null) novas.put(nome, f);
+                } catch (Exception e) {
+                    Log.w(LOG_TAG, "efeito " + nome + " não carregou", e);
+                }
+            }
+        }
+        folhas = novas;
+        for (Folha f : saem) {
+            for (int i = 0; i < VAGAS; i++) if (tocando[i] == f) tocando[i] = null;
+            f.bitmap.recycle();
+            DesenhoGl.soltarDepois(f.bitmap);
+        }
     }
 
     /** Põe uma folha pronta (testes e ferramentas). */

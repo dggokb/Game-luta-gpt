@@ -149,6 +149,19 @@ public final class PaginaFinal {
         return active;
     }
 
+    /**
+     * Fora da cinemática, esquece o pack do último Ultra. Guardado aqui, ele (as imagens e, no
+     * OpenGL, as texturas delas na placa de vídeo) ficava vivo luta após luta.
+     */
+    public void soltar() {
+        if (!active) pack = null;
+    }
+
+    /** O pack que a página segura agora (null depois de {@link #soltar}). */
+    UltraPack pack() {
+        return pack;
+    }
+
     /** Verdadeiro durante a quebra da página: o jogo por trás já aparece nos buracos. */
     public boolean isShattering() {
         return active && shatterTime >= 0f;

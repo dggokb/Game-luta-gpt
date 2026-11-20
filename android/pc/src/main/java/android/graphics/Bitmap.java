@@ -30,6 +30,38 @@ public final class Bitmap {
         this.config = Config.ARGB_8888;
         conta = new Conta((long) this.image.getWidth() * this.image.getHeight() * 4L);
         COLETOR.register(this, conta);
+        if (RASTREAR) {
+            String origem = StackWalker.getInstance().walk(s -> s
+                .filter(f -> f.getClassName().startsWith("com.gamelutagpt") && !f.getClassName().startsWith("com.gamelutagpt.pc"))
+                .limit(2)
+                .map(f -> f.getClassName().substring(f.getClassName().lastIndexOf('.') + 1) + "." + f.getMethodName())
+                .reduce((a, b) -> a + " < " + b).orElse("?"));
+            synchronized (ORIGENS) { ORIGENS.put(this, origem + "|" + conta.bytes.get()); }
+        }
+    }
+
+    /** Extensão do PC ({@code -Dgameluta.rastrearBitmaps=true}): quem criou cada bitmap vivo. */
+    private static final boolean RASTREAR = Boolean.getBoolean("gameluta.rastrearBitmaps");
+    private static final java.util.Map<Bitmap, String> ORIGENS = new java.util.WeakHashMap<>();
+
+    /**
+     * Extensão do PC: os bitmaps ainda vivos (alcançáveis), por quem os criou, com o tamanho de
+     * quando nasceram (no celular um bitmap reciclado depois de subir continua com a textura).
+     */
+    public static String vivosPorOrigem() {
+        java.util.Map<String, long[]> por = new java.util.TreeMap<>();
+        synchronized (ORIGENS) {
+            for (String v : ORIGENS.values()) {
+                int i = v.lastIndexOf('|');
+                long[] n = por.computeIfAbsent(v.substring(0, i), k -> new long[2]);
+                n[0]++;
+                n[1] += Long.parseLong(v.substring(i + 1));
+            }
+        }
+        StringBuilder s = new StringBuilder();
+        for (java.util.Map.Entry<String, long[]> e : por.entrySet())
+            s.append(String.format(java.util.Locale.ROOT, "  %5d MB %4d  %s%n", e.getValue()[1] >> 20, e.getValue()[0], e.getKey()));
+        return s.toString();
     }
 
     /** Extensão do PC: bytes de todos os bitmaps ainda vivos (para medir carregamentos). */

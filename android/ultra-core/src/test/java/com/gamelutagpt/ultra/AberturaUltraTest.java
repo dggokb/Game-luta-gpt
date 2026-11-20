@@ -63,6 +63,21 @@ public class AberturaUltraTest {
         }
     }
 
+    /** Terminada a abertura, soltar esquece o pack; no meio dela, não. */
+    @Test public void soltarEsqueceOPackSoDepoisDoFim() {
+        UltraDefinition d = UltraDefinition.fromJson("{\"nome\": \"Teste\", \"cor\": \"#3FA7D6\"}");
+        AberturaUltra abertura = new AberturaUltra();
+        abertura.start(new UltraPack(d, new RenderImage[UltraSlot.values().length], new RenderImage[7], java.util.Collections.<String>emptyList()), 1);
+        abertura.update(1f / 60f);
+        abertura.soltar();
+        assertNotNull(abertura.pack());
+        for (int i = 0; i < 2000 && abertura.isActive(); i++) abertura.update(1f / 60f);
+        assertFalse(abertura.isActive());
+        abertura.soltar();
+        assertNull(abertura.pack());
+        abertura.render(new TextCanvas());
+    }
+
     @Test public void everyOpeningStyleShowsTheNameWithOrWithoutArt() {
         for (String style : AberturaUltra.STYLES) {
             UltraDefinition d = UltraDefinition.fromJson("{\"nome\": \"Sinfonia Escarlate\", \"estilo\": {\"abertura\": \""

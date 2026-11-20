@@ -88,6 +88,28 @@ public class PaginaFinalTest {
         return recorder;
     }
 
+    /** Terminada a cinemática, soltar esquece o pack; no meio dela, não (a página ainda desenha). */
+    @Test
+    public void soltarEsqueceOPackSoDepoisDoFim() {
+        Recorder recorder = new Recorder();
+        PaginaFinal pagina = new PaginaFinal(recorder);
+        NullCanvas canvas = new NullCanvas();
+        pagina.start(UltraPack.placeholder("TESTE", 0xFFF4B73B), 1);
+        pagina.update(DT);
+        pagina.soltar();
+        assertNotNull(pagina.pack());
+        pagina.render(canvas);
+        for (int i = 0; i < 1000 && pagina.isActive(); i++) {
+            pagina.update(DT);
+            pagina.render(canvas);
+        }
+        assertFalse(pagina.isActive());
+        pagina.soltar();
+        assertNull(pagina.pack());
+        pagina.update(DT);
+        pagina.render(canvas);
+    }
+
     /** Página + raio somam o dano total; o bônus vale para a detonação e para o raio. */
     private static void assertTotal(Recorder r, UltraGrade grade) {
         float bonusShare = PaginaFinal.HIT_FRACTION[2] + PaginaFinal.BEAM_FRACTION;

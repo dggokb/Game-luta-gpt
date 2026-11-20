@@ -560,6 +560,26 @@ final class SpriteAtlasCache {
         return get(character,atlas);
     }
 
+    /** As folhas prontas, por personagem: "p03 46 folhas 697 MB · ..." (o MedirLuta no PC). */
+    String resumoPorPersonagem() {
+        java.util.Map<String,long[]> por=new java.util.TreeMap<>();
+        synchronized(trava) {
+            for(Entrada e:folhas.values()) {
+                if(e.folha==null)continue;
+                String r=e.atlas.resource;
+                String quem=r.startsWith("player_base")?"player_base":r.substring(0,Math.max(1,r.indexOf('_')));
+                long[] n=por.computeIfAbsent(quem,k->new long[2]);
+                n[0]++;n[1]+=e.folha.bytes;
+            }
+        }
+        StringBuilder s=new StringBuilder();
+        for(Map.Entry<String,long[]> e:por.entrySet()) {
+            if(s.length()>0)s.append(" · ");
+            s.append(e.getKey()).append(' ').append(e.getValue()[0]).append(" folhas ").append(e.getValue()[1]>>20).append(" MB");
+        }
+        return s.toString();
+    }
+
     /** Bytes das folhas prontas no cache agora (o botão MEDIR). */
     long bytesProntos() {
         synchronized(trava) { return bytesProntos; }
