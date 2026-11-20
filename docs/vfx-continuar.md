@@ -2119,3 +2119,10 @@ no lugar do `impacto_v08_forte` só ali.
 - Visto nos quadros: no jogo o teste parece menor que o v08, porque os quadros grandes (as
   faíscas abertas) são bem transparentes e o que mais aparece é a estrela do começo. Falta o dono
   dizer se aumenta ou se fica assim.
+- **Teste 2 (mesmo dia):** outra folha 4×4 do dono, amarela (estrela com miolo claro e faíscas
+  finas que abrem), "testa com esse". Mesmo caminho, fora do jogo: 15 quadros, `pixelScale` 1,5
+  (abre mais que o primeiro: 317 px de altura no mundo), luz `#F5C83E`. Guardado em
+  `art/vfx/teste_soco_forte_v09/teste2_amarelo/`. Vídeo lado a lado com o v08, normal e câmera
+  lenta. Nos quadros: a estrela aparece no punho, mas os 15 quadros correm no tempo curto do
+  acerto forte (~0,28 s) e as faíscas abertas são finas e claras; ao lado do v08 parece pequeno.
+  Falta o dono dizer.
