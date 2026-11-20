@@ -2056,3 +2056,7 @@ Rodada de 19/11 (instalado): o vídeo s1 do dono saiu com os riscos e o X do jei
 parado ficam na arte do Kōga (`GARRA_1`, `GARRA_2`); o X que voa é a folha `onda_p03` (quadros 44-58 do vídeo,
 a mão dele pintada por cima com inpaint antes da chave do verde; o brilho amarelado do verde puxado para o
 laranja, G ≤ 0,62·R nos tons quentes; 260 px, o tamanho do X parado; luz `#FF6A2A`). Gravado no PC.
+
+## 20/11: Garra do Kōga, efeito estranho
+
+O dono: "o efeito tbem ta estranho". Olhado de perto: a borda das marcas e do X com franja verde-amarelada (o verde do fundo no brilho meio transparente) e o X como placa laranja sólida (o vermelho entre os cortes opaco, o brilho chegando à borda do recorte). Feito: `sem_verde` nos clipes da garra, e `efeito_leve` (novo em personagem.py: laranja/vermelho vivo, R>190 e B<90, fica meio transparente pela luminância; o corte branco fica inteiro) nas marcas paradas e na folha `onda_p03`. Sem `soma`: somando, o X lavava o cenário. Falta o dono ver no vídeo.

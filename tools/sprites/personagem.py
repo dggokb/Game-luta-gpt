@@ -339,9 +339,24 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
     out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
     if opts.get('sem_verde'):
         sem_verde(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png', opts.get('fogo'))
+    if opts.get('efeito_leve'):
+        efeito_leve(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
     if opts.get('preencher_invisivel'):
         preencher_invisivel(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
     return out.strip().splitlines()[0]
+
+
+def efeito_leve(caminho):
+    """O efeito desenhado no vídeo (as marcas da garra do Kōga) fica corte e brilho, não placa: o
+    laranja e o vermelho vivos entre os cortes (R alto, quase sem azul: não pega pele, branco nem as
+    faixas vermelho-escuras da roupa) ficam meio transparentes pela luminância, e o corte branco fica
+    inteiro. O dono, 20/11: "o efeito tbem ta estranho" (a placa laranja do X)."""
+    a = np.array(Image.open(caminho).convert('RGBA')).astype(np.float32)
+    r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
+    lum = (0.3 * r + 0.59 * g + 0.11 * b) / 255
+    fogo = (r > 190) & (b < 90)
+    a[..., 3] = np.where(fogo, al * np.clip(0.25 + (lum - 0.35) * 1.6, 0.25, 1), al)
+    Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA').save(caminho)
 
 
 def preencher_invisivel(caminho):

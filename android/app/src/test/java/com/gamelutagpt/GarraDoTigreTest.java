@@ -9,6 +9,9 @@ import org.junit.Test;
  * O S1 em três do Kōga (19/11, a Garra do tigre, ideia do dono): ↓↘→ + botão é o 1º corte (S1A);
  * um botão dentro dele emenda o 2º corte, o X (a continuação SG); outro botão dentro do X emenda o
  * S1 de projétil, o X lançado. Sem apertar, cada etapa volta à guarda. A CPU usa a sequência.
+ * 20/11 (o dono: "tem q respeitar o tempo da animação"): cada etapa toca no tempo do vídeo e a
+ * seguinte só sai no fim da pose segurada, por mais rápido que se aperte; acertada, a sequência
+ * inteira é combo.
  */
 public class GarraDoTigreTest {
     private static final CharacterDefinition KOGA = GeneratedCharacters.get("p03");
@@ -68,6 +71,55 @@ public class GarraDoTigreTest {
             abriu = s.f(0).attacking() && CancelSystem.ABERTURA.equals(s.f(0).attack.id);
         }
         assertTrue("do M acertado sai o 1º corte", abriu);
+    }
+
+    /** Apertando o botão em todo quadro, o X só sai no fim da pose segurada do 1º corte. */
+    @Test public void apertarRapidoNaoAcelera() {
+        CombatEngineTest.Sim s = luta(600f);
+        s.in[0].special = "M";
+        s.step();
+        s.in[0].special = null;
+        int ultimo = -1;
+        for (int t = 0; t < 80; t++) {
+            CombatFighter f = s.f(0);
+            if (f.attacking() && CancelSystem.ABERTURA.equals(f.attack.id)) ultimo = f.attackFrame;
+            if (f.attacking() && CancelSystem.FOLLOW_UP.equals(f.attack.id)) break;
+            s.in[0].light = true;
+            s.step();
+            s.in[0].light = false;
+        }
+        AttackDefinition abertura = KOGA.attack(CancelSystem.ABERTURA);
+        assertTrue("o X saiu", s.f(0).attacking() && CancelSystem.FOLLOW_UP.equals(s.f(0).attack.id));
+        assertTrue("o 1º corte tocou até a pose segurada (" + ultimo + ")", ultimo >= abertura.whiffWindow.start - 1);
+        assertTrue("a janela abre depois das marcas formadas",
+            abertura.whiffWindow.start > abertura.startupFrames + abertura.activeFrames + 8);
+    }
+
+    /** De perto, os três acertam sem o rival sair do atordoamento. */
+    @Test public void aSequenciaAcertadaEhCombo() {
+        CombatEngineTest.Sim s = luta(150f);
+        s.in[0].special = "M";
+        s.step();
+        s.in[0].special = null;
+        boolean acertou = false, soltou = false, xAcertou = false;
+        for (int t = 0; t < 200 && !xAcertou; t++) {
+            s.in[0].light = true;
+            s.step();
+            s.in[0].light = false;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker == 0 && !e.blocked) {
+                    acertou = true;
+                    if (e.projectile) xAcertou = true;
+                }
+            }
+            if (acertou && !xAcertou) {
+                CombatFighter d = s.f(1);
+                assertTrue("o rival ficou preso no quadro " + t + " (" + d.status + ")",
+                    d.status != CombatFighter.Status.NEUTRAL);
+            }
+        }
+        assertTrue("o 1º corte acertou", acertou);
+        assertTrue("o X lançado acertou", xAcertou);
     }
 
     /** A CPU (nível 8) contra um jogador parado: ela solta o X lançado pela sequência. */
