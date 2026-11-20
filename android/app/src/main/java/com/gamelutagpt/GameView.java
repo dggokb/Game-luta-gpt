@@ -1764,7 +1764,7 @@ public class GameView extends SurfaceView
             // O trabalho do quadro para a dica de desempenho do Android (o tempo até aqui, sem a espera).
             if (glQuadro) desenhoGl.relatarTrabalho(System.nanoTime() - frameStart);
             if (teste.ativo()) registrarQuadroDoTeste();
-            if (MedicaoContinua.ligada) {
+            if (medindo()) {
                 if (perfil.ultimoQuadro[PerfilQuadros.FUNDO] > 0) medicao.quadro(perfil, quemLuta(), atlases.bytesProntos());
                 else medicao.pausa();
             }
@@ -4308,8 +4308,13 @@ public class GameView extends SurfaceView
     }
 
     /** A caixa do MEDIR no alto da tela, por cima de tudo, em qualquer modo. */
+    /** A caixa do MEDIR: o botão MEDIR do Modo Teste ou o FPS da pausa em MEDIR (arcade, história). */
+    private boolean medindo() {
+        return MedicaoContinua.ligada || pausa.medir();
+    }
+
     private void desenharMedicao(Canvas canvas) {
-        if (!MedicaoContinua.ligada) return;
+        if (!medindo()) return;
         java.util.List<String> linhas = medicao.linhas();
         if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(true);
         try {

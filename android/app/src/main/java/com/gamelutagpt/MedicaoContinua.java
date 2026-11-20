@@ -68,7 +68,7 @@ final class MedicaoContinua {
     /** As linhas da caixa: as lutas antigas e a de agora (a última embaixo). */
     List<String> linhas() {
         List<String> out = new ArrayList<>();
-        out.add("MEDIR (toque no MEDIR do Modo Teste para desligar)  " + Runtime.getRuntime().availableProcessors() + " núcleos");
+        out.add("MEDIR (desliga no FPS da pausa ou no MEDIR do Modo Teste)  " + Runtime.getRuntime().availableProcessors() + " núcleos");
         int n = fechadas - antigas.size();
         for (Luta l : antigas) out.add(linha(++n, l, false));
         if (atual != null) out.add(linha(++n, atual, true));

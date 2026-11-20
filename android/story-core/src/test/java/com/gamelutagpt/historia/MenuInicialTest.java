@@ -135,13 +135,18 @@ public class MenuInicialTest {
         assertTrue("ligado de começo", p.fps());
         for (int i = 0; i < 6; i++) p.mover(1);
         assertEquals(MenuPausa.Opcao.FPS, p.cursor());
+        assertFalse("o MEDIR começa desligado", p.medir());
+        // DESLIGADO → LIGADO → MEDIR (o contador e a caixa do MEDIR, 20/11) → DESLIGADO.
         assertNull("troca e a pausa continua", p.confirmar());
-        assertFalse(p.fps());
-        assertTrue(p.ajustar(1));
         assertTrue(p.fps());
+        assertTrue("o terceiro estado: MEDIR", p.medir());
+        assertTrue(p.ajustar(1));
+        assertFalse(p.fps());
+        assertFalse(p.medir());
         float[] caixa = MenuPausa.CAIXAS[6];
         assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
-        assertFalse(p.fps());
+        assertTrue(p.fps());
+        assertFalse(p.medir());
         assertTrue(p.isOpen());
         p.render(new PaginaHistoriaTest.NullCanvas());
     }

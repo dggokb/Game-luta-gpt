@@ -25,6 +25,12 @@ public final class MenuPausa {
     public static final String GRAFICOS = "GRÁFICOS";
     /** O contador de quadros por segundo no canto da tela. */
     public static final String FPS = "FPS";
+    /**
+     * O terceiro estado do FPS (20/11): além do contador, a caixa do MEDIR (o resumo de cada luta,
+     * {@code MedicaoContinua}), para achar a queda de FPS no arcade e na história, onde os botões de
+     * teste não aparecem.
+     */
+    public static final String MEDIR = "MEDIR";
     /** Os botões de teste do canto (IA, DEBUG, VIDA, GRÁF, OPENGL...): aparecem ou somem. */
     public static final String BOTOES = "BOTÕES DE TESTE";
     /** Níveis dos gráficos (quem usa a pausa monta o rótulo com eles). */
@@ -37,7 +43,7 @@ public final class MenuPausa {
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
     public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, NIVEL_CPU,
-        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", FPS, BOTOES, REGISTRO, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
+        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", FPS, MEDIR, BOTOES, REGISTRO, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
 
     /** A opção GRÁFICOS: quem usa a pausa diz o que mostrar e o que fazer ao trocar. */
     public interface Graficos {
@@ -78,6 +84,8 @@ public final class MenuPausa {
     private int velocidade = nivel(VELOCIDADE_PADRAO);
     private boolean impacto = true;
     private boolean fps = true;
+    /** FPS no terceiro estado: o contador e a caixa do MEDIR. Vale nesta sessão do app. */
+    private boolean medir;
     private boolean botoes = true;
     private int nivelCpu = NIVEL_PADRAO;
     private final TelaComandos comandos = new TelaComandos();
@@ -139,8 +147,21 @@ public final class MenuPausa {
         return fps;
     }
 
+    /** A caixa do MEDIR ligada (o FPS no terceiro estado). */
+    public boolean medir() {
+        return medir;
+    }
+
+    /** DESLIGADO → LIGADO → MEDIR → DESLIGADO. */
+    private void proximoFps() {
+        if (!fps) fps = true;
+        else if (!medir) medir = true;
+        else { fps = false; medir = false; }
+    }
+
     public void setFps(boolean ligado) {
         fps = ligado;
+        if (!ligado) medir = false;
     }
 
     /** Os botões de teste do canto aparecem (e respondem ao toque). */
@@ -190,7 +211,7 @@ public final class MenuPausa {
             return true;
         }
         if (open && cursor() == Opcao.FPS) {
-            if (direcao != 0) fps = !fps;
+            if (direcao != 0) proximoFps();
             return true;
         }
         if (open && cursor() == Opcao.BOTOES) {
@@ -240,7 +261,7 @@ public final class MenuPausa {
             return null;
         }
         if (cursor() == Opcao.FPS) {
-            fps = !fps;
+            proximoFps();
             return null;
         }
         if (cursor() == Opcao.BOTOES) {
@@ -297,7 +318,7 @@ public final class MenuPausa {
                     return null;
                 }
                 if (cursor() == Opcao.FPS) {
-                    fps = !fps;
+                    proximoFps();
                     return null;
                 }
                 if (cursor() == Opcao.BOTOES) {
@@ -344,7 +365,7 @@ public final class MenuPausa {
         c.drawText(titulo, cx, 252f, size, Tinta.withAlpha(BotaoMenu.WHITE, (int)(255f * in)),
             Tinta.withAlpha(BotaoMenu.INK, (int)(255f * in)), size * 0.14f, true);
         String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(IMPACTO) + ":  " + t(impacto ? LIGADO : DESLIGADO),
-            rotuloNivel(), t(COMANDOS), rotuloGraficos(), t(FPS) + ":  " + t(fps ? LIGADO : DESLIGADO),
+            rotuloNivel(), t(COMANDOS), rotuloGraficos(), t(FPS) + ":  " + t(medir ? MEDIR : fps ? LIGADO : DESLIGADO),
             t(BOTOES) + ":  " + t(botoes ? LIGADO : DESLIGADO), t(REGISTRO), t(MENU_INICIAL)};
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
