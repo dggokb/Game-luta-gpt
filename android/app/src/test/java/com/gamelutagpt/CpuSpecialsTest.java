@@ -33,6 +33,7 @@ public class CpuSpecialsTest {
         assertEquals(CpuSpecials.Role.ECHO, role("p06", "S2"));
         assertEquals(CpuSpecials.Role.PULL, role("p06", "S3"));
         assertEquals(CpuSpecials.Role.ANTI_AIR, role("player_base", "S2"));
+        assertEquals("o Uppercut da casa do Kōga (20/11) tira do ar", CpuSpecials.Role.ANTI_AIR, role("p03", "S2"));
         assertEquals(CpuSpecials.Role.LOW, role("p07", "S4"));
     }
 
