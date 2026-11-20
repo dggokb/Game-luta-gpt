@@ -14,20 +14,19 @@
   "video": {
     "arquivo": "L.mp4",
     "personagem": "p03",
-    "escala": 0.4139,
-    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "escala": 0.4015,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
     "quadros": "16,18,20,22,24,28,34,38,42,46",
-    "celula": 288,
     "largura": 256,
-    "raiz": "114,270",
+    "raiz": "115,238",
     "fixar": "video",
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true
   },
   "frameWidth": 512,
-  "frameHeight": 576,
-  "rootX": 228,
-  "rootY": 540,
+  "frameHeight": 512,
+  "rootX": 230,
+  "rootY": 476,
   "pixelScale": 2.0
 }

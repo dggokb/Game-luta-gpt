@@ -1,8 +1,8 @@
 {
   "_doc": "Kōga (p03), vídeos H3 de 19/11 (linha brigão, imagens de 19/11). Receita de clipes montados (montagem.py).",
   "_opcoes": {
-    "escala": 0.4139,
-    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "escala": 0.4015,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
     "densidade": 2,
     "nitidez": true,
     "preencher_invisivel": true

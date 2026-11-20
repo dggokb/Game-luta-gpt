@@ -14,12 +14,11 @@
   "video": {
     "arquivo": "dashH.mp4",
     "personagem": "p03",
-    "escala": 0.4139,
-    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "escala": 0.4015,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
     "quadros": "1,5,9,13,17,21,25,29,53,55,57,63,71",
-    "celula": 288,
     "largura": 320,
-    "raiz": "152,270",
+    "raiz": "152,238",
     "colunas": 6,
     "fixar": "registro",
     "sem_poeira": true,
@@ -28,8 +27,8 @@
     "nitidez": true
   },
   "frameWidth": 640,
-  "frameHeight": 576,
+  "frameHeight": 512,
   "rootX": 304,
-  "rootY": 540,
+  "rootY": 476,
   "pixelScale": 2.0
 }

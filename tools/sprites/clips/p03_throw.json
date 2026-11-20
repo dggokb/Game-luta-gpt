@@ -14,12 +14,12 @@
   "video": {
     "arquivo": "agarrao2.mp4",
     "personagem": "p03",
-    "escala": 0.4139,
-    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda) na mesma escala do Kōga de antes",
+    "escala": 0.4015,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
     "quadros": "10,12,14,16,18,20,24,30,36,40,42,44,50,58,62,64,66,70,78,86,90,94,98,104,108",
     "celula": 320,
     "largura": 320,
-    "raiz": "120,294",
+    "raiz": "122,295",
     "colunas": 6,
     "fixar": "video",
     "sem_poeira": true,
@@ -29,7 +29,7 @@
   },
   "frameWidth": 640,
   "frameHeight": 640,
-  "rootX": 240,
-  "rootY": 588,
+  "rootX": 244,
+  "rootY": 590,
   "pixelScale": 2.0
 }
