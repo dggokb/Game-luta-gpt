@@ -517,8 +517,7 @@ final class GlRenderCanvas implements RenderCanvas {
         GLES30.glEnable(GLES30.GL_BLEND);
         GLES30.glBlendFunc(GLES30.GL_ONE, GLES30.GL_ONE_MINUS_SRC_ALPHA);
         // Texturas de bitmaps que já não existem (cenário e Ultra de lutas passadas).
-        java.lang.ref.Reference<? extends Bitmap> ref;
-        while ((ref = esquecidas.poll()) != null) apagar((Textura)ref);
+        apagarEsquecidas();
         usarPrograma(enxuto);
         GLES30.glUniform2f(uTela, largura, altura);
         usarPrograma(completo);
@@ -1915,6 +1914,15 @@ final class GlRenderCanvas implements RenderCanvas {
         texturas.put(bitmap, t);
         bytesTexturas += bytes;
         return t;
+    }
+
+    /**
+     * Apaga as texturas de bitmaps que o coletor já recolheu (cenário e Ultra de lutas passadas).
+     * Também fora de um quadro: no carregamento, antes de as folhas da luta nova subirem.
+     */
+    void apagarEsquecidas() {
+        java.lang.ref.Reference<? extends Bitmap> ref;
+        while ((ref = esquecidas.poll()) != null) apagar((Textura)ref);
     }
 
     boolean temTextura(Bitmap bitmap) {

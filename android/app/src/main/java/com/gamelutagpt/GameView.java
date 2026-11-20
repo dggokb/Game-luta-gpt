@@ -1196,7 +1196,22 @@ public class GameView extends SurfaceView
         loadSuperIntros();
         medicao.parte("ultras");
         medicao.fim(atlases);
+        soltarImagensDeLutasPassadas();
         startIntro();
+    }
+
+    /**
+     * O cenário e o Ultra da luta passada já não são usados, mas a textura deles só sai da placa
+     * de vídeo quando o coletor de lixo recolhe o bitmap (o {@code GlRenderCanvas} os segura por
+     * referência fraca). Desde que o jogo quase não cria lixo (5.11), o coletor quase não roda: o
+     * cenário da 1ª luta (46–160 MB) ficava na placa junto com o da 2ª. Aqui, atrás da tela de
+     * carregamento, o coletor passa uma vez e o próximo quadro apaga essas texturas.
+     */
+    private void soltarImagensDeLutasPassadas() {
+        String antes = AndroidRenderAssets.vivasDaLuta();
+        System.gc();
+        Log.i(MedicaoCarregamento.TAG, "imagens da luta vivas antes do coletor: " + antes);
+        Log.i(MedicaoCarregamento.TAG, "imagens da luta vivas depois do coletor: " + AndroidRenderAssets.vivasDaLuta());
     }
 
     /**
@@ -1753,6 +1768,7 @@ public class GameView extends SurfaceView
             String[] dupla = duplaPedida;
             if (dupla != null) {
                 duplaPedida = null;
+                if (dupla.length > 4) useStage(dupla[4]);
                 selectTeams(dupla[0], dupla[1], dupla[2], dupla[3]);
             }
             perfil.inicio();
@@ -2759,14 +2775,18 @@ public class GameView extends SurfaceView
 
     /** Relâmpagos do cenário já ouvidos e quadros até o trovão do último. */
     private int relampagosOuvidos, trovaoEm = -1;
-    private com.gamelutagpt.stage.StageScene trovaoCena;
+    /**
+     * O cenário da contagem, sem segurá-lo: guardado direto, ele prendia o cenário da luta passada
+     * (e as texturas dele na placa de vídeo, 46–160 MB) durante o carregamento da seguinte.
+     */
+    private java.lang.ref.WeakReference<com.gamelutagpt.stage.StageScene> trovaoCena = new java.lang.ref.WeakReference<>(null);
 
     /** Relâmpago novo no cenário: o trovão chega um pouco depois do clarão, como de verdade. */
     private void updateTrovao() {
         int strikes = stageScene.strikes();
-        if (stageScene != trovaoCena) {
+        if (stageScene != trovaoCena.get()) {
             // Cenário novo: a contagem dele começa de novo, sem trovão atrasado do anterior.
-            trovaoCena = stageScene;
+            trovaoCena = new java.lang.ref.WeakReference<>(stageScene);
             relampagosOuvidos = strikes;
             trovaoEm = -1;
         }
@@ -4153,8 +4173,10 @@ public class GameView extends SurfaceView
      * PC ({@code gradle :pc:medirLuta -Pdupla=p15,p16,p13,p14}): troca as duplas da luta, na
      * thread do jogo (com a tela de carregamento), para medir o Super e o Ultra de quem quiser.
      */
-    public void escolherDuplas(String jogador, String parceiro, String rival, String parceiroRival) {
-        duplaPedida = new String[] {jogador, parceiro, rival, parceiroRival};
+    public void escolherDuplas(String jogador, String parceiro, String rival, String parceiroRival, String... cenario) {
+        // Com o cenário (MedirLuta, várias lutas): a troca de cenário entre as lutas, como no arcade.
+        duplaPedida = cenario.length > 0 ? new String[] {jogador, parceiro, rival, parceiroRival, cenario[0]}
+            : new String[] {jogador, parceiro, rival, parceiroRival};
     }
 
     private volatile String[] duplaPedida;

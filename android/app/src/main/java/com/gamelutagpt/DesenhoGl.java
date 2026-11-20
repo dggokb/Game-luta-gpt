@@ -529,6 +529,7 @@ final class DesenhoGl implements SurfaceHolder.Callback {
      */
     void manutencao() {
         if (soltas.isEmpty() || quadroAberto || !preparar()) return;
+        canvas.apagarEsquecidas();
         Bitmap b;
         while ((b = soltas.poll()) != null) canvas.soltar(b);
     }
@@ -624,6 +625,10 @@ final class DesenhoGl implements SurfaceHolder.Callback {
 
     private int subir(SpriteAtlasCache atlases, long orcamentoNs, int maximo) {
         if (!preparar()) return 0;
+        // Antes das folhas novas: o que a luta passada deixou sai da placa primeiro.
+        canvas.apagarEsquecidas();
+        Bitmap solta;
+        while ((solta = soltas.poll()) != null) canvas.soltar(solta);
         long ate = System.nanoTime() + orcamentoNs;
         atlases.prontas(prontas);
         int faltam = 0;

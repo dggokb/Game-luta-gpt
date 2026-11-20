@@ -828,6 +828,41 @@ trava 9, luta 12, HUD 14. Nenhuma parte se repete e nenhum pedaço do HUD passa 
 soluços isolados do aparelho, sem um culpado no jogo. A página final do Ultra ficou em 0,26 ms
 por quadro (pior 13).
 
+### 5.20 O cenário da luta passada ficava na placa de vídeo (20/11)
+
+**Sintoma (celular, arcade e história):** o FPS cai da 2ª luta em diante, com qualquer
+personagem. Na caixa do MEDIR as folhas não crescem de uma luta para a outra (2145, 1830 e
+2032 MB), mas as texturas somam 2473 MB, cerca de 440 MB além das folhas.
+
+**Por que o teste de antes não pegou:** o botão TESTE e o `medirLuta` mediam uma luta só.
+
+**Causa:** as texturas do cenário e do Ultra são apagadas da placa só quando o coletor de lixo
+recolhe o bitmap (o `GlRenderCanvas` os guarda por referência fraca). Duas coisas impediam isso:
+- `GameView.trovaoCena` (a contagem dos relâmpagos, de 06/11) guardava o cenário anterior
+  direto. Ele só era trocado no primeiro quadro da luta nova, então no carregamento o cenário
+  velho continuava preso.
+- Desde que o jogo quase não cria lixo (5.11), o coletor quase não roda. O cenário velho ficava
+  na placa luta adentro: de 46 MB (Templo da Lua) a 160 MB (Arena Imperial) a mais.
+
+**Correção:**
+- `trovaoCena` virou referência fraca.
+- No fim do carregamento da luta (`soltarImagensDeLutasPassadas`), o coletor passa uma vez,
+  atrás da tela de carregamento.
+- `DesenhoGl.subir` apaga as texturas recolhidas antes de subir as folhas da luta nova, para as
+  duas não ficarem juntas na placa.
+- O log `Carregamento` diz que imagens da luta continuam vivas, antes e depois do coletor
+  (`AndroidRenderAssets.vivasDaLuta`).
+
+**No PC** (`MedirLuta` com o cenário no quinto nome:
+`-Dgameluta.dupla="p03,p02,player_base,p04,arena_imperial;p03,p02,p13,p14,terraco_lua;p03,p02,p15,p16,porto_secreto"`):
+
+| Carregamento | Vivas depois do coletor, antes | Depois da correção |
+|---|---|---|
+| 2ª luta (Terraço da Lua) | Arena Imperial 145 MB + Terraço 107 MB | só o Terraço, 107 MB |
+| 3ª luta (Porto Secreto) | Terraço 107 MB + Porto 57 MB | só o Porto, 57 MB |
+
+Os Ultras de quem saiu da luta já saíam com o coletor. A confirmação do FPS é no celular.
+
 ### Resumo do celular (Xiaomi 24116RACCG, 1080p, OpenGL, p15+p16)
 
 | Medida | Primeiro relatório | Final |

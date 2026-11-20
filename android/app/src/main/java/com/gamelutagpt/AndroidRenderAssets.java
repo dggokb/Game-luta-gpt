@@ -109,7 +109,48 @@ final class AndroidRenderAssets implements RenderAssets {
         return new AndroidRenderImage(decodificar(path), path, this);
     }
 
+    /**
+     * Imagens da luta ainda vivas (cenário, Ultra), sem segurá-las: a textura de uma imagem que
+     * saiu só é apagada da placa de vídeo quando o coletor de lixo a recolhe. Para conferir que o
+     * cenário e o Ultra da luta passada saíram ({@link #vivasDaLuta}).
+     */
+    private static final java.util.Map<Bitmap, String> VIVAS = new java.util.WeakHashMap<>();
+
     private Bitmap decodificar(String path) throws IOException {
+        Bitmap b = decodificarAgora(path);
+        if (daLuta) {
+            String grupo = path;
+            int barra = path.indexOf('/');
+            if (barra >= 0) {
+                int segunda = path.indexOf('/', barra + 1);
+                if (segunda > 0) grupo = path.substring(0, segunda);
+            }
+            long bytes = (long)b.getWidth() * b.getHeight() * 4L;
+            synchronized (VIVAS) { VIVAS.put(b, grupo + "|" + bytes); }
+        }
+        return b;
+    }
+
+    /** As imagens da luta ainda na memória, por pasta: "stages/porto 12 imagens 60 MB · ...". */
+    static String vivasDaLuta() {
+        java.util.Map<String, long[]> porGrupo = new java.util.TreeMap<>();
+        synchronized (VIVAS) {
+            for (String v : VIVAS.values()) {
+                int i = v.lastIndexOf('|');
+                long[] n = porGrupo.computeIfAbsent(v.substring(0, i), k -> new long[2]);
+                n[0]++;
+                n[1] += Long.parseLong(v.substring(i + 1));
+            }
+        }
+        StringBuilder s = new StringBuilder();
+        for (java.util.Map.Entry<String, long[]> e : porGrupo.entrySet()) {
+            if (s.length() > 0) s.append(" · ");
+            s.append(e.getKey()).append(' ').append(e.getValue()[0]).append(" imagens ").append(e.getValue()[1] >> 20).append(" MB");
+        }
+        return s.length() == 0 ? "nenhuma" : s.toString();
+    }
+
+    private Bitmap decodificarAgora(String path) throws IOException {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         try (InputStream in = assets.open(path)) {

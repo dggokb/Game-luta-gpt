@@ -51,7 +51,9 @@ public final class MedirLuta {
         for (int n = 0; n < lutas.length; n++) {
             if (lutas[n] != null) {
                 String[] d = lutas[n].split(",");
-                c.jogo().escolherDuplas(d[0], d[1], d[2], d[3]);
+                // Um quinto nome troca o cenário: -Dgameluta.dupla="p03,p02,p15,p16,porto_secreto;...".
+                if (d.length > 4) c.jogo().escolherDuplas(d[0], d[1], d[2], d[3], d[4]);
+                else c.jogo().escolherDuplas(d[0], d[1], d[2], d[3]);
                 c.esperar(1.0);
                 long carregando = System.currentTimeMillis() + 180_000;
                 while (!c.jogo().iniciarTesteDesempenho()) {
