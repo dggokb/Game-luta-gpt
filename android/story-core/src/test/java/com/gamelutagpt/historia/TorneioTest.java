@@ -471,6 +471,18 @@ public class TorneioTest {
     }
 
     @Test
+    public void ep06AbreComOAnuncioDaSemifinalEAsApostas() throws IOException {
+        // 67 a 69, dos dois irmãos: o anúncio da semifinal, o magnata e as apostas, antes da luta.
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            Campanha c = Campanha.load(new GameAssets(), 3);
+            c.escolher(irmao);
+            List<String> paginas = paginas("ep06", c);
+            assertEquals(irmao + ": " + paginas, java.util.Arrays.asList("pag1.jpg", "pag2.jpg", "pag3.jpg"), paginas.subList(0, 3));
+            assertTrue(paginas.indexOf("LUTA") > paginas.indexOf("pag3.jpg"));
+        }
+    }
+
+    @Test
     public void ep03TemAsPaginasDoAdversarioDoPorto() throws IOException {
         List<String> chegada = java.util.Arrays.asList("pag1_ryuga.jpg", "pag2_ryuga.jpg", "pag3.jpg", "pag4_ryuga.jpg");
         List<String> p05 = paginas("ep03", campanhaComPorto(Torneio.RYUGA, "p05"));
