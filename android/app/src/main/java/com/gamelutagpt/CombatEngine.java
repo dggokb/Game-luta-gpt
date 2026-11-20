@@ -6219,6 +6219,10 @@ final class CombatEngine {
      */
     private void cutRecovery(CombatFighter a, AttackDefinition attack, AttackDefinition.Window window) {
         if (attack.kind != AttackDefinition.Kind.NORMAL || attack.maxHits > 1 || !a.grounded || a.attack != attack) return;
+        // A Garra do tigre (o S1 em três do Kōga): a marca fica na tela a janela inteira, acertando
+        // ou não (o dono, 20/11: "ela não pode sumir"); o corte voltava à guarda e apagava a marca.
+        if (a.character().moves.containsKey(CancelSystem.ABERTURA) &&
+            (CancelSystem.ABERTURA.equals(attack.id) || CancelSystem.FOLLOW_UP.equals(attack.id))) return;
         int last = hitCutLastFrame(attack, window);
         if (last < 0) return;
         a.hitCutFrame = last;
