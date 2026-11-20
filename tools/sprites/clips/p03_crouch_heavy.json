@@ -46,7 +46,8 @@
       0.5
     ],
     "ferramenta": "tools/sprites/smear.py",
-    "clarear": 0.3,
+    "semEscuro": true,
+    "largura": 0.28,
     "opacidade": [
       1.0,
       0.5

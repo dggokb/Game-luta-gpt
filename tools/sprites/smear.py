@@ -100,7 +100,7 @@ def so_corpo(cel, abre=5, borda=3):
     return Image.fromarray(px, 'RGBA')
 
 
-def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO, sem_escuro=False, clarear=0.0, alfa=1.0):
+def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRIMENTO, sem_escuro=False, clarear=0.0, alfa=1.0, largura=LARGURA_MEMBRO):
     """O quadro com o membro esticado para trás: cada ponto do membro deixa uma língua até onde ele
     estava no desenho anterior (o pé, que andou muito, uma cauda longa; o joelho, quase nada), e o
     rastro vira a área que o membro varreu, em giro (chute em arco) ou reto (soco). Coordenadas em
@@ -116,7 +116,7 @@ def esticar(cel, ponta, junta, ponta_antes, junta_antes, rng, comprimento=COMPRI
     t = (rx * seg[0] + ry * seg[1]) / L ** 2          # 0 na junta, 1 na ponta
     o = rx * n[0] + ry * n[1]                          # px para o lado da reta
     tc = np.clip(t, 0.0, 1.08)
-    perto = np.hypot(rx - tc * seg[0], ry - tc * seg[1]) <= LARGURA_MEMBRO * L
+    perto = np.hypot(rx - tc * seg[0], ry - tc * seg[1]) <= largura * L
     # Só o desenho opaco vira língua: o halo meio transparente do vídeo daria línguas sujas.
     membro = perto & (px[..., 3] >= 250) & (t > 0.05) & (t < 1.0 - PONTA_LIVRE * 0.5)
     if sem_escuro:
@@ -325,6 +325,8 @@ def main():
     p.add_argument('--opacidade', help='opacidade das línguas em cada desenho de --quadros, na ordem: "1,0.5" '
                                        '(sem isto: com 2 desenhos, o segundo, o do acerto, a 50%%)')
     p.add_argument('--clarear', type=float, help='0 a 1: puxa as línguas escuras (roupa preta) para um cinza-azulado')
+    p.add_argument('--largura', type=float, help='meia largura do membro, fração dele (padrão %s): menos quando a '
+                                                   'cabeça ou o cabelo ficam colados no braço' % LARGURA_MEMBRO)
     p.add_argument('--sem-escuro', action='store_true', help='o escuro (roupa preta atrás do membro) não vira língua')
     p.add_argument('--antes', help='de que desenho cada um estica: "7=5" (sem isto, o último do caminho '
                                    'com a ponta noutro lugar)')
@@ -358,6 +360,8 @@ def main():
     a.sem_escuro = a.sem_escuro or bool(smear and smear.get('semEscuro'))
     if a.opacidade is None and smear and 'opacidade' in smear:
         a.opacidade = ','.join(map(str, smear['opacidade']))
+    if a.largura is None:
+        a.largura = float(smear.get('largura', LARGURA_MEMBRO)) if smear else LARGURA_MEMBRO
     if a.clarear is None:
         a.clarear = float(smear.get('clarear', 0.0)) if smear else 0.0
     if a.antes is None and smear:
@@ -452,7 +456,7 @@ def main():
         x0, y0 = (q % cols) * fw, (q // cols) * fh
         cel = folha.crop((x0, y0, x0 + fw, y0 + fh))
         u = cam[str(ant)]
-        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento, a.sem_escuro, a.clarear, alfa)
+        nova = esticar(cel, folha_xy(v[0], v[1]), folha_xy(v[2], v[3]), folha_xy(u[0], u[1]), folha_xy(u[2], u[3]), rng, a.comprimento, a.sem_escuro, a.clarear, alfa, a.largura)
         folha.paste(nova, (x0, y0))
         feitos.append((q, round(andou[q])))
     print('esticados (desenho, px do mundo que a ponta andou):', feitos)
@@ -494,6 +498,8 @@ def gravar(a, clip, clip_path, folha, original, quadros, opac):
         clip['smear']['semEscuro'] = True
     if a.clarear:
         clip['smear']['clarear'] = a.clarear
+    if a.largura != LARGURA_MEMBRO:
+        clip['smear']['largura'] = a.largura
     clip['smear']['opacidade'] = opac
     if a.giro:
         clip['smear']['giro'] = a.giro
