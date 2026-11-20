@@ -19,7 +19,7 @@ public class ComandosPorPersonagemTest {
     private static final String[][] TABELA = {
         {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←"},
         {"p02", "Palma", "↓ ↘ →", "Chute da garça", "→ ↓ ↘", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "← →"},
-        {"p03", "Garra do tigre", "↓ ↘ →", "Punho em sequência", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
+        {"p03", "Garra do tigre", "↓ ↘ →", "Uppercut da casa", "→ ↓ ↘", "Avanço em três", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},
         {"p05", "Kunai", "↓ ↘ →", "Shuriken", "↓ ↙ ←", "Selo e mudança", "↓ ↓", "Corte de mão", "← ↙ ↓ ↘ →"},
         {"p06", "Sombra rastejante", "↓ ↙ ←", "Eco de sombra", "↓ ↓", "Puxar", "→ ↘ ↓ ↙ ←", "Passo-sombra", "↓ ↘ →"},
