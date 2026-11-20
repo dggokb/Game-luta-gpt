@@ -1024,7 +1024,7 @@
     }
   },
   "special_s3": {
-    "_doc": "S3 ↓↙←, Investida da voadora (20/11, a ideia do dono: \"ele dá o dash curto e voadora, se acertar o adversário emenda os golpes, se errar... errou\"; vídeos dashH, a voadora, e s3, a rajada de socos). Corre (6-21), sai do chão (24-32) e acerta a voadora (33, o 1º acerto); acertando, pousa (39-84), solta os cinco socos curtos (s3 33, 41, 45, 55, 65) e o soco grande (s3 73) e volta à guarda (s3 76-99). Errou ou defenderam: o SPECIAL_S3_ERRO (cai da voadora). Sem o deslizamento lateral (fixo) e com os pés na raiz: quem anda, sobe e cai é o motor (o voo, como a voadora correndo; 20/11, o dono: \"o chute não tá lançado, parece que ele para no ar e chuta\").",
+    "_doc": "S3 ↓↙←, Investida da voadora (20/11, a ideia do dono: \"ele dá o dash curto e voadora, se acertar o adversário emenda os golpes, se errar... errou\"; vídeos dashH, a voadora, e s3, a rajada de socos). Corre (6-21), sai do chão (24-32) e acerta a voadora (33, o 1º acerto); acertando, pousa (39-84), solta os cinco socos curtos (s3 33, 41, 45, 55, 65) e o soco grande (s3 73) e volta à guarda (s3 76-99). Errou ou defenderam: o SPECIAL_S3_ERRO (cai da voadora). Sem o deslizamento lateral (fixo): quem anda é o motor, sem parar até o pouso; a subida e a descida são as do vídeo (20/11: com o voo do motor e os pés na raiz, a troca da pose de salto para a do chute afundava o corpo no ar, o dono: \"o arco ainda tá ruim\").",
     "trechos": [
       [
         "dashH",
@@ -1042,8 +1042,8 @@
     "quadros": "6,9,12,15,18,21,24,26,28,30,32,33,35,37,39,48,57,60,63,66,69,72,75,81,84,92,93,94,95,97,99,101,103,105,107,110,113,115,117,120,123,125,127,130,132,135,138,142,146,150,153,156,159,161",
     "opcoes": {
       "fixar": "tronco",
-      "pe_no_chao": true,
-      "sem_poeira": true
+      "sem_poeira": true,
+      "pe_no_chao": false
     },
     "animacoes": {
       "SPECIAL_S3": {
@@ -1120,8 +1120,8 @@
     "quadros": "39,48,57,60,63,66,69,72,75,78,81,84,87,90",
     "opcoes": {
       "fixar": "tronco",
-      "pe_no_chao": true,
-      "sem_poeira": true
+      "sem_poeira": true,
+      "pe_no_chao": false
     },
     "animacoes": {
       "SPECIAL_S3_ERRO": {}

@@ -17,20 +17,19 @@
     "escala": 0.4015,
     "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
     "quadros": "39,48,57,60,63,66,69,72,75,78,81,84,87,90",
-    "celula": 288,
+    "celula": 320,
     "largura": 352,
-    "raiz": "165,270",
+    "raiz": "165,302",
     "colunas": 5,
-    "pe_no_chao": true,
     "sem_poeira": true,
     "limpar_chao": true,
+    "emendar_idle": true,
     "densidade": 2,
-    "nitidez": true,
-    "emendar_idle": true
+    "nitidez": true
   },
   "frameWidth": 704,
-  "frameHeight": 576,
+  "frameHeight": 640,
   "rootX": 330,
-  "rootY": 540,
+  "rootY": 604,
   "pixelScale": 2.0
 }

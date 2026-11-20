@@ -10,7 +10,7 @@
     "frameWidth": 704,
     "frameHeight": 640,
     "rootX": 434,
-    "rootY": 604,
+    "rootY": 600,
     "columns": 5,
     "frameCount": 54
   },
@@ -19,539 +19,539 @@
       "index": 0,
       "outputBbox": [
         110,
-        226,
+        198,
         601,
-        606
+        578
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 62,
       "opaquePixels": 68389
     },
     {
       "index": 1,
       "outputBbox": [
         171,
-        218,
+        208,
         545,
-        606
+        596
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 44,
       "opaquePixels": 58776
     },
     {
       "index": 2,
       "outputBbox": [
         132,
-        211,
+        199,
         565,
-        606
+        594
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 46,
       "opaquePixels": 69430
     },
     {
       "index": 3,
       "outputBbox": [
         86,
-        210,
+        198,
         578,
-        605
+        593
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 47,
       "opaquePixels": 73803
     },
     {
       "index": 4,
       "outputBbox": [
         219,
-        226,
+        222,
         510,
-        605
+        601
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 39,
       "opaquePixels": 49292
     },
     {
       "index": 5,
       "outputBbox": [
         189,
-        197,
+        193,
         490,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 51971
     },
     {
       "index": 6,
       "outputBbox": [
         199,
-        83,
+        72,
         477,
-        606
+        595
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 45,
       "opaquePixels": 61741
     },
     {
       "index": 7,
       "outputBbox": [
         199,
-        87,
+        63,
         476,
-        605
+        581
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 59,
       "opaquePixels": 62777
     },
     {
       "index": 8,
       "outputBbox": [
         195,
-        92,
+        58,
         470,
-        606
+        572
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 58,
       "opaquePixels": 64241
     },
     {
       "index": 9,
       "outputBbox": [
         135,
-        169,
+        77,
         528,
-        606
+        514
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 77,
       "opaquePixels": 64791
     },
     {
       "index": 10,
       "outputBbox": [
         99,
-        228,
+        74,
         653,
-        606
+        452
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 51,
       "opaquePixels": 72129
     },
     {
       "index": 11,
       "outputBbox": [
         94,
-        228,
+        74,
         649,
-        606
+        452
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 55,
       "opaquePixels": 72123
     },
     {
       "index": 12,
       "outputBbox": [
         88,
-        229,
+        74,
         649,
-        605
+        450
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 55,
       "opaquePixels": 72662
     },
     {
       "index": 13,
       "outputBbox": [
         84,
-        231,
+        73,
         648,
-        606
+        448
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 56,
       "opaquePixels": 72742
     },
     {
       "index": 14,
       "outputBbox": [
         80,
-        232,
+        73,
         645,
-        605
+        446
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 59,
       "opaquePixels": 72868
     },
     {
       "index": 15,
       "outputBbox": [
         66,
-        238,
+        72,
         639,
-        606
+        440
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 65,
       "opaquePixels": 73108
     },
     {
       "index": 16,
       "outputBbox": [
         55,
-        240,
+        69,
         631,
-        606
+        435
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 55,
       "opaquePixels": 73634
     },
     {
       "index": 17,
       "outputBbox": [
         52,
-        219,
+        71,
         600,
-        605
+        457
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 52,
       "opaquePixels": 70534
     },
     {
       "index": 18,
       "outputBbox": [
         56,
-        189,
+        74,
         550,
-        605
+        490
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 56,
       "opaquePixels": 68674
     },
     {
       "index": 19,
       "outputBbox": [
         151,
-        111,
+        109,
         514,
-        606
+        604
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 36,
       "opaquePixels": 69230
     },
     {
       "index": 20,
       "outputBbox": [
         233,
-        237,
+        232,
         592,
-        605
+        600
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 40,
       "opaquePixels": 57941
     },
     {
       "index": 21,
       "outputBbox": [
         225,
-        288,
+        280,
         584,
-        605
+        597
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 43,
       "opaquePixels": 53267
     },
     {
       "index": 22,
       "outputBbox": [
         217,
-        299,
+        291,
         578,
-        605
+        597
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 43,
       "opaquePixels": 51986
     },
     {
       "index": 23,
       "outputBbox": [
         199,
-        247,
+        239,
         564,
-        605
+        597
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 43,
       "opaquePixels": 56711
     },
     {
       "index": 24,
       "outputBbox": [
         181,
-        165,
+        157,
         572,
-        605
+        597
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 43,
       "opaquePixels": 63062
     },
     {
       "index": 25,
       "outputBbox": [
         166,
-        188,
+        181,
         544,
-        606
+        599
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 41,
       "opaquePixels": 61327
     },
     {
       "index": 26,
       "outputBbox": [
         165,
-        182,
+        177,
         542,
-        605
+        600
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 40,
       "opaquePixels": 59016
     },
     {
       "index": 27,
       "outputBbox": [
         163,
-        182,
+        178,
         603,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 64062
     },
     {
       "index": 28,
       "outputBbox": [
         161,
-        182,
+        178,
         601,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 64095
     },
     {
       "index": 29,
       "outputBbox": [
         159,
-        183,
+        179,
         556,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 61574
     },
     {
       "index": 30,
       "outputBbox": [
         156,
-        179,
+        175,
         534,
-        605
+        601
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 39,
       "opaquePixels": 58235
     },
     {
       "index": 31,
       "outputBbox": [
         149,
-        171,
+        166,
         531,
-        605
+        600
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 40,
       "opaquePixels": 64411
     },
     {
       "index": 32,
       "outputBbox": [
         146,
-        171,
+        166,
         572,
-        605
+        600
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 40,
       "opaquePixels": 66221
     },
     {
       "index": 33,
       "outputBbox": [
         152,
-        178,
+        174,
         528,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 59876
     },
     {
       "index": 34,
       "outputBbox": [
         149,
-        181,
+        177,
         589,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 63763
     },
     {
       "index": 35,
       "outputBbox": [
         144,
-        174,
+        170,
         523,
-        605
+        601
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 39,
       "opaquePixels": 60689
     },
     {
       "index": 36,
       "outputBbox": [
         138,
-        169,
+        164,
         566,
-        605
+        600
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 40,
       "opaquePixels": 66767
     },
     {
       "index": 37,
       "outputBbox": [
         143,
-        177,
+        173,
         520,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 59185
     },
     {
       "index": 38,
       "outputBbox": [
         140,
-        182,
+        178,
         581,
-        606
+        602
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 38,
       "opaquePixels": 63576
     },
     {
       "index": 39,
       "outputBbox": [
         138,
-        178,
+        173,
         515,
-        605
+        600
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 40,
       "opaquePixels": 59475
     },
     {
       "index": 40,
       "outputBbox": [
         131,
-        174,
+        168,
         511,
-        606
+        600
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 40,
       "opaquePixels": 63444
     },
     {
       "index": 41,
       "outputBbox": [
         129,
-        174,
+        167,
         528,
-        606
+        599
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 41,
       "opaquePixels": 65120
     },
     {
       "index": 42,
       "outputBbox": [
         121,
-        179,
+        171,
         577,
-        606
+        598
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 42,
       "opaquePixels": 66666
     },
     {
       "index": 43,
       "outputBbox": [
         119,
-        179,
+        171,
         575,
-        606
+        598
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 42,
       "opaquePixels": 66394
     },
     {
       "index": 44,
       "outputBbox": [
         116,
-        180,
+        172,
         571,
-        606
+        598
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 42,
       "opaquePixels": 65875
     },
     {
       "index": 45,
       "outputBbox": [
         118,
-        185,
+        191,
         635,
-        606
+        612
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 28,
       "opaquePixels": 68128
     },
     {
       "index": 46,
       "outputBbox": [
         117,
-        183,
+        180,
         606,
-        606
+        603
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 37,
       "opaquePixels": 66747
     },
     {
       "index": 47,
       "outputBbox": [
         116,
-        181,
+        179,
         604,
-        606
+        604
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 36,
       "opaquePixels": 64942
     },
     {
       "index": 48,
       "outputBbox": [
         138,
-        182,
+        180,
         626,
-        606
+        604
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 36,
       "opaquePixels": 64946
     },
     {
@@ -569,58 +569,58 @@
       "index": 50,
       "outputBbox": [
         189,
-        184,
+        182,
         571,
-        606
+        604
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 36,
       "opaquePixels": 60367
     },
     {
       "index": 51,
       "outputBbox": [
         208,
-        180,
+        172,
         595,
-        606
+        598
       ],
-      "minimumMargin": 34,
+      "minimumMargin": 42,
       "opaquePixels": 62293
     },
     {
       "index": 52,
       "outputBbox": [
         227,
-        170,
+        166,
         620,
-        605
+        601
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 39,
       "opaquePixels": 63978
     },
     {
       "index": 53,
       "outputBbox": [
         251,
-        170,
+        166,
         644,
-        605
+        601
       ],
-      "minimumMargin": 35,
+      "minimumMargin": 39,
       "opaquePixels": 63917
     }
   ],
   "passed": true,
   "packed": {
     "frameWidth": 617,
-    "frameHeight": 539,
+    "frameHeight": 570,
     "rootX": 390,
-    "rootY": 529,
+    "rootY": 550,
     "columns": 5,
     "frameCount": 54,
     "cropOffset": [
       44,
-      75
+      50
     ],
     "sheetWidth": 4096,
     "sheetHeight": 2652,
@@ -631,7 +631,7 @@
         500,
         388,
         62,
-        147
+        144
       ],
       [
         504,
@@ -639,7 +639,7 @@
         384,
         396,
         123,
-        139
+        154
       ],
       [
         3652,
@@ -647,7 +647,7 @@
         444,
         404,
         84,
-        132
+        145
       ],
       [
         0,
@@ -655,7 +655,7 @@
         500,
         404,
         38,
-        131
+        144
       ],
       [
         1956,
@@ -663,7 +663,7 @@
         300,
         388,
         171,
-        147
+        168
       ],
       [
         3336,
@@ -671,7 +671,7 @@
         312,
         420,
         141,
-        118
+        139
       ],
       [
         0,
@@ -679,7 +679,7 @@
         288,
         532,
         151,
-        4
+        18
       ],
       [
         292,
@@ -687,7 +687,7 @@
         288,
         528,
         151,
-        8
+        9
       ],
       [
         584,
@@ -695,7 +695,7 @@
         284,
         524,
         147,
-        13
+        4
       ],
       [
         1248,
@@ -703,7 +703,7 @@
         404,
         448,
         87,
-        90
+        23
       ],
       [
         2260,
@@ -711,7 +711,7 @@
         564,
         388,
         51,
-        149
+        20
       ],
       [
         2828,
@@ -719,7 +719,7 @@
         564,
         388,
         46,
-        149
+        20
       ],
       [
         3396,
@@ -727,7 +727,7 @@
         572,
         384,
         40,
-        150
+        20
       ],
       [
         0,
@@ -735,7 +735,7 @@
         572,
         384,
         36,
-        152
+        19
       ],
       [
         576,
@@ -743,7 +743,7 @@
         576,
         384,
         32,
-        153
+        19
       ],
       [
         1156,
@@ -751,7 +751,7 @@
         584,
         376,
         18,
-        159
+        18
       ],
       [
         1744,
@@ -759,7 +759,7 @@
         584,
         376,
         7,
-        161
+        15
       ],
       [
         892,
@@ -767,7 +767,7 @@
         556,
         396,
         4,
-        140
+        17
       ],
       [
         2828,
@@ -775,7 +775,7 @@
         504,
         424,
         8,
-        110
+        20
       ],
       [
         872,
@@ -783,7 +783,7 @@
         372,
         504,
         103,
-        32
+        55
       ],
       [
         2332,
@@ -791,7 +791,7 @@
         368,
         376,
         185,
-        158
+        178
       ],
       [
         3084,
@@ -799,7 +799,7 @@
         368,
         328,
         177,
-        209
+        226
       ],
       [
         3456,
@@ -807,7 +807,7 @@
         372,
         316,
         169,
-        220
+        237
       ],
       [
         2704,
@@ -815,7 +815,7 @@
         376,
         368,
         151,
-        168
+        185
       ],
       [
         1656,
@@ -823,7 +823,7 @@
         400,
         448,
         133,
-        86
+        103
       ],
       [
         2436,
@@ -831,7 +831,7 @@
         388,
         428,
         118,
-        109
+        127
       ],
       [
         1836,
@@ -839,7 +839,7 @@
         388,
         432,
         117,
-        103
+        123
       ],
       [
         2228,
@@ -847,7 +847,7 @@
         448,
         432,
         115,
-        103
+        124
       ],
       [
         2680,
@@ -855,7 +855,7 @@
         448,
         432,
         113,
-        103
+        124
       ],
       [
         3132,
@@ -863,7 +863,7 @@
         408,
         432,
         111,
-        104
+        125
       ],
       [
         1996,
@@ -871,7 +871,7 @@
         388,
         436,
         108,
-        100
+        121
       ],
       [
         2060,
@@ -879,7 +879,7 @@
         392,
         444,
         101,
-        92
+        112
       ],
       [
         2456,
@@ -887,7 +887,7 @@
         436,
         444,
         98,
-        92
+        112
       ],
       [
         2388,
@@ -895,7 +895,7 @@
         384,
         436,
         104,
-        99
+        120
       ],
       [
         2776,
@@ -903,7 +903,7 @@
         448,
         436,
         101,
-        102
+        123
       ],
       [
         408,
@@ -911,7 +911,7 @@
         388,
         440,
         96,
-        95
+        116
       ],
       [
         2896,
@@ -919,7 +919,7 @@
         436,
         444,
         90,
-        90
+        110
       ],
       [
         800,
@@ -927,7 +927,7 @@
         388,
         440,
         95,
-        98
+        119
       ],
       [
         3544,
@@ -935,7 +935,7 @@
         452,
         432,
         92,
-        103
+        124
       ],
       [
         3228,
@@ -943,7 +943,7 @@
         388,
         436,
         90,
-        99
+        119
       ],
       [
         1192,
@@ -951,7 +951,7 @@
         388,
         440,
         83,
-        95
+        114
       ],
       [
         1584,
@@ -959,7 +959,7 @@
         408,
         440,
         81,
-        95
+        113
       ],
       [
         3620,
@@ -967,7 +967,7 @@
         464,
         436,
         73,
-        100
+        117
       ],
       [
         0,
@@ -975,7 +975,7 @@
         464,
         436,
         71,
-        100
+        117
       ],
       [
         468,
@@ -983,7 +983,7 @@
         464,
         436,
         68,
-        101
+        118
       ],
       [
         0,
@@ -991,7 +991,7 @@
         528,
         432,
         70,
-        106
+        137
       ],
       [
         532,
@@ -999,7 +999,7 @@
         500,
         432,
         69,
-        104
+        126
       ],
       [
         936,
@@ -1007,7 +1007,7 @@
         496,
         436,
         68,
-        102
+        125
       ],
       [
         1036,
@@ -1015,7 +1015,7 @@
         496,
         432,
         90,
-        103
+        126
       ],
       [
         1536,
@@ -1023,7 +1023,7 @@
         500,
         432,
         113,
-        103
+        128
       ],
       [
         2040,
@@ -1031,7 +1031,7 @@
         392,
         432,
         141,
-        105
+        128
       ],
       [
         1436,
@@ -1039,7 +1039,7 @@
         396,
         436,
         160,
-        101
+        118
       ],
       [
         3336,
@@ -1047,7 +1047,7 @@
         404,
         444,
         179,
-        91
+        112
       ],
       [
         0,
@@ -1055,12 +1055,12 @@
         404,
         444,
         203,
-        91
+        112
       ]
     ],
     "decodedBytes": {
       "canonical": 99123200,
-      "grid": 73163860,
+      "grid": 77371800,
       "packed": 43450368
     },
     "pixelScale": 2.0
@@ -1069,8 +1069,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2a14057847355713b3081c88199a607985a7a0d2d406c90f26b51aa4ef6e370d",
-      "config": "f98eee899a18713db10241c5d32d96dca07212d289443e156f6ee3a20be2a897",
+      "source": "82a20cc77e92d1202dcfbb24456dc20f72e029919d9df09e42d7c51c2765bb28",
+      "config": "cd167557dbfbd193f288a938df26aeda2103525a903ee481642fc1824737d712",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

@@ -38,24 +38,23 @@ public class InvestidaDaVoadoraTest {
         assertEquals(KOGA.attack("S3").totalFrames, r[2], 3);
     }
 
-    /** A voadora sai do chão de verdade e ainda anda para a frente no ar (o dono: "parece que ele para no ar e chuta"). */
-    @Test public void aVoadoraVoaParaAFrente() {
+    /**
+     * A voadora anda para a frente sem parar até o pouso (o dono: "parece que ele para no ar e chuta";
+     * "tá contra as leis da física"): a subida e a descida são as do vídeo, e o corpo segue andando
+     * enquanto o desenho está no ar (até o quadro 30), sem parar no meio.
+     */
+    @Test public void aVoadoraAndaAteOPouso() {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(KOGA, BASE, 600f, 1500f);
         s.in[0].special = "S3";
         s.step();
         s.in[0].special = null;
-        float xNoAr = Float.NaN;
-        boolean voou = false;
+        float antes = s.f(0).x;
         for (int t = 0; t < 40; t++) {
             s.step();
             CombatFighter f = s.f(0);
-            if (!f.grounded) {
-                voou = true;
-                if (Float.isNaN(xNoAr)) xNoAr = f.x;
-            }
+            if (f.attackFrame > 1 && f.attackFrame <= 30) assertTrue("anda no quadro " + f.attackFrame, f.x > antes);
+            antes = f.x;
         }
-        assertTrue("sai do chão", voou);
-        assertTrue("anda no ar", s.f(0).x - xNoAr > 30f);
     }
 
     @Test public void errandoAcabaNaVoadora() {
