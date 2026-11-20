@@ -173,6 +173,71 @@ public class BolsaApostasTest {
         assertEquals("x1.0", BolsaApostas.formatarOdd(1.0));
     }
 
+    // ------------------------------------------------------------ a arte
+
+    /** A pasta dos assets (o teste roda no app ou pelo build do PC). */
+    private static java.io.File assets() {
+        for (String c : new String[] {"src/main/assets", "app/src/main/assets", "../app/src/main/assets"}) {
+            java.io.File f = new java.io.File(c);
+            if (new java.io.File(f, BolsaApostas.PASTA + "placa.json").isFile()) return f;
+        }
+        String repo = System.getProperty("gameluta.repo");
+        return new java.io.File(repo, "android/app/src/main/assets");
+    }
+
+    private static final com.gamelutagpt.render.RenderAssets ARQUIVOS = new com.gamelutagpt.render.RenderAssets() {
+        @Override public String readText(String path) throws java.io.IOException {
+            return new String(java.nio.file.Files.readAllBytes(new java.io.File(assets(), path).toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        @Override public com.gamelutagpt.render.RenderImage loadImage(String path) throws java.io.IOException {
+            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(new java.io.File(assets(), path));
+            if (img == null) throw new java.io.IOException(path);
+            return new com.gamelutagpt.render.RenderImage() {
+                @Override public int width() { return img.getWidth(); }
+                @Override public int height() { return img.getHeight(); }
+            };
+        }
+    };
+
+    /** Um RenderCanvas que não desenha nada (conta as imagens). */
+    private static com.gamelutagpt.render.RenderCanvas tela(int[] imagens) {
+        return (com.gamelutagpt.render.RenderCanvas)java.lang.reflect.Proxy.newProxyInstance(
+            BolsaApostasTest.class.getClassLoader(), new Class<?>[] {com.gamelutagpt.render.RenderCanvas.class},
+            (proxy, m, args) -> {
+                if (m.getName().startsWith("drawImage")) imagens[0]++;
+                Class<?> t = m.getReturnType();
+                if (t == float.class) return 10f;
+                if (t == int.class) return 0;
+                if (t == boolean.class) return false;
+                return null;
+            });
+    }
+
+    @Test public void theArtLoadsWithAllItsMeasures() {
+        BolsaApostas b = new BolsaApostas();
+        b.carregar(ARQUIVOS);
+        assertTrue("a placa, as fichas e os rostos abriram", b.temArte());
+    }
+
+    @Test public void aWholeFightDrawsWithTheArtAndTheChips() {
+        Luta l = new Luta();
+        l.bolsa.carregar(ARQUIVOS);
+        int[] imagens = {0};
+        com.gamelutagpt.render.RenderCanvas c = tela(imagens);
+        l.go();
+        // Ganho grande (fichas voando), um patamar (a moeda) e depois os dois parados (fichas caindo).
+        l.bolsa.ganhar(l.engine, 1, BolsaApostas.PATAMAR, l.voz);
+        for (int i = 0; i < BolsaApostas.CAI + 120; i++) {
+            l.step();
+            l.bolsa.desenhar(c, i / 60f);
+        }
+        assertTrue(imagens[0] > 1000);
+        assertTrue("a pilha da CPU cresceu", l.bolsa.fichasNaPilha(1) > l.bolsa.fichasNaPilha(0));
+        assertTrue(l.bolsa.fichasNaPilha(0) >= 2 && l.bolsa.fichasNaPilha(1) <= BolsaApostas.FICHAS_MAX);
+    }
+
     // ------------------------------------------------------------ a CPU
 
     @Test public void theCpuGetsInAHurryWhenItsBetsCoolDown() {

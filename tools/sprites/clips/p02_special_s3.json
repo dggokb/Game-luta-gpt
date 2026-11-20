@@ -2,7 +2,7 @@
   "id": "p02_special_s3",
   "javaName": "P02_SPECIAL_S3",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_special_s3_video_normalized.png",
+  "source": "art/sprites/source/p02_special_s3_video_normalized_smear.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_special_s3.webp",
   "report": "tools/sprites/reports/p02_special_s3.report.json",
   "preview": "android/app/build/sprite-review/p02_special_s3-import.png",
@@ -31,6 +31,26 @@
   "frameWidth": 448,
   "frameHeight": 576,
   "rootY": 540,
-  "sourceReferences": [],
-  "pixelScale": 2.0
+  "sourceReferences": [
+    "art/sprites/source/p02_special_s3_video_normalized.png"
+  ],
+  "pixelScale": 2.0,
+  "smear": {
+    "fonte": "art/sprites/source/p02_special_s3_video_normalized.png",
+    "quadros": [
+      12,
+      13
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "clarear": 0.6,
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }

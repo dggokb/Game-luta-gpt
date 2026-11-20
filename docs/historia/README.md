@@ -144,7 +144,8 @@ as páginas que mudam para o Kōga, e o número que falta lá é o mesmo do Ryū
 ep01 = 12 a 22, ep02 = 23 a 27 (26_1 e 26_2 são as lembranças), ep03 = 28 a 37 (32_1 a 32_6 são o
 desafio de cada dupla), ep04 = 38 a 55 (38_00 a 38_06 são a dupla do porto no salão; 52 a 55 depois
 das quartas), ep05 = 56 a 66 (56 a 59 de cada irmão; 63 e 65 dependem de quem embosca na ponte; 64, 65
-e 66 de cada irmão; a 66 vem depois da luta e fecha o episódio).
+e 66 de cada irmão; a 66 vem depois da luta e fecha o episódio), ep06 = 67 em diante (67 a 69 dos dois: o anúncio da
+semifinal, o magnata e as apostas).
 
 | ep01 | Global | Ryūga | Kōga |
 |---|---|---|---|

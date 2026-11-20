@@ -1,7 +1,7 @@
 {
   "id": "player_base_plexo",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_plexo_video_normalized_hd_aprovado_2x.png",
+  "source": "art/sprites/source/player_base_plexo_video_normalized_smear_hd_aprovado_2x.png",
   "sourceNote": "player_base gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -57,7 +57,7 @@
         542
       ],
       "minimumMargin": 34,
-      "opaquePixels": 60910
+      "opaquePixels": 61413
     },
     {
       "index": 4,
@@ -68,7 +68,7 @@
         542
       ],
       "minimumMargin": 34,
-      "opaquePixels": 60931
+      "opaquePixels": 61977
     },
     {
       "index": 5,
@@ -347,12 +347,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c1cc4729b47c1d41bed1ac65c0e0f3f0ff2aea870bcf03d81f4dff148e7815e9",
-      "config": "8a86b7ec563cb8d428c028a44f4aeb2eae6106732fa4ab292d79733eb73668f0",
+      "source": "c69aafc676d99f616e63dbad13a1c0c0dab81abcfca6af674531f07d7e6a5b91",
+      "config": "f07e8eb88e3f362c37acf8a0e44beba3330ef34d6ce743f4a7421c4643bf6670",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_plexo_video_normalized.png": "27bbfad22669a5330f9fdde957a7103f58ee080bd29d67e3f3ef072bc48561ed"
+      "art/sprites/source/player_base_plexo_video_normalized.png": "27bbfad22669a5330f9fdde957a7103f58ee080bd29d67e3f3ef072bc48561ed",
+      "art/sprites/source/player_base_plexo_video_normalized_smear.png": "c72f00b8b55065fa9d735875641103181a8275541c60b062e91b9d9812ab5406"
     }
   }
 }

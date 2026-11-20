@@ -2,7 +2,7 @@
   "id": "player_base_plexo",
   "javaName": "PLAYER_BASE_PLEXO",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_plexo_video_normalized_hd_aprovado_2x.png",
+  "source": "art/sprites/source/player_base_plexo_video_normalized_smear_hd_aprovado_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_plexo.webp",
   "report": "tools/sprites/reports/player_base_plexo.report.json",
   "preview": "android/app/build/sprite-review/player_base_plexo-import.png",
@@ -30,6 +30,24 @@
   "rootY": 540,
   "pixelScale": 2.0,
   "sourceReferences": [
-    "art/sprites/source/player_base_plexo_video_normalized.png"
-  ]
+    "art/sprites/source/player_base_plexo_video_normalized.png",
+    "art/sprites/source/player_base_plexo_video_normalized_smear.png"
+  ],
+  "smear": {
+    "fonte": "art/sprites/source/player_base_plexo_video_normalized.png",
+    "quadros": [
+      3,
+      4
+    ],
+    "semente": 11,
+    "comprimento": [
+      1.2,
+      1.0
+    ],
+    "ferramenta": "tools/sprites/smear.py",
+    "opacidade": [
+      1.0,
+      0.5
+    ]
+  }
 }
