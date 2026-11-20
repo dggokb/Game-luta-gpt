@@ -49,6 +49,7 @@ public class BolsaApostasTest {
             in[1].clearPresses();
             flow.update(engine, true);
             bolsa.update(engine, flow, voz);
+            bolsa.passarTempo(engine, 1f / 60f);
         }
 
         void steps(int n) { for (int i = 0; i < n; i++) step(); }
@@ -122,10 +123,16 @@ public class BolsaApostasTest {
         // Com as odds iguais o ganho é o valor cheio: um patamar exato.
         l.bolsa.ganhar(l.engine, 0, BolsaApostas.PATAMAR, l.voz);
         assertEquals(1, l.bolsa.patamares(0));
+        // A barra sobe quando a moeda chega nela (o rastro leva o olho até lá), não antes.
+        assertEquals("a moeda saiu", 1, l.bolsa.voando(0));
+        l.steps(BolsaApostas.VOO_QUADROS - 2);
+        assertEquals("ainda voando", barra, l.p1[0].superMeter);
+        l.steps(3);
+        assertEquals(0, l.bolsa.voando(0));
         assertEquals(barra + BolsaApostas.SUPER_DO_PATAMAR, l.p1[0].superMeter);
         assertTrue(l.eventos.contains("aposta_patamar"));
         assertEquals("Ryūga", l.de("aposta_patamar").get("nome"));
-        assertTrue(l.de("aposta_patamar").get("valor").startsWith("¥ "));
+        assertTrue("o valor na fala vem em kon", l.de("aposta_patamar").get("valor").endsWith(" kon"));
         // Abaixo do próximo patamar: nada a mais.
         l.bolsa.ganhar(l.engine, 0, BolsaApostas.PATAMAR / 10, l.voz);
         assertEquals(1, l.bolsa.patamares(0));
@@ -166,9 +173,10 @@ public class BolsaApostasTest {
     }
 
     @Test public void moneyAndOddsAreWrittenTheWayTheHudShowsThem() {
-        assertEquals("¥ 1.250.000", BolsaApostas.formatar(1_250_000L));
-        assertEquals("¥ 500", BolsaApostas.formatar(500L));
-        assertEquals("¥ 0", BolsaApostas.formatar(-3L));
+        assertEquals("1.250.000", BolsaApostas.formatar(1_250_000L));
+        assertEquals("500", BolsaApostas.formatar(500L));
+        assertEquals("0", BolsaApostas.formatar(-3L));
+        assertEquals("1.250.000 kon", BolsaApostas.formatarFala(1_250_000L));
         assertEquals("x2.4", BolsaApostas.formatarOdd(2.43));
         assertEquals("x1.0", BolsaApostas.formatarOdd(1.0));
     }
@@ -179,7 +187,7 @@ public class BolsaApostasTest {
     private static java.io.File assets() {
         for (String c : new String[] {"src/main/assets", "app/src/main/assets", "../app/src/main/assets"}) {
             java.io.File f = new java.io.File(c);
-            if (new java.io.File(f, BolsaApostas.PASTA + "placa.json").isFile()) return f;
+            if (new java.io.File(f, BolsaApostas.PASTA + "letreiro.json").isFile()) return f;
         }
         String repo = System.getProperty("gameluta.repo");
         return new java.io.File(repo, "android/app/src/main/assets");
@@ -218,24 +226,28 @@ public class BolsaApostasTest {
     @Test public void theArtLoadsWithAllItsMeasures() {
         BolsaApostas b = new BolsaApostas();
         b.carregar(ARQUIVOS);
-        assertTrue("a placa, as fichas e os rostos abriram", b.temArte());
+        assertTrue("o letreiro, o rastro, a moeda e os rostos abriram", b.temArte());
     }
 
-    @Test public void aWholeFightDrawsWithTheArtAndTheChips() {
+    @Test public void aWholeFightDrawsWithTheArtAndTheCoinTrail() {
         Luta l = new Luta();
         l.bolsa.carregar(ARQUIVOS);
         int[] imagens = {0};
         com.gamelutagpt.render.RenderCanvas c = tela(imagens);
         l.go();
-        // Ganho grande (fichas voando), um patamar (a moeda) e depois os dois parados (fichas caindo).
+        // Um patamar de cada lado (as moedas voando com o rastro) e depois os dois parados (caindo).
         l.bolsa.ganhar(l.engine, 1, BolsaApostas.PATAMAR, l.voz);
+        l.bolsa.ganhar(l.engine, 0, BolsaApostas.PATAMAR, l.voz);
+        int noVoo = 0;
         for (int i = 0; i < BolsaApostas.CAI + 120; i++) {
             l.step();
-            l.bolsa.desenhar(c, i / 60f);
+            int antes = imagens[0];
+            l.bolsa.desenhar(c, i / 60f, BolsaApostas.CENTRO_TELA);
+            l.bolsa.desenharVoos(c);
+            if (i < BolsaApostas.VOO_QUADROS && imagens[0] - antes > 20) noVoo++;
         }
         assertTrue(imagens[0] > 1000);
-        assertTrue("a pilha da CPU cresceu", l.bolsa.fichasNaPilha(1) > l.bolsa.fichasNaPilha(0));
-        assertTrue(l.bolsa.fichasNaPilha(0) >= 2 && l.bolsa.fichasNaPilha(1) <= BolsaApostas.FICHAS_MAX);
+        assertTrue("o rastro desenha em fatias enquanto a moeda voa", noVoo > BolsaApostas.VOO_QUADROS / 2);
     }
 
     // ------------------------------------------------------------ a CPU

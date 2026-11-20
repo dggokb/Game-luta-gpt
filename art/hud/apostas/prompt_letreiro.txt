@@ -1,0 +1,9 @@
+You have an image generation tool. Use it to GENERATE a new image (do not write code). Attached: alvo_m1.png is the APPROVED concept of a betting ticker at the bottom of our 2D anime fighting game screen; estilo.png is the top HUD whose style it follows. Produce ONLY that bottom ticker as a standalone UI asset, EMPTY, so the game can draw live numbers on it.
+
+Canvas: 2560x240, landscape. Background: flat pure chroma green #00FF00 everywhere outside the ticker (no shadow or glow on the green).
+The ticker, exactly like the bottom element in alvo_m1.png but empty and clean:
+- A thin slanted dark-navy broadcast strip running the FULL width along the bottom (about 50 px tall), neon blue edge light on the left half, neon red on the right half, thin gold trim.
+- In the center, the strip rises into a raised scoreboard tab about 980 px wide and 180 px tall (one continuous shape with the strip), dark navy with gold trim and slanted ends.
+- Inside the tab: a wide empty dark plate on the left (for the blue team's money) and one on the right (for the red team's money), each with a faint blue / red inner glow edge; between them, in the center, a small gold hexagon frame whose inside is flat pure magenta #FF00FF (the game draws a face there), poking slightly above the top of the tab; under the two plates, one long thin bar slot whose inside is flat pure magenta #FF00FF (the game fills it); two small empty dark tags with thin gold border at the outer lower corners of the tab (for odds).
+- On the strip, left of the tab, a small empty dark area (for a live label).
+NO text, NO letters, NO numbers, NO face, NO arrows anywhere. Save as letreiro_original.png in the current directory.

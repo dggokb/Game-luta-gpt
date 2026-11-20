@@ -1,0 +1,8 @@
+You have an image generation tool. Use it to GENERATE a new image (do not write code). Our 2D anime fighting game is called SOKON (the attached estilo.png is its HUD: dark navy, neon blue and red, gold, clean ink outlines, sharp angular shapes). We need an ORIGINAL fictional CURRENCY SYMBOL, the official money of the SOKON world, used like "$" before numbers in the HUD (e.g. [symbol] 1.250.000).
+
+Make a presentation sheet, 2048x1024, plain dark navy background, with FOUR different proposals side by side, each in its own gold-bordered card. In each card: the symbol big in solid white (a flat single-color glyph that reads well at 20 px, like a typographic currency sign: one letterform plus one or two strokes), and below it the same symbol small in gold on a sample number "1.250.000" to show it in use. The four directions:
+1. "KON" (from 魂, soul): a sharp angular K crossed by two short horizontal strokes, with a tiny flame notch on the top arm.
+2. "SŌ": an angular S built like a lightning bolt, crossed by one vertical stroke.
+3. "SHIN" (from 心, heart): a compact glyph made of a stylized 心 shape over one horizontal bar.
+4. "RYŌ" (old Japanese coin): a hexagon outline with a single sharp diagonal slash through it and a small dot, like a minted mark.
+The symbols must NOT look like any real currency sign ($, ¥, €, £, ₩, ₭, ₽, ₹, ฿, ₿, ¢). Clean, bold, game-logo quality. Do not write any other text except the sample numbers. Save as propostas.png in the current directory.

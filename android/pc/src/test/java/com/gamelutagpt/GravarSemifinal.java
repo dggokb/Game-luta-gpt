@@ -85,9 +85,17 @@ public final class GravarSemifinal {
         int[] px = new int[largura * altura];
         BattleFlow flow = (BattleFlow)campo("flow").get(jogo);
         int quadros = 0, depoisDoFim = -1, limite = segundos * 60;
+        BolsaApostas bolsa = (BolsaApostas)campo("bolsa").get(jogo);
+        int[] patamares = {0, 0};
         while (quadros < limite && depoisDoFim != 0) {
             avancar.invoke(jogo, CombatConfig.DT);
             quadros++;
+            for (int lado = 0; lado < 2; lado++) {
+                if (bolsa.patamares(lado) != patamares[lado]) {
+                    patamares[lado] = bolsa.patamares(lado);
+                    System.out.printf(java.util.Locale.ROOT, "patamar do lado %d aos %.2f s%n", lado, quadros / 60.0);
+                }
+            }
             if (depoisDoFim > 0) depoisDoFim--;
             else if (depoisDoFim < 0 && flow.over()) depoisDoFim = 4 * 60;
             if (quadros % 2 != 0) continue;

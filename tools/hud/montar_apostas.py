@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Monta a arte da Bolsa de Apostas (docs/historia/aposta.md) a partir das imagens do Codex em
-art/hud/apostas/:
+"""Monta a arte da Bolsa de Apostas (docs/historia/aposta.md) a partir das imagens do Codex:
 
-- placa_original.png (fundo verde; o medalhão e os dois medidores em magenta) →
-  assets/ui/hud/apostas/placa.png, com o verde e o magenta transparentes, recortada no desenho,
-  e placa.json com as medidas (em pixels da placa.png): o hexágono do rosto, os dois medidores,
-  as duas placas do dinheiro e as duas plaquinhas da odd. O jogo desenha o rosto e os medidores
-  por baixo da arte, e os números por cima.
-- fichas.png (fundo verde, 8 peças em duas linhas) → uma imagem por peça:
-  pilha_azul, pilha_vermelha, ficha_azul, ficha_vermelha, moeda, voa_azul, voa_vermelha, brilho.
+- art/hud/apostas/letreiro_original.png (o letreiro do rodapé, o concept M1 aprovado em 20/11,
+  fundo verde; o medalhão e a barra em magenta) vira duas peças em assets/ui/hud/apostas/:
+  - faixa.png: só a faixa fina da borda de baixo, de ponta a ponta (o meio, onde o placar
+    sobe, é preenchido com a faixa lisa);
+  - letreiro.png: o placar que sobe no meio (com o pé da faixa embaixo), para o jogo pôr no vão
+    entre o direcional e os botões; o verde e o magenta ficam transparentes;
+  - letreiro.json: as medidas no letreiro.png: o hexágono do rosto, a barra, as duas placas do
+    dinheiro, as duas plaquinhas da odd e onde a faixa começa (no letreiro e na faixa.png).
+- art/vfx/aposta/{rastro,chegada,moeda_luz}.png (luz em fundo preto): o rastro da moeda que
+  vai até a barra de Super, o estouro na chegada e a moeda com brilho; o preto vira
+  transparente pelo brilho.
 
     python3 tools/hud/montar_apostas.py
 """
@@ -22,26 +25,28 @@ from PIL import Image
 
 RAIZ = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RAIZ / "tools/sprites"))
+sys.path.insert(0, str(RAIZ / "tools/historia"))
 import efeito_video as ev  # noqa: E402
+from versus_arte import brilho_sobre_preto  # noqa: E402
 
-ORIGEM = RAIZ / "art/hud/apostas"
+HUD = RAIZ / "art/hud/apostas"
+VFX = RAIZ / "art/vfx/aposta"
 SAIDA = RAIZ / "android/app/src/main/assets/ui/hud/apostas"
-# A placa no jogo tem ~460 de largura (tela virtual 1280): a imagem fica com o dobro.
-LARGURA_PLACA = 1000
-# Maior lado de cada ficha.
-LADO_FICHA = 160
-FICHAS = ["pilha_azul", "pilha_vermelha", "ficha_azul", "ficha_vermelha",
-          "moeda", "voa_azul", "voa_vermelha", "brilho"]
+
+# O placar no letreiro_original.png (2560x240): de onde o pé esquerdo sai da faixa até o direito.
+PLACAR = (760, 1800)
+# Coluna da faixa lisa (sem o brilho das pontas) que preenche o meio da faixa.
+FAIXA_LISA = 600
+# Escala de cada peça (a original é o dobro da tela de 1280).
+ESCALA_LETREIRO, ESCALA_FAIXA = 0.75, 0.625
+# Maior lado das peças do efeito.
+LADO = {"rastro": 1024, "chegada": 512, "moeda_luz": 256}
 
 
-def sem_verde(rgb):
-    return ev.chave(rgb, ev.cor_do_fundo([rgb]))
-
-
-def poligono(mascara):
+def poligono(mascara, folga=0.02):
     cs, _ = cv2.findContours(mascara.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     c = max(cs, key=cv2.contourArea)
-    return cv2.approxPolyDP(c, 0.02 * cv2.arcLength(c, True), True).reshape(-1, 2).astype(float)
+    return cv2.approxPolyDP(c, folga * cv2.arcLength(c, True), True).reshape(-1, 2).astype(float)
 
 
 def pedacos(mascara, area_minima):
@@ -49,71 +54,74 @@ def pedacos(mascara, area_minima):
     return [(rot == i, st[i]) for i in range(1, n) if st[i, cv2.CC_STAT_AREA] >= area_minima]
 
 
-def placa():
-    rgb = np.array(Image.open(ORIGEM / "placa_original.png").convert("RGB"))
+def letreiro():
+    rgb = np.array(Image.open(HUD / "letreiro_original.png").convert("RGB"))
+    rgba = ev.chave(rgb, ev.cor_do_fundo([rgb]))
     r, g, b = (rgb[..., i].astype(int) for i in range(3))
     magenta = (r > 170) & (b > 170) & (g < 110)
-    # Os buracos crescem 2 px: some a franja rosa, e o que o jogo desenha encosta na tinta.
-    furo = cv2.dilate(magenta.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
-    rgba = sem_verde(rgb)
-    rgba[furo, 3] = 0
-    ys, xs = np.where(rgba[..., 3] > 0)
-    x0, x1, y0, y1 = xs.min() - 4, xs.max() + 5, ys.min() - 4, ys.max() + 5
-    escala = LARGURA_PLACA / (x1 - x0)
+    rgba[cv2.dilate(magenta.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0, 3] = 0
+    verde = rgba[..., 3] == 0
+    # Onde a faixa começa (a primeira linha com desenho na coluna lisa).
+    topo_faixa = int(np.argmax(~verde[:, FAIXA_LISA]))
 
-    def em(p):
-        return [[round((x - x0) * escala, 1), round((y - y0) * escala, 1)] for x, y in p]
+    # A faixa: o meio vira a coluna lisa, e em cima dela tudo transparente.
+    faixa = rgba.copy()
+    x0, x1 = PLACAR
+    faixa[:, x0:x1] = faixa[:, FAIXA_LISA:FAIXA_LISA + 1]
+    faixa = faixa[topo_faixa - 4:]
+    img = Image.fromarray(faixa)
+    img = img.resize((round(img.width * ESCALA_FAIXA), round(img.height * ESCALA_FAIXA)), Image.LANCZOS)
+    img.save(SAIDA / "faixa.png", optimize=True)
 
-    buracos = sorted(pedacos(magenta, 2000), key=lambda p: p[1][cv2.CC_STAT_AREA], reverse=True)
-    hexagono = poligono(buracos[0][0])
-    medidores = sorted((poligono(m) for m, _ in buracos[1:3]), key=lambda p: p[:, 0].min())
-    # As placas escuras (azul-marinho) por dentro das asas: a do dinheiro (grande) e a da odd.
-    marinho = (r < 40) & (g < 50) & (b > 30) & (b < 90)
-    placas = []
-    for m, st in pedacos(marinho, 3000):
+    # O placar, com o pé da faixa.
+    placar = rgba[:, x0:x1]
+    rr, gg, bb = r[:, x0:x1], g[:, x0:x1], b[:, x0:x1]
+    mag = magenta[:, x0:x1]
+    s = ESCALA_LETREIRO
+
+    def em(pts):
+        return [[round(x * s, 1), round(y * s, 1)] for x, y in pts]
+
+    buracos = sorted(pedacos(mag, 300), key=lambda p: p[1][cv2.CC_STAT_TOP])
+    if len(buracos) != 2:
+        raise SystemExit(f"letreiro: achei {len(buracos)} áreas magenta, esperava 2 (o rosto e a barra)")
+    escuro = (rr < 45) & (gg < 55) & (bb < 90)
+    dinheiro, odd = [], []
+    for _, st in pedacos(escuro, 800):
         x, y, w, h, _ = st
-        if 60 <= h <= 90 and w > 500:
-            placas.append(("dinheiro", [x, y, x + w, y + h]))
-        elif 30 <= h <= 55 and 120 <= w <= 220:
-            placas.append(("odd", [x, y, x + w, y + h]))
-    medidas = {"largura": LARGURA_PLACA, "altura": round((y1 - y0) * escala),
-               "hexagono": em(hexagono), "medidor": [em(medidores[0]), em(medidores[1])]}
-    for nome in ("dinheiro", "odd"):
-        caixas = sorted((c for n, c in placas if n == nome), key=lambda c: c[0])
-        if len(caixas) != 2:
-            raise SystemExit(f"placa: achei {len(caixas)} placas de {nome}, esperava 2")
-        medidas[nome] = [sum(em([c[:2], c[2:]]), []) for c in caixas]
-    img = Image.fromarray(rgba[y0:y1, x0:x1]).resize((medidas["largura"], medidas["altura"]), Image.LANCZOS)
-    img.save(SAIDA / "placa.png", optimize=True)
-    (SAIDA / "placa.json").write_text(json.dumps(medidas, indent=1) + "\n", encoding="utf-8")
-    print("placa.png", img.size)
+        caixa = [round(x * s, 1), round(y * s, 1), round((x + w) * s, 1), round((y + h) * s, 1)]
+        if 50 <= h <= 90 and 250 <= w <= 450:
+            dinheiro.append(caixa)
+        elif 20 <= h <= 45 and 80 <= w <= 160:
+            odd.append(caixa)
+    if len(dinheiro) != 2 or len(odd) != 2:
+        raise SystemExit(f"letreiro: {len(dinheiro)} placas de dinheiro e {len(odd)} de odd (esperava 2 e 2)")
+    medidas = {
+        "largura": round(placar.shape[1] * s), "altura": round(placar.shape[0] * s),
+        "hexagono": em(poligono(buracos[0][0])), "barra": em(poligono(buracos[1][0], 0.004)),
+        "dinheiro": sorted(dinheiro), "odd": sorted(odd),
+        "topoFaixa": round(topo_faixa * s, 1),
+        "faixaAltura": img.height, "faixaTopo": round(4 * ESCALA_FAIXA, 1),
+    }
+    Image.fromarray(placar).resize((medidas["largura"], medidas["altura"]), Image.LANCZOS).save(
+        SAIDA / "letreiro.png", optimize=True)
+    (SAIDA / "letreiro.json").write_text(json.dumps(medidas, indent=1) + "\n", encoding="utf-8")
+    print("faixa.png", img.size, "letreiro.png", (medidas["largura"], medidas["altura"]))
 
 
-def fichas():
-    rgb = np.array(Image.open(ORIGEM / "fichas.png").convert("RGB"))
-    rgba = sem_verde(rgb)
-    # Peças juntas: os brilhos soltos viram uma peça só.
-    junto = cv2.dilate((rgba[..., 3] > 0).astype(np.uint8), np.ones((41, 41), np.uint8))
-    achados = [st for _, st in pedacos(junto, 4000)]
-    if len(achados) != len(FICHAS):
-        raise SystemExit(f"fichas: achei {len(achados)} peças, esperava {len(FICHAS)}")
-    meio = rgb.shape[0] / 2
-    achados.sort(key=lambda s: (s[1] + s[3] / 2 > meio, s[0]))
-    for nome, (x, y, w, h, _) in zip(FICHAS, achados):
-        peca = rgba[y:y + h, x:x + w]
-        ys, xs = np.where(peca[..., 3] > 0)
-        peca = peca[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-        img = Image.fromarray(peca)
-        escala = LADO_FICHA / max(img.size)
-        img = img.resize((max(1, round(img.width * escala)), max(1, round(img.height * escala))), Image.LANCZOS)
+def efeitos():
+    for nome, lado in LADO.items():
+        img = brilho_sobre_preto(Image.open(VFX / f"{nome}.png"))
+        escala = lado / max(img.size)
+        img = img.resize((round(img.width * escala), round(img.height * escala)), Image.LANCZOS)
         img.save(SAIDA / f"{nome}.png", optimize=True)
         print(f"{nome}.png", img.size)
 
 
 def main():
     SAIDA.mkdir(parents=True, exist_ok=True)
-    placa()
-    fichas()
+    letreiro()
+    efeitos()
 
 
 if __name__ == "__main__":

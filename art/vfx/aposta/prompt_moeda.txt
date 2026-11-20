@@ -1,0 +1,2 @@
+You have an image generation tool. Use it to GENERATE a new image (do not write code). A visual effect for a 2D anime fighting game, anime fighting game VFX style, on a PURE BLACK background (#000000), no character, no text.
+Canvas: 512x512. A flying gold yen coin (¥ embossed, seen slightly tilted) wrapped in bright gold-white light: a glowing aura hugging the coin, a white-hot rim highlight, and a few short sharp light spikes and sparkles around it. Cel-shaded flat tone bands, light is the brightest thing. Centered. Save as moeda_luz.png in the current directory.
