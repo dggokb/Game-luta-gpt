@@ -574,6 +574,12 @@ final class GeneratedSpriteLayouts {
     static final int P03_DEFENSE_STAND_ROOT_Y = 478;
     static final int P03_DEFENSE_STAND_FRAME_COUNT = 8;
 
+    static final int P03_DOIS_SOCOS_FRAME_WIDTH = 506;
+    static final int P03_DOIS_SOCOS_FRAME_HEIGHT = 453;
+    static final int P03_DOIS_SOCOS_ROOT_X = 236;
+    static final int P03_DOIS_SOCOS_ROOT_Y = 442;
+    static final int P03_DOIS_SOCOS_FRAME_COUNT = 14;
+
     static final int P03_ENERGY_FRAME_WIDTH = 709;
     static final int P03_ENERGY_FRAME_HEIGHT = 572;
     static final int P03_ENERGY_ROOT_X = 206;
@@ -706,12 +712,6 @@ final class GeneratedSpriteLayouts {
     static final int P03_MEDIUM_ROOT_Y = 457;
     static final int P03_MEDIUM_FRAME_COUNT = 16;
 
-    static final int P03_OMBRADA_FRAME_WIDTH = 487;
-    static final int P03_OMBRADA_FRAME_HEIGHT = 452;
-    static final int P03_OMBRADA_ROOT_X = 272;
-    static final int P03_OMBRADA_ROOT_Y = 443;
-    static final int P03_OMBRADA_FRAME_COUNT = 18;
-
     static final int P03_RISE_FRAME_WIDTH = 413;
     static final int P03_RISE_FRAME_HEIGHT = 455;
     static final int P03_RISE_ROOT_X = 195;
@@ -767,9 +767,9 @@ final class GeneratedSpriteLayouts {
     static final int P03_VICTORY_FRAME_COUNT = 33;
 
     static final int P03_VOADORA_CORRIDA_FRAME_WIDTH = 624;
-    static final int P03_VOADORA_CORRIDA_FRAME_HEIGHT = 562;
+    static final int P03_VOADORA_CORRIDA_FRAME_HEIGHT = 539;
     static final int P03_VOADORA_CORRIDA_ROOT_X = 341;
-    static final int P03_VOADORA_CORRIDA_ROOT_Y = 550;
+    static final int P03_VOADORA_CORRIDA_ROOT_Y = 529;
     static final int P03_VOADORA_CORRIDA_FRAME_COUNT = 24;
 
     static final int P03_WALK_BACK_FRAME_WIDTH = 436;

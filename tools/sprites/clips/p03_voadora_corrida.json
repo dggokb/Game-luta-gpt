@@ -21,6 +21,7 @@
     "largura": 352,
     "raiz": "191,302",
     "colunas": 5,
+    "pe_no_chao": true,
     "sem_poeira": true,
     "limpar_chao": true,
     "densidade": 2,

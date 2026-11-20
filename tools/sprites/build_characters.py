@@ -261,8 +261,9 @@ def validate_mechanics(name, mech, m, projectile):
     # Voo de verdade (o S2 e o S3 do Ryūga): o corpo sai do chão e cai pela gravidade do pulo.
     if 'voo' in mech:
         v = mech['voo']
-        if projectile or not isinstance(v, dict) or set(v) - {'altura', 'frames', 'paira'}:
-            raise ValueError(f'{name}.mecanica.voo: a melee move with altura, frames and paira')
+        if projectile or not isinstance(v, dict) or set(v) - {'altura', 'frames', 'paira', 'recuo'}:
+            raise ValueError(f'{name}.mecanica.voo: a melee move with altura, frames, paira and recuo')
+        if 'recuo' in v: positive(v['recuo'], f'{name}.mecanica.voo.recuo')
         frames('voo', v); positive(v.get('altura'), f'{name}.mecanica.voo.altura')
         if v['frames'][0] >= v['frames'][1]:
             raise ValueError(f'{name}.mecanica.voo.frames: takeoff before landing')
@@ -887,6 +888,7 @@ def compile_packs(root, results, alterados=None, medir=False):
         if 'voo' in mech:
             v = mech['voo']
             code += '.flight('+f(v['altura'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('paira'))).lower()+')'
+            if 'recuo' in v: code += '.flightRecoil('+f(v['recuo'])+')'
         if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
         if 'carga' in mech: code += '.charge('+str(mech['carga']['frames'])+','+str(mech['carga']['bonus'])+')'

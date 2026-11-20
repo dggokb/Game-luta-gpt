@@ -91,8 +91,31 @@ public class GarraDoTigreTest {
         AttackDefinition abertura = KOGA.attack(CancelSystem.ABERTURA);
         assertTrue("o X saiu", s.f(0).attacking() && CancelSystem.FOLLOW_UP.equals(s.f(0).attack.id));
         assertTrue("o 1º corte tocou até a pose segurada (" + ultimo + ")", ultimo >= abertura.whiffWindow.start - 1);
-        assertTrue("a janela abre depois das marcas formadas",
-            abertura.whiffWindow.start > abertura.startupFrames + abertura.activeFrames + 8);
+        assertTrue("a janela abre com as marcas formadas",
+            abertura.whiffWindow.start >= abertura.startupFrames + abertura.activeFrames);
+    }
+
+    /**
+     * O dono, 20/11: a marca fica na tela enquanto dá para apertar de novo; sem apertar, some. A
+     * janela da continuação cobre a pose segurada inteira (as marcas paradas na frente dele) e
+     * fecha quando ele volta à guarda.
+     */
+    @Test public void aMarcaFicaEnquantoDaParaApertar() {
+        segura(CancelSystem.ABERTURA, 7, 15);
+        segura(CancelSystem.FOLLOW_UP, 5, 15);
+    }
+
+    /** Do começo ao fim da janela, o desenho é a pose segurada (quadros {@code de} a {@code ate} do clipe). */
+    private static void segura(String id, int de, int ate) {
+        CharacterDefinition.Move m = KOGA.moves.get(id);
+        AttackDefinition a = m.attack;
+        for (int f = a.whiffWindow.start; f <= a.whiffWindow.end; f++) {
+            int q = m.animation.frame(m.animationTime((f + 0.5f) * CombatConfig.DT), 0f);
+            assertTrue(id + ": no quadro " + f + " da janela o desenho é o " + q + " (marcas de " + de + " a " + ate + ")",
+                q >= de && q <= ate);
+        }
+        int depois = m.animation.frame(m.animationTime((a.whiffWindow.end + 4.5f) * CombatConfig.DT), 0f);
+        assertTrue(id + ": fechada a janela, ele volta à guarda (" + depois + ")", depois > ate);
     }
 
     /** De perto, os três acertam sem o rival sair do atordoamento. */
