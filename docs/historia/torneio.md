@@ -171,7 +171,10 @@ São imagens largas (1774×887), cada uma uma página de um quadro só. O
 - **ep05, a ponte do Ryūga:** `pag9_ryuga` (64: o Ryūga e a Yín-lù na ponte, "HEY!") e
   `pag10_ryuga_p05` / `_p11` / `_p13` (65 de cada dupla: a dupla da ponte e o "vocês já tiveram a
   chance de vocês"), e logo a luta da emboscada. Vieram pelo chat (o Drive estava falhando).
-- No Kōga, depois da 63, ainda segue o rascunho de antes (a noite e a fala dele) até a luta.
+- **ep05, a ponte do Kōga:** `pag9_koga` (64: o Kōga e o Brucy na ponte, "HEY!") e
+  `pag10_koga_p05` / `_p11` / `_p13` (65 de cada dupla: "cala a boca e vamos..." / "não precisamos de
+  motivo pra lutar... vem!"), e logo a luta da emboscada. Também vieram pelo chat; o rascunho antigo do
+  Kōga (a noite e o splash `ponte_koga`) saiu.
 
 ### O sorteio em cena (ep04)
 
