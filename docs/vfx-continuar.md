@@ -2162,3 +2162,9 @@ no lugar do `impacto_v08_forte` só ali.
   altura) ao lado do v08, normal e câmera lenta, fora do jogo. Nos quadros: aparecem a estrela
   amarela e as faíscas; os brilhos redondos e os anéis do fim quase não se veem no cenário.
   Guardado em `art/vfx/teste_soco_forte_v09/teste5_impacto_cel10/`. Falta o dono dizer.
+- **Teste 5 reforçado:** "reforça os brilhos e grava de novo". Transparência por uma curva
+  (alfa' = alfa^0,5: 6% vira ~25%, o que já era forte quase não muda; opacidade média do que
+  aparece de 32 para 65 em 255). Vídeo com três lado a lado (v08, teste 5, teste 5 reforçado),
+  1x, normal e câmera lenta, fora do jogo. Nos quadros, os brilhos redondos e os anéis do fim
+  passam a aparecer como um halo amarelo sobre os lutadores. Folha em
+  `art/vfx/teste_soco_forte_v09/teste5_impacto_cel10/reforcado/`. Falta o dono dizer.
