@@ -560,6 +560,11 @@ final class SpriteAtlasCache {
         return get(character,atlas);
     }
 
+    /** Bytes das folhas prontas no cache agora (o botão MEDIR). */
+    long bytesProntos() {
+        synchronized(trava) { return bytesProntos; }
+    }
+
     /** Solta as folhas que só estavam no OpenGL (o contexto se perdeu): o próximo preload decodifica de novo. */
     void soltarSoNoOpenGl() {
         synchronized(trava) {

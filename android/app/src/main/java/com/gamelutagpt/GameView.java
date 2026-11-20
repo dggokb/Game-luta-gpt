@@ -1764,6 +1764,10 @@ public class GameView extends SurfaceView
             // O trabalho do quadro para a dica de desempenho do Android (o tempo até aqui, sem a espera).
             if (glQuadro) desenhoGl.relatarTrabalho(System.nanoTime() - frameStart);
             if (teste.ativo()) registrarQuadroDoTeste();
+            if (MedicaoContinua.ligada) {
+                if (perfil.ultimoQuadro[PerfilQuadros.FUNDO] > 0) medicao.quadro(perfil, quemLuta(), atlases.bytesProntos());
+                else medicao.pausa();
+            }
             // No teste a qualidade fica parada: trocar no meio misturava as medidas.
             // No AUTO a medida só recomenda: o nível muda na próxima abertura do jogo (13/11).
             if (janela && !teste.ativo() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
@@ -2486,6 +2490,7 @@ public class GameView extends SurfaceView
                 case PERF_HUD: return TesteDesempenho.hud ? "HUD ON" : "HUD OFF";
                 case PERF_MSGS: return TesteDesempenho.mensagens ? "MSGS ON" : "MSGS OFF";
                 case PERF_TESTE: return teste.ativo() ? "TESTE " + teste.segundosRestantes() + "s" : "TESTE";
+                case PERF_MEDIR: return MedicaoContinua.ligada ? "MEDIR ON" : "MEDIR";
                 case PERF_GL:
                     // O que vale na luta de agora; trocado, vale a partir da próxima.
                     if (TesteDesempenho.openGl != glNaLuta) return TesteDesempenho.openGl ? "OPENGL ON*" : "OPENGL OFF*";
@@ -2504,6 +2509,7 @@ public class GameView extends SurfaceView
                 case PERF_MSGS: return TesteDesempenho.mensagens;
                 case PERF_TESTE: return teste.ativo() || teste.relatorio() != null;
                 case PERF_GL: return TesteDesempenho.openGl;
+                case PERF_MEDIR: return MedicaoContinua.ligada;
                 default: return true;
             }
         }
@@ -3960,6 +3966,7 @@ public class GameView extends SurfaceView
                     renderFrame(gl);
                     if (pausa.fps()) drawFpsCounter(gl);
                     desenharTeste(gl);
+                    desenharMedicao(gl);
                     desenharAvisoGl(gl);
                     // As imagens do Ultra sobem durante a abertura dele (a luta parada), uma por quadro:
                     // no meio da luta cada envio era um engasgo.
@@ -3995,6 +4002,7 @@ public class GameView extends SurfaceView
             renderFrame(canvas);
             if (pausa.fps()) drawFpsCounter(canvas);
             desenharTeste(canvas);
+            desenharMedicao(canvas);
             desenharAvisoGl(canvas);
             perfil.marca(PerfilQuadros.TELA);
         } finally {
@@ -4276,6 +4284,51 @@ public class GameView extends SurfaceView
         if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(true);
         try {
             desenharRelatorio(canvas, r);
+        } finally {
+            if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(false);
+        }
+    }
+
+    final MedicaoContinua medicao = new MedicaoContinua();
+    private final Paint medirPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    /** As duplas da luta de agora ("p03+p02 x p13+p14"), para o MEDIR separar uma luta da outra. */
+    private String quemLuta() {
+        StringBuilder s = new StringBuilder();
+        for (int lado = 0; lado < 2; lado++) {
+            if (lado == 1) s.append(" x ");
+            boolean primeiro = true;
+            for (FighterState m : engine.team(lado).members) {
+                if (!primeiro) s.append('+');
+                s.append(m.character.id);
+                primeiro = false;
+            }
+        }
+        return s.toString();
+    }
+
+    /** A caixa do MEDIR no alto da tela, por cima de tudo, em qualquer modo. */
+    private void desenharMedicao(Canvas canvas) {
+        if (!MedicaoContinua.ligada) return;
+        java.util.List<String> linhas = medicao.linhas();
+        if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(true);
+        try {
+            canvas.save();
+            canvas.scale(canvas.getWidth() / (float) VW, canvas.getHeight() / (float) VH);
+            medirPaint.setTextSize(11f);
+            medirPaint.setTypeface(Typeface.DEFAULT);
+            medirPaint.setTextAlign(Paint.Align.LEFT);
+            float alto = linhas.size() * 14f + 8f, top = 160f;
+            testeCaixa.set(8f, top, VW - 8f, top + alto);
+            medirPaint.setColor(0xC0101018);
+            canvas.drawRoundRect(testeCaixa, 6f, 6f, medirPaint);
+            float y = top + 15f;
+            for (String l : linhas) {
+                medirPaint.setColor(l.startsWith(">") ? 0xFFFFD84A : 0xFFFFFFFF);
+                canvas.drawText(l, 16f, y, medirPaint);
+                y += 14f;
+            }
+            canvas.restore();
         } finally {
             if (canvas instanceof CanvasGl) ((CanvasGl) canvas).linhasProprias(false);
         }
@@ -8271,6 +8324,9 @@ public class GameView extends SurfaceView
                     // Com o relatório na tela, o toque fecha; senão começa (só no meio de uma luta).
                     if (teste.relatorio() != null) teste.fecharRelatorio();
                     else if (!teste.ativo()) iniciarTesteDesempenho();
+                    break;
+                case PERF_MEDIR:
+                    MedicaoContinua.ligada = !MedicaoContinua.ligada;
                     break;
                 case PERF_GL:
                     // Desenho novo (OpenGL) × Canvas: vale a partir da próxima luta (DUPLA ou IA).
