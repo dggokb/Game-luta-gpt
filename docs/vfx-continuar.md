@@ -2091,6 +2091,6 @@ numa curva do placar até a barra de Super do lado, em fatias que se encostam (c
 `EfeitosVideo.fita`), procedural (a ponta anda com a moeda, o fim vem 14 quadros atrás e apaga de
 trás para a frente), 48 px de largura, por cima de tudo; o estouro na barra e a barra só sobe
 na chegada. Anda no tempo da tela (0,6 s). Gravado no PC (`gravarSemifinal -PcontroleNaTela`),
-normal e em câmera lenta (4x); não visto no celular. Esperando o dono aprovar no vídeo: está na
-branch local `bolsa-letreiro`, fora da `game-luta-sprite-fable`.
+normal e em câmera lenta (4x); não visto no celular. **Aprovado pelo dono no vídeo (20/11:
+"Ótimo")** e mandado para a `game-luta-sprite-fable`.
 
