@@ -2130,3 +2130,10 @@ no lugar do `impacto_v08_forte` só ali.
   da do v08, ~635 px de altura com as faíscas abertas); o tempo igual. O `efeito.json` guardado em
   `art/vfx/teste_soco_forte_v09/teste2_amarelo/` já está nesse tamanho. Vídeo lado a lado, normal e
   câmera lenta, fora do jogo. Falta o dono dizer.
+- **Teste 3 (dourado, 2,5x):** outra folha 4×4 do dono (estrela dourada que abre em anel de
+  faíscas), "testa esse em 2.5 tamanho". `pixelScale` 0,6 (2,5x a escala do primeiro teste; ~790
+  px de altura com o anel aberto). Guardado em `art/vfx/teste_soco_forte_v09/teste3_dourado/`.
+  Vídeo lado a lado, normal e câmera lenta, fora do jogo. Nos quadros, as faíscas tomam o rival e
+  o braço; o miolo é vazado (o escuro no meio é o braço do Kōga por trás, não defeito da folha).
+  Uma quarta (amarela com miolo azul-claro, "esse tbem") veio só como imagem no chat, sem arquivo:
+  falta ele mandar como anexo.
