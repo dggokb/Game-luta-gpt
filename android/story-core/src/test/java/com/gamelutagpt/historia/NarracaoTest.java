@@ -47,7 +47,7 @@ public class NarracaoTest {
             v.put(k, "Ryūga");
         }
         v.put("n", "7");
-        v.put("valor", "¥ 1.250.000");
+        v.put("valor", "1.250.000 kon");
         return v;
     }
 
@@ -84,7 +84,7 @@ public class NarracaoTest {
             v.put(k, "Takatoshi");
         }
         v.put("n", "12");
-        v.put("valor", "¥ 12.750.000");
+        v.put("valor", "12.750.000 kon");
         for (String idioma : new String[] {null, "en", "es"}) {
             Narracao n = narrador();
             if (idioma != null) {
@@ -146,7 +146,7 @@ public class NarracaoTest {
         assertEquals("o narrador continua o dono dos outros", Narracao.QUEM, n.eventos().get("inicio").quem);
         assertTrue(n.narrar("aposta_patamar", vars()));
         assertEquals("apostador", n.quemAtual());
-        assertTrue(n.textoAtual().contains("Ryūga") || n.textoAtual().contains("¥"));
+        assertTrue(n.textoAtual().contains("Ryūga") || n.textoAtual().contains("kon"));
         n.stop();
         assertNull(n.quemAtual());
         assertTrue(n.narrar("inicio", vars()));

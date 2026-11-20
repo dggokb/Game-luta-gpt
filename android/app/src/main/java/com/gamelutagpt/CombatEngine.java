@@ -2685,6 +2685,13 @@ final class CombatEngine {
                 } else {
                     if (f.energyRunFrames > 0) boost *= config.energyRunSpeedPermille / 1000f;
                     boolean correndo = f.forwardDashing && holdingForward;
+                    if (correndo && touchingAhead(f) && fighters[1 - f.index].grounded) {
+                        // Encostou no rival correndo: a corrida acaba ali (20/11, o dono: "caindo do
+                        // super ainda desliza no dash"; o Kōga pousava colado, corria e ficava
+                        // patinando no lugar com o desenho de correr, o empurrão segurando os dois).
+                        f.forwardDashing = false;
+                        correndo = false;
+                    }
                     float speed = correndo ? dashSpeed(f) * boost : walkSpeed(f, holdingForward) * boost;
                     if (correndo || horizontal == 0 ||
                         !andarPeloPe(f, holdingForward, speed, passadaAntes, f.passadaFrente)) {

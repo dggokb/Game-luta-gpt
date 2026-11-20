@@ -35,9 +35,10 @@ public class OtgTest {
     }
 
     @Test public void valeParaTodos() {
-        for (String id : new String[] {"p03", "p09", "p12", "p13"}) emenda(id, "2L M 2M 2M L M", 6);
-        // Rasteira curta empurra para longe: um passo à frente e o ↓ + M pega.
-        for (String id : new String[] {"p02", "p05"}) emenda(id, "2L M 2M C120 2M L M", 6);
+        for (String id : new String[] {"p09", "p12", "p13"}) emenda(id, "2L M 2M 2M L M", 6);
+        // Rasteira curta empurra para longe: um passo à frente e o ↓ + M pega (o Kōga também, desde
+        // que o M dele parou de andar, 20/11).
+        for (String id : new String[] {"p02", "p05", "p03"}) emenda(id, "2L M 2M C120 2M L M", 6);
     }
 
     @Test public void soDentroDeComboEUmaVezPorCombo() {

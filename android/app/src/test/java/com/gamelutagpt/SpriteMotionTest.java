@@ -77,6 +77,25 @@ public class SpriteMotionTest {
         // Golpe que termina em pé (o jab) volta direto para a guarda.
         assertNotEquals(SpriteMotion.Clip.RISE,depoisDo("LIGHT_JAB",false).clip);
     }
+    /**
+     * O golpe no ar que acaba ainda no ar segura a última pose dele até o chão (20/11, o dono:
+     * "golpes aéreos quebram o frame"): não troca para o JUMP nem o FALL, que são de outro vídeo.
+     */
+    @Test public void oGolpeNoArSeguraAUltimaPoseAteOChao() {
+        for(String id:new String[]{"p03","p02"}) {
+            CharacterDefinition c=GeneratedCharacters.get(id);
+            String golpe=c.moves.get("jM").animation.id;
+            SpriteMotion m=new SpriteMotion(c);
+            m.update(.016f,false,false,-400,0,true,false,false,null,0,false,false);
+            float total=c.animation(golpe).duration;
+            for(float t=0;t<total;t+=.016f)m.update(.016f,false,false,100,0,true,false,false,golpe,t,false,false);
+            for(int i=0;i<10;i++)m.update(.016f,false,false,i<5?-200:300,0,true,false,false,null,0,false,false);
+            assertEquals(id+": segura o golpe no ar",golpe,m.clip);
+            assertEquals(id+": na última pose",c.animation(golpe).quadroDaFolha(c.animation(golpe).quadros()-1),m.frame());
+            m.update(.016f,true,false,0,0,true,false,false,null,0,false,false);
+            assertEquals(id+": no chão, o pouso",SpriteMotion.Clip.LAND,m.clip);
+        }
+    }
     @Test public void holdingDownAfterACrouchingAttackStaysCrouched() {
         // Quem não tem a respiração agachada (CROUCH_IDLE): o p04 (a p02 ganhou a dela em 12/11, o p03 em 19/11).
         CharacterDefinition sem=GeneratedCharacters.get("p04");
