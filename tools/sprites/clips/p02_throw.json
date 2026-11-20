@@ -2,13 +2,13 @@
   "id": "p02_throw",
   "javaName": "P02_THROW",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_throw_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_throw_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_throw.webp",
   "report": "tools/sprites/reports/p02_throw.report.json",
   "preview": "android/app/build/sprite-review/p02_throw-import.png",
   "expectedFrames": 17,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -20,15 +20,14 @@
     "celula": 288,
     "largura": 256,
     "raiz": "94,270",
-    "colunas": 11,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2
   },
-  "frameHeight": 288,
-  "rootX": 94,
-  "rootY": 270,
-  "frameWidth": 256,
-  "sourceReferences": [
-    "art/sprites/source/p02_throw_video_normalized.png"
-  ]
+  "frameHeight": 576,
+  "rootX": 188,
+  "rootY": 540,
+  "frameWidth": 512,
+  "sourceReferences": [],
+  "pixelScale": 2.0
 }

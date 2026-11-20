@@ -2,13 +2,13 @@
   "id": "p02_hit_crouch",
   "javaName": "P02_HIT_CROUCH",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_hit_crouch_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_hit_crouch_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_hit_crouch.webp",
   "report": "tools/sprites/reports/p02_hit_crouch.report.json",
   "preview": "android/app/build/sprite-review/p02_hit_crouch-import.png",
   "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -20,15 +20,15 @@
     "celula": 224,
     "largura": 192,
     "raiz": "100,206",
-    "colunas": 11,
+    "colunas": 10,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2
   },
-  "frameWidth": 192,
-  "frameHeight": 224,
-  "rootX": 100,
-  "rootY": 206,
-  "sourceReferences": [
-    "art/sprites/source/p02_hit_crouch_video_normalized.png"
-  ]
+  "frameWidth": 384,
+  "frameHeight": 448,
+  "rootX": 200,
+  "rootY": 412,
+  "sourceReferences": [],
+  "pixelScale": 2.0
 }

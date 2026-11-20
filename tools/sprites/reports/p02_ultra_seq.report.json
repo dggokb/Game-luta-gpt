@@ -1599,12 +1599,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "36ab92b08e721524e665d62a64c2be1695150ec19067dfa93ed77880488a1056",
+      "source": "a94dfa72f07c2cd86e6bdae1572412534e9584fd0148be9c768af6497da662d2",
       "config": "1440d8666a2c245f5257e28c1517b11b271b64612d43f90efb0fff79cfcc9e80",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_ultra_seq_video_normalized.png": "36ab92b08e721524e665d62a64c2be1695150ec19067dfa93ed77880488a1056"
+      "art/sprites/source/p02_ultra_seq_video_normalized.png": "a94dfa72f07c2cd86e6bdae1572412534e9584fd0148be9c768af6497da662d2"
     }
   }
 }

@@ -2,7 +2,7 @@
   "id": "p02_hit_air",
   "javaName": "P02_HIT_AIR",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_hit_air_video_normalized_sr_hd.png",
+  "source": "art/sprites/source/p02_hit_air_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_hit_air.webp",
   "report": "tools/sprites/reports/p02_hit_air.report.json",
   "preview": "android/app/build/sprite-review/p02_hit_air-import.png",
@@ -22,13 +22,13 @@
     "raiz": "82,232",
     "colunas": 10,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2
   },
-  "frameWidth": 160,
-  "frameHeight": 352,
-  "rootX": 82,
-  "rootY": 232,
-  "sourceReferences": [
-    "art/sprites/source/p02_hit_air_video_normalized.png"
-  ]
+  "frameWidth": 320,
+  "frameHeight": 704,
+  "rootX": 164,
+  "rootY": 464,
+  "sourceReferences": [],
+  "pixelScale": 2.0
 }
