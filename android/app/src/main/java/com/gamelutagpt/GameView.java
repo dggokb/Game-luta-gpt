@@ -1832,6 +1832,8 @@ public class GameView extends SurfaceView
             finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade() *
                 (finalizacao.ativo() ? ImpactFeel.LENTA_ACELERA : RITMO_BASE));
         }
+        // A Bolsa (HUD) anda no tempo da tela: a moeda até a barra de Super não fica lenta no impacto.
+        if (fightClockRunning() && apostaNaLuta()) bolsa.passarTempo(engine, clamp(elapsedSeconds, 0f, 0.05f));
         // O STAMP da cinemática bate no tempo da tela, não na câmera lenta do impacto embaixo dele.
         float sentir = cinematica.stampNaTela() ? 1f : feel.timeScale();
         float speed = fightClockRunning() ? ImpactFeel.relogio(pausa.velocidade(), RITMO_BASE, sentir) : 1f;
@@ -4828,12 +4830,17 @@ public class GameView extends SurfaceView
                         ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
                     if (storyMode || TesteDesempenho.hud) drawHud(canvas);
                     else hud.drawButtonsOnly(canvas, hudState);
-                    if (apostaNaLuta() && (storyMode || TesteDesempenho.hud)) bolsa.desenhar(renderCanvas, engine.frame() / 60f);
+                    if (apostaNaLuta() && (storyMode || TesteDesempenho.hud)) {
+                        bolsa.desenhar(renderCanvas, engine.frame() / 60f,
+                            touchControls ? BolsaApostas.CENTRO_TOQUE : BolsaApostas.CENTRO_TELA);
+                    }
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }
                 // Na cena do Ultra o HUD some: o grito da cena (POFT!, BOOOOOM!) aparece mesmo assim.
                 if (faixas >= 0.5f && throwBannerLado < 0 && TesteDesempenho.mensagens) drawFaixaDeAviso(canvas);
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
+                // A moeda da Bolsa voando até a barra de Super: luz, por cima até dos controles.
+                if (apostaNaLuta() && faixas < 0.5f) bolsa.desenharVoos(renderCanvas);
                 TesteAutomatico.hud(TesteAutomatico.HUD_TOQUE);
                 cinematica.renderFaixas(renderCanvas);
                 // O STAMP fica embaixo dos quadros da conversa: quem grita continua aparecendo.
@@ -9283,6 +9290,8 @@ public class GameView extends SurfaceView
 
     /** A Bolsa anda com a luta; o Apostador fala pelo narrador. */
     private void updateBolsa() {
+        // Na Semifinal a caixa do narrador sobe e fica em cima do placar do rodapé.
+        if (narracao != null) narracao.setDeslocamento(apostaNaLuta() ? -BolsaApostas.NARRADOR_SOBE : 0f);
         if (!apostaNaLuta()) return;
         bolsa.carregar(ultraAssets);
         bolsa.update(engine, flow, narracao != null && narracaoAtiva() ? narracao::narrar : (e, v) -> {});

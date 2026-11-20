@@ -2079,3 +2079,18 @@ laranja, G ≤ 0,62·R nos tons quentes; 260 px, o tamanho do X parado; luz `#FF
 ## 20/11: Garra do Kōga, efeito estranho
 
 O dono: "o efeito tbem ta estranho". Olhado de perto: a borda das marcas e do X com franja verde-amarelada (o verde do fundo no brilho meio transparente) e o X como placa laranja sólida (o vermelho entre os cortes opaco, o brilho chegando à borda do recorte). Feito: `sem_verde` nos clipes da garra, e `efeito_leve` (novo em personagem.py: laranja/vermelho vivo, R>190 e B<90, fica meio transparente pela luminância; o corte branco fica inteiro) nas marcas paradas e na folha `onda_p03`. Sem `soma`: somando, o X lavava o cenário. Falta o dono ver no vídeo.
+
+## 20/11: Bolsa de Apostas, rastro da moeda até a barra de Super
+
+O dono: "faz efeito visual de rastro quando vai pro Super pra saber que tá aumentando lá" (a
+moeda do patamar da Bolsa de Apostas, na Semifinal, junto com o letreiro do rodapé M1). Feito
+pela regra 2 (arte gerada, código só posiciona e anima): o Codex gerou o rastro (luz dourada em
+fundo preto, cabeça branca à direita, fiapos irregulares e pontudos), o estouro da chegada e a
+moeda com brilho (`art/vfx/aposta/`). No jogo (`BolsaApostas.desenharVoos`): a textura esticada
+numa curva do placar até a barra de Super do lado, em fatias que se encostam (como o
+`EfeitosVideo.fita`), procedural (a ponta anda com a moeda, o fim vem 14 quadros atrás e apaga de
+trás para a frente), 48 px de largura, por cima de tudo; o estouro na barra e a barra só sobe
+na chegada. Anda no tempo da tela (0,6 s). Gravado no PC (`gravarSemifinal -PcontroleNaTela`),
+normal e em câmera lenta (4x); não visto no celular. Esperando o dono aprovar no vídeo: está na
+branch local `bolsa-letreiro`, fora da `game-luta-sprite-fable`.
+
