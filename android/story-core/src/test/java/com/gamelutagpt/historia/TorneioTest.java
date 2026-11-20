@@ -455,13 +455,12 @@ public class TorneioTest {
                     paginas.indexOf("pag1_" + irmao + ".jpg") + 5));
                 int i = paginas.indexOf("pag5.jpg");
                 assertEquals(java.util.Arrays.asList("pag5.jpg", "pag6.jpg", "pag7.jpg", ponte), paginas.subList(i, i + 4));
-                assertTrue(paginas.indexOf("LUTA") > paginas.indexOf(ponte));
-                // A ponte do Ryūga (64 e 65 de cada dupla): a última página antes da luta.
-                if (Torneio.RYUGA.equals(irmao)) {
-                    String chegada = "pag10_ryuga_" + t.emboscada().id + ".jpg";
-                    assertEquals(java.util.Arrays.asList("pag9_ryuga.jpg", chegada, "LUTA"),
-                        paginas.subList(paginas.indexOf("LUTA") - 2, paginas.indexOf("LUTA") + 1));
-                }
+                // A ponte de cada irmão (64 e 65 de cada dupla) vem logo depois da 63 e leva direto à luta.
+                String chegada = "pag10_" + irmao + "_" + t.emboscada().id + ".jpg";
+                int p = paginas.indexOf(ponte);
+                assertEquals(java.util.Arrays.asList(ponte, "pag9_" + irmao + ".jpg", chegada, "LUTA"), paginas.subList(p, p + 4));
+                String outro = Torneio.RYUGA.equals(irmao) ? Torneio.KOGA : Torneio.RYUGA;
+                assertFalse(paginas.contains("pag9_" + outro + ".jpg"));
                 vistas.add(ponte);
             }
         }
