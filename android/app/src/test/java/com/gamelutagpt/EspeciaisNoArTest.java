@@ -132,9 +132,9 @@ public class EspeciaisNoArTest {
     }
 
     @Test public void oS1QueEhSoDeArContinuaSendoOMergulho() {
-        // O p14 (S1 só no ar, o chute que mergulha) e o p03 (S4 Mergulho): no ar eles ganham do
-        // especial de chão de mesmo comando e descem até o chão.
-        for (String[] caso : new String[][]{{"p14", "S"}, {"p03", "S4"}}) {
+        // O p14 (S1 só no ar, o chute que mergulha): no ar ganha do especial de chão de mesmo comando
+        // e desce até o chão. (O S4 Mergulho do p03 saiu em 20/11: o Kōga ficou com três especiais.)
+        for (String[] caso : new String[][]{{"p14", "S"}}) {
             Luta l = new Luta(caso[0]);
             l.noAlto();
             assertEquals(caso[0], caso[1], l.solta(caso[1]));

@@ -541,7 +541,7 @@ public final class BateriaIdentidade {
 
     // ------------------------------------------------------------------ T04 antiaéreo
 
-    static final String[] PULOS = {"pulo à frente", "jH tarde (180 px)", "pulo longo (corrida)", "cruzado", "super pulo", "mergulho (Kōga S4)"};
+    static final String[] PULOS = {"pulo à frente", "jH tarde (180 px)", "pulo longo (corrida)", "cruzado", "super pulo", "mergulho (p14 S1)"};
 
     /**
      * Quem pula (o Ryūga, ou o Kōga no mergulho) vem com jH (o S4 no mergulho) apertado ao descer;
@@ -549,7 +549,7 @@ public final class BateriaIdentidade {
      * 0: nada; -1: levou.
      */
     static int antiAereo(String def, String pulo, String resposta, int t) {
-        String jumper = pulo.startsWith("mergulho") ? "p03" : "player_base";
+        String jumper = pulo.startsWith("mergulho") ? "p14" : "player_base";
         float gap = pulo.equals("cruzado") ? 150f : pulo.startsWith("pulo longo") ? 520f : pulo.equals("super pulo") ? 330f : pulo.startsWith("mergulho") ? 330f : 300f;
         Cena c = new Cena(jumper, def, 1000f, 1000f + gap);
         List<Toque> r = roteiro(ch(def), resposta, c.e.config);
@@ -558,12 +558,12 @@ public final class BateriaIdentidade {
         int inicio = t - (r.size() - 1);
         boolean golpe = false, saiu = false;
         int resultado = 0;
-        List<Toque> s4 = pulo.startsWith("mergulho") ? roteiro(ch("p03"), "S4", c.e.config) : null;
+        List<Toque> s4 = pulo.startsWith("mergulho") ? roteiro(ch("p14"), "S", c.e.config) : null;
         int s4Inicio = -1;
         for (int fr = 0; fr < 140; fr++) {
             FighterInput in = c.in[0];
             switch (pulo) {
-                case "pulo à frente": case "jH tarde (180 px)": case "cruzado": case "mergulho (Kōga S4)":
+                case "pulo à frente": case "jH tarde (180 px)": case "cruzado": case "mergulho (p14 S1)":
                     if (fr < 2) in.direction = 8;
                     break;
                 case "pulo longo (corrida)":

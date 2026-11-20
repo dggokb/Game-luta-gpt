@@ -19,7 +19,7 @@ public class ComandosPorPersonagemTest {
     private static final String[][] TABELA = {
         {"player_base", "Onda", "↓ ↘ →", "Punho ascendente", "→ ↓ ↘", "Chute giratório", "↓ ↙ ←"},
         {"p02", "Palma", "↓ ↘ →", "Chute da garça", "→ ↓ ↘", "Contra-golpe", "← ↙ ↓", "Chute rodopiante", "← →"},
-        {"p03", "Garra do tigre", "↓ ↘ →", "Uppercut da casa", "→ ↓ ↘", "Investida da voadora", "↓ ↙ ←", "Mergulho", "No ar: ↓ ↘ →"},
+        {"p03", "Garra do tigre", "↓ ↘ →", "Uppercut da casa", "→ ↓ ↘", "Investida da voadora", "↓ ↙ ←"},
         {"p04", "Soco de impacto", "↓ ↘ →", "Cabeçada", "[←] →", "Esquiva", "↓ ↓", "Ombrada", "← ↙ ↓ ↘ →"},
         {"p05", "Kunai", "↓ ↘ →", "Shuriken", "↓ ↙ ←", "Selo e mudança", "↓ ↓", "Corte de mão", "← ↙ ↓ ↘ →"},
         {"p06", "Sombra rastejante", "↓ ↙ ←", "Eco de sombra", "↓ ↓", "Puxar", "→ ↘ ↓ ↙ ←", "Passo-sombra", "↓ ↘ →"},
@@ -265,13 +265,15 @@ public class ComandosPorPersonagemTest {
         chao.motion("M", 3, 2, 1);
         assertEquals("no chão o ↓↘→ do p03 é a Garra do tigre (o 1º corte)", CancelSystem.ABERTURA, chao.started());
 
-        Luta ar = new Luta("p03");
+        // O mergulho que só sai no ar é o S1 do p14 (o S4 Mergulho do p03 saiu em 20/11: o Kōga ficou
+        // com três especiais, como o Ryūga).
+        Luta ar = new Luta("p14");
         ar.in.direction = 7;
         ar.step();
         ar.in.direction = 0;
         ar.steps(6);
         ar.motion("H", 3, 2, 1);
-        assertEquals("S4", ar.started());
+        assertEquals("S", ar.started());
         CombatFighter p = ar.p();
         AttackDefinition s4 = p.attack;
         float y = p.y, x = p.x;

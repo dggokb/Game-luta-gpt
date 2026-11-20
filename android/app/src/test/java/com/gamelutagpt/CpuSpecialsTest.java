@@ -28,7 +28,6 @@ public class CpuSpecialsTest {
         assertEquals(CpuSpecials.Role.PROJECTILE, role("p05", "S2"));
         assertEquals(CpuSpecials.Role.PROJECTILE, role("p11", "S2"));
         assertEquals(CpuSpecials.Role.ARMOR, role("p09", "S3"));
-        assertEquals(CpuSpecials.Role.DIVE, role("p03", "S4"));
         assertEquals(CpuSpecials.Role.DIVE, role("p14", "S"));
         assertEquals(CpuSpecials.Role.ECHO, role("p06", "S2"));
         assertEquals(CpuSpecials.Role.PULL, role("p06", "S3"));
