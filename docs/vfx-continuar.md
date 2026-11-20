@@ -2152,3 +2152,7 @@ no lugar do `impacto_v08_forte` só ali.
   aberto). Vídeo lado a lado, normal e câmera lenta, fora do jogo. Nos quadros, a estrela fica do
   tamanho do punho e o anel abre em volta do rival. Falta o dono escolher qual entra (para
   instalar em 1,2x, `pixelScale` 1,25).
+- **Teste 4 em 1x × o de hoje:** "Deixa 1 o segundo com o do jogo comparando". `pixelScale` 1,5
+  (~315 px de altura com o anel aberto), lado a lado com o `impacto_v08_forte`, normal e câmera
+  lenta, fora do jogo. Nos quadros, a estrela fica menor que a do v08 e o anel abre em volta do
+  punho. Falta o dono dizer.
