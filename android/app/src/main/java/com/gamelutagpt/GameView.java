@@ -843,6 +843,11 @@ public class GameView extends SurfaceView
 
     /** Começa a decodificar as folhas desses lutadores em segundo plano (sem esperar). */
     private void anteciparLutadores(String... ids) {
+        anteciparLutadores(false, ids);
+    }
+
+    /** {@code semLutaAtras}: nenhuma luta parada atrás da tela (a seleção); as folhas dela podem sair. */
+    private void anteciparLutadores(boolean semLutaAtras, String... ids) {
         String chave = String.join(",", ids);
         if (chave.equals(lutadoresAntecipados)) return;
         lutadoresAntecipados = chave;
@@ -855,14 +860,18 @@ public class GameView extends SurfaceView
                 // Lutador sem pack (ainda): nada para antecipar.
             }
         }
-        if (!atlases.antecipar(lutadores.toArray(new CharacterDefinition[0])))
+        if (!atlases.antecipar(semLutaAtras, lutadores.toArray(new CharacterDefinition[0])))
             Log.i(MedicaoCarregamento.TAG, "antecipação parcial (memória): " + chave);
     }
 
     /** Na seleção: as escolhas da tela (as que ainda vão mudar também; o orçamento segura). */
     private void anteciparSelecao() {
-        if (characterSelect.solo()) anteciparLutadores(characterSelect.point(), characterSelect.partner());
-        else anteciparLutadores(characterSelect.point(), characterSelect.partner(),
+        if (characterSelect.solo()) anteciparLutadores(true, characterSelect.point(), characterSelect.partner());
+        // Sem as regras do 2x2 (IA OFF), o parceiro do rival não entra na luta (selectTeamsNow não
+        // o carrega): adiantá-lo gastava até 700 MB do orçamento à toa.
+        else if (!flow.battle()) anteciparLutadores(true, characterSelect.point(), characterSelect.partner(),
+            characterSelect.opponentPoint());
+        else anteciparLutadores(true, characterSelect.point(), characterSelect.partner(),
             characterSelect.opponentPoint(), characterSelect.opponentPartner());
     }
 
@@ -1523,7 +1532,21 @@ public class GameView extends SurfaceView
         if (testFightPending) {
             testFightPending = false;
             selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
+            return;
         }
+        // A seleção pode ter soltado folhas desta luta para adiantar as escolhas (antecipar sem luta
+        // atrás): de volta a ela, o que saiu carrega com a tela de carregamento, e não no meio da luta.
+        if (!atlases.todasProntas(lutadoresEmCampo())) carregando(this::keepFightAtlases);
+    }
+
+    /** Quem a luta de agora desenha: a dupla do jogador e, do CPU, quem ainda está de pé. */
+    private CharacterDefinition[] lutadoresEmCampo() {
+        java.util.List<CharacterDefinition> em = new java.util.ArrayList<>();
+        for (FighterState member : team) em.add(member.character);
+        for (FighterState member : engine.team(OPPONENT).members) {
+            if (member.life > 0 || member == opponentPoint()) em.add(member.character);
+        }
+        return em.toArray(new CharacterDefinition[0]);
     }
 
     private String teamLabel() {

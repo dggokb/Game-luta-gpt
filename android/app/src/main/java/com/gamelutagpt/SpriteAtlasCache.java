@@ -367,6 +367,14 @@ final class SpriteAtlasCache {
      * total couber no orçamento das antecipações. Devolve false se alguma ficou de fora.
      */
     boolean antecipar(CharacterDefinition... characters) {
+        return antecipar(false,characters);
+    }
+
+    /**
+     * Como {@link #antecipar(CharacterDefinition...)}; com {@code semLutaAtras}, quando não há luta
+     * parada atrás da tela (a seleção), as folhas da luta que acabou também cedem lugar.
+     */
+    boolean antecipar(boolean semLutaAtras,CharacterDefinition... characters) {
         boolean todas=true;
         java.util.Set<String> queridas=new java.util.HashSet<>();
         for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) queridas.add(a.atlas.resource);
@@ -383,7 +391,7 @@ final class SpriteAtlasCache {
                 if(folhas.containsKey(a.atlas.resource)||adiada(c,a.atlas))continue;
                 float escala=escalaAgora(c,a.atlas);
                 Entrada nova=new Entrada(c,a.atlas,escala);
-                if(bytesProntos+bytesEmAndamento+nova.bytes>orcamentoAntecipado) liberarAntecipadas(queridas,nova.bytes);
+                if(bytesProntos+bytesEmAndamento+nova.bytes>orcamentoAntecipado) liberarAntecipadas(queridas,nova.bytes,semLutaAtras);
                 if(bytesProntos+bytesEmAndamento+nova.bytes>orcamentoAntecipado) { todas=false;continue; }
                 nova.soAntecipada=true;
                 folhas.put(a.atlas.resource,nova);
@@ -396,14 +404,23 @@ final class SpriteAtlasCache {
         return todas;
     }
 
-    /** Solta folhas prontas que só antecipações antigas pediram, até caber {@code bytes}. Com a trava. */
-    private void liberarAntecipadas(java.util.Set<String> queridas,long bytes) {
-        for(Iterator<Map.Entry<String,Entrada>> it=folhas.entrySet().iterator();it.hasNext();) {
-            if(bytesProntos+bytesEmAndamento+bytes<=orcamentoAntecipado)return;
-            Entrada e=it.next().getValue();
-            if(!e.soAntecipada||e.folha==null||queridas.contains(e.atlas.resource))continue;
-            it.remove();e.descartada=true;
-            soltar(e.folha);
+    /**
+     * Solta folhas prontas que a antecipação nova não quer, até caber {@code bytes}: primeiro as
+     * que só antecipações antigas pediram; com {@code semLutaAtras} (a seleção), depois as da luta
+     * que acabou. Antes, as da luta passada (1,5–2,5 GB numa dupla pesada) ocupavam o orçamento:
+     * a seleção mal adiantava as escolhidas e a tela de carregamento decodificava quase tudo. Nas
+     * páginas da história não: uma cena pode parar a luta no meio, e ela volta. Com a trava.
+     */
+    private void liberarAntecipadas(java.util.Set<String> queridas,long bytes,boolean semLutaAtras) {
+        for(int passada=0;passada<(semLutaAtras?2:1);passada++) {
+            for(Iterator<Map.Entry<String,Entrada>> it=folhas.entrySet().iterator();it.hasNext();) {
+                if(bytesProntos+bytesEmAndamento+bytes<=orcamentoAntecipado)return;
+                Entrada e=it.next().getValue();
+                if(e.folha==null||queridas.contains(e.atlas.resource))continue;
+                if(passada==0&&!e.soAntecipada)continue;
+                it.remove();e.descartada=true;
+                soltar(e.folha);
+            }
         }
     }
 
@@ -438,6 +455,18 @@ final class SpriteAtlasCache {
         synchronized(trava) { e=folhas.get(atlas.resource); }
         if(e==null||e.folha==null)throw new IllegalStateException("Atlas not preloaded: "+atlas.resource);
         return e.folha;
+    }
+
+    /** Todas as folhas que o preload carregaria destes personagens estão prontas. */
+    boolean todasProntas(CharacterDefinition... characters) {
+        synchronized(trava) {
+            for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) {
+                if(a.atlas==null||adiada(c,a.atlas))continue;
+                Entrada e=folhas.get(a.atlas.resource);
+                if(e==null||e.folha==null)return false;
+            }
+        }
+        return true;
     }
 
     /** A folha já está pronta para desenhar (sem decodificar na hora). */

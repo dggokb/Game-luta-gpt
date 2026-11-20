@@ -883,6 +883,37 @@ Os efeitos de personagem entraram entre 14/11 e 17/11, depois da medição de 5.
 **O que não sobra:** as folhas (o `retainOnly` solta e apaga a textura), as intros de Super e a
 vitória. Os retratos do HUD guardam no máximo um por personagem (até ~5 MB).
 
+### 5.22 Carregamento lento depois da seleção (20/11)
+
+**Causa:** a seleção adianta as folhas das escolhas enquanto o jogador escolhe
+(`SpriteAtlasCache.antecipar`), num orçamento de 35% da RAM, até 2,5 GB. Duas coisas gastavam esse
+orçamento:
+- **As folhas da luta que acabou** ficam no cache até a luta nova começar, e contavam no orçamento
+  sem poder sair (só saíam as de antecipações antigas). Uma dupla pesada ocupa 1,5–2,5 GB; quatro
+  personagens pesados pedem ~2,4 GB. A seleção mal adiantava e a tela de carregamento
+  decodificava quase tudo.
+- **O parceiro do rival** era adiantado mesmo sem as regras do 2x2 (IA OFF), quando ele não entra
+  na luta: até 700 MB à toa.
+
+As folhas cresceram nesta semana (Yin-lu em HD, Kōga com os vídeos inteiros), então o orçamento
+estourou onde antes cabia.
+
+**Correção:**
+- Na seleção (`antecipar(semLutaAtras=true, ...)`), quando falta orçamento, as folhas da luta que
+  acabou cedem lugar depois das antecipações antigas.
+- Nas páginas da história não: uma cena pode parar a luta no meio, e ela volta.
+- Cancelar a seleção volta para a luta parada. Se faltar alguma folha dela, ela recarrega com a
+  tela de carregamento (`todasProntas`, `keepFightAtlases`), não no meio da luta.
+- Sem o 2x2, o parceiro do rival não é adiantado.
+
+**No PC:** com Kōga, Yin-lu e Ryūga (1,9 GB) da luta passada no cache, escolhendo Natisuko e Bonnie
+com o orçamento do celular (2,5 GB):
+
+| | Antecipação |
+|---|---|
+| Antes | Natisuko inteira e 1 folha da Bonnie; o resto ficava para a tela de carregamento |
+| Depois | as duas inteiras prontas antes de confirmar (saem as folhas do Kōga) |
+
 ### Resumo do celular (Xiaomi 24116RACCG, 1080p, OpenGL, p15+p16)
 
 | Medida | Primeiro relatório | Final |
