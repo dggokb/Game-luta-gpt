@@ -276,6 +276,10 @@ public class GameView extends SurfaceView
      */
     private com.gamelutagpt.historia.Narracao narracao;
     private final NarradorLuta narradorLuta = new NarradorLuta();
+    /** A Bolsa de Apostas do Apostador (a Semifinal da história: {@code "aposta": true}). */
+    private final BolsaApostas bolsa = new BolsaApostas();
+    /** {@code -Dgameluta.aposta=true}: a Bolsa em qualquer batalha (para gravar no PC). */
+    private static final boolean APOSTA_SEMPRE = Boolean.getBoolean("gameluta.aposta");
     private boolean narracaoPronta;
     /** O narrador em pessoa no cenário, atrás dos lutadores (placeholder animado). */
     private final com.gamelutagpt.historia.NarradorPalco narradorPalco = new com.gamelutagpt.historia.NarradorPalco();
@@ -427,7 +431,8 @@ public class GameView extends SurfaceView
 
     private void desenharTelao(com.gamelutagpt.render.RenderCanvas rc, float l, float t, float r, float b) {
         if (telaoCanvas == null || telaoRenderer == null) return;
-        telao.desenhar(rc, quadroDoTelao, l, t, r, b, GROUND_Y, qualidade.efeitosLeves(), engine.frame() / 60f);
+        telao.desenhar(rc, quadroDoTelao, l, t, r, b, GROUND_Y, qualidade.efeitosLeves(), engine.frame() / 60f,
+            apostaNaLuta() ? bolsa.letreiro() : null);
     }
 
     /** Os lutadores do telão, no Canvas do quadro (o RenderCanvas do cenário transforma o mesmo Canvas). */
@@ -2090,6 +2095,9 @@ public class GameView extends SurfaceView
                 opponentInput.clear();
             } else {
                 ai.setSecondsLeft(flow.timed() ? flow.clockSeconds() : -1);
+                // Na Bolsa: a CPU não deixa esfriar e arrisca mais o show quando é a zebra.
+                if (apostaNaLuta()) ai.setAposta(bolsa.pressa(OPPONENT), bolsa.show(OPPONENT));
+                else ai.setAposta(0f, 1.0);
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }
@@ -2163,6 +2171,7 @@ public class GameView extends SurfaceView
         updateGritoDaTroca();
         updateConversa();
         updateNarracao();
+        updateBolsa();
         gravarTelao();
         updateCinematica(intro);
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
@@ -2384,6 +2393,7 @@ public class GameView extends SurfaceView
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
         narradorLuta.reset();
+        bolsa.reset();
         gritoDaTroca.reset();
         narradorPalco.reset();
         if (narracao != null) narracao.stop();
@@ -4807,6 +4817,7 @@ public class GameView extends SurfaceView
                         ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
                     if (storyMode || TesteDesempenho.hud) drawHud(canvas);
                     else hud.drawButtonsOnly(canvas, hudState);
+                    if (apostaNaLuta() && (storyMode || TesteDesempenho.hud)) bolsa.desenhar(renderCanvas, engine.frame() / 60f);
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }
                 // Na cena do Ultra o HUD some: o grito da cena (POFT!, BOOOOOM!) aparece mesmo assim.
@@ -9227,10 +9238,12 @@ public class GameView extends SurfaceView
                 if (!narracao.carregar()) Log.w(LOG_TAG, "narrador.json não abriu");
                 if (loadTemporada()) {
                     narracao.setTemporada(temporada);
-                    narradorLuta.setNomes(c -> {
+                    java.util.function.Function<CharacterDefinition, String> nomes = c -> {
                         String nome = temporada != null ? temporada.nomeDoLutador(c.id) : null;
                         return nome != null ? nome : c.displayName;
-                    });
+                    };
+                    narradorLuta.setNomes(nomes);
+                    bolsa.setNomes(nomes);
                 }
             }
             narradorLuta.update(engine, flow, narracao::narrar);
@@ -9238,9 +9251,30 @@ public class GameView extends SurfaceView
         narracao.update(FIXED_STEP);
         narradorNoPalco = narracaoAtiva();
         if (narradorNoPalco) {
-            narradorPalco.update(FIXED_STEP, narracao.textoAtual(), narracao.expressaoAtual(),
-                narracao.prioridadeAtual(), narracao.digitando());
+            // O Apostador fala na mesma faixa: o narrador no palco só mexe nas falas dele.
+            boolean dele = com.gamelutagpt.historia.Narracao.QUEM.equals(narracao.quemAtual());
+            narradorPalco.update(FIXED_STEP, dele ? narracao.textoAtual() : null, dele ? narracao.expressaoAtual() : null,
+                dele ? narracao.prioridadeAtual() : 0, dele && narracao.digitando());
         }
+    }
+
+    /**
+     * A luta tem a Bolsa de Apostas: a Semifinal da história ({@code "aposta": true}) ou, com
+     * {@code -Dgameluta.aposta=true}, qualquer batalha.
+     */
+    private boolean apostaNaLuta() {
+        if (!flow.battle() || tutorial.active() || demo.active()) return false;
+        if (APOSTA_SEMPRE) return true;
+        if (!storyMode) return false;
+        Episodio.Passo luta = historia.waitingFight() ? historia.passo() : null;
+        return luta != null && luta.aposta;
+    }
+
+    /** A Bolsa anda com a luta; o Apostador fala pelo narrador. */
+    private void updateBolsa() {
+        if (!apostaNaLuta()) return;
+        bolsa.carregar(ultraAssets);
+        bolsa.update(engine, flow, narracao != null && narracaoAtiva() ? narracao::narrar : (e, v) -> {});
     }
 
     /**

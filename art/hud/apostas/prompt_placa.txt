@@ -1,0 +1,11 @@
+You have an image generation tool. Use it to GENERATE a new image (do not write code). The attached estilo.png is the top HUD of our 2D anime fighting game: dark navy angular panels, thin glowing neon outlines, blue electric lightning on the left side and red on the right, clean ink outlines, polished cel-shaded look. Create a NEW HUD element in EXACTLY that style: a "betting pool" plaque that sits centered under that HUD.
+
+Canvas: 1536x512, landscape. Background: flat pure chroma green #00FF00 everywhere outside the plaque (no shadows or glow on the green, so it can be keyed out).
+
+The plaque, perfectly left-right symmetrical, about 1400 px wide and 300 px tall, centered:
+- CENTER: a vertical hexagon portrait frame (same hexagon shape as the face frames in estilo.png), about 250 px tall, with a thick ornate polished GOLD border with small casino ornaments (tiny poker chip and yen coin motifs). The inside of the hexagon must be flat solid pure magenta #FF00FF (empty window, the game draws a face there). It overlaps and sits slightly higher than the two wings.
+- LEFT WING (player side): a dark navy angular panel shaped like the panels in estilo.png, with a glowing BLUE neon edge and blue lightning crackling off its outer end. Inside it, two empty areas: on top, a wide dark rectangular plate with a thin gold border (empty, for a money number); below it, a long thin slanted gauge slot running from the outer end to the hexagon, its inside flat solid pure magenta #FF00FF (empty, the game fills it). At the outer bottom corner, a small dark tag with a thin gold border (empty, for odds).
+- RIGHT WING (opponent side): the exact mirror of the left wing, with RED neon and red lightning.
+- A thin gold trim line ties both wings to the hexagon, like a casino table rail.
+
+Absolutely NO text, NO letters, NO numbers, NO characters or faces anywhere. Flat empty areas where numbers go. Save the result as placa.png in the current directory.

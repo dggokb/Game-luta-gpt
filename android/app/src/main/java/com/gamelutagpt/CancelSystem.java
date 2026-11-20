@@ -129,7 +129,11 @@ final class CancelSystem {
                     if (!special.saiEm(f.grounded) || !especialNoArLiberado(f, special.air)) return null;
                     return c.attack(entry.strength);
                 }
-                // S1 em três: ↓↘→ + botão é o 1º corte (o poder sai no fim da sequência).
+                // S1 em três: ↓↘→ + botão é o 1º corte (o poder sai no fim da sequência). Dentro de um
+                // corte, o botão logo depois do ↓↘→ (o comando ainda lido) ou o ↓↘→ de novo é a
+                // próxima etapa, como o botão sozinho (20/11: no celular o aperto lia de novo o
+                // comando, o 1º corte não emendava e voltava à guarda, e a marca sumia).
+                if (c.moves.containsKey(ABERTURA) && followUp(f) != null) return followUp(f);
                 if (c.moves.containsKey(ABERTURA) && f.grounded) return c.attack(ABERTURA);
                 if (projectileAlive || f.state.profile.energy == null) return null;
                 if (c.fighter.energyAir && f.grounded) return null;   // S1 só no ar (o p14)

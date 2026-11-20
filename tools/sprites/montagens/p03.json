@@ -819,7 +819,7 @@
     }
   },
   "garra_1": {
-    "_doc": "S1 Garra do tigre, 1º corte (S1A), no tempo do vídeo s1 (o dono, 20/11: \"tem q respeitar o tempo da animação\" e as marcas se formando no movimento): todos os quadros 11-26 a 42 ms (24 qps): arma (11-15), as marcas se formam no arco (16-18, o impacto no 16) e seguram (19-26; o vídeo segura até 34, igual); sem continuar, volta à guarda (14-8, o armar ao contrário). A continuação só sai no fim da pose segurada.",
+    "_doc": "S1 Garra do tigre, 1º corte (S1A), no tempo do vídeo s1 (o dono, 20/11: \"tem q respeitar o tempo da animação\" e as marcas se formando no movimento): todos os quadros 11-26 a 42 ms (24 qps): arma (11-15), as marcas se formam no arco (16-18, o impacto no 16) e seguram (19-34, a pose segurada inteira do vídeo: o tempo de apertar de novo com a marca na tela); sem continuar, volta à guarda (14-8, o armar ao contrário). A continuação só sai no fim da pose segurada.",
     "trechos": [
       [
         "s1",
@@ -827,7 +827,7 @@
         124
       ]
     ],
-    "quadros": "11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,14,12,10,8",
+    "quadros": "11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,14,12,10,8",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true,
@@ -858,13 +858,21 @@
           42,
           42,
           42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
           42
         ]
       }
     }
   },
   "garra_2": {
-    "_doc": "S1 Garra do tigre, 2º corte (SG), no tempo do vídeo s1: arma a mão de trás (35-37), o X se forma no corte cruzado (38-40, o impacto no 38) e pulsa (41-50); sem continuar, volta à guarda (58, 60, 94, 112). O X lançado só sai no fim do X pulsando.",
+    "_doc": "S1 Garra do tigre, 2º corte (SG), no tempo do vídeo s1: arma a mão de trás (35-37), o X se forma no corte cruzado (38-40, o impacto no 38) e pulsa (41-56, a pose segurada inteira do vídeo); sem continuar, volta à guarda (94, 112). O X lançado só sai no fim do X pulsando.",
     "trechos": [
       [
         "s1",
@@ -872,7 +880,7 @@
         124
       ]
     ],
-    "quadros": "35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,58,60,94,112",
+    "quadros": "35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,94,112",
     "opcoes": {
       "fixar": "video",
       "sem_poeira": true,
@@ -884,6 +892,10 @@
       "GARRA_2": {
         "impacto": 3,
         "tempos": [
+          42,
+          42,
+          42,
+          42,
           42,
           42,
           42,

@@ -121,6 +121,13 @@ O mesmo evento só volta depois de 8 s (os de prioridade 3 não esperam).
 | `vitoria` / `perfeito` | 3 | fim da luta (o vencedor sem perder vida) | `vencedor` |
 | `tempo_esgotado` / `empate` | 3 | fim pelo tempo / empate | `vencedor` |
 
+## Outras vozes (o Apostador)
+
+O `narrador.json` pode ter `"vozes"` (nome e cor de quem mais fala na faixa) e o evento diz quem
+fala com `"quem"`. A Semifinal usa isso para o Apostador (`aposta_*`, ver
+[aposta.md](aposta.md)); o retrato sai de `historia/retratos/<quem>_<expressao>.png`. Sem
+`"quem"`, fala o narrador. O nome na plaquinha é traduzido pelo idioma da temporada.
+
 ## Os retratos
 
 Os três rostos saem dos close-ups da coluna da direita do model sheet (de cima para baixo:

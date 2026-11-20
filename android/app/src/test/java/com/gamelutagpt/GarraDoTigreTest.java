@@ -101,8 +101,8 @@ public class GarraDoTigreTest {
      * fecha quando ele volta à guarda.
      */
     @Test public void aMarcaFicaEnquantoDaParaApertar() {
-        segura(CancelSystem.ABERTURA, 7, 15);
-        segura(CancelSystem.FOLLOW_UP, 5, 15);
+        segura(CancelSystem.ABERTURA, 7, 23);
+        segura(CancelSystem.FOLLOW_UP, 5, 21);
     }
 
     /** Do começo ao fim da janela, o desenho é a pose segurada (quadros {@code de} a {@code ate} do clipe). */
@@ -116,6 +116,65 @@ public class GarraDoTigreTest {
         }
         int depois = m.animation.frame(m.animationTime((a.whiffWindow.end + 4.5f) * CombatConfig.DT), 0f);
         assertTrue(id + ": fechada a janela, ele volta à guarda (" + depois + ")", depois > ate);
+    }
+
+    /**
+     * Um aperto só, no meio da janela (com a marca na tela), acertando ou no vazio: a próxima etapa
+     * sai na hora, sem ele voltar à guarda antes (o dono, 20/11: "a marca não pode sumir").
+     */
+    @Test public void umApertoNoMeioDaJanelaSaiNaHora() {
+        for (float gap : new float[] {150f, 600f}) {
+            CombatEngineTest.Sim s = luta(gap);
+            s.in[0].special = "M";
+            s.step();
+            s.in[0].special = null;
+            AttackDefinition abertura = KOGA.attack(CancelSystem.ABERTURA);
+            int meio = (abertura.whiffWindow.start + abertura.whiffWindow.end) / 2;
+            for (int t = 0; t < 120 && !(s.f(0).attacking() && s.f(0).attackFrame >= meio); t++) s.step();
+            assertEquals(CancelSystem.ABERTURA, s.f(0).attack.id);
+            s.in[0].light = true;
+            s.step();
+            s.in[0].light = false;
+            for (int t = 0; t < 3 && !CancelSystem.FOLLOW_UP.equals(s.f(0).attack.id); t++) s.step();
+            assertEquals("gap " + gap + ": o X saiu na hora", CancelSystem.FOLLOW_UP, s.f(0).attack.id);
+        }
+    }
+
+    /** O aperto lido como o comando de novo (↓↘→ + botão ainda no buffer, ou repetido) também emenda. */
+    @Test public void oComandoDeNovoTambemEmenda() {
+        CombatEngineTest.Sim s = luta(600f);
+        s.in[0].special = "M";
+        s.step();
+        s.in[0].special = null;
+        AttackDefinition abertura = KOGA.attack(CancelSystem.ABERTURA);
+        for (int t = 0; t < 120 && !(s.f(0).attacking() && s.f(0).attackFrame >= abertura.whiffWindow.start + 4); t++) s.step();
+        s.in[0].special = "L";
+        s.step();
+        s.in[0].special = null;
+        for (int t = 0; t < 3 && !CancelSystem.FOLLOW_UP.equals(s.f(0).attack.id); t++) s.step();
+        assertEquals("o X saiu", CancelSystem.FOLLOW_UP, s.f(0).attack.id);
+        AttackDefinition x = KOGA.attack(CancelSystem.FOLLOW_UP);
+        for (int t = 0; t < 120 && !(s.f(0).attackFrame >= x.whiffWindow.start + 4); t++) s.step();
+        s.in[0].special = "H";
+        s.step();
+        s.in[0].special = null;
+        for (int t = 0; t < 3 && !"S".equals(s.f(0).attack.id); t++) s.step();
+        assertEquals("o X lançado saiu", "S", s.f(0).attack.id);
+    }
+
+    /** Acertando, a marca também fica: o golpe não corta a recuperação nem volta seco à guarda. */
+    @Test public void acertandoAMarcaNaoSome() {
+        CombatEngineTest.Sim s = luta(150f);
+        s.in[0].special = "M";
+        s.step();
+        s.in[0].special = null;
+        boolean acertou = false;
+        for (int t = 0; t < 120 && s.f(0).attacking(); t++) {
+            s.step();
+            acertou |= s.f(0).outcome == CombatFighter.Outcome.HIT;
+            if (acertou) assertTrue("sem corte da recuperação", s.f(0).hitCutFrame < 0);
+        }
+        assertTrue("o 1º corte acertou", acertou);
     }
 
     /** De perto, os três acertam sem o rival sair do atordoamento. */
