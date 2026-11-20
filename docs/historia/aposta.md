@@ -12,27 +12,36 @@ cada dupla, e o dinheiro vai para quem dá show. Decidido pelo dono em 20/11:
 Código: `android/app/src/main/java/com/gamelutagpt/BolsaApostas.java` (Java puro, com o desenho
 da placa). Testes: `BolsaApostasTest` (app), `NarracaoTest` e `TorneioTest` (story-core).
 
+## A moeda: o kon
+
+O dinheiro do SOKON é o **kon** (de 魂, alma): o símbolo é um K anguloso cortado por dois traços,
+com uma chama no braço de cima (escolhido pelo dono em 20/11 entre quatro propostas do Codex,
+`art/hud/moeda/propostas_original.png`, a primeira). A fonte não tem o símbolo: no HUD ele é a
+imagem `ui/hud/moeda/kon_<cor>.png`, desenhada antes do número na cor dele
+(`python3 tools/hud/montar_moeda.py` gera as cores a partir de `art/hud/moeda/kon.png`). Nas
+falas, o valor vem por extenso: "1.250.000 kon".
+
 ## Como funciona
 
 | O que acontece | Quanto entra (antes da odd) | Para quem |
 |---|---|---|
-| Dano que entra | ¥ 40 por ponto de dano | quem bateu |
-| Primeiro golpe da luta | + ¥ 80.000 | quem bateu |
-| Contra-golpe | + ¥ 40.000 | quem bateu |
-| Combo de 5+ / 10+ acertos | ¥ 15.000 / ¥ 30.000 por acerto | quem fez o combo |
-| Defesa perfeita | ¥ 60.000 | quem defendeu |
-| Guard break | ¥ 120.000 | quem quebrou |
-| Combo breaker | ¥ 150.000 | quem quebrou |
-| K.O. de um lutador | ¥ 300.000 | quem derrubou |
-| Super | ¥ 200.000 | quem soltou |
-| SHINKAI | ¥ 250.000 | quem ligou |
-| Ultra / Ultra SHINKAI | ¥ 450.000 / ¥ 900.000 | quem soltou |
+| Dano que entra | 40 kon por ponto de dano | quem bateu |
+| Primeiro golpe da luta | + 80.000 kon | quem bateu |
+| Contra-golpe | + 40.000 kon | quem bateu |
+| Combo de 5+ / 10+ acertos | 15.000 kon / 30.000 kon por acerto | quem fez o combo |
+| Defesa perfeita | 60.000 kon | quem defendeu |
+| Guard break | 120.000 kon | quem quebrou |
+| Combo breaker | 150.000 kon | quem quebrou |
+| K.O. de um lutador | 300.000 kon | quem derrubou |
+| Super | 200.000 kon | quem soltou |
+| SHINKAI | 250.000 kon | quem ligou |
+| Ultra / Ultra SHINKAI | 450.000 kon / 900.000 kon | quem soltou |
 
-- **Abertura**: ¥ 500.000 em cada dupla, odds iguais.
+- **Abertura**: 500.000 kon em cada dupla, odds iguais.
 - **Odds**: 60% pela vida das duplas e 40% pelo dinheiro de cada uma, com a margem da casa
   (`odd = 0,92 / favoritismo`, de x1.05 a x9.9). O ganho é multiplicado por `odd / 1,84`
   (entre 0,6 e 3): **a zebra ganha mais pelo mesmo golpe** e a virada rende muito.
-- **Patamar**: a cada ¥ 750.000 acima do maior valor que a dupla já teve, o titular ganha
+- **Patamar**: a cada 750.000 kon acima do maior valor que a dupla já teve, o titular ganha
   **¼ de barra de Super** e aparece `+SUPER` do lado dela. O Apostador comenta.
 - **Esfriar**: o titular que fica **3 s sem atacar** (parado, recuando ou só defendendo) esfria
   (o valor fica azul, `ESFRIANDO`); com **5 s** os apostadores tiram **6% do dinheiro por

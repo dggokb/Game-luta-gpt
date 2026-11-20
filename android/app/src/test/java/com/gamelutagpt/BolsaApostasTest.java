@@ -132,7 +132,7 @@ public class BolsaApostasTest {
         assertEquals(barra + BolsaApostas.SUPER_DO_PATAMAR, l.p1[0].superMeter);
         assertTrue(l.eventos.contains("aposta_patamar"));
         assertEquals("Ryūga", l.de("aposta_patamar").get("nome"));
-        assertTrue(l.de("aposta_patamar").get("valor").startsWith("¥ "));
+        assertTrue("o valor na fala vem em kon", l.de("aposta_patamar").get("valor").endsWith(" kon"));
         // Abaixo do próximo patamar: nada a mais.
         l.bolsa.ganhar(l.engine, 0, BolsaApostas.PATAMAR / 10, l.voz);
         assertEquals(1, l.bolsa.patamares(0));
@@ -173,9 +173,10 @@ public class BolsaApostasTest {
     }
 
     @Test public void moneyAndOddsAreWrittenTheWayTheHudShowsThem() {
-        assertEquals("¥ 1.250.000", BolsaApostas.formatar(1_250_000L));
-        assertEquals("¥ 500", BolsaApostas.formatar(500L));
-        assertEquals("¥ 0", BolsaApostas.formatar(-3L));
+        assertEquals("1.250.000", BolsaApostas.formatar(1_250_000L));
+        assertEquals("500", BolsaApostas.formatar(500L));
+        assertEquals("0", BolsaApostas.formatar(-3L));
+        assertEquals("1.250.000 kon", BolsaApostas.formatarFala(1_250_000L));
         assertEquals("x2.4", BolsaApostas.formatarOdd(2.43));
         assertEquals("x1.0", BolsaApostas.formatarOdd(1.0));
     }

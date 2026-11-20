@@ -32,7 +32,7 @@ import java.util.Map;
 final class BolsaApostas {
     /** A aposta de abertura em cada dupla (odds iguais). */
     static final long INICIAL = 500_000L;
-    /** ¥ por ponto de dano que entra (a vida de um lutador fica perto de 10.000). */
+    /** Kon por ponto de dano que entra (a vida de um lutador fica perto de 10.000). */
     static final long POR_DANO = 40L;
     static final long PRIMEIRO_GOLPE = 80_000L, CONTRA_GOLPE = 40_000L;
     /** Combo fechado: por acerto, a partir de {@link NarradorLuta#COMBO} e de {@link NarradorLuta#COMBO_GRANDE}. */
@@ -70,7 +70,7 @@ final class BolsaApostas {
     /** Quadros sem atacar do titular de cada lado. */
     private final int[] quieto = new int[2];
     private final boolean[] avisouEsfriando = new boolean[2], avisouCaindo = new boolean[2];
-    /** O último ganho de cada lado (para o "+¥" no HUD) e há quantos quadros. */
+    /** Quadros desde o último patamar de cada lado. */
     private final int[] patamarIdade = {999, 999};
     private int favorita = -1;
 
@@ -116,7 +116,7 @@ final class BolsaApostas {
 
     long dinheiro(int side) { return dinheiro[side]; }
 
-    /** A odd da dupla (quanto paga cada ¥ apostado nela). */
+    /** A odd da dupla (quanto paga cada kon apostado nela). */
     double odd(int side) { return odd[side]; }
 
     /** A parte da bolsa que é desta dupla (0 a 1), para a barra. */
@@ -305,7 +305,7 @@ final class BolsaApostas {
         patamarIdade[side] = 0;
         // A barra sobe quando a moeda chega nela (o rastro leva o olho até lá).
         voar(side, SUPER_DO_PATAMAR * novos);
-        voz.narrar("aposta_patamar", vars("nome", nome(engine, side), "valor", formatar(dinheiro[side])));
+        voz.narrar("aposta_patamar", vars("nome", nome(engine, side), "valor", formatarFala(dinheiro[side])));
         return true;
     }
 
@@ -355,7 +355,18 @@ final class BolsaApostas {
         return m;
     }
 
-    /** "¥ 1.250.000". */
+    /**
+     * A moeda do SOKON, o kon (o K com a chama; o símbolo é a imagem ui/hud/moeda/kon_*.png,
+     * desenhada antes do número: a fonte não tem ele).
+     */
+    static final String NOME_MOEDA = "kon";
+
+    /** "1.250.000 kon": o valor nas falas (texto, sem o símbolo). */
+    static String formatarFala(long valor) {
+        return formatar(valor) + " " + NOME_MOEDA;
+    }
+
+    /** "1.250.000": o número; no HUD o símbolo do kon vem antes, como imagem. */
     static String formatar(long valor) {
         String n = Long.toString(Math.max(0L, valor));
         StringBuilder out = new StringBuilder();
@@ -363,7 +374,7 @@ final class BolsaApostas {
             if (i > 0 && (n.length() - i) % 3 == 0) out.append('.');
             out.append(n.charAt(i));
         }
-        return "¥ " + out;
+        return out.toString();
     }
 
     /** "x2.4". */
@@ -392,6 +403,8 @@ final class BolsaApostas {
     private static final int AZUL_LUZ = 0xFF6FC3FF, VERMELHO_LUZ = 0xFFFF6A6A, SOBE = 0xFF4CE07A;
     private static final String[] PECAS = {"letreiro", "faixa", "rastro", "chegada", "moeda_luz"};
     private static final String[] ROSTOS = {"normal", "empolgado", "gargalhada"};
+    /** As cores do símbolo do kon (tools/hud/montar_moeda.py), uma por cor de número. */
+    private static final String[] CORES_KON = {"branco", "azul", "vermelho", "frio", "cai", "ouro"};
 
     private final Map<String, com.gamelutagpt.render.RenderImage> arte = new HashMap<>();
     private boolean carregada;
@@ -430,6 +443,7 @@ final class BolsaApostas {
                 oddCaixa[s] = numeros(((java.util.List<?>)m.get("odd")).get(s));
             }
             for (String p : PECAS) arte.put(p, assets.loadImage(PASTA + p + ".png"));
+            for (String cor : CORES_KON) arte.put("kon_" + cor, assets.loadImage("ui/hud/moeda/kon_" + cor + ".png"));
             for (String r : ROSTOS) {
                 arte.put("rosto_" + r, assets.loadImage("historia/retratos/apostador_" + r + ".png"));
             }
@@ -622,16 +636,27 @@ final class BolsaApostas {
             float k = Math.min(1f, (quieto[lado] - ESFRIA) / 40f);
             c.fillRect(d[0] + 6f, d[1] + 4f, d[2] - 6f, d[3] - 4f, ((int)(0x50 * k) << 24) | 0x7FD8FF);
         }
-        int cor = caindo(lado) ? (((int)(tempo * 4f)) % 2 == 0 ? CAI_COR : 0xFFFFFFFF) : frio ? FRIO
-            : lado == 0 ? AZUL_LUZ : VERMELHO_LUZ;
+        boolean pisca = caindo(lado) && ((int)(tempo * 4f)) % 2 == 0;
+        int cor = caindo(lado) ? (pisca ? CAI_COR : 0xFFFFFFFF) : frio ? FRIO : lado == 0 ? AZUL_LUZ : VERMELHO_LUZ;
+        String corKon = caindo(lado) ? (pisca ? "cai" : "branco") : frio ? "frio" : lado == 0 ? "azul" : "vermelho";
         float tam = (d[3] - d[1]) * 0.66f;
-        float cx = (d[0] + d[2]) * 0.5f - 8f, base = d[3] - (d[3] - d[1] - tam * 0.72f) * 0.5f;
+        float base = d[3] - (d[3] - d[1] - tam * 0.72f) * 0.5f;
         String valor = formatar(Math.round(mostrado[lado] / 1000.0) * 1000L);
+        // O símbolo do kon antes do número, os dois centrados juntos na placa.
+        com.gamelutagpt.render.RenderImage kon = arte.get("kon_" + corKon);
+        float konAlto = tam * 1.12f, konLargo = kon != null ? konAlto * kon.width() / kon.height() : 0f;
+        float largoTexto = c.measureText(valor, tam, false), vao = tam * 0.12f;
+        float inicio = (d[0] + d[2]) * 0.5f - 8f - (konLargo + vao + largoTexto) * 0.5f;
+        if (kon != null) {
+            float ky = base - tam * 0.72f * 0.5f - konAlto * 0.5f;
+            c.drawImage(kon, inicio, ky, inicio + konLargo, ky + konAlto, 255);
+        }
+        float cx = inicio + konLargo + vao + largoTexto * 0.5f;
         // Um halo da cor do time atrás dos dígitos (o letreiro de LED).
         c.drawText(valor, cx, base, tam, cor, (cor & 0xFFFFFF) | 0x40000000, 9f, false);
         c.drawText(valor, cx, base, tam, cor, INK, 3.5f, false);
         // A seta: verde subindo (logo depois de ganhar), vermelha caindo (perdendo aposta).
-        float sx = cx + c.measureText(valor, tam, false) * 0.5f + 16f, sy = (d[1] + d[3]) * 0.5f;
+        float sx = cx + largoTexto * 0.5f + 16f, sy = (d[1] + d[3]) * 0.5f;
         if (caindo(lado)) {
             c.fillPolygon(new float[] {sx - 8f, sy - 6f, sx + 8f, sy - 6f, sx, sy + 8f}, CAI_COR);
         } else if (subiuIdade[lado] < 90) {
@@ -751,7 +776,7 @@ final class BolsaApostas {
         float l = CENTRO_TELA - 165f, r = CENTRO_TELA + 165f, t = 720f - 52f, b = 720f;
         c.fillPolygon(new float[] {l + 10f, t, r - 10f, t, r, b, l, b}, 0xE0101420);
         for (int s = 0; s < 2; s++) {
-            String valor = formatar(dinheiro[s]);
+            String valor = formatarFala(dinheiro[s]);
             float w = c.measureText(valor, 15f, false);
             float cx = s == 0 ? l + 16f + w * 0.5f : r - 16f - w * 0.5f;
             c.drawText(valor, cx, t + 20f, 15f, caindo(s) ? CAI_COR : quieto[s] >= ESFRIA ? FRIO : 0xFFFFFFFF, INK, 2.5f, false);
