@@ -3701,9 +3701,9 @@ public class GameView extends SurfaceView
                 // Saída do super pulo: anel de choque e poeira nos pés, na cor do lutador.
                 float sx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
                 // A fumaça desenhada pelo dono (art/vfx/super_pulo_v01), quando existe.
-                String fumaca = FUMACA_SOKON && efeitos.tem("fumaca_pulo_s1") ? "fumaca_pulo_s1"
+                String fumaca = FUMACA_SOKON && efeitos.tem("fumaca_pulo_s4") ? "fumaca_pulo_s4"
                     : efeitos.tem("super_pulo_v01") ? "super_pulo_v01" : "super_pulo";
-                if (fumaca.equals("fumaca_pulo_s1") && efeitos.tocar(fumaca, sx, GROUND_Y, 1.4f, f.facing < 0)) {
+                if (fumaca.equals("fumaca_pulo_s4") && efeitos.tocar(fumaca, sx, GROUND_Y, 1.2f, f.facing < 0)) {
                     efeitos.atrasDosLutadores();
                     fumaca = null;
                 }
@@ -6036,7 +6036,7 @@ public class GameView extends SurfaceView
         // A fumaça de queda desenhada pelo dono (art/vfx/fumaca_queda_v01: uma nuvem de cada lado
         // dos pés, com o meio aberto para não cobrir o lutador), quando existe.
         boolean queda = efeitos.tem(FUMACA_QUEDA);
-        if (pose.poeira > 0f && FUMACA_SOKON && efeitos.tocar("fumaca_pouso_s1", x, GROUND_Y, 0.8f + 0.4f * pose.poeira, false)) {
+        if (pose.poeira > 0f && FUMACA_SOKON && efeitos.tocar("fumaca_pouso_s4", x, GROUND_Y, 0.8f + 0.4f * pose.poeira, false)) {
             efeitos.atrasDosLutadores();
             pose.poeira = 0f;
         }
@@ -6051,10 +6051,10 @@ public class GameView extends SurfaceView
             boolean largada = f.forwardDashing || f.backdashFrames > 0;
             // A fumaça desenhada pelo dono (art/vfx/fumaca_dash_v04), quando existe; senão a de antes.
             String fumaca = efeitos.tem("fumaca_dash_v05") ? "fumaca_dash_v05" : efeitos.tem("fumaca_dash_v04") ? "fumaca_dash_v04" : "poeira_corrida";
-            if (FUMACA_SOKON && efeitos.tem("fumaca_corrida_s1")) {
+            if (FUMACA_SOKON && efeitos.tem("fumaca_corrida_s4")) {
                 // As fumaças do Sōkon FX: o arranque solta a nuvem para trás, a freada solta a dos pés
                 // deslizando para a frente (antes a freada ficava sem).
-                if (efeitos.tocar(largada ? "fumaca_corrida_s1" : "fumaca_freada_s1",
+                if (efeitos.tocar(largada ? "fumaca_corrida_s4" : "fumaca_freada_s4",
                         x - (largada ? d * 20f : -d * 10f), GROUND_Y, 1f, d < 0)) {
                     efeitos.atrasDosLutadores();
                     pose.deslize = 0;
@@ -6309,7 +6309,7 @@ public class GameView extends SurfaceView
     private void efeitosDeMovimento(int i, CombatFighter f) {
         float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
-            if (FUMACA_SOKON && efeitos.tocar("fumaca_pulo_s1", x, GROUND_Y, 1f, f.facing < 0)) {
+            if (FUMACA_SOKON && efeitos.tocar("fumaca_pulo_s4", x, GROUND_Y, 1f, f.facing < 0)) {
                 efeitos.atrasDosLutadores();
             // Teste do dono (11/11): a fumaça do super pulo, menor, também no pulo comum.
             } else if (efeitos.tocar("super_pulo_v01", x - f.facing * PULO_FUMACA_ATRAS, GROUND_Y, PULO_COMUM_ESCALA, f.facing < 0)) {
@@ -6323,7 +6323,7 @@ public class GameView extends SurfaceView
         if (f.status == CombatFighter.Status.KNOCKDOWN) {
             int t = f.knockdownFrame - engine.config.knockdownFallFrames;
             fase = t < 0 ? 0 : t < engine.config.knockdownBounceFrames ? 1 : 2;
-            if (fase > quiqueFase[i] && FUMACA_SOKON && efeitos.tocar("fumaca_queda_s1", x, GROUND_Y, fase == 1 ? 1f : 0.7f, false)) {
+            if (fase > quiqueFase[i] && FUMACA_SOKON && efeitos.tocar("fumaca_queda_s4", x, GROUND_Y, fase == 1 ? 1f : 0.7f, false)) {
                 efeitos.atrasDosLutadores();
             } else if (fase > quiqueFase[i] && !efeitos.tocar(FUMACA_QUEDA, x, GROUND_Y, fase == 1 ? 1.1f : 0.8f, false)) {
                 efeitos.tocar("fumaca_pulo", x, GROUND_Y, fase == 1 ? 1.1f : 0.7f, false);
