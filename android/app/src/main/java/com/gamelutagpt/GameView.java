@@ -6320,7 +6320,9 @@ public class GameView extends SurfaceView
     }
 
     static final int REACAO_TRONCO = 0, REACAO_ROSTO = 1, REACAO_FORTE = 2;
-    private static final String[] REACAO_EM_PE = {SpriteStates.HIT_BODY, SpriteStates.HIT_HIGH, SpriteStates.HIT_HEAVY};
+    // Tronco e forte voltam para a HIT_STAND (o dono, 21/11: as reações de corpo e forte do
+    // Ryūga ficaram ruins). Os desenhos HIT_BODY/HIT_HEAVY ficam só para a cena da história.
+    private static final String[] REACAO_EM_PE = {SpriteStates.HIT_STAND, SpriteStates.HIT_HIGH, SpriteStates.HIT_STAND};
     private final int[] reacao = new int[2];
 
     /**

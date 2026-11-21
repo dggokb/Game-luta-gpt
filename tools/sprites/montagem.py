@@ -18,9 +18,10 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
       "animacoes": {"SPECIAL_S4": {"frames": "0-12,12-0", "impacto": 6}}
     }
 
-- trechos: [vídeo sem .mp4, primeiro quadro, fim exclusivo]; {"dx": N} desloca o trecho N px do vídeo. Cada vídeo de complemento
+- trechos: [vídeo sem .mp4, primeiro quadro, fim exclusivo]; {"dx": N} desloca o trecho N px do vídeo ({"dx": N, "rampa": true}: aos poucos, de 0 a N). Cada vídeo de complemento
   começa no último quadro do anterior (o quadro final de um é o inicial do outro no Flow),
-  então os trechos colados formam um vídeo contínuo, na mesma câmera. "fixo_corpo" é o "fixo"
+  então os trechos colados formam um vídeo contínuo, na mesma câmera. "fixo_quadro" prende o tronco em cada quadro
+  (não só a velocidade média: a corrida e o salto do dashH do Kōga). "fixo_corpo" é o "fixo"
   medindo o corpo escuro, sem a fumaça branca do vídeo (a investida do p13). "fixo" anula o
   deslocamento lateral do trecho (a voadora atravessa a tela; quem anda no jogo é o motor,
   com o avanço do golpe) e os trechos seguintes ficam no mesmo lugar; "emenda" (trecho que pula quadros do vídeo) começa com
@@ -126,23 +127,37 @@ def glue(folder, trechos):
             # Trecho que não continua o anterior (pulou quadros do vídeo): começa com o corpo
             # onde o anterior terminou.
             offset = int(round(body_x(frames[-1]) - body_x(part[0])))
+        rampa = 0
         for extra in item[3:]:
-            if isinstance(extra, dict) and 'dx' in extra:
+            if isinstance(extra, dict) and extra.get('rampa'):
+                # {"dx": N, "rampa": true}: o deslocamento entra aos poucos, de 0 no 1º quadro a N
+                # no último (o pouso da voadora do Kōga recua até a distância dos socos, 21/11).
+                rampa = int(extra['dx'])
+            elif isinstance(extra, dict) and 'dx' in extra:
                 # Desloca o trecho (px do vídeo): os socos do S3 do Kōga, que o vídeo desenha atrás
                 # da raiz (o punho não chegava no rival). Com "alinha" no trecho seguinte, a volta à
                 # guarda leva o corpo de volta à raiz aos poucos.
                 offset += int(extra['dx'])
-        if 'fixo' in item[3:] or 'fixo_corpo' in item[3:]:
+        if 'fixo' in item[3:] or 'fixo_corpo' in item[3:]:  # (fixo_quadro: abaixo)
             xs = np.array([body_x(f) if 'fixo_corpo' in item[3:] else torso_x(key(f)) for f in part])
             t = np.arange(len(xs))
             trend = np.polyval(np.polyfit(t, xs, 1), t)
             moves = [int(round(offset - (v - trend[0]))) for v in trend]
+        elif 'fixo_quadro' in item[3:]:
+            # O tronco preso quadro a quadro (mediana de 5 contra o tremor da medida): o "fixo"
+            # tira uma velocidade constante, e no dashH do Kōga a corrida rápida e a voadora quase
+            # parada no ar faziam o desenho voltar 180 px na decolagem (21/11).
+            xs = np.array([torso_x(key(f)) for f in part])
+            sm = np.array([np.median(xs[max(0, i - 2):i + 3]) for i in range(len(xs))])
+            moves = [int(round(offset - (v - sm[0]))) for v in sm]
         elif 'alinha' in item[3:]:
             # Termina com o tronco onde o vídeo colado começou (a guarda volta ao lugar da raiz).
             end = start - (torso_x(key(part[-1])) + offset)
             moves = [int(round(offset + end * i / max(1, len(part) - 1))) for i in range(len(part))]
         else:
             moves = [offset] * len(part)
+        if rampa:
+            moves = [int(round(m + rampa * i / max(1, len(moves) - 1))) for i, m in enumerate(moves)]
         frames += [shift(f, m) for f, m in zip(part, moves)]
         offset = moves[-1]
     return frames
@@ -159,7 +174,7 @@ def write_video(frames, path):
 def source(char, folder, name, spec):
     """O vídeo de onde o clipe sai: o próprio arquivo ou o colado."""
     trechos = spec['trechos']
-    if len(trechos) == 1 and not {'fixo', 'fixo_corpo'} & set(trechos[0][3:]):
+    if len(trechos) == 1 and not {'fixo', 'fixo_corpo', 'fixo_quadro'} & set(trechos[0][3:]):
         video, a, _ = trechos[0][:3]
         return str(Path(folder) / f'{video}.mp4'), a
     path = OUT / f'{char}_{name}.mp4'

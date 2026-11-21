@@ -23,8 +23,8 @@ Cada estado é uma animação do personagem (`SpriteStates`). Sem o clipe própr
 | Estado | Quando | Pose | Sem o clipe |
 |---|---|---|---|
 | `HIT_HIGH` | Em pé, golpe fraco ou médio que pega acima de 72% da altura de quem apanha | Cabeça joga para trás, queixo para cima, olhos fechados | `HIT_STAND` (Ryūga: já tem) |
-| `HIT_BODY` | Em pé, golpe fraco ou médio que pega abaixo disso | Dobra o tronco, braços sobre a barriga | `HIT_STAND` (Ryūga: já tem) |
-| `HIT_HEAVY` | Em pé, golpe forte, especial, Super ou Ultra | O corpo inteiro vai para trás em arco, um pé sai do chão | `HIT_STAND` (Ryūga: já tem) |
+| `HIT_BODY` | Em pé, golpe fraco ou médio que pega abaixo disso | Dobra o tronco, braços sobre a barriga | `HIT_STAND` (21/11: fora da luta, o dono achou ruim; a luta usa `HIT_STAND`) |
+| `HIT_HEAVY` | Em pé, golpe forte, especial, Super ou Ultra | O corpo inteiro vai para trás em arco, um pé sai do chão | `HIT_STAND` (21/11: fora da luta, o dono achou ruim; a luta usa `HIT_STAND`) |
 | `HIT_CROUCH` | Agachado, qualquer golpe | Encolhe agachado | (já existe) |
 | `HIT_AIR` | No ar, lançado, quique no chão ou na parede | Corpo arqueado para trás no ar | (já existe) |
 | `KNOCKDOWN` / `GROUNDED` / `GETUP` | Queda (rasteira, golpe que derruba, fim de combo no ar) | Cai de costas, fica no chão, levanta | (já existem) |
