@@ -1,16 +1,16 @@
 {
   "id": "p03_fall_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_fall_down_sr_hd.png",
+  "source": "art/sprites/source/p03_fall_down_video_normalized.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Derrubado: queda (0-6) e no chao (7-10); pes na raiz, cada quadro no proprio tronco; poeira recortada.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 1024,
-    "frameHeight": 640,
-    "rootX": 512,
-    "rootY": 600,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 334,
+    "rootY": 476,
     "columns": 6,
     "frameCount": 11
   },
@@ -18,233 +18,233 @@
     {
       "index": 0,
       "outputBbox": [
-        351,
-        206,
-        789,
-        602
+        44,
+        78,
+        467,
+        478
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 64521
+      "minimumMargin": 34,
+      "opaquePixels": 59722
     },
     {
       "index": 1,
       "outputBbox": [
-        346,
-        214,
-        796,
-        602
+        68,
+        102,
+        503,
+        477
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 65067
+      "minimumMargin": 35,
+      "opaquePixels": 60353
     },
     {
       "index": 2,
       "outputBbox": [
-        344,
-        219,
-        800,
-        603
+        86,
+        147,
+        528,
+        477
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 65533
+      "minimumMargin": 35,
+      "opaquePixels": 59726
     },
     {
       "index": 3,
       "outputBbox": [
-        341,
-        230,
-        805,
-        602
+        95,
+        175,
+        554,
+        478
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 65735
+      "minimumMargin": 34,
+      "opaquePixels": 59281
     },
     {
       "index": 4,
       "outputBbox": [
-        347,
-        339,
-        841,
-        602
+        93,
+        228,
+        559,
+        478
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 59605
+      "minimumMargin": 34,
+      "opaquePixels": 58908
     },
     {
       "index": 5,
       "outputBbox": [
-        257,
-        219,
-        606,
-        603
+        73,
+        155,
+        492,
+        478
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 57653
+      "minimumMargin": 34,
+      "opaquePixels": 53859
     },
     {
       "index": 6,
       "outputBbox": [
-        416,
-        275,
-        774,
-        602
+        83,
+        211,
+        571,
+        477
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 53261
+      "minimumMargin": 35,
+      "opaquePixels": 55712
     },
     {
       "index": 7,
       "outputBbox": [
-        386,
-        244,
-        793,
-        603
+        84,
+        232,
+        578,
+        477
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 58259
+      "minimumMargin": 35,
+      "opaquePixels": 56731
     },
     {
       "index": 8,
       "outputBbox": [
-        386,
-        244,
-        793,
-        603
+        73,
+        290,
+        584,
+        477
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 58167
+      "minimumMargin": 35,
+      "opaquePixels": 49697
     },
     {
       "index": 9,
       "outputBbox": [
-        390,
-        253,
-        796,
-        603
+        71,
+        340,
+        594,
+        478
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 57482
+      "minimumMargin": 34,
+      "opaquePixels": 48040
     },
     {
       "index": 10,
       "outputBbox": [
-        369,
-        326,
-        785,
-        601
+        71,
+        339,
+        594,
+        478
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 52831
+      "minimumMargin": 34,
+      "opaquePixels": 48039
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 610,
-    "frameHeight": 421,
-    "rootX": 268,
+    "frameWidth": 566,
+    "frameHeight": 416,
+    "rootX": 298,
     "rootY": 406,
     "columns": 6,
     "frameCount": 11,
     "cropOffset": [
-      244,
-      194
+      36,
+      70
     ],
-    "sheetWidth": 1780,
-    "sheetHeight": 1156,
+    "sheetWidth": 532,
+    "sheetHeight": 3100,
     "frames": [
       [
         0,
         0,
-        456,
-        412,
-        98,
+        432,
+        408,
+        4,
         4
       ],
       [
-        460,
         0,
-        468,
-        404,
-        93,
-        12
-      ],
-      [
-        932,
-        0,
-        476,
-        400,
-        91,
-        17
+        412,
+        444,
+        384,
+        28,
+        28
       ],
       [
         0,
-        416,
-        484,
-        392,
-        89,
-        27
-      ],
-      [
-        820,
-        812,
-        512,
-        280,
-        95,
-        137
-      ],
-      [
-        1412,
-        0,
-        368,
-        400,
-        4,
-        17
-      ],
-      [
-        0,
-        812,
-        376,
-        344,
-        163,
+        800,
+        452,
+        340,
+        46,
         73
       ],
       [
-        488,
-        416,
-        424,
-        376,
-        134,
-        41
+        0,
+        1480,
+        468,
+        312,
+        55,
+        101
       ],
       [
-        916,
-        416,
-        424,
-        376,
-        134,
-        41
+        0,
+        2076,
+        476,
+        260,
+        53,
+        154
       ],
       [
-        1344,
-        416,
-        424,
-        368,
-        138,
-        52
+        0,
+        1144,
+        428,
+        332,
+        33,
+        81
       ],
       [
-        380,
-        812,
-        436,
-        292,
-        116,
-        124
+        0,
+        1796,
+        496,
+        276,
+        43,
+        137
+      ],
+      [
+        0,
+        2340,
+        504,
+        256,
+        44,
+        158
+      ],
+      [
+        0,
+        2600,
+        520,
+        196,
+        33,
+        216
+      ],
+      [
+        0,
+        2800,
+        532,
+        148,
+        31,
+        266
+      ],
+      [
+        0,
+        2952,
+        532,
+        148,
+        31,
+        265
       ]
     ],
     "decodedBytes": {
-      "canonical": 31457280,
-      "grid": 12326880,
-      "packed": 8230720
+      "canonical": 15728640,
+      "grid": 11301888,
+      "packed": 6596800
     },
     "pixelScale": 2.0
   },
@@ -252,12 +252,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1d52d0f982d6482706926710b7c5290d4080f41c941bf63c0d997a8e8bb5444e",
-      "config": "7ad77905e8e0f458eda77a3620e25685402f0667396fef20129aeaeb09c3cb92",
+      "source": "5dc31f76e8b321216c43d3d27f0b1b46c36b469733282e507fa03a854970fda9",
+      "config": "008be46858a1ac869ecb7050342f5e1ba3b467c24a581b5ed1b253c7a1ef194d",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
-    },
-    "referenceSources": {
-      "art/sprites/source/p03_fall_down_video_normalized.png": "d24764cd165ea8107477eaccede5f6150eb0879f142f1963662bb119d3a8487f"
     }
   }
 }

@@ -348,6 +348,33 @@ POSTURAS = ('IDLE', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH_IDLE', 'CROUCH', 'JUMP'
             'HIT_STAND', 'HIT_CROUCH', 'HIT_AIR', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'DEFENSE_AIR')
 
 
+# Apanhando, o corpo não foge da pancada (21/11, as reações novas do Kōga): o desenho recua a
+# cabeça e o tronco, e a caixa medida nele recuava junto (até 45 px): o H da p07 depois do L e do M
+# e a 4ª pancada do Super da Natisuko passavam a errar. A frente de cada faixa fica, no mínimo,
+# onde está na guarda (a mediana da postura de referência); o desenho não muda.
+GUARDA_DA_REACAO = {'HIT_STAND': 'IDLE', 'HIT_AIR': 'IDLE', 'HIT_CROUCH': 'CROUCH_IDLE'}
+
+
+def frente_da_guarda(pack, nome):
+    """A frente (x1) de cada faixa na guarda de referência da reação, ou None."""
+    ref = pack['animations'].get(GUARDA_DA_REACAO.get(nome, ''), {}).get('silhueta', {}).get('corpo')
+    if not ref:
+        return None
+    faixas_ref = [c for c in ref.values() if len(c) == FAIXAS]
+    if not faixas_ref:
+        return None
+    return [float(np.median([c[j][1] for c in faixas_ref])) for j in range(FAIXAS)]
+
+
+def reacao_nao_foge(pack, nome, corpo):
+    """Leva a frente das faixas de uma reação até a da guarda (só onde o desenho recuou)."""
+    frente = frente_da_guarda(pack, nome)
+    if not frente:
+        return corpo
+    return {q: [[c[0], max(c[1], round(frente[j])), c[2], c[3]] if j < len(frente) else c
+                for j, c in enumerate(cs)] for q, cs in corpo.items()}
+
+
 def silhuetas(pack):
     """Caixas de cada quadro do desenho: nos golpes o corpo (faixas) e o membro que bate; nas
     posturas só o corpo."""
@@ -378,6 +405,8 @@ def silhuetas(pack):
             # O jogo mostra o agachar reduzido em volta da raiz: as caixas encolhem junto.
             k = escala[min(len(a['frames']) - 1, len(escala) - 1)]
             corpo = {q: [[round(v * k) for v in c] for c in cs] for q, cs in corpo.items()}
+        if nome in GUARDA_DA_REACAO:
+            corpo = reacao_nao_foge(pack, nome, corpo)
         a['silhueta'] = {'corpo': corpo, 'golpe': {}}
 
 

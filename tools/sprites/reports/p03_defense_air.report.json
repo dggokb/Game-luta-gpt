@@ -1,155 +1,307 @@
 {
   "id": "p03_defense_air",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_defense_air_sr_hd.png",
+  "source": "art/sprites/source/p03_defense_air_video_normalized.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa no ar; pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 640,
+    "frameWidth": 320,
     "frameHeight": 640,
-    "rootX": 280,
-    "rootY": 600,
-    "columns": 6,
-    "frameCount": 6
+    "rootX": 172,
+    "rootY": 604,
+    "columns": 11,
+    "frameCount": 14
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        131,
-        111,
-        408,
-        603
+        54,
+        110,
+        285,
+        606
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 58818
+      "minimumMargin": 34,
+      "opaquePixels": 59547
     },
     {
       "index": 1,
       "outputBbox": [
-        129,
-        111,
-        412,
-        603
+        48,
+        162,
+        290,
+        605
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 58982
+      "minimumMargin": 30,
+      "opaquePixels": 61611
     },
     {
       "index": 2,
       "outputBbox": [
-        124,
-        111,
-        418,
-        603
+        57,
+        123,
+        285,
+        605
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 59150
+      "minimumMargin": 35,
+      "opaquePixels": 59551
     },
     {
       "index": 3,
       "outputBbox": [
-        124,
-        111,
-        414,
-        603
+        70,
+        91,
+        281,
+        606
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 59184
+      "minimumMargin": 34,
+      "opaquePixels": 57994
     },
     {
       "index": 4,
       "outputBbox": [
-        124,
-        110,
-        414,
-        604
+        66,
+        95,
+        282,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 59357
+      "minimumMargin": 35,
+      "opaquePixels": 58139
     },
     {
       "index": 5,
       "outputBbox": [
-        131,
-        107,
-        412,
-        603
+        66,
+        95,
+        282,
+        605
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 59675
+      "minimumMargin": 35,
+      "opaquePixels": 58260
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        58,
+        104,
+        284,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 59475
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        57,
+        108,
+        285,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 59914
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        54,
+        110,
+        285,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 59494
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        49,
+        113,
+        286,
+        605
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 59583
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        45,
+        113,
+        286,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 59474
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        40,
+        113,
+        286,
+        606
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 59481
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        36,
+        113,
+        287,
+        606
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 59423
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        30,
+        112,
+        287,
+        606
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 59385
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 318,
-    "frameHeight": 522,
-    "rootX": 168,
-    "rootY": 505,
-    "columns": 6,
-    "frameCount": 6,
+    "frameWidth": 276,
+    "frameHeight": 531,
+    "rootX": 150,
+    "rootY": 521,
+    "columns": 11,
+    "frameCount": 14,
     "cropOffset": [
-      112,
-      95
+      22,
+      83
     ],
-    "sheetWidth": 620,
-    "sheetHeight": 1548,
+    "sheetWidth": 1796,
+    "sheetHeight": 1032,
     "frames": [
       [
-        304,
+        1160,
         0,
-        296,
-        512,
-        10,
+        240,
+        504,
+        28,
+        23
+      ],
+      [
+        1544,
+        528,
+        252,
+        452,
+        22,
+        75
+      ],
+      [
+        1304,
+        528,
+        236,
+        492,
+        31,
+        36
+      ],
+      [
+        0,
+        0,
+        220,
+        524,
+        44,
+        4
+      ],
+      [
+        224,
+        0,
+        224,
+        520,
+        40,
         8
       ],
       [
+        452,
         0,
+        224,
         520,
-        300,
-        512,
-        8,
-        7
+        40,
+        8
       ],
       [
-        304,
-        520,
-        312,
+        680,
+        0,
+        236,
         512,
-        4,
-        7
+        32,
+        17
+      ],
+      [
+        920,
+        0,
+        236,
+        508,
+        31,
+        21
+      ],
+      [
+        1404,
+        0,
+        240,
+        504,
+        28,
+        23
+      ],
+      [
+        1052,
+        528,
+        248,
+        500,
+        23,
+        26
       ],
       [
         0,
-        1036,
-        308,
-        512,
-        4,
-        7
+        528,
+        252,
+        504,
+        19,
+        26
       ],
       [
-        312,
-        1036,
-        308,
-        512,
-        4,
-        6
+        256,
+        528,
+        256,
+        504,
+        14,
+        26
       ],
       [
-        0,
-        0,
-        300,
         516,
+        528,
+        260,
+        504,
         10,
-        4
+        26
+      ],
+      [
+        780,
+        528,
+        268,
+        504,
+        4,
+        25
       ]
     ],
     "decodedBytes": {
-      "canonical": 9830400,
-      "grid": 3983904,
-      "packed": 3839040
+      "canonical": 18022400,
+      "grid": 12896928,
+      "packed": 7413888
     },
     "pixelScale": 2.0
   },
@@ -157,12 +309,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "58d7fcd6ff10027d151d158f696cb4dc8e3a7af73161ef607d55d60372320644",
-      "config": "a51d5f41f0354dcb462cb663f3d1eb2fe5f069f99fa6c03e7db927ea7cefea0b",
+      "source": "7feef177ce60ee81411f355e65a9952c4c1c76d75f3575bb5a31b9954cdb0016",
+      "config": "dfbda167d951ce1fe909170a63e475cbc9b3cd0b65db1ffef20109e3bea99c79",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
-    },
-    "referenceSources": {
-      "art/sprites/source/p03_defense_air_video_normalized.png": "26e3123f26a9d5f09e6d16d0d3fc52265307bd71be950e069b3c44e11f1d047c"
     }
   }
 }

@@ -2,36 +2,34 @@
   "id": "p03_hit_air",
   "javaName": "P03_HIT_AIR",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_hit_air_sr_hd.png",
+  "source": "art/sprites/source/p03_hit_air_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_hit_air.webp",
   "report": "tools/sprites/reports/p03_hit_air.report.json",
   "preview": "android/app/build/sprite-review/p03_hit_air-import.png",
-  "expectedFrames": 4,
+  "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 4,
+  "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 640,
-  "frameHeight": 640,
-  "rootX": 300,
-  "rootY": 600,
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 218,
+  "rootY": 540,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe no ar; pes na raiz.",
-  "sourceReferences": [
-    "art/sprites/source/p03_hit_air_video_normalized.png"
-  ],
   "pixelScale": 2.0,
-  "reescala": [
-    1.0638,
-    1.0638,
-    1.0638,
-    1.0638
-  ],
-  "reguaFatores": [
-    1.0638,
-    1.0638,
-    1.0638,
-    1.0638
-  ],
-  "regua": [
-    "ajuste no app 20261014-0532: 94% (HIT_AIR)"
-  ]
+  "video": {
+    "arquivo": "danoPulo.mp4",
+    "personagem": "p03",
+    "escala": 0.4015,
+    "motivo": "vídeos H3 do Kōga novo (19/11, imagens de 19/11 com 541 px de guarda): 0,4139 (a escala do Ryūga) menos 3% (o dono, 20/11: pés e mãos maiores que os do Ryūga)",
+    "quadros": "24,26,28,30,32,36,40,46,52,58,64",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "109,270",
+    "colunas": 9,
+    "fixar": "video",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

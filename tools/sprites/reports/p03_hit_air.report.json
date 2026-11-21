@@ -1,117 +1,250 @@
 {
   "id": "p03_hit_air",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_hit_air_sr_hd.png",
+  "source": "art/sprites/source/p03_hit_air_video_normalized.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe no ar; pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 640,
-    "frameHeight": 640,
-    "rootX": 300,
-    "rootY": 600,
-    "columns": 4,
-    "frameCount": 4
+    "frameWidth": 448,
+    "frameHeight": 576,
+    "rootX": 218,
+    "rootY": 540,
+    "columns": 9,
+    "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        98,
-        167,
-        464,
-        603
+        69,
+        48,
+        383,
+        541
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 64958
+      "minimumMargin": 35,
+      "opaquePixels": 71343
     },
     {
       "index": 1,
       "outputBbox": [
-        106,
-        176,
-        464,
-        604
+        67,
+        54,
+        384,
+        542
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 65155
+      "minimumMargin": 34,
+      "opaquePixels": 71388
     },
     {
       "index": 2,
       "outputBbox": [
-        118,
-        181,
-        458,
-        603
+        67,
+        55,
+        385,
+        541
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 64261
+      "minimumMargin": 35,
+      "opaquePixels": 71506
     },
     {
       "index": 3,
       "outputBbox": [
-        136,
-        174,
-        457,
-        604
+        66,
+        57,
+        385,
+        542
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 63402
+      "minimumMargin": 34,
+      "opaquePixels": 71388
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        66,
+        54,
+        385,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71495
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        64,
+        57,
+        386,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 71489
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        62,
+        60,
+        387,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 71325
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        61,
+        62,
+        388,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71440
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        60,
+        65,
+        389,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71349
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        59,
+        68,
+        389,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 71128
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        69,
+        52,
+        389,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 71121
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 392,
-    "frameHeight": 463,
-    "rootX": 215,
-    "rootY": 446,
-    "columns": 4,
-    "frameCount": 4,
+    "frameWidth": 346,
+    "frameHeight": 510,
+    "rootX": 167,
+    "rootY": 500,
+    "columns": 9,
+    "frameCount": 11,
     "cropOffset": [
-      85,
-      154
+      51,
+      40
     ],
-    "sheetWidth": 384,
-    "sheetHeight": 1804,
+    "sheetWidth": 1984,
+    "sheetHeight": 1004,
     "frames": [
       [
         0,
         0,
-        384,
-        456,
-        4,
+        324,
+        504,
+        14,
         4
       ],
       [
+        660,
         0,
-        460,
-        376,
-        448,
-        13,
+        328,
+        496,
+        12,
+        10
+      ],
+      [
+        992,
+        0,
+        328,
+        496,
+        12,
+        11
+      ],
+      [
+        1324,
+        0,
+        328,
+        496,
+        11,
         13
       ],
       [
+        1656,
         0,
-        1364,
-        360,
-        440,
-        25,
-        18
+        328,
+        496,
+        11,
+        10
       ],
       [
         0,
-        912,
+        508,
+        332,
+        496,
+        9,
+        13
+      ],
+      [
+        336,
+        508,
+        336,
+        492,
+        7,
+        16
+      ],
+      [
+        676,
+        508,
+        336,
+        488,
+        6,
+        18
+      ],
+      [
+        1016,
+        508,
         340,
-        448,
-        43,
-        11
+        484,
+        5,
+        21
+      ],
+      [
+        1360,
+        508,
+        340,
+        484,
+        4,
+        24
+      ],
+      [
+        328,
+        0,
+        328,
+        500,
+        14,
+        8
       ]
     ],
     "decodedBytes": {
-      "canonical": 6553600,
-      "grid": 2903936,
-      "packed": 2770944
+      "canonical": 18579456,
+      "grid": 12705120,
+      "packed": 7967744
     },
     "pixelScale": 2.0
   },
@@ -119,12 +252,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "8ac98c197be069fd0559d29e855dfedf7877886255d7a33fafa89b0992641c16",
-      "config": "879d20adf25c4725da96813666a28ded68b22416c37f9c9417f6ebebe5849cc4",
+      "source": "9d7d241a9799e833eeb0d119bb7022af5a1826ac4b7e308a424bbe1dfb400a41",
+      "config": "5c51ef8cd4b028d099cff7b6dcc129739fba6394b3936974a8e87ea1505ba50e",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
-    },
-    "referenceSources": {
-      "art/sprites/source/p03_hit_air_video_normalized.png": "e72ba62829e4898c1746b04d87f807667f6e150038481677aa6d61e8096ebf02"
     }
   }
 }
