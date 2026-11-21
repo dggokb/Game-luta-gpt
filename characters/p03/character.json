@@ -98,7 +98,7 @@
         ],
         "reach": 175,
         "hitHeight": 244,
-        "launchType": "launch",
+        "launchType": "arc",
         "knockback": 140,
         "mecanica": {
           "avanco": {
@@ -106,6 +106,21 @@
             "frames": [
               10,
               21
+            ]
+          },
+          "arco": {
+            "altura": 110,
+            "distancia": 520,
+            "parede": true
+          },
+          "corrida": {
+            "quadro": 15,
+            "perto": 110,
+            "velocidade": 1500,
+            "max": 30,
+            "ciclo": [
+              3,
+              3
             ]
           }
         },
@@ -19511,6 +19526,16 @@
           "frames": [
             0,
             30
+          ]
+        },
+        "corrida": {
+          "quadro": 8,
+          "perto": 170,
+          "velocidade": 800,
+          "max": 45,
+          "ciclo": [
+            0,
+            5
           ]
         }
       },

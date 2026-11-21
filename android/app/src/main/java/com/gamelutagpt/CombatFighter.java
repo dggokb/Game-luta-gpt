@@ -262,6 +262,10 @@ final class CombatFighter {
      * essa velocidade (px por quadro, com o lado), e solta as palmas quando chega. 0: parada.
      */
     float investida;
+    /** Quadros já corridos até o rival neste golpe (mecânica de corrida: o S3 do Kōga). */
+    int corrida;
+    /** Neste quadro o golpe esperou correndo (o corpo anda na velocidade da corrida). */
+    boolean correndo;
     /** Quadro (do motor) em que o Espelho do Lago leu o poder, ou -1: o desenho é o do desvio. */
     int desvioInicio = -1;
     CombatFighter investeAlvo;
@@ -497,6 +501,8 @@ final class CombatFighter {
         investida = 0f;
         investeAlvo = null;
         desvioInicio = -1;
+        corrida = 0;
+        correndo = false;
         grabMissed = false;
         armorUsed = 0;
         charge = 0;

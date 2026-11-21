@@ -8,7 +8,8 @@ import org.junit.Test;
  * O S3 do Kōga (20/11, a ideia do dono: "ele dá o dash curto e voadora, se acertar o adversário emenda
  * os golpes, se errar... errou"): a voadora é o primeiro acerto; acertando, saem os cinco socos e o soco
  * grande (7 acertos, o último derruba); errando ou defendida, ele cai da voadora (o SPECIAL_S3_ERRO) e o
- * golpe acaba logo.
+ * golpe acaba logo. Desde 21/11 (o dono: "tem que ir correndo até o adversário e aí sim dá o chute") ele
+ * corre até o rival antes de sair do chão, até um limite (~600 px de corrida): mais longe que isso, erra.
  */
 public class InvestidaDaVoadoraTest {
     private static final CharacterDefinition KOGA = GeneratedCharacters.get("p03");
@@ -58,7 +59,7 @@ public class InvestidaDaVoadoraTest {
     }
 
     @Test public void errandoAcabaNaVoadora() {
-        int[] r = rodar(900f, false);
+        int[] r = rodar(1300f, false);
         assertEquals(0, r[0]);
         assertTrue("o golpe acaba logo (" + r[2] + ")", r[2] < KOGA.attack("S3").totalFrames - 30);
     }

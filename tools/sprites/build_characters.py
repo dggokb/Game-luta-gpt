@@ -220,7 +220,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg','cruza'}
+             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg','cruza','corrida'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -245,6 +245,14 @@ def validate_mechanics(name, mech, m, projectile):
     for flag in ('repele', 'apara'):
         if mech.get('contra', {}).get(flag) not in (None, True):
             raise ValueError(f'{name}.mecanica.contra.{flag}: true (or leave it out)')
+    if 'corrida' in mech:
+        # Corre até o rival antes do golpe (o S3 do Kōga): quadro, perto (px), velocidade, limite e ciclo.
+        c = mech['corrida']
+        if not (isinstance(c, dict) and type(c.get('quadro')) is int and 0 <= c['quadro'] < m['startupFrames']
+                and isinstance(c.get('perto'), (int, float)) and isinstance(c.get('velocidade'), (int, float)) and c['velocidade'] > 0
+                and type(c.get('max')) is int and c['max'] > 0 and isinstance(c.get('ciclo'), list) and len(c['ciclo']) == 2
+                and all(type(v) is int for v in c['ciclo']) and 0 <= c['ciclo'][0] <= c['ciclo'][1]):
+            raise ValueError(f'{name}.mecanica.corrida: expected quadro (antes do ativo), perto, velocidade, max e ciclo [a, b]')
     if 'avanco' in mech:
         frames('avanco', mech['avanco'])
         v = mech['avanco'].get('velocidade')  # negativa: recua (estrela da p16)
@@ -873,6 +881,9 @@ def compile_packs(root, results, alterados=None, medir=False):
         if 'avanco' in mech:
             v = mech['avanco']
             code += '.advance('+f(v['velocidade'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('atravessa'))).lower()+')'
+        if 'corrida' in mech:
+            c = mech['corrida']
+            code += '.run('+str(c['quadro'])+','+f(c['perto'])+','+f(c['velocidade'])+','+str(c['max'])+','+str(c['ciclo'][0])+','+str(c['ciclo'][1])+')'
         if mech.get('desenho'): code += '.drawnStrike()'
         if 'casca' in mech: code += '.peel('+str(mech['casca']['quadro'])+','+f(mech['casca']['x'])+','+str(mech['casca']['duracao'])+')'
         if mech.get('quicaEmPe'): code += '.standBounce()'

@@ -5725,6 +5725,15 @@ public class GameView extends SurfaceView
                 int quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
                 animation = dv.id;
                 animationElapsed = dv.timeOfFrame(Math.min(dv.frameCount() - 1, quadro)) + 0.001f;
+            } else if (f.attack.mechanics.runs() && f.corrida > 0 && f.attackFrame == f.attack.mechanics.runFrame &&
+                       (f.move != null ? f.move.animation : art) != null) {
+                // Correndo até o rival (o S3 e o Super do Kōga): os quadros da corrida do vídeo em ciclo.
+                AttackDefinition.Mechanics m = f.attack.mechanics;
+                CharacterDefinition.Animation an = f.move != null ? f.move.animation : art;
+                int n = m.runCycleEnd - m.runCycleStart + 1;
+                int quadro = Math.min(an.frameCount() - 1, m.runCycleStart + (f.corrida / CORRIDA_QUADROS) % n);
+                animation = an.id;
+                animationElapsed = an.timeOfFrame(quadro) + 0.001f;
             } else if (f.move != null) {
                 if (f.move.animation != null) {
                     animation = f.move.animation.id;
@@ -6885,6 +6894,8 @@ public class GameView extends SurfaceView
     /** O desenho do desvio do Espelho do Lago (o poder lido) e os quadros do giro dele. */
     private static final String DESVIO = "SUPER_DESVIO";
     private static final int DESVIO_GIRO = 18;
+    /** Quadros do jogo em cada desenho da corrida até o rival (um ciclo de 6 desenhos em 0,2 s). */
+    private static final int CORRIDA_QUADROS = 2;
 
     /** O Super de contra-golpe com o efeito de penas da dona (o Espelho do Lago da Yin-lu). */
     private boolean superDeContra(CombatFighter f) {

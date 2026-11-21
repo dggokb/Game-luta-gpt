@@ -1689,6 +1689,22 @@ final class CombatEngine {
      * Um passo da investida do Espelho do Lago até quem atirou: true enquanto ainda corre. Chegando
      * (a distância das palmas), as palmas saem nele como no contra-golpe de perto.
      */
+    /**
+     * A corrida até o rival (o S3 do Kōga): no quadro da corrida o golpe espera, correndo, até a
+     * frente do rival ficar perto (ou o limite de quadros); aí segue (sai do chão e chuta).
+     */
+    private boolean correAteORival(CombatFighter f) {
+        AttackDefinition.Mechanics m = f.attack.mechanics;
+        f.correndo = false;
+        if (!m.runs() || f.attackFrame != m.runFrame || !f.grounded || f.corrida >= m.runMax) return false;
+        CombatFighter alvo = fighters[1 - f.index];
+        float frente = (alvo.x - f.x) * f.facing - alvo.body().halfWidth;
+        if (frente <= m.runNear || touchingAhead(f)) return false;
+        f.corrida++;
+        f.correndo = true;
+        return true;
+    }
+
     private boolean avancaInvestida(CombatFighter f) {
         CombatFighter alvo = f.investeAlvo;
         if (alvo == null || alvo.ko()) {
@@ -2314,6 +2330,7 @@ final class CombatEngine {
                 if (moveMechanics.flies() && !f.grounded && f.attackFrame >= moveMechanics.flightEnd - 1) break;
                 // O Espelho do Lago investindo até quem atirou: o golpe espera ela chegar.
                 if (f.investida > 0f && avancaInvestida(f)) break;
+                if (correAteORival(f)) break;
                 f.attackFrame++;
                 if (moveMechanics.flies() && f.grounded && f.attackFrame == moveMechanics.flightStart) takeOff(f);
                 int depois = f.attackFrame - f.attack.startupFrames;
@@ -2733,7 +2750,8 @@ final class CombatEngine {
             // until it reaches the opponent (it does not shove it across the stage), or through it.
             // Negative speed backs away (a cartwheel), which contact never stops.
             if (f.attack.mechanics.passThrough || f.attack.mechanics.advanceSpeed < 0f || !touchingAhead(f)) {
-                f.x += f.facing * f.attack.mechanics.advanceSpeed * boost * CombatConfig.DT;
+                float v = f.correndo ? f.attack.mechanics.runSpeed : f.attack.mechanics.advanceSpeed;
+                f.x += f.facing * v * boost * CombatConfig.DT;
             }
         } else if (f.attacking() && !f.grounded && f.attack.kind == AttackDefinition.Kind.NORMAL) {
             // Air normals keep the jump's steering; ground attacks and specials lock it.
@@ -5981,7 +5999,11 @@ final class CombatEngine {
             push(d, a, -direction * Math.min(attack.mechanics.pull, Math.max(0f, gap)));
             cues.add("PULL");
         }
-        if (attack.strikeHold != null && !projectile) {
+        // A última que joga longe (a cabeçada do Super do Kōga, 21/11: "lança pra frente") não segura:
+        // segurar zerava o voo e ele caía no lugar.
+        boolean jogaLonge = lastStrike && (launch == AttackDefinition.Launch.ARC ||
+            launch == AttackDefinition.Launch.LAUNCH || launch == AttackDefinition.Launch.WALL_BOUNCE);
+        if (attack.strikeHold != null && !projectile && !jogaLonge) {
             // A pose segura o rival: cada pancada o deixa no lugar dela, sem empurrão.
             holdAhead(a, d, attack.strikeHold[Math.min(c.hitbox, attack.strikeHold.length - 1)]);
             push(d, a, 0f);

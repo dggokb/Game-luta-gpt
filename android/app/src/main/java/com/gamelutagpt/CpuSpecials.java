@@ -145,7 +145,9 @@ final class CpuSpecials {
         if (m.advanceSpeed <= 0f) return 0f;
         int end = Math.min(m.advanceEnd, a.startupFrames + a.activeFrames - 1);
         int frames = end - m.advanceStart + 1;
-        return frames <= 0 ? 0f : m.advanceSpeed * frames * CombatConfig.DT;
+        // A corrida até o rival (o S3 do Kōga) soma o que ela anda no limite dela.
+        float corrida = m.runs() ? m.runSpeed * m.runMax * CombatConfig.DT : 0f;
+        return frames <= 0 ? corrida : m.advanceSpeed * frames * CombatConfig.DT + corrida;
     }
 
     /** O golpe corpo a corpo pega o rival de corpo {@code target} a {@code gap} (centro a centro)? */
@@ -164,6 +166,11 @@ final class CpuSpecials {
         AttackDefinition.Mechanics m = a.mechanics;
         float falta = gap - (a.reach + target.halfWidth);
         if (falta <= 0f || m.advanceSpeed <= 0f) return a.startupFrames;
+        if (m.runs()) {
+            // Corre até perto e depois sai o golpe: a largada inteira mais a corrida que falta.
+            float corre = Math.max(0f, gap - target.halfWidth - m.runNear);
+            return a.startupFrames + (int)Math.ceil(corre / (m.runSpeed * CombatConfig.DT));
+        }
         float passo = m.advanceSpeed * CombatConfig.DT;
         return Math.max(a.startupFrames, m.advanceStart + (int)Math.ceil(falta / passo));
     }

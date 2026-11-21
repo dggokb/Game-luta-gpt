@@ -136,12 +136,12 @@ public class ComboKogaTest {
 
     // ---------------------------------------------------------------- o Super (21/11)
 
-    /** O Super novo: investe, 12 socos rápidos e a cabeçada que lança (13 pancadas). */
+    /** O Super novo: investe, 12 socos rápidos e a cabeçada que lança para a frente (13 pancadas). */
     @Test public void oSuperInvesteSocaELancaNaCabecada() {
         AttackDefinition sup = GeneratedCharacters.get(KOGA).attack("SUPER");
         assertEquals(13, sup.maxHits);
-        assertEquals(AttackDefinition.Launch.LAUNCH, sup.launch);
-        for (float gap : new float[] {120f, 300f, 450f}) {
+        assertEquals("a cabeçada lança para a frente, não para cima", AttackDefinition.Launch.ARC, sup.launch);
+        for (float gap : new float[] {120f, 300f, 450f, 800f}) {
             CombatConfig cfg = new CombatConfig();
             cfg.justDefenseFrames = -1;
             CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get(KOGA), "P1"),
@@ -151,7 +151,7 @@ public class ComboKogaTest {
             FighterInput i0 = new FighterInput(), i1 = new FighterInput();
             i0.superAttack = true;
             int acertos = 0;
-            boolean lancou = false;
+            float x0 = e.fighter(1).x, frente = 0f, alto = 0f;
             List<Integer> quadros = new ArrayList<>();
             for (int t = 0; t < 200; t++) {
                 e.step(i0, i1);
@@ -161,12 +161,43 @@ public class ComboKogaTest {
                     acertos++;
                     quadros.add(e.fighter(0).attackFrame);
                 }
-                if (acertos == 13 && e.fighter(1).launched) lancou = true;
+                if (acertos == 13) {
+                    frente = Math.max(frente, e.fighter(1).x - x0);
+                    alto = Math.max(alto, Arena.GROUND_Y - e.fighter(1).y);
+                }
             }
-            assertEquals("de " + gap + " px a investida chega e as 13 pegam", 13, acertos);
-            assertTrue("a cabeçada lança", lancou);
+            assertEquals("de " + gap + " px ele corre até a frente do rival e as 13 pegam", 13, acertos);
+            assertTrue("a cabeçada joga longe para a frente: " + frente, frente > 400f);
+            assertTrue("e baixo, não para cima: " + alto, alto < 160f);
             for (int i = 1; i < 12; i++) assertEquals("os socos a cada 4 quadros: " + quadros, 4, quadros.get(i) - quadros.get(i - 1));
         }
+    }
+
+    // ---------------------------------------------------------------- o S3 corre até o rival (21/11)
+
+    /** O ↓↙← corre até o rival e só então sai a voadora (o dono: "e aí sim dá o chute"). */
+    @Test public void oS3CorreAteORivalEDaOChute() {
+        for (float gap : new float[] {150f, 450f, 700f}) {
+            CombatConfig cfg = new CombatConfig();
+            cfg.justDefenseFrames = -1;
+            CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get(KOGA), "P1"),
+                new FighterState(GeneratedCharacters.get(YINLU), "P2"), 300f, 300f + gap, cfg);
+            e.fighter(1).state.life = 10_000_000;
+            FighterInput i0 = new FighterInput(), i1 = new FighterInput();
+            i0.special = "S3";
+            int acertos = 0, corrida = 0;
+            for (int t = 0; t < 240; t++) {
+                e.step(i0, i1);
+                i0.clear();
+                corrida = Math.max(corrida, e.fighter(0).corrida);
+                for (CombatEngine.HitEvent h : e.events()) if (h.attacker == 0 && !h.blocked) acertos++;
+            }
+            assertEquals("de " + gap + " px: a voadora e os seis socos", 7, acertos);
+            if (gap >= 450f) assertTrue("de longe ele corre antes de chutar: " + corrida, corrida > 5);
+        }
+        // A CPU sabe que o S3 chega longe (a corrida entra no alcance dela).
+        AttackDefinition s3 = GeneratedCharacters.get(KOGA).attack("S3");
+        assertTrue("alcance da corrida para a CPU: " + CpuSpecials.travel(s3), CpuSpecials.travel(s3) >= 500f);
     }
 
     @Test public void aCpuAcertaOSuperNovo() {

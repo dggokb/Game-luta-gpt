@@ -155,6 +155,14 @@ final class AttackDefinition {
         /** The body passes through the opponent while advancing (cross-up). */
         boolean passThrough;
         /**
+         * Corrida até o rival (o S3 do Kōga, 21/11; o dono: "ele tem que ir correndo até o adversário e
+         * aí sim dá o chute"): no quadro {@link #runFrame} o golpe espera, correndo a {@link #runSpeed},
+         * até a frente do rival ficar a {@link #runNear} px (ou {@link #runMax} quadros). O desenho repete
+         * os quadros {@link #runCycleStart}..{@link #runCycleEnd} da animação (a corrida do vídeo).
+         */
+        int runFrame = -1, runMax, runCycleStart, runCycleEnd;
+        float runNear, runSpeed;
+        /**
          * Avanço cujo desenho também avança à frente da raiz (o bote da Investida do p12): a pancada
          * é a ponta desenhada, não a caixa do golpe.
          */
@@ -216,6 +224,11 @@ final class AttackDefinition {
         Mechanics advance(float speed, int start, int end, boolean through) {
             advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;
         }
+        Mechanics run(int frame, float near, float speed, int max, int cycleStart, int cycleEnd) {
+            runFrame = frame; runNear = near; runSpeed = speed; runMax = max; runCycleStart = cycleStart; runCycleEnd = cycleEnd;
+            return this;
+        }
+        boolean runs() { return runFrame >= 0; }
         Mechanics drawnStrike() { drawnStrike = true; return this; }
         Mechanics peel(int frame, float x, int frames) { peelFrame = frame; peelX = x; peelFrames = frames; return this; }
         Mechanics standBounce() { standBounce = true; return this; }
@@ -575,6 +588,10 @@ final class AttackDefinition {
             if (m.counter != Reads.NONE) checkRange(name + "counter", m.counterStart, m.counterEnd, total);
             if (m.evade != Reads.NONE) checkRange(name + "evade", m.evadeStart, m.evadeEnd, total);
             if (m.advanceSpeed != 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
+            if (m.runs() && (m.runFrame >= startup || m.runSpeed <= 0f || m.runMax <= 0 ||
+                m.runCycleStart < 0 || m.runCycleEnd < m.runCycleStart)) {
+                throw new IllegalArgumentException(name + "run: a corrida espera antes do ativo, com velocidade, limite e ciclo");
+            }
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
             if (m.poisonDamage > 0 && m.poisonFrames < 1) throw new IllegalArgumentException(name + "poison needs frames");
             if (m.repel && m.counter == Reads.NONE) throw new IllegalArgumentException(name + "a repel is a counter stance");
