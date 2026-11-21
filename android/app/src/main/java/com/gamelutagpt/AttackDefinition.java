@@ -158,9 +158,10 @@ final class AttackDefinition {
          * Corrida até o rival (o S3 do Kōga, 21/11; o dono: "ele tem que ir correndo até o adversário e
          * aí sim dá o chute"): no quadro {@link #runFrame} o golpe espera, correndo a {@link #runSpeed},
          * até a frente do rival ficar a {@link #runNear} px (ou {@link #runMax} quadros). O desenho repete
-         * os quadros {@link #runCycleStart}..{@link #runCycleEnd} da animação (a corrida do vídeo).
+         * os quadros {@link #runCycle} da animação, na ordem da passada, {@link #runStep} quadros cada.
          */
-        int runFrame = -1, runMax, runCycleStart, runCycleEnd;
+        int runFrame = -1, runMax, runStep = 4;
+        int[] runCycle = new int[0];
         float runNear, runSpeed;
         /**
          * Avanço cujo desenho também avança à frente da raiz (o bote da Investida do p12): a pancada
@@ -224,8 +225,8 @@ final class AttackDefinition {
         Mechanics advance(float speed, int start, int end, boolean through) {
             advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;
         }
-        Mechanics run(int frame, float near, float speed, int max, int cycleStart, int cycleEnd) {
-            runFrame = frame; runNear = near; runSpeed = speed; runMax = max; runCycleStart = cycleStart; runCycleEnd = cycleEnd;
+        Mechanics run(int frame, float near, float speed, int max, int step, int... cycle) {
+            runFrame = frame; runNear = near; runSpeed = speed; runMax = max; runStep = step; runCycle = cycle.clone();
             return this;
         }
         boolean runs() { return runFrame >= 0; }
@@ -588,8 +589,8 @@ final class AttackDefinition {
             if (m.counter != Reads.NONE) checkRange(name + "counter", m.counterStart, m.counterEnd, total);
             if (m.evade != Reads.NONE) checkRange(name + "evade", m.evadeStart, m.evadeEnd, total);
             if (m.advanceSpeed != 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
-            if (m.runs() && (m.runFrame >= startup || m.runSpeed <= 0f || m.runMax <= 0 ||
-                m.runCycleStart < 0 || m.runCycleEnd < m.runCycleStart)) {
+            if (m.runs() && (m.runFrame >= startup || m.runSpeed <= 0f || m.runMax <= 0 || m.runStep <= 0 ||
+                m.runCycle.length == 0)) {
                 throw new IllegalArgumentException(name + "run: a corrida espera antes do ativo, com velocidade, limite e ciclo");
             }
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");

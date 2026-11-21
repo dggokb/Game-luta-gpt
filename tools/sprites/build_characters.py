@@ -250,9 +250,9 @@ def validate_mechanics(name, mech, m, projectile):
         c = mech['corrida']
         if not (isinstance(c, dict) and type(c.get('quadro')) is int and 0 <= c['quadro'] < m['startupFrames']
                 and isinstance(c.get('perto'), (int, float)) and isinstance(c.get('velocidade'), (int, float)) and c['velocidade'] > 0
-                and type(c.get('max')) is int and c['max'] > 0 and isinstance(c.get('ciclo'), list) and len(c['ciclo']) == 2
-                and all(type(v) is int for v in c['ciclo']) and 0 <= c['ciclo'][0] <= c['ciclo'][1]):
-            raise ValueError(f'{name}.mecanica.corrida: expected quadro (antes do ativo), perto, velocidade, max e ciclo [a, b]')
+                and type(c.get('max')) is int and c['max'] > 0 and isinstance(c.get('ciclo'), list) and len(c['ciclo']) >= 1
+                and all(type(v) is int and v >= 0 for v in c['ciclo']) and type(c.get('passo', 4)) is int and c.get('passo', 4) > 0):
+            raise ValueError(f'{name}.mecanica.corrida: expected quadro (antes do ativo), perto, velocidade, max, ciclo [desenhos] e passo')
     if 'avanco' in mech:
         frames('avanco', mech['avanco'])
         v = mech['avanco'].get('velocidade')  # negativa: recua (estrela da p16)
@@ -883,7 +883,7 @@ def compile_packs(root, results, alterados=None, medir=False):
             code += '.advance('+f(v['velocidade'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('atravessa'))).lower()+')'
         if 'corrida' in mech:
             c = mech['corrida']
-            code += '.run('+str(c['quadro'])+','+f(c['perto'])+','+f(c['velocidade'])+','+str(c['max'])+','+str(c['ciclo'][0])+','+str(c['ciclo'][1])+')'
+            code += '.run('+str(c['quadro'])+','+f(c['perto'])+','+f(c['velocidade'])+','+str(c['max'])+','+str(c.get('passo', 4))+','+','.join(map(str, c['ciclo']))+')'
         if mech.get('desenho'): code += '.drawnStrike()'
         if 'casca' in mech: code += '.peel('+str(mech['casca']['quadro'])+','+f(mech['casca']['x'])+','+str(mech['casca']['duracao'])+')'
         if mech.get('quicaEmPe'): code += '.standBounce()'
