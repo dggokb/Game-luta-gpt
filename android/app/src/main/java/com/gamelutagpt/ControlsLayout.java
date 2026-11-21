@@ -129,10 +129,12 @@ final class ControlsLayout {
 
     // MENU (top center): opens the pause in every mode (the test's team select is DUPLA).
     // Com a barra com raios, o toque é a placa do MENU desenhada na arte (abaixo do relógio).
-    static final float SELECT_BUTTON_LEFT = HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaX(557f) : 565f;
-    static final float SELECT_BUTTON_TOP = HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaY(132f) : 112f;
-    static final float SELECT_BUTTON_RIGHT = HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaX(723f) : 715f;
-    static final float SELECT_BUTTON_BOTTOM = HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaY(170f) : 154f;
+    // Na barra compacta o MENU é a placa pequena do centro (764–908 × 92–117 na arte, ~585–695 × 72–92
+    // na tela); o toque pega uma área maior em volta, para o dedo.
+    static final float SELECT_BUTTON_LEFT = HudRenderer.COMPACTA ? 572f : HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaX(557f) : 565f;
+    static final float SELECT_BUTTON_TOP = HudRenderer.COMPACTA ? 62f : HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaY(132f) : 112f;
+    static final float SELECT_BUTTON_RIGHT = HudRenderer.COMPACTA ? 708f : HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaX(723f) : 715f;
+    static final float SELECT_BUTTON_BOTTOM = HudRenderer.COMPACTA ? 104f : HudRenderer.BARRA_RAIOS ? HudRenderer.paraTelaY(170f) : 154f;
 
     /** First control under the point, in the priority order the input handler uses. */
     static Control controlAt(float x, float y) {
