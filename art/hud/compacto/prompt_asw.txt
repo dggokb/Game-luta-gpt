@@ -1,0 +1,8 @@
+Use the attached image (referencia.png) only as the STYLE reference: blue electric lightning for player 1, red for player 2, dark navy plates with neon edges, glossy green life bars, the same two male fighter faces (player 1 brown hair, player 2 red-brown hair) and a white-haired girl as player 1's partner.
+
+Generate a NEW image named hud_compacto.png: a compact top HUD for a 2D anime fighting game on a phone, drawn at professional console fighting game quality. Canvas 1672 x 941 px, fully TRANSPARENT background (PNG with alpha). All artwork inside the top 130 px; everything below must be transparent. Labels allowed: SHINKAI, SUPER, TAG, numbers, the center "∞" with "TREINO", and a small MENU button under the clock. Use names "RYŪGA" (left) and "KŌGA" (right) instead of PLAYER 1/2. Keep the life bars long (they are the most important element) and the center narrow. Mirror the red side.
+
+Layout model (inspiration only, do not copy any real game's art or logo):
+the HUD layout of Arc System Works anime fighters (Guilty Gear Strive style organization): very thin, sharply slanted life bars that run from the outer edge toward the center clock, with a sleek angular frame; a small angular portrait cut-in at the outer end overlapping the bar; under the life bar a thin slanted strip with the SHINKAI gauge and the five SUPER cells; the partner (TAG) shown as a small slanted portrait tab with a thin bar tucked under the main portrait. Lightning as thin sharp accents along the slanted edges.
+
+Save only hud_compacto.png in the current folder.
