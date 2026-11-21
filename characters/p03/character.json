@@ -19045,7 +19045,16 @@
       ],
       "launchType": "knockdown",
       "knockback": 90,
-      "hitFloor": 155
+      "hitFloor": 155,
+      "segurarRival": [
+        125,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ]
     }
   }
 }
