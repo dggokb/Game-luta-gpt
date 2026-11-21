@@ -103,13 +103,28 @@ final class CombatRules {
         CharacterDefinition.Body target,
         boolean targetCrouching
     ) {
+        return projectileHits(previousX, nextX, y, radius, radius, targetX, targetBaseY, target, targetCrouching);
+    }
+
+    /** Com a meia altura separada da meia largura (a caixa da marca da Garra do Kōga). */
+    static boolean projectileHits(
+        float previousX,
+        float nextX,
+        float y,
+        float radius,
+        float halfHeight,
+        float targetX,
+        float targetBaseY,
+        CharacterDefinition.Body target,
+        boolean targetCrouching
+    ) {
         float left = targetX - target.halfWidth;
         float right = targetX + target.halfWidth;
         float projectileLeft = Math.min(previousX, nextX) - radius;
         float projectileRight = Math.max(previousX, nextX) + radius;
         boolean horizontal = projectileRight >= left && projectileLeft <= right;
         float top = targetBaseY - target.height(targetCrouching);
-        boolean vertical = y + radius >= top && y - radius <= targetBaseY;
+        boolean vertical = y + halfHeight >= top && y - halfHeight <= targetBaseY;
         return horizontal && vertical;
     }
 

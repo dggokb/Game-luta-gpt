@@ -88,6 +88,20 @@ final class Projectile {
         this.visual = visual;
     }
 
+    /**
+     * A marca da Garra do Kōga (AttackDefinition.Mechanics#mark): parada onde nasceu, uma caixa de
+     * meia largura {@link #radius} e meia altura {@link #halfHeight}, que some quando {@link #life}
+     * chega a zero (ou ao acertar, ser defendida ou chocar). {@link #efeito} é a folha que a
+     * desenha quando o dono sai da pose do golpe.
+     */
+    boolean marca;
+    float halfHeight;
+    int life;
+    String efeito;
+
+    /** Meia altura da caixa: a da marca, ou o raio da bola. */
+    float halfHeight() { return marca ? halfHeight : radius; }
+
     /** Anulado por um projétil do rival: sai da tela sem acertar ninguém. */
     boolean cancelled;
 

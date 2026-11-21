@@ -128,7 +128,8 @@ final class CpuPerception {
         float bestAlem = 0f;
         for (List<Projectile> list : java.util.Arrays.asList(engine.energyProjectiles, engine.superProjectiles)) {
             for (Projectile p : list) {
-                if (p.ownerIndex != owner || p.returning) continue;
+                // A marca da Garra do Kōga fica parada: não é bola chegando (AiController.respeitaMarca).
+                if (p.ownerIndex != owner || p.returning || p.marca) continue;
                 // Até o corpo do desenho (a base aberta, a guarda): o que passa da caixa antiga
                 // encosta antes, e os prazos de pular e defender contam até ele.
                 float alem = alemDaCaixa(me, -p.direction);

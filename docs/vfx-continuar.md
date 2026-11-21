@@ -2256,3 +2256,11 @@ no lugar do `impacto_v08_forte` só ali.
   `impacto_ar_super` ainda é o das cenas (agarrão com cena, cinemáticas) e fica nos assets. Imagem
   em `art/vfx/teste_soco_forte_v09/super_impacto_cel14_30fps/`. Vídeo do Super do Kōga (3 acertos),
   normal e câmera lenta. Gravado no PC.
+- **Marca da Garra do Kōga como poder (21/11):** "o princípio da marca é ser um poder". A marca
+  dos dois cortes virou projétil parado no motor; fora da pose da Garra ela é desenhada pelas folhas
+  `marca_p03` (os três riscos) e `marca_x_p03` (o X), tiradas do quadro 13 da GARRA_1 e do 15 da
+  GARRA_2 pela cor do brilho (`tools/sprites/marca_garra.py`), na escala da folha dele, com a luz
+  `#FF6A2A` do X que voa. Vídeo: os três cortes, a marca anulando a bola do Ryūga (normal e câmera
+  lenta) e o cancelamento no Super com a marca no lugar. Gravado no PC. Ficou para o dono: a marca
+  que acertou ou chocou continua na pose dele até a guarda, e a da pose fica lilás com a luz do
+  cenário enquanto a solta é laranja.

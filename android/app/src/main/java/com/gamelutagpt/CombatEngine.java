@@ -2344,6 +2344,7 @@ final class CombatEngine {
                     spawnEnergyShot(f);
                 }
                 if (f.attackFrame == f.attack.mechanics.teleportFrame) teleportBehind(f);
+                if (f.attackFrame == f.attack.mechanics.markFrame) deixaMarca(f);
                 break;
             case HITSTUN:
             case BLOCKSTUN:
@@ -3227,8 +3228,9 @@ final class CombatEngine {
 
     /** Arranhão de uma batida defendida: especial e Super/Ultra; no SHINKAI, todo golpe. */
     private int chipFor(CombatFighter a, AttackDefinition attack, int strikeDamage) {
+        // A marca da Garra é poder: arranha como especial (o X também, que pesa como forte).
         int permille = attack.strength == AttackDefinition.Strength.SUPER ? config.chipSuperPermille
-            : attack.strength == AttackDefinition.Strength.SPECIAL ? config.chipSpecialPermille : 0;
+            : attack.strength == AttackDefinition.Strength.SPECIAL || attack.mechanics.marks() ? config.chipSpecialPermille : 0;
         if (a.state.inShinkai()) permille = Math.max(permille, config.shinkaiChipPermille);
         return strikeDamage * permille / 1000;
     }
@@ -3500,6 +3502,11 @@ final class CombatEngine {
             p.fuse = data.trapFuse["L".equals(f.commandButton) ? 0 : "H".equals(f.commandButton) ? 2 : 1];
         }
         (superKind ? superProjectiles : energyProjectiles).add(p);
+        if (energy && f.character().moves.containsKey(CancelSystem.ABERTURA)) {
+            // O X lançado da Garra: a marca do X parada vira o X que voa.
+            energyProjectiles.removeIf(q -> q.marca && q.ownerIndex == f.index &&
+                CancelSystem.FOLLOW_UP.equals(q.attack.id));
+        }
     }
 
     /** SHINKAI ENERGY: a recuperação do S (projétil) curta, para sair bola atrás de bola. */
@@ -3514,6 +3521,30 @@ final class CombatEngine {
         return f.state.inShinkai(Shinkai.Type.ENERGY) && f.attack.kind == AttackDefinition.Kind.NORMAL &&
             f.attack.strength == AttackDefinition.Strength.HEAVY && f.state.profile.energy != null &&
             f.character().attack("S") != null;
+    }
+
+    /**
+     * A marca da Garra do Kōga (21/11; o dono: "o princípio da marca é ser um poder, então tem que
+     * respeitar as características de poder do nosso jogo"): um poder parado na frente dele, do quadro
+     * do corte até o fim da janela da continuação. Ele pode apanhar que ela fica e acerta; choca com
+     * o poder do rival e arranha na defesa, como os outros poderes.
+     */
+    private void deixaMarca(CombatFighter f) {
+        AttackDefinition.Mechanics m = f.attack.mechanics;
+        Projectile p = new Projectile(f.x + f.facing * m.markX, f.y - m.markY, 0f, 0f, m.markHalfW,
+            f.attack.damage, f.state.profile.color, f.index, f.facing, f.attack, "MARCA");
+        p.marca = true;
+        p.halfHeight = m.markHalfH;
+        p.life = m.markUntil - m.markFrame + 1;
+        p.efeito = m.markEffect;
+        energyProjectiles.add(p);
+    }
+
+    /** As marcas de {@code owner} na tela (a do 1º corte e a do X da Garra). */
+    int marcas(int owner) {
+        int n = 0;
+        for (Projectile p : energyProjectiles) if (p.marca && p.ownerIndex == owner) n++;
+        return n;
     }
 
     private void spawnEnergyShot(CombatFighter f) {
@@ -3734,8 +3765,7 @@ final class CombatEngine {
             Projectile a = i < energyCount ? energyProjectiles.get(i) : superProjectiles.get(i - energyCount);
             for (int j = i + 1; j < total && a.clashes(); j++) {
                 Projectile b = j < energyCount ? energyProjectiles.get(j) : superProjectiles.get(j - energyCount);
-                if (b.ownerIndex == a.ownerIndex || !b.clashes() || !CombatRules.projectilesMeet(
-                    a.previousX, a.x, a.y, a.radius, b.previousX, b.x, b.y, b.radius)) continue;
+                if (b.ownerIndex == a.ownerIndex || !b.clashes() || !seEncontram(a, b)) continue;
                 int strengthA = a.durability(), strengthB = b.durability();
                 boolean superA = a.superKind(), superB = b.superKind();
                 if (!(superA && !superB)) a.hitsDone += strengthB;
@@ -3754,6 +3784,17 @@ final class CombatEngine {
         cues.add("PROJECTILE_CLASH");
         removeCancelled(energyProjectiles);
         removeCancelled(superProjectiles);
+    }
+
+    /** Dois poderes se tocam neste passo: a bola pelo círculo, a marca pela caixa dela. */
+    private static boolean seEncontram(Projectile a, Projectile b) {
+        if (!a.marca && !b.marca) {
+            return CombatRules.projectilesMeet(a.previousX, a.x, a.y, a.radius, b.previousX, b.x, b.y, b.radius);
+        }
+        if (Math.abs(a.y - b.y) > a.halfHeight() + b.halfHeight()) return false;
+        float al = Math.min(a.previousX, a.x) - a.radius, ar = Math.max(a.previousX, a.x) + a.radius;
+        float bl = Math.min(b.previousX, b.x) - b.radius, br = Math.max(b.previousX, b.x) + b.radius;
+        return ar >= bl && al <= br;
     }
 
     private static void removeCancelled(List<Projectile> projectiles) {
@@ -3806,6 +3847,11 @@ final class CombatEngine {
         while (it.hasNext()) {
             Projectile p = it.next();
             p.previousX = p.x;
+            if (p.marca) {
+                // A marca fica parada onde nasceu até o fim da janela da continuação.
+                if (--p.life <= 0) it.remove();
+                continue;
+            }
             if (p.holding) continue;   // parado no rival entre um acerto e o próximo
             if (p.chutada) {
                 if (caixaChutadaChegou(p)) it.remove();
@@ -3852,14 +3898,15 @@ final class CombatEngine {
         return countProjectiles(energyProjectiles, owner);
     }
 
+    // A marca da Garra não conta no "um poder por vez": o X lançado sai com ela na tela.
     private static int countProjectiles(List<Projectile> projectiles, int owner) {
         int count = 0;
-        for (Projectile p : projectiles) if (p.ownerIndex == owner) count++;
+        for (Projectile p : projectiles) if (p.ownerIndex == owner && !p.marca) count++;
         return count;
     }
 
     private static boolean hasProjectile(List<Projectile> projectiles, int owner) {
-        for (Projectile p : projectiles) if (p.ownerIndex == owner) return true;
+        for (Projectile p : projectiles) if (p.ownerIndex == owner && !p.marca) return true;
         return false;
     }
 
@@ -3868,6 +3915,7 @@ final class CombatEngine {
     private void detectMelee(CombatFighter a, CombatFighter d) {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         if (a.attack.mechanics.peelFrames > 0) return;   // jogar a casca não bate
+        if (a.attack.mechanics.marks()) return;          // a Garra: quem bate é a marca (deixaMarca)
         int frame = hitFrame(a);
         if (a.attack.mechanics.pound && poundStrike(a, d, frame)) return;
         if (a.attack.mechanics.rebound && (a.attack.mechanics.dives() ? reboundDive(a, d, frame) : reboundMissed(a, frame))) return;
@@ -4107,15 +4155,16 @@ final class CombatEngine {
         // Na corrida de energia a bola passa por ele.
         if (d.energyRunFrames > 0) return false;
         float[] corpo = crouch == d.crouchingBody() ? corpoAtual(d) : null;
+        float meia = p.halfHeight();
         if (corpo == null) {
-            return CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), crouch);
+            return CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, meia, d.x, d.y, d.body(), crouch);
         }
         float pl = Math.min(p.previousX, p.x) - p.radius, pr = Math.max(p.previousX, p.x) + p.radius;
         for (int i = 0; i + 3 < corpo.length; i += 4) {
             float left = (d.facing > 0 ? d.x + corpo[i] : d.x - corpo[i + 1]) - FOLGA_DESENHO;
             float right = (d.facing > 0 ? d.x + corpo[i + 1] : d.x - corpo[i]) + FOLGA_DESENHO;
             float top = d.y - corpo[i + 3] - FOLGA_DESENHO, bottom = d.y - corpo[i + 2];
-            if (pr >= left && pl <= right && p.y + p.radius >= top && p.y - p.radius <= bottom) return true;
+            if (pr >= left && pl <= right && p.y + meia >= top && p.y - meia <= bottom) return true;
         }
         return false;
     }
@@ -4260,7 +4309,7 @@ final class CombatEngine {
      * (é o braço) e a caixa em voo.
      */
     private Projectile reflete(Projectile p, CombatFighter quem) {
-        if (p.superKind() || p.retracts() || p.trap != null) return null;
+        if (p.superKind() || p.retracts() || p.trap != null || p.marca) return null;
         Projectile v = new Projectile(p.x, p.y, p.range, p.speed, p.radius, p.damage, p.color, quem.index,
             -p.direction, p.attack, p.visual);
         v.totalHits = Math.max(1, p.totalHits - p.hitsDone);
@@ -5773,7 +5822,8 @@ final class CombatEngine {
         // Pancadas no chão (o Super do p13): a primeira, a queda do pulo, já derruba.
         if (!projectile && attack.mechanics.pound && c.hitbox == 0) launch = AttackDefinition.Launch.KNOCKDOWN;
         float hitPush = lastStrike ? attack.pushbackOnHit : attack.pushbackOnHit * config.strikeHoldPushback;
-        if (projectile && lastStrike && attack.kind != AttackDefinition.Kind.SUPER) {
+        // A marca da Garra fica parada: empurra como o golpe dela (nada), não como a bola que voa.
+        if (projectile && lastStrike && attack.kind != AttackDefinition.Kind.SUPER && !c.projectile.marca) {
             hitPush = Math.max(hitPush, config.projectileHitPushback);
         }
         float airPush = lastStrike ? attack.knockback : attack.knockback * config.strikeHoldPushback;
@@ -5800,7 +5850,8 @@ final class CombatEngine {
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
         d.presoNoAr = 0;
-        d.stunProjectile = projectile && attack.kind != AttackDefinition.Kind.SUPER && !c.echo ? c.projectile : null;
+        d.stunProjectile = projectile && attack.kind != AttackDefinition.Kind.SUPER && !c.echo && !c.projectile.marca
+            ? c.projectile : null;
         // A new hit takes over any flight in progress (and any free fall after the hitstun).
         d.freeFallFrames = 0;
         d.vx = 0f;
@@ -6107,7 +6158,8 @@ final class CombatEngine {
      * tempo de soltar outra, e bola atrás de bola era um combo sem fim.
      */
     private static boolean energyChain(Contact c, CombatFighter d) {
-        if (c.projectile == null || c.echo || c.attack.kind == AttackDefinition.Kind.SUPER ||
+        // A marca da Garra do Kōga é combo de propósito (os três cortes acertados emendam).
+        if (c.projectile == null || c.echo || c.projectile.marca || c.attack.kind == AttackDefinition.Kind.SUPER ||
             d.status != CombatFighter.Status.HITSTUN || !d.grounded) {
             return false;
         }

@@ -1,0 +1,31 @@
+{
+ "nome": "marca_p03",
+ "video": "os três riscos do 1º corte (S1A), quadro 13 da folha GARRA_1: a marca da Garra parada, para quando o Kōga sai da Garra com ela na tela (tools/sprites/marca_garra.py; a mesma escala da folha dele)",
+ "ancora": "centro",
+ "pixelScale": 1.8605,
+ "altura": 235.4,
+ "quadros": [
+  [
+   0,
+   0,
+   260,
+   438,
+   -130.0,
+   -219.0
+  ]
+ ],
+ "duracoesMs": [
+  1000
+ ],
+ "caixa": {
+  "frente": 161.8,
+  "altura": 174.2,
+  "meiaLargura": 69.9,
+  "meiaAltura": 117.7
+ },
+ "luz": {
+  "cor": "#FF6A2A",
+  "alcance": 0.8,
+  "forca": 0.6
+ }
+}

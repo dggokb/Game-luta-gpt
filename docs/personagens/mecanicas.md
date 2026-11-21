@@ -210,6 +210,16 @@ no ar, aperta pra cima e sai empurrado para longe dela).
 soca, o segundo dá uma ombrada, e saem correndo; cada um leva metade do dano do Super. O
 capanga não tem imagem inicial, então a escala é manual (225 px, um pouco maior que o p07).
 
+**Marca (21/11, a Garra do tigre do Kōga):** `mecanica.marca` no golpe (`quadro`, `ate`, `frente`,
+`altura`, `meiaLargura`, `meiaAltura`, `efeito`): no quadro do corte o golpe deixa um poder parado na
+frente do lutador, que fica até o quadro `ate` (o fim da janela da continuação). O golpe em si não bate:
+quem acerta é a marca, com as regras de poder (continua se o dono apanhar, choca com o poder do rival e
+os dois se anulam, arranha na defesa). Diferente da bola, ela não empurra, emenda em combo (bola em cima
+de bola não emenda; marca sim) e não conta no "um poder por vez". O desenho: na pose do golpe é o da
+folha do lutador; fora dela, a folha `efeito` de `assets/efeitos` (`tools/sprites/marca_garra.py`, que
+também mede a caixa). A CPU rival não anda para dentro dela (`AiController.respeitaMarca`). Testes:
+`GarraDoTigreTest`.
+
 **Wall jump (14/10):** animação própria do p05 (`WALL_JUMP`, 3º vídeo: agacha no ar contra a
 parede invisível e sai de voadora), tocada enquanto dura o empurrão da parede.
 

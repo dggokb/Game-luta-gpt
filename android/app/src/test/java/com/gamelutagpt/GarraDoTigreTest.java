@@ -43,7 +43,7 @@ public class GarraDoTigreTest {
         boolean saiu = false;
         for (int t = 0; t < 30 && !saiu; t++) {
             s.step();
-            for (Projectile p : s.engine.energyProjectiles) saiu |= p.ownerIndex == 0;
+            for (Projectile p : s.engine.energyProjectiles) saiu |= p.ownerIndex == 0 && !p.marca;
         }
         assertTrue("o X voa (o projétil do S1)", saiu);
     }
@@ -228,5 +228,103 @@ public class GarraDoTigreTest {
             }
         }
         assertTrue("a CPU lançou o X pela sequência", lancados >= 1);
+    }
+    // ---- A marca é um poder (21/11; o dono: "o princípio da marca é ser um poder, então tem que
+    // respeitar as características de poder do nosso jogo")
+
+    /** Solta o 1º corte e anda até o quadro da marca; devolve a marca (null: já acertou ao nascer). */
+    private static Projectile primeiraMarca(CombatEngineTest.Sim s) {
+        s.in[0].special = "M";
+        s.step();
+        s.in[0].special = null;
+        int quadro = KOGA.attack(CancelSystem.ABERTURA).mechanics.markFrame;
+        for (int t = 0; t < 30 && s.f(0).attackFrame < quadro; t++) s.step();
+        assertEquals("o 1º corte chegou ao quadro da marca", quadro, s.f(0).attackFrame);
+        for (Projectile p : s.engine.energyProjectiles) if (p.marca && p.ownerIndex == 0) return p;
+        return null;
+    }
+
+    @Test public void aMarcaFicaSeOKogaApanhaEAcertaQuemEntra() {
+        // O rival fora da marca; o Kōga apanha logo depois de ela nascer (o golpe dele acaba) e o
+        // rival corre para dentro: a marca continua no lugar e acerta.
+        CombatEngineTest.Sim s = luta(380f);
+        Projectile marca = primeiraMarca(s);
+        assertNotNull("o rival está fora da marca", marca);
+        float x = marca.x;
+        CombatFighter k = s.f(0);
+        k.clearAttack();
+        k.status = CombatFighter.Status.HITSTUN;
+        k.stunLeft = k.stunTotal = 30;
+        int vida = s.f(1).state.life;
+        boolean acertou = false;
+        for (int t = 0; t < 20 && !acertou; t++) {
+            s.in[1].dash = true;
+            s.in[1].direction = 5;   // para a esquerda: a frente dele
+            assertTrue("a marca fica no lugar com o Kōga apanhando",
+                !s.engine.energyProjectiles.contains(marca) || marca.x == x);
+            s.step();
+            acertou = s.f(1).state.life < vida;
+        }
+        assertTrue("o rival que entra na marca apanha", acertou);
+        assertEquals(CombatFighter.Status.HITSTUN, s.f(1).status);
+    }
+
+    @Test public void aMarcaAnulaOPoderDoRival() {
+        CombatEngineTest.Sim s = luta(600f);
+        Projectile marca = primeiraMarca(s);
+        assertNotNull(marca);
+        // Uma bola do rival vindo na altura do peito.
+        Projectile bola = new Projectile(marca.x + 300f, marca.y, 900f, 900f, 24f, 700, 0xFFFFFFFF, 1, -1,
+            BASE.attack("S"));
+        s.engine.energyProjectiles.add(bola);
+        int vida = s.f(0).state.life;
+        for (int t = 0; t < 30; t++) s.step();
+        assertFalse("a bola se desfez", s.engine.energyProjectiles.contains(bola));
+        assertFalse("a marca também", s.engine.energyProjectiles.contains(marca));
+        assertEquals("o Kōga não apanhou", vida, s.f(0).state.life);
+    }
+
+    @Test public void aMarcaArranhaNaDefesa() {
+        CombatEngineTest.Sim s = luta(120f);
+        s.in[1].direction = 1;   // trás (o Kōga à esquerda): defende em pé
+        int vida = s.f(1).state.life;
+        primeiraMarca(s);
+        boolean defendeu = false;
+        for (int t = 0; t < 10; t++) {
+            s.in[1].direction = 1;
+            s.step();
+            defendeu |= s.f(1).status == CombatFighter.Status.BLOCKSTUN;
+        }
+        assertTrue("defendeu a marca", defendeu);
+        assertTrue("a marca arranha (vida vermelha), como poder", s.f(1).state.life < vida);
+    }
+
+    @Test public void aMarcaNaoEmpurraEOsTresCortesSaoCombo() {
+        CombatEngineTest.Sim s = luta(100f);
+        float antes = s.f(1).x;
+        primeiraMarca(s);
+        assertTrue("o 2º corte emenda", apertaAte(s, CancelSystem.FOLLOW_UP, 60));
+        for (int t = 0; t < 20; t++) s.step();
+        assertEquals("a marca acerta sem empurrar (como a Garra)", antes, s.f(1).x, 1f);
+        assertEquals("o 1º corte e o X acertaram em combo", 2, s.engine.session(1).hitCount);
+    }
+
+    /** A CPU rival não anda para dentro da marca: perto dela, para e defende até ela sumir. */
+    @Test public void aCpuNaoEntraNaMarca() {
+        CombatEngineTest.Sim s = luta(330f);
+        AiController cpu = new AiController(new OpponentAi(new Random(3)), new Random(3 * 31 + 7));
+        cpu.setEnabled(true);
+        cpu.setLevel(8);
+        Projectile marca = primeiraMarca(s);
+        assertNotNull("ela está fora da marca", marca);
+        int vida = s.f(1).state.life;
+        boolean defendeu = false;
+        for (int t = 0; t < 20 && s.engine.energyProjectiles.contains(marca); t++) {
+            cpu.fill(s.engine, 1, s.in[1]);
+            defendeu |= s.in[1].direction == 1;
+            s.step();
+        }
+        assertTrue("perto da marca ela segura a defesa", defendeu);
+        assertEquals("e não leva o corte", vida, s.f(1).state.life);
     }
 }

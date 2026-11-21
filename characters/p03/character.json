@@ -18920,7 +18920,18 @@
       "pushbackOnBlock": 0,
       "maxUsesPerChain": 1,
       "hitHeight": 290,
-      "hitFloor": 56
+      "hitFloor": 56,
+      "mecanica": {
+        "marca": {
+          "quadro": 13,
+          "ate": 29,
+          "frente": 161.8,
+          "altura": 174.2,
+          "meiaLargura": 69.9,
+          "meiaAltura": 117.7,
+          "efeito": "marca_p03"
+        }
+      }
     },
     "SG": {
       "animation": "GARRA_2",
@@ -18955,7 +18966,18 @@
       "pushbackOnBlock": 0,
       "maxUsesPerChain": 1,
       "hitHeight": 291,
-      "hitFloor": 5
+      "hitFloor": 5,
+      "mecanica": {
+        "marca": {
+          "quadro": 8,
+          "ate": 26,
+          "frente": 166.6,
+          "altura": 159.6,
+          "meiaLargura": 101.0,
+          "meiaAltura": 133.3,
+          "efeito": "marca_x_p03"
+        }
+      }
     }
   },
   "specialAnimations": {

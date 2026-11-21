@@ -1,0 +1,31 @@
+{
+ "nome": "marca_x_p03",
+ "video": "o X do 2º corte (SG), quadro 15 da folha GARRA_2: a marca da Garra parada, para quando o Kōga sai da Garra com ela na tela (tools/sprites/marca_garra.py; a mesma escala da folha dele)",
+ "ancora": "centro",
+ "pixelScale": 1.8605,
+ "altura": 266.6,
+ "quadros": [
+  [
+   0,
+   0,
+   376,
+   496,
+   -188.0,
+   -248.0
+  ]
+ ],
+ "duracoesMs": [
+  1000
+ ],
+ "caixa": {
+  "frente": 166.6,
+  "altura": 159.6,
+  "meiaLargura": 101.0,
+  "meiaAltura": 133.3
+ },
+ "luz": {
+  "cor": "#FF6A2A",
+  "alcance": 0.8,
+  "forca": 0.6
+ }
+}

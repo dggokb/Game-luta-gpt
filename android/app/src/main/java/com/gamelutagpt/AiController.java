@@ -495,7 +495,7 @@ final class AiController {
         // A bola dela chegando perto dele (a própria bola ela sabe onde está).
         boolean viva = false;
         for (Projectile p : engine.energyProjectiles) {
-            if (p.ownerIndex != self) continue;
+            if (p.ownerIndex != self || p.marca) continue;   // a marca da Garra não é bola que vai
             float vem = (seen.x - p.x) * p.direction;
             if (vem > 0f && vem < BOLA_PERTO) viva = true;
         }
@@ -1269,6 +1269,7 @@ final class AiController {
             return;
         }
         if (seen == null || seen.ko) return;   // ainda não viu nada: espera
+        if (respeitaMarca(engine, me, out)) return;
         if (punishGuardBreak(me, target, seen, out)) return;
         if (punish(engine, me, target, seen, out)) return;
         if (antiAir(engine, me, target, seen, out)) return;
@@ -1756,6 +1757,34 @@ final class AiController {
             return holdGuard(me, out);
         }
         anticipationTimer = 12;   // decidiu agir: espera um pouco antes de pensar de novo
+        return false;
+    }
+
+    /** Quão perto da marca do rival ela chega antes de parar e defender (px, da borda do corpo). */
+    static final float MARCA_PERTO = 50f;
+    /** Quadros de marca na tela antes de ela reagir (vê a marca se formar). */
+    static final int MARCA_VE = 4;
+
+    /**
+     * A marca da Garra do Kōga é um poder parado na frente dele (21/11): ela não anda para dentro.
+     * Com uma marca dele à frente e o corpo dela a {@link #MARCA_PERTO} da borda, para e segura a
+     * defesa até a marca sumir (punir o Kōga passando por ela é levar o corte).
+     */
+    private boolean respeitaMarca(CombatEngine engine, CombatFighter me, FighterInput out) {
+        if (!me.grounded) return false;
+        for (Projectile p : engine.energyProjectiles) {
+            if (!p.marca || p.ownerIndex == me.index) continue;
+            AttackDefinition.Mechanics m = p.attack.mechanics;
+            if (m.markUntil - m.markFrame + 1 - p.life < MARCA_VE) continue;
+            int lado = p.x >= me.x ? 1 : -1;
+            // Até o corpo desenhado (a guarda passa da caixa), como a bola (CpuPerception).
+            float borda = Math.abs(p.x - me.x) - p.radius - me.body().halfWidth - CpuPerception.alemDaCaixa(me, lado);
+            if (borda > MARCA_PERTO) continue;
+            movingForward = dashing = false;
+            out.direction = lado > 0 ? 5 : 1;   // trás: a defesa em pé
+            lastReason = "marca na frente: defende";
+            return true;
+        }
         return false;
     }
 

@@ -160,6 +160,18 @@ final class AttackDefinition {
          * até a frente do rival ficar a {@link #runNear} px (ou {@link #runMax} quadros). O desenho repete
          * os quadros {@link #runCycle} da animação, na ordem da passada, {@link #runStep} quadros cada.
          */
+        /**
+         * A marca da Garra do tigre (Kōga, 21/11; o dono: "o princípio da marca é ser um poder"): no
+         * quadro {@link #markFrame} o golpe deixa um poder parado na frente dele (a caixa da marca,
+         * da raiz: {@link #markX} à frente, {@link #markY} de altura do centro, meias medidas
+         * {@link #markHalfW} e {@link #markHalfH}), que fica até o quadro {@link #markUntil} do golpe
+         * (o fim da janela da continuação) mesmo que ele apanhe. O golpe em si não bate: quem acerta é
+         * a marca, com as regras de poder (choca com o do rival, arranha na defesa). Desenho: a folha
+         * {@link #markEffect} em assets/efeitos quando ele não está mais na pose do golpe.
+         */
+        int markFrame = -1, markUntil;
+        float markX, markY, markHalfW, markHalfH;
+        String markEffect;
         int runFrame = -1, runMax, runStep = 4;
         int[] runCycle = new int[0];
         /** A corrida usa a animação do dash do lutador (a corrida dele de sempre), pela distância andada. */
@@ -236,6 +248,12 @@ final class AttackDefinition {
             return this;
         }
         boolean runs() { return runFrame >= 0; }
+        Mechanics mark(int frame, int until, float x, float y, float halfW, float halfH, String effect) {
+            markFrame = frame; markUntil = until; markX = x; markY = y; markHalfW = halfW; markHalfH = halfH;
+            markEffect = effect;
+            return this;
+        }
+        boolean marks() { return markFrame >= 0; }
         Mechanics drawnStrike() { drawnStrike = true; return this; }
         Mechanics peel(int frame, float x, int frames) { peelFrame = frame; peelX = x; peelFrames = frames; return this; }
         Mechanics standBounce() { standBounce = true; return this; }
@@ -598,6 +616,10 @@ final class AttackDefinition {
             if (m.runs() && (m.runFrame >= startup || m.runSpeed <= 0f || m.runMax <= 0 || m.runStep <= 0 ||
                 m.runCycle.length == 0 && !m.runDash)) {
                 throw new IllegalArgumentException(name + "run: a corrida espera antes do ativo, com velocidade, limite e ciclo");
+            }
+            if (m.marks() && (m.markFrame < 1 || m.markUntil <= m.markFrame || m.markUntil >= total ||
+                m.markHalfW <= 0f || m.markHalfH <= 0f || m.markEffect == null)) {
+                throw new IllegalArgumentException(name + "marca: quadro dentro do golpe, até depois dele, caixa e efeito");
             }
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
             if (m.poisonDamage > 0 && m.poisonFrames < 1) throw new IllegalArgumentException(name + "poison needs frames");

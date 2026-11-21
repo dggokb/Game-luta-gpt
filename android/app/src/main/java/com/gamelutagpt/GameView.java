@@ -6435,6 +6435,13 @@ public class GameView extends SurfaceView
         projeteisEmFolha.clear();
         float ms = engine.frame() * FIXED_STEP * 1000f;
         for (Projectile p : engine.energyProjectiles) {
+            if (p.marca) {
+                // A marca da Garra do Kōga: na pose do golpe ela é a do desenho dele; fora dela
+                // (apanhou, cancelou no Super) é a folha da marca, parada onde o poder está.
+                projeteisEmFolha.add(p);
+                if (!marcaNoDesenhoDoDono(p)) efeitos.desenharEm(c, p.efeito, ms, p.x, p.y, 1f, p.direction < 0);
+                continue;
+            }
             if (!projetilDoPersonagem(p)) continue;
             float k = p.radius / 24f;
             String id = engine.fighter(p.ownerIndex).character().id;
@@ -6460,9 +6467,15 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** O dono está na pose da Garra (S1A ou o X), que já traz a marca desenhada. */
+    private boolean marcaNoDesenhoDoDono(Projectile p) {
+        CombatFighter dono = engine.fighter(p.ownerIndex);
+        return dono.attacking() && dono.attack != null && dono.attack.mechanics.marks();
+    }
+
     /** A bola padrão do personagem (não o mini do SHINKAI nem um desenho próprio). */
     private boolean projetilDoPersonagem(Projectile p) {
-        if (p.mini || p.ownerIndex < 0 || p.ownerIndex > 1) return false;
+        if (p.mini || p.marca || p.ownerIndex < 0 || p.ownerIndex > 1) return false;
         if (p.visual == null || "ONDA".equals(p.visual)) return true;
         // Outro desenho (a palma da Yin-lu) com a folha do vídeo do dono: a folha no lugar dele.
         return !p.superKind() && efeitos.tem("onda_" + engine.fighter(p.ownerIndex).character().id);
@@ -7298,6 +7311,10 @@ public class GameView extends SurfaceView
             java.util.List<Projectile> ps = lista == 0 ? engine.energyProjectiles : engine.superProjectiles;
             for (int i = 0; i < ps.size() && luzesEfeito < LUZES_DE_EFEITO; i++) {
                 Projectile p = ps.get(i);
+                if (p.marca && !marcaNoDesenhoDoDono(p)) {
+                    if (efeitos.luzEm(p.efeito, p.x, p.y, luzesDeEfeito[luzesEfeito])) luzesEfeito++;
+                    continue;
+                }
                 if (!projetilDoPersonagem(p)) continue;
                 String nome = (lista == 0 ? "onda_" : "super_") + engine.fighter(p.ownerIndex).character().id;
                 if (efeitos.luzEm(nome, p.x, p.y, luzesDeEfeito[luzesEfeito])) luzesEfeito++;

@@ -220,7 +220,7 @@ def validate_mechanics(name, mech, m, projectile):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
     known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho','agarra','salto',
-             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg','cruza','corrida'}
+             'chao','rebote','desenho','voo','arco','casca','quicaEmPe','otg','cruza','corrida','marca'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -255,6 +255,18 @@ def validate_mechanics(name, mech, m, projectile):
                 and type(c.get('max')) is int and c['max'] > 0 and isinstance(c.get('ciclo'), list) and len(c['ciclo']) >= 1
                 and all(type(v) is int and v >= 0 for v in c['ciclo']) and type(c.get('passo', 4)) is int and c.get('passo', 4) > 0):
             raise ValueError(f'{name}.mecanica.corrida: expected quadro (antes do ativo), perto, velocidade, max, ciclo [desenhos] e passo')
+    if 'marca' in mech:
+        # A marca da Garra do Kōga (21/11): um poder parado na frente dele, do quadro até o fim da
+        # janela; a caixa sai do tools/sprites/marca_garra.py e o efeito é a folha em assets/efeitos.
+        c = mech['marca']
+        total_m = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+        nums = ('frente', 'altura', 'meiaLargura', 'meiaAltura')
+        if not (isinstance(c, dict) and set(c) == {'quadro', 'ate', 'efeito', *nums}
+                and type(c['quadro']) is int and type(c['ate']) is int and 1 <= c['quadro'] < c['ate'] < total_m
+                and all(isinstance(c[k], (int, float)) for k in nums) and c['meiaLargura'] > 0 and c['meiaAltura'] > 0
+                and isinstance(c['efeito'], str) and (ROOT / 'android/app/src/main/assets/efeitos' / c['efeito'] / 'efeito.json').exists()):
+            raise ValueError(f'{name}.mecanica.marca: expected quadro, ate (dentro do golpe), frente, altura, '
+                             'meiaLargura, meiaAltura e efeito (uma pasta de assets/efeitos)')
     if 'avanco' in mech:
         frames('avanco', mech['avanco'])
         v = mech['avanco'].get('velocidade')  # negativa: recua (estrela da p16)
@@ -889,6 +901,10 @@ def compile_packs(root, results, alterados=None, medir=False):
                 code += '.runDash('+str(c['quadro'])+','+f(c['perto'])+','+f(c['velocidade'])+','+str(c['max'])+')'
             else:
                 code += '.run('+str(c['quadro'])+','+f(c['perto'])+','+f(c['velocidade'])+','+str(c['max'])+','+str(c.get('passo', 4))+','+','.join(map(str, c['ciclo']))+')'
+        if 'marca' in mech:
+            c = mech['marca']
+            code += ('.mark('+str(c['quadro'])+','+str(c['ate'])+','+f(c['frente'])+','+f(c['altura'])+','
+                     +f(c['meiaLargura'])+','+f(c['meiaAltura'])+',"'+c['efeito']+'")')
         if mech.get('desenho'): code += '.drawnStrike()'
         if 'casca' in mech: code += '.peel('+str(mech['casca']['quadro'])+','+f(mech['casca']['x'])+','+str(mech['casca']['duracao'])+')'
         if mech.get('quicaEmPe'): code += '.standBounce()'
