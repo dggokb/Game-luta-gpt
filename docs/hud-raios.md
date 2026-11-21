@@ -56,3 +56,26 @@ Super embaixo e o toque antigo do MENU voltam como estavam.
   botão "Run workflow".
 - Os retratos são as artes de conceito (`ui/hud/concepts`). Alguns têm fundo branco, que
   aparece nos cantos da moldura hexagonal.
+
+## Barra compacta (21/11)
+
+O dono achou que a barra cobria muito a tela (~26% da altura) e que só diminuir era gambiarra. Das
+versões geradas no Codex a partir desta arte (`art/hud/compacto/`, os prompts ao lado), escolheu a do
+time empilhado no canto (`hud_compacto_dbfz.png`): uma faixa de ~13% da altura.
+
+- `tools/hud/montar_barra_compacta.py` monta `assets/ui/hud/hud-compacto.png` (linhas 0 a 132): buracos
+  nos rostos, vidas, TAG, SHINKAI e no miolo dos quadradinhos do Super (o contorno de neon fica); apaga
+  os nomes, ∞/TREINO e MENU. TAG, SHINKAI e SUPER ficam pintados; não há o número do Super.
+- `HudRenderer.COMPACTA` troca a arte e as medidas (`RAIOS_P1/P2`, nomes, relógio, MENU, anel do
+  assist); o desenho ao vivo é o mesmo. O toque do MENU vai para 572–708 × 62–104.
+- **Ligada** ("põe", 21/11, depois do vídeo `hud_compacto.mp4`); `-Dgameluta.barraCompacta=false`
+  volta à barra de raios de três andares.
+- O Codex foi instalado na sessão (`npm install -g @openai/codex`, `codex login --device-auth` com a
+  conta do dono); cada imagem: `codex exec --skip-git-repo-check --sandbox workspace-write --image
+  referencia.png - < prompt.txt`.
+- Depois, "os encaixes de imagem estão errados; se não for bom, faz nova": o Codex redesenhou só as
+  molduras dos rostos (hexágonos limpos; o do parceiro pequeno, no canto de baixo do principal) com o
+  miolo em magenta puro (`hud_compacto_dbfz_molduras.png`, `prompt_molduras.txt`). O script acha os
+  buracos dos rostos pelo magenta e imprime os contornos que vão no `HudRenderer`. Na barra compacta o
+  retrato entra pela altura com os olhos a 47% da moldura (`ROSTO_ENQUADRA`, `PARCEIRO_ENQUADRA`),
+  não cobrindo a caixa pela largura.

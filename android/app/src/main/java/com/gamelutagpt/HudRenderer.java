@@ -430,8 +430,16 @@ final class HudRenderer {
     // O que é vivo (rostos, vidas, SHINKAI, quadradinhos do Super) vai ANTES da arte, que tem
     // buracos ali; números, rótulos e brilhos vão depois, por cima.
 
-    static final String RAIOS_ARQUIVO = "ui/hud/hud-raios.png";
-    static final float RAIOS_ESCALA = 1280f / 1672f, RAIOS_TOPO = 76f, RAIOS_Y = -6f;
+    /**
+     * A barra compacta (o dono, 21/11: "o HUD está cobrindo muito a tela"; ele escolheu, das
+     * versões geradas no Codex, a do time empilhado no canto): art/hud/compacto/hud_compacto_dbfz.png
+     * montada por tools/hud/montar_barra_compacta.py. Uma faixa de ~13% da altura no lugar dos três
+     * andares de ~26%. Mesmo desenho ao vivo, outras medidas (COMPACTA_P1/P2 e as do centro).
+     * Ligada ("põe", 21/11); {@code -Dgameluta.barraCompacta=false} volta à barra de raios de três andares.
+     */
+    static final boolean COMPACTA = !"false".equals(System.getProperty("gameluta.barraCompacta"));
+    static final String RAIOS_ARQUIVO = COMPACTA ? "ui/hud/hud-compacto.png" : "ui/hud/hud-raios.png";
+    static final float RAIOS_ESCALA = 1280f / 1672f, RAIOS_TOPO = COMPACTA ? 0f : 76f, RAIOS_Y = COMPACTA ? 2f : -6f;
 
     /** Um lado da barra com raios, nas coordenadas da imagem do dono. */
     private static final class LadoRaios {
@@ -470,31 +478,59 @@ final class HudRenderer {
     }
 
     // Medidas tiradas da arte (tools/hud/montar_barra_raios.py abre os buracos nesses lugares).
-    private static final LadoRaios RAIOS_P1 = new LadoRaios(false, BLUE,
+    private static final LadoRaios RAIOS_P1 = COMPACTA ? new LadoRaios(false, BLUE,
+        new float[]{75, 22, 52, 63, 52, 67, 74, 107, 126, 108, 129, 103, 128, 96, 140, 76, 145, 76, 150, 67, 148, 59, 126, 22},
+        new float[]{138, 78, 129, 94, 129, 98, 137, 112, 161, 113, 170, 98, 170, 94, 162, 79},
+        new float[]{161, 48, 737, 65}, new float[]{255, 75, 758, 87},
+        new float[]{309, 96, 482, 96, 476, 111, 303, 111},
+        celulasCompactas(569f, 27.6f), 99f, 109f,
+        0f, 0f, 0f, 0f, 750f, 103f) : new LadoRaios(false, BLUE,
         new float[]{96, 127, 184, 127, 220, 163, 137, 254, 37, 182},
         new float[]{157, 262, 220, 263, 249, 297, 147, 297},
         new float[]{198, 169, 719, 204}, new float[]{319, 268, 642, 289},
         new float[]{293, 225, 450, 225, 442, 244, 278, 244},
         new float[]{582, 607, 612, 637, 641, 667, 672, 697, 702, 727}, 223f, 242f,
         557f, 247f, 284f, 290f, 704f, 278f);
-    private static final LadoRaios RAIOS_P2 = new LadoRaios(true, RED,
+    private static final LadoRaios RAIOS_P2 = COMPACTA ? new LadoRaios(true, RED,
+        new float[]{1546, 22, 1523, 63, 1523, 67, 1527, 75, 1534, 78, 1542, 92, 1545, 107, 1597, 108, 1621, 67, 1619, 59, 1597, 22},
+        new float[]{1511, 78, 1502, 94, 1502, 98, 1510, 112, 1534, 113, 1543, 98, 1543, 94, 1535, 79},
+        new float[]{936, 48, 1512, 65}, new float[]{915, 75, 1417, 87},
+        new float[]{1196, 96, 1356, 96, 1352, 111, 1203, 111},
+        celulasCompactas(1038f, 27.1f), 99f, 109f,
+        0f, 0f, 0f, 0f, 921f, 103f) : new LadoRaios(true, RED,
         new float[]{1487, 127, 1575, 127, 1631, 181, 1535, 254, 1451, 163},
         new float[]{1449, 262, 1509, 262, 1524, 298, 1419, 298},
         new float[]{955, 169, 1476, 204}, new float[]{1034, 268, 1352, 289},
         new float[]{1236, 225, 1393, 225, 1406, 244, 1239, 244},
         new float[]{1071, 1097, 1102, 1127, 1132, 1157, 1162, 1187, 1192, 1217}, 224f, 241f,
         1043f, 247f, 1388f, 290f, 970f, 279f);
+    /** Os quadradinhos do Super da barra compacta: esquerda e direita de cada um, a partir de {@code x}. */
+    private static float[] celulasCompactas(float x, float passo) {
+        float[] r = new float[10];
+        for (int i = 0; i < 5; i++) { r[i * 2] = x + passo * i + 2f; r[i * 2 + 1] = x + passo * i + 27f; }
+        return r;
+    }
+
     /** Plaquinha do nome em cima da vida (onde a arte do dono tinha PLAYER 1/2), em coordenadas da arte. */
-    private static final float RAIOS_NOME_X_P1 = 304f, RAIOS_NOME_X_P2 = 1368f, RAIOS_NOME_Y = 158f, RAIOS_NOME_LARGURA = 158f;
+    private static final float RAIOS_NOME_X_P1 = COMPACTA ? 248f : 304f, RAIOS_NOME_X_P2 = COMPACTA ? 1428f : 1368f,
+        RAIOS_NOME_Y = COMPACTA ? 43f : 158f, RAIOS_NOME_LARGURA = COMPACTA ? 132f : 158f, RAIOS_NOME_TAM = COMPACTA ? 22f : 36f;
+    /** Tamanhos e alturas do centro (relógio, modo, MENU) e dos textos dos lados, por barra. */
+    private static final float RELOGIO_Y = COMPACTA ? 55f : 191f, RELOGIO_TAM = COMPACTA ? 50f : 92f,
+        RELOGIO_NUM_Y = COMPACTA ? 53f : 187f, RELOGIO_NUM_TAM = COMPACTA ? 34f : 66f, RELOGIO_PULSO_Y = COMPACTA ? 42f : 165f,
+        MODO_Y = COMPACTA ? 76f : 219f, MODO_TAM = COMPACTA ? 16f : 28f, MENU_TAM = COMPACTA ? 18f : 29f,
+        SHINKAI_NOME_TAM = COMPACTA ? 13f : 20f, ANEL_R = COMPACTA ? 11f : 17f;
+    private static final float[] MENU_PLACA = COMPACTA
+        ? new float[]{775f, 92f, 897f, 92f, 908f, 117f, 764f, 117f}
+        : new float[]{755f, 257f, 925f, 257f, 944f, 305f, 728f, 305f};
     /** Placa do relógio e do MENU, no centro. */
-    private static final float RAIOS_CENTRO_X = 836f, RAIOS_MENU_Y = 281f;
+    private static final float RAIOS_CENTRO_X = 836f, RAIOS_MENU_Y = COMPACTA ? 111f : 281f;
 
     private final Rect raiosOrigem = new Rect();
     private final RectF raiosDestino = new RectF();
     private Bitmap hudRaiosPlaca;
-    private final Shader raiosVidaGrad = new Degrade.Linear(0f, 169f, 0f, 204f,
+    private final Shader raiosVidaGrad = new Degrade.Linear(0f, COMPACTA ? 47f : 169f, 0f, COMPACTA ? 66f : 204f,
         new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
-    private final Shader raiosTagGrad = new Degrade.Linear(0f, 268f, 0f, 289f,
+    private final Shader raiosTagGrad = new Degrade.Linear(0f, COMPACTA ? 76f : 268f, 0f, COMPACTA ? 88f : 289f,
         new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
 
     /** Toque do MENU na tela virtual: a placa do centro da arte. */
@@ -533,18 +569,19 @@ final class HudRenderer {
         topoRaios(c, RAIOS_P1, active, reserve, s.tagReadyRatio(), effects.point);
         topoRaios(c, RAIOS_P2, s.opponent(), s.opponentReserve(), s.opponentTagReadyRatio(), effects.cpu);
         // O nome oficial de quem está em campo na plaquinha de cima (a arte dizia PLAYER 1/2).
-        textoCabe(c, active.hudNome, RAIOS_NOME_X_P1, RAIOS_NOME_Y, 36f, RAIOS_NOME_LARGURA, Color.WHITE);
-        textoCabe(c, s.opponent().hudNome, RAIOS_NOME_X_P2, RAIOS_NOME_Y, 36f, RAIOS_NOME_LARGURA, Color.WHITE);
+        textoCabe(c, active.hudNome, RAIOS_NOME_X_P1, RAIOS_NOME_Y, RAIOS_NOME_TAM, RAIOS_NOME_LARGURA, Color.WHITE);
+        textoCabe(c, s.opponent().hudNome, RAIOS_NOME_X_P2, RAIOS_NOME_Y, RAIOS_NOME_TAM, RAIOS_NOME_LARGURA, Color.WHITE);
         TesteAutomatico.hud(TesteAutomatico.HUD_BARRAS);
         efeitosRaios(c);
         TesteAutomatico.hud(TesteAutomatico.HUD_EFEITOS);
         // Centro: o relógio (∞ no treino e nas cenas, os segundos na batalha), o modo e o MENU.
         relogioRaios(c, s);
-        text(c, s.battleActive() ? "BATALHA" : "TREINO", RAIOS_CENTRO_X, 219f, 28f, Color.WHITE);
+        text(c, s.battleActive() ? "BATALHA" : "TREINO", RAIOS_CENTRO_X, MODO_Y, MODO_TAM, Color.WHITE);
         boolean menu = s.pressed(Control.CHARACTER_SELECT);
         if (menu) {
             shape.reset();
-            shape.moveTo(755f, 257f); shape.lineTo(925f, 257f); shape.lineTo(944f, 305f); shape.lineTo(728f, 305f);
+            float[] m = MENU_PLACA;
+            shape.moveTo(m[0], m[1]); shape.lineTo(m[2], m[3]); shape.lineTo(m[4], m[5]); shape.lineTo(m[6], m[7]);
             shape.close();
             fxPaint.setStyle(Paint.Style.FILL); fxPaint.setColor(0x5530C8FF);
             c.drawPath(shape, fxPaint);
@@ -552,7 +589,7 @@ final class HudRenderer {
             c.drawPath(shape, fxPaint);
             fxPaint.setStyle(Paint.Style.FILL);
         }
-        label(c, s.selectButtonLabel(), RAIOS_CENTRO_X, RAIOS_MENU_Y, 29f, Color.WHITE);
+        label(c, COMPACTA ? s.selectButtonLabel().replace("◀ ", "") : s.selectButtonLabel(), RAIOS_CENTRO_X, RAIOS_MENU_Y, MENU_TAM, Color.WHITE);
         TesteAutomatico.hud(TesteAutomatico.HUD_TEXTOS);
         c.restore();
     }
@@ -576,7 +613,7 @@ final class HudRenderer {
                            CharacterDefinition ausente, CharacterSelectRenderer portraits, HudEffects.Meter fx) {
         float hurt = effects.fade(fx.hitAt, .32f);
         float shake = hurt * 6f * (float)Math.sin(effects.now * 95.0);
-        rostoRaios(c, portraits, point.character, l.rosto, l.rostoCaixa, shake);
+        rostoRaios(c, portraits, point.character, l.rosto, l.rostoCaixa, shake, ROSTO_ENQUADRA);
         if (hurt > 0f) {
             fxPaint.setColor(0xFFFF2A3A);
             fxPaint.setAlpha(Math.round(120 * hurt));
@@ -586,7 +623,7 @@ final class HudRenderer {
         CharacterDefinition parceiro = reserve == null ? ausente : reserve.character;
         paint.setColor(0xFF0A1122);
         c.drawPath(l.parceiro, paint);
-        if (parceiro != null) rostoRaios(c, portraits, parceiro, l.parceiro, l.parceiroCaixa, 0f);
+        if (parceiro != null) rostoRaios(c, portraits, parceiro, l.parceiro, l.parceiroCaixa, 0f, PARCEIRO_ENQUADRA);
         if (reserve == null && parceiro != null) {
             // Parceiro fora (duelo, ou o CPU sem dupla): o rosto fica apagado.
             paint.setColor(0xAA05070D);
@@ -603,8 +640,19 @@ final class HudRenderer {
         superRaios(c, point, l, fx);
     }
 
+    /**
+     * Como o rosto entra na moldura: {altura do retrato em alturas da moldura (0: cobrir a caixa, o
+     * jeito da barra de raios), onde ficam os olhos na moldura (fração da altura), onde ficam os
+     * olhos no retrato, deslocamento para o lado (fração da largura, para o miolo da moldura), a
+     * largura mínima (fração da largura da moldura)}. Na
+     * barra compacta a moldura do parceiro é uma tira baixa e larga: cobrir pela largura mostrava só
+     * o queixo (o dono, 21/11: "os encaixes de imagem estão errados"); agora ela pega a faixa dos olhos.
+     */
+    private static final float[] ROSTO_ENQUADRA = COMPACTA ? new float[]{1.22f, .47f, .46f, 0f, 1f} : new float[]{0f, .44f, .5f, 0f, 0f};
+    private static final float[] PARCEIRO_ENQUADRA = COMPACTA ? new float[]{1.45f, .47f, .46f, 0f, 1f} : new float[]{0f, .44f, .5f, 0f, 0f};
+
     private void rostoRaios(Canvas c, CharacterSelectRenderer portraits, CharacterDefinition character,
-                            Path forma, RectF caixa, float dx) {
+                            Path forma, RectF caixa, float dx, float[] enq) {
         paint.setColor(0xFF0A1122);
         c.drawPath(forma, paint);
         Bitmap bitmap = portraits.hudPortrait(character);
@@ -612,12 +660,21 @@ final class HudRenderer {
         c.save();
         c.clipPath(forma);
         float w = caixa.width(), h = caixa.height();
-        // Um pouco mais perto que só cobrir a caixa: o rosto enche a moldura, como na arte.
-        float scale = 1.22f * Math.max(w / bitmap.getWidth(), h / bitmap.getHeight());
-        float drawW = bitmap.getWidth() * scale, drawH = bitmap.getHeight() * scale;
-        float cy = caixa.top + h * .44f;
-        portraitBox.set(caixa.left + dx + (w - drawW) / 2f, cy - drawH / 2f,
-            caixa.left + dx + (w + drawW) / 2f, cy + drawH / 2f);
+        if (enq[0] > 0f) {
+            float drawH = h * enq[0], drawW = bitmap.getWidth() * drawH / bitmap.getHeight();
+            // Mais estreito que a moldura, ele cresce até cobrir a largura (sem sobrar fundo dos lados).
+            if (drawW < w * enq[4]) { drawH *= w * enq[4] / drawW; drawW = w * enq[4]; }
+            float top = caixa.top + h * enq[1] - drawH * enq[2];
+            float left = caixa.left + dx + w * enq[3] + (w - drawW) / 2f;
+            portraitBox.set(left, top, left + drawW, top + drawH);
+        } else {
+            // Um pouco mais perto que só cobrir a caixa: o rosto enche a moldura, como na arte.
+            float scale = 1.22f * Math.max(w / bitmap.getWidth(), h / bitmap.getHeight());
+            float drawW = bitmap.getWidth() * scale, drawH = bitmap.getHeight() * scale;
+            float cy = caixa.top + h * enq[1];
+            portraitBox.set(caixa.left + dx + (w - drawW) / 2f, cy - drawH / 2f,
+                caixa.left + dx + (w + drawW) / 2f, cy + drawH / 2f);
+        }
         c.drawBitmap(bitmap, null, portraitBox, imagePaint);
         c.restore();
     }
@@ -725,39 +782,41 @@ final class HudRenderer {
     private void topoRaios(Canvas c, LadoRaios l, FighterState f, FighterState reserve, float ready, HudEffects.Meter fx) {
         int level = Math.max(0, Math.min(5, f.superMeter / CombatConfig.METER_PER_BAR));
         float pop = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
-        if (level > 0) {
+        if (level > 0 && l.digitoX > 0f) {
             fxPaint.setColor(l.cor);
             fxPaint.setAlpha(Math.round(40 + 110 * pop + (level == 5 ? 30 * (float)Math.sin(effects.now * 6) + 30 : 0)));
             c.drawCircle(l.digitoX, l.digitoY - 13f, 17f + 8f * pop, fxPaint);
             fxPaint.setAlpha(255);
         }
-        text(c, LEVELS[level], l.digitoX, l.digitoY + 3f * pop, 34f * (1f + .3f * pop),
+        // A barra compacta não tem o número (os cinco quadradinhos já contam as barras).
+        if (l.digitoX > 0f) text(c, LEVELS[level], l.digitoX, l.digitoY + 3f * pop, 34f * (1f + .3f * pop),
             pop > 0f ? 0xFFFFF3B0 : level == 0 ? 0xFFAEB6C8 : Color.WHITE);
         if (f.superMeter >= CombatConfig.MAX_METER) {
             float a = l.celulas[0], z = l.celulas[9];
             energyEdge(c, a - 2f, l.celTopo - 3f, z - a + 4f, l.celBase - l.celTopo + 6f, l.cor, 1f);
         }
         // Sem parceiro, o TAG fica apagado (não cabe "TAG OFF" na placa).
-        text(c, "TAG", l.tagX, l.tagY, 27f, reserve == null ? 0xFF5E6678 : Color.WHITE);
+        // Na barra compacta o TAG fica pintado na arte.
+        if (l.tagX > 0f) text(c, "TAG", l.tagX, l.tagY, 27f, reserve == null ? 0xFF5E6678 : Color.WHITE);
         // Assist: o anel enche até ficar pronto; pronto, fica como na arte (aceso).
         float k = reserve == null ? 0f : Arena.clamp(ready, 0f, 1f);
         if (k < 1f) {
             paint.setColor(0xF0070B16);
-            c.drawCircle(l.anelX, l.anelY, 21f, paint);
+            c.drawCircle(l.anelX, l.anelY, ANEL_R + 4f, paint);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(4f);
             paint.setColor(0xFF1A2236);
-            c.drawCircle(l.anelX, l.anelY, 17f, paint);
+            c.drawCircle(l.anelX, l.anelY, ANEL_R, paint);
             if (k > 0f) {
                 paint.setColor(l.cor);
-                c.drawArc(l.anelX - 17f, l.anelY - 17f, l.anelX + 17f, l.anelY + 17f, -90f, 360f * k, false, paint);
+                c.drawArc(l.anelX - ANEL_R, l.anelY - ANEL_R, l.anelX + ANEL_R, l.anelY + ANEL_R, -90f, 360f * k, false, paint);
             }
             paint.setStyle(Paint.Style.FILL);
         }
         if (f.inShinkai()) {
             float[] r = l.shinkai;
             String nome = f.emRuptura() ? "RUPTURA" : f.limiteQuadros > 0 ? "NO LIMITE" : "SHINKAI " + f.shinkaiType.label;
-            text(c, nome, (r[0] + r[2]) / 2f, r[3] - 3f, 20f, Color.WHITE);
+            text(c, nome, (r[0] + r[2]) / 2f, r[3] - 3f, SHINKAI_NOME_TAM, Color.WHITE);
         } else if (f.shinkaiReady()) {
             float[] r = l.shinkai;
             energyEdge(c, r[0], r[1] - 2f, r[2] - r[0], r[3] - r[1] + 4f, f.corShinkai(), 1f);
@@ -767,8 +826,8 @@ final class HudRenderer {
     private void relogioRaios(Canvas c, State s) {
         String label = s.clockLabel();
         boolean inf = "∞".equals(label);
-        float size = inf ? 92f : label.length() >= 3 ? 56f : 66f;
-        float y = inf ? 191f : 187f;
+        float size = inf ? RELOGIO_TAM : RELOGIO_NUM_TAM * (label.length() >= 3 ? 56f / 66f : 1f);
+        float y = inf ? RELOGIO_Y : RELOGIO_NUM_Y;
         if (!s.clockUrgent()) {
             text(c, label, RAIOS_CENTRO_X, y, size, Color.WHITE);
             return;
@@ -776,9 +835,9 @@ final class HudRenderer {
         float beat = (float)(effects.now - Math.floor(effects.now));
         float pulse = 1f + 0.18f * Math.max(0f, 1f - beat * 4f);
         c.save();
-        c.translate(RAIOS_CENTRO_X, 165f);
+        c.translate(RAIOS_CENTRO_X, RELOGIO_PULSO_Y);
         c.scale(pulse, pulse);
-        c.translate(-RAIOS_CENTRO_X, -165f);
+        c.translate(-RAIOS_CENTRO_X, -RELOGIO_PULSO_Y);
         text(c, label, RAIOS_CENTRO_X, y, size, RED);
         c.restore();
     }
@@ -804,7 +863,7 @@ final class HudRenderer {
             fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(4f);
             fxPaint.setColor(use > 0 ? Color.WHITE : 0xFF84ECFF);
             fxPaint.setAlpha(Math.round(230 * Math.min(1f, pulso)));
-            c.drawCircle(l.anelX, l.anelY, 24f + 6f * ready, fxPaint);
+            c.drawCircle(l.anelX, l.anelY, ANEL_R * 1.4f + 6f * ready, fxPaint);
             fxPaint.setAlpha(255); fxPaint.setStyle(Paint.Style.FILL);
         }
         // Troca de dupla: o contorno do rosto novo acende.
