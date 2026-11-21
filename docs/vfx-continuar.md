@@ -2194,3 +2194,10 @@ no lugar do `impacto_v08_forte` só ali.
   tempo do acerto forte como os `impacto_v0*`, na ponta do golpe, luz `#F2E640`. O v08 fica nos
   assets como reserva: para voltar, apagar a pasta `impacto_v09_forte`. Gravado no PC; falta o
   dono ver no celular.
+- **Teste 6 (Impacto-cel14, 21/11):** "Testa esse no H e me manda vídeo". Folha 4×4 de 2048 px,
+  15 quadros, 12 fps (83 ms por quadro), com transparência. Em 1x (`pixelScale` 1,5; ~319 px)
+  ao lado do forte de hoje (o Impacto-cel10 instalado), com o motor de animação desligado como
+  está agora, normal e câmera lenta, fora do jogo (cópia separada; nome `impacto_v0t_teste`, para
+  ter a ponta do golpe e o tempo dos `impacto_v0*`). Nos quadros: a cruz e os raios aparecem; o
+  disco e os anéis do fim quase não (brilho fraco, como o cel10 antes do reforço). Guardado em
+  `art/vfx/teste_soco_forte_v09/teste6_impacto_cel14/`. Falta o dono dizer.
