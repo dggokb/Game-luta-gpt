@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Monta a barra compacta da luta (assets/ui/hud/hud-compacto.png) a partir da arte gerada no Codex
 (art/hud/compacto/hud_compacto_dbfz.png, 1672x941, a escolhida pelo dono em 21/11: o time
-empilhado no canto, como no Dragon Ball FighterZ).
+empilhado no canto, como no Dragon Ball FighterZ). Depois de "os encaixes de imagem estão
+errados", o Codex redesenhou só as molduras dos rostos, com o miolo em magenta puro
+(hud_compacto_dbfz_molduras.png, a arte usada): os buracos dos rostos são o magenta, exatos, e o
+script imprime os contornos para o HudRenderer.
 
 Como no montar_barra_raios.py: abre buracos onde o jogo desenha ao vivo (rostos, vida, TAG,
 SHINKAI e o miolo dos quadradinhos do Super, deixando o contorno de neon) e apaga os textos que
@@ -18,7 +21,7 @@ import numpy as np
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-ARTE = os.path.join(ROOT, "art", "hud", "compacto", "hud_compacto_dbfz.png")
+ARTE = os.path.join(ROOT, "art", "hud", "compacto", "hud_compacto_dbfz_molduras.png")
 SAIDA = os.path.join(ROOT, "android", "app", "src", "main", "assets", "ui", "hud", "hud-compacto.png")
 TOPO, BASE = 0, 132
 
@@ -27,8 +30,8 @@ ROSTOS = [[(36, 57), (80, 27), (146, 27), (167, 46), (138, 75), (118, 97), (98, 
 PARCEIROS = [[(141, 77), (179, 77), (219, 109), (112, 109)],
              [(1491, 77), (1546, 77), (1560, 92), (1557, 110), (1452, 110)]]
 # Vida e TAG: achados pela cor a partir de um ponto (semente, caixa).
-POR_COR = [("vida", (400, 56), (150, 44, 730, 69)), ("vida", (1200, 56), (945, 44, 1525, 69)),
-           ("vida", (500, 81), (245, 74, 745, 90)), ("vida", (1150, 81), (925, 74, 1425, 90)),
+POR_COR = [("vida", (400, 56), (150, 44, 745, 69)), ("vida", (1200, 56), (925, 44, 1525, 69)),
+           ("vida", (500, 81), (245, 72, 765, 90)), ("vida", (1150, 81), (905, 72, 1430, 90)),
            ("azul", (400, 103), (306, 94, 484, 114)), ("vermelho", (1270, 103), (1192, 94, 1358, 114))]
 
 
@@ -62,7 +65,27 @@ def main():
         hull = cv2.convexHull(cv2.findNonZero((lab == lab[sy, sx]).astype(np.uint8)))
         cv2.fillPoly(buraco, [hull], 255)
     buraco = cv2.dilate(buraco, np.ones((3, 3), np.uint8))
-    for poly in ROSTOS + PARCEIROS + CELULAS:
+    # Rostos: o miolo magenta da moldura, com 2 px a mais (a borda antisserrilhada do magenta).
+    mag = ((R > 170) & (B > 170) & (G < 110) & (A[..., 3] > 100)).astype(np.uint8)
+    mag[BASE:] = 0
+    n, lab, st, _ = cv2.connectedComponentsWithStats(mag, 4)
+    formas = sorted([i for i in range(1, n) if st[i][4] > 300], key=lambda i: -st[i][4])
+    assert len(formas) == 4, f"{len(formas)} molduras magenta (esperava 4)"
+    for i in formas:
+        um = cv2.dilate((lab == i).astype(np.uint8), np.ones((5, 5), np.uint8))
+        cs, _ = cv2.findContours(um, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        pol = cv2.approxPolyDP(max(cs, key=cv2.contourArea), 1.2, True).reshape(-1, 2)
+        lado = "P1" if pol[:, 0].mean() < W / 2 else "P2"
+        tipo = "rosto" if st[i][4] > 3000 else "parceiro"
+        print(lado, tipo, "new float[]{" + ", ".join(f"{x}, {y}" for x, y in pol) + "}")
+        cv2.fillPoly(buraco, [pol.astype(np.int32)], 255)
+    for cor, (sx, sy), (x0, y0, x1, y1) in POR_COR:
+        m = np.zeros((H, W), np.uint8)
+        m[y0:y1, x0:x1] = cores[cor][y0:y1, x0:x1]
+        _, lb = cv2.connectedComponents(m, connectivity=8)
+        ys, xs = np.nonzero(lb == lb[sy, sx])
+        print(cor, "caixa", xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
+    for poly in CELULAS:
         cv2.fillPoly(buraco, [np.array(poly, np.int32)], 255)
     claro = A[..., :3].min(2) > 150
     texto = np.zeros((H, W), np.uint8)

@@ -479,9 +479,9 @@ final class HudRenderer {
 
     // Medidas tiradas da arte (tools/hud/montar_barra_raios.py abre os buracos nesses lugares).
     private static final LadoRaios RAIOS_P1 = COMPACTA ? new LadoRaios(false, BLUE,
-        new float[]{36, 57, 80, 27, 146, 27, 167, 46, 138, 75, 118, 97, 98, 92},
-        new float[]{141, 77, 179, 77, 219, 109, 112, 109},
-        new float[]{160, 47, 716, 66}, new float[]{252, 76, 740, 88},
+        new float[]{75, 22, 52, 63, 52, 67, 74, 107, 126, 108, 129, 103, 128, 96, 140, 76, 145, 76, 150, 67, 148, 59, 126, 22},
+        new float[]{138, 78, 129, 94, 129, 98, 137, 112, 161, 113, 170, 98, 170, 94, 162, 79},
+        new float[]{161, 48, 737, 65}, new float[]{255, 75, 758, 87},
         new float[]{309, 96, 482, 96, 476, 111, 303, 111},
         celulasCompactas(569f, 27.6f), 99f, 109f,
         0f, 0f, 0f, 0f, 750f, 103f) : new LadoRaios(false, BLUE,
@@ -492,9 +492,9 @@ final class HudRenderer {
         new float[]{582, 607, 612, 637, 641, 667, 672, 697, 702, 727}, 223f, 242f,
         557f, 247f, 284f, 290f, 704f, 278f);
     private static final LadoRaios RAIOS_P2 = COMPACTA ? new LadoRaios(true, RED,
-        new float[]{1504, 45, 1524, 27, 1596, 27, 1637, 57, 1570, 96, 1549, 90, 1543, 77},
-        new float[]{1491, 77, 1546, 77, 1560, 92, 1557, 110, 1452, 110},
-        new float[]{958, 47, 1515, 66}, new float[]{933, 76, 1419, 88},
+        new float[]{1546, 22, 1523, 63, 1523, 67, 1527, 75, 1534, 78, 1542, 92, 1545, 107, 1597, 108, 1621, 67, 1619, 59, 1597, 22},
+        new float[]{1511, 78, 1502, 94, 1502, 98, 1510, 112, 1534, 113, 1543, 98, 1543, 94, 1535, 79},
+        new float[]{936, 48, 1512, 65}, new float[]{915, 75, 1417, 87},
         new float[]{1196, 96, 1356, 96, 1352, 111, 1203, 111},
         celulasCompactas(1038f, 27.1f), 99f, 109f,
         0f, 0f, 0f, 0f, 921f, 103f) : new LadoRaios(true, RED,
@@ -613,7 +613,7 @@ final class HudRenderer {
                            CharacterDefinition ausente, CharacterSelectRenderer portraits, HudEffects.Meter fx) {
         float hurt = effects.fade(fx.hitAt, .32f);
         float shake = hurt * 6f * (float)Math.sin(effects.now * 95.0);
-        rostoRaios(c, portraits, point.character, l.rosto, l.rostoCaixa, shake);
+        rostoRaios(c, portraits, point.character, l.rosto, l.rostoCaixa, shake, ROSTO_ENQUADRA);
         if (hurt > 0f) {
             fxPaint.setColor(0xFFFF2A3A);
             fxPaint.setAlpha(Math.round(120 * hurt));
@@ -623,7 +623,7 @@ final class HudRenderer {
         CharacterDefinition parceiro = reserve == null ? ausente : reserve.character;
         paint.setColor(0xFF0A1122);
         c.drawPath(l.parceiro, paint);
-        if (parceiro != null) rostoRaios(c, portraits, parceiro, l.parceiro, l.parceiroCaixa, 0f);
+        if (parceiro != null) rostoRaios(c, portraits, parceiro, l.parceiro, l.parceiroCaixa, 0f, PARCEIRO_ENQUADRA);
         if (reserve == null && parceiro != null) {
             // Parceiro fora (duelo, ou o CPU sem dupla): o rosto fica apagado.
             paint.setColor(0xAA05070D);
@@ -640,8 +640,19 @@ final class HudRenderer {
         superRaios(c, point, l, fx);
     }
 
+    /**
+     * Como o rosto entra na moldura: {altura do retrato em alturas da moldura (0: cobrir a caixa, o
+     * jeito da barra de raios), onde ficam os olhos na moldura (fração da altura), onde ficam os
+     * olhos no retrato, deslocamento para o lado (fração da largura, para o miolo da moldura), a
+     * largura mínima (fração da largura da moldura)}. Na
+     * barra compacta a moldura do parceiro é uma tira baixa e larga: cobrir pela largura mostrava só
+     * o queixo (o dono, 21/11: "os encaixes de imagem estão errados"); agora ela pega a faixa dos olhos.
+     */
+    private static final float[] ROSTO_ENQUADRA = COMPACTA ? new float[]{1.22f, .47f, .46f, 0f, 1f} : new float[]{0f, .44f, .5f, 0f, 0f};
+    private static final float[] PARCEIRO_ENQUADRA = COMPACTA ? new float[]{1.45f, .47f, .46f, 0f, 1f} : new float[]{0f, .44f, .5f, 0f, 0f};
+
     private void rostoRaios(Canvas c, CharacterSelectRenderer portraits, CharacterDefinition character,
-                            Path forma, RectF caixa, float dx) {
+                            Path forma, RectF caixa, float dx, float[] enq) {
         paint.setColor(0xFF0A1122);
         c.drawPath(forma, paint);
         Bitmap bitmap = portraits.hudPortrait(character);
@@ -649,12 +660,21 @@ final class HudRenderer {
         c.save();
         c.clipPath(forma);
         float w = caixa.width(), h = caixa.height();
-        // Um pouco mais perto que só cobrir a caixa: o rosto enche a moldura, como na arte.
-        float scale = 1.22f * Math.max(w / bitmap.getWidth(), h / bitmap.getHeight());
-        float drawW = bitmap.getWidth() * scale, drawH = bitmap.getHeight() * scale;
-        float cy = caixa.top + h * .44f;
-        portraitBox.set(caixa.left + dx + (w - drawW) / 2f, cy - drawH / 2f,
-            caixa.left + dx + (w + drawW) / 2f, cy + drawH / 2f);
+        if (enq[0] > 0f) {
+            float drawH = h * enq[0], drawW = bitmap.getWidth() * drawH / bitmap.getHeight();
+            // Mais estreito que a moldura, ele cresce até cobrir a largura (sem sobrar fundo dos lados).
+            if (drawW < w * enq[4]) { drawH *= w * enq[4] / drawW; drawW = w * enq[4]; }
+            float top = caixa.top + h * enq[1] - drawH * enq[2];
+            float left = caixa.left + dx + w * enq[3] + (w - drawW) / 2f;
+            portraitBox.set(left, top, left + drawW, top + drawH);
+        } else {
+            // Um pouco mais perto que só cobrir a caixa: o rosto enche a moldura, como na arte.
+            float scale = 1.22f * Math.max(w / bitmap.getWidth(), h / bitmap.getHeight());
+            float drawW = bitmap.getWidth() * scale, drawH = bitmap.getHeight() * scale;
+            float cy = caixa.top + h * enq[1];
+            portraitBox.set(caixa.left + dx + (w - drawW) / 2f, cy - drawH / 2f,
+                caixa.left + dx + (w + drawW) / 2f, cy + drawH / 2f);
+        }
         c.drawBitmap(bitmap, null, portraitBox, imagePaint);
         c.restore();
     }

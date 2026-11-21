@@ -1,0 +1,8 @@
+Edit the attached image (referencia.png), a compact fighting game HUD on a transparent 1672 x 941 canvas (all art in the top 130 px). Keep EVERYTHING identical (same layout, lightning, plates, life bars, TAG/SHINKAI/SUPER rows, clock, MENU, colors, transparency) except the portrait frames:
+
+- The two main portrait frames (left blue, right red, at the outer ends): redraw each as a clean, regular hexagon frame with the same neon edge style, about 100 px wide and 92 px tall, vertically spanning roughly rows 18 to 112.
+- The two partner portrait frames (the small ones under/inside the main portraits): redraw each as a small separate regular hexagon frame, about 44 px wide and 40 px tall, sitting at the bottom inner corner of the main hexagon, overlapping it slightly, same neon edge style.
+- The INSIDE of all four frames must be filled with SOLID FLAT MAGENTA #FF00FF only: no faces, no shading, no texture, no gradient, hard clean edges against the frame line. The game will paint the portraits there.
+- Do not change anything else; keep the background transparent and nothing below row 130.
+
+Save the result as hud_encaixe.png in the current folder, same size 1672 x 941, PNG with alpha.

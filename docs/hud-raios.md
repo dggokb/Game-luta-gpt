@@ -73,3 +73,9 @@ time empilhado no canto (`hud_compacto_dbfz.png`): uma faixa de ~13% da altura.
 - O Codex foi instalado na sessão (`npm install -g @openai/codex`, `codex login --device-auth` com a
   conta do dono); cada imagem: `codex exec --skip-git-repo-check --sandbox workspace-write --image
   referencia.png - < prompt.txt`.
+- Depois, "os encaixes de imagem estão errados; se não for bom, faz nova": o Codex redesenhou só as
+  molduras dos rostos (hexágonos limpos; o do parceiro pequeno, no canto de baixo do principal) com o
+  miolo em magenta puro (`hud_compacto_dbfz_molduras.png`, `prompt_molduras.txt`). O script acha os
+  buracos dos rostos pelo magenta e imprime os contornos que vão no `HudRenderer`. Na barra compacta o
+  retrato entra pela altura com os olhos a 47% da moldura (`ROSTO_ENQUADRA`, `PARCEIRO_ENQUADRA`),
+  não cobrindo a caixa pela largura.
