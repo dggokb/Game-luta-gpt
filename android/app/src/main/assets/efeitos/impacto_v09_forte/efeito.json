@@ -1,6 +1,6 @@
 {
  "nome": "impacto_v09_forte",
- "video": "Impacto-cel10 do programa de efeitos do dono, brilhos refor\u00e7ados (alfa^0,5), 1x",
+ "video": "Impacto-cel10 do programa do dono, brilhos refor\u00e7ados (alfa^0,5), cor dourada do cel14 (amarelos -12\u00b0 de matiz), 1x",
  "trecho": [
   0,
   14
@@ -27,7 +27,7 @@
   42
  ],
  "luz": {
-  "cor": "#F2E640",
+  "cor": "#F5C83E",
   "alcance": 0.9,
   "forca": 0.75
  },

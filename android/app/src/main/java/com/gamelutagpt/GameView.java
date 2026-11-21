@@ -6165,8 +6165,8 @@ public class GameView extends SurfaceView
                 nome = "impacto_ar_super";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v09_forte")) {
                 // O impacto feito pelo dono no programa de efeitos dele (Impacto-cel10, 4x4 a 24 fps),
-                // com os brilhos fracos reforçados (alfa^0,5): art/vfx/teste_soco_forte_v09/teste5_impacto_cel10.
-                // Em teste no aparelho (21/11); o v08 continua nos assets como reserva.
+                // com os brilhos fracos reforçados (alfa^0,5) e a cor dourada do médio (cel14), 21/11:
+                // art/vfx/teste_soco_forte_v09/teste5_impacto_cel10. O v08 continua nos assets como reserva.
                 nome = "impacto_v09_forte";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v08_forte")) {
                 // O hit forte novo desenhado pelo dono (art/vfx/impacto_forte_v08, em fundo preto,
@@ -6195,6 +6195,10 @@ public class GameView extends SurfaceView
                 nome = "impacto_v06_fraco";
             } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_ar_fraco")) {
                 nome = "impacto_ar_fraco";
+            } else if (size == ImpactEffects.MEDIUM && efeitos.tem("impacto_v09_medio")) {
+                // O médio do programa de efeitos do dono (Impacto-cel14, 4x4 a 12 fps), 21/11:
+                // art/vfx/teste_soco_forte_v09/teste6_impacto_cel14. O H tem a mesma cor (impacto_v09_forte).
+                nome = "impacto_v09_medio";
             } else if (efeitos.tem("impacto_v06_medio_ec")) {
                 nome = "impacto_v06_medio_ec";
             } else {
