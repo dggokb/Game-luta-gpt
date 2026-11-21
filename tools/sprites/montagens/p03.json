@@ -819,7 +819,7 @@
     }
   },
   "garra_1": {
-    "_doc": "S1 Garra do tigre, 1º corte (S1A), no tempo do vídeo s1 (o dono, 20/11: \"tem q respeitar o tempo da animação\" e as marcas se formando no movimento): todos os quadros 11-26 a 42 ms (24 qps): arma (11-15), as marcas se formam no arco (16-18, o impacto no 16) e seguram (19-34, a pose segurada inteira do vídeo: o tempo de apertar de novo com a marca na tela); sem continuar, volta à guarda (14-10, o armar ao contrário, e o 112, a guarda do fim do vídeo, que bate com o idle; o 8 do começo do vídeo tinha pose diferente e quebrava na volta, o dono 20/11). A continuação só sai no fim da pose segurada. 21/11 (o dono: 'o S1 do Kōga tem muita brecha'): a recuperação caiu de 50 para 24 quadros e a pose segurada foi comprimida (fator 0,5); janela da continuação 20-43.",
+    "_doc": "S1 Garra do tigre, 1º corte (S1A), no tempo do vídeo s1 (o dono, 20/11: \"tem q respeitar o tempo da animação\" e as marcas se formando no movimento): todos os quadros 11-26 a 42 ms (24 qps): arma (11-15), as marcas se formam no arco (16-18, o impacto no 16) e seguram (19-34, a pose segurada inteira do vídeo: o tempo de apertar de novo com a marca na tela); sem continuar, volta à guarda (14-10, o armar ao contrário, e o 112, a guarda do fim do vídeo, que bate com o idle; o 8 do começo do vídeo tinha pose diferente e quebrava na volta, o dono 20/11). A continuação só sai no fim da pose segurada. 21/11 (o dono: 'o S1 do Kōga tem muita brecha'): a recuperação caiu de 50 para 24 quadros e a pose segurada foi comprimida (fator 0,5); janela da continuação 20-43. Depois ('ele fica muito em posição de poder esperando os outros 2 golpes'): recuperação 14, pose segurada mais curta.",
     "trechos": [
       [
         "s1",
@@ -847,27 +847,19 @@
           42,
           42,
           21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21,
-          21
-        ]
+          17,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "frames": "0,1,2,3,4,5,6,7,8,9,11,13,15,17,19,21,23,25,27"
       }
     }
   },
@@ -898,25 +890,18 @@
           42,
           42,
           23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23,
-          23
-        ]
+          17,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26,
+          26
+        ],
+        "frames": "0,1,2,3,4,5,6,7,9,11,13,15,17,19,21,23"
       }
     }
   },
