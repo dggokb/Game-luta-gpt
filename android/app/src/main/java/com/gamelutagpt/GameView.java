@@ -6191,6 +6191,10 @@ public class GameView extends SurfaceView
                 nome = "impacto_ar_forte";
             } else if (baixo && efeitos.tem("impacto_ar_baixo")) {
                 nome = "impacto_ar_baixo";
+            } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_v09_fraco")) {
+                // O fraco do programa de efeitos do dono (Impacto-cel14 _2, 4x4 a 12 fps), 21/11:
+                // da mesma família do médio e do forte (impacto_v09_medio, impacto_v09_forte).
+                nome = "impacto_v09_fraco";
             } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_v06_fraco")) {
                 nome = "impacto_v06_fraco";
             } else if (size <= ImpactEffects.LIGHT && efeitos.tem("impacto_ar_fraco")) {

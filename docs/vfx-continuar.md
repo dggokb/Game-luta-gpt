@@ -2221,3 +2221,9 @@ no lugar do `impacto_v08_forte` só ali.
     e esverdeados (matiz 40–170°) girados 12° para o dourado (o cel10 era amarelo-limão ~60°, o
     cel14 dourado ~48°); o azul do miolo fica. Luz `#F5C83E`.
   - Vídeo: Kōga M e depois H, normal e câmera lenta. Gravado no PC; falta o dono ver no celular.
+- **L com o efeito do programa do dono (21/11):** "Coloca esse no L". `impacto_v09_fraco`: o
+  Impacto-cel14 _2 (disco com cruz, 4x4 a 12 fps), 1x (`pixelScale` 1,5; ~160 px), luz
+  `#F5C83E` mais fraca (alcance 0,7, força 0,55). Entra antes do `impacto_v06_fraco`. A imagem
+  em `art/vfx/teste_soco_forte_v09/fraco_impacto_cel14_2/`. Vídeo do L do Kōga, normal e câmera
+  lenta; o disco fica fraco no cenário (como o cel10 antes do reforço). Gravado no PC; falta o
+  dono ver no celular. Agora L, M e H são da mesma família dourada.
