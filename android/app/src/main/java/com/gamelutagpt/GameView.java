@@ -5726,10 +5726,11 @@ public class GameView extends SurfaceView
                 int quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
                 animation = dv.id;
                 animationElapsed = dv.timeOfFrame(Math.min(dv.frameCount() - 1, quadro)) + 0.001f;
-            } else if (f.attack.mechanics.runDash && f.corrida > 0 && f.attackFrame == f.attack.mechanics.runFrame &&
+            } else if (f.attack.mechanics.runDash && f.grounded && f.attackFrame <= f.attack.mechanics.runFrame &&
                        character.animations.containsKey(SpriteStates.DASH)) {
                 // Correndo até o rival com a corrida de sempre (o dash): o desenho troca pela distância
-                // andada, como no dash, e o pé não patina.
+                // andada, como no dash, e o pé não patina. Desde o 1º quadro do golpe (21/11, o dono:
+                // "no começo ainda tem um salto": os quadros antes da corrida eram a passada do vídeo).
                 // O renderizador toca o DASH pelo caminho do dash normal (correndoAteORival, abaixo).
                 correndoAteORival = true;
             } else if (f.attack.mechanics.runs() && f.corrida > 0 && f.attackFrame == f.attack.mechanics.runFrame &&
@@ -5977,7 +5978,7 @@ public class GameView extends SurfaceView
             f.crouchingBody() || guard == CombatFighter.GUARD_LOW || f.jumpSquat > 0,
             f.vy,
             // Deslizando no embalo (golpe dado na corrida) ele não dá passo: a guarda, não o andar.
-            correndoAteORival ? f.facing * f.attack.mechanics.runSpeed * CombatConfig.DT : f.embalo != 0f ? 0f : f.travel,
+            correndoAteORival ? (f.correndo ? f.facing * f.attack.mechanics.runSpeed * CombatConfig.DT : f.travel) : f.embalo != 0f ? 0f : f.travel,
             correndoAteORival || f.travel * f.facing > 0,
             f.forwardDashing || correndoAteORival,
             f.backdashFrames > 0,
