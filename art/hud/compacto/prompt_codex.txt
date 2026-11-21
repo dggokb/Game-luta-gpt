@@ -1,0 +1,14 @@
+Use the attached image (referencia.png) as the style reference. It is the top HUD bar of a 2D anime fighting game: blue electric lightning on the player 1 side, red on the player 2 side, dark navy plates with neon edges, hexagon portraits, green life bars, SHINKAI gauge, SUPER cells, TAG bar, a center clock with "∞ TREINO" and a MENU button.
+
+Generate a NEW image file named hud_compacto.png: the same HUD redesigned to be COMPACT, keeping exactly the same art style, colors, lightning, materials and the same two characters' faces.
+
+Size and layout:
+- Canvas 1672 x 941 px, fully TRANSPARENT background (PNG with alpha). The HUD sits at the very top; everything below row 130 must be empty/transparent.
+- The whole HUD must fit in a single band about 120 px tall at the top (it is currently about 250 px tall: cut it roughly in half).
+- Each side, from the screen edge inward: a smaller hexagon portrait at the outer end; a long slanted life bar (green) with a small name plate above it; right under the life bar, ONE thin row containing: a tiny circular portrait of the partner with a short thin green bar (TAG), a thin SHINKAI gauge, and five small slanted SUPER cells with the number next to them.
+- Center: a small dark hexagon clock with "∞" and a small "TREINO" under it, and a small MENU button right under the clock. Keep the center narrow.
+- The lightning stays only as a finish on the outer ends and along the bottom edge; it must NOT grow downward.
+- Mirror the layout on the red side.
+- No other text besides names, numbers, SHINKAI, SUPER, TAG, TREINO and MENU.
+
+Save only hud_compacto.png in the current folder.
