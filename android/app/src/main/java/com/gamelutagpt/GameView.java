@@ -6025,7 +6025,7 @@ public class GameView extends SurfaceView
      */
     static final boolean FUMACA_PULO_DONO = Boolean.getBoolean("gameluta.fumacaPuloDono");
     /** O tamanho e quanto ela sai atrás do lutador (px do mundo): "um pouco maior e um pouco mais para trás". */
-    private static final float PULO_DONO_ESCALA = 1.6f, PULO_DONO_ATRAS = 85f;
+    private static final float PULO_DONO_ESCALA = 1.35f, PULO_DONO_ATRAS = 78f;
 
     /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
     private static final String FUMACA_QUEDA = "fumaca_queda_v01";
