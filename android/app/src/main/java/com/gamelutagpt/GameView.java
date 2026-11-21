@@ -6024,6 +6024,8 @@ public class GameView extends SurfaceView
      * ({@code -Dgameluta.fumacaPuloDono=true} liga para gravar).
      */
     static final boolean FUMACA_PULO_DONO = Boolean.getBoolean("gameluta.fumacaPuloDono");
+    /** O tamanho e quanto ela sai atrás do lutador (px do mundo): "um pouco maior e um pouco mais para trás". */
+    private static final float PULO_DONO_ESCALA = 1.3f, PULO_DONO_ATRAS = 75f;
 
     /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
     private static final String FUMACA_QUEDA = "fumaca_queda_v01";
@@ -6325,7 +6327,7 @@ public class GameView extends SurfaceView
     private void efeitosDeMovimento(int i, CombatFighter f) {
         float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
-            if (FUMACA_PULO_DONO && efeitos.tocar("fumaca_pulo_dono", x - f.facing * PULO_FUMACA_ATRAS, GROUND_Y, 1f, f.facing < 0)) {
+            if (FUMACA_PULO_DONO && efeitos.tocar("fumaca_pulo_dono", x - f.facing * PULO_DONO_ATRAS, GROUND_Y, PULO_DONO_ESCALA, f.facing < 0)) {
                 efeitos.atrasDosLutadores();
             } else if (FUMACA_SOKON && efeitos.tocar("fumaca_pulo_s4", x, GROUND_Y, 1f, f.facing < 0)) {
                 efeitos.atrasDosLutadores();
