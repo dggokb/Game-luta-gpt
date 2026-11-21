@@ -6137,6 +6137,11 @@ public class GameView extends SurfaceView
             // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
             if (superGolpe) {
                 nome = "impacto_ar_super";
+            } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v09_forte")) {
+                // O impacto feito pelo dono no programa de efeitos dele (Impacto-cel10, 4x4 a 24 fps),
+                // com os brilhos fracos reforçados (alfa^0,5): art/vfx/teste_soco_forte_v09/teste5_impacto_cel10.
+                // Em teste no aparelho (21/11); o v08 continua nos assets como reserva.
+                nome = "impacto_v09_forte";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v08_forte")) {
                 // O hit forte novo desenhado pelo dono (art/vfx/impacto_forte_v08, em fundo preto,
                 // recortado) com o anel de pressão de ar em 3D: impactos_v06_ec.py, forte_v08.

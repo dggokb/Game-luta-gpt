@@ -2168,3 +2168,9 @@ no lugar do `impacto_v08_forte` só ali.
   1x, normal e câmera lenta, fora do jogo. Nos quadros, os brilhos redondos e os anéis do fim
   passam a aparecer como um halo amarelo sobre os lutadores. Folha em
   `art/vfx/teste_soco_forte_v09/teste5_impacto_cel10/reforcado/`. Falta o dono dizer.
+- **Instalado para teste no aparelho (21/11):** "Poem no fable quero testar". O teste 5 reforçado
+  entrou no jogo como `impacto_v09_forte` (assets/efeitos), na frente do v08 na escolha do acerto
+  forte (`GameView`, a faísca por força). 1x (`pixelScale` 1,5), 42 ms por quadro esticados no
+  tempo do acerto forte como os `impacto_v0*`, na ponta do golpe, luz `#F2E640`. O v08 fica nos
+  assets como reserva: para voltar, apagar a pasta `impacto_v09_forte`. Gravado no PC; falta o
+  dono ver no celular.
