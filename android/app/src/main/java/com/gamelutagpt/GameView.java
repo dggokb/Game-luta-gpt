@@ -5690,6 +5690,7 @@ public class GameView extends SurfaceView
                 animationElapsed = voo.animationTime(Math.min(frames, pose.totalFrames - 0.5f) * FIXED_STEP);
             }
         }
+        boolean correndoAteORival = false;
         if (animation == null && f.attacking()) {
             float elapsed = (f.attackFrame + 0.5f) * FIXED_STEP;
             float total = f.attack.totalFrames * FIXED_STEP;
@@ -5725,6 +5726,13 @@ public class GameView extends SurfaceView
                 int quadro = desde < DESVIO_GIRO ? desde * 9 / DESVIO_GIRO : 9 + (desde / 4) % 6;
                 animation = dv.id;
                 animationElapsed = dv.timeOfFrame(Math.min(dv.frameCount() - 1, quadro)) + 0.001f;
+            } else if (f.attack.mechanics.runDash && f.grounded && f.attackFrame <= f.attack.mechanics.runFrame &&
+                       character.animations.containsKey(SpriteStates.DASH)) {
+                // Correndo até o rival com a corrida de sempre (o dash): o desenho troca pela distância
+                // andada, como no dash, e o pé não patina. Desde o 1º quadro do golpe (21/11, o dono:
+                // "no começo ainda tem um salto": os quadros antes da corrida eram a passada do vídeo).
+                // O renderizador toca o DASH pelo caminho do dash normal (correndoAteORival, abaixo).
+                correndoAteORival = true;
             } else if (f.attack.mechanics.runs() && f.corrida > 0 && f.attackFrame == f.attack.mechanics.runFrame &&
                        (f.move != null ? f.move.animation : art) != null) {
                 // Correndo até o rival (o S3 e o Super do Kōga): os quadros da corrida do vídeo em ciclo.
@@ -5950,6 +5958,12 @@ public class GameView extends SurfaceView
         );
         boolean locked = f.status != CombatFighter.Status.NEUTRAL && !f.attacking() &&
             f.status != CombatFighter.Status.ULTRA;
+        if (correndoAteORival) {
+            // Correndo até o rival (o S3 do Kōga): o desenho é o dash de sempre, pela distância.
+            animation = null;
+            combatPose = false;
+            locked = false;
+        }
 
         // Parado e cansado (pouca vida), o idle anda mais devagar (motor de animação).
         float clipStep = FIXED_STEP;
@@ -5964,9 +5978,9 @@ public class GameView extends SurfaceView
             f.crouchingBody() || guard == CombatFighter.GUARD_LOW || f.jumpSquat > 0,
             f.vy,
             // Deslizando no embalo (golpe dado na corrida) ele não dá passo: a guarda, não o andar.
-            f.embalo != 0f ? 0f : f.travel,
-            f.travel * f.facing > 0,
-            f.forwardDashing,
+            correndoAteORival ? (f.correndo ? f.facing * f.attack.mechanics.runSpeed * CombatConfig.DT : f.travel) : f.embalo != 0f ? 0f : f.travel,
+            correndoAteORival || f.travel * f.facing > 0,
+            f.forwardDashing || correndoAteORival,
             f.backdashFrames > 0,
             animation,
             animationElapsed,
@@ -6307,7 +6321,9 @@ public class GameView extends SurfaceView
     }
 
     static final int REACAO_TRONCO = 0, REACAO_ROSTO = 1, REACAO_FORTE = 2;
-    private static final String[] REACAO_EM_PE = {SpriteStates.HIT_BODY, SpriteStates.HIT_HIGH, SpriteStates.HIT_HEAVY};
+    // Tronco e forte voltam para a HIT_STAND (o dono, 21/11: as reações de corpo e forte do
+    // Ryūga ficaram ruins). Os desenhos HIT_BODY/HIT_HEAVY ficam só para a cena da história.
+    private static final String[] REACAO_EM_PE = {SpriteStates.HIT_STAND, SpriteStates.HIT_HIGH, SpriteStates.HIT_STAND};
     private final int[] reacao = new int[2];
 
     /**

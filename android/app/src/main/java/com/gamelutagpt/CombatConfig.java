@@ -484,17 +484,18 @@ final class CombatConfig {
      */
     static final int LIFE_SCALE_PERMILLE = 1400;
     /**
-     * Guarda gasta por quadro de blockstun do golpe defendido (um leve ~50, um forte ~85):
-     * umas 20 defesas seguidas quebram, 7–14 s só defendendo (com 10 eram 3,5–7 s, bem mais
-     * rápido que o mercado: docs/balanco/mercado.md).
+     * Guarda gasta por quadro de blockstun do golpe defendido (um leve ~120, um forte ~200):
+     * umas 8–10 defesas seguidas quebram (duas sequências L-M-H e pouco). Com 5 eram 18–24 defesas, mais de 20 s de pressão, e a
+     * guarda nunca quebrava (o dono, 21/11: "defende demais e não quebra nunca a guarda; o problema
+     * não é defender, é a guarda não quebrar").
      */
-    int guardDrainPerBlockstunFrame = 5;
+    int guardDrainPerBlockstunFrame = 12;
     /** Batida de um golpe de várias batidas antes da última: gasta só esta fração (por mil). */
     int guardHoldingDrainPermille = 500;
-    /** Quadros sem defender antes de a guarda começar a voltar. */
-    int guardRegenDelayFrames = 120;
-    /** Guarda que volta por quadro (cheia em ~8 s, depois de 2 s sem defender). */
-    int guardRegenPerFrame = 2;
+    /** Quadros sem defender antes de a guarda começar a voltar (3 s: entre uma sequência e outra ela não volta). */
+    int guardRegenDelayFrames = 180;
+    /** Guarda que volta por quadro (cheia em ~16 s, depois de 3 s sem defender). */
+    int guardRegenPerFrame = 1;
     /** Atordoamento do guard break: aberto, sem defesa, tempo de entrar um combo. */
     int guardBreakStunFrames = 50;
     /** Congelamento do estalo da quebra (os dois, como um golpe forte). */

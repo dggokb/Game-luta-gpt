@@ -802,13 +802,13 @@ foi de 37 s para 61 s.
 Defender para sempre não funciona: cada defesa gasta a **guarda** (`FighterState.guard`,
 0..`CombatConfig.GUARD_MAX` = 1000), e quando ela zera a defesa **quebra**.
 
-- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (10). Um leve gasta ~100, um
-  forte ~170–250, um Super 170–450. Batidas de um golpe de várias batidas antes da última
-  gastam metade. Uma sequência L-M-H defendida gasta ~400–580: **umas 2 sequências seguidas**
-  quebram (umas 11 defesas, ~4,5 s de pressão; eram 17 e quase nunca quebrava); os pesados
-  (p07, p09) quebram mais rápido.
-- **Volta**: depois de `guardRegenDelayFrames` (120, 2 s) sem defender, 2 por quadro (cheia
-  em ~8 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
+- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (12; 21/11, o dono: "defende demais e não
+  quebra nunca a guarda; o problema não é defender, é a guarda não quebrar"; com 5 eram 18–24 defesas). Um
+  leve gasta ~120, um forte ~200. Batidas de um golpe de várias batidas antes da última gastam metade.
+  Umas **9–12 defesas seguidas** quebram (pouco mais de duas sequências L-M-H).
+- **Volta**: depois de `guardRegenDelayFrames` (180, 3 s) sem defender, 1 por quadro (cheia em ~16 s): entre
+  uma sequência e outra ela não volta. Quem está fora de campo recupera também. Para no congelamento do
+  Super/Ultra.
 - **Quebrou** (cue `GUARD_BREAK`): o golpe que quebrou não tira vida, mas quem defendia fica
   **aberto** por `guardBreakStunFrames` (50) depois de um congelamento de 18 — um hitstun longo,
   sem defesa e sem o empurrão da defesa (fica ao alcance do castigo). No ar, cai e termina no
