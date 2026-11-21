@@ -419,7 +419,7 @@ final class PaginaGuiada {
         String text = temporada.t(b.texto);
         float w = (b.caixa[2] - b.caixa[0]) * pageW;
         float h = (b.caixa[3] - b.caixa[1]) * pageH;
-        float size = Math.min(40f, h);
+        float size = Math.min(b.letraMax, h);
         List<String> lines = Baloes.wrap(c, text, size, w);
         while (size > 9f) {
             lines = Baloes.wrap(c, text, size, w);

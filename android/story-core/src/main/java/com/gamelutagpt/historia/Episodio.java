@@ -278,19 +278,29 @@ public final class Episodio {
          */
         public final String[] destaque;
         public final int corDestaque;
+        /**
+         * Maior letra (em px da página) que o texto pode ter: 40 nos balões comuns; maior num grito
+         * gigante pintado (o APOSTA! da página 68), para o texto ocupar a explosão inteira.
+         */
+        public final float letraMax;
 
         BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura) {
-            this(area, caixa, texto, moldura, new String[0], 0);
+            this(area, caixa, texto, moldura, new String[0], 0, LETRA_MAX);
         }
 
-        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura, String[] destaque, int corDestaque) {
+        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura, String[] destaque, int corDestaque,
+                    float letraMax) {
             this.area = area;
             this.caixa = caixa;
             this.texto = texto;
             this.moldura = moldura;
             this.destaque = destaque;
             this.corDestaque = corDestaque;
+            this.letraMax = letraMax;
         }
+
+        /** A letra máxima de um balão sem {@code "letraMax"}. */
+        public static final float LETRA_MAX = 40f;
     }
 
     /** Um quadro da página. Sem imagem, o jogo desenha uma arte provisória a partir de cena e personagens. */
@@ -492,7 +502,8 @@ public final class Episodio {
             else for (Object pedaco : list(b, "destaque")) destaque.add(String.valueOf(pedaco));
             baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto,
                 Boolean.TRUE.equals(b.get("moldura")), destaque.toArray(new String[0]),
-                Temporada.parseColor(string(b, "corDestaque", "#D8262E"))));
+                Temporada.parseColor(string(b, "corDestaque", "#D8262E")),
+                b.get("letraMax") instanceof Number ? ((Number) b.get("letraMax")).floatValue() : BalaoPronto.LETRA_MAX));
         }
         boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
         Quadro quadro = new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),

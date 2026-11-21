@@ -180,7 +180,7 @@ São imagens largas (1774×887), cada uma uma página de um quadro só. O
   cartão "Semifinal". O rascunho do mensageiro depois da luta (`pag3_q1`/`pag3_q2`) saiu.
 - **Começo do ep06 (dos dois irmãos):** `pag1` (67: a arena, "SENHORAS E SENHORES! FINALMENTE TEMOS
   A GRANDE SEMIFINAL!", "uma palavrinha dos nossos idealizadores"), `pag2` (68: o magnata, "Dinheiro!",
-  "Sangue!", e o APOSTA! gigante, que fica na arte com nota traduzida no rodapé) e `pag3` (69: "teremos
+  "Sangue!", e o APOSTA! gigante, digitado em vermelho com letra grande, `letraMax`, para traduzir) e `pag3` (69: "teremos
   APOSTAS!", "APOSTÃO AO VIVO!" em vermelho, o YEHHHH! fica na arte). Depois ainda vem o splash
   provisório de cada irmão e a luta da semifinal com a Bolsa de Apostas.
 
