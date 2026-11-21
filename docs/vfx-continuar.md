@@ -1865,7 +1865,8 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   `dono/pulo_cel92_4046794477_v2`) no lugar da primeira: 40 por segundo (~400 ms), 1,6× e 85 px atrás.
   Depois, "diminui um pouco o tamanho": 1,35× e 78 px atrás. Depois, "faz aparecer um pouco antes": a folha começa no 3º
   desenho (`--inicio 2`; o 1º é vazio e o 2º quase não se vê), então ela já aparece no quadro em
-  que ele sai do chão, junto com a de hoje. `GameView.FUMACA_PULO_DONO`
+  que ele sai do chão, junto com a de hoje. "Foi muito antes": começa no 2º desenho (`--inicio 1`,
+  só o vazio sai). `GameView.FUMACA_PULO_DONO`
   desligado até ele aprovar `android/app/build/sprite-review/fumaca_pulo_dono.mp4`.
 
 ## Fora do VFX, o que ficou pendente
