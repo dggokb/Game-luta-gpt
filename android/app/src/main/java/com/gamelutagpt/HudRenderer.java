@@ -498,11 +498,27 @@ final class HudRenderer {
         new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
 
     /** Toque do MENU na tela virtual: a placa do centro da arte. */
-    static float raiosTela(float y) { return RAIOS_Y + (y - RAIOS_TOPO) * RAIOS_ESCALA; }
+    static float raiosTela(float y) { return HUD_TAMANHO * (RAIOS_Y + (y - RAIOS_TOPO) * RAIOS_ESCALA); }
+
+    /**
+     * Tamanho da barra de cima (o dono, 21/11: "o HUD está cobrindo muito a tela"): 1 é a arte na
+     * largura toda; menos, ela encolhe presa no topo e no meio da tela. O toque do MENU acompanha
+     * ({@link #paraTela}). {@code -Dgameluta.hudTamanho} só para comparar.
+     */
+    static final float HUD_TAMANHO = Float.parseFloat(System.getProperty("gameluta.hudTamanho", "1"));
+
+    /** Um ponto da barra (já na tela virtual, sem o tamanho) levado para onde ele fica com o tamanho. */
+    static float paraTelaX(float x) { return Arena.VW / 2f + (x - Arena.VW / 2f) * HUD_TAMANHO; }
+    static float paraTelaY(float y) { return y * HUD_TAMANHO; }
 
     private void drawRaios(Canvas c, State s, CharacterSelectRenderer portraits,
                            FighterState active, FighterState reserve) {
         c.save();
+        if (HUD_TAMANHO != 1f) {
+            c.translate(Arena.VW / 2f, 0f);
+            c.scale(HUD_TAMANHO, HUD_TAMANHO);
+            c.translate(-Arena.VW / 2f, 0f);
+        }
         c.translate(0f, RAIOS_Y);
         c.scale(RAIOS_ESCALA, RAIOS_ESCALA);
         c.translate(0f, -RAIOS_TOPO);
