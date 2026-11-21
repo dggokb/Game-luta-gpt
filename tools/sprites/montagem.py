@@ -18,7 +18,7 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
       "animacoes": {"SPECIAL_S4": {"frames": "0-12,12-0", "impacto": 6}}
     }
 
-- trechos: [vídeo sem .mp4, primeiro quadro, fim exclusivo]. Cada vídeo de complemento
+- trechos: [vídeo sem .mp4, primeiro quadro, fim exclusivo]; {"dx": N} desloca o trecho N px do vídeo. Cada vídeo de complemento
   começa no último quadro do anterior (o quadro final de um é o inicial do outro no Flow),
   então os trechos colados formam um vídeo contínuo, na mesma câmera. "fixo_corpo" é o "fixo"
   medindo o corpo escuro, sem a fumaça branca do vídeo (a investida do p13). "fixo" anula o
@@ -126,6 +126,12 @@ def glue(folder, trechos):
             # Trecho que não continua o anterior (pulou quadros do vídeo): começa com o corpo
             # onde o anterior terminou.
             offset = int(round(body_x(frames[-1]) - body_x(part[0])))
+        for extra in item[3:]:
+            if isinstance(extra, dict) and 'dx' in extra:
+                # Desloca o trecho (px do vídeo): os socos do S3 do Kōga, que o vídeo desenha atrás
+                # da raiz (o punho não chegava no rival). Com "alinha" no trecho seguinte, a volta à
+                # guarda leva o corpo de volta à raiz aos poucos.
+                offset += int(extra['dx'])
         if 'fixo' in item[3:] or 'fixo_corpo' in item[3:]:
             xs = np.array([body_x(f) if 'fixo_corpo' in item[3:] else torso_x(key(f)) for f in part])
             t = np.arange(len(xs))

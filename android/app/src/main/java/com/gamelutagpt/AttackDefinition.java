@@ -162,6 +162,8 @@ final class AttackDefinition {
          */
         int runFrame = -1, runMax, runStep = 4;
         int[] runCycle = new int[0];
+        /** A corrida usa a animação do dash do lutador (a corrida dele de sempre), pela distância andada. */
+        boolean runDash;
         float runNear, runSpeed;
         /**
          * Avanço cujo desenho também avança à frente da raiz (o bote da Investida do p12): a pancada
@@ -227,6 +229,10 @@ final class AttackDefinition {
         }
         Mechanics run(int frame, float near, float speed, int max, int step, int... cycle) {
             runFrame = frame; runNear = near; runSpeed = speed; runMax = max; runStep = step; runCycle = cycle.clone();
+            return this;
+        }
+        Mechanics runDash(int frame, float near, float speed, int max) {
+            runFrame = frame; runNear = near; runSpeed = speed; runMax = max; runDash = true;
             return this;
         }
         boolean runs() { return runFrame >= 0; }
@@ -590,7 +596,7 @@ final class AttackDefinition {
             if (m.evade != Reads.NONE) checkRange(name + "evade", m.evadeStart, m.evadeEnd, total);
             if (m.advanceSpeed != 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
             if (m.runs() && (m.runFrame >= startup || m.runSpeed <= 0f || m.runMax <= 0 || m.runStep <= 0 ||
-                m.runCycle.length == 0)) {
+                m.runCycle.length == 0 && !m.runDash)) {
                 throw new IllegalArgumentException(name + "run: a corrida espera antes do ativo, com velocidade, limite e ciclo");
             }
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
