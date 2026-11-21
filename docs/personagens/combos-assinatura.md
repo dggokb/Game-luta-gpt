@@ -133,9 +133,9 @@ quadros e o atordoamento é curto).
 | K2 | Estômago | L, M, M, → + H (dois socos) → S3 Investida da voadora | 12 |
 | K3 | Uppercut da casa | L, M, M, S2 (arco) → corre → ↓ + M no caído → L, M, → + H, S3 | 9 |
 | K4 | Sobe | 2L, M, 2H (lança) → super pulo → jL, jM → pulo → jL, jM, jH | 8 |
-| K5 | Bica | → + M (golpe alto), S2, Super | 5 |
+| K5 | Bica | → + M (golpe alto), S2, Super | 15 |
 | K6 | Voadora correndo | corre → H (voadora, lança) → corre → 2H → super pulo → jL, jM → pulo → jL, jM, jH | 7 |
-| K7 | Fecho de Super | L, L, M, M, S1 (três cortes), Super | 10 |
+| K7 | Fecho de Super | L, L, M, M, S1 (três cortes), Super | 20 |
 | K8 | Canto | (no canto) L, L, M, M, H (quica na parede), → + H, S3 | 14 |
 
 O que não emendou e ficou de fora: depois do H no meio da arena (vai longe para a Garra e o S2);

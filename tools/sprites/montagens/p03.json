@@ -1313,5 +1313,71 @@
     "animacoes": {
       "GETUP": {}
     }
+  },
+  "super": {
+    "_doc": "Super (21/11, ideia do dono: 'ele investe rápido, aparece na frente, dá vários golpes rápidos e finaliza com cabeçada que lança'). super1: a guarda (13), o arranque (15; o 17 tem a poeira e o fantasma verde) e a pose da investida (21; 18-20 são borrão e 22 sai do quadro). super2: oito socos (4, 7, 10, 14, 18, 21, 26, 30) tocados em ciclo, 12 socos de 67 ms (o dono: 'os socos do meio têm que ser mais rápidos que a animação, ficou bem lerda'). super3: a cabeçada (0), o clarão fica fora (1-3), a cabeça baixa depois do impacto (6, 7, 8; o 4 e o 5 são borrão) e a volta à guarda (12-15). super_apoio1 e super_apoio2 não precisaram. emenda: cada vídeo começa com o corpo onde o anterior parou (quem anda é o avanço do Super). sem_efeitos: o risco da investida e a poeira do arranque saem. super1_borda: o super1 com as 6 últimas colunas dos quadros 21 e 22 pintadas de verde (o punho encosta na borda do vídeo e a emenda repetia a coluna da borda num risco até o fim do quadro).",
+    "trechos": [
+      [
+        "super1",
+        13,
+        18
+      ],
+      [
+        "super1_borda",
+        21,
+        22,
+        "emenda"
+      ],
+      [
+        "super2",
+        0,
+        32,
+        "emenda"
+      ],
+      [
+        "super3",
+        0,
+        16,
+        "emenda"
+      ]
+    ],
+    "quadros": "0,2,5,10,13,16,20,24,27,32,36,38,44,45,46,50,51,52,53",
+    "opcoes": {
+      "fixar": "video",
+      "sem_poeira": true,
+      "densidade": 2,
+      "sem_efeitos": true
+    },
+    "animacoes": {
+      "SUPER_WAVE": {
+        "frames": "0,1,2,3,4,5,6,7,8,9,10,3,4,5,6,11,12,13,14,15,16,17,18",
+        "tempos": [
+          50,
+          150,
+          167,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          67,
+          100,
+          133,
+          83,
+          67,
+          67,
+          67,
+          67,
+          67
+        ],
+        "impacto": 3
+      }
+    }
   }
 }

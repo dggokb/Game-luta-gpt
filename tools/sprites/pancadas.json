@@ -107,11 +107,45 @@
       },
       "SUPER": {
         "pancadas": [
+          3,
+          4,
+          5,
+          6,
           7,
+          8,
+          9,
+          10,
           11,
+          12,
+          13,
+          14,
           16
         ],
-        "avanco": 260
+        "avanco": {
+          "distancia": 280,
+          "de": 2,
+          "ate": 3
+        },
+        "rival": [
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125,
+          125
+        ],
+        "alcance": 175,
+        "altura": 244,
+        "pausa": 1,
+        "pausaFinal": 14,
+        "_doc": "21/11: só registro (o Kōga é mantido à mão no character.json; o mecanicas.py não roda nele desde que o S4 saiu). Investida, 12 socos a cada 4 quadros e a cabeçada que lança (launch)."
       }
     },
     "p04": {

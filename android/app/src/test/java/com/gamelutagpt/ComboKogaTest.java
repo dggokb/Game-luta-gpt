@@ -58,7 +58,7 @@ public class ComboKogaTest {
     @Test public void k5BicaAbreParaOS2EOSuper() {
         // A bica é golpe alto (de surpresa): abre o combo; no meio dele o atordoamento é curto.
         assertTrue(GeneratedCharacters.get(KOGA).attack(GolpeAlto.BINDING).overhead);
-        BateriaCombos.Exec x = koga("6M S2 SUPER", 5);
+        BateriaCombos.Exec x = koga("6M S2 SUPER", 15);
         assertTrue("o Super entrou", x.superUsado);
     }
 
@@ -69,7 +69,7 @@ public class ComboKogaTest {
     }
 
     @Test public void k7FechoDeSuper() {
-        BateriaCombos.Exec x = koga("L L M M S SG S SUPER", 10);
+        BateriaCombos.Exec x = koga("L L M M S SG S SUPER", 20);
         assertTrue("o Super entrou", x.superUsado);
     }
 
@@ -132,6 +132,70 @@ public class ComboKogaTest {
     private static boolean temSequencia(List<String> seq, String antes, String depois) {
         for (int i = 0; i + 1 < seq.size(); i++) if (antes.equals(seq.get(i)) && depois.equals(seq.get(i + 1))) return true;
         return false;
+    }
+
+    // ---------------------------------------------------------------- o Super (21/11)
+
+    /** O Super novo: investe, 12 socos rápidos e a cabeçada que lança (13 pancadas). */
+    @Test public void oSuperInvesteSocaELancaNaCabecada() {
+        AttackDefinition sup = GeneratedCharacters.get(KOGA).attack("SUPER");
+        assertEquals(13, sup.maxHits);
+        assertEquals(AttackDefinition.Launch.LAUNCH, sup.launch);
+        for (float gap : new float[] {120f, 300f, 450f}) {
+            CombatConfig cfg = new CombatConfig();
+            cfg.justDefenseFrames = -1;
+            CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get(KOGA), "P1"),
+                new FighterState(GeneratedCharacters.get(YINLU), "P2"), 600f, 600f + gap, cfg);
+            e.fighter(0).state.superMeter = 5000;
+            e.fighter(1).state.life = 10_000_000;
+            FighterInput i0 = new FighterInput(), i1 = new FighterInput();
+            i0.superAttack = true;
+            int acertos = 0;
+            boolean lancou = false;
+            List<Integer> quadros = new ArrayList<>();
+            for (int t = 0; t < 200; t++) {
+                e.step(i0, i1);
+                i0.clear();
+                for (CombatEngine.HitEvent h : e.events()) {
+                    if (h.attacker != 0 || h.blocked || !"SUPER".equals(h.moveId)) continue;
+                    acertos++;
+                    quadros.add(e.fighter(0).attackFrame);
+                }
+                if (acertos == 13 && e.fighter(1).launched) lancou = true;
+            }
+            assertEquals("de " + gap + " px a investida chega e as 13 pegam", 13, acertos);
+            assertTrue("a cabeçada lança", lancou);
+            for (int i = 1; i < 12; i++) assertEquals("os socos a cada 4 quadros: " + quadros, 4, quadros.get(i) - quadros.get(i - 1));
+        }
+    }
+
+    @Test public void aCpuAcertaOSuperNovo() {
+        int inteiros = 0;
+        for (long seed = 1; seed <= 6; seed++) {
+            CombatConfig cfg = new CombatConfig();
+            cfg.justDefenseFrames = -1;
+            CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.defaultCharacter(), "P1"),
+                new FighterState(GeneratedCharacters.get(KOGA), "CPU"), 600f, 760f, cfg);
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setLevel(8);
+            FighterInput p = new FighterInput(), out = new FighterInput();
+            int seguidos = 0;
+            for (int f = 0; f < 60 * 60; f++) {
+                e.fighter(0).state.life = e.fighter(0).state.profile.maxLife;
+                e.fighter(1).state.life = e.fighter(1).state.profile.maxLife;
+                e.fighter(1).state.superMeter = 5000;
+                cpu.fill(e, 1, out);
+                e.step(p, out);
+                for (CombatEngine.HitEvent h : e.events()) {
+                    if (h.attacker != 1 || h.blocked) continue;
+                    if (!"SUPER".equals(h.moveId)) { seguidos = 0; continue; }
+                    if (++seguidos == 13) inteiros++;
+                }
+                if (!e.fighter(1).attacking()) seguidos = 0;
+            }
+        }
+        assertTrue("a CPU acertou o Super inteiro: " + inteiros, inteiros >= 1);
     }
 
     @Test public void aCpuFazOsCombosDeAssinaturaDoKoga() {

@@ -742,11 +742,11 @@ final class GeneratedSpriteLayouts {
     static final int P03_SPECIAL_S3_ERRO_ROOT_Y = 539;
     static final int P03_SPECIAL_S3_ERRO_FRAME_COUNT = 14;
 
-    static final int P03_SUPER_FRAME_WIDTH = 617;
-    static final int P03_SUPER_FRAME_HEIGHT = 677;
-    static final int P03_SUPER_ROOT_X = 286;
-    static final int P03_SUPER_ROOT_Y = 646;
-    static final int P03_SUPER_FRAME_COUNT = 22;
+    static final int P03_SUPER_FRAME_WIDTH = 643;
+    static final int P03_SUPER_FRAME_HEIGHT = 479;
+    static final int P03_SUPER_ROOT_X = 282;
+    static final int P03_SUPER_ROOT_Y = 463;
+    static final int P03_SUPER_FRAME_COUNT = 19;
 
     static final int P03_TAUNT_FRAME_WIDTH = 324;
     static final int P03_TAUNT_FRAME_HEIGHT = 515;
