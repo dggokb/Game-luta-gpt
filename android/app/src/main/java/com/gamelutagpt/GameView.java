@@ -6162,7 +6162,9 @@ public class GameView extends SurfaceView
             // O efeito de dano de cada força (os vídeos de art/vfx/dano): fraco, médio, forte, e o
             // do golpe que pega embaixo (a rasteira). Sem a folha da força, vale a do médio.
             if (superGolpe) {
-                nome = "impacto_ar_super";
+                // O do programa de efeitos do dono (Impacto-cel14 a 30 fps, brilhos reforçados), 21/11,
+                // no lugar do impacto_ar_super antigo (que fica como reserva).
+                nome = efeitos.tem("impacto_v09_super") ? "impacto_v09_super" : "impacto_ar_super";
             } else if (size >= ImpactEffects.HEAVY && efeitos.tem("impacto_v09_forte")) {
                 // O impacto feito pelo dono no programa de efeitos dele (Impacto-cel10, 4x4 a 24 fps),
                 // com os brilhos fracos reforçados (alfa^0,5) e a cor dourada do médio (cel14), 21/11:

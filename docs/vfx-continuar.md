@@ -2233,3 +2233,10 @@ no lugar do `impacto_v08_forte` só ali.
 - **M reforçado (21/11):** "Reforça o M tbem". O `impacto_v09_medio` com alfa^0,5, como o L e o
   H: o brilho dourado aparece em volta da cruz. Agora os três (L, M, H) reforçados. Vídeo do Kōga
   L, M e H, normal e câmera lenta. Gravado no PC.
+- **Super com o efeito do programa do dono (21/11):** "Vamos esses no super q tem um antigo".
+  `impacto_v09_super`: o Impacto-cel14 a 30 fps (33 ms por quadro), brilhos reforçados (alfa^0,5),
+  1x (`pixelScale` 1,5) com a escala 1,25 que o Super já tinha, luz `#F5C83E` (alcance 1, força
+  0,8). No lugar do `impacto_ar_super` no acerto do Super (a lança de luz por baixo continua). O
+  `impacto_ar_super` ainda é o das cenas (agarrão com cena, cinemáticas) e fica nos assets. Imagem
+  em `art/vfx/teste_soco_forte_v09/super_impacto_cel14_30fps/`. Vídeo do Super do Kōga (3 acertos),
+  normal e câmera lenta. Gravado no PC.
