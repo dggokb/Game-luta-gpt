@@ -1,0 +1,121 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;background:transparent;overflow:hidden;font-family:"DejaVu Sans",sans-serif}
+*{box-sizing:border-box}
+.abs{position:absolute}
+.plate{background:linear-gradient(180deg,#141a33ee,#070a18ee)}
+.life{background:linear-gradient(180deg,#ffff9c,#7bff22 45%,#0adf49)}
+.lifebg{background:#2a0c0c}
+.dmg{background:#ff4b3a}
+.shk{background:linear-gradient(90deg,#1e9cf0,#7fd6ff)}
+.shk2{background:linear-gradient(270deg,#35e0ff,#b9f6ff)}
+.txt{color:#fff;font-weight:bold;font-style:italic;text-shadow:0 0 3px #000,0 0 6px #000}
+.cell{border:2px solid;border-radius:2px;transform:skewX(-18deg)}
+.face{background-size:cover;background-position:center}
+.ctl{border-radius:50%;border:3px solid #ffffff40;background:#ffffff14;color:#ffffff60;font:bold 18px "DejaVu Sans";display:flex;align-items:center;justify-content:center}
+</style></head><body><div id="root"></div>
+<script>
+const P=new URLSearchParams(location.search);const QUAL=P.get('c');
+const root=document.getElementById('root');
+function el(css,cls='',html=''){const d=document.createElement('div');d.className='abs '+cls;d.style.cssText=css;d.innerHTML=html;root.appendChild(d);return d}
+const azul='#2a8cff',verm='#ff3348';
+function cells(x,y,n,cor,w=16,h=11,gap=4,cheias=0,dir=1){for(let i=0;i<n;i++){const xx=dir>0?x+i*(w+gap):x-(i+1)*(w+gap)+gap;el(`left:${xx}px;top:${y}px;width:${w}px;height:${h}px;border-color:${cor};background:${i<cheias?cor:'#0008'}`,'cell')}}
+function controles(){ // o celular: direcional e botões (só para ver o espaço)
+ el('left:43px;top:403px;width:284px;height:284px','ctl','');
+ for(const [x,y,r,t] of [[990,602,64,'L'],[1100,508,64,'M'],[1210,602,64,'H'],[1100,650,46,''],[915,500,50,'TAG'],[870,628,54,'SUPER'],[790,555,40,'SH']])
+  el(`left:${x-r}px;top:${y-r}px;width:${2*r}px;height:${2*r}px;font-size:${r>50?16:13}px`,'ctl',t);
+}
+function relogio(y,tam){
+ el(`left:${640-tam/2}px;top:${y}px;width:${tam}px;height:${tam*.78}px;clip-path:polygon(18% 0,82% 0,100% 50%,82% 100%,18% 100%,0 50%);background:linear-gradient(180deg,#1b2246,#05070f);border:0`,'');
+ el(`left:${640-tam/2}px;top:${y+tam*.06}px;width:${tam}px;text-align:center;font-size:${tam*.42}px;line-height:1`,'txt','∞');
+ el(`left:${640-tam/2}px;top:${y+tam*.5}px;width:${tam}px;text-align:center;font-size:${tam*.15}px`,'txt','TREINO');
+}
+function menuIcone(x,y){el(`left:${x}px;top:${y}px;width:46px;height:30px;border-radius:6px;background:#0b1024cc;border:2px solid #6fe3ff88;text-align:center;font-size:18px;line-height:26px`,'txt','☰')}
+function raio(x,y,w,cor,dir){ // acabamento de raio fino na borda
+ el(`left:${x}px;top:${y}px;width:${w}px;height:3px;background:linear-gradient(${dir>0?90:270}deg,${cor},#fff 40%,${cor}00);box-shadow:0 0 8px ${cor},0 0 14px ${cor}`,'');
+}
+function rosto(x,y,s,img,cor,forma){
+ const clip=forma==='hex'?'polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)':forma==='quad'?'polygon(12% 0,100% 0,88% 100%,0 100%)':'circle(50%)';
+ el(`left:${x-3}px;top:${y-3}px;width:${s+6}px;height:${s+6}px;clip-path:${clip};background:${cor};box-shadow:0 0 10px ${cor}`,'');
+ el(`left:${x}px;top:${y}px;width:${s}px;height:${s}px;clip-path:${clip};background-image:url(${img})`,'face');
+}
+// ---------- A: faixa única ----------
+function A(){
+ for(const lado of [0,1]){
+  const d=lado?-1:1,cor=lado?verm:azul,X=x=>lado?1280-x:x;
+  // placa
+  el(`left:${lado?700:0}px;top:0;width:580px;height:92px;clip-path:${lado?'polygon(6% 0,100% 0,100% 100%,0 100%)':'polygon(0 0,94% 0,100% 100%,0 100%)'}`,'plate');
+  raio(lado?700:0,90,580,cor,d);
+  rosto(lado?1280-84:10,8,74,lado?'koga.png':'ryuga.png',cor,'hex');
+  // parceiro (TAG)
+  rosto(lado?1280-112:68,52,34,lado?'koga.png':'yinlu.png',cor,'circle');
+  // nome
+  el(`left:${lado?700:96}px;top:6px;width:484px;text-align:${lado?'right':'left'};font-size:15px`,'txt',lado?'KŌGA KOMYO':'RYŪGA KOMYO');
+  // vida
+  const lx=lado?700+40:96,lw=444;
+  el(`left:${lx}px;top:26px;width:${lw}px;height:22px;transform:skewX(${lado?18:-18}deg)`,'lifebg');
+  el(`left:${lado?lx+lw*.35:lx}px;top:26px;width:${lw*.65}px;height:22px;transform:skewX(${lado?18:-18}deg)`,'life');
+  // tag mini
+  el(`left:${lado?lx+lw-150:lx+50}px;top:52px;width:100px;height:6px;transform:skewX(${lado?18:-18}deg)`,'life');
+  // shinkai + super
+  const sx=lado?lx+20:lx+170;
+  el(`left:${sx}px;top:62px;width:150px;height:9px;transform:skewX(${lado?18:-18}deg);background:#0a1430;border:1px solid ${lado?'#35e0ff':'#1e9cf0'}`,'');
+  el(`left:${sx}px;top:62px;width:${150*.7}px;height:9px;transform:skewX(${lado?18:-18}deg)`,lado?'shk2':'shk');
+  el(`left:${lado?sx:sx}px;top:72px;width:150px;font-size:10px;text-align:${lado?'right':'left'}`,'txt','SHINKAI');
+  cells(lado?lx+lw-10:lx+340,62,5,cor,16,11,4,2,lado?-1:1);
+  el(`left:${lado?lx+lw-140:lx+448}px;top:56px;font-size:20px`,'txt','2');
+ }
+ relogio(2,86);
+ menuIcone(617,72);
+}
+// ---------- B: medidores embaixo ----------
+function B(){
+ for(const lado of [0,1]){
+  const cor=lado?verm:azul;
+  el(`left:${lado?720:0}px;top:0;width:560px;height:70px;clip-path:${lado?'polygon(5% 0,100% 0,100% 100%,0 100%)':'polygon(0 0,95% 0,100% 100%,0 100%)'}`,'plate');
+  raio(lado?720:0,68,560,cor,lado?-1:1);
+  rosto(lado?1280-70:8,6,58,lado?'koga.png':'ryuga.png',cor,'quad');
+  rosto(lado?1280-100:52,40,26,lado?'koga.png':'yinlu.png',cor,'circle');
+  const lx=lado?760:80,lw=430;
+  el(`left:${lado?720:84}px;top:5px;width:476px;text-align:${lado?'right':'left'};font-size:14px`,'txt',lado?'KŌGA KOMYO':'RYŪGA KOMYO');
+  el(`left:${lx}px;top:24px;width:${lw}px;height:22px;transform:skewX(${lado?18:-18}deg)`,'lifebg');
+  el(`left:${lado?lx+lw*.35:lx}px;top:24px;width:${lw*.65}px;height:22px;transform:skewX(${lado?18:-18}deg)`,'life');
+  el(`left:${lado?lx+lw-120:lx+30}px;top:52px;width:90px;height:6px;transform:skewX(${lado?18:-18}deg)`,'life');
+  // embaixo, entre os controles
+  const bx=lado?650:350,by=676;
+  el(`left:${lado?640:330}px;top:${by-8}px;width:310px;height:44px;clip-path:${lado?'polygon(0 0,92% 0,100% 100%,0 100%)':'polygon(8% 0,100% 0,100% 100%,0 100%)'}`,'plate');
+  cells(lado?bx+250:bx+10,by,5,cor,22,13,5,2,lado?-1:1);
+  el(`left:${lado?bx+260:bx-14}px;top:${by-6}px;font-size:22px`,'txt','2');
+  const sx=lado?bx+10:bx+140;
+  el(`left:${sx}px;top:${by+18}px;width:120px;height:8px;background:#0a1430;border:1px solid ${lado?'#35e0ff':'#1e9cf0'};transform:skewX(-18deg)`,'');
+  el(`left:${sx}px;top:${by+18}px;width:84px;height:8px;transform:skewX(-18deg)`,lado?'shk2':'shk');
+  el(`left:${sx}px;top:${by+2}px;width:120px;font-size:10px;text-align:center`,'txt','SHINKAI');
+ }
+ relogio(2,72);
+ menuIcone(617,58);
+}
+// ---------- C: cantos ----------
+function C(){
+ for(const lado of [0,1]){
+  const cor=lado?verm:azul;
+  el(`left:${lado?820:0}px;top:0;width:460px;height:104px;clip-path:${lado?'polygon(0 0,100% 0,100% 100%,22% 100%)':'polygon(0 0,100% 0,78% 100%,0 100%)'}`,'plate');
+  raio(lado?820:0,102,460,cor,lado?-1:1);
+  rosto(lado?1280-92:8,10,84,lado?'koga.png':'ryuga.png',cor,'hex');
+  rosto(lado?1280-60:20,66,32,lado?'koga.png':'yinlu.png',cor,'circle');
+  const lx=lado?860:100,lw=320;
+  el(`left:${lado?860:100}px;top:6px;width:320px;text-align:${lado?'right':'left'};font-size:14px`,'txt',lado?'KŌGA KOMYO':'RYŪGA KOMYO');
+  el(`left:${lx}px;top:24px;width:${lw}px;height:24px;transform:skewX(${lado?18:-18}deg)`,'lifebg');
+  el(`left:${lado?lx+lw*.35:lx}px;top:24px;width:${lw*.65}px;height:24px;transform:skewX(${lado?18:-18}deg)`,'life');
+  el(`left:${lado?lx+lw-130:lx+10}px;top:52px;width:110px;height:6px;transform:skewX(${lado?18:-18}deg)`,'life');
+  const sx=lado?lx+10:lx+30;
+  el(`left:${sx}px;top:64px;width:130px;height:9px;background:#0a1430;border:1px solid ${lado?'#35e0ff':'#1e9cf0'};transform:skewX(-18deg)`,'');
+  el(`left:${sx}px;top:64px;width:91px;height:9px;transform:skewX(-18deg)`,lado?'shk2':'shk');
+  el(`left:${sx}px;top:76px;width:130px;font-size:10px;text-align:${lado?'right':'left'}`,'txt','SHINKAI');
+  cells(lado?lx+lw-20:lx+170,64,5,cor,15,11,4,2,lado?-1:1);
+  el(`left:${lado?lx+lw-140:lx+280}px;top:58px;font-size:20px`,'txt','2');
+ }
+ relogio(4,64);
+ menuIcone(617,56);
+}
+({A,B,C})[QUAL]();
+if(P.get('ctl'))controles();
+</script></body></html>
