@@ -1859,7 +1859,8 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   esse pra pulo"): `art/vfx/sokon/dono/Fuma_a-cel92-4046794477-4x4-24fps.png` (quadros em
   `dono/pulo_cel92_4046794477`), instalada como `fumaca_pulo_dono` (origem 185,338, escala 0,62,
   24 por segundo), no pulo comum, atrás do lutador. Depois, "um pouco maior e um pouco mais para
-  trás": 1,3× e 75 px atrás (`PULO_DONO_ESCALA`, `PULO_DONO_ATRAS`). `GameView.FUMACA_PULO_DONO`
+  trás": 1,3× e 75 px atrás (`PULO_DONO_ESCALA`, `PULO_DONO_ATRAS`). Depois, "acelera um pouco a animação": de
+  24 para 32 quadros por segundo (os 16 quadros em ~500 ms em vez de ~670). `GameView.FUMACA_PULO_DONO`
   desligado até ele aprovar `android/app/build/sprite-review/fumaca_pulo_dono.mp4`.
 
 ## Fora do VFX, o que ficou pendente
