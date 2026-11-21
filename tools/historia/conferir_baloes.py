@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Confere se o texto dos balões das páginas prontas cabe no miolo branco, com folga.
 
-Simula o que o jogo faz (PaginaGuiada.fit: maior letra até 40 px que cabe na "caixa", texto
+Simula o que o jogo faz (PaginaGuiada.fit: maior letra até 40 px, ou "letraMax" do balão, que cabe na "caixa", texto
 centrado nela) em português, inglês e espanhol, e mede a menor distância da letra até a borda
 do balão ("area"), em frações do tamanho da letra. Abaixo de 0,15 o texto encosta ou vaza
 (balão espetado, cuja caixa pega as pontas, é o caso típico).
@@ -55,8 +55,8 @@ def wrap(text, size, maxw):
     return lines
 
 
-def fit(text, w, h):
-    size = int(min(40, h))
+def fit(text, w, h, maxima=40):
+    size = int(min(maxima, h))
     lines = wrap(text, size, w)
     while size > 9:
         lines = wrap(text, size, w)
@@ -67,8 +67,8 @@ def fit(text, w, h):
     return size, lines
 
 
-def letras(shape, text, caixa, W, Hh):
-    size, lines = fit(text, (caixa[2] - caixa[0]) * W, (caixa[3] - caixa[1]) * Hh)
+def letras(shape, text, caixa, W, Hh, maxima=40):
+    size, lines = fit(text, (caixa[2] - caixa[0]) * W, (caixa[3] - caixa[1]) * Hh, maxima)
     lh = size * 1.12
     cx = (caixa[0] + caixa[2]) * 0.5 * W
     y = (caixa[1] + caixa[3]) * 0.5 * Hh - len(lines) * lh * 0.5 + size * 0.86
@@ -96,7 +96,7 @@ def folga(b, W, Hh, caixa, m, dist):
     """Menor distância letra-borda / tamanho da letra (negativo: pixels fora do balão)."""
     pior, menor = 1e9, 99
     for t in textos(b):
-        tm, size = letras((Hh, W), t, caixa, W, Hh)
+        tm, size = letras((Hh, W), t, caixa, W, Hh, b.get("letraMax", 40))
         if not tm.any():
             continue
         fora = int((tm & (m == 0)).sum())
@@ -110,7 +110,7 @@ def lados(b, W, Hh, caixa, dist):
     cx, cy = (caixa[0] + caixa[2]) / 2 * W, (caixa[1] + caixa[3]) / 2 * Hh
     w, h = (caixa[2] - caixa[0]) * W, (caixa[3] - caixa[1]) * Hh
     for t in textos(b):
-        tm, size = letras((Hh, W), t, caixa, W, Hh)
+        tm, size = letras((Hh, W), t, caixa, W, Hh, b.get("letraMax", 40))
         yy, xx = np.where(tm & (dist < ALVO * size))
         if (xx < cx - 0.2 * w).any(): s.add("L")
         if (xx > cx + 0.2 * w).any(): s.add("R")
