@@ -1841,6 +1841,17 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   seis plumas; 0,62, com a beira do quadro apagando aos poucos). Todas atrás dos lutadores.
 - **Desligadas** (`GameView.FUMACA_SOKON`; `-Dgameluta.fumacaSokon=true` liga para gravar) até o
   dono aprovar `android/app/build/sprite-review/fumacas_sokon.mp4` (hoje e as novas lado a lado).
+- **Depois, "tenta se aproximar do que tem hoje, ficou bem ruim e diferente"** (e "você está livre
+  para alterar o código dele"): as de hoje são brancas, de sombra cinza bem clara, poucas bolas
+  grandes, e no fim se partem em meias-luas. O Sōkon fazia a sombra a 65% da cor e sumia pela
+  transparência. `art/vfx/sokon/SokonFX_4.html` (cópia alterada da versão 3, para o dono usar) ganhou
+  dois controles na Fumaça: **Claridade da sombra** (a sombra de 65% até 95% da cor) e **Dissipar em
+  curvas** (cada tufo, da 30% da vida em diante, é cortado por um círculo que cresce de um lado e
+  vira meia-lua; a transparência geral do fim deixa de valer). Os dois vão no "Salvar tipo". As
+  fumaças agora são `fumaca_*_s4` (`fumacas_v4.json`: branca, sombra 55%, curvas 100%, poucas
+  plumas e tufos, desenho "Pluma"; corrida e freada com o vento no ponto, estreito, dobrando as
+  pontas), no tamanho das de hoje. As tentativas 1 a 3 (`fumacas.json`, `fumacas_v2.json`,
+  `fumacas_v3.json`, `clarear.py`) ficaram de registro; as folhas delas saíram.
 
 ## Fora do VFX, o que ficou pendente
 

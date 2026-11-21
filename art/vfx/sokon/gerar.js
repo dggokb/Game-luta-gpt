@@ -1,6 +1,6 @@
 // Gera quadros de efeito com o Sōkon FX do dono (SokonFX_3.html), sem tela: abre a ferramenta num
 // Chromium, põe os controles como no tipo pedido e desenha os 16 quadros, um PNG transparente cada.
-//   node art/vfx/sokon/gerar.js art/vfx/sokon/fumacas.json SAIDA
+//   node art/vfx/sokon/gerar.js art/vfx/sokon/fumacas.json SAIDA [SokonFX_4.html]
 // O .json é uma lista de tipos {nome, seed, valores: {id do controle: valor}}; sai SAIDA/<nome>/q_01..q_16.png.
 const {chromium}=require('playwright');
 const fs=require('fs'),path=require('path');
@@ -9,7 +9,7 @@ const fs=require('fs'),path=require('path');
  const saida=process.argv[3];
  const b=await chromium.launch();const p=await b.newPage();
  const erros=[];p.on('pageerror',e=>erros.push(e.message));
- await p.goto('file://'+path.resolve(__dirname,'SokonFX_3.html'));
+ await p.goto('file://'+path.resolve(__dirname,process.argv[4]||'SokonFX_4.html'));
  for(const tipo of tipos){
   const quadros=await p.evaluate(({valores,semente})=>{
    const el=id=>document.getElementById(id);

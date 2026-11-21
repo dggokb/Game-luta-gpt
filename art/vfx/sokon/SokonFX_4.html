@@ -1,0 +1,850 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sōkon FX</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#12131a;color:#edece9;font:16px "DM Sans",system-ui,sans-serif}main{max-width:970px;margin:auto;padding:28px}h1{letter-spacing:-.07em;font-size:42px;margin:0 0 22px}h1 i{color:#ffac48}section{display:grid;grid-template-columns:1fr 240px;gap:22px}canvas{width:100%;aspect-ratio:1;display:block;border-radius:12px;background:radial-gradient(ellipse,#30303d,#191921 70%)}aside{display:flex;flex-direction:column;gap:16px}label{display:grid;gap:6px;color:#c4c0c8;font-size:14px}select,input,button{font:inherit;max-width:100%;accent-color:#ffac48}select,button{padding:12px;border:1px solid #46444c;border-radius:7px;background:#25252d;color:inherit}button{cursor:pointer}button.primary{background:#ffac48;color:#251904;font-weight:700}input[type=color]{width:100%;height:35px}footer{display:flex;align-items:center;gap:12px;margin-top:10px}footer input{min-width:0;flex:1}output{font-variant-numeric:tabular-nums}@media(max-width:650px){main{padding:16px}section{grid-template-columns:1fr}aside{display:grid;grid-template-columns:1fr 1fr}}
+.opening-setting[hidden],.impact-setting[hidden]{display:none}.impact-setting{grid-template-columns:1fr auto}.impact-setting input{grid-column:1/-1;width:100%}
+main{height:100vh;height:100dvh;display:flex;flex-direction:column}
+h1{flex:none}
+section{flex:1;min-height:0;grid-template-rows:minmax(0,1fr)}
+.preview{min-width:0;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;align-self:stretch}
+.preview canvas{max-height:100%;width:100%;height:auto;max-width:100%;aspect-ratio:1;align-self:start;justify-self:center;object-fit:contain}
+aside{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 6px 16px 0;scrollbar-gutter:stable}
+aside>*{flex-shrink:0;min-width:0}
+@media(min-width:651px){.preview canvas{width:min(100%,calc(100dvh - 196px))}}
+@media(max-width:650px){
+ h1{font-size:28px;margin-bottom:8px}
+ section{grid-template-rows:auto minmax(0,1fr);gap:12px}
+ .preview canvas{width:min(100%,34vh);width:min(100%,34dvh)}
+ aside{grid-template-columns:repeat(2,minmax(0,1fr));align-content:start}
+}
+.smoke-setting[hidden]{display:none}</style><main><h1>SŌKON <i>FX</i></h1><section><div class="preview"><canvas id="stage" width="512" height="512"></canvas><footer><button id="play">Pausar</button><input aria-label="Quadro" id="frame" type="range" min="0" max="15" value="0"><output id="counter"></output></footer></div><aside tabindex="0" aria-label="Ajustes do efeito">
+<label>Efeito<select id="kind"><option>Impacto</option><option>Corte</option><option>Projétil</option><option>Fogo</option><option>Água</option><option>Gosma</option><option>Fumaça</option></select></label><label class="impact-setting">Material do impacto<select id="material"><option>Energia</option><option>Fogo</option><option>Água</option><option>Gosma</option><option>Raio</option><option>Gelo</option><option>Vento</option><option>Pedra</option><option>Nanquim</option></select></label><label class="impact-setting">Estilo do impacto<select id="artStyle"><option value="original">Original</option><option value="anime">Anime anos 90</option><option value="manga">Mangá de alto contraste</option><option value="brush">Pincel seco</option></select></label><label class="smoke-setting" hidden>Força do vento <output id="windForceValue">0%</output><input type="range" id="windForce" min="0" max="100" value="0"></label><label class="smoke-setting" hidden>Direção do vento <output id="windAngleValue">0°</output><input type="range" id="windAngle" min="-180" max="180" value="0"></label><label class="smoke-setting" hidden>Largura da rajada <output id="windWidthValue">85 px</output><input type="range" id="windWidth" min="12" max="240" value="85"></label><button class="smoke-setting" hidden id="windPick">Posicionar vento na prévia</button><input type="hidden" id="windX" value="256"><input type="hidden" id="windY" value="240"><label class="smoke-setting" hidden>Quantidade de plumas <output id="plumesValue">2</output><input id="plumes" type="range" min="1" max="8" value="2"></label><label class="smoke-setting" hidden>Separação nas bases <output id="gapValue">48 px</output><input id="gap" type="range" min="0" max="120" value="48"></label><label class="smoke-setting" hidden>Separação nas pontas <output id="tipGapValue">48 px</output><input id="tipGap" type="range" min="0" max="120" value="48"></label><label class="smoke-setting" hidden>Altura da junção <output id="joinAtValue">100%</output><input id="joinAt" type="range" min="10" max="100" value="100"></label><label class="smoke-setting" hidden>Expansão para cima <output id="riseValue">100%</output><input id="rise" type="range" min="0" max="200" value="100"></label><label class="smoke-setting" hidden>Expansão para baixo <output id="fallValue">0%</output><input id="fall" type="range" min="0" max="200" value="0"></label><label class="smoke-setting" hidden>Espelhamento horizontal<select id="smokeMirror"><option value="off">Desligado</option><option value="flip">Inverter conjunto</option><option value="pairs">Espelhar em pares</option></select></label><label class="smoke-setting" hidden>Claridade da sombra <output id="shadeLightValue">0%</output><input id="shadeLight" type="range" min="0" max="100" value="0"></label><label class="smoke-setting" hidden>Dissipar em curvas <output id="curlValue">0%</output><input id="curl" type="range" min="0" max="100" value="0"></label><label>Estilo · Vetor → Cel shading<input id="styleMix" type="range" min="0" max="100" value="0"></label><label>Cor da energia<input id="tint" type="color" value="#ff781a"></label><label>Intensidade<input id="power" type="range" min="3" max="14" value="9"></label><label>Partículas<input id="particles" type="range" min="0" max="60" value="32"></label><label>Luminosidade<input id="light" type="range" min="0" max="100" value="75"></label><label class="impact-setting">Desenho do efeito<select id="drawing" style="grid-column:1/-1"><option value="star">Estrela clássica</option><option value="cross">Clarão em cruz</option><option value="saw">Serra giratória</option><option value="twin">Pontas duplas</option></select></label><label class="impact-setting">Movimento do efeito<select id="motion" style="grid-column:1/-1"><option value="pulse">Abre e fecha</option><option value="out">Abre para fora</option><option value="in">De fora para dentro</option></select></label><label class="opening-setting" hidden>Início da abertura · quadro <output id="openingValue">7</output><input id="openingFrame" type="range" min="1" max="14" value="7"></label><label class="opening-setting" hidden>Fragmentos do miolo <output id="pieceValue">52</output><input id="pieces" type="range" min="0" max="120" value="52"></label><label class="opening-setting" hidden>Forma da abertura<select id="openingShape"><option value="radial">Radial</option><option value="cross">Em cruz</option><option value="fan">Em leque</option><option value="spiral">Em espiral</option><option value="random">Aleatório</option></select></label><label class="impact-setting">Miolo · largura da camada externa<output id="rimWidthValue">100%</output><input id="rimWidth" type="range" min="10" max="250" value="100"></label><label class="impact-setting">Miolo · largura da camada clara<output id="coreWidthValue">100%</output><input id="coreWidth" type="range" min="10" max="250" value="100"></label><label class="impact-setting">Grossura dos riscos internos<output id="riskWidthValue">100%</output><input id="riskWidth" type="range" min="5" max="1000" value="100"></label><label class="impact-setting">Grossura dos riscos externos<output id="outerWidthValue">100%</output><input id="outerWidth" type="range" min="25" max="250" value="100"></label><label class="impact-setting">Cor das partículas<input id="particleTint" type="color" value="#ff781a"></label><label class="impact-setting">Usar cor da energia<input id="linkTint" type="checkbox" checked style="grid-column:2;width:auto"></label><label class="impact-setting">Grossura das partículas<output id="particleWidthValue">100%</output><input id="particleWidth" type="range" min="25" max="300" value="100"></label><label class="impact-setting">Tipos de partículas<output id="shapesValue">1</output><input id="shapes" type="range" min="1" max="4" value="1"></label><button type="button" class="impact-setting" id="halo" aria-pressed="true">Halo de fundo · ligado</button><label class="impact-setting">Diâmetro da expansão <output id="diameterValue">100%</output><input id="diameter" type="range" min="10" max="200" value="100"></label><label class="impact-setting">Direcional <output id="focusValue">0%</output><input id="focus" type="range" min="0" max="100" value="0"></label><label>Direção<input id="angle" type="range" min="-180" max="180" value="-15"></label><label>Velocidade<select id="fps"><option>12</option><option selected>24</option><option>30</option><option>60</option></select></label><button class="primary" id="generate">Gerar variação</button><label>Nome do tipo<input id="presetName" maxlength="60" placeholder="Ex.: Impacto pesado"></label><button id="keep">Salvar tipo</button><button id="backup">Baixar todos os tipos</button><label>Importar tipos (.json)<input id="restore" type="file" accept=".json,application/json"></label><label>Tipos salvos<select id="savedTypes"><option value="">Escolher tipo</option></select></label><output id="presetStatus" role="status"></output><button id="save">Exportar spritesheet PNG</button></aside></section></main>
+<script>
+const el=id=>document.getElementById(id);
+const stage=el('stage'), frames=16;
+let seed=75823,playing=true,start=performance.now();
+function generator(value){return ()=>{value=(Math.imul(value,1664525)+1013904223)>>>0;return value/4294967296}}
+const profiles = {
+ Impacto: {rimWidth:100,coreWidth:100,diameter:100, focus:0, riskWidth:100, outerWidth:100, particleWidth:100, shapes:1, styleMix:0, particles:32, light:75},
+ Corte: {styleMix:0, particles:18, light:55},
+ Projétil: {styleMix:0, particles:38, light:80},
+ Fogo: {tint:'#ff651e',styleMix:60,particles:22,light:75},
+ Água: {tint:'#229fde',styleMix:55,particles:32,light:35},
+ Fumaça: {tint:'#9699a4',styleMix:65,particles:16,light:0},
+ Gosma: {tint:'#83c533',styleMix:70,particles:12,light:25}
+};
+function lighting(ctx,kind,t,color,amount){
+ if(!amount)return;
+ ctx.save();
+ let x=0,y=0,rx=150,ry=150,pulse=Math.exp(-3*t);
+ if(kind==='Corte'){
+  x=-95+210*t; y=35-77*t; rx=116; ry=19;
+  pulse=.5+.5*Math.sin(Math.PI*t);
+ }else if(kind==='Projétil'){
+  x=-50+110*t; rx=97; ry=68; pulse=.88+.12*Math.cos(t*12);
+ }
+ ctx.translate(x,y);
+ if(kind==='Corte')ctx.rotate(-.42);
+ ctx.scale(rx,ry);
+ ctx.globalAlpha*=amount/100*pulse;
+ const glow=ctx.createRadialGradient(0,0,0,0,0,1);
+ glow.addColorStop(0,'#fff8e9');glow.addColorStop(.23,color);
+ glow.addColorStop(.57,color+'85');glow.addColorStop(1,color+'00');
+ ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
+}
+function aim(angle){
+ const focus=profiles.Impacto.focus/100;
+ if(!focus)return angle;
+ const signed=Math.atan2(Math.sin(angle),Math.cos(angle));
+ return signed*(1-.9*focus);
+}
+function scatter(ctx,kind,t,color,count){
+ const random=generator(seed^0x519abe);
+ for(let i=0;i<count;i++){
+  const a=random(),b=random(),c=random(),d=random();
+  let x,y,theta,length;
+  if(kind==='Impacto'){
+   theta=aim(a*Math.PI*2);const distance=(18+b*45+(80+c*103)*Math.sqrt(t))*profiles.Impacto.diameter/100;
+   x=Math.cos(theta)*distance;y=Math.sin(theta)*distance+15*t*t*profiles.Impacto.diameter/100;
+   length=3+d*11*(1-t);
+  }else if(kind==='Corte'){
+   x=-154+310*a+27*t;y=68-55*a-107*a*a+(b-.5)*(16+88*t);
+   theta=-.35-.6*a+(c-.5)*.45;length=3+9*d;
+  }else{
+   const age=(a+t*1.25)%1;
+   x=-50+110*t-12-age*(96+b*60);
+   y=(c-.5)*(20+65*age)+Math.sin(age*5+b*6)*7;
+   theta=(c-.5)*.45;length=(1-age)*(4+11*d);
+  }
+  ctx.save();ctx.translate(x,y);ctx.rotate(theta);
+  ctx.fillStyle=!el('linkTint').checked ? el('particleTint').value : (i%4===0?'#fff7d7':color);
+  const impact=kind==='Impacto';
+  const width=(1.2+d)*(profiles[kind].particleWidth/100);
+  const shape=i%profiles[kind].shapes;
+  ctx.beginPath();
+  const material=impact?el('material').value:'Energia';
+  if(shape===0 && material==='Gosma')ctx.ellipse(0,0,width*2,width*1.65,0,0,Math.PI*2);
+  else if(shape===0 && material==='Água')ctx.ellipse(0,0,length*.62,width,0,0,Math.PI*2);
+  else if(shape===0 && material==='Fogo'){
+   ctx.moveTo(-length,0);ctx.quadraticCurveTo(length*.1,-width*2,length*.7,-width);ctx.quadraticCurveTo(0,width*2,-length,0);
+  }else switch(shape){
+   case 1: ctx.ellipse(0,0,width*1.35,width,0,0,Math.PI*2); break;
+   case 2: ctx.moveTo(-length*.6,width);ctx.lineTo(length,0);ctx.lineTo(-length*.2,-width*1.5);break;
+   case 3: for(let k=0;k<8;k++){const angle=k*Math.PI/4;
+    const radius=k%2===0?1:.25;
+    const px=Math.cos(angle)*length*radius,py=Math.sin(angle)*width*2.8*radius;
+    if(k===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+   }break;
+   default:ctx.moveTo(-length,0);ctx.lineTo(0,-width);ctx.lineTo(length*.55,0);ctx.lineTo(0,width);
+  }
+  ctx.closePath();ctx.fill();ctx.restore();
+ }
+}
+function paint(ctx,base,mix,x,y,radius){
+ ctx.fillStyle=base;
+ if(mix===0){ctx.fill();return}
+ const shadow=base.slice(1).match(/../g).map((pair,i)=>
+  Math.round(parseInt(pair,16)*(1-mix*[.58,.66,.42][i])));
+ const shade='rgb('+shadow.join(',')+')';
+ const band=ctx.createLinearGradient(x-radius*.3,y-radius,x+radius*.3,y+radius);
+ band.addColorStop(0,base);band.addColorStop(.56,base);
+ band.addColorStop(.561,shade);band.addColorStop(1,shade);
+ ctx.strokeStyle='rgba(35,17,45,'+mix*.88+')';
+ ctx.lineWidth=1+3*mix;ctx.lineJoin='round';ctx.stroke();
+ ctx.fillStyle=band;ctx.fill();
+}
+// Split the filled star into radial triangles, then move each piece from its own centroid.
+function externalHeadings(count){
+ const random=generator(seed^0x519abe);
+ return Array.from({length:count},()=>{
+  const angle=aim(random()*Math.PI*2);
+  // scatter samples three more values per particle for its size and travel.
+  random();random();random();
+  return angle;
+ });
+}
+function burstCore(points, progress, color, polygon, headings, inner=points.map(([x,y])=>[x*.66,y*.66])){
+ const random=generator(seed^0x432db9);
+ const count=Number(el('pieces').value);
+ function edge(position,outline=points){
+  const i=Math.floor(position),fraction=position-i;
+  const a=outline[i%outline.length],b=outline[(i+1)%outline.length];
+  return a.map((v,j)=>v+(b[j]-v)*fraction);
+ }
+ for(let i=0;i<count;i++){
+   const start=i*points.length/count,end=(i+1)*points.length/count;
+   const piece=[[0,0],edge(start)];
+   for(let k=Math.floor(start)+1;k<end;k++)piece.push(points[k]);
+   piece.push(edge(end));
+   const inside=[[0,0],edge(start,inner),...inner.slice(Math.floor(start)+1,Math.ceil(end)),edge(end,inner)];
+   const [mx,my]=edge((start+end)/2);
+   const cx=mx*2/3,cy=my*2/3;
+   const radial=Math.atan2(cy,cx);
+   let direction=radial+(random()-.5)*.32;
+   switch(el('openingShape').value){
+    case 'cross': direction=Math.round(radial/(Math.PI/2))*Math.PI/2+(direction-radial); break;
+    case 'fan': direction=.78*Math.sin(direction); break;
+    case 'radial':
+    case 'random': {
+     direction=radial;
+     let best=0;
+     for(const angle of headings){
+      const alignment=Math.cos(angle-radial);
+      if(alignment>best){direction=angle;best=alignment}
+     }
+     break;
+    }
+    case 'spiral': direction+=progress*2.3; break;
+   }
+   const distance=progress*(62+random()*91)*profiles.Impacto.diameter/100;
+   const size=(1-progress)**(1.4+random());
+   const spin=progress*(random()-.5)*2.5;
+   if(['radial','random'].includes(el('openingShape').value)){
+    const ux=Math.cos(direction),uy=Math.sin(direction);
+    // Keep the original vertices at release, then collapse their cross-track offsets.
+    const lateral=size*Math.exp(-9*progress);
+    function follow([px,py]){
+     const along=(mx*ux+my*uy)*.66*(1-size)+distance+(px*ux+py*uy)*size;
+     const across=(-px*uy+py*ux)*lateral;
+     return [along*ux-across*uy,along*uy+across*ux];
+    }
+    polygon(piece.map(follow),color);
+    polygon(inside.map(follow),elementsPalette[el('material').value][1]);
+    continue;
+   }
+   const transform=([x,y])=>{
+    const dx=(x-cx)*size,dy=(y-cy)*size;
+    return [cx+distance*Math.cos(direction)+dx*Math.cos(spin)-dy*Math.sin(spin),
+            cy+distance*Math.sin(direction)+dx*Math.sin(spin)+dy*Math.cos(spin)];
+   };
+   polygon(piece.map(transform),color);
+   polygon(inside.map(transform),elementsPalette[el('material').value][1]);
+ }
+}
+// Evaluate the gust in preview coordinates, then convert displacement back
+// into each puff's local space (including mirrored and rotated plumes).
+function bendSmoke(ctx,x,y,t){
+ const force=+el('windForce').value/100;
+ if(!force)return;
+ const m=ctx.getTransform(),angle=+el('angle').value*Math.PI/180;
+ const c=Math.cos(angle),s=Math.sin(angle);
+ const a=c*m.a-s*m.b,b=s*m.a+c*m.b,d=s*m.c+c*m.d,h=c*m.c-s*m.d;
+ const px=m.a*x+m.c*y+m.e-256,py=m.b*x+m.d*y+m.f-256;
+ const dx=256+c*px-s*py-el('windX').value,dy=256+s*px+c*py-el('windY').value;
+ const dir=+el('windAngle').value*Math.PI/180,u=Math.cos(dir),v=Math.sin(dir);
+ const along=dx*u+dy*v,cross=-dx*v+dy*u;
+ const width=+el('windWidth').value/2,reach=along<0?38:145;
+ // Integrate exposure from the emitter to this puff. Past contact keeps
+ // carrying the puff downwind even after its centre leaves the narrow jet.
+ const pathX=a*x+h*y,pathY=b*x+d*y;
+ let exposure=0;
+ for(let i=0;i<16;i++){
+  const back=(i+.5)/16;
+  const sx=dx-back*pathX,sy=dy-back*pathY;
+  const axial=sx*u+sy*v,lateral=-sx*v+sy*u;
+  exposure+=Math.exp(-.5*((axial/(axial<0?38:145))**2+(lateral/width)**2))/16;
+ }
+ const local=Math.exp(-.5*((along/reach)**2+(cross/width)**2));
+ const amount=force*(58*local+270*t*exposure);
+ const det=a*d-b*h;
+ const lx=(d*u-h*v)/det,ly=(a*v-b*u)/det;
+ const gx=-amount*(along*u/(reach*reach)-cross*v/(width*width));
+ const gy=-amount*(along*v/(reach*reach)+cross*u/(width*width));
+ const localX=gx*a+gy*b,localY=gx*h+gy*d;
+ ctx.translate(x+amount*lx,y+amount*ly);
+ const limit=Math.min(1,.7/(Math.hypot(lx,ly)*Math.hypot(localX,localY)||1));
+ ctx.transform(1+lx*localX*limit,ly*localX*limit,lx*localY*limit,1+ly*localY*limit,0,0);
+ ctx.translate(-x,-y);
+}
+function drawSmoke(ctx,t,profile,color,strength,plumeSeed=seed,tipOffset=0){
+ const random=generator(plumeSeed^0xab529d);
+ const channels=color.slice(1).match(/../g).map(v=>parseInt(v,16));
+ const tint=(gain,white)=>'rgb('+channels.map(v=>Math.round(v*gain+white)).join(',')+')';
+ // Claridade da sombra: 0 é a sombra de antes (65% da cor); 100 quase a própria cor.
+ const sl=+el('shadeLight').value/100,curl=+el('curl').value/100;
+ const shade=tint(.65+.3*sl,0),light=tint(.78,48);
+ const dense=6+strength, height=128+strength*2;
+ function spreadAt(y){
+  const z=Math.max(0,Math.min(1,-y/(height*el('joinAt').value/100)));
+  return tipOffset*z*z*(3-2*z);
+ }
+ ctx.save();ctx.translate(0,64);
+ for(let i=0;i<dense;i++){
+  const delay=i/dense*.42,age=(t-delay)/(1-delay);
+  const side=random()*2-1, swirl=random()*6.28, swell=random();
+  if(age<=0||age>=1)continue;
+  const y=-age*height+10*Math.sin(swirl+age*4);
+  const x=side*(5+age*42)+Math.sin(swirl+age*5)*age*23+spreadAt(y);
+  const radius=(9+age*(30+swell*19))*Math.min(1,age*9);
+  ctx.save();bendSmoke(ctx,x,y,t);ctx.translate(x,y);ctx.scale(profile.rimWidth/100,1);
+  // Dissipar em curvas: a transparência some menos e, da metade da vida em diante, cada bola é
+  // comida por dentro por outra que cresce deslocada; sobram meias-luas que se afinam até sumir.
+  const fadeAlpha=(1-age**2)*.86,keep=Math.max(0,1-Math.max(0,age-.82)/.18)*.95;
+  ctx.globalAlpha*=Math.min(1,age*10)*(fadeAlpha+(keep-fadeAlpha)*curl);
+  const bite=curl>0?Math.max(0,Math.min(1,(age-.3)/.62))*curl:0;
+  if(bite>0){
+   // Um corte por tufo, vindo de um lado (o giro do tufo) e crescendo: o tufo inteiro vira uma
+   // meia-lua virada para o outro lado, que afina até sumir.
+   const cut=radius*(.35+1.0*bite),off=radius*(.75-.2*bite);
+   ctx.save();ctx.beginPath();ctx.rect(-4*radius,-4*radius,8*radius,8*radius);
+   ctx.ellipse(-Math.cos(swirl)*off,-Math.abs(Math.sin(swirl))*off*.6,cut,cut*.85,0,0,Math.PI*2);
+   ctx.clip('evenodd');
+  }
+  // Overlapping scallops drift together as one billow.
+  for(let l=0;l<5;l++){
+   const angle=swirl+l*Math.PI*2/5+age*.6;
+   const dx=Math.cos(angle)*radius*.44,dy=Math.sin(angle)*radius*.34;
+   ctx.beginPath();ctx.ellipse(dx,dy,radius*.78,radius*.67,angle*.12,0,Math.PI*2);
+   ctx.fillStyle=l<2?shade:color;ctx.fill();
+  }
+  if(bite>0)ctx.restore();
+  if(bite>.2){ctx.restore();continue;}
+  ctx.globalAlpha*=.25+.56*profile.styleMix/100;
+  ctx.beginPath();ctx.ellipse(-radius*.18,-radius*.38,radius*.47*profile.coreWidth/100,radius*.22,-.25,0,Math.PI*2);
+  ctx.fillStyle=light;ctx.fill();ctx.restore();
+ }
+ ctx.globalAlpha*=.38*Math.sin(t*Math.PI);
+ for(let i=0;i<profile.particles;i++){
+  const side=random()*2-1,phase=random()*6.28,age=random()*.35+t*.65;
+  const radius=2+random()*6;
+  const y=-age*(height+20),x=side*(15+age*62)+Math.sin(phase+t*5)*15+spreadAt(y);
+  ctx.save();bendSmoke(ctx,x,y,t);
+  materialParticle(ctx,i,x,y,radius*1.5,radius,side*.6,color);ctx.restore();
+ }
+ ctx.restore();
+}
+function drawMaterial(ctx,kind,t,profile,color,strength){
+ const rand=generator(seed),power=.7+strength/23;
+ const lift=Math.sin(Math.PI*t),mix=profile.styleMix/100;
+ ctx.save();ctx.translate(0,60);ctx.scale(power,power);
+ ctx.shadowColor=color;ctx.shadowBlur=profile.light*.17;
+ function oval(x,y,rx,ry,angle,ink){
+  ctx.beginPath();ctx.ellipse(x,y,rx,ry,angle,0,2*Math.PI);
+  ctx.fillStyle=ink;ctx.fill();
+ }
+ if(kind==='Fogo'){
+  for(let i=0;i<9;i++){
+   const x=(i-4)*10,w=(16+rand()*10)*profile.rimWidth/100;
+   const h=(75+rand()*55-Math.abs(x))*(.55+lift);
+   const bend=Math.sin(t*9+rand()*4)*24;
+   function flame(scale,ink){
+    ctx.save();ctx.translate(x,0);ctx.scale(scale,scale);ctx.beginPath();
+    ctx.moveTo(-w,0);ctx.bezierCurveTo(-w*1.6,-h*.45,bend+10,-h*.55,bend,-h);
+    ctx.bezierCurveTo(bend+w,-h*.55,w*1.7,-h*.24,w,0);
+    ctx.quadraticCurveTo(0,15,-w,0);ctx.fillStyle=ink;ctx.fill();ctx.restore();
+   }
+   flame(1,color);flame((.43+.19*mix)*profile.coreWidth/100,'#ffdf83');
+  }
+ }else if(kind==='Água'){
+  for(let i=0;i<7;i++){
+   const dx=(i-3)*(16+16*t),h=(75+rand()*65)*lift;
+   const tip=dx*(1.3+t*.4),y=-h+18*t;
+   ctx.beginPath();ctx.moveTo(dx*.46-9*profile.rimWidth/100,2);
+   ctx.quadraticCurveTo(dx*.94,-h*.84,tip,y);
+   ctx.quadraticCurveTo(dx*.82,-h*.52,dx*.46+12,5);
+   ctx.fillStyle=color;ctx.fill();
+   oval(tip,y,(4+2*mix)*profile.coreWidth/100,7,dx*.008,'#d4fbff');
+  }
+  oval(0,4,32+80*t,4+4*lift,0,color);
+ }else{
+  const w=33+57*t,h=18+20*lift;
+  oval(0,0,w,h,0,color);
+  for(let i=0;i<5;i++){
+   const x=(i-2)*16,y=-(36+rand()*65)*lift;
+   const tip=x*(1+.7*t),r=(8+rand()*9)*profile.rimWidth/100;
+   ctx.beginPath();ctx.moveTo(x-13,2);ctx.quadraticCurveTo(tip-4,y*.55,tip-r,y);
+   ctx.lineTo(tip+r,y);ctx.quadraticCurveTo(tip+3,y*.52,x+14,2);
+   ctx.fillStyle=color;ctx.fill();oval(tip,y,r,r*.9,0,color);
+   oval(tip-r*.3,y-r*.38,r*(.18+.22*mix)*profile.coreWidth/100,r*.15,-.4,'#eaffbd');
+  }
+ }
+ for(let i=0;i<profile.particles;i++){
+  const a=rand(),b=rand(),c=rand();
+  if(kind==='Fogo'){
+   const age=(a+t*.82)%1;
+   materialParticle(ctx,i,(b-.5)*(68+60*age)+9*Math.sin(c*6+age*5),-age*172,1+c*2,2+c*4,.25,'#ffd477');
+  }else{
+   const slime=kind==='Gosma',x=(a-.5)*(35+t*(slime?150:270));
+   const y=-(40+b*(slime?65:145))*lift+14*t;
+   const r=(slime?4:1.5)+c*(slime?6:3);
+   materialParticle(ctx,i,x,y,r,r*(slime?1.05:1.65),x*.005,color);
+  }
+ }
+ ctx.restore();
+}
+const drawings={
+ Impacto:['Estrela clássica','Clarão em cruz','Serra giratória','Pontas duplas'],
+ Corte:['Arco','Corte largo','Estocada','Lâmina dupla'],
+ Projétil:['Esfera','Onda larga','Lança','Disparo duplo'],
+ Fogo:['Labareda','Muralha','Tocha','Chama dupla'],
+ Água:['Respingo','Leque','Jato','Jato duplo'],
+ Fumaça:['Pluma','Cortina baixa','Coluna fina','Pluma inclinada'],
+ Gosma:['Bolha','Poça larga','Filamento','Fluxo duplo']
+};
+function materialParticle(ctx,i,x,y,rx,ry,angle,color){
+ const profile=profiles[el('kind').value];
+ ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(rx*profile.particleWidth/100,ry);
+ ctx.beginPath();
+ switch(i%profile.shapes){
+ case 1:ctx.arc(0,0,1,0,Math.PI*2);break;
+ case 2:ctx.moveTo(-1,1);ctx.lineTo(0,-1);ctx.lineTo(1,1);ctx.closePath();break;
+ case 3:ctx.moveTo(0,-1.6);ctx.lineTo(.7,0);ctx.lineTo(0,1.4);ctx.lineTo(-.7,0);ctx.closePath();break;
+ default:ctx.ellipse(0,0,1,1,0,0,Math.PI*2);
+ }
+ ctx.fillStyle=el('linkTint').checked?color:el('particleTint').value;ctx.fill();ctx.restore();
+}
+const layerCanvas=document.createElement('canvas');
+layerCanvas.width=layerCanvas.height=512;
+function renderOther(ctx,kind,index,profile,color,strength){
+ const motion=el('motion').value,opening=+el('openingFrame').value-1;
+ const splitting=kind!=='Fumaça' && motion==='out' && index>=opening;
+ let phase=(splitting?opening:index)/(frames-1);
+ if(kind!=='Fumaça' && motion==='in')phase=1-phase;
+ const layer=layerCanvas.getContext('2d');
+ layer.clearRect(0,0,512,512);layer.save();layer.translate(256,256);
+ const variant=el('drawing').selectedIndex,vertical=['Fogo','Água','Gosma','Fumaça'].includes(kind);
+ const spread=1-.72*profile.focus/100;
+ const width=(variant===1?1.35:variant===2?.64:1)*spread;
+ const height=variant===1?.78:variant===2?1.25:1;
+ const scale=profile.diameter/100;
+ layer.scale(scale*(vertical?width:height),scale*(vertical?height:width));
+ if(haloEnabled && vertical)lighting(layer,kind,phase,color,profile.light*.55);
+ if(kind==='Fumaça'){
+  const count=+el('plumes').value,gap=+el('gap').value;
+  const mirror=el('smokeMirror').value;
+  if(mirror==='flip')layer.scale(-1,1);
+  for(let j=0;j<count;j++){
+   const partner=count-1-j;
+   const group=mirror==='pairs'?Math.min(j,partner):j;
+   const plumeSeed=seed^Math.imul(group,0x45d9f3b);
+   layer.save();layer.translate((j-(count-1)/2)*gap,64);
+   if(mirror==='pairs' && j>partner)layer.scale(-1,1);
+   if(variant===3)layer.transform(1,0,-.45,1,0,0);
+   for(const [id,sign] of [['rise',1],['fall',-1]]){
+    const reach=+el(id).value/100;
+    if(!reach)continue;
+    layer.save();layer.scale(1,sign*reach);layer.translate(0,-64);
+    const side=j-(count-1)/2;
+    const tipOffset=side*(+el('tipGap').value-gap)*(mirror==='pairs'&&j>partner?-1:1);
+    drawSmoke(layer,phase,profile,color,strength,plumeSeed,tipOffset);
+    layer.restore();
+   }
+   layer.restore();
+  }
+  layer.restore();ctx.drawImage(layerCanvas,-256,-256);return;
+ }
+ const copies=variant===3?2:1;
+ for(let j=0;j<copies;j++){
+  layer.save();
+  if(copies===2){layer.translate(vertical?(j?32:-32):0,vertical?0:(j?24:-24));layer.rotate(j?.16:-.16);layer.scale(.78,.78)}
+  if(vertical)drawMaterial(layer,kind,phase,profile,color,strength);
+  else draw(layer,phase*(frames-1),true);
+  layer.restore();
+ }
+ layer.restore();
+ if(!splitting){ctx.drawImage(layerCanvas,-256,-256);return}
+ const count=+el('pieces').value,progress=(index-opening+1)/(frames-opening);
+ const random=generator(seed^0x8338);
+ for(let i=0;i<count;i++){
+  const start=i*2*Math.PI/count,end=(i+1)*2*Math.PI/count;
+  let angle=(start+end)/2;
+  const shape=el('openingShape').value,jitter=random()-.5;
+  if(shape==='cross')angle=Math.round(angle/(Math.PI/2))*Math.PI/2;
+  if(shape==='fan')angle=Math.sin(angle)*.8;
+  if(shape==='spiral')angle+=progress*1.8;
+  if(shape==='random')angle+=jitter*.65;
+  const reach=progress*(50+100*random())*scale;
+  ctx.save();ctx.translate(reach*Math.cos(angle),reach*Math.sin(angle));ctx.scale(1-.65*progress,1-.65*progress);
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,365,start,end);ctx.closePath();ctx.clip();
+  ctx.drawImage(layerCanvas,-256,-256);ctx.restore();
+ }
+}
+const elementsPalette={
+ Raio:['#9365ff','#f8f4ff'],Gelo:['#52bcee','#ddfbff'],Vento:['#a6e4db','#f3fffc'],Pedra:['#9a6950','#e3c49c'],Nanquim:['#30283d','#bbb1c0'],
+ Energia:['#ff781a','#fff5cd'],Fogo:['#ff5422','#ffed91'],
+ Água:['#238ed6','#c8f6ff'],Gosma:['#68b932','#dcff9a']
+};
+function impactPath(ctx,points,material,t){
+ ctx.beginPath();
+ if(material==='Gosma'||material==='Nanquim'){
+  const last=points[points.length-1],first=points[0];
+  ctx.moveTo((last[0]+first[0])/2,(last[1]+first[1])/2);
+  points.forEach(([x,y],i)=>{
+   const next=points[(i+1)%points.length];
+   ctx.quadraticCurveTo(x,y,(x+next[0])/2,(y+next[1])/2);
+  });
+ }else{
+  ctx.moveTo(...points[0]);
+  for(let i=1;i<=points.length;i++){
+   const [x,y]=points[i%points.length],[a,b]=points[i-1];
+   const dx=x-a,dy=y-b;
+   if(material==='Fogo'){
+    const curl=.18+.08*Math.sin(t*7+i);
+    ctx.bezierCurveTo(a+dx*.35-dy*curl,b+dy*.35+dx*curl,a+dx*.72+dy*.09,b+dy*.72-dx*.09,x,y);
+   }else if(material==='Água'){
+    ctx.quadraticCurveTo(a+dx*.55+dy*.16,b+dy*.55-dx*.16,x,y);
+   }else ctx.lineTo(x,y);
+  }
+ }
+ ctx.closePath();
+}
+function elementalStreak(ctx,material,r,w,t,ink,highlight,number,polygon){
+ ctx.fillStyle=ink;ctx.strokeStyle=ink;ctx.lineWidth=Math.max(1,w);
+ ctx.beginPath();
+ switch(material){
+ case 'Raio':{
+  const flicker=Math.floor(t*15/2)+number;
+  const kink=(flicker%2?1:-1)*w*2;
+  ctx.moveTo(r*.42,0);ctx.lineTo(r*.72,kink);ctx.lineTo(r*.76,-kink*.6);ctx.lineTo(r+28,0);ctx.stroke();
+  if(flicker%3){ctx.beginPath();ctx.moveTo(r*.72,kink);ctx.lineTo(r*.86,kink*3);ctx.lineTo(r*.95,kink*2.7);ctx.lineWidth*=.42;ctx.stroke()}
+  break;
+ }
+ case 'Gelo':
+  polygon([[r-5,0],[r+5,-w*2],[r+28,-w],[r+16,w*1.6]],ink);
+  polygon([[r+5,-w*2],[r+28,-w],[r+10,0]],highlight);break;
+ case 'Vento':
+  ctx.moveTo(r-12,-w*2);ctx.quadraticCurveTo(r+17,-w*4,r+28,0);
+  ctx.quadraticCurveTo(r+17,-w*2,r-12,-w*2);ctx.fill();break;
+ case 'Pedra':
+  polygon([[r-4,0],[r+1,-w*2],[r+11,-w*1.5],[r+15,w],[r+6,w*2]],ink);break;
+ case 'Nanquim':
+  ctx.moveTo(r-15,0);ctx.quadraticCurveTo(r+4,-w*2,r+15,-w);
+  ctx.quadraticCurveTo(r+25,w*2,r+9,w);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.arc(r+29,0,Math.max(1,w*.6),0,Math.PI*2);ctx.fill();break;
+ default:polygon([[r,0],[r+16,-w],[r+32,0],[r+12,w]],ink);
+ }
+}
+function draw(ctx,index,local=false){
+ const random=generator(seed),t=index/(frames-1),strength=+el('power').value,color=el('tint').value;
+ ctx.save();if(!local){ctx.beginPath();ctx.rect(0,0,512,512);ctx.clip();ctx.translate(256,256);ctx.rotate(+el('angle').value*Math.PI/180)}
+ function polygon(points,fill){if(kind==='Impacto')impactPath(ctx,points,el('material').value,t);else {ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();}
+ if(kind==='Impacto'){
+  ctx.save();
+  ctx.shadowColor=color+Math.round(255*glow).toString(16).padStart(2,'0');
+  ctx.shadowBlur=28*glow;
+  ctx.fillStyle=fill;ctx.fill();
+  ctx.restore();
+  if(mix && points.length<=4){
+   const [a,b,c]=points;
+   face([a,b,[(b[0]+c[0])*.5,(b[1]+c[1])*.5]],'rgba(75,24,51,'+.52*mix+')');
+  }
+  return;
+ }
+ const ys=points.map(point=>point[1]),low=Math.min(...ys),high=Math.max(...ys);
+ paint(ctx,fill,mix,points.reduce((sum,p)=>sum+p[0],0)/points.length,(low+high)/2,Math.max(1,(high-low)/2))}
+ function face(points,ink){
+  ctx.beginPath();ctx.moveTo(...points[0]);
+  for(const point of points.slice(1))ctx.lineTo(...point);
+  ctx.closePath();ctx.fillStyle=ink;ctx.fill();
+ }
+ function starLayer(points,fill){
+  polygon(points,fill);
+  if(!mix)return;
+  ctx.save();impactPath(ctx,points,el('material').value,t);ctx.clip();
+  for(let i=0;i<points.length;i+=2){
+   const tip=points[i],right=points[i+1],left=points[(i+points.length-1)%points.length];
+   const ridge=[tip[0]*.19,tip[1]*.19];
+   face([ridge,tip,right],'rgba(87,30,56,'+.55*mix+')');
+   face([ridge,[tip[0]*.89,tip[1]*.89],[left[0]*.71,left[1]*.71]],'rgba(255,251,217,'+.62*mix+')');
+  }
+  ctx.restore();
+ }
+ const kind=el('kind').value,profile=profiles[kind];
+ // A fumaça que se desfaz em curvas some pelo corte, não pela transparência geral do fim.
+ const curlFade=kind==='Fumaça'?+el('curl').value/100:0;
+ const fade=Math.min(1,(1-t)*2.4)*(1-curlFade)+curlFade;ctx.globalAlpha=fade;
+ if(!local && kind!=='Impacto'){renderOther(ctx,kind,index,profile,color,strength);ctx.restore();return}
+ if(local)ctx.globalAlpha=1;
+ const art=el('artStyle').value;
+ if(kind==='Impacto' && art==='manga')ctx.filter='grayscale(1) contrast(350%)';
+ const glow=profile.light/100;
+ const mix=kind==='Impacto'&&art==='anime'?Math.max(.85,profile.styleMix/100):profile.styleMix/100;
+ const motion=el('motion').value;
+ const directional=kind==='Impacto' && (motion==='in'||motion==='out');
+ let travel=t;
+ if(directional){
+  travel=motion==='in'?1-t:t;
+  const scale=.10+.90*(1-(1-travel)**2);
+  ctx.scale(scale,scale);
+ }
+ if(haloEnabled)lighting(ctx,kind,directional?travel:t,color,profile.light);
+ if(kind==='Impacto'){
+ const points=[];
+ const drawing=el('drawing').value;
+ let rays=strength+4;
+ if(drawing==='cross')rays=4*Math.max(2,Math.round(rays/4));
+ if(drawing==='twin')rays=2*Math.ceil(rays/2);
+ const spacing=2*Math.PI/rays;
+ const lengths=Array.from({length:rays},(_,i)=>{
+  const length=68+random()*95;
+  if(drawing==='cross')return i%(rays/4)===0?145+.22*length:.38*length;
+  if(drawing==='saw')return 68+.42*length;
+  return length;
+ });
+ const width=profile.riskWidth;
+ for(let i=0;i<rays;i++){
+  const a=i*spacing;
+  const r=lengths[i]*(directional?1:(1+.35*Math.sin(t*4))*(1-.75*t));
+  // Above 250%, broaden the base toward the shorter adjacent tip.
+  const broadening=Math.max(0,(width-250)/750);
+  const limit=.92*Math.min(lengths[i],lengths[(i+1)%rays]);
+  const base=(22*Math.min(width,250)/100+broadening*(limit-55))*(directional?1:1-t);
+  let valley=a+.2+broadening*(spacing/2-.2);
+  let tip=a;
+  let root=base;
+  if(drawing==='saw'){tip+=spacing*.33;valley=a+spacing*.93;root=Math.min(r*.84,base*2.5)}
+  if(drawing==='twin'){
+   tip+=(i%2===0?1:-1)*spacing*.23;
+   valley=a+spacing*.5;
+   if(i%2===0)root=Math.max(base,limit*.64*(directional?1:1-t));
+  }
+  points.push([r*Math.cos(aim(tip)),r*Math.sin(aim(tip))],[root*Math.cos(aim(valley)),root*Math.sin(aim(valley))])
+  // Anchor the cut in the radial fan to the contact point as the cone closes.
+  if(profile.focus && a<=Math.PI && a+spacing>Math.PI){
+   const seam=valley>Math.PI?points.length-1:points.length;
+   const fade=Math.min(1,profile.focus/15);
+   const joint=[-base*(1-fade),0];
+   points.splice(seam,0,joint,joint);
+  };
+ }
+ const material=el('material').value;
+ const rayColor=art==='manga'?'#161616':color,coreColor=art==='manga'?'#ffffff':elementsPalette[el('material').value][1];
+ function layer(width,scale){
+  return points.map(([x,y],i)=>{
+   let factor=1;
+   if(i%2 && width!==100){
+    const radius=Math.hypot(x,y);
+    const limit=Math.min(Math.hypot(...points[i-1]),Math.hypot(...points[(i+1)%points.length]));
+    factor=width<100?width/100:1+(width-100)/150*Math.max(0,limit/Math.max(radius,.001)-1)*.9;
+   }
+   return [x*factor*scale,y*factor*scale];
+  });
+ }
+ const shell=layer(profile.rimWidth,1),inner=layer(profile.coreWidth,.66);
+ const streaks=Array.from({length:strength*2},()=>({
+  angle:aim(random()*Math.PI*2),
+  radius:(16+random()*65+120*travel)*profile.diameter/100,
+  width:(2+random()*3)*profile.outerWidth/100
+ }));
+ const opening=+el('openingFrame').value||7;
+ if(motion==='out' && index+1>=opening){
+  const progress=(index+2-opening)/(frames+1-opening);
+  ctx.globalAlpha=Math.min(1,(1-t)*8);
+  const headings=streaks.map(streak=>streak.angle).concat(externalHeadings(profile.particles));
+  burstCore(shell,progress,rayColor,polygon,headings,inner);
+
+  ctx.globalAlpha=fade;
+ }else{
+  if(material==='Vento'){
+   for(let j=0;j<3;j++){ctx.beginPath();ctx.ellipse(0,0,22+travel*65+j*7,17+travel*44+j*5,0,j*2+travel,j*2+travel+1.8);ctx.strokeStyle=j===1?coreColor:rayColor;ctx.lineWidth=2+j;ctx.stroke()}
+  }else{
+   starLayer(shell,rayColor);starLayer(inner,coreColor);
+   if(material==='Gelo'||material==='Pedra'){
+    for(let j=0;j<inner.length;j+=4)face([[0,0],inner[j],inner[(j+1)%inner.length]],material==='Gelo'?'#64a8d7':'#765544');
+   }
+  }
+ }
+ for(const [number,streak] of streaks.entries()){
+  ctx.save();
+  if(material==='Pedra')ctx.translate(0,travel*travel*48);
+  ctx.rotate(streak.angle);
+  elementalStreak(ctx,material,streak.radius,streak.width,travel,rayColor,coreColor,number,polygon);
+  ctx.restore();
+ }
+ if(material==='Pedra' && t>.24){
+  const dust=generator(seed^0x35df);ctx.save();ctx.globalAlpha*=.36*Math.sin(Math.PI*(t-.24)/.76);
+  for(let j=0;j<profile.particles;j++){
+   const x=(dust()-.5)*(48+180*t),y=18+36*t-dust()*21;
+   ctx.beginPath();ctx.ellipse(x,y,6+11*t,4+6*t,0,0,Math.PI*2);ctx.fillStyle=rayColor;ctx.fill();
+  }ctx.restore();
+ }
+ }else if(el('kind').value==='Corte'){
+ for(let i=0;i<strength;i++){const offset=(random()-.5)*44,r=118+random()*84;
+ ctx.beginPath();ctx.moveTo(-r+62*t,74+offset);ctx.quadraticCurveTo(10,42+offset,r-36*(1-t),-108+offset);ctx.quadraticCurveTo(8,42+offset+(23-20*t)*(i%4===0?profile.coreWidth:profile.rimWidth)/100,-r+62*t,74+offset);ctx.closePath();paint(ctx,i%4===0?'#fff6d6':color,mix,10,offset,80)}
+ }else{
+ const x=-50+110*t;
+ for(let i=0;i<strength*2;i++){const y=(random()-.5)*70,w=(4+random()*13)*profile.rimWidth/100,len=50+random()*108,phase=random()*6.28;
+ polygon([[x+30,y],[x-16,y-w],[x-len+13*Math.sin(phase+7*t),y*.6],[x-20,y+w]],i%4===0?'#fff6d6':color)}
+ ctx.beginPath();ctx.ellipse(x,0,48,36,0,0,Math.PI*2);paint(ctx,color,mix,x,0,36);ctx.beginPath();ctx.ellipse(x+8,0,32,21*profile.coreWidth/100,0,0,Math.PI*2);paint(ctx,'#fff7df',mix,x+8,0,21)
+ }
+ scatter(ctx,kind,travel,color,profile.particles);
+ if(kind==='Impacto'&&art==='brush'){
+  const grain=generator(seed^0x91bf);ctx.save();ctx.globalCompositeOperation='destination-out';
+  for(let j=0;j<320;j++){
+   const a=aim(grain()*Math.PI*2),r=grain()*210,len=3+grain()*19;
+   ctx.save();ctx.rotate(a);ctx.fillStyle='#000';ctx.fillRect(r,-1,len,.5+grain()*1.6);ctx.restore();
+  }ctx.restore();
+ }
+ ctx.restore()
+}
+let pickingWind=false;
+el('windPick').onclick=()=>{
+ pickingWind=!pickingWind;
+ el('windPick').textContent=pickingWind?'Toque no ponto da fumaça · cancelar':'Posicionar vento na prévia';
+ preview();
+};
+stage.onpointerdown=e=>{
+ if(!pickingWind||el('kind').value!=='Fumaça')return;
+ const box=stage.getBoundingClientRect();
+ const side=Math.min(box.width,box.height);
+ for(const [id,pos,origin,size] of [['windX',e.clientX,box.left,box.width],['windY',e.clientY,box.top,box.height]]){
+  el(id).value=Math.round(Math.max(0,Math.min(512,512*(pos-origin-(size-side)/2)/side)));
+ }
+ el('windPick').onclick();
+};
+function windGuide(ctx){
+ if(!pickingWind||el('kind').value!=='Fumaça')return;
+ ctx.save();ctx.translate(+el('windX').value,+el('windY').value);ctx.rotate(+el('windAngle').value*Math.PI/180);
+ ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(0,0,+el('windWidth').value/2,0,2*Math.PI);ctx.stroke();ctx.setLineDash([]);
+ ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(30,0);ctx.lineTo(22,-5);ctx.moveTo(30,0);ctx.lineTo(22,5);ctx.stroke();ctx.restore();
+}
+function preview(){const ctx=stage.getContext('2d');ctx.clearRect(0,0,512,512);draw(ctx,+el('frame').value);windGuide(ctx);el('counter').value=(+el('frame').value+1)+'/16'}
+function tick(now){if(playing){el('frame').value=Math.min(15,Math.floor((now-start)*+el('fps').value/1000)%(frames+3));preview()}requestAnimationFrame(tick)}
+el('generate').onclick=()=>{seed=crypto.getRandomValues(new Uint32Array(1))[0];el('frame').value=0;start=performance.now();preview()};
+el('play').onclick=()=>{playing=!playing;el('play').textContent=playing?'Pausar':'Reproduzir';start=performance.now()-el('frame').value*1000/el('fps').value};
+let customParticleTint=el('particleTint').value;
+el('particleTint').oninput=()=>{
+ customParticleTint=el('particleTint').value;
+ el('linkTint').checked=false;
+ preview();
+};
+el('linkTint').onchange=()=>{
+ el('particleTint').value=el('linkTint').checked?el('tint').value:customParticleTint;
+ preview();
+};
+let haloEnabled=true;
+el('halo').onclick=()=>{
+ haloEnabled=!haloEnabled;
+ el('halo').setAttribute('aria-pressed',String(haloEnabled));
+ el('halo').textContent='Halo de fundo · '+(haloEnabled?'ligado':'desligado');
+ preview();
+};
+function showOpening(){
+ for(const label of document.querySelectorAll('.opening-setting')){
+  label.hidden=el('kind').value==='Fumaça'||el('motion').value!=='out';
+ }
+}
+el('motion').oninput=()=>{showOpening();preview()};
+el('pieces').oninput=()=>{el('pieceValue').value=el('pieces').value;preview()};
+el('artStyle').oninput=preview;
+el('material').oninput=()=>{
+ el('tint').value=elementsPalette[el('material').value][0];el('tint').oninput();
+};
+el('drawing').oninput=preview;
+el('openingShape').oninput=preview;
+el('openingFrame').oninput=()=>{
+ el('openingValue').value=el('openingFrame').value;
+ preview();
+};
+el('frame').oninput=()=>{playing=false;el('play').textContent='Reproduzir';preview()};
+for(const key of ['rimWidth','coreWidth','diameter','focus','riskWidth','outerWidth','particleWidth','shapes']){
+ el(key).oninput=()=>{
+  profiles[el('kind').value][key]=+el(key).value;
+  el(key+'Value').value=el(key).value+(key==='shapes'?'':'%');
+  preview();
+ };
+}
+const widths=['rimWidth','coreWidth','diameter','focus','particleWidth','shapes'];
+for(const kind of Object.keys(profiles))if(kind!=='Impacto')Object.assign(profiles[kind],{rimWidth:100,coreWidth:100,diameter:100,focus:0,particleWidth:100,shapes:1});
+const appearances={};
+function recordAppearance(){
+ return {drawing:el('drawing').value,motion:el('motion').value,openingFrame:el('openingFrame').value,pieces:el('pieces').value,openingShape:el('openingShape').value,particleTint:el('particleTint').value,linked:el('linkTint').checked,halo:haloEnabled,custom:customParticleTint};
+}
+const defaultAppearance=recordAppearance();
+let activeKind=el('kind').value;
+el('kind').oninput=(event)=>{
+ const next=el('kind').value;
+ if(event && activeKind!==next){
+  appearances[activeKind]=recordAppearance();
+  const settings=appearances[next]||defaultAppearance;
+  for(const id of ['drawing','motion','openingFrame','pieces','openingShape','particleTint'])el(id).value=settings[id];
+  el('openingValue').value=settings.openingFrame;el('pieceValue').value=settings.pieces;
+  customParticleTint=settings.custom;el('linkTint').checked=settings.linked;
+  if(haloEnabled!==settings.halo)el('halo').onclick();
+  profiles[activeKind].tint=el('tint').value;
+  el('tint').value=profiles[next].tint||'#ff781a';
+  if(el('linkTint').checked)el('particleTint').value=el('tint').value;
+ }
+ for(const label of document.querySelectorAll('.smoke-setting'))label.hidden=next!=='Fumaça';
+ activeKind=next;
+ showOpening();
+ for(const label of document.querySelectorAll('.impact-setting'))label.hidden=next!=='Impacto' && !!label.querySelector('#riskWidth,#outerWidth,#material,#artStyle');
+ if(next==='Fumaça')el('motion').closest('label').hidden=true;
+ for(const [i,name] of drawings[next].entries())el('drawing').options[i].textContent=name;
+ for(const key of widths){el(key).value=profiles[next][key];el(key+'Value').value=profiles[next][key]+(key==='shapes'?'':'%')}
+ const profile=profiles[el('kind').value];
+ for(const id of ['particles','light','styleMix'])el(id).value=profile[id];
+ preview();
+};
+for(const id of ['particles','light','styleMix'])el(id).oninput=()=>{
+ profiles[el('kind').value][id]=+el(id).value;preview();
+};
+for(const id of ['power','angle'])el(id).oninput=preview;
+el('tint').oninput=()=>{
+ if(el('linkTint').checked)el('particleTint').value=el('tint').value;
+ preview();
+};
+el('save').onclick=()=>{const sheet=document.createElement('canvas');sheet.width=sheet.height=2048;const ctx=sheet.getContext('2d');
+ for(let i=0;i<frames;i++){ctx.save();ctx.translate((i%4)*512,Math.floor(i/4)*512);draw(ctx,i);ctx.restore()}
+ sheet.toBlob(blob=>{const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=el('kind').value+'-cel'+profiles[el('kind').value].styleMix+'-'+seed+'-4x4-'+el('fps').value+'fps.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)})};
+const presetKey='sokonfx.presets.v1';
+const smokeDefaults={shadeLight:'0',curl:'0',tipGap:'48',joinAt:'100',windForce:'0',windWidth:'85',windAngle:'0',windX:'256',windY:'240',plumes:'2',gap:'48',rise:'100',fall:'0',smokeMirror:'off'};
+function refreshSmoke(){
+ for(const [id,unit] of Object.entries({shadeLight:'%',curl:'%',tipGap:' px',joinAt:'%',windForce:'%',windAngle:'°',windWidth:' px',plumes:'',gap:' px',rise:'%',fall:'%'}))el(id+'Value').value=el(id).value+unit;
+}
+for(const id of Object.keys(smokeDefaults))el(id).oninput=()=>{refreshSmoke();preview()};
+const savedFields=[...Object.keys(smokeDefaults),'kind','artStyle','material','drawing','styleMix','tint','power','particles','light','motion','openingFrame','pieces','openingShape','rimWidth','coreWidth','diameter','focus','riskWidth','outerWidth','particleTint','particleWidth','shapes','angle','fps'];
+let sessionTypes=[],sessionOnly=false;
+function storedTypes(){
+ if(sessionOnly)return sessionTypes;
+ try{
+  const data=JSON.parse(localStorage.getItem(presetKey)||'[]');
+  if(Array.isArray(data))sessionTypes=data;
+ }catch{}
+ return sessionTypes;
+}
+function persistTypes(types){
+ sessionTypes=types;
+ try{localStorage.setItem(presetKey,JSON.stringify(types));sessionOnly=false}catch{sessionOnly=true}
+}
+function downloadTypes(types){
+ const blob=new Blob([JSON.stringify({format:'sokonfx-types-v1',types},null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='SokonFX-tipos.json';link.click();
+ setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+el('backup').onclick=()=>{
+ const types=storedTypes();
+ if(types.length)downloadTypes(types);
+ else el('presetStatus').textContent='Nenhum tipo salvo nesta cópia.';
+};
+el('restore').onchange=async()=>{
+ const file=el('restore').files[0];
+ if(!file)return;
+ try{
+  const data=JSON.parse(await file.text());
+  const incoming=Array.isArray(data)?data:data.types;
+  if(!Array.isArray(incoming)||!incoming.every(p=>typeof p?.name==='string'&&p.name.trim()&&Object.hasOwn(profiles,p.values?.kind)&&Number.isInteger(p.seed)))throw Error();
+  const merged=storedTypes().slice();
+  for(const item of incoming){
+   if(merged.some(p=>JSON.stringify(p)===JSON.stringify(item)))continue;
+   let name=item.name,n=2;
+   while(merged.some(p=>p.name===name))name=item.name+' ('+(n++)+')';
+   merged.push({...item,name});
+  }
+  persistTypes(merged);showTypes(merged);
+  el('presetStatus').textContent='Importação concluída. Escolha um tipo salvo.';
+ }catch{el('presetStatus').textContent='Arquivo de tipos inválido.'}
+ el('restore').value='';
+};
+function showTypes(types){
+ const select=el('savedTypes');
+ select.length=1;
+ for(const type of types)select.add(new Option(type.name,type.name));
+}
+try{showTypes(storedTypes())}catch{el('presetStatus').textContent='Não foi possível acessar os tipos salvos neste navegador.'}
+el('keep').onclick=()=>{
+ const name=el('presetName').value.trim();
+ if(!name){el('presetStatus').textContent='Digite um nome para salvar.';el('presetName').focus();return}
+ try{
+  const types=storedTypes();
+  const index=types.findIndex(type=>type.name===name);
+  if(index>=0 && !confirm('Substituir o tipo “'+name+'”?'))return;
+  const values=Object.fromEntries(savedFields.map(id=>[id,el(id).value]));
+  const preset={name,values,seed,haloEnabled,customParticleTint,linked:el('linkTint').checked};
+  if(index>=0)types[index]=preset;else types.push(preset);
+  persistTypes(types);downloadTypes(types);
+  showTypes(types);
+  el('savedTypes').value='';
+  el('presetStatus').textContent='Tipo salvo. Guarde o JSON para importar na próxima versão.';
+ }catch{el('presetStatus').textContent='Falha ao salvar. Verifique o armazenamento do navegador.'}
+};
+el('savedTypes').onchange=()=>{
+ try{
+  const preset=storedTypes().find(type=>type.name===el('savedTypes').value);
+  if(!preset)return;
+  for(const id of savedFields)el(id).value=preset.values[id]??(id==='tipGap'?preset.values.gap:undefined)??smokeDefaults[id]??(['rimWidth','coreWidth','diameter'].includes(id)?100:id==='focus'?0:id==='drawing'?'star':id==='artStyle'?'original':id==='material'?'Energia':el(id).value);
+  if(preset.values.kind==='Fumaça' && preset.values.plumes===undefined){
+   const wasDouble=preset.values.drawing==='twin';
+   el('plumes').value=wasDouble?2:1;
+   if(wasDouble)el('drawing').selectedIndex=0;
+  }
+  refreshSmoke();
+  const profile=profiles[el('kind').value];
+  for(const id of ['styleMix','particles','light'])profile[id]=+el(id).value;
+  for(const id of ['rimWidth','coreWidth','diameter','focus','riskWidth','outerWidth','particleWidth','shapes']){
+   profile[id]=+el(id).value;
+   el(id+'Value').value=el(id).value+(id==='shapes'?'':'%');
+  }
+  seed=preset.seed;customParticleTint=preset.customParticleTint;
+  el('linkTint').checked=preset.linked;
+  if(haloEnabled!==preset.haloEnabled)el('halo').onclick();
+  el('pieceValue').value=el('pieces').value;el('openingValue').value=el('openingFrame').value;
+  el('presetName').value=preset.name;
+  el('frame').value=0;start=performance.now();
+  el('kind').oninput();
+  el('presetStatus').textContent='Tipo carregado: '+preset.name;
+  el('savedTypes').value='';
+ }catch{el('presetStatus').textContent='Não foi possível carregar este tipo.'}
+};
+preview();requestAnimationFrame(tick)
+</script></html>

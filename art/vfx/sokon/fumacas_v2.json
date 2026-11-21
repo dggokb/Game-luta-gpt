@@ -1,0 +1,12 @@
+[
+ {"nome":"fumaca_corrida_s2","seed":4021,"valores":{"kind":"Fumaça","angle":0,"tint":"#ffffff","styleMix":20,"power":8,"particles":6,"light":0,"drawing":"cross",
+   "plumes":4,"gap":34,"tipGap":60,"joinAt":100,"rise":95,"fall":0,"smokeMirror":"off","windForce":100,"windAngle":180,"windX":330,"windY":300,"windWidth":240}},
+ {"nome":"fumaca_freada_s2","seed":7713,"valores":{"kind":"Fumaça","angle":0,"tint":"#ffffff","styleMix":20,"power":4,"particles":4,"light":0,"drawing":"cross",
+   "plumes":2,"gap":24,"tipGap":40,"joinAt":100,"rise":80,"fall":0,"smokeMirror":"off","windForce":80,"windAngle":0,"windX":220,"windY":310,"windWidth":180}},
+ {"nome":"fumaca_pulo_s2","seed":5150,"valores":{"kind":"Fumaça","angle":0,"tint":"#ffffff","styleMix":20,"power":12,"particles":6,"light":0,"drawing":"saw",
+   "plumes":1,"gap":0,"tipGap":0,"joinAt":100,"rise":140,"fall":0,"smokeMirror":"off","windForce":0}},
+ {"nome":"fumaca_pouso_s2","seed":3307,"valores":{"kind":"Fumaça","angle":0,"tint":"#ffffff","styleMix":20,"power":5,"particles":4,"light":0,"drawing":"star",
+   "plumes":2,"gap":120,"tipGap":120,"joinAt":100,"rise":55,"fall":0,"smokeMirror":"pairs","windForce":0}},
+ {"nome":"fumaca_queda_s2","seed":9091,"valores":{"kind":"Fumaça","angle":0,"tint":"#ffffff","styleMix":20,"power":7,"particles":6,"light":0,"drawing":"star",
+   "plumes":2,"gap":120,"tipGap":120,"joinAt":100,"rise":75,"fall":0,"smokeMirror":"pairs","windForce":0}}
+]
