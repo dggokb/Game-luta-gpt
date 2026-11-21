@@ -137,6 +137,8 @@ final class AiController {
      * golpe encostar (ou passar), se emenda a próxima. Sorteio à parte, como o da corrida.
      */
     private AttackDefinition garraEtapa;
+    /** Combos que ela começou (escolhe a rota de assinatura da vez: ComboBook.routeDaVez). */
+    private int combosComecados;
     private boolean garraSegue;
     private final java.util.Random garraRandom = new java.util.Random(0x6A22A);
     /** A chance de emendar a próxima etapa (acertou, defendido, no vazio), vezes a punição do nível. */
@@ -3060,7 +3062,10 @@ final class AiController {
 
     /** Começa a rota do caderno no passo {@code first} (ou só ele, se não estiver na rota). */
     private void startRoute(CharacterDefinition c, String first) {
-        List<String> book = ComboBook.route(c);
+        // Combo de assinatura (ComboBook.ASSINATURA): um de cada vez com a rota do estilo, quando ele
+        // começa pelo golpe que abriu (senão, a rota do estilo).
+        List<String> book = ComboBook.routeDaVez(c, combosComecados++);
+        if (book.indexOf(first) < 0) book = ComboBook.route(c);
         int index = book.indexOf(first);
         if (index >= 0) {
             route = book;
@@ -3206,7 +3211,7 @@ final class AiController {
             return;
         }
         if (me.grounded && !next.startsWith("j") && !"S".equals(next) && !"SUPER".equals(next) &&
-            !alcanca(me.character(), next, projectedGap(me, target), target)) {
+            !alcancaPasso(me.character(), next, projectedGap(me, target), target)) {
             // O empurrão do golpe tirou o próximo do alcance: fecha com o que ainda alcança.
             next = closer(engine, me, target);
             if (next == null) return;
@@ -3305,7 +3310,7 @@ final class AiController {
             next = "S";
         }
         if (!"S".equals(next) && !"SUPER".equals(next) &&
-            !alcanca(me.character(), next, projectedGap(me, target), target)) return false;
+            !alcancaPasso(me.character(), next, projectedGap(me, target), target)) return false;
         press(next, me, out);
         return true;
     }
@@ -3343,6 +3348,21 @@ final class AiController {
             return option;
         }
         return null;
+    }
+
+    /**
+     * O passo da rota alcança dessa distância: o golpe comum pela régua, o especial de comando (S2,
+     * S3...) pelo alcance dele mais o avanço (CpuSpecials). Antes o especial no meio do combo nunca
+     * "alcançava" (a régua só tem os golpes comuns) e ela trocava o S3 do Kōga pelo Super.
+     */
+    private static boolean alcancaPasso(CharacterDefinition c, String step, float gap, CombatFighter target) {
+        if (ComboBook.special(step) && !"S".equals(step)) {
+            AttackDefinition a = c.attack(step);
+            CharacterDefinition.Special s = c.specials.get(step);
+            if (a == null || s == null) return false;
+            return CpuSpecials.reaches(CpuSpecials.option(step, a, s), gap, target.body(), target.crouchingBody());
+        }
+        return alcanca(c, step, gap, target);
     }
 
     /** O golpe no chão alcança o rival dessa distância (golpe sem alcance no pacote: não). */

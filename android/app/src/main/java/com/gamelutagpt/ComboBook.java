@@ -43,6 +43,30 @@ final class ComboBook {
         for (String[] f : t) FECHO_NO_AR.put(f[0], new String[] {f[1], f[2]});
     }
 
+    /**
+     * Combos de assinatura no chão de quem já tem (docs/personagens/combos-assinatura.md, conferidos
+     * no motor por ComboKogaTest): a CPU alterna, um combo de cada vez, entre a rota do estilo e
+     * estas ("a CPU acompanha tudo", 21/11). Kōga: K2 Estômago (L, M, M, → + H, S3) e K1 Garra (L,
+     * L, M, M, a Garra do tigre, que ela continua sozinha corte a corte).
+     */
+    static final Map<String, List<List<String>>> ASSINATURA = new HashMap<>();
+    static {
+        ASSINATURA.put("p03", java.util.Arrays.asList(
+            java.util.Arrays.asList("L", "M", "M", CancelSystem.COMMAND_HEAVY, "S3"),
+            java.util.Arrays.asList("L", "L", "M", "M", "S")));
+    }
+
+    /**
+     * A rota do combo de número {@code vez} do lutador: a do estilo e as de assinatura, uma de cada
+     * vez (sem assinatura, sempre a do estilo).
+     */
+    static List<String> routeDaVez(CharacterDefinition c, int vez) {
+        List<List<String>> extra = ASSINATURA.get(c.id);
+        if (extra == null || extra.isEmpty()) return route(c);
+        int k = Math.floorMod(vez, extra.size() + 1);
+        return k == 0 ? route(c) : Collections.unmodifiableList(extra.get(k - 1));
+    }
+
     private static final Map<String, List<String>> CACHE = new HashMap<>();
 
     static synchronized List<String> route(CharacterDefinition c) {

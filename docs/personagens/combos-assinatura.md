@@ -1,4 +1,4 @@
-# Combos de assinatura: Ryūga, Yin-lu e Bonnie
+# Combos de assinatura: Ryūga, Yin-lu, Kōga e Bonnie
 
 Os dois primeiros refeitos. Tudo aqui está no jogo, conferido no motor (`ComboRyugaTest`,
 `ComboYinluTest`, `GolpeDeCorridaTest`) e gravado no PC. Os outros entram quando cada um for refeito,
@@ -113,6 +113,39 @@ longo, leve e aéreo.
 Regras da base que vieram com a Yin-lu (valem para todos): todo golpe que lança deixa pelo menos 44
 quadros de atordoamento (`launchHitstunFrames`); golpe de várias pancadas só cancela em pulo depois
 da última; e o pulo logo depois de lançar, saindo do ar, é o super pulo que persegue.
+
+---
+
+## Kōga (p03): o brigão de perto, termina no especial (21/11)
+
+**Jeito de combar:** pressão colada, pouco pulo. O combo fica no chão e fecha num especial que
+leva o rival: a Garra do tigre (três cortes), a Investida da voadora (7 acertos, derruba) ou o
+Uppercut da casa (joga em arco; ele corre, pega no chão e recomeça). O **H joga longe na parede**:
+no meio da arena o combo sai do **M** para o especial; no canto, o H quica e volta para os dois
+socos. A bica (→ + M) é golpe alto: abre o combo de surpresa, não serve no meio dele (sai em 20
+quadros e o atordoamento é curto).
+
+### Os combos (conferidos no motor, contra o Ryūga parado: `ComboKogaTest`)
+
+| # | Nome | Sequência | Acertos |
+|---|---|---|---|
+| K1 | Garra | L, L, M, M, S1 Garra do tigre (os três cortes) | 7 |
+| K2 | Estômago | L, M, M, → + H (dois socos) → S3 Investida da voadora | 12 |
+| K3 | Uppercut da casa | L, M, M, S2 (arco) → corre → ↓ + M no caído → L, M, → + H, S3 | 9 |
+| K4 | Sobe | 2L, M, 2H (lança) → super pulo → jL, jM → pulo → jL, jM, jH | 8 |
+| K5 | Bica | → + M (golpe alto), S2, Super | 5 |
+| K6 | Voadora correndo | corre → H (voadora, lança) → corre → 2H → super pulo → jL, jM → pulo → jL, jM, jH | 7 |
+| K7 | Fecho de Super | L, L, M, M, S1 (três cortes), Super | 10 |
+| K8 | Canto | (no canto) L, L, M, M, H (quica na parede), → + H, S3 | 14 |
+
+O que não emendou e ficou de fora: depois do H no meio da arena (vai longe para a Garra e o S2);
+L → → + M (o L não cancela no golpe alto); a bica no meio do combo; depois da voadora correndo e do
+↓ + M no caído, o combo cai no segundo golpe (sobra a versão no ar, K6).
+
+**A CPU:** alterna, um combo de cada vez, entre a rota do estilo (L, M, M, 2H, combo no ar e S2) e
+as duas de assinatura, K2 e K1 (`ComboBook.ASSINATURA`). Para isso a CPU passou a saber até onde
+o especial de comando chega no meio do combo (o alcance mais o avanço, `CpuSpecials`): antes ela
+achava que o S3 nunca alcançava e trocava pelo Super. Teste: `ComboKogaTest`.
 
 ---
 
