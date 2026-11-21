@@ -2230,3 +2230,6 @@ no lugar do `impacto_v08_forte` só ali.
 - **L reforçado (21/11):** "Reforça o brilho e faz l m h". O `impacto_v09_fraco` com a
   transparência por alfa^0,5, como o H: o disco dourado aparece em volta da cruz. Vídeo do Kōga
   L, M e H em sequência, normal e câmera lenta. O M (cel14) ficou sem reforço. Gravado no PC.
+- **M reforçado (21/11):** "Reforça o M tbem". O `impacto_v09_medio` com alfa^0,5, como o L e o
+  H: o brilho dourado aparece em volta da cruz. Agora os três (L, M, H) reforçados. Vídeo do Kōga
+  L, M e H, normal e câmera lenta. Gravado no PC.
