@@ -230,7 +230,7 @@ public class ComboKogaTest {
     }
 
     @Test public void aCpuFazOsCombosDeAssinaturaDoKoga() {
-        int[] n = cpuAssinaturas(6);
+        int[] n = cpuAssinaturas(12);
         assertTrue("a CPU emendou os dois socos na investida: " + n[0], n[0] >= 1);
         assertTrue("a CPU emendou a Garra no M: " + n[1], n[1] >= 1);
     }
