@@ -2227,3 +2227,6 @@ no lugar do `impacto_v08_forte` só ali.
   em `art/vfx/teste_soco_forte_v09/fraco_impacto_cel14_2/`. Vídeo do L do Kōga, normal e câmera
   lenta; o disco fica fraco no cenário (como o cel10 antes do reforço). Gravado no PC; falta o
   dono ver no celular. Agora L, M e H são da mesma família dourada.
+- **L reforçado (21/11):** "Reforça o brilho e faz l m h". O `impacto_v09_fraco` com a
+  transparência por alfa^0,5, como o H: o disco dourado aparece em volta da cruz. Vídeo do Kōga
+  L, M e H em sequência, normal e câmera lenta. O M (cel14) ficou sem reforço. Gravado no PC.
