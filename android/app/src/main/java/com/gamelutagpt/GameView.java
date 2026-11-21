@@ -6018,6 +6018,12 @@ public class GameView extends SurfaceView
      * ({@code -Dgameluta.fumacaSokon=true} liga para gravar).
      */
     static final boolean FUMACA_SOKON = Boolean.getBoolean("gameluta.fumacaSokon");
+    /**
+     * A fumaça do pulo comum feita pelo dono no Sōkon FX (21/11: "tentar esse pra pulo"; a folha
+     * dele em art/vfx/sokon/dono). Desligada até ele aprovar no vídeo
+     * ({@code -Dgameluta.fumacaPuloDono=true} liga para gravar).
+     */
+    static final boolean FUMACA_PULO_DONO = Boolean.getBoolean("gameluta.fumacaPuloDono");
 
     /** A fumaça de queda (pouso do pulo e o corpo batendo no chão): art/vfx/fumaca_queda_v01. */
     private static final String FUMACA_QUEDA = "fumaca_queda_v01";
@@ -6319,7 +6325,9 @@ public class GameView extends SurfaceView
     private void efeitosDeMovimento(int i, CombatFighter f) {
         float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
-            if (FUMACA_SOKON && efeitos.tocar("fumaca_pulo_s4", x, GROUND_Y, 1f, f.facing < 0)) {
+            if (FUMACA_PULO_DONO && efeitos.tocar("fumaca_pulo_dono", x - f.facing * PULO_FUMACA_ATRAS, GROUND_Y, 1f, f.facing < 0)) {
+                efeitos.atrasDosLutadores();
+            } else if (FUMACA_SOKON && efeitos.tocar("fumaca_pulo_s4", x, GROUND_Y, 1f, f.facing < 0)) {
                 efeitos.atrasDosLutadores();
             // Teste do dono (11/11): a fumaça do super pulo, menor, também no pulo comum.
             } else if (efeitos.tocar("super_pulo_v01", x - f.facing * PULO_FUMACA_ATRAS, GROUND_Y, PULO_COMUM_ESCALA, f.facing < 0)) {

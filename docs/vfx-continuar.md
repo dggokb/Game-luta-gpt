@@ -1853,6 +1853,14 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   pontas), no tamanho das de hoje. As tentativas 1 a 3 (`fumacas.json`, `fumacas_v2.json`,
   `fumacas_v3.json`, `clarear.py`) ficaram de registro; as folhas delas saíram.
 
+- **Depois:** a busca automática (`art/vfx/sokon/buscar.js`: 900 combinações por fumaça, nota pela
+  forma quadro a quadro contra as de hoje) não passou de 21–42% de semelhança; a fumaça do Sōkon
+  empilha elipses e não faz as volutas desenhadas das de hoje. O dono mandou a folha dele ("tentar
+  esse pra pulo"): `art/vfx/sokon/dono/Fuma_a-cel92-4046794477-4x4-24fps.png` (quadros em
+  `dono/pulo_cel92_4046794477`), instalada como `fumaca_pulo_dono` (origem 185,338, escala 0,62,
+  24 por segundo), no pulo comum, 40 px atrás do lutador e atrás dele. `GameView.FUMACA_PULO_DONO`
+  desligado até ele aprovar `android/app/build/sprite-review/fumaca_pulo_dono.mp4`.
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a
