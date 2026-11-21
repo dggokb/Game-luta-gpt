@@ -30,10 +30,16 @@ public class HudArtTest {
         return bitmap;
     }
     // Pontos da barra com raios na tela de 1280x720 (medidas da arte, ver HudRenderer.RAIOS_P1/P2).
-    private static final int ANEL_X=Math.round(704*HudRenderer.RAIOS_ESCALA),ANEL_Y=Math.round(HudRenderer.raiosTela(278));
-    private static final int CELULA_Y=Math.round(HudRenderer.raiosTela(233));
+    // Na barra compacta (HudRenderer.COMPACTA, as medidas de COMPACTA_P1/P2), os mesmos pontos.
+    private static final boolean C=HudRenderer.COMPACTA;
+    private static final int ANEL_X=Math.round((C?750:704)*HudRenderer.RAIOS_ESCALA),ANEL_Y=Math.round(HudRenderer.raiosTela(C?103:278));
+    private static final int CELULA_Y=Math.round(HudRenderer.raiosTela(C?104:233));
     /** Centro do quadradinho {@code i} do Super (o do CPU começa em x=1084 da arte). */
-    private static int celula(boolean cpu,int i){return Math.round(((cpu?1084:594.5f)+i*29.9f)*HudRenderer.RAIOS_ESCALA);}
+    private static int celula(boolean cpu,int i){
+        if(C)return Math.round((cpu?1052.5f+i*27.1f:583.5f+i*27.6f)*HudRenderer.RAIOS_ESCALA);
+        return Math.round(((cpu?1084:594.5f)+i*29.9f)*HudRenderer.RAIOS_ESCALA);}
+    /** Um ponto da vida do jogador na tela. */
+    private static final int VIDA_X=350,VIDA_Y=C?46:82;
 
     @Test public void upperMeterTracksAssistCooldownIndependentlyFromSuper() throws Exception {
         GameView game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
@@ -110,12 +116,12 @@ public class HudArtTest {
         active.restoreLife();
         Bitmap full=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         draw(game,"drawHud",new Canvas(full));
-        int healthy=full.getPixel(350,82);
+        int healthy=full.getPixel(VIDA_X,VIDA_Y);
         assertTrue("Live life must be green",Color.green(healthy)>Color.red(healthy));
         active.life=0;active.recoverableLife=0;
         Bitmap empty=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         draw(game,"drawHud",new Canvas(empty));
-        assertNotEquals("Artwork must not bake in full health",healthy,empty.getPixel(350,82));
+        assertNotEquals("Artwork must not bake in full health",healthy,empty.getPixel(VIDA_X,VIDA_Y));
         active.restoreLife();
         Bitmap review=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         Canvas c=new Canvas(review);

@@ -68,8 +68,8 @@ time empilhado no canto (`hud_compacto_dbfz.png`): uma faixa de ~13% da altura.
   os nomes, ∞/TREINO e MENU. TAG, SHINKAI e SUPER ficam pintados; não há o número do Super.
 - `HudRenderer.COMPACTA` troca a arte e as medidas (`RAIOS_P1/P2`, nomes, relógio, MENU, anel do
   assist); o desenho ao vivo é o mesmo. O toque do MENU vai para 572–708 × 62–104.
-- **Desligada** (`-Dgameluta.barraCompacta=true` liga para gravar) até o dono aprovar
-  `android/app/build/sprite-review/hud_compacto.mp4`.
+- **Ligada** ("põe", 21/11, depois do vídeo `hud_compacto.mp4`); `-Dgameluta.barraCompacta=false`
+  volta à barra de raios de três andares.
 - O Codex foi instalado na sessão (`npm install -g @openai/codex`, `codex login --device-auth` com a
   conta do dono); cada imagem: `codex exec --skip-git-repo-check --sandbox workspace-write --image
   referencia.png - < prompt.txt`.

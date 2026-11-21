@@ -435,9 +435,9 @@ final class HudRenderer {
      * versões geradas no Codex, a do time empilhado no canto): art/hud/compacto/hud_compacto_dbfz.png
      * montada por tools/hud/montar_barra_compacta.py. Uma faixa de ~13% da altura no lugar dos três
      * andares de ~26%. Mesmo desenho ao vivo, outras medidas (COMPACTA_P1/P2 e as do centro).
-     * Desligada até ele aprovar ({@code -Dgameluta.barraCompacta=true} liga para gravar).
+     * Ligada ("põe", 21/11); {@code -Dgameluta.barraCompacta=false} volta à barra de raios de três andares.
      */
-    static final boolean COMPACTA = Boolean.getBoolean("gameluta.barraCompacta");
+    static final boolean COMPACTA = !"false".equals(System.getProperty("gameluta.barraCompacta"));
     static final String RAIOS_ARQUIVO = COMPACTA ? "ui/hud/hud-compacto.png" : "ui/hud/hud-raios.png";
     static final float RAIOS_ESCALA = 1280f / 1672f, RAIOS_TOPO = COMPACTA ? 0f : 76f, RAIOS_Y = COMPACTA ? 2f : -6f;
 
