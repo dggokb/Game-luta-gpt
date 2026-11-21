@@ -1822,6 +1822,26 @@ do `SUPER_PODER`, esfera do `concentra`) está na branch `claude/golpes-personag
   e a altura das labaredas (até 45% da subida) caem juntas. Vídeo `aura_shinkai_fim.mp4` (a força indo
   e voltando, gravada com uma função de teste que não ficou no código).
 
+## Fumaças feitas no Sōkon FX do dono (21/11)
+
+- **Pedido:** o dono está fazendo um "fazedor de effect", o Sōkon FX (página HTML com canvas:
+  impacto, corte, projétil, fogo, água, gosma, fumaça; exporta folha 4×4 de 512 px). "Usa esse e
+  vamos criar efeitos de fumaça pra corridas, pulos, pés etc. Adiciona como achar melhor e cria
+  vídeos."
+- **Como se opera sem tela:** `art/vfx/sokon/SokonFX_3.html` (a versão dele) e
+  `art/vfx/sokon/gerar.js` (Playwright: põe os controles de cada tipo do `fumacas.json`, a semente
+  da variação, e chama o `draw` da página para os 16 quadros; sai `<nome>/q_01..q_16.png`). Para
+  outra versão da ferramenta, troque o HTML. Os tipos estão em `art/vfx/sokon/fumacas.json`.
+- **Feito:** cinco fumaças, cinza claro (#D9D5CF), cel shading 65, a 24 por segundo (16 quadros,
+  ~670 ms), origem nos pés (256,320 do quadro):
+  `fumaca_corrida_s1` (arranque do dash: três plumas que o vento leva para trás; 0,6),
+  `fumaca_freada_s1` (nova: a freada do dash, os pés deslizando, vento para a frente; 0,5),
+  `fumaca_pulo_s1` (duas plumas espelhadas em V; 0,6; no super pulo a 1,4),
+  `fumaca_pouso_s1` (quatro plumas baixas espelhadas; 0,6) e `fumaca_queda_s1` (o corpo no chão:
+  seis plumas; 0,62, com a beira do quadro apagando aos poucos). Todas atrás dos lutadores.
+- **Desligadas** (`GameView.FUMACA_SOKON`; `-Dgameluta.fumacaSokon=true` liga para gravar) até o
+  dono aprovar `android/app/build/sprite-review/fumacas_sokon.mp4` (hoje e as novas lado a lado).
+
 ## Fora do VFX, o que ficou pendente
 
 - **Jogar o APK e dizer se os golpes ficaram diferentes de um personagem para outro.** É a

@@ -1,0 +1,120 @@
+[
+ {
+  "nome": "fumaca_corrida_s1",
+  "seed": 4021,
+  "valores": {
+   "kind": "Fumaça",
+   "angle": 0,
+   "tint": "#d9d5cf",
+   "styleMix": 65,
+   "power": 6,
+   "particles": 14,
+   "light": 0,
+   "drawing": "star",
+   "plumes": 3,
+   "gap": 22,
+   "tipGap": 50,
+   "joinAt": 100,
+   "rise": 150,
+   "fall": 0,
+   "smokeMirror": "off",
+   "windForce": 70,
+   "windAngle": 180,
+   "windX": 300,
+   "windY": 300,
+   "windWidth": 200
+  }
+ },
+ {
+  "nome": "fumaca_freada_s1",
+  "seed": 7713,
+  "valores": {
+   "kind": "Fumaça",
+   "angle": 0,
+   "tint": "#d9d5cf",
+   "styleMix": 65,
+   "power": 4,
+   "particles": 10,
+   "light": 0,
+   "drawing": "star",
+   "plumes": 2,
+   "gap": 22,
+   "tipGap": 40,
+   "joinAt": 100,
+   "rise": 120,
+   "fall": 0,
+   "smokeMirror": "off",
+   "windForce": 60,
+   "windAngle": 0,
+   "windX": 220,
+   "windY": 310,
+   "windWidth": 160
+  }
+ },
+ {
+  "nome": "fumaca_pulo_s1",
+  "seed": 5150,
+  "valores": {
+   "kind": "Fumaça",
+   "angle": 0,
+   "tint": "#d9d5cf",
+   "styleMix": 65,
+   "power": 7,
+   "particles": 16,
+   "light": 0,
+   "drawing": "star",
+   "plumes": 2,
+   "gap": 24,
+   "tipGap": 120,
+   "joinAt": 80,
+   "rise": 85,
+   "fall": 0,
+   "smokeMirror": "pairs",
+   "windForce": 0
+  }
+ },
+ {
+  "nome": "fumaca_pouso_s1",
+  "seed": 3307,
+  "valores": {
+   "kind": "Fumaça",
+   "angle": 0,
+   "tint": "#d9d5cf",
+   "styleMix": 65,
+   "power": 6,
+   "particles": 14,
+   "light": 0,
+   "drawing": "star",
+   "plumes": 4,
+   "gap": 44,
+   "tipGap": 96,
+   "joinAt": 100,
+   "rise": 110,
+   "fall": 0,
+   "smokeMirror": "pairs",
+   "windForce": 0
+  }
+ },
+ {
+  "nome": "fumaca_queda_s1",
+  "seed": 9091,
+  "valores": {
+   "kind": "Fumaça",
+   "angle": 0,
+   "tint": "#d9d5cf",
+   "styleMix": 65,
+   "power": 10,
+   "particles": 20,
+   "light": 0,
+   "drawing": "star",
+   "plumes": 6,
+   "gap": 32,
+   "tipGap": 66,
+   "joinAt": 100,
+   "rise": 130,
+   "fall": 0,
+   "smokeMirror": "pairs",
+   "windForce": 0
+  }
+ }
+]
