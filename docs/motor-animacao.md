@@ -5,6 +5,12 @@ o motor mexe no desenho na hora de pintar: achata e estica, inclina, mistura a t
 deixa rastro. **Só apresentação**: o motor de combate, o frame data e as caixas não mudam (a
 ferramenta de revisão confere que o estado da luta sai igual com o motor ligado e desligado).
 
+> **Desligado por padrão desde 21/11** (o dono: "queria tirar tudo p testar"). O jogo começa
+> com o ANIM OFF: nenhuma mexida por cima do desenho dos vídeos. O botão ANIM do Modo Teste (e a
+> tecla F4) liga de novo: 100% → 150% → 50% → desligado. Suspeita a conferir com ele: os cortes
+> da Garra do Kōga (`S1A`, `SG`) são golpes `NORMAL` cadastrados no pack e recebiam antecipação,
+> seguir, trava e estalo, o que pode ser o "pêndulo" do corpo e do poder que ele viu no S1.
+
 ## O que ele faz
 
 Organizado pelos 12 princípios da animação (o que cada efeito resolve):

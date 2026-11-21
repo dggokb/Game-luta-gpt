@@ -39,12 +39,30 @@ public class AnimacaoNosEspeciaisTest {
         return maior;
     }
 
+    /** O motor começa desligado (21/11) e as medidas abaixo o ligam só enquanto medem. */
+    private static float comMotorLigado(int[] direcoes, PadInput.Button botao) {
+        boolean antes = AnimacaoLutador.AJUSTES.ligado;
+        AnimacaoLutador.AJUSTES.ligado = true;
+        try {
+            return maiorInclinacao(direcoes, botao);
+        } finally {
+            AnimacaoLutador.AJUSTES.ligado = antes;
+        }
+    }
+
     @Test public void especialNaoBalancaOCorpo() {
         // S2: → ↓ ↘ + H (direções da tela, olhando para a direita).
-        assertTrue(maiorInclinacao(new int[] {1, 3, 2}, PadInput.Button.HEAVY) < 0.5f);
+        assertTrue(comMotorLigado(new int[] {1, 3, 2}, PadInput.Button.HEAVY) < 0.5f);
     }
 
     @Test public void normalForteContinuaComAntecipacaoEContinuidade() {
-        assertTrue(maiorInclinacao(new int[] {0}, PadInput.Button.HEAVY) > 1f);
+        assertTrue(comMotorLigado(new int[] {0}, PadInput.Button.HEAVY) > 1f);
+    }
+
+    /** Pedido do dono (21/11): o jogo começa sem nenhuma mexida por cima do desenho. */
+    @Test public void oMotorComecaDesligadoENaoMexeNoGolpe() {
+        assertFalse(AnimacaoLutador.AJUSTES.ligado);
+        assertEquals("ANIM OFF", AnimacaoLutador.rotulo());
+        assertTrue(maiorInclinacao(new int[] {0}, PadInput.Button.HEAVY) < 0.01f);
     }
 }

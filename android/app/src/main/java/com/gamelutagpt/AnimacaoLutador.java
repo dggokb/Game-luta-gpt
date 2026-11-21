@@ -16,7 +16,15 @@ final class AnimacaoLutador {
 
     /** Níveis do botão ANIM (e da tecla F4): intensidade, e 0 = desligado. */
     static final float[] NIVEIS = {1f, 1.5f, 0.5f, 0f};
-    private static int nivel;
+    /**
+     * Começa desligado (o dono, 21/11: "queria tirar tudo p testar"): nenhuma mexida por cima do
+     * desenho dos vídeos (antecipação, estalo, seguir o golpe, trava, smear, achatar). O ANIM liga.
+     */
+    private static int nivel = NIVEIS.length - 1;
+
+    static {
+        AJUSTES.ligado = false;
+    }
 
     /** Próximo nível: 100% → 150% → 50% → desligado → 100%. */
     static void proximoNivel() {
